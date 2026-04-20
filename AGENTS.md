@@ -14,7 +14,7 @@ in plain English — see *Adding or retiring agents* near the bottom.
 | Slug              | Where it runs                                                                             | Role                                                                                                                                                                                   | Owns these paths                                               | Hands-off paths                                                                 |
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, merges PRs, adds/retires agents, final authority.                                                                                               | —                                                              | —                                                                               |
-| **claude-brain**  | Claude Code on cntrl_alt_lenny's PC **or Mac** (dedicated session, separate from the decomper)      | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task. Has spot authority to merge PRs when cntrl_alt_lenny is AFK and flags doing so in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`                       | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
+| **claude-brain**  | Claude Code on cntrl_alt_lenny's PC **or Mac** (dedicated session, separate from the decomper)      | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`                       | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
 | **claude-cloud**  | Claude Code on the web (no access to the ROM, `dsd`, or `ninja`)                          | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via the GitHub MCP integration. Cannot run local builds, so delegates verification to brain. | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **claude-pc**     | Claude Code on cntrl_alt_lenny's PC (decomper session)                                              | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
@@ -165,15 +165,20 @@ become a decomp target.
 1. **Before starting any task**, run `git fetch origin` and read this
    file (top to bottom). State on disk may be behind what's on GitHub.
 2. **Never push to `main` directly.** Every change is a pull request.
-   cntrl_alt_lenny merges. This is the only review checkpoint, so it matters.
+   The brain reviews locally, summarizes to cntrl_alt_lenny in plain
+   English, and merges on OK. cntrl_alt_lenny retains veto — the brain's
+   job is to make the review/merge decision easy to approve, not to
+   outsource the click.
 3. **One branch per task.** Branch name = `<agent-slug>/<kebab-scope>`,
    e.g. `claude-pc/ov005-decomp`, `claude-cloud/symbol-analyzer`.
    One branch, one PR, one concern.
 4. **Stay inside your "Owns" column.** If the task needs a change in
    another agent's territory, either open a PR in that agent's scope
    (as them, not you) or ask cntrl_alt_lenny / the brain to re-partition.
-5. **Open a PR when done.** Don't merge your own PR. Don't force-push.
-   Describe in the PR body: what changed, why, any follow-ups.
+5. **Open a PR when done.** Don't merge your own PR — that's the
+   brain's job (including for brain-authored PRs, on cntrl_alt_lenny's
+   OK). Don't force-push. Describe in the PR body: what changed,
+   why, any follow-ups.
 
 ## Branch naming
 
@@ -192,8 +197,20 @@ No-one else touches it without coordination.
 2. Open a PR titled with a short summary of the change (under 70 chars).
 3. PR description says: **what** changed, **why** (link the task brief
    or a sentence of context), anything the reviewer should know.
-4. The brain reviews. cntrl_alt_lenny merges.
-5. After merge, delete the branch (GitHub offers a button).
+4. **Brain reviews locally** — pulls the branch, runs the appropriate
+   subset of `ninja rom` / `./dsd check modules` / `ninja objdiff` /
+   `python tools/progress.py` to verify the PR doesn't regress the
+   baseline, then summarizes for cntrl_alt_lenny in plain English:
+   what changed, why it's safe, what's next. cntrl_alt_lenny doesn't
+   need to read the diff — the summary is the interface.
+5. **Brain offers to merge.** On cntrl_alt_lenny's OK (explicit "merge
+   it" or a thumbs-up), merge with `gh pr merge <N> --squash
+   --delete-branch` (squash matches the existing commit history).
+   When cntrl_alt_lenny is AFK, the brain self-merges and notes so in
+   the PR body — see *Rules every agent follows* §2.
+6. After merge, delete the branch. If `--delete-branch` fails from a
+   worktree because `main` is checked out in the main clone, finish
+   with `git push origin --delete <branch>`.
 
 ## The "brain" role
 
@@ -208,6 +225,12 @@ Responsibilities:
     `ninja rom`, `./dsd.exe check modules`, `python tools/progress.py`
     (and `python tools/analyze_symbols.py` once that lands) to verify
     the PR doesn't regress any module's checksum or the target list.
+  - **Summarizes every PR for cntrl_alt_lenny in plain English before
+    merging** — what changed, why it's safe, what's next. Brain has
+    the context; cntrl_alt_lenny shouldn't have to reverse-engineer
+    the diff to approve. Then offers to merge; executes on OK. This
+    applies even to brain-authored PRs (e.g. AGENTS.md edits, briefs,
+    baserom-hash records) — cntrl_alt_lenny still gets the yes/no.
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's cntrl_alt_lenny's call.
 
