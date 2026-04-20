@@ -38,6 +38,45 @@ Claude Code session open with the toolchain installed and a current
 is stateless — the next brain reads this file + *State of play* below
 and picks up.
 
+### Brain onboarding on a fresh machine
+
+If you're a brand-new `claude-brain` session starting cold on a PC or
+Mac that has never built this repo, do these one-time steps before you
+touch any PR. cntrl_alt_lenny will typically say something like *"you are
+the brain, review everything"* — that's your cue to run this checklist.
+
+1. **Be at the repo root.** `git clone https://github.com/cntrl-alt-lenny/gx-spirit-caller`
+   then `cd` into it, or `cd` into an existing clone.
+2. **Sync with GitHub.** `git fetch origin && git pull --ff-only`.
+3. **Drop the baserom in place.** Copy `baserom_eur.nds` (SHA-1
+   `1da50df7c210fae96dc69b3825554b9ce13b4f75`) to `orig/baserom_eur.nds`.
+   Ask cntrl_alt_lenny to AirDrop / iCloud-share / USB-transfer it from a machine
+   that already has it — do **not** re-dump or redownload. The SHA-1
+   is pinned, any other copy will fail `tools/configure.py`.
+4. **Install Python deps.** `python -m pip install -r tools/requirements.txt`
+   (gets `requests`, `pyperclip`). Python 3.11+ required per CLAUDE.md.
+5. **Generate the build graph + verify the ROM.** `python tools/configure.py eur`
+   (verifies baserom SHA-1 and writes `build.ninja`). **Do this again
+   every time new `.c` files appear in `src/` from a decomper PR** — the
+   linker will otherwise error with *"ov005_*.o not found"*.
+6. **First build.** `ninja rom`. First run auto-downloads the native
+   `dsd`, `objdiff-cli`, and `mwccarm`/`mwldarm` (via `wibo` on Linux,
+   `wine` on macOS, direct on Windows). Takes a few minutes. Subsequent
+   builds are seconds.
+7. **Confirm the baseline.** Run the current module-check command from
+   *State of play* below. Today's baseline is 24/27 OK (main / DTCM /
+   overlay 4 still fail — expected, placeholder-symbol artifacts).
+8. **Read `State of play`** and tackle whatever *Next-brain TODO* lists.
+
+Afterwards, your loop is: fetch, read State of play, review any open
+PRs (`gh pr list --state open`), verify them locally (configure +
+ninja rom + `./dsd.exe check modules -c config/eur/arm9/config.yaml`),
+merge or comment, update State of play, write briefs for cntrl_alt_lenny to
+paste to other agents, repeat.
+
+On **Windows**, `dsd` is shipped as `./dsd.exe`; on **macOS/Linux** it's
+`./dsd`. The `dsd check modules` invocation adapts accordingly.
+
 ### State of play (brain keeps this current)
 
 The brain updates this section at the end of every working chunk so
@@ -45,50 +84,76 @@ the next brain (possibly on a different machine) can catch up in under
 a minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-20, after merging PRs #4 / #5 / #6 / #7 / #8.
+**Last updated:** 2026-04-20, after merging PRs #4–#17 (14 PRs today).
 
 **Baseline:** `ninja rom` succeeds, `./dsd.exe check modules` reports
 24/27 OK. ARM9 main / DTCM / overlay 4 still fail — expected,
 placeholder-symbol artifacts per CLAUDE.md, not caused by agent work.
 
-**Matched function count:** 12 (all 4-byte `bx lr` stubs in overlay 5:
-`func_ov005_021aa4a0..ac` from the first chunk, plus
-`021aaf00/04`, `021ab3e0/e4`, `021ad058/05c`, `021b0b28/2c` from PR #8).
+**Matched function count:** 17 — 12 × 4-byte `bx lr` stubs in ov005
+plus 5 easy-tier leaves in ov005 from PR #11 (`021ab0fc`, `021ac9c8`,
+`021acacc`, `021acad4`, `021ad048` — first non-stub matches in the
+repo, all hand-decomped with disassembly-prefaced comments).
 
-**Merged today:**
+**Merged today (in order):**
   - PR #4 — `tools/analyze_symbols.py`, 6-tier decomp target analyzer.
   - PR #5 — `libs/nitro/` + `libs/runtime/` header scaffolding.
-  - PR #6 — Brief 001 published (docs/briefs/001-*).
-  - PR #7 — State-of-play section + brief 002 (docs/briefs/002-*).
-  - PR #8 — Brief 001 shipped by `claude-pc`: 8 ov005 trivial stubs.
+  - PR #6 — Brief 001 published (`docs/briefs/001-*.md`).
+  - PR #7 — State-of-play section + brief 002 (`docs/briefs/002-*.md`).
+  - PR #8 — `claude-pc` ships brief 001: 8 ov005 `bx lr` stubs.
+  - PR #9 — Rename "Leona" → "cntrl_alt_lenny" throughout AGENTS.md.
+  - PR #10 — Analyzer: bulk-candidate groups + `__sinit`-by-overlay
+    summary (claude-cloud, brief 002).
+  - PR #11 — `claude-pc` ov005 easy-tier: 5 hand-decomped leaves.
+  - PR #12 — `tools/rename_symbol.py`, safe symbol rename with
+    validation (cloud, unbriefed but useful — decomper should use it).
+  - PR #13 — Analyzer: `--diff` mode for snapshot-over-snapshot
+    progress deltas (cloud, unbriefed; brain rebased onto #10 during
+    review since they both touched `analyze_symbols.py`).
+  - PR #14 — `tools/overlay_coupling.py`, cross-module call-density
+    report (cloud, unbriefed).
+  - PR #15 — `tools/data_symbol_sizes.py`, infers `data_*` extents
+    from symbol-address gaps (cloud, unbriefed).
+  - PR #16 — `generate_heatmap.py` per-cell progress-bar overlay so
+    partial matches are visible (cloud, unbriefed).
+  - PR #17 — `libs/nitro/include/nitro/fx.h`, FX_* fixed-point math
+    signatures (cloud, unbriefed; mildly preemptive vs the "add only
+    when needed" rule in `libs/nitro/README.md`, but self-aware about
+    it — file's own header explains the drift risk. Kept for now.)
 
 **In flight:**
-  - `claude-pc` → should now pick up the ov005 **easy-tier** leaves
-    listed at the bottom of `docs/briefs/001-ov005-finish-trivials.md`
-    (next 3–5 picks of size 0x8..0x20). New branch: likely
-    `claude-pc/ov005-easy-tier`.
-  - `claude-cloud` → Brief 002: extend the analyzer with a "bulk
-    candidates" section. Branch: `claude-cloud/analyzer-bulk-groups`.
+  - `claude-pc` → nothing pending. Brief 001 (trivials + easy-tier)
+    is fully consumed. Next chunk needs a new brief (likely **brief
+    003: `__sinit` bulk match**, 51 templated functions — the
+    highest-leverage remaining target per `targets.md`).
+  - `claude-cloud` → no open brief. cntrl_alt_lenny said Cloud is "finished"
+    for now. If/when Cloud resumes, brief 003 scaffolding (e.g. a
+    `libs/runtime/sinit.c` template) is the natural next ask.
 
 **Next-brain TODO:**
-  1. Review the next `claude-pc` PR locally. Before `ninja rom`, **re-run
-     `python tools/configure.py eur`** — new `.c` files require a rebuild
-     of `build.ninja` or the linker errors with `"ov005_stubs_*.o" not
-     found` (seen during PR #8 review).
-  2. Review `claude-cloud`'s PR when it arrives — tools change, re-run
-     the analyzer and spot-check the new bulk-candidates output.
-  3. Re-run `python tools/analyze_symbols.py --version eur` after any
-     `claude-pc` merge to refresh `build/eur/analysis/targets.md`.
-  4. After the ov005 easy-tier lands, scope the **__sinit bulk match**
-     as brief 003 for `claude-pc` — 51 templated functions across 15
-     overlays is the highest-leverage next chunk.
-  5. Stale remote branch `claude-pc/ov005-finish-trivials` still exists
-     (PR #8 squash-merged but auto-delete couldn't prune it because the
-     decomper's worktree still tracks it). Delete once `claude-pc`
-     confirms it's off that branch locally.
+  1. **Write brief 003 for `claude-pc`**: the `__sinit` bulk match.
+     Target list: 51 `__sinit_*` across 15 overlays (see
+     `libs/runtime/README.md`). Check `build/eur/analysis/targets.md`
+     for the per-size / per-overlay breakdown — after re-running
+     `python tools/analyze_symbols.py --version eur`.
+  2. After the decomper ships brief 003, re-run the analyzer (`--diff`
+     is worth a try now — PR #13 landed it) and look for cascades:
+     every newly-named callee bumps unmatched functions up the tier
+     list.
+  3. Stale remote branches may still exist if cntrl_alt_lenny's decomper or
+     cloud session still tracks merged branches locally. Safe to
+     delete with `git push origin --delete <branch>` once the agents
+     confirm they're off those branches.
+  4. Tools shipped but not yet used by the decomper:
+     `tools/rename_symbol.py`, `tools/overlay_coupling.py`,
+     `tools/data_symbol_sizes.py`. Mention them in the next brief so
+     the decomper knows they exist.
 
-**New agents?** Not yet. Three AI slots (brain / cloud / pc) is enough
-coordination surface. Re-evaluate after brief 002 + brief 003 land.
+**New agents?** Still no. The brain + decomper + cloud slot-split held
+up cleanly under today's traffic (14 PRs, one merge conflict). Reopen
+the question if a fourth role emerges from the next 1-2 weeks of
+work — e.g. a dedicated `asset-pc` agent for graphics / sound if those
+become a decomp target.
 
 ## Rules every agent follows
 
@@ -188,14 +253,17 @@ itself:
 
 ### Open briefs
 
+(none — briefs 001 and 002 both shipped and merged. Next brain should
+write brief 003 for `claude-pc` on the `__sinit` bulk match.)
+
+### Closed briefs (reference)
+
 - [`docs/briefs/001-ov005-finish-trivials.md`](docs/briefs/001-ov005-finish-trivials.md)
-  — `claude-pc`: finish the 8 remaining trivial (size=0x4) stubs in
-  overlay 5, then start the easy-tier leaves. Explicitly **not** yet
-  `func_ov005_021aaea8` (0x58, medium tier).
+  — `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
+  matched (8 trivial + 5 easy-tier leaves).
 - [`docs/briefs/002-analyzer-bulk-groups.md`](docs/briefs/002-analyzer-bulk-groups.md)
-  — `claude-cloud`: extend `tools/analyze_symbols.py` with a "bulk
-  candidates" output — groups of functions that share module + exact
-  size, where matching one likely unlocks the rest as pattern copies.
+  — `claude-cloud`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
+  with 382 bulk groups covering 8009 functions.
 
 ## Retired agents
 
