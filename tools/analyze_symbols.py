@@ -901,6 +901,174 @@ def write_targets_md(
 
 
 # --------------------------------------------------------------------------- #
+# Snapshots + diff
+#
+# Every run writes `snapshot.json` next to the other outputs, capturing
+# a minimal per-function record (tier, name, size). The *next* run
+# loads it before overwriting, and `--diff` prints what changed since
+# then — useful motivational feedback for the decomper:
+#
+#   Since last snapshot:
+#     +7 named functions
+#     5 moved:  hard -> medium
+#     Renames: func_020abcde -> Ov005_DrawInit, ...
+#
+# Snapshots live under build/<ver>/analysis/ which is gitignored, so
+# they're per-machine. First run on a machine has no prior snapshot
+# and simply notes that.
+# --------------------------------------------------------------------------- #
+
+def build_snapshot(version: str, targets: list[Target]) -> dict:
+    """Minimal serialisable state — only what's needed to compute a
+    meaningful diff. Keyed by '<module>|0x<addr>' so a single dict-
+    comparison reveals tier/name/size drift per function."""
+    from collections import Counter
+    tier_counts = Counter(t.tier for t in targets)
+    return {
+        "version": version,
+        "schema": 1,
+        "totals": {
+            "classified": len(targets),
+            "tier_counts": dict(tier_counts),
+        },
+        "symbols": {
+            f"{t.symbol.module}|0x{t.symbol.addr:08x}": {
+                "name": t.symbol.name,
+                "tier": t.tier,
+                "size": t.symbol.size,
+            }
+            for t in targets
+        },
+    }
+
+
+def read_snapshot(path: Path) -> dict | None:
+    if not path.is_file():
+        return None
+    try:
+        with path.open() as f:
+            data = json.load(f)
+        # Minimal schema check — older snapshots are ignored rather
+        # than crashing the diff.
+        if not isinstance(data, dict) or "symbols" not in data:
+            return None
+        return data
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def write_snapshot(path: Path, snapshot: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as f:
+        json.dump(snapshot, f, indent=2)
+
+
+def compute_diff(prev: dict, curr: dict) -> dict:
+    """Return a structured diff between two snapshots.
+
+    Keys:
+      tier_delta    — {tier_name: curr_count - prev_count}
+      moved         — [(key, prev_tier, curr_tier), ...] tier changed
+      renamed       — [(key, prev_name, curr_name), ...] name changed
+      newly_classified — [(key, curr_name, curr_tier), ...] not in prev
+      removed       — [(key, prev_name, prev_tier), ...] not in curr
+    """
+    prev_syms: dict = prev.get("symbols", {})
+    curr_syms: dict = curr.get("symbols", {})
+
+    moved: list[tuple[str, str, str]] = []
+    renamed: list[tuple[str, str, str]] = []
+    newly: list[tuple[str, str, str]] = []
+    removed: list[tuple[str, str, str]] = []
+
+    for key, curr_rec in curr_syms.items():
+        prev_rec = prev_syms.get(key)
+        if prev_rec is None:
+            newly.append((key, curr_rec["name"], curr_rec["tier"]))
+            continue
+        if prev_rec.get("name") != curr_rec["name"]:
+            renamed.append((key, prev_rec["name"], curr_rec["name"]))
+        if prev_rec.get("tier") != curr_rec["tier"]:
+            moved.append((key, prev_rec["tier"], curr_rec["tier"]))
+
+    for key, prev_rec in prev_syms.items():
+        if key not in curr_syms:
+            removed.append((key, prev_rec.get("name", "?"),
+                            prev_rec.get("tier", "?")))
+
+    prev_counts = prev.get("totals", {}).get("tier_counts", {})
+    curr_counts = curr.get("totals", {}).get("tier_counts", {})
+    all_tiers = set(prev_counts) | set(curr_counts)
+    tier_delta = {
+        tier: curr_counts.get(tier, 0) - prev_counts.get(tier, 0)
+        for tier in all_tiers
+    }
+
+    return {
+        "tier_delta": tier_delta,
+        "moved": moved,
+        "renamed": renamed,
+        "newly_classified": newly,
+        "removed": removed,
+    }
+
+
+def print_diff(diff: dict, *, limit: int = 20) -> None:
+    print("=" * 60)
+    print("Diff vs last snapshot")
+    print("=" * 60)
+
+    td = diff["tier_delta"]
+    nonzero = {t: d for t, d in td.items() if d != 0}
+    if nonzero:
+        print("\nTier count deltas:")
+        for tier in TIER_ORDER:
+            d = nonzero.get(tier)
+            if d is None:
+                continue
+            sign = "+" if d > 0 else ""
+            print(f"  {tier:<8s} {sign}{d}")
+    else:
+        print("\nTier counts unchanged.")
+
+    renamed = diff["renamed"]
+    if renamed:
+        print(f"\nRenames ({len(renamed)}):")
+        for key, old, new in renamed[:limit]:
+            print(f"  {key}  {old}  ->  {new}")
+        if len(renamed) > limit:
+            print(f"  ... (+{len(renamed) - limit} more)")
+
+    moved = diff["moved"]
+    if moved:
+        print(f"\nTier changes ({len(moved)}):")
+        # Group by (prev, curr) for a compact summary.
+        from collections import Counter
+        transitions = Counter((p, c) for _, p, c in moved)
+        for (prev, curr), count in sorted(transitions.items(), key=lambda kv: -kv[1]):
+            print(f"  {count:>4d}  {prev:<8s} -> {curr}")
+
+    newly = diff["newly_classified"]
+    if newly:
+        print(f"\nNewly classified ({len(newly)}):")
+        for key, name, tier in newly[:limit]:
+            print(f"  {key}  {name}  [{tier}]")
+        if len(newly) > limit:
+            print(f"  ... (+{len(newly) - limit} more)")
+
+    removed = diff["removed"]
+    if removed:
+        print(f"\nRemoved ({len(removed)}):")
+        for key, name, tier in removed[:limit]:
+            print(f"  {key}  {name}  [was {tier}]")
+        if len(removed) > limit:
+            print(f"  ... (+{len(removed) - limit} more)")
+
+    if not any([renamed, moved, newly, removed]) and not nonzero:
+        print("\nNo changes since last snapshot.")
+
+
+# --------------------------------------------------------------------------- #
 # Entrypoint
 # --------------------------------------------------------------------------- #
 
@@ -912,10 +1080,14 @@ def main() -> int:
                     help="Skip writing build/<ver>/analysis/*; stdout summary only")
     ap.add_argument("--limit", type=int, default=50,
                     help="Max rows per tier in targets.md (default: 50)")
+    ap.add_argument("--diff", action="store_true",
+                    help="Print changes vs the previous snapshot "
+                         "(build/<ver>/analysis/snapshot.json)")
     args = ap.parse_args()
 
     config_root = ROOT / "config" / args.version
     out_dir = ROOT / "build" / args.version / "analysis"
+    snapshot_path = out_dir / "snapshot.json"
 
     modules = load_all(config_root)
     graph = build_call_graph(modules)
@@ -925,15 +1097,34 @@ def main() -> int:
 
     print_summary(modules, graph, targets, groups)
 
+    # Load previous snapshot BEFORE writing the new one, so we keep
+    # the pre-run state available for comparison.
+    prev_snapshot = read_snapshot(snapshot_path)
+    curr_snapshot = build_snapshot(args.version, targets)
+
+    if args.diff:
+        if prev_snapshot is None:
+            print(
+                "\n(--diff requested but no previous snapshot at "
+                f"{snapshot_path.relative_to(ROOT)} — this is the first "
+                "run on this machine. Rerun after a rename or match to "
+                "see the delta.)"
+            )
+        else:
+            print()
+            print_diff(compute_diff(prev_snapshot, curr_snapshot))
+
+
     if not args.no_outputs:
         write_graph_json(out_dir / "graph.json", modules, graph)
         write_targets_md(
             out_dir / "targets.md", targets, groups, sinit_summary, limit=args.limit
         )
         write_bulk_json(out_dir / "bulk.json", groups)
+        write_snapshot(snapshot_path, curr_snapshot)
         print(
             f"\nWrote {out_dir}/graph.json, {out_dir}/targets.md, "
-            f"and {out_dir}/bulk.json",
+            f"{out_dir}/bulk.json, and {out_dir}/snapshot.json",
             file=sys.stderr,
         )
 
