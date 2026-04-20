@@ -57,18 +57,28 @@ No-one else touches it without coordination.
 
 ## The "brain" role
 
-Currently held by `claude-cloud`. Responsibilities:
+Currently held by `claude-brain` (the dedicated PC Claude Code session).
+Responsibilities:
 
   - Keeps **AGENTS.md** current (this file).
   - Writes **task briefs** for other agents on request — a short spec
     with scope, non-scope, success criteria, suggested branch name,
     and the files they'll touch.
-  - Reviews PRs from every agent.
+  - Reviews PRs from every agent locally: pulls the branch, runs
+    `ninja rom`, `./dsd.exe check modules`, `python tools/progress.py`
+    (and `python tools/analyze_symbols.py` once that lands) to verify
+    the PR doesn't regress any module's checksum or the target list.
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's Leona's call.
 
+`claude-cloud` supports the brain: it writes scaffolding, tools, and
+headers on its own branches, and can review PRs through the GitHub MCP
+integration, but all "does the rebuilt ROM still work?" questions are
+resolved by the brain.
+
 The role is tied to the repo, not a specific Claude conversation —
-any fresh Claude session that reads this file picks it up.
+any fresh PC Claude session that reads this file and has the toolchain
+installed can take over.
 
 ## Adding or retiring agents
 
@@ -109,13 +119,22 @@ When the brain writes a task for another agent, it goes here. Format:
 
 (none yet)
 
-## Existing branches at time of writing
+## In-flight branches at time of writing
 
-For reference — these predate the manifest and stay as-is:
+For reference — these predate the manifest. Brain should review and
+merge (or request changes on) each in whatever order makes sense:
 
   - `claude/symbol-analyzer` — Cloud's decomp-target analyzer
-    (`tools/analyze_symbols.py`). Awaiting merge.
-  - `claude/libs-nitro-scaffold` — Cloud's NitroSDK + CRT header
-    scaffolding. Awaiting merge.
+    (`tools/analyze_symbols.py`). Parses every `config/eur/**/symbols.txt`
+    + `relocs.txt`, builds a call graph, classifies 9,867 functions
+    into 6 tiers (trivial / easy / sinit / named / medium / hard).
+    Emits `build/eur/analysis/{graph.json,targets.md}`.
+  - `claude/libs-nitro-scaffold` — Cloud's NitroSDK + CodeWarrior
+    runtime header scaffolding (`libs/nitro/`, `libs/runtime/`).
+    Declarations only, no `.c` files yet; provides the inclusion
+    target for future matched code.
+  - `claude-cloud/agents-manifest` — this file's introduction PR.
 
-Future Cloud branches will use the `claude-cloud/` prefix.
+Future Cloud branches will use the `claude-cloud/` prefix; the two
+`claude/…` branches above predate the naming convention and stay
+as-is until merged.
