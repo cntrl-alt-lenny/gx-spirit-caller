@@ -397,26 +397,99 @@ class Target:
     callees_total: int   # count of direct callees overall
 
 
-def classify(symbol: Symbol, graph: CallGraph) -> Target | None:
+TIER_ORDER: list[str] = ["trivial", "easy", "sinit", "named", "medium", "hard"]
+
+
+def classify(symbol: Symbol, graph: CallGraph, modules: dict[str, ModuleData]) -> Target | None:
     """Assign a tier to a single symbol, or return None if it's not a
-    decomp candidate (e.g. data symbol, gap unit, already matched).
+    decomp candidate (data, gap, assembler local label, zero-size).
 
     Tiers:
-      trivial — leaf, size ≤ 4, passing module (likely `bx lr`)
-      easy    — leaf, size ≤ 0x20, passing module
-      sinit   — any `__sinit_*` (bulk opportunity, 51 of them)
-      named   — already has a real name (BIOS thunk, Entry, main, etc.) —
-                implementation still todo but the target is known
-      medium  — size ≤ 0x80, all direct callees already named, passing module
-      hard    — everything else (or anything in a failing module)
+      trivial - leaf, size <= 4, passing module (likely `bx lr`)
+      easy    - leaf, size <= 0x20, passing module
+      sinit   - any `__sinit_*` (bulk opportunity, 51 of them)
+      named   - already has a real name (BIOS thunk, Entry, main, etc.)
+                but not yet trivial/easy/sinit
+      medium  - size <= 0x80, all direct callees already named, passing module
+      hard    - everything else (or anything in a failing module)
     """
-    raise NotImplementedError
+    if not symbol.is_function:
+        return None
+    if symbol.size == 0:
+        # _unk placeholders from --allow-unknown-function-calls; not a
+        # picking target - they need structural fixes first.
+        return None
+    if symbol.name.startswith(".L_"):
+        # Assembler local labels inside other functions - not a decomp
+        # unit on their own.
+        return None
+
+    key: SymbolKey = (symbol.module, symbol.addr)
+    callees = graph.edges_call.get(key, set())
+    out_deg = len(callees)
+    callees_named = 0
+    for (cm, ca) in callees:
+        cs = modules[cm].by_addr.get(ca)
+        if cs is not None and cs.is_named:
+            callees_named += 1
+
+    is_leaf = out_deg == 0
+    all_callees_named = out_deg > 0 and callees_named == out_deg
+    in_passing = not symbol.is_failing_module
+
+    # Tier hierarchy: identity wins over shape (named > trivial), and
+    # __sinit_* is a distinct bulk category. The failing-module flag is
+    # advisory (noted in `reason`), not a gate - individual small-function
+    # bodies don't drift; only cross-module relocs do, and those live in
+    # their own callsites.
+    fail_note = f"  [NB: {symbol.module} module checksum failing]" if symbol.is_failing_module else ""
+
+    if symbol.name.startswith("__sinit_"):
+        tier = "sinit"
+        reason = f"CodeWarrior static init template (size=0x{symbol.size:x}){fail_note}"
+    elif symbol.is_named:
+        tier = "named"
+        reason = f"already named ({symbol.name}){fail_note}"
+    elif is_leaf and symbol.size <= 0x4:
+        tier = "trivial"
+        reason = f"leaf, {symbol.size}B - likely `bx lr` or SWI stub{fail_note}"
+    elif is_leaf and symbol.size <= 0x20:
+        tier = "easy"
+        reason = f"leaf, {symbol.size}B, no outgoing calls{fail_note}"
+    elif symbol.size <= 0x80 and all_callees_named:
+        tier = "medium"
+        reason = f"{symbol.size}B, all {out_deg} callees already named{fail_note}"
+    else:
+        tier = "hard"
+        if out_deg > 0 and callees_named == 0:
+            reason = f"{out_deg} callees, none named yet{fail_note}"
+        else:
+            reason = f"{symbol.size}B, {callees_named}/{out_deg} callees named{fail_note}"
+
+    return Target(
+        symbol=symbol,
+        tier=tier,
+        reason=reason,
+        callees_named=callees_named,
+        callees_total=out_deg,
+    )
 
 
 def rank_targets(modules: dict[str, ModuleData], graph: CallGraph) -> list[Target]:
     """Classify every function symbol and return the resulting list,
-    sorted so the easiest wins appear first (tier rank, then size ascending)."""
-    raise NotImplementedError
+    sorted easiest-first: (tier rank asc, size asc, address asc)."""
+    targets: list[Target] = []
+    for mod in modules.values():
+        for sym in mod.symbols:
+            t = classify(sym, graph, modules)
+            if t is not None:
+                targets.append(t)
+    targets.sort(key=lambda t: (
+        TIER_ORDER.index(t.tier),
+        t.symbol.size,
+        t.symbol.addr,
+    ))
+    return targets
 
 
 # --------------------------------------------------------------------------- #
