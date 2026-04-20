@@ -1,0 +1,679 @@
+#!/usr/bin/env python3
+
+"""
+analyze_symbols.py — call-graph + decomp-target analyzer for ds-decomp projects.
+
+Reads every config/<version>/arm9/**/symbols.txt and relocs.txt, cross-
+references each reloc with its calling and called function, builds a call
+graph, and emits:
+
+  - stdout summary: per-module stats, named-symbol breakdown, call-graph
+    metrics (leaf/orphan counts, in/out-degree distribution)
+  - build/<version>/analysis/graph.json: full serialized call graph
+  - build/<version>/analysis/targets.md: prioritised decomp target list
+    (Trivial / Easy / __sinit bulk / Named / Medium / Hard tiers)
+
+Rerun after any symbols.txt rename or new `dsd apply` — it reads only the
+current on-disk state, so output always reflects the latest config.
+
+Usage:
+    python tools/analyze_symbols.py [--version eur] [--no-outputs] [--limit N]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from collections import defaultdict
+from dataclasses import dataclass, field
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent.parent
+
+# Per CLAUDE.md — the three modules currently failing `dsd check modules`.
+# Functions in these modules are higher-risk first targets because layout
+# drift may break the match independent of the function's correctness.
+FAILING_MODULES: set[str] = {"main", "dtcm", "ov004"}
+
+# Reloc kinds that represent a control-flow edge (caller → callee).
+CALL_RELOC_KINDS: set[str] = {
+    "arm_call",
+    "thumb_call",
+    "arm_call_thumb",
+    "thumb_call_arm",
+}
+# Reloc kinds that represent a data reference (reader → datum).
+LOAD_RELOC_KINDS: set[str] = {"load"}
+
+# Line formats in config/<ver>/**/symbols.txt, e.g.
+#   Entry         kind:function(arm,size=0x13c) addr:0x02000800
+#   data_020b4320 kind:data(any)                addr:0x020b4320
+SYMBOL_RE = re.compile(
+    r"^(?P<name>\S+)\s+kind:(?P<type>\w+)\((?P<attrs>[^)]*)\)\s+addr:0x(?P<addr>[0-9a-fA-F]+)"
+)
+
+# Line format in config/<ver>/**/relocs.txt, e.g.
+#   from:0x02000814 kind:arm_call to:0x02000a78 module:main
+#   from:0x021aa4cc kind:load     to:0x021b1d4c module:overlay(5)
+RELOC_RE = re.compile(
+    r"from:0x(?P<src>[0-9a-fA-F]+)\s+kind:(?P<kind>\w+)\s+to:0x(?P<dest>[0-9a-fA-F]+)\s+module:(?P<module>\S+)"
+)
+
+
+# --------------------------------------------------------------------------- #
+# Data model
+# --------------------------------------------------------------------------- #
+
+@dataclass
+class Symbol:
+    """A single entry from a symbols.txt file."""
+
+    name: str
+    module: str          # "main" / "itcm" / "dtcm" / "ov000" ... "ov023"
+    addr: int
+    size: int            # 0 for data(any) symbols with unknown extent
+    type: str            # "function" / "data"
+    mode: str            # "arm" / "thumb" for functions; "any" for data
+
+    @property
+    def is_function(self) -> bool:
+        return self.type == "function"
+
+    @property
+    def is_named(self) -> bool:
+        # dsd init emits `func_<addr>` / `func_<ov>_<addr>` / `data_<addr>` /
+        # `data_<ov>_<addr>` for unnamed entries. `_dsd_gap_*` are gap units.
+        # __sinit_ names are dsd-synthetic too (static initializer shells),
+        # but we count them as "named" — they're categorized on sight.
+        placeholder_prefixes = ("func_", "data_", "_dsd_gap")
+        return not self.name.startswith(placeholder_prefixes)
+
+    @property
+    def end_addr(self) -> int:
+        return self.addr + self.size
+
+    @property
+    def is_failing_module(self) -> bool:
+        return self.module in FAILING_MODULES
+
+
+@dataclass
+class Reloc:
+    """A single entry from a relocs.txt file, plus the source module
+    (implied by which file the line came from)."""
+
+    src_addr: int
+    src_module: str
+    dest_addr: int
+    dest_module: str     # normalized: "main"/"itcm"/"dtcm"/"ovNNN"
+    kind: str
+
+
+@dataclass
+class ModuleData:
+    """Parsed contents of one module's symbols.txt + relocs.txt, plus
+    the derived lookup structures used by the analyzer."""
+
+    name: str
+    symbols: list[Symbol] = field(default_factory=list)
+    relocs: list[Reloc] = field(default_factory=list)
+
+    # addr -> Symbol (entry-point lookup; exact match)
+    by_addr: dict[int, Symbol] = field(default_factory=dict)
+
+    # symbols sorted by addr for range-binsearch (mid-function lookup)
+    by_addr_sorted: list[Symbol] = field(default_factory=list)
+
+    def enclosing_function(self, addr: int) -> Symbol | None:
+        """Find the function whose address range contains `addr`, or
+        None if `addr` isn't inside any known function in this module.
+        Uses binary search over self.by_addr_sorted."""
+        import bisect
+        # bisect_right gives us the index after the last symbol with
+        # addr <= target; the candidate is the one before it.
+        idx = bisect.bisect_right([s.addr for s in self.by_addr_sorted], addr) - 1
+        if idx < 0:
+            return None
+        cand = self.by_addr_sorted[idx]
+        if not cand.is_function or cand.size == 0:
+            return None
+        if cand.addr <= addr < cand.end_addr:
+            return cand
+        return None
+
+
+# --------------------------------------------------------------------------- #
+# Parsing
+# --------------------------------------------------------------------------- #
+
+def parse_module_destination(raw: str) -> str:
+    """Normalize reloc `module:` values to short keys used elsewhere.
+
+    Examples:
+        "main"        -> "main"
+        "itcm"        -> "itcm"
+        "dtcm"        -> "dtcm"
+        "overlay(5)"  -> "ov005"
+        "overlay(23)" -> "ov023"
+    """
+    if raw.startswith("overlay(") and raw.endswith(")"):
+        n = int(raw[len("overlay("):-1])
+        return f"ov{n:03d}"
+    return raw
+
+
+def parse_symbols_file(path: Path, module: str) -> list[Symbol]:
+    """Parse one symbols.txt into a list of Symbol objects.
+    Silently returns [] if the file doesn't exist."""
+    if not path.is_file():
+        return []
+    out: list[Symbol] = []
+    with path.open() as f:
+        for line in f:
+            line = line.rstrip()
+            if not line or line.startswith("#"):
+                continue
+            m = SYMBOL_RE.match(line)
+            if not m:
+                continue
+            attrs = m["attrs"]
+            mode = "any"
+            size = 0
+            # `function(arm,size=0x13c)` vs `data(any)`.
+            for part in attrs.split(","):
+                part = part.strip()
+                if part.startswith("size=0x"):
+                    size = int(part[len("size=0x"):], 16)
+                elif part in ("arm", "thumb", "any"):
+                    mode = part
+            out.append(Symbol(
+                name=m["name"],
+                module=module,
+                addr=int(m["addr"], 16),
+                size=size,
+                type=m["type"],
+                mode=mode,
+            ))
+    return out
+
+
+def parse_relocs_file(path: Path, src_module: str) -> list[Reloc]:
+    """Parse one relocs.txt into a list of Reloc objects.
+    Silently returns [] if the file doesn't exist."""
+    if not path.is_file():
+        return []
+    out: list[Reloc] = []
+    with path.open() as f:
+        for line in f:
+            line = line.rstrip()
+            if not line or line.startswith("#"):
+                continue
+            m = RELOC_RE.match(line)
+            if not m:
+                continue
+            out.append(Reloc(
+                src_addr=int(m["src"], 16),
+                src_module=src_module,
+                dest_addr=int(m["dest"], 16),
+                dest_module=parse_module_destination(m["module"]),
+                kind=m["kind"],
+            ))
+    return out
+
+
+def discover_modules(config_root: Path) -> list[str]:
+    """Enumerate every module's short name by walking config_root.
+
+    Returns a list like ["main", "itcm", "dtcm", "ov000", ..., "ov023"]
+    in a stable, deterministic order (main, itcm, dtcm, then overlays
+    sorted numerically)."""
+    names: list[str] = []
+    arm9 = config_root / "arm9"
+    if (arm9 / "symbols.txt").is_file():
+        names.append("main")
+    if (arm9 / "itcm" / "symbols.txt").is_file():
+        names.append("itcm")
+    if (arm9 / "dtcm" / "symbols.txt").is_file():
+        names.append("dtcm")
+    overlays_dir = arm9 / "overlays"
+    if overlays_dir.is_dir():
+        ovs = sorted(
+            p.name for p in overlays_dir.iterdir()
+            if p.is_dir() and p.name.startswith("ov") and (p / "symbols.txt").is_file()
+        )
+        names.extend(ovs)
+    return names
+
+
+def load_all(config_root: Path) -> dict[str, ModuleData]:
+    """Load and index every module under config_root. Returns a
+    {module_name: ModuleData} dict with all lookup structures populated."""
+    arm9 = config_root / "arm9"
+    # Map a short module name to its (symbols, relocs) file paths.
+    def paths_for(name: str) -> tuple[Path, Path]:
+        if name == "main":
+            return arm9 / "symbols.txt", arm9 / "relocs.txt"
+        if name in ("itcm", "dtcm"):
+            return arm9 / name / "symbols.txt", arm9 / name / "relocs.txt"
+        return (
+            arm9 / "overlays" / name / "symbols.txt",
+            arm9 / "overlays" / name / "relocs.txt",
+        )
+
+    out: dict[str, ModuleData] = {}
+    for name in discover_modules(config_root):
+        sym_path, rel_path = paths_for(name)
+        symbols = parse_symbols_file(sym_path, name)
+        relocs = parse_relocs_file(rel_path, name)
+        by_addr = {s.addr: s for s in symbols}
+        by_addr_sorted = sorted(symbols, key=lambda s: s.addr)
+        out[name] = ModuleData(
+            name=name,
+            symbols=symbols,
+            relocs=relocs,
+            by_addr=by_addr,
+            by_addr_sorted=by_addr_sorted,
+        )
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# Call graph
+# --------------------------------------------------------------------------- #
+
+# A SymbolKey is (module, addr) — globally unique across the whole project.
+SymbolKey = tuple[str, int]
+
+
+@dataclass
+class CallGraph:
+    """Resolved adjacency structure over all Symbols.
+
+    edges_call[caller_key] -> set of callee keys
+    edges_load[reader_key] -> set of data keys referenced
+    in_degree_call / out_degree_call / in_degree_load / out_degree_load:
+        cached per-node counts (call edges and load edges kept separate).
+    unresolved_calls: relocs whose dest_addr didn't map to any known
+        function (e.g. calls into gap units, cross-overlay-swap dead-ends).
+    """
+
+    edges_call: dict[SymbolKey, set[SymbolKey]] = field(default_factory=lambda: defaultdict(set))
+    edges_load: dict[SymbolKey, set[SymbolKey]] = field(default_factory=lambda: defaultdict(set))
+    unresolved_calls: list[Reloc] = field(default_factory=list)
+    unresolved_loads: list[Reloc] = field(default_factory=list)
+
+    def in_degree_call(self, key: SymbolKey) -> int:
+        # Recomputed lazily — cheap enough for ~45k edges and avoids
+        # keeping a second dict in sync with edges_call.
+        return sum(1 for callees in self.edges_call.values() if key in callees)
+
+    def out_degree_call(self, key: SymbolKey) -> int:
+        return len(self.edges_call.get(key, ()))
+
+    def all_in_degrees_call(self) -> dict[SymbolKey, int]:
+        """Single-pass in-degree table (avoids O(N*E) when scoring every node)."""
+        counts: dict[SymbolKey, int] = defaultdict(int)
+        for callees in self.edges_call.values():
+            for k in callees:
+                counts[k] += 1
+        return counts
+
+
+def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
+    """For every reloc in every module, resolve src_addr and dest_addr
+    to enclosing symbols and add an edge to the CallGraph. Relocs whose
+    endpoints don't resolve go into the unresolved_* lists."""
+    graph = CallGraph()
+
+    for src_mod_name, src_mod in modules.items():
+        for r in src_mod.relocs:
+            # Caller: addr -> enclosing function in its own module. Load
+            # relocs often originate inside functions too, so we treat
+            # caller lookup the same way for both call and load kinds.
+            caller = src_mod.enclosing_function(r.src_addr)
+            if caller is None:
+                # Source lives in a gap/data/unaligned region — rare but
+                # possible; we can't attribute the edge to a function.
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                elif r.kind in LOAD_RELOC_KINDS:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            caller_key: SymbolKey = (caller.module, caller.addr)
+
+            # Callee/datum: exact entry match is the common case (BL targets
+            # the function prologue); fall back to enclosing_function for
+            # loads that land mid-data and for tail-calls into gap units.
+            dest_mod = modules.get(r.dest_module)
+            if dest_mod is None:
+                # Destination module not loaded (shouldn't happen for
+                # config/eur, but guard anyway).
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                else:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            callee = dest_mod.by_addr.get(r.dest_addr)
+            if callee is None and r.kind in CALL_RELOC_KINDS:
+                # BL to a non-prologue address — exit-branch into a
+                # sibling function (tail call). Record the containing
+                # function if there is one, else unresolved.
+                callee = dest_mod.enclosing_function(r.dest_addr)
+            if callee is None:
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                else:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            callee_key: SymbolKey = (callee.module, callee.addr)
+
+            if r.kind in CALL_RELOC_KINDS:
+                graph.edges_call[caller_key].add(callee_key)
+            elif r.kind in LOAD_RELOC_KINDS:
+                graph.edges_load[caller_key].add(callee_key)
+            # else: link_time_const and other rarer kinds — ignore for now.
+
+    return graph
+
+
+# --------------------------------------------------------------------------- #
+# Target tiering
+# --------------------------------------------------------------------------- #
+
+@dataclass
+class Target:
+    """A single decomp candidate with enough context to pick and justify it."""
+
+    symbol: Symbol
+    tier: str            # "trivial" / "easy" / "sinit" / "named" / "medium" / "hard"
+    reason: str          # human-readable justification
+    callees_named: int   # count of direct callees that already have real names
+    callees_total: int   # count of direct callees overall
+
+
+TIER_ORDER: list[str] = ["trivial", "easy", "sinit", "named", "medium", "hard"]
+
+
+def classify(symbol: Symbol, graph: CallGraph, modules: dict[str, ModuleData]) -> Target | None:
+    """Assign a tier to a single symbol, or return None if it's not a
+    decomp candidate (data, gap, assembler local label, zero-size).
+
+    Tiers:
+      trivial - leaf, size <= 4, passing module (likely `bx lr`)
+      easy    - leaf, size <= 0x20, passing module
+      sinit   - any `__sinit_*` (bulk opportunity, 51 of them)
+      named   - already has a real name (BIOS thunk, Entry, main, etc.)
+                but not yet trivial/easy/sinit
+      medium  - size <= 0x80, all direct callees already named, passing module
+      hard    - everything else (or anything in a failing module)
+    """
+    if not symbol.is_function:
+        return None
+    if symbol.size == 0:
+        # _unk placeholders from --allow-unknown-function-calls; not a
+        # picking target - they need structural fixes first.
+        return None
+    if symbol.name.startswith(".L_"):
+        # Assembler local labels inside other functions - not a decomp
+        # unit on their own.
+        return None
+
+    key: SymbolKey = (symbol.module, symbol.addr)
+    callees = graph.edges_call.get(key, set())
+    out_deg = len(callees)
+    callees_named = 0
+    for (cm, ca) in callees:
+        cs = modules[cm].by_addr.get(ca)
+        if cs is not None and cs.is_named:
+            callees_named += 1
+
+    is_leaf = out_deg == 0
+    all_callees_named = out_deg > 0 and callees_named == out_deg
+    in_passing = not symbol.is_failing_module
+
+    # Tier hierarchy: identity wins over shape (named > trivial), and
+    # __sinit_* is a distinct bulk category. The failing-module flag is
+    # advisory (noted in `reason`), not a gate - individual small-function
+    # bodies don't drift; only cross-module relocs do, and those live in
+    # their own callsites.
+    fail_note = f"  [NB: {symbol.module} module checksum failing]" if symbol.is_failing_module else ""
+
+    if symbol.name.startswith("__sinit_"):
+        tier = "sinit"
+        reason = f"CodeWarrior static init template (size=0x{symbol.size:x}){fail_note}"
+    elif symbol.is_named:
+        tier = "named"
+        reason = f"already named ({symbol.name}){fail_note}"
+    elif is_leaf and symbol.size <= 0x4:
+        tier = "trivial"
+        reason = f"leaf, {symbol.size}B - likely `bx lr` or SWI stub{fail_note}"
+    elif is_leaf and symbol.size <= 0x20:
+        tier = "easy"
+        reason = f"leaf, {symbol.size}B, no outgoing calls{fail_note}"
+    elif symbol.size <= 0x80 and all_callees_named:
+        tier = "medium"
+        reason = f"{symbol.size}B, all {out_deg} callees already named{fail_note}"
+    else:
+        tier = "hard"
+        if out_deg > 0 and callees_named == 0:
+            reason = f"{out_deg} callees, none named yet{fail_note}"
+        else:
+            reason = f"{symbol.size}B, {callees_named}/{out_deg} callees named{fail_note}"
+
+    return Target(
+        symbol=symbol,
+        tier=tier,
+        reason=reason,
+        callees_named=callees_named,
+        callees_total=out_deg,
+    )
+
+
+def rank_targets(modules: dict[str, ModuleData], graph: CallGraph) -> list[Target]:
+    """Classify every function symbol and return the resulting list,
+    sorted easiest-first: (tier rank asc, size asc, address asc)."""
+    targets: list[Target] = []
+    for mod in modules.values():
+        for sym in mod.symbols:
+            t = classify(sym, graph, modules)
+            if t is not None:
+                targets.append(t)
+    targets.sort(key=lambda t: (
+        TIER_ORDER.index(t.tier),
+        t.symbol.size,
+        t.symbol.addr,
+    ))
+    return targets
+
+
+# --------------------------------------------------------------------------- #
+# Output
+# --------------------------------------------------------------------------- #
+
+def print_summary(modules: dict[str, ModuleData], graph: CallGraph, targets: list[Target]) -> None:
+    """Human-readable summary: per-module counts, graph metrics, tier
+    breakdown, and a preview of the top few rows per tier."""
+    from collections import Counter
+
+    total_syms = sum(len(m.symbols) for m in modules.values())
+    total_fns = sum(1 for m in modules.values() for s in m.symbols if s.is_function)
+    total_named = sum(1 for m in modules.values() for s in m.symbols if s.is_named and s.is_function)
+
+    print(f"Modules        : {len(modules)}")
+    print(f"Total symbols  : {total_syms}")
+    print(f"Functions      : {total_fns}  ({total_named} named, "
+          f"{total_fns - total_named} placeholder)")
+    print()
+
+    print("Per-module function counts:")
+    for name, mod in modules.items():
+        fns = sum(1 for s in mod.symbols if s.is_function)
+        named = sum(1 for s in mod.symbols if s.is_function and s.is_named)
+        mark = "FAIL" if name in FAILING_MODULES else "ok  "
+        print(f"  [{mark}] {name:<8s} {fns:>5d} fns  ({named} named)")
+    print()
+
+    call_edges = sum(len(s) for s in graph.edges_call.values())
+    load_edges = sum(len(s) for s in graph.edges_load.values())
+    print("Call graph:")
+    print(f"  call edges (unique)  : {call_edges}")
+    print(f"  load edges (unique)  : {load_edges}")
+    print(f"  unresolved calls     : {len(graph.unresolved_calls)}")
+    print(f"  unresolved loads     : {len(graph.unresolved_loads)}")
+    print()
+
+    tier_counts = Counter(t.tier for t in targets)
+    print("Decomp target tiers:")
+    for tier in TIER_ORDER:
+        print(f"  {tier:<8s}: {tier_counts.get(tier, 0):>5d}")
+    print()
+
+    print("Top candidates per tier:")
+    for tier in TIER_ORDER:
+        rows = [t for t in targets if t.tier == tier][:3]
+        if not rows:
+            continue
+        print(f"\n  [{tier}]")
+        for t in rows:
+            s = t.symbol
+            print(f"    {s.module}:{s.name:<40s} 0x{s.addr:08x}  "
+                  f"size=0x{s.size:<4x}  {t.reason}")
+
+
+def write_graph_json(path: Path, modules: dict[str, ModuleData], graph: CallGraph) -> None:
+    """Serialize the full graph to JSON with hex-formatted addresses."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def sym_dict(s: Symbol) -> dict:
+        return {
+            "name": s.name,
+            "module": s.module,
+            "addr": f"0x{s.addr:08x}",
+            "size": f"0x{s.size:x}",
+            "type": s.type,
+            "mode": s.mode,
+        }
+
+    def edge_list(d: dict[SymbolKey, set[SymbolKey]]) -> list[dict]:
+        out = []
+        for (src_mod, src_addr), callees in d.items():
+            for (dst_mod, dst_addr) in callees:
+                out.append({
+                    "src_module": src_mod,
+                    "src_addr": f"0x{src_addr:08x}",
+                    "dest_module": dst_mod,
+                    "dest_addr": f"0x{dst_addr:08x}",
+                })
+        return out
+
+    def reloc_list(rels: list[Reloc]) -> list[dict]:
+        return [{
+            "src_module": r.src_module,
+            "src_addr": f"0x{r.src_addr:08x}",
+            "dest_module": r.dest_module,
+            "dest_addr": f"0x{r.dest_addr:08x}",
+            "kind": r.kind,
+        } for r in rels]
+
+    payload = {
+        "symbols": [sym_dict(s) for m in modules.values() for s in m.symbols],
+        "edges_call": edge_list(graph.edges_call),
+        "edges_load": edge_list(graph.edges_load),
+        "unresolved_calls": reloc_list(graph.unresolved_calls),
+        "unresolved_loads": reloc_list(graph.unresolved_loads),
+    }
+    with path.open("w") as f:
+        json.dump(payload, f, indent=2)
+
+
+def write_targets_md(path: Path, targets: list[Target], limit: int | None) -> None:
+    """Render the tiered target list as Markdown: one section per tier,
+    a table per section, honoring `limit` so the file stays reviewable."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    from collections import Counter
+    counts = Counter(t.tier for t in targets)
+
+    lines: list[str] = []
+    lines.append("# Decomp target list")
+    lines.append("")
+    lines.append("Generated by `tools/analyze_symbols.py`. Rerun after any rename "
+                 "or `dsd apply` to refresh.")
+    lines.append("")
+    lines.append("| Tier | Count | What it is |")
+    lines.append("|------|------:|------------|")
+    descriptions = {
+        "sinit":   "CodeWarrior `__sinit_*` static initializers (bulk template)",
+        "named":   "Already has a real name (BIOS thunks, Entry, main, ...)",
+        "trivial": "Leaf function, <= 4 bytes (likely `bx lr` or SWI stub)",
+        "easy":    "Leaf function, <= 0x20 bytes, no outgoing calls",
+        "medium":  "<= 0x80 bytes, every direct callee already named",
+        "hard":    "Everything else",
+    }
+    for tier in TIER_ORDER:
+        lines.append(f"| **{tier}** | {counts.get(tier, 0)} | {descriptions[tier]} |")
+    lines.append("")
+
+    for tier in TIER_ORDER:
+        rows = [t for t in targets if t.tier == tier]
+        if not rows:
+            continue
+        shown = rows if limit is None else rows[:limit]
+        lines.append(f"## {tier}  ({len(rows)} total" +
+                     (f", showing first {len(shown)}" if limit and len(rows) > limit else "") +
+                     ")")
+        lines.append("")
+        lines.append("| Module | Name | Address | Size | Callees (named/total) | Reason |")
+        lines.append("|--------|------|---------|-----:|----------------------:|--------|")
+        for t in shown:
+            s = t.symbol
+            lines.append(
+                f"| {s.module} | `{s.name}` | `0x{s.addr:08x}` | "
+                f"`0x{s.size:x}` | {t.callees_named}/{t.callees_total} | "
+                f"{t.reason} |"
+            )
+        lines.append("")
+
+    with path.open("w") as f:
+        f.write("\n".join(lines))
+
+
+# --------------------------------------------------------------------------- #
+# Entrypoint
+# --------------------------------------------------------------------------- #
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[1] if __doc__ else None)
+    ap.add_argument("--version", default="eur",
+                    help='Game version under config/<version>/ (default: "eur")')
+    ap.add_argument("--no-outputs", action="store_true",
+                    help="Skip writing build/<ver>/analysis/*; stdout summary only")
+    ap.add_argument("--limit", type=int, default=50,
+                    help="Max rows per tier in targets.md (default: 50)")
+    args = ap.parse_args()
+
+    config_root = ROOT / "config" / args.version
+    out_dir = ROOT / "build" / args.version / "analysis"
+
+    modules = load_all(config_root)
+    graph = build_call_graph(modules)
+    targets = rank_targets(modules, graph)
+
+    print_summary(modules, graph, targets)
+
+    if not args.no_outputs:
+        write_graph_json(out_dir / "graph.json", modules, graph)
+        write_targets_md(out_dir / "targets.md", targets, limit=args.limit)
+        print(f"\nWrote {out_dir}/graph.json and {out_dir}/targets.md", file=sys.stderr)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
