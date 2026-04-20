@@ -114,20 +114,52 @@ if the rebuilt ROM hashes equal to the baserom, every function is matched.
    `symbols.txt`. Adjust if ds-decomp's schema differs from what the
    heuristic expects; the real `report.json` path is already wired.
 
-## Known blockers (upstream)
+## Bootstrapping `config/<ver>/` (one-off)
 
-- **`dsd init` fails on overlay 0 analysis.** Error:
-  ```
-  Local function call from 0x021aaed4 in overlay 0 to 0x021b3810 leads to no function
-  ```
-  Reproducible on `dsd v0.11.0` against the EUR extract. Source address
-  (0x021aaed4) is 12 bytes *before* overlay 0's base (0x021aaee0), and
-  overlay 2 shares the same base address — a classic DS overlay-swap
-  pattern that dsd's current analysis doesn't handle. Tracked upstream
-  in ds-decomp issues #17 / #20 / #23 (open). Until resolved, `config/`
-  cannot be populated automatically, so the mwld/link/sha1 chain cannot
-  run end-to-end. Workaround TBD — likely needs upstream input from the
-  `dsd` author or a manual pre-analysis pass to seed the symbols.
+`dsd init` is not wired into the Ninja graph — it's a rare, structural
+operation you run by hand once per region, before anything else works.
+On this game, the stock run of `dsd init` fails with
+`Local function call from 0x021aaed4 in overlay 0 to 0x021b3810 leads to
+no function` because overlay 0 and overlay 2 share base address
+`0x021aaee0` (an overlay-swap pattern dsd's current analysis can't
+model). The hidden flag `--allow-unknown-function-calls` bypasses the
+error by injecting placeholder symbols at the unresolved addresses —
+those symbols will be replaced as real analysis progresses.
+
+```bash
+./dsd init \
+    --rom-config extract/eur/config.yaml \
+    --output-path config/eur \
+    --build-path build/eur \
+    --allow-unknown-function-calls
+```
+
+Run this after `ninja extract/<ver>/config.yaml` and before anything
+else. Upstream: filed as [ds-decomp#58](https://github.com/AetiasHax/ds-decomp/issues/58),
+related to open issues #17 / #20 / #23.
+
+## Current round-trip status (EUR)
+
+With the workaround above plus the rest of the pipeline, `ninja rom`
+succeeds end-to-end and produces `gx-spirit-caller_eur.nds`. Module-level
+checksum state vs the baserom (from `dsd check modules`):
+
+| Module      | Status         |
+|-------------|----------------|
+| ARM9 main   | ❌ checksum diff |
+| ITCM        | ✅ OK           |
+| DTCM        | ❌ checksum diff |
+| Overlay 0   | ✅ OK           |
+| Overlay 1–3 | ✅ OK           |
+| Overlay 4   | ❌ checksum diff |
+| Overlay 5–23| ✅ OK           |
+
+**24 of 27 modules round-trip byte-identically.** The 3 failures are
+almost certainly artifacts of the placeholder symbols that
+`--allow-unknown-function-calls` injected; expect them to resolve as the
+cross-module relocations in ARM9 main / DTCM / overlay 4 are manually
+filled in (or as the upstream analyzer improves). `ninja sha1` is the
+final gate and will stay red until all 27 modules check green.
 
 ## Platform notes
 

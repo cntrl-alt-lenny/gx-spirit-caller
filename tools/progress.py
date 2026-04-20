@@ -79,12 +79,16 @@ def print_report(version: str, report: dict) -> None:
     def pct(matched, total):
         return (matched / total * 100.0) if total else 0.0
 
-    code_matched = measures.get("matched_code", 0)
-    code_total   = measures.get("total_code", 0)
-    data_matched = measures.get("matched_data", 0)
-    data_total   = measures.get("total_data", 0)
-    units_done   = measures.get("complete_code", 0)
-    units_total  = measures.get("total_units", 0)
+    # objdiff v2.7+ emits byte totals as strings (values exceed JS safe-int range).
+    def as_int(v) -> int:
+        return int(v) if v is not None else 0
+
+    code_matched = as_int(measures.get("matched_code"))
+    code_total   = as_int(measures.get("total_code"))
+    data_matched = as_int(measures.get("matched_data"))
+    data_total   = as_int(measures.get("total_data"))
+    units_done   = as_int(measures.get("complete_code"))
+    units_total  = as_int(measures.get("total_units"))
 
     print(f"  code:   {code_matched:>10} / {code_total:<10} bytes  ({pct(code_matched, code_total):5.2f}%)")
     print(f"  data:   {data_matched:>10} / {data_total:<10} bytes  ({pct(data_matched, data_total):5.2f}%)")
@@ -96,8 +100,8 @@ def print_report(version: str, report: dict) -> None:
         for cat in report["categories"]:
             name = cat.get("name", "?")
             m = cat.get("measures", {})
-            print(f"    {name:<20} code {pct(m.get('matched_code', 0), m.get('total_code', 0)):5.2f}%   "
-                  f"data {pct(m.get('matched_data', 0), m.get('total_data', 0)):5.2f}%")
+            print(f"    {name:<20} code {pct(as_int(m.get('matched_code')), as_int(m.get('total_code'))):5.2f}%   "
+                  f"data {pct(as_int(m.get('matched_data')), as_int(m.get('total_data'))):5.2f}%")
 
 
 def main() -> int:

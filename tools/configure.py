@@ -250,7 +250,7 @@ class Project:
         ]
 
     def arm9_lcf(self) -> Path:
-        return self.game_build / "linker_script.lcf"
+        return self.game_build / "arm9.lcf"
 
     def arm9_objects_txt(self) -> Path:
         return self.game_build / "objects.txt"
@@ -320,7 +320,9 @@ def main():
 
         n.rule(
             name="lcf",
-            command=f"{DSD} lcf -c $config_path --lcf-file $lcf_file --objects-file $objects_file"
+            # v0.11+ `dsd lcf` writes to conventional paths under the build dir:
+            # build/<ver>/arm9.lcf and build/<ver>/objects.txt. No CLI paths needed.
+            command=f"{DSD} lcf -c $config_path"
         )
         n.newline()
 
