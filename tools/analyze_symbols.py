@@ -80,25 +80,24 @@ class Symbol:
 
     @property
     def is_function(self) -> bool:
-        """True for `kind:function(...)` symbols."""
-        raise NotImplementedError
+        return self.type == "function"
 
     @property
     def is_named(self) -> bool:
-        """True if a human has renamed this away from the dsd-default
-        `func_0xxxxxxx` / `data_0xxxxxxx` / `_dsd_gap_*` placeholder."""
-        raise NotImplementedError
+        # dsd init emits `func_<addr>` / `func_<ov>_<addr>` / `data_<addr>` /
+        # `data_<ov>_<addr>` for unnamed entries. `_dsd_gap_*` are gap units.
+        # __sinit_ names are dsd-synthetic too (static initializer shells),
+        # but we count them as "named" — they're categorized on sight.
+        placeholder_prefixes = ("func_", "data_", "_dsd_gap")
+        return not self.name.startswith(placeholder_prefixes)
 
     @property
     def end_addr(self) -> int:
-        """Exclusive end address (addr + size). Undefined for size==0."""
-        raise NotImplementedError
+        return self.addr + self.size
 
     @property
     def is_failing_module(self) -> bool:
-        """True if the symbol lives in a module whose checksum currently
-        fails against the baserom (per CLAUDE.md)."""
-        raise NotImplementedError
+        return self.module in FAILING_MODULES
 
 
 @dataclass
@@ -132,7 +131,18 @@ class ModuleData:
         """Find the function whose address range contains `addr`, or
         None if `addr` isn't inside any known function in this module.
         Uses binary search over self.by_addr_sorted."""
-        raise NotImplementedError
+        import bisect
+        # bisect_right gives us the index after the last symbol with
+        # addr <= target; the candidate is the one before it.
+        idx = bisect.bisect_right([s.addr for s in self.by_addr_sorted], addr) - 1
+        if idx < 0:
+            return None
+        cand = self.by_addr_sorted[idx]
+        if not cand.is_function or cand.size == 0:
+            return None
+        if cand.addr <= addr < cand.end_addr:
+            return cand
+        return None
 
 
 # --------------------------------------------------------------------------- #
@@ -149,19 +159,69 @@ def parse_module_destination(raw: str) -> str:
         "overlay(5)"  -> "ov005"
         "overlay(23)" -> "ov023"
     """
-    raise NotImplementedError
+    if raw.startswith("overlay(") and raw.endswith(")"):
+        n = int(raw[len("overlay("):-1])
+        return f"ov{n:03d}"
+    return raw
 
 
 def parse_symbols_file(path: Path, module: str) -> list[Symbol]:
     """Parse one symbols.txt into a list of Symbol objects.
     Silently returns [] if the file doesn't exist."""
-    raise NotImplementedError
+    if not path.is_file():
+        return []
+    out: list[Symbol] = []
+    with path.open() as f:
+        for line in f:
+            line = line.rstrip()
+            if not line or line.startswith("#"):
+                continue
+            m = SYMBOL_RE.match(line)
+            if not m:
+                continue
+            attrs = m["attrs"]
+            mode = "any"
+            size = 0
+            # `function(arm,size=0x13c)` vs `data(any)`.
+            for part in attrs.split(","):
+                part = part.strip()
+                if part.startswith("size=0x"):
+                    size = int(part[len("size=0x"):], 16)
+                elif part in ("arm", "thumb", "any"):
+                    mode = part
+            out.append(Symbol(
+                name=m["name"],
+                module=module,
+                addr=int(m["addr"], 16),
+                size=size,
+                type=m["type"],
+                mode=mode,
+            ))
+    return out
 
 
 def parse_relocs_file(path: Path, src_module: str) -> list[Reloc]:
     """Parse one relocs.txt into a list of Reloc objects.
     Silently returns [] if the file doesn't exist."""
-    raise NotImplementedError
+    if not path.is_file():
+        return []
+    out: list[Reloc] = []
+    with path.open() as f:
+        for line in f:
+            line = line.rstrip()
+            if not line or line.startswith("#"):
+                continue
+            m = RELOC_RE.match(line)
+            if not m:
+                continue
+            out.append(Reloc(
+                src_addr=int(m["src"], 16),
+                src_module=src_module,
+                dest_addr=int(m["dest"], 16),
+                dest_module=parse_module_destination(m["module"]),
+                kind=m["kind"],
+            ))
+    return out
 
 
 def discover_modules(config_root: Path) -> list[str]:
@@ -170,13 +230,54 @@ def discover_modules(config_root: Path) -> list[str]:
     Returns a list like ["main", "itcm", "dtcm", "ov000", ..., "ov023"]
     in a stable, deterministic order (main, itcm, dtcm, then overlays
     sorted numerically)."""
-    raise NotImplementedError
+    names: list[str] = []
+    arm9 = config_root / "arm9"
+    if (arm9 / "symbols.txt").is_file():
+        names.append("main")
+    if (arm9 / "itcm" / "symbols.txt").is_file():
+        names.append("itcm")
+    if (arm9 / "dtcm" / "symbols.txt").is_file():
+        names.append("dtcm")
+    overlays_dir = arm9 / "overlays"
+    if overlays_dir.is_dir():
+        ovs = sorted(
+            p.name for p in overlays_dir.iterdir()
+            if p.is_dir() and p.name.startswith("ov") and (p / "symbols.txt").is_file()
+        )
+        names.extend(ovs)
+    return names
 
 
 def load_all(config_root: Path) -> dict[str, ModuleData]:
     """Load and index every module under config_root. Returns a
     {module_name: ModuleData} dict with all lookup structures populated."""
-    raise NotImplementedError
+    arm9 = config_root / "arm9"
+    # Map a short module name to its (symbols, relocs) file paths.
+    def paths_for(name: str) -> tuple[Path, Path]:
+        if name == "main":
+            return arm9 / "symbols.txt", arm9 / "relocs.txt"
+        if name in ("itcm", "dtcm"):
+            return arm9 / name / "symbols.txt", arm9 / name / "relocs.txt"
+        return (
+            arm9 / "overlays" / name / "symbols.txt",
+            arm9 / "overlays" / name / "relocs.txt",
+        )
+
+    out: dict[str, ModuleData] = {}
+    for name in discover_modules(config_root):
+        sym_path, rel_path = paths_for(name)
+        symbols = parse_symbols_file(sym_path, name)
+        relocs = parse_relocs_file(rel_path, name)
+        by_addr = {s.addr: s for s in symbols}
+        by_addr_sorted = sorted(symbols, key=lambda s: s.addr)
+        out[name] = ModuleData(
+            name=name,
+            symbols=symbols,
+            relocs=relocs,
+            by_addr=by_addr,
+            by_addr_sorted=by_addr_sorted,
+        )
+    return out
 
 
 # --------------------------------------------------------------------------- #
