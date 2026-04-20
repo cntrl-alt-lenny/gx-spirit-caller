@@ -11,14 +11,25 @@ in plain English — see *Adding or retiring agents* near the bottom.
 
 ## Active agents
 
-| Slug              | Role                                                                                    | Owns these paths                                                                 | Hands-off paths                                   |
-|-------------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|---------------------------------------------------|
-| **leona**         | Human project owner. Sets priorities, merges PRs, adds/retires agents, final authority. | —                                                                                | —                                                 |
-| **claude-cloud**  | The **brain**. Coordinator. Maintains this file, writes task briefs for other agents, reviews PRs, builds shared tooling and library scaffolding. | `tools/`, `libs/`, `include/`, `AGENTS.md`, `CLAUDE.md`, `docs/` (if created)     | `src/`, `config/**/symbols.txt` (except renames explicitly authorised) |
-| **claude-pc**     | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match. | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`                        | `tools/`, `libs/`, `include/`, `AGENTS.md`        |
+| Slug              | Where it runs                                                                             | Role                                                                                                                                                                                   | Owns these paths                                               | Hands-off paths                                                                 |
+|-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
+| **leona**         | meatspace                                                                                 | Human project owner. Sets priorities, merges PRs, adds/retires agents, final authority.                                                                                               | —                                                              | —                                                                               |
+| **claude-brain**  | Claude Code on Leona's PC (dedicated session, separate from the decomper)                 | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task.                         | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/` (if created)          | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
+| **claude-cloud**  | Claude Code on the web (no access to the ROM, `dsd`, or `ninja`)                          | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via the GitHub MCP integration. Cannot run local builds, so delegates verification to brain. | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
+| **claude-pc**     | Claude Code on Leona's PC (decomper session)                                              | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
 agents* below.
+
+### Why the brain runs on the PC, not on Cloud
+
+The brain needs to actually execute `ninja`, `./dsd.exe check modules`,
+`python tools/progress.py`, etc. to verify that incoming PRs don't
+regress the build. Cloud sessions don't have the baserom or the
+toolchain, so they can *design* work and *review diffs* but can't
+*prove the ROM still builds*. Putting the brain on the PC means one
+session can both decide and verify, which is the difference between
+coordinating and guessing.
 
 ## Rules every agent follows
 
