@@ -306,17 +306,80 @@ class CallGraph:
     unresolved_loads: list[Reloc] = field(default_factory=list)
 
     def in_degree_call(self, key: SymbolKey) -> int:
-        raise NotImplementedError
+        # Recomputed lazily — cheap enough for ~45k edges and avoids
+        # keeping a second dict in sync with edges_call.
+        return sum(1 for callees in self.edges_call.values() if key in callees)
 
     def out_degree_call(self, key: SymbolKey) -> int:
-        raise NotImplementedError
+        return len(self.edges_call.get(key, ()))
+
+    def all_in_degrees_call(self) -> dict[SymbolKey, int]:
+        """Single-pass in-degree table (avoids O(N*E) when scoring every node)."""
+        counts: dict[SymbolKey, int] = defaultdict(int)
+        for callees in self.edges_call.values():
+            for k in callees:
+                counts[k] += 1
+        return counts
 
 
 def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
     """For every reloc in every module, resolve src_addr and dest_addr
     to enclosing symbols and add an edge to the CallGraph. Relocs whose
     endpoints don't resolve go into the unresolved_* lists."""
-    raise NotImplementedError
+    graph = CallGraph()
+
+    for src_mod_name, src_mod in modules.items():
+        for r in src_mod.relocs:
+            # Caller: addr -> enclosing function in its own module. Load
+            # relocs often originate inside functions too, so we treat
+            # caller lookup the same way for both call and load kinds.
+            caller = src_mod.enclosing_function(r.src_addr)
+            if caller is None:
+                # Source lives in a gap/data/unaligned region — rare but
+                # possible; we can't attribute the edge to a function.
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                elif r.kind in LOAD_RELOC_KINDS:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            caller_key: SymbolKey = (caller.module, caller.addr)
+
+            # Callee/datum: exact entry match is the common case (BL targets
+            # the function prologue); fall back to enclosing_function for
+            # loads that land mid-data and for tail-calls into gap units.
+            dest_mod = modules.get(r.dest_module)
+            if dest_mod is None:
+                # Destination module not loaded (shouldn't happen for
+                # config/eur, but guard anyway).
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                else:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            callee = dest_mod.by_addr.get(r.dest_addr)
+            if callee is None and r.kind in CALL_RELOC_KINDS:
+                # BL to a non-prologue address — exit-branch into a
+                # sibling function (tail call). Record the containing
+                # function if there is one, else unresolved.
+                callee = dest_mod.enclosing_function(r.dest_addr)
+            if callee is None:
+                if r.kind in CALL_RELOC_KINDS:
+                    graph.unresolved_calls.append(r)
+                else:
+                    graph.unresolved_loads.append(r)
+                continue
+
+            callee_key: SymbolKey = (callee.module, callee.addr)
+
+            if r.kind in CALL_RELOC_KINDS:
+                graph.edges_call[caller_key].add(callee_key)
+            elif r.kind in LOAD_RELOC_KINDS:
+                graph.edges_load[caller_key].add(callee_key)
+            # else: link_time_const and other rarer kinds — ignore for now.
+
+    return graph
 
 
 # --------------------------------------------------------------------------- #
