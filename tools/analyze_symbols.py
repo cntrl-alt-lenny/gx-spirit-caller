@@ -493,10 +493,139 @@ def rank_targets(modules: dict[str, ModuleData], graph: CallGraph) -> list[Targe
 
 
 # --------------------------------------------------------------------------- #
+# Bulk groups
+#
+# A bulk group is a cluster of functions sharing the same (module, size).
+# If enough functions share those two attributes in a single module, they
+# are almost certainly emitted from the same CodeWarrior template — match
+# one, paste the pattern across the rest. Examples in this game:
+#
+#   * 51 `__sinit_*` static initializers (mostly size=0x2c) across 15
+#     overlays — see libs/runtime/README.md.
+#   * Small `bx lr` vtable-default stubs (size=0x2 or 0x4) repeated at
+#     the head of several overlays.
+#
+# Leverage score = count / size. More functions in the group and smaller
+# each = better bang for the buck (match cost roughly scales with size,
+# payoff scales with count).
+# --------------------------------------------------------------------------- #
+
+MIN_BULK_COUNT = 4
+
+
+@dataclass
+class BulkGroup:
+    """Functions sharing the same (module, size)."""
+
+    module: str
+    size: int
+    members: list[Symbol]  # sorted by address
+
+    @property
+    def count(self) -> int:
+        return len(self.members)
+
+    @property
+    def leverage(self) -> float:
+        return self.count / self.size if self.size > 0 else 0.0
+
+    @property
+    def is_failing_module(self) -> bool:
+        return self.module in FAILING_MODULES
+
+    @property
+    def addr_first(self) -> int:
+        return self.members[0].addr
+
+    @property
+    def addr_last(self) -> int:
+        return self.members[-1].addr
+
+    @property
+    def all_sinit(self) -> bool:
+        return all(s.name.startswith("__sinit_") for s in self.members)
+
+    @property
+    def all_placeholder(self) -> bool:
+        return all(not s.is_named for s in self.members)
+
+
+def _name_family(name: str) -> str:
+    """Coarse-grained name family for bulk bucketing.
+
+    Returns "__sinit" for CodeWarrior static initializers (so they
+    cluster cleanly even when generic `func_*` symbols share their
+    size), and "" for everything else (which keeps generic
+    `(module, size)` grouping intact for bx-lr stubs, vtable defaults,
+    etc.). Extend this if other distinctive prefixes surface.
+    """
+    if name.startswith("__sinit_"):
+        return "__sinit"
+    return ""
+
+
+def find_bulk_groups(modules: dict[str, ModuleData], min_count: int = MIN_BULK_COUNT) -> list[BulkGroup]:
+    """Cluster every function by (module, size, name-family) and return
+    groups with at least `min_count` members, sorted by leverage desc.
+
+    The name-family dimension keeps `__sinit_*` in its own bucket per
+    overlay, so a cluster isn't diluted by unrelated `func_*` symbols
+    that happen to share the same size."""
+    buckets: dict[tuple[str, int, str], list[Symbol]] = defaultdict(list)
+    for mod in modules.values():
+        for s in mod.symbols:
+            if not s.is_function:
+                continue
+            if s.size == 0:
+                # _unk placeholders — can't template-match something of
+                # unknown size.
+                continue
+            if s.name.startswith(".L_"):
+                # Assembler local labels aren't real function entries.
+                continue
+            buckets[(s.module, s.size, _name_family(s.name))].append(s)
+
+    groups: list[BulkGroup] = []
+    for (module, size, _family), members in buckets.items():
+        if len(members) < min_count:
+            continue
+        members_sorted = sorted(members, key=lambda s: s.addr)
+        groups.append(BulkGroup(module=module, size=size, members=members_sorted))
+    # Highest leverage first; tiebreak on count desc, then smaller size.
+    groups.sort(key=lambda g: (-g.leverage, -g.count, g.size))
+    return groups
+
+
+def find_sinit_summary(modules: dict[str, ModuleData]) -> dict[str, list[tuple[int, int]]]:
+    """Per-overlay size distribution of `__sinit_*` symbols.
+
+    Unlike find_bulk_groups, this ignores MIN_BULK_COUNT — even a lone
+    __sinit is useful information because the 51 across 15 overlays
+    form a single logical bulk opportunity (CodeWarrior emits them all
+    from one template). Returned shape:
+        {module: [(size, count), ...]} sorted by count desc then size.
+    """
+    per_module: dict[str, dict[int, int]] = defaultdict(lambda: defaultdict(int))
+    for mod in modules.values():
+        for s in mod.symbols:
+            if s.is_function and s.name.startswith("__sinit_") and s.size > 0:
+                per_module[s.module][s.size] += 1
+    out: dict[str, list[tuple[int, int]]] = {}
+    for module, sizes in per_module.items():
+        out[module] = sorted(sizes.items(), key=lambda kv: (-kv[1], kv[0]))
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Output
 # --------------------------------------------------------------------------- #
 
-def print_summary(modules: dict[str, ModuleData], graph: CallGraph, targets: list[Target]) -> None:
+def print_summary(
+    modules: dict[str, ModuleData],
+    graph: CallGraph,
+    targets: list[Target],
+    groups: list[BulkGroup],
+) -> None:
     """Human-readable summary: per-module counts, graph metrics, tier
     breakdown, and a preview of the top few rows per tier."""
     from collections import Counter
@@ -545,6 +674,20 @@ def print_summary(modules: dict[str, ModuleData], graph: CallGraph, targets: lis
             print(f"    {s.module}:{s.name:<40s} 0x{s.addr:08x}  "
                   f"size=0x{s.size:<4x}  {t.reason}")
 
+    print()
+    total_members = sum(g.count for g in groups)
+    print(f"Bulk candidate groups : {len(groups)}  ({total_members} functions)")
+    if groups:
+        print("Top 5 by leverage (count / size):")
+        for g in groups[:5]:
+            fail_tag = "  [FAIL module]" if g.is_failing_module else ""
+            sinit_tag = "  __sinit" if g.all_sinit else ""
+            print(
+                f"  {g.module:<6s}  size=0x{g.size:<4x}  "
+                f"count={g.count:<3d}  leverage={g.leverage:6.3f}"
+                f"{sinit_tag}{fail_tag}"
+            )
+
 
 def write_graph_json(path: Path, modules: dict[str, ModuleData], graph: CallGraph) -> None:
     """Serialize the full graph to JSON with hex-formatted addresses."""
@@ -592,7 +735,44 @@ def write_graph_json(path: Path, modules: dict[str, ModuleData], graph: CallGrap
         json.dump(payload, f, indent=2)
 
 
-def write_targets_md(path: Path, targets: list[Target], limit: int | None) -> None:
+def write_bulk_json(path: Path, groups: list[BulkGroup]) -> None:
+    """Serialize every bulk group (no limit) to JSON."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "groups": [
+            {
+                "module": g.module,
+                "size": f"0x{g.size:x}",
+                "count": g.count,
+                "leverage": round(g.leverage, 4),
+                "failing_module": g.is_failing_module,
+                "all_sinit": g.all_sinit,
+                "all_placeholder": g.all_placeholder,
+                "addr_first": f"0x{g.addr_first:08x}",
+                "addr_last": f"0x{g.addr_last:08x}",
+                "members": [
+                    {
+                        "name": m.name,
+                        "addr": f"0x{m.addr:08x}",
+                        "mode": m.mode,
+                    }
+                    for m in g.members
+                ],
+            }
+            for g in groups
+        ],
+    }
+    with path.open("w") as f:
+        json.dump(payload, f, indent=2)
+
+
+def write_targets_md(
+    path: Path,
+    targets: list[Target],
+    groups: list[BulkGroup],
+    sinit_summary: dict[str, list[tuple[int, int]]],
+    limit: int | None,
+) -> None:
     """Render the tiered target list as Markdown: one section per tier,
     a table per section, honoring `limit` so the file stays reviewable."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -640,6 +820,82 @@ def write_targets_md(path: Path, targets: list[Target], limit: int | None) -> No
             )
         lines.append("")
 
+    # ---- Bulk candidates section ----
+    bulk_cap = 20
+    lines.append("## Bulk candidates")
+    lines.append("")
+    if not groups:
+        lines.append("No bulk groups with >= "
+                     f"{MIN_BULK_COUNT} members found at current state.")
+        lines.append("")
+    else:
+        total_members = sum(g.count for g in groups)
+        lines.append(
+            f"{len(groups)} groups of functions share the same "
+            f"`(module, size)` and have at least {MIN_BULK_COUNT} members "
+            f"(leverage = count / size). Match one, paste the pattern "
+            f"across the rest."
+        )
+        lines.append("")
+        lines.append(f"**Total:** {total_members} functions across {len(groups)} groups.")
+        lines.append("")
+        shown = groups if len(groups) <= bulk_cap else groups[:bulk_cap]
+        header = (
+            "| Rank | Module | Size | Count | Leverage | Addr range | Kind | Sample names |"
+        )
+        sep = "|-----:|--------|-----:|------:|---------:|------------|------|--------------|"
+        lines.append(header)
+        lines.append(sep)
+        for i, g in enumerate(shown, start=1):
+            kind_bits: list[str] = []
+            if g.all_sinit:
+                kind_bits.append("`__sinit`")
+            if g.all_placeholder and not g.all_sinit:
+                kind_bits.append("all unnamed")
+            if g.is_failing_module:
+                kind_bits.append(f"**NB:** {g.module} checksum failing")
+            kind = "; ".join(kind_bits) if kind_bits else "—"
+            samples = ", ".join(f"`{m.name}`" for m in g.members[:3])
+            if g.count > 3:
+                samples += f", ... (+{g.count - 3})"
+            lines.append(
+                f"| {i} | {g.module} | `0x{g.size:x}` | {g.count} | "
+                f"{g.leverage:.3f} | `0x{g.addr_first:08x}`–`0x{g.addr_last:08x}` | "
+                f"{kind} | {samples} |"
+            )
+        if len(groups) > bulk_cap:
+            lines.append("")
+            lines.append(
+                f"(showing top {bulk_cap} of {len(groups)} groups — "
+                f"see `bulk.json` for the full list)"
+            )
+        lines.append("")
+
+    # ---- __sinit by overlay ----
+    lines.append("### `__sinit_*` by overlay")
+    lines.append("")
+    if not sinit_summary:
+        lines.append("No `__sinit_*` symbols found.")
+        lines.append("")
+    else:
+        total_sinit = sum(
+            count for rows in sinit_summary.values() for _, count in rows
+        )
+        lines.append(
+            f"{total_sinit} CodeWarrior static-init shells across "
+            f"{len(sinit_summary)} overlays — all generated from the same "
+            f"template, so matching one unlocks the rest regardless of size."
+        )
+        lines.append("")
+        lines.append("| Overlay | Total | Sizes (count × size) |")
+        lines.append("|---------|------:|----------------------|")
+        for module in sorted(sinit_summary.keys()):
+            rows = sinit_summary[module]
+            total = sum(count for _, count in rows)
+            sizes_desc = ", ".join(f"{count} × `0x{size:x}`" for size, count in rows)
+            lines.append(f"| {module} | {total} | {sizes_desc} |")
+        lines.append("")
+
     with path.open("w") as f:
         f.write("\n".join(lines))
 
@@ -664,13 +920,22 @@ def main() -> int:
     modules = load_all(config_root)
     graph = build_call_graph(modules)
     targets = rank_targets(modules, graph)
+    groups = find_bulk_groups(modules)
+    sinit_summary = find_sinit_summary(modules)
 
-    print_summary(modules, graph, targets)
+    print_summary(modules, graph, targets, groups)
 
     if not args.no_outputs:
         write_graph_json(out_dir / "graph.json", modules, graph)
-        write_targets_md(out_dir / "targets.md", targets, limit=args.limit)
-        print(f"\nWrote {out_dir}/graph.json and {out_dir}/targets.md", file=sys.stderr)
+        write_targets_md(
+            out_dir / "targets.md", targets, groups, sinit_summary, limit=args.limit
+        )
+        write_bulk_json(out_dir / "bulk.json", groups)
+        print(
+            f"\nWrote {out_dir}/graph.json, {out_dir}/targets.md, "
+            f"and {out_dir}/bulk.json",
+            file=sys.stderr,
+        )
 
     return 0
 
