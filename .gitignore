@@ -1,0 +1,43 @@
+# Build outputs
+build/
+build.ninja
+.ninja_log*
+.ninja_lock
+
+# Downloaded tools
+/dsd
+/dsd.exe
+/dsd.pdb
+/objdiff-cli
+/objdiff-cli.exe
+/wibo
+/ninja.exe
+/tools/mwccarm/
+
+# ROMs and BIOS dumps — never commit copyrighted binaries
+*.nds
+*bios.bin
+
+# dsd extraction artifacts
+extract/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Misc
+objdiff.json
+*.sav
+*.xMAP
+
+# Python venv
+.venv/
+
+# Local scratch / review notes — not part of the project
+Files to be Reviewed/

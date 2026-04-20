@@ -1,0 +1,3 @@
+# ninja_syntax is vendored at tools/ninja_syntax.py (Apache-2.0, © 2011 Google)
+requests
+pyperclip
