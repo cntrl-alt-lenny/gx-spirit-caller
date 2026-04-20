@@ -8,3 +8,19 @@
 src/overlay005/ov005_stubs.c:
     complete
     .text start:0x021aa4a0 end:0x021aa4b0
+
+src/overlay005/ov005_stubs_aaf00.c:
+    complete
+    .text start:0x021aaf00 end:0x021aaf08
+
+src/overlay005/ov005_stubs_ab3e0.c:
+    complete
+    .text start:0x021ab3e0 end:0x021ab3e8
+
+src/overlay005/ov005_stubs_ad058.c:
+    complete
+    .text start:0x021ad058 end:0x021ad060
+
+src/overlay005/ov005_stubs_b0b28.c:
+    complete
+    .text start:0x021b0b28 end:0x021b0b30
