@@ -27,6 +27,14 @@ HEIGHT = 480
 PAD = 1                  # gap between rectangles
 HEADER_H = 44            # space for title bar
 
+# Bottom progress-bar overlay. A cell's background is already tinted
+# by match %, but at low percentages (1–5%) the tint is nearly
+# indistinguishable from 0%. The bar shows the exact matched fraction
+# so the decomper can see "something landed here" at a glance.
+BAR_HEIGHT = 4           # px, at the bottom of each cell
+BAR_COLOR = "#2f8a4f"    # darker green than the 100% fill
+BAR_MIN_CELL_W = 28      # don't render bar on tiny cells
+
 
 def as_int(v) -> int:
     return int(v) if v is not None else 0
@@ -182,17 +190,33 @@ def render_svg(report: dict, version: str) -> str:
         pct = match_pct(m)
         fill = color_for(pct)
         size_bytes = as_int(m.get("total_code")) + as_int(m.get("total_data"))
+        matched_bytes = as_int(m.get("matched_code")) + as_int(m.get("matched_data"))
         kb = size_bytes / 1024.0
         name = short_name(unit["name"])
         text_fill = text_color_for_bg(fill)
 
+        cell_w = max(0.0, w - 2 * PAD)
+        cell_h = max(0.0, h - 2 * PAD)
         out.append(
             f'<rect x="{x + PAD:.1f}" y="{y + PAD:.1f}" '
-            f'width="{max(0, w - 2 * PAD):.1f}" height="{max(0, h - 2 * PAD):.1f}" '
+            f'width="{cell_w:.1f}" height="{cell_h:.1f}" '
             f'fill="{fill}" stroke="#1f2429" stroke-width="0.5">'
-            f'<title>{unit["name"]} — {kb:.1f} KB — {pct * 100:.2f}% matched</title>'
+            f'<title>{unit["name"]} — {kb:.1f} KB — '
+            f'{matched_bytes}/{size_bytes} B matched ({pct * 100:.2f}%)</title>'
             f'</rect>'
         )
+
+        # Bottom progress bar — only render when the cell is wide
+        # enough for the bar to be readable, and only when there's
+        # a non-zero amount matched (so 0% cells stay clean).
+        if pct > 0.0 and cell_w >= BAR_MIN_CELL_W and cell_h >= BAR_HEIGHT + 4:
+            bar_w = cell_w * pct
+            bar_y = y + PAD + cell_h - BAR_HEIGHT
+            out.append(
+                f'<rect x="{x + PAD:.1f}" y="{bar_y:.1f}" '
+                f'width="{bar_w:.1f}" height="{BAR_HEIGHT}" '
+                f'fill="{BAR_COLOR}" stroke="none" pointer-events="none"/>'
+            )
 
         # Only render labels if the cell is large enough to fit them.
         if w >= 60 and h >= 28:
