@@ -139,14 +139,27 @@ tracked placeholders.
 
 ## Progress
 
+<p align="center">
+  <img src="assets/progress-heatmap.svg" alt="Decomp progress heatmap" width="100%">
+</p>
+
+Each rectangle is one translation unit; area is proportional to total
+bytes (code + data); fill color encodes match percentage from red (0%)
+through orange/yellow to green (100%). Hover any cell on a desktop
+browser for the exact name, size, and percentage.
+
 ```bash
 python tools/progress.py            # human-readable table
-python tools/progress.py --json     # machine-readable, for CI / frogress.decomp.dev
+ninja heatmap                       # regenerate assets/progress-heatmap.svg
 ```
 
-The script reads `build/<ver>/report.json` once `ninja report` has run.
+`progress.py` reads `build/<ver>/report.json` once `ninja report` has run.
 Before that, it falls back to counting `function` entries in every
 `symbols.txt` so the denominator is non-zero from day one.
+
+The heatmap SVG is committed to the repo so it renders on GitHub. Run
+`ninja heatmap` after any change that affects matched %, then commit the
+updated SVG alongside your code change so the README badge stays current.
 
 ## Toolchain
 

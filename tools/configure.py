@@ -386,6 +386,12 @@ def main():
         )
         n.newline()
 
+        n.rule(
+            name="heatmap",
+            command=f"{PYTHON} tools/generate_heatmap.py --version $game_version --report $in --out $out"
+        )
+        n.newline()
+
         add_download_tool_builds(n)
         add_extract_build(n, project)
         add_delink_and_lcf_builds(n, project)
@@ -394,6 +400,7 @@ def main():
         add_check_builds(n, project)
         add_objdiff_builds(n, project)
         add_progress_build(n, project)
+        add_heatmap_build(n, project)
 
 
 def add_download_tool_builds(n: ninja_syntax.Writer):
@@ -639,6 +646,20 @@ def add_progress_build(n: ninja_syntax.Writer, project: Project):
         outputs="progress",
         variables={"game_version": project.game_version},
     )
+    n.newline()
+
+
+def add_heatmap_build(n: ninja_syntax.Writer, project: Project):
+    heatmap_path = "assets/progress-heatmap.svg"
+    n.build(
+        inputs=str(project.objdiff_report()),
+        implicit=["tools/generate_heatmap.py"],
+        rule="heatmap",
+        outputs=heatmap_path,
+        variables={"game_version": project.game_version},
+    )
+    n.newline()
+    n.build(inputs=heatmap_path, rule="phony", outputs="heatmap")
     n.newline()
 
 
