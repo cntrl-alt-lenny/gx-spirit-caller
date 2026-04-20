@@ -63,3 +63,30 @@ subdivision the real SDK uses when in doubt.
   SDK functions. We reverse-engineer, we do not copy copyrighted code.
 - Martin Korth's [GBATEK](https://problemkaputt.de/gbatek.htm) is the
   canonical BIOS reference for the SWI thunks in `swi.h`.
+
+## Appendix: current named-symbol survey (EUR)
+
+What `dsd init` actually labelled in
+`config/eur/arm9/**/symbols.txt` as of the last bootstrap run:
+
+| Category                   | Named | Location                                          |
+|----------------------------|-------|---------------------------------------------------|
+| BIOS / SWI thunks          | 18    | arm9 main `0x02000086–0x020007ea` (this header)   |
+| CRT bootstrap              | 3     | `Entry`, `AutoloadCallback`, `main` (→ libs/runtime/) |
+| `__sinit_*` static initializers | 51 | across 15 overlays (→ libs/runtime/ README has the table) |
+| NitroSDK `OS_*/GX_*/FX_*/MI_*/FS_*/PAD_*/SND_*/…` | **0** | unlabelled — show up as `func_0xxxxxxx` |
+| MSL libc / math            | 0     | unlabelled                                        |
+
+The NitroSDK and MSL counts of zero don't mean they aren't in the
+binary — most of the arm9 ~2 MB of code is SDK/libc. It means nobody
+has identified them yet. Expect them to surface one at a time during
+matching, at which point headers land here as `nitro/os.h`,
+`nitro/gx.h`, and so on.
+
+Re-run the survey after any bulk `dsd apply` or overlay fix:
+
+```bash
+# count named (non-`func_`/non-`data_`) symbols per overlay
+grep -rh '^[A-Za-z_][A-Za-z0-9_]* kind:function' config/eur \
+    | grep -Ev '^(func|data|_dsd)_' | awk '{print $1}' | sort | uniq -c | sort -rn
+```
