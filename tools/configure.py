@@ -56,9 +56,9 @@ DECOMP_ME_COMPILER = "mwcc_30_131"
 # Leave None until a verified dump is hashed by a human; once set, a wrong
 # dump fails configure.py with a clear error.
 BASEROM_SHA1: dict[str, str | None] = {
-    "usa": None,  # AYXE — fill in after first verified US dump
+    "usa": "9e53dcc74d8a9db4de6b655d62a1da6f5e9c2a83",  # AYXE
     "eur": "1da50df7c210fae96dc69b3825554b9ce13b4f75",  # AYXP — En,Fr,De,Es,It
-    "jpn": None,  # AYXJ — fill in after first verified JP dump
+    "jpn": "761fbfc62f4fe74f867e973a5eda91b8e86424f6",  # AYXJ
 }
 
 CC_FLAGS = " ".join([
