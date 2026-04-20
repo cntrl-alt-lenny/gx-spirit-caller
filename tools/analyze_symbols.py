@@ -497,32 +497,151 @@ def rank_targets(modules: dict[str, ModuleData], graph: CallGraph) -> list[Targe
 # --------------------------------------------------------------------------- #
 
 def print_summary(modules: dict[str, ModuleData], graph: CallGraph, targets: list[Target]) -> None:
-    """Print the human-readable summary to stdout:
-    per-module function/data counts, named/unnamed split, call-graph
-    metrics (edge count, unresolved counts), and a preview of the top
-    ~20 target rows."""
-    raise NotImplementedError
+    """Human-readable summary: per-module counts, graph metrics, tier
+    breakdown, and a preview of the top few rows per tier."""
+    from collections import Counter
+
+    total_syms = sum(len(m.symbols) for m in modules.values())
+    total_fns = sum(1 for m in modules.values() for s in m.symbols if s.is_function)
+    total_named = sum(1 for m in modules.values() for s in m.symbols if s.is_named and s.is_function)
+
+    print(f"Modules        : {len(modules)}")
+    print(f"Total symbols  : {total_syms}")
+    print(f"Functions      : {total_fns}  ({total_named} named, "
+          f"{total_fns - total_named} placeholder)")
+    print()
+
+    print("Per-module function counts:")
+    for name, mod in modules.items():
+        fns = sum(1 for s in mod.symbols if s.is_function)
+        named = sum(1 for s in mod.symbols if s.is_function and s.is_named)
+        mark = "FAIL" if name in FAILING_MODULES else "ok  "
+        print(f"  [{mark}] {name:<8s} {fns:>5d} fns  ({named} named)")
+    print()
+
+    call_edges = sum(len(s) for s in graph.edges_call.values())
+    load_edges = sum(len(s) for s in graph.edges_load.values())
+    print("Call graph:")
+    print(f"  call edges (unique)  : {call_edges}")
+    print(f"  load edges (unique)  : {load_edges}")
+    print(f"  unresolved calls     : {len(graph.unresolved_calls)}")
+    print(f"  unresolved loads     : {len(graph.unresolved_loads)}")
+    print()
+
+    tier_counts = Counter(t.tier for t in targets)
+    print("Decomp target tiers:")
+    for tier in TIER_ORDER:
+        print(f"  {tier:<8s}: {tier_counts.get(tier, 0):>5d}")
+    print()
+
+    print("Top candidates per tier:")
+    for tier in TIER_ORDER:
+        rows = [t for t in targets if t.tier == tier][:3]
+        if not rows:
+            continue
+        print(f"\n  [{tier}]")
+        for t in rows:
+            s = t.symbol
+            print(f"    {s.module}:{s.name:<40s} 0x{s.addr:08x}  "
+                  f"size=0x{s.size:<4x}  {t.reason}")
 
 
 def write_graph_json(path: Path, modules: dict[str, ModuleData], graph: CallGraph) -> None:
-    """Serialize the full graph to JSON:
-        {
-          "symbols":   [{name, module, addr, size, type, mode}, ...],
-          "edges_call":[{src_module, src_addr, dest_module, dest_addr}, ...],
-          "edges_load":[{src_module, src_addr, dest_module, dest_addr}, ...],
-          "unresolved_calls": [...], "unresolved_loads": [...]
+    """Serialize the full graph to JSON with hex-formatted addresses."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def sym_dict(s: Symbol) -> dict:
+        return {
+            "name": s.name,
+            "module": s.module,
+            "addr": f"0x{s.addr:08x}",
+            "size": f"0x{s.size:x}",
+            "type": s.type,
+            "mode": s.mode,
         }
-    Hex-formatted addresses for readability. Creates parent dirs as needed.
-    """
-    raise NotImplementedError
+
+    def edge_list(d: dict[SymbolKey, set[SymbolKey]]) -> list[dict]:
+        out = []
+        for (src_mod, src_addr), callees in d.items():
+            for (dst_mod, dst_addr) in callees:
+                out.append({
+                    "src_module": src_mod,
+                    "src_addr": f"0x{src_addr:08x}",
+                    "dest_module": dst_mod,
+                    "dest_addr": f"0x{dst_addr:08x}",
+                })
+        return out
+
+    def reloc_list(rels: list[Reloc]) -> list[dict]:
+        return [{
+            "src_module": r.src_module,
+            "src_addr": f"0x{r.src_addr:08x}",
+            "dest_module": r.dest_module,
+            "dest_addr": f"0x{r.dest_addr:08x}",
+            "kind": r.kind,
+        } for r in rels]
+
+    payload = {
+        "symbols": [sym_dict(s) for m in modules.values() for s in m.symbols],
+        "edges_call": edge_list(graph.edges_call),
+        "edges_load": edge_list(graph.edges_load),
+        "unresolved_calls": reloc_list(graph.unresolved_calls),
+        "unresolved_loads": reloc_list(graph.unresolved_loads),
+    }
+    with path.open("w") as f:
+        json.dump(payload, f, indent=2)
 
 
 def write_targets_md(path: Path, targets: list[Target], limit: int | None) -> None:
-    """Render the tiered target list as Markdown:
-    one section per tier, a table with columns (name, module, addr,
-    size, callees_named/total, reason). Honors `limit` per tier so the
-    file doesn't blow out to thousands of rows."""
-    raise NotImplementedError
+    """Render the tiered target list as Markdown: one section per tier,
+    a table per section, honoring `limit` so the file stays reviewable."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    from collections import Counter
+    counts = Counter(t.tier for t in targets)
+
+    lines: list[str] = []
+    lines.append("# Decomp target list")
+    lines.append("")
+    lines.append("Generated by `tools/analyze_symbols.py`. Rerun after any rename "
+                 "or `dsd apply` to refresh.")
+    lines.append("")
+    lines.append("| Tier | Count | What it is |")
+    lines.append("|------|------:|------------|")
+    descriptions = {
+        "sinit":   "CodeWarrior `__sinit_*` static initializers (bulk template)",
+        "named":   "Already has a real name (BIOS thunks, Entry, main, ...)",
+        "trivial": "Leaf function, <= 4 bytes (likely `bx lr` or SWI stub)",
+        "easy":    "Leaf function, <= 0x20 bytes, no outgoing calls",
+        "medium":  "<= 0x80 bytes, every direct callee already named",
+        "hard":    "Everything else",
+    }
+    for tier in TIER_ORDER:
+        lines.append(f"| **{tier}** | {counts.get(tier, 0)} | {descriptions[tier]} |")
+    lines.append("")
+
+    for tier in TIER_ORDER:
+        rows = [t for t in targets if t.tier == tier]
+        if not rows:
+            continue
+        shown = rows if limit is None else rows[:limit]
+        lines.append(f"## {tier}  ({len(rows)} total" +
+                     (f", showing first {len(shown)}" if limit and len(rows) > limit else "") +
+                     ")")
+        lines.append("")
+        lines.append("| Module | Name | Address | Size | Callees (named/total) | Reason |")
+        lines.append("|--------|------|---------|-----:|----------------------:|--------|")
+        for t in shown:
+            s = t.symbol
+            lines.append(
+                f"| {s.module} | `{s.name}` | `0x{s.addr:08x}` | "
+                f"`0x{s.size:x}` | {t.callees_named}/{t.callees_total} | "
+                f"{t.reason} |"
+            )
+        lines.append("")
+
+    with path.open("w") as f:
+        f.write("\n".join(lines))
 
 
 # --------------------------------------------------------------------------- #
