@@ -14,22 +14,69 @@ in plain English — see *Adding or retiring agents* near the bottom.
 | Slug              | Where it runs                                                                             | Role                                                                                                                                                                                   | Owns these paths                                               | Hands-off paths                                                                 |
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **leona**         | meatspace                                                                                 | Human project owner. Sets priorities, merges PRs, adds/retires agents, final authority.                                                                                               | —                                                              | —                                                                               |
-| **claude-brain**  | Claude Code on Leona's PC (dedicated session, separate from the decomper)                 | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task.                         | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/` (if created)          | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
+| **claude-brain**  | Claude Code on Leona's PC **or Mac** (dedicated session, separate from the decomper)      | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task. Has spot authority to merge PRs when Leona is AFK and flags doing so in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`                       | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
 | **claude-cloud**  | Claude Code on the web (no access to the ROM, `dsd`, or `ninja`)                          | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via the GitHub MCP integration. Cannot run local builds, so delegates verification to brain. | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **claude-pc**     | Claude Code on Leona's PC (decomper session)                                              | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
 agents* below.
 
-### Why the brain runs on the PC, not on Cloud
+### Why the brain runs locally (PC or Mac), not on Cloud
 
 The brain needs to actually execute `ninja`, `./dsd.exe check modules`,
 `python tools/progress.py`, etc. to verify that incoming PRs don't
 regress the build. Cloud sessions don't have the baserom or the
 toolchain, so they can *design* work and *review diffs* but can't
-*prove the ROM still builds*. Putting the brain on the PC means one
-session can both decide and verify, which is the difference between
-coordinating and guessing.
+*prove the ROM still builds*. Putting the brain on a local machine
+means one session can both decide and verify, which is the difference
+between coordinating and guessing.
+
+The role is tied to the repo, not to a specific machine or Claude
+conversation. Leona roams between PC and Mac; whichever one has a
+Claude Code session open with the toolchain installed and a current
+`orig/baserom_eur.nds` is the active brain for that stretch. Handoff
+is stateless — the next brain reads this file + *State of play* below
+and picks up.
+
+### State of play (brain keeps this current)
+
+The brain updates this section at the end of every working chunk so
+the next brain (possibly on a different machine) can catch up in under
+a minute. Keep it short. If you're the brain reading this cold: `git
+log --oneline -20` and the open-PR list fill in whatever this misses.
+
+**Last updated:** 2026-04-20, after merging PRs #4 / #5 / #6.
+
+**Baseline:** `ninja rom` succeeds, `./dsd.exe check modules` reports
+24/27 OK. ARM9 main / DTCM / overlay 4 still fail — expected,
+placeholder-symbol artifacts per CLAUDE.md, not caused by agent work.
+
+**Merged today:**
+  - PR #4 — `tools/analyze_symbols.py`, 6-tier decomp target analyzer.
+  - PR #5 — `libs/nitro/` + `libs/runtime/` header scaffolding.
+  - PR #6 — Brief 001 (ov005 trivials for `claude-pc`).
+
+**In flight:**
+  - `claude-pc` → Brief 001: 8 remaining ov005 trivials, then easy-tier
+    leaves in the same overlay. Next PR expected on branch
+    `claude-pc/ov005-finish-trivials`.
+  - `claude-cloud` → Brief 002: extend the analyzer with a "bulk
+    candidates" section (groups of same-size functions that likely
+    share a template). Branch: `claude-cloud/analyzer-bulk-groups`.
+
+**Next-brain TODO:**
+  1. Review `claude-pc`'s next PR locally (`ninja rom`,
+     `./dsd.exe check modules`, must still be 24/27).
+  2. Review `claude-cloud`'s next PR — tools change, re-run the analyzer
+     and spot-check the new bulk-candidates output.
+  3. Re-run `python tools/analyze_symbols.py --version eur` after any
+     `claude-pc` merge to refresh `build/eur/analysis/targets.md`.
+  4. After ov005 trivials land, scope the **__sinit bulk match** as
+     brief 003 for `claude-pc` — 51 templated functions across 15
+     overlays is the highest-leverage next chunk.
+
+**New agents?** Not yet. Three AI slots (brain / cloud / pc) is enough
+coordination surface. Re-evaluate after brief 002 + brief 003 land.
 
 ## Rules every agent follows
 
@@ -133,6 +180,10 @@ itself:
   — `claude-pc`: finish the 8 remaining trivial (size=0x4) stubs in
   overlay 5, then start the easy-tier leaves. Explicitly **not** yet
   `func_ov005_021aaea8` (0x58, medium tier).
+- [`docs/briefs/002-analyzer-bulk-groups.md`](docs/briefs/002-analyzer-bulk-groups.md)
+  — `claude-cloud`: extend `tools/analyze_symbols.py` with a "bulk
+  candidates" output — groups of functions that share module + exact
+  size, where matching one likely unlocks the rest as pattern copies.
 
 ## Retired agents
 
