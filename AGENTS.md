@@ -180,6 +180,20 @@ become a decomp target.
    OK). Don't force-push. Describe in the PR body: what changed,
    why, any follow-ups.
 
+### Cloud autonomous work
+
+`claude-cloud` fills idle time between briefs. Defaults:
+
+- **May open unbriefed:** new scripts in `tools/`, improvements to
+  existing analyzer scripts, CI changes, PR reviews via GitHub MCP,
+  docs restructuring inside `AGENTS.md` / `docs/`.
+- **Requires a brief first:** anything under `libs/nitro/` or
+  `libs/runtime/` — header scaffolding drifts fast without a
+  concrete call-site. Wait for the brain to scope one.
+- **When unsure:** open the PR, flag it under a "⚠️ Brain please
+  confirm scope" heading, and **don't** request merge — the brain
+  approves, rescopes, or closes.
+
 ## Branch naming
 
 `<agent-slug>/<kebab-case-scope>` — for example:
