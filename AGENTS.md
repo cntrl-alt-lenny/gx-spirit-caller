@@ -112,7 +112,10 @@ section at the bottom with a one-line note. Don't delete history.
 
 ## Task briefs
 
-When the brain writes a task for another agent, it goes here. Format:
+When the brain writes a task for another agent, it goes into
+`docs/briefs/NNN-<slug>.md` and gets a one-line pointer here so agents
+can see the open queue without opening every file. Format of the brief
+itself:
 
 ```
 ### <agent-slug>/<scope>
@@ -124,7 +127,12 @@ When the brain writes a task for another agent, it goes here. Format:
 **Branch:** suggested branch name following the convention above.
 ```
 
-(Empty at the moment — briefs arrive as tasks are scoped.)
+### Open briefs
+
+- [`docs/briefs/001-ov005-finish-trivials.md`](docs/briefs/001-ov005-finish-trivials.md)
+  — `claude-pc`: finish the 8 remaining trivial (size=0x4) stubs in
+  overlay 5, then start the easy-tier leaves. Explicitly **not** yet
+  `func_ov005_021aaea8` (0x58, medium tier).
 
 ## Retired agents
 
