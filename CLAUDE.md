@@ -5,9 +5,9 @@ Goal: a byte-identical ROM rebuilt from C source, verified via SHA-1.
 
 | Version | Game code | Baserom path              | Status                |
 |---------|-----------|---------------------------|-----------------------|
-| `usa`   | AYXE      | `orig/baserom_usa.nds`    | hash TBD              |
+| `usa`   | AYXE      | `orig/baserom_usa.nds`    | hashed                |
 | `eur`   | AYXP      | `orig/baserom_eur.nds`    | hashed (En,Fr,De,Es,It) |
-| `jpn`   | AYXJ      | `orig/baserom_jpn.nds`    | hash TBD              |
+| `jpn`   | AYXJ      | `orig/baserom_jpn.nds`    | hashed                |
 
 The version is a positional arg to `tools/configure.py` and appears in
 config/ and build/ subpaths. All three may coexist; pick one per run.
@@ -100,9 +100,10 @@ if the rebuilt ROM hashes equal to the baserom, every function is matched.
 
 ## Known placeholders to fill in
 
-1. **Baserom SHA-1 (usa, jpn)** — `BASEROM_SHA1` in `tools/configure.py`
-   and the checksum files `gx-spirit-caller_<ver>.sha1`. The EUR entry is
-   filled in (`1da50df7…b4f75`, En,Fr,De,Es,It dump). USA/JPN pending.
+1. ~~**Baserom SHA-1 (usa, jpn)**~~ — all three regions hashed:
+   EUR `1da50df7…b4f75` (En,Fr,De,Es,It), USA `9e53dcc7…c2a83`,
+   JPN `761fbfc6…424f6`. `BASEROM_SHA1` in `tools/configure.py` and
+   `gx-spirit-caller_<ver>.sha1` both set.
 2. **Exact mwcc SP revision** — `2.0/sp1p5` is the DS-era default and
    dqix's choice. Revisit after the first objdiff attempt; if everything
    is off by the same handful of instruction patterns, the SP revision
