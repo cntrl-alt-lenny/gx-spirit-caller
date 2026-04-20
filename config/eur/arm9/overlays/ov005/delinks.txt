@@ -24,3 +24,19 @@ src/overlay005/ov005_stubs_ad058.c:
 src/overlay005/ov005_stubs_b0b28.c:
     complete
     .text start:0x021b0b28 end:0x021b0b30
+
+src/overlay005/ov005_021ab0fc.c:
+    complete
+    .text start:0x021ab0fc end:0x021ab108
+
+src/overlay005/ov005_021ac9c8.c:
+    complete
+    .text start:0x021ac9c8 end:0x021ac9d0
+
+src/overlay005/ov005_021acacc.c:
+    complete
+    .text start:0x021acacc end:0x021acadc
+
+src/overlay005/ov005_021ad048.c:
+    complete
+    .text start:0x021ad048 end:0x021ad058
