@@ -84,7 +84,9 @@ the next brain (possibly on a different machine) can catch up in under
 a minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-20, after merging PRs #4–#17 (14 PRs today).
+**Last updated:** 2026-04-20 (evening), after brain handoff from PC to
+Mac. cntrl_alt_lenny moved machines and dropped USA + JPN dumps into
+`orig/` on the Mac. Mac brain is now active; PC brain is idle.
 
 **Baseline:** `ninja rom` succeeds, `./dsd.exe check modules` reports
 24/27 OK. ARM9 main / DTCM / overlay 4 still fail — expected,
@@ -122,32 +124,35 @@ repo, all hand-decomped with disassembly-prefaced comments).
     it — file's own header explains the drift risk. Kept for now.)
 
 **In flight:**
-  - `claude-pc` → nothing pending. Brief 001 (trivials + easy-tier)
-    is fully consumed. Next chunk needs a new brief (likely **brief
-    003: `__sinit` bulk match**, 51 templated functions — the
-    highest-leverage remaining target per `targets.md`).
-  - `claude-cloud` → no open brief. cntrl_alt_lenny said Cloud is "finished"
-    for now. If/when Cloud resumes, brief 003 scaffolding (e.g. a
-    `libs/runtime/sinit.c` template) is the natural next ask.
+  - PR #19 — `claude-brain/record-usa-jpn-hashes`. Records USA and
+    JPN baserom SHA-1s now that cntrl_alt_lenny's dumps are on the Mac.
+    Unblocks `python tools/configure.py usa/jpn`; doesn't build them
+    yet (no `config/usa/` or `config/jpn/` — dsd init is EUR-only).
+  - PR for brief 003 (this branch, `claude-brain/brief-003-sinit`) —
+    publishes [docs/briefs/003-sinit-bulk-match.md](docs/briefs/003-sinit-bulk-match.md)
+    and wires it into the Open briefs section.
+  - `claude-pc` → brief 003 is ready to pick up. `__sinit` bulk match
+    — match one, propagate the 0x2c pattern across 43 siblings in
+    passing overlays. See the brief for scope and first-target
+    recommendation.
+  - `claude-cloud` → still paused. cntrl_alt_lenny's instruction: stand
+    down until brief 003 surfaces scaffolding needs (likely a
+    `libs/runtime/sinit.c` / ctor-list header).
 
 **Next-brain TODO:**
-  1. **Write brief 003 for `claude-pc`**: the `__sinit` bulk match.
-     Target list: 51 `__sinit_*` across 15 overlays (see
-     `libs/runtime/README.md`). Check `build/eur/analysis/targets.md`
-     for the per-size / per-overlay breakdown — after re-running
-     `python tools/analyze_symbols.py --version eur`.
+  1. Merge PRs #19 and the brief-003 PR after review (they're both
+     authored by brain; a second brain or cntrl_alt_lenny should sanity-check
+     before merge).
   2. After the decomper ships brief 003, re-run the analyzer (`--diff`
      is worth a try now — PR #13 landed it) and look for cascades:
      every newly-named callee bumps unmatched functions up the tier
      list.
-  3. Stale remote branches may still exist if cntrl_alt_lenny's decomper or
-     cloud session still tracks merged branches locally. Safe to
-     delete with `git push origin --delete <branch>` once the agents
-     confirm they're off those branches.
-  4. Tools shipped but not yet used by the decomper:
-     `tools/rename_symbol.py`, `tools/overlay_coupling.py`,
-     `tools/data_symbol_sizes.py`. Mention them in the next brief so
-     the decomper knows they exist.
+  3. Stale remote branches: `claude-pc/ov005-easy-tier` (PR #11,
+     merged) is still on origin. Safe to `git push origin --delete`
+     once cntrl_alt_lenny confirms the PC decomper session is off it.
+  4. ~~Namecheck unused tools in the next brief.~~ Done in brief 003:
+     `tools/rename_symbol.py` (strongly recommended),
+     `tools/overlay_coupling.py`, `tools/data_symbol_sizes.py`.
 
 **New agents?** Still no. The brain + decomper + cloud slot-split held
 up cleanly under today's traffic (14 PRs, one merge conflict). Reopen
@@ -253,8 +258,13 @@ itself:
 
 ### Open briefs
 
-(none — briefs 001 and 002 both shipped and merged. Next brain should
-write brief 003 for `claude-pc` on the `__sinit` bulk match.)
+- [`docs/briefs/003-sinit-bulk-match.md`](docs/briefs/003-sinit-bulk-match.md)
+  — `claude-pc`, branch `claude-pc/sinit-bulk-match`. Match a single
+  `__sinit_*` (suggested: `__sinit_ov005_021b16e4`, size `0x2c`),
+  then propagate across the 43 same-sized siblings in passing
+  overlays. Outliers and `__sinit_ov004_*` are explicitly out of
+  scope. First PR should contain one matched function so the brain
+  can sanity-check the template before bulk propagation.
 
 ### Closed briefs (reference)
 
