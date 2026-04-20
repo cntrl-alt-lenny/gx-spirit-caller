@@ -1083,11 +1083,19 @@ def main() -> int:
     ap.add_argument("--diff", action="store_true",
                     help="Print changes vs the previous snapshot "
                          "(build/<ver>/analysis/snapshot.json)")
+    ap.add_argument("--against", type=Path, default=None,
+                    help="Compare against a snapshot at this path instead of "
+                         "the default build/<ver>/analysis/snapshot.json. "
+                         "Used by CI to compare PR vs main.")
+    ap.add_argument("--diff-json", type=Path, default=None,
+                    help="Also write the diff as JSON to this path. "
+                         "Used by CI to format PR comments.")
     args = ap.parse_args()
 
     config_root = ROOT / "config" / args.version
     out_dir = ROOT / "build" / args.version / "analysis"
     snapshot_path = out_dir / "snapshot.json"
+    compare_path = args.against if args.against is not None else snapshot_path
 
     modules = load_all(config_root)
     graph = build_call_graph(modules)
@@ -1099,20 +1107,26 @@ def main() -> int:
 
     # Load previous snapshot BEFORE writing the new one, so we keep
     # the pre-run state available for comparison.
-    prev_snapshot = read_snapshot(snapshot_path)
+    prev_snapshot = read_snapshot(compare_path)
     curr_snapshot = build_snapshot(args.version, targets)
 
-    if args.diff:
+    diff_payload: dict | None = None
+    if args.diff or args.diff_json is not None:
         if prev_snapshot is None:
             print(
-                "\n(--diff requested but no previous snapshot at "
-                f"{snapshot_path.relative_to(ROOT)} — this is the first "
-                "run on this machine. Rerun after a rename or match to "
-                "see the delta.)"
+                f"\n(No previous snapshot at {compare_path} — "
+                "diff skipped.)"
             )
         else:
-            print()
-            print_diff(compute_diff(prev_snapshot, curr_snapshot))
+            diff_payload = compute_diff(prev_snapshot, curr_snapshot)
+            if args.diff:
+                print()
+                print_diff(diff_payload)
+
+    if args.diff_json is not None and diff_payload is not None:
+        args.diff_json.parent.mkdir(parents=True, exist_ok=True)
+        with args.diff_json.open("w") as f:
+            json.dump(diff_payload, f, indent=2)
 
 
     if not args.no_outputs:
