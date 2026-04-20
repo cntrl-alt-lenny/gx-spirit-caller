@@ -27,10 +27,12 @@ from get_platform import get_platform
 
 
 DEFAULT_WIBO_PATH = "./wibo"
+DEFAULT_MACOS_WINE = "wine"  # Expect `wine` on PATH (brew install --cask wine-stable)
 
 
 parser = argparse.ArgumentParser(description="Generates build.ninja")
-parser.add_argument('-w', type=str, default=DEFAULT_WIBO_PATH, dest="wine", required=False, help="Path to Wine/Wibo (linux only)")
+parser.add_argument('-w', type=str, default=None, dest="wine", required=False,
+                    help="Path to the Win32 runner. Linux: wibo (auto-downloaded). macOS: wine on PATH (install via Homebrew). Unused on Windows.")
 parser.add_argument("--compiler", type=Path, required=False, help="Path to pre-installed compiler root directory")
 parser.add_argument("--no-extract", action="store_true", help="Skip extract step")
 parser.add_argument("--dsd", type=Path, required=False, help="Path to pre-installed dsd CLI")
@@ -44,7 +46,7 @@ args = parser.parse_args()
 # --------------------------------------------------------------------------- #
 
 GAME = "gx-spirit-caller"
-DSD_VERSION = 'v0.6.0'
+DSD_VERSION = 'v0.11.0'
 WIBO_VERSION = '0.6.16'
 OBJDIFF_VERSION = 'v2.7.1'
 MWCC_VERSION = "2.0/sp1p5"
@@ -54,7 +56,9 @@ DECOMP_ME_COMPILER = "mwcc_30_131"
 # Leave None until a verified dump is hashed by a human; once set, a wrong
 # dump fails configure.py with a clear error.
 BASEROM_SHA1: dict[str, str | None] = {
-    "usa": None,  # TODO: fill in after first verified dump (AYXE, US)
+    "usa": None,  # AYXE — fill in after first verified US dump
+    "eur": "1da50df7c210fae96dc69b3825554b9ce13b4f75",  # AYXP — En,Fr,De,Es,It
+    "jpn": None,  # AYXJ — fill in after first verified JP dump
 }
 
 CC_FLAGS = " ".join([
@@ -132,7 +136,14 @@ platform = get_platform()
 if platform is None:
     exit(1)
 EXE = platform.exe
-WINE = args.wine if platform.system != "windows" else ""
+# Pick the Win32 runner for running mwccarm.exe / mwldarm.exe on non-Windows hosts.
+# Linux: wibo (auto-downloaded via a ninja rule). macOS: system `wine` from Homebrew.
+if platform.system == "windows":
+    WINE = ""
+elif platform.system == "macos":
+    WINE = args.wine if args.wine is not None else DEFAULT_MACOS_WINE
+else:
+    WINE = args.wine if args.wine is not None else DEFAULT_WIBO_PATH
 DSD = str(args.dsd or os.path.join('.', str(root_path / f"dsd{EXE}")))
 OBJDIFF = os.path.join('.', str(root_path / f"objdiff-cli{EXE}"))
 CC = os.path.join('.', str(mwcc_path / "mwccarm.exe"))
@@ -407,7 +418,8 @@ def add_download_tool_builds(n: ninja_syntax.Writer):
         )
         n.newline()
 
-    if platform.system != "windows" and WINE == DEFAULT_WIBO_PATH:
+    # wibo is Linux-only; macOS uses a system-installed `wine`, so no download rule there.
+    if platform.system == "linux" and WINE == DEFAULT_WIBO_PATH:
         n.build(
             rule="download_tool",
             outputs=WINE,

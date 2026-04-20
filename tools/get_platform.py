@@ -4,9 +4,9 @@ import platform
 class Platform:
     def __init__(self, *, system: str, machine: str, exe: str):
         self.system = system
-        '''Name of operating system: "windows" or "linux"'''
+        '''OS name as used in tool release URLs: "windows", "linux", or "macos"'''
         self.machine = machine
-        '''Name of machine architecture: "x86_64"'''
+        '''Architecture as used in tool release URLs: "x86_64", "aarch64", or "arm64"'''
         self.exe = exe
         '''Executable file extension: ".exe" for Windows, "" otherwise'''
 
@@ -20,15 +20,23 @@ def get_platform() -> Platform | None:
     elif system == "Linux":
         system = "linux"
     elif system == "Darwin":
-        system = "linux"
+        system = "macos"
     else:
         print(f"Unknown system '{system}'")
         return None
-    match platform.machine().lower():
-        case "amd64" | "x86_64": machine = "x86_64"
-        case "arm64" | "aarch64": machine = "x86_64"
-        case machine:
-            print(f"Unknown machine: {machine}")
+
+    raw_machine = platform.machine().lower()
+    match raw_machine:
+        case "amd64" | "x86_64":
+            machine = "x86_64"
+        case "arm64":
+            machine = "arm64"
+        case "aarch64":
+            # objdiff-cli uses "aarch64" on Linux but "arm64" on macOS;
+            # dsd only ships "arm64" macOS binaries (no Linux arm builds).
+            machine = "arm64" if system == "macos" else "aarch64"
+        case _:
+            print(f"Unknown machine: {raw_machine}")
             return None
 
     return Platform(system=system, machine=machine, exe=exe)

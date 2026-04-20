@@ -35,3 +35,9 @@ __pycache__/
 objdiff.json
 *.sav
 *.xMAP
+
+# Python venv
+.venv/
+
+# Local scratch / review notes — not part of the project
+Files to be Reviewed/
