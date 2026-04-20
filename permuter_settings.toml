@@ -1,0 +1,68 @@
+# permuter_settings.toml
+#
+# Project-wide defaults for decomp-permuter
+# (https://github.com/simonlindholm/decomp-permuter). Permuter is the
+# NDS/GC/N64 decomp community's workhorse matcher — it applies bounded
+# random permutations to your C source (variable renames, type juggles,
+# loop restructuring, etc.) and reports which permutations produce a
+# byte-match against the target assembly. Essential for any function
+# larger than ~100 bytes that doesn't match on first try.
+#
+# Workflow (see `tools/permute.py` for a helper that resolves paths):
+#
+#   1. Check out decomp-permuter somewhere on disk, e.g.
+#      `cd .. && git clone https://github.com/simonlindholm/decomp-permuter`
+#      then `pip install pynacl toml Levenshtein`.
+#   2. `ninja rom && ninja objdiff`  (produces the .o we're matching)
+#   3. `python tools/permute.py <function_name>`  — prints the exact
+#      command to run permuter's `./import.py` with the right paths.
+#   4. `cd ../decomp-permuter && ./permuter.py /path/to/work_dir -j`
+#
+# Permuter auto-picks this file up when `./import.py` runs inside a
+# subtree that contains it. Per-function `settings.toml` overrides are
+# layered on top of these defaults.
+
+# Build system: permuter re-invokes ninja to rebuild the target .o.
+build_system = "ninja"
+
+# Compiler family: CodeWarrior ARM (mwccarm.exe / mwldarm.exe).
+# Permuter uses this to pick the right asm diffing strategy.
+compiler_type = "mwcc"
+
+# Architecture for asm parsing. Mwccarm targets ARMv5 / ARM946E.
+target_arch = "arm32"
+
+# Compile flags — kept in sync with tools/configure.py:CC_FLAGS manually.
+# If configure.py's flags change, update here or permuter's generated
+# compile.sh will diverge from the project's actual build.
+compile_flags = [
+    "-O4,p",
+    "-enum int",
+    "-char signed",
+    "-str noreuse",
+    "-proc arm946e",
+    "-gccext,on",
+    "-fp soft",
+    "-inline noauto",
+    "-Cpp_exceptions off",
+    "-RTTI off",
+    "-interworking",
+    "-w off",
+    "-sym on",
+    "-gccinc",
+    "-lang=c",
+]
+
+# Include paths, relative to repo root. Permuter substitutes these into
+# the generated compile.sh.
+include_paths = [
+    "include",
+    "libs/nitro/include",
+    "libs/runtime/include",
+]
+
+# Extra preprocessor defines. Passed to mwccarm via `-d`. Match the
+# defines `configure.py` injects per build.
+defines = [
+    "VERSION_EUR=1",
+]
