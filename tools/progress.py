@@ -87,7 +87,7 @@ def print_report(version: str, report: dict) -> None:
     code_total   = as_int(measures.get("total_code"))
     data_matched = as_int(measures.get("matched_data"))
     data_total   = as_int(measures.get("total_data"))
-    units_done   = as_int(measures.get("complete_code"))
+    units_done   = as_int(measures.get("complete_units"))
     units_total  = as_int(measures.get("total_units"))
 
     print(f"  code:   {code_matched:>10} / {code_total:<10} bytes  ({pct(code_matched, code_total):5.2f}%)")
