@@ -1,0 +1,1 @@
+Wiki source lives in [`wiki/`](https://github.com/cntrl-alt-lenny/gx-spirit-caller/tree/main/wiki) on the main repo — edit via PR, not the wiki UI. Licensed under [MIT](https://github.com/cntrl-alt-lenny/gx-spirit-caller/blob/main/LICENSE).
