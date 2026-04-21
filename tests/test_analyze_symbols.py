@@ -25,6 +25,13 @@ from pathlib import Path
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
+# The import block below is deliberately comprehensive: it doubles as
+# an import-time smoke test of the analyze_symbols public surface. If
+# a downstream tool (targets.md, bulk.json, CI tier-delta comments,
+# rename_symbol.py, permute.py) relies on a name that later gets
+# removed or renamed, this module stops loading and CI fails fast —
+# louder than any single test would be. F401 is waived for this file
+# in ruff.toml; the "unused" imports are the point.
 from analyze_symbols import (  # noqa: E402
     BulkGroup,
     CallGraph,

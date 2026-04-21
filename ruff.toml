@@ -29,3 +29,7 @@ ignore = [
 [lint.per-file-ignores]
 # Vendored from upstream — leave alone.
 "tools/ninja_syntax.py" = ["ALL"]
+# Deliberate import-time smoke test of the analyze_symbols public surface.
+# The "unused" imports are the point — they fail-fast on schema drift.
+# See the comment above the import block in the file itself.
+"tests/test_analyze_symbols.py" = ["F401"]
