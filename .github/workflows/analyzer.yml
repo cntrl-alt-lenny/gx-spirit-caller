@@ -1,0 +1,121 @@
+name: Analyzer
+
+# Runs the decomp-target analyzer on every PR and on every push to main.
+# On PRs, posts a tier-delta comment comparing PR state vs main. On
+# main pushes, validates that the analyzer still runs cleanly (guards
+# against symbols.txt / config breakage sneaking past PR review).
+#
+# Does NOT build the ROM, run `dsd`, or regenerate the match-%
+# progress-heatmap.svg — those require the baserom, which CI never has
+# access to. The tier-coloured heatmap alternative was explicitly
+# parked for a separate PR (see the PR #21 description / brain's
+# Cloud-autonomous-work assignment).
+
+on:
+  pull_request:
+    paths:
+      - 'config/**'
+      - 'src/**'
+      - 'tools/analyze_symbols.py'
+      - 'tools/ci_format_diff.py'
+      - '.github/workflows/analyzer.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/**'
+      - 'src/**'
+      - 'tools/analyze_symbols.py'
+
+permissions:
+  contents: read
+
+jobs:
+  pr-tier-delta:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout PR (with full history for the base-branch diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r tools/requirements.txt
+
+      - name: Analyze main baseline
+        run: |
+          set -euo pipefail
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+          git worktree add /tmp/main-tree origin/${{ github.event.pull_request.base.ref }}
+          (cd /tmp/main-tree && python tools/analyze_symbols.py \
+              --version eur --no-outputs >/dev/null 2>&1 || true)
+          if [ -f /tmp/main-tree/build/eur/analysis/snapshot.json ]; then
+            cp /tmp/main-tree/build/eur/analysis/snapshot.json /tmp/main-snapshot.json
+          else
+            echo '{}' > /tmp/main-snapshot.json
+          fi
+
+      - name: Analyze PR + compute diff
+        run: |
+          python tools/analyze_symbols.py \
+              --version eur \
+              --no-outputs \
+              --against /tmp/main-snapshot.json \
+              --diff-json /tmp/diff.json
+
+      - name: Format diff as Markdown
+        run: python tools/ci_format_diff.py /tmp/diff.json -o /tmp/comment.md
+
+      - name: Upsert PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Find any prior analyzer comment on this PR and update it in
+        # place, so the PR timeline isn't spammed with a new comment on
+        # every push. Falls back to creating one if none exists.
+        run: |
+          set -euo pipefail
+          MARKER='<sub>🤖 Posted by `.github/workflows/analyzer.yml`'
+          PR=${{ github.event.pull_request.number }}
+          existing_id=$(
+            gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
+              --jq ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
+              | head -n1 || true
+          )
+          if [ -n "${existing_id}" ]; then
+            gh api --method PATCH \
+              "repos/${{ github.repository }}/issues/comments/${existing_id}" \
+              -f body="$(cat /tmp/comment.md)"
+          else
+            gh pr comment "${PR}" --body-file /tmp/comment.md \
+                --repo "${{ github.repository }}"
+          fi
+
+  main-baseline:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r tools/requirements.txt
+
+      - name: Run analyzer (validates config/ integrity)
+        run: python tools/analyze_symbols.py --version eur --no-outputs
