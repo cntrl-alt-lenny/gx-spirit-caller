@@ -28,3 +28,15 @@ src/overlay009/ov009_stubs_ab1b4.c:
 src/overlay009/ov009_stubs_ab840.c:
     complete
     .text start:0x021ab840 end:0x021ab848
+
+src/overlay009/ov009_021ab324.c:
+    complete
+    .text start:0x021ab324 end:0x021ab32c
+
+src/overlay009/ov009_021ab838.c:
+    complete
+    .text start:0x021ab838 end:0x021ab840
+
+src/overlay009/ov009_021ad204.c:
+    complete
+    .text start:0x021ad204 end:0x021ad214
