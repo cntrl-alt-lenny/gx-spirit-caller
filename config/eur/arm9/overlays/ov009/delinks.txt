@@ -16,3 +16,15 @@ src/overlay009/sinit_ov009_021ad894.c:
 src/overlay009/sinit_ov009_021ad8c0.c:
     complete
     .init start:0x021ad8c0 end:0x021ad8ec
+
+src/overlay009/ov009_stubs_aa4a0.c:
+    complete
+    .text start:0x021aa4a0 end:0x021aa4a8
+
+src/overlay009/ov009_stubs_ab1b4.c:
+    complete
+    .text start:0x021ab1b4 end:0x021ab1bc
+
+src/overlay009/ov009_stubs_ab840.c:
+    complete
+    .text start:0x021ab840 end:0x021ab848
