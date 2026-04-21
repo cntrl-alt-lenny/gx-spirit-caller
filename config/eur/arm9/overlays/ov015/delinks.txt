@@ -8,3 +8,7 @@
 src/overlay015/sinit_ov015_021b5b14.c:
     complete
     .init start:0x021b5b14 end:0x021b5b40
+
+src/overlay015/sinit_ov015_021b5b40.c:
+    complete
+    .init start:0x021b5b40 end:0x021b5b7c
