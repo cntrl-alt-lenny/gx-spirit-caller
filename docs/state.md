@@ -8,102 +8,102 @@ brain (possibly on a different machine) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-21 morning, after the overnight merge wave
-(10 PRs) brought main to `bf1e978`. cntrl_alt_lenny authorised cloud
-to refresh this file directly since after the PR #24 split it was
-still showing yesterday's pre-merge state.
+**Last updated:** 2026-04-21 afternoon, after the wave of 6 PRs
+(#34 / #36 / #37 / #38 / #39 / #40) brought main to `1d8cb6f`.
+cntrl_alt_lenny authorised cloud to refresh the file directly since
+brain is busy on the decomp-coordination path. asm-vs-C decision
+went to **C** (retroactively validated by the shape of #36's match).
 
 **Baseline:** `ninja rom` succeeds, `./dsd.exe check modules` reports
 24/27 OK. ARM9 main / DTCM / overlay 4 still fail — expected,
 placeholder-symbol artifacts per CLAUDE.md, not caused by agent work.
+ov005 stays ✅ after the #36 match landed there.
 
-**Matched function count:** 17 (unchanged since 2026-04-20). All in
-overlay 5: 12 × 4-byte `bx lr` stubs plus 5 easy-tier leaves from
-PR #11 (`021ab0fc`, `021ac9c8`, `021acacc`, `021acad4`, `021ad048`).
-Decomper hasn't opened a match PR this cycle — brief 003 (`__sinit`
-bulk) is scoped and waiting for pickup.
+**Matched function count:** **18** (up from 17). Delta: +1 function,
++44 bytes. The new one is `__sinit_ov005_021b16e4` from PR #36 — the
+first `0x2c`-byte CodeWarrior static-init stub matched, serving as
+the template for the 43-sibling bulk propagation now in flight with
+the decomper. `progress.py` ticks 100 → 144 bytes matched.
 
-## Merged overnight (in landing order)
+## Merged since last refresh (this session)
 
-Brain confirmed wave order: 28 → 30 → 31 → 29 → 27 → 33 → 32 → 23 →
-24 → 25. Main tip: `bf1e978`.
+In landing order. Main tip: `1d8cb6f`.
 
-- **PR #28** — `.editorconfig`. Cross-editor tab / newline / charset
-  defaults so mixed PC/Mac/web sessions don't whitespace-thrash.
-- **PR #30** — `.github/PULL_REQUEST_TEMPLATE.md` + structured issue
-  templates. Review handoffs now follow a consistent shape.
-- **PR #31** — `tools/generate_briefs_index.py` + seeded
-  `docs/briefs/README.md`. Briefs have an auto-regenerated index.
-- **PR #29** — `.github/workflows/labeler.yml` + `.github/labeler.yml`
-  (cloud). Auto-labels every PR by `area:*` path family and
-  `agent:*` head-branch prefix. Self-bootstrapping `gh label create`.
-- **PR #27** — `tests/test_analyze_symbols.py`, 56-test unittest
-  suite + `tests.yml` workflow (cloud). Pins analyzer behaviour
-  against schema drift; runs in ~80ms.
-- **PR #33** — `tools/update_progress_badge.py`. README progress
-  badge now refreshes from `progress.py` output on every main push.
-- **PR #32** — ruff + markdownlint CI, plus preexisting findings
-  fixed (brain). Found 5 "unused" imports in PR #27's test file that
-  are actually smoke-imports verifying the public API surface —
-  interaction-only issue; fix in-flight as PR #34.
-- **PR #23** — `.github/workflows/analyzer.yml` + `tools/ci_format_diff.py`
-  + analyzer `--against` / `--diff-json` flags (cloud). Posts a
-  tier-delta comment on every PR vs `main`. Upserts so the timeline
-  isn't spammed.
-- **PR #24** — split State of play out of `AGENTS.md` into
-  `docs/state.md` (cloud). AGENTS.md: 339 → 253 lines.
-- **PR #25** — Cloud autonomous-work policy (cloud). Formalises what
-  cloud may ship unbriefed (tools/, CI, docs, analyzer changes) vs
-  what needs a brief (libs/nitro/, libs/runtime/).
+- **PR #34** — `claude-brain/lint-fix-test-smoke-imports`. Ruff F401
+  waiver for the test file's intentional smoke-imports. Brain's
+  narrow follow-up to PR #27 ↔ #32 interaction.
+- **PR #36** — `claude-pc/sinit-bulk-match`. Decomper's first
+  `__sinit_*` match. Locally-externed `func_020b42f4`; surfaces the
+  mwcc `#pragma define_section / #pragma section INIT begin/end`
+  syntax find for `.init`-section symbol routing.
+- **PR #35** — `claude-cloud/refresh-state-md`. Cloud's refresh of
+  this file to the previous baseline (`bf1e978`).
+- **PR #38** — `claude-cloud/tests-cover-tools`. Extends the unittest
+  suite 56 → 86 tests, covering `rename_symbol.py` + `ci_format_diff.py`.
+- **PR #39** — `claude-cloud/overlay-coupling-loads`. `--loads` mode
+  for `overlay_coupling.py`. Surfaces ov001 / ov023 as even more
+  standalone in the data dimension than they are on calls.
+- **PR #40** — `claude-brain/progress-delinks-fallback`. Adds a
+  delinks.txt fallback to `progress.py` so the README progress badge
+  stops showing 0.00%-red in CI (CI can't run `ninja rom`, so
+  `report.json` never exists there).
+- **PR #37** — `claude-cloud/runtime-sinit-header`. Ships
+  `libs/runtime/include/runtime/sinit.h` with a `__register_global_object`
+  extern, to be shared by all 44 `__sinit_*` shells once the
+  decomper's propagation migrates off locally-externed
+  `func_020b42f4`. Opened draft with ⚠️ scope-check; brain promoted
+  to ready after cntrl_alt_lenny picked C over asm.
 
-## Closed without merging
+## Earlier wave (2026-04-21 overnight, for historical context)
 
-- **PR #26** — wiki seed attempt. Near-verbatim duplicate of
-  `CLAUDE.md`; brain closed it rather than maintain two drifting
-  sources of truth. Reopen as a "CLAUDE.md → wiki generator" (script
-  that publishes one-way) if we revisit.
+Landed before this session: PRs #28 → #30 → #31 → #29 → #27 → #33
+→ #32 → #23 → #24 → #25 (wave order: editorconfig, PR/issue
+templates, briefs index, PR labeler, analyzer test suite, progress
+badge, ruff+markdownlint CI, analyzer tier-delta workflow,
+state.md split, autonomy policy).
+
+PR #26 (wiki duplicate of `CLAUDE.md`) closed without merging.
 
 ## In flight
 
-- **PR #34** — `claude-brain/lint-fix-test-smoke-imports`. Ruff F401
-  waiver for the test file's intentional smoke-imports. Narrow fix;
-  brain's own follow-up to PR #32 / #27 interaction.
-- **`claude-pc` → brief 003.** `__sinit` bulk match ready to pick up.
-  `docs/briefs/003-sinit-bulk-match.md` has the scope: match one
-  `0x2c`-byte `__sinit_*` in a passing overlay, propagate to its 43
-  same-(module,size) siblings via `tools/rename_symbol.py`. No PR
-  yet — decomper hasn't started this cycle.
-- **`claude-cloud`** — autonomy is now formal per PR #25. Docs
-  restructure + CI + tools/analyzer-improvements all unbriefed-OK.
-  `libs/nitro/` and `libs/runtime/` still need briefs.
+- **`claude-pc` → brief 003 propagation.** After #36's template match
+  and #37's shared header, the decomper propagates the `0x2c` pattern
+  across the remaining 43 `__sinit_*` siblings in passing overlays.
+  Workflow per sibling: `#include <runtime/sinit.h>`, drop the local
+  `func_020b42f4` extern, `tools/rename_symbol.py` the symbol, rebuild,
+  objdiff, commit. Expect 3-5 PRs batching by overlay (ov006 × 11 is
+  the biggest single-overlay cluster; ov005 × 5, ov016 × 5 next).
+- **Brain** — standing by for propagation PRs; will self-merge when
+  cntrl_alt_lenny is AFK per AGENTS.md §3.
+- **`claude-cloud`** — optional follow-ups while decomper propagates:
+  - `generate_heatmap.py` delinks fallback (same pattern as #40 for
+    progress.py). Branch: `claude-cloud/heatmap-delinks-fallback`.
 
 ## Next-brain TODO
 
-1. Merge PR #34 (your own F401 waiver). One-line fix, no functional
-   impact — self-merge when cntrl_alt_lenny is AFK per AGENTS.md.
-2. When `claude-pc` ships its first brief-003 PR, the analyzer's
-   tier-delta comment (PR #23) should light up automatically — spot-
-   check the first one looks sensible. Re-run `analyze_symbols.py
-   --diff` locally to cross-verify.
-3. Stale remote branch to clean:
-   - `claude-pc/ov005-easy-tier` (PR #11 merged). Cloud's sandbox
-     gets HTTP 403 on `git push --delete`; any PC session or the
-     GitHub UI can delete in one click.
-4. If brief-003's first match uncovers a real `nn_hook_ctor_list` or
-   similar `libs/runtime/sinit.c` need, scope that as brief 004 for
-   cloud. Until it surfaces, no speculative libs/ work.
-5. The `claude/*` (no agent suffix) branches in recent remote
-   fetches — `claude/improve-wiki-formatting-YhqJP`,
-   `claude/add-editorconfig` — came from GitHub's built-in Claude
-   integration, not our named agents. They land as normal PRs; keep
-   an eye on whether they respect AGENTS.md scope.
+1. Review each decomper propagation PR as it lands. Check `dsd check
+   modules` still reports 24/27 OK after each merge (no accidental
+   layout drift in the passing overlays).
+2. After the full 43-sibling propagation completes, retire `#include`
+   of the local `func_020b42f4` externs and let `<runtime/sinit.h>`
+   become authoritative. Rename `func_020b42f4` →
+   `__register_global_object` via `tools/rename_symbol.py`.
+3. Refresh this file again after propagation wraps. Matched-function
+   count will jump from 18 to ~62 in one wave.
+4. Stale remote branch: `claude-pc/ov005-easy-tier` (PR #11 merged).
+   Cloud gets HTTP 403 on `git push --delete`; any PC session or the
+   GitHub UI clears it in one click.
+5. `claude/*` (no-suffix) branches continue to land from GitHub's
+   built-in Claude integration. Still respecting scope so far; no
+   action needed.
 
 ## New agents?
 
-Still no. Brain + decomper + cloud slot-split is holding under
-~24 merged PRs in the first full working day. Reopen the question if:
+Still no. Brain + decomper + cloud slot-split is holding under ~28
+merged PRs over the first working day. Reopen the question if:
+
 - Asset pipelines (graphics / audio) become a decomp target — likely
   a dedicated `asset-pc` agent at that point.
-- PR review latency becomes the bottleneck (brain backlogged) — at
-  which point a second brain-class agent on a different machine
-  could help, per the existing handoff-is-stateless design.
+- PR-review latency becomes the bottleneck (brain backlogged) — at
+  which point a second brain-class agent on a different machine could
+  help, per the existing handoff-is-stateless design.
