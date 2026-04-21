@@ -3,20 +3,29 @@
 """
 Reports decomp progress for Yu-Gi-Oh! GX Spirit Caller.
 
-Two sources, in order of preference:
+Three sources, in order of preference (descending fidelity):
 
   1. build/<version>/report.json produced by `ninja report`
-     (i.e. `objdiff-cli report generate`). Post-decomp, this is the source
-     of truth — it reports matched code %, matched data %, complete-unit
-     counts, etc.
+     (i.e. `objdiff-cli report generate`). Post-decomp + post-build, this
+     is the source of truth — reports matched code %, matched data %,
+     complete-unit counts, etc. Requires the full toolchain to generate.
 
-  2. config/<version>/**/symbols.txt — the list of every known symbol,
-     produced by `dsd init`. Pre-decomp (before anything compiles), we
-     just count function entries here so the denominator is non-zero.
+  2. config/<version>/**/delinks.txt produced by `dsd init` + hand-carved
+     TU headers. Sums the byte ranges of TUs marked `complete` as matched
+     code/data, against the module section maps as totals. No build
+     required — works in CI where the baserom and toolchain aren't
+     available. A "complete" TU in delinks is a strong signal that
+     objdiff agrees the bytes match (that's what the decomper types in
+     once they verify 100% match).
 
-When neither exists yet, we print a friendly hint and exit 0. This script
-is stubbed for the 0% state; expand the report.json parser once decomp
-actually begins.
+  3. config/<version>/**/symbols.txt — the list of every known symbol.
+     Pre-carve fallback: just counts function entries so the denominator
+     is non-zero. Matched is always 0 here. Used only when neither
+     report.json nor any TU-carved delinks.txt exists.
+
+All three produce the same top-level shape when `--json` is passed so
+downstream tools (update_progress_badge.py, generate_heatmap.py) don't
+need to know which source was used.
 """
 
 import argparse
@@ -26,6 +35,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# Section classifications for the delinks.txt tier. Matches objdiff's
+# own categorisation (.text + .init count as code; everything else that
+# carries actual bytes counts as data).
+CODE_SECTIONS = {".text", ".init"}
+DATA_SECTIONS = {".data", ".rodata", ".ctor", ".dtor", ".bss"}
 
 
 def count_functions_in_symbols(symbols_file: Path) -> int:
@@ -55,6 +70,155 @@ def count_total_functions(config_dir: Path) -> int:
     for symbols in config_dir.rglob("symbols.txt"):
         total += count_functions_in_symbols(symbols)
     return total
+
+
+# --------------------------------------------------------------------------- #
+# delinks.txt tier
+# --------------------------------------------------------------------------- #
+
+def parse_delinks_file(delinks_file: Path) -> tuple[list[tuple[str, int, int]], list[dict]]:
+    """Parse a dsd-produced delinks.txt.
+
+    Returns a tuple `(module_sections, tus)`:
+
+      module_sections: list of (section_name, start, end) tuples for the
+        module-wide section map at the top of the file — the
+        authoritative byte-range totals for this module.
+
+      tus: list of TU dicts, each
+          {"source": "src/...c" or "_dsd_gap@...",
+           "status": "complete" | None,
+           "sections": [(name, start, end), ...]}
+
+    File layout:
+
+        .text       start:0x... end:0x... kind:code align:32   <-- module map
+        .rodata     start:...                                  <-- module map
+        ...                                                    <-- blank line
+        src/path/foo.c:                                        <-- TU header
+            complete                                           <-- optional
+            .text start:0x... end:0x...                        <-- section
+        _dsd_gap@mod_N:                                        <-- gap TU
+            .text start:...
+    """
+    module_sections: list[tuple[str, int, int]] = []
+    tus: list[dict] = []
+    current_tu: dict | None = None
+    in_tu_section = False  # False while we're still in the leading module map
+
+    if not delinks_file.is_file():
+        return module_sections, tus
+
+    try:
+        with delinks_file.open() as f:
+            for raw in f:
+                line = raw.rstrip()
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+
+                # TU header: `src/...:` or `_dsd_gap@...:`
+                if stripped.endswith(":") and not stripped.startswith("."):
+                    if current_tu is not None:
+                        tus.append(current_tu)
+                    current_tu = {
+                        "source": stripped.rstrip(":"),
+                        "status": None,
+                        "sections": [],
+                    }
+                    in_tu_section = True
+                    continue
+
+                # Status line: `complete` (or other bare keyword). Only
+                # meaningful once we're inside a TU.
+                if in_tu_section and current_tu is not None and \
+                   stripped in ("complete", "incomplete"):
+                    current_tu["status"] = stripped
+                    continue
+
+                # Section line: starts with a dot.
+                if stripped.startswith("."):
+                    parts = stripped.split()
+                    section_name = parts[0]
+                    start = end = None
+                    for p in parts[1:]:
+                        if p.startswith("start:0x"):
+                            start = int(p[len("start:0x"):], 16)
+                        elif p.startswith("end:0x"):
+                            end = int(p[len("end:0x"):], 16)
+                    if start is None or end is None:
+                        continue
+                    if in_tu_section and current_tu is not None:
+                        current_tu["sections"].append((section_name, start, end))
+                    else:
+                        module_sections.append((section_name, start, end))
+                    continue
+                # Any other line (unrecognised): leave TU context alone.
+        if current_tu is not None:
+            tus.append(current_tu)
+    except OSError:
+        pass
+    return module_sections, tus
+
+
+def summarize_delinks(config_dir: Path) -> dict | None:
+    """Walk every config/<ver>/**/delinks.txt and aggregate byte totals
+    into a report.json-shaped dict. Returns None if no delinks.txt
+    files are found.
+
+    Totals come from the module section maps (authoritative). Matched
+    sums sections from TUs whose status is `complete`.
+    """
+    all_delinks = list(config_dir.rglob("delinks.txt"))
+    if not all_delinks:
+        return None
+
+    matched_code = total_code = matched_data = total_data = 0
+    matched_units = total_units = 0
+
+    for delinks in all_delinks:
+        module_sections, tus = parse_delinks_file(delinks)
+
+        # Totals — from the module-level section map.
+        for name, start, end in module_sections:
+            size = max(0, end - start)
+            if name in CODE_SECTIONS:
+                total_code += size
+            elif name in DATA_SECTIONS:
+                total_data += size
+
+        # Matched — from TUs with status=complete. Gap entries
+        # (`_dsd_gap@...`) are uncarved TUs that count toward the
+        # denominator (they're chunks to eventually match) but never
+        # toward matched (status=complete is typed by the decomper once
+        # objdiff agrees).
+        for tu in tus:
+            total_units += 1
+            if tu.get("source", "").startswith("_dsd_gap"):
+                continue
+            if tu.get("status") != "complete":
+                continue
+            matched_units += 1
+            for name, start, end in tu.get("sections", []):
+                size = max(0, end - start)
+                if name in CODE_SECTIONS:
+                    matched_code += size
+                elif name in DATA_SECTIONS:
+                    matched_data += size
+
+    return {
+        "source": "delinks",
+        "measures": {
+            # Match report.json's str-bytes convention for values that
+            # could overflow JS safe-int range in downstream tooling.
+            "matched_code":    str(matched_code),
+            "total_code":      str(total_code),
+            "matched_data":    str(matched_data),
+            "total_data":      str(total_data),
+            "complete_units":  matched_units,
+            "total_units":     total_units,
+        },
+    }
 
 
 def print_stub(version: str, total: int) -> None:
@@ -113,6 +277,8 @@ def main() -> int:
     report_path = ROOT / "build" / args.version / "report.json"
     config_dir  = ROOT / "config" / args.version
 
+    # Tier 1 — objdiff-generated report.json. Highest fidelity; requires
+    # a post-`ninja report` local build.
     if report_path.is_file():
         with report_path.open() as f:
             report = json.load(f)
@@ -123,6 +289,27 @@ def main() -> int:
             print_report(args.version, report)
         return 0
 
+    # Tier 2 — delinks.txt-derived summary. Works in CI (no toolchain
+    # or baserom needed); counts bytes in TUs the decomper has marked
+    # `complete`. Approximate but correct-directional.
+    delinks_summary = summarize_delinks(config_dir)
+    if delinks_summary is not None and delinks_summary["measures"]["total_units"]:
+        if args.json:
+            # Merge a `state: delinks` tag so downstream tools can see
+            # the provenance without changing their measures-reading code.
+            payload = {"version": args.version, "state": "delinks",
+                       **delinks_summary}
+            json.dump(payload, sys.stdout, indent=2)
+            print()
+        else:
+            print_report(args.version, delinks_summary)
+            print("  source: delinks.txt (approximate — run `ninja report` locally "
+                  "for objdiff-verified numbers)")
+        return 0
+
+    # Tier 3 — pre-carve stub. Only runs when there is no delinks.txt
+    # TU graph yet. Matched is always 0; just shows the denominator so
+    # the badge says 0.00% of N functions instead of 0.00% of nothing.
     total = count_total_functions(config_dir)
     if args.json:
         json.dump({
