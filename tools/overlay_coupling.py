@@ -39,10 +39,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_symbols import (  # noqa: E402
     CALL_RELOC_KINDS,
     FAILING_MODULES,
+    LOAD_RELOC_KINDS,
     ROOT,
     discover_modules,
     parse_relocs_file,
 )
+
+
+MODES: dict[str, tuple[set[str], str, str]] = {
+    # key -> (reloc-kind set, stdout/md label, output filename suffix)
+    "calls": (CALL_RELOC_KINDS, "call", ""),
+    "loads": (LOAD_RELOC_KINDS, "load", "-loads"),
+}
 
 
 def module_relocs_path(config_root: Path, module: str) -> Path:
@@ -55,14 +63,18 @@ def module_relocs_path(config_root: Path, module: str) -> Path:
     return arm9 / "overlays" / module / "relocs.txt"
 
 
-def build_matrix(config_root: Path) -> tuple[list[str], dict[tuple[str, str], int]]:
+def build_matrix(
+    config_root: Path,
+    kinds: set[str] = CALL_RELOC_KINDS,
+) -> tuple[list[str], dict[tuple[str, str], int]]:
     """Return (modules, edges) where edges[(src, dst)] is the number of
-    call relocs from src into dst. Self-loops included (src == dst)."""
+    relocs from src into dst whose kind is in `kinds`. Self-loops
+    included (src == dst)."""
     modules = discover_modules(config_root)
     edges: dict[tuple[str, str], int] = defaultdict(int)
     for src in modules:
         for r in parse_relocs_file(module_relocs_path(config_root, src), src):
-            if r.kind in CALL_RELOC_KINDS:
+            if r.kind in kinds:
                 edges[(src, r.dest_module)] += 1
     return modules, dict(edges)
 
@@ -85,20 +97,25 @@ def standalone(modules: list[str], edges: dict[tuple[str, str], int], threshold:
     return out
 
 
-def print_summary(modules: list[str], edges: dict[tuple[str, str], int], top_n: int) -> None:
+def print_summary(
+    modules: list[str],
+    edges: dict[tuple[str, str], int],
+    top_n: int,
+    label: str = "call",
+) -> None:
     total = sum(edges.values())
     self_edges = sum(c for (s, d), c in edges.items() if s == d)
     cross_edges = total - self_edges
-    print(f"Modules            : {len(modules)}")
-    print(f"Total call edges   : {total}")
-    print(f"  self-loops       : {self_edges}")
-    print(f"  cross-module     : {cross_edges}")
+    print(f"Modules                 : {len(modules)}")
+    print(f"Total {label} edges     : {total}")
+    print(f"  self-loops            : {self_edges}")
+    print(f"  cross-module          : {cross_edges}")
     print()
 
     # Top-N pairs by count, cross-module only.
     cross = [((s, d), c) for (s, d), c in edges.items() if s != d]
     cross.sort(key=lambda kv: -kv[1])
-    print(f"Top {top_n} coupled pairs (src -> dst, call count):")
+    print(f"Top {top_n} coupled pairs (src -> dst, {label} count):")
     for (s, d), c in cross[:top_n]:
         fail = ""
         if s in FAILING_MODULES or d in FAILING_MODULES:
@@ -107,9 +124,9 @@ def print_summary(modules: list[str], edges: dict[tuple[str, str], int], top_n: 
     print()
 
     stands = standalone(modules, edges, threshold=20)
-    print(f"Standalone modules (< 20 external outbound calls): {len(stands)}")
+    print(f"Standalone modules (< 20 external outbound {label}s): {len(stands)}")
     for m, external in stands:
-        print(f"  {m:<6s}  {external} external calls")
+        print(f"  {m:<6s}  {external} external {label}s")
 
 
 def write_coupling_md(
@@ -117,6 +134,7 @@ def write_coupling_md(
     modules: list[str],
     edges: dict[tuple[str, str], int],
     top_n: int,
+    label: str = "call",
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -124,19 +142,22 @@ def write_coupling_md(
     cross.sort(key=lambda kv: -kv[1])
 
     lines: list[str] = []
-    lines.append("# Overlay coupling")
+    title = "Overlay coupling" if label == "call" else f"Overlay coupling ({label}s)"
+    lines.append(f"# {title}")
     lines.append("")
+    kind_extra = "" if label == "call" else f" (filtered to {label} relocs)"
     lines.append(
-        "Cross-module call density, derived from every "
-        "`config/<ver>/arm9/**/relocs.txt`. Regenerate with "
-        "`python tools/overlay_coupling.py --version <ver>`."
+        f"Cross-module {label} density, derived from every "
+        f"`config/<ver>/arm9/**/relocs.txt`{kind_extra}. Regenerate with "
+        f"`python tools/overlay_coupling.py --version <ver>"
+        f"{' --loads' if label == 'load' else ''}`."
     )
     lines.append("")
 
     total = sum(edges.values())
     self_edges = sum(c for (s, d), c in edges.items() if s == d)
     cross_edges = total - self_edges
-    lines.append(f"- Total call edges: **{total}** "
+    lines.append(f"- Total {label} edges: **{total}** "
                  f"({self_edges} self-loops, {cross_edges} cross-module)")
     lines.append(f"- Modules: **{len(modules)}**")
     lines.append("")
@@ -144,7 +165,7 @@ def write_coupling_md(
     # Top-N pairs.
     lines.append(f"## Tightest-coupled pairs (top {min(top_n, len(cross))})")
     lines.append("")
-    lines.append("| Rank | Src | Dst | Call count | Notes |")
+    lines.append(f"| Rank | Src | Dst | {label.capitalize()} count | Notes |")
     lines.append("|-----:|-----|-----|-----------:|-------|")
     for i, ((s, d), c) in enumerate(cross[:top_n], start=1):
         notes = []
@@ -156,9 +177,9 @@ def write_coupling_md(
     lines.append("")
 
     # Per-module "top 3 outbound" matrix.
-    lines.append("## Per-module top 3 outbound destinations")
+    lines.append(f"## Per-module top 3 outbound destinations ({label}s)")
     lines.append("")
-    lines.append("| Module | Self calls | Top 3 external destinations |")
+    lines.append(f"| Module | Self {label}s | Top 3 external destinations |")
     lines.append("|--------|-----------:|------------------------------|")
     for m in modules:
         self_c = edges.get((m, m), 0)
@@ -173,12 +194,12 @@ def write_coupling_md(
 
     # Standalone modules.
     stands = standalone(modules, edges, threshold=20)
-    lines.append("## Standalone modules (< 20 external outbound calls)")
+    lines.append(f"## Standalone modules (< 20 external outbound {label}s)")
     lines.append("")
     if not stands:
         lines.append("(none)")
     else:
-        lines.append("| Module | External calls |")
+        lines.append(f"| Module | External {label}s |")
         lines.append("|--------|---------------:|")
         for m, external in stands:
             lines.append(f"| {m} | {external} |")
@@ -190,24 +211,35 @@ def write_coupling_md(
 
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Cross-module call density report for dsd-based decomps"
+        description="Cross-module call/load density report for dsd-based decomps"
     )
     ap.add_argument("--version", default="eur")
     ap.add_argument("--top", type=int, default=15,
                     help="Top N coupled pairs to show (default 15)")
     ap.add_argument("--no-outputs", action="store_true",
-                    help="Skip writing build/<ver>/analysis/coupling.md")
+                    help="Skip writing build/<ver>/analysis/coupling*.md")
+    mode_group = ap.add_mutually_exclusive_group()
+    mode_group.add_argument("--calls", dest="mode", action="store_const", const="calls",
+                            help="Count call relocs (default)")
+    mode_group.add_argument("--loads", dest="mode", action="store_const", const="loads",
+                            help="Count load relocs instead — shows which overlay reads "
+                                 "which other module's data. Complements --calls: loads "
+                                 "tell you who reads a data structure, calls tell you "
+                                 "who invokes a function.")
+    ap.set_defaults(mode="calls")
     args = ap.parse_args()
 
     config_root = ROOT / "config" / args.version
     out_dir = ROOT / "build" / args.version / "analysis"
+    kinds, label, suffix = MODES[args.mode]
 
-    modules, edges = build_matrix(config_root)
-    print_summary(modules, edges, top_n=args.top)
+    modules, edges = build_matrix(config_root, kinds=kinds)
+    print_summary(modules, edges, top_n=args.top, label=label)
 
     if not args.no_outputs:
-        write_coupling_md(out_dir / "coupling.md", modules, edges, top_n=args.top)
-        print(f"\nWrote {out_dir}/coupling.md", file=sys.stderr)
+        md_path = out_dir / f"coupling{suffix}.md"
+        write_coupling_md(md_path, modules, edges, top_n=args.top, label=label)
+        print(f"\nWrote {md_path}", file=sys.stderr)
 
     return 0
 
