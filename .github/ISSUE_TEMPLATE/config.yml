@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Wiki
+    url: https://github.com/cntrl-alt-lenny/gx-spirit-caller/wiki
+    about: Toolchain table, matching workflow, project conventions, build status
+  - name: ds-decomp upstream issues
+    url: https://github.com/AetiasHax/ds-decomp/issues
+    about: For dsd analyzer / extraction bugs (not specific to this game)

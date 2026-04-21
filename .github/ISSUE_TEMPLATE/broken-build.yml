@@ -1,0 +1,78 @@
+name: Broken build
+description: The build fails for me on a clean checkout
+title: "[build] "
+labels: ["build", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please fill in everything you can — most build
+        failures come down to platform / Python / runner mismatches, and the
+        details below let us reproduce or rule those out fast.
+
+  - type: input
+    id: os
+    attributes:
+      label: OS and architecture
+      description: e.g. `macOS 14.4 arm64`, `Ubuntu 22.04 x86_64`, `Windows 11`
+      placeholder: "macOS 14.4 arm64"
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      description: Output of `python --version`
+      placeholder: "3.12.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: region
+    attributes:
+      label: Region
+      options:
+        - usa
+        - eur
+        - jpn
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which step failed?
+      options:
+        - tools/configure.py
+        - ninja extract/<ver>/config.yaml
+        - dsd init (bootstrapping)
+        - ninja (compile / link)
+        - ninja objdiff / report
+        - ninja sha1
+        - other (describe below)
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Exact command that failed
+      placeholder: "ninja sha1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Full output
+      description: Paste the full output of the failing command. Use a code block.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Did you modify anything? Are you on a fork? Anything special about your environment?
