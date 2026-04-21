@@ -11,3 +11,11 @@ src/overlay007/sinit_ov007_021b2f38.c:
 src/overlay007/sinit_ov007_021b2f64.c:
     complete
     .init start:0x021b2f64 end:0x021b2f90
+
+src/overlay007/ov007_stubs_b2560.c:
+    complete
+    .text start:0x021b2560 end:0x021b2568
+
+src/overlay007/ov007_stubs_b2a90.c:
+    complete
+    .text start:0x021b2a90 end:0x021b2a98

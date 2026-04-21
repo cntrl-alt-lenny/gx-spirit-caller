@@ -48,3 +48,47 @@ src/overlay006/sinit_ov006_021cba24.c:
 src/overlay006/sinit_ov006_021cba50.c:
     complete
     .init start:0x021cba50 end:0x021cba7c
+
+src/overlay006/ov006_stubs_b5c24.c:
+    complete
+    .text start:0x021b5c24 end:0x021b5c2c
+
+src/overlay006/ov006_stubs_b9ef0.c:
+    complete
+    .text start:0x021b9ef0 end:0x021b9ef8
+
+src/overlay006/ov006_stubs_c1554.c:
+    complete
+    .text start:0x021c1554 end:0x021c155c
+
+src/overlay006/ov006_stubs_c19a0.c:
+    complete
+    .text start:0x021c19a0 end:0x021c19a8
+
+src/overlay006/ov006_stubs_c507c.c:
+    complete
+    .text start:0x021c507c end:0x021c5084
+
+src/overlay006/ov006_stubs_c695c.c:
+    complete
+    .text start:0x021c695c end:0x021c6964
+
+src/overlay006/ov006_stubs_c6bf8.c:
+    complete
+    .text start:0x021c6bf8 end:0x021c6c00
+
+src/overlay006/ov006_stubs_c7554.c:
+    complete
+    .text start:0x021c7554 end:0x021c755c
+
+src/overlay006/ov006_stubs_c9ecc.c:
+    complete
+    .text start:0x021c9ecc end:0x021c9ed4
+
+src/overlay006/ov006_stubs_cac08.c:
+    complete
+    .text start:0x021cac08 end:0x021cac10
+
+src/overlay006/ov006_stubs_cb028.c:
+    complete
+    .text start:0x021cb028 end:0x021cb030
