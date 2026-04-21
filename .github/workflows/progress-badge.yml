@@ -1,0 +1,65 @@
+name: Update progress badge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'config/**/symbols.txt'
+      - 'tools/progress.py'
+      - 'tools/update_progress_badge.py'
+      - 'README.md'
+  schedule:
+    # Weekly backstop in case something slips past the path filter.
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: progress-badge
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update README badge
+        id: update
+        run: |
+          python tools/update_progress_badge.py --version eur
+          # Capture whether README actually changed.
+          if git diff --quiet README.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open PR with badge update
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bot/progress-badge
+          delete-branch: true
+          commit-message: "chore: update README progress badge"
+          title: "chore: update README progress badge"
+          body: |
+            Automated badge refresh from `tools/update_progress_badge.py`.
+
+            Triggered by changes under `config/**/symbols.txt` (or a scheduled
+            run / manual dispatch). The script reads `tools/progress.py --json`
+            and rewrites the `img.shields.io/badge/Progress-...` URL in
+            `README.md`.
+
+            Safe to merge if the diff is the badge URL only.
+          labels: |
+            automation
+            docs
