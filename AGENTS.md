@@ -225,22 +225,28 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/003-sinit-bulk-match.md`](docs/briefs/003-sinit-bulk-match.md)
-  — `claude-pc`, branch `claude-pc/sinit-bulk-match`. Match a single
-  `__sinit_*` (suggested: `__sinit_ov005_021b16e4`, size `0x2c`),
-  then propagate across the 43 same-sized siblings in passing
-  overlays. Outliers and `__sinit_ov004_*` are explicitly out of
-  scope. First PR should contain one matched function so the brain
-  can sanity-check the template before bulk propagation.
+(none right now; see `docs/state.md` for the next-brain TODO queue)
 
 ### Closed briefs (reference)
 
 - [`docs/briefs/001-ov005-finish-trivials.md`](docs/briefs/001-ov005-finish-trivials.md)
-  — `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
+  `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
   matched (8 trivial + 5 easy-tier leaves).
 - [`docs/briefs/002-analyzer-bulk-groups.md`](docs/briefs/002-analyzer-bulk-groups.md)
-  — `claude-cloud`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
+  `claude-cloud`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
   with 382 bulk groups covering 8009 functions.
+- [`docs/briefs/003-sinit-bulk-match.md`](docs/briefs/003-sinit-bulk-match.md)
+  `claude-pc`, shipped across the sinit wave PRs. Matched the
+  same-sized `__sinit_*` group; deferred the documented outliers.
+- [`docs/briefs/004-trivial-stubs-wave.md`](docs/briefs/004-trivial-stubs-wave.md)
+  `claude-pc`, shipped in PR #63, PR #65, and PR #66. Matched 56
+  trivial `bx lr` stubs across passing overlays.
+- [`docs/briefs/005-easy-tier-wave.md`](docs/briefs/005-easy-tier-wave.md)
+  `claude-pc`, shipped in PR #70, PR #71, and PR #72. Matched 24
+  easy-tier leaves across ov005/ov006/ov007/ov009.
+- [`docs/briefs/006-easy-tier-heavies.md`](docs/briefs/006-easy-tier-heavies.md)
+  `claude-pc`, shipped in PR #79, PR #80, PR #81, and PR #82.
+  Matched 29 easy-tier leaves across ov015/ov010/ov011/ov000.
 
 ## Retired agents
 
@@ -248,20 +254,5 @@ itself:
 
 ## In-flight branches at time of writing
 
-For reference — these predate the manifest. Brain should review and
-merge (or request changes on) each in whatever order makes sense:
-
-  - `claude/symbol-analyzer` — Cloud's decomp-target analyzer
-    (`tools/analyze_symbols.py`). Parses every `config/eur/**/symbols.txt`
-    + `relocs.txt`, builds a call graph, classifies 9,867 functions
-    into 6 tiers (trivial / easy / sinit / named / medium / hard).
-    Emits `build/eur/analysis/{graph.json,targets.md}`.
-  - `claude/libs-nitro-scaffold` — Cloud's NitroSDK + CodeWarrior
-    runtime header scaffolding (`libs/nitro/`, `libs/runtime/`).
-    Declarations only, no `.c` files yet; provides the inclusion
-    target for future matched code.
-  - `claude-cloud/agents-manifest` — this file's introduction PR.
-
-Future Cloud branches will use the `claude-cloud/` prefix; the two
-`claude/…` branches above predate the naming convention and stay
-as-is until merged.
+None known after brief 006. Use `gh pr list --state open` and
+`docs/state.md` as the live source of truth before starting work.
