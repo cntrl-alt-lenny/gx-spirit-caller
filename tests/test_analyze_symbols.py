@@ -39,6 +39,7 @@ from analyze_symbols import (  # noqa: E402
     ModuleData,
     Reloc,
     Symbol,
+    Target,
     TIER_ORDER,
     _name_family,
     build_call_graph,
@@ -519,6 +520,146 @@ class TestComputeDiff(unittest.TestCase):
         d = compute_diff(prev, curr)
         self.assertEqual(d["tier_delta"]["hard"], -3)
         self.assertEqual(d["tier_delta"]["medium"], 3)
+
+    # --- bulk-group diff -----------------------------------------------------
+
+    def test_bulk_groups_missing_is_empty(self):
+        # Snapshots that predate schema 2 have no bulk_groups field;
+        # compute_diff must treat that side as empty rather than crashing.
+        prev = {"symbols": {}}
+        curr = {"symbols": {}}
+        d = compute_diff(prev, curr)
+        self.assertEqual(d["bulk_groups_new"], [])
+        self.assertEqual(d["bulk_groups_removed"], [])
+        self.assertEqual(d["bulk_groups_changed"], [])
+
+    def test_bulk_group_newly_formed(self):
+        prev = {"symbols": {}, "bulk_groups": {}}
+        curr = {
+            "symbols": {},
+            "bulk_groups": {
+                "ov005|0x2c|__sinit": {
+                    "count": 5, "all_sinit": True,
+                    "all_placeholder": False, "failing_module": False,
+                },
+            },
+        }
+        d = compute_diff(prev, curr)
+        self.assertEqual(d["bulk_groups_new"],
+                         [("ov005|0x2c|__sinit", 5, True)])
+        self.assertEqual(d["bulk_groups_removed"], [])
+        self.assertEqual(d["bulk_groups_changed"], [])
+
+    def test_bulk_group_dissolved(self):
+        # Group existed in prev, gone in curr (e.g. members got named
+        # out individually and dropped below the 4-member threshold).
+        prev = {
+            "symbols": {},
+            "bulk_groups": {
+                "main|0x4|": {
+                    "count": 4, "all_sinit": False,
+                    "all_placeholder": True, "failing_module": True,
+                },
+            },
+        }
+        curr = {"symbols": {}, "bulk_groups": {}}
+        d = compute_diff(prev, curr)
+        self.assertEqual(d["bulk_groups_removed"],
+                         [("main|0x4|", 4, False)])
+
+    def test_bulk_group_count_change(self):
+        prev = {
+            "symbols": {},
+            "bulk_groups": {
+                "ov006|0x2c|__sinit": {
+                    "count": 11, "all_sinit": True,
+                    "all_placeholder": False, "failing_module": False,
+                },
+            },
+        }
+        curr = {
+            "symbols": {},
+            "bulk_groups": {
+                "ov006|0x2c|__sinit": {
+                    "count": 7, "all_sinit": True,
+                    "all_placeholder": False, "failing_module": False,
+                },
+            },
+        }
+        d = compute_diff(prev, curr)
+        self.assertEqual(len(d["bulk_groups_changed"]), 1)
+        key, pc, cc, pf, cf = d["bulk_groups_changed"][0]
+        self.assertEqual(key, "ov006|0x2c|__sinit")
+        self.assertEqual((pc, cc), (11, 7))
+        self.assertEqual(pf, cf)  # flags unchanged, only count dropped
+
+    def test_bulk_group_flag_flip(self):
+        # all_placeholder True -> False means someone renamed a member
+        # out of the placeholder pool. This is the signal that bulk
+        # progress is happening even if count stayed constant.
+        prev = {
+            "symbols": {},
+            "bulk_groups": {
+                "ov005|0x4|": {
+                    "count": 12, "all_sinit": False,
+                    "all_placeholder": True, "failing_module": False,
+                },
+            },
+        }
+        curr = {
+            "symbols": {},
+            "bulk_groups": {
+                "ov005|0x4|": {
+                    "count": 12, "all_sinit": False,
+                    "all_placeholder": False, "failing_module": False,
+                },
+            },
+        }
+        d = compute_diff(prev, curr)
+        self.assertEqual(len(d["bulk_groups_changed"]), 1)
+        _key, pc, cc, pf, cf = d["bulk_groups_changed"][0]
+        self.assertEqual((pc, cc), (12, 12))
+        self.assertEqual(pf, (False, True))
+        self.assertEqual(cf, (False, False))
+
+    def test_bulk_group_unchanged_not_reported(self):
+        # Identical group on both sides — must not appear in any of
+        # the three bulk_groups_* lists.
+        group = {
+            "count": 5, "all_sinit": True,
+            "all_placeholder": False, "failing_module": False,
+        }
+        prev = {"symbols": {}, "bulk_groups": {"ov005|0x2c|__sinit": group}}
+        curr = {"symbols": {}, "bulk_groups": {"ov005|0x2c|__sinit": group}}
+        d = compute_diff(prev, curr)
+        self.assertEqual(d["bulk_groups_new"], [])
+        self.assertEqual(d["bulk_groups_removed"], [])
+        self.assertEqual(d["bulk_groups_changed"], [])
+
+
+class TestBuildSnapshotWithGroups(unittest.TestCase):
+    """build_snapshot learned to accept a groups list in schema 2.
+    Omitting it must keep snapshot schema-compat with schema 1 output."""
+
+    def test_omitting_groups_omits_key(self):
+        tgt = Target(symbol=make_symbol("Entry", "main", 0x100, size=4),
+                     tier="named", reason="", callees_named=0, callees_total=0)
+        snap = build_snapshot("eur", [tgt])
+        self.assertNotIn("bulk_groups", snap)
+
+    def test_passing_groups_populates_key(self):
+        tgt = Target(symbol=make_symbol("Entry", "main", 0x100, size=4),
+                     tier="named", reason="", callees_named=0, callees_total=0)
+        sinit_syms = [make_symbol(f"__sinit_ov005_{i:x}", "ov005",
+                                  0x1000 + i * 0x2c, size=0x2c)
+                      for i in range(5)]
+        group = BulkGroup(module="ov005", size=0x2c, members=sinit_syms)
+        snap = build_snapshot("eur", [tgt], [group])
+        self.assertIn("bulk_groups", snap)
+        self.assertIn("ov005|0x2c|__sinit", snap["bulk_groups"])
+        entry = snap["bulk_groups"]["ov005|0x2c|__sinit"]
+        self.assertEqual(entry["count"], 5)
+        self.assertTrue(entry["all_sinit"])
 
 
 # --------------------------------------------------------------------------- #

@@ -167,6 +167,97 @@ class TestRender(unittest.TestCase):
         # Footer.
         self.assertIn(".github/workflows/analyzer.yml", md)
 
+    # --- bulk-group section --------------------------------------------------
+
+    def test_bulk_groups_absent_when_empty(self):
+        md = render({
+            "bulk_groups_new": [],
+            "bulk_groups_removed": [],
+            "bulk_groups_changed": [],
+        })
+        self.assertNotIn("### Bulk groups", md)
+
+    def test_bulk_groups_new_rendered(self):
+        md = render({
+            "bulk_groups_new": [
+                ("ov005|0x2c|__sinit", 5, True),
+                ("ov006|0x4|", 10, False),
+            ],
+        })
+        self.assertIn("### Bulk groups (2 new, 0 removed, 0 changed)", md)
+        # Pipes inside the key are escaped so the table cell stays
+        # intact in a GFM-rendered PR comment.
+        self.assertIn(r"`ov005\|0x2c\|__sinit`", md)
+        self.assertIn("`__sinit`", md)  # __sinit note rendered
+        self.assertIn(r"`ov006\|0x4\|`", md)
+        # Plus-sign column for new groups.
+        self.assertIn(r"| + | `ov005\|0x2c\|__sinit`", md)
+
+    def test_bulk_groups_removed_rendered(self):
+        md = render({
+            "bulk_groups_removed": [
+                ("main|0x4|", 4, False),
+            ],
+        })
+        self.assertIn("### Bulk groups (0 new, 1 removed, 0 changed)", md)
+        # Unicode minus sign used for removed groups.
+        self.assertIn(r"| − | `main\|0x4\|`", md)
+
+    def test_bulk_group_keys_escape_pipes(self):
+        # Regression for Codex P2: bulk-group IDs contain `|` and
+        # land directly in GFM table cells, where unescaped pipes
+        # split the row into extra columns (hiding count + notes).
+        # Verify both that the escape is present and that the raw
+        # pipe never appears in the bulk-group rows.
+        md = render({
+            "bulk_groups_new": [("ov005|0x2c|__sinit", 5, True)],
+            "bulk_groups_removed": [("main|0x4|", 4, False)],
+            "bulk_groups_changed": [
+                ("ov006|0x2c|__sinit", 11, 7, (True, False), (True, False)),
+            ],
+        })
+        # Escaped form is present for each row.
+        self.assertIn(r"`ov005\|0x2c\|__sinit`", md)
+        self.assertIn(r"`main\|0x4\|`", md)
+        self.assertIn(r"`ov006\|0x2c\|__sinit`", md)
+        # Scope the "no unescaped pipes in keys" check to the bulk
+        # rows by searching for each key's raw form inside backticks.
+        self.assertNotIn("`ov005|0x2c|__sinit`", md)
+        self.assertNotIn("`main|0x4|`", md)
+        self.assertNotIn("`ov006|0x2c|__sinit`", md)
+
+    def test_bulk_groups_count_change(self):
+        md = render({
+            "bulk_groups_changed": [
+                ("ov006|0x2c|__sinit", 11, 7, (True, False), (True, False)),
+            ],
+        })
+        self.assertIn("### Bulk groups (0 new, 0 removed, 1 changed)", md)
+        # Count delta rendered with sign.
+        self.assertIn("11→7 (-4)", md)
+
+    def test_bulk_groups_flag_flip(self):
+        md = render({
+            "bulk_groups_changed": [
+                ("ov005|0x4|", 12, 12, (False, True), (False, False)),
+            ],
+        })
+        self.assertIn("`all_placeholder` True→False", md)
+        # Count unchanged, flags flipped — delta renders as bare `0`
+        # (not `+0` or `-0`; zero gets no sign).
+        self.assertIn("12→12 (0)", md)
+
+    def test_bulk_groups_truncation_note(self):
+        # More than the limit should emit "and N more".
+        many_new = [(f"g{i}", 5, False) for i in range(20)]
+        md = render({"bulk_groups_new": many_new}, limit=5)
+        # Only first 5 rendered.
+        self.assertIn("`g0`", md)
+        self.assertIn("`g4`", md)
+        self.assertNotIn("`g5`", md)
+        # Note about the rest.
+        self.assertIn("and 15 more", md)
+
 
 if __name__ == "__main__":
     unittest.main()
