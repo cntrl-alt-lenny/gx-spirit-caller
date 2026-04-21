@@ -39,6 +39,7 @@ from analyze_symbols import (  # noqa: E402
     ModuleData,
     Reloc,
     Symbol,
+    Target,
     TIER_ORDER,
     _name_family,
     build_call_graph,
@@ -641,14 +642,12 @@ class TestBuildSnapshotWithGroups(unittest.TestCase):
     Omitting it must keep snapshot schema-compat with schema 1 output."""
 
     def test_omitting_groups_omits_key(self):
-        from analyze_symbols import Target, build_snapshot
         tgt = Target(symbol=make_symbol("Entry", "main", 0x100, size=4),
                      tier="named", reason="", callees_named=0, callees_total=0)
         snap = build_snapshot("eur", [tgt])
         self.assertNotIn("bulk_groups", snap)
 
     def test_passing_groups_populates_key(self):
-        from analyze_symbols import BulkGroup, Target, build_snapshot
         tgt = Target(symbol=make_symbol("Entry", "main", 0x100, size=4),
                      tier="named", reason="", callees_named=0, callees_total=0)
         sinit_syms = [make_symbol(f"__sinit_ov005_{i:x}", "ov005",
