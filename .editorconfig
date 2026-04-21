@@ -1,0 +1,50 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Python: PEP 8.
+[*.py]
+indent_size = 4
+
+# C / C++ / headers.
+[*.{c,cpp,h,hpp,inc}]
+indent_size = 4
+
+# YAML / TOML / JSON: 2-space indent is the de facto standard.
+[*.{yml,yaml,toml,json}]
+indent_size = 2
+
+# Markdown: keep trailing whitespace (two trailing spaces = hard line break).
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# Ninja build files use single-space indent for continuations; leave alone.
+[*.ninja]
+indent_style = space
+indent_size = 2
+
+# dsd-generated config: machine-written, never hand-edited (per CLAUDE.md).
+# Leave whitespace alone so dsd round-trips don't churn.
+[config/**]
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = false
+insert_final_newline = unset
+
+# Same for extracted/built artifacts (gitignored, but in case any sneak in).
+[{extract,build}/**]
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = false
+insert_final_newline = unset
+
+# Makefiles need real tabs.
+[{Makefile,*.mk}]
+indent_style = tab
