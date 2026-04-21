@@ -3,3 +3,11 @@
     .ctor       start:0x021b2f90 end:0x021b2f98 kind:rodata align:4
     .data       start:0x021b2fa0 end:0x021b3480 kind:data align:32
     .bss        start:0x021b3480 end:0x02233580 kind:bss align:32
+
+src/overlay007/sinit_ov007_021b2f38.c:
+    complete
+    .init start:0x021b2f38 end:0x021b2f64
+
+src/overlay007/sinit_ov007_021b2f64.c:
+    complete
+    .init start:0x021b2f64 end:0x021b2f90
