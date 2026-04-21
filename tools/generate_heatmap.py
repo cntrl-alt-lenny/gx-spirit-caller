@@ -21,6 +21,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Reuse the delinks.txt parser that brain already wrote for progress.py.
+# Same file format, same CODE/DATA section classification — keeping schema
+# drift in one place.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from progress import (  # noqa: E402
+    CODE_SECTIONS,
+    DATA_SECTIONS,
+    parse_delinks_file,
+)
+
 # Canvas
 WIDTH = 1200
 HEIGHT = 480
@@ -243,6 +253,81 @@ def render_svg(report: dict, version: str) -> str:
     return "".join(out)
 
 
+def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
+    """Build a report.json-shaped dict from config/<ver>/**/delinks.txt
+    when the real report.json isn't available (typical CI case — no
+    baserom, so `ninja report` can't run).
+
+    Unlike progress.py's summarize_delinks (which only produces top-
+    level aggregates), this emits the full per-unit list the heatmap
+    needs: each TU becomes a treemap cell with its own byte totals
+    and match percentages.
+
+    Returns None if no delinks.txt files are found (first-run state).
+
+    Matching heuristic: a TU marked `complete` in delinks.txt counts
+    all its sections' bytes as matched. `_dsd_gap@*` TUs count as
+    total-only (they're the uncarved remainder). This mirrors what
+    objdiff reports locally once `ninja report` has run.
+    """
+    all_delinks = list(config_dir.rglob("delinks.txt"))
+    if not all_delinks:
+        return None
+
+    units: list[dict] = []
+    m_code = t_code = m_data = t_data = 0
+    complete_units = 0
+
+    for delinks in all_delinks:
+        _module_sections, tus = parse_delinks_file(delinks)
+        for tu in tus:
+            name = tu.get("source", "")
+            status = tu.get("status")
+            is_gap = name.startswith("_dsd_gap")
+            is_complete = (status == "complete") and not is_gap
+
+            unit_total_code = unit_total_data = 0
+            for section, start, end in tu.get("sections", []):
+                size = max(0, end - start)
+                if section in CODE_SECTIONS:
+                    unit_total_code += size
+                elif section in DATA_SECTIONS:
+                    unit_total_data += size
+
+            unit_matched_code = unit_total_code if is_complete else 0
+            unit_matched_data = unit_total_data if is_complete else 0
+
+            t_code += unit_total_code
+            t_data += unit_total_data
+            m_code += unit_matched_code
+            m_data += unit_matched_data
+            if is_complete:
+                complete_units += 1
+
+            units.append({
+                "name": name,
+                "measures": {
+                    "matched_code": str(unit_matched_code),
+                    "total_code":   str(unit_total_code),
+                    "matched_data": str(unit_matched_data),
+                    "total_data":   str(unit_total_data),
+                },
+            })
+
+    return {
+        "source": "delinks",
+        "measures": {
+            "matched_code":   str(m_code),
+            "total_code":     str(t_code),
+            "matched_data":   str(m_data),
+            "total_data":     str(t_data),
+            "complete_code":  complete_units,
+            "total_units":    len(units),
+        },
+        "units": units,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate decomp progress heatmap SVG")
     parser.add_argument("--version", default="eur", help="Version (eur/usa/jpn)")
@@ -255,17 +340,34 @@ def main():
     report_path = args.report or (ROOT / "build" / args.version / "report.json")
     out_path = args.out or (ROOT / "assets" / "progress-heatmap.svg")
 
-    if not report_path.exists():
-        print(f"error: {report_path} not found — run `ninja report` first.", file=sys.stderr)
-        sys.exit(1)
-
-    with report_path.open("r", encoding="utf-8") as f:
-        report = json.load(f)
+    if report_path.exists():
+        with report_path.open("r", encoding="utf-8") as f:
+            report = json.load(f)
+        source = "report.json"
+    else:
+        # CI fallback: no baserom → no `ninja report` → no report.json.
+        # Synthesize per-unit data from delinks.txt so the heatmap
+        # regenerates meaningfully in CI instead of silently failing.
+        config_dir = ROOT / "config" / args.version
+        report = synthesize_report_from_delinks(config_dir)
+        if report is None:
+            print(
+                f"error: {report_path} not found and no "
+                f"{config_dir}/**/delinks.txt files to fall back on. "
+                "Run `ninja report` locally or `dsd init` to produce "
+                "the config.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        source = "delinks.txt fallback"
 
     svg = render_svg(report, args.version)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(svg, encoding="utf-8")
-    print(f"wrote {out_path} ({out_path.stat().st_size} bytes, {len(report.get('units', []))} units)")
+    print(
+        f"wrote {out_path} ({out_path.stat().st_size} bytes, "
+        f"{len(report.get('units', []))} units, source: {source})"
+    )
 
 
 if __name__ == "__main__":
