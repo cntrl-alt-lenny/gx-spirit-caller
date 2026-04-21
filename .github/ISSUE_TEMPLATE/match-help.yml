@@ -1,0 +1,59 @@
+name: Match help
+description: A function is being stubborn — share context and ask for ideas
+title: "[match] "
+labels: ["match-help"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for "I've tried X, Y, Z and the diff still won't close" —
+        not for general questions. For those, open a Discussion or ask in
+        whatever chat the project uses.
+
+  - type: input
+    id: function
+    attributes:
+      label: Function address / name
+      placeholder: "func_021ab0fc (overlay 5)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: region
+    attributes:
+      label: Region
+      options:
+        - usa
+        - eur
+        - jpn
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you've tried
+      description: Variations attempted, casts tried, decomp.me scratches, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: diff
+    attributes:
+      label: Current objdiff output
+      description: Paste the relevant section of the per-function diff.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: scratch
+    attributes:
+      label: decomp.me scratch URL (optional)
+      placeholder: "https://decomp.me/scratch/abcde"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Any other context
+      description: Suspected calling convention quirks, NitroSDK calls involved, related matched siblings, etc.
