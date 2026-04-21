@@ -7,7 +7,10 @@ in the PR body).
 
 from __future__ import annotations
 
+import contextlib
+import io
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -19,6 +22,8 @@ from find_duplicates import (  # noqa: E402
     Fingerprint,
     compute_fingerprint,
     find_duplicate_clusters,
+    print_summary,
+    write_md,
 )
 
 
@@ -186,6 +191,66 @@ class TestFindDuplicateClusters(unittest.TestCase):
         # Higher leverage first.
         self.assertEqual(clusters[0].fingerprint.size, 0x4)
         self.assertEqual(clusters[1].fingerprint.size, 0x10)
+
+
+class TestPrintSummaryAsciiSafe(unittest.TestCase):
+    """Regression for Codex P2 on PR #49: print_summary must not
+    crash when stdout can only encode ASCII (Windows cp1252,
+    LC_ALL=C). Reproduce by capturing stdout as an ASCII-only
+    stream and verifying every byte written encodes cleanly."""
+
+    def _cluster_with_calls(self):
+        syms = [sym(f"f_{m}", m, 0x100, size=0x4)
+                for m in ("ov005", "ov006", "ov007", "ov008")]
+        modules = {s.module: make_module(s.module, [s]) for s in syms}
+        graph = CallGraph()
+        # Give each one an outgoing call so callee_modules is non-empty
+        # AND exercise the empty-set-like branch (no calls) via size
+        # mismatch — handled below in a second cluster.
+        for s in syms:
+            graph.edges_call[(s.module, s.addr)].add(("main", 0x200))
+        return find_duplicate_clusters(modules, graph)
+
+    def test_print_summary_encodes_as_ascii(self):
+        clusters = self._cluster_with_calls()
+        self.assertTrue(clusters)  # fixture sanity
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            print_summary(clusters, top_n=5)
+        # Must encode cleanly as strict ASCII.
+        buf.getvalue().encode("ascii")  # raises on any non-ASCII
+
+    def test_print_summary_no_outgoing_calls_ascii_safe(self):
+        # The empty-callees branch used to emit U+2205 EMPTY SET.
+        syms = [sym(f"f_{i}", "ov005", 0x100 + i * 4, size=0x4)
+                for i in range(4)]
+        modules = {"ov005": make_module("ov005", syms)}
+        clusters = find_duplicate_clusters(modules, CallGraph())
+        self.assertTrue(clusters)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            print_summary(clusters, top_n=5)
+        buf.getvalue().encode("ascii")
+
+
+class TestWriteMdEncoding(unittest.TestCase):
+    """write_md uses non-ASCII glyphs (em-dash, checkmark, ellipsis).
+    The file opener must pin UTF-8 so it doesn't crash in a non-UTF-8
+    default locale."""
+
+    def test_write_md_uses_utf8(self):
+        syms = [sym(f"f_{i}", "ov005", 0x100 + i * 4, size=0x4)
+                for i in range(4)]
+        modules = {"ov005": make_module("ov005", syms)}
+        clusters = find_duplicate_clusters(modules, CallGraph())
+        self.assertTrue(clusters)
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "dupes.md"
+            write_md(out, clusters, top_n=5, sample_per_cluster=2)
+            # Must round-trip as UTF-8 (won't in cp1252).
+            text = out.read_text(encoding="utf-8")
+            # Body is non-empty and includes at least the known header.
+            self.assertIn("Duplicate / template candidates", text)
 
 
 if __name__ == "__main__":
