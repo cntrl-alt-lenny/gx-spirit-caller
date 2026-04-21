@@ -247,6 +247,9 @@ itself:
 - [`docs/briefs/006-easy-tier-heavies.md`](docs/briefs/006-easy-tier-heavies.md)
   `claude-pc`, shipped in PR #79, PR #80, PR #81, and PR #82.
   Matched 29 easy-tier leaves across ov015/ov010/ov011/ov000.
+- [`docs/briefs/007-ov000-bit-getter.md`](docs/briefs/007-ov000-bit-getter.md)
+  `claude-pc`, shipped in PR #85. Matched one ov000 0x10 bit getter
+  as the low-risk Brief 007 opener.
 
 ## Retired agents
 
