@@ -17,9 +17,10 @@ from the current config), it:
   2. Generates a `.c` file with a skeleton body plus a comment
      header listing the discovered context (who calls this, what
      it calls, what data it loads).
-  3. Prints the delinks.txt TU header line the decomper pastes
-     after they verify the match. We do NOT auto-modify
-     delinks.txt — that's the decomper's carving territory.
+  3. Prints the exact delinks.txt `complete` TU block for the
+     skeleton. By default this is only a dry-run preview; pass both
+     `--confirm --apply-delinks` to append those blocks after objdiff
+     verifies the match.
 
 The scaffolded skeleton is a starting-point artifact, not a
 finished match. Decomper still iterates against objdiff to:
@@ -44,6 +45,11 @@ Usage:
 
   # Actually write files (default is dry-run).
   python tools/scaffold_batch.py --version eur --count 5 --confirm
+
+  # After the generated files have been matched, append their exact
+  # complete-TU delinks blocks too.
+  python tools/scaffold_batch.py --version eur --count 5 \\
+      --confirm --apply-delinks
 
 """
 
@@ -72,6 +78,7 @@ from next_targets import (  # noqa: E402
     collect_matched_ranges,
     is_addr_matched,
 )
+from progress import parse_delinks_file  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
@@ -88,6 +95,8 @@ class ScaffoldPlan:
     output_path: Path
     text: str
     delinks_line: str
+    delinks_block: str
+    delinks_section: str
     warnings: list[str] = field(default_factory=list)
 
 
@@ -111,6 +120,56 @@ def _derive_output_path(sym: Symbol) -> Path:
     if stem.startswith("func_"):
         stem = stem[len("func_"):]
     return ROOT / "src" / subdir / f"{stem}.c"
+
+
+def _delinks_path_for_module(config_dir: Path, module: str) -> Path:
+    if module == "main":
+        return config_dir / "arm9" / "delinks.txt"
+    if module in ("itcm", "dtcm"):
+        return config_dir / "arm9" / module / "delinks.txt"
+    return config_dir / "arm9" / "overlays" / module / "delinks.txt"
+
+
+def _delinks_section_for_symbol(
+    sym: Symbol, config_dir: Path | None,
+) -> tuple[str, list[str]]:
+    """Return the delinks section that contains `sym`.
+
+    `scaffold_batch` can be unit-tested without a real config tree, so
+    callers may pass `None`; in that case, fall back to .text and let
+    tests cover the exact-resolution path separately.
+    """
+    if config_dir is None:
+        return ".text", []
+
+    delinks_path = _delinks_path_for_module(config_dir, sym.module)
+    module_sections, _tus = parse_delinks_file(delinks_path)
+    for section_name, start, end in module_sections:
+        if start <= sym.addr < end:
+            warnings: list[str] = []
+            if sym.end_addr > end:
+                warnings.append(
+                    f"{sym.name} extends past {section_name} section "
+                    f"end 0x{end:08x}; check the generated delinks block."
+                )
+            return section_name, warnings
+
+    return ".text", [
+        f"could not resolve section for {sym.module}|0x{sym.addr:08x}; "
+        "defaulted delinks block to .text."
+    ]
+
+
+def _format_delinks_complete_block(
+    src_path: Path, sym: Symbol, section_name: str,
+) -> str:
+    end = sym.addr + sym.size
+    src = src_path.as_posix()
+    return (
+        f"{src}:\n"
+        f"    complete\n"
+        f"    {section_name} start:0x{sym.addr:08x} end:0x{end:08x}"
+    )
 
 
 def _resolved_key_list(
@@ -199,12 +258,11 @@ def render_skeleton(
         "iterate until 100% match."
     )
     lines.append(
-        " *   3. Add the TU header to delinks.txt (printed by this "
-        "tool) and mark `complete`"
+        " *   3. Once objdiff agrees, append the complete delinks.txt "
+        "block printed by this tool"
     )
     lines.append(
-        " *      once objdiff agrees. Rename the symbol via "
-        "`tools/rename_symbol.py` if"
+        " *      and rename the symbol via `tools/rename_symbol.py` if"
     )
     lines.append(" *      the function's role becomes clear.")
     lines.append(" */")
@@ -226,6 +284,7 @@ def build_scaffold_plan(
     tier: str,
     modules: dict[str, ModuleData],
     graph: CallGraph,
+    config_dir: Path | None = None,
 ) -> ScaffoldPlan:
     key: SymbolKey = (sym.module, sym.addr)
     callers = _resolved_key_list(_callers_of(key, graph), modules)
@@ -243,10 +302,15 @@ def build_scaffold_plan(
         rel = output.relative_to(ROOT)
     except ValueError:
         rel = output
-    end = sym.addr + sym.size
-    delinks_line = (
-        f"{rel}:\n"
-        f"    .text start:0x{sym.addr:08x} end:0x{end:08x}"
+    delinks_section, section_warnings = _delinks_section_for_symbol(
+        sym, config_dir,
+    )
+    delinks_block = _format_delinks_complete_block(
+        rel, sym, delinks_section,
+    )
+    delinks_line = "\n".join(
+        line for line in delinks_block.splitlines()
+        if line.strip() != "complete"
     )
 
     warnings: list[str] = []
@@ -254,11 +318,15 @@ def build_scaffold_plan(
         warnings.append(
             f"{rel} already exists — will be skipped on --confirm."
         )
+    warnings.extend(section_warnings)
 
     return ScaffoldPlan(
         module=sym.module, addr=sym.addr, name=sym.name, size=sym.size,
         tier=tier, output_path=output,
-        text=text, delinks_line=delinks_line, warnings=warnings,
+        text=text, delinks_line=delinks_line,
+        delinks_block=delinks_block,
+        delinks_section=delinks_section,
+        warnings=warnings,
     )
 
 
@@ -358,7 +426,7 @@ def filter_scaffoldable(
 # Output
 # --------------------------------------------------------------------------- #
 
-def print_plans(plans: list[ScaffoldPlan]) -> None:
+def print_plans(plans: list[ScaffoldPlan], *, apply_delinks: bool = False) -> None:
     if not plans:
         print("(no scaffoldable targets — try widening the filters "
               "or raising --count)")
@@ -371,13 +439,14 @@ def print_plans(plans: list[ScaffoldPlan]) -> None:
             for w in p.warnings:
                 print(f"    ! {w}")
     print()
-    print("delinks.txt TU headers to paste (do this after objdiff "
+    print("delinks.txt complete-TU blocks (apply only after objdiff "
           "agrees on the match):\n")
     for p in plans:
         # Derive the target delinks.txt path hint.
         target_delinks = _delinks_hint_for_module(p.module)
-        print(f"  # add to config/<ver>/{target_delinks}:")
-        for line in p.delinks_line.split("\n"):
+        action = "append to" if apply_delinks else "add to"
+        print(f"  # {action} config/<ver>/{target_delinks}:")
+        for line in p.delinks_block.split("\n"):
             print(f"  {line}")
         print()
 
@@ -403,6 +472,46 @@ def write_plans(plans: list[ScaffoldPlan]) -> int:
     return written
 
 
+def apply_delinks_blocks(
+    plans: list[ScaffoldPlan], config_dir: Path,
+) -> tuple[int, list[str]]:
+    """Append each plan's complete-TU block to its module delinks.txt.
+
+    Existing source entries are skipped so rerunning a command is safe.
+    Returns (appended_count, messages).
+    """
+    appended = 0
+    messages: list[str] = []
+    for p in plans:
+        delinks_path = _delinks_path_for_module(config_dir, p.module)
+        if not delinks_path.is_file():
+            messages.append(f"missing delinks.txt: {delinks_path}")
+            continue
+
+        try:
+            existing = delinks_path.read_text(encoding="utf-8")
+        except OSError as e:
+            messages.append(f"could not read {delinks_path}: {e}")
+            continue
+
+        source_line = p.delinks_block.splitlines()[0]
+        if source_line in existing.splitlines():
+            messages.append(f"skip {source_line} already present")
+            continue
+
+        prefix = "" if not existing else ("\n" if existing.endswith("\n") else "\n\n")
+        try:
+            with delinks_path.open("a", encoding="utf-8") as f:
+                f.write(prefix)
+                f.write(p.delinks_block)
+                f.write("\n")
+        except OSError as e:
+            messages.append(f"could not append to {delinks_path}: {e}")
+            continue
+        appended += 1
+    return appended, messages
+
+
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
@@ -424,6 +533,10 @@ def main() -> int:
                     help="Max files to scaffold per run (default 10)")
     ap.add_argument("--confirm", action="store_true",
                     help="Actually write files (default is dry-run)")
+    ap.add_argument("--apply-delinks", action="store_true",
+                    help="With --confirm, append the generated complete-TU "
+                         "blocks to each module's delinks.txt. Intended "
+                         "for post-objdiff use.")
     args = ap.parse_args()
 
     config_dir = ROOT / "config" / args.version
@@ -445,7 +558,9 @@ def main() -> int:
     plans: list[ScaffoldPlan] = []
     for (mod, addr, tier) in accepted:
         sym = modules[mod].by_addr[addr]
-        plans.append(build_scaffold_plan(sym, tier, modules, graph))
+        plans.append(build_scaffold_plan(
+            sym, tier, modules, graph, config_dir,
+        ))
 
     if rejected:
         print(f"Rejected {len(rejected)}:")
@@ -454,10 +569,14 @@ def main() -> int:
             print(f"  {mod}|0x{addr:08x}  [{tier}]  — {reason}")
         print()
 
-    print_plans(plans)
+    print_plans(plans, apply_delinks=args.apply_delinks)
 
     if not args.confirm:
-        print("Dry-run — nothing written. Pass --confirm to materialise.")
+        if args.apply_delinks:
+            print("Dry-run — no files or delinks.txt blocks written. "
+                  "Pass --confirm to materialise.")
+        else:
+            print("Dry-run — nothing written. Pass --confirm to materialise.")
         return 0
 
     written = write_plans(plans)
@@ -466,6 +585,11 @@ def main() -> int:
     if skipped:
         msg += f"; skipped {skipped} already-existing"
     print(msg + ".")
+    if args.apply_delinks:
+        appended, messages = apply_delinks_blocks(plans, config_dir)
+        print(f"Appended {appended} delinks.txt block(s).")
+        for m in messages:
+            print(f"  {m}")
     return 0
 
 
