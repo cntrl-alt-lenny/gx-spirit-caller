@@ -1,0 +1,69 @@
+name: PR labeler
+
+# Auto-labels every PR by:
+#   * changed-file paths (area:tools / libs / config / src / docs / ci / assets)
+#   * head-branch prefix (agent:cloud / agent:pc / agent:brain)
+#
+# Config lives in .github/labeler.yml.
+#
+# Self-bootstrapping: the first step creates any labels that don't
+# already exist on the repo, with colours chosen for at-a-glance
+# separation between `area:` and `agent:` label families. Safe to
+# re-run (gh label create is idempotent via `|| true`).
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write           # needed by `gh label create`
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # `area:*` labels — muted blues/greys.
+          declare -A area=(
+            ["area:tools"]="0366d6"
+            ["area:libs"]="5319e7"
+            ["area:config"]="0e8a16"
+            ["area:src"]="1d76db"
+            ["area:docs"]="7057ff"
+            ["area:ci"]="fbca04"
+            ["area:assets"]="d4c5f9"
+          )
+          # `agent:*` labels — distinct hues per session.
+          declare -A agent=(
+            ["agent:cloud"]="006b75"
+            ["agent:pc"]="b60205"
+            ["agent:brain"]="e99695"
+          )
+
+          for name in "${!area[@]}"; do
+            gh label create "$name" --repo "$REPO" \
+              --color "${area[$name]}" \
+              --description "Auto-applied by .github/workflows/labeler.yml" \
+              2>/dev/null || true
+          done
+          for name in "${!agent[@]}"; do
+            gh label create "$name" --repo "$REPO" \
+              --color "${agent[$name]}" \
+              --description "Auto-applied by .github/workflows/labeler.yml" \
+              2>/dev/null || true
+          done
+
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler.yml
+          sync-labels: true
