@@ -24,6 +24,10 @@ src/overlay000/ov000_021ac530.c:
     complete
     .text start:0x021ac530 end:0x021ac538
 
+src/overlay000/ov000_021ac550.c:
+    complete
+    .text start:0x021ac550 end:0x021ac560
+
 src/overlay000/ov000_021ac750.c:
     complete
     .text start:0x021ac750 end:0x021ac760
