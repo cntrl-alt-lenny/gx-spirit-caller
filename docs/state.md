@@ -8,138 +8,127 @@ brain (possibly on a different machine) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-21 evening. Main is at `911978a` — brief
-003's full sinit propagation (waves 1-4 + outliers + ctor/dtor stubs)
-landed alongside cloud's test-coverage + tool PRs. cntrl_alt_lenny is
-picking the decomper's next direction between three options; see
-**In flight** below.
+**Last updated:** 2026-04-22. Main is at `9d8c5f3` — briefs 004
+(trivial stubs) and 005 (easy-tier wave 1) both landed, plus cloud's
+propagation/scaffold tool pair. **Matched function count jumped
+~65 → 153.** Code-byte percentage ticked 0.09% → 0.11%; the README
+badge auto-refreshed via PR #75 post-waves.
 
 **Baseline:** `ninja rom` succeeds, `./dsd check modules` still
 reports **24/27 OK**. ARM9 main / DTCM / overlay 4 still fail —
 expected, placeholder-symbol artifacts per CLAUDE.md, not caused by
-agent work. No module regressed during the wave.
+agent work. No module regressed through either wave.
 
-**Matched function count:** **~65** (from 18 at previous refresh —
-+47 functions across the sinit propagation). Cumulative from
-wave-commit messages: `Units matched: 10 → 52` across waves 1-4
-(#43/#44/#45/#47), plus #55 added 3 outlier sinits and 10 ctor/dtor
-stubs (`bx lr`). Exact running total: re-check with `ninja progress`
-on the next local build. Code bytes matched: 144 → 1992+ (waves only;
-outlier/stub bytes not summed here).
+**Matched breakdown** (live from `python tools/next_targets.py
+--version eur`):
+
+| Tier | Matched | Unmatched | Total | % matched |
+|------|--------:|----------:|------:|----------:|
+| `trivial` | 78 | 59 | 137 | 56.9% |
+| `easy` | 29 | 1094 | 1123 | 2.6% |
+| `sinit` | 46 | 5 | 51 | 90.2% |
+| `named` | 0 | 22 | 22 | 0.0% |
+| `medium` | 0 | 6 | 6 | 0.0% |
+| `hard` | 0 | 8510 | 8510 | 0.0% |
+
+`sinit` is effectively closed (5 deferred outliers remain by design);
+`trivial` is past half; `easy` is now the main grind with ~1100
+candidates.
 
 ## Merged since last refresh
 
-Ordered by landing time, main tip `911978a`. Grouped into tracks.
+Main tip `19ae558` → `9d8c5f3`, split into two parallel tracks.
 
-### Decomper track (all 24/27 modules green throughout)
+### Decomper track
 
-- **PR #43** — `claude-pc/sinit-propagate-wave-1`. 7 matches: ov005
-  remaining 4 + ov009 all 3. First use of `<runtime/sinit.h>` from
-  cloud's #37.
-- **PR #44** — `claude-pc/sinit-propagate-wave-2`. 18 matches:
-  ov006 × 11 + ov007 × 2 + ov016 × 5. Biggest single overlay
-  cluster of the whole propagation.
-- **PR #45** — `claude-pc/sinit-propagate-wave-3`. 10 matches:
-  ov014 × 3 + ov017 × 4 + ov019 × 3.
-- **PR #47** — `claude-pc/sinit-propagate-wave-4`. 7 matches across
-  5 tail overlays (ov002, ov003, ov010, ov015, ov021). Closes the
-  0x2c-byte bulk-sinit template target.
-- **PR #55** — rebase of #52 + #53 onto post-waves main. 3 size-
-  outlier sinits (0x04 × 2 + 0x3c × 1) matched via a slightly
-  generalised template, plus the 10 `bx lr` ctor/dtor stubs
-  referenced by the sinits in #43 / #47.
+- **PR #62** — brief 004 opener, coordination note for the 56 × 0x4
+  `bx lr` trivial-stubs wave across 6 overlays.
+- **PR #63** — trivial stubs wave 1: ov006 × 22 + ov007 × 4 = 26
+  matches.
+- **PR #65** — trivial stubs wave 2: ov014 × 6 + ov016 × 10 = 16
+  matches.
+- **PR #66** — trivial stubs wave 3 (final): ov017 × 8 + ov019 × 6
+  = 14 matches. Closes brief 004's target of 56.
+- **PR #68** — brief 005 opener, easy-tier leaves across
+  ov005/ov006/ov007/ov009, ~25 targets.
+- **PR #70** — easy-tier wave 1: ov005 × 6 + ov009 × 3 = 9 matches.
+- **PR #71** — easy-tier wave 2: ov007 × 7 matches.
+- **PR #72** — easy-tier wave 3: ov006 × 8 smallest easy-tier
+  functions.
 
-Every merge in this track shipped with `complete_code_percent: 100.0`
-on first build per the PR bodies.
+Every merge in this track shipped green on `dsd check modules` and
+on the new `match-invariants` workflow (PR #69).
 
 ### Cloud track
 
-- **PR #41** — `claude-cloud/refresh-state-after-sinit`. The
-  immediately preceding state refresh. Markdownlint MD018 was fixed
-  mid-flight (a wrapped `#32 →` read as an ATX heading at col 1).
-- **PR #42** — `claude-cloud/heatmap-delinks-fallback`. Mirrors #40
-  for `generate_heatmap.py`. Per Codex review, the fallback now uses
-  the authoritative module-level section map for totals and emits a
-  synthetic `_dsd_gap@<module>` cell for the remainder — previously
-  modules with only the section map contributed zero bytes and
-  inflated the carved-module match %.
-- **PR #48** — `claude-cloud/tests-coupling-permute`. +33 tests for
-  `overlay_coupling.py` + `permute.py`.
-- **PR #50** — `claude-cloud/tests-progress`. +23 tests for
-  `progress.py`, pinning the CI delinks-fallback wiring.
-- **PR #51** — `claude-cloud/tests-heatmap`. +30 tests for
-  `generate_heatmap.py` (pure helpers + `render_svg` smoke).
-- **PR #54** — `claude-cloud/tests-data-symbol-sizes`. +24 tests for
-  `data_symbol_sizes.py`. Last untested tool.
-- **PR #56** — rebase of cloud's #49 (`tools/find_duplicates.py`)
-  after brain fixed an F401 on the Counter import exposed on rebase.
-  Call-graph shape clustering; per Codex review, `print_summary` is
-  now ASCII-safe and `write_md` is UTF-8-pinned.
-- **PR #57** — rebase of cloud's #46 (diff bulk groups, schema 2)
-  after brain fixed F811 redefinitions and escaped `|` in bulk-group
-  keys for GFM tables (Codex P2).
+- **PR #58** — previous state refresh (this file, post-brief-003).
+- **PR #64** — `docs/decomp-workflow.md`. Plain-language onboarding
+  guide for vibe coders / new readers.
+- **PR #67** — `tools/check_match_invariants.py`. Pre-flight metadata
+  checker (placeholder-in-complete-TU, orphan externs, missing TU
+  sources).
+- **PR #69** — `.github/workflows/match-invariants.yml` +
+  `tools/ci_format_invariants.py`. Wires #67 into CI as a single
+  upserted PR comment, soft-fail on warnings + hard-fail on errors.
+- **PR #73** — `tools/propagate_template.py`. Auto-generates
+  sibling C files from one matched template + a find_duplicates
+  cluster. Validated: re-generating `sinit_ov005_021b1710.c`
+  produces a body byte-identical to what the decomper shipped
+  manually in PR #43.
+- **PR #74** — `tools/scaffold_batch.py`. Pre-creates `.c`
+  skeletons for N unmatched targets with caller/callee/load
+  context in the header comment. Removes the ~5-minute-per-
+  function setup cost for isolated leaves.
+- **PR #75** — auto-generated progress-badge bump (the workflow's
+  own first clean round-trip; the permission + path-filter fix
+  brain made earlier now self-runs on every significant byte
+  shift).
 
-Coverage summary after this wave: 86 → **220 tests** across every
-non-toolchain-dependent script in `tools/`. Only `configure.py` /
-`download_tool.py` remain uncovered and they need a real toolchain
-to exercise.
-
-## Earlier wave (2026-04-21 overnight, for historical context)
-
-Landed before the previous refresh: PRs #28 → #30 → #31 → #29 → #27
-→ #33 → #32 → #23 → #24 → #25 (editorconfig, PR/issue templates,
-briefs index, PR labeler, analyzer test suite, progress badge,
-ruff+markdownlint CI, analyzer tier-delta workflow, state.md split,
-autonomy policy). See `git log --oneline` for full ordering.
+Coverage after this wave: **~350 tests** across every non-toolchain-
+dependent script in `tools/`. Only `configure.py` /
+`download_tool.py` remain uncovered — both need a real toolchain.
 
 ## In flight
 
-- **cntrl_alt_lenny** — picking the decomp's next direction between:
-  1. The 4 deferred sinit outliers (the ones flagged with diffs
-     during #47 / #52). Needs a slightly different C template or
-     hand analysis.
-  2. New-overlay easy-tier leaf functions (size ≤ 0x20, `bx lr`-ish
-     shapes surfaced by `tools/find_duplicates.py` now that #56 is
-     in). High-count / low-per-unit-cost.
-  3. Runtime-library decomp. SDK / CRT-shaped symbols (OS_*,
-     NNS_*, etc.) surfacing as callees of the sinit-adjacent code.
-     Would want `libs/nitro/include/...` scaffolding.
-- **`claude-cloud`** — standing by. If option (3) wins, expect a
-  scaffolding task for new headers under `libs/nitro/`. No
-  autonomous follow-ups queued beyond this.
-- **`claude-brain`** — reviewing, merging, and retiring stale
-  branches (see TODO item below).
+- **`claude-pc`** — brief 006 starting soon. Expected to continue the
+  easy-tier grind in additional overlays (ov014/ov016/ov017/ov019
+  all have room). With 1094 easy-tier candidates and the new
+  scaffold_batch tool, the wave pace may increase.
+- **`claude-cloud`** — standing by. Likely follow-ups if/when brief
+  006 surfaces them: sinit-outlier investigation, `libs/nitro/`
+  scaffolding if runtime-library decomp comes up.
+- **`claude-brain`** — reviewing + merging, maintaining manifests.
+  Retiring stale branches on a rolling basis.
 
 ## Next-brain TODO
 
-1. Once cntrl_alt_lenny picks a direction, brief the decomper and
-   cloud accordingly. Drop a `docs/briefs/00N-*.md` if the new target
-   needs per-function guidance (as with brief 003 for the sinit
-   template).
-2. After the next decomp wave, re-run `ninja progress` and plug the
-   exact matched-function count into the header of this file. The
-   `~65` here is derived from commit messages, not live measurement.
-3. Rename `func_020b42f4` → `__register_global_object` via
-   `tools/rename_symbol.py`. The sinit propagation migrated every
-   caller to `<runtime/sinit.h>`, so the local extern is no longer
-   referenced — safe to rename now.
-4. Sweep and delete stale remote branches from the wave:
-   `claude-pc/sinit-propagate-wave-1..4`,
-   `claude-pc/sinit-outliers-mechanical`,
-   `claude-pc/ov009-ov021-ctor-dtor-stubs`,
-   `claude-cloud/find-duplicates`, `claude-cloud/diff-bulk-groups`
-   (both superseded by the rebased #56 / #57), plus the earlier
-   `claude-pc/ov005-easy-tier` (cloud still HTTP-403s on delete).
-5. `claude/*` (no-suffix, GitHub-native Claude integration) branches
-   continue to land. Still respecting scope; no action needed.
+1. Write brief 006 once cntrl_alt_lenny confirms the easy-tier
+   continuation direction. Consider whether scaffold_batch.py (PR
+   #74) should be called out in the brief as the recommended
+   starting tool.
+2. Investigate the 4 deferred sinit outliers. They flagged diffs
+   in #47 / #52 but were left for hand analysis. Likely a slightly
+   different C template — might be worth a mini-brief if the
+   pattern is generalizable.
+3. Consider making the `match-invariants` check **required** in
+   GitHub branch protection now that it's stable across a few PRs.
+   Would give `missing_tu_source` errors actual merge-block teeth
+   without trapping warnings.
+4. Data-tier work: progress badge / heatmap both still show 0%
+   data matched because no `.data` / `.bss` TUs have been carved.
+   When that becomes relevant (brief 007+ territory), the delinks
+   tier in `progress.py` already handles it.
+5. Stale remote-branch sweep: the brief-004 and brief-005 wave
+   branches can be deleted now that they're merged. Cloud's HTTP
+   403 on `git push --delete` makes this a PC / GitHub-UI task.
 
 ## New agents?
 
-Still no. Brain + decomper + cloud slot-split is holding well past
-40 merged PRs. Reopen if:
+Still no. Brain + decomper + cloud slot-split is holding past
+60 merged PRs. Reopen if:
 
-- cntrl_alt_lenny picks direction (3) and the `libs/nitro/` scope
-  balloons — might want a dedicated `lib-pc` agent at that point.
+- `libs/nitro/` scope balloons with runtime-library decomp — might
+  justify a dedicated `lib-pc` agent at that point.
 - Asset pipelines (graphics / audio) ever become a decomp target —
   likely `asset-pc`.
 - PR-review latency becomes the bottleneck (brain backlogged) — a
