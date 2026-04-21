@@ -4,3 +4,23 @@
     .ctor       start:0x021b8f58 end:0x021b8f6c kind:rodata align:4
     .data       start:0x021b8f80 end:0x021b9740 kind:data align:32
     .bss        start:0x021b9740 end:0x021bb4c0 kind:bss align:32
+
+src/overlay016/sinit_ov016_021b8e7c.c:
+    complete
+    .init start:0x021b8e7c end:0x021b8ea8
+
+src/overlay016/sinit_ov016_021b8ea8.c:
+    complete
+    .init start:0x021b8ea8 end:0x021b8ed4
+
+src/overlay016/sinit_ov016_021b8ed4.c:
+    complete
+    .init start:0x021b8ed4 end:0x021b8f00
+
+src/overlay016/sinit_ov016_021b8f00.c:
+    complete
+    .init start:0x021b8f00 end:0x021b8f2c
+
+src/overlay016/sinit_ov016_021b8f2c.c:
+    complete
+    .init start:0x021b8f2c end:0x021b8f58

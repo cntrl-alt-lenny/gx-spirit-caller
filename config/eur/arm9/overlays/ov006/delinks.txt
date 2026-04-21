@@ -4,3 +4,47 @@
     .ctor       start:0x021cba7c end:0x021cbaa8 kind:rodata align:4
     .data       start:0x021cbac0 end:0x021cf140 kind:data align:32
     .bss        start:0x021cf140 end:0x0225e1a0 kind:bss align:32
+
+src/overlay006/sinit_ov006_021cb898.c:
+    complete
+    .init start:0x021cb898 end:0x021cb8c4
+
+src/overlay006/sinit_ov006_021cb8c4.c:
+    complete
+    .init start:0x021cb8c4 end:0x021cb8f0
+
+src/overlay006/sinit_ov006_021cb8f0.c:
+    complete
+    .init start:0x021cb8f0 end:0x021cb91c
+
+src/overlay006/sinit_ov006_021cb91c.c:
+    complete
+    .init start:0x021cb91c end:0x021cb948
+
+src/overlay006/sinit_ov006_021cb948.c:
+    complete
+    .init start:0x021cb948 end:0x021cb974
+
+src/overlay006/sinit_ov006_021cb974.c:
+    complete
+    .init start:0x021cb974 end:0x021cb9a0
+
+src/overlay006/sinit_ov006_021cb9a0.c:
+    complete
+    .init start:0x021cb9a0 end:0x021cb9cc
+
+src/overlay006/sinit_ov006_021cb9cc.c:
+    complete
+    .init start:0x021cb9cc end:0x021cb9f8
+
+src/overlay006/sinit_ov006_021cb9f8.c:
+    complete
+    .init start:0x021cb9f8 end:0x021cba24
+
+src/overlay006/sinit_ov006_021cba24.c:
+    complete
+    .init start:0x021cba24 end:0x021cba50
+
+src/overlay006/sinit_ov006_021cba50.c:
+    complete
+    .init start:0x021cba50 end:0x021cba7c
