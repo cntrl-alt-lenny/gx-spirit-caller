@@ -1,0 +1,59 @@
+# Path + branch-name → label mapping for .github/workflows/labeler.yml.
+# Consumed by actions/labeler@v5. Edit here, commit, next PR picks it up.
+#
+# Two kinds of labels applied automatically:
+#
+#   area:*   — what kind of change it is (tools / libs / src / docs / …)
+#              Matched on changed-file paths.
+#
+#   agent:*  — who the change is from (cloud / pc / brain).
+#              Matched on the branch name prefix.
+
+'area:tools':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tools/**'
+
+'area:libs':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'libs/**'
+      - 'include/**'
+
+'area:config':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'config/**'
+
+'area:src':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/**'
+
+'area:docs':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**'
+
+'area:ci':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - 'permuter_settings.toml'
+
+'area:assets':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'assets/**'
+
+# agent:* — matched on the PR's head-branch prefix. Mirrors AGENTS.md
+# slugs exactly. If a new agent joins, add its prefix here.
+'agent:cloud':
+  - head-branch: ['^claude-cloud/']
+
+'agent:pc':
+  - head-branch: ['^claude-pc/']
+
+'agent:brain':
+  - head-branch: ['^claude-brain/']
