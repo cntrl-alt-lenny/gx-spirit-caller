@@ -1,0 +1,31 @@
+# Ruff configuration — minimal & non-stylistic for now.
+#
+# We only enable rules that catch real bugs (undefined names, unused imports,
+# syntax errors). Stylistic rules (E, W, formatting) are deliberately off so
+# this PR doesn't reformat the existing tools/. Tighten over time if we want.
+
+target-version = "py311"
+line-length = 100
+
+# Only lint the dirs we author. config/ and build/ are machine-written.
+extend-exclude = [
+    "config",
+    "build",
+    "extract",
+    "libs",
+]
+
+[lint]
+select = [
+    "F",    # pyflakes: undefined names, unused imports/vars, etc.
+    "E9",   # syntax errors
+    "B",    # flake8-bugbear: likely bugs
+    "UP",   # pyupgrade: avoid deprecated python idioms
+]
+ignore = [
+    "B008",  # function-call-in-default-arg — fine in argparse usage
+]
+
+[lint.per-file-ignores]
+# Vendored from upstream — leave alone.
+"tools/ninja_syntax.py" = ["ALL"]

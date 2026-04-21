@@ -1,0 +1,7 @@
+# Don't lint machine-generated dsd / build / extract output.
+config/
+build/
+extract/
+
+# Don't lint vendored library docs — leave to their upstream.
+libs/

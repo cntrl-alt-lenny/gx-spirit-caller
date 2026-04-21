@@ -328,7 +328,7 @@ def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
     endpoints don't resolve go into the unresolved_* lists."""
     graph = CallGraph()
 
-    for src_mod_name, src_mod in modules.items():
+    for _src_mod_name, src_mod in modules.items():
         for r in src_mod.relocs:
             # Caller: addr -> enclosing function in its own module. Load
             # relocs often originate inside functions too, so we treat
@@ -435,7 +435,6 @@ def classify(symbol: Symbol, graph: CallGraph, modules: dict[str, ModuleData]) -
 
     is_leaf = out_deg == 0
     all_callees_named = out_deg > 0 and callees_named == out_deg
-    in_passing = not symbol.is_failing_module
 
     # Tier hierarchy: identity wins over shape (named > trivial), and
     # __sinit_* is a distinct bulk category. The failing-module flag is

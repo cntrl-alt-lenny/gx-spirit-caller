@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 # Sibling tools/ imports — tools/ is on sys.path when this is run as
