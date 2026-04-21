@@ -176,7 +176,10 @@ def print_summary(clusters: list[DuplicateCluster], top_n: int = 10) -> None:
     print(f"Top {top_n} by leverage (count / size):")
     for c in clusters[:top_n]:
         fp = c.fingerprint
-        cm = f"calls→{{{','.join(fp.callee_modules) or '∅'}}}"
+        # ASCII-only: `print_summary` writes to sys.stdout which in a
+        # non-UTF-8 locale (e.g. LC_ALL=C, cp1252) would raise
+        # UnicodeEncodeError on glyphs like -> or the empty-set sign.
+        cm = f"calls->{{{','.join(fp.callee_modules)}}}"
         xmod = "  [cross-module]" if c.is_cross_module else ""
         src = f"  [in {fp.src_module}]" if fp.src_module else ""
         print(f"  size=0x{fp.size:<4x}  "
@@ -247,7 +250,9 @@ def write_md(
             )
         lines.append("")
 
-    with path.open("w") as f:
+    # Markdown body uses non-ASCII glyphs (—, ✓, …). Pin the file
+    # encoding so the writer doesn't crash in non-UTF-8 locales.
+    with path.open("w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 
