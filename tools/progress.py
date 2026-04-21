@@ -66,7 +66,7 @@ def print_stub(version: str, total: int) -> None:
     print(f"Yu-Gi-Oh! GX Spirit Caller ({version}) — decomp progress")
     print()
     print(f"  functions matched:  0 / {total}  ({pct:5.2f}%)")
-    print(f"  data matched:       (no report yet)")
+    print("  data matched:       (no report yet)")
     print()
     print("  Run `ninja report` after compiling any source to produce a real report.")
 

@@ -31,7 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -116,7 +116,7 @@ def print_summary(per_module: dict[str, dict[int, int | None]]) -> None:
 
     for module, sizes in per_module.items():
         module_bytes = 0
-        for addr, size in sizes.items():
+        for _addr, size in sizes.items():
             total += 1
             if size is None:
                 unknown += 1

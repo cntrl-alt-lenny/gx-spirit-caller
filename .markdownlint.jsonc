@@ -1,0 +1,31 @@
+// markdownlint config — bug-finder, not style enforcer.
+//
+// Existing files use a mix of table alignment styles, list indents, and
+// inline HTML. Rather than reformat everything, we only enable rules
+// that catch likely typos and structural mistakes.
+//
+// Full rule list: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+{
+  "default": false,
+
+  "MD001": true,   // heading levels increment by one
+  "MD003": true,   // consistent heading style
+  "MD011": true,   // reversed link syntax (text)[url] -> [text](url)
+  "MD012": { "maximum": 2 }, // no more than 2 blank lines in a row
+  "MD018": true,   // no missing space after hash on atx heading
+  "MD019": true,   // no multiple spaces after hash on atx heading
+  "MD022": true,   // headings surrounded by blank lines
+  "MD023": true,   // headings start at left margin
+  "MD025": true,   // single H1 per doc
+  "MD031": true,   // fenced code blocks surrounded by blank lines
+  "MD037": true,   // no spaces inside emphasis markers
+  "MD038": true,   // no spaces inside code span markers
+  "MD039": true,   // no spaces inside link text
+  "MD042": true,   // no empty links
+  "MD045": true,   // images should have alt text
+  "MD047": true,   // file should end with single newline
+  "MD051": true,   // link fragments should match a heading
+  "MD052": true,   // reference links should resolve
+  "MD053": true,   // reference link definitions used
+  "MD054": true    // link/image style consistency
+}
