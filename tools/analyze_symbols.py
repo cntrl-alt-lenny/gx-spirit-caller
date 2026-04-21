@@ -917,15 +917,22 @@ def write_targets_md(
 # and simply notes that.
 # --------------------------------------------------------------------------- #
 
-def build_snapshot(version: str, targets: list[Target]) -> dict:
+def build_snapshot(version: str, targets: list[Target],
+                   groups: list[BulkGroup] | None = None) -> dict:
     """Minimal serialisable state — only what's needed to compute a
-    meaningful diff. Keyed by '<module>|0x<addr>' so a single dict-
-    comparison reveals tier/name/size drift per function."""
+    meaningful diff. Keyed by '<module>|0x<addr>' for per-function
+    records and '<module>|0x<size>|<family>' for bulk-group records
+    so a single dict-comparison reveals tier/name/size drift per
+    function AND group-level churn (count changes, member renames
+    shifting all_sinit / all_placeholder, etc.).
+
+    `groups` is optional for backward-compat; passing None omits the
+    bulk_groups key and the diff will simply skip that section."""
     from collections import Counter
     tier_counts = Counter(t.tier for t in targets)
-    return {
+    snapshot = {
         "version": version,
-        "schema": 1,
+        "schema": 2,
         "totals": {
             "classified": len(targets),
             "tier_counts": dict(tier_counts),
@@ -939,6 +946,17 @@ def build_snapshot(version: str, targets: list[Target]) -> dict:
             for t in targets
         },
     }
+    if groups is not None:
+        snapshot["bulk_groups"] = {
+            f"{g.module}|0x{g.size:x}|{_name_family(g.members[0].name)}": {
+                "count": g.count,
+                "all_sinit": g.all_sinit,
+                "all_placeholder": g.all_placeholder,
+                "failing_module": g.is_failing_module,
+            }
+            for g in groups
+        }
+    return snapshot
 
 
 def read_snapshot(path: Path) -> dict | None:
@@ -971,6 +989,11 @@ def compute_diff(prev: dict, curr: dict) -> dict:
       renamed       — [(key, prev_name, curr_name), ...] name changed
       newly_classified — [(key, curr_name, curr_tier), ...] not in prev
       removed       — [(key, prev_name, prev_tier), ...] not in curr
+      bulk_groups_new       — [(key, count, all_sinit), ...] newly-formed
+      bulk_groups_removed   — [(key, count, all_sinit), ...] dissolved
+      bulk_groups_changed   — [(key, prev_count, curr_count,
+                                prev_flags, curr_flags), ...]
+                              where flags is (all_sinit, all_placeholder)
     """
     prev_syms: dict = prev.get("symbols", {})
     curr_syms: dict = curr.get("symbols", {})
@@ -1003,12 +1026,46 @@ def compute_diff(prev: dict, curr: dict) -> dict:
         for tier in all_tiers
     }
 
+    # Bulk-group diff — new / removed / changed. Gracefully handles
+    # snapshots from before schema 2 (missing bulk_groups) by treating
+    # the side as empty.
+    prev_groups: dict = prev.get("bulk_groups", {})
+    curr_groups: dict = curr.get("bulk_groups", {})
+
+    bg_new: list[tuple[str, int, bool]] = []
+    bg_removed: list[tuple[str, int, bool]] = []
+    bg_changed: list[tuple[str, int, int, tuple[bool, bool], tuple[bool, bool]]] = []
+
+    for key, curr_g in curr_groups.items():
+        prev_g = prev_groups.get(key)
+        if prev_g is None:
+            bg_new.append((key, curr_g.get("count", 0),
+                           bool(curr_g.get("all_sinit", False))))
+            continue
+        prev_count = prev_g.get("count", 0)
+        curr_count = curr_g.get("count", 0)
+        prev_flags = (bool(prev_g.get("all_sinit", False)),
+                      bool(prev_g.get("all_placeholder", False)))
+        curr_flags = (bool(curr_g.get("all_sinit", False)),
+                      bool(curr_g.get("all_placeholder", False)))
+        if prev_count != curr_count or prev_flags != curr_flags:
+            bg_changed.append((key, prev_count, curr_count,
+                               prev_flags, curr_flags))
+
+    for key, prev_g in prev_groups.items():
+        if key not in curr_groups:
+            bg_removed.append((key, prev_g.get("count", 0),
+                               bool(prev_g.get("all_sinit", False))))
+
     return {
         "tier_delta": tier_delta,
         "moved": moved,
         "renamed": renamed,
         "newly_classified": newly,
         "removed": removed,
+        "bulk_groups_new": bg_new,
+        "bulk_groups_removed": bg_removed,
+        "bulk_groups_changed": bg_changed,
     }
 
 
@@ -1063,7 +1120,35 @@ def print_diff(diff: dict, *, limit: int = 20) -> None:
         if len(removed) > limit:
             print(f"  ... (+{len(removed) - limit} more)")
 
-    if not any([renamed, moved, newly, removed]) and not nonzero:
+    bg_new = diff.get("bulk_groups_new", [])
+    bg_removed = diff.get("bulk_groups_removed", [])
+    bg_changed = diff.get("bulk_groups_changed", [])
+    any_bg = bg_new or bg_removed or bg_changed
+    if any_bg:
+        print(f"\nBulk groups ({len(bg_new)} new, "
+              f"{len(bg_removed)} removed, {len(bg_changed)} changed):")
+        for key, count, is_sinit in bg_new[:limit]:
+            tag = "  [__sinit]" if is_sinit else ""
+            print(f"  + {key}  count={count}{tag}")
+        for key, count, is_sinit in bg_removed[:limit]:
+            tag = "  [__sinit]" if is_sinit else ""
+            print(f"  - {key}  count={count}{tag}")
+        for key, pc, cc, pf, cf in bg_changed[:limit]:
+            delta_c = cc - pc
+            sign = "+" if delta_c > 0 else ""
+            flag_note = ""
+            if pf != cf:
+                # Flag transitions — e.g. all_sinit went True->False.
+                transitions = []
+                if pf[0] != cf[0]:
+                    transitions.append(f"all_sinit={pf[0]}->{cf[0]}")
+                if pf[1] != cf[1]:
+                    transitions.append(f"all_placeholder={pf[1]}->{cf[1]}")
+                flag_note = "  (" + ", ".join(transitions) + ")"
+            print(f"  ~ {key}  count {pc}->{cc} ({sign}{delta_c}){flag_note}")
+
+    if (not any([renamed, moved, newly, removed, any_bg])
+            and not nonzero):
         print("\nNo changes since last snapshot.")
 
 
@@ -1107,7 +1192,7 @@ def main() -> int:
     # Load previous snapshot BEFORE writing the new one, so we keep
     # the pre-run state available for comparison.
     prev_snapshot = read_snapshot(compare_path)
-    curr_snapshot = build_snapshot(args.version, targets)
+    curr_snapshot = build_snapshot(args.version, targets, groups)
 
     diff_payload: dict | None = None
     if args.diff or args.diff_json is not None:
