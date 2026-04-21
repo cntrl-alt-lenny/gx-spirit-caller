@@ -5,7 +5,8 @@ Focus points:
   - Skeleton text includes callers/callees/loads sections populated
     from the call graph
   - Scaffold plan carries the delinks.txt TU header the decomper
-    must paste post-match
+    must paste post-match, plus the full complete-TU block it can
+    optionally apply
   - filter_scaffoldable drops already-matched, size-0, and
     unresolved targets
   - _load_targets_from_json honours the next_targets JSON schema
@@ -27,12 +28,16 @@ sys.path.insert(0, str(_TOOLS))
 from analyze_symbols import CallGraph, ModuleData, Symbol  # noqa: E402
 from scaffold_batch import (  # noqa: E402
     ScaffoldPlan,
+    _delinks_path_for_module,
+    _delinks_section_for_symbol,
     _callers_of,
     _delinks_hint_for_module,
     _derive_output_path,
+    _format_delinks_complete_block,
     _load_targets_from_json,
     _overlay_dir,
     _resolved_key_list,
+    apply_delinks_blocks,
     build_scaffold_plan,
     filter_scaffoldable,
     render_skeleton,
@@ -66,6 +71,13 @@ def _graph(edges_call=None, edges_load=None) -> CallGraph:
             for d in dests:
                 g.edges_load[src].add(d)
     return g
+
+
+def _write_delinks(config_dir: Path, module: str, body: str) -> Path:
+    path = _delinks_path_for_module(config_dir, module)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(body)
+    return path
 
 
 # ------------------------------------------------------------------------- #
@@ -191,6 +203,7 @@ class TestBuildScaffoldPlan(unittest.TestCase):
         # delinks line has the right range.
         self.assertIn("start:0x021ba1f0 end:0x021ba1f8",
                       plan.delinks_line)
+        self.assertIn("complete", plan.delinks_block)
 
     def test_warning_when_output_exists(self):
         target = _sym("func_ov005_100", "ov005", 0x100, size=0x8)
@@ -221,6 +234,79 @@ class TestBuildScaffoldPlan(unittest.TestCase):
                         pass
             # Silence unused-var warning.
             _ = td
+
+
+class TestDelinksBlocks(unittest.TestCase):
+    def test_complete_block_uses_section_from_module_map(self):
+        target = _sym("__sinit_ov005_021b16e4", "ov005", 0x021b16e4,
+                      size=0x2c)
+        modules = {"ov005": _module("ov005", [target])}
+        with tempfile.TemporaryDirectory() as td:
+            config = Path(td)
+            _write_delinks(
+                config, "ov005",
+                "    .text start:0x021aa4a0 end:0x021b1568 kind:code\n"
+                "    .init start:0x021b16e4 end:0x021b17c0 kind:code\n",
+            )
+            plan = build_scaffold_plan(target, "sinit", modules,
+                                       _graph(), config)
+
+        expected = (
+            "src/overlay005/__sinit_ov005_021b16e4.c:\n"
+            "    complete\n"
+            "    .init start:0x021b16e4 end:0x021b1710"
+        )
+        self.assertEqual(plan.delinks_section, ".init")
+        self.assertEqual(plan.delinks_block, expected)
+        self.assertNotIn("complete", plan.delinks_line)
+
+    def test_section_falls_back_to_text_with_warning(self):
+        target = _sym("func_ov006_021ba1f0", "ov006", 0x021ba1f0,
+                      size=0x8)
+        with tempfile.TemporaryDirectory() as td:
+            section, warnings = _delinks_section_for_symbol(
+                target, Path(td),
+            )
+        self.assertEqual(section, ".text")
+        self.assertTrue(any("defaulted" in w for w in warnings))
+
+    def test_complete_block_uses_posix_paths(self):
+        sym = _sym("func_x", "ov006", 0x1000, size=0x8)
+        block = _format_delinks_complete_block(
+            Path("src") / "overlay006" / "foo.c", sym, ".text",
+        )
+        self.assertTrue(block.startswith("src/overlay006/foo.c:\n"))
+        self.assertIn("    complete\n", block)
+
+    def test_apply_delinks_blocks_appends_once(self):
+        target = _sym("func_ov006_021ba1f0", "ov006", 0x021ba1f0,
+                      size=0x8)
+        modules = {"ov006": _module("ov006", [target])}
+        with tempfile.TemporaryDirectory() as td:
+            config = Path(td)
+            delinks = _write_delinks(
+                config, "ov006",
+                "    .text start:0x021ba000 end:0x021bb000 kind:code\n",
+            )
+            plan = build_scaffold_plan(target, "easy", modules,
+                                       _graph(), config)
+
+            appended, messages = apply_delinks_blocks([plan], config)
+            self.assertEqual(appended, 1)
+            self.assertEqual(messages, [])
+
+            appended_again, messages_again = apply_delinks_blocks(
+                [plan], config,
+            )
+            content = delinks.read_text()
+
+        self.assertEqual(appended_again, 0)
+        self.assertTrue(any("already present" in m for m in messages_again))
+        self.assertEqual(
+            content.count("src/overlay006/ov006_021ba1f0.c:"), 1,
+        )
+        self.assertIn("    complete\n", content)
+        self.assertIn(".text start:0x021ba1f0 end:0x021ba1f8", content)
 
 
 class TestFilterScaffoldable(unittest.TestCase):
