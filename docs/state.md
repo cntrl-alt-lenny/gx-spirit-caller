@@ -56,11 +56,11 @@ In landing order. Main tip: `1d8cb6f`.
 
 ## Earlier wave (2026-04-21 overnight, for historical context)
 
-Landed before this session: PRs #28 → #30 → #31 → #29 → #27 → #33 →
-#32 → #23 → #24 → #25 (wave order: editorconfig, PR/issue templates,
-briefs index, PR labeler, analyzer test suite, progress badge,
-ruff+markdownlint CI, analyzer tier-delta workflow, state.md split,
-autonomy policy).
+Landed before this session: PRs #28 → #30 → #31 → #29 → #27 → #33
+→ #32 → #23 → #24 → #25 (wave order: editorconfig, PR/issue
+templates, briefs index, PR labeler, analyzer test suite, progress
+badge, ruff+markdownlint CI, analyzer tier-delta workflow,
+state.md split, autonomy policy).
 
 PR #26 (wiki duplicate of `CLAUDE.md`) closed without merging.
 
