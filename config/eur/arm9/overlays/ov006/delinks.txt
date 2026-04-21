@@ -92,3 +92,35 @@ src/overlay006/ov006_stubs_cac08.c:
 src/overlay006/ov006_stubs_cb028.c:
     complete
     .text start:0x021cb028 end:0x021cb030
+
+src/overlay006/ov006_021ba1f0.c:
+    complete
+    .text start:0x021ba1f0 end:0x021ba1f8
+
+src/overlay006/ov006_021c159c.c:
+    complete
+    .text start:0x021c159c end:0x021c15a4
+
+src/overlay006/ov006_021c1650.c:
+    complete
+    .text start:0x021c1650 end:0x021c1658
+
+src/overlay006/ov006_021c1678.c:
+    complete
+    .text start:0x021c1678 end:0x021c1680
+
+src/overlay006/ov006_021c19e4.c:
+    complete
+    .text start:0x021c19e4 end:0x021c19ec
+
+src/overlay006/ov006_021c1cb8.c:
+    complete
+    .text start:0x021c1cb8 end:0x021c1cc0
+
+src/overlay006/ov006_021c50c4.c:
+    complete
+    .text start:0x021c50c4 end:0x021c50cc
+
+src/overlay006/ov006_021c52b0.c:
+    complete
+    .text start:0x021c52b0 end:0x021c52b8
