@@ -32,16 +32,9 @@ extern char data_ov005_021b1d4c[];
 #pragma define_section INIT ".init" abs32 RX
 #pragma section INIT begin
 
-asm void __sinit_ov005_021b16e4(void) {
-    nofralloc
-    stmdb sp!, {r3, lr}
-    ldr  r0, =data_ov005_021b1d4c
-    bl   func_ov005_021aa4a4
-    ldr  r0, =data_ov005_021b1d4c
-    ldr  r1, =func_ov005_021aa4a8
-    ldr  r2, =data_ov005_021b1d40
-    bl   func_020b42f4
-    ldmia sp!, {r3, pc}
+void __sinit_ov005_021b16e4(void) {
+    func_ov005_021aa4a4(data_ov005_021b1d4c);
+    func_020b42f4(data_ov005_021b1d4c, func_ov005_021aa4a8, data_ov005_021b1d40);
 }
 
 #pragma section INIT end
