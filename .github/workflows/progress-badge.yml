@@ -4,9 +4,19 @@ on:
   push:
     branches: [main]
     paths:
+      # Symbol graph changes (renames, new symbols).
       - 'config/**/symbols.txt'
+      # TU-carving changes — `complete` markers here are the primary
+      # signal the delinks.txt tier of progress.py reads when CI
+      # can't run ninja.
+      - 'config/**/delinks.txt'
+      # New matched source files — the actual progress.
+      - 'src/**/*.c'
+      - 'src/**/*.cpp'
+      # Progress tooling itself.
       - 'tools/progress.py'
       - 'tools/update_progress_badge.py'
+      # README so a manual badge edit doesn't get stuck stale.
       - 'README.md'
   schedule:
     # Weekly backstop in case something slips past the path filter.
