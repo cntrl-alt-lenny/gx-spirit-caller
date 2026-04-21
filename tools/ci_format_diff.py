@@ -112,8 +112,49 @@ def render(diff: dict, *, limit: int = 15) -> str:
             out.append(f"- _…and {len(removed) - limit} more_")
         out.append("")
 
+    bg_new = diff.get("bulk_groups_new", [])
+    bg_removed = diff.get("bulk_groups_removed", [])
+    bg_changed = diff.get("bulk_groups_changed", [])
+    bg_any = bool(bg_new or bg_removed or bg_changed)
+    if bg_any:
+        out.append(f"### Bulk groups "
+                   f"({len(bg_new)} new, {len(bg_removed)} removed, "
+                   f"{len(bg_changed)} changed)")
+        out.append("")
+        out.append("| Δ | Group | Count | Notes |")
+        out.append("|---|-------|------:|-------|")
+
+        def _notes(is_sinit: bool) -> str:
+            return "`__sinit`" if is_sinit else "—"
+
+        for key, count, is_sinit in bg_new[:limit]:
+            out.append(f"| + | `{key}` | {count} | {_notes(is_sinit)} |")
+        for key, count, is_sinit in bg_removed[:limit]:
+            out.append(f"| − | `{key}` | {count} | {_notes(is_sinit)} |")
+        for entry in bg_changed[:limit]:
+            key, pc, cc, pf, cf = entry
+            delta = cc - pc
+            sign = "+" if delta > 0 else ""
+            notes_bits: list[str] = []
+            if pf != cf:
+                if pf[0] != cf[0]:
+                    notes_bits.append(f"`all_sinit` {pf[0]}→{cf[0]}")
+                if pf[1] != cf[1]:
+                    notes_bits.append(f"`all_placeholder` {pf[1]}→{cf[1]}")
+            notes = "; ".join(notes_bits) if notes_bits else "—"
+            out.append(
+                f"| ~ | `{key}` | {pc}→{cc} ({sign}{delta}) | {notes} |"
+            )
+        total_bg = len(bg_new) + len(bg_removed) + len(bg_changed)
+        shown = sum(min(limit, len(xs)) for xs in (bg_new, bg_removed, bg_changed))
+        if total_bg > shown:
+            out.append("")
+            out.append(f"_…and {total_bg - shown} more bulk-group "
+                       "changes (see `bulk.json`)._")
+        out.append("")
+
     # If no section rendered, show a soothing idle message.
-    has_content = nonzero or renamed or moved or newly or removed
+    has_content = nonzero or renamed or moved or newly or removed or bg_any
     if not has_content:
         out.append("_No classification changes — this PR doesn't touch "
                    "the analyzer's inputs._")
