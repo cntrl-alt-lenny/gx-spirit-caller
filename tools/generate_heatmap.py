@@ -253,6 +253,20 @@ def render_svg(report: dict, version: str) -> str:
     return "".join(out)
 
 
+def _module_name_from_delinks_path(delinks_path: Path, config_dir: Path) -> str:
+    """Derive a short module name from a delinks.txt path.
+
+    config/eur/arm9/delinks.txt                    -> "arm9"
+    config/eur/arm9/overlays/ov020/delinks.txt     -> "ov020"
+    """
+    try:
+        rel = delinks_path.relative_to(config_dir)
+    except ValueError:
+        rel = delinks_path
+    parts = rel.parts[:-1]  # drop "delinks.txt"
+    return parts[-1] if parts else "module"
+
+
 def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
     """Build a report.json-shaped dict from config/<ver>/**/delinks.txt
     when the real report.json isn't available (typical CI case — no
@@ -265,10 +279,17 @@ def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
 
     Returns None if no delinks.txt files are found (first-run state).
 
-    Matching heuristic: a TU marked `complete` in delinks.txt counts
-    all its sections' bytes as matched. `_dsd_gap@*` TUs count as
-    total-only (they're the uncarved remainder). This mirrors what
-    objdiff reports locally once `ninja report` has run.
+    Totals come from the module-level section map (authoritative,
+    mirrors summarize_delinks in progress.py). Per-unit cells come
+    from carved TUs; if those TUs don't cover the whole module, a
+    synthetic `_dsd_gap@<module>` cell is emitted for the remainder
+    so the heatmap shows every byte in the ROM — otherwise a module
+    with only the section map (no TUs) silently contributes zero
+    bytes and carved modules appear at inflated percentages.
+
+    Matching heuristic: a TU marked `complete` counts all its
+    sections' bytes as matched. `_dsd_gap@*` TUs (from dsd itself
+    or synthesized here) never count as matched.
     """
     all_delinks = list(config_dir.rglob("delinks.txt"))
     if not all_delinks:
@@ -279,7 +300,21 @@ def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
     complete_units = 0
 
     for delinks in all_delinks:
-        _module_sections, tus = parse_delinks_file(delinks)
+        module_sections, tus = parse_delinks_file(delinks)
+        module_name = _module_name_from_delinks_path(delinks, config_dir)
+
+        module_total_code = sum(
+            max(0, end - start)
+            for name, start, end in module_sections
+            if name in CODE_SECTIONS
+        )
+        module_total_data = sum(
+            max(0, end - start)
+            for name, start, end in module_sections
+            if name in DATA_SECTIONS
+        )
+
+        tu_total_code = tu_total_data = 0
         for tu in tus:
             name = tu.get("source", "")
             status = tu.get("status")
@@ -294,11 +329,12 @@ def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
                 elif section in DATA_SECTIONS:
                     unit_total_data += size
 
+            tu_total_code += unit_total_code
+            tu_total_data += unit_total_data
+
             unit_matched_code = unit_total_code if is_complete else 0
             unit_matched_data = unit_total_data if is_complete else 0
 
-            t_code += unit_total_code
-            t_data += unit_total_data
             m_code += unit_matched_code
             m_data += unit_matched_data
             if is_complete:
@@ -311,6 +347,26 @@ def synthesize_report_from_delinks(config_dir: Path) -> dict | None:
                     "total_code":   str(unit_total_code),
                     "matched_data": str(unit_matched_data),
                     "total_data":   str(unit_total_data),
+                },
+            })
+
+        # Authoritative totals come from the module-level map.
+        t_code += module_total_code
+        t_data += module_total_data
+
+        # Bytes not yet carved into a TU become one synthetic gap
+        # cell per module. Keeps the heatmap and its top-level
+        # percentages honest when a module hasn't been carved yet.
+        gap_code = max(0, module_total_code - tu_total_code)
+        gap_data = max(0, module_total_data - tu_total_data)
+        if gap_code + gap_data > 0:
+            units.append({
+                "name": f"_dsd_gap@{module_name}",
+                "measures": {
+                    "matched_code": "0",
+                    "total_code":   str(gap_code),
+                    "matched_data": "0",
+                    "total_data":   str(gap_data),
                 },
             })
 
