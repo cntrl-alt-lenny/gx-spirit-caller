@@ -40,3 +40,7 @@ src/overlay005/ov005_021acacc.c:
 src/overlay005/ov005_021ad048.c:
     complete
     .text start:0x021ad048 end:0x021ad058
+
+src/overlay005/sinit_ov005_021b16e4.c:
+    complete
+    .init start:0x021b16e4 end:0x021b1710
