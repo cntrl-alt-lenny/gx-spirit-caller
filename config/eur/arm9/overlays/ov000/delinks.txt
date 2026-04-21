@@ -3,3 +3,43 @@
     .ctor       start:0x021b63fc end:0x021b63fc kind:rodata align:4
     .data       start:0x021b6400 end:0x021c73e0 kind:data align:32
     .bss        start:0x021c73e0 end:0x021c9d60 kind:bss align:32
+
+src/overlay000/ov000_021aa4b4.c:
+    complete
+    .text start:0x021aa4b4 end:0x021aa4c4
+
+src/overlay000/ov000_021aaeb8.c:
+    complete
+    .text start:0x021aaeb8 end:0x021aaec4
+
+src/overlay000/ov000_021abe54.c:
+    complete
+    .text start:0x021abe54 end:0x021abe64
+
+src/overlay000/ov000_021abf40.c:
+    complete
+    .text start:0x021abf40 end:0x021abf50
+
+src/overlay000/ov000_021ac530.c:
+    complete
+    .text start:0x021ac530 end:0x021ac538
+
+src/overlay000/ov000_021ac750.c:
+    complete
+    .text start:0x021ac750 end:0x021ac760
+
+src/overlay000/ov000_021ac760.c:
+    complete
+    .text start:0x021ac760 end:0x021ac770
+
+src/overlay000/ov000_021acdc0.c:
+    complete
+    .text start:0x021acdc0 end:0x021acdcc
+
+src/overlay000/ov000_021af358.c:
+    complete
+    .text start:0x021af358 end:0x021af368
+
+src/overlay000/ov000_021af368.c:
+    complete
+    .text start:0x021af368 end:0x021af378
