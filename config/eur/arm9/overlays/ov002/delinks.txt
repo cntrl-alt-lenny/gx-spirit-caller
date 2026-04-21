@@ -4,3 +4,11 @@
     .ctor       start:0x022ca860 end:0x022ca874 kind:rodata align:4
     .data       start:0x022ca880 end:0x022cd300 kind:data align:32
     .bss        start:0x022cd300 end:0x022d2980 kind:bss align:32
+
+src/overlay002/sinit_ov002_022ca808.c:
+    complete
+    .init start:0x022ca808 end:0x022ca834
+
+src/overlay002/sinit_ov002_022ca834.c:
+    complete
+    .init start:0x022ca834 end:0x022ca860
