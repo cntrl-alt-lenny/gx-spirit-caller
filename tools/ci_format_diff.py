@@ -38,6 +38,18 @@ def fmt_signed(n: int) -> str:
     return str(n)
 
 
+def _esc_md_table(s: str) -> str:
+    """Escape characters that would break a GFM table cell.
+
+    Bulk-group keys have the shape `ov005|0x2c|__sinit`. Dropped
+    unescaped into a table cell they'd split into extra columns
+    and shift the count/notes values into the wrong column (or
+    hide them entirely). `\\|` escapes in GFM tables even inside
+    inline code.
+    """
+    return s.replace("|", "\\|")
+
+
 def render(diff: dict, *, limit: int = 15) -> str:
     out: list[str] = []
     out.append("## 📊 Analyzer tier delta")
@@ -128,9 +140,9 @@ def render(diff: dict, *, limit: int = 15) -> str:
             return "`__sinit`" if is_sinit else "—"
 
         for key, count, is_sinit in bg_new[:limit]:
-            out.append(f"| + | `{key}` | {count} | {_notes(is_sinit)} |")
+            out.append(f"| + | `{_esc_md_table(key)}` | {count} | {_notes(is_sinit)} |")
         for key, count, is_sinit in bg_removed[:limit]:
-            out.append(f"| − | `{key}` | {count} | {_notes(is_sinit)} |")
+            out.append(f"| − | `{_esc_md_table(key)}` | {count} | {_notes(is_sinit)} |")
         for entry in bg_changed[:limit]:
             key, pc, cc, pf, cf = entry
             delta = cc - pc
@@ -143,7 +155,7 @@ def render(diff: dict, *, limit: int = 15) -> str:
                     notes_bits.append(f"`all_placeholder` {pf[1]}→{cf[1]}")
             notes = "; ".join(notes_bits) if notes_bits else "—"
             out.append(
-                f"| ~ | `{key}` | {pc}→{cc} ({sign}{delta}) | {notes} |"
+                f"| ~ | `{_esc_md_table(key)}` | {pc}→{cc} ({sign}{delta}) | {notes} |"
             )
         total_bg = len(bg_new) + len(bg_removed) + len(bg_changed)
         shown = sum(min(limit, len(xs)) for xs in (bg_new, bg_removed, bg_changed))
