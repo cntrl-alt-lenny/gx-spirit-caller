@@ -48,12 +48,15 @@
       - 'assets/**'
 
 # agent:* — matched on the PR's head-branch prefix. Mirrors AGENTS.md
-# slugs exactly. If a new agent joins, add its prefix here.
+# slugs. Each label matches both the current model-agnostic slug
+# (`cloud/`, `decomper/`, `brain/`) and the grandfathered `claude-*/`
+# prefixes from before the rename so historical PRs still label
+# correctly. If a new agent joins, add its prefix here.
 'agent:cloud':
-  - head-branch: ['^claude-cloud/']
+  - head-branch: ['^cloud/', '^claude-cloud/']
 
 'agent:pc':
-  - head-branch: ['^claude-pc/']
+  - head-branch: ['^decomper/', '^claude-pc/']
 
 'agent:brain':
-  - head-branch: ['^claude-brain/']
+  - head-branch: ['^brain/', '^claude-brain/']
