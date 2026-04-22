@@ -8,18 +8,20 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-22. Main tip is wherever the slug-rename PR
-lands (see merged list below). No decomp regressions from the rename.
+**Last updated:** 2026-04-22. Main tip is `373c6b0` after merging
+PR #88 (worklist-diff tool) and PR #89 (brief 008 wrappers). Brief
+009 is now open, docs/state.md refresh follows the chunk.
 
-**Baseline:** `python tools/configure.py eur`, `ninja rom`, and
-`./dsd.exe check modules -c config/eur/arm9/config.yaml` all pass on
-Windows. Module check: expected **24/27 OK**. ARM9 main / DTCM / overlay 4
-fail for the known placeholder-symbol reasons from CLAUDE.md, not from
-agent work.
+**Baseline:** `python tools/configure.py eur`, `ninja rom`,
+`ninja objdiff`, `ninja report`, and `./dsd.exe check modules -c
+config/eur/arm9/config.yaml` all pass on Windows. Module check:
+expected **24/27 OK** (ARM9 main / DTCM / overlay 4 still fail per
+CLAUDE.md, not agent-caused).
 
-**Progress:** `python tools/progress.py --version eur` reports code
-`2960 / 2386664` bytes (0.12%), data `0 / 4776528` bytes (0.00%),
-and `142 / 254` units passing (55.91%).
+**Progress:** `python tools/progress.py --version eur` now reports
+code `2992 / 2386664` bytes (0.13%), data `0 / 4776528` bytes
+(0.00%), and `144 / 257` units passing (56.03%). +32 bytes / +2 units
+from PR #89's tail-wrapper match.
 
 **Matched breakdown** (live from `python tools/next_targets.py
 --version eur`):
@@ -27,87 +29,96 @@ and `142 / 254` units passing (55.91%).
 | Tier | Matched | Unmatched | Total | % matched |
 |------|--------:|----------:|------:|----------:|
 | `trivial` | 78 | 59 | 137 | 56.9% |
-| `easy` | 59 | 1064 | 1123 | 5.3% |
+| `easy` | 61 | 1062 | 1123 | 5.4% |
 | `sinit` | 46 | 5 | 51 | 90.2% |
 | `named` | 0 | 22 | 22 | 0.0% |
 | `medium` | 0 | 6 | 6 | 0.0% |
 | `hard` | 0 | 8510 | 8510 | 0.0% |
 
-`sinit` is effectively closed apart from 4-5 targeted outliers;
-`easy` remains the main grind with ~1064 candidates.
+The two brief-008 wrappers count as `easy` (both 0x10, leaf-after-
+tail-call). `sinit` still at 46 matched / 5 outliers — brief 009 aims
+at one of those five.
 
 ## Merged since last refresh
 
-Main tip moved from `0d33ec8` through the slug-rename chunk.
+Main tip moved from `c9e1b69` → `373c6b0`.
 
-### Brain track (this chunk)
+### Decomper track
 
-- **Slug rename: model-agnostic.** `claude-brain` → `brain`,
-  `claude-cloud` → `cloud`, `claude-pc` → `decomper`. The Active
-  Agents table's *Where it runs* column is now LLM-agnostic; Codex
-  CLI has proven all three slots work regardless of which LLM backs
-  the session. Historical branches keep their `claude-*` prefixes;
-  only new branches use the new slugs. Updated AGENTS.md,
-  `docs/decomp-workflow.md`, `tools/rename_symbol.py` comment, and
-  `.github/labeler.yml` (old + new prefixes both matched).
-- **Brief 008 published.** `decomper/ov011-tail-wrappers` — matches
-  the `func_ov011_021ce324` / `021ce334` tail-call wrapper pair.
-  Small PR, both functions in it. First brief using the new slug
-  convention.
+- **PR #89** — brief 008 shipped. `func_ov011_021ce324` /
+  `021ce334` tail-call wrapper pair, both 100% objdiff, 16/16
+  matched code bytes each. Baseline stayed 24/27 OK. Used the
+  `scaffold_batch.py --apply-delinks` flow end-to-end.
 
-### Decomper / cloud tracks
+### Cloud track
 
-Clean since PR #86 — no decomper or cloud work merged in this chunk.
-The previous wave (Brief 007 / `func_ov000_021ac550`) is the last
-function match on record; brief 008 opens the next small chunk.
+- **PR #88** — `tools/ci_format_worklist_diff.py`. Takes two
+  `next_targets --emit-json` snapshots and renders a Markdown
+  before/after diff suitable for PR bodies. 27 new tests; full test
+  suite green at 385 tests. Pairs naturally with the existing CI
+  match-invariants comment gate — a future CI tweak could auto-post
+  tier-delta on any src/ PR.
+
+### Brain track
+
+- Refreshed `docs/state.md` (this file). Next-brain TODO narrowed
+  to brief 009 review + downstream planning.
+- Wrote brief 009 on `__sinit_ov002_022ca7e8` (the safest sinit
+  outlier deferred from brief 003).
 
 ## In flight
 
-- **Open PRs:** zero (post-rename-merge).
-- **`decomper`** — brief 008 open. Branch:
-  `decomper/ov011-tail-wrappers`. Aim: one PR, two wrapper functions
-  matched at 100% objdiff, baseline holds.
-- **`cloud`** — no formal brief. Per AGENTS.md *Cloud autonomous work*,
-  `cloud` may pick up unbriefed `tools/` / `docs/` work; if idle, stand
-  by until brief 009 or a natural follow-up surfaces. Good candidates
-  it could propose itself: a `tier-delta` wrapper on `next_targets.py`
-  for PR bodies, an `--callers-of-callers` mode on `find_callsites.py`,
-  or early scaffolding ideas for data-tier work.
-- **`brain`** — waiting for the next PR to review. Will re-run
-  `tools/analyze_symbols.py` + heatmap regen after brief 008 lands.
+- **Open PRs:** zero (post brain-PR merge).
+- **`decomper`** — brief 009 open. Branch:
+  `decomper/sinit-ov002-outlier`. One 0x18 sinit outlier, one PR,
+  one `.c` + delinks entry. See
+  [`docs/briefs/009-sinit-ov002-outlier.md`](briefs/009-sinit-ov002-outlier.md)
+  for the full shape + literal-pool-ordering risk notes.
+- **`cloud`** — no open brief. Good self-directed candidates per
+  AGENTS.md *Cloud autonomous work*:
+  - Wire `ci_format_worklist_diff.py` (PR #88) into a GitHub
+    Actions workflow so src/ PRs auto-post a tier-delta comment.
+  - `--callers-of-callers` mode for `tools/find_callsites.py`.
+  - Scaffolding research for the data tier (still 0% matched).
+- **`brain`** — waiting for the next decomper PR. Will re-run
+  analyzer + heatmap regen after brief 009 lands.
 
 ## Next-brain TODO
 
-1. **Review brief 008 PR when it opens.** Decomper submits one PR with
-   two `.c` files under `src/overlay011/` and two delinks-block
-   appends. Verify locally: `python tools/configure.py eur`, `ninja rom`,
-   `./dsd.exe check modules`, `ninja objdiff` (both functions should
-   show 100%). Baseline must stay 24/27 OK. Then summarize for
-   cntrl_alt_lenny and offer to merge.
-2. **Write brief 009** on the `__sinit_ov002_022ca7e8` outlier once
-   brief 008 is merged. Per Codex-decomper scouting (see note file):
-   "loads `data_ov002_022d11bc`, stores `data_ov002_022cc4f4` at
-   `+0x1f8`, returns. Wrinkle: getting mwcc to keep the `.init`
-   placement and literal-load/store order."
-3. **Consider making `match-invariants` a required branch-protection
-   check** once brief 008 is done. It's been stable for many PRs;
-   would give `missing_tu_source` errors actual merge-block teeth.
-4. **Data-tier at 0%** — still waiting on first carved TU. Becomes
-   relevant at brief 010+ territory.
-5. **Stale remote-branch sweep** — none currently outstanding
-   post-rename-merge, but check after brief 008 lands.
+1. **Review brief 009 PR when it opens.** Single `.c` under
+   `src/overlay002/`, one delinks-block append. Verify:
+   `python tools/configure.py eur`, `ninja rom`, `ninja objdiff`,
+   `./dsd.exe check modules`. Must stay 24/27 OK; the target function
+   must hit 100% in `ninja report`. Summarize for cntrl_alt_lenny and
+   offer to merge.
+2. **Scope brief 010** once 009 is merged. Natural shape: the ov010
+   sinit pair (`__sinit_ov010_021b89a8` + `__sinit_ov010_021b89f0`,
+   two 0x48 shapes sharing a ctor-chain pattern) plus
+   `__sinit_ov011_021d3620`. Closes the sinit tier down to just the
+   ov004 outlier (which stays deferred while ov004 is failing).
+3. **Pre-existing warning:** `check_match_invariants` notes that
+   `func_ov021_021aaf58` sits inside a `complete` TU in ov021 but
+   still uses a dsd-placeholder name. Not brief 008/009's fault —
+   was there before. Minor: either rename it when the identity is
+   clear, or leave it as a permanent warning. No action required
+   this chunk; note for future brain.
+4. **Consider making `match-invariants` a required branch-protection
+   check.** Carryover from previous state. Stable across the brief
+   007/008/009 wave; would give `missing_tu_source` errors actual
+   merge-block teeth without trapping warnings.
+5. **Data-tier still at 0%.** Becomes actionable after sinit
+   tier closes (brief 010+ territory).
+6. **Stale remote-branch sweep** — none currently outstanding.
 
 ## New agents?
 
-Still no. Brain + decomper + cloud continues to hold. Codex joining
-didn't require a new slot — it slotted into the existing three
-role-based slugs, which is exactly what the model-agnostic rename
-captures. Reopen if:
+Still no. The model-agnostic slug rename landed in PR #87 — Codex CLI
+has successfully taken all three roles at various points. Reopen if:
 
 - `libs/nitro/` or `libs/runtime/` scope balloons → dedicated `libs`
   agent.
 - Asset pipelines (graphics/audio) become a decomp target → `assets`
   agent.
-- Multiple concurrent sessions want the same role (e.g. two brains
-  reviewing in parallel) — then we'd need per-model slugs like
-  `codex-brain`, but we don't today.
+- Multiple concurrent sessions want the same role — then per-model
+  slugs (`codex-brain` alongside `claude-brain`-as-role), but we're
+  still at one-session-per-role today.
