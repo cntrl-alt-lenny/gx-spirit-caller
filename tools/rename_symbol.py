@@ -3,7 +3,7 @@
 """
 rename_symbol.py — rename one symbol across the dsd config.
 
-Every time `claude-pc` matches a function, the placeholder name
+Every time the decomper matches a function, the placeholder name
 (`func_020abcde`) gets promoted to a real name (e.g. `Duel_DrawCard`).
 That means editing a line in exactly one `config/<ver>/**/symbols.txt`
 file — easy to miss, easy to edit the wrong overlay's file by accident,

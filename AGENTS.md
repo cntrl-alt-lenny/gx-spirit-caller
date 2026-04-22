@@ -13,37 +13,47 @@ in plain English — see *Adding or retiring agents* near the bottom.
 
 | Slug              | Where it runs                                                                             | Role                                                                                                                                                                                   | Owns these paths                                               | Hands-off paths                                                                 |
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
-| **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, merges PRs, adds/retires agents, final authority.                                                                                               | —                                                              | —                                                                               |
-| **claude-brain**  | Claude Code on cntrl_alt_lenny's PC **or Mac** (dedicated session, separate from the decomper)      | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`                       | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
-| **claude-cloud**  | Claude Code on the web (no access to the ROM, `dsd`, or `ninja`)                          | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via the GitHub MCP integration. Cannot run local builds, so delegates verification to brain. | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
-| **claude-pc**     | Claude Code on cntrl_alt_lenny's PC (decomper session)                                              | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
+| **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, picks direction, merges PRs, adds/retires agents, final authority.                                                                              | —                                                              | —                                                                               |
+| **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
+| **cloud**         | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain.     | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
+| **decomper**      | Any LLM session on cntrl_alt_lenny's PC or Mac, with toolchain + baserom (separate session from brain) | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
 agents* below.
 
-### Why the brain runs locally (PC or Mac), not on Cloud
+### Why the brain runs locally (PC or Mac), not on a cloud session
 
 The brain needs to actually execute `ninja`, `./dsd.exe check modules`,
 `python tools/progress.py`, etc. to verify that incoming PRs don't
-regress the build. Cloud sessions don't have the baserom or the
-toolchain, so they can *design* work and *review diffs* but can't
+regress the build. Web/cloud LLM sessions don't have the baserom or
+the toolchain, so they can *design* work and *review diffs* but can't
 *prove the ROM still builds*. Putting the brain on a local machine
 means one session can both decide and verify, which is the difference
 between coordinating and guessing.
 
-The role is tied to the repo, not to a specific machine or Claude
-conversation. cntrl_alt_lenny roams between PC and Mac; whichever one has a
-Claude Code session open with the toolchain installed and a current
-`orig/baserom_eur.nds` is the active brain for that stretch. Handoff
-is stateless — the next brain reads this file + *State of play* below
-and picks up.
+### Slugs are roles, not LLM providers
+
+**Any** LLM session that meets a slot's *Where it runs* requirement can
+take that slot. Claude Code has played all three roles; Codex CLI has
+played all three roles; a future Gemini / GPT / whatever session can
+too. The slug is the **role**, not the **model**. When cntrl_alt_lenny
+opens a chat and says *"you are the decomper"*, that session becomes
+`decomper` for as long as it's the one working the role — regardless of
+which LLM backs it.
+
+Handoff is stateless. Whichever local session has the toolchain
+installed, a current `orig/baserom_eur.nds`, and has read this file +
+`docs/state.md` is the active `brain` for that stretch; the next one
+can pick up from there.
 
 ### Brain onboarding on a fresh machine
 
-If you're a brand-new `claude-brain` session starting cold on a PC or
-Mac that has never built this repo, do these one-time steps before you
+If you're a brand-new `brain` session starting cold on a PC or Mac
+that has never built this repo, do these one-time steps before you
 touch any PR. cntrl_alt_lenny will typically say something like *"you are
 the brain, review everything"* — that's your cue to run this checklist.
+Works the same regardless of which LLM (Claude Code, Codex CLI, etc.)
+is backing the session.
 
 1. **Be at the repo root.** `git clone https://github.com/cntrl-alt-lenny/gx-spirit-caller`
    then `cd` into it, or `cd` into an existing clone.
@@ -100,8 +110,10 @@ brain reads it cold to catch up in under a minute.
    job is to make the review/merge decision easy to approve, not to
    outsource the click.
 3. **One branch per task.** Branch name = `<agent-slug>/<kebab-scope>`,
-   e.g. `claude-pc/ov005-decomp`, `claude-cloud/symbol-analyzer`.
-   One branch, one PR, one concern.
+   e.g. `decomper/ov011-tail-wrappers`, `cloud/tier-delta`,
+   `brain/agents-rename`. One branch, one PR, one concern. (Older
+   branches in history use the pre-rename slugs `claude-pc`,
+   `claude-cloud`, `claude-brain`; those are grandfathered.)
 4. **Stay inside your "Owns" column.** If the task needs a change in
    another agent's territory, either open a PR in that agent's scope
    (as them, not you) or ask cntrl_alt_lenny / the brain to re-partition.
@@ -112,7 +124,7 @@ brain reads it cold to catch up in under a minute.
 
 ### Cloud autonomous work
 
-`claude-cloud` fills idle time between briefs. Defaults:
+`cloud` fills idle time between briefs. Defaults:
 
 - **May open unbriefed:** new scripts in `tools/`, improvements to
   existing analyzer scripts, CI changes, PR reviews via GitHub MCP,
@@ -128,12 +140,14 @@ brain reads it cold to catch up in under a minute.
 
 `<agent-slug>/<kebab-case-scope>` — for example:
 
-  - `claude-cloud/add-gx-headers`
-  - `claude-pc/overlay-4-sinit-matches`
-  - `codex/generate-nitro-os-decls`
+  - `cloud/add-gx-headers`
+  - `decomper/ov011-tail-wrappers`
+  - `brain/agents-rename`
 
-The slug left of `/` identifies which agent owns pushes to that branch.
-No-one else touches it without coordination.
+The slug left of `/` identifies which role owns pushes to that branch.
+No-one else touches it without coordination. Branches from before the
+model-agnostic rename (`claude-brain/*`, `claude-cloud/*`, `claude-pc/*`)
+remain valid in git history and don't need to be renamed.
 
 ## Pull-request workflow
 
@@ -158,8 +172,8 @@ No-one else touches it without coordination.
 
 ## The "brain" role
 
-Currently held by `claude-brain` (the dedicated PC Claude Code session).
-Responsibilities:
+Held by `brain` (a dedicated local Claude Code or Codex CLI session
+with the toolchain installed). Responsibilities:
 
   - Keeps **AGENTS.md** current (this file).
   - Writes **task briefs** for other agents on request — a short spec
@@ -178,14 +192,14 @@ Responsibilities:
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's cntrl_alt_lenny's call.
 
-`claude-cloud` supports the brain: it writes scaffolding, tools, and
-headers on its own branches, and can review PRs through the GitHub MCP
-integration, but all "does the rebuilt ROM still work?" questions are
-resolved by the brain.
+`cloud` supports the brain: it writes scaffolding, tools, and headers
+on its own branches, and can review PRs through GitHub MCP integrations,
+but all "does the rebuilt ROM still work?" questions are resolved by
+the brain.
 
-The role is tied to the repo, not a specific Claude conversation —
-any fresh PC Claude session that reads this file and has the toolchain
-installed can take over.
+The role is tied to the repo, not to a specific LLM conversation — any
+fresh local session (Claude Code, Codex CLI, …) that reads this file
+and has the toolchain installed can take over.
 
 ## Adding or retiring agents
 
@@ -225,7 +239,11 @@ itself:
 
 ### Open briefs
 
-(none right now; see `docs/state.md` for the next-brain TODO queue)
+- [`docs/briefs/008-ov011-tail-call-wrappers.md`](docs/briefs/008-ov011-tail-call-wrappers.md)
+  — `decomper`: match the `func_ov011_021ce324` / `func_ov011_021ce334`
+  tail-call wrapper pair at 100% objdiff. Two tiny wrappers; briefed
+  together because the first tail-calls the second. Branch:
+  `decomper/ov011-tail-wrappers`.
 
 ### Closed briefs (reference)
 

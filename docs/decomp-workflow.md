@@ -31,9 +31,9 @@ Three AI agents, one human. Each has a narrow job.
 | Agent | Where it lives | What it does |
 |---|---|---|
 | **cntrl_alt_lenny** | meatspace | You. Sets priorities, picks direction, merges PRs. |
-| **claude-brain** | local Claude Code, PC or Mac | Reviews and merges PRs. Runs `ninja` / `dsd` locally to verify each PR doesn't break the build. Writes task briefs. Keeps `AGENTS.md` / `docs/state.md` current. |
-| **claude-pc** | local Claude Code (decomper session) | The actual decomper. Matches individual functions. Writes C source in `src/`. Renames symbols. |
-| **claude-cloud** | Claude Code on the web | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. That's me. |
+| **brain** | local LLM session (Claude Code or Codex CLI), PC or Mac | Reviews and merges PRs. Runs `ninja` / `dsd` locally to verify each PR doesn't break the build. Writes task briefs. Keeps `AGENTS.md` / `docs/state.md` current. |
+| **decomper** | local LLM session (separate from brain) | The actual decomper. Matches individual functions. Writes C source in `src/`. Renames symbols. |
+| **cloud** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. |
 
 Why the split? Matching a function is a focused, iterative task (one
 person on one function at a time). Tool-building is parallel work that
@@ -80,7 +80,7 @@ Say the decomper picks `__sinit_ov005_021b16e4`. Here's what happens:
    (`__sinit_ov005_021b16e4`).
 
 9. **Commit + PR**. Commit the new `.c` file, the `symbols.txt` and
-   `delinks.txt` changes. Push to a `claude-pc/*` branch. Open a PR.
+   `delinks.txt` changes. Push to a `decomper/*` branch. Open a PR.
 
 10. **Review + merge**. Brain reviews, runs `./dsd check modules` to
     confirm no module regressed, and merges.
@@ -175,9 +175,11 @@ Everything else is a proxy.
 
 A pull request is just a git branch with a note attached. The flow is:
 
-1. An agent writes code on a branch named like `claude-cloud/foo` or
-   `claude-pc/bar`. The `<agent>/<slug>` shape is a convention so
-   everyone can see at a glance who made it.
+1. An agent writes code on a branch named like `cloud/foo` or
+   `decomper/bar`. The `<agent>/<slug>` shape is a convention so
+   everyone can see at a glance who made it. (Branches from before
+   the model-agnostic slug rename use `claude-cloud/*` / `claude-pc/*`
+   / `claude-brain/*` in history.)
 2. The agent pushes the branch and opens a PR via the GitHub API. This
    doesn't change `main`; it just says "here's a proposed change".
 3. Brain reviews it: reads the diff, runs `ninja` / `dsd check modules`
