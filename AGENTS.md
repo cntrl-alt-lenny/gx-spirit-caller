@@ -239,14 +239,16 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/008-ov011-tail-call-wrappers.md`](docs/briefs/008-ov011-tail-call-wrappers.md)
-  — `decomper`: match the `func_ov011_021ce324` / `func_ov011_021ce334`
-  tail-call wrapper pair at 100% objdiff. Two tiny wrappers; briefed
-  together because the first tail-calls the second. Branch:
-  `decomper/ov011-tail-wrappers`.
+- [`docs/briefs/009-sinit-ov002-outlier.md`](docs/briefs/009-sinit-ov002-outlier.md)
+  — `decomper`: match the 0x18 sinit outlier `__sinit_ov002_022ca7e8`
+  (deferred from brief 003). Shorter-than-template shape; literal-pool
+  ordering is the main risk. Branch: `decomper/sinit-ov002-outlier`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/008-ov011-tail-call-wrappers.md`](docs/briefs/008-ov011-tail-call-wrappers.md)
+  `decomper`, shipped in PR #89. Matched `func_ov011_021ce324` /
+  `021ce334` — both 0x10 ARM tail-call wrappers, 100% objdiff.
 - [`docs/briefs/001-ov005-finish-trivials.md`](docs/briefs/001-ov005-finish-trivials.md)
   `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
   matched (8 trivial + 5 easy-tier leaves).
