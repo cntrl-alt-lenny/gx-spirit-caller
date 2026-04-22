@@ -36,3 +36,11 @@ src/overlay011/ov011_021d2d18.c:
 src/overlay011/ov011_021d2d3c.c:
     complete
     .text start:0x021d2d3c end:0x021d2d44
+
+src/overlay011/ov011_021ce324.c:
+    complete
+    .text start:0x021ce324 end:0x021ce334
+
+src/overlay011/ov011_021ce334.c:
+    complete
+    .text start:0x021ce334 end:0x021ce344
