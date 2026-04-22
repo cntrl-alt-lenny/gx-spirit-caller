@@ -33,6 +33,17 @@ caller is asked to disambiguate with `module addr`.
 
 Output is plain text by default; `--json` switches to a machine-
 readable form for scripting.
+
+`--caller-depth N` walks up to N hops through the caller tree
+(default 1 = direct only). Useful when the direct callers are
+themselves placeholder-named — a second or third hop often brings
+in a named symbol that tells you what the function is for. Output
+is deduplicated per hop: a function never appears at two depths,
+the shallowest wins.
+
+    # Two hops of callers for signature inference.
+    python tools/find_callsites.py --version eur \\
+        ov006 0x021ba1f0 --caller-depth 2
 """
 
 from __future__ import annotations
@@ -40,7 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -118,6 +129,35 @@ class Refs:
     # Loads whose dest didn't resolve to a known symbol (mid-data,
     # or a symbol pruned during dsd's analysis).
     unresolved_loads: list[tuple[str, int]]
+    # Depth-2+ caller expansion. `caller_hops[0]` = depth-2 (callers
+    # of the direct callers), `caller_hops[1]` = depth-3, and so on.
+    # Empty list when `caller_depth=1` (default). Dedup'd against
+    # earlier hops and the target itself so a function never appears
+    # at two depths — the shallowest wins.
+    caller_hops: list[list[ResolvedSymbol]] = field(default_factory=list)
+
+
+def _callers_of_key(
+    target_key: SymbolKey,
+    modules: dict[str, ModuleData],
+    graph_edges_call: dict[SymbolKey, set[SymbolKey]],
+) -> list[ResolvedSymbol]:
+    """Return ResolvedSymbols of every caller that BL's into
+    `target_key`. Skips unresolved keys."""
+    out: list[ResolvedSymbol] = []
+    for caller_key, callees in graph_edges_call.items():
+        if target_key not in callees:
+            continue
+        cm, ca = caller_key
+        md = modules.get(cm)
+        if md is None:
+            continue
+        sym = md.by_addr.get(ca)
+        if sym is None:
+            continue
+        out.append(ResolvedSymbol(module=cm, addr=ca, symbol=sym))
+    out.sort(key=lambda r: (r.module, r.addr))
+    return out
 
 
 def collect_refs(
@@ -125,21 +165,24 @@ def collect_refs(
     modules: dict[str, ModuleData],
     graph_edges_call: dict[SymbolKey, set[SymbolKey]],
     graph_edges_load: dict[SymbolKey, set[SymbolKey]],
+    *,
+    caller_depth: int = 1,
 ) -> Refs:
-    """Walk the resolved graph for the target's bidirectional refs."""
-    callers: list[ResolvedSymbol] = []
-    for caller_key, callees in graph_edges_call.items():
-        if target.key in callees:
-            cm, ca = caller_key
-            md = modules.get(cm)
-            if md is None:
-                continue
-            sym = md.by_addr.get(ca)
-            if sym is None:
-                continue
-            callers.append(ResolvedSymbol(module=cm, addr=ca, symbol=sym))
-    callers.sort(key=lambda r: (r.module, r.addr))
+    """Walk the resolved graph for the target's bidirectional refs.
 
+    `caller_depth` controls how far up the caller tree to expand:
+      - 1 (default): just the direct callers (backwards-compatible).
+      - 2+: BFS up to N hops, populating `caller_hops`. Useful when
+        the direct callers are themselves placeholder-named, and a
+        second hop brings real-named context into view.
+    """
+    callers = _callers_of_key(
+        target.key, modules, graph_edges_call,
+    )
+
+    # Callees are unchanged — no depth expansion here. Signature
+    # inference reads caller argument patterns, so the asymmetry
+    # between callers and callees is deliberate.
     callees: list[ResolvedSymbol] = []
     for callee_key in graph_edges_call.get(target.key, set()):
         cm, ca = callee_key
@@ -168,8 +211,57 @@ def collect_refs(
     loads.sort(key=lambda r: (r.module, r.addr))
     unresolved.sort()
 
-    return Refs(callers=callers, callees=callees,
-                loads=loads, unresolved_loads=unresolved)
+    caller_hops = _expand_caller_hops(
+        target, callers, modules, graph_edges_call, caller_depth,
+    )
+
+    return Refs(
+        callers=callers, callees=callees,
+        loads=loads, unresolved_loads=unresolved,
+        caller_hops=caller_hops,
+    )
+
+
+def _expand_caller_hops(
+    target: ResolvedSymbol,
+    direct_callers: list[ResolvedSymbol],
+    modules: dict[str, ModuleData],
+    graph_edges_call: dict[SymbolKey, set[SymbolKey]],
+    caller_depth: int,
+) -> list[list[ResolvedSymbol]]:
+    """BFS upward from `direct_callers` up to `caller_depth` hops.
+    Returns hops[0] = depth-2, hops[1] = depth-3, etc.
+
+    Each level is dedup'd against (target, all earlier levels, the
+    current level itself) so a symbol that's both a direct caller
+    AND reached via another caller only appears once, at the
+    shallowest depth.
+    """
+    if caller_depth <= 1:
+        return []
+
+    visited: set[SymbolKey] = {target.key}
+    for r in direct_callers:
+        visited.add(r.key)
+
+    hops: list[list[ResolvedSymbol]] = []
+    frontier = direct_callers
+    for _ in range(caller_depth - 1):
+        next_level: list[ResolvedSymbol] = []
+        for caller in frontier:
+            for upstream in _callers_of_key(
+                caller.key, modules, graph_edges_call,
+            ):
+                if upstream.key in visited:
+                    continue
+                visited.add(upstream.key)
+                next_level.append(upstream)
+        next_level.sort(key=lambda r: (r.module, r.addr))
+        hops.append(next_level)
+        if not next_level:
+            break
+        frontier = next_level
+    return hops
 
 
 # --------------------------------------------------------------------------- #
@@ -195,6 +287,17 @@ def print_text(target: ResolvedSymbol, refs: Refs) -> None:
     for r in refs.callers:
         print(f"  {_fmt_sym(r)}")
     print()
+
+    # Deeper caller hops — each level labelled with its depth + count.
+    for i, level in enumerate(refs.caller_hops):
+        depth = i + 2
+        print(f"Callers ({depth} hops, {len(level)}):")
+        if not level:
+            print(f"  (none new at depth {depth} — caller subtree "
+                  "closed or fully dedup'd against earlier hops)")
+        for r in level:
+            print(f"  {_fmt_sym(r)}")
+        print()
 
     print(f"Callees ({len(refs.callees)}):")
     if not refs.callees:
@@ -227,6 +330,9 @@ def to_json(target: ResolvedSymbol, refs: Refs) -> dict:
     return {
         "target": _as(target),
         "callers": [_as(r) for r in refs.callers],
+        "caller_hops": [
+            [_as(r) for r in level] for level in refs.caller_hops
+        ],
         "callees": [_as(r) for r in refs.callees],
         "loads": [_as(r) for r in refs.loads],
         "unresolved_loads": [
@@ -248,11 +354,28 @@ def main() -> int:
                     help="Game version (eur/usa/jpn)")
     ap.add_argument("--json", action="store_true",
                     help="Emit JSON instead of plain text")
+    ap.add_argument(
+        "--caller-depth", type=int, default=1, metavar="N",
+        help="Walk N hops up the caller tree (default 1 = direct only). "
+             "Useful when direct callers are placeholder-named and a "
+             "deeper hop brings real-named context into view. Capped "
+             "at 5 to avoid graph-wide expansion.",
+    )
     # Positional spec: either `module addr` or `name`. Validated below.
     ap.add_argument("ident", nargs="+",
                     help="Either `<module> <addr>` (e.g. main 0x02000800) "
                          "or a single symbol name (e.g. Entry)")
     args = ap.parse_args()
+
+    if args.caller_depth < 1:
+        print("error: --caller-depth must be >= 1.", file=sys.stderr)
+        return 2
+    if args.caller_depth > 5:
+        print("error: --caller-depth > 5 is rejected — the graph fans "
+              "out fast and the output stops being useful. Lower it or "
+              "run at depth 5 and inspect the output first.",
+              file=sys.stderr)
+        return 2
 
     config_dir = ROOT / "config" / args.version
     if not config_dir.is_dir():
@@ -301,6 +424,7 @@ def main() -> int:
     refs = collect_refs(
         target, modules,
         graph.edges_call, graph.edges_load,
+        caller_depth=args.caller_depth,
     )
 
     if args.json:
