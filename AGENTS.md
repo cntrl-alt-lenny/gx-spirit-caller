@@ -239,13 +239,18 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/009-sinit-ov002-outlier.md`](docs/briefs/009-sinit-ov002-outlier.md)
-  — `decomper`: match the 0x18 sinit outlier `__sinit_ov002_022ca7e8`
-  (deferred from brief 003). Shorter-than-template shape; literal-pool
-  ordering is the main risk. Branch: `decomper/sinit-ov002-outlier`.
+- [`docs/briefs/010-sinit-remaining-outliers.md`](docs/briefs/010-sinit-remaining-outliers.md)
+  — `decomper`: close out the three remaining sinit outliers — ov010
+  pair (`__sinit_ov010_021b89a8` + `021b89f0`, both 0x48) and the
+  ov011 zeroing sinit (`__sinit_ov011_021d3620`, 0x34). One PR, three
+  targets, sinit tier advances to 49/51. Branch:
+  `decomper/sinit-remaining-outliers`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/009-sinit-ov002-outlier.md`](docs/briefs/009-sinit-ov002-outlier.md)
+  `decomper`, shipped in PR #92. Matched `__sinit_ov002_022ca7e8`
+  (24 bytes, asm-void escape hatch for mwcc's RHS-first ordering).
 - [`docs/briefs/008-ov011-tail-call-wrappers.md`](docs/briefs/008-ov011-tail-call-wrappers.md)
   `decomper`, shipped in PR #89. Matched `func_ov011_021ce324` /
   `021ce334` — both 0x10 ARM tail-call wrappers, 100% objdiff.
