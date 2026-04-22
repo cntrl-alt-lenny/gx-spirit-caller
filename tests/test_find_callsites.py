@@ -252,5 +252,162 @@ class TestToJson(unittest.TestCase):
                          [{"module": "ov099", "addr": "0x0000beef"}])
 
 
+class TestCallerDepthExpansion(unittest.TestCase):
+    """Covers the --caller-depth > 1 path added for deep-context
+    lookups. The graph here is:
+
+        X ----> A
+                A ----> target
+                B ----> target
+        Y ----> A
+        Y ----> B
+                target ----> leaf
+
+    With caller_depth=1: target's callers are [A, B].
+    With caller_depth=2: depth-2 adds {X, Y} (callers of A + B,
+    minus target itself, dedup'd).
+    """
+
+    def setUp(self):
+        self.target_sym = _sym("target", "ov005", 0x400, size=0x20)
+        self.a = _sym("A", "ov005", 0x200, size=0x10)
+        self.b = _sym("B", "ov005", 0x300, size=0x10)
+        self.x = _sym("X", "ov005", 0x100, size=0x10)
+        self.y = _sym("Y", "ov005", 0x150, size=0x10)
+        self.leaf = _sym("leaf", "ov005", 0x500, size=0x8)
+
+        self.modules = {
+            "ov005": _module("ov005", [
+                self.x, self.y, self.a, self.b, self.target_sym, self.leaf,
+            ]),
+        }
+        self.edges_call: dict = defaultdict(set)
+        self.edges_load: dict = defaultdict(set)
+        # X -> A, Y -> A, Y -> B
+        self.edges_call[("ov005", 0x100)].add(("ov005", 0x200))
+        self.edges_call[("ov005", 0x150)].add(("ov005", 0x200))
+        self.edges_call[("ov005", 0x150)].add(("ov005", 0x300))
+        # A -> target, B -> target
+        self.edges_call[("ov005", 0x200)].add(("ov005", 0x400))
+        self.edges_call[("ov005", 0x300)].add(("ov005", 0x400))
+        # target -> leaf
+        self.edges_call[("ov005", 0x400)].add(("ov005", 0x500))
+
+        self.target = ResolvedSymbol("ov005", 0x400, self.target_sym)
+
+    def test_depth_1_backwards_compatible(self):
+        # Default behaviour must not change: caller_hops is empty.
+        refs = collect_refs(
+            self.target, self.modules,
+            self.edges_call, self.edges_load,
+        )
+        direct = [(r.module, r.addr) for r in refs.callers]
+        self.assertCountEqual(direct, [("ov005", 0x200), ("ov005", 0x300)])
+        self.assertEqual(refs.caller_hops, [])
+
+    def test_depth_2_adds_upstream_callers(self):
+        refs = collect_refs(
+            self.target, self.modules,
+            self.edges_call, self.edges_load,
+            caller_depth=2,
+        )
+        direct = [(r.module, r.addr) for r in refs.callers]
+        self.assertCountEqual(direct, [("ov005", 0x200), ("ov005", 0x300)])
+        self.assertEqual(len(refs.caller_hops), 1)
+        hop2 = [(r.module, r.addr) for r in refs.caller_hops[0]]
+        self.assertCountEqual(hop2, [("ov005", 0x100), ("ov005", 0x150)])
+
+    def test_depth_exceeding_graph_caps_naturally(self):
+        # X and Y have no upstream — depth=3 should come up empty
+        # for the 3-hop level AND stop early (no depth-4 attempt).
+        refs = collect_refs(
+            self.target, self.modules,
+            self.edges_call, self.edges_load,
+            caller_depth=4,
+        )
+        # Depth 2 populated, depth 3 empty.
+        self.assertEqual(len(refs.caller_hops), 2)
+        self.assertEqual(len(refs.caller_hops[0]), 2)
+        self.assertEqual(refs.caller_hops[1], [])
+
+    def test_dedup_across_depths(self):
+        # If a symbol is both a direct caller AND reachable via another
+        # caller, it should only appear at the shallowest depth.
+        # Construct: X -> target, X -> A, A -> target.
+        # Depth-1 = {X, A}. Depth-2 would naively try {X} again; we
+        # want it filtered out.
+        edges: dict = defaultdict(set)
+        edges[("ov005", 0x100)].add(("ov005", 0x400))  # X -> target
+        edges[("ov005", 0x100)].add(("ov005", 0x200))  # X -> A
+        edges[("ov005", 0x200)].add(("ov005", 0x400))  # A -> target
+        refs = collect_refs(
+            self.target, self.modules,
+            edges, self.edges_load,
+            caller_depth=2,
+        )
+        direct = [(r.module, r.addr) for r in refs.callers]
+        self.assertCountEqual(
+            direct, [("ov005", 0x100), ("ov005", 0x200)],
+        )
+        # X (0x100) is already a direct caller → must NOT appear in
+        # depth-2. Depth-2 comes from A's callers; its only caller is
+        # X, which is excluded. Expected: empty depth-2.
+        self.assertEqual(len(refs.caller_hops), 1)
+        self.assertEqual(refs.caller_hops[0], [])
+
+    def test_target_itself_excluded_from_deeper_hops(self):
+        # Adversarial: target calls into its own caller chain via leaf.
+        # target must never appear as its own caller in any hop.
+        edges: dict = defaultdict(set)
+        edges[("ov005", 0x200)].add(("ov005", 0x400))  # A -> target
+        edges[("ov005", 0x400)].add(("ov005", 0x500))  # target -> leaf
+        edges[("ov005", 0x500)].add(("ov005", 0x400))  # leaf -> target (cycle)
+        refs = collect_refs(
+            self.target, self.modules,
+            edges, self.edges_load,
+            caller_depth=3,
+        )
+        # Depth-1: A + leaf (both direct callers).
+        direct_keys = {(r.module, r.addr) for r in refs.callers}
+        self.assertIn(("ov005", 0x500), direct_keys)  # leaf
+        self.assertIn(("ov005", 0x200), direct_keys)  # A
+        # target itself must not appear at any deeper depth.
+        for level in refs.caller_hops:
+            for r in level:
+                self.assertNotEqual(
+                    (r.module, r.addr), self.target.key,
+                )
+
+    def test_json_schema_exposes_caller_hops(self):
+        refs = collect_refs(
+            self.target, self.modules,
+            self.edges_call, self.edges_load,
+            caller_depth=2,
+        )
+        payload = to_json(self.target, refs)
+        self.assertIn("caller_hops", payload)
+        self.assertEqual(len(payload["caller_hops"]), 1)
+        # Each deep-hop entry has the same shape as a direct caller.
+        self.assertEqual(
+            set(payload["caller_hops"][0][0].keys()),
+            set(payload["callers"][0].keys()),
+        )
+
+    def test_print_text_includes_deep_hop_section(self):
+        refs = collect_refs(
+            self.target, self.modules,
+            self.edges_call, self.edges_load,
+            caller_depth=2,
+        )
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            print_text(self.target, refs)
+        out = buf.getvalue()
+        self.assertIn("Callers (2 hops, 2)", out)
+        # Depth-2 members rendered.
+        self.assertIn("ov005|0x00000100", out)
+        self.assertIn("ov005|0x00000150", out)
+
+
 if __name__ == "__main__":
     unittest.main()
