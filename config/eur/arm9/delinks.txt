@@ -51,3 +51,43 @@ src/main/main.c:
 src/main/register_global_object.c:
     complete
     .text start:0x020b42f4 end:0x020b4314
+
+src/main/VBlankIntrWait.s:
+    complete
+    .text start:0x02000086 end:0x0200008c
+
+src/main/LZ77UnCompReadByCallbackWrite16bit.s:
+    complete
+    .text start:0x020000f2 end:0x020000f6
+
+src/main/RLUnCompReadByCallbackWrite16bit.s:
+    complete
+    .text start:0x0200017a end:0x0200017e
+
+src/main/Div.s:
+    complete
+    .text start:0x020001f2 end:0x020001f6
+
+src/main/BitUnPack.s:
+    complete
+    .text start:0x020002ae end:0x020002b2
+
+src/main/Mod.s:
+    complete
+    .text start:0x02000324 end:0x0200032a
+
+src/main/IsDebugger.s:
+    complete
+    .text start:0x0200045a end:0x0200045e
+
+src/main/GetCRC16.s:
+    complete
+    .text start:0x020005f6 end:0x020005fa
+
+src/main/RLUnCompReadNormalWrite8bit.s:
+    complete
+    .text start:0x02000652 end:0x02000656
+
+src/main/SoftReset.s:
+    complete
+    .text start:0x0200078a end:0x0200078e
