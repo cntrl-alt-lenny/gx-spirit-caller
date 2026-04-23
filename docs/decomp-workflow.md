@@ -135,14 +135,81 @@ Every script in `tools/` exists to shorten some step of that loop.
 - **`tools/analyze_symbols.py --diff-json`** — computes the tier delta
   between two snapshots. Used by CI to post a "this PR changes N
   tier-whatever counts" comment on every pull request.
+- **`tools/data_worklist.py`** — "which data symbols are highest-
+  leverage to name first?"  Ranks unmatched `data_*` entries by
+  cross-module reader density. Good companion to
+  `nitro_suggest_renames.py` on the data side.
+- **`tools/diff_reasons.py`** — classifies every function in a
+  `report.json` snapshot into a fuzzy-match bucket (`matched` /
+  `close` / `medium` / `low` / `fail`). Single-snapshot view.
+- **`tools/ci_format_diff_reasons.py`** — the two-snapshot delta.
+  Consumes two `report.json` files and flags regressions /
+  improvements / new / dropped functions. See "Catching match-depth
+  regressions before merge" below for the local workflow.
 
 ### CI glue (you won't touch these directly, but they exist)
 
 - `tools/ci_format_diff.py` — renders the analyzer diff as Markdown
   for the PR comment bot.
+- `tools/ci_format_worklist_diff.py` — delinks-level delta
+  (complete-yes/no transitions).
+- `tools/ci_format_invariants.py` — metadata-hygiene renderer.
 - `tools/configure.py` — generates `build.ninja` for the build.
 - `tools/download_tool.py` — fetches mwccarm, dsd, objdiff on first
   use.
+
+## Catching match-depth regressions before merge
+
+`ninja report` requires a baserom, which CI doesn't have. So the
+match-depth regression check runs **locally, pre-merge, by brain**
+instead of in a GitHub Actions workflow. This is "Path A" of the
+three options documented in #109's PR body — the minimum-viable
+regression-alarm loop until the baserom-in-CI problem gets solved
+(if ever).
+
+The full check takes ~2 minutes on a warm build:
+
+```bash
+# 1. Snapshot main's match state.
+git checkout main
+ninja report
+cp build/eur/report.json /tmp/before.json
+
+# 2. Check out the PR and rebuild.
+gh pr checkout <NNN>                       # or: git fetch + checkout
+ninja                                      # picks up any config/src changes
+ninja report
+cp build/eur/report.json /tmp/after.json
+
+# 3. Render the delta.
+python tools/ci_format_diff_reasons.py \
+    /tmp/before.json /tmp/after.json > /tmp/delta.md
+```
+
+Open `/tmp/delta.md` in the editor. The renderer surfaces:
+
+- **🛑 Regressions** — functions that moved to a worse bucket. Alarm
+  list. If empty, the PR doesn't break any existing match.
+- **✅ Improvements** — functions that moved to a better bucket.
+- **🆕 New entries** — functions in `after` but not `before` (usually
+  a new TU carve).
+- **🗑️ Dropped entries** — in `before` but not `after`. Flagged with
+  a footgun warning because the common cause is a rename that broke
+  every sibling.
+- **Bucket-count delta** — per-bucket before/after/Δ table.
+
+If there's a regression, paste the rendered Markdown into a PR
+review comment and hand it back to the author. Agents (cloud /
+decomper) consume review bodies as first-class feedback, so the
+paste-into-review flow closes the loop without any CI infrastructure.
+
+**Tip:** the smoke output in the #109 PR body shows exactly what a
+regression report looks like against a synthetic fixture. Read that
+once to calibrate before running against a real PR.
+
+**When to skip the check:** brain-only PRs (docs, state.md refreshes,
+`docs/briefs/*`) don't touch `config/` or `src/`, so they can't move
+the match state. Only run the delta on PRs touching code or config.
 
 ## Reading the progress numbers
 
