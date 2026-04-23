@@ -28,3 +28,11 @@ src/overlay010/ov010_021b2888.c:
 src/overlay010/ov010_021b3a14.c:
     complete
     .text start:0x021b3a14 end:0x021b3a1c
+
+src/overlay010/sinit_ov010_021b89a8.c:
+    complete
+    .init start:0x021b89a8 end:0x021b89f0
+
+src/overlay010/sinit_ov010_021b89f0.c:
+    complete
+    .init start:0x021b89f0 end:0x021b8a38
