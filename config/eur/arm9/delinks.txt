@@ -35,3 +35,19 @@ src/main/IntrWait.c:
 src/main/Sqrt.c:
     complete
     .text start:0x02000728 end:0x0200072c
+
+src/main/Entry.c:
+    complete
+    .text start:0x02000800 end:0x0200093c
+
+src/main/AutoloadCallback.c:
+    complete
+    .text start:0x02000a74 end:0x02000a78
+
+src/main/main.c:
+    complete
+    .text start:0x02000c34 end:0x02000c44
+
+src/main/register_global_object.c:
+    complete
+    .text start:0x020b42f4 end:0x020b4314
