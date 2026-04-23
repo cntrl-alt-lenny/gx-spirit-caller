@@ -27,6 +27,13 @@ names actually appear in `config/<ver>/**/symbols.txt`.
   `BitUnPack`, `LZ77UnCompReadByCallbackWrite16bit`,
   `LZ77UnCompReadNormalWrite8bit`, `RLUnCompReadByCallbackWrite16bit`,
   `RLUnCompReadNormalWrite8bit`, `HuffUnCompReadByCallback`.
+- `include/nitro/os.h` — OS-subsystem core types. Enums + typedefs
+  only (no function prototypes yet): `OSArenaId`, `OSHeapHandle`,
+  `OSTick`, `OSIrqMask`, `OSLockWord`, and opaque forward
+  declarations for `OSMutex` / `OSThread` / `OSThreadQueue`.
+  Added to scaffold data-tier identity work — see
+  `docs/research/data-tier-scouting.md` for the top `data_worklist`
+  candidates that would bind to these types.
 
 ## Naming
 
