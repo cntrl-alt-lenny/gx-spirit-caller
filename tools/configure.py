@@ -322,9 +322,31 @@ def main():
         )
         n.newline()
 
+        # After `dsd delink` produces the gap `.o` files, patch each
+        # one's `.text` sh_addralign 4 -> 2. Without this step
+        # `mwldarm` uses max(section.sh_addralign, ALIGNALL) which
+        # means the ALIGNALL(2) in the LCF is useless — every gap
+        # `.o` still forces 4-alignment at link time, cascade-shifting
+        # every Thumb thunk downstream. See PR #115 second-round
+        # bisect in the same PR body.
+        #
+        # Only alignment, not size trimming: dsd delink extracts
+        # pre-built bytes from the baserom, so there's no mwasm
+        # size-pad artifact to undo. Keep --trim-padding off here
+        # (it would produce correct output on already-exact-size
+        # sections but it's wasted work, and the tool's
+        # no-op-on-already-clean path would dominate).
+        # $out is delink.yaml; its parent dir is where dsd drops the
+        # gap `.o`s. The --dir mode walks that tree recursively —
+        # cross-platform (ninja's `find | xargs` breaks on Windows
+        # cmd.exe).
+        patch_align = "tools/patch_section_align.py"
         n.rule(
             name="delink",
-            command=f"{DSD} delink --config-path $config_path"
+            command=(
+                f"{DSD} delink --config-path $config_path"
+                f" && {PYTHON} {patch_align} --dir $delinks_dir"
+            ),
         )
         n.newline()
 
@@ -676,10 +698,13 @@ def add_delink_and_lcf_builds(n: ninja_syntax.Writer, project: Project):
     delinks_path = project.arm9_delinks()
     n.build(
         inputs=project.dsd_configs() + [rom_config],
-        implicit=DSD,
+        implicit=[DSD, "tools/patch_section_align.py"],
         rule="delink",
         outputs=str(delinks_path / "delink.yaml"),
-        variables={"config_path": str(project.arm9_config_yaml())},
+        variables={
+            "config_path": str(project.arm9_config_yaml()),
+            "delinks_dir": str(delinks_path),
+        },
     )
     n.newline()
 
