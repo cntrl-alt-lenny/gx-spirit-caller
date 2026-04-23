@@ -145,13 +145,28 @@ class TestGetSourceFiles(unittest.TestCase):
 class TestMwasmRuleDefinitions(unittest.TestCase):
     """Constants used to build the mwasm rule command. Pinning so
     that accidental flag-removals get caught before brief 013
-    regresses."""
+    regresses.
+
+    Flag values verified empirically against mwasmarm 2.0/sp1p5 by
+    the decomper (PR #110 feedback):
+      - `-proc arm5TE` accepted; `v5te`, `arm5te`, `ARM5TE` rejected
+        (case-sensitive valid-list)
+      - `-sym on` rejected as unknown option; `-g` is the mwasmarm
+        equivalent for debug info
+    """
 
     def test_asm_flags_has_expected_tokens(self):
-        # The three flags we documented in the source comment.
-        self.assertIn("-proc v5te", configure.ASM_FLAGS)
+        self.assertIn("-proc arm5TE", configure.ASM_FLAGS)
         self.assertIn("-msgstyle gcc", configure.ASM_FLAGS)
-        self.assertIn("-sym on", configure.ASM_FLAGS)
+        self.assertIn("-g", configure.ASM_FLAGS)
+
+    def test_asm_flags_no_longer_has_rejected_tokens(self):
+        # Regression guard: the decomper-rejected v1 tokens must
+        # stay out. `-sym on` is specifically rejected by mwasmarm;
+        # `v5te` is a mwccarm flag that mwasmarm's valid-list
+        # doesn't accept.
+        self.assertNotIn("-proc v5te", configure.ASM_FLAGS)
+        self.assertNotIn("-sym on", configure.ASM_FLAGS)
 
     def test_asm_points_at_mwasmarm_exe(self):
         # The tool constant must resolve to mwasmarm.exe inside the
