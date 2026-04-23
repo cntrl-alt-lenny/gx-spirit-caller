@@ -24,3 +24,51 @@ src/overlay002/sinit_ov002_022ca834.c:
 src/overlay002/sinit_ov002_022ca7e8.c:
     complete
     .init start:0x022ca7e8 end:0x022ca800
+
+src/overlay002/ov002_021aeaf8.c:
+    complete
+    .text start:0x021aeaf8 end:0x021aeb00
+
+src/overlay002/ov002_021ca2c8.c:
+    complete
+    .text start:0x021ca2c8 end:0x021ca2d0
+
+src/overlay002/ov002_02213654.c:
+    complete
+    .text start:0x02213654 end:0x0221365c
+
+src/overlay002/ov002_02214730.c:
+    complete
+    .text start:0x02214730 end:0x02214738
+
+src/overlay002/ov002_02257454.c:
+    complete
+    .text start:0x02257454 end:0x0225745c
+
+src/overlay002/ov002_0225745c.c:
+    complete
+    .text start:0x0225745c end:0x02257464
+
+src/overlay002/ov002_0226d530.c:
+    complete
+    .text start:0x0226d530 end:0x0226d538
+
+src/overlay002/ov002_02281a20.c:
+    complete
+    .text start:0x02281a20 end:0x02281a28
+
+src/overlay002/ov002_0229110c.c:
+    complete
+    .text start:0x0229110c end:0x02291114
+
+src/overlay002/ov002_02292da4.c:
+    complete
+    .text start:0x02292da4 end:0x02292dac
+
+src/overlay002/ov002_0229cd44.c:
+    complete
+    .text start:0x0229cd44 end:0x0229cd4c
+
+src/overlay002/ov002_0229cd54.c:
+    complete
+    .text start:0x0229cd54 end:0x0229cd5c

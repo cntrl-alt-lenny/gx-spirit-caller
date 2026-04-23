@@ -124,3 +124,31 @@ src/overlay006/ov006_021c50c4.c:
 src/overlay006/ov006_021c52b0.c:
     complete
     .text start:0x021c52b0 end:0x021c52b8
+
+src/overlay006/ov006_021c6990.c:
+    complete
+    .text start:0x021c6990 end:0x021c6998
+
+src/overlay006/ov006_021c6b2c.c:
+    complete
+    .text start:0x021c6b2c end:0x021c6b34
+
+src/overlay006/ov006_021c6bd4.c:
+    complete
+    .text start:0x021c6bd4 end:0x021c6bdc
+
+src/overlay006/ov006_021c6c2c.c:
+    complete
+    .text start:0x021c6c2c end:0x021c6c34
+
+src/overlay006/ov006_021c757c.c:
+    complete
+    .text start:0x021c757c end:0x021c7584
+
+src/overlay006/ov006_021c9ef4.c:
+    complete
+    .text start:0x021c9ef4 end:0x021c9efc
+
+src/overlay006/ov006_021cac30.c:
+    complete
+    .text start:0x021cac30 end:0x021cac38
