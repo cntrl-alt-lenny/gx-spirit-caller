@@ -95,3 +95,11 @@ src/main/SoftReset.s:
 src/main/func_0203c5e4.c:
     complete
     .text start:0x0203c5e4 end:0x0203c620
+
+src/main/func_0203c5a4.c:
+    complete
+    .text start:0x0203c5a4 end:0x0203c5e4
+
+src/main/func_02037c54.c:
+    complete
+    .text start:0x02037c54 end:0x02037ca0
