@@ -5,7 +5,7 @@
  * Disassembly (build/eur/asm/_dsd_gap@main_8.s):
  *
  *     stmdb sp!, {r3, lr}
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r0, [r0, #0x8d4]
  *     mov   r0, r0, lsl #0x10
  *     mov   r0, r0, lsr #0x10
@@ -16,9 +16,9 @@
  * brief 013's shift-shift note.
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 unsigned short func_02019034(void) {
-    int v = *(int *)(func_02018b28() + 0x8d4);
+    int v = *(int *)(GetSystemWork() + 0x8d4);
     return (unsigned short)v;
 }

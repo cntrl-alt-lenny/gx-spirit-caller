@@ -4,7 +4,7 @@
  * Disassembly:
  *
  *     stmdb sp!, {r3, lr}
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r1, [r0, #0x8e4]
  *     bic   r1, r1, #0xff0000    ; 0xff0000 = rotated-immediate
  *     str   r1, [r0, #0x8e4]
@@ -15,9 +15,9 @@
  * does (0xff rotated by 16).
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 void func_0201a388(void) {
-    int *slot = (int *)(func_02018b28() + 0x8e4);
+    int *slot = (int *)(GetSystemWork() + 0x8e4);
     *slot &= ~0xff0000;
 }

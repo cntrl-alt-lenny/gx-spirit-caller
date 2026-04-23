@@ -3,7 +3,7 @@
  * ARM's 8-bit rotated-immediate encoding.
  *
  *     stmdb sp!, {r3, lr}
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r2, [r0, #0x8e8]
  *     ldr   r1, .L_02018a80        ; r1 = 0xfff807ff
  *     and   r1, r2, r1
@@ -18,9 +18,9 @@
  * would need a pool constant — mwcc picks `and`.
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 void func_02018a64(void) {
-    int *slot = (int *)(func_02018b28() + 0x8e8);
+    int *slot = (int *)(GetSystemWork() + 0x8e8);
     *slot &= 0xfff807ff;
 }

@@ -2,7 +2,7 @@
  *
  *     stmdb sp!, {r4, lr}
  *     mov   r4, r0
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r2, [r0, #0x8d0]
  *     and   r1, r4, #0xf
  *     bic   r2, r2, #0xf
@@ -11,9 +11,9 @@
  *     ldmia sp!, {r4, pc}
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 void func_02019160(int value) {
-    int *slot = (int *)(func_02018b28() + 0x8d0);
+    int *slot = (int *)(GetSystemWork() + 0x8d0);
     *slot = (*slot & ~0xf) | (value & 0xf);
 }

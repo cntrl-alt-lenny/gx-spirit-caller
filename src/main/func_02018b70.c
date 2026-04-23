@@ -2,7 +2,7 @@
  *
  *     stmdb sp!, {r4, lr}
  *     mov   r4, r0
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r2, [r0, #0x8f8]
  *     mov   r1, r4, lsl #0x1f      ; r1 = value << 31 (isolate bit 0)
  *     bic   r2, r2, #0x8000        ; clear bit 15
@@ -15,9 +15,9 @@
  * "low bit → field" idiom when the input isn't known-narrow.
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 void func_02018b70(unsigned int value) {
-    int *slot = (int *)(func_02018b28() + 0x8f8);
+    int *slot = (int *)(GetSystemWork() + 0x8f8);
     *slot = (*slot & ~0x8000) | ((value << 31) >> 16);
 }

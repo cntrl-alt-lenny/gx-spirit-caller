@@ -5,7 +5,7 @@
  * Disassembly (build/eur/asm/_dsd_gap@main_5.s):
  *
  *     stmdb sp!, {r3, lr}
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     add   r0, r0, #0x810
  *     ldmia sp!, {r3, pc}
  *
@@ -13,8 +13,8 @@
  * encodes 0x810 = 0x81 ror 28 in one instruction.
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 char *func_02018b94(void) {
-    return func_02018b28() + 0x810;
+    return GetSystemWork() + 0x810;
 }
