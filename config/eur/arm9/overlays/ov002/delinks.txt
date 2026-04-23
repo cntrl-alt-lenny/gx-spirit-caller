@@ -72,3 +72,23 @@ src/overlay002/ov002_0229cd44.c:
 src/overlay002/ov002_0229cd54.c:
     complete
     .text start:0x0229cd54 end:0x0229cd5c
+
+src/overlay002/ov002_0220e74c.c:
+    complete
+    .text start:0x0220e74c end:0x0220e75c
+
+src/overlay002/ov002_02212e8c.c:
+    complete
+    .text start:0x02212e8c end:0x02212e9c
+
+src/overlay002/ov002_02214720.c:
+    complete
+    .text start:0x02214720 end:0x02214730
+
+src/overlay002/ov002_02222614.c:
+    complete
+    .text start:0x02222614 end:0x02222624
+
+src/overlay002/ov002_02269b90.c:
+    complete
+    .text start:0x02269b90 end:0x02269ba0

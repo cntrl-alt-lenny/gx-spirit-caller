@@ -60,3 +60,7 @@ src/overlay015/ov015_021b3f80.c:
 src/overlay015/ov015_021b4040.c:
     complete
     .text start:0x021b4040 end:0x021b405c
+
+src/overlay015/ov015_021b2348.c:
+    complete
+    .text start:0x021b2348 end:0x021b235c
