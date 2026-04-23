@@ -354,10 +354,15 @@ def main():
         # the baserom does — see brief 013 / PR #110 for the
         # empirical confirmation that the pokediamond `.s`-pattern
         # alone isn't sufficient for our scattered-thunk layout.
+        # `--trim-padding` flag added in PR #116 fix for PR #115's
+        # regression: mwasmarm also pads `.text` section SIZE to a
+        # 4-byte multiple with trailing 0x0000 bytes. For size-6
+        # thunks (VBlankIntrWait, Mod) that's a 2-byte cascade shift
+        # at link time. The trim path reverses it at the .o level.
         patch_align = "tools/patch_section_align.py"
         mwasm_cmd = (
             f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
-            f' && {PYTHON} {patch_align} $out'
+            f' && {PYTHON} {patch_align} --trim-padding $out'
         )
         mwasm_implicit = [ASM, patch_align]
         n.rule(
@@ -366,11 +371,21 @@ def main():
         )
         n.newline()
 
+        # Post-process the dsd-generated arm9.lcf to rewrite the
+        # `.arm9` segment's `ALIGNALL(4)` to `ALIGNALL(2)`. Without
+        # this, mwldarm honors the ALIGNALL floor and re-raises
+        # our .o-level sh_addralign=2 back to 4 at link time,
+        # defeating the Thumb-thunk fix. See PR #115 bisect and
+        # docs/research/thumb-align-wall.md.
+        patch_lcf = "tools/patch_lcf_arm9_align.py"
         n.rule(
             name="lcf",
             # v0.11+ `dsd lcf` writes to conventional paths under the build dir:
             # build/<ver>/arm9.lcf and build/<ver>/objects.txt. No CLI paths needed.
-            command=f"{DSD} lcf -c $config_path"
+            command=(
+                f"{DSD} lcf -c $config_path"
+                f" && {PYTHON} {patch_lcf} $lcf_file"
+            ),
         )
         n.newline()
 
@@ -675,7 +690,7 @@ def add_delink_and_lcf_builds(n: ninja_syntax.Writer, project: Project):
     objects_file = project.arm9_objects_txt()
     n.build(
         inputs=project.delinks_files + [rom_config],
-        implicit=DSD,
+        implicit=[DSD, "tools/patch_lcf_arm9_align.py"],
         rule="lcf",
         outputs=[str(lcf_file), str(objects_file)],
         variables={

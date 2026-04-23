@@ -43,6 +43,7 @@ from patch_section_align import (  # noqa: E402
     TARGET_ALIGN,
     patch_file,
     patch_text_sections,
+    trim_text_section_padding,
 )
 
 
@@ -296,6 +297,143 @@ class TestDefensiveParsing(unittest.TestCase):
         struct.pack_into("<I", blob, E_SHOFF, 0)
         with self.assertRaises(ELFParseError):
             patch_text_sections(bytes(blob))
+
+
+class TestTrimTextSectionPadding(unittest.TestCase):
+    """PR #116's Fix B: reverse mwasmarm's 4-byte sh_size padding."""
+
+    def _build_elf_with_text_content(self, content: bytes) -> bytes:
+        """Build a minimal ELF32 LE with one `.text` section whose
+        payload is exactly `content`. `sh_size` matches `len(content)`.
+        Used to test the trim trigger against specific byte patterns."""
+        shstr = b"\x00.text\x00.shstrtab\x00"
+        text_off = 0x34
+        text_size = len(content)
+        shstr_off = text_off + text_size
+        shdr_off = shstr_off + len(shstr)
+
+        headers = (
+            _shdr(0, 0, 0, 0, 0)
+            + _shdr(
+                shstr.index(b".text"), 1, text_off, text_size, 2,
+            )
+            + _shdr(
+                shstr.index(b".shstrtab"), 3, shstr_off,
+                len(shstr), 1,
+            )
+        )
+        blob = _ehdr(shdr_off, 3, 2) + content + shstr + headers
+        return blob
+
+    def test_trims_trailing_null_pair(self):
+        # 6 real bytes (Thumb: swi + bx lr, say) + 2-byte null padding.
+        content = b"\x05\xDF\x70\x47\x00\x00\x00\x00"
+        # Actually: 4 real bytes (swi 5; bx lr) + 4 bytes of what
+        # mwasm pads. Keep size=8 for the mwasm-padded case. But
+        # trim only happens when the LAST 2 bytes are 0x0000 AND
+        # size % 4 == 0. This fixture: both conditions met.
+        blob = self._build_elf_with_text_content(content)
+        self.assertEqual(_sh_addralign_of(blob, ".text"), 2)
+        patched, changes = trim_text_section_padding(blob)
+        self.assertEqual(changes, [(".text", 8, 6)])
+
+    def test_does_not_trim_legit_nonzero_ending(self):
+        # Genuine 8-byte Thumb: some 4-instruction sequence ending in
+        # `bx lr` (0x7047). Tool must NOT trim.
+        content = b"\x00\x00\x00\x00\x00\x00\x70\x47"
+        blob = self._build_elf_with_text_content(content)
+        _, changes = trim_text_section_padding(blob)
+        self.assertEqual(changes, [])
+
+    def test_does_not_trim_non_multiple_of_4(self):
+        # Odd-shaped .text (6 bytes, not aligned to 4) — the trim
+        # trigger requires sh_size % 4 == 0 because mwasm only pads
+        # to 4-multiples. Nothing to undo here.
+        content = b"\x00\x00\x00\x00\x00\x00"
+        blob = self._build_elf_with_text_content(content)
+        _, changes = trim_text_section_padding(blob)
+        self.assertEqual(changes, [])
+
+    def test_does_not_trim_non_text(self):
+        # `.data` ending in 0x0000 is legit (u32 zero literal).
+        # Only `.text*` should be considered for trimming.
+        blob = _build_elf([(".data", 1, 0x10, 4)])
+        _, changes = trim_text_section_padding(blob)
+        self.assertEqual(changes, [])
+
+    def test_idempotent(self):
+        content = b"\x05\xDF\x70\x47\x00\x00\x00\x00"  # 4 real + 4 pad
+        blob = self._build_elf_with_text_content(content)
+        once, changes1 = trim_text_section_padding(blob)
+        twice, changes2 = trim_text_section_padding(once)
+        self.assertEqual(len(changes1), 1)
+        # After first trim, sh_size is 6 (not a 4-multiple), so the
+        # trigger doesn't fire again.
+        self.assertEqual(changes2, [])
+
+
+class TestPatchFileWithTrimPadding(unittest.TestCase):
+    def test_trim_flag_applies_size_fix(self):
+        # 4 bytes of "code" + 4 bytes of mwasm 0x0000 pad.
+        content = b"\x05\xDF\x70\x47\x00\x00\x00\x00"
+        blob = (
+            _ehdr(
+                0x34 + len(content) + len(b"\x00.text\x00.shstrtab\x00"),
+                3, 2,
+            )
+            + content
+            + b"\x00.text\x00.shstrtab\x00"
+            + _shdr(0, 0, 0, 0, 0)
+            + _shdr(1, 1, 0x34, len(content), 4)   # .text align=4
+            + _shdr(7, 3, 0x34 + len(content),
+                    len(b"\x00.text\x00.shstrtab\x00"), 1)
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "obj.o"
+            p.write_bytes(blob)
+            rc = patch_file(p, trim_padding=True)
+            self.assertEqual(rc, 0)
+            # Post-patch: .text align=2 AND sh_size=6 (not 8).
+            patched = p.read_bytes()
+            self.assertEqual(
+                _sh_addralign_of(patched, ".text"), 2,
+            )
+            # Walk to read sh_size.
+            shoff = struct.unpack_from("<I", patched, E_SHOFF)[0]
+            text_hdr = shoff + 1 * SHDR_SIZE  # .text is idx 1
+            sh_size = struct.unpack_from(
+                "<I", patched, text_hdr + SH_SIZE,
+            )[0]
+            self.assertEqual(sh_size, 6)
+
+    def test_trim_flag_off_preserves_size(self):
+        content = b"\x05\xDF\x70\x47\x00\x00\x00\x00"
+        blob = (
+            _ehdr(
+                0x34 + len(content) + len(b"\x00.text\x00.shstrtab\x00"),
+                3, 2,
+            )
+            + content
+            + b"\x00.text\x00.shstrtab\x00"
+            + _shdr(0, 0, 0, 0, 0)
+            + _shdr(1, 1, 0x34, len(content), 4)
+            + _shdr(7, 3, 0x34 + len(content),
+                    len(b"\x00.text\x00.shstrtab\x00"), 1)
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "obj.o"
+            p.write_bytes(blob)
+            # Default call (trim_padding=False): align patched but
+            # size unchanged.
+            rc = patch_file(p, trim_padding=False)
+            self.assertEqual(rc, 0)
+            patched = p.read_bytes()
+            shoff = struct.unpack_from("<I", patched, E_SHOFF)[0]
+            text_hdr = shoff + 1 * SHDR_SIZE
+            sh_size = struct.unpack_from(
+                "<I", patched, text_hdr + SH_SIZE,
+            )[0]
+            self.assertEqual(sh_size, 8)  # unchanged
 
 
 if __name__ == "__main__":
