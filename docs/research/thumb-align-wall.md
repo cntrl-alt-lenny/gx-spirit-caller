@@ -197,6 +197,49 @@ Rejected. Forking away from dsd's LCF generator is a massive scope
 expansion for a narrow problem — worth it only if other alignment
 issues compound (none identified so far).
 
+## Post-merge retrospective (added after PR #115 / #116)
+
+This writeup originally rejected "Option C (post-compile ELF
+patcher)" as novel-and-risky. Brief 013 went with the `.s` + ELF
+patcher path anyway (PR #110 / #112), shipping both
+`tools/patch_section_align.py` (sh_addralign=2 rewrite) and the
+mwasm rule wiring.
+
+**That wasn't enough.** PR #115 bisected a `dsd check modules` regression
+from 24/27 → 0/27 OK and found **two compounding causes** the
+original writeup didn't predict:
+
+1. **LCF ALIGNALL override.** mwldarm honors `ALIGNALL(4)` from the
+   dsd-generated `arm9.lcf` and **re-raises** every `sh_addralign=2`
+   back to 4 at link time. The `.o`-level fix was silently defeated.
+   The survey above (dsd-template hardcoded as a literal) correctly
+   identified the ALIGNALL was a hard floor, but the writeup's
+   recommendation implicitly assumed the sh_addralign patch would
+   still take effect downstream. It didn't.
+2. **mwasm size padding.** mwasmarm also pads `.text` section sizes
+   up to a 4-multiple with trailing `0x0000` bytes. For size-6
+   Thumb thunks (`VBlankIntrWait`, `Mod`), that's a 2-byte cascade
+   shift at link time even when alignment is correct.
+
+**The fix shipped in PR #116** (`cloud/fix-align-regression`) had to
+address both:
+
+- **Fix A — `tools/patch_lcf_arm9_align.py`**: post-process the
+  generated LCF, rewrite `ALIGNALL(4) → ALIGNALL(2)` **in the
+  `.arm9` segment only** (overlays / ITCM / DTCM keep their 4s).
+  Wired into the `lcf` ninja rule.
+- **Fix B — `trim_text_section_padding` on
+  `tools/patch_section_align.py`**: walk `.text*` sections; if
+  `sh_size % 4 == 0` and the last two bytes are `0x0000`, trim
+  `sh_size` by 2. Narrow trigger because `0x0000` is not a valid
+  Thumb instruction in ARMv5TE — unambiguously mwasm's pad byte.
+
+**Lesson for future reads of this doc**: even with source + `.o`
+level fixes in place, an LCF-level floor can silently overwrite
+them. Any future align-related work should explicitly audit:
+`mwasmarm output → .o sh_addralign → LCF ALIGNALL → mwldarm
+decision`. All four steps, not just the first two.
+
 ## Suggested next steps
 
 1. **Brain scopes brief 013** around the `.s` approach above.

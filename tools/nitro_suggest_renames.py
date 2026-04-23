@@ -171,6 +171,43 @@ def is_tractable(
     return True
 
 
+# Bare-name → Nitro-subsystem mapping for project-local names that
+# don't follow the PREFIX_Name convention but still carry subsystem
+# signal. Curated per PR #114 research: every brief-011/013 BIOS SWI
+# thunk lives in OS territory (NitroSDK has OS_Halt, OS_GetCRC16,
+# OS_Sqrt, OS_LZ77UnCompReadNormalWrite8bit, etc.). Without this
+# mapping the scorer gets no subsystem hint when a target calls
+# these thunks, and HIGH-confidence suggestions can't materialise.
+#
+# Keep this list conservative: only add bare names whose subsystem
+# identity is unambiguous in the NitroSDK ROM (i.e. the thunk
+# wraps exactly that subsystem's OS_/GX_/whatever primitive). Don't
+# add project-local names like `Entry` / `main` where the
+# convention doesn't apply.
+BARE_NAME_SUBSYSTEMS: dict[str, str] = {
+    # Brief 011 BIOS SWI thunks — all dispatch to ARM9 BIOS, modelled
+    # under `OS` in ntrtwl/NitroSDK.
+    "SoftReset":                           "OS",
+    "WaitByLoop":                          "OS",
+    "IntrWait":                            "OS",
+    "VBlankIntrWait":                      "OS",
+    "Halt":                                "OS",
+    "CpuSet":                              "OS",
+    "CpuFastSet":                          "OS",
+    "Sqrt":                                "OS",
+    "Div":                                 "OS",
+    "Mod":                                 "OS",
+    "GetCRC16":                            "OS",
+    "IsDebugger":                          "OS",
+    "BitUnPack":                           "OS",
+    "LZ77UnCompReadNormalWrite8bit":       "OS",
+    "LZ77UnCompReadByCallbackWrite16bit":  "OS",
+    "HuffUnCompReadByCallback":            "OS",
+    "RLUnCompReadNormalWrite8bit":         "OS",
+    "RLUnCompReadByCallbackWrite16bit":    "OS",
+}
+
+
 def callee_subsystems(
     sym: Symbol,
     modules: dict[str, ModuleData],
@@ -178,7 +215,18 @@ def callee_subsystems(
 ) -> set[str]:
     """Return the set of NitroSDK-style subsystems this function's
     named callees belong to (e.g. {'OS', 'FS'}). Empty when all
-    callees are still placeholder-named."""
+    callees are still placeholder-named.
+
+    Detects two forms of signal:
+      - **`PREFIX_Name` convention** — `OS_Foo` → `OS`. Nitro SDK's
+        canonical shape.
+      - **Bare name in BARE_NAME_SUBSYSTEMS** — project-local names
+        that still carry subsystem identity (BIOS SWI thunks like
+        `Halt`, `Div`). PR #114 found the pre-existing scorer
+        ignored these; re-running the suggester after brief 013's
+        thunks landed produced 0 HIGH because the named callees
+        didn't contribute signal. This lookup closes that gap.
+    """
     subsystems: set[str] = set()
     for (mod, addr) in edges_call.get((sym.module, sym.addr), set()):
         md = modules.get(mod)
@@ -187,11 +235,19 @@ def callee_subsystems(
         callee = md.by_addr.get(addr)
         if callee is None or callee.name.startswith(PLACEHOLDER_PREFIXES):
             continue
-        # "OS_Foo" -> "OS", "__register_global_object" -> None
+        # PREFIX_Name convention: "OS_Foo" -> "OS".
+        # Skip "__register_global_object"-shaped names (no upper
+        # prefix). The bare-name lookup below handles those that
+        # do carry subsystem identity without a prefix.
         if "_" in callee.name:
             head = callee.name.split("_", 1)[0]
             if head.isupper() and head.isalpha() and 1 < len(head) <= 6:
                 subsystems.add(head)
+                continue
+        # Bare-name BIOS thunk / project-local → subsystem lookup.
+        bare_sub = BARE_NAME_SUBSYSTEMS.get(callee.name)
+        if bare_sub is not None:
+            subsystems.add(bare_sub)
     return subsystems
 
 
