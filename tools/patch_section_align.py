@@ -183,25 +183,94 @@ def patch_text_sections(
     return buf, changes
 
 
-def patch_file(path: Path, *, target_align: int = TARGET_ALIGN) -> int:
+def trim_text_section_padding(
+    data: bytes | bytearray,
+) -> tuple[bytearray, list[tuple[str, int, int]]]:
+    """Reverse mwasmarm's automatic 4-byte-size `.text` padding.
+
+    Context: PR #115's regression bisect showed that mwasmarm pads
+    the emitted `.text` section's `sh_size` up to the next multiple
+    of 4, trailing the function content with `0x00 0x00` bytes. A
+    6-byte Thumb thunk (e.g. VBlankIntrWait: `swi 0x05; bx lr` + a
+    2-byte exit) becomes an 8-byte section. Even with our
+    `sh_addralign=2` patch in place, that 8-byte size cascade-shifts
+    every downstream byte at link time and breaks the module
+    checksum.
+
+    This function walks section headers. For each `.text*` section
+    where:
+      - `sh_size % 4 == 0` (mwasm padding lands on a 4-multiple), AND
+      - the last 2 bytes of the section's content are `0x00 0x00`
+    …it trims `sh_size` by 2. Returns (patched_bytes, changes) where
+    each change is `(name, old_size, new_size)`.
+
+    The trim-trigger is deliberately narrow: only even-sized `.text`
+    sections with trailing NULs qualify. Legit 8-byte Thumb functions
+    that happen to end in `bx lr; nop` have the `nop` encoded as
+    `0xBF00` (or `0x46C0`), not `0x0000`, so they don't match the
+    trigger. `0x0000` is not a valid Thumb instruction in the
+    ARMv5TE ISA — it's mwasm's pad byte, period.
+    """
+    _check_elf_magic(data)
+    buf = bytearray(data)
+    shstrtab, e_shoff, e_shentsize, e_shnum = _read_shstrtab(buf)
+
+    changes: list[tuple[str, int, int]] = []
+    for i in range(e_shnum):
+        sh_off = e_shoff + i * e_shentsize
+        name_off = _read_u32(buf, sh_off + SH_NAME)
+        if name_off >= len(shstrtab):
+            continue
+        name = _read_cstring(shstrtab, name_off)
+        if not name.startswith(".text"):
+            continue
+        cur_size = _read_u32(buf, sh_off + SH_SIZE)
+        if cur_size == 0 or cur_size % 4 != 0 or cur_size < 2:
+            continue
+        content_off = _read_u32(buf, sh_off + SH_OFFSET)
+        if content_off + cur_size > len(buf):
+            continue  # truncated file; skip defensively
+        last_two = bytes(buf[
+            content_off + cur_size - 2:content_off + cur_size
+        ])
+        if last_two != b"\x00\x00":
+            continue
+        new_size = cur_size - 2
+        _write_u32(buf, sh_off + SH_SIZE, new_size)
+        changes.append((name, cur_size, new_size))
+    return buf, changes
+
+
+def patch_file(
+    path: Path, *,
+    target_align: int = TARGET_ALIGN,
+    trim_padding: bool = False,
+) -> int:
     """Patch `path` in-place. Returns exit code: 0 = success,
-    1 = parse error (stderr-logged)."""
+    1 = parse error (stderr-logged).
+
+    With `trim_padding=True`, also runs `trim_text_section_padding`
+    — needed for mwasm's 4-byte size-pad artifact (PR #115).
+    """
     try:
         original = path.read_bytes()
     except OSError as e:
         print(f"error: could not read {path}: {e}", file=sys.stderr)
         return 1
     try:
-        patched, changes = patch_text_sections(
+        patched, align_changes = patch_text_sections(
             original, target_align=target_align,
         )
+        size_changes: list[tuple[str, int, int]] = []
+        if trim_padding:
+            patched, size_changes = trim_text_section_padding(patched)
     except ELFParseError as e:
         print(f"error: {path}: {e}", file=sys.stderr)
         return 1
 
-    if not changes:
-        # Nothing to do — either already 2-aligned, or no .text
-        # sections at all. Both are fine; stay silent.
+    if not align_changes and not size_changes:
+        # Nothing to do — either already 2-aligned / no .text
+        # sections / no trailing padding. Silent success.
         return 0
 
     try:
@@ -210,9 +279,12 @@ def patch_file(path: Path, *, target_align: int = TARGET_ALIGN) -> int:
         print(f"error: could not write {path}: {e}", file=sys.stderr)
         return 1
 
-    # Success — one informational line per patched section.
-    for name, old, new in changes:
+    for name, old, new in align_changes:
         print(f"patched {path}: {name} sh_addralign {old} -> {new}",
+              file=sys.stderr)
+    for name, old, new in size_changes:
+        print(f"patched {path}: {name} sh_size {old} -> {new} "
+              "(trimmed mwasm padding)",
               file=sys.stderr)
     return 0
 
@@ -228,8 +300,18 @@ def main() -> int:
         help=f"Alignment to rewrite to (default: {TARGET_ALIGN}). "
              "Only rewrites sections whose current align is higher.",
     )
+    ap.add_argument(
+        "--trim-padding", action="store_true",
+        help="Also trim mwasm's trailing 0x0000 size-padding from "
+             "`.text` sections (required for mwasmarm .s → .o where "
+             "the source is not a 4-byte multiple). See PR #115.",
+    )
     args = ap.parse_args()
-    return patch_file(args.path, target_align=args.target_align)
+    return patch_file(
+        args.path,
+        target_align=args.target_align,
+        trim_padding=args.trim_padding,
+    )
 
 
 if __name__ == "__main__":
