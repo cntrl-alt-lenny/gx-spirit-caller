@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -101,6 +102,11 @@ class Candidate:
     # (no outbound calls → likely no upstream register handoff), None
     # otherwise. Conservative — we don't have register analysis here.
     inferred_argcount: int | None
+    # Non-stopword tokens drawn from the target's named callees'
+    # names. Enables discriminator scoring within a subsystem tie-
+    # group (PR #121 found the scorer capped at +3 with 5 alphabetised
+    # ties; this adds up to +2 for name-token overlap).
+    callee_name_tokens: frozenset[str] = frozenset()
     # Number of distinct callers in the current call graph. Used as
     # a signal for "widely-used helper" vs "one-off local": a function
     # with many callers is more likely to be a real SDK API, less
@@ -208,6 +214,96 @@ BARE_NAME_SUBSYSTEMS: dict[str, str] = {
 }
 
 
+# Tokens that appear so commonly in both Nitro SDK names AND
+# project-local placeholders that they contribute noise rather than
+# signal when used for token-overlap scoring. `init` / `get` / `set` /
+# `is` are the big offenders — almost every subsystem has dozens of
+# them, so overlap on these boosts *every* candidate uniformly (which
+# is the same as boosting none).
+#
+# Kept deliberately narrow: only add a token here after checking that
+# it fires for > ~5% of name pairs AND doesn't discriminate. See
+# PR #121's analysis for the scorer ceiling that this extension
+# addresses.
+TOKEN_OVERLAP_STOPWORDS: frozenset[str] = frozenset({
+    "init", "get", "set", "is", "new", "fn", "func", "sub",
+})
+
+
+# Split at:
+#   - underscore runs
+#   - lowercase → uppercase boundary (`spinWait` → spin|Wait)
+#   - uppercase-run → CamelCase (acronym: `OSHeap` → OS|Heap;
+#     triggered by [A-Z] followed by [A-Z][a-z])
+#
+# Intentionally does NOT split at letter↔digit boundaries: that
+# would break `ov005` → `ov` + `005`, which matters because the
+# stem form shows up in placeholder names and we want single-token
+# matching. Noisy numeric fragments get filtered below.
+_TOKEN_SPLIT_RE = re.compile(
+    r"[_]+|(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])"
+)
+
+
+def _name_tokens(name: str) -> frozenset[str]:
+    """Split a symbol name into lowercase tokens.
+
+    `OS_SpinWait` → {'os', 'spin', 'wait'}
+    `func_ov005_021b2334` → {'func', 'ov005'}  (021b2334 dropped)
+    `__register_global_object` → {'register', 'global', 'object'}
+    `GX_LoadBG0Char` → {'gx', 'load', 'bg0char'}
+
+    Drops:
+      - empty tokens (from multiple underscores / boundary edge cases)
+      - pure-digit tokens (`005`, `123`) — addresses / indices,
+        not discriminating
+      - pure-hex tokens ≥ 4 chars (`021b`, `2334`, `abcd`) — address
+        fragments that would overfit the overlap signal
+    """
+    out: set[str] = set()
+    for raw in _TOKEN_SPLIT_RE.split(name):
+        lo = raw.lower().strip("_")
+        if not lo:
+            continue
+        if lo.isdigit():
+            continue
+        if len(lo) >= 4 and all(c in "0123456789abcdef" for c in lo):
+            # Hex-addr fragment; not discriminating.
+            continue
+        out.add(lo)
+    return frozenset(out)
+
+
+def callee_name_tokens(
+    sym: Symbol,
+    modules: dict[str, ModuleData],
+    edges_call,
+) -> frozenset[str]:
+    """Union of `_name_tokens` over every *named* direct callee.
+
+    Used by the scorer to award a discriminator bonus when a Nitro
+    candidate's name shares a non-stopword token with the target's
+    callees. Example: a target that calls `WaitByLoop` should
+    favour `OS_SpinWait` over `OS_AddToHeap`, because the former
+    shares the `wait` token.
+
+    Pre-PR #132, the scorer capped at +3 (subsystem match) for
+    non-leaves — every OS_* candidate tied and the tool rendered an
+    alphabetical tie-group. This token signal produces a real
+    discriminator within the tie-group.
+    """
+    tokens: set[str] = set()
+    for (mod, addr) in edges_call.get((sym.module, sym.addr), set()):
+        md = modules.get(mod)
+        if md is None:
+            continue
+        callee = md.by_addr.get(addr)
+        if callee is None or callee.name.startswith(PLACEHOLDER_PREFIXES):
+            continue
+        tokens |= _name_tokens(callee.name)
+    return frozenset(tokens) - TOKEN_OVERLAP_STOPWORDS
+
+
 def callee_subsystems(
     sym: Symbol,
     modules: dict[str, ModuleData],
@@ -293,11 +389,13 @@ def collect_candidates(
             subs = callee_subsystems(sym, modules, edges_call)
             argc = infer_argcount(sym, out_deg)
             caller_count = _count_callers(key, edges_call)
+            tokens = callee_name_tokens(sym, modules, edges_call)
             out.append(Candidate(
                 target=sym,
                 out_degree=out_deg,
                 named_callee_subsystems=subs,
                 inferred_argcount=argc,
+                callee_name_tokens=tokens,
                 caller_count=caller_count,
             ))
     # Easiest-first: size asc, out_degree asc, module+addr
@@ -339,6 +437,19 @@ def _score_nitro_fn(cand: Candidate, nitro_fn: dict) -> int:
     # pointer-returning allocator.
     if cand.target.size <= 0x8 and nitro_fn.get("return_type") == "void":
         score += 1
+
+    # Name-token overlap: within a subsystem tie-group, prefer the
+    # candidate whose name shares a non-stopword token with the
+    # target's callees. Resolves the score-3 ceiling documented in
+    # PR #121. Capped at +2 so it can complement (not overwhelm)
+    # subsystem signal; a 1-token match (+1) or 2-token match (+2)
+    # is plenty to break a 5-way alphabetical tie.
+    if cand.callee_name_tokens:
+        cand_tokens = _name_tokens(nitro_fn.get("name", ""))
+        cand_tokens -= TOKEN_OVERLAP_STOPWORDS
+        overlap = cand_tokens & cand.callee_name_tokens
+        if overlap:
+            score += min(len(overlap), 2)
 
     return score
 
