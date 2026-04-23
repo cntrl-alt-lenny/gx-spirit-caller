@@ -36,7 +36,33 @@ from patch_lcf_arm9_align import (  # noqa: E402
 
 
 # dsd's actual LCF shape, trimmed to the bits we care about.
+#
+# dsd emits segment headers in the `<name> : {` form (with a colon
+# before the opening brace) — empirically verified against
+# `build/eur/arm9.lcf` produced by `dsd lcf` at v0.11.0. The older
+# bare-brace `<name> {` form surfaced in some dsd pre-releases; the
+# patcher accepts both (PR #118), and we cover both forms below.
 _CANONICAL_LCF = """\
+SECTIONS {
+    .arm9 : {
+        ALIGNALL(4);
+        .text : { *(.text) }
+    }
+    .itcm : {
+        ALIGNALL(4);
+        .text : { *(.text) }
+    }
+    .overlay_000 : {
+        ALIGNALL(4);
+        .text : { *(.text) }
+    }
+}
+"""
+
+# Older bare-brace variant. Kept as a regression-pin that the patcher's
+# regex stays lenient — if someone tightens it back to colon-only, this
+# fixture surfaces the break.
+_CANONICAL_LCF_BARE_BRACE = """\
 SECTIONS {
     .arm9 {
         ALIGNALL(4);
@@ -59,13 +85,13 @@ class TestPatchLcfText(unittest.TestCase):
         patched, changed = patch_lcf_text(_CANONICAL_LCF)
         self.assertTrue(changed)
         # `.arm9` block now says ALIGNALL(2).
-        self.assertIn(".arm9 {\n        ALIGNALL(2);", patched)
+        self.assertIn(".arm9 : {\n        ALIGNALL(2);", patched)
 
     def test_other_segments_left_alone(self):
         patched, _ = patch_lcf_text(_CANONICAL_LCF)
         # Both .itcm and .overlay_000 still at ALIGNALL(4).
-        self.assertIn(".itcm {\n        ALIGNALL(4);", patched)
-        self.assertIn(".overlay_000 {\n        ALIGNALL(4);", patched)
+        self.assertIn(".itcm : {\n        ALIGNALL(4);", patched)
+        self.assertIn(".overlay_000 : {\n        ALIGNALL(4);", patched)
 
     def test_idempotent(self):
         once, changed1 = patch_lcf_text(_CANONICAL_LCF)
@@ -100,12 +126,12 @@ class TestPatchLcfText(unittest.TestCase):
     def test_custom_target_alignall(self):
         # --target-alignall 8 → .arm9 rewritten to ALIGNALL(8).
         patched, _ = patch_lcf_text(_CANONICAL_LCF, target_alignall=8)
-        self.assertIn(".arm9 {\n        ALIGNALL(8);", patched)
+        self.assertIn(".arm9 : {\n        ALIGNALL(8);", patched)
 
     def test_arm9_already_at_target_no_op(self):
         already_patched = _CANONICAL_LCF.replace(
-            ".arm9 {\n        ALIGNALL(4);",
-            ".arm9 {\n        ALIGNALL(2);",
+            ".arm9 : {\n        ALIGNALL(4);",
+            ".arm9 : {\n        ALIGNALL(2);",
             1,
         )
         patched, changed = patch_lcf_text(already_patched)
@@ -118,7 +144,7 @@ class TestPatchLcfText(unittest.TestCase):
         # first to stay conservative — documented behaviour.
         lcf = (
             "SECTIONS {\n"
-            "    .arm9 {\n"
+            "    .arm9 : {\n"
             "        ALIGNALL(4);\n"
             "        ALIGNALL(4);\n"
             "    }\n"
@@ -152,15 +178,15 @@ class TestPatchFile(unittest.TestCase):
             rc = patch_file(p)
             self.assertEqual(rc, 0)
             after = p.read_text()
-            self.assertIn(".arm9 {\n        ALIGNALL(2);", after)
-            self.assertIn(".itcm {\n        ALIGNALL(4);", after)
+            self.assertIn(".arm9 : {\n        ALIGNALL(2);", after)
+            self.assertIn(".itcm : {\n        ALIGNALL(4);", after)
 
     def test_already_patched_is_noop(self):
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "arm9.lcf"
             already = _CANONICAL_LCF.replace(
-                ".arm9 {\n        ALIGNALL(4);",
-                ".arm9 {\n        ALIGNALL(2);",
+                ".arm9 : {\n        ALIGNALL(4);",
+                ".arm9 : {\n        ALIGNALL(2);",
                 1,
             )
             p.write_text(already)
@@ -172,6 +198,34 @@ class TestPatchFile(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             rc = patch_file(Path(td) / "nonexistent.lcf")
             self.assertEqual(rc, 1)
+
+
+class TestBothHeaderForms(unittest.TestCase):
+    """dsd has shipped both `.arm9 : {` (current) and `.arm9 {` (older)
+    block headers across versions. PR #118's regex accepts either.
+    These tests pin that leniency — if someone tightens the regex back
+    to colon-only, or rewrites only the bare form, they break here."""
+
+    def test_colon_form_matches_and_rewrites(self):
+        # Real dsd v0.11+ shape.
+        patched, changed = patch_lcf_text(_CANONICAL_LCF)
+        self.assertTrue(changed)
+        self.assertIn(".arm9 : {\n        ALIGNALL(2);", patched)
+
+    def test_bare_brace_form_matches_and_rewrites(self):
+        # Older dsd / alternate-template shape.
+        patched, changed = patch_lcf_text(_CANONICAL_LCF_BARE_BRACE)
+        self.assertTrue(changed)
+        self.assertIn(".arm9 {\n        ALIGNALL(2);", patched)
+
+    def test_both_forms_patch_only_arm9(self):
+        # Whichever header form dsd emits, overlays must remain
+        # ALIGNALL(4). Regression pin against an accidental global
+        # rewrite.
+        for fixture in (_CANONICAL_LCF, _CANONICAL_LCF_BARE_BRACE):
+            patched, _ = patch_lcf_text(fixture)
+            self.assertEqual(patched.count("ALIGNALL(2);"), 1)
+            self.assertEqual(patched.count("ALIGNALL(4);"), 2)
 
 
 if __name__ == "__main__":

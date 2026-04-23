@@ -41,6 +41,7 @@ from patch_section_align import (  # noqa: E402
     SH_OFFSET,
     SH_SIZE,
     TARGET_ALIGN,
+    main,
     patch_file,
     patch_text_sections,
     trim_text_section_padding,
@@ -434,6 +435,111 @@ class TestPatchFileWithTrimPadding(unittest.TestCase):
                 "<I", patched, text_hdr + SH_SIZE,
             )[0]
             self.assertEqual(sh_size, 8)  # unchanged
+
+
+class TestDirMode(unittest.TestCase):
+    """PR #118's --dir mode: recursively walk a directory for *.o
+    files. Used by the `delink` ninja rule to patch every
+    dsd-produced gap object cross-platform (find/xargs don't work
+    on cmd.exe on Windows). Regressions would silently leave gap
+    objects at sh_addralign=4, re-raising the align wall via
+    mwldarm's max()."""
+
+    def _run_main(self, argv: list[str]) -> int:
+        """Invoke main() with a synthesized argv. Returns exit code."""
+        saved = sys.argv[:]
+        sys.argv = ["patch_section_align.py", *argv]
+        try:
+            return main()
+        finally:
+            sys.argv = saved
+
+    def test_dir_mode_patches_all_o_files(self):
+        # Two gap-style .o files at different depths — simulate what
+        # `dsd delink` drops into build/<ver>/delinks/.
+        blob = _build_elf([(".text", 1, 0x10, 4)])
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "sub").mkdir()
+            a = root / "a.o"
+            b = root / "sub" / "b.o"
+            a.write_bytes(blob)
+            b.write_bytes(blob)
+            rc = self._run_main(["--dir", str(root)])
+            self.assertEqual(rc, 0)
+            # Both objects had their .text sh_addralign rewritten.
+            self.assertEqual(_sh_addralign_of(a.read_bytes(), ".text"), 2)
+            self.assertEqual(_sh_addralign_of(b.read_bytes(), ".text"), 2)
+
+    def test_dir_mode_ignores_non_o_files(self):
+        # A README, a .c file, and a .d depfile share the directory.
+        # Walker should only touch *.o.
+        blob = _build_elf([(".text", 1, 0x10, 4)])
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            obj = root / "real.o"
+            obj.write_bytes(blob)
+            (root / "README.md").write_text("not an ELF")
+            (root / "junk.c").write_text("int main() { return 0; }")
+            (root / "real.d").write_text("real.o: real.c")
+            rc = self._run_main(["--dir", str(root)])
+            self.assertEqual(rc, 0)
+            self.assertEqual(
+                _sh_addralign_of(obj.read_bytes(), ".text"), 2,
+            )
+
+    def test_dir_mode_empty_directory_is_noop(self):
+        # `dsd delink` may legitimately produce zero gap objects on
+        # a fully-carved module. The ninja rule still runs the
+        # patcher; it must exit 0.
+        with tempfile.TemporaryDirectory() as td:
+            rc = self._run_main(["--dir", td])
+            self.assertEqual(rc, 0)
+
+    def test_dir_mode_missing_directory_errors(self):
+        with tempfile.TemporaryDirectory() as td:
+            missing = Path(td) / "does-not-exist"
+            rc = self._run_main(["--dir", str(missing)])
+            self.assertEqual(rc, 1)
+
+    def test_dir_and_positional_mutually_exclusive(self):
+        # `--dir <path> obj.o` is ambiguous — tool must reject
+        # rather than silently favour one.
+        blob = _build_elf([(".text", 1, 0x10, 4)])
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            obj = root / "obj.o"
+            obj.write_bytes(blob)
+            rc = self._run_main(["--dir", str(root), str(obj)])
+            self.assertEqual(rc, 2)
+
+    def test_dir_mode_skips_non_elf_dot_o(self):
+        # A `.o` that isn't an ELF (imagine a stray archive or a
+        # build artifact mis-named). main() should return non-zero
+        # without blowing up — the underlying patch_file reports 1.
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "bogus.o").write_bytes(b"not an ELF at all")
+            rc = self._run_main(["--dir", str(root)])
+            self.assertEqual(rc, 1)
+
+    def test_dir_mode_preserves_non_text_sections(self):
+        # Gap objects often contain .data / .rodata payload. Make
+        # sure those aren't accidentally rewritten when we walk a
+        # directory.
+        blob = _build_elf([
+            (".text", 1, 0x10, 4),
+            (".rodata", 1, 0x10, 4),
+        ])
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            obj = root / "gap.o"
+            obj.write_bytes(blob)
+            rc = self._run_main(["--dir", str(root)])
+            self.assertEqual(rc, 0)
+            patched = obj.read_bytes()
+            self.assertEqual(_sh_addralign_of(patched, ".text"), 2)
+            self.assertEqual(_sh_addralign_of(patched, ".rodata"), 4)
 
 
 if __name__ == "__main__":
