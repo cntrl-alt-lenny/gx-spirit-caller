@@ -65,14 +65,25 @@ def _nitro(
 # ------------------------------------------------------------------------- #
 
 
+def _edges_with_n_callers(target: tuple, n: int):
+    """Make a defaultdict(set) graph where `target` has `n` distinct
+    caller keys. Keeps test fixtures compact when the min_callers
+    filter needs to be exercised."""
+    edges = defaultdict(set)
+    for i in range(n):
+        edges[("caller_mod", 0x1000 + i)].add(target)
+    return edges
+
+
 class TestIsTractable(unittest.TestCase):
     def test_placeholder_small_leaf_is_tractable(self):
         sym = _sym("func_ov005_100", "ov005", 0x100, size=0x8)
         modules = {"ov005": _module("ov005", [sym])}
+        # With default min_callers=2, need ≥2 distinct callers.
+        edges = _edges_with_n_callers(("ov005", 0x100), 2)
         self.assertTrue(is_tractable(
             sym, modules=modules,
-            edges_call=defaultdict(set), matched={},
-            max_size=0x40,
+            edges_call=edges, matched={},
         ))
 
     def test_non_placeholder_rejected(self):
@@ -82,7 +93,6 @@ class TestIsTractable(unittest.TestCase):
         self.assertFalse(is_tractable(
             sym, modules={},
             edges_call=defaultdict(set), matched={},
-            max_size=0x40,
         ))
 
     def test_too_large_rejected(self):
@@ -90,7 +100,6 @@ class TestIsTractable(unittest.TestCase):
         self.assertFalse(is_tractable(
             sym, modules={},
             edges_call=defaultdict(set), matched={},
-            max_size=0x40,
         ))
 
     def test_zero_size_rejected(self):
@@ -98,7 +107,6 @@ class TestIsTractable(unittest.TestCase):
         self.assertFalse(is_tractable(
             sym, modules={},
             edges_call=defaultdict(set), matched={},
-            max_size=0x40,
         ))
 
     def test_already_matched_rejected(self):
@@ -106,20 +114,19 @@ class TestIsTractable(unittest.TestCase):
         matched = {"ov005": [(0x100, 0x108)]}
         self.assertFalse(is_tractable(
             sym, modules={"ov005": _module("ov005", [sym])},
-            edges_call=defaultdict(set), matched=matched,
-            max_size=0x40,
+            edges_call=_edges_with_n_callers(("ov005", 0x100), 3),
+            matched=matched,
         ))
 
     def test_high_out_degree_rejected(self):
         # More than 2 outbound calls → too noisy for subsystem inference.
         sym = _sym("func_ov005_100", "ov005", 0x100, size=0x20)
-        edges = defaultdict(set)
+        edges = _edges_with_n_callers(("ov005", 0x100), 3)
         for i in range(5):
             edges[("ov005", 0x100)].add(("ov005", 0x200 + i * 4))
         self.assertFalse(is_tractable(
             sym, modules={"ov005": _module("ov005", [sym])},
             edges_call=edges, matched={},
-            max_size=0x40,
         ))
 
     def test_data_symbol_rejected(self):
@@ -129,7 +136,63 @@ class TestIsTractable(unittest.TestCase):
         self.assertFalse(is_tractable(
             sym, modules={"ov005": _module("ov005", [sym])},
             edges_call=defaultdict(set), matched={},
-            max_size=0x40,
+        ))
+
+    def test_tiny_stub_rejected_by_default(self):
+        # Brain's usability feedback: size-0x4 `bx lr` shapes are so
+        # generic that every 0-arg Nitro function scores identically.
+        # Default filter now drops them.
+        sym = _sym("func_ov005_100", "ov005", 0x100, size=0x4)
+        self.assertFalse(is_tractable(
+            sym, modules={"ov005": _module("ov005", [sym])},
+            edges_call=_edges_with_n_callers(("ov005", 0x100), 5),
+            matched={},
+        ))
+
+    def test_tiny_stub_allowed_with_min_size_override(self):
+        sym = _sym("func_ov005_100", "ov005", 0x100, size=0x4)
+        self.assertTrue(is_tractable(
+            sym, modules={"ov005": _module("ov005", [sym])},
+            edges_call=_edges_with_n_callers(("ov005", 0x100), 5),
+            matched={}, min_size=0x2,
+        ))
+
+    def test_single_caller_rejected_by_default(self):
+        # min_callers=2 default filters out idiosyncratic 1-caller
+        # helpers whose role is rarely a well-known SDK function.
+        sym = _sym("func_ov005_100", "ov005", 0x100, size=0x10)
+        edges = _edges_with_n_callers(("ov005", 0x100), 1)
+        self.assertFalse(is_tractable(
+            sym, modules={"ov005": _module("ov005", [sym])},
+            edges_call=edges, matched={},
+        ))
+
+    def test_single_caller_allowed_with_override(self):
+        sym = _sym("func_ov005_100", "ov005", 0x100, size=0x10)
+        edges = _edges_with_n_callers(("ov005", 0x100), 1)
+        self.assertTrue(is_tractable(
+            sym, modules={"ov005": _module("ov005", [sym])},
+            edges_call=edges, matched={}, min_callers=1,
+        ))
+
+    def test_failing_module_rejected_by_default(self):
+        # main / dtcm / ov004 are in FAILING_MODULES per
+        # analyze_symbols. Default filter excludes them — renames
+        # there don't unblock anything while the module fails
+        # module-check for structural reasons.
+        sym = _sym("func_main_02000b60", "main", 0x02000b60, size=0x10)
+        self.assertFalse(is_tractable(
+            sym, modules={"main": _module("main", [sym])},
+            edges_call=_edges_with_n_callers(("main", 0x02000b60), 3),
+            matched={},
+        ))
+
+    def test_failing_module_allowed_with_flag(self):
+        sym = _sym("func_main_02000b60", "main", 0x02000b60, size=0x10)
+        self.assertTrue(is_tractable(
+            sym, modules={"main": _module("main", [sym])},
+            edges_call=_edges_with_n_callers(("main", 0x02000b60), 3),
+            matched={}, include_failing_modules=True,
         ))
 
 
@@ -278,30 +341,126 @@ class TestRankNitroCandidates(unittest.TestCase):
 class TestCollectCandidates(unittest.TestCase):
     def test_sorted_easiest_first(self):
         syms = [
-            _sym("func_ov005_200", "ov005", 0x200, size=0x10),
-            _sym("func_ov005_100", "ov005", 0x100, size=0x4),
-            _sym("func_ov005_300", "ov005", 0x300, size=0x8),
+            _sym("func_ov005_200", "ov005", 0x200, size=0x20),
+            _sym("func_ov005_100", "ov005", 0x100, size=0x8),
+            _sym("func_ov005_300", "ov005", 0x300, size=0x10),
         ]
         modules = {"ov005": _module("ov005", syms)}
-        cands = collect_candidates(
-            modules, defaultdict(set), {}, max_size=0x40,
-        )
+        # Every fixture symbol needs ≥ min_callers=2 to survive the
+        # default filter. Give each one 2 distinct callers.
+        edges = defaultdict(set)
+        for s in syms:
+            for i in range(2):
+                edges[("driver", 0x100 + i)].add((s.module, s.addr))
+        cands = collect_candidates(modules, edges, {})
         sizes = [c.target.size for c in cands]
         self.assertEqual(sizes, sorted(sizes))
 
     def test_mixed_in_and_out_of_scope(self):
         syms = [
-            _sym("func_ov005_100", "ov005", 0x100, size=0x8),      # ok
+            _sym("func_ov005_100", "ov005", 0x100, size=0x10),     # ok
             _sym("Entry", "ov005", 0x200, size=0x13c),              # named
             _sym("func_ov005_300", "ov005", 0x300, size=0x400),    # too big
             _sym("func_ov005_400", "ov005", 0x400, size=0x10),      # matched
         ]
         modules = {"ov005": _module("ov005", syms)}
         matched = {"ov005": [(0x400, 0x410)]}
-        cands = collect_candidates(
-            modules, defaultdict(set), matched, max_size=0x40,
-        )
+        edges = defaultdict(set)
+        # Give every `ov005` symbol 2 callers so min_callers filter
+        # passes; the other filters (named / oversized / matched)
+        # still knock out everything except 0x100.
+        for s in syms:
+            for i in range(2):
+                edges[("driver", 0x100 + i)].add((s.module, s.addr))
+        cands = collect_candidates(modules, edges, matched)
         self.assertEqual([c.target.addr for c in cands], [0x100])
+
+    def test_failing_module_excluded_by_default(self):
+        syms = [
+            _sym("func_main_02000b60", "main", 0x02000b60, size=0x10),
+            _sym("func_ov005_100", "ov005", 0x100, size=0x10),
+        ]
+        modules = {
+            "main":  _module("main", [syms[0]]),
+            "ov005": _module("ov005", [syms[1]]),
+        }
+        edges = defaultdict(set)
+        for s in syms:
+            for i in range(2):
+                edges[("driver", 0x100 + i)].add((s.module, s.addr))
+        cands = collect_candidates(modules, edges, {})
+        addrs = [(c.target.module, c.target.addr) for c in cands]
+        # main is in FAILING_MODULES → excluded by default.
+        self.assertEqual(addrs, [("ov005", 0x100)])
+
+    def test_failing_module_included_with_flag(self):
+        syms = [_sym("func_main_02000b60", "main", 0x02000b60, size=0x10)]
+        modules = {"main": _module("main", syms)}
+        edges = defaultdict(set)
+        for i in range(2):
+            edges[("driver", 0x100 + i)].add(("main", 0x02000b60))
+        cands = collect_candidates(
+            modules, edges, {}, include_failing_modules=True,
+        )
+        self.assertEqual(len(cands), 1)
+
+
+class TestClassifyConfidence(unittest.TestCase):
+    def test_no_candidates_is_low(self):
+        from nitro_suggest_renames import (
+            CONF_LOW, classify_confidence,
+        )
+        cand = Candidate(
+            target=_sym("func_x", "ov005", 0x100, size=0x10),
+            out_degree=0,
+            named_callee_subsystems=set(),
+            inferred_argcount=None,
+            caller_count=3,
+        )
+        self.assertEqual(classify_confidence(cand, []), CONF_LOW)
+
+    def test_strong_subsystem_signal_is_high(self):
+        from nitro_suggest_renames import (
+            CONF_HIGH, classify_confidence,
+        )
+        cand = Candidate(
+            target=_sym("func_x", "ov005", 0x100, size=0x10),
+            out_degree=1,
+            named_callee_subsystems={"OS"},  # subsystem signal
+            inferred_argcount=0,
+            caller_count=4,
+        )
+        # Fake a ranked list: top 6, second 3 → gap ≥ 2, top ≥ 5.
+        ranked = [(6, _nitro("OS_Top")), (3, _nitro("OS_Second"))]
+        self.assertEqual(classify_confidence(cand, ranked), CONF_HIGH)
+
+    def test_shallow_score_is_medium(self):
+        from nitro_suggest_renames import (
+            CONF_MEDIUM, classify_confidence,
+        )
+        cand = Candidate(
+            target=_sym("func_x", "ov005", 0x100, size=0x10),
+            out_degree=0,
+            named_callee_subsystems={"OS"},
+            inferred_argcount=None,
+            caller_count=2,
+        )
+        ranked = [(3, _nitro("OS_A"))]
+        self.assertEqual(classify_confidence(cand, ranked), CONF_MEDIUM)
+
+    def test_no_signal_is_low(self):
+        from nitro_suggest_renames import (
+            CONF_LOW, classify_confidence,
+        )
+        cand = Candidate(
+            target=_sym("func_x", "ov005", 0x100, size=0x4),
+            out_degree=0,
+            named_callee_subsystems=set(),  # no subsystem hint
+            inferred_argcount=0,
+            caller_count=1,  # weak caller signal
+        )
+        ranked = [(3, _nitro("OS_A")), (3, _nitro("OS_B"))]
+        self.assertEqual(classify_confidence(cand, ranked), CONF_LOW)
 
 
 class TestRenderReport(unittest.TestCase):
@@ -338,24 +497,76 @@ class TestRenderReport(unittest.TestCase):
         # At least one candidate row rendered.
         self.assertIn("`OS_Reset`", md)
 
-    def test_limit_truncates(self):
-        # 3 candidates but limit=1 — only one target rendered.
+    def test_limit_truncates_within_confidence_tier(self):
+        # 3 HIGH-confidence candidates but effective per-tier limit=1
+        # → one rendered, the other two get the "and N more" note.
         cs = [
             Candidate(
                 target=_sym(f"func_ov005_{i}",
-                            "ov005", 0x100 + i * 4, size=0x4),
+                            "ov005", 0x100 + i * 4, size=0x10),
                 out_degree=0,
-                named_callee_subsystems=set(),
+                named_callee_subsystems={"OS"},
                 inferred_argcount=0,
+                caller_count=5,
             ) for i in range(3)
         ]
+        # Pool has a clearly-winning top + low-scoring decoys to give
+        # each target a score ≥ 5 with a ≥ 2 gap → HIGH confidence.
+        nitro = [
+            _nitro("OS_Top"),         # 0 args, void, OS → high
+            _nitro("GX_Low", subsystem="GX"),  # cross-subsystem → -1
+        ]
         md = render_report(
-            cs, [_nitro("OS_Reset")],
-            max_candidates=1, limit=1,
+            cs, nitro,
+            max_candidates=3, limit=1,
             dict_source="/fake",
         )
-        # Truncation note.
+        # Only one HIGH target actually rendered; truncation note.
         self.assertIn("…and 2 more", md)
+        self.assertIn("HIGH-confidence", md)
+
+    def test_low_confidence_hidden_by_default(self):
+        # Generic-shape candidate with no signal → LOW → hidden
+        # unless --show-low-confidence.
+        cand = Candidate(
+            target=_sym("func_ov005_100", "ov005", 0x100, size=0x10),
+            out_degree=0,
+            named_callee_subsystems=set(),
+            inferred_argcount=0,
+            caller_count=1,
+        )
+        nitro = [_nitro("OS_Reset")]
+        md_default = render_report(
+            [cand], nitro, max_candidates=3, limit=10,
+            dict_source="/fake",
+        )
+        md_shown = render_report(
+            [cand], nitro, max_candidates=3, limit=10,
+            dict_source="/fake", show_low_confidence=True,
+        )
+        self.assertNotIn("`func_ov005_100`", md_default)
+        self.assertIn("Everything classified LOW", md_default)
+        self.assertIn("`func_ov005_100`", md_shown)
+        self.assertIn("LOW-confidence", md_shown)
+
+    def test_confidence_breakdown_line_always_emitted(self):
+        cand = Candidate(
+            target=_sym("func_ov005_100", "ov005", 0x100, size=0x10),
+            out_degree=0,
+            named_callee_subsystems={"OS"},
+            inferred_argcount=0,
+            caller_count=4,
+        )
+        nitro = [_nitro("OS_Reset"), _nitro("GX_Init", subsystem="GX")]
+        md = render_report(
+            [cand], nitro, max_candidates=2, limit=5,
+            dict_source="/fake",
+        )
+        # Breakdown surfaces counts even when some tiers are empty.
+        self.assertIn("Confidence breakdown", md)
+        self.assertIn("HIGH", md)
+        self.assertIn("MEDIUM", md)
+        self.assertIn("LOW", md)
 
 
 if __name__ == "__main__":
