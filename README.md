@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/github/license/cntrl-alt-lenny/gx-spirit-caller" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform">
-  <img src="https://img.shields.io/badge/Progress-0.05%25-red" alt="Progress">
+  <img src="https://img.shields.io/badge/Progress-0.06%25-red" alt="Progress">
 </p>
 
 <p align="center">
