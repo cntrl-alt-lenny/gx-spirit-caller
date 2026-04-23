@@ -21,6 +21,9 @@ from permute import (  # noqa: E402
     module_delinks_path,
     module_symbols_path,
     parse_tu_ranges,
+    render_readme,
+    render_run_sh,
+    stage_work_dir,
     tu_containing,
 )
 
@@ -217,6 +220,162 @@ class TestExpectedPaths(unittest.TestCase):
             expected_disasm_path(build, "ov005", 0x021aa4a0),
             build / "disasm" / "ov005_021aa4a0.s",
         )
+
+
+class TestRenderRunSh(unittest.TestCase):
+    """PR #161: run.sh auto-generated alongside the copy staging."""
+
+    def test_contains_import_and_permuter_commands(self):
+        out = render_run_sh(
+            function_name="func_02000800",
+            permuter_path=Path("/home/user/decomp-permuter"),
+            source_c=Path("/home/user/gx-spirit-caller/src/main/entry.c"),
+            target_s=Path("/home/user/gx-spirit-caller/build/eur/disasm/main_02000800.s"),
+        )
+        # Shebang is bash for portability (works on macOS/Linux).
+        self.assertIn("#!/usr/bin/env bash", out)
+        # Both key commands are referenced.
+        self.assertIn("./import.py", out)
+        self.assertIn("./permuter.py", out)
+        # Function name appears so grep-forward is easy.
+        self.assertIn("func_02000800", out)
+
+    def test_idempotent_import_guard(self):
+        # Re-running run.sh should be safe: it checks for the
+        # nonmatchings/<fn>/ dir before re-importing.
+        out = render_run_sh(
+            function_name="sinit_ov005_021b16e4",
+            permuter_path=Path("/p"),
+            source_c=Path("/s.c"),
+            target_s=Path("/s.s"),
+        )
+        self.assertIn(
+            "if [ ! -d", out,
+            "should guard import.py against re-running",
+        )
+        self.assertIn("nonmatchings/sinit_ov005_021b16e4", out)
+
+    def test_uses_set_euo_pipefail(self):
+        # Catch upstream config errors early rather than let the
+        # permuter swallow them.
+        out = render_run_sh(
+            function_name="x",
+            permuter_path=Path("/p"),
+            source_c=Path("/s.c"),
+            target_s=Path("/s.s"),
+        )
+        self.assertIn("set -euo pipefail", out)
+
+
+class TestRenderReadme(unittest.TestCase):
+    def test_mentions_target_and_paths(self):
+        md = render_readme(
+            function_name="func_02000800",
+            module="main",
+            addr=0x02000800,
+            source_c=Path("src/main/entry.c"),
+            target_s=Path("build/eur/disasm/main_02000800.s"),
+        )
+        self.assertIn("func_02000800", md)
+        self.assertIn("main", md)
+        self.assertIn("0x02000800", md)
+        self.assertIn("src/main/entry.c", md)
+        self.assertIn("build/eur/disasm/main_02000800.s", md)
+
+    def test_includes_followup_steps(self):
+        md = render_readme(
+            function_name="x", module="main", addr=0x1000,
+            source_c=Path("s.c"), target_s=Path("s.s"),
+        )
+        # Referenced workflow should cover ninja + delinks update.
+        self.assertIn("ninja rom", md)
+        self.assertIn("delinks.txt", md)
+
+    def test_run_command_is_prominent(self):
+        md = render_readme(
+            function_name="x", module="main", addr=0x1000,
+            source_c=Path("s.c"), target_s=Path("s.s"),
+        )
+        self.assertIn("./run.sh", md)
+
+
+class TestStageWorkDir(unittest.TestCase):
+    """End-to-end: stage_work_dir produces the expected files."""
+
+    def test_staging_creates_all_files(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            src = tmp / "entry.c"
+            src.write_text("/* source */", encoding="utf-8")
+            obj = tmp / "entry.o"
+            obj.write_bytes(b"\x7fELF")
+            s_file = tmp / "entry.s"
+            s_file.write_text("# disasm", encoding="utf-8")
+
+            work_dir = stage_work_dir(
+                function_name="test_fn",
+                module="main",
+                addr=0x02000800,
+                source_c=src,
+                target_o=obj,
+                target_s=s_file,
+                permuter_path=Path("/fake/permuter"),
+            )
+            try:
+                self.assertTrue(
+                    (work_dir / "base.c").is_file(),
+                    "base.c should be copied",
+                )
+                self.assertTrue(
+                    (work_dir / "base.o").is_file(),
+                    "base.o should be copied",
+                )
+                self.assertTrue(
+                    (work_dir / "run.sh").is_file(),
+                    "run.sh should be generated",
+                )
+                self.assertTrue(
+                    (work_dir / "README.md").is_file(),
+                    "README.md should be generated",
+                )
+                # run.sh must be executable.
+                import stat as _stat
+                mode = (work_dir / "run.sh").stat().st_mode
+                self.assertTrue(
+                    mode & _stat.S_IXUSR,
+                    "run.sh must have S_IXUSR set",
+                )
+            finally:
+                # Clean up the artifact — stage_work_dir writes to
+                # the repo root, not the tmp dir.
+                import shutil as _shutil
+                _shutil.rmtree(work_dir, ignore_errors=True)
+
+    def test_legacy_call_skips_run_sh_and_readme(self):
+        # Pre-#161 callers pass only source_c + target_o (no
+        # target_s, no permuter_path). stage_work_dir must still
+        # work (no crashes) but won't generate run.sh / README.
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            src = tmp / "entry.c"
+            src.write_text("/* source */", encoding="utf-8")
+            obj = tmp / "entry.o"
+            obj.write_bytes(b"")
+
+            work_dir = stage_work_dir(
+                function_name="legacy_fn",
+                module="main",
+                addr=0x02001000,
+                source_c=src,
+                target_o=obj,
+            )
+            try:
+                self.assertTrue((work_dir / "base.c").is_file())
+                self.assertFalse((work_dir / "run.sh").exists())
+                self.assertFalse((work_dir / "README.md").exists())
+            finally:
+                import shutil as _shutil
+                _shutil.rmtree(work_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
