@@ -89,18 +89,21 @@ LD_FLAGS = " ".join([
     "-nodead",
 ])
 # mwasmarm invocation for hand-written .s files. Kept minimal:
-#   -proc v5te     ARM9 is armv5te; same target pokediamond + heartgold
-#                  use for their SWI-thunk asm libs.
+#   -proc arm5TE   ARM9 is armv5te; mwasmarm's valid-list uses this
+#                  exact spelling (case-sensitive — `v5te`,
+#                  `arm5te`, `ARM5TE` all rejected by our build of
+#                  mwasmarm). pokediamond uses the same knob.
 #   -msgstyle gcc  Consistent with the C-compile rule.
-#   -sym on        Match CC_FLAGS — debug info is cheap and consistent.
+#   -g             Debug info. `-sym on` (the mwccarm knob) is
+#                  rejected by mwasmarm as unknown.
 # We do not enable `-MD` on the asm rule: mwasmarm doesn't reliably
 # emit depfiles, and hand-written .s files rarely have include chains
 # worth tracking. If the decomper later adds .s files with #includes
 # that need automatic rebuild, revisit this decision.
 ASM_FLAGS = " ".join([
-    "-proc v5te",
+    "-proc arm5TE",
     "-msgstyle gcc",
-    "-sym on",
+    "-g",
 ])
 DSD_OBJDIFF_ARGS = " ".join([
     "--scratch",
@@ -342,8 +345,21 @@ def main():
         # section-alignment wall (see docs/research/thumb-align-wall.md).
         # Scoped just to .s files under src/ + libs/; .c files stay on
         # the mwcc rule. Uses mwasmarm.exe from the same mwccarm bundle.
-        mwasm_cmd = f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
-        mwasm_implicit = [ASM]
+        #
+        # Post-compile, we patch the emitted .o's `.text` section
+        # header so its `sh_addralign` is 2 instead of the 4 that
+        # mwasmarm emits regardless of source-level `.thumb` /
+        # `.balign 2` directives. Required to let mwldarm place
+        # Thumb thunks at 2-aligned (not-4-aligned) addresses like
+        # the baserom does — see brief 013 / PR #110 for the
+        # empirical confirmation that the pokediamond `.s`-pattern
+        # alone isn't sufficient for our scattered-thunk layout.
+        patch_align = "tools/patch_section_align.py"
+        mwasm_cmd = (
+            f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
+            f' && {PYTHON} {patch_align} $out'
+        )
+        mwasm_implicit = [ASM, patch_align]
         n.rule(
             name="mwasm",
             command=mwasm_cmd,
