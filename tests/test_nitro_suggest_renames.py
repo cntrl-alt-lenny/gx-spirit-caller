@@ -19,8 +19,11 @@ sys.path.insert(0, str(_TOOLS))
 
 from analyze_symbols import ModuleData, Symbol  # noqa: E402
 from nitro_suggest_renames import (  # noqa: E402
+    TOKEN_OVERLAP_STOPWORDS,
     Candidate,
+    _name_tokens,
     _score_nitro_fn,
+    callee_name_tokens,
     callee_subsystems,
     collect_candidates,
     infer_argcount,
@@ -675,6 +678,217 @@ class TestRenderReport(unittest.TestCase):
         self.assertIn("HIGH", md)
         self.assertIn("MEDIUM", md)
         self.assertIn("LOW", md)
+
+
+class TestNameTokens(unittest.TestCase):
+    """`_name_tokens` underpins the PR #132 overlap bonus. Pinning:
+      - underscore split
+      - camelCase boundary split
+      - hex-addr fragments dropped
+      - case-insensitive output
+    """
+
+    def test_snake_case_split(self):
+        self.assertEqual(
+            _name_tokens("OS_Init"), frozenset({"os", "init"}),
+        )
+
+    def test_camel_case_split(self):
+        self.assertEqual(
+            _name_tokens("OS_SpinWait"),
+            frozenset({"os", "spin", "wait"}),
+        )
+
+    def test_multi_camel_boundary(self):
+        # No letter↔digit split. `LZ77Un` stays as `lz77un`,
+        # `Write8bit` stays as `write8bit`. This is a deliberate
+        # tradeoff (see `_TOKEN_SPLIT_RE` docstring) — preserving
+        # `ov005` as a single token matters more than teasing apart
+        # these fused names.
+        self.assertEqual(
+            _name_tokens("LZ77UnCompReadNormalWrite8bit"),
+            frozenset({"lz77un", "comp", "read", "normal",
+                       "write8bit"}),
+        )
+
+    def test_drops_hex_addr_fragment(self):
+        # `021b2334` is 8 hex chars, ≥4 → dropped. `ov005` is not
+        # pure-hex (has 'v') → kept as a single token.
+        tokens = _name_tokens("func_ov005_021b2334")
+        self.assertIn("func", tokens)
+        self.assertIn("ov005", tokens)
+        self.assertNotIn("021b2334", tokens)
+
+    def test_double_underscore_prefix_stripped(self):
+        # `__register_global_object` should split to the meaningful
+        # parts without a leading empty token.
+        self.assertEqual(
+            _name_tokens("__register_global_object"),
+            frozenset({"register", "global", "object"}),
+        )
+
+    def test_short_hex_tokens_kept_as_literal(self):
+        # "abc" is 3 chars, < 6 hex-drop threshold; stays.
+        tokens = _name_tokens("func_abc")
+        self.assertIn("abc", tokens)
+
+
+class TestCalleeNameTokens(unittest.TestCase):
+    """`callee_name_tokens` aggregates tokens across named callees."""
+
+    def test_aggregates_non_stopwords(self):
+        target = _sym("func_01", "main", 0x100)
+        callee_os = _sym("OS_SpinWait", "main", 0x200)
+        callee_gx = _sym("GX_LoadBG0Char", "main", 0x300)
+        md = _module("main", [target, callee_os, callee_gx])
+        edges_call = {
+            ("main", 0x100): {("main", 0x200), ("main", 0x300)},
+        }
+        tokens = callee_name_tokens(target, {"main": md}, edges_call)
+        # Subsystem prefixes (os, gx) survive — not hex, not stopwords.
+        # `GX_LoadBG0Char` → {gx, load, bg0char} (no letter↔digit
+        # split; see `_TOKEN_SPLIT_RE` docstring for the tradeoff).
+        self.assertIn("spin", tokens)
+        self.assertIn("wait", tokens)
+        self.assertIn("load", tokens)
+        self.assertIn("bg0char", tokens)
+
+    def test_drops_placeholder_callees(self):
+        target = _sym("func_01", "main", 0x100)
+        callee_placeholder = _sym("func_02000200", "main", 0x200)
+        md = _module("main", [target, callee_placeholder])
+        edges_call = {("main", 0x100): {("main", 0x200)}}
+        tokens = callee_name_tokens(target, {"main": md}, edges_call)
+        # `func_02000200` is the placeholder name; none of its tokens
+        # contribute (even the hex fragment is dropped).
+        self.assertEqual(tokens, frozenset())
+
+    def test_removes_stopwords(self):
+        target = _sym("func_01", "main", 0x100)
+        # A synthetic callee name whose only tokens are stopwords.
+        callee = _sym("Init", "main", 0x200)  # would tokenize to {"init"}
+        md = _module("main", [target, callee])
+        edges_call = {("main", 0x100): {("main", 0x200)}}
+        tokens = callee_name_tokens(target, {"main": md}, edges_call)
+        # Stopword filtered out.
+        self.assertNotIn("init", tokens)
+
+    def test_stopwords_frozen(self):
+        # Regression pin: if someone accidentally adds "wait" or
+        # "spin" to stopwords, the #132 demo case stops
+        # discriminating. Keep the stopword list tight.
+        self.assertNotIn("wait", TOKEN_OVERLAP_STOPWORDS)
+        self.assertNotIn("spin", TOKEN_OVERLAP_STOPWORDS)
+        self.assertIn("init", TOKEN_OVERLAP_STOPWORDS)
+        self.assertIn("get", TOKEN_OVERLAP_STOPWORDS)
+
+
+class TestTokenOverlapScoring(unittest.TestCase):
+    """PR #132 scorer extension: name-token overlap bonus
+    discriminates within subsystem tie-groups."""
+
+    def _cand(
+        self, tokens: frozenset[str],
+        subsystems: set[str] = None,
+        size: int = 0x20,
+        out_degree: int = 1,
+        argc: int | None = None,
+        callers: int = 5,
+    ) -> Candidate:
+        return Candidate(
+            target=_sym("func_01", "main", 0x100, size=size),
+            out_degree=out_degree,
+            named_callee_subsystems=subsystems or set(),
+            inferred_argcount=argc,
+            callee_name_tokens=tokens,
+            caller_count=callers,
+        )
+
+    def test_overlap_adds_one_per_token_capped_at_two(self):
+        # One token overlap → +1; two → +2; three → still +2 (cap).
+        cand_one = self._cand(frozenset({"wait"}))
+        fn_one = {
+            "name": "OS_SpinWait", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        cand_many = self._cand(frozenset({"wait", "spin", "loop"}))
+        fn_many = {
+            "name": "OS_SpinWaitLoop", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        # Targets that aren't leaves + don't have argc don't get the
+        # other bonuses — isolates the overlap signal.
+        self.assertEqual(_score_nitro_fn(cand_one, fn_one), 1)
+        # cand_many has 3 matching tokens but capped at +2.
+        self.assertEqual(_score_nitro_fn(cand_many, fn_many), 2)
+
+    def test_discriminates_within_subsystem_tie_group(self):
+        # The #121 demo: target calls WaitByLoop → OS subsystem.
+        # `OS_SpinWait` shares `wait` (overlap +1); `OS_AddToHeap`
+        # doesn't overlap (+0). Before this bonus, both scored 3.
+        cand = self._cand(
+            tokens=frozenset({"wait", "loop", "by"}),
+            subsystems={"OS"},
+        )
+        fn_spinwait = {
+            "name": "OS_SpinWait", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        fn_addheap = {
+            "name": "OS_AddToHeap", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        spin_score = _score_nitro_fn(cand, fn_spinwait)
+        heap_score = _score_nitro_fn(cand, fn_addheap)
+        # Both get +3 for subsystem. SpinWait additionally gets
+        # +1 for the `wait` overlap. AddToHeap gets nothing extra.
+        self.assertEqual(spin_score, 4)
+        self.assertEqual(heap_score, 3)
+        # Discriminator fires: gap of 1 where before there was 0.
+        self.assertGreater(spin_score, heap_score)
+
+    def test_no_overlap_no_bonus(self):
+        fn = {
+            "name": "FS_OpenFile", "subsystem": "FS",
+            "return_type": "void", "arg_count": 0,
+        }
+        # Wrong subsystem: FS candidate against OS-callee target.
+        # No token overlap, cross-subsystem penalty applies.
+        cand_with_sub = self._cand(
+            tokens=frozenset({"wait", "loop"}),
+            subsystems={"OS"},
+        )
+        self.assertEqual(_score_nitro_fn(cand_with_sub, fn), -1)
+
+    def test_no_bonus_without_callee_tokens(self):
+        # If target has no named callees (tokens frozenset is empty),
+        # overlap check short-circuits. Candidate score is just the
+        # subsystem / leaf / argc components.
+        cand = self._cand(
+            tokens=frozenset(), subsystems={"OS"},
+        )
+        fn = {
+            "name": "OS_SpinWait", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        # Subsystem match +3. No overlap (empty tokens). Score = 3.
+        self.assertEqual(_score_nitro_fn(cand, fn), 3)
+
+    def test_stopwords_dont_overlap(self):
+        # If target callees ONLY carry stopword tokens, overlap must
+        # be zero — stopwords filtered at both target-side and
+        # candidate-side.
+        cand = self._cand(
+            tokens=frozenset(),  # stopwords pre-filtered
+            subsystems={"OS"},
+        )
+        fn = {
+            "name": "OS_GetInit", "subsystem": "OS",
+            "return_type": "void", "arg_count": 0,
+        }
+        # get/init both stopwords; candidate's other tokens are
+        # just "os" which doesn't overlap an empty target-token set.
+        self.assertEqual(_score_nitro_fn(cand, fn), 3)
 
 
 if __name__ == "__main__":
