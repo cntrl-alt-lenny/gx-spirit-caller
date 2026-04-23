@@ -8,125 +8,156 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-22. Main tip is `a94181f` after merging
-PRs #91, #92, #93. Brief 010 now open, docs/state.md refresh follows.
+**Last updated:** 2026-04-23. Main tip is `71b3e9c` (PR #119).
+Refresh written by cloud because state was 3 rounds stale after the
+brief 010–013 cascade.
 
 **Baseline:** `python tools/configure.py eur`, `ninja rom`,
 `ninja objdiff`, `ninja report`, and `./dsd.exe check modules -c
 config/eur/arm9/config.yaml` all pass on Windows. Module check:
-expected **24/27 OK** (ARM9 main / DTCM / overlay 4 still fail per
-CLAUDE.md, not agent-caused).
+still **24/27 OK** (ARM9 main / DTCM / overlay 4 fail for structural
+placeholder-symbol reasons per CLAUDE.md — not agent-caused).
 
 **Progress:** `python tools/progress.py --version eur` now reports
-code `3016 / 2386664` bytes (0.13%), data `0 / 4776528` bytes
-(0.00%), and `145 / 258` units passing (56.20%). +24 bytes / +1
-unit from PR #92's sinit outlier.
+code `4208 / 2388172` bytes (**0.18%**, up from 0.13%), data
+`0 / 4776528` bytes (0.00%), units `188 / 188` (100%). +1192 code
+bytes / +43 units since the last refresh. Driven by briefs 010–013
+closing out the named tier and the medium-tier starts from PRs
+#115 and #120.
 
 **Matched breakdown** (live from `python tools/next_targets.py
---version eur`):
+--version eur --no-outputs`):
 
 | Tier | Matched | Unmatched | Total | % matched |
 |------|--------:|----------:|------:|----------:|
 | `trivial` | 78 | 59 | 137 | 56.9% |
-| `easy` | 61 | 1062 | 1123 | 5.4% |
-| `sinit` | 47 | 4 | 51 | 92.2% |
-| `named` | 0 | 22 | 22 | 0.0% |
-| `medium` | 0 | 6 | 6 | 0.0% |
+| `easy` | 76 | 1047 | 1123 | 6.8% |
+| `sinit` | 50 | 1 | 51 | 98.0% |
+| `named` | **22** | 0 | 22 | **100.0%** |
+| `medium` | 3 | 3 | 6 | 50.0% |
 | `hard` | 0 | 8510 | 8510 | 0.0% |
 
-sinit is now at 47/51; brief 010 targets 3 more (both ov010 sinits +
-the ov011 zeroing sinit), which would land sinit at **49/51**. Only
-the ov004 outlier (in a failing module) stays deferred after that.
+**Named tier closed.** Only outlier left in sinit is the ov004
+failing-module sinit (deferred). Medium tier at 3/6 on main, will
+climb to 5/6 once #120 lands (one more asm-void medium-tier target
+deferred as its own future brief).
 
 ## Merged since last refresh
 
-Main tip moved from `5c1cb9b` → `a94181f`.
+Main tip moved from `a94181f` → `71b3e9c`. Heavy session —
+name-tier closure + the align-regression fire + tool/docs work.
 
 ### Decomper track
 
-- **PR #92** — brief 009 shipped. `__sinit_ov002_022ca7e8` matched at
-  100% / 24 of 24 code bytes. Required **`asm void`** — mwcc's
-  RHS-first evaluation order can't be beaten in plain C when both
-  sides of the assign are global addresses. Decomper tried four C
-  variants (plain assign, `slot` temp, `volatile char **` temp,
-  `*(unsigned int *)(...)`) plus struct access + swapped extern
-  decl order — all produced the wrong literal-pool layout. Header
-  comment in
-  [`src/overlay002/sinit_ov002_022ca7e8.c`](../src/overlay002/sinit_ov002_022ca7e8.c)
-  is a useful reference for the escape-hatch pattern.
+- **PR #96** — brief 010 closed. `__sinit_ov010_021b89a8`,
+  `__sinit_ov010_021b89f0`, `__sinit_ov011_021d3620`. Sinit tier now
+  50/51; only the ov004 outlier remains.
+- **PR #98 / #100 / #102 / #105 / #110 / #112 / #115 / #116 / #118**
+  — brief 011 → 013 named-tier cascade. 18 BIOS SWI thunks named
+  (brief 011), 4 main-runtime non-thunks (brief 012), 10 Thumb
+  `.s`-file workaround thunks (brief 013). Named tier closed **22/22**.
+- **PR #107 / #111** — easy-tier sweeps (ov015 + ov011). +15 matches
+  combined.
+- **PR #115** — 3 medium-tier interpolation-family matches
+  (`func_0203c5e4` + 2 siblings). Medium tier at 3/6. Also surfaced
+  the PR #118 regression-fire bisect.
 
 ### Cloud track
 
-- **PR #91** — `.github/workflows/worklist-diff.yml`. Wires PR #88's
-  `ci_format_worklist_diff.py` into a PR workflow: on every PR
-  touching `config/**` / `src/**` / relevant tools, snapshots the
-  worklist on base vs head and posts/upserts a single comment with
-  matches-landed / new-candidates / tier-delta. Mirrors the existing
-  analyzer.yml / match-invariants.yml upsert pattern. Path-filter
-  means only src-affecting PRs get the comment; docs / brain PRs
-  stay quiet.
-- **PR #93** — `tools/find_callsites.py --caller-depth N` for
-  multi-hop caller expansion (capped at 5 to avoid graph-wide
-  explosions). Tests bumped from the previous count to 24. Useful
-  when direct callers are placeholder-named and a deeper hop brings
-  real-named context into view — came up naturally while scouting
-  brief 010's ctor chains.
+- **PR #97 / #99** — `tools/nitro_suggest_renames.py` + dict build
+  from `ntrtwl/NitroSDK`. Usability pass in #99 (saner defaults,
+  LOW suppressed, fail-module skip).
+- **PR #108 / #109** — `diff_reasons.py` (match-depth classifier)
+  + `ci_format_diff_reasons.py` (before/after delta renderer).
+  Brain picked Path A integration (local-only, no CI). Docs
+  follow-up pending in #124.
+- **PR #114 / #117** — brief 014 seed via nitro_suggest_renames.
+  Found the PREFIX_Name convention gap; #117 added
+  `BARE_NAME_SUBSYSTEMS` mapping for the 18 brief-011 BIOS thunks.
+- **PR #116 / #118** — the align-regression fire. #110/#112
+  shipped the Thumb `.s` workaround; two post-merge issues
+  (LCF ALIGNALL hardcoded to 4, mwasm 4-byte size-pad,
+  gap-object sh_addralign missing, colon-form LCF regex miss)
+  caused `dsd check modules` to collapse 24/27 → 0/27. Both
+  rounds landed as production-fire self-merges. `docs/research/thumb-align-wall.md`
+  has the full retrospective.
+- **PR #119** — fixture hygiene on `test_patch_lcf_arm9_align.py` +
+  `test_patch_section_align.py`. Added `--dir` mode coverage.
 
 ### Brain track
 
-- Refreshed `docs/state.md` (this file) + wrote brief 010 on the
-  three remaining sinit outliers. Added an *Open briefs* pointer in
-  `AGENTS.md` and moved brief 009 to the closed-briefs reference.
+- Closed briefs 010, 011, 012, 013 in `docs/briefs/`. Coordinated the
+  PR #116/#118 fires with cloud self-merges. `state.md` got stale in
+  the process — cloud picked up this refresh.
 
 ## In flight
 
-- **Open PRs:** zero (post this brain-PR merge).
-- **`decomper`** — brief 010 open. Branch:
-  `decomper/sinit-remaining-outliers`. One PR, three targets
-  (`__sinit_ov010_021b89a8`, `__sinit_ov010_021b89f0`,
-  `__sinit_ov011_021d3620`). See
-  [`docs/briefs/010-sinit-remaining-outliers.md`](briefs/010-sinit-remaining-outliers.md)
-  for the shapes + risk notes. Closes sinit to 49/51.
-- **`cloud`** — no open brief. Good self-directed candidates:
-  1. Follow-up patch on `tools/ci_format_worklist_diff.py`: the
-     stdout path crashes on Windows cp1252 console when rendering
-     emoji (📉 in the "Worklist delta" heading). The `-o file` path
-     that the CI workflow uses works fine — this only affects local
-     stdout usage on Windows terminals. One-line fix:
-     `sys.stdout.reconfigure(encoding="utf-8")` early in `main()`.
-  2. Research-only scoping for the data tier opener (still 0%
-     matched). A `tools/data_worklist.py` or similar.
-  3. A `permuter` integration pass — `tools/permute.py` exists but
-     is minimally wired; could add a CI-runnable smoke test.
-- **`brain`** — waiting for the next decomper PR. Will re-run
-  analyzer + heatmap regen after brief 010 lands.
+**Open PRs** (as of this refresh):
+
+- **#120** — decomper medium-tier 5/6 close (`func_020386f4` +
+  `func_0203874c` anim-family cousins). Defers one remaining
+  medium-tier target (`func_020b3814`, asm-territory) to its own
+  future brief.
+- **#121** — cloud brief 014 seed post-#117. Headline: #117
+  bare-name mapping works but produces exactly ONE new signal hit
+  (`main|0x02093820` → WaitByLoop → OS) because all 20 BIOS-thunk
+  callers are in `main` (a FAILING_MODULE). Structural ceiling at
+  score 3 — no HIGH-confidence hits until the scorer or the
+  call-graph naming grows.
+- **#122** — decomper ov010 easy-tier close-out. 14/14
+  byte-identical first build. Contains a note about a
+  `propagate_template.py` bug (cross-module same-address pairs
+  silently no-op).
+- **#123** — cloud `tools/data_worklist.py`. Ranks 10,952 unmatched
+  data symbols by cross-module reader density. Top hit
+  `data_020b4728` referenced from 14 modules; dtcm entries in
+  top-10 suggest OS heap state candidates.
+- **#124** — cloud Path A docs for `ci_format_diff_reasons`.
+  Documents the 3-step local pre-merge regression check in
+  `docs/decomp-workflow.md`. Also refreshes the tool catalogue.
+
+**Agent-track status:**
+
+- **`decomper`** — medium-tier close in flight (#120) and ov010
+  easy-tier close in flight (#122). No open brief currently
+  assigned; natural next is to pick up brief 014 rename cascade
+  once brain reads the #121 seed.
+- **`cloud`** — three PRs in flight (#121, #123, #124). No
+  production fires. Good self-directed candidates after brain
+  merges: the scorer extension flagged in #121 (non-leaf shape
+  bonus), or a first pass on `data_020b4728` identification via
+  NitroSDK grep.
+- **`brain`** — five open PRs to triage + any decomper briefs to
+  scope.
 
 ## Next-brain TODO
 
-1. **Review brief 010 PR when it opens.** Three new `.c` files
-   under `src/overlay010/` + `src/overlay011/`, three delinks-block
-   appends across two overlays. Verify: `python tools/configure.py
-   eur`, `ninja rom`, `ninja objdiff`, `./dsd.exe check modules`
-   (still 24/27). All three target functions must hit 100% in
-   `ninja report`. Summarize for cntrl_alt_lenny and offer to merge.
-2. **Scope brief 011** once brief 010 lands. Natural next target:
-   the **named tier** (22 candidates). Pick a single BIOS / libc
-   function with a known name — `Div`, `Sqrt`, `LZ77Uncomp*` — as
-   the opener, same one-function-PR cadence as brief 007.
-3. **Latent bug** in `tools/ci_format_worklist_diff.py` (Windows
-   stdout Unicode) — noted above. Non-blocking; the CI workflow
-   uses `-o file` which sidesteps it. Fix with one line when cloud
-   has idle time.
-4. **Pre-existing warning** carryover: `func_ov021_021aaf58` is in
-   a `complete` TU but still placeholder-named. Fix when identity
-   is clear.
-5. **`match-invariants` as a required check** in GitHub branch
-   protection — continuing carryover. Stable across many PRs now.
-6. **Data-tier opener** — 0% still. Likely brief 012+.
+1. **Triage the 5 open PRs** (#120–124) in whatever order you
+   prefer. None of them block each other. #120 + #122 need a
+   `ninja` / `dsd check modules` verification; #121/#123/#124 are
+   docs/tools-only.
+2. **Scope brief 014 (rename cascade)** using the seed in
+   `docs/research/nitro-rename-suggestions-round2.md`. First pick:
+   `func_02093820` — the single new-signal hit, calls `WaitByLoop`,
+   10 callers across 4 modules. Grep NitroSDK for `OS_*` functions
+   that internally touch `WaitByLoop` — narrow candidate set.
+3. **Scope brief 015 (data-tier first pass)** using the worklist
+   from #123 (`build/eur/analysis/data_worklist.md`). The #1
+   candidate `data_020b4728` (14 modules, 27 readers) is almost
+   certainly an SDK fundamental. A 2-3-symbol pilot brief would
+   validate the ranking and open the data-tier door.
+4. **Medium-tier asm follow-up** — `func_020b3814` is the last
+   medium-tier target and is asm-territory (shared-code entry
+   points that dsd sees as separate functions). Mirror brief 013's
+   `asm void` / `.s`-file escape-hatch approach when you scope it.
+5. **Pre-existing carryover**: `func_ov021_021aaf58` in a complete
+   TU but still placeholder-named. Fix when identity is clear.
+6. **`match-invariants` required check** in branch protection —
+   carryover from prior state refreshes. Stable across many PRs;
+   would be a 30-second GitHub settings change.
 
 ## New agents?
 
-Still no. Brain + decomper + cloud is holding. Slug rename in PR #87
-means any LLM session can take any slot; no new manifest changes
-needed. Reopen if `libs/nitro/` / `libs/runtime/` balloons, or if
-graphics/audio decomp becomes a target.
+Still no. Brain + decomper + cloud is holding even through the
+#116/#118 fire. Reopen if `libs/nitro/` header adoption balloons,
+or if graphics/audio decomp becomes a target.
