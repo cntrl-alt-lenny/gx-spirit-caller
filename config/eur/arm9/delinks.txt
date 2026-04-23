@@ -147,3 +147,7 @@ src/main/func_02018f90.c:
 src/main/func_0201be98.c:
     complete
     .text start:0x0201be98 end:0x0201bea8
+
+src/main/func_020b3814.s:
+    complete
+    .text start:0x020b3814 end:0x020b3850
