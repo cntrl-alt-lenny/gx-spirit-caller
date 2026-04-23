@@ -61,7 +61,11 @@ from pathlib import Path
 # dsd doesn't emit any.
 
 _ARM9_BLOCK_START_RE = re.compile(
-    r"(^\s*\.arm9\s*\{\s*$)",
+    # dsd emits either `.arm9 {` or `.arm9 : {` depending on version.
+    # Both are valid LCF; accept either. PR #115 second-round found
+    # the colon form was missed by the bare-brace-only regex,
+    # silently no-op'ing this patcher and leaving ALIGNALL(4) intact.
+    r"(^\s*\.arm9\s*:?\s*\{\s*$)",
     re.MULTILINE,
 )
 _ALIGNALL_RE = re.compile(r"\bALIGNALL\s*\(\s*\d+\s*\)\s*;")

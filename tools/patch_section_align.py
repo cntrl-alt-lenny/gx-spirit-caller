@@ -294,7 +294,18 @@ def main() -> int:
         description="Rewrite `.text*` sh_addralign on a "
                     "mwasmarm-emitted .o file. Idempotent.",
     )
-    ap.add_argument("path", type=Path, help="Path to the .o file")
+    ap.add_argument(
+        "paths", type=Path, nargs="*",
+        help="Path(s) to .o file(s). Accepts one or many. Mutually "
+             "exclusive with --dir (use one or the other).",
+    )
+    ap.add_argument(
+        "--dir", type=Path, default=None,
+        help="Directory to walk recursively for *.o files. Used by "
+             "the 'delink' ninja rule to batch-patch every "
+             "dsd-produced gap .o cross-platform (find/xargs don't "
+             "work on Windows cmd.exe). See PR #115.",
+    )
     ap.add_argument(
         "--target-align", type=int, default=TARGET_ALIGN,
         help=f"Alignment to rewrite to (default: {TARGET_ALIGN}). "
@@ -304,14 +315,38 @@ def main() -> int:
         "--trim-padding", action="store_true",
         help="Also trim mwasm's trailing 0x0000 size-padding from "
              "`.text` sections (required for mwasmarm .s → .o where "
-             "the source is not a 4-byte multiple). See PR #115.",
+             "the source is not a 4-byte multiple). See PR #115. "
+             "Does NOT apply to dsd delink outputs — those don't "
+             "have the padding artifact; alignment patching alone "
+             "suffices for them.",
     )
     args = ap.parse_args()
-    return patch_file(
-        args.path,
-        target_align=args.target_align,
-        trim_padding=args.trim_padding,
-    )
+    if args.dir is not None and args.paths:
+        print("error: --dir and positional paths are mutually exclusive",
+              file=sys.stderr)
+        return 2
+    if args.dir is not None:
+        if not args.dir.is_dir():
+            print(f"error: --dir {args.dir} is not a directory",
+                  file=sys.stderr)
+            return 1
+        targets = sorted(args.dir.rglob("*.o"))
+    else:
+        targets = args.paths
+    if not targets:
+        # No .o files found — silent success. `dsd delink` may
+        # legitimately produce zero gaps on a fully-carved module.
+        return 0
+    rc = 0
+    for p in targets:
+        result = patch_file(
+            p,
+            target_align=args.target_align,
+            trim_padding=args.trim_padding,
+        )
+        if result != 0:
+            rc = result
+    return rc
 
 
 if __name__ == "__main__":
