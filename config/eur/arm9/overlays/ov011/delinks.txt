@@ -84,3 +84,31 @@ src/overlay011/ov011_021d2c94.c:
 src/overlay011/ov011_021d2d04.c:
     complete
     .text start:0x021d2d04 end:0x021d2d18
+
+src/overlay011/ov011_021cc140.c:
+    complete
+    .text start:0x021cc140 end:0x021cc15c
+
+src/overlay011/ov011_021cdb94.c:
+    complete
+    .text start:0x021cdb94 end:0x021cdbac
+
+src/overlay011/ov011_021cf048.c:
+    complete
+    .text start:0x021cf048 end:0x021cf060
+
+src/overlay011/ov011_021d091c.c:
+    complete
+    .text start:0x021d091c end:0x021d0938
+
+src/overlay011/ov011_021d1d18.c:
+    complete
+    .text start:0x021d1d18 end:0x021d1d30
+
+src/overlay011/ov011_021d2278.c:
+    complete
+    .text start:0x021d2278 end:0x021d2290
+
+src/overlay011/ov011_021d2da0.c:
+    complete
+    .text start:0x021d2da0 end:0x021d2db8
