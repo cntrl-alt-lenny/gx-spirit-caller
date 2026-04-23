@@ -3,7 +3,7 @@
  * func_02018b94's pointer-returner).
  *
  *     stmdb sp!, {r3, lr}
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     add   r1, r0, #0x810         ; dest = &state[0x810]
  *     mov   r0, #0x0               ; value = 0
  *     mov   r2, #0x20              ; byte count = 32
@@ -19,9 +19,9 @@
  * order vs libc memset is dsd-normalized here as a raw extern.
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 extern void func_020944c0(int value, void *dest, int count);
 
 void func_02018ba4(void) {
-    func_020944c0(0, func_02018b28() + 0x810, 0x20);
+    func_020944c0(0, GetSystemWork() + 0x810, 0x20);
 }

@@ -2,7 +2,7 @@
  *
  *     stmdb sp!, {r4, lr}
  *     mov   r4, r0
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     ldr   r2, [r0, #0x8fc]
  *     sub   r0, r4, #0x1
  *     mov   r1, #0x1
@@ -12,9 +12,9 @@
  * No store — pure read. Returns the masked value (non-zero if set).
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 int func_0201abfc(int n) {
-    int slot = *(int *)(func_02018b28() + 0x8fc);
+    int slot = *(int *)(GetSystemWork() + 0x8fc);
     return slot & (1 << (n - 1));
 }

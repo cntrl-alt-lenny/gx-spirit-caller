@@ -2,7 +2,7 @@
  *
  *     stmdb sp!, {r4, lr}
  *     mov   r4, r0
- *     bl    func_02018b28
+ *     bl    GetSystemWork
  *     sub   r1, r4, #0x1           ; bit index = n - 1
  *     mov   r2, #0x1
  *     mvn   r1, r2, lsl r1         ; r1 = ~(1 << (n-1))
@@ -12,9 +12,9 @@
  *     ldmia sp!, {r4, pc}
  */
 
-extern char *func_02018b28(void);
+extern char *GetSystemWork(void);
 
 void func_0201abd4(int n) {
-    int *slot = (int *)(func_02018b28() + 0x8fc);
+    int *slot = (int *)(GetSystemWork() + 0x8fc);
     *slot &= ~(1 << (n - 1));
 }
