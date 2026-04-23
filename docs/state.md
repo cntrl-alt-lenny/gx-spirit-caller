@@ -23,7 +23,7 @@ code `4208 / 2388172` bytes (**0.18%**, up from 0.13%), data
 `0 / 4776528` bytes (0.00%), units `188 / 188` (100%). +1192 code
 bytes / +43 units since the last refresh. Driven by briefs 010–013
 closing out the named tier and the medium-tier starts from PRs
-#115 and #120.
+PRs #115 and #120.
 
 **Matched breakdown** (live from `python tools/next_targets.py
 --version eur --no-outputs`):
@@ -159,5 +159,5 @@ name-tier closure + the align-regression fire + tool/docs work.
 ## New agents?
 
 Still no. Brain + decomper + cloud is holding even through the
-#116/#118 fire. Reopen if `libs/nitro/` header adoption balloons,
+PRs #116/#118 fire. Reopen if `libs/nitro/` header adoption balloons,
 or if graphics/audio decomp becomes a target.
