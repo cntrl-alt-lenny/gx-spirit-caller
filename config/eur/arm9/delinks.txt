@@ -123,3 +123,35 @@ src/main/func_020386f4.c:
 src/main/func_0203874c.c:
     complete
     .text start:0x0203874c end:0x020387ac
+
+src/main/func_02019034.c:
+    complete
+    .text start:0x02019034 end:0x0201904c
+
+src/main/func_020190ec.c:
+    complete
+    .text start:0x020190ec end:0x020190fc
+
+src/main/func_02019124.c:
+    complete
+    .text start:0x02019124 end:0x0201913c
+
+src/main/func_020195ec.c:
+    complete
+    .text start:0x020195ec end:0x02019604
+
+src/main/func_02019664.c:
+    complete
+    .text start:0x02019664 end:0x0201967c
+
+src/main/func_0201969c.c:
+    complete
+    .text start:0x0201969c end:0x020196b0
+
+src/main/func_0201a388.c:
+    complete
+    .text start:0x0201a388 end:0x0201a3a0
+
+src/main/func_0201a3a0.c:
+    complete
+    .text start:0x0201a3a0 end:0x0201a3b8
