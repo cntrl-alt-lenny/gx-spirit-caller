@@ -36,3 +36,27 @@ src/overlay015/ov015_021b3520.c:
 src/overlay015/ov015_021b5a64.c:
     complete
     .text start:0x021b5a64 end:0x021b5a6c
+
+src/overlay015/ov015_021b2334.c:
+    complete
+    .text start:0x021b2334 end:0x021b2348
+
+src/overlay015/ov015_021b24f4.c:
+    complete
+    .text start:0x021b24f4 end:0x021b2514
+
+src/overlay015/ov015_021b2864.c:
+    complete
+    .text start:0x021b2864 end:0x021b287c
+
+src/overlay015/ov015_021b2890.c:
+    complete
+    .text start:0x021b2890 end:0x021b28a8
+
+src/overlay015/ov015_021b3f80.c:
+    complete
+    .text start:0x021b3f80 end:0x021b3f98
+
+src/overlay015/ov015_021b4040.c:
+    complete
+    .text start:0x021b4040 end:0x021b405c
