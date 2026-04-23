@@ -88,6 +88,20 @@ LD_FLAGS = " ".join([
     "-msgstyle gcc",
     "-nodead",
 ])
+# mwasmarm invocation for hand-written .s files. Kept minimal:
+#   -proc v5te     ARM9 is armv5te; same target pokediamond + heartgold
+#                  use for their SWI-thunk asm libs.
+#   -msgstyle gcc  Consistent with the C-compile rule.
+#   -sym on        Match CC_FLAGS — debug info is cheap and consistent.
+# We do not enable `-MD` on the asm rule: mwasmarm doesn't reliably
+# emit depfiles, and hand-written .s files rarely have include chains
+# worth tracking. If the decomper later adds .s files with #includes
+# that need automatic rebuild, revisit this decision.
+ASM_FLAGS = " ".join([
+    "-proc v5te",
+    "-msgstyle gcc",
+    "-sym on",
+])
 DSD_OBJDIFF_ARGS = " ".join([
     "--scratch",
     f"--compiler {DECOMP_ME_COMPILER}",
@@ -148,6 +162,12 @@ DSD = str(args.dsd or os.path.join('.', str(root_path / f"dsd{EXE}")))
 OBJDIFF = os.path.join('.', str(root_path / f"objdiff-cli{EXE}"))
 CC = os.path.join('.', str(mwcc_path / "mwccarm.exe"))
 LD = os.path.join('.', str(mwcc_path / "mwldarm.exe"))
+# mwasmarm ships inside the same mwccarm.zip bundle we already
+# download. Used for hand-written .s assembly — the only escape
+# hatch for the Thumb section-alignment wall (see
+# docs/research/thumb-align-wall.md + brief 013). Pokediamond +
+# pokeheartgold ship BIOS SWI thunks this way.
+ASM = os.path.join('.', str(mwcc_path / "mwasmarm.exe"))
 PYTHON = sys.executable
 
 
@@ -246,7 +266,7 @@ class Project:
     def source_object_files(self) -> list[str]:
         return [
             str(self.game_build / source_file.with_suffix(".o"))
-            for source_file in get_c_cpp_files([src_path, libs_path])
+            for source_file in get_source_files([src_path, libs_path])
         ]
 
     def arm9_lcf(self) -> Path:
@@ -315,6 +335,18 @@ def main():
             name="mwcc",
             command=mwcc_cmd,
             depfile="$basefile.d",
+        )
+        n.newline()
+
+        # Assembly rule — unlocks the .s escape hatch for the Thumb
+        # section-alignment wall (see docs/research/thumb-align-wall.md).
+        # Scoped just to .s files under src/ + libs/; .c files stay on
+        # the mwcc rule. Uses mwasmarm.exe from the same mwccarm bundle.
+        mwasm_cmd = f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
+        mwasm_implicit = [ASM]
+        n.rule(
+            name="mwasm",
+            command=mwasm_cmd,
         )
         n.newline()
 
@@ -396,6 +428,7 @@ def main():
         add_extract_build(n, project)
         add_delink_and_lcf_builds(n, project)
         add_mwcc_builds(n, project, mwcc_implicit)
+        add_mwasm_builds(n, project, mwasm_implicit)
         add_mwld_and_rom_builds(n, project)
         add_check_builds(n, project)
         add_objdiff_builds(n, project)
@@ -535,6 +568,32 @@ def add_mwcc_builds(n: ninja_syntax.Writer, project: Project, mwcc_implicit: lis
         n.newline()
 
 
+def add_mwasm_builds(
+    n: ninja_syntax.Writer, project: Project, mwasm_implicit: list,
+):
+    """Emit one `mwasm` build per .s file under src/ + libs/.
+
+    No m2ctx / scratch-context sibling here (unlike the C path) —
+    decomp.me's asm scratches are fed the extracted disassembly
+    directly, not a preprocessed source file, so there's nothing
+    useful to preprocess from a hand-written .s file."""
+    for source_file in get_asm_files([src_path, libs_path]):
+        src_obj_path = project.game_build / source_file
+        n.build(
+            inputs=str(source_file),
+            implicit=mwasm_implicit,
+            rule="mwasm",
+            outputs=str(src_obj_path.with_suffix(".o")),
+            variables={
+                # Reserved for per-file overrides — e.g. a sub-
+                # architecture switch if one TU needs `-proc arm4t`
+                # for libc compatibility.
+                "asm_flags": "",
+            },
+        )
+        n.newline()
+
+
 def get_c_cpp_files(dirs: list[Path]):
     for d in dirs:
         if not d.is_dir():
@@ -546,12 +605,38 @@ def get_c_cpp_files(dirs: list[Path]):
                     yield root / file
 
 
+def get_asm_files(dirs: list[Path]):
+    """Walk `dirs` for hand-written .s assembly files. Kept
+    separate from get_c_cpp_files so the caller can attach the
+    right compile rule per-file."""
+    for d in dirs:
+        if not d.is_dir():
+            continue
+        for root, _, files in os.walk(d):
+            root = Path(root)
+            for file in files:
+                if is_asm(file):
+                    yield root / file
+
+
+def get_source_files(dirs: list[Path]):
+    """Every source file that produces a linkable .o — C, C++, or
+    hand-written assembly. Order matters for reproducible ninja
+    output; yields C/C++ first, then asm."""
+    yield from get_c_cpp_files(dirs)
+    yield from get_asm_files(dirs)
+
+
 def is_cpp(name):
     return Path(str(name)).suffix in [".cpp"]
 
 
 def is_c(name):
     return Path(str(name)).suffix in [".c"]
+
+
+def is_asm(name):
+    return Path(str(name)).suffix in [".s", ".S"]
 
 
 def add_delink_and_lcf_builds(n: ninja_syntax.Writer, project: Project):
