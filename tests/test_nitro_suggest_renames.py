@@ -240,6 +240,114 @@ class TestCalleeSubsystems(unittest.TestCase):
             edges[("ov005", 0x100)].add((c.module, c.addr))
         self.assertEqual(callee_subsystems(target, modules, edges), set())
 
+    def test_bios_thunk_bare_name_contributes_os(self):
+        # Brief 011/013 shipped BIOS SWI thunks with bare names
+        # (`Halt`, `Div`, `Sqrt`, ...) that don't match the Nitro
+        # PREFIX_Name convention. Those names map into OS via
+        # BARE_NAME_SUBSYSTEMS so targets that call them still get
+        # subsystem signal. Regression guard for PR #114's gap.
+        target = _sym("func_ov006_100", "ov006", 0x100)
+        halt = _sym("Halt", "main", 0x200)
+        modules = {
+            "ov006": _module("ov006", [target]),
+            "main":  _module("main", [halt]),
+        }
+        edges = defaultdict(set)
+        edges[("ov006", 0x100)].add(("main", 0x200))
+        self.assertEqual(callee_subsystems(target, modules, edges), {"OS"})
+
+    def test_multiple_bios_thunks_still_single_os_signal(self):
+        # A function calling several BIOS thunks still reports one
+        # OS subsystem (set semantics).
+        target = _sym("func_ov006_100", "ov006", 0x100)
+        thunks = [
+            _sym("Halt", "main", 0x200),
+            _sym("Div",  "main", 0x204),
+            _sym("Sqrt", "main", 0x208),
+        ]
+        modules = {
+            "ov006": _module("ov006", [target]),
+            "main":  _module("main", thunks),
+        }
+        edges = defaultdict(set)
+        for t in thunks:
+            edges[("ov006", 0x100)].add((t.module, t.addr))
+        self.assertEqual(callee_subsystems(target, modules, edges), {"OS"})
+
+    def test_prefix_name_and_bare_name_coexist(self):
+        # Target calls both a PREFIX_Name (OS_GetTick) AND a bare
+        # BIOS thunk (Halt) — both paths contribute, union is {OS}.
+        target = _sym("func_ov006_100", "ov006", 0x100)
+        callees = [
+            _sym("OS_GetTick", "main", 0x200),
+            _sym("Halt",       "main", 0x204),
+        ]
+        modules = {
+            "ov006": _module("ov006", [target]),
+            "main":  _module("main", callees),
+        }
+        edges = defaultdict(set)
+        for c in callees:
+            edges[("ov006", 0x100)].add((c.module, c.addr))
+        self.assertEqual(
+            callee_subsystems(target, modules, edges), {"OS"},
+        )
+
+    def test_prefix_name_and_bare_name_different_subsystems(self):
+        # Target calls GX_Init (GX prefix) and Halt (bare → OS) —
+        # both should land in the signal set.
+        target = _sym("func_ov006_100", "ov006", 0x100)
+        callees = [
+            _sym("GX_Init", "main", 0x200),
+            _sym("Halt",    "main", 0x204),
+        ]
+        modules = {
+            "ov006": _module("ov006", [target]),
+            "main":  _module("main", callees),
+        }
+        edges = defaultdict(set)
+        for c in callees:
+            edges[("ov006", 0x100)].add((c.module, c.addr))
+        self.assertEqual(
+            callee_subsystems(target, modules, edges), {"GX", "OS"},
+        )
+
+    def test_bare_name_mapping_is_deliberately_narrow(self):
+        # `Entry` and `__register_global_object` are not in the
+        # BARE_NAME_SUBSYSTEMS table (deliberately — those names
+        # don't carry subsystem identity). Verify they still don't
+        # contribute signal after the lookup is added.
+        from nitro_suggest_renames import BARE_NAME_SUBSYSTEMS
+        self.assertNotIn("Entry", BARE_NAME_SUBSYSTEMS)
+        self.assertNotIn(
+            "__register_global_object", BARE_NAME_SUBSYSTEMS,
+        )
+        self.assertNotIn("main", BARE_NAME_SUBSYSTEMS)
+
+    def test_known_brief_011_thunks_all_in_table(self):
+        # Regression guard: every BIOS SWI thunk shipped in briefs
+        # 011 and 013 must be in the BARE_NAME_SUBSYSTEMS table.
+        # If brief 011's list grows later, adding the new names
+        # is a one-line dict addition and this test will remind
+        # whoever misses one.
+        from nitro_suggest_renames import BARE_NAME_SUBSYSTEMS
+        expected = {
+            "SoftReset", "WaitByLoop", "IntrWait", "VBlankIntrWait",
+            "Halt", "CpuSet", "CpuFastSet", "Sqrt", "Div", "Mod",
+            "GetCRC16", "IsDebugger", "BitUnPack",
+            "LZ77UnCompReadNormalWrite8bit",
+            "LZ77UnCompReadByCallbackWrite16bit",
+            "HuffUnCompReadByCallback",
+            "RLUnCompReadNormalWrite8bit",
+            "RLUnCompReadByCallbackWrite16bit",
+        }
+        missing = expected - set(BARE_NAME_SUBSYSTEMS)
+        self.assertEqual(missing, set(), f"missing from map: {missing}")
+        # And they all map to OS specifically (BIOS lives under OS
+        # in ntrtwl/NitroSDK).
+        for name in expected:
+            self.assertEqual(BARE_NAME_SUBSYSTEMS[name], "OS", name)
+
 
 class TestInferArgcount(unittest.TestCase):
     def test_small_leaf_is_zero(self):
