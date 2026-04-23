@@ -1,8 +1,8 @@
 """Unit tests for tools/ci_format_worklist_diff.py.
 
-The CI comment pipeline (if this tool gets wired up) will pipe
-render() output straight into `gh pr comment`. Regressions here
-would spam every decomp PR with malformed markdown. Pinning:
+The CI comment pipeline pipes render() output straight into `gh pr
+comment`. Regressions here would spam every decomp PR with malformed
+markdown. Pinning:
 
   - JSON loader tolerates malformed rows + parses hex addrs
   - compute_diff: landed / new / migrations classified correctly
@@ -10,15 +10,19 @@ would spam every decomp PR with malformed markdown. Pinning:
   - Sorting is deterministic (tier rank → size → addr)
   - render() covers: no-changes case, mixed case, per-section
     limit truncation, tier-summary bold-on-nonzero, footer marker
+  - main() is robust to non-UTF-8 stdout (Windows cp1252 consoles)
 """
 
 from __future__ import annotations
 
+import io
 import json
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -396,6 +400,70 @@ class TestEndToEnd(unittest.TestCase):
         self.assertIn("`func_ov015_021b1234`", md)
         self.assertIn("`medium`", md)
         self.assertIn("`named`", md)
+
+
+class TestMainUtf8StdoutReconfigure(unittest.TestCase):
+    """Regression coverage for the Windows cp1252 stdout crash.
+
+    `render()` includes the 📉 emoji (plus ✅ 🆕 🔀 in richer diffs).
+    On a default Windows cp1252 console, `print(md)` would raise
+    UnicodeEncodeError before the fix. `main()` reconfigures stdout
+    to utf-8 early to prevent that; these tests pin the guard.
+    """
+
+    def _write_pair_with_landed_match(self, td: Path) -> tuple[Path, Path]:
+        """Create a before/after pair that exercises the emoji-rich
+        path (matches-landed banner surfaces ✅, header always has 📉)."""
+        before = td / "before.json"
+        after = td / "after.json"
+        _write_snapshot(before, [
+            {"tier": "easy", "module": "ov006",
+             "addr": "0x021ba1f0", "size": 8, "name": "x"},
+        ], breakdown={"easy": {"matched": 1, "unmatched": 2, "total": 3}})
+        _write_snapshot(after, [], breakdown={
+            "easy": {"matched": 2, "unmatched": 1, "total": 3},
+        })
+        return before, after
+
+    def test_main_with_ascii_only_stdout_does_not_crash(self):
+        """Simulate a cp1252 console by routing stdout through a
+        BytesIO wrapped in a TextIOWrapper with encoding='cp1252'
+        and errors='strict'. Before the fix, `print(md)` would raise
+        UnicodeEncodeError on the 📉 header. After the fix, main()
+        reconfigures to utf-8 early and the write succeeds."""
+        from ci_format_worklist_diff import main
+        with tempfile.TemporaryDirectory() as td:
+            before, after = self._write_pair_with_landed_match(Path(td))
+            buf = io.BytesIO()
+            ascii_stdout = io.TextIOWrapper(
+                buf, encoding="cp1252", errors="strict",
+                write_through=True,
+            )
+            argv = ["ci_format_worklist_diff.py", str(before), str(after)]
+            with patch.object(sys, "argv", argv), \
+                 redirect_stdout(ascii_stdout):
+                rc = main()
+            ascii_stdout.flush()
+            self.assertEqual(rc, 0)
+        written = buf.getvalue()
+        # The header emoji must be preserved in the bytes — reconfigure
+        # switched the encoding to utf-8 in place, so it's encoded as
+        # the utf-8 byte sequence for 📉 (0xF0 0x9F 0x93 0x89).
+        self.assertIn(b"\xf0\x9f\x93\x89", written)
+
+    def test_main_with_no_reconfigure_support_does_not_crash(self):
+        """Some stdout replacements (StringIO, custom test captures)
+        don't expose `reconfigure` at all. The try/except around the
+        call must swallow AttributeError cleanly."""
+        from ci_format_worklist_diff import main
+        with tempfile.TemporaryDirectory() as td:
+            before, after = self._write_pair_with_landed_match(Path(td))
+            buf = io.StringIO()  # no .reconfigure method
+            argv = ["ci_format_worklist_diff.py", str(before), str(after)]
+            with patch.object(sys, "argv", argv), redirect_stdout(buf):
+                rc = main()
+            self.assertEqual(rc, 0)
+        self.assertIn("📉 Worklist delta", buf.getvalue())
 
 
 if __name__ == "__main__":
