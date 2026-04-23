@@ -92,3 +92,7 @@ src/overlay010/ov010_021b6c1c.c:
 src/overlay010/ov010_021b6c34.c:
     complete
     .text start:0x021b6c34 end:0x021b6c4c
+
+src/overlay010/ov010_021b2348.c:
+    complete
+    .text start:0x021b2348 end:0x021b235c

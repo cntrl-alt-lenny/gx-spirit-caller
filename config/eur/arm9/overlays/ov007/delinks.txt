@@ -47,3 +47,7 @@ src/overlay007/ov007_021b2cf8.c:
 src/overlay007/ov007_021b2ee4.c:
     complete
     .text start:0x021b2ee4 end:0x021b2ef0
+
+src/overlay007/ov007_021b2c44.c:
+    complete
+    .text start:0x021b2c44 end:0x021b2c58
