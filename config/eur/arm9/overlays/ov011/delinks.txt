@@ -44,3 +44,7 @@ src/overlay011/ov011_021ce324.c:
 src/overlay011/ov011_021ce334.c:
     complete
     .text start:0x021ce334 end:0x021ce344
+
+src/overlay011/sinit_ov011_021d3620.c:
+    complete
+    .init start:0x021d3620 end:0x021d3654
