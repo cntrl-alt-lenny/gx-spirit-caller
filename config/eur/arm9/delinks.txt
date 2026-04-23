@@ -404,3 +404,115 @@ src/main/func_02068964.c:
 src/main/func_020689b0.c:
     complete
     .text start:0x020689b0 end:0x020689b8
+
+src/main/func_02062510.c:
+    complete
+    .text start:0x02062510 end:0x02062518
+
+src/main/func_02068990.c:
+    complete
+    .text start:0x02068990 end:0x02068998
+
+src/main/func_020689dc.c:
+    complete
+    .text start:0x020689dc end:0x020689e4
+
+src/main/func_02068ca0.c:
+    complete
+    .text start:0x02068ca0 end:0x02068ca8
+
+src/main/func_0206a314.c:
+    complete
+    .text start:0x0206a314 end:0x0206a31c
+
+src/main/func_02074450.c:
+    complete
+    .text start:0x02074450 end:0x02074458
+
+src/main/func_0207d318.c:
+    complete
+    .text start:0x0207d318 end:0x0207d320
+
+src/main/func_0207def8.c:
+    complete
+    .text start:0x0207def8 end:0x0207df00
+
+src/main/func_0207df00.c:
+    complete
+    .text start:0x0207df00 end:0x0207df08
+
+src/main/func_0207df08.c:
+    complete
+    .text start:0x0207df08 end:0x0207df10
+
+src/main/func_0207df10.c:
+    complete
+    .text start:0x0207df10 end:0x0207df18
+
+src/main/func_0207df18.c:
+    complete
+    .text start:0x0207df18 end:0x0207df20
+
+src/main/func_0207e230.c:
+    complete
+    .text start:0x0207e230 end:0x0207e238
+
+src/main/func_0207f87c.c:
+    complete
+    .text start:0x0207f87c end:0x0207f884
+
+src/main/func_0207fce0.c:
+    complete
+    .text start:0x0207fce0 end:0x0207fce8
+
+src/main/func_02081f48.c:
+    complete
+    .text start:0x02081f48 end:0x02081f50
+
+src/main/func_020908f0.c:
+    complete
+    .text start:0x020908f0 end:0x020908f8
+
+src/main/func_02091688.c:
+    complete
+    .text start:0x02091688 end:0x02091690
+
+src/main/func_02091814.c:
+    complete
+    .text start:0x02091814 end:0x0209181c
+
+src/main/func_02092380.c:
+    complete
+    .text start:0x02092380 end:0x02092388
+
+src/main/func_02095e60.c:
+    complete
+    .text start:0x02095e60 end:0x02095e68
+
+src/main/func_0209678c.c:
+    complete
+    .text start:0x0209678c end:0x02096794
+
+src/main/func_02098618.c:
+    complete
+    .text start:0x02098618 end:0x02098620
+
+src/main/func_02098620.c:
+    complete
+    .text start:0x02098620 end:0x02098628
+
+src/main/func_020986b8.c:
+    complete
+    .text start:0x020986b8 end:0x020986c0
+
+src/main/func_0209b49c.c:
+    complete
+    .text start:0x0209b49c end:0x0209b4a4
+
+src/main/func_020b2970.c:
+    complete
+    .text start:0x020b2970 end:0x020b2978
+
+src/main/func_020b427c.c:
+    complete
+    .text start:0x020b427c end:0x020b4284
