@@ -376,23 +376,100 @@ def _parse_module_from_template(path: Path) -> str:
     )
 
 
+def _module_dir_name(module: str) -> str:
+    """Map a module key to its source-tree directory name.
+
+    Mirrors the convention checked into `src/`:
+      main / itcm / dtcm → literal directory name
+      ov000 ... ov023    → overlay000 ... overlay023
+
+    Used by `_derive_output_path` to swap the parent directory on
+    cross-module template propagation — otherwise the generated file
+    lands under the template's directory (wrong ninja/configure
+    bucket).
+    """
+    if module in ("main", "itcm", "dtcm"):
+        return module
+    if module.startswith("ov") and module[2:].isdigit():
+        n = int(module[2:])
+        return f"overlay{n:03d}"
+    raise ValueError(f"unknown module key for directory mapping: {module!r}")
+
+
 def _derive_output_path(
     template_path: Path, template_sym: Symbol, target_sym: Symbol,
 ) -> Path:
-    """Generate an output path by substituting the symbol name inside
-    the template's filename stem."""
-    old = template_sym.name
-    new = target_sym.name
-    if old in template_path.stem:
-        new_stem = template_path.stem.replace(old, new)
+    """Generate an output path by mapping template → target across
+    both the parent directory (if modules differ) and the filename
+    stem (symbol name or `<module>_<hex>` substitution).
+
+    Decomper's filename conventions:
+      - `src/main/func_02000800.c` (stem == symbol name)
+      - `src/overlay005/ov005_021b16e4.c` (stem uses `ovNNN_hex`,
+        symbol name is `func_ov005_021b16e4` — stem omits the
+        `func_` prefix)
+
+    Bug fix (#122): the prior version only substituted the full
+    symbol name in the stem. For overlay templates the symbol-name
+    check never matched (no `func_` in stem), so it fell through
+    to a hex-tail substitution — and on cross-module same-address
+    pairs (e.g. ov015|0x021b2334 → ov010|0x021b2334) the hex-tail
+    substitution was a no-op and the output collapsed to the
+    template path. This version handles the `ovNNN_hex` stem shape
+    AND swaps the parent directory when modules differ.
+    """
+    # Step 1: parent directory. If modules match we keep the template's
+    # parent as-is. If they differ, swap the module directory part.
+    if template_sym.module == target_sym.module:
+        target_parent = template_path.parent
     else:
-        # Fallback: substitute the hex-addr tail.
-        new_stem = re.sub(
-            r"[0-9a-fA-F]{6,8}$",
-            f"{target_sym.addr:08x}",
-            template_path.stem,
-        )
-    return template_path.with_name(new_stem + template_path.suffix)
+        t_dir = _module_dir_name(template_sym.module)
+        s_dir = _module_dir_name(target_sym.module)
+        parts = list(template_path.parent.parts)
+        new_parts = [s_dir if p == t_dir else p for p in parts]
+        if new_parts == parts:
+            # Template path didn't contain the expected module
+            # directory component (unusual). Leave parent unchanged;
+            # caller will notice via the existing `output_path
+            # already exists` / `--confirm` path.
+            target_parent = template_path.parent
+        else:
+            target_parent = Path(*new_parts)
+
+    # Step 2: stem rewrite. Try in order:
+    #   (a) full symbol name (main-style filenames)
+    #   (b) `<template_module>_<template_hex>` token (overlay-style)
+    #   (c) hex-tail fallback (last-resort, mirrors the pre-fix
+    #       behaviour so same-module / same-convention templates
+    #       still work)
+    stem = template_path.stem
+    t_name = template_sym.name
+    s_name = target_sym.name
+
+    if t_name in stem:
+        new_stem = stem.replace(t_name, s_name)
+    else:
+        t_token = f"{template_sym.module}_{template_sym.addr:08x}"
+        s_token = f"{target_sym.module}_{target_sym.addr:08x}"
+        if t_token in stem:
+            new_stem = stem.replace(t_token, s_token)
+        else:
+            # Hex-tail fallback. Note: also swap module token if
+            # both modules appear in the stem (rare, defensive —
+            # covers hand-rolled filenames that embed both).
+            scratch = stem
+            if template_sym.module != target_sym.module \
+                    and template_sym.module in scratch:
+                scratch = scratch.replace(
+                    template_sym.module, target_sym.module,
+                )
+            new_stem = re.sub(
+                r"[0-9a-fA-F]{6,8}$",
+                f"{target_sym.addr:08x}",
+                scratch,
+            )
+
+    return target_parent / (new_stem + template_path.suffix)
 
 
 def _format_delinks_tu_header(src_path: Path, sym: Symbol) -> str:

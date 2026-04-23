@@ -32,6 +32,7 @@ from propagate_template import (  # noqa: E402
     TemplateMismatch,
     _augment_bss_symbols,
     _derive_output_path,
+    _module_dir_name,
     _parse_addr_from_template,
     _parse_module_from_template,
     _substitute_addr_comments,
@@ -219,6 +220,126 @@ class TestDeriveOutputPath(unittest.TestCase):
             t_sym, s_sym,
         )
         self.assertEqual(out.stem, "foo_9abcdef0")
+
+
+class TestCrossModulePropagation(unittest.TestCase):
+    """Regression tests for PR #122's bug: cross-module same-address
+    propagation silently no-op'd because the filename stem uses
+    `<module>_<hex>` while the symbol name is `func_<module>_<hex>`,
+    so the "full name in stem" check failed and the hex-tail fallback
+    wrote back the same address. Output path collapsed to the
+    template path and `--confirm` appeared to run but wrote nothing.
+
+    These tests pin the fix:
+      - parent directory swapped to target module
+      - `<tmod>_<hex>` → `<smod>_<hex>` stem substitution
+      - same-address-different-module no longer collapses
+    """
+
+    def test_cross_module_same_addr_overlay(self):
+        # The exact shape from PR #122: template in ov015, target in
+        # ov010, both at address 0x021b2334. Output must land in
+        # src/overlay010/ov010_021b2334.c, not src/overlay015/... .
+        t_sym = _sym(
+            "func_ov015_021b2334", "ov015", 0x021b2334,
+        )
+        s_sym = _sym(
+            "func_ov010_021b2334", "ov010", 0x021b2334,
+        )
+        out = _derive_output_path(
+            Path("src/overlay015/ov015_021b2334.c"),
+            t_sym, s_sym,
+        )
+        self.assertEqual(
+            out, Path("src/overlay010/ov010_021b2334.c"),
+        )
+
+    def test_cross_module_different_addrs_overlay(self):
+        # Common case: crossing modules AND addresses.
+        t_sym = _sym(
+            "func_ov015_021b2334", "ov015", 0x021b2334,
+        )
+        s_sym = _sym(
+            "func_ov010_021b24f4", "ov010", 0x021b24f4,
+        )
+        out = _derive_output_path(
+            Path("src/overlay015/ov015_021b2334.c"),
+            t_sym, s_sym,
+        )
+        self.assertEqual(
+            out, Path("src/overlay010/ov010_021b24f4.c"),
+        )
+
+    def test_cross_module_main_to_overlay(self):
+        # Template in main/, target in ov005/. Both parent directory
+        # AND stem need to change.
+        t_sym = _sym("func_02000800", "main", 0x02000800)
+        s_sym = _sym(
+            "func_ov005_021b1710", "ov005", 0x021b1710,
+        )
+        out = _derive_output_path(
+            Path("src/main/func_02000800.c"),
+            t_sym, s_sym,
+        )
+        # For main→overlay, the stem replacement falls back to
+        # hex-tail since neither the full-name nor the
+        # `<tmod>_<hex>` token pattern applies. The hex-tail swap
+        # + parent-dir swap still land in the right place.
+        self.assertEqual(out.parent, Path("src/overlay005"))
+        self.assertTrue(out.stem.endswith("021b1710"))
+
+    def test_module_dir_name_main_family(self):
+        self.assertEqual(_module_dir_name("main"), "main")
+        self.assertEqual(_module_dir_name("itcm"), "itcm")
+        self.assertEqual(_module_dir_name("dtcm"), "dtcm")
+
+    def test_module_dir_name_overlay(self):
+        self.assertEqual(_module_dir_name("ov005"), "overlay005")
+        self.assertEqual(_module_dir_name("ov023"), "overlay023")
+        self.assertEqual(_module_dir_name("ov000"), "overlay000")
+
+    def test_module_dir_name_unknown_raises(self):
+        with self.assertRaises(ValueError):
+            _module_dir_name("weird")
+        with self.assertRaises(ValueError):
+            _module_dir_name("ov__")
+
+    def test_same_module_keeps_parent_directory(self):
+        # Within-module propagation (the original working case) must
+        # not regress: parent directory preserved, stem changes.
+        t_sym = _sym(
+            "__sinit_ov005_021b16e4", "ov005", 0x021b16e4,
+        )
+        s_sym = _sym(
+            "__sinit_ov005_021b1710", "ov005", 0x021b1710,
+        )
+        out = _derive_output_path(
+            Path("src/overlay005/sinit_ov005_021b16e4.c"),
+            t_sym, s_sym,
+        )
+        self.assertEqual(
+            out, Path("src/overlay005/sinit_ov005_021b1710.c"),
+        )
+
+    def test_cross_module_token_only_in_stem_not_name(self):
+        # Stem uses `ovNNN_hex` pattern. Full symbol name
+        # (`func_ovNNN_hex`) doesn't appear in stem. The new
+        # token-substitution branch is what makes this work.
+        t_sym = _sym(
+            "func_ov015_021b2334", "ov015", 0x021b2334,
+        )
+        s_sym = _sym(
+            "func_ov010_021b2334", "ov010", 0x021b2334,
+        )
+        out = _derive_output_path(
+            Path("src/overlay015/ov015_021b2334.c"),
+            t_sym, s_sym,
+        )
+        # Before the fix, this test would have failed with output =
+        # template (same stem, same directory, effectively no-op).
+        self.assertNotEqual(
+            out, Path("src/overlay015/ov015_021b2334.c"),
+        )
 
 
 class TestDerivePlan(unittest.TestCase):
