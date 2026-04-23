@@ -238,6 +238,25 @@ That number can be misleading if you're new:
 The goal is "the SHA-1 of the rebuilt ROM matches the baserom SHA-1".
 Everything else is a proxy.
 
+## Local setup extras (optional but recommended)
+
+One-time hook installation that catches metadata-drift errors
+before they reach CI:
+
+```bash
+python tools/install_git_hooks.py
+```
+
+This sets `core.hooksPath=.githooks` so every `git push` runs
+`tools/check_match_invariants.py` and blocks if errors are found.
+Warnings (currently ~317 pre-existing `complete_tu_rename` backlog)
+are let through. Bypass a single push with `git push --no-verify`;
+uninstall with `python tools/install_git_hooks.py --uninstall`.
+
+Caught #135's `.c`-listed-but-`.s`-on-disk delinks mismatch in
+testing before CI would have flagged it — same shape of bug that
+costs a PR round-trip each time it happens.
+
 ## What a PR means in this setup
 
 A pull request is just a git branch with a note attached. The flow is:
