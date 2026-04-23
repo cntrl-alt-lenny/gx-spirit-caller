@@ -103,3 +103,15 @@ src/main/func_0203c5a4.c:
 src/main/func_02037c54.c:
     complete
     .text start:0x02037c54 end:0x02037ca0
+
+src/main/func_020139b4.c:
+    complete
+    .text start:0x020139b4 end:0x020139c4
+
+src/main/func_020139c4.c:
+    complete
+    .text start:0x020139c4 end:0x020139d4
+
+src/main/func_020139d4.c:
+    complete
+    .text start:0x020139d4 end:0x020139e4
