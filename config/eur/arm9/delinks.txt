@@ -91,3 +91,7 @@ src/main/RLUnCompReadNormalWrite8bit.s:
 src/main/SoftReset.s:
     complete
     .text start:0x0200078a end:0x0200078e
+
+src/main/func_0203c5e4.c:
+    complete
+    .text start:0x0203c5e4 end:0x0203c620
