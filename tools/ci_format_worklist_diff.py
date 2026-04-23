@@ -56,6 +56,7 @@ base + head commits, same pattern as analyzer.yml's tier-delta job.)
 
 from __future__ import annotations
 
+import io
 import json
 import sys
 from dataclasses import dataclass
@@ -323,6 +324,18 @@ def _signed(n: int) -> str:
 # --------------------------------------------------------------------------- #
 
 def main() -> int:
+    # Force UTF-8 on stdout so the emoji header (📉 ✅ 🆕 🔀) survives
+    # on Windows cp1252 consoles when the tool is run locally. The
+    # `-o <path>` writer already pins utf-8; this covers the plain
+    # `python tools/ci_format_worklist_diff.py before.json after.json`
+    # invocation that crashes otherwise. No-op in environments where
+    # stdout is already utf-8 (Linux/macOS, GitHub Actions runners)
+    # or where reconfigure isn't available (piped, non-TextIO stdout).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, io.UnsupportedOperation):
+        pass
+
     args = sys.argv[1:]
     out_path: Path | None = None
     positional: list[str] = []
