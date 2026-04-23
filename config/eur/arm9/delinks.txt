@@ -3,3 +3,35 @@
     .ctor       start:0x020c3bbc end:0x020c3bbc kind:rodata align:4
     .data       start:0x020c3bc0 end:0x02102c60 kind:data align:32
     .bss        start:0x02102c60 end:0x021aa4a0 kind:bss align:32
+
+src/main/CpuSet.c:
+    complete
+    .text start:0x02000254 end:0x02000258
+
+src/main/HuffUnCompReadByCallback.c:
+    complete
+    .text start:0x02000394 end:0x02000398
+
+src/main/WaitByLoop.c:
+    complete
+    .text start:0x02000400 end:0x02000404
+
+src/main/LZ77UnCompReadNormalWrite8bit.c:
+    complete
+    .text start:0x020004b0 end:0x020004b4
+
+src/main/CpuFastSet.c:
+    complete
+    .text start:0x02000524 end:0x02000528
+
+src/main/Halt.c:
+    complete
+    .text start:0x02000584 end:0x02000588
+
+src/main/IntrWait.c:
+    complete
+    .text start:0x020006b0 end:0x020006b4
+
+src/main/Sqrt.c:
+    complete
+    .text start:0x02000728 end:0x0200072c
