@@ -1,0 +1,23 @@
+/* func_ov000_021ae4c4: extract top byte of u32 field at data+0x2a8.
+ *
+ *     ldr r0, .L
+ *     ldr r0, [r0, #0x2a8]
+ *     mov r0, r0, lsr #0x18       ; >> 24 (unsigned)
+ *     bx  lr
+ *
+ * Same global (data_ov000_021c758c) as func_ov000_021adc1c but at
+ * a different offset. Each file declares its own typedef for the
+ * padding shape; they don't need to agree since externs match by
+ * symbol name not type.
+ */
+
+typedef struct {
+    char _pad[0x2a8];
+    unsigned int field_2a8;
+} ov000_state_2a8_t;
+
+extern ov000_state_2a8_t data_ov000_021c758c;
+
+unsigned func_ov000_021ae4c4(void) {
+    return data_ov000_021c758c.field_2a8 >> 24;
+}
