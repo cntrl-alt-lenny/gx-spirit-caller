@@ -884,3 +884,31 @@ src/main/func_02091700.s:
 src/main/func_02093bfc.s:
     complete
     .text start:0x02093bfc end:0x02093c10
+
+src/main/func_0201e80c.c:
+    complete
+    .text start:0x0201e80c end:0x0201e818
+
+src/main/func_02022270.c:
+    complete
+    .text start:0x02022270 end:0x0202227c
+
+src/main/func_0202c93c.c:
+    complete
+    .text start:0x0202c93c end:0x0202c948
+
+src/main/func_02031ff0.c:
+    complete
+    .text start:0x02031ff0 end:0x02031ffc
+
+src/main/func_02032344.c:
+    complete
+    .text start:0x02032344 end:0x02032350
+
+src/main/func_02032e80.c:
+    complete
+    .text start:0x02032e80 end:0x02032e8c
+
+src/main/func_020335c8.c:
+    complete
+    .text start:0x020335c8 end:0x020335d4
