@@ -1,9 +1,11 @@
 name: Match invariants
 
 # Pre-flight metadata sanity checks for the decomp:
-#   - Placeholder-named symbols inside `complete` TUs (warn)
-#   - Orphan `extern` declarations in src/ whose target was renamed (warn)
+#   - src/ references a name not in symbols.txt + not declared in
+#     libs/**/*.h — #171-class rebase drift (error, blocks merge)
 #   - TU sources listed in delinks.txt but missing on disk (error)
+#   - Orphan `extern` declarations in src/ whose target was renamed (warn)
+#   - Placeholder-named symbols inside `complete` TUs (warn)
 #
 # On PRs: upserts a single comment summarising the findings. Job
 # exit status reflects whether any error-severity issues were found

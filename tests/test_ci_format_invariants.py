@@ -50,9 +50,36 @@ def _issue(check: str, severity: str = "warn", **kwargs) -> dict:
 
 class TestCheckOrder(unittest.TestCase):
     def test_error_severity_checks_come_first(self):
-        # missing_tu_source is the only error-severity check and
-        # should lead — most urgent to fix.
-        self.assertEqual(CHECK_ORDER[0], "missing_tu_source")
+        # cross_file_name_drift (PR #185) leads — it's the most
+        # severe class of drift (rebase footgun that silently
+        # passes build but corrupts subsequent renames). Second
+        # is missing_tu_source.
+        self.assertEqual(CHECK_ORDER[0], "cross_file_name_drift")
+        self.assertEqual(CHECK_ORDER[1], "missing_tu_source")
+
+    def test_all_four_checks_are_ordered(self):
+        # Regression pin: adding a new check without also wiring it
+        # into CHECK_ORDER means its issues get silently dropped
+        # from the PR comment.
+        expected = {
+            "cross_file_name_drift",
+            "missing_tu_source",
+            "orphan_extern",
+            "complete_tu_rename",
+        }
+        self.assertEqual(set(CHECK_ORDER), expected)
+
+    def test_every_check_has_a_description(self):
+        # A check without a CHECK_DESC entry renders the section
+        # header but no _italic explanation_ — brain / agents
+        # lose the "what does this mean?" context. Pin all four
+        # have descriptions.
+        from ci_format_invariants import CHECK_DESC
+        for check in CHECK_ORDER:
+            self.assertIn(
+                check, CHECK_DESC,
+                f"{check} is in CHECK_ORDER but missing CHECK_DESC",
+            )
 
 
 class TestFmtIssue(unittest.TestCase):
@@ -137,8 +164,10 @@ class TestRenderWithErrors(unittest.TestCase):
 
     def test_mixed_errors_and_warnings(self):
         md = render({
-            "count": 5, "errors": 1, "warnings": 4,
+            "count": 6, "errors": 2, "warnings": 4,
             "issues": [
+                _issue("cross_file_name_drift", severity="error",
+                       path="src/main/foo.c:42"),
                 _issue("missing_tu_source", severity="error",
                        path="src/missing.c"),
                 _issue("complete_tu_rename", module="ov005", addr=0x100),
@@ -150,13 +179,53 @@ class TestRenderWithErrors(unittest.TestCase):
         # Mixed → error banner wins (block merge note is shown).
         self.assertIn("block merge", md)
         # Section order follows CHECK_ORDER:
-        # missing_tu_source, orphan_extern, complete_tu_rename.
+        # cross_file_name_drift, missing_tu_source, orphan_extern,
+        # complete_tu_rename.
+        drift_pos = md.find("### `cross_file_name_drift`")
         ms_pos = md.find("### `missing_tu_source`")
         oe_pos = md.find("### `orphan_extern`")
         ct_pos = md.find("### `complete_tu_rename`")
-        self.assertGreater(ms_pos, 0)
+        self.assertGreater(drift_pos, 0)
+        self.assertGreater(ms_pos, drift_pos)
         self.assertGreater(oe_pos, ms_pos)
         self.assertGreater(ct_pos, oe_pos)
+
+    def test_drift_issue_renders_with_full_context(self):
+        # Regression pin for PR #185: drift issues MUST appear in
+        # the PR comment body. Previously, adding a new check to
+        # check_match_invariants.py without updating this
+        # formatter's CHECK_ORDER silently dropped them from the
+        # comment — the workflow exit-code would still fail, but
+        # the user saw "1 error" with no detail about which file.
+        md = render({
+            "count": 1, "errors": 1, "warnings": 0,
+            "issues": [_issue(
+                "cross_file_name_drift",
+                severity="error",
+                path="src/main/taskfoo.c:15",
+                message=(
+                    "`extern ... Task_Drift` references a symbol not "
+                    "in any symbols.txt and not declared in "
+                    "libs/**/*.h. Likely a rebase drift (see #171)."
+                ),
+                suggestion=(
+                    "Verify symbols.txt has a `Task_Drift` entry at "
+                    "the expected address."
+                ),
+            )],
+        })
+        # Section header + count present.
+        self.assertIn("### `cross_file_name_drift`", md)
+        self.assertIn("(1 error(s))", md)
+        # File location surfaces.
+        self.assertIn("src/main/taskfoo.c:15", md)
+        # Message + suggestion survive rendering.
+        self.assertIn("rebase drift", md)
+        self.assertIn("Task_Drift", md)
+        # Check-description text is included.
+        self.assertIn("rebase drift", md.lower())
+        # Error emoji fires on the issue itself.
+        self.assertIn("🛑", md)
 
 
 class TestPerCheckLimit(unittest.TestCase):
