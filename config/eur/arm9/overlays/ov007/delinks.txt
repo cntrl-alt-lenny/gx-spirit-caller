@@ -10,9 +10,11 @@ src/overlay007/sinit_ov007_021b2f38.c:
 
 
 
+
 src/overlay007/sinit_ov007_021b2f64.c:
     complete
     .init start:0x021b2f64 end:0x021b2f90
+
 
 
 
@@ -22,9 +24,11 @@ src/overlay007/ov007_stubs_b2560.c:
 
 
 
+
 src/overlay007/ov007_stubs_b2a90.c:
     complete
     .text start:0x021b2a90 end:0x021b2a98
+
 
 
 
@@ -34,9 +38,11 @@ src/overlay007/ov007_021b2598.c:
 
 
 
+
 src/overlay007/ov007_021b2628.c:
     complete
     .text start:0x021b2628 end:0x021b2630
+
 
 
 
@@ -46,9 +52,11 @@ src/overlay007/ov007_021b2ac8.c:
 
 
 
+
 src/overlay007/ov007_021b2b6c.c:
     complete
     .text start:0x021b2b6c end:0x021b2b74
+
 
 
 
@@ -58,9 +66,11 @@ src/overlay007/ov007_021b2ce8.c:
 
 
 
+
 src/overlay007/ov007_021b2cf8.c:
     complete
     .text start:0x021b2cf8 end:0x021b2d0c
+
 
 
 
@@ -70,13 +80,16 @@ src/overlay007/ov007_021b2ee4.c:
 
 
 
+
 src/overlay007/ov007_021b2c44.c:
     complete
     .text start:0x021b2c44 end:0x021b2c58
 
+
 src/overlay007/ov007_021b2568.c:
     complete
     .text start:0x021b2568 end:0x021b2598
+
 
 src/overlay007/ov007_021b2a98.c:
     complete
