@@ -9,69 +9,86 @@ src/overlay015/sinit_ov015_021b5b14.c:
     complete
     .init start:0x021b5b14 end:0x021b5b40
 
+
 src/overlay015/sinit_ov015_021b5b40.c:
     complete
     .init start:0x021b5b40 end:0x021b5b7c
+
 
 src/overlay015/ov015_021b2480.c:
     complete
     .text start:0x021b2480 end:0x021b2488
 
+
 src/overlay015/ov015_021b2488.c:
     complete
     .text start:0x021b2488 end:0x021b2490
+
 
 src/overlay015/ov015_021b287c.c:
     complete
     .text start:0x021b287c end:0x021b2888
 
+
 src/overlay015/ov015_021b2888.c:
     complete
     .text start:0x021b2888 end:0x021b2890
+
 
 src/overlay015/ov015_021b3520.c:
     complete
     .text start:0x021b3520 end:0x021b3528
 
+
 src/overlay015/ov015_021b5a64.c:
     complete
     .text start:0x021b5a64 end:0x021b5a6c
+
 
 src/overlay015/ov015_021b2334.c:
     complete
     .text start:0x021b2334 end:0x021b2348
 
+
 src/overlay015/ov015_021b24f4.c:
     complete
     .text start:0x021b24f4 end:0x021b2514
+
 
 src/overlay015/ov015_021b2864.c:
     complete
     .text start:0x021b2864 end:0x021b287c
 
+
 src/overlay015/ov015_021b2890.c:
     complete
     .text start:0x021b2890 end:0x021b28a8
+
 
 src/overlay015/ov015_021b3f80.c:
     complete
     .text start:0x021b3f80 end:0x021b3f98
 
+
 src/overlay015/ov015_021b4040.c:
     complete
     .text start:0x021b4040 end:0x021b405c
+
 
 src/overlay015/ov015_021b2348.c:
     complete
     .text start:0x021b2348 end:0x021b235c
 
+
 src/overlay015/ov015_021b285c.s:
     complete
     .text start:0x021b285c end:0x021b2860
 
+
 src/overlay015/ov015_021b2860.s:
     complete
     .text start:0x021b2860 end:0x021b2864
+
 
 src/overlay015/ov015_021b3168.s:
     complete
