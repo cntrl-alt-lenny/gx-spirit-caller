@@ -141,3 +141,7 @@ src/overlay005/sinit_ov005_021b1768.c:
 src/overlay005/sinit_ov005_021b1794.c:
     complete
     .init start:0x021b1794 end:0x021b17c0
+
+src/overlay005/ov005_021aa4b0.c:
+    complete
+    .text start:0x021aa4b0 end:0x021aa4d0

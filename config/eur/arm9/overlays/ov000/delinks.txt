@@ -185,3 +185,7 @@ src/overlay000/ov000_021ab21c.c:
 src/overlay000/ov000_021acebc.c:
     complete
     .text start:0x021acebc end:0x021acef8
+
+src/overlay000/ov000_021aae70.c:
+    complete
+    .text start:0x021aae70 end:0x021aaea0
