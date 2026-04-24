@@ -884,3 +884,47 @@ src/main/func_02091700.s:
 src/main/func_02093bfc.s:
     complete
     .text start:0x02093bfc end:0x02093c10
+
+src/main/func_02018a38.c:
+    complete
+    .text start:0x02018a38 end:0x02018a64
+
+src/main/func_020186b0.s:
+    complete
+    .text start:0x020186b0 end:0x020186c8
+
+src/main/func_0201a3b8.c:
+    complete
+    .text start:0x0201a3b8 end:0x0201a3ec
+
+src/main/func_0201ab5c.c:
+    complete
+    .text start:0x0201ab5c end:0x0201ab80
+
+src/main/func_0201ad90.c:
+    complete
+    .text start:0x0201ad90 end:0x0201ada0
+
+src/main/func_0201b60c.c:
+    complete
+    .text start:0x0201b60c end:0x0201b630
+
+src/main/func_0201b630.c:
+    complete
+    .text start:0x0201b630 end:0x0201b648
+
+src/main/func_0201b75c.c:
+    complete
+    .text start:0x0201b75c end:0x0201b770
+
+src/main/func_0201b7e0.c:
+    complete
+    .text start:0x0201b7e0 end:0x0201b7fc
+
+src/main/func_0201b7fc.c:
+    complete
+    .text start:0x0201b7fc end:0x0201b82c
+
+src/main/func_0201c198.c:
+    complete
+    .text start:0x0201c198 end:0x0201c1bc
