@@ -73,3 +73,11 @@ src/overlay007/ov007_021b2ee4.c:
 src/overlay007/ov007_021b2c44.c:
     complete
     .text start:0x021b2c44 end:0x021b2c58
+
+src/overlay007/ov007_021b2568.c:
+    complete
+    .text start:0x021b2568 end:0x021b2598
+
+src/overlay007/ov007_021b2a98.c:
+    complete
+    .text start:0x021b2a98 end:0x021b2ac8
