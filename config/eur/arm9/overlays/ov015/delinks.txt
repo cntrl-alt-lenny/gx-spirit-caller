@@ -93,3 +93,7 @@ src/overlay015/ov015_021b2860.s:
 src/overlay015/ov015_021b3168.s:
     complete
     .text start:0x021b3168 end:0x021b316c
+
+src/overlay015/ov015_021b316c.s:
+    complete
+    .text start:0x021b316c end:0x021b3170

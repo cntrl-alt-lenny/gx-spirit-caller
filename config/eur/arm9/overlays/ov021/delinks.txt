@@ -31,4 +31,4 @@ src/overlay021/ov021_021aaad4.c:
 
 src/overlay021/ov021_021ab148.c:
     complete
-    .text start:0x021ab148 end:0x021ab150    .text start:0x021ab148 end:0x021ab150
+    .text start:0x021ab148 end:0x021ab150
