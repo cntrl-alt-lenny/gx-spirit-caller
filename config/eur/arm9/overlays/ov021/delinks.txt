@@ -19,3 +19,19 @@ src/overlay021/ov021_stubs_aa9b4.c:
 src/overlay021/ov021_stubs_aaf54.c:
     complete
     .text start:0x021aaf54 end:0x021aaf5c
+
+src/overlay021/ov021_021aaad4.c:
+    complete
+    .text start:0x021aaad4 end:0x021aaadc
+
+src/overlay021/ov021_021ab148.c:
+    complete
+    .text start:0x021ab148 end:0x021ab150
+
+src/overlay021/ov021_021aaad4.c:
+    complete
+    .text start:0x021aaad4 end:0x021aaadc
+
+src/overlay021/ov021_021ab148.c:
+    complete
+    .text start:0x021ab148 end:0x021ab150
