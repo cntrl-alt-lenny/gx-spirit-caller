@@ -9,29 +9,36 @@ src/overlay017/sinit_ov017_021b7f5c.c:
     complete
     .init start:0x021b7f5c end:0x021b7f88
 
+
 src/overlay017/sinit_ov017_021b7f88.c:
     complete
     .init start:0x021b7f88 end:0x021b7fb4
+
 
 src/overlay017/sinit_ov017_021b7fb4.c:
     complete
     .init start:0x021b7fb4 end:0x021b7fe0
 
+
 src/overlay017/sinit_ov017_021b7fe0.c:
     complete
     .init start:0x021b7fe0 end:0x021b800c
+
 
 src/overlay017/ov017_stubs_b2dd4.c:
     complete
     .text start:0x021b2dd4 end:0x021b2ddc
 
+
 src/overlay017/ov017_stubs_b4568.c:
     complete
     .text start:0x021b4568 end:0x021b4570
 
+
 src/overlay017/ov017_stubs_b6804.c:
     complete
     .text start:0x021b6804 end:0x021b680c
+
 
 src/overlay017/ov017_stubs_b7738.c:
     complete

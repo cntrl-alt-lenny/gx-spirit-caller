@@ -8,45 +8,56 @@ src/overlay007/sinit_ov007_021b2f38.c:
     complete
     .init start:0x021b2f38 end:0x021b2f64
 
+
 src/overlay007/sinit_ov007_021b2f64.c:
     complete
     .init start:0x021b2f64 end:0x021b2f90
+
 
 src/overlay007/ov007_stubs_b2560.c:
     complete
     .text start:0x021b2560 end:0x021b2568
 
+
 src/overlay007/ov007_stubs_b2a90.c:
     complete
     .text start:0x021b2a90 end:0x021b2a98
+
 
 src/overlay007/ov007_021b2598.c:
     complete
     .text start:0x021b2598 end:0x021b25a0
 
+
 src/overlay007/ov007_021b2628.c:
     complete
     .text start:0x021b2628 end:0x021b2630
+
 
 src/overlay007/ov007_021b2ac8.c:
     complete
     .text start:0x021b2ac8 end:0x021b2ad0
 
+
 src/overlay007/ov007_021b2b6c.c:
     complete
     .text start:0x021b2b6c end:0x021b2b74
+
 
 src/overlay007/ov007_021b2ce8.c:
     complete
     .text start:0x021b2ce8 end:0x021b2cf8
 
+
 src/overlay007/ov007_021b2cf8.c:
     complete
     .text start:0x021b2cf8 end:0x021b2d0c
 
+
 src/overlay007/ov007_021b2ee4.c:
     complete
     .text start:0x021b2ee4 end:0x021b2ef0
+
 
 src/overlay007/ov007_021b2c44.c:
     complete
