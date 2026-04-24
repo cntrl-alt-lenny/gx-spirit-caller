@@ -35,7 +35,7 @@
 
         .text
 
-        .extern func_020937a4
+        .extern OS_DisableIrq
         .extern func_02093bf0
 
         .global func_02093bfc
@@ -44,6 +44,6 @@ func_02093bfc:
         stmdb   sp!, {lr}
         sub     sp, sp, #0x4
 loop_top:
-        bl      func_020937a4
+        bl      OS_DisableIrq
         bl      func_02093bf0
         b       loop_top
