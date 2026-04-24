@@ -257,6 +257,30 @@ Caught #135's `.c`-listed-but-`.s`-on-disk delinks mismatch in
 testing before CI would have flagged it — same shape of bug that
 costs a PR round-trip each time it happens.
 
+### Claude Code hooks (if you run Claude Code)
+
+`.claude/settings.json` wires two hooks that fire inside the agent
+loop (earlier than the git-level `.githooks/pre-push`):
+
+- **PostToolUse on Edit / Write / MultiEdit** →
+  `.claude/hooks/post_edit.py` runs `ruff check` on any edited
+  `tools/*.py` or `tests/*.py` file, then `python -m unittest
+  discover -s tests` if ruff was clean. Non-blocking — surfaces
+  issues in tool output so the agent can fix before committing.
+  Addresses the "F401 unused import found at commit time" class
+  of friction seen across multiple cloud sessions.
+- **PreToolUse on Bash** → `.claude/hooks/pre_bash.py` inspects
+  the Bash command for `git push`; if it matches, runs
+  `check_match_invariants.py --version eur` and BLOCKS (exit 2)
+  on errors. Bypass with `SKIP_INVARIANTS_HOOK=1 git push ...`
+  or `git push --no-verify`. Same backstop as `.githooks/pre-push`
+  but catches the drift earlier in the agent turn.
+
+These hooks are opt-in per Claude Code session — they only fire
+when Claude Code reads `.claude/settings.json`. Raw `git` from a
+terminal uses `.githooks/pre-push` (the installer above); Claude
+Code uses both paths and checks complementarily.
+
 ## What a PR means in this setup
 
 A pull request is just a git branch with a note attached. The flow is:

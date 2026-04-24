@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "description": "Project-level Claude Code settings for the Yu-Gi-Oh GX Spirit Caller decomp. Hooks enforce ruff/test/invariants gates so the agent catches drift in-loop rather than at CI. Keep in sync with docs/decomp-workflow.md § Local setup extras.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/post_edit.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/pre_bash.py"
+          }
+        ]
+      }
+    ]
+  }
+}
