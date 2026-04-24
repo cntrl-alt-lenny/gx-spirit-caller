@@ -1461,3 +1461,7 @@ src/main/func_020b41bc.s:
 src/main/func_0203ab98.s:
     complete
     .text start:0x0203ab98 end:0x0203ab9c
+
+src/main/Copy32.s:
+    complete
+    .text start:0x020944d4 end:0x020944ec
