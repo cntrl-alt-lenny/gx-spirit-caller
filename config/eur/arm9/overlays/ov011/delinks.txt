@@ -178,3 +178,11 @@ src/overlay011/ov011_021d2118.c:
 src/overlay011/ov011_021d2138.c:
     complete
     .text start:0x021d2138 end:0x021d2158
+
+src/overlay011/ov011_021d12bc.s:
+    complete
+    .text start:0x021d12bc end:0x021d12c0
+
+src/overlay011/ov011_021d18b0.s:
+    complete
+    .text start:0x021d18b0 end:0x021d18b4
