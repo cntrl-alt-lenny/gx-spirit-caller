@@ -21,6 +21,23 @@ in plain English — see *Adding or retiring agents* near the bottom.
 Extend this table when a new agent joins; see *Adding or retiring
 agents* below.
 
+### Claude Code subagent configs
+
+The three role definitions are also shipped as Claude Code subagent
+files under `.claude/agents/`:
+
+- [`.claude/agents/brain.md`](.claude/agents/brain.md) — coordinator
+- [`.claude/agents/decomper.md`](.claude/agents/decomper.md) — function matcher
+- [`.claude/agents/cloud.md`](.claude/agents/cloud.md) — scaffolder
+
+Each file captures the role's scope + hands-off paths + workflow loop
+so a fresh Claude Code session can load the appropriate subagent
+(`/agents` picker, or `Task({ subagent_type: "brain" })` from a
+parent session) instead of re-discovering the conventions from
+AGENTS.md cold. The subagent specs are derived from this file — if
+you change the owns/hands-off columns here, update the matching
+`.claude/agents/*.md` too (and vice versa).
+
 ### Why the brain runs locally (PC or Mac), not on a cloud session
 
 The brain needs to actually execute `ninja`, `./dsd.exe check modules`,
