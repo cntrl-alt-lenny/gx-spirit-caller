@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**40 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**41 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis) (10)
+- [Analysis / worklist](#analysis) (11)
 - [Rename support](#rename-support) (6)
 - [Match acceleration](#match-acceleration) (5)
 - [Hygiene / invariants](#invariants) (1)
@@ -63,6 +63,12 @@ The "look up everything that touches X" question comes up constantly during deco
 **call-graph-shape clustering.**
 
 Complements `tools/analyze_symbols.py`'s bulk-group output. Bulk groups cluster strictly by `(module, size, name-family)`, which is conservative by design — it only merges functions the name-prefix heuristic says are related. This tool g…
+
+### `tools/find_mega_cascades.py`
+
+**transitive cascade finder.**
+
+Extends `find_cascades.py` (#132) from single-step to multi-step promotion prediction. Same graph semantics, recursive evaluation.
 
 ### `tools/next_targets.py`
 

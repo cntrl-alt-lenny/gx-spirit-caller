@@ -50,6 +50,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("ci_format_", "ci-formatters", "CI formatters"),
     ("patch_", "infrastructure", "Infrastructure / build-patching"),
     ("nitro_", "rename-support", "Rename support"),
+    ("find_mega_cascades", "analysis", "Analysis / worklist"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
