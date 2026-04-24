@@ -108,41 +108,96 @@ class TestSizeSimilarity(unittest.TestCase):
 
 
 class TestScoreCandidate(unittest.TestCase):
-    def test_identical_callers_and_size(self):
+    def test_identical_all_signals_maxes_at_one(self):
+        # Identical caller-set + size + reloc-sig + adjacent →
+        # score = 0.50 + 0.20 + 0.20 + 0.10 = 1.0.
         anchor = _sym("main", 0x1000)
         cand = _sym("main", 0x2000)  # different addr, same size
         callers = frozenset({("main", 0x5000), ("main", 0x6000)})
-        score, jac, sz, adj, shared = score_candidate(
-            anchor, callers, cand, callers,
+        sig = ((0x8, "arm_call"), (0x10, "load"))
+        score, jac, reloc_jac, sz, adj, shared = score_candidate(
+            anchor, callers, cand, callers, sig, sig,
         )
-        # jac=1, size=1, adjacent (|2000-1000|=0x1000 = window)
         self.assertAlmostEqual(jac, 1.0)
+        self.assertAlmostEqual(reloc_jac, 1.0)
         self.assertAlmostEqual(sz, 1.0)
         self.assertTrue(adj)
-        # 0.6 + 0.3 + 0.1 = 1.0
         self.assertAlmostEqual(score, 1.0, places=4)
         self.assertEqual(shared, callers)
+
+    def test_identical_callers_and_size_no_reloc_sig(self):
+        # Pre-reloc-sig pin: when both sides have no relocs, score
+        # caps at caller + size + adjacency = 0.80 (the 0.20 reloc
+        # weight contributes 0).
+        anchor = _sym("main", 0x1000)
+        cand = _sym("main", 0x2000)
+        callers = frozenset({("main", 0x5000), ("main", 0x6000)})
+        score, jac, reloc_jac, sz, adj, shared = score_candidate(
+            anchor, callers, cand, callers,
+        )
+        self.assertAlmostEqual(jac, 1.0)
+        self.assertAlmostEqual(reloc_jac, 0.0)
+        self.assertAlmostEqual(sz, 1.0)
+        self.assertTrue(adj)
+        # 0.50 + 0.0 + 0.20 + 0.10 = 0.80
+        self.assertAlmostEqual(score, 0.80, places=4)
 
     def test_no_caller_overlap_but_similar_size(self):
         anchor = _sym("main", 0x1000, size=0x20)
         cand = _sym("main", 0x2000, size=0x20)
         a_callers = frozenset({("main", 0x5000)})
         c_callers = frozenset({("main", 0x6000)})
-        score, jac, sz, adj, shared = score_candidate(
+        score, jac, reloc_jac, sz, adj, shared = score_candidate(
             anchor, a_callers, cand, c_callers,
         )
         self.assertEqual(jac, 0.0)
+        self.assertEqual(reloc_jac, 0.0)
         self.assertEqual(sz, 1.0)
         self.assertTrue(adj)
-        # 0 + 0.3 + 0.1 = 0.4
-        self.assertAlmostEqual(score, 0.4, places=4)
+        # 0 + 0 + 0.20 + 0.10 = 0.30
+        self.assertAlmostEqual(score, 0.30, places=4)
         self.assertEqual(shared, frozenset())
+
+    def test_reloc_sig_discriminates_tie(self):
+        # Two candidates with matching caller + size + adjacency,
+        # differing only in reloc-sig. The reloc-matching candidate
+        # scores +0.20 over the one that mismatches.
+        anchor = _sym("main", 0x1000)
+        cand = _sym("main", 0x2000)
+        callers = frozenset({("main", 0x5000)})
+        matching_sig = ((0x8, "arm_call"),)
+        mismatch_sig = ((0x8, "load"),)
+
+        score_match, *_ = score_candidate(
+            anchor, callers, cand, callers,
+            matching_sig, matching_sig,
+        )
+        score_miss, *_ = score_candidate(
+            anchor, callers, cand, callers,
+            matching_sig, mismatch_sig,
+        )
+        self.assertGreater(score_match, score_miss)
+        # Delta = full reloc weight (0.20).
+        self.assertAlmostEqual(score_match - score_miss, 0.20, places=4)
+
+    def test_empty_reloc_sig_no_signal(self):
+        # Anchor has relocs; candidate is a leaf (no relocs). The
+        # reloc-sig dimension contributes 0 — not -1, not 1 —
+        # because leaves don't carry body-shape evidence either way.
+        anchor = _sym("main", 0x1000)
+        cand = _sym("main", 0x2000)
+        callers = frozenset({("main", 0x5000)})
+        _score, _jac, reloc_jac, _sz, _adj, _ = score_candidate(
+            anchor, callers, cand, callers,
+            ((0x8, "arm_call"),), (),
+        )
+        self.assertEqual(reloc_jac, 0.0)
 
     def test_adjacency_threshold_inclusive(self):
         # Exactly at the window threshold → still adjacent.
         anchor = _sym("main", 0x1000)
         cand = _sym("main", 0x1000 + ADJACENCY_BONUS_WINDOW)
-        _s, _j, _sz, adj, _ = score_candidate(
+        _s, _j, _r, _sz, adj, _ = score_candidate(
             anchor, frozenset(), cand, frozenset(),
         )
         self.assertTrue(adj)
@@ -152,7 +207,7 @@ class TestScoreCandidate(unittest.TestCase):
         # qualifies for the bonus (addresses overlap by accident).
         anchor = _sym("main", 0x1000)
         cand = _sym("ov005", 0x1000)
-        _s, _j, _sz, adj, _ = score_candidate(
+        _s, _j, _r, _sz, adj, _ = score_candidate(
             anchor, frozenset(), cand, frozenset(),
         )
         self.assertFalse(adj)
@@ -263,16 +318,14 @@ class TestFindCandidates(unittest.TestCase):
 
     def test_min_score_floor(self):
         anchor, modules, graph = self._build()
-        # Score threshold high enough to suppress everything.
+        # Under weights 0.50 caller + 0.20 reloc + 0.20 size + 0.10
+        # adj, sibling (jac=1, reloc=0 fixture has no relocs, size=1,
+        # adj=True) scores 0.50 + 0 + 0.20 + 0.10 = 0.80. Unrelated
+        # (jac=0, reloc=0, size=0.25, adj=False) scores 0.05. A floor
+        # of 0.5 keeps the sibling and drops the unrelated.
         cands = find_candidates(
-            anchor, modules, graph, matched={}, min_score=0.99,
+            anchor, modules, graph, matched={}, min_score=0.5,
         )
-        # Unrelated has jac=0 + size=0.25 (0x20 vs 0x80) + adj=False
-        # → score = 0.075. Sibling has jac=1 + size=1 + adj=True →
-        # score = 1.0. Floor 0.99 rejects both… wait, sibling is
-        # exactly 1.0 with adjacency. So it survives. Test the
-        # "reject low-score" direction with a higher floor.
-        # Expected: only the sibling survives.
         names = [c.symbol.name for c in cands]
         self.assertIn("func_02001100", names)
         self.assertNotIn("func_02030000", names)
@@ -312,6 +365,7 @@ class TestRenderTextReport(unittest.TestCase):
             symbol=_sym("main", 0x1100, size=0x20),
             score=0.85,
             caller_jaccard=0.75,
+            reloc_jaccard=0.50,
             size_ratio=1.0,
             is_adjacent=True,
             shared_callers=frozenset({("main", 0x5000)}),
@@ -320,6 +374,8 @@ class TestRenderTextReport(unittest.TestCase):
         self.assertIn("func_00001100", out)
         # Score column
         self.assertIn("0.85", out)
+        # Reloc-Jaccard column
+        self.assertIn("0.50", out)
         # Shared-callers digest for top candidate
         self.assertIn("shared callers", out)
 
@@ -333,6 +389,7 @@ class TestRenderJson(unittest.TestCase):
             symbol=_sym("main", 0x1100, size=0x20),
             score=0.85,
             caller_jaccard=0.75,
+            reloc_jaccard=0.50,
             size_ratio=1.0,
             is_adjacent=True,
             shared_callers=frozenset({("main", 0x5000)}),
@@ -341,6 +398,9 @@ class TestRenderJson(unittest.TestCase):
         self.assertEqual(payload["anchor"]["name"], "GX_Init")
         self.assertEqual(len(payload["candidates"]), 1)
         self.assertEqual(payload["candidates"][0]["score"], 0.85)
+        self.assertEqual(
+            payload["candidates"][0]["reloc_jaccard"], 0.50,
+        )
         self.assertEqual(
             payload["candidates"][0]["shared_callers"],
             [["main", 0x5000]],
