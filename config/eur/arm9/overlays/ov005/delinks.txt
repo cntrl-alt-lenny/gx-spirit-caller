@@ -12,9 +12,11 @@ src/overlay005/ov005_stubs.c:
 
 
 
+
 src/overlay005/ov005_stubs_aaf00.c:
     complete
     .text start:0x021aaf00 end:0x021aaf08
+
 
 
 
@@ -26,9 +28,11 @@ src/overlay005/ov005_stubs_ab3e0.c:
 
 
 
+
 src/overlay005/ov005_stubs_ad058.c:
     complete
     .text start:0x021ad058 end:0x021ad060
+
 
 
 
@@ -40,9 +44,11 @@ src/overlay005/ov005_stubs_b0b28.c:
 
 
 
+
 src/overlay005/ov005_021ab0fc.c:
     complete
     .text start:0x021ab0fc end:0x021ab108
+
 
 
 
@@ -54,9 +60,11 @@ src/overlay005/ov005_021ac9c8.c:
 
 
 
+
 src/overlay005/ov005_021acacc.c:
     complete
     .text start:0x021acacc end:0x021acadc
+
 
 
 
@@ -68,9 +76,11 @@ src/overlay005/ov005_021ad048.c:
 
 
 
+
 src/overlay005/ov005_021ab260.c:
     complete
     .text start:0x021ab260 end:0x021ab274
+
 
 
 
@@ -82,9 +92,11 @@ src/overlay005/ov005_021ab318.c:
 
 
 
+
 src/overlay005/ov005_021ab3a0.c:
     complete
     .text start:0x021ab3a0 end:0x021ab3b4
+
 
 
 
@@ -96,9 +108,11 @@ src/overlay005/ov005_021ab3b4.c:
 
 
 
+
 src/overlay005/ov005_021abc68.c:
     complete
     .text start:0x021abc68 end:0x021abc74
+
 
 
 
@@ -110,9 +124,11 @@ src/overlay005/ov005_021ac9d0.c:
 
 
 
+
 src/overlay005/sinit_ov005_021b16e4.c:
     complete
     .init start:0x021b16e4 end:0x021b1710
+
 
 
 
@@ -124,9 +140,11 @@ src/overlay005/sinit_ov005_021b1710.c:
 
 
 
+
 src/overlay005/sinit_ov005_021b173c.c:
     complete
     .init start:0x021b173c end:0x021b1768
+
 
 
 
@@ -138,9 +156,11 @@ src/overlay005/sinit_ov005_021b1768.c:
 
 
 
+
 src/overlay005/sinit_ov005_021b1794.c:
     complete
     .init start:0x021b1794 end:0x021b17c0
+
 
 src/overlay005/ov005_021aa4b0.c:
     complete
