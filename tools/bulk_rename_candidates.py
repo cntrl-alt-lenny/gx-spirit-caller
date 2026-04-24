@@ -84,6 +84,10 @@ from next_targets import (  # noqa: E402
     collect_matched_ranges,
     is_addr_matched,
 )
+from propagate_template import (  # noqa: E402
+    reloc_signature,
+    relocs_for_function,
+)
 
 
 PLACEHOLDER_PREFIXES = ("func_", "data_", "_dsd_gap")
@@ -95,11 +99,40 @@ PLACEHOLDER_PREFIXES = ("func_", "data_", "_dsd_gap")
 ADJACENCY_BONUS_WINDOW = 0x1000
 
 
+# Scoring weights. Must sum to 1.0 so the headline score stays in
+# the 0-1 range regardless of which signals fire.
+#
+# Weights picked so:
+#   - Caller-Jaccard dominates (same-caller structure is the
+#     strongest sibling signal in practice, per PR #153's smoke).
+#   - Reloc-sig Jaccard is the second-strongest body-shape signal
+#     — two functions with identical `(offset, kind)` reloc
+#     tuples are almost certainly the same template emitted twice.
+#   - Size ratio is a weaker shape signal.
+#   - Address adjacency is a proximity hint, not conclusive.
+#
+# Decomper's #208 specifically suggested body-pattern matching to
+# cut the false-positive rate. Reloc-sig is a safe approximation
+# of body shape (cloud can compute it from relocs.txt without
+# disassembly — we already use it in pattern_library.py #160 and
+# propagate_template.py).
+_W_CALLER_JACCARD = 0.50
+_W_RELOC_JACCARD = 0.20
+_W_SIZE_RATIO = 0.20
+_W_ADJACENCY = 0.10
+
+
 @dataclass(frozen=True)
 class Candidate:
     symbol: Symbol
     score: float
     caller_jaccard: float
+    # Body-shape proxy: Jaccard over (reloc_offset, kind) tuples
+    # of the two functions' outbound relocs. Matches pattern_library
+    # #160's scoring dimension.  0.0 when either side has no relocs
+    # (leaf functions); 1.0 on exact-signature match (same template
+    # emitted twice).
+    reloc_jaccard: float
     size_ratio: float     # min/max of the two sizes; 1.0 = exact match
     is_adjacent: bool
     shared_callers: frozenset[SymbolKey]
@@ -139,15 +172,40 @@ def _size_similarity(a: int, b: int) -> float:
     return min(a, b) / max(a, b)
 
 
+def _reloc_sig_jaccard(
+    a_sig: tuple[tuple[int, str], ...],
+    b_sig: tuple[tuple[int, str], ...],
+) -> float:
+    """Jaccard over (offset, kind) reloc tuples. Empty-vs-empty
+    returns 0 (no signal; don't inflate score for two leaves).
+    Same semantics as _jaccard but over ordered-tuple signatures."""
+    sa, sb = set(a_sig), set(b_sig)
+    if not sa and not sb:
+        return 0.0
+    union = len(sa | sb)
+    return len(sa & sb) / union if union else 0.0
+
+
 def score_candidate(
     anchor: Symbol,
     anchor_callers: frozenset[SymbolKey],
     cand: Symbol,
     cand_callers: frozenset[SymbolKey],
-) -> tuple[float, float, float, bool, frozenset[SymbolKey]]:
-    """Weighted sum. Returns (score, jaccard, size_ratio,
-    is_adjacent, shared_callers)."""
+    anchor_reloc_sig: tuple[tuple[int, str], ...] = (),
+    cand_reloc_sig: tuple[tuple[int, str], ...] = (),
+) -> tuple[float, float, float, float, bool, frozenset[SymbolKey]]:
+    """Weighted sum over 4 signals. Returns (score, caller_jaccard,
+    reloc_jaccard, size_ratio, is_adjacent, shared_callers).
+
+    Weights in `_W_*` constants; sum to 1.0 so headline score stays
+    in 0-1 range regardless of which signals fire.
+
+    Reloc-sig-Jaccard defaults to 0 when either side has no relocs
+    (leaf functions or caller lists not loaded). Callers that want
+    the body-pattern discriminator should pass non-empty sigs
+    derived from `relocs_for_function` + `reloc_signature`."""
     jaccard = _jaccard(anchor_callers, cand_callers)
+    reloc_jac = _reloc_sig_jaccard(anchor_reloc_sig, cand_reloc_sig)
     size_ratio = _size_similarity(anchor.size, cand.size)
     is_adjacent = (
         cand.module == anchor.module
@@ -155,15 +213,13 @@ def score_candidate(
     )
     shared = anchor_callers & cand_callers
 
-    # Weights picked to keep the score roughly in 0-1 range.
-    # Caller-Jaccard dominates because same-caller structure is the
-    # strongest sibling signal in practice.
     score = (
-        0.6 * jaccard
-        + 0.3 * size_ratio
-        + (0.1 if is_adjacent else 0.0)
+        _W_CALLER_JACCARD * jaccard
+        + _W_RELOC_JACCARD * reloc_jac
+        + _W_SIZE_RATIO * size_ratio
+        + (_W_ADJACENCY if is_adjacent else 0.0)
     )
-    return score, jaccard, size_ratio, is_adjacent, shared
+    return score, jaccard, reloc_jac, size_ratio, is_adjacent, shared
 
 
 def find_candidates(
@@ -189,6 +245,15 @@ def find_candidates(
     anchor_key: SymbolKey = (anchor.module, anchor.addr)
     anchor_callers = _callers_of(anchor_key, graph.edges_call)
 
+    # Pre-compute the anchor's reloc signature once. Reused on
+    # every scoring pass.
+    anchor_mod = modules.get(anchor.module)
+    anchor_sig: tuple[tuple[int, str], ...] = ()
+    if anchor_mod is not None:
+        anchor_sig = reloc_signature(
+            relocs_for_function(anchor, anchor_mod), anchor.addr,
+        )
+
     out: list[Candidate] = []
     for mod_name, md in modules.items():
         if not cross_module and mod_name != anchor.module:
@@ -206,14 +271,21 @@ def find_candidates(
                 continue
             cand_key: SymbolKey = (sym.module, sym.addr)
             cand_callers = _callers_of(cand_key, graph.edges_call)
-            score, jaccard, size_ratio, is_adj, shared = score_candidate(
-                anchor, anchor_callers, sym, cand_callers,
+            cand_sig = reloc_signature(
+                relocs_for_function(sym, md), sym.addr,
+            )
+            score, jaccard, reloc_jac, size_ratio, is_adj, shared = (
+                score_candidate(
+                    anchor, anchor_callers, sym, cand_callers,
+                    anchor_sig, cand_sig,
+                )
             )
             if score < min_score:
                 continue
             out.append(Candidate(
                 symbol=sym, score=score,
                 caller_jaccard=jaccard,
+                reloc_jaccard=reloc_jac,
                 size_ratio=size_ratio,
                 is_adjacent=is_adj,
                 shared_callers=shared,
@@ -247,13 +319,14 @@ def render_text_report(
     lines.append(f"  Found {len(candidates)} candidate(s):")
     lines.append("")
     lines.append(
-        "    Score  Caller-J   Size-R  Adj  Module  Addr          Name",
+        "    Score  Caller-J  Reloc-J  Size-R  Adj  Module  Addr          Name",
     )
-    lines.append("    -----  --------   ------  ---  ------  ------------  ----")
+    lines.append("    -----  --------  -------  ------  ---  ------  ------------  ----")
     for c in candidates:
         adj_flag = " ✓ " if c.is_adjacent else "   "
         lines.append(
-            f"    {c.score:.2f}    {c.caller_jaccard:.2f}       "
+            f"    {c.score:.2f}    {c.caller_jaccard:.2f}      "
+            f"{c.reloc_jaccard:.2f}     "
             f"{c.size_ratio:.2f}    {adj_flag}  "
             f"{c.symbol.module:6s}  0x{c.symbol.addr:08x}  "
             f"{c.symbol.name}",
@@ -295,6 +368,7 @@ def render_json(
                 "size": c.symbol.size,
                 "score": round(c.score, 4),
                 "caller_jaccard": round(c.caller_jaccard, 4),
+                "reloc_jaccard": round(c.reloc_jaccard, 4),
                 "size_ratio": round(c.size_ratio, 4),
                 "is_adjacent": c.is_adjacent,
                 "shared_callers": [
