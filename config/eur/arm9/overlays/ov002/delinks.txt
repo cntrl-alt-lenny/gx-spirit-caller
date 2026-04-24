@@ -249,7 +249,3 @@ src/overlay002/ov002_022bdb14.s:
 src/overlay002/ov002_022bdb84.s:
     complete
     .text start:0x022bdb84 end:0x022bdb88
-    .text start:0x022bdfb4 end:0x022bdfc4
-    .text start:0x022bdfb4 end:0x022bdfc4
-    .text start:0x022bdfb4 end:0x022bdfc4
-    .text start:0x022bdfb4 end:0x022bdfc4
