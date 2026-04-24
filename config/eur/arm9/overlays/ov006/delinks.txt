@@ -470,3 +470,11 @@ src/overlay006/ov006_021cadbc.c:
 src/overlay006/ov006_021cb14c.c:
     complete
     .text start:0x021cb14c end:0x021cb158
+
+src/overlay006/ov006_021c6964.c:
+    complete
+    .text start:0x021c6964 end:0x021c6990
+
+src/overlay006/ov006_021c6c00.c:
+    complete
+    .text start:0x021c6c00 end:0x021c6c2c
