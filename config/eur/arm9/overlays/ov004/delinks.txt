@@ -70,3 +70,15 @@ src/overlay004/ov004_021dbdd8.s:
 src/overlay004/ov004_021d8644.s:
     complete
     .text start:0x021d8644 end:0x021d8648
+
+src/overlay004/ov004_021d3ddc.s:
+    complete
+    .text start:0x021d3ddc end:0x021d3de4
+
+src/overlay004/ov004_021dbc78.s:
+    complete
+    .text start:0x021dbc78 end:0x021dbc80
+
+src/overlay004/ov004_021dbc80.s:
+    complete
+    .text start:0x021dbc80 end:0x021dbc8a
