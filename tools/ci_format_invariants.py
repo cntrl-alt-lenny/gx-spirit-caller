@@ -14,7 +14,8 @@ Shape of the JSON (see check_match_invariants.to_json):
       "warnings": int,
       "issues": [
         {
-          "check":      str,   # "complete_tu_rename" / "orphan_extern" / "missing_tu_source"
+          "check":      str,   # "cross_file_name_drift" / "missing_tu_source" /
+                               # "orphan_extern" / "complete_tu_rename"
           "severity":   str,   # "error" / "warn"
           "module":     str|null,
           "addr":       int|null,
@@ -39,9 +40,21 @@ from collections import defaultdict
 from pathlib import Path
 
 
-CHECK_ORDER = ["missing_tu_source", "orphan_extern", "complete_tu_rename"]
+CHECK_ORDER = [
+    "cross_file_name_drift",  # error — highest severity, always first
+    "missing_tu_source",      # error
+    "orphan_extern",          # warn
+    "complete_tu_rename",     # warn
+]
 
 CHECK_DESC = {
+    "cross_file_name_drift": (
+        "`src/` references a symbol not in any `symbols.txt` and not "
+        "declared in `libs/**/*.h` — typically a rebase drift where a "
+        "rename landed on a parallel branch that got rebased away "
+        "(see PR #171). Blocks merge: either restore the rename in "
+        "`symbols.txt` or roll back the `src/` reference."
+    ),
     "missing_tu_source": (
         "TU source listed in `delinks.txt` but missing on disk. "
         "The build will fail to link until the `.c` file exists."
