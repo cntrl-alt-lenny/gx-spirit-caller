@@ -884,3 +884,15 @@ src/main/func_02091700.s:
 src/main/func_02093bfc.s:
     complete
     .text start:0x02093bfc end:0x02093c10
+
+src/main/OS_DefaultIrqHandler.s:
+    complete
+    .text start:0x02090570 end:0x02090574
+
+src/main/func_02019898.c:
+    complete
+    .text start:0x02019898 end:0x020198bc
+
+src/main/func_0201ac60.c:
+    complete
+    .text start:0x0201ac60 end:0x0201ac84
