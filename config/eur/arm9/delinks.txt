@@ -849,7 +849,7 @@ src/main/func_020351d4.c:
 
 
 
-src/main/func_02006870.c:
+src/main/Task_InvokeLocked.c:
     complete
     .text start:0x02006870 end:0x020068b4
 
@@ -884,3 +884,15 @@ src/main/func_02091700.s:
 src/main/func_02093bfc.s:
     complete
     .text start:0x02093bfc end:0x02093c10
+
+src/main/OS_DisableIrq.s:
+    complete
+    .text start:0x020937a4 end:0x020937b8
+
+src/main/OS_RestoreIrq.s:
+    complete
+    .text start:0x020937b8 end:0x020937d0
+
+src/main/Fill32.s:
+    complete
+    .text start:0x020944c0 end:0x020944d4
