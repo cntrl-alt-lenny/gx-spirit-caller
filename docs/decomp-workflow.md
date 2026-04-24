@@ -90,6 +90,10 @@ Now repeat ~5,000 times. That's the project.
 ## Tools and when to reach for each
 
 Every script in `tools/` exists to shorten some step of that loop.
+This section is a narrative walkthrough. For the **exhaustive**
+per-tool catalogue (auto-generated from each tool's module
+docstring), see
+[`docs/tools-index.md`](tools-index.md).
 
 ### Picking what to match
 
