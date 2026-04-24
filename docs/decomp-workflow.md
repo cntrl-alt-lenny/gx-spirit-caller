@@ -158,6 +158,109 @@ Every script in `tools/` exists to shorten some step of that loop.
 - `tools/download_tool.py` — fetches mwccarm, dsd, objdiff on first
   use.
 
+## The rename-cascade pipeline
+
+A mature workflow for the "rename a wave of siblings at once" case,
+used for briefs 014/015/016+. Validated by PR #165 (4 renames → 85
+tier promotions). Four tools compose into a scout → decide → apply
+→ verify flow:
+
+### 1. Pick a high-leverage anchor
+
+```bash
+python tools/find_cascades.py --version eur --top 20
+```
+
+Ranks placeholder functions by how many `hard → medium` tier
+promotions their rename would trigger. The top-1 is usually the
+single highest-leverage match in the project right now. Pair with
+a look at `next_targets.py --tier hard` to confirm the anchor is
+tractable at all.
+
+### 2. Scout the anchor's siblings
+
+Match the anchor (manual matching loop above). Once it's named,
+the sibling cluster becomes surveyable:
+
+```bash
+python tools/bulk_rename_candidates.py --version eur <module> <addr>
+```
+
+Scores sibling placeholders via caller-set Jaccard + size
+similarity + address adjacency. Top-N candidates form the rename
+wave. Example output lives at
+`docs/research/cascade-3-scouting.md` (PR #175).
+
+### 3. Decide names + write a decisions file
+
+For each sibling the decomper picks a canonical NitroSDK-style
+name (grep [NitroSDK](https://github.com/ntrtwl/NitroSDK) for
+matching shapes, use `tools/nitro_suggest_renames.py` for
+candidates). Write a JSON decisions file:
+
+```json
+{
+  "brief": "016",
+  "anchor": "Task_InvokeLocked",
+  "source_scouting": "docs/research/cascade-3-scouting.md",
+  "renames": [
+    {
+      "module": "main",
+      "addr": "0x020067fc",
+      "old": "func_020067fc",
+      "new": "Task_Post",
+      "rationale": "0.25 jaccard / 36 shared callers / size 0x74"
+    }
+  ]
+}
+```
+
+### 4. Apply atomically
+
+```bash
+# Dry-run first.
+python tools/cascade_apply.py cascades/brief-016.json
+
+# Confirms every rename validates (new-name not taken, old-name
+# resolves, no batch-internal collisions). If ANY fails, NOTHING
+# writes. Prints a commit-message + PR-body template.
+
+# Apply.
+python tools/cascade_apply.py cascades/brief-016.json --confirm
+```
+
+The emitted template has a test-plan section with checkboxes for:
+
+- `dsd check modules` — module checksum baseline preserved
+- `check_match_invariants --version eur` — 0 errors (clean
+  cross-file drift; see PR #185)
+- `find_cascades --version eur` — measure downstream tier
+  promotions from the wave
+- `ninja rom` clean
+
+Paste into `git commit -m "$(...)"` directly.
+
+### 5. Quantify the cascade
+
+After merge, the `cascades-diff.yml` CI workflow (PR #144) auto-
+comments on the PR with a per-rename cascade impact breakdown. The
+post-merge comparison tells you how many `hard → medium` promotions
+the wave actually produced — validates the model against the
+scouting prediction.
+
+### Tool summary
+
+| Step | Tool | PR |
+|---|---|---|
+| Anchor pick | `tools/find_cascades.py` | #132 |
+| Sibling scout | `tools/bulk_rename_candidates.py` | #153 |
+| Batch apply | `tools/cascade_apply.py` | #190 |
+| Drift gate | `tools/check_match_invariants.py` | #185 |
+| CI cascade comment | `.github/workflows/cascades-diff.yml` | #144 |
+
+For a worked example, see `docs/research/cascade-3-scouting.md`
+and the `brief-016-*.md` brief that applies it.
+
 ## Catching match-depth regressions before merge
 
 `ninja report` requires a baserom, which CI doesn't have. So the
