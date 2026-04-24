@@ -307,10 +307,227 @@ def check_missing_tu_sources(
 
 
 # --------------------------------------------------------------------------- #
+# Check 4: cross-file name drift
+#
+# #171 precedent: a rename wave on one branch renamed func_X → NewName
+# in symbols.txt + shipped src/NewName.c using that name. A parallel
+# wave's rebase lost the symbols.txt half. Resulting main: src/ refers
+# to NewName, symbols.txt still has func_X at that address, build
+# appears to work because the linker binds by address at the .o level
+# once sections land, but subsequent renames to NewName clobber state
+# differently than expected. Subtle. Rebase-friendly.
+#
+# This check catches it pre-flight: any name referenced from src/
+# (C extern or `.s` BL/B target) that isn't in ANY symbols.txt AND
+# isn't declared in a libs/**/*.h header is drift.
+# --------------------------------------------------------------------------- #
+
+# Function-shape extern declaration: `extern <type-modifiers> NAME(<args>);`
+# The `[^;{]*?` makes the pre-name region lazy so we don't cross
+# statement boundaries; the trailing `;` requires a terminator so we
+# don't match function DEFINITIONS (`extern int foo(...) { ... }`).
+_EXTERN_FN_RE = re.compile(
+    r"^[^\n]*?\bextern\s+[^;{]*?\b(?P<name>[A-Za-z_]\w*)\s*"
+    r"\([^)]*\)\s*;",
+    re.MULTILINE | re.DOTALL,
+)
+
+# Assembly branch with a name target. Matches `bl NAME` / `b NAME`
+# where NAME starts with a letter or underscore (excludes local
+# labels `.L_XXXXXX` and numeric / hex literal targets). Deliberately
+# does NOT include `bx` / `blx` — those take register operands in
+# mwcc-ARM's emitted asm. Keeping the matcher tight minimises
+# false positives on register names like `lr`.
+_ASM_BRANCH_RE = re.compile(
+    r"^\s*(?:bl|b)\s+(?P<name>[A-Za-z_]\w*)\b",
+    re.MULTILINE,
+)
+
+# File-local label definition (`loop_top:`). Used to skip branches
+# to labels defined within the same `.s` file — those are local
+# control flow, not cross-file references. Leading whitespace is
+# rare but tolerated (conditional assembly generators emit it).
+_ASM_LABEL_DEF_RE = re.compile(
+    r"^\s*(?P<name>[A-Za-z_]\w*)\s*:",
+    re.MULTILINE,
+)
+
+# Top-level function declaration in a header file. Used to build the
+# "declared in libs/" set so we don't flag SDK names that are
+# prototyped but not yet implemented. Requires trailing `;` to
+# exclude definitions; no `extern` required since headers typically
+# omit it.
+_HEADER_DECL_RE = re.compile(
+    r"^[^\n/]*?\b(?P<name>[A-Za-z_]\w*)\s*\([^)]*\)\s*;",
+    re.MULTILINE | re.DOTALL,
+)
+
+# Assembly mnemonics that collide with identifier characters. If the
+# `.s` regex would match `b eq_label` as "name=eq_label" where `eq` is
+# actually the condition code, we'd false-positive. These are
+# excluded from the branch check.
+_ASM_IGNORED_NAMES: frozenset[str] = frozenset({
+    # ARM condition codes + register mnemonics that could parse as
+    # an identifier at the mnemonic boundary. Very few of these
+    # appear as BL/B operands in dsd output, but exclude defensively.
+    "eq", "ne", "cs", "hs", "cc", "lo", "mi", "pl", "vs", "vc",
+    "hi", "ls", "ge", "lt", "gt", "le", "al",
+    "lr", "sp", "pc", "ip", "fp",
+})
+
+
+def _all_symbol_names(config_dir: Path) -> set[str]:
+    """Every name that appears in any symbols.txt under config_dir,
+    regardless of kind. Includes placeholders + real names + bss
+    entries. Read raw so kind:bss lines (no parens, skipped by
+    analyze_symbols.SYMBOL_RE) are included.
+    """
+    names: set[str] = set()
+    sym_line_re = re.compile(r"^(\S+)\s+kind:")
+    for sym_file in config_dir.rglob("symbols.txt"):
+        try:
+            with sym_file.open(encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    m = sym_line_re.match(line)
+                    if m:
+                        names.add(m.group(1))
+        except OSError:
+            continue
+    return names
+
+
+def _all_header_decl_names(libs_root: Path) -> set[str]:
+    """Names declared in any libs/**/*.h file. Used as a whitelist
+    for "this name is declared in a header even if the implementation
+    hasn't landed yet" (e.g. nitro/os.h decl before the .c exists)."""
+    names: set[str] = set()
+    if not libs_root.is_dir():
+        return names
+    for pat in ("**/*.h", "**/*.hpp"):
+        for path in libs_root.rglob(pat):
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            for m in _HEADER_DECL_RE.finditer(text):
+                names.add(m.group("name"))
+    return names
+
+
+def _line_number(text: str, pos: int) -> int:
+    return text.count("\n", 0, pos) + 1
+
+
+def _rel_path(path: Path) -> Path:
+    try:
+        return path.relative_to(ROOT)
+    except ValueError:
+        return path
+
+
+def check_cross_file_name_drift(
+    src_dir: Path,
+    libs_dir: Path,
+    config_dir: Path,
+) -> list[Issue]:
+    """Flag src/ references to names that aren't in any symbols.txt
+    AND aren't declared in libs/**/*.h.
+
+    Catches the #171 rebase-drift scenario. Errors rather than
+    warnings — this class of bug always indicates actionable
+    state (either the rename is missing or the src/ reference
+    needs to roll back)."""
+    known = _all_symbol_names(config_dir)
+    declared = _all_header_decl_names(libs_dir)
+    resolvable = known | declared
+
+    issues: list[Issue] = []
+
+    # C / C++ externs.
+    for pat in ("**/*.c", "**/*.cpp"):
+        for path in src_dir.rglob(pat):
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            already_flagged: set[str] = set()
+            for m in _EXTERN_FN_RE.finditer(text):
+                name = m.group("name")
+                if name in resolvable or name in already_flagged:
+                    continue
+                already_flagged.add(name)
+                issues.append(Issue(
+                    check="cross_file_name_drift",
+                    severity="error",
+                    module=None,
+                    addr=None,
+                    path=f"{_rel_path(path)}:{_line_number(text, m.start())}",
+                    message=(
+                        f"`extern ... {name}` references a symbol not "
+                        "in any symbols.txt and not declared in "
+                        "libs/**/*.h. Likely a rebase drift (see #171)."
+                    ),
+                    suggestion=(
+                        f"Verify symbols.txt has a `{name}` entry at "
+                        "the expected address. If the rename landed on "
+                        "a parallel branch that got rebased away, "
+                        "re-apply with `tools/rename_symbol.py`."
+                    ),
+                ))
+
+    # `.s` branch targets.
+    for path in src_dir.rglob("**/*.s"):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        # Collect file-local label definitions up front so we can
+        # skip branches to them. `loop_top:` inside the same .s
+        # file is local control flow, not cross-file drift.
+        local_labels = {
+            m.group("name") for m in _ASM_LABEL_DEF_RE.finditer(text)
+        }
+        already_flagged = set()
+        for m in _ASM_BRANCH_RE.finditer(text):
+            name = m.group("name")
+            if (name in resolvable
+                    or name in local_labels
+                    or name in already_flagged
+                    or name in _ASM_IGNORED_NAMES
+                    or name.startswith("L_")):
+                continue
+            already_flagged.add(name)
+            issues.append(Issue(
+                check="cross_file_name_drift",
+                severity="error",
+                module=None,
+                addr=None,
+                path=f"{_rel_path(path)}:{_line_number(text, m.start())}",
+                message=(
+                    f"`bl {name}` / `b {name}` in .s but `{name}` "
+                    "isn't in any symbols.txt and not declared in "
+                    "libs/**/*.h. Likely a rebase drift (see #171)."
+                ),
+                suggestion=(
+                    f"Verify symbols.txt has a `{name}` entry. If "
+                    "this is a newly-named symbol, confirm the "
+                    "rename landed on main; otherwise rename this "
+                    "reference to its current symbols.txt name."
+                ),
+            ))
+    return issues
+
+
+# --------------------------------------------------------------------------- #
 # Runner + output
 # --------------------------------------------------------------------------- #
 
-CHECK_ORDER = ["complete_tu_rename", "missing_tu_source", "orphan_extern"]
+CHECK_ORDER = [
+    "cross_file_name_drift",
+    "missing_tu_source",
+    "orphan_extern",
+    "complete_tu_rename",
+]
 
 
 def run_all_checks(
@@ -321,8 +538,15 @@ def run_all_checks(
 ) -> list[Issue]:
     config_dir = ROOT / "config" / version
     src_dir = ROOT / "src"
+    libs_dir = ROOT / "libs"
     modules = load_all(config_dir)
     issues: list[Issue] = []
+    # cross_file_name_drift runs first — it's the highest-severity
+    # class (errors that always indicate real bugs) and gates the
+    # rest. Module-filter doesn't apply: drift crosses modules.
+    issues.extend(check_cross_file_name_drift(
+        src_dir, libs_dir, config_dir,
+    ))
     issues.extend(check_complete_tu_renames(
         modules, config_dir, module_filter=module_filter, strict=strict,
     ))
