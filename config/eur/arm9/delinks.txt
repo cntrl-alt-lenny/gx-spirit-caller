@@ -2244,3 +2244,23 @@ src/main/func_0206e468.s:
 src/main/func_0206be1c.s:
     complete
     .text start:0x0206be1c end:0x0206be28
+
+src/main/func_0202b7cc.c:
+    complete
+    .text start:0x0202b7cc end:0x0202b7ec
+
+src/main/func_0202b7ec.c:
+    complete
+    .text start:0x0202b7ec end:0x0202b80c
+
+src/main/func_0202b80c.c:
+    complete
+    .text start:0x0202b80c end:0x0202b830
+
+src/main/func_0202b830.c:
+    complete
+    .text start:0x0202b830 end:0x0202b854
+
+src/main/func_0202b854.c:
+    complete
+    .text start:0x0202b854 end:0x0202b878
