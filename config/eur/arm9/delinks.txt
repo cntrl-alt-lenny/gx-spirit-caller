@@ -1138,3 +1138,31 @@ src/main/func_02019898.c:
 src/main/func_0201ac60.c:
     complete
     .text start:0x0201ac60 end:0x0201ac84
+
+src/main/func_0201bba4.c:
+    complete
+    .text start:0x0201bba4 end:0x0201bbc8
+
+src/main/func_0201b7b4.c:
+    complete
+    .text start:0x0201b7b4 end:0x0201b7e0
+
+src/main/func_02019acc.c:
+    complete
+    .text start:0x02019acc end:0x02019af4
+
+src/main/func_0201aabc.s:
+    complete
+    .text start:0x0201aabc end:0x0201aaf4
+
+src/main/func_0201aaf4.s:
+    complete
+    .text start:0x0201aaf4 end:0x0201ab2c
+
+src/main/func_02018d1c.c:
+    complete
+    .text start:0x02018d1c end:0x02018d58
+
+src/main/func_0201a454.c:
+    complete
+    .text start:0x0201a454 end:0x0201a498
