@@ -35,6 +35,7 @@ from analyze_symbols import ModuleData, Symbol  # noqa: E402
 from check_match_invariants import (  # noqa: E402
     Issue,
     check_complete_tu_renames,
+    check_cross_file_name_drift,
     check_missing_tu_sources,
     check_orphan_externs,
     exit_code_for,
@@ -380,6 +381,311 @@ class TestToJson(unittest.TestCase):
         self.assertEqual(payload["warnings"], 1)
         self.assertEqual(payload["errors"], 0)
         self.assertEqual(payload["issues"][0]["check"], "complete_tu_rename")
+
+
+class TestCrossFileNameDrift(unittest.TestCase):
+    """#171-class drift detection: src/ references a name that
+    isn't in any symbols.txt AND isn't declared in libs/**/*.h.
+
+    Pinning:
+      - C extern to a missing name → error
+      - C extern to a known symbol → no issue
+      - C extern to a libs/-declared name (header decl, no .c yet)
+        → no issue (legit SDK scaffold)
+      - `.s` BL to a missing name → error
+      - `.s` BL to a file-local label definition → no issue
+      - `.s` BL to a `.L_xxxxxxxx` local label → no issue
+      - Duplicate refs in same file → one issue, not N
+      - Deliberately-ignored operand names (eq, lr, sp, …) → skipped
+      - Function definitions (extern int foo(x) { ... }) without the
+        terminating ; → NOT matched by the extern regex
+    """
+
+    def _setup(
+        self,
+        tmp: Path,
+        *,
+        symbols: dict[str, list[str]] | None = None,
+        libs_headers: dict[str, str] | None = None,
+        src_files: dict[str, str] | None = None,
+    ) -> tuple[Path, Path, Path]:
+        """Build synthetic config/eur/, libs/, src/ trees.
+
+        symbols: {module: [names...]} — each becomes a symbols.txt line
+        libs_headers: {filename: body} — written under libs/nitro/
+        src_files: {filename: body} — written under src/
+        """
+        config_dir = tmp / "config" / "eur"
+        src_dir = tmp / "src"
+        libs_dir = tmp / "libs"
+        for d in (config_dir, src_dir, libs_dir):
+            d.mkdir(parents=True, exist_ok=True)
+        for mod, names in (symbols or {}).items():
+            mod_dir = (
+                config_dir / "arm9" if mod == "main"
+                else config_dir / "arm9" / "overlays" / mod
+            )
+            mod_dir.mkdir(parents=True, exist_ok=True)
+            lines = [
+                # Use function(arm, size=0x10) so the tool's
+                # kind:type(attrs) regex accepts the line if we
+                # ever wire analyze_symbols parsing.
+                f"{n} kind:function(arm,size=0x10) addr:0x0200{i:04x}"
+                for i, n in enumerate(names)
+            ]
+            (mod_dir / "symbols.txt").write_text(
+                "\n".join(lines) + "\n", encoding="utf-8",
+            )
+        for fname, body in (libs_headers or {}).items():
+            p = libs_dir / "nitro" / "include" / "nitro" / fname
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(body, encoding="utf-8")
+        for fname, body in (src_files or {}).items():
+            p = src_dir / fname
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(body, encoding="utf-8")
+        return config_dir, src_dir, libs_dir
+
+    def test_c_extern_missing_name_flagged(self):
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": ["ExistingName"]},
+                src_files={
+                    "main/foo.c": (
+                        "extern void MissingName(int x);\n"
+                        "void bar(void) { MissingName(0); }\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(len(issues), 1)
+            self.assertEqual(issues[0].check, "cross_file_name_drift")
+            self.assertEqual(issues[0].severity, "error")
+            self.assertIn("MissingName", issues[0].message)
+
+    def test_c_extern_known_name_ignored(self):
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": ["KnownName"]},
+                src_files={
+                    "main/foo.c": (
+                        "extern int KnownName(void);\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_c_extern_lib_declared_name_ignored(self):
+        # Header declares it, even if no .c implements yet.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                libs_headers={
+                    "os.h": "void OS_GetTick(void);\n",
+                },
+                src_files={
+                    "main/foo.c": (
+                        "extern void OS_GetTick(void);\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_c_function_definition_not_matched(self):
+        # `extern int foo(int x) { return x; }` is a definition,
+        # not a declaration. Must not trigger the drift check.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/foo.c": (
+                        "extern int MyDefinition(int x) {\n"
+                        "    return x + 1;\n"
+                        "}\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_asm_bl_missing_name_flagged(self):
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/x.s": (
+                        ".text\n"
+                        "entry:\n"
+                        "        bl      DriftedName\n"
+                        "        bx      lr\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(len(issues), 1)
+            self.assertIn("DriftedName", issues[0].message)
+
+    def test_asm_bl_local_label_ignored(self):
+        # `loop_top:` defined in-file, `b loop_top` must NOT drift.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/x.s": (
+                        ".text\n"
+                        "entry:\n"
+                        "loop_top:\n"
+                        "        subs    r0, #1\n"
+                        "        bne     loop_top\n"
+                        "        bx      lr\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_asm_bl_dot_L_local_label_ignored(self):
+        # dsd's `.L_XXXXXXXX:` labels are local by convention.
+        # The branch regex doesn't match `.L_`-prefixed targets
+        # at all (`.` isn't a valid leading char), but pin that.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/x.s": (
+                        ".text\n"
+                        ".L_02000086:\n"
+                        "        b       .L_02000086\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_asm_bl_known_symbol_ignored(self):
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": ["OS_SpinWait"]},
+                src_files={
+                    "main/x.s": (
+                        ".text\n"
+                        "foo:\n"
+                        "        bl      OS_SpinWait\n"
+                        "        bx      lr\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_duplicate_refs_single_issue_per_file(self):
+        # A file that BLs to `BadName` 10 times should produce
+        # one drift issue, not ten.
+        with tempfile.TemporaryDirectory() as td:
+            body = ".text\nentry:\n" + (
+                "        bl      BadName\n" * 10
+            ) + "        bx      lr\n"
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={"main/x.s": body},
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(len(issues), 1)
+
+    def test_ignored_asm_operand_names_skipped(self):
+        # `bl lr` would never be valid instruction syntax in
+        # practice (bl takes a label, not a register), but the
+        # regex conceivably matches it. `lr` is in the ignored set
+        # so no false positive.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/x.s": "        bl lr\n",
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(issues, [])
+
+    def test_missing_libs_dir_tolerated(self):
+        # Some clones don't have libs/ set up yet. The check should
+        # silently fall back to the symbols.txt-only resolvable set.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir = Path(td) / "config" / "eur" / "arm9"
+            config_dir.mkdir(parents=True)
+            (config_dir / "symbols.txt").write_text(
+                "Known kind:function(arm,size=0x10) addr:0x02001000\n",
+                encoding="utf-8",
+            )
+            src_dir = Path(td) / "src"
+            src_dir.mkdir()
+            (src_dir / "main").mkdir()
+            (src_dir / "main" / "foo.c").write_text(
+                "extern void Known(void);\n", encoding="utf-8",
+            )
+            # libs_dir doesn't exist at all.
+            issues = check_cross_file_name_drift(
+                src_dir, Path(td) / "libs",
+                Path(td) / "config" / "eur",
+            )
+            self.assertEqual(issues, [])
+
+    def test_different_files_produce_separate_issues(self):
+        # `foo.c` and `bar.c` both reference `Drift1` and `Drift2`
+        # respectively → 2 issues (one per file).
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": []},
+                src_files={
+                    "main/foo.c": "extern void Drift1(void);\n",
+                    "main/bar.c": "extern int Drift2(int);\n",
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(len(issues), 2)
+            names = {
+                issues[0].message.split("`")[1],
+                issues[1].message.split("`")[1],
+            }
+            self.assertEqual(
+                names, {"extern ... Drift1",
+                        "extern ... Drift2"},
+            )
 
 
 if __name__ == "__main__":
