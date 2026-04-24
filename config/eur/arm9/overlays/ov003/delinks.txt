@@ -9,9 +9,11 @@ src/overlay003/sinit_ov003_021cf114.c:
     complete
     .init start:0x021cf114 end:0x021cf140
 
+
 src/overlay003/ov003_021ca2b4.s:
     complete
     .text start:0x021ca2b4 end:0x021ca2b8
+
 
 src/overlay003/ov003_021ca2b8.s:
     complete
