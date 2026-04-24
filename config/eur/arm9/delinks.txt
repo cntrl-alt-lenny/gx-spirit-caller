@@ -1988,3 +1988,11 @@ src/main/func_02082050.s:
 src/main/func_02078ebc.s:
     complete
     .text start:0x02078ebc end:0x02078ec8
+
+src/main/func_020058b4.c:
+    complete
+    .text start:0x020058b4 end:0x020058f0
+
+src/main/func_02006334.c:
+    complete
+    .text start:0x02006334 end:0x02006368
