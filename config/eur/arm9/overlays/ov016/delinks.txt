@@ -12,9 +12,11 @@ src/overlay016/sinit_ov016_021b8e7c.c:
 
 
 
+
 src/overlay016/sinit_ov016_021b8ea8.c:
     complete
     .init start:0x021b8ea8 end:0x021b8ed4
+
 
 
 
@@ -26,9 +28,11 @@ src/overlay016/sinit_ov016_021b8ed4.c:
 
 
 
+
 src/overlay016/sinit_ov016_021b8f00.c:
     complete
     .init start:0x021b8f00 end:0x021b8f2c
+
 
 
 
@@ -40,9 +44,11 @@ src/overlay016/sinit_ov016_021b8f2c.c:
 
 
 
+
 src/overlay016/ov016_stubs_b2b24.c:
     complete
     .text start:0x021b2b24 end:0x021b2b2c
+
 
 
 
@@ -54,6 +60,7 @@ src/overlay016/ov016_stubs_b3a70.c:
 
 
 
+
 src/overlay016/ov016_stubs_b553c.c:
     complete
     .text start:0x021b553c end:0x021b5544
@@ -61,9 +68,11 @@ src/overlay016/ov016_stubs_b553c.c:
 
 
 
+
 src/overlay016/ov016_stubs_b5fa8.c:
     complete
     .text start:0x021b5fa8 end:0x021b5fb0
+
 
 
 
