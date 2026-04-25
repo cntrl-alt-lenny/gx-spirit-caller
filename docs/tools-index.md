@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**41 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**42 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -15,7 +15,7 @@ git add docs/tools-index.md
 - [Rename support](#rename-support) (6)
 - [Match acceleration](#match-acceleration) (5)
 - [Hygiene / invariants](#invariants) (1)
-- [CI formatters](#ci-formatters) (5)
+- [CI formatters](#ci-formatters) (6)
 - [Infrastructure / build-patching](#infrastructure) (13)
 
 ## Analysis / worklist
@@ -191,6 +191,12 @@ Consumes two objdiff `report.json` snapshots and renders a Markdown delta showin
 **render a match-invariants report as Markdown for a PR comment.**
 
 Consumes the JSON emitted by `check_match_invariants.py --json` and prints a Markdown block suitable for piping into `gh pr comment`.
+
+### `tools/ci_format_mega_cascades.py`
+
+**render the per-PR mega-cascade ranking**
+
+diff as an upsertable Markdown comment.
 
 ### `tools/ci_format_rename_cascades.py`
 
