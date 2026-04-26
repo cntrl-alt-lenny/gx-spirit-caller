@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**42 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**44 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis) (11)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (5)
+- [Match acceleration](#match-acceleration) (6)
 - [Hygiene / invariants](#invariants) (1)
 - [CI formatters](#ci-formatters) (6)
 - [Infrastructure / build-patching](#infrastructure) (13)
@@ -137,6 +137,12 @@ The decomp loop spends real time on per-function setup: pick the target, look up
 ## Match acceleration
 
 _Tools that compress the decomp iteration loop: context assembly, template matching, permuter workspace staging._
+
+### `tools/find_pattern_clusters.py`
+
+**surface clusters of functions sharing an**
+
+exact reloc signature, where at least one is already matched and at least one is still unmatched.
 
 ### `tools/m2ctx.py`
 
