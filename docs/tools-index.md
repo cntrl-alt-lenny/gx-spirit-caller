@@ -15,7 +15,7 @@ git add docs/tools-index.md
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (5)
 - [Hygiene / invariants](#invariants) (1)
-- [CI formatters](#ci-formatters) (5)
+- [CI formatters](#ci-formatters) (6)
 - [Infrastructure / build-patching](#infrastructure) (13)
 
 ## Analysis / worklist
@@ -197,6 +197,12 @@ Consumes two objdiff `report.json` snapshots and renders a Markdown delta showin
 **render a match-invariants report as Markdown for a PR comment.**
 
 Consumes the JSON emitted by `check_match_invariants.py --json` and prints a Markdown block suitable for piping into `gh pr comment`.
+
+### `tools/ci_format_mega_cascades.py`
+
+**render the per-PR mega-cascade ranking**
+
+diff as an upsertable Markdown comment.
 
 ### `tools/ci_format_rename_cascades.py`
 
