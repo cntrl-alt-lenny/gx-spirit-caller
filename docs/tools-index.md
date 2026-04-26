@@ -7,12 +7,12 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**41 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**42 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis) (11)
-- [Rename support](#rename-support) (6)
+- [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (5)
 - [Hygiene / invariants](#invariants) (1)
 - [CI formatters](#ci-formatters) (5)
@@ -91,6 +91,12 @@ Three sources, in order of preference (descending fidelity):
 ## Rename support
 
 _Tools that rename symbols or help pick names. Write to `config/<ver>/**/symbols.txt`. Atomic-batch variants exist (see cascade_apply) for multi-rename waves._
+
+### `tools/bulk_data_candidates.py`
+
+**find placeholder data symbols that likely**
+
+share a just-named data symbol's role, so the decomper can bulk-rename N data siblings in a single PR.
 
 ### `tools/bulk_rename_candidates.py`
 

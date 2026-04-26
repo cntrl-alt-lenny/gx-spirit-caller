@@ -60,6 +60,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("data_symbol_sizes", "analysis", "Analysis / worklist"),
     ("diff_reasons", "analysis", "Analysis / worklist"),
     ("bulk_rename_candidates", "rename-support", "Rename support"),
+    ("bulk_data_candidates", "rename-support", "Rename support"),
     ("rename_symbol", "rename-support", "Rename support"),
     ("cascade_apply", "rename-support", "Rename support"),
     ("pattern_library", "match-acceleration", "Match acceleration"),
