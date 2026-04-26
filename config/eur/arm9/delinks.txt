@@ -2501,6 +2501,66 @@ src/main/OSi_IrqHandlerDma0.c:
     complete
     .text start:0x020904c4 end:0x020904d4
 
+src/main/func_0202b4b4.c:
+    complete
+    .text start:0x0202b4b4 end:0x0202b4d4
+
+src/main/func_0202b4d4.c:
+    complete
+    .text start:0x0202b4d4 end:0x0202b4f4
+
+src/main/func_0206e7b0.c:
+    complete
+    .text start:0x0206e7b0 end:0x0206e7bc
+
+src/main/func_0206ea84.c:
+    complete
+    .text start:0x0206ea84 end:0x0206ea90
+
+src/main/func_0206ecb4.c:
+    complete
+    .text start:0x0206ecb4 end:0x0206ecc0
+
+src/main/func_0206ecc0.c:
+    complete
+    .text start:0x0206ecc0 end:0x0206eccc
+
+src/main/func_0207cfa4.c:
+    complete
+    .text start:0x0207cfa4 end:0x0207cfb0
+
+src/main/func_0207cfb0.c:
+    complete
+    .text start:0x0207cfb0 end:0x0207cfbc
+
+src/main/func_0207cfbc.c:
+    complete
+    .text start:0x0207cfbc end:0x0207cfc8
+
+src/main/func_0207d4d0.c:
+    complete
+    .text start:0x0207d4d0 end:0x0207d4dc
+
+src/main/func_0207daf4.c:
+    complete
+    .text start:0x0207daf4 end:0x0207db00
+
+src/main/func_0207e540.c:
+    complete
+    .text start:0x0207e540 end:0x0207e54c
+
+src/main/func_02087168.c:
+    complete
+    .text start:0x02087168 end:0x02087174
+
+src/main/func_020879fc.c:
+    complete
+    .text start:0x020879fc end:0x02087a08
+
+src/main/func_02096228.c:
+    complete
+    .text start:0x02096228 end:0x02096234
+
 
 src/main/func_0202b0b4.c:
     complete
