@@ -256,14 +256,22 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/010-sinit-remaining-outliers.md`](docs/briefs/010-sinit-remaining-outliers.md)
-  — `decomper`: close out the three remaining sinit outliers — ov010
-  pair (`__sinit_ov010_021b89a8` + `021b89f0`, both 0x48) and the
-  ov011 zeroing sinit (`__sinit_ov011_021d3620`, 0x34). One PR, three
-  targets, sinit tier advances to 49/51. Branch:
-  `decomper/sinit-remaining-outliers`.
+- [`docs/briefs/015-cluster-propagation-pilot.md`](docs/briefs/015-cluster-propagation-pilot.md)
+  — `decomper`: bulk-match the top remaining cluster
+  (`main` / `func_020498f0`, 0x10, **148 unmatched siblings**) using
+  cloud's new `tools/find_pattern_clusters.py` (PR #227) + existing
+  `tools/propagate_template.py`. Match the anchor by hand, propagate
+  to validated siblings. Branch: `decomper/cluster-prop-020498f0`.
 
 ### Closed briefs (reference)
+
+- Briefs 010–014 all shipped during the gap between the previous and
+  current state-md refreshes. Their full archive lives in
+  `docs/briefs/010-*.md` through `docs/briefs/014-*.md` plus the
+  per-brief PRs (#94, #98, #102, #105, #146 and the wave PRs that
+  drained each brief's targets). The auto-generated
+  [`docs/briefs/README.md`](docs/briefs/README.md) index lists every
+  brief with its working branch.
 
 - [`docs/briefs/009-sinit-ov002-outlier.md`](docs/briefs/009-sinit-ov002-outlier.md)
   `decomper`, shipped in PR #92. Matched `__sinit_ov002_022ca7e8`
