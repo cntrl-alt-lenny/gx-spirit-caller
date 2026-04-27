@@ -7,16 +7,16 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**44 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**46 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (11)
+- [Analysis / worklist](#analysis) (11)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (6)
-- [Hygiene / invariants](#hygiene--invariants) (1)
-- [CI formatters](#ci-formatters) (6)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (13)
+- [Match acceleration](#match-acceleration) (7)
+- [Hygiene / invariants](#invariants) (1)
+- [CI formatters](#ci-formatters) (7)
+- [Infrastructure / build-patching](#infrastructure) (13)
 
 ## Analysis / worklist
 
@@ -138,6 +138,12 @@ The decomp loop spends real time on per-function setup: pick the target, look up
 
 _Tools that compress the decomp iteration loop: context assembly, template matching, permuter workspace staging._
 
+### `tools/cluster_wave_propagate.py`
+
+**drive `propagate_template` across all**
+
+unmatched siblings of a matched anchor, in one wave.
+
 ### `tools/find_pattern_clusters.py`
 
 **surface clusters of functions sharing an**
@@ -207,6 +213,12 @@ Consumes the JSON emitted by `check_match_invariants.py --json` and prints a Mar
 ### `tools/ci_format_mega_cascades.py`
 
 **render the per-PR mega-cascade ranking**
+
+diff as an upsertable Markdown comment.
+
+### `tools/ci_format_pattern_clusters.py`
+
+**render the per-PR pattern-cluster**
 
 diff as an upsertable Markdown comment.
 
