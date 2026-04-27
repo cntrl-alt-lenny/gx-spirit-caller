@@ -9,8 +9,16 @@ labelled `**Goal:**` describes what the brief covers.
 
 Run after adding or editing a brief; commit the regenerated README
 alongside the brief itself.
+
+    python tools/generate_briefs_index.py
+    # → writes docs/briefs/README.md
+
+    python tools/generate_briefs_index.py --check
+    # → exits non-zero if the committed index is out of date
+    #   (suitable for CI gate)
 """
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -104,6 +112,16 @@ def render_index(briefs: list[dict]) -> str:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser(
+        description="Regenerate docs/briefs/README.md.",
+    )
+    ap.add_argument(
+        "--check", action="store_true",
+        help="Exit non-zero if the committed index is out of date. "
+             "For CI use.",
+    )
+    args = ap.parse_args()
+
     briefs: list[dict] = []
     for path in sorted(BRIEFS_DIR.glob("*.md")):
         if path.name == "README.md":
@@ -120,6 +138,23 @@ def main() -> int:
         return 1
 
     rendered = render_index(briefs)
+
+    if args.check:
+        existing = (
+            INDEX_PATH.read_text(encoding="utf-8")
+            if INDEX_PATH.is_file() else ""
+        )
+        if existing != rendered:
+            print(
+                f"error: {INDEX_PATH.relative_to(ROOT)} is out of "
+                "date. Re-run `python tools/generate_briefs_index.py` "
+                "and commit.",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"{INDEX_PATH.relative_to(ROOT)} is current.")
+        return 0
+
     if INDEX_PATH.exists() and INDEX_PATH.read_text(encoding="utf-8") == rendered:
         print(f"{INDEX_PATH.relative_to(ROOT)} already up to date.")
         return 0
