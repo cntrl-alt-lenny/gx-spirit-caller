@@ -131,9 +131,10 @@ territory as #6; probably falls out of the same investigation.
 
 ## Recommended first carve (pilot)
 
-For brief 015-shaped work (first data match), pick either #1 or
-#6. #1 has more consumer diversity (safer hypothesis-narrowing).
-#6 is smaller-scope (DTCM is tighter than arbitrary main data).
+For brief 015-shaped work (first data match), pick either candidate
+`#1` or candidate `#6`. Candidate `#1` has more consumer diversity
+(safer hypothesis-narrowing). Candidate `#6` is smaller-scope (DTCM
+is tighter than arbitrary main data).
 
 Paired with this doc, `libs/nitro/include/nitro/os.h` now ships
 with `OSArenaId` / `OSHeapHandle` / `OSTick` / `OSIrqMask` /

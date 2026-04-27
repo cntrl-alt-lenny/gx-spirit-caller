@@ -30,9 +30,10 @@ Three shifts since round 3, all real progress signal:
 
 ### 1. Tractable set keeps shrinking with matches
 
-323 → **292** default / 995 → **921** failing. Decomper waves
-#165/#167/#170/#171/#176/#177/#178/#180/#186/#182 consumed ~74
-placeholder targets out of the corpus. Normal drain pattern.
+323 → **292** default / 995 → **921** failing. Decomper PR waves
+`#165` / `#167` / `#170` / `#171` / `#176` / `#177` / `#178` /
+`#180` / `#186` / `#182` consumed ~74 placeholder targets out of
+the corpus. Normal drain pattern.
 
 ### 2. MEDIUM collapsed in the default scan
 
