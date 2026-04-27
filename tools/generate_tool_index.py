@@ -52,6 +52,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("nitro_", "rename-support", "Rename support"),
     ("find_mega_cascades", "analysis", "Analysis / worklist"),
     ("find_pattern_clusters", "match-acceleration", "Match acceleration"),
+    ("cluster_wave_propagate", "match-acceleration", "Match acceleration"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
@@ -141,29 +142,6 @@ CATEGORY_DESC = {
         "`generate_tool_index.CATEGORIES` to classify."
     ),
 }
-
-
-def _anchor_for(title: str) -> str:
-    """GitHub-flavored markdown auto-slug for a heading. Mirrors
-    the algorithm markdownlint MD051 expects:
-
-      - lowercase
-      - strip every char that isn't alphanumeric / space / hyphen
-        / underscore
-      - replace spaces with hyphens
-      - consecutive hyphens are preserved (a heading like
-        "Analysis / worklist" → "analysis--worklist", two hyphens
-        because the slash is stripped while the surrounding spaces
-        each become a hyphen)
-    """
-    out: list[str] = []
-    for ch in title.lower():
-        if ch.isalnum() or ch in ("-", "_"):
-            out.append(ch)
-        elif ch == " ":
-            out.append("-")
-        # everything else (e.g. "/") is dropped
-    return "".join(out)
 
 
 @dataclass(frozen=True)
@@ -295,11 +273,7 @@ def render(tools: list[Tool]) -> str:
         if not bucket:
             continue
         title = CATEGORY_TITLES.get(cat, cat)
-        # Use the heading's GitHub-auto-slug so the TOC link target
-        # matches the heading anchor (markdownlint MD051).
-        lines.append(
-            f"- [{title}](#{_anchor_for(title)}) ({len(bucket)})",
-        )
+        lines.append(f"- [{title}](#{cat.replace('-', '-')}) ({len(bucket)})")
     lines.append("")
 
     # Per-category sections.
