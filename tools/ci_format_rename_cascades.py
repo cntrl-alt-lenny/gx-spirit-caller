@@ -34,6 +34,7 @@ branch config; this tool is pure function-of-two-directories.
 from __future__ import annotations
 
 import argparse
+import io
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -266,6 +267,18 @@ def render_markdown(
 # --------------------------------------------------------------------------- #
 
 def main() -> int:
+    # Force UTF-8 on stdout so the emoji header (🔗) survives on
+    # Windows cp1252 consoles when the tool is run locally. The
+    # `-o <path>` writer already pins utf-8; this covers the plain
+    # stdout invocation that crashes otherwise. No-op in
+    # environments where stdout is already utf-8 (Linux/macOS,
+    # GitHub Actions runners) or where reconfigure isn't available
+    # (piped, non-TextIO stdout).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, io.UnsupportedOperation):
+        pass
+
     ap = argparse.ArgumentParser(
         description="Render per-PR rename-cascade impact as Markdown.",
     )
