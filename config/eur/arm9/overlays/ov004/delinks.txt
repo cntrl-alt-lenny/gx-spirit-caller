@@ -106,3 +106,8 @@ src/overlay004/ov004_021dbc78.s:
 src/overlay004/ov004_021dbc80.s:
     complete
     .text start:0x021dbc80 end:0x021dbc8a
+
+src/overlay004/func_ov004_021dabc0.c:
+    complete
+    .text start:0x021dabc0 end:0x021dabcc
+

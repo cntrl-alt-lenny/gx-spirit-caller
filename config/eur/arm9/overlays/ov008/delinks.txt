@@ -3,3 +3,8 @@
     .ctor       start:0x021b2430 end:0x021b2430 kind:rodata align:4
     .data       start:0x021b2440 end:0x021b2780 kind:data align:32
     .bss        start:0x021b2780 end:0x021b2f40 kind:bss align:32
+
+src/overlay008/func_ov008_021b23ac.c:
+    complete
+    .text start:0x021b23ac end:0x021b23b8
+
