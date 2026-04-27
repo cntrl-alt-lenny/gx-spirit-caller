@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**44 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**45 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -15,7 +15,7 @@ git add docs/tools-index.md
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (6)
 - [Hygiene / invariants](#invariants) (1)
-- [CI formatters](#ci-formatters) (6)
+- [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure) (13)
 
 ## Analysis / worklist
@@ -207,6 +207,12 @@ Consumes the JSON emitted by `check_match_invariants.py --json` and prints a Mar
 ### `tools/ci_format_mega_cascades.py`
 
 **render the per-PR mega-cascade ranking**
+
+diff as an upsertable Markdown comment.
+
+### `tools/ci_format_pattern_clusters.py`
+
+**render the per-PR pattern-cluster**
 
 diff as an upsertable Markdown comment.
 
