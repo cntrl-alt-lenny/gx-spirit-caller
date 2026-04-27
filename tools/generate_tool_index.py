@@ -52,6 +52,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("nitro_", "rename-support", "Rename support"),
     ("find_mega_cascades", "analysis", "Analysis / worklist"),
     ("find_pattern_clusters", "match-acceleration", "Match acceleration"),
+    ("cluster_wave_propagate", "match-acceleration", "Match acceleration"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
