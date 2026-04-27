@@ -180,7 +180,7 @@ NitroSDK-Decomp project uses this pattern routinely.
 
 **Caveat**: doesn't help if the target is in a different
 overlay or module (24-bit range might exceed). But decomper's
-#208 case is specifically `Task_InvokeLocked`, which is in
+PR #208 case is specifically `Task_InvokeLocked`, which is in
 `main` — same module as any caller in `main`.
 
 ### Path C — emit the pool word explicitly

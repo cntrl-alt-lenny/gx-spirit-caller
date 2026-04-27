@@ -43,12 +43,14 @@ run.
    `func_ov000_021ac550` flow: write the C, build, objdiff to 100%,
    ship.
 3. **Run propagation.**
+
    ```
    python tools/propagate_template.py apply \
      --template src/main/<matched-sibling>.c \
      --cluster main 0x020498f0 \
      --version eur
    ```
+
    The tool validates reloc shape per target before emitting; it
    refuses with `TemplateMismatch` on any sibling whose actual
    relocation pattern diverges, so accidental wrong-C ships are

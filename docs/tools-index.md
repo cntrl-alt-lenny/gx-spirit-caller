@@ -11,12 +11,12 @@ git add docs/tools-index.md
 
 ## Contents
 
-- [Analysis / worklist](#analysis) (11)
+- [Analysis / worklist](#analysis--worklist) (11)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (6)
-- [Hygiene / invariants](#invariants) (1)
+- [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (6)
-- [Infrastructure / build-patching](#infrastructure) (13)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (13)
 
 ## Analysis / worklist
 

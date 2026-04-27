@@ -143,6 +143,29 @@ CATEGORY_DESC = {
 }
 
 
+def _anchor_for(title: str) -> str:
+    """GitHub-flavored markdown auto-slug for a heading. Mirrors
+    the algorithm markdownlint MD051 expects:
+
+      - lowercase
+      - strip every char that isn't alphanumeric / space / hyphen
+        / underscore
+      - replace spaces with hyphens
+      - consecutive hyphens are preserved (a heading like
+        "Analysis / worklist" → "analysis--worklist", two hyphens
+        because the slash is stripped while the surrounding spaces
+        each become a hyphen)
+    """
+    out: list[str] = []
+    for ch in title.lower():
+        if ch.isalnum() or ch in ("-", "_"):
+            out.append(ch)
+        elif ch == " ":
+            out.append("-")
+        # everything else (e.g. "/") is dropped
+    return "".join(out)
+
+
 @dataclass(frozen=True)
 class Tool:
     name: str              # stem, e.g. "find_cascades"
@@ -272,7 +295,11 @@ def render(tools: list[Tool]) -> str:
         if not bucket:
             continue
         title = CATEGORY_TITLES.get(cat, cat)
-        lines.append(f"- [{title}](#{cat.replace('-', '-')}) ({len(bucket)})")
+        # Use the heading's GitHub-auto-slug so the TOC link target
+        # matches the heading anchor (markdownlint MD051).
+        lines.append(
+            f"- [{title}](#{_anchor_for(title)}) ({len(bucket)})",
+        )
     lines.append("")
 
     # Per-category sections.
