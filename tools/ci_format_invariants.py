@@ -34,6 +34,7 @@ Usage:
 
 from __future__ import annotations
 
+import io
 import json
 import sys
 from collections import defaultdict
@@ -174,6 +175,18 @@ def render(report: dict, *, limit_per_check: int = 15) -> str:
 
 
 def main() -> int:
+    # Force UTF-8 on stdout so the emoji header (🧹 ✅) survives on
+    # Windows cp1252 consoles when the tool is run locally. The
+    # `-o <path>` writer already pins utf-8; this covers the plain
+    # stdout invocation that crashes otherwise. No-op in
+    # environments where stdout is already utf-8 (Linux/macOS,
+    # GitHub Actions runners) or where reconfigure isn't available
+    # (piped, non-TextIO stdout).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, io.UnsupportedOperation):
+        pass
+
     if len(sys.argv) < 2:
         print("usage: ci_format_invariants.py <invariants.json> "
               "[-o <out.md>]", file=sys.stderr)
