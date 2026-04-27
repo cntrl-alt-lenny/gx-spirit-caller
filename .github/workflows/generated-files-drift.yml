@@ -1,0 +1,51 @@
+name: Generated files drift
+
+# Gates auto-generated docs against drift. Each generator exposes a
+# `--check` mode that exits non-zero if the committed output differs
+# from a fresh regeneration. Catches PRs that add a new tool or brief
+# without re-running the regenerator.
+#
+# Currently gates:
+#   docs/tools-index.md   ← tools/generate_tool_index.py
+#   docs/briefs/README.md ← tools/generate_briefs_index.py
+#
+# Does NOT gate assets/progress-heatmap.svg — its committed form is
+# generated from `report.json` (post-`ninja report`, requires baserom),
+# while CI falls back to `delinks.txt` synthesis which produces a
+# structurally-different SVG. A CI gate would always false-fail.
+
+on:
+  pull_request:
+    paths:
+      # tools-index regenerates from tool docstrings + the prefix-
+      # rule table in generate_tool_index.py itself.
+      - 'tools/**.py'
+      - 'docs/tools-index.md'
+      # briefs-index regenerates from filenames + first-paragraph
+      # parsing of every docs/briefs/NNN-*.md.
+      - 'docs/briefs/**.md'
+      - '.github/workflows/generated-files-drift.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r tools/requirements.txt
+
+      - name: Check tools-index drift
+        run: python tools/generate_tool_index.py --check
+
+      - name: Check briefs-index drift
+        run: python tools/generate_briefs_index.py --check

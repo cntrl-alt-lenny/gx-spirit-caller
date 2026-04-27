@@ -393,6 +393,14 @@ def main():
                         help="Path to output SVG (default: assets/progress-heatmap.svg)")
     args = parser.parse_args()
 
+    # NOTE: no --check mode here. The committed SVG is generated
+    # from report.json (real matched-byte counts post-`ninja
+    # report`), but CI has no baserom and falls back to delinks.txt
+    # synthesis, which produces a structurally-different SVG. A
+    # CI gate would always false-fail. The drift CI workflow
+    # gates `generate_tool_index --check` and
+    # `generate_briefs_index --check` only.
+
     report_path = args.report or (ROOT / "build" / args.version / "report.json")
     out_path = args.out or (ROOT / "assets" / "progress-heatmap.svg")
 
