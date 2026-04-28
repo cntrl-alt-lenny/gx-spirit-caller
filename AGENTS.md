@@ -256,12 +256,12 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/015-cluster-propagation-pilot.md`](docs/briefs/015-cluster-propagation-pilot.md)
-  — `decomper`: bulk-match the top remaining cluster
-  (`main` / `func_020498f0`, 0x10, **148 unmatched siblings**) using
-  cloud's new `tools/find_pattern_clusters.py` (PR #227) + existing
-  `tools/propagate_template.py`. Match the anchor by hand, propagate
-  to validated siblings. Branch: `decomper/cluster-prop-020498f0`.
+- [`docs/briefs/016-cluster-prop-ov000.md`](docs/briefs/016-cluster-prop-ov000.md)
+  — `decomper`: cluster-propagation pilot round 2. Anchor is already
+  matched (`ov000 / func_ov000_021aa4a0`, size 0x14); propagate to
+  the 72 unmatched siblings. Realistic expectation per brief 015's
+  hit rate: 5-15 actually validate at 100%. Branch:
+  `decomper/cluster-prop-ov000-021aa4a0`.
 
 ### Closed briefs (reference)
 
