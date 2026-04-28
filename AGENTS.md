@@ -256,12 +256,18 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/016-cluster-prop-ov000.md`](docs/briefs/016-cluster-prop-ov000.md)
-  — `decomper`: cluster-propagation pilot round 2. Anchor is already
-  matched (`ov000 / func_ov000_021aa4a0`, size 0x14); propagate to
-  the 72 unmatched siblings. Realistic expectation per brief 015's
-  hit rate: 5-15 actually validate at 100%. Branch:
-  `decomper/cluster-prop-ov000-021aa4a0`.
+- [`docs/briefs/017-cluster-prop-020085d4.md`](docs/briefs/017-cluster-prop-020085d4.md)
+  — `decomper`: cluster-propagation pilot round 3, this time on an
+  **offset-0 / no-literal anchor** to side-step brief 016's
+  literal-substitution gap. Anchor `main / func_020085d4` (size 0x10,
+  130 unmatched siblings, same `return *data` shape that yielded
+  12.5% in brief 015). Branch: `decomper/cluster-prop-020085d4`.
+- [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
+  — `cloud`: ship the two propagation-tooling improvements brief
+  016 + 017 collectively diagnosed. (1) `propagate_template
+  --substitute-imm` for per-sibling literal swap. (2) finer cluster
+  fingerprint in `find_pattern_clusters.py` (instruction-shape
+  histogram or similar). Branch: `cloud/cluster-tooling-upgrade`.
 
 ### Closed briefs (reference)
 
