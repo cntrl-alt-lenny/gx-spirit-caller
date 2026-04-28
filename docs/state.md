@@ -8,9 +8,9 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-27 (second refresh today). Main tip is
-`31def5c` after PRs #233 / #235 / #237 / #238 / #239 (cloud sweep +
-brief 015 ship). Brief 015 closed; brief 016 opens this chunk.
+**Last updated:** 2026-04-27 (third refresh today). Main tip is
+`1ee0935` after PR #241 (decomper, brief 016 ship). Brief 016 closed;
+briefs 017 + 018 open this chunk.
 
 **Baseline:** Per merged PR bodies, `ninja rom` clean and `./dsd
 check modules` baseline preserved (3 expected failures: ARM9 main /
@@ -24,108 +24,95 @@ brief 015's verification. CI's `pr-invariants` + `pr-tier-delta` +
 | Tier | Matched | Unmatched | Total | % matched |
 |------|--------:|----------:|------:|----------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** |
-| `easy` | 345 | 765 | 1110 | **31.1%** |
+| `easy` | 347 | 763 | 1110 | **31.3%** |
 | `sinit` | 50 | 1 | 51 | 98.0% |
 | `named` | 38 | 1 | 39 | 97.4% |
 | `medium` | 94 | 62 | 156 | 60.3% |
 | `hard` | 36 | 8321 | 8357 | 0.4% |
 
-Δ since previous refresh: `easy` 327 → 345 (+18 from brief 015's
-propagation pilot). `find_pattern_clusters.py` now reports **53
-ready-to-propagate clusters covering 821 unmatched** (down from 839).
+Δ since previous refresh: `easy` 345 → 347 (+2 from brief 016, with
+the third-refresh-today recalibration noted below).
+`find_pattern_clusters.py` now reports **53 ready-to-propagate
+clusters covering 819 unmatched**.
+
+**Yield reality check after three pilots:** brief 015 → 12.5% (18/144),
+brief 016 → 2.9% (2/70), brief 017 → predicted 12-15% (offset-0 shape
+again, side-stepping brief 016's diagnosed problem). The pipeline is
+working but bottlenecked on two specific tooling gaps (see brief 018
+for cloud's formal scope to fix them).
 
 ## Merged since previous refresh
 
-Main tip moved from `351899f` → `31def5c` (5 PRs + rebase).
+Main tip moved from `31def5c` → `1ee0935` (1 PR).
 
 ### Decomper track
 
-- **PR #237** — Brief 015 shipped. **18 byte-identical anchor-
-  pattern matches** in `main`, all the singleton-pointer-getter
-  shape (`extern void *data_<addr>; void *func(void) { return
-  data_<addr>; }`). Out of 144 propagation candidates, 89 main + 37
-  ov002 dropped at `TemplateMismatch` — instruction shape diverged
-  despite shared `(size, reloc-sig)` fingerprint. **Hit rate
-  ~12.5%** is the new realistic expectation for sig-1 cluster
-  propagation. The cluster-finder tool is correctly refusing to
-  ship wrong-C; that's the safety story playing out.
-
-### Cloud track
-
-- **PR #233** — Pin UTF-8 on stdout for emoji-emitting CI
-  formatters. Fixes the latent Windows-cp1252 stdout bug previously
-  flagged in state.md.
-- **PR #235** — CI: gate generated docs against drift. Adds a
-  workflow check that auto-regenerated doc artifacts (briefs index,
-  tools index, etc.) match what's committed.
-- **PR #238** — Unblock markdownlint CI: 9 errors across 5 files.
-  Cleanup pass after the doc-drift gate exposed lint debt.
-- **PR #239** — Rebase #234 + #236 onto post-#235 main with
-  regenerated tools-index. Mechanical merge.
+- **PR #241** — Brief 016 shipped. **2 byte-identical matches**
+  (`main_020498dc`, `ov008_021b1e0c`), both the
+  `*data->field_NNN = arg` shape. Yield 2/70 (2.9%), well below
+  the 5-15 calibrated band. Decomper's PR body diagnosed the
+  collapse: `(size, sig_len)` cluster fingerprint groups wildly
+  different shapes (tail-call thunks, constant-write setters,
+  byte-store doubles, lookup-table loads, the actual anchor shape)
+  AND `propagate_template` doesn't substitute numeric literals
+  even when shape is right (the cluster has 81 different str
+  offsets across siblings; the template's hardcoded `0x144`
+  matched nothing). Decomper hand-patched the 2 surviving
+  shape-correct siblings' integer literal — disclosed clearly,
+  byte-verified.
 
 ### Brain track (this PR)
 
-- Refreshed this file again (#237's drop-rate intel needed a
-  refreshed expectation in the next brief).
-- Wrote brief 016 — cluster #2 propagation pilot. Anchor is already
-  matched (`ov000 / func_ov000_021aa4a0`); propagate to the 72
-  unmatched siblings, expect 5-15 to land per the new hit-rate
-  baseline.
-- AGENTS.md open-briefs list moves 015 → 016.
+- Accept brief 016's literal-only patching pattern as the
+  documented exception to "drop, don't patch" — see brief 017's
+  rules section. Will be retired once brief 018 lands
+  `--substitute-imm`.
+- Wrote brief 017 — cluster pilot round 3 on an offset-0
+  anchor (`func_020085d4`, 130 unmatched siblings, same shape as
+  brief 015's 12.5%-yield cluster). Side-steps brief 016's
+  literal-substitution gap until cloud ships brief 018.
+- Wrote brief 018 — formal cloud scope for the two systemic fixes
+  brief 016's PR diagnosed: `propagate_template --substitute-imm`
+  + finer cluster fingerprint in `find_pattern_clusters.py`.
+- AGENTS.md open-briefs list now points at 017 + 018.
 
-### Conflict-resolution note (carryover)
+## In flight (post this brain-PR)
 
-Wave 11's append-only delinks.txt overlap kept being painful. The
-generic resolution is `sed -i '/^<<<<<<< /d; /^=======$/d;
-/^>>>>>>> /d' config/eur/arm9/delinks.txt` because both blocks are
-just additions. Brief 016 keeps PR scope to a single overlay's
-delinks (`config/eur/arm9/overlays/ov000/delinks.txt`) so it
-shouldn't conflict with anything else.
-
-## In flight
-
-- **Open PRs:** zero (post this brain-PR merge).
-- **`decomper`** — brief 016 open. Branch:
-  `decomper/cluster-prop-ov000-021aa4a0`. One PR, propagation-
-  validated siblings of `func_ov000_021aa4a0` (anchor already
-  matched).
-- **`cloud`** — latent stdout + UTF-8 fixes shipped (PR #233);
-  doc-drift CI shipped (PR #235). Remaining self-directed candidates:
-  1. **`build.ninja` shell-wrapping fix** — configure.py emits
-     compound rules with `&&` and no `cmd.exe /c` wrapper. Affects
-     non-cmd shells on Windows; Linux/macOS unaffected. Touchy
-     cross-platform; not blocking, but is what's keeping the brain
-     shell on this exact setup from running `ninja rom`.
-  2. **Cluster CI integration** — extend PR-comment workflows to
-     surface "this PR drains N% of cluster X" or "promotes M new
-     clusters to ready" using the freshly-shipped
-     `tools/ci_format_pattern_clusters.py` (referenced in #237's
-     diff but I haven't audited what it does yet).
-  3. **Cluster fingerprint subdivision** — brief 015's 12.5% hit
-     rate suggests `(size, reloc-sig)` alone is too coarse. A
-     deeper signature (instruction-shape histogram, prefix bytes,
-     literal-pool layout) on the cluster finder would push the
-     hit rate up materially, which compounds across every future
-     pilot. Tools-only, well-bounded.
-- **`brain`** — waiting for brief 016 PR. Will re-run cluster
-  analysis after to size brief 017.
+- **Open PRs:** zero.
+- **`decomper`** — brief 017 open. Branch:
+  `decomper/cluster-prop-020085d4`. Predicted yield 12-15% on the
+  130-sibling offset-0 cluster.
+- **`cloud`** — brief 018 open. Branch:
+  `cloud/cluster-tooling-upgrade`. Two specific propagation-tooling
+  fixes that unblock yield rates on literal-bearing clusters.
+- **`brain`** — waiting for whichever PR comes back first. Brief
+  019 depends on 018's tooling.
 
 ## Next-brain TODO
 
-1. **Review brief 016 PR when it opens.** Single overlay
-   (`src/overlay000/`) + `config/eur/arm9/overlays/ov000/delinks.txt`
-   — won't conflict with main delinks anymore. Verify: configure,
-   `ninja rom`, `ninja objdiff` (every kept sibling 100%), `./dsd
-   check modules` still 24/27, `check_match_invariants`. PR body
-   will list dropped siblings; that's the propagation tool refusing
-   to ship wrong-C, which is fine.
-2. **Brief 017 candidate** — cluster #3, `ov006 / func_ov006_021b7ce0`
-   (size 0x1c, sig 1, 60 unmatched). Same flow as 016.
-3. **Brain shell repair** — carryover. If you can fix the
-   Windows-bash + ninja `&&` issue (or just document
-   cmd.exe / WSL / PowerShell as the recommended brain shell),
-   it's an onboarding cliff for fresh brain sessions.
-4. **Pre-existing carryovers** — `func_ov021_021aaf58` placeholder-
+1. **Review brief 017 PR when it opens.** Likely 15-20 propagated
+   siblings + drops. Per-sibling delinks blocks across `main` and
+   any overlays the cluster reaches. Verify: configure, ninja rom,
+   ninja objdiff, dsd check modules (still 24/27),
+   `check_match_invariants`. The literal-only-substitution
+   exception (carryover from brief 016 disclosure) applies if
+   needed; brief 018 retires the exception.
+2. **Review brief 018 PR when it opens.** Tools-only:
+   `tools/propagate_template.py` + `tools/find_pattern_clusters.py`
+   + their tests. Run the smoke commands in the brief's *Success*
+   section to confirm cluster #1 (offset-0) and cluster #2
+   (offset-bearing) end up in different clusters under the new
+   fingerprint, and that `--substitute-imm` rewrites at least one
+   literal correctly.
+3. **Queue brief 019** post-018 merge: rerun brief 016's cluster
+   (`func_ov000_021aa4a0`, 68 still unmatched) with the new tooling
+   to validate the bottleneck diagnosis. Predicted yield jumps
+   2.9% → ~50-80% if the diagnosis is right.
+4. **Brain shell repair** — carryover. Windows-bash + ninja `&&`
+   issue. Cloud's autonomous-work option (build.ninja shell
+   wrapping) was deprioritized into brief 018 directly — both
+   propagation issues take precedence.
+5. **Pre-existing carryovers** — `func_ov021_021aaf58` placeholder-
    in-complete-TU warning; `__sinit_ov004_02209a5c` (failing
    module); `match-invariants` not yet a required branch-protection
    check.
