@@ -95,16 +95,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_symbols import (  # noqa: E402
     ModuleData,
+    Reloc,
     ROOT,
     Symbol,
     load_all,
 )
+from data_symbol_sizes import infer_per_module  # noqa: E402
 from next_targets import (  # noqa: E402
     collect_matched_ranges,
     is_addr_matched,
 )
 from propagate_template import (  # noqa: E402
-    reloc_signature,
     relocs_for_function,
 )
 
@@ -155,15 +156,113 @@ class Cluster:
 
 
 # --------------------------------------------------------------------------- #
+# Extended reloc signature
+# --------------------------------------------------------------------------- #
+#
+# `propagate_template.reloc_signature` returns `(offset, kind)` tuples —
+# enough for an exact mechanical match of two functions' template shape.
+# But the brief 015 pilot showed `(size, reloc_signature)` is too coarse
+# for cluster-level grouping: 144 candidates shared the fingerprint,
+# only 18 (12.5%) actually matched the anchor's instruction shape. The
+# rest had different instruction sequences targeting different kinds of
+# symbols (function vs data) at the same `(offset, kind)` slot.
+#
+# Cloud has no access to the baserom or the toolchain, so it can't
+# inspect instruction bytes. But it CAN look up the *target* of each
+# reloc — and the target's TYPE (function / data) plus, for data
+# targets, the inferred SIZE BUCKET, are strong shape discriminators
+# that survive without seeing instructions.
+#
+# Examples this catches:
+#   - anchor pattern  `ldr r0, =data_X; ldr r0, [r0]; bx lr`
+#                     → 1 reloc, target_kind="d4" (4-byte pointer)
+#   - tail-call       `ldr ip, =func_Y; mov r1, #N; bx ip`
+#                     → 1 reloc, target_kind="fn"            ← different bucket
+#   - field getter    `ldr r0, =data_Z; ldr r0, [r0, #0x40]` (data_Z is a struct)
+#                     → 1 reloc, target_kind="d128"          ← different bucket
+#
+# Where the old `(size, [(offset, kind)])` lumped all three into one
+# cluster of 156 unmatched siblings, the extended signature splits
+# them into per-target-shape sub-clusters, each of which is much more
+# homogeneous (and so much more likely to all `derive_plan`-validate).
+
+# Compact target-kind labels — kept short so the fingerprint tuple
+# isn't dominated by string overhead. Buckets mirror
+# `data_symbol_sizes.size_bucket` boundaries.
+_DATA_BUCKETS: list[tuple[int, str]] = [
+    (4, "d4"),
+    (8, "d8"),
+    (0x20, "d32"),
+    (0x80, "d128"),
+    (0x400, "d1k"),
+    (0x4000, "d16k"),
+]
+
+
+def _data_bucket(size: int | None) -> str:
+    if size is None:
+        return "d_unk"
+    for upper, label in _DATA_BUCKETS:
+        if size <= upper:
+            return label
+    return "d_big"
+
+
+def _target_kind(
+    r: Reloc,
+    modules: dict[str, ModuleData],
+    sizes_cache: dict[str, dict[int, int | None]],
+) -> str:
+    """Compact label for a reloc's target. `fn` for function targets,
+    `dN` for data targets bucketed by inferred size, `ext` for
+    targets that don't resolve to any known module / symbol."""
+    md = modules.get(r.dest_module)
+    if md is None:
+        return "ext"
+    target = md.by_addr.get(r.dest_addr)
+    if target is None:
+        return "ext"
+    if target.is_function:
+        return "fn"
+    # Data target — look up the inferred size from the per-module cache.
+    if r.dest_module not in sizes_cache:
+        sizes_cache[r.dest_module] = infer_per_module(md.symbols)
+    size = sizes_cache[r.dest_module].get(r.dest_addr)
+    return _data_bucket(size)
+
+
+def _extended_reloc_signature(
+    relocs: list[Reloc],
+    base_addr: int,
+    modules: dict[str, ModuleData],
+    sizes_cache: dict[str, dict[int, int | None]],
+) -> tuple[tuple[int, str, str], ...]:
+    """Like `propagate_template.reloc_signature` but each tuple is
+    `(offset, kind, target_kind)` — see module-level comment for
+    rationale."""
+    return tuple(
+        (
+            r.src_addr - base_addr,
+            r.kind,
+            _target_kind(r, modules, sizes_cache),
+        )
+        for r in relocs
+    )
+
+
+# --------------------------------------------------------------------------- #
 # Cluster computation
 # --------------------------------------------------------------------------- #
 
 def _fingerprint(
-    sym: Symbol, md: ModuleData,
+    sym: Symbol,
+    md: ModuleData,
+    modules: dict[str, ModuleData],
+    sizes_cache: dict[str, dict[int, int | None]],
 ) -> Fingerprint | None:
-    """Build the (size, reloc-sig) fingerprint for one function.
-    Returns None for symbols that aren't valid template members
-    (zero-size, gap stubs, sinit shells)."""
+    """Build the (size, extended-reloc-sig) fingerprint for one
+    function. Returns None for symbols that aren't valid template
+    members (zero-size, gap stubs, sinit shells)."""
     if not sym.is_function:
         return None
     if sym.size == 0:
@@ -172,7 +271,10 @@ def _fingerprint(
         return None
     if sym.name.startswith("_dsd_gap"):
         return None
-    sig = reloc_signature(relocs_for_function(sym, md), sym.addr)
+    sig = _extended_reloc_signature(
+        relocs_for_function(sym, md), sym.addr,
+        modules, sizes_cache,
+    )
     return (sym.size, sig)
 
 
@@ -192,9 +294,10 @@ def find_clusters(
     surfacing it as a cluster is correct.
     """
     buckets: dict[Fingerprint, list[Symbol]] = defaultdict(list)
+    sizes_cache: dict[str, dict[int, int | None]] = {}
     for _mod_name, md in modules.items():
         for sym in md.symbols:
-            fp = _fingerprint(sym, md)
+            fp = _fingerprint(sym, md, modules, sizes_cache)
             if fp is None:
                 continue
             buckets[fp].append(sym)
@@ -239,7 +342,8 @@ def find_clusters_for_anchor(
     md = modules.get(anchor.module)
     if md is None:
         return None
-    anchor_fp = _fingerprint(anchor, md)
+    sizes_cache: dict[str, dict[int, int | None]] = {}
+    anchor_fp = _fingerprint(anchor, md, modules, sizes_cache)
     if anchor_fp is None:
         return None
     siblings: list[Symbol] = []
@@ -247,7 +351,7 @@ def find_clusters_for_anchor(
         for sym in mdat.symbols:
             if sym.module == anchor.module and sym.addr == anchor.addr:
                 continue
-            fp = _fingerprint(sym, mdat)
+            fp = _fingerprint(sym, mdat, modules, sizes_cache)
             if fp != anchor_fp:
                 continue
             siblings.append(sym)
