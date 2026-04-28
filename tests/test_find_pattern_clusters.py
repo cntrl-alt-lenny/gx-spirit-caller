@@ -88,36 +88,102 @@ def _reloc(
     )
 
 
+def _fp(sym, md, modules=None):
+    """Test helper: call _fingerprint with a fresh sizes cache and
+    a default `{md.name: md}` modules dict if none supplied."""
+    if modules is None:
+        modules = {md.name: md}
+    return _fingerprint(sym, md, modules, {})
+
+
 class TestFingerprint(unittest.TestCase):
-    def test_basic_function_returns_size_and_sig(self):
+    def test_basic_function_unresolved_targets_yield_ext(self):
         sym = _fn("main", 0x1000, size=0x40)
+        # Both relocs target dest_addr=0 in module "main" — no symbol
+        # there, so target_kind falls through to "ext".
         relocs = [
             _reloc("main", 0x1004, kind="arm_call"),
             _reloc("main", 0x100c, kind="arm_pcrel"),
         ]
         md = _module_with_relocs("main", [sym], relocs)
-        fp = _fingerprint(sym, md)
+        fp = _fp(sym, md)
         self.assertEqual(fp[0], 0x40)
-        # offsets relative to base, kinds preserved
         self.assertEqual(
             fp[1],
-            ((0x4, "arm_call"), (0xc, "arm_pcrel")),
+            ((0x4, "arm_call", "ext"), (0xc, "arm_pcrel", "ext")),
         )
+
+    def test_function_target_yields_fn(self):
+        sym = _fn("main", 0x1000, size=0x10)
+        target_fn = _fn("main", 0x5000, size=0x20)
+        relocs = [_reloc(
+            "main", 0x1004, kind="arm_call",
+            dest_module="main", dest_addr=0x5000,
+        )]
+        md = _module_with_relocs(
+            "main", [sym, target_fn], relocs,
+        )
+        fp = _fp(sym, md)
+        self.assertEqual(fp[1], ((0x4, "arm_call", "fn"),))
+
+    def test_data_target_buckets_by_inferred_size(self):
+        # Two data targets, two functions reading them. The inferred
+        # data-size comes from gap-to-next-symbol in the module.
+        sym = _fn("main", 0x1000, size=0x10)
+        # data at 0x6000 with the next symbol at 0x6004 → size 4 → "d4"
+        small_data = Symbol(
+            name="data_06000000", module="main", addr=0x6000,
+            size=0, type="data", mode="any",
+        )
+        next_sym = Symbol(
+            name="data_06000004", module="main", addr=0x6004,
+            size=0, type="data", mode="any",
+        )
+        relocs = [_reloc(
+            "main", 0x1004, kind="arm_pcrel",
+            dest_module="main", dest_addr=0x6000,
+        )]
+        md = _module_with_relocs(
+            "main", [sym, small_data, next_sym], relocs,
+        )
+        fp = _fp(sym, md)
+        self.assertEqual(fp[1], ((0x4, "arm_pcrel", "d4"),))
+
+    def test_data_target_larger_bucket(self):
+        sym = _fn("main", 0x1000, size=0x10)
+        # data at 0x6000 with next at 0x6080 → size 0x80 → "d128"
+        big_data = Symbol(
+            name="data_06000000", module="main", addr=0x6000,
+            size=0, type="data", mode="any",
+        )
+        next_sym = Symbol(
+            name="data_06000080", module="main", addr=0x6080,
+            size=0, type="data", mode="any",
+        )
+        relocs = [_reloc(
+            "main", 0x1004, kind="arm_pcrel",
+            dest_module="main", dest_addr=0x6000,
+        )]
+        md = _module_with_relocs(
+            "main", [sym, big_data, next_sym], relocs,
+        )
+        fp = _fp(sym, md)
+        self.assertEqual(fp[1], ((0x4, "arm_pcrel", "d128"),))
 
     def test_zero_size_filtered(self):
         sym = _fn("main", 0x1000, size=0)
         md = _module_with_relocs("main", [sym], [])
-        self.assertIsNone(_fingerprint(sym, md))
+        self.assertIsNone(_fp(sym, md))
 
     def test_sinit_filtered(self):
         sym = _fn("main", 0x1000, name="__sinit_foo", size=0x20)
         md = _module_with_relocs("main", [sym], [])
-        self.assertIsNone(_fingerprint(sym, md))
+        self.assertIsNone(_fp(sym, md))
 
     def test_dsd_gap_filtered(self):
         sym = _fn("main", 0x1000, name="_dsd_gap_001", size=0x20)
         md = _module_with_relocs("main", [sym], [])
-        self.assertIsNone(_fingerprint(sym, md))
+        self.assertIsNone(_fp(sym, md))
 
     def test_non_function_filtered(self):
         sym = Symbol(
@@ -125,12 +191,12 @@ class TestFingerprint(unittest.TestCase):
             size=0x10, type="data", mode="any",
         )
         md = _module_with_relocs("main", [sym], [])
-        self.assertIsNone(_fingerprint(sym, md))
+        self.assertIsNone(_fp(sym, md))
 
     def test_leaf_with_no_relocs_has_empty_sig(self):
         sym = _fn("main", 0x1000, size=0x4)
         md = _module_with_relocs("main", [sym], [])
-        fp = _fingerprint(sym, md)
+        fp = _fp(sym, md)
         self.assertEqual(fp, (0x4, ()))
 
 
@@ -222,6 +288,61 @@ class TestFindClusters(unittest.TestCase):
         clusters = find_clusters({"main": md}, matched)
         self.assertEqual(len(clusters), 1)
         self.assertEqual(clusters[0].fingerprint, (0x4, ()))
+
+    def test_target_kind_subdivides_otherwise_identical_clusters(self):
+        # Two functions with the same (size, [(offset, kind)]) — old
+        # fingerprint would group them. New fingerprint splits them
+        # because their reloc targets differ (one points at a function,
+        # one at data).
+        anchor_fn = _fn("main", 0x1000, size=0x10, name="AnchorFn")
+        anchor_data = _fn("main", 0x2000, size=0x10, name="AnchorData")
+        # Two unmatched siblings, one of each shape.
+        un_fn = _fn("main", 0x3000, size=0x10)
+        un_data = _fn("main", 0x4000, size=0x10)
+        # Targets.
+        target_fn = _fn("main", 0x9000, size=0x20)
+        target_data = Symbol(
+            name="data_0a000000", module="main", addr=0xa000,
+            size=0, type="data", mode="any",
+        )
+        # Force an inferred-size for the data target so it gets a
+        # specific bucket (not "d_unk").
+        next_after_data = Symbol(
+            name="data_0a000004", module="main", addr=0xa004,
+            size=0, type="data", mode="any",
+        )
+        relocs = [
+            # AnchorFn + un_fn → target_fn
+            _reloc("main", 0x1004, kind="arm_pcrel",
+                   dest_module="main", dest_addr=0x9000),
+            _reloc("main", 0x3004, kind="arm_pcrel",
+                   dest_module="main", dest_addr=0x9000),
+            # AnchorData + un_data → target_data
+            _reloc("main", 0x2004, kind="arm_pcrel",
+                   dest_module="main", dest_addr=0xa000),
+            _reloc("main", 0x4004, kind="arm_pcrel",
+                   dest_module="main", dest_addr=0xa000),
+        ]
+        md = _module_with_relocs(
+            "main",
+            [anchor_fn, anchor_data, un_fn, un_data,
+             target_fn, target_data, next_after_data],
+            relocs,
+        )
+        matched = {"main": [(0x1000, 0x1010), (0x2000, 0x2010)]}
+        clusters = find_clusters({"main": md}, matched)
+
+        # Two distinct clusters expected — one per target_kind.
+        self.assertEqual(len(clusters), 2)
+        # The fingerprints' target_kind labels should differ.
+        target_kinds = {
+            c.fingerprint[1][0][2] for c in clusters
+        }
+        self.assertEqual(target_kinds, {"fn", "d4"})
+        # Each cluster has exactly one matched + one unmatched.
+        for c in clusters:
+            self.assertEqual(len(c.matched), 1)
+            self.assertEqual(len(c.unmatched), 1)
 
     def test_sort_unmatched_count_desc(self):
         # Two distinct fingerprints, different unmatched counts.
