@@ -2899,3 +2899,7 @@ src/main/func_0209d5d4.c:
 src/main/func_0209dca8.c:
     complete
     .text start:0x0209dca8 end:0x0209dcb8
+
+src/main/main_020498dc.c:
+    complete
+    .text start:0x020498dc end:0x020498f0
