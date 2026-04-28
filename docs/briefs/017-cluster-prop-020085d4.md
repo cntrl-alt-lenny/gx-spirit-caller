@@ -27,18 +27,28 @@ already matched as of main `1ee0935`).
   void *func_020085d4(void) { return data_02104f3c; }
   ```
 
-- Cluster #1 in current `find_pattern_clusters` ranking after #241:
+- Cluster size in current `find_pattern_clusters` ranking, **post
+  PR #243** (cloud's finer-fingerprint half of brief 018):
 
   ```
-  main   func_020085d4  size=0x10  sig=1  matched=39  unmatched=130
+  main   func_020085d4  size=0x10  sig=1  matched=25  unmatched=41
   ```
 
-  (It became #1 because brief 015 promoted 18 siblings into the
-  matched-anchor pool; brief 016's anchor was different shape.)
-- **Calibrated yield expectation: 12-15% ≈ 15-20 actual matches**
-  out of the 130. Higher would be great, lower means the offset-0
-  shape isn't actually as homogeneous as we think and brief 018
-  (cloud's tooling fix) becomes the only path.
+  PR #243 split the original 169-function bucket into multiple
+  tighter clusters by reloc-target type + data-size. The
+  `func_020085d4` shape now scopes to a more homogeneous group of
+  41 unmatched siblings rather than the previous 130 mixed-shape
+  ones. Tighter cluster → expected higher per-target hit rate.
+- **Calibrated yield expectation: 25-50% ≈ 10-20 actual matches**
+  out of the 41. The percentage is up from brief 015's 12.5%
+  because the cluster is now more homogeneous; the absolute count
+  is similar because the cluster shrank.
+- **Note on the new top cluster** (`OSi_IrqHandlerTimer3`,
+  85 unmatched): NOT brief-017-friendly. Its anchor uses a
+  `mov r0, #N` immediate that varies per sibling, so it needs
+  brief 018's still-unshipped `--substitute-imm` half.
+  `func_020085d4` (this brief's target) has zero literals and
+  remains propagatable today.
 
 **Approach (mechanical, brief 015 style):**
 
@@ -100,10 +110,11 @@ yet substitute literals; once brief 018 ships
 
 **Success:**
 
-- 15-20 propagated siblings at 100% objdiff (per the calibrated
-  band). If yield drops below 5, **stop and report** — that means
-  even the offset-0 shape isn't homogeneous enough for the current
-  tooling, and brief 018's tooling fix is now blocking.
+- 10-20 propagated siblings at 100% objdiff (refreshed band — see
+  context note above). If yield drops below 5, **stop and report**
+  — that means even the post-#243 finer fingerprint isn't tight
+  enough for this cluster, and the second half of brief 018
+  (`--substitute-imm`) becomes the only path forward.
 - `./dsd.exe check modules` still **24/27 OK**.
 - `python tools/check_match_invariants.py --version eur` exits 0
   (placeholder-name warnings are fine and expected).
