@@ -808,3 +808,11 @@ src/overlay002/func_ov002_0227e76c.c:
 src/overlay002/func_ov002_021ff990.c:
     complete
     .text start:0x021ff990 end:0x021ff9a8
+
+src/overlay002/func_ov002_0227d5dc.c:
+    complete
+    .text start:0x0227d5dc end:0x0227d5f8
+
+src/overlay002/func_ov002_0224e374.c:
+    complete
+    .text start:0x0224e374 end:0x0224e390
