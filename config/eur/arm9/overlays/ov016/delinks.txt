@@ -98,3 +98,11 @@ src/overlay016/ov016_stubs_b5fa8.c:
 src/overlay016/ov016_stubs_b77c4.c:
     complete
     .text start:0x021b77c4 end:0x021b77cc
+
+src/overlay016/func_ov016_021b5414.c:
+    complete
+    .text start:0x021b5414 end:0x021b5424
+
+src/overlay016/func_ov016_021b22c8.c:
+    complete
+    .text start:0x021b22c8 end:0x021b22d8
