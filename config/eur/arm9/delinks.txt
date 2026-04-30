@@ -4808,3 +4808,7 @@ src/main/func_0206254c.c:
 src/main/func_02064a88.c:
     complete
     .text start:0x02064a88 end:0x02064a98
+
+src/main/func_0201cff8.c:
+    complete
+    .text start:0x0201cff8 end:0x0201d014
