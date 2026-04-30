@@ -4037,3 +4037,31 @@ src/main/func_0203af44.c:
 src/main/func_020318a4.c:
     complete
     .text start:0x020318a4 end:0x020318b8
+
+src/main/func_020937fc.s:
+    complete
+    .text start:0x020937fc end:0x02093808
+
+src/main/func_02093808.s:
+    complete
+    .text start:0x02093808 end:0x02093814
+
+src/main/func_02093814.s:
+    complete
+    .text start:0x02093814 end:0x02093820
+
+src/main/func_02092860.s:
+    complete
+    .text start:0x02092860 end:0x0209286c
+
+src/main/func_02092928.s:
+    complete
+    .text start:0x02092928 end:0x02092934
+
+src/main/func_02092934.s:
+    complete
+    .text start:0x02092934 end:0x02092940
+
+src/main/func_02093bf0.s:
+    complete
+    .text start:0x02093bf0 end:0x02093bfc
