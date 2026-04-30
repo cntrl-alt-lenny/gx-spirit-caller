@@ -695,3 +695,29 @@ src/overlay002/func_ov002_02267634.c:
 src/overlay002/func_ov002_021ff2b8.c:
     complete
     .text start:0x021ff2b8 end:0x021ff2c8
+
+src/overlay002/func_ov002_021f72e0.c:
+    complete
+    .text start:0x021f72e0 end:0x021f72f8
+
+
+src/overlay002/func_ov002_021f7fe0.c:
+    complete
+    .text start:0x021f7fe0 end:0x021f7ff8
+
+src/overlay002/func_ov002_0220448c.c:
+    complete
+    .text start:0x0220448c end:0x022044a4
+
+src/overlay002/func_ov002_022064d0.c:
+    complete
+    .text start:0x022064d0 end:0x022064e8
+
+src/overlay002/func_ov002_0227e76c.c:
+    complete
+    .text start:0x0227e76c end:0x0227e784
+
+src/overlay002/func_ov002_021ff990.c:
+    complete
+    .text start:0x021ff990 end:0x021ff9a8
+
