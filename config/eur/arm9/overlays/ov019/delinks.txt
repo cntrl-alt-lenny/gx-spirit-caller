@@ -16,9 +16,11 @@ src/overlay019/sinit_ov019_021b5a88.c:
 
 
 
+
 src/overlay019/sinit_ov019_021b5ab4.c:
     complete
     .init start:0x021b5ab4 end:0x021b5ae0
+
 
 
 
@@ -38,6 +40,7 @@ src/overlay019/sinit_ov019_021b5ae0.c:
 
 
 
+
 src/overlay019/ov019_stubs_b2ae0.c:
     complete
     .text start:0x021b2ae0 end:0x021b2ae8
@@ -49,9 +52,11 @@ src/overlay019/ov019_stubs_b2ae0.c:
 
 
 
+
 src/overlay019/ov019_stubs_b4658.c:
     complete
     .text start:0x021b4658 end:0x021b4660
+
 
 
 
