@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**46 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**47 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis) (11)
+- [Analysis / worklist](#analysis) (12)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (7)
 - [Hygiene / invariants](#invariants) (1)
@@ -87,6 +87,12 @@ Walks every `config/<ver>/arm9/**/relocs.txt`, counts the control-flow edges bet
 **Reports decomp progress for Yu-Gi-Oh! GX Spirit Caller.**
 
 Three sources, in order of preference (descending fidelity):
+
+### `tools/tier_classifier.py`
+
+**bucket every function in a tier into actionable**
+
+"how to attack this" categories using the v2 cluster fingerprint.
 
 ## Rename support
 
