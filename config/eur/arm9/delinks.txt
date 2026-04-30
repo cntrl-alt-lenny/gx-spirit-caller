@@ -2903,3 +2903,35 @@ src/main/func_0209dca8.c:
 src/main/main_020498dc.c:
     complete
     .text start:0x020498dc end:0x020498f0
+
+src/main/func_020a3830.c:
+    complete
+    .text start:0x020a3830 end:0x020a3840
+
+src/main/func_02046760.c:
+    complete
+    .text start:0x02046760 end:0x02046770
+
+src/main/func_020467e4.c:
+    complete
+    .text start:0x020467e4 end:0x020467f4
+
+src/main/func_0204067c.c:
+    complete
+    .text start:0x0204067c end:0x0204068c
+
+src/main/func_02077b4c.c:
+    complete
+    .text start:0x02077b4c end:0x02077b5c
+
+src/main/func_020a9950.c:
+    complete
+    .text start:0x020a9950 end:0x020a9960
+
+src/main/func_020930a0.c:
+    complete
+    .text start:0x020930a0 end:0x020930b0
+
+src/main/func_02093c10.c:
+    complete
+    .text start:0x02093c10 end:0x02093c20
