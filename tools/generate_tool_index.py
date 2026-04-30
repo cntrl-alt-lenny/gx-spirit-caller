@@ -57,6 +57,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
     ("next_targets", "analysis", "Analysis / worklist"),
+    ("tier_classifier", "analysis", "Analysis / worklist"),
     ("progress", "analysis", "Analysis / worklist"),
     ("overlay_coupling", "analysis", "Analysis / worklist"),
     ("data_symbol_sizes", "analysis", "Analysis / worklist"),
