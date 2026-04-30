@@ -17,9 +17,11 @@ src/overlay010/sinit_ov010_021b897c.c:
 
 
 
+
 src/overlay010/ov010_021b2480.c:
     complete
     .text start:0x021b2480 end:0x021b2488
+
 
 
 
@@ -41,9 +43,11 @@ src/overlay010/ov010_021b2488.c:
 
 
 
+
 src/overlay010/ov010_021b287c.c:
     complete
     .text start:0x021b287c end:0x021b2888
+
 
 
 
@@ -65,9 +69,11 @@ src/overlay010/ov010_021b2888.c:
 
 
 
+
 src/overlay010/ov010_021b3a14.c:
     complete
     .text start:0x021b3a14 end:0x021b3a1c
+
 
 
 
@@ -89,9 +95,11 @@ src/overlay010/sinit_ov010_021b89a8.c:
 
 
 
+
 src/overlay010/sinit_ov010_021b89f0.c:
     complete
     .init start:0x021b89f0 end:0x021b8a38
+
 
 
 
@@ -113,9 +121,11 @@ src/overlay010/ov010_021b2334.c:
 
 
 
+
 src/overlay010/ov010_021b24f4.c:
     complete
     .text start:0x021b24f4 end:0x021b2514
+
 
 
 
@@ -137,9 +147,11 @@ src/overlay010/ov010_021b2864.c:
 
 
 
+
 src/overlay010/ov010_021b2890.c:
     complete
     .text start:0x021b2890 end:0x021b28a8
+
 
 
 
@@ -161,9 +173,11 @@ src/overlay010/ov010_021b3c38.c:
 
 
 
+
 src/overlay010/ov010_021b3c48.c:
     complete
     .text start:0x021b3c48 end:0x021b3c58
+
 
 
 
@@ -185,9 +199,11 @@ src/overlay010/ov010_021b4014.c:
 
 
 
+
 src/overlay010/ov010_021b4028.c:
     complete
     .text start:0x021b4028 end:0x021b403c
+
 
 
 
@@ -209,9 +225,11 @@ src/overlay010/ov010_021b4678.c:
 
 
 
+
 src/overlay010/ov010_021b4690.c:
     complete
     .text start:0x021b4690 end:0x021b46a8
+
 
 
 
@@ -233,9 +251,11 @@ src/overlay010/ov010_021b4750.c:
 
 
 
+
 src/overlay010/ov010_021b6c00.c:
     complete
     .text start:0x021b6c00 end:0x021b6c1c
+
 
 
 
@@ -257,9 +277,11 @@ src/overlay010/ov010_021b6c1c.c:
 
 
 
+
 src/overlay010/ov010_021b6c34.c:
     complete
     .text start:0x021b6c34 end:0x021b6c4c
+
 
 
 
@@ -281,9 +303,11 @@ src/overlay010/ov010_021b2348.c:
 
 
 
+
 src/overlay010/ov010_021b285c.s:
     complete
     .text start:0x021b285c end:0x021b2860
+
 
 
 
@@ -305,9 +329,11 @@ src/overlay010/ov010_021b2860.s:
 
 
 
+
 src/overlay010/ov010_021b365c.s:
     complete
     .text start:0x021b365c end:0x021b3660
+
 
 
 
