@@ -5313,3 +5313,31 @@ src/main/func_0201aaa0.c:
 src/main/func_0201cff8.c:
     complete
     .text start:0x0201cff8 end:0x0201d014
+
+src/main/func_0201ed28.c:
+    complete
+    .text start:0x0201ed28 end:0x0201ed3c
+
+src/main/func_020643d8.c:
+    complete
+    .text start:0x020643d8 end:0x020643ec
+
+src/main/func_020a5654.c:
+    complete
+    .text start:0x020a5654 end:0x020a5668
+
+src/main/func_020a5864.c:
+    complete
+    .text start:0x020a5864 end:0x020a5878
+
+src/main/func_020a6600.c:
+    complete
+    .text start:0x020a6600 end:0x020a6614
+
+src/main/func_020ace00.c:
+    complete
+    .text start:0x020ace00 end:0x020ace14
+
+src/main/func_0203825c.c:
+    complete
+    .text start:0x0203825c end:0x02038270
