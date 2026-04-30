@@ -351,6 +351,89 @@ class TestFindCandidates(unittest.TestCase):
         self.assertEqual(cands[1].symbol.addr, 0x3000)
 
 
+class TestConfidenceLabel(unittest.TestCase):
+    """Confidence is a categorical fusion derived from existing
+    per-signal fields. Pinning the boundaries protects the rendered
+    label from silently shifting when scoring weights are tuned in
+    follow-up PRs."""
+
+    def _cand(self, **overrides):
+        defaults = dict(
+            symbol=_sym("main", 0x2000, size=0x20),
+            score=0.0,
+            caller_jaccard=0.0,
+            reloc_jaccard=0.0,
+            size_ratio=0.0,
+            is_adjacent=False,
+            shared_callers=frozenset(),
+        )
+        defaults.update(overrides)
+        from bulk_rename_candidates import Candidate
+        return Candidate(**defaults)
+
+    def test_high_when_score_strong_and_two_signals_strong(self):
+        c = self._cand(
+            score=0.85,
+            caller_jaccard=0.9,
+            reloc_jaccard=0.8,
+            size_ratio=1.0,
+        )
+        self.assertEqual(c.confidence, "HIGH")
+
+    def test_med_when_score_strong_but_only_one_signal_strong(self):
+        # Score above 0.6 but only one signal corroborates → MED.
+        c = self._cand(
+            score=0.65,
+            caller_jaccard=0.0,
+            reloc_jaccard=0.0,
+            size_ratio=1.0,    # only this signal is strong
+        )
+        self.assertEqual(c.confidence, "MED")
+
+    def test_med_when_score_borderline(self):
+        c = self._cand(
+            score=0.3,
+            caller_jaccard=0.4,
+            reloc_jaccard=0.4,
+            size_ratio=0.4,
+        )
+        self.assertEqual(c.confidence, "MED")
+
+    def test_med_when_two_signals_strong_but_score_low(self):
+        # Two strong signals but the weighted score is < 0.3.
+        # This shouldn't be possible with the production weights
+        # — but the OR-clause guarantees we don't miss the
+        # corroboration signal if weights are retuned.
+        c = self._cand(
+            score=0.0,
+            caller_jaccard=0.5,
+            reloc_jaccard=0.5,
+            size_ratio=0.0,
+        )
+        self.assertEqual(c.confidence, "MED")
+
+    def test_low_when_single_signal_below_threshold(self):
+        c = self._cand(
+            score=0.1,
+            caller_jaccard=0.0,
+            reloc_jaccard=0.45,   # below the 0.5 strong threshold
+            size_ratio=0.5,
+        )
+        self.assertEqual(c.confidence, "LOW")
+
+    def test_low_at_zeros(self):
+        c = self._cand()
+        self.assertEqual(c.confidence, "LOW")
+
+    def test_n_strong_signals_counts_correctly(self):
+        c = self._cand(
+            caller_jaccard=0.5,    # boundary, counts
+            reloc_jaccard=0.49,    # below, doesn't count
+            size_ratio=0.9,        # boundary, counts
+        )
+        self.assertEqual(c.n_strong_signals, 2)
+
+
 class TestRenderTextReport(unittest.TestCase):
     def test_empty_candidates_polite_message(self):
         anchor = _sym("main", 0x1000, name="GX_Init")
@@ -378,6 +461,9 @@ class TestRenderTextReport(unittest.TestCase):
         self.assertIn("0.50", out)
         # Shared-callers digest for top candidate
         self.assertIn("shared callers", out)
+        # Confidence column header + value (HIGH for this fixture).
+        self.assertIn("Conf", out)
+        self.assertIn("HIGH", out)
 
 
 class TestRenderJson(unittest.TestCase):
@@ -404,6 +490,10 @@ class TestRenderJson(unittest.TestCase):
         self.assertEqual(
             payload["candidates"][0]["shared_callers"],
             [["main", 0x5000]],
+        )
+        # Confidence label included for downstream consumers.
+        self.assertEqual(
+            payload["candidates"][0]["confidence"], "HIGH",
         )
 
 
