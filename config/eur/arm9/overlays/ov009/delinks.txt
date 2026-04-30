@@ -14,9 +14,11 @@ src/overlay009/sinit_ov009_021ad868.c:
 
 
 
+
 src/overlay009/sinit_ov009_021ad894.c:
     complete
     .init start:0x021ad894 end:0x021ad8c0
+
 
 
 
@@ -32,9 +34,11 @@ src/overlay009/sinit_ov009_021ad8c0.c:
 
 
 
+
 src/overlay009/ov009_stubs_aa4a0.c:
     complete
     .text start:0x021aa4a0 end:0x021aa4a8
+
 
 
 
@@ -50,9 +54,11 @@ src/overlay009/ov009_stubs_ab1b4.c:
 
 
 
+
 src/overlay009/ov009_stubs_ab840.c:
     complete
     .text start:0x021ab840 end:0x021ab848
+
 
 
 
@@ -68,9 +74,11 @@ src/overlay009/ov009_021ab324.c:
 
 
 
+
 src/overlay009/ov009_021ab838.c:
     complete
     .text start:0x021ab838 end:0x021ab840
+
 
 
 
