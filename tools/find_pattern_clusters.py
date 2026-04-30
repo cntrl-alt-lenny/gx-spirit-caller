@@ -138,6 +138,87 @@ class Cluster:
         return len(self.matched) + len(self.unmatched)
 
     @property
+    def predicted_yield(self) -> float:
+        """Heuristic 0-1 estimate of the fraction of `unmatched`
+        siblings that will mechanically propagate cleanly via
+        `cluster_wave_propagate` + `propagate_template`.
+
+        Empirical calibration:
+          - Brief 015 (#237): v1 fingerprint, 1 anchor, size=0x10,
+            sig_len=1 → actual yield 12.5% (18/144)
+          - Brief 016 (#240): v1 fingerprint, 1 anchor → similar
+          - Decomper's #264: v2 fingerprint, multiple anchors,
+            hard-tier → actual yield 94.7%
+
+        The biggest signal is **anchor count**: multi-anchor
+        empirically corroborates the shape; single-anchor leaves
+        the prediction guessing whether one matched function is
+        a representative template or just an exception.
+
+        Other factors (in order of penalty):
+          - `sig_len=0` clusters (pure leaves, no relocs) are
+            speculative — could be coincidentally-same-size
+            distinct functions
+          - `ext` targets (unresolved relocs) introduce target-
+            shape uncertainty
+          - large sizes (>0x80) leave more room for body variation
+
+        Combined as a multiplicative product so any one weak factor
+        pulls the prediction down. Conservative by design — under-
+        promising and over-delivering is the right failure mode for
+        a "should I run this wave?" gate.
+        """
+        # Anchor confidence — the strongest signal. Step function
+        # tuned to the calibration data above.
+        n_anchors = len(self.matched)
+        if n_anchors >= 5:
+            anchor_score = 0.92   # well-corroborated shape
+        elif n_anchors >= 2:
+            anchor_score = 0.75   # multiple anchors = ok signal
+        elif n_anchors == 1:
+            anchor_score = 0.50   # single anchor = post-v2 unknown
+        else:
+            return 0.0   # no anchor at all → not propagatable
+
+        # Sig confidence — more relocs constrain shape harder.
+        if self.sig_len >= 3:
+            sig_score = 0.95
+        elif self.sig_len >= 1:
+            sig_score = 0.85
+        else:
+            sig_score = 0.40   # sig_len=0 = pure speculation
+
+        # Size penalty — big functions have more body variation
+        # outside the reloc shape.
+        if self.size <= 0x20:
+            size_score = 1.00
+        elif self.size <= 0x80:
+            size_score = 0.90
+        else:
+            size_score = 0.70
+
+        # Ext-target penalty — unresolved targets mean the
+        # propagation might rewrite a reloc that doesn't actually
+        # exist in the same shape on the sibling.
+        ext_count = sum(1 for r in self.fingerprint[1] if r[2] == "ext")
+        ext_penalty = 1.0 - 0.05 * ext_count
+        ext_penalty = max(ext_penalty, 0.5)   # floor, even if all-ext
+
+        return anchor_score * sig_score * size_score * ext_penalty
+
+    @property
+    def yield_label(self) -> str:
+        """Categorical version of `predicted_yield` for at-a-glance
+        triage. Mirrors the HIGH/MED/LOW pattern from
+        `bulk_rename_candidates.Candidate.confidence` (#252)."""
+        y = self.predicted_yield
+        if y >= 0.65:
+            return "HIGH"
+        if y >= 0.35:
+            return "MED"
+        return "LOW"
+
+    @property
     def sort_key(self) -> tuple[int, int, int, int]:
         # Primary: more unmatched siblings = more leverage (desc).
         # Secondary: smaller size = cheaper to verify (asc).
@@ -399,7 +480,8 @@ def render_text_summary(
         lines.append(
             f"  {i:>3}. {anchor.module:<6s} {anchor.name:<30s} "
             f"size=0x{c.size:x}  sig={c.sig_len:>2}  "
-            f"matched={len(c.matched)}  unmatched={len(c.unmatched)}",
+            f"matched={len(c.matched)}  unmatched={len(c.unmatched)}  "
+            f"yield≈{c.predicted_yield * 100:>3.0f}% [{c.yield_label}]",
         )
     return "\n".join(lines)
 
@@ -446,7 +528,9 @@ def render_markdown(
             f"`size=0x{c.size:x}` &nbsp;|&nbsp; "
             f"`relocs={c.sig_len}` &nbsp;|&nbsp; "
             f"`matched={len(c.matched)}` &nbsp;|&nbsp; "
-            f"`unmatched={len(c.unmatched)}`"
+            f"`unmatched={len(c.unmatched)}` &nbsp;|&nbsp; "
+            f"`yield≈{c.predicted_yield * 100:.0f}%` "
+            f"[**{c.yield_label}**]"
         )
         lines.append("")
 
@@ -484,6 +568,8 @@ def render_json(clusters: list[Cluster]) -> str:
             {
                 "size": c.size,
                 "sig_len": c.sig_len,
+                "predicted_yield": round(c.predicted_yield, 4),
+                "yield_label": c.yield_label,
                 "matched": [
                     {
                         "module": s.module,
