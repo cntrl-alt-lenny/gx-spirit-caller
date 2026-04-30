@@ -388,3 +388,15 @@ src/overlay002/func_ov002_0229cd34.c:
     complete
     .text start:0x0229cd34 end:0x0229cd40
 
+
+src/overlay002/func_ov002_021afbc4.c:
+    complete
+    .text start:0x021afbc4 end:0x021afbd4
+
+src/overlay002/func_ov002_021b1ce0.c:
+    complete
+    .text start:0x021b1ce0 end:0x021b1cf0
+
+src/overlay002/func_ov002_022477d8.c:
+    complete
+    .text start:0x022477d8 end:0x022477e8
