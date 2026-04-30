@@ -143,6 +143,44 @@ class Candidate:
         # match). Tertiary: address asc for determinism.
         return (-self.score, self.symbol.size, self.symbol.addr)
 
+    @property
+    def n_strong_signals(self) -> int:
+        """Count of signals with confidence-grade strength.
+        Thresholds picked so a "strong" signal alone is suggestive
+        but not conclusive — corroboration across multiple is what
+        promotes the candidate to HIGH."""
+        return sum([
+            self.caller_jaccard >= 0.5,
+            self.reloc_jaccard >= 0.5,
+            self.size_ratio >= 0.9,
+        ])
+
+    @property
+    def confidence(self) -> str:
+        """Categorical confidence label fused from the per-signal
+        scores. Surfaces the actionable summary the decomper needs
+        without burying the per-signal data:
+
+          HIGH  — score ≥ 0.6 AND ≥ 2 signals corroborate. Multi-
+                  signal agreement is the strongest evidence the
+                  candidate is a real sibling, not a coincidence.
+          MED   — borderline: score ≥ 0.3 OR ≥ 2 strong signals.
+                  Worth a look; might pan out, might not.
+          LOW   — single-signal match below the thresholds. Likely
+                  noise; safe to skip unless the cluster is empty.
+
+        Computed lazily from the existing per-signal fields — no
+        extra storage cost. Existing `score` field stays the
+        underlying numeric used for sorting; this is the categorical
+        summary on top.
+        """
+        strong = self.n_strong_signals
+        if self.score >= 0.6 and strong >= 2:
+            return "HIGH"
+        if self.score >= 0.3 or strong >= 2:
+            return "MED"
+        return "LOW"
+
 
 def _callers_of(
     key: SymbolKey, edges_call,
@@ -319,13 +357,14 @@ def render_text_report(
     lines.append(f"  Found {len(candidates)} candidate(s):")
     lines.append("")
     lines.append(
-        "    Score  Caller-J  Reloc-J  Size-R  Adj  Module  Addr          Name",
+        "    Score  Conf  Caller-J  Reloc-J  Size-R  Adj  Module  Addr          Name",
     )
-    lines.append("    -----  --------  -------  ------  ---  ------  ------------  ----")
+    lines.append("    -----  ----  --------  -------  ------  ---  ------  ------------  ----")
     for c in candidates:
         adj_flag = " ✓ " if c.is_adjacent else "   "
         lines.append(
-            f"    {c.score:.2f}    {c.caller_jaccard:.2f}      "
+            f"    {c.score:.2f}   {c.confidence:<4s}  "
+            f"{c.caller_jaccard:.2f}      "
             f"{c.reloc_jaccard:.2f}     "
             f"{c.size_ratio:.2f}    {adj_flag}  "
             f"{c.symbol.module:6s}  0x{c.symbol.addr:08x}  "
@@ -367,6 +406,7 @@ def render_json(
                 "name": c.symbol.name,
                 "size": c.symbol.size,
                 "score": round(c.score, 4),
+                "confidence": c.confidence,
                 "caller_jaccard": round(c.caller_jaccard, 4),
                 "reloc_jaccard": round(c.reloc_jaccard, 4),
                 "size_ratio": round(c.size_ratio, 4),
