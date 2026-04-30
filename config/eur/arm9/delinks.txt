@@ -3419,3 +3419,55 @@ src/main/func_020930a0.c:
 src/main/func_02093c10.c:
     complete
     .text start:0x02093c10 end:0x02093c20
+
+src/main/func_0202bb0c.c:
+    complete
+    .text start:0x0202bb0c end:0x0202bb20
+
+src/main/func_0202bb40.c:
+    complete
+    .text start:0x0202bb40 end:0x0202bb54
+
+src/main/func_0202bb64.c:
+    complete
+    .text start:0x0202bb64 end:0x0202bb78
+
+src/main/func_0202bbc8.c:
+    complete
+    .text start:0x0202bbc8 end:0x0202bbdc
+
+src/main/func_0202bbec.c:
+    complete
+    .text start:0x0202bbec end:0x0202bc00
+
+src/main/func_0202bc10.c:
+    complete
+    .text start:0x0202bc10 end:0x0202bc24
+
+src/main/func_0202bc24.c:
+    complete
+    .text start:0x0202bc24 end:0x0202bc38
+
+src/main/func_0202bb20.c:
+    complete
+    .text start:0x0202bb20 end:0x0202bb30
+
+src/main/func_0202bb30.c:
+    complete
+    .text start:0x0202bb30 end:0x0202bb40
+
+src/main/func_0202bb54.c:
+    complete
+    .text start:0x0202bb54 end:0x0202bb64
+
+src/main/func_0202bb78.c:
+    complete
+    .text start:0x0202bb78 end:0x0202bb88
+
+src/main/func_0202bbdc.c:
+    complete
+    .text start:0x0202bbdc end:0x0202bbec
+
+src/main/func_0202bc00.c:
+    complete
+    .text start:0x0202bc00 end:0x0202bc10
