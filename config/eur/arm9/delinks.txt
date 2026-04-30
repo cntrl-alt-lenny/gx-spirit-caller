@@ -5313,3 +5313,15 @@ src/main/func_0201aaa0.c:
 src/main/func_0201cff8.c:
     complete
     .text start:0x0201cff8 end:0x0201d014
+
+src/main/func_0204436c.c:
+    complete
+    .text start:0x0204436c end:0x02044384
+
+src/main/func_02047e88.c:
+    complete
+    .text start:0x02047e88 end:0x02047ea0
+
+src/main/func_0205362c.c:
+    complete
+    .text start:0x0205362c end:0x02053644
