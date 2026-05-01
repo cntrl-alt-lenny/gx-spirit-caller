@@ -18,9 +18,11 @@ src/overlay014/sinit_ov014_021b4c18.c:
 
 
 
+
 src/overlay014/sinit_ov014_021b4c44.c:
     complete
     .init start:0x021b4c44 end:0x021b4c70
+
 
 
 
@@ -44,6 +46,7 @@ src/overlay014/sinit_ov014_021b4c70.c:
 
 
 
+
 src/overlay014/ov014_stubs_b2744.c:
     complete
     .text start:0x021b2744 end:0x021b274c
@@ -57,9 +60,11 @@ src/overlay014/ov014_stubs_b2744.c:
 
 
 
+
 src/overlay014/ov014_stubs_b3c18.c:
     complete
     .text start:0x021b3c18 end:0x021b3c20
+
 
 
 
