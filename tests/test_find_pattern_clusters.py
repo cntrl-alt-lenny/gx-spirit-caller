@@ -422,6 +422,114 @@ class TestFindClustersForAnchor(unittest.TestCase):
         self.assertEqual(len(cluster.matched), 1)
 
 
+class TestPredictedYield(unittest.TestCase):
+    """Pin the yield-predictor heuristic boundaries. Empirical
+    calibration:
+      brief 015 (v1, 1 anchor, size=0x10, sig_len=1) → 12.5% actual
+      decomper #264 (v2, multi-anchor)              → 94.7% actual
+    """
+
+    def _cluster(
+        self, *, n_anchors: int, n_unmatched: int = 1,
+        size: int = 0x20, sig_len: int = 1,
+        target_kind: str = "fn",
+    ) -> Cluster:
+        sig = tuple(
+            (0x4 + i * 4, "arm_call", target_kind)
+            for i in range(sig_len)
+        )
+        anchors = tuple(
+            _fn("main", 0x1000 + i * 0x100, size=size, name=f"A{i}")
+            for i in range(n_anchors)
+        )
+        unmatched = tuple(
+            _fn("main", 0x5000 + i * 0x100, size=size)
+            for i in range(n_unmatched)
+        )
+        return Cluster(
+            fingerprint=(size, sig),
+            matched=anchors,
+            unmatched=unmatched,
+        )
+
+    def test_high_when_many_anchors_and_tight_sig(self):
+        # 5 anchors + sig_len=3 + small size → empirically corroborated
+        c = self._cluster(n_anchors=5, sig_len=3, size=0x18)
+        self.assertGreaterEqual(c.predicted_yield, 0.65)
+        self.assertEqual(c.yield_label, "HIGH")
+
+    def test_med_when_two_anchors(self):
+        c = self._cluster(n_anchors=2, sig_len=1, size=0x20)
+        self.assertEqual(c.yield_label, "MED")
+
+    def test_med_when_single_anchor_default_size(self):
+        # Brief 015 shape: 1 anchor, sig_len=1, size=0x10. Predictor
+        # should not over-promise — empirical was 12.5%, predictor
+        # should land in MED or LOW, not HIGH.
+        c = self._cluster(n_anchors=1, sig_len=1, size=0x10)
+        self.assertNotEqual(c.yield_label, "HIGH")
+
+    def test_low_when_sig_len_zero(self):
+        # sig_len=0 leaf clusters are speculative — the doc-flagged
+        # "could be coincidentally-same-shape" case from #255.
+        c = self._cluster(n_anchors=1, sig_len=0, size=0x2c)
+        self.assertEqual(c.yield_label, "LOW")
+
+    def test_zero_yield_when_no_anchor(self):
+        c = Cluster(
+            fingerprint=(0x20, ((0x4, "arm_call", "fn"),)),
+            matched=(),
+            unmatched=(_fn("main", 0x5000),),
+        )
+        self.assertEqual(c.predicted_yield, 0.0)
+        self.assertEqual(c.yield_label, "LOW")
+
+    def test_ext_target_penalty(self):
+        # Same sig_len + anchor count, but ext targets pull yield
+        # down vs all-fn.
+        all_fn = self._cluster(
+            n_anchors=2, sig_len=2, target_kind="fn",
+        )
+        all_ext = self._cluster(
+            n_anchors=2, sig_len=2, target_kind="ext",
+        )
+        self.assertGreater(
+            all_fn.predicted_yield, all_ext.predicted_yield,
+        )
+
+    def test_size_penalty_for_large_functions(self):
+        small = self._cluster(n_anchors=2, sig_len=2, size=0x20)
+        big = self._cluster(n_anchors=2, sig_len=2, size=0x200)
+        self.assertGreater(
+            small.predicted_yield, big.predicted_yield,
+        )
+
+    def test_predicted_yield_is_probability(self):
+        # Across a sweep of plausible inputs, predicted_yield must
+        # stay in [0, 1].
+        for n_anchors in [0, 1, 2, 5, 10]:
+            for sig_len in [0, 1, 3, 10]:
+                for size in [0x4, 0x20, 0x80, 0x400]:
+                    c = self._cluster(
+                        n_anchors=n_anchors, sig_len=sig_len, size=size,
+                    )
+                    self.assertGreaterEqual(c.predicted_yield, 0.0)
+                    self.assertLessEqual(c.predicted_yield, 1.0)
+
+    def test_yield_label_high_threshold(self):
+        # 5+ anchors, sig_len=3+, small size, no ext — the maximally
+        # corroborated cluster. Should hit HIGH.
+        c = self._cluster(n_anchors=5, sig_len=3, size=0x10)
+        self.assertEqual(c.yield_label, "HIGH")
+
+    def test_brief_015_replay_is_not_high(self):
+        # Replay brief 015's cluster shape exactly: 1 anchor,
+        # sig_len=1, size=0x10. Empirically 12.5% — the predictor
+        # MUST not call this HIGH or it would mislead briefs.
+        c = self._cluster(n_anchors=1, sig_len=1, size=0x10)
+        self.assertNotEqual(c.yield_label, "HIGH")
+
+
 class TestRenderTextSummary(unittest.TestCase):
     def test_empty_renders_polite_message(self):
         out = render_text_summary([])
@@ -431,7 +539,7 @@ class TestRenderTextSummary(unittest.TestCase):
         anchor = _fn("main", 0x1000, size=0x20, name="MyTemplate")
         sib = _fn("main", 0x2000, size=0x20)
         cluster = Cluster(
-            fingerprint=(0x20, ((0x4, "arm_call"),)),
+            fingerprint=(0x20, ((0x4, "arm_call", "ext"),)),
             matched=(anchor,),
             unmatched=(sib,),
         )
@@ -446,7 +554,7 @@ class TestRenderMarkdown(unittest.TestCase):
         anchor = _fn("main", 0x1000, size=0x20, name="MyTemplate")
         sib = _fn("main", 0x2000, size=0x20)
         cluster = Cluster(
-            fingerprint=(0x20, ((0x4, "arm_call"),)),
+            fingerprint=(0x20, ((0x4, "arm_call", "ext"),)),
             matched=(anchor,),
             unmatched=(sib,),
         )
@@ -467,7 +575,7 @@ class TestRenderJson(unittest.TestCase):
         anchor = _fn("main", 0x1000, size=0x20, name="MyTemplate")
         sib = _fn("main", 0x2000, size=0x20)
         cluster = Cluster(
-            fingerprint=(0x20, ((0x4, "arm_call"),)),
+            fingerprint=(0x20, ((0x4, "arm_call", "ext"),)),
             matched=(anchor,),
             unmatched=(sib,),
         )
