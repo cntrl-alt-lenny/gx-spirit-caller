@@ -6195,3 +6195,30 @@ src/main/func_020431f4.c:
 src/main/func_0205236c.c:
     complete
     .text start:0x0205236c end:0x02052384
+src/main/func_020453b4.c:
+    complete
+    .text start:0x020453b4 end:0x020453cc
+
+src/main/func_0204593c.c:
+    complete
+    .text start:0x0204593c end:0x02045954
+
+src/main/func_020498c4.c:
+    complete
+    .text start:0x020498c4 end:0x020498dc
+
+src/main/func_0209153c.c:
+    complete
+    .text start:0x0209153c end:0x02091554
+
+src/main/func_020951d0.c:
+    complete
+    .text start:0x020951d0 end:0x020951e8
+
+src/main/func_020951e8.c:
+    complete
+    .text start:0x020951e8 end:0x02095200
+
+src/main/func_02095200.c:
+    complete
+    .text start:0x02095200 end:0x02095218
