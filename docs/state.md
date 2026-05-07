@@ -8,40 +8,38 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 evening (post-briefs-022/024/025). Main
-tip is `d6f6690` after PR #304 (cloud, find_shape_templates.py). Two
-open briefs (027 decomper, 026 cloud-low-priority).
+**Last updated:** 2026-05-07 late-evening (post-briefs-026/027). Main
+tip is `1a16c8d` after PR #307 (cloud, wine migration to Game Porting
+Toolkit). One open brief (028, decomper).
 
-**Today's totals:** 13 PRs merged, **+108 byte-identical matches**.
-Easy tier moved 31.3% → **70.8%** in a single day. The cluster
-pipeline transitioned from "manual single-anchor brief-020 workflow"
-to "tool-assisted heterogeneous-cluster sweep" by EOD.
+**Today's totals:** **15 PRs merged**, **+140 byte-identical matches**.
+Easy tier moved 31.3% → **73.7%** in a single day. Wine deprecation
+unblocked. The cluster pipeline now runs `find_shape_templates`-
+assisted on previously-stuck heterogeneous clusters and is delivering
+70-94% yields where brief 023 had calibrated 40-60%.
 
 **Baseline:** Verified across all of today's merges —
 `python tools/configure.py eur` clean, `ninja rom` 1011/1011 clean,
 `./dsd check modules` 24/27 (3 expected: ARM9 main / DTCM / overlay
 4). CI's `pr-invariants` + `pr-tier-delta` + `pr-pattern-clusters-
 diff` + `pr-worklist-diff` all green on every shipped PR. Markdown
-lint also green (cleared in #296).
+lint also green. Brief 026 verified the same baseline against the
+Game Porting Toolkit wine binary — ROM SHA-1 bit-identical to the
+wine-stable output from the same `src/`.
 
 **Progress** (live from `python tools/next_targets.py --version eur`,
-post-#304):
+post-#307):
 
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 786 | 324 | 1110 | **70.8%** | **+439** |
+| `easy` | 818 | 292 | 1110 | **73.7%** | **+471** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 94 | 62 | 156 | 60.3% | — |
 | `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
 
-`+439` to easy is from wave 17's 66 + brief 020's 20 + brief 022's 24
-+ brief 024's 18 = 128 fresh matches plus the tier-classifier
-reclassifications that swept previously-hard candidates into easy as
-their callers/callees matched.
-
-**Cluster yield track record** through brief 024:
+**Cluster yield track record** through brief 027:
 
 | Brief | Anchor | Sib pool | Matched | Yield | Notes |
 |------:|--------|---------:|--------:|------:|-------|
@@ -50,34 +48,34 @@ their callers/callees matched.
 | 017 | `func_020085d4` | 41 | 13 | 31.7% | Offset-0 anchor sidestep |
 | 020 | `func_02006164` | 23 | 20 | 87.0% | Heterogeneous; per-shape templates unlock |
 | 022 | `func_0202b0e0` | 31 | 24 | 77.4% | Same heterogeneous unlock; 14-shape templating |
-| 024 | `func_0202b43c` | 18 | 18 | **100.0%** | Single-shape cluster; selection-rule first test |
+| 024 | `func_0202b43c` | 18 | 18 | 100.0% | Single-shape cluster; selection-rule first test |
+| 027 | `func_ov006_021b7ce0` | 34 | 32 | **94.1%** | First find_shape_templates pilot; ov006 cluster #2 |
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
---version eur --top 8`, post-#304):
+--version eur --top 8`, post-#307):
 
 | # | Anchor | Size | Sig | Matched | Unmatched | Predicted yield |
 |--:|--------|------|----:|--------:|----------:|-----------------|
-| 1 | `func_ov006_021c81a4` | 0x1c | 0 | 1  | 44 | ≈20% LOW (heterogeneous, ≥15 shapes — see brief 023) |
-| 2 | `func_ov006_021b7ce0` | 0x1c | 1 | 2  | 34 | ≈61% MED (heterogeneous, ≥8 shapes — **brief 027 in flight**) |
-| 3 | `func_02033f10`       | 0x18 | 0 | 16 | 31 | ≈37% MED |
-| 4 | `func_02001d84`       | 0x14 | 0 | 27 | 30 | ≈37% MED |
-| 5 | `func_0202b4b4`       | 0x20 | 0 | 7  | 26 | ≈37% MED |
-| 6 | `func_0208c428`       | 0x34 | 0 | 2  | 25 | ≈27% LOW |
-| 7 | `ov010_021b4750`      | 0x1c | 1 | 3  | 22 | ≈64% MED |
-| 8 | `func_0202b0b4`       | 0x2c | 1 | 1  | 15 | ≈36% MED |
+| 1 | `func_ov006_021c81a4` | 0x1c | 0 | 1  | 44 | ≈20% LOW (heterogeneous, ≥15 shapes — **brief 028 in flight**) |
+| 2 | `func_02033f10`       | 0x18 | 0 | 16 | 31 | ≈37% MED |
+| 3 | `func_02001d84`       | 0x14 | 0 | 27 | 30 | ≈37% MED |
+| 4 | `func_0202b4b4`       | 0x20 | 0 | 7  | 26 | ≈37% MED |
+| 5 | `func_0208c428`       | 0x34 | 0 | 2  | 25 | ≈27% LOW |
+| 6 | `ov010_021b4750`      | 0x1c | 1 | 3  | 22 | ≈64% MED |
+| 7 | `func_0202b0b4`       | 0x2c | 1 | 1  | 15 | ≈36% MED |
+| 8 | `func_02001e84`       | 0x10 | 0 | **42** | 14 | ≈37% MED (3.0 template ratio — strongest in top 8) |
 
-**Brief 024's selection rule has run dry** — no remaining
-HIGH/MED ≥60% candidates pass the matched ≥10 floor with the ov006
-exclusion. The self-extend clause therefore can't fire as written.
-Brief 027 supersedes it: pilots ov006 cluster #2 explicitly using
-the new `find_shape_templates.py` tool to surface clone candidates.
-If brief 027's yield ≥50%, brain queues a follow-up for cluster #1.
+Cluster #2 (`func_ov006_021b7ce0`) drained out via brief 027.
+Cluster #1 still rank #1; brief 028 targets it next. Rank #8
+`func_02001e84` is interesting for a follow-up: 42 matched / 14
+unmatched is a 3:1 template ratio that should over-deliver under
+brief-020-style heterogeneous unlock if the cluster turns out
+multi-shape.
 
 ## Closed today (2026-05-07)
 
-Main tip moved from `bea13c5` (start-of-evening) → `d6f6690`. Across
-the whole day: from `9fef7ac` (this morning's stale state.md) →
-`d6f6690` = 13 PRs merged.
+Main tip moved across the whole day from `9fef7ac` (this morning's
+stale state.md) → `1a16c8d` = **15 PRs merged**.
 
 ### Cloud track (today)
 
@@ -86,8 +84,12 @@ the whole day: from `9fef7ac` (this morning's stale state.md) →
 - **PR #299** Brief 023 — 348-line ov006 research note. Diagnosed
   heterogeneous-bag clusters; recommended `find_shape_templates.py`.
 - **PR #304** Brief 025 — `find_shape_templates.py` tool, 679 lines
-  + 532 lines of tests. Opcode-sequence Levenshtein scoring across
-  the matched corpus.
+  + 532 lines of tests.
+- **PR #307** Brief 026 — wine migration to Game Porting Toolkit
+  cask. AGENTS.md *Brain onboarding* + *Wine on macOS* sections
+  updated. `tools/configure.py` gains `_resolve_macos_wine()`
+  helper that auto-detects `wine` (existing) or `wine64` (GPTK).
+  Brain locally verified.
 
 ### Decomper track (today)
 
@@ -98,46 +100,52 @@ the whole day: from `9fef7ac` (this morning's stale state.md) →
 - **PR #301** Brief 022 — 24 matches @ 77% yield. Heterogeneous
   unlock generalised.
 - **PR #303** Brief 024 — 18 matches @ 100% yield. First
-  anchor-selection-rule pilot; single-shape cluster, no surprises.
+  anchor-selection-rule pilot.
+- **PR #306** Brief 027 — 32 matches @ 94% yield. First
+  `find_shape_templates` pilot; ov006 cluster #2 fully drained.
 
 ### Brain track (today)
 
-- **PRs #291, #295, #298, #300, #302, *this PR*** — six brain
-  refresh / brief-pre-queue PRs. Worktree convention added (#302),
-  wine deprecation tracked (#302), brief 027 queued (this PR).
-- One worktree-collision incident (mid-evening) — recovered the
-  decomper's brief 022 commit from reflog before any data loss.
-  AGENTS.md *Worktree convention* section codifies the prevention
-  pattern.
+- **PRs #291, #295, #298, #300, #302, #305, *this PR*** — seven
+  brain refresh / brief-pre-queue PRs.
+- Worktree convention added (#302). Wine deprecation flagged
+  (#302) and now resolved (#307).
+- One worktree-collision incident — recovered from reflog before
+  any data loss; AGENTS.md *Worktree convention* prevents
+  recurrence.
 
 ## In flight (post this brain-PR)
 
 - **Open PRs (1):** #294 chore: update README progress badge —
   GitHub Actions bot. Self-managing.
-- **`decomper`** — brief 027 (above). Pilots ov006 cluster #2
-  using `find_shape_templates`.
-- **`cloud`** — brief 026 (wine migration, medium-low priority,
-  4-month runway). No PR yet.
-- **`brain`** — waiting for brief 027 + brief 026 PRs.
+- **`decomper`** — brief 028 (above). ov006 cluster #1, 44
+  unmatched, second find_shape_templates pilot.
+- **`cloud`** — nothing open. State.md backlog suggests a tool
+  iteration brief if 028's yield falls below 30%.
+- **`brain`** — waiting for brief 028 PR.
 
 ## Next-brain TODO
 
-1. **Review brief 027 PR** when decomper opens it. Pay attention
-   to the worked-example proof of `find_shape_templates` in the
-   PR body — this is the first real-world validation of the tool
-   against an unblocked cluster. Standard verification gate.
-2. **Decide brief 028** based on brief 027's yield:
-   - Yield ≥ 50% → queue cluster #1 (`func_ov006_021c81a4`, 44
-     unmatched LOW). The sig=0 / 0%-matched anchor will stress-
-     test `find_shape_templates`.
-   - Yield 40-50% → queue same with reduced expectations + flag
-     for cloud potential tool iteration.
-   - Yield < 40% → research follow-up: investigate whether
-     `find_shape_templates` needs a similarity-metric or
-     dimension iteration before more pilots.
-3. **Review brief 026 PR** when cloud lands the wine migration
-   research.
-4. **Pre-existing carryovers** —
+1. **Review brief 028 PR** when decomper opens it. Standard gate.
+   Pay attention to:
+   - Per-shape template table referencing brief 023's
+     classification.
+   - Time-spent ballpark vs brief 027 — useful signal for whether
+     the tool's leverage scales with cluster size.
+   - First-pass / second-pass split per the brief's suggested
+     cadence.
+2. **Decide brief 029** based on brief 028's yield:
+   - Yield ≥ 50% → queue rank-#8 `func_02001e84` (42 matched /
+     14 unmatched, 3:1 template ratio, MED 37% — should over-
+     deliver per the brief-020 pattern). Or pick the next rank-
+     #2 `func_02033f10` MED 37%.
+   - Yield 30-50% → queue cluster-#1 leftovers + cluster-#2
+     leftovers as a sweep PR.
+   - Yield < 30% → queue cloud research follow-up: investigate
+     whether `find_shape_templates` needs a sig=0 dimension
+     boost (byte-prefix fingerprint to disambiguate same-opcode-
+     sequence functions).
+3. **Pre-existing carryovers** —
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings (carryover from brief 003).
    - `match-invariants` not yet a required branch-protection
@@ -145,9 +153,9 @@ the whole day: from `9fef7ac` (this morning's stale state.md) →
 
 ## New agents?
 
-Still no. The worktree convention added today resolves the only
-operational issue with the current 4-agent setup (brain + decomper
-+ cloud + auto-progress-badge bot). Adding a second decomper
-remains low-friction if cntrl_alt_lenny wants to test it (see
-this morning's brainstorm) — but throughput per-agent has been
-strong enough that the case for it has weakened.
+Still no. Today scaled fine through 4 agents (brain + decomper +
+cloud + auto-progress-badge bot). The only operational issue
+(worktree collision) was resolved with the worktree convention.
+A second decomper remains low-friction to add if cntrl_alt_lenny
+wants to test it, but throughput per-agent is high enough that
+the case is weak.
