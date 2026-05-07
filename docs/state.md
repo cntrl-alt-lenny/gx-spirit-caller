@@ -8,12 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 late-night, post-brief-030 first PR.
-Main tip is `8cdcd5e` after PR #313 (decomper, brief 030, 10 matches
-@ 71%). Brief 030's self-extend clause has 2 follow-ups remaining.
+**Last updated:** 2026-05-07 late-night, post-brief-031 self-extend.
+Main tip is `99adc66` after PR #315 (decomper, brief 031 self-extend,
+2 matches @ 22%). Brief 030's self-extend clause has 1 follow-up
+remaining; brief 032 (cloud research) queued in parallel.
 
-**Today's totals:** **20 PRs merged**, **+198 byte-identical matches**.
-Easy tier moved 31.3% → **78.9%** in a single day.
+**Today's totals:** **22 PRs merged**, **+200 byte-identical matches**.
+Easy tier moved 31.3% → **79.1%** in a single day.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
@@ -24,7 +25,7 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 876 | 234 | 1110 | **78.9%** | **+529** |
+| `easy` | 878 | 232 | 1110 | **79.1%** | **+531** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 94 | 62 | 156 | 60.3% | — |
@@ -44,6 +45,7 @@ post-#311):
 | 028 | `func_ov006_021c81a4` | 44 | 27 | 61.4% |
 | 029 | `func_02001d84` | 30 | 21 | 70.0% |
 | 030 | `func_02001e84` | 14 | 10 | 71.4% |
+| 031* | `func_020453b4` | 9  | 2  | 22.2% (HIGH 78% predicted; codegen walls) |
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):

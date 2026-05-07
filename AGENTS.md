@@ -314,12 +314,20 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
-  — `decomper`: **self-extend remaining**. Brief 030's first PR
-  (#313) shipped at 71% on `func_02001e84`. Up to 2 self-extended
-  follow-ups still allowed under the same selection rule. New
-  signal: a HIGH 78% candidate (`func_020453b4`, 10/9) appeared
-  at rank #8 post-#313 — eligible under the rule and worth picking
-  by judgment over pure-ratio sorting.
+  — `decomper`: **1 self-extend remaining**. Brief 030's first
+  PR (#313) shipped at 71% on `func_02001e84`. Self-extend brief
+  031 (#315) hit 22% on the HIGH 78% rank-#8 anchor and escalated
+  per the brief's clause. Decomper may file ONE more self-extend
+  if they want — recommended pick now is rank #1
+  `func_02033f10` (16/31 = 0.52 ratio, MED 37%, largest pool).
+- [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
+  — `cloud`: research-only consolidation of the cumulative
+  reg-alloc / mwcc-codegen notes from briefs 020/022/028/029/030/
+  031 PR bodies into a permanent reference at
+  `docs/research/codegen-walls.md`. Brief 031's 22% yield dominated
+  by 2-3 of these walls; consolidating them now saves future
+  decomper sessions re-discovering them. Branch:
+  `cloud/consolidate-codegen-walls`.
 
 ### Closed briefs (reference)
 
