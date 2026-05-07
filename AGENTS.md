@@ -313,17 +313,23 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](docs/briefs/028-cluster-prop-ov006-021c81a4.md)
-  — `decomper`: second pilot leveraging `find_shape_templates.py`,
-  this time on the larger ov006 cluster #1 (`func_ov006_021c81a4`,
-  sig 0, 1 matched / 44 unmatched, 20% LOW). Brief 023's research
-  classified ≥15 distinct shapes here. Brief 027's 94% on cluster
-  #2 triggered this brief per state.md TODO #2. Target ≥18 matches
-  (41%); upside 25+ if the new tool's leverage holds on a sig=0
-  anchor. Branch: `decomper/cluster-prop-ov006-021c81a4`.
+- [`docs/briefs/029-cluster-prop-next-med.md`](docs/briefs/029-cluster-prop-next-med.md)
+  — `decomper`: continue the cluster-pilot wave. Both ov006 anchors
+  fully drained via briefs 027 + 028; remaining top-8 ranking is
+  all MED 37%. Selection rule: highest template-ratio MED with
+  matched ≥10. Default suggestion: rank #2 `func_02001d84`
+  (27/30, 0.90 ratio) but decomper picks. Target ≥40% yield on
+  the chosen pool. Branch: `decomper/cluster-prop-<addr>`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](docs/briefs/028-cluster-prop-ov006-021c81a4.md)
+  `decomper`, shipped in PR #309. **27 byte-identical matches at
+  61% yield** on ov006 cluster #1 — 3x the predicted 20% LOW,
+  comfortably above brief 023's 40-60% calibration. 18 distinct
+  shape templates across two passes; honest stop at 27 because
+  remaining 17 had clear codegen-quirk reasons. Per-target time
+  1.8x brief 027 (within stop-guidance).
 - [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
   `decomper`, shipped in PR #306. **32 byte-identical matches at
   94% yield** on ov006 cluster #2 — way past brief 023's 40-60%
