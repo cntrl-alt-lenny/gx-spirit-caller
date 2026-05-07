@@ -47,11 +47,13 @@ build on a fresh clone.
 **Success:**
 
 - A fresh clone followed by:
+
   ```bash
   python -m pip install -r tools/requirements.txt
   python tools/configure.py eur
   ninja rom
   ```
+
   completes without the manual `download_tool.py` workaround step.
 - Existing populated clones unaffected (the .exe is already on disk →
   ninja treats the rule as already satisfied; rebuilding `build.ninja`

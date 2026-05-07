@@ -91,6 +91,7 @@ effectively **superseded**, not blocking; closing it formally below.
 Main tip moved from `9fef7ac` → `ba9d658` (27 commits).
 
 ### Brief closures
+
 - **Brief 017** — shipped in PR #247. 13 offset-substitution
   matches on the `func_020085d4` cluster.
 - **Brief 018 (first half)** — shipped in PR #243 (cluster
@@ -100,6 +101,7 @@ Main tip moved from `9fef7ac` → `ba9d658` (27 commits).
   retiring the substitute-imm scope.
 
 ### Cloud track
+
 - **PR #243** (4/28) `find_pattern_clusters: subdivide by reloc
   target type + data-size bucket` (brief 018 first half).
 - **PR #251** Backfill unit tests for 3 cross-platform tools.
@@ -114,6 +116,7 @@ Main tip moved from `9fef7ac` → `ba9d658` (27 commits).
   tail .s files).
 
 ### Decomper track
+
 - **PR #245** `named tier 39/39 closed: __sinit_ov004_02209a5c`.
 - **PR #247** Brief 017 (13 matches).
 - **PR #253** Rebase #248+#249+#250 (56 matches).
@@ -133,6 +136,7 @@ Main tip moved from `9fef7ac` → `ba9d658` (27 commits).
 - **PR #284** Rebase #282+#283 (36 matches).
 
 ### Brain track (this PR)
+
 - Refreshed state.md to reflect 27-commit gap since 4/28.
 - Wrote brief 019 (`cloud/configure-mwasmarm-output`) — fresh-clone
   bootstrap fix; documented in *Open briefs* below.
