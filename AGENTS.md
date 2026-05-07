@@ -256,20 +256,34 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/020-cluster-prop-02006164.md`](docs/briefs/020-cluster-prop-02006164.md)
-  — `decomper`: cluster-propagation pilot round 4 against the new
-  top-HIGH anchor `main / func_02006164` (size 0x18, sig 1, 28
-  matched / 23 unmatched, 74% predicted yield). Wave-17 anchor;
-  fresh template. Target ≥12 byte-identical matches (52% lower
-  bound). Branch: `decomper/cluster-prop-02006164`.
-- [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
-  — `cloud`: fix the 7 pre-existing markdown-lint failures
-  (`docs/briefs/016`, `docs/briefs/017`, `docs/tools-index.md`)
-  bleeding red CI onto every PR. Docs-only one-off. Branch:
-  `cloud/markdownlint-cleanup`.
+- [`docs/briefs/022-cluster-prop-0202b0e0.md`](docs/briefs/022-cluster-prop-0202b0e0.md)
+  — `decomper`: cluster-propagation pilot round 5 against the new
+  top-HIGH anchor `main / func_0202b0e0` (size 0x20, sig 1, 10
+  matched / 31 unmatched, 74% predicted yield). Lifts brief 020's
+  hand-patch budget to a *15 distinct shape templates* cap based
+  on the brief-020 unlock. Target ≥15 byte-identical matches.
+  Branch: `decomper/cluster-prop-0202b0e0`.
+- [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
+  — `cloud`: research-only diagnosis of why the two persistently-
+  stuck top-of-pool ov006 clusters (`func_ov006_021c81a4` 44
+  unmatched LOW; `func_ov006_021b7ce0` 34 unmatched MED) resist
+  propagation across multiple wave passes. Land as
+  `docs/research/ov006-cluster-stuck.md`. Branch:
+  `cloud/ov006-cluster-investigation`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
+  `cloud`, shipped in PR #296. Cleared 7 pre-existing markdown-lint
+  errors and patched `tools/generate_tool_index.py` to compute
+  GFM-style heading slugs going forward (root-cause fix, not just
+  symptoms).
+- [`docs/briefs/020-cluster-prop-02006164.md`](docs/briefs/020-cluster-prop-02006164.md)
+  `decomper`, shipped in PR #297. **20 byte-identical matches
+  (87% yield)** — beat predicted 74%. Heterogeneous cluster
+  unlocked via per-shape templating (12 distinct shapes) instead
+  of the brief's per-bit-position hand-patches. Updated the
+  brief-template guidance in brief 022.
 - [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
   `cloud`, shipped in PR #292. Fresh-clone bootstrap fix —
   `outputs=[CC, LD, ASM]` in the `download_tool` rule. Verified by
