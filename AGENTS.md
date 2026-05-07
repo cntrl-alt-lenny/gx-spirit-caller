@@ -102,6 +102,51 @@ ninja rom + `./dsd.exe check modules -c config/eur/arm9/config.yaml`),
 merge or comment, update `docs/state.md`, write briefs for cntrl_alt_lenny to
 paste to other agents, repeat.
 
+### Worktree convention (multi-agent on the same machine)
+
+When `brain` and `decomper` are both running on the same physical
+machine (the common case for cntrl_alt_lenny's setup), **they must
+work in separate git worktrees** so they don't fight over branch
+state in the same working directory. Standard layout:
+
+| Worktree path                              | Slug      | Purpose                                          |
+|--------------------------------------------|-----------|--------------------------------------------------|
+| `/Users/leo/Dev/gx-spirit-caller`          | `brain`   | Main repo. Brain pulls main, reviews PRs, builds verifications. |
+| `/Users/leo/Dev/gx-spirit-caller-decomper` | `decomper`| Sibling worktree. Decomper checks out its own `decomper/cluster-prop-*` branches without touching brain's working state. |
+
+Add the decomper worktree once per machine via:
+
+```
+git worktree add /Users/leo/Dev/gx-spirit-caller-decomper main
+cp /Users/leo/Dev/gx-spirit-caller/orig/baserom_*.nds \
+   /Users/leo/Dev/gx-spirit-caller-decomper/orig/
+```
+
+Each worktree gets its own `orig/baserom_*.nds` (gitignored) and
+its own `build/` directory. The `.git` is shared via worktree
+mechanics, so commits/branches are visible across both — but
+working-tree state (modified files, untracked files, current
+checkout) is isolated.
+
+When starting a new decomper session, point it at
+`/Users/leo/Dev/gx-spirit-caller-decomper` instead of the main
+clone. The cloud agent doesn't need a worktree — it runs without
+the local toolchain so it works on a remote / cloud LLM session
+and pushes branches directly.
+
+### Wine deprecation (macOS, deadline 2026-09-01)
+
+Homebrew's `wine-stable`, `wine@staging`, and `wine@devel` casks
+are all deprecated as of 2026-05-06 and **will be disabled on
+2026-09-01** (Apple Gatekeeper now blocks the unsigned x86_64
+binaries). Existing installs keep working past the deadline; new
+installs / reinstalls / contributors with fresh machines won't.
+
+Migration is tracked under [brief 026](docs/briefs/026-wine-migration-prep.md).
+Until that lands, current macOS brain setups stay on
+`wine-stable`; new machines should pause at AGENTS.md *Brain
+onboarding* step 6 and read brief 026 before installing wine.
+
 On **Windows**, `dsd` is shipped as `./dsd.exe`; on **macOS/Linux** it's
 `./dsd`. The `dsd check modules` invocation adapts accordingly.
 
@@ -263,13 +308,6 @@ itself:
   hand-patch budget to a *15 distinct shape templates* cap based
   on the brief-020 unlock. Target ≥15 byte-identical matches.
   Branch: `decomper/cluster-prop-0202b0e0`.
-- [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
-  — `cloud`: research-only diagnosis of why the two persistently-
-  stuck top-of-pool ov006 clusters (`func_ov006_021c81a4` 44
-  unmatched LOW; `func_ov006_021b7ce0` 34 unmatched MED) resist
-  propagation across multiple wave passes. Land as
-  `docs/research/ov006-cluster-stuck.md`. Branch:
-  `cloud/ov006-cluster-investigation`.
 - [`docs/briefs/024-cluster-prop-next-high.md`](docs/briefs/024-cluster-prop-next-high.md)
   — `decomper` (pre-queued, picks up after brief 022 lands):
   cluster-propagation pilot round 6, parameterised on the
@@ -279,16 +317,30 @@ itself:
   without a fresh brain brief if the same selection rule applies.
   Branch: `decomper/cluster-prop-<addr>`.
 - [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
-  — `cloud` (pre-queued, **contingent on brief 023**): implements
-  whichever tooling fix brief 023's research recommends (finer
-  fingerprint dimension, yield-prediction recalibration, or
-  sibling-arity hint). Three scope variants pre-scoped; cloud
-  picks the one matching the research conclusion. Closed unscoped
-  if brief 023 finds no tooling angle. Branch:
-  `cloud/ov006-tooling-<a|b|c>`.
+  — `cloud`: implement `tools/find_shape_templates.py` per brief
+  023's recommendation (Proposal #2 of the research note).
+  Surfaces clone-candidate matched functions across the entire
+  matched corpus by opcode-sequence similarity, automating brief
+  020's manual asm-grepping workflow. ~150–300 lines, single
+  file. Pays back across every future heterogeneous-cluster
+  pilot. Branch: `cloud/find-shape-templates`.
+- [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
+  — `cloud`: investigate and document the migration path off
+  homebrew's deprecated `wine-stable` / `@staging` / `@devel`
+  casks (all disabled 2026-09-01). Land as
+  `docs/research/wine-migration.md` + AGENTS.md update. Medium-
+  low priority; ~4 months runway. Branch:
+  `cloud/wine-migration-prep`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
+  `cloud`, shipped in PR #299. 348-line research note diagnosing
+  the two persistently-stuck top-of-pool ov006 clusters as
+  heterogeneous bags (≥15 / ≥8 distinct shapes hiding behind
+  identical fingerprints). Predicted yields are correct, not bugged.
+  Recommendation: build `find_shape_templates.py` (now scoped as
+  brief 025).
 - [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
   `cloud`, shipped in PR #296. Cleared 7 pre-existing markdown-lint
   errors and patched `tools/generate_tool_index.py` to compute
