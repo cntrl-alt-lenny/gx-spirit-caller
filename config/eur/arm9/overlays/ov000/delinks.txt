@@ -378,3 +378,15 @@ src/overlay000/ov000_021acebc.c:
 src/overlay000/ov000_021aae70.c:
     complete
     .text start:0x021aae70 end:0x021aaea0
+
+src/overlay000/ov000_021ae4ac.c:
+    complete
+    .text start:0x021ae4ac end:0x021ae4c4
+
+src/overlay000/ov000_021adb58.c:
+    complete
+    .text start:0x021adb58 end:0x021adb70
+
+src/overlay000/ov000_021ae474.c:
+    complete
+    .text start:0x021ae474 end:0x021ae48c
