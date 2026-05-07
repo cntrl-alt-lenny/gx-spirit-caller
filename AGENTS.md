@@ -313,24 +313,33 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
-  — `decomper`: **1 self-extend remaining**. Brief 030's first
-  PR (#313) shipped at 71% on `func_02001e84`. Self-extend brief
-  031 (#315) hit 22% on the HIGH 78% rank-#8 anchor and escalated
-  per the brief's clause. Decomper may file ONE more self-extend
-  if they want — recommended pick now is rank #1
-  `func_02033f10` (16/31 = 0.52 ratio, MED 37%, largest pool).
-- [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
-  — `cloud`: research-only consolidation of the cumulative
-  reg-alloc / mwcc-codegen notes from briefs 020/022/028/029/030/
-  031 PR bodies into a permanent reference at
-  `docs/research/codegen-walls.md`. Brief 031's 22% yield dominated
-  by 2-3 of these walls; consolidating them now saves future
-  decomper sessions re-discovering them. Branch:
-  `cloud/consolidate-codegen-walls`.
+- [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
+  — `decomper`: likely-final easy-tier cluster pilot. Cluster pool
+  has drained; only rank #4 `func_0201397c` (28/17 = 1.65 ratio,
+  MED 37%) clearly passes the selection rule. **First test of
+  using `docs/research/codegen-walls.md`** (brief 032's research)
+  during the work — drops should be classified against the
+  doc's buckets. Target ≥7 matches (40%); ≥10 (60%) would
+  validate brief 032's coercible-but-missed finding. Branch:
+  `decomper/cluster-prop-<addr>`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
+  `cloud`, shipped in PR #317. 641-line research note at
+  `docs/research/codegen-walls.md`; 15 codegen walls classified
+  into coercible-with-knowledge (8, accounting for 19% of past
+  drops), permanent (5, 62%), and edge cases (3, 17%). Plus 2
+  tooling-tractable proposals for follow-up. Brain auto-fixed
+  MD031 lint in the file post-merge.
+- [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
+  `decomper`, shipped across PR #313 (10 matches @ 71% on
+  `func_02001e84`), PR #315 (2 matches @ 22% — below floor on
+  HIGH rank-#8 escalation), and PR #318 (24 matches @ 77% on
+  rank #1 `func_02033f10` — option-B recovery). Self-extend
+  pattern fully tested across 3 PRs; produced both wins and the
+  first below-floor escalation. Pattern stays per-brief for now,
+  not graduated to AGENTS.md yet.
 - [`docs/briefs/029-cluster-prop-next-med.md`](docs/briefs/029-cluster-prop-next-med.md)
   `decomper`, shipped in PR #311. **21 byte-identical matches at
   70% yield** on rank-#2 `func_02001d84` (default suggestion;
