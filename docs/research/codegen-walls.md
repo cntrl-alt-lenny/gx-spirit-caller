@@ -67,33 +67,46 @@ Grep these first when a partial-match drop shape looks familiar.
 ### C-1. Predicated-execution: pure pred-exec vs early-return
 
 **Target asm:**
+
 ```
+
 cmp r0, ...; movle ...; bxle lr; ...; bx lr
+
 ```
+
 i.e. pure conditional movs + conditional bx, no branches.
 
 **mwcc emits when miscoded:**
+
 ```
+
 cmp r0, ...; bne .L1; ...; bx lr; .L1: ...; bx lr
+
 ```
+
 i.e. real branches with separate basic blocks.
 
 **C that coerces it:**
+
 ```c
 int f(int a) {
     if (cond) { side_effect; a = b; }
     return a;
 }
+
 ```
+
 Combine the conditional side effect *and* the conditional value
 update into a single non-returning if-body, then return at the
 end. mwcc's predication pass picks up 2-3-op if-bodies. Pred-exec
 only fires when **no early `return`** appears in the if-body.
 
 **C that breaks it (drops to early-return shape):**
+
 ```c
 if (cond) { side_effect; return b; }
 return a;       // forces bxeq lr branch
+
 ```
 
 **Use when:** the target has any sequence of conditional movs +
@@ -107,33 +120,45 @@ from this exact distinction, all `bxne lr` partial matches).
 ### C-2. Local-pointer reuse for two-field reads
 
 **Target asm:**
+
 ```
+
 ldr  r3, =data
 ldr  r1, [r3, #N]
 str  r1, [r3, #M]
+
 ```
+
 Single `&data` materialisation, both ops use `r3`.
 
 **mwcc emits when miscoded:**
+
 ```
+
 ldr  r3, =data
 ldr  r1, [r3, #N]
 ldr  r2, =data            ; second materialisation
 str  r1, [r2, #M]
+
 ```
+
 or interleaves an unrelated store between the two operations.
 
 **C that coerces it:**
+
 ```c
 T *p = data;        /* local-cached */
 p->m = p->n;        /* two ops via the same p */
+
 ```
 
 **C that breaks it:**
+
 ```c
 data->m = data->n;  /* mwcc may re-materialise on the second access */
 volatile T *vp = data;
 vp->m = vp->n;      /* volatile forces TWO reads, worse than miscoded form */
+
 ```
 
 **Use when:** target has one address materialisation + two ops.
@@ -146,9 +171,12 @@ broke `func_0208904c` (brief 022) when missed.
 ### C-3. Volatile-cast to suppress CSE on self-copy / redundant load
 
 **Target asm:**
+
 ```
+
 ldr  r1, [r3, #N]
 str  r1, [r3, #N]            ; re-store same value (e.g. memory-mapped flush)
+
 ```
 
 **mwcc emits when miscoded:**
@@ -156,12 +184,15 @@ mwcc CSE-elides the load-then-store-same-value because it knows
 the value didn't change. Output is empty for this fragment.
 
 **C that coerces it:**
+
 ```c
 struct {
     volatile int field;     /* or cast at the access site */
 } *p = data;
 p->field = p->field;
+
 ```
+
 The `volatile` qualifier blocks CSE.
 
 **Use when:** target has an obvious memory-mapped or
@@ -173,7 +204,9 @@ field, no transformation in between).
 ### C-4. Range-check pure pred-exec (1≤x≤K bool)
 
 **Target asm:**
+
 ```
+
 cmp r0, #L
 movge r0, #1
 bxge lr
@@ -182,19 +215,23 @@ movle r0, #1
 bxle lr
 mov r0, #0
 bx lr
+
 ```
 
 **mwcc emits when miscoded** (fragmented branches): regular
 `cmp/blt/cmp/bgt/mov/bx` pattern.
 
 **C that coerces it:**
+
 ```c
 int f(int a) {
     if (a < L) return 0;
     if (a > H) return 0;
     return 1;
 }
+
 ```
+
 Two separate early-returns produce predicated movs.
 
 **Or alternatively** for the `(x<A?0:x<B?1:2)` 3-way classifier
@@ -206,12 +243,15 @@ the conditional-mov ladder.
 ### C-5. Pass-through dispatcher fnptr in r1
 
 **Target asm:**
+
 ```
+
 push {r3, lr}
 ldr  r1, =data
 ldr  r1, [r1, #N]            ; r1 = data->fnptr_N
 blx  r1                      ; r0 = caller's unmodified arg
 pop  {r3, pc}
+
 ```
 
 **The trick:** mwcc materialises the fnptr in **r1** (not r0)
@@ -219,6 +259,7 @@ because r0 already holds the caller's unmodified arg passed
 through to the callee.
 
 **C that coerces it:**
+
 ```c
 typedef int (*fn_int_t)(int arg);
 typedef struct { ... fn_int_t fnptr_N; } data_t;
@@ -226,6 +267,7 @@ extern data_t data;
 int f(int arg) {
     return data.fnptr_N(arg);  /* arg flows through r0 untouched */
 }
+
 ```
 
 **Use when:** target has push/ldr/ldr/blx-reg/pop shape and the
@@ -237,31 +279,43 @@ call target is loaded from a global struct.
 ### C-6. Long-long return via pointer cast (avoid arithmetic pack)
 
 **Target asm:**
+
 ```
+
 ldr  r2, [r0, #N]
 ldr  r1, [r0, #N+4]
 mov  r0, r2
 bx   lr
+
 ```
 
 **mwcc emits when miscoded** (arithmetic pack):
+
 ```
+
 ... ldr r2 / ldr r1 / orr r1, r1, #0 / orr r0, r0, #0 / bx lr
+
 ```
+
 The two `orr ..., #0` are no-op moves that mwcc inserts for
 `((u64)hi << 32) | lo` arithmetic packing.
 
 **C that coerces it:**
+
 ```c
 unsigned long long f(T *p) {
     return *(unsigned long long *)&p->field;
 }
+
 ```
+
 Pointer-cast to `u64*` produces clean two-load-and-mov.
 
 **C that breaks it:**
+
 ```c
 return ((u64)p->hi << 32) | (u32)p->lo;   /* spurious orr/0 pack */
+
 ```
 
 **Use when:** target has 2 consecutive loads + a `mov r0, r2` +
@@ -275,23 +329,29 @@ Two distinct strlen-shape codegens, picked by which C source form
 matches:
 
 - **Post-increment form** — target uses `ldrsb r1, [r0], #1`:
+
   ```c
   size_t strlen_b(const signed char *p) {
       size_t n = (size_t)-1;
       while (*p++) n++;
       return n;
   }
+
   ```
+
   (brief 028 `func_020aaddc` matched.)
 
 - **Indexed form** — target uses `[r0, r2]`:
+
   ```c
   size_t strlen_b_indexed(const signed char *p) {
       size_t i = 0;
       while (p[i]) i++;
       return i;
   }
+
   ```
+
   (brief 029 `func_ov004_021dbd08` *did not match* with the
   post-increment form; needed the indexed C form. Future
   pilots: read the asm and pick the C shape that matches the
@@ -339,15 +399,22 @@ rather than iterating.
 ### P-1. Shift-pair vs mask collapse
 
 **Target asm preserves shift form:**
+
 ```
+
 lsl r0, r0, #24
 lsr r0, r0, #24
+
 ```
+
 or `lsl 30/lsr 30`, or `lsl 31/lsr 31`.
 
 **mwcc collapses to:**
+
 ```
+
 and r0, r0, #0xff       ; or #3, or #1
+
 ```
 
 **Why:** `(x << K) >> K` is semantically `x & ((1<<(32-K))-1)`,
@@ -455,10 +522,14 @@ flag.
 Not strictly a wall — more an idiom decomper should recognise.
 When `ldrh`/`strh` offset exceeds the 8-bit immediate range
 (>0xff), mwcc emits:
+
 ```
+
 add r0, r0, #0x100
 ldrh r1, [r0, #0xNN]
+
 ```
+
 The high byte of the offset is added to the base register first.
 **Target ROM does the same.** Listed here because partial-match
 shapes may surface this idiom and the decomper should not iterate
@@ -595,6 +666,7 @@ shape we should chase".
 ## Quantification
 
 ```
+
 By bucket:
   Permanent              :  29 drops (62%)
   Coercible-but-missed   :   9 drops (19%)  ← future "should have matched"
@@ -605,6 +677,7 @@ Top single wall:
   P-1 (shift-pair collapse) :  8 drops (17%)
   P-4 (r2-vs-r3 swap)       :  4 drops ( 9%)
   E-3 (Thumb)               :  4 drops ( 9%)
+
 ```
 
 **Read of the data:** roughly **20 % of dropped matches** in the
