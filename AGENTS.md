@@ -270,6 +270,22 @@ itself:
   propagation across multiple wave passes. Land as
   `docs/research/ov006-cluster-stuck.md`. Branch:
   `cloud/ov006-cluster-investigation`.
+- [`docs/briefs/024-cluster-prop-next-high.md`](docs/briefs/024-cluster-prop-next-high.md)
+  — `decomper` (pre-queued, picks up after brief 022 lands):
+  cluster-propagation pilot round 6, parameterised on the
+  post-#022 ranking. Selects the highest-template-confidence
+  HIGH/MED ≥60% anchor automatically. Introduces a **self-extend
+  clause** — decomper may file two follow-up cluster pilots
+  without a fresh brain brief if the same selection rule applies.
+  Branch: `decomper/cluster-prop-<addr>`.
+- [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
+  — `cloud` (pre-queued, **contingent on brief 023**): implements
+  whichever tooling fix brief 023's research recommends (finer
+  fingerprint dimension, yield-prediction recalibration, or
+  sibling-arity hint). Three scope variants pre-scoped; cloud
+  picks the one matching the research conclusion. Closed unscoped
+  if brief 023 finds no tooling angle. Branch:
+  `cloud/ov006-tooling-<a|b|c>`.
 
 ### Closed briefs (reference)
 
