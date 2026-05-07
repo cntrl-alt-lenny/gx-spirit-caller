@@ -313,16 +313,23 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/029-cluster-prop-next-med.md`](docs/briefs/029-cluster-prop-next-med.md)
-  — `decomper`: continue the cluster-pilot wave. Both ov006 anchors
-  fully drained via briefs 027 + 028; remaining top-8 ranking is
-  all MED 37%. Selection rule: highest template-ratio MED with
-  matched ≥10. Default suggestion: rank #2 `func_02001d84`
-  (27/30, 0.90 ratio) but decomper picks. Target ≥40% yield on
-  the chosen pool. Branch: `decomper/cluster-prop-<addr>`.
+- [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
+  — `decomper`: continue the brief-029 cluster-pilot wave with the
+  same selection rule. Default suggestion: rank #7
+  `func_02001e84` (42/14 = 3.0 ratio, strongest template
+  confidence in eligibles). **Self-extend clause** — decomper may
+  file up to two follow-up cluster pilots without a fresh brain
+  brief if the same selection rule applies. Branch:
+  `decomper/cluster-prop-<addr>`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/029-cluster-prop-next-med.md`](docs/briefs/029-cluster-prop-next-med.md)
+  `decomper`, shipped in PR #311. **21 byte-identical matches at
+  70% yield** on rank-#2 `func_02001d84` (default suggestion;
+  doubled the predicted MED 37%). 16 distinct shape templates;
+  selection-rule trace in PR body validates the brief's
+  filtering.
 - [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](docs/briefs/028-cluster-prop-ov006-021c81a4.md)
   `decomper`, shipped in PR #309. **27 byte-identical matches at
   61% yield** on ov006 cluster #1 — 3x the predicted 20% LOW,
