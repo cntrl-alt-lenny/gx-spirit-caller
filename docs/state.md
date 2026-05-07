@@ -8,12 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 late-night, post-brief-033 + pivot to
-medium tier. Main tip after PR #320 (decomper, brief 033, 3 matches
-@ 18% — below floor BUT delivered a research-grade pivot
-recommendation). Cluster pipeline closed for now; medium tier opens.
+**Last updated:** 2026-05-07 late-night, post-brief-034 + Style A
+wall discovery. Main tip is `51d22b0` after PR #323 (decomper,
+brief 034, **zero matches**, blocked on Style A epilogue wall) and
+PR #322 (cloud, codegen-walls C-1 refinement). **Decomper on hold**
+pending brief 036 (cloud research, HIGH priority) on the Style A
+trigger.
 
-**Today's totals:** **27 PRs merged**, **+229 byte-identical
+**Today's totals:** **30 PRs merged**, **+229 byte-identical
 matches**. Easy tier moved 31.3% → **81.5%** in a single day.
 
 **Baseline:** Verified across all of today's merges. CI gates all
@@ -48,11 +50,36 @@ post-#311):
 | 031* | `func_020453b4` | 9  | 2  | 22.2% (HIGH 78% predicted; codegen walls) |
 | 030-extend | `func_02033f10` | 31 | 24 | 77.4% (option-B recovery, fresh sig=0 cluster) |
 | 033* | `func_0201397c` | 17 | 3  | 17.6% (brief 028 residue; pivot recommendation) |
+| 034* | medium-tier wave 1 | 11 | 0 | 0% (Style A epilogue wall blocks every IRQ-bracket candidate) |
 
 **Cluster pipeline closed.** Easy-tier cluster pool drained
-through brief 033's below-floor signal. Brief 034 pivots to
-medium-tier individual-function matching using the codegen-walls
-reference.
+through brief 033. Brief 034 attempted medium-tier individual-
+function pivot and discovered a fundamental new wall.
+
+## ⚠️ Style A vs Style B epilogue — current blocker
+
+Brief 034's analysis (PR #323) identified that mwcc 2.0/sp1p5 with
+the project's current flags emits **Style B** epilogues
+(`stmdb sp!, {r3, lr}; ...; ldmia sp!, {r3, pc}`) while target
+ROM consistently uses **Style A**
+(`stmdb sp!, {lr}; sub sp, sp, #4; ...; add sp, sp, #4; ldmia
+sp!, {lr}; bx lr`). Both ABI-equivalent; byte-encoded output
+differs.
+
+This blocks ~50% of remaining medium-tier candidates by inspection
+(every IRQ-bracket / Task-Locked / Fill32-pattern function in the
+target ROM uses Style A). Brief 036 (cloud research, HIGH
+priority) investigates the trigger:
+
+- (a) Compiler flag — most likely; some `-O` level or ABI knob
+  flips epilogue style.
+- (b) mwcc version — sp1p4 / sp1p3 / sp2 may emit Style A.
+- (c) Source pragma.
+- (d) Permanent — `.s` workaround required, or skip Style A
+  targets entirely.
+
+**Decomper is on hold** until brief 036 lands. This is the
+critical-path item for the next session.
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):

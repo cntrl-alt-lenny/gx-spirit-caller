@@ -313,22 +313,32 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/034-medium-tier-wave.md`](docs/briefs/034-medium-tier-wave.md)
-  — `decomper`: medium-tier pivot wave (brief 033's recommendation).
-  Match 6–12 individual medium-tier functions from
-  `next_targets.py` top of list (sizes 0x24–0x40, 1–2 named
-  callees each). First time using `codegen-walls.md` mid-work
-  outside the cluster pipeline. Branch: `decomper/medium-tier-wave-1`.
-- [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
-  — `cloud`: small docs-only patch. Update C-1 (predicated
-  execution) in `docs/research/codegen-walls.md` with brief 033's
-  refinement: the predication-vs-early-return trigger flips when
-  the if-body crosses ≤3 ARM instructions. ~3-4 historic drops
-  reclassify from coercible-but-missed to permanent. Low priority;
-  not blocking. Branch: `cloud/codegen-walls-c1-refinement`.
+- [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
+  — `cloud` **(HIGH priority)**: research the Style A vs Style B
+  epilogue trigger surfaced by brief 034. mwcc 2.0/sp1p5 emits
+  Style B; target ROM uses Style A across every medium-tier
+  IRQ-bracket function attempted. **Decomper is on hold pending
+  this brief's findings** — Style A blocks ~50% of remaining
+  medium-tier candidates. Land as
+  `docs/research/style-a-epilogue.md` with concrete
+  recommendation (flag-found / `.s`-only / permanent-wall).
+  Branch: `cloud/style-a-epilogue-research`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
+  `cloud`, shipped in PR #322. Refined codegen-walls.md C-1
+  with the ≤3-op if-body predication threshold + new P-6
+  permanent entry. Quantification updated: permanent 29 → 32
+  drops (62% → 68%), coercible-but-missed 9 → 6 drops (19% →
+  13%).
+- [`docs/briefs/034-medium-tier-wave.md`](docs/briefs/034-medium-tier-wave.md)
+  `decomper`, shipped in PR #323. **0 byte-identical matches**
+  but discovered the **Style A vs Style B epilogue wall** —
+  blocks every IRQ-bracket / Task-Locked / Fill32-pattern
+  medium-tier candidate attempted. Empty commit; the analysis
+  IS the deliverable. Triggered brief 036 (cloud research)
+  immediately.
 - [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
   `decomper`, shipped in PR #320. **3 byte-identical matches at
   18% yield** — second below-floor pilot, BUT the PR delivered a
