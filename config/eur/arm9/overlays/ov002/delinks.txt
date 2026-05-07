@@ -1701,3 +1701,7 @@ src/overlay002/func_ov002_021bcf00.c:
 src/overlay002/func_ov002_0229cd1c.c:
     complete
     .text start:0x0229cd1c end:0x0229cd34
+
+src/overlay002/func_ov002_021b91f8.c:
+    complete
+    .text start:0x021b91f8 end:0x021b9210
