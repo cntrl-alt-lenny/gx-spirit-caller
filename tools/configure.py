@@ -508,7 +508,7 @@ def add_download_tool_builds(n: ninja_syntax.Writer):
     if args.compiler is None:
         n.build(
             rule="download_tool",
-            outputs=[CC, LD],
+            outputs=[CC, LD, ASM],
             variables={"tool": "mwccarm", "tag": "latest", "path": tools_path},
         )
         n.newline()
