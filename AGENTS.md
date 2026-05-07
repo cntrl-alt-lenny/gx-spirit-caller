@@ -301,29 +301,16 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/022-cluster-prop-0202b0e0.md`](docs/briefs/022-cluster-prop-0202b0e0.md)
-  — `decomper`: cluster-propagation pilot round 5 against the new
-  top-HIGH anchor `main / func_0202b0e0` (size 0x20, sig 1, 10
-  matched / 31 unmatched, 74% predicted yield). Lifts brief 020's
-  hand-patch budget to a *15 distinct shape templates* cap based
-  on the brief-020 unlock. Target ≥15 byte-identical matches.
-  Branch: `decomper/cluster-prop-0202b0e0`.
-- [`docs/briefs/024-cluster-prop-next-high.md`](docs/briefs/024-cluster-prop-next-high.md)
-  — `decomper` (pre-queued, picks up after brief 022 lands):
-  cluster-propagation pilot round 6, parameterised on the
-  post-#022 ranking. Selects the highest-template-confidence
-  HIGH/MED ≥60% anchor automatically. Introduces a **self-extend
-  clause** — decomper may file two follow-up cluster pilots
-  without a fresh brain brief if the same selection rule applies.
-  Branch: `decomper/cluster-prop-<addr>`.
-- [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
-  — `cloud`: implement `tools/find_shape_templates.py` per brief
-  023's recommendation (Proposal #2 of the research note).
-  Surfaces clone-candidate matched functions across the entire
-  matched corpus by opcode-sequence similarity, automating brief
-  020's manual asm-grepping workflow. ~150–300 lines, single
-  file. Pays back across every future heterogeneous-cluster
-  pilot. Branch: `cloud/find-shape-templates`.
+- [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
+  — `decomper`: first pilot leveraging `find_shape_templates.py`.
+  Targets ov006 cluster #2 (`func_ov006_021b7ce0`, sig 1, 2 matched
+  / 34 unmatched, 61% MED). Brief 023's research diagnosed this as
+  a heterogeneous bag with ≥8 shapes; brief 025's tool surfaces
+  per-target clone candidates automatically. Target ≥14 matches
+  (lower edge of brief 023's 40-60% calibrated band). Supersedes
+  brief 024's self-extend (no remaining HIGH/MED ≥60% non-ov006
+  candidates pass the rule post-brief-024). Branch:
+  `decomper/cluster-prop-ov006-021b7ce0`.
 - [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
   — `cloud`: investigate and document the migration path off
   homebrew's deprecated `wine-stable` / `@staging` / `@devel`
@@ -334,6 +321,23 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
+  `cloud`, shipped in PR #304. `tools/find_shape_templates.py` —
+  679-line tool + 532 lines of tests. Opcode-sequence Levenshtein
+  scoring across the matched corpus with stat-based dsd-dis caching.
+  Sample output on brief-020 anchor returns expected siblings at
+  similarity 1.0. Sibling to `pattern_library.py`.
+- [`docs/briefs/024-cluster-prop-next-high.md`](docs/briefs/024-cluster-prop-next-high.md)
+  `decomper`, shipped in PR #303. **18 byte-identical matches at
+  100% yield** on rank-#8 `func_0202b43c`. Single-shape cluster of
+  4-insn pre-call-arg-rsb tail-call thunks. First test of the
+  anchor-selection rule — selection trace in PR body shows the
+  filter working as intended.
+- [`docs/briefs/022-cluster-prop-0202b0e0.md`](docs/briefs/022-cluster-prop-0202b0e0.md)
+  `decomper`, shipped in PR #301. **24 byte-identical matches at
+  77% yield** (target ≥15, predicted 74%). 14 distinct shape
+  templates under the lifted 15-cap; excellent reg-alloc notes
+  carry over for future heterogeneous-cluster pilots.
 - [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
   `cloud`, shipped in PR #299. 348-line research note diagnosing
   the two persistently-stuck top-of-pool ov006 clusters as
