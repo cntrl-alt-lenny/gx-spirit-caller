@@ -90,6 +90,14 @@ is backing the session.
    `dsd`, `objdiff-cli`, and `mwccarm`/`mwldarm` (via `wibo` on Linux,
    `wine` on macOS, direct on Windows). Takes a few minutes. Subsequent
    builds are seconds.
+   - **macOS prerequisite** (replaces deprecated `wine-stable`):
+     `brew install --cask Gcenx/wine/game-porting-toolkit`. Apple
+     Silicon also needs Rosetta 2 (`softwareupdate
+     --install-rosetta --agree-to-license`). Existing brains
+     migrating from `wine-stable` should
+     `brew uninstall --cask wine-stable` first to satisfy the
+     cask's conflicts-with check. Rationale + tested baseline:
+     [`docs/research/wine-migration.md`](docs/research/wine-migration.md).
 7. **Confirm the baseline.** Run the current module-check command from
    [`docs/state.md`](docs/state.md). Today's baseline is 24/27 OK (main /
    DTCM / overlay 4 still fail — expected, placeholder-symbol artifacts).
@@ -134,18 +142,22 @@ clone. The cloud agent doesn't need a worktree — it runs without
 the local toolchain so it works on a remote / cloud LLM session
 and pushes branches directly.
 
-### Wine deprecation (macOS, deadline 2026-09-01)
+### Wine on macOS (post-deprecation)
 
 Homebrew's `wine-stable`, `wine@staging`, and `wine@devel` casks
-are all deprecated as of 2026-05-06 and **will be disabled on
-2026-09-01** (Apple Gatekeeper now blocks the unsigned x86_64
-binaries). Existing installs keep working past the deadline; new
-installs / reinstalls / contributors with fresh machines won't.
+are all deprecated and **will be disabled on 2026-09-01** (Apple
+Gatekeeper blocks the unsigned x86_64 binaries). The migration
+landed in [brief 026](docs/briefs/026-wine-migration-prep.md):
+fresh macOS brains install
+[Gcenx's Game Porting Toolkit cask](https://github.com/Gcenx/homebrew-wine)
+instead — the install command is in *Brain onboarding* step 6
+above. Rationale + verified-baseline write-up:
+[`docs/research/wine-migration.md`](docs/research/wine-migration.md).
 
-Migration is tracked under [brief 026](docs/briefs/026-wine-migration-prep.md).
-Until that lands, current macOS brain setups stay on
-`wine-stable`; new machines should pause at AGENTS.md *Brain
-onboarding* step 6 and read brief 026 before installing wine.
+Existing brains already on `wine-stable` keep working past the
+deadline (the binary on disk doesn't disappear); migrate at the
+next reinstall or when the cask conflict bites a fresh
+configure.
 
 On **Windows**, `dsd` is shipped as `./dsd.exe`; on **macOS/Linux** it's
 `./dsd`. The `dsd check modules` invocation adapts accordingly.

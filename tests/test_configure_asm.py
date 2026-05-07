@@ -1,4 +1,5 @@
-"""Unit tests for tools/configure.py's asm-rule helpers.
+"""Unit tests for tools/configure.py's asm-rule helpers and macOS
+wine-runner resolution.
 
 Scoped to the pure source-discovery helpers added alongside the
 `mwasm` build rule. End-to-end ninja-generation testing requires the
@@ -173,6 +174,50 @@ class TestMwasmRuleDefinitions(unittest.TestCase):
         # downloaded mwccarm bundle — nothing else in that bundle is
         # a valid assembler target.
         self.assertTrue(configure.ASM.endswith("mwasmarm.exe"))
+
+
+class TestResolveMacosWine(unittest.TestCase):
+    """Pin the wine-runner candidate-selection so a wine-stable user's
+    setup keeps resolving to `wine` after the GPTK migration brief
+    landed, while a fresh GPTK install resolves to `wine64`."""
+
+    def test_wine_stable_only_picks_wine(self):
+        # `which` mock: only `wine` resolves on PATH.
+        which = lambda name: "/opt/homebrew/bin/wine" if name == "wine" else None
+        self.assertEqual(
+            configure._resolve_macos_wine(("wine", "wine64"), which=which),
+            "wine",
+        )
+
+    def test_gptk_only_picks_wine64(self):
+        # Fresh-install machine: only `wine64` resolves.
+        which = lambda name: (
+            "/opt/homebrew/bin/wine64" if name == "wine64" else None
+        )
+        self.assertEqual(
+            configure._resolve_macos_wine(("wine", "wine64"), which=which),
+            "wine64",
+        )
+
+    def test_both_present_prefers_first_candidate(self):
+        # Coexistence (rare, but harmless): both casks installed.
+        # First-candidate-wins keeps wine-stable behaviour stable for
+        # contributors who haven't yet uninstalled the legacy cask.
+        which = lambda name: f"/opt/homebrew/bin/{name}"
+        self.assertEqual(
+            configure._resolve_macos_wine(("wine", "wine64"), which=which),
+            "wine",
+        )
+
+    def test_neither_present_falls_back_to_first(self):
+        # No wine on PATH at all: emit the first candidate so the
+        # build.ninja command surfaces a clear "wine: command not
+        # found" at build time instead of a silent empty WINE.
+        which = lambda name: None
+        self.assertEqual(
+            configure._resolve_macos_wine(("wine", "wine64"), which=which),
+            "wine",
+        )
 
 
 if __name__ == "__main__":
