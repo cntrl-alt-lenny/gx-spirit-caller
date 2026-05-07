@@ -60,9 +60,9 @@ post-#311):
 | 8 | `func_020453b4`       | 0x18 | 1 | 10 | 9  | **≈78% HIGH** (new appearance, 1.11 ratio) |
 
 Eligible (MED ≥37%, matched ≥10) candidates for brief 030's
-self-extends: ranks #1, #5, #7, #8. **A HIGH 78% appeared at rank
-#8 (`func_020453b4`, 10/9)** — eligible under the rule and a
-strong judgment-call pick over pure-ratio sorting (the rule
+self-extends: ranks #1, #5, #7, #8. **A HIGH 78% appeared at
+rank #8** (`func_020453b4`, 10/9) — eligible under the rule and
+a strong judgment-call pick over pure-ratio sorting (the rule
 prefers ratio but doesn't penalise HIGH yield predictions).
 
 ## Self-extend pattern testing
