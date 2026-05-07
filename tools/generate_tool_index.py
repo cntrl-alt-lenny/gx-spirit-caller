@@ -154,6 +154,22 @@ class Tool:
     category: str          # slug from CATEGORY_ORDER
 
 
+def _heading_slug(text: str) -> str:
+    # Match the GFM-style heading anchor that markdownlint's MD051
+    # checks against: lowercase, drop punctuation other than `-`/`_`,
+    # and replace spaces with hyphens. Consecutive non-word chars
+    # collapse to consecutive hyphens (e.g. "Analysis / worklist"
+    # → "analysis--worklist") which keeps the link valid even when
+    # the heading mixes words and separators.
+    out: list[str] = []
+    for ch in text.strip().lower():
+        if ch.isalnum() or ch in "-_":
+            out.append(ch)
+        elif ch.isspace():
+            out.append("-")
+    return "".join(out)
+
+
 def _category_for(name: str) -> str:
     # Longest-prefix wins; stable order in CATEGORIES determines tie-
     # break for equal-length matches (not expected in practice).
@@ -274,7 +290,7 @@ def render(tools: list[Tool]) -> str:
         if not bucket:
             continue
         title = CATEGORY_TITLES.get(cat, cat)
-        lines.append(f"- [{title}](#{cat.replace('-', '-')}) ({len(bucket)})")
+        lines.append(f"- [{title}](#{_heading_slug(title)}) ({len(bucket)})")
     lines.append("")
 
     # Per-category sections.
