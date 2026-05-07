@@ -1565,3 +1565,7 @@ src/overlay002/ov002_021aff78.c:
 src/overlay002/ov002_02259834.c:
     complete
     .text start:0x02259834 end:0x0225984c
+
+src/overlay002/ov002_0220c8b0.c:
+    complete
+    .text start:0x0220c8b0 end:0x0220c8d0
