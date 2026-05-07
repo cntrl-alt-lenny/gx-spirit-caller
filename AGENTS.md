@@ -314,13 +314,12 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
-  — `decomper`: continue the brief-029 cluster-pilot wave with the
-  same selection rule. Default suggestion: rank #7
-  `func_02001e84` (42/14 = 3.0 ratio, strongest template
-  confidence in eligibles). **Self-extend clause** — decomper may
-  file up to two follow-up cluster pilots without a fresh brain
-  brief if the same selection rule applies. Branch:
-  `decomper/cluster-prop-<addr>`.
+  — `decomper`: **self-extend remaining**. Brief 030's first PR
+  (#313) shipped at 71% on `func_02001e84`. Up to 2 self-extended
+  follow-ups still allowed under the same selection rule. New
+  signal: a HIGH 78% candidate (`func_020453b4`, 10/9) appeared
+  at rank #8 post-#313 — eligible under the rule and worth picking
+  by judgment over pure-ratio sorting.
 
 ### Closed briefs (reference)
 

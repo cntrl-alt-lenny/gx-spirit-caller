@@ -8,12 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 night, post-brief-029. Main tip is
-`fa6f9b3` after PR #311 (decomper, brief 029, 21 matches @ 70%).
-One open brief (030, decomper, with self-extend clause).
+**Last updated:** 2026-05-07 late-night, post-brief-030 first PR.
+Main tip is `8cdcd5e` after PR #313 (decomper, brief 030, 10 matches
+@ 71%). Brief 030's self-extend clause has 2 follow-ups remaining.
 
-**Today's totals:** **19 PRs merged**, **+188 byte-identical matches**.
-Easy tier moved 31.3% → **78.0%** in a single day.
+**Today's totals:** **20 PRs merged**, **+198 byte-identical matches**.
+Easy tier moved 31.3% → **78.9%** in a single day.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
@@ -24,7 +24,7 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 866 | 244 | 1110 | **78.0%** | **+519** |
+| `easy` | 876 | 234 | 1110 | **78.9%** | **+529** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 94 | 62 | 156 | 60.3% | — |
@@ -43,6 +43,7 @@ post-#311):
 | 027 | `func_ov006_021b7ce0` | 34 | 32 | 94.1% |
 | 028 | `func_ov006_021c81a4` | 44 | 27 | 61.4% |
 | 029 | `func_02001d84` | 30 | 21 | 70.0% |
+| 030 | `func_02001e84` | 14 | 10 | 71.4% |
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):
@@ -55,12 +56,14 @@ post-#311):
 | 4 | `ov010_021b4750`      | 0x1c | 1 | 3  | 22 | ≈64% MED (matched <10) |
 | 5 | `func_0201397c`       | 0x1c | 0 | 28 | 17 | ≈37% MED (1.65 ratio) |
 | 6 | `func_0202b0b4`       | 0x2c | 1 | 1  | 15 | ≈36% MED (matched <10) |
-| 7 | `func_02001e84`       | 0x10 | 0 | **42** | 14 | ≈37% MED (3.0 ratio — **brief 030 default**) |
-| 8 | `func_02001d84`       | 0x14 | 0 | 48 | 9  | ≈37% MED (brief-029 residue) |
+| 7 | `func_02001d84`       | 0x14 | 0 | 48 | 9  | ≈37% MED (brief-029 residue) |
+| 8 | `func_020453b4`       | 0x18 | 1 | 10 | 9  | **≈78% HIGH** (new appearance, 1.11 ratio) |
 
-Eligible (MED ≥37%, matched ≥10) candidates for brief 030 / its
-self-extends: ranks #1, #5, #7, #8. Default suggestion: rank #7
-`func_02001e84` (highest ratio).
+Eligible (MED ≥37%, matched ≥10) candidates for brief 030's
+self-extends: ranks #1, #5, #7, #8. **A HIGH 78% appeared at
+rank #8** (`func_020453b4`, 10/9) — eligible under the rule and
+a strong judgment-call pick over pure-ratio sorting (the rule
+prefers ratio but doesn't penalise HIGH yield predictions).
 
 ## Self-extend pattern testing
 
