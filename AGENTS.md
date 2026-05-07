@@ -256,15 +256,24 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
-  — `cloud`: add `mwasmarm.exe` to the `download_tool` rule's
-  outputs in `tools/configure.py:511` so a fresh clone's first
-  `ninja rom` doesn't fail with *"no known rule to make
-  mwasmarm.exe"*. Bootstrap-only bug; invisible on populated trees.
-  Branch: `cloud/configure-mwasmarm-output`.
+- [`docs/briefs/020-cluster-prop-02006164.md`](docs/briefs/020-cluster-prop-02006164.md)
+  — `decomper`: cluster-propagation pilot round 4 against the new
+  top-HIGH anchor `main / func_02006164` (size 0x18, sig 1, 28
+  matched / 23 unmatched, 74% predicted yield). Wave-17 anchor;
+  fresh template. Target ≥12 byte-identical matches (52% lower
+  bound). Branch: `decomper/cluster-prop-02006164`.
+- [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
+  — `cloud`: fix the 7 pre-existing markdown-lint failures
+  (`docs/briefs/016`, `docs/briefs/017`, `docs/tools-index.md`)
+  bleeding red CI onto every PR. Docs-only one-off. Branch:
+  `cloud/markdownlint-cleanup`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
+  `cloud`, shipped in PR #292. Fresh-clone bootstrap fix —
+  `outputs=[CC, LD, ASM]` in the `download_tool` rule. Verified by
+  brain via the documented `rm -rf tools/mwccarm` smoke test.
 - [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
   `cloud`. **First half** shipped in PR #243 (cluster fingerprint
   subdivision). **Second half** (`propagate_template --substitute-imm`)
