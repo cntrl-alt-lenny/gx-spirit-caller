@@ -10,12 +10,12 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **15 distinct mwcc-vs-baserom codegen
+**Short answer:** **16 distinct mwcc-vs-baserom codegen
 divergences** account for the **47 dropped matches across the six
 pilots** (020 / 022 / 028 / 029 / 030 / 031). Most fall into one
 of three buckets: **coercible-with-knowledge** (8 patterns —
 the right C variation matches; future briefs can grep here first),
-**permanent** (5 patterns — mwcc keeps "winning" the codegen
+**permanent** (6 patterns — mwcc keeps "winning" the codegen
 choice regardless of C variation; budget zero matches in the
 yield band), and **tooling-tractable** (2 patterns —
 `propagate_template` could ship a register-renaming or
@@ -109,13 +109,40 @@ return a;       // forces bxeq lr branch
 
 ```
 
-**Use when:** the target has any sequence of conditional movs +
-conditional bx. First fix to try is collapsing the early-return
-shape into a unified post-if return.
+**ARM-op limit (≤3-op if-body):** brief 033's pilot of
+`func_0201397c`'s residue cluster surfaced a hard threshold. The
+predication pass reliably switches to early-`bxXX lr` once the
+if-body expands to **≥4 ARM instructions**, regardless of which C
+phrasing is used. mwcc has no flag or pragma exposed to raise the
+limit, and no source-shape variation tested in brief 033 changed
+the emit. The matched-vs-dropped historic data:
 
-**Provenance:** brief 020 `func_02054ea8`, brief 022 callout +
-`func_0207f8f8`/`02087d10`/`02067b8c` (3 drops in brief 028 came
-from this exact distinction, all `bxne lr` partial matches).
+| Function              | If-body ARM-ops | Outcome           |
+|-----------------------|----------------:|-------------------|
+| `func_02054ea8` (b020)|               3 | predication ✓     |
+| `func_02052798`/`b8`/`d8`/`f8` (b022) |  3 | predication ✓     |
+| `func_02067b8c` (b028, b033) |        4 | `bxge lr` early-return ✗ |
+| `func_0207f8f8` (b028, b033) |        4 | `bxge lr` early-return ✗ |
+| `func_02087d10` (b028, b033) |        4 | `bxge lr` early-return ✗ |
+
+The 4-op trigger applies even for the canonical recipe
+`if (cond) { side; a = b; } return a;` — adding a fourth ARM op
+(typical: a second store, or an arithmetic chain that doesn't
+fold into a single instruction) tips mwcc into the branch form.
+Brief 033 tried 5 source variations on a 4-op body before
+escalating; none matched.
+
+**Use when:** the target has any sequence of conditional movs +
+conditional bx **AND** the equivalent if-body would expand to ≤3
+ARM instructions. Above that, treat the function as a permanent
+wall (P-6 below) and skip without iterating.
+
+**Provenance:** matched — brief 020 `func_02054ea8`, brief 022
+`func_02052798`/`b8`/`d8`/`f8`. Dropped at the 4-op limit —
+brief 028 `func_02067b8c`/`func_0207f8f8`/`func_02087d10`
+(originally tagged C-1-coercible; brief 033 reattempted the
+same residue-cluster siblings and confirmed the threshold via
+the 5-variation iteration above, reclassified to P-6).
 
 ### C-2. Local-pointer reuse for two-field reads
 
@@ -389,7 +416,7 @@ fighting mwcc inline-asm escapes.
 **Provenance:** brief 029 carryover note + 6 / 30 matches in
 that brief came via `.s` files; brief 030 reused the pattern.
 
-## Permanent (5 patterns)
+## Permanent (6 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -538,6 +565,29 @@ on the C source — it's already correct.
 **Affected drops:** zero (it's idiom-not-wall) but appears in 3+
 matched shapes across briefs 027–029.
 
+### P-6. Predication threshold (≥4-op if-body)
+
+The boundary at the bottom of C-1: when an `if (cond) { ... }`
+body expands to **4 or more ARM instructions** in mwcc's output,
+the optimiser switches off the predicated-execution pass and
+emits an early-`bxXX lr` branch instead. The split is binary —
+3-op bodies predicate, 4-op bodies don't — and no source-shape
+coercion tried so far has crossed the line. See C-1's *ARM-op
+limit* subsection above for the matched-vs-dropped table and the
+brief-033 iteration log.
+
+**Why permanent:** mwcc's predication pass scores predicate-cost
+against branch-cost using a fixed heuristic that's not exposed
+via flags or pragmas. The threshold is set in the codegen
+pipeline; the C source can only steer the *shape* of the
+if-body, not the instruction count.
+
+**Affected drops:** brief 028 `func_02067b8c`, `func_0207f8f8`,
+`func_02087d10` (originally tagged C-1-coercible; brief 033
+reattempted them in the residue cluster and confirmed they hit
+this threshold). **3 of 47 drops (6%)** — third-largest single
+wall in the set.
+
 ## Codegen-inherent edge cases (3 patterns)
 
 Drops that the C language genuinely can't express. Future pilots:
@@ -640,7 +690,7 @@ shape we should chase".
 | 028 / 309  | `func_020944a4`           | (predicated halfword memcpy) | permanent  |
 | 028 / 309  | `func_02094588`           | (memcpy unroll chunk size) | permanent  |
 | 028 / 309  | `func_0209aa48`/`_d788`   | P-1    | permanent  |
-| 028 / 309  | `func_0207f8f8`/`_87d10`/`_67b8c` | C-1 (missed) | coercible |
+| 028 / 309  | `func_0207f8f8`/`_87d10`/`_67b8c` | P-6 (4-op pred-threshold; reclass'd by brief 033) | permanent |
 | 028 / 309  | `func_0209bf18`           | P-2    | permanent  |
 | 028 / 309  | `func_ov006_021b6d00`     | (CSE add-imm hoisting) | permanent |
 | 028 / 309  | `func_02078eec`           | (64-bit halfword pack) | permanent |
@@ -668,31 +718,37 @@ shape we should chase".
 ```
 
 By bucket:
-  Permanent              :  29 drops (62%)
-  Coercible-but-missed   :   9 drops (19%)  ← future "should have matched"
+  Permanent              :  32 drops (68%)
+  Coercible-but-missed   :   6 drops (13%)  ← future "should have matched"
   Edge case              :   8 drops (17%)
   Future-tooling         :   1 drop  ( 2%)
 
 Top single wall:
-  P-1 (shift-pair collapse) :  8 drops (17%)
-  P-4 (r2-vs-r3 swap)       :  4 drops ( 9%)
-  E-3 (Thumb)               :  4 drops ( 9%)
+  P-1 (shift-pair collapse)         :  8 drops (17%)
+  P-4 (r2-vs-r3 swap)               :  4 drops ( 9%)
+  E-3 (Thumb)                       :  4 drops ( 9%)
+  P-6 (4-op predication threshold)  :  3 drops ( 6%)
 
 ```
 
-**Read of the data:** roughly **20 % of dropped matches** in the
+**Read of the data:** roughly **13 % of dropped matches** in the
 6-pilot window were *coercible-but-missed* — the right C variation
-existed at the time and the decomper just didn't try it. This is
-the highest-leverage section of this doc: future pilots that spot
-a partial-match shape matching one of C-1 through C-8 should lift
-the documented variation directly.
+existed at the time and the decomper just didn't try it. (The
+share dropped from ~20% in the original brief-032 reading after
+brief 033 surfaced P-6's 4-op predication threshold and
+reclassified 3 historic C-1 drops to permanent.) The bucket is
+still the highest-leverage section of this doc: future pilots
+that spot a partial-match shape matching one of C-1 through C-8
+should lift the documented variation directly — but check C-1's
+*ARM-op limit* subsection first.
 
-The other ~80% of drops are permanent walls that the cluster-pilot
-yield band should already account for. Brief 023's calibration
-of MED 37% / HIGH 78% factored in the historic permanent-wall
-loss; that's why the predictions have been roughly right despite
-the over-delivery on heterogeneous clusters (where the *shape
-heterogeneity* compensates for the per-shape wall losses).
+The other ~87% of drops are permanent walls or edge cases that
+the cluster-pilot yield band should already account for. Brief
+023's calibration of MED 37% / HIGH 78% factored in the historic
+permanent-wall loss; that's why the predictions have been roughly
+right despite the over-delivery on heterogeneous clusters (where
+the *shape heterogeneity* compensates for the per-shape wall
+losses).
 
 ## Recommendation
 
