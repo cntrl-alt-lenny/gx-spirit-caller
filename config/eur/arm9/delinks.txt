@@ -6322,3 +6322,95 @@ src/main/func_02087fe0.c:
 src/main/func_020a3634.c:
     complete
     .text start:0x020a3634 end:0x020a3654
+
+src/main/func_02001d68.c:
+    complete
+    .text start:0x02001d68 end:0x02001d84
+
+src/main/func_02006110.c:
+    complete
+    .text start:0x02006110 end:0x0200612c
+
+src/main/func_0200612c.c:
+    complete
+    .text start:0x0200612c end:0x02006148
+
+src/main/func_02006148.c:
+    complete
+    .text start:0x02006148 end:0x02006164
+
+src/main/func_02008598.c:
+    complete
+    .text start:0x02008598 end:0x020085b4
+
+src/main/func_020097d4.c:
+    complete
+    .text start:0x020097d4 end:0x020097f0
+
+src/main/func_0201d060.c:
+    complete
+    .text start:0x0201d060 end:0x0201d07c
+
+src/main/func_0201d134.c:
+    complete
+    .text start:0x0201d134 end:0x0201d150
+
+src/main/func_0201f19c.c:
+    complete
+    .text start:0x0201f19c end:0x0201f1b8
+
+src/main/func_02021c0c.c:
+    complete
+    .text start:0x02021c0c end:0x02021c28
+
+src/main/func_02045280.c:
+    complete
+    .text start:0x02045280 end:0x0204529c
+
+src/main/func_020469b4.c:
+    complete
+    .text start:0x020469b4 end:0x020469d0
+
+src/main/func_02046ac4.c:
+    complete
+    .text start:0x02046ac4 end:0x02046ae0
+
+src/main/func_02048108.c:
+    complete
+    .text start:0x02048108 end:0x02048124
+
+src/main/func_02052334.c:
+    complete
+    .text start:0x02052334 end:0x02052350
+
+src/main/func_02052350.c:
+    complete
+    .text start:0x02052350 end:0x0205236c
+
+src/main/func_02068480.c:
+    complete
+    .text start:0x02068480 end:0x0206849c
+
+src/main/func_02070ea8.c:
+    complete
+    .text start:0x02070ea8 end:0x02070ec4
+
+src/main/func_0208738c.c:
+    complete
+    .text start:0x0208738c end:0x020873a8
+
+src/main/func_02089008.c:
+    complete
+    .text start:0x02089008 end:0x02089024
+
+src/main/func_02093084.c:
+    complete
+    .text start:0x02093084 end:0x020930a0
+
+src/main/func_0209dc8c.c:
+    complete
+    .text start:0x0209dc8c end:0x0209dca8
+
+src/main/func_020a5878.c:
+    complete
+    .text start:0x020a5878 end:0x020a5894
