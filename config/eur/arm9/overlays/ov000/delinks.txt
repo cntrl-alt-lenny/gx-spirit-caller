@@ -390,3 +390,43 @@ src/overlay000/ov000_021adb58.c:
 src/overlay000/ov000_021ae474.c:
     complete
     .text start:0x021ae474 end:0x021ae48c
+
+src/overlay000/ov000_021ace2c.c:
+    complete
+    .text start:0x021ace2c end:0x021ace4c
+
+src/overlay000/ov000_021ace4c.c:
+    complete
+    .text start:0x021ace4c end:0x021ace6c
+
+src/overlay000/ov000_021ace84.c:
+    complete
+    .text start:0x021ace84 end:0x021acea4
+
+src/overlay000/ov000_021ad464.c:
+    complete
+    .text start:0x021ad464 end:0x021ad484
+
+src/overlay000/ov000_021adc30.c:
+    complete
+    .text start:0x021adc30 end:0x021adc50
+
+src/overlay000/ov000_021ae48c.c:
+    complete
+    .text start:0x021ae48c end:0x021ae4ac
+
+src/overlay000/ov000_021aecd8.c:
+    complete
+    .text start:0x021aecd8 end:0x021aecf8
+
+src/overlay000/ov000_021aed18.c:
+    complete
+    .text start:0x021aed18 end:0x021aed38
+
+src/overlay000/ov000_021af338.c:
+    complete
+    .text start:0x021af338 end:0x021af358
+
+src/overlay000/ov000_021af3d0.c:
+    complete
+    .text start:0x021af3d0 end:0x021af3f0
