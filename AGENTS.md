@@ -256,20 +256,23 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/017-cluster-prop-020085d4.md`](docs/briefs/017-cluster-prop-020085d4.md)
-  — `decomper`: cluster-propagation pilot round 3, this time on an
-  **offset-0 / no-literal anchor** to side-step brief 016's
-  literal-substitution gap. Anchor `main / func_020085d4` (size 0x10,
-  130 unmatched siblings, same `return *data` shape that yielded
-  12.5% in brief 015). Branch: `decomper/cluster-prop-020085d4`.
-- [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
-  — `cloud`: ship the two propagation-tooling improvements brief
-  016 + 017 collectively diagnosed. (1) `propagate_template
-  --substitute-imm` for per-sibling literal swap. (2) finer cluster
-  fingerprint in `find_pattern_clusters.py` (instruction-shape
-  histogram or similar). Branch: `cloud/cluster-tooling-upgrade`.
+- [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
+  — `cloud`: add `mwasmarm.exe` to the `download_tool` rule's
+  outputs in `tools/configure.py:511` so a fresh clone's first
+  `ninja rom` doesn't fail with *"no known rule to make
+  mwasmarm.exe"*. Bootstrap-only bug; invisible on populated trees.
+  Branch: `cloud/configure-mwasmarm-output`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
+  `cloud`. **First half** shipped in PR #243 (cluster fingerprint
+  subdivision). **Second half** (`propagate_template --substitute-imm`)
+  *superseded* by the post-#255 hard-tier clustering pivot — see
+  `docs/state.md` for the narrative.
+- [`docs/briefs/017-cluster-prop-020085d4.md`](docs/briefs/017-cluster-prop-020085d4.md)
+  `decomper`, shipped in PR #247. 13 offset-substitution matches on
+  the `func_020085d4` cluster.
 
 - Briefs 010–014 all shipped during the gap between the previous and
   current state-md refreshes. Their full archive lives in

@@ -8,160 +8,199 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-04-28. Main tip is `335ccbe` after PR #243
-(cloud, half of brief 018). Cluster fingerprint subdivision shipped
-clean; `propagate_template --substitute-imm` half is still pending
-on cloud's queue.
+**Last updated:** 2026-05-06. Main tip is `ba9d658` after PR #285
+(progress badge). Five open `decomper/wave17-pr*` PRs (#286–#290) in
+flight totalling **66 byte-identical matches**, none yet verified
+locally by this brain — see *In flight* below.
 
-**Baseline:** Per merged PR bodies, `ninja rom` clean and `./dsd
-check modules` baseline preserved (3 expected failures: ARM9 main /
-DTCM / overlay 4). My local Bash-on-Windows brain shell still can't
-drive ninja's `&&` chains; the decomper's setup works fine across
-brief 015's verification. CI's `pr-invariants` + `pr-tier-delta` +
-`pr-worklist-diff` all green on every shipped PR.
+**Baseline:** Verified fresh today on a brand-new macOS arm64 brain
+shell — `python tools/configure.py eur` clean, `ninja rom` 1008/1008
+clean, `./dsd check modules` reproduces the documented 24/27 (3
+expected failures: ARM9 main / DTCM / overlay 4). The previous
+brain's Bash-on-Windows `&&` issue is no longer relevant on this
+shell. CI's `pr-invariants` + `pr-tier-delta` + `pr-worklist-diff`
+all green on every shipped PR per merged bodies.
 
-**Progress** (live from `python tools/next_targets.py --version eur`):
+**Progress** (live from `python tools/next_targets.py --version eur`,
+post-#285):
 
-| Tier | Matched | Unmatched | Total | % matched |
-|------|--------:|----------:|------:|----------:|
-| `trivial` | 136 | 0 | 136 | **100.0%** |
-| `easy` | 347 | 763 | 1110 | **31.3%** |
-| `sinit` | 50 | 1 | 51 | 98.0% |
-| `named` | 38 | 1 | 39 | 97.4% |
-| `medium` | 94 | 62 | 156 | 60.3% |
-| `hard` | 36 | 8321 | 8357 | 0.4% |
+| Tier | Matched | Unmatched | Total | % matched | Δ since 4/28 |
+|------|--------:|----------:|------:|----------:|-------------:|
+| `trivial` | 136 | 0 | 136 | **100.0%** | — |
+| `easy` | 658 | 452 | 1110 | **59.3%** | **+311** |
+| `sinit` | 51 | 0 | 51 | **100.0%** | +1 (closed) |
+| `named` | 38 | 1 | 39 | 97.4% | — |
+| `medium` | 94 | 62 | 156 | 60.3% | — |
+| `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
 
-Δ since previous refresh: tier counts unchanged (PR #243 was
-tools-only). `find_pattern_clusters.py` now reports **57 clusters
-covering 728 unmatched** (was 53/819) — the finer fingerprint split
-mixed-shape buckets and ~91 functions whose old bucket was too coarse
-fell out of clusters. That's expected and good.
+The big mover is **easy** (+311 matches, 31.3% → 59.3%) driven by
+the post-#255 hard-tier clustering pivot — see *Direction shift*
+below — plus the ongoing easy-wave throughput. `sinit` closed
+100% via PR #245 (`__sinit_ov004_02209a5c`).
 
-**Cluster ranking under the new fingerprint** (top 8):
+**Cluster ranking** (live from `python tools/find_pattern_clusters.py
+--version eur --top 5`, post-#278 with HIGH/MED/LOW yield labels):
 
-| # | Anchor | Size | Sig | Matched | Unmatched | Notes |
-|--:|--------|------|----:|--------:|----------:|-------|
-| 1 | `OSi_IrqHandlerTimer3` | 0x10 | 1 | 13 | 85 | needs `--substitute-imm` |
-| 2 | `OS_DisableIrq`        | 0x14 | 0 | 12 | 45 | offset-0 candidate |
-| 3 | `func_ov006_021c81a4`  | 0x1c | 0 | 1  | 44 | offset-0 candidate |
-| 4 | `func_020085d4`        | 0x10 | 1 | 25 | 41 | brief 017 target |
-| 5 | `func_ov011_021ca524`  | 0x14 | 1 | 2  | 40 | |
-| 6 | `func_ov000_021abe54`  | 0x10 | 0 | 20 | 36 | offset-0 |
-| 7 | `OS_RestoreIrq`        | 0x18 | 0 | 12 | 35 | offset-0 |
-| 8 | `func_ov006_021b7ce0`  | 0x1c | 1 | 2  | 34 | |
+| # | Anchor | Size | Sig | Matched | Unmatched | Predicted yield |
+|--:|--------|------|----:|--------:|----------:|-----------------|
+| 1 | `func_ov006_021c81a4` | 0x1c | 0 | 1  | 44 | ≈20% [LOW] |
+| 2 | `func_02001d84`       | 0x14 | 0 | 22 | 35 | ≈37% [MED] |
+| 3 | `OS_RestoreIrq`       | 0x18 | 0 | 12 | 35 | ≈37% [MED] |
+| 4 | `func_ov006_021b7ce0` | 0x1c | 1 | 2  | 34 | ≈61% [MED] |
+| 5 | `func_0209de5c`       | 0x18 | 1 | 19 | 32 | ≈74% [HIGH] |
 
-`func_020085d4` cluster shrank 130 → 41; brief 017 updated to reflect
-the new size. The new top cluster (`OSi_IrqHandlerTimer3`, 85
-unmatched) is NOT brief-017-friendly because its anchor uses a
-varying `mov r0, #N` immediate — that cluster is gated on the
-second half of brief 018 landing.
+55 ready-to-propagate clusters cover **493 unmatched** (was 728 on
+4/28). The brief-017 anchor (`func_020085d4`) and brief-016 anchor
+(`func_ov000_021aa4a0`) have both fallen out of the top — most of
+their siblings drained through the cluster pipeline. The new top-5
+HIGH cluster (`func_0209de5c`, 74%) is the most attractive next
+pilot anchor.
 
-**Yield reality check across the pilot wave:** brief 015 → 12.5%
-(18/144), brief 016 → 2.9% (2/70). Brief 017's predicted band
-revised to 25-50% (~10-20 matches) on the post-#243 tighter cluster.
+## Direction shift since 4/28: hard-tier clustering
 
-## Merged since previous refresh
+Brief 018's second half (`propagate_template --substitute-imm`)
+was *not* pursued. Instead the cluster pipeline pivoted via:
 
-Main tip moved from `9fef7ac` → `335ccbe` (1 PR).
+- **#246** `docs/research/medium-tier-plateau.md` — diagnosed why
+  medium tier sat at 60% for so long.
+- **#255** `docs/research/hard-tier-clustering.md` — proposed
+  applying the cluster signal to hard-tier siblings (which until
+  then had been excluded as "too varied").
+- **#263** `tools/tier_classifier.py` — operationalized the
+  research; produces the per-tier candidate lists.
+- **#264** first hard-tier cluster pilot — 18 single-call boolean
+  wrappers, **94.7% yield** (18/19). Vastly outperformed brief
+  016's 2.9% and matched brief 015's 12.5% by an order of magnitude.
+- **#270, #276** rebase PRs draining hard-cluster waves
+  (59 + 78 matches respectively). The 74-fn ov002 sweep in #276 is
+  the single largest match wave to date.
+- **#271** "hard cluster #8 (5/5): IRQ-pair siblings" — drained
+  the cluster the old top-of-list (`OSi_IrqHandlerTimer3`, 85
+  unmatched on 4/28) was anchoring.
+- **#278** added per-cluster `predicted_yield` + HIGH/MED/LOW
+  bucket labels; visible in the cluster table above.
+
+Net: the substitute-imm gap brief 018 was meant to fix turned out
+to be sidesteppable by going *up* the tier ladder (hard-tier
+clusters with single-shape relocations) rather than *deeper*
+(literal substitution within mixed easy clusters). Brief 018 is now
+effectively **superseded**, not blocking; closing it formally below.
+
+## Closed since previous refresh
+
+Main tip moved from `9fef7ac` → `ba9d658` (27 commits).
+
+### Brief closures
+
+- **Brief 017** — shipped in PR #247. 13 offset-substitution
+  matches on the `func_020085d4` cluster.
+- **Brief 018 (first half)** — shipped in PR #243 (cluster
+  fingerprint subdivision).
+- **Brief 018 (second half)** — *superseded*, not shipped. Hard-
+  tier clustering (#255 → #264 onward) is the working alternative;
+  retiring the substitute-imm scope.
 
 ### Cloud track
 
-- **PR #243** — `find_pattern_clusters: subdivide by reloc target
-  type + data-size bucket`. The first half of brief 018. Splits the
-  old `(size, sig_len)` bucket into smaller, more homogeneous
-  groups. Effect: 53 clusters / 819 unmatched → 57 clusters / 728
-  unmatched. `func_020085d4` cluster (brief 015's anchor shape) split
-  130 → 41 unmatched; brief 015 anchor and brief 016 anchor are now
-  in different clusters, validating brief 018's first success
-  criterion. Tests: 28 cluster-tool tests pass; full suite has 6
-  pre-existing failures (Windows path / executable-bit issues in
-  `cluster_wave_propagate`, `permute`, `install_git_hooks`,
-  `claude_hooks` — all confirmed pre-existing on main, not
-  regressions).
+- **PR #243** (4/28) `find_pattern_clusters: subdivide by reloc
+  target type + data-size bucket` (brief 018 first half).
+- **PR #251** Backfill unit tests for 3 cross-platform tools.
+- **PR #252** `bulk_rename_candidates: add HIGH/MED/LOW confidence
+  label`.
+- **PR #263** `Add tools/tier_classifier.py — operationalize
+  #246/#255 analysis`.
+- **PR #278** `find_pattern_clusters: add predicted_yield +
+  HIGH/MED/LOW labels`.
+- **PRs #246, #255, #279** Research notes (medium-tier plateau,
+  hard-tier clustering, trim-padding false-positive on relocation-
+  tail .s files).
 
-### Decomper track (carryover from previous refresh)
+### Decomper track
 
-- **PR #241** — Brief 016 shipped. **2 byte-identical matches**
-  (`main_020498dc`, `ov008_021b1e0c`), both the
-  `*data->field_NNN = arg` shape. Yield 2/70 (2.9%), well below
-  the 5-15 calibrated band. Decomper's PR body diagnosed the
-  collapse: `(size, sig_len)` cluster fingerprint groups wildly
-  different shapes (tail-call thunks, constant-write setters,
-  byte-store doubles, lookup-table loads, the actual anchor shape)
-  AND `propagate_template` doesn't substitute numeric literals
-  even when shape is right (the cluster has 81 different str
-  offsets across siblings; the template's hardcoded `0x144`
-  matched nothing). Decomper hand-patched the 2 surviving
-  shape-correct siblings' integer literal — disclosed clearly,
-  byte-verified.
+- **PR #245** `named tier 39/39 closed: __sinit_ov004_02209a5c`.
+- **PR #247** Brief 017 (13 matches).
+- **PR #253** Rebase #248+#249+#250 (56 matches).
+- **PR #256** `main thunk cluster: 13 0202bbxx-bcxx const-arg
+  dispatchers`.
+- **PR #258** `overlay easy wave 13: 10 thunks across 4 overlays`.
+- **PR #261** Rebase #257+#259+#260 (38 matches).
+- **PR #264** `hard-tier cluster #1 pilot: 18 single-call boolean
+  wrappers (94.7% yield)`.
+- **PR #270** Rebase #265+#266+#267+#268 (59 matches).
+- **PR #271** `hard cluster #8 (5/5): IRQ-pair siblings produce
+  dispatch + 2-call shapes`.
+- **PR #276** Rebase #272+#273+#274+#275 (78 matches incl. ov002
+  74-fn sweep).
+- **PR #280** `overlay easy wave 16: 9 ov002 4-insn thunks`.
+- **PR #281** `easy wave 16: 7 main 4-insn 0x14 thunks`.
+- **PR #284** Rebase #282+#283 (36 matches).
 
 ### Brain track (this PR)
 
-- Verified PR #243 locally — 28 cluster-tool tests pass, full suite
-  failures are pre-existing not regressions. Real-world cluster
-  tool output confirms brief 018's first success criterion:
-  brief-015-anchor (`func_020085d4`) and brief-016-anchor
-  (`func_020498dc`) now land in different clusters under the
-  finer fingerprint.
-- Updated brief 017 to reflect the new cluster size (130 → 41
-  unmatched) and revised the calibrated yield band (12-15% → 25-50%
-  on the now-tighter cluster).
-- Flagged the remaining half of brief 018 (`propagate_template
-  --substitute-imm`) as still pending. Cloud's queue.
-
-### Brain track (carryover from previous refresh)
-
-- Wrote brief 017 — cluster pilot round 3 on an offset-0
-  anchor (`func_020085d4`). Side-steps brief 016's literal-
-  substitution gap.
-- Wrote brief 018 — formal cloud scope for both systemic fixes:
-  the finer cluster fingerprint (now shipped in #243) and
-  + finer cluster fingerprint in `find_pattern_clusters.py`.
-- AGENTS.md open-briefs list now points at 017 + 018.
+- Refreshed state.md to reflect 27-commit gap since 4/28.
+- Wrote brief 019 (`cloud/configure-mwasmarm-output`) — fresh-clone
+  bootstrap fix; documented in *Open briefs* below.
+- Closed briefs 017 and 018 in AGENTS.md (017 shipped #247; 018
+  first half #243, second half superseded).
+- Verified the documented 24/27 baseline reproduces from a brand-
+  new macOS arm64 brain shell after working through one new
+  fresh-clone gotcha (the brief-019 bug).
 
 ## In flight (post this brain-PR)
 
-- **Open PRs:** zero.
-- **`decomper`** — brief 017 still open. Branch:
-  `decomper/cluster-prop-020085d4`. Revised expectation post-#243:
-  10-20 matches on a 41-sibling cluster (was 130-sibling). Brief
-  text updated accordingly.
-- **`cloud`** — brief 018 *half open*. PR #243 shipped the cluster-
-  fingerprint subdivision; the second half (`propagate_template
-  --substitute-imm`) is still pending. Brief 018's text retains
-  the full scope; the next cloud PR should target that half on a
-  branch like `cloud/propagate-substitute-imm`.
-- **`brain`** — waiting for the next PR.
+- **Open PRs (5):** All `decomper/wave17-pr*`, all from cntrl-alt-
+  lenny, all opened 2026-05-03. Cumulative wave 17:
+  - **#286** easy wave 17: 19 main pool-data thunks (extends ov002
+    sweep). +228/-0, 20 files.
+  - **#287** hard wave 17: 20 mixed-shape leaf matches in main.
+    +229/-0, 21 files.
+  - **#288** hard wave 17: 10 bit-field + IPC + bit-test matches.
+    +141/-0, 11 files.
+  - **#289** hard wave 17: 10 main 5-insn 0x18 matches (lookups +
+    comparators + 2-deref). +107/-0, 11 files.
+  - **#290** hard wave 17: 7 main 5-insn 0x18 thunk variants.
+    +77/-0, 8 files.
+
+  Each PR body documents `ninja rom` clean + `./dsd check modules`
+  3-failure baseline + N byte-identical. **None yet verified
+  locally by this brain.** Default brain workflow per AGENTS.md is
+  to pull each branch, replay verification, summarize for
+  cntrl_alt_lenny in plain English, offer to merge. That's the next
+  brain task — see TODO #1.
+
+- **`decomper`** — wave 17 above. No outstanding brief; the wave
+  was self-driven from the cluster output rather than a brain
+  brief.
+
+- **`cloud`** — brief 019 (this PR's brief) is the only open work.
+  No prior cloud brief still in flight.
+
+- **`brain`** — this PR refreshes state.md + files brief 019.
 
 ## Next-brain TODO
 
-1. **Review brief 017 PR when it opens.** Decomper ships
-   propagated siblings of `func_020085d4`. Verify: configure,
-   ninja rom, ninja objdiff, dsd check modules (still 24/27),
-   `check_match_invariants`. Literal-only-patching exception
-   from brief 016 still applies until `--substitute-imm` lands.
-2. **Review the second-half cloud PR** (substitute-imm). Tools-
-   only: extending `tools/propagate_template.py` so the per-
-   sibling `_pad`/`field_<hex>`/offset literals adapt to each
-   target's actual baserom offsets. Smoke test: rerun brief 016's
-   cluster (`ov000 / func_ov000_021aa4a0`) with `--substitute-imm`
-   — should rewrite the literals correctly without hand-patching.
-3. **Queue brief 019** once `--substitute-imm` lands: rerun brief
-   016's cluster with the new tooling to validate the bottleneck
-   diagnosis. Predicted yield jumps **2.9% → ~50-80%**.
-4. **Queue brief 020** for the new top cluster
-   (`OSi_IrqHandlerTimer3`, 85 unmatched). It's gated on
-   `--substitute-imm` because the anchor's `mov r0, #N` immediate
-   varies per sibling.
-5. **Brain shell repair** — carryover. Windows-bash + ninja `&&`
-   issue.
-6. **Pre-existing carryovers** — `func_ov021_021aaf58` placeholder-
-   in-complete-TU warning; `__sinit_ov004_02209a5c` (failing
-   module); `match-invariants` not yet a required branch-protection
-   check.
+1. **Verify and review wave 17 (#286–#290)** locally. For each PR
+   in order: pull branch, `python tools/configure.py eur`, `ninja
+   rom`, `./dsd check modules` (must stay 24/27), `python
+   tools/check_match_invariants.py`, `python tools/progress.py`.
+   Summarize each in plain English for cntrl_alt_lenny, offer to
+   merge. The 5 PRs may rebase into a single squash like #270 /
+   #276 — ask cntrl_alt_lenny's preference (one rebase PR vs five
+   sequential merges) before merging.
+2. **Review brief 019 PR** when it opens (this PR's brief, scoped
+   for cloud). Smoke test: `rm -rf tools/mwccarm && python
+   tools/configure.py eur && ninja rom` should download mwccarm
+   exactly once and proceed to compile, no manual `download_tool.py`
+   step.
+3. **Queue next pilot anchor.** Top HIGH cluster is
+   `func_0209de5c` (size 0x18, 74% predicted yield, 32 unmatched).
+   When the wave 17 dust settles, write a brief for decomper.
+4. **Pre-existing carryovers** —
+   `func_ov021_021aaf58` placeholder-in-complete-TU warning;
+   `match-invariants` not yet a required branch-protection check.
 
 ## New agents?
 
 Still no. Brain + decomper + cloud + the auto-progress-badge bot
 continues to scale. Codex CLI sessions have played all three roles
-fluently across this chunk per past chats.
+fluently across multiple chunks.
