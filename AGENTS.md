@@ -313,18 +313,30 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
-  — `decomper`: likely-final easy-tier cluster pilot. Cluster pool
-  has drained; only rank #4 `func_0201397c` (28/17 = 1.65 ratio,
-  MED 37%) clearly passes the selection rule. **First test of
-  using `docs/research/codegen-walls.md`** (brief 032's research)
-  during the work — drops should be classified against the
-  doc's buckets. Target ≥7 matches (40%); ≥10 (60%) would
-  validate brief 032's coercible-but-missed finding. Branch:
-  `decomper/cluster-prop-<addr>`.
+- [`docs/briefs/034-medium-tier-wave.md`](docs/briefs/034-medium-tier-wave.md)
+  — `decomper`: medium-tier pivot wave (brief 033's recommendation).
+  Match 6–12 individual medium-tier functions from
+  `next_targets.py` top of list (sizes 0x24–0x40, 1–2 named
+  callees each). First time using `codegen-walls.md` mid-work
+  outside the cluster pipeline. Branch: `decomper/medium-tier-wave-1`.
+- [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
+  — `cloud`: small docs-only patch. Update C-1 (predicated
+  execution) in `docs/research/codegen-walls.md` with brief 033's
+  refinement: the predication-vs-early-return trigger flips when
+  the if-body crosses ≤3 ARM instructions. ~3-4 historic drops
+  reclassify from coercible-but-missed to permanent. Low priority;
+  not blocking. Branch: `cloud/codegen-walls-c1-refinement`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
+  `decomper`, shipped in PR #320. **3 byte-identical matches at
+  18% yield** — second below-floor pilot, BUT the PR delivered a
+  research-grade post-mortem: cluster turned out to be brief 028
+  residue re-fingerprinted; codegen-walls.md workflow validated
+  (cross-reference-before-iterate saved hours); concrete C-1
+  refinement proposal (predicated-exec ≤3-op limit) handed to
+  brief 035; explicit pivot-to-medium-tier recommendation.
 - [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
   `cloud`, shipped in PR #317. 641-line research note at
   `docs/research/codegen-walls.md`; 15 codegen walls classified

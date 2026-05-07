@@ -8,15 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 late-night, post-brief-030-final-extend
-+ brief-032 (cloud research). Main tip is `5f3dcf6` after PRs #318
-(decomper, +24 matches @ 77%) and #317 (cloud, codegen-walls
-research). Brief 030 self-extend allowance fully expended (1 win
-+ 1 escalation + 1 win = 3 PRs). Brief 033 queued for the likely-
-final easy-tier pilot.
+**Last updated:** 2026-05-07 late-night, post-brief-033 + pivot to
+medium tier. Main tip after PR #320 (decomper, brief 033, 3 matches
+@ 18% — below floor BUT delivered a research-grade pivot
+recommendation). Cluster pipeline closed for now; medium tier opens.
 
-**Today's totals:** **25 PRs merged**, **+226 byte-identical
-matches**. Easy tier moved 31.3% → **81.3%** in a single day.
+**Today's totals:** **27 PRs merged**, **+229 byte-identical
+matches**. Easy tier moved 31.3% → **81.5%** in a single day.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
@@ -27,7 +25,7 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 902 | 208 | 1110 | **81.3%** | **+555** |
+| `easy` | 905 | 205 | 1110 | **81.5%** | **+558** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 94 | 62 | 156 | 60.3% | — |
@@ -49,6 +47,12 @@ post-#311):
 | 030 | `func_02001e84` | 14 | 10 | 71.4% |
 | 031* | `func_020453b4` | 9  | 2  | 22.2% (HIGH 78% predicted; codegen walls) |
 | 030-extend | `func_02033f10` | 31 | 24 | 77.4% (option-B recovery, fresh sig=0 cluster) |
+| 033* | `func_0201397c` | 17 | 3  | 17.6% (brief 028 residue; pivot recommendation) |
+
+**Cluster pipeline closed.** Easy-tier cluster pool drained
+through brief 033's below-floor signal. Brief 034 pivots to
+medium-tier individual-function matching using the codegen-walls
+reference.
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):
