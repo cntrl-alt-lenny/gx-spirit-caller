@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**47 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**48 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (12)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (7)
+- [Match acceleration](#match-acceleration) (8)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (13)
@@ -155,6 +155,12 @@ unmatched siblings of a matched anchor, in one wave.
 **surface clusters of functions sharing an**
 
 exact reloc signature, where at least one is already matched and at least one is still unmatched.
+
+### `tools/find_shape_templates.py`
+
+**surface clone-candidate matched functions**
+
+for an unmatched target by opcode-sequence similarity.
 
 ### `tools/m2ctx.py`
 
