@@ -11,9 +11,9 @@ yield is LOW.
 
 Brief 027 (PR #306) landed ov006 cluster #2 at **94% yield** (32/34)
 — far above brief 023's 40-60% calibration. The new tool unlocked
-the cluster much more dramatically than predicted. State.md TODO
-#2 said yield ≥ 50% on cluster #2 triggers brief 028 for cluster
-#1; 94% is comfortably past that threshold.
+the cluster much more dramatically than predicted. State.md
+TODO #2 said yield ≥ 50% on cluster #2 triggers brief 028 for
+cluster #1; 94% is comfortably past that threshold.
 
 Cluster #1 is harder than cluster #2 in two ways:
 - **More shapes** (≥15 vs ≥8 per brief 023). More distinct
