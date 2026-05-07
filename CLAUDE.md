@@ -164,9 +164,17 @@ final gate and will stay red until all 27 modules check green.
 
 ## Platform notes
 
-- **macOS (Apple Silicon):** use `brew install --cask wine-stable` for the
-  Win32 runner. `configure.py` auto-selects `wine` from `PATH` on Darwin.
-  `dsd-macos-arm64` and `objdiff-cli-macos-arm64` are downloaded natively.
+- **macOS (Apple Silicon):** install the
+  [Game Porting Toolkit cask](https://github.com/Gcenx/homebrew-wine)
+  for the Win32 runner —
+  `brew install --cask Gcenx/wine/game-porting-toolkit` — and
+  Rosetta 2. `configure.py` auto-selects `wine` from `PATH` on
+  Darwin, which resolves to GPTK's `wine64` shim under
+  `/opt/homebrew/bin/`. The legacy `wine-stable` cask is
+  deprecated; see
+  [`docs/research/wine-migration.md`](docs/research/wine-migration.md).
+  `dsd-macos-arm64` and `objdiff-cli-macos-arm64` are downloaded
+  natively.
 - **Linux:** `wibo` is auto-downloaded and runs the Win32 compiler.
 - **Windows:** `mwccarm.exe` / `mwldarm.exe` run natively; no runner.
 - `get_platform.py` was patched 2026-04-20 to return `Darwin → macos` and

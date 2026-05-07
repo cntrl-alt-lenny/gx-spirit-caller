@@ -27,12 +27,34 @@ from get_platform import get_platform
 
 
 DEFAULT_WIBO_PATH = "./wibo"
-DEFAULT_MACOS_WINE = "wine"  # Expect `wine` on PATH (brew install --cask wine-stable)
+# macOS auto-detects whichever Win32 runner is on PATH:
+#   - `wine`   → wine-stable cask (deprecated, disabled 2026-09-01)
+#   - `wine64` → Gcenx/wine/game-porting-toolkit cask (post-deprecation)
+# See docs/research/wine-migration.md for the migration write-up.
+DEFAULT_MACOS_WINE_CANDIDATES = ("wine", "wine64")
+
+
+def _resolve_macos_wine(
+    candidates: tuple[str, ...] = DEFAULT_MACOS_WINE_CANDIDATES,
+    which=None,
+) -> str:
+    """Pick the first candidate that resolves on PATH; otherwise the
+    first candidate, so the resulting build.ninja error surfaces as a
+    clear "wine: command not found" rather than a silent miss here.
+
+    `which` is injectable for tests."""
+    if which is None:
+        from shutil import which as _which
+        which = _which
+    for cand in candidates:
+        if which(cand):
+            return cand
+    return candidates[0]
 
 
 parser = argparse.ArgumentParser(description="Generates build.ninja")
 parser.add_argument('-w', type=str, default=None, dest="wine", required=False,
-                    help="Path to the Win32 runner. Linux: wibo (auto-downloaded). macOS: wine on PATH (install via Homebrew). Unused on Windows.")
+                    help="Path to the Win32 runner. Linux: wibo (auto-downloaded). macOS: auto-detects wine (wine-stable cask) or wine64 (game-porting-toolkit cask) on PATH. Unused on Windows.")
 parser.add_argument("--compiler", type=Path, required=False, help="Path to pre-installed compiler root directory")
 parser.add_argument("--no-extract", action="store_true", help="Skip extract step")
 parser.add_argument("--dsd", type=Path, required=False, help="Path to pre-installed dsd CLI")
@@ -154,11 +176,12 @@ if platform is None:
     exit(1)
 EXE = platform.exe
 # Pick the Win32 runner for running mwccarm.exe / mwldarm.exe on non-Windows hosts.
-# Linux: wibo (auto-downloaded via a ninja rule). macOS: system `wine` from Homebrew.
+# Linux: wibo (auto-downloaded via a ninja rule). macOS: probe PATH
+# for either `wine` (wine-stable cask) or `wine64` (game-porting-toolkit cask).
 if platform.system == "windows":
     WINE = ""
 elif platform.system == "macos":
-    WINE = args.wine if args.wine is not None else DEFAULT_MACOS_WINE
+    WINE = args.wine if args.wine is not None else _resolve_macos_wine()
 else:
     WINE = args.wine if args.wine is not None else DEFAULT_WIBO_PATH
 DSD = str(args.dsd or os.path.join('.', str(root_path / f"dsd{EXE}")))
