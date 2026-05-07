@@ -58,12 +58,14 @@ already matched as of main `1ee0935`).
    `python tools/find_pattern_clusters.py --version eur main 0x020085d4`
    for the per-anchor list of 130 unmatched siblings.
 3. **Propagate:**
+
    ```
    python tools/propagate_template.py apply \
      --template src/main/func_020085d4.c \
      --cluster main 0x020085d4 \
      --version eur
    ```
+
    Likely emits 130 `.c` files. Most will fail byte-compare.
 4. **Build + report.** `ninja rom`, `ninja objdiff` (if it doesn't
    panic — see brief 016 PR's note about objdiff-cli upstream),

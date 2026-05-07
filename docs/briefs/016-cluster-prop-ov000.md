@@ -48,12 +48,14 @@ siblings only.
    Note the `--ranking sig=1` output — these are functions whose
    reloc fingerprint matches the anchor.
 3. **Propagate.**
+
    ```
    python tools/propagate_template.py apply \
      --template src/overlay000/ov000_021aa4a0.c \
      --cluster ov000 0x021aa4a0 \
      --version eur
    ```
+
 4. **Build + report.** `ninja rom`, `ninja objdiff`, `ninja
    report`. Look at the `report.json` deltas for the propagated
    files: drop any that show <100%, keep the rest.
