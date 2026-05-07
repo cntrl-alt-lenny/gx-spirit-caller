@@ -70,9 +70,9 @@ are the natural follow-up MED candidates if 022's heterogeneous-
 cluster experience holds.
 
 **The persistent ov006 problem:** ranks #1 and #2 are the same
-clusters that have been sitting at the top across the entire post-
-#243 cluster pipeline. Brief 023 (cloud, research-only) goes after
-why — see *In flight* below.
+clusters that have been sitting at the top across the entire
+post-#243 cluster pipeline. Brief 023 (cloud, research-only) goes
+after why — see *In flight* below.
 
 ## Closed since previous refresh (5/7 AM → 5/7 PM)
 
