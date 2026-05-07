@@ -313,26 +313,32 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
-  — `decomper`: first pilot leveraging `find_shape_templates.py`.
-  Targets ov006 cluster #2 (`func_ov006_021b7ce0`, sig 1, 2 matched
-  / 34 unmatched, 61% MED). Brief 023's research diagnosed this as
-  a heterogeneous bag with ≥8 shapes; brief 025's tool surfaces
-  per-target clone candidates automatically. Target ≥14 matches
-  (lower edge of brief 023's 40-60% calibrated band). Supersedes
-  brief 024's self-extend (no remaining HIGH/MED ≥60% non-ov006
-  candidates pass the rule post-brief-024). Branch:
-  `decomper/cluster-prop-ov006-021b7ce0`.
-- [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
-  — `cloud`: investigate and document the migration path off
-  homebrew's deprecated `wine-stable` / `@staging` / `@devel`
-  casks (all disabled 2026-09-01). Land as
-  `docs/research/wine-migration.md` + AGENTS.md update. Medium-
-  low priority; ~4 months runway. Branch:
-  `cloud/wine-migration-prep`.
+- [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](docs/briefs/028-cluster-prop-ov006-021c81a4.md)
+  — `decomper`: second pilot leveraging `find_shape_templates.py`,
+  this time on the larger ov006 cluster #1 (`func_ov006_021c81a4`,
+  sig 0, 1 matched / 44 unmatched, 20% LOW). Brief 023's research
+  classified ≥15 distinct shapes here. Brief 027's 94% on cluster
+  #2 triggered this brief per state.md TODO #2. Target ≥18 matches
+  (41%); upside 25+ if the new tool's leverage holds on a sig=0
+  anchor. Branch: `decomper/cluster-prop-ov006-021c81a4`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
+  `decomper`, shipped in PR #306. **32 byte-identical matches at
+  94% yield** on ov006 cluster #2 — way past brief 023's 40-60%
+  calibrated band. First real-world validation of
+  `find_shape_templates.py`. Honest workflow note: tool useful
+  for cluster orientation, asm-read still the bottleneck on the
+  C-write step.
+- [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
+  `cloud`, shipped in PR #307. Migrated macOS brain onboarding
+  off `wine-stable` (disabled 2026-09-01) onto **Gcenx's Game
+  Porting Toolkit cask**. Brain locally verified end-to-end
+  (24/27 baseline preserved with the new wine binary; 20 unit
+  tests including 4 new `TestResolveMacosWine` cases pass).
+  AGENTS.md *Brain onboarding* step 6 + *Wine on macOS* section
+  updated by cloud as part of the PR.
 - [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
   `cloud`, shipped in PR #304. `tools/find_shape_templates.py` —
   679-line tool + 532 lines of tests. Opcode-sequence Levenshtein
