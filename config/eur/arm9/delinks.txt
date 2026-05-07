@@ -6694,3 +6694,17 @@ src/main/func_020937e4.s:
 src/main/func_020a60a8.c:
     complete
     .text start:0x020a60a8 end:0x020a60c0
+
+src/main/func_020928cc.s:
+    complete
+    .text start:0x020928cc end:0x020928e8
+
+src/main/func_020928e8.s:
+    complete
+    .text start:0x020928e8 end:0x02092904
+
+src/main/func_02092940.s:
+    complete
+    .text start:0x02092940 end:0x0209295c
+
+
