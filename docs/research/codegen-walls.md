@@ -10,17 +10,18 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **22 distinct mwcc-vs-baserom codegen
+**Short answer:** **23 distinct mwcc-vs-baserom codegen
 divergences** account for the **51+ dropped matches across the
 seven pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040;
 the per-PR cross-reference table below covers these; brief 046
-waves 5–6 added two new C-N coercions documented in C-10 / C-11
-but not yet folded into the per-PR drop table). Most fall into
-one of three buckets: **coercible-with-knowledge** (11 patterns
-— the right C variation matches; future briefs can grep here
-first), **permanent** (8 patterns — mwcc keeps "winning" the
-codegen choice regardless of C variation; budget zero matches
-in the yield band), and **tooling-tractable** (3 patterns —
+waves 5–7 added three new C-N coercions documented in C-10 /
+C-11 / C-12 but not yet folded into the per-PR drop table).
+Most fall into one of three buckets: **coercible-with-knowledge**
+(12 patterns — the right C variation matches; future briefs
+can grep here first), **permanent** (8 patterns — mwcc keeps
+"winning" the codegen choice regardless of C variation; budget
+zero matches in the yield band), and **tooling-tractable**
+(3 patterns —
 `propagate_template` could ship a register-renaming or
 literal-substitution variant — T-1, T-2 still proposed; T-3
 third compiler routing tier **shipped in PR #340** via brief
@@ -67,7 +68,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (11 patterns)
+## Coercible-with-knowledge (12 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -629,6 +630,115 @@ removes it.
 this coercion: `func_02036298`, `func_0203c58c`,
 `func_0203c620`, `func_0203c638`. Decomper noted the lesson
 inline in the PR body.
+
+### C-12. Push-r0 arg-preserving thunk via `asm void` + `nofralloc`
+
+(W-E in brief 048's research note classification —
+[`push-r0-wall-research`](../briefs/048-push-r0-wall-research.md).)
+
+**Target asm.** Tiny call-then-restore wrappers that preserve
+their first arg across one or more `bl` calls by using the push
+instruction itself as the spill slot:
+
+```text
+
+push {r0, lr}                  ; spill arg + lr
+bl helper                      ; helper clobbers r0
+[bl another_helper]            ; optional 2nd clobber
+pop {r0, lr}                   ; restore arg
+bx lr                          ; tail-return preserving caller's r0
+
+```
+
+i.e. 4 instructions (single bl) or 5 instructions (two bls), no
+callee-save register touched.
+
+**mwcc emits when miscoded** (every C variation tried, every SP):
+
+```text
+
+push {r4, lr}                  ; mwcc spills via callee-save r4 instead
+mov  r4, r0
+bl   helper
+mov  r0, r4
+pop  {r4, [pc|lr]}
+[bx lr]                        ; +bx if Style A epilogue
+
+```
+
+i.e. 6 instructions (24 bytes) — **+8 bytes over target's 16**.
+
+**Method (brief 048).** Sweep tested:
+
+- 5 C variations (return-arg, no-return-arg, volatile-saved,
+  void-arg, function-pointer wrapper) — none flipped to push-r0.
+- All 15 mwcc SPs (1.2/base, sp2, sp2p3, sp3, sp4 + 2.0/base,
+  sp1, sp1p2, sp1p5, sp1p6, sp1p7, sp2, sp2p2, sp2p3, sp2p4) —
+  every one emits the `push {r4, lr}; mov r4, r0; ...` form
+  for the natural C source. **No mwcc revision exposed in the
+  shipped toolchain produces the push-r0 form from C.**
+- The original ROM almost certainly used **inline asm** for these
+  wrappers (the project pattern set in brief 011 / `src/main/CpuSet.c`
+  uses `asm void` + `nofralloc` for the BIOS SWI thunks).
+
+**C that coerces it (verified byte-identical):**
+
+```c
+extern int func_020932a4(int);
+
+asm void func_02093294(int x) {
+    nofralloc
+    stmdb sp!, {r0, lr}        /* mwcc inline-asm syntax for `push` */
+    bl    func_020932a4
+    ldmia sp!, {r0, lr}        /* mwcc inline-asm syntax for `pop` */
+    bx    lr
+}
+```
+
+Compiles via the **default `.c` rule (mwcc 2.0/sp1p5)** — no need
+for `*.legacy.c` routing. The `nofralloc` directive disables
+mwcc's prologue/epilogue generation; the body is emitted
+verbatim. Verified byte-identical for both
+`func_02093294` (16 bytes) and `func_02092f04` (20 bytes,
+two-bl variant).
+
+**Two non-obvious mwcc inline-asm rules:**
+
+- **Use the multi-load mnemonics, not `push`/`pop`.** mwcc's
+  inline-asm assembler treats `stmdb sp!, {r0, lr}` as the
+  canonical form for ARM-mode push, and `ldmia sp!, {r0, lr}`
+  for pop. Writing `push {r0, lr}` or `pop {r0, lr}` directly
+  inside the `asm void` block fails to compile with `unknown
+  assembler instruction mnemonic`. The disassembly displays the
+  encoding as `push`/`pop` because both are the canonical
+  mnemonics for the same encoding — but mwcc's inline-asm
+  parser only accepts the `stmdb`/`ldmia` form.
+- **`asm void` requires the default `.c` routing.** mwcc
+  1.2/sp2p3 (the `.legacy.c` tier) **rejects** `stmdb sp!`
+  syntax with the same "unknown assembler instruction
+  mnemonic" error. The legacy compiler's inline-asm parser
+  predates the multi-load mnemonics. Even though the target's
+  epilogue is `pop {r0, lr}; bx lr` (Style A), the routing must
+  stay on default `.c` (mwcc 2.0/sp1p5) for the inline asm to
+  compile.
+
+**Use when:** target has 4-5-instruction wrapper that pushes r0
+alongside lr (no other regs), calls one or two helpers, pops r0
+back, and returns. **brief 046 wave 7 mis-routed the two
+candidates through `*.legacy.c` because the epilogue is Style
+A.** The right routing is `.c` default, then use the inline-asm
+recipe above.
+
+**Provenance:** brief 046 wave 7 (PR #347) flagged
+`func_02093294` and `func_02092f04` as a "provisional new wall";
+brief 048 (this research) verified the inline-asm coercion
+byte-identical for both targets.
+
+**Cross-corpus survey (brief 048):** 2 candidates total in the
+unmatched-gap-functions corpus — only `func_02093294` and
+`func_02092f04`. No future-leverage from a 4th routing tier;
+two one-off matches via the inline-asm recipe above are the
+right scope.
 
 ## Permanent (8 patterns)
 
