@@ -313,19 +313,24 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
-  — `cloud` **(HIGH priority)**: fix the `dsd lcf` filename
-  inconsistency surfaced by brief 038 (PR #328). `arm9.lcf`
-  references `func_X.legacy.o` while `objects.txt` drops
-  `.legacy.` and references `func_X.o`, breaking mwldarm. Land
-  `tools/patch_objects_legacy.py` post-process script in the
-  existing `patch_lcf_arm9_align.py` pattern. **Brain will
-  re-run brief 038's reproducer before merging** — won't repeat
-  brief 037's smoke-test miss. Branch:
-  `cloud/objects-txt-legacy-patch`.
+- [`docs/briefs/040-medium-tier-wave-2-retry.md`](docs/briefs/040-medium-tier-wave-2-retry.md)
+  — `decomper`: retry brief 038 with the now-working Style A
+  pipeline (brief 036 diagnosis + brief 037 routing + brief 039
+  link-step fix). Same 11 IRQ-bracket targets from brief 034.
+  Brain ran the smoke test reproducer end-to-end before merging
+  brief 039; routing chain confirmed working. Target ≥6 matches
+  (high-confidence top 6 from brief 034 partial scores). Branch:
+  `decomper/medium-tier-wave-2-retry`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
+  `cloud`, shipped in PR #330. `tools/patch_objects_legacy.py`
+  post-process script + 20 unit tests. Chained into the lcf
+  ninja rule. **Brain ran brief 038's exact reproducer end-to-
+  end before merging this time** — link step succeeded; arm9.lcf
+  and objects.txt now agree on `.legacy.o`. Style A unblock
+  chain end-to-end working.
 - [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
   `decomper`, **escalation closed in PR #328**. 0 byte-identical
   matches; blocked on the `dsd lcf` filename inconsistency.

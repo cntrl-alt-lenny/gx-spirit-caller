@@ -8,23 +8,24 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 mid-morning, post-brief-038
-escalation. Main tip is `529aa2e` after PR #328 (decomper, brief
-038 escalation, **0 matches** — blocked on a `dsd lcf` filename
-inconsistency in brief 037's routing). Brief 039 (cloud, HIGH
-priority) queued to fix; brief 040 (decomper retry) follows.
+**Last updated:** 2026-05-08 mid-morning, post-brief-039. Main
+tip is `6f0ca1d` after PR #330 (cloud, brief 039 — `dsd lcf`
+post-process patch, **brain-verified end-to-end via brief 038's
+reproducer**). Style A unblock chain end-to-end working. Brief
+040 (decomper retry of brief 038's 11 targets) queued.
 
-**Style A wall RESOLVED at the diagnosis level (brief 036) and the
-routing level (brief 037), but a `dsd lcf` post-merge bug now
-blocks the actual link step.** Decomper is on hold again pending
-brief 039.
+**Style A unblock chain complete:**
 
-**Brain miss noted (own this):** brief 037 had an explicit smoke
-test in its success criteria — write a `.legacy.c`, build,
-byte-match. Brain only verified the no-`.legacy.c` regression path
-when merging #327; the smoke test would have caught the dsd
-inconsistency. Brief 039 explicitly requires brain to re-run the
-smoke test before merge.
+1. Brief 034 — discovered the wall (0 matches)
+2. Brief 036 — diagnosed (mwcc 1.2/sp2p3 emits Style A)
+3. Brief 037 — routing infrastructure (`*.legacy.c`)
+4. Brief 038 — exposed dsd lcf bug
+5. Brief 039 — post-process script fixes the link step
+6. **Brief 040 — decomper retries** (queued)
+
+Brain re-ran brief 038's exact reproducer before merging brief
+039 (the smoke test brief 037 should have had). Link step
+succeeded; arm9.lcf and objects.txt now agree on `.legacy.o`.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
