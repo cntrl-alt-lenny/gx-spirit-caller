@@ -16,7 +16,8 @@ config/ and build/ subpaths. All three may coexist; pick one per run.
 
 | Tool        | Version        | Notes                                        |
 |-------------|----------------|----------------------------------------------|
-| `mwccarm`   | `2.0/sp1p5`    | decomp.me id: `mwcc_30_131`. Adjust if objdiff says so after the first matching attempt. |
+| `mwccarm`   | `2.0/sp1p5`    | Default. decomp.me id: `mwcc_30_131`. Adjust if objdiff says so after the first matching attempt. |
+| `mwccarm` (legacy) | `1.2/sp2p3` | Per-TU compiler for Style A epilogue files (`*.legacy.c` filename suffix). See [`docs/research/style-a-epilogue.md`](docs/research/style-a-epilogue.md). |
 | `mwldarm`   | `2.0/sp1p5`    | Ships alongside mwccarm.                     |
 | `dsd`       | `v0.11.0`      | https://github.com/AetiasHax/ds-decomp (native macOS arm64 builds since v0.9.1) |
 | `objdiff-cli` | `v2.7.1`     | https://github.com/encounter/objdiff         |

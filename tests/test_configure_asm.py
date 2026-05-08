@@ -1,15 +1,19 @@
-"""Unit tests for tools/configure.py's asm-rule helpers and macOS
-wine-runner resolution.
+"""Unit tests for tools/configure.py's asm-rule helpers, macOS
+wine-runner resolution, and dual-compiler routing.
 
-Scoped to the pure source-discovery helpers added alongside the
-`mwasm` build rule. End-to-end ninja-generation testing requires the
-actual toolchain (mwccarm, dsd, wibo, a baserom), which the cloud
-environment doesn't have — brain/decomper verifies the full pipeline
-on merge. These tests pin the parts we CAN exercise in isolation:
+Scoped to the pure source-discovery / classifier helpers and the
+constants that drive the build.ninja generator. End-to-end
+ninja-generation testing requires the actual toolchain (mwccarm,
+dsd, wibo, a baserom), which the cloud environment doesn't have —
+brain/decomper verifies the full pipeline on merge. These tests
+pin the parts we CAN exercise in isolation:
 
-  - is_asm()         file-extension classifier
+  - is_asm() / is_c() / is_legacy_c() file-extension classifiers
   - get_asm_files()  .s/.S walker
   - get_source_files() union generator (C/C++ + asm)
+  - the LEGACY_C_SUFFIX / MWCC_VERSION / LEGACY_MWCC_VERSION
+    constants + their derived paths
+  - macOS wine-runner candidate selection
 
 configure.py runs argparse at module load, so the test module
 installs a synthetic sys.argv before importing. Tests must therefore
@@ -174,6 +178,77 @@ class TestMwasmRuleDefinitions(unittest.TestCase):
         # downloaded mwccarm bundle — nothing else in that bundle is
         # a valid assembler target.
         self.assertTrue(configure.ASM.endswith("mwasmarm.exe"))
+
+
+class TestIsLegacyC(unittest.TestCase):
+    """Pin the dual-compiler routing predicate. A regression that
+    silently mis-classifies a `.legacy.c` as default-mwcc would
+    silently break Style A epilogue matching across every routed TU
+    in brief 038 and beyond."""
+
+    def test_legacy_suffix_matches(self):
+        self.assertTrue(configure.is_legacy_c("foo.legacy.c"))
+        self.assertTrue(configure.is_legacy_c("src/main/func_0207cbbc.legacy.c"))
+        self.assertTrue(configure.is_legacy_c(Path("foo.legacy.c")))
+
+    def test_plain_c_does_not_match(self):
+        self.assertFalse(configure.is_legacy_c("foo.c"))
+        self.assertFalse(configure.is_legacy_c("src/main/CpuSet.c"))
+        self.assertFalse(configure.is_legacy_c(Path("src/main/Task_InvokeLocked.c")))
+
+    def test_cpp_does_not_match(self):
+        # No C++ legacy support today — `*.legacy.cpp` should NOT
+        # route. If/when a Style A C++ TU surfaces, decide explicitly.
+        self.assertFalse(configure.is_legacy_c("foo.legacy.cpp"))
+
+    def test_legacy_substring_in_middle_does_not_match(self):
+        # Defensive: `legacy_helpers.c` contains the word "legacy"
+        # but doesn't end in the suffix; must not route.
+        self.assertFalse(configure.is_legacy_c("legacy_helpers.c"))
+        self.assertFalse(configure.is_legacy_c("foo.legacy.c.bak"))
+
+    def test_path_suffix_only_returns_c(self):
+        # Double-check the precondition that motivated the
+        # endswith()-based predicate: Path.suffix on a multi-dot
+        # filename returns only the last segment, so we cannot rely
+        # on it to detect `.legacy.c`.
+        self.assertEqual(Path("foo.legacy.c").suffix, ".c")
+        self.assertTrue(configure.is_c("foo.legacy.c"))  # is_c() also matches!
+        # is_legacy_c() is what disambiguates the routing.
+        self.assertTrue(configure.is_legacy_c("foo.legacy.c"))
+
+
+class TestLegacyCompilerConstants(unittest.TestCase):
+    """Pin the version + path constants that drive the dual-compiler
+    rule. A typo in the version string would silently route through
+    a non-existent compiler binary at build time."""
+
+    def test_legacy_version_pinned(self):
+        # docs/research/style-a-epilogue.md established 1.2/sp2p3
+        # as the Style A boundary version. Pin it.
+        self.assertEqual(configure.LEGACY_MWCC_VERSION, "1.2/sp2p3")
+
+    def test_default_version_pinned(self):
+        # 2.0/sp1p5 is the project's documented default per CLAUDE.md.
+        self.assertEqual(configure.MWCC_VERSION, "2.0/sp1p5")
+
+    def test_legacy_suffix_constant(self):
+        self.assertEqual(configure.LEGACY_C_SUFFIX, ".legacy.c")
+
+    def test_legacy_cc_path_points_at_sp2p3_mwccarm(self):
+        # The path constant should resolve to mwcc 1.2/sp2p3's
+        # mwccarm.exe, not mwldarm or mwasmarm.
+        self.assertIn("mwccarm/1.2/sp2p3", configure.LEGACY_CC)
+        self.assertTrue(configure.LEGACY_CC.endswith("mwccarm.exe"))
+
+    def test_default_cc_unchanged(self):
+        # Regression guard: dual-compiler addition must not alter
+        # the default compiler's path.
+        self.assertIn("mwccarm/2.0/sp1p5", configure.CC)
+        self.assertTrue(configure.CC.endswith("mwccarm.exe"))
+
+    def test_legacy_and_default_paths_differ(self):
+        self.assertNotEqual(configure.LEGACY_CC, configure.CC)
 
 
 class TestResolveMacosWine(unittest.TestCase):
