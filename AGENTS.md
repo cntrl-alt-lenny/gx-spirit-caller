@@ -313,23 +313,38 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/041-medium-tier-wave-3.md`](docs/briefs/041-medium-tier-wave-3.md)
-  — `decomper`: continue medium-tier work past brief 040's seed
-  list. Pick fresh candidates, mix Style A (`.legacy.c`) and
-  Style B (default) per disassembly. Skip brief 040's 4 W-A..W-D
-  blocked targets (brief 042 territory). Self-extend clause
-  active: up to 2 follow-up waves without a fresh brief. Branch:
-  `decomper/medium-tier-wave-3`.
-- [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
-  — `cloud`: document the 4 new walls (W-A..W-D) brief 040
-  surfaced into `docs/research/codegen-walls.md`. For W-A and
-  W-B specifically, attempt sp2p3 coercion variations — if any
-  work, flag as coercible-with-knowledge so future briefs
-  unblock those targets. Medium priority; decomper isn't
-  blocked on this. Branch: `cloud/codegen-walls-w-abcd`.
+- [`docs/briefs/043-medium-tier-wave-4.md`](docs/briefs/043-medium-tier-wave-4.md)
+  — `decomper`: medium-tier wave 4. Re-attack `func_020916c8`
+  with brief 042's W-A → C-9 coercion. Pick fresh candidates,
+  apply brief 041's declaration-order trick. Skip W-B/W-C/W-D
+  (sp3-T-3 + true permanent — brief 044 decides on sp3 routing).
+  **Self-extend clause** active for up to 2 follow-up waves.
+  Branch: `decomper/medium-tier-wave-4`.
+- [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
+  — `cloud`: research-only. Sweep medium+easy unmatched
+  candidates against mwcc 1.2/sp3 to count sp3-byte-identical
+  matches. Decide whether to add a third routing tier
+  (`.legacy_sp3.c`), use `.s` files only, or shelve. Land as
+  `docs/research/sp3-routing-decision.md` with verdict +
+  recommended follow-up brief scope. Branch:
+  `cloud/sp3-routing-research`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
+  `cloud`, shipped in PR #334. 310-line update to codegen-walls.md
+  documenting W-A..W-D + coercion attempts. **W-A flipped to C-9
+  coercible** (uninitialised temp trick); **W-B verified
+  byte-identical via mwcc 1.2/sp3** (T-3 tooling-tractable —
+  triggered brief 044). W-C T-3+P-7 hybrid. W-D true permanent
+  (P-8).
+- [`docs/briefs/041-medium-tier-wave-3.md`](docs/briefs/041-medium-tier-wave-3.md)
+  `decomper`, shipped in PR #335. **8 byte-identical matches
+  across 4 modules** (main + ov005 + ov006 + ov011). Medium
+  tier 64.7% → 69.9%. New source-shape lesson: declaration
+  order controls callee-save register allocation. Provisional
+  new wall flagged on `func_0201904c` (clamped 16-bit add); brief
+  044 picks it up as part of the sp3 sweep.
 - [`docs/briefs/040-medium-tier-wave-2-retry.md`](docs/briefs/040-medium-tier-wave-2-retry.md)
   `decomper`, shipped in PR #332. **7 byte-identical matches
   (64% yield)** via the now-working `.legacy.c` pipeline. First
