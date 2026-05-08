@@ -6708,3 +6708,31 @@ src/main/func_02092940.s:
     .text start:0x02092940 end:0x0209295c
 
 
+
+src/main/func_020a1e3c.legacy.c:
+    complete
+    .text start:0x020a1e3c end:0x020a1e68
+
+src/main/func_02091690.legacy.c:
+    complete
+    .text start:0x02091690 end:0x020916c8
+
+src/main/func_02091714.legacy.c:
+    complete
+    .text start:0x02091714 end:0x02091748
+
+src/main/func_0209d6f0.legacy.c:
+    complete
+    .text start:0x0209d6f0 end:0x0209d724
+
+src/main/func_0207cbbc.legacy.c:
+    complete
+    .text start:0x0207cbbc end:0x0207cbe0
+
+src/main/func_0207b5f8.legacy.c:
+    complete
+    .text start:0x0207b5f8 end:0x0207b62c
+
+src/main/func_0209d724.legacy.c:
+    complete
+    .text start:0x0209d724 end:0x0209d758
