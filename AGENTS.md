@@ -313,12 +313,18 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **2 self-extends remaining** on brief
-046's clause — they may file up to 2 follow-up medium-tier waves
-without a fresh brain brief if the same selection rule applies
-(mix Style A/B/sp3 per disassembly using brief 044's discriminator;
-skip W-D and W-C P-7 pool-dedup). Cloud is on standby; may pick up
-autonomous docs/research items per AGENTS.md.
+- [`docs/briefs/047-hard-tier-pilot.md`](docs/briefs/047-hard-tier-pilot.md)
+  — `decomper`: first hard-tier pilot. Pick 6–10 small (≤0x20)
+  hard-tier candidates across all 3 routing tiers. Skip
+  recursive-callee functions and push-r0 candidates (brief 048).
+  Self-extend allowance: 2 follow-ups if first PR's yield ≥50%.
+  Branch: `decomper/hard-tier-pilot`.
+- [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
+  — `cloud`: research the push-r0-spill idiom wall surfaced by
+  brief 046 wave 7. C-variation + mwcc-version sweep to classify
+  as coercible / new-tier / edge-case / permanent. Update
+  codegen-walls.md with verdict. Medium priority. Branch:
+  `cloud/push-r0-wall-research`.
 
 ### Closed briefs (reference)
 
