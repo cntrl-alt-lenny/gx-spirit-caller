@@ -8,15 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-07 late-night, post-brief-034 + Style A
-wall discovery. Main tip is `51d22b0` after PR #323 (decomper,
-brief 034, **zero matches**, blocked on Style A epilogue wall) and
-PR #322 (cloud, codegen-walls C-1 refinement). **Decomper on hold**
-pending brief 036 (cloud research, HIGH priority) on the Style A
-trigger.
+**Last updated:** 2026-05-08 morning, post-brief-036. Main tip is
+`d2fe1ad` after PR #325 (cloud, Style A wall **diagnosed and
+solved** — mwcc 1.2/sp2p3 emits Style A). Brief 037 (cloud,
+implementation) + brief 038 (decomper, wave 2) queued.
 
-**Today's totals:** **30 PRs merged**, **+229 byte-identical
-matches**. Easy tier moved 31.3% → **81.5%** in a single day.
+**Style A wall RESOLVED.** Cloud's research confirmed
+hypothesis (b): mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 and
+1.2/sp3+ emit Style B. Same dual-compiler pattern as pokediamond.
+Brief 037 implements per-TU routing; brief 038 unblocks brief
+034's 11 targets.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
@@ -56,30 +57,26 @@ post-#311):
 through brief 033. Brief 034 attempted medium-tier individual-
 function pivot and discovered a fundamental new wall.
 
-## ⚠️ Style A vs Style B epilogue — current blocker
+## Style A wall — resolved (2026-05-08)
 
-Brief 034's analysis (PR #323) identified that mwcc 2.0/sp1p5 with
-the project's current flags emits **Style B** epilogues
-(`stmdb sp!, {r3, lr}; ...; ldmia sp!, {r3, pc}`) while target
-ROM consistently uses **Style A**
-(`stmdb sp!, {lr}; sub sp, sp, #4; ...; add sp, sp, #4; ldmia
-sp!, {lr}; bx lr`). Both ABI-equivalent; byte-encoded output
-differs.
+Cloud's brief 036 research (PR #325,
+`docs/research/style-a-epilogue.md`) confirmed:
 
-This blocks ~50% of remaining medium-tier candidates by inspection
-(every IRQ-bracket / Task-Locked / Fill32-pattern function in the
-target ROM uses Style A). Brief 036 (cloud research, HIGH
-priority) investigates the trigger:
+| Compiler | Epilogue |
+|---|---|
+| `mwccarm 1.2/base` / `sp2` / `sp2p3` | **Style A** |
+| `mwccarm 1.2/sp3` / `sp4` | Style B |
+| `mwccarm 2.0/base` … `sp2p4` (10 SPs) | Style B |
 
-- (a) Compiler flag — most likely; some `-O` level or ABI knob
-  flips epilogue style.
-- (b) mwcc version — sp1p4 / sp1p3 / sp2 may emit Style A.
-- (c) Source pragma.
-- (d) Permanent — `.s` workaround required, or skip Style A
-  targets entirely.
+Same project flags. The optimiser was tightened in 1.2/sp3 and
+the change persists across all later SPs. Verified byte-
+identical against 2 of brief 034's targets (`func_0207cbbc`,
+`func_020a1e3c`). **Same dual-compiler pattern as pokediamond.**
 
-**Decomper is on hold** until brief 036 lands. This is the
-critical-path item for the next session.
+Brief 037 (cloud) implements per-TU routing in
+`tools/configure.py`. Brief 038 (decomper) consumes the routing
+to unblock brief 034's 11 targets. Decomper still on hold until
+brief 037 lands.
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):
