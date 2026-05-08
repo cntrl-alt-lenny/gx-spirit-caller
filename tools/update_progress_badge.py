@@ -8,6 +8,17 @@ Pulls the percentage from `tools/progress.py --json` (which prefers
 build/<ver>/report.json and falls back to symbols.txt counting), then
 rewrites the single `img.shields.io/badge/Progress-...` line in README.md.
 
+**Code-only formula.** The badge tracks `matched_code / total_code`,
+matching the headline progress.py prints in its human-readable
+output (`  code:  X / Y bytes  (Z%)`). Earlier versions used
+`(matched_code + matched_data) / (total_code + total_data)`, which
+drags the badge down because the data tier is structurally 0%-matched
+until data-tier work begins (today: data total 4.7 MB, all
+unmatched). Including data in the denominator made the badge under-
+represent visible progress: 0.39% (code+data) vs 1.18% (code-only)
+on 2026-05-08. Revisit when data-tier matching has actual
+forward motion.
+
 Idempotent: exits 0 with no diff if the badge is already correct.
 Exit code 0 always (no diff and successful update both succeed); exit
 code 1 only on hard error (missing README, malformed shields URL, etc.).
@@ -56,7 +67,10 @@ def color_for(pct: float) -> str:
 
 
 def compute_pct(version: str) -> float:
-    """Run progress.py --json and return matched percentage as a float."""
+    """Run progress.py --json and return matched-code percentage as
+    a float. Code-only by design — see module docstring; the data
+    tier is structurally 0% today and dragging it into the denominator
+    under-represents visible progress."""
     out = subprocess.check_output(
         [sys.executable, str(PROGRESS), "--version", version, "--json"],
         text=True,
@@ -67,11 +81,10 @@ def compute_pct(version: str) -> float:
     if data.get("state") == "stub":
         return 0.0
 
-    # Full objdiff report: pct from matched / total code+data bytes.
     measures = data.get("measures") or {}
-    matched = int(measures.get("matched_code") or 0) + int(measures.get("matched_data") or 0)
-    total = int(measures.get("total_code") or 0) + int(measures.get("total_data") or 0)
-    return (matched / total * 100.0) if total else 0.0
+    matched_code = int(measures.get("matched_code") or 0)
+    total_code = int(measures.get("total_code") or 0)
+    return (matched_code / total_code * 100.0) if total_code else 0.0
 
 
 def render_badge_url(pct: float) -> tuple[str, str]:

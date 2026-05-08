@@ -28,6 +28,7 @@ sys.path.insert(0, str(_TOOLS))
 from update_progress_badge import (  # noqa: E402
     BADGE_RE,
     color_for,
+    compute_pct,
     render_badge_url,
     update_readme,
 )
@@ -91,6 +92,91 @@ class TestBadgeRe(unittest.TestCase):
     def test_no_match_on_unrelated_shields_url(self):
         url = "https://img.shields.io/badge/License-MIT-blue"
         self.assertIsNone(BADGE_RE.search(url))
+
+
+class TestComputePct(unittest.TestCase):
+    """Pin the badge formula. Earlier versions used code+data which
+    made the badge under-represent visible progress (0.39% vs
+    progress.py's 1.18% headline on 2026-05-08). The current
+    code-only formula matches what progress.py prints prominently in
+    its text output."""
+
+    def _stub_progress_json(self, payload: dict):
+        """Patch subprocess.check_output to return the JSON payload
+        update_progress_badge.compute_pct expects."""
+        import json as _json
+        return mock.patch(
+            "update_progress_badge.subprocess.check_output",
+            return_value=_json.dumps(payload),
+        )
+
+    def test_stub_state_returns_zero(self):
+        with self._stub_progress_json({"state": "stub"}):
+            self.assertEqual(compute_pct("eur"), 0.0)
+
+    def test_code_only_ratio_tracks_code_not_data(self):
+        # With the historical code+data formula this would be:
+        # (28188 + 0) / (2388172 + 4776528) = 0.39%.
+        # Current code-only formula: 28188 / 2388172 = 1.18%.
+        # The 1.18% number is what progress.py prints as the headline.
+        with self._stub_progress_json({
+            "state": "delinks",
+            "measures": {
+                "matched_code": "28188",
+                "total_code": "2388172",
+                "matched_data": "0",
+                "total_data": "4776528",
+            },
+        }):
+            pct = compute_pct("eur")
+        self.assertAlmostEqual(pct, 28188 / 2388172 * 100.0, places=4)
+        self.assertGreater(pct, 1.0)
+        self.assertLess(pct, 1.5)
+
+    def test_data_field_ignored(self):
+        # Defensive: with some matched_data the formula must still
+        # ignore data so a future "data tier match" doesn't suddenly
+        # change the badge interpretation. (When data work begins,
+        # revisit per the module docstring.)
+        with self._stub_progress_json({
+            "state": "delinks",
+            "measures": {
+                "matched_code": "100",
+                "total_code": "1000",
+                "matched_data": "9999",
+                "total_data": "9999",
+            },
+        }):
+            pct = compute_pct("eur")
+        # 100 / 1000 = 10.0%, not (100+9999)/(1000+9999) = 90.91%.
+        self.assertAlmostEqual(pct, 10.0, places=4)
+
+    def test_zero_total_returns_zero(self):
+        with self._stub_progress_json({
+            "state": "delinks",
+            "measures": {
+                "matched_code": "0",
+                "total_code": "0",
+                "matched_data": "0",
+                "total_data": "0",
+            },
+        }):
+            self.assertEqual(compute_pct("eur"), 0.0)
+
+    def test_int_or_string_measures(self):
+        # progress.py emits integers as ints in some paths and as
+        # strings in others (JSON ints, but the older delinks path
+        # stringified them via `str(value)`). The compute_pct code
+        # uses int() so both work.
+        for matched, total in [("100", "1000"), (100, 1000)]:
+            with self._stub_progress_json({
+                "state": "delinks",
+                "measures": {
+                    "matched_code": matched,
+                    "total_code": total,
+                },
+            }):
+                self.assertEqual(compute_pct("eur"), 10.0)
 
 
 class TestUpdateReadme(unittest.TestCase):
