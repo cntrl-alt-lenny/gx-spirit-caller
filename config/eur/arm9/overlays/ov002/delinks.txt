@@ -1705,3 +1705,19 @@ src/overlay002/func_ov002_0229cd1c.c:
 src/overlay002/func_ov002_021b91f8.c:
     complete
     .text start:0x021b91f8 end:0x021b9210
+
+src/overlay002/func_ov002_021b00d0.c:
+    complete
+    .text start:0x021b00d0 end:0x021b00e8
+
+src/overlay002/func_ov002_021ba104.c:
+    complete
+    .text start:0x021ba104 end:0x021ba11c
+
+src/overlay002/func_ov002_02240ee4.c:
+    complete
+    .text start:0x02240ee4 end:0x02240efc
+
+src/overlay002/func_ov002_0229e844.c:
+    complete
+    .text start:0x0229e844 end:0x0229e85c
