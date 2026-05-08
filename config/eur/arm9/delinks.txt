@@ -6736,3 +6736,24 @@ src/main/func_0207b5f8.legacy.c:
 src/main/func_0209d724.legacy.c:
     complete
     .text start:0x0209d724 end:0x0209d758
+
+src/main/func_0200bd20.c:
+    complete
+    .text start:0x0200bd20 end:0x0200bd58
+
+src/main/func_0200bd58.c:
+    complete
+    .text start:0x0200bd58 end:0x0200bd90
+
+src/main/func_0200bca8.c:
+    complete
+    .text start:0x0200bca8 end:0x0200bce4
+
+src/main/func_0200bce4.c:
+    complete
+    .text start:0x0200bce4 end:0x0200bd20
+
+src/main/func_0200c558.c:
+    complete
+    .text start:0x0200c558 end:0x0200c594
+
