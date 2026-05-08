@@ -302,9 +302,9 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 
 ### `tools/patch_objects_legacy.py`
 
-**rewrite `func_X.o` -> `func_X.legacy.o` in**
+**rewrite `func_X.o` -> `func_X.legacy.o`**
 
-the dsd-generated objects.txt for any source ending in `.legacy.c`.
+(or `.legacy_sp3.o`) in the dsd-generated objects.txt for any source ending in one of the legacy routing suffixes.
 
 ### `tools/patch_section_align.py`
 

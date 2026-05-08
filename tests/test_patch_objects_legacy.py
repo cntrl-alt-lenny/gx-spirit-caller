@@ -49,6 +49,27 @@ class TestSuffixConstantInSync(unittest.TestCase):
             configure.LEGACY_C_SUFFIX,
         )
 
+    def test_sp3_matches_configure_constant(self):
+        # Brief 045: third routing tier (mwcc 1.2/sp3). Pin the
+        # patcher's duplicate against configure.py's source-of-truth
+        # so they don't drift.
+        self.assertEqual(
+            patch_objects_legacy.LEGACY_SP3_C_SUFFIX,
+            configure.LEGACY_SP3_C_SUFFIX,
+        )
+
+    def test_legacy_suffixes_tuple_contains_both(self):
+        # Pin the membership of LEGACY_SUFFIXES so a future tier
+        # addition can't quietly drop one of the existing entries.
+        self.assertIn(
+            patch_objects_legacy.LEGACY_C_SUFFIX,
+            patch_objects_legacy.LEGACY_SUFFIXES,
+        )
+        self.assertIn(
+            patch_objects_legacy.LEGACY_SP3_C_SUFFIX,
+            patch_objects_legacy.LEGACY_SUFFIXES,
+        )
+
 
 class TestBuggyAndFixedSuffixes(unittest.TestCase):
     def test_simple_main_path(self):
@@ -79,6 +100,30 @@ class TestBuggyAndFixedSuffixes(unittest.TestCase):
             patch_objects_legacy.buggy_and_fixed_suffixes(
                 Path("src/main/CpuSet.c"),
             )
+
+    def test_legacy_sp3_main_path(self):
+        # Brief 045 third tier — sp3 routing. Same dsd lcf bug
+        # applies; the qualifier in the fixed suffix is
+        # `.legacy_sp3` instead of `.legacy`.
+        buggy, fixed = patch_objects_legacy.buggy_and_fixed_suffixes(
+            Path("src/main/func_020467f4.legacy_sp3.c"),
+        )
+        self.assertEqual(buggy, "src/main/func_020467f4.o")
+        self.assertEqual(fixed, "src/main/func_020467f4.legacy_sp3.o")
+
+    def test_legacy_sp3_overlay_path(self):
+        buggy, fixed = patch_objects_legacy.buggy_and_fixed_suffixes(
+            Path("src/overlay005/ov005_X.legacy_sp3.c"),
+        )
+        self.assertEqual(buggy, "src/overlay005/ov005_X.o")
+        self.assertEqual(fixed, "src/overlay005/ov005_X.legacy_sp3.o")
+
+    def test_legacy_sp3_dotted_stem_preserved(self):
+        buggy, fixed = patch_objects_legacy.buggy_and_fixed_suffixes(
+            Path("src/main/foo.bar.legacy_sp3.c"),
+        )
+        self.assertEqual(buggy, "src/main/foo.bar.o")
+        self.assertEqual(fixed, "src/main/foo.bar.legacy_sp3.o")
 
 
 class TestPatchObjectsText(unittest.TestCase):
@@ -183,6 +228,65 @@ class TestPatchObjectsText(unittest.TestCase):
         self.assertIn("build/eur/src/main/foo.legacy.o\n", new)
         self.assertIn("build/eur/src/overlay005/foo.o\n", new)
 
+    def test_rewrites_legacy_sp3_only(self):
+        # Sp3-only mix: a single .legacy_sp3.c source rewrites the
+        # corresponding .o entry. Plain `.c` siblings pass through.
+        text = (
+            "build/eur/src/main/CpuSet.o\n"
+            "build/eur/src/main/func_020467f4.o\n"
+            "build/eur/src/main/Task_InvokeLocked.o\n"
+        )
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_020467f4.legacy_sp3.c")],
+        )
+        self.assertEqual(n, 1)
+        self.assertIn(
+            "build/eur/src/main/func_020467f4.legacy_sp3.o",
+            new,
+        )
+        self.assertIn("build/eur/src/main/CpuSet.o\n", new)
+        self.assertIn("build/eur/src/main/Task_InvokeLocked.o\n", new)
+        self.assertNotIn("build/eur/src/main/func_020467f4.o\n", new)
+
+    def test_mixed_legacy_and_legacy_sp3(self):
+        # Both routing tiers in use simultaneously — every TU's
+        # entry is rewritten to its correct fixed form. This is the
+        # expected steady-state once decomper starts using sp3 for
+        # specific targets while keeping existing .legacy.c targets.
+        text = (
+            "build/eur/src/main/CpuSet.o\n"                 # plain
+            "build/eur/src/main/func_0207cbbc.o\n"          # legacy
+            "build/eur/src/main/func_020467f4.o\n"          # legacy_sp3
+            "build/eur/src/overlay005/ov005_X.o\n"          # legacy
+            "build/eur/src/main/Task_InvokeLocked.o\n"      # plain
+        )
+        sources = [
+            Path("src/main/func_0207cbbc.legacy.c"),
+            Path("src/main/func_020467f4.legacy_sp3.c"),
+            Path("src/overlay005/ov005_X.legacy.c"),
+        ]
+        new, n = patch_objects_legacy.patch_objects_text(text, sources)
+        self.assertEqual(n, 3)
+        self.assertIn("func_0207cbbc.legacy.o", new)
+        self.assertIn("func_020467f4.legacy_sp3.o", new)
+        self.assertIn("ov005_X.legacy.o", new)
+        # Plain entries unchanged.
+        self.assertIn("build/eur/src/main/CpuSet.o\n", new)
+        self.assertIn("build/eur/src/main/Task_InvokeLocked.o\n", new)
+        # Buggy entries gone.
+        self.assertNotIn("build/eur/src/main/func_0207cbbc.o\n", new)
+        self.assertNotIn("build/eur/src/main/func_020467f4.o\n", new)
+
+    def test_legacy_sp3_idempotent(self):
+        # Running the patcher again on already-fixed sp3 entries
+        # must not double-patch into `func_X.legacy_sp3.legacy_sp3.o`.
+        text = "build/eur/src/main/func_020467f4.legacy_sp3.o\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_020467f4.legacy_sp3.c")],
+        )
+        self.assertEqual(n, 0)
+        self.assertEqual(new, text)
+
 
 class TestCollectLegacySources(unittest.TestCase):
     """End-to-end test of the delinks.txt walker with a synthetic
@@ -249,6 +353,45 @@ class TestCollectLegacySources(unittest.TestCase):
         ))
         sources = patch_objects_legacy.collect_legacy_sources(self.tmp)
         self.assertEqual(sources, [])
+
+    def test_legacy_sp3_source_collected(self):
+        # Brief 045: third routing tier. A `.legacy_sp3.c` source
+        # alone must be picked up by the walker.
+        self._write("arm9/delinks.txt", (
+            "src/main/func_020467f4.legacy_sp3.c:\n"
+            "    complete\n"
+            "    .text start:0x020467f4 end:0x02046828\n"
+        ))
+        sources = patch_objects_legacy.collect_legacy_sources(self.tmp)
+        self.assertEqual(
+            sources,
+            [Path("src/main/func_020467f4.legacy_sp3.c")],
+        )
+
+    def test_mixed_legacy_and_legacy_sp3_sources_collected(self):
+        # Mixed steady-state — both suffixes coexist in the same
+        # delinks.txt and must both surface in the walker output.
+        self._write("arm9/delinks.txt", (
+            "src/main/CpuSet.c:\n"
+            "    complete\n"
+            "    .text start:0x02000254 end:0x02000258\n"
+            "src/main/func_0207cbbc.legacy.c:\n"
+            "    complete\n"
+            "    .text start:0x0207cbbc end:0x0207cbe0\n"
+            "src/main/func_020467f4.legacy_sp3.c:\n"
+            "    complete\n"
+            "    .text start:0x020467f4 end:0x02046828\n"
+        ))
+        sources = patch_objects_legacy.collect_legacy_sources(self.tmp)
+        # Both legacy variants returned (order is delinks-file order).
+        self.assertIn(
+            Path("src/main/func_0207cbbc.legacy.c"), sources,
+        )
+        self.assertIn(
+            Path("src/main/func_020467f4.legacy_sp3.c"), sources,
+        )
+        # Plain `.c` source is NOT collected.
+        self.assertNotIn(Path("src/main/CpuSet.c"), sources)
 
 
 class TestPatchFile(unittest.TestCase):
@@ -325,6 +468,63 @@ class TestPatchFile(unittest.TestCase):
         # Second run is a no-op.
         patch_objects_legacy.patch_file(self.tmp, objects)
         self.assertEqual(objects.read_text(), first)
+
+    def test_end_to_end_rewrite_legacy_sp3(self):
+        # Brief 045: third routing tier — end-to-end. Synthetic
+        # delinks.txt with one .legacy_sp3.c source + objects.txt
+        # with the buggy entry. After patch, the fixed entry has
+        # the `.legacy_sp3` qualifier.
+        delinks = self.tmp / "arm9" / "delinks.txt"
+        delinks.parent.mkdir(parents=True)
+        delinks.write_text(
+            "src/main/func_020467f4.legacy_sp3.c:\n"
+            "    complete\n"
+            "    .text start:0x020467f4 end:0x02046828\n"
+        )
+        objects = self.tmp / "objects.txt"
+        objects.write_text(
+            "build/eur/src/main/CpuSet.o\n"
+            "build/eur/src/main/func_020467f4.o\n"
+        )
+        rc = patch_objects_legacy.patch_file(
+            config_dir=self.tmp,
+            objects_path=objects,
+        )
+        self.assertEqual(rc, 0)
+        out = objects.read_text()
+        self.assertIn("build/eur/src/main/func_020467f4.legacy_sp3.o\n", out)
+        self.assertIn("build/eur/src/main/CpuSet.o\n", out)
+        self.assertNotIn("build/eur/src/main/func_020467f4.o\n", out)
+
+    def test_end_to_end_mixed_tiers(self):
+        # Both .legacy.c and .legacy_sp3.c in the same delinks.txt
+        # — the patcher rewrites each line to its correct fixed
+        # form. Mirrors how the project will look once decomper
+        # starts using sp3 routing for some targets while keeping
+        # existing sp2p3 targets.
+        delinks = self.tmp / "arm9" / "delinks.txt"
+        delinks.parent.mkdir(parents=True)
+        delinks.write_text(
+            "src/main/func_0207cbbc.legacy.c:\n"
+            "    complete\n"
+            "    .text start:0x0207cbbc end:0x0207cbe0\n"
+            "src/main/func_020467f4.legacy_sp3.c:\n"
+            "    complete\n"
+            "    .text start:0x020467f4 end:0x02046828\n"
+        )
+        objects = self.tmp / "objects.txt"
+        objects.write_text(
+            "build/eur/src/main/func_0207cbbc.o\n"
+            "build/eur/src/main/func_020467f4.o\n"
+        )
+        rc = patch_objects_legacy.patch_file(
+            config_dir=self.tmp,
+            objects_path=objects,
+        )
+        self.assertEqual(rc, 0)
+        out = objects.read_text()
+        self.assertIn("func_0207cbbc.legacy.o", out)
+        self.assertIn("func_020467f4.legacy_sp3.o", out)
 
 
 if __name__ == "__main__":

@@ -81,6 +81,16 @@ MWCC_VERSION = "2.0/sp1p5"
 # sweep that confirmed the boundary.
 LEGACY_MWCC_VERSION = "1.2/sp2p3"
 LEGACY_C_SUFFIX = ".legacy.c"  # filename routing convention
+# Third routing tier — mwcc 1.2/sp3. Same `push {regs, lr}; sub sp,
+# #4` prologue as sp2p3, but `pop {regs, pc}` (Style B) epilogue
+# instead of `pop {regs, lr}; bx lr` (Style A). The combination is
+# unique to sp3: neither sp1p5 (default — no sub-sp; r3-spill) nor
+# sp2p3 (Style A epilogue) emits it. brief 044 / PR #337
+# (docs/research/sp3-routing-decision.md) verified the count and
+# justified shipping the tier; brief 042 (PR #334) verified W-B
+# (`func_020467f4`) byte-matches under sp3.
+LEGACY_SP3_MWCC_VERSION = "1.2/sp3"
+LEGACY_SP3_C_SUFFIX = ".legacy_sp3.c"  # filename routing convention
 DECOMP_ME_COMPILER = "mwcc_30_131"
 
 # Known-good SHA-1 hashes of clean baserom dumps, keyed by version.
@@ -159,9 +169,10 @@ libs_path        = root_path / "libs"
 extract_path     = root_path / "extract"
 orig_path        = root_path / "orig"
 tools_path       = root_path / "tools"
-mwcc_root        = args.compiler or tools_path / "mwccarm"
-mwcc_path        = mwcc_root / MWCC_VERSION
-mwcc_legacy_path = mwcc_root / LEGACY_MWCC_VERSION
+mwcc_root            = args.compiler or tools_path / "mwccarm"
+mwcc_path            = mwcc_root / MWCC_VERSION
+mwcc_legacy_path     = mwcc_root / LEGACY_MWCC_VERSION
+mwcc_legacy_sp3_path = mwcc_root / LEGACY_SP3_MWCC_VERSION
 
 
 # --------------------------------------------------------------------------- #
@@ -201,6 +212,11 @@ LD = os.path.join('.', str(mwcc_path / "mwldarm.exe"))
 # Legacy compiler for Style A TUs. Linker stays on MWCC_VERSION —
 # only the mwccarm.exe path differs per-TU.
 LEGACY_CC = os.path.join('.', str(mwcc_legacy_path / "mwccarm.exe"))
+# Third compiler tier — mwcc 1.2/sp3 — for TUs whose
+# prologue/epilogue combination matches neither sp1p5 (default) nor
+# sp2p3 (.legacy.c). See `LEGACY_SP3_MWCC_VERSION` above for
+# rationale. Routed via `*.legacy_sp3.c` (`is_legacy_sp3_c()`).
+LEGACY_SP3_CC = os.path.join('.', str(mwcc_legacy_sp3_path / "mwccarm.exe"))
 # mwasmarm ships inside the same mwccarm.zip bundle we already
 # download. Used for hand-written .s assembly — the only escape
 # hatch for the Thumb section-alignment wall (see
@@ -417,6 +433,27 @@ def main():
         )
         n.newline()
 
+        # Third-tier per-TU compiler rule for sp3-unique epilogue
+        # shapes (no r3-spill + sub-sp + pop-into-pc). Files routed
+        # via the `*.legacy_sp3.c` suffix (`is_legacy_sp3_c()`)
+        # compile through this rule. Same CC_FLAGS / CC_INCLUDES as
+        # the default `mwcc` and `mwcc_legacy` rules; only the
+        # mwccarm.exe path differs. See
+        # docs/research/sp3-routing-decision.md (brief 044) for the
+        # 3-tier discriminator and the candidate count that
+        # justified shipping this third tier.
+        mwcc_legacy_sp3_cmd = f'{WINE} "{LEGACY_SP3_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_sp3_implicit = [LEGACY_SP3_CC]
+        if platform.system != "windows":
+            mwcc_legacy_sp3_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_legacy_sp3_implicit.append(transform_dep)
+        n.rule(
+            name="mwcc_legacy_sp3",
+            command=mwcc_legacy_sp3_cmd,
+            depfile="$basefile.d",
+        )
+        n.newline()
+
         # Assembly rule — unlocks the .s escape hatch for the Thumb
         # section-alignment wall (see docs/research/thumb-align-wall.md).
         # Scoped just to .s files under src/ + libs/; .c files stay on
@@ -548,7 +585,13 @@ def main():
         add_download_tool_builds(n)
         add_extract_build(n, project)
         add_delink_and_lcf_builds(n, project)
-        add_mwcc_builds(n, project, mwcc_implicit, mwcc_legacy_implicit)
+        add_mwcc_builds(
+            n,
+            project,
+            mwcc_implicit,
+            mwcc_legacy_implicit,
+            mwcc_legacy_sp3_implicit,
+        )
         add_mwasm_builds(n, project, mwasm_implicit)
         add_mwld_and_rom_builds(n, project)
         add_check_builds(n, project)
@@ -576,12 +619,15 @@ def add_download_tool_builds(n: ninja_syntax.Writer):
     if args.compiler is None:
         # The mwccarm `latest` bundle ships every published 1.2 + 2.0
         # SP under `tools/mwccarm/<series>/<sp>/`, so a single
-        # download covers both the default (`MWCC_VERSION`) and the
-        # legacy compiler (`LEGACY_MWCC_VERSION`) used for Style A
-        # TUs — see docs/research/style-a-epilogue.md.
+        # download covers the default (`MWCC_VERSION`), the Style A
+        # legacy compiler (`LEGACY_MWCC_VERSION`), and the third sp3
+        # tier (`LEGACY_SP3_MWCC_VERSION`). See
+        # docs/research/style-a-epilogue.md and
+        # docs/research/sp3-routing-decision.md for the per-tier
+        # sweeps that motivated each routing.
         n.build(
             rule="download_tool",
-            outputs=[CC, LD, ASM, LEGACY_CC],
+            outputs=[CC, LD, ASM, LEGACY_CC, LEGACY_SP3_CC],
             variables={"tool": "mwccarm", "tag": "latest", "path": tools_path},
         )
         n.newline()
@@ -667,14 +713,23 @@ def add_mwcc_builds(
     project: Project,
     mwcc_implicit: list,
     mwcc_legacy_implicit: list,
+    mwcc_legacy_sp3_implicit: list,
 ):
     """Emit one mwcc build per .c / .cpp file under src/ + libs/.
 
-    Routing:
-      - `*.legacy.c` files use the `mwcc_legacy` rule
-        (mwcc 1.2/sp2p3, Style A epilogue).
-      - everything else uses the default `mwcc` rule
-        (mwcc 2.0/sp1p5, Style B epilogue).
+    Routing (checked in order; first match wins — the suffixes are
+    mutually exclusive in practice but the ordering is defensive):
+
+      - `*.legacy_sp3.c` → `mwcc_legacy_sp3` rule
+        (mwcc 1.2/sp3, sub-sp prologue + Style B epilogue).
+      - `*.legacy.c` → `mwcc_legacy` rule
+        (mwcc 1.2/sp2p3, sub-sp prologue + Style A epilogue).
+      - everything else → default `mwcc` rule
+        (mwcc 2.0/sp1p5, r3-spill prologue + Style B epilogue).
+
+    See docs/research/sp3-routing-decision.md (brief 044) for the
+    3-tier discriminator and the per-compiler prologue/epilogue
+    sweep that motivated each routing tier.
     """
     for source_file in get_c_cpp_files([src_path, libs_path]):
         src_obj_path = project.game_build / source_file
@@ -683,7 +738,10 @@ def add_mwcc_builds(
             cc_flags.append("-lang=c++")
         elif is_c(source_file):
             cc_flags.append("-lang=c")
-        if is_legacy_c(source_file):
+        if is_legacy_sp3_c(source_file):
+            rule = "mwcc_legacy_sp3"
+            implicit = mwcc_legacy_sp3_implicit
+        elif is_legacy_c(source_file):
             rule = "mwcc_legacy"
             implicit = mwcc_legacy_implicit
         else:
@@ -789,6 +847,16 @@ def is_legacy_c(name):
     # Path.suffix only returns the LAST dotted suffix (so `.c` here),
     # not the full multi-dot tail; check the literal end-of-name.
     return str(name).endswith(LEGACY_C_SUFFIX)
+
+
+def is_legacy_sp3_c(name):
+    """A `.legacy_sp3.c` file routes through mwcc 1.2/sp3 — the
+    third compiler tier. Used for TUs whose prologue/epilogue
+    combination (sub-sp + Style B pop-into-pc, no r3-spill)
+    matches neither the default sp1p5 nor the sp2p3 .legacy.c
+    routing. See LEGACY_SP3_C_SUFFIX above and
+    docs/research/sp3-routing-decision.md (brief 044)."""
+    return str(name).endswith(LEGACY_SP3_C_SUFFIX)
 
 
 def is_asm(name):

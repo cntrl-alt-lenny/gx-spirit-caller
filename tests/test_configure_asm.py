@@ -217,6 +217,54 @@ class TestIsLegacyC(unittest.TestCase):
         # is_legacy_c() is what disambiguates the routing.
         self.assertTrue(configure.is_legacy_c("foo.legacy.c"))
 
+    def test_legacy_sp3_does_not_match_legacy_c(self):
+        # The two suffixes are mutually exclusive: a `.legacy_sp3.c`
+        # file must NOT also classify as `.legacy.c` (and therefore
+        # accidentally route through both rules — which would
+        # produce two ninja build entries with the same output and
+        # an "multiple rules generate ..." error). The literal
+        # endswith() check makes them disjoint because
+        # `.legacy_sp3.c` doesn't end with `.legacy.c`.
+        self.assertFalse(configure.is_legacy_c("foo.legacy_sp3.c"))
+        self.assertFalse(configure.is_legacy_c("src/main/func_X.legacy_sp3.c"))
+
+
+class TestIsLegacySp3C(unittest.TestCase):
+    """Pin the third-tier routing predicate (mwcc 1.2/sp3). Mirrors
+    TestIsLegacyC. A regression that silently mis-classifies a
+    `.legacy_sp3.c` would silently break the sp3-unique-prologue
+    target matches the routing exists to enable (brief 044
+    sp3-routing-decision)."""
+
+    def test_legacy_sp3_suffix_matches(self):
+        self.assertTrue(configure.is_legacy_sp3_c("foo.legacy_sp3.c"))
+        self.assertTrue(configure.is_legacy_sp3_c("src/main/func_020467f4.legacy_sp3.c"))
+        self.assertTrue(configure.is_legacy_sp3_c(Path("foo.legacy_sp3.c")))
+
+    def test_plain_c_does_not_match(self):
+        self.assertFalse(configure.is_legacy_sp3_c("foo.c"))
+        self.assertFalse(configure.is_legacy_sp3_c("src/main/CpuSet.c"))
+
+    def test_cpp_does_not_match(self):
+        # No C++ legacy_sp3 support — same policy as `.legacy.cpp`.
+        self.assertFalse(configure.is_legacy_sp3_c("foo.legacy_sp3.cpp"))
+
+    def test_legacy_c_does_not_match_legacy_sp3(self):
+        # Mutually exclusive in the other direction: a `.legacy.c`
+        # must NOT classify as `.legacy_sp3.c`.
+        self.assertFalse(configure.is_legacy_sp3_c("foo.legacy.c"))
+        self.assertFalse(configure.is_legacy_sp3_c("src/main/func_X.legacy.c"))
+
+    def test_substring_in_middle_does_not_match(self):
+        self.assertFalse(configure.is_legacy_sp3_c("legacy_sp3_helpers.c"))
+        self.assertFalse(configure.is_legacy_sp3_c("foo.legacy_sp3.c.bak"))
+
+    def test_path_suffix_only_returns_c(self):
+        # Same multi-dot caveat as is_legacy_c().
+        self.assertEqual(Path("foo.legacy_sp3.c").suffix, ".c")
+        self.assertTrue(configure.is_c("foo.legacy_sp3.c"))
+        self.assertTrue(configure.is_legacy_sp3_c("foo.legacy_sp3.c"))
+
 
 class TestLegacyCompilerConstants(unittest.TestCase):
     """Pin the version + path constants that drive the dual-compiler
@@ -249,6 +297,36 @@ class TestLegacyCompilerConstants(unittest.TestCase):
 
     def test_legacy_and_default_paths_differ(self):
         self.assertNotEqual(configure.LEGACY_CC, configure.CC)
+
+
+class TestLegacySp3CompilerConstants(unittest.TestCase):
+    """Pin the third-tier (sp3) version + path constants. Same
+    rationale as TestLegacyCompilerConstants — a typo would silently
+    route TUs through a non-existent compiler binary."""
+
+    def test_legacy_sp3_version_pinned(self):
+        # docs/research/sp3-routing-decision.md (brief 044) pins
+        # 1.2/sp3 as the third-tier discriminator.
+        self.assertEqual(configure.LEGACY_SP3_MWCC_VERSION, "1.2/sp3")
+
+    def test_legacy_sp3_suffix_constant(self):
+        self.assertEqual(configure.LEGACY_SP3_C_SUFFIX, ".legacy_sp3.c")
+
+    def test_legacy_sp3_cc_path_points_at_sp3_mwccarm(self):
+        self.assertIn("mwccarm/1.2/sp3", configure.LEGACY_SP3_CC)
+        self.assertTrue(configure.LEGACY_SP3_CC.endswith("mwccarm.exe"))
+
+    def test_three_compiler_paths_all_differ(self):
+        # Defense against a copy-paste regression that left two
+        # constants pointing at the same binary.
+        self.assertNotEqual(configure.LEGACY_SP3_CC, configure.CC)
+        self.assertNotEqual(configure.LEGACY_SP3_CC, configure.LEGACY_CC)
+        self.assertNotEqual(configure.LEGACY_CC, configure.CC)
+
+    def test_three_suffix_constants_distinct(self):
+        # The three routing tiers must use distinct suffix conventions
+        # for the routing predicates to make a clean choice.
+        self.assertNotEqual(configure.LEGACY_C_SUFFIX, configure.LEGACY_SP3_C_SUFFIX)
 
 
 class TestResolveMacosWine(unittest.TestCase):
