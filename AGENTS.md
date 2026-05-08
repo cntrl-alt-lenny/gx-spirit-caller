@@ -313,21 +313,35 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/047-hard-tier-pilot.md`](docs/briefs/047-hard-tier-pilot.md)
-  — `decomper`: first hard-tier pilot. Pick 6–10 small (≤0x20)
-  hard-tier candidates across all 3 routing tiers. Skip
-  recursive-callee functions and push-r0 candidates (brief 048).
-  Self-extend allowance: 2 follow-ups if first PR's yield ≥50%.
-  Branch: `decomper/hard-tier-pilot`.
-- [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
-  — `cloud`: research the push-r0-spill idiom wall surfaced by
-  brief 046 wave 7. C-variation + mwcc-version sweep to classify
-  as coercible / new-tier / edge-case / permanent. Update
-  codegen-walls.md with verdict. Medium priority. Branch:
-  `cloud/push-r0-wall-research`.
+No open briefs. Decomper has **2 self-extends remaining** on brief
+047's clause (yield criterion met by margin: 100% vs ≥50%
+threshold). Same selection rule **with one addition**: push-r0
+thunks are now eligible per brief 048's C-12 coercion (mwcc inline
+asm via `asm void func() { nofralloc; stmdb sp!, {r0, lr}; ...
+ldmia sp!, {r0, lr}; bx lr; }`). 2 immediate targets:
+`func_02093294`, `func_02092f04`.
+
+Cloud is on standby; may pick up autonomous tasks per AGENTS.md —
+notably brief 047's recommendation #3 (re-run
+`find_pattern_clusters` focused on hard-tier 0x1c shapes; the
+matched corpus has grown enough that cluster propagation may
+re-open).
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
+  `cloud`, shipped in PR #351. **C-12 push-r0 thunk via asm void**
+  — mwcc inline asm coerces; verified across all 15 SPs in
+  toolchain (none emit push-r0 from C source). Two immediate
+  unblocks: `func_02093294`, `func_02092f04`. Decomper picks
+  these up under brief 047's self-extend.
+- [`docs/briefs/047-hard-tier-pilot.md`](docs/briefs/047-hard-tier-pilot.md)
+  `decomper`, shipped in PR #350. **15 byte-identical matches at
+  100% per-attempt yield** on first hard-tier wave. 9 sp1p5 + 6
+  sp3 + 0 sp2p3 across main/ov002/ov011. Hard tier 1.1% → 1.3%.
+  Qualitative read: hard tier ≤ 0x20 = medium-tier thunks
+  rebadged. Self-extend yield criterion exceeded; 2 follow-ups
+  available.
 - [`docs/briefs/046-medium-tier-wave-5.md`](docs/briefs/046-medium-tier-wave-5.md)
   `decomper`, shipped in PR #342. **6 byte-identical matches
   across all 3 compiler tiers** (4 sp3, 1 sp2p3, 1 sp1p5). 3/5
