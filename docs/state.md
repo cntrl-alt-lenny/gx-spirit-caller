@@ -8,15 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 late-morning, post-briefs-041+042.
-Main tip after PRs #335 (decomper, +8 matches across 4 modules)
-and #334 (cloud, W-A..W-D walls + coercion findings). Medium tier
-**69.9%** matched. Brief 043 (decomper wave 4, applies W-A
-coercion) + brief 044 (cloud, sp3 routing research) queued.
+**Last updated:** 2026-05-08 midday, post-briefs-043+044. Main
+tip after PRs #338 (decomper, +9 matches at 100%) and #337
+(cloud, sp3 sweep verdict). Medium tier **75.6%**. Briefs 045
+(cloud sp3 routing implementation, HIGH) + 046 (decomper sp3
+wave, gated) queued.
 
-Cloud's sp3 finding is the next bigger thing — W-B byte-identical
-via mwcc 1.2/sp3 (a third compiler tier). If brief 044's sweep
-finds ≥10 candidates, brief 045 builds the routing.
+Three-tier compiler architecture coming online: mwcc 2.0/sp1p5
+(default) + mwcc 1.2/sp2p3 (`.legacy.c` Style A) + mwcc 1.2/sp3
+(`.legacy_sp3.c`, brief 045 implements).
 
 **Style A unblock chain complete:**
 
@@ -43,7 +43,7 @@ post-#311):
 | `easy` | 905 | 205 | 1110 | **81.5%** | **+558** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
-| `medium` | 109 | 47 | 156 | **69.9%** | **+15** |
+| `medium` | 118 | 38 | 156 | **75.6%** | **+24** |
 | `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
 
 **Cluster yield track record** through brief 029:

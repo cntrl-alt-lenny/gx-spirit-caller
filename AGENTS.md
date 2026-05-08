@@ -313,24 +313,32 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/043-medium-tier-wave-4.md`](docs/briefs/043-medium-tier-wave-4.md)
-  — `decomper`: medium-tier wave 4. Re-attack `func_020916c8`
-  with brief 042's W-A → C-9 coercion. Pick fresh candidates,
-  apply brief 041's declaration-order trick. Skip W-B/W-C/W-D
-  (sp3-T-3 + true permanent — brief 044 decides on sp3 routing).
-  **Self-extend clause** active for up to 2 follow-up waves.
-  Branch: `decomper/medium-tier-wave-4`.
-- [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
-  — `cloud`: research-only. Sweep medium+easy unmatched
-  candidates against mwcc 1.2/sp3 to count sp3-byte-identical
-  matches. Decide whether to add a third routing tier
-  (`.legacy_sp3.c`), use `.s` files only, or shelve. Land as
-  `docs/research/sp3-routing-decision.md` with verdict +
-  recommended follow-up brief scope. Branch:
-  `cloud/sp3-routing-research`.
+- [`docs/briefs/045-sp3-routing-implementation.md`](docs/briefs/045-sp3-routing-implementation.md)
+  — `cloud` **(HIGH priority)**: implement the sp3 routing tier
+  per brief 044's verdict. `*.legacy_sp3.c` → mwcc 1.2/sp3 next
+  to existing `*.legacy.c` → 1.2/sp2p3 + default → 2.0/sp1p5.
+  Extend `tools/configure.py` + `tools/patch_objects_legacy.py` +
+  tests. **Brain WILL re-run brief-038-style smoke test for both
+  tiers before merge.** Branch: `cloud/sp3-routing-implementation`.
+- [`docs/briefs/046-medium-tier-wave-5.md`](docs/briefs/046-medium-tier-wave-5.md)
+  — `decomper`: first sp3 wave. Re-attack brief 044's 5 medium
+  sp3-unique candidates + pick fresh medium-tier targets across
+  all three tiers. Pre-condition: brief 045 must be merged.
+  Self-extend allowance preserved (2 follow-ups). Branch:
+  `decomper/medium-tier-wave-5`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
+  `cloud`, shipped in PR #337. Sp3 sweep verdict: **ship the
+  third tier**. 7 sp3-unique medium+easy candidates (borderline
+  range), but cloud's cross-cutting argument about the 416
+  hard-tier candidates as future leverage convinced brain to
+  override the conservative default. Brief 045 implements.
+- [`docs/briefs/043-medium-tier-wave-4.md`](docs/briefs/043-medium-tier-wave-4.md)
+  `decomper`, shipped in PR #338. **9 byte-identical matches at
+  100% per-attempt yield.** W-A unblock confirmed first-try via
+  C-9. Medium tier 69.9% → 75.6%. Decomper is on a streak.
 - [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
   `cloud`, shipped in PR #334. 310-line update to codegen-walls.md
   documenting W-A..W-D + coercion attempts. **W-A flipped to C-9
