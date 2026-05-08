@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**48 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**49 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (8)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (13)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (14)
 
 ## Analysis / worklist
 
@@ -299,6 +299,12 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 **rewrite `ALIGNALL(4)` to `ALIGNALL(2)` in the**
 
 `.arm9` segment of a dsd-generated arm9.lcf.
+
+### `tools/patch_objects_legacy.py`
+
+**rewrite `func_X.o` -> `func_X.legacy.o` in**
+
+the dsd-generated objects.txt for any source ending in `.legacy.c`.
 
 ### `tools/patch_section_align.py`
 
