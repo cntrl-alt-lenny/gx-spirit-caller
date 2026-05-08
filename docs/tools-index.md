@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**49 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**50 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (8)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (14)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (15)
 
 ## Analysis / worklist
 
@@ -271,6 +271,12 @@ A "brief" is a markdown file named `NNN-slug.md` whose first non-blank line has 
 **Generates an SVG treemap visualizing decomp progress per unit.**
 
 Reads build/<version>/report.json (objdiff-cli format) and writes assets/progress-heatmap.svg. Each rectangle is one translation unit; area is proportional to total bytes (code + data); fill color encodes match percentage from red (0%) t…
+
+### `tools/generate_research_index.py`
+
+**Regenerate docs/research/README.md from the research notes in the**
+
+same directory.
 
 ### `tools/generate_tool_index.py`
 

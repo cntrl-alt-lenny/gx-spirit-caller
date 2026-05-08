@@ -78,6 +78,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("install_git_hooks", "infrastructure", "Infrastructure / build-patching"),
     ("generate_heatmap", "infrastructure", "Infrastructure / build-patching"),
     ("generate_briefs_index", "infrastructure", "Infrastructure / build-patching"),
+    ("generate_research_index", "infrastructure", "Infrastructure / build-patching"),
     ("generate_tool_index", "infrastructure", "Infrastructure / build-patching"),
     ("update_progress_badge", "infrastructure", "Infrastructure / build-patching"),
     ("ninja_syntax", "infrastructure", "Infrastructure / build-patching"),
