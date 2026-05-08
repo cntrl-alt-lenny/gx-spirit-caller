@@ -19,17 +19,19 @@ grep here first), **permanent** (8 patterns — mwcc keeps
 "winning" the codegen choice regardless of C variation; budget
 zero matches in the yield band), and **tooling-tractable**
 (3 patterns — `propagate_template` could ship a register-
-renaming or literal-substitution variant, or `tools/configure.py`
-could add a third compiler routing tier, if follow-up briefs
-land). Brief 031's HIGH 78% under-delivery (22%) was dominated
-by 2-3 walls (r2-vs-r3 spill on swap thunks, pool-load vs
-add-imm chain, ldmib fusion) that all sit in the *permanent*
-bucket. Brief 040's 4 drops surfaced a third compiler flavour
-(mwcc 1.2/sp3) that the project's two-tier routing doesn't yet
-reach — see T-3. The full table of patterns + the per-PR
-dropped-symbol cross-reference is below; future pilots that
-hit a partial-match shape should grep the *Permanent* and
-*Coercible* sections first before iterating on C variations.
+renaming or literal-substitution variant — T-1, T-2 still
+proposed; T-3 third compiler routing tier **shipped in PR #340**
+via brief 045). Brief 031's HIGH 78% under-delivery (22%) was
+dominated by 2-3 walls (r2-vs-r3 spill on swap thunks,
+pool-load vs add-imm chain, ldmib fusion) that all sit in the
+*permanent* bucket. Brief 040's 4 drops surfaced a third
+compiler flavour (mwcc 1.2/sp3) that the project's two-tier
+routing didn't reach — now reached via the
+`*.legacy_sp3.c` convention; see T-3. The full table of
+patterns + the per-PR dropped-symbol cross-reference is below;
+future pilots that hit a partial-match shape should grep the
+*Permanent* and *Coercible* sections first before iterating
+on C variations.
 
 ## Method
 
@@ -880,7 +882,20 @@ than T-1 because the affected drop count is small.
 
 **Brief candidate**: lower priority than T-1.
 
-### T-3. Add a third mwcc routing tier (mwcc 1.2/sp3)
+### T-3. Third mwcc routing tier (mwcc 1.2/sp3) — SHIPPED
+
+**Status: shipped in PR #340 (brief 045)** — `*.legacy_sp3.c`
+files now route through mwcc 1.2/sp3 alongside the existing
+default (mwcc 2.0/sp1p5) and `*.legacy.c` (mwcc 1.2/sp2p3)
+tiers. `tools/patch_objects_legacy.py` extended to rewrite
+both `.legacy` and `.legacy_sp3` suffixes; `tools/configure.py`
+gained a `mwcc_legacy_sp3` ninja rule. Brain ran the dual-tier
+smoke test before merging — `objects.txt` and `arm9.lcf` agree
+on `.legacy_sp3.o`. The 7 sp3-unique medium+easy candidates
+that brief 044 (PR #337,
+[`docs/research/sp3-routing-decision.md`](sp3-routing-decision.md))
+identified are now eligible for routing; brief 046 (decomper)
+is the first wave consuming them.
 
 Brief 037 (PR #327) shipped two-tier per-TU routing — default
 mwcc 2.0/sp1p5 + `*.legacy.c` → mwcc 1.2/sp2p3 — to unblock
@@ -889,8 +904,9 @@ surfaced a third codegen flavour: target uses **Style B
 (`pop {pc}` 1-step return) WITH the `push {lr}; sub sp, #4`
 prologue** that mwcc 1.2/sp2p3 emits but combined with the
 single-step pop merge that mwcc 2.0 added in 1.2/sp3 onward.
-Neither current routing tier emits this combination; **mwcc
-1.2/sp3 does** (verified byte-identical against W-B).
+Neither of the original two routing tiers emitted this
+combination; **mwcc 1.2/sp3 does** (verified byte-identical
+against W-B).
 
 Per-compiler shape table for the same C source:
 
@@ -900,25 +916,53 @@ Per-compiler shape table for the same C source:
 | mwcc 1.2/sp2p3      | `push {lr}; sub sp, #4`   | `pop {lr}; bx lr`     | epilogue mismatch (Style A) |
 | **mwcc 1.2/sp3**    | `push {lr}; sub sp, #4`   | `pop {pc}`            | **byte-identical** |
 
-A third routing tier (proposed: `*.sp3.c` filename suffix; or
-add a `LEGACY_SP3_MWCC_VERSION` constant + `is_sp3_c()`
-predicate in `tools/configure.py` + a `mwcc_sp3` ninja rule
-mirroring the brief 037 pattern) would unblock W-B directly
-and partially unblock W-C (whose Style B half this fixes; the
-P-7 pool-not-deduped residual remains independent).
+**Routing convention (as shipped):** files named `*.legacy_sp3.c`
+under `src/` or `libs/` route through `mwcc_legacy_sp3` →
+`tools/mwccarm/1.2/sp3/mwccarm.exe`. The
+`LEGACY_SP3_MWCC_VERSION` / `LEGACY_SP3_C_SUFFIX` constants in
+`tools/configure.py` are the source-of-truth; the
+`is_legacy_sp3_c()` predicate handles classification.
+`tools/patch_objects_legacy.py`'s `LEGACY_SUFFIXES` tuple holds
+both `.legacy.c` and `.legacy_sp3.c` so the same dsd-lcf
+filename-drop bug brief 039 fixed for the first tier doesn't
+recur on the third.
 
-**Estimated unlock:** W-B (1 confirmed match) + W-C's
-Style-B-aspect (1 partial — pool-dedup residual still blocks)
-+ any future Style B target whose prologue uses `sub sp, #4`
-(needs cross-corpus survey).
+**Confirmed unlock so far:** W-B
+(`func_020467f4`, byte-identical via brief 042 verification).
 
-**Brief candidate:** medium priority. Same complexity as the
-brief 037 implementation; mostly a copy of `mwcc_legacy` rule
-+ `LEGACY_C_SUFFIX` machinery with the path constant pointing
-at `tools/mwccarm/1.2/sp3/` (already shipped with the standard
-`mwccarm latest` bundle — verified locally during brief 042
-research). One extra `LEGACY_SP3_CC` output added to the
-`download_tool` rule's outputs list.
+**Pending unlock (brief 046's wave):** the remaining 6
+sp3-unique medium+easy candidates from brief 044:
+
+| Address     | Symbol            | Tier   | Insns |
+|-------------|-------------------|--------|------:|
+| `0x0203cff8`| `func_0203cff8`   | medium |    32 |
+| `0x0203d078`| `func_0203d078`   | medium |    26 |
+| `0x0207db8c`| `func_0207db8c`   | medium |    28 |
+| `0x0208205c`| `func_0208205c`   | medium |    21 |
+| `0x0204548c`| `func_0204548c`   | easy   |     8 |
+| `0x020454ac`| `func_020454ac`   | easy   |     8 |
+
+The static signature-detection only confirms the
+prologue/epilogue match — body-byte match still requires the
+right C source per-target. Real yield will come back via
+brief 046's PR.
+
+**Future leverage:** 416 hard-tier sp3-unique candidates remain
+unclaimed — the routing tier is now in place for any future
+hard-tier pivot.
+
+**What sp3 routing does NOT unblock:**
+
+- **W-C `func_02023fec`** — sp3 fixes the Style B half but
+  the residual P-7 pool-not-deduped pattern remains. Permanent
+  unless a source-level coercion surfaces.
+- **W-D `func_ov000_021ac85c`** — bit-chain reg-alloc (P-8);
+  prologue/epilogue is already sp1p5-or-sp3 ambiguous so sp3
+  routing doesn't change the wall.
+- **`func_0201904c`** (brief 041's provisional wall) — body
+  shape (`orrhi/lslls/orrls` predicated 3-way merge vs sp3's
+  2-way predicated stores). Separate C-source coercion
+  problem under all three compilers.
 
 ## Per-PR drop cross-reference
 
@@ -964,8 +1008,8 @@ shape we should chase".
 | 031 / 315  | `func_0207dee0`           | P-2    | permanent  |
 | 031 / 315  | `func_ov002_022912c8`     | P-1    | permanent  |
 | 040 / 332  | `func_020916c8`           | C-9 (missed; uninitialised-prev coercion) | coercible |
-| 040 / 332  | `func_020467f4`           | T-3 candidate (mwcc 1.2/sp3 routing) | tooling-tractable |
-| 040 / 332  | `func_02023fec`           | T-3 (Style B half) + P-7 (pool dedup residual) | partial / permanent |
+| 040 / 332  | `func_020467f4`           | T-3 (mwcc 1.2/sp3 routing — SHIPPED PR #340; brief 046 consumes) | tooling-tractable |
+| 040 / 332  | `func_02023fec`           | T-3 (Style B half — SHIPPED PR #340) + P-7 (pool dedup residual) | partial / permanent |
 | 040 / 332  | `func_ov000_021ac85c`     | P-8 (bit-chain reg-alloc) | permanent |
 
 ## Quantification
@@ -1018,20 +1062,28 @@ losses).
    was tagged "permanent" until brief 042 found C-9). When
    stuck, also re-read the `prev = X` initialiser line — that's
    what missed C-9 historically.
-3. **Decomper, when routing through `*.legacy.c`:** sanity-check
-   the target's epilogue first. If target has `pop {…, pc}`
-   (Style B 1-step) — e.g. brief 040 W-B / W-C / W-D — **do
-   NOT** route through `*.legacy.c`; sp2p3 cannot emit Style B.
-   The default mwcc 2.0/sp1p5 routing or a future T-3 third
-   tier is the right home for Style B targets.
+3. **Decomper, when routing through a compiler tier:** sanity-
+   check the target's prologue/epilogue first.
+   - `pop {regs, lr}; bx lr` (Style A 2-step) → `*.legacy.c`
+     (mwcc 1.2/sp2p3).
+   - `pop {regs, pc}` with `push {regs, lr}; sub sp, #4`
+     prologue and **no** `r3` in the push → `*.legacy_sp3.c`
+     (mwcc 1.2/sp3, the T-3 third tier shipped in PR #340).
+   - `pop {regs, pc}` with `push {r3, regs, lr}` (r3-spill) or
+     2/4-reg push without sub-sp → default `.c`
+     (mwcc 2.0/sp1p5).
+   Mis-routing was the brief-040 mistake on W-B / W-C / W-D —
+   they were Style B targets routed through `*.legacy.c`
+   (which only emits Style A). `docs/research/sp3-routing-decision.md`'s
+   per-compiler discriminator table is the long-form reference.
 4. **Brain decides whether to queue T-1 (r2-vs-r3 swap-thunk
    tooling) as a follow-up cloud brief.** Highest single-pattern
    impact in the *tooling-tractable* bucket; brief-031's HIGH
    78% under-delivery was dominated by this wall.
-5. **Brain decides whether to queue T-3 (mwcc 1.2/sp3 routing
-   tier).** New as of brief 042; W-B byte-matches via mwcc
-   1.2/sp3, and W-C's Style B half does too. Same complexity as
-   brief 037's two-tier routing implementation.
+5. **T-3 SHIPPED (PR #340).** mwcc 1.2/sp3 routing tier landed
+   via brief 045; brief 046 is the first decomper wave consuming
+   it. The 7 sp3-unique candidates from brief 044 are eligible
+   for routing.
 6. **Defer T-2** until another cluster surfaces ≥3 P-3 drops.
 7. **No changes to existing tooling** ship in this research note.
 8. **Append-only updates:** future cluster pilots that surface a
