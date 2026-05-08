@@ -313,19 +313,30 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
-  — `cloud` **(HIGH priority)**: research the Style A vs Style B
-  epilogue trigger surfaced by brief 034. mwcc 2.0/sp1p5 emits
-  Style B; target ROM uses Style A across every medium-tier
-  IRQ-bracket function attempted. **Decomper is on hold pending
-  this brief's findings** — Style A blocks ~50% of remaining
-  medium-tier candidates. Land as
-  `docs/research/style-a-epilogue.md` with concrete
-  recommendation (flag-found / `.s`-only / permanent-wall).
-  Branch: `cloud/style-a-epilogue-research`.
+- [`docs/briefs/037-dual-compiler-routing.md`](docs/briefs/037-dual-compiler-routing.md)
+  — `cloud` **(HIGH priority)**: implement per-TU compiler
+  routing in `tools/configure.py` per brief 036's finding —
+  files routed via a filename convention (or allowlist) compile
+  with mwcc 1.2/sp2p3 (Style A) instead of 2.0/sp1p5 (Style B).
+  Same dual-compiler pattern as pokediamond. Decomper still on
+  hold; brief 038 immediately follows. Branch:
+  `cloud/dual-compiler-routing`.
+- [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
+  — `decomper`: medium-tier wave 2 using brief 037's routing.
+  Re-attack brief 034's 11 IRQ-bracket targets that were blocked
+  by Style A. Pre-condition: brief 037 must be merged first.
+  Target ≥6 matches; 9+ would clear most of brief 034's blocked
+  list. Branch: `decomper/medium-tier-wave-2`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
+  `cloud`, shipped in PR #325. **Style A wall fully diagnosed** —
+  mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 (all SPs) and
+  1.2/sp3+ emit Style B. Verified byte-identical against 2 of
+  brief 034's targets. Matches pokediamond's dual-compiler
+  pattern. Brief 037 (cloud) operationalises; brief 038
+  (decomper) consumes.
 - [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
   `cloud`, shipped in PR #322. Refined codegen-walls.md C-1
   with the ≤3-op if-body predication threshold + new P-6
