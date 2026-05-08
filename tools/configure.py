@@ -72,6 +72,15 @@ DSD_VERSION = 'v0.11.0'
 WIBO_VERSION = '0.6.16'
 OBJDIFF_VERSION = 'v2.7.1'
 MWCC_VERSION = "2.0/sp1p5"
+# Older mwcc revision used by the original ROM for a subset of TUs
+# that emit Style A epilogues (`pop {regs, lr}; bx lr`). mwcc 2.0
+# tightened the optimiser in 1.2/sp3 onward to merge `pop +
+# bx lr` into `pop {pc}` (Style B). Per-TU routing is the
+# dual-compiler approach pokediamond / pokeplatinum / pokeheartgold
+# also use; see docs/research/style-a-epilogue.md for the per-version
+# sweep that confirmed the boundary.
+LEGACY_MWCC_VERSION = "1.2/sp2p3"
+LEGACY_C_SUFFIX = ".legacy.c"  # filename routing convention
 DECOMP_ME_COMPILER = "mwcc_30_131"
 
 # Known-good SHA-1 hashes of clean baserom dumps, keyed by version.
@@ -152,6 +161,7 @@ orig_path        = root_path / "orig"
 tools_path       = root_path / "tools"
 mwcc_root        = args.compiler or tools_path / "mwccarm"
 mwcc_path        = mwcc_root / MWCC_VERSION
+mwcc_legacy_path = mwcc_root / LEGACY_MWCC_VERSION
 
 
 # --------------------------------------------------------------------------- #
@@ -188,6 +198,9 @@ DSD = str(args.dsd or os.path.join('.', str(root_path / f"dsd{EXE}")))
 OBJDIFF = os.path.join('.', str(root_path / f"objdiff-cli{EXE}"))
 CC = os.path.join('.', str(mwcc_path / "mwccarm.exe"))
 LD = os.path.join('.', str(mwcc_path / "mwldarm.exe"))
+# Legacy compiler for Style A TUs. Linker stays on MWCC_VERSION —
+# only the mwccarm.exe path differs per-TU.
+LEGACY_CC = os.path.join('.', str(mwcc_legacy_path / "mwccarm.exe"))
 # mwasmarm ships inside the same mwccarm.zip bundle we already
 # download. Used for hand-written .s assembly — the only escape
 # hatch for the Thumb section-alignment wall (see
@@ -386,6 +399,24 @@ def main():
         )
         n.newline()
 
+        # Per-TU dual-compiler rule for Style A epilogue TUs. Same
+        # CC_FLAGS / CC_INCLUDES as the default `mwcc` rule — the only
+        # difference is the binary path. Files routed via the
+        # `*.legacy.c` suffix (`is_legacy_c()`) compile through this
+        # rule. See docs/research/style-a-epilogue.md for the
+        # mwcc-version sweep that motivated the routing.
+        mwcc_legacy_cmd = f'{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_implicit = [LEGACY_CC]
+        if platform.system != "windows":
+            mwcc_legacy_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_legacy_implicit.append(transform_dep)
+        n.rule(
+            name="mwcc_legacy",
+            command=mwcc_legacy_cmd,
+            depfile="$basefile.d",
+        )
+        n.newline()
+
         # Assembly rule — unlocks the .s escape hatch for the Thumb
         # section-alignment wall (see docs/research/thumb-align-wall.md).
         # Scoped just to .s files under src/ + libs/; .c files stay on
@@ -503,7 +534,7 @@ def main():
         add_download_tool_builds(n)
         add_extract_build(n, project)
         add_delink_and_lcf_builds(n, project)
-        add_mwcc_builds(n, project, mwcc_implicit)
+        add_mwcc_builds(n, project, mwcc_implicit, mwcc_legacy_implicit)
         add_mwasm_builds(n, project, mwasm_implicit)
         add_mwld_and_rom_builds(n, project)
         add_check_builds(n, project)
@@ -529,9 +560,14 @@ def add_download_tool_builds(n: ninja_syntax.Writer):
     n.newline()
 
     if args.compiler is None:
+        # The mwccarm `latest` bundle ships every published 1.2 + 2.0
+        # SP under `tools/mwccarm/<series>/<sp>/`, so a single
+        # download covers both the default (`MWCC_VERSION`) and the
+        # legacy compiler (`LEGACY_MWCC_VERSION`) used for Style A
+        # TUs — see docs/research/style-a-epilogue.md.
         n.build(
             rule="download_tool",
-            outputs=[CC, LD, ASM],
+            outputs=[CC, LD, ASM, LEGACY_CC],
             variables={"tool": "mwccarm", "tag": "latest", "path": tools_path},
         )
         n.newline()
@@ -612,7 +648,20 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     n.newline()
 
 
-def add_mwcc_builds(n: ninja_syntax.Writer, project: Project, mwcc_implicit: list):
+def add_mwcc_builds(
+    n: ninja_syntax.Writer,
+    project: Project,
+    mwcc_implicit: list,
+    mwcc_legacy_implicit: list,
+):
+    """Emit one mwcc build per .c / .cpp file under src/ + libs/.
+
+    Routing:
+      - `*.legacy.c` files use the `mwcc_legacy` rule
+        (mwcc 1.2/sp2p3, Style A epilogue).
+      - everything else uses the default `mwcc` rule
+        (mwcc 2.0/sp1p5, Style B epilogue).
+    """
     for source_file in get_c_cpp_files([src_path, libs_path]):
         src_obj_path = project.game_build / source_file
         cc_flags = []
@@ -620,10 +669,16 @@ def add_mwcc_builds(n: ninja_syntax.Writer, project: Project, mwcc_implicit: lis
             cc_flags.append("-lang=c++")
         elif is_c(source_file):
             cc_flags.append("-lang=c")
+        if is_legacy_c(source_file):
+            rule = "mwcc_legacy"
+            implicit = mwcc_legacy_implicit
+        else:
+            rule = "mwcc"
+            implicit = mwcc_implicit
         n.build(
             inputs=str(source_file),
-            implicit=mwcc_implicit,
-            rule="mwcc",
+            implicit=implicit,
+            rule=rule,
             outputs=str(src_obj_path.with_suffix(".o")),
             variables={
                 "game_version": project.game_version,
@@ -709,6 +764,17 @@ def is_cpp(name):
 
 def is_c(name):
     return Path(str(name)).suffix in [".c"]
+
+
+def is_legacy_c(name):
+    """A `.legacy.c` file routes through mwcc 1.2/sp2p3 (Style A
+    epilogue) instead of the default mwcc 2.0/sp1p5 (Style B). The
+    suffix decision is per-file; the rest of the project's CC_FLAGS
+    are unchanged. See LEGACY_C_SUFFIX above and
+    docs/research/style-a-epilogue.md."""
+    # Path.suffix only returns the LAST dotted suffix (so `.c` here),
+    # not the full multi-dot tail; check the literal end-of-name.
+    return str(name).endswith(LEGACY_C_SUFFIX)
 
 
 def is_asm(name):
