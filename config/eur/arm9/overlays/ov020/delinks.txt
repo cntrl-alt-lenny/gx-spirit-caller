@@ -7,3 +7,7 @@
 src/overlay020/ov020_021ada6c.c:
     complete
     .text start:0x021ada6c end:0x021ada74
+
+src/overlay020/func_ov020_021aae48.c:
+    complete
+    .text start:0x021aae48 end:0x021aae64
