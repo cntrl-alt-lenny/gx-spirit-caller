@@ -8,16 +8,23 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 morning, post-brief-036. Main tip is
-`d2fe1ad` after PR #325 (cloud, Style A wall **diagnosed and
-solved** — mwcc 1.2/sp2p3 emits Style A). Brief 037 (cloud,
-implementation) + brief 038 (decomper, wave 2) queued.
+**Last updated:** 2026-05-08 mid-morning, post-brief-038
+escalation. Main tip is `529aa2e` after PR #328 (decomper, brief
+038 escalation, **0 matches** — blocked on a `dsd lcf` filename
+inconsistency in brief 037's routing). Brief 039 (cloud, HIGH
+priority) queued to fix; brief 040 (decomper retry) follows.
 
-**Style A wall RESOLVED.** Cloud's research confirmed
-hypothesis (b): mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 and
-1.2/sp3+ emit Style B. Same dual-compiler pattern as pokediamond.
-Brief 037 implements per-TU routing; brief 038 unblocks brief
-034's 11 targets.
+**Style A wall RESOLVED at the diagnosis level (brief 036) and the
+routing level (brief 037), but a `dsd lcf` post-merge bug now
+blocks the actual link step.** Decomper is on hold again pending
+brief 039.
+
+**Brain miss noted (own this):** brief 037 had an explicit smoke
+test in its success criteria — write a `.legacy.c`, build,
+byte-match. Brain only verified the no-`.legacy.c` regression path
+when merging #327; the smoke test would have caught the dsd
+inconsistency. Brief 039 explicitly requires brain to re-run the
+smoke test before merge.
 
 **Baseline:** Verified across all of today's merges. CI gates all
 green; markdown lint green; macOS wine on Game Porting Toolkit.
@@ -57,26 +64,31 @@ post-#311):
 through brief 033. Brief 034 attempted medium-tier individual-
 function pivot and discovered a fundamental new wall.
 
-## Style A wall — resolved (2026-05-08)
+## Style A wall — diagnosed + routed, link-step bug found (2026-05-08)
 
-Cloud's brief 036 research (PR #325,
-`docs/research/style-a-epilogue.md`) confirmed:
+Cloud's brief 036 research (PR #325) confirmed mwcc 1.2/sp2p3
+emits Style A; mwcc 2.0 (all SPs) and 1.2/sp3+ emit Style B.
+Same project flags. Same dual-compiler pattern as pokediamond.
 
-| Compiler | Epilogue |
-|---|---|
-| `mwccarm 1.2/base` / `sp2` / `sp2p3` | **Style A** |
-| `mwccarm 1.2/sp3` / `sp4` | Style B |
-| `mwccarm 2.0/base` … `sp2p4` (10 SPs) | Style B |
+Cloud's brief 037 (PR #327) shipped per-TU routing via
+`*.legacy.c` filename convention. configure.py auto-routes; the
+default mwcc rule and the new `mwcc_legacy` rule coexist.
 
-Same project flags. The optimiser was tightened in 1.2/sp3 and
-the change persists across all later SPs. Verified byte-
-identical against 2 of brief 034's targets (`func_0207cbbc`,
-`func_020a1e3c`). **Same dual-compiler pattern as pokediamond.**
+**Bug found in brief 038 (PR #328):** `dsd lcf` produces
+inconsistent `objects.txt` ↔ `arm9.lcf` for `.legacy.c` sources:
 
-Brief 037 (cloud) implements per-TU routing in
-`tools/configure.py`. Brief 038 (decomper) consumes the routing
-to unblock brief 034's 11 targets. Decomper still on hold until
-brief 037 lands.
+```
+arm9.lcf:    func_X.legacy.o(.text)         ← what mwldarm wants
+objects.txt: build/.../func_X.o             ← what mwldarm has
+```
+
+mwldarm fails on every routed TU. The `.o` file exists; it's
+just not in objects.txt's search list under the lcf-referenced
+name.
+
+Brief 039 (cloud, HIGH priority) post-process script for
+objects.txt fixes this. Brief 040 (decomper retry of brief 038)
+follows.
 
 **Cluster ranking** (live from `python tools/find_pattern_clusters.py
 --version eur --top 8`, post-#311):

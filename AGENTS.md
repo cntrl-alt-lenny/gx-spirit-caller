@@ -313,23 +313,31 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/037-dual-compiler-routing.md`](docs/briefs/037-dual-compiler-routing.md)
-  — `cloud` **(HIGH priority)**: implement per-TU compiler
-  routing in `tools/configure.py` per brief 036's finding —
-  files routed via a filename convention (or allowlist) compile
-  with mwcc 1.2/sp2p3 (Style A) instead of 2.0/sp1p5 (Style B).
-  Same dual-compiler pattern as pokediamond. Decomper still on
-  hold; brief 038 immediately follows. Branch:
-  `cloud/dual-compiler-routing`.
-- [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
-  — `decomper`: medium-tier wave 2 using brief 037's routing.
-  Re-attack brief 034's 11 IRQ-bracket targets that were blocked
-  by Style A. Pre-condition: brief 037 must be merged first.
-  Target ≥6 matches; 9+ would clear most of brief 034's blocked
-  list. Branch: `decomper/medium-tier-wave-2`.
+- [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
+  — `cloud` **(HIGH priority)**: fix the `dsd lcf` filename
+  inconsistency surfaced by brief 038 (PR #328). `arm9.lcf`
+  references `func_X.legacy.o` while `objects.txt` drops
+  `.legacy.` and references `func_X.o`, breaking mwldarm. Land
+  `tools/patch_objects_legacy.py` post-process script in the
+  existing `patch_lcf_arm9_align.py` pattern. **Brain will
+  re-run brief 038's reproducer before merging** — won't repeat
+  brief 037's smoke-test miss. Branch:
+  `cloud/objects-txt-legacy-patch`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
+  `decomper`, **escalation closed in PR #328**. 0 byte-identical
+  matches; blocked on the `dsd lcf` filename inconsistency.
+  Empty commit; bug analysis is the deliverable. Triggered
+  brief 039.
+- [`docs/briefs/037-dual-compiler-routing.md`](docs/briefs/037-dual-compiler-routing.md)
+  `cloud`, shipped in PR #327. Per-TU dual-compiler routing via
+  `*.legacy.c` filename convention. **Brain merged this without
+  running the brief's required end-to-end smoke test** — the
+  test would have caught the `dsd lcf` inconsistency that
+  blocked brief 038. Brief 039 is the post-process workaround;
+  the routing core itself is sound.
 - [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
   `cloud`, shipped in PR #325. **Style A wall fully diagnosed** —
   mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 (all SPs) and
