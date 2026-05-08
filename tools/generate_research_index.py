@@ -107,7 +107,6 @@ def parse_research_note(path: Path) -> dict | None:
     heading = ""
     summary_lines: list[str] = []
     in_italic_block = False
-    saw_blank = False  # one blank between paragraphs is OK; we
                        # keep accumulating until we have substance
 
     def _enough_summary() -> bool:
@@ -131,7 +130,6 @@ def parse_research_note(path: Path) -> dict | None:
                 break
             # Otherwise tolerate the blank and keep scanning. Reset
             # italic-block state too.
-            saw_blank = True
             in_italic_block = False
             continue
         # `## Foo` H2 means we're past the lead — definitely stop.
@@ -153,7 +151,6 @@ def parse_research_note(path: Path) -> dict | None:
         elif stripped.startswith("* "):
             stripped = stripped[2:].strip()
         summary_lines.append(stripped)
-        saw_blank = False
 
     if not heading:
         return None
