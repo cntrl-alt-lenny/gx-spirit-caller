@@ -313,22 +313,30 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/045-sp3-routing-implementation.md`](docs/briefs/045-sp3-routing-implementation.md)
-  — `cloud` **(HIGH priority)**: implement the sp3 routing tier
-  per brief 044's verdict. `*.legacy_sp3.c` → mwcc 1.2/sp3 next
-  to existing `*.legacy.c` → 1.2/sp2p3 + default → 2.0/sp1p5.
-  Extend `tools/configure.py` + `tools/patch_objects_legacy.py` +
-  tests. **Brain WILL re-run brief-038-style smoke test for both
-  tiers before merge.** Branch: `cloud/sp3-routing-implementation`.
-- [`docs/briefs/046-medium-tier-wave-5.md`](docs/briefs/046-medium-tier-wave-5.md)
-  — `decomper`: first sp3 wave. Re-attack brief 044's 5 medium
-  sp3-unique candidates + pick fresh medium-tier targets across
-  all three tiers. Pre-condition: brief 045 must be merged.
-  Self-extend allowance preserved (2 follow-ups). Branch:
-  `decomper/medium-tier-wave-5`.
+No open briefs. Decomper has **2 self-extends remaining** on brief
+046's clause — they may file up to 2 follow-up medium-tier waves
+without a fresh brain brief if the same selection rule applies
+(mix Style A/B/sp3 per disassembly using brief 044's discriminator;
+skip W-D and W-C P-7 pool-dedup). Cloud is on standby; may pick up
+autonomous docs/research items per AGENTS.md.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/046-medium-tier-wave-5.md`](docs/briefs/046-medium-tier-wave-5.md)
+  `decomper`, shipped in PR #342. **6 byte-identical matches
+  across all 3 compiler tiers** (4 sp3, 1 sp2p3, 1 sp1p5). 3/5
+  brief-044 sp3-unique candidates landed; W-B unblocked. Brief
+  044's discriminator predicted reliably. New observation: brief
+  041's declare-order r4↔r5 trick doesn't transfer to sp3.
+  Self-extend allowance preserved (2 follow-ups remaining).
+- [`docs/briefs/045-sp3-routing-implementation.md`](docs/briefs/045-sp3-routing-implementation.md)
+  `cloud`, shipped in PR #340. Third compiler routing tier
+  (`*.legacy_sp3.c` → mwcc 1.2/sp3) implemented next to existing
+  tiers. Brain ran the dual-tier smoke test before merging
+  (lcf + objects.txt agreed on both `.legacy.o` and
+  `.legacy_sp3.o`). Brain pushed a follow-up commit on cloud's
+  branch to regenerate `docs/tools-index.md` after CI caught the
+  drift; small miss, no rework needed.
 - [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
   `cloud`, shipped in PR #337. Sp3 sweep verdict: **ship the
   third tier**. 7 sp3-unique medium+easy candidates (borderline

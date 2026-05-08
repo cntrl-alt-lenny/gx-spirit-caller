@@ -8,15 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 midday, post-briefs-043+044. Main
-tip after PRs #338 (decomper, +9 matches at 100%) and #337
-(cloud, sp3 sweep verdict). Medium tier **75.6%**. Briefs 045
-(cloud sp3 routing implementation, HIGH) + 046 (decomper sp3
-wave, gated) queued.
-
-Three-tier compiler architecture coming online: mwcc 2.0/sp1p5
-(default) + mwcc 1.2/sp2p3 (`.legacy.c` Style A) + mwcc 1.2/sp3
-(`.legacy_sp3.c`, brief 045 implements).
+**Last updated:** 2026-05-08 afternoon, post-briefs-045/046.
+Main tip after PRs #342 (decomper, +6 matches across all 3 tiers)
+and #341 (cloud, autonomous T-3-shipped docs cleanup). Medium
+tier **78.2%**, easy **81.7%**. Three-tier compiler architecture
+fully live and validated — decomper has 2 self-extends remaining
+for medium-tier wave 6+.
 
 **Style A unblock chain complete:**
 
@@ -40,10 +37,10 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 905 | 205 | 1110 | **81.5%** | **+558** |
+| `easy` | 907 | 203 | 1110 | **81.7%** | **+560** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
-| `medium` | 118 | 38 | 156 | **75.6%** | **+24** |
+| `medium` | 122 | 34 | 156 | **78.2%** | **+28** |
 | `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
 
 **Cluster yield track record** through brief 029:
