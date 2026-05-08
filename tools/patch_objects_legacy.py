@@ -1,38 +1,46 @@
 #!/usr/bin/env python3
 
 """
-patch_objects_legacy.py — rewrite `func_X.o` -> `func_X.legacy.o` in
-the dsd-generated objects.txt for any source ending in `.legacy.c`.
+patch_objects_legacy.py — rewrite `func_X.o` -> `func_X.legacy.o`
+(or `.legacy_sp3.o`) in the dsd-generated objects.txt for any
+source ending in one of the legacy routing suffixes.
 
 Context: brief 037 (PR #327) shipped per-TU dual-compiler routing
-via the `*.legacy.c` filename convention. The mwcc_legacy ninja
-rule produces `func_X.legacy.o` correctly, but `dsd lcf` emits an
-inconsistent pair of files for `.legacy.c` sources:
+via the `*.legacy.c` filename convention; brief 045 added the
+third tier `*.legacy_sp3.c` (mwcc 1.2/sp3, see
+docs/research/sp3-routing-decision.md). The `mwcc_legacy` /
+`mwcc_legacy_sp3` ninja rules produce `func_X.legacy.o` /
+`func_X.legacy_sp3.o` correctly, but `dsd lcf` emits an
+inconsistent pair of files for both suffixes:
 
     arm9.lcf:    func_X.legacy.o(.text)             ← what mwldarm wants
     objects.txt: build/<ver>/src/main/func_X.o      ← what dsd emits (BUG)
 
 mwldarm reads objects.txt as its file-search list, then resolves
 arm9.lcf's references against it. The lookup fails for every routed
-TU because the `.legacy` suffix is missing in the search list.
+TU because the `.legacy[_sp3]` qualifier is missing in the search
+list.
 
-Brief 038 (PR #328) escalated; brief 039 lands this post-process
-fix. Same dsd-output-patcher pattern as
+Brief 038 (PR #328) escalated for the .legacy.c variant; brief 039
+landed the post-process fix. Brief 045 extends it to `.legacy_sp3.c`
+under the same dsd lcf bug. Same dsd-output-patcher pattern as
 `tools/patch_lcf_arm9_align.py` and `tools/patch_section_align.py`.
 
 Scope: ONLY rewrites entries whose corresponding source file (per
-delinks.txt) ends in `.legacy.c`. Default `.c` and `.cpp` and
-`.s` entries pass through unchanged. Idempotent — running on an
-already-patched objects.txt is a no-op.
+delinks.txt) ends in one of `LEGACY_SUFFIXES`. Default `.c` and
+`.cpp` and `.s` entries pass through unchanged. Idempotent —
+running on an already-patched objects.txt is a no-op.
 
 Invocation is appended to the `lcf` ninja rule so objects.txt is
 patched before mwldarm reads it. See tools/configure.py.
 
 See also:
   - docs/research/style-a-epilogue.md — the brief 036 research
-    that motivated the dual-compiler routing
-  - tools/configure.py LEGACY_C_SUFFIX / is_legacy_c() — the
-    routing convention itself
+    that motivated the .legacy.c (sp2p3) routing
+  - docs/research/sp3-routing-decision.md — brief 044 research
+    that motivated the .legacy_sp3.c (sp3) routing
+  - tools/configure.py LEGACY_C_SUFFIX / LEGACY_SP3_C_SUFFIX /
+    is_legacy_c() / is_legacy_sp3_c() — the routing conventions
 
 Usage:
 
@@ -54,20 +62,48 @@ from progress import parse_delinks_file  # noqa: E402
 
 
 LEGACY_C_SUFFIX = ".legacy.c"
-# Mirror configure.py's LEGACY_C_SUFFIX constant. Kept duplicated
-# rather than imported because configure.py runs argparse at module
-# load — importing it from a small post-process script would force
-# a synthetic argv dance just to use one string. The
-# tests/test_patch_objects_legacy.py file has a regression check
-# pinning the two constants in sync.
+LEGACY_SP3_C_SUFFIX = ".legacy_sp3.c"
+# Mirror configure.py's LEGACY_C_SUFFIX / LEGACY_SP3_C_SUFFIX
+# constants. Kept duplicated rather than imported because
+# configure.py runs argparse at module load — importing it from a
+# small post-process script would force a synthetic argv dance just
+# to use a couple of strings. The
+# tests/test_patch_objects_legacy.py file has regression checks
+# pinning the duplications in sync.
+
+# Order matters when checking which suffix a path ends with — the
+# longer suffix (`.legacy_sp3.c`) must be checked BEFORE the shorter
+# (`.legacy.c`) only if one were a tail of the other. They aren't
+# (sp3 has `_sp3` between `legacy` and `.c`), so endswith() on
+# either is unambiguous, but we sort longest-first for defensiveness
+# in case a future tier adds a suffix that does overlap.
+LEGACY_SUFFIXES: tuple[str, ...] = (
+    LEGACY_SP3_C_SUFFIX,
+    LEGACY_C_SUFFIX,
+)
+
+
+def _matching_legacy_suffix(name: str) -> str | None:
+    """Return the LEGACY_SUFFIXES entry that `name` ends with, or
+    None if `name` is not a legacy-routed source. Longest-first
+    iteration so a hypothetical `.legacy_sp3.c` would never be
+    misclassified as `.legacy.c` on a host whose endswith() short-
+    circuits at the first match (`.legacy.c` is NOT a tail of
+    `.legacy_sp3.c` — it's `_sp3.c` — so this is purely defensive).
+    """
+    for suf in LEGACY_SUFFIXES:
+        if name.endswith(suf):
+            return suf
+    return None
 
 
 def collect_legacy_sources(config_dir: Path) -> list[Path]:
     """Walk every delinks.txt under `config_dir` and return the
-    source-paths ending in `.legacy.c`.
+    source-paths ending in any LEGACY_SUFFIXES entry.
 
     Each TU's `source` is the literal string from delinks.txt,
-    e.g. `"src/main/func_0207cbbc.legacy.c"`.
+    e.g. `"src/main/func_0207cbbc.legacy.c"` or
+    `"src/main/func_020467f4.legacy_sp3.c"`.
     """
     out: list[Path] = []
     if not config_dir.is_dir():
@@ -76,20 +112,25 @@ def collect_legacy_sources(config_dir: Path) -> list[Path]:
         _module_sections, tus = parse_delinks_file(delinks)
         for tu in tus:
             source = tu.get("source", "")
-            if source.endswith(LEGACY_C_SUFFIX):
+            if _matching_legacy_suffix(source) is not None:
                 out.append(Path(source))
     return out
 
 
 def buggy_and_fixed_suffixes(source: Path) -> tuple[str, str]:
-    """For a `.legacy.c` source, return (buggy_suffix, fixed_suffix)
-    — the path-tails that appear in the dsd-emitted objects.txt and
-    the form mwldarm expects (matching arm9.lcf).
+    """For a legacy-routed source, return (buggy_suffix,
+    fixed_suffix) — the path-tails that appear in the dsd-emitted
+    objects.txt and the form mwldarm expects (matching arm9.lcf).
 
-    Concretely, for `src/main/func_0207cbbc.legacy.c`:
+    Concretely:
 
+      `src/main/func_0207cbbc.legacy.c` →
         buggy_suffix  = "src/main/func_0207cbbc.o"
         fixed_suffix  = "src/main/func_0207cbbc.legacy.o"
+
+      `src/main/func_020467f4.legacy_sp3.c` →
+        buggy_suffix  = "src/main/func_020467f4.o"
+        fixed_suffix  = "src/main/func_020467f4.legacy_sp3.o"
 
     Suffixes are POSIX-style (forward-slash) regardless of host OS,
     matching the dsd / ninja output format. Both forms preserve the
@@ -97,14 +138,18 @@ def buggy_and_fixed_suffixes(source: Path) -> tuple[str, str]:
     stem files in different modules during the rewrite below.
     """
     name = source.name
-    if not name.endswith(LEGACY_C_SUFFIX):
+    suf = _matching_legacy_suffix(name)
+    if suf is None:
         raise ValueError(f"not a legacy-routed source: {source}")
-    stem_no_legacy = name[: -len(LEGACY_C_SUFFIX)]      # "func_X"
-    stem_with_legacy = stem_no_legacy + ".legacy"        # "func_X.legacy"
+    stem_no_legacy = name[: -len(suf)]                  # "func_X"
+    # Strip trailing ".c" from the suffix to get the qualifier
+    # to splice into the .o filename: ".legacy" or ".legacy_sp3".
+    legacy_qualifier = suf[: -len(".c")]
+    stem_with_legacy = stem_no_legacy + legacy_qualifier
     parent = source.parent.as_posix()
     return (
-        f"{parent}/{stem_no_legacy}.o",                  # buggy
-        f"{parent}/{stem_with_legacy}.o",                # fixed
+        f"{parent}/{stem_no_legacy}.o",                 # buggy
+        f"{parent}/{stem_with_legacy}.o",               # fixed
     )
 
 

@@ -161,6 +161,30 @@ mwcc 1.2/sp2p3 reproduction matching it byte-for-byte (see
 
 ## Recommendation
 
+**Update (brief 045 / PR 045-sp3-routing-implementation): a third
+routing tier has shipped.** The dual-compiler boundary documented
+below was correct as far as it went, but brief 042 (PR #334)
+discovered that mwcc **1.2/sp3** emits a *third* prologue/epilogue
+combination — `push {regs, lr}; sub sp, #4 ... pop {regs, pc}` —
+that neither sp1p5 nor sp2p3 produces. Brief 044 (PR #337,
+[`docs/research/sp3-routing-decision.md`](sp3-routing-decision.md))
+counted 7 sp3-unique medium+easy candidates plus 416 hard-tier
+candidates and recommended shipping the third tier. Brief 045
+implemented it: `*.legacy_sp3.c` files now route through mwcc
+1.2/sp3 alongside the `*.legacy.c` → 1.2/sp2p3 and default `.c` →
+2.0/sp1p5 tiers documented below. The 3-tier discriminator from
+brief 044 (re-stated for convenience):
+
+| Compiler | Push | Sub-sp? | Epilogue |
+|---|---|---:|---|
+| 2.0/sp1p5 | r3-spill (`push {r3, ..., lr}` when reg-count odd) | no | `pop {regs, pc}` |
+| 1.2/sp2p3 | no r3-spill | `sub sp, #4` | `pop {regs, lr}; bx lr` |
+| **1.2/sp3** | **no r3-spill** | **`sub sp, #4`** | **`pop {regs, pc}`** |
+
+The original two-tier recommendation below is preserved for
+historical context; treat the brief 044/045 update as the
+current state of the routing.
+
 **Verdict (a) — Found It.** Brain queues a follow-up brief that:
 
 1. **Adds mwccarm 1.2/sp2p3 as a recognised compiler.** The
