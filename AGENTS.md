@@ -313,19 +313,14 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **2 self-extends remaining** on brief
-047's clause (yield criterion met by margin: 100% vs ≥50%
-threshold). Same selection rule **with one addition**: push-r0
-thunks are now eligible per brief 048's C-12 coercion (mwcc inline
-asm via `asm void func() { nofralloc; stmdb sp!, {r0, lr}; ...
-ldmia sp!, {r0, lr}; bx lr; }`). 2 immediate targets:
-`func_02093294`, `func_02092f04`.
+No open briefs. Decomper has **1 self-extend remaining** on brief
+047's clause (wave 8 = first self-extend, shipped 100% yield + the
+2 C-12 push-r0 unblocks). Same selection rule. After the final
+self-extend, brain re-scopes.
 
-Cloud is on standby; may pick up autonomous tasks per AGENTS.md —
-notably brief 047's recommendation #3 (re-run
-`find_pattern_clusters` focused on hard-tier 0x1c shapes; the
-matched corpus has grown enough that cluster propagation may
-re-open).
+Cloud is on standby. Hard-tier cluster rescan (PR #353) confirmed
+the individual-target approach is the right shape — don't queue
+cluster pilots.
 
 ### Closed briefs (reference)
 
