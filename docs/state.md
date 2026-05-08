@@ -8,12 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 evening, post-brief-046-fully-drained
-+ post-badge-fix. Main tip is `91afddf` after PR #348 (combined
-badge formula + workflow direct-push fix). Medium tier **80.1%**,
-easy **81.7%**, hard **1.1%** (got a +28 bump from brief 046's
-small-thunk matches). Briefs 047 (decomper hard-tier pilot) +
-048 (cloud push-r0 wall research) queued.
+**Last updated:** 2026-05-08 evening, post-briefs-047/048 — first
+hard-tier pilot landed clean (15/15 = 100%) and push-r0 wall
+flipped to coercible (C-12). Main tip after PRs #350 + #351.
+Hard tier **1.3%**, medium **80.1%**, easy **81.7%**. Decomper
+has 2 self-extends remaining on brief 047 with push-r0 eligibility
+added.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -50,7 +50,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 95 | 8262 | 8357 | **1.1%** | **+28** |
+| `hard` | 110 | 8247 | 8357 | **1.3%** | **+43** |
 
 **Cluster yield track record** through brief 029:
 
