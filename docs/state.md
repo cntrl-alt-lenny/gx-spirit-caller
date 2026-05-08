@@ -8,11 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 mid-morning, post-brief-039. Main
-tip is `6f0ca1d` after PR #330 (cloud, brief 039 — `dsd lcf`
-post-process patch, **brain-verified end-to-end via brief 038's
-reproducer**). Style A unblock chain end-to-end working. Brief
-040 (decomper retry of brief 038's 11 targets) queued.
+**Last updated:** 2026-05-08 late-morning, post-brief-040. Main
+tip is `6c8c69a` after PR #332 (decomper, brief 040 — **7 matches
+at 64%** via the now-working `.legacy.c` pipeline). First Style A
+matches landed; medium tier moved 60.3% → 64.7%. Brief 041
+(decomper, wave 3) + brief 042 (cloud, W-A..W-D wall write-up)
+queued.
 
 **Style A unblock chain complete:**
 
@@ -39,7 +40,7 @@ post-#311):
 | `easy` | 905 | 205 | 1110 | **81.5%** | **+558** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
-| `medium` | 94 | 62 | 156 | 60.3% | — |
+| `medium` | 101 | 55 | 156 | **64.7%** | **+7** |
 | `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
 
 **Cluster yield track record** through brief 029:

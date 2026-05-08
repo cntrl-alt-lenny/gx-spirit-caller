@@ -313,17 +313,30 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/040-medium-tier-wave-2-retry.md`](docs/briefs/040-medium-tier-wave-2-retry.md)
-  — `decomper`: retry brief 038 with the now-working Style A
-  pipeline (brief 036 diagnosis + brief 037 routing + brief 039
-  link-step fix). Same 11 IRQ-bracket targets from brief 034.
-  Brain ran the smoke test reproducer end-to-end before merging
-  brief 039; routing chain confirmed working. Target ≥6 matches
-  (high-confidence top 6 from brief 034 partial scores). Branch:
-  `decomper/medium-tier-wave-2-retry`.
+- [`docs/briefs/041-medium-tier-wave-3.md`](docs/briefs/041-medium-tier-wave-3.md)
+  — `decomper`: continue medium-tier work past brief 040's seed
+  list. Pick fresh candidates, mix Style A (`.legacy.c`) and
+  Style B (default) per disassembly. Skip brief 040's 4 W-A..W-D
+  blocked targets (brief 042 territory). Self-extend clause
+  active: up to 2 follow-up waves without a fresh brief. Branch:
+  `decomper/medium-tier-wave-3`.
+- [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
+  — `cloud`: document the 4 new walls (W-A..W-D) brief 040
+  surfaced into `docs/research/codegen-walls.md`. For W-A and
+  W-B specifically, attempt sp2p3 coercion variations — if any
+  work, flag as coercible-with-knowledge so future briefs
+  unblock those targets. Medium priority; decomper isn't
+  blocked on this. Branch: `cloud/codegen-walls-w-abcd`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/040-medium-tier-wave-2-retry.md`](docs/briefs/040-medium-tier-wave-2-retry.md)
+  `decomper`, shipped in PR #332. **7 byte-identical matches
+  (64% yield)** via the now-working `.legacy.c` pipeline. First
+  validation of the Style A unblock chain end-to-end. Source-
+  shape lessons captured: twin functions can want opposite C
+  shapes; `unsigned short` return type controls halfword extend
+  emission. 4 walls (W-A..W-D) documented for brief 042.
 - [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
   `cloud`, shipped in PR #330. `tools/patch_objects_legacy.py`
   post-process script + 20 unit tests. Chained into the lcf
