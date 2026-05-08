@@ -453,7 +453,18 @@ def main():
         # our .o-level sh_addralign=2 back to 4 at link time,
         # defeating the Thumb-thunk fix. See PR #115 bisect and
         # docs/research/thumb-align-wall.md.
+        #
+        # Also chained: `patch_objects_legacy.py`. dsd lcf strips
+        # `.legacy.` from objects.txt entries while preserving the
+        # full filename in arm9.lcf, breaking mwldarm's link step
+        # for every `.legacy.c`-routed TU (brief 037 → brief 038
+        # escalation → brief 039 fix). The patcher rewrites
+        # `func_X.o` → `func_X.legacy.o` post-emit. No-op on
+        # default `.c` files; idempotent. See
+        # docs/research/style-a-epilogue.md for the dual-compiler
+        # context.
         patch_lcf = "tools/patch_lcf_arm9_align.py"
+        patch_objects = "tools/patch_objects_legacy.py"
         n.rule(
             name="lcf",
             # v0.11+ `dsd lcf` writes to conventional paths under the build dir:
@@ -461,6 +472,9 @@ def main():
             command=(
                 f"{DSD} lcf -c $config_path"
                 f" && {PYTHON} {patch_lcf} $lcf_file"
+                f" && {PYTHON} {patch_objects}"
+                f" --config-dir $config_dir"
+                f" --objects $objects_file"
             ),
         )
         n.newline()
@@ -804,11 +818,16 @@ def add_delink_and_lcf_builds(n: ninja_syntax.Writer, project: Project):
     objects_file = project.arm9_objects_txt()
     n.build(
         inputs=project.delinks_files + [rom_config],
-        implicit=[DSD, "tools/patch_lcf_arm9_align.py"],
+        implicit=[
+            DSD,
+            "tools/patch_lcf_arm9_align.py",
+            "tools/patch_objects_legacy.py",
+        ],
         rule="lcf",
         outputs=[str(lcf_file), str(objects_file)],
         variables={
             "config_path": str(project.arm9_config_yaml()),
+            "config_dir": str(project.game_config),
             "lcf_file": str(lcf_file),
             "objects_file": str(objects_file),
         },
