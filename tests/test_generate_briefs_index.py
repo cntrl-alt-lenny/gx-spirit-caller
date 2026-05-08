@@ -18,6 +18,7 @@ sys.path.insert(0, str(_TOOLS))
 from generate_briefs_index import (  # noqa: E402
     BRIEFS_DIR,
     INDEX_PATH,
+    _truncate_balanced,
     parse_brief,
     render_index,
 )
@@ -123,6 +124,55 @@ class TestRenderIndex(unittest.TestCase):
             if "001-foo.md" in line
         )
         self.assertLess(len(goal_line), 300)
+
+
+class TestTruncateBalanced(unittest.TestCase):
+    """Pin the balanced-truncation helper. Markdownlint MD038 flags
+    unclosed backtick code spans inside table cells; the helper walks
+    back to a balanced state to avoid the false alarm. Mirror of the
+    research-index helper's tests in
+    `tests/test_generate_research_index.py` — kept in sync by
+    convention."""
+
+    def test_short_string_passthrough(self):
+        self.assertEqual(_truncate_balanced("short", 100), "short")
+
+    def test_simple_truncation_keeps_balance(self):
+        s = "no backticks here, just regular text " * 10
+        out = _truncate_balanced(s, 50)
+        self.assertTrue(out.endswith("..."))
+        self.assertLessEqual(len(out), 50)
+        self.assertEqual(out.count("`"), 0)
+
+    def test_truncation_preserves_balanced_backticks(self):
+        # Cut would land mid-codespan; helper walks back to keep the
+        # backticks balanced.
+        s = "abc `defghij` xxxxxxxxxx `unclosed_at_cut_xxxxxxxxxxxxxx"
+        out = _truncate_balanced(s, 30)
+        self.assertTrue(out.endswith("..."))
+        self.assertEqual(out.count("`") % 2, 0)
+
+    def test_drops_trailing_open_bracket(self):
+        s = "ab [link-text-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        out = _truncate_balanced(s, 7)
+        self.assertNotIn("[...", out)
+        self.assertTrue(out.endswith("..."))
+
+    def test_brief_017_unbalanced_backtick_repro(self):
+        # Concrete regression case from docs/briefs/017-cluster-prop-
+        # 020085d4.md's goal — pre-fix output truncated to
+        # "... `propagate_template`'s missing `--substitute..."
+        # leaving 5 backticks (unclosed code span). Helper walks back
+        # past the dangling backtick.
+        s = (
+            "Round 3 of the cluster-propagation pilot. Pick the cluster "
+            "the decomper's brief 016 PR explicitly recommended: an "
+            "**offset-0, no-literal anchor**, where `propagate_template`'s "
+            "missing `--substitute-name flag forced the wave to fall back "
+            "to manual cloning."
+        )
+        out = _truncate_balanced(s, 200)
+        self.assertEqual(out.count("`") % 2, 0)
 
 
 class TestCommittedIndexIsCurrent(unittest.TestCase):

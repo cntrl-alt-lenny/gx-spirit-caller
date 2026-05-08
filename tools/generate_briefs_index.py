@@ -30,6 +30,35 @@ INDEX_PATH = BRIEFS_DIR / "README.md"
 BRIEF_FILENAME_RE = re.compile(r"^(\d{3})-(.+)\.md$")
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 GOAL_LABEL = "**Goal:**"
+GOAL_MAX_CHARS = 200
+
+
+def _truncate_balanced(s: str, max_chars: int) -> str:
+    """Truncate `s` to at most `max_chars` characters with `...`,
+    walking back if needed so the result has balanced backtick code
+    spans. Markdownlint's MD038 flags an unclosed backtick because
+    it treats the rest of the line as an open code span; balanced
+    truncation avoids the false alarm. Also drops any trailing `[`,
+    `(`, or `_` so we don't leave a half-open markdown construct.
+
+    Mirror of `tools/generate_research_index.py`'s helper of the same
+    name; kept in sync by convention. If a third caller appears,
+    factor into a shared module.
+    """
+    if len(s) <= max_chars:
+        return s
+    cut = max_chars - 3
+    candidate = s[:cut].rstrip()
+    while candidate and candidate.count("`") % 2 == 1:
+        # Find the previous backtick and cut there. Drop the trailing
+        # backtick too — that leaves a clean closing-backtick boundary.
+        last = candidate.rfind("`")
+        if last < 0:
+            break
+        candidate = candidate[:last].rstrip()
+    while candidate and candidate[-1] in "[(_":
+        candidate = candidate[:-1].rstrip()
+    return candidate + "..."
 
 
 def parse_brief(path: Path) -> dict | None:
@@ -90,9 +119,11 @@ def render_index(briefs: list[dict]) -> str:
     ]
     for b in briefs:
         # Markdown table cells: collapse pipes and newlines, trim length.
+        # `_truncate_balanced` keeps backtick code spans paired so the
+        # rendered output passes MD038 even when the cut-point lands
+        # inside a `code-span`.
         goal = b["goal"].replace("|", "\\|").replace("\n", " ")
-        if len(goal) > 200:
-            goal = goal[:197].rstrip() + "..."
+        goal = _truncate_balanced(goal, GOAL_MAX_CHARS)
         link = f"[`{b['heading']}`]({b['filename']})"
         lines.append(f"| {b['number']} | {link} | {goal} |")
 
