@@ -1721,3 +1721,11 @@ src/overlay002/func_ov002_02240ee4.c:
 src/overlay002/func_ov002_0229e844.c:
     complete
     .text start:0x0229e844 end:0x0229e85c
+
+src/overlay002/func_ov002_0227adb8.c:
+    complete
+    .text start:0x0227adb8 end:0x0227adcc
+
+src/overlay002/func_ov002_022a8c90.c:
+    complete
+    .text start:0x022a8c90 end:0x022a8ca8
