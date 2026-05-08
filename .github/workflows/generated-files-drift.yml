@@ -6,8 +6,9 @@ name: Generated files drift
 # without re-running the regenerator.
 #
 # Currently gates:
-#   docs/tools-index.md   ← tools/generate_tool_index.py
-#   docs/briefs/README.md ← tools/generate_briefs_index.py
+#   docs/tools-index.md     ← tools/generate_tool_index.py
+#   docs/briefs/README.md   ← tools/generate_briefs_index.py
+#   docs/research/README.md ← tools/generate_research_index.py
 #
 # Does NOT gate assets/progress-heatmap.svg — its committed form is
 # generated from `report.json` (post-`ninja report`, requires baserom),
@@ -24,6 +25,9 @@ on:
       # briefs-index regenerates from filenames + first-paragraph
       # parsing of every docs/briefs/NNN-*.md.
       - 'docs/briefs/**.md'
+      # research-index regenerates from H1 + first-paragraph
+      # parsing of every docs/research/*.md.
+      - 'docs/research/**.md'
       - '.github/workflows/generated-files-drift.yml'
 
 permissions:
@@ -49,3 +53,6 @@ jobs:
 
       - name: Check briefs-index drift
         run: python tools/generate_briefs_index.py --check
+
+      - name: Check research-index drift
+        run: python tools/generate_research_index.py --check
