@@ -8,12 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 evening, post-briefs-047/048 — first
-hard-tier pilot landed clean (15/15 = 100%) and push-r0 wall
-flipped to coercible (C-12). Main tip after PRs #350 + #351.
-Hard tier **1.3%**, medium **80.1%**, easy **81.7%**. Decomper
-has 2 self-extends remaining on brief 047 with push-r0 eligibility
-added.
+**Last updated:** 2026-05-08 night, post-wave-8 + cluster-rescan
+verdict. Main tip after PRs #354 + #353. Hard tier **1.5%**;
+2 self-extends consumed → 1 remaining on brief 047. C-12 push-r0
+pool fully drained (W-E exhausted in wave 8 first try).
+
+Cloud's hard-tier cluster rescan landed verdict: don't queue
+cluster pilots. Compounding is happening at the
+`find_shape_templates` layer, not cluster-anchor. Brief 047's
+individual-target approach stays the canonical workflow.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -50,7 +53,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 110 | 8247 | 8357 | **1.3%** | **+43** |
+| `hard` | 125 | 8232 | 8357 | **1.5%** | **+58** |
 
 **Cluster yield track record** through brief 029:
 
