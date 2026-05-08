@@ -25,9 +25,12 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
+  # Serialise so two pushes in quick succession don't race.
+  # cancel-in-progress is false because the second run is idempotent
+  # — letting it complete is fine, and avoids "ran but nothing
+  # happened" gaps in the action log.
   group: progress-badge
   cancel-in-progress: false
 
@@ -36,6 +39,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Fetch with full history so the push doesn't reject as
+          # non-fast-forward when a sibling commit lands between
+          # checkout and push.
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
         with:
@@ -45,31 +54,47 @@ jobs:
         id: update
         run: |
           python tools/update_progress_badge.py --version eur
-          # Capture whether README actually changed.
           if git diff --quiet README.md; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open PR with badge update
+      - name: Push badge update directly to main
         if: steps.update.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bot/progress-badge
-          delete-branch: true
-          commit-message: "chore: update README progress badge"
-          title: "chore: update README progress badge"
-          body: |
-            Automated badge refresh from `tools/update_progress_badge.py`.
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # `[skip ci]` keeps the workflow from re-triggering itself on
+          # the README path filter — defensive belt-and-braces; GitHub's
+          # default workflow-token-push-doesn't-trigger-workflows rule
+          # already covers this, but the marker makes the intent explicit
+          # in the commit log.
+          MSG="chore: update README progress badge [skip ci]"
 
-            Triggered by changes under `config/**/symbols.txt` (or a scheduled
-            run / manual dispatch). The script reads `tools/progress.py --json`
-            and rewrites the `img.shields.io/badge/Progress-...` URL in
-            `README.md`.
+          # Rebase-on-failure retry: if main moves between checkout
+          # and push, reset to the new tip, recompute the badge, and
+          # retry. Bounded to 3 attempts so a fully-broken state can
+          # still fail the workflow rather than spin forever.
+          for attempt in 1 2 3; do
+            git add README.md
+            git commit -m "$MSG"
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            # Push rejected — main moved. Reset to its new tip and
+            # recompute. If the badge is already correct on the new
+            # tip, the next iteration's `git diff --quiet` will be
+            # clean and we exit 0 with no push needed.
+            git fetch origin main
+            git reset --hard origin/main
+            python tools/update_progress_badge.py --version eur
+            if git diff --quiet README.md; then
+              echo "main already has the correct badge after rebase; nothing to do"
+              exit 0
+            fi
+          done
 
-            Safe to merge if the diff is the badge URL only.
-          labels: |
-            automation
-            docs
+          echo "failed to push after 3 attempts"
+          exit 1
