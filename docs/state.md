@@ -8,12 +8,21 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 afternoon, post-briefs-045/046.
-Main tip after PRs #342 (decomper, +6 matches across all 3 tiers)
-and #341 (cloud, autonomous T-3-shipped docs cleanup). Medium
-tier **78.2%**, easy **81.7%**. Three-tier compiler architecture
-fully live and validated — decomper has 2 self-extends remaining
-for medium-tier wave 6+.
+**Last updated:** 2026-05-08 evening, post-brief-046-fully-drained
++ post-badge-fix. Main tip is `91afddf` after PR #348 (combined
+badge formula + workflow direct-push fix). Medium tier **80.1%**,
+easy **81.7%**, hard **1.1%** (got a +28 bump from brief 046's
+small-thunk matches). Briefs 047 (decomper hard-tier pilot) +
+048 (cloud push-r0 wall research) queued.
+
+**Badge bug resolved (PR #348):** the progress badge showed 0.39%
+all day while real EUR code-byte progress was 1.18%. Two bugs:
+(1) compute_pct used `(matched_code+matched_data)/(total_code+
+total_data)` with `matched_data=0` and `total_data=4.7MB` dragging
+the ratio 3× low; (2) workflow opened PR #294 and waited for a
+human merge that never came. Fixed both: code-only formula, push
+direct to main with `[skip ci]` + retry. Workflow will keep itself
+fresh going forward.
 
 **Style A unblock chain complete:**
 
@@ -40,8 +49,8 @@ post-#311):
 | `easy` | 907 | 203 | 1110 | **81.7%** | **+560** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
-| `medium` | 122 | 34 | 156 | **78.2%** | **+28** |
-| `hard` | 67 | 8290 | 8357 | 0.8% | +31 |
+| `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
+| `hard` | 95 | 8262 | 8357 | **1.1%** | **+28** |
 
 **Cluster yield track record** through brief 029:
 
