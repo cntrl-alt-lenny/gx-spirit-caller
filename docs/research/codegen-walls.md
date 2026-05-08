@@ -10,28 +10,30 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **20 distinct mwcc-vs-baserom codegen
-divergences** account for the **51 dropped matches across the
-seven pilots** (020 / 022 / 028 / 029 / 030 / 031 / 040). Most
-fall into one of three buckets: **coercible-with-knowledge**
-(9 patterns — the right C variation matches; future briefs can
-grep here first), **permanent** (8 patterns — mwcc keeps
-"winning" the codegen choice regardless of C variation; budget
-zero matches in the yield band), and **tooling-tractable**
-(3 patterns — `propagate_template` could ship a register-
-renaming or literal-substitution variant — T-1, T-2 still
-proposed; T-3 third compiler routing tier **shipped in PR #340**
-via brief 045). Brief 031's HIGH 78% under-delivery (22%) was
-dominated by 2-3 walls (r2-vs-r3 spill on swap thunks,
-pool-load vs add-imm chain, ldmib fusion) that all sit in the
-*permanent* bucket. Brief 040's 4 drops surfaced a third
-compiler flavour (mwcc 1.2/sp3) that the project's two-tier
-routing didn't reach — now reached via the
-`*.legacy_sp3.c` convention; see T-3. The full table of
-patterns + the per-PR dropped-symbol cross-reference is below;
-future pilots that hit a partial-match shape should grep the
-*Permanent* and *Coercible* sections first before iterating
-on C variations.
+**Short answer:** **22 distinct mwcc-vs-baserom codegen
+divergences** account for the **51+ dropped matches across the
+seven pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040;
+the per-PR cross-reference table below covers these; brief 046
+waves 5–6 added two new C-N coercions documented in C-10 / C-11
+but not yet folded into the per-PR drop table). Most fall into
+one of three buckets: **coercible-with-knowledge** (11 patterns
+— the right C variation matches; future briefs can grep here
+first), **permanent** (8 patterns — mwcc keeps "winning" the
+codegen choice regardless of C variation; budget zero matches
+in the yield band), and **tooling-tractable** (3 patterns —
+`propagate_template` could ship a register-renaming or
+literal-substitution variant — T-1, T-2 still proposed; T-3
+third compiler routing tier **shipped in PR #340** via brief
+045). Brief 031's HIGH 78% under-delivery (22%) was dominated
+by 2-3 walls (r2-vs-r3 spill on swap thunks, pool-load vs
+add-imm chain, ldmib fusion) that all sit in the *permanent*
+bucket. Brief 040's 4 drops surfaced a third compiler flavour
+(mwcc 1.2/sp3) that the project's two-tier routing didn't reach
+— now reached via the `*.legacy_sp3.c` convention; see T-3.
+The full table of patterns + the per-PR dropped-symbol
+cross-reference is below; future pilots that hit a partial-match
+shape should grep the *Permanent* and *Coercible* sections first
+before iterating on C variations.
 
 ## Method
 
@@ -65,7 +67,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (9 patterns)
+## Coercible-with-knowledge (11 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -513,6 +515,120 @@ coercion + verified byte-identical. **How brief 040 missed
 it:** decomper iterated on the C variant *body* (changing
 the `<` to `!=`, etc.) without reconsidering the local
 declaration's `= 0` initialiser.
+
+### C-10. Late-return early-zero: invert the null-check
+
+**Target asm:** the function has **two separate epilogue pops** —
+one at the end of the main success-path, one at a late "return
+0" basic block that the early-null-check branches into. mwcc
+emits these as two distinct `pop {regs, pc}` sequences; nothing
+shared.
+
+**mwcc emits when miscoded** (sharing the epilogue with the
+main return):
+
+```c
+/* breaks: mwcc shares the early-return pop with the main
+   return because the success-path lands at the same merged
+   epilogue block. */
+int f(T *p) {
+    if (p == 0) return 0;
+    /* main work */
+    return 1;
+}
+```
+
+mwcc with this shape produces a single shared epilogue. Target
+ROM has two separate pops.
+
+**C that coerces it (verified byte-identical):**
+
+```c
+int f(T *p) {
+    if (p != 0) {
+        /* main work */
+        return 1;
+    }
+    return 0;
+}
+```
+
+The inverted test pulls the early-zero `return 0;` to the END
+of the C source, after the main work. mwcc's epilogue layout
+follows the source order: a return-at-the-end gets its own
+`pop` block; a return-at-the-front-after-an-early-check shares
+with the main return.
+
+**Use when:** target has two separate `pop {regs, pc}` blocks
+where one is the "null path" return-zero and the other is the
+"success path" return-N. The conventional `if (p == 0) return
+0; ...; return 1;` shape merges them; **inverting the test**
+splits them.
+
+**Provenance:** brief 046 wave 5 (PR #342) dropped
+`func_0200b06c` because the conventional null-check shape
+shared epilogues; brief 046 wave 6 (PR #345) re-attempted with
+the inverted test and matched byte-identically. **How brief 046
+missed it on first pass:** the "guard then work" mental model
+maps naturally to `if (p == 0) return 0; ...` — the inverted
+form reads as a slightly-awkward "do the work conditionally"
+rephrase but produces the right epilogue shape.
+
+### C-11. Return arg, not literal, for predicated `ldmeqia`
+
+**Target asm:** the function has a predicated single-instruction
+pop that uses the cmp's already-zero r0 directly:
+
+```text
+cmp r0, #0
+ldmeqia sp!, {regs, pc}    ; predicated pop; r0 == 0 already, no mov needed
+... main path ...
+```
+
+i.e. when the if-condition is true, mwcc emits NO explicit
+`mov r0, #0` before the pop — because r0 is already 0 from the
+test. The pop instruction itself carries the predicate.
+
+**mwcc emits when miscoded** (extra `mov r0, #0`):
+
+```c
+int f(int x, ...) {
+    if (x == 0) return 0;        /* breaks: extra mov r0, #0 */
+    /* main work */
+    return 1;
+}
+```
+
+mwcc treats the literal `0` as a fresh value to materialise,
+emitting `mov r0, #0; pop {...}` (2 instructions) where target
+has the single predicated pop.
+
+**C that coerces it (verified byte-identical):**
+
+```c
+int f(int x, ...) {
+    if (x == 0) return x;        /* matches: predicated ldmeqia */
+    /* main work */
+    return 1;
+}
+```
+
+Returning `x` exploits the fact that *x is provably 0 in this
+branch* — mwcc's optimiser recognises the equivalence and
+collapses the move. For pointer args, `return (int)p;` works
+the same way (pointer-zero compares equal to integer-zero on
+NDS ABI).
+
+**Use when:** target has `cmp rN, #0; ldmXXia sp!, {..., pc}`
+or any other predicated single-instruction return that depends
+on the cmp's flags being preserved through the pop. The
+convention `return 0;` adds a redundant move; `return x;`
+removes it.
+
+**Provenance:** brief 046 wave 6 (PR #345) — 4 matches via
+this coercion: `func_02036298`, `func_0203c58c`,
+`func_0203c620`, `func_0203c638`. Decomper noted the lesson
+inline in the PR body.
 
 ## Permanent (8 patterns)
 
