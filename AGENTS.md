@@ -313,21 +313,20 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **2 self-extends remaining** on brief
-049's clause (yield criterion exceeded; 100% on the cap-raise
-test). Same selection rule **with two additions**:
+No open briefs. Decomper has **1 self-extend remaining** on brief
+049's clause (wave 11 = self-extend 1 at 89%; W-F pool exhausted).
+Same selection rule. **For the final self-extend, prefer cloud's
+15 surfaced candidates from PR #363** (post-w10 cluster rescan)
+— 2 fully-clean homogeneous-shape clusters + 13 misc per-target
+candidates. After the final self-extend, brain re-scopes.
 
-- **C-14 unblock for W-F** (per brief 050) — 2 immediate targets
-  `func_ov002_021fbba8`, `func_ov002_02243740`.
-- **Repeated-twin signal observed in wave 10** — cluster-pipeline-
-  reopen scan is a candidate cloud autonomous task; if cloud lands
-  it before decomper's next self-extend, decomper picks anchors
-  from there.
+**State note:** PR #363 found that the prior "easy-tier cluster
+pool drained" claim from brief 033 is stale — 110 easy-tier
+siblings now sit in propagation-eligible clusters post-corpus-
+growth. Worth a separate brain look at the next pivot.
 
-Cloud is on standby; suggested autonomous task is to re-run
-`find_pattern_clusters` against the now-~290+ matched corpus
-(brief 047 wave 9's recommendation #3 elevated to high-priority
-by wave 10's twin observations).
+Cloud is on standby; cluster-rescan deliverable shipped. May pick
+up smaller autonomous tasks per AGENTS.md.
 
 ### Closed briefs (reference)
 
