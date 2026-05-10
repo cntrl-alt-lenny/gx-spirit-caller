@@ -313,21 +313,29 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
-  — `decomper`: mixed-tier wave. Cloud's 4 remaining cluster-
-  rescan candidates from PR #363 + fresh hard-tier ≤ 0x28 mix.
-  Skip ov004 (brief 052 BSS-shift research). Self-extend
-  allowance: 2 follow-ups if yield ≥ 60%. Branch:
-  `decomper/mixed-wave-13`.
-- [`docs/briefs/052-wave-12-wall-investigations.md`](docs/briefs/052-wave-12-wall-investigations.md)
-  — `cloud`: three-part — (1) C-2 struct-copy refinement fold
-  (fast), (2) mvn-vs-sub peephole sweep (coercion classification),
-  (3) ov004 BSS layout shift investigation (potential dsd lcf
-  bug). Verdict on each drives follow-up briefs. Medium priority.
-  Branch: `cloud/wave-12-wall-investigations`.
+No open briefs. Decomper has **1 self-extend remaining** on brief
+051's clause (wave 13 = self-extend 1 at 88%; ov010 tail-call
+cluster fully drained). Same selection rule **with one addition**:
+C-15 (W-G mvn-vs-sub peephole, per brief 052) is now coercible —
+applies wherever the peephole bit decomper. After the final self-
+extend, brain re-scopes.
+
+Cloud is on standby; brief 052 fully shipped including ov004 BSS
+investigation. May pick up smaller autonomous tasks per AGENTS.md.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
+  `decomper`, shipped in PR #368. **14 byte-identical at 88%**
+  from the `func_ov010_021b4750` tail-call cluster (PR #363
+  separate-scope, 22 siblings). All 14 reclassify to easy
+  (82.7% → 84.0%).
+- [`docs/briefs/052-wave-12-wall-investigations.md`](docs/briefs/052-wave-12-wall-investigations.md)
+  `cloud`, shipped in PR #369. Three deliverables: C-2a
+  struct-copy refinement (cracks brief 022's historic
+  `func_0208904c` miss); **C-15 / W-G** mvn-vs-sub peephole
+  classified as routing-tractable; ov004 BSS investigation
+  documented.
 - [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
   `decomper`, full chain shipped across PRs #359 + #362 + #366
   (waves 10/11/12). **34 matches at ~87% combined yield.** Wave
