@@ -181,6 +181,17 @@ brief 044 (re-stated for convenience):
 | 1.2/sp2p3 | no r3-spill | `sub sp, #4` | `pop {regs, lr}; bx lr` |
 | **1.2/sp3** | **no r3-spill** | **`sub sp, #4`** | **`pop {regs, pc}`** |
 
+> **Pitfall (brief 049 self-extend 1 / wave 11 — PR #362).**
+> `sub sp, #4` is **necessary but not sufficient** for sp3
+> classification: both sp2p3 and sp3 emit it. The
+> disambiguating signal between sp2p3 and sp3 is the **pop
+> target** — `pop {regs, lr}; bx lr` (2-step) is sp2p3 (Style
+> A); `pop {regs, pc}` (1-step) is sp3. Wave 11 mis-routed
+> `func_020a6150` through `*.legacy_sp3.c` after seeing
+> `sub sp, #4`; re-routing through `*.legacy.c` fixed the
+> size mismatch immediately. Always read the epilogue first,
+> the prologue second.
+
 The original two-tier recommendation below is preserved for
 historical context; treat the brief 044/045 update as the
 current state of the routing.
