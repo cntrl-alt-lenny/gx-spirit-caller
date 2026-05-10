@@ -8,13 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 late-night, post-wave-9 (final brief
-047 self-extend) + autonomous tooling drift fix. Main tip after
-PRs #357 + #356. Hard tier **1.6%**. Brief 047 allowance fully
-expended (3 PRs, 41 matches at ~91% combined yield).
+**Last updated:** 2026-05-10 afternoon, post-wave-10 + brief 050.
+Main tip after PRs #359 + #360. Hard tier **1.8%**. Cap-raise to
+≤ 0x28 validated (100% yield in wave 10). C-14 (W-F r2-vs-r1
+reg-alloc) flipped coercible — 2 more unblocks queued.
 
-Briefs 049 (decomper hard-tier wave 10, size cap raised to 0x28)
-and 050 (cloud, fold C-13 + research W-F r2-reg-alloc wall) queued.
+Decomper has 2 self-extends remaining on brief 049 + C-14 unblocks.
+Cloud's suggested autonomous task is the cluster-pipeline-reopen
+scan (wave 10's twin signal elevated it from "consider" to
+"high-priority").
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -51,7 +53,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 136 | 8221 | 8357 | **1.6%** | **+69** |
+| `hard` | 151 | 8206 | 8357 | **1.8%** | **+84** |
 
 **Cluster yield track record** through brief 029:
 
