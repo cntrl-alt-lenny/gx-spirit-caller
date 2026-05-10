@@ -1729,3 +1729,31 @@ src/overlay002/func_ov002_0227adb8.c:
 src/overlay002/func_ov002_022a8c90.c:
     complete
     .text start:0x022a8c90 end:0x022a8ca8
+
+src/overlay002/func_ov002_021b41e8.c:
+    complete
+    .text start:0x021b41e8 end:0x021b4204
+
+src/overlay002/func_ov002_021ba9e8.c:
+    complete
+    .text start:0x021ba9e8 end:0x021baa04
+
+src/overlay002/func_ov002_021c8470.legacy_sp3.c:
+    complete
+    .text start:0x021c8470 end:0x021c848c
+
+src/overlay002/func_ov002_021c848c.legacy_sp3.c:
+    complete
+    .text start:0x021c848c end:0x021c84a8
+
+src/overlay002/func_ov002_021c84a8.legacy_sp3.c:
+    complete
+    .text start:0x021c84a8 end:0x021c84c4
+
+src/overlay002/func_ov002_021c84c4.legacy_sp3.c:
+    complete
+    .text start:0x021c84c4 end:0x021c84e0
+
+
+
+
