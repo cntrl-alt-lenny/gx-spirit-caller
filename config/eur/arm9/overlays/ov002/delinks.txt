@@ -1765,3 +1765,15 @@ src/overlay002/func_ov002_021fbba8.c:
 src/overlay002/func_ov002_02243740.c:
     complete
     .text start:0x02243740 end:0x0224375c
+
+src/overlay002/func_ov002_022644fc.c:
+    complete
+    .text start:0x022644fc end:0x02264510
+
+src/overlay002/func_ov002_022ac028.c:
+    complete
+    .text start:0x022ac028 end:0x022ac03c
+
+src/overlay002/func_ov002_022a51cc.c:
+    complete
+    .text start:0x022a51cc end:0x022a51e0
