@@ -10,14 +10,18 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **23 distinct mwcc-vs-baserom codegen
-divergences** account for the **51+ dropped matches across the
-seven pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040;
-the per-PR cross-reference table below covers these; brief 046
-waves 5–7 added three new C-N coercions documented in C-10 /
-C-11 / C-12 but not yet folded into the per-PR drop table).
-Most fall into one of three buckets: **coercible-with-knowledge**
-(12 patterns — the right C variation matches; future briefs
+**Short answer:** **25 distinct mwcc-vs-baserom codegen
+divergences** account for the **55+ dropped matches across the
+eight pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+047-wave9; the per-PR cross-reference table below covers
+these; brief 046 waves 5–7 added three new C-N coercions
+documented in C-10 / C-11 / C-12; brief 047 wave 9 surfaced
+**C-13** (predicated if-X order) — fold-only, the research
+already happened in the wave PR — and **W-F** (r2-vs-r1
+cmp-scratch reg-alloc) which brief 050's research classified
+as **C-14** (2-arg pass-through coercion). Most fall into one
+of three buckets: **coercible-with-knowledge**
+(14 patterns — the right C variation matches; future briefs
 can grep here first), **permanent** (8 patterns — mwcc keeps
 "winning" the codegen choice regardless of C variation; budget
 zero matches in the yield band), and **tooling-tractable**
@@ -60,7 +64,8 @@ Source-PR coverage:
 | 030   | 313 | 71.4% |     10  |       4 |
 | 031   | 315 | 22.2% |      2  |       7 |
 | 040   | 332 | 63.6% |      7  |       4 |
-| —     | —   |   —   | **111** |  **51** |
+| 047/wave9 | 357 | 73.3% |  11  |       4 |
+| —     | —   |   —   | **122** |  **55** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -68,7 +73,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (12 patterns)
+## Coercible-with-knowledge (14 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -740,6 +745,201 @@ unmatched-gap-functions corpus — only `func_02093294` and
 two one-off matches via the inline-asm recipe above are the
 right scope.
 
+### C-13. Predicated if-X order — source order controls emission
+
+**Target asm (`func_ov002_021b41e8`, brief 047 wave 9):** both
+branches of the conditional are predicated, sharing the same
+epilogue. The two predicated instructions are emitted in a
+specific order:
+
+```text
+
+stmdb sp!, {r3, lr}
+ldrh   r0, [r0, #0xa]
+bl     func_ov002_021b3c10
+cmp    r0, #0x0
+ldrneh r0, [r0, #0x4]      ; ne-path FIRST
+mvneq  r0, #0x0             ; eq-path SECOND
+ldmia  sp!, {r3, pc}
+
+```
+
+The `ldrneh` (non-zero return-`r[2]`) appears BEFORE the `mvneq`
+(zero return-`-1`).
+
+**mwcc emits when miscoded** (swapped order from natural C
+phrasing):
+
+```c
+/* breaks: mwcc emits mvneq first, ldrneh second */
+int f(unsigned short *p) {
+    unsigned short *r = (unsigned short *)helper(p[5]);
+    if (r == 0) return -1;       /* eq-path first in source */
+    return r[2];                  /* ne-path second */
+}
+```
+
+mwcc walks the if/return blocks in **source order** when both
+branches collapse to a single predicated instruction. The
+"natural" guard-then-fallthrough phrasing emits the predicated
+ops in eq-then-ne order; target ROM has them in ne-then-eq.
+
+**C that coerces it (verified byte-identical):**
+
+```c
+extern void *helper(unsigned short key);
+
+int f(unsigned short *p) {
+    unsigned short *r = (unsigned short *)helper(p[5]);
+    if (r != 0) return r[2];      /* ne-path first → ldrneh first */
+    return -1;                     /* eq-path second → mvneq second */
+}
+```
+
+Inverting the if-condition pulls the ne-path into the source's
+first position, which mwcc emits as the first predicated
+instruction.
+
+**Use when:** target has TWO predicated instructions sharing a
+single epilogue (no separate `pop` blocks — distinct from
+C-10), and the predicated-instruction order doesn't match the
+natural C phrasing. Re-order the C source so the if-condition
+matches the target's first predicated-op condition.
+
+**How C-13 differs from C-10.** C-10 is about **two separate
+`pop {regs, pc}` blocks** (the early-return branches off into
+its own basic block before the main return); C-13 is about
+**one shared epilogue** with two predicated instructions ahead
+of it. Different structural problem — same "invert the test"
+fix at the source level. When the target has two pops, look at
+C-10; when the target has predicated ops sharing one pop, look
+at C-13.
+
+**Provenance:** brief 047 wave 9 (PR #357) — the worked
+example is `func_ov002_021b41e8`. Decomper noted the lesson
+inline:
+> when both branches are predicated, source order of the
+> if-blocks determines emitted instruction order.
+
+Folded here in brief 050.
+
+### C-14. 2-arg pass-through forces cmp-scratch off r1
+
+**Target asm (W-F, brief 047 wave 9 — `func_ov002_021fbba8` /
+`func_ov002_02243740`):** a tail-call-shaped function with a
+predicated early-return where the cmp temp uses **r2**, not
+the natural r1:
+
+```text
+
+stmdb  sp!, {r3, lr}
+ldr    r2, [r0, #0x14]    ; ← target picks r2 for cmp scratch
+cmp    r2, #0x0
+movne  r0, #0x1
+ldmneia sp!, {r3, pc}      ; predicated early-return-1
+bl     func_ov002_021f4a84
+ldmia  sp!, {r3, pc}
+
+```
+
+**mwcc emits when miscoded** (1-arg signature — natural shape):
+
+```c
+/* breaks: mwcc allocates r1 for the cmp scratch */
+extern int helper(T *p);
+int f(T *p) {
+    if (p->field != 0) return 1;
+    return helper(p);
+}
+```
+
+mwcc reg-allocator picks the lowest free scratch (r1) for a
+short-lived load-then-cmp temp when no other live value
+occupies it. **Verified across all 15 SPs in the toolchain
+(1.2/base..sp4 + 2.0/base..sp2p4) — every SP picks r1 for the
+natural 1-arg shape.** Decomper's first-pass attempt of
+adding an unused `int x` parameter also picks r1 because mwcc
+dead-codes the unused param.
+
+**C that coerces it (verified byte-identical, both targets):**
+
+```c
+extern int helper(T *p, int x);     /* declared 2-arg */
+
+int f(T *p, int x) {
+    if (p->field != 0) return 1;
+    return helper(p, x);             /* x flows through r1 */
+}
+```
+
+The trick is **using x at the helper call site**. mwcc must
+keep `x` (in r1 at function entry) live across the cmp because
+the bl needs r1 set; this excludes r1 from the scratch pool and
+the allocator picks r2 next.
+
+**If the helper is observably 1-arg** (asm shows it never reads
+r1) — declare it 1-arg and cast at the call site so the source
+doesn't carry an extern-declaration lie:
+
+```c
+extern int helper(T *p);             /* truthful 1-arg */
+
+int f(T *p, int x) {
+    if (p->field != 0) return 1;
+    return ((int(*)(T*, int))helper)(p, x);
+}
+```
+
+Both shapes emit the same caller bytes. Pick the one that
+matches the helper's actual signature in the rest of the
+codebase.
+
+**Variations that DON'T flip** (verified):
+
+- `int f(T *p, int unused) { ...return helper(p); }` — mwcc
+  dead-codes the unused param.
+- `int v = p->field; if (v != 0) ...` — explicit local doesn't
+  reserve a register.
+- `register int v asm("r2"); v = p->field; ...` — mwcc
+  syntactically accepts the GCC-style register-asm hint but
+  ignores it for ARM-mode codegen.
+- ternary form, inverted condition, `unsigned int` field,
+  `void *` field — all keep r1.
+
+**Use when:** target has 1-arg-shape `push {r3, lr}; ldr rN,
+[r0, #imm]; cmp rN, #0; mov?? r0, #imm; ldm??ia sp!, {r3, pc};
+bl helper; ldmia sp!, {r3, pc}` AND the load destination `rN`
+is r2 (not r1). The fix is **2-arg signature with int
+pass-through** to a 2-arg-or-cast helper call.
+
+**How brief 047 missed it.** Decomper's wave 9 PR explicitly
+flagged: *"Tried 2-arg signature (reserve r1) — didn't flip."*
+The miss was variant v12 above (unused `x`), not the
+pass-through variant — mwcc dead-codes unused params, so the
+2-arg signature alone doesn't reserve r1. Brief 050's sweep
+isolated the pass-through call as the necessary trigger.
+
+**Method (brief 050):** sweep tested 12 C variations against
+`func_ov002_021fbba8` and 15 mwcc SPs (1.2/base..sp4 +
+2.0/base..sp2p4) on the natural 1-arg shape. Every SP picked
+r1; only the 2-arg pass-through variation flipped to r2.
+Verified byte-identical for both targets at the asm-shape
+level (size 0x1c each, instruction sequence + register
+allocation match exactly, only the bl offset is
+reloc-dependent).
+
+**Provenance:** brief 047 wave 9 (PR #357) flagged the two
+targets as W-F provisional reg-alloc wall; brief 050 (this
+research) verified the 2-arg pass-through coercion.
+
+**Cross-corpus survey (brief 050):** 2 candidates from wave 9
+plus likely a small population of similar tail-call-thunk-with-
+early-return shapes in the unmatched-gap corpus. Decomper
+should grep for `ldr r2, [r0, #imm]; cmp r2, #0` in the
+unmatched-arm gap functions when picking next hard-tier
+targets — each surfacing of this asm shape is a C-14 unblock
+candidate.
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -1237,39 +1437,47 @@ shape we should chase".
 | 040 / 332  | `func_020467f4`           | T-3 (mwcc 1.2/sp3 routing — SHIPPED PR #340; brief 046 consumes) | tooling-tractable |
 | 040 / 332  | `func_02023fec`           | T-3 (Style B half — SHIPPED PR #340) + P-7 (pool dedup residual) | partial / permanent |
 | 040 / 332  | `func_ov000_021ac85c`     | P-8 (bit-chain reg-alloc) | permanent |
+| 047w9 / 357 | `func_ov002_02211808`    | P-1    | permanent  |
+| 047w9 / 357 | `func_ov002_0223fd10`    | P-1    | permanent  |
+| 047w9 / 357 | `func_ov002_021fbba8`    | C-14 (missed; 2-arg pass-through coercion — brief 050) | coercible |
+| 047w9 / 357 | `func_ov002_02243740`    | C-14 (missed; 2-arg pass-through coercion — brief 050) | coercible |
 
 ## Quantification
 
 ```
 
-By bucket (across 7 pilots: 020, 022, 028, 029, 030, 031, 040):
-  Permanent              :  34 drops (67%)
-  Coercible-but-missed   :   7 drops (14%)  ← future "should have matched"
-  Edge case              :   8 drops (16%)
+By bucket (across 8 pilots: 020, 022, 028, 029, 030, 031, 040,
+047-wave9):
+  Permanent              :  36 drops (65%)
+  Coercible-but-missed   :   9 drops (16%)  ← future "should have matched"
+  Edge case              :   8 drops (15%)
   Tooling-tractable      :   2 drops ( 4%)
 
 Top single wall:
-  P-1 (shift-pair collapse)         :  8 drops (16%)
-  P-4 (r2-vs-r3 swap)               :  4 drops ( 8%)
-  E-3 (Thumb)                       :  4 drops ( 8%)
-  P-6 (4-op predication threshold)  :  3 drops ( 6%)
-  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 8% — brief 040)
+  P-1 (shift-pair collapse)         : 10 drops (18%)
+  P-4 (r2-vs-r3 swap)               :  4 drops ( 7%)
+  E-3 (Thumb)                       :  4 drops ( 7%)
+  P-6 (4-op predication threshold)  :  3 drops ( 5%)
+  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 7% — brief 040)
+  C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 4% — brief 047 wave 9)
 
 ```
 
-**Read of the data:** roughly **14 % of dropped matches** in the
-7-pilot window were *coercible-but-missed* — the right C variation
-existed at the time and the decomper just didn't try it. (The
-share dropped from ~20% in the original brief-032 reading after
-brief 033 surfaced P-6's 4-op predication threshold and
-reclassified 3 historic C-1 drops to permanent; brief 042 then
-recovered W-A back into the coercible bucket via C-9.) The bucket
-is still the highest-leverage section of this doc: future pilots
-that spot a partial-match shape matching one of C-1 through C-9
-should lift the documented variation directly — but check C-1's
-*ARM-op limit* subsection first.
+**Read of the data:** roughly **16 % of dropped matches** in the
+8-pilot window were *coercible-but-missed* — the right C variation
+existed (or was discovered post-hoc by a follow-up cloud research
+brief) and the decomper just didn't try it. (The
+share moved from ~20% in the original brief-032 reading down to
+~14% after brief 033 surfaced P-6's 4-op predication threshold
+and reclassified 3 historic C-1 drops to permanent; brief 042
+recovered W-A via C-9; brief 048 recovered W-E via C-12; and
+brief 050 recovered W-F via C-14, bumping the share back to
+~16%.) The bucket is still the highest-leverage section of this
+doc: future pilots that spot a partial-match shape matching one
+of C-1 through C-14 should lift the documented variation directly
+— but check C-1's *ARM-op limit* subsection first.
 
-The other ~87% of drops are permanent walls or edge cases that
+The other ~84% of drops are permanent walls or edge cases that
 the cluster-pilot yield band should already account for. Brief
 023's calibration of MED 37% / HIGH 78% factored in the historic
 permanent-wall loss; that's why the predictions have been roughly
@@ -1283,11 +1491,15 @@ losses).
    inlining "Reg-alloc carryover" sections. Saves ~30 lines of
    PR body per pilot.
 2. **Decomper greps `coercible-with-knowledge` first** when a
-   partial-match drop looks familiar. Estimated ~14% of drops
+   partial-match drop looks familiar. Estimated ~16% of drops
    are wrongly classified as walls today (e.g. brief 040 W-A
-   was tagged "permanent" until brief 042 found C-9). When
-   stuck, also re-read the `prev = X` initialiser line — that's
-   what missed C-9 historically.
+   was tagged "permanent" until brief 042 found C-9; brief 047
+   wave 9 W-F was tagged "provisional reg-alloc wall" until
+   brief 050 found C-14). When stuck, also re-read the
+   `prev = X` initialiser line — that's what missed C-9
+   historically; for r2-vs-r1 cmp-scratch divergence, check
+   whether a 2-arg pass-through C source flips the allocator
+   (C-14).
 3. **Decomper, when routing through a compiler tier:** sanity-
    check the target's prologue/epilogue first.
    - `pop {regs, lr}; bx lr` (Style A 2-step) → `*.legacy.c`
