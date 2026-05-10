@@ -929,8 +929,12 @@ allocation match exactly, only the bl offset is
 reloc-dependent).
 
 **Provenance:** brief 047 wave 9 (PR #357) flagged the two
-targets as W-F provisional reg-alloc wall; brief 050 (this
-research) verified the 2-arg pass-through coercion.
+targets as W-F provisional reg-alloc wall; brief 050
+(PR #360) verified the 2-arg pass-through coercion at the
+asm-shape level; **brief 049 self-extend 1 / wave 11
+(PR #362) shipped both as byte-identical compiled-and-linked
+matches first try — C-14 transfers cleanly to fresh
+candidates.**
 
 **Cross-corpus survey (brief 050):** 2 candidates from wave 9
 plus likely a small population of similar tail-call-thunk-with-
@@ -938,7 +942,18 @@ early-return shapes in the unmatched-gap corpus. Decomper
 should grep for `ldr r2, [r0, #imm]; cmp r2, #0` in the
 unmatched-arm gap functions when picking next hard-tier
 targets — each surfacing of this asm shape is a C-14 unblock
-candidate.
+candidate. Wave 11's PR documented the canonical asm grep
+recipe:
+
+```text
+
+ldr   r2, [r0, #imm]
+cmp   r2, #0
+mov?? r0, #imm
+ldm??ia sp!, {r3, pc}
+bl    helper
+
+```
 
 ## Permanent (8 patterns)
 
@@ -1439,8 +1454,8 @@ shape we should chase".
 | 040 / 332  | `func_ov000_021ac85c`     | P-8 (bit-chain reg-alloc) | permanent |
 | 047w9 / 357 | `func_ov002_02211808`    | P-1    | permanent  |
 | 047w9 / 357 | `func_ov002_0223fd10`    | P-1    | permanent  |
-| 047w9 / 357 | `func_ov002_021fbba8`    | C-14 (missed; 2-arg pass-through coercion — brief 050) | coercible |
-| 047w9 / 357 | `func_ov002_02243740`    | C-14 (missed; 2-arg pass-through coercion — brief 050) | coercible |
+| 047w9 / 357 | `func_ov002_021fbba8`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
+| 047w9 / 357 | `func_ov002_02243740`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
 
 ## Quantification
 
