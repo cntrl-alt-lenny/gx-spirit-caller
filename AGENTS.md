@@ -313,14 +313,18 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **1 self-extend remaining** on brief
-047's clause (wave 8 = first self-extend, shipped 100% yield + the
-2 C-12 push-r0 unblocks). Same selection rule. After the final
-self-extend, brain re-scopes.
-
-Cloud is on standby. Hard-tier cluster rescan (PR #353) confirmed
-the individual-target approach is the right shape — don't queue
-cluster pilots.
+- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
+  — `decomper`: hard-tier wave 10 with size cap raised cautiously
+  to ≤ 0x28 (was ≤ 0x20; main-module pool drained at the lower
+  cap). Same routing-tier discriminator + push-r0 C-12 + skip
+  W-F (cloud's brief 050 territory). Self-extend allowance:
+  2 follow-ups if yield ≥ 60%. Branch: `decomper/hard-tier-wave-10`.
+- [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
+  — `cloud`: two-part — (1) fold **C-13** (predicated if-X order,
+  from wave 9) into codegen-walls.md, (2) research **W-F**
+  (r2-vs-r1 reg-alloc wall from wave 9). Verdict drives whether
+  brief 051 unblocks the 2 W-F targets. Medium priority.
+  Branch: `cloud/codegen-walls-c13-plus-r2-research`.
 
 ### Closed briefs (reference)
 
