@@ -10,13 +10,13 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **26 distinct mwcc-vs-baserom codegen
-divergences** account for the **59+ dropped matches across the
-nine pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
-047-wave9 / 049-wave12; the per-PR cross-reference table below
-covers these; brief 046 waves 5–7 added three new C-N
-coercions documented in C-10 / C-11 / C-12; brief 047 wave 9
-surfaced **C-13** (predicated if-X order) — fold-only, the
+**Short answer:** **27 distinct mwcc-vs-baserom codegen
+divergences** account for the **69+ dropped matches across the
+ten pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+047-wave9 / 049-wave12 / 051-wave14; the per-PR cross-reference
+table below covers these; brief 046 waves 5–7 added three new
+C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
+9 surfaced **C-13** (predicated if-X order) — fold-only, the
 research already happened in the wave PR — and **W-F**
 (r2-vs-r1 cmp-scratch reg-alloc) which brief 050's research
 classified as **C-14** (2-arg pass-through coercion); brief
@@ -24,9 +24,14 @@ classified as **C-14** (2-arg pass-through coercion); brief
 under C-2's existing entry as C-2a) and **W-G** (mvn-vs-sub
 peephole on flat thunks) which brief 052's research
 classified as **C-15** (legacy-tier routing — peephole is
-mwcc 2.0-only). Most fall into one
+mwcc 2.0-only); brief 051 wave 14 surfaced **W-H**
+(`ldr r1; bx r1` vs `ldr ip; bx ip` flat-thunk scratch
+choice) which brief 054's research classified as **C-16**
+(`asm void` + `nofralloc` inline-asm recipe — same shape as
+C-12), plus a **C-15-vs-P-1 taxonomy lesson** folded as a
+*Wall family note* under both entries. Most fall into one
 of three buckets: **coercible-with-knowledge**
-(15 patterns — the right C variation or routing tier
+(16 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
 (8 patterns — mwcc keeps "winning" the codegen choice
 regardless of C variation; budget zero matches in the yield
@@ -72,7 +77,8 @@ Source-PR coverage:
 | 040   | 332 | 63.6% |      7  |       4 |
 | 047/wave9 | 357 | 73.3% |  11  |       4 |
 | 049/wave12 | 366 | 73.3% | 11  |       4 |
-| —     | —   |   —   | **133** |  **59** |
+| 051/wave14 | 372 | 47.4% |  9  |      10 |
+| —     | —   |   —   | **142** |  **69** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -80,7 +86,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (15 patterns)
+## Coercible-with-knowledge (16 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1002,6 +1008,36 @@ candidates.**
 
 ### C-15. mwcc-2.0 peephole avoidance via legacy-tier routing for flat-thunk arg setup
 
+> **Wall family note — C-15 vs P-1.** Both walls superficially
+> look like 2-instruction → 1-instruction collapses, but they
+> target different mwcc optimisation passes and therefore have
+> opposite resolutions. Always check the *trigger* column
+> before applying a fix:
+>
+> | Wall | Pattern | Trigger | Fix |
+> |---|---|---|---|
+> | **C-15** (this entry) | `mvn r1, #0` (target) vs `sub r1, r0, #1` (mwcc) — *same insn count*, peephole on `(K, K±imm)` arg pair | **mwcc 2.0 only** (all 1.2/* SPs emit direct `mvn`) | Route through `*.legacy.c` (sp2p3) or `*.legacy_sp3.c` (sp3) |
+> | **P-1** (below) | `lsl rN, rN, #K; lsr rN, rN, #K` (target, *2 insns*) vs `and rN, rN, #mask` (mwcc, *1 insn*) — *different insn count*, mask collapse on zero-extend | **All mwcc SPs** (1.2/base..sp4 + 2.0/base..sp2p4) | **Permanent.** No coercion. Route doesn't help. |
+>
+> **The trap (brief 051 wave 14 / PR #372):** decomper saw 7
+> ov002 flat thunks with `lsl 16; lsr 16` halfword zero-extend
+> as the body and routed all 7 through `*.legacy.c` expecting
+> C-15's mwcc-2.0-only-peephole logic to apply. **All 7
+> collapsed to `and #0xffff` even on mwcc 1.2/sp2p3** — because
+> P-1 is shape-collapse, not peephole, and fires on every SP.
+> The 7 candidates correctly belong in the P-1 cross-reference
+> rows (permanent), not C-15.
+>
+> **Quick discriminator at the asm level:**
+>
+> - Target has **2 insns** that mwcc collapses to **1 insn**
+>   on a halfword/byte zero-extend (`lsl K; lsr K` or
+>   `(x << K) >> K` C source) → **P-1**, no fix.
+> - Target has **1 insn** that mwcc emits as a different
+>   **1 insn** (typical: `mvn` vs `sub` on `-1` from a
+>   set-zero-then-derive context) → **C-15**, route through
+>   1.2/* tier.
+
 **Target asm (`func_02054c64` — wave 12 W-G observation):**
 
 ```text
@@ -1127,6 +1163,126 @@ bl    helper
 
 ```
 
+### C-16. ldr-rN-vs-ldr-ip flat-thunk scratch via `asm void` + `nofralloc`
+
+(W-H in brief 054's research note classification — *this entry*.)
+
+**Target asm (`func_0209085c` — wave 14 W-H observation):** a
+3-instruction flat tail-call thunk that loads the helper
+pointer into a non-`ip` scratch register:
+
+```text
+
+ldr   r1, .L
+bx    r1
+.word func_020909b0
+
+```
+
+i.e. 3 insns (12 bytes / 0x0c) — same shape as C-15 / brief 047
+flat thunks, except the load destination is **r1**, not the
+mwcc-default **r12 (ip)**.
+
+**mwcc emits when miscoded** (every C variation tried, every SP):
+
+```text
+
+ldr   r12, .L              ; mwcc picks ip (r12) — intra-procedure scratch
+bx    r12
+.word func_020909b0
+
+```
+
+i.e. same 3 insns + .word, byte-equivalent EXCEPT the
+register field on the `ldr` and `bx` differs (`r12` vs `r1`).
+Single-byte divergence → byte-compare fails.
+
+**Method (brief 054).** Sweep tested:
+
+- 6 C variations (natural pass-through, void-arg, zero-arg
+  passthrough, function-pointer cast, function-pointer-of-
+  pointer, GCC-style `register int x asm("r1")`) — every shape
+  on mwcc 2.0/sp1p5 picks `r12` for the load destination.
+- All 15 mwcc SPs (1.2/base, sp2, sp2p3, sp3, sp4 + 2.0/base,
+  sp1, sp1p2, sp1p5, sp1p6, sp1p7, sp2, sp2p2, sp2p3, sp2p4)
+  on the natural pass-through C source — **every SP picks r12.**
+  No SP coerces by default.
+- The original ROM almost certainly used **inline asm** for
+  these wrappers — same logic as C-12 (push-r0 thunks) where
+  no C source can reach the asm shape.
+
+**C that coerces it (verified byte-identical against
+`func_0209085c`):**
+
+```c
+extern int func_helper(int);
+
+asm void func_target(int x) {
+    nofralloc
+    ldr r1, =func_helper
+    bx  r1
+}
+```
+
+Compiles via the **default `.c` rule (mwcc 2.0/sp1p5)** — no
+need for `*.legacy.c` routing (and `*.legacy.c` would actually
+fail; see the inline-asm-rule note below). The `nofralloc`
+directive disables mwcc's prologue/epilogue generation; the
+body is emitted verbatim. Verified byte-identical for
+`func_0209085c` (3 insns + .word = 12 bytes, register field
+matches).
+
+`asm int func_target(int x) { ... }` produces the exact same
+bytes — the `void` vs `int` choice depends on how the
+function's signature is declared elsewhere in the codebase.
+For tail-call thunks `asm void` is the cleaner reading
+(the function doesn't return in the C sense; it tail-jumps).
+
+**Inline-asm parser caveat (same as C-12):**
+
+- **`ldr r1, =label` requires DEFAULT `.c` routing
+  (mwcc 2.0/sp1p5).** mwcc 1.2/sp2p3 (the `.legacy.c` tier)
+  and mwcc 1.2/sp3 (the `.legacy_sp3.c` tier) **reject** the
+  `ldr rN, =symbol` mnemonic with `unknown assembler
+  instruction mnemonic`. The legacy compilers' inline-asm
+  parsers predate the load-from-pool-via-equals syntax. Even
+  though the target is a flat thunk with no prologue/epilogue
+  (so any tier is technically equivalent at the body level),
+  the routing must stay on default `.c` for the inline asm to
+  compile.
+
+**Use when:** target is a 3-insn flat tail-call thunk
+(`ldr rN, .L; bx rN; .word target`) where `rN ≠ r12 (ip)`.
+The mwcc default for any natural C source is r12; the inline-
+asm recipe above coerces the chosen register. **For r3
+variants** (3 ov004 candidates surveyed below) substitute
+`ldr r3, =func_helper; bx r3` in the recipe.
+
+**Cross-corpus survey (brief 054):** scanned all unmatched ARM
+gap functions for the 3-insn `ldr rN, .L; bx rN; .word target`
+shape with `rN != ip`:
+
+| Register | Count | Locations |
+|---|---:|---|
+| r1 | 1 | `func_0209085c` (main, the wave 14 W-H target) |
+| r3 | 3 | `func_ov004_021dbdbc`, `func_ov004_021dbdd0`, `func_ov004_021de280` (all in ov004) |
+
+The 3 r3 candidates are in **overlay 4** — deferred per
+[`ov004-bss-shift.md`](ov004-bss-shift.md) until the overlay-4
+baseline checksum passes. Total ARM-tractable scope today: 1
+target. Per brief 044's threshold scheme (≥10 ship-tier, 5-9
+.s-only, <5 shelve), 1 candidate falls below all thresholds —
+**but C-16 is just the C-12 recipe with a different register**,
+so the marginal cost is near-zero. Decomper should pick up
+`func_0209085c` next time they're working in main; defer the
+ov004 trio.
+
+**Provenance:** brief 051 self-extend (wave 14, PR #372)
+flagged `func_0209085c` as a "single-byte register choice; no
+coercion found" drop and named the wall W-H; brief 054 (this
+research) verified the inline-asm coercion via the same recipe
+as C-12. **W-H reclassified from "no coercion" to C-16.**
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -1135,6 +1291,15 @@ walls in yield predictions. Future pilots: skip-and-document
 rather than iterating.
 
 ### P-1. Shift-pair vs mask collapse
+
+> **Wall family note — see also C-15.** P-1 superficially
+> looks like C-15 (both are 2→1 or 1→1 collapses) but is
+> permanent across **all** mwcc SPs (1.2 and 2.0). C-15's
+> routing fix does not apply. See the [Wall family note](#c-15-mwcc-20-peephole-avoidance-via-legacy-tier-routing-for-flat-thunk-arg-setup)
+> at the top of C-15's entry for the discriminator. **Brief
+> 051 wave 14 (PR #372) misapplied C-15 routing to 7
+> `lsl 16; lsr 16` halfword zero-extend candidates; all 7
+> collapsed to `and #0xffff` on every routing tier.**
 
 **Target asm preserves shift form:**
 
@@ -1166,8 +1331,16 @@ uses mask) is the same wall in the other direction.
 
 **Affected drops:** brief 022 `ov000_021ab6cc`/`021af5c0`, brief
 028 `func_0203d6c4`/`func_0209aa48`/`func_0209d788`, brief 029
-`func_0207d304`, brief 031 `func_ov002_022912c8`. **8 of 47
-drops (17%)** — the largest single wall in this set.
+`func_0207d304`, brief 031 `func_ov002_022912c8`; brief 049
+self-extend (wave 14, PR #372) added 7 ov002 misapplications
+that decomper initially routed through `*.legacy.c` expecting
+C-15-style fix to apply: `func_ov002_0226af78`,
+`_0226afb4`, `_0226aff0`, `_0226b094`, `_0226b13c`, `_0226b158`,
+`_0226b258` — all `lsl 16; lsr 16` halfword zero-extends that
+collapse to `and #0xffff` even on mwcc 1.2/sp2p3. **17 of 69
+drops (25%)** — by far the largest single wall in this set,
+and the most-frequently-misapplied wall (see *Wall family
+note* in C-15 entry above).
 
 ### P-2. ldmia / ldmib / stmia fusion (bidirectional)
 
@@ -1628,37 +1801,50 @@ shape we should chase".
 | 047w9 / 357 | `func_ov002_0223fd10`    | P-1    | permanent  |
 | 047w9 / 357 | `func_ov002_021fbba8`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
 | 047w9 / 357 | `func_ov002_02243740`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
-| 049w12 / 366 | `func_02054c64`         | C-15 (mvn-vs-sub peephole; route through `*.legacy.c` per brief 052) | coercible (routing) |
-| 049w12 / 366 | `func_0209085c`         | (r1-vs-ip scratch on flat thunk; provisional minor wall — pending future research) | provisional |
+| 049w12 / 366 | `func_02054c64`         | C-15 (mvn-vs-sub peephole; route through `*.legacy.c` per brief 052; matched in w14/PR#372) | coercible (routing, resolved) |
+| 049w12 / 366 | `func_0209085c`         | C-16 (W-H r1-vs-ip flat-thunk scratch; coerced via `asm void` + `nofralloc` per brief 054) | coercible (asm-void) |
 | 049w12 / 366 | `func_ov004_021cb278`   | (ov004 BSS layout shift — see `ov004-bss-shift.md`, brief 052 part 3) | tooling/infra |
 | 049w12 / 366 | `func_ov004_021dbf30`   | (ov004 BSS layout shift — see `ov004-bss-shift.md`, brief 052 part 3) | tooling/infra |
+| 051w14 / 372 | `func_ov002_0226af78`/`_afb4`/`_aff0`/`_b094`/`_b13c`/`_b158`/`_b258` | P-1 (`lsl 16; lsr 16` halfword zero-extend; misapplied C-15 routing — see *Wall family note*) | permanent (×7) |
+| 051w14 / 372 | `func_020534b4`          | (mvnne-andne `& -1` collapse; mwcc emits `movne r0, r4` — semantic equivalence) | permanent |
+| 051w14 / 372 | `func_0205da2c`          | (multi-return convention: `mov r0, r1` post-bl skip-before-write) | edge case |
+| 051w14 / 372 | `func_0209085c` (retry)  | C-16 (`*.legacy.c` routing did NOT fix; `asm void` + `nofralloc` recipe per brief 054 — same target as w12 row above, retry confirmed C-15 doesn't apply) | coercible (asm-void, resolved) |
 
 ## Quantification
 
 ```
 
-By bucket (across 9 pilots: 020, 022, 028, 029, 030, 031, 040,
-047-wave9, 049-wave12):
-  Permanent              :  36 drops (61%)
-  Coercible-but-missed   :  10 drops (17%)  ← future "should have matched"
-  Edge case              :   8 drops (14%)
+By bucket (across 10 pilots: 020, 022, 028, 029, 030, 031, 040,
+047-wave9, 049-wave12, 051-wave14):
+  Permanent              :  44 drops (64%)  ← +8 wave 14 (7 P-1 + 1 collapse)
+  Coercible-but-missed   :  10 drops (14%)  ← future "should have matched"
+  Edge case              :   9 drops (13%)
   Tooling-tractable      :   2 drops ( 3%)
   Tooling/infra (ov004 BSS)   :   2 drops ( 3% — brief 049 wave 12)
-  Provisional minor wall      :   1 drop  ( 2% — brief 049 wave 12)
+  Provisional minor wall      :   0 drops ( — — W-H reclassified to C-16 by brief 054)
+
+(Wave 14 retry of `func_0209085c` is counted as a drop in the
+source-PR table — yielding 10 drops on that wave — but the
+underlying wall is the same row as the wave 12 attempt in the
+cross-reference. So the bucket sum is 67, vs the source-PR
+table's cumulative 69 — the +2 difference is the wave-12 W-G
+match in wave 14 + the wave-12 W-H retry. Bucket math
+intentionally counts unique walls, not per-attempt.)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 10 drops (17%)
-  P-4 (r2-vs-r3 swap)               :  4 drops ( 7%)
-  E-3 (Thumb)                       :  4 drops ( 7%)
-  P-6 (4-op predication threshold)  :  3 drops ( 5%)
-  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 7% — brief 040)
+  P-1 (shift-pair collapse)         : 17 drops (25%)  ← largest
+  P-4 (r2-vs-r3 swap)               :  4 drops ( 6%)
+  E-3 (Thumb)                       :  4 drops ( 6%)
+  P-6 (4-op predication threshold)  :  3 drops ( 4%)
+  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 6% — brief 040)
   C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 3% — brief 047 wave 9)
-  C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 2% — brief 049 wave 12)
+  C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 1% — brief 049 wave 12)
+  C-16 (W-H r1-vs-ip ldr scratch)   :  1 drop  ( 1% — brief 051 wave 14)
 
 ```
 
-**Read of the data:** roughly **17 % of dropped matches** in the
-9-pilot window were *coercible-but-missed* — the right C variation
+**Read of the data:** roughly **14 % of dropped matches** in the
+10-pilot window are *coercible-but-missed* — the right C variation
 or routing tier existed (or was discovered post-hoc by a follow-
 up cloud research brief) and the decomper just didn't try it.
 (The share moved from ~20% in the original brief-032 reading
@@ -1666,13 +1852,18 @@ down to ~14% after brief 033 surfaced P-6's 4-op predication
 threshold and reclassified 3 historic C-1 drops to permanent;
 brief 042 recovered W-A via C-9; brief 048 recovered W-E via
 C-12; brief 050 recovered W-F via C-14; brief 052 recovered W-G
-via C-15.) The bucket is still the highest-leverage section of
+via C-15; brief 054 recovered W-H via C-16. The recent share
+dipped from ~17% back to ~14% as wave 14's 7 P-1 misapplications
+added to the *permanent* bucket — the **misapplication itself
+was the high-leverage lesson**, captured in C-15's *Wall family
+note*.) The bucket is still the highest-leverage section of
 this doc: future pilots that spot a partial-match shape matching
-one of C-1 through C-15 should lift the documented variation or
+one of C-1 through C-16 should lift the documented variation or
 routing-tier change directly — but check C-1's *ARM-op limit*
-subsection first.
+subsection AND C-15's *Wall family note* (C-15 vs P-1
+discriminator) first.
 
-The other ~83% of drops are permanent walls, edge cases, or
+The other ~86% of drops are permanent walls, edge cases, or
 infrastructure issues that the cluster-pilot yield band should
 already account for. Brief 023's calibration of MED 37% / HIGH
 78% factored in the historic permanent-wall loss; that's why
@@ -1686,15 +1877,22 @@ heterogeneity* compensates for the per-shape wall losses).
    inlining "Reg-alloc carryover" sections. Saves ~30 lines of
    PR body per pilot.
 2. **Decomper greps `coercible-with-knowledge` first** when a
-   partial-match drop looks familiar. Estimated ~16% of drops
+   partial-match drop looks familiar. Estimated ~14% of drops
    are wrongly classified as walls today (e.g. brief 040 W-A
    was tagged "permanent" until brief 042 found C-9; brief 047
    wave 9 W-F was tagged "provisional reg-alloc wall" until
-   brief 050 found C-14). When stuck, also re-read the
-   `prev = X` initialiser line — that's what missed C-9
-   historically; for r2-vs-r1 cmp-scratch divergence, check
-   whether a 2-arg pass-through C source flips the allocator
-   (C-14).
+   brief 050 found C-14; brief 051 wave 14 W-H was tagged
+   "no coercion found" until brief 054 found C-16). When
+   stuck, also re-read the `prev = X` initialiser line —
+   that's what missed C-9 historically; for r2-vs-r1
+   cmp-scratch divergence, check whether a 2-arg pass-through
+   C source flips the allocator (C-14); for `ldr rN; bx rN`
+   flat thunks where `rN ≠ ip`, use the `asm void` +
+   `nofralloc` recipe (C-16). **Check the C-15 *Wall family
+   note* (C-15 vs P-1 discriminator) before applying any
+   routing fix to a 2-insn → 1-insn collapse** — wave 14's
+   misapplication of C-15 routing to 7 P-1 candidates is the
+   most-frequently-missed taxonomy distinction in this doc.
 3. **Decomper, when routing through a compiler tier:** sanity-
    check the target's prologue/epilogue first.
    - `pop {regs, lr}; bx lr` (Style A 2-step) → `*.legacy.c`
