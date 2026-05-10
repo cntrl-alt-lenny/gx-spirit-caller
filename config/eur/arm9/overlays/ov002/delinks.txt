@@ -1757,3 +1757,11 @@ src/overlay002/func_ov002_021c84c4.legacy_sp3.c:
 
 
 
+
+src/overlay002/func_ov002_021fbba8.c:
+    complete
+    .text start:0x021fbba8 end:0x021fbbc4
+
+src/overlay002/func_ov002_02243740.c:
+    complete
+    .text start:0x02243740 end:0x0224375c
