@@ -10,21 +10,27 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **25 distinct mwcc-vs-baserom codegen
-divergences** account for the **55+ dropped matches across the
-eight pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
-047-wave9; the per-PR cross-reference table below covers
-these; brief 046 waves 5–7 added three new C-N coercions
-documented in C-10 / C-11 / C-12; brief 047 wave 9 surfaced
-**C-13** (predicated if-X order) — fold-only, the research
-already happened in the wave PR — and **W-F** (r2-vs-r1
-cmp-scratch reg-alloc) which brief 050's research classified
-as **C-14** (2-arg pass-through coercion). Most fall into one
+**Short answer:** **26 distinct mwcc-vs-baserom codegen
+divergences** account for the **59+ dropped matches across the
+nine pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+047-wave9 / 049-wave12; the per-PR cross-reference table below
+covers these; brief 046 waves 5–7 added three new C-N
+coercions documented in C-10 / C-11 / C-12; brief 047 wave 9
+surfaced **C-13** (predicated if-X order) — fold-only, the
+research already happened in the wave PR — and **W-F**
+(r2-vs-r1 cmp-scratch reg-alloc) which brief 050's research
+classified as **C-14** (2-arg pass-through coercion); brief
+049 wave 12 surfaced the C-2 struct-copy refinement (folded
+under C-2's existing entry as C-2a) and **W-G** (mvn-vs-sub
+peephole on flat thunks) which brief 052's research
+classified as **C-15** (legacy-tier routing — peephole is
+mwcc 2.0-only). Most fall into one
 of three buckets: **coercible-with-knowledge**
-(14 patterns — the right C variation matches; future briefs
-can grep here first), **permanent** (8 patterns — mwcc keeps
-"winning" the codegen choice regardless of C variation; budget
-zero matches in the yield band), and **tooling-tractable**
+(15 patterns — the right C variation or routing tier
+matches; future briefs can grep here first), **permanent**
+(8 patterns — mwcc keeps "winning" the codegen choice
+regardless of C variation; budget zero matches in the yield
+band), and **tooling-tractable**
 (3 patterns —
 `propagate_template` could ship a register-renaming or
 literal-substitution variant — T-1, T-2 still proposed; T-3
@@ -65,7 +71,8 @@ Source-PR coverage:
 | 031   | 315 | 22.2% |      2  |       7 |
 | 040   | 332 | 63.6% |      7  |       4 |
 | 047/wave9 | 357 | 73.3% |  11  |       4 |
-| —     | —   |   —   | **122** |  **55** |
+| 049/wave12 | 366 | 73.3% | 11  |       4 |
+| —     | —   |   —   | **133** |  **59** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -73,7 +80,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (14 patterns)
+## Coercible-with-knowledge (15 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -208,6 +215,63 @@ carryover notes (cleaner than `volatile` for one-read flow) and
 broke `func_0208904c` (brief 022) when missed.
 
 **Provenance:** brief 022 carryover + drop, brief 028 implicit.
+Re-attempted and matched in brief 049 self-extend 2 / wave 12
+(PR #366) — see *Struct-copy refinement* below.
+
+#### C-2a. Struct-copy refinement for multi-field load-then-store
+
+Wave 12's re-attempt of `func_0208904c` (brief 022's historic
+miss) surfaced a second-order constraint: **the local-pointer
+cache (C-2 baseline) doesn't enforce load-load-store-store
+ordering on multi-field copies.** mwcc may interleave the
+loads and stores depending on temp-allocator choices. Target
+ROM emits load-both-then-store-both:
+
+```text
+
+ldr r1, .L
+ldr r1, [r1, #0x0]            ; p = *data
+ldr r2, [r1, #0x7c]            ; load 1 (r2)
+ldr r1, [r1, #0x80]            ; load 2 (r1)
+str r2, [r0, #0x0]             ; store 1
+str r1, [r0, #0x4]             ; store 2
+
+```
+
+**C that breaks the ordering** (interleaves load-store-load-store):
+
+```c
+/* C-2 baseline — works for single field; can interleave on pairs */
+T *p = *data;
+out->a = p->f_7c;     /* mwcc may emit ldr/str here, then ldr/str next */
+out->b = p->f_80;
+```
+
+**C that coerces the load-load-store-store order (verified
+byte-identical against `func_0208904c`):**
+
+```c
+typedef struct { int a; int b; } pair_t;
+void f(pair_t *out) {
+    *out = *(pair_t *)((char *)data + 0x7c);
+}
+```
+
+The struct-copy expression `*out = *src;` forces mwcc to treat
+the read as a single composite operation; the codegen pipeline
+emits both loads before either store. Pure pointer-cast at the
+call site keeps the source clean — no `T *p = src;` local
+needed.
+
+**Use when:** target has 2+ adjacent field reads from a single
+base followed by 2+ adjacent field writes to a single
+destination, AND the order is strict load-load-...-store-store
+(no interleaving). The single-field C-2 recipe handles 1-pair
+trivially; pairs/triples need the struct-copy form.
+
+**Provenance:** brief 049 self-extend 2 / wave 12
+(PR #366) — `func_0208904c` matched after brief 022 + brief
+050 cluster-rescan both flagged it as a C-2-coercible miss.
 
 ### C-3. Volatile-cast to suppress CSE on self-copy / redundant load
 
@@ -936,6 +1000,114 @@ asm-shape level; **brief 049 self-extend 1 / wave 11
 matches first try — C-14 transfers cleanly to fresh
 candidates.**
 
+### C-15. mwcc-2.0 peephole avoidance via legacy-tier routing for flat-thunk arg setup
+
+**Target asm (`func_02054c64` — wave 12 W-G observation):**
+
+```text
+
+ldr   ip, .L
+mov   r0, #0
+mvn   r1, #0                  ; r1 = -1 via direct mvn
+bx    ip
+.word func_02054ea8
+
+```
+
+i.e. a 4-instruction flat tail-call thunk that materialises
+`(0, -1)` as args via `mov` + `mvn` directly.
+
+**mwcc 2.0/sp1p5 emits when miscoded** (default `.c` routing
+under `int f(void) { return helper(0, -1); }`):
+
+```text
+
+ldr ip, .L
+mov r0, #0
+sub r1, r0, #1                 ; r1 = -1 via peephole (r0 - 1)
+bx  ip
+.word helper
+
+```
+
+The mwcc 2.0 peephole optimiser observes that `r0` is being
+set to a constant `K` immediately before `r1` needs to be set
+to `K + small_imm` (in this case `K=0`, `imm=-1`), and emits
+`sub r1, r0, #1` (or `add r1, r0, #imm`) to save the explicit
+materialisation. The peephole is general:
+
+| Args | mwcc 2.0 emit | Peephole fires? |
+|---|---|---|
+| `(0, -1)` | `mov r0, #0; sub r1, r0, #1` | yes |
+| `(0, -2)` | `mov r0, #0; sub r1, r0, #2` | yes |
+| `(0, +1)` | `mov r0, #0; mov r1, #1` | no (mov shorter) |
+| `(5, -1)` | `mov r0, #5; sub r1, r0, #6` | yes (5 - 6 = -1) |
+| `(-1, -1)` | `mvn r0, #0; mov r1, r0` | no (reg copy) |
+| `(-1, 0)` | `mvn r0, #0; mov r1, #0` | no (-1 first) |
+
+**No C-source coercion flips it.** Sweep tested 9 variations
+(local-typed `-1`, `~0`, `(int)~0u`, `(int)(unsigned int)-1`,
+`((int)(0u-1u))`, statement-expression, GCC `register`
+storage, two-statement local declarations in either order, an
+explicit `int x = 0 - 1`) — every variation that produced
+byte-equivalent overall shape kept the `sub`. `volatile`
+breaks the shape entirely (push/pop + stack roundtrip).
+
+**mwcc-version sweep across all 15 SPs** isolates the
+peephole to mwcc 2.0:
+
+| Compiler family | -1 emission |
+|---|---|
+| **1.2/base, sp2, sp2p3, sp3, sp4** | `mvn r1, #0` (direct, matches target) |
+| 2.0/base, sp1, sp1p2, sp1p5, sp1p6, sp1p7, sp2, sp2p2, sp2p3, sp2p4 | `sub r1, r0, #1` (peephole) |
+
+**The fix is routing, not C source.** Route the file through
+`*.legacy.c` (mwcc 1.2/sp2p3) or `*.legacy_sp3.c` (mwcc
+1.2/sp3) and the body emits direct `mvn`. Verified
+byte-identical against `func_02054c64` via both 1.2/sp2p3
+and 1.2/sp3.
+
+**Why routing is safe for flat thunks.** A flat tail-call
+thunk has no prologue or epilogue (just `bx ip`) — there's
+no Style A vs Style B epilogue concern. The SP version only
+affects the body codegen. Routing through `*.legacy.c` or
+`*.legacy_sp3.c` flips the peephole without touching
+prologue/epilogue.
+
+**For non-flat-thunk shapes:** if the target HAS a prologue +
+epilogue AND hits the peephole, the routing tier must match
+the epilogue style too (per the
+*Recommendation #3 — routing decision tree* below). For a
+pop-into-pc target with the peephole, route through
+`*.legacy_sp3.c` (sp3 keeps the `pop {regs, pc}` style); for
+a `pop {regs, lr}; bx lr` target, route through `*.legacy.c`
+(sp2p3). Sample disassembly the target's epilogue first.
+
+**Use when:** target asm shows direct `mvn` or `mov #imm` for
+a negative or otherwise-immediate-derivable constant
+**immediately after** another `mov #K` to a different
+register, AND mwcc 2.0 emits the `sub`/`add` peephole form
+on the natural C source. Solution: switch the file extension
+to `*.legacy.c` (or `*.legacy_sp3.c` for sp3-epilogue
+targets).
+
+**Provenance:** brief 049 self-extend 2 / wave 12 (PR #366)
+flagged `func_02054c64` as a "provisional minor wall"
+(W-G); brief 052 (this research) verified the peephole is
+mwcc 2.0-specific, all 5 1.2/* SPs emit `mvn` directly,
+both `*.legacy.c` and `*.legacy_sp3.c` routing produce
+byte-identical output for the target. Wall reclassified
+from "provisional minor" to "C-15 routing-tractable
+coercion".
+
+**Cross-corpus survey (brief 052):** 1 confirmed candidate
+(`func_02054c64`). The peephole-shape grep is `mov rN, #0;
+mvn rM, #0` (or any `mov rN, #K; mov rM, #K±imm` shape) on
+flat thunks — likely a small population in the unmatched-
+gap corpus. Future cluster pilots that surface this asm
+shape on a flat thunk should route through `*.legacy.c`
+first try.
+
 **Cross-corpus survey (brief 050):** 2 candidates from wave 9
 plus likely a small population of similar tail-call-thunk-with-
 early-return shapes in the unmatched-gap corpus. Decomper
@@ -1456,49 +1628,57 @@ shape we should chase".
 | 047w9 / 357 | `func_ov002_0223fd10`    | P-1    | permanent  |
 | 047w9 / 357 | `func_ov002_021fbba8`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
 | 047w9 / 357 | `func_ov002_02243740`    | C-14 (missed in w9; coerced + matched in w11/PR#362) | coercible (resolved) |
+| 049w12 / 366 | `func_02054c64`         | C-15 (mvn-vs-sub peephole; route through `*.legacy.c` per brief 052) | coercible (routing) |
+| 049w12 / 366 | `func_0209085c`         | (r1-vs-ip scratch on flat thunk; provisional minor wall — pending future research) | provisional |
+| 049w12 / 366 | `func_ov004_021cb278`   | (ov004 BSS layout shift — see `ov004-bss-shift.md`, brief 052 part 3) | tooling/infra |
+| 049w12 / 366 | `func_ov004_021dbf30`   | (ov004 BSS layout shift — see `ov004-bss-shift.md`, brief 052 part 3) | tooling/infra |
 
 ## Quantification
 
 ```
 
-By bucket (across 8 pilots: 020, 022, 028, 029, 030, 031, 040,
-047-wave9):
-  Permanent              :  36 drops (65%)
-  Coercible-but-missed   :   9 drops (16%)  ← future "should have matched"
-  Edge case              :   8 drops (15%)
-  Tooling-tractable      :   2 drops ( 4%)
+By bucket (across 9 pilots: 020, 022, 028, 029, 030, 031, 040,
+047-wave9, 049-wave12):
+  Permanent              :  36 drops (61%)
+  Coercible-but-missed   :  10 drops (17%)  ← future "should have matched"
+  Edge case              :   8 drops (14%)
+  Tooling-tractable      :   2 drops ( 3%)
+  Tooling/infra (ov004 BSS)   :   2 drops ( 3% — brief 049 wave 12)
+  Provisional minor wall      :   1 drop  ( 2% — brief 049 wave 12)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 10 drops (18%)
+  P-1 (shift-pair collapse)         : 10 drops (17%)
   P-4 (r2-vs-r3 swap)               :  4 drops ( 7%)
   E-3 (Thumb)                       :  4 drops ( 7%)
   P-6 (4-op predication threshold)  :  3 drops ( 5%)
   P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 7% — brief 040)
-  C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 4% — brief 047 wave 9)
+  C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 3% — brief 047 wave 9)
+  C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 2% — brief 049 wave 12)
 
 ```
 
-**Read of the data:** roughly **16 % of dropped matches** in the
-8-pilot window were *coercible-but-missed* — the right C variation
-existed (or was discovered post-hoc by a follow-up cloud research
-brief) and the decomper just didn't try it. (The
-share moved from ~20% in the original brief-032 reading down to
-~14% after brief 033 surfaced P-6's 4-op predication threshold
-and reclassified 3 historic C-1 drops to permanent; brief 042
-recovered W-A via C-9; brief 048 recovered W-E via C-12; and
-brief 050 recovered W-F via C-14, bumping the share back to
-~16%.) The bucket is still the highest-leverage section of this
-doc: future pilots that spot a partial-match shape matching one
-of C-1 through C-14 should lift the documented variation directly
-— but check C-1's *ARM-op limit* subsection first.
+**Read of the data:** roughly **17 % of dropped matches** in the
+9-pilot window were *coercible-but-missed* — the right C variation
+or routing tier existed (or was discovered post-hoc by a follow-
+up cloud research brief) and the decomper just didn't try it.
+(The share moved from ~20% in the original brief-032 reading
+down to ~14% after brief 033 surfaced P-6's 4-op predication
+threshold and reclassified 3 historic C-1 drops to permanent;
+brief 042 recovered W-A via C-9; brief 048 recovered W-E via
+C-12; brief 050 recovered W-F via C-14; brief 052 recovered W-G
+via C-15.) The bucket is still the highest-leverage section of
+this doc: future pilots that spot a partial-match shape matching
+one of C-1 through C-15 should lift the documented variation or
+routing-tier change directly — but check C-1's *ARM-op limit*
+subsection first.
 
-The other ~84% of drops are permanent walls or edge cases that
-the cluster-pilot yield band should already account for. Brief
-023's calibration of MED 37% / HIGH 78% factored in the historic
-permanent-wall loss; that's why the predictions have been roughly
-right despite the over-delivery on heterogeneous clusters (where
-the *shape heterogeneity* compensates for the per-shape wall
-losses).
+The other ~83% of drops are permanent walls, edge cases, or
+infrastructure issues that the cluster-pilot yield band should
+already account for. Brief 023's calibration of MED 37% / HIGH
+78% factored in the historic permanent-wall loss; that's why
+the predictions have been roughly right despite the over-
+delivery on heterogeneous clusters (where the *shape
+heterogeneity* compensates for the per-shape wall losses).
 
 ## Recommendation
 
