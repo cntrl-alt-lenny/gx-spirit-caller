@@ -8,15 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-08 night, post-wave-8 + cluster-rescan
-verdict. Main tip after PRs #354 + #353. Hard tier **1.5%**;
-2 self-extends consumed → 1 remaining on brief 047. C-12 push-r0
-pool fully drained (W-E exhausted in wave 8 first try).
+**Last updated:** 2026-05-08 late-night, post-wave-9 (final brief
+047 self-extend) + autonomous tooling drift fix. Main tip after
+PRs #357 + #356. Hard tier **1.6%**. Brief 047 allowance fully
+expended (3 PRs, 41 matches at ~91% combined yield).
 
-Cloud's hard-tier cluster rescan landed verdict: don't queue
-cluster pilots. Compounding is happening at the
-`find_shape_templates` layer, not cluster-anchor. Brief 047's
-individual-target approach stays the canonical workflow.
+Briefs 049 (decomper hard-tier wave 10, size cap raised to 0x28)
+and 050 (cloud, fold C-13 + research W-F r2-reg-alloc wall) queued.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -53,7 +51,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 125 | 8232 | 8357 | **1.5%** | **+58** |
+| `hard` | 136 | 8221 | 8357 | **1.6%** | **+69** |
 
 **Cluster yield track record** through brief 029:
 
