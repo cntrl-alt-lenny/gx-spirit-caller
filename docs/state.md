@@ -8,17 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-10 afternoon, post-wave-11 + cluster
-rescan. Main tip after PRs #362 + #363. Hard tier **1.9%**.
-W-F pool exhausted (wave 11 took both C-14 unblocks first try).
+**Last updated:** 2026-05-10 late-afternoon, post-wave-12 +
+brief 049 fully drained. Main tip after PRs #366 + #365. Easy
+tier **82.7%** (+11 from wave 12), hard **1.9%**.
 
-Cloud's PR #363 surfaced 15 individual-target propagation
-candidates and noted that the "easy-tier drained" claim from
-brief 033 is now stale (110 easy siblings in propagation-
-eligible clusters post-corpus-growth). Decomper has 1 self-
-extend remaining; brain recommends targeting cloud's 15 in the
-final wave. After that, brain re-scopes — easy-tier reopen is
-on the table again.
+Brief 049's full chain (waves 10/11/12) shipped 34 matches at
+~87% combined yield. Wave 12 empirically validated cloud's
+"easy-tier reopened" finding — all 11 wave-12 matches reclassified
+to easy tier. Brief 051 (decomper, cloud's 4 remaining clusters
++ hard mix) and 052 (cloud, 3 wall investigations from wave 12)
+queued.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -51,7 +50,7 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 907 | 203 | 1110 | **81.7%** | **+560** |
+| `easy` | 918 | 192 | 1110 | **82.7%** | **+571** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
