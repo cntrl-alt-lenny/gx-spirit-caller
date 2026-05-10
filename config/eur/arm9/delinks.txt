@@ -7099,3 +7099,28 @@ src/main/func_0207fd08.c:
 src/main/func_0207fd28.c:
     complete
     .text start:0x0207fd28 end:0x0207fd48
+
+src/main/func_02001ba4.c:
+    complete
+    .text start:0x02001ba4 end:0x02001bc8
+
+
+src/main/func_0201b6e4.c:
+    complete
+    .text start:0x0201b6e4 end:0x0201b708
+
+src/main/func_0201f7cc.c:
+    complete
+    .text start:0x0201f7cc end:0x0201f7f0
+
+src/main/func_0209bff4.legacy.c:
+    complete
+    .text start:0x0209bff4 end:0x0209c014
+
+src/main/func_0209c014.legacy.c:
+    complete
+    .text start:0x0209c014 end:0x0209c034
+
+src/main/func_020a6150.legacy.c:
+    complete
+    .text start:0x020a6150 end:0x020a6170
