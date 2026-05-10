@@ -7216,3 +7216,24 @@ src/main/func_02020224.c:
 src/main/func_0202c228.c:
     complete
     .text start:0x0202c228 end:0x0202c24c
+
+src/main/func_020068b4.c:
+    complete
+    .text start:0x020068b4 end:0x020068f4
+
+src/main/func_02011a3c.c:
+    complete
+    .text start:0x02011a3c end:0x02011a7c
+
+
+src/main/func_020115e0.c:
+    complete
+    .text start:0x020115e0 end:0x02011620
+
+src/main/func_02037ac4.c:
+    complete
+    .text start:0x02037ac4 end:0x02037b04
+
+src/main/func_02031a70.c:
+    complete
+    .text start:0x02031a70 end:0x02031ab0
