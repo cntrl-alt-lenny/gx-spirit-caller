@@ -8,15 +8,18 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-10 evening, post-wave-13 + brief 052.
-Main tip after PRs #368 + #369. Easy **84.0%** (+14 from wave 13),
-hard 1.9%, medium 80.1%.
+**Last updated:** 2026-05-10 night, post-wave-14 + strategic pivot.
+Main tip after PRs #371 + #372. Easy **84.1%**, hard **2.0%**
+(crossed for the first time). Brief 051 self-extends fully
+exhausted.
 
-Wave 13 drained the `ov010_021b4750` tail-call cluster (14/16 at
-88%). Brief 052 shipped 3 deliverables including a new C-15 /
-W-G coercion (mvn-vs-sub peephole) and the ov004 BSS investigation
-research note. Decomper has 1 self-extend remaining on brief 051
-with C-15 addendum.
+**Strategic pivot in briefs 053/054:** small-function pool
+exhausted; the badge sits at 1.28% on main and needs byte-volume
+work to move meaningfully. Brief 053 raises the hard-tier cap to
+≤ 0x40 and accepts lower per-attempt yield in exchange for ~2-3×
+bytes per match. Brief 054 (cloud) folds the C-15-vs-P-1
+taxonomy lesson from wave 14 + researches the new `ldr ip; bx ip`
+wall.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -49,11 +52,11 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 932 | 178 | 1110 | **84.0%** | **+585** |
+| `easy` | 933 | 177 | 1110 | **84.1%** | **+586** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 159 | 8198 | 8357 | **1.9%** | **+92** |
+| `hard` | 167 | 8190 | 8357 | **2.0%** | **+100** |
 
 **Cluster yield track record** through brief 029:
 
