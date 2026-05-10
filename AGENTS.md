@@ -313,21 +313,34 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
-  — `decomper`: hard-tier wave 10 with size cap raised cautiously
-  to ≤ 0x28 (was ≤ 0x20; main-module pool drained at the lower
-  cap). Same routing-tier discriminator + push-r0 C-12 + skip
-  W-F (cloud's brief 050 territory). Self-extend allowance:
-  2 follow-ups if yield ≥ 60%. Branch: `decomper/hard-tier-wave-10`.
-- [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
-  — `cloud`: two-part — (1) fold **C-13** (predicated if-X order,
-  from wave 9) into codegen-walls.md, (2) research **W-F**
-  (r2-vs-r1 reg-alloc wall from wave 9). Verdict drives whether
-  brief 051 unblocks the 2 W-F targets. Medium priority.
-  Branch: `cloud/codegen-walls-c13-plus-r2-research`.
+No open briefs. Decomper has **2 self-extends remaining** on brief
+049's clause (yield criterion exceeded; 100% on the cap-raise
+test). Same selection rule **with two additions**:
+
+- **C-14 unblock for W-F** (per brief 050) — 2 immediate targets
+  `func_ov002_021fbba8`, `func_ov002_02243740`.
+- **Repeated-twin signal observed in wave 10** — cluster-pipeline-
+  reopen scan is a candidate cloud autonomous task; if cloud lands
+  it before decomper's next self-extend, decomper picks anchors
+  from there.
+
+Cloud is on standby; suggested autonomous task is to re-run
+`find_pattern_clusters` against the now-~290+ matched corpus
+(brief 047 wave 9's recommendation #3 elevated to high-priority
+by wave 10's twin observations).
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
+  `cloud`, shipped in PR #360. Two deliverables: (1) **C-13**
+  folded (predicated if-X order, from wave 9). (2) **W-F →
+  C-14 coercible** (r2-vs-r1 reg-alloc; specific C variation
+  flips). Two unblocks for decomper queued.
+- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
+  `decomper`, shipped in PR #359. **15/15 = 100% yield** at
+  raised ≤ 0x28 cap. Hard tier 1.6% → 1.8%. Cap-raise hypothesis
+  validated. Strong repeated-twin signal observed (compounding
+  via find_shape_templates).
 - [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
   `cloud`, shipped in PR #351. **C-12 push-r0 thunk via asm void**
   — mwcc inline asm coerces; verified across all 15 SPs in
