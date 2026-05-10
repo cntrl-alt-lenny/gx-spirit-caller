@@ -313,23 +313,28 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **1 self-extend remaining** on brief
-049's clause (wave 11 = self-extend 1 at 89%; W-F pool exhausted).
-Same selection rule. **For the final self-extend, prefer cloud's
-15 surfaced candidates from PR #363** (post-w10 cluster rescan)
-— 2 fully-clean homogeneous-shape clusters + 13 misc per-target
-candidates. After the final self-extend, brain re-scopes.
-
-**State note:** PR #363 found that the prior "easy-tier cluster
-pool drained" claim from brief 033 is stale — 110 easy-tier
-siblings now sit in propagation-eligible clusters post-corpus-
-growth. Worth a separate brain look at the next pivot.
-
-Cloud is on standby; cluster-rescan deliverable shipped. May pick
-up smaller autonomous tasks per AGENTS.md.
+- [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
+  — `decomper`: mixed-tier wave. Cloud's 4 remaining cluster-
+  rescan candidates from PR #363 + fresh hard-tier ≤ 0x28 mix.
+  Skip ov004 (brief 052 BSS-shift research). Self-extend
+  allowance: 2 follow-ups if yield ≥ 60%. Branch:
+  `decomper/mixed-wave-13`.
+- [`docs/briefs/052-wave-12-wall-investigations.md`](docs/briefs/052-wave-12-wall-investigations.md)
+  — `cloud`: three-part — (1) C-2 struct-copy refinement fold
+  (fast), (2) mvn-vs-sub peephole sweep (coercion classification),
+  (3) ov004 BSS layout shift investigation (potential dsd lcf
+  bug). Verdict on each drives follow-up briefs. Medium priority.
+  Branch: `cloud/wave-12-wall-investigations`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
+  `decomper`, full chain shipped across PRs #359 + #362 + #366
+  (waves 10/11/12). **34 matches at ~87% combined yield.** Wave
+  10 validated cap-raise to 0x28; wave 11 took both C-14 W-F
+  unblocks first try; wave 12 took 11/15 from cloud's PR #363
+  rescan list and reclassified them all to easy tier — empirically
+  validating the "easy-tier reopened" finding.
 - [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
   `cloud`, shipped in PR #360. Two deliverables: (1) **C-13**
   folded (predicated if-X order, from wave 9). (2) **W-F →
