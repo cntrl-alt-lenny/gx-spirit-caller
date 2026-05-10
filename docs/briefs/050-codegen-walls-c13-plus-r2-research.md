@@ -58,8 +58,8 @@ Same method order brief 048 used:
    - Decomper tried "reserve r1 with 2-arg signature" — didn't
      flip. Document what they did, then try the rest.
 
-2. **mwcc-version sweep** across all 15 SPs (1.2/* + 2.0/*) in
-   case some SP picks r2 by default.
+2. **mwcc-version sweep** across all 15 SPs (`1.2/*` + `2.0/*`)
+   in case some SP picks r2 by default.
 
 3. **Inline-asm hypothesis** if neither (1) nor (2) coerces.
 
