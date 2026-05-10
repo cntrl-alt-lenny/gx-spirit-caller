@@ -8,16 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-10 late-afternoon, post-wave-12 +
-brief 049 fully drained. Main tip after PRs #366 + #365. Easy
-tier **82.7%** (+11 from wave 12), hard **1.9%**.
+**Last updated:** 2026-05-10 evening, post-wave-13 + brief 052.
+Main tip after PRs #368 + #369. Easy **84.0%** (+14 from wave 13),
+hard 1.9%, medium 80.1%.
 
-Brief 049's full chain (waves 10/11/12) shipped 34 matches at
-~87% combined yield. Wave 12 empirically validated cloud's
-"easy-tier reopened" finding — all 11 wave-12 matches reclassified
-to easy tier. Brief 051 (decomper, cloud's 4 remaining clusters
-+ hard mix) and 052 (cloud, 3 wall investigations from wave 12)
-queued.
+Wave 13 drained the `ov010_021b4750` tail-call cluster (14/16 at
+88%). Brief 052 shipped 3 deliverables including a new C-15 /
+W-G coercion (mvn-vs-sub peephole) and the ov004 BSS investigation
+research note. Decomper has 1 self-extend remaining on brief 051
+with C-15 addendum.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -50,7 +49,7 @@ post-#311):
 | Tier | Matched | Unmatched | Total | % matched | Δ today |
 |------|--------:|----------:|------:|----------:|--------:|
 | `trivial` | 136 | 0 | 136 | **100.0%** | — |
-| `easy` | 918 | 192 | 1110 | **82.7%** | **+571** |
+| `easy` | 932 | 178 | 1110 | **84.0%** | **+585** |
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
