@@ -313,15 +313,19 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **1 self-extend remaining** on brief
-051's clause (wave 13 = self-extend 1 at 88%; ov010 tail-call
-cluster fully drained). Same selection rule **with one addition**:
-C-15 (W-G mvn-vs-sub peephole, per brief 052) is now coercible —
-applies wherever the peephole bit decomper. After the final self-
-extend, brain re-scopes.
-
-Cloud is on standby; brief 052 fully shipped including ov004 BSS
-investigation. May pick up smaller autonomous tasks per AGENTS.md.
+- [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
+  — `decomper` **(strategic pivot)**: hard-tier wave with size
+  cap raised aggressively to ≤ 0x40. Trade per-attempt yield for
+  byte volume — goal is to meaningfully move the badge (1.28% on
+  main; small-function pool drying up). Self-extend allowance:
+  2 follow-ups if yield ≥ 40% AND bytes-matched ≥ 200 per wave.
+  Branch: `decomper/hard-tier-byte-volume`.
+- [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
+  — `cloud`: two-part — (1) fold C-15 vs P-1 taxonomy
+  distinction (wave 14 misapplication lesson), (2) research the
+  new `ldr ip; bx ip` wall surfaced by wave 14 drop (sweep to
+  classify C-N / T-N / E-N / P-N). Medium priority.
+  Branch: `cloud/c15-vs-p1-taxonomy-plus-ldr-ip-wall`.
 
 ### Closed briefs (reference)
 
