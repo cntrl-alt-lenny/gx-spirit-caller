@@ -1723,3 +1723,64 @@ heterogeneity* compensates for the per-shape wall losses).
    genuinely new wall should add an entry to this doc rather than
    inlining in the PR body. Keep the per-bucket quantification
    refreshed.
+
+## Operational notes
+
+Debugging guidance that doesn't fit a single wall entry but
+affects how to read partial-match results across a wave.
+
+### Cross-function reference shift on wall-induced size mismatches
+
+When a function fails to match because mwcc emits **fewer
+bytes** than the baserom (typical for a P-1 shift-collapse drop
+or any wall that compresses the source), the size delta
+**cascades through the linker layout**: every function placed
+*after* the failing one gets shifted up by the delta. If a
+later function references a tail-call target or pool address
+within the shifted region, its **resolved relocation address
+will be wrong** — the function appears to fail at objdiff
+even though its own C source is byte-correct.
+
+**Symptom (brief 051 wave 13 — PR #368):** the
+`func_ov010_021b4750` ov002-sibling cluster shipped 8 candidates
+that all tail-call `func_ov002_0229ade0`. Two of those 8 each
+emitted 4 bytes short (P-1 wall on `lsl 16; lsr 16`
+zero-extend). The combined 8-byte shift bumped
+`func_ov002_0229ade0` from `0x0229ade0` (declared) down to
+`0x0229add8` in the linker map, breaking the pool-resolved
+target address for **every one of the 8 thunks**, not just
+the 2 walls. Initial wave attempt: 0/8. Drop the 2 walls →
+8/8 byte-identical first try.
+
+**Debugging recipe:**
+
+1. When a function fails to match and the per-function
+   objdiff diff shows the **pool-word value** (not the asm)
+   differs by a small offset (4-32 bytes), suspect a
+   cross-function cascade.
+2. Identify the closest **earlier** unmatched function in the
+   same overlay — especially anything in the most recent
+   wave. Read its asm to see if it would emit fewer bytes
+   than the declared size (P-1 / P-3 chain / unsupported
+   shape).
+3. Drop the earlier candidate from the wave (revert its
+   `src/.../*.c` and reset its `symbols.txt` rename) and
+   re-run the build. If the later candidate suddenly
+   matches, the cascade was the cause.
+4. The earlier candidate stays as a permanent-wall drop;
+   the later candidate is **not** a wall and ships
+   normally.
+
+**Why this matters:** cluster-pilot waves that pick adjacent
+candidates from the same overlay are especially vulnerable —
+a single P-1 drop can mask up to N other matches in the
+downstream tail. The "drop and retry" workflow is cheap
+(seconds per iteration) and catches the cascade before
+classifying healthy candidates as walls.
+
+**Cross-reference:** brief 051 wave 13 ([PR #368](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/368))
+documented this for the first time at the cluster-pilot
+level. The whole-binary version of the same shift is what
+makes the **ov004 BSS layout shift** ([`ov004-bss-shift.md`](ov004-bss-shift.md))
+so persistent — that's the same cascade scaled up to a
+section-boundary mis-sizing.
