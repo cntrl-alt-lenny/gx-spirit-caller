@@ -313,22 +313,28 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
-  — `decomper` **(strategic pivot)**: hard-tier wave with size
-  cap raised aggressively to ≤ 0x40. Trade per-attempt yield for
-  byte volume — goal is to meaningfully move the badge (1.28% on
-  main; small-function pool drying up). Self-extend allowance:
-  2 follow-ups if yield ≥ 40% AND bytes-matched ≥ 200 per wave.
-  Branch: `decomper/hard-tier-byte-volume`.
-- [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
-  — `cloud`: two-part — (1) fold C-15 vs P-1 taxonomy
-  distinction (wave 14 misapplication lesson), (2) research the
-  new `ldr ip; bx ip` wall surfaced by wave 14 drop (sweep to
-  classify C-N / T-N / E-N / P-N). Medium priority.
-  Branch: `cloud/c15-vs-p1-taxonomy-plus-ldr-ip-wall`.
+No open briefs. Decomper has **2 self-extends remaining** on brief
+053 (wave 15 = initial brief; both gates passed at 83% yield + 320
+bytes). Same selection rule **with one addition**: C-16 (W-H
+ldr-r1-vs-ip, per brief 054) is now coercible — applies when the
+target uses `ldr r1; bx r1` for tail-call and mwcc default emits
+`ldr ip; bx ip`.
+
+Cloud is on standby; brief 054 fully shipped (wall family note +
+C-16 / W-H coercion). May pick up smaller autonomous tasks per
+AGENTS.md.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
+  `decomper`, shipped in PR #374 (wave 15 — initial). **5 matches
+  at 0x40 size, 320 bytes combined, 83% yield.** Cap-raise to
+  ≤ 0x40 validated; both self-extend gates passed. Hard tier
+  2.0% → 2.1%.
+- [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
+  `cloud`, shipped in PR #375. Two deliverables: (1) C-15 vs P-1
+  wall family note (cross-links + discriminator table); (2)
+  **C-16 / W-H** ldr-r1-vs-ip flipped coercible.
 - [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
   `decomper`, shipped in PR #368. **14 byte-identical at 88%**
   from the `func_ov010_021b4750` tail-call cluster (PR #363
