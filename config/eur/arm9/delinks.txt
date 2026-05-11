@@ -7237,3 +7237,31 @@ src/main/func_02037ac4.c:
 src/main/func_02031a70.c:
     complete
     .text start:0x02031a70 end:0x02031ab0
+
+src/main/func_020442d0.c:
+    complete
+    .text start:0x020442d0 end:0x020442f8
+
+src/main/func_0207d430.c:
+    complete
+    .text start:0x0207d430 end:0x0207d458
+
+src/main/func_0200b35c.c:
+    complete
+    .text start:0x0200b35c end:0x0200b384
+
+src/main/func_02038594.c:
+    complete
+    .text start:0x02038594 end:0x020385bc
+
+src/main/func_020822a0.c:
+    complete
+    .text start:0x020822a0 end:0x020822c8
+
+src/main/func_020822c8.c:
+    complete
+    .text start:0x020822c8 end:0x020822f0
+
+src/main/func_02087ce8.c:
+    complete
+    .text start:0x02087ce8 end:0x02087d10
