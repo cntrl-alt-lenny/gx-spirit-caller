@@ -19,10 +19,14 @@ So the project is a long series of small wins: match one function,
 commit, match the next, commit, until the whole ROM is in C source and
 the hashes line up.
 
-Current status: ~0.09% of the code matched. ~99.9% to go. This is
+Current status: ~1.3% of the code matched (per the README badge,
+which tracks byte-accurate progress). ~98.7% to go. The "easy" tier
+sits at ~84% matched, the "medium" tier at ~80%, but those are
+function-count percentages — the bulk of the ROM lives in the
+"hard" tier (~2%) where each function takes more work. This is
 normal for a fresh decomp — the early sinit/stub waves clear the
 trivial shapes, then momentum builds as the tooling and conventions
-settle.
+settle. Live stats live in [`docs/state.md`](state.md).
 
 ## The cast
 
@@ -411,28 +415,42 @@ change passes through brain's local verification before landing on
 
 ## Common gotchas for a new vibe coder
 
-- **"The badge says 0%. Is nothing happening?"**  No — the badge is
-  code-byte-accurate; 60+ functions are matched (sinit wave), but they
-  total 2KB out of 2.3MB. Progress is real, it's just early.
+- **"The badge says ~1% but easy tier is 84% matched. Which is right?"**
+  Both — they measure different things. The badge tracks **code
+  bytes** matched out of total code bytes; that's the honest "are we
+  done?" headline. The tier percentages track **function count** in
+  each difficulty bucket. Easy-tier functions are small, so matching
+  900+ of them still only shifts the byte percentage by a couple of
+  points. The big move comes from cracking hard-tier work where
+  individual functions are larger and there are 8000+ of them.
 - **"Why does the decomper iterate 20 times on one function?"**  mwcc
   (the CodeWarrior compiler) has specific quirks — local variable
   order, struct layout, register allocation patterns. Matching means
   convincing mwcc to emit the exact same assembly. Small C changes
   (one `int` → `short`) can flip the output entirely.
-- **"Why can't cloud just run the build?"**  Cloud sessions are
-  stateless web instances with no baserom and no toolchain. That's by
-  design — it keeps tool-building (cloud) parallel to matching (pc)
-  without either waiting on the other.
-- **"sinit outliers?"**  The brief-003 template matched 44 of 48
-  `__sinit_*` functions perfectly. Four have slightly different shapes
-  (size 0x04 vs 0x2c, or 0x3c) and need small template variants.
-  These are the "deferred outliers" — still matchable, just not by
-  the exact same paste job.
+  [`docs/research/codegen-walls.md`](research/codegen-walls.md)
+  catalogues the 27-and-counting recurring divergences with worked
+  C source for each.
+- **"Why can't cloud just run the build?"**  Cloud as a *role* is
+  designed to be runnable in a stateless web session without
+  toolchain access; that's what keeps tool-building parallel to
+  matching. A particular cloud session may happen to have the
+  toolchain installed (e.g. on the same machine as brain) but the
+  role's *outputs* — tools, headers, docs — are valid to ship
+  without verifying the rebuilt ROM. Brain is the always-local role
+  that runs the build to verify PRs before merge.
+- **"sinit outliers?"**  All 51 `__sinit_*` functions are now matched
+  (sinit tier sits at 100%). Brief 003's bulk-template wave + brief
+  009's one-off `__sinit_ov002_022ca7e8` (asm-void escape for mwcc's
+  RHS-first ordering) covered the full set.
 - **"Failing modules?"**  Three of 27 modules (main, dtcm, ov004)
   don't round-trip through `dsd check modules` yet. That's a
   structural issue with placeholder symbols injected by
-  `--allow-unknown-function-calls` during `dsd init`. Fixable but
-  hasn't been prioritized.
+  `--allow-unknown-function-calls` during `dsd init`.
+  [`docs/research/ov004-bss-shift.md`](research/ov004-bss-shift.md)
+  documents one specific symptom (a 0x400-byte BSS-layout shift on
+  ov004 caused by the same root cause). Fixable, deferred until it
+  becomes a bottleneck.
 
 ## Where to dig deeper
 
