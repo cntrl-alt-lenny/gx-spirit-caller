@@ -10,11 +10,11 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **32 distinct mwcc-vs-baserom codegen
-divergences** account for the **90+ dropped matches across the
-sixteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+**Short answer:** **33 distinct mwcc-vs-baserom codegen
+divergences** account for the **93+ dropped matches across the
+seventeen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
-053-wave17 / 055-wave18 / 055-wave19 / 055-wave20; the per-PR cross-reference
+053-wave17 / 055-wave18 / 055-wave19 / 055-wave20 / 057-wave21; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -90,7 +90,8 @@ Source-PR coverage:
 | 055/wave18 | 383 | 80.0% |  8  |       2 |
 | 055/wave19 | 385 | 60.0% |  6  |       4 |
 | 055/wave20 | 387 | 66.7% |  8  |       4 |
-| —     | —   |   —   | **183** |  **90** |
+| 057/wave21 | 390 | 70.0% |  7  |       3 |
+| —     | —   |   —   | **190** |  **93** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -98,7 +99,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (20 patterns)
+## Coercible-with-knowledge (21 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1745,6 +1746,109 @@ subtleties. Possibly a C-18 or P-9 entry." Brief 056-territory
 cloud autonomous PR (this one) — sweep verified routing fix on
 the triplet; C-20 entry added.
 
+### C-21. Ternary-to-constants collapse — decompose role from value
+
+**Target asm (`func_ov002_022b3720` — brief 057 wave 21):** a
+conditional 8-bit-rotation that produces `0x100` or `0x80` from
+a sign bit:
+
+```text
+
+cmp   r3, #0x0
+movlt r3, #0x1             ; sign bit
+movge r3, #0x0
+mov   r3, r3, lsl #0x7     ; sign << 7
+rsb   r3, r3, #0x100        ; r3 = 0x100 - (sign << 7)
+
+```
+
+4 instructions: `mov{lt,ge} #{1,0}; lsl #7; rsb #0x100`. The
+final value is one of two constants (`0x100` or `0x80`)
+produced via an explicit arithmetic chain (decision → bit-
+shift → subtract).
+
+**mwcc emits when miscoded** (natural ternary form):
+
+```c
+/* breaks: mwcc folds the ternary into 2 direct mov-immediates */
+p->f_1c = (prev < 0) ? 0x80 : 0x100;
+```
+
+```text
+
+cmp   r3, #0x0
+movlt r3, #0x80             ; direct constant for true path
+movge r3, #0x100            ; direct constant for false path
+
+```
+
+2 instructions: `mov{lt,ge} #{0x80,0x100}`. **mwcc's
+optimiser recognises the ternary returns one of two
+small-immediate constants and folds the entire decision
+into two predicated mov-immediates.** Same end value; 2
+fewer instructions; different bytes.
+
+**C that coerces it (verified byte-identical against
+`func_ov002_022b3720`):**
+
+```c
+int sign = (prev < 0) ? 1 : 0;             /* decision → 1 or 0 */
+p->f_1c = 0x100 - (sign << 7);             /* arithmetic chain */
+```
+
+**The trick:** decompose the ternary's two roles — *what's the
+decision?* (sign 1 or 0) from *what's the value?* (0x100 - 0x80,
+expressed as `0x100 - (sign << 7)`). mwcc's fold-pass requires
+both branches to be small-immediate constants on the same
+expression; splitting `sign` and the arithmetic into separate
+statements blocks the fold and emits the explicit `lsl/rsb`
+chain.
+
+**No SP variation flips it (verified all 15 SPs).** Sweep
+tested the coerced source across mwcc 1.2/base..sp4 +
+2.0/base..sp2p4 — every SP preserves the 4-insn chain
+(`movlt/movge/lsl/rsb`). Pure C-source coercion; no routing
+tier needed.
+
+**Use when:** target asm shows a 4-insn chain
+`mov{cond} rN, #{a}; mov{!cond} rN, #{b}; lsl rN, rN, #K;
+rsb rN, rN, #C` (or `add`/`sub`/`orr` instead of `rsb`) —
+where the two predicated mov constants are *small* (typically
+`0` and `1`) and the final value is computed by a single
+arithmetic op on the shifted form.
+
+**The recognition cue:** target has `lsl rN, rN, #K` AND
+`rsb rN, rN, #imm` (or similar) *immediately after* two
+predicated mov-immediates, AND the two predicated movs
+could plausibly be folded to "direct large constants" but
+weren't. The natural C source `(cond) ? X : Y` produces the
+folded form; the decomposed source `int sign = (cond) ? 1 :
+0; result = LARGE - (sign << K);` produces the chain.
+
+**Practical rule:** when the asm shape has BOTH a
+`mov{cond} #small` AND a subsequent arithmetic chain (shift +
+arith), the target was likely compiled from a "decompose role
+from value" C source. Don't write the natural ternary; split
+the role (decision producing 0/1) from the value (arithmetic
+on the decision).
+
+**How brief 057 wave 21 missed it on first pass:** the natural
+ternary `(prev < 0) ? 0x80 : 0x100` reads as the most direct C
+encoding — both constants are small enough to be mov-immediate
+operands, so mwcc folds them. The lesson is that *target's
+4-insn chain implies the original source did the arithmetic
+explicitly*; mwcc's optimiser can't infer back from
+two-constant ternary to single-arithmetic-chain.
+
+**Provenance:** brief 057 wave 21 (PR #390) — decomper
+documented the iteration ("`func_ov002_022b3720` fixed by
+emitting the shift-and-rsb explicitly instead of the natural
+ternary") and flagged it as "**possible C-20 codegen-walls
+entry** (the 'ternary-to-constants' collapse pattern)" — but
+C-20 was simultaneously taken by the pack-args wall (brief 056
+PR #389), so this is **C-21**. Brief 057-related fold-in (this
+cloud autonomous PR).
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -2304,16 +2408,19 @@ shape we should chase".
 | 055w19 / 385 | `func_0207db44`           | (mwcc didn't introduce `add r2, r0, #0x24` intermediate base for two accesses at +0x28/+0x2c) | permanent |
 | 055w20 / 387 | `func_ov002_021ae60c`/`_638`/`_6a4` | **C-20** (pack-halfwords-into-arg + tail-call; route via `*.legacy.c` with double-cast — brief 056 sweep verified byte-identical) | coercible (routing) |
 | 055w20 / 387 | `func_ov002_0226b00c`     | C-20 family (byte-pack variant; routing tier same as triplet, source form needs per-target tuning — brief 056 sweep partial) | coercible (routing, family) |
+| 057w21 / 390 | `func_02022540`           | (mwcc separate `i` + `i*0x10` induction vars vs orig's combined `add r1, base, i, lsl #4`; array-indexing source made it worse) | permanent |
+| 057w21 / 390 | `func_0202d9a0`           | (mwcc +1 extra insn on null + dual-counter inc; direct-struct-extern attempt didn't help) | permanent |
+| 057w21 / 390 | `func_02055298`           | C-1r family (in-place string xform: target has `beq L; ...; L: ...; bx lr` shared epilogue, mwcc collapses to `bxeq lr` early-return) | permanent (C-1r family) |
 
 ## Quantification
 
 ```
 
-By bucket (across 16 pilots: 020, 022, 028, 029, 030, 031, 040,
+By bucket (across 17 pilots: 020, 022, 028, 029, 030, 031, 040,
 047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16,
-053-wave17, 055-wave18, 055-wave19, 055-wave20):
-  Permanent              :  61 drops (68%)  ← +6 brief 055 (mwcc CSE / reg-alloc / stmia fusion family)
-  Coercible-but-missed   :  14 drops (16%)  ← +4 brief 055 wave 20 (C-20 routing-tractable triplet + family)
+053-wave17, 055-wave18, 055-wave19, 055-wave20, 057-wave21):
+  Permanent              :  64 drops (69%)  ← +3 wave 21 (2 mwcc-fusion + 1 C-1r family)
+  Coercible-but-missed   :  14 drops (15%)  ← future "should have matched"
   Edge case              :   9 drops (10%)
   Tooling-tractable      :   2 drops ( 2%)
   Tooling/infra (ov004 BSS)   :   2 drops ( 2% — brief 049 wave 12)
@@ -2354,7 +2461,10 @@ via C-15; brief 054 recovered W-H via C-16 and confirmed C-1r
 permanent; brief 055 waves 18 + 19 isolated C-17 (bitfield-
 mask redundancy), C-18 (combined-AND shared-epilogue), and
 C-19 (`int` local for `lt`-vs-`lo`) as wave-time iteration
-wins — already folded without affecting drop counts. The
+wins; brief 056-territory cloud sweep recovered the wave-20
+triplet via C-20 (pack-args routing); brief 057 wave 21
+isolated C-21 (ternary-to-constants decomposition) as another
+wave-time iteration win. The
 recent share dipped from ~17% to ~13% as wave 14 + wave 16 +
 wave 17 added permanent drops (7 P-1 misapplications + 3
 C-1r over-predication + 3 P-4-family / addr-taken) — the
