@@ -1822,6 +1822,22 @@ src/overlay002/func_ov002_0226bad0.c:
     complete
     .text start:0x0226bad0 end:0x0226baf8
 
+src/overlay002/func_ov002_0226b204.c:
+    complete
+    .text start:0x0226b204 end:0x0226b22c
+
+src/overlay002/func_ov002_022593f4.c:
+    complete
+    .text start:0x022593f4 end:0x02259420
+
+src/overlay002/func_ov002_02259a68.c:
+    complete
+    .text start:0x02259a68 end:0x02259a94
+
+src/overlay002/func_ov002_021d13b8.c:
+    complete
+    .text start:0x021d13b8 end:0x021d13e0
+
 
 
 
