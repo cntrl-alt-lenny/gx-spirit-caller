@@ -7337,3 +7337,19 @@ src/main/func_02005c60.c:
 src/main/func_02023d44.c:
     complete
     .text start:0x02023d44 end:0x02023d88
+
+src/main/func_02005d0c.c:
+    complete
+    .text start:0x02005d0c end:0x02005d54
+
+src/main/func_02012560.c:
+    complete
+    .text start:0x02012560 end:0x020125ac
+
+src/main/func_02033c2c.c:
+    complete
+    .text start:0x02033c2c end:0x02033c74
+
+src/main/func_02034114.c:
+    complete
+    .text start:0x02034114 end:0x02034160
