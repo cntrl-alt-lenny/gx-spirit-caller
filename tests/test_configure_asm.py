@@ -329,6 +329,81 @@ class TestLegacySp3CompilerConstants(unittest.TestCase):
         self.assertNotEqual(configure.LEGACY_C_SUFFIX, configure.LEGACY_SP3_C_SUFFIX)
 
 
+class TestWrapChainForWindows(unittest.TestCase):
+    """Pin the Windows-only shell-chain wrap added in brief 058.
+
+    Ninja on Windows calls `CreateProcess` directly (no `/bin/sh -c`),
+    so the `delink` / `lcf` / `mwasm` rule bodies — which chain a tool
+    with a Python post-processing step via `&&` — used to die on step
+    3 of the build with `dsd.exe error: unexpected argument '&&'
+    found`. The fix wraps the chain in `cmd /c "..."` on Windows so
+    cmd processes the operator. Linux / macOS rule bodies must stay
+    byte-identical to today's (Ninja's POSIX `/bin/sh -c` handles
+    `&&` natively).
+    """
+
+    def test_windows_wraps_in_cmd_c(self):
+        out = configure._wrap_chain_for_windows(
+            "a && b", system="windows",
+        )
+        self.assertEqual(out, 'cmd /c "a && b"')
+
+    def test_linux_passthrough(self):
+        # POSIX path must be byte-identical — anything else would
+        # change build.ninja for every Linux/macOS contributor.
+        out = configure._wrap_chain_for_windows(
+            "a && b", system="linux",
+        )
+        self.assertEqual(out, "a && b")
+
+    def test_macos_passthrough(self):
+        out = configure._wrap_chain_for_windows(
+            "a && b", system="macos",
+        )
+        self.assertEqual(out, "a && b")
+
+    def test_inner_double_quotes_preserved(self):
+        # mwasm's chain has an inner-quoted ASM path (e.g.
+        # `"C:\...\mwasmarm.exe"`). cmd /c's quote-handling rule with
+        # >2 quote chars + special chars between them is "strip first
+        # and last", which preserves the inner quotes. Pin the
+        # generated form so a careless refactor doesn't break that.
+        chain = '"C:\\path\\mwasmarm.exe" -o $out $in && python tail.py'
+        out = configure._wrap_chain_for_windows(chain, system="windows")
+        self.assertEqual(
+            out,
+            'cmd /c ""C:\\path\\mwasmarm.exe" -o $out $in && python tail.py"',
+        )
+
+    def test_ninja_variables_passthrough(self):
+        # `$config_path` etc. must reach Ninja literally so it can
+        # expand them at build time. The wrap doesn't touch them.
+        chain = "dsd delink --config-path $config_path && python tail.py --dir $delinks_dir"
+        out = configure._wrap_chain_for_windows(chain, system="windows")
+        self.assertIn("$config_path", out)
+        self.assertIn("$delinks_dir", out)
+        self.assertTrue(out.startswith('cmd /c "'))
+        self.assertTrue(out.endswith('"'))
+
+    def test_empty_chain_still_wrapped_on_windows(self):
+        # Degenerate but defined: an empty chain still gets cmd /c
+        # so the rule shape is uniform. Doesn't matter functionally.
+        out = configure._wrap_chain_for_windows("", system="windows")
+        self.assertEqual(out, 'cmd /c ""')
+
+    def test_default_system_uses_module_platform(self):
+        # When `system` is omitted, the helper falls back to the
+        # module-level `platform.system` set at import time. This
+        # is the path taken by main(); the test just confirms the
+        # default doesn't raise.
+        out = configure._wrap_chain_for_windows("a && b")
+        self.assertIsInstance(out, str)
+        # On the CI runner (Linux) the call must be a passthrough.
+        # If a future CI matrix adds Windows, that runner will see
+        # the wrapped form — both branches are explicitly covered
+        # by the system-injected tests above.
+
+
 class TestResolveMacosWine(unittest.TestCase):
     """Pin the wine-runner candidate-selection so a wine-stable user's
     setup keeps resolving to `wine` after the GPTK migration brief
