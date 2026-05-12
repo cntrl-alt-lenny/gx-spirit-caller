@@ -7317,3 +7317,23 @@ src/main/func_0202cdf8.c:
 src/main/func_02011a14.c:
     complete
     .text start:0x02011a14 end:0x02011a3c
+
+src/main/func_02018abc.c:
+    complete
+    .text start:0x02018abc end:0x02018b14
+
+src/main/func_0202c730.c:
+    complete
+    .text start:0x0202c730 end:0x0202c770
+
+src/main/func_0202f1d8.c:
+    complete
+    .text start:0x0202f1d8 end:0x0202f218
+
+src/main/func_02005c60.c:
+    complete
+    .text start:0x02005c60 end:0x02005ca0
+
+src/main/func_02023d44.c:
+    complete
+    .text start:0x02023d44 end:0x02023d88
