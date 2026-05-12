@@ -157,11 +157,34 @@ def patch_objects_text(text: str, sources: list[Path]) -> tuple[str, int]:
     """Apply the suffix rewrite to the contents of objects.txt.
 
     Each line of objects.txt is a single .o path. We scan for any
-    line ending in a buggy-suffix and replace its tail with the
-    corresponding fixed-suffix. Returns (new_text, count_changed).
+    line ending in a buggy-suffix and replace its trailing basename
+    with the corresponding fixed-suffix's basename. Returns
+    (new_text, count_changed).
 
     A line that already ends in the fixed-suffix is left alone —
     that's the idempotent path; rerunning is safe.
+
+    Path-separator handling (brief 059): `buggy_and_fixed_suffixes`
+    returns POSIX-form suffixes (forward-slash) regardless of host
+    because `dsd` on Linux/macOS emits POSIX paths. On Windows
+    `dsd` emits backslash paths, so a literal `line.endswith(buggy)`
+    misses every legacy entry — the symptom that brought down
+    `ninja rom` at the final mwldarm step. The fix:
+
+      1. Match on a POSIX-normalized copy of the line so the
+         directory portion (`src/main/`) still disambiguates
+         same-stem files in different modules — preserved from
+         before this fix.
+      2. Rewrite only the trailing basename, not the whole
+         suffix. The buggy / fixed pair differs ONLY in the
+         basename (`func_X.o` → `func_X.legacy.o`); the
+         directory part is identical. So the directory and its
+         native separator style stay verbatim in the output
+         line. A Windows line stays all-backslash; a POSIX line
+         stays all-forward-slash.
+
+    This is Approach A from brief 059 — minimal change,
+    separator-preserving. See tests for the platform matrix.
     """
     if not sources:
         return text, 0
@@ -175,13 +198,18 @@ def patch_objects_text(text: str, sources: list[Path]) -> tuple[str, int]:
     changed = 0
     for raw in text.splitlines(keepends=True):
         line = raw.rstrip("\n").rstrip("\r")
+        line_norm = line.replace("\\", "/")
         for buggy, fixed in rewrite_map.items():
-            if line.endswith(buggy) and not line.endswith(fixed):
-                # Replace exactly the trailing-suffix occurrence.
-                # Anchored at end-of-line so a substring match
-                # mid-path (e.g. `dir/func_X.o.bak`) cannot hit.
-                head = line[: -len(buggy)]
-                line = head + fixed
+            if line_norm.endswith(buggy) and not line_norm.endswith(fixed):
+                # Swap only the basename ("func_X.o" →
+                # "func_X.legacy.o"). The directory portion stays
+                # exactly as dsd emitted it — backslashes on
+                # Windows, forward slashes on POSIX, mixed if
+                # something upstream produced a mixed line.
+                buggy_basename = buggy.rsplit("/", 1)[-1]
+                fixed_basename = fixed.rsplit("/", 1)[-1]
+                head = line[: -len(buggy_basename)]
+                line = head + fixed_basename
                 changed += 1
                 break
         out_lines.append(line + "\n")

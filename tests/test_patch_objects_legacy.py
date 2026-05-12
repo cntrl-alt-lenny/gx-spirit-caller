@@ -288,6 +288,168 @@ class TestPatchObjectsText(unittest.TestCase):
         self.assertEqual(new, text)
 
 
+class TestPathSeparatorHandling(unittest.TestCase):
+    """Brief 059: `dsd` on Windows emits backslash paths in
+    objects.txt while `buggy_and_fixed_suffixes()` produces
+    POSIX-form (forward-slash) suffixes via `Path.as_posix()`. The
+    pre-fix `line.endswith(buggy)` check missed every legacy entry
+    on Windows, the rewrite silently no-op'd, and mwldarm bailed on
+    the first missing `.legacy.o`. These cases pin the
+    separator-agnostic behaviour:
+
+      1. Backslash-form lines match and get rewritten.
+      2. Mixed-separator lines match and get rewritten.
+      3. The rewrite preserves each line's native separator style
+         (Windows in → Windows out; POSIX in → POSIX out).
+      4. Rerunning on already-fixed Windows-form input is a no-op
+         (idempotency holds across separator styles).
+      5. The disambiguation-by-directory check still works on
+         Windows-form input (matching is normalized; only the
+         right module's entry is rewritten).
+    """
+
+    def test_windows_backslash_line_rewritten(self):
+        text = (
+            r"build\eur\src\main\CpuSet.o" "\n"
+            r"build\eur\src\main\func_0207cbbc.o" "\n"
+            r"build\eur\src\main\Task_InvokeLocked.o" "\n"
+        )
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_0207cbbc.legacy.c")],
+        )
+        self.assertEqual(n, 1)
+        # Native separators preserved end-to-end.
+        self.assertIn(
+            r"build\eur\src\main\func_0207cbbc.legacy.o" "\n",
+            new,
+        )
+        # Untouched neighbours keep backslashes.
+        self.assertIn(r"build\eur\src\main\CpuSet.o" "\n", new)
+        self.assertIn(r"build\eur\src\main\Task_InvokeLocked.o" "\n", new)
+        # Buggy entry is gone.
+        self.assertNotIn(r"build\eur\src\main\func_0207cbbc.o" "\n", new)
+
+    def test_windows_backslash_line_no_forward_slash_leak(self):
+        # Stricter version of the test above — the output line must
+        # not contain a single forward slash. A pre-fix Approach A
+        # candidate that wrote `head + fixed_posix` would leak
+        # forward slashes in the basename's directory portion. The
+        # basename-swap algorithm avoids this entirely.
+        text = r"build\eur\src\main\func_0207cbbc.o" "\n"
+        new, _ = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_0207cbbc.legacy.c")],
+        )
+        # Strip the trailing \n before the assertion so the test
+        # error message points at the path, not the newline.
+        out_line = new.rstrip("\n")
+        self.assertNotIn("/", out_line)
+
+    def test_windows_legacy_sp3_line_rewritten(self):
+        # Brief 045 third tier on a Windows-form line. Same fix
+        # applies — the only difference is the qualifier in the
+        # fixed basename.
+        text = r"build\eur\src\main\func_020467f4.o" "\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_020467f4.legacy_sp3.c")],
+        )
+        self.assertEqual(n, 1)
+        self.assertEqual(
+            new, r"build\eur\src\main\func_020467f4.legacy_sp3.o" "\n",
+        )
+
+    def test_mixed_separator_line_rewritten(self):
+        # Defensive case: a line where the head uses one separator
+        # style and the tail uses another. The basename swap touches
+        # only the trailing `func_X.o` → `func_X.legacy.o`, so the
+        # head's mixed style is preserved verbatim.
+        text = "build/eur\\src\\main\\func_X.o\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_X.legacy.c")],
+        )
+        self.assertEqual(n, 1)
+        # Head (`build/eur\src\main\`) is unchanged. Basename swap
+        # only touches the trailing `func_X.o`. Expected output:
+        # `build/eur\src\main\func_X.legacy.o`.
+        self.assertEqual(new, "build/eur\\src\\main\\func_X.legacy.o\n")
+
+    def test_windows_form_idempotent(self):
+        # Already-patched Windows-form line. The patcher must NOT
+        # double-patch into `func_X.legacy.legacy.o`.
+        text = r"build\eur\src\main\func_0207cbbc.legacy.o" "\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_0207cbbc.legacy.c")],
+        )
+        self.assertEqual(n, 0)
+        self.assertEqual(new, text)
+
+    def test_windows_form_sp3_idempotent(self):
+        # Same idempotency contract for the sp3 qualifier on
+        # Windows-form input.
+        text = r"build\eur\src\main\func_020467f4.legacy_sp3.o" "\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_020467f4.legacy_sp3.c")],
+        )
+        self.assertEqual(n, 0)
+        self.assertEqual(new, text)
+
+    def test_windows_form_module_disambiguation(self):
+        # Two sources with the same stem in different modules, all
+        # in Windows-form lines. Only the matching legacy source's
+        # line is rewritten — the other module's plain `.o` stays
+        # untouched. This was the only behaviour the pre-brief-059
+        # POSIX matcher got "right" on Windows (because it always
+        # returned False); the new normalized matcher must keep it.
+        text = (
+            r"build\eur\src\main\foo.o" "\n"
+            r"build\eur\src\overlay005\foo.o" "\n"
+        )
+        sources = [Path("src/main/foo.legacy.c")]
+        new, n = patch_objects_legacy.patch_objects_text(text, sources)
+        self.assertEqual(n, 1)
+        self.assertIn(r"build\eur\src\main\foo.legacy.o" "\n", new)
+        # overlay005's plain `.o` is preserved.
+        self.assertIn(r"build\eur\src\overlay005\foo.o" "\n", new)
+        # main's buggy `.o` is gone.
+        self.assertNotIn(r"build\eur\src\main\foo.o" "\n", new)
+
+    def test_windows_form_anchored_match(self):
+        # End-anchored match must hold under normalization too — a
+        # `.o.bak` mid-path-style false positive in Windows form
+        # must not trigger a rewrite.
+        text = r"build\eur\src\main\func_0207cbbc.o.bak" "\n"
+        new, n = patch_objects_legacy.patch_objects_text(
+            text, [Path("src/main/func_0207cbbc.legacy.c")],
+        )
+        self.assertEqual(n, 0)
+        self.assertEqual(new, text)
+
+    def test_windows_mixed_legacy_and_legacy_sp3(self):
+        # Both routing tiers on Windows-form lines — the
+        # steady-state once decomper uses both `.legacy.c` and
+        # `.legacy_sp3.c` targets. Every entry rewrites correctly
+        # while preserving native separators.
+        text = (
+            r"build\eur\src\main\CpuSet.o" "\n"
+            r"build\eur\src\main\func_0207cbbc.o" "\n"
+            r"build\eur\src\main\func_020467f4.o" "\n"
+            r"build\eur\src\overlay005\ov005_X.o" "\n"
+            r"build\eur\src\main\Task_InvokeLocked.o" "\n"
+        )
+        sources = [
+            Path("src/main/func_0207cbbc.legacy.c"),
+            Path("src/main/func_020467f4.legacy_sp3.c"),
+            Path("src/overlay005/ov005_X.legacy.c"),
+        ]
+        new, n = patch_objects_legacy.patch_objects_text(text, sources)
+        self.assertEqual(n, 3)
+        self.assertIn(r"build\eur\src\main\func_0207cbbc.legacy.o" "\n", new)
+        self.assertIn(r"build\eur\src\main\func_020467f4.legacy_sp3.o" "\n", new)
+        self.assertIn(r"build\eur\src\overlay005\ov005_X.legacy.o" "\n", new)
+        # Plain `.o` neighbours unchanged.
+        self.assertIn(r"build\eur\src\main\CpuSet.o" "\n", new)
+        self.assertIn(r"build\eur\src\main\Task_InvokeLocked.o" "\n", new)
+
+
 class TestCollectLegacySources(unittest.TestCase):
     """End-to-end test of the delinks.txt walker with a synthetic
     config tree. parse_delinks_file is reused from progress.py so
