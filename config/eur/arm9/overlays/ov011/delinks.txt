@@ -562,3 +562,15 @@ src/overlay011/func_ov011_021cc7f8.c:
 src/overlay011/func_ov011_021d0fd4.c:
     complete
     .text start:0x021d0fd4 end:0x021d0ffc
+
+src/overlay011/func_ov011_021d1058.c:
+    complete
+    .text start:0x021d1058 end:0x021d1080
+
+src/overlay011/func_ov011_021d11a0.c:
+    complete
+    .text start:0x021d11a0 end:0x021d11c8
+
+src/overlay011/func_ov011_021d11c8.c:
+    complete
+    .text start:0x021d11c8 end:0x021d11f0

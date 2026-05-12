@@ -442,3 +442,11 @@ src/overlay000/ov000_021ac7a8.c:
 src/overlay000/ov000_021ac78c.c:
     complete
     .text start:0x021ac78c end:0x021ac7a8
+
+src/overlay000/func_ov000_021af780.c:
+    complete
+    .text start:0x021af780 end:0x021af7a8
+
+src/overlay000/func_ov000_021af7a8.c:
+    complete
+    .text start:0x021af7a8 end:0x021af7d0

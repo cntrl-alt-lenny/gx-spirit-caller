@@ -7281,3 +7281,15 @@ src/main/func_02001d98.c:
 src/main/func_020a3380.c:
     complete
     .text start:0x020a3380 end:0x020a33a8
+
+src/main/func_02023214.c:
+    complete
+    .text start:0x02023214 end:0x02023244
+
+src/main/func_02048ed4.c:
+    complete
+    .text start:0x02048ed4 end:0x02048f04
+
+src/main/func_020351e8.c:
+    complete
+    .text start:0x020351e8 end:0x02035218
