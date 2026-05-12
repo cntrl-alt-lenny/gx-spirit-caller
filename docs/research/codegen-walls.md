@@ -1810,11 +1810,11 @@ tested the coerced source across mwcc 1.2/base..sp4 +
 (`movlt/movge/lsl/rsb`). Pure C-source coercion; no routing
 tier needed.
 
-**Use when:** target asm shows a 4-insn chain `mov{cond}
-rN, #{a}; mov{!cond} rN, #{b}; lsl rN, rN, #K; rsb rN, rN,
-#C` (or `add`/`sub`/`orr` instead of `rsb`) — where the
-two predicated mov constants are *small* (typically `0`
-and `1`) and the final value is computed by a single
+**Use when:** target asm shows a 4-insn chain
+`mov{cond} rN, #{a}; mov{!cond} rN, #{b}; lsl rN, rN, #K;
+rsb rN, rN, #C` (or `add`/`sub`/`orr` instead of `rsb`) —
+where the two predicated mov constants are *small* (typically
+`0` and `1`) and the final value is computed by a single
 arithmetic op on the shifted form.
 
 **The recognition cue:** target has `lsl rN, rN, #K` AND
@@ -1825,12 +1825,12 @@ weren't. The natural C source `(cond) ? X : Y` produces the
 folded form; the decomposed source `int sign = (cond) ? 1 :
 0; result = LARGE - (sign << K);` produces the chain.
 
-**Practical rule:** when the asm shape has BOTH a `mov{cond}
-#small` AND a subsequent arithmetic chain (shift + arith), the
-target was likely compiled from a "decompose role from value"
-C source. Don't write the natural ternary; split the role
-(decision producing 0/1) from the value (arithmetic on the
-decision).
+**Practical rule:** when the asm shape has BOTH a
+`mov{cond} #small` AND a subsequent arithmetic chain (shift +
+arith), the target was likely compiled from a "decompose role
+from value" C source. Don't write the natural ternary; split
+the role (decision producing 0/1) from the value (arithmetic
+on the decision).
 
 **How brief 057 wave 21 missed it on first pass:** the natural
 ternary `(prev < 0) ? 0x80 : 0x100` reads as the most direct C
