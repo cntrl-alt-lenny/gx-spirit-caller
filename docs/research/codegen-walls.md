@@ -10,7 +10,7 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **28 distinct mwcc-vs-baserom codegen
+**Short answer:** **29 distinct mwcc-vs-baserom codegen
 divergences** account for the **80+ dropped matches across the
 thirteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
@@ -95,7 +95,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (16 patterns)
+## Coercible-with-knowledge (17 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1372,6 +1372,100 @@ coercion found" drop and named the wall W-H; brief 054 (this
 research) verified the inline-asm coercion via the same recipe
 as C-12. **W-H reclassified from "no coercion" to C-16.**
 
+### C-17. Bitfield-write mask redundancy — omit the redundant `& mask` after shift-isolation
+
+**Target asm (`func_ov011_021d1058` — brief 055 wave 18):**
+
+```text
+
+ldr   r3, .L
+mov   r2, #0x28
+mla   r3, r0, r2, r3         ; r3 = &row[idx]
+ldr   r2, [r3, #0x8]
+mov   r0, r1, lsl #0x18
+bic   r1, r2, #0x3fc
+orr   r0, r1, r0, lsr #0x16   ; ← shifted-operand fused into orr
+str   r0, [r3, #0x8]
+bx    lr
+
+```
+
+The key insn is `orr r0, r1, r0, lsr #0x16` — mwcc fuses the
+`lsr` shift into the `orr`'s shifted-operand form, saving 2
+instructions vs the un-fused chain.
+
+**mwcc emits when miscoded** (with the redundant `& mask`):
+
+```c
+/* breaks: trailing `& 0x3fcu` prevents lsr+orr fusion */
+*p = (*p & ~0x3fcu) | (((val << 24) >> 22) & 0x3fcu);
+```
+
+```text
+
+lsl   r0, r1, #24
+ldr   r1, [r2, #0x8]
+lsr   r0, r0, #22             ; separate lsr
+bic   r1, r1, #1020
+and   r0, r0, #1020           ; spurious mask (3rd extra insn)
+orr   r0, r1, r0              ; un-fused orr
+str   r0, [r2, #0x8]
+
+```
+
+11 insns + .word = 0x2c (4 bytes / 1 insn over target).
+
+**C that coerces it (verified byte-identical against
+`func_ov011_021d1058`):**
+
+```c
+*p = (*p & ~0x3fcu) | ((val << 24) >> 22);
+```
+
+Just remove the trailing `& 0x3fcu`. The shifts have **already
+isolated** the bits — `(val << 24) >> 22` keeps only bits 2..9
+of `val`, exactly matching the `~0x3fcu` complement on the LHS.
+The redundant mask blocks mwcc's shifted-operand fusion pass
+that combines `lsr K` into the `orr`'s third operand
+(`orr rD, rN, rM, lsr #K`).
+
+**Use when:** target asm shows `orr rD, rN, rM, lsr #K` (or
+similar shifted-operand fusion) on a `(field & ~mask) | (val
+shifted)` bitfield-write idiom. Verify the shifts isolate the
+correct bits — if `(val << K1) >> K2` masks to exactly the
+bits cleared by `~mask` on the other side, the trailing `& mask`
+is redundant.
+
+**Practical rule:** for any bitfield-write of the form
+`(field & ~mask) | ((val << K1) >> K2)`, if the resulting bits
+of the shift-pair fit within `mask`, **omit any explicit
+`& mask` on the shifted-val side**. The shifts already
+isolate; the redundant mask blocks fusion.
+
+**How brief 055 wave 18 missed it on first pass:** the
+"defensive mask" intuition is strong — bitfield writes
+commonly look like `(field & ~mask) | (val & mask)` in
+defensive C, so adding `& mask` to the shifted form reads as
+"matching the conventional shape". The lesson is that
+shift-pair isolation is logically equivalent to AND-mask
+isolation; mwcc only fuses when the AND is absent.
+
+**Cross-corpus survey (brief 055):** brief 055's PR explicitly
+flagged this as the iteration win on `func_ov011_021d1058`.
+Future waves working on bitfield writes through `row[idx]` or
+similar should grep target asm for `orr ..., lsr` /
+`orr ..., lsl` fused shifts as a recognition cue. Likely a
+small population (estimated ≤10 candidates given the bitfield-
+write idiom's scope), but each is a clean 1-line source-shape
+win.
+
+**Provenance:** brief 055 wave 18 (PR #383) — decomper
+documented the wave-time iteration ("REMOVING a redundant
+mask fixed `func_ov011_021d1058`") and explicitly requested
+the fold ("Possibly worth a codegen-walls C-2b-or-similar
+entry"). Brief 055-related fold-in (this cloud autonomous
+PR).
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -1960,7 +2054,7 @@ Top single wall:
 ```
 
 **Read of the data:** roughly **13 % of dropped matches** in the
-12-pilot window are *coercible-but-missed* — the right C variation
+13-pilot window are *coercible-but-missed* — the right C variation
 or routing tier existed (or was discovered post-hoc by a follow-
 up cloud research brief) and the decomper just didn't try it.
 (The share moved from ~20% in the original brief-032 reading
@@ -1969,17 +2063,21 @@ threshold and reclassified 3 historic C-1 drops to permanent;
 brief 042 recovered W-A via C-9; brief 048 recovered W-E via
 C-12; brief 050 recovered W-F via C-14; brief 052 recovered W-G
 via C-15; brief 054 recovered W-H via C-16 and confirmed C-1r
-permanent. The recent share dipped from ~17% to ~13% as wave 14
-+ wave 16 added permanent drops (7 P-1 misapplications + 3
-C-1r over-predication) — the **misapplication patterns
-themselves were the high-leverage lessons**, captured in
-C-15's *Wall family note* and C-1r's subsection under C-1.)
-The coercible bucket is still the highest-leverage section of
-this doc: future pilots that spot a partial-match shape
-matching one of C-1 through C-16 should lift the documented
-variation or routing-tier change directly — but check C-1's
-*ARM-op limit* + *C-1r reverse direction* subsections AND
-C-15's *Wall family note* (C-15 vs P-1 discriminator) first.
+permanent; brief 055 wave 18 isolated C-17 (bitfield-mask
+redundancy) as a wave-time iteration win — already folded
+without affecting the wave's drop count. The recent share
+dipped from ~17% to ~13% as wave 14 + wave 16 + wave 17 added
+permanent drops (7 P-1 misapplications + 3 C-1r over-
+predication + 3 P-4-family / addr-taken) — the
+**misapplication patterns themselves were the high-leverage
+lessons**, captured in C-15's *Wall family note* and C-1r's
+subsection under C-1.) The coercible bucket is still the
+highest-leverage section of this doc: future pilots that spot
+a partial-match shape matching one of C-1 through C-17 should
+lift the documented variation or routing-tier change directly
+— but check C-1's *ARM-op limit* + *C-1r reverse direction*
+subsections AND C-15's *Wall family note* (C-15 vs P-1
+discriminator) first.
 
 The other ~87% of drops are permanent walls, edge cases, or
 infrastructure issues that the cluster-pilot yield band should
