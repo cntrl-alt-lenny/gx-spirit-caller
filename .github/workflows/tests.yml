@@ -101,3 +101,12 @@ jobs:
         # 058). Run just the targeted helper + its callers' module
         # so we don't import a noisy mixed signal here.
         run: python -m unittest tests.test_configure_asm.TestWrapChainForWindows -v
+
+      - name: Run patch_objects_legacy path-separator tests
+        # Brief 059 / PR #395: dsd on Windows emits backslash paths in
+        # objects.txt; the pre-fix patcher silently no-op'd for every
+        # legacy-routed TU. Run the new `TestPathSeparatorHandling`
+        # class on a real Windows host so the assertions exercise
+        # genuine Windows-form `r"..."` strings, not test-author-
+        # crafted backslash literals.
+        run: python -m unittest tests.test_patch_objects_legacy.TestPathSeparatorHandling -v
