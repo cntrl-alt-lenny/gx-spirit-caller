@@ -1846,6 +1846,18 @@ src/overlay002/func_ov002_0229d2ec.c:
     complete
     .text start:0x0229d2ec end:0x0229d32c
 
+src/overlay002/func_ov002_021ae60c.legacy.c:
+    complete
+    .text start:0x021ae60c end:0x021ae638
+
+src/overlay002/func_ov002_021ae638.legacy.c:
+    complete
+    .text start:0x021ae638 end:0x021ae664
+
+src/overlay002/func_ov002_021ae6a4.legacy.c:
+    complete
+    .text start:0x021ae6a4 end:0x021ae6d0
+
 
 
 
