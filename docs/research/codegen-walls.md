@@ -10,7 +10,7 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **29 distinct mwcc-vs-baserom codegen
+**Short answer:** **31 distinct mwcc-vs-baserom codegen
 divergences** account for the **80+ dropped matches across the
 thirteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
@@ -95,7 +95,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (17 patterns)
+## Coercible-with-knowledge (19 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1466,6 +1466,165 @@ the fold ("Possibly worth a codegen-walls C-2b-or-similar
 entry"). Brief 055-related fold-in (this cloud autonomous
 PR).
 
+### C-18. Combined-AND form for two-paths-converging-on-same-return
+
+**Target asm (`func_ov002_0226bad0` — brief 055 wave 19):**
+
+```text
+
+ldr   r2, .L
+ldr   r2, [r2, #0xd94]
+cmp   r0, r2
+beq   .L_zero                  ; ← branch to shared return-0
+cmp   r1, #0xb
+moveq r0, #0x800
+bxeq  lr
+.L_zero:
+mov   r0, #0x0
+bx    lr
+
+```
+
+i.e. **one branch** that joins a shared `mov r0, #0; bx lr`
+epilogue, with the success path's predicated return embedded
+between.
+
+**mwcc emits when miscoded** (separate-if form):
+
+```c
+/* breaks: two predicated early-returns, no shared epilogue */
+int f(int a, int b) {
+    if (a == K) return 0;
+    if (b == M) return N;
+    return 0;
+}
+```
+
+```text
+
+cmp   r0, K
+moveq r0, #0                   ; predicated early-return-0
+bxeq  lr
+cmp   r1, #M
+moveq r0, #N
+movne r0, #0                   ; predicated final-return-0 (no branch)
+bx    lr
+
+```
+
+Same instruction count (9 + .word = 0x28), but the bytes
+differ: target uses one `beq` + shared `mov r0, #0; bx lr`;
+mwcc with separate-if's uses `bxeq lr` + `movne r0, #0`.
+
+**C that coerces it (verified byte-identical against
+`func_ov002_0226bad0`):**
+
+```c
+int f(int a, int b) {
+    if (a != K && b == M) return N;
+    return 0;
+}
+```
+
+Combine the two predicates with `&&`: the first failure
+branches to the shared `return 0` site. mwcc emits `beq L`
+to the trailing `mov r0, #0; bx lr` block.
+
+**Use when:** target has a single `b{cond} .L` branch to a
+trailing `mov r0, #<C>; bx lr` (shared zero-return epilogue),
+AND a predicated mid-function return (`bx{cond} lr`) that uses
+a different constant. Two "guard then maybe return N" paths
+converging on a common "return C" — express as a single
+combined-AND if-statement.
+
+**How brief 055 wave 19 missed it on first pass:** the
+"guard each precondition separately" mental model is the
+natural way to read the asm. The combined-AND form requires
+*inverting the first comparison's sense* (`a != K` instead of
+`a == K`) — a small but easy-to-miss source-shape move.
+
+**Provenance:** brief 055 wave 19 (PR #385) — decomper
+documented the iteration ("`func_ov002_0226bad0` fixed via
+combined-AND form") and flagged the pattern as worth noting.
+Brief 055-related fold-in (this cloud autonomous PR).
+
+### C-19. `int` local to flip `lo` (unsigned-less) → `lt` (signed-less)
+
+**Target asm (`func_0203baa0` — brief 055 wave 19):**
+
+```text
+
+ldrb   r3, [r0, #0xae]
+cmp    r3, #0xff
+ldrlt  r1, .L
+movlt  r2, #0x0
+strltb r2, [r1, r3]
+...
+
+```
+
+Target uses **`lt`** (signed-less-than) predication.
+
+**mwcc emits when miscoded** (direct unsigned-byte compare):
+
+```c
+/* breaks: emits `lo` instead of `lt` */
+void f(S *p) {
+    if (p->f_byte < 0xff) arr[p->f_byte] = 0;
+}
+```
+
+```text
+
+ldrb   r3, [r0, #0xae]
+cmp    r3, #0xff
+ldrlo  r1, .L                   ← lo, not lt
+movlo  r2, #0x0
+strlob r2, [r1, r3]
+
+```
+
+Same instruction count and shape, but the predication
+condition-codes differ. `lo` (encoded `0x3`) vs `lt`
+(encoded `0xb`) — single-nibble divergence per predicated
+insn.
+
+**C that coerces it (verified byte-identical against
+`func_0203baa0`):**
+
+```c
+void f(S *p) {
+    int i = p->f_byte;                /* promote to int local */
+    if (i < 0xff) arr[i] = 0;
+}
+```
+
+The `int` local promotes the unsigned-byte to signed-int
+*before* the comparison. mwcc reads the comparison's LHS as
+signed and selects `lt`. Without the local, `p->f_byte`
+keeps its `unsigned char` type all the way to the cmp,
+which mwcc translates to `lo`.
+
+**Use when:** target asm shows `{ldr,mov,str}lt` predication
+on a small-immediate compare (typically `cmp rN, #0xff` or
+similar), AND the source-of-truth value is loaded from a
+`u8`/`u16` field via `ldrb`/`ldrh`. The natural direct-
+compare form emits `lo`; promoting through `int i = p->f;`
+emits `lt`.
+
+**Quick discriminator at the asm level:** condition code
+`0xb` in the predicated insn's high nibble = `lt`; `0x3` =
+`lo`. Both encode "less-than" semantically but on different
+flag bits. Targets compiled from `int`-promoted source emit
+`lt`; targets compiled from `unsigned`-typed source emit
+`lo`.
+
+**Provenance:** brief 055 wave 19 (PR #385) — decomper
+documented the iteration ("`func_0203baa0` fixed via `int`
+local instead of direct unsigned-char compare") and flagged
+the pattern as worth noting. Brief 055-related fold-in
+(this cloud autonomous PR).
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -2063,17 +2222,18 @@ threshold and reclassified 3 historic C-1 drops to permanent;
 brief 042 recovered W-A via C-9; brief 048 recovered W-E via
 C-12; brief 050 recovered W-F via C-14; brief 052 recovered W-G
 via C-15; brief 054 recovered W-H via C-16 and confirmed C-1r
-permanent; brief 055 wave 18 isolated C-17 (bitfield-mask
-redundancy) as a wave-time iteration win — already folded
-without affecting the wave's drop count. The recent share
-dipped from ~17% to ~13% as wave 14 + wave 16 + wave 17 added
-permanent drops (7 P-1 misapplications + 3 C-1r over-
-predication + 3 P-4-family / addr-taken) — the
+permanent; brief 055 waves 18 + 19 isolated C-17 (bitfield-
+mask redundancy), C-18 (combined-AND shared-epilogue), and
+C-19 (`int` local for `lt`-vs-`lo`) as wave-time iteration
+wins — already folded without affecting drop counts. The
+recent share dipped from ~17% to ~13% as wave 14 + wave 16 +
+wave 17 added permanent drops (7 P-1 misapplications + 3
+C-1r over-predication + 3 P-4-family / addr-taken) — the
 **misapplication patterns themselves were the high-leverage
 lessons**, captured in C-15's *Wall family note* and C-1r's
 subsection under C-1.) The coercible bucket is still the
 highest-leverage section of this doc: future pilots that spot
-a partial-match shape matching one of C-1 through C-17 should
+a partial-match shape matching one of C-1 through C-19 should
 lift the documented variation or routing-tier change directly
 — but check C-1's *ARM-op limit* + *C-1r reverse direction*
 subsections AND C-15's *Wall family note* (C-15 vs P-1
