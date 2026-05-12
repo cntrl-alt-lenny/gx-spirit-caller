@@ -313,20 +313,25 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/055-hard-tier-byte-volume-continued.md`](docs/briefs/055-hard-tier-byte-volume-continued.md)
-  — `decomper`: continuation of brief 053's byte-volume pivot.
-  Same rule (≤ 0x40, skip P-1 / C-1r / ov004, apply C-16). Brief
-  053's 3-wave chain shipped 19 matches / 884 bytes at 66%
-  combined yield; brief 055 pushes for ~3 more waves before any
-  cap-raise. Self-extend: 2 follow-ups under same gates (≥40%
-  yield + ≥200 bytes). Branch:
-  `decomper/hard-tier-byte-volume-continued`.
+- [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](docs/briefs/057-hard-tier-cap-raise-0x60.md)
+  — `decomper`: cap raised from ≤ 0x40 → ≤ 0x60. Briefs 053 + 055
+  together shipped 41 matches / 1832 bytes at 67% — the ≤ 0x40
+  toolkit is proven; time to push for more bytes per match. Math
+  shows the cap-raise breaks even at 40% yield, wins at 50%+.
+  Self-extend gates: ≥ 40% yield AND ≥ 250 bytes per wave (raised
+  from 200). Branch: `decomper/hard-tier-cap-raise-0x60`.
 
 Cloud is on standby; no scoped brief. May pick up smaller
 autonomous tasks per AGENTS.md.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/055-hard-tier-byte-volume-continued.md`](docs/briefs/055-hard-tier-byte-volume-continued.md)
+  `decomper`, full chain shipped across PRs #383 / #385 / #387
+  (waves 18/19/20). **22 matches / 948 bytes / 69% combined
+  yield.** Beat brief 053's 884-byte chain. 4 C-16 W-H wins via
+  natural C; multi-module twin pattern strong. Triggered cloud
+  C-17 / C-18 / C-19 autonomous fold-ins.
 - [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
   `decomper`, full chain shipped across PRs #374 / #378 / #380
   (waves 15/16/17). **19 matches / 884 bytes combined at 66%
