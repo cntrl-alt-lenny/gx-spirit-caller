@@ -8,15 +8,19 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-12 afternoon, post-brief-053-full-chain.
-Main tip after PRs #379 + #380. Easy **84.1%**, hard **2.2%**,
-badge **1.32%**.
+**Last updated:** 2026-05-12 afternoon, post-brief-055-full-chain.
+Main tip after PRs #386 + #387. Easy **84.1%**, hard **2.4%**,
+badge **1.36%**.
 
-Brief 053's 3-wave chain shipped **19 matches / 884 bytes combined**
-at 66% yield. Strategic byte-volume pivot validated. Brief 055
-continues the pattern (≤ 0x40 cap, same gates). Wave 16's C-1r
-over-predication shape confirmed permanent across all 15 SPs
-(cloud PR #379).
+Brief 053 + 055 combined: **41 matches / 1832 bytes / 67% yield**
+across 6 waves at ≤ 0x40 cap. Toolkit proven. Brief 057 raises
+cap to ≤ 0x60 to push for higher byte-volume — math shows it
+breaks even at 40% yield, wins at 50%+.
+
+Cloud autonomous fold-ins shipped: C-1r permanent verdict (15-SP
+sweep), C-17 bitfield-mask redundancy, C-18 combined-AND, C-19
+int-comparison-flavor, P-4 family extension. Codegen-walls.md
+now ~19 entries.
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -53,7 +57,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 186 | 8171 | 8357 | **2.2%** | **+119** |
+| `hard` | 208 | 8149 | 8357 | **2.4%** | **+141** |
 
 **Cluster yield track record** through brief 029:
 
