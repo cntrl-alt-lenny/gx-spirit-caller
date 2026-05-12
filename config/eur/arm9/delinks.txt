@@ -7265,3 +7265,19 @@ src/main/func_020822c8.c:
 src/main/func_02087ce8.c:
     complete
     .text start:0x02087ce8 end:0x02087d10
+
+src/main/func_02089024.c:
+    complete
+    .text start:0x02089024 end:0x0208904c
+
+src/main/func_0208910c.c:
+    complete
+    .text start:0x0208910c end:0x02089134
+
+src/main/func_02001d98.c:
+    complete
+    .text start:0x02001d98 end:0x02001dc4
+
+src/main/func_020a3380.c:
+    complete
+    .text start:0x020a3380 end:0x020a33a8
