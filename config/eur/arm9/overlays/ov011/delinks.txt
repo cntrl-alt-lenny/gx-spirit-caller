@@ -574,3 +574,7 @@ src/overlay011/func_ov011_021d11a0.c:
 src/overlay011/func_ov011_021d11c8.c:
     complete
     .text start:0x021d11c8 end:0x021d11f0
+
+src/overlay011/func_ov011_021d0e58.c:
+    complete
+    .text start:0x021d0e58 end:0x021d0e88
