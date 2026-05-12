@@ -10,11 +10,11 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **31 distinct mwcc-vs-baserom codegen
-divergences** account for the **80+ dropped matches across the
-thirteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+**Short answer:** **32 distinct mwcc-vs-baserom codegen
+divergences** account for the **90+ dropped matches across the
+sixteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
-053-wave17; the per-PR cross-reference
+053-wave17 / 055-wave18 / 055-wave19 / 055-wave20; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -87,7 +87,10 @@ Source-PR coverage:
 | 053/wave15 | 374 | 83.3% |  5  |       1 |
 | 053/wave16 | 378 | 50.0% |  7  |       7 |
 | 053/wave17 | 380 | 70.0% |  7  |       3 |
-| —     | —   |   —   | **161** |  **80** |
+| 055/wave18 | 383 | 80.0% |  8  |       2 |
+| 055/wave19 | 385 | 60.0% |  6  |       4 |
+| 055/wave20 | 387 | 66.7% |  8  |       4 |
+| —     | —   |   —   | **183** |  **90** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -95,7 +98,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (19 patterns)
+## Coercible-with-knowledge (20 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1625,6 +1628,123 @@ local instead of direct unsigned-char compare") and flagged
 the pattern as worth noting. Brief 055-related fold-in
 (this cloud autonomous PR).
 
+### C-20. Pack-halfwords-into-arg + tail-call via legacy-tier routing
+
+**Target asm (`func_ov002_021ae60c` triplet — brief 055 wave 20):**
+
+```text
+
+mov   r2, r2, lsl #0x10       ; explicit zero-extend r2 to halfword
+mov   r2, r2, lsr #0x10       ;   (lsl+lsr pair = & 0xffff)
+mov   r3, r2, lsl #0x10       ; r3 = (c & 0xffff) << 16  (re-shift after mask)
+mov   r1, r1, lsl #0x10       ; r1 = b << 16
+mov   r2, r0                  ; r2 = a (overwrites masked c — dead after step 3)
+orr   r3, r3, r1, lsr #0x10   ; r3 = (c<<16) | (b & 0xffff)
+ldr   ip, .L                  ; tail-call setup
+mov   r0, #0x31               ; r0 = constant
+mov   r1, #0x6                ; r1 = constant
+bx    ip
+.word func_ov002_0229ade0
+
+```
+
+11 insns + .word = 0x30. Note the EXPLICIT `lsl K; lsr K` pair
+on r2 — mwcc 2.0's optimiser sees the third shift (`mov r3, r2,
+lsl #0x10`) and collapses the entire pre-shift mask away
+because the upper bits get shifted out anyway.
+
+**mwcc emits when miscoded** (natural C source on
+mwcc 2.0/sp1p5):
+
+```c
+/* breaks: mwcc elides the mask — 9 insns vs target's 11 */
+func_helper(0x31, 6, a, ((c & 0xffff) << 16) | (b & 0xffff));
+```
+
+```text
+
+ldr  r12, .L
+lsl  r3, r2, #16             ; mwcc elides the (c & 0xffff) prefix — knows lsl kills upper bits
+lsl  r1, r1, #16
+mov  r2, r0
+orr  r3, r3, r1, lsr #16
+mov  r0, #49
+mov  r1, #6
+bx   r12
+
+```
+
+8 insns + .word + bx = 9 insns total. **−8 bytes vs target.**
+The `unsigned short` arg variant (`unsigned short b, unsigned
+short c`) elides EVEN MORE because mwcc trusts the caller's
+zero-extend.
+
+**C that coerces it (verified byte-identical against the
+3-target triplet `func_ov002_021ae60c` / `_638` / `_6a4`):**
+
+```c
+extern void func_helper(int, int, int, unsigned int);
+
+void func_target(int a, unsigned int b, unsigned int c) {
+    func_helper(0x31, 6, a,
+        ((unsigned int)(unsigned short)c << 16) |
+        (unsigned int)(unsigned short)b);
+}
+```
+
+**Compile via `*.legacy.c` routing** (mwcc 1.2/sp2p3). The
+double-cast `(unsigned int)(unsigned short)c` writes the mask
+as an explicit type-conversion sequence that mwcc 1.2 preserves
+faithfully — it emits the literal `lsl 16; lsr 16` shift-pair
+to zero-extend the halfword. mwcc 2.0 sees through the cast
+sequence and collapses (because subsequent `<< 16` makes the
+mask redundant); mwcc 1.2 doesn't perform that collapse.
+
+**Why routing-tractable, not C-coercible alone.** Sweep tested
+12 C variations on mwcc 2.0/sp1p5 (natural, `unsigned short`
+args, explicit-mask local, GCC register-asm hint, double-cast,
+volatile, etc.) — every variation on 2.0/sp1p5 collapses to 9
+insns or fewer. **All 5 mwcc 1.2 SPs** (1.2/base, sp2, sp2p3,
+sp3, sp4) with the double-cast form preserve the explicit
+11-insn shape. **All 10 mwcc 2.0 SPs** elide. The wall is
+mwcc-2.0-specific shift-pair-after-mask collapse; routing
+through `*.legacy.c` (or `*.legacy_sp3.c`) sidesteps it.
+
+**Why routing is safe for flat tail-call thunks.** The target
+has no prologue / epilogue (just `bx ip` for tail-call), so
+Style A vs Style B epilogue style doesn't apply. The legacy
+compilers' inline-asm parser caveat (per C-12 / C-16) doesn't
+apply either — this recipe uses pure C source. Compatible with
+both `*.legacy.c` and `*.legacy_sp3.c`.
+
+**Use when:** target has an explicit `lsl K; lsr K` shift-pair
+on a halfword/byte value that's then immediately re-shifted (or
+OR'd with another shifted value), followed by a tail-call.
+Recognition cue: 3+ consecutive `mov rN, rM, lsl #...` /
+`mov rN, rM, lsr #...` insns where one of the shifts appears
+"redundant" after a wider final shift. The redundant-looking
+shift is the wall — mwcc 2.0 will elide it; routing through
+`*.legacy.c` preserves it.
+
+**Cross-corpus survey (brief 055 wave 20):** the explicit
+triplet `func_ov002_021ae60c` / `_021ae638` / `_021ae6a4`
+(all 0x30, all in ov002, all share callee `func_ov002_0229ade0`,
+all share the pack-2-halfwords-into-r3 shape). Each differs
+only in the last `mov r1, #imm` constant (6, 7, 9). **Family
+extension:** `func_ov002_0226b00c` is the same wall on a
+byte-pack variant (target masks `r3` / `r2` with `and #0xff`
+instead of `lsl/lsr`); the recipe shape needs adjusted source
+form but routing tier is the same (`*.legacy.c`). Decomper to
+verify per-target.
+
+**Provenance:** brief 055 wave 20 (PR #387) flagged the
+triplet drops as "These look worth a cloud research brief —
+the pack-multiple-halfwords-into-a-single-arg pattern surfaces
+multiple times and mwcc's mask-elision varies with arg-type
+subtleties. Possibly a C-18 or P-9 entry." Brief 056-territory
+cloud autonomous PR (this one) — sweep verified routing fix on
+the triplet; C-20 entry added.
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -2176,19 +2296,27 @@ shape we should chase".
 | 053w16 / 378 | `func_0201f0f4`           | (predicated range-check form +4) | permanent |
 | 053w17 / 380 | `func_02084a9c`/`_84ac4`  | (P-4 family: r0-vs-r1 ldr-dest divergence on fnptr-cache shape; brief 054 sweep verified asm-void recipe coerces but below shelve threshold) | permanent |
 | 053w17 / 380 | `func_ov002_021b91d0`     | (address-taken stack-frame elision: mwcc `-O4,p` optimises non-`volatile` address-taken local back to register; `volatile` adds extra reload — exact spill-no-reload target shape not reachable) | permanent |
+| 055w18 / 383 | `func_ov011_021d2d44`     | (mwcc CSE'd `idx*2` differently than orig's fused `idx*4` + `[reg, #2]` for second access) | permanent |
+| 055w18 / 383 | `func_ov000_021ac834`     | (P-4 family: r0-vs-r2 ldr-dest divergence on sign-ext differ-test; inline-return form didn't flip allocator) | permanent |
+| 055w19 / 385 | `func_ov011_021ca600`     | (mwcc 2 extra pointer-arith insns instead of `[base, #imm]` form; byte-pointer source would need struct typedef) | permanent |
+| 055w19 / 385 | `func_ov000_021ac508`     | (mwcc CSE'd two RMW cycles into one; two-statement source still merged) | permanent |
+| 055w19 / 385 | `func_0207d994`           | (mwcc `stmia` for two adjacent stores where orig had `mov r0, r3` interleaved) | permanent |
+| 055w19 / 385 | `func_0207db44`           | (mwcc didn't introduce `add r2, r0, #0x24` intermediate base for two accesses at +0x28/+0x2c) | permanent |
+| 055w20 / 387 | `func_ov002_021ae60c`/`_638`/`_6a4` | **C-20** (pack-halfwords-into-arg + tail-call; route via `*.legacy.c` with double-cast — brief 056 sweep verified byte-identical) | coercible (routing) |
+| 055w20 / 387 | `func_ov002_0226b00c`     | C-20 family (byte-pack variant; routing tier same as triplet, source form needs per-target tuning — brief 056 sweep partial) | coercible (routing, family) |
 
 ## Quantification
 
 ```
 
-By bucket (across 13 pilots: 020, 022, 028, 029, 030, 031, 040,
+By bucket (across 16 pilots: 020, 022, 028, 029, 030, 031, 040,
 047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16,
-053-wave17):
-  Permanent              :  55 drops (69%)  ← +3 wave 17 (P-4 family pair + addr-taken-spill)
-  Coercible-but-missed   :  10 drops (13%)  ← future "should have matched"
-  Edge case              :   9 drops (11%)
-  Tooling-tractable      :   2 drops ( 3%)
-  Tooling/infra (ov004 BSS)   :   2 drops ( 3% — brief 049 wave 12)
+053-wave17, 055-wave18, 055-wave19, 055-wave20):
+  Permanent              :  61 drops (68%)  ← +6 brief 055 (mwcc CSE / reg-alloc / stmia fusion family)
+  Coercible-but-missed   :  14 drops (16%)  ← +4 brief 055 wave 20 (C-20 routing-tractable triplet + family)
+  Edge case              :   9 drops (10%)
+  Tooling-tractable      :   2 drops ( 2%)
+  Tooling/infra (ov004 BSS)   :   2 drops ( 2% — brief 049 wave 12)
   Provisional minor wall      :   0 drops ( — — W-H reclassified to C-16 by brief 054)
 
 (Wave 14 retry of `func_0209085c` is counted as a drop in the
@@ -2200,13 +2328,14 @@ match in wave 14 + the wave-12 W-H retry. Bucket math
 intentionally counts unique walls, not per-attempt.)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 17 drops (21%)  ← largest
-  P-4 family (single-byte reg-alloc): 6 drops ( 8%  — incl. wave 17 r0-vs-r1 pair)
-  E-3 (Thumb)                       :  4 drops ( 5%)
-  C-1r (over-predication branchy)   :  3 drops ( 4% — brief 053 wave 16)
-  P-6 (4-op predication threshold)  :  3 drops ( 4%)
-  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 5% — brief 040)
-  C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 3% — brief 047 wave 9)
+  P-1 (shift-pair collapse)         : 17 drops (19%)  ← largest
+  P-4 family (single-byte reg-alloc): 7 drops ( 8%  — incl. brief 055 wave 18 r0-vs-r2)
+  E-3 (Thumb)                       :  4 drops ( 4%)
+  C-20 (pack-args routing — new)    :  4 drops ( 4% — brief 055 wave 20 triplet + family)
+  C-1r (over-predication branchy)   :  3 drops ( 3% — brief 053 wave 16)
+  P-6 (4-op predication threshold)  :  3 drops ( 3%)
+  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 4% — brief 040)
+  C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 2% — brief 047 wave 9)
   C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 1% — brief 049 wave 12)
   C-16 (W-H r1-vs-ip ldr scratch)   :  1 drop  ( 1% — brief 051 wave 14)
 
