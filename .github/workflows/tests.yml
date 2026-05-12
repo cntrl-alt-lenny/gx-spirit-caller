@@ -42,3 +42,62 @@ jobs:
 
       - name: Run unittest suite
         run: python -m unittest discover -s tests -v
+
+  configure-windows:
+    # Windows-only smoke gate added with brief 058 / PR #393.
+    #
+    # Why: Ninja on Windows calls CreateProcess directly (no shell),
+    # so `&&`-chained rule bodies in tools/configure.py die at build
+    # time with `unexpected argument '&&' found`. The fix wraps the
+    # three affected rules (`delink`, `lcf`, `mwasm`) in
+    # `cmd /c "..."` via `_wrap_chain_for_windows()`. This job
+    # regenerates `build.ninja` on a real Windows runner so that
+    # regression can't slip back in silently.
+    #
+    # Scope is intentionally narrow: configure-only. Full `ninja rom`
+    # would need the baserom (not redistributable) and the mwccarm /
+    # dsd binaries downloaded at first build, which the Linux job
+    # doesn't pay for either. The end-to-end "ninja rom + dsd check
+    # modules" smoke test is brain's job pre-merge.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r tools/requirements.txt
+
+      - name: Generate build.ninja (configure-only)
+        run: python tools/configure.py eur --skip-sha1
+
+      - name: Assert cmd /c wrap on the three Windows-fragile rules
+        shell: pwsh
+        run: |
+          # Each Windows-fragile rule's `command = ` line must start
+          # with `cmd /c "` so cmd.exe processes the `&&` chain.
+          # Ninja calls CreateProcess directly on Windows (no shell),
+          # so an un-wrapped chain dies at build time with
+          # `dsd.exe error: unexpected argument '&&' found`.
+          # If brief 058's `_wrap_chain_for_windows` regresses (e.g.,
+          # a fourth chained rule gets added without the wrap), this
+          # gate catches it before merge.
+          $matches = Select-String -Path build.ninja `
+              -Pattern '^\s*command = cmd /c "' -AllMatches
+          $count = ($matches | Measure-Object).Count
+          Write-Host "Found $count rule(s) wrapped in cmd /c"
+          if ($count -lt 3) {
+            Write-Host "::error::expected at least 3 'cmd /c' wraps (delink, lcf, mwasm), got $count"
+            exit 1
+          }
+
+      - name: Run wrap-helper unit tests
+        # The full unittest discover surfaces unrelated path-separator
+        # assumptions on Windows (pre-existing, not in scope for brief
+        # 058). Run just the targeted helper + its callers' module
+        # so we don't import a noisy mixed signal here.
+        run: python -m unittest tests.test_configure_asm.TestWrapChainForWindows -v

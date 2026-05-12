@@ -227,6 +227,39 @@ PYTHON = sys.executable
 
 
 # --------------------------------------------------------------------------- #
+# Shell-chain wrap for Windows
+# --------------------------------------------------------------------------- #
+
+def _wrap_chain_for_windows(chain: str, system: str | None = None) -> str:
+    """Make a `&&`-chained command line runnable under Ninja on Windows.
+
+    Ninja on Windows invokes commands via `CreateProcess` directly — no
+    `cmd.exe` shell — so `&&` lands as a literal argv token to the
+    first executable in the chain (`dsd.exe`, `mwasmarm.exe`, etc.)
+    and the build dies on the first such rule. Wrapping in
+    `cmd /c "..."` defers chain parsing to cmd, which interprets `&&`
+    natively. No-op on non-Windows hosts (Ninja on POSIX uses
+    `/bin/sh -c`, which handles `&&` correctly).
+
+    The `mwcc` / `mwcc_legacy` / `mwcc_legacy_sp3` rules use a
+    different idiom: they omit their post-processing tail on Windows
+    entirely because `transform_dep.py` is a host-tool nicety, not
+    correctness. The three rules treated here — `delink`, `lcf`,
+    `mwasm` — chain steps that are required on every platform (gap
+    `.o` alignment fixups, LCF rewrites, mwasm size-trim), so the
+    Windows fix has to keep running them. See brief 058 / PR #393.
+
+    `system` is injectable for tests; falls back to the module-level
+    `platform.system` (set at import time by `get_platform()`).
+    """
+    if system is None:
+        system = platform.system
+    if system == "windows":
+        return f'cmd /c "{chain}"'
+    return chain
+
+
+# --------------------------------------------------------------------------- #
 # Baserom SHA-1 verification
 # --------------------------------------------------------------------------- #
 
@@ -395,7 +428,7 @@ def main():
         patch_align = "tools/patch_section_align.py"
         n.rule(
             name="delink",
-            command=(
+            command=_wrap_chain_for_windows(
                 f"{DSD} delink --config-path $config_path"
                 f" && {PYTHON} {patch_align} --dir $delinks_dir"
             ),
@@ -473,7 +506,7 @@ def main():
         # thunks (VBlankIntrWait, Mod) that's a 2-byte cascade shift
         # at link time. The trim path reverses it at the .o level.
         patch_align = "tools/patch_section_align.py"
-        mwasm_cmd = (
+        mwasm_cmd = _wrap_chain_for_windows(
             f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
             f' && {PYTHON} {patch_align} --trim-padding $out'
         )
@@ -506,7 +539,7 @@ def main():
             name="lcf",
             # v0.11+ `dsd lcf` writes to conventional paths under the build dir:
             # build/<ver>/arm9.lcf and build/<ver>/objects.txt. No CLI paths needed.
-            command=(
+            command=_wrap_chain_for_windows(
                 f"{DSD} lcf -c $config_path"
                 f" && {PYTHON} {patch_lcf} $lcf_file"
                 f" && {PYTHON} {patch_objects}"
