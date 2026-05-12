@@ -8,14 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-10 night, post-wave-15 (strategic-pivot
-debut). Main tip after PRs #374 + #375. Easy **84.1%**, hard
-**2.1%** (cap-raise to 0x40 paid back — 320 bytes in one wave).
+**Last updated:** 2026-05-12 afternoon, post-brief-053-full-chain.
+Main tip after PRs #379 + #380. Easy **84.1%**, hard **2.2%**,
+badge **1.32%**.
 
-Strategic pivot validated: 5 matches at 0x40 size = 320 bytes
-combined, 83% yield. Decomper has 2 self-extends remaining on
-brief 053 + C-16 W-H addendum. Cloud's brief 054 shipped wall
-family note + new coercion.
+Brief 053's 3-wave chain shipped **19 matches / 884 bytes combined**
+at 66% yield. Strategic byte-volume pivot validated. Brief 055
+continues the pattern (≤ 0x40 cap, same gates). Wave 16's C-1r
+over-predication shape confirmed permanent across all 15 SPs
+(cloud PR #379).
 
 **Badge bug resolved (PR #348):** the progress badge showed 0.39%
 all day while real EUR code-byte progress was 1.18%. Two bugs:
@@ -52,7 +53,7 @@ post-#311):
 | `sinit` | 51 | 0 | 51 | **100.0%** | +1 |
 | `named` | 38 | 1 | 39 | 97.4% | — |
 | `medium` | 125 | 31 | 156 | **80.1%** | **+31** |
-| `hard` | 172 | 8185 | 8357 | **2.1%** | **+105** |
+| `hard` | 186 | 8171 | 8357 | **2.2%** | **+119** |
 
 **Cluster yield track record** through brief 029:
 

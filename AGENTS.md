@@ -313,24 +313,26 @@ itself:
 
 ### Open briefs
 
-No open briefs. Decomper has **2 self-extends remaining** on brief
-053 (wave 15 = initial brief; both gates passed at 83% yield + 320
-bytes). Same selection rule **with one addition**: C-16 (W-H
-ldr-r1-vs-ip, per brief 054) is now coercible — applies when the
-target uses `ldr r1; bx r1` for tail-call and mwcc default emits
-`ldr ip; bx ip`.
+- [`docs/briefs/055-hard-tier-byte-volume-continued.md`](docs/briefs/055-hard-tier-byte-volume-continued.md)
+  — `decomper`: continuation of brief 053's byte-volume pivot.
+  Same rule (≤ 0x40, skip P-1 / C-1r / ov004, apply C-16). Brief
+  053's 3-wave chain shipped 19 matches / 884 bytes at 66%
+  combined yield; brief 055 pushes for ~3 more waves before any
+  cap-raise. Self-extend: 2 follow-ups under same gates (≥40%
+  yield + ≥200 bytes). Branch:
+  `decomper/hard-tier-byte-volume-continued`.
 
-Cloud is on standby; brief 054 fully shipped (wall family note +
-C-16 / W-H coercion). May pick up smaller autonomous tasks per
-AGENTS.md.
+Cloud is on standby; no scoped brief. May pick up smaller
+autonomous tasks per AGENTS.md.
 
 ### Closed briefs (reference)
 
 - [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
-  `decomper`, shipped in PR #374 (wave 15 — initial). **5 matches
-  at 0x40 size, 320 bytes combined, 83% yield.** Cap-raise to
-  ≤ 0x40 validated; both self-extend gates passed. Hard tier
-  2.0% → 2.1%.
+  `decomper`, full chain shipped across PRs #374 / #378 / #380
+  (waves 15/16/17). **19 matches / 884 bytes combined at 66%
+  yield.** Strategic byte-volume pivot validated. Brief 055
+  continues the pattern. Wave 16 surfaced C-1r over-predication
+  (cloud confirmed permanent in PR #379).
 - [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
   `cloud`, shipped in PR #375. Two deliverables: (1) C-15 vs P-1
   wall family note (cross-links + discriminator table); (2)
