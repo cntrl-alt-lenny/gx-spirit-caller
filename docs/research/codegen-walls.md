@@ -11,9 +11,10 @@ Same research format as
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
 **Short answer:** **28 distinct mwcc-vs-baserom codegen
-divergences** account for the **77+ dropped matches across the
-twelve pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
-047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16; the per-PR cross-reference
+divergences** account for the **80+ dropped matches across the
+thirteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
+053-wave17; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -85,7 +86,8 @@ Source-PR coverage:
 | 051/wave14 | 372 | 47.4% |  9  |      10 |
 | 053/wave15 | 374 | 83.3% |  5  |       1 |
 | 053/wave16 | 378 | 50.0% |  7  |       7 |
-| —     | —   |   —   | **154** |  **77** |
+| 053/wave17 | 380 | 70.0% |  7  |       3 |
+| —     | —   |   —   | **161** |  **80** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -1509,11 +1511,29 @@ to be mwcc-version specific.
 
 **Affected drops:** brief 031 `func_02052ddc`, `_0207842c`,
 `_02078444`, `_ov002_0229cd70` (all 66% partial; identical-asm
-group of 3 cross-overlay siblings + 1 main). **4 of 47 (9%)**.
+group of 3 cross-overlay siblings + 1 main); brief 053
+self-extend 2 / wave 17 (PR #380) added `func_02084a9c` +
+`_02084ac4` (r0-vs-r1 ldr-dest on fnptr-cache shape — a
+different reg-allocator-pick variant in the same single-byte-
+divergence family). **6 of 80 (8%)** across the canonical
+swap-thunk and fnptr-cache shapes.
+
+**Coercion fallback (brief 054 sweep on wave-17 targets):** the
+`asm void` + `nofralloc` recipe from C-12 / C-16 also works
+here — the wave-17 reg-alloc divergence emits byte-identical
+when written verbatim in inline asm. But the cost per target
+is high (~10 lines of inline asm with manual label
+management vs ~3 lines of C source), and the cross-corpus
+population is small (P-4 + wave 17 = 6 known instances). Per
+brief 044's threshold scheme: this falls below the ≥10
+ship-tier line. **Recommendation: skip and document** unless
+a future wave surfaces enough instances to justify the
+inline-asm-per-target cost.
 
 **Tooling angle (T-1):** see *Tooling-tractable* section below —
-this could be unlocked by a `propagate_template --rename-regs`
-flag.
+the broader family (any single-byte register-field
+divergence) could be unlocked by a `propagate_template
+--rename-regs` flag at near-zero per-target cost.
 
 ### P-5. Halfword offset >0xff split via add
 
@@ -1901,16 +1921,19 @@ shape we should chase".
 | 053w16 / 378 | `func_0202147c`           | (pool-load placement r1/r2 vs r2/r1 — variant of P-3) | permanent |
 | 053w16 / 378 | `func_02046c60`/`_49634`  | (alias-reload form +4; 11 insns vs orig 10) | permanent |
 | 053w16 / 378 | `func_0201f0f4`           | (predicated range-check form +4) | permanent |
+| 053w17 / 380 | `func_02084a9c`/`_84ac4`  | (P-4 family: r0-vs-r1 ldr-dest divergence on fnptr-cache shape; brief 054 sweep verified asm-void recipe coerces but below shelve threshold) | permanent |
+| 053w17 / 380 | `func_ov002_021b91d0`     | (address-taken stack-frame elision: mwcc `-O4,p` optimises non-`volatile` address-taken local back to register; `volatile` adds extra reload — exact spill-no-reload target shape not reachable) | permanent |
 
 ## Quantification
 
 ```
 
-By bucket (across 12 pilots: 020, 022, 028, 029, 030, 031, 040,
-047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16):
-  Permanent              :  52 drops (68%)  ← +8 wave 14 + 1 wave 15 + 7 wave 16
+By bucket (across 13 pilots: 020, 022, 028, 029, 030, 031, 040,
+047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16,
+053-wave17):
+  Permanent              :  55 drops (69%)  ← +3 wave 17 (P-4 family pair + addr-taken-spill)
   Coercible-but-missed   :  10 drops (13%)  ← future "should have matched"
-  Edge case              :   9 drops (12%)
+  Edge case              :   9 drops (11%)
   Tooling-tractable      :   2 drops ( 3%)
   Tooling/infra (ov004 BSS)   :   2 drops ( 3% — brief 049 wave 12)
   Provisional minor wall      :   0 drops ( — — W-H reclassified to C-16 by brief 054)
@@ -1924,8 +1947,8 @@ match in wave 14 + the wave-12 W-H retry. Bucket math
 intentionally counts unique walls, not per-attempt.)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 17 drops (22%)  ← largest
-  P-4 (r2-vs-r3 swap)               :  4 drops ( 5%)
+  P-1 (shift-pair collapse)         : 17 drops (21%)  ← largest
+  P-4 family (single-byte reg-alloc): 6 drops ( 8%  — incl. wave 17 r0-vs-r1 pair)
   E-3 (Thumb)                       :  4 drops ( 5%)
   C-1r (over-predication branchy)   :  3 drops ( 4% — brief 053 wave 16)
   P-6 (4-op predication threshold)  :  3 drops ( 4%)
