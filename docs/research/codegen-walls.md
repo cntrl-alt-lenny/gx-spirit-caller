@@ -10,10 +10,10 @@ Same research format as
 [`hard-tier-clustering.md`](hard-tier-clustering.md) /
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
-**Short answer:** **27 distinct mwcc-vs-baserom codegen
-divergences** account for the **69+ dropped matches across the
-ten pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
-047-wave9 / 049-wave12 / 051-wave14; the per-PR cross-reference
+**Short answer:** **28 distinct mwcc-vs-baserom codegen
+divergences** account for the **77+ dropped matches across the
+twelve pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -29,7 +29,12 @@ mwcc 2.0-only); brief 051 wave 14 surfaced **W-H**
 choice) which brief 054's research classified as **C-16**
 (`asm void` + `nofralloc` inline-asm recipe — same shape as
 C-12), plus a **C-15-vs-P-1 taxonomy lesson** folded as a
-*Wall family note* under both entries. Most fall into one
+*Wall family note* under both entries; brief 053 wave 16
+surfaced a reverse-direction **C-1 corollary** (mwcc over-
+predicates `if-or-or return-const + return-const` final
+returns where target uses a branchy return) — brief 054's
+SP sweep verified all 15 SPs collapse identically, classified
+as **C-1r permanent**. Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
@@ -78,7 +83,9 @@ Source-PR coverage:
 | 047/wave9 | 357 | 73.3% |  11  |       4 |
 | 049/wave12 | 366 | 73.3% | 11  |       4 |
 | 051/wave14 | 372 | 47.4% |  9  |      10 |
-| —     | —   |   —   | **142** |  **69** |
+| 053/wave15 | 374 | 83.3% |  5  |       1 |
+| 053/wave16 | 378 | 50.0% |  7  |       7 |
+| —     | —   |   —   | **154** |  **77** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -170,6 +177,86 @@ brief 028 `func_02067b8c`/`func_0207f8f8`/`func_02087d10`
 (originally tagged C-1-coercible; brief 033 reattempted the
 same residue-cluster siblings and confirmed the threshold via
 the 5-variation iteration above, reclassified to P-6).
+
+#### C-1r. Reverse direction: mwcc over-predicates `if-or-or return-const + return-const`
+
+C-1 covers the case where target uses predication and mwcc emits
+branches. **The reverse also happens:** target uses a branchy
+final return (`bne L; mov rN, #X; bx lr; L: mov rN, #Y; bx lr` —
+5 insns) and mwcc collapses both arms into a 3-insn predicated
+return (`moveq rN, #X; movne rN, #Y; bx lr`). Net mwcc emit is
+**8 bytes shorter** than target.
+
+**Target asm (3 wave-16 drops):** an OR'd multi-key bool
+predicate with a branchy final return:
+
+```text
+
+ldr r2, .L                   ; pool: K1
+cmp r0, r2                   ; predicated cmp chain
+addne r1, r2, #delta1
+cmpne r0, r1
+addne r1, r2, #delta2
+cmpne r0, r1
+bne .L_else                  ; branchy return
+mov r0, #0x1
+bx lr
+.L_else:
+mov r0, #0x0
+bx lr
+
+```
+
+11 insns + .word = 0x30 bytes. Note the **hybrid shape** —
+predicated cmp chain (3 `addne/cmpne` pairs) PLUS branchy final
+return.
+
+**mwcc emits when miscoded** (every C variation tried, every SP):
+
+```text
+
+ldr r2, .L
+cmp r0, r2
+addne r1, r2, #delta1
+cmpne r0, r1
+addne r1, r2, #delta2
+cmpne r0, r1
+moveq r0, #0x1               ; final return collapsed to predication
+movne r0, #0x0
+bx lr
+
+```
+
+9 insns + .word = 0x28 bytes. **8 bytes shorter than target.**
+
+**No coercion found (verified all 15 SPs).** Brief 054
+sweep tested the natural OR'd-condition C source
+(`if (x == K1 || x == K2 || x == K3) return 1; return 0;`)
+across all 15 mwcc SPs (1.2/base..sp4 + 2.0/base..sp2p4): every
+SP collapses the final return into the 3-insn predicated form.
+Also tested `-O3,p` / `-O2,p` (same collapse) and `-O1,p`
+(produces a 13-insn shape with `beq L; ...; bne L; mov #1; bx
+lr; L: mov #0; bx lr` — different prologue, larger size). The
+3-separate-ifs form (`if (...) return 1; if (...) return 1; if
+(...) return 1; return 0;`) emits a different 13-insn shape
+(every cmp uses `bxeq` shortcut), also non-matching. **The
+target's hybrid shape (predicated chain + branchy return) is
+not reachable from C under the project's `-O4,p` standard
+flags.**
+
+**Use when (negative):** target has the hybrid shape
+documented above. Skip and document — this is a permanent
+corollary of C-1's predication pass. No SP / routing fix
+exists; budget zero matches.
+
+**Why this differs from C-15 (mvn-vs-sub peephole):** C-15 is
+mwcc-2.0-only and `*.legacy.c` routing fixes it. C-1r fires
+on ALL mwcc SPs (every legacy tier produces the same collapse).
+Routing doesn't help.
+
+**Affected drops:** brief 053 self-extend 1 / wave 16 (PR #378)
+`func_0202ef08`, `func_0202f59c`, `func_02031764`.
+**3 of 69 drops (4%).**
 
 ### C-2. Local-pointer reuse for two-field reads
 
@@ -1809,16 +1896,21 @@ shape we should chase".
 | 051w14 / 372 | `func_020534b4`          | (mvnne-andne `& -1` collapse; mwcc emits `movne r0, r4` — semantic equivalence) | permanent |
 | 051w14 / 372 | `func_0205da2c`          | (multi-return convention: `mov r0, r1` post-bl skip-before-write) | edge case |
 | 051w14 / 372 | `func_0209085c` (retry)  | C-16 (`*.legacy.c` routing did NOT fix; `asm void` + `nofralloc` recipe per brief 054 — same target as w12 row above, retry confirmed C-15 doesn't apply) | coercible (asm-void, resolved) |
+| 053w15 / 374 | `func_02034054`           | (branchy/predicated mismatch on 0x40 candidate — same family as C-1r below) | permanent |
+| 053w16 / 378 | `func_0202ef08`/`_f59c`/`_31764` | C-1r (over-predication: target hybrid predicated-chain + branchy-return; all 15 SPs collapse final return — brief 054 sweep verified) | permanent (corollary of C-1) |
+| 053w16 / 378 | `func_0202147c`           | (pool-load placement r1/r2 vs r2/r1 — variant of P-3) | permanent |
+| 053w16 / 378 | `func_02046c60`/`_49634`  | (alias-reload form +4; 11 insns vs orig 10) | permanent |
+| 053w16 / 378 | `func_0201f0f4`           | (predicated range-check form +4) | permanent |
 
 ## Quantification
 
 ```
 
-By bucket (across 10 pilots: 020, 022, 028, 029, 030, 031, 040,
-047-wave9, 049-wave12, 051-wave14):
-  Permanent              :  44 drops (64%)  ← +8 wave 14 (7 P-1 + 1 collapse)
-  Coercible-but-missed   :  10 drops (14%)  ← future "should have matched"
-  Edge case              :   9 drops (13%)
+By bucket (across 12 pilots: 020, 022, 028, 029, 030, 031, 040,
+047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16):
+  Permanent              :  52 drops (68%)  ← +8 wave 14 + 1 wave 15 + 7 wave 16
+  Coercible-but-missed   :  10 drops (13%)  ← future "should have matched"
+  Edge case              :   9 drops (12%)
   Tooling-tractable      :   2 drops ( 3%)
   Tooling/infra (ov004 BSS)   :   2 drops ( 3% — brief 049 wave 12)
   Provisional minor wall      :   0 drops ( — — W-H reclassified to C-16 by brief 054)
@@ -1832,19 +1924,20 @@ match in wave 14 + the wave-12 W-H retry. Bucket math
 intentionally counts unique walls, not per-attempt.)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 17 drops (25%)  ← largest
-  P-4 (r2-vs-r3 swap)               :  4 drops ( 6%)
-  E-3 (Thumb)                       :  4 drops ( 6%)
+  P-1 (shift-pair collapse)         : 17 drops (22%)  ← largest
+  P-4 (r2-vs-r3 swap)               :  4 drops ( 5%)
+  E-3 (Thumb)                       :  4 drops ( 5%)
+  C-1r (over-predication branchy)   :  3 drops ( 4% — brief 053 wave 16)
   P-6 (4-op predication threshold)  :  3 drops ( 4%)
-  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 6% — brief 040)
+  P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 5% — brief 040)
   C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 3% — brief 047 wave 9)
   C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 1% — brief 049 wave 12)
   C-16 (W-H r1-vs-ip ldr scratch)   :  1 drop  ( 1% — brief 051 wave 14)
 
 ```
 
-**Read of the data:** roughly **14 % of dropped matches** in the
-10-pilot window are *coercible-but-missed* — the right C variation
+**Read of the data:** roughly **13 % of dropped matches** in the
+12-pilot window are *coercible-but-missed* — the right C variation
 or routing tier existed (or was discovered post-hoc by a follow-
 up cloud research brief) and the decomper just didn't try it.
 (The share moved from ~20% in the original brief-032 reading
@@ -1852,18 +1945,20 @@ down to ~14% after brief 033 surfaced P-6's 4-op predication
 threshold and reclassified 3 historic C-1 drops to permanent;
 brief 042 recovered W-A via C-9; brief 048 recovered W-E via
 C-12; brief 050 recovered W-F via C-14; brief 052 recovered W-G
-via C-15; brief 054 recovered W-H via C-16. The recent share
-dipped from ~17% back to ~14% as wave 14's 7 P-1 misapplications
-added to the *permanent* bucket — the **misapplication itself
-was the high-leverage lesson**, captured in C-15's *Wall family
-note*.) The bucket is still the highest-leverage section of
-this doc: future pilots that spot a partial-match shape matching
-one of C-1 through C-16 should lift the documented variation or
-routing-tier change directly — but check C-1's *ARM-op limit*
-subsection AND C-15's *Wall family note* (C-15 vs P-1
-discriminator) first.
+via C-15; brief 054 recovered W-H via C-16 and confirmed C-1r
+permanent. The recent share dipped from ~17% to ~13% as wave 14
++ wave 16 added permanent drops (7 P-1 misapplications + 3
+C-1r over-predication) — the **misapplication patterns
+themselves were the high-leverage lessons**, captured in
+C-15's *Wall family note* and C-1r's subsection under C-1.)
+The coercible bucket is still the highest-leverage section of
+this doc: future pilots that spot a partial-match shape
+matching one of C-1 through C-16 should lift the documented
+variation or routing-tier change directly — but check C-1's
+*ARM-op limit* + *C-1r reverse direction* subsections AND
+C-15's *Wall family note* (C-15 vs P-1 discriminator) first.
 
-The other ~86% of drops are permanent walls, edge cases, or
+The other ~87% of drops are permanent walls, edge cases, or
 infrastructure issues that the cluster-pilot yield band should
 already account for. Brief 023's calibration of MED 37% / HIGH
 78% factored in the historic permanent-wall loss; that's why
