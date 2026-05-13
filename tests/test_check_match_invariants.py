@@ -687,6 +687,80 @@ class TestCrossFileNameDrift(unittest.TestCase):
                         "extern ... Drift2"},
             )
 
+    def test_multi_region_symbol_resolves_against_other_region(self):
+        # PR #423 fix: a USA-only symbol (in config/usa/symbols.txt but
+        # not in config/eur/symbols.txt) must NOT trip cross_file_name_
+        # drift when referenced from src/usa/. The check unions across
+        # all bootstrapped config/<region>/ siblings.
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            # config/eur/ — has only the EUR-side address
+            eur_config, src_dir, libs_dir = self._setup(
+                tmp,
+                symbols={"main": ["func_02006164"]},  # EUR address
+            )
+            # config/usa/ — sibling of config/eur/, has the USA-side
+            # address that doesn't exist in EUR's symbols.txt
+            usa_config = tmp / "config" / "usa" / "arm9"
+            usa_config.mkdir(parents=True, exist_ok=True)
+            (usa_config / "symbols.txt").write_text(
+                "func_02006148 kind:function(arm,size=0x10) "
+                "addr:0x02006148\n",
+                encoding="utf-8",
+            )
+            # src/usa/main/foo.c references the USA-side address
+            (src_dir / "usa" / "main").mkdir(parents=True, exist_ok=True)
+            (src_dir / "usa" / "main" / "foo.c").write_text(
+                "extern void func_02006148(void);\n",
+                encoding="utf-8",
+            )
+            # Run with config/eur/ as the primary (matches CI's
+            # `--version eur` default)
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, eur_config,
+            )
+            # No drift errors: USA symbol resolves via sibling
+            # config/usa/symbols.txt
+            self.assertEqual(
+                [i for i in issues if i.severity == "error"], [],
+                "multi-region union should resolve USA symbol against "
+                "config/usa/ even when --version eur is passed",
+            )
+
+    def test_multi_region_genuinely_missing_still_flags(self):
+        # Sanity check the fix isn't too loose: a name missing from
+        # ALL regions' symbols.txt must still trip the check.
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            eur_config, src_dir, libs_dir = self._setup(
+                tmp,
+                symbols={"main": []},  # empty EUR symbols
+            )
+            # Bootstrap USA + JPN with their own (different) symbol sets
+            for region, addr in (("usa", "0x02000010"), ("jpn", "0x02000020")):
+                rc = tmp / "config" / region / "arm9"
+                rc.mkdir(parents=True, exist_ok=True)
+                (rc / "symbols.txt").write_text(
+                    f"func_{addr[2:]} kind:function(arm,size=0x10) "
+                    f"addr:{addr}\n",
+                    encoding="utf-8",
+                )
+            # Reference a symbol that exists in NONE of the regions
+            (src_dir / "main").mkdir(parents=True, exist_ok=True)
+            (src_dir / "main" / "drift.c").write_text(
+                "extern void func_deadbeef(void);\n",
+                encoding="utf-8",
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, eur_config,
+            )
+            errors = [i for i in issues if i.severity == "error"]
+            self.assertEqual(
+                len(errors), 1,
+                "symbol missing from ALL regions must still error",
+            )
+            self.assertIn("func_deadbeef", errors[0].message)
+
 
 if __name__ == "__main__":
     unittest.main()

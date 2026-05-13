@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**52 tools** across 7 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**53 tools** across 7 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (12)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (8)
+- [Match acceleration](#match-acceleration) (9)
 - [Multi-region porting](#multi-region-porting) (2)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
@@ -190,6 +190,12 @@ mwcc emits many template-shaped instruction sequences: 44+ __sinit_* static-init
 **one-shot context assembler for a decomp target.**
 
 The "preparing to decompile function F" ritual currently involves half-a-dozen tools: find_callsites for callers, find_callsites again for callees, find_callsites a third time for data loads, a manual grep through src/<module>/ for alrea…
+
+### `tools/suggest_coercion.py`
+
+**rule engine over objdiff JSON output.**
+
+Given an unmatched function's `objdiff-cli diff` JSON, surfaces candidate codegen-walls.md entries with their recipes. Replaces a chunk of the manual "stare at diff → look up wall in codegen-walls → pick coercion" iteration loop with a o…
 
 ## Multi-region porting
 
