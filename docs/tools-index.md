@@ -7,13 +7,14 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**51 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**52 tools** across 7 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (13)
+- [Analysis / worklist](#analysis--worklist) (12)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (8)
+- [Multi-region porting](#multi-region-porting) (2)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (15)
@@ -69,12 +70,6 @@ Complements `tools/analyze_symbols.py`'s bulk-group output. Bulk groups cluster 
 **transitive cascade finder.**
 
 Extends `find_cascades.py` (#132) from single-step to multi-step promotion prediction. Same graph semantics, recursive evaluation.
-
-### `tools/find_region_siblings.py`
-
-**find USA / JPN counterparts of an EUR symbol.**
-
-Given an EUR function (by address or name), prints candidate USA + JPN sibling addresses using fingerprint matching against `config/{usa,jpn}/**/symbols.txt` + `relocs.txt`.
 
 ### `tools/next_targets.py`
 
@@ -195,6 +190,22 @@ mwcc emits many template-shaped instruction sequences: 44+ __sinit_* static-init
 **one-shot context assembler for a decomp target.**
 
 The "preparing to decompile function F" ritual currently involves half-a-dozen tools: find_callsites for callers, find_callsites again for callees, find_callsites a third time for data loads, a manual grep through src/<module>/ for alrea…
+
+## Multi-region porting
+
+_Cross-region porting pipeline: locate USA/JPN siblings of EUR-matched functions and mechanically rewrite source for the target region. See brief 061 / 064 for design._
+
+### `tools/find_region_siblings.py`
+
+**find USA / JPN counterparts of an EUR symbol.**
+
+Given an EUR function (by address or name), prints candidate USA + JPN sibling addresses using fingerprint matching against `config/{usa,jpn}/**/symbols.txt` + `relocs.txt`.
+
+### `tools/port_to_region.py`
+
+**mechanical EUR-to-region source porting.**
+
+Given a matched EUR `.c` source, rewrite all cross-region symbol references (function names, callees, data symbols) to their USA or JPN siblings via `find_region_siblings.find_siblings()`. Write the ported source to `src/<region>/<module…
 
 ## Hygiene / invariants
 

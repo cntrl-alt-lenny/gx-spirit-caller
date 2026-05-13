@@ -54,6 +54,8 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("find_pattern_clusters", "match-acceleration", "Match acceleration"),
     ("find_shape_templates", "match-acceleration", "Match acceleration"),
     ("cluster_wave_propagate", "match-acceleration", "Match acceleration"),
+    ("find_region_siblings", "multi-region", "Multi-region porting"),
+    ("port_to_region", "multi-region", "Multi-region porting"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
@@ -95,6 +97,7 @@ CATEGORY_ORDER = [
     "analysis",
     "rename-support",
     "match-acceleration",
+    "multi-region",
     "invariants",
     "ci-formatters",
     "infrastructure",
@@ -105,6 +108,7 @@ CATEGORY_TITLES = {
     "analysis": "Analysis / worklist",
     "rename-support": "Rename support",
     "match-acceleration": "Match acceleration",
+    "multi-region": "Multi-region porting",
     "invariants": "Hygiene / invariants",
     "ci-formatters": "CI formatters",
     "infrastructure": "Infrastructure / build-patching",
@@ -126,6 +130,11 @@ CATEGORY_DESC = {
     "match-acceleration": (
         "Tools that compress the decomp iteration loop: context "
         "assembly, template matching, permuter workspace staging."
+    ),
+    "multi-region": (
+        "Cross-region porting pipeline: locate USA/JPN siblings of "
+        "EUR-matched functions and mechanically rewrite source for "
+        "the target region. See brief 061 / 064 for design."
     ),
     "invariants": (
         "Pre-flight sanity checks. Run locally before pushing and "
