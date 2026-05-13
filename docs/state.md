@@ -8,12 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 morning, post-#404 + #405 merge.
-Brain on Mac. Brief 060 initial (wave 24) shipped 9 matches at
-75% yield — well above gates. C-20a recipe shipped, byte-pack
-wall coercible. Run `python tools/next_targets.py --version eur`
-for current per-tier numbers — printed counts now stale by +25
-hard-tier matches across waves 21-24.
+**Last updated:** 2026-05-13 mid-morning, post-#407 + #408 merge.
+Brain on Mac. Brief 060 self-extend 1/2 (wave 25) shipped 11
+matches at 85% yield — combined waves 24+25 are 20 matches /
+764 bytes / 80% yield, already exceeding brief 057's full
+3-wave chain in just 2 waves. C-20a recipe recovered both
+wave-23 drops first-try. Run `python tools/next_targets.py
+--version eur` for current per-tier numbers — printed counts
+now stale by +36 hard-tier matches across waves 21-25.
 
 ## This session in one paragraph
 
@@ -98,13 +100,17 @@ PR #400 (brain state refresh), PR #401 (cloud S-class sweep
 verdict + preamble), PR #402 (decomper wave 23 — brief 057
 self-extend 2/2 FINAL), PR #403 (brain brief 060 doc), PR #404
 (cloud C-20a inline-asm fallback), PR #405 (decomper wave 24 —
-brief 060 INITIAL).
+brief 060 INITIAL), PR #406 (brain state refresh), PR #407
+(cloud S-1 ↔ cascade cross-reference), and PR #408 (decomper
+wave 25 — brief 060 self-extend 1/2).
 
-**Brief 060 active (decomper, mid-chain).** Wave 24 shipped 9
-matches / 320 bytes / **75% yield** — well above the 40% / 250
-gates. Cluster-anchor compare against the 90-candidate MEDIUM
-pool propagated very well at the small end (0x20-0x28). 78
-candidates remain in the pool for self-extends 1/2 + 2/2.
+**Brief 060 active (decomper, mid-chain — 1 self-extend slot
+left).** Wave 24 + 25 combined: **20 matches / 764 bytes / 80%
+yield**. Cluster-anchor compare against the 90-candidate MEDIUM
+pool propagated very well at the small end (0x20-0x28). Wave
+25 recovered both wave-23 C-20a drops first-try with cloud's
+PR #404 recipe (`func_ov002_0226b00c` + `func_ov002_022a8668`).
+~70 candidates remain. One self-extend (2/2) available.
 
 **Brief 057 closed.** Cumulative 16 matches / 1016 bytes / ~57%
 across waves 21+22+23.
@@ -119,15 +125,17 @@ threshold).
 
 **Cloud follow-up candidates (autonomous standing rule):**
 
-1. **S-1 cascading misplacement** sub-finding — decomper's wave
-   24 surface. Uniform offset shift can come from upstream TU
-   size mismatch in the lcf cascade, not just struct padding.
-   The diagnostic at the linked-binary level is the same; the
-   resolution lives somewhere else. Worth a sub-entry in S-1
-   or a sibling S-2.
-2. **C-21 "explicit-next-ahead walk loop"** fold-in still
-   pending decomper usage (wave 24 didn't surface a linked-list
-   walk; carries to self-extends).
+1. **S-1 cascade variant (c) — cross-`.o` BL pool literals.**
+   Wave 25's PR body surfaced a third symptom variant after
+   #407's variant-(a)/(b) cross-reference fold: the asm body
+   matches `.o`-byte-perfect, but a cross-function BL relocation
+   into a shifted upstream region resolves to a 4-or-8-byte-
+   off target. Same root cause as (a) and (b); decomper called
+   it out as a "downstream symptoms" extension to S-1. Low-
+   priority fold-in.
+2. **C-21 "explicit-next-ahead walk loop"** still pending
+   decomper usage (neither wave 24 nor 25 surfaced a linked-
+   list walk; carries to wave 26).
 3. Pre-existing carryover #1 (placeholder-in-complete-TU
    warning, `func_ov021_021aaf58`) still open.
 
