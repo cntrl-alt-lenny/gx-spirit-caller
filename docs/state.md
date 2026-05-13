@@ -8,11 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-12 evening, post-brief-058 / post-brief-059,
-mid Windows→Mac brain handoff. Main tip after PR #392 + #396. Badge
-**1.39%** (live README). Run `python tools/next_targets.py --version
-eur` for current per-tier numbers — last printed counts are stale by
-+14 hard-tier matches from waves 21 + 22.
+**Last updated:** 2026-05-13 morning, post-#397 + #398 merge. Brain
+back on Mac after Windows handoff. Main tip `46ca0ba`. Badge
+**1.39%** (live README) — unchanged, today's merges were docs-only.
+Run `python tools/next_targets.py --version eur` for current per-tier
+numbers — last printed counts are still stale by +14 hard-tier
+matches from waves 21 + 22.
 
 ## This session in one paragraph
 
@@ -86,48 +87,57 @@ needs the Game Porting Toolkit cask per
 
 ## In flight (post this brain-PR)
 
-**Open PRs (2 — both cloud autonomous, both pending brain review):**
+**Open PRs: 0.** #397 + #398 squashed onto main this morning.
 
-- **#397** `cloud/c20-family-corpus-scan` — C-20 family corpus
-  scan (post-wave-22). **⚠️ Brain please confirm scope** flag
-  set per cloud autonomous standing rule. Brain needs to read
-  the survey output, decide if it's actionable as a decomper
-  brief, merge or rescope.
-- **#398** `cloud/source-layout-pitfalls-note` — new "Source-
-  layout pitfalls" section in `docs/research/codegen-walls.md`
-  + S-1 padding off-by-one entry. Originates from wave 22's
-  iteration win on `func_02012560` (`char _pad[0x11]` mis-
-  aligning the following `int` to +0x14). Pure docs; should be
-  a quick read-and-merge.
+**#397 scope-confirm: option (a).** Accepted the reloc-sig
+pre-filter as the survey output. Three HIGH-confidence drops
+ready to feed into the next decomper brief:
+
+| Candidate | Size | Cluster |
+|---|---|---|
+| `func_0206eea0` (main) | 0x2c | Cluster A — exact triplet sig (matches 4 already-shipped C-20 anchors) |
+| `func_ov002_022a8668` | 0x2c | Cluster A — exact triplet sig |
+| `func_ov002_0226b00c` | 0x28 | Cluster B — byte-pack variant per C-20 *Family extension* note |
+
+90 MEDIUM-confidence thunk-shape candidates in
+[`docs/research/c20-family-corpus-scan.md`](research/c20-family-corpus-scan.md)
+serve as a per-target search-space narrowing input for
+`find_shape_templates`. Strict asm-grep (option b in #397's
+proposal) is brain-host work — deferred; will fold into a
+future calibration pass if the HIGH-3 don't surface enough
+volume.
+
+**#398:** S-1 padding off-by-one entry now reference-grade
+in `codegen-walls.md` under a new top-level *Source-layout
+pitfalls (not codegen walls)* section. New `S-` prefix
+distinct from `C-N` / `P-N` / `E-N` / `T-N` — marks
+authoring errors that *look like* codegen walls in the diff
+(uniform offset shift after a `char _pad[]` array) but are
+correctable in the C source alone.
 
 **Decomper:** brief 057 self-extend 2/2 in progress. Same
 selection rule as wave 22 — hard-tier, ≤ 0x60 cap, anchor by
 current ranking with HIGH-prediction outliers fair game.
 Iteration-win flags from wave 22 (padding off-by-one trap +
-C-20-recipe-is-drop-in) sent to decomper for shape recognition.
+C-20-recipe-is-drop-in) sent to decomper for shape
+recognition; both now reference-grade as of this morning.
 
-**Brain:** mid-handoff Windows → Mac. cntrl_alt_lenny's Mac
-session picks up cold from this state.md. New macOS brain
-needs the *Brain onboarding on a fresh machine* checklist in
-`AGENTS.md` plus the macOS-specific Game Porting Toolkit step
-(see *Wine on macOS post-deprecation*).
+**Brain:** back on Mac after Windows handoff. Main local
+worktree at `/Users/leo/Dev/gx-spirit-caller`, decomper at
+`/Users/leo/Dev/gx-spirit-caller-decomper` per the worktree
+convention in `AGENTS.md`.
 
 ## Next-brain TODO
 
-1. **Review PR #397 (cloud, scope-confirm).** Read the survey
-   output. If candidate list is actionable (decent number of
-   targets at workable sizes, recipe genuinely drop-in), merge
-   + scope next decomper brief around it. If too thin or off-
-   scope, comment + close.
-2. **Review PR #398 (cloud, source-layout pitfalls).** Docs-
-   only; likely merge after a single-read pass.
-3. **Verify + merge decomper's brief 057 self-extend 2/2 PR**
+1. **Verify + merge decomper's brief 057 self-extend 2/2 PR**
    when it opens. Standard gate (configure → ninja rom → dsd
    check modules 24/27).
-4. **Scope brief 060** from post-057 rankings once 2/2 closes.
-   Decision points: stay in hard-tier at 0x60 cap, raise cap
-   again, or pivot tier — depends on yield trend.
-5. **Pre-existing carryovers (unchanged):**
+2. **Scope brief 060** from post-057 rankings once 2/2 closes.
+   Folds in the 3 HIGH-confidence C-20-family candidates from
+   #397 as drop-in pool. Decision points on top: stay in
+   hard-tier at 0x60 cap, raise cap again to 0x80, or pivot —
+   depends on the brief 057 2/2 yield trend.
+3. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection
