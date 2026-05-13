@@ -354,7 +354,9 @@ class Project:
     def source_object_files(self) -> list[str]:
         return [
             str(self.game_build / source_file.with_suffix(".o"))
-            for source_file in get_source_files([src_path, libs_path])
+            for source_file in get_source_files(
+                [src_path, libs_path], region=self.game_version,
+            )
         ]
 
     def arm9_lcf(self) -> Path:
@@ -764,7 +766,8 @@ def add_mwcc_builds(
     3-tier discriminator and the per-compiler prologue/epilogue
     sweep that motivated each routing tier.
     """
-    for source_file in get_c_cpp_files([src_path, libs_path]):
+    for source_file in get_c_cpp_files(
+            [src_path, libs_path], region=project.game_version):
         src_obj_path = project.game_build / source_file
         cc_flags = []
         if is_cpp(source_file):
@@ -813,7 +816,8 @@ def add_mwasm_builds(
     decomp.me's asm scratches are fed the extracted disassembly
     directly, not a preprocessed source file, so there's nothing
     useful to preprocess from a hand-written .s file."""
-    for source_file in get_asm_files([src_path, libs_path]):
+    for source_file in get_asm_files(
+            [src_path, libs_path], region=project.game_version):
         src_obj_path = project.game_build / source_file
         n.build(
             inputs=str(source_file),
@@ -830,7 +834,46 @@ def add_mwasm_builds(
         n.newline()
 
 
-def get_c_cpp_files(dirs: list[Path]):
+# Known regions for per-region source-tree filtering. A path
+# `src/<R>/...` where R ∈ KNOWN_REGIONS is treated as
+# region-specific source — only included when the current build
+# targets region R. Paths under `src/<module>/...` without a
+# region prefix (e.g. `src/main/`, `src/overlay002/`) are the EUR
+# baseline and only appear in EUR builds. See brief 064
+# deliverable 2's strawman convention.
+KNOWN_REGIONS: tuple[str, ...] = ("eur", "usa", "jpn")
+
+
+def _is_region_source_excluded(path: Path, region: str | None) -> bool:
+    """True when `path` is under a per-region source tree that
+    doesn't match `region`. Filters cross-region sources out of
+    per-region builds.
+
+    Rules (per deliverable-2 strawman):
+      - `src/<R>/...` where R ∈ KNOWN_REGIONS  → for region R only
+      - `src/<module>/...` (no region prefix)  → EUR baseline,
+        only included in EUR builds
+      - Anything outside `src/` (e.g. `libs/`) → region-neutral,
+        always included
+      - `region=None` disables filtering (back-compat for any
+        importer that doesn't care about regions).
+    """
+    if region is None:
+        return False
+    parts = path.parts
+    for i, p in enumerate(parts):
+        if p == "src" and i + 1 < len(parts):
+            sub = parts[i + 1]
+            if sub in KNOWN_REGIONS:
+                # Explicit region prefix; must match the build region.
+                return sub != region
+            # No region prefix → EUR-implicit baseline.
+            return region != "eur"
+    # Outside src/ (libs/, etc.) → never excluded.
+    return False
+
+
+def get_c_cpp_files(dirs: list[Path], region: str | None = None):
     for d in dirs:
         if not d.is_dir():
             continue
@@ -838,10 +881,13 @@ def get_c_cpp_files(dirs: list[Path]):
             root = Path(root)
             for file in files:
                 if is_cpp(file) or is_c(file):
-                    yield root / file
+                    candidate = root / file
+                    if _is_region_source_excluded(candidate, region):
+                        continue
+                    yield candidate
 
 
-def get_asm_files(dirs: list[Path]):
+def get_asm_files(dirs: list[Path], region: str | None = None):
     """Walk `dirs` for hand-written .s assembly files. Kept
     separate from get_c_cpp_files so the caller can attach the
     right compile rule per-file."""
@@ -852,15 +898,21 @@ def get_asm_files(dirs: list[Path]):
             root = Path(root)
             for file in files:
                 if is_asm(file):
-                    yield root / file
+                    candidate = root / file
+                    if _is_region_source_excluded(candidate, region):
+                        continue
+                    yield candidate
 
 
-def get_source_files(dirs: list[Path]):
+def get_source_files(dirs: list[Path], region: str | None = None):
     """Every source file that produces a linkable .o — C, C++, or
     hand-written assembly. Order matters for reproducible ninja
-    output; yields C/C++ first, then asm."""
-    yield from get_c_cpp_files(dirs)
-    yield from get_asm_files(dirs)
+    output; yields C/C++ first, then asm.
+
+    `region` filters per-region `src/<R>/` subtrees; see
+    `_is_region_source_excluded` for the rule."""
+    yield from get_c_cpp_files(dirs, region=region)
+    yield from get_asm_files(dirs, region=region)
 
 
 def is_cpp(name):
