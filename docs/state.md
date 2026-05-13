@@ -8,14 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 mid-morning, post-#407 + #408 merge.
-Brain on Mac. Brief 060 self-extend 1/2 (wave 25) shipped 11
-matches at 85% yield — combined waves 24+25 are 20 matches /
-764 bytes / 80% yield, already exceeding brief 057's full
-3-wave chain in just 2 waves. C-20a recipe recovered both
-wave-23 drops first-try. Run `python tools/next_targets.py
---version eur` for current per-tier numbers — printed counts
-now stale by +36 hard-tier matches across waves 21-25.
+**Last updated:** 2026-05-13 late morning, **post-#414 + #415
+merge.** Brief 061's multi-region porting research returned
+**GO** with 74.8% HIGH-confidence pairings (90.6% in the ≤0x40
+sweet spot). `config/usa/` + `config/jpn/` bootstrapped via
+PR #415. Brief 060 closed at 29 matches / 1072 bytes / ~75%.
+Brain on Mac. Run `python tools/next_targets.py --version eur`
+for current per-tier numbers — stale by +45 hard-tier matches
+across waves 21-26.
 
 ## This session in one paragraph
 
@@ -104,13 +104,26 @@ brief 060 INITIAL), PR #406 (brain state refresh), PR #407
 (cloud S-1 ↔ cascade cross-reference), and PR #408 (decomper
 wave 25 — brief 060 self-extend 1/2).
 
-**Brief 060 active (decomper, mid-chain — 1 self-extend slot
-left).** Wave 24 + 25 combined: **20 matches / 764 bytes / 80%
-yield**. Cluster-anchor compare against the 90-candidate MEDIUM
-pool propagated very well at the small end (0x20-0x28). Wave
-25 recovered both wave-23 C-20a drops first-try with cloud's
-PR #404 recipe (`func_ov002_0226b00c` + `func_ov002_022a8668`).
-~70 candidates remain. One self-extend (2/2) available.
+**Brief 060 CLOSED.** Full 3-wave chain: **29 matches / 1072
+bytes / ~75% combined yield** — strongest brief outcome since
+brief 057's first two waves. ~32% of the PR #397 90-pool
+drained; ~61 candidates remain. Surfaced cascade variants
+(b)/(c)/(d) (PRs #407/#410/#413). Two propagate-template
+4-clone families (wave 25 bitfields + wave 26 helper-thunks)
+validate the template-substitution pattern.
+
+**Brief 061 CLOSED with VERDICT GO** (PR #414). 74.8%
+HIGH-confidence cross-region pairings; 90.6% in ≤0x40 band;
+USA + JPN pairwise-identical to EUR in function count.
+**Estimated unlock: 800-1700 cross-region matches at full
+pipeline ship.** `tools/find_region_siblings.py` v1 prototype
+shipped; smoke-tested 75% HIGH against bootstrapped configs.
+
+**Config bootstrap shipped** (PR #415). `config/usa/` and
+`config/jpn/` ~7 MB each via `dsd init --allow-unknown-
+function-calls`. Multi-region README badges (PR #411) ready
+to track real numbers as soon as the first bulk-port wave
+lands.
 
 **Brief 057 closed.** Cumulative 16 matches / 1016 bytes / ~57%
 across waves 21+22+23.
@@ -123,35 +136,32 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — three scoped briefs now open (parallel pickup):**
+**Cloud — four scoped briefs open (parallel pickup):**
 
-1. **Brief 061 (HIGH) — multi-region porting research.** The
-   biggest leverage point identified in this session's tools-
-   investment review. EUR is at 1.45%, USA and JPN at 0%.
-   Survey + prototype the EUR ↔ USA ↔ JPN correspondence
-   space. Ship feasibility verdict + `tools/find_region_
-   siblings.py`. GO → follow-up implementation brief unlocks
-   bulk cross-region porting (potential ~800-1300 free
-   matches at 30-50% port rate).
+1. **Brief 064 (HIGH) — multi-region implementation.** Three
+   deliverables downstream of brief 061's GO: byte-level
+   disambiguation in `find_region_siblings.py` (precision ≥
+   0.95), `tools/port_to_region.py`, and `configure.py`/Ninja
+   parallel-region builds. Unblocks decomper brief 065.
 2. **Brief 062 (MEDIUM-HIGH) — diff-to-coercion suggester.**
    Rule engine over objdiff JSON + codegen-walls.md catalog.
-   v0 covers 5-7 most-frequent walls. ~2-3× iteration-time
-   speedup per match across all future waves.
+   ~2-3× iteration-time speedup per match. Independent.
 3. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
-   Promote `permute.py` from bootstrap-only to auto-running
-   decomp-permuter. Becomes high-priority on the next
-   cap-raise; deferred priority while we're at ≤0x40.
+   Becomes high-priority on the next cap-raise. Independent.
 
-All three are independent — cloud can pick any/all in any
-order. Standing autonomous rule + ⚠️ scope-confirm flag still
-applies per brief.
+**Decomper — one scoped brief open (HIGH, gated on 064):**
+
+4. **Brief 065 — multi-region bulk-port wave 1.** First
+   bulk-porting wave consuming brief 064's pipeline. Target
+   50-100 HIGH-confidence EUR matches ported byte-mechanically
+   to USA + JPN combined. First time USA + JPN badges show
+   non-zero.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
-- S-1 cascade variant (c) — cross-`.o` BL pool literals (wave
-  25 surface). Worth a "downstream symptoms" extension to S-1.
 - C-21 "explicit-next-ahead walk loop" fold-in pending
-  decomper usage.
+  decomper usage (brief 060 didn't surface a linked-list walk;
+  carries to a hard-tier follow-up).
 - Pre-existing carryover #1 (placeholder-in-complete-TU
   warning, `func_ov021_021aaf58`).
 
@@ -161,23 +171,29 @@ applies per brief.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper's brief 060 final self-extend
-   (wave 26) PR** when it opens. Standard gate (configure →
-   ninja rom → dsd check modules 24/27).
-2. **Triage cloud's brief 061 / 062 / 063 PRs** as they land.
-   061 has a binary GO / NO-GO / GO-WITH-CAVEATS verdict
-   downstream of it — feasibility output gates whether brain
-   scopes the multi-region implementation brief.
-3. **Scope brief 064** from post-brief-060 rankings once the
-   full chain closes. Decision points: stay at ≤0x40 mining
-   the MEDIUM pool residual; raise cap; pivot tier; or (if
-   brief 061 verdict is GO) pivot fully to multi-region bulk-
-   porting work.
-4. **If brief 061 returns GO** → scope multi-region
-   implementation brief (cloud) + bulk-porting wave brief
-   (decomper). Brain runs `dsd init` on USA + JPN
-   `extract/<ver>/config.yaml` to bootstrap their config/
-   directories before the porting work begins.
+1. **Triage cloud brief 064 PR when it opens.** Three
+   deliverables (byte-level disambiguation, port_to_region.py,
+   configure.py/Ninja parallel-region). Each is structurally
+   independent — cloud may ship as one mega-PR or split.
+   The convention question for brain to confirm in the PR
+   review: **per-region `src/<region>/` trees vs single shared
+   `src/` with `#ifdef`s?** Cloud's strawman is per-region
+   trees; brain confirms or pivots.
+2. **Verify + merge decomper brief 065 (bulk-port wave 1) PR
+   when it opens.** Different gate than usual — instead of
+   24/27 single-region, verify both USA and JPN reach 24/27.
+   The first wave should be 50-100 ports; PR body reports
+   actual HIGH-confidence precision rate observed.
+3. **Triage cloud brief 062 / 063 PRs** as they land.
+4. **Scope brief 066** for the hard-tier residual once
+   bulk-porting validates. Decision points: stay at ≤0x40
+   mining the ~61 MEDIUM-pool residual; brain-host strict
+   asm-grep on that pool; pivot to a different shape; or
+   pause hard-tier work entirely during the bulk-port window.
+5. **If brief 065 returns precision ≥ 0.85** → queue brief
+   067 (bulk-port wave 2/3 targeting the rest of the HIGH
+   pool). Steady-state estimate: 100-200 ports/week until
+   the 1600-1700 pool drains.
 3. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.

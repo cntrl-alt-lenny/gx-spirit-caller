@@ -313,41 +313,60 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/060-hard-tier-c20-medium-pool.md`](docs/briefs/060-hard-tier-c20-medium-pool.md)
-  — `decomper`: fall back from ≤ 0x60 (wave 23 yield 25%) to ≤ 0x40,
-  with the **90-candidate MEDIUM C-20 thunk-shape pool** from PR
-  #397 as the primary selection input. Cluster-anchor compare per
-  target is the leverage. Wave 24 + 25 combined: **20 matches /
-  764 bytes / 80% yield** — one self-extend slot (2/2) remains.
-  Branch: `decomper/hard-tier-c20-medium-pool`.
+- [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
+  — `cloud` (HIGH priority): implementation downstream of brief
+  061's GO verdict. Three deliverables: byte-level disambiguation
+  in `find_region_siblings.py` (precision ≥ 0.95), `tools/
+  port_to_region.py` for mechanical EUR → USA/JPN porting, and
+  `configure.py`/Ninja parallel-region builds. Unblocks decomper
+  brief 065 (bulk-port wave). Branch:
+  `cloud/multi-region-implementation`.
 
-- [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
-  — `cloud` (HIGH priority): research + prototype the EUR ↔ USA
-  ↔ JPN function-correspondence space. EUR sits at 1.45%, USA and
-  JPN are at 0% — every EUR match is currently 1× when it could
-  be up to 3×. Ship a feasibility verdict + a working
-  `tools/find_region_siblings.py` prototype. GO verdict triggers
-  a follow-up implementation brief; NO-GO documents the wall.
-  Branch: `cloud/multi-region-porting-research`.
+- [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
+  — `decomper` (HIGH priority, **gated on brief 064 landing**):
+  first bulk-port wave. Target 50-100 HIGH-confidence EUR matches
+  ported byte-mechanically to USA + JPN combined. Calibrates real
+  port rate vs brief 061's 90.6% sweet-spot estimate. First time
+  USA + JPN badges (PR #411) show non-zero. Branch:
+  `decomper/multi-region-bulk-port-wave-1`.
 
 - [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
   — `cloud` (MEDIUM-HIGH priority): build
   `tools/suggest_coercion.py` rule engine over objdiff's JSON
   output + the codegen-walls.md catalog. v0 covers the 5-7
   most-frequent walls; replaces manual diff → wall lookup. ~2-3×
-  iteration-time speedup per match. Independent of 061. Branch:
-  `cloud/diff-to-coercion-suggester`.
+  iteration-time speedup per match. Independent of 064/065.
+  Branch: `cloud/diff-to-coercion-suggester`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
   from bootstrap-only to auto-running decomp-permuter on
   close-but-not-byte-identical candidates. Becomes high-priority
   as soon as the next cap-raise hits the 0x60-0x100 band where
-  permuter shines. Independent of 061 + 062. Branch:
+  permuter shines. Independent of 062 + 064/065. Branch:
   `cloud/permuter-auto-runner`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
+  `cloud`, shipped in PR #414. **VERDICT: GO.** 74.8%
+  HIGH-confidence pairings across 500-sample stratified survey
+  (peaking 90.6% in ≤0x40 band, 100% in medium). USA + JPN are
+  pairwise-identical in function count to EUR (1 extra function
+  in main = total drift across symbol graph). Estimated unlock:
+  **800-1700 cross-region matches** at full pipeline ship.
+  Followed by PR #415 (brain bootstrap of `config/usa/` +
+  `config/jpn/`) then brief 064 (implementation pipeline) +
+  brief 065 (first bulk-port wave).
+- [`docs/briefs/060-hard-tier-c20-medium-pool.md`](docs/briefs/060-hard-tier-c20-medium-pool.md)
+  `decomper`, full chain shipped across PRs #405 / #408 / #412
+  (waves 24/25/26). **29 matches / 1072 bytes / ~75% combined
+  yield.** Strongest brief outcome since brief 057's first two
+  waves. C-20a recipe (PR #404) recovered both wave-23 drops
+  first-try. Two distinct propagate-template 4-clone families
+  shipped (wave 25 bitfields + wave 26 helper-thunks). ~32% of
+  the PR #397 90-pool drained; ~61 candidates remain. Surfaced
+  cascade variants (b)/(c)/(d) (PRs #407/#410/#413).
 - [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](docs/briefs/057-hard-tier-cap-raise-0x60.md)
   `decomper`, full chain shipped across PRs #390 / #392 / #402
   (waves 21/22/23). **16 matches / 1016 bytes / ~57% combined
