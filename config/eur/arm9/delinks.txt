@@ -7353,3 +7353,12 @@ src/main/func_02033c2c.c:
 src/main/func_02034114.c:
     complete
     .text start:0x02034114 end:0x02034160
+
+src/main/func_0206eea0.legacy.c:
+    complete
+    .text start:0x0206eea0 end:0x0206eecc
+
+src/main/func_020a333c.c:
+    complete
+    .text start:0x020a333c end:0x020a3380
+
