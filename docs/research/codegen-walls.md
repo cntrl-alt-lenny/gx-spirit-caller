@@ -11,10 +11,11 @@ Same research format as
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
 **Short answer:** **33 distinct mwcc-vs-baserom codegen
-divergences** account for the **93+ dropped matches across the
-seventeen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
+divergences** account for the **102+ dropped matches across the
+nineteen pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
-053-wave17 / 055-wave18 / 055-wave19 / 055-wave20 / 057-wave21; the per-PR cross-reference
+053-wave17 / 055-wave18 / 055-wave19 / 055-wave20 / 057-wave21 /
+057-wave22 / 057-wave23; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -91,7 +92,9 @@ Source-PR coverage:
 | 055/wave19 | 385 | 60.0% |  6  |       4 |
 | 055/wave20 | 387 | 66.7% |  8  |       4 |
 | 057/wave21 | 390 | 70.0% |  7  |       3 |
-| —     | —   |   —   | **190** |  **93** |
+| 057/wave22 | 392 | 70.0% |  7  |       3 |
+| 057/wave23 | 402 | 25.0% |  2  |       6 |
+| —     | —   |   —   | **199** |  **102** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -1746,6 +1749,95 @@ subtleties. Possibly a C-18 or P-9 entry." Brief 056-territory
 cloud autonomous PR (this one) — sweep verified routing fix on
 the triplet; C-20 entry added.
 
+#### C-20a. Inline-asm fallback for tail-call-detection failure
+
+The routing recipe above unlocks the **halfword-pack triplet
+shape** where pure C source produces the right asm given the
+right routing tier. **Two family-extension shapes fail this
+test** — wave 23 (PR #402) confirmed:
+
+- `func_ov002_0226b00c` — **byte-pack variant**: target uses
+  `and r3, #0xff; and r2, #0xff; orr r2, r3, r2, lsl #8`
+  followed by halfword zero-extend (`lsl 16; lsr 16`) +
+  `bx ip` tail-call.
+- `func_ov002_022a8668` — **4-store + 4-mov-then-tail-call
+  shape** with explicit `sub r1, r0, #0x32` constant-derive
+  (target uses `sub` because mwcc-2.0 peephole; mwcc-1.2 would
+  emit `mvn r1, #0` — see C-15).
+
+Both fail pure-C coercion: every C source variation across all
+15 SPs produces a stack-framed `bl helper; pop {regs, pc}`
+form instead of `bx ip`. mwcc's tail-call detector trips on
+the `q → r2` reg-shuffle (mwcc-1.2) or the constant-derive
+chain (mwcc-2.0).
+
+**The recipe (verified byte-identical against both targets):**
+
+```c
+extern void func_helper(int, int, int, unsigned short);
+
+asm void func_target(int a, int b, int c, int d) {
+    nofralloc
+    and  r3, r3, #0xff
+    and  r2, r2, #0xff
+    orr  r2, r3, r2, lsl #0x8
+    mov  r3, r2, lsl #0x10
+    mov  r2, r1
+    ldr  ip, =func_helper
+    mov  r3, r3, lsr #0x10
+    mov  r1, #0x9
+    bx   ip
+}
+```
+
+Same template as **C-12 (push-r0)** and **C-16 (ldr-r1-vs-ip)**:
+`asm void` + `nofralloc` emits the body verbatim with no
+prologue / epilogue / tail-call detection. Compile via the
+**default `.c` rule (mwcc 2.0/sp1p5)** — same caveat as C-12
+and C-16: mwcc 1.2/sp2p3 and mwcc 1.2/sp3 inline-asm parsers
+reject `ldr ip, =label` syntax.
+
+**Method (brief 060-territory cloud research):** sweep tested
+6 C variations (natural 4-arg, explicit-locals, explicit-uint,
+`uchar`→`ushort`, 4-arg int casts, 3-arg packed-first) on each
+of the 15 mwcc SPs. Every C variation + SP combination emits a
+stack-frame (`push {r3, lr}` or `stmdb sp!, {lr}; sub sp, #4`)
+followed by `bl helper; pop`. No pure-C path produces the
+target's flat `bx ip` shape. Inline-asm hypothesis verified
+byte-identical against both targets.
+
+**Cross-corpus survey (brief 060-territory):**
+
+| Target | Wall family | Status |
+|---|---|---|
+| `func_ov002_0226b00c` | byte-pack + 4-arg shuffle | C-20a recipe ✓ verified byte-identical |
+| `func_ov002_022a8668` | 4-store + 4-mov + tail-call (`sub r1, r0, #0x32` constant-derive) | C-20a recipe ✓ verified byte-identical |
+
+Per brief 044's threshold scheme (≥10 ship-tier, 5-9 .s-only,
+<5 shelve), 2 candidates falls below the ship-tier line. **The
+recipe is mechanical and reusable** for any future
+pack-args-or-stores + flat-`bx ip` target where mwcc's
+tail-call detector fails. Decomper picks these up when working
+in scope; documented as the inline-asm fallback under C-20's
+umbrella rather than a fresh C-N number.
+
+**Use when:** target is a flat tail-call thunk
+(`...body...; bx ip; .word helper`) where the body involves
+either (a) explicit `and rN, #0xff` byte masks (byte-pack
+shape), or (b) constant-derive chains (e.g.
+`sub r1, r0, #imm` reusing a prior `mov`), AND every routing
+tier attempted produces a stack-frame `bl helper; pop`
+instead. The asm-void recipe sidesteps mwcc's tail-call detection
+entirely.
+
+**Provenance:** brief 060-territory cloud autonomous PR (this
+one) — option (1) from brain's post-#401 suggestions list.
+Wave 23 (PR #402) flagged both targets after wave 19, 20, 23
+had each hit the same wall on `func_ov002_0226b00c`. Sweep
+verified the inline-asm recipe is the right cross-target
+template; classification under C-20a (subfamily) preserves
+the C-N count without adding a fresh number.
+
 ### C-21. Ternary-to-constants collapse — decompose role from value
 
 **Target asm (`func_ov002_022b3720` — brief 057 wave 21):** a
@@ -2572,21 +2664,29 @@ shape we should chase".
 | 055w19 / 385 | `func_0207d994`           | (mwcc `stmia` for two adjacent stores where orig had `mov r0, r3` interleaved) | permanent |
 | 055w19 / 385 | `func_0207db44`           | (mwcc didn't introduce `add r2, r0, #0x24` intermediate base for two accesses at +0x28/+0x2c) | permanent |
 | 055w20 / 387 | `func_ov002_021ae60c`/`_638`/`_6a4` | **C-20** (pack-halfwords-into-arg + tail-call; route via `*.legacy.c` with double-cast — brief 056 sweep verified byte-identical) | coercible (routing) |
-| 055w20 / 387 | `func_ov002_0226b00c`     | C-20 family (byte-pack variant; routing tier same as triplet, source form needs per-target tuning — brief 056 sweep partial) | coercible (routing, family) |
+| 055w20 / 387 | `func_ov002_0226b00c`     | C-20a (byte-pack + 4-arg shuffle; brief 060-territory sweep verified inline-asm fallback recipe — same as wave 23 retry below) | coercible (asm-void, resolved) |
 | 057w21 / 390 | `func_02022540`           | (mwcc separate `i` + `i*0x10` induction vars vs orig's combined `add r1, base, i, lsl #4`; array-indexing source made it worse) | permanent |
 | 057w21 / 390 | `func_0202d9a0`           | (mwcc +1 extra insn on null + dual-counter inc; direct-struct-extern attempt didn't help) | permanent |
 | 057w21 / 390 | `func_02055298`           | C-1r family (in-place string xform: target has `beq L; ...; L: ...; bx lr` shared epilogue, mwcc collapses to `bxeq lr` early-return) | permanent (C-1r family) |
+| 057w22 / 392 | `func_0207c990`           | (mwcc's predicated-vs-early-return decision on singleton init + counter inc; `int ok` form attempted) | permanent |
+| 057w22 / 392 | `func_0202142c`           | P-7 (pool dedup wall — orig has 2 pool loads for the same data symbol; mwcc dedups to 1) | permanent |
+| 057w23 / 402 | `func_ov002_022a8668`     | **C-20a** (4-store + 4-mov-then-tail-call + `sub r1, r0, #imm` constant-derive; inline-asm fallback recipe — brief 060-territory cloud sweep verified byte-identical) | coercible (asm-void, resolved) |
+| 057w23 / 402 | `func_02067a4c`           | (array init + descending loop: mwcc swapped counter/value registers r1↔r2; allocation differs by declaration order, both attempted) | permanent |
+| 057w23 / 402 | `func_02000d4c`           | (stack-pop op: mwcc elided stack frame, used r12 instead of orig's lr-as-temp; can't force `lr` usage from C source) | permanent |
+| 057w23 / 402 | `func_02021660`           | (predicated nested loop: mwcc emitted +12 bytes; different predication choice — variant of C-1/P-6 family) | permanent |
+| 057w23 / 402 | `func_0205d4c0`           | (5-field null check: mwcc collapsed early-returns to `bxeq lr` +12 bytes; combined-AND (C-18) and goto-form variations attempted) | permanent |
 
 ## Quantification
 
 ```
 
-By bucket (across 17 pilots: 020, 022, 028, 029, 030, 031, 040,
+By bucket (across 19 pilots: 020, 022, 028, 029, 030, 031, 040,
 047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16,
-053-wave17, 055-wave18, 055-wave19, 055-wave20, 057-wave21):
-  Permanent              :  64 drops (69%)  ← +3 wave 21 (2 mwcc-fusion + 1 C-1r family)
-  Coercible-but-missed   :  14 drops (15%)  ← future "should have matched"
-  Edge case              :   9 drops (10%)
+053-wave17, 055-wave18, 055-wave19, 055-wave20, 057-wave21,
+057-wave22, 057-wave23):
+  Permanent              :  70 drops (69%)  ← +2 wave 22 + 4 wave 23 permanent
+  Coercible-but-missed   :  16 drops (16%)  ← +2 wave 23 (C-20a resolved both)
+  Edge case              :   9 drops ( 9%)
   Tooling-tractable      :   2 drops ( 2%)
   Tooling/infra (ov004 BSS)   :   2 drops ( 2% — brief 049 wave 12)
   Provisional minor wall      :   0 drops ( — — W-H reclassified to C-16 by brief 054)
@@ -2600,13 +2700,13 @@ match in wave 14 + the wave-12 W-H retry. Bucket math
 intentionally counts unique walls, not per-attempt.)
 
 Top single wall:
-  P-1 (shift-pair collapse)         : 17 drops (19%)  ← largest
-  P-4 family (single-byte reg-alloc): 7 drops ( 8%  — incl. brief 055 wave 18 r0-vs-r2)
+  P-1 (shift-pair collapse)         : 17 drops (17%)  ← largest
+  P-4 family (single-byte reg-alloc): 7 drops ( 7%  — incl. brief 055 wave 18 r0-vs-r2)
+  C-20 + C-20a (pack-args family)   :  6 drops ( 6%  — incl. brief 060-territory wave 23 byte-pack pair)
   E-3 (Thumb)                       :  4 drops ( 4%)
-  C-20 (pack-args routing — new)    :  4 drops ( 4% — brief 055 wave 20 triplet + family)
-  C-1r (over-predication branchy)   :  3 drops ( 3% — brief 053 wave 16)
-  P-6 (4-op predication threshold)  :  3 drops ( 3%)
+  C-1r (over-predication branchy)   :  4 drops ( 4% — brief 053 wave 16 + brief 057 wave 21)
   P-7 / P-8 / T-3 (W-A..D residue)  :  4 drops ( 4% — brief 040)
+  P-6 (4-op predication threshold)  :  3 drops ( 3%)
   C-14 (W-F r2-vs-r1 reg-alloc)     :  2 drops ( 2% — brief 047 wave 9)
   C-15 (W-G mvn-vs-sub peephole)    :  1 drop  ( 1% — brief 049 wave 12)
   C-16 (W-H r1-vs-ip ldr scratch)   :  1 drop  ( 1% — brief 051 wave 14)
@@ -2629,7 +2729,11 @@ C-19 (`int` local for `lt`-vs-`lo`) as wave-time iteration
 wins; brief 056-territory cloud sweep recovered the wave-20
 triplet via C-20 (pack-args routing); brief 057 wave 21
 isolated C-21 (ternary-to-constants decomposition) as another
-wave-time iteration win. The
+wave-time iteration win; brief 060-territory cloud sweep
+recovered the byte-pack + 4-arg-shuffle subfamily
+(`func_ov002_0226b00c` + `func_ov002_022a8668`) via **C-20a**
+(inline-asm fallback for tail-call-detection failure — same
+template as C-12/C-16). The
 recent share dipped from ~17% to ~13% as wave 14 + wave 16 +
 wave 17 added permanent drops (7 P-1 misapplications + 3
 C-1r over-predication + 3 P-4-family / addr-taken) — the
