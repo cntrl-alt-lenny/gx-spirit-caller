@@ -2345,9 +2345,24 @@ cost the decomper a wave-iteration cycle each (initial match
 attempt → off-by-K diff → "looks like codegen carryover" →
 *it isn't, the struct decl is wrong* → fix → match).
 
-Distinct from the `C-N` / `P-N` / `E-N` / `T-N` entries above:
-those are mwcc-vs-baserom divergences with no source-level
-expression. These are correctable in the C source alone.
+**Distinction from C-N entries (subtle but important):**
+
+- **C-N coercions** assume the C source is *valid* (it describes
+  the target's behaviour correctly) but produces a *byte-different
+  shape* than the target's compiler chose. The fix is a
+  source-form tweak that nudges mwcc toward a different equally-
+  valid emission.
+- **S-N pitfalls** assume the C source is *invalid* (it doesn't
+  accurately describe the target's struct layout / field types
+  / field sizes). The fix is to correct the description; mwcc's
+  emission was always right *for the source as written*.
+
+**Diff-shape discriminator:** if the diff is **uniform** across
+many or all fields (every offset shifts by the same K) and the
+shift starts after a struct member, suspect S-class first. If
+the diff is **local** to a single operation (one mov differs,
+one branch direction differs, one condition-code flavour
+differs), suspect C-N first.
 
 ### S-1. Padding off-by-one — sub-word `_pad` lands fields at wrong offsets
 
@@ -2442,6 +2457,47 @@ note. This entry promotes the iteration win into the grep-able
 reference so future targets that show a uniform offset-shift
 diff get triaged here first instead of cycling through C-N
 candidates that don't apply.
+
+### Sweep result — only S-1 surfaced (waves 5+ through 22)
+
+Cloud autonomous sweep covered 34 wave + brief PRs (briefs
+020 / 022 / 028 / 029 / 030 / 031 / 033–366 — every
+"iteration win" or "fixed by" note in the corpus through the
+end of wave 22) looking for additional source-layout
+authoring pitfalls. **S-1 (padding off-by-one) is the only
+source-layout pitfall surfaced so far.**
+
+Adjacent finds — *not* S-class, listed here for clarity:
+
+- **`func_ov011_021ca600` drop (PR #385 wave 19)** —
+  "byte-pointer source would need a struct typedef to coerce."
+  This looks like S-class on first read but is a **C-source
+  shape** choice: byte-pointer arithmetic
+  (`*(int*)(buf + 0x10)`) and struct-member access
+  (`p->field_10`) are both valid C, but they emit different
+  asm (`add + ldr` vs single `ldr [base, #imm]`). The struct
+  decl isn't wrong — the access shape is. Adjacent to C-2
+  (local-pointer reuse). Decomper didn't pursue the coercion
+  this wave; no entry-worthy pattern emerged.
+- **All ten "iteration win" notes** in waves 13–22 (brief 051
+  / 053 / 055 / 057) reduced to C-N coercions (now C-2a, C-9,
+  C-11, C-13, C-14, C-15, C-16, C-17, C-18, C-19, C-20, C-21)
+  or wave-time fixes that didn't generalise. Sweep classified
+  each; none described a struct-decl authoring error.
+
+The expectation going forward: S-class entries will accrue
+when a wave-iteration note explicitly says "the struct decl
+was wrong" / "miscounted padding" / "wrong field type" /
+similar authoring-error framing. Cloud should keep sweeping
+on the same pattern when new waves land. If the corpus
+crosses ~5 S-N entries, the section header should expand
+to mention common categories (padding / field-type /
+field-size).
+
+**Provenance:** brief 060-territory cloud autonomous sweep
+(this section) — option (ii) from brain's post-#398
+suggestions list. Sweep verdict: no additional S-class
+entries; preamble clarified with C-N-vs-S-N discriminator.
 
 ## Per-PR drop cross-reference
 
