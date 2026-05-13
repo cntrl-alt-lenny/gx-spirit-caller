@@ -8,12 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 morning, post-#401 + #402 merge + brief
-060 queued. Brain on Mac. Badge **1.39%** still (waves 21+22+23
-are stale to badge — auto-refresh kicks on next push). Run
-`python tools/next_targets.py --version eur` for current per-tier
-numbers — printed counts now stale by +16 hard-tier matches from
-waves 21+22+23.
+**Last updated:** 2026-05-13 morning, post-#404 + #405 merge.
+Brain on Mac. Brief 060 initial (wave 24) shipped 9 matches at
+75% yield — well above gates. C-20a recipe shipped, byte-pack
+wall coercible. Run `python tools/next_targets.py --version eur`
+for current per-tier numbers — printed counts now stale by +25
+hard-tier matches across waves 21-24.
 
 ## This session in one paragraph
 
@@ -93,53 +93,57 @@ needs the Game Porting Toolkit cask per
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** (post this brain-PR landing). Today's merged
-set: PRs #397 + #398 (cloud docs), PR #400 (brain state
-refresh), PR #401 (cloud S-class sweep verdict + preamble
-clarification), and PR #402 (decomper wave 23 — brief 057
-self-extend 2/2 FINAL).
+set: PR #397 + PR #398 (cloud C-20 corpus scan + S-1 padding),
+PR #400 (brain state refresh), PR #401 (cloud S-class sweep
+verdict + preamble), PR #402 (decomper wave 23 — brief 057
+self-extend 2/2 FINAL), PR #403 (brain brief 060 doc), PR #404
+(cloud C-20a inline-asm fallback), PR #405 (decomper wave 24 —
+brief 060 INITIAL).
+
+**Brief 060 active (decomper, mid-chain).** Wave 24 shipped 9
+matches / 320 bytes / **75% yield** — well above the 40% / 250
+gates. Cluster-anchor compare against the 90-candidate MEDIUM
+pool propagated very well at the small end (0x20-0x28). 78
+candidates remain in the pool for self-extends 1/2 + 2/2.
 
 **Brief 057 closed.** Cumulative 16 matches / 1016 bytes / ~57%
-across waves 21+22+23. Wave 23 burned the 3 HIGH-confidence
-drops from PR #397: `func_0206eea0` matched; the other two
-(`func_ov002_022a8668` mvn-vs-sub on −1 const,
-`func_ov002_0226b00c` byte-pack tail-call shape) are confirmed
-walls and on the brief 060 skip list.
+across waves 21+22+23.
 
-**Brief 060 queued (decomper).** Fall back to ≤ 0x40 with the
-**90-candidate MEDIUM C-20 thunk-shape pool** from PR #397 as
-the primary selection input. Cluster-anchor compare per target
-is the leverage — each unmatched target has a matched sibling
-already shipped. Apply list adds C-21 next-ahead walk loop
-(pending fold; wave 23 surface) + S-1 awareness. Skip list adds
-wave-23 confirmed walls. Self-extend gates unchanged.
+**C-20a recipe shipped (PR #404).** The byte-pack C-20 variant
+wall is **coercible via inline-asm** (`asm void` + `nofralloc`,
+same template as C-12 / C-16). Both wave-23-dropped candidates
+verified byte-identical with the recipe. Classification: C-20a
+sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
+discretion pickup (2 candidates < 5-target fresh-brief
+threshold).
 
 **Cloud follow-up candidates (autonomous standing rule):**
 
-1. Research brief on the `func_ov002_0226b00c` byte-pack C-20
-   variant wall — three waves now (19, 20, 23) have hit the same
-   mwcc-1.2 `bx ip` tail-call detection issue on the 4-arg
-   `q → r2` shuffle. Worth a P-9 or C-20b classification.
-2. C-21 "explicit-next-ahead walk loop" fold-in once decomper
-   uses it productively in brief 060 (apply list pending).
+1. **S-1 cascading misplacement** sub-finding — decomper's wave
+   24 surface. Uniform offset shift can come from upstream TU
+   size mismatch in the lcf cascade, not just struct padding.
+   The diagnostic at the linked-binary level is the same; the
+   resolution lives somewhere else. Worth a sub-entry in S-1
+   or a sibling S-2.
+2. **C-21 "explicit-next-ahead walk loop"** fold-in still
+   pending decomper usage (wave 24 didn't surface a linked-list
+   walk; carries to self-extends).
 3. Pre-existing carryover #1 (placeholder-in-complete-TU
    warning, `func_ov021_021aaf58`) still open.
 
 **Brain:** on Mac. Main worktree
 `/Users/leo/Dev/gx-spirit-caller`; decomper worktree
-`/Users/leo/Dev/gx-spirit-caller-decomper`. Local Mac toolchain
-verified working post-Windows handoff (PR #402 verified via
-`python3.13 tools/configure.py eur && ninja rom && ./dsd check
-modules` — 24/27 OK).
+`/Users/leo/Dev/gx-spirit-caller-decomper`.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper's brief 060 PR** when it opens.
-   Standard gate (configure → ninja rom → dsd check modules
-   24/27).
-2. **Scope brief 062** from post-060 rankings once it (and any
-   self-extends) close. Decision points: stay at ≤ 0x40 mining
-   the MEDIUM pool residual, run strict asm-grep against the
-   pool, pivot to USA/JPN bootstrap, or invest in
+1. **Verify + merge decomper's brief 060 self-extend PRs** when
+   they open. Standard gate (configure → ninja rom → dsd check
+   modules 24/27).
+2. **Scope brief 062** from post-060 rankings once the full
+   brief 060 chain closes. Decision points: stay at ≤ 0x40
+   mining the MEDIUM pool residual, run strict asm-grep against
+   the pool, pivot to USA/JPN bootstrap, or invest in
    `find_shape_templates` improvements.
 3. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
