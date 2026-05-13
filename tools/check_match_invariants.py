@@ -208,16 +208,21 @@ def _known_placeholder_names(
             if s.name.startswith(PLACEHOLDER_PREFIXES):
                 out.add(s.name)
     # Raw scan for names the regex in analyze_symbols skipped.
+    # Multi-region: scan every bootstrapped config/<region>/ so
+    # src/<region>/ files don't fail orphan_extern against
+    # region-specific placeholders that only live in that region's
+    # symbols.txt.
     name_re = re.compile(r"^((?:func|data)_[A-Za-z0-9_]+)\s")
-    for sym_file in config_dir.rglob("symbols.txt"):
-        try:
-            with sym_file.open(encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    m = name_re.match(line)
-                    if m:
-                        out.add(m.group(1))
-        except OSError:
-            continue
+    for region_config in _all_bootstrapped_config_dirs(config_dir):
+        for sym_file in region_config.rglob("symbols.txt"):
+            try:
+                with sym_file.open(encoding="utf-8", errors="replace") as f:
+                    for line in f:
+                        m = name_re.match(line)
+                        if m:
+                            out.add(m.group(1))
+            except OSError:
+                continue
     return out
 
 
@@ -376,23 +381,64 @@ _ASM_IGNORED_NAMES: frozenset[str] = frozenset({
 })
 
 
+def _all_bootstrapped_config_dirs(primary: Path) -> list[Path]:
+    """Return every `config/<region>/` directory that exists as a
+    sibling of `primary`, starting with `primary` (the `--version`
+    arg's config dir).
+
+    Multi-region rationale: brief 064 + 065 introduced per-region
+    `src/<region>/` trees that reference symbols from
+    `config/<region>/**/symbols.txt`. The cross-file name-drift +
+    orphan-extern checks must resolve against ALL bootstrapped
+    regions' symbols, not just `--version`'s, otherwise every
+    region-specific symbol looks like a rebase drift (PR #423
+    surfaced 82 false-error invariant fires).
+
+    Sibling discovery (vs. hard-coding ROOT/config) keeps tests
+    isolated: a tempdir `config/eur/` will only sweep tempdir's
+    own siblings, not the real repo's regions.
+
+    `primary` is always included first (deterministic ordering)
+    even if it's the same as one of the auto-discovered regions.
+    """
+    seen: set[Path] = {primary.resolve()}
+    out: list[Path] = [primary]
+    config_root = primary.parent
+    if config_root.is_dir():
+        for region_dir in sorted(config_root.iterdir()):
+            if not region_dir.is_dir():
+                continue
+            resolved = region_dir.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            out.append(region_dir)
+    return out
+
+
 def _all_symbol_names(config_dir: Path) -> set[str]:
-    """Every name that appears in any symbols.txt under config_dir,
-    regardless of kind. Includes placeholders + real names + bss
-    entries. Read raw so kind:bss lines (no parens, skipped by
-    analyze_symbols.SYMBOL_RE) are included.
+    """Every name that appears in any symbols.txt under any
+    bootstrapped `config/<region>/`, regardless of kind. Includes
+    placeholders + real names + bss entries. Read raw so kind:bss
+    lines (no parens, skipped by analyze_symbols.SYMBOL_RE) are
+    included.
+
+    Unions across all bootstrapped regions because `src/<region>/`
+    files reference that region's address-keyed symbols, and
+    regions diverge in addresses by design.
     """
     names: set[str] = set()
     sym_line_re = re.compile(r"^(\S+)\s+kind:")
-    for sym_file in config_dir.rglob("symbols.txt"):
-        try:
-            with sym_file.open(encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    m = sym_line_re.match(line)
-                    if m:
-                        names.add(m.group(1))
-        except OSError:
-            continue
+    for region_config in _all_bootstrapped_config_dirs(config_dir):
+        for sym_file in region_config.rglob("symbols.txt"):
+            try:
+                with sym_file.open(encoding="utf-8", errors="replace") as f:
+                    for line in f:
+                        m = sym_line_re.match(line)
+                        if m:
+                            names.add(m.group(1))
+            except OSError:
+                continue
     return names
 
 
