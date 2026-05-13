@@ -313,21 +313,14 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
-  — `cloud` (HIGH priority): implementation downstream of brief
-  061's GO verdict. Three deliverables: byte-level disambiguation
-  in `find_region_siblings.py` (precision ≥ 0.95), `tools/
-  port_to_region.py` for mechanical EUR → USA/JPN porting, and
-  `configure.py`/Ninja parallel-region builds. Unblocks decomper
-  brief 065 (bulk-port wave). Branch:
-  `cloud/multi-region-implementation`.
-
 - [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **gated on brief 064 landing**):
-  first bulk-port wave. Target 50-100 HIGH-confidence EUR matches
-  ported byte-mechanically to USA + JPN combined. Calibrates real
-  port rate vs brief 061's 90.6% sweet-spot estimate. First time
-  USA + JPN badges (PR #411) show non-zero. Branch:
+  — `decomper` (HIGH priority, **now ACTIVE** — brief 064
+  closed via PRs #418/#419/#420): first bulk-port wave. Target
+  50-100 HIGH-confidence EUR matches ported byte-mechanically to
+  USA + JPN combined via `tools/port_to_region.py`. Calibrates
+  real port rate vs brief 061's 90.6% sweet-spot estimate +
+  brief 064 part 1's 57% single-HIGH unique-winner rate. First
+  time USA + JPN badges (PR #411) show non-zero. Branch:
   `decomper/multi-region-bulk-port-wave-1`.
 
 - [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
@@ -359,6 +352,16 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
+  `cloud`, full chain shipped across PRs #418 (part 1, byte-
+  disambiguation) + #419 (part 2, `tools/port_to_region.py`) +
+  #420 (part 3, parallel-region builds). **All 3 deliverables
+  closed.** v2 disambiguation: 20% → 57% single-HIGH unique
+  winners (2.85× improvement, brief 061 500-sample re-run).
+  Per-region tree convention (Option A) confirmed in #419.
+  `configure.py` per-region filter ships and all three regions
+  hit 24/27 baseline at the same placeholder modules. Brief
+  065 unblocked.
 - [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
   `cloud`, shipped in PR #414. **VERDICT: GO.** 74.8%
   HIGH-confidence pairings across 500-sample stratified survey
