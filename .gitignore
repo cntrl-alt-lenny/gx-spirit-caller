@@ -21,6 +21,11 @@ build.ninja
 # dsd extraction artifacts
 extract/
 
+# Cross-project source-mining cache. Vendored upstream decomp
+# repos for brief 066 research; see tools/vendor_external_sources.py
+# for the clone script + pinned commits. Never committed to history.
+tools/_vendor/
+
 # Editor / OS
 .vscode/
 .idea/
