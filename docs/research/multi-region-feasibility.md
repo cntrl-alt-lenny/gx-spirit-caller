@@ -242,14 +242,23 @@ EUR baseline.
 
 ## Limitations
 
-1. **Byte-level disambiguation not implemented.** The
-   prototype narrows the search to 1-5 candidates but doesn't
-   pick the true twin within that set. For mechanical porting
-   to ship without manual cross-check at every step, the next
-   tool iteration must add byte-similarity scoring (read
-   function bytes from baseroms, mask reloc slots, score
-   hamming distance). This is a 1-3 day follow-up, not
-   in-scope for this brief.
+1. **~~Byte-level disambiguation not implemented~~ — RESOLVED
+   in brief 064 (PR pending).** The prototype's documented
+   limitation has been addressed. v2 of
+   `find_region_siblings.py` adds byte-level Hamming
+   similarity scoring with reloc-slot masking. Re-validation
+   on the same 500-sample survey shows:
+
+   | Metric | v1 | v2 | Improvement |
+   |---|---:|---:|---|
+   | Single-HIGH queries (unique winner) | 20.0% | **57.0%** | 2.85× |
+   | Multi-HIGH queries (manual disamb. needed) | 53.7% | 16.7% | 3.2× fewer |
+   | Zero-HIGH queries (drop to MEDIUM/LOW) | 26.3% | 26.3% | unchanged |
+
+   The `func_02006164` motivating case (v1 returned 3 HIGH
+   candidates with 2 false positives) now returns 1 HIGH
+   (true twin `func_02006148` byte-sim 1.000) + 2 demoted to
+   MEDIUM (byte-sim 0.917 / 0.958).
 
 2. **Trivial-tier (≤ 0x10) pairing rate is 57%.** Small
    functions have few/no relocs to fingerprint; reloc-bag

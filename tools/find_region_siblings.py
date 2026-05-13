@@ -36,18 +36,27 @@ Fingerprint dimensions (in confidence order):
 4. **Position-in-module rank**: when other signals tie, prefer
    the candidate whose ordinal position in its module matches
    the EUR original's.
+5. **Byte-level disambiguation (v2):** when reloc fingerprint
+   alone ties multiple HIGH candidates, read each candidate's
+   raw bytes from the region's baserom, mask out reloc-affected
+   slots, and score by Hamming similarity. Demote candidates
+   whose byte-sim is below 0.99 if a perfect-or-near-perfect
+   match exists elsewhere; demote candidates below 0.90 to
+   LOW unconditionally.
 
 Output classification:
 
-- **HIGH**: same module + same size + reloc signature exactly matches.
-- **MEDIUM**: same module + same size + ≥80% reloc-signature
-  similarity (Jaccard over (kind, target_module) tuples ignoring
-  offset jitter).
+- **HIGH**: same module + same size + reloc signature exactly
+  matches AND (byte-sim ≥ 0.99 OR no better candidate exists).
+- **MEDIUM**: same module + same size + reloc bag matches but
+  offsets drift, OR byte-sim 0.90-0.99 when a higher-byte-sim
+  candidate exists.
 - **LOW**: same module + same size + reloc-count match but
-  structure differs.
+  structure differs OR byte-sim < 0.90.
 - **NONE**: no candidate matches even size + module.
 
-Brief 061 (PR pending) introduced this tool. Multi-region survey
+Briefs 061 (prototype) + 064 (byte-level disambiguation
+implementation) introduced this tool. Multi-region survey
 output: `docs/research/multi-region-feasibility.md`.
 """
 
@@ -65,7 +74,191 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config"
+EXTRACT_DIR = ROOT / "extract"
 SRC_DIR = ROOT / "src"
+
+
+# Cache module → (binary path, base address) lookups per region.
+# Lazy-populated on first access; survives across find_siblings calls
+# within a single tool invocation.
+_MODULE_LOAD_CACHE: dict[tuple[str, str], tuple[Path, int] | None] = {}
+# Cache module raw bytes per region.
+_MODULE_BYTES_CACHE: dict[tuple[str, str], bytes] = {}
+
+
+def _resolve_module_load(region: str, module: str) -> tuple[Path, int] | None:
+    """Return (binary_path, base_address) for a module in a region.
+
+    Returns None if the module is unknown or its extract data is
+    missing. Caches results.
+    """
+    key = (region, module)
+    if key in _MODULE_LOAD_CACHE:
+        return _MODULE_LOAD_CACHE[key]
+
+    result: tuple[Path, int] | None = None
+    extract_arm9 = EXTRACT_DIR / region / "arm9"
+
+    if module == "main":
+        yaml_path = extract_arm9 / "arm9.yaml"
+        bin_path = extract_arm9 / "arm9.bin"
+        if yaml_path.is_file() and bin_path.is_file():
+            base = _read_yaml_int(yaml_path, "base_address")
+            if base is not None:
+                result = (bin_path, base)
+    elif module == "itcm" or module == "dtcm":
+        yaml_path = extract_arm9 / f"{module}.yaml"
+        bin_path = extract_arm9 / f"{module}.bin"
+        if yaml_path.is_file() and bin_path.is_file():
+            base = _read_yaml_int(yaml_path, "base_address")
+            if base is not None:
+                result = (bin_path, base)
+    elif module.startswith("ov") and module[2:].isdigit():
+        idx = int(module[2:])
+        overlays_dir = EXTRACT_DIR / region / "arm9_overlays"
+        yaml_path = overlays_dir / "overlays.yaml"
+        bin_path = overlays_dir / f"ov{idx:03d}.bin"
+        if yaml_path.is_file() and bin_path.is_file():
+            # Look up base address by ID in the overlays list.
+            base = _read_overlay_base(yaml_path, idx)
+            if base is not None:
+                result = (bin_path, base)
+
+    _MODULE_LOAD_CACHE[key] = result
+    return result
+
+
+def _read_yaml_int(path: Path, key: str) -> int | None:
+    """Lightweight YAML scalar reader for top-level `key: <int>`.
+
+    We avoid pulling in pyyaml as a dependency since the only
+    fields we need are integer scalars at the top level.
+    """
+    pattern = re.compile(rf"^{re.escape(key)}:\s*(\d+)\s*$")
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        m = pattern.match(line)
+        if m:
+            return int(m.group(1))
+    return None
+
+
+def _read_overlay_base(path: Path, overlay_id: int) -> int | None:
+    """Find the base_address for `overlay_id` in overlays.yaml.
+
+    Hand-parses the list-of-mappings structure to avoid pyyaml.
+    """
+    current_id: int | None = None
+    base_re = re.compile(r"^\s+base_address:\s*(\d+)\s*$")
+    id_re = re.compile(r"^\s+-?\s*id:\s*(\d+)\s*$")
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        m = id_re.match(line)
+        if m:
+            current_id = int(m.group(1))
+            continue
+        m = base_re.match(line)
+        if m and current_id == overlay_id:
+            return int(m.group(1))
+    return None
+
+
+def _module_bytes(region: str, module: str) -> bytes | None:
+    """Return the full raw bytes of a module's binary, cached."""
+    key = (region, module)
+    if key in _MODULE_BYTES_CACHE:
+        return _MODULE_BYTES_CACHE[key]
+    load = _resolve_module_load(region, module)
+    if load is None:
+        return None
+    bin_path, _base = load
+    data = bin_path.read_bytes()
+    _MODULE_BYTES_CACHE[key] = data
+    return data
+
+
+def _function_bytes(region: str, module: str, addr: int, size: int) -> bytes | None:
+    """Read raw function bytes from the region's extracted ROM.
+
+    Returns None if the module is unknown or the address is out of
+    range. Returns exactly `size` bytes when the load region covers
+    [addr, addr+size).
+    """
+    load = _resolve_module_load(region, module)
+    if load is None:
+        return None
+    _bin_path, base = load
+    data = _module_bytes(region, module)
+    if data is None:
+        return None
+    offset = addr - base
+    if offset < 0 or offset + size > len(data):
+        return None
+    return data[offset:offset + size]
+
+
+def _mask_relocs(bytes_: bytes, func_addr: int,
+                 reloc_offsets: list[int]) -> bytes:
+    """Replace bytes at reloc-affected offsets with 0x00 (sentinel).
+
+    `reloc_offsets` is the list of absolute reloc-from addresses
+    that fall inside this function. For each, we zero the 4-byte
+    word at the 4-aligned address — this safely covers:
+
+    - ARM BL relocations (24-bit imm in a 4-byte instruction)
+    - ARM `ldr ip, =label` pool slots (4-byte `.word`)
+    - Thumb branch / load relocations (2 or 4 bytes)
+
+    Slightly aggressive vs precise per-kind masking, but never
+    leaks region-specific bytes that would falsely separate
+    siblings.
+    """
+    out = bytearray(bytes_)
+    for absolute in reloc_offsets:
+        rel = absolute - func_addr
+        # Align down to 4-byte boundary
+        aligned = (rel // 4) * 4
+        for i in range(aligned, aligned + 4):
+            if 0 <= i < len(out):
+                out[i] = 0x00
+    return bytes(out)
+
+
+def _byte_similarity(a: bytes, b: bytes) -> float:
+    """Hamming similarity over equal positions; 0.0..1.0.
+
+    Returns 1.0 if both empty. Returns 0.0 if lengths differ
+    (a/b should be pre-aligned by the caller; this is a safety
+    net).
+    """
+    if len(a) != len(b):
+        return 0.0
+    if not a:
+        return 1.0
+    eq = sum(1 for x, y in zip(a, b, strict=True) if x == y)
+    return eq / len(a)
+
+
+def function_byte_similarity(
+    region_a: str, func_a: Function,
+    region_b: str, func_b: Function,
+) -> float | None:
+    """Compare two cross-region function candidates by their raw
+    bytes (with reloc slots masked).
+
+    Returns a similarity in [0.0, 1.0], or None if either region's
+    extract data isn't available (e.g. brain hasn't bootstrapped).
+    """
+    a_bytes = _function_bytes(region_a, func_a.module, func_a.addr,
+                              func_a.size)
+    b_bytes = _function_bytes(region_b, func_b.module, func_b.addr,
+                              func_b.size)
+    if a_bytes is None or b_bytes is None:
+        return None
+
+    a_reloc_offsets = [func_a.addr + ro for ro, _, _ in func_a.reloc_sig]
+    b_reloc_offsets = [func_b.addr + ro for ro, _, _ in func_b.reloc_sig]
+    a_masked = _mask_relocs(a_bytes, func_a.addr, a_reloc_offsets)
+    b_masked = _mask_relocs(b_bytes, func_b.addr, b_reloc_offsets)
+    return _byte_similarity(a_masked, b_masked)
 
 
 @dataclass(frozen=True)
@@ -213,10 +406,22 @@ def find_siblings(
     target_region: dict[str, list[Function]],
     *,
     max_results: int = 5,
+    source_region: str = "eur",
+    target_region_name: str | None = None,
+    byte_disambiguate: bool = True,
 ) -> list[Match]:
     """Find candidate twins of `eur_func` in the target region.
 
     Returns up to `max_results` candidates ranked by confidence.
+
+    When `byte_disambiguate=True` (default) and the source +
+    target region extract data is available, candidates with
+    matching reloc fingerprints are additionally ranked by raw-
+    byte Hamming similarity (with reloc slots masked). This
+    resolves the v1 prototype's documented limitation: identical-
+    reloc-fingerprint candidates that differ only in instruction-
+    encoded immediates (e.g. `lsl #0x1e` vs `lsl #0x1d`) get
+    disambiguated to a single winner.
     """
     # Restrict to same module
     candidates = target_region.get(eur_func.module, [])
@@ -252,12 +457,70 @@ def find_siblings(
             rationale=rationale,
         ))
 
-    # Sort by score descending, then by rank-proximity for ties
-    scored.sort(key=lambda m: (
-        -m.score,
-        abs(m.func.rank - eur_func.rank),
-        abs(m.func.addr - eur_func.addr),
-    ))
+    # Byte-level disambiguation pass.
+    # Disambiguates between candidates by comparing raw function
+    # bytes with reloc slots masked out. Resolves the v1
+    # limitation: identical-reloc-fingerprint candidates that
+    # differ in instruction-encoded immediates get separated.
+    if byte_disambiguate and target_region_name is not None:
+        # Compute byte-similarity for ALL HIGH/MEDIUM candidates,
+        # so the leaderboard is uniformly disambiguated rather
+        # than only tied-at-top candidates.
+        sims: list[float | None] = []
+        for m in scored:
+            if m.confidence in ("HIGH", "MEDIUM"):
+                bsim = function_byte_similarity(
+                    source_region, eur_func,
+                    target_region_name, m.func,
+                )
+            else:
+                bsim = None
+            sims.append(bsim)
+            if bsim is not None:
+                m.rationale = f"{m.rationale} | byte-sim={bsim:.3f}"
+                m.byte_sim = bsim
+
+        # Find the best byte-sim across all HIGH/MEDIUM candidates.
+        valid = [s for s in sims if s is not None]
+        if valid:
+            best_bsim = max(valid)
+            for m, bsim in zip(scored, sims, strict=True):
+                if bsim is None:
+                    continue
+                # Demotion rules:
+                # - byte-sim ≥ 0.99 → keep HIGH (perfect-or-near-
+                #   perfect twin)
+                # - 0.90 ≤ byte-sim < 0.99 AND a better candidate
+                #   exists → demote to MEDIUM (almost-twin but
+                #   loser)
+                # - byte-sim < 0.90 → demote to LOW (likely
+                #   wrong shape despite matching reloc-bag)
+                if bsim < 0.90:
+                    if m.confidence == "HIGH":
+                        m.confidence = "LOW"
+                        m.score = m.score * 0.7
+                    elif m.confidence == "MEDIUM":
+                        m.confidence = "LOW"
+                        m.score = m.score * 0.7
+                elif bsim < 0.99 and best_bsim >= 0.99:
+                    # There's a 0.99+ winner; this is a near-miss.
+                    if m.confidence == "HIGH":
+                        m.confidence = "MEDIUM"
+                        m.score = m.score * 0.9
+                # bsim >= 0.99 OR no better candidate: keep
+                # current confidence.
+
+    # Sort by score descending, then byte-sim descending,
+    # then rank-proximity, then addr-proximity
+    def _sort_key(m: Match) -> tuple:
+        bsim = getattr(m, "byte_sim", -1.0)
+        return (
+            -m.score,
+            -bsim,
+            abs(m.func.rank - eur_func.rank),
+            abs(m.func.addr - eur_func.addr),
+        )
+    scored.sort(key=_sort_key)
     return scored[:max_results]
 
 
@@ -369,6 +632,10 @@ def main() -> int:
                     help="Emit JSON output.")
     ap.add_argument("--max-results", type=int, default=5,
                     help="Max candidates per region (default 5).")
+    ap.add_argument("--no-byte-disambiguate", action="store_true",
+                    help="Disable v2 byte-level disambiguation pass. "
+                         "Useful for comparison to v1 prototype output, "
+                         "or when extract/<region>/ isn't available.")
     args = ap.parse_args()
 
     print("Loading EUR symbols...", file=sys.stderr)
@@ -401,8 +668,16 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    usa_matches = find_siblings(eur_func, usa, max_results=args.max_results)
-    jpn_matches = find_siblings(eur_func, jpn, max_results=args.max_results)
+    usa_matches = find_siblings(
+        eur_func, usa, max_results=args.max_results,
+        source_region="eur", target_region_name="usa",
+        byte_disambiguate=not args.no_byte_disambiguate,
+    )
+    jpn_matches = find_siblings(
+        eur_func, jpn, max_results=args.max_results,
+        source_region="eur", target_region_name="jpn",
+        byte_disambiguate=not args.no_byte_disambiguate,
+    )
 
     if args.json:
         out = {
@@ -473,8 +748,16 @@ def _cmd_sample(
     per_match_records: list[dict] = []
 
     for eur_func in sample:
-        usa_matches = find_siblings(eur_func, usa, max_results=1)
-        jpn_matches = find_siblings(eur_func, jpn, max_results=1)
+        usa_matches = find_siblings(
+            eur_func, usa, max_results=1,
+            source_region="eur", target_region_name="usa",
+            byte_disambiguate=not args.no_byte_disambiguate,
+        )
+        jpn_matches = find_siblings(
+            eur_func, jpn, max_results=1,
+            source_region="eur", target_region_name="jpn",
+            byte_disambiguate=not args.no_byte_disambiguate,
+        )
 
         usa_conf = usa_matches[0].confidence if usa_matches else "NONE"
         jpn_conf = jpn_matches[0].confidence if jpn_matches else "NONE"
