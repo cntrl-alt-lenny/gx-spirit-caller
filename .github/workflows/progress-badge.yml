@@ -53,7 +53,9 @@ jobs:
       - name: Update README badge
         id: update
         run: |
-          python tools/update_progress_badge.py --version eur
+          # Multi-region: no --version flag → tool iterates over
+          # all 3 regions (EUR/USA/JPN). Per PR #411's refactor.
+          python tools/update_progress_badge.py
           if git diff --quiet README.md; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
@@ -89,7 +91,7 @@ jobs:
             # clean and we exit 0 with no push needed.
             git fetch origin main
             git reset --hard origin/main
-            python tools/update_progress_badge.py --version eur
+            python tools/update_progress_badge.py
             if git diff --quiet README.md; then
               echo "main already has the correct badge after rebase; nothing to do"
               exit 0
