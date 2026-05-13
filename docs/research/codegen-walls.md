@@ -11,11 +11,11 @@ Same research format as
 [`medium-tier-plateau.md`](medium-tier-plateau.md).
 
 **Short answer:** **33 distinct mwcc-vs-baserom codegen
-divergences** account for the **105+ dropped matches across the
-twenty pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040 /
-047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
+divergences** account for the **107+ dropped matches across the
+twenty-one pilot waves** (020 / 022 / 028 / 029 / 030 / 031 / 040
+/ 047-wave9 / 049-wave12 / 051-wave14 / 053-wave15 / 053-wave16 /
 053-wave17 / 055-wave18 / 055-wave19 / 055-wave20 / 057-wave21 /
-057-wave22 / 057-wave23 / 060-wave24; the per-PR cross-reference
+057-wave22 / 057-wave23 / 060-wave24 / 060-wave25; the per-PR cross-reference
 table below covers these; brief 046 waves 5–7 added three new
 C-N coercions documented in C-10 / C-11 / C-12; brief 047 wave
 9 surfaced **C-13** (predicated if-X order) — fold-only, the
@@ -95,7 +95,8 @@ Source-PR coverage:
 | 057/wave22 | 392 | 70.0% |  7  |       3 |
 | 057/wave23 | 402 | 25.0% |  2  |       6 |
 | 060/wave24 | 405 | 75.0% |  9  |       3 |
-| —     | —   |   —   | **208** |  **105** |
+| 060/wave25 | 408 | 84.6% | 11  |       2 |
+| —     | —   |   —   | **219** |  **107** |
 
 Each pattern gets: a name, the target asm shape, the mwcc-emitted
 asm shape, the C source variation that *did* coerce it (when
@@ -2524,17 +2525,22 @@ mismatch (e.g. you have an `int` where the target has a
 > | **S-1 (this entry)** | The C source's struct decl doesn't match the target's layout — mwcc honours the wrong decl and emits offsets per the wrong layout. | Correct the `_pad` size / field types in the C source. |
 > | **Cross-function cascade** ([Operational notes](#cross-function-reference-shift-on-wall-induced-size-mismatches)) | An *upstream* TU in the same overlay/section emitted wrong-sized `.o` bytes, shifting every downstream TU's link-time address by the delta. The downstream `.o` bytes are *correct*; only their placement is wrong. | Drop the upstream TU (it's hitting a wall and emitting wrong size); downstream TUs land at correct addresses automatically. |
 >
-> **Discriminator (brief 060 wave 24 / PR #405):** when a
-> "uniform shift" diff appears, check the *struct decl* AND
-> the *recent upstream TU additions* in the same section.
-> Wave 24 hit the cascade variant — adding `func_0201d5c0`
-> (which turned out to be −4 bytes vs target) misplaced 3
-> downstream candidates (`func_0201d710` / `_d738` / `_d6d4`)
-> by 4 bytes even though their `.o` bytes were correct.
-> Dropping `_d5c0` recovered all 3 downstream candidates
-> instantly. **Decomper recipe:** if the struct decl looks
-> correct, suspect cascade. If no recent upstream addition is
-> a candidate for size-mismatch, suspect S-1.
+> **Discriminator (brief 060 waves 24 + 25 / PRs #405 + #408):**
+> when a "uniform shift" diff appears, check the *struct decl*
+> AND the *recent upstream TU additions* in the same overlay —
+> AND for cross-`.o` BL targets, in the target's module too.
+> Wave 24 hit the cascade within-overlay variant: adding
+> `func_0201d5c0` (−4 bytes vs target) misplaced 3 downstream
+> candidates in the same overlay; dropping `_d5c0` recovered
+> all 3. Wave 25 hit the cross-`.o` variant: two
+> size-mismatched drops in main shifted `func_02037208`'s
+> address, breaking the C-20a candidate `func_ov002_022a8668`
+> in ov002 even though its `.o` was byte-correct.
+> **Decomper recipe:** if the struct decl looks correct,
+> suspect cascade. Check upstream TUs in the same overlay
+> first; if none, check the target's module for the
+> cross-`.o` variant (c). If no upstream candidate could be
+> size-mismatched in either location, suspect S-1.
 
 **How to spot it before writing:** when you transcribe a
 struct from disassembled offsets, compute `4-byte-aligned-up
@@ -2701,16 +2707,18 @@ shape we should chase".
 | 060w24 / 405 | `func_02007f38`           | P-3 (pool-loaded composite constant `0x52008421` vs orig's `mov+orr+orr+orr` chain; `v \|= ...` chain didn't prevent fold) | permanent |
 | 060w24 / 405 | `func_02070fe8`           | (alias-reload family: mwcc emitted `bxeq lr` early-return instead of fully-predicated body; same family as wave 19 drops) | permanent |
 | 060w24 / 405 | `func_0201d5c0`           | (2-way switch: mwcc collapsed branch+predicate mix; **also triggered the cascading-misplacement variant (b) on 3 downstream candidates** — see Operational notes) | permanent (cascade trigger) |
+| 060w25 / 408 | `func_02054c0c`           | (stack-local for output param: mwcc elided the stack frame; couldn't force stack allocation from natural C — same family as wave-17 `func_ov002_021b91d0` addr-taken elision) | permanent |
+| 060w25 / 408 | `func_020342f0`           | (null-chain + 2-field OR-bool: mwcc emitted different predicate ordering; bool + if-chain attempts both off. **Together with `_02054c0c` triggered the cascading-misplacement variant (c) cross-`.o` BL pool literal shift** — see Operational notes) | permanent (cascade trigger) |
 
 ## Quantification
 
 ```
 
-By bucket (across 20 pilots: 020, 022, 028, 029, 030, 031, 040,
+By bucket (across 21 pilots: 020, 022, 028, 029, 030, 031, 040,
 047-wave9, 049-wave12, 051-wave14, 053-wave15, 053-wave16,
 053-wave17, 055-wave18, 055-wave19, 055-wave20, 057-wave21,
-057-wave22, 057-wave23, 060-wave24):
-  Permanent              :  73 drops (70%)  ← +3 wave 24 permanent (P-3 + alias-reload + cascade-trigger)
+057-wave22, 057-wave23, 060-wave24, 060-wave25):
+  Permanent              :  75 drops (70%)  ← +2 wave 25 (addr-taken-elision + cascade-trigger pair)
   Coercible-but-missed   :  16 drops (15%)
   Edge case              :   9 drops ( 9%)
   Tooling-tractable      :   2 drops ( 2%)
@@ -2844,19 +2852,23 @@ bytes** than the baserom (typical for a P-1 shift-collapse drop
 or any wall that compresses the source), the size delta
 **cascades through the linker layout**: every function placed
 *after* the failing one gets shifted up by the delta. The
-cascade surfaces two distinct visible effects — **two
+cascade surfaces three distinct visible effects — **three
 symptoms with one root cause**:
 
 | Effect | What objdiff/`dsd check modules` shows | First documented |
 |---|---|---|
-| **(a) Downstream pool-word values resolve wrong** | The later function's `.o` is byte-correct, but its pool-loaded relocations into the shifted region resolve to addresses 4-32 bytes off | brief 051 wave 13 (PR #368) |
+| **(a) Within-overlay pool-word values resolve wrong** | The later function's `.o` is byte-correct, but its pool-loaded relocations into the shifted region resolve to addresses 4-32 bytes off | brief 051 wave 13 (PR #368) |
 | **(b) Downstream TUs land at wrong addresses** | The later function's `.o` bytes are correct *and* its pool-word values are correct, but the function itself is placed at an address shifted by the upstream delta — `dsd check modules` flags the linked binary as off | brief 060 wave 24 (PR #405) |
+| **(c) Cross-`.o` BL pool literals resolve wrong** | The downstream `.o` is byte-correct *including* the pool-word relocation entry; only the link-time resolved value differs because the cross-module BL target sits in a shifted upstream region | brief 060 wave 25 (PR #408) |
 
-Both effects arise from the same upstream-TU size mismatch;
-which one is more visible depends on whether the
-downstream-affected function has cross-function relocations
-into the shifted region (then (a) dominates) or not (then (b)
-dominates).
+All three effects arise from the same upstream-TU size mismatch;
+which one is more visible depends on what kind of reference the
+downstream-affected function has into the shifted region:
+- relocation pointing into a *same-overlay* shifted region → (a)
+- no relocation into the shifted region; the function ITSELF is
+  in the shifted zone → (b)
+- relocation pointing *cross-`.o` / cross-module* into a shifted
+  region in a different `.o` → (c)
 
 **Symptom variant (a) — brief 051 wave 13 / PR #368:** the
 `func_ov010_021b4750` ov002-sibling cluster shipped 8
@@ -2886,19 +2898,42 @@ this cascade; if no upstream candidate could be size-shifted,
 suspect S-1 (struct padding error). See S-1's *Diagnostic-vs-
 resolution split* callout for the triage flow.
 
+**Symptom variant (c) — brief 060 wave 25 / PR #408:** the
+new C-20a candidate `func_ov002_022a8668` (ov002) shipped
+byte-correct `.o`, including its pool word
+`.word func_02037208` (a cross-module BL target in main).
+Two unrelated drops in the same wave (`func_020342f0` at +8
+and `func_02054c0c` at −8, both in main) shifted main's `.o`
+layout. The +8 shift happened to bracket
+`func_02037208`'s declared address, so the linker placed
+`func_02037208` at `0x02037210` instead of `0x02037208` —
+making the C-20a candidate's resolved pool word 8 bytes off,
+even though its own `.o` was byte-perfect and the pool-word
+relocation entry was correct. Dropping the two
+size-mismatched main TUs → `func_ov002_022a8668`'s pool word
+immediately resolved to the right value, byte-identical
+first try. **Cross-`.o` variant of (a):** same mechanism,
+but the BL points into a different `.o` than the source
+function. The decomper's signal here was "asm body matches
+`.o`-byte-perfect, but cross-function BL resolves to a 4-or-
+8-byte-off target".
+
 **Debugging recipe:**
 
 1. When a function fails to match and the per-function
-   objdiff diff shows either the **pool-word value** differs
-   by a small offset (4-32 bytes) (variant a) **or** the
-   `.o` bytes are correct but `dsd check modules` shows the
-   linked binary off (variant b), suspect a cross-function
+   objdiff diff shows any of (variant a) **pool-word value**
+   differs by a small offset (4-32 bytes), (variant b) `.o`
+   bytes are correct but `dsd check modules` shows the
+   linked binary off, or (variant c) `.o` bytes are correct
+   *and* the pool-word relocation entry is correct but its
+   link-time-resolved value is off, suspect a cross-function
    cascade.
-2. Identify the closest **earlier** unmatched function in the
-   same overlay — especially anything in the most recent
-   wave. Read its asm to see if it would emit fewer bytes
-   than the declared size (P-1 / P-3 chain / unsupported
-   shape).
+2. Identify any **earlier** unmatched function in the same
+   overlay OR — for variant (c) — any unmatched function in
+   the **target `.o`'s module** that bracket the BL target
+   address. Read its asm to see if it would emit fewer/more
+   bytes than the declared size (P-1 / P-3 chain /
+   unsupported shape).
 3. Drop the earlier candidate from the wave (revert its
    `src/.../*.c` and reset its `symbols.txt` rename) and
    re-run the build. If the later candidate suddenly
@@ -2910,22 +2945,32 @@ resolution split* callout for the triage flow.
 **Why this matters:** cluster-pilot waves that pick adjacent
 candidates from the same overlay are especially vulnerable —
 a single P-1 (or any size-shrinking-wall) drop can mask up to
-N other matches in the downstream tail. The "drop and retry"
+N other matches in the downstream tail. Variant (c) is even
+more insidious: a size-mismatch in one module can break a
+candidate in a different module via cross-`.o` BL relocation,
+so the "obvious upstream suspect" might not be in the same
+overlay as the failing candidate. The "drop and retry"
 workflow is cheap (seconds per iteration) and catches the
-cascade before classifying healthy candidates as walls. Wave
-24 caught variant (b) mid-wave specifically because the
-decomper recognized the "downstream candidates appearing as
-−4 even though their `.o` bytes look right" pattern as the
-cascade signature and tried the drop-upstream recipe rather
-than iterating on the 3 downstream candidates' source.
+cascade before classifying healthy candidates as walls.
+
+Wave 24 and wave 25 both caught variants mid-wave because the
+decomper recognized the cascade signature (downstream `.o`
+bytes correct but the link-level diff shows shift) and tried
+the drop-upstream recipe rather than iterating on the affected
+candidate's source. Variant (c) requires looking across module
+boundaries to find the size-mismatched TU.
 
 **Cross-reference:**
 
 - Brief 051 wave 13 ([PR #368](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/368))
-  documented variant (a) first.
+  documented variant (a) first (within-overlay pool-word).
 - Brief 060 wave 24 ([PR #405](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/405))
-  surfaced variant (b) and the explicit overlap with S-1's
-  diagnostic surface.
+  surfaced variant (b) (downstream placement-shift) and the
+  explicit overlap with S-1's diagnostic surface.
+- Brief 060 wave 25 ([PR #408](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/408))
+  surfaced variant (c) (cross-`.o` BL pool literals) —
+  size mismatch in main shifted `func_02037208`, breaking the
+  C-20a candidate in ov002's resolved BL target.
 - The **whole-binary version** of the same shift is what
   makes the **ov004 BSS layout shift**
   ([`ov004-bss-shift.md`](ov004-bss-shift.md)) so persistent
