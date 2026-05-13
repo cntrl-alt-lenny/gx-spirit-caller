@@ -56,6 +56,8 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("cluster_wave_propagate", "match-acceleration", "Match acceleration"),
     ("find_region_siblings", "multi-region", "Multi-region porting"),
     ("port_to_region", "multi-region", "Multi-region porting"),
+    ("find_external_source", "cross-project", "Cross-project source mining"),
+    ("vendor_external_sources", "cross-project", "Cross-project source mining"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),
@@ -99,6 +101,7 @@ CATEGORY_ORDER = [
     "rename-support",
     "match-acceleration",
     "multi-region",
+    "cross-project",
     "invariants",
     "ci-formatters",
     "infrastructure",
@@ -110,6 +113,7 @@ CATEGORY_TITLES = {
     "rename-support": "Rename support",
     "match-acceleration": "Match acceleration",
     "multi-region": "Multi-region porting",
+    "cross-project": "Cross-project source mining",
     "invariants": "Hygiene / invariants",
     "ci-formatters": "CI formatters",
     "infrastructure": "Infrastructure / build-patching",
@@ -136,6 +140,14 @@ CATEGORY_DESC = {
         "Cross-region porting pipeline: locate USA/JPN siblings of "
         "EUR-matched functions and mechanically rewrite source for "
         "the target region. See brief 061 / 064 for design."
+    ),
+    "cross-project": (
+        "Cross-project source mining: vendor upstream decomp repos "
+        "(pokediamond, pokeheartgold, AetiasHax/st) and surface "
+        "candidate `.c` source for our unmatched NitroSDK / MSL_C / "
+        "libnns functions. See brief 066 (research) for design + "
+        "verdict; brief 068 (implementation) for the byte-fingerprint "
+        "pass."
     ),
     "invariants": (
         "Pre-flight sanity checks. Run locally before pushing and "
