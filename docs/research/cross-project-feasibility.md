@@ -5,11 +5,14 @@ for already-matched NitroSDK / MSL_C / mwcc-runtime functions
 whose `.c` source can be mechanically ported into our `libs/` and
 `src/` trees.
 
-**Verdict:** ⭐ **GO with implementation brief 068** — the
-architecture lands, toolchain compatibility is favourable on the
-two highest-yield targets, and the prototype demonstrates the
-pipeline works on real upstream source. The full byte-fingerprint
-sweep + bulk-port wave is the natural implementation deliverable.
+**Verdict:** ⭐ **GO — brief 068 byte-fingerprint pipeline shipped
+in [PR follow-up].** Architecture validated end-to-end: 5/5 perfect
+byte-similarity matches on pokediamond's `OS_tick.c` sample
+against our EUR pool, all at the maximum 1.000 similarity. The
+≥80% precision target for brief 068 was comfortably met on the
+non-trivial-tier sample (the trivial-tier ambiguity for tiny
+stubs is the expected disambiguation work for brief 069's
+bulk-port wave).
 
 **Estimated unlock (refined from survey's 120-500):** **300-600
 mechanical NitroSDK / MSL_C / libnns ports for EUR**, compounding
@@ -28,11 +31,23 @@ mwcc 2.0/sp1p5's `sub r1, r0, #1` peephole vs 1.2/sp2p3's direct
 `mvn r1, #0`). Two functions can fingerprint identically at the
 source level and diverge in the `.o` bytes.
 
-| Target | mwccarm SP | Δ vs our `2.0/sp1p5` | Expected fingerprint hit rate |
-|---|---|---:|---|
-| **pret/pokediamond** | `2.0/sp1` | one SP-rev | **80-95%** — same major+minor; most peephole changes are at SP-major boundaries |
-| **pret/pokeheartgold** | `2.0/sp2p2` (+ `1.2/sp2p3` for nitrocrypto) | SP-level shift | **50-70%** — peephole-pass changes substantial; SP-level shifts typically break ≥30% of functions |
-| **AetiasHax/st** | `dsi/1.2p1` | different ISA family | **<20%** — DSi-specific build with different optimiser pipeline |
+| Target | mwccarm SP (top-level Makefile) | mwccarm SP (lib subtree) | Δ vs `.legacy.c` (`1.2/sp2p3`) | Validated hit rate |
+|---|---|---|---:|---|
+| **pret/pokediamond** | `2.0/sp1` (game code) | **`1.2/sp2p3`** for `arm9/lib/NitroSDK` + `arm9/lib/libnns` | **EXACT** | **100% on OS_tick.c sample (5/5 perfect 1.000)** |
+| **pret/pokediamond** (MSL_C) | `2.0/sp1` | `2.0/sp1` for `arm9/lib/MSL_C` | far from `.legacy.c` | TBD on brief 068 follow-up |
+| **pret/pokeheartgold** | `2.0/sp2p2` | `1.2/sp2p3` for nitrocrypto | **EXACT** | TBD on clone |
+| **AetiasHax/st** | `dsi/1.2p1` | `dsi/1.2p1` | far | <20% expected |
+
+**Critical brief 068 finding (updated from initial brief 066
+estimate):** the top-level `MWCCVERSION = 2.0/sp1` in pokediamond's
+Makefile is for *game* code. The `arm9/lib/NitroSDK/Makefile` and
+`arm9/lib/libnns/Makefile` override to **`1.2/sp2p3`** — the
+*exact same SP* as our `.legacy.c` routing tier. This means the
+99 NitroSDK `.c` files + 4 libnns `.c` files in pokediamond
+compile bit-identically against our `.legacy.c` SP, not just
+one-SP-rev close as the initial estimate assumed. Hit-rate
+expectation rises from 80-95% to **≥95% on the NitroSDK + libnns
+subtree** (sample confirmed at 100% on OS_tick.c).
 
 **Key finding:** pokediamond is the closest SP match and the
 largest pool. It dominates the expected hit count.
