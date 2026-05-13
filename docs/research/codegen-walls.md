@@ -2334,6 +2334,115 @@ hard-tier pivot.
   2-way predicated stores). Separate C-source coercion
   problem under all three compilers.
 
+## Source-layout pitfalls (not codegen walls)
+
+Hand-written-source mistakes that look like codegen walls in the
+diff (mwcc emits "wrong" offsets) but are actually authoring
+errors in the `.c` source. mwcc is doing the right thing —
+the C declaration just doesn't describe the target's struct
+layout faithfully. Promoted into this reference because they
+cost the decomper a wave-iteration cycle each (initial match
+attempt → off-by-K diff → "looks like codegen carryover" →
+*it isn't, the struct decl is wrong* → fix → match).
+
+Distinct from the `C-N` / `P-N` / `E-N` / `T-N` entries above:
+those are mwcc-vs-baserom divergences with no source-level
+expression. These are correctable in the C source alone.
+
+### S-1. Padding off-by-one — sub-word `_pad` lands fields at wrong offsets
+
+**Symptom:** ldr/str offsets in mwcc's emitted asm are off by
+`+4` (or `+2`, or `+1`) versus the target across every field
+after a `char _pad[K]` array. The diff *looks* like reg-alloc
+or scratch-register noise because every memory access shifts
+uniformly — but the offsets shift, not the registers.
+
+**Pattern:** when a `char _pad[K]` array is followed by an
+`int` field, the C compiler pads the array's tail up to the
+next 4-byte boundary before laying down the `int`. If
+`K mod 4 != 0`, the `int` lands at `offsetof(_pad) + K +
+(4 - K%4)`, not `offsetof(_pad) + K`. Every subsequent field
+in the struct is also shifted, so the entire downstream offset
+chain is wrong by the same delta.
+
+**Example (wave 22, `func_02012560`, brief 057):**
+
+The struct began at offset +0x00 (no leading field before the
+pad), so the pad fully owned the bytes up to the next field's
+offset. The target had an `int` at +0x10, meaning the pad
+needed to occupy exactly +0x00..+0x0f (16 bytes = `0x10`):
+
+```c
+/* Wrong: 17-byte pad ends at +0x11, mwcc aligns int up to +0x14. */
+struct Thing {
+    char  _pad[0x11];    /* +0x00..+0x10 (17 bytes), ends at +0x11 */
+    int   value;         /* mwcc pads up to next 4-aligned → +0x14 ❌ */
+    /* every subsequent field offset is +4 from where target has it */
+};
+
+/* Right: 16-byte pad ends at +0x10, mwcc places int at +0x10 directly. */
+struct Thing {
+    char  _pad[0x10];    /* +0x00..+0x0f (16 bytes), ends at +0x10 */
+    int   value;         /* +0x10, already 4-aligned ✓ */
+};
+```
+
+The general rule when the pad doesn't start at offset +0x00:
+the right pad size is "whatever brings `_pad`'s end-offset to
+the target int's offset, with no rounding-up". If a leading
+`char` puts the pad's start at +0x01, an int at +0x10 needs a
+`_pad[0xf]` (15 bytes, ending at +0x10) — not `_pad[0x10]`
+(16 bytes, ending at +0x11 → int aligned to +0x14). The
+miscount in PR #392 was the simpler "starts-at-zero" case where
+the pad's size equals the next-int's offset directly; the
+broader pitfall is forgetting that mwcc rounds up if the pad
+doesn't end on a 4-byte boundary.
+
+**How to spot it in the diff:** every `ldr` / `str` offset in
+the mwcc emission is exactly `+K` (typically `+4`) larger than
+the target, AND the offset shift starts after a `char _pad[]`
+field. If the shift is across the whole struct (offsets `+0`
+onward), the trap is somewhere earlier — likely a field-type
+mismatch (e.g. you have an `int` where the target has a
+`short`).
+
+**How to spot it before writing:** when you transcribe a
+struct from disassembled offsets, compute `4-byte-aligned-up
+(prev_end + pad_size)` after each pad and compare against the
+next target offset. If they disagree, the pad is wrong.
+
+**Affected matches:** brief 057 wave 22 `func_02012560`
+(PR #392). Decomper's iteration note:
+
+> Padding off-by-one trap on `func_02012560`. `char _pad[0x11]`
+> (17 bytes) followed by `int` aligns to the next 4-byte
+> boundary, landing the int at `+0x14` instead of `+0x10`. mwcc's
+> emitted offsets are off by 4 across all subsequent fields.
+> Easy fix once spotted: `0x11 → 0x10`. Pattern: when struct
+> padding lands at a misaligned offset, every downstream `int`
+> field shifts by 4. Watch the byte-count after pad arrays.
+
+**Resolution:** correct the `_pad` size in the C source. No
+routing change, no mwcc-flag change, no inline-asm escape. The
+fix is in the struct declaration alone.
+
+**Why this isn't C-N or P-N:** mwcc's emission is *correct* —
+it's faithfully implementing the C language's alignment rules
+on a struct whose declaration doesn't match the target's
+layout. The miscompile is in the human's struct decl, not in
+the compiler's response to it. A C-coercion entry would imply
+"tweak the source form to coax mwcc into emitting the target";
+here you tweak the source form to *describe the target
+accurately* — the codegen difference is downstream of the
+declaration error.
+
+**Provenance:** brief 057 wave 22 (PR #392) — decomper
+documented the iteration as a "worth flagging" calibration
+note. This entry promotes the iteration win into the grep-able
+reference so future targets that show a uniform offset-shift
+diff get triaged here first instead of cycling through C-N
+candidates that don't apply.
+
 ## Per-PR drop cross-reference
 
 For each dropped symbol, the wall it hit. Useful when reading the
