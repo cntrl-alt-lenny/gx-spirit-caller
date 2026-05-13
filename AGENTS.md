@@ -346,6 +346,17 @@ itself:
   permuter shines. Independent of 062 + 064/065. Branch:
   `cloud/permuter-auto-runner`.
 
+- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
+  — `cloud` (MEDIUM priority): research brief — survey the
+  DS-decomp ecosystem (AetiasHax/st, pret/pokeheartgold,
+  pret/pokediamond) for already-matched NitroSDK / MSL_C
+  source we can mechanically port. Ship feasibility verdict +
+  `tools/find_external_source.py` prototype. Estimated unlock:
+  **120-500 mechanical ports** for EUR, ~3× through brief
+  064/065's multi-region pipeline. Independent of 064/065;
+  scheduled after 064 closes so it doesn't compete for cloud
+  attention. Branch: `cloud/cross-project-source-research`.
+
 ### Closed briefs (reference)
 
 - [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)

@@ -136,7 +136,7 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — four scoped briefs open (parallel pickup):**
+**Cloud — five scoped briefs open (parallel pickup):**
 
 1. **Brief 064 (HIGH) — multi-region implementation.** Three
    deliverables downstream of brief 061's GO: byte-level
@@ -146,12 +146,18 @@ threshold).
 2. **Brief 062 (MEDIUM-HIGH) — diff-to-coercion suggester.**
    Rule engine over objdiff JSON + codegen-walls.md catalog.
    ~2-3× iteration-time speedup per match. Independent.
-3. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
+3. **Brief 066 (MEDIUM) — cross-project source research.**
+   Survey AetiasHax/st + pret/pokeheartgold + pret/pokediamond
+   for already-matched NitroSDK/MSL_C source. Estimated
+   unlock: 120-500 mechanical ports for EUR (×3 via brief
+   064/065 → 360-1500 across regions). Scheduled after 064 so
+   it doesn't compete with the in-flight multi-region work.
+4. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
    Becomes high-priority on the next cap-raise. Independent.
 
 **Decomper — one scoped brief open (HIGH, gated on 064):**
 
-4. **Brief 065 — multi-region bulk-port wave 1.** First
+5. **Brief 065 — multi-region bulk-port wave 1.** First
    bulk-porting wave consuming brief 064's pipeline. Target
    50-100 HIGH-confidence EUR matches ported byte-mechanically
    to USA + JPN combined. First time USA + JPN badges show
