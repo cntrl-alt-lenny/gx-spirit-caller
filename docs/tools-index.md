@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**50 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**51 tools** across 6 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (12)
+- [Analysis / worklist](#analysis--worklist) (13)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (8)
 - [Hygiene / invariants](#hygiene--invariants) (1)
@@ -69,6 +69,12 @@ Complements `tools/analyze_symbols.py`'s bulk-group output. Bulk groups cluster 
 **transitive cascade finder.**
 
 Extends `find_cascades.py` (#132) from single-step to multi-step promotion prediction. Same graph semantics, recursive evaluation.
+
+### `tools/find_region_siblings.py`
+
+**find USA / JPN counterparts of an EUR symbol.**
+
+Given an EUR function (by address or name), prints candidate USA + JPN sibling addresses using fingerprint matching against `config/{usa,jpn}/**/symbols.txt` + `relocs.txt`.
 
 ### `tools/next_targets.py`
 
