@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**56 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**57 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (12)
+- [Analysis / worklist](#analysis--worklist) (13)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (9)
 - [Multi-region porting](#multi-region-porting) (2)
@@ -71,6 +71,12 @@ Complements `tools/analyze_symbols.py`'s bulk-group output. Bulk groups cluster 
 **transitive cascade finder.**
 
 Extends `find_cascades.py` (#132) from single-step to multi-step promotion prediction. Same graph semantics, recursive evaluation.
+
+### `tools/list_named_tier_callees.py`
+
+**enumerate the upstream + local named**
+
+NitroSDK / MSL_C / libnns API surface.
 
 ### `tools/next_targets.py`
 
