@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**55 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**56 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -15,7 +15,7 @@ git add docs/tools-index.md
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (9)
 - [Multi-region porting](#multi-region-porting) (2)
-- [Cross-project source mining](#cross-project-source-mining) (2)
+- [Cross-project source mining](#cross-project-source-mining) (3)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (15)
@@ -217,6 +217,12 @@ Given a matched EUR `.c` source, rewrite all cross-region symbol references (fun
 ## Cross-project source mining
 
 _Cross-project source mining: vendor upstream decomp repos (pokediamond, pokeheartgold, AetiasHax/st) and surface candidate `.c` source for our unmatched NitroSDK / MSL_C / libnns functions. See brief 066 (research) for design + verdict; brief 068 (implementation) for the byte-fingerprint pass._
+
+### `tools/external_obj.py`
+
+**compile vendored external `.c` sources and**
+
+extract per-function byte fingerprints from the resulting `.o`.
 
 ### `tools/find_external_source.py`
 

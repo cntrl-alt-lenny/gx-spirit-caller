@@ -28,6 +28,9 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from find_external_source import (  # noqa: E402
+    BYTE_HIGH_THRESHOLD,
+    BYTE_MEDIUM_THRESHOLD,
+    ByteMatch,
     Candidate,
     ExternalFunc,
     FUNC_DEF_RE,
@@ -35,10 +38,12 @@ from find_external_source import (  # noqa: E402
     REPOS,
     SP_DISTANCE,
     _confidence_for_distance,
+    _confidence_for_similarity,
     _extract_functions_from_file,
     _sp_distance,
     build_external_index,
     lookup_by_name,
+    render_csv,
     render_json,
     render_text,
     repo_for,
@@ -366,6 +371,61 @@ class TestMetadataConsistency(unittest.TestCase):
                 f"{r.name} mwcc_sp {r.mwcc_sp} not in SP_DISTANCE; "
                 f"add an explicit entry to make scoring deliberate",
             )
+
+
+# --------------------------------------------------------------------------- #
+# Byte-fingerprint mode (brief 068)
+# --------------------------------------------------------------------------- #
+
+
+class TestByteConfidenceMapping(unittest.TestCase):
+    def test_above_high_threshold_is_high(self):
+        self.assertEqual(_confidence_for_similarity(1.0), "HIGH")
+        self.assertEqual(_confidence_for_similarity(BYTE_HIGH_THRESHOLD),
+                         "HIGH")
+
+    def test_above_medium_is_medium(self):
+        self.assertEqual(_confidence_for_similarity(0.90), "MEDIUM")
+        self.assertEqual(_confidence_for_similarity(BYTE_MEDIUM_THRESHOLD),
+                         "MEDIUM")
+
+    def test_below_medium_is_low(self):
+        self.assertEqual(_confidence_for_similarity(0.50), "LOW")
+        self.assertEqual(_confidence_for_similarity(0.0), "LOW")
+
+
+class TestRenderCSV(unittest.TestCase):
+    def _one_match(self) -> list[ByteMatch]:
+        return [ByteMatch(
+            external_repo="pokediamond",
+            external_file="arm9/lib/NitroSDK/src/OS_tick.c",
+            external_func="OS_GetTick",
+            external_size=0xb0,
+            our_region="eur",
+            our_module="main",
+            our_name="func_020930b0",
+            our_addr=0x020930b0,
+            similarity=1.0,
+            confidence="HIGH",
+        )]
+
+    def test_csv_header_present(self):
+        out = render_csv(self._one_match())
+        self.assertIn("confidence,similarity,external_repo", out)
+
+    def test_csv_row_format(self):
+        out = render_csv(self._one_match())
+        # The HIGH row mentions pokediamond, OS_GetTick, our addr
+        self.assertIn("pokediamond", out)
+        self.assertIn("OS_GetTick", out)
+        self.assertIn("0x020930b0", out)
+        self.assertIn("1.0000", out)
+
+    def test_csv_empty_when_no_matches(self):
+        out = render_csv([])
+        # Only the header row
+        self.assertEqual(out.count("\n"), 1)
+        self.assertIn("confidence", out)
 
 
 if __name__ == "__main__":

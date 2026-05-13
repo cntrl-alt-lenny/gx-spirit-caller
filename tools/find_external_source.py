@@ -59,6 +59,7 @@ Non-scope (per brief 066):
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import sys
@@ -69,6 +70,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 VENDOR_DIR = ROOT / "tools" / "_vendor"
 CONFIG_DIR = ROOT / "config"
+
+# Byte-similarity thresholds for the brief 068 byte-fingerprint
+# pipeline. Tuned against the OS_tick.c sample run
+# (all matches landed at 1.000 against our `.legacy.c`-SP-aligned
+# pokediamond NitroSDK pool). The MEDIUM/LOW bands give us
+# headroom for functions whose reloc tables differ slightly across
+# regions or where mwccarm's optimiser made a different choice.
+BYTE_HIGH_THRESHOLD = 0.95
+BYTE_MEDIUM_THRESHOLD = 0.80
 
 
 # Our toolchain's default mwcc SP. Vendored repos at this exact SP
@@ -374,6 +384,159 @@ def resolve_name_for_address(
 
 
 # --------------------------------------------------------------------------- #
+# Byte-fingerprint pipeline (brief 068)
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class ByteMatch:
+    """One byte-fingerprint match between an external function and
+    one of our unmatched candidates. Output row format for the
+    CSV that decomper brief 069 consumes."""
+    external_repo: str
+    external_file: str
+    external_func: str
+    external_size: int
+    our_region: str
+    our_module: str
+    our_name: str          # `func_<addr>` or already-renamed symbol
+    our_addr: int
+    similarity: float
+    confidence: str        # "HIGH" / "MEDIUM" / "LOW"
+
+
+def _confidence_for_similarity(sim: float) -> str:
+    if sim >= BYTE_HIGH_THRESHOLD:
+        return "HIGH"
+    if sim >= BYTE_MEDIUM_THRESHOLD:
+        return "MEDIUM"
+    return "LOW"
+
+
+def byte_scan_repo(
+    repo: str, region: str,
+    *,
+    limit_files: int | None = None,
+    min_similarity: float = BYTE_MEDIUM_THRESHOLD,
+) -> list[ByteMatch]:
+    """Compile every vendored `.c` file in the repo's lib_roots,
+    extract per-function fingerprints, match each external function
+    against all our same-size candidates in `region`. Returns
+    every match at or above `min_similarity`.
+
+    Lazy-imports `external_obj` and `find_region_siblings` — the
+    byte-fingerprint path has a wine + ELF-parse dependency that
+    the v0 name-only mode doesn't need.
+    """
+    # Lazy imports
+    _here = Path(__file__).resolve().parent
+    sys.path.insert(0, str(_here))
+    import external_obj  # noqa: E402
+    import find_region_siblings as frs  # noqa: E402
+
+    repo_meta = repo_for(repo)
+    if repo_meta is None:
+        return []
+
+    # Load our region pool once
+    region_funcs = frs.load_region(region)
+
+    matches: list[ByteMatch] = []
+    files_scanned = 0
+    for lib_root in repo_meta.lib_roots:
+        root_path = VENDOR_DIR / repo / lib_root
+        if not root_path.is_dir():
+            continue
+        for c_file in sorted(root_path.rglob("*.c")):
+            if limit_files is not None and files_scanned >= limit_files:
+                break
+            files_scanned += 1
+            src_rel = str(c_file.relative_to(VENDOR_DIR / repo))
+            o_path = external_obj.compile_external(repo, src_rel)
+            if o_path is None:
+                continue
+            for ext_fn in external_obj.extract_functions(o_path):
+                fp = ext_fn.fingerprint()
+                # Find our matching-size candidates across all modules
+                for module, funcs in region_funcs.items():
+                    for f in funcs:
+                        if f.size != ext_fn.size:
+                            continue
+                        our_bytes = frs._function_bytes(
+                            region, module, f.addr, f.size)
+                        if our_bytes is None:
+                            continue
+                        our_reloc_offsets = [
+                            f.addr + ro for ro, _, _ in f.reloc_sig
+                        ]
+                        our_masked = frs._mask_relocs(
+                            our_bytes, f.addr, our_reloc_offsets)
+                        sim = external_obj.byte_similarity(fp, our_masked)
+                        if sim < min_similarity:
+                            continue
+                        matches.append(ByteMatch(
+                            external_repo=repo,
+                            external_file=src_rel,
+                            external_func=ext_fn.name,
+                            external_size=ext_fn.size,
+                            our_region=region,
+                            our_module=module,
+                            our_name=f.name,
+                            our_addr=f.addr,
+                            similarity=sim,
+                            confidence=_confidence_for_similarity(sim),
+                        ))
+    # Sort: HIGH first, then by similarity desc, then by external addr
+    conf_rank = {"HIGH": 3, "MEDIUM": 2, "LOW": 1}
+    matches.sort(key=lambda m: (
+        -conf_rank.get(m.confidence, 0),
+        -m.similarity,
+        m.external_func,
+    ))
+    return matches
+
+
+def render_csv(matches: list[ByteMatch]) -> str:
+    """CSV format consumed by decomper brief 069's bulk-port wave.
+    Columns are chosen so the decomper can grep the HIGH rows and
+    pull the external `.c` file for inspection."""
+    buf = []
+    writer = csv.writer(_BufWriter(buf))
+    writer.writerow([
+        "confidence", "similarity",
+        "external_repo", "external_file", "external_func",
+        "external_size",
+        "our_region", "our_module", "our_name", "our_addr_hex",
+    ])
+    for m in matches:
+        writer.writerow([
+            m.confidence,
+            f"{m.similarity:.4f}",
+            m.external_repo,
+            m.external_file,
+            m.external_func,
+            f"0x{m.external_size:04x}",
+            m.our_region,
+            m.our_module,
+            m.our_name,
+            f"0x{m.our_addr:08x}",
+        ])
+    return "".join(buf)
+
+
+class _BufWriter:
+    """csv.writer needs a `.write(str)` target. List-of-strings
+    buffer keeps the output in-memory + lets us return it from
+    `render_csv`."""
+
+    def __init__(self, buf: list):
+        self.buf = buf
+
+    def write(self, s: str) -> None:
+        self.buf.append(s)
+
+
+# --------------------------------------------------------------------------- #
 # Output rendering
 # --------------------------------------------------------------------------- #
 
@@ -453,7 +616,8 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         description="Find upstream `.c` source for our unmatched "
                     "functions by mining vendored decomp repos. "
-                    "Brief 066 v0: name-based matching.",
+                    "Brief 066 (name-based) + brief 068 "
+                    "(--byte-scan: byte-fingerprint pipeline).",
     )
     p.add_argument("--name", help="Function name to look up "
                                   "(e.g. IntrWait, OS_GetTick).")
@@ -463,11 +627,41 @@ def main(argv: list[str] | None = None) -> int:
                                   "(e.g. 0x02000086).")
     p.add_argument("--region", default="eur",
                    help="Region for address lookup (default: eur).")
-    p.add_argument("--format", choices=("text", "json"), default="text",
-                   help="Output format (default: text).")
+    p.add_argument("--format", choices=("text", "json", "csv"),
+                   default="text",
+                   help="Output format. csv is required for "
+                        "--byte-scan (brief 069 consumes it).")
     p.add_argument("--list-pools", action="store_true",
                    help="Print which repos are cloned + index size.")
+    # Brief 068 — byte-fingerprint scan
+    p.add_argument("--byte-scan", metavar="REPO",
+                   help="Scan all vendored .c files in REPO, compile "
+                        "+ fingerprint each function, match against "
+                        "our region pool by byte similarity. Output "
+                        "as CSV for brief 069's bulk-port wave.")
+    p.add_argument("--byte-scan-limit-files", type=int, default=None,
+                   help="Cap the number of .c files compiled per "
+                        "scan (for sample validation / dry-run).")
+    p.add_argument("--byte-scan-min-similarity", type=float, default=None,
+                   help="Minimum byte-similarity threshold "
+                        "(default: 0.80 = MEDIUM band; use 0.95 for "
+                        "HIGH-only).")
     args = p.parse_args(argv)
+
+    if args.byte_scan:
+        if args.format != "csv":
+            print("note: --byte-scan output is CSV; ignoring --format "
+                  f"{args.format}.", file=sys.stderr)
+        min_sim = (args.byte_scan_min_similarity
+                   if args.byte_scan_min_similarity is not None
+                   else BYTE_MEDIUM_THRESHOLD)
+        matches = byte_scan_repo(
+            args.byte_scan, args.region,
+            limit_files=args.byte_scan_limit_files,
+            min_similarity=min_sim,
+        )
+        sys.stdout.write(render_csv(matches))
+        return 0
 
     if args.list_pools:
         for repo in REPOS:
