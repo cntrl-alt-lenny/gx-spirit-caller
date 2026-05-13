@@ -392,6 +392,38 @@ def resolve_symbol(
 # Rewriting
 # --------------------------------------------------------------------------- #
 
+def find_rename_collisions(
+    resolutions: list[Resolution],
+) -> list[tuple[str, list[Resolution]]]:
+    """Detect target-name collisions across distinct EUR symbols.
+
+    A collision means two or more EUR refs (different addresses /
+    modules / kinds) resolved to the **same target name**. The
+    catastrophic failure mode is parent ↔ callee collision: a
+    function being ported maps to the same target name as one of
+    its callees, so the rewritten C body calls itself recursively
+    where it should be calling a different target. Brief 065 wave
+    3 surfaced this; the fix is detect-and-refuse rather than
+    ship silently-wrong code.
+
+    Returns a list of `(target_name, [colliding_resolutions])`
+    tuples. Empty list = no collisions, safe to substitute.
+
+    Resolutions with `target_name is None` (unresolved) are
+    ignored — they're surfaced separately by the confidence-floor
+    check.
+    """
+    by_target: dict[str, list[Resolution]] = {}
+    for r in resolutions:
+        if r.target_name is None:
+            continue
+        by_target.setdefault(r.target_name, []).append(r)
+    return [
+        (name, rs) for name, rs in by_target.items()
+        if len(rs) > 1
+    ]
+
+
 def apply_substitutions(
     source_text: str,
     resolutions: list[Resolution],
@@ -791,6 +823,49 @@ def main() -> int:
             print("\nRe-run with --confidence-floor LOW to accept anyway, "
                   "or fix the renames upstream.")
         return 2
+
+    # Detect rename collisions: two or more distinct EUR refs
+    # resolved to the same target name. Worst case is parent ↔
+    # callee collision (self-recursive rewrite); any collision is
+    # always wrong. Refuse even in --dry-run so the decomper sees
+    # the issue before manual review.
+    collisions = find_rename_collisions(resolutions)
+    if collisions:
+        if args.json:
+            print(json.dumps({
+                "status": "refused",
+                "reason": f"{len(collisions)} rename collision(s); "
+                          f"two or more EUR symbols resolved to the "
+                          f"same target name, which would emit "
+                          f"self-recursive or otherwise-broken code",
+                "collisions": [
+                    {
+                        "target_name": name,
+                        "eur_refs": [_resolution_to_dict(r) for r in rs],
+                    }
+                    for name, rs in collisions
+                ],
+                "resolutions": [_resolution_to_dict(r) for r in resolutions],
+            }, indent=2))
+        else:
+            print(f"REFUSED — {len(collisions)} rename collision(s) "
+                  f"detected. Two or more distinct EUR symbols "
+                  f"resolved to the same target name. Substituting "
+                  f"would emit self-recursive or otherwise-broken "
+                  f"code; manual review needed.")
+            for name, rs in collisions:
+                print(f"\n  target={name}")
+                for r in rs:
+                    print(f"    ← {r.eur_ref.text:<32} "
+                          f"[{r.confidence}] {r.notes}")
+            print("\nLikely causes:")
+            print("  - find_region_siblings returned a non-unique HIGH")
+            print("    candidate (false-positive — re-run with byte-")
+            print("    disambiguation if not already on).")
+            print("  - One of the EUR symbols has already been renamed")
+            print("    upstream and its target name now collides with a")
+            print("    sibling. Inspect config/<region>/**/symbols.txt.")
+        return 3
 
     # Build the rewritten source.
     rewritten = apply_substitutions(source_text, resolutions)

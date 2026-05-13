@@ -25,6 +25,7 @@ from port_to_region import (  # noqa: E402
     Resolution,
     apply_substitutions,
     compute_output_path,
+    find_rename_collisions,
     function_symbol_for,
     infer_module_from_path,
     module_to_src_dir,
@@ -451,6 +452,112 @@ class TestComputeOutputPathWithModulePrefix(unittest.TestCase):
         self.assertEqual(
             out, ROOT / "src/usa/main/main_020488f0.legacy.c",
         )
+
+
+# --------------------------------------------------------------------------- #
+# Rename-collision detection (brief 065 wave 3 follow-up)
+# --------------------------------------------------------------------------- #
+
+
+class TestFindRenameCollisions(unittest.TestCase):
+    """Catches parent ↔ callee target-name collisions before they
+    emit self-recursive code. Surfaced by brief 065 wave 3."""
+
+    def _res(self, eur_name: str, eur_addr: int,
+             target: str | None,
+             confidence: str = "HIGH") -> Resolution:
+        return Resolution(
+            eur_ref=SymbolRef(text=eur_name, kind="func",
+                              module="main", addr=eur_addr),
+            target_name=target,
+            confidence=confidence,
+            notes="",
+        )
+
+    def test_no_collisions_when_targets_distinct(self):
+        # Normal case: each EUR ref resolves to a different USA name.
+        resolutions = [
+            self._res("func_02006164", 0x02006164, "func_02006148"),
+            self._res("func_02006c0c", 0x02006c0c, "func_02006bf0"),
+            self._res("func_0201ed28", 0x0201ed28, "func_0201ecd4"),
+        ]
+        self.assertEqual(find_rename_collisions(resolutions), [])
+
+    def test_parent_callee_collision_detected(self):
+        # Brief 065 wave 3's failure mode: function being ported
+        # (parent) and one of its callees both resolve to the same
+        # target → substitution emits self-recursive code.
+        resolutions = [
+            # parent function being ported
+            self._res("func_02006164", 0x02006164, "func_02006148"),
+            # callee — resolved to same target! (false-positive)
+            self._res("func_02006c0c", 0x02006c0c, "func_02006148"),
+        ]
+        collisions = find_rename_collisions(resolutions)
+        self.assertEqual(len(collisions), 1)
+        target_name, colliding = collisions[0]
+        self.assertEqual(target_name, "func_02006148")
+        self.assertEqual(len(colliding), 2)
+        # Both EUR sources are surfaced
+        eur_names = sorted(r.eur_ref.text for r in colliding)
+        self.assertEqual(
+            eur_names, ["func_02006164", "func_02006c0c"],
+        )
+
+    def test_three_way_collision(self):
+        # Triple collision (rare but possible if find_siblings
+        # returns the same HIGH for multiple distinct candidates).
+        resolutions = [
+            self._res("func_a", 0x1000, "func_X"),
+            self._res("func_b", 0x2000, "func_X"),
+            self._res("func_c", 0x3000, "func_X"),
+        ]
+        collisions = find_rename_collisions(resolutions)
+        self.assertEqual(len(collisions), 1)
+        target_name, colliding = collisions[0]
+        self.assertEqual(target_name, "func_X")
+        self.assertEqual(len(colliding), 3)
+
+    def test_unresolved_targets_ignored(self):
+        # `target_name=None` (NONE-confidence symbols) shouldn't
+        # contribute to collisions — they get surfaced separately
+        # by the confidence-floor check.
+        resolutions = [
+            self._res("func_a", 0x1000, None, confidence="NONE"),
+            self._res("func_b", 0x2000, None, confidence="NONE"),
+            self._res("func_c", 0x3000, "func_X"),
+        ]
+        self.assertEqual(find_rename_collisions(resolutions), [])
+
+    def test_data_symbol_collision_also_detected(self):
+        # Two data symbols resolving to the same target name is
+        # also a collision (would emit duplicate `extern` decls
+        # with conflicting types).
+        resolutions = [
+            Resolution(
+                eur_ref=SymbolRef(text="data_02103d74", kind="data",
+                                  module="main", addr=0x02103d74),
+                target_name="data_02103c94",
+                confidence="EXACT_ADDR", notes="",
+            ),
+            Resolution(
+                eur_ref=SymbolRef(text="data_02103d78", kind="data",
+                                  module="main", addr=0x02103d78),
+                target_name="data_02103c94",
+                confidence="EXACT_ADDR", notes="",
+            ),
+        ]
+        collisions = find_rename_collisions(resolutions)
+        self.assertEqual(len(collisions), 1)
+
+    def test_only_one_resolution_no_collision(self):
+        # Trivial case: single resolution → never a collision.
+        self.assertEqual(find_rename_collisions([
+            self._res("func_a", 0x1000, "func_X"),
+        ]), [])
+
+    def test_empty_resolutions_no_collision(self):
+        self.assertEqual(find_rename_collisions([]), [])
 
 
 if __name__ == "__main__":
