@@ -19,14 +19,18 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from port_to_region import (  # noqa: E402
+    FILENAME_RE,
     SYMBOL_RE,
     SymbolRef,
     Resolution,
     apply_substitutions,
     compute_output_path,
+    function_symbol_for,
     infer_module_from_path,
     module_to_src_dir,
+    parse_filename_stem,
     parse_symbols_in_source,
+    target_stem_for_prefix,
 )
 
 
@@ -247,6 +251,206 @@ class TestComputeOutputPath(unittest.TestCase):
             "jpn", "func_Y", "main",
         )
         self.assertEqual(out, ROOT / "src/jpn/main/func_Y.legacy_sp3.c")
+
+
+# --------------------------------------------------------------------------- #
+# Filename-pattern patch (brief 062 follow-up — accept <module>_<addr>.c)
+# --------------------------------------------------------------------------- #
+
+
+class TestFilenameRE(unittest.TestCase):
+    """Pin the four accepted filename patterns + rejection cases."""
+
+    def test_func_addr(self):
+        m = FILENAME_RE.match("func_02006164")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("prefix"), "func")
+        self.assertEqual(m.group("addr"), "02006164")
+
+    def test_func_ov_addr(self):
+        m = FILENAME_RE.match("func_ov002_021b41e8")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("prefix"), "func_ov002")
+        self.assertEqual(m.group("addr"), "021b41e8")
+
+    def test_main_addr(self):
+        m = FILENAME_RE.match("main_020498dc")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("prefix"), "main")
+        self.assertEqual(m.group("addr"), "020498dc")
+
+    def test_ov_addr(self):
+        m = FILENAME_RE.match("ov002_021aff78")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("prefix"), "ov002")
+        self.assertEqual(m.group("addr"), "021aff78")
+
+    def test_partial_hex_rejected(self):
+        # 7-hex address: not enough digits.
+        self.assertIsNone(FILENAME_RE.match("func_0200616"))
+        self.assertIsNone(FILENAME_RE.match("main_0200616"))
+
+    def test_extended_hex_rejected(self):
+        # 9-hex address: anchored regex must reject.
+        self.assertIsNone(FILENAME_RE.match("func_020061640"))
+        self.assertIsNone(FILENAME_RE.match("ov002_021aff780"))
+
+    def test_unrelated_prefix_rejected(self):
+        # `sinit_ov002_<addr>` is NOT accepted — sinit files are a
+        # different convention (static initialisers); decomper
+        # handles them separately.
+        self.assertIsNone(FILENAME_RE.match("sinit_ov002_021b2f64"))
+        # Already-renamed task files don't have an address suffix
+        # at all → reject.
+        self.assertIsNone(FILENAME_RE.match("Task_StartLockedSubTask"))
+        # `ov<NNN>_stubs_<short>` (multi-function stub file) — not
+        # the same shape; brief 062 follow-up explicitly scopes to
+        # the address-keyed single-function convention.
+        self.assertIsNone(FILENAME_RE.match("ov009_stubs_ab840"))
+
+
+class TestParseFilenameStem(unittest.TestCase):
+    """Pin the (prefix, module, addr) tuple for each accepted shape."""
+
+    def test_func_addr_routes_to_main(self):
+        self.assertEqual(
+            parse_filename_stem("func_02006164"),
+            ("func", "main", 0x02006164),
+        )
+
+    def test_func_ov_addr_routes_to_overlay(self):
+        self.assertEqual(
+            parse_filename_stem("func_ov002_021b41e8"),
+            ("func_ov002", "ov002", 0x021b41e8),
+        )
+
+    def test_main_addr_routes_to_main(self):
+        self.assertEqual(
+            parse_filename_stem("main_020498dc"),
+            ("main", "main", 0x020498dc),
+        )
+
+    def test_ov_addr_routes_to_overlay(self):
+        self.assertEqual(
+            parse_filename_stem("ov002_021aff78"),
+            ("ov002", "ov002", 0x021aff78),
+        )
+
+    def test_unrecognised_returns_none(self):
+        self.assertIsNone(parse_filename_stem("sinit_ov007_021b2f64"))
+        self.assertIsNone(parse_filename_stem("Task_DrawHand"))
+
+
+class TestFunctionSymbolFor(unittest.TestCase):
+    """The function-symbol *inside* the source is always
+    `func_<addr>` / `func_ov<NNN>_<addr>` regardless of filename
+    convention. This helper builds it from (module, addr)."""
+
+    def test_main_module(self):
+        self.assertEqual(
+            function_symbol_for("main", 0x02006164),
+            "func_02006164",
+        )
+
+    def test_overlay_module(self):
+        self.assertEqual(
+            function_symbol_for("ov002", 0x021b41e8),
+            "func_ov002_021b41e8",
+        )
+
+    def test_high_overlay_pads_to_three_digits(self):
+        # Defensive: ov0 / ov12 → ov000 / ov012 in the symbol name.
+        self.assertEqual(
+            function_symbol_for("ov0", 0x021b41e8),
+            "func_ov000_021b41e8",
+        )
+        self.assertEqual(
+            function_symbol_for("ov12", 0x021b41e8),
+            "func_ov012_021b41e8",
+        )
+
+
+class TestTargetStemForPrefix(unittest.TestCase):
+    """The output filename stem preserves the input's prefix style;
+    only the address changes to the resolved target's address."""
+
+    def test_func_prefix_passthrough(self):
+        # The classic case — input was func_<eur>.c, output is
+        # func_<usa>.c (existing behaviour, unchanged).
+        self.assertEqual(
+            target_stem_for_prefix("func", "func_02006148"),
+            "func_02006148",
+        )
+
+    def test_main_prefix_preserved(self):
+        # Brief 062 follow-up: main_<eur>.c → main_<usa>.c.
+        # The resolved symbol is still `func_<usa_addr>`, but the
+        # filename keeps the `main_` prefix.
+        self.assertEqual(
+            target_stem_for_prefix("main", "func_02006148"),
+            "main_02006148",
+        )
+
+    def test_func_ov_prefix_passthrough(self):
+        self.assertEqual(
+            target_stem_for_prefix("func_ov002", "func_ov002_021b4108"),
+            "func_ov002_021b4108",
+        )
+
+    def test_ov_prefix_preserved(self):
+        # ov002_<eur>.c → ov002_<usa>.c.
+        self.assertEqual(
+            target_stem_for_prefix("ov002", "func_ov002_021b4108"),
+            "ov002_021b4108",
+        )
+
+    def test_renamed_symbol_falls_back_to_verbatim(self):
+        # If the target symbol has been renamed (no trailing 8-hex),
+        # we can't derive an address — fall back to using the name
+        # verbatim. The decomper can re-derive the filename later.
+        self.assertEqual(
+            target_stem_for_prefix("main", "Task_DrawHand"),
+            "Task_DrawHand",
+        )
+
+
+class TestComputeOutputPathWithModulePrefix(unittest.TestCase):
+    """End-to-end: a `main_<eur>.c` or `ov002_<eur>.c` input
+    produces a same-prefix output. Validates the full pipeline
+    from filename-pattern parsing through path computation."""
+
+    def test_main_addr_input_preserves_prefix(self):
+        ROOT = _TOOLS.parent
+        prefix, module, _addr = parse_filename_stem("main_020498dc")
+        target_stem = target_stem_for_prefix(prefix, "func_020488f0")
+        out = compute_output_path(
+            ROOT / "src/main/main_020498dc.c",
+            "usa", target_stem, module,
+        )
+        self.assertEqual(out, ROOT / "src/usa/main/main_020488f0.c")
+
+    def test_ov_addr_input_preserves_prefix(self):
+        ROOT = _TOOLS.parent
+        prefix, module, _addr = parse_filename_stem("ov002_021aff78")
+        target_stem = target_stem_for_prefix(prefix, "func_ov002_021afe00")
+        out = compute_output_path(
+            ROOT / "src/overlay002/ov002_021aff78.c",
+            "usa", target_stem, module,
+        )
+        self.assertEqual(out, ROOT / "src/usa/overlay002/ov002_021afe00.c")
+
+    def test_main_addr_input_with_legacy_suffix_preserves_both(self):
+        # Brief 062 follow-up + .legacy.c routing tier interaction.
+        ROOT = _TOOLS.parent
+        prefix, module, _addr = parse_filename_stem("main_020498dc")
+        target_stem = target_stem_for_prefix(prefix, "func_020488f0")
+        out = compute_output_path(
+            ROOT / "src/main/main_020498dc.legacy.c",
+            "usa", target_stem, module,
+        )
+        self.assertEqual(
+            out, ROOT / "src/usa/main/main_020488f0.legacy.c",
+        )
 
 
 if __name__ == "__main__":
