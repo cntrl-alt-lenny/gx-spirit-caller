@@ -8,13 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 afternoon, **brief 065 waves 1+2
-landed: 272 cumulative cross-region ports / 98.6% precision.**
-USA + JPN badges at **0.13% each** (jumped 3.25× from wave 1).
-EUR 1.46%. Brief 066 (cross-project source research) closed
-with VERDICT GO; briefs 068 + 069 queued for the next round.
-Brain on Mac. Multi-region + cross-project pipelines both
-operational end-to-end.
+**Last updated:** 2026-05-13 afternoon, **brief 065 FULL CHAIN
+CLOSED + brief 068 byte-fingerprint pipeline shipped.** Brief
+065 final tally: **400 byte-identical cross-region ports across
+3 waves / 92.6% cumulative precision** (200 USA + 200 JPN). Brief
+068 validates with **5/5 perfect 1.000 byte-sim** matches on
+pokediamond's `OS_tick.c` — and a critical SP refinement:
+NitroSDK + libnns subtrees use mwcc 1.2/sp2p3 = **EXACT match
+to our `.legacy.c` SP** (103 of 105 files in pokediamond's lib
+pool). Hit-rate jumps from 80-95% to 100% sample-validated.
+Brief 069 (cross-project bulk-port) NOW UNBLOCKED.
 
 ## This session in one paragraph
 
@@ -135,34 +138,41 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — two scoped briefs open (parallel pickup):**
+**Cloud — autonomous candidates from wave 3 + queued briefs:**
 
-1. **Brief 068 (MEDIUM-HIGH) — cross-project byte-fingerprint
-   pass.** Extend `find_external_source.py` from name-only to
-   byte-fingerprint matching using PR #418's similarity
-   primitives. Target ≥80% precision on pokediamond (one SP
-   rev), ≥95% on pokeheartgold/nitrocrypto (exact `.legacy.c`
-   SP match). Output ranked CSV consumed by brief 069.
-2. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
-   Becomes high-priority on the next cap-raise. Independent.
+Autonomous-priority pickups (wave-3 surfaced):
 
-Brief 062 closed via PR #422; brief 066 closed via PR #429
-(VERDICT GO).
+- `port_to_region.py` **rename-collision bug** — when the
+  parent EUR symbol's USA-renamed name matches a callee's
+  USA-renamed name, tool emits self-recursive code. Single
+  detect-and-refuse patch with clear error. Small.
+- **Named-tier blacklist sweep** — `Fill32` tripped the
+  linker in wave 3. Likely candidates from a NitroSDK callee
+  survey: `MI_*`, `OS_*`, `FS_*`, IRQ/DMA family. Pre-port
+  pruning makes brief 069's pool cleaner.
+- **v3 disambiguator training data** — 4 false-HIGH region-
+  divergent functions across 700 attempts (0.6% residual
+  rate stable across waves 2+3). Two ov011 + two main, all
+  easy-tier ≤0x20 size. Worth a v3 of `find_region_siblings`
+  if pursued.
 
-**Decomper — two scoped briefs (one active, one gated):**
+Scoped briefs still open:
 
-3. **Brief 065 waves 1+2 (CLOSED, PRs #423 + #428)** — **272
-   cumulative cross-region ports / 98.6% precision**.
-   Self-extend gates passed with massive margin on both
-   waves. **One self-extend (wave 3) remaining.** Decomper
-   may run autonomously. Newly-unlocked filename-pattern
-   sources (PR #427) plus residual ~519 HIGH candidates fuel
-   wave 3.
-4. **Brief 069 (HIGH, gated on brief 068)** — first cross-
-   project bulk-port wave. Ports upstream NitroSDK / MSL_C
-   source into region-neutral `libs/`. Each port unlocks EUR
-   + USA + JPN simultaneously (3× compounding via the brief
-   064/065 pipeline). Target 50-150 ports for wave 1.
+1. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
+   Becomes high-priority on the next hard-tier cap-raise.
+
+Brief 062 / 066 / 068 all closed via PRs #422 / #429 / #432.
+
+**Decomper — brief 069 NOW ACTIVE:**
+
+2. **Brief 069 (HIGH, ACTIVE)** — first cross-project
+   bulk-port wave. Consumes brief 068's ranked CSV
+   (`--byte-scan pokediamond --format csv`). Targets the
+   NitroSDK + libnns subtrees (mwcc 1.2/sp2p3 = exact match
+   to our `.legacy.c` SP). 50-150 ports for wave 1; each
+   port lands in region-neutral `libs/` so it unlocks EUR +
+   USA + JPN simultaneously. Use `.legacy.c` routing for
+   NitroSDK + libnns ports.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
