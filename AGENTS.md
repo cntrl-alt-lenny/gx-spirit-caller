@@ -313,19 +313,33 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](docs/briefs/057-hard-tier-cap-raise-0x60.md)
-  — `decomper`: cap raised from ≤ 0x40 → ≤ 0x60. Briefs 053 + 055
-  together shipped 41 matches / 1832 bytes at 67% — the ≤ 0x40
-  toolkit is proven; time to push for more bytes per match. Math
-  shows the cap-raise breaks even at 40% yield, wins at 50%+.
-  Self-extend gates: ≥ 40% yield AND ≥ 250 bytes per wave (raised
-  from 200). Branch: `decomper/hard-tier-cap-raise-0x60`.
+- [`docs/briefs/060-hard-tier-c20-medium-pool.md`](docs/briefs/060-hard-tier-c20-medium-pool.md)
+  — `decomper`: fall back from ≤ 0x60 (wave 23 yield 25%) to ≤ 0x40,
+  with the **90-candidate MEDIUM C-20 thunk-shape pool** from PR
+  #397 as the primary selection input. Cluster-anchor compare per
+  target is the leverage. Skip list adds wave-23 confirmed walls
+  (byte-pack + cross-module C-20 variants). Apply list adds C-21
+  next-ahead loop candidate (pending fold) + S-1 awareness.
+  Self-extend gates unchanged: ≥ 40% yield AND ≥ 250 bytes.
+  Branch: `decomper/hard-tier-c20-medium-pool`.
 
 Cloud is on standby; no scoped brief. May pick up smaller
-autonomous tasks per AGENTS.md.
+autonomous tasks per AGENTS.md. A research brief on the
+`func_ov002_0226b00c` byte-pack C-20 variant wall (wave 19+20+23
+all hit the same `bx ip` tail-call detection issue) is a strong
+candidate when scoped — see brief 060's *Skip* section for
+context.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](docs/briefs/057-hard-tier-cap-raise-0x60.md)
+  `decomper`, full chain shipped across PRs #390 / #392 / #402
+  (waves 21/22/23). **16 matches / 1016 bytes / ~57% combined
+  yield.** Cap-raise paid off for 2 waves (70% each at 0x60) then
+  collapsed in wave 23 (25%). Surfaced C-21 ternary-to-constants
+  (folded in PR #391) + S-1 padding off-by-one (folded in PR #398)
+  + the candidate C-21 "next-ahead walk loop" pattern. Followed
+  by brief 060 (fall back to ≤ 0x40, mine the PR #397 MEDIUM pool).
 - [`docs/briefs/055-hard-tier-byte-volume-continued.md`](docs/briefs/055-hard-tier-byte-volume-continued.md)
   `decomper`, full chain shipped across PRs #383 / #385 / #387
   (waves 18/19/20). **22 matches / 948 bytes / 69% combined
