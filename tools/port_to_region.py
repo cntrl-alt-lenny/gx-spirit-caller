@@ -96,6 +96,28 @@ SYMBOL_RE = re.compile(
 )
 
 
+# Filename validation — broader than SYMBOL_RE for source parsing.
+# Accepts the four address-keyed translation-unit conventions
+# decomper uses in this project (brief 065 wave 1 hit ~10 sources
+# of the `<module>_<addr>.c` form that the older `func_*`-only
+# validator rejected — see PR #423 / brief 062 follow-up):
+#
+#   - `func_<addr>`           → main, prefix style "func"
+#   - `func_ov<NNN>_<addr>`   → overlay NNN, prefix style "func_ov<NNN>"
+#   - `main_<addr>`           → main, prefix style "main"
+#   - `ov<NNN>_<addr>`        → overlay NNN, prefix style "ov<NNN>"
+#
+# The prefix is captured so `compute_output_path` can preserve the
+# input naming convention in the output (a `main_<eur>.c` source
+# ports to `main_<usa>.c`, not `func_<usa>.c`). The function symbol
+# inside the source is always `func_<addr>` / `func_ov<NNN>_<addr>`
+# regardless of filename style; only the *file naming* varies.
+FILENAME_RE = re.compile(
+    r"^(?P<prefix>func_ov\d+|func|main|ov\d+)"
+    r"_(?P<addr>[0-9a-fA-F]{8})$"
+)
+
+
 @dataclass(frozen=True)
 class SymbolRef:
     """A parsed symbol reference in the source."""
@@ -157,6 +179,88 @@ def module_to_src_dir(module: str) -> str:
     if module.startswith("ov") and module[2:].isdigit():
         return "overlay" + module[2:].zfill(3)
     return module
+
+
+def parse_filename_stem(stem: str) -> tuple[str, str, int] | None:
+    """Parse a source-file stem (already stripped of `.legacy` /
+    `.legacy_sp3` routing suffix and `.c` extension). Returns
+    `(prefix, module, addr)` or None if the stem doesn't match any
+    accepted address-keyed pattern.
+
+    Accepted patterns (see FILENAME_RE):
+
+        func_<addr>          → ("func",         "main",   addr)
+        func_ov<NNN>_<addr>  → ("func_ov<NNN>", "ov<NNN>", addr)
+        main_<addr>          → ("main",         "main",   addr)
+        ov<NNN>_<addr>       → ("ov<NNN>",      "ov<NNN>", addr)
+
+    The `prefix` is the literal text before the `_<addr>` suffix —
+    callers should preserve it in the output filename so a
+    `main_<eur_addr>.c` source ports to `main_<target_addr>.c`
+    rather than to `func_<target_addr>.c` (which would change the
+    convention mid-port).
+
+    The function symbol *inside* the source is always
+    `func_<addr>` / `func_ov<NNN>_<addr>` regardless of the file
+    naming style — only the filename convention varies.
+    """
+    m = FILENAME_RE.match(stem)
+    if not m:
+        return None
+    prefix = m.group("prefix")
+    addr = int(m.group("addr"), 16)
+    if prefix == "func":
+        module = "main"
+    elif prefix == "main":
+        module = "main"
+    elif prefix.startswith("func_ov"):
+        # "func_ov002" → module "ov002"
+        module = prefix[len("func_"):]
+    else:
+        # bare overlay form, "ov002"
+        module = prefix
+    return prefix, module, addr
+
+
+def function_symbol_for(module: str, addr: int) -> str:
+    """Build the function-symbol name (as it appears in the C
+    source and in symbols.txt) for a given (module, address) pair.
+
+    main → `func_<addr>`
+    ov<NNN> → `func_ov<NNN>_<addr>`
+    """
+    if module.startswith("ov") and module[2:].isdigit():
+        return f"func_ov{module[2:].zfill(3)}_{addr:08x}"
+    return f"func_{addr:08x}"
+
+
+def target_stem_for_prefix(prefix: str, target_func_name: str) -> str:
+    """Given an input filename prefix (e.g. "main", "ov002",
+    "func", "func_ov002") and the resolved target function name
+    (e.g. "func_02006148" or "func_ov002_021b4108"), build the
+    output filename stem that preserves the input convention.
+
+    Examples:
+
+        prefix="func",        target="func_02006148"      → "func_02006148"
+        prefix="main",        target="func_02006148"      → "main_02006148"
+        prefix="func_ov002",  target="func_ov002_021b4108" → "func_ov002_021b4108"
+        prefix="ov002",       target="func_ov002_021b4108" → "ov002_021b4108"
+
+    The output address comes from the resolved target name's
+    trailing 8-hex address; the prefix is the input's literal
+    prefix. This is what makes `main_<eur>.c` port to
+    `main_<usa>.c` rather than switching naming conventions
+    mid-port.
+    """
+    m = re.search(r"_([0-9a-fA-F]{8})$", target_func_name)
+    if not m:
+        # Symbol has been renamed already (no trailing 8-hex) —
+        # fall back to using the resolved name verbatim. The
+        # decomper can re-derive the filename later if needed.
+        return target_func_name
+    target_addr_hex = m.group(1)
+    return f"{prefix}_{target_addr_hex}"
 
 
 # --------------------------------------------------------------------------- #
@@ -314,15 +418,25 @@ def apply_substitutions(
 def compute_output_path(
     source_path: Path,
     target_region: str,
-    target_func_name: str,
+    target_stem: str,
     module: str,
 ) -> Path:
     """Compute the per-region output path for a ported source.
 
-    `src/main/func_02006164.c` + target=usa + target_func=func_02006148
-    → `src/usa/main/func_02006148.c`
+    `target_stem` is the new filename's stem (without routing
+    suffix or extension) — callers compute this via
+    `target_stem_for_prefix()` so the output preserves the input
+    filename convention (`main_<eur>.c` → `main_<target>.c`,
+    `func_<eur>.c` → `func_<target>.c`, etc.).
 
-    `src/overlay002/func_ov002_X.c` + target=jpn → `src/jpn/overlay002/...`
+    Examples:
+
+        src/main/func_02006164.c + target=usa, stem=func_02006148
+            → src/usa/main/func_02006148.c
+        src/main/main_020498dc.c + target=usa, stem=main_<usa_addr>
+            → src/usa/main/main_<usa_addr>.c
+        src/overlay002/ov002_<eur>.c + target=jpn, stem=ov002_<jpn>
+            → src/jpn/overlay002/ov002_<jpn>.c
 
     `.legacy.c` and `.legacy_sp3.c` suffixes are preserved.
     """
@@ -339,7 +453,7 @@ def compute_output_path(
         routing_suffix = ".legacy"
         name_stem = name_stem[:-len(".legacy")]
 
-    new_filename = f"{target_func_name}{routing_suffix}{suffix}"
+    new_filename = f"{target_stem}{routing_suffix}{suffix}"
     src_subdir = module_to_src_dir(module)
     return SRC_DIR / target_region / src_subdir / new_filename
 
@@ -581,17 +695,26 @@ def main() -> int:
         file_stem = file_stem[:-len(".legacy_sp3")]
     elif file_stem.endswith(".legacy"):
         file_stem = file_stem[:-len(".legacy")]
-    m = SYMBOL_RE.match(file_stem)
-    if not m or m.group("kind") != "func":
-        print(f"error: filename doesn't match a func_<addr> pattern: "
-              f"{args.source.name}", file=sys.stderr)
+    parsed = parse_filename_stem(file_stem)
+    if parsed is None:
+        print(f"error: filename doesn't match any accepted pattern "
+              f"(func_<addr>, func_ov<NNN>_<addr>, main_<addr>, "
+              f"ov<NNN>_<addr>): {args.source.name}", file=sys.stderr)
         return 1
+    file_prefix, file_module, file_addr = parsed
+    # Belt-and-suspenders consistency: the module derived from the
+    # *path* (src/main/, src/overlay002/, …) must agree with the
+    # one derived from the filename prefix. Disagreement means the
+    # file is in the wrong directory — surface that early.
+    if file_module != module:
+        print(f"warning: path module ({module}) disagrees with "
+              f"filename module ({file_module}); using filename's. "
+              f"Source: {args.source}", file=sys.stderr)
     main_func_ref = SymbolRef(
-        text=file_stem,
+        text=function_symbol_for(file_module, file_addr),
         kind="func",
-        module=("ov" + m.group("overlay").zfill(3) if m.group("overlay")
-                else module),
-        addr=int(m.group("addr"), 16),
+        module=file_module,
+        addr=file_addr,
     )
     main_func_resolution = resolve_symbol(
         main_func_ref, args.target, eur, target, target_data,
@@ -672,16 +795,21 @@ def main() -> int:
     # Build the rewritten source.
     rewritten = apply_substitutions(source_text, resolutions)
 
-    # Output path.
+    # Output path. Preserve the input filename prefix style
+    # (func / func_ov<NNN> / main / ov<NNN>) so the convention
+    # stays consistent across the EUR → target port. The address
+    # is the target's, derived from the resolved symbol.
     if args.output_path:
         out_path = args.output_path
     else:
-        # Resolve the target func for output-path naming.
-        target_func_name = main_func_resolution.target_name
-        if target_func_name is None:
-            target_func_name = main_func_ref.text + "_UNRESOLVED"
+        if main_func_resolution.target_name is None:
+            target_stem = f"{file_prefix}_UNRESOLVED"
+        else:
+            target_stem = target_stem_for_prefix(
+                file_prefix, main_func_resolution.target_name,
+            )
         out_path = compute_output_path(
-            args.source, args.target, target_func_name,
+            args.source, args.target, target_stem,
             main_func_ref.module,
         )
 
