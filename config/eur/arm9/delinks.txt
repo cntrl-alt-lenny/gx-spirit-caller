@@ -7402,5 +7402,10 @@ src/main/func_0202b980.c:
     complete
     .text start:0x0202b980 end:0x0202b9b0
 
+src/main/func_02034320.c:
+    complete
+    .text start:0x02034320 end:0x02034344
+
+
 
 
