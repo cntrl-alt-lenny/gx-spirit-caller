@@ -7386,4 +7386,21 @@ src/main/func_0201d738.c:
     complete
     .text start:0x0201d738 end:0x0201d760
 
+src/main/func_0202b8f0.c:
+    complete
+    .text start:0x0202b8f0 end:0x0202b920
+
+src/main/func_0202b920.c:
+    complete
+    .text start:0x0202b920 end:0x0202b950
+
+src/main/func_0202b950.c:
+    complete
+    .text start:0x0202b950 end:0x0202b980
+
+src/main/func_0202b980.c:
+    complete
+    .text start:0x0202b980 end:0x0202b9b0
+
+
 
