@@ -4,3 +4,16 @@
     .ctor       start:0x021cb970 end:0x021cb99c kind:rodata align:4
     .data       start:0x021cb9a0 end:0x021cf020 kind:data align:32
     .bss        start:0x021cf020 end:0x0225e080 kind:bss align:32
+
+
+src/usa/overlay006/ov006_021b69c8.c:
+    complete
+    .text start:0x021b69c8 end:0x021b69d8
+
+src/usa/overlay006/func_ov006_021c6ad0.c:
+    complete
+    .text start:0x021c6ad0 end:0x021c6adc
+
+src/usa/overlay006/ov006_021b5e50.c:
+    complete
+    .text start:0x021b5e50 end:0x021b5e60

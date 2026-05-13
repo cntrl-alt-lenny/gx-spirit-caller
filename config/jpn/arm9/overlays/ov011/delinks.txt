@@ -8,3 +8,9 @@
 src/jpn/overlay011/func_ov011_021c9fb4.c:
     complete
     .text start:0x021c9fb4 end:0x021c9fcc
+
+
+
+src/jpn/overlay011/ov011_021cac28.c:
+    complete
+    .text start:0x021cac28 end:0x021cac3c
