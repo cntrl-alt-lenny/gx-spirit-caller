@@ -8,12 +8,12 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 morning, post-#397 + #398 merge. Brain
-back on Mac after Windows handoff. Main tip `46ca0ba`. Badge
-**1.39%** (live README) — unchanged, today's merges were docs-only.
-Run `python tools/next_targets.py --version eur` for current per-tier
-numbers — last printed counts are still stale by +14 hard-tier
-matches from waves 21 + 22.
+**Last updated:** 2026-05-13 morning, post-#401 + #402 merge + brief
+060 queued. Brain on Mac. Badge **1.39%** still (waves 21+22+23
+are stale to badge — auto-refresh kicks on next push). Run
+`python tools/next_targets.py --version eur` for current per-tier
+numbers — printed counts now stale by +16 hard-tier matches from
+waves 21+22+23.
 
 ## This session in one paragraph
 
@@ -61,9 +61,14 @@ Tier breakdown last printed post-#311 (stale by waves 21 + 22):
 | `medium` | 125 | 31 | 156 | **80.1%** |
 | `hard` | 208 (+14 stale) | 8149 (−14 stale) | 8357 | **2.4–2.6%** |
 
-Waves 21 + 22 (brief 057): **14 matches / 904 bytes / 70% avg
-yield** at the 0x60 cap — comfortably above the 40% break-even
-point. Brief 057 self-extend 2/2 in progress (decomper).
+Brief 057 full chain (waves 21 + 22 + 23 final): **16 matches /
+1016 bytes / ~57% combined yield** at the 0x60 cap. Wave-by-wave:
+70% / 70% / 25% — cap-raise paid for itself across 2 waves,
+exhausted in the third. Surfaced C-21 (folded in #391), S-1
+padding (folded in #398), and a candidate C-21 "next-ahead walk
+loop" pattern (apply-list pending). **Brief 060 queued:** fall
+back to ≤ 0x40, mine the 90-candidate MEDIUM C-20 thunk pool
+from PR #397.
 
 ## Style A unblock chain — closed (no change)
 
@@ -87,56 +92,54 @@ needs the Game Porting Toolkit cask per
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0.** #397 + #398 squashed onto main this morning.
+**Open PRs: 0** (post this brain-PR landing). Today's merges:
+#397 + #398 (cloud docs), #400 (brain state refresh), #401
+(cloud S-class sweep verdict + preamble clarification), #402
+(decomper wave 23 — brief 057 self-extend 2/2 FINAL).
 
-**#397 scope-confirm: option (a).** Accepted the reloc-sig
-pre-filter as the survey output. Three HIGH-confidence drops
-ready to feed into the next decomper brief:
+**Brief 057 closed.** Cumulative 16 matches / 1016 bytes / ~57%
+across waves 21+22+23. Wave 23 burned the 3 HIGH-confidence
+drops from PR #397: `func_0206eea0` matched; the other two
+(`func_ov002_022a8668` mvn-vs-sub on −1 const,
+`func_ov002_0226b00c` byte-pack tail-call shape) are confirmed
+walls and on the brief 060 skip list.
 
-| Candidate | Size | Cluster |
-|---|---|---|
-| `func_0206eea0` (main) | 0x2c | Cluster A — exact triplet sig (matches 4 already-shipped C-20 anchors) |
-| `func_ov002_022a8668` | 0x2c | Cluster A — exact triplet sig |
-| `func_ov002_0226b00c` | 0x28 | Cluster B — byte-pack variant per C-20 *Family extension* note |
+**Brief 060 queued (decomper).** Fall back to ≤ 0x40 with the
+**90-candidate MEDIUM C-20 thunk-shape pool** from PR #397 as
+the primary selection input. Cluster-anchor compare per target
+is the leverage — each unmatched target has a matched sibling
+already shipped. Apply list adds C-21 next-ahead walk loop
+(pending fold; wave 23 surface) + S-1 awareness. Skip list adds
+wave-23 confirmed walls. Self-extend gates unchanged.
 
-90 MEDIUM-confidence thunk-shape candidates in
-[`docs/research/c20-family-corpus-scan.md`](research/c20-family-corpus-scan.md)
-serve as a per-target search-space narrowing input for
-`find_shape_templates`. Strict asm-grep (option b in #397's
-proposal) is brain-host work — deferred; will fold into a
-future calibration pass if the HIGH-3 don't surface enough
-volume.
+**Cloud follow-up candidates (autonomous standing rule):**
 
-**#398:** S-1 padding off-by-one entry now reference-grade
-in `codegen-walls.md` under a new top-level *Source-layout
-pitfalls (not codegen walls)* section. New `S-` prefix
-distinct from `C-N` / `P-N` / `E-N` / `T-N` — marks
-authoring errors that *look like* codegen walls in the diff
-(uniform offset shift after a `char _pad[]` array) but are
-correctable in the C source alone.
+1. Research brief on the `func_ov002_0226b00c` byte-pack C-20
+   variant wall — three waves now (19, 20, 23) have hit the same
+   mwcc-1.2 `bx ip` tail-call detection issue on the 4-arg
+   `q → r2` shuffle. Worth a P-9 or C-20b classification.
+2. C-21 "explicit-next-ahead walk loop" fold-in once decomper
+   uses it productively in brief 060 (apply list pending).
+3. Pre-existing carryover #1 (placeholder-in-complete-TU
+   warning, `func_ov021_021aaf58`) still open.
 
-**Decomper:** brief 057 self-extend 2/2 in progress. Same
-selection rule as wave 22 — hard-tier, ≤ 0x60 cap, anchor by
-current ranking with HIGH-prediction outliers fair game.
-Iteration-win flags from wave 22 (padding off-by-one trap +
-C-20-recipe-is-drop-in) sent to decomper for shape
-recognition; both now reference-grade as of this morning.
-
-**Brain:** back on Mac after Windows handoff. Main local
-worktree at `/Users/leo/Dev/gx-spirit-caller`, decomper at
-`/Users/leo/Dev/gx-spirit-caller-decomper` per the worktree
-convention in `AGENTS.md`.
+**Brain:** on Mac. Main worktree
+`/Users/leo/Dev/gx-spirit-caller`; decomper worktree
+`/Users/leo/Dev/gx-spirit-caller-decomper`. Local Mac toolchain
+verified working post-Windows handoff (PR #402 verified via
+`python3.13 tools/configure.py eur && ninja rom && ./dsd check
+modules` — 24/27 OK).
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper's brief 057 self-extend 2/2 PR**
-   when it opens. Standard gate (configure → ninja rom → dsd
-   check modules 24/27).
-2. **Scope brief 060** from post-057 rankings once 2/2 closes.
-   Folds in the 3 HIGH-confidence C-20-family candidates from
-   #397 as drop-in pool. Decision points on top: stay in
-   hard-tier at 0x60 cap, raise cap again to 0x80, or pivot —
-   depends on the brief 057 2/2 yield trend.
+1. **Verify + merge decomper's brief 060 PR** when it opens.
+   Standard gate (configure → ninja rom → dsd check modules
+   24/27).
+2. **Scope brief 062** from post-060 rankings once it (and any
+   self-extends) close. Decision points: stay at ≤ 0x40 mining
+   the MEDIUM pool residual, run strict asm-grep against the
+   pool, pivot to USA/JPN bootstrap, or invest in
+   `find_shape_templates` improvements.
 3. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
