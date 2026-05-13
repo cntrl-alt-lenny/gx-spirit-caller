@@ -8,13 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 midday, **brief 064 fully closed.**
-PRs #418 (v2 byte-disambiguation, 20%→57% single-HIGH unique
-winners), #419 (`tools/port_to_region.py`, Option A per-region
-trees confirmed), #420 (`configure.py` parallel-region filter,
-all 3 regions verify at 24/27) all landed. Decomper brief 065
-now ACTIVE. Brain on Mac. EUR badge still 1.45% (badge updates
-on next `src/*.c` push from brief 065's first wave).
+**Last updated:** 2026-05-13 midday, **brief 065 wave 1 landed:
+88 byte-identical cross-region ports at 100% precision.** First
+time USA + JPN badges show non-zero in the README (0.04% each).
+EUR 1.46%. Brief 062 also closed (PR #422, `suggest_coercion.py`
+v0). Brain on Mac. Multi-region pipeline is now operational end-
+to-end: feasibility verdict → bootstrap → tool chain → first
+production wave, all in one session.
 
 ## This session in one paragraph
 
@@ -135,38 +135,38 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — three scoped briefs open (parallel pickup, no
-HIGH-priority blocker now that 064 is closed):**
+**Cloud — two scoped briefs open (parallel pickup):**
 
-1. **Brief 062 (MEDIUM-HIGH) — diff-to-coercion suggester.**
-   Rule engine over objdiff JSON + codegen-walls.md catalog.
-   ~2-3× iteration-time speedup per match. Independent.
-2. **Brief 066 (MEDIUM) — cross-project source research.**
+1. **Brief 066 (MEDIUM) — cross-project source research.**
    Survey AetiasHax/st + pret/pokeheartgold + pret/pokediamond
    for already-matched NitroSDK/MSL_C source. Estimated
    unlock: 120-500 mechanical ports for EUR (×3 via the
-   brief 064 pipeline → 360-1500 across regions). The byte-
-   similarity primitives shipped in PR #418
-   (`function_byte_similarity()`, `_mask_relocs()`) and
-   `port_to_region.py`'s symbol-rewrite scaffolding from PR
-   #419 are designed to be reusable — `find_external_source.py`
-   and a future `port_external_source.py` slot into the same
-   architecture with `libs/` as the output instead of
-   `src/<region>/`.
-3. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
+   brief 064 pipeline → 360-1500 across regions). Reusable
+   primitives from PR #418 (`function_byte_similarity()`,
+   `_mask_relocs()`) and PR #419's symbol-rewrite
+   scaffolding mean `find_external_source.py` slots into
+   the existing architecture with `libs/` output.
+2. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
    Becomes high-priority on the next cap-raise. Independent.
 
-**Decomper — one scoped brief ACTIVE (HIGH):**
+Brief 062 closed via PR #422 (`tools/suggest_coercion.py` v0,
+5-wall rule engine). Decomper measures hit rate on next
+iterative wave; thresholds tune from real data.
 
-4. **Brief 065 — multi-region bulk-port wave 1.** Brief 064
-   chain fully landed (PRs #418/#419/#420); brief 065 now
-   unblocked. Target 50-100 HIGH-confidence EUR matches
-   ported byte-mechanically to USA + JPN combined via
-   `tools/port_to_region.py`. First time USA + JPN badges
-   show non-zero. **Strong note: PR #418 v2 disambiguation
-   pushed single-HIGH unique-winner rate to 57%**, so the
-   raw HIGH-pool decomper can target is much richer than
-   brief 061's prototype estimates.
+**Decomper — brief 065 wave 1 closed; self-extends available:**
+
+3. **Brief 065 wave 1 (CLOSED, PR #423)** — 88 byte-identical
+   cross-region ports / 100% HIGH-confidence precision.
+   Self-extend gates passed with margin. Up to **2 follow-up
+   bulk-port waves available** under the brief's clause.
+   Decomper may run wave 2 autonomously per the brief.
+   Wave-2 calibration hints from wave-1 PR body:
+   - Tool tweak: accept `<module>_<addr>.c` filename pattern
+     (~10 more sources per 40 attempted) → potential brief
+     068 patch.
+   - Named-tier bootstrap (`Task_*`, `OS_*`, `Get*`) → its
+     own future wave; wave-2 skips them per the wave-1
+     conservative selection.
 
 **Cloud lower-priority candidates (autonomous-only):**
 

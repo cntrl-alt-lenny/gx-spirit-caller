@@ -314,22 +314,10 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **now ACTIVE** — brief 064
-  closed via PRs #418/#419/#420): first bulk-port wave. Target
-  50-100 HIGH-confidence EUR matches ported byte-mechanically to
-  USA + JPN combined via `tools/port_to_region.py`. Calibrates
-  real port rate vs brief 061's 90.6% sweet-spot estimate +
-  brief 064 part 1's 57% single-HIGH unique-winner rate. First
-  time USA + JPN badges (PR #411) show non-zero. Branch:
+  — `decomper` (HIGH priority, **wave 1 closed via PR #423** —
+  88 matches at 100% precision; up to 2 self-extends available
+  under the brief's clause). Branch:
   `decomper/multi-region-bulk-port-wave-1`.
-
-- [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
-  — `cloud` (MEDIUM-HIGH priority): build
-  `tools/suggest_coercion.py` rule engine over objdiff's JSON
-  output + the codegen-walls.md catalog. v0 covers the 5-7
-  most-frequent walls; replaces manual diff → wall lookup. ~2-3×
-  iteration-time speedup per match. Independent of 064/065.
-  Branch: `cloud/diff-to-coercion-suggester`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -352,6 +340,14 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
+  `cloud`, shipped in PR #422. `tools/suggest_coercion.py` v0
+  rule engine over objdiff JSON + codegen-walls.md catalog.
+  Two-mode CLI (auto-locate + JSON-in). 5 walls in v0 (C-15,
+  P-1, S-1, C-20, C-1). Doc-as-source-of-truth (anchors only,
+  no recipe restating). 28 unit tests; full suite 1274/1274.
+  Hit-rate measurement deferred to decomper's next iterative
+  wave per the brief's spec.
 - [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
   `cloud`, full chain shipped across PRs #418 (part 1, byte-
   disambiguation) + #419 (part 2, `tools/port_to_region.py`) +
@@ -361,7 +357,8 @@ itself:
   Per-region tree convention (Option A) confirmed in #419.
   `configure.py` per-region filter ships and all three regions
   hit 24/27 baseline at the same placeholder modules. Brief
-  065 unblocked.
+  065 unblocked; **wave 1 closed at 88 matches / 100%
+  precision** (PR #423).
 - [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
   `cloud`, shipped in PR #414. **VERDICT: GO.** 74.8%
   HIGH-confidence pairings across 500-sample stratified survey
