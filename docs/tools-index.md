@@ -328,7 +328,7 @@ mwasmarm-emitted ELF .o.
 
 ### `tools/update_progress_badge.py`
 
-**Compute the decomp progress percentage and update README.md's shields.io**
+**Compute the decomp progress percentage for each region and update**
 
-badge to match.
+README.md's per-region shields.io badges to match.
 

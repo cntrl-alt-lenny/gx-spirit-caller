@@ -8,7 +8,13 @@
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/github/license/cntrl-alt-lenny/gx-spirit-caller" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform">
-  <img src="https://img.shields.io/badge/Progress-1.45%25-red" alt="Progress">
+</p>
+
+<p align="center">
+  <strong>Per-region progress</strong><br>
+  <img src="https://img.shields.io/badge/EUR-1.45%25-red" alt="EUR Progress">
+  <img src="https://img.shields.io/badge/USA-0.00%25-red" alt="USA Progress">
+  <img src="https://img.shields.io/badge/JPN-0.00%25-red" alt="JPN Progress">
 </p>
 
 <p align="center">

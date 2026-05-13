@@ -1,18 +1,20 @@
 """Unit tests for tools/update_progress_badge.py.
 
-The tool reads `tools/progress.py --json` and rewrites the
-shields.io badge URL in README.md. Regressions would either:
+The tool reads `tools/progress.py --json` per region and rewrites
+per-region shields.io badge URLs in README.md (one badge per region
+in EUR / USA / JPN). Regressions would either:
   - Pick the wrong color band → badge looks misleadingly green at 1%
-  - Mangle the URL → README renders broken image
+  - Mangle a region's URL → README renders a broken image for that region
   - Mis-parse the badge regex → false claim "no badge found"
+  - Cross-region contamination → updating EUR overwrites the USA slot
 
 Pinned cases:
   - color_for: every band boundary
   - render_badge_url: %25 escape for "%" character
-  - update_readme: idempotent when the badge is already current
-  - update_readme: replaces text + color preserving the URL prefix
-  - update_readme: bails when no Progress badge exists
-  - BADGE_RE: matches typical README spelling but not unrelated URLs
+  - _badge_re(region): matches that region's slot, ignores other regions
+  - compute_pct: code-only formula; stub state returns 0
+  - update_readme_for_region: idempotent when current; replaces text+color;
+    bails on missing / duplicate slot
 """
 
 from __future__ import annotations
@@ -26,11 +28,13 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from update_progress_badge import (  # noqa: E402
-    BADGE_RE,
+    REGIONS,
+    REGION_LABEL,
+    _badge_re,
     color_for,
     compute_pct,
     render_badge_url,
-    update_readme,
+    update_readme_for_region,
 )
 
 
@@ -81,17 +85,44 @@ class TestRenderBadgeUrl(unittest.TestCase):
         self.assertEqual(text, "100.00%25")
 
 
-class TestBadgeRe(unittest.TestCase):
-    def test_matches_typical_readme_spelling(self):
-        url = "https://img.shields.io/badge/Progress-3.50%25-orange?style=flat"
-        m = BADGE_RE.search(url)
-        self.assertIsNotNone(m)
-        self.assertEqual(m.group(2), "3.50%25")
-        self.assertEqual(m.group(4), "orange")
+class TestRegionConstants(unittest.TestCase):
+    def test_all_three_regions_listed(self):
+        self.assertEqual(REGIONS, ("eur", "usa", "jpn"))
 
-    def test_no_match_on_unrelated_shields_url(self):
+    def test_every_region_has_a_label(self):
+        for region in REGIONS:
+            self.assertIn(region, REGION_LABEL)
+            self.assertEqual(REGION_LABEL[region], region.upper())
+
+
+class TestBadgeRe(unittest.TestCase):
+    def test_eur_regex_matches_eur_slot(self):
+        url = "https://img.shields.io/badge/EUR-1.45%25-red?style=flat"
+        m = _badge_re("eur").search(url)
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group(2), "1.45%25")
+        self.assertEqual(m.group(4), "red")
+
+    def test_usa_regex_matches_usa_slot(self):
+        url = "https://img.shields.io/badge/USA-0.00%25-red"
+        m = _badge_re("usa").search(url)
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group(2), "0.00%25")
+        self.assertEqual(m.group(4), "red")
+
+    def test_jpn_regex_matches_jpn_slot(self):
+        url = "https://img.shields.io/badge/JPN-0.00%25-red"
+        m = _badge_re("jpn").search(url)
+        self.assertIsNotNone(m)
+
+    def test_eur_regex_ignores_usa_slot(self):
+        # Cross-region contamination guard: EUR regex must NOT match USA.
+        url = "https://img.shields.io/badge/USA-0.00%25-red"
+        self.assertIsNone(_badge_re("eur").search(url))
+
+    def test_eur_regex_ignores_unrelated_shields_url(self):
         url = "https://img.shields.io/badge/License-MIT-blue"
-        self.assertIsNone(BADGE_RE.search(url))
+        self.assertIsNone(_badge_re("eur").search(url))
 
 
 class TestComputePct(unittest.TestCase):
@@ -111,8 +142,12 @@ class TestComputePct(unittest.TestCase):
         )
 
     def test_stub_state_returns_zero(self):
+        # Non-bootstrapped regions return state:stub from progress.py.
+        # The badge tool resolves them to 0.0 (red) without erroring.
         with self._stub_progress_json({"state": "stub"}):
             self.assertEqual(compute_pct("eur"), 0.0)
+            self.assertEqual(compute_pct("usa"), 0.0)
+            self.assertEqual(compute_pct("jpn"), 0.0)
 
     def test_code_only_ratio_tracks_code_not_data(self):
         # With the historical code+data formula this would be:
@@ -136,8 +171,7 @@ class TestComputePct(unittest.TestCase):
     def test_data_field_ignored(self):
         # Defensive: with some matched_data the formula must still
         # ignore data so a future "data tier match" doesn't suddenly
-        # change the badge interpretation. (When data work begins,
-        # revisit per the module docstring.)
+        # change the badge interpretation.
         with self._stub_progress_json({
             "state": "delinks",
             "measures": {
@@ -148,7 +182,6 @@ class TestComputePct(unittest.TestCase):
             },
         }):
             pct = compute_pct("eur")
-        # 100 / 1000 = 10.0%, not (100+9999)/(1000+9999) = 90.91%.
         self.assertAlmostEqual(pct, 10.0, places=4)
 
     def test_zero_total_returns_zero(self):
@@ -164,10 +197,6 @@ class TestComputePct(unittest.TestCase):
             self.assertEqual(compute_pct("eur"), 0.0)
 
     def test_int_or_string_measures(self):
-        # progress.py emits integers as ints in some paths and as
-        # strings in others (JSON ints, but the older delinks path
-        # stringified them via `str(value)`). The compute_pct code
-        # uses int() so both work.
         for matched, total in [("100", "1000"), (100, 1000)]:
             with self._stub_progress_json({
                 "state": "delinks",
@@ -179,89 +208,73 @@ class TestComputePct(unittest.TestCase):
                 self.assertEqual(compute_pct("eur"), 10.0)
 
 
-class TestUpdateReadme(unittest.TestCase):
-    """update_readme reads README.md from disk via the module-global
-    ROOT — patch the module's README to point at a tempfile and
-    re-import-after-patch isn't necessary because update_readme reads
-    via the closure."""
+class TestUpdateReadmeForRegion(unittest.TestCase):
+    """update_readme_for_region takes the readme contents string +
+    region name + text + color, and returns (new_contents, summary).
+    summary is None when the badge is already current."""
 
-    def _readme_with(self, contents: str) -> Path:
-        from update_progress_badge import README  # path-typed
-        README.parent.mkdir(parents=True, exist_ok=True)
-        return README
+    def _readme_with(self, badge_lines: dict[str, tuple[str, str]]) -> str:
+        """Build a synthetic README body with one badge per provided
+        region. ``badge_lines = {"eur": ("1.45%25", "red"), ...}``."""
+        lines = ["# Repo\n"]
+        for region, (text, color) in badge_lines.items():
+            label = REGION_LABEL[region]
+            lines.append(
+                f"![{label}](https://img.shields.io/badge/"
+                f"{label}-{text}-{color})\n"
+            )
+        return "".join(lines)
 
     def test_idempotent_when_already_current(self):
-        # Render the current state directly and verify update_readme
-        # detects "no change" via summary == None.
-        with mock.patch(
-            "update_progress_badge.README",
-        ) as mock_path:
-            mock_path.read_text.return_value = (
-                "# Repo\n"
-                "![Progress](https://img.shields.io/badge/"
-                "Progress-3.50%25-orange)\n"
-            )
-            new, summary = update_readme("3.50%25", "orange")
+        contents = self._readme_with({"eur": ("1.45%25", "red")})
+        new, summary = update_readme_for_region(contents, "eur", "1.45%25", "red")
         self.assertIsNone(summary)
-        # Contents returned unchanged.
-        self.assertIn("3.50%25-orange", new)
+        self.assertIn("EUR-1.45%25-red", new)
 
     def test_replace_changes_text_and_color(self):
-        with mock.patch(
-            "update_progress_badge.README",
-        ) as mock_path:
-            mock_path.read_text.return_value = (
-                "![Progress](https://img.shields.io/badge/"
-                "Progress-3.50%25-orange)\n"
-            )
-            new, summary = update_readme("4.00%25", "orange")
+        contents = self._readme_with({"eur": ("1.45%25", "red")})
+        new, summary = update_readme_for_region(contents, "eur", "1.75%25", "red")
         self.assertIsNotNone(summary)
-        self.assertEqual(summary, "3.50%25-orange -> 4.00%25-orange")
-        self.assertIn("4.00%25-orange", new)
-        self.assertNotIn("3.50%25-orange", new)
+        self.assertEqual(summary, "EUR: 1.45%25-red -> 1.75%25-red")
+        self.assertIn("EUR-1.75%25-red", new)
+        self.assertNotIn("EUR-1.45%25-red", new)
 
     def test_color_change_alone_triggers_update(self):
-        with mock.patch(
-            "update_progress_badge.README",
-        ) as mock_path:
-            mock_path.read_text.return_value = (
-                "![Progress](https://img.shields.io/badge/"
-                "Progress-25.00%25-orange)\n"
-            )
-            new, summary = update_readme("25.00%25", "yellow")
-        self.assertIn("25.00%25-yellow", new)
-        self.assertEqual(
-            summary, "25.00%25-orange -> 25.00%25-yellow",
+        contents = self._readme_with({"eur": ("25.00%25", "orange")})
+        new, summary = update_readme_for_region(contents, "eur", "25.00%25", "yellow")
+        self.assertIn("EUR-25.00%25-yellow", new)
+        self.assertEqual(summary, "EUR: 25.00%25-orange -> 25.00%25-yellow")
+
+    def test_updates_only_the_targeted_region(self):
+        # Cross-region contamination guard: updating EUR must NOT touch
+        # USA or JPN slots, even if their numbers would also have a
+        # match against the regex shape.
+        contents = self._readme_with({
+            "eur": ("1.45%25", "red"),
+            "usa": ("0.00%25", "red"),
+            "jpn": ("0.00%25", "red"),
+        })
+        new, summary = update_readme_for_region(contents, "eur", "1.50%25", "red")
+        self.assertIsNotNone(summary)
+        self.assertIn("EUR-1.50%25-red", new)
+        # USA + JPN slots untouched.
+        self.assertIn("USA-0.00%25-red", new)
+        self.assertIn("JPN-0.00%25-red", new)
+
+    def test_missing_region_slot_raises_systemexit(self):
+        # Only EUR badge present; asking to update USA must error.
+        contents = self._readme_with({"eur": ("1.45%25", "red")})
+        with self.assertRaises(SystemExit):
+            update_readme_for_region(contents, "usa", "1.00%25", "red")
+
+    def test_duplicate_region_slot_raises_systemexit(self):
+        # Two EUR badges in the same README → ambiguous, must error.
+        contents = (
+            "![EUR](https://img.shields.io/badge/EUR-1.00%25-red)\n"
+            "![EUR2](https://img.shields.io/badge/EUR-2.00%25-red)\n"
         )
-
-    def test_no_badge_raises_systemexit(self):
-        with mock.patch(
-            "update_progress_badge.README",
-        ) as mock_path:
-            mock_path.read_text.return_value = (
-                "# Repo\n_no badge here_\n"
-            )
-            mock_path.relative_to = (
-                lambda *a, **k: Path("README.md")
-            )
-            with self.assertRaises(SystemExit):
-                update_readme("1.00%25", "red")
-
-    def test_multiple_badges_raises_systemexit(self):
-        with mock.patch(
-            "update_progress_badge.README",
-        ) as mock_path:
-            mock_path.read_text.return_value = (
-                "[![](https://img.shields.io/badge/"
-                "Progress-1.00%25-red)] "
-                "[![](https://img.shields.io/badge/"
-                "Progress-2.00%25-red)]"
-            )
-            mock_path.relative_to = (
-                lambda *a, **k: Path("README.md")
-            )
-            with self.assertRaises(SystemExit):
-                update_readme("3.00%25", "red")
+        with self.assertRaises(SystemExit):
+            update_readme_for_region(contents, "eur", "3.00%25", "red")
 
 
 if __name__ == "__main__":
