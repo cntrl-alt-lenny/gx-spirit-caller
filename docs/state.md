@@ -92,10 +92,11 @@ needs the Game Porting Toolkit cask per
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** (post this brain-PR landing). Today's merges:
-#397 + #398 (cloud docs), #400 (brain state refresh), #401
-(cloud S-class sweep verdict + preamble clarification), #402
-(decomper wave 23 — brief 057 self-extend 2/2 FINAL).
+**Open PRs: 0** (post this brain-PR landing). Today's merged
+set: PRs #397 + #398 (cloud docs), PR #400 (brain state
+refresh), PR #401 (cloud S-class sweep verdict + preamble
+clarification), and PR #402 (decomper wave 23 — brief 057
+self-extend 2/2 FINAL).
 
 **Brief 057 closed.** Cumulative 16 matches / 1016 bytes / ~57%
 across waves 21+22+23. Wave 23 burned the 3 HIGH-confidence

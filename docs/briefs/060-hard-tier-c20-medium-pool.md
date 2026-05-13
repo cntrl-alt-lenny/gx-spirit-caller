@@ -34,11 +34,11 @@ asm can be compared against; the C-20 routing recipe is drop-in for
 the homogeneous halfword-pack triplet shape (wave 22 success
 confirms).
 
-Wave 23 already burned the three HIGH-confidence drops from PR
-#397: `func_0206eea0` matched (wave 23), `func_ov002_022a8668`
-dropped (mwcc 1.2 `mvn r1, #0` wall), `func_ov002_0226b00c` dropped
-(byte-pack tail-call detection wall, same as wave 19+20+23). Those
-two confirmed walls go on the skip list.
+Wave 23 already burned the three HIGH-confidence drops from
+PR #397: `func_0206eea0` matched (wave 23), `func_ov002_022a8668`
+dropped (mwcc 1.2 `mvn r1, #0` wall), `func_ov002_0226b00c`
+dropped (byte-pack tail-call detection wall, same as wave
+19+20+23). Those two confirmed walls go on the skip list.
 
 **Selection rule:**
 
