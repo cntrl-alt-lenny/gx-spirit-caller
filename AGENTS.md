@@ -314,10 +314,26 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **wave 1 closed via PR #423** —
-  88 matches at 100% precision; up to 2 self-extends available
-  under the brief's clause). Branch:
-  `decomper/multi-region-bulk-port-wave-1`.
+  — `decomper` (HIGH priority, **waves 1+2 closed at 272
+  cumulative ports / 98.6% precision** via PRs #423 + #428).
+  One self-extend slot remaining. Branch:
+  `decomper/multi-region-bulk-port-wave-N`.
+
+- [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](docs/briefs/068-cross-project-byte-fingerprint-pass.md)
+  — `cloud` (MEDIUM-HIGH priority): extend
+  `find_external_source.py` to byte-fingerprint matching.
+  Reuses PR #418's similarity primitives. Ranked CSV output
+  consumed by brief 069. Targets pokediamond (80-95% expected
+  precision) + pokeheartgold (50-95% by SP-tier). Branch:
+  `cloud/cross-project-byte-fingerprint-pass`.
+
+- [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
+  — `decomper` (HIGH priority, **gated on brief 068**): first
+  cross-project bulk-port wave. Mechanical ports of upstream
+  NitroSDK / MSL_C source into `libs/`. Region-neutral, so each
+  port unlocks EUR + USA + JPN simultaneously (3× compounding
+  via brief 064/065 pipeline). Branch:
+  `decomper/cross-project-bulk-port-wave-1`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -340,6 +356,18 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
+  `cloud`, shipped in PR #429. **VERDICT: GO** with refined
+  estimates. SP-distance matrix is the dominant risk model:
+  pokediamond (one SP rev → 80-95%), pokeheartgold (50-70%),
+  st (skip — different ISA family). Bonus finding: pokeheartgold's
+  nitrocrypto uses our exact `.legacy.c` SP (1.2/sp2p3) — perfect-
+  fingerprint candidates. v0 prototype shipped:
+  `tools/find_external_source.py` + `tools/vendor_external_sources.py`
+  + 819 pokediamond functions indexed. Estimated unlock: 300-600
+  EUR ports from pokediamond alone (×3 regions via brief 064/065
+  → 900-1800 cross-region matches). Followed by brief 068 (impl)
+  + brief 069 (bulk-port wave).
 - [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
   `cloud`, shipped in PR #422. `tools/suggest_coercion.py` v0
   rule engine over objdiff JSON + codegen-walls.md catalog.

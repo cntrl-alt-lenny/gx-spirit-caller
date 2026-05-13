@@ -8,13 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 midday, **brief 065 wave 1 landed:
-88 byte-identical cross-region ports at 100% precision.** First
-time USA + JPN badges show non-zero in the README (0.04% each).
-EUR 1.46%. Brief 062 also closed (PR #422, `suggest_coercion.py`
-v0). Brain on Mac. Multi-region pipeline is now operational end-
-to-end: feasibility verdict → bootstrap → tool chain → first
-production wave, all in one session.
+**Last updated:** 2026-05-13 afternoon, **brief 065 waves 1+2
+landed: 272 cumulative cross-region ports / 98.6% precision.**
+USA + JPN badges at **0.13% each** (jumped 3.25× from wave 1).
+EUR 1.46%. Brief 066 (cross-project source research) closed
+with VERDICT GO; briefs 068 + 069 queued for the next round.
+Brain on Mac. Multi-region + cross-project pipelines both
+operational end-to-end.
 
 ## This session in one paragraph
 
@@ -137,36 +137,32 @@ threshold).
 
 **Cloud — two scoped briefs open (parallel pickup):**
 
-1. **Brief 066 (MEDIUM) — cross-project source research.**
-   Survey AetiasHax/st + pret/pokeheartgold + pret/pokediamond
-   for already-matched NitroSDK/MSL_C source. Estimated
-   unlock: 120-500 mechanical ports for EUR (×3 via the
-   brief 064 pipeline → 360-1500 across regions). Reusable
-   primitives from PR #418 (`function_byte_similarity()`,
-   `_mask_relocs()`) and PR #419's symbol-rewrite
-   scaffolding mean `find_external_source.py` slots into
-   the existing architecture with `libs/` output.
+1. **Brief 068 (MEDIUM-HIGH) — cross-project byte-fingerprint
+   pass.** Extend `find_external_source.py` from name-only to
+   byte-fingerprint matching using PR #418's similarity
+   primitives. Target ≥80% precision on pokediamond (one SP
+   rev), ≥95% on pokeheartgold/nitrocrypto (exact `.legacy.c`
+   SP match). Output ranked CSV consumed by brief 069.
 2. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
    Becomes high-priority on the next cap-raise. Independent.
 
-Brief 062 closed via PR #422 (`tools/suggest_coercion.py` v0,
-5-wall rule engine). Decomper measures hit rate on next
-iterative wave; thresholds tune from real data.
+Brief 062 closed via PR #422; brief 066 closed via PR #429
+(VERDICT GO).
 
-**Decomper — brief 065 wave 1 closed; self-extends available:**
+**Decomper — two scoped briefs (one active, one gated):**
 
-3. **Brief 065 wave 1 (CLOSED, PR #423)** — 88 byte-identical
-   cross-region ports / 100% HIGH-confidence precision.
-   Self-extend gates passed with margin. Up to **2 follow-up
-   bulk-port waves available** under the brief's clause.
-   Decomper may run wave 2 autonomously per the brief.
-   Wave-2 calibration hints from wave-1 PR body:
-   - Tool tweak: accept `<module>_<addr>.c` filename pattern
-     (~10 more sources per 40 attempted) → potential brief
-     068 patch.
-   - Named-tier bootstrap (`Task_*`, `OS_*`, `Get*`) → its
-     own future wave; wave-2 skips them per the wave-1
-     conservative selection.
+3. **Brief 065 waves 1+2 (CLOSED, PRs #423 + #428)** — **272
+   cumulative cross-region ports / 98.6% precision**.
+   Self-extend gates passed with massive margin on both
+   waves. **One self-extend (wave 3) remaining.** Decomper
+   may run autonomously. Newly-unlocked filename-pattern
+   sources (PR #427) plus residual ~519 HIGH candidates fuel
+   wave 3.
+4. **Brief 069 (HIGH, gated on brief 068)** — first cross-
+   project bulk-port wave. Ports upstream NitroSDK / MSL_C
+   source into region-neutral `libs/`. Each port unlocks EUR
+   + USA + JPN simultaneously (3× compounding via the brief
+   064/065 pipeline). Target 50-150 ports for wave 1.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
