@@ -7362,3 +7362,28 @@ src/main/func_020a333c.c:
     complete
     .text start:0x020a333c end:0x020a3380
 
+src/main/func_020890e4.c:
+    complete
+    .text start:0x020890e4 end:0x0208910c
+
+src/main/func_02095bf8.c:
+    complete
+    .text start:0x02095bf8 end:0x02095c18
+
+src/main/func_0201d6d4.c:
+    complete
+    .text start:0x0201d6d4 end:0x0201d6f8
+
+src/main/func_0206bab0.legacy.c:
+    complete
+    .text start:0x0206bab0 end:0x0206bad4
+
+src/main/func_0201d710.c:
+    complete
+    .text start:0x0201d710 end:0x0201d738
+
+src/main/func_0201d738.c:
+    complete
+    .text start:0x0201d738 end:0x0201d760
+
+
