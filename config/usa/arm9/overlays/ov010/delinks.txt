@@ -4,3 +4,11 @@
     .ctor       start:0x021b8938 end:0x021b8944 kind:rodata align:4
     .data       start:0x021b8960 end:0x021b8b20 kind:data align:32
     .bss        start:0x021b8b20 end:0x021b9f00 kind:bss align:32
+
+src/usa/overlay010/ov010_021b4650.c:
+    complete
+    .text start:0x021b4650 end:0x021b466c
+
+src/usa/overlay010/ov010_021b3b48.c:
+    complete
+    .text start:0x021b3b48 end:0x021b3b58
