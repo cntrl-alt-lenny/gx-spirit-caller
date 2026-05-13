@@ -123,21 +123,37 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud follow-up candidates (autonomous standing rule):**
+**Cloud — three scoped briefs now open (parallel pickup):**
 
-1. **S-1 cascade variant (c) — cross-`.o` BL pool literals.**
-   Wave 25's PR body surfaced a third symptom variant after
-   #407's variant-(a)/(b) cross-reference fold: the asm body
-   matches `.o`-byte-perfect, but a cross-function BL relocation
-   into a shifted upstream region resolves to a 4-or-8-byte-
-   off target. Same root cause as (a) and (b); decomper called
-   it out as a "downstream symptoms" extension to S-1. Low-
-   priority fold-in.
-2. **C-21 "explicit-next-ahead walk loop"** still pending
-   decomper usage (neither wave 24 nor 25 surfaced a linked-
-   list walk; carries to wave 26).
-3. Pre-existing carryover #1 (placeholder-in-complete-TU
-   warning, `func_ov021_021aaf58`) still open.
+1. **Brief 061 (HIGH) — multi-region porting research.** The
+   biggest leverage point identified in this session's tools-
+   investment review. EUR is at 1.45%, USA and JPN at 0%.
+   Survey + prototype the EUR ↔ USA ↔ JPN correspondence
+   space. Ship feasibility verdict + `tools/find_region_
+   siblings.py`. GO → follow-up implementation brief unlocks
+   bulk cross-region porting (potential ~800-1300 free
+   matches at 30-50% port rate).
+2. **Brief 062 (MEDIUM-HIGH) — diff-to-coercion suggester.**
+   Rule engine over objdiff JSON + codegen-walls.md catalog.
+   v0 covers 5-7 most-frequent walls. ~2-3× iteration-time
+   speedup per match across all future waves.
+3. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
+   Promote `permute.py` from bootstrap-only to auto-running
+   decomp-permuter. Becomes high-priority on the next
+   cap-raise; deferred priority while we're at ≤0x40.
+
+All three are independent — cloud can pick any/all in any
+order. Standing autonomous rule + ⚠️ scope-confirm flag still
+applies per brief.
+
+**Cloud lower-priority candidates (autonomous-only):**
+
+- S-1 cascade variant (c) — cross-`.o` BL pool literals (wave
+  25 surface). Worth a "downstream symptoms" extension to S-1.
+- C-21 "explicit-next-ahead walk loop" fold-in pending
+  decomper usage.
+- Pre-existing carryover #1 (placeholder-in-complete-TU
+  warning, `func_ov021_021aaf58`).
 
 **Brain:** on Mac. Main worktree
 `/Users/leo/Dev/gx-spirit-caller`; decomper worktree
@@ -145,14 +161,23 @@ threshold).
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper's brief 060 self-extend PRs** when
-   they open. Standard gate (configure → ninja rom → dsd check
-   modules 24/27).
-2. **Scope brief 062** from post-060 rankings once the full
-   brief 060 chain closes. Decision points: stay at ≤ 0x40
-   mining the MEDIUM pool residual, run strict asm-grep against
-   the pool, pivot to USA/JPN bootstrap, or invest in
-   `find_shape_templates` improvements.
+1. **Verify + merge decomper's brief 060 final self-extend
+   (wave 26) PR** when it opens. Standard gate (configure →
+   ninja rom → dsd check modules 24/27).
+2. **Triage cloud's brief 061 / 062 / 063 PRs** as they land.
+   061 has a binary GO / NO-GO / GO-WITH-CAVEATS verdict
+   downstream of it — feasibility output gates whether brain
+   scopes the multi-region implementation brief.
+3. **Scope brief 064** from post-brief-060 rankings once the
+   full chain closes. Decision points: stay at ≤0x40 mining
+   the MEDIUM pool residual; raise cap; pivot tier; or (if
+   brief 061 verdict is GO) pivot fully to multi-region bulk-
+   porting work.
+4. **If brief 061 returns GO** → scope multi-region
+   implementation brief (cloud) + bulk-porting wave brief
+   (decomper). Brain runs `dsd init` on USA + JPN
+   `extract/<ver>/config.yaml` to bootstrap their config/
+   directories before the porting work begins.
 3. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.

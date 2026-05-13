@@ -317,18 +317,34 @@ itself:
   — `decomper`: fall back from ≤ 0x60 (wave 23 yield 25%) to ≤ 0x40,
   with the **90-candidate MEDIUM C-20 thunk-shape pool** from PR
   #397 as the primary selection input. Cluster-anchor compare per
-  target is the leverage. Skip list adds wave-23 confirmed walls
-  (byte-pack + cross-module C-20 variants). Apply list adds C-21
-  next-ahead loop candidate (pending fold) + S-1 awareness.
-  Self-extend gates unchanged: ≥ 40% yield AND ≥ 250 bytes.
+  target is the leverage. Wave 24 + 25 combined: **20 matches /
+  764 bytes / 80% yield** — one self-extend slot (2/2) remains.
   Branch: `decomper/hard-tier-c20-medium-pool`.
 
-Cloud is on standby; no scoped brief. May pick up smaller
-autonomous tasks per AGENTS.md. A research brief on the
-`func_ov002_0226b00c` byte-pack C-20 variant wall (wave 19+20+23
-all hit the same `bx ip` tail-call detection issue) is a strong
-candidate when scoped — see brief 060's *Skip* section for
-context.
+- [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
+  — `cloud` (HIGH priority): research + prototype the EUR ↔ USA
+  ↔ JPN function-correspondence space. EUR sits at 1.45%, USA and
+  JPN are at 0% — every EUR match is currently 1× when it could
+  be up to 3×. Ship a feasibility verdict + a working
+  `tools/find_region_siblings.py` prototype. GO verdict triggers
+  a follow-up implementation brief; NO-GO documents the wall.
+  Branch: `cloud/multi-region-porting-research`.
+
+- [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
+  — `cloud` (MEDIUM-HIGH priority): build
+  `tools/suggest_coercion.py` rule engine over objdiff's JSON
+  output + the codegen-walls.md catalog. v0 covers the 5-7
+  most-frequent walls; replaces manual diff → wall lookup. ~2-3×
+  iteration-time speedup per match. Independent of 061. Branch:
+  `cloud/diff-to-coercion-suggester`.
+
+- [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
+  — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
+  from bootstrap-only to auto-running decomp-permuter on
+  close-but-not-byte-identical candidates. Becomes high-priority
+  as soon as the next cap-raise hits the 0x60-0x100 band where
+  permuter shines. Independent of 061 + 062. Branch:
+  `cloud/permuter-auto-runner`.
 
 ### Closed briefs (reference)
 
