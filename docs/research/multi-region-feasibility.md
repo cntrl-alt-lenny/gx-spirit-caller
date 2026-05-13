@@ -300,16 +300,22 @@ EUR baseline.
 
 **Suggested implementation brief scope:**
 
-1. Byte-level disambiguation in `find_region_siblings.py`
-   (1-3 days).
-2. `tools/port_to_region.py` — auto-clones EUR `src/<func>.c`
-   to `src/<region>/<func>.c`, rewriting region-specific
-   symbol references and routing tier. Calls
-   `find_region_siblings` to resolve the cross-region symbol
-   names automatically.
-3. `configure.py` / Ninja integration for parallel-region
-   builds — minor (the dsd init step already shipped here;
-   the rest is build-graph wiring).
+1. ✅ **Shipped — PR #418.** Byte-level disambiguation in
+   `find_region_siblings.py`. 500-sample re-validation: single-HIGH
+   precision 20.0% → 57.0% (2.85×), `func_02006164` motivating case
+   returns the true twin as the only HIGH.
+2. ✅ **Shipped — PR #419.** `tools/port_to_region.py` — auto-
+   clones EUR `src/<func>.c` to `src/<region>/<module>/<func>.c`,
+   rewriting cross-region symbol references via
+   `find_region_siblings` and a parallel-reloc data-symbol map.
+   Strawman: per-region `src/<region>/` trees with EUR unprefixed
+   at `src/<module>/`.
+3. ✅ **Shipped — PR #420.** `configure.py` / Ninja integration
+   for parallel-region builds. `configure.py {usa,jpn}` emits valid
+   `build.ninja`; `ninja rom` succeeds for both; `dsd check
+   modules` matches EUR's 24/27 baseline exactly (same three
+   placeholder-diff modules: ARM9 main, DTCM, overlay 4). Source
+   discovery filters `src/<region>/` per-build region.
 4. Decomper consumes the new pipeline via bulk-port waves —
    estimated ~50-100 mechanical ports per wave on the
    high-HIGH-confidence subset.

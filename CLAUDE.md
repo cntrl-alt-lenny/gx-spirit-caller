@@ -141,28 +141,36 @@ Run this after `ninja extract/<ver>/config.yaml` and before anything
 else. Upstream: filed as [ds-decomp#58](https://github.com/AetiasHax/ds-decomp/issues/58),
 related to open issues #17 / #20 / #23.
 
-## Current round-trip status (EUR)
+## Current round-trip status (all three regions)
 
 With the workaround above plus the rest of the pipeline, `ninja rom`
-succeeds end-to-end and produces `gx-spirit-caller_eur.nds`. Module-level
-checksum state vs the baserom (from `dsd check modules`):
+succeeds end-to-end for all three regions and produces
+`gx-spirit-caller_<eur|usa|jpn>.nds`. Module-level checksum state vs
+the baserom (from `dsd check modules`):
 
-| Module      | Status         |
-|-------------|----------------|
-| ARM9 main   | ❌ checksum diff |
-| ITCM        | ✅ OK           |
-| DTCM        | ❌ checksum diff |
-| Overlay 0   | ✅ OK           |
-| Overlay 1–3 | ✅ OK           |
-| Overlay 4   | ❌ checksum diff |
-| Overlay 5–23| ✅ OK           |
+| Module       | EUR              | USA              | JPN              |
+|--------------|------------------|------------------|------------------|
+| ARM9 main    | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
+| ITCM         | ✅ OK            | ✅ OK            | ✅ OK            |
+| DTCM         | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
+| Overlay 0    | ✅ OK            | ✅ OK            | ✅ OK            |
+| Overlay 1–3  | ✅ OK            | ✅ OK            | ✅ OK            |
+| Overlay 4    | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
+| Overlay 5–23 | ✅ OK            | ✅ OK            | ✅ OK            |
 
-**24 of 27 modules round-trip byte-identically.** The 3 failures are
-almost certainly artifacts of the placeholder symbols that
+**24 of 27 modules round-trip byte-identically per region** — the same
+exact pattern across all three. The 3 failures are almost certainly
+artifacts of the placeholder symbols that
 `--allow-unknown-function-calls` injected; expect them to resolve as the
 cross-module relocations in ARM9 main / DTCM / overlay 4 are manually
 filled in (or as the upstream analyzer improves). `ninja sha1` is the
 final gate and will stay red until all 27 modules check green.
+
+`configure.py` filters per-region source trees automatically:
+`src/<region>/` is region-specific (USA / JPN ports from
+`tools/port_to_region.py`), `src/<module>/` without a region prefix is
+the EUR baseline, and `libs/` is region-neutral. See brief 064
+deliverable 2 (PR #419) for the porting convention.
 
 ## Platform notes
 
