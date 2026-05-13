@@ -313,27 +313,16 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **waves 1+2 closed at 272
-  cumulative ports / 98.6% precision** via PRs #423 + #428).
-  One self-extend slot remaining. Branch:
-  `decomper/multi-region-bulk-port-wave-N`.
-
-- [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](docs/briefs/068-cross-project-byte-fingerprint-pass.md)
-  — `cloud` (MEDIUM-HIGH priority): extend
-  `find_external_source.py` to byte-fingerprint matching.
-  Reuses PR #418's similarity primitives. Ranked CSV output
-  consumed by brief 069. Targets pokediamond (80-95% expected
-  precision) + pokeheartgold (50-95% by SP-tier). Branch:
-  `cloud/cross-project-byte-fingerprint-pass`.
-
 - [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **gated on brief 068**): first
-  cross-project bulk-port wave. Mechanical ports of upstream
-  NitroSDK / MSL_C source into `libs/`. Region-neutral, so each
-  port unlocks EUR + USA + JPN simultaneously (3× compounding
-  via brief 064/065 pipeline). Branch:
-  `decomper/cross-project-bulk-port-wave-1`.
+  — `decomper` (HIGH priority, **NOW ACTIVE** — brief 068
+  shipped via PR #432, validating with 5/5 perfect 1.000
+  byte-sim matches). First cross-project bulk-port wave.
+  Mechanical ports of upstream NitroSDK / libnns source into
+  region-neutral `libs/`. Each port unlocks EUR + USA + JPN
+  simultaneously. **Route via `.legacy.c`** — pokediamond's
+  NitroSDK + libnns subtrees use mwcc 1.2/sp2p3 = exact match
+  to our `.legacy.c` tier. Target 50-150 ports for wave 1.
+  Branch: `decomper/cross-project-bulk-port-wave-1`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -356,6 +345,23 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
+  `decomper`, full 3-wave chain shipped via PRs #423 / #428 /
+  #431. **400 byte-identical cross-region matches (200 USA +
+  200 JPN) / 92.6% cumulative precision.** Brief 057+060
+  combined shipped 45 EUR-side matches over 6 waves; brief
+  065 shipped 400 cross-region in 3. Order-of-magnitude lift
+  the multi-region investment was scoped for. Followed by
+  brief 069 (cross-project bulk-port, now ACTIVE).
+- [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](docs/briefs/068-cross-project-byte-fingerprint-pass.md)
+  `cloud`, shipped in PR #432. `tools/external_obj.py` +
+  `find_external_source.py --byte-scan` mode. **5/5 perfect
+  1.000 byte-sim matches** on pokediamond's `OS_tick.c` with
+  contiguous EUR addresses (0x020930a0 → 0x020931f8). Critical
+  SP refinement vs brief 066: pokediamond's NitroSDK + libnns
+  subtrees (103 of 105 files) use mwcc 1.2/sp2p3 = exact match
+  to our `.legacy.c` SP. Hit rate jumps from 80-95% to 100%
+  sample-validated. CSV contract shipped for brief 069.
 - [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
   `cloud`, shipped in PR #429. **VERDICT: GO** with refined
   estimates. SP-distance matrix is the dominant risk model:
