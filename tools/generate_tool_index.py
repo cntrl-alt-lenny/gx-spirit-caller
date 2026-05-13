@@ -73,6 +73,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("scratch_bundle", "match-acceleration", "Match acceleration"),
     ("permute", "match-acceleration", "Match acceleration"),
     ("propagate_template", "match-acceleration", "Match acceleration"),
+    ("suggest_", "match-acceleration", "Match acceleration"),
     ("check_match_invariants", "invariants", "Hygiene / invariants"),
     ("check_", "invariants", "Hygiene / invariants"),
     ("configure", "infrastructure", "Infrastructure / build-patching"),
