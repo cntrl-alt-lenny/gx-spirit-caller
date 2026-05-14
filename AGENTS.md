@@ -320,14 +320,14 @@ itself:
   Target 50-100 byte-identical ports. Branch:
   `decomper/cross-project-bulk-port-wave-3`.
 
-- [`docs/briefs/075-cross-region-apply-existing-ports.md`](docs/briefs/075-cross-region-apply-existing-ports.md)
-  — `decomper` (HIGH, **NOW ACTIVE** — independent of
-  brief 074): apply `tools/cross_apply_libs_port.py` (PR
-  #451) to the 87 existing cross-project ports so each
-  lands in USA + JPN. **First time USA + JPN badges move
-  substantially from 0.19%.** Expected USA + JPN climb to
-  ~0.6-0.7% each. Branch:
-  `decomper/cross-region-apply-existing-ports`.
+- [`docs/briefs/076-cross-apply-libs-port-improvements.md`](docs/briefs/076-cross-apply-libs-port-improvements.md)
+  — `cloud` (MEDIUM): two tool follow-ups from brief 075
+  wave 1's diagnostic. **D1:** accept `func_ov<NNN>_`
+  filename pattern (~1-line, +29 ports unlock). **D2:**
+  raw-bytes + reloc-parity fallback for uncompiled
+  USA/JPN gaps (+5-10 ports). Brain re-runs cross-region
+  wave after this lands. Branch:
+  `cloud/cross-apply-libs-port-improvements`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -350,6 +350,16 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/075-cross-region-apply-existing-ports.md`](docs/briefs/075-cross-region-apply-existing-ports.md)
+  `decomper`, shipped in PR #454. 27 of 87 ports cross-applied
+  (below 70 target). Headline output: byte-uniqueness diagnostic
+  — 62% of the 87-port set is size-4 stubs (`bx lr` etc.),
+  2,632 byte-identical instances in USA's main alone. Refusal
+  rate was 92% but every refusal was a true negative. 568
+  bytes per region, all 3 regions 24/27 baseline preserved.
+  USA + JPN climbed 0.19% → 0.23% (smaller than projected
+  0.6-0.7% because refused pool was trivial bytes). Three
+  follow-up vectors surfaced; D1 + D2 become brief 076.
 - [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
   `cloud`, shipped in PR #451. **Approach A extended** (function
   + data-ref rename via parallel-reloc bridge). 1-port worked
