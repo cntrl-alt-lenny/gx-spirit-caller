@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**57 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**58 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -15,7 +15,7 @@ git add docs/tools-index.md
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (9)
 - [Multi-region porting](#multi-region-porting) (2)
-- [Cross-project source mining](#cross-project-source-mining) (3)
+- [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (15)
@@ -235,6 +235,12 @@ extract per-function byte fingerprints from the resulting `.o`.
 **locate upstream `.c` source for our**
 
 unmatched functions, mining vendored decomp repos.
+
+### `tools/port_external_source.py`
+
+**drive the cross-project port from**
+
+brief 068 byte-fingerprint match to a compiled ported `.c`.
 
 ### `tools/vendor_external_sources.py`
 
