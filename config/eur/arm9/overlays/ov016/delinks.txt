@@ -150,3 +150,7 @@ src/overlay016/func_ov016_021b5414.c:
 src/overlay016/func_ov016_021b22c8.c:
     complete
     .text start:0x021b22c8 end:0x021b22d8
+
+src/overlay016/func_ov016_021b5a28.c:
+    complete
+    .text start:0x021b5a28 end:0x021b5a6c
