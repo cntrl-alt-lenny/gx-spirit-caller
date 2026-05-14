@@ -313,21 +313,20 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
-  — `decomper` (HIGH, **ACTIVE** — in flight, no PR yet):
-  resume cross-project bulk-port chain. Pool est. ~130 ok
-  candidates after the brief 070 follow-up driver shipping.
-  Target 50-100 byte-identical ports. Branch:
-  `decomper/cross-project-bulk-port-wave-3`.
+- [`docs/briefs/077-strip-static-keyword.md`](docs/briefs/077-strip-static-keyword.md)
+  — `cloud` (SMALL, autonomous-priority): 2-line fix to
+  `port_external_source.py`'s `_compose_port_source` —
+  strip `static` from rewritten function signatures.
+  Closes silent-corruption mode decomper bisected in brief
+  074 wave 3. Branch: `cloud/strip-static-keyword`.
 
-- [`docs/briefs/076-cross-apply-libs-port-improvements.md`](docs/briefs/076-cross-apply-libs-port-improvements.md)
-  — `cloud` (MEDIUM): two tool follow-ups from brief 075
-  wave 1's diagnostic. **D1:** accept `func_ov<NNN>_`
-  filename pattern (~1-line, +29 ports unlock). **D2:**
-  raw-bytes + reloc-parity fallback for uncompiled
-  USA/JPN gaps (+5-10 ports). Brain re-runs cross-region
-  wave after this lands. Branch:
-  `cloud/cross-apply-libs-port-improvements`.
+- [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cross-region apply
+  wave 2 using brief 076's improved tool. Pool ~72 ports
+  (60 from brief 075's refusal residual + 12 new from
+  brief 074 wave 3). Expected USA + JPN climb 0.23% → ~0.4-
+  0.5% each. Branch:
+  `decomper/cross-region-apply-wave-2`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -350,6 +349,23 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
+  `decomper`, shipped in PR #457 at 12/50 below floor. **Brief
+  074 chain CLOSES at cumulative 99 cross-project ports**
+  (10 b069w1 + 64 b071w1 + 13 b071w2 + 12 b074w3). Three sub-
+  floor waves in a row signaled pool drain, not driver
+  quality (substantive ≥0x18 conversion rate stayed at 75%).
+  `already-complete` count climbed 119 → 450 confirming pool
+  drain. Surfaced two follow-ups: static-keyword silent-
+  corruption (brief 077), pool depth bias future waves toward
+  substantive ports only.
+- [`docs/briefs/076-cross-apply-libs-port-improvements.md`](docs/briefs/076-cross-apply-libs-port-improvements.md)
+  `cloud`, shipped in PR #456. D1 overlay-port regex + D2
+  raw-bytes + reloc-parity fallback. Sweep shows **17 size-
+  16+ unlocks on existing libs/nitro sample** plus 29 overlay
+  ports unlocked. D2's strictly-conservative-fallback design
+  (never overrides primary HIGH) catches the BL-offset
+  divergence trap from brief 075 wave 1.
 - [`docs/briefs/075-cross-region-apply-existing-ports.md`](docs/briefs/075-cross-region-apply-existing-ports.md)
   `decomper`, shipped in PR #454. 27 of 87 ports cross-applied
   (below 70 target). Headline output: byte-uniqueness diagnostic

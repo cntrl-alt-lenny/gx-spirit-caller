@@ -8,16 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 late afternoon, **brief 075
-shipped at 27/87 (below 70 target)** via PR #454 — but the
-byte-uniqueness diagnostic is the brief's most valuable
-output (62% of the 87-port set is size-4 stubs that collide
-2632× in USA's main; refusal rate isn't a tool bug, it's a
-calibration of what was in the pool). Plus D6.a math vendoring
-shipped (PR #453). USA + JPN climbed 0.19% → **0.23% each**
-(first material climb). Brief 076 (tool follow-ups) queued
-for cloud. Decomper proceeds with brief 074 (cross-project
-wave 3, in flight). EUR 1.51%.
+**Last updated:** 2026-05-14 evening, **brief 074 chain
+CLOSES at 99 cumulative cross-project ports.** Wave 3 hit
+floor at 12 (third sub-floor wave in a row); decomper's
+diagnostic confirms pool drain, not driver quality.
+Substantive ≥0x18 conversion rate stays healthy at 75%;
+absolute pool depth is the constraint. Brief 076 (D1+D2
+tool improvements) merged adding ~46 cross-region unlocks.
+Brief 077 (static-strip fix) + brief 078 (cross-region
+wave 2) queued. EUR 1.51%, USA + JPN 0.23% each — about to
+move on brief 078.
 
 ## This session in one paragraph
 
@@ -138,32 +138,31 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — one MEDIUM brief queued:**
+**Cloud — one SMALL autonomous + one MEDIUM-LOW carryover:**
 
-1. **Brief 076 (MEDIUM)** — `cross_apply_libs_port.py` D1
-   (filename pattern) + D2 (raw-bytes + reloc-parity
-   fallback). Unlocks ~35 more ports from brief 075's
-   refusal pool. Decomper's wave-1 diagnostic surfaced
-   these as bounded, tool-shaped follow-ups.
+1. **Brief 077 (SMALL, autonomous)** — 2-line static-strip
+   fix to `_compose_port_source`. Prevents silent-corruption
+   mode decomper bisected in brief 074 wave 3.
 2. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
 
 Closed cloud briefs: 062/066/068/070-D1/070-D4/070-D2+D3/
-072/072-D6.a/073 plus twelve autonomous patches landed in
-PRs 427, 434, 435, 438, 440, 441, 444, 446, 448, 449, 451,
-453.
+072/072-D6.a/073/076 plus twelve autonomous patches landed
+in PRs 427, 434, 435, 438, 440, 441, 444, 446, 448, 449,
+451, 453.
 
-**Decomper — brief 074 ACTIVE (in flight):**
+**Decomper — brief 078 NOW ACTIVE (cross-region wave 2):**
 
-3. **Brief 074 (HIGH, in flight, no PR yet)** — cross-project
-   bulk-port wave 3 with the post-#444/446/448/449 sharper
-   driver + D6.a math types. Pool est. ~140 ok candidates
-   (was ~130 pre-D6.a). Target 50-100 byte-identical ports.
-   Decomper signaled they're proceeding without waiting on
-   brief 075 review feedback.
+3. **Brief 078 (HIGH, ACTIVE)** — cross-region apply wave 2
+   using brief 076's improved tool. Pool ~72 ports (60 from
+   brief 075 residual + 12 new from brief 074 wave 3).
+   D1+D2 unlock ~46 of those for cross-apply. Expected
+   USA + JPN climb: 0.23% → ~0.4-0.5% each.
 
-Closed decomper briefs: 075 wave 1 chain. Brief 077 (cross-
-region wave 2 with the brief-076-improved tool) brain will
-queue after brief 076 + brief 074 both land.
+Closed decomper briefs: 074 (cross-project chain, 99 ports
+cumulative) + 075 wave 1. Cross-project pipeline at natural
+drain — next major lever after brief 078 is brain's call
+(single-region resumption, pokeheartgold/nitrocrypto, or
+Approach B refactor — to be scoped post-brief-078).
 
 **Cloud lower-priority candidates (autonomous-only):**
 
