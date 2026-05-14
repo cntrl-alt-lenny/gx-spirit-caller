@@ -77,8 +77,13 @@ SOURCE_REGION = "eur"
 
 # Filename pattern for a libs/nitro/ port — must encode the EUR
 # address so we can find the byte-equivalent in the other regions.
+# Brief 076 D1: also accept the overlay-qualified form
+# `func_ov<NNN>_<addr>.legacy[_sp3].c` (29 of brief 075 wave-1's
+# port-pool used this shape). The `overlay` group is None for
+# main-module ports.
 _PORT_FILENAME_RE = re.compile(
-    r"^func_(?P<addr>[0-9a-fA-F]{8})(?P<routing>\.legacy(?:_sp3)?)\.c$"
+    r"^func_(?:ov(?P<overlay>\d+)_)?(?P<addr>[0-9a-fA-F]{8})"
+    r"(?P<routing>\.legacy(?:_sp3)?)\.c$"
 )
 
 
@@ -150,19 +155,86 @@ def parse_port_filename(port_file: Path) -> tuple[int, str] | None:
     return int(m.group("addr"), 16), m.group("routing")
 
 
+def _reloc_parity(eur_func, cand_func) -> bool:
+    """Strict reloc-parity check: EUR + candidate must have
+    identical reloc-sig tuples (same length, same offset/kind/
+    to_module structure). The `to_addr` field is excluded from
+    the comparison (region-specific by design — see
+    find_region_siblings.Function.reloc_sig docstring).
+
+    Brief 076 D2: catches the BL-offset-divergence trap that the
+    pure byte-similarity gate misses. Two functions can be
+    byte-identical (after reloc masking) yet have different
+    reloc tables — those bytes mean different things at link
+    time. Reloc parity ensures both functions call into the
+    same downstream functions and load the same data modules.
+    """
+    return tuple(eur_func.reloc_sig) == tuple(cand_func.reloc_sig)
+
+
+def _raw_bytes_equal(
+    eur_func, cand_func, source_region: str, target_region: str,
+) -> bool:
+    """Strict raw-bytes equality with reloc-slot masking.
+    Returns True iff EUR's masked bytes match cand's masked bytes
+    EXACTLY (no Hamming tolerance — every byte position outside
+    the reloc slots must agree)."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import find_region_siblings as frs  # noqa: E402
+
+    eur_bytes = frs._function_bytes(
+        source_region, eur_func.module,
+        eur_func.addr, eur_func.size,
+    )
+    cand_bytes = frs._function_bytes(
+        target_region, cand_func.module,
+        cand_func.addr, cand_func.size,
+    )
+    if eur_bytes is None or cand_bytes is None:
+        return False
+    if len(eur_bytes) != len(cand_bytes):
+        return False
+
+    eur_reloc_offsets = [
+        eur_func.addr + ro for ro, _, _ in eur_func.reloc_sig
+    ]
+    cand_reloc_offsets = [
+        cand_func.addr + ro for ro, _, _ in cand_func.reloc_sig
+    ]
+    eur_masked = frs._mask_relocs(
+        eur_bytes, eur_func.addr, eur_reloc_offsets)
+    cand_masked = frs._mask_relocs(
+        cand_bytes, cand_func.addr, cand_reloc_offsets)
+    return eur_masked == cand_masked
+
+
 def find_byte_equivalent(
     eur_module: str, eur_addr: int, target_region: str,
 ) -> tuple[int, str] | None:
-    """Call `find_region_siblings`'s scoring path to locate the
-    byte-equivalent placeholder in `target_region`. Returns
-    `(target_addr, target_old_name)` if exactly one HIGH
-    candidate at sim=1.0 exists; None otherwise.
+    """Locate the byte-equivalent placeholder in `target_region`.
+    Returns `(target_addr, target_old_name)` for a unique HIGH
+    match, or None if ambiguous/missing.
 
-    The "exactly one HIGH" requirement is the same disambiguation
-    rule as PR #448's `callee-ambiguous` check — if EUR's port
-    matches two functions in the target region at sim=1.0, we
-    refuse to cross-apply automatically. The decomper picks the
-    right one manually via the standard rename flow.
+    Two-pass disambiguation:
+
+    1. **Primary**: `find_region_siblings`'s scoring path (PR
+       #418's byte-disambiguation v2). Pass if exactly one HIGH
+       candidate at sim ≥ 0.99.
+
+    2. **Fallback** (brief 076 D2): if (1) returns 0 or ≥2 HIGH
+       candidates, run a strict raw-bytes + reloc-parity check
+       across every same-size same-module candidate in the
+       target region. Accept only if EXACTLY ONE candidate
+       passes BOTH:
+         - Raw masked bytes match byte-for-byte (no Hamming
+           tolerance)
+         - Reloc-sig tuples are identical (catches BL-offset
+           divergence — 1 silent corruption in wave 1)
+
+    The fallback covers the 5-10 size-16+ ports decomper hit in
+    wave 1 where the primary path's compiled-`.o` signatures
+    couldn't disambiguate the uncompiled USA/JPN gap (no source
+    `.c` exists for those functions in either region yet).
     """
     sys.path.insert(0, str(ROOT / "tools"))
     import find_region_siblings as frs  # noqa: E402
@@ -184,13 +256,33 @@ def find_byte_equivalent(
         target_region_name=target_region,
     )
 
-    # Require exactly one HIGH @ score >= 0.99 (mirrors
-    # find_region_siblings v2's HIGH bucket — byte-sim >= 0.99).
     high_matches = [m for m in matches if m.confidence == "HIGH"]
-    if len(high_matches) != 1:
-        return None
-    top = high_matches[0]
-    return top.func.addr, top.func.name
+    if len(high_matches) == 1:
+        top = high_matches[0]
+        return top.func.addr, top.func.name
+
+    # Fallback (brief 076 D2) — raw bytes + reloc parity. Walk
+    # every same-size same-module candidate, not just the
+    # HIGH-tagged ones from find_siblings (which uses softer
+    # thresholds). Require EXACTLY ONE pass-through on BOTH
+    # criteria.
+    candidates = target_regions.get(eur_module, [])
+    strict_winners: list = []
+    for cand in candidates:
+        if cand.size != eur_func.size:
+            continue
+        if not _reloc_parity(eur_func, cand):
+            continue
+        if not _raw_bytes_equal(
+                eur_func, cand,
+                SOURCE_REGION, target_region):
+            continue
+        strict_winners.append(cand)
+
+    if len(strict_winners) == 1:
+        w = strict_winners[0]
+        return w.addr, w.name
+    return None
 
 
 def find_eur_function(
