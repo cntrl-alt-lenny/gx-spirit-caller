@@ -63,16 +63,21 @@ class TestMaskRelocs(unittest.TestCase):
         )
         self.assertEqual(result, b"\x00\x00\x00\x00\xee\xff\x11\x22")
 
-    def test_reloc_mid_function_aligns_to_word(self):
-        # Function starts at 0x100, reloc at 0x106.
-        # Should zero the 4-byte aligned word at 0x104..0x107.
+    def test_reloc_at_two_aligned_offset(self):
+        # Brief 079 D2 v2: mask 4 bytes from the actual reloc-
+        # from offset (NOT 4-aligned-down). This correctly
+        # handles Thumb-2 BL at 2-aligned offsets.
+        # Function starts at 0x100, reloc at 0x106 → mask bytes
+        # 6..9 (the 4-byte Thumb-2 BL pair).
         result = _mask_relocs(
-            b"\xaa\xbb\xcc\xdd\xee\xff\x11\x22",
+            b"\xaa\xbb\xcc\xdd\xee\xff\x11\x22\x33\x44",
             0x100,
             [0x106],
         )
-        # rel = 6; aligned = 4; zero bytes 4..7
-        self.assertEqual(result, b"\xaa\xbb\xcc\xdd\x00\x00\x00\x00")
+        # rel = 6; mask bytes 6..9
+        self.assertEqual(
+            result, b"\xaa\xbb\xcc\xdd\xee\xff\x00\x00\x00\x00",
+        )
 
     def test_multiple_relocs(self):
         # Two relocs at start and end.

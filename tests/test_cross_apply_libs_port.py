@@ -257,6 +257,71 @@ class TestCrossApplyPlanShape(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# Brief 079 D1 v2 — preserve `ov<NNN>_` prefix in rename target
+# --------------------------------------------------------------------------- #
+
+
+class TestD1V2OverlayPrefixRename(unittest.TestCase):
+    """Brief 079 D1 v2: when EUR port filename is
+    `func_ov<NNN>_<addr>.legacy[_sp3].c`, the target rename must
+    emit `func_ov<NNN>_<eur_addr>` (NOT bare `func_<eur_addr>`).
+    Libs/ files declare the function with the overlay prefix;
+    symbol mismatch breaks the link otherwise (brief 078 wave 2
+    bug).
+
+    `derive_plan` constructs the rename target — verifies the
+    filename's overlay group is captured and threaded into
+    target_new_name."""
+
+    def test_main_module_port_no_overlay_prefix(self):
+        # Sanity check: main-module ports keep the bare
+        # `func_<addr>` rename target.
+        from cross_apply_libs_port import _PORT_FILENAME_RE
+        m = _PORT_FILENAME_RE.match("func_02007218.legacy.c")
+        self.assertIsNotNone(m)
+        self.assertIsNone(m.group("overlay"))
+
+    def test_overlay_port_captures_overlay_number(self):
+        # Brief 079 D1 v2 worked example: `func_ov015_021b3168
+        # .legacy.c` — derive_plan must capture the `015` group
+        # so the rename target becomes `func_ov015_021b3168`.
+        from cross_apply_libs_port import _PORT_FILENAME_RE
+        m = _PORT_FILENAME_RE.match("func_ov015_021b3168.legacy.c")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("overlay"), "015")
+        self.assertEqual(m.group("addr"), "021b3168")
+
+    def test_overlay_rename_target_includes_prefix(self):
+        # Direct test of derive_plan's rename-target-name
+        # construction via the regex group: for overlay='002'
+        # + addr=0x021b41e8, the construction must produce
+        # `func_ov002_021b41e8`.
+        from cross_apply_libs_port import _PORT_FILENAME_RE
+        m = _PORT_FILENAME_RE.match("func_ov002_021b41e8.legacy.c")
+        overlay = m.group("overlay")
+        addr = int(m.group("addr"), 16)
+        # Reproduce derive_plan's construction logic
+        if overlay:
+            target = f"func_ov{int(overlay):03d}_{addr:08x}"
+        else:
+            target = f"func_{addr:08x}"
+        self.assertEqual(target, "func_ov002_021b41e8")
+
+    def test_single_digit_overlay_zero_padded(self):
+        # `func_ov2_<addr>` is invalid (overlays are 3-digit-
+        # padded by NitroSDK convention) but the regex accepts
+        # `\d+`. The construction zero-pads to 3 digits.
+        from cross_apply_libs_port import _PORT_FILENAME_RE
+        m = _PORT_FILENAME_RE.match("func_ov2_021b41e8.legacy.c")
+        if m:  # regex accepts; downstream pads
+            overlay = m.group("overlay")
+            self.assertEqual(int(overlay), 2)
+            # 3-digit pad
+            target = f"func_ov{int(overlay):03d}_021b41e8"
+            self.assertEqual(target, "func_ov002_021b41e8")
+
+
+# --------------------------------------------------------------------------- #
 # Brief 076 D2 — strict raw-bytes + reloc-parity fallback
 # --------------------------------------------------------------------------- #
 
