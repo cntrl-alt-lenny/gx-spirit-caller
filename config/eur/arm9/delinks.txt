@@ -7308,3 +7308,26 @@ src/main/func_02018bc0.c:
     complete
     .text start:0x02018bc0 end:0x02018be8
 
+src/main/func_02011780.c:
+    complete
+    .text start:0x02011780 end:0x020117ac
+
+src/main/func_020117ac.c:
+    complete
+    .text start:0x020117ac end:0x020117dc
+
+src/main/func_0201a0b8.c:
+    complete
+    .text start:0x0201a0b8 end:0x0201a0e0
+
+src/main/func_020198bc.c:
+    complete
+    .text start:0x020198bc end:0x020198ec
+
+src/main/func_02019088.c:
+    complete
+    .text start:0x02019088 end:0x020190c0
+
+src/main/func_0201a594.c:
+    complete
+    .text start:0x0201a594 end:0x0201a5c0
