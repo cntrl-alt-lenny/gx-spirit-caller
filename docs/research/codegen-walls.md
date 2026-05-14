@@ -2768,7 +2768,127 @@ field-size).
 **Provenance:** brief 060-territory cloud autonomous sweep
 (this section) — option (ii) from brain's post-#398
 suggestions list. Sweep verdict: no additional S-class
-entries; preamble clarified with C-N-vs-S-N discriminator.
+entries through wave 22; preamble clarified with C-N-vs-S-N
+discriminator. **Post-sweep:** S-2 (switch-case textual
+ordering) surfaced in brief 086 wave 1 (PR #474), entry
+below — the expectation that authoring pitfalls accrue
+post-wave-22 has held.
+
+### S-2. Switch-case textual ordering controls jump-table body layout
+
+**Symptom:** a dense-switch function shows `b .L<target>` mismatches
+on a subset of the case-body branches — typically 4-8 mismatched
+target offsets in a function that otherwise byte-matches. The diff
+is *not* a uniform shift (that'd be S-1) and *not* a single insn
+flavour difference (that'd be a C-N coercion); it's a *swap* of
+which case body sits at which memory address.
+
+**Pattern:** mwcc preserves the **source-textual order** of `case
+N:` labels when laying out the switch-body blocks, even when the
+case values themselves are order-independent (e.g. a jump-table
+dispatch where every case returns a constant). If the original
+source had `case 1:` before `case 0:`, the original `.o`'s switch
+body has case 1's code at the *lower* address — the dispatch table
+points each case's value at the correct body, so semantics are
+identical, but the byte layout is order-of-declaration.
+
+When a decomper transcribes the function from disassembly and
+writes the cases in natural numeric order (`case 0:` first), the
+emitted `.o` lays out the bodies in numeric order — semantically
+identical to the target, but `b .L<offset>` instructions in the
+jump-table read different offsets and the function is no longer
+byte-identical.
+
+**Example (brief 086 wave 1, `func_0203dde8` — PR #474):**
+
+The target's dense jump-table dispatches 4 cases. The disassembly
+shows `mvn r0, #9` (i.e. `return -10`, encoding case 0's return)
+sitting *after* `mvn r0, #8` (case 1's `return -9`) in memory.
+That tells you the source emitted `case 1` before `case 0`:
+
+```c
+/* Wrong — natural numeric order. mwcc emits bodies in this
+   order, but the target wanted case 1's body before case 0's.
+   Result: 4 b-target mismatches in the jump-table. */
+switch (n) {
+    case 0: return -10;
+    case 1: return -9;
+    case 2: return -8;
+    case 3: return -7;
+    default: return 0;
+}
+
+/* Right — re-order the C labels so case 1's body comes first in
+   source-text, matching the target's memory layout. */
+switch (n) {
+    case 1: return -9;      /* case 1 first — matches target layout */
+    case 0: return -10;
+    case 2: return -8;
+    case 3: return -7;
+    default: return 0;
+}
+```
+
+The dispatch table (which is just `value → body offset`) is the
+same either way; only the body's memory address per case-value
+changes.
+
+**How to spot it in the diff:** on a dense switch with a jump-
+table dispatch, look at the disassembled case-body sequence in
+memory order. If the case-value progression isn't monotonic
+(e.g. you see returns or branches for case 1's value at a lower
+address than case 0's value), the original source declared the
+cases in non-natural order. The fix is to re-order your C source
+to match.
+
+**How to spot it before writing:** when transcribing a dense
+switch, sort the case-bodies by *memory address* (lowest to
+highest) and assign their `case N:` labels in that order, not in
+numeric order. The C is uglier (case values appear out of
+sequence), but it byte-matches.
+
+**Affected matches:** brief 086 wave 1 `func_0203dde8` (PR #474).
+Decomper's recognition cue verbatim:
+
+> dense `switch` jump-table where case bodies appear in memory in
+> a non-natural order (e.g. `mvn r0, #9` before `mvn r0, #8`,
+> mapping to case 0 returning -10 before case 1 returning -9).
+> Re-order the C `case N:` labels to match the memory layout.
+
+**Resolution:** re-order the `case N:` labels in the C source to
+match the case-body sequence in the target's memory. No routing
+change, no mwcc-flag change, no inline-asm escape. The fix is in
+the source declaration order alone.
+
+**Why this isn't C-N or P-N:** mwcc's emission is *correct* — it
+faithfully lays out the case bodies in the order the C source
+declared them. The miscompile is in the human's case ordering,
+not in the compiler's response to it. A C-coercion entry would
+imply "tweak the source form to coax mwcc into emitting the
+target"; here you tweak the source form to *describe the target's
+intended layout accurately*. Same shape as S-1 (padding off-by-
+one) — the codegen difference is downstream of a source-layout
+authoring choice, not a compiler-vs-source disagreement.
+
+**Sparseness note:** S-2 only matters when the switch is dense
+enough that mwcc emits a *jump-table* dispatch. For sparse
+switches that compile to a series of `cmp r0, #N; beq .L_caseN`
+branches, the case order in source doesn't affect codegen at
+all (each `case N:` becomes an independent compare against the
+fall-through scrutinee). The discriminator: in the target's
+disassembly, look for a `ldr pc, [pc, rN, lsl #2]` (or
+equivalent jump-table dispatch) — if you see it, S-2 applies;
+if you see a chain of `cmp; beq` instead, the C case order is
+free.
+
+**Provenance:** brief 086 wave 1 (PR #474) — decomper documented
+the iteration as a "worth folding into walls" calibration note
+under "S-2 — switch-case textual ordering controls body
+layout". This entry promotes the recipe into the grep-able
+reference. First S-N entry since S-1 (brief 057 wave 22, PR #392);
+confirms the sweep section above's expectation that S-class
+entries accrue when wave-iteration notes flag authoring-error
+framing.
 
 ## Per-PR drop cross-reference
 
