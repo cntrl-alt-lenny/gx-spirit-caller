@@ -314,14 +314,25 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
-  — `cloud` (HIGH priority): ship a robust
-  `tools/port_external_source.py` after wave 1 of brief 069
-  (PR #436) hit the floor at 10 ports due to the absence of
-  this tool. Four deliverables: pokediamond `.map`
-  integration (callee remap), primitive header vendoring
-  (macros + enums), struct-access support, data-reference
-  reloc handling. Unblocks brief 071 (decomper rerun). Branch:
-  `cloud/port-external-source-driver`.
+  — `cloud` (HIGH priority): **D1 shipped via PR #438** (117
+  candidates → 2.34× the brief 070 floor). D2/D3/D4 deferred to
+  parallel ⚠️ scope-confirm autonomous PRs (brain green-lit on
+  #438). Suggested cloud sequencing: D4 first (cheap, builds on
+  D1 RelocRef infra → 110 candidates unlocked), then D2+D3 as
+  a pair (intertwined header/struct vendoring → 264 candidates
+  unlocked). Total theoretical ceiling: 491 candidates across
+  D1-D4. Branch: `cloud/port-external-source-driver` (D1
+  merged); D2/D3/D4 on follow-up cloud branches.
+
+- [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
+  — `decomper` (HIGH priority, **NOW ACTIVE** — brief 070 D1
+  shipped). Cross-project bulk-port wave 1 rerun against the
+  117 D1-ready candidates. Targets 50-100 byte-identical ports
+  into region-neutral `libs/nitro/` (each port unlocks EUR +
+  USA + JPN simultaneously). Routes as `.legacy.c` (1.2/sp2p3
+  exact SP match). Self-extends 1/2 + 2/2 pull from D4 + D3 +
+  D2 follow-ups as cloud ships those. Branch:
+  `decomper/cross-project-bulk-port-wave-1-rerun`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
