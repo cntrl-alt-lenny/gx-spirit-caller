@@ -37,7 +37,15 @@ surfaced a reverse-direction **C-1 corollary** (mwcc over-
 predicates `if-or-or return-const + return-const` final
 returns where target uses a branchy return) — brief 054's
 SP sweep verified all 15 SPs collapse identically, classified
-as **C-1r permanent**. Most fall into one
+as **C-1r permanent**. Brief 081 wave 2 + wave 3 (PRs #467
+/ #468) reported a "struct-pointer + `->` field access silent-
+corruption wall" from 3 candidates; brief 084's C-variation
+sweep showed those 3 candidates have **three distinct root
+causes** — only `func_02001ef4`'s adjacent-bitfield pattern
+is a new wall (**C-22**), the other two (`func_020070dc`
+strlen-style, `func_0200a454` 4-iter copy) fold to existing
+C-1 + C-2/C-15-family recipes (see C-22's Wall family note).
+Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
@@ -106,7 +114,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (21 patterns)
+## Coercible-with-knowledge (22 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1944,6 +1952,144 @@ entry** (the 'ternary-to-constants' collapse pattern)" — but
 C-20 was simultaneously taken by the pack-args wall (brief 056
 PR #389), so this is **C-21**. Brief 057-related fold-in (this
 cloud autonomous PR).
+
+### C-22. Adjacent-bitfield write — `(v & ~mask) | (a<<8) | (b<<12)` vs bitfield syntax
+
+> **Wall family note — brief 081's "struct-pointer wall" was
+> three distinct walls.** Brief 081 wave 2 + wave 3 (PRs #467,
+> #468) reported three candidates that compiled+linked clean but
+> failed at byte-verify, grouping them under a hypothesised
+> "typedef'd struct pointer + `->` field access silent-corruption"
+> wall. Brief 084's C-variation sweep (this entry) showed the
+> three candidates have **three distinct root causes**, only one
+> of which is a new wall:
+>
+> | Brief 081 candidate | Actual wall | Coercion |
+> |---|---|---|
+> | `func_02001ef4` (bit-field pack) | **C-22 — new entry below** | bitfield struct decl |
+> | `func_020070dc` (strlen-style) | C-1 (predicated early-return) | explicit `goto` to force branch form |
+> | `func_0200a454` (4-iter copy) | C-2 + C-15-family (legacy-tier routing) | temp-local cache + `.legacy.c` (mwcc 1.2/sp2p3) routing |
+>
+> The shared symptom (typedef'd struct + `->` field access) was
+> a syntactic coincidence, not a common codegen mechanism. The
+> three-walls-not-one finding is itself the more general lesson:
+> wall hypotheses from N candidates should be confirmed by a
+> codegen sweep, not by symptom similarity.
+
+**Target asm (`func_02001ef4` — brief 081 wave 2 / brief 084):**
+
+```text
+
+ldr   r3, [r0, #0x24]            ; load the struct member
+mov   r1, r1, lsl #28             ; lsl/lsr to mask r1 to 4 bits
+bic   r3, r3, #0xf00              ; clear bits 8-11   ← TWO masks
+orr   ip, r3, r1, lsr #20         ; set bits 8-11
+bic   r3, ip, #0xf000             ; clear bits 12-15  ← TWO masks
+mov   r1, r2, lsl #28
+orr   r1, r3, r1, lsr #16         ; set bits 12-15
+str   r1, [r0, #0x24]
+bx    lr
+
+```
+
+9 instructions. Two **separate** `bic` masks: one clearing bits
+8-11, the second clearing bits 12-15. The orig emits this as
+clear-then-set twice.
+
+**mwcc emits when miscoded** (natural compound-mask form):
+
+```c
+/* breaks: mwcc folds the two clears into a single combined mask */
+p->field_24 = (p->field_24 & ~0xff00)
+            | ((a & 0xf) << 8)
+            | ((b & 0xf) << 12);
+```
+
+```text
+
+ldr   r3, [r0, #0x24]
+mov   r1, r1, lsl #28
+bic   r3, r3, #0xff00              ; SINGLE combined clear ← FOLD
+mov   r2, r2, lsl #28
+orr   r1, r3, r1, lsr #20
+orr   r1, r1, r2, lsr #16
+str   r1, [r0, #0x24]
+bx    lr
+
+```
+
+8 instructions. mwcc's optimiser sees `& ~0xff00` as one mask
+clearing two adjacent 4-bit ranges, and emits a single `bic`
+covering both. Same semantic; different bytes.
+
+**C that coerces it (verified byte-identical against
+`func_02001ef4`, mwcc 2.0/sp1p5):**
+
+```c
+typedef struct foo_t {
+    u8  padding[0x24];
+    u32 lo_8     :  8;
+    u32 bf_8_12  :  4;     /* first  4-bit field */
+    u32 bf_12_16 :  4;     /* second 4-bit field */
+    u32 hi_16    : 16;
+} foo_t;
+
+void f(foo_t *p, u32 a, u32 b) {
+    p->bf_8_12  = a;
+    p->bf_12_16 = b;
+}
+```
+
+**The trick:** declare each 4-bit window as its own bitfield, then
+write each field with a separate statement. mwcc treats each
+bitfield write as a clear-then-set on its own bit range, emitting
+two `bic`s — matching orig's two-step pattern. The compound-mask
+form (`v & ~0xff00`) collapses to one `bic`.
+
+**SP variation (verified all 3 routing tiers):**
+
+| SP | mwcc | Result |
+|---|---|---|
+| default | 2.0/sp1p5 | ⭐ byte-identical |
+| `.legacy.c` | 1.2/sp2p3 | size match, different bytes (legacy emits an extra `mov` for shift-mask isolation) |
+| `.legacy_sp3.c` | 1.2/sp3 | size match, different bytes (same as 1.2/sp2p3) |
+
+**Default-SP-only.** Don't route to `.legacy.c` for this pattern;
+the bitfield syntax + default mwcc 2.0/sp1p5 is the win.
+
+**Use when:** target asm shows **two adjacent `bic ...; orr ...`
+pairs** writing different 4-bit (or other small-width) ranges to
+the same struct member, AND the asm has TWO `bic` masks at
+different bit positions (e.g. `bic #0xf00; ... bic #0xf000;`).
+The natural compound-mask C source folds the two `bic`s into one;
+the bitfield form preserves the two-step pattern.
+
+**The recognition cue:** target has `ldr rN, [base, #imm]` →
+`bic` → `orr` → `bic` → `orr` → `str rN, [base, #imm]`. Two
+clears + two sets on the same loaded register. If you'd write
+this naturally as `p->field = (p->field & ~MASK) | ((a & A) <<
+S1) | ((b & B) << S2);`, mwcc folds the two clears. Use
+bitfields.
+
+**Practical rule:** when the asm shape has two adjacent `bic`s
+on the same register at different positions, the target was
+likely compiled from C with adjacent bitfield decls. Don't
+write the compound-mask form; declare each field's window as
+a C bitfield.
+
+**Confirmed instances:**
+
+- `func_02001ef4` (brief 081 wave 2, PR #467) — 9 insn, two
+  4-bit bitfields at positions 8-12 and 12-16.
+
+**Provenance:** brief 081 wave 2 (PR #467) hypothesised a
+generic "struct-pointer silent-corruption wall" from 3
+candidates. Brief 084 (PR #?) ran the C-variation sweep,
+discovered the 3-walls-not-1 reality, classified this single
+new wall as **C-22**, and pinned the bitfield-syntax recipe
+above. The other two candidates fold to existing C-1 +
+C-2/C-15-family recipes (see Wall family note above for the
+mapping).
 
 ## Permanent (8 patterns)
 
