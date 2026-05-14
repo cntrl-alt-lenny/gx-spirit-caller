@@ -374,6 +374,71 @@ class TestMetadataConsistency(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# Post-clone hooks (brief 080)
+# --------------------------------------------------------------------------- #
+
+
+class TestPostClone(unittest.TestCase):
+    """Pin behaviour of vendor_external_sources._post_clone.
+
+    Brief 080: pokeheartgold's build generates
+    `lib/include/nitro/fx/fx_const.h` from a CSV. We must run that
+    generator at post-clone time, otherwise every NitroSDK .c file
+    fails to compile with "the file 'nitro/fx/fx_const.h' cannot
+    be opened". The hook must be a no-op for other targets.
+    """
+
+    def test_no_op_for_non_pokeheartgold_target(self):
+        from vendor_external_sources import Target, _post_clone
+        with tempfile.TemporaryDirectory() as tmp:
+            # Should not raise and should not create anything.
+            t = Target(
+                name="pokediamond", url="x", commit="HEAD",
+                mwcc_sp="2.0/sp1", lib_roots=("a",),
+            )
+            _post_clone(t, Path(tmp))
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+
+    def test_no_op_when_generator_dir_missing(self):
+        # Defensive: pokeheartgold layout may shift upstream. If the
+        # gen_fx_consts dir disappears, log a warning but don't crash.
+        import contextlib
+        import io
+
+        from vendor_external_sources import Target, _post_clone
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Target(
+                name="pokeheartgold", url="x", commit="HEAD",
+                mwcc_sp="2.0/sp2p2", lib_roots=("a",),
+            )
+            # Capture the warning so the test output stays clean.
+            buf = io.StringIO()
+            with contextlib.redirect_stderr(buf):
+                _post_clone(t, Path(tmp))
+            self.assertIn("gen_fx_consts dir missing", buf.getvalue())
+
+    def test_no_op_when_fx_const_already_exists(self):
+        # Idempotent: re-running _post_clone after the header is
+        # already generated must not re-run the C build.
+        from vendor_external_sources import Target, _post_clone
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            fx_dir = root / "lib" / "include" / "nitro" / "fx"
+            fx_dir.mkdir(parents=True)
+            (fx_dir / "fx_const.h").write_bytes(b"// sentinel\n")
+            t = Target(
+                name="pokeheartgold", url="x", commit="HEAD",
+                mwcc_sp="2.0/sp2p2", lib_roots=("a",),
+            )
+            _post_clone(t, root)
+            # File must still have our sentinel — no overwrite.
+            self.assertEqual(
+                (fx_dir / "fx_const.h").read_bytes(),
+                b"// sentinel\n",
+            )
+
+
+# --------------------------------------------------------------------------- #
 # Byte-fingerprint mode (brief 068)
 # --------------------------------------------------------------------------- #
 

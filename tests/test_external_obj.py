@@ -34,6 +34,8 @@ from external_obj import (  # noqa: E402
     ExternalFunc,
     PROFILES,
     POKEDIAMOND_NITROSDK,
+    POKEHEARTGOLD_DSPROT,
+    POKEHEARTGOLD_NITROSDK,
     _parse_elf32,
     byte_similarity,
     extract_functions,
@@ -69,6 +71,42 @@ class TestProfileFor(unittest.TestCase):
         self.assertIsNone(profile_for("pokediamond",
                                        "arm9/src/main.c"))
 
+    # Brief 080: pokeheartgold extension. Three subtree prefixes
+    # route to two profiles (NitroSDK + MSL_C share sp2p2; dsprot
+    # is sp2p3 per its subtree Makefile override).
+    def test_pokeheartgold_nitrosdk_routes_to_sp2p2(self):
+        prof = profile_for("pokeheartgold",
+                           "lib/NitroSDK/src/os/os_terminate_proc.c")
+        self.assertIs(prof, POKEHEARTGOLD_NITROSDK)
+        self.assertEqual(prof.sp, "2.0/sp2p2")
+
+    def test_pokeheartgold_msl_c_routes_to_sp2p2(self):
+        # MSL_C and NitroSDK share the same SP per the upstream
+        # top-level Makefile (MWCCVER := 2.0/sp2p2 covers both).
+        prof = profile_for("pokeheartgold", "lib/MSL_C/src/rand.c")
+        self.assertIs(prof, POKEHEARTGOLD_NITROSDK)
+
+    def test_pokeheartgold_dsprot_routes_to_sp2p3(self):
+        # dsprot is the SP-override subtree (2.0/sp2p3 per
+        # lib/dsprot/Makefile).
+        prof = profile_for("pokeheartgold", "lib/dsprot/src/rc4.c")
+        self.assertIs(prof, POKEHEARTGOLD_DSPROT)
+        self.assertEqual(prof.sp, "2.0/sp2p3")
+
+    def test_pokeheartgold_dsprot_prefix_wins_over_nitrosdk(self):
+        # Ordering test: dsprot's prefix is registered BEFORE the
+        # generic NitroSDK prefix in PROFILES dict insertion order.
+        # If we swapped the order, dsprot files would silently
+        # route to the wrong SP. This test pins the priority.
+        keys = list(PROFILES.keys())
+        dsprot_idx = keys.index("pokeheartgold:lib/dsprot")
+        nitro_idx = keys.index("pokeheartgold:lib/NitroSDK")
+        self.assertLess(
+            dsprot_idx, nitro_idx,
+            "dsprot must be registered before NitroSDK to win "
+            "prefix-match resolution",
+        )
+
 
 class TestBuildProfileMetadata(unittest.TestCase):
     def test_sp_is_legacy_compatible(self):
@@ -83,6 +121,25 @@ class TestBuildProfileMetadata(unittest.TestCase):
         # them produces ENOENT-style compile errors.
         self.assertIn("arm9/lib/NitroSDK/include",
                       POKEDIAMOND_NITROSDK.include_paths)
+
+    def test_pokeheartgold_sp_is_one_rev_from_default(self):
+        # All porting-eligible pokeheartgold subtrees live in the
+        # 2.0/ SP family — one minor SP-rev distance from our
+        # project default 2.0/sp1p5. Brief 080's hit-rate survey
+        # observed 89 unique HIGH-band external functions matching
+        # the EUR pool at this SP distance, in line with brief 066's
+        # general 50-70% pairing projection.
+        self.assertTrue(POKEHEARTGOLD_NITROSDK.sp.startswith("2.0/"))
+        self.assertTrue(POKEHEARTGOLD_DSPROT.sp.startswith("2.0/"))
+
+    def test_pokeheartgold_lib_include_present(self):
+        # The umbrella `<nitro.h>` header lives at
+        # `lib/include/nitro.h`; without that path in include_paths
+        # every NitroSDK .c file fails to compile.
+        self.assertIn("lib/include",
+                      POKEHEARTGOLD_NITROSDK.include_paths)
+        self.assertIn("lib/include",
+                      POKEHEARTGOLD_DSPROT.include_paths)
 
 
 # --------------------------------------------------------------------------- #

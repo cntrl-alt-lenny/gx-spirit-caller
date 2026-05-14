@@ -123,6 +123,7 @@ def clone_target(target: Target, force: bool = False) -> Path:
     dest = VENDOR_DIR / target.name
     if dest.exists() and not force:
         print(f"[skip] {target.name} already cloned at {dest}")
+        _post_clone(target, dest)
         return dest
     if dest.exists() and force:
         print(f"[remove] {dest}")
@@ -142,7 +143,39 @@ def clone_target(target: Target, force: bool = False) -> Path:
         _run(["git", "fetch", "--depth", "1", "origin", target.commit],
              cwd=dest)
         _run(["git", "checkout", target.commit], cwd=dest)
+    _post_clone(target, dest)
     return dest
+
+
+def _post_clone(target: Target, dest: Path) -> None:
+    """Per-target post-clone fixups. Idempotent — safe to re-run.
+
+    Currently only pokeheartgold needs one: its build generates
+    `lib/include/nitro/fx/fx_const.h` from a CSV via a tiny C tool
+    in `tools/gen_fx_consts/`. Without that header, every .c file
+    that pulls in `<nitro.h>` (most of NitroSDK) fails to compile
+    with `the file 'nitro/fx/fx_const.h' cannot be opened`. We
+    build the generator with the system gcc and run it to write
+    the header into the vendor tree.
+
+    See docs/research/pokeheartgold-extension-feasibility.md for
+    why this is a hard build dependency (brief 080)."""
+    if target.name != "pokeheartgold":
+        return
+    fx_const_h = dest / "lib" / "include" / "nitro" / "fx" / "fx_const.h"
+    if fx_const_h.is_file():
+        return
+    gen_dir = dest / "tools" / "gen_fx_consts"
+    if not gen_dir.is_dir():
+        print(f"  [warn] pokeheartgold: gen_fx_consts dir missing, "
+              f"NitroSDK compilation will fail", file=sys.stderr)
+        return
+    print(f"[post-clone] generating {fx_const_h.relative_to(dest)}")
+    gen_bin = gen_dir / "gen_fx_consts"
+    if not gen_bin.is_file():
+        _run(["make"], cwd=gen_dir)
+    fx_const_h.parent.mkdir(parents=True, exist_ok=True)
+    _run([str(gen_bin), str(fx_const_h)])
 
 
 def main(argv: list[str] | None = None) -> int:
