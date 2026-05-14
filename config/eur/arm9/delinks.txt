@@ -7246,3 +7246,31 @@ libs/nitro/func_02092668.legacy.c:
 libs/nitro/func_020983b8.legacy.c:
     complete
     .text start:0x020983b8 end:0x020983f4
+
+src/main/func_020057dc.c:
+    complete
+    .text start:0x020057dc end:0x02005800
+
+src/main/func_02006314.c:
+    complete
+    .text start:0x02006314 end:0x02006334
+
+src/main/func_020068f4.c:
+    complete
+    .text start:0x020068f4 end:0x02006918
+
+src/main/func_0200924c.c:
+    complete
+    .text start:0x0200924c end:0x02009278
+
+src/main/func_02000ec8.c:
+    complete
+    .text start:0x02000ec8 end:0x02000ef8
+
+src/main/func_0200b194.c:
+    complete
+    .text start:0x0200b194 end:0x0200b1bc
+
+src/main/func_0200bfa4.c:
+    complete
+    .text start:0x0200bfa4 end:0x0200bfcc
