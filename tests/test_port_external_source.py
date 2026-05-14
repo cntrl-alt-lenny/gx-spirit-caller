@@ -28,12 +28,14 @@ sys.path.insert(0, str(_TOOLS))
 from port_external_source import (  # noqa: E402
     PortRequest,
     PortResult,
+    _VENDORED_CACHE,
     aggregate_skip_reasons,
     build_parallel_reloc_data_map,
     compute_delinks_entry,
     compute_output_path,
     detect_skip_reasons,
     extract_function_body,
+    load_vendored_identifiers,
     remap_callees_in_body,
     remap_data_refs_in_body,
 )
@@ -68,17 +70,21 @@ class TestDetectSkipReasons(unittest.TestCase):
         self.assertIsNone(out)
 
     def test_struct_arrow_detected(self):
+        # Default LIBS_NITRO doesn't vendor `Thread` so the
+        # struct-access check refuses with the unvendored type
+        # name in the detail.
         body = "void f(Thread *t) { t->state = 1; }"
         out = detect_skip_reasons(body, [], [])
         self.assertIsNotNone(out)
         self.assertEqual(out[0], "struct-access")
-        self.assertIn("->", out[1])
+        self.assertIn("Thread", out[1])
 
     def test_struct_dot_detected(self):
         body = "void f(void) { Thread t; t.state = 1; }"
         out = detect_skip_reasons(body, [], [])
         self.assertIsNotNone(out)
         self.assertEqual(out[0], "struct-access")
+        self.assertIn("Thread", out[1])
 
     def test_undefined_macro_detected(self):
         # ALL_CAPS macros like OS_CONSOLE_DEBUG
@@ -403,6 +409,141 @@ class TestExternalObjRelocs(unittest.TestCase):
         )
         self.assertEqual(f.callee_names(), [])
         self.assertEqual(f.data_refs(), [])
+
+
+# --------------------------------------------------------------------------- #
+# D2 / D3 — Vendored identifier scanner
+# --------------------------------------------------------------------------- #
+
+
+class TestLoadVendoredIdentifiers(unittest.TestCase):
+    def _make_libs(self, headers: dict[str, str]) -> Path:
+        """Build a synthetic libs/nitro/include/ tree."""
+        tmp = Path(tempfile.mkdtemp())
+        include = tmp / "include"
+        for rel_path, content in headers.items():
+            path = include / rel_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        # Clear cache so per-test fixtures don't bleed.
+        _VENDORED_CACHE.clear()
+        return tmp
+
+    def test_macros_extracted(self):
+        libs = self._make_libs({
+            "nitro/types.h": (
+                "#define BOOL int\n"
+                "#define TRUE 1\n"
+                "#define OS_CONSOLE_DEBUG 0x1\n"
+            ),
+        })
+        macros, structs, enums = load_vendored_identifiers(libs)
+        self.assertIn("BOOL", macros)
+        self.assertIn("TRUE", macros)
+        self.assertIn("OS_CONSOLE_DEBUG", macros)
+
+    def test_typedefs_extracted_into_both_sets(self):
+        # typedef'd names appear in both macros (for `#define`-like
+        # source uses) and structs (for type-name source uses).
+        libs = self._make_libs({
+            "nitro/os.h": (
+                "typedef struct OSi_Mutex OSMutex;\n"
+                "typedef int OSi_BoolType;\n"
+            ),
+        })
+        macros, structs, _ = load_vendored_identifiers(libs)
+        self.assertIn("OSMutex", macros)
+        self.assertIn("OSMutex", structs)
+        self.assertIn("OSi_BoolType", structs)
+
+    def test_struct_defs_extracted(self):
+        libs = self._make_libs({
+            "nitro/os.h": (
+                "struct CardiCommon { int x; };\n"
+                "union Foo { int x; char y; };\n"
+            ),
+        })
+        _, structs, _ = load_vendored_identifiers(libs)
+        self.assertIn("CardiCommon", structs)
+        self.assertIn("Foo", structs)
+
+    def test_enum_values_extracted(self):
+        libs = self._make_libs({
+            "nitro/os.h": (
+                "enum OSArenaId {\n"
+                "    OS_ARENA_MAIN = 0,\n"
+                "    OS_ARENA_ITCM = 1,\n"
+                "    OS_ARENA_DTCM = 2,\n"
+                "};\n"
+            ),
+        })
+        _, structs, enums = load_vendored_identifiers(libs)
+        self.assertIn("OSArenaId", structs)
+        self.assertIn("OS_ARENA_MAIN", enums)
+        self.assertIn("OS_ARENA_ITCM", enums)
+
+    def test_missing_libs_returns_empty_sets(self):
+        tmp = Path(tempfile.mkdtemp())
+        # No `include/` subdir → empty
+        _VENDORED_CACHE.clear()
+        macros, structs, enums = load_vendored_identifiers(tmp)
+        self.assertEqual((len(macros), len(structs), len(enums)),
+                         (0, 0, 0))
+
+
+class TestVendoredAwareSkipReasons(unittest.TestCase):
+    """detect_skip_reasons now consults vendored identifiers —
+    macros and struct types that are in libs/nitro/include/
+    don't trigger refusals."""
+
+    def _make_libs_with_macros(self, *names: str) -> Path:
+        tmp = Path(tempfile.mkdtemp())
+        include = tmp / "include" / "nitro"
+        include.mkdir(parents=True)
+        defs = "".join(f"#define {n} 1\n" for n in names)
+        (include / "stubs.h").write_text(defs)
+        _VENDORED_CACHE.clear()
+        return tmp
+
+    def _make_libs_with_typedefs(self, *names: str) -> Path:
+        tmp = Path(tempfile.mkdtemp())
+        include = tmp / "include" / "nitro"
+        include.mkdir(parents=True)
+        defs = "".join(f"typedef int {n};\n" for n in names)
+        (include / "types.h").write_text(defs)
+        _VENDORED_CACHE.clear()
+        return tmp
+
+    def test_vendored_macro_not_refused(self):
+        libs = self._make_libs_with_macros("OS_CONSOLE_DEBUG")
+        body = "void f(void) { u32 x = OS_CONSOLE_DEBUG; }"
+        out = detect_skip_reasons(body, [], [], libs_root=libs)
+        self.assertIsNone(out)
+
+    def test_unvendored_macro_still_refused(self):
+        libs = self._make_libs_with_macros("OS_CONSOLE_DEBUG")
+        body = "void f(void) { u32 x = OS_UNKNOWN_FLAG; }"
+        out = detect_skip_reasons(body, [], [], libs_root=libs)
+        self.assertIsNotNone(out)
+        self.assertEqual(out[0], "undefined-macro")
+        self.assertEqual(out[1], "OS_UNKNOWN_FLAG")
+
+    def test_vendored_struct_type_allows_arrow_access(self):
+        # `CardCommon` is vendored as a typedef → struct-access
+        # check accepts `card->field` because CardCommon is in the
+        # vendored struct-type set.
+        libs = self._make_libs_with_typedefs("CardCommon")
+        body = "void f(CardCommon *card) { card->lock = 1; }"
+        out = detect_skip_reasons(body, [], [], libs_root=libs)
+        self.assertIsNone(out)
+
+    def test_unvendored_struct_type_still_refused(self):
+        libs = self._make_libs_with_typedefs("CardCommon")
+        body = "void f(Thread *t) { t->state = 1; }"
+        out = detect_skip_reasons(body, [], [], libs_root=libs)
+        self.assertIsNotNone(out)
+        self.assertEqual(out[0], "struct-access")
+        self.assertIn("Thread", out[1])
 
 
 # --------------------------------------------------------------------------- #

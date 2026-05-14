@@ -145,6 +145,24 @@ _STRUCT_ARROW_RE = re.compile(r"->[a-zA-Z_]")
 # the dot.
 _STRUCT_DOT_RE = re.compile(r"[a-zA-Z_]\.[a-zA-Z_]")
 
+# D3 — extract struct/union/enum tags + typedef'd struct-type uses
+# from a source body. The set is what we'd need vendored.
+#
+# Patterns covered:
+#   `struct CardCommon *p;`     → tag "CardCommon" (with `struct`)
+#   `CARDiCommon *p;`            → typedef name (no `struct` prefix)
+# Distinguishing them needs a parser; we conservatively collect ALL
+# CamelCase or `<prefix>i_<rest>` identifiers in pointer/variable-
+# declaration positions, then intersect with what's actually
+# vendored in `libs/nitro/include/`.
+_STRUCT_TYPE_HINT_RE = re.compile(
+    # `Type *name`, `Type name[`, `(Type *)`, `Type name;` — heuristic
+    # filter to typical typename shapes (CamelCase with at least one
+    # internal underscore-or-lowercase transition).
+    r"\b(?P<tag>[A-Z][a-zA-Z0-9]*[a-z][a-zA-Z0-9_]*)"
+    r"(?=\s*[*]?\s*[a-zA-Z_][\w]*\s*[\[;,)=])"
+)
+
 # Macros / undefined identifiers from upstream:
 #   1. ALL_CAPS_IDENTIFIER that isn't a function-call (4+ uppercase
 #      chars rules out enum-tag false positives like `OK`).
@@ -175,10 +193,111 @@ _MACRO_ALLOWLIST: frozenset[str] = frozenset({
 })
 
 
+# D2/D3 — Vendored identifier scanner.
+#
+# We don't try to fully parse `libs/nitro/include/**/*.h` — that
+# would need a real C parser. Instead, scan with regexes that
+# match the conventions decomper uses:
+#
+#   `#define MACRO ...`        → macro tag
+#   `typedef ... NAME;`        → typedef tag (catches struct
+#                                  typedef'd-pointers and enum
+#                                  typedef'd-names)
+#   `struct NAME { ... };`     → struct tag
+#   `union  NAME { ... };`     → union tag
+#   `enum   NAME { ... };`     → enum tag
+#   `<ENUMERATOR>,` inside enum body → enum-value tag (treated as macro)
+#
+# Returns three sets: macros, struct_types, enum_values. Used by
+# detect_skip_reasons to relax the macro / struct refusals when
+# the needed identifiers are already vendored.
+
+# MULTILINE on the start-of-line patterns so `^` matches each line,
+# not just the first character of the file.
+_HEADER_MACRO_RE = re.compile(
+    r"^\s*#\s*define\s+(?P<name>[A-Za-z_]\w+)",
+    re.MULTILINE,
+)
+_HEADER_TYPEDEF_RE = re.compile(
+    # `typedef ... NAME;` — captures the final identifier before `;`
+    r"\btypedef\s+[^;]+?\b(?P<name>[A-Za-z_]\w+)\s*;"
+)
+_HEADER_STRUCT_DEF_RE = re.compile(
+    r"\b(?:struct|union)\s+(?P<name>[A-Za-z_]\w+)\s*\{"
+)
+_HEADER_ENUM_DEF_RE = re.compile(
+    r"\benum\s+(?P<name>[A-Za-z_]\w+)?\s*\{"
+)
+_HEADER_ENUM_VALUE_RE = re.compile(
+    # An enumerator: starts with letter+underscore name at start of
+    # line (in an `enum { ... }` body), followed by `=`/`,`/`}`.
+    r"^\s*(?P<name>[A-Z][A-Z0-9_]+)\s*[=,}]"
+)
+
+
+_VENDORED_CACHE: dict[Path, tuple[frozenset[str],
+                                   frozenset[str],
+                                   frozenset[str]]] = {}
+
+
+def load_vendored_identifiers(
+    libs_root: Path = LIBS_NITRO,
+) -> tuple[frozenset[str], frozenset[str], frozenset[str]]:
+    """Scan `libs/nitro/include/**/*.h` for vendored macros,
+    struct/union/enum tags, and enum-value tags. Returns
+    `(macros, struct_types, enum_values)`. Cached per-call.
+
+    These three sets feed `detect_skip_reasons`'s D2/D3 checks —
+    a macro / struct-type that's vendored is no longer a refusal
+    trigger.
+    """
+    if libs_root in _VENDORED_CACHE:
+        return _VENDORED_CACHE[libs_root]
+    macros: set[str] = set()
+    structs: set[str] = set()
+    enum_values: set[str] = set()
+    include_dir = libs_root / "include"
+    if not include_dir.is_dir():
+        out = (frozenset(), frozenset(), frozenset())
+        _VENDORED_CACHE[libs_root] = out
+        return out
+    for header in include_dir.rglob("*.h"):
+        try:
+            text = header.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for m in _HEADER_MACRO_RE.finditer(text):
+            macros.add(m.group("name"))
+        for m in _HEADER_TYPEDEF_RE.finditer(text):
+            # typedef names are loaded as both macros and struct-
+            # types: a typedef like `typedef struct CardiCommon
+            # CARDiCommon;` makes `CARDiCommon` usable as a type
+            # in source, and a `#define`-style allow.
+            structs.add(m.group("name"))
+            macros.add(m.group("name"))
+        for m in _HEADER_STRUCT_DEF_RE.finditer(text):
+            structs.add(m.group("name"))
+        for m in _HEADER_ENUM_DEF_RE.finditer(text):
+            n = m.group("name")
+            if n:
+                structs.add(n)
+        # Enum-value approximation: ALL_CAPS identifier at start of
+        # line followed by `=`/`,`/`}`. Conservative — overcounts
+        # in the macros set is fine.
+        for line in text.splitlines():
+            mv = _HEADER_ENUM_VALUE_RE.match(line)
+            if mv:
+                enum_values.add(mv.group("name"))
+    out = (frozenset(macros), frozenset(structs), frozenset(enum_values))
+    _VENDORED_CACHE[libs_root] = out
+    return out
+
+
 def detect_skip_reasons(
     body: str, callees: list[str], data_refs: list[str],
     *,
     data_resolved: bool = False,
+    libs_root: Path = LIBS_NITRO,
 ) -> tuple[str, str] | None:
     """Run cheap skip-reason detectors on the upstream source
     body. Returns `(reason, detail)` on first hit, or None if all
@@ -191,39 +310,47 @@ def detect_skip_reasons(
     structural check (struct-access via `->` / `.field`) and macro
     heuristic still apply because those are source-text issues
     independent of the reloc map.
+
+    D2 / D3 (brief 070 follow-up): consult vendored identifiers in
+    `libs/nitro/include/` — macros and struct types that decomper
+    has already vendored don't trigger refusals.
     """
+    vendored_macros, vendored_structs, vendored_enums = (
+        load_vendored_identifiers(libs_root)
+    )
+
     # D4 — data reloc: only refuses if the caller hasn't resolved
     # them via the parallel-reloc map. (Pre-D4 behaviour was an
     # unconditional refusal.)
     if data_refs and not data_resolved:
         return ("data-ref", ", ".join(data_refs[:5]))
 
-    # D3 — struct access via -> or .field
-    m = _STRUCT_ARROW_RE.search(body)
-    if m:
-        # Surface a snippet around the match for actionable error.
-        idx = m.start()
-        snippet = body[max(0, idx - 8):idx + 16].replace("\n", " ")
-        return ("struct-access", f"-> at offset {idx}: …{snippet}…")
-    m = _STRUCT_DOT_RE.search(body)
-    if m:
-        idx = m.start()
-        snippet = body[max(0, idx - 8):idx + 16].replace("\n", " ")
-        # Don't flag obvious-not-struct cases like "u32 x.y" — but
-        # this heuristic catches `obj.field` clearly enough that
-        # most matches are real structs. False positives skip
-        # candidates conservatively, which is the right default.
-        return ("struct-access", f".field at offset {idx}: …{snippet}…")
+    # D3 — struct access via -> or .field, gated on whether the
+    # struct types being accessed are vendored.
+    if _STRUCT_ARROW_RE.search(body) or _STRUCT_DOT_RE.search(body):
+        # Collect struct-type hints in the body (CamelCase tokens
+        # in declaration position).
+        hints = {m.group("tag") for m in
+                 _STRUCT_TYPE_HINT_RE.finditer(body)}
+        # Filter out callees that incidentally match the CamelCase
+        # heuristic (e.g. `SomeFunc(arg)` shouldn't trip).
+        hints -= set(callees)
+        unvendored = hints - vendored_structs
+        if unvendored:
+            return ("struct-access",
+                    f"unvendored struct types: "
+                    f"{', '.join(sorted(unvendored)[:5])}")
 
-    # D2 — undefined macros
+    # D2 — undefined macros (now consults vendored set).
     callee_set = set(callees)
+    vendored_set = vendored_macros | vendored_enums
     for m in _MACRO_LIKE_RE.finditer(body):
-        # group(0) is the full match incl. `reg_` prefix; group(1)
-        # is the inner alternation match — same in practice.
         name = m.group(0)
         if name in _MACRO_ALLOWLIST:
             continue
         if name in callee_set:
+            continue
+        if name in vendored_set:
             continue
         # Found a real undefined-macro candidate.
         return ("undefined-macro", name)
