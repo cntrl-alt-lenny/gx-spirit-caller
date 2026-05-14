@@ -8,16 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 afternoon, **brief 065 FULL CHAIN
-CLOSED + brief 068 byte-fingerprint pipeline shipped.** Brief
-065 final tally: **400 byte-identical cross-region ports across
-3 waves / 92.6% cumulative precision** (200 USA + 200 JPN). Brief
-068 validates with **5/5 perfect 1.000 byte-sim** matches on
-pokediamond's `OS_tick.c` — and a critical SP refinement:
-NitroSDK + libnns subtrees use mwcc 1.2/sp2p3 = **EXACT match
-to our `.legacy.c` SP** (103 of 105 files in pokediamond's lib
-pool). Hit-rate jumps from 80-95% to 100% sample-validated.
-Brief 069 (cross-project bulk-port) NOW UNBLOCKED.
+**Last updated:** 2026-05-13 afternoon, **brief 069 wave 1
+hit the floor (10/50) — brain scoping miss.** Brief 069 spec
+listed `port_external_source.py` as a brief 068 deliverable
+but it wasn't shipped (brief 068 was fingerprint-only).
+Decomper built ad-hoc driver inline, shipped 10 byte-
+identical NitroSDK ports. **All 10 are real wins, merged.**
+EUR badge climbed 1.46% → 1.48%. Brief 070 queued: ship the
+proper `port_external_source.py` to unblock brief 071 (rerun
+of the bulk-port wave with proper tooling).
 
 ## This session in one paragraph
 
@@ -138,41 +137,26 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — autonomous candidates from wave 3 + queued briefs:**
+**Cloud — one HIGH brief active, one MEDIUM-LOW queued:**
 
-Autonomous-priority pickups (wave-3 surfaced):
-
-- `port_to_region.py` **rename-collision bug** — when the
-  parent EUR symbol's USA-renamed name matches a callee's
-  USA-renamed name, tool emits self-recursive code. Single
-  detect-and-refuse patch with clear error. Small.
-- **Named-tier blacklist sweep** — `Fill32` tripped the
-  linker in wave 3. Likely candidates from a NitroSDK callee
-  survey: `MI_*`, `OS_*`, `FS_*`, IRQ/DMA family. Pre-port
-  pruning makes brief 069's pool cleaner.
-- **v3 disambiguator training data** — 4 false-HIGH region-
-  divergent functions across 700 attempts (0.6% residual
-  rate stable across waves 2+3). Two ov011 + two main, all
-  easy-tier ≤0x20 size. Worth a v3 of `find_region_siblings`
-  if pursued.
-
-Scoped briefs still open:
-
-1. **Brief 063 (MEDIUM-LOW) — permuter auto-runner.**
+1. **Brief 070 (HIGH, ACTIVE)** — ship robust
+   `tools/port_external_source.py`. Four deliverables:
+   pokediamond `.map` integration (callee remap), primitive
+   header vendoring (macros + enums), struct-access support,
+   data-reference reloc handling. Unblocks brief 071
+   (decomper rerun). Funnel from brief 069 wave 1: 2887 HIGH
+   rows → 455 dedup → 14 driver-OK; brief 070 closes the
+   441-row gap.
+2. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
    Becomes high-priority on the next hard-tier cap-raise.
 
-Brief 062 / 066 / 068 all closed via PRs #422 / #429 / #432.
+PRs #422 / #429 / #432 / #434 / #435 closed.
 
-**Decomper — brief 069 NOW ACTIVE:**
+**Decomper — no active brief; brief 071 gated on brief 070:**
 
-2. **Brief 069 (HIGH, ACTIVE)** — first cross-project
-   bulk-port wave. Consumes brief 068's ranked CSV
-   (`--byte-scan pokediamond --format csv`). Targets the
-   NitroSDK + libnns subtrees (mwcc 1.2/sp2p3 = exact match
-   to our `.legacy.c` SP). 50-150 ports for wave 1; each
-   port lands in region-neutral `libs/` so it unlocks EUR +
-   USA + JPN simultaneously. Use `.legacy.c` routing for
-   NitroSDK + libnns ports.
+3. **Brief 071 (not yet written)** — cross-project bulk-port
+   wave 1 RERUN once brief 070 ships the proper driver. Same
+   shape as brief 069's spec; brain queues post-brief-070.
 
 **Cloud lower-priority candidates (autonomous-only):**
 

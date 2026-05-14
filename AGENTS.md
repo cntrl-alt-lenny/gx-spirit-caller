@@ -313,16 +313,15 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
-  — `decomper` (HIGH priority, **NOW ACTIVE** — brief 068
-  shipped via PR #432, validating with 5/5 perfect 1.000
-  byte-sim matches). First cross-project bulk-port wave.
-  Mechanical ports of upstream NitroSDK / libnns source into
-  region-neutral `libs/`. Each port unlocks EUR + USA + JPN
-  simultaneously. **Route via `.legacy.c`** — pokediamond's
-  NitroSDK + libnns subtrees use mwcc 1.2/sp2p3 = exact match
-  to our `.legacy.c` tier. Target 50-150 ports for wave 1.
-  Branch: `decomper/cross-project-bulk-port-wave-1`.
+- [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
+  — `cloud` (HIGH priority): ship a robust
+  `tools/port_external_source.py` after wave 1 of brief 069
+  (PR #436) hit the floor at 10 ports due to the absence of
+  this tool. Four deliverables: pokediamond `.map`
+  integration (callee remap), primitive header vendoring
+  (macros + enums), struct-access support, data-reference
+  reloc handling. Unblocks brief 071 (decomper rerun). Branch:
+  `cloud/port-external-source-driver`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -345,6 +344,16 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
+  `decomper`, shipped in PR #436 at the floor (10 ports vs 50
+  floor). **Brain scoping miss** — brief 069 listed
+  `port_external_source.py` as a brief 068 deliverable but
+  it wasn't in brief 068's actual scope. The 10 ports are all
+  byte-identical at 100% precision; the floor-miss is
+  port-driver maturity, not pipeline precision. Funnel
+  diagnostic: 2887 HIGH rows → 455 dedup → 14 driver-OK →
+  10 byte-match. Followed by brief 070 (ship the proper
+  driver) → brief 071 (decomper rerun).
 - [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
   `decomper`, full 3-wave chain shipped via PRs #423 / #428 /
   #431. **400 byte-identical cross-region matches (200 USA +
