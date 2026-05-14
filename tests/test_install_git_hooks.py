@@ -33,6 +33,13 @@ class TestPrePushHookExecutable(unittest.TestCase):
     perms), the install script re-applies it — but the fact that
     it shipped non-executable would still be a regression."""
 
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "Windows doesn't honour Unix exec-bits on regular files; "
+        "the bit is set on the checked-in file and propagates to "
+        "Linux/macOS hosts but Windows shows mode 0o666. The Linux "
+        "CI runner covers this assertion.",
+    )
     def test_pre_push_is_executable(self):
         hook = _ROOT / HOOKS_DIR_NAME / "pre-push"
         self.assertTrue(hook.is_file(), f"{hook} missing")
@@ -110,6 +117,12 @@ class TestInstallerEndToEnd(unittest.TestCase):
                 self._read_hooks_path(repo), HOOKS_DIR_NAME,
             )
 
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "Windows doesn't honour Unix exec-bits via chmod; the "
+        "install_git_hooks.py codepath that re-applies S_IXUSR is "
+        "a no-op there. Linux CI covers the contract.",
+    )
     def test_install_restores_exec_bit(self):
         with tempfile.TemporaryDirectory() as td:
             repo = self._setup_fake_repo(Path(td))

@@ -364,10 +364,18 @@ class TestComputeDelinksEntry(unittest.TestCase):
         entry = compute_delinks_entry(
             "func_02093160", 0x02093160, 0x9c,
         )
-        # Sanity: contains the right path, start, end
-        self.assertIn(str(LIBS_NITRO.relative_to(
-            LIBS_NITRO.parent.parent)) + "/func_02093160.legacy.c",
-            entry)
+        # Sanity: contains the right path, start, end. The path is
+        # in POSIX form (forward slashes) regardless of host —
+        # `compute_delinks_entry` uses `Path.as_posix()` so the
+        # checked-in `delinks.txt` convention is preserved across
+        # Linux / macOS / Windows authors.
+        expected_path = (
+            LIBS_NITRO.relative_to(LIBS_NITRO.parent.parent).as_posix()
+            + "/func_02093160.legacy.c"
+        )
+        self.assertIn(expected_path, entry)
+        # And explicitly: no backslashes leak through on Windows.
+        self.assertNotIn("\\", entry)
         self.assertIn("complete", entry)
         self.assertIn("start:0x02093160", entry)
         # 0x02093160 + 0x9c = 0x020931fc

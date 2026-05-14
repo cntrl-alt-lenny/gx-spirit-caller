@@ -43,8 +43,15 @@ def import_d_file(in_file: str) -> str:
                 if path[0] == "z":
                     path = path[2:].replace("\\", "/")
                 elif in_wsl():
+                    # Drop the colon after the drive letter, then
+                    # prepend `/mnt/`. Must NOT use `os.path.join`
+                    # here — on Windows hosts running this transform
+                    # under WSL (rare but possible), os.path.join
+                    # uses the native separator and produces
+                    # `/mnt\c/path` instead of `/mnt/c/path`.
+                    # The WSL convention is forward-slash-only.
                     path = path[0:1] + path[2:]
-                    path = os.path.join("/mnt", path.replace("\\", "/"))
+                    path = "/mnt/" + path.replace("\\", "/")
                 else:
                     path = os.path.realpath(
                         os.path.join(winedevices, path.replace("\\", "/"))

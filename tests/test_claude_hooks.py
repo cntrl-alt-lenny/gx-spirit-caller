@@ -150,7 +150,20 @@ class TestPostEditInternal(unittest.TestCase):
 
     def test_relative_path_for_abs_outside_root_is_none(self):
         # A tmp file path Claude's Edit tool touched via a scratch.
-        p = post_edit._relative_path("/tmp/elsewhere/x.py")
+        # Use the platform's actual tempdir so the path is truly
+        # absolute on every host — `/tmp/...` is absolute on Linux
+        # but relative-to-current-drive on Windows.
+        import tempfile
+        outside = Path(tempfile.gettempdir()).resolve() / "elsewhere" / "x.py"
+        # Sanity-check that the picked path really is outside ROOT;
+        # if a runner places its tempdir under the worktree (rare,
+        # but possible), the test premise is broken.
+        try:
+            outside.relative_to(post_edit.ROOT)
+            self.skipTest("tempdir resolved inside ROOT — premise broken")
+        except ValueError:
+            pass
+        p = post_edit._relative_path(str(outside))
         self.assertIsNone(p)
 
     def test_relative_path_for_relative_passes_through(self):

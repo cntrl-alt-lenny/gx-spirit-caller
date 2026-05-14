@@ -880,9 +880,17 @@ def compute_delinks_entry(
     our_name: str, our_addr: int, size: int,
     *, libs_root: Path = LIBS_NITRO,
 ) -> str:
-    """Format matches `config/<region>/<module>/delinks.txt`."""
+    """Format matches `config/<region>/<module>/delinks.txt`.
+
+    The path component is emitted in POSIX form (forward slashes)
+    regardless of host OS — `delinks.txt` is a checked-in config
+    file and the project's convention is POSIX everywhere. Without
+    `as_posix()` this function would write `libs\\nitro\\func.c`
+    entries on Windows hosts, which mismatch the rest of the
+    repo and break dsd's parser downstream.
+    """
     rel = compute_output_path(our_name, libs_root=libs_root)
-    rel = rel.relative_to(ROOT)
+    rel = rel.relative_to(ROOT).as_posix()
     return (
         f"{rel}:\n"
         f"    complete\n"

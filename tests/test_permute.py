@@ -289,8 +289,14 @@ class TestRenderReadme(unittest.TestCase):
         self.assertIn("func_02000800", md)
         self.assertIn("main", md)
         self.assertIn("0x02000800", md)
-        self.assertIn("src/main/entry.c", md)
-        self.assertIn("build/eur/disasm/main_02000800.s", md)
+        # POSIX-normalize the rendered markdown for Windows-host
+        # runs — `render_readme` interpolates the Path arguments
+        # via str(...) which uses backslashes on Windows. The
+        # logical content is correct on either platform; the
+        # normalisation just makes the substring assertion match.
+        md_posix = md.replace("\\", "/")
+        self.assertIn("src/main/entry.c", md_posix)
+        self.assertIn("build/eur/disasm/main_02000800.s", md_posix)
 
     def test_includes_followup_steps(self):
         md = render_readme(
@@ -348,13 +354,16 @@ class TestStageWorkDir(unittest.TestCase):
                     (work_dir / "README.md").is_file(),
                     "README.md should be generated",
                 )
-                # run.sh must be executable.
-                import stat as _stat
-                mode = (work_dir / "run.sh").stat().st_mode
-                self.assertTrue(
-                    mode & _stat.S_IXUSR,
-                    "run.sh must have S_IXUSR set",
-                )
+                # run.sh must be executable. Skip on Windows —
+                # Unix exec-bits don't exist there; the install/
+                # invocation flow is `bash ./run.sh` regardless.
+                if sys.platform != "win32":
+                    import stat as _stat
+                    mode = (work_dir / "run.sh").stat().st_mode
+                    self.assertTrue(
+                        mode & _stat.S_IXUSR,
+                        "run.sh must have S_IXUSR set",
+                    )
             finally:
                 # Clean up the artifact — stage_work_dir writes to
                 # the repo root, not the tmp dir.

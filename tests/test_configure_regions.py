@@ -41,6 +41,16 @@ finally:
     sys.argv = _OLD_ARGV
 
 
+def _posix(p) -> str:
+    """Render `p` (a path-like or string) in POSIX form regardless
+    of host OS. `Path.relative_to(...)` on Windows produces backslash
+    paths; the test assertions below compare against forward-slash
+    literals that match the project's actual on-disk convention
+    (delinks.txt, symbols.txt — POSIX everywhere). Without this
+    normalisation every region test would fail on Windows hosts."""
+    return str(p).replace("\\", "/")
+
+
 class TestIsRegionSourceExcluded(unittest.TestCase):
     """Pure-function tests for the per-region filter predicate."""
 
@@ -133,7 +143,7 @@ class TestGetCCppFilesRegion(unittest.TestCase):
             root = Path(td)
             self._build_tree(root)
             out = sorted(
-                str(p.relative_to(root)) for p in configure.get_c_cpp_files(
+                _posix(p.relative_to(root)) for p in configure.get_c_cpp_files(
                     [root / "src", root / "libs"], region="eur",
                 )
             )
@@ -148,7 +158,7 @@ class TestGetCCppFilesRegion(unittest.TestCase):
             root = Path(td)
             self._build_tree(root)
             out = sorted(
-                str(p.relative_to(root)) for p in configure.get_c_cpp_files(
+                _posix(p.relative_to(root)) for p in configure.get_c_cpp_files(
                     [root / "src", root / "libs"], region="usa",
                 )
             )
@@ -162,7 +172,7 @@ class TestGetCCppFilesRegion(unittest.TestCase):
             root = Path(td)
             self._build_tree(root)
             out = sorted(
-                str(p.relative_to(root)) for p in configure.get_c_cpp_files(
+                _posix(p.relative_to(root)) for p in configure.get_c_cpp_files(
                     [root / "src", root / "libs"], region="jpn",
                 )
             )
@@ -176,7 +186,7 @@ class TestGetCCppFilesRegion(unittest.TestCase):
             root = Path(td)
             self._build_tree(root)
             out = sorted(
-                str(p.relative_to(root)) for p in configure.get_c_cpp_files(
+                _posix(p.relative_to(root)) for p in configure.get_c_cpp_files(
                     [root / "src", root / "libs"],
                 )
             )
@@ -201,12 +211,12 @@ class TestGetAsmFilesRegion(unittest.TestCase):
             (root / "src" / "usa" / "main" / "boot.s").write_text("@ usa\n")
 
             eur_out = sorted(
-                str(p.relative_to(root)) for p in configure.get_asm_files(
+                _posix(p.relative_to(root)) for p in configure.get_asm_files(
                     [root / "src"], region="eur",
                 )
             )
             usa_out = sorted(
-                str(p.relative_to(root)) for p in configure.get_asm_files(
+                _posix(p.relative_to(root)) for p in configure.get_asm_files(
                     [root / "src"], region="usa",
                 )
             )
@@ -229,12 +239,12 @@ class TestGetSourceFilesRegion(unittest.TestCase):
             (root / "src" / "usa" / "main" / "g.s").write_text("")
 
             eur_out = sorted(
-                str(p.relative_to(root)) for p in configure.get_source_files(
+                _posix(p.relative_to(root)) for p in configure.get_source_files(
                     [root / "src"], region="eur",
                 )
             )
             usa_out = sorted(
-                str(p.relative_to(root)) for p in configure.get_source_files(
+                _posix(p.relative_to(root)) for p in configure.get_source_files(
                     [root / "src"], region="usa",
                 )
             )
