@@ -39,6 +39,7 @@ from port_external_source import (  # noqa: E402
     is_addr_complete,
     load_complete_ranges,
     load_vendored_identifiers,
+    CalleeResolution,
     remap_callees_in_body,
     remap_data_refs_in_body,
 )
@@ -214,68 +215,121 @@ class TestExtractFunctionBody(unittest.TestCase):
 # --------------------------------------------------------------------------- #
 
 
+def _unique(name: str, addr: int) -> CalleeResolution:
+    """Test helper: build a unique-match CalleeResolution."""
+    return CalleeResolution(candidates=((name, addr),))
+
+
+def _ambiguous(*candidates: tuple[str, int]) -> CalleeResolution:
+    """Test helper: build an ambiguous-match CalleeResolution."""
+    return CalleeResolution(candidates=tuple(candidates))
+
+
 class TestRemapCalleesInBody(unittest.TestCase):
     def test_basic_substitution(self):
         body = ("void OS_InitTick(void) {\n"
                 "    OSi_CountUpTick();\n"
                 "}\n")
         callees = ["OSi_CountUpTick"]
-        index = {"OSi_CountUpTick": ("func_02093160", 0x02093160)}
-        rewritten, remaps, unresolvable = remap_callees_in_body(
-            body, callees, index,
+        index = {"OSi_CountUpTick": _unique("func_02093160",
+                                              0x02093160)}
+        rewritten, remaps, unresolvable, ambiguous = (
+            remap_callees_in_body(body, callees, index)
         )
         self.assertIn("func_02093160", rewritten)
         self.assertNotIn("OSi_CountUpTick(", rewritten)
         self.assertEqual(remaps, {"OSi_CountUpTick": "func_02093160"})
         self.assertEqual(unresolvable, [])
+        self.assertEqual(ambiguous, {})
 
     def test_unresolvable_callee_reported(self):
         body = "void f(void) { mystery(); }"
         callees = ["mystery"]
-        out, remaps, unresolvable = remap_callees_in_body(
+        out, remaps, unresolvable, ambiguous = remap_callees_in_body(
             body, callees, {},  # empty index
         )
         # No substitution because unresolvable
         self.assertIn("mystery()", out)
         self.assertEqual(remaps, {})
         self.assertEqual(unresolvable, ["mystery"])
+        self.assertEqual(ambiguous, {})
+
+    def test_ambiguous_callee_reported(self):
+        # D1 v2 (wave-2 follow-up): OS_UnlockCartridge had two
+        # candidates in our pool at sim=1.0; the arbitrary-first
+        # pick was wrong. Now reported as ambiguous → caller
+        # refuses with `callee-ambiguous`.
+        body = "void f(void) { OS_UnlockCartridge(); }"
+        callees = ["OS_UnlockCartridge"]
+        index = {
+            "OS_UnlockCartridge": _ambiguous(
+                ("func_02009800", 0x02009800),
+                ("func_02009900", 0x02009900),
+            ),
+        }
+        out, remaps, unresolvable, ambiguous = remap_callees_in_body(
+            body, callees, index,
+        )
+        # No substitution applied for ambiguous candidates
+        self.assertIn("OS_UnlockCartridge", out)
+        self.assertEqual(remaps, {})
+        self.assertEqual(unresolvable, [])
+        self.assertIn("OS_UnlockCartridge", ambiguous)
+        self.assertEqual(len(ambiguous["OS_UnlockCartridge"]), 2)
 
     def test_longest_first_ordering(self):
-        # `func` is a prefix of `func_helper`. Longest-first
-        # ordering prevents `func` from being substituted inside
-        # `func_helper`.
         body = "void caller(void) { func(); func_helper(); }"
         callees = ["func", "func_helper"]
         index = {
-            "func": ("our_func", 0x1000),
-            "func_helper": ("our_helper", 0x2000),
+            "func": _unique("our_func", 0x1000),
+            "func_helper": _unique("our_helper", 0x2000),
         }
-        rewritten, _remaps, _ = remap_callees_in_body(
+        rewritten, _remaps, _, _ = remap_callees_in_body(
             body, callees, index,
         )
-        # Both names get substituted to their distinct local names
         self.assertIn("our_func", rewritten)
         self.assertIn("our_helper", rewritten)
-        # `our_helper` is not corrupted by a partial `func`→`our_func`
-        # substitution (e.g. `our_func_helper`)
         self.assertNotIn("our_func_helper", rewritten)
 
     def test_word_boundary_strict(self):
-        # `OS_Init` substitution should NOT rewrite `OS_InitTick`
-        # (longest-first handles this correctly).
         body = "void f(void) { OS_Init(); OS_InitTick(); }"
         callees = ["OS_Init", "OS_InitTick"]
         index = {
-            "OS_Init": ("local_init", 0x1000),
-            "OS_InitTick": ("local_inittick", 0x2000),
+            "OS_Init": _unique("local_init", 0x1000),
+            "OS_InitTick": _unique("local_inittick", 0x2000),
         }
-        rewritten, _remaps, _ = remap_callees_in_body(
+        rewritten, _remaps, _, _ = remap_callees_in_body(
             body, callees, index,
         )
         self.assertIn("local_init()", rewritten)
         self.assertIn("local_inittick()", rewritten)
-        # No mangled `local_initTick` from a partial substitution
         self.assertNotIn("local_initTick", rewritten)
+
+
+class TestCalleeResolution(unittest.TestCase):
+    """Dataclass invariants for the new CalleeResolution shape."""
+
+    def test_empty_is_neither_unique_nor_ambiguous(self):
+        r = CalleeResolution()
+        self.assertFalse(r.is_unique)
+        self.assertFalse(r.is_ambiguous)
+        self.assertIsNone(r.primary)
+
+    def test_single_candidate_is_unique(self):
+        r = CalleeResolution(candidates=(("x", 0x100),))
+        self.assertTrue(r.is_unique)
+        self.assertFalse(r.is_ambiguous)
+        self.assertEqual(r.primary, ("x", 0x100))
+
+    def test_multiple_candidates_is_ambiguous(self):
+        r = CalleeResolution(candidates=(
+            ("x", 0x100), ("y", 0x200),
+        ))
+        self.assertFalse(r.is_unique)
+        self.assertTrue(r.is_ambiguous)
+        # primary returns None for ambiguous — caller must use
+        # candidates explicitly
+        self.assertIsNone(r.primary)
 
 
 # --------------------------------------------------------------------------- #
