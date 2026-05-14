@@ -8,15 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-13 afternoon, **brief 069 wave 1
-hit the floor (10/50) — brain scoping miss.** Brief 069 spec
-listed `port_external_source.py` as a brief 068 deliverable
-but it wasn't shipped (brief 068 was fingerprint-only).
-Decomper built ad-hoc driver inline, shipped 10 byte-
-identical NitroSDK ports. **All 10 are real wins, merged.**
-EUR badge climbed 1.46% → 1.48%. Brief 070 queued: ship the
-proper `port_external_source.py` to unblock brief 071 (rerun
-of the bulk-port wave with proper tooling).
+**Last updated:** 2026-05-14 morning, **brief 070 D1 shipped
+(PR #438): 117 compile-ready candidates, 2.34× the floor.**
+9/10 of brief 069's wave 1 ports re-validate cleanly through
+the new driver. Brief 071 (decomper bulk-port wave 1 rerun)
+NOW ACTIVE — pool is 117 D1-ready candidates with self-extend
+waves absorbing D4/D3/D2 follow-ups as cloud ships them.
+Cloud parallelizes D2/D3/D4 against decomper's brief 071 work.
+EUR 1.48%, USA + JPN 0.19% each.
 
 ## This session in one paragraph
 
@@ -137,26 +136,35 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — one HIGH brief active, one MEDIUM-LOW queued:**
+**Cloud — D2/D3/D4 follow-ups in parallel autonomous PRs:**
 
-1. **Brief 070 (HIGH, ACTIVE)** — ship robust
-   `tools/port_external_source.py`. Four deliverables:
-   pokediamond `.map` integration (callee remap), primitive
-   header vendoring (macros + enums), struct-access support,
-   data-reference reloc handling. Unblocks brief 071
-   (decomper rerun). Funnel from brief 069 wave 1: 2887 HIGH
-   rows → 455 dedup → 14 driver-OK; brief 070 closes the
-   441-row gap.
-2. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
+1. **Brief 070 D1 (CLOSED, PR #438)** — port_external_source.py
+   callee-remap via .o reloc table. 117-candidate D1-ready
+   pool. 9/10 wave-1 re-validation. Skip-reason taxonomy
+   (struct-access 157, data-ref 110, undefined-macro 107)
+   gates D2/D3/D4.
+2. **D2 + D3 + D4 (cloud autonomous, ⚠️ scope-confirm)** —
+   brain green-lit on PR #438 review. Cloud sequencing
+   recommendation: D4 first (110 candidates, builds on D1
+   RelocRef infra; structurally similar to D1's callee
+   remap but for data symbols). Then D2 + D3 as a pair
+   (intertwined header + struct vendoring, 264 candidates
+   unlocked).
+3. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
    Becomes high-priority on the next hard-tier cap-raise.
 
-PRs #422 / #429 / #432 / #434 / #435 closed.
+Closed cloud briefs: 062/066/068/070-D1 plus four autonomous
+patches (#427/#434/#435/#438).
 
-**Decomper — no active brief; brief 071 gated on brief 070:**
+**Decomper — brief 071 NOW ACTIVE:**
 
-3. **Brief 071 (not yet written)** — cross-project bulk-port
-   wave 1 RERUN once brief 070 ships the proper driver. Same
-   shape as brief 069's spec; brain queues post-brief-070.
+4. **Brief 071 (HIGH, ACTIVE)** — cross-project bulk-port
+   wave 1 rerun. Pool: 117 D1-ready candidates surfaced by
+   PR #438's full sweep. Target 50-100 byte-identical ports
+   into region-neutral `libs/nitro/`. Self-extends 1/2 +
+   2/2 pull from D4 + D3 + D2 candidates as cloud ships them
+   in parallel. Routes as `.legacy.c` (1.2/sp2p3 exact SP
+   match per brief 068's audit).
 
 **Cloud lower-priority candidates (autonomous-only):**
 
