@@ -500,3 +500,111 @@ src/jpn/main/func_02068c1c.c:
 libs/nitro/func_02007218.legacy.c:
     complete
     .text start:0x020071fc end:0x02007214
+
+libs/nitro/func_0208b16c.legacy.c:
+    complete
+    .text start:0x0208b084 end:0x0208b0a8
+
+libs/nitro/func_0208b2a4.legacy.c:
+    complete
+    .text start:0x0208b1bc end:0x0208b1e4
+
+libs/nitro/func_0208b2cc.legacy.c:
+    complete
+    .text start:0x0208b1e4 end:0x0208b218
+
+libs/nitro/func_0208b920.legacy.c:
+    complete
+    .text start:0x0208b838 end:0x0208b864
+
+libs/nitro/func_0208b94c.legacy.c:
+    complete
+    .text start:0x0208b864 end:0x0208b898
+
+libs/nitro/func_0208e254.legacy.c:
+    complete
+    .text start:0x0208e16c end:0x0208e1b4
+
+libs/nitro/func_0208e29c.legacy.c:
+    complete
+    .text start:0x0208e1b4 end:0x0208e20c
+
+libs/nitro/func_0208e2f4.legacy.c:
+    complete
+    .text start:0x0208e20c end:0x0208e230
+
+libs/nitro/func_0208e43c.legacy.c:
+    complete
+    .text start:0x0208e354 end:0x0208e3e8
+
+libs/nitro/func_020903b0.legacy.c:
+    complete
+    .text start:0x020902c8 end:0x020902ec
+
+libs/nitro/func_02092860.legacy.c:
+    complete
+    .text start:0x02092778 end:0x02092784
+
+libs/nitro/func_02092928.legacy.c:
+    complete
+    .text start:0x02092840 end:0x0209284c
+
+libs/nitro/func_02092934.legacy.c:
+    complete
+    .text start:0x0209284c end:0x02092858
+
+libs/nitro/func_02092e4c.legacy.c:
+    complete
+    .text start:0x02092d64 end:0x02092d74
+
+libs/nitro/func_02092e5c.legacy.c:
+    complete
+    .text start:0x02092d74 end:0x02092d84
+
+libs/nitro/func_02092e6c.legacy.c:
+    complete
+    .text start:0x02092d84 end:0x02092d98
+
+libs/nitro/func_02092e80.legacy.c:
+    complete
+    .text start:0x02092d98 end:0x02092da0
+
+libs/nitro/func_02092e88.legacy.c:
+    complete
+    .text start:0x02092da0 end:0x02092da8
+
+libs/nitro/func_02093bf0.legacy.c:
+    complete
+    .text start:0x02093afc end:0x02093b08
+
+libs/nitro/func_02094588.legacy.c:
+    complete
+    .text start:0x02094494 end:0x020944b0
+
+libs/nitro/func_020945a4.legacy.c:
+    complete
+    .text start:0x020944b0 end:0x020944d4
+
+libs/nitro/func_020945c8.legacy.c:
+    complete
+    .text start:0x020944d4 end:0x02094500
+
+libs/nitro/func_020947c8.legacy.c:
+    complete
+    .text start:0x020946d4 end:0x020946dc
+
+libs/nitro/func_020a66a4.legacy.c:
+    complete
+    .text start:0x020a65b0 end:0x020a65f4
+
+libs/nitro/func_02093a20.legacy.c:
+    complete
+    .text start:0x0209392c end:0x02093948
+
+libs/nitro/func_02095158.legacy.c:
+    complete
+    .text start:0x02095064 end:0x0209508c
+
+libs/nitro/func_02095180.legacy.c:
+    complete
+    .text start:0x0209508c end:0x020950b4
