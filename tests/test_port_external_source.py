@@ -28,6 +28,7 @@ sys.path.insert(0, str(_TOOLS))
 from port_external_source import (  # noqa: E402
     PortRequest,
     PortResult,
+    _COMPLETE_RANGES_CACHE,
     _VENDORED_CACHE,
     aggregate_skip_reasons,
     build_parallel_reloc_data_map,
@@ -35,6 +36,8 @@ from port_external_source import (  # noqa: E402
     compute_output_path,
     detect_skip_reasons,
     extract_function_body,
+    is_addr_complete,
+    load_complete_ranges,
     load_vendored_identifiers,
     remap_callees_in_body,
     remap_data_refs_in_body,
@@ -737,6 +740,155 @@ class TestPortResultDataRemaps(unittest.TestCase):
         self.assertIn("callee_remaps", d)
         self.assertIn("data_remaps", d)
         self.assertEqual(d["data_remaps"]["OSi_X"], "data_xxx")
+
+
+# --------------------------------------------------------------------------- #
+# Wave-1 follow-ups (PR #443): TU-collision pre-filter + ish-mismatch
+# --------------------------------------------------------------------------- #
+
+
+class TestLoadCompleteRanges(unittest.TestCase):
+    """`load_complete_ranges` parses `delinks.txt` entries marked
+    `complete` and returns their `.text` address ranges. Used by
+    the sweep to skip already-claimed addresses early."""
+
+    def _make_config(self, region: str, files: dict[str, str]) -> Path:
+        tmp = Path(tempfile.mkdtemp())
+        for rel, content in files.items():
+            path = tmp / region / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        return tmp
+
+    def test_parses_single_complete_entry(self):
+        from unittest import mock
+        tmp = self._make_config("eur", {
+            "arm9/delinks.txt": (
+                "src/main/CpuSet.c:\n"
+                "    complete\n"
+                "    .text start:0x02000254 end:0x02000258\n"
+            ),
+        })
+        _COMPLETE_RANGES_CACHE.clear()
+        with mock.patch("port_external_source.CONFIG_DIR", tmp):
+            ranges = load_complete_ranges("eur")
+        self.assertEqual(ranges, ((0x02000254, 0x02000258),))
+
+    def test_skips_incomplete_entries(self):
+        # An entry without `complete` shouldn't contribute.
+        from unittest import mock
+        tmp = self._make_config("eur", {
+            "arm9/delinks.txt": (
+                "src/main/Done.c:\n"
+                "    complete\n"
+                "    .text start:0x02000100 end:0x02000110\n"
+                "\n"
+                "src/main/InProgress.c:\n"
+                "    .text start:0x02000200 end:0x02000210\n"
+            ),
+        })
+        _COMPLETE_RANGES_CACHE.clear()
+        with mock.patch("port_external_source.CONFIG_DIR", tmp):
+            ranges = load_complete_ranges("eur")
+        self.assertEqual(ranges, ((0x02000100, 0x02000110),))
+
+    def test_walks_overlays_and_subdirs(self):
+        from unittest import mock
+        tmp = self._make_config("eur", {
+            "arm9/delinks.txt": (
+                "src/main/A.c:\n"
+                "    complete\n"
+                "    .text start:0x02000000 end:0x02000010\n"
+            ),
+            "arm9/itcm/delinks.txt": (
+                "src/itcm/B.c:\n"
+                "    complete\n"
+                "    .text start:0x01ff8000 end:0x01ff8010\n"
+            ),
+            "arm9/overlays/ov002/delinks.txt": (
+                "src/overlay002/C.c:\n"
+                "    complete\n"
+                "    .text start:0x021a0000 end:0x021a0010\n"
+            ),
+        })
+        _COMPLETE_RANGES_CACHE.clear()
+        with mock.patch("port_external_source.CONFIG_DIR", tmp):
+            ranges = load_complete_ranges("eur")
+        self.assertIn((0x02000000, 0x02000010), ranges)
+        self.assertIn((0x01ff8000, 0x01ff8010), ranges)
+        self.assertIn((0x021a0000, 0x021a0010), ranges)
+
+    def test_missing_region_returns_empty(self):
+        from unittest import mock
+        tmp = Path(tempfile.mkdtemp())
+        _COMPLETE_RANGES_CACHE.clear()
+        with mock.patch("port_external_source.CONFIG_DIR", tmp):
+            ranges = load_complete_ranges("nonexistent")
+        self.assertEqual(ranges, ())
+
+    def test_dedup(self):
+        # Same range in two different delinks.txt files → reported once.
+        from unittest import mock
+        tmp = self._make_config("eur", {
+            "arm9/delinks.txt": (
+                "src/A.c:\n"
+                "    complete\n"
+                "    .text start:0x02000000 end:0x02000010\n"
+            ),
+            "arm9/itcm/delinks.txt": (
+                "src/B.c:\n"
+                "    complete\n"
+                "    .text start:0x02000000 end:0x02000010\n"
+            ),
+        })
+        _COMPLETE_RANGES_CACHE.clear()
+        with mock.patch("port_external_source.CONFIG_DIR", tmp):
+            ranges = load_complete_ranges("eur")
+        self.assertEqual(ranges, ((0x02000000, 0x02000010),))
+
+
+class TestIsAddrComplete(unittest.TestCase):
+    def test_addr_in_range(self):
+        ranges = ((0x02000100, 0x02000200), (0x02001000, 0x02001100))
+        self.assertTrue(is_addr_complete(0x02000150, ranges))
+        self.assertTrue(is_addr_complete(0x02000100, ranges))  # start inclusive
+        self.assertTrue(is_addr_complete(0x020010ff, ranges))
+
+    def test_addr_at_end_exclusive(self):
+        # `end` is exclusive (matches delinks.txt convention).
+        ranges = ((0x02000100, 0x02000200),)
+        self.assertFalse(is_addr_complete(0x02000200, ranges))
+
+    def test_addr_outside(self):
+        ranges = ((0x02000100, 0x02000200),)
+        self.assertFalse(is_addr_complete(0x020000ff, ranges))
+        self.assertFalse(is_addr_complete(0x02000300, ranges))
+
+    def test_empty_ranges(self):
+        self.assertFalse(is_addr_complete(0x02000000, ()))
+
+
+class TestIshFieldOnExternalFunc(unittest.TestCase):
+    """Brief 070 wave-1 follow-up: ExternalFunc exposes `ish`
+    ("arm" / "thumb") so the port driver can refuse-fast on
+    instruction-set mismatch. MI_Zero36B worked example."""
+
+    def test_defaults_to_arm(self):
+        from external_obj import ExternalFunc
+        f = ExternalFunc(
+            name="f", section_index=1,
+            bytes_=b"\x00" * 4, size=4,
+        )
+        self.assertEqual(f.ish, "arm")
+
+    def test_thumb_ish_settable(self):
+        from external_obj import ExternalFunc
+        f = ExternalFunc(
+            name="f", section_index=1,
+            bytes_=b"\x00" * 4, size=4,
+            ish="thumb",
+        )
+        self.assertEqual(f.ish, "thumb")
 
 
 if __name__ == "__main__":

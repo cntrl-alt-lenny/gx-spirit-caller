@@ -253,6 +253,13 @@ class ExternalFunc:
     # Raw section bytes (function instruction stream)
     bytes_: bytes
     size: int
+    # Instruction set — "arm" or "thumb". Brief 070 wave-1
+    # follow-up (PR #443): on ARM ELF, STT_FUNC symbols for
+    # THUMB functions have their st_value's LSB set. Without
+    # this we mis-match a THUMB-targeted ports against an ARM
+    # upstream (or vice versa) — the byte-fingerprint check
+    # accidentally passes on the shared prefix bytes.
+    ish: str = "arm"
     # Reloc-from offsets within the function bytes (i.e. byte
     # offsets where a 4-byte reloc word lives). Used by
     # `function_fingerprint` to zero out reloc slots before
@@ -403,19 +410,28 @@ def extract_functions(o_path: Path) -> list[ExternalFunc]:
         # mwccarm emits ARM/Thumb mode markers as STT_FUNC named
         # `$a` / `$t` / `$d` at section offset 0 — those are
         # placeholders, not real function names. We pick the
-        # first STT_FUNC at offset 0 whose name doesn't start
-        # with `$`.
+        # first STT_FUNC at section offset 0 whose name doesn't
+        # start with `$`.
+        #
+        # ARM ELF convention: THUMB function symbols have their
+        # st_value LSB set. So a THUMB function defined at
+        # section offset 0 has st_value == 1, not 0. We accept
+        # value in {0, 1} and detect ish from the LSB.
         name = ""
+        ish = "arm"
         for sym in elf["symbols"]:
             if sym["shndx"] != i:
                 continue
             if sym["type"] != 2:  # STT_FUNC
                 continue
-            if sym["value"] != 0:
+            sym_value = sym["value"]
+            # Strip the THUMB bit when checking "at section offset 0"
+            if (sym_value & ~1) != 0:
                 continue
             if sym["name"].startswith("$") or not sym["name"]:
                 continue
             name = sym["name"]
+            ish = "thumb" if (sym_value & 1) else "arm"
             break
         if not name:
             continue
@@ -457,6 +473,7 @@ def extract_functions(o_path: Path) -> list[ExternalFunc]:
             section_index=i,
             bytes_=sec_bytes,
             size=len(sec_bytes),
+            ish=ish,
             reloc_offsets=reloc_offsets,
             relocs=tuple(ref_list),
         ))

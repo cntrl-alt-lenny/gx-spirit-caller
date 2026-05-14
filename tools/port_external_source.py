@@ -681,6 +681,102 @@ def _find_our_module_for_addr(
     return None
 
 
+# --------------------------------------------------------------------------- #
+# Wave-1 follow-ups — TU-collision pre-filter + ish-mismatch check
+# --------------------------------------------------------------------------- #
+
+
+# Cache for parsed delinks.txt complete-ranges. Keyed by region.
+_COMPLETE_RANGES_CACHE: dict[str, tuple[tuple[int, int], ...]] = {}
+
+
+# Regex matching `.text start:0x<addr> end:0x<addr>` inside a
+# delinks.txt entry. Brief 070 wave 1 surfaced that ~30% of sweep
+# candidates land on addresses already claimed `complete` by an
+# existing TU — those should refuse pre-emptively rather than
+# burn iteration time on a redundant port.
+_DELINKS_TEXT_RANGE_RE = re.compile(
+    r"\.text\s+start:0x(?P<start>[0-9a-fA-F]+)"
+    r"\s+end:0x(?P<end>[0-9a-fA-F]+)"
+)
+
+
+def load_complete_ranges(
+    region: str,
+) -> tuple[tuple[int, int], ...]:
+    """Parse every `delinks.txt` under `config/<region>/` for
+    entries marked `complete` and return their `.text` address
+    ranges as a sorted tuple of `(start, end)` pairs.
+
+    Brief 070 wave-1 follow-up — TU-collision pre-filter. The
+    sweep driver consults this set and refuses any candidate whose
+    `our_addr` falls inside a complete range (it's already
+    claimed).
+    """
+    if region in _COMPLETE_RANGES_CACHE:
+        return _COMPLETE_RANGES_CACHE[region]
+    region_dir = CONFIG_DIR / region
+    if not region_dir.is_dir():
+        _COMPLETE_RANGES_CACHE[region] = ()
+        return ()
+    ranges: list[tuple[int, int]] = []
+    # Walk every delinks.txt. Format: each TU entry is a
+    # `<path>:` header followed by indented lines. We accumulate
+    # all `.text start: end:` ranges that appear in an entry
+    # whose body contains the word `complete`.
+    for delinks in region_dir.rglob("delinks.txt"):
+        try:
+            text = delinks.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        # Split into entries by blank lines; track which entries
+        # have `complete` and collect their `.text` ranges.
+        for entry in text.split("\n\n"):
+            if "complete" not in entry:
+                continue
+            for m in _DELINKS_TEXT_RANGE_RE.finditer(entry):
+                start = int(m.group("start"), 16)
+                end = int(m.group("end"), 16)
+                ranges.append((start, end))
+    ranges_t = tuple(sorted(set(ranges)))
+    _COMPLETE_RANGES_CACHE[region] = ranges_t
+    return ranges_t
+
+
+def is_addr_complete(
+    addr: int, ranges: tuple[tuple[int, int], ...],
+) -> bool:
+    """O(n) range membership check. `ranges` is small (hundreds
+    of entries on EUR's current state), so linear scan is fine."""
+    for start, end in ranges:
+        if start <= addr < end:
+            return True
+    return False
+
+
+def load_our_function_ish(
+    region: str, module: str, addr: int,
+) -> str | None:
+    """Look up our local function's instruction set
+    ("arm"/"thumb") from `config/<region>/<module>/symbols.txt`.
+
+    Used by the ish-mismatch check (brief 070 wave-1 follow-up).
+    MI_Zero36B was the worked example: our local is
+    `kind:function(thumb,size=0xe)` while pokediamond's
+    MI_Zero36B is ARM at size 0x1c. The byte-fingerprint passes
+    on a shared prefix; the ish check rejects it cleanly.
+    """
+    sys.path.insert(0, str(ROOT / "tools"))
+    import find_region_siblings as frs  # noqa: E402
+
+    region_funcs = frs.load_region(region)
+    mod_funcs = region_funcs.get(module, [])
+    for f in mod_funcs:
+        if f.addr == addr:
+            return f.ish
+    return None
+
+
 def remap_data_refs_in_body(
     body: str, data_map: dict[str, str],
 ) -> str:
@@ -757,6 +853,19 @@ def port_function(
             detail=f"{request.src_rel} in {request.repo}",
         )
 
+    # Wave-1 follow-up: TU-collision pre-filter. Refuse early if
+    # this address is already claimed `complete` in any
+    # delinks.txt — no point compiling upstream / running the
+    # full pipeline for an addr that's already done.
+    complete_ranges = load_complete_ranges(request.our_region)
+    if is_addr_complete(request.our_addr, complete_ranges):
+        return PortResult(
+            status="refused", reason="already-complete",
+            detail=(f"0x{request.our_addr:08x} is in a "
+                    f"delinks.txt complete range "
+                    f"(config/{request.our_region}/...)"),
+        )
+
     # Compile + extract the upstream function
     o_path = external_obj.compile_external(request.repo, request.src_rel)
     if o_path is None:
@@ -772,6 +881,25 @@ def port_function(
             status="refused", reason="upstream-func-not-in-obj",
             detail=f"{request.upstream_func} not in {request.src_rel}",
         )
+
+    # Wave-1 follow-up: ish-mismatch (ARM vs THUMB) refuse-fast.
+    # Look up our local function's instruction set; if it differs
+    # from upstream's, the byte-fingerprint match was a false-pass
+    # on a shared prefix. MI_Zero36B worked example: our THUMB
+    # 0xe vs upstream ARM 0x1c.
+    our_module = _find_our_module_for_addr(
+        request.our_region, request.our_addr,
+    )
+    if our_module is not None:
+        our_ish = load_our_function_ish(
+            request.our_region, our_module, request.our_addr,
+        )
+        if our_ish is not None and our_ish != target.ish:
+            return PortResult(
+                status="refused", reason="ish-mismatch",
+                detail=(f"our {our_ish} vs upstream {target.ish} "
+                        f"({request.upstream_func})"),
+            )
 
     # Parse upstream source body
     src_text = src_path.read_text(encoding="utf-8")
@@ -792,12 +920,8 @@ def port_function(
 
     # D4 — Data-ref remap via parallel-reloc map.
     #
-    # Find our local function in symbols.txt to get its
-    # (module, addr, size) tuple. Without that we can't index
-    # into the relocs table.
-    our_module = _find_our_module_for_addr(
-        request.our_region, request.our_addr,
-    )
+    # `our_module` was resolved earlier for the ish-mismatch
+    # check; reuse it here without a second symbols.txt scan.
     data_map: dict[str, str] = {}
     data_unresolved: list[str] = []
     if data_refs:

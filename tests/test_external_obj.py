@@ -249,6 +249,29 @@ class TestElfParser(unittest.TestCase):
             funcs = extract_functions(path)
             self.assertEqual(len(funcs), 1)
             self.assertEqual(funcs[0].name, "OS_GetTick")
+            self.assertEqual(funcs[0].ish, "arm")
+        finally:
+            path.unlink()
+
+    def test_thumb_bit_detected(self):
+        # ARM ELF convention: THUMB STT_FUNC symbols have st_value's
+        # LSB set. A THUMB function at section offset 0 has
+        # st_value == 1. Brief 070 wave-1 follow-up: catch ish
+        # mismatches that the byte-fingerprint would false-pass.
+        elf = _make_minimal_elf(
+            sections_data={".text": b"\x70\x47\x00\x00"},   # bx lr Thumb
+            symbols=[
+                ("MI_Zero36B", 1, 2, 2, 1),  # value=1 → THUMB
+            ],
+        )
+        with tempfile.NamedTemporaryFile(suffix=".o", delete=False) as f:
+            f.write(elf)
+            path = Path(f.name)
+        try:
+            funcs = extract_functions(path)
+            self.assertEqual(len(funcs), 1)
+            self.assertEqual(funcs[0].name, "MI_Zero36B")
+            self.assertEqual(funcs[0].ish, "thumb")
         finally:
             path.unlink()
 
