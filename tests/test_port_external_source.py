@@ -29,11 +29,13 @@ from port_external_source import (  # noqa: E402
     PortRequest,
     PortResult,
     aggregate_skip_reasons,
+    build_parallel_reloc_data_map,
     compute_delinks_entry,
     compute_output_path,
     detect_skip_reasons,
     extract_function_body,
     remap_callees_in_body,
+    remap_data_refs_in_body,
 )
 
 
@@ -44,8 +46,9 @@ from port_external_source import (  # noqa: E402
 
 class TestDetectSkipReasons(unittest.TestCase):
     def test_data_ref_takes_precedence(self):
-        # Data refs are the cleanest signal (we know them by name
-        # from the reloc table) so they get checked first.
+        # Pre-D4 behaviour: unresolved data refs refuse the port.
+        # (D4 callers pass `data_resolved=True` after running the
+        # parallel-reloc map, which skips this check.)
         body = "void f(void) { int x = 0; }"
         callees = []
         data_refs = ["OSi_TickCounter"]
@@ -53,6 +56,16 @@ class TestDetectSkipReasons(unittest.TestCase):
         self.assertIsNotNone(out)
         self.assertEqual(out[0], "data-ref")
         self.assertIn("OSi_TickCounter", out[1])
+
+    def test_data_resolved_skips_data_check(self):
+        # When D4's parallel-reloc map has resolved the data refs,
+        # the caller passes data_resolved=True and detect_skip_reasons
+        # falls through to the struct + macro checks.
+        body = "u32 f(void) { return OSi_TickCounter; }"
+        out = detect_skip_reasons(
+            body, [], ["OSi_TickCounter"], data_resolved=True,
+        )
+        self.assertIsNone(out)
 
     def test_struct_arrow_detected(self):
         body = "void f(Thread *t) { t->state = 1; }"
@@ -390,6 +403,199 @@ class TestExternalObjRelocs(unittest.TestCase):
         )
         self.assertEqual(f.callee_names(), [])
         self.assertEqual(f.data_refs(), [])
+
+
+# --------------------------------------------------------------------------- #
+# D4 — Data-ref remap via parallel-reloc map
+# --------------------------------------------------------------------------- #
+
+
+class TestRemapDataRefsInBody(unittest.TestCase):
+    def test_basic_substitution(self):
+        body = "u32 f(void) { return OSi_TickCounter; }"
+        data_map = {"OSi_TickCounter": "data_020c3f48"}
+        out = remap_data_refs_in_body(body, data_map)
+        self.assertIn("data_020c3f48", out)
+        self.assertNotIn("OSi_TickCounter", out)
+
+    def test_empty_map_passthrough(self):
+        body = "u32 f(void) { return 0; }"
+        self.assertEqual(remap_data_refs_in_body(body, {}), body)
+
+    def test_longest_first_for_overlapping_names(self):
+        # `OSi_Tick` is a prefix of `OSi_TickCounter`. Longest-first
+        # prevents wrong substitution.
+        body = "u32 f(void) { return OSi_TickCounter + OSi_Tick; }"
+        data_map = {
+            "OSi_Tick": ("data_aaaa"),
+            "OSi_TickCounter": ("data_bbbb"),
+        }
+        out = remap_data_refs_in_body(body, data_map)
+        self.assertIn("data_aaaa", out)
+        self.assertIn("data_bbbb", out)
+        # `data_aaaa` is not nested inside `data_bbbb` from a partial match
+        self.assertNotIn("data_aaaaCounter", out)
+
+    def test_word_boundary_no_partial_match(self):
+        body = "void f(void) { OSi_Tick(); OSi_TickPrefix; }"
+        data_map = {"OSi_Tick": "data_xxx"}
+        out = remap_data_refs_in_body(body, data_map)
+        # `OSi_Tick(` (with paren) gets substituted because the
+        # word boundary fires between `k` and `(`. That's fine —
+        # the regex is correct.
+        self.assertIn("data_xxx()", out)
+        # `OSi_TickPrefix` is the same word from `OSi_Tick`'s
+        # perspective — \b doesn't fire between `k` and `P`.
+        # Verify it stays unchanged.
+        self.assertIn("OSi_TickPrefix", out)
+
+
+class TestBuildParallelRelocDataMap(unittest.TestCase):
+    """The cross-project analogue of port_to_region's parallel-
+    reloc data symbol map. Same invariant: byte-identical
+    functions share offset+kind reloc structure; addresses differ
+    per project. Tested via mocked region data."""
+
+    def _make_external_func(self, name: str, size: int,
+                            relocs: list):
+        from external_obj import ExternalFunc
+        return ExternalFunc(
+            name=name, section_index=1,
+            bytes_=b"\x00" * size, size=size,
+            relocs=tuple(relocs),
+        )
+
+    def test_single_data_ref_mapped(self):
+        from external_obj import RelocRef
+        from unittest import mock
+        ext = self._make_external_func("OS_GetTick", 0xb0, [
+            RelocRef(offset=0x10, target="OSi_TickCounter", kind="data"),
+        ])
+        # Mock region data: at our address, offset 0x10 has a data
+        # reloc pointing to addr 0x020c3f48 in module "main"; our
+        # symbols.txt names that addr `data_020c3f48`.
+        fake_relocs = {
+            "main": {0x020930c0: [("arm-data", 0x020c3f48, "main")]},
+        }
+        fake_data_symbols = {0x020c3f48: "data_020c3f48"}
+        with mock.patch("port_external_source._load_region_data",
+                         return_value=(fake_relocs, fake_data_symbols)):
+            mapping, unresolved = build_parallel_reloc_data_map(
+                ext, "main", 0x020930b0, 0xb0, "eur",
+            )
+        self.assertEqual(mapping, {"OSi_TickCounter": "data_020c3f48"})
+        self.assertEqual(unresolved, [])
+
+    def test_unresolved_when_no_local_reloc_at_offset(self):
+        from external_obj import RelocRef
+        from unittest import mock
+        ext = self._make_external_func("OS_GetTick", 0xb0, [
+            RelocRef(offset=0x10, target="OSi_TickCounter", kind="data"),
+        ])
+        # Our local has no reloc at offset 0x10 — collision.
+        fake_relocs = {"main": {}}
+        fake_data_symbols = {}
+        with mock.patch("port_external_source._load_region_data",
+                         return_value=(fake_relocs, fake_data_symbols)):
+            mapping, unresolved = build_parallel_reloc_data_map(
+                ext, "main", 0x020930b0, 0xb0, "eur",
+            )
+        self.assertEqual(mapping, {})
+        self.assertEqual(unresolved, ["OSi_TickCounter"])
+
+    def test_unresolved_when_addr_not_in_symbols(self):
+        from external_obj import RelocRef
+        from unittest import mock
+        ext = self._make_external_func("OS_GetTick", 0xb0, [
+            RelocRef(offset=0x10, target="OSi_TickCounter", kind="data"),
+        ])
+        # Reloc exists but the target addr isn't in symbols.txt
+        # (shouldn't happen in healthy config, but defensive).
+        fake_relocs = {
+            "main": {0x020930c0: [("arm-data", 0x99999999, "main")]},
+        }
+        fake_data_symbols = {0x020c3f48: "data_020c3f48"}
+        with mock.patch("port_external_source._load_region_data",
+                         return_value=(fake_relocs, fake_data_symbols)):
+            mapping, unresolved = build_parallel_reloc_data_map(
+                ext, "main", 0x020930b0, 0xb0, "eur",
+            )
+        self.assertEqual(mapping, {})
+        self.assertEqual(unresolved, ["OSi_TickCounter"])
+
+    def test_function_callees_ignored(self):
+        from external_obj import RelocRef
+        from unittest import mock
+        ext = self._make_external_func("OS_InitTick", 0x9c, [
+            # func kind — not D4's scope
+            RelocRef(offset=0x20, target="OSi_CountUpTick", kind="func"),
+            # data kind — D4 handles it
+            RelocRef(offset=0x30, target="OSi_NeedResetTimer", kind="data"),
+        ])
+        # Local reloc at 0x020931f8 + 0x30 = 0x02093228
+        fake_relocs = {
+            "main": {0x02093228: [("arm-data", 0x020c3f4c, "main")]},
+        }
+        fake_data_symbols = {0x020c3f4c: "data_020c3f4c"}
+        with mock.patch("port_external_source._load_region_data",
+                         return_value=(fake_relocs, fake_data_symbols)):
+            mapping, unresolved = build_parallel_reloc_data_map(
+                ext, "main", 0x020931f8, 0x9c, "eur",
+            )
+        # Only the data reloc shows up — func reloc skipped
+        self.assertEqual(mapping, {"OSi_NeedResetTimer": "data_020c3f4c"})
+
+    def test_multiple_data_refs_at_different_offsets(self):
+        from external_obj import RelocRef
+        from unittest import mock
+        ext = self._make_external_func("f", 0x40, [
+            RelocRef(offset=0x10, target="OSi_A", kind="data"),
+            RelocRef(offset=0x20, target="OSi_B", kind="data"),
+            RelocRef(offset=0x30, target="OSi_C", kind="data"),
+        ])
+        # Our local has 3 data relocs at the matching offsets
+        fake_relocs = {
+            "main": {
+                0x02000010: [("arm-data", 0x020c1000, "main")],
+                0x02000020: [("arm-data", 0x020c2000, "main")],
+                0x02000030: [("arm-data", 0x020c3000, "main")],
+            },
+        }
+        fake_data_symbols = {
+            0x020c1000: "data_020c1000",
+            0x020c2000: "data_020c2000",
+            0x020c3000: "data_020c3000",
+        }
+        with mock.patch("port_external_source._load_region_data",
+                         return_value=(fake_relocs, fake_data_symbols)):
+            mapping, _ = build_parallel_reloc_data_map(
+                ext, "main", 0x02000000, 0x40, "eur",
+            )
+        self.assertEqual(mapping, {
+            "OSi_A": "data_020c1000",
+            "OSi_B": "data_020c2000",
+            "OSi_C": "data_020c3000",
+        })
+
+
+class TestPortResultDataRemaps(unittest.TestCase):
+    """PortResult exposes D4's data_remaps separately from D1's
+    callee_remaps for downstream metrics aggregation."""
+
+    def test_default_empty(self):
+        res = PortResult(status="ok", reason="ok")
+        self.assertEqual(res.data_remaps, {})
+
+    def test_to_dict_includes_data_remaps(self):
+        res = PortResult(
+            status="ok", reason="ok",
+            callee_remaps={"caller": "local_caller"},
+            data_remaps={"OSi_X": "data_xxx"},
+        )
+        d = res.to_dict()
+        self.assertIn("callee_remaps", d)
+        self.assertIn("data_remaps", d)
+        self.assertEqual(d["data_remaps"]["OSi_X"], "data_xxx")
 
 
 if __name__ == "__main__":
