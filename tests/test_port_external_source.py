@@ -945,5 +945,107 @@ class TestIshFieldOnExternalFunc(unittest.TestCase):
         self.assertEqual(f.ish, "thumb")
 
 
+# --------------------------------------------------------------------------- #
+# Brief 077 — strip leading `static` from rewritten port body
+# --------------------------------------------------------------------------- #
+
+
+class TestStaticKeywordStrip(unittest.TestCase):
+    """Brief 077: dsd-gap TUs are never static; preserving the
+    keyword shifts mwldarm's symbol allocation and breaks
+    layout. _compose_port_source strips leading `static` from
+    the rewritten body before emitting the final source."""
+
+    def _compose(self, body: str) -> str:
+        from external_obj import ExternalFunc
+        from port_external_source import (
+            PortRequest, _compose_port_source,
+        )
+        req = PortRequest(
+            repo="pokediamond",
+            src_rel="arm9/lib/NitroSDK/src/OS_thread.c",
+            upstream_func="OSi_IdleThreadProc",
+            our_region="eur",
+            our_addr=0x02007218,
+            our_name="func_02007218",
+        )
+        ext_fn = ExternalFunc(
+            name="OSi_IdleThreadProc",
+            section_index=1,
+            bytes_=b"\x00" * 0x18, size=0x18,
+        )
+        return _compose_port_source(
+            body, "func_02007218", req, ext_fn, remaps={},
+        )
+
+    def test_static_qualifier_stripped(self):
+        # Brief 074 wave 3 worked example: OSi_IdleThreadProc
+        # was declared `static void OSi_IdleThreadProc(void) { ... }`
+        # upstream. Driver pre-077 preserved the keyword;
+        # mwldarm shifted allocation by 8 bytes.
+        body = (
+            "static void OSi_IdleThreadProc(void) {\n"
+            "    while (1) {}\n"
+            "}\n"
+        )
+        out = self._compose(body)
+        # `static ` removed from the function-signature line
+        self.assertNotIn("static void OSi", out)
+        # The function body itself survives
+        self.assertIn("void OSi_IdleThreadProc(void)", out)
+        self.assertIn("while (1) {}", out)
+
+    def test_local_scope_static_preserved(self):
+        # `static int x = 0;` inside the function body MUST be
+        # preserved — it has different semantics (file-scope
+        # storage class for the local). count=1 + ^ anchor in
+        # the regex ensures only the outer static is stripped.
+        body = (
+            "void counter(void) {\n"
+            "    static int x = 0;\n"
+            "    x++;\n"
+            "}\n"
+        )
+        out = self._compose(body)
+        # Local-scope static still there
+        self.assertIn("static int x = 0;", out)
+        # Function signature unchanged
+        self.assertIn("void counter(void)", out)
+
+    def test_no_static_no_change(self):
+        # Non-static function passes through unchanged.
+        body = (
+            "void OSi_NotStatic(void) {\n"
+            "    return;\n"
+            "}\n"
+        )
+        out = self._compose(body)
+        self.assertIn("void OSi_NotStatic(void)", out)
+        self.assertNotIn("static void", out)
+
+    def test_static_with_leading_whitespace_stripped(self):
+        # Belt-and-suspenders: if the body has a leading newline
+        # before `static`, the `^\s*` portion handles it. (In
+        # practice the body extractor strips this, but defensive.)
+        body = "\n    static void f(void) { return; }\n"
+        out = self._compose(body)
+        self.assertNotIn("static void f", out)
+        self.assertIn("void f(void)", out)
+
+    def test_static_in_inner_function_after_brace_preserved(self):
+        # A nested static (e.g. inside an inline asm or a
+        # second function defined after the first) MUST be
+        # preserved — count=1 only strips the FIRST match,
+        # which is the outermost function's signature.
+        body = (
+            "void outer(void) { return; }\n"
+            "static void inner(void) { return; }\n"
+        )
+        out = self._compose(body)
+        # The second `static` keyword is preserved because
+        # ^\s*static\s+ only matches start-of-string.
+        self.assertIn("static void inner", out)
+
+
 if __name__ == "__main__":
     unittest.main()
