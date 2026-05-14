@@ -184,31 +184,49 @@ class TestDataRefRE(unittest.TestCase):
 
 
 class TestDelinksPathFor(unittest.TestCase):
+    # Assertions compare against forward-slash literals (the
+    # project's on-disk convention). `_delinks_path_for` returns a
+    # native-separator Path; POSIX-normalize before endswith so the
+    # tests pass on Windows hosts too.
     def test_main(self):
         p = _delinks_path_for("usa", "main")
-        self.assertTrue(str(p).endswith("config/usa/arm9/delinks.txt"))
+        self.assertTrue(
+            str(p).replace("\\", "/").endswith("config/usa/arm9/delinks.txt")
+        )
 
     def test_itcm(self):
         p = _delinks_path_for("usa", "itcm")
-        self.assertTrue(str(p).endswith(
-            "config/usa/arm9/itcm/delinks.txt"))
+        self.assertTrue(
+            str(p).replace("\\", "/").endswith(
+                "config/usa/arm9/itcm/delinks.txt"
+            )
+        )
 
     def test_dtcm(self):
         p = _delinks_path_for("jpn", "dtcm")
-        self.assertTrue(str(p).endswith(
-            "config/jpn/arm9/dtcm/delinks.txt"))
+        self.assertTrue(
+            str(p).replace("\\", "/").endswith(
+                "config/jpn/arm9/dtcm/delinks.txt"
+            )
+        )
 
     def test_overlay(self):
         p = _delinks_path_for("usa", "ov002")
-        self.assertTrue(str(p).endswith(
-            "config/usa/arm9/overlays/ov002/delinks.txt"))
+        self.assertTrue(
+            str(p).replace("\\", "/").endswith(
+                "config/usa/arm9/overlays/ov002/delinks.txt"
+            )
+        )
 
     def test_high_overlay_padded(self):
         p = _delinks_path_for("usa", "ov12")
         # Per port_to_region's convention, single-digit overlays
         # pad to 3 digits in the path.
-        self.assertTrue(str(p).endswith(
-            "config/usa/arm9/overlays/ov012/delinks.txt"))
+        self.assertTrue(
+            str(p).replace("\\", "/").endswith(
+                "config/usa/arm9/overlays/ov012/delinks.txt"
+            )
+        )
 
     def test_unknown_module_raises(self):
         with self.assertRaises(ValueError):

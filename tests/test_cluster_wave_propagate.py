@@ -104,8 +104,12 @@ class TestFindTemplatePath(unittest.TestCase):
             path = find_template_path(anchor, td)
             self.assertIsNotNone(path)
             # Returned absolute against ROOT, not td. Just check the
-            # tail matches the source.
-            self.assertTrue(str(path).endswith("src/main/MyFunc.c"))
+            # tail matches the source. POSIX-normalize on Windows so
+            # the native-separator path still ends in the same
+            # logical suffix.
+            self.assertTrue(
+                str(path).replace("\\", "/").endswith("src/main/MyFunc.c")
+            )
 
     def test_overlay_module_uses_overlays_subdir(self):
         with tempfile.TemporaryDirectory() as td_str:
@@ -122,8 +126,9 @@ class TestFindTemplatePath(unittest.TestCase):
             anchor = _fn("ov005", 0x021ad048, size=0x20)
             path = find_template_path(anchor, td)
             self.assertIsNotNone(path)
+            # POSIX-normalize on Windows (Path returns backslashes).
             self.assertTrue(
-                str(path).endswith(
+                str(path).replace("\\", "/").endswith(
                     "src/overlay005/sinit_ov005_021ad048.c",
                 ),
             )

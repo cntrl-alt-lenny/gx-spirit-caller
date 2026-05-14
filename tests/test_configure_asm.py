@@ -285,14 +285,21 @@ class TestLegacyCompilerConstants(unittest.TestCase):
 
     def test_legacy_cc_path_points_at_sp2p3_mwccarm(self):
         # The path constant should resolve to mwcc 1.2/sp2p3's
-        # mwccarm.exe, not mwldarm or mwasmarm.
-        self.assertIn("mwccarm/1.2/sp2p3", configure.LEGACY_CC)
+        # mwccarm.exe, not mwldarm or mwasmarm. Compare on a POSIX-
+        # normalized copy so the assertion works on Windows hosts
+        # too (configure.LEGACY_CC is built via os.path.join, so
+        # the native separator leaks through).
+        self.assertIn(
+            "mwccarm/1.2/sp2p3", configure.LEGACY_CC.replace("\\", "/"),
+        )
         self.assertTrue(configure.LEGACY_CC.endswith("mwccarm.exe"))
 
     def test_default_cc_unchanged(self):
         # Regression guard: dual-compiler addition must not alter
         # the default compiler's path.
-        self.assertIn("mwccarm/2.0/sp1p5", configure.CC)
+        self.assertIn(
+            "mwccarm/2.0/sp1p5", configure.CC.replace("\\", "/"),
+        )
         self.assertTrue(configure.CC.endswith("mwccarm.exe"))
 
     def test_legacy_and_default_paths_differ(self):
@@ -313,7 +320,11 @@ class TestLegacySp3CompilerConstants(unittest.TestCase):
         self.assertEqual(configure.LEGACY_SP3_C_SUFFIX, ".legacy_sp3.c")
 
     def test_legacy_sp3_cc_path_points_at_sp3_mwccarm(self):
-        self.assertIn("mwccarm/1.2/sp3", configure.LEGACY_SP3_CC)
+        # POSIX-normalize for Windows-host runs; see
+        # test_default_cc_unchanged for the rationale.
+        self.assertIn(
+            "mwccarm/1.2/sp3", configure.LEGACY_SP3_CC.replace("\\", "/"),
+        )
         self.assertTrue(configure.LEGACY_SP3_CC.endswith("mwccarm.exe"))
 
     def test_three_compiler_paths_all_differ(self):
