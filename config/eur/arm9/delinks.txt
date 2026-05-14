@@ -7199,3 +7199,50 @@ libs/nitro/func_020a60c0.legacy.c:
     complete
     .text start:0x020a60c0 end:0x020a60fc
 
+libs/nitro/func_0208b8e0.legacy.c:
+    complete
+    .text start:0x0208b8e0 end:0x0208b920
+
+libs/nitro/func_0208e334.legacy.c:
+    complete
+    .text start:0x0208e334 end:0x0208e3e8
+
+libs/nitro/func_0209150c.legacy.c:
+    complete
+    .text start:0x0209150c end:0x0209153c
+
+libs/nitro/func_02091554.legacy.c:
+    complete
+    .text start:0x02091554 end:0x02091584
+
+libs/nitro/func_0209164c.legacy.c:
+    complete
+    .text start:0x0209164c end:0x02091678
+
+libs/nitro/func_02091700.legacy.c:
+    complete
+    .text start:0x02091700 end:0x02091714
+
+libs/nitro/func_02091b30.legacy.c:
+    complete
+    .text start:0x02091b30 end:0x02091b5c
+
+libs/nitro/func_02092124.legacy.c:
+    complete
+    .text start:0x02092124 end:0x02092154
+
+libs/nitro/func_020921dc.legacy.c:
+    complete
+    .text start:0x020921dc end:0x02092254
+
+libs/nitro/func_02092644.legacy.c:
+    complete
+    .text start:0x02092644 end:0x02092668
+
+libs/nitro/func_02092668.legacy.c:
+    complete
+    .text start:0x02092668 end:0x0209268c
+
+libs/nitro/func_020983b8.legacy.c:
+    complete
+    .text start:0x020983b8 end:0x020983f4
