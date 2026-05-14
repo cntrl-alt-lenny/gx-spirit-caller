@@ -53,6 +53,12 @@ Skip-reason taxonomy (brief 070 D2/D3/D4 unlock):
                        in our pool. Brief 069 wave 1 callee-mapping
                        trap surfaces here as `callee-unresolvable`
                        rather than as silent self-recursion.
+  callee-ambiguous:    upstream callee has ≥2 byte-fingerprint matches
+                       in our pool at sim ≥ threshold. D1 v2 (brief
+                       070 wave-2 follow-up): OS_UnlockCartridge case.
+                       Naming one over the other is a 50/50 guess;
+                       refuse and let the decomper disambiguate via
+                       callsite analysis.
   data-ref:            upstream function reads/writes a data symbol
                        (D4 — analogous to D1 but for data; deferred).
   struct-access:       upstream source uses ->member / .field syntax
@@ -407,18 +413,61 @@ def extract_function_body(
 # --------------------------------------------------------------------------- #
 
 
+@dataclass(frozen=True)
+class CalleeResolution:
+    """Result of byte-fingerprint-matching one upstream callee
+    against our region pool.
+
+    `candidates` lists every local function with byte-similarity
+    ≥ CALLEE_HIGH_THRESHOLD. Three cases:
+
+      - len(candidates) == 0: no match → caller treats as
+        `callee-unresolvable`.
+      - len(candidates) == 1: unique resolution → caller
+        substitutes name.
+      - len(candidates) > 1: ambiguous → caller refuses with new
+        `callee-ambiguous` reason (brief 070 wave-2 D1 v2:
+        OS_UnlockCartridge had two candidates at sim=1.0, the
+        previous arbitrary-first pick was wrong).
+    """
+    candidates: tuple[tuple[str, int], ...] = ()
+
+    @property
+    def is_unique(self) -> bool:
+        return len(self.candidates) == 1
+
+    @property
+    def is_ambiguous(self) -> bool:
+        return len(self.candidates) > 1
+
+    @property
+    def primary(self) -> tuple[str, int] | None:
+        """Convenience accessor for the unique-match case.
+        Returns None for unresolvable OR ambiguous."""
+        if self.is_unique:
+            return self.candidates[0]
+        return None
+
+
 def _build_upstream_to_local_index(
     repo: str, region: str,
-) -> dict[str, tuple[str, int]]:
+) -> dict[str, CalleeResolution]:
     """For every named function in the vendored repo, compile +
     extract its fingerprint, then byte-similarity-match against
-    our region pool. Returns dict[upstream_name] → (our_name,
-    our_addr).
+    our region pool. Returns dict[upstream_name] →
+    CalleeResolution (which encodes unique / ambiguous /
+    unresolvable via its `candidates` tuple).
 
     Cached per-call. A future optimisation would persist this to
     `tools/_vendor/_cache/<repo>_index.json`; for now we rebuild
     in-memory each invocation (a few seconds with pokediamond's
     NitroSDK pool).
+
+    Brief 070 wave-2 D1 v2: tracks ALL local candidates with
+    sim ≥ CALLEE_HIGH_THRESHOLD (not just the arbitrary-first).
+    `OS_UnlockCartridge` had two candidates in our pool at
+    sim=1.0; the previous "pick first" behaviour silently chose
+    the wrong one. Now reported as ambiguous → refuse.
     """
     sys.path.insert(0, str(ROOT / "tools"))
     import external_obj  # noqa: E402
@@ -430,7 +479,7 @@ def _build_upstream_to_local_index(
         return {}
 
     region_funcs = frs.load_region(region)
-    index: dict[str, tuple[str, int]] = {}
+    index: dict[str, CalleeResolution] = {}
 
     for lib_root in repo_meta.lib_roots:
         root_path = fes.VENDOR_DIR / repo / lib_root
@@ -443,8 +492,10 @@ def _build_upstream_to_local_index(
                 continue
             for ext_fn in external_obj.extract_functions(o_path):
                 fp = ext_fn.fingerprint()
-                # Find best 1.0 match by size
-                best = None
+                # Collect ALL ≥-threshold matches (not just the
+                # best). Multiple matches at top similarity = the
+                # ambiguous-candidate case D1 v2 catches.
+                matches: list[tuple[str, int]] = []
                 for module, funcs in region_funcs.items():
                     for f in funcs:
                         if f.size != ext_fn.size:
@@ -460,21 +511,22 @@ def _build_upstream_to_local_index(
                             our_bytes, f.addr, our_reloc_offsets)
                         sim = external_obj.byte_similarity(fp, our_masked)
                         if sim >= CALLEE_HIGH_THRESHOLD:
-                            if best is None or sim > best[2]:
-                                best = (f.name, f.addr, sim)
-                if best is not None:
-                    index[ext_fn.name] = (best[0], best[1])
+                            matches.append((f.name, f.addr))
+                if matches:
+                    index[ext_fn.name] = CalleeResolution(
+                        candidates=tuple(matches),
+                    )
     return index
 
 
 # In-process cache — _build_upstream_to_local_index is expensive
 # (~seconds), so callers that port many functions share one build.
-_INDEX_CACHE: dict[tuple[str, str], dict[str, tuple[str, int]]] = {}
+_INDEX_CACHE: dict[tuple[str, str], dict[str, CalleeResolution]] = {}
 
 
 def upstream_to_local_index(
     repo: str, region: str,
-) -> dict[str, tuple[str, int]]:
+) -> dict[str, CalleeResolution]:
     key = (repo, region)
     if key not in _INDEX_CACHE:
         _INDEX_CACHE[key] = _build_upstream_to_local_index(repo, region)
@@ -483,22 +535,37 @@ def upstream_to_local_index(
 
 def remap_callees_in_body(
     body: str, callees: list[str],
-    upstream_to_local: dict[str, tuple[str, int]],
-) -> tuple[str, dict[str, str], list[str]]:
+    upstream_to_local: dict[str, CalleeResolution],
+) -> tuple[str, dict[str, str], list[str],
+           dict[str, tuple[tuple[str, int], ...]]]:
     """For each upstream callee name in `callees`, look up the
     corresponding local name in `upstream_to_local` and rewrite
-    `body` to use the local name. Returns `(rewritten_body,
-    remap_decisions, unresolvable)` — unresolvable is the list
-    of callee names with no fingerprint match.
+    `body` to use the local name.
+
+    Returns `(rewritten_body, remap_decisions, unresolvable,
+    ambiguous)`:
+      - rewritten_body: source with substitutions applied
+      - remap_decisions: dict[upstream_name] → our_local_name (the
+        unique matches)
+      - unresolvable: list of callee names with no byte-fingerprint
+        match in our pool
+      - ambiguous: dict[upstream_name] → tuple of tied candidates
+        (≥2 functions at sim=CALLEE_HIGH_THRESHOLD). D1 v2 catches
+        the OS_UnlockCartridge case where the previous arbitrary-
+        first pick was wrong.
     """
     remaps: dict[str, str] = {}
     unresolvable: list[str] = []
+    ambiguous: dict[str, tuple[tuple[str, int], ...]] = {}
     for name in callees:
-        match = upstream_to_local.get(name)
-        if match is None:
+        resolution = upstream_to_local.get(name)
+        if resolution is None or not resolution.candidates:
             unresolvable.append(name)
             continue
-        local_name, _addr = match
+        if resolution.is_ambiguous:
+            ambiguous[name] = resolution.candidates
+            continue
+        local_name, _addr = resolution.primary
         remaps[name] = local_name
     # Apply substitutions longest-name-first to avoid prefix
     # collisions (mirror port_to_region.apply_substitutions).
@@ -509,7 +576,7 @@ def remap_callees_in_body(
     for upstream_name, local_name in sorted_remaps:
         pattern = r"\b" + re.escape(upstream_name) + r"\b"
         out = re.sub(pattern, local_name, out)
-    return out, remaps, unresolvable
+    return out, remaps, unresolvable, ambiguous
 
 
 # --------------------------------------------------------------------------- #
@@ -954,13 +1021,28 @@ def port_function(
     upstream_to_local = upstream_to_local_index(
         request.repo, request.our_region,
     )
-    rewritten_body, remaps, unresolvable = remap_callees_in_body(
-        body, callees, upstream_to_local,
+    rewritten_body, remaps, unresolvable, ambiguous = (
+        remap_callees_in_body(body, callees, upstream_to_local)
     )
     if unresolvable:
         return PortResult(
             status="refused", reason="callee-unresolvable",
             detail=", ".join(unresolvable[:5]),
+            callee_remaps=remaps,
+        )
+    if ambiguous:
+        # D1 v2 — multiple local candidates at sim=1.0. Naming
+        # one over the other is a 50/50 guess; refuse and let
+        # the decomper disambiguate via callsite analysis.
+        detail_parts = []
+        for name, cands in list(ambiguous.items())[:3]:
+            cand_strs = [
+                f"{n}@0x{a:08x}" for n, a in cands[:3]
+            ]
+            detail_parts.append(f"{name} → {{{', '.join(cand_strs)}}}")
+        return PortResult(
+            status="refused", reason="callee-ambiguous",
+            detail="; ".join(detail_parts),
             callee_remaps=remaps,
         )
 
