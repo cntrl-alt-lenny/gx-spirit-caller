@@ -313,19 +313,20 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
-  — `cloud` (MEDIUM-HIGH): extend D2+D3 framework with full
-  struct definitions for `_OSThread`, `_OSThreadQueue`,
-  `OSMutex` etc. Brief 071 wave 2 lost 112 compile-fails on
-  these; expected unlock ~80 ports. Branch:
-  `cloud/port-driver-d5-struct-vendoring`.
+- [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): resume cross-project
+  bulk-port chain. Driver substantially sharper after D5
+  (PR #449) + ambiguous-callee refuse (PR #448) + #444
+  (pre-filter + ish-mismatch) + #446 (silent-corruption
+  fix). Expected ~130 candidate ok pool; target 50-100
+  byte-identical ports. Branch:
+  `decomper/cross-project-bulk-port-wave-3`.
 
 - [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
-  — `cloud` (MEDIUM): solve the "libs/ port `.c` declares
-  EUR-addr name but USA/JPN symbols.txt has different addr"
-  refactor. Research + pilot ~10-port batch end-to-end. Brain
-  accountability: state.md misled with "small follow-up"
-  guidance — it's brief-sized. Branch:
+  — `cloud` (MEDIUM): solve the libs/ port-naming refactor
+  that wave 2 surfaced as brief-sized. Research + pilot
+  ~10-port batch end-to-end. Unlocks 3× compounding
+  multiplier on cross-project ports. Branch:
   `cloud/per-region-cross-application`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
@@ -349,6 +350,13 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
+  `cloud`, shipped in PR #449. Full struct defs for
+  `_OSThread`, `_OSThreadQueue`, `OSMutex` + transitive deps
+  (OSContext, CPContext). 300-sample sweep: struct-access
+  drops 118 → 80 (-38). 3 of 5 OS_thread.c / OS_mutex.c
+  functions unblock (was 0/5 pre-D5). New headers:
+  libs/nitro/include/nitro/os_thread.h + os_printf.h.
 - [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
   `decomper`, full chain shipped across PRs #442 (wave 1, 64
   ports / 0.88) + #445 (wave 2, 13 ports / 0.68 — below
