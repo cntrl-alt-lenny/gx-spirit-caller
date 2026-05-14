@@ -18,10 +18,6 @@ src/overlay003/sinit_ov003_021cf114.c:
 
 
 
-libs/nitro/func_ov003_021ca2b8.legacy.c:
-    complete
-    .text start:0x021ca2b8 end:0x021ca2bc
-
 libs/nitro/func_ov003_021ca2b4.legacy.c:
     complete
     .text start:0x021ca2b4 end:0x021ca2b8
