@@ -31,6 +31,7 @@ from cross_apply_libs_port import (  # noqa: E402
     _DATA_REF_RE,
     _delinks_path_for,
     _find_data_refs_in_port,
+    _reloc_parity,
     parse_port_filename,
 )
 
@@ -49,6 +50,27 @@ class TestParsePortFilename(unittest.TestCase):
         result = parse_port_filename(Path("func_02007218.legacy_sp3.c"))
         self.assertEqual(result, (0x02007218, ".legacy_sp3"))
 
+    def test_overlay_legacy_c(self):
+        # Brief 076 D1: overlay-qualified port filename
+        # (`func_ov<NNN>_<addr>.legacy.c`). 29 of brief 075
+        # wave-1's pool used this shape and were refused
+        # pre-D1.
+        result = parse_port_filename(
+            Path("func_ov002_021b3c10.legacy.c"))
+        self.assertEqual(result, (0x021b3c10, ".legacy"))
+
+    def test_overlay_legacy_sp3_c(self):
+        result = parse_port_filename(
+            Path("func_ov002_021b3c10.legacy_sp3.c"))
+        self.assertEqual(result, (0x021b3c10, ".legacy_sp3"))
+
+    def test_overlay_with_three_digit(self):
+        # Triple-digit overlay (ov023 = the highest overlay in
+        # this game).
+        result = parse_port_filename(
+            Path("func_ov023_022bbcde.legacy.c"))
+        self.assertEqual(result, (0x022bbcde, ".legacy"))
+
     def test_rejects_no_address(self):
         # `Fill32.legacy.c` is a renamed file — no EUR address to
         # cross-apply against. Tool refuses.
@@ -63,6 +85,12 @@ class TestParsePortFilename(unittest.TestCase):
         # cross-project pokediamond ports). EUR-baseline `.c`
         # files are out of scope.
         self.assertIsNone(parse_port_filename(Path("func_02007218.c")))
+
+    def test_rejects_partial_overlay_form(self):
+        # Brief 076 D1: must be `func_ov<digits>_<addr>` — not
+        # `func_ov_<addr>` (missing overlay number).
+        self.assertIsNone(parse_port_filename(
+            Path("func_ov_021b3c10.legacy.c")))
 
 
 # --------------------------------------------------------------------------- #
@@ -226,6 +254,80 @@ class TestCrossApplyPlanShape(unittest.TestCase):
         old, new = plan.data_renames[0]
         self.assertEqual(old, "data_020c3e68")
         self.assertEqual(new, "data_020c3f48")
+
+
+# --------------------------------------------------------------------------- #
+# Brief 076 D2 — strict raw-bytes + reloc-parity fallback
+# --------------------------------------------------------------------------- #
+
+
+class _MockFunc:
+    """Stand-in for `find_region_siblings.Function` for the
+    pure-function reloc-parity tests. Mirrors the dataclass
+    fields we read."""
+
+    def __init__(self, addr: int, size: int, module: str,
+                 reloc_sig: tuple):
+        self.addr = addr
+        self.size = size
+        self.module = module
+        self.reloc_sig = reloc_sig
+
+
+class TestRelocParity(unittest.TestCase):
+    """Brief 076 D2: strict reloc-sig tuple equality. EUR + cand
+    must agree on (offset, kind, to_module) for every reloc entry.
+    Catches the BL-offset-divergence trap that pure byte-similarity
+    misses."""
+
+    def test_identical_relocs_pass(self):
+        eur = _MockFunc(0x02000000, 0x20, "main",
+                        ((4, "call", "main"),
+                         (8, "data", "main")))
+        cand = _MockFunc(0x02100000, 0x20, "main",
+                         ((4, "call", "main"),
+                          (8, "data", "main")))
+        self.assertTrue(_reloc_parity(eur, cand))
+
+    def test_different_offset_fails(self):
+        eur = _MockFunc(0x02000000, 0x20, "main",
+                        ((4, "call", "main"),))
+        cand = _MockFunc(0x02100000, 0x20, "main",
+                         ((8, "call", "main"),))  # different offset
+        self.assertFalse(_reloc_parity(eur, cand))
+
+    def test_different_kind_fails(self):
+        eur = _MockFunc(0x02000000, 0x20, "main",
+                        ((4, "call", "main"),))
+        cand = _MockFunc(0x02100000, 0x20, "main",
+                         ((4, "data", "main"),))  # different kind
+        self.assertFalse(_reloc_parity(eur, cand))
+
+    def test_different_to_module_fails(self):
+        # Different downstream call target module — catches the
+        # BL-offset-divergence trap.
+        eur = _MockFunc(0x02000000, 0x20, "main",
+                        ((4, "call", "main"),))
+        cand = _MockFunc(0x02100000, 0x20, "main",
+                         ((4, "call", "ov002"),))  # different target
+        self.assertFalse(_reloc_parity(eur, cand))
+
+    def test_different_count_fails(self):
+        eur = _MockFunc(0x02000000, 0x20, "main",
+                        ((4, "call", "main"),))
+        cand = _MockFunc(0x02100000, 0x20, "main",
+                         ((4, "call", "main"),
+                          (8, "data", "main")))  # extra reloc
+        self.assertFalse(_reloc_parity(eur, cand))
+
+    def test_both_empty_pass(self):
+        # No relocs on either side — trivially parity. The
+        # downstream caller (strict raw-bytes) catches the
+        # genuine-byte-divergence case, so reloc parity is fine
+        # here.
+        eur = _MockFunc(0x02000000, 0x10, "main", ())
+        cand = _MockFunc(0x02100000, 0x10, "main", ())
+        self.assertTrue(_reloc_parity(eur, cand))
 
 
 if __name__ == "__main__":
