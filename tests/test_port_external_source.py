@@ -1046,6 +1046,57 @@ class TestStaticKeywordStrip(unittest.TestCase):
         # ^\s*static\s+ only matches start-of-string.
         self.assertIn("static void inner", out)
 
+    def test_static_inline_both_stripped(self):
+        # Brief 077.b: pokediamond's NitroSDK has 9 `static
+        # inline` functions (CARDi_*, _GX_OBJ_PTR, PXIi_*, …).
+        # If any pass the byte-fingerprint match, the prior
+        # `static` strip alone left `inline` behind — which
+        # shifts mwldarm's symbol allocation the same way bare
+        # static did. Both keywords stripped together.
+        body = (
+            "static inline BOOL CARDi_OnReadPageDirect"
+            "(CARDRomStat *arg) {\n"
+            "    return TRUE;\n"
+            "}\n"
+        )
+        out = self._compose(body)
+        self.assertNotIn("static inline", out)
+        self.assertNotIn("inline BOOL", out)
+        # Function body itself survives
+        self.assertIn("BOOL CARDi_OnReadPageDirect", out)
+        self.assertIn("return TRUE;", out)
+
+    def test_static_inline_with_extra_whitespace(self):
+        # `\s+` between static + inline tolerates multiple
+        # spaces/tabs (some upstream sources do this).
+        body = (
+            "static  inline\tu32 foo(void) { return 0; }\n"
+        )
+        out = self._compose(body)
+        # Both keywords stripped from the function signature.
+        # (Note: "inline" string elsewhere — e.g. the wrapper
+        # provenance comment — doesn't appear, so the global
+        # assertNotIn is fine here.)
+        self.assertNotIn("static", out)
+        self.assertNotIn("inline", out)
+        # Function signature preserved
+        self.assertIn("u32 foo(void)", out)
+
+    def test_bare_inline_without_static_preserved(self):
+        # Defensive: pokediamond's NitroSDK has zero standalone
+        # `inline foo(...)` at file scope (only `static inline`).
+        # But IF a future upstream has bare `inline`, the
+        # regex should NOT strip it — that's a different case
+        # (linkage semantics differ). Confirmed by surveying
+        # pokediamond NitroSDK src: zero bare-inline matches.
+        body = (
+            "inline void foo(void) { return; }\n"
+        )
+        out = self._compose(body)
+        # Bare `inline` is NOT stripped by the regex
+        # (which requires `static` first)
+        self.assertIn("inline void foo", out)
+
 
 if __name__ == "__main__":
     unittest.main()
