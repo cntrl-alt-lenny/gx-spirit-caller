@@ -84,15 +84,19 @@ extern "C" {
 /* ------------------------------------------------------------------------
  * Vector / matrix types
  *
- * Forward declarations only — field layouts are added in nitro/fx_vec.h /
- * nitro/fx_mtx.h as those surfaces get decomp'd. Opaque here so code
- * taking pointers compiles now. */
-
-typedef struct VecFx32 VecFx32;
-typedef struct VecFx16 VecFx16;
-typedef struct MtxFx33 MtxFx33;
-typedef struct MtxFx43 MtxFx43;
-typedef struct MtxFx44 MtxFx44;
+ * Full struct bodies live in `nitro/fx_vec.h` + `nitro/fx_mtx.h`
+ * (vendored as part of brief 072 D6). Pre-D6 these were forward
+ * decls only; cross-project ports of FX_* / GX_* functions need
+ * the full layouts to compile `.x` / `_[i]` member access.
+ *
+ * Mirror pokediamond's dual struct-tag + typedef-alias pattern:
+ *
+ *     typedef struct Vecx32 { ... } VecFx32;
+ *
+ * Both `Vecx32` and `VecFx32` resolve to the same struct
+ * (upstream uses both spellings in different places). */
+#include <nitro/fx_vec.h>
+#include <nitro/fx_mtx.h>
 
 /* ------------------------------------------------------------------------
  * Scalar arithmetic
