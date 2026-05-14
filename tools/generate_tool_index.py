@@ -59,6 +59,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("find_external_source", "cross-project", "Cross-project source mining"),
     ("vendor_external_sources", "cross-project", "Cross-project source mining"),
     ("external_obj", "cross-project", "Cross-project source mining"),
+    ("port_external_source", "cross-project", "Cross-project source mining"),
     ("find_", "analysis", "Analysis / worklist"),
     ("analyze_", "analysis", "Analysis / worklist"),
     ("data_worklist", "analysis", "Analysis / worklist"),

@@ -222,6 +222,29 @@ def compile_external(
 # --------------------------------------------------------------------------- #
 
 
+@dataclass(frozen=True)
+class RelocRef:
+    """One reloc entry inside an external function's body. Brief
+    070 deliverables 1 + 4 use this to remap upstream callee /
+    data symbol names → our local placeholders.
+
+    `kind` mirrors STT_FUNC vs STT_OBJECT/STT_NOTYPE semantics:
+      - "func"   — STT_FUNC: a `bl`/`blx` call target. The
+                   port driver remaps `target` → our local
+                   `func_<addr>` via brief 068's CSV.
+      - "data"   — STT_OBJECT (or zero-size STT_NOTYPE with no
+                   `$a`/`$t` prefix): a data symbol load. The
+                   port driver remaps `target` → our local
+                   `data_<addr>` via (D4: address + size +
+                   relocation-pattern matching).
+      - "other"  — anything else (rare: section refs, debug-
+                   only symbols).
+    """
+    offset: int       # byte offset within the function
+    target: str       # the symbol name being referenced
+    kind: str         # "func" / "data" / "other"
+
+
 @dataclass
 class ExternalFunc:
     """One function extracted from an external .o."""
@@ -235,6 +258,12 @@ class ExternalFunc:
     # `function_fingerprint` to zero out reloc slots before
     # similarity comparison.
     reloc_offsets: tuple[int, ...] = ()
+    # Brief 070 D1+D4: per-reloc target names + kinds. Same
+    # offsets as `reloc_offsets`, augmented with the symbol the
+    # reloc points at. Brief 070's port driver uses this to
+    # remap callees + data references without the sort-pair
+    # heuristic that tripped brief 069 wave 1.
+    relocs: tuple[RelocRef, ...] = ()
     # The repo + source-file this came from (filled by extraction).
     repo: str = ""
     src_rel: str = ""
@@ -250,6 +279,18 @@ class ExternalFunc:
             if off + 4 <= len(out):
                 out[off:off + 4] = b"\x00\x00\x00\x00"
         return bytes(out)
+
+    def callee_names(self) -> list[str]:
+        """Distinct names of all STT_FUNC reloc targets. The
+        upstream callees brief 070's port driver needs to remap
+        to our local placeholders."""
+        return sorted({r.target for r in self.relocs
+                       if r.kind == "func"})
+
+    def data_refs(self) -> list[str]:
+        """Distinct names of all data-symbol reloc targets."""
+        return sorted({r.target for r in self.relocs
+                       if r.kind == "data"})
 
 
 def _parse_elf32(data: bytes) -> dict:
@@ -315,8 +356,10 @@ def _parse_elf32(data: bytes) -> dict:
                 "name": name, "value": value, "size": size,
                 "type": sym_type, "shndx": shndx,
             })
-    # Walk reloc sections
-    relocs: dict[int, list[int]] = {}
+    # Walk reloc sections. Each entry is (offset, sym_idx). Symbol
+    # name + kind resolution happens during `extract_functions`
+    # where we have the per-function context.
+    relocs: dict[int, list[tuple[int, int]]] = {}
     for sh in sections:
         if sh["type"] not in (9, 4):  # SHT_REL=9, SHT_RELA=4
             continue
@@ -326,7 +369,9 @@ def _parse_elf32(data: bytes) -> dict:
         sec_data = data[sh["offset"]:sh["offset"] + sh["size"]]
         for off in range(0, sh["size"], ent):
             r_offset = struct.unpack_from("<I", sec_data, off + 0)[0]
-            relocs[target_idx].append(r_offset)
+            r_info = struct.unpack_from("<I", sec_data, off + 4)[0]
+            sym_idx = r_info >> 8
+            relocs[target_idx].append((r_offset, sym_idx))
     return {
         "sections": sections,
         "symbols": symbols,
@@ -375,13 +420,45 @@ def extract_functions(o_path: Path) -> list[ExternalFunc]:
         if not name:
             continue
         sec_bytes = data[sh["offset"]:sh["offset"] + sh["size"]]
-        reloc_offsets = tuple(sorted(set(elf["relocs"].get(i, []))))
+        raw_relocs = elf["relocs"].get(i, [])
+        # Build RelocRef objects with target name + kind.
+        ref_list: list[RelocRef] = []
+        for r_off, sym_idx in raw_relocs:
+            if sym_idx >= len(elf["symbols"]):
+                continue
+            sym = elf["symbols"][sym_idx]
+            target_name = sym["name"]
+            # Skip mode markers + section refs (anonymous targets).
+            if not target_name or target_name.startswith("$"):
+                continue
+            sym_type = sym["type"]
+            if sym_type == 2:    # STT_FUNC
+                kind = "func"
+            elif sym_type == 1:  # STT_OBJECT
+                kind = "data"
+            elif sym_type == 0:  # STT_NOTYPE — could be either
+                # Heuristic: if the name looks like data
+                # (lowercase + underscores, starts with non-cap
+                # or has `_` early), treat as data. NitroSDK
+                # data symbols are `OSi_*Count` / `data_*` style;
+                # NitroSDK functions are `OS_*` / `Fn*` mostly.
+                # Conservative: default to "other".
+                kind = "other"
+            else:
+                kind = "other"
+            ref_list.append(RelocRef(
+                offset=r_off, target=target_name, kind=kind,
+            ))
+        # Sort offsets uniq for backward-compat reloc_offsets field
+        # (consumed by fingerprint masking).
+        reloc_offsets = tuple(sorted({r.offset for r in ref_list}))
         out.append(ExternalFunc(
             name=name,
             section_index=i,
             bytes_=sec_bytes,
             size=len(sec_bytes),
             reloc_offsets=reloc_offsets,
+            relocs=tuple(ref_list),
         ))
     return out
 
