@@ -8,13 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 afternoon, **brief 073 shipped
-(PR #451) — per-region cross-application tool + 1-port worked
-example.** All 3 regions verified at 24/27 baseline. Brief
-075 (full 87-port backfill via the new tool) NOW ACTIVE for
-decomper. Brief 074 (cross-project wave 3) ALSO ACTIVE — no
-PR yet, in flight. Decomper has two independent active briefs.
-EUR 1.51%, USA + JPN 0.19% — about to move on brief 075.
+**Last updated:** 2026-05-14 late afternoon, **brief 075
+shipped at 27/87 (below 70 target)** via PR #454 — but the
+byte-uniqueness diagnostic is the brief's most valuable
+output (62% of the 87-port set is size-4 stubs that collide
+2632× in USA's main; refusal rate isn't a tool bug, it's a
+calibration of what was in the pool). Plus D6.a math vendoring
+shipped (PR #453). USA + JPN climbed 0.19% → **0.23% each**
+(first material climb). Brief 076 (tool follow-ups) queued
+for cloud. Decomper proceeds with brief 074 (cross-project
+wave 3, in flight). EUR 1.51%.
 
 ## This session in one paragraph
 
@@ -135,30 +138,32 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — standing autonomous + one MEDIUM-LOW carryover:**
+**Cloud — one MEDIUM brief queued:**
 
-No active scoped brief for cloud right now. Brief 063
-(permuter auto-runner, MEDIUM-LOW) becomes high-priority on
-the next hard-tier cap-raise. Standing autonomous rule
-applies if cloud spots a high-leverage corpus / research /
-tooling target.
+1. **Brief 076 (MEDIUM)** — `cross_apply_libs_port.py` D1
+   (filename pattern) + D2 (raw-bytes + reloc-parity
+   fallback). Unlocks ~35 more ports from brief 075's
+   refusal pool. Decomper's wave-1 diagnostic surfaced
+   these as bounded, tool-shaped follow-ups.
+2. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
 
-Closed cloud briefs: 062/066/068/070-D1/070-D4/070-D2+D3/072
-/073 plus eleven autonomous patches landed in PRs 427, 434,
-435, 438, 440, 441, 444, 446, 448, 449, 451.
+Closed cloud briefs: 062/066/068/070-D1/070-D4/070-D2+D3/
+072/072-D6.a/073 plus twelve autonomous patches landed in
+PRs 427, 434, 435, 438, 440, 441, 444, 446, 448, 449, 451,
+453.
 
-**Decomper — two independent HIGH briefs active:**
+**Decomper — brief 074 ACTIVE (in flight):**
 
-1. **Brief 074 (HIGH, in flight, no PR yet)** — cross-project
+3. **Brief 074 (HIGH, in flight, no PR yet)** — cross-project
    bulk-port wave 3 with the post-#444/446/448/449 sharper
-   driver. Pool est. ~130 ok candidates. Target 50-100
-   byte-identical ports.
+   driver + D6.a math types. Pool est. ~140 ok candidates
+   (was ~130 pre-D6.a). Target 50-100 byte-identical ports.
+   Decomper signaled they're proceeding without waiting on
+   brief 075 review feedback.
 
-2. **Brief 075 (HIGH, NOW ACTIVE)** — cross-region application
-   of existing 87 cross-project ports. Uses cloud's new
-   `tools/cross_apply_libs_port.py` (PR #451). Independent of
-   brief 074. First time USA + JPN badges move substantially
-   from 0.19%. Expected USA + JPN climb: ~0.6-0.7% each.
+Closed decomper briefs: 075 wave 1 chain. Brief 077 (cross-
+region wave 2 with the brief-076-improved tool) brain will
+queue after brief 076 + brief 074 both land.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
