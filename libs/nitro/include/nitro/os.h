@@ -58,18 +58,45 @@ typedef u64 OSTick;
  * ARM9 IE/IF register layout. */
 typedef u32 OSIrqMask;
 
-/* ---- Thread / sync primitives (opaque) --------------------------------- */
+/* OS_DisableInterrupts / OS_RestoreInterrupts use these as the
+ * CPSR mask state. Brief 072 D5: vendored from
+ * `nitro/OS_system_shared.h` because `OSIntrMode` was the
+ * second-most-common unvendored struct-type hint in brief 071
+ * wave 2's compile-fail survey. Values map directly to the
+ * ARM CPSR I/F bit positions. */
+#define HW_PSR_DISABLE_FIQ      0x40
+#define HW_PSR_DISABLE_IRQ      0x80
+#define HW_PSR_DISABLE_IRQ_FIQ  0xc0
 
-/* Full layout of these types lives under NitroSDK's os/common/;
- * game code treats them as handles. When libs/nitro/os/ grows a
- * real thread.c / mutex.c, the full structs come with it. */
+typedef enum {
+    OS_INTRMODE_DISABLE_IRQ = HW_PSR_DISABLE_IRQ,
+    OS_INTRMODE_DISABLE_FIQ = HW_PSR_DISABLE_FIQ,
+    OS_INTRMODE_ENABLE      = 0,
+} OSIntrMode;
 
-typedef struct OSMutex            OSMutex;
-typedef struct _OSThread          OSThread;
-typedef struct _OSThreadQueue     OSThreadQueue;
-typedef struct _OSThreadLink      OSThreadLink;
-typedef struct _OSMutexQueue      OSMutexQueue;
-typedef struct _OSMutexLink       OSMutexLink;
+/* OSProcMode — CPU privilege/mode. Same source header
+ * (`OS_system_shared.h`). Values are the CPSR M field. */
+typedef enum {
+    OS_PROCMODE_USER  = 16,
+    OS_PROCMODE_FIQ   = 17,
+    OS_PROCMODE_IRQ   = 18,
+    OS_PROCMODE_SVC   = 19,
+    OS_PROCMODE_ABORT = 23,
+    OS_PROCMODE_UNDEF = 27,
+    OS_PROCMODE_SYS   = 31,
+} OSProcMode;
+
+/* ---- Thread / sync primitives ------------------------------------------ */
+
+/* Full struct bodies live in `nitro/os_thread.h` (vendored as
+ * part of brief 072 D5). Pre-D5 these were forward-declared here
+ * with a TODO; cross-project NitroSDK ports need the full layout
+ * to compile `thread->state` / `queue->head` style member access.
+ *
+ * Include order matters: `os_thread.h` defines OSContext +
+ * CPContext too, so types/swi/fx callers don't need to know
+ * about the layered include. */
+#include <nitro/os_thread.h>
 
 /* OSLockWord — 3-u32 word used by OS_LockByWord / OS_SpinWait /
  * OS_TryLockByWord. Volatile because the lock is poked under
