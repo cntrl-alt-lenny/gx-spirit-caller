@@ -167,8 +167,8 @@ def _post_clone(target: Target, dest: Path) -> None:
         return
     gen_dir = dest / "tools" / "gen_fx_consts"
     if not gen_dir.is_dir():
-        print(f"  [warn] pokeheartgold: gen_fx_consts dir missing, "
-              f"NitroSDK compilation will fail", file=sys.stderr)
+        print("  [warn] pokeheartgold: gen_fx_consts dir missing, "
+              "NitroSDK compilation will fail", file=sys.stderr)
         return
     print(f"[post-clone] generating {fx_const_h.relative_to(dest)}")
     gen_bin = gen_dir / "gen_fx_consts"
