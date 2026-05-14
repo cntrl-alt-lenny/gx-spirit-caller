@@ -56,6 +56,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("cluster_wave_propagate", "match-acceleration", "Match acceleration"),
     ("find_region_siblings", "multi-region", "Multi-region porting"),
     ("port_to_region", "multi-region", "Multi-region porting"),
+    ("cross_apply_libs_port", "multi-region", "Multi-region porting"),
     ("find_external_source", "cross-project", "Cross-project source mining"),
     ("vendor_external_sources", "cross-project", "Cross-project source mining"),
     ("external_obj", "cross-project", "Cross-project source mining"),

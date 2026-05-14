@@ -7,14 +7,14 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**58 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**59 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (13)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (9)
-- [Multi-region porting](#multi-region-porting) (2)
+- [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
@@ -207,6 +207,12 @@ Given an unmatched function's `objdiff-cli diff` JSON, surfaces candidate codege
 ## Multi-region porting
 
 _Cross-region porting pipeline: locate USA/JPN siblings of EUR-matched functions and mechanically rewrite source for the target region. See brief 061 / 064 for design._
+
+### `tools/cross_apply_libs_port.py`
+
+**apply a libs/nitro/ port across**
+
+EUR + USA + JPN regions.
 
 ### `tools/find_region_siblings.py`
 

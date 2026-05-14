@@ -496,3 +496,7 @@ src/jpn/main/func_0200857c.c:
 src/jpn/main/func_02068c1c.c:
     complete
     .text start:0x02068c1c end:0x02068c2c
+
+libs/nitro/func_02007218.legacy.c:
+    complete
+    .text start:0x020071fc end:0x02007214
