@@ -494,31 +494,9 @@ src/overlay011/ov011_021d2138.c:
 
 
 
-src/overlay011/ov011_021d12bc.s:
-    complete
-    .text start:0x021d12bc end:0x021d12c0
-
-
-
-
-
-
-
-
-
-
-src/overlay011/ov011_021d18b0.s:
+libs/nitro/func_ov011_021d18b0.legacy.c:
     complete
     .text start:0x021d18b0 end:0x021d18b4
-
-
-
-
-
-
-
-
-
 src/overlay011/ov011_021d2db8.c:
     complete
     .text start:0x021d2db8 end:0x021d2de4
@@ -578,3 +556,7 @@ src/overlay011/func_ov011_021d11c8.c:
 src/overlay011/func_ov011_021d0e58.c:
     complete
     .text start:0x021d0e58 end:0x021d0e88
+
+libs/nitro/func_ov011_021d12bc.legacy.c:
+    complete
+    .text start:0x021d12bc end:0x021d12c0

@@ -243,23 +243,9 @@ src/overlay015/ov015_021b2860.s:
 
 
 
-src/overlay015/ov015_021b3168.s:
-    complete
-    .text start:0x021b3168 end:0x021b316c
-
-
-
-
-
-
-
-
-
-
-src/overlay015/ov015_021b316c.s:
+libs/nitro/func_ov015_021b316c.legacy.c:
     complete
     .text start:0x021b316c end:0x021b3170
-
 src/overlay015/func_ov015_021b2ddc.c:
     complete
     .text start:0x021b2ddc end:0x021b2df8
@@ -267,3 +253,7 @@ src/overlay015/func_ov015_021b2ddc.c:
 src/overlay015/func_ov015_021b34a4.c:
     complete
     .text start:0x021b34a4 end:0x021b34cc
+
+libs/nitro/func_ov015_021b3168.legacy.c:
+    complete
+    .text start:0x021b3168 end:0x021b316c
