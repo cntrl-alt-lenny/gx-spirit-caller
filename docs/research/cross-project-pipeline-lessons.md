@@ -138,11 +138,13 @@ function differently, shifting subsequent symbols by 8 bytes each.
 Cumulative 32-byte shift broke all 27 modules (24/27 → 0/27).
 
 **Fix:** brief 077 PR #459 — 2-line regex strip:
+
 ```python
 rewritten_body = re.sub(
     r"^\s*static\s+", "", rewritten_body, count=1,
 )
 ```
+
 `^` anchor (no MULTILINE) matches only the body's start. Local-scope
 `static int x = 0;` inside the body survives.
 
