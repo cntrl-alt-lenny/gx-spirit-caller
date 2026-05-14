@@ -313,26 +313,14 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
-  — `cloud` (HIGH priority): **D1 shipped via PR #438** (117
-  candidates → 2.34× the brief 070 floor). D2/D3/D4 deferred to
-  parallel ⚠️ scope-confirm autonomous PRs (brain green-lit on
-  #438). Suggested cloud sequencing: D4 first (cheap, builds on
-  D1 RelocRef infra → 110 candidates unlocked), then D2+D3 as
-  a pair (intertwined header/struct vendoring → 264 candidates
-  unlocked). Total theoretical ceiling: 491 candidates across
-  D1-D4. Branch: `cloud/port-external-source-driver` (D1
-  merged); D2/D3/D4 on follow-up cloud branches.
-
 - [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
-  — `decomper` (HIGH priority, **NOW ACTIVE** — brief 070 D1
-  shipped). Cross-project bulk-port wave 1 rerun against the
-  117 D1-ready candidates. Targets 50-100 byte-identical ports
-  into region-neutral `libs/nitro/` (each port unlocks EUR +
-  USA + JPN simultaneously). Routes as `.legacy.c` (1.2/sp2p3
-  exact SP match). Self-extends 1/2 + 2/2 pull from D4 + D3 +
-  D2 follow-ups as cloud ships those. Branch:
-  `decomper/cross-project-bulk-port-wave-1-rerun`.
+  — `decomper` (HIGH priority, **wave 1 closed at 64 ports /
+  0.88 precision** via PR #442). Self-extends 1/2 + 2/2
+  available; pool is now **171 candidates** (D1 117 + D4 +33
+  + D2+D3 +21 from cloud's full brief 070 shipment). Wave 2
+  should additionally fold wave-1 ports into USA + JPN
+  delinks.txt for per-region cross-application. Branch:
+  `decomper/cross-project-bulk-port-wave-N`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -355,6 +343,15 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
+  `cloud`, **fully closed** across PRs #438 (D1 callee remap),
+  #440 (D4 data-ref remap), #441 (D2+D3 vendored framework).
+  D1+D4+D2+D3 combined: 171 compile-ready candidates against
+  the pokediamond NitroSDK + libnns pool (3.4× brief 071's
+  50 floor). Architectural symmetry with `port_to_region.py`'s
+  parallel-reloc bridge paid off as designed. D2+D3 framework
+  compounds incrementally as decomper vendors more headers
+  into `libs/nitro/include/`.
 - [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
   `decomper`, shipped in PR #436 at the floor (10 ports vs 50
   floor). **Brain scoping miss** — brief 069 listed

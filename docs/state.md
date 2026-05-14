@@ -8,14 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 morning, **brief 070 D1 shipped
-(PR #438): 117 compile-ready candidates, 2.34× the floor.**
-9/10 of brief 069's wave 1 ports re-validate cleanly through
-the new driver. Brief 071 (decomper bulk-port wave 1 rerun)
-NOW ACTIVE — pool is 117 D1-ready candidates with self-extend
-waves absorbing D4/D3/D2 follow-ups as cloud ships them.
-Cloud parallelizes D2/D3/D4 against decomper's brief 071 work.
-EUR 1.48%, USA + JPN 0.19% each.
+**Last updated:** 2026-05-14 mid-morning, **brief 070 FULLY
+CLOSED (D1+D4+D2+D3 all shipped) + brief 071 wave 1 ABOVE
+FLOOR.** 64 byte-identical cross-project ports / 0.88
+precision. Cumulative cross-project: **74 ports** (10 brief 069
++ 64 brief 071). EUR badge **1.51%**, USA + JPN 0.19% (wave 1
+landed EUR-only; per-region cross-application is a small
+follow-up). Brief 071 self-extend GREEN — wave 2 can run
+autonomously against the now-171-candidate D1+D4+D2+D3 pool.
 
 ## This session in one paragraph
 
@@ -136,35 +136,44 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — D2/D3/D4 follow-ups in parallel autonomous PRs:**
+**Cloud — autonomous candidates from wave 1 + queued brief:**
 
-1. **Brief 070 D1 (CLOSED, PR #438)** — port_external_source.py
-   callee-remap via .o reloc table. 117-candidate D1-ready
-   pool. 9/10 wave-1 re-validation. Skip-reason taxonomy
-   (struct-access 157, data-ref 110, undefined-macro 107)
-   gates D2/D3/D4.
-2. **D2 + D3 + D4 (cloud autonomous, ⚠️ scope-confirm)** —
-   brain green-lit on PR #438 review. Cloud sequencing
-   recommendation: D4 first (110 candidates, builds on D1
-   RelocRef infra; structurally similar to D1's callee
-   remap but for data symbols). Then D2 + D3 as a pair
-   (intertwined header + struct vendoring, 264 candidates
-   unlocked).
-3. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
-   Becomes high-priority on the next hard-tier cap-raise.
+Wave-1 calibration data surfaced four D1 limitations worth
+autonomous-PR pickup, in priority order:
 
-Closed cloud briefs: 062/066/068/070-D1 plus four autonomous
-patches (#427/#434/#435/#438).
+- **TU-collision pre-filter via `delinks.txt` complete
+  markers** (highest leverage — 75 of 276 wave-1 attempts
+  dropped here, ~30% noise reduction). Have the sweep
+  consult `config/<region>/**/delinks.txt` for `complete`
+  claims at each candidate's address; skip those upfront.
+- **THUMB/ARM kind mismatch refuse-fast** (small — 2-line
+  addition to D1's logic). When our symbol's `kind:` differs
+  from upstream's compiled kind, refuse. Wave 1's
+  `MI_Zero36B` (THUMB 0xe vs ARM 0x1c) is the worked example.
+- **`extern u32 GXi_DmaId` r-value detection** (medium). D4's
+  data-ref detector catches the symbol but doesn't fire on
+  "identifier used as r-value not via `&` or call." Affects
+  all `GX_load2d.c`-style ports.
+- **Cross-TU placeholder remap fragility** (architectural,
+  defer). Self-resolves as `libs/nitro/` grows; not blocking.
 
-**Decomper — brief 071 NOW ACTIVE:**
+Scoped briefs:
 
-4. **Brief 071 (HIGH, ACTIVE)** — cross-project bulk-port
-   wave 1 rerun. Pool: 117 D1-ready candidates surfaced by
-   PR #438's full sweep. Target 50-100 byte-identical ports
-   into region-neutral `libs/nitro/`. Self-extends 1/2 +
-   2/2 pull from D4 + D3 + D2 candidates as cloud ships them
-   in parallel. Routes as `.legacy.c` (1.2/sp2p3 exact SP
-   match per brief 068's audit).
+1. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
+   Becomes high-priority on next hard-tier cap-raise.
+
+Closed cloud briefs: 062/066/068/070-D1/070-D4/070-D2+D3 plus
+six autonomous patches (#427/#434/#435/#438/#440/#441).
+
+**Decomper — brief 071 self-extend 1/2 available:**
+
+2. **Brief 071 (HIGH, self-extend 1/2 ACTIVE)** — wave 1
+   closed at 64 ports / 0.88 precision. Wave 2 pool now
+   **171 candidates** (D1 117 + D4 +33 + D2+D3 +21).
+   Self-extend gates both clear from wave 1. Wave-2 should
+   additionally fold the wave-1 ports into USA + JPN
+   delinks.txt (small per-region cross-application that
+   wave 1 punted on) so USA + JPN badges move from 0.19%.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
