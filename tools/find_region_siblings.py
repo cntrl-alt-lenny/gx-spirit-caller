@@ -200,23 +200,33 @@ def _mask_relocs(bytes_: bytes, func_addr: int,
     """Replace bytes at reloc-affected offsets with 0x00 (sentinel).
 
     `reloc_offsets` is the list of absolute reloc-from addresses
-    that fall inside this function. For each, we zero the 4-byte
-    word at the 4-aligned address — this safely covers:
+    that fall inside this function. For each, zero the 4 bytes
+    starting at the reloc-from address — covers:
 
-    - ARM BL relocations (24-bit imm in a 4-byte instruction)
-    - ARM `ldr ip, =label` pool slots (4-byte `.word`)
-    - Thumb branch / load relocations (2 or 4 bytes)
+    - ARM BL / B relocations (4-byte instruction at 4-aligned
+      offset — full instruction masked)
+    - ARM `ldr ip, =label` pool slots (4-byte `.word` at 4-aligned
+      offset — full word masked)
+    - Thumb-2 BL relocations (4-byte instruction pair at
+      2-aligned offset — full instruction pair masked)
+    - Thumb-1 branch / load relocations (2-byte instruction;
+      mask extends 2 bytes past it — over-mask is safer than
+      under-mask, and the reloc-parity gate in cross_apply
+      catches any false positives the over-mask introduces)
 
-    Slightly aggressive vs precise per-kind masking, but never
-    leaks region-specific bytes that would falsely separate
-    siblings.
+    Brief 079 D2 v2 fix: previously the mask was 4-aligned-down,
+    which under-masked Thumb-2 BL at 2-aligned offsets (e.g. a
+    BL at offset 0x12 had only bytes 0x10-0x13 masked; bytes
+    0x14-0x15 — half the BL — leaked region-specific encoding
+    bytes). Now we mask from the actual reloc-from offset.
     """
     out = bytearray(bytes_)
     for absolute in reloc_offsets:
         rel = absolute - func_addr
-        # Align down to 4-byte boundary
-        aligned = (rel // 4) * 4
-        for i in range(aligned, aligned + 4):
+        # Mask 4 bytes from the actual reloc-from offset (NOT
+        # 4-aligned-down — that was the brief 079 D2 v2 bug for
+        # Thumb-2 BL at 2-aligned offsets).
+        for i in range(rel, rel + 4):
             if 0 <= i < len(out):
                 out[i] = 0x00
     return bytes(out)

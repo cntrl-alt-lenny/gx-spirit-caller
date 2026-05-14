@@ -432,7 +432,21 @@ def derive_plan(
               file=sys.stderr)
         return None
     target_addr, target_old_name = target_match
-    target_new_name = f"func_{eur_addr:08x}"
+
+    # Brief 079 D1 v2 — preserve the `ov<NNN>_` prefix in the
+    # rename target. For overlay ports (`func_ov<NNN>_<addr>.
+    # legacy.c`), libs/ files declare the function as
+    # `func_ov<NNN>_<eur_addr>`; the rename must emit a
+    # matching name in the target region's symbols.txt or the
+    # link fails on symbol mismatch (brief 078 wave 2's bug).
+    m = _PORT_FILENAME_RE.match(port_file.name)
+    overlay = m.group("overlay") if m else None
+    if overlay:
+        target_new_name = (
+            f"func_ov{int(overlay):03d}_{eur_addr:08x}"
+        )
+    else:
+        target_new_name = f"func_{eur_addr:08x}"
     delinks_path = _delinks_path_for(target_region, eur_module)
 
     # Scan the port for data refs; build per-region data renames.
