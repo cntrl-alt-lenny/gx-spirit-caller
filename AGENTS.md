@@ -313,29 +313,21 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](docs/briefs/079-cross-apply-tool-v2-fixes.md)
-  — `cloud` (MEDIUM): D1 v2 overlay-prefix rename fix + D2
-  v2 reloc-aware byte comparison. Unlocks ~30 more cross-
-  region ports — the last bounded chunk before natural
-  drain. Branch: `cloud/cross-apply-tool-v2-fixes`.
+- [`docs/briefs/082-pokeheartgold-bulk-port-wave-1.md`](docs/briefs/082-pokeheartgold-bulk-port-wave-1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): first pokeheartgold
+  cross-project bulk-port wave using brief 080's CSV
+  pipeline. Target 30-60 byte-identical ports from
+  `lib/NitroSDK + lib/MSL_C + lib/dsprot` (2.0/sp2p2, one
+  SP-rev off ours). Branch:
+  `decomper/pokeheartgold-bulk-port-wave-1`.
 
-- [`docs/briefs/080-pokeheartgold-extension-research.md`](docs/briefs/080-pokeheartgold-extension-research.md)
-  — `cloud` (MEDIUM): research + prototype for the second
-  cross-project upstream source. Brief 066's headline:
-  pokeheartgold's `nitrocrypto` subtree uses mwcc 1.2/sp2p3
-  = our exact `.legacy.c` SP. Sample-validate the ≥95%
-  projection for that sub-pool. Branch:
-  `cloud/pokeheartgold-extension-research`.
-
-- [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): resume EUR hard-tier
-  matching after cross-region/cross-project drain. Pick up
-  brief 060's residual ~61 MEDIUM C-20-family candidates +
-  new pool surveys, now with the full brief 062 (suggest_
-  coercion) + brief 070/072 toolchain available. Cap ≤ 0x40.
-  Each match potentially 3× via cross-region tooling on
-  follow-up. Branch:
-  `decomper/single-region-hard-tier-resumption`.
+- [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](docs/briefs/084-c22-struct-pointer-corruption-wall.md)
+  — `cloud` (MEDIUM-HIGH): codify the new struct-pointer +
+  field-access silent-corruption wall (C-22 candidate)
+  brief 081 chain confirmed across 3 datapoints. Part 1:
+  fold entry into codegen-walls.md. Part 2: investigate
+  recipe via C-variation + SP sweep. Branch:
+  `cloud/c22-struct-pointer-corruption-wall`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -358,6 +350,29 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
+  `decomper`, full 3-wave chain shipped via PRs #464 / #467
+  / #468. **21 matches / 876 bytes / 67.7% combined yield.**
+  Slope-change validation post-tools-investment. Wave 1
+  hit 87.5% yield; chain trended downward as pool drained.
+  Surfaced new wall candidate (struct-pointer + field-
+  access silent-corruption, 3 datapoints — brief 084
+  codifies) + suggest_coercion calibration: 6.5%
+  cumulative invocation rate, rule engine is long-tail
+  accelerator at ≤0x40 band (not first-pass tool).
+- [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](docs/briefs/079-cross-apply-tool-v2-fixes.md)
+  `cloud`, shipped in PR #463. D1 v2 overlay-prefix rename
+  + D2 v2 reloc-mask offset fix (closes Thumb-2 BL
+  half-mask trap). ~30 cross-region ports unlocked for
+  brief 085 (future).
+- [`docs/briefs/080-pokeheartgold-extension-research.md`](docs/briefs/080-pokeheartgold-extension-research.md)
+  `cloud`, shipped in PR #465. VERDICT: GO-WITH-CAVEATS.
+  Brief 066 correction: nitrocrypto is `.s` not `.c`. Real
+  unlock is 39 portable `.c` files across NitroSDK +
+  MSL_C + dsprot at 2.0/sp2p2 (one SP rev off ours).
+  Estimated ~50-80 ports/region after disambiguation.
+  Plus cloud-research-archaeology lessons writeup
+  shipped via PR #466.
 - [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #461. 11 of 40 target — below
   target. **Cross-region pipeline at natural drain**:
