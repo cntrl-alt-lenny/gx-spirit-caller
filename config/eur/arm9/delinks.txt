@@ -7335,3 +7335,23 @@ src/main/func_0201a594.c:
 libs/nitro/func_020921a8.legacy.c:
     complete
     .text start:0x020921a8 end:0x020921dc
+
+src/main/func_0200bef4.c:
+    complete
+    .text start:0x0200bef4 end:0x0200bf4c
+
+src/main/func_0200bf4c.c:
+    complete
+    .text start:0x0200bf4c end:0x0200bfa4
+
+src/main/func_0203dde8.c:
+    complete
+    .text start:0x0203dde8 end:0x0203de2c
+
+src/main/func_0208bde0.legacy.c:
+    complete
+    .text start:0x0208bde0 end:0x0208be38
+
+src/main/func_0208bd88.legacy.c:
+    complete
+    .text start:0x0208bd88 end:0x0208bde0
