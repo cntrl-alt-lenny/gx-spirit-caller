@@ -850,7 +850,7 @@ def _run_mode(
         return 1
     if source_c_abs is None or not source_c_abs.is_file():
         print(
-            f"ERROR: source .c not resolvable — see Source TU line above.",
+            "ERROR: source .c not resolvable — see Source TU line above.",
             file=sys.stderr,
         )
         return 1
@@ -892,7 +892,7 @@ def _run_mode(
             str(source_c_abs),
             str(disasm_s),
         ]
-        print(f"Importing into permuter:")
+        print("Importing into permuter:")
         print(f"  {' '.join(import_cmd)}")
         try:
             subprocess.run(import_cmd, check=True, cwd=str(permuter_path))
