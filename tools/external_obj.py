@@ -118,13 +118,65 @@ POKEDIAMOND_NITROSDK = BuildProfile(
 )
 
 
+# Brief 080 — pokeheartgold extension. Upstream Makefile audit:
+#
+#   pokeheartgold/Makefile           MWCCVER := 2.0/sp2p2 (NitroSDK, MSL_C)
+#   pokeheartgold/lib/dsprot/Mk      MWCCVER := 2.0/sp2p3 (newer SP)
+#   pokeheartgold/lib/syscall/Mk     MWCCVER := 2.0/sp2p3 (asm only)
+#   pokeheartgold/asm/nitrocrypto.o  MWCCVER := 1.2/sp2p3 (assembly!)
+#
+# Brief 066's "nitrocrypto exact-SP-match bonus pool" projection
+# turned out NOT to apply: pokeheartgold's nitrocrypto is .s
+# (assembly), not .c — no porting target. See
+# docs/research/pokeheartgold-extension-feasibility.md for the
+# full audit + verdict.
+#
+# All porting-eligible pokeheartgold subtrees use mwcc 2.0 family
+# (one SP-rev from our default 2.0/sp1p5). Expected pairing rate
+# 50-70% per brief 066's general non-exact-SP projection.
+POKEHEARTGOLD_NITROSDK = BuildProfile(
+    repo="pokeheartgold",
+    sp="2.0/sp2p2",
+    include_paths=(
+        "lib/include",
+        "include",
+    ),
+    cflags_extra=(
+        "-lang", "c99",
+        "-inline", "on,noauto",
+    ),
+    defines=("SDK_ARM9", "SDK_FINALROM"),
+)
+
+
+# pokeheartgold's lib/dsprot uses 2.0/sp2p3 per its subtree
+# Makefile override.
+POKEHEARTGOLD_DSPROT = BuildProfile(
+    repo="pokeheartgold",
+    sp="2.0/sp2p3",
+    include_paths=(
+        "lib/include",
+        "lib/dsprot/include",
+        "include",
+    ),
+    cflags_extra=(
+        "-lang", "c99",
+        "-inline", "on,noauto",
+    ),
+    defines=("SDK_ARM9", "SDK_FINALROM"),
+)
+
+
 PROFILES: dict[str, BuildProfile] = {
     # The (repo, subtree-prefix) → profile mapping. We pick the
-    # first matching prefix for each source path.
-    # NitroSDK + libnns share their profile (1.2/sp2p3); MSL_C
-    # would use a different profile when added.
+    # first matching prefix for each source path; ORDER MATTERS
+    # for prefix overlap (e.g. dsprot before generic NitroSDK
+    # path if any overlap existed — none here).
     "pokediamond:arm9/lib/NitroSDK": POKEDIAMOND_NITROSDK,
     "pokediamond:arm9/lib/libnns": POKEDIAMOND_NITROSDK,
+    "pokeheartgold:lib/dsprot": POKEHEARTGOLD_DSPROT,
+    "pokeheartgold:lib/NitroSDK": POKEHEARTGOLD_NITROSDK,
+    "pokeheartgold:lib/MSL_C": POKEHEARTGOLD_NITROSDK,
 }
 
 
