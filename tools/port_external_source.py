@@ -1091,7 +1091,24 @@ def _compose_port_source(
     """Wrap the rewritten function body with a provenance comment
     block + minimal extern declarations for any remapped callees
     and data refs. Decomper refines `(void)` placeholders into
-    typed declarations after the port lands."""
+    typed declarations after the port lands.
+
+    Brief 077 fix: strip leading `static` from the rewritten body.
+    Upstream source may declare a function `static` (file-local
+    linkage), but our dsd-gap TUs are never static — preserving
+    the keyword would shift mwldarm's symbol allocation by 8
+    bytes per affected function. Brief 074 wave 3 (PR #457) hit
+    this silent corruption on `OSi_IdleThreadProc` +
+    `OSi_CancelThreadAlarmForSleep` (cumulative 32-byte shift,
+    all 27 modules broken until manual bisection).
+    """
+    # `^\s*static\s+` only matches the body's leading static
+    # qualifier (no MULTILINE flag, so `^` is start-of-string
+    # only). Local-scope `static int x = 0;` inside the function
+    # body is preserved.
+    rewritten_body = re.sub(
+        r"^\s*static\s+", "", rewritten_body, count=1,
+    )
     lines = []
     lines.append("/*")
     lines.append(" * Cross-project port:")
