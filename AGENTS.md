@@ -313,14 +313,20 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
-  — `decomper` (HIGH priority, **wave 1 closed at 64 ports /
-  0.88 precision** via PR #442). Self-extends 1/2 + 2/2
-  available; pool is now **171 candidates** (D1 117 + D4 +33
-  + D2+D3 +21 from cloud's full brief 070 shipment). Wave 2
-  should additionally fold wave-1 ports into USA + JPN
-  delinks.txt for per-region cross-application. Branch:
-  `decomper/cross-project-bulk-port-wave-N`.
+- [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
+  — `cloud` (MEDIUM-HIGH): extend D2+D3 framework with full
+  struct definitions for `_OSThread`, `_OSThreadQueue`,
+  `OSMutex` etc. Brief 071 wave 2 lost 112 compile-fails on
+  these; expected unlock ~80 ports. Branch:
+  `cloud/port-driver-d5-struct-vendoring`.
+
+- [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
+  — `cloud` (MEDIUM): solve the "libs/ port `.c` declares
+  EUR-addr name but USA/JPN symbols.txt has different addr"
+  refactor. Research + pilot ~10-port batch end-to-end. Brain
+  accountability: state.md misled with "small follow-up"
+  guidance — it's brief-sized. Branch:
+  `cloud/per-region-cross-application`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -343,6 +349,17 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
+  `decomper`, full chain shipped across PRs #442 (wave 1, 64
+  ports / 0.88) + #445 (wave 2, 13 ports / 0.68 — below
+  floor). **Cumulative 87 cross-project ports** at the
+  closure. Wave 2 surfaced three driver-quality findings now
+  on cloud's queue: D5 full-struct vendoring (brief 072),
+  per-region cross-application refactor (brief 073), D1
+  ambiguous-addr disambiguation. Plus cloud shipped #444
+  (TU-collision pre-filter + ish-mismatch) and #446
+  (STT_NOTYPE r-value classification) in parallel — both
+  silent-corruption fixes the next cross-project wave needs.
 - [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
   `cloud`, **fully closed** across PRs #438 (D1 callee remap),
   #440 (D4 data-ref remap), #441 (D2+D3 vendored framework).

@@ -8,14 +8,16 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 mid-morning, **brief 070 FULLY
-CLOSED (D1+D4+D2+D3 all shipped) + brief 071 wave 1 ABOVE
-FLOOR.** 64 byte-identical cross-project ports / 0.88
-precision. Cumulative cross-project: **74 ports** (10 brief 069
-+ 64 brief 071). EUR badge **1.51%**, USA + JPN 0.19% (wave 1
-landed EUR-only; per-region cross-application is a small
-follow-up). Brief 071 self-extend GREEN — wave 2 can run
-autonomously against the now-171-candidate D1+D4+D2+D3 pool.
+**Last updated:** 2026-05-14 late morning, **brief 071 chain
+CLOSED at 87 cumulative cross-project ports.** Wave 2 (per
+PR #445) hit floor at 13 ports / 0.68 precision; honest
+below-floor handback. Plus cloud shipped PR #444 (TU-collision
+pre-filter + ish-mismatch) and PR #446 (STT_NOTYPE silent-
+corruption fix). Brief 072 (D5 struct vendoring) + brief 073
+(per-region cross-application refactor) queued for cloud.
+EUR 1.51%, USA + JPN 0.19%. **Brain accountability:** state's
+"small follow-up" guidance on per-region cross-application
+was wrong — it's brief-sized work, now scoped as 073.
 
 ## This session in one paragraph
 
@@ -136,44 +138,42 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — autonomous candidates from wave 1 + queued brief:**
+**Cloud — two HIGH-leverage scoped briefs queued:**
 
-Wave-1 calibration data surfaced four D1 limitations worth
-autonomous-PR pickup, in priority order:
+1. **Brief 072 (MEDIUM-HIGH) — D5 full struct vendoring.**
+   Brief 071 wave 2 lost 112 compile-fails on incomplete
+   struct types (`_OSThread`, `_OSThreadQueue`, `OSMutex`).
+   Headers in `libs/nitro/include/` only have forward decls;
+   D2+D3 framework relaxes refusal but compile still needs
+   real struct bodies. Vendor full defs from pokediamond.
+   Expected unlock: ~80 ports recoverable.
+2. **Brief 073 (MEDIUM) — per-region cross-application
+   refactor.** Solve the libs/ port `.c` declares
+   EUR-addr-name vs USA/JPN symbols.txt-has-different-name
+   refactor. Research approach A (per-region symbol rename)
+   vs B (libs/ ports use upstream NitroSDK names) +
+   ~10-port pilot batch. Unlocks the 3× compounding multiplier
+   on cross-project ports (currently libs/ ports only
+   contribute to EUR's match count).
 
-- **TU-collision pre-filter via `delinks.txt` complete
-  markers** (highest leverage — 75 of 276 wave-1 attempts
-  dropped here, ~30% noise reduction). Have the sweep
-  consult `config/<region>/**/delinks.txt` for `complete`
-  claims at each candidate's address; skip those upfront.
-- **THUMB/ARM kind mismatch refuse-fast** (small — 2-line
-  addition to D1's logic). When our symbol's `kind:` differs
-  from upstream's compiled kind, refuse. Wave 1's
-  `MI_Zero36B` (THUMB 0xe vs ARM 0x1c) is the worked example.
-- **`extern u32 GXi_DmaId` r-value detection** (medium). D4's
-  data-ref detector catches the symbol but doesn't fire on
-  "identifier used as r-value not via `&` or call." Affects
-  all `GX_load2d.c`-style ports.
-- **Cross-TU placeholder remap fragility** (architectural,
-  defer). Self-resolves as `libs/nitro/` grows; not blocking.
+Plus carryover:
 
-Scoped briefs:
+3. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
 
-1. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
-   Becomes high-priority on next hard-tier cap-raise.
+Cloud autonomous still-open candidate from wave 2:
 
-Closed cloud briefs: 062/066/068/070-D1/070-D4/070-D2+D3 plus
-six autonomous patches (#427/#434/#435/#438/#440/#441).
+- D1 v2 ambiguous-addr disambiguation (small) —
+  `OS_UnlockCartridge` had two candidates; D1 picked wrong.
+  Same shape as `callee-unresolvable` refuse-fast.
 
-**Decomper — brief 071 self-extend 1/2 available:**
+Closed: 062/066/068/070-D1/070-D4/070-D2+D3 plus eight
+autonomous patches (#427/#434/#435/#438/#440/#441/#444/#446).
 
-2. **Brief 071 (HIGH, self-extend 1/2 ACTIVE)** — wave 1
-   closed at 64 ports / 0.88 precision. Wave 2 pool now
-   **171 candidates** (D1 117 + D4 +33 + D2+D3 +21).
-   Self-extend gates both clear from wave 1. Wave-2 should
-   additionally fold the wave-1 ports into USA + JPN
-   delinks.txt (small per-region cross-application that
-   wave 1 punted on) so USA + JPN badges move from 0.19%.
+**Decomper — standing down, no active brief:**
+
+Brief 071 chain CLOSED. Next decomper move is brief 074
+(cross-project wave 3 rerun once briefs 072 + 073 ship).
+Brain will scope brief 074 after the cloud follow-ups land.
 
 **Cloud lower-priority candidates (autonomous-only):**
 
