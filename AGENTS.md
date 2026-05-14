@@ -314,20 +314,20 @@ itself:
 ### Open briefs
 
 - [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): resume cross-project
-  bulk-port chain. Driver substantially sharper after D5
-  (PR #449) + ambiguous-callee refuse (PR #448) + #444
-  (pre-filter + ish-mismatch) + #446 (silent-corruption
-  fix). Expected ~130 candidate ok pool; target 50-100
-  byte-identical ports. Branch:
+  — `decomper` (HIGH, **ACTIVE** — in flight, no PR yet):
+  resume cross-project bulk-port chain. Pool est. ~130 ok
+  candidates after the brief 070 follow-up driver shipping.
+  Target 50-100 byte-identical ports. Branch:
   `decomper/cross-project-bulk-port-wave-3`.
 
-- [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
-  — `cloud` (MEDIUM): solve the libs/ port-naming refactor
-  that wave 2 surfaced as brief-sized. Research + pilot
-  ~10-port batch end-to-end. Unlocks 3× compounding
-  multiplier on cross-project ports. Branch:
-  `cloud/per-region-cross-application`.
+- [`docs/briefs/075-cross-region-apply-existing-ports.md`](docs/briefs/075-cross-region-apply-existing-ports.md)
+  — `decomper` (HIGH, **NOW ACTIVE** — independent of
+  brief 074): apply `tools/cross_apply_libs_port.py` (PR
+  #451) to the 87 existing cross-project ports so each
+  lands in USA + JPN. **First time USA + JPN badges move
+  substantially from 0.19%.** Expected USA + JPN climb to
+  ~0.6-0.7% each. Branch:
+  `decomper/cross-region-apply-existing-ports`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -350,6 +350,14 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
+  `cloud`, shipped in PR #451. **Approach A extended** (function
+  + data-ref rename via parallel-reloc bridge). 1-port worked
+  example (`func_02007218.legacy.c`) verifies 3-region 24/27
+  baseline preserved. New tool: `tools/cross_apply_libs_port.py`.
+  20 new tests. Approach B (upstream NitroSDK naming) deferred to
+  brief 076 if Approach A's semantic noise bites decomper
+  iteration. Followed by brief 075 (full 87-port batch).
 - [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
   `cloud`, shipped in PR #449. Full struct defs for
   `_OSThread`, `_OSThreadQueue`, `OSMutex` + transitive deps
