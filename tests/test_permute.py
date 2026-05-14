@@ -16,13 +16,23 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from permute import (  # noqa: E402
+    PERMUTER_PINNED_COMMIT,
+    PERMUTER_REPO_URL,
+    PERMUTER_VENDOR_DIR,
+    PermuterRunResult,
+    best_output,
+    collect_output_dirs,
+    copy_match_to_perm_work,
+    ensure_permuter_installed,
     expected_disasm_path,
     expected_object_path,
+    install_permuter_deps,
     module_delinks_path,
     module_symbols_path,
     parse_tu_ranges,
     render_readme,
     render_run_sh,
+    run_permuter,
     stage_work_dir,
     tu_containing,
 )
@@ -376,6 +386,496 @@ class TestStageWorkDir(unittest.TestCase):
             finally:
                 import shutil as _shutil
                 _shutil.rmtree(work_dir, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Brief 063 — auto-runner mode tests.
+#
+# We can't actually run decomp-permuter from cloud (no toolchain, no
+# baserom, no permuter clone in CI). The tests below cover the
+# wrapper logic — auto-install command shapes, output-dir scanning,
+# subprocess invocation building, byte-match detection, stdout
+# streaming, wall-clock cap — by mocking `git` / `pip` / `Popen` and
+# the filesystem. Production end-to-end verification is brain's job
+# on a host with a working toolchain.
+# ---------------------------------------------------------------------------
+
+
+class TestPermuterConstants(unittest.TestCase):
+    """Pin the version-controlled inputs to the auto-installer so a
+    typo in the URL or commit doesn't go un-noticed."""
+
+    def test_repo_url_points_at_upstream(self):
+        self.assertEqual(
+            PERMUTER_REPO_URL,
+            "https://github.com/simonlindholm/decomp-permuter.git",
+        )
+
+    def test_pinned_commit_is_sha_shaped(self):
+        # Full 40-char hex sha. Bumping is fine; nonsense isn't.
+        self.assertEqual(len(PERMUTER_PINNED_COMMIT), 40)
+        int(PERMUTER_PINNED_COMMIT, 16)  # raises if non-hex
+
+    def test_vendor_dir_under_tools_vendor(self):
+        # Path matches the project's tools/_vendor/ convention so the
+        # existing .gitignore entry covers it without changes.
+        parts = PERMUTER_VENDOR_DIR.parts
+        self.assertEqual(parts[-3:], ("tools", "_vendor", "decomp-permuter"))
+
+
+class TestEnsurePermuterInstalled(unittest.TestCase):
+    """Auto-install logic — cold-clone path and idempotent re-pin path."""
+
+    def test_cold_clone_invokes_git_clone_and_checkout(self):
+        # Vendor dir doesn't exist yet → clone + checkout.
+        calls = []
+        def fake_git(args, cwd=None):
+            calls.append((tuple(args), cwd))
+            class R: stdout = ""
+            return R()
+        logs = []
+        with tempfile.TemporaryDirectory() as td:
+            vendor = Path(td) / "decomp-permuter"
+            # vendor doesn't exist; permuter.py doesn't exist either.
+            ensure_permuter_installed(
+                vendor_dir=vendor,
+                commit="deadbeef" * 5,
+                run_git=fake_git,
+                log=logs.append,
+            )
+        # Expect a clone followed by a checkout — exact arg shape:
+        self.assertEqual(len(calls), 2)
+        clone_args, clone_cwd = calls[0]
+        self.assertEqual(clone_args[0], "clone")
+        self.assertEqual(clone_args[1], PERMUTER_REPO_URL)
+        self.assertIsNone(clone_cwd)
+        checkout_args, checkout_cwd = calls[1]
+        self.assertEqual(checkout_args, ("checkout", "deadbeef" * 5))
+        # checkout runs INSIDE the cloned dir.
+        self.assertEqual(checkout_cwd, vendor)
+
+    def test_already_at_pinned_commit_is_noop(self):
+        # Vendor dir exists and HEAD already matches → no git fetch /
+        # checkout. Fast-path branch.
+        calls = []
+        commit = "abcdef01" * 5
+        def fake_git(args, cwd=None):
+            calls.append(tuple(args))
+            class R:
+                stdout = commit + "\n"
+            return R()
+        with tempfile.TemporaryDirectory() as td:
+            vendor = Path(td) / "decomp-permuter"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub\n")
+            ensure_permuter_installed(
+                vendor_dir=vendor,
+                commit=commit,
+                run_git=fake_git,
+                log=lambda m: None,
+            )
+        # Only the HEAD check ran — no fetch, no checkout.
+        self.assertEqual(calls, [("rev-parse", "HEAD")])
+
+    def test_existing_but_wrong_commit_repins(self):
+        # Vendor dir exists, HEAD ≠ pinned → fetch + checkout.
+        commit = "11111111" * 5
+        calls = []
+        def fake_git(args, cwd=None):
+            calls.append(tuple(args))
+            class R:
+                stdout = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n"
+            return R()
+        with tempfile.TemporaryDirectory() as td:
+            vendor = Path(td) / "decomp-permuter"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub\n")
+            ensure_permuter_installed(
+                vendor_dir=vendor,
+                commit=commit,
+                run_git=fake_git,
+                log=lambda m: None,
+            )
+        self.assertEqual(calls[0], ("rev-parse", "HEAD"))
+        self.assertIn(("fetch", "origin"), calls)
+        self.assertIn(("checkout", commit), calls)
+
+
+class TestInstallPermuterDeps(unittest.TestCase):
+    def test_pip_command_is_python_m_pip_install(self):
+        captured = []
+        def fake_pip(cmd):
+            captured.append(cmd)
+        install_permuter_deps(
+            deps=("toml", "Levenshtein"),
+            python_exe="/fake/python",
+            run_pip=fake_pip,
+            log=lambda m: None,
+        )
+        self.assertEqual(len(captured), 1)
+        cmd = captured[0]
+        self.assertEqual(
+            cmd,
+            ["/fake/python", "-m", "pip", "install", "toml", "Levenshtein"],
+        )
+
+    def test_empty_deps_is_noop(self):
+        # Defensive — if the deps list is wiped to empty, the call
+        # must not invoke pip at all.
+        captured = []
+        install_permuter_deps(
+            deps=(),
+            run_pip=lambda c: captured.append(c),
+            log=lambda m: None,
+        )
+        self.assertEqual(captured, [])
+
+
+class TestCollectOutputDirs(unittest.TestCase):
+    """Permuter writes `<input_dir>/output-<score>-<ctr>/source.c`.
+    The wrapper scans this layout after a run to find the best
+    permutation (or detect a byte-match at score 0)."""
+
+    def test_empty_nonmatchings_returns_empty(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.assertEqual(collect_output_dirs(Path(td)), [])
+
+    def test_missing_nonmatchings_returns_empty(self):
+        self.assertEqual(
+            collect_output_dirs(Path("/definitely/not/here")), [],
+        )
+
+    def test_sorted_by_score_ascending(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "output-12-0").mkdir()
+            (root / "output-0-0").mkdir()
+            (root / "output-5-3").mkdir()
+            # Non-matching dirs are ignored.
+            (root / "settings.toml").write_text("")
+            (root / "base.c").write_text("")
+            (root / "scrap").mkdir()
+            dirs = collect_output_dirs(root)
+            names = [d.name for d in dirs]
+            self.assertEqual(names, ["output-0-0", "output-5-3", "output-12-0"])
+
+    def test_best_output_picks_lowest_score(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "output-12-0").mkdir()
+            (root / "output-0-2").mkdir()
+            (root / "output-3-1").mkdir()
+            best, score = best_output(root)
+            self.assertEqual(best.name, "output-0-2")
+            self.assertEqual(score, 0)
+
+    def test_best_output_empty_returns_nones(self):
+        with tempfile.TemporaryDirectory() as td:
+            best, score = best_output(Path(td))
+            self.assertIsNone(best)
+            self.assertIsNone(score)
+
+
+class _FakePermuterProcess:
+    """Minimal stand-in for `subprocess.Popen`. Streams a fixed
+    canned-stdout, exits with `exit_code`, supports terminate()/wait()
+    so the wall-clock branch can be exercised too."""
+
+    def __init__(self, lines: list[str], exit_code: int = 0,
+                 hang_after: int | None = None):
+        from io import StringIO
+        # Each "line" must already end in \n. readline() returns ""
+        # at EOF.
+        self.stdout = StringIO("".join(lines))
+        self._exit = exit_code
+        self._poll_returned = False
+        self._terminated = False
+        self._hang_after = hang_after
+        self._lines_read = 0
+
+    def readline(self) -> str:
+        # readline() on StringIO works fine — returns "" at EOF.
+        line = self.stdout.readline()
+        if line:
+            self._lines_read += 1
+        return line
+
+    def poll(self):
+        # Only signal "done" once readline returns "" (i.e. all canned
+        # lines consumed). Lets the wrapper's drain loop terminate
+        # naturally.
+        if self.stdout.tell() == len(self.stdout.getvalue()):
+            return self._exit
+        return None
+
+    def terminate(self):
+        self._terminated = True
+
+    def kill(self):
+        self._terminated = True
+
+    def wait(self, timeout=None):
+        return self._exit
+
+
+class TestRunPermuter(unittest.TestCase):
+    """Subprocess invocation + stdout streaming + outcome detection.
+    Permuter itself is mocked — we verify the wrapper builds the
+    right command, captures stdout to the right log path, and
+    reports the right `PermuterRunResult` shape."""
+
+    def test_builds_expected_command_with_defaults(self):
+        captured_cmd = {}
+        def fake_popen(cmd, **kwargs):
+            captured_cmd["cmd"] = cmd
+            captured_cmd["kwargs"] = kwargs
+            return _FakePermuterProcess(lines=[], exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nonmatchings = tmp / "nm"
+            nonmatchings.mkdir()
+            log_dir = tmp / "logs"
+            res = run_permuter(
+                vendor_dir=vendor,
+                nonmatchings_dir=nonmatchings,
+                function_name="func_x",
+                log_dir=log_dir,
+                threads=4,
+                max_seconds=10,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+            cmd = captured_cmd["cmd"]
+            # Argv[0] is sys.executable; argv[1] is the script path.
+            self.assertEqual(cmd[1], str(vendor / "permuter.py"))
+            self.assertEqual(cmd[2], str(nonmatchings))
+            self.assertIn("-j", cmd)
+            self.assertEqual(cmd[cmd.index("-j") + 1], "4")
+            # Default: --stop-on-zero is on.
+            self.assertIn("--stop-on-zero", cmd)
+            # No seed by default.
+            self.assertNotIn("--seed", cmd)
+            # Log file exists after run — assertion is inside the
+            # tempdir context so the log path is still valid.
+            self.assertTrue(res.log_path.is_file())
+            self.assertEqual(res.log_path.parent, log_dir)
+            self.assertFalse(res.timed_out)
+            self.assertEqual(res.exit_code, 0)
+
+    def test_seed_propagates_to_command(self):
+        captured = {}
+        def fake_popen(cmd, **_kw):
+            captured["cmd"] = cmd
+            return _FakePermuterProcess(lines=[], exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="f", log_dir=tmp / "logs",
+                threads=2, seed=42, max_seconds=5,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+        cmd = captured["cmd"]
+        self.assertIn("--seed", cmd)
+        self.assertEqual(cmd[cmd.index("--seed") + 1], "42")
+
+    def test_no_stop_on_zero_when_disabled(self):
+        captured = {}
+        def fake_popen(cmd, **_kw):
+            captured["cmd"] = cmd
+            return _FakePermuterProcess(lines=[], exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="f", log_dir=tmp / "logs",
+                threads=1, max_seconds=5, stop_on_zero=False,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+        self.assertNotIn("--stop-on-zero", captured["cmd"])
+
+    def test_match_detection_via_output_dir_glob(self):
+        # Permuter "found" a match (output-0-0/ created during the
+        # mocked run). Wrapper should see it and report match_found.
+        lines = [
+            "iteration 1, 0 errors, score = 50\n",
+            "found new best score! (10 vs 50)\n",
+            "found new best score! (0 vs 10)\n",
+            "wrote to /tmp/nm/output-0-0\n",
+        ]
+        def fake_popen(cmd, **_kw):
+            return _FakePermuterProcess(lines=lines, exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            # Pre-populate the output dir that the mocked run "would
+            # have created" — same effect as if real permuter had run.
+            (nm / "output-0-0").mkdir()
+            (nm / "output-0-0" / "source.c").write_text(
+                "/* matched permutation */\nvoid f(void) {}\n"
+            )
+            res = run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="f", log_dir=tmp / "logs",
+                threads=1, max_seconds=5,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+            self.assertTrue(res.match_found)
+            self.assertEqual(res.best_score, 0)
+            self.assertIsNotNone(res.result_c_path)
+            self.assertEqual(res.result_c_path.name, "source.c")
+            self.assertTrue(res.result_c_path.is_file())
+
+    def test_no_match_reports_best_score(self):
+        # Permuter ran but didn't find a match — best score is non-
+        # zero. match_found stays False.
+        def fake_popen(cmd, **_kw):
+            return _FakePermuterProcess(lines=[], exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            (nm / "output-12-0").mkdir()
+            (nm / "output-7-3").mkdir()
+            res = run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="f", log_dir=tmp / "logs",
+                threads=1, max_seconds=5,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+        self.assertFalse(res.match_found)
+        self.assertEqual(res.best_score, 7)
+        self.assertIsNone(res.result_c_path)
+
+    def test_log_captures_full_stdout(self):
+        lines = [
+            "iteration 1, 0 errors, score = 50\n",
+            "found new best score! (10 vs 50)\n",
+            "iteration 2, 0 errors, score = 10\n",
+        ]
+        def fake_popen(cmd, **_kw):
+            return _FakePermuterProcess(lines=lines, exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            res = run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="func_x", log_dir=tmp / "logs",
+                threads=1, max_seconds=5,
+                popen=fake_popen,
+                console_print=lambda m: None,
+                sleep=lambda s: None,
+            )
+            contents = res.log_path.read_text()
+            for L in lines:
+                self.assertIn(L.rstrip("\n"), contents)
+
+    def test_tail_print_only_emits_progress_lines(self):
+        # Verify the wrapper's tail-print filter — `iteration X` lines
+        # should NOT be echoed to the console (would be too noisy);
+        # `found new best`, `tied best`, `found a better`, `wrote to`
+        # SHOULD be. Brief 063's "tail-print the most recent best
+        # score line" intent.
+        lines = [
+            "iteration 1, 0 errors, score = 50\n",
+            "found new best score! (10 vs 50)\n",
+            "iteration 2, 0 errors, score = 10\n",
+            "tied best score! (10 vs 10)\n",
+            "iteration 3, 0 errors, score = 10\n",
+            "found a better score! (5 vs 10)\n",
+            "wrote to /tmp/nm/output-5-0\n",
+        ]
+        echoed = []
+        def fake_popen(cmd, **_kw):
+            return _FakePermuterProcess(lines=lines, exit_code=0)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vendor = tmp / "vendor"
+            vendor.mkdir()
+            (vendor / "permuter.py").write_text("# stub")
+            nm = tmp / "nm"
+            nm.mkdir()
+            run_permuter(
+                vendor_dir=vendor, nonmatchings_dir=nm,
+                function_name="f", log_dir=tmp / "logs",
+                threads=1, max_seconds=5,
+                popen=fake_popen,
+                console_print=lambda m: echoed.append(m),
+                sleep=lambda s: None,
+            )
+        # Banner lines (command/log/cap/threads) come first; then the
+        # progress markers. Filter to just the progress prefix.
+        progress = [e for e in echoed if "permuter:" in e]
+        # 4 progress markers expected; `iteration` lines suppressed.
+        self.assertEqual(len(progress), 4)
+        self.assertTrue(any("found new best" in p for p in progress))
+        self.assertTrue(any("tied best" in p for p in progress))
+        self.assertTrue(any("found a better" in p for p in progress))
+        self.assertTrue(any("wrote to" in p for p in progress))
+
+
+class TestCopyMatchToPermWork(unittest.TestCase):
+    def test_copies_source_c_to_result_c(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            src = tmp / "output-0-0" / "source.c"
+            src.parent.mkdir(parents=True)
+            src.write_text("/* matched */\nvoid f(void) {}\n", encoding="utf-8")
+            work_dir = tmp / "perm_work" / "main_f_02000000"
+            dst = copy_match_to_perm_work(
+                result_c=src, perm_work_dir=work_dir,
+            )
+            self.assertEqual(dst, work_dir / "result.c")
+            self.assertTrue(dst.is_file())
+            self.assertEqual(dst.read_text(), src.read_text())
+
+
+class TestPermuterRunResultDefaults(unittest.TestCase):
+    """Empty PermuterRunResult — defensive shape pin so future
+    callers can rely on the field defaults."""
+
+    def test_defaults(self):
+        r = PermuterRunResult()
+        self.assertFalse(r.match_found)
+        self.assertIsNone(r.best_score)
+        self.assertIsNone(r.result_c_path)
+        self.assertIsNone(r.log_path)
+        self.assertFalse(r.timed_out)
+        self.assertIsNone(r.exit_code)
+        self.assertEqual(r.output_dirs, [])
 
 
 if __name__ == "__main__":

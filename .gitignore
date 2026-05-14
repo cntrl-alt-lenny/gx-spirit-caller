@@ -41,6 +41,14 @@ objdiff.json
 *.sav
 *.xMAP
 
+# Permuter runs: stdout-streamed log files under permute_log/<func>.log
+# (brief 063). The `perm_work/` directory is the wrapper's staging
+# area (already ignored implicitly since nothing has ever checked it
+# in). The auto-runner creates `permute_log/` when invoked with
+# `--run`; keep those out of the repo.
+permute_log/
+perm_work/
+
 # Python venv
 .venv/
 

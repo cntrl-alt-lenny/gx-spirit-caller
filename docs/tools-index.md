@@ -182,7 +182,7 @@ propose the best-fit template for a new target.
 
 ### `tools/permute.py`
 
-**bootstrap a decomp-permuter run for a single function.**
+**bootstrap (and optionally auto-run) decomp-permuter for a single function.**
 
 Decomp-permuter (https://github.com/simonlindholm/decomp-permuter) is the standard matching-accelerator for NDS/GC/N64 decomps. Given a C source and a target assembly, it applies bounded random permutations (variable renames, type juggle…
 
