@@ -452,145 +452,21 @@ src/overlay002/ov002_022bdfb4.c:
 
 
 
-src/overlay002/ov002_0229cd40.s:
-    complete
-    .text start:0x0229cd40 end:0x0229cd44
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_0229cd4c.s:
+libs/nitro/func_ov002_0229cd4c.legacy.c:
     complete
     .text start:0x0229cd4c end:0x0229cd50
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_0229cd50.s:
-    complete
-    .text start:0x0229cd50 end:0x0229cd54
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022aacbc.s:
+libs/nitro/func_ov002_022aacbc.legacy.c:
     complete
     .text start:0x022aacbc end:0x022aacc0
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022ab3e0.s:
-    complete
-    .text start:0x022ab3e0 end:0x022ab3e4
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022b5588.s:
+libs/nitro/func_ov002_022b5588.legacy.c:
     complete
     .text start:0x022b5588 end:0x022b558c
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022b558c.s:
-    complete
-    .text start:0x022b558c end:0x022b5590
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022b8098.s:
+libs/nitro/func_ov002_022b8098.legacy.c:
     complete
     .text start:0x022b8098 end:0x022b809c
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022bdb10.s:
-    complete
-    .text start:0x022bdb10 end:0x022bdb14
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022bdb14.s:
+libs/nitro/func_ov002_022bdb14.legacy.c:
     complete
     .text start:0x022bdb14 end:0x022bdb18
-
-
-
-
-
-
-
-
-
-
-src/overlay002/ov002_022bdb84.s:
-    complete
-    .text start:0x022bdb84 end:0x022bdb88
-
-
-
-
-
-
 src/overlay002/func_ov002_021b0c28.c:
     complete
     .text start:0x021b0c28 end:0x021b0c34
@@ -1930,12 +1806,26 @@ src/overlay002/func_ov002_02208394.c:
     complete
     .text start:0x02208394 end:0x022083b4
 
+libs/nitro/func_ov002_0229cd40.legacy.c:
+    complete
+    .text start:0x0229cd40 end:0x0229cd44
 
+libs/nitro/func_ov002_0229cd50.legacy.c:
+    complete
+    .text start:0x0229cd50 end:0x0229cd54
 
+libs/nitro/func_ov002_022ab3e0.legacy.c:
+    complete
+    .text start:0x022ab3e0 end:0x022ab3e4
 
+libs/nitro/func_ov002_022b558c.legacy.c:
+    complete
+    .text start:0x022b558c end:0x022b5590
 
+libs/nitro/func_ov002_022bdb10.legacy.c:
+    complete
+    .text start:0x022bdb10 end:0x022bdb14
 
-
-
-
-
+libs/nitro/func_ov002_022bdb84.legacy.c:
+    complete
+    .text start:0x022bdb84 end:0x022bdb88
