@@ -313,20 +313,29 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/077-strip-static-keyword.md`](docs/briefs/077-strip-static-keyword.md)
-  — `cloud` (SMALL, autonomous-priority): 2-line fix to
-  `port_external_source.py`'s `_compose_port_source` —
-  strip `static` from rewritten function signatures.
-  Closes silent-corruption mode decomper bisected in brief
-  074 wave 3. Branch: `cloud/strip-static-keyword`.
+- [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](docs/briefs/079-cross-apply-tool-v2-fixes.md)
+  — `cloud` (MEDIUM): D1 v2 overlay-prefix rename fix + D2
+  v2 reloc-aware byte comparison. Unlocks ~30 more cross-
+  region ports — the last bounded chunk before natural
+  drain. Branch: `cloud/cross-apply-tool-v2-fixes`.
 
-- [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cross-region apply
-  wave 2 using brief 076's improved tool. Pool ~72 ports
-  (60 from brief 075's refusal residual + 12 new from
-  brief 074 wave 3). Expected USA + JPN climb 0.23% → ~0.4-
-  0.5% each. Branch:
-  `decomper/cross-region-apply-wave-2`.
+- [`docs/briefs/080-pokeheartgold-extension-research.md`](docs/briefs/080-pokeheartgold-extension-research.md)
+  — `cloud` (MEDIUM): research + prototype for the second
+  cross-project upstream source. Brief 066's headline:
+  pokeheartgold's `nitrocrypto` subtree uses mwcc 1.2/sp2p3
+  = our exact `.legacy.c` SP. Sample-validate the ≥95%
+  projection for that sub-pool. Branch:
+  `cloud/pokeheartgold-extension-research`.
+
+- [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): resume EUR hard-tier
+  matching after cross-region/cross-project drain. Pick up
+  brief 060's residual ~61 MEDIUM C-20-family candidates +
+  new pool surveys, now with the full brief 062 (suggest_
+  coercion) + brief 070/072 toolchain available. Cap ≤ 0x40.
+  Each match potentially 3× via cross-region tooling on
+  follow-up. Branch:
+  `decomper/single-region-hard-tier-resumption`.
 
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
   — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
@@ -349,6 +358,19 @@ itself:
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
+  `decomper`, shipped in PR #461. 11 of 40 target — below
+  target. **Cross-region pipeline at natural drain**:
+  39/99 libs/nitro ports applied (39% coverage). Remaining
+  60 split into ~30 four-byte trivial stubs (un-cross-
+  applicable), ~25 overlay ports (blocked on D1 v2 in
+  brief 079), ~5 substantive byte-collision (D2 v2 in
+  brief 079). Pipeline cap with current tools ~70 ports.
+- [`docs/briefs/077-strip-static-keyword.md`](docs/briefs/077-strip-static-keyword.md)
+  `cloud`, shipped in PR #459. 2-line static-strip regex
+  + 5 tests. Followed by PR #460 (brief 077.b — `static
+  inline` extension after family survey ruled out other
+  family members).
 - [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
   `decomper`, shipped in PR #457 at 12/50 below floor. **Brief
   074 chain CLOSES at cumulative 99 cross-project ports**
