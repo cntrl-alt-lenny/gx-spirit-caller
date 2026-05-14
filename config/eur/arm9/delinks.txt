@@ -7331,3 +7331,7 @@ src/main/func_02019088.c:
 src/main/func_0201a594.c:
     complete
     .text start:0x0201a594 end:0x0201a5c0
+
+libs/nitro/func_020921a8.legacy.c:
+    complete
+    .text start:0x020921a8 end:0x020921dc
