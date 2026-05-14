@@ -8,15 +8,15 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 evening, **strategic pivot
-post-cross-region drain.** Brief 078 wave 2 closed at 11/40
-(third consecutive below-target wave). Cross-region pipeline
-at 39/99 = 39% coverage; remaining 60 are mostly un-cross-
-applicable trivial stubs + 30 blocked on tool-v2 fixes.
-Cross-project + cross-region pipelines both at natural
-drain. **Three new briefs queued:** 079 (cloud, tool v2
-fixes), 080 (cloud, pokeheartgold research), 081 (decomper,
-single-region hard-tier resumption). EUR **1.54%**, USA +
+**Last updated:** 2026-05-14 night, **brief 081 chain CLOSED
+at 21 matches / 876 bytes / 67.7% yield** (slope-change
+validation post-tools-investment). Surfaced new struct-
+pointer silent-corruption wall (3 datapoints — C-22
+candidate, brief 084 queued) + suggest_coercion invocation-
+rate calibration data. Pokeheartgold infra shipped (PR #465)
+with GO-WITH-CAVEATS verdict — ~50-80 ports/region available
+(brief 082 active). Cloud lessons writeup shipped (PR #466)
+for cross-project pipeline archaeology. EUR **1.57%**, USA +
 JPN **0.26% each**.
 
 ## This session in one paragraph
@@ -138,36 +138,32 @@ sub-letter under C-20 (precedent: C-2a, C-1r). Decomper-
 discretion pickup (2 candidates < 5-target fresh-brief
 threshold).
 
-**Cloud — two scoped briefs queued + carryover:**
+**Cloud — one scoped brief queued + carryover:**
 
-1. **Brief 079 (MEDIUM)** — D1 v2 overlay-prefix rename fix
-   + D2 v2 reloc-aware byte comparison. Last bounded cross-
-   region tool work; unlocks ~30 more ports before natural
-   drain.
-2. **Brief 080 (MEDIUM)** — pokeheartgold/nitrocrypto
-   extension research. Brief 066's bonus finding:
-   nitrocrypto uses our exact `.legacy.c` SP. Sample-
-   validate ≥95% projection on that sub-pool. Verdict +
-   profile-registry extension + feasibility doc.
-3. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
+1. **Brief 084 (MEDIUM-HIGH)** — codify C-22 struct-pointer
+   silent-corruption wall (3 datapoints from brief 081
+   chain). Part 1: fold into codegen-walls.md. Part 2:
+   investigate recipe via C-variation + SP sweep.
+   Unblocks brief 086 (single-region cap-raise to ≤0x60).
+2. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner.
 
 Closed cloud briefs: 062/066/068/070 chain/072/072-D6.a/
-073/076/077/077.b plus thirteen autonomous patches.
+073/076/077/077.b/079/080 plus fifteen autonomous patches
+(cumulative since session start).
 
-**Decomper — strategic pivot to single-region:**
+**Decomper — cross-project pivot (pokeheartgold):**
 
-4. **Brief 081 (HIGH, NOW ACTIVE)** — single-region EUR
-   hard-tier resumption. Pick up brief 060's residual ~61
-   MEDIUM C-20-family candidates + fresh pool surveys, now
-   with the full brief 062 (suggest_coercion) + 070/072
-   toolchain available. Cap ≤ 0x40. Self-extend gates
-   same as brief 060.
+3. **Brief 082 (HIGH, NOW ACTIVE)** — pokeheartgold/MSL_C
+   bulk-port wave 1. Uses brief 080's CSV pipeline. Target
+   30-60 byte-identical ports from 2.0/sp2p2 subtree (one
+   SP-rev off ours). Region-neutral `libs/nitro/` — each
+   port × 3 regions via future cross-region apply.
 
-Closed decomper briefs: 074 chain (99 cross-project ports)
-+ 075/078 chain (39 cross-region applied). Pipelines at
-natural drain. Single-region resumption is the strategic
-pivot back to direct EUR badge growth with the now-much-
-richer toolchain.
+Closed decomper briefs: 074 (99 cross-project ports) + 075/
+078 (39 cross-region applied) + 081 (21 single-region
+matches / 876 bytes). Cumulative session output across all
+pipelines: **180 cross-region+cross-project+single-region
+match-equivalents.**
 
 **Cloud lower-priority candidates (autonomous-only):**
 
