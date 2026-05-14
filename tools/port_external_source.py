@@ -1102,12 +1102,26 @@ def _compose_port_source(
     `OSi_CancelThreadAlarmForSleep` (cumulative 32-byte shift,
     all 27 modules broken until manual bisection).
     """
-    # `^\s*static\s+` only matches the body's leading static
-    # qualifier (no MULTILINE flag, so `^` is start-of-string
-    # only). Local-scope `static int x = 0;` inside the function
-    # body is preserved.
+    # Strip leading `static` + optional `inline` from the body's
+    # function-signature line. Brief 077 covered the bare `static`
+    # case (4 wave-3 ports). Brief 077.b (this PR) extends to
+    # `static inline` — 9 pokediamond NitroSDK functions are
+    # declared `static inline` in upstream source; if any of those
+    # ever pass the byte-fingerprint match (i.e. didn't get
+    # inlined-away by mwcc), we'd leave `inline` behind after the
+    # static strip and shift mwldarm's symbol allocation the same
+    # way bare `static` did.
+    #
+    # The `^` anchor (no MULTILINE) matches only the body's
+    # start, so local-scope `static int x = 0;` is preserved.
+    # `count=1` is belt-and-suspenders.
+    #
+    # Doesn't touch `register` on parameters (load-bearing in
+    # mwccarm `asm void` functions like `CP_SaveContext`) or
+    # `__attribute__` (not present in pokediamond NitroSDK
+    # source — surveyed and verified).
     rewritten_body = re.sub(
-        r"^\s*static\s+", "", rewritten_body, count=1,
+        r"^\s*static(?:\s+inline)?\s+", "", rewritten_body, count=1,
     )
     lines = []
     lines.append("/*")
