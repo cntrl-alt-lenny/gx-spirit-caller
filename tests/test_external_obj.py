@@ -215,6 +215,27 @@ class TestElfParser(unittest.TestCase):
         self.assertIn(".text", section_names)
         self.assertIn(".symtab", section_names)
 
+    def test_relocs_dict_shape(self):
+        # Brief 070 wave-1 follow-up (PR #445): _parse_elf32's
+        # relocs dict now stores 3-tuples (offset, sym_idx,
+        # reloc_type) so extract_functions can classify STT_NOTYPE
+        # symbols by reloc type rather than just symbol type. The
+        # GXi_DmaId case (extern u32 → STT_NOTYPE → was being
+        # mis-classified as kind="other") is fixed by checking
+        # reloc type first.
+        #
+        # No synthetic reloc sections in the helper — the end-to-
+        # end classification is exercised by the manual smoke test
+        # on pokediamond's GX_load2d.c (see PR description).
+        # Here we just sanity-check the relocs dict exists.
+        elf = _make_minimal_elf(
+            sections_data={".text": b"\x00" * 0x30},
+            symbols=[("Owner", 0, 0x30, 2, 1)],
+        )
+        from external_obj import _parse_elf32
+        parsed = _parse_elf32(elf)
+        self.assertIsInstance(parsed["relocs"], dict)
+
     def test_extracts_named_function(self):
         # One .text section with one named function symbol.
         elf = _make_minimal_elf(

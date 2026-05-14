@@ -363,10 +363,14 @@ def _parse_elf32(data: bytes) -> dict:
                 "name": name, "value": value, "size": size,
                 "type": sym_type, "shndx": shndx,
             })
-    # Walk reloc sections. Each entry is (offset, sym_idx). Symbol
-    # name + kind resolution happens during `extract_functions`
-    # where we have the per-function context.
-    relocs: dict[int, list[tuple[int, int]]] = {}
+    # Walk reloc sections. Each entry is (offset, sym_idx,
+    # reloc_type). Reloc type lets us classify the call-site
+    # nature even when the symbol's STT_ type is STT_NOTYPE
+    # (extern-declared, defined elsewhere). Brief 070 wave-1
+    # follow-up: GXi_DmaId is `extern u32` in GX_load2d.c, which
+    # makes it STT_NOTYPE in the .o; the reloc type
+    # (R_ARM_ABS32=2) tells us it's a data reference regardless.
+    relocs: dict[int, list[tuple[int, int, int]]] = {}
     for sh in sections:
         if sh["type"] not in (9, 4):  # SHT_REL=9, SHT_RELA=4
             continue
@@ -378,7 +382,8 @@ def _parse_elf32(data: bytes) -> dict:
             r_offset = struct.unpack_from("<I", sec_data, off + 0)[0]
             r_info = struct.unpack_from("<I", sec_data, off + 4)[0]
             sym_idx = r_info >> 8
-            relocs[target_idx].append((r_offset, sym_idx))
+            r_type = r_info & 0xff
+            relocs[target_idx].append((r_offset, sym_idx, r_type))
     return {
         "sections": sections,
         "symbols": symbols,
@@ -438,8 +443,17 @@ def extract_functions(o_path: Path) -> list[ExternalFunc]:
         sec_bytes = data[sh["offset"]:sh["offset"] + sh["size"]]
         raw_relocs = elf["relocs"].get(i, [])
         # Build RelocRef objects with target name + kind.
+        #
+        # Kind classification (brief 070 wave-1 follow-up):
+        # First by RELOCATION TYPE (which encodes the call-site
+        # nature: bl-target vs .word literal), then by symbol
+        # type as a fallback. The reloc-type-first approach
+        # correctly classifies STT_NOTYPE symbols (extern-
+        # declared, defined elsewhere) — these were being missed
+        # by D4's parallel-reloc map because the previous code
+        # routed them to kind="other".
         ref_list: list[RelocRef] = []
-        for r_off, sym_idx in raw_relocs:
+        for r_off, sym_idx, r_type in raw_relocs:
             if sym_idx >= len(elf["symbols"]):
                 continue
             sym = elf["symbols"][sym_idx]
@@ -447,21 +461,29 @@ def extract_functions(o_path: Path) -> list[ExternalFunc]:
             # Skip mode markers + section refs (anonymous targets).
             if not target_name or target_name.startswith("$"):
                 continue
-            sym_type = sym["type"]
-            if sym_type == 2:    # STT_FUNC
+            # ARM ELF reloc types (subset):
+            #   1 R_ARM_PC24       (older bl/blx encoding)
+            #   2 R_ARM_ABS32      (data ref / function pointer)
+            #   3 R_ARM_REL32      (relative data ref)
+            #   5 R_ARM_ABS16
+            #   10 R_ARM_THM_CALL  (Thumb bl)
+            #   28 R_ARM_CALL      (modern bl)
+            #   29 R_ARM_JUMP24    (b)
+            #   30 R_ARM_THM_JUMP24
+            if r_type in (1, 10, 28, 29, 30):
                 kind = "func"
-            elif sym_type == 1:  # STT_OBJECT
+            elif r_type in (2, 3, 5):
                 kind = "data"
-            elif sym_type == 0:  # STT_NOTYPE — could be either
-                # Heuristic: if the name looks like data
-                # (lowercase + underscores, starts with non-cap
-                # or has `_` early), treat as data. NitroSDK
-                # data symbols are `OSi_*Count` / `data_*` style;
-                # NitroSDK functions are `OS_*` / `Fn*` mostly.
-                # Conservative: default to "other".
-                kind = "other"
             else:
-                kind = "other"
+                # Unknown reloc type — fall back to symbol-type
+                # classification.
+                sym_type = sym["type"]
+                if sym_type == 2:    # STT_FUNC
+                    kind = "func"
+                elif sym_type == 1:  # STT_OBJECT
+                    kind = "data"
+                else:
+                    kind = "other"
             ref_list.append(RelocRef(
                 offset=r_off, target=target_name, kind=kind,
             ))
