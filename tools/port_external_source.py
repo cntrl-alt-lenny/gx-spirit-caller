@@ -111,6 +111,8 @@ class PortResult:
     delinks_entry: str = ""
     # For metrics: per-callee remap decisions
     callee_remaps: dict[str, str] = field(default_factory=dict)
+    # Per-data-ref remap decisions (D4)
+    data_remaps: dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return {
@@ -121,6 +123,7 @@ class PortResult:
                             if self.output_path else None),
             "delinks_entry": self.delinks_entry,
             "callee_remaps": dict(self.callee_remaps),
+            "data_remaps": dict(self.data_remaps),
             "rewritten_source": self.rewritten_source,
         }
 
@@ -300,19 +303,25 @@ def detect_skip_reasons(
     body. Returns `(reason, detail)` on first hit, or None if all
     detectors pass.
 
+    Order matters — D4 data-ref check comes first because we know
+    the exact upstream data names from the reloc table. With D4
+    shipped, the caller resolves data refs via the parallel-reloc
+    map and passes `data_resolved=True` to skip the refusal. The
+    structural check (struct-access via `->` / `.field`) and macro
+    heuristic still apply because those are source-text issues
+    independent of the reloc map.
+
     D2 / D3 (brief 070 follow-up): consult vendored identifiers in
     `libs/nitro/include/` — macros and struct types that decomper
     has already vendored don't trigger refusals.
-
-    D4: pre-D4 default refuses on data refs; callers that have
-    built the parallel-reloc map pass `data_resolved=True` to
-    skip the refusal.
     """
     vendored_macros, vendored_structs, vendored_enums = (
         load_vendored_identifiers(libs_root)
     )
 
-    # D4 — data reloc.
+    # D4 — data reloc: only refuses if the caller hasn't resolved
+    # them via the parallel-reloc map. (Pre-D4 behaviour was an
+    # unconditional refusal.)
     if data_refs and not data_resolved:
         return ("data-ref", ", ".join(data_refs[:5]))
 
@@ -504,6 +513,193 @@ def remap_callees_in_body(
 
 
 # --------------------------------------------------------------------------- #
+# Data-ref remap (D4) — parallel-reloc data symbol map
+# --------------------------------------------------------------------------- #
+
+
+# Per-region cache. The .relocs and .symbols files are stable
+# during a session; load once.
+_REGION_RELOCS_CACHE: dict[str, dict] = {}
+_REGION_DATA_SYMBOLS_CACHE: dict[str, dict] = {}
+
+
+def _load_region_data(region: str) -> tuple[dict, dict]:
+    """Load (relocs, data_symbols) for `region`. Reuses
+    `port_to_region`'s load_full_relocs (which has the
+    relocs.txt parser) to avoid duplicating format-handling
+    code.
+
+    Returns:
+      relocs: dict[source_module][from_addr] → list of
+              (kind, to_addr, to_module) tuples
+      data_symbols: dict[addr] → name  (data + bss entries from
+              the region's symbols.txt)
+    """
+    if region in _REGION_RELOCS_CACHE:
+        return (_REGION_RELOCS_CACHE[region],
+                _REGION_DATA_SYMBOLS_CACHE[region])
+    sys.path.insert(0, str(ROOT / "tools"))
+    import port_to_region as ptr  # noqa: E402
+
+    relocs = ptr.load_full_relocs(region)
+    data_symbols: dict[int, str] = {}
+    config_arm9 = CONFIG_DIR / region / "arm9"
+
+    def _parse_symbols(path: Path) -> None:
+        if not path.is_file():
+            return
+        for line in path.read_text(
+                encoding="utf-8", errors="replace").splitlines():
+            m = ptr.DATA_RE.match(line)
+            if m:
+                addr = int(m.group("addr"), 16)
+                data_symbols[addr] = m.group("name")
+
+    _parse_symbols(config_arm9 / "symbols.txt")
+    for sub in ("itcm", "dtcm"):
+        _parse_symbols(config_arm9 / sub / "symbols.txt")
+    overlays_dir = config_arm9 / "overlays"
+    if overlays_dir.is_dir():
+        for ov_dir in sorted(overlays_dir.iterdir()):
+            _parse_symbols(ov_dir / "symbols.txt")
+
+    _REGION_RELOCS_CACHE[region] = relocs
+    _REGION_DATA_SYMBOLS_CACHE[region] = data_symbols
+    return relocs, data_symbols
+
+
+def build_parallel_reloc_data_map(
+    upstream_func,
+    our_module: str, our_addr: int, our_size: int,
+    our_region: str,
+) -> tuple[dict[str, str], list[str]]:
+    """For each upstream data-kind reloc, find the corresponding
+    reloc at the same offset in our local function, look up our
+    local data symbol name, and map upstream_name → our_local_name.
+
+    Cross-project analogue of `port_to_region.derive_data_address_
+    mapping` (PR #419). Same invariant: when two functions are
+    byte-identical (after reloc masking — which we already verified
+    via byte-fingerprint match ≥0.9999), their reloc tables share
+    OFFSETS and KINDS. The address each reloc resolves to is
+    project-specific; the offset + kind structure is stable.
+
+    Returns `(mapping, unresolved)`:
+      mapping: dict[upstream_name] → our_local_name (e.g.
+               `OSi_TickCounter` → `data_020c3f48` or
+               `OSi_TickCounter` if our local is named).
+      unresolved: list of upstream data names that have no
+               matching reloc in our local function (skip-reason
+               trigger for the caller).
+    """
+    relocs, data_symbols = _load_region_data(our_region)
+    module_relocs = relocs.get(our_module, {})
+
+    # Build dict[offset_within_our_func][reloc_kind] → list of
+    # (to_addr, to_module). Walk our function's address range
+    # in 2-byte stride (relocs can land on any 2-byte boundary).
+    our_at_offset: dict[int, dict[str, list[tuple[int, str]]]] = {}
+    for from_addr in range(our_addr, our_addr + our_size, 2):
+        if from_addr in module_relocs:
+            offset = from_addr - our_addr
+            slot = our_at_offset.setdefault(offset, {})
+            for kind, to_addr, to_module in module_relocs[from_addr]:
+                slot.setdefault(kind, []).append((to_addr, to_module))
+
+    mapping: dict[str, str] = {}
+    unresolved: list[str] = []
+
+    # Walk upstream relocs that are data-kind; pair with our
+    # relocs at the same offset. Pair by occurrence-order within
+    # a (offset, kind) bucket — matches port_to_region's
+    # convention.
+    upstream_data_per_offset: dict[int, list[str]] = {}
+    for r in upstream_func.relocs:
+        if r.kind != "data":
+            continue
+        upstream_data_per_offset.setdefault(r.offset, []).append(r.target)
+
+    for offset, upstream_names in upstream_data_per_offset.items():
+        our_slot = our_at_offset.get(offset, {})
+        # Our reloc kinds for data are "data" / "bss" / sometimes
+        # other ARM-specific kinds. The .relocs.txt uses
+        # arm-data style — we accept any non-"call" kind as data.
+        our_data_addrs = []
+        for kind, addrs in our_slot.items():
+            if kind in ("call", "thumb_call", "arm_call"):
+                continue
+            our_data_addrs.extend(addrs)
+        for i, upstream_name in enumerate(upstream_names):
+            if i >= len(our_data_addrs):
+                unresolved.append(upstream_name)
+                continue
+            our_addr_target, _our_to_module = our_data_addrs[i]
+            our_name = data_symbols.get(our_addr_target)
+            if our_name is None:
+                unresolved.append(upstream_name)
+                continue
+            mapping[upstream_name] = our_name
+
+    return mapping, unresolved
+
+
+def _find_our_module_for_addr(
+    region: str, addr: int,
+) -> str | None:
+    """Locate the module that owns `addr` in our region's
+    config. Scans `symbols.txt` files until a function entry
+    matches. Cached implicitly via the relocs cache (we touch
+    the same files).
+
+    Returns module name like "main" / "ov002" / "itcm" / "dtcm",
+    or None if no symbol exists at `addr`.
+    """
+    region_dir = CONFIG_DIR / region / "arm9"
+    if not region_dir.is_dir():
+        return None
+    needle = f"addr:0x{addr:08x}"
+
+    def _check(path: Path) -> bool:
+        if not path.is_file():
+            return False
+        for line in path.read_text(
+                encoding="utf-8", errors="replace").splitlines():
+            if needle in line:
+                return True
+        return False
+
+    if _check(region_dir / "symbols.txt"):
+        return "main"
+    for sub in ("itcm", "dtcm"):
+        if _check(region_dir / sub / "symbols.txt"):
+            return sub
+    overlays_dir = region_dir / "overlays"
+    if overlays_dir.is_dir():
+        for ov_dir in sorted(overlays_dir.iterdir()):
+            if _check(ov_dir / "symbols.txt"):
+                return ov_dir.name
+    return None
+
+
+def remap_data_refs_in_body(
+    body: str, data_map: dict[str, str],
+) -> str:
+    """Apply each upstream_data → our_local_data substitution.
+    Same longest-first \b-bounded approach as the callee remap
+    (mirror port_to_region.apply_substitutions)."""
+    if not data_map:
+        return body
+    sorted_pairs = sorted(
+        data_map.items(), key=lambda kv: -len(kv[0]),
+    )
+    out = body
+    for upstream_name, local_name in sorted_pairs:
+        pattern = r"\b" + re.escape(upstream_name) + r"\b"
+        out = re.sub(pattern, local_name, out)
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Output paths + delinks emission
 # --------------------------------------------------------------------------- #
 
@@ -587,14 +783,44 @@ def port_function(
         )
     body, _start, _end = body_info
 
-    # Skip-reason detection (D2/D3/D4)
     callees = target.callee_names()
     # Exclude self-references — those don't need remapping (the
     # ported function will use our_name, and a recursive call
     # already resolves to itself in the rewritten output).
     callees = [c for c in callees if c != request.upstream_func]
     data_refs = target.data_refs()
-    skip = detect_skip_reasons(body, callees, data_refs)
+
+    # D4 — Data-ref remap via parallel-reloc map.
+    #
+    # Find our local function in symbols.txt to get its
+    # (module, addr, size) tuple. Without that we can't index
+    # into the relocs table.
+    our_module = _find_our_module_for_addr(
+        request.our_region, request.our_addr,
+    )
+    data_map: dict[str, str] = {}
+    data_unresolved: list[str] = []
+    if data_refs:
+        if our_module is None:
+            return PortResult(
+                status="refused", reason="our-addr-not-in-config",
+                detail=f"0x{request.our_addr:08x} in {request.our_region}",
+            )
+        data_map, data_unresolved = build_parallel_reloc_data_map(
+            target, our_module, request.our_addr, target.size,
+            request.our_region,
+        )
+        if data_unresolved:
+            return PortResult(
+                status="refused", reason="data-ref-unresolved",
+                detail=", ".join(data_unresolved[:5]),
+            )
+
+    # Skip-reason detection (D2/D3 — D4 now resolved).
+    skip = detect_skip_reasons(
+        body, callees, data_refs,
+        data_resolved=True,
+    )
     if skip is not None:
         return PortResult(
             status="refused", reason=skip[0], detail=skip[1],
@@ -614,6 +840,12 @@ def port_function(
             callee_remaps=remaps,
         )
 
+    # D4 — apply the data-ref substitutions
+    if data_map:
+        rewritten_body = remap_data_refs_in_body(
+            rewritten_body, data_map,
+        )
+
     # Rewrite the function-defining name too (the signature uses
     # `request.upstream_func`; we want our local name there).
     our_name = request.our_name or f"func_{request.our_addr:08x}"
@@ -622,11 +854,11 @@ def port_function(
 
     # Compose the final source. Keep upstream's body verbatim
     # apart from the substitutions — extern declarations for our
-    # local callees are emitted as a header comment block, but
-    # the actual `extern` lines are decomper's responsibility
-    # (they hand-author or pull from a vendored header).
+    # local callees + data refs are emitted as a header block, but
+    # full typing is decomper's responsibility (they refine the
+    # `(void)` placeholder + data-ref types after the port lands).
     final_src = _compose_port_source(
-        rewritten_body, our_name, request, target, remaps,
+        rewritten_body, our_name, request, target, remaps, data_map,
     )
 
     out_path = compute_output_path(our_name, libs_root=libs_root)
@@ -640,6 +872,7 @@ def port_function(
         rewritten_source=final_src,
         delinks_entry=delinks_entry,
         callee_remaps=remaps,
+        data_remaps=data_map,
     )
 
 
@@ -647,12 +880,12 @@ def _compose_port_source(
     rewritten_body: str, our_name: str,
     request: PortRequest, ext_fn,
     remaps: dict[str, str],
+    data_remaps: dict[str, str] | None = None,
 ) -> str:
     """Wrap the rewritten function body with a provenance comment
-    block + minimal extern declarations for any remapped callees.
-    Decomper expands the externs to typed declarations after the
-    port lands (the `(void)` placeholder makes the C compile;
-    correct typing comes later)."""
+    block + minimal extern declarations for any remapped callees
+    and data refs. Decomper refines `(void)` placeholders into
+    typed declarations after the port lands."""
     lines = []
     lines.append("/*")
     lines.append(" * Cross-project port:")
@@ -664,12 +897,21 @@ def _compose_port_source(
     lines.append(" * Compiles with `.legacy.c` routing (mwcc 1.2/sp2p3 — "
                  "exact SP match")
     lines.append(" * to pokediamond's NitroSDK build flags). Brief 070 "
-                 "D1 callee remap.")
+                 "D1+D4: callee +")
+    lines.append(" * data-ref remap via parallel-reloc map.")
     lines.append(" */")
     lines.append("")
     if remaps:
         for upstream_name, local_name in sorted(remaps.items()):
             lines.append(f"extern void {local_name}(void);  "
+                         f"// {upstream_name}")
+        lines.append("")
+    if data_remaps:
+        for upstream_name, local_name in sorted(data_remaps.items()):
+            # Use a generic int placeholder. Decomper refines
+            # types after the port lands (typical NitroSDK data
+            # is u32 / BOOL / vu64 etc.).
+            lines.append(f"extern int {local_name};  "
                          f"// {upstream_name}")
         lines.append("")
     lines.append(rewritten_body)

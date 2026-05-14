@@ -12,7 +12,7 @@
 
 <p align="center">
   <strong>Per-region progress</strong><br>
-  <img src="https://img.shields.io/badge/EUR-1.48%25-red" alt="EUR Progress">
+  <img src="https://img.shields.io/badge/EUR-1.51%25-red" alt="EUR Progress">
   <img src="https://img.shields.io/badge/USA-0.19%25-red" alt="USA Progress">
   <img src="https://img.shields.io/badge/JPN-0.19%25-red" alt="JPN Progress">
 </p>
