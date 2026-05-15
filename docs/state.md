@@ -8,12 +8,17 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-14 late, post-#470 + #471 merge, brief 086
-queued for decomper. Main tip after PRs #470 + #471 (+ this brain-PR).
-Brain back on Windows after Mac stretch. **Cross-project pipeline
-declared drained** (pokeheartgold wave 1 = 1/30-60); **brief 086
-single-region cap-raise to ≤0x60 is the next big lever**. EUR
-**1.57%**, USA + JPN **0.26% each**.
+**Last updated:** 2026-05-15 (Mac brain resumed post-Windows work).
+**Brief 086 cap-raise chain CLOSED at 21 matches / 1440 bytes / 63%
+yield** — 1.6× brief 081's byte output at same match count. Brief 088
+shipped C-23 MMIO base-folding wall (dual peephole — base-folding +
+ANDS→TST — both fixed by `.legacy.c`, distinct asm-grep from C-15).
+Brief 084 + 091 chain refines C-22 adjacent-bitfield (1 production
+hit + 5 cumulative datapoints awaiting v2 sweep). S-2a loop-counter
+signedness extension landed via PR #479. **Brief 090 NOW ACTIVE** —
+cross-region apply for 42 EUR src/main/ matches accumulated across
+briefs 081 + 086. EUR **1.64%** (up from 1.57% at session-resume),
+USA + JPN **0.26%** (about to climb on brief 090).
 
 ## Today's merges (just-landed)
 
