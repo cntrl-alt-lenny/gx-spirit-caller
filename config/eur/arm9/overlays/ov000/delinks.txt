@@ -450,3 +450,7 @@ src/overlay000/func_ov000_021af780.c:
 src/overlay000/func_ov000_021af7a8.c:
     complete
     .text start:0x021af7a8 end:0x021af7d0
+
+src/overlay000/func_ov000_021ac85c.c:
+    complete
+    .text start:0x021ac85c end:0x021ac890
