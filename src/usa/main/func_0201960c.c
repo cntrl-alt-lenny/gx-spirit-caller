@@ -1,0 +1,20 @@
+/* func_0201960c: insert an 8-bit field into bits 16..23 of state[0x8d4].
+ * Sibling of func_02019108 (same shape, different offset).
+ *
+ *     stmdb sp!, {r4, lr}
+ *     mov   r4, r0
+ *     bl    GetSystemWork
+ *     ldr   r2, [r0, #0x8d4]
+ *     mov   r1, r4, lsl #0x18
+ *     bic   r2, r2, #0xff0000
+ *     orr   r1, r2, r1, lsr #0x8
+ *     str   r1, [r0, #0x8d4]
+ *     ldmia sp!, {r4, pc}
+ */
+
+extern char *GetSystemWork(void);
+
+void func_0201960c(unsigned int value) {
+    int *slot = (int *)(GetSystemWork() + 0x8d4);
+    *slot = (*slot & ~0xff0000) | ((value << 24) >> 8);
+}
