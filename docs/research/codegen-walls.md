@@ -2202,7 +2202,72 @@ ldmia sp!, {r4, r5, r6, pc}
 1. **Reg-alloc swap.** Orig allocates `&ctx` to r5 (higher-numbered) and `idx` to r4 (lower-numbered) — opposite of mwcc 2.0's allocator preference. Every (variant, SP) tested allocates `&ctx` to r4 + `idx` to r5 instead. Source-form interventions (`local_ptrs`, `entry_ptr`, `idx_first` declaration ordering, `batched_loads` reordering) shift the size to match (0x48) at every `2.0/*` SP and `1.2/sp3` + `1.2/sp4`, but the register identity stays swapped. mwcc allocates by USAGE order (first-loaded value gets the lower-numbered register), and `&ctx` MUST be loaded first because `idx` requires `ctx.counter`. There is no source-form intervention that flips this.
 2. **Load-store batching diverges.** Orig batches 2 loads then writes; mwcc emits load-store-load-store-load-store. The `batched_loads` variant (manual local temps for the 3 q-fields) doesn't propagate through mwcc 2.0's CSE.
 
-**Classification: P-4 family** (register-allocation wall, see [P-4](#p-4-r2-vs-r3-scratch-register-selection-on-swap-shape-thunks)). Permanent for the project's default-tier source-form pipeline. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; the closest hit is `entry_ptr` at any `2.0/*` SP producing a 0x48-byte function with the wrong register allocation in 6 positions. Permuter (brief 063, PR #473) is the natural next attempt — the wall is in the allocator, not the source form, so a register-renaming pass could potentially recover the byte-identical version.
+**Classification: P-4 family — confirmed permanent (brief 093 permuter rule-out).**
+Permanent for the project's default-tier source-form pipeline.
+Brief 091 sweep tested 5 source variants × 15 SPs = 75
+combinations; the closest hit is `entry_ptr` at any `2.0/*` SP
+producing a 0x48-byte function with the wrong register
+allocation in 6 positions. **Brief 093 (PR #?) ran permuter**
+(brief 063, PR #473) against the `entry_ptr` variant for ~300
+iterations × 3 threads (~900 thread-iterations total). **Best
+score plateau: 80** (baseline 265, theoretical byte-identical =
+0). Permuter found a closer-to-orig **load-ordering** by
+reusing the loop counter as a temp for the last field load
+(`idx = q->f_44; ... entry->f_c = idx;`) — same shape brief
+091's `batched_loads` variant attempted — but **could not flip
+the underlying r4 ↔ r5 register-allocation swap**. The 6 byte
+positions identified by brief 091 as register-swap divergences
+remained different at score 80; mwcc 2.0's usage-order
+allocator is **downstream of any source-level mutation**
+permuter can apply.
+
+**Permuter rule-out confirmed.** Brief 093's outcome: P-4
+register-allocation walls are not coercible via either
+source-form sweeps (brief 091's 75 attempts) or permuter's
+random-mutation search (brief 093's ~900 thread-iterations).
+Treat the asm-grep discriminator
+(`stmdb sp!, {r4-r6, lr}; ldr r5, .Lpool; ldr r4, [r5, #imm]`
+where the *first-loaded* base is allocated to the
+*higher-numbered* register) as a **hard skip-rule** for future
+single-region cap-raises. Permuter recovery for this wall
+family is not expected to land.
+
+**Permuter setup gaps surfaced (brief 093, for follow-up
+tooling brief).** Brief 063's `--run` mode hadn't been
+exercised end-to-end on macOS Apple Silicon before brief 093.
+Five vendor patches were needed to get permuter past the
+import + first-iteration stages:
+
+1. **`tools/_vendor/decomp-permuter/import.py`**: catch
+   `FileNotFoundError` in `homebrew_gcc_cpp` (Apple Silicon
+   has no `/usr/local/bin`, only `/opt/homebrew/bin`; the
+   upstream raises only on `ValueError`).
+2. **`import.py`**: accept lowercase `-i` as an include flag
+   (mwccarm convention); upstream only scrapes `-I` from the
+   ninja compile command.
+3. **`import.py`**: default `DEFAULT_AS_CMDLINE` to
+   `arm-none-eabi-as -mcpu=arm946e-s -mthumb-interwork`;
+   upstream hardcodes MIPS (`mips-linux-gnu-as
+   -march=vr4300 -mabi=32`).
+4. **`tools/_vendor/decomp-permuter/prelude.inc`**: replace
+   the MIPS `.set noat / .set noreorder / .set gp=64`
+   directives with ARM-compatible macros; otherwise
+   `arm-none-eabi-as` rejects the prelude.
+5. **Per-work-dir `compile.sh`**: strip the
+   `&& transform_dep.py …` suffix from the ninja-derived
+   compile command; upstream import.py captures the chained
+   command verbatim, and mwccarm rejects `&&` as a literal
+   argument.
+
+Plus one project-specific .s normalization: dsd-dis emits
+`.global` (with `e`) + `arm_func_start`/`arm_func_end` /
+`.include "macros/function.inc"` macros, all of which
+upstream permuter chokes on. Brief 093 hand-edited the .s
+into permuter-acceptable form (`.globl func_name` + strip
+macros). A follow-up tooling brief should fold these patches
+upstream OR mediate them via a wrapper layer in
+`tools/permute.py` so the next cloud-autonomous permuter
+run is a clean `--run` invocation.
 
 **Provenance:** brief 081 wave 2 (PR #467) hypothesised a
 generic "struct-pointer silent-corruption wall" from 3
@@ -2601,6 +2666,26 @@ inline-asm-per-target cost.
 the broader family (any single-byte register-field
 divergence) could be unlocked by a `propagate_template
 --rename-regs` flag at near-zero per-target cost.
+
+**Permuter rule-out (brief 093, PR #?):** the P-4 family was
+a natural permuter target — its discriminator is "wall is in
+the allocator, not source form." Brief 093 ran permuter against
+`func_02000cc4` (the brief 086 wave 3 / brief 091 P-4 instance)
+for ~900 thread-iterations. Best score plateau: 80 (baseline
+265, theoretical zero = byte-identical). Permuter found a
+**load-ordering improvement** by reusing `idx` as a temp for
+the trailing field load (`idx = q->f_44; ... entry->f_c =
+idx;`) but **could not flip the underlying r4 ↔ r5 register
+swap**. The 6 byte positions divergent at the score-80
+plateau are exactly the register-swap positions brief 091
+documented. **Permuter rule-out confirmed**: mwcc 2.0's
+usage-order register allocator is downstream of any source-
+level mutation permuter applies. P-4 reg-alloc divergences
+are not coercible without the T-1 post-processing variant
+(register-renaming on the emitted .o, breaking the
+"byte-identical from C source" invariant). See brief 091
+sub-note under C-22 for the per-iteration score table and
+the permuter-vendor setup gaps surfaced.
 
 ### P-5. Halfword offset >0xff split via add
 
@@ -3469,7 +3554,7 @@ shape we should chase".
 | 086w2 / 478 | `func_0208e61c` / `func_0208e664` | **C-23** (GX matrix-copy via GXSTAT base + matrix-result block; same dual-peephole shape as 086w1 — confirms recipe transfers across MMIO blocks) | coercible (routing, resolved) |
 | 086w3 / 480 | `func_02001c98` | **C-22** (production hit using bitfield-via-union recipe from brief 084 — adjacent 4-bit fields at positions 17-21 + 21-25; recipe transfers from brief 081's `func_02001ef4` to a fresh datapoint) | coercible (bitfield-decl, resolved) |
 | 086w3 / 480 | `func_02009758` | (mwcc-2.0 modulo-by-power-of-2 peephole + reg-alloc — orig emits 4-insn signed-modulo recovery via mwcc 1.2 codegen; mwcc 2.0 collapses to 1-insn `and rN, #0x1f`. Brief 091 sweep tested 4 source variants × 15 SPs = 60 combinations; no byte-identical match) | P-N candidate (brief 091 sub-note under C-22) |
-| 086w3 / 480 | `func_02000cc4` | **P-4 family** (counter-increment + helper-call + struct-array entry init; orig allocates `&ctx`→r5, `idx`→r4, mwcc all SPs allocate the swap. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; size matches at most SPs but reg-alloc stays swapped. Permuter — brief 063 — is the natural next attempt) | permanent (P-4) |
+| 086w3 / 480 | `func_02000cc4` | **P-4 family — confirmed permanent** (counter-increment + helper-call + struct-array entry init; orig allocates `&ctx`→r5, `idx`→r4, mwcc all SPs allocate the swap. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; size matches at most SPs but reg-alloc stays swapped. **Brief 093 (PR #?) ran permuter ~900 thread-iterations, best score 80 plateau — permuter rule-out confirmed**; treat as hard skip) | permanent (P-4, permuter rule-out) |
 
 ## Quantification
 
