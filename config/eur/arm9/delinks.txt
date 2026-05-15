@@ -7408,3 +7408,7 @@ src/main/func_02001c98.c:
     complete
     .text start:0x02001c98 end:0x02001cd0
 
+src/main/func_02005bfc.c:
+    complete
+    .text start:0x02005bfc end:0x02005c60
+
