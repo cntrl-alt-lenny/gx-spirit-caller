@@ -61,6 +61,17 @@ finding (extending brief 084's *3-walls-not-1* to 6) — neither
 new datapoint is a C-22 instance, both classify as P-N /
 P-4-family with no source-form coercion at any of the 15 mwcc
 SPs tested.
+Brief 097 (decomper hand-back) surveyed 31 medium-tier candidates
+with 0 byte-identical recoveries; the dominant wall pattern was
+indirect-call dispatch (~12 of 31). Brief 099 (PR #?) ran the
+6-variant × 15-SP sweep on `func_02048c28` per brief 084's
+methodology, surfaced the **single-global vs two-global**
+source-form distinction (variants A-E with two synthetic globals
+mismatched by 1 pool-offset byte; variant F with one global
+achieved byte-identical at mwcc 1.2/sp3), and classified the
+wall as **new C-24** — first wall to use the third routing tier
+(`*.legacy_sp3.c`, mwcc 1.2/sp3) as the recipe. Cross-corpus
+scan found 49 unmatched candidates matching the C-24 signature.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
@@ -130,7 +141,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (23 patterns)
+## Coercible-with-knowledge (24 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -2504,6 +2515,201 @@ entry, not just a C-15 sub-family". Brief 088 (PR #?) ran the
 methodology, confirming distinct peephole machinery from C-15
 and pinning the recipe + cross-corpus survey notes.
 
+### C-24. Indirect-call dispatch with pool-dedup — `.legacy_sp3.c` routing
+
+> **Wall family note — C-24 vs C-23 vs C-15.** All three are
+> mwcc-2.0-only codegen divergences fixed by routing to a 1.2-
+> family SP. Distinct peephole/codegen machinery in each. Quick
+> discriminator at the asm level:
+>
+> | Wall | Asm signature | Routing |
+> |---|---|---|
+> | **C-15** | constant-pair derivation: `mov rN, #K; mvn rM, #0` (1.2) vs `mov rN, #K; sub rM, rN, #1` (2.0) on flat thunks | `*.legacy.c` (mwcc 1.2/sp2p3) |
+> | **C-23** | 3+ adjacent MMIO base loads + ANDS→TST in wait loops | `*.legacy.c` (mwcc 1.2/sp2p3) |
+> | **C-24** (this entry) | indirect call (`blx rN`) + pool-dedup of two `ldr rN, [pc, #imm]` loads to the SAME pool slot + `push {lr}; sub sp, #4` prologue | `*.legacy_sp3.c` (mwcc 1.2/sp3) |
+>
+> C-24 is the **first wall classified as needing the third
+> routing tier** (`*.legacy_sp3.c`, mwcc 1.2/sp3) for byte-
+> identical recovery — C-15 and C-23 both land at
+> `*.legacy.c` (1.2/sp2p3). Brief 044's `sp3-routing-decision.md`
+> identified the third tier; C-24 is the wall that uses it as
+> the coercion path.
+
+**Target asm (`func_02048c28` — brief 099 worked example):**
+
+```text
+
+stmdb sp!, {lr}                  ; push {lr} only (e92d4000)
+sub   sp, sp, #0x4               ; explicit 8-byte align (e24dd004)
+ldr   r1, [pc, #0x2c]            ; r1 = &data_X (pool slot at +0x3c)
+mov   r0, #0
+ldr   r3, [r1]                   ; r3 = *data_X = &cb (the cb instance)
+ldrb  r1, [r3, #0x1d]            ; r1 = cb->flag
+ldr   r2, [r3, #0x30]            ; r2 = cb->arg
+ldr   r3, [r3, #0x2c]            ; r3 = cb->fn
+blx   r3                         ; call cb->fn(0, flag, arg)
+ldr   r0, [pc, #0x10]            ; r0 = &data_X (SAME pool slot at +0x3c)
+mov   r1, #0x2
+ldr   r0, [r0]                   ; r0 = *data_X = &cb
+str   r1, [r0]                   ; cb->first = 2
+add   sp, sp, #0x4
+ldmia sp!, {pc}
+.word data_X                     ; ONE pool word, both LDRs target it
+
+```
+
+15 insns + 1 pool word = 0x40. **Two LDR-from-pool instructions
+target the same pool slot** — mwcc 1.2/sp3 dedups the global
+address into a single pool word. mwcc 2.0 emits a different
+sequence entirely (no pool dedup, no sub-sp/add-sp pair, uses
+`push {r3, lr}` + `pop {r3, pc}` for 8-byte alignment).
+
+**mwcc 2.0/sp1p5 emits when miscoded** (default routing —
+different shape entirely):
+
+```c
+/* breaks: mwcc 2.0 emits 14 insns + 2 pool words, register
+   r3 used as alignment-stack-trick instead of sub sp #4 */
+typedef struct cb_t {
+    u32 first;
+    u8  _pad0[0x19]; u8 flag;
+    u8  _pad1[0xe];  u32 (*fn)(u32, u32, u32); u32 arg;
+} cb_t;
+extern cb_t *data_X;
+
+void f(void) {
+    cb_t *cb = data_X;
+    cb->fn(0, cb->flag, cb->arg);
+    data_X->first = 2;
+}
+```
+
+```text
+
+stmdb sp!, {r3, lr}              ; push {r3, lr} — 8-align via dummy r3
+ldr   r1, [pc, #0x28]            ; r1 = &data_X
+mov   r0, #0
+ldr   r3, [r1]                   ; r3 = *data_X
+ldrb  r1, [r3, #0x1d]
+ldr   r2, [r3, #0x30]
+ldr   r3, [r3, #0x2c]
+blx   r3
+ldr   r0, [pc, #0xc]             ; r0 = &data_X (DIFFERENT pool slot — no dedup)
+mov   r1, #0x2
+ldr   r0, [r0]
+str   r1, [r0]
+ldmia sp!, {r3, pc}              ; pop {r3, pc}
+.word data_X                     ; pool slot 1
+.word data_X                     ; pool slot 2 (duplicate)
+
+```
+
+13 insns + 2 pool words = 0x38. **−0x8 bytes** vs target. Two
+peephole differences fire together: dummy-r3 stack-trick + no
+pool-dedup.
+
+**C that coerces it (verified byte-identical against
+`func_02048c28`, `*.legacy_sp3.c` routing → mwcc 1.2/sp3):**
+
+The same natural source above. **No source change required** —
+the fix is the routing tier:
+
+```bash
+mv src/main/func_02048c28.c src/main/func_02048c28.legacy_sp3.c
+ninja
+```
+
+**Critical source-form constraint**: the C **must use a single
+global pointer** (e.g. `extern cb_t *data_X;` referenced twice
+as `data_X` in the body), NOT two separate global
+declarations for the same address. The pool-dedup peephole
+in mwcc 1.2/sp3 only fires when the source-level identifier
+is the same — separate `extern cb_t *foo; extern cb_t *bar;`
+declarations at the same address still emit two pool words.
+Brief 099's sweep iteration A-E used two synthetic globals
+and missed the recipe by 1 pool-offset byte; variant F
+(single global) achieved score 0.
+
+**SP boundary (verified all 15 mwcc SPs, 6 source variations
+× 90 compiles):**
+
+| mwcc SP | A-E (two-global variants) | F (single-global variant) |
+|---|---|---|
+| 1.2/base, sp2, sp2p3 | 0x48 score 3 (extra epilogue) | 0x44 score 3 (extra epilogue) |
+| 1.2/sp3, sp4 | 0x44 score 1 (pool-offset diff) | ⭐ **0x40 byte-identical** |
+| 2.0/base..sp2p4 (10 SPs) | 0x3c score 42 (full divergence) | 0x38 score 46 (full divergence) |
+
+⭐ = byte-identical match. Recipe: variant F (single-global)
++ `*.legacy_sp3.c` routing → mwcc 1.2/sp3.
+
+**Boundary semantics:**
+
+- **`1.2/sp3` / `1.2/sp4`**: emit the dedup'd-pool + `sub sp, #4`
+  form. **`1.2/sp3` is the project's pinned `*.legacy_sp3.c` SP
+  — the canonical recipe.**
+- **`1.2/base` / `1.2/sp2` / `1.2/sp2p3`**: dedup'd-pool but
+  emit a 2-instruction longer epilogue (separate `bx lr` after
+  `pop {lr}`). Close, but not byte-identical at any other SP.
+- **All `2.0/*` (10 SPs)**: emit the dummy-r3 stack-trick form
+  AND skip pool dedup. Two simultaneous codegen differences
+  fire together; both are mwcc-2.0-family-only.
+
+**Use when:** target asm has BOTH:
+
+1. **Indirect call** via `blx rN` where rN holds a struct-field
+   load (`ldr rN, [base, #imm]; ...; blx rN`).
+2. **Pool dedup** — at least 2 distinct `ldr rN, [pc, #imm]`
+   instructions whose offsets compute to the **same pool
+   slot**. Indicates the target was compiled with mwcc
+   1.2/sp3-tier pool dedup.
+
+The combination is the C-24 signature. Either signal alone is
+not sufficient — many functions use indirect calls without pool
+dedup, and pool dedup can occur in non-call functions.
+
+**Recognition cue:** decode the function's `ldr rN, [pc, #imm]`
+instructions; for each, compute `pool_target = insn_offset + 8 +
+imm`. If two LDRs share the same `pool_target`, AND the function
+has at least one `blx rN`, route through `*.legacy_sp3.c`.
+
+**Cross-corpus survey notes:** brief 099's full-arm9 scan found
+**49 unmatched functions** (size 0x20-0x100) matching the C-24
+signature (blx + pool-dedup). Of these, 3 also match the strict
+prologue+epilogue (`push {lr}; sub sp, #4` / `add sp, #4; pop
+{pc}`):
+
+| Function | Size | Notes |
+|---|---|---|
+| `func_020454cc` | 0x24 | smallest — 9-insn skeleton |
+| `func_0205d5a0` | 0x28 | 10-insn variant |
+| `func_02048c28` | 0x40 | brief 099 worked example (verified byte-identical) |
+
+The other 46 candidates use varied prologue/epilogue shapes
+(typically `push {r4, lr}` for callee-save register caching);
+the C-24 recipe (single-global + `*.legacy_sp3.c`) should still
+apply but the asm signature scan above is the conservative
+filter. Future single-region waves can grep the 49 candidates
+and apply the recipe.
+
+**Confirmed instances:**
+
+- `func_02048c28` (brief 099 worked example, this entry) —
+  callback dispatch + post-call field write, 15 insns + 1 pool.
+
+**Provenance:** brief 097 (decomper hand-back) surveyed 31
+medium-tier candidates; the dominant wall pattern was
+"indirect call (`blx rN`) + struct callbacks" (~12 of 31).
+Brief 099 (PR #?) ran a 6-variant × 15-SP sweep on
+`func_02048c28` per brief 084's "3-walls-not-1" methodology,
+discovered the **single-global vs two-global** source-form
+distinction (variants A-E with two synthetic globals
+mismatched by 1 pool-offset byte; variant F with one global
+achieved byte-identical), classified the wall as **C-24**,
+and identified the **third routing tier** (`*.legacy_sp3.c`,
+mwcc 1.2/sp3) as the coercion path. First wall in the
+catalog to use the third routing tier as the recipe (C-15
+and C-23 both land at `*.legacy.c`).
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -3555,6 +3761,8 @@ shape we should chase".
 | 086w3 / 480 | `func_02001c98` | **C-22** (production hit using bitfield-via-union recipe from brief 084 — adjacent 4-bit fields at positions 17-21 + 21-25; recipe transfers from brief 081's `func_02001ef4` to a fresh datapoint) | coercible (bitfield-decl, resolved) |
 | 086w3 / 480 | `func_02009758` | (mwcc-2.0 modulo-by-power-of-2 peephole + reg-alloc — orig emits 4-insn signed-modulo recovery via mwcc 1.2 codegen; mwcc 2.0 collapses to 1-insn `and rN, #0x1f`. Brief 091 sweep tested 4 source variants × 15 SPs = 60 combinations; no byte-identical match) | P-N candidate (brief 091 sub-note under C-22) |
 | 086w3 / 480 | `func_02000cc4` | **P-4 family — confirmed permanent** (counter-increment + helper-call + struct-array entry init; orig allocates `&ctx`→r5, `idx`→r4, mwcc all SPs allocate the swap. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; size matches at most SPs but reg-alloc stays swapped. **Brief 093 (PR #?) ran permuter ~900 thread-iterations, best score 80 plateau — permuter rule-out confirmed**; treat as hard skip) | permanent (P-4, permuter rule-out) |
+| 099 / sweep | `func_02048c28` | **C-24** (worked example) — indirect-call + pool-dedup + `push {lr}; sub sp, #4` prologue; mwcc 2.0 emits dummy-r3 stack-trick + no pool-dedup. Brief 099's 6-variant × 15-SP sweep verified `*.legacy_sp3.c` (mwcc 1.2/sp3) + single-global source form recovers byte-identical | coercible (routing, sp3-tier) |
+| 099 / sweep | `func_020454cc` / `func_0205d5a0` | **C-24** (strict prologue/epilogue match, smallest 2 candidates); 49 broader matches across the unmatched residue per the C-24 cross-corpus survey | coercible (routing, sp3-tier) |
 
 ## Quantification
 
