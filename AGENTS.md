@@ -313,43 +313,62 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/082-pokeheartgold-bulk-port-wave-1.md`](docs/briefs/082-pokeheartgold-bulk-port-wave-1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): first pokeheartgold
-  cross-project bulk-port wave using brief 080's CSV
-  pipeline. Target 30-60 byte-identical ports from
-  `lib/NitroSDK + lib/MSL_C + lib/dsprot` (2.0/sp2p2, one
-  SP-rev off ours). Branch:
-  `decomper/pokeheartgold-bulk-port-wave-1`.
+- [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply `tools/
+  port_to_region.py` to the 42 EUR `src/main/*.c` matches
+  accumulated across brief 081 + brief 086 chains. First
+  sustained USA + JPN badge growth since brief 078 wave 2;
+  expected climb 0.26% → ~0.4-0.5% each region. Branch:
+  `decomper/cross-region-apply-single-region-matches`.
 
-- [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](docs/briefs/084-c22-struct-pointer-corruption-wall.md)
-  — `cloud` (MEDIUM-HIGH): codify the new struct-pointer +
-  field-access silent-corruption wall (C-22 candidate)
-  brief 081 chain confirmed across 3 datapoints. Part 1:
-  fold entry into codegen-walls.md. Part 2: investigate
-  recipe via C-variation + SP sweep. Branch:
-  `cloud/c22-struct-pointer-corruption-wall`.
-
-- [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
-  — `cloud` (MEDIUM-LOW priority): extend `tools/permute.py`
-  from bootstrap-only to auto-running decomp-permuter on
-  close-but-not-byte-identical candidates. Becomes high-priority
-  as soon as the next cap-raise hits the 0x60-0x100 band where
-  permuter shines. Independent of 062 + 064/065. Branch:
-  `cloud/permuter-auto-runner`.
-
-- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
-  — `cloud` (MEDIUM priority): research brief — survey the
-  DS-decomp ecosystem (AetiasHax/st, pret/pokeheartgold,
-  pret/pokediamond) for already-matched NitroSDK / MSL_C
-  source we can mechanically port. Ship feasibility verdict +
-  `tools/find_external_source.py` prototype. Estimated unlock:
-  **120-500 mechanical ports** for EUR, ~3× through brief
-  064/065's multi-region pipeline. Independent of 064/065;
-  scheduled after 064 closes so it doesn't compete for cloud
-  attention. Branch: `cloud/cross-project-source-research`.
+- [`docs/briefs/091-c22-v2-expansion.md`](docs/briefs/091-c22-v2-expansion.md)
+  — `cloud` (MEDIUM): refine C-22 adjacent-bitfield wall
+  recipe using 5 cumulative datapoints (3 brief 081 + 2
+  brief 086 wave 3). Brief 084's bitfield-via-union recipe
+  worked on 1 of 5; remaining 4 shapes (bit-set with side-
+  effect, increment+init, etc.) likely need C-22a/b/c sub-
+  letters. Branch: `cloud/c22-v2-expansion`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md`](docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md)
+  `decomper`, full 3-wave chain shipped via PRs #474 (W1) +
+  #478 (W2) + #480 (W3). **21 matches / 1440 bytes / ~63%
+  combined yield.** Cap-raise to ≤0x60 paid off — **1.6×
+  brief 081's byte output** at same match count. Wave 1+2 ran
+  80%/82% yield; wave 3 dropped to 25% (drain signal at the
+  upper edge of the band). Surfaced C-22 first production hit
+  (`func_02001c98`) + 2 more C-22 datapoints (brief 091 v2
+  expansion) + S-2a loop-counter signedness extension to S-2.
+- [`docs/briefs/088-mmio-base-folding-wall-sweep.md`](docs/briefs/088-mmio-base-folding-wall-sweep.md)
+  `cloud`, shipped in PR #481. **C-23 classification: NEW
+  ENTRY** (per brief 084's "3-walls-not-1" methodology). 75-
+  compile sweep (5 variants × 15 SPs) confirmed C-23 carries
+  TWO peepholes (base-folding + ANDS→TST) sharing the C-15
+  SP boundary but with distinct asm-grep discriminators.
+  Recipe `.legacy.c` (mwcc 1.2/sp2p3) byte-identical for all
+  4 confirmed instances; `.legacy_sp3.c` is 4 bytes shorter
+  (epilogue change, NOT byte-identical).
+- [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](docs/briefs/084-c22-struct-pointer-corruption-wall.md)
+  `cloud`, shipped in PR #471. Codified C-22 adjacent-bitfield
+  wall from brief 081 chain's 3 datapoints. Bitfield-via-
+  union recipe validated in production (brief 086 wave 3
+  `func_02001c98`). Brief 091 (v2 expansion) refines for
+  remaining 4 non-bitfield shapes from 5-datapoint cumulative
+  pool.
+- [`docs/briefs/082-pokeheartgold-bulk-port-wave-1.md`](docs/briefs/082-pokeheartgold-bulk-port-wave-1.md)
+  `decomper`, shipped in PR #470. Below target (1 match) —
+  pool calibration data for the 2.0/sp2p2 cross-project
+  pool. Cumulative cross-project: 100 ports (99 pokediamond
+  + 1 pokeheartgold).
+- [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
+  `cloud`, shipped in PR #473. `--run` mode for
+  `tools/permute.py`. Active for hard-tier candidates that
+  hit close-but-not-byte-identical states.
+- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
+  `cloud`, originally shipped via PR #429; correction
+  applied via brief 080 (PR #465). Folded into the
+  cross-project pipeline.
 - [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
   `decomper`, full 3-wave chain shipped via PRs #464 / #467
   / #468. **21 matches / 876 bytes / 67.7% combined yield.**
