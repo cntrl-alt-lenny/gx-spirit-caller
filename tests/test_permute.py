@@ -522,7 +522,6 @@ class TestEnsurePermuterInstalled(unittest.TestCase):
         # When apply_patches isn't injected, the cold path calls
         # patch_permuter_vendor on the cloned dir. Stub git so the
         # clone is a no-op + capture the patcher invocation.
-        calls = []
         def fake_git(args, cwd=None):
             class R: stdout = ""
             return R()
