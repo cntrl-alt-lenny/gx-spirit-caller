@@ -16,9 +16,12 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from permute import (  # noqa: E402
+    PERMUTER_ARM_PRELUDE,
     PERMUTER_PINNED_COMMIT,
     PERMUTER_REPO_URL,
     PERMUTER_VENDOR_DIR,
+    PERMUTER_VENDOR_PATCH_GUARD,
+    PERMUTER_VENDOR_PATCHES,
     PermuterRunResult,
     best_output,
     collect_output_dirs,
@@ -29,11 +32,14 @@ from permute import (  # noqa: E402
     install_permuter_deps,
     module_delinks_path,
     module_symbols_path,
+    normalize_disasm_for_permuter,
     parse_tu_ranges,
+    patch_permuter_vendor,
     render_readme,
     render_run_sh,
     run_permuter,
     stage_work_dir,
+    strip_compile_sh_ampersand,
     tu_containing,
 )
 
@@ -450,6 +456,7 @@ class TestEnsurePermuterInstalled(unittest.TestCase):
                 vendor_dir=vendor,
                 commit="deadbeef" * 5,
                 run_git=fake_git,
+                apply_patches=lambda *a, **kw: None,
                 log=logs.append,
             )
         # Expect a clone followed by a checkout — exact arg shape:
@@ -481,6 +488,7 @@ class TestEnsurePermuterInstalled(unittest.TestCase):
                 vendor_dir=vendor,
                 commit=commit,
                 run_git=fake_git,
+                apply_patches=lambda *a, **kw: None,
                 log=lambda m: None,
             )
         # Only the HEAD check ran — no fetch, no checkout.
@@ -503,11 +511,34 @@ class TestEnsurePermuterInstalled(unittest.TestCase):
                 vendor_dir=vendor,
                 commit=commit,
                 run_git=fake_git,
+                apply_patches=lambda *a, **kw: None,
                 log=lambda m: None,
             )
         self.assertEqual(calls[0], ("rev-parse", "HEAD"))
         self.assertIn(("fetch", "origin"), calls)
         self.assertIn(("checkout", commit), calls)
+
+    def test_apply_patches_called_by_default(self):
+        # When apply_patches isn't injected, the cold path calls
+        # patch_permuter_vendor on the cloned dir. Stub git so the
+        # clone is a no-op + capture the patcher invocation.
+        calls = []
+        def fake_git(args, cwd=None):
+            class R: stdout = ""
+            return R()
+        patcher_invocations = []
+        def fake_patcher(vendor_dir, *, log=None):
+            patcher_invocations.append(vendor_dir)
+        with tempfile.TemporaryDirectory() as td:
+            vendor = Path(td) / "decomp-permuter"
+            ensure_permuter_installed(
+                vendor_dir=vendor,
+                commit="deadbeef" * 5,
+                run_git=fake_git,
+                apply_patches=fake_patcher,
+                log=lambda m: None,
+            )
+        self.assertEqual(patcher_invocations, [vendor])
 
 
 class TestInstallPermuterDeps(unittest.TestCase):
@@ -885,6 +916,233 @@ class TestPermuterRunResultDefaults(unittest.TestCase):
         self.assertFalse(r.timed_out)
         self.assertIsNone(r.exit_code)
         self.assertEqual(r.output_dirs, [])
+
+
+# --------------------------------------------------------------------------- #
+# Brief 096 — permuter wrapper for macOS Apple Silicon
+# --------------------------------------------------------------------------- #
+
+
+class TestNormalizeDisasmForPermuter(unittest.TestCase):
+    """dsd-dis → permuter-acceptable .s transformation."""
+
+    DSD_SAMPLE = """    .include "macros/function.inc"
+
+    .text
+    .global func_02009758
+    arm_func_start func_02009758
+func_02009758: ; 0x02009758
+    stmdb sp!, {r3, lr}
+    mov r1, r0, asr #4 ; comment after instr
+    ldmia sp!, {r3, pc}
+    arm_func_end func_02009758
+"""
+
+    def test_strips_dsd_include(self):
+        out = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        self.assertNotIn("macros/function.inc", out)
+        self.assertNotIn(".include", out)
+
+    def test_strips_arm_func_start_end(self):
+        out = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        self.assertNotIn("arm_func_start", out)
+        self.assertNotIn("arm_func_end", out)
+
+    def test_rewrites_global_to_globl(self):
+        out = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        self.assertNotIn(".global ", out)
+        self.assertIn(".globl func_02009758", out)
+
+    def test_preserves_instructions(self):
+        # Body instructions + label survive verbatim.
+        out = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        self.assertIn("func_02009758:", out)
+        self.assertIn("stmdb sp!, {r3, lr}", out)
+        self.assertIn("ldmia sp!, {r3, pc}", out)
+
+    def test_strips_semicolon_annotations(self):
+        # dsd-dis uses `;` for NASM-style comments; ARM GNU as
+        # treats `;` as junk-at-end-of-line and refuses. The
+        # normaliser strips them.
+        out = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        self.assertNotIn("; 0x02009758", out)
+        self.assertNotIn("comment after instr", out)
+        # Label and instruction body still present.
+        self.assertIn("func_02009758:", out)
+        self.assertIn("mov r1, r0, asr #4", out)
+
+    def test_idempotent(self):
+        # Running the normaliser twice produces the same output.
+        once = normalize_disasm_for_permuter(self.DSD_SAMPLE)
+        twice = normalize_disasm_for_permuter(once)
+        self.assertEqual(once, twice)
+
+    def test_globl_in_input_is_preserved(self):
+        # If the input already uses `.globl`, leave it alone.
+        already_globl = self.DSD_SAMPLE.replace(".global", ".globl")
+        out = normalize_disasm_for_permuter(already_globl)
+        self.assertIn(".globl func_02009758", out)
+        self.assertNotIn(".global ", out)
+
+
+class TestStripCompileShAmpersand(unittest.TestCase):
+    """compile.sh → strip the `&& transform_dep.py …` chunk while
+    preserving `"$INPUT" -o "$OUTPUT"`."""
+
+    NINJA_DERIVED = """#!/usr/bin/env bash
+INPUT="$(realpath "$1")"
+OUTPUT="$(realpath "$3")"
+cd /Users/leo/Dev/gx-spirit-caller
+wine ./tools/mwccarm/2.0/sp1p5/mwccarm.exe -O4,p -enum int -lang=c -d eur -c '&&' /opt/homebrew/opt/python@3.13/bin/python3.13 tools/transform_dep.py build/eur/src/main/foo.d build/eur/src/main/foo.d "$INPUT" -o "$OUTPUT"
+"""
+
+    def test_strips_ampersand_chain(self):
+        out = strip_compile_sh_ampersand(self.NINJA_DERIVED)
+        self.assertNotIn("&&", out)
+        self.assertNotIn("transform_dep.py", out)
+        # Header lines + mwccarm invocation survive.
+        self.assertIn("#!/usr/bin/env bash", out)
+        self.assertIn("wine ./tools/mwccarm", out)
+
+    def test_preserves_input_output_placeholders(self):
+        # The `"$INPUT" -o "$OUTPUT"` markers must land in mwccarm's
+        # arg list (they were originally pushed to the END by import.py
+        # because of the `&&` chain). After the strip, the line should
+        # end with `-c "$INPUT" -o "$OUTPUT"`.
+        out = strip_compile_sh_ampersand(self.NINJA_DERIVED)
+        self.assertIn('"$INPUT"', out)
+        self.assertIn('"$OUTPUT"', out)
+        # They appear AFTER `-c` so mwccarm can find the source.
+        wine_line = next(line for line in out.splitlines()
+                         if line.startswith("wine "))
+        self.assertRegex(wine_line, r'-c\s+"\$INPUT"\s+-o\s+"\$OUTPUT"')
+
+    def test_idempotent(self):
+        once = strip_compile_sh_ampersand(self.NINJA_DERIVED)
+        twice = strip_compile_sh_ampersand(once)
+        self.assertEqual(once, twice)
+
+    def test_no_ampersand_no_change(self):
+        # File without `&&` passes through.
+        no_amp = "#!/usr/bin/env bash\nwine mwccarm.exe foo.c\n"
+        self.assertEqual(strip_compile_sh_ampersand(no_amp), no_amp)
+
+
+class TestPatchPermuterVendor(unittest.TestCase):
+    """patch_permuter_vendor applies the 3 import.py edits + the
+    prelude.inc replacement, idempotently."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.vendor = Path(self.tmpdir.name)
+        # Synthesise a pristine `import.py` with the exact search
+        # strings from the pinned commit. The patches use these as
+        # substring anchors.
+        (self.vendor / "import.py").write_text(
+            'def homebrew_gcc_cpp() -> str:\n'
+            '    lookup_paths = ["/usr/local/bin", "/opt/homebrew/bin"]\n'
+            '\n'
+            '    for lookup_path in lookup_paths:\n'
+            '        try:\n'
+            '            return max(f for f in os.listdir(lookup_path) if f.startswith("cpp-"))\n'
+            '        except ValueError:\n'
+            '            pass\n'
+            '\n'
+            '\n'
+            'DEFAULT_AS_CMDLINE: List[str] = ["mips-linux-gnu-as", "-march=vr4300", "-mabi=32"]\n'
+            '\n'
+            '    for arg in compiler:\n'
+            '        if include_next > 0:\n'
+            '            include_next -= 1\n'
+            '            cpp_command.append(arg)\n'
+            '            continue\n'
+            '        if arg in ["-D", "-U", "-I"]:\n'
+            '            cpp_command.append(arg)\n'
+            '            include_next = 1\n'
+            '            continue\n'
+            '        if (\n'
+            '            arg.startswith("-D")\n'
+            '        ):\n'
+            '            pass\n',
+            encoding="utf-8",
+        )
+        (self.vendor / "prelude.inc").write_text(
+            ".set noat\n.set noreorder\n.set gp=64\n", encoding="utf-8",
+        )
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    def test_applies_all_three_import_patches(self):
+        patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+        text = (self.vendor / "import.py").read_text(encoding="utf-8")
+        # Patch 1: FileNotFoundError catch.
+        self.assertIn("(ValueError, FileNotFoundError)", text)
+        # Patch 2: lowercase `-i` handling.
+        self.assertIn('if arg == "-i":', text)
+        # Patch 3: ARM assembler default.
+        self.assertIn("arm-none-eabi-as", text)
+        self.assertNotIn("mips-linux-gnu-as", text)
+        # Guard substring present in each patched location.
+        self.assertGreaterEqual(
+            text.count(PERMUTER_VENDOR_PATCH_GUARD), 3,
+        )
+
+    def test_replaces_prelude(self):
+        patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+        prelude = (self.vendor / "prelude.inc").read_text(encoding="utf-8")
+        self.assertEqual(prelude, PERMUTER_ARM_PRELUDE)
+        self.assertIn(PERMUTER_VENDOR_PATCH_GUARD, prelude)
+        self.assertNotIn(".set noat", prelude)
+
+    def test_idempotent(self):
+        # Second invocation must not double-patch.
+        patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+        once = (self.vendor / "import.py").read_text(encoding="utf-8")
+        patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+        twice = (self.vendor / "import.py").read_text(encoding="utf-8")
+        self.assertEqual(once, twice)
+        # Guard count stays the same (3 import.py + 1 prelude is the
+        # expected total for an applied vendor).
+        self.assertEqual(
+            once.count(PERMUTER_VENDOR_PATCH_GUARD),
+            twice.count(PERMUTER_VENDOR_PATCH_GUARD),
+        )
+
+    def test_missing_search_string_raises(self):
+        # Tampered file → patch.py can't find the anchor → loud
+        # failure rather than silent corruption.
+        (self.vendor / "import.py").write_text(
+            "# completely different content\n", encoding="utf-8",
+        )
+        with self.assertRaises(ValueError) as ctx:
+            patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+        self.assertIn("brief 096 patch", str(ctx.exception))
+
+    def test_missing_file_raises(self):
+        # No import.py → fail loud rather than silently skip.
+        (self.vendor / "import.py").unlink()
+        with self.assertRaises(ValueError):
+            patch_permuter_vendor(self.vendor, log=lambda *a, **k: None)
+
+
+class TestPatchRegistry(unittest.TestCase):
+    """Sanity: the patch table is well-formed."""
+
+    def test_three_import_patches(self):
+        filenames = {p[0] for p in PERMUTER_VENDOR_PATCHES}
+        self.assertEqual(filenames, {"import.py"})
+
+    def test_guard_in_every_replacement(self):
+        for _filename, _search, replacement in PERMUTER_VENDOR_PATCHES:
+            self.assertIn(PERMUTER_VENDOR_PATCH_GUARD, replacement)
+
+    def test_arm_prelude_uses_percent_function_not_at(self):
+        # ELF/ARM uses `%function`; upstream MIPS prelude used
+        # `@function`. Regression guard against drift on prelude
+        # bumps.
+        self.assertIn("%function", PERMUTER_ARM_PRELUDE)
+        self.assertNotIn("@function", PERMUTER_ARM_PRELUDE)
 
 
 if __name__ == "__main__":
