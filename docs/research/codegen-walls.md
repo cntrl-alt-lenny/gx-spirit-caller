@@ -2152,12 +2152,13 @@ ldmia sp!, {r3, pc}
 ```
 
 17 insns + 2 pool. The orig is mwcc-1.2-style code: it computes
-`idx % 32` via the **full signed-modulo formula** (`mov r0, lsr
-#31; rsb r0, r2, r0, lsl #27; add r2, r2, r0, ror #27` — 3-insn
-recovery), as opposed to mwcc 2.0's **single-insn `and rN,
-#0x1f`** peephole. mwcc 2.0 recognises that `idx & 0x1f` is
-equivalent to `idx % 32` for non-negative idx and emits the
-short form even when source-author wrote `% 32`.
+`idx % 32` via the **full signed-modulo formula** — 3-insn
+recovery using `mov r0, lsr #31` / `rsb r0, r2, r0, lsl #27` /
+`add r2, r2, r0, ror #27` — as opposed to mwcc 2.0's
+**single-insn `and rN, #0x1f`** peephole. mwcc 2.0 recognises
+that `idx & 0x1f` is equivalent to `idx % 32` for non-negative
+idx and emits the short form even when source-author wrote
+`% 32`.
 
 Brief 091 sweep (4 source variants × 15 SPs):
 
