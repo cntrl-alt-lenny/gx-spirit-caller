@@ -23,16 +23,38 @@ from port_to_region import (  # noqa: E402
     SYMBOL_RE,
     SymbolRef,
     Resolution,
+    _fmt_shift,
     apply_substitutions,
+    compute_neighbor_shift_consensus,
     compute_output_path,
+    derive_data_shift_consensus,
     find_rename_collisions,
     function_symbol_for,
     infer_module_from_path,
     module_to_src_dir,
     parse_filename_stem,
     parse_symbols_in_source,
+    resolve_symbol,
     target_stem_for_prefix,
 )
+
+
+class TestFmtShift(unittest.TestCase):
+    """_fmt_shift renders signed hex correctly for both directions."""
+
+    def test_positive_shift(self):
+        self.assertEqual(_fmt_shift(0x8), "+0x8")
+        self.assertEqual(_fmt_shift(0x1000), "+0x1000")
+
+    def test_negative_shift(self):
+        # USA addresses sometimes sit *below* EUR (negative shift).
+        # We must NOT render this as `+0x-20`; that string is what
+        # the brief 095 v1 prototype produced and looks malformed.
+        self.assertEqual(_fmt_shift(-0x20), "-0x20")
+        self.assertEqual(_fmt_shift(-0x1c), "-0x1c")
+
+    def test_zero_shift(self):
+        self.assertEqual(_fmt_shift(0), "0x0")
 
 
 class TestSymbolPattern(unittest.TestCase):
@@ -558,6 +580,473 @@ class TestFindRenameCollisions(unittest.TestCase):
 
     def test_empty_resolutions_no_collision(self):
         self.assertEqual(find_rename_collisions([]), [])
+
+
+# --------------------------------------------------------------------------- #
+# Brief 095 — D2 v2 neighbor-shift auto-promote
+# --------------------------------------------------------------------------- #
+
+
+class _FakeFunc:
+    """Minimal Function stand-in for the consensus/resolve tests.
+
+    Mirrors find_region_siblings.Function's read-only fields used by
+    port_to_region — addr, name. The full Function dataclass is
+    frozen and has more fields, but the consensus helper only needs
+    addr + name.
+    """
+    __slots__ = ("addr", "size", "name", "module", "rank")
+
+    def __init__(self, addr: int, name: str = "", module: str = "main",
+                 size: int = 0x20, rank: int = 0):
+        self.addr = addr
+        self.size = size
+        self.name = name
+        self.module = module
+        self.rank = rank
+
+
+class _FakeMatch:
+    """Stand-in for find_region_siblings.Match — just .func +
+    .confidence are read by port_to_region."""
+    __slots__ = ("func", "confidence", "score", "rationale")
+
+    def __init__(self, func: _FakeFunc, confidence: str,
+                 score: float = 0.5, rationale: str = ""):
+        self.func = func
+        self.confidence = confidence
+        self.score = score
+        self.rationale = rationale
+
+
+def _make_find_siblings_fn(matches: dict[int, _FakeMatch]):
+    """Build a stub find_siblings_fn for tests. Returns the
+    pre-canned match for `eur_func.addr`; empty list if not in the
+    table."""
+    def _fn(eur_func, target_regions, *,
+            max_results=1, source_region="eur",
+            target_region_name=None, byte_disambiguate=True):
+        m = matches.get(eur_func.addr)
+        return [m] if m is not None else []
+    return _fn
+
+
+class TestComputeNeighborShiftConsensus(unittest.TestCase):
+    """Brief 095 D2 v2 — neighbor-shift consensus helper.
+
+    The shift the brief targets is constant per module-region for DS
+    overlays: EUR functions in a kbyte all shift by the same +N to
+    their USA twin. We synthesise 8 EUR neighbors around a target
+    address, return HIGH matches with a consensus +8 shift, and check
+    the helper finds it.
+    """
+
+    def _eur_region(self) -> dict[str, list]:
+        # 8 EUR functions in module "main", addresses 0x02006d00 .. 0x02006e54
+        addrs = [
+            0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+            0x02006e00, 0x02006e40, 0x02006e54, 0x02006e80,
+        ]
+        return {"main": [_FakeFunc(addr=a, rank=i)
+                         for i, a in enumerate(addrs)]}
+
+    def test_consensus_8_from_5_neighbors(self):
+        eur = self._eur_region()
+        # Every neighbor matches HIGH with +8 shift in USA.
+        matches = {
+            a: _FakeMatch(_FakeFunc(addr=a + 0x8), "HIGH")
+            for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                      0x02006e00, 0x02006e40, 0x02006e80)
+        }
+        fn = _make_find_siblings_fn(matches)
+        shift, sampled = compute_neighbor_shift_consensus(
+            eur_addr=0x02006e54, module="main",
+            eur_regions=eur, target_regions={},
+            find_siblings_fn=fn, target_region_name="usa",
+        )
+        self.assertEqual(shift, 0x8)
+        # 5 neighbors sampled (n_neighbors default).
+        self.assertEqual(len(sampled), 5)
+
+    def test_consensus_when_4_of_5_agree(self):
+        # 4 of 5 neighbors agree on +8; 1 anomalous +16. Default
+        # min_agreement is 3 → +8 wins.
+        eur = self._eur_region()
+        addrs = [0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0, 0x02006e00]
+        matches = {
+            addrs[0]: _FakeMatch(_FakeFunc(addr=addrs[0] + 0x8), "HIGH"),
+            addrs[1]: _FakeMatch(_FakeFunc(addr=addrs[1] + 0x8), "HIGH"),
+            addrs[2]: _FakeMatch(_FakeFunc(addr=addrs[2] + 0x8), "HIGH"),
+            addrs[3]: _FakeMatch(_FakeFunc(addr=addrs[3] + 0x10), "HIGH"),
+            addrs[4]: _FakeMatch(_FakeFunc(addr=addrs[4] + 0x8), "HIGH"),
+        }
+        fn = _make_find_siblings_fn(matches)
+        shift, sampled = compute_neighbor_shift_consensus(
+            eur_addr=0x02006e54, module="main",
+            eur_regions=eur, target_regions={},
+            find_siblings_fn=fn, target_region_name="usa",
+        )
+        self.assertEqual(shift, 0x8)
+        self.assertEqual(len(sampled), 5)
+
+    def test_no_consensus_when_split_2_2_1(self):
+        # 2 vote +8, 2 vote +16, 1 votes +24 → no mode reaches 3 →
+        # consensus is None.
+        eur = self._eur_region()
+        addrs = [0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0, 0x02006e00]
+        matches = {
+            addrs[0]: _FakeMatch(_FakeFunc(addr=addrs[0] + 0x8), "HIGH"),
+            addrs[1]: _FakeMatch(_FakeFunc(addr=addrs[1] + 0x10), "HIGH"),
+            addrs[2]: _FakeMatch(_FakeFunc(addr=addrs[2] + 0x8), "HIGH"),
+            addrs[3]: _FakeMatch(_FakeFunc(addr=addrs[3] + 0x10), "HIGH"),
+            addrs[4]: _FakeMatch(_FakeFunc(addr=addrs[4] + 0x18), "HIGH"),
+        }
+        fn = _make_find_siblings_fn(matches)
+        shift, sampled = compute_neighbor_shift_consensus(
+            eur_addr=0x02006e54, module="main",
+            eur_regions=eur, target_regions={},
+            find_siblings_fn=fn, target_region_name="usa",
+        )
+        self.assertIsNone(shift)
+        self.assertEqual(len(sampled), 5)
+
+    def test_no_consensus_when_too_few_high_neighbors(self):
+        # Only 2 HIGH neighbors found (rest are MEDIUM / no match).
+        # min_agreement is 3 → no consensus.
+        eur = self._eur_region()
+        matches = {
+            0x02006d00: _FakeMatch(_FakeFunc(addr=0x02006d08), "HIGH"),
+            0x02006d40: _FakeMatch(_FakeFunc(addr=0x02006d48), "HIGH"),
+            0x02006d80: _FakeMatch(_FakeFunc(addr=0x02006d88), "MEDIUM"),
+        }
+        fn = _make_find_siblings_fn(matches)
+        shift, sampled = compute_neighbor_shift_consensus(
+            eur_addr=0x02006e54, module="main",
+            eur_regions=eur, target_regions={},
+            find_siblings_fn=fn, target_region_name="usa",
+        )
+        self.assertIsNone(shift)
+        # 2 HIGH samples collected, not enough for consensus.
+        self.assertEqual(len(sampled), 2)
+
+    def test_pivot_not_in_module_returns_none(self):
+        eur = self._eur_region()
+        fn = _make_find_siblings_fn({})
+        shift, sampled = compute_neighbor_shift_consensus(
+            eur_addr=0xdeadbeef, module="main",
+            eur_regions=eur, target_regions={},
+            find_siblings_fn=fn, target_region_name="usa",
+        )
+        self.assertIsNone(shift)
+        self.assertEqual(sampled, [])
+
+
+class TestResolveSymbolAutoPromote(unittest.TestCase):
+    """Brief 095 D2 v2 — resolve_symbol promotes LOW→MEDIUM when
+    the candidate's shift matches the neighbor consensus."""
+
+    def _eur_region(self) -> dict[str, list]:
+        addrs = [
+            0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+            0x02006e00, 0x02006e40, 0x02006e54, 0x02006e80,
+        ]
+        return {"main": [_FakeFunc(addr=a, rank=i)
+                         for i, a in enumerate(addrs)]}
+
+    def _target_region(self) -> dict[str, list]:
+        # USA has 8 functions at EUR+8 each.
+        return {"main": [_FakeFunc(addr=a + 0x8) for a in (
+            0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+            0x02006e00, 0x02006e40, 0x02006e54, 0x02006e80,
+        )]}
+
+    def test_low_promoted_to_medium_on_consensus_match(self):
+        eur = self._eur_region()
+        target = self._target_region()
+        # 6 HIGH neighbors + the candidate which comes back LOW.
+        # All shifts are +8.
+        matches = {}
+        for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                  0x02006e00, 0x02006e40, 0x02006e80):
+            matches[a] = _FakeMatch(
+                _FakeFunc(addr=a + 0x8, name=f"func_{a + 0x8:08x}"),
+                "HIGH",
+            )
+        # The candidate has no relocs → comes back LOW.
+        matches[0x02006e54] = _FakeMatch(
+            _FakeFunc(addr=0x02006e5c, name="func_02006e5c"),
+            "LOW",
+            rationale="size+ish match, no relocs to compare",
+        )
+        fn = _make_find_siblings_fn(matches)
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        cache: dict = {}
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            fn, consensus_cache=cache,
+        )
+        self.assertEqual(res.confidence, "MEDIUM")
+        self.assertEqual(res.target_name, "func_02006e5c")
+        self.assertIn("auto-promoted LOW→MEDIUM", res.notes)
+        self.assertIn("+0x8", res.notes)
+        # Sanity: no malformed `+0x-N` strings should appear.
+        self.assertNotIn("+0x-", res.notes)
+        # Cache populated for re-use.
+        self.assertIn(("main", "usa"), cache)
+
+    def test_low_stays_low_on_wrong_shift_anti_match(self):
+        # Brief 095 spec: candidate whose shift differs from consensus
+        # stays LOW. This is the intentional anti-match safeguard.
+        eur = self._eur_region()
+        target = self._target_region()
+        matches = {}
+        for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                  0x02006e00, 0x02006e40, 0x02006e80):
+            matches[a] = _FakeMatch(
+                _FakeFunc(addr=a + 0x8, name=f"func_{a + 0x8:08x}"),
+                "HIGH",
+            )
+        # Candidate at WRONG shift +0x40 (vs consensus +0x8).
+        matches[0x02006e54] = _FakeMatch(
+            _FakeFunc(addr=0x02006e94, name="func_02006e94"),
+            "LOW",
+            rationale="size+ish match, no relocs to compare",
+        )
+        fn = _make_find_siblings_fn(matches)
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            fn,
+        )
+        self.assertEqual(res.confidence, "LOW")
+        self.assertEqual(res.target_name, "func_02006e94")
+        self.assertIn("anti-match", res.notes)
+
+    def test_low_stays_low_when_no_consensus(self):
+        # Brief 095: if no consensus, default behavior — keep LOW.
+        eur = self._eur_region()
+        target = self._target_region()
+        # Only 2 HIGH neighbors, not enough for min_agreement=3.
+        matches = {
+            0x02006d00: _FakeMatch(
+                _FakeFunc(addr=0x02006d08, name="x"), "HIGH"),
+            0x02006d40: _FakeMatch(
+                _FakeFunc(addr=0x02006d48, name="y"), "HIGH"),
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e5c, name="func_02006e5c"),
+                "LOW",
+                rationale="size+ish match, no relocs to compare",
+            ),
+        }
+        fn = _make_find_siblings_fn(matches)
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {}, fn,
+        )
+        self.assertEqual(res.confidence, "LOW")
+        self.assertIn("no neighbor consensus", res.notes)
+
+    def test_auto_promote_disabled_keeps_low(self):
+        # --no-auto-promote opt-out: even with consensus, LOW stays LOW.
+        eur = self._eur_region()
+        target = self._target_region()
+        matches = {}
+        for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                  0x02006e00, 0x02006e40, 0x02006e80):
+            matches[a] = _FakeMatch(
+                _FakeFunc(addr=a + 0x8, name=f"func_{a + 0x8:08x}"),
+                "HIGH",
+            )
+        matches[0x02006e54] = _FakeMatch(
+            _FakeFunc(addr=0x02006e5c, name="func_02006e5c"),
+            "LOW",
+            rationale="size+ish match, no relocs to compare",
+        )
+        fn = _make_find_siblings_fn(matches)
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {}, fn,
+            auto_promote_low=False,
+        )
+        self.assertEqual(res.confidence, "LOW")
+        self.assertNotIn("auto-promoted", res.notes)
+
+    def test_high_resolution_unaffected_by_promote(self):
+        # Sanity: HIGH matches don't touch the consensus path.
+        eur = self._eur_region()
+        target = self._target_region()
+        matches = {0x02006e54: _FakeMatch(
+            _FakeFunc(addr=0x02006e5c, name="func_02006e5c"),
+            "HIGH",
+        )}
+        fn = _make_find_siblings_fn(matches)
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn)
+        self.assertEqual(res.confidence, "HIGH")
+        self.assertNotIn("auto-promote", res.notes)
+
+    def test_data_d3_shift_consensus_resolves_unmapped_symbol(self):
+        # Brief 095 D3 — when a data symbol misses the
+        # parallel-reloc map AND misses exact-addr match, derive
+        # the shift from other same-module mappings and try the
+        # shifted address.
+        eur = self._eur_region()
+        target = self._target_region()
+        # 2 known mappings establish consensus shift -0xe0.
+        data_addr_map = {
+            ("main", 0x021a18b8): ("main", 0x021a17d8),
+            ("main", 0x021a19e8): ("main", 0x021a1908),
+        }
+        # USA symbols.txt has data_021a1938 at the shifted address
+        # (021a1a18 - 0xe0).
+        target_data = {"main": {
+            0x021a17d8: "data_021a17d8",
+            0x021a1908: "data_021a1908",
+            0x021a1938: "data_021a1938",
+        }}
+        # Unmapped data ref — must NOT exact-addr-match (021a1a18
+        # is not in target_data) and the parallel-reloc map doesn't
+        # cover it.
+        ref = SymbolRef(text="data_021a1a18", kind="data",
+                        module="main", addr=0x021a1a18)
+        # find_siblings_fn is not used by the data path.
+        res = resolve_symbol(
+            ref, "usa", eur, target, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "EXACT_ADDR")
+        self.assertEqual(res.target_name, "data_021a1938")
+        self.assertIn("D3 data-shift consensus", res.notes)
+        self.assertIn("-0xe0", res.notes)
+
+    def test_data_d3_keeps_none_when_no_consensus(self):
+        # < min_agreement mappings → no consensus → fall through
+        # to NONE.
+        data_addr_map = {
+            ("main", 0x021a18b8): ("main", 0x021a17d8),
+        }
+        target_data = {"main": {0x021a17d8: "data_021a17d8"}}
+        ref = SymbolRef(text="data_021a1a18", kind="data",
+                        module="main", addr=0x021a1a18)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "NONE")
+        self.assertIn("parallel-reloc map didn't cover", res.notes)
+
+    def test_data_d3_keeps_none_when_shifted_addr_missing(self):
+        # Consensus shift exists, but target region has no data
+        # symbol at the shifted address → still NONE.
+        data_addr_map = {
+            ("main", 0x021a18b8): ("main", 0x021a17d8),
+            ("main", 0x021a19e8): ("main", 0x021a1908),
+        }
+        # Note: 0x021a1938 (021a1a18 - 0xe0) is NOT in target_data.
+        target_data = {"main": {
+            0x021a17d8: "data_021a17d8",
+            0x021a1908: "data_021a1908",
+        }}
+        ref = SymbolRef(text="data_021a1a18", kind="data",
+                        module="main", addr=0x021a1a18)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "NONE")
+
+    def test_derive_data_shift_consensus_skips_cross_module(self):
+        # Cross-module entries (main → ov002) MUST NOT contribute to
+        # the same-module consensus calculation — overlay layouts
+        # have their own shifts independent of main.
+        data_addr_map = {
+            ("main", 0x100): ("main", 0xc0),    # main shift -0x40
+            ("main", 0x200): ("main", 0x1c0),   # main shift -0x40
+            ("main", 0x300): ("main", 0x2c0),   # main shift -0x40
+            ("ov002", 0x300): ("ov002", 0x340), # ov002 shift +0x40
+        }
+        # 3 main entries agree on -0x40 (default min_agreement=3).
+        self.assertEqual(
+            derive_data_shift_consensus(data_addr_map, "main"),
+            -0x40,
+        )
+        # ov002 only has 1 entry → no consensus at min_agreement=3.
+        self.assertIsNone(
+            derive_data_shift_consensus(
+                data_addr_map, "ov002", min_agreement=3,
+            ),
+        )
+
+    def test_derive_data_shift_consensus_min_agreement_2(self):
+        # The data-path default in resolve_symbol uses
+        # min_agreement=2 (smaller maps than the func-path's =3).
+        # Verify the helper respects the override.
+        data_addr_map = {
+            ("main", 0x100): ("main", 0xc0),
+            ("main", 0x200): ("main", 0x1c0),
+        }
+        self.assertEqual(
+            derive_data_shift_consensus(
+                data_addr_map, "main", min_agreement=2,
+            ),
+            -0x40,
+        )
+        # Default min_agreement=3 has only 2 entries → None.
+        self.assertIsNone(
+            derive_data_shift_consensus(data_addr_map, "main"),
+        )
+
+    def test_consensus_cache_reused_across_calls(self):
+        # Two LOW resolutions in the same (module, target_region)
+        # should share the consensus computation.
+        eur = self._eur_region()
+        target = self._target_region()
+        matches = {}
+        for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                  0x02006e00, 0x02006e40, 0x02006e80):
+            matches[a] = _FakeMatch(
+                _FakeFunc(addr=a + 0x8, name=f"func_{a + 0x8:08x}"),
+                "HIGH",
+            )
+        matches[0x02006e54] = _FakeMatch(
+            _FakeFunc(addr=0x02006e5c, name="x"), "LOW",
+            rationale="size+ish match")
+
+        # Counter call-tracking find_siblings_fn
+        call_count = [0]
+        inner = _make_find_siblings_fn(matches)
+
+        def counting_fn(*a, **kw):
+            call_count[0] += 1
+            return inner(*a, **kw)
+
+        cache: dict = {}
+        ref = SymbolRef(text="x", kind="func", module="main",
+                        addr=0x02006e54)
+        resolve_symbol(ref, "usa", eur, target, {},
+                       counting_fn, consensus_cache=cache)
+        first_call_count = call_count[0]
+        # Second resolution at a different addr (same module/region):
+        # consensus should hit the cache.
+        ref2 = SymbolRef(text="y", kind="func", module="main",
+                         addr=0x02006e40)
+        # Make addr 0x02006e40 also come back LOW for this round
+        matches[0x02006e40] = _FakeMatch(
+            _FakeFunc(addr=0x02006e48, name="y"), "LOW",
+            rationale="size+ish match")
+        resolve_symbol(ref2, "usa", eur, target, {},
+                       counting_fn, consensus_cache=cache)
+        # Second call must NOT re-walk the neighbors — only the
+        # candidate's own find_siblings call counts.
+        self.assertEqual(call_count[0], first_call_count + 1)
 
 
 if __name__ == "__main__":

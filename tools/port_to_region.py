@@ -70,6 +70,15 @@ Out of scope for v1:
   needs the same routing tier.
 
 Brief 064 deliverable #2 of 3.
+
+Brief 095 D2 v2 (auto-promote LOW → MEDIUM by neighbor-shift
+consensus) + D3 (data-symbol shift-consensus fallback)
+extend the matcher so that the most common LOW/NONE cases —
+"size+ish match, no relocs to compare" main functions, and
+comment-referenced sibling-function data symbols — resolve
+cleanly without per-port operator override. See
+`compute_neighbor_shift_consensus` and
+`derive_data_shift_consensus` for the rules.
 """
 
 from __future__ import annotations
@@ -292,6 +301,141 @@ def parse_symbols_in_source(source_text: str, default_module: str) -> dict[tuple
     return out
 
 
+def _fmt_shift(shift: int) -> str:
+    """Render an EUR→target address shift as a signed hex string.
+
+    Positive: `+0x20`. Negative: `-0x20`. Zero: `0x0`.
+    Used by D2 v2 messages so shifts read naturally regardless of
+    direction (USA can sit either side of EUR depending on module).
+    """
+    if shift == 0:
+        return "0x0"
+    sign = "+" if shift > 0 else "-"
+    return f"{sign}0x{abs(shift):x}"
+
+
+def derive_data_shift_consensus(
+    data_addr_map: dict[tuple[str, int], tuple[str, int]],
+    module: str,
+    *,
+    min_agreement: int = 3,
+) -> int | None:
+    """Compute the consensus EUR→target shift for data symbols in
+    `module` from an existing parallel-reloc-derived `data_addr_map`.
+
+    Brief 095 D3 — fallback for data-symbol references that the
+    function's own parallel-reloc map didn't cover (typically:
+    comment-referenced sibling-function data symbols, or BSS layout
+    differences where the EUR symbol exists but the parallel-reloc
+    map has a stale entry).
+
+    Returns the mode shift iff `min_agreement` distinct mappings in
+    `module` agree on the shift; else None.
+
+    The map's keys are `(module, eur_addr)` → values
+    `(module, target_addr)`. Same-module entries provide the shift
+    signal; cross-module entries are skipped (overlay-layout shifts
+    differ from main-layout shifts).
+    """
+    from collections import Counter
+
+    shifts: list[int] = []
+    for (eur_mod, eur_addr), (tgt_mod, tgt_addr) in data_addr_map.items():
+        if eur_mod != module or tgt_mod != module:
+            continue
+        shifts.append(tgt_addr - eur_addr)
+
+    if len(shifts) < min_agreement:
+        return None
+    most_common, count = Counter(shifts).most_common(1)[0]
+    if count >= min_agreement:
+        return most_common
+    return None
+
+
+def compute_neighbor_shift_consensus(
+    eur_addr: int,
+    module: str,
+    eur_regions: dict[str, list],
+    target_regions: dict[str, list],
+    find_siblings_fn,
+    target_region_name: str,
+    *,
+    n_neighbors: int = 5,
+    search_radius: int = 30,
+    min_agreement: int = 3,
+) -> tuple[int | None, list[int]]:
+    """Compute the consensus EUR→target address shift from the N
+    nearest HIGH-confidence neighbors of `eur_addr` in `module`.
+
+    Walks outward from `eur_addr` in ordinal-rank order, runs
+    find_siblings_fn on each neighbor, collects up to `n_neighbors`
+    HIGH-confidence hits, and returns the mode of their shifts iff
+    `min_agreement` of them agree on a single shift.
+
+    Returns `(consensus_shift, sampled_shifts)`. `consensus_shift` is
+    None when no consensus exists (no HIGH neighbors found, or the
+    sampled shifts don't agree).
+
+    Brief 095 D2 v2 — used to auto-promote LOW→MEDIUM when a
+    candidate's EUR↔target shift matches the surrounding HIGH-match
+    shift pattern.
+
+    Parameters:
+      n_neighbors    — number of HIGH neighbors to sample (default 5)
+      search_radius  — max ordinal distance to walk (default 30)
+      min_agreement  — minimum agreeing-shift count to declare
+                       consensus (default 3, i.e. ≥3 of 5)
+    """
+    from collections import Counter
+
+    eur_module_funcs = sorted(
+        eur_regions.get(module, []), key=lambda f: f.addr,
+    )
+    pivot = next(
+        (i for i, f in enumerate(eur_module_funcs) if f.addr == eur_addr),
+        None,
+    )
+    if pivot is None:
+        return None, []
+
+    shifts: list[int] = []
+    # Walk symmetric +1, -1, +2, -2, ... to bias toward immediate
+    # neighbors first. Lower-numbered deltas are most likely to
+    # share the same per-region shift.
+    for delta in range(1, search_radius + 1):
+        for sign in (1, -1):
+            idx = pivot + sign * delta
+            if idx < 0 or idx >= len(eur_module_funcs):
+                continue
+            neighbor = eur_module_funcs[idx]
+            matches = find_siblings_fn(
+                neighbor, target_regions,
+                max_results=1,
+                source_region="eur",
+                target_region_name=target_region_name,
+                byte_disambiguate=True,
+            )
+            if not matches:
+                continue
+            top = matches[0]
+            if top.confidence != "HIGH":
+                continue
+            shifts.append(top.func.addr - neighbor.addr)
+            if len(shifts) >= n_neighbors:
+                break
+        if len(shifts) >= n_neighbors:
+            break
+
+    if len(shifts) < min_agreement:
+        return None, shifts
+
+    most_common_shift, count = Counter(shifts).most_common(1)[0]
+    if count >= min_agreement:
+        return most_common_shift, shifts
+    return None, shifts
+
+
 def resolve_symbol(
     ref: SymbolRef,
     target_region: str,
@@ -300,6 +444,9 @@ def resolve_symbol(
     target_data_symbols: dict[str, dict[int, str]],
     find_siblings_fn,
     data_addr_map: dict[tuple[str, int], tuple[str, int]] | None = None,
+    *,
+    auto_promote_low: bool = True,
+    consensus_cache: dict[tuple[str, str], tuple[int | None, list[int]]] | None = None,
 ) -> Resolution:
     """Resolve one EUR symbol reference to its target-region name.
 
@@ -307,6 +454,14 @@ def resolve_symbol(
     For `data_*`: first tries the derived parallel-reloc mapping
     (built from the function being ported's reloc table), then
     falls back to exact-address match in target's symbols.txt.
+
+    Brief 095 D2 v2: when `auto_promote_low=True` (default) and the
+    fingerprint match returns LOW confidence, compute the consensus
+    EUR→target shift of the N nearest HIGH neighbors in the same
+    module. If the candidate's shift matches the consensus, promote
+    LOW → MEDIUM. `consensus_cache` is a caller-supplied dict that
+    caches results across calls within one port_to_region invocation
+    (keyed by (module, target_region)).
     """
     if ref.kind == "data":
         # Try the parallel-reloc-derived mapping first (most
@@ -340,6 +495,31 @@ def resolve_symbol(
                 confidence="EXACT_ADDR",
                 notes=f"exact-address match in {target_region}/{ref.module}",
             )
+
+        # Brief 095 D3 — data-symbol shift-consensus fallback.
+        # When the parallel-reloc map didn't cover the address AND
+        # exact-addr match fails, derive the shift from other
+        # same-module mappings in the map and try the shifted addr.
+        # Catches comment-referenced sibling-function data symbols
+        # (brief 090 legacy_sp3 refusals).
+        if data_addr_map:
+            data_shift = derive_data_shift_consensus(
+                data_addr_map, ref.module, min_agreement=2,
+            )
+            if data_shift is not None:
+                shifted_addr = ref.addr + data_shift
+                shifted_name = data_table.get(shifted_addr)
+                if shifted_name:
+                    return Resolution(
+                        eur_ref=ref,
+                        target_name=shifted_name,
+                        confidence="EXACT_ADDR",
+                        notes=f"D3 data-shift consensus "
+                              f"{_fmt_shift(data_shift)} → "
+                              f"{target_region}/{ref.module}/"
+                              f"0x{shifted_addr:08x}",
+                    )
+
         return Resolution(
             eur_ref=ref,
             target_name=None,
@@ -380,11 +560,54 @@ def resolve_symbol(
         )
 
     top = matches[0]
+    confidence = top.confidence
+    notes = top.rationale
+
+    # Brief 095 D2 v2 — auto-promote LOW → MEDIUM when the candidate's
+    # EUR↔target shift matches the consensus shift of N nearest HIGH
+    # neighbors. Brief 090 calibration: 15 of 15 substantive LOW ports
+    # landed byte-identical under this rule.
+    if auto_promote_low and confidence == "LOW":
+        cache_key = (ref.module, target_region)
+        if consensus_cache is not None and cache_key in consensus_cache:
+            consensus_shift, sampled = consensus_cache[cache_key]
+        else:
+            consensus_shift, sampled = compute_neighbor_shift_consensus(
+                ref.addr, ref.module,
+                eur_regions, target_regions,
+                find_siblings_fn, target_region,
+            )
+            if consensus_cache is not None:
+                consensus_cache[cache_key] = (consensus_shift, sampled)
+
+        if consensus_shift is not None:
+            actual_shift = top.func.addr - ref.addr
+            if actual_shift == consensus_shift:
+                confidence = "MEDIUM"
+                notes = (
+                    f"{notes} | D2 v2 auto-promoted LOW→MEDIUM "
+                    f"(neighbor consensus shift={_fmt_shift(consensus_shift)} "
+                    f"from {len(sampled)} HIGH neighbors)"
+                )
+            else:
+                notes = (
+                    f"{notes} | D2 v2 anti-match: candidate shift "
+                    f"{_fmt_shift(actual_shift)} ≠ consensus "
+                    f"{_fmt_shift(consensus_shift)} from {len(sampled)} "
+                    f"HIGH neighbors (kept LOW)"
+                )
+        else:
+            notes = (
+                f"{notes} | D2 v2: no neighbor consensus "
+                f"(sampled {len(sampled)} HIGH neighbors, "
+                f"need ≥3 agreement)"
+            )
+
     return Resolution(
         eur_ref=ref,
         target_name=top.func.name,
-        confidence=top.confidence,
-        notes=top.rationale,
+        confidence=confidence,
+        notes=notes,
     )
 
 
@@ -675,6 +898,13 @@ def main() -> int:
                     help="Refuse to write unless every func symbol "
                          "resolves at this confidence or better. "
                          "Default HIGH.")
+    ap.add_argument("--no-auto-promote", action="store_true",
+                    help="Brief 095 D2 v2: disable the LOW→MEDIUM "
+                         "auto-promotion rule (re-runs raw find_siblings "
+                         "confidence). Default: auto-promote enabled — "
+                         "LOW candidates whose EUR↔target shift matches "
+                         "the consensus shift of N=5 nearest HIGH "
+                         "neighbors are promoted to MEDIUM.")
     ap.add_argument("--output-path", type=Path, default=None,
                     help="Override the computed output path.")
     ap.add_argument("--dry-run", action="store_true",
@@ -748,9 +978,15 @@ def main() -> int:
         module=file_module,
         addr=file_addr,
     )
+    # Brief 095 D2 v2 — shared cache so the neighbor-shift consensus
+    # is computed at most once per (module, target_region) pair within
+    # one port_to_region invocation.
+    consensus_cache: dict[tuple[str, str], tuple[int | None, list[int]]] = {}
     main_func_resolution = resolve_symbol(
         main_func_ref, args.target, eur, target, target_data,
         find_siblings,
+        auto_promote_low=not args.no_auto_promote,
+        consensus_cache=consensus_cache,
     )
 
     # Build the parallel-reloc data-symbol map for THIS function,
@@ -793,6 +1029,8 @@ def main() -> int:
                 ref, args.target, eur, target, target_data,
                 find_siblings,
                 data_addr_map=data_addr_map,
+                auto_promote_low=not args.no_auto_promote,
+                consensus_cache=consensus_cache,
             ))
 
     # Check confidence floor.
