@@ -94,6 +94,289 @@ PERMUTER_PINNED_COMMIT = "efc5c5e7d9850f7267323b7dca6b41bc30a42d1f"
 PERMUTER_PIP_DEPS = ("toml", "Levenshtein")
 
 
+# ---------------------------------------------------------------------- #
+# Brief 096 — permuter wrapper for macOS Apple Silicon
+# ---------------------------------------------------------------------- #
+#
+# Brief 093 (PR #487) surfaced 5 vendor patches + 1 .s normalization
+# needed to run permuter end-to-end on macOS Apple Silicon. Brief 096
+# wraps them at the project layer: the patches are applied to the
+# cloned vendor dir post-clone, and the .s normalization happens
+# in-place on the dsd-dis output before import.py runs.
+#
+# Architecture choice: project-side wrapper (vs upstream patches).
+# Trade-off picked: keep `tools/_vendor/decomp-permuter/` close to
+# upstream HEAD so future commit-bumps don't require manual diff-
+# reconciliation. The patches are stored as Python string
+# replacements with a guard substring (`# brief 096 patch`) so the
+# patcher is idempotent — second invocation detects the guard and
+# fast-paths.
+#
+# Each patch entry is `(filename, search_string, replacement_string)`.
+# The search_string is verbatim from the pinned commit. If upstream
+# changes the surrounding code, the patch will fail loudly (KeyError
+# / ValueError) rather than silently corrupting the vendor; bump
+# PERMUTER_PINNED_COMMIT after auditing the new shape.
+PERMUTER_VENDOR_PATCH_GUARD = "brief 096 patch applied"
+
+PERMUTER_VENDOR_PATCHES: tuple[tuple[str, str, str], ...] = (
+    # Patch 1 — homebrew_gcc_cpp FileNotFoundError.
+    # Apple Silicon's /usr/local/bin doesn't exist; upstream raises only
+    # on ValueError (when listdir is non-empty but no `cpp-*` entry).
+    # Catch FileNotFoundError too so the lookup walks both candidates.
+    (
+        "import.py",
+        '        try:\n'
+        '            return max(f for f in os.listdir(lookup_path) if f.startswith("cpp-"))\n'
+        '        except ValueError:\n'
+        '            pass',
+        '        try:\n'
+        '            return max(f for f in os.listdir(lookup_path) if f.startswith("cpp-"))\n'
+        '        except (ValueError, FileNotFoundError):  # brief 096 patch applied (homebrew_gcc_cpp)\n'
+        '            pass',
+    ),
+    # Patch 2 — accept lowercase `-i` as include flag.
+    # mwccarm uses lowercase `-i`; upstream scrapes only `-I`. Treat
+    # `-i <path>` as `-I <path>` for the cpp invocation so project
+    # include paths reach the preprocessor.
+    (
+        "import.py",
+        '        if arg in ["-D", "-U", "-I"]:\n'
+        '            cpp_command.append(arg)\n'
+        '            include_next = 1\n'
+        '            continue\n'
+        '        if (',
+        '        if arg in ["-D", "-U", "-I"]:\n'
+        '            cpp_command.append(arg)\n'
+        '            include_next = 1\n'
+        '            continue\n'
+        '        if arg == "-i":  # brief 096 patch applied (lowercase -i for mwccarm)\n'
+        '            cpp_command.append("-I")\n'
+        '            include_next = 1\n'
+        '            continue\n'
+        '        if (',
+    ),
+    # Patch 3 — DEFAULT_AS_CMDLINE → ARM for this project.
+    # Upstream hardcodes MIPS (vr4300 / abi=32). We compile ARM946E-S
+    # with thumb-interwork via arm-none-eabi-as (homebrew binutils).
+    (
+        "import.py",
+        'DEFAULT_AS_CMDLINE: List[str] = ["mips-linux-gnu-as", "-march=vr4300", "-mabi=32"]',
+        'DEFAULT_AS_CMDLINE: List[str] = ["arm-none-eabi-as", "-mcpu=arm946e-s", "-mthumb-interwork"]  # brief 096 patch applied (ARM)',
+    ),
+)
+
+
+# Replacement contents for `prelude.inc` (patch 4). Upstream ships a
+# MIPS-flavoured prelude with `.set noat / .set noreorder / .set
+# gp=64` directives that `arm-none-eabi-as` rejects outright. We
+# replace it with an ARM-compatible macro set covering the same
+# label-emission shapes (glabel, alabel, jlabel, dlabel, ehlabel,
+# nonmatching). The substituting flavour `@function` / `@object`
+# becomes `%function` / `%object` (ELF on ARM uses `%` not `@`).
+PERMUTER_ARM_PRELUDE = """/* brief 096 patch applied — ARM-compatible prelude.inc.
+ * Replaces upstream's MIPS-flavoured directives + macros.
+ * gx-spirit-caller targets ARM946E-S; the macros below produce
+ * the same label-emission shapes the rest of permuter expects. */
+
+.macro glabel label, visibility=global
+    .\\visibility \\label
+    .type \\label, %function
+    \\label:
+.endm
+
+.macro endlabel label
+    .size \\label, . - \\label
+.endm
+
+.macro alabel label, visibility=global
+    .\\visibility \\label
+    .type \\label, %function
+    \\label:
+.endm
+
+.macro ehlabel label, visibility=global
+    .\\visibility \\label
+    \\label:
+.endm
+
+.macro jlabel label, visibility=local
+    \\label:
+.endm
+
+.macro dlabel label, visibility=global
+    .\\visibility \\label
+    .type \\label, %object
+    \\label:
+.endm
+
+.macro enddlabel label
+    .size \\label, . - \\label
+.endm
+
+.macro nonmatching label, size=1
+    .global \\label\\().NON_MATCHING
+    .type \\label\\().NON_MATCHING, %object
+    .size \\label\\().NON_MATCHING, \\size
+    \\label\\().NON_MATCHING:
+.endm
+"""
+
+
+# Regexes for the dsd-dis → permuter .s normalization (patch 6).
+# dsd-dis emits a `.s` shape that upstream permuter's import.py
+# chokes on; the wrapper normalises before invoking import.py.
+_DSD_DIS_INCLUDE_RE = re.compile(
+    r'^\s*\.include\s+"macros/function\.inc".*$', re.MULTILINE,
+)
+_DSD_DIS_ARM_FUNC_START_RE = re.compile(
+    r'^\s*arm_func_start\s+\S+.*$', re.MULTILINE,
+)
+_DSD_DIS_ARM_FUNC_END_RE = re.compile(
+    r'^\s*arm_func_end\s+\S+.*$', re.MULTILINE,
+)
+_DSD_DIS_GLOBAL_RE = re.compile(
+    r'^(\s*)\.global(\s+\S+)', re.MULTILINE,
+)
+# dsd-dis annotates labels with NASM-style `; 0x<addr>` trailers
+# (e.g. `func_02009758: ; 0x02009758`). ARM's GNU assembler treats
+# `@` as the line-comment marker, not `;`, so trailers like these
+# fire "junk at end of line" errors. Strip them before assembling.
+_DSD_DIS_SEMI_COMMENT_RE = re.compile(
+    r'\s*;.*$', re.MULTILINE,
+)
+
+
+def normalize_disasm_for_permuter(src_text: str) -> str:
+    """Transform dsd-dis assembly output into permuter-acceptable form.
+
+    Brief 093 hand-edited the .s for each permuter run; brief 096
+    automates the same edits:
+
+      - `.global name` → `.globl name`  (permuter scrapes `.globl`)
+      - `.include "macros/function.inc"` → removed (dsd-specific;
+        the macros it provides are replaced by our ARM prelude.inc)
+      - `arm_func_start name` / `arm_func_end name` → removed
+        (dsd-specific section-bounds macros; permuter doesn't need
+        them and arm-none-eabi-as can't expand them without the
+        include file)
+      - `; <comment>` trailing annotations stripped — dsd-dis uses
+        NASM-style `;` but ARM GNU as uses `@`. Stripping is safer
+        than rewriting since the annotations carry no semantics.
+
+    Pure-function — takes raw text, returns transformed text. The
+    .s file's instructions and labels are preserved verbatim; only
+    the dsd-specific directives at the top + arm_func_* macros are
+    rewritten. Idempotent — running on already-normalised text is
+    a no-op (the regexes match nothing).
+    """
+    out = src_text
+    out = _DSD_DIS_INCLUDE_RE.sub("", out)
+    out = _DSD_DIS_ARM_FUNC_START_RE.sub("", out)
+    out = _DSD_DIS_ARM_FUNC_END_RE.sub("", out)
+    out = _DSD_DIS_GLOBAL_RE.sub(r"\1.globl\2", out)
+    out = _DSD_DIS_SEMI_COMMENT_RE.sub("", out)
+    return out
+
+
+# Regex for the compile.sh `&&` strip (patch 5). When import.py
+# generates the per-work-dir compile.sh from the project's ninja
+# rule, it captures the full mwccarm invocation INCLUDING the
+# `&& transform_dep.py ...` post-step chain. The captured shape is:
+#
+#   wine mwccarm.exe ... -c '&&' /path/python tools/transform_dep.py
+#       X.d X.d "$INPUT" -o "$OUTPUT"
+#
+# mwccarm rejects `&&` as a literal argument. We strip the
+# `'&&' ... transform_dep.py X.d X.d` chunk while preserving the
+# `"$INPUT" -o "$OUTPUT"` placeholders that import.py injected
+# (they live AFTER the transform_dep.py args, not before). The
+# result is the clean mwccarm invocation:
+#
+#   wine mwccarm.exe ... -c "$INPUT" -o "$OUTPUT"
+#
+# Non-greedy + lookahead at `"$INPUT"` so we stop at the right
+# place even if upstream changes the transform_dep.py arg shape.
+_COMPILE_SH_AMPERSAND_RE = re.compile(
+    r"\s*'?&&'?\s+.*?(?=\"\$INPUT\")",
+)
+
+
+def strip_compile_sh_ampersand(compile_sh_text: str) -> str:
+    """Remove the `&& transform_dep.py …` suffix import.py captures.
+
+    The project's ninja rule chains `mwccarm.exe -c … && python
+    tools/transform_dep.py …` so the dep-file gets cleaned up after
+    each compile. import.py scrapes `ninja -t commands` verbatim
+    and writes that whole line into compile.sh, where the `&&` is
+    treated as a literal arg by mwccarm AND `"$INPUT"`/`"$OUTPUT"`
+    end up in the wrong position (after transform_dep.py's args
+    rather than as mwccarm's source/output).
+
+    The regex strips the chunk between `'&&'` and `"$INPUT"` so
+    `"$INPUT" -o "$OUTPUT"` falls back into mwccarm's arg list at
+    the natural position. Idempotent — already-stripped text is
+    a no-op (no `'&&'` present → no match).
+    """
+    # Insert a space so `-c"$INPUT"` doesn't end up squished after
+    # the strip — mwccarm needs `-c <space> filename`.
+    return _COMPILE_SH_AMPERSAND_RE.sub(" ", compile_sh_text)
+
+
+def patch_permuter_vendor(
+    vendor_dir: Path,
+    *,
+    log=print,
+) -> None:
+    """Apply the brief-093 vendor patches to a cloned decomp-permuter
+    checkout. Idempotent — second invocation detects the guard
+    substring (`# brief 096 patch applied`) and fast-paths each
+    already-patched file.
+
+    Patches:
+      1-3) import.py — FileNotFoundError catch, lowercase `-i`
+           include flag, ARM DEFAULT_AS_CMDLINE.
+      4)   prelude.inc — replace MIPS directives with ARM macros.
+
+    Patches 5 (compile.sh `&&` strip) and 6 (dsd-dis .s
+    normalisation) run later, not on the vendor dir — they target
+    files emitted on each --run invocation.
+
+    Patch failure raises ValueError naming the broken patch — most
+    likely cause is upstream landed a change that moved the patch
+    target. Bump PERMUTER_PINNED_COMMIT after auditing the new
+    upstream shape.
+    """
+    for filename, search, replacement in PERMUTER_VENDOR_PATCHES:
+        path = vendor_dir / filename
+        if not path.is_file():
+            raise ValueError(
+                f"brief 096 patch target missing: "
+                f"{path.relative_to(vendor_dir.parent)} "
+                f"(did the vendor clone succeed?)"
+            )
+        text = path.read_text(encoding="utf-8")
+        if PERMUTER_VENDOR_PATCH_GUARD in text and replacement in text:
+            # Patch already applied — idempotent fast path.
+            continue
+        if search not in text:
+            raise ValueError(
+                f"brief 096 patch {filename}: search string not found. "
+                f"Upstream likely shifted; audit and refresh the patch."
+            )
+        path.write_text(text.replace(search, replacement, 1), encoding="utf-8")
+        log(f"  patched {filename} (brief 096)")
+
+    # Patch 4 — prelude.inc replacement (not a substring patch;
+    # we overwrite the whole file).
+    prelude_path = vendor_dir / "prelude.inc"
+    if prelude_path.is_file():
+        current = prelude_path.read_text(encoding="utf-8")
+        if PERMUTER_VENDOR_PATCH_GUARD not in current:
+            prelude_path.write_text(PERMUTER_ARM_PRELUDE, encoding="utf-8")
+            log("  replaced prelude.inc with ARM-flavoured macros (brief 096)")
+
+
 # Match signals in permuter's stdout. Verified against the upstream
 # strings in src/main.py at the pinned commit:
 #   - "wrote to {output_dir}"   → fires whenever a candidate is
@@ -399,6 +682,7 @@ def ensure_permuter_installed(
     commit: str = PERMUTER_PINNED_COMMIT,
     *,
     run_git=_run_git,
+    apply_patches=None,
     log=print,
 ) -> Path:
     """Clone decomp-permuter into `vendor_dir` if absent; checkout the
@@ -406,12 +690,16 @@ def ensure_permuter_installed(
     dir is a no-op fast path (HEAD already at pinned commit). Returns
     `vendor_dir`.
 
-    `run_git` is injectable so tests can stub git out. `log` is a
-    print-like callable for status messages.
+    `run_git` is injectable so tests can stub git out. `apply_patches`
+    is the brief-096 patcher (defaults to `patch_permuter_vendor`);
+    pass a no-op for tests that don't populate the vendor with real
+    files. `log` is a print-like callable for status messages.
 
     Does NOT install pip deps — that's a separate step (see
     `install_permuter_deps`) so callers can gate it on a venv check.
     """
+    if apply_patches is None:
+        apply_patches = patch_permuter_vendor
     permuter_py = vendor_dir / "permuter.py"
     if permuter_py.is_file():
         # Fast path: check whether HEAD already matches the pin.
@@ -420,6 +708,11 @@ def ensure_permuter_installed(
             current = head.stdout.strip()
             if current == commit:
                 log(f"  decomp-permuter already at pinned commit {commit[:12]}.")
+                # Brief 096 — ensure patches are applied even when the
+                # clone pre-existed (e.g. brief 093's hand-patched
+                # vendor, or a previous --run that crashed before
+                # patching).
+                apply_patches(vendor_dir, log=log)
                 return vendor_dir
             log(
                 f"  decomp-permuter at {current[:12]}, pinning to "
@@ -427,9 +720,14 @@ def ensure_permuter_installed(
             )
             run_git(["fetch", "origin"], cwd=vendor_dir)
             run_git(["checkout", commit], cwd=vendor_dir)
+            apply_patches(vendor_dir, log=log)
             return vendor_dir
         except subprocess.CalledProcessError as e:
             log(f"  WARNING: pin check failed ({e}); proceeding with HEAD.")
+            try:
+                apply_patches(vendor_dir, log=log)
+            except ValueError as patch_err:
+                log(f"  WARNING: patcher failed ({patch_err}); continuing.")
             return vendor_dir
 
     # Cold path: clone.
@@ -442,6 +740,9 @@ def ensure_permuter_installed(
     run_git(["clone", PERMUTER_REPO_URL, str(vendor_dir)])
     log(f"  checking out pinned commit {commit[:12]}...")
     run_git(["checkout", commit], cwd=vendor_dir)
+    # Brief 096 — apply the macOS/ARM patches before any caller
+    # invokes permuter scripts. Idempotent; second call is a no-op.
+    apply_patches(vendor_dir, log=log)
     return vendor_dir
 
 
@@ -866,6 +1167,17 @@ def _run_mode(
                 file=sys.stderr,
             )
             return 1
+        # Brief 096 — patches are local (no network); apply them even
+        # under --skip-install. `ensure_permuter_installed` handles the
+        # network-vs-local split; --skip-install only skips the network
+        # piece. Idempotent if already-patched.
+        try:
+            patch_permuter_vendor(permuter_path)
+        except ValueError as patch_err:
+            print(
+                f"  WARNING: brief 096 patcher failed: {patch_err}",
+                file=sys.stderr,
+            )
     else:
         try:
             ensure_permuter_installed(vendor_dir=permuter_path)
@@ -883,6 +1195,17 @@ def _run_mode(
     nonmatchings_root = permuter_path / "nonmatchings"
     nonmatchings_dir = nonmatchings_root / sym.name
     if not nonmatchings_dir.is_dir():
+        # Brief 096 — normalise the dsd-dis .s into a permuter-
+        # acceptable shape before invoking import.py. The normalised
+        # copy lives next to the original (`.permuter.s` suffix) so
+        # the original stays untouched (`ninja dis` may overwrite the
+        # source on re-run).
+        normalized_s = disasm_s.with_suffix(".permuter.s")
+        normalized_s.write_text(
+            normalize_disasm_for_permuter(disasm_s.read_text(encoding="utf-8")),
+            encoding="utf-8",
+        )
+
         # import.py creates `nonmatchings/<funcname>/` (or with a
         # numeric suffix on collision). We invoke it once; permuter
         # is idempotent on re-runs against the same dir.
@@ -890,7 +1213,7 @@ def _run_mode(
             sys.executable,
             str(permuter_path / "import.py"),
             str(source_c_abs),
-            str(disasm_s),
+            str(normalized_s),
         ]
         print("Importing into permuter:")
         print(f"  {' '.join(import_cmd)}")
@@ -917,6 +1240,16 @@ def _run_mode(
             )
             return 1
         nonmatchings_dir = candidates[-1]
+
+        # Brief 096 — strip the `&& transform_dep.py …` suffix from the
+        # generated compile.sh. import.py scrapes the ninja compile
+        # rule verbatim; mwccarm chokes on `&&` as a literal arg.
+        compile_sh = nonmatchings_dir / "compile.sh"
+        if compile_sh.is_file():
+            compile_sh.write_text(
+                strip_compile_sh_ampersand(compile_sh.read_text(encoding="utf-8")),
+                encoding="utf-8",
+            )
     print(f"Nonmatchings dir: {nonmatchings_dir.relative_to(ROOT)}")
     print()
 
