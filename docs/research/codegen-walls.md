@@ -2890,6 +2890,139 @@ confirms the sweep section above's expectation that S-class
 entries accrue when wave-iteration notes flag authoring-error
 framing.
 
+#### S-2a. Loop-counter signedness controls `cmp`/`branch` condition codes
+
+A second source-form authoring decision in the same family
+shape as S-2 — mwcc faithfully emits what the C declares; the
+miscompile is in the human's type choice, not in the compiler's
+response. Folded under S-2 because both are "source-author the
+codegen surface, not C-coerce mwcc."
+
+**Symptom:** loop-shape function (typically a `for` / `while`
+counting up to a struct-field bound) byte-matches everything
+**except** two cond-code positions — the loop-condition compare
+and the early-return guard. Diff is **2 cond-code nibbles** out
+of an otherwise-identical body. Looks like nothing else: not S-1
+(no field-offset shift), not S-2 (no switch / jump-table
+involvement), not C-1 (no predication-vs-branch flip), not C-N
+in general (cond-code choice is type-driven, not coercible by
+source rephrasing).
+
+**Pattern:** mwcc picks the ARM cond-code by the **promoted-
+arithmetic-type signedness** of the comparison operands. When
+the loop counter is `int` (signed) and the bound is a `u8` /
+`u16` field (which promotes to `int` per C11 §6.3.1.1), the
+comparison is **signed** → `lt` / `le`. When the loop counter is
+`u32` / `unsigned int`, the bound's `int` promotion converts to
+`unsigned int` per "usual arithmetic conversions" (C11 §6.3.1.8),
+and the comparison is **unsigned** → `cc` (a.k.a. `lo`) / `ls`.
+
+**Worked example (brief 086 wave 2, `func_0208539c` + clone
+`func_020853dc` — PR #478):**
+
+The target's loop body emits unsigned conditions:
+
+```text
+
+ldmlsfd sp!, {r4-r6, pc}   ; early-return when arg0->f_18 == 0 (ls = unsigned ≤)
+...
+bcc     .L_loop             ; loop while i < f_18 (cc/lo = unsigned <)
+
+```
+
+Same loop body written with `int i`:
+
+```c
+/* breaks: int i forces signed comparison */
+void f(state_t *p, int arg1) {
+    int i;
+    for (i = 0; i < p->f_18; i++) {
+        helper(p, i, arg1);
+    }
+}
+```
+
+Emits:
+
+```text
+
+ldmlefd sp!, {r4-r6, pc}   ; signed-≤ early-return
+...
+blt     .L_loop             ; signed-< loop branch
+
+```
+
+Same loop body written with `u32 i`:
+
+```c
+/* coerces target: u32 i forces unsigned comparison */
+void f(state_t *p, int arg1) {
+    u32 i;
+    for (i = 0; i < p->f_18; i++) {
+        helper(p, i, arg1);
+    }
+}
+```
+
+Emits the target's `ldmlsfd` + `bcc`. Two cond-code nibbles flip
+from `d`/`b` (signed `le`/`lt`) to `9`/`3` (unsigned `ls`/`cc`).
+**Verified byte-identical** against `func_0208539c` /
+`func_020853dc` per PR #478.
+
+**The byte diff (uint.c vs sint.c, mwcc 2.0/sp1p5):**
+
+| Offset | uint (target) | sint | Decoded |
+|---|---|---|---|
+| +0x18 | `98bd8070` | `d8bd8070` | `ldmls{fd}` ↔ `ldmle{fd}` |
+| +0x38 | `3afffff7` | `bafffff7` | `bcc` (-0x24) ↔ `blt` (-0x24) |
+
+Identical bytes everywhere else. Two cond-code positions = the
+entire diff.
+
+**Recognition cue:** target's loop body uses any of `cc` / `cs` /
+`hi` / `ls` / `lo` / `hs` (unsigned cond codes) where you'd
+naturally write the C with signed `int` indexing. The bound is
+typically a `u8` / `u16` struct field (so the type-promotion
+asymmetry surfaces). Fix is to declare the loop counter
+explicitly as `u32` / `unsigned int` so the comparison stays
+unsigned end-to-end.
+
+**The opposite mode** also surfaces: when the target uses signed
+cond codes (`lt` / `le` / `gt` / `ge`) and the natural C
+transcription accidentally widens to unsigned (e.g. via a `size_t`
+loop counter), the same fix applies in reverse — declare `int i`
+to force signed comparison. Same family, same authoring-decision
+mechanism.
+
+**Why this isn't C-N or P-N:** mwcc's cond-code emission is
+mechanically driven by the operand types per the C standard's
+arithmetic conversion rules. There is no "tweak the source phrasing
+to coax mwcc into the right cond-code" — the rules are
+deterministic. The fix is to declare the loop counter with the
+type signedness that produces the target's cond code. Same
+authoring-error framing as S-1 / S-2.
+
+**Why fold under S-2 (not a fresh S-3):** S-2's parent entry
+covers "source-form authoring decisions mwcc faithfully
+reproduces." Switch-case textual ordering and loop-counter
+signedness are two instances of the same broader pattern — the
+miscompile is in the C declaration (case order / variable type),
+not the compiler's response. Future S-2b candidates (e.g. struct-
+field declaration order controlling load batching, or `enum` vs
+`int` choice controlling jump-table density) will accrete here
+under S-2 rather than spawning new top-level entries.
+
+**Affected matches:** brief 086 wave 2 `func_0208539c` +
+`func_020853dc` (PR #478).
+
+**Provenance:** brief 086 wave 2 (PR #478) — decomper documented
+the iteration as a "candidate **S-2 extension**" calibration
+note under "Iteration win worth folding". This entry promotes
+the recipe into the grep-able reference and pins the C11
+arithmetic-conversion mechanism that drives the cond-code
+choice. Cloud-autonomous fold per the brain-flagged follow-up
+on PR #478's review.
+
 ## Per-PR drop cross-reference
 
 For each dropped symbol, the wall it hit. Useful when reading the
