@@ -45,6 +45,15 @@ causes** — only `func_02001ef4`'s adjacent-bitfield pattern
 is a new wall (**C-22**), the other two (`func_020070dc`
 strlen-style, `func_0200a454` 4-iter copy) fold to existing
 C-1 + C-2/C-15-family recipes (see C-22's Wall family note).
+Brief 086 wave 1 + wave 2 (PRs #474 / #478) discovered that
+mwcc 2.0 folds 4× MMIO base-address constants into 1 base +
+offsets, AND co-fires an `ands rN, rN, #imm; bne` →
+`tst rN, #imm; bne` peephole — the `.legacy.c` (mwcc 1.2/sp2p3)
+recipe restores both behaviours. Brief 088 (PR #?) ran the
+5-variant × 15-SP sweep per brief 084's "3-walls-not-1"
+methodology and classified this as **new C-23**, distinct
+peephole machinery from C-15 despite sharing the same SP
+boundary + `*.legacy.c` fix.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
@@ -114,7 +123,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (22 patterns)
+## Coercible-with-knowledge (23 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -1145,6 +1154,12 @@ candidates.**
 >   **1 insn** (typical: `mvn` vs `sub` on `-1` from a
 >   set-zero-then-derive context) → **C-15**, route through
 >   1.2/* tier.
+> - Target has **3+ `ldr rN, [pc, #imm]`** loads of nearby
+>   (≤ ±0x40 byte spacing) MMIO addresses, OR a wait-loop
+>   using `ands rN, rN, #imm; bne` → **C-23**, *also* route
+>   through `*.legacy.c` (1.2/sp2p3) — same fix, distinct
+>   peephole machinery. See [C-23](#c-23-mmio-base-folding--andstst-peepholes-on-volatile-pointer-local-block)
+>   for the full table + cross-corpus survey of MMIO blocks.
 
 **Target asm (`func_02054c64` — wave 12 W-G observation):**
 
@@ -2091,6 +2106,226 @@ above. The other two candidates fold to existing C-1 +
 C-2/C-15-family recipes (see Wall family note above for the
 mapping).
 
+### C-23. MMIO base-folding + ANDS→TST peepholes on volatile pointer-local block
+
+> **Wall family note — C-23 vs C-15.** Both walls are
+> mwcc-2.0-only peephole optimisations on constant-pool
+> materialisation, both fixed by routing through `*.legacy.c`
+> (mwcc 1.2/sp2p3). The peephole machinery is **distinct** —
+> two separate optimisation passes that share an SP boundary,
+> not one peephole with two surface shapes.
+>
+> | Wall | Peephole signature | Discriminator |
+> |---|---|---|
+> | **C-15** | constant-pair derivation: `mov rN, #K; mvn rM, #0` (1.2) vs `mov rN, #K; sub rM, rN, #1` (2.0) | **2 instructions** materialising `(K, ±1)` near each other |
+> | **C-23** (this entry) | base-address dedup: 4× `ldr rN, .Lpool` of nearby MMIO addresses (1.2) vs 1× `ldr base; [base, #imm]` (2.0). Often co-fires with **ANDS→TST** in `&`-then-branch wait loops | **3+ separate `ldr rN, [pc, #imm]`** of nearby (within ±0x40 byte) constants |
+>
+> **Quick discriminator at the asm level:**
+>
+> - Target has 2 instructions materialising a constant pair where
+>   one is derivable from the other (`#K, #-1`, `#K, #K-1`, etc.)
+>   → **C-15**, route through `*.legacy.c`.
+> - Target has **3+ `ldr rN, [pc, #imm]`** loads + the loaded
+>   constants (in the trailing pool) are within a tight MMIO
+>   block (e.g. `0x04000280`, `0x04000290`, `0x04000298`,
+>   `0x040002a0`) → **C-23**, route through `*.legacy.c`.
+>
+> Both fixes happen to be the same routing flag; the
+> discriminator matters when the target hits a third pattern
+> that *isn't* legacy-tier-routable (e.g. P-1's mask-collapse
+> which fires on every SP). See P-1's wall family note for
+> that trap.
+
+**Target asm (`func_0208bde0` quotient form, brief 086 wave 1
+PR #474 — DS hardware divider):**
+
+```text
+
+stmfd sp!, {lr}
+sub   sp, sp, #0x4              ; align/scratch
+ldr   ip, .L_DIVCNT             ; ip = 0x04000280   ← FOUR
+mov   lr, #0x0
+ldr   r3, .L_NUMER              ; r3 = 0x04000290   ← separate
+strh  lr, [ip]
+ldr   r2, .L_DENOM              ; r2 = 0x04000298   ← pool
+str   r0, [r3, #0x0]
+str   r1, [r2, #0x0]
+str   lr, [r2, #0x4]
+.L_wait:
+ldrh  r0, [ip]
+ands  r0, r0, #0x8000           ; ANDS — sets flags AND writes back
+bne   .L_wait
+ldr   r0, .L_RESULT             ; r0 = 0x040002a0   ← loads
+ldr   r0, [r0, #0x0]
+add   sp, sp, #0x4
+ldmfd sp!, {lr}
+bx    lr
+.L_DIVCNT:  .word 0x04000280
+.L_NUMER:   .word 0x04000290
+.L_DENOM:   .word 0x04000298
+.L_RESULT:  .word 0x040002a0
+
+```
+
+18 insns + 4 pool words = 0x58. **Two distinct shapes** that
+mwcc 2.0 collapses but mwcc 1.2 preserves:
+
+1. **Four separate `ldr rN, .L*`** pool loads — one per MMIO
+   register address.
+2. **`ands r0, r0, #0x8000`** in the wait loop — writes the
+   AND result back to r0 even though r0 is reloaded next
+   iteration.
+
+**mwcc 2.0/sp1p5 emits when miscoded** (natural pointer-local
+form, default routing — both peepholes fire):
+
+```c
+/* breaks: mwcc folds 4 base loads → 1 + offsets, AND flips ands → tst */
+int func_0208bde0(int numer, int denom) {
+    vu16 *p_divcnt  = (vu16 *)0x04000280;
+    vs32 *p_numer   = (vs32 *)0x04000290;
+    vs32 *p_denom   = (vs32 *)0x04000298;
+    vs32 *p_result  = (vs32 *)0x040002a0;
+    *p_divcnt = 0;
+    *p_numer  = numer;
+    *p_denom  = denom;
+    p_denom[1] = 0;
+    while (*p_divcnt & 0x8000)
+        ;
+    return *p_result;
+}
+```
+
+```text
+
+ldr   r2, [pc, #0x28]           ; r2 = 0x04000280  ← SINGLE base
+mov   r3, #0
+strh  r3, [r2, #0x0]            ; DIVCNT (offset 0)
+str   r0, [r2, #0x10]           ; NUMER  (offset +0x10)
+str   r1, [r2, #0x18]           ; DENOM  (offset +0x18)
+str   r3, [r2, #0x1c]           ; DENOM+4
+ldrh  r0, [r2, #0x0]
+tst   r0, #0x8000               ; TST — flag-only, no write-back
+bne   .L_wait
+ldr   r0, [pc, #0x8]
+ldr   r0, [r0, #0x0]
+bx    lr
+.word 0x04000280                ; only 2 pool words
+.word 0x040002a0
+
+```
+
+14 insns + 2 pool = 0x38. **−0x20 bytes** vs. target. Two
+peepholes fire together: base-folding + ANDS→TST.
+
+**C that coerces it (verified byte-identical against
+`func_0208bde0`, `*.legacy.c` routing → mwcc 1.2/sp2p3):**
+
+The same natural pointer-local source above. **No source change
+required** — the fix is the routing tier:
+
+```bash
+mv src/main/func_0208bde0.c src/main/func_0208bde0.legacy.c
+ninja
+```
+
+`*.legacy.c` routes through mwcc 1.2/sp2p3, which lacks both
+peepholes — emits 4 separate pool loads + literal `ands` from
+the C `&` operator. Verified byte-identical to orig.
+
+**SP boundary (verified all 15 mwcc SPs, 5 source variations
+× 75 compiles):**
+
+| mwcc SP | A pointer-locals | B inline casts | C struct typedef | D `register` | E macros |
+|---|---|---|---|---|---|
+| 1.2/base | ⭐ 0x58 ANDS | 0x60 ANDS | 0x30 ANDS-folded | ⭐ 0x58 ANDS | 0x60 ANDS |
+| 1.2/sp2 | ⭐ 0x58 ANDS | 0x60 ANDS | 0x30 ANDS-folded | ⭐ 0x58 ANDS | 0x60 ANDS |
+| **1.2/sp2p3** | ⭐ **0x58 ANDS** | 0x60 ANDS | 0x30 ANDS-folded | ⭐ 0x58 ANDS | 0x60 ANDS |
+| 1.2/sp3 | 0x54 ANDS | 0x5c ANDS | 0x30 ANDS-folded | 0x54 ANDS | 0x5c ANDS |
+| 1.2/sp4 | 0x54 ANDS | 0x5c ANDS | 0x30 ANDS-folded | 0x54 ANDS | 0x5c ANDS |
+| 2.0/base..sp2p4 (10 SPs) | 0x38 **TST** folded | 0x38 **TST** folded | 0x30 **TST** folded | 0x38 **TST** folded | 0x38 **TST** folded |
+
+⭐ = byte-identical match against orig.
+
+**Boundary semantics:**
+
+- **`1.2/{base, sp2, sp2p3}`**: emits the unfolded 4-pool-load
+  + literal-ANDS form. **`1.2/sp2p3` is the project's pinned
+  `*.legacy.c` SP — the canonical recipe.**
+- **`1.2/sp3` / `1.2/sp4`**: emits unfolded 4-pool-load + ANDS,
+  but the function epilogue is 4 bytes shorter (single `ldmfd
+  sp!, {pc}` return vs `ldmfd sp!, {lr}; bx lr`). Close, but
+  not byte-identical to the target's `1.2/sp2p3`-style epilogue.
+- **All `2.0/*` (10 SPs)**: emits the folded 1-base + offsets +
+  TST form. The two peepholes are mwcc-2.0-only.
+
+**The two peepholes can be observed independently** via
+variant C (struct typedef):
+
+| | Base-folding | ANDS→TST |
+|---|---|---|
+| `1.2/*` + variant C (struct) | ✓ source-driven | ✗ keeps ANDS |
+| `2.0/*` + variant C (struct) | ✓ source-driven (redundant) | ✓ peephole-driven |
+| `1.2/*` + variants A/B/D/E | ✗ keeps 4 loads | ✗ keeps ANDS |
+| `2.0/*` + variants A/B/D/E | ✓ peephole-driven | ✓ peephole-driven |
+
+mwcc 2.0 has the ANDS→TST peephole regardless of source form
+(it's an `&`-then-branch dataflow optimisation). mwcc 2.0's
+base-folding peephole only fires on pointer-local form;
+variant C's struct typedef pre-folds at the source level so
+it doesn't matter what mwcc would have done.
+
+**Use when:** target asm has **3+ `ldr rN, [pc, #imm]`** loads
+of nearby (≤ ±0x40 byte spacing) MMIO addresses, AND/OR a
+wait-loop using `ands rN, rN, #imm; bne` (rN dead after the
+branch). Either signal — and especially both together — points
+to C-23. Route through `*.legacy.c`.
+
+**Recognition cue:** target's pool literals (last 4-8 bytes of
+the function) are 4+ MMIO addresses in the same `0x040002xx` /
+`0x04000xxx` block — a register-block layout that mwcc 2.0
+would naturally fold to a single base if it had the chance.
+
+**Cross-corpus survey notes:** the DS has many adjacent MMIO
+register blocks beyond the divider:
+
+| Block | Range | Likely C-23 candidates |
+|---|---|---|
+| Display engine A | `0x04000000-0x0400006f` | DISPCNT, BG\*CNT, BG\*OFS, etc. |
+| DMA channels | `0x040000b0-0x040000ef` | DMA\*SAD, DMA\*DAD, DMA\*CNT (12 regs × 4 chans) |
+| Timers | `0x04000100-0x0400010f` | TM\*CNT_L, TM\*CNT_H × 4 |
+| IPC | `0x04000180-0x0400018b` | IPCSYNC, IPCFIFOCNT, IPCFIFOSEND |
+| Interrupt controller | `0x04000208-0x04000218` | IME, IE, IF, AUXIE |
+| Math (this entry) | `0x04000280-0x040002b8` | DIVCNT, NUMER, DENOM, RESULT, SQRTCNT, SQRTRES, SQRT_PARAM |
+| Display engine B | `0x04001000-0x0400106f` | mirror of A |
+| GX matrix / vertex | `0x04000440-0x040004ff` | GXSTAT, MTX_PUSH/POP/COPY, MULT_*, VEC_/POS_/COLOR_/NORMAL_, VTX_*, etc. |
+
+Decomper's brief 086 wave 2 (PR #478) confirmed C-23 working
+on the GX block via `func_0208e61c` + `func_0208e664` (matrix-
+copy via GXSTAT base + matrix-result base). Each subsequent
+function touching 3+ adjacent MMIO addresses in any block above
+is a C-23 candidate; pre-route through `*.legacy.c`.
+
+**Confirmed instances:**
+
+- `func_0208bd88` (brief 086 wave 1, PR #474) — DS HW divider,
+  remainder form, 18 insns + 4 pool = 0x58.
+- `func_0208bde0` (brief 086 wave 1, PR #474) — DS HW divider,
+  quotient form, same shape as above.
+- `func_0208e61c` (brief 086 wave 2, PR #478) — GX matrix-copy
+  via GXSTAT + matrix-result block, 0x48.
+- `func_0208e664` (brief 086 wave 2, PR #478) — GX matrix-copy
+  clone of `func_0208e61c`, 0x48.
+
+**Provenance:** brief 086 wave 1 (PR #474) discovered the
+`.legacy.c` recipe by iteration on the divider pair. Brief 086
+wave 2 (PR #478) confirmed the recipe transfers to the GX
+block, hypothesising "C-23 should be a separate codegen-walls.md
+entry, not just a C-15 sub-family". Brief 088 (PR #?) ran the
+5-variant × 15-SP sweep above per brief 084's "3-walls-not-1"
+methodology, confirming distinct peephole machinery from C-15
+and pinning the recipe + cross-corpus survey notes.
+
 ## Permanent (8 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -2984,6 +3219,8 @@ shape we should chase".
 | 060w26 / 412 | `func_020a2f9c`           | (multi-field write with chained pointer-deref: mwcc emitted +4 extra insn) | permanent |
 | 060w26 / 412 | `func_ov002_0227aa50`     | **Cascade variant (d)** (`.o` byte-perfect, `.word data_022cd300` pool literal resolved to `0x022cd320` — upstream data-layout shift in main's `.data`/`.bss`; see Operational notes) | (.o-correct, cascade-shifted) |
 | 060w26 / 412 | _(1 iterated-then-removed candidate)_ | (counted in 14-attempt total per wave PR) | — |
+| 086w1 / 474 | `func_0208bd88` / `func_0208bde0` | **C-23** (DS HW divider — 4× MMIO base loads + ANDS in wait loop; default mwcc 2.0/sp1p5 folds to 1 base + offsets + flips ANDS→TST; `*.legacy.c` mwcc 1.2/sp2p3 routing restores both — brief 088 sweep verified all 15 SPs) | coercible (routing, resolved) |
+| 086w2 / 478 | `func_0208e61c` / `func_0208e664` | **C-23** (GX matrix-copy via GXSTAT base + matrix-result block; same dual-peephole shape as 086w1 — confirms recipe transfers across MMIO blocks) | coercible (routing, resolved) |
 
 ## Quantification
 
