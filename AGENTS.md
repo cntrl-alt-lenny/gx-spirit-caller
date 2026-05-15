@@ -313,27 +313,48 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/097-medium-tier-follow-on-wave.md`](docs/briefs/097-medium-tier-follow-on-wave.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): medium-tier
-  follow-on single-region wave. Cross-region pool drained
-  by brief 094 (311-port backfill); cap-raise drained by
-  brief 092. Medium-tier is the next natural forward pool.
-  Wave 1 calibration: 8-12 candidates, then self-extend
-  if gate fires (≥40% + ≥250). Branch:
-  `decomper/medium-tier-follow-on-wave`.
+- [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): permuter sweep on
+  3 brief-094 byte-diff drops + 5 brief-097 dropped
+  candidates = 8 total. Uses brief 096's freshly-shipped
+  wrapper. Target: ≥1 of 8 recovered byte-identical.
+  Branch: `decomper/permuter-sweep-byte-diff`.
 
-- [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
-  — `cloud` (MEDIUM): wrap (or upstream) the 5 macOS
-  setup-gap patches from brief 093 PR #487 — `homebrew_
-  gcc_cpp` FileNotFoundError, lowercase `-i` flag, ARM-
-  targeted `DEFAULT_AS_CMDLINE`, `prelude.inc` ARM macros,
-  `compile.sh` `&&` strip — plus dsd-dis `.s` normalization
-  (`.global`, `arm_func_start`, `arm_func_end`,
-  `macros/function.inc`). Hard prereq for autonomous
-  P-class investigations on fresh worktrees. Branch:
-  `cloud/permuter-wrapper`.
+- [`docs/briefs/099-medium-tier-walls-research.md`](docs/briefs/099-medium-tier-walls-research.md)
+  — `cloud` (MEDIUM): walls research on brief 097's 31
+  medium-tier residue. Patterns share indirect-call /
+  critical-section / predicated-cascade combinations.
+  Run brief 084 / 088 / 091-style codegen sweeps on the
+  most-represented pattern (likely indirect-call). Goal:
+  ≥1 source-form recipe surfaced. Branch:
+  `cloud/medium-tier-walls-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
+  `cloud`, shipped in PR #492. Project-side shim (over
+  upstreaming patches). 4 vendor patches stored as Python
+  string-replacements with guard substring for
+  idempotency; 2 per-run rewrites (`compile.sh && strip`
+  + `.s` dsd-dis normalization). Loud failure mode:
+  ValueError if upstream refactor breaks an anchor.
+  End-to-end validated against `func_02009758`: ~208
+  thread-iterations in 30s, no manual hand-edits. 20 new
+  tests, suite 1583/1583. Brain pushed `87ef1c6` to clear
+  F841 in new test (unused `calls = []` accumulator).
+- [`docs/briefs/097-medium-tier-follow-on-wave.md`](docs/briefs/097-medium-tier-follow-on-wave.md)
+  `decomper`, **HANDED BACK at 0 matches**. 20 medium-
+  tier candidates surveyed, 5 attempted, **0 byte-
+  identical**. Walls: indirect-call (`blx rN`), critical-
+  section nesting (OS_Disable/Restore reorder), predicated
+  cascade, P-4 skip-list hit, W-N temp-register choice.
+  Both gates missed; chain closes at wave 1. Honest
+  signal that medium-tier residue's walls combine
+  multiple known walls; dominant patterns (indirect-call
+  + critical-section + predicated-cascade) need
+  codegen-sweep research before further single-region
+  waves are productive. 1 new W-N datapoint
+  (`func_ov000_021ac85c`).
 
 - [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #490. **311 EUR ports × 2
