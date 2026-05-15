@@ -49,11 +49,18 @@ Brief 086 wave 1 + wave 2 (PRs #474 / #478) discovered that
 mwcc 2.0 folds 4× MMIO base-address constants into 1 base +
 offsets, AND co-fires an `ands rN, rN, #imm; bne` →
 `tst rN, #imm; bne` peephole — the `.legacy.c` (mwcc 1.2/sp2p3)
-recipe restores both behaviours. Brief 088 (PR #?) ran the
+recipe restores both behaviours. Brief 088 (PR #481) ran the
 5-variant × 15-SP sweep per brief 084's "3-walls-not-1"
 methodology and classified this as **new C-23**, distinct
 peephole machinery from C-15 despite sharing the same SP
-boundary + `*.legacy.c` fix.
+boundary + `*.legacy.c` fix. Brief 086 wave 3 (PR #480) added
+two more candidates to the brief 081 chain plus one production
+hit using brief 084's bitfield recipe; brief 091 (PR #?) swept
+the two unrecovered datapoints and confirmed the *6-walls-not-1*
+finding (extending brief 084's *3-walls-not-1* to 6) — neither
+new datapoint is a C-22 instance, both classify as P-N /
+P-4-family with no source-form coercion at any of the 15 mwcc
+SPs tested.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
@@ -1971,25 +1978,35 @@ cloud autonomous PR).
 ### C-22. Adjacent-bitfield write — `(v & ~mask) | (a<<8) | (b<<12)` vs bitfield syntax
 
 > **Wall family note — brief 081's "struct-pointer wall" was
-> three distinct walls.** Brief 081 wave 2 + wave 3 (PRs #467,
-> #468) reported three candidates that compiled+linked clean but
-> failed at byte-verify, grouping them under a hypothesised
-> "typedef'd struct pointer + `->` field access silent-corruption"
-> wall. Brief 084's C-variation sweep (this entry) showed the
-> three candidates have **three distinct root causes**, only one
-> of which is a new wall:
+> six distinct walls (updated by brief 091).** Brief 081 wave 2 +
+> wave 3 (PRs #467, #468) reported three candidates that
+> compiled+linked clean but failed at byte-verify, grouping them
+> under a hypothesised "typedef'd struct pointer + `->` field
+> access silent-corruption" wall. Brief 086 wave 3 (PR #480)
+> added two more datapoints + one production hit. Brief 084's
+> C-variation sweep classified the original 3; brief 091's sweep
+> classified the new 2 — every datapoint has a distinct root
+> cause:
 >
-> | Brief 081 candidate | Actual wall | Coercion |
-> |---|---|---|
-> | `func_02001ef4` (bit-field pack) | **C-22 — new entry below** | bitfield struct decl |
-> | `func_020070dc` (strlen-style) | C-1 (predicated early-return) | explicit `goto` to force branch form |
-> | `func_0200a454` (4-iter copy) | C-2 + C-15-family (legacy-tier routing) | temp-local cache + `.legacy.c` (mwcc 1.2/sp2p3) routing |
+> | Datapoint | Surfaced | Actual wall | Coercion |
+> |---|---|---|---|
+> | `func_02001ef4` (bit-field pack) | brief 081 wave 2 | **C-22 — this entry** | bitfield struct decl |
+> | `func_020070dc` (strlen-style) | brief 081 wave 2 | C-1 (predicated early-return) | explicit `goto` to force branch form |
+> | `func_0200a454` (4-iter copy) | brief 081 wave 3 | C-2 + C-15-family (legacy-tier routing) | temp-local cache + `.legacy.c` (mwcc 1.2/sp2p3) routing |
+> | `func_02001c98` (bit-field pack on 4-bit pair) | brief 086 wave 3 | **C-22 — production hit** | bitfield-via-union recipe (this entry) ✅ |
+> | `func_02009758` (bit-array set + cache flag) | brief 086 wave 3 | mwcc-2.0 modulo-by-pow-2 peephole + reg-alloc | **none found** (P-N candidate; see Brief 091 sub-note below) |
+> | `func_02000cc4` (counter increment + helper-call + struct-array init) | brief 086 wave 3 | P-4 family (register-allocation wall) | **none found** (size matches, bytes diverge in reg-alloc; see sub-note) |
 >
-> The shared symptom (typedef'd struct + `->` field access) was
-> a syntactic coincidence, not a common codegen mechanism. The
-> three-walls-not-one finding is itself the more general lesson:
-> wall hypotheses from N candidates should be confirmed by a
-> codegen sweep, not by symptom similarity.
+> Brief 084 + brief 091 between them established that the
+> shared symptom (typedef'd struct + `->` field access) was a
+> syntactic coincidence rather than a common codegen mechanism —
+> 6 candidates spread across 6 distinct codegen disagreements,
+> only 2 of which were actual C-22 (the bitfield-pack pattern
+> this entry codifies). The 6-walls-not-one finding is itself
+> the more general lesson: wall hypotheses from N candidates
+> should be confirmed by a codegen sweep, not by symptom
+> similarity. Brief 088 (C-23 sweep) operationalised this same
+> methodology for a different wall family.
 
 **Target asm (`func_02001ef4` — brief 081 wave 2 / brief 084):**
 
@@ -2096,15 +2113,110 @@ a C bitfield.
 
 - `func_02001ef4` (brief 081 wave 2, PR #467) — 9 insn, two
   4-bit bitfields at positions 8-12 and 12-16.
+- `func_02001c98` (brief 086 wave 3, PR #480) — production
+  hit using the recipe above; bitfield-via-union with two
+  4-bit fields at positions 17-21 and 21-25.
+
+#### Brief 091 sub-note — two co-grouped datapoints with no recipe
+
+Brief 086 wave 3 (PR #480) added two more candidates to the
+brief 081 chain. Brief 091's C-variation sweep (5+ source
+shapes × 15 SPs each) showed neither is a C-22 instance and
+neither has a coercion recipe at the project's default SP.
+Documenting them here so future iterations can grep the
+discriminator + skip rather than re-running the same sweep.
+
+**`func_02009758` (bit-array set + cache flag side-effect, 0x4c).**
+Asm pattern:
+
+```text
+
+stmdb sp!, {r3, lr}
+mov   r1, r0, asr #4              ; idx / 16 (signed)
+add   r1, r0, r1, lsr #27         ; idx + bias (for /32)
+mov   r2, r0, lsr #31             ; sign bit
+rsb   r0, r2, r0, lsl #27         ; (idx << 27) - sign
+ldr   r3, .L_bitmap
+mov   lr, r1, asr #5              ; word index
+ldr   r1, [r3, lr, lsl #2]        ; bitmap[word]
+add   r2, r2, r0, ror #27         ; bit_idx (signed-mod recovery)
+mov   ip, #1
+tst   r1, ip, lsl r2              ; test bit
+ldmnefd sp!, {r3, pc}             ; predicated early-return
+orr   r1, r1, ip, lsl r2          ; set bit
+ldr   r0, .L_cache
+str   r1, [r3, lr, lsl #2]
+str   ip, [r0, #0xa88]            ; cache flag = 1
+ldmia sp!, {r3, pc}
+
+```
+
+17 insns + 2 pool. The orig is mwcc-1.2-style code: it computes
+`idx % 32` via the **full signed-modulo formula** (`mov r0, lsr
+#31; rsb r0, r2, r0, lsl #27; add r2, r2, r0, ror #27` — 3-insn
+recovery), as opposed to mwcc 2.0's **single-insn `and rN,
+#0x1f`** peephole. mwcc 2.0 recognises that `idx & 0x1f` is
+equivalent to `idx % 32` for non-negative idx and emits the
+short form even when source-author wrote `% 32`.
+
+Brief 091 sweep (4 source variants × 15 SPs):
+
+| Source | mwcc 2.0/sp1p5 | mwcc 1.2/sp2p3 | mwcc 1.2/sp3 |
+|---|---|---|---|
+| natural (`int idx; idx & 0x1f`) | 0x44 (-8) | 0x58 (+12) | 0x54 (+8) |
+| signed_mod (`idx % 32`) | 0x50 (+4) | 0x58 (+12) | 0x54 (+8) |
+| signed_int_array (s32 bitmap) | 0x50 (+4) | 0x58 (+12) | 0x54 (+8) |
+| unsigned (`u32 idx; idx & 0x1f`) | 0x3c (-8) | 0x50 (+4) | 0x4c size-match — bytes diff |
+
+Closest: `unsigned` at 1.2/sp3 — size-match but registers + epilogue diverge. None of the 60 (variant, SP) combinations produces byte-identical match.
+
+**Classification: P-N permanent-style.** mwcc-2.0's modulo-by-power-of-2 peephole is mwcc-version-specific; routing to `.legacy.c` (1.2/sp2p3) doesn't help because mwcc 1.2 emits the longer formula but with different register allocation throughout. Neither SP boundary produces byte-identical against the orig. Decomper's selection rule should skip functions matching the asm pattern (`mov rN, lsr #31; rsb rM, rN, ...; add ..., ror #27` for signed-modulo recovery) until a future cap-raise / permuter run unlocks them.
+
+**`func_02000cc4` (counter-increment + helper-call + struct-array entry init, 0x48).**
+Asm pattern:
+
+```text
+
+stmdb sp!, {r4, r5, r6, lr}
+ldr   r5, .L_ctx                  ; r5 = &ctx (loaded into r5!)
+ldr   r4, [r5, #0x80]              ; r4 = ctx.counter (loaded into r4!)
+add   r0, r4, #1                   ; r0 = idx + 1
+str   r0, [r5, #0x80]              ; ctx.counter = idx + 1
+add   r6, r5, r4, lsl #4           ; r6 = entry = &ctx + idx*16
+bl    helper                       ; helper(idx + 1)
+ldr   r1, .L_extra
+str   r0, [r5, r4, lsl #4]         ; entry->f_0 = helper return (uses indexed addr)
+ldr   r0, [r1, #0x3c]              ; load q->f_3c
+ldr   r2, [r1, #0x40]              ; load q->f_40 (BATCHED loads)
+str   r0, [r6, #0x4]               ; store entry->f_4
+ldr   r0, [r1, #0x44]              ; load q->f_44
+str   r2, [r6, #0x8]               ; store entry->f_8 (BATCHED stores)
+str   r0, [r6, #0xc]               ; store entry->f_c
+ldmia sp!, {r4, r5, r6, pc}
+
+```
+
+16 insns + 2 pool. Two simultaneous codegen disagreements:
+
+1. **Reg-alloc swap.** Orig allocates `&ctx` to r5 (higher-numbered) and `idx` to r4 (lower-numbered) — opposite of mwcc 2.0's allocator preference. Every (variant, SP) tested allocates `&ctx` to r4 + `idx` to r5 instead. Source-form interventions (`local_ptrs`, `entry_ptr`, `idx_first` declaration ordering, `batched_loads` reordering) shift the size to match (0x48) at every `2.0/*` SP and `1.2/sp3` + `1.2/sp4`, but the register identity stays swapped. mwcc allocates by USAGE order (first-loaded value gets the lower-numbered register), and `&ctx` MUST be loaded first because `idx` requires `ctx.counter`. There is no source-form intervention that flips this.
+2. **Load-store batching diverges.** Orig batches 2 loads then writes; mwcc emits load-store-load-store-load-store. The `batched_loads` variant (manual local temps for the 3 q-fields) doesn't propagate through mwcc 2.0's CSE.
+
+**Classification: P-4 family** (register-allocation wall, see [P-4](#p-4-r2-vs-r3-scratch-register-selection-on-swap-shape-thunks)). Permanent for the project's default-tier source-form pipeline. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; the closest hit is `entry_ptr` at any `2.0/*` SP producing a 0x48-byte function with the wrong register allocation in 6 positions. Permuter (brief 063, PR #473) is the natural next attempt — the wall is in the allocator, not the source form, so a register-renaming pass could potentially recover the byte-identical version.
 
 **Provenance:** brief 081 wave 2 (PR #467) hypothesised a
 generic "struct-pointer silent-corruption wall" from 3
-candidates. Brief 084 (PR #?) ran the C-variation sweep,
-discovered the 3-walls-not-1 reality, classified this single
+candidates. Brief 084 (PR #471) ran the C-variation sweep,
+discovered the 3-walls-not-1 reality, classified the single
 new wall as **C-22**, and pinned the bitfield-syntax recipe
-above. The other two candidates fold to existing C-1 +
+above. Brief 086 wave 3 (PR #480) added two more datapoints
++ confirmed the recipe via production hit on `func_02001c98`.
+Brief 091 (PR #?) ran the C-variation sweep on the two new
+unrecovered datapoints, classified them as P-N / P-4-family
+respectively, and added the discriminator + sweep matrix
+above so future iterations can skip them without re-running.
+The other three brief 081 candidates fold to existing C-1 +
 C-2/C-15-family recipes (see Wall family note above for the
-mapping).
+full mapping).
 
 ### C-23. MMIO base-folding + ANDS→TST peepholes on volatile pointer-local block
 
@@ -3354,6 +3466,9 @@ shape we should chase".
 | 060w26 / 412 | _(1 iterated-then-removed candidate)_ | (counted in 14-attempt total per wave PR) | — |
 | 086w1 / 474 | `func_0208bd88` / `func_0208bde0` | **C-23** (DS HW divider — 4× MMIO base loads + ANDS in wait loop; default mwcc 2.0/sp1p5 folds to 1 base + offsets + flips ANDS→TST; `*.legacy.c` mwcc 1.2/sp2p3 routing restores both — brief 088 sweep verified all 15 SPs) | coercible (routing, resolved) |
 | 086w2 / 478 | `func_0208e61c` / `func_0208e664` | **C-23** (GX matrix-copy via GXSTAT base + matrix-result block; same dual-peephole shape as 086w1 — confirms recipe transfers across MMIO blocks) | coercible (routing, resolved) |
+| 086w3 / 480 | `func_02001c98` | **C-22** (production hit using bitfield-via-union recipe from brief 084 — adjacent 4-bit fields at positions 17-21 + 21-25; recipe transfers from brief 081's `func_02001ef4` to a fresh datapoint) | coercible (bitfield-decl, resolved) |
+| 086w3 / 480 | `func_02009758` | (mwcc-2.0 modulo-by-power-of-2 peephole + reg-alloc — orig emits 4-insn signed-modulo recovery via mwcc 1.2 codegen; mwcc 2.0 collapses to 1-insn `and rN, #0x1f`. Brief 091 sweep tested 4 source variants × 15 SPs = 60 combinations; no byte-identical match) | P-N candidate (brief 091 sub-note under C-22) |
+| 086w3 / 480 | `func_02000cc4` | **P-4 family** (counter-increment + helper-call + struct-array entry init; orig allocates `&ctx`→r5, `idx`→r4, mwcc all SPs allocate the swap. Brief 091 sweep tested 5 source variants × 15 SPs = 75 combinations; size matches at most SPs but reg-alloc stays swapped. Permuter — brief 063 — is the natural next attempt) | permanent (P-4) |
 
 ## Quantification
 
