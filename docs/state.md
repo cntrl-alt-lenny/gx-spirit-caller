@@ -8,51 +8,56 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-15 (Mac brain — brief 092 + 093 merge).
-**Brief 092 wave 1 CLOSED at 1 match / 100 bytes** — below floor on
-both gates (20% yield, 100 bytes vs 40% / 250 thresholds). Cap-raise
-chain self-terminated per spec. **Yield trajectory: 67.7% (081) → 63%
-(086) → 20% (092)** is the textbook diminishing-returns curve for the
-single-region EUR hard-tier band. **Brief 093 CLOSED: P-4 family
-confirmed permanent** — permuter ran ~900 thread-iterations against
-`func_02000cc4`, found closer load-ordering (score 80 vs baseline 265)
-but couldn't flip the r4 ↔ r5 reg-alloc swap. Skip-rule final. EUR
-**1.64%**, USA + JPN **0.34%**.
+**Last updated:** 2026-05-15 (Mac brain — brief 094 + 095 merge).
+**Brief 094 wave 2 CLOSED at 311 EUR ports × 2 regions = 622 byte-
+identical region-landings** — **largest single-PR badge climb of the
+session.** USA + JPN climbed **0.34% → 0.70%** (2.05× growth). The
+actual EUR pool was 375 ports (not the ~43 brief 094 spec'd) — brief
+092's PR body had been counting only the 39-port brief 090 sample, but
+brief 094's empirical `comm -23` recipe correctly surfaced the full
+residual from briefs 057/060/065/081/086/092 + earlier hard-tier
+waves. **83% LOW-floor conversion** validates brief 090's 15/15
+calibration at scale. **Brief 095 CLOSED: D2 v2 + D3 both shipped**
+— LOW→MEDIUM auto-promote (N=5 / min-agreement=3) plus data-shift
+consensus fallback resolved both brief-090 legacy_sp3 refusals.
+1563/1563 tests passing. Manual `--confidence-floor LOW` no longer
+needed for the common case. EUR **1.64%**.
 
 ## Today's merges (just-landed)
 
-- **PR #486 — decomper / brief 092 wave 1 (cap-raise ≤0x80 CLOSED
-  at floor).** Wave-1 funnel surveyed 5 candidates in the 0x60-0x80
-  band; 1 byte-identical match (`func_02005bfc`, 0x64 bit-test +
-  Task_PostLocked dispatcher). The 4 drops hit C-1 / W-stack-split /
-  popcount-mask-order — **none** of the brief 091 skip-list shapes
-  (P-N + P-4) appeared, so the pre-emptive filter worked correctly.
-  The residual ≤0x80 pool is just dominated by other walls with no
-  current source-form recipe. Self-extend gate honored — chain
-  closes at wave 1. EUR 24/27 verified locally. 2 new wall datapoints
-  surfaced: **W-stack-split** (2nd datapoint: `func_02004ef4` joins
-  `func_02004f58` from brief 081 wave 2) and **W-popcount-mask-order**
-  (1 datapoint: `func_020061bc`).
-- **PR #487 — cloud / brief 093 permuter vs P-4 rule-out.** ~900
-  thread-iterations of permuter against `func_02000cc4`'s
-  `entry_ptr` variant. Best score plateau 80 (baseline 265). Permuter
-  found a closer load-ordering reusing the loop counter as a temp,
-  but the 6 byte positions divergent at score 80 are exactly the
-  brief 091 reg-swap positions. **mwcc-2.0's usage-order allocator
-  is downstream of any source-mutation permuter can apply.** P-4
-  family confirmed permanent. Codegen-walls.md updated with the
-  rule-out + 5-patch macOS setup-gap list (see permuter-wrapper
-  TODO below).
+- **PR #490 — decomper / brief 094 wave 2 (cross-region apply
+  backfill).** 311 EUR ports × 2 regions = **622 byte-identical
+  landings, 83% conversion from the 375-port pool.** All 3 regions
+  24/27 baseline preserved (USA + JPN verified locally). Funnel:
+  816 EUR src/main → 375 missing USA equivalents → 371 ported
+  → 4 collisions + 34 undefined-callee + 3 byte-diff drops → 311.
+  2 callee renames (Task_PostLocked + Task_InvokeLocked) unblocked
+  ~30 ports en-bloc. Decomper's projection of ~3.0-3.5% badge
+  climb missed by ~5× — actual was 0.70% because per-port avg size
+  is ~64 bytes against a multi-MB binary. Still the largest single-
+  PR climb in the project.
+- **PR #489 — cloud / brief 095 port_to_region D2 v2 + D3.** Both
+  deliverables landed in one PR. D2 v2 promotes LOW→MEDIUM when the
+  EUR↔target shift matches the consensus shift of N=5 nearest HIGH
+  neighbors (min-agreement 3). D3 reuses the consensus pattern at
+  data-symbol granularity (min-agreement 2) to resolve refusals
+  where the per-function reloc map doesn't contain the data symbol.
+  4 brief-090 LOW candidates auto-promote to MEDIUM with correct
+  consensus shifts; both brief-090 legacy_sp3 refusals (`func_
+  020820b8` + `func_020820f8`) fully resolve via D3. Anti-match
+  safeguard verified — wrong-shift candidates stay LOW with an
+  explicit `anti-match` rationale rather than misfiring. 21 new
+  tests; suite 1563/1563.
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
 | Single-region EUR hard-tier (briefs 057+060+081+086+092) | 88 matches / 4504 bytes |
-| Cross-region apply (briefs 075+078+090) | 72 ports × 2 regions = 144 region-matches |
+| Cross-region apply (briefs 075+078+090+094) | 383 ports × 2 regions = 766 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | 23 coercible + 9 permanent + 2 candidate-walls (W-stack-split 2dp / W-popcount-mask-order 1dp) |
-| Total session match-equivalents | ~347 |
+| Total session match-equivalents | ~970 |
 
 Cross-region applies and cross-project ports are region-neutral
 work — each port slot unlocks ×3 region matches when bootstrapped
@@ -73,105 +78,105 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 092 + 093 close
-and brief 094 + 095 queue lands.
+**Open PRs: 0** once this brain-PR for brief 094 + 095 close
+and brief 096 + 097 queue lands.
 
-**Decomper — brief 094 (HIGH, NEW):**
+**Decomper — brief 097 (HIGH, NEW):**
 
-- **Cross-region apply for remaining EUR src/main/ matches.**
-  Brief 090 covered 33 of the brief 081+086 pool; brief 092
-  added 1 more match (`func_02005bfc`). Decomper estimated
-  ~43 EUR ports remaining to apply (numbers to verify
-  empirically). Conversion target: ~75% per brief 090's
-  78% calibration. Use `--confidence-floor LOW` — proven
-  15/15 safe on substantive (≥0x20) functions in brief 090.
-  Branch: `decomper/cross-region-apply-wave-2`. **Highest-
-  leverage forward move** per decomper's own recommendation
-  in PR #486 + brief 090's badge climb (0.26→0.34%).
+- **Medium-tier follow-on wave.** Brief 094 drained the
+  cross-region backfill pool; brief 092 confirmed the
+  single-region cap-raise lever is floored at ≤0x80. The
+  next natural pool is medium-tier follow-on candidates —
+  the ~80%-matched modules have remaining shapes that
+  earlier waves didn't reach. Start with a calibration
+  wave (8-12 candidates) to see what current shapes are
+  left after the recent cap-raise + cross-region waves.
+  Self-extend gate: yield ≥40% + bytes ≥250. Branch:
+  `decomper/medium-tier-follow-on-wave`.
 
-**Cloud — brief 095 (MEDIUM, NEW):**
+**Cloud — brief 096 (MEDIUM, NEW):**
 
-- **port_to_region D2 v2 + D3 follow-on.** Auto-promote
-  LOW→MEDIUM when EUR↔target address-shift parity matches
-  HIGH neighbors (15/15 safe per brief 090). D3 stretch:
-  data-symbol parallel-reloc resolution for legacy_sp3
-  lazy-init thunks (2 refusals in brief 090). Brief 094
-  benefits immediately from D2 v2 (cleaner port list, no
-  `--confidence-floor LOW` override). Branch:
-  `cloud/port-to-region-d2-v2`.
+- **Permuter wrapper for macOS setup-gap.** Brief 093
+  surfaced 5 vendor patches needed to run permuter on
+  Apple Silicon (`homebrew_gcc_cpp` FileNotFoundError,
+  lowercase `-i` include flag, ARM-targeted `DEFAULT_AS_
+  CMDLINE`, `prelude.inc` ARM macros, `compile.sh` `&&`
+  strip) plus dsd-dis `.s` normalization (`.global`,
+  `arm_func_start`, `arm_func_end`, `macros/function.inc`).
+  Wrap in `tools/permute.py` (the cleaner option per the
+  brief 063 / 093 architecture) OR upstream the patches.
+  Hard prereq for any future P-class wall investigation
+  on a fresh worktree. Branch: `cloud/permuter-wrapper`.
 
-**Backlog (post-094/095):**
+**Backlog (post-096/097):**
 
-1. **Brief 096 — permuter wrapper.** Cloud surfaced 5
-   vendor patches needed to run permuter on macOS Apple
-   Silicon (homebrew_gcc_cpp FileNotFoundError, lowercase
-   `-i` include flag, ARM-targeted `DEFAULT_AS_CMDLINE`,
-   `prelude.inc` ARM macros, `compile.sh` `&&` strip) plus
-   dsd-dis `.s` normalization (`.global`, `arm_func_start`,
-   `arm_func_end`, `macros/function.inc`). Without
-   wrapping, next autonomous permuter run on a fresh
-   worktree will hit the same wall. Wrap in `tools/
-   permute.py` OR upstream the patches. Not urgent (brief
-   094 + 095 don't need permuter) but a hard prerequisite
-   for any future P-class wall investigation.
-2. **W-stack-split codegen sweep** — 2 datapoints
+1. **W-stack-split codegen sweep** — 2 datapoints
    (`func_02004f58`, `func_02004ef4`). One more datapoint
-   from brief 094 or future single-region work would
-   justify a brief 084-style codegen sweep to codify the
-   wall family.
-3. **W-popcount-mask-order** — 1 datapoint. Track for
+   from brief 097 or future single-region work would
+   justify a brief 084-style codegen sweep.
+2. **W-popcount-mask-order** — 1 datapoint. Track for
    recurrence.
-4. **C-21 "explicit-next-ahead walk loop" fold-in**
+3. **C-21 "explicit-next-ahead walk loop" fold-in**
    pending decomper usage — carries to a future hard-tier
    follow-up that surfaces a linked-list walk pattern.
+4. **64 unrecovered brief-094 ports** — 4 symbol-name
+   collisions + 34 undefined-callee drops + 3 byte-diffs
+   + 23 other-refused. Some may unlock when brief 097's
+   medium-tier wave promotes more named symbols (e.g.
+   `Fill32`, `OS_RestoreIrq`); revisit at end of brief
+   097 chain.
 
 **Cap-raise pipeline (closed):**
 
 081 (≤0x40, 67.7%) → 086 (≤0x60, 63%) → 092 (≤0x80, 20%).
-The single-region EUR cap-raise lever is **drained at
-floor**. Further band escalation (≤0xC0, ≤0x100) only
-makes sense if cloud brief 095 D3 or a future W-wall
-sweep unlocks new recipes. Until then, cross-region apply
-(brief 094) is the highest leverage move on the EUR pool.
+Single-region EUR cap-raise lever **drained at floor**.
+Cross-region apply pool **also now drained** — brief 094's
+311-port backfill cleaned the residual from briefs 057
+through 092. **Medium-tier follow-on is the next natural
+forward pool.**
 
 **Cross-project pipeline (unchanged):**
 
 Brief 082 wave 2 still DE-PRIORITIZED. The pokeheartgold
 pool drain signal hasn't changed; struct vendoring effort
-is similar size to the unlock.
+is similar size to the unlock. Brief 095 D3's data-symbol
+shift consensus could be reused for cross-project data
+resolution if a future brief wants to retry pokeheartgold.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 094 (cross-region apply
-   wave 2) PR** when it opens. 3-region gate: USA + JPN
-   `ninja rom` + `dsd check modules` 24/27 each. EUR usually
-   untouched (cross-region tooling only edits USA / JPN
-   sources + symbols + delinks). Watch conversion rate vs
-   brief 090's 78% — if substantially lower, brief 064 D2
-   v2 (cloud brief 095) has more room to help; if higher
-   or matched, the pool was just refusal-dominated, not
-   shape-dominated.
-2. **Verify + merge cloud brief 095 (port_to_region D2 v2)
-   PR** when it opens. Tooling change — verify by running
-   brief 064 / 076 / 079's tests + spot-check D2 v2 promotes
-   correctly on at least 2 LOW-confidence candidates. If
-   D3 (data-symbol parallel-reloc for legacy_sp3) lands in
-   the same PR, also spot-check the 2 brief-090-refused
-   thunks now port cleanly.
-3. **Scope brief 096+ after 094 + 095 close.** Options
+1. **Verify + merge decomper brief 097 (medium-tier
+   follow-on) PR** when it opens. EUR `ninja rom` + `dsd
+   check modules` 24/27 baseline. Watch shape distribution
+   vs the cap-raise band — medium-tier matches will look
+   different (typically larger, more diverse callee
+   profiles). Self-extend gate fires for waves 2/3 if
+   yield ≥40% + bytes ≥250.
+2. **Verify + merge cloud brief 096 (permuter wrapper)
+   PR** when it opens. Tooling change — verify by spot-
+   checking that a fresh worktree on macOS can invoke
+   `tools/permute.py --run` against brief 091's P-N
+   candidate (`func_02009758`) without manual vendor
+   patches. If wrapped (preferred), the wrapper layer is
+   in `tools/permute.py`; if upstreamed, the patches are
+   in `tools/_vendor/decomp-permuter/`. Both fine — cloud
+   picks the cleaner option.
+3. **Scope brief 098+ after 096 + 097 close.** Options
    ranked by leverage:
-   - **Permuter wrapper (brief 096 candidate)** — unblock
-     autonomous permuter runs by upstreaming or wrapping
-     the 5 macOS setup patches. Hard prerequisite for any
-     future P-class investigation, but not blocking 094/095.
-   - **W-stack-split codegen sweep** if brief 094 surfaces
+   - **W-stack-split codegen sweep** if brief 097 surfaces
      a 3rd datapoint (currently 2: `func_02004f58`,
      `func_02004ef4`).
-   - **Medium-tier follow-on single-region wave** (~80%
-     matched currently; the cap-raise ceiling at ≤0x80
-     means the next single-region work is medium-tier).
+   - **Permuter sweep across P-N candidates** if brief
+     096 lands cleanly — `func_02009758` (brief 091
+     mwcc-2.0 modulo peephole) is the obvious first
+     target; if it cracks, the entire P-N family may
+     unlock.
+   - **64 unrecovered brief-094 ports retry** — some may
+     unlock as brief 097 promotes more named symbols.
    - **Pokeheartgold drift-port (brief 082 v2)** still
-     DE-PRIORITIZED — revisit only with strong reason.
+     DE-PRIORITIZED — revisit only with strong reason or
+     if brief 095 D3's data-shift consensus opens the
+     drift problem from a new angle.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
