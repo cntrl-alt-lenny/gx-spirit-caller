@@ -2835,10 +2835,10 @@ pipeline (brief 096) against 8 byte-diff candidates; recovered
 1 (`func_ov000_021ac85c`) via permuter's discovery of the
 split-statement recipe. Brief 100 Part 1 (PR #?) codified the
 recipe as **C-25** and ran the 15-SP confirmation sweep —
-recipe works at all 10 mwcc 2.0/* SPs, no routing needed.
+recipe works at all 10 mwcc `2.0/*` SPs, no routing needed.
 First W-class wall in the catalog promoted to C-class via
 permuter discovery + post-hoc codification (per the brief
-098 hand-back recommendation). The 1.2/* family doesn't
+098 hand-back recommendation). The `1.2/*` family doesn't
 apply — both variants emit a different (longer) shape there.
 
 ### C-26. Critical-section + helper-signature mismatch — `.legacy.c` routing
@@ -2964,10 +2964,10 @@ helper:
 
 ```
 
-If the helper's first non-prologue instruction is `ldr r0, [pc,
-#...]` (or any other write to r0 before reading it), then r0 is
-NOT a real arg. The caller's C source should declare the helper
-signature without args.
+If the helper's first non-prologue instruction is
+`ldr r0, [pc, #...]` (or any other write to r0 before reading
+it), then r0 is NOT a real arg. The caller's C source should
+declare the helper signature without args.
 
 **SP boundary (verified all 15 mwcc SPs, 4 source variations
 × 60 compiles):**
