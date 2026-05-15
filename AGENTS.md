@@ -313,24 +313,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): permuter sweep on
-  3 brief-094 byte-diff drops + 5 brief-097 dropped
-  candidates = 8 total. Uses brief 096's freshly-shipped
-  wrapper. Target: ≥1 of 8 recovered byte-identical.
-  Branch: `decomper/permuter-sweep-byte-diff`.
+- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply C-24
+  indirect-call + pool-dedup recipe (brief 099) to wave 1
+  candidates. 3 strict-signature matches from cross-corpus
+  survey; broader 49-candidate pool. Recipe: `*.legacy_sp3.c`
+  routing + single-global source-form constraint. Self-
+  extend gate: yield ≥40% + bytes ≥250. Branch:
+  `decomper/c24-recipe-wave-1`.
 
-- [`docs/briefs/099-medium-tier-walls-research.md`](docs/briefs/099-medium-tier-walls-research.md)
-  — `cloud` (MEDIUM): walls research on brief 097's 31
-  medium-tier residue. Patterns share indirect-call /
-  critical-section / predicated-cascade combinations.
-  Run brief 084 / 088 / 091-style codegen sweeps on the
-  most-represented pattern (likely indirect-call). Goal:
-  ≥1 source-form recipe surfaced. Branch:
-  `cloud/medium-tier-walls-research`.
+- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
+  — `cloud` (MEDIUM): two-part. (1) Codify W-N temp-
+  register coercion recipe (brief 098 surfaced via
+  permuter) as new C-N entry in codegen-walls.md.
+  (2) Critical-section nesting walls research — next
+  pattern from brief 097 residue (~8 of 31). Brief 084 /
+  088 / 099-style codegen sweep. Branch:
+  `cloud/wn-codify-critical-section-research`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
+  `decomper`, shipped in PR #494. **1 of 8 recovered —
+  production-readiness threshold met.** The recovery
+  (`func_ov000_021ac85c`) cracked the **W-N temp-register
+  wall** via permuter's discovery: split the bitfield
+  chain into two statements to force mwcc into the
+  correct store-reload reg-alloc pattern. **W-N is now
+  coercible-with-tooling, not permanent.** 2 timeouts
+  (one P-4 control case, expected fail). 5 candidates
+  lacked source baselines (couldn't attempt) — queued
+  as backlog. Throughput: ~200-230 iter / 60s / thread.
+  Brain queued brief 100 to codify the W-N recipe.
+- [`docs/briefs/099-medium-tier-walls-research.md`](docs/briefs/099-medium-tier-walls-research.md)
+  `cloud`, shipped in PR #495. **NEW C-24 entry: indirect-
+  call dispatch + pool-dedup wall.** First wall in catalog
+  using `.legacy_sp3.c` (mwcc 1.2/sp3) recipe — completes
+  the C-15 (`.legacy.c`) / C-23 (`.legacy.c` dual) / C-24
+  (`.legacy_sp3.c`) routing-tier discriminator triangle
+  that brief 044 anticipated. **Source-form constraint:**
+  single-global identifier required for pool-dedup
+  peephole to fire (variant F at 90 compiles, vs A-E
+  two-global at score 1). Cross-corpus survey: 49
+  candidates match the signature; 3 strict-signature
+  matches. Brief 101 queued to apply at scale.
 - [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
   `cloud`, shipped in PR #492. Project-side shim (over
   upstreaming patches). 4 vendor patches stored as Python
@@ -341,7 +367,7 @@ itself:
   End-to-end validated against `func_02009758`: ~208
   thread-iterations in 30s, no manual hand-edits. 20 new
   tests, suite 1583/1583. Brain pushed `87ef1c6` to clear
-  F841 in new test (unused `calls = []` accumulator).
+  F841 in new test.
 - [`docs/briefs/097-medium-tier-follow-on-wave.md`](docs/briefs/097-medium-tier-follow-on-wave.md)
   `decomper`, **HANDED BACK at 0 matches**. 20 medium-
   tier candidates surveyed, 5 attempted, **0 byte-
@@ -350,11 +376,11 @@ itself:
   cascade, P-4 skip-list hit, W-N temp-register choice.
   Both gates missed; chain closes at wave 1. Honest
   signal that medium-tier residue's walls combine
-  multiple known walls; dominant patterns (indirect-call
-  + critical-section + predicated-cascade) need
-  codegen-sweep research before further single-region
+  multiple known walls; dominant patterns required
+  codegen-sweep research (brief 099 closed the
+  indirect-call pattern) before further single-region
   waves are productive. 1 new W-N datapoint
-  (`func_ov000_021ac85c`).
+  (`func_ov000_021ac85c`) — now coercible via brief 098.
 
 - [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #490. **311 EUR ports × 2
