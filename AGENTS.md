@@ -313,26 +313,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cross-region apply
-  wave 2 — port the remaining EUR src/main/ matches not
-  covered by brief 090 (estimate ~43 ports, decomper to
-  verify empirically) to USA + JPN. Use `--confidence-
-  floor LOW` (15/15 safe per brief 090). Conversion target
-  ~75% per brief 090's 78% calibration. Branch:
-  `decomper/cross-region-apply-wave-2`.
+- [`docs/briefs/097-medium-tier-follow-on-wave.md`](docs/briefs/097-medium-tier-follow-on-wave.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): medium-tier
+  follow-on single-region wave. Cross-region pool drained
+  by brief 094 (311-port backfill); cap-raise drained by
+  brief 092. Medium-tier is the next natural forward pool.
+  Wave 1 calibration: 8-12 candidates, then self-extend
+  if gate fires (≥40% + ≥250). Branch:
+  `decomper/medium-tier-follow-on-wave`.
 
-- [`docs/briefs/095-port-to-region-d2-v2.md`](docs/briefs/095-port-to-region-d2-v2.md)
-  — `cloud` (MEDIUM): port_to_region.py D2 v2 — auto-
-  promote LOW→MEDIUM when EUR↔target address-shift parity
-  matches HIGH neighbors (15/15 safe per brief 090
-  calibration). D3 stretch: data-symbol parallel-reloc
-  resolution for legacy_sp3 lazy-init thunks. Brief 094
-  benefits immediately. Branch:
-  `cloud/port-to-region-d2-v2`.
+- [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
+  — `cloud` (MEDIUM): wrap (or upstream) the 5 macOS
+  setup-gap patches from brief 093 PR #487 — `homebrew_
+  gcc_cpp` FileNotFoundError, lowercase `-i` flag, ARM-
+  targeted `DEFAULT_AS_CMDLINE`, `prelude.inc` ARM macros,
+  `compile.sh` `&&` strip — plus dsd-dis `.s` normalization
+  (`.global`, `arm_func_start`, `arm_func_end`,
+  `macros/function.inc`). Hard prereq for autonomous
+  P-class investigations on fresh worktrees. Branch:
+  `cloud/permuter-wrapper`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
+  `decomper`, shipped in PR #490. **311 EUR ports × 2
+  regions = 622 byte-identical landings, 83% conversion
+  from 375-port pool — largest single-PR badge climb of
+  the session.** Pool was 9× brief 094's estimate because
+  brief 092's PR body counted only the 39-port brief 090
+  sample, not the full residual. USA + JPN 0.34% → 0.70%
+  (2.05×). Decomper's projection of 3.0-3.5% missed by 5×
+  (per-port avg ~64 bytes against a multi-MB binary, so
+  the percentage doesn't reflect the match count
+  proportionally). 64 unrecovered: 4 collisions + 34
+  undefined-callee + 3 byte-diff + 23 other-refused.
+- [`docs/briefs/095-port-to-region-d2-v2.md`](docs/briefs/095-port-to-region-d2-v2.md)
+  `cloud`, shipped in PR #489. **D2 v2 + D3 both shipped.**
+  D2 v2: LOW→MEDIUM auto-promote (N=5 / min-agreement=3
+  consensus shift) eliminates the manual `--confidence-
+  floor LOW` override. D3: data-shift consensus (min-
+  agreement 2) resolves both brief-090 legacy_sp3
+  refusals. 4 brief-090 LOW candidates auto-promote
+  correctly; anti-match safeguard verified (wrong-shift
+  candidates stay LOW with explicit rationale). 21 new
+  tests, suite 1563/1563.
 - [`docs/briefs/092-single-region-cap-raise-0x80.md`](docs/briefs/092-single-region-cap-raise-0x80.md)
   `decomper`, shipped in PR #486. Wave 1 CLOSED at floor: **1
   match / 100 bytes / 20% yield**. Cap-raise yield trajectory
@@ -352,8 +376,7 @@ itself:
   2.0's usage-order allocator is downstream of source
   mutation. Surfaced 5 macOS permuter setup-gap patches
   (homebrew_gcc_cpp / lowercase -i / DEFAULT_AS_CMDLINE /
-  prelude.inc / compile.sh) — candidate for brief 096
-  wrapper.
+  prelude.inc / compile.sh) — closed by brief 096.
 
 - [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
   `decomper`, shipped in PR #483. **33 of 39 EUR matches × 2
