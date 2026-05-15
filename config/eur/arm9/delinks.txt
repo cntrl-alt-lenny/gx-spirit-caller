@@ -7391,3 +7391,20 @@ src/main/func_020820b8.legacy_sp3.c:
 src/main/func_020820f8.legacy_sp3.c:
     complete
     .text start:0x020820f8 end:0x02082138
+
+src/main/func_020069f4.c:
+    complete
+    .text start:0x020069f4 end:0x02006a38
+
+src/main/func_02008cd4.c:
+    complete
+    .text start:0x02008cd4 end:0x02008d1c
+
+src/main/func_02008548.c:
+    complete
+    .text start:0x02008548 end:0x02008598
+
+src/main/func_02001c98.c:
+    complete
+    .text start:0x02001c98 end:0x02001cd0
+
