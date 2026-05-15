@@ -165,6 +165,7 @@ mwcc 2.0/sp1p5 default and capture the emit shape:
 1. **Approach A: separate pointer-locals** (PR #474's natural
    form — known to fold; baseline).
 2. **Approach B: hardcoded address constants per access**:
+
    ```c
    *(vu16 *)0x04000280 = 0;
    *(vs32 *)0x04000290 = numer;
@@ -173,9 +174,11 @@ mwcc 2.0/sp1p5 default and capture the emit shape:
    while (*(vu16 *)0x04000280 & 0x8000) ;
    return *(vs32 *)0x040002a0;
    ```
+
    mwcc may emit four separate `ldr` loads if it can't see the
    four constants are derived from a shared base.
 3. **Approach C: register-block struct typedef**:
+
    ```c
    typedef struct {
        vu16 cnt; vu16 _pad; vs32 numer;
@@ -183,13 +186,16 @@ mwcc 2.0/sp1p5 default and capture the emit shape:
    } div_regs_t;
    ((volatile div_regs_t *)0x04000280)->numer = numer;
    ```
+
    Tests whether the fold is a *constant-pool dedup* peephole
    (would fire on B and C alike) or a *pointer-local CSE*
    peephole (would fire on A only).
 4. **Approach D: GCC register storage class on the base**:
+
    ```c
    register vu16 *p_divcnt asm("r2") = (vu16 *)0x04000280;
    ```
+
    May force mwcc to keep each pointer-local in a separate
    register, defeating the fold.
 5. **Approach E: `asm void` direct write of the prologue** (per
@@ -212,7 +218,7 @@ re-compile through:
 Also re-run the full per-SP sweep across all 15 mwcc SPs (matching
 C-15's per-SP discriminator table) to determine the **exact
 mwcc-version boundary** where the MMIO fold appears. C-15's
-boundary is "all 1.2/* SPs emit direct, all 2.0/* SPs emit
+boundary is "all `1.2/*` SPs emit direct, all `2.0/*` SPs emit
 peephole"; verify whether this pattern has the same boundary or
 a different one.
 
