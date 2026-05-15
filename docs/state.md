@@ -8,49 +8,51 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-15 (Mac brain resumed post-Windows work).
-**Brief 086 cap-raise chain CLOSED at 21 matches / 1440 bytes / 63%
-yield** — 1.6× brief 081's byte output at same match count. Brief 088
-shipped C-23 MMIO base-folding wall (dual peephole — base-folding +
-ANDS→TST — both fixed by `.legacy.c`, distinct asm-grep from C-15).
-Brief 084 + 091 chain refines C-22 adjacent-bitfield (1 production
-hit + 5 cumulative datapoints awaiting v2 sweep). S-2a loop-counter
-signedness extension landed via PR #479. **Brief 090 NOW ACTIVE** —
-cross-region apply for 42 EUR src/main/ matches accumulated across
-briefs 081 + 086. EUR **1.64%** (up from 1.57% at session-resume),
-USA + JPN **0.26%** (about to climb on brief 090).
+**Last updated:** 2026-05-15 (Mac brain — brief 090 + 091 merge).
+**Brief 090 wave 1 CLOSED: 33 of 39 EUR matches × 2 regions = 66
+region-landings** (78% conversion, dead-center of the 30-50 projection).
+**Brief 091 CLOSED: 6-walls-not-1** — extends brief 084's 3-walls
+methodology; the brief 081 + 086 "struct-pointer wall" cluster grouped
+6 candidates by symptom with 6 distinct root causes (only 2 actual
+C-22). 2 new permanent-wall classifications: P-N (mwcc-2.0 modulo
+peephole) + P-4 family (reg-alloc). USA + JPN climbed **0.26% → 0.34%**
+post-#483 (first sustained multi-region growth since brief 078 wave 2).
+EUR **1.64%** (unchanged this round — no EUR-side work in #483/#484).
 
 ## Today's merges (just-landed)
 
-- **PR #470 — decomper / brief 082 wave 1 (pokeheartgold cross-
-  project).** Target 30-60 ports; delivered **1** byte-identical
-  match (`func_020921a8` = `OSi_RemoveLinkFromQueue`, 0x34). Funnel:
-  379 byte-fingerprint HIGH candidates → 92% drained by prior briefs
-  → 12 D1+D5-OK → 6 compile-fails (need struct vendoring) + 3
-  byte-diff drops + 2 sinit drops → 1 match. All 3 regions verified
-  24/27. Decomper flagged this a **natural-drain signal** for the
-  cross-project pipeline; cumulative cross-project coverage now
-  **100 ports / 5,840 bytes** across briefs 069/071/074/082.
-- **PR #471 — cloud / brief 084 C-22 wall research.** Closed brief
-  084 with **3/3 candidates recoverable** (spec required ≥1/3). The
-  "struct-pointer silent-corruption wall" brief 081 hypothesised
-  resolved into **three distinct walls**, not one: C-22 (new
-  bitfield-pack), C-1 (predicated early-return, already known), and
-  C-2+C-15-family (already known). Pure docs (+148/-2 in
-  `codegen-walls.md`). The deeper lesson — wall hypotheses from N
-  candidates should be confirmed by codegen sweep, not symptom
-  similarity — captured at the top of the C-22 entry as a
-  methodology note for future briefs.
+- **PR #483 — decomper / brief 090 wave 1 (cross-region apply).**
+  Target 30-50 ports per region; delivered **33 of 39 EUR matches × 2
+  regions = 66 byte-identical landings.** All 3 regions 24/27 baseline
+  preserved (USA + JPN verified locally post-merge). Funnel: 39 EUR
+  pool → 18 HIGH-confidence + 15 LOW-confidence (all landed
+  byte-identical) + 2 legacy_sp3 refused + 1 symbol-rename fix
+  (OS_DisableIrq). **Calibration win:** LOW-floor on substantive
+  (≥0x20) functions is safe — brief 064 D2 v2 should auto-promote
+  LOW→MEDIUM when EUR↔target address shift matches HIGH neighbors,
+  unlocking these without `--confidence-floor LOW` override. Also
+  caught + fixed a brief 075 bug (OS_DisableIrq pinned to wrong
+  address in USA + JPN).
+- **PR #484 — cloud / brief 091 C-22 v2 expansion (6-walls-not-1).**
+  Methodology extension: candidate clusters sharing symptom
+  (same +32-byte shift, same struct-pointer pattern) mask N distinct
+  root causes. Brief 084 surfaced 3, brief 091 confirms 6 total in
+  the brief 081 + 086 C-22 cluster. **135 compiles** across 2
+  unrecovered datapoints: `func_02009758` → P-N (mwcc-2.0 modulo
+  peephole, mwcc-version-specific, no source-form recipe); `func_02000cc4`
+  → P-4 family (reg-alloc, **permuter is the next-attempt path**).
+  Pure docs (+138/-23 in `codegen-walls.md`). Brain pushed MD018
+  line-wrap fix (commit `54c6569`) to clear lint before merge.
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
-| Single-region EUR hard-tier (briefs 057+060+081) | 66 matches / 2964 bytes |
-| Cross-region apply (briefs 075+078) | 39 ports × 2 regions = 78 region-matches |
+| Single-region EUR hard-tier (briefs 057+060+081+086) | 87 matches / 4404 bytes |
+| Cross-region apply (briefs 075+078+090) | 72 ports × 2 regions = 144 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
-| Codegen-walls catalogued | 22 coercible + 8 permanent + family corollaries |
-| Total session match-equivalents | ~280 |
+| Codegen-walls catalogued | 23 coercible + 9 permanent + family corollaries |
+| Total session match-equivalents | ~346 |
 
 Cross-region applies and cross-project ports are region-neutral
 work — each port slot unlocks ×3 region matches when bootstrapped
@@ -71,66 +73,79 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 086 + state.md
-refresh lands.
+**Open PRs: 0** once this brain-PR for brief 090+091 close and
+new brief queue lands.
 
-**Decomper:**
+**Decomper — brief 092 (HIGH, NEW):**
 
-- **Brief 086 (HIGH, NEW)** — single-region EUR hard-tier
-  cap-raise to ≤0x60. Highest-leverage forward move per PR
-  #470's drain analysis. Wave 1 target 10-12 candidates in
-  0x40-0x60 band. Apply list includes the new C-22 recipe
-  (bitfield syntax for adjacent `bic/orr` pairs) and the
-  methodology lesson (codegen-sweep wall hypotheses before
-  classifying). Self-extend gate: yield ≥40% + bytes ≥250.
+- **Single-region EUR hard-tier cap-raise to ≤0x80.** Natural
+  escalation: 081 (≤0x40) → 086 (≤0x60) → 092 (≤0x80). Apply
+  list inherits brief 091's asm discriminators — skip P-N
+  (signed-modulo peephole emitting `mov rN, lsr #31` / `rsb` /
+  `add ... ror #27` triplet) and P-4 family (reg-alloc swap
+  with no source-form coercion) pre-emptively rather than
+  burning iteration on them. Self-extend gate: yield ≥40% +
+  bytes ≥250. Branch: `decomper/single-region-cap-raise-0x80`.
 
-**Cloud — autonomous backlog:**
+**Cloud — brief 093 (MEDIUM, NEW):**
 
-1. **Brief 063 (MEDIUM-LOW)** — permuter auto-runner. Carryover
-   from earlier sessions. Picks up at cloud's discretion.
-2. **Brief 087-or-similar (queued, post-086)** — if brief 086
-   surfaces a fourth wall hypothesis, brain queues a sweep
-   brief in the 084 pattern.
-3. **C-21 "explicit-next-ahead walk loop" fold-in** pending
+- **Permuter vs brief 091 P-4 candidate (`func_02000cc4`).**
+  Brief 091 explicitly classified P-4 family as the natural
+  permuter target — every (variant, SP) hit the size-match
+  ceiling but registers stayed swapped in 6 positions.
+  Permuter (brief 063 / PR #473) is purpose-built for this.
+  Run it against `func_02000cc4` + 1-2 other known P-4 walls
+  from earlier briefs; if any recover, document the permuter
+  recipe + cycle-cost calibration as a coercible-with-tooling
+  pattern. Branch: `cloud/permuter-vs-p4-validation`.
+
+**Cloud — backlog (post-093):**
+
+1. **port_to_region D2 v2 + D3 (NEW from brief 090
+   calibration).** Auto-promote LOW→MEDIUM when EUR↔target
+   address shift matches neighboring HIGH matches (15/15
+   safe in brief 090). D3: data-symbol parallel-reloc
+   resolution for legacy_sp3 lazy-init thunks (2 refusals
+   in brief 090). Queue as brief 094 when 093 closes.
+2. **C-21 "explicit-next-ahead walk loop" fold-in** pending
    decomper usage — carries to a future hard-tier follow-up
    that surfaces a linked-list walk pattern.
 
-**Cross-project pipeline:**
+**Cross-project pipeline (unchanged):**
 
-Brief 082 wave 2 is technically still on the table — would
-require a separate struct-vendoring brief to unblock the 6
-compile-fails (OSContext, OSMutexQueue, `sRandSeed`, `printfStr`
-etc.). Expected unlock: +5-6 ports. **DE-PRIORITIZED** — the
-struct vendoring effort is similar size to the unlock; brief
-086 is much higher leverage. Revisit only if brief 086 chain
-exhausts the cap-raise pool earlier than expected.
+Brief 082 wave 2 still DE-PRIORITIZED. Revisit only if brief
+092 chain exhausts the cap-raise pool earlier than expected.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 086 wave 1 PR** when it
+1. **Verify + merge decomper brief 092 wave 1 PR** when it
    opens. Standard gate: EUR `ninja rom` + `dsd check modules`
-   24/27. Watch wave-1 yield + size distribution — if matches
-   are predominantly ≤0x40 (i.e. the cap-raise isn't drawing
-   from the new band), pivot wave 2 selection toward 0x40-0x60
-   preference.
-2. **Verify + merge decomper self-extend waves 2/3** as they
-   open. Same gate. Track yield trajectory — brief 057 ran
-   70%/70%/25% (cap exhausted at wave 3); brief 060 ran 75%
-   sustained (still had pool depth); brief 081 ran 67.7% (peak
-   yield was at ≤0x40). Brief 086 at ≤0x60 should expect
-   yield in the 55-70% range based on band-size scaling.
-3. **Scope brief 087+ after 086 closes.** Options to weigh:
-   - Cap-raise further (≤0x80) if 086's last wave still has
-     pool depth.
-   - Pivot back to medium-tier (~80% matched currently — may
-     have follow-on candidates worth a wave).
-   - Cross-region apply wave from accumulated single-region
-     matches (briefs 075 / 078 pattern).
-4. **Optional: scope brief 085 for struct vendoring** if the
-   user wants to keep the cross-project lever warm despite
-   the drain signal. Otherwise leave brief 082 wave 2
-   de-prioritized indefinitely.
-5. **Pre-existing carryovers (unchanged across the session):**
+   24/27. Watch wave-1 yield + size distribution — if ≤0x80
+   band is drawing matches (i.e. predominantly 0x60-0x80
+   shapes), self-extend gate fires for waves 2/3. If wave 1
+   yield is <40% or bytes <250, the cap-raise pool is drained
+   at ≤0x80 and brain pivots to cross-region wave (only 6
+   leftover EUR ports from brief 090 worth ~12 region-
+   matches — small but free) OR medium-tier follow-on candidates.
+2. **Verify + merge cloud brief 093 (permuter vs P-4) PR**
+   when it opens. Two outcomes worth following:
+   - **Permuter recovers `func_02000cc4` byte-identical:**
+     P-4 family becomes coercible-with-tooling. Brief 094
+     queued to run permuter against the rest of the P-4
+     pool (estimate: 3-5 known candidates across brief 081
+     + 086 chains). Brain queues this as the next-most-
+     leveraged single-region move.
+   - **Permuter fails:** P-4 stays permanent. Brain's
+     selection rule for brief 095+ skips P-4 shapes
+     pre-emptively (asm discriminator from brief 091 entry).
+3. **Scope brief 094+ after 092 + 093 close.** Options:
+   - Cross-region wave 2 (6 leftover EUR ports + future
+     brief 092 matches).
+   - port_to_region D2 v2 + D3 (auto-promote LOW→MEDIUM +
+     legacy_sp3 data-symbol resolution).
+   - ≤0xC0 cap-raise if brief 092 still has pool depth.
+   - Pivot to medium-tier follow-on (~80% matched).
+4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection

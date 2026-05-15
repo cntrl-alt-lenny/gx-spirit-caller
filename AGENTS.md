@@ -313,24 +313,49 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply `tools/
-  port_to_region.py` to the 42 EUR `src/main/*.c` matches
-  accumulated across brief 081 + brief 086 chains. First
-  sustained USA + JPN badge growth since brief 078 wave 2;
-  expected climb 0.26% → ~0.4-0.5% each region. Branch:
-  `decomper/cross-region-apply-single-region-matches`.
+- [`docs/briefs/092-single-region-cap-raise-0x80.md`](docs/briefs/092-single-region-cap-raise-0x80.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): single-region EUR
+  hard-tier cap-raise to ≤0x80. Natural escalation 081
+  (≤0x40) → 086 (≤0x60) → 092 (≤0x80). Skip-list inherits
+  brief 091's P-N + P-4 asm discriminators (don't burn
+  iteration on the known mwcc-2.0-peephole-locked or
+  reg-alloc-locked shapes). Self-extend gate: yield ≥40%
+  + bytes ≥250. Branch:
+  `decomper/single-region-cap-raise-0x80`.
 
-- [`docs/briefs/091-c22-v2-expansion.md`](docs/briefs/091-c22-v2-expansion.md)
-  — `cloud` (MEDIUM): refine C-22 adjacent-bitfield wall
-  recipe using 5 cumulative datapoints (3 brief 081 + 2
-  brief 086 wave 3). Brief 084's bitfield-via-union recipe
-  worked on 1 of 5; remaining 4 shapes (bit-set with side-
-  effect, increment+init, etc.) likely need C-22a/b/c sub-
-  letters. Branch: `cloud/c22-v2-expansion`.
+- [`docs/briefs/093-permuter-vs-p4-validation.md`](docs/briefs/093-permuter-vs-p4-validation.md)
+  — `cloud` (MEDIUM): run permuter (brief 063 / PR #473)
+  against brief 091's P-4 candidate `func_02000cc4` plus
+  1-2 known P-4 walls from earlier briefs. If any recover
+  byte-identical, P-4 family becomes coercible-with-tooling;
+  document the recipe + cycle-cost calibration. If none
+  recover, P-4 stays permanent and brain's selection rule
+  skips P-4 shapes pre-emptively. Branch:
+  `cloud/permuter-vs-p4-validation`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
+  `decomper`, shipped in PR #483. **33 of 39 EUR matches × 2
+  regions = 66 byte-identical landings** (78% conversion, dead
+  centre of the 30-50 projection). USA + JPN badges 0.26% →
+  0.34% — first sustained multi-region growth since brief 078
+  wave 2. Calibration: LOW-confidence floor on substantive
+  (≥0x20) functions is safe (15/15 landed); D2 v2 should
+  auto-promote LOW→MEDIUM when address-shift parity matches
+  HIGH neighbors. Caught + fixed a brief 075 OS_DisableIrq
+  rename bug. 2 legacy_sp3 refusals (data-symbol resolution
+  gap, candidate for D3).
+- [`docs/briefs/091-c22-v2-expansion.md`](docs/briefs/091-c22-v2-expansion.md)
+  `cloud`, shipped in PR #484. **6-walls-not-1 finding** —
+  extends brief 084's 3-walls methodology. Brief 081 + 086
+  C-22 cluster (6 candidates by symptom) had 6 distinct root
+  causes; only 2 were actual C-22. 135 compiles across 2
+  unrecovered datapoints: `func_02009758` → P-N permanent
+  (mwcc-2.0 modulo peephole, mwcc-version-specific);
+  `func_02000cc4` → P-4 family (reg-alloc, permuter is next).
+  C-22 bitfield-via-union recipe unchanged. Brain pushed
+  MD018 line-wrap fix `54c6569`.
 - [`docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md`](docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md)
   `decomper`, full 3-wave chain shipped via PRs #474 (W1) +
   #478 (W2) + #480 (W3). **21 matches / 1440 bytes / ~63%
