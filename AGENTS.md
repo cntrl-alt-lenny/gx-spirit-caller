@@ -313,27 +313,47 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/092-single-region-cap-raise-0x80.md`](docs/briefs/092-single-region-cap-raise-0x80.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): single-region EUR
-  hard-tier cap-raise to ≤0x80. Natural escalation 081
-  (≤0x40) → 086 (≤0x60) → 092 (≤0x80). Skip-list inherits
-  brief 091's P-N + P-4 asm discriminators (don't burn
-  iteration on the known mwcc-2.0-peephole-locked or
-  reg-alloc-locked shapes). Self-extend gate: yield ≥40%
-  + bytes ≥250. Branch:
-  `decomper/single-region-cap-raise-0x80`.
+- [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cross-region apply
+  wave 2 — port the remaining EUR src/main/ matches not
+  covered by brief 090 (estimate ~43 ports, decomper to
+  verify empirically) to USA + JPN. Use `--confidence-
+  floor LOW` (15/15 safe per brief 090). Conversion target
+  ~75% per brief 090's 78% calibration. Branch:
+  `decomper/cross-region-apply-wave-2`.
 
-- [`docs/briefs/093-permuter-vs-p4-validation.md`](docs/briefs/093-permuter-vs-p4-validation.md)
-  — `cloud` (MEDIUM): run permuter (brief 063 / PR #473)
-  against brief 091's P-4 candidate `func_02000cc4` plus
-  1-2 known P-4 walls from earlier briefs. If any recover
-  byte-identical, P-4 family becomes coercible-with-tooling;
-  document the recipe + cycle-cost calibration. If none
-  recover, P-4 stays permanent and brain's selection rule
-  skips P-4 shapes pre-emptively. Branch:
-  `cloud/permuter-vs-p4-validation`.
+- [`docs/briefs/095-port-to-region-d2-v2.md`](docs/briefs/095-port-to-region-d2-v2.md)
+  — `cloud` (MEDIUM): port_to_region.py D2 v2 — auto-
+  promote LOW→MEDIUM when EUR↔target address-shift parity
+  matches HIGH neighbors (15/15 safe per brief 090
+  calibration). D3 stretch: data-symbol parallel-reloc
+  resolution for legacy_sp3 lazy-init thunks. Brief 094
+  benefits immediately. Branch:
+  `cloud/port-to-region-d2-v2`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/092-single-region-cap-raise-0x80.md`](docs/briefs/092-single-region-cap-raise-0x80.md)
+  `decomper`, shipped in PR #486. Wave 1 CLOSED at floor: **1
+  match / 100 bytes / 20% yield**. Cap-raise yield trajectory
+  67.7% (081) → 63% (086) → 20% (092) is textbook
+  diminishing returns at the ≤0x80 band. Brief 091's
+  pre-emptive skip-list worked correctly (0 of 4 drops hit
+  P-N or P-4); the residual pool is dominated by C-1 /
+  W-stack-split / popcount-mask-order shapes with no current
+  source-form recipe. 2 new wall candidates surfaced
+  (W-stack-split 2dp, W-popcount-mask-order 1dp).
+- [`docs/briefs/093-permuter-vs-p4-validation.md`](docs/briefs/093-permuter-vs-p4-validation.md)
+  `cloud`, shipped in PR #487. **P-4 family confirmed
+  permanent.** Permuter ran ~900 thread-iterations against
+  `func_02000cc4`'s entry_ptr variant; best score 80
+  (baseline 265). The 6 divergent byte positions at score
+  80 are exactly the brief 091 reg-swap positions. mwcc
+  2.0's usage-order allocator is downstream of source
+  mutation. Surfaced 5 macOS permuter setup-gap patches
+  (homebrew_gcc_cpp / lowercase -i / DEFAULT_AS_CMDLINE /
+  prelude.inc / compile.sh) — candidate for brief 096
+  wrapper.
 
 - [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
   `decomper`, shipped in PR #483. **33 of 39 EUR matches × 2
