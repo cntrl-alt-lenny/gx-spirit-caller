@@ -38,10 +38,30 @@ from analyze_symbols import (  # noqa: E402
 )
 from data_worklist import (  # noqa: E402
     DATA_PLACEHOLDER_PREFIX,
+    SHAPE_ARRAY,
+    SHAPE_BSS,
+    SHAPE_FNPTR,
+    SHAPE_SCALAR,
+    SHAPE_STRING,
+    SHAPE_STRUCT,
+    SHAPE_UNKNOWN,
+    CLUSTER_FILTERS,
+    ModuleSections,
+    SectionRange,
+    _is_code_address,
+    _is_printable_string,
     _load_readers_index,
+    _looks_like_array,
+    _looks_like_fnptr_table,
+    _parse_csv_filter,
+    _parse_section_header,
+    build_size_table,
+    classify_shape,
     rank_data_symbols,
     render_markdown,
     render_stdout_summary,
+    resolve_cluster,
+    section_for_symbol,
 )
 
 
@@ -354,6 +374,397 @@ class TestDataPlaceholderPrefix(unittest.TestCase):
     def test_named_data_doesnt_match(self):
         self.assertFalse("g_HeapState".startswith(DATA_PLACEHOLDER_PREFIX))
         self.assertFalse("OSi_Context".startswith(DATA_PLACEHOLDER_PREFIX))
+
+
+# --------------------------------------------------------------------------- #
+# Brief 114 — v2 tooling tests (section / size / shape / cluster filters)
+# --------------------------------------------------------------------------- #
+
+
+def _bss_sym(module: str, addr: int, size: int = 0) -> Symbol:
+    """Helper for bss-typed symbols (brief 114 added `bss` to the
+    SYMBOL_RE; `analyze_symbols` now emits type='bss' for these)."""
+    name = f"data_{addr:08x}" if module == "main" else f"data_{module}_{addr:08x}"
+    return Symbol(
+        name=name, module=module, addr=addr, size=size,
+        type="bss", mode="any",
+    )
+
+
+def _main_sections() -> ModuleSections:
+    """A canonical 'main' module section layout matching the EUR build:
+    text → rodata → data → bss. Used for v2 filter tests."""
+    return ModuleSections(
+        module="main",
+        sections=[
+            SectionRange(name="text",   start=0x02000000, end=0x020b4320),
+            SectionRange(name="rodata", start=0x020b4320, end=0x020c3bc0),
+            SectionRange(name="data",   start=0x020c3bc0, end=0x02102c60),
+            SectionRange(name="bss",    start=0x02102c60, end=0x021aa4a0),
+        ],
+        binary=None,
+        load_addr=0x02000000,
+    )
+
+
+class TestParseSectionHeader(unittest.TestCase):
+    def test_parses_canonical_header(self):
+        import tempfile
+        from pathlib import Path as _P
+        text = (
+            "    .text       start:0x02000000 end:0x020b4320 kind:code align:32\n"
+            "    .rodata     start:0x020b4320 end:0x020c3bc0 kind:rodata align:4\n"
+            "    .data       start:0x020c3bc0 end:0x02102c60 kind:data align:32\n"
+            "    .bss        start:0x02102c60 end:0x021aa4a0 kind:bss align:32\n"
+            "\n"
+            "src/main/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x02000254 end:0x02000258\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(text)
+            tmp = _P(f.name)
+        try:
+            sections = _parse_section_header(tmp)
+        finally:
+            tmp.unlink()
+        self.assertEqual(len(sections), 4)
+        # Normalized names match.
+        names = [s.name for s in sections]
+        self.assertEqual(names, ["text", "rodata", "data", "bss"])
+        # Bss range is correct.
+        bss = next(s for s in sections if s.name == "bss")
+        self.assertEqual(bss.start, 0x02102c60)
+        self.assertEqual(bss.end, 0x021aa4a0)
+
+    def test_missing_file_returns_empty(self):
+        from pathlib import Path as _P
+        sections = _parse_section_header(_P("/nonexistent/path/delinks.txt"))
+        self.assertEqual(sections, [])
+
+    def test_header_only_no_tus(self):
+        import tempfile
+        from pathlib import Path as _P
+        text = (
+            "    .text       start:0x01ff8000 end:0x01ff886c kind:code align:32\n"
+            "    .bss        start:0x01ff8880 end:0x01ff8880 kind:bss align:32\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(text)
+            tmp = _P(f.name)
+        try:
+            sections = _parse_section_header(tmp)
+        finally:
+            tmp.unlink()
+        self.assertEqual(len(sections), 2)
+
+
+class TestSectionForSymbol(unittest.TestCase):
+    def test_address_lookup_within_section(self):
+        modsecs = {"main": _main_sections()}
+        sym = _bss_sym("main", 0x02102d00)
+        self.assertEqual(section_for_symbol(modsecs, sym), "bss")
+
+    def test_rodata_classification(self):
+        modsecs = {"main": _main_sections()}
+        sym = _data_sym("main", 0x020b4728)
+        self.assertEqual(section_for_symbol(modsecs, sym), "rodata")
+
+    def test_data_classification(self):
+        modsecs = {"main": _main_sections()}
+        sym = _data_sym("main", 0x020c3e48)
+        self.assertEqual(section_for_symbol(modsecs, sym), "data")
+
+    def test_dtcm_module_override(self):
+        # DTCM/ITCM modules return their module name as the section,
+        # regardless of underlying section (since the cluster taxonomy
+        # treats them as their own tier).
+        modsecs = {"dtcm": ModuleSections(
+            module="dtcm",
+            sections=[SectionRange(name="data", start=0x027e0000, end=0x027e0600)],
+            binary=None, load_addr=0x027e0000,
+        )}
+        sym = _data_sym("dtcm", 0x027e0010)
+        self.assertEqual(section_for_symbol(modsecs, sym), "dtcm")
+
+    def test_unknown_module_returns_unknown(self):
+        sym = _data_sym("main", 0x02102d00)
+        self.assertEqual(section_for_symbol({}, sym), "unknown")
+
+    def test_out_of_section_returns_unknown(self):
+        modsecs = {"main": _main_sections()}
+        sym = _data_sym("main", 0x05000000)  # way outside
+        self.assertEqual(section_for_symbol(modsecs, sym), "unknown")
+
+
+class TestBuildSizeTable(unittest.TestCase):
+    def test_explicit_size_preserved(self):
+        sized = _data_sym("main", 0x02000200, size=0x40)
+        md = _module("main", [sized])
+        modsecs = {"main": _main_sections()}
+        table = build_size_table({"main": md}, modsecs)
+        self.assertEqual(table[("main", 0x02000200)], 0x40)
+
+    def test_size_deduced_from_next_symbol(self):
+        a = _data_sym("main", 0x020c3bc8)  # size=0
+        b = _data_sym("main", 0x020c3c00, size=0x4)  # next symbol
+        md = _module("main", [a, b])
+        modsecs = {"main": _main_sections()}
+        table = build_size_table({"main": md}, modsecs)
+        # a's size is deduced as b.addr - a.addr = 0x38
+        self.assertEqual(table[("main", 0x020c3bc8)], 0x38)
+        # b keeps its explicit size
+        self.assertEqual(table[("main", 0x020c3c00)], 0x4)
+
+    def test_last_symbol_in_section_uses_section_end(self):
+        last = _data_sym("main", 0x021aa400)  # near end of bss
+        md = _module("main", [last])
+        modsecs = {"main": _main_sections()}
+        table = build_size_table({"main": md}, modsecs)
+        # bss ends at 0x021aa4a0
+        self.assertEqual(table[("main", 0x021aa400)], 0x021aa4a0 - 0x021aa400)
+
+    def test_no_section_returns_zero(self):
+        outside = _data_sym("main", 0x05000000)  # outside any section
+        md = _module("main", [outside])
+        modsecs = {"main": _main_sections()}
+        table = build_size_table({"main": md}, modsecs)
+        self.assertEqual(table[("main", 0x05000000)], 0)
+
+
+class TestShapeHeuristics(unittest.TestCase):
+    def test_is_printable_string_accepts_null_term_ascii(self):
+        self.assertTrue(_is_printable_string(b"hello\x00"))
+        self.assertTrue(_is_printable_string(b"abc\x00\x00"))
+
+    def test_is_printable_string_rejects_short(self):
+        # Less than 4 bytes — not enough signal to call it a string.
+        self.assertFalse(_is_printable_string(b"\x00"))
+        self.assertFalse(_is_printable_string(b"a\x00"))
+
+    def test_is_printable_string_rejects_no_terminator(self):
+        self.assertFalse(_is_printable_string(b"hello"))
+
+    def test_is_printable_string_rejects_binary(self):
+        self.assertFalse(_is_printable_string(b"\xff\x80\x00\x00"))
+
+    def test_is_printable_string_rejects_all_zero(self):
+        self.assertFalse(_is_printable_string(b"\x00\x00\x00\x00"))
+
+    def test_is_code_address_accepts_ram_range(self):
+        self.assertTrue(_is_code_address(0x02000000))
+        self.assertTrue(_is_code_address(0x02100000))
+        self.assertTrue(_is_code_address(0x023fffff))  # overlay tail
+
+    def test_is_code_address_accepts_itcm(self):
+        self.assertTrue(_is_code_address(0x01ff8100))
+
+    def test_is_code_address_rejects_dtcm_and_rom(self):
+        self.assertFalse(_is_code_address(0x027e0000))   # dtcm
+        self.assertFalse(_is_code_address(0x08000000))   # GBA cart slot
+        self.assertFalse(_is_code_address(0x00000000))
+
+    def test_looks_like_fnptr_table_detects_code_pointers(self):
+        # 4 little-endian code addresses.
+        addresses = [0x02000800, 0x02000a00, 0x02000c00, 0x02000e00]
+        b = b"".join(a.to_bytes(4, "little") for a in addresses)
+        self.assertTrue(_looks_like_fnptr_table(b))
+
+    def test_looks_like_fnptr_table_rejects_random_words(self):
+        b = b"\x00\x10\x00\x05\x40\x32\x82\xa0"  # not code addrs
+        self.assertFalse(_looks_like_fnptr_table(b))
+
+    def test_looks_like_array_detects_repeated_marker(self):
+        # 4-byte stride with a stable type tag at offset 0 of each entry.
+        b = bytes([
+            0x01, 0x00, 0xab, 0xcd,
+            0x01, 0x00, 0x12, 0x34,
+            0x01, 0x00, 0x56, 0x78,
+            0x01, 0x00, 0x9a, 0xbc,
+        ])
+        self.assertTrue(_looks_like_array(b))
+
+    def test_looks_like_array_detects_all_zero(self):
+        # Uniformly-filled buffer is array-like.
+        self.assertTrue(_looks_like_array(b"\x00" * 64))
+
+    def test_classify_shape_bss_for_bss_section(self):
+        sym = _bss_sym("main", 0x02102d00)
+        # No bytes inspected at all when section is bss.
+        shape = classify_shape(sym, "bss", 0x40, modsecs=None)
+        self.assertEqual(shape, SHAPE_BSS)
+
+    def test_classify_shape_scalar_for_small_size(self):
+        sym = _data_sym("main", 0x020c3e48, size=4)
+        msec = _main_sections()
+        msec.binary = b"\x00" * 0x200000
+        shape = classify_shape(sym, "data", 4, msec)
+        self.assertEqual(shape, SHAPE_SCALAR)
+
+    def test_classify_shape_unknown_when_size_zero(self):
+        sym = _data_sym("main", 0x020c3e48)
+        shape = classify_shape(sym, "data", 0, _main_sections())
+        self.assertEqual(shape, SHAPE_UNKNOWN)
+
+
+class TestClusterShorthand(unittest.TestCase):
+    def test_cluster_a_is_bss(self):
+        cf = resolve_cluster("A")
+        self.assertEqual(cf.sections, frozenset({"bss"}))
+        self.assertIsNone(cf.shapes)
+
+    def test_cluster_b_is_data_scalars(self):
+        cf = resolve_cluster("B")
+        self.assertEqual(cf.sections, frozenset({"data"}))
+        self.assertEqual(cf.shapes, frozenset({SHAPE_SCALAR}))
+        self.assertEqual(cf.size_max, 8)
+
+    def test_cluster_c_is_rodata(self):
+        cf = resolve_cluster("C")
+        self.assertEqual(cf.sections, frozenset({"rodata"}))
+
+    def test_cluster_d_is_data_structs_min_size(self):
+        cf = resolve_cluster("D")
+        self.assertEqual(cf.sections, frozenset({"data"}))
+        self.assertEqual(cf.size_min, 0x40)
+        self.assertIn(SHAPE_STRUCT, cf.shapes)
+
+    def test_cluster_e_is_dtcm_itcm(self):
+        cf = resolve_cluster("E")
+        self.assertEqual(cf.sections, frozenset({"dtcm", "itcm"}))
+
+    def test_cluster_case_insensitive(self):
+        # `--cluster a` works just like `--cluster A`.
+        self.assertEqual(resolve_cluster("a"), resolve_cluster("A"))
+
+    def test_all_clusters_have_entries(self):
+        # Sanity: A-E all defined.
+        for c in "ABCDE":
+            self.assertIn(c, CLUSTER_FILTERS)
+
+
+class TestCsvFilterParser(unittest.TestCase):
+    def test_none_returns_none(self):
+        self.assertIsNone(_parse_csv_filter(None, ("a", "b")))
+
+    def test_all_returns_none(self):
+        self.assertIsNone(_parse_csv_filter("all", ("a", "b")))
+
+    def test_single_value(self):
+        self.assertEqual(_parse_csv_filter("a", ("a", "b")), frozenset({"a"}))
+
+    def test_comma_separated(self):
+        result = _parse_csv_filter("a,b", ("a", "b", "c"))
+        self.assertEqual(result, frozenset({"a", "b"}))
+
+    def test_unknown_value_raises(self):
+        with self.assertRaises(ValueError):
+            _parse_csv_filter("zzz", ("a", "b"))
+
+
+class TestRankWithFilters(unittest.TestCase):
+    def _enriched_fixture(self):
+        """Fixture with section+size enrichment data."""
+        # Data symbols across sections.
+        d_rodata = _data_sym("main", 0x020b4728, size=0x10)
+        d_data = _data_sym("main", 0x020c3e48, size=0x4)
+        d_bss = _bss_sym("main", 0x02102d00, size=0x100)
+        f_main = _func_sym("main", 0x02001000)
+        md = _module("main", [d_rodata, d_data, d_bss, f_main])
+        modules = {"main": md}
+        graph = CallGraph()
+        graph.edges_load[("main", 0x02001000)].add(("main", 0x020b4728))
+        graph.edges_load[("main", 0x02001000)].add(("main", 0x020c3e48))
+        graph.edges_load[("main", 0x02001000)].add(("main", 0x02102d00))
+        modsecs_map = {"main": _main_sections()}
+        size_table = build_size_table(modules, modsecs_map)
+        return modules, graph, modsecs_map, size_table
+
+    def test_section_filter_restricts_to_bss(self):
+        modules, graph, modsecs_map, size_table = self._enriched_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+            modsecs_map=modsecs_map, size_table=size_table,
+            section_filter=frozenset({"bss"}),
+        )
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].section, "bss")
+
+    def test_section_filter_csv_multi(self):
+        modules, graph, modsecs_map, size_table = self._enriched_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+            modsecs_map=modsecs_map, size_table=size_table,
+            section_filter=frozenset({"data", "rodata"}),
+        )
+        sections = {e.section for e in entries}
+        self.assertEqual(sections, {"data", "rodata"})
+
+    def test_size_min_filter(self):
+        modules, graph, modsecs_map, size_table = self._enriched_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+            modsecs_map=modsecs_map, size_table=size_table,
+            size_min=0x80,
+        )
+        # Only the bss symbol (size=0x100) survives.
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].symbol.addr, 0x02102d00)
+
+    def test_size_max_filter(self):
+        modules, graph, modsecs_map, size_table = self._enriched_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+            modsecs_map=modsecs_map, size_table=size_table,
+            size_max=8,
+        )
+        # Only the .data scalar (size=4) survives.
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].symbol.addr, 0x020c3e48)
+
+    def test_shape_filter_for_scalar(self):
+        modules, graph, modsecs_map, size_table = self._enriched_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+            modsecs_map=modsecs_map, size_table=size_table,
+            shape_filter=frozenset({SHAPE_SCALAR}),
+        )
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].shape, SHAPE_SCALAR)
+
+
+class TestRenderMarkdownV2(unittest.TestCase):
+    def test_cluster_filter_in_header(self):
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={},
+        )
+        md = render_markdown(
+            entries, version="eur",
+            total_data_symbols=4, matched_data_count=0,
+            cluster="A",
+        )
+        self.assertIn("cluster=`A`", md)
+
+    def test_section_shape_table_rendered(self):
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(modules, graph, matched={})
+        md = render_markdown(
+            entries, version="eur",
+            total_data_symbols=4, matched_data_count=0,
+        )
+        self.assertIn("Section + shape distribution", md)
+
+    def test_ranked_table_has_v2_columns(self):
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(modules, graph, matched={})
+        md = render_markdown(
+            entries, version="eur",
+            total_data_symbols=4, matched_data_count=0,
+        )
+        # New columns: Section, Size, Shape
+        self.assertIn("| # | Module | Name | Addr | Section | Size | Shape | "
+                      "Readers | Cross-mod | Reader modules |", md)
 
 
 if __name__ == "__main__":
