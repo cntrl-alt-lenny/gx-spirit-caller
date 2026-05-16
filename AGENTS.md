@@ -313,25 +313,51 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): C-24 recipe wave
-  2 (self-extend from wave 1's 71% yield) + opportunistic
-  C-25 / C-26 application where their signatures appear
-  in candidates. 32 candidates remain in the 49-pool;
-  pick 10-15. Try natural form FIRST per brief 100
-  NEGATIVE finding. Self-extend gate: yield ≥40% + bytes
-  ≥250. Branch: `decomper/c24-recipe-wave-2`.
+- [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
+  C-24 wave 3 self-extend on remaining ~13 candidates
+  from the 49-pool. (2) C-26 strict-signature wave on
+  8-10 candidates from brief 100's identified subset
+  of the 125-candidate critsec pool. Continue brief 100
+  NEGATIVE-finding methodology — try natural form FIRST.
+  Self-extend gate (chain cap): yield ≥40% + bytes ≥250.
+  Branch: `decomper/c24-w3-c26-application`.
 
-- [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
-  — `cloud` (MEDIUM): walls research on the predicated-
-  cascade pattern (~6 of 31 brief 097 residue). Brief
-  084 / 088 / 099 / 100-style codegen sweep on smallest
-  single-wall exemplar. Goal: ≥1 new C-N or P-N entry
-  + check for over-classification per brief 100's
-  NEGATIVE pattern. Branch:
-  `cloud/predicated-cascade-research`.
+- [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
+  — `cloud` (MEDIUM): permuter sweep on 5-8
+  representative P-9 candidates (mvnNE-write peephole
+  gap, brief 103). Recovery goal: ≥1 promotes P-9 → C-N
+  via brief 100-style codification. Uses brief 096
+  wrapper. Brief 098 attempted-with-source recovery rate
+  was 33%; P-9 candidates are smaller (0x20-0x40) so
+  faster iteration. Branch: `cloud/permuter-vs-p9`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
+  `decomper`, shipped in PR #500. **13 ports / 648
+  bytes / 68% yield.** C-24 application expanded beyond
+  `.legacy_sp3.c` to **two adjacent routing tiers** (4
+  via `.legacy.c`, 9 via default `.c`). Of the 9 default-
+  `.c` ports, all byte-matched natural form — brief 097's
+  "indirect-call" classification was over-broad (third
+  NEGATIVE finding). Routing-tier insight: `lr`-as-
+  scratch is NOT sp3-exclusive — softens C-24's "uses
+  lr → 1.2-family" hint. Cumulative briefs 101+102: **25
+  ports / 1464 bytes**. Brain pushed empty commit
+  `0032550` to retrigger CI that didn't initially fire +
+  close/reopen the PR for the same reason.
+- [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
+  `cloud`, shipped in PR #501. **New P-9 entry: mvnNE-
+  write peephole gap.** 90 compiles (6 variants × 15
+  SPs) all miss — mwcc 2.0 lowers `cond ? -1 : 0` as
+  `mov + rsb` instead of direct `mvnNE rN, #0` across
+  ALL toolchain SPs. Big methodology win: 281-candidate
+  pool narrowed to **36 strict P-9 signature** matches;
+  ~245 are likely naturals (second NEGATIVE finding in
+  a row). **P-8 annotated SUPERSEDED BY C-25**
+  (housekeeping). Future-attempt paths: `asm void` +
+  `nofralloc` recipe OR permuter sweep (brief 105).
 
 - [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
   `decomper`, shipped in PR #498. **12 ports / 816 bytes
