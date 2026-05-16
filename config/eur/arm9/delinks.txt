@@ -7659,6 +7659,10 @@ src/main/func_020335d4.c:
 
 
 
+src/main/data_020b4748.c:
+    complete
+    .rodata start:0x020b4748 end:0x020b4768
+
 src/main/bss/data_main_bss_pre.s:
     complete
     .bss start:0x02102c60 end:0x02102d44
