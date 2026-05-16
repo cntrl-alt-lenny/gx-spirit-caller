@@ -313,27 +313,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  C-26 wave 2 on the broader strict-sig pool (~121
-  remaining candidates after brief 104 took 4 of 125;
-  helper-body inspection per brief 100 rule, target
-  8-12 candidates). (2) P-9 early-return sub-pool
-  application (~12 candidates from brief 105's scope
-  refinement, natural-source recoverable). Self-extend
-  gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c26-w2-p9-early-return`.
+- [`docs/briefs/108-c27-application-wave-1.md`](docs/briefs/108-c27-application-wave-1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): C-27 application
+  wave 1 (~15-20 candidates from ~80-candidate cross-
+  corpus pool). Dual-extern + symbols.txt alias recipe
+  per brief 107's worked example. Try natural form
+  FIRST per 6-NEGATIVE-finding rule. Self-extend gate:
+  yield ≥40% + bytes ≥250. Branch:
+  `decomper/c27-application-wave-1`.
 
-- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
-  — `cloud` (MEDIUM): final brief 097 residue patterns
-  — pool-word count (~3 candidates) + cross-module BL
-  (~3 candidates). Roll both into one brief; brief 084 /
-  088 / 099 / 100 / 103-style codegen sweeps. Watch for
-  NEGATIVE findings (5 consecutive walls research
-  briefs have surfaced classification over-reach).
-  Branch: `cloud/poolword-crossmodule-bl-research`.
+- [`docs/briefs/109-brief-106-residue-research.md`](docs/briefs/109-brief-106-residue-research.md)
+  — `cloud` (MEDIUM): walls research on brief 106's 5
+  skipped patterns (`func_02037b34` / `func_02079ddc` /
+  `func_020326d4` / `func_020aac30` / `func_020338f8`).
+  Brief 084 / 088 / 099 / 100 / 103 / 105 / 107-style
+  codegen sweep on most-cluster-able pattern. Goal: ≥1
+  new C-N or P-N entry. Branch:
+  `cloud/brief-106-residue-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
+  `decomper`, shipped in PR #507. **10 ports / 952
+  bytes / 67% combined yield** (effective 9 after
+  `func_02033488` dedup vs brief 105). C-26 wave 2: 5
+  ports (4 via `.legacy.c`). P-9 early-return: 5 ports
+  across three routing tiers. **Source-form refinements:**
+  `goto end;`, `&array[idx*N]`, multi-restore early-
+  return. **C-class application chain cumulative
+  101+102+104+106: 43 ports / 2976 bytes.** Coordination
+  miss flagged: future brief specs need explicit
+  already-shipped exclusion lists for sub-pool overlap.
+- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
+  `cloud`, shipped in PR #506. **Brief 097 residue
+  classification COMPLETE.** **C-27** = pool-word
+  DUPLICATION wall, supersedes P-7. Dual-extern +
+  symbols.txt alias recipe; 120-compile sweep on
+  `func_02023fec`. Cross-corpus: 157 duplicate-pool
+  occurrences, **~80 candidate functions**. **T-4** =
+  cross-module BL analysis gap (NOT codegen wall) —
+  102 unresolved `bl #<imm>` instructions at 23 distinct
+  unnamed addresses; named symbols.txt entry → BL
+  byte-trivially matches. ~25-33 function unlocks.
+  Brief 097 hand-back's 31 candidates → 5 wall families
+  classified end-to-end.
 
 - [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
   `decomper`, shipped in PR #503. **8 ports / 560 bytes**

@@ -8,52 +8,61 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-16 (Mac brain — brief 104 + 105 merge).
-**Brief 104 CLOSED at 8 ports / 560 bytes**: C-24 chain capped
-(waves 1+2+3 = **33 cumulative ports / 2024 bytes**) + C-26 strict-
-sig wave 1 landed 4 ports (4-for-4 on the helper-first-instruction
-inspection rule). **Fourth NEGATIVE finding** (3 of 8 ports matched
-natural form). **Brief 105 CLOSED: 1 recovery + P-9 scope
-refinement** — wall applies to MASK form `cond ? -1 : 0`, NOT
-EARLY-RETURN form `if (cond) return -1; ...`. 36-candidate strict
-pool partitions: ~⅓ early-return (natural-source recoverable),
-~⅔ mask (true permanent including against permuter). EUR **1.71%**,
-USA + JPN **0.70%**. **Codegen-walls catalog stable at 26 coercible
-+ 10 permanent + 2 candidate.**
+**Last updated:** 2026-05-16 (Mac brain — brief 106 + 107 merge).
+**Brief 106 CLOSED at 10 ports / 952 bytes / 67% combined yield.**
+C-26 wave 2 (5 ports, 4 via `.legacy.c`) + P-9 early-return
+application (5 ports across three routing tiers). **Cumulative
+C-class chain briefs 101+102+104+106: 43 ports / 2976 bytes.**
+5th consecutive NEGATIVE finding. **Brief 107 CLOSED: brief 097
+residue classification COMPLETE.** **C-27** (pool-word DUPLICATION)
+**supersedes P-7** — dual-extern + symbols.txt alias recipe at
+default mwcc `2.0/*`, **~80 candidate cross-corpus pool**. **T-4**
+is a new wall TYPE (analysis-completeness, NOT codegen): 102
+unresolved BL instructions at 23 distinct unnamed addresses, **~25-33
+function unlocks** after symbols.txt promotion. EUR **1.77%**, USA +
+JPN **0.70%**. **Codegen-walls now at 27 coercible + 10 permanent +
+2 candidate + T-4 analysis tier.**
 
 ## Today's merges (just-landed)
 
-- **PR #503 — decomper / brief 104 (C-24 cap + C-26 wave 1).**
-  8 ports / 560 bytes. C-24 wave 3 final: 4 ports (3 default `.c` +
-  1 `.legacy.c`). C-26 strict-sig wave 1: 4 ports, all `.legacy.c`,
-  all confirmed via helper-first-instruction inspection (`ldr r0,
-  [pc, #N]` pattern). **C-24 chain cumulative 33 ports / 2024 bytes
-  across briefs 101+102+104.** 4th NEGATIVE finding in a row.
-  Brain resolved merge conflict in `config/eur/arm9/delinks.txt`
-  against brief 105's parallel work; same CI quirk as PR #500
-  (workflows only fired after merge-conflict resolution push).
-- **PR #504 — cloud / brief 105 (P-9 permuter sweep).** 5 of 6
-  P-9 candidates attempted. 1 base recovery (`func_02033488`,
-  natural early-return source) + 4 plateau. **Key finding:** wall
-  applies specifically to `cond ? -1 : 0` MASK form, NOT
-  `if (cond) return -1; ...` EARLY-RETURN form. Recovery was
-  iteration-1 base-form match, not a permuter mutation — cloud
-  honestly framed it as scope-refinement, not C-N promotion.
-  Permuter rescue rate calibration: 33% (brief 098, P-8 reg-alloc)
-  vs 20% (brief 105, P-9 IR-lowering) suggests permuter is more
-  useful for reg-alloc walls than IR-lowering ones. Brain resolved
-  merge conflict against PR #503's parallel work.
+- **PR #507 — decomper / brief 106 (C-26 wave 2 + P-9 early-return).**
+  10 ports / 952 bytes (effective 9 after dedup — see coordination
+  note below). C-26 wave 2: 5 ports (4 via `.legacy.c`, 1 default
+  `.c` per NEGATIVE-finding methodology). P-9 early-return: 5 ports
+  across three routing tiers (3 default `.c`, 1 `.legacy_sp3.c`,
+  1 `.legacy.c`) — brief 105's "natural-source recoverable" framing
+  shape-correct but routing-varied. **Source-form refinements:**
+  `goto end;` to force `mov+pop` over `popeq`, `&array[idx*N]` for
+  mla emission, multi-restore early-return for natural critsec
+  match. **Coordination miss:** decomper re-ported `func_02033488`
+  which brief 105 had already shipped. Brain resolved by keeping
+  cloud's version + dropping decomper's duplicate. Future brief
+  specs need explicit "already-shipped" exclusion lists for sub-
+  pool overlap.
+- **PR #506 — cloud / brief 107 (pool-word + cross-module-BL
+  research).** **Brief 097 residue classification COMPLETE** —
+  end-to-end demonstration of the walls-research methodology
+  pipeline working through 31 residue candidates into 5 wall
+  classifications. **C-27** = pool-word DUPLICATION wall, supersedes
+  P-7 (same pattern as P-8 → C-25 promotion). Dual-extern + alias
+  entry recipe; 120-compile sweep on `func_02023fec`. **~80
+  candidate cross-corpus pool**. **T-4** = cross-module BL
+  analysis gap (not codegen wall) — 102 unresolved BL instructions
+  at 23 distinct unnamed addresses; 99/102 unknown to dsd, 3
+  misclassified as data. Once named, BLs emit trivially byte-
+  identical. **~25-33 function unlocks** await symbols.txt
+  promotion.
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
-| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102+104+105) | 123 matches / 6624 bytes |
+| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102+104+105+106) | 132 matches / 7576 bytes |
 | Cross-region apply (briefs 075+078+090+094) | 383 ports × 2 regions = 766 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
-| Codegen-walls catalogued | **26 coercible** + **10 permanent** + 2 candidate (W-stack-split 2dp / W-popcount-mask-order 1dp; W-N → C-25; P-8 superseded by C-25; P-9 mask vs early-return scope refinement per brief 105) |
-| Tooling unblocked | Permuter wrapper (096) + walls-research methodology pipeline + natural-form-first rule |
-| Total session match-equivalents | ~1005 |
+| Codegen-walls catalogued | **27 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 added this session; W-N → C-25; P-7 superseded by C-27; P-8 superseded by C-25) |
+| Tooling unblocked | Permuter wrapper (096) + walls-research pipeline + natural-form-first rule + brief 097 residue COMPLETE |
+| Total session match-equivalents | ~1014 |
 
 Cross-region applies and cross-project ports are region-neutral
 work — each port slot unlocks ×3 region matches when bootstrapped
@@ -74,89 +83,108 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 104 + 105
-close and brief 106 + 107 queue lands.
+**Open PRs: 0** once this brain-PR for brief 106 + 107
+close and brief 108 + 109 queue lands.
 
-**Decomper — brief 106 (HIGH, NEW):**
+**Decomper — brief 108 (HIGH, NEW):**
 
-- **C-26 wave 2 + P-9 early-return sub-pool application.**
-  Two-part wave:
-  1. **C-26 wave 2 from the broader strict-sig pool.**
-     Brief 104 took 4 of the ~125 candidates with the
-     OS_Disable/Restore pair. Brief 100 confirmed C-26
-     applies when helper writes r0 first non-prologue
-     instruction. ~121 candidates remain; pick 8-12 via
-     the helper-body inspection rule. Try natural form
-     FIRST per the now-operational rule.
-  2. **P-9 early-return sub-pool application.** Brief
-     105's scope refinement: ~12 candidates with the
-     `if (cond) return -1; ...` early-return form are
-     natural-source recoverable. Pick 6-10 from the
-     sub-pool and apply natural source. (Mask form
-     ~24 candidates stay permanent.)
+- **C-27 application wave 1.** Brief 107 shipped the
+  C-27 pool-word DUPLICATION recipe (dual-extern +
+  symbols.txt alias, default mwcc `2.0/*` SPs).
+  ~80 candidate cross-corpus pool. Wave 1: pick 15-20
+  candidates from the smallest size band (≤0x60).
+  Per-candidate: write source with two extern
+  declarations referencing the same address, add a
+  symbols.txt alias entry, build, verify. Apply natural
+  form FIRST per the 5-NEGATIVE-findings rule (some
+  candidates may match without needing the alias).
   Self-extend gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c26-w2-p9-early-return`.
+  `decomper/c27-application-wave-1`.
 
-**Cloud — brief 107 (MEDIUM, NEW):**
+**Cloud — brief 109 (MEDIUM, NEW):**
 
-- **Final brief-097 residue patterns: pool-word count +
-  cross-module BL.** Two remaining brief 097 patterns
-  (~3 candidates each) — small populations but rolling
-  both into one brief covers the residue. Brief 084 /
-  088 / 099 / 100 / 103-style codegen sweeps on
-  smallest exemplars. Watch for NEGATIVE findings (5
-  consecutive walls research briefs have surfaced
-  classification over-reach). Branch:
-  `cloud/poolword-crossmodule-bl-research`.
+- **Brief 106 hand-back walls research.** Brief 106's
+  funnel surfaced 5 new wall candidates that didn't fit
+  existing recipes:
+  1. `func_02037b34` — predicated vs early-return form
+     mismatch (mwcc 2.0 chose predication where orig
+     used early-return).
+  2. `func_02079ddc` — r1/r2 reg-alloc swap on indexed
+     halfword load.
+  3. `func_020326d4` — mwcc didn't split `ctx+0x1fc`
+     intermediate.
+  4. `func_020aac30` — push {r0-r3} arg-spill vs
+     str-spill.
+  5. `func_020338f8` — predication shape (brief 104
+     carryover).
+  Pick the most-cluster-able pattern as smallest single-
+  wall exemplar; brief 084 / 088 / 099 / 100 / 103 /
+  105 / 107-style codegen sweep. Watch for NEGATIVE
+  findings. Goal: ≥ 1 new C-N or P-N entry. Branch:
+  `cloud/brief-106-residue-research`.
 
-**Backlog (post-106/107):**
+**Backlog (post-108/109):**
 
-1. **Pre-stage source baselines for the 5 brief-098
-   untested candidates** + permuter retry. 2 brief-097
-   (skipped during initial wave) + 3 brief-094 USA-side
-   byte-diffs. Decomper-side work.
-2. **P-9 mask-form asm-void recipe.** Brief 105 confirmed
-   mask form (~24 candidates) is permanent for both
-   source-form AND permuter paths. `asm void` +
-   `nofralloc` (C-12 / C-16 style) is the only remaining
-   future-attempt path; would take ~10 lines of inline
-   asm per target. Worth scoping when ≥3 candidates are
-   ≥0x40 bytes.
-3. **Data-tier work** — currently 0%. Decomper flagged
-   in brief 097 hand-back as the next major lever.
-   Scoping brief still pending.
-4. **W-stack-split codegen sweep** — 2 datapoints
-   (`func_02004f58`, `func_02004ef4`). One more datapoint
-   would justify a brief 084-style codegen sweep.
-5. **W-popcount-mask-order** — 1 datapoint. Track for
-   recurrence.
-6. **64 unrecovered brief-094 ports** — 4 symbol-name
-   collisions + 34 undefined-callee drops + 3 byte-diff
-   + 23 other-refused. Await source pre-staging or
-   named-symbol promotion.
+1. **T-4 application wave (decomper).** Brief 107
+   surfaced 23 unnamed BL targets unlocking 8 main +
+   15-25 overlay caller functions via symbols.txt
+   promotion in correct overlays. NOT codegen work
+   (analysis-completeness). Pure symbol naming. Brief
+   110-or-111 candidate.
+2. **C-26 wave 3 (decomper).** Brief 106 took 5 of 121
+   remaining strict-sig pool; ~116 candidates remain.
+3. **Pre-stage source baselines for the 5 brief-098
+   untested candidates** + permuter retry.
+4. **P-9 mask-form asm-void recipe.** Brief 105
+   confirmed permanent for source + permuter; `asm
+   void` is the only remaining path. Worth scoping
+   when ≥3 candidates are ≥0x40 bytes.
+5. **Data-tier work** — currently 0%. The biggest
+   unrealized lever. Needs scoping brief.
+6. **W-stack-split codegen sweep** — 2 datapoints;
+   awaiting 3rd to justify codegen sweep.
+7. **W-popcount-mask-order** — 1 datapoint.
+8. **64 unrecovered brief-094 ports** — await source
+   pre-staging or named-symbol promotion (T-4 may
+   resolve some via the same mechanism).
 
-**Strategic state — walls-research methodology mature:**
+**Strategic state — walls-research pipeline mature
++ brief 097 residue COMPLETE:**
 
-The walls-research pipeline operates reliably now. Pattern:
+The walls-research pipeline operates reliably:
 
 1. Decomper hand-back surfaces residue patterns.
 2. **TRY NATURAL FORM FIRST** at default mwcc 2.0/sp1p5
-   (cemented across briefs 100 / 102 / 103 / 104 / 105 —
-   **five consecutive NEGATIVE findings**, ~30% over-
-   classification rate is the empirical baseline).
+   (cemented across briefs 100 / 102 / 103 / 104 / 105
+   / 106 — **six consecutive NEGATIVE findings**, ~30%
+   over-classification rate is the empirical baseline).
 3. Permuter sweep discovers recipes for actually-walled
    subset (brief 098 P-8 → C-25 promotion; brief 105 P-9
    scope refinement).
-4. Cloud codegen sweep codifies (briefs 099 / 100 / 103).
-5. Decomper applies at scale (briefs 101 / 102 / 104).
+4. Cloud codegen sweep codifies (briefs 099 / 100 / 103
+   / 107).
+5. Decomper applies at scale (briefs 101 / 102 / 104 /
+   106).
 
-This pipeline shipped **34 new EUR matches across this
-session's walls-research run (briefs 098-105)** plus
-4 new catalog entries (C-24 / C-25 / C-26 / P-9). The
-cycle is **recipe-bound**, not pool-bound. **Two
-permuter datapoints (brief 098 / 105)** suggest permuter
-is more useful for reg-alloc walls (P-8 → C-25) than
-IR-lowering walls (P-9 → scope refinement only).
+**Brief 097 residue (31 candidates) is now FULLY
+CLASSIFIED across 5 wall families:**
+
+| Pattern | Wall classified | Application status |
+|---|---|---|
+| Indirect call (~12) | C-24 (brief 099) | 33 ports shipped via 101+102+104 |
+| Critical-section (~8) | C-26 (brief 100) | 9 ports shipped via 104+106 |
+| Predicated cascade (~6) | P-9 mask + scope refinement (briefs 103+105) | 5 P-9 early-return shipped via 106 |
+| Pool-word (~3) | C-27 supersedes P-7 (brief 107) | ~80-candidate pool awaiting brief 108 |
+| Cross-module BL (~3) | T-4 analysis-completeness (brief 107) | ~25-33 unlocks awaiting brief 110 |
+
+A "0-yield" hand-back (brief 097) generated ~150+ future
+matches across systematic walls research. End-to-end
+demonstration of the methodology pipeline.
+
+**Codegen-walls catalog at 27 coercible + 10 permanent +
+2 candidate + T-4** (analysis tier — new mechanism class).
+Two P-class → C-class promotions this session (P-7 → C-27
+via brief 107, P-8 → C-25 via brief 098 + 100).
 
 **Brief 097's classifications were over-inclusive across
 FIVE patterns** (critsec, indirect-call, predicated-
@@ -168,40 +196,36 @@ USA + JPN 0.70% means most of the ROM is still unmatched
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 106 (C-26 wave 2 +
-   P-9 early-return application) PR** when it opens.
-   EUR `ninja rom` + `dsd check modules` 24/27 baseline.
-   Watch yield trajectory: C-26 wave 2 broader strict-
-   sig pool should hold near brief 104's 4-for-4 strict
-   yield IF helper-body inspection rule is applied
-   consistently; P-9 early-return is the natural-source
-   slice (~12 candidates), expect ≥7 byte-identical at
-   first attempt. Self-extend gate fires for waves 3
-   if combined yield ≥40%.
-2. **Verify + merge cloud brief 107 (pool-word + cross-
-   module-BL walls research) PR** when it opens. Pure
-   docs; sweep matrix + classification per brief 084
-   pattern. Each remaining pattern has only ~3
-   candidates — watch for NEGATIVE findings (now the
-   empirical baseline at ~30% over-classification rate).
-3. **Scope brief 108+ after 106 + 107 close.** Options
+1. **Verify + merge decomper brief 108 (C-27 application
+   wave 1) PR** when it opens. EUR `ninja rom` + `dsd
+   check modules` 24/27 baseline. Watch first-wave yield
+   vs brief 107's worked example — C-27 should land
+   strongly for the strict-signature subset of the
+   ~80-candidate pool. Self-extend fires for wave 2 if
+   yield ≥40%.
+2. **Verify + merge cloud brief 109 (brief 106 hand-back
+   walls research) PR** when it opens. Pure docs work;
+   sweep matrix on the 5 new patterns from brief 106's
+   skip list. Watch for NEGATIVE findings (operational
+   baseline now).
+3. **Scope brief 110+ after 108 + 109 close.** Options
    ranked by leverage:
-   - **C-26 wave 3** if brief 106's C-26 half yielded
-     well + 100+ candidates remain in strict-sig pool.
-   - **Permuter source pre-staging brief** — write
-     baseline C for the 5 brief-098 untested candidates;
-     re-run permuter sweep. Probably 1-2 more recoveries
-     given calibration.
-   - **Data-tier scope brief** — still pending. Likely
-     needs a dedicated brief just to scope what "data-
-     tier matching" means in the dsd workflow. **Biggest
-     unrealized lever** per decomper's brief 097 hand-
-     back framing.
+   - **T-4 application wave** (decomper) — 23 unnamed
+     BL targets, symbols.txt promotion in correct
+     overlays. Unlocks ≥ 8 main + 15-25 overlay caller
+     functions. Pure analysis + naming work, not
+     codegen recipe application.
+   - **C-26 wave 3** if brief 106's C-26 half still
+     leaves ~100 candidates in strict-sig pool.
+   - **C-27 wave 2** if brief 108's wave 1 yielded
+     well.
    - **Cross-region apply wave 3** — accumulate brief
-     101+102+104+106 single-region matches and apply to
-     USA + JPN via port_to_region.py. Brief 095 D2 v2
-     auto-promote should make this cleaner than brief
-     094 wave 2.
+     101+102+104+106+108 single-region matches and
+     port to USA + JPN. Brief 095 D2 v2 auto-promote
+     should make this cleaner than brief 094 wave 2.
+     Big USA/JPN badge climb expected.
+   - **Data-tier scope brief** — still pending; biggest
+     unrealized lever.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
