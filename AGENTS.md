@@ -313,26 +313,52 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
+- [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
   — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  C-24 wave 3 self-extend on remaining ~13 candidates
-  from the 49-pool. (2) C-26 strict-signature wave on
-  8-10 candidates from brief 100's identified subset
-  of the 125-candidate critsec pool. Continue brief 100
-  NEGATIVE-finding methodology — try natural form FIRST.
-  Self-extend gate (chain cap): yield ≥40% + bytes ≥250.
-  Branch: `decomper/c24-w3-c26-application`.
+  C-26 wave 2 on the broader strict-sig pool (~121
+  remaining candidates after brief 104 took 4 of 125;
+  helper-body inspection per brief 100 rule, target
+  8-12 candidates). (2) P-9 early-return sub-pool
+  application (~12 candidates from brief 105's scope
+  refinement, natural-source recoverable). Self-extend
+  gate: yield ≥40% + bytes ≥250. Branch:
+  `decomper/c26-w2-p9-early-return`.
 
-- [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
-  — `cloud` (MEDIUM): permuter sweep on 5-8
-  representative P-9 candidates (mvnNE-write peephole
-  gap, brief 103). Recovery goal: ≥1 promotes P-9 → C-N
-  via brief 100-style codification. Uses brief 096
-  wrapper. Brief 098 attempted-with-source recovery rate
-  was 33%; P-9 candidates are smaller (0x20-0x40) so
-  faster iteration. Branch: `cloud/permuter-vs-p9`.
+- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
+  — `cloud` (MEDIUM): final brief 097 residue patterns
+  — pool-word count (~3 candidates) + cross-module BL
+  (~3 candidates). Roll both into one brief; brief 084 /
+  088 / 099 / 100 / 103-style codegen sweeps. Watch for
+  NEGATIVE findings (5 consecutive walls research
+  briefs have surfaced classification over-reach).
+  Branch: `cloud/poolword-crossmodule-bl-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
+  `decomper`, shipped in PR #503. **8 ports / 560 bytes**
+  total. C-24 wave 3 final: 4 ports (3 default `.c` + 1
+  `.legacy.c`) — chain capped. C-26 strict-sig wave 1: 4
+  ports, all via `.legacy.c`, all confirmed via helper-
+  first-instruction inspection rule (`ldr r0, [pc, #N]`
+  pattern). **Cumulative C-24 chain across briefs 101+
+  102+104: 33 ports / 2024 bytes.** Brain resolved merge
+  conflict in delinks.txt against brief 105's parallel
+  `func_02033488`; same CI workflow-trigger quirk as PR
+  #500 (workflows fired only after merge-conflict
+  resolution push).
+- [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
+  `cloud`, shipped in PR #504. **1 base recovery
+  (`func_02033488`) + P-9 scope refinement.** Wall
+  applies to MASK form (`cond ? -1 : 0`), NOT EARLY-
+  RETURN form (`if (cond) return -1; ...`). 36-candidate
+  strict pool partitions: ~⅓ early-return (natural-
+  source recoverable) / ~⅔ mask (true permanent). The
+  recovery was iter-1 base form match, not a permuter
+  mutation — cloud framed it as scope refinement, not
+  C-N promotion. Permuter rescue rate: 20% (1/5) vs
+  brief 098's 33% (1/3) — permuter more useful for
+  reg-alloc walls than IR-lowering walls.
 
 - [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
   `decomper`, shipped in PR #500. **13 ports / 648
