@@ -7650,3 +7650,11 @@ src/main/func_020335d4.c:
 
 
 
+
+src/main/bss/data_main_bss_pre.s:
+    complete
+    .bss start:0x02102c60 end:0x02102d44
+
+src/main/bss/data_main_bss.s:
+    complete
+    .bss start:0x02102d44 end:0x021aa4a0
