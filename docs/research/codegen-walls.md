@@ -105,7 +105,7 @@ EARLY-RETURN form is unrelated codegen sharing the `mvn`
 instruction. The 36-candidate pool sub-divides: ~⅓ early-return
 (recoverable with natural source), ~⅔ mask form (true P-9
 permanent including against permuter exploration).
-Brief 107 (PR #?) **closed the brief 097 residue classification
+Brief 107 (PR #506) **closed the brief 097 residue classification
 phase** by sweeping the final two patterns: pool-word count
 mismatch (~3 of 31) + cross-module BL (~3 of 31). Pool-word
 classification: ran 8-variant × 15-SP sweep on `func_02023fec`
@@ -128,11 +128,30 @@ complete:** all 5 patterns (indirect-call → C-24, critical-
 section → C-26, predicated-cascade → P-9 + early-return scope-
 refinement, pool-word → C-27, cross-module BL → T-4) are now
 classified or recipe-codified.
+Brief 109 (PR #?) opened the **brief 106 residue classification
+phase** with codegen sweeps on 5 candidates brief 106 surfaced
+as wall candidates. One recovery (`func_020338f8` — recipe:
+explicit ternary intermediate + `result = 1` set before
+OS_DisableIrq + separate flag-check stage; byte-matches at all
+10 mwcc 2.0/* SPs); classified as **C-28 — predicated-cascade
+collapse**, sibling of C-25 + C-26 in the "split-statement
+intermediate" family. One P-N classification (`func_02037b34`
+— 6-variant × 15-SP sweep, all 75 compiles predicate the tail);
+classified as **P-10 — over-predication of short tail vs
+early-return**, distinct from P-9's mvnNE-write peephole.
+Permuter is the next-attempt path. Two partial findings worth
+flagging: `func_02079ddc` recovers 13/17 instructions at
+`.legacy.c` routing but residue is P-4-family r1↔r2 reg-alloc
+swap on the indexed halfword load; `func_020326d4` natural form
+is +8 bytes over (mwcc CSE folds `base + 0x1fc` back into
+`base + 0xe7c`, defeating source-level intermediate-pointer
+coercion attempts at all 15 SPs). Both partials are P-N
+candidates pending a permuter-vs-residue follow-up brief.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
-(27 patterns — the right C variation or routing tier
+(28 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
-(9 patterns — mwcc keeps "winning" the codegen choice
+(10 patterns — mwcc keeps "winning" the codegen choice
 regardless of C variation; budget zero matches in the yield
 band), and **tooling-tractable**
 (4 patterns —
@@ -198,7 +217,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (27 patterns)
+## Coercible-with-knowledge (28 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -3254,7 +3273,172 @@ recipe doesn't disturb adjacent functions). Classified as
 **C-27 — pool-word DUPLICATION wall** with the dual-extern +
 symbols.txt-alias recipe.
 
-## Permanent (9 patterns)
+### C-28. Predicated-cascade collapse — explicit ternary intermediate
+
+> **Wall family note — C-28 vs C-25 vs C-26.** All three are
+> "split-statement intermediate" coercions where mwcc's natural
+> optimization combines multiple expressions into a single
+> predicated cascade or chained-reg-allocation, and the orig's
+> compiler kept them as separate steps with intermediate
+> materialization.
+>
+> | Wall | What mwcc combines | Coercion | Routing |
+> |---|---|---|---|
+> | **C-25** | bitfield-chain reg-alloc (r0 lives across chain) | split chain into 2 statements + named temp | default 2.0/sp1p5 |
+> | **C-26** | critical-section helper call (mwcc passes p in r0) | helper signature without args + `.legacy.c` | `*.legacy.c` (1.2/sp2p3) |
+> | **C-28** (this entry) | predicated-cascade (mwcc fuses tst → movne/moveq → cmp → moveq into the predicated branch decision) | explicit ternary intermediate variable | default 2.0/sp1p5 |
+>
+> C-28 is the lightest-touch of the three — just one extra local
+> variable `int flag = ... ? 1 : 0;` between the test and the
+> decision. No routing change.
+
+**Target asm (`func_020338f8` — brief 109 worked example):**
+
+```text
+
+stmdb sp!, {r3, r4, r5, lr}
+mov   r4, r0                       ; r4 = p (caller's arg)
+mov   r5, #0x1                     ; result = 1 (set BEFORE bl, survives)
+bl    OS_DisableIrq
+ldr   r1, [r4, #0xeb4]
+mov   r4, r0                       ; r4 = saved IRQ state (clobbers p)
+tst   r1, #0x2000
+movne r0, r5                       ; flag = (bit set) ? 1 : 0
+moveq r0, #0x0
+cmp   r0, #0x0
+moveq r5, #0x0                     ; if (flag == 0) result = 0
+beq   .L_skip
+bl    func_02046ae0
+cmp   r0, #0x1
+movle r5, #0x0                     ; if (helper() <= 1) result = 0
+.L_skip:
+mov   r0, r4
+bl    OS_RestoreIrq
+mov   r0, r5
+ldmia sp!, {r3, r4, r5, pc}
+
+```
+
+19 insns = 0x4c. The diagnostic is the **two-stage decision**:
+the ternary `tst → movne r0,r5 / moveq r0,#0` materializes a flag
+in r0, then a separate `cmp r0,#0 → moveq r5,#0 → beq` consumes
+the flag and updates result. mwcc's natural form combines these
+into a single `tst → moveq r5,#0 → beq` (three insns shorter).
+
+**mwcc emits when miscoded** (natural inline form):
+
+```c
+int func_020338f8(state_t *p) {
+    int saved = OS_DisableIrq();
+    int result = 1;
+    if ((p->flag_eb4 & 0x2000) == 0) {
+        result = 0;
+    } else {
+        if (func_02046ae0() <= 1) result = 0;
+    }
+    OS_RestoreIrq(saved);
+    return result;
+}
+```
+
+```text
+
+stmdb sp!, {r3, r4, r5, lr}
+mov   r4, r0
+bl    OS_DisableIrq
+ldr   r1, [r4, #0xeb4]
+mov   r5, #1                       ; result = 1 (set AFTER bl)
+tst   r1, #0x2000
+mov   r4, r0
+moveq r5, #0                       ; if eq: result = 0 (combine cmp+moveq)
+beq   .L_skip                      ; branch
+bl    func_02046ae0
+cmp   r0, #1
+movle r5, #0
+.L_skip:
+mov   r0, r4
+bl    OS_RestoreIrq
+mov   r0, r5
+pop {r3, r4, r5, pc}
+
+```
+
+16 insns = 0x40. **−0x0c bytes** vs target. mwcc collapsed the
+ternary + flag-check into a single `moveq r5, #0; beq` because
+the flag is only consumed by one branch decision.
+
+**C that coerces it (verified byte-identical against `func_020338f8`,
+default mwcc 2.0/sp1p5 — no routing change):**
+
+```c
+extern int  OS_DisableIrq(void);
+extern void OS_RestoreIrq(int saved);
+extern int  func_02046ae0(void);
+
+struct s338f8 {
+    char _pad[0xeb4];
+    int  flag_eb4;
+};
+
+int func_020338f8(struct s338f8 *p) {
+    int saved;
+    int flag;
+    int result = 1;
+    saved = OS_DisableIrq();
+    flag = (p->flag_eb4 & 0x2000) ? 1 : 0;   /* explicit intermediate */
+    if (flag == 0) {
+        result = 0;
+    } else {
+        if (func_02046ae0() <= 1) result = 0;
+    }
+    OS_RestoreIrq(saved);
+    return result;
+}
+```
+
+Three source-form factors fire together:
+1. **`result = 1` declared at function top** (before `OS_DisableIrq`)
+   → mwcc spills `r5 = 1` BEFORE the bl, surviving the call.
+   Without this, mwcc defers the init until after the ldr, losing
+   r5's pre-bl placement.
+2. **Explicit `flag = (expr) ? 1 : 0` intermediate** → mwcc emits
+   the materialization into r0 via `movne r0, r5; moveq r0, #0`,
+   instead of folding the tst directly into the branch decision.
+3. **Separate `if (flag == 0)` check** → mwcc emits `cmp r0, #0;
+   moveq r5, #0; beq` as a distinct decision stage, instead of
+   collapsing into a single `moveq r5, #0; beq` based on tst flags.
+
+Removing ANY of the three regresses the size (one fewer insn each).
+
+**SP boundary (verified 15 mwcc SPs, 6 source variants):**
+
+| mwcc SP | A_natural | B_explicit_intermediate |
+|---|---|---|
+| 1.2/base..sp2p3 | 0x4c+ | 0x58 |
+| 1.2/sp3, sp4 | 0x4c | 0x54 |
+| 2.0/base..sp2p4 (10 SPs) | 0x40 | **0x4c ✓** |
+
+Default mwcc 2.0/sp1p5 with variant B hits target's exact bytes.
+
+**Cross-corpus survey:** the strict C-28 signature is "critical
+section + ternary-driven flag-then-branch" with the
+movne/moveq/cmp/moveq cascade. Brief 100's critical-section
+cross-corpus survey found 125 unmatched candidates; how many
+fit the C-28 signature (vs C-26's helper-signature form) needs
+a per-candidate spot-check.
+
+**Provenance:** brief 106 (decomper hand-back) listed
+`func_020338f8` as a "predication shape (carryover from brief
+104)" residue candidate. Brief 109 (PR #?) ran a codegen sweep
+across 6 source variants + identified the explicit-ternary-
+intermediate recipe; recipe byte-matches at default mwcc
+2.0/sp1p5 (no routing). End-to-end validated: built
+`src/main/func_020338f8.c`, .o byte-identical to target,
+`dsd check modules` preserves 24/27 baseline. Classified as
+**C-28 — predicated-cascade collapse**, sibling of C-25 + C-26
+in the "split-statement intermediate" family.
+
+## Permanent (10 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -3763,6 +3947,122 @@ mask form; the early-return form is unrelated codegen sharing
 the diagnostic `mvn` instruction. ~12 of the 36-candidate pool
 are estimated early-return form (recoverable with natural
 source), ~24 are mask form (true P-9 permanent).
+
+### P-10. Over-predication of short tail vs early-return
+
+**Target asm (`func_02037b34` — brief 109 worked example):**
+
+```text
+
+stmdb sp!, {r3, lr}
+bl    helper                       ; helper() → r0
+cmp   r0, #0x0
+mvneq r0, #0x0                     ; if (r0 == 0) r0 = -1
+ldmeqia sp!, {r3, pc}              ; ← EARLY RETURN on eq
+ldr   r0, [r0, #0x34]              ; (unpredicated tail)
+mov   r0, r0, lsl #0x10            ; zero-extend u16 via lsl 16
+mov   r0, r0, lsr #0x10            ;                + lsr 16
+ldmia sp!, {r3, pc}
+
+```
+
+9 insns = 0x24. The diagnostic is the **early-return**
+(`ldmeqia` between the mvneq and the load) followed by an
+UNPREDICATED tail. orig's compiler split the cmp-based decision
+into "return-now-or-fall-through-linearly."
+
+**mwcc emits when miscoded** (every variant tested at every SP —
+all 75 compiles, including with `unsigned int`+`& 0xffff`,
+`unsigned int`+`(short)`, `(v << 16) >> 16`, `unsigned int
+volatile`, and `union {int; short}`):
+
+```c
+extern void *func_02037b04(void);
+struct s { char _pad[0x34]; unsigned short f_34; };  /* OR unsigned int + mask */
+
+int func_02037b34(void) {
+    struct s *p = func_02037b04();
+    if (p == 0) return -1;
+    return (unsigned short)p->f_34;   /* OR p->f_34 & 0xffff */
+}
+```
+
+```text
+
+stmdb sp!, {r3, lr}
+bl    func_02037b04
+cmp   r0, #0
+mvneq r0, #0                       ; if eq: r0 = -1
+ldrne r0, [r0, #0x34]              ; ← PREDICATED tail (else continues)
+lslne r0, r0, #16                  ; (or: ldrhne r0, [r0, #0x34] in u16 form,
+lsrne r0, r0, #16                  ;  which collapses the lsl+lsr too)
+pop {r3, pc}                       ; unconditional final pop
+
+```
+
+7-8 insns = 0x1c-0x20. **−0x04 to −0x08 bytes** vs target. mwcc
+2.0 chose to predicate the entire tail (ldrne / lslne / lsrne)
+rather than emit an early-return. The compiler's cost model
+prefers predication when the predicated branch is short
+(typically ≤4 insns).
+
+**No coercion found.** Tried (6 source variants × 15 mwcc SPs =
+75 compiles):
+
+| Variant | Field type | Tail extension |
+|---|---|---|
+| A_natural | `unsigned short` | `(unsigned short)v` → `ldrhne` (single insn) |
+| B_intmask | `unsigned int` | `v & 0xffff` → `ldrne + lslne + lsrne` |
+| C_intcast | `unsigned int` | `(unsigned short)v` → `ldrne + lslne + lsrne` |
+| D_lslshift | `unsigned int` | `(v << 16) >> 16` → `ldrne + lslne + lsrne` |
+| E_union | `union {int; short}` | `.as_short` → `ldrhne` (single insn) |
+| F_volatile | `volatile unsigned int` | `v & 0xffff` → `ldrne + lslne + lsrne` |
+
+**Every SP predicates the tail.** None emit `mvneq + ldmeqia +
+ldr + lsl + lsr` (target's early-return shape). The wall sits
+in mwcc's "when to predicate vs early-return" cost decision —
+inaccessible from source.
+
+**Why permanent (today):** mwcc 2.0's predication peephole runs
+post-codegen and is not exposed via any `-help` flag.
+Predication-vs-early-return is a compiler-internal decision
+based on instruction count + register live-range analysis. No
+source-form trick observed coerces the early-return shape
+when the tail body is ≤4 insns.
+
+**Affected drops:** brief 105 / 106 `func_02037b34`. The strict
+signature is "function with `mvneq r0, #0` followed by an
+`ldmeqia` early-return," distinct from P-9's mask-form. Brief
+105 spot-checked the `mvnEQ; popEQ` early-return form and found
+it NATURAL-FORM-RECOVERABLE (the `if (cond) return -1` shape
+compiles cleanly). The new wall here is when the early-return
+is followed by a **multi-insn unpredicated tail** that mwcc
+chooses to predicate instead of leaving as a fall-through.
+
+**Future-attempt paths:**
+
+1. **Permuter (brief 096 wrapper)** — brief 098's P-8 → C-25
+   precedent and brief 105's P-9 sweep both showed permuter can
+   sometimes find unexpected source-forms. Brief 105 already
+   tried permuter on `func_02037b34` (best score 210 in 300s, 4
+   threads, ~2000 iters). Worth a longer run (e.g. 1200s × 4
+   threads) before final classification.
+2. **`asm void` + `nofralloc`** recipe (C-12 / C-16 style) —
+   write the predicated cascade replacement directly in inline
+   asm. Heavy per-target cost but unblocks individual recoveries.
+3. **Scope-refinement gate** — like P-9, the broader signature
+   pool may include false-positives where natural form happens
+   to work. Decomper's selection rule should attempt natural
+   form FIRST before invoking this wall's hard skip.
+
+**Provenance:** brief 106 (decomper hand-back) listed
+`func_02037b34` as a "predicated vs early-return form mismatch"
+residue candidate. Brief 109 (PR #?) ran a 6-variant × 15-SP
+codegen sweep (75 compiles); no variant produces the target's
+early-return shape at any SP. Classified as **P-10 — over-
+predication of short tail** (sibling of P-9 mvnNE wall, but at
+the predication-vs-early-return axis rather than the
+mvnNE-write peephole). Permuter is the next-attempt path.
 
 ## Codegen-inherent edge cases (3 patterns)
 
@@ -4579,6 +4879,11 @@ shape we should chase".
 | 107 / sweep | `func_02023fec` | **C-27** (worked example, supersedes P-7) — pool-word DUPLICATION wall; mwcc 2.0/sp1p5 dedupes pool entries, orig emits two separate `.word data_X` slots with the address cached in r4 across the BL. 8-variant × 15-SP sweep (120 compiles): variant F (dual-stash with two distinct extern symbols + `void * volatile *` local pointers + `symbols.txt` alias) byte-matches at all 10 mwcc 2.0/* SPs. End-to-end validated with build + `dsd check modules` (24/27 baseline preserved) | coercible (source-form + symbols.txt alias, default SP) |
 | 107 / scan | (8 main functions + 15-25 overlay functions cross-corpus) | **T-4** (worked sample) — overlay function symbol promotion; 102 unresolved `bl #<imm>` instructions across overlays target 23 distinct addresses, 99 unknown to dsd analysis + 3 misclassified as data(any). NOT a codegen wall — pure analysis-completeness gap. Recipe: name each target in the correct overlay's symbols.txt; mwcc emits `bl <symbol>` and link resolves byte-trivially | tooling-tractable (T-4, application wave outstanding) |
 | 107 / spot | `func_02021158` (cross-corpus C-27 spot-check) | NEGATIVE — natural form at mwcc 2.0/sp1p5 produces 0x30 (single pool, range-check compiled as `sub+cmp+bhi`), target is 0x38 (dual pool + literal `cmp+cmpne` chain). Confirms C-27 wall extends beyond `func_02023fec` AND identifies a SECOND wall in same function (range-check idiom). 157 cross-corpus pool-pair occurrences need a sweep wave to determine how many are C-27-recoverable vs how many carry secondary walls | C-27 (plus secondary wall on range-check) |
+| 109 / sweep | `func_020338f8` | **C-28** (worked example) — predicated-cascade collapse; mwcc 2.0 combines `tst → moveq → beq` whereas orig splits via ternary intermediate. 6-variant × 15-SP sweep: variant B (explicit ternary intermediate + `result = 1` set before bl) byte-matches at all 10 mwcc 2.0/* SPs. End-to-end validated; src committed. | coercible (source-form, default SP) |
+| 109 / sweep | `func_02037b34` | **P-10** (worked example) — over-predication of short tail vs early-return; 6-variant × 15-SP sweep (75 compiles) all predicate the tail (`mvneq + ldrne + lslne + lsrne`); target uses `mvneq + ldmeqia + ldr + lsl + lsr` (early return + unpredicated linear tail). Permuter is next-attempt path | permanent (P-10, source-form pipeline) |
+| 109 / partial | `func_02079ddc` | **C-N partial** — `.legacy.c` (1.2/sp2p3) routing recovers prologue/epilogue + `ands` shape; 13/17 instructions match. Residue is P-4-family **r1↔r2 reg-alloc swap** on the indexed halfword load. Permuter-tractable or P-4-class permanent | partial (.legacy.c + P-4 residue) |
+| 109 / partial | `func_020326d4` | **P-N candidate** — natural form at default 2.0/sp1p5 is 0x58 (target 0x50, +8 bytes over). mwcc CSE folds `base + 0x1fc` back into `[base, #0xe7c]` direct access, defeating intermediate-pointer coercion attempts (variants B/C/D/E with sub-struct casts, volatile-pointer, char* arithmetic). Permanent for source-form pipeline; static-inline helper recovers shape but adds a real bl insn | provisional P-N (CSE-of-base-pointer-arithmetic, pending permuter) |
+| 109 / NEG | `func_020aac30` | Natural form is 0x50 (target 0x54, just 1 insn short). Semantics-difference wall: target stashes arg0 to STACK at [sp, #0x4] then passes `&arg0_stackslot` (i.e. `signed char **`) to the helper, while natural form caches arg0 in r4 and passes the value. Needs helper signature change to take `signed char **`. Likely C-N if helper sig refactor lands; pending separate investigation | partial (sig-change needed, brief candidate for follow-up) |
 
 ## Quantification
 
