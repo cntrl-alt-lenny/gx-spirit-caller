@@ -215,24 +215,36 @@ TU can cover ~50 adjacent .bss symbols at once).
 
 ### Cluster B — `.data` scalar constants (low difficulty)
 
-**Recipe**: declare initialized scalar/struct variables with the
-right initializer bytes.
+**Status:** recipe established by **brief 117**, see
+[`docs/research/cluster-b-recipe.md`](cluster-b-recipe.md) for full
+write-up.
 
-```c
-int data_020c3bc0 = 0x02000c44;   /* address-of-something */
-short data_020c3bc4 = 0x000c;
-```
+**Recipe summary**: declare initialized scalars at the right address.
+W4 resolution confirmed: mwcc 2.0/sp1p5 places `int x = N;` in `.data`
+automatically — NO `__attribute__((section))` needed. Multi-global
+`.c` files reorder symbols (NOT declaration order, NOT address order),
+so:
 
-**Pool size**: subset of the 10,952 `data(any)` symbols whose
-addresses fall in `.data` ranges AND whose size is ≤ 8 bytes.
-Estimate: ~500-1000 candidates.
+- **Singleton scalar → `.c` file** (one global per file).
+- **Contiguous run of scalars → `.s` file** with mwasmarm
+  (brief 115's DTCM pattern).
 
-**Difficulty**: LOW per-symbol but **requires byte verification**
-(unlike .bss). The reader's usage often reveals the type
-(int vs short vs pointer).
+**Pool size (refined by brief 117 byte-pattern inspection of 247
+candidates)**:
 
-**Estimated wave throughput**: 20-30 symbols per wave (each needs
-type inference + value comparison).
+- **86 true scalars** (35%) — int/short/byte values; fit cluster B.
+- **115 small ASCII strings** (47%) — fold into cluster C workflow.
+- **32 pointers** (13%) — need typedef discovery; sequence after
+  brief 121+ typedef-inference tooling.
+- **14 unclassified** (6%) — per-candidate inspection.
+
+**Estimated wave throughput**: 25-30 syms/wave for true scalars
+(86 / 30 = ~3 waves to drain the scalar sub-pool). String + pointer
+sub-pools sequence into later waves.
+
+**Worked examples (brief 117 — both byte-identical):**
+- `src/main/data_020c3e48.c` (singleton `.c`, value=1)
+- `src/main/data_02102be8.s` (13-symbol ASCII-string run via `.s`)
 
 ### Cluster C — `.rodata` strings + const arrays (medium)
 
