@@ -313,25 +313,51 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/108-c27-application-wave-1.md`](docs/briefs/108-c27-application-wave-1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): C-27 application
-  wave 1 (~15-20 candidates from ~80-candidate cross-
-  corpus pool). Dual-extern + symbols.txt alias recipe
-  per brief 107's worked example. Try natural form
-  FIRST per 6-NEGATIVE-finding rule. Self-extend gate:
-  yield ≥40% + bytes ≥250. Branch:
-  `decomper/c27-application-wave-1`.
+- [`docs/briefs/110-cross-region-apply-wave-3.md`](docs/briefs/110-cross-region-apply-wave-3.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cross-region
+  apply wave 3 for 46 EUR matches accumulated across
+  briefs 101+102+104+106+108. Expected ~36 EUR × 2
+  regions = ~72 region-landings. Brief 095 D2 v2 +
+  D3 auto-promote should run cleaner than brief 094
+  wave 2. Big USA + JPN badge climb (0.70% → ~0.85-
+  1.0%). Branch: `decomper/cross-region-apply-wave-3`.
 
-- [`docs/briefs/109-brief-106-residue-research.md`](docs/briefs/109-brief-106-residue-research.md)
-  — `cloud` (MEDIUM): walls research on brief 106's 5
-  skipped patterns (`func_02037b34` / `func_02079ddc` /
-  `func_020326d4` / `func_020aac30` / `func_020338f8`).
-  Brief 084 / 088 / 099 / 100 / 103 / 105 / 107-style
-  codegen sweep on most-cluster-able pattern. Goal: ≥1
-  new C-N or P-N entry. Branch:
-  `cloud/brief-106-residue-research`.
+- [`docs/briefs/111-p10-permuter-callee-save.md`](docs/briefs/111-p10-permuter-callee-save.md)
+  — `cloud` (MEDIUM): two-part. (1) P-10 permuter
+  sweep with longer timeout than brief 105 (mvn-write
+  DECISION layer wall, distinct from P-9). (2) Callee-
+  save preservation walls research from brief 108's
+  5 dropped candidates. Either deliverable can land
+  first per cloud's discretion. Branch:
+  `cloud/p10-permuter-callee-save-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/108-c27-application-wave-1.md`](docs/briefs/108-c27-application-wave-1.md)
+  `decomper`, shipped in PR #509. **3 ports / 232
+  bytes — all 3 gates missed, chain closes.** Honest
+  calibration: C-27 recipe is narrower than brief 107's
+  ~80-candidate estimate suggested. Funnel surfaced
+  **callee-save preservation mismatch** (5 candidates
+  blocked) and **loop scheduling divergence** (3 more).
+  6th NEGATIVE-finding confirmation but INVERTED: 0 of
+  ~5 natural-form attempts matched — for C-27 the
+  recipe IS required. `func_02021158` secondary
+  `cmp+cmpne` range-check wall flagged (below
+  escalation threshold). Cumulative C-class chain
+  101+102+104+106+108: **46 ports / 3208 bytes**.
+- [`docs/briefs/109-brief-106-residue-research.md`](docs/briefs/109-brief-106-residue-research.md)
+  `cloud`, shipped in PR #510. **C-28 RECOVERY + P-10
+  PERMANENT + 3 partial classifications.** C-28
+  (predicated-cascade collapse, explicit-intermediate
+  recipe) is the third "split-statement intermediate"
+  family member (joins C-25, C-26). P-10 (over-
+  predication of short tail vs early-return) is
+  distinct from P-9 — P-9 is the MVN-WRITE peephole,
+  P-10 is the predicate-vs-early-return DECISION at IR
+  layer. Permuter recommended for P-10 (longer timeout
+  than brief 105). Brain pushed `538d467` to clear
+  MD037.
 
 - [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
   `decomper`, shipped in PR #507. **10 ports / 952
