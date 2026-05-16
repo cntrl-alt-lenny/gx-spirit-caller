@@ -34,10 +34,12 @@ claim to all 3 regions' `dtcm/delinks.txt`.
 **Part 1 method (cluster A wave 1):**
 
 1. **Pool selection** via brief 114's tooling:
+
    ```bash
    python tools/data_worklist.py --version eur \
        --cluster A --module main --top 60
    ```
+
    This emits the top 60 cluster A candidates in main
    by cross-module reader density. Pick ~50 by:
    - Skipping symbols already in `.text` (won't happen
@@ -54,6 +56,7 @@ claim to all 3 regions' `dtcm/delinks.txt`.
    - Add the symbol declaration to a new
      `src/main/bss/data_main_bss.s` (or similar)
      using mwasmarm syntax:
+
      ```
      .extern data_<addr>  ; if cross-module referenced
      .global data_<addr>
@@ -61,6 +64,7 @@ claim to all 3 regions' `dtcm/delinks.txt`.
      data_<addr>:
          .space <size>
      ```
+
    - Add TU claim to `config/eur/arm9/delinks.txt`
      pointing at the `.bss` range.
    - `ninja rom` + verify byte-identical (or rather:

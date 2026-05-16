@@ -40,10 +40,12 @@ in the right output section. No `__attribute__` or
 
 1. **Inventory the cluster B pool.** Run brief 114's
    worklist:
+
    ```bash
    python tools/data_worklist.py --version eur \
        --cluster B --top 20
    ```
+
    Inspect the top 20 by reader density. Classify each
    as:
    - Likely-`.c`-suitable (typed value, e.g.
@@ -57,15 +59,18 @@ in the right output section. No `__attribute__` or
    approaches:
    - **`.c` approach:** declare the scalar in a new
      `src/main/data/data_scalars.c` (or similar):
+
      ```c
      /* g_<name> at 0x<addr> */
      int g_<name> = 0x<value>;
      ```
+
      Test whether mwcc emits the byte sequence at the
      expected address with default routing.
    - **`.s` approach:** add to a new
      `src/main/data/data_scalars.s` using brief 115's
      mwasmarm pattern:
+
      ```
      .global g_<name>
      .section .data
