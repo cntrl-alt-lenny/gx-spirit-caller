@@ -113,7 +113,7 @@ classification: ran 8-variant × 15-SP sweep on `func_02023fec`
 discovered the dual-extern + `symbols.txt` alias recipe — variant
 F (dual-stash with two distinct extern symbols + `void * volatile *`
 local pointers + an alias line in `symbols.txt`) byte-matches at
-all 10 mwcc 2.0/* SPs. Classified as **C-27 — pool-word
+all 10 mwcc `2.0/*` SPs. Classified as **C-27 — pool-word
 DUPLICATION wall** (the inverse-direction sibling of C-24's
 pool-dedup); P-7 promoted to "SUPERSEDED BY C-27." Cross-corpus
 survey: 157 duplicate-pool-pair occurrences. Cross-module BL
