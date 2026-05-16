@@ -8,57 +8,58 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-15 (Mac brain — brief 098 + 099 merge).
-**Brief 098 CLOSED: permuter sweep 1 of 8 recovered** —
-production-readiness threshold met. The recovery (`func_ov000_021ac85c`)
-cracked the **W-N temp-register wall** via permuter's discovery that
-splitting a bitfield chain into two statements forces mwcc into the
-correct store-reload reg-alloc pattern. **W-N is now coercible-with-
-tooling, not permanent** — recipe pending codification (brief 100).
-**Brief 099 CLOSED: new C-24 entry — first wall to use `.legacy_sp3.c`
-(mwcc 1.2/sp3)**. Indirect-call dispatch + pool-dedup peephole. 90
-compiles surfaced variant F (single-global vs two-global identifier)
-as the critical source-form constraint. **49 unmatched candidates
-match the C-24 signature; 3 strict-signature matches.** Codegen-walls
-now at **24 coercible + 9 permanent + 2 candidate**. EUR **1.64%**,
-USA + JPN **0.70%**.
+**Last updated:** 2026-05-16 (Mac brain — brief 102 + 103 merge).
+**Brief 102 wave 2 CLOSED at 13 ports / 648 bytes / 68% yield** —
+both gates pass; wave 3 in reserve. C-24 application expanded beyond
+`.legacy_sp3.c` to **two adjacent routing tiers** (4 via `.legacy.c`,
+9 via default `.c`). **9 of 13 ports byte-matched natural form** —
+brief 097's "indirect-call" classification was also over-broad
+(third NEGATIVE finding in a row). **Brief 103 CLOSED: new P-9 entry
++ second NEGATIVE finding for predicated-cascade.** P-9 (mvnNE-write
+peephole gap) classified permanent; 36 strict-signature candidates
+remain in cross-corpus pool; **~245 of broader 281-candidate set are
+likely naturals**. P-8 annotated SUPERSEDED BY C-25 (housekeeping).
+**Codegen-walls now at 26 coercible + 10 permanent + 2 candidate.**
+**Methodology rule established (across briefs 100 + 102 + 103): try
+natural form FIRST before invoking any C-class recipe.** EUR
+**1.68%**, USA + JPN **0.70%**.
 
 ## Today's merges (just-landed)
 
-- **PR #494 — decomper / brief 098 permuter sweep.** 1 of 8
-  candidates recovered byte-identical (`func_ov000_021ac85c`, W-N
-  temp-reg wall). 2 timeouts (`func_02023fec` plateau at 220,
-  `func_0200b0c8` plateau at 500 — P-4 control case, expected fail).
-  5 candidates lacked source baselines (couldn't attempt). The
-  W-N recovery's source-form recipe: split the bitfield chain into
-  two statements (`p->f_98 = p->f_98 | 0x4000000;` then
-  `p->f_98 = ((p->f_98 & ~0xf80000) | 0x880000) | 0x8000000;`) to
-  force mwcc to write back to memory between operations. Brief 100
-  candidate: codify as new C-N entry. Permuter throughput: ~200-230
-  iter / 60s / thread on this machine.
-- **PR #495 — cloud / brief 099 medium-tier walls research.**
-  **C-24 (indirect-call dispatch + pool-dedup) added — first wall in
-  catalog using `.legacy_sp3.c` recipe.** 6 source variants × 15 SPs =
-  90 compiles surfaced the constraint that variant F (single global
-  identifier referenced from both source-level call sites) is
-  required for the pool-dedup peephole to fire; variants A-E
-  (two-global) closest-but-not at score 1. **C-15 (`.legacy.c`) /
-  C-23 (`.legacy.c` dual peephole) / C-24 (`.legacy_sp3.c`)
-  discriminator triangle now established.** Cross-corpus survey
-  found 49 candidates matching the C-24 signature; 3 match the
-  strict prologue/epilogue. Brief 101 candidate: apply recipe at
-  scale.
+- **PR #500 — decomper / brief 102 wave 2 (routing-tier expansion).**
+  13 ports / 648 bytes / 68% yield. All 3 regions 24/27 baseline (EUR
+  verified locally). **C-24 recipe spans two adjacent routing tiers
+  beyond `.legacy_sp3.c`:** 4 ports via `.legacy.c` (mwcc 1.2/sp2p3)
+  + 9 ports via **default `.c`** (actually natural-form matches; not
+  C-24 walled — per brief 100 NEGATIVE pattern). **Routing-tier
+  insight:** `lr`-as-scratch register is NOT sp3-exclusive — emerges
+  under default sp1p5 when r0-r12 are all live and the function
+  pushes {r3, lr}. Brief 099's C-24 recipe should soften "uses lr →
+  1.2-family" to a probabilistic hint. 5 reg-alloc-blocked + 1
+  linker-placement-misalign skips. **Cumulative briefs 101+102: 25
+  ports / 1464 bytes.** Brain pushed empty commit `0032550` to
+  retrigger CI workflows that didn't initially fire.
+- **PR #501 — cloud / brief 103 (predicated-cascade research).**
+  **New P-9 entry: mvnNE-write peephole gap.** mwcc 2.0 lowers `cond
+  ? -1 : 0` as `mov + rsb` instead of direct conditional `mvnNE rN,
+  #0`. 90 compiles (6 variants × 15 SPs) all miss. Peephole appears
+  absent across all 15 SPs in toolchain. **Big methodology win:**
+  `func_02092644` byte-matches natural form at all 15 SPs — brief
+  097's "predicated cascade" was over-broad (281 candidates → 36
+  strict P-9 signature). **P-8 annotated SUPERSEDED BY C-25** (P-8 =
+  same wall brief 098 cracked + brief 100 codified). Future-attempt
+  paths for P-9: `asm void` + `nofralloc` recipe OR permuter sweep.
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
-| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098) | 89 matches / 4556 bytes |
+| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102) | 114 matches / 6020 bytes |
 | Cross-region apply (briefs 075+078+090+094) | 383 ports × 2 regions = 766 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
-| Codegen-walls catalogued | **24 coercible** (C-24 added) + 9 permanent + 2 candidate-walls (W-stack-split 2dp / W-popcount-mask-order 1dp; W-N **now coercible-with-tooling** via brief 098) |
-| Tooling unblocked (briefs 096+098) | Permuter wrapper + 1 production recovery proves W-N coercibility |
-| Total session match-equivalents | ~971 |
+| Codegen-walls catalogued | **26 coercible** + **10 permanent** (P-9 added) + 2 candidate (W-stack-split 2dp / W-popcount-mask-order 1dp; W-N → C-25; P-8 superseded by C-25) |
+| Tooling unblocked (briefs 096+098+100) | Permuter wrapper + walls-research methodology pipeline |
+| Total session match-equivalents | ~996 |
 
 Cross-region applies and cross-project ports are region-neutral
 work — each port slot unlocks ×3 region matches when bootstrapped
@@ -79,64 +80,64 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 098 + 099
-close and brief 100 + 101 queue lands.
+**Open PRs: 0** once this brain-PR for brief 102 + 103
+close and brief 104 + 105 queue lands.
 
-**Decomper — brief 101 (HIGH, NEW):**
+**Decomper — brief 104 (HIGH, NEW):**
 
-- **C-24 indirect-call recipe application wave 1.** Brief
-  099 surfaced the recipe (`*.legacy_sp3.c` routing +
-  single-global source-form constraint) and the
-  candidate pool (49 cross-corpus matches; 3 strict-
-  signature matches). Wave 1: pick 10-15 candidates from
-  the broader 49-candidate pool (prioritize the 3 strict-
-  signature matches first, then expand outward). Apply
-  the C-24 recipe per the codegen-walls.md template +
-  brief 099's worked example (`func_02048c28`). Self-
-  extend gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c24-recipe-wave-1`.
+- **C-24 wave 3 self-extend + C-26 strict-signature
+  application.** Brief 102 wave 2 hit 68% / 648 bytes —
+  both gates pass; wave 3 in reserve under self-extend
+  clause. Wave 3 has TWO components:
+  1. **Continue C-24 chain** — remaining 49-pool
+     candidates not yet attempted (49 minus 17 brief-101
+     minus 19 brief-102 ≈ 13 remaining). With brief 102's
+     routing-tier insight (`lr`-as-scratch isn't sp3-
+     exclusive), recipe matrix is broader than original
+     scoping.
+  2. **C-26 strict-signature wave** — 125 unmatched
+     candidates have OS_Disable/Restore pair; brief 100
+     identified the strict subset where helper overwrites
+     r0 first instruction. Pick 8-10 from brief 100's
+     identified subset. Per-function helper-body
+     inspection per brief 100's rule.
+  Continue applying brief 100 NEGATIVE-finding methodology
+  (try natural form FIRST). Self-extend gate: yield ≥40%
+  + bytes ≥250. Branch: `decomper/c24-w3-c26-application`.
 
-**Cloud — brief 100 (MEDIUM, NEW):**
+**Cloud — brief 105 (MEDIUM, NEW):**
 
-- **W-N store-reload recipe codification + critical-
-  section walls research.** Two-part:
-  1. **Codify W-N temp-register coercion** as new C-25
-     (or whatever the next slot is) entry in
-     `codegen-walls.md`. Recipe per brief 098 PR #494:
-     split bitfield chain into two statements to force
-     mwcc store-reload pattern. Cross-reference
-     `func_ov000_021ac85c` as worked example.
-  2. **Critical-section nesting walls research** —
-     next-most-represented pattern from brief 097
-     residue (~8 of 31). Same brief 084 / 088 / 099-
-     style codegen sweep. Goal: ≥ 1 source-form recipe
-     OR P-N classification with asm discriminator.
-  Branch: `cloud/wn-codify-critical-section-research`.
+- **Permuter sweep on P-9 candidates.** Brief 103
+  classified P-9 (mvnNE-write peephole gap) as permanent
+  for source-form pipeline. 36 strict-signature
+  candidates in cross-corpus pool. Per brief 098's
+  pattern (which promoted P-8 → C-25 via permuter
+  discovery), run permuter against 5-8 representative
+  P-9 candidates (size 0x20-0x40 band). Recovery goal:
+  ≥1 promotes P-9 → C-N via brief 100-style
+  codification. Use brief 096 wrapper. Branch:
+  `cloud/permuter-vs-p9`.
 
-**Backlog (post-100/101):**
+**Backlog (post-104/105):**
 
 1. **Pre-stage source baselines for the 5 brief-098
    untested candidates** + permuter retry. 2 brief-097
    (skipped during initial wave) + 3 brief-094 USA-side
    byte-diffs. Decomper-side work; queue as a future
-   brief once 101 closes.
+   brief once 104 closes.
 2. **Data-tier work** — currently 0%. Decomper flagged
-   in brief 097 hand-back as the next major lever once
-   the function-level easy levers are exhausted. Scope
-   a brief once 100 + 101 close + brain has bandwidth.
+   in brief 097 hand-back as the next major lever. Scope
+   a brief once 104 + 105 close + brain has bandwidth.
 3. **W-stack-split codegen sweep** — 2 datapoints
    (`func_02004f58`, `func_02004ef4`). One more datapoint
    would justify a brief 084-style codegen sweep.
 4. **W-popcount-mask-order** — 1 datapoint. Track for
    recurrence.
-5. **Predicated-cascade walls research** (~6 of 31 in
-   brief 097 residue) — after critical-section closes
-   in brief 100.
-6. **Pool-word count walls research** (~3 of 31) +
-   **cross-module BL** (~3 of 31) — small populations;
-   defer until they hit 5+ datapoints OR get folded
-   into a single brief covering both.
-7. **64 unrecovered brief-094 ports** — 4 symbol-name
+5. **Pool-word count walls research** (~3 of 31 brief
+   097 residue) + **cross-module BL** (~3 of 31) —
+   small populations; defer until they hit 5+ datapoints
+   OR get folded into a single brief covering both.
+6. **64 unrecovered brief-094 ports** — 4 symbol-name
    collisions + 34 undefined-callee drops + 3 byte-diff
    (all 3 still untested — `func_020068d8` /
    `func_020331a4` / `func_02052b50` lacked source
@@ -144,63 +145,65 @@ close and brief 100 + 101 queue lands.
    other-refused. Await source pre-staging (queued
    backlog item 1) or named-symbol promotion.
 
-**Strategic state — leverage-extraction phase complete:**
+**Strategic state — walls-research pipeline + natural-
+form-first rule:**
 
-The **easy-lever** pipelines are all drained:
+The walls-research methodology pipeline is the primary
+lever post-leverage-extraction drain. Recently REFINED
+with a critical new step:
 
-- Single-region EUR cap-raise: 081 (≤0x40, 67.7%) → 086
-  (≤0x60, 63%) → 092 (≤0x80, 20% — floor).
-- Cross-region apply: brief 094 backfilled the 375-port
-  residual at 83% conversion.
-- Cross-project bulk-port: brief 082 calibrated the
-  drain signal at the pokeheartgold trickle.
-- Medium-tier follow-on (brief 097): wave 1 returned 0
-  byte-identical — walls are combinatorial.
+1. Decomper hand-back surfaces residue patterns.
+2. **TRY NATURAL FORM FIRST** at default mwcc 2.0/sp1p5
+   (added across briefs 100 / 102 / 103 — three
+   consecutive NEGATIVE findings).
+3. Permuter sweep discovers recipes for actually-walled
+   subset (brief 098).
+4. Cloud codegen sweep codifies (brief 099 / 100 / 103).
+5. Decomper applies at scale (brief 101 / 102).
 
-**~970 cumulative match-equivalents** banked in this
-session. **Next phase shifts from leverage extraction to
-systematic walls-research + permuter sweeps + data-tier
-coverage.** Each unit of work yields fewer matches but
-the headroom is huge (EUR 1.64% / USA + JPN 0.70% — most
-of the ROM is still unmatched). Decomper's "natural
-drain" framing in the brief 097 hand-back is correct
-for the easy levers; incorrect framing if read as
-"project at endpoint" — the project is mid-arc.
+This pipeline produced 25 matches across briefs 101+102
++ 4 new catalog entries (C-24 / C-25 / C-26 / P-9). The
+cycle is **recipe-bound**, not pool-bound — each new
+C-class entry unlocks a candidate slice (49 for C-24;
+125 for C-26 strict-sig). **Brief 097's classifications
+were over-inclusive across THREE patterns** (critsec,
+indirect-call, predicated-cascade) — the natural-form-
+first rule is now the operational default. EUR 1.68%
+/ USA + JPN 0.70% means most of the ROM is still
+unmatched. Project mid-arc.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 101 (C-24 recipe wave
-   1) PR** when it opens. EUR `ninja rom` + `dsd check
-   modules` 24/27 baseline. Watch yield vs the brief 099
-   projection — 3 strict-signature matches should land
-   high-confidence, broader 49-candidate pool should
-   land 3-8 in wave 1. Self-extend gate fires for
-   waves 2/3 if yield ≥40% + bytes ≥250.
-2. **Verify + merge cloud brief 100 (W-N codify +
-   critical-section research) PR** when it opens. Two-
-   part PR; verify each independently:
-   - W-N codification: codegen-walls.md gains a new
-     C-N entry with the store-reload recipe + worked
-     example. Brief 098's `func_ov000_021ac85c` should
-     be cross-referenced.
-   - Critical-section research: 84/088/099-style codegen
-     sweep matrix; recipe ID or P-N classification.
-3. **Scope brief 102+ after 100 + 101 close.** Options
+1. **Verify + merge decomper brief 104 (C-24 wave 3 +
+   C-26 strict-sig wave) PR** when it opens. EUR `ninja
+   rom` + `dsd check modules` 24/27 baseline. Watch
+   yield trajectory: C-24 wave 3 should taper from
+   wave 2's 68% as remaining candidates skew toward the
+   harder reg-alloc-adjacent shapes; C-26 strict-sig
+   should be the cleaner half of the wave (newer
+   recipe applied for first time at scale). Combined
+   yield ≥40% triggers no further wave extension (this
+   is wave 3 = chain cap).
+2. **Verify + merge cloud brief 105 (permuter sweep on
+   P-9 candidates) PR** when it opens. Per-candidate
+   verify: each recovery = new `src/.../func_*.c` that
+   must build clean. Recovery rate calibration: brief
+   098 was 33% on attempted-with-source. P-9 candidates
+   are smaller (0x20-0x40 band) so faster iteration;
+   expect similar or higher recovery rate. ≥1 recovery
+   triggers a brief 106 codification (P-9 → C-N).
+3. **Scope brief 106+ after 104 + 105 close.** Options
    ranked by leverage:
-   - **C-24 recipe waves 2/3** if brief 101's wave 1
-     yields well + has pool depth (49 candidates means
-     1-3 follow-up waves are likely).
-   - **Predicated-cascade walls research** (~6 of 31
-     brief 097 residue) — after critical-section
-     closes in brief 100.
+   - **P-9 → C-N codification** if brief 105 recovers
+     ≥1. Cloud brief in brief 100 pattern.
+   - **C-26 strict-signature wave 2** if brief 104's
+     C-26 half yielded well + has pool depth.
    - **Permuter source pre-staging brief** — write
      baseline C for the 5 brief-098 untested candidates;
-     re-run permuter sweep. Probably 1-2 more recoveries
-     given brief 098's 33% attempted-with-source rate.
-   - **Data-tier scope brief** — still pending; decomper
-     flagged as next major lever. Likely needs a
-     dedicated brief just to scope what "data-tier
-     matching" means.
+     re-run permuter sweep.
+   - **Data-tier scope brief** — still pending. Likely
+     needs a dedicated brief just to scope what "data-
+     tier matching" means in the dsd workflow.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
