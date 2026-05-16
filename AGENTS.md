@@ -313,26 +313,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  Cluster A `.bss` wave 1 — ~50 symbols from main per
-  brief 114's worklist v2 cluster A pool (1586
-  candidates). Apply brief 115's `.s` + LCF auto-routing
-  recipe. (2) Cross-region DTCM parity — move `src/dtcm/`
-  → `libs/dtcm/`, promote IRQ handler names to USA + JPN
-  symbols.txt. Goal: USA + JPN flip to 25/27 (3-region
-  DTCM parity). Branch:
-  `decomper/cluster-a-wave-1-dtcm-parity`.
+- [`docs/briefs/118-cluster-a-wave-2-overlay.md`](docs/briefs/118-cluster-a-wave-2-overlay.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cluster A wave 2
+  — overlay coverage. Pick one large-pool overlay (ov004
+  or ov006, ~525 KB each per brief 113). Apply brief
+  115/116 mwasmarm `.s` + LCF auto-routing `.bss`
+  recipe at scale. Same wave size as brief 116's 647-
+  sym main wave (per-overlay gap-list size). Goal:
+  flip overlay's checksum to OK if .bss coverage is
+  the sole gap. Branch:
+  `decomper/cluster-a-wave-2-overlay`.
 
-- [`docs/briefs/117-cluster-b-scalars-research.md`](docs/briefs/117-cluster-b-scalars-research.md)
-  — `cloud` (MEDIUM): cluster B `.data` scalars recipe
-  research. Brief 114 enumerated 247 cluster B
-  candidates (avg 4 bytes). Workflow wall W4 (cluster B
-  section attribute) TBD. Output: recipe documentation
-  for brief 120+ scale-out. Branch:
-  `cloud/cluster-b-scalars-research`.
+- [`docs/briefs/119-cluster-c-strings-research.md`](docs/briefs/119-cluster-c-strings-research.md)
+  — `cloud` (MEDIUM): cluster C strings + const arrays
+  recipe research. **Effective pool ~462 candidates**
+  (347 native + 115 from brief 117 cluster B mis-
+  classification). Investigation: `const char[]`
+  `.rodata` placement, mwasmarm `.ascii` patterns,
+  edge cases (const pointers, wide strings, large
+  const arrays). Branch: `cloud/cluster-c-strings-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
+  `decomper`, shipped in PR #522. **🎉 ALL 3 REGIONS
+  AT 25/27 OK** — first multi-region milestone of the
+  session. **647 cluster A `.bss` symbols claimed in
+  main** (~13× brief 113's per-wave estimate; recipe
+  scales linearly). Cross-region DTCM parity: moved
+  `src/dtcm/` → `libs/dtcm/`, promoted 11 SDK IRQ
+  handler names to USA + JPN symbols.txt, added all
+  3 regions' delinks.txt claims. ARM9 main checksum
+  still FAILED (cross-module relocs in `.text`/`.data`
+  remain — separate scope).
+- [`docs/briefs/117-cluster-b-scalars-research.md`](docs/briefs/117-cluster-b-scalars-research.md)
+  `cloud`, shipped in PR #521. **W4 resolved + multi-
+  global wall surfaced + 47% sub-classification.** mwcc
+  2.0/sp1p5 places `int x = N;` in `.data`
+  automatically (no attribute needed). BUT mwcc reorders
+  globals within a `.c` file → `.s` is safe default
+  for groups of 2+ adjacent scalars. **47% of cluster B
+  (115/247) is 4-byte ASCII strings** mis-classified
+  by brief 114's v2 heuristic. 86 true scalars + 32
+  pointers + 14 unclassified. Brief 121 candidate:
+  data_worklist v3 byte-pattern refinement.
 
 - [`docs/briefs/115-dtcm-pilot-cluster-e.md`](docs/briefs/115-dtcm-pilot-cluster-e.md)
   `decomper`, shipped in PR #519. **First production
