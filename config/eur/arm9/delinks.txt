@@ -7521,9 +7521,9 @@ src/main/func_020320c8.c:
     complete
     .text start:0x020320c8 end:0x020320f8
 
-
-
-
+src/main/func_02033488.c:
+    complete
+    .text start:0x02033488 end:0x020334b4
 
 
 
@@ -7568,17 +7568,6 @@ src/main/func_020a35dc.legacy.c:
 src/main/func_0209e8d0.legacy.c:
     complete
     .text start:0x0209e8d0 end:0x0209e91c
-
-
-
-
-
-
-
-src/main/func_02033488.c:
-    complete
-    .text start:0x02033488 end:0x020334b4
-
 
 src/main/func_02051a84.legacy_sp3.c:
     complete

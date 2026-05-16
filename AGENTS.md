@@ -313,25 +313,101 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply C-24
-  indirect-call + pool-dedup recipe (brief 099) to wave 1
-  candidates. 3 strict-signature matches from cross-corpus
-  survey; broader 49-candidate pool. Recipe: `*.legacy_sp3.c`
-  routing + single-global source-form constraint. Self-
-  extend gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c24-recipe-wave-1`.
+- [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
+  C-26 wave 2 on the broader strict-sig pool (~121
+  remaining candidates after brief 104 took 4 of 125;
+  helper-body inspection per brief 100 rule, target
+  8-12 candidates). (2) P-9 early-return sub-pool
+  application (~12 candidates from brief 105's scope
+  refinement, natural-source recoverable). Self-extend
+  gate: yield ≥40% + bytes ≥250. Branch:
+  `decomper/c26-w2-p9-early-return`.
 
-- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
-  — `cloud` (MEDIUM): two-part. (1) Codify W-N temp-
-  register coercion recipe (brief 098 surfaced via
-  permuter) as new C-N entry in codegen-walls.md.
-  (2) Critical-section nesting walls research — next
-  pattern from brief 097 residue (~8 of 31). Brief 084 /
-  088 / 099-style codegen sweep. Branch:
-  `cloud/wn-codify-critical-section-research`.
+- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
+  — `cloud` (MEDIUM): final brief 097 residue patterns
+  — pool-word count (~3 candidates) + cross-module BL
+  (~3 candidates). Roll both into one brief; brief 084 /
+  088 / 099 / 100 / 103-style codegen sweeps. Watch for
+  NEGATIVE findings (5 consecutive walls research
+  briefs have surfaced classification over-reach).
+  Branch: `cloud/poolword-crossmodule-bl-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
+  `decomper`, shipped in PR #503. **8 ports / 560 bytes**
+  total. C-24 wave 3 final: 4 ports (3 default `.c` + 1
+  `.legacy.c`) — chain capped. C-26 strict-sig wave 1: 4
+  ports, all via `.legacy.c`, all confirmed via helper-
+  first-instruction inspection rule (`ldr r0, [pc, #N]`
+  pattern). **Cumulative C-24 chain across briefs 101+
+  102+104: 33 ports / 2024 bytes.** Brain resolved merge
+  conflict in delinks.txt against brief 105's parallel
+  `func_02033488`; same CI workflow-trigger quirk as PR
+  #500 (workflows fired only after merge-conflict
+  resolution push).
+- [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
+  `cloud`, shipped in PR #504. **1 base recovery
+  (`func_02033488`) + P-9 scope refinement.** Wall
+  applies to MASK form (`cond ? -1 : 0`), NOT EARLY-
+  RETURN form (`if (cond) return -1; ...`). 36-candidate
+  strict pool partitions: ~⅓ early-return (natural-
+  source recoverable) / ~⅔ mask (true permanent). The
+  recovery was iter-1 base form match, not a permuter
+  mutation — cloud framed it as scope refinement, not
+  C-N promotion. Permuter rescue rate: 20% (1/5) vs
+  brief 098's 33% (1/3) — permuter more useful for
+  reg-alloc walls than IR-lowering walls.
+
+- [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
+  `decomper`, shipped in PR #500. **13 ports / 648
+  bytes / 68% yield.** C-24 application expanded beyond
+  `.legacy_sp3.c` to **two adjacent routing tiers** (4
+  via `.legacy.c`, 9 via default `.c`). Of the 9 default-
+  `.c` ports, all byte-matched natural form — brief 097's
+  "indirect-call" classification was over-broad (third
+  NEGATIVE finding). Routing-tier insight: `lr`-as-
+  scratch is NOT sp3-exclusive — softens C-24's "uses
+  lr → 1.2-family" hint. Cumulative briefs 101+102: **25
+  ports / 1464 bytes**. Brain pushed empty commit
+  `0032550` to retrigger CI that didn't initially fire +
+  close/reopen the PR for the same reason.
+- [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
+  `cloud`, shipped in PR #501. **New P-9 entry: mvnNE-
+  write peephole gap.** 90 compiles (6 variants × 15
+  SPs) all miss — mwcc 2.0 lowers `cond ? -1 : 0` as
+  `mov + rsb` instead of direct `mvnNE rN, #0` across
+  ALL toolchain SPs. Big methodology win: 281-candidate
+  pool narrowed to **36 strict P-9 signature** matches;
+  ~245 are likely naturals (second NEGATIVE finding in
+  a row). **P-8 annotated SUPERSEDED BY C-25**
+  (housekeeping). Future-attempt paths: `asm void` +
+  `nofralloc` recipe OR permuter sweep (brief 105).
+
+- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
+  `decomper`, shipped in PR #498. **12 ports / 816 bytes
+  / 71% yield** — both self-extend gates pass with
+  significant margin. First production application of
+  the `.legacy_sp3.c` third routing tier. Recipe
+  refinements surfaced during application: `flags |=
+  mask` produces dedup'd codegen, fn-ptr hoist before
+  conditional branch, `do { ... } while` shape preference.
+  Funnel: 17 attempts → 12 byte-identical + 5 reg-alloc-
+  blocked. 12 distinct sub-patterns under the C-24
+  umbrella covered.
+- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
+  `cloud`, shipped in PR #497. **2 new entries: C-25 +
+  C-26.** C-25 (W-N store-reload, default `2.0/*` SPs)
+  is the **first W-class → C-class promotion** via
+  permuter discovery + post-hoc sweep. C-26 (critical-
+  section + helper-signature mismatch, `.legacy.c`
+  routing) surfaced a **NEGATIVE finding** that 4 brief-
+  097 critsec candidates byte-match natural form — brief
+  097's broad classification was over-inclusive. Helper-
+  signature inspection rule: helper that writes r0 in
+  first non-prologue instruction → declare as no-arg.
+  Brain pushed `bea7b26` to clear MD037 + MD018.
 
 - [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
   `decomper`, shipped in PR #494. **1 of 8 recovered —
