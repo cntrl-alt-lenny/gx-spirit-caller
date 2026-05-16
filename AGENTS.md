@@ -313,25 +313,45 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/110-cross-region-apply-wave-3.md`](docs/briefs/110-cross-region-apply-wave-3.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cross-region
-  apply wave 3 for 46 EUR matches accumulated across
-  briefs 101+102+104+106+108. Expected ~36 EUR × 2
-  regions = ~72 region-landings. Brief 095 D2 v2 +
-  D3 auto-promote should run cleaner than brief 094
-  wave 2. Big USA + JPN badge climb (0.70% → ~0.85-
-  1.0%). Branch: `decomper/cross-region-apply-wave-3`.
+- [`docs/briefs/112-c29-c30-application-wave.md`](docs/briefs/112-c29-c30-application-wave.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
+  C-29 application (`if (!p)` idiom, ~20-25 from ~36
+  P-10 strict-sig pool). (2) C-30 application (4
+  callee-save candidates from brief 108's residue).
+  Self-extend gate: yield ≥40% + bytes ≥250. Branch:
+  `decomper/c29-c30-application-wave`.
 
-- [`docs/briefs/111-p10-permuter-callee-save.md`](docs/briefs/111-p10-permuter-callee-save.md)
-  — `cloud` (MEDIUM): two-part. (1) P-10 permuter
-  sweep with longer timeout than brief 105 (mvn-write
-  DECISION layer wall, distinct from P-9). (2) Callee-
-  save preservation walls research from brief 108's
-  5 dropped candidates. Either deliverable can land
-  first per cloud's discretion. Branch:
-  `cloud/p10-permuter-callee-save-research`.
+- [`docs/briefs/113-data-tier-scoping.md`](docs/briefs/113-data-tier-scoping.md)
+  — `cloud` (MEDIUM): data-tier scoping brief. Define
+  data-tier matching semantics in the dsd workflow,
+  identify candidate pool size, output a future brief
+  plan for application waves (114+). The biggest
+  unrealized lever in the project (currently 0%).
+  Branch: `cloud/data-tier-scoping`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/110-cross-region-apply-wave-3.md`](docs/briefs/110-cross-region-apply-wave-3.md)
+  `decomper`, shipped in PR #512. **71 region-landings /
+  5052 bytes / 77% USA + 74% JPN conversion.** Cleanest
+  cross-region apply wave ever — brief 095's D2 v2 + D3
+  validated at production scale (94/94 attempts at HIGH
+  confidence; zero manual `--confidence-floor LOW`
+  overrides; zero refusals). First multi-region badge
+  advance since brief 094 wave 2.
+- [`docs/briefs/111-p10-permuter-callee-save.md`](docs/briefs/111-p10-permuter-callee-save.md)
+  `cloud`, shipped in PR #513. **2 byte-identical
+  recoveries: C-29 + C-30.** C-29: P-10 → C-29
+  promotion via permuter at 1200s × 4 threads (4×
+  brief 105's budget). Recipe: literally `if (!p)`
+  instead of `if (p == 0)` — semantically identical,
+  mwcc 2.0 lowers them differently. Scope: ≥3-insn
+  unpredicated tail. **3rd P-N → C-N promotion this
+  session.** C-30: extends C-27 with shift-based bit
+  extraction; unlocks 4 callee-save candidates. 2
+  partial findings (helper-sig wall + CSE wall) need
+  follow-up. **Operational rule: 1200s+ permuter
+  budget for IR-lowering walls.**
 
 - [`docs/briefs/108-c27-application-wave-1.md`](docs/briefs/108-c27-application-wave-1.md)
   `decomper`, shipped in PR #509. **3 ports / 232
