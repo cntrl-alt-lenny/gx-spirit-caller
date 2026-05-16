@@ -8,50 +8,53 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-16 (Mac brain — brief 110 + 111 merge).
-**Brief 110 CLOSED at 71 region-landings / 5052 bytes** — cleanest
-cross-region apply wave ever shipped. 77% USA / 74% JPN conversion;
-brief 095 D2 v2 + D3 eliminated ALL manual `--confidence-floor LOW`
-overrides (94/94 attempts at HIGH default). **Brief 111 CLOSED: 2
-byte-identical recoveries — P-10 → C-29 (permuter promotion) + new
-C-30 (callee-save recipe).** C-29 is the simplest source-form change
-documented (`if (p == 0)` → `if (!p)` for short-tail early-return);
-permuter found it at iter ~50 with 1200s × 4 threads (4× brief 105's
-budget). **3rd P-N → C-N promotion** this session (P-7 → C-27,
-P-8 → C-25, P-10 → C-29). C-30 extends C-27 with shift-based bit
-extraction; unlocks 4 more callee-save candidates. EUR **1.78%**,
-USA + JPN **0.70%** (badge bot pending). **Codegen-walls now at 30
-coercible + 10 permanent + 2 candidate + T-4 analysis tier.**
+**Last updated:** 2026-05-16 (Mac brain — brief 112 + 113 merge).
+**MAJOR STRATEGIC PIVOT: brief 113 scoping reveals data-tier is 2.0×
+the size of code (4.78 MB data vs 2.39 MB code) and 0.00% matched.**
+Function-tier walls-research has been mature for several rounds; data-
+tier is the next session arc. **Brief 112 CLOSED at 1 port / 72 bytes**
+— second consecutive application-wave hand-back (after brief 108).
+C-29 / C-30 recipes are narrower than surface classification suggests
+(7th NEGATIVE-finding confirmation). **Brief 113 CLOSED: 5-cluster
+data-tier taxonomy + future brief plan (briefs 114-119+).** Cluster E
+(DTCM pilot, brief 115 candidate) is the highest-leverage immediate
+next step — flips DTCM module FAILED → OK = **first 25/27 baseline
+since session start**. **6-month roadmap: 50% data-tier matched,
+26/27 modules OK.** EUR **1.79%**, USA + JPN **0.70%**. **Codegen-
+walls catalog stable at 30 coercible + 10 permanent + 2 candidate +
+T-4 (function tier complete; data tier opens with brief 114+).**
 
 ## Today's merges (just-landed)
 
-- **PR #512 — decomper / brief 110 (cross-region apply wave 3).**
-  **71 region-landings / 5052 bytes** (target ≥ 50, +42%). USA 36
-  ports / 77% conversion, JPN 35 ports / 74% conversion — within
-  noise of brief 094's 78% baseline at much smaller scale (94
-  attempts vs brief 094's 375). **Brief 095's D2 v2 + D3 tooling
-  validated at production scale:** 94/94 HIGH confidence, 0
-  manual LOW-floor overrides, 0 refusals. **First multi-region
-  badge advance since brief 094 wave 2.** CI worked cleanly on
-  first push (no merge-conflict-resolution quirk this time).
-- **PR #513 — cloud / brief 111 (P-10 permuter + callee-save
-  research).** Two byte-identical recoveries shipped. **C-29
-  (`!p` idiom for short-tail early-return)** — P-10 → C-29
-  promotion via permuter at 1200s × 4 threads (~50 iter). The
-  recipe is `if (!p)` instead of `if (p == 0)` — semantically
-  identical but mwcc 2.0 lowers them to different control flows.
-  Scope: wall fires only with ≥ 3-insn unpredicated tail.
-  **C-30 (pool-DUP + shift-based bit extraction)** extends
-  C-27's dual-extern + alias machinery with a shift recipe for
-  callee-save spill. Unlocks 4 more of brief 108's dropped
-  candidates. 2 partial findings remain (`func_020335d4` helper-
-  sig wall, `func_020326d4` CSE wall).
+- **PR #516 — decomper / brief 112 (C-29 + C-30 application).**
+  1 port / 72 bytes — chain closes (all 3 gates missed). 2nd
+  consecutive application-wave hand-back. **Useful funnel:** 5 new
+  candidates have well-characterized failure modes
+  (`func_02000d4c` leaf-optimization, `func_020326d4` offset-split
+  CSE, `func_020aac30` arg-spill convention, `func_0208906c`
+  secondary range-check, `func_0202a1cc` callee-save reload-over-
+  spill despite C-30 recipe). Recipes are narrower than the asm-
+  signature classification suggests — operational rule: classify
+  cheaply, recipe-test cheaply, don't over-extrapolate from
+  worked-example to pool-size.
+- **PR #515 — cloud / brief 113 (data-tier scoping).** **THE
+  STRATEGIC PIVOT.** 5-cluster taxonomy (A `.bss` symbol placement
+  / B `.data` scalars / C `.rodata` strings + const arrays /
+  D struct arrays + dispatch tables / E DTCM/ITCM specials).
+  **85% of data is `.bss`** (zero-fill, no bytes in arm9.bin) —
+  matching is purely SYMBOL PLACEMENT (structurally easier than
+  function-tier). 97% of data concentrated in 8 modules.
+  10,952 total data symbols, 2,020 in worklist with ≥1 reader.
+  **5 workflow walls identified with mitigations** (no codegen
+  walls during scoping). Cross-project leverage: partial yes for
+  SDK fundamentals (~10 symbols/game). Tooling gaps: data_worklist
+  .py v2 (brief 114), typedef inference (brief 120+).
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
-| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102+104+105+106+108+109+111) | 138 matches / 7956 bytes |
+| Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102+104+105+106+108+109+111+112) | 139 matches / 8028 bytes |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -77,111 +80,92 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 110 + 111
-close and brief 112 + 113 queue lands.
+**Open PRs: 0** once this brain-PR for brief 112 + 113
+close and brief 114 + 115 queue lands.
 
-**Decomper — brief 112 (HIGH, NEW):**
+**DATA-TIER SESSION ARC OPENS** with brief 114 + 115. Per
+brief 113's plan:
 
-- **C-29 + C-30 application wave (combined).** Both
-  recipes just shipped via brief 111. Two-part:
-  1. **C-29 application** — `if (p == 0)` → `if (!p)`
-     idiom for short-tail (≥3-insn unpredicated tail)
-     early-return functions. ~36 P-10 cross-corpus
-     candidates per brief 109/111; likely 20-25
-     recoverable since recipe scope-filters to ≥3-insn
-     tails.
-  2. **C-30 application** — 4 brief 108 callee-save
-     dropped candidates: `func_02024024`, `func_02024574`,
-     `func_0202a1cc`, `func_0202a27c`. Dual-extern +
-     symbols.txt alias + shift-based bit extract recipe
-     per brief 111's `func_020071c4` worked example.
-  Apply natural-form-first per the 8-NEGATIVE-finding
-  baseline. Self-extend gate: yield ≥40% + bytes ≥250.
-  Branch: `decomper/c29-c30-application-wave`.
+**Decomper — brief 115 (HIGH, NEW):**
 
-**Cloud — brief 113 (MEDIUM, NEW):**
+- **DTCM data-tier pilot (cluster E).** First production
+  data-tier wave. Small pool (~5-10 DTCM-section
+  symbols), high leverage: flips DTCM module FAILED →
+  OK = **first 25/27 baseline since session start**.
+  Per brief 113's cluster E recipe: declare DTCM-section
+  symbols with appropriate section attribute (TBD —
+  workflow wall W5, research during this wave) + SDK
+  typedef where applicable. Branch:
+  `decomper/dtcm-pilot-cluster-e`.
 
-- **Data-tier scoping brief.** Currently 0% on the
-  data-tier. Has been queued in the backlog since brief
-  097's hand-back. **Biggest unrealized lever** —
-  decomper flagged it as the next major lever once
-  function-tier easy levers are exhausted. Brief 113
-  is a SCOPING brief, not an application brief:
-  - Define what "data-tier matching" means in the dsd
-    workflow (data symbols, statics, .bss, .rodata
-    blobs, jump tables).
-  - Identify candidate pool size via `dsd report`
-    filtering on data-tier modules.
-  - Determine workflow: which tooling exists, what's
-    needed, who owns each step (cloud research vs
-    decomper application).
-  - Output: a future brief plan (114+ or 115+) for
-    actual data-tier application waves.
-  Branch: `cloud/data-tier-scoping`.
+**Cloud — brief 114 (MEDIUM, NEW):**
 
-**Backlog (post-110/111):**
+- **data_worklist.py v2 tooling.** Per brief 113's
+  brief 114 plan: extend brief 081-era worklist tool
+  with section + size + shape filtering. Required
+  before brief 116+ scale-out waves can run cleanly.
+  Estimated 4-6h cloud work. Branch:
+  `cloud/data-worklist-v2`.
+
+**Backlog (per brief 113 plan):**
+
+- **Brief 116:** cluster A `.bss` wave 1 (~50 symbols
+  in main, 6-10h decomper).
+- **Brief 117+:** cluster A scale-out (15-25 waves for
+  full `.bss` across ov004/6/7/9/14/21 + main).
+- **Brief 118:** cluster B `.data` scalars (~500-1000
+  candidates).
+- **Brief 119+:** cluster C (strings + const arrays) +
+  cluster D (struct arrays + dispatch tables).
+- **Brief 120+:** typedef inference tool (for cluster D).
+
+**Function-tier backlog (de-prioritized during data-tier
+session arc — revisit if data-tier proves slow):**
 
 1. **T-4 application wave (decomper).** Brief 107
    surfaced 23 unnamed BL targets, ~25-33 function
    unlocks via symbols.txt promotion. Pure analysis
-   work. Brief 114-or-115 candidate.
+   work. Could fit between data-tier waves.
 2. **C-28 application wave (decomper).** Brief 109
-   shipped recipe; ~10-20 candidate cross-corpus pool
-   for the critsec + ternary-driven flag-then-branch
-   pattern.
-3. **C-26 wave 3 (decomper).** ~116 candidates remain
-   in strict-sig pool after brief 106.
-4. **C-27 wave 2 (decomper).** Brief 108 had narrow
-   recipe; with C-30 unblocking the callee-save subset
-   and brief 112's C-30 wave done, retry the remaining
-   ~70 C-27 candidates.
-5. **3 brief 109 partial classifications** —
-   `func_02079ddc` (`.legacy.c` recovers 13/17, P-4
-   residue), `func_020326d4` (CSE wall), `func_020aac30`
-   (semantics-difference).
-6. **2 brief 111 partials** — `func_020335d4` (helper-
-   sig wall, C-26 family extension candidate),
-   `func_020326d4` (CSE wall, both briefs).
-7. **Pre-stage source baselines for the 5 brief-098
-   untested candidates** + permuter retry. Now even
-   more promising given brief 111's 1200s budget
-   finding.
-8. **P-9 mask-form asm-void recipe.** Brief 105
-   confirmed permanent for source + permuter; `asm
-   void` is the only remaining path. Worth scoping
-   when ≥3 candidates are ≥0x40 bytes.
-9. **W-stack-split codegen sweep** — 2 datapoints;
-   awaiting 3rd to justify codegen sweep.
-10. **W-popcount-mask-order** — 1 datapoint.
-11. **64 unrecovered brief-094 ports** — await source
-    pre-staging or T-4 named-symbol promotion.
+   shipped recipe; ~10-20 candidates.
+3. **C-26 wave 3 (decomper).** ~116 candidates remain.
+4. **C-27 wave 2 (decomper).** Retry remaining ~70
+   C-27 candidates after brief 112's hand-back.
+5. **3 brief 109 + 2 brief 111 partial classifications.**
+6. **Pre-stage source baselines for 5 brief-098
+   untested candidates** + permuter retry at 1200s.
+7. **P-9 mask-form asm-void recipe** (≥3 ≥0x40-byte
+   candidates).
+8. **W-stack-split codegen sweep** (3rd datapoint).
+9. **W-popcount-mask-order** (1 datapoint).
+10. **64 unrecovered brief-094 ports.**
 
-**Strategic state — walls-research pipeline mature
-+ brief 094→095→110 tooling chain complete:**
+**Strategic state — major session-arc transition:**
 
-The walls-research pipeline operates reliably:
+**Function-tier phase (briefs 057-112):** complete + drained.
+Walls-research pipeline mature: 8 NEGATIVE-finding
+datapoints, 3 P-N → C-N permuter/sweep promotions,
+30 coercible + 10 permanent + 2 candidate + T-4 catalog.
+Cross-region tooling chain (094 → 095 → 110) complete.
+Two consecutive application-wave hand-backs (briefs 108
++ 112) signal the function-tier residue is now recipe-
+narrow.
 
-1. Decomper hand-back surfaces residue patterns.
-2. **TRY NATURAL FORM FIRST** at default mwcc 2.0/sp1p5
-   (cemented across briefs 100 / 102 / 103 / 104 / 105
-   / 106 / 108 / 109 — **8 consecutive NEGATIVE-finding
-   datapoints**, ~30% over-classification rate is the
-   empirical baseline).
-3. Permuter sweep discovers recipes for actually-walled
-   subset (brief 098 P-8 → C-25; brief 111 P-10 → C-29;
-   brief 105 P-9 mask stayed permanent at 300s budget).
-   **Operational rule: 1200s+ permuter budget for IR-
-   lowering walls** (brief 111 confirmed brief 105's
-   miss was budget-related).
-4. Cloud codegen sweep codifies (briefs 099 / 100 / 103
-   / 107 / 109 / 111).
-5. Decomper applies at scale (briefs 101 / 102 / 104 /
-   106 / 108 / 110 / **soon 112**).
-
-Cross-region tooling chain (094 → 095 → 110) is now
-complete. Brief 110 ran 94/94 attempts at HIGH default
-confidence with zero manual `--confidence-floor LOW`
-overrides — brief 095's D2 v2 + D3 production-validated.
+**Data-tier phase (brief 113 onward):** opens with
+brief 114 + 115. Brief 113's scoping reveals:
+- **Data tier is 2.0× larger than code** (4.78 MB vs
+  2.39 MB; currently 0.00% matched).
+- **85% is `.bss`** — purely symbol-placement matching,
+  structurally easier than function-tier.
+- **5-cluster taxonomy** with per-wave throughput
+  estimates: A `.bss` (50-100/wave) / B `.data`
+  scalars (20-30) / C `.rodata` (10-20) / D struct
+  arrays (3-5) / E DTCM/ITCM (5-10, one-shot, **flips
+  DTCM module FAILED → OK**).
+- **6-month roadmap:** 50% data-tier matched, 26/27
+  modules OK. Multi-quarter session arc.
+- **First 25/27 baseline since session start** unlocks
+  with brief 115 (cluster E DTCM pilot).
 
 **Brief 097 residue (31 candidates) is now FULLY
 CLASSIFIED across 5 wall families:**
@@ -208,47 +192,41 @@ C-class promotions this session** (P-7 → C-27 via brief
 107, P-8 → C-25 via briefs 098 + 100, P-10 → C-29 via
 brief 111 permuter with longer budget).
 
-**Brief 097's classifications were over-inclusive across
-FIVE patterns** (critsec, indirect-call, predicated-
-cascade, plus brief 102 default-`.c` natural matches +
-brief 105 P-9 early-return). The natural-form-first
-rule pays back ~30% of candidate effort. **Brief 108
-showed the INVERSE case** — for C-27 pattern, 0% of
-natural-form attempts matched (recipe IS required). The
-rule still pays: rules out misclassifications cheaply.
-EUR 1.78% / USA + JPN 0.70% means most of the ROM is
-still unmatched — project mid-arc, not endpoint.
+**Function-tier session arc closure framing:**
+EUR 1.79% / USA + JPN 0.70% — function-tier matching
+has produced ~140 EUR matches + ~840 region-equivalents
++ 100 cross-project + ~1091 cumulative session match-
+equivalents. **But the data tier — 4.78 MB at 0%
+matched — represents 2× more code-equivalent matching
+work ahead.** Project is firmly mid-arc; data-tier
+opens a multi-quarter session arc.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 112 (C-29 + C-30
-   application wave) PR** when it opens. EUR `ninja
-   rom` + `dsd check modules` 24/27. Watch yield: C-29
-   should land strongly (recipe is trivial source-form
-   change); C-30 has only 4 candidates so floor result
-   acceptable. Self-extend fires for wave 2 if combined
-   yield ≥40%.
-2. **Verify + merge cloud brief 113 (data-tier scoping)
-   PR** when it opens. Pure scoping/research; verify
-   the output is a clear plan for future application
-   briefs (114+). Watch for "this is bigger than
-   expected" framing — data-tier may be 3-5 briefs of
-   tooling + application work.
-3. **Scope brief 114+ after 112 + 113 close.** Options
-   ranked by leverage:
-   - **C-28 application wave** (decomper) — brief 109's
-     recipe; ~10-20 candidates from critsec + ternary-
-     driven flag-then-branch pattern.
-   - **T-4 application wave** (decomper) — 23 unnamed
-     BL targets via symbols.txt promotion.
-   - **C-26 wave 3** — ~116 candidates remain in
-     strict-sig pool.
-   - **Cross-region apply wave 4** — accumulate
-     brief 112's matches, port to USA + JPN. Smaller
-     pool than brief 110 but the tooling is now fully
-     automated.
-   - **Data-tier application brief** — if brief 113
-     scoping reveals an immediately-actionable slice.
+1. **Verify + merge decomper brief 115 (DTCM pilot,
+   data-tier cluster E) PR** when it opens. This is the
+   FIRST production data-tier wave. Verify gate:
+   `ninja rom` + `dsd check modules` should report
+   **25/27 OK** for the first time this session
+   (DTCM flips from FAILED → OK on success). Watch
+   for workflow wall W5 surfacing — DTCM section
+   attribute syntax is TBD per brief 113's note.
+2. **Verify + merge cloud brief 114 (data_worklist.py
+   v2) PR** when it opens. Tooling brief. Verify by
+   spot-checking that section + size + shape filters
+   work on a 2020-candidate worklist; the tool should
+   produce a clear ranked output that decomper can use
+   to prioritize brief 116+ waves.
+3. **Scope brief 116+ after 114 + 115 close.** Options
+   per brief 113's plan:
+   - **Brief 116 — cluster A `.bss` wave 1** (decomper,
+     ~50 symbols in main, 6-10h).
+   - **Brief 117+ — cluster A scale-out** across
+     ov004/6/7/9/14/21.
+   - **Brief 118 — cluster B `.data` scalars**.
+   - **Function-tier carryovers** (T-4 application,
+     C-28 wave, etc.) — fit between data-tier waves
+     opportunistically.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.

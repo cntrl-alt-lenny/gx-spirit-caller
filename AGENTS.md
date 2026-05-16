@@ -313,23 +313,43 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/112-c29-c30-application-wave.md`](docs/briefs/112-c29-c30-application-wave.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  C-29 application (`if (!p)` idiom, ~20-25 from ~36
-  P-10 strict-sig pool). (2) C-30 application (4
-  callee-save candidates from brief 108's residue).
-  Self-extend gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c29-c30-application-wave`.
+- [`docs/briefs/115-dtcm-pilot-cluster-e.md`](docs/briefs/115-dtcm-pilot-cluster-e.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): **first
+  production data-tier wave**. Cluster E (DTCM/ITCM
+  specials, ~5-10 symbols). Flips DTCM module FAILED →
+  OK = **first 25/27 baseline since session start**.
+  Workflow wall W5 (DTCM section attribute syntax) is
+  TBD; research during this wave. Branch:
+  `decomper/dtcm-pilot-cluster-e`.
 
-- [`docs/briefs/113-data-tier-scoping.md`](docs/briefs/113-data-tier-scoping.md)
-  — `cloud` (MEDIUM): data-tier scoping brief. Define
-  data-tier matching semantics in the dsd workflow,
-  identify candidate pool size, output a future brief
-  plan for application waves (114+). The biggest
-  unrealized lever in the project (currently 0%).
-  Branch: `cloud/data-tier-scoping`.
+- [`docs/briefs/114-data-worklist-v2.md`](docs/briefs/114-data-worklist-v2.md)
+  — `cloud` (MEDIUM): `data_worklist.py` v2 tooling.
+  Extend brief 081-era worklist tool with section +
+  size + shape filtering. Required for brief 116+ scale-
+  out waves to run cleanly. ~4-6h cloud work. Branch:
+  `cloud/data-worklist-v2`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/112-c29-c30-application-wave.md`](docs/briefs/112-c29-c30-application-wave.md)
+  `decomper`, shipped in PR #516. **1 port / 72 bytes
+  — chain closes (all 3 gates missed).** 2nd
+  consecutive application-wave hand-back (after brief
+  108). Recipes are narrower than asm-signature
+  classification suggests; 5 candidates have well-
+  characterized failure modes (leaf optimization,
+  offset-split CSE, arg-spill convention, secondary
+  range-check, callee-save reload-over-spill). 7th
+  NEGATIVE-finding confirmation.
+- [`docs/briefs/113-data-tier-scoping.md`](docs/briefs/113-data-tier-scoping.md)
+  `cloud`, shipped in PR #515. **STRATEGIC PIVOT.**
+  Data tier is 2.0× larger than code (4.78 MB at 0%
+  matched). 85% is `.bss` (zero-fill, structurally
+  easier than function-tier). **5-cluster taxonomy** +
+  future brief plan (114→119+). 6-month roadmap: 50%
+  data-tier matched, 26/27 modules OK. **Cluster E
+  DTCM pilot (brief 115) flips DTCM module FAILED →
+  OK = first 25/27 baseline since session start.**
 
 - [`docs/briefs/110-cross-region-apply-wave-3.md`](docs/briefs/110-cross-region-apply-wave-3.md)
   `decomper`, shipped in PR #512. **71 region-landings /
