@@ -128,7 +128,7 @@ complete:** all 5 patterns (indirect-call → C-24, critical-
 section → C-26, predicated-cascade → P-9 + early-return scope-
 refinement, pool-word → C-27, cross-module BL → T-4) are now
 classified or recipe-codified.
-Brief 109 (PR #?) opened the **brief 106 residue classification
+Brief 109 (PR #510) opened the **brief 106 residue classification
 phase** with codegen sweeps on 5 candidates brief 106 surfaced
 as wall candidates. One recovery (`func_020338f8` — recipe:
 explicit ternary intermediate + `result = 1` set before
@@ -147,9 +147,25 @@ is +8 bytes over (mwcc CSE folds `base + 0x1fc` back into
 `base + 0xe7c`, defeating source-level intermediate-pointer
 coercion attempts at all 15 SPs). Both partials are P-N
 candidates pending a permuter-vs-residue follow-up brief.
+Brief 111 (PR #?) ran permuter against P-10 (longer timeout —
+1200s × 4 threads, 4× brief 109's budget) AND did codegen
+research on brief 108's 5 callee-save candidates. Permuter
+discovered the P-10 recipe at iter ~50: **`if (!p) return X;`
+(unary NOT)** triggers early-return where `if (p == 0) return X;`
+(equality with 0) triggers predicated cascade. Both forms
+semantically identical; mwcc 2.0 compiles them to DIFFERENT
+control-flow shapes. Classified as **C-29** with P-10 promoted
+to "SUPERSEDED BY C-29." This is the **3rd P-N → C-N permuter
+promotion** (after P-8 → C-25 in brief 098; P-9 → ? in brief 105
+remained permanent for mask form). Brief 108 callee-save research
+on `func_020071c4` surfaced the dual-extern + symbols.txt-alias
+recipe (C-27) PLUS a shift-based bit-extraction coercion;
+classified as **C-30 — pool-DUP + shift-bit extension of C-27**.
+End-to-end validated; src committed for both C-29 + C-30 worked
+examples.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
-(28 patterns — the right C variation or routing tier
+(30 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
 (10 patterns — mwcc keeps "winning" the codegen choice
 regardless of C variation; budget zero matches in the yield
@@ -217,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (28 patterns)
+## Coercible-with-knowledge (30 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -3438,6 +3454,281 @@ intermediate recipe; recipe byte-matches at default mwcc
 **C-28 — predicated-cascade collapse**, sibling of C-25 + C-26
 in the "split-statement intermediate" family.
 
+### C-29. `if (!p)` idiom for short-tail early return (SUPERSEDES P-10)
+
+> **Promotion note — C-29 supersedes P-10.** P-10 (brief 109)
+> classified `func_02037b34`'s "over-predication of short tail"
+> wall as permanent after a 6-variant × 15-SP sweep produced
+> zero recoveries. Brief 111's permuter run (1200s × 4 threads
+> per candidate, 4× brief 109's budget) found the recipe at
+> iter ~50: the wall coerces by replacing `if (p == 0) return X;`
+> with `if (!p) return X;` (unary NOT instead of equality with 0).
+> Both forms are semantically identical; mwcc 2.0 compiles them
+> to DIFFERENT control-flow shapes.
+
+> **Wall family note — C-29 vs C-28.** Both fix predication-vs-
+> control-flow mismatches but at different axes:
+>
+> | Wall | mwcc's default | Source-form coercion |
+> |---|---|---|
+> | **C-28** | combines `tst → moveq → beq` into single predicated cascade | introduce ternary intermediate flag + separate test stage |
+> | **C-29** (this entry) | predicates the entire post-null-check tail | use `!p` instead of `p == 0` for the early-return test |
+
+**Target asm (`func_02037b34` — brief 105/109/111 worked example):**
+
+```text
+
+stmdb sp!, {r3, lr}
+bl    func_02037b04
+cmp   r0, #0x0
+mvneq r0, #0x0                     ; if (r0 == 0) r0 = -1
+ldmeqia sp!, {r3, pc}              ; ← EARLY RETURN on eq
+ldr   r0, [r0, #0x34]              ; (unpredicated tail begins)
+mov   r0, r0, lsl #0x10
+mov   r0, r0, lsr #0x10
+ldmia sp!, {r3, pc}
+
+```
+
+9 insns = 0x24.
+
+**mwcc emits with `if (p == 0)`** (any of `== 0`, `== NULL`,
+`== (void*)0` — all coerce identically):
+
+```c
+if (p == 0) return -1;
+return p->f_34 & 0xffff;
+```
+
+```text
+
+push  {r3, lr}
+bl    helper
+cmp   r0, #0
+mvneq r0, #0
+ldrne r0, [r0, #0x34]              ; PREDICATED tail
+lslne r0, r0, #16
+lsrne r0, r0, #16
+pop   {r3, pc}
+
+```
+
+8 insns = 0x20. **−0x04 bytes** vs target. mwcc predicates the
+entire post-cmp tail (`ldrne + lslne + lsrne`) rather than
+emitting an early-return.
+
+**C that coerces it (verified byte-identical at default mwcc
+2.0/sp1p5, no routing change):**
+
+```c
+extern void *func_02037b04(void);
+
+struct s37b34 {
+    char _pad[0x34];
+    unsigned int f_34;
+};
+
+int func_02037b34(void) {
+    struct s37b34 *p = func_02037b04();
+    if (!p) return -1;        /* ← !p instead of p == 0 */
+    return p->f_34 & 0xffff;
+}
+```
+
+**Idiom matrix** (verified at default mwcc 2.0/sp1p5):
+
+| Source idiom | Result |
+|---|---|
+| `if (p == 0) return -1;` | predicated tail (0x20) |
+| `if (p == NULL) return -1;` | predicated tail (0x20) |
+| `if (p == (void*)0) return -1;` | predicated tail (0x20) |
+| `if (!p) return -1;` | **early return (0x24, target shape) ✓** |
+| `if (p) { ... } return -1;` (inverted) | **early return (0x24) ✓** |
+| `if (p != 0) { ... } return -1;` (inverted) | **early return (0x24) ✓** |
+| `if (p != NULL) { ... } return -1;` (inverted) | **early return (0x24) ✓** |
+
+The wall is mwcc's "equality with 0/NULL" semantic — three
+distinct source idioms (`== 0`, `== NULL`, `== (void*)0`) all
+trigger the predicated cascade. Switching to `!p` or any
+not-equal / inverted form triggers the early-return shape.
+
+**Scope:** the wall only fires when:
+1. The early-return-on-null is followed by a multi-insn tail
+   (typically ≥3 unpredicated insns).
+2. The function has a single-cmp control flow shape (no
+   intervening calls before the cmp).
+
+With a 1-insn tail (e.g., `return p->f_X;` alone), mwcc keeps
+predicating even with `!p`. With a 2-insn tail, mixed results.
+For 3+ insns, the `!p` recipe reliably triggers early return.
+
+**Cross-corpus survey:** brief 109 estimated ~36 strict P-10
+candidates. The C-29 recipe applies to any candidate where the
+tail is ≥3 insns; smaller tails are NOT walled (mwcc emits
+predicated shape that orig also has). Decomper application
+waves should attempt C-29 first; for short-tail residue, fall
+through to permuter or accept skip.
+
+**Provenance:** brief 105 (PR #504) first surfaced
+`func_02037b34` as a permuter candidate (300s × 4 threads,
+best score 210 — no recovery). Brief 109 (PR #510) ran a
+codegen sweep, classified as P-10 permanent. Brief 111
+(PR #?) re-ran permuter with 1200s budget; permuter discovered
+the `if (!p)` recipe at iter ~50, score 0 — full byte-identical
+recovery. End-to-end validated; src committed.
+
+This is the **3rd P-N → C-N promotion via permuter discovery**:
+brief 098 P-8 → C-25, brief 105 P-9 → C-N (NEGATIVE — confirmed
+permanent for mask form), brief 111 P-10 → C-29. Adds a data
+point for "permuter is useful for IR-lowering walls when budget
+is enough" — 300s misses, 1200s finds it.
+
+### C-30. Pool-DUP + shift-based bit extraction (extends C-27)
+
+> **Wall family note — C-30 extends C-27.** C-27 covers the
+> dual-pool-word recipe (extern alias + symbols.txt entry) for
+> functions caching a global pointer in a callee-save register
+> across a BL. C-30 adds a SECOND coercion layer for functions
+> where the early-return condition also involves SHIFT-BASED
+> bit extraction (lsl + lsrs) rather than mwcc's preferred
+> `tst + popeq` peephole.
+>
+> | Wall | C-27 | C-30 |
+> |---|---|---|
+> | **Pool-dup** | dual-extern + symbols.txt alias | same |
+> | **Bit-extraction** | (no bit test in C-27's example) | `((v << K) >> 31)` shift idiom |
+> | **Required for recovery** | C-27 alone | C-27 + shift idiom |
+
+**Target asm (`func_020071c4` — brief 111 worked example):**
+
+```text
+
+stmdb sp!, {r4, lr}
+ldr   r0, .L_pool1                 ; r0 = &data_X (test slot)
+ldr   r4, .L_pool2                 ; r4 = &data_X (callee-save)
+ldr   r0, [r0, #0x10]              ; r0 = *p_X +0x10
+mov   r0, r0, lsl #0x1e            ; shift to isolate bit 1
+movs  r0, r0, lsr #0x1f            ; lsr 31 + S flag (cmp 0)
+ldmeqia sp!, {r4, pc}              ; early return if bit clear
+bl    func_02006918
+bl    func_02006a38
+ldr   r0, [r4, #0x14]              ; access via cached r4
+cmp   r0, #0
+beq   .L_done
+bl    func_020057dc
+.L_done:
+ldr   r1, [r4, #0x10]
+mov   r0, #0
+bic   r1, r1, #2
+str   r1, [r4, #0x10]
+str   r0, [r4, #0x14]
+ldmia sp!, {r4, pc}
+.L_pool1: .word data_02104f1c
+.L_pool2: .word data_02104f1c
+
+```
+
+21 insns = 0x54. Two diagnostic features:
+1. Two distinct pool slots for the same `data_X` (C-27 wall).
+2. The 1-bit test is done via `lsl 30 + lsrs 31` (3 insns) +
+   `ldmeqia` (early-return) — instead of mwcc's natural
+   `tst rN, #2 + popeq` (2 insns).
+
+**mwcc emits when miscoded** (single extern, natural form, no
+shift idiom):
+
+```c
+void func_020071c4(void) {
+    struct s071c4 *p = (struct s071c4 *)&data_02104f1c;
+    if ((p->f_10 & 2) == 0) return;
+    ...
+}
+```
+
+```text
+
+push  {r4, lr}
+ldr   r4, [pool]                   ; r4 = &data_X (SINGLE pool slot)
+ldr   r0, [r4, #0x10]
+tst   r0, #2                       ; 2-insn test+branch
+popeq {r4, pc}
+...
+
+```
+
+18 insns = 0x48. **−0x0c bytes** vs target. Two divergences
+fire together: (1) single pool slot, (2) tst peephole.
+
+**C that coerces it (verified byte-identical at default mwcc
+2.0/sp1p5):**
+
+```c
+extern unsigned int data_02104f1c;
+extern unsigned int data_02104f1c_alias;  /* via symbols.txt */
+extern void func_02006918(void);
+extern void func_02006a38(void);
+extern void func_020057dc(void);
+
+struct s071c4 {
+    char _pad[0x10];
+    unsigned int f_10;
+    int f_14;
+};
+
+void func_020071c4(void) {
+    struct s071c4 *p_test  = (struct s071c4 *)&data_02104f1c;
+    struct s071c4 *p_store = (struct s071c4 *)&data_02104f1c_alias;
+    unsigned int v = p_test->f_10;
+    if (((v << 30) >> 31) == 0) return;    /* shift idiom */
+    func_02006918();
+    func_02006a38();
+    if (p_store->f_14 != 0) func_020057dc();
+    p_store->f_10 &= ~2u;
+    p_store->f_14 = 0;
+}
+```
+
+Plus `data_02104f1c_alias kind:bss addr:0x02104f1c` in
+`config/eur/arm9/symbols.txt`.
+
+The shift idiom `((v << 30) >> 31)` produces:
+- `mov rN, rN, lsl #30` (isolate bit 1 to MSB)
+- `movs rN, rN, lsr #31` (shift to LSB + set Z flag)
+
+Instead of mwcc's preferred `tst rN, #2; popeq` (1 cmp + 1
+predicated pop). The shift idiom is 3 insns (`mov` lsl, `movs`
+lsr, `ldmeqia`) vs `tst` idiom's 2 insns (`tst`, `popeq`) — an
+extra instruction that matches target's longer form.
+
+**SP boundary (verified 15 mwcc SPs, 4 source variants):**
+
+| mwcc SP | A_natural | C_simpledual | D_shiftbit | E_volstruct |
+|---|---|---|---|---|
+| 1.2/base..sp2p3 | 0x50 | 0x58 | 0x5c | 0x58 |
+| 1.2/sp3, sp4 | 0x48 | 0x50 | 0x54 ✓ | 0x50 |
+| 2.0/base..sp2p4 (10 SPs) | 0x48 | 0x50 | **0x54 ✓** | 0x50 |
+
+Variant D (dual-stash + shift-bit) hits 0x54 at all 10 mwcc
+2.0/* SPs AND at 1.2/sp3-sp4. Default 2.0/sp1p5 works without
+routing.
+
+**Cross-corpus survey:** brief 108 flagged 5 C-27 callee-save
+candidates as wall-blocked. Brief 111's spot-check confirmed
+`func_020071c4` recovers with C-30 recipe; the remaining 4
+(`func_02024024`, `func_02024574`, `func_0202a1cc`,
+`func_0202a27c`) all share similar structure with Fill32 loops
+— need per-candidate inspection for the specific bit-test
+idiom + helper-arg patterns. Application wave outstanding.
+
+**Provenance:** brief 108 (PR #509) flagged 5 candidates as
+"callee-save preservation mismatch" — couldn't recover via
+C-27's recipe alone. Brief 111 (PR #?) sweeped 4 source
+variants on `func_020071c4` (smallest single-wall exemplar);
+variant D (shift-based bit extraction + dual-extern) hit
+byte-identical at all 10 mwcc 2.0/* SPs. End-to-end validated;
+src committed. Classified as **C-30 — pool-DUP + shift-bit
+extension of C-27**.
+
 ## Permanent (10 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -4057,12 +4348,20 @@ chooses to predicate instead of leaving as a fall-through.
 
 **Provenance:** brief 106 (decomper hand-back) listed
 `func_02037b34` as a "predicated vs early-return form mismatch"
-residue candidate. Brief 109 (PR #?) ran a 6-variant × 15-SP
+residue candidate. Brief 109 (PR #510) ran a 6-variant × 15-SP
 codegen sweep (75 compiles); no variant produces the target's
 early-return shape at any SP. Classified as **P-10 — over-
 predication of short tail** (sibling of P-9 mvnNE wall, but at
 the predication-vs-early-return axis rather than the
 mvnNE-write peephole). Permuter is the next-attempt path.
+
+**SUPERSEDED BY C-29 (brief 111):** brief 111's permuter run
+(1200s × 4 threads, 4× brief 109's budget) found the recipe at
+iter ~50 — the wall coerces with `if (!p) return -1;` (unary
+NOT) instead of `if (p == 0) return -1;` (equality with 0).
+Both forms are semantically identical; mwcc 2.0 compiles them
+to DIFFERENT control-flow shapes. P-10 is no longer permanent
+for this pattern — see C-29 for the codified recipe.
 
 ## Codegen-inherent edge cases (3 patterns)
 
@@ -4884,6 +5183,10 @@ shape we should chase".
 | 109 / partial | `func_02079ddc` | **C-N partial** — `.legacy.c` (1.2/sp2p3) routing recovers prologue/epilogue + `ands` shape; 13/17 instructions match. Residue is P-4-family **r1↔r2 reg-alloc swap** on the indexed halfword load. Permuter-tractable or P-4-class permanent | partial (.legacy.c + P-4 residue) |
 | 109 / partial | `func_020326d4` | **P-N candidate** — natural form at default 2.0/sp1p5 is 0x58 (target 0x50, +8 bytes over). mwcc CSE folds `base + 0x1fc` back into `[base, #0xe7c]` direct access, defeating intermediate-pointer coercion attempts (variants B/C/D/E with sub-struct casts, volatile-pointer, char* arithmetic). Permanent for source-form pipeline; static-inline helper recovers shape but adds a real bl insn | provisional P-N (CSE-of-base-pointer-arithmetic, pending permuter) |
 | 109 / NEG | `func_020aac30` | Natural form is 0x50 (target 0x54, just 1 insn short). Semantics-difference wall: target stashes arg0 to STACK at [sp, #0x4] then passes `&arg0_stackslot` (i.e. `signed char **`) to the helper, while natural form caches arg0 in r4 and passes the value. Needs helper signature change to take `signed char **`. Likely C-N if helper sig refactor lands; pending separate investigation | partial (sig-change needed, brief candidate for follow-up) |
+| 111 / perm | `func_02037b34` | **C-29** (worked example, supersedes P-10) — permuter @ 1200s × 4 threads found recipe at iter ~50: `if (!p) return -1;` triggers early-return shape where `if (p == 0) return -1;` (and `== NULL`, `== (void*)0`) trigger predicated cascade. Both semantically identical; mwcc 2.0 compiles them to DIFFERENT control flows. End-to-end validated; src committed. 3rd P-N → C-N permuter promotion (after P-8 → C-25 brief 098; P-9 mask form stayed permanent brief 105) | coercible (source-form idiom, default SP) |
+| 111 / sweep | `func_020071c4` | **C-30** (worked example, extends C-27) — pool-DUP + shift-based bit extraction. 4-variant × 15-SP sweep: variant D (dual-extern + symbols.txt alias + `((v << 30) >> 31)` shift idiom) byte-matches at all 10 mwcc 2.0/* SPs. End-to-end validated; src committed | coercible (source-form + symbols.txt alias, default SP) |
+| 111 / partial | `func_020335d4`, `func_020326d4` | 020335d4 close-but-1-insn-off (mwcc emits extra `mov r0, #0` for helper call where target leaves r0 from previous bl — C-26-style helper-sig wall). Permuter run 5964 iters / ~7 min, best plateau 225 — confirms permuter can't bridge the secondary wall. 020326d4 still hits brief 109's CSE wall (mwcc folds `base + 0x1fc` → `[base, #0xe7c]`). `!p` recipe didn't help either; both need additional source-form factors beyond C-29 | partial (C-29 + secondary wall) |
+| 111 / methodology | (P-N → C-N permuter promotion rate) | After brief 111: 2 of 3 P-N permuter sweeps promoted (P-8 → C-25 brief 098; P-10 → C-29 brief 111; P-9 mask remained permanent brief 105). Recovery rate 67%. Calibration: longer budget (1200s vs brief 105's 300s) was decisive for P-10. Permuter is a valid tool for IR-lowering walls when budget is enough | (methodology data point) |
 
 ## Quantification
 
