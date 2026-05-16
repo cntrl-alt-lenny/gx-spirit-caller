@@ -85,6 +85,18 @@ present in orig; helper-takes-no-args declaration matches orig
 when helper ignores incoming r0 by overwriting it from a pool
 literal). Classified as **C-26** — same routing family as C-23
 + C-24 but with a distinct source-form factor on top.
+Brief 103 (PR #?) ran a 6-variant × 15-SP sweep on the
+predicated-cascade pattern (~6 of 31 brief-097 residue);
+discovered the mwcc-2.0-only **`mvnNE rN, #0` peephole gap**
+(no source-form combination across 90 compiles produces the
+direct conditional-mvn-write-of-`-1` shape orig uses).
+Classified as **P-9** (permanent for source-form pipeline,
+asm-void recipe is the future-attempt path). NEGATIVE finding
+flagged: a 281-candidate broader scan + natural-form spot-check
+showed brief 097's "predicated-cascade" classification was
+over-broad — many candidates byte-match natural form. The
+actually-walled population is the 36-candidate `mvnNE`-signature
+subset.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
@@ -3025,7 +3037,7 @@ C-24 (mwcc-2.0 stack-frame elision behaviour, fixed by
 1.2-tier routing) but with a distinct source-form factor
 (helper signature) on top.
 
-## Permanent (8 patterns)
+## Permanent (9 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -3366,6 +3378,121 @@ tested forces the r1 split.
 divergence with identical semantics; could be unlocked by a
 T-1-style `--rename-regs` post-process if future briefs find
 more instances.
+
+**SUPERSEDED BY C-25 (brief 100):** brief 098's permuter recovery
+of `func_ov000_021ac85c` discovered a source-form recipe (split
+the bitfield-chain expression into two statements). Brief 100
+Part 1 codified the recipe as **C-25**. P-8 is no longer
+permanent for this pattern — see C-25 for the working
+two-statement-source recipe.
+
+### P-9. Conditional mvn-write `-1`: `mvnNE rN, #0` peephole absent
+
+**Target asm (`func_020534b4` — brief 103 worked example):**
+
+```text
+
+stmdb sp!, {r4, lr}
+mov   r4, r0
+bl    helper                      ; helper(arg) → r0
+cmp   r0, #0
+mvnNE r0, #0                      ; r0 = -1 (NE) — direct mvn-write
+andNE r0, r4, r0                  ; r0 = arg & -1 = arg (NE, masked path)
+movEQ r0, #0                      ; r0 = 0 (EQ)
+ldmia sp!, {r4, pc}
+
+```
+
+8 instructions = 0x20 bytes. The diagnostic feature is the
+**`mvnNE rN, #0`** instruction — orig writes `-1` directly via
+a predicated `mvn` rather than computing it through
+`mov + rsb`. The subsequent `andNE r0, r4, r0` does
+`arg & -1 = arg` — a no-op mask that the source's `mask`
+variable provoked mwcc to emit (rather than the shorter `mov r0,
+r4` that the simpler natural form produces).
+
+**mwcc emits when miscoded** (all 90 source × SP combinations
+tested — none produce `mvnNE rN, #0`):
+
+| Source variant | Default mwcc 2.0/sp1p5 emit |
+|---|---|
+| natural `return helper(arg) ? arg : 0;` | `moveq r4, #0; mov r0, r4` (7 insns, byte-diff 14) |
+| explicit `int mask = helper(arg) ? -1 : 0;` then `arg & mask` | `movne r0, #1; moveq r0, #0; rsb r0, r0, #0; and r0, r4, r0` (8 insns, byte-diff 10) |
+| `~0` instead of `-1` | same as `-1` variant (mwcc treats them identically) |
+| `if`/`else` chain | same as explicit-mask variant |
+| split into 2 statements (`int r = helper(...); int mask = r ? -1 : 0;`) | same |
+| inline ternary `helper(arg) ? (arg & -1) : 0` | same as natural |
+
+**The wall mechanism:** mwcc 2.0 lowers `cond ? -1 : 0` as
+"produce a {0, 1} via `movXX`, then negate via `rsb r0, r0, #0`."
+mwcc never emits a direct `mvnXX rN, #0` (which would produce
+`-1` predicated in one instruction). orig was likely compiled
+with a different optimisation level OR a hand-written asm
+fragment that produced the `mvnNE`-form directly.
+
+**SP boundary (verified all 15 mwcc SPs, 6 source variations
+× 90 compiles):**
+
+| mwcc SP | natural | explicit-mask | recipe-equivalent |
+|---|---|---|---|
+| 1.2/base..sp2p3 | 0x20 score 14 | 0x28 score 10 | none |
+| 1.2/sp3, sp4 | 0x1c score 14 | 0x24 score 10 | none |
+| 2.0/base..sp2p4 (10 SPs) | 0x1c score 14 | 0x24 score 10 | none |
+
+No (source, SP) combination produces `mvnNE rN, #0`. The
+peephole appears absent across all 15 SPs in our toolchain.
+
+**Resolution:** P-N **permanent for source-form pipeline**.
+Future-attempt paths:
+
+1. **`asm void` + `nofralloc`** recipe (C-12 / C-16 style) —
+   write the conditional `mvn` directly in inline asm. High
+   per-target cost (~10 lines of inline asm) but produces
+   byte-identical output. Worth the cost when the candidate is
+   ≥ 0x40 bytes / has multiple `mvnNE`-pattern instances.
+2. **Permuter (brief 096 wrapper)** — let permuter discover an
+   unexpected source-form. P-N classification doesn't preclude
+   permuter recovery; brief 098 promoted P-8 → C-25 via
+   exactly this path.
+
+**Cross-corpus survey:** 36 unmatched functions (size 0x18-0x80)
+contain a predicated `mvn rN, #0` instruction. These are the
+P-9 candidate population. Worked example: `func_020534b4`
+(0x20). Other notable candidates from the residue:
+
+- `func_02037b34` (0x24)
+- `func_02033488` (0x2c)
+- `func_02054c0c` (0x24)
+- `func_02000d4c` (0x50)
+- `func_02022540` (0x40)
+
+**NEGATIVE finding (worth flagging for future-wave selection):**
+brief 097 classified ~6 of 31 medium-tier residue candidates as
+"predicated-cascade walled." Brief 103's cross-corpus scan
+found **281 unmatched functions** in main with the broader
+predicated-cascade asm signature (≥3 sequenced conditional ops,
+no intervening branch). A natural-form spot-check on
+`func_02092644` (0x24 doubly-linked-list node-unlink with two
+`if (cond) ... else ...` stores) produced **byte-identical
+output at ALL 15 mwcc SPs**. Many of the 281 candidates are
+likely not actually walled — brief 097's "predicated cascade"
+classification was over-broad. Decomper's selection rule for
+future waves should attempt natural form FIRST. The actually-
+walled subset is identified by the **`mvnNE rN, #0`** signature
+above (36 candidates).
+
+**Provenance:** brief 097 (decomper hand-back) flagged
+predicated cascade as the 3rd-most-represented wall pattern
+(~6 of 31). Brief 103 (PR #?) ran a 6-variant × 15-SP sweep
+on the smallest predicated-cascade exemplar (`func_020534b4`),
+discovered the mwcc-2.0-only `mvnNE rN, #0` peephole gap,
+classified as **P-9** with a 36-candidate cross-corpus pool.
+Negative-finding gate (per brief 100's lesson): spot-checked
+`func_02092644` (also from the 281-candidate predicated-cascade
+signature set) → byte-identical natural form at all 15 SPs.
+Brief 097's broad classification was over-inclusive; the
+actually-walled population is the 36-candidate `mvnNE`-signature
+subset.
 
 ## Codegen-inherent edge cases (3 patterns)
 
@@ -4081,6 +4208,9 @@ shape we should chase".
 | 098 / 494 | `func_ov000_021ac85c` | **C-25** (worked example) — bitfield-chain reg-alloc temp-register dance. Brief 098 recovered via permuter discovery of split-statement source form; brief 100 Part 1 codified as default-SP-only C-class recipe. | coercible (source-form, default SP) |
 | 100p2 / sweep | `func_020919d8` | **C-26** (worked example) — critical-section + helper-signature mismatch; orig's helper ignores incoming r0 (overwrites from pool first instruction). Recipe: declare helper signature without args + route via `*.legacy.c`. Cross-corpus survey: 125 unmatched functions have the OS_DisableIrq/Restore pair; strict C-26 sub-population needs per-function helper-body inspection | coercible (routing + source-form, legacy.c) |
 | 100p2 / sweep | `func_02034754` / `func_02095484` / `func_0208a684` / `func_02032e8c` (4 of the 125 critsec candidates) | **NEGATIVE finding** — natural-form C source byte-matches at default mwcc 2.0/sp1p5 (NOT walled). Brief 097's broad "critical-section wall" framing was over-inclusive; not all OS_DisableIrq/Restore pairs hit a coercion problem. Future single-region waves should attempt natural form first before invoking C-26's routing fix | natural-form / already-coercible |
+| 103 / sweep | `func_020534b4` | **P-9** (worked example) — `mvnNE rN, #0` peephole gap; mwcc 2.0 emits `mov + rsb` for `cond ? -1 : 0` instead of direct conditional-mvn. 6-variant × 15-SP sweep (90 compiles): no source-form combination produces the orig's shape. asm-void recipe (C-12/C-16 family) is the future-attempt path | permanent (P-9, source-form pipeline; asm-void candidate) |
+| 103 / sweep | `func_02092644` | **NEGATIVE finding** — doubly-linked-list node unlink with two if/else predicated-store branches; natural C byte-matches orig at ALL 15 mwcc SPs. Brief 097's "predicated-cascade" classification was over-inclusive (281 candidates have the broader signature; only the 36-candidate `mvnNE`-signature subset is actually walled) | natural-form / already-coercible |
+| 103 / scan | `func_02037b34` / `func_02033488` / `func_02054c0c` / `func_02000d4c` / `func_02022540` | **P-9** (cross-corpus matches) — 36 unmatched functions contain a predicated `mvn rN, #0` instruction. These are the actually-walled subset of the 281-candidate broader predicated-cascade signature | permanent (P-9, deferred to asm-void or permuter) |
 
 ## Quantification
 
