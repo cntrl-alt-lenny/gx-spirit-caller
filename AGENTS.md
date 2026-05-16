@@ -313,23 +313,48 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/115-dtcm-pilot-cluster-e.md`](docs/briefs/115-dtcm-pilot-cluster-e.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): **first
-  production data-tier wave**. Cluster E (DTCM/ITCM
-  specials, ~5-10 symbols). Flips DTCM module FAILED →
-  OK = **first 25/27 baseline since session start**.
-  Workflow wall W5 (DTCM section attribute syntax) is
-  TBD; research during this wave. Branch:
-  `decomper/dtcm-pilot-cluster-e`.
+- [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
+  Cluster A `.bss` wave 1 — ~50 symbols from main per
+  brief 114's worklist v2 cluster A pool (1586
+  candidates). Apply brief 115's `.s` + LCF auto-routing
+  recipe. (2) Cross-region DTCM parity — move `src/dtcm/`
+  → `libs/dtcm/`, promote IRQ handler names to USA + JPN
+  symbols.txt. Goal: USA + JPN flip to 25/27 (3-region
+  DTCM parity). Branch:
+  `decomper/cluster-a-wave-1-dtcm-parity`.
 
-- [`docs/briefs/114-data-worklist-v2.md`](docs/briefs/114-data-worklist-v2.md)
-  — `cloud` (MEDIUM): `data_worklist.py` v2 tooling.
-  Extend brief 081-era worklist tool with section +
-  size + shape filtering. Required for brief 116+ scale-
-  out waves to run cleanly. ~4-6h cloud work. Branch:
-  `cloud/data-worklist-v2`.
+- [`docs/briefs/117-cluster-b-scalars-research.md`](docs/briefs/117-cluster-b-scalars-research.md)
+  — `cloud` (MEDIUM): cluster B `.data` scalars recipe
+  research. Brief 114 enumerated 247 cluster B
+  candidates (avg 4 bytes). Workflow wall W4 (cluster B
+  section attribute) TBD. Output: recipe documentation
+  for brief 120+ scale-out. Branch:
+  `cloud/cluster-b-scalars-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/115-dtcm-pilot-cluster-e.md`](docs/briefs/115-dtcm-pilot-cluster-e.md)
+  `decomper`, shipped in PR #519. **First production
+  data-tier wave. EUR 25/27 OK** (DTCM module flipped
+  FAILED → OK — first multi-module-baseline improvement
+  of the session). 5 symbols / 1568 bytes byte-identical
+  via mwasmarm `.s` + dsd LCF auto-routing recipe.
+  **Workflow wall W5 resolved differently than expected**
+  (NOT `__attribute__((section))` or `#pragma section` —
+  the recipe is `.s` files + dsd's LCF auto-routing
+  based on delinks.txt address claims). USA + JPN remain
+  at 24/27 pending brief 116 part 2 cross-region parity.
+- [`docs/briefs/114-data-worklist-v2.md`](docs/briefs/114-data-worklist-v2.md)
+  `cloud`, shipped in PR #518. **data_worklist.py v2
+  ships with all 5 cluster filters** + sanity-check
+  passes (cluster A = 85.34% of pool, matches brief
+  113's prediction). **Bonus: bug fix** — analyze_symbols
+  .py's SYMBOL_RE was paren-required and silently
+  dropping every `kind:bss addr:0x...` line. 1587 bss
+  symbols (637 main + 950 overlays) now reach downstream
+  tools. 1631/1631 tests (+48 new). Brain pushed
+  `ac1aedd` to clear 4 F401 unused imports.
 
 - [`docs/briefs/112-c29-c30-application-wave.md`](docs/briefs/112-c29-c30-application-wave.md)
   `decomper`, shipped in PR #516. **1 port / 72 bytes
