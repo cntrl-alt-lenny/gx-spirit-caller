@@ -51,8 +51,13 @@ LOAD_RELOC_KINDS: set[str] = {"load"}
 # Line formats in config/<ver>/**/symbols.txt, e.g.
 #   Entry         kind:function(arm,size=0x13c) addr:0x02000800
 #   data_020b4320 kind:data(any)                addr:0x020b4320
+#   data_02102c60 kind:bss                      addr:0x02102c60
+# The parens are optional — `kind:bss` carries no attrs. brief 114
+# extended this to admit the paren-less form so .bss symbols (which
+# the original regex silently dropped) flow into downstream tools.
 SYMBOL_RE = re.compile(
-    r"^(?P<name>\S+)\s+kind:(?P<type>\w+)\((?P<attrs>[^)]*)\)\s+addr:0x(?P<addr>[0-9a-fA-F]+)"
+    r"^(?P<name>\S+)\s+kind:(?P<type>\w+)(?:\((?P<attrs>[^)]*)\))?"
+    r"\s+addr:0x(?P<addr>[0-9a-fA-F]+)"
 )
 
 # Line format in config/<ver>/**/relocs.txt, e.g.
@@ -179,10 +184,10 @@ def parse_symbols_file(path: Path, module: str) -> list[Symbol]:
             m = SYMBOL_RE.match(line)
             if not m:
                 continue
-            attrs = m["attrs"]
+            attrs = m["attrs"] or ""    # brief 114: paren-less form has no attrs
             mode = "any"
             size = 0
-            # `function(arm,size=0x13c)` vs `data(any)`.
+            # `function(arm,size=0x13c)` vs `data(any)` vs `bss` (no parens).
             for part in attrs.split(","):
                 part = part.strip()
                 if part.startswith("size=0x"):
