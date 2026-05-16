@@ -96,7 +96,7 @@ flagged: a 281-candidate broader scan + natural-form spot-check
 showed brief 097's "predicated-cascade" classification was
 over-broad — many candidates byte-match natural form. The
 actually-walled population is the 36-candidate `mvnNE`-signature
-subset. Brief 105 (PR #?) followed up with permuter sweep on
+subset. Brief 105 (PR #504) followed up with permuter sweep on
 5 of 6 named P-9 candidates (300s × 4 threads each); 1 base
 recovery (`func_02033488`, early-return form), 4 plateau
 (mask form). Refined P-9 scope: the wall applies specifically
@@ -105,18 +105,42 @@ EARLY-RETURN form is unrelated codegen sharing the `mvn`
 instruction. The 36-candidate pool sub-divides: ~⅓ early-return
 (recoverable with natural source), ~⅔ mask form (true P-9
 permanent including against permuter exploration).
+Brief 107 (PR #?) **closed the brief 097 residue classification
+phase** by sweeping the final two patterns: pool-word count
+mismatch (~3 of 31) + cross-module BL (~3 of 31). Pool-word
+classification: ran 8-variant × 15-SP sweep on `func_02023fec`
+(brief 040's worked example, originally classified P-7);
+discovered the dual-extern + `symbols.txt` alias recipe — variant
+F (dual-stash with two distinct extern symbols + `void * volatile *`
+local pointers + an alias line in `symbols.txt`) byte-matches at
+all 10 mwcc 2.0/* SPs. Classified as **C-27 — pool-word
+DUPLICATION wall** (the inverse-direction sibling of C-24's
+pool-dedup); P-7 promoted to "SUPERSEDED BY C-27." Cross-corpus
+survey: 157 duplicate-pool-pair occurrences. Cross-module BL
+classification: scanned all overlays' disasm for `bl #<imm>`
+fallback patterns; found 102 occurrences at 23 distinct target
+addresses (99 unknown to dsd, 3 misclassified as data). Pure
+analysis-completeness issue — once the targets are named, mwcc
+emits `bl <symbol>` and the link is byte-trivial. Classified as
+**T-4 — overlay function symbol promotion** (tooling/analysis
+gap, not a codegen wall). **Brief 097 residue classification
+complete:** all 5 patterns (indirect-call → C-24, critical-
+section → C-26, predicated-cascade → P-9 + early-return scope-
+refinement, pool-word → C-27, cross-module BL → T-4) are now
+classified or recipe-codified.
 Most fall into one
 of three buckets: **coercible-with-knowledge**
-(16 patterns — the right C variation or routing tier
+(27 patterns — the right C variation or routing tier
 matches; future briefs can grep here first), **permanent**
-(8 patterns — mwcc keeps "winning" the codegen choice
+(9 patterns — mwcc keeps "winning" the codegen choice
 regardless of C variation; budget zero matches in the yield
 band), and **tooling-tractable**
-(3 patterns —
+(4 patterns —
 `propagate_template` could ship a register-renaming or
 literal-substitution variant — T-1, T-2 still proposed; T-3
 third compiler routing tier **shipped in PR #340** via brief
-045). Brief 031's HIGH 78% under-delivery (22%) was dominated
+045; T-4 overlay function symbol promotion **research-only**
+via brief 107 — application wave outstanding). Brief 031's HIGH 78% under-delivery (22%) was dominated
 by 2-3 walls (r2-vs-r3 spill on swap thunks, pool-load vs
 add-imm chain, ldmib fusion) that all sit in the *permanent*
 bucket. Brief 040's 4 drops surfaced a third compiler flavour
@@ -174,7 +198,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (26 patterns)
+## Coercible-with-knowledge (27 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -3045,6 +3069,191 @@ C-24 (mwcc-2.0 stack-frame elision behaviour, fixed by
 1.2-tier routing) but with a distinct source-form factor
 (helper signature) on top.
 
+### C-27. Pool-word DUPLICATION — two distinct externs + symbols.txt alias (SUPERSEDES P-7)
+
+> **Promotion note — C-27 supersedes P-7.** P-7 (brief 040)
+> classified the pool-not-deduped wall on `func_02023fec` as
+> permanent for the source-form pipeline, with a parenthetical
+> "would require config-level alias declaration" speculation
+> that was untested at the time. Brief 107 (PR #?) confirmed the
+> speculation: a `symbols.txt` alias entry + dual-extern source
+> form recovers byte-identical at the project's default mwcc
+> 2.0/sp1p5 — no routing tier change, no inline asm. P-7 is no
+> longer permanent for this pattern — see this entry for the
+> working recipe.
+
+> **Wall family note — C-27 vs C-24 (inverse direction).** C-24
+> requires *pool dedup* (force mwcc to emit one pool entry for
+> two LDRs that load the same address). C-27 requires the
+> *opposite* — force mwcc to emit TWO pool entries for two LDRs
+> that load the same address, when the function caches the
+> address in a callee-save register (r4) across a BL to survive
+> the call.
+>
+> | Wall | What mwcc does | What orig does | Recipe |
+> |---|---|---|---|
+> | **C-24** | dedupes pool when source uses one identifier; 2-entry pool when source uses two identifiers | 1-entry pool | single-extern (C-24 variant F) + `.legacy_sp3.c` |
+> | **C-27** (this entry) | 1-entry pool + reloads address after BL (defers callee-save spill) | 2-entry pool + caches address in r4 across BL (callee-save spill happens at function entry) | dual-extern + `symbols.txt` address alias + `void * volatile *` local pointer dance |
+>
+> Both walls live on the same axis (mwcc's pool-dedup peephole)
+> but pull in opposite directions. C-24 wants the peephole TO
+> fire; C-27 wants it to NOT fire.
+
+**Target asm (`func_02023fec` — brief 107 worked example):**
+
+```text
+
+stmdb sp!, {r4, lr}
+ldr   r0, .L_pool1                ; r0 = &data_X (test slot)
+ldr   r4, .L_pool2                ; r4 = &data_X (callee-save, survives bl)
+ldr   r0, [r0, #0x0]              ; r0 = *p
+cmp   r0, #0x0
+beq   .L_skip
+ldr   r0, [r4, #0x0]              ; r0 = *p (via cached r4)
+bl    Task_InvokeLocked
+mov   r0, #0x0
+str   r0, [r4, #0x0]              ; *p = NULL (via cached r4)
+.L_skip:
+mov   r0, #0x1
+ldmia sp!, {r4, pc}
+.L_pool1: .word data_X            ; ← two distinct pool entries
+.L_pool2: .word data_X            ;   for the SAME address
+
+```
+
+14 insns × 4 bytes = 0x38. The diagnostic is the **pool layout**:
+two adjacent `.word` slots holding the same address constant,
+loaded into r0 (caller-save, for the test) and r4 (callee-save,
+for the post-BL store). orig's compiler chose to pre-load both
+before the cmp/beq decision tree, so r4 is already populated
+when the BL returns.
+
+**mwcc emits when miscoded** (single extern, natural form):
+
+```c
+extern void *data_X;
+extern void Task_InvokeLocked(void *p);
+
+int func_02023fec(void) {
+    if (data_X != 0) {
+        Task_InvokeLocked(data_X);
+        data_X = 0;
+    }
+    return 1;
+}
+```
+
+```text
+
+stmdb sp!, {r3, lr}                ; push {r3, lr} (cheap stack-trick)
+ldr   r0, [pc, #0x24]              ; r0 = &data_X (single pool slot)
+ldr   r0, [r0]                     ; r0 = *p
+cmp   r0, #0x0
+beq   .L_skip
+ldr   r0, [pc, #0x14]              ; reuses SAME pool slot
+ldr   r0, [r0]
+bl    Task_InvokeLocked
+ldr   r0, [pc, #0x10]              ; reuses SAME pool slot
+mov   r1, #0x0
+str   r1, [r0]
+.L_skip:
+mov   r0, #0x1
+ldmia sp!, {r3, pc}
+.word data_X                       ; ← ONE pool slot, reused 3×
+
+```
+
+12 insns + 1 pool word = 0x30. **−0x8 bytes** vs target. Two
+divergences: (1) single pool entry instead of two, (2)
+`push {r3, lr}` cheap stack-trick instead of `push {r4, lr}`
+callee-save. The two are linked — without r4 being live across
+the BL, mwcc has no reason to pre-load the address; without two
+distinct pool references, mwcc dedupes.
+
+**C that coerces it (verified byte-identical against
+`func_02023fec`, default mwcc 2.0/sp1p5 routing — no `.legacy`
+suffix needed):**
+
+```c
+extern void *data_X;
+extern void *data_X_alias;         /* SAME address (see symbols.txt) */
+extern void Task_InvokeLocked(void *p);
+
+int func_02023fec(void) {
+    void * volatile *test_p  = (void * volatile *)&data_X;
+    void * volatile *store_p = (void * volatile *)&data_X_alias;
+    if (*test_p != 0) {
+        Task_InvokeLocked(*store_p);
+        *store_p = 0;
+    }
+    return 1;
+}
+```
+
+The volatile-qualified local pointer dance forces mwcc to
+materialize both addresses eagerly (no deferred reload after the
+BL); the dual-extern with two distinct identifiers prevents
+pool dedup at the `.o` level; the linker resolves both to the
+same address via the alias entry.
+
+**Required symbols.txt entry** (one-line addition next to the
+original `data_X` line):
+
+```text
+data_0219a8e4       kind:bss addr:0x0219a8e4
+data_0219a8e4_alias kind:bss addr:0x0219a8e4   ← brief 107 alias
+data_0219a8ec       kind:bss addr:0x0219a8ec
+```
+
+Both names resolve to the same byte. mwldarm doesn't error on
+duplicate addresses; `dsd check modules` is unaffected (the
+alias is invisible at the binary level — only the compiler sees
+it as a separate symbol for purposes of emitting two pool
+entries).
+
+**SP boundary (verified all 15 mwcc SPs, 8 source variants ×
+120 compiles):**
+
+| mwcc SP | A_natural | B_volatile | C_twoglobals | F_dualstash | I_castbreak | J_inlineasm |
+|---|---|---|---|---|---|---|
+| 1.2/base..sp2p3 | 0x3c | 0x40 | 0x48 | 0x3c | 0x40 | (asm syntax) |
+| 1.2/sp3, sp4 | 0x38 | 0x3c | 0x44 | 0x38 | 0x3c | (asm syntax) |
+| 2.0/base..sp2p4 (10 SPs) | 0x30 | 0x34 | 0x3c | **0x38 ✓** | 0x34 | 0x34 |
+
+Variant F (dual-stash with two-globals) hits 0x38 at all 10
+mwcc 2.0/* SPs — byte-identical at the project's default
+2.0/sp1p5 (no routing required). A and B fall short by 8 bytes
+(missing the second pool entry). C is too long (8 extra bytes
+from double-loading both globals before the test). I and J both
+dedup back to single pool entry (mwcc treats them as one symbol
+despite the cast-break / inline-asm tricks).
+
+**Cross-corpus survey:** scan of `config/eur/arm9/relocs.txt`
+for `from:0xA kind:load to:0xT` pairs where two relocs at
+addresses 4 bytes apart point to the same target — **157
+duplicate-pool-pair occurrences** across the project. After
+deduplicating to unique target functions: an estimated **~80
+candidate functions** carry this pattern (sweep needed to
+confirm strict P-9-style "function actually exhibits the
+callee-save r4 trick across BL"). Per the brief 100 → 103 →
+105 NEGATIVE-finding pattern, a future application wave should
+sweep 5-10 candidates first and verify natural-form NEGATIVE
+gate (some pool-pair instances may be in functions where the
+two pool entries are NOT the cache-across-BL shape — e.g.
+distinct globals at adjacent addresses).
+
+**Provenance:** brief 097 (decomper hand-back) flagged
+pool-word count mismatch as the 4th-most-represented residue
+pattern (~3 of 31). Brief 107 (PR #?) ran a 5-variant × 15-SP
+sweep on the smallest exemplar (`func_02023fec`), plus 3
+extended variants F/G/H/I/J targeting the dual-pool problem
+directly. Variant F (`F_dualstash`) hits byte-identical at all
+10 mwcc 2.0/* SPs — confirmed end-to-end build with the alias
+entry; `dsd check modules` returns the same 24/27 baseline (the
+recipe doesn't disturb adjacent functions). Classified as
+**C-27 — pool-word DUPLICATION wall** with the dual-extern +
+symbols.txt-alias recipe.
+
 ## Permanent (9 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -3325,6 +3534,15 @@ currently model.
 document — the bit-level pool difference is the only divergence;
 the function semantics are correct.
 
+**SUPERSEDED BY C-27 (brief 107):** the parenthetical
+"aliasing externs" speculation in this entry was tested by
+brief 107 and works end-to-end. The recipe (dual-extern +
+`symbols.txt` alias entry + `void * volatile *` local pointer
+dance) recovers byte-identical at the project's default mwcc
+2.0/sp1p5. P-7 is no longer permanent for this pattern — see
+C-27 for the codified recipe + cross-corpus survey (157
+duplicate-pool-pair occurrences, ~80 candidate functions).
+
 ### P-8. Bit-chain reg-alloc: r0-only vs r0→r1→r0
 
 **Target asm (W-D, brief 040 — `func_ov000_021ac85c`):** a
@@ -3591,7 +3809,7 @@ pilots are scoped ARM-only; Thumb siblings are deferred.
 **Resolution:** out-of-cluster scope per AGENTS.md /
 brief-template guidance. Document and skip.
 
-## Tooling-tractable (3 patterns)
+## Tooling-tractable (4 patterns)
 
 Patterns where a `propagate_template` or `find_shape_templates`
 extension could unlock currently-dropped matches. Don't ship the
@@ -3700,7 +3918,9 @@ hard-tier pivot.
 
 - **W-C `func_02023fec`** — sp3 fixes the Style B half but
   the residual P-7 pool-not-deduped pattern remains. Permanent
-  unless a source-level coercion surfaces.
+  unless a source-level coercion surfaces. **(UPDATE — brief 107
+  surfaced the source-level coercion: dual-extern + symbols.txt
+  alias. See C-27. W-C is now coercible, not permanent.)**
 - **W-D `func_ov000_021ac85c`** — bit-chain reg-alloc (P-8);
   prologue/epilogue is already sp1p5-or-sp3 ambiguous so sp3
   routing doesn't change the wall.
@@ -3708,6 +3928,97 @@ hard-tier pivot.
   shape (`orrhi/lslls/orrls` predicated 3-way merge vs sp3's
   2-way predicated stores). Separate C-source coercion
   problem under all three compilers.
+
+### T-4. Overlay function symbol promotion — cross-module BL to unnamed addresses
+
+dsd-analysis-completeness gap rather than a codegen wall.
+Functions in the overlay-shared 0x021b____ region are sometimes
+not identified by dsd's static analysis — the address has no
+entry in any overlay's `symbols.txt`, OR is misclassified as
+`kind:data(any)`. When code in a sibling overlay calls into
+that address via `bl`, dsd-dis can't emit `bl <symbol>` and
+falls back to `bl #<offset>` (raw relative offset, no symbol).
+
+**Diagnostic signature** in `build/<ver>/disasm/_dsd_gap@*.s`:
+
+```text
+bl #-0x185dc
+bl #+0x12a48
+```
+
+(any `bl` with a `#`-prefixed numeric operand instead of a
+symbol name).
+
+**Brief 107 cross-corpus scan:** 102 occurrences across
+ov011/12/13 (90) and main (12). Aggregated to **23 distinct
+target addresses**, all in 0x021b____:
+
+| Target | Call count | Classification |
+|---|---|---|
+| `0x021b1434` | 17× | UNKNOWN to dsd analysis |
+| `0x021b1e48` | 16× | UNKNOWN to dsd analysis |
+| `0x021b13c0` | 12× | UNKNOWN to dsd analysis |
+| `0x021b3138` | 8× | UNKNOWN to dsd analysis |
+| `0x021b12ac` | 6× | UNKNOWN to dsd analysis |
+| `0x021b375c` | 6× | UNKNOWN to dsd analysis |
+| `0x021b1918` | 5× | UNKNOWN to dsd analysis |
+| `0x021b1abc` | 3× | MISCLASSIFIED as data(any) in ov005 |
+| ... 15 more | 1-3× each | UNKNOWN or misclassified |
+
+**Classification:** 99 of 102 (**97%**) target an address that
+isn't in any `symbols.txt`. 3 of 102 (**3%**) target an address
+classified as data in one of the ranged-overlay siblings.
+**Zero of 102** target a known function — so once the target
+is named, mwcc will emit `bl <symbol>` and the linker patches
+it. The mechanism is byte-trivial; the gap is purely the
+analysis layer not finding the function symbol.
+
+**Resolution (per-target, manual):**
+
+1. For each of the 23 distinct addresses, identify which
+   overlay's binary actually contains the code at that address
+   (the address range overlaps multiple sibling overlays;
+   determine by inspecting the bytes in each candidate
+   overlay's extracted binary).
+2. Add `func_ov<N>_<addr> kind:function(arm,size=0x<N>) addr:0x<addr>`
+   to that overlay's `symbols.txt`.
+3. For the 3 data-misclassified entries, change the kind from
+   `data(any)` to `function(arm, size=...)`.
+4. Re-run `ninja rom`. The caller's `bl #-0xN` becomes
+   `bl <symbol_name>` at next dsd-dis; the link resolves
+   correctly.
+
+**Estimated unlock:** the 8 main functions containing these
+unresolved BLs (`func_0201bf80`, `func_0201bfb4`, `func_0201bf8c`,
+`func_0201c1bc`, `func_0201c1e0`, `func_0201c224`,
+`func_0201c2a8` [5 BLs], `func_0201c6a0`, `func_0201b82c`)
+should become recoverable to at least byte-trivial after the
+target symbols are named. The corresponding ov011/12/13
+functions (90 BLs across an estimated 15-25 caller functions)
+likewise.
+
+**Why this is a T-N, not a C-N or P-N:** the wall isn't in
+mwcc's codegen — mwcc never sees these symbols, since dsd-dis
+never emits source for them. The wall is in the analysis layer
+that decides "what is a function?" and "what is a data
+constant?" Naming the targets reveals the codegen as already-
+matching (the byte at the call site is `eb<N>` either way; only
+the link-resolved offset differs).
+
+**Brief candidate** (rolled out of brief 107 — research only):
+a "T-4 application" wave that enumerates the 23 addresses,
+inspects bytes per candidate overlay, and adds the function
+symbols. Brief 107's pre-work + the per-target classification
+table above scope the task; a decomper wave of ~1 hour of
+per-target lookups should clear most or all 23.
+
+**Provenance:** brief 097 (decomper hand-back) flagged
+cross-module BL as the 5th-most-represented residue pattern
+(~3 of 31). Brief 107 (PR #?) scanned all overlays' disasm
+for unresolved `bl #<imm>` instructions; found 102 occurrences
+at 23 distinct target addresses, all classifiable as either
+unknown-symbol (99) or misclassified-as-data (3). Classified
+as T-4 — tooling/analysis-completeness gap, not a codegen wall.
 
 ## Source-layout pitfalls (not codegen walls)
 
@@ -4265,6 +4576,9 @@ shape we should chase".
 | 103 / scan | `func_02037b34` / `func_02033488` / `func_02054c0c` / `func_02000d4c` / `func_02022540` | **P-9** (cross-corpus matches) — 36 unmatched functions contain a predicated `mvn rN, #0` instruction. These are the actually-walled subset of the 281-candidate broader predicated-cascade signature | permanent (P-9, deferred to asm-void or permuter) |
 | 105 / perm | `func_02033488` | **BASE RECOVERY** — natural-form `if (!(p->f_eb4 & 1)) return -1; ... return 0;` early-return source matches byte-identical at default mwcc 2.0/sp1p5. Permuter reported `base score = 0` at iter 1, exited cleanly via `--stop-on-zero`. **P-9 scope refinement**: the wall applies to `cond ? -1 : 0` MASK form (provokes `mvnNE; andNE; movEQ`), NOT the `if (cond) return -1` EARLY-RETURN form (compiles natively to `mvnEQ; popEQ`). The two patterns share the diagnostic `mvn rN, #0` instruction but are distinct codegen shapes | natural-form recovery (early-return sub-form) |
 | 105 / perm | `func_020534b4` (worked example), `func_02022540`, `func_02037b34`, `func_02054c0c` | **P-9 plateau confirmed** — 4 mask-form candidates ran 300s × 4 threads each (~2000 iters / 4 threads). Best scores: 305 (no improvement, worked example), 565, 210 (volatile-temp partial), 360 (post sig-fix partial). None reached score 0 — confirms mask-form P-9 is permanent in source-form pipeline including permuter exploration | permanent (P-9, mask form; asm-void or accept skip) |
+| 107 / sweep | `func_02023fec` | **C-27** (worked example, supersedes P-7) — pool-word DUPLICATION wall; mwcc 2.0/sp1p5 dedupes pool entries, orig emits two separate `.word data_X` slots with the address cached in r4 across the BL. 8-variant × 15-SP sweep (120 compiles): variant F (dual-stash with two distinct extern symbols + `void * volatile *` local pointers + `symbols.txt` alias) byte-matches at all 10 mwcc 2.0/* SPs. End-to-end validated with build + `dsd check modules` (24/27 baseline preserved) | coercible (source-form + symbols.txt alias, default SP) |
+| 107 / scan | (8 main functions + 15-25 overlay functions cross-corpus) | **T-4** (worked sample) — overlay function symbol promotion; 102 unresolved `bl #<imm>` instructions across overlays target 23 distinct addresses, 99 unknown to dsd analysis + 3 misclassified as data(any). NOT a codegen wall — pure analysis-completeness gap. Recipe: name each target in the correct overlay's symbols.txt; mwcc emits `bl <symbol>` and link resolves byte-trivially | tooling-tractable (T-4, application wave outstanding) |
+| 107 / spot | `func_02021158` (cross-corpus C-27 spot-check) | NEGATIVE — natural form at mwcc 2.0/sp1p5 produces 0x30 (single pool, range-check compiled as `sub+cmp+bhi`), target is 0x38 (dual pool + literal `cmp+cmpne` chain). Confirms C-27 wall extends beyond `func_02023fec` AND identifies a SECOND wall in same function (range-check idiom). 157 cross-corpus pool-pair occurrences need a sweep wave to determine how many are C-27-recoverable vs how many carry secondary walls | C-27 (plus secondary wall on range-check) |
 
 ## Quantification
 
