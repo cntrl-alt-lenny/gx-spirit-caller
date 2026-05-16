@@ -313,25 +313,49 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply C-24
-  indirect-call + pool-dedup recipe (brief 099) to wave 1
-  candidates. 3 strict-signature matches from cross-corpus
-  survey; broader 49-candidate pool. Recipe: `*.legacy_sp3.c`
-  routing + single-global source-form constraint. Self-
-  extend gate: yield ≥40% + bytes ≥250. Branch:
-  `decomper/c24-recipe-wave-1`.
+- [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): C-24 recipe wave
+  2 (self-extend from wave 1's 71% yield) + opportunistic
+  C-25 / C-26 application where their signatures appear
+  in candidates. 32 candidates remain in the 49-pool;
+  pick 10-15. Try natural form FIRST per brief 100
+  NEGATIVE finding. Self-extend gate: yield ≥40% + bytes
+  ≥250. Branch: `decomper/c24-recipe-wave-2`.
 
-- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
-  — `cloud` (MEDIUM): two-part. (1) Codify W-N temp-
-  register coercion recipe (brief 098 surfaced via
-  permuter) as new C-N entry in codegen-walls.md.
-  (2) Critical-section nesting walls research — next
-  pattern from brief 097 residue (~8 of 31). Brief 084 /
-  088 / 099-style codegen sweep. Branch:
-  `cloud/wn-codify-critical-section-research`.
+- [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
+  — `cloud` (MEDIUM): walls research on the predicated-
+  cascade pattern (~6 of 31 brief 097 residue). Brief
+  084 / 088 / 099 / 100-style codegen sweep on smallest
+  single-wall exemplar. Goal: ≥1 new C-N or P-N entry
+  + check for over-classification per brief 100's
+  NEGATIVE pattern. Branch:
+  `cloud/predicated-cascade-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
+  `decomper`, shipped in PR #498. **12 ports / 816 bytes
+  / 71% yield** — both self-extend gates pass with
+  significant margin. First production application of
+  the `.legacy_sp3.c` third routing tier. Recipe
+  refinements surfaced during application: `flags |=
+  mask` produces dedup'd codegen, fn-ptr hoist before
+  conditional branch, `do { ... } while` shape preference.
+  Funnel: 17 attempts → 12 byte-identical + 5 reg-alloc-
+  blocked. 12 distinct sub-patterns under the C-24
+  umbrella covered.
+- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
+  `cloud`, shipped in PR #497. **2 new entries: C-25 +
+  C-26.** C-25 (W-N store-reload, default `2.0/*` SPs)
+  is the **first W-class → C-class promotion** via
+  permuter discovery + post-hoc sweep. C-26 (critical-
+  section + helper-signature mismatch, `.legacy.c`
+  routing) surfaced a **NEGATIVE finding** that 4 brief-
+  097 critsec candidates byte-match natural form — brief
+  097's broad classification was over-inclusive. Helper-
+  signature inspection rule: helper that writes r0 in
+  first non-prologue instruction → declare as no-arg.
+  Brain pushed `bea7b26` to clear MD037 + MD018.
 
 - [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
   `decomper`, shipped in PR #494. **1 of 8 recovered —
