@@ -38,11 +38,8 @@ from analyze_symbols import (  # noqa: E402
 )
 from data_worklist import (  # noqa: E402
     DATA_PLACEHOLDER_PREFIX,
-    SHAPE_ARRAY,
     SHAPE_BSS,
-    SHAPE_FNPTR,
     SHAPE_SCALAR,
-    SHAPE_STRING,
     SHAPE_STRUCT,
     SHAPE_UNKNOWN,
     CLUSTER_FILTERS,

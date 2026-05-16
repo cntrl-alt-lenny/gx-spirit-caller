@@ -58,7 +58,6 @@ for function symbols) — this is the data-side companion.
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
