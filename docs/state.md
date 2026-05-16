@@ -8,46 +8,54 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-16 (Mac brain — brief 114 + 115 merge).
-**MILESTONE: EUR baseline flipped 24/27 → 25/27 — first multi-module-
-baseline improvement of the session.** Brief 115's DTCM pilot
-(cluster E) shipped 5 symbols / 1568 bytes byte-identical via
-mwasmarm `.s` + dsd LCF auto-routing recipe. Workflow wall W5
-resolved differently than expected (no `__attribute__((section))`
-needed). **Brief 114 CLOSED: data_worklist.py v2 ships with cluster
-filters + a bonus regex fix that surfaced 1587 bss symbols missing
-from the corpus** (analyze_symbols.py's SYMBOL_RE was dropping every
-`kind:bss addr:0x...` line — real tooling bug). 1631/1631 tests
-pass (was 1583/1583; +48 new). EUR **1.79%**, USA + JPN **0.70%**.
-**Data tier opens with 5 symbols / 1568 bytes shipped.**
+**Last updated:** 2026-05-16 (Mac brain — brief 116 + 117 merge).
+**🎉 MILESTONE: ALL 3 REGIONS AT 25/27.** Brief 116 shipped 647
+cluster A `.bss` symbols in main module + cross-region DTCM parity
+(libs/dtcm/ + IRQ handler name promotion). EUR + USA + JPN all
+verified locally. First multi-region baseline milestone since session
+start. **Brief 117 resolved W4 + sub-classified cluster B**:
+- W4: mwcc 2.0/sp1p5 places `int x = N;` in `.data` automatically
+  (no attribute/pragma needed).
+- Multi-global wall: mwcc reorders globals within a `.c` file → use
+  `.s` for groups of 2+ contiguous scalars.
+- 47% of cluster B is actually 4-byte ASCII strings (brief 114's v2
+  shape heuristic mis-classified them). 247 cluster B → 86 true
+  scalars + 115 strings (→ cluster C) + 32 pointers + 14
+  unclassified.
+
+EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
+badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #519 — decomper / brief 115 (DTCM pilot, cluster E).** **First
-  production data-tier wave. EUR 25/27 OK** (DTCM module flipped).
-  5 symbols / 1568 bytes byte-identical against `extract/eur/arm9/
-  dtcm.bin`. **Workflow wall W5 resolved as mwasmarm `.s` + dsd LCF
-  auto-routing** (NOT `__attribute__((section))` or `#pragma
-  section`). USA + JPN remain at 24/27 — blocked on IRQ symbol
-  naming in their symbols.txt (separate brief). Brain pushed
-  `782e058` to regenerate research index for the new
-  `dtcm-section-attribute.md`.
-- **PR #518 — cloud / brief 114 (data_worklist.py v2).** All 5
-  cluster filters land + sanity-check passes (cluster A = 4.07 MB =
-  85.34% of pool, matches brief 113's prediction). **Bonus: bug
-  fix surfaced.** analyze_symbols.py's SYMBOL_RE was paren-required
-  and silently DROPPED every `kind:bss addr:0x...` line — 637 bss
-  symbols in main + 950 across overlays were never reaching
-  downstream tools. Fix landed alongside (parens now optional).
-  1631/1631 tests (+48 new for v2 features). Brain pushed
-  `ac1aedd` to clear 4 F401 unused imports.
+- **PR #522 — decomper / brief 116 (cluster A wave 1 + DTCM
+  parity).** **All 3 regions verified at 25/27 locally** — first
+  multi-region milestone since session start. **647 cluster A
+  `.bss` symbols claimed in main** (~13× brief 113's per-wave
+  estimate of 50-100). The `.s` + LCF auto-routing recipe scales
+  linearly across symbol count. Cross-region parity: moved
+  `src/dtcm/` → `libs/dtcm/`, promoted SDK IRQ handler names to
+  USA + JPN symbols.txt, added claims to all 3 regions' delinks.
+  ARM9 main checksum still FAILED (cross-module relocs in `.text`/
+  `.data`, separate scope from this wave).
+- **PR #521 — cloud / brief 117 (cluster B research).** **W4
+  resolved + multi-global wall surfaced + 47% sub-classification.**
+  mwcc 2.0/sp1p5 places `int x = N;` in `.data` automatically (no
+  attribute needed). But mwcc reorders globals WITHIN a `.c` file
+  → `.s` is the safe default for groups of 2+ adjacent scalars.
+  Sub-classification: 115 of 247 cluster B candidates are 4-byte
+  ASCII strings (47%, fold to cluster C); 86 true scalars; 32
+  pointers (need typedef); 14 unclassified. Brief 121 candidate:
+  data_worklist v3 byte-pattern refinement for size-4 buffers.
 
 ## Cumulative pipeline state
 
 | Pipeline | Output (cumulative) |
 |----------|---------------------|
 | Single-region EUR hard-tier (briefs 057+060+081+086+092+097+098+101+102+104+105+106+108+109+111+112) | 139 matches / 8028 bytes |
-| **Data-tier EUR (brief 115 cluster E)** | **5 symbols / 1568 bytes** | **DTCM module: 24/27 → 25/27** |
+| **Data-tier EUR cluster E (brief 115)** | 5 symbols / 1568 bytes | DTCM 24/27 → 25/27 |
+| **Data-tier cluster A wave 1 (brief 116, EUR main)** | **647 .bss symbols claimed** | (zero-fill, no byte content change) |
+| **Cross-region DTCM parity (brief 116)** | 11 SDK names + libs/dtcm/ path move | **3 regions at 25/27** ✅ |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -73,70 +81,82 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 114 + 115
-close and brief 116 + 117 queue lands.
+**Open PRs: 0** once this brain-PR for brief 116 + 117
+close and brief 118 + 119 queue lands.
 
-**DATA-TIER SESSION ARC ACTIVE.** Brief 115 shipped the
-cluster E pilot (EUR 25/27); brief 114 shipped the
-worklist v2 tooling. Brief 116+ scale to cluster A.
+**DATA-TIER SESSION ARC ACTIVE — 3 regions at 25/27.**
+Brief 116 scaled cluster A in main (647 syms in one
+wave, 13× brief 113's estimate). Brief 117 resolved
+cluster B W4 + surfaced multi-global wall + 47% sub-
+classification finding.
 
-**Decomper — brief 116 (HIGH, NEW):**
+**Decomper — brief 118 (HIGH, NEW):**
 
-- **Cluster A `.bss` wave 1 + cross-region DTCM parity.**
-  Two-part:
-  1. **Cluster A `.bss` wave 1** — pick ~50 symbols from
-     main module per brief 114's
-     `data_worklist.py --cluster A --module main` output
-     (1586-candidate cluster A pool). Apply brief 115's
-     `.s` + LCF auto-routing recipe with `.bss` section
-     directive. Per brief 113's per-wave throughput
-     estimate (50-100 syms/wave for cluster A).
-  2. **Cross-region DTCM parity** — move `src/dtcm/` →
-     `libs/dtcm/` (region-neutral path), promote SDK
-     IRQ handler names to USA + JPN symbols.txt, add
-     `libs/dtcm/dtcm_data.s` claim to all 3 regions'
-     `dtcm/delinks.txt`. Goal: flip USA + JPN to 25/27
-     too (3-region DTCM parity).
-  Branch: `decomper/cluster-a-wave-1-dtcm-parity`.
+- **Cluster A wave 2 — overlay coverage.** Brief 113's
+  cluster A pool was 1586 candidates; brief 116 took
+  647 in main. ~940 remaining across overlays
+  (ov002/4/6/7/9/14/21 per brief 113's per-module
+  concentration — ov004/6/7/9/14/21 each ~525 KB).
+  Wave 2: pick **one large-pool overlay** (ov004 or
+  ov006), apply brief 115/116's mwasmarm `.s` +
+  LCF auto-routing recipe with `.bss` section
+  directive. Same scale as brief 116 (200-600+ syms
+  per overlay). Branch:
+  `decomper/cluster-a-wave-2-overlay`.
 
-**Cloud — brief 117 (MEDIUM, NEW):**
+**Cloud — brief 119 (MEDIUM, NEW):**
 
-- **Cluster B `.data` scalars research.** Brief 114's
-  output: 247 cluster B candidates (avg 4 bytes each).
-  Define the cluster B recipe: declare initialized
-  scalars at correct address. Investigation:
-  - Source-form: `.c` with `int g_foo = 0x...` (or
-    similar) vs `.s` mwasmarm `.data .word 0x...`.
-  - Section attribute: does mwcc 2.0/sp1p5 place
-    `int x = N;` in `.data` automatically, or does it
-    need `__attribute__((section(".data")))`? Brief 113
-    flagged this as workflow wall W4.
-  - Per-symbol: how does the worklist v2 tool classify
-    "scalar" vs near-misses (struct of 1 field, etc.)?
-  Output: cluster B recipe documentation + worked
-  example for brief 118 wave 1 to apply at scale.
-  Branch: `cloud/cluster-b-scalars-research`.
+- **Cluster C strings + const arrays research.**
+  Per brief 113's plan (347 native cluster C
+  candidates) + brief 117's mis-classification
+  finding (115 cluster B candidates are actually
+  4-byte ASCII strings → fold to cluster C).
+  **Effective cluster C pool: ~462 candidates.**
+  Define the cluster C recipe: const-qualified
+  declarations, string-literal placement, `.rodata`
+  vs `.data` (mwcc's choice for `const char[]`).
+  Investigation:
+  - Does mwcc place `const char foo[] = "...";` in
+    `.rodata` automatically?
+  - Cross-reference brief 115's `.ascii` directive
+    pattern.
+  - Edge cases: const-qualified pointers, wide string
+    constants, large const arrays.
+  Output: cluster C recipe doc for brief 121+ scale-
+  out. Branch:
+  `cloud/cluster-c-strings-research`.
+
+**Data-tier backlog (post-118/119):**
+
+1. **Brief 120 — cluster B wave 1** (decomper). 86
+   true-scalar sub-pool per brief 117's recipe. Apply
+   `.s` for groups + singleton `.c` for isolated
+   scalars.
+2. **Brief 121 — data_worklist v3 byte-pattern
+   refinement** (cloud). Distinguish 4-byte
+   strings/pointers/scalars in shape heuristic.
+3. **Cluster A wave 3+** — remaining overlays after
+   brief 118 (depending on which overlay it tackles).
+4. **Cluster D research** (struct arrays + dispatch
+   tables, brief 113 plan). 98 candidates.
 
 **Function-tier backlog (de-prioritized during data-tier
 session arc — revisit if data-tier proves slow):**
 
-1. **T-4 application wave (decomper).** Brief 107
-   surfaced 23 unnamed BL targets, ~25-33 function
-   unlocks via symbols.txt promotion. Pure analysis
-   work. Could fit between data-tier waves.
-2. **C-28 application wave (decomper).** Brief 109
-   shipped recipe; ~10-20 candidates.
-3. **C-26 wave 3 (decomper).** ~116 candidates remain.
-4. **C-27 wave 2 (decomper).** Retry remaining ~70
-   C-27 candidates after brief 112's hand-back.
+1. **T-4 application wave** — 23 unnamed BL targets.
+2. **C-28 application wave** — ~10-20 candidates.
+3. **C-26 wave 3** — ~116 candidates remain.
+4. **C-27 wave 2** — retry post brief 112 hand-back.
 5. **3 brief 109 + 2 brief 111 partial classifications.**
-6. **Pre-stage source baselines for 5 brief-098
-   untested candidates** + permuter retry at 1200s.
-7. **P-9 mask-form asm-void recipe** (≥3 ≥0x40-byte
-   candidates).
+6. **Pre-stage source baselines for 5 brief-098 untested
+   candidates** + permuter retry at 1200s.
+7. **P-9 mask-form asm-void recipe.**
 8. **W-stack-split codegen sweep** (3rd datapoint).
 9. **W-popcount-mask-order** (1 datapoint).
 10. **64 unrecovered brief-094 ports.**
+11. **ARM9 main checksum recovery** — depends on cross-
+    module relocations in `.text`/`.data`. Separate
+    brief once data-tier momentum slows.
 
 **Strategic state — major session-arc transition:**
 
@@ -149,26 +169,34 @@ Two consecutive application-wave hand-backs (briefs 108
 + 112) signal the function-tier residue is now recipe-
 narrow.
 
-**Data-tier phase (brief 113 onward):** **ACTIVE.**
-Brief 115 shipped first 5 symbols / 1568 bytes; EUR
-flipped to 25/27. Brief 114 shipped tooling (worklist
-v2 + bonus regex fix surfacing 1587 missing bss
-symbols). Brief 113's scoping reveals:
-- **Data tier is 2.0× larger than code** (4.78 MB vs
-  2.39 MB; currently 0.00% matched).
-- **85% is `.bss`** — purely symbol-placement matching,
-  structurally easier than function-tier.
-- **5-cluster taxonomy** with per-wave throughput
-  estimates: A `.bss` (50-100/wave) / B `.data`
-  scalars (20-30) / C `.rodata` (10-20) / D struct
-  arrays (3-5) / E DTCM/ITCM (5-10, one-shot, **flips
-  DTCM module FAILED → OK**).
-- **6-month roadmap:** 50% data-tier matched, 26/27
-  modules OK. Multi-quarter session arc.
-- **First 25/27 baseline since session start** shipped
-  via brief 115 (cluster E DTCM pilot). EUR-only;
-  USA + JPN remain at 24/27 pending brief 116 part 2
-  (cross-region DTCM parity).
+**Data-tier phase (brief 113 onward):** **ACTIVE +
+SCALING.** First 5 briefs shipped:
+- Brief 113: 5-cluster taxonomy.
+- Brief 114: data_worklist.py v2 + 1587-bss bug fix.
+- Brief 115: cluster E DTCM pilot (EUR 25/27).
+- Brief 116: cluster A wave 1 (647 syms in main) +
+  cross-region DTCM parity (**all 3 regions 25/27**).
+- Brief 117: cluster B research (W4 + multi-global
+  wall + 47% sub-classification finding).
+
+**Wave-size calibration:** brief 113's 50-100/wave for
+cluster A was 13× too conservative. Brief 116 took 647
+in one wave; per-wave throughput is **linear with
+section gap-list size**, not capped by recipe
+complexity. Cluster A may close in 2-4 waves (not
+15-25).
+
+**Updated cluster sizes** (post-brief-117 sub-class):
+- Cluster A `.bss`: 1586 total (939 remaining post
+  brief 116).
+- Cluster B `.data` true scalars: **86** (was 247).
+- Cluster B → cluster C strings: **+115** new
+  candidates (47% mis-classification).
+- Cluster B pointers: 32 (need typedef).
+- Cluster B unclassified: 14.
+- Cluster C native: 347. **Cluster C effective: ~462.**
+- Cluster D struct arrays: 98.
+- Cluster E DTCM: 3 (closed by brief 115+116).
 
 **Brief 097 residue (31 candidates) is now FULLY
 CLASSIFIED across 5 wall families:**
@@ -195,41 +223,44 @@ C-class promotions this session** (P-7 → C-27 via brief
 107, P-8 → C-25 via briefs 098 + 100, P-10 → C-29 via
 brief 111 permuter with longer budget).
 
-**Function-tier session arc closure framing:**
-EUR 1.79% / USA + JPN 0.70% — function-tier matching
-has produced ~140 EUR matches + ~840 region-equivalents
-+ 100 cross-project + ~1091 cumulative session match-
-equivalents. **But the data tier — 4.78 MB at 0%
-matched — represents 2× more code-equivalent matching
-work ahead.** Project is firmly mid-arc; data-tier
-opens a multi-quarter session arc.
+**Cumulative session arc framing:**
+EUR 1.79% / USA + JPN 0.70% (function-tier badge);
+**3-region 25/27 baseline** (data-tier DTCM milestone).
+Function-tier matching: ~140 EUR + ~840 region-
+equivalents + 100 cross-project. Data-tier opens with
+brief 115 + 116: 652 cluster A/E symbols claimed,
+DTCM byte-identical in all 3 regions. ~1097+ cumulative
+session match-equivalents. Project firmly mid-arc;
+data-tier session arc actively scaling.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 116 (cluster A wave
-   1 + cross-region DTCM parity) PR** when it opens.
-   3-region gate: USA + JPN should ALSO flip DTCM to
-   OK with the cross-region parity work — **goal: USA
-   + JPN 25/27 baseline**. Cluster A wave 1 yield: per
-   brief 113's per-wave estimate (50-100 syms); watch
-   for `.bss` recipe extensions vs brief 115's DTCM
-   recipe.
-2. **Verify + merge cloud brief 117 (cluster B scalars
+1. **Verify + merge decomper brief 118 (cluster A wave
+   2 — overlay coverage) PR** when it opens. EUR `ninja
+   rom` + `dsd check modules` 25/27 baseline preserved.
+   Watch which overlay's checksum flips to OK as a
+   result (depending on how complete the overlay's
+   .bss coverage becomes). Brief 113 estimated 525 KB
+   per ov004/6/7/9/14/21; one overlay per wave is
+   reasonable.
+2. **Verify + merge cloud brief 119 (cluster C strings
    research) PR** when it opens. Pure research; output
-   is a recipe doc for brief 118 wave 1. Watch for
-   workflow wall W4 (cluster B section attribute) being
-   resolved similarly to W5 (LCF auto-routing) or
-   needing different approach.
-3. **Scope brief 118+ after 116 + 117 close.** Options
-   per brief 113's plan:
-   - **Brief 118 — cluster A scale-out wave 2** in
-     main (more candidates from worklist v2 pool).
-   - **Brief 119 — cluster A scale-out across ov004/
-     6/7/9/14/21** (15-25 waves total).
-   - **Brief 120 — cluster B `.data` scalars wave 1**
-     applying brief 117's recipe.
-   - **Function-tier carryovers** (T-4, C-28, etc.) —
-     fit opportunistically.
+   is the cluster C recipe + ~462-candidate effective
+   pool sizing (347 native + 115 from brief 117 cluster
+   B mis-classification).
+3. **Scope brief 120+ after 118 + 119 close.** Options:
+   - **Brief 120 — cluster B wave 1** (decomper, 86
+     true-scalar sub-pool per brief 117).
+   - **Brief 121 — cluster C wave 1** (decomper,
+     applying brief 119's recipe to the 462-candidate
+     pool).
+   - **Brief 122 — data_worklist v3** (cloud, byte-
+     pattern refinement per brief 117's recommendation).
+   - **Brief 123 — cluster A wave 3+** (further
+     overlays not covered by brief 118).
+   - **Cross-region cluster A apply** — when EUR
+     cluster A is mostly done, port .bss + cross-
+     region symbols.txt to USA + JPN.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
