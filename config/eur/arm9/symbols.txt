@@ -11190,6 +11190,7 @@ data_02104cf8 kind:bss addr:0x02104cf8
 data_02104dac kind:bss addr:0x02104dac
 data_02104eac kind:bss addr:0x02104eac
 data_02104f1c kind:bss addr:0x02104f1c
+data_02104f1c_alias kind:bss addr:0x02104f1c
 data_02104f3c kind:bss addr:0x02104f3c
 data_02104f4c kind:bss addr:0x02104f4c
 data_02104f50 kind:bss addr:0x02104f50

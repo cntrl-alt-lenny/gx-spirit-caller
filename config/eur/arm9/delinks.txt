@@ -7529,6 +7529,14 @@ src/main/func_020338f8.c:
     complete
     .text start:0x020338f8 end:0x02033944
 
+src/main/func_02037b34.c:
+    complete
+    .text start:0x02037b34 end:0x02037b58
+
+src/main/func_020071c4.c:
+    complete
+    .text start:0x020071c4 end:0x02007218
+
 
 
 
