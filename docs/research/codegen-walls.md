@@ -85,7 +85,7 @@ present in orig; helper-takes-no-args declaration matches orig
 when helper ignores incoming r0 by overwriting it from a pool
 literal). Classified as **C-26** — same routing family as C-23
 + C-24 but with a distinct source-form factor on top.
-Brief 103 (PR #?) ran a 6-variant × 15-SP sweep on the
+Brief 103 (PR #501) ran a 6-variant × 15-SP sweep on the
 predicated-cascade pattern (~6 of 31 brief-097 residue);
 discovered the mwcc-2.0-only **`mvnNE rN, #0` peephole gap**
 (no source-form combination across 90 compiles produces the
@@ -96,7 +96,15 @@ flagged: a 281-candidate broader scan + natural-form spot-check
 showed brief 097's "predicated-cascade" classification was
 over-broad — many candidates byte-match natural form. The
 actually-walled population is the 36-candidate `mvnNE`-signature
-subset.
+subset. Brief 105 (PR #?) followed up with permuter sweep on
+5 of 6 named P-9 candidates (300s × 4 threads each); 1 base
+recovery (`func_02033488`, early-return form), 4 plateau
+(mask form). Refined P-9 scope: the wall applies specifically
+to the `cond ? -1 : 0` MASK form; the `if (cond) return -1;`
+EARLY-RETURN form is unrelated codegen sharing the `mvn`
+instruction. The 36-candidate pool sub-divides: ~⅓ early-return
+(recoverable with natural source), ~⅔ mask form (true P-9
+permanent including against permuter exploration).
 Most fall into one
 of three buckets: **coercible-with-knowledge**
 (16 patterns — the right C variation or routing tier
@@ -3481,9 +3489,46 @@ future waves should attempt natural form FIRST. The actually-
 walled subset is identified by the **`mvnNE rN, #0`** signature
 above (36 candidates).
 
+**Brief 105 follow-up (permuter sweep on 5 of 6 named
+candidates):** ran `tools/permute.py --max-seconds 300 --threads 4`
+against each. Per-candidate plateau + cycle-cost:
+
+| Candidate | Size | Baseline | Best | Iters / 300s | Outcome |
+|---|---|---|---|---|---|
+| `func_020534b4` | 0x20 | 305 | 305 | 2208 | **plateau** (worked example — mask form) |
+| `func_02037b34` | 0x24 | 500 | 210 | 2011 | partial (volatile-temp trick) |
+| `func_02033488` | 0x2c |   0 |   0 |    1 | **BASE RECOVERY** (early-return form) |
+| `func_02054c0c` | 0x24 | 660 | 360 | 2021 | partial (post sig-fix) |
+| `func_02022540` | 0x40 | 1255 | 565 | 1908 | partial |
+
+**Key finding — P-9 scope refinement:** the wall applies
+specifically to the **`cond ? -1 : 0` MASK pattern** that
+provokes `mvnNE + andNE + movEQ`. The
+**`if (cond) return -1; ... return val;` EARLY-RETURN pattern**
+(used by `func_02033488`, and by inspection also
+`func_02037b34`, `func_02054c0c`) compiles natively to
+`mvnEQ rN, #0; popEQ {...}` at all 10 mwcc 2.0/* SPs — these
+are **not** walled, they're an unrelated codegen shape that
+happens to share the diagnostic `mvn rN, #0` instruction.
+
+The 36-candidate cross-corpus pool conflated the two patterns.
+For future-wave selection, the **strict P-9 subset** is
+candidates where the `mvnNE` lands at the **end** of a
+predicated sequence (`mvnNE; andNE; movEQ`-style mask
+composition), not at the **start** (`mvnEQ` early-return → pop).
+Decomper's brief 097 candidate selection rule should be
+re-narrowed accordingly. `func_02033488` is the recovered
+exemplar of the early-return form.
+
+The 4 plateau / partial-recovery candidates confirm that for
+the MASK form, the wall remains permanent even with permuter
+exploration — the source-form transformation space does not
+contain a path to `mvnNE; andNE; movEQ`. asm-void + nofralloc
+(C-12 / C-16 style) is the only remaining path for those.
+
 **Provenance:** brief 097 (decomper hand-back) flagged
 predicated cascade as the 3rd-most-represented wall pattern
-(~6 of 31). Brief 103 (PR #?) ran a 6-variant × 15-SP sweep
+(~6 of 31). Brief 103 (PR #501) ran a 6-variant × 15-SP sweep
 on the smallest predicated-cascade exemplar (`func_020534b4`),
 discovered the mwcc-2.0-only `mvnNE rN, #0` peephole gap,
 classified as **P-9** with a 36-candidate cross-corpus pool.
@@ -3492,7 +3537,14 @@ Negative-finding gate (per brief 100's lesson): spot-checked
 signature set) → byte-identical natural form at all 15 SPs.
 Brief 097's broad classification was over-inclusive; the
 actually-walled population is the 36-candidate `mvnNE`-signature
-subset.
+subset. Brief 105 (PR #?) ran permuter against 5 of the 6 named
+strict-signature candidates (300s × 4 threads each) — 1 base
+recovery (`func_02033488`, early-return form), 4 plateau
+(mask form). Refines P-9 scope: the wall is specifically the
+mask form; the early-return form is unrelated codegen sharing
+the diagnostic `mvn` instruction. ~12 of the 36-candidate pool
+are estimated early-return form (recoverable with natural
+source), ~24 are mask form (true P-9 permanent).
 
 ## Codegen-inherent edge cases (3 patterns)
 
@@ -4211,6 +4263,8 @@ shape we should chase".
 | 103 / sweep | `func_020534b4` | **P-9** (worked example) — `mvnNE rN, #0` peephole gap; mwcc 2.0 emits `mov + rsb` for `cond ? -1 : 0` instead of direct conditional-mvn. 6-variant × 15-SP sweep (90 compiles): no source-form combination produces the orig's shape. asm-void recipe (C-12/C-16 family) is the future-attempt path | permanent (P-9, source-form pipeline; asm-void candidate) |
 | 103 / sweep | `func_02092644` | **NEGATIVE finding** — doubly-linked-list node unlink with two if/else predicated-store branches; natural C byte-matches orig at ALL 15 mwcc SPs. Brief 097's "predicated-cascade" classification was over-inclusive (281 candidates have the broader signature; only the 36-candidate `mvnNE`-signature subset is actually walled) | natural-form / already-coercible |
 | 103 / scan | `func_02037b34` / `func_02033488` / `func_02054c0c` / `func_02000d4c` / `func_02022540` | **P-9** (cross-corpus matches) — 36 unmatched functions contain a predicated `mvn rN, #0` instruction. These are the actually-walled subset of the 281-candidate broader predicated-cascade signature | permanent (P-9, deferred to asm-void or permuter) |
+| 105 / perm | `func_02033488` | **BASE RECOVERY** — natural-form `if (!(p->f_eb4 & 1)) return -1; ... return 0;` early-return source matches byte-identical at default mwcc 2.0/sp1p5. Permuter reported `base score = 0` at iter 1, exited cleanly via `--stop-on-zero`. **P-9 scope refinement**: the wall applies to `cond ? -1 : 0` MASK form (provokes `mvnNE; andNE; movEQ`), NOT the `if (cond) return -1` EARLY-RETURN form (compiles natively to `mvnEQ; popEQ`). The two patterns share the diagnostic `mvn rN, #0` instruction but are distinct codegen shapes | natural-form recovery (early-return sub-form) |
+| 105 / perm | `func_020534b4` (worked example), `func_02022540`, `func_02037b34`, `func_02054c0c` | **P-9 plateau confirmed** — 4 mask-form candidates ran 300s × 4 threads each (~2000 iters / 4 threads). Best scores: 305 (no improvement, worked example), 565, 210 (volatile-temp partial), 360 (post sig-fix partial). None reached score 0 — confirms mask-form P-9 is permanent in source-form pipeline including permuter exploration | permanent (P-9, mask form; asm-void or accept skip) |
 
 ## Quantification
 
