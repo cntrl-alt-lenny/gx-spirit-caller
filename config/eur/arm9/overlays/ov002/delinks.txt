@@ -1855,3 +1855,7 @@ src/overlay002/data_ov002_022ca528.c:
 src/overlay002/data_ov002_022ca510.c:
     complete
     .rodata start:0x022ca510 end:0x022ca528
+
+src/overlay002/data_ov002_022cc154.c:
+    complete
+    .data start:0x022cc154 end:0x022cc218

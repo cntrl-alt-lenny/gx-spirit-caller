@@ -3,3 +3,11 @@
     .ctor       start:0x021ad314 end:0x021ad314 kind:rodata align:4
     .data       start:0x021ad320 end:0x021ad860 kind:data align:32
     .bss        start:0x021ad860 end:0x021ae260 kind:bss align:32
+
+src/overlay018/data_ov018_021ad738.c:
+    complete
+    .data start:0x021ad738 end:0x021ad798
+
+src/overlay018/data_ov018_021ad7a4.c:
+    complete
+    .data start:0x021ad7a4 end:0x021ad7d4

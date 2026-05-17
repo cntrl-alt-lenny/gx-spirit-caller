@@ -262,3 +262,7 @@ libs/nitro/func_ov015_021b316c.legacy.c:
 src/overlay015/data_ov015_021b5a8c.c:
     complete
     .rodata start:0x021b5a8c end:0x021b5ac8
+
+src/overlay015/data_ov015_021b5ba0.c:
+    complete
+    .data start:0x021b5ba0 end:0x021b5bb0

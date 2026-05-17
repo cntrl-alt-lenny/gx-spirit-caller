@@ -358,3 +358,7 @@ src/overlay010/data_ov010_021b8870.c:
 src/overlay010/data_ov010_021b8908.c:
     complete
     .rodata start:0x021b8908 end:0x021b8928
+
+src/overlay010/data_ov010_021b8a60.c:
+    complete
+    .data start:0x021b8a60 end:0x021b8a70

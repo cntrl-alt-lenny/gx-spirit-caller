@@ -573,3 +573,7 @@ src/overlay011/data_ov011_021d3394.c:
 src/overlay011/data_ov011_021d3594.c:
     complete
     .rodata start:0x021d3594 end:0x021d35ac
+
+src/overlay011/data_ov011_021d38a8.c:
+    complete
+    .data start:0x021d38a8 end:0x021d38bc

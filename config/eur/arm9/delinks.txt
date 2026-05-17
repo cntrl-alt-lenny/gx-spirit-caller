@@ -7743,3 +7743,35 @@ src/main/data_020c398c.c:
     complete
     .rodata start:0x020c398c end:0x020c3b8c
 
+
+src/main/data_020c4fe8.c:
+    complete
+    .data start:0x020c4fe8 end:0x020c50ec
+
+src/main/data_020c4f20.c:
+    complete
+    .data start:0x020c4f20 end:0x020c4fe8
+
+src/main/data_020c6418.c:
+    complete
+    .data start:0x020c6418 end:0x020c6484
+
+src/main/data_020c63bc.c:
+    complete
+    .data start:0x020c63bc end:0x020c6418
+
+src/main/data_020c4ee8.c:
+    complete
+    .data start:0x020c4ee8 end:0x020c4f20
+
+src/main/data_020febf8.c:
+    complete
+    .data start:0x020febf8 end:0x020fec28
+
+src/main/data_020c6390.c:
+    complete
+    .data start:0x020c6390 end:0x020c63bc
+
+src/main/data_020fe78c.c:
+    complete
+    .data start:0x020fe78c end:0x020fe7b8
