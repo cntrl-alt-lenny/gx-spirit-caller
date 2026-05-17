@@ -313,24 +313,47 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/130-cluster-c-wave-4-d1-wave-2.md`](docs/briefs/130-cluster-c-wave-4-d1-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  Cluster C Pattern 1 wave 4 continuation (25-35
-  normal candidates + try one of the 3 deferred
-  mega-arrays). (2) Cluster D-1 wave 2 (12-18 of
-  ~50 remaining dispatch tables). Branch:
-  `decomper/cluster-c-wave-4-d1-wave-2`.
+- [`docs/briefs/132-ov004-symbol-scoping-phase2.md`](docs/briefs/132-ov004-symbol-scoping-phase2.md)
+  — `cloud` (HIGH, **NOW ACTIVE**): **🔑 actual 26/27
+  unlock.** Per brief 131 Phase 2 plan + symbol-
+  collision root cause. Localize sibling-overlay
+  FUNC symbols at link time so mwldarm doesn't see
+  them as call targets. 3 approaches (per-overlay
+  link inputs / symbol-local visibility / symbol
+  rename pre-link). Goal: ov004's remaining 8125
+  bytes → ~0; main auto-flips on 9 cascade bytes.
+  Branch: `cloud/ov004-symbol-scoping-phase2`.
 
-- [`docs/briefs/131-ov004-thunk-section-fix.md`](docs/briefs/131-ov004-thunk-section-fix.md)
-  — `cloud` (HIGH): **🔑 26/27 baseline unlock.**
-  Per brief 129's recommended Option 3: build a
-  custom LCF `.thunk` section to absorb mwldarm's
-  spurious thumb→arm veneers without displacing
-  `.data`. Fallback to Options 2/1/4 if needed.
-  Document W7 workflow wall (mwldarm overlay-swap
-  blindness). Branch: `cloud/ov004-thunk-section-fix`.
+- [`docs/briefs/133-cluster-d1-wave-3-mega2.md`](docs/briefs/133-cluster-d1-wave-3-mega2.md)
+  — `decomper` (HIGH): two-part parallel-track. (1)
+  Cluster D-1 wave 3 (12-18 of ~35 remaining
+  dispatch tables). (2) Try 5 KB `data_022bf3c4`
+  mega-array (Pattern 1 ov002). ov004 candidates
+  still skipped pending brief 132 unlock. Branch:
+  `decomper/cluster-d1-wave-3-mega2`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/130-cluster-c-wave-4-d1-wave-2.md`](docs/briefs/130-cluster-c-wave-4-d1-wave-2.md)
+  `decomper`, shipped in PR #542. **42 candidates
+  byte-identical** (26 cluster C + 1 mega-array +
+  15 D-1). **First production mega-array shipped**:
+  `data_ov002_022be1ac` 4632 bytes. **Cluster C
+  Pattern 1 ~95% drained; D-1 ~50% drained.**
+  Cumulative cluster C/D arc: **176 symbols** across
+  6 briefs.
+- [`docs/briefs/131-ov004-thunk-section-fix.md`](docs/briefs/131-ov004-thunk-section-fix.md)
+  `cloud`, shipped in PR #543. **🔑 Phase 1 ALIGNALL
+  partial unlock: 95% ov004 + 52% main byte-diff
+  reduction.** No baseline flips yet. 4 sub-options
+  tried, all hit walls (`-nointerworking` regresses
+  ov002, `/DISCARD/` mwldarm syntax error, pin-end
+  triggers reverse-flow error, `.thunk` markers
+  ignored). Phase 1 mitigation: ALIGNALL 4 → 2 via
+  `patch_lcf_arm9_align.py` tool extension. **W7
+  workflow wall documented** + symbol-collision
+  root cause for Phase 2 identified. Brief 132
+  unlocks the rest.
 
 - [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](docs/briefs/128-main-cat1-cluster-c-wave-3.md)
   `decomper`, shipped in PR #539. **42 candidates

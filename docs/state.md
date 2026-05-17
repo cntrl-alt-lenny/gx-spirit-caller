@@ -8,44 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-17 (Mac brain — brief 128 + 129 merge).
-**🔑 OV004 root cause identified: 86 spurious mwldarm thumb→arm
-veneers in `.rodata`.** Brief 129 scoping confirmed brief 113's Cat
-4 hypothesis empirically. mwldarm doesn't model overlay swapping →
-emits veneers for ov002 calls thinking they're reachable. 1,024
-bytes veneer pool cascades everything downstream. **Brief 113's risk
-assessment was correct for ov004 (unlike main)** — Cat 4 fix needs
-NEW TOOLING (LCF `.thunk` section, mwldarm flag, or dsd re-run). W7
-candidate workflow wall. **Brief 128 shipped 42 candidates** (3 Cat
-1 main fixes byte-identical, main 21→16 bytes; 39 cluster C Pattern
-1 wave 3). 3-region 25/27 baseline preserved.
+**Last updated:** 2026-05-17 (Mac brain — brief 130 + 131 merge).
+**🔑 Brief 131 ALIGNALL Phase 1 shipped: 95% ov004 + 52% main
+byte-diff reduction.** No baseline flips yet — Phase 2 (per-overlay
+symbol scoping) needed for the full 26/27 unlock. 4 sub-options
+tried, all hit walls; ALIGNALL via existing `patch_lcf_arm9_align.py`
+tool extension is the partial mitigation that works without
+regressions. **Symbol-collision root cause documented**: `data_ov004_
+02208760` (DATA) collides with `func_ov002_02208760` (FUNC) at same
+VA; mwldarm's veneer decision is FUNC-biased and overlay-blind.
+**W7 workflow wall documented**: mwldarm overlay-swap blindness.
+**Brief 130 shipped 42 candidates** (26 cluster C Pattern 1 + 1
+mega-array + 15 D-1) — first mega-array breakthrough. 3-region
+25/27 baseline preserved.
 
 EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
 badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #539 — decomper / brief 128 (Cat 1 main + cluster C wave 3).**
-  **42 candidates byte-identical** (3 Cat 1 main fixes + 39 cluster
-  C Pattern 1 wave 3). Cat 1 = 3 one-line `s/wrong/correct/` edits
-  in matched TUs (`func_02048f98`, `func_02052bc4`, `func_0206255c`)
-  → main's gap shrinks 21 → 16 bytes (still FAILED pending OV004
-  cascade). 3 cluster C mega-arrays deferred (30 KB + 5 KB + 4.6
-  KB — substantial enough to deserve dedicated waves). Cumulative
-  cluster C/D arc: **134 symbols** across 5 briefs.
-- **PR #540 — cloud / brief 129 (OV004 scoping).** **🔑 ROOT CAUSE
-  IDENTIFIED: 86 spurious mwldarm thumb→arm veneers in `.rodata`.**
-  All 86 targets resolve to ov002 functions (mutually-exclusive
-  overlay; mwldarm doesn't model overlay swapping). 1,024 bytes
-  veneer pool cascades everything downstream → ~165K bytes total
-  diff (~99% cascade, 0 genuine content errors). **Cat 4 fix needs
-  NEW TOOLING** (unlike main's Cat 1). 4 options scoped:
-  (1) mwldarm flag, (2) per-overlay symbol filtering, (3) custom
-  LCF `.thunk` section [**recommended — lowest risk**], (4) dsd
-  init re-run [highest risk]. **W7 candidate workflow wall**:
-  mwldarm overlay-swap blindness. **Brief 113's risk assessment
-  was correct for ov004** — empirical falsification of brief 127's
-  "no new toolchain" framing when extended to ov004.
+- **PR #542 — decomper / brief 130 (cluster C wave 4 + D-1 wave 2).**
+  **42 candidates byte-identical** (26 cluster C Pattern 1 + 1
+  mega-array + 15 D-1 dispatch tables). **First production mega-
+  array shipped**: `data_ov002_022be1ac` 4632 bytes — Pattern 1
+  recipe scales to multi-KB arrays. 2 mega-arrays remain
+  (30 KB + 5 KB) for future waves. ov004 candidates correctly
+  skipped per brief 129 finding. **Cluster C Pattern 1 ~95%
+  drained; D-1 ~50% drained (35/71).** Cumulative cluster C/D
+  arc: **176 symbols** across 6 briefs.
+- **PR #543 — cloud / brief 131 (ov004 ALIGNALL Phase 1).** **🔑
+  Partial unlock — 95% ov004 + 52% main byte-diff reduction; no
+  baseline flips.** 4 sub-options tried, all hit walls: Option 1
+  (`-nointerworking`) regresses ov002 35 diffs; Option 3a (`/DISCARD/`)
+  is GNU-ld syntax mwldarm rejects; Option 3b (pin section end)
+  triggers "move location backward"; Option 3c (`.thunk` markers)
+  accepted but ignored. **Phase 1 mitigation: ALIGNALL 4 → 2 via
+  existing `patch_lcf_arm9_align.py` tool extension.** No regressions.
+  **Symbol-collision root cause identified for Phase 2**: DATA
+  symbol in ov004 collides with FUNC in ov002 at same VA; mwldarm
+  veneer decision is FUNC-biased + overlay-blind. **W7 workflow
+  wall documented**. Brief 132 candidate: per-overlay symbol scoping.
 
 ## Cumulative pipeline state
 
@@ -62,11 +64,13 @@ badges directly; multi-module-OK is the visible milestone).
 | **Cluster D wave 1 D-1 (brief 124)** | **20 tables / 1652 bytes** | 11 modules; ~28% of D-1 pool drained |
 | **Cluster C+D wave 2 (brief 126)** | **29 C Pattern 1 + 7 D-2 = 36 syms / 41 KB** | W6 cascade bisected; D-2 strict-alignment confirmed |
 | **Cluster C wave 3 + Cat 1 main fix (brief 128)** | **39 C + 3 Cat 1 fixes = 42 syms / 4229 bytes** | Cat 1 byte-identical; main 21→16 bytes |
+| **Cluster C wave 4 + D-1 wave 2 (brief 130)** | **26 C + 1 mega-array + 15 D-1 = 42 syms** | First mega-array shipped (4632 bytes) |
 | **Cluster D recipe (brief 121)** | D-1 dispatch tables ~71 / D-2 scalar arrays ~30-40 | D-3 ~20 deferred or via Pattern 3 generator |
 | **data_worklist v3 (brief 123)** | 4-byte sub-shapes + refined cluster filters | brief 117 sub-class reproduced at 94% |
 | **Pattern 3 generator (brief 125)** | `tools/cluster_c_pattern3_gen.py` + 2 worked examples | Closes brief 119's FAILED Pattern 2 case |
-| **ARM9 main scoping (brief 127)** | **21 bytes / 6 symbols** | 76% cascades from OV004; Cat 1 fixed in brief 128 |
-| **OV004 scoping (brief 129)** | **86 spurious veneers** / ~165K bytes cascade | W7 candidate; needs LCF .thunk tooling (brief 131) |
+| **ARM9 main scoping (brief 127)** | **21 bytes / 6 symbols** | Cat 1 (5 bytes) fixed in 128; 16 bytes cascade from OV004 (10 post-brief-131) |
+| **OV004 scoping (brief 129)** | **86 spurious veneers** / ~165K bytes cascade | W7 wall identified |
+| **OV004 ALIGNALL Phase 1 (brief 131)** | **95% ov004 + 52% main diff reduction** | ov004: 165K→8125 bytes; main: 21→10 bytes |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -92,68 +96,76 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 128 + 129
-close and brief 130 + 131 queue lands.
+**Open PRs: 0** once this brain-PR for brief 130 + 131
+close and brief 132 + 133 queue lands.
 
-**DATA-TIER MATURE + 26/27 PATH CONCRETE BUT TOOLING-
-DEPENDENT.** Cluster C/D scaling well; main Cat 1
-shipped (16 bytes residue pending OV004); OV004 Cat 4
-needs LCF tooling work to fix the mwldarm veneer leak.
+**DATA-TIER MATURE + 26/27 PATH PROGRESS (Phase 1 done).**
+Cluster C Pattern 1 ~95% drained; D-1 ~50% drained.
+ov004 Phase 1 ALIGNALL shipped (95% diff reduction);
+Phase 2 per-overlay symbol scoping is the actual unlock.
 
-**Decomper — brief 130 (HIGH, NEW):**
+**Cloud — brief 132 (HIGH, NEW):**
 
-- **Cluster C wave 4 + cluster D-1 wave 2.** Two-part
-  parallel-track. (1) Cluster C Pattern 1 wave 4
-  continuation — ~40-80 remaining + 3 deferred mega-
-  arrays (30 KB / 5 KB / 4.6 KB). Target 25-35 normal
-  candidates + try one mega-array. (2) Cluster D-1
-  wave 2 — ~50 remaining D-1 dispatch tables (post
-  brief 124's 20). Target 12-18 in this wave. Same
-  recipes (brief 121 D-1 + brief 119 Pattern 1).
-  Branch: `decomper/cluster-c-wave-4-d1-wave-2`.
+- **OV004 Phase 2 — per-overlay symbol scoping fix.**
+  **🔑 THE ACTUAL 26/27 UNLOCK.** Per brief 131's Phase
+  2 plan + symbol-collision root cause: localize
+  sibling-overlay FUNC symbols at link time so mwldarm
+  doesn't see them as call targets. Breaks the
+  collision that triggers veneers.
+  - Approaches to investigate:
+    - (A) Per-overlay link inputs — strip ov002
+      symbols from ov004's link input.
+    - (B) Symbol-local visibility — mark ov002 funcs
+      as local to ov002's link unit.
+    - (C) Symbol-rename pre-link — rename ov002
+      funcs to ov002-scoped names before linking
+      ov004.
+  - End-to-end test: ov004's remaining 8125 bytes
+    diff drops to ~0; dsd check modules flips ov004
+    OK; main auto-flips on its 9 cascade bytes
+    (10 → 1 = brief 127's Cat 1 byte which brief 128
+    already fixed via source).
+  - Goal: **3-region baseline 25/27 → 27/27** (full
+    SHA1 match across all 3 regions) if main also
+    flips cleanly. **26/27 minimum.**
+  Branch: `cloud/ov004-symbol-scoping-phase2`.
 
-**Cloud — brief 131 (HIGH, NEW):**
+**Decomper — brief 133 (HIGH, NEW):**
 
-- **Cat 4 fix via LCF `.thunk` section.** **🔑 THIS IS
-  THE 26/27 BASELINE UNLOCK.** Per brief 129's
-  recommendation (Option 3, lowest risk). Build a
-  custom LCF section that absorbs mwldarm's spurious
-  thumb→arm veneers without displacing `.data` —
-  preserves `.rodata` end VA, breaks the cascade. If
-  approach 3 fails or proves too complex, fall back
-  to Option 2 (per-overlay symbol filtering) or
-  Option 1 (mwldarm flag tweak). Option 4 (dsd init
-  re-run) is last resort.
-  - W7 candidate workflow wall — document the
-    mwldarm overlay-swap blindness mechanism in
-    `codegen-walls.md` or workflow-walls doc.
-  - End-to-end test: ov004 built vs orig
-    byte-identical after fix; dsd check modules
-    flips ov004 to OK; main auto-flips on cascade.
-  - Brief 132+ candidate emerges: any Phase 2
-    residue cleanup if Cat 4 fix leaves bytes
-    differing (per brief 129's contingency).
-  Branch: `cloud/ov004-thunk-section-fix`.
+- **Cluster D-1 wave 3 + second mega-array try.** Two-
+  part parallel-track while cloud works the unlock.
+  (1) Cluster D-1 wave 3 — ~35 remaining dispatch
+  tables (post brief 124+130). Target 12-18 in this
+  wave. (2) Try the 5 KB `data_022bf3c4` mega-array
+  (cluster C Pattern 1, ov002). 1 mega-array per wave
+  is the established cadence per brief 130's
+  precedent. ov004 candidates STILL SKIPPED until
+  brief 132's Phase 2 lands. Branch:
+  `decomper/cluster-d1-wave-3-mega2`.
 
-**Data-tier backlog (post-124/125):**
+**Data-tier backlog (post-130/131):**
 
-1. **Cluster C wave 3 — Pattern 3 application via
-   brief 125 generator** (decomper). ~50-90 candidates
-   closed in 1-3 waves.
-2. **Cluster C wave 3 — Pattern 2 application**
-   (decomper). 17 dsd-compatible runs in main.
-3. **Cluster B wave 1 — true scalars** (decomper). 81
-   true-scalar sub-pool per brief 123 v3.
-4. **Cluster A wave 4** — remaining small overlays +
+1. **Cluster C Pattern 3 application via brief 125
+   generator** (decomper). ~50-90 candidates closed
+   in 1-3 waves.
+2. **Cluster C Pattern 2 application** (decomper).
+   17 dsd-compatible runs in main.
+3. **Cluster B wave 1 — true scalars** (decomper).
+   81 true-scalar sub-pool per brief 123 v3.
+4. **Cluster D-2 wave 2** (decomper). ~25-35
+   remaining scalar arrays.
+5. **Cluster A wave 4** — remaining small overlays +
    ov007 cleanup. Closes cluster A to 85-90%.
-5. **Cross-region cluster A apply** — port the 1145
+6. **Cross-region cluster A apply** — port the 1145
    EUR cluster A symbols to USA + JPN.
-6. **Cluster D-3** via Pattern 3 generator (~20
-   complex nested structs; alternative to typedef
-   tool).
-7. **Single-pointer cluster D cleanup** — ~50 trivial
-   pointer-code/pointer-data per brief 124's
-   recommendation.
+7. **3rd mega-array (`data_020b6ec4` 30 KB)** —
+   biggest deferred Pattern 1 candidate.
+8. **Cluster D-3** via Pattern 3 generator (~20
+   complex nested structs).
+9. **Single-pointer cluster D cleanup** — ~50 trivial
+   pointer-code/pointer-data per brief 124.
+10. **ov004 cluster C + D candidates** — pending brief
+    132 Phase 2 unlock.
    strategic lever; revisit when data-tier momentum
    slows.
 
@@ -246,39 +258,38 @@ EUR 1.79% / USA + JPN 0.70% (function-tier badge);
 Function-tier matching: ~140 EUR + ~840 region-
 equivalents + 100 cross-project. **Data-tier: 1145
 cluster A `.bss` syms (~72% drained) + 5 cluster E
-DTCM syms + 20 cluster D-1 dispatch tables + 105
-cluster C Pattern 1 syms + 7 cluster D-2 arrays + 2
-Pattern 3 worked examples + 3 Cat 1 main TU fixes.**
-~1100+ cumulative session match-equivalents (function-
-tier) + ~1287 data-tier symbols claimed. **Path to
-26/27 baseline now hinges on brief 131 (Cat 4 LCF
-.thunk fix)** — when OV004 flips, main auto-flips on
-its 16 cascade bytes. **NEW TOOLING NEEDED** for the
-unlock (per brief 129's W7 finding).
+DTCM syms + 35 cluster D-1 dispatch tables + 131
+cluster C Pattern 1 syms + 1 mega-array + 7 cluster
+D-2 arrays + 2 Pattern 3 worked examples + 3 Cat 1
+main TU fixes.** ~1100+ cumulative session match-
+equivalents (function-tier) + ~1329 data-tier symbols
+claimed. **Brief 131 Phase 1 reduces ov004 diff 95%
+and main 52%** — path to 26/27 narrows further via
+brief 132 Phase 2 (per-overlay symbol scoping).
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 130 (cluster C
-   wave 4 + cluster D-1 wave 2) PR** when it opens.
-   EUR `ninja rom` + `dsd check modules` 25/27 baseline
-   preserved. Watch for any mega-array success (one of
-   30 KB / 5 KB / 4.6 KB tried). D-1 wave 2 covers ~12-
-   18 of remaining ~50 D-1 tables.
-2. **Verify + merge cloud brief 131 (Cat 4 LCF .thunk
-   fix) PR** when it opens. **🔑 26/27 baseline unlock.**
-   Verify by: ov004 module flips FAILED → OK; main
-   auto-flips on cascade-resolved bytes (16/21 bytes
-   should drop); 3-region baseline goes from 25/27 →
-   **27/27** if both ov004 + main flip. Cascading wins
-   likely — possible 26/27 minimum, 27/27 best case.
-   If brief 131 takes Option 2/3/4 (fallback options),
-   document tooling-change rationale.
-3. **Scope brief 132+ after 130 + 131 close.** Options:
-   - **Brief 132 — Phase 2 OV004 residue cleanup**
-     (conditional, only if brief 131 leaves bytes
-     differing per brief 129's contingency).
-   - **Brief 133 — cluster C wave 5 (Pattern 3 via
-     brief 125 generator)** (decomper, ~50-90
+1. **Verify + merge cloud brief 132 (OV004 Phase 2
+   per-overlay symbol scoping) PR** when it opens.
+   **🔑 26/27 baseline unlock.** Verify gate: ov004
+   `dsd check modules` flips FAILED → OK; main auto-
+   flips on its 9 cascade bytes (post-Phase-1 ov004
+   has 8125 bytes residue, main has 10 bytes residue).
+   Target: **3-region baseline 25/27 → 27/27** if
+   main also flips clean; **26/27 minimum**.
+2. **Verify + merge decomper brief 133 (D-1 wave 3
+   + 2nd mega-array)** when it opens. EUR `ninja rom`
+   + `dsd check modules` 25/27 baseline preserved.
+   Watch for the 5 KB mega-array success (`data_022bf3c4`).
+3. **Scope brief 134+ after 132 + 133 close.** Options:
+   - **If brief 132 flipped to 26/27 or 27/27**: post-
+     unlock waves can include ov004 candidates
+     (cluster C / D-1 / D-2). Brief 134 candidate:
+     ov004 cluster sweep.
+   - **If brief 132 partial**: Phase 3 follow-up to
+     close remaining bytes.
+   - **Brief 135 — cluster C wave Pattern 3 application
+     via brief 125 generator** (decomper, ~50-90
      candidates).
    - **Brief 134 — cluster B wave 1** (decomper, 81
      true scalars per brief 123 v3).
