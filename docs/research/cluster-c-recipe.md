@@ -191,13 +191,57 @@ data_020c3881:
 ```
 
 This groups `data_020c387c` (5 bytes) + `data_020c3881` (9 bytes)
-+ 2 bytes padding = **16 bytes total**, 4-aligned. ✓ should work.
++ 2 bytes padding = **16 bytes total**, 4-aligned.
 
-**Pending verification** — brief 119 didn't end-to-end test this
-group form because dsd's size deduction for the embedded
-`data_020c3881` symbol (size=0 in symbols.txt) extends the
-expected end past the TU range. Workaround: explicitly set the
-inner symbol's size in symbols.txt before adding the TU claim.
+**VERIFIED brief 121 Part 2** — but on a different candidate.
+The `data_020c387c` + `data_020c3881` chunk FAILS dsd validation
+because the next symbol after `data_020c3881` is at 0x020c398c
+(0x10b bytes past); dsd's size deduction (next-symbol-distance)
+exceeds the chunk's 16-byte range.
+
+**Working Pattern 2 worked example** (brief 121 Part 2):
+
+```text
+src/main/data_020b52d4.s:
+    complete
+    .rodata start:0x020b52d4 end:0x020b52d8
+```
+
+```asm
+        .section .rodata
+
+        .global data_020b52d4
+data_020b52d4:
+        .byte 0x00, 0x00
+
+        .global data_020b52d6
+data_020b52d6:
+        .byte 0x00, 0x00
+```
+
+Two 2-byte symbols summing to 4 bytes. dsd deduces each symbol's
+size from `next_symbol_addr - this_addr`:
+
+- `data_020b52d4` (at 0x020b52d4): next = 0x020b52d6 → size 2
+- `data_020b52d6` (at 0x020b52d6): next = 0x020b52d8 → size 2
+
+Both deduced sizes fit within the chunk (end 0x020b52d8). dsd
+accepts the TU; build succeeds; bytes byte-identical.
+
+**The Pattern 2 constraint**: dsd's deduced-size for the LAST
+embedded symbol must fit within the chunk. I.e., the symbol AFTER
+the chunk's last embedded must be AT OR BEFORE the chunk's end.
+
+**Pattern 2 eligibility scan** (per brief 121's analysis of main
+.rodata): **17 dsd-compatible 4-aligned runs** found across the
+127 main `.rodata` data symbols. Larger pools available in
+overlays (not yet enumerated).
+
+**Workaround for non-eligible Pattern 2 candidates** (like the
+NAN/INFINITY example): the only fix is to **add an explicit-size
+hint to symbols.txt for the embedded symbol** — dsd doesn't
+support this currently. Alternative is Pattern 3 (chunk the whole
+section) which sidesteps the per-symbol deduction.
 
 ### Pattern 3 — chunk the entire `.rodata` (most aggressive)
 

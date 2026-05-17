@@ -284,29 +284,33 @@ baseline preserved.
 
 ### Cluster D — `.data` struct arrays + dispatch tables (medium-high)
 
-**Recipe**: declare struct array literals with the right struct
-typedef + per-entry initializer.
+**Status:** recipe established by **brief 121 Part 1**, see
+[`docs/research/cluster-d-recipe.md`](cluster-d-recipe.md) for
+the 3-sub-cluster classification + worked examples.
 
-```c
-typedef struct { fn_ptr_t cb; int arg0; int arg1; } dispatch_entry_t;
-dispatch_entry_t data_020bef80[] = {
-    { func_X, 0, 0 },
-    { func_Y, 6, 0 },
-    /* ... */
-};
-```
+**3 sub-clusters**:
 
-**Pool size**: estimate ~50-100 distinct multi-entry struct
-tables (game engine dispatch tables, scene tables, etc.).
+- **D-1** (dispatch / pointer tables): `void *[]` array of `extern`
+  references — `.c` form, naturally 4-aligned size. ~71 candidates
+  (39 native fnptr + 32 from brief 117's pointer sub-pool).
+- **D-2** (scalar struct / byte arrays): typed C array
+  (`unsigned char []` / `unsigned short []` / `unsigned int []`).
+  ~30-40 candidates.
+- **D-3** (complex nested struct arrays): defer to future
+  typedef-inference brief. ~20 candidates (the large >0x100 ones).
 
-**Difficulty**: HIGH per-table. Requires:
-- Identifying the struct shape (size + fields) from readers
-- Resolving every function pointer / data pointer to its named
-  symbol (cross-references)
-- Matching alignment + padding bytes
+**Pool size (refined per brief 121)**:
+- 98 native cluster D candidates + 32 from brief 117 D-1 fold =
+  **~130 effective**.
 
-**Estimated wave throughput**: 3-5 tables per wave (large
-per-table investment).
+**Estimated wave throughput** (refined per brief 121):
+- D-1: 5-10 tables/wave (mechanical, extern resolution)
+- D-2: 10-15 arrays/wave (byte/short/int initializer transcription)
+- D-3: 1-2 tables/wave (typedef discovery per candidate)
+
+**Worked examples (brief 121, both byte-identical)**:
+- `src/main/data_0210210c.c` (D-1: 20-byte data-pointer table)
+- `src/main/data_02101f34.c` (D-2: 64-byte permutation array)
 
 ### Cluster E — DTCM / ITCM specials (one-shot)
 
