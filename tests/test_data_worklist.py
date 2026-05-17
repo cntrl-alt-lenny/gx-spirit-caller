@@ -39,12 +39,16 @@ from analyze_symbols import (  # noqa: E402
 from data_worklist import (  # noqa: E402
     DATA_PLACEHOLDER_PREFIX,
     SHAPE_BSS,
+    SHAPE_POINTER_CODE,
+    SHAPE_POINTER_DATA,
     SHAPE_SCALAR,
+    SHAPE_STRING_ASCII4,
     SHAPE_STRUCT,
     SHAPE_UNKNOWN,
     CLUSTER_FILTERS,
     ModuleSections,
     SectionRange,
+    _is_ascii4,
     _is_code_address,
     _is_printable_string,
     _load_readers_index,
@@ -52,6 +56,7 @@ from data_worklist import (  # noqa: E402
     _looks_like_fnptr_table,
     _parse_csv_filter,
     _parse_section_header,
+    _pointer_target_section,
     build_size_table,
     classify_shape,
     rank_data_symbols,
@@ -616,15 +621,29 @@ class TestClusterShorthand(unittest.TestCase):
         self.assertEqual(cf.shapes, frozenset({SHAPE_SCALAR}))
         self.assertEqual(cf.size_max, 8)
 
-    def test_cluster_c_is_rodata(self):
+    def test_cluster_c_includes_rodata_and_ascii4_data(self):
+        # v3 (brief 123) — C now spans .rodata + .data (for ASCII4
+        # strings mis-classified into cluster B per brief 117).
         cf = resolve_cluster("C")
-        self.assertEqual(cf.sections, frozenset({"rodata"}))
+        self.assertIn("rodata", cf.sections)
+        self.assertIn("data", cf.sections)
+        # Shape filter includes both string forms.
+        self.assertIsNotNone(cf.shapes)
+        # Verifying via locally-imported constant (avoid TYPE_CHECKING circular).
+        from data_worklist import SHAPE_STRING_ASCII4 as _ASCII4
+        self.assertIn(_ASCII4, cf.shapes)
 
-    def test_cluster_d_is_data_structs_min_size(self):
+    def test_cluster_d_is_data_structs_includes_pointers(self):
+        # v3 (brief 123) — D folds brief 117's 32-pointer sub-pool
+        # via SHAPE_POINTER_CODE + SHAPE_POINTER_DATA; size_min
+        # dropped from 0x40 to 0x4 so 4-byte pointers fit.
         cf = resolve_cluster("D")
         self.assertEqual(cf.sections, frozenset({"data"}))
-        self.assertEqual(cf.size_min, 0x40)
+        self.assertEqual(cf.size_min, 0x4)
         self.assertIn(SHAPE_STRUCT, cf.shapes)
+        from data_worklist import SHAPE_POINTER_CODE as _PC, SHAPE_POINTER_DATA as _PD
+        self.assertIn(_PC, cf.shapes)
+        self.assertIn(_PD, cf.shapes)
 
     def test_cluster_e_is_dtcm_itcm(self):
         cf = resolve_cluster("E")
@@ -762,6 +781,221 @@ class TestRenderMarkdownV2(unittest.TestCase):
         # New columns: Section, Size, Shape
         self.assertIn("| # | Module | Name | Addr | Section | Size | Shape | "
                       "Readers | Cross-mod | Reader modules |", md)
+
+
+# --------------------------------------------------------------------------- #
+# Brief 123 v3 — 4-byte sub-shape distinction (ASCII4 / pointer-code /
+# pointer-data) + cluster filter refinements
+# --------------------------------------------------------------------------- #
+
+
+def _modsecs_with_bytes(payload: bytes, load_addr: int = 0x02000000,
+                        sections: list[SectionRange] | None = None) -> ModuleSections:
+    """Helper: build a ModuleSections with synthetic bytes for shape tests."""
+    if sections is None:
+        sections = [
+            SectionRange(name="data", start=load_addr,
+                         end=load_addr + len(payload))
+        ]
+    return ModuleSections(
+        module="main",
+        sections=sections,
+        binary=payload,
+        load_addr=load_addr,
+    )
+
+
+class TestAscii4Heuristic(unittest.TestCase):
+    def test_pure_ascii_4chars(self):
+        self.assertTrue(_is_ascii4(b"ABCD"))
+
+    def test_ascii_with_trailing_null(self):
+        self.assertTrue(_is_ascii4(b"PR\x00\x00"))
+        self.assertTrue(_is_ascii4(b"%u\x00\x00"))
+        self.assertTrue(_is_ascii4(b"256\x00"))
+
+    def test_single_ascii_three_nulls(self):
+        self.assertTrue(_is_ascii4(b"0\x00\x00\x00"))
+
+    def test_rejects_wrong_length(self):
+        self.assertFalse(_is_ascii4(b"AB"))
+        self.assertFalse(_is_ascii4(b"ABCDE"))
+
+    def test_rejects_all_null(self):
+        # All-zero is NOT ASCII4 — would false-positive on every BSS-like
+        # cell. Requires ≥1 printable byte.
+        self.assertFalse(_is_ascii4(b"\x00\x00\x00\x00"))
+
+    def test_rejects_non_printable(self):
+        # 0x01 is not printable.
+        self.assertFalse(_is_ascii4(b"\x01ABC"))
+
+    def test_rejects_interleaved_null(self):
+        # "A\0BC" — null appears before the printable run ends.
+        self.assertFalse(_is_ascii4(b"A\x00BC"))
+
+
+class TestPointerTargetSection(unittest.TestCase):
+    def _setup(self):
+        """Two modules: main with text+data ranges, ov005 with text."""
+        return {
+            "main": ModuleSections(
+                module="main",
+                sections=[
+                    SectionRange(name="text", start=0x02000000, end=0x020b4320),
+                    SectionRange(name="rodata", start=0x020b4320, end=0x020c3bc0),
+                    SectionRange(name="data", start=0x020c3bc0, end=0x02102c60),
+                    SectionRange(name="bss", start=0x02102c60, end=0x021aa4a0),
+                ],
+                binary=None, load_addr=0x02000000,
+            ),
+            "ov005": ModuleSections(
+                module="ov005",
+                sections=[
+                    SectionRange(name="text", start=0x021aa4a0, end=0x021b1234),
+                    SectionRange(name="data", start=0x021b1234, end=0x021b224c),
+                ],
+                binary=None, load_addr=0x021aa4a0,
+            ),
+        }
+
+    def test_main_text_addr_is_code(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x02050000, modsecs), "code")
+
+    def test_main_rodata_addr_is_data(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x020b5000, modsecs), "data")
+
+    def test_main_data_addr_is_data(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x020e0000, modsecs), "data")
+
+    def test_main_bss_addr_is_data(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x02103000, modsecs), "data")
+
+    def test_overlay_text_addr_is_code(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x021ab000, modsecs), "code")
+
+    def test_itcm_is_code(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x01ff8100, modsecs), "code")
+
+    def test_dtcm_is_data(self):
+        modsecs = self._setup()
+        self.assertEqual(_pointer_target_section(0x027e0100, modsecs), "data")
+
+    def test_unknown_address_returns_none(self):
+        modsecs = self._setup()
+        # 0x08000000 (GBA cart slot) — outside all known sections.
+        self.assertIsNone(_pointer_target_section(0x08000000, modsecs))
+
+
+class TestClassifyShapeV3SubShapes(unittest.TestCase):
+    """v3 (brief 123) — 4-byte sub-shape classification."""
+
+    def _modsecs_map(self):
+        return {
+            "main": ModuleSections(
+                module="main",
+                sections=[
+                    SectionRange(name="text", start=0x02000000, end=0x020b4320),
+                    SectionRange(name="data", start=0x020c3bc0, end=0x02102c60),
+                ],
+                binary=None, load_addr=0x02000000,
+            ),
+        }
+
+    def _modsecs_for_sym(self, addr: int, payload: bytes) -> ModuleSections:
+        """ModuleSections whose binary contains `payload` at `addr`."""
+        return ModuleSections(
+            module="main",
+            sections=[
+                SectionRange(name="data", start=addr, end=addr + len(payload)),
+            ],
+            binary=payload,
+            load_addr=addr,
+        )
+
+    def test_size4_ascii4_classifies_as_string_ascii4(self):
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"PR\x00\x00")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_STRING_ASCII4)
+
+    def test_size4_code_addr_classifies_as_pointer_code(self):
+        # Bytes: little-endian 0x02050000 (in main .text range)
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"\x00\x00\x05\x02")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_POINTER_CODE)
+
+    def test_size4_data_addr_classifies_as_pointer_data(self):
+        # Bytes: little-endian 0x020e0000 (in main .data range)
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"\x00\x00\x0e\x02")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_POINTER_DATA)
+
+    def test_size4_random_value_falls_back_to_scalar(self):
+        # Bytes don't resolve to any section AND aren't ASCII.
+        # 0xffffffff: not in any section; all bytes non-printable.
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"\xff\xff\xff\xff")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_SCALAR)
+
+    def test_size4_no_modsecs_map_falls_back_to_scalar(self):
+        # Without modsecs_map, can't classify pointer; defaults to scalar.
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"\x00\x00\x05\x02")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=None)
+        # Bytes still get ASCII4 check (which fails) → fallback scalar.
+        self.assertEqual(shape, SHAPE_SCALAR)
+
+    def test_size1_or_2_skips_sub_shape_logic(self):
+        # 1- and 2-byte values are always SHAPE_SCALAR (no byte inspection).
+        sym = _data_sym("main", 0x02100000, size=1)
+        shape = classify_shape(sym, "data", 1, None, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_SCALAR)
+        shape = classify_shape(sym, "data", 2, None, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_SCALAR)
+
+    def test_size4_ascii4_takes_precedence_over_pointer(self):
+        # If a 4-byte value is BOTH printable AND looks like a pointer,
+        # ASCII4 wins (rare edge case, but worth pinning).
+        # "P\0\0\0" — bytes 0x50 0x00 0x00 0x00 → ASCII4
+        # (As LE u32 = 0x00000050, not a valid section address)
+        sym = _data_sym("main", 0x02100000, size=4)
+        msec = self._modsecs_for_sym(0x02100000, b"P\x00\x00\x00")
+        shape = classify_shape(sym, "data", 4, msec, modsecs_map=self._modsecs_map())
+        self.assertEqual(shape, SHAPE_STRING_ASCII4)
+
+
+class TestClusterFilterV3(unittest.TestCase):
+    """v3 (brief 123) — refined cluster B/C/D filter mappings."""
+
+    def test_cluster_b_excludes_pointers_and_ascii(self):
+        cf = resolve_cluster("B")
+        # B's shape filter is strictly {scalar} — pointer/ascii excluded.
+        self.assertEqual(cf.shapes, frozenset({SHAPE_SCALAR}))
+        self.assertNotIn(SHAPE_POINTER_CODE, cf.shapes)
+        self.assertNotIn(SHAPE_STRING_ASCII4, cf.shapes)
+
+    def test_cluster_c_includes_ascii4_and_spans_rodata_data(self):
+        cf = resolve_cluster("C")
+        self.assertIn("rodata", cf.sections)
+        self.assertIn("data", cf.sections)
+        self.assertIn(SHAPE_STRING_ASCII4, cf.shapes)
+
+    def test_cluster_d_includes_both_pointer_sub_shapes(self):
+        cf = resolve_cluster("D")
+        self.assertIn(SHAPE_POINTER_CODE, cf.shapes)
+        self.assertIn(SHAPE_POINTER_DATA, cf.shapes)
+        # Size min dropped from 0x40 to 0x4 to accommodate 4-byte pointers.
+        self.assertEqual(cf.size_min, 0x4)
 
 
 if __name__ == "__main__":

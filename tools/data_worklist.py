@@ -330,7 +330,10 @@ def build_size_table(
 # Recognised shape tokens for the --shape filter.
 SHAPE_BSS = "bss"
 SHAPE_SCALAR = "scalar"
-SHAPE_STRING = "string"
+SHAPE_STRING = "string"             # multi-byte ASCII string buffer
+SHAPE_STRING_ASCII4 = "string-ascii4"   # 4-byte ASCII slot (brief 123 v3)
+SHAPE_POINTER_CODE = "pointer-code"     # 4-byte word → code address (brief 123)
+SHAPE_POINTER_DATA = "pointer-data"     # 4-byte word → data address (brief 123)
 SHAPE_FNPTR = "fnptr_table"
 SHAPE_JUMP = "jump_table"
 SHAPE_ARRAY = "array"
@@ -338,7 +341,10 @@ SHAPE_STRUCT = "struct"
 SHAPE_UNKNOWN = "unknown"
 
 ALL_SHAPES = (
-    SHAPE_BSS, SHAPE_SCALAR, SHAPE_STRING, SHAPE_FNPTR, SHAPE_JUMP,
+    SHAPE_BSS, SHAPE_SCALAR,
+    SHAPE_STRING, SHAPE_STRING_ASCII4,
+    SHAPE_POINTER_CODE, SHAPE_POINTER_DATA,
+    SHAPE_FNPTR, SHAPE_JUMP,
     SHAPE_ARRAY, SHAPE_STRUCT, SHAPE_UNKNOWN,
 )
 
@@ -374,12 +380,95 @@ def _is_code_address(addr: int) -> bool:
     no function pointer should ever resolve there.
 
     Function-pointer table heuristic just checks the range; relocs
-    cross-checking is left to a future refinement."""
+    cross-checking is left to a future refinement.
+
+    For brief 123 v3's finer pointer-code vs pointer-data
+    distinction, use `_pointer_target_section()` instead — it
+    consults the per-module section ranges from `modsecs_map`."""
     if 0x01ff8000 <= addr < 0x01ff8800:        # ITCM
         return True
     if 0x027e0000 <= addr < 0x027e8000:        # DTCM — data only
         return False
     return 0x02000000 <= addr < 0x02400000     # ARM9 main + overlays
+
+
+# --------------------------------------------------------------------------- #
+# Brief 123 v3 — section-aware pointer classification + 4-byte sub-shapes
+# --------------------------------------------------------------------------- #
+
+# Section names that hold executable code. Per delinks.txt section
+# `kind` field; both .text and .init are code sections (matches
+# SECTION_NORMALIZE → "text").
+CODE_SECTION_NAMES = frozenset({"text"})
+
+# Section names that hold non-code data.
+DATA_SECTION_NAMES = frozenset({"data", "rodata", "bss", "dtcm", "itcm"})
+
+
+def _pointer_target_section(
+    addr: int,
+    modsecs_map: dict[str, ModuleSections],
+) -> str | None:
+    """Return the section *category* a 4-byte pointer value would
+    target, by scanning all modules' section ranges.
+
+    Returns one of:
+      - "code"  — addr lands in a module's `.text` section
+                  (or the ITCM region, treated as code)
+      - "data"  — addr lands in `.data` / `.rodata` / `.bss` /
+                  (or DTCM, treated as data)
+      - None    — addr doesn't resolve to any known section
+                  (often invalid as a pointer — likely a scalar value
+                  that happens to fall in the 0x02000000+ range)
+
+    Brief 123 v3: replaces the broad `_is_code_address` range check
+    for the new `SHAPE_POINTER_CODE` / `SHAPE_POINTER_DATA` shapes.
+    The `_is_code_address` helper stays as a coarse range gate for
+    `_looks_like_fnptr_table` (which doesn't take modsecs_map)."""
+    # ITCM is always code by convention. DTCM is always data.
+    if 0x01ff8000 <= addr < 0x01ff8800:
+        return "code"
+    if 0x027e0000 <= addr < 0x027e8000:
+        return "data"
+    # General scan of all modules.
+    for msec in modsecs_map.values():
+        rng = msec.section_of(addr)
+        if rng is None:
+            continue
+        if rng.name in CODE_SECTION_NAMES:
+            return "code"
+        if rng.name in DATA_SECTION_NAMES:
+            return "data"
+    return None
+
+
+def _is_ascii4(b: bytes) -> bool:
+    """Heuristic for SHAPE_STRING_ASCII4 (brief 117 finding):
+    4-byte slot whose bytes are mostly printable ASCII with optional
+    trailing null(s). Examples seen in the wild: "1\\0\\0\\0",
+    "256\\0", "N/A\\0", "fn\\0\\0", "PR\\0\\0".
+
+    Requires:
+      - exactly 4 bytes
+      - at least 1 byte is printable ASCII (0x20-0x7e, excluding null)
+      - all non-null bytes are printable ASCII
+      - any nulls come AFTER the printable run (not interleaved)"""
+    if len(b) != 4:
+        return False
+    seen_null = False
+    printable_count = 0
+    for byte in b:
+        if byte == 0:
+            seen_null = True
+            continue
+        # After a null, all remaining bytes must also be null.
+        if seen_null:
+            return False
+        if not (0x20 <= byte <= 0x7e):
+            return False
+        printable_count += 1
+    # At least one printable byte and not all-null.
+    return printable_count >= 1
 
 
 def _looks_like_fnptr_table(b: bytes, min_entries: int = 4) -> bool:
@@ -428,32 +517,68 @@ def classify_shape(
     section: str,
     size: int,
     modsecs: ModuleSections | None,
+    modsecs_map: dict[str, ModuleSections] | None = None,
 ) -> str:
     """Classify a data symbol's shape via byte-pattern heuristics.
 
-    Order of checks:
-      1. .bss / unknown section → SHAPE_BSS (no bytes to inspect)
-      2. size 0 → SHAPE_UNKNOWN (can't classify without extent)
-      3. size 1/2/4 → SHAPE_SCALAR
-      4. printable + null-term → SHAPE_STRING
-      5. code-pointer pattern → SHAPE_FNPTR (size ≥ 16) or SHAPE_JUMP
+    Order of checks (v3 brief 123):
+      1. .bss section → SHAPE_BSS (no bytes to inspect)
+      2. size 0 → SHAPE_UNKNOWN
+      3. size 1/2 → SHAPE_SCALAR
+      4. **size 4** (v3 sub-shapes — order matters):
+         a. printable-ASCII pattern → SHAPE_STRING_ASCII4
+         b. value resolves to code addr → SHAPE_POINTER_CODE
+         c. value resolves to data addr → SHAPE_POINTER_DATA
+         d. otherwise → SHAPE_SCALAR (default for 4-byte values)
+      5. printable + null-term → SHAPE_STRING (multi-byte)
+      6. code-pointer pattern → SHAPE_FNPTR (size ≥ 16) or SHAPE_JUMP
          (size 8-15, 2-3 entries)
-      6. repeating-element pattern → SHAPE_ARRAY
-      7. otherwise → SHAPE_STRUCT (opaque catch-all for >4 byte data)
+      7. repeating-element pattern → SHAPE_ARRAY
+      8. otherwise → SHAPE_STRUCT (opaque catch-all for >4 byte data)
+
+    `modsecs_map` (v3) enables section-aware pointer classification.
+    When None, the v3 pointer-code/pointer-data sub-shapes fall back
+    to plain SHAPE_SCALAR (matches v2 behaviour). When provided, the
+    4-byte byte-pattern is inspected against per-module section
+    ranges to pick the right pointer-sub-shape.
     """
     if section in ("bss",):
         return SHAPE_BSS
     if size == 0:
         return SHAPE_UNKNOWN
-    if size in (1, 2, 4):
+    if size in (1, 2):
         return SHAPE_SCALAR
     if modsecs is None:
-        return SHAPE_UNKNOWN
+        # v3: without section info, can't run pointer / ASCII byte
+        # checks. Size 4 falls back to SHAPE_SCALAR (v2 behaviour);
+        # larger sizes can't be inferred at all.
+        return SHAPE_SCALAR if size == 4 else SHAPE_UNKNOWN
     b = modsecs.bytes_at(sym.addr, size)
     if b is None:
-        # No bytes on disk (e.g., .bss but classified to a non-bss
-        # section due to header gap) — treat as bss for filtering.
-        return SHAPE_BSS
+        # No bytes on disk (build hasn't run, or .bss classified to
+        # a non-bss section due to header gap). Size 4 → SHAPE_SCALAR
+        # default (matches v2; the v3 sub-shapes require bytes). Other
+        # sizes treat as bss for filtering.
+        return SHAPE_SCALAR if size == 4 else SHAPE_BSS
+
+    # v3 (brief 123) — 4-byte sub-shape distinction.
+    if size == 4:
+        # 4a. ASCII4: brief 117's mis-classified-cluster-B finding.
+        if _is_ascii4(b):
+            return SHAPE_STRING_ASCII4
+        # 4b/c. Pointer classification: parse LE word, classify by
+        # target section.
+        word = int.from_bytes(b, "little")
+        if modsecs_map is not None:
+            target = _pointer_target_section(word, modsecs_map)
+            if target == "code":
+                return SHAPE_POINTER_CODE
+            if target == "data":
+                return SHAPE_POINTER_DATA
+        # 4d. Default: scalar (true int / short / byte).
+        return SHAPE_SCALAR
+
+    # ≥5 bytes — original v2 shape inference.
     if _is_printable_string(b):
         return SHAPE_STRING
     if _looks_like_fnptr_table(b, min_entries=4):
@@ -481,6 +606,17 @@ class ClusterFilter:
 
 
 # Brief 113's cluster taxonomy resolved into concrete filters.
+# v3 (brief 123) refines B/C/D to use the new sub-shapes:
+#   - B (.data scalars): SHAPE_SCALAR only — excludes ASCII4 strings
+#     (now cluster C) and pointers (now cluster D D-1).
+#   - C (.rodata): includes SHAPE_STRING_ASCII4 from anywhere (folds
+#     brief 117's 115-symbol cluster B mis-classified pool). The
+#     filter no longer constrains by section since ASCII4 strings
+#     may live in .data too.
+#   - D (.data + dispatch tables): includes SHAPE_POINTER_CODE +
+#     SHAPE_POINTER_DATA alongside the existing struct/array/fnptr
+#     shapes. Folds brief 117's 32-symbol pointer sub-pool into the
+#     D-1 (dispatch tables) recipe.
 CLUSTER_FILTERS: dict[str, ClusterFilter] = {
     "A": ClusterFilter(
         sections=frozenset({"bss"}),
@@ -495,15 +631,25 @@ CLUSTER_FILTERS: dict[str, ClusterFilter] = {
         size_max=8,
     ),
     "C": ClusterFilter(
-        sections=frozenset({"rodata"}),
-        shapes=None,
+        # v3: C now spans both .rodata (native strings/arrays) AND
+        # cluster B's ASCII4 sub-pool in .data. Sections are
+        # constrained per-shape via shape filter membership.
+        sections=frozenset({"rodata", "data"}),
+        shapes=frozenset({
+            SHAPE_STRING, SHAPE_STRING_ASCII4,
+            SHAPE_ARRAY, SHAPE_STRUCT,
+        }),
         size_min=0,
         size_max=None,
     ),
     "D": ClusterFilter(
         sections=frozenset({"data"}),
-        shapes=frozenset({SHAPE_STRUCT, SHAPE_ARRAY, SHAPE_FNPTR, SHAPE_JUMP}),
-        size_min=0x40,
+        shapes=frozenset({
+            SHAPE_STRUCT, SHAPE_ARRAY,
+            SHAPE_FNPTR, SHAPE_JUMP,
+            SHAPE_POINTER_CODE, SHAPE_POINTER_DATA,   # v3: brief 117 fold
+        }),
+        size_min=0x4,        # v3: 4-byte pointer sub-pool fits (was 0x40)
         size_max=None,
     ),
     "E": ClusterFilter(
@@ -638,7 +784,12 @@ def rank_data_symbols(
                     (sym.module, sym.addr), sym.size,
                 )
             if modsecs_map is not None:
-                shape = classify_shape(sym, section, effective_size, modsecs)
+                # v3 (brief 123) — pass modsecs_map so the 4-byte
+                # pointer-code / pointer-data sub-shapes work.
+                shape = classify_shape(
+                    sym, section, effective_size, modsecs,
+                    modsecs_map=modsecs_map,
+                )
 
             # v2 filtering.
             if section_filter is not None and section not in section_filter:
