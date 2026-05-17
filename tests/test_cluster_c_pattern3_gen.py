@@ -26,7 +26,6 @@ sys.path.insert(0, str(_TOOLS))
 from analyze_symbols import ModuleData, Symbol  # noqa: E402
 from cluster_c_pattern3_gen import (  # noqa: E402
     GenContext,
-    GeneratedChunk,
     _deduce_sizes,
     _emit_directives_for_bytes,
     _escape_ascii_for_asm,
