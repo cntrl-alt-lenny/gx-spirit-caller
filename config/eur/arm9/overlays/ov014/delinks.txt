@@ -78,3 +78,7 @@ src/overlay014/ov014_stubs_b3c18.c:
 src/overlay014/ov014_stubs_b44e0.c:
     complete
     .text start:0x021b44e0 end:0x021b44e8
+
+src/overlay014/bss/data_ov014_bss.s:
+    complete
+    .bss start:0x021b5040 end:0x02235180
