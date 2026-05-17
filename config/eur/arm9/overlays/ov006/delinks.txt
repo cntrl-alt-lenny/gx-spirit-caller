@@ -1116,3 +1116,7 @@ src/overlay006/data_ov006_021cb310.c:
 src/overlay006/data_ov006_021cb32c.c:
     complete
     .rodata start:0x021cb32c end:0x021cb348
+
+src/overlay006/data_ov006_021cbbc8.c:
+    complete
+    .data start:0x021cbbc8 end:0x021cbbd8
