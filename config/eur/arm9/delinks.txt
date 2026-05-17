@@ -7663,6 +7663,18 @@ src/main/data_020b4748.c:
     complete
     .rodata start:0x020b4748 end:0x020b4768
 
+src/main/data_020b52d4.s:
+    complete
+    .rodata start:0x020b52d4 end:0x020b52d8
+
+src/main/data_02101f34.c:
+    complete
+    .data start:0x02101f34 end:0x02101f74
+
+src/main/data_0210210c.c:
+    complete
+    .data start:0x0210210c end:0x02102120
+
 src/main/bss/data_main_bss_pre.s:
     complete
     .bss start:0x02102c60 end:0x02102d44
