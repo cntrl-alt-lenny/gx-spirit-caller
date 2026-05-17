@@ -313,24 +313,44 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](docs/briefs/122-cluster-c-wave-1-pattern1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cluster C wave
-  1 — Pattern 1 application. Apply brief 119's
-  4-aligned individual symbols recipe to ~150-185
-  candidates. **First production use of W6 mitigation
-  at scale.** Wave 1 target: 20-30 symbols from
-  highest-cross-module-reader pool. Branch:
-  `decomper/cluster-c-wave-1-pattern1`.
+- [`docs/briefs/124-cluster-d-wave-1-d1.md`](docs/briefs/124-cluster-d-wave-1-d1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cluster D wave
+  1 — D-1 dispatch tables. ~71 candidates per brief
+  121 recipe (`.c extern + void*[]`, naturally
+  4-aligned). Brief 123 v3's pointer-code filter
+  surfaces clean candidates. Wave 1 target: 10-15
+  dispatch tables. Branch:
+  `decomper/cluster-d-wave-1-d1`.
 
-- [`docs/briefs/123-data-worklist-v3.md`](docs/briefs/123-data-worklist-v3.md)
-  — `cloud` (MEDIUM): data_worklist.py v3 byte-pattern
-  refinement. Distinguish 4-byte values into sub-
-  shapes (string-ascii4 / pointer-code / pointer-data
-  / scalar). Refines brief 117's 47% mis-classification
-  finding + brief 121's 32-pointer fold. Brief 124+
-  scale-out benefits. Branch: `cloud/data-worklist-v3`.
+- [`docs/briefs/125-cluster-c-pattern3-generator.md`](docs/briefs/125-cluster-c-pattern3-generator.md)
+  — `cloud` (MEDIUM): cluster C Pattern 3 generator
+  tool. Handles the ~50-90 cluster C residue after
+  Patterns 1 + 2 exhaust. Generator produces chunked
+  `.s` files + delinks.txt headers for non-aligned
+  symbol groups too large for Pattern 2's dsd
+  validation constraint. Branch:
+  `cloud/cluster-c-pattern3-generator`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](docs/briefs/122-cluster-c-wave-1-pattern1.md)
+  `decomper`, shipped in PR #530. **37 cluster C
+  Pattern 1 symbols / 4672 bytes / 185% of floor.**
+  First production W6 mitigation at scale across 9
+  modules (main + 8 overlays). Pattern 1 strict filter
+  (size % 4 == 0 AND addr % 4 == 0) held — no W6
+  cascade. Pool drain: 110-150 Pattern 1 candidates
+  remain.
+- [`docs/briefs/123-data-worklist-v3.md`](docs/briefs/123-data-worklist-v3.md)
+  `cloud`, shipped in PR #531. **data_worklist v3
+  ships with 3 new size-4 sub-shapes:** string-ascii4
+  (≥1 printable + nulls), pointer-code (LE u32 →
+  `.text`), pointer-data (LE u32 → `.data`/`.rodata`/
+  `.bss`). **Brief 117's manual sub-classification
+  reproduced at 94%.** Cluster pool sizes refined:
+  B → 81 true scalars (67% reduction); C jumps to
+  ~1755 effective (folds 115 ASCII4); D adds pointer
+  sub-shapes. 25 new tests; 1656/1656 total.
 
 - [`docs/briefs/120-cluster-a-wave-3-overlays.md`](docs/briefs/120-cluster-a-wave-3-overlays.md)
   `decomper`, shipped in PR #527. **175 cluster A

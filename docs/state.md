@@ -8,42 +8,37 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-17 (Mac brain — brief 120 + 121 merge).
-**Cluster A coverage at ~72%** (1145/1586 candidates drained across
-briefs 116 + 118 + 120). Brief 120 shipped 175 cluster A `.bss`
-symbols across 3 overlays (ov009 + ov021 + ov014). Brief 121 split
-cluster D into 3 sub-clusters (D-1 dispatch tables ~71 / D-2 scalar
-arrays ~30-40 / D-3 complex defer to typedef tool) + verified
-cluster C Pattern 2 with dsd validation constraint discovery (17
-dsd-compatible runs in main `.rodata`). 3-region 25/27 baseline
-preserved.
+**Last updated:** 2026-05-17 (Mac brain — brief 122 + 123 merge).
+**First cluster C wave shipped: 37 Pattern 1 symbols / 4672 bytes /
+no W6 cascade.** Brief 122 validated brief 119's W6 mitigation at
+scale across 9 modules. Brief 123 shipped data_worklist v3 — 3 new
+size-4 sub-shapes (string-ascii4 / pointer-code / pointer-data) +
+refined cluster filters. Brief 117's manual sub-classification
+reproduced at 94%; cluster pool sizes materially refined. 3-region
+25/27 baseline preserved.
 
 EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
 badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #527 — decomper / brief 120 (cluster A wave 3 — overlays).**
-  175 cluster A `.bss` symbols across ov009 (66) + ov021 (69) +
-  ov014 (40). Self-extended to 3 overlays per cap. Slightly below
-  200-sym floor (87%) — gap files smaller than ov004 was. All 3
-  overlays were OK at baseline; `.bss` claims preserved OK status.
-  **Cluster A coverage cumulative: 1145 / 1586 = ~72% drained**
-  across briefs 116 + 118 + 120.
-- **PR #528 — cloud / brief 121 (cluster D research + Pattern 2
-  verification).** Both parts shipped with byte-identical worked
-  examples. **Cluster D split into 3 sub-clusters:** D-1 dispatch
-  tables (~71 candidates, `.c` extern + `void*[]` recipe, naturally
-  4-aligned) / D-2 scalar struct/byte arrays (~30-40 candidates,
-  typed `.c` array no const) / D-3 complex nested (~20, defer to
-  typedef tool brief 124+). **Pattern 2 verified with dsd
-  validation constraint discovery:** dsd deduces embedded-symbol
-  size by next-addr distance and the LAST embedded must fit within
-  the chunk's range; brief 119's `NAN(\0`+`INFINITY\0` sketch fails
-  this check. **17 dsd-compatible Pattern 2 runs found in main**
-  `.rodata` (smaller than brief 119's ~185-230 estimate but still
-  ships value). 3 worked examples (`data_0210210c`, `data_02101f34`,
-  `data_020b52d4`).
+- **PR #530 — decomper / brief 122 (cluster C wave 1 Pattern 1).**
+  **37 cluster C symbols / 4672 bytes / 185% of floor.** First
+  production W6 mitigation at scale across 9 modules (main + 8
+  overlays). Pattern 1 strict filter held (`size % 4 == 0 AND addr
+  % 4 == 0`); no W6 cascade. 3-region 25/27 baseline preserved.
+  Pool drain trajectory: 110-150 Pattern 1 candidates remaining
+  after wave 1; 3-4 waves close the sub-pool.
+- **PR #531 — cloud / brief 123 (data_worklist v3).** 3 new
+  size-4 sub-shapes: **string-ascii4** (≥1 printable + nulls),
+  **pointer-code** (LE u32 resolves to `.text`), **pointer-data**
+  (LE u32 resolves to `.data`/`.rodata`/`.bss`). Section-aware
+  pointer classification via `_pointer_target_section()`. **Brief
+  117's manual sub-classification reproduced at 94%.** Cluster
+  pool sizes materially refined: B drops 67% (true scalars only,
+  ~81), C jumps 66% (folds 115 ASCII4 strings, ~1755 total bytes-
+  by-count effective pool), D adds pointer sub-shapes. 25 new
+  tests; 1656/1656 total.
 
 ## Cumulative pipeline state
 
@@ -56,7 +51,9 @@ badges directly; multi-module-OK is the visible milestone).
 | **Data-tier cluster A wave 3 (brief 120, EUR ov009+ov021+ov014)** | **175 .bss symbols claimed** | all 3 overlays preserved OK baseline |
 | **Cross-region DTCM parity (brief 116)** | 11 SDK names + libs/dtcm/ path move | **3 regions at 25/27** ✅ |
 | **Cluster A coverage (cumulative briefs 116 + 118 + 120)** | **1145 / 1586 = ~72%** | 1-2 more waves to drain |
+| **Cluster C wave 1 Pattern 1 (brief 122)** | **37 symbols / 4672 bytes** | 9 modules, no W6 cascade |
 | **Cluster D recipe (brief 121)** | D-1 dispatch tables ~71 / D-2 scalar arrays ~30-40 | D-3 ~20 deferred to typedef tool |
+| **data_worklist v3 (brief 123)** | 4-byte sub-shapes + refined cluster filters | brief 117 sub-class reproduced at 94% |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -82,66 +79,67 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 120 + 121
-close and brief 122 + 123 queue lands.
+**Open PRs: 0** once this brain-PR for brief 122 + 123
+close and brief 124 + 125 queue lands.
 
-**DATA-TIER SESSION ARC SCALING.** Cluster A at 72% via
-briefs 116 + 118 + 120. Cluster C Pattern 1 recipe
-ready (brief 119); Pattern 2 verified with 17-run
-dsd-compatible sub-pool (brief 121). Cluster D split
-into D-1/D-2 ready + D-3 deferred (brief 121).
+**DATA-TIER SESSION ARC SCALING + RECIPE LIBRARY MATURE.**
+Cluster A at 72%; cluster C Pattern 1 production-
+validated (37 syms); cluster D recipes ready (D-1 + D-2);
+data_worklist v3 surfaces clean classifications.
 
-**Decomper — brief 122 (HIGH, NEW):**
+**Decomper — brief 124 (HIGH, NEW):**
 
-- **Cluster C wave 1 — Pattern 1 application.** Brief
-  119 documented Pattern 1 (4-aligned individual
-  symbols, ~30-40% of 462-candidate pool ≈ 150-185
-  candidates). Apply `.c const T arr[N] = {...};`
-  recipe. New cluster, fresh recipe, validates W6
-  mitigation at scale. Wave 1 target: 20-30 symbols
-  from highest-cross-module-reader candidates per
-  `data_worklist.py --cluster C` output. Branch:
-  `decomper/cluster-c-wave-1-pattern1`.
+- **Cluster D wave 1 — D-1 dispatch tables.** Brief
+  121 shipped the D-1 recipe (`.c extern + void*[]`
+  array, naturally 4-aligned → no W6 risk). Brief
+  123 v3's pointer-code shape filter surfaces clean
+  D-1 candidates. Pool: ~71 candidates from native
+  D + brief 117's 32-pointer fold. Wave 1 target:
+  10-15 dispatch tables from highest-reader-density
+  pool. Branch: `decomper/cluster-d-wave-1-d1`.
 
-**Cloud — brief 123 (MEDIUM, NEW):**
+**Cloud — brief 125 (MEDIUM, NEW):**
 
-- **data_worklist.py v3 — byte-pattern refinement.**
-  Per brief 117's recommendation + brief 121's cluster
-  D fold. Refine v2's shape heuristic to distinguish
-  4-byte values into sub-shapes:
-  - `string-ascii4`: printable ASCII bytes, last byte
-    typically null
-  - `pointer-code`: byte pattern resolves to a `.text`
-    address in some module
-  - `pointer-data`: byte pattern resolves to a `.data`/
-    `.rodata`/`.bss` address
-  - `scalar`: anything else
-  Currently brief 114's v2 treats anything size ≤ 4
-  as `scalar`, leading to brief 117's 47% mis-
-  classification finding + brief 121's 32-pointer
-  fold into cluster D. v3 surfaces these distinctions
-  in the worklist output for cleaner brief 124+ wave
-  selection. Branch: `cloud/data-worklist-v3`.
+- **Cluster C Pattern 3 generator tool.** Brief 119
+  noted Pattern 3 (chunk-section approach, ~50-90
+  remaining cluster C candidates after Pattern 1 + 2
+  exhaust) is generator-tool territory. Brief 122 just
+  proved Pattern 1's W6 mitigation works; brief 121
+  verified Pattern 2 has only 17 dsd-compatible runs.
+  The residue (~50-90 candidates) needs Pattern 3 to
+  close cluster C. Build a generator tool:
+  - Input: per-module list of non-aligned cluster C
+    candidates
+  - Output: one `.s` per chunked region, with all
+    embedded symbols + proper alignment + dsd-
+    compatible delinks.txt header
+  - Test: end-to-end byte-identical on 1-2 chunks
+  Branch: `cloud/cluster-c-pattern3-generator`.
 
 **Data-tier backlog (post-122/123):**
 
-1. **Cluster D wave 1 — D-1 application** (decomper).
-   ~71 dispatch table candidates per brief 121 recipe.
-   `.c extern + void*[]` array, naturally 4-aligned.
-2. **Cluster C wave 2 — Pattern 2 application**
+1. **Cluster C wave 2 — Pattern 1 continuation**
+   (decomper). 110-150 remaining 4-aligned candidates;
+   3-4 waves close the sub-pool.
+2. **Cluster C wave 3+ — Pattern 2 application**
    (decomper). 17 dsd-compatible runs in main per
    brief 121's verification.
-3. **Cluster B wave 1 — true scalars** (decomper). 86
-   true-scalar sub-pool per brief 117's recipe.
-4. **Cluster A wave 4** — remaining small overlays +
-   ov007 cleanup. Closes cluster A to 85-90%.
-5. **Cluster D wave 1 — D-2 application** (decomper).
+3. **Cluster D wave 2 — D-2 application** (decomper).
    ~30-40 scalar array candidates per brief 121.
+4. **Cluster B wave 1 — true scalars** (decomper). 81
+   true-scalar sub-pool per brief 123 v3 refined count
+   (was 86 per brief 117's manual count, ~94% match).
+5. **Cluster A wave 4** — remaining small overlays +
+   ov007 cleanup. Closes cluster A to 85-90%.
 6. **Cross-region cluster A apply** — port the 1145
    EUR cluster A symbols to USA + JPN via the brief
    116 cross-region DTCM parity pattern.
 7. **Typedef-inference tool brief** — for cluster D-3
    (~20 complex nested structs).
+8. **ARM9 main checksum recovery scoping** — depends
+   on cross-module `.text`/`.data` relocations. Large
+   strategic lever; revisit when data-tier momentum
+   slows.
 
 **Function-tier backlog (de-prioritized during data-tier
 session arc — revisit if data-tier proves slow):**
@@ -241,34 +239,32 @@ waves.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 122 (cluster C wave
-   1 Pattern 1 application) PR** when it opens. EUR
-   `ninja rom` + `dsd check modules` 25/27 baseline
-   preserved. **Watch for W6 cascade** — if any non-
-   4-aligned candidates slip into the wave, the build
-   will fail catastrophically (32-byte shift). The
-   Pattern 1 filter (size % 4 == 0) is the gate.
-2. **Verify + merge cloud brief 123 (data_worklist v3
-   byte-pattern refinement) PR** when it opens. Tool
-   brief. Verify by spot-checking that the new shape
-   sub-classes (string-ascii4 / pointer-code /
-   pointer-data / scalar) produce stable outputs on
-   the 247 cluster B candidates (brief 117's pool).
-3. **Scope brief 124+ after 122 + 123 close.** Options:
-   - **Brief 124 — cluster D wave 1 (D-1 dispatch
-     tables)** (decomper, ~71 candidates per brief 121).
-   - **Brief 125 — cluster B wave 1** (decomper, 86
-     true scalars per brief 117).
-   - **Brief 126 — cluster A wave 4** (decomper,
+1. **Verify + merge decomper brief 124 (cluster D
+   wave 1 D-1 dispatch tables) PR** when it opens.
+   EUR `ninja rom` + `dsd check modules` 25/27 baseline
+   preserved. D-1 recipe is naturally 4-aligned (4 ×
+   N pointers) → no W6 risk by construction. Watch
+   for cross-overlay reloc issues if a D-1 candidate
+   references symbols across modules.
+2. **Verify + merge cloud brief 125 (cluster C
+   Pattern 3 generator tool) PR** when it opens. Tool
+   brief. Verify by end-to-end test on 1-2 chunks:
+   generator produces `.s` files + delinks.txt header
+   that pass `ninja rom` + `dsd check modules` 25/27.
+3. **Scope brief 126+ after 124 + 125 close.** Options:
+   - **Brief 126 — cluster D wave 2 (D-2 scalar
+     arrays)** (decomper, ~30-40 candidates).
+   - **Brief 127 — cluster C wave 2 (Pattern 1
+     continuation)** (decomper, 110-150 remaining).
+   - **Brief 128 — cluster C wave 3 (Pattern 3
+     application)** (decomper, after brief 125
+     generator lands).
+   - **Brief 129 — cluster B wave 1** (decomper, 81
+     true scalars per brief 123 v3).
+   - **Brief 130 — cluster A wave 4** (decomper,
      remaining small overlays).
-   - **Brief 127 — cross-region cluster A apply**
+   - **Brief 131 — cross-region cluster A apply**
      (decomper, port 1145 EUR symbols to USA + JPN).
-   - **Brief 128 — typedef-inference tool** (cloud,
-     for cluster D-3).
-   - **Brief 125 — cluster A wave 4+** (small overlays
-     not covered by brief 120).
-   - **Cross-region cluster A apply** — when EUR
-     cluster A is mostly done, port to USA + JPN.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
