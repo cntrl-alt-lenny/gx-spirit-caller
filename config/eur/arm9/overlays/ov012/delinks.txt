@@ -27,3 +27,7 @@ src/overlay012/data_ov012_021cc180.c:
 src/overlay012/data_ov012_021cc150.c:
     complete
     .rodata start:0x021cc150 end:0x021cc180
+
+src/overlay012/data_ov012_021cc080.c:
+    complete
+    .rodata start:0x021cc080 end:0x021cc0a4

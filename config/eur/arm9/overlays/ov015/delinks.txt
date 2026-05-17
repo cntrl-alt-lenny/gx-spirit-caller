@@ -266,3 +266,15 @@ src/overlay015/data_ov015_021b5a8c.c:
 src/overlay015/data_ov015_021b5ba0.c:
     complete
     .data start:0x021b5ba0 end:0x021b5bb0
+
+src/overlay015/data_ov015_021b5ac8.c:
+    complete
+    .rodata start:0x021b5ac8 end:0x021b5ae8
+
+src/overlay015/data_ov015_021b5ae8.c:
+    complete
+    .rodata start:0x021b5ae8 end:0x021b5b0c
+
+src/overlay015/data_ov015_021b5bb0.c:
+    complete
+    .data start:0x021b5bb0 end:0x021b5bc8

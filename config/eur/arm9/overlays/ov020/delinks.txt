@@ -19,3 +19,11 @@ src/overlay020/data_ov020_021adf68.c:
 src/overlay020/data_ov020_021addd0.c:
     complete
     .rodata start:0x021addd0 end:0x021addd8
+
+src/overlay020/data_ov020_021adfbc.c:
+    complete
+    .data start:0x021adfbc end:0x021adfdc
+
+src/overlay020/data_ov020_021adfa8.c:
+    complete
+    .data start:0x021adfa8 end:0x021adfbc

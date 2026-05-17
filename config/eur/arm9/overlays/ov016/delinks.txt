@@ -154,3 +154,11 @@ src/overlay016/func_ov016_021b22c8.c:
 src/overlay016/func_ov016_021b5a28.c:
     complete
     .text start:0x021b5a28 end:0x021b5a6c
+
+src/overlay016/data_ov016_021b8e5c.c:
+    complete
+    .rodata start:0x021b8e5c end:0x021b8e7c
+
+src/overlay016/data_ov016_021b8e34.c:
+    complete
+    .rodata start:0x021b8e34 end:0x021b8e5c

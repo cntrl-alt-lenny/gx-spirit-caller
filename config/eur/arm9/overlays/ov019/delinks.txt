@@ -82,3 +82,11 @@ src/overlay019/ov019_stubs_b52e8.c:
 src/overlay019/func_ov019_021b56f8.c:
     complete
     .text start:0x021b56f8 end:0x021b573c
+
+src/overlay019/data_ov019_021b5a68.c:
+    complete
+    .rodata start:0x021b5a68 end:0x021b5a88
+
+src/overlay019/data_ov019_021b5a28.c:
+    complete
+    .rodata start:0x021b5a28 end:0x021b5a50

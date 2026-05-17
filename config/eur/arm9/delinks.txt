@@ -7911,3 +7911,51 @@ src/main/data_020be754.c:
 src/main/data_020c3854.c:
     complete
     .rodata start:0x020c3854 end:0x020c387c
+
+src/main/data_02102360.c:
+    complete
+    .data start:0x02102360 end:0x02102380
+
+src/main/data_02102380.c:
+    complete
+    .data start:0x02102380 end:0x021023a0
+
+src/main/data_021023a0.c:
+    complete
+    .data start:0x021023a0 end:0x021023c0
+
+src/main/data_020b4a0c.c:
+    complete
+    .rodata start:0x020b4a0c end:0x020b4a2c
+
+src/main/data_020bec1c.c:
+    complete
+    .rodata start:0x020bec1c end:0x020bec3c
+
+src/main/data_020bef3c.c:
+    complete
+    .rodata start:0x020bef3c end:0x020bef5c
+
+src/main/data_02102958.c:
+    complete
+    .data start:0x02102958 end:0x02102964
+
+src/main/data_020c6894.c:
+    complete
+    .data start:0x020c6894 end:0x020c689c
+
+src/main/data_020c3e6c.c:
+    complete
+    .data start:0x020c3e6c end:0x020c3e84
+
+src/main/data_02101f00.c:
+    complete
+    .data start:0x02101f00 end:0x02101f18
+
+src/main/data_020c3ce0.c:
+    complete
+    .data start:0x020c3ce0 end:0x020c3cf4
+
+src/main/data_021021d0.c:
+    complete
+    .data start:0x021021d0 end:0x021021e0

@@ -1907,3 +1907,31 @@ src/overlay002/data_ov002_022ca790.c:
 src/overlay002/data_ov002_022be184.c:
     complete
     .rodata start:0x022be184 end:0x022be1ac
+
+src/overlay002/data_ov002_022be1ac.c:
+    complete
+    .rodata start:0x022be1ac end:0x022bf3c4
+
+src/overlay002/data_ov002_022c8ff0.c:
+    complete
+    .rodata start:0x022c8ff0 end:0x022c9010
+
+src/overlay002/data_ov002_022c836c.c:
+    complete
+    .rodata start:0x022c836c end:0x022c8390
+
+src/overlay002/data_ov002_022c9010.c:
+    complete
+    .rodata start:0x022c9010 end:0x022c9038
+
+src/overlay002/data_ov002_022cbab4.c:
+    complete
+    .data start:0x022cbab4 end:0x022cbacc
+
+src/overlay002/data_ov002_022cbe10.c:
+    complete
+    .data start:0x022cbe10 end:0x022cbe28
+
+src/overlay002/data_ov002_022cbe28.c:
+    complete
+    .data start:0x022cbe28 end:0x022cbe40
