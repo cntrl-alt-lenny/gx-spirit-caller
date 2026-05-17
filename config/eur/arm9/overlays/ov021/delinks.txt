@@ -77,3 +77,7 @@ src/overlay021/ov021_021aaad4.c:
 src/overlay021/ov021_021ab148.c:
     complete
     .text start:0x021ab148 end:0x021ab150
+
+src/overlay021/bss/data_ov021_bss.s:
+    complete
+    .bss start:0x021ace80 end:0x0222d0e0
