@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**59 tools** across 8 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**60 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,6 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (15)
+- [Uncategorised](#uncategorised) (1)
 
 ## Analysis / worklist
 
@@ -395,4 +396,14 @@ mwasmarm-emitted ELF .o.
 **Compute the decomp progress percentage for each region and update**
 
 README.md's per-region shields.io badges to match.
+
+## Uncategorised
+
+_Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/cluster_c_pattern3_gen.py`
+
+**generator for brief 119 cluster C Pattern 3.**
+
+Brief 119 identified 3 patterns for cluster C `.rodata` symbol carving:
 
