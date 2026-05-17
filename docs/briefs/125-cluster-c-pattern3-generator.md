@@ -45,6 +45,7 @@ but for `.rodata` chunks with byte content.
      - Use `.byte 0x..., 0x..., ...` for arbitrary
        byte sequences.
    - Per-symbol header:
+
      ```
              .global data_<addr>
      data_<addr>:
