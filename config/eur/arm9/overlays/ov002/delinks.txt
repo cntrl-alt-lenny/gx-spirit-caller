@@ -1835,3 +1835,23 @@ libs/nitro/func_ov002_022bdb14.legacy.c:
     complete
     .text start:0x022bdb14 end:0x022bdb18
 
+
+src/overlay002/data_ov002_022ca390.c:
+    complete
+    .rodata start:0x022ca390 end:0x022ca398
+
+src/overlay002/data_ov002_022c819c.c:
+    complete
+    .rodata start:0x022c819c end:0x022c834c
+
+src/overlay002/data_ov002_022ca370.c:
+    complete
+    .rodata start:0x022ca370 end:0x022ca390
+
+src/overlay002/data_ov002_022ca528.c:
+    complete
+    .rodata start:0x022ca528 end:0x022ca544
+
+src/overlay002/data_ov002_022ca510.c:
+    complete
+    .rodata start:0x022ca510 end:0x022ca528

@@ -350,3 +350,11 @@ libs/nitro/func_ov010_021b2860.legacy.c:
 libs/nitro/func_ov010_021b3660.legacy.c:
     complete
     .text start:0x021b3660 end:0x021b3664
+
+src/overlay010/data_ov010_021b8870.c:
+    complete
+    .rodata start:0x021b8870 end:0x021b889c
+
+src/overlay010/data_ov010_021b8908.c:
+    complete
+    .rodata start:0x021b8908 end:0x021b8928

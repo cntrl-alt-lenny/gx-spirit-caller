@@ -1084,3 +1084,35 @@ src/overlay006/func_ov006_021b9dec.c:
 src/overlay006/bss/data_ov006_bss.s:
     complete
     .bss start:0x021cf140 end:0x0225e1a0
+
+src/overlay006/data_ov006_021cb518.c:
+    complete
+    .rodata start:0x021cb518 end:0x021cb5f4
+
+src/overlay006/data_ov006_021cb370.c:
+    complete
+    .rodata start:0x021cb370 end:0x021cb3d4
+
+src/overlay006/data_ov006_021cb348.c:
+    complete
+    .rodata start:0x021cb348 end:0x021cb370
+
+src/overlay006/data_ov006_021cb798.c:
+    complete
+    .rodata start:0x021cb798 end:0x021cb7b8
+
+src/overlay006/data_ov006_021cb2d8.c:
+    complete
+    .rodata start:0x021cb2d8 end:0x021cb2f4
+
+src/overlay006/data_ov006_021cb2f4.c:
+    complete
+    .rodata start:0x021cb2f4 end:0x021cb310
+
+src/overlay006/data_ov006_021cb310.c:
+    complete
+    .rodata start:0x021cb310 end:0x021cb32c
+
+src/overlay006/data_ov006_021cb32c.c:
+    complete
+    .rodata start:0x021cb32c end:0x021cb348

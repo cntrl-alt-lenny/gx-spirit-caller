@@ -561,3 +561,15 @@ libs/nitro/func_ov011_021d12bc.legacy.c:
 libs/nitro/func_ov011_021d18b0.legacy.c:
     complete
     .text start:0x021d18b0 end:0x021d18b4
+
+src/overlay011/data_ov011_021d35ac.c:
+    complete
+    .rodata start:0x021d35ac end:0x021d35c8
+
+src/overlay011/data_ov011_021d3394.c:
+    complete
+    .rodata start:0x021d3394 end:0x021d33bc
+
+src/overlay011/data_ov011_021d3594.c:
+    complete
+    .rodata start:0x021d3594 end:0x021d35ac

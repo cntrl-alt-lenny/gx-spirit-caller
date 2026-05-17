@@ -7,3 +7,7 @@
 src/overlay012/ov012_021ca340.c:
     complete
     .text start:0x021ca340 end:0x021ca36c
+
+src/overlay012/data_ov012_021cc120.c:
+    complete
+    .rodata start:0x021cc120 end:0x021cc138
