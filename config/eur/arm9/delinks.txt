@@ -7675,6 +7675,14 @@ src/main/data_0210210c.c:
     complete
     .data start:0x0210210c end:0x02102120
 
+src/main/data/data_020b4320.s:
+    complete
+    .rodata start:0x020b4320 end:0x020b4350
+
+src/main/data/data_020c387c.s:
+    complete
+    .rodata start:0x020c387c end:0x020c398c
+
 src/main/bss/data_main_bss_pre.s:
     complete
     .bss start:0x02102c60 end:0x02102d44

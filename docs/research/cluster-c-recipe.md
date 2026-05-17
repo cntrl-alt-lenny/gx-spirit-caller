@@ -243,20 +243,46 @@ hint to symbols.txt for the embedded symbol** — dsd doesn't
 support this currently. Alternative is Pattern 3 (chunk the whole
 section) which sidesteps the per-symbol deduction.
 
-### Pattern 3 — chunk the entire `.rodata` (most aggressive)
+### Pattern 3 — chunk a `.rodata` region via the generator tool
 
-Like brief 116's cluster A approach (one big `.s` file claiming
-all of main `.bss` minus the existing pilot), a future cluster C
-wave could claim the entire `.rodata` section in one `.s` file
-with all symbols at their right offsets. This eliminates the
-gap-fragmentation problem entirely and aligns naturally with the
-section's exact byte count.
+**Status:** generator shipped by **brief 125** at
+[`tools/cluster_c_pattern3_gen.py`](../../tools/cluster_c_pattern3_gen.py).
 
-Brief 121+ scale-out should evaluate per-module: if main has
-347 native + ~115 ex-cluster-B = 462 candidates spread across
-0xf89c bytes of `.rodata`, a single chunk file would be ~63 KB
-(roughly the size of brief 116's `src/main/bss/data_main_bss.s`
-at 1888 lines).
+The generator takes a 4-aligned `.rodata` chunk range and produces:
+- A `.s` file at `src/<module>/data/data_<addr>.s` with per-symbol
+  `.global` + `.ascii` / `.word` / `.byte` directives.
+- A `delinks.txt` TU entry to append.
+
+Byte-pattern selection (priority order):
+1. Printable-ASCII + null-term → `.ascii "..."` + `.byte 0x00`.
+2. 4-byte aligned word whose value resolves to a known symbol →
+   `.word <symbol_name>` (cross-module pointer resolution).
+3. Otherwise → `.byte 0x.., 0x.., ...` (wraps at 8 bytes/line).
+
+Usage:
+
+```bash
+python tools/cluster_c_pattern3_gen.py --version eur --module main \
+    --start 0x020c387c --end 0x020c398c
+```
+
+**Worked example (brief 125)**:
+`src/main/data/data_020c387c.s` — 272-byte chunk covering
+`data_020c387c` ("NAN(\0") + `data_020c3881` (`"INFINITY\0"` + 263
+bytes of trailing data). Byte-identical end-to-end; 25/27 baseline
+preserved.
+
+**Second worked example (brief 125)**:
+`src/main/data/data_020b4320.s` — 48-byte chunk covering 6 ×
+8-byte struct entries. Demonstrates the generator handles
+non-string non-pointer raw byte content.
+
+Brief 116's cluster A approach (one big `.s` per `.bss` section)
+scales naturally to a per-chunk approach for `.rodata`. The
+generator's per-chunk output keeps the changes reviewable; brief
+116's per-section approach (~1888-line `.s`) is fine for `.bss`
+because it has only zero-fill bytes, but `.rodata` byte content
+benefits from chunk-sized files.
 
 ## What this means for brief 113's plan
 
