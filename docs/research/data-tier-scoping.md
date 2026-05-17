@@ -248,24 +248,39 @@ sub-pools sequence into later waves.
 
 ### Cluster C — `.rodata` strings + const arrays (medium)
 
-**Recipe**: declare `const` strings or const arrays with exact
-initializer values.
+**Status:** recipe established by **brief 119**, see
+[`docs/research/cluster-c-recipe.md`](cluster-c-recipe.md) for full
+write-up + new wall W6.
 
-```c
-const char data_020b4720[] = "DebugString\0";
-const unsigned short data_020b4760[8] = { 0x0001, 0x0002, ... };
-```
+**Recipe summary**: claim symbols (or symbol groups) whose total
+size is a multiple of 4 bytes. mwldarm rounds `.rodata` section
+size to 4-byte alignment; non-aligned claims cascade through the
+`.ctor` ALIGN(32) directive to shift `.data` + `.bss` + overlays
+by 32 bytes — ALL modules fail. New **W6 wall** documented.
 
-**Pool size**: 326 KB of `.rodata` — likely 200-500 distinct
-const tables.
+Safe patterns:
+- **Pattern 1**: claim symbols whose individual size is 4-aligned
+  (e.g. 32-byte `const u16[16]`).
+- **Pattern 2**: claim contiguous groups whose summed size is
+  4-aligned (e.g. 5-byte string + 9-byte string + 2-byte pad =
+  16 bytes).
+- **Pattern 3**: chunk the entire `.rodata` section in one `.s`
+  file (brief 116's cluster A approach scaled to .rodata).
 
-**Difficulty**: MEDIUM. Strings are easy; complex tables (palette,
-animation frame data, sprite metadata) need careful sizing +
-alignment. Some `.rodata` entries are NULL-terminated strings;
-others are length-prefixed; others are fixed-size arrays — the
-shape must be inferred from readers.
+**Pool size (refined per brief 119 + 117 sub-classification)**:
+- 347 native cluster C candidates + 115 mis-classified cluster B
+  4-byte strings = **~462 effective candidates**.
+- Brief 113's original estimate of 200-500 was accurate.
 
-**Estimated wave throughput**: 10-20 symbols per wave.
+**Estimated wave throughput**: 20-30 syms/wave for 4-aligned
+candidates (Pattern 1, easy slice). Larger waves possible with
+Pattern 3 (chunk-the-section) but require generator tooling or
+manual transcription of ~60 KB of bytes.
+
+**Worked example (brief 119)**: `src/main/data_020b4748.c` —
+16-element `const unsigned short` array (32 bytes, naturally
+4-aligned). Byte-identical at default mwcc 2.0/sp1p5; 25/27
+baseline preserved.
 
 ### Cluster D — `.data` struct arrays + dispatch tables (medium-high)
 
@@ -374,6 +389,39 @@ DTCM symbols need `#pragma section "DTCM"` (or equivalent) for mwldarm
 to place them in the DTCM segment rather than main `.data` / `.bss`.
 The exact pragma syntax for this project's mwldarm is **TBD** — needs
 research during cluster E's first wave.
+
+**RESOLVED** by brief 115: no pragma needed — mwasmarm `.s` with
+`.section .data` + dsd LCF auto-routing handles DTCM placement. See
+[`docs/research/dtcm-section-attribute.md`](dtcm-section-attribute.md).
+
+### W6 — mwldarm `.rodata` 4-byte size rounding + `.ctor` cascade (brief 119)
+
+mwldarm rounds `.rodata` section size to 4-byte alignment when
+assembling the linked output. A claim whose total size is NOT a
+multiple of 4 bytes causes mwldarm to add 1-3 bytes of padding,
+which shifts following `.rodata` bytes, cascades through the
+`.ctor` section's `ALIGN(32)` directive, and shifts the entire
+`.data` + `.bss` + overlay layout by **32 bytes** — failing every
+module's checksum (25 OK → 1 OK).
+
+**Mitigation** (brief 119, see
+[`docs/research/cluster-c-recipe.md`](cluster-c-recipe.md)):
+- Claim `.rodata` symbols whose individual size is 4-aligned
+  (Pattern 1).
+- Group contiguous non-aligned symbols into one TU whose summed
+  size is 4-aligned (Pattern 2).
+- Chunk the entire `.rodata` section in one `.s` file
+  (Pattern 3, scales like brief 116's cluster A).
+
+**Why not W4 / W5 forms?**
+- `.bss` (cluster A): zero-fill at runtime → no padding bytes in
+  file. Brief 116 saw no alignment cascade.
+- `.data` (cluster B): section alignment 32 (per delinks.txt
+  header). mwldarm pads each `.data` section internally; dsd's
+  gap regen accounts for it. No cascading shift.
+- `.rodata` (cluster C): section alignment 4 (per delinks.txt
+  header). The 4-byte rounding interacts uniquely with the
+  `.ctor` ALIGN(32) directive emitted by dsd's LCF gen.
 
 ## Cross-project leverage
 
