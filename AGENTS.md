@@ -313,24 +313,43 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](docs/briefs/128-main-cat1-cluster-c-wave-3.md)
+- [`docs/briefs/130-cluster-c-wave-4-d1-wave-2.md`](docs/briefs/130-cluster-c-wave-4-d1-wave-2.md)
   — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
-  ARM9 main Category 1 fix per brief 127's plan (3
-  wrong-target source TUs, 5 bytes, ~30 min). (2)
-  Cluster C Pattern 1 wave 3 continuation (25-35
-  candidates from the 80-120 4-aligned residue).
-  Branch: `decomper/main-cat1-cluster-c-wave-3`.
+  Cluster C Pattern 1 wave 4 continuation (25-35
+  normal candidates + try one of the 3 deferred
+  mega-arrays). (2) Cluster D-1 wave 2 (12-18 of
+  ~50 remaining dispatch tables). Branch:
+  `decomper/cluster-c-wave-4-d1-wave-2`.
 
-- [`docs/briefs/129-ov004-checksum-scoping.md`](docs/briefs/129-ov004-checksum-scoping.md)
-  — `cloud` (MEDIUM): OV004 checksum recovery
-  scoping — same methodology as brief 127 applied to
-  overlay 4. **76% of main's gap cascades from OV004
-  per brief 127** — when OV004 flips OK, main auto-
-  flips too → 26/27 baseline. Output: brief 132+
-  application plan. Branch:
-  `cloud/ov004-checksum-scoping`.
+- [`docs/briefs/131-ov004-thunk-section-fix.md`](docs/briefs/131-ov004-thunk-section-fix.md)
+  — `cloud` (HIGH): **🔑 26/27 baseline unlock.**
+  Per brief 129's recommended Option 3: build a
+  custom LCF `.thunk` section to absorb mwldarm's
+  spurious thumb→arm veneers without displacing
+  `.data`. Fallback to Options 2/1/4 if needed.
+  Document W7 workflow wall (mwldarm overlay-swap
+  blindness). Branch: `cloud/ov004-thunk-section-fix`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](docs/briefs/128-main-cat1-cluster-c-wave-3.md)
+  `decomper`, shipped in PR #539. **42 candidates
+  byte-identical** (3 Cat 1 main fixes + 39 cluster C
+  Pattern 1 wave 3). Cat 1 = 3 one-line edits per
+  brief 127's plan; main 21→16 bytes (still FAILED,
+  pending OV004 cascade). 3 mega-arrays deferred
+  (30 KB / 5 KB / 4.6 KB).
+- [`docs/briefs/129-ov004-checksum-scoping.md`](docs/briefs/129-ov004-checksum-scoping.md)
+  `cloud`, shipped in PR #540. **🔑 ROOT CAUSE: 86
+  spurious mwldarm thumb→arm veneers in `.rodata`.**
+  Brief 113's Cat 4 hypothesis confirmed empirically.
+  All targets resolve to ov002 (mutually-exclusive
+  overlay; mwldarm doesn't model overlay swapping).
+  1,024-byte veneer pool cascades everything → ~165K
+  bytes total diff (~99% cascade, 0 genuine errors).
+  **Cat 4 fix needs NEW TOOLING.** 4 options scoped;
+  Option 3 (LCF `.thunk` section) recommended. W7
+  candidate workflow wall.
 
 - [`docs/briefs/126-cluster-cd-wave-2.md`](docs/briefs/126-cluster-cd-wave-2.md)
   `decomper`, shipped in PR #537. **36 symbols / 41
