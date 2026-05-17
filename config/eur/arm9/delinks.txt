@@ -7959,3 +7959,27 @@ src/main/data_020c3ce0.c:
 src/main/data_021021d0.c:
     complete
     .data start:0x021021d0 end:0x021021e0
+
+src/main/data_021021b8.c:
+    complete
+    .data start:0x021021b8 end:0x021021c4
+
+src/main/data_021021c4.c:
+    complete
+    .data start:0x021021c4 end:0x021021d0
+
+src/main/data_020c3cc8.c:
+    complete
+    .data start:0x020c3cc8 end:0x020c3cd0
+
+src/main/data_020c3cd0.c:
+    complete
+    .data start:0x020c3cd0 end:0x020c3cd8
+
+src/main/data_020c3cd8.c:
+    complete
+    .data start:0x020c3cd8 end:0x020c3ce0
+
+src/main/data_02102104.c:
+    complete
+    .data start:0x02102104 end:0x0210210c

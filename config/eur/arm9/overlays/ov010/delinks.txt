@@ -378,3 +378,7 @@ src/overlay010/data_ov010_021b889c.c:
 src/overlay010/data_ov010_021b8a70.c:
     complete
     .data start:0x021b8a70 end:0x021b8a88
+
+src/overlay010/data_ov010_021b8bb4.c:
+    complete
+    .data start:0x021b8bb4 end:0x021b8bc0

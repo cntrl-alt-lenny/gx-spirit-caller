@@ -278,3 +278,7 @@ src/overlay015/data_ov015_021b5ae8.c:
 src/overlay015/data_ov015_021b5bb0.c:
     complete
     .data start:0x021b5bb0 end:0x021b5bc8
+
+src/overlay015/data_ov015_021b5cbc.c:
+    complete
+    .data start:0x021b5cbc end:0x021b5cc8
