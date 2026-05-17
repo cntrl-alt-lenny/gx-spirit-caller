@@ -313,27 +313,43 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/118-cluster-a-wave-2-overlay.md`](docs/briefs/118-cluster-a-wave-2-overlay.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cluster A wave 2
-  — overlay coverage. Pick one large-pool overlay (ov004
-  or ov006, ~525 KB each per brief 113). Apply brief
-  115/116 mwasmarm `.s` + LCF auto-routing `.bss`
-  recipe at scale. Same wave size as brief 116's 647-
-  sym main wave (per-overlay gap-list size). Goal:
-  flip overlay's checksum to OK if .bss coverage is
-  the sole gap. Branch:
-  `decomper/cluster-a-wave-2-overlay`.
+- [`docs/briefs/120-cluster-a-wave-3-overlays.md`](docs/briefs/120-cluster-a-wave-3-overlays.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cluster A wave 3
+  — remaining overlays. ~632 candidates across ov007/
+  9/14/21 + smaller. Apply brief 116/118's `.s` + LCF
+  recipe. Same per-wave pattern as brief 118 (2
+  overlays). Branch:
+  `decomper/cluster-a-wave-3-overlays`.
 
-- [`docs/briefs/119-cluster-c-strings-research.md`](docs/briefs/119-cluster-c-strings-research.md)
-  — `cloud` (MEDIUM): cluster C strings + const arrays
-  recipe research. **Effective pool ~462 candidates**
-  (347 native + 115 from brief 117 cluster B mis-
-  classification). Investigation: `const char[]`
-  `.rodata` placement, mwasmarm `.ascii` patterns,
-  edge cases (const pointers, wide strings, large
-  const arrays). Branch: `cloud/cluster-c-strings-research`.
+- [`docs/briefs/121-cluster-d-pattern2-research.md`](docs/briefs/121-cluster-d-pattern2-research.md)
+  — `cloud` (MEDIUM): two-part. (1) Cluster D struct
+  arrays + dispatch tables research (98 candidates per
+  brief 113). (2) Brief 119 Pattern 2 verification
+  (group adjacent non-aligned cluster C symbols to
+  4-aligned total). Branch:
+  `cloud/cluster-d-pattern2-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/118-cluster-a-wave-2-overlay.md`](docs/briefs/118-cluster-a-wave-2-overlay.md)
+  `decomper`, shipped in PR #524. **307 cluster A
+  `.bss` symbols across ov004 (231) + ov006 (76).**
+  Recipe scales cleanly from main to overlays. ov006
+  preserved OK; ov004 stays FAILED due to `.text`/
+  `.data` residue (predicted — same shape as ARM9
+  main). Cluster A coverage cumulative: **970 / 1586
+  = ~61% drained.**
+- [`docs/briefs/119-cluster-c-strings-research.md`](docs/briefs/119-cluster-c-strings-research.md)
+  `cloud`, shipped in PR #525. **NEW WALL W6
+  DISCOVERED:** mwldarm rounds `.rodata` section size
+  to 4-byte alignment + dsd LCF `.ctor` `ALIGN(32)`
+  cascade → 5-byte symbol shifts everything by 32
+  bytes → all modules fail. **3 safe recipe patterns
+  documented:** Pattern 1 (4-aligned individual
+  symbols, ~30-40% of 462-pool) = brief 122 wave 1
+  target. Pattern 2 (group, ~40-50%) needs follow-up
+  verification (brief 121 part 2). Pattern 3 (chunk-
+  section, ~10-20%) is generator-tool candidate.
 
 - [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
   `decomper`, shipped in PR #522. **🎉 ALL 3 REGIONS
