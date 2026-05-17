@@ -1080,3 +1080,7 @@ src/overlay006/func_ov006_021c155c.c:
 src/overlay006/func_ov006_021b9dec.c:
     complete
     .text start:0x021b9dec end:0x021b9e08
+
+src/overlay006/bss/data_ov006_bss.s:
+    complete
+    .bss start:0x021cf140 end:0x0225e1a0
