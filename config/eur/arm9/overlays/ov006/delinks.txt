@@ -1152,3 +1152,43 @@ src/overlay006/data_ov006_021cb7b8.c:
 src/overlay006/data_ov006_021cb820.c:
     complete
     .rodata start:0x021cb820 end:0x021cb848
+
+src/overlay006/data_ov006_021cb4f8.c:
+    complete
+    .rodata start:0x021cb4f8 end:0x021cb518
+
+src/overlay006/data_ov006_021cb6d8.c:
+    complete
+    .rodata start:0x021cb6d8 end:0x021cb6f8
+
+src/overlay006/data_ov006_021cb718.c:
+    complete
+    .rodata start:0x021cb718 end:0x021cb738
+
+src/overlay006/data_ov006_021cb738.c:
+    complete
+    .rodata start:0x021cb738 end:0x021cb758
+
+src/overlay006/data_ov006_021cb758.c:
+    complete
+    .rodata start:0x021cb758 end:0x021cb778
+
+src/overlay006/data_ov006_021cb778.c:
+    complete
+    .rodata start:0x021cb778 end:0x021cb798
+
+src/overlay006/data_ov006_021cb7e0.c:
+    complete
+    .rodata start:0x021cb7e0 end:0x021cb800
+
+src/overlay006/data_ov006_021cb800.c:
+    complete
+    .rodata start:0x021cb800 end:0x021cb820
+
+src/overlay006/data_ov006_021cb65c.c:
+    complete
+    .rodata start:0x021cb65c end:0x021cb680
+
+src/overlay006/data_ov006_021cf0c4.c:
+    complete
+    .data start:0x021cf0c4 end:0x021cf0d8

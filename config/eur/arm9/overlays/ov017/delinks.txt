@@ -122,3 +122,11 @@ src/overlay017/data_ov017_021b7e8c.c:
 src/overlay017/data_ov017_021b7ef8.c:
     complete
     .rodata start:0x021b7ef8 end:0x021b7f3c
+
+src/overlay017/data_ov017_021b7f3c.c:
+    complete
+    .rodata start:0x021b7f3c end:0x021b7f5c
+
+src/overlay017/data_ov017_021b7ed0.c:
+    complete
+    .rodata start:0x021b7ed0 end:0x021b7ef8
