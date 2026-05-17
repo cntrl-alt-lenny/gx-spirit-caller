@@ -313,3 +313,7 @@ src/overlay005/func_ov005_021aaf08.c:
 src/overlay005/func_ov005_021abbfc.c:
     complete
     .text start:0x021abbfc end:0x021abc68
+
+src/overlay005/data_ov005_021b1568.c:
+    complete
+    .rodata start:0x021b1568 end:0x021b157c
