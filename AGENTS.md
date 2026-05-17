@@ -313,24 +313,47 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/126-cluster-cd-wave-2.md`](docs/briefs/126-cluster-cd-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): two-part
-  parallel-track wave. (1) Cluster C Pattern 1
-  continuation (25-35 of 110-150 remaining 4-aligned
-  candidates). (2) Cluster D wave 2 — D-1 cleanup
-  (10-15 of ~51 remaining) + start D-2 (5-10 of ~30-
-  40 scalar arrays per brief 121's recipe). Branch:
-  `decomper/cluster-cd-wave-2`.
+- [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](docs/briefs/128-main-cat1-cluster-c-wave-3.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part. (1)
+  ARM9 main Category 1 fix per brief 127's plan (3
+  wrong-target source TUs, 5 bytes, ~30 min). (2)
+  Cluster C Pattern 1 wave 3 continuation (25-35
+  candidates from the 80-120 4-aligned residue).
+  Branch: `decomper/main-cat1-cluster-c-wave-3`.
 
-- [`docs/briefs/127-arm9-main-checksum-scoping.md`](docs/briefs/127-arm9-main-checksum-scoping.md)
-  — `cloud` (MEDIUM): scoping brief for ARM9 main
-  checksum recovery — biggest remaining strategic
-  lever. Inventory `.text`/`.data` residue, identify
-  category, output brief 130+ application plan. May
-  surface new workflow walls. Branch:
-  `cloud/arm9-main-checksum-scoping`.
+- [`docs/briefs/129-ov004-checksum-scoping.md`](docs/briefs/129-ov004-checksum-scoping.md)
+  — `cloud` (MEDIUM): OV004 checksum recovery
+  scoping — same methodology as brief 127 applied to
+  overlay 4. **76% of main's gap cascades from OV004
+  per brief 127** — when OV004 flips OK, main auto-
+  flips too → 26/27 baseline. Output: brief 132+
+  application plan. Branch:
+  `cloud/ov004-checksum-scoping`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/126-cluster-cd-wave-2.md`](docs/briefs/126-cluster-cd-wave-2.md)
+  `decomper`, shipped in PR #537. **36 symbols / 41
+  KB** (29 cluster C Pattern 1 + 7 D-2 scalar arrays).
+  **W6 cascade detected + bisected → recipe
+  refinement: brief 119 Pattern 1 strict-alignment
+  applies to D-2 cluster too** (not just C). Dropped
+  4 ov006 unaligned + 3 ov004 baseline-cascade
+  candidates. Largest cluster C symbol shipped:
+  `data_ov002_022c357c` 19,488 bytes. Cumulative
+  cluster C/D arc: 95 symbols / 47K bytes.
+- [`docs/briefs/127-arm9-main-checksum-scoping.md`](docs/briefs/127-arm9-main-checksum-scoping.md)
+  `cloud`, shipped in PR #536. **🔑 ARM9 main gap is
+  only 21 bytes / 6 symbols** (brief 113 hypothesis
+  falsified). 3 categories: Cat 1 = 5 bytes / 3
+  wrong-target TUs (`func_02048f98`, `func_02052bc4`,
+  `func_0206255c`); Cat 2 = 4 bytes / 2 `.rodata`
+  pointers into OV004; Cat 3 = 12 bytes / 1 `.data`
+  struct array into OV004. **76% of gap cascades
+  from OV004 failure** — confirms brief 118 coupled-
+  module prediction. Path to 26/27: Cat 1 fix + OV004
+  recovery → main auto-flips. **No new toolchain
+  investment needed.**
 
 - [`docs/briefs/124-cluster-d-wave-1-d1.md`](docs/briefs/124-cluster-d-wave-1-d1.md)
   `decomper`, shipped in PR #533. **20 dispatch
