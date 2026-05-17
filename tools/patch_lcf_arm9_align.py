@@ -2,7 +2,7 @@
 
 """
 patch_lcf_arm9_align.py — rewrite `ALIGNALL(4)` to `ALIGNALL(2)` in the
-`.arm9` segment of a dsd-generated arm9.lcf.
+`.arm9` segment (and per-segment list) of a dsd-generated arm9.lcf.
 
 Context: dsd's LCF template hardcodes `ALIGNALL(4)` per segment. For
 the `.arm9` main code segment specifically, we need `ALIGNALL(2)` so
@@ -12,9 +12,11 @@ Without this post-process, mwldarm honors `ALIGNALL(4)` and re-raises
 every section back to 4-alignment at link time, defeating the .o-level
 fix and breaking `dsd check modules` for every module.
 
-Scope: ONLY touches `.arm9`. Overlays, ITCM, and DTCM keep their
-`ALIGNALL(4)` since those segments don't have 2-aligned Thumb content
-(per decomper's bisect in PR #115).
+Scope: by default ONLY touches `.arm9`. Brief 131 added the ability to
+target additional overlay segments (e.g. `.ov004`) via the
+`--also-segments` flag — used by `configure.py` to fix the ov004
+cascade where dsd-carved gap objects expose 2-aligned Thumb function
+boundaries.
 
 Invocation is appended to the `dsd lcf` ninja rule so the LCF is
 always patched before mwldarm reads it. Idempotent — running on an
@@ -23,10 +25,14 @@ already-patched LCF is a no-op.
 See also:
   - docs/research/thumb-align-wall.md — the root cause writeup
   - tools/patch_section_align.py — the companion .o-level patcher
+  - docs/research/ov004-thunk-section-fix.md — brief 131 ov004 fix
+    (`--also-segments` use case)
 
 Usage:
 
     python tools/patch_lcf_arm9_align.py build/eur/arm9.lcf
+    python tools/patch_lcf_arm9_align.py build/eur/arm9.lcf \\
+        --also-segments .ov004
 """
 
 from __future__ import annotations
@@ -71,63 +77,93 @@ _ARM9_BLOCK_START_RE = re.compile(
 _ALIGNALL_RE = re.compile(r"\bALIGNALL\s*\(\s*\d+\s*\)\s*;")
 
 
+def _block_start_re_for(segment: str) -> re.Pattern[str]:
+    """Build the same `<segment> {` / `<segment> : {` block-start
+    regex used for `.arm9`, but parameterised on the segment name.
+    Caller passes the raw LCF identifier including its leading dot
+    (e.g. ``.ov004``, ``.arm9``)."""
+    # Escape any regex meta in the segment name (only `.` matters
+    # for LCF identifiers in practice).
+    pattern = (
+        r"(^\s*" + re.escape(segment) + r"\s*:?\s*\{\s*$)"
+    )
+    return re.compile(pattern, re.MULTILINE)
+
+
 def patch_lcf_text(
     text: str, *,
     target_alignall: int = 2,
-) -> tuple[str, bool]:
-    """Return (patched_text, changed).
+    segments: tuple[str, ...] = (".arm9",),
+) -> tuple[str, list[str]]:
+    """Return (patched_text, segments_changed).
 
-    Finds the `.arm9 {` block in `text`, locates the first ALIGNALL
-    inside it, rewrites the value to `target_alignall`. Returns
-    (text, False) unchanged if the block or the ALIGNALL isn't found,
-    or if it's already at the target value.
+    For each segment name in `segments`, find the `<segment> {` block
+    in `text`, locate the first ALIGNALL inside it, and rewrite the
+    value to `target_alignall`. Returns `(text, [])` unchanged for
+    any segment whose block or ALIGNALL isn't found, or whose value
+    is already at the target.
+
+    `segments` defaults to `(".arm9",)` to preserve the original
+    single-segment behaviour. Brief 131 added `--also-segments` to
+    cover ov004's Cat 4 alignment cascade.
     """
-    m = _ARM9_BLOCK_START_RE.search(text)
-    if m is None:
-        return text, False
+    changed: list[str] = []
+    for segment in segments:
+        block_re = _block_start_re_for(segment)
+        m = block_re.search(text)
+        if m is None:
+            continue
 
-    # Scan forward from the `{` character to find the matching `}`,
-    # tracking brace depth. That's where the .arm9 block ends.
-    open_brace = text.index("{", m.end() - 1)
-    depth = 1
-    i = open_brace + 1
-    while i < len(text) and depth > 0:
-        c = text[i]
-        if c == "{":
-            depth += 1
-        elif c == "}":
-            depth -= 1
-            if depth == 0:
-                break
-        i += 1
-    if depth != 0:
-        # Unbalanced — don't guess; leave the LCF untouched.
-        return text, False
-    block_end = i
+        # Scan forward from the `{` character to find the matching `}`,
+        # tracking brace depth. That's where the segment block ends.
+        open_brace = text.index("{", m.end() - 1)
+        depth = 1
+        i = open_brace + 1
+        while i < len(text) and depth > 0:
+            c = text[i]
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        if depth != 0:
+            # Unbalanced — don't guess; skip this segment.
+            continue
+        block_end = i
 
-    block = text[open_brace:block_end + 1]
-    new_block, n = _ALIGNALL_RE.subn(
-        f"ALIGNALL({target_alignall});", block, count=1,
-    )
-    if n == 0 or new_block == block:
-        return text, False
-    return text[:open_brace] + new_block + text[block_end + 1:], True
+        block = text[open_brace:block_end + 1]
+        new_block, n = _ALIGNALL_RE.subn(
+            f"ALIGNALL({target_alignall});", block, count=1,
+        )
+        if n == 0 or new_block == block:
+            continue
+        text = text[:open_brace] + new_block + text[block_end + 1:]
+        changed.append(segment)
+    return text, changed
 
 
-def patch_file(path: Path, *, target_alignall: int = 2) -> int:
+def patch_file(
+    path: Path, *,
+    target_alignall: int = 2,
+    segments: tuple[str, ...] = (".arm9",),
+) -> int:
     try:
         original = path.read_text(encoding="utf-8")
     except OSError as e:
         print(f"error: could not read {path}: {e}", file=sys.stderr)
         return 1
 
-    new_text, changed = patch_lcf_text(
-        original, target_alignall=target_alignall,
+    new_text, changed_segments = patch_lcf_text(
+        original,
+        target_alignall=target_alignall,
+        segments=segments,
     )
-    if not changed:
-        # Not an error — either .arm9 isn't present in this LCF
-        # (e.g. a dev-only delink), the ALIGNALL is already at
-        # target, or the file doesn't match the expected dsd
+    if not changed_segments:
+        # Not an error — either the requested segment(s) aren't present
+        # in this LCF (e.g. a dev-only delink), the ALIGNALL is already
+        # at target, or the file doesn't match the expected dsd
         # template. Silent success; the wider build will fail loudly
         # if the LCF is actually malformed.
         return 0
@@ -138,7 +174,9 @@ def patch_file(path: Path, *, target_alignall: int = 2) -> int:
         print(f"error: could not write {path}: {e}", file=sys.stderr)
         return 1
     print(
-        f"patched {path}: .arm9 ALIGNALL set to {target_alignall}",
+        f"patched {path}: "
+        f"ALIGNALL set to {target_alignall} in "
+        f"{', '.join(changed_segments)}",
         file=sys.stderr,
     )
     return 0
@@ -146,17 +184,31 @@ def patch_file(path: Path, *, target_alignall: int = 2) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Rewrite ALIGNALL(N) inside the .arm9 segment of "
-                    "a dsd-generated arm9.lcf. Idempotent.",
+        description="Rewrite ALIGNALL(N) inside the .arm9 segment "
+                    "(and any extra segments) of a dsd-generated "
+                    "arm9.lcf. Idempotent.",
     )
     ap.add_argument("path", type=Path, help="Path to arm9.lcf")
     ap.add_argument(
         "--target-alignall", type=int, default=2,
-        help="ALIGNALL value to set inside .arm9 (default: 2). "
-             "Raising it would revert to the pre-patch state.",
+        help="ALIGNALL value to set inside the targeted segments "
+             "(default: 2). Raising it would revert to the pre-patch "
+             "state.",
+    )
+    ap.add_argument(
+        "--also-segments", nargs="*", default=[],
+        help="Additional LCF segment names (with leading dot, e.g. "
+             "`.ov004`) to rewrite alongside `.arm9`. Used by brief "
+             "131 to fix ov004's dsd-carved Thumb gap alignment "
+             "cascade.",
     )
     args = ap.parse_args()
-    return patch_file(args.path, target_alignall=args.target_alignall)
+    segments = (".arm9",) + tuple(args.also_segments)
+    return patch_file(
+        args.path,
+        target_alignall=args.target_alignall,
+        segments=segments,
+    )
 
 
 if __name__ == "__main__":
