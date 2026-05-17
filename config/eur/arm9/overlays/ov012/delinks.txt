@@ -11,3 +11,19 @@ src/overlay012/ov012_021ca340.c:
 src/overlay012/data_ov012_021cc120.c:
     complete
     .rodata start:0x021cc120 end:0x021cc138
+
+src/overlay012/data_ov012_021cc06c.c:
+    complete
+    .rodata start:0x021cc06c end:0x021cc078
+
+src/overlay012/data_ov012_021cc1e8.c:
+    complete
+    .rodata start:0x021cc1e8 end:0x021cc288
+
+src/overlay012/data_ov012_021cc180.c:
+    complete
+    .rodata start:0x021cc180 end:0x021cc1e8
+
+src/overlay012/data_ov012_021cc150.c:
+    complete
+    .rodata start:0x021cc150 end:0x021cc180

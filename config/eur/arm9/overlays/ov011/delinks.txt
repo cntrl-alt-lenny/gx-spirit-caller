@@ -577,3 +577,19 @@ src/overlay011/data_ov011_021d3594.c:
 src/overlay011/data_ov011_021d38a8.c:
     complete
     .data start:0x021d38a8 end:0x021d38bc
+
+src/overlay011/data_ov011_021d3060.c:
+    complete
+    .rodata start:0x021d3060 end:0x021d30f8
+
+src/overlay011/data_ov011_021d31d8.c:
+    complete
+    .rodata start:0x021d31d8 end:0x021d323c
+
+src/overlay011/data_ov011_021d3178.c:
+    complete
+    .rodata start:0x021d3178 end:0x021d31d8
+
+src/overlay011/data_ov011_021d35ec.c:
+    complete
+    .rodata start:0x021d35ec end:0x021d3620

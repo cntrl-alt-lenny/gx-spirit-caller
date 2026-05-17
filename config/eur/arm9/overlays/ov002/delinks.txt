@@ -1859,3 +1859,51 @@ src/overlay002/data_ov002_022ca510.c:
 src/overlay002/data_ov002_022cc154.c:
     complete
     .data start:0x022cc154 end:0x022cc218
+
+src/overlay002/data_ov002_022c9ad0.c:
+    complete
+    .rodata start:0x022c9ad0 end:0x022ca370
+
+src/overlay002/data_ov002_022c9508.c:
+    complete
+    .rodata start:0x022c9508 end:0x022c9ad0
+
+src/overlay002/data_ov002_022c357c.c:
+    complete
+    .rodata start:0x022c357c end:0x022c819c
+
+src/overlay002/data_ov002_022c86b8.c:
+    complete
+    .rodata start:0x022c86b8 end:0x022c89a0
+
+src/overlay002/data_ov002_022c89a0.c:
+    complete
+    .rodata start:0x022c89a0 end:0x022c8ff0
+
+src/overlay002/data_ov002_022c9250.c:
+    complete
+    .rodata start:0x022c9250 end:0x022c9508
+
+src/overlay002/data_ov002_022c9038.c:
+    complete
+    .rodata start:0x022c9038 end:0x022c9250
+
+src/overlay002/data_ov002_022bdfec.c:
+    complete
+    .rodata start:0x022bdfec end:0x022be10c
+
+src/overlay002/data_ov002_022ca3dc.c:
+    complete
+    .rodata start:0x022ca3dc end:0x022ca468
+
+src/overlay002/data_ov002_022ca544.c:
+    complete
+    .rodata start:0x022ca544 end:0x022ca59c
+
+src/overlay002/data_ov002_022ca790.c:
+    complete
+    .rodata start:0x022ca790 end:0x022ca7e8
+
+src/overlay002/data_ov002_022be184.c:
+    complete
+    .rodata start:0x022be184 end:0x022be1ac

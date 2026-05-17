@@ -82,3 +82,7 @@ src/overlay014/ov014_stubs_b44e0.c:
 src/overlay014/bss/data_ov014_bss.s:
     complete
     .bss start:0x021b5040 end:0x02235180
+
+src/overlay014/data_ov014_021b4bf8.c:
+    complete
+    .rodata start:0x021b4bf8 end:0x021b4c08

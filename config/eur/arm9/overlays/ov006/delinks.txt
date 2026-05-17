@@ -1120,3 +1120,35 @@ src/overlay006/data_ov006_021cb32c.c:
 src/overlay006/data_ov006_021cbbc8.c:
     complete
     .data start:0x021cbbc8 end:0x021cbbd8
+
+src/overlay006/data_ov006_021cbb50.c:
+    complete
+    .data start:0x021cbb50 end:0x021cbb74
+
+src/overlay006/data_ov006_021cc0f4.c:
+    complete
+    .data start:0x021cc0f4 end:0x021cc118
+
+src/overlay006/data_ov006_021cb3d4.c:
+    complete
+    .rodata start:0x021cb3d4 end:0x021cb444
+
+src/overlay006/data_ov006_021cb680.c:
+    complete
+    .rodata start:0x021cb680 end:0x021cb6d8
+
+src/overlay006/data_ov006_021cb848.c:
+    complete
+    .rodata start:0x021cb848 end:0x021cb898
+
+src/overlay006/data_ov006_021cb634.c:
+    complete
+    .rodata start:0x021cb634 end:0x021cb65c
+
+src/overlay006/data_ov006_021cb7b8.c:
+    complete
+    .rodata start:0x021cb7b8 end:0x021cb7e0
+
+src/overlay006/data_ov006_021cb820.c:
+    complete
+    .rodata start:0x021cb820 end:0x021cb848

@@ -7783,3 +7783,131 @@ src/main/data_020c6390.c:
 src/main/data_020fe78c.c:
     complete
     .data start:0x020fe78c end:0x020fe7b8
+
+src/main/data_020bec44.c:
+    complete
+    .rodata start:0x020bec44 end:0x020bec4c
+
+src/main/data_020bff80.c:
+    complete
+    .rodata start:0x020bff80 end:0x020c1690
+
+src/main/data_020b5e20.c:
+    complete
+    .rodata start:0x020b5e20 end:0x020b6ec4
+
+src/main/data_020c1f80.c:
+    complete
+    .rodata start:0x020c1f80 end:0x020c2f80
+
+src/main/data_020bf280.c:
+    complete
+    .rodata start:0x020bf280 end:0x020bff80
+
+src/main/data_020b52d8.c:
+    complete
+    .rodata start:0x020b52d8 end:0x020b599c
+
+src/main/data_020b4d60.c:
+    complete
+    .rodata start:0x020b4d60 end:0x020b52d0
+
+src/main/data_020c32f8.c:
+    complete
+    .rodata start:0x020c32f8 end:0x020c35cc
+
+src/main/data_020c2f80.c:
+    complete
+    .rodata start:0x020c2f80 end:0x020c3084
+
+src/main/data_020c3084.c:
+    complete
+    .rodata start:0x020c3084 end:0x020c3188
+
+src/main/data_020b4908.c:
+    complete
+    .rodata start:0x020b4908 end:0x020b4a08
+
+src/main/data_020bed6c.c:
+    complete
+    .rodata start:0x020bed6c end:0x020bee6c
+
+src/main/data_020b4b1c.c:
+    complete
+    .rodata start:0x020b4b1c end:0x020b4bd4
+
+src/main/data_020bea2c.c:
+    complete
+    .rodata start:0x020bea2c end:0x020bead0
+
+src/main/data_02102120.c:
+    complete
+    .data start:0x02102120 end:0x02102138
+
+src/main/data_021023c0.c:
+    complete
+    .data start:0x021023c0 end:0x021023d8
+
+src/main/data_02101e64.c:
+    complete
+    .data start:0x02101e64 end:0x02101e7c
+
+src/main/data_020c68cc.c:
+    complete
+    .data start:0x020c68cc end:0x020c68ec
+
+src/main/data_020bead0.c:
+    complete
+    .rodata start:0x020bead0 end:0x020beb58
+
+src/main/data_020c319c.c:
+    complete
+    .rodata start:0x020c319c end:0x020c31f8
+
+src/main/data_020be6c4.c:
+    complete
+    .rodata start:0x020be6c4 end:0x020be71c
+
+src/main/data_020bec8c.c:
+    complete
+    .rodata start:0x020bec8c end:0x020bece4
+
+src/main/data_020be9e8.c:
+    complete
+    .rodata start:0x020be9e8 end:0x020bea2c
+
+src/main/data_020b59a0.c:
+    complete
+    .rodata start:0x020b59a0 end:0x020b59e0
+
+src/main/data_020beefc.c:
+    complete
+    .rodata start:0x020beefc end:0x020bef3c
+
+src/main/data_020bec58.c:
+    complete
+    .rodata start:0x020bec58 end:0x020bec8c
+
+src/main/data_020beb8c.c:
+    complete
+    .rodata start:0x020beb8c end:0x020bebbc
+
+src/main/data_020bebbc.c:
+    complete
+    .rodata start:0x020bebbc end:0x020bebec
+
+src/main/data_020bebec.c:
+    complete
+    .rodata start:0x020bebec end:0x020bec1c
+
+src/main/data_020b5a8c.c:
+    complete
+    .rodata start:0x020b5a8c end:0x020b5ab8
+
+src/main/data_020be754.c:
+    complete
+    .rodata start:0x020be754 end:0x020be77c
+
+src/main/data_020c3854.c:
+    complete
+    .rodata start:0x020c3854 end:0x020c387c
