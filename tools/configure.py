@@ -537,6 +537,16 @@ def main():
         # context.
         patch_lcf = "tools/patch_lcf_arm9_align.py"
         patch_objects = "tools/patch_objects_legacy.py"
+        # Brief 131: also patch `.ov004` (ALIGNALL 4 → 2). dsd's
+        # gap-carving for ov004 exposes 2-aligned Thumb function
+        # boundaries inside the segment; without the patch mwldarm's
+        # ALIGNALL(4) floor inserts 2-byte padding between gap
+        # objects, shifting every downstream byte. Combined with the
+        # `-nointerworking` LD flag (suppresses 86 spurious thumb→arm
+        # veneers), this resolves ov004's full 1024-byte cascade and
+        # the corresponding 16-byte cascade in ARM9 main. See
+        # docs/research/ov004-thunk-section-fix.md for the full
+        # bisect + flip-to-OK evidence.
         n.rule(
             name="lcf",
             # v0.11+ `dsd lcf` writes to conventional paths under the build dir:
@@ -544,6 +554,7 @@ def main():
             command=_wrap_chain_for_windows(
                 f"{DSD} lcf -c $config_path"
                 f" && {PYTHON} {patch_lcf} $lcf_file"
+                f" --also-segments .ov004"
                 f" && {PYTHON} {patch_objects}"
                 f" --config-dir $config_dir"
                 f" --objects $objects_file"

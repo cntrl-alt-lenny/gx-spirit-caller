@@ -369,7 +369,7 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 
 **rewrite `ALIGNALL(4)` to `ALIGNALL(2)` in the**
 
-`.arm9` segment of a dsd-generated arm9.lcf.
+`.arm9` segment (and per-segment list) of a dsd-generated arm9.lcf.
 
 ### `tools/patch_objects_legacy.py`
 
