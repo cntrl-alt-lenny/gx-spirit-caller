@@ -313,23 +313,44 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/120-cluster-a-wave-3-overlays.md`](docs/briefs/120-cluster-a-wave-3-overlays.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cluster A wave 3
-  — remaining overlays. ~632 candidates across ov007/
-  9/14/21 + smaller. Apply brief 116/118's `.s` + LCF
-  recipe. Same per-wave pattern as brief 118 (2
-  overlays). Branch:
-  `decomper/cluster-a-wave-3-overlays`.
+- [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](docs/briefs/122-cluster-c-wave-1-pattern1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): cluster C wave
+  1 — Pattern 1 application. Apply brief 119's
+  4-aligned individual symbols recipe to ~150-185
+  candidates. **First production use of W6 mitigation
+  at scale.** Wave 1 target: 20-30 symbols from
+  highest-cross-module-reader pool. Branch:
+  `decomper/cluster-c-wave-1-pattern1`.
 
-- [`docs/briefs/121-cluster-d-pattern2-research.md`](docs/briefs/121-cluster-d-pattern2-research.md)
-  — `cloud` (MEDIUM): two-part. (1) Cluster D struct
-  arrays + dispatch tables research (98 candidates per
-  brief 113). (2) Brief 119 Pattern 2 verification
-  (group adjacent non-aligned cluster C symbols to
-  4-aligned total). Branch:
-  `cloud/cluster-d-pattern2-research`.
+- [`docs/briefs/123-data-worklist-v3.md`](docs/briefs/123-data-worklist-v3.md)
+  — `cloud` (MEDIUM): data_worklist.py v3 byte-pattern
+  refinement. Distinguish 4-byte values into sub-
+  shapes (string-ascii4 / pointer-code / pointer-data
+  / scalar). Refines brief 117's 47% mis-classification
+  finding + brief 121's 32-pointer fold. Brief 124+
+  scale-out benefits. Branch: `cloud/data-worklist-v3`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/120-cluster-a-wave-3-overlays.md`](docs/briefs/120-cluster-a-wave-3-overlays.md)
+  `decomper`, shipped in PR #527. **175 cluster A
+  `.bss` symbols** across ov009 (66) + ov021 (69) +
+  ov014 (40). Self-extended to 3 overlays per cap.
+  Slightly below 200-sym floor (87%) — gap files
+  smaller than ov004 was. All 3 preserved OK baseline.
+  **Cluster A coverage cumulative: 1145 / 1586 = ~72%
+  drained** across briefs 116 + 118 + 120.
+- [`docs/briefs/121-cluster-d-pattern2-research.md`](docs/briefs/121-cluster-d-pattern2-research.md)
+  `cloud`, shipped in PR #528. **Cluster D split into
+  3 sub-clusters:** D-1 dispatch tables (~71, `.c`
+  extern + `void*[]`, naturally 4-aligned) / D-2
+  scalar arrays (~30-40, typed `.c` no const) / D-3
+  complex (~20, defer to typedef tool). **Pattern 2
+  verified** with dsd validation constraint discovery
+  (Last Embedded Symbol Range Check). 17 dsd-compatible
+  Pattern 2 runs in main; brief 119's universal estimate
+  was over-broad. 3 worked examples (`data_0210210c`
+  D-1, `data_02101f34` D-2, `data_020b52d4` Pattern 2).
 
 - [`docs/briefs/118-cluster-a-wave-2-overlay.md`](docs/briefs/118-cluster-a-wave-2-overlay.md)
   `decomper`, shipped in PR #524. **307 cluster A
