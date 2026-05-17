@@ -8,36 +8,45 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-17 (Mac brain — brief 124 + 125 merge).
-**First cluster D wave shipped: 20 D-1 dispatch tables / 1652 bytes.**
-Brief 124 validated brief 121's D-1 recipe at scale across 11 modules.
-Brief 125 shipped the **Pattern 3 generator tool** (`tools/cluster_c_pattern3_gen.py`)
-which closes brief 119's previously-FAILED Pattern 2 sketches via
-chunk-large-enough-to-satisfy-dsd. 2 worked examples (272 + 48 byte
-chunks) byte-identical. 3-region 25/27 baseline preserved.
+**Last updated:** 2026-05-17 (Mac brain — brief 126 + 127 merge).
+**🔑 ARM9 main checksum gap is ONLY 21 bytes / 6 symbols.** Brief 127
+scoping revealed: brief 113's pessimistic "substantial cross-module
+reloc residue" hypothesis was empirically wrong. **76% of main's gap
+cascades from OV004 failure** (confirms brief 118 coupled-module
+prediction). Path to 26/27 baseline now concretely scoped: Category 1
+fix (5 bytes, ~30 min decomper) + OV004 recovery → main auto-flips.
+**Brief 126 surfaced cluster C/D recipe refinement** — Pattern 1
+strict-alignment (size%4==0 AND addr%4==0) applies to D-2 too (not
+just C). W6 cascade detected, bisected, dropped 4 unaligned ov006
+candidates. Net 36 syms / 41 KB shipped.
 
 EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
 badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #533 — decomper / brief 124 (cluster D wave 1 D-1).** **20
-  dispatch tables / 1652 bytes / 200% of floor.** First production
-  application of brief 121's D-1 recipe across main + 10 overlays.
-  All targets resolved cleanly via existing symbols.txt names
-  (brief 123 v3's pointer-code filter pre-screened). Per-table size
-  variance wide (16-byte tables in ov006/010/015/017 alongside
-  320-byte tables in ov021). Pool drain: ~28% of ~71 D-1
-  candidates drained; 4-6 waves close the sub-pool.
-- **PR #534 — cloud / brief 125 (cluster C Pattern 3 generator).**
-  **343-line generator at `tools/cluster_c_pattern3_gen.py` +
-  34 new tests.** Closes brief 119's FAILED Pattern 2 case — the
-  `data_020c387c` "NAN(/INFINITY" chunk was 272 bytes / 2 symbols
-  with the last embedded deduced as 0x10b bytes, exceeding any
-  Pattern 2 16-byte chunk. Pattern 3 chunk-large-enough-to-satisfy-
-  dsd ships it byte-identical. Cross-module pointer resolution
-  enabled via `sym_by_addr` map. 1690/1690 tests total. Brain
-  pushed `a366a86` to clear 4 ruff classes (F401/B007/B905/F541).
+- **PR #537 — decomper / brief 126 (cluster C+D wave 2).** **36
+  symbols / 41 KB combined** (29 cluster C Pattern 1 + 7 D-2 scalar
+  arrays). **W6 cascade detected and bisected** — surfaced **recipe
+  refinement: brief 119's Pattern 1 strict-alignment rule applies
+  to cluster D-2 too** (not just C). 4 ov006 D-2 candidates at
+  `addr % 4 == 2` triggered cascade; dropped + ov006 reverted to
+  OK. 3 ov004 D-2 candidates dropped (byte-diff due to ov004
+  baseline-FAILED cascade — same shape as brief 127's main finding).
+  Substantial volume: `data_ov002_022c357c` at 19,488 bytes is
+  largest cluster C symbol shipped so far. Cumulative cluster C/D
+  arc: **95 symbols / 47K bytes** across briefs 121+122+124+126.
+- **PR #536 — cloud / brief 127 (ARM9 main checksum scoping).**
+  **🔑 Gap is only 21 bytes / 6 symbols** (much smaller than brief
+  113 hypothesized). **3 categories:** Cat 1 = 5 bytes / 3 wrong-
+  target source TUs (`func_02048f98`, `func_02052bc4`,
+  `func_0206255c`) — ~30-min decomper fix. Cat 2 = 4 bytes / 2
+  `.rodata` pointers into OV004 (cascade). Cat 3 = 12 bytes / 1
+  `.data` struct array into OV004 (cascade). **76% of gap cascades
+  from OV004 failure** — confirms brief 118 coupled-module
+  prediction. Path to 26/27: Cat 1 fix + OV004 recovery → main
+  auto-flips. **No new toolchain investment needed** — brief 113's
+  pessimistic risk assessment falsified empirically.
 
 ## Cumulative pipeline state
 
@@ -52,9 +61,11 @@ badges directly; multi-module-OK is the visible milestone).
 | **Cluster A coverage (cumulative briefs 116 + 118 + 120)** | **1145 / 1586 = ~72%** | 1-2 more waves to drain |
 | **Cluster C wave 1 Pattern 1 (brief 122)** | **37 symbols / 4672 bytes** | 9 modules, no W6 cascade |
 | **Cluster D wave 1 D-1 (brief 124)** | **20 tables / 1652 bytes** | 11 modules; ~28% of D-1 pool drained |
+| **Cluster C+D wave 2 (brief 126)** | **29 C Pattern 1 + 7 D-2 = 36 syms / 41 KB** | W6 cascade bisected; D-2 strict-alignment confirmed |
 | **Cluster D recipe (brief 121)** | D-1 dispatch tables ~71 / D-2 scalar arrays ~30-40 | D-3 ~20 deferred or via Pattern 3 generator |
 | **data_worklist v3 (brief 123)** | 4-byte sub-shapes + refined cluster filters | brief 117 sub-class reproduced at 94% |
 | **Pattern 3 generator (brief 125)** | `tools/cluster_c_pattern3_gen.py` + 2 worked examples | Closes brief 119's FAILED Pattern 2 case |
+| **ARM9 main scoping (brief 127)** | **21 bytes / 6 symbols total gap** | 76% cascades from OV004; Cat 1 fix + OV004 → main flips |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -80,50 +91,48 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 124 + 125
-close and brief 126 + 127 queue lands.
+**Open PRs: 0** once this brain-PR for brief 126 + 127
+close and brief 128 + 129 queue lands.
 
-**DATA-TIER SESSION ARC SCALING + RECIPE LIBRARY MATURE.**
-Cluster A at 72%, C wave 1 shipped (37 syms), D wave 1
-shipped (20 tables). Pattern 3 generator unlocks the
-cluster C residue. Cluster D-2 + D-3 candidates remain.
+**DATA-TIER + ARM9 MAIN: BOTH AT TURNING POINTS.**
+Cluster A at 72%, C/D recipes mature with refinement
+(strict alignment applies to D-2 too). **ARM9 main
+gap is only 21 bytes** — Cat 1 fix + OV004 recovery
+= 26/27 baseline.
 
-**Decomper — brief 126 (HIGH, NEW):**
+**Decomper — brief 128 (HIGH, NEW):**
 
-- **Cluster C wave 2 (Pattern 1 continuation) + cluster
-  D wave 2 (D-1 cleanup + start D-2).** Two-part
-  parallel-track wave. (1) Cluster C Pattern 1: 110-
-  150 4-aligned candidates remaining post-brief-122;
-  target 25-35 in wave 2. (2) Cluster D: ~51 D-1
-  remaining post-brief-124 + start D-2 (~30-40 scalar
-  arrays per brief 121's recipe). Target 10-15 D-1
-  + 5-10 D-2 in this wave. Apply brief 121/122
-  recipes; no recipe changes needed. Branch:
-  `decomper/cluster-cd-wave-2`.
+- **Two-part parallel-track wave.** (1) **Category 1
+  ARM9 main fix** per brief 127's plan: 3 wrong-target
+  source TUs (`func_02048f98`, `func_02052bc4`,
+  `func_0206255c`) → 5 bytes fixed (won't flip main
+  alone — needs OV004 recovery too — but reduces main's
+  residue). ~30 min work. (2) **Cluster C Pattern 1
+  wave 3 continuation**: 80-120 remaining 4-aligned
+  candidates; target 25-35 in this wave. Brief 126
+  shipped recipe refinement (D-2 also strict-aligned)
+  — but cluster C Pattern 1 was always strict-aligned,
+  no recipe change for C. Branch:
+  `decomper/main-cat1-cluster-c-wave-3`.
 
-**Cloud — brief 127 (MEDIUM, NEW):**
+**Cloud — brief 129 (MEDIUM, NEW):**
 
-- **ARM9 main checksum recovery scoping.** Biggest
-  remaining strategic lever. ARM9 main has been
-  FAILED across all 3 regions since session start
-  despite 647 `.bss` symbols claimed (brief 116) +
-  37 cluster C Pattern 1 + 8 cluster D-1 tables.
-  Brief 113 noted main checksum failure is in
-  `.text` or `.data` cross-module relocations, NOT
-  .bss. Scope what "ARM9 main checksum recovery"
-  actually requires:
-  - Inventory what's in main's `.text`/`.data` that
-    differs from the orig (use `xxd` + dsd's section
-    map to bisect).
-  - Identify the residue category (unknown function
-    addresses? Cross-module reloc target misses?
-    Function-tier matches that weren't byte-identical
-    despite landing? Specific data symbol shapes that
-    Pattern 3 generator hasn't touched?).
-  - Output: brief 130+ plan — application briefs for
-    each residue type. May surface new workflow
-    walls; flag W7+ as needed.
-  Branch: `cloud/arm9-main-checksum-scoping`.
+- **OV004 checksum recovery scoping.** Same methodology
+  as brief 127 applied to overlay 4. OV004 has been
+  FAILED at baseline since session start (placeholder
+  symbol injection artifact). Brief 127 confirmed
+  brief 118's prediction: main + ov004 are coupled,
+  and 76% of main's gap cascades from OV004's gap.
+  When OV004 flips OK, main auto-flips on the
+  cascade-resolved bytes. Per brief 127's plan:
+  - Bisect ov004 built vs orig (xxd + dsd section
+    map; same methodology).
+  - Categorize residue (similar shape to brief 127's
+    Cat 1/2/3).
+  - Output: brief 132+ application plan.
+  - Risk assessment: brief 127's "no new toolchain"
+    finding may hold here too; verify.
+  Branch: `cloud/ov004-checksum-scoping`.
 
 **Data-tier backlog (post-124/125):**
 
@@ -236,40 +245,45 @@ EUR 1.79% / USA + JPN 0.70% (function-tier badge);
 Function-tier matching: ~140 EUR + ~840 region-
 equivalents + 100 cross-project. **Data-tier: 1145
 cluster A `.bss` syms (~72% drained) + 5 cluster E
-DTCM syms + 20 cluster D-1 dispatch tables + 37
-cluster C Pattern 1 syms + 2 Pattern 3 worked
-examples.** ~1100+ cumulative session match-equivalents
-(function-tier) + ~1230 data-tier symbols claimed.
-Project firmly mid-arc; data-tier session arc scaling.
-Cluster A may close in 1-2 more waves; cluster C/D
-recipes mature.
+DTCM syms + 20 cluster D-1 dispatch tables + 66
+cluster C Pattern 1 syms + 7 cluster D-2 arrays + 2
+Pattern 3 worked examples.** ~1100+ cumulative session
+match-equivalents (function-tier) + ~1267 data-tier
+symbols claimed. **Path to 26/27 baseline scoped at
+21 bytes total ARM9 main gap** (brief 127). Project
+firmly mid-arc; recipes mature; turning point on
+baseline progression.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 126 (cluster C+D
-   wave 2 parallel-track) PR** when it opens. EUR
-   `ninja rom` + `dsd check modules` 25/27 baseline
-   preserved. Two-part: cluster C Pattern 1
-   continuation + cluster D-1 cleanup + D-2 start.
-   Recipes are mature; per-symbol cost is the same as
-   brief 122/124 waves.
-2. **Verify + merge cloud brief 127 (ARM9 main
-   checksum scoping) PR** when it opens. Scoping
-   brief; output is a brief 130+ plan for ARM9 main
-   recovery. Watch for new workflow walls (W7+
-   candidates).
-3. **Scope brief 128+ after 126 + 127 close.** Options:
-   - **Brief 128 — cluster C wave 3 (Pattern 3
-     application via brief 125 generator)** (decomper,
-     ~50-90 candidates closed in 1-3 waves).
-   - **Brief 129 — cluster B wave 1** (decomper, 81
+1. **Verify + merge decomper brief 128 (Category 1
+   main fix + cluster C Pattern 1 wave 3) PR** when
+   it opens. EUR `ninja rom` + `dsd check modules`
+   25/27 baseline preserved (Cat 1 alone won't flip
+   main — needs OV004 too). Watch for the 5-byte
+   delta on main's checksum (main still FAILED but
+   bytes-diff shrinks to 16 from 21).
+2. **Verify + merge cloud brief 129 (OV004 checksum
+   scoping) PR** when it opens. Same methodology as
+   brief 127. Output is brief 132+ plan. Watch for
+   the gap size — brief 127's main was 21 bytes;
+   OV004 likely similar order of magnitude (or
+   larger given its data-tier residue).
+3. **Scope brief 130+ after 128 + 129 close.** Options:
+   - **Brief 130 — OV004 recovery wave 1** (decomper,
+     per brief 129's plan). **If OV004 flips OK,
+     main auto-flips too → 26/27 baseline.**
+   - **Brief 131 — cluster C wave 4 (Pattern 3 via
+     brief 125 generator)** (decomper, ~50-90
+     candidates).
+   - **Brief 132 — cluster B wave 1** (decomper, 81
      true scalars per brief 123 v3).
-   - **Brief 130 — ARM9 main checksum recovery
-     wave 1** (decomper, per brief 127's scoping).
-   - **Brief 131 — cluster A wave 4** (decomper,
+   - **Brief 133 — cluster A wave 4** (decomper,
      remaining small overlays).
-   - **Brief 132 — cross-region cluster A apply**
+   - **Brief 134 — cross-region cluster A apply**
      (decomper, port 1145 EUR symbols to USA + JPN).
+   - **Brief 135 — matched-TU byte-diff scanner**
+     (cloud tooling, optional per brief 127 spec).
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
