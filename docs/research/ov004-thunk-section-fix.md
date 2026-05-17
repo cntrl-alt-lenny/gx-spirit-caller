@@ -300,7 +300,7 @@ No source files changed. No build-system restructuring. The change
 is strictly additive — a single LCF post-process flag wired into
 the `lcf` ninja rule.
 
-## TL;DR for brain
+## TL;DR for brain (Phase 1)
 
 - **Brief 131 lands Phase 1**: `ALIGNALL(2)` on `.ov004` LCF
   segment. Cuts ov004 byte-diff by 95% (165K → 8,125) and main
@@ -321,3 +321,168 @@ the `lcf` ninja rule.
   mitigation tiers (Phase 1 → Phase 2 → upstream).
 - **Optimistic outlook**: when brief 132 + brief 130 both land,
   3-region baseline jumps 25/27 → 27/27 (full SHA1 match).
+
+---
+
+## Phase 2 (brief 132) — symbol-scoping research
+
+**Outcome**: Phase 2 did **NOT flip ov004 to OK**. All three
+approaches the brief enumerated were investigated; each fell to
+a different mwldarm-internal mechanism that ignores the .o-level
+attributes I had hoped would influence veneer generation. The
+research yielded a precise model of mwldarm's veneer-trigger
+that wasn't visible from Phase 1's vantage point, and a
+research-grade tool that enumerates the collision set. Brief 133+
+needs to escalate to either per-overlay link (the brief's
+Option A) or post-link binary patching (a new option that
+emerged from Phase 2's failure analysis).
+
+### What was tested
+
+| Approach | Mechanism tested | Result | Status |
+|---|---|---|---|
+| **B v1**: STT_FUNC → STT_NOTYPE | Patch all 783 colliding ov002 funcs' symbol types via new ELF rewriter; preserve global binding so cross-`.o` refs still resolve | mwldarm still emits all 86 veneers. **Symbol type is NOT the trigger.** | REJECTED |
+| **B v2**: clear SHF_EXECINSTR | Patch `.text` section flags on all 47 .o files containing colliding funcs; also keeps the type strip | mwldarm still emits all 86 veneers. **Section exec-flag is NOT the trigger.** | REJECTED |
+| **A**: `-overlaygroup` CLI | Inject `-overlaygroup OG_A/B/C -overlay OVnnn` directives into `objects.txt` to declare mutual-exclusion groups matching the LCF MEMORY layout | mwldarm correctly enforces the grouping AND now flags every cross-overlay reference as undefined. Link fails with 200+ unresolved symbols (`func_ov020_021ac4fc` from `data_ov021_021ac8a0`, etc.) | REJECTED — surfaces problems beyond brief 132's scope |
+| **C**: rename pre-link | Theoretical analysis: mwldarm looks up FUNCs by VA, not by name. Renaming the symbol changes the name but the VA, type, and section still match a FUNC. Predicted no-op without further changes | not tested as written | SUPERSEDED by Approach A |
+
+### Empirical model of mwldarm's veneer trigger
+
+After Phase 2 testing, the precise gating conditions appear to be:
+
+1. The symbol's VA falls inside a section assigned to a different
+   LCF MEMORY region than the load-site's section.
+2. The symbol's containing section is reachable in the link
+   namespace (the `-overlaygroup` test confirms isolation removes
+   the trigger entirely).
+3. Neither STT_FUNC vs STT_NOTYPE nor SHF_EXECINSTR vs `0`
+   affects the decision once (1)+(2) are satisfied. The .o-level
+   attributes I had hoped would gate the trigger are ignored by
+   mwldarm's veneer-emit pass — it appears to use only the
+   resolved VA + the section's owning MEMORY region.
+
+This narrows the remaining viable approaches to two structural
+ones:
+
+- **Per-overlay link restructure**: invoke `mwldarm` once per
+  mutually-exclusive overlay group, feeding each invocation only
+  the .o files for that group's overlays + a per-group LCF.
+  Cross-group references resolve via a final partial-link pass.
+  Significant build-system change.
+- **Post-link binary patching**: accept mwldarm's veneers,
+  produce the binary as today, then surgically remove the
+  1024-byte veneer pool + rewrite the 158 .rodata pointers
+  that target veneers back to their ultimate addresses + shift
+  downstream .data/.bss content to fill the 1024-byte gap +
+  unshift every 4-byte word in the file whose value falls in
+  the +0x400 cascade range. Contained to ov004.bin; doesn't
+  touch other modules.
+
+Brief 133+ should pick one and execute.
+
+### What this brief ships
+
+1. **`tools/strip_overlay_func_collisions.py`** — new ELF
+   patcher that enumerates collisions and applies
+   STT_FUNC→STT_NOTYPE + (optionally) clears SHF_EXECINSTR on
+   `.text` sections. **Currently NOT wired into the build** —
+   empirically a no-op for veneer suppression. Kept as
+   standalone research tooling: invoke via
+
+   ```
+   python tools/strip_overlay_func_collisions.py \
+       --config-dir config/<ver>/arm9 \
+       --delinks-dir build/<ver>/delinks
+   ```
+
+   to enumerate ov002's 783 colliding FUNCs in ov004's
+   `.rodata` range, or pass `--clear-text-exec` to also apply
+   the section-flag clear. Future brief 133+ work may
+   re-purpose the collision-enumeration logic for post-link
+   patching scope.
+2. **No build-pipeline changes shipped** — the strip-tool wire-
+   in was removed after confirming it's a no-op. Phase 1's
+   `ALIGNALL(2)` for `.ov004` remains active (it's a real
+   95% reduction).
+3. **This research note** — Phase 2 findings + brief 133+
+   candidate plans.
+
+### Updated W7 mitigation tiers
+
+| Tier | Description | Status |
+|---|---|---|
+| 1 | `ALIGNALL(2)` on the affected overlay segment | ✅ shipped in brief 131 |
+| 2a | .o-level FUNC type / section flag rewriting | ❌ proven NO-OP; tool kept for research |
+| 2b | `-overlaygroup` CLI injection | ❌ too aggressive; needs additional cross-overlay reference plumbing |
+| 3a | Per-overlay link restructure | NOT TRIED; the natural Phase 2 escalation |
+| 3b | Post-link binary patching of ov004.bin | NOT TRIED; surgical, contained alternative |
+| 4 | Upstream dsd / mwldarm fixes | not actionable — mwldarm closed-source |
+
+### Brief 133+ candidate plans
+
+#### Brief 133-A — Per-overlay link (the brief's Option A)
+
+- Modify `tools/configure.py` to invoke `mwldarm` once per
+  mutually-exclusive overlay group instead of once for the
+  whole arm9 image.
+- Each per-group invocation gets its own LCF (subset of the
+  current arm9.lcf), with only that group's overlays
+  declared.
+- A final partial-link pass resolves cross-group references.
+- Requires significant dsd LCF generator changes (or a custom
+  generator in `tools/`).
+- Risk: high — touches the core link step. Test surface = all
+  27 modules across 3 regions.
+
+#### Brief 133-B — Post-link binary patching (recommended)
+
+- Build a `tools/ov004_undo_veneers.py` that consumes
+  `build/<ver>/build/arm9_ov004.bin` and produces a corrected
+  version.
+- Algorithm:
+  1. Scan for the 12-byte veneer pattern
+     `7847 c046 04f01fe5 <target>`.
+  2. Build a map veneer-VA → ultimate-target VA.
+  3. Scan `.rodata` for 4-byte words matching any veneer VA;
+     replace with the corresponding ultimate-target VA.
+  4. Splice out the 1024-byte veneer pool from the file.
+  5. Scan every 4-aligned word in the resulting file; if
+     value ∈ [shifted-.data-range, shifted-.bss-range],
+     subtract 0x400.
+  6. Update file size; verify `dsd check modules` reports OK.
+- Risk: moderate. False-positive pointer patches in (5) are
+  the main concern; can be controlled by intersecting with
+  `dsd`'s `relocs.txt` for ov004.
+
+Brief 133-B is the recommended starting point: smaller scope,
+contained blast radius, and the algorithm is straightforward
+once the 158 veneer-references are enumerated (`cmp` + brief 131
+ALIGNALL gets you to <60 .rodata pointer words that need
+patching — the rest is deterministic re-shift arithmetic).
+
+### TL;DR for brain (Phase 2)
+
+- **Brief 132 did NOT flip ov004 to OK.** Tested all three
+  approaches the brief listed; none worked cleanly against
+  mwldarm 2.0/sp1p5.
+- **Empirical finding**: mwldarm's veneer trigger is gated by
+  *MEMORY-region membership of the resolved VA*, not by .o-level
+  symbol type (STT_FUNC) or section flag (SHF_EXECINSTR).
+  Both were verified by patching all 783 colliding ov002
+  symbols — veneer count stayed at 86.
+- **`-overlaygroup` CLI works** (mwldarm respects the grouping
+  and stops emitting cross-group veneers) but exposes ~200
+  legitimate cross-overlay references that fail to resolve.
+  Fixing those is brief 133+ scope.
+- **Tool delivered**: `tools/strip_overlay_func_collisions.py`
+  — enumerates 783 collisions, patches STT_FUNC/SHF_EXECINSTR
+  selectively. NOT wired into the build (no-op for veneers).
+  Useful as research scaffolding for future post-link work.
+- **Brief 133 path forward (recommended: Brief 133-B)**:
+  post-link binary patching of `arm9_ov004.bin`. Splice out
+  veneers, rewrite .rodata pointers to ultimate targets,
+  un-shift downstream .data/.bss content. Contained to ov004
+  only. Should achieve the 26/27 baseline once paired with
+  brief 130's main Cat 1 source fix.
+- **Baseline unchanged from brief 131**: 25/27 across all 3
+  regions. No regressions; no flips.
