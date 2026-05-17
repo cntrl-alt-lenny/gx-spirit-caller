@@ -25,3 +25,7 @@ src/overlay008/func_ov008_021aa5d8.c:
 src/overlay008/func_ov008_021ada90.c:
     complete
     .text start:0x021ada90 end:0x021adaa8
+
+src/overlay008/data_ov008_021b23e0.c:
+    complete
+    .rodata start:0x021b23e0 end:0x021b2430

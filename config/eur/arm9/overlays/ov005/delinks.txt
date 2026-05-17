@@ -321,3 +321,15 @@ src/overlay005/data_ov005_021b1568.c:
 src/overlay005/data_ov005_021b1abc.c:
     complete
     .data start:0x021b1abc end:0x021b1b84
+
+src/overlay005/data_ov005_021b1618.c:
+    complete
+    .rodata start:0x021b1618 end:0x021b16e4
+
+src/overlay005/data_ov005_021b15b4.c:
+    complete
+    .rodata start:0x021b15b4 end:0x021b1618
+
+src/overlay005/data_ov005_021b158c.c:
+    complete
+    .rodata start:0x021b158c end:0x021b15b4

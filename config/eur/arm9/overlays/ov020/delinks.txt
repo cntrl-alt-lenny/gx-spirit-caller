@@ -15,3 +15,7 @@ src/overlay020/func_ov020_021aae48.c:
 src/overlay020/data_ov020_021adf68.c:
     complete
     .data start:0x021adf68 end:0x021adf80
+
+src/overlay020/data_ov020_021addd0.c:
+    complete
+    .rodata start:0x021addd0 end:0x021addd8
