@@ -313,25 +313,43 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/124-cluster-d-wave-1-d1.md`](docs/briefs/124-cluster-d-wave-1-d1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): cluster D wave
-  1 — D-1 dispatch tables. ~71 candidates per brief
-  121 recipe (`.c extern + void*[]`, naturally
-  4-aligned). Brief 123 v3's pointer-code filter
-  surfaces clean candidates. Wave 1 target: 10-15
-  dispatch tables. Branch:
-  `decomper/cluster-d-wave-1-d1`.
+- [`docs/briefs/126-cluster-cd-wave-2.md`](docs/briefs/126-cluster-cd-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): two-part
+  parallel-track wave. (1) Cluster C Pattern 1
+  continuation (25-35 of 110-150 remaining 4-aligned
+  candidates). (2) Cluster D wave 2 — D-1 cleanup
+  (10-15 of ~51 remaining) + start D-2 (5-10 of ~30-
+  40 scalar arrays per brief 121's recipe). Branch:
+  `decomper/cluster-cd-wave-2`.
 
-- [`docs/briefs/125-cluster-c-pattern3-generator.md`](docs/briefs/125-cluster-c-pattern3-generator.md)
-  — `cloud` (MEDIUM): cluster C Pattern 3 generator
-  tool. Handles the ~50-90 cluster C residue after
-  Patterns 1 + 2 exhaust. Generator produces chunked
-  `.s` files + delinks.txt headers for non-aligned
-  symbol groups too large for Pattern 2's dsd
-  validation constraint. Branch:
-  `cloud/cluster-c-pattern3-generator`.
+- [`docs/briefs/127-arm9-main-checksum-scoping.md`](docs/briefs/127-arm9-main-checksum-scoping.md)
+  — `cloud` (MEDIUM): scoping brief for ARM9 main
+  checksum recovery — biggest remaining strategic
+  lever. Inventory `.text`/`.data` residue, identify
+  category, output brief 130+ application plan. May
+  surface new workflow walls. Branch:
+  `cloud/arm9-main-checksum-scoping`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/124-cluster-d-wave-1-d1.md`](docs/briefs/124-cluster-d-wave-1-d1.md)
+  `decomper`, shipped in PR #533. **20 dispatch
+  tables / 1652 bytes / 200% of floor.** First
+  production application of brief 121's D-1 recipe
+  across main + 10 overlays. All targets resolved
+  cleanly via existing symbols.txt names. Per-table
+  size variance wide (16-byte → 320-byte). ~28% of
+  ~71 D-1 pool drained; 4-6 waves close it.
+- [`docs/briefs/125-cluster-c-pattern3-generator.md`](docs/briefs/125-cluster-c-pattern3-generator.md)
+  `cloud`, shipped in PR #534. **343-line generator
+  at `tools/cluster_c_pattern3_gen.py` + 34 new
+  tests.** Closes brief 119's FAILED Pattern 2 case
+  (`data_020c387c` "NAN(/INFINITY" — 0x10b-byte
+  embedded symbol exceeded any Pattern 2 chunk).
+  Cross-module pointer resolution via `sym_by_addr`
+  map. 2 worked examples (272 + 48 bytes) byte-
+  identical. Brain pushed `a366a86` to clear 4 ruff
+  classes (F401/B007/B905/F541).
 
 - [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](docs/briefs/122-cluster-c-wave-1-pattern1.md)
   `decomper`, shipped in PR #530. **37 cluster C
