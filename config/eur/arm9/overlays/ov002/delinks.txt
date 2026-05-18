@@ -1939,3 +1939,7 @@ src/overlay002/data_ov002_022cbe28.c:
 src/overlay002/data_ov002_022bf3c4.c:
     complete
     .rodata start:0x022bf3c4 end:0x022c08c4
+
+src/overlay002/data_ov002_022cacc0.c:
+    complete
+    .data start:0x022cacc0 end:0x022cad34

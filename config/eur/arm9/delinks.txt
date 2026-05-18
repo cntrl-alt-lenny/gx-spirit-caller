@@ -7983,3 +7983,43 @@ src/main/data_020c3cd8.c:
 src/main/data_02102104.c:
     complete
     .data start:0x02102104 end:0x0210210c
+
+src/main/data_020fe55c.c:
+    complete
+    .data start:0x020fe55c end:0x020fe578
+
+src/main/data_021015e4.c:
+    complete
+    .data start:0x021015e4 end:0x021016f4
+
+src/main/data_020fb5c0.c:
+    complete
+    .data start:0x020fb5c0 end:0x020fb5f0
+
+src/main/data/data_020b46e0.s:
+    complete
+    .rodata start:0x020b46e0 end:0x020b4728
+
+src/main/data/data_020b4a2c.s:
+    complete
+    .rodata start:0x020b4a2c end:0x020b4b1c
+
+src/main/data/data_020b59e0.s:
+    complete
+    .rodata start:0x020b59e0 end:0x020b5a8c
+
+src/main/data/data_020b5ab8.s:
+    complete
+    .rodata start:0x020b5ab8 end:0x020b5b80
+
+src/main/data/data_020be71c.s:
+    complete
+    .rodata start:0x020be71c end:0x020be754
+
+src/main/data/data_020beb58.s:
+    complete
+    .rodata start:0x020beb58 end:0x020beb8c
+
+src/main/data/data_020bece4.s:
+    complete
+    .rodata start:0x020bece4 end:0x020bed6c

@@ -7,3 +7,7 @@
 src/overlay022/data_ov022_021ab8a8.c:
     complete
     .rodata start:0x021ab8a8 end:0x021ab8e4
+
+src/overlay022/data_ov022_021ab9a0.c:
+    complete
+    .data start:0x021ab9a0 end:0x021ab9bc
