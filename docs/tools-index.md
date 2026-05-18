@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**63 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**64 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (17)
-- [Uncategorised](#uncategorised) (2)
+- [Uncategorised](#uncategorised) (3)
 
 ## Analysis / worklist
 
@@ -412,6 +412,12 @@ README.md's per-region shields.io badges to match.
 ## Uncategorised
 
 _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/clean_macos_junk.py`
+
+**recursively remove OS-generated metadata**
+
+files (and optional directories) from a directory tree.
 
 ### `tools/cluster_c_pattern3_gen.py`
 
