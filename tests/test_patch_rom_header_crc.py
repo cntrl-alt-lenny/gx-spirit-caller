@@ -30,7 +30,6 @@ from patch_rom_header_crc import (  # noqa: E402
     EXPECTED_LOGO_CRC,
     HEADER_CRC_OFFSET,
     HEADER_RANGE_END,
-    HEADER_RANGE_START,
     LOGO_CRC_OFFSET,
     LOGO_RANGE_END,
     LOGO_RANGE_START,
