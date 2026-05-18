@@ -8,14 +8,13 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-18, post-#565 + #566 merge, brief 146 queued
-(cloud patcher-fix). Brain back on Windows after the long Mac stretch
-that ran briefs 087 → 145. **🎉 SHA1 FINAL GATE PASSES** across all 3
-regions as of brief 140 (PR #558) — the project's original goal is
-achieved. Current wavefront is **post-SHA1 polish** (cluster work +
-patcher generalisation + Pattern 3 tooling) — work that doesn't move
-SHA1 (it's already green) but improves byte-coverage discipline and
-makes future ROM-rebuild contributions safer.
+**Last updated:** 2026-05-18 evening, post-#569 + #570 merge, briefs
+147 + 148 queued. Brain on Windows. **🎉 SHA1 FINAL GATE PASSES**
+across all 3 regions as of brief 140 (PR #558) — the project's
+original goal is achieved. Current wavefront is **post-SHA1 polish**
+(cluster work + patcher generalisation + Pattern 3 tooling) — work
+that doesn't move SHA1 (it's already green) but improves byte-coverage
+discipline and makes future ROM-rebuild contributions safer.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -54,58 +53,74 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges
 
-- **PR #565 — cloud / brief 144** (Pattern 3 generator extern emission
-  fix). Closes long-standing generator gap surfaced in briefs 135 +
-  139: `tools/cluster_c_pattern3_gen.py` now emits `.extern` decls
-  automatically for every `.word <name>` reference not locally defined.
-  Removes per-chunk hand-edits (1-5 externs were manually added on
-  every Pattern 3 wave to date — 14 chunks). +12 tests
-  (`TestCollectExternalRefs` + `TestGenerateChunkExternEmission`),
-  1770/1770 suite. 3-region `ninja sha1` PASS preserved.
-- **PR #566 — decomper / brief 145 (BLOCKED writeup)**. Decomper
-  hit a residual bug in brief 142's patcher generalisation:
-  `_fix_ctor_and_pad` still assumes a fixed 16-byte input shape, but
-  at `n < 86` mwldarm emits only 12 bytes (no `WRITEW(0)`
-  terminator). Patcher over-reads by 4 bytes → output is 4 bytes
-  short → SHA1 fails. **0 source-level claims shipped.** Decomper
-  filed [`docs/research/ov004-rodata-patcher-blocker.md`](research/ov004-rodata-patcher-blocker.md)
-  with the diagnostic, math, and recommended fix shape. Baseline
-  preserved (EUR `ninja sha1` PASS); no broken source-side changes
-  shipped. Correct way to handle a blocker — characterise + file
-  research note + don't break SHA1.
+- **PR #569 — decomper / brief 143 cluster B wave 2.** 114 true
+  scalars in main `.data`, 100% yield, 456 bytes drained. Self-
+  extend authorisation from wave 1 cleared trivially. 3-region
+  `ninja sha1` PASS preserved + 3-region 27/27 modules OK. Cluster
+  B true scalars effectively drained at size=4 W6-eligible; ~35-50
+  candidates remain in size-1/2 + pointer + W6-rejected sub-pools
+  (gating dependency: brief 148 below).
+- **PR #570 — cloud / brief 146 patcher ctor-terminator detection.**
+  Fixes the residual bug in `tools/patch_ov004_veneers.py` that
+  blocked brief 145. Two-path `_fix_ctor_and_pad`: WITH_TERMINATOR
+  (n=86, +8 net, preserves historical SHA1 PASS bit-for-bit) and
+  NO_TERMINATOR (0 < n < 86, +12 net, new). **Notable: cloud
+  empirically corrected the brief's recommended discriminator
+  byte offset** — brief said bytes 4-7, but those are zero in both
+  cases; cloud used bytes 12-15 where the `.LZN` data marker
+  differs from zero pad. Pinned with a dedicated test. Unblocks
+  ov004 `.rodata` source-level work.
+- **PR #567 (earlier today) — brain / brief 146 doc + state.md
+  refresh post-SHA1.** Caught state.md up from brief 086 (where
+  Windows brain left off in the previous session) to current main.
+- **PR #568 (earlier today) — brain / worktree docs fix.** AGENTS.md
+  + state.md now document both worktree mechanisms (Mac manual
+  sibling worktrees vs Windows Claude Code automatic sandboxes).
+- **PR #565 (earlier today) — cloud / brief 144 Pattern 3 generator
+  extern emission fix.** Removes per-chunk hand-edits for every
+  future Pattern 3 wave (14 chunks shipped to date had manual
+  `.extern` lines). 1770/1770 tests post-merge.
+- **PR #566 (earlier today) — decomper / brief 145 BLOCKED writeup.**
+  Diagnosed the patcher bug brief 146 now fixes. No source-side
+  changes shipped (correct discipline — characterise + file
+  research note + don't break SHA1).
 
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Cloud — one HIGH brief queued:**
+**Decomper — one HIGH brief queued (now unblocked):**
 
-- **Brief 146 (HIGH, NEW)** — `cloud/patcher-ctor-terminator-detection`.
-  Fix the residual bug in `tools/patch_ov004_veneers.py` that brief
-  145 surfaced. Two-part: detect ctor terminator presence (bytes 4-7
-  of post-splice ctor region == zero → 16-byte shape; non-zero → 12-byte
-  shape); set `fix_end` accordingly. Update
-  `expected_output_delta_for(n)` for variable net delta. Tests pin
-  output size + first-100-byte hash for `n ∈ {86, 9, 0}`. Critical:
-  3-region SHA1 PASS must hold for both n=86 (historical case) AND
-  n<86 (new case with one representative ov004 `.rodata` claim).
+- **Brief 147 (HIGH, NEW)** — `decomper/ov004-rodata-cluster-wave-retry`.
+  Retry of brief 145, now unblocked by brief 146. Ship ≥ 20 ov004
+  `.rodata` cluster claims across Pattern 1 .c, Pattern 1 .s, and
+  Pattern 3 chunks (via brief 125 generator + brief 144's auto-
+  `.extern` emission). All three reproducer shapes decomper used to
+  diagnose brief 145's bug should now ship clean. Self-extend gate
+  unchanged (≥40% yield + ≥250 B).
 
-**Decomper — parked:**
+**Cloud — one MEDIUM brief queued (research):**
 
-- **Brief 147 (HIGH, QUEUED — gated on brief 146)** — retry of brief
-  145. Ship ≥ 20 ov004 `.rodata` cluster claims (Pattern 1 .c +
-  Pattern 1 .s + Pattern 3 chunks via brief 125 generator). Brain
-  scopes the full brief once brief 146 lands.
+- **Brief 148 (MEDIUM, NEW)** — `cloud/cluster-b-pointer-typedef-research`.
+  Survey cluster B's remaining ~10-20 pointer slots, classify the
+  pointee for each, choose a recipe (probably typed-pointer `.c` or
+  `.word <name>` in `.s`), and ship 1-3 worked examples with 3-region
+  SHA1 PASS to validate. Optional cheap side: spot-check `unsigned
+  char` / `unsigned short` recipes for the ~14 size-1/2 candidates.
+  Unblocks cluster B wave 3 (which would be **brief 149 (decomper)**,
+  scoped after this lands).
 
 ## Active clusters (post-SHA1 polish wavefront)
 
 - **Cluster A** — `.rodata` (briefs 132 → 139 main run, then post-SHA1
   follow-up via 141). Largely drained.
-- **Cluster B** — 60 true scalars opened in brief 143 (PR #561); wave 1
-  done. Wave 2/3 self-extends pending decomper next slot.
+- **Cluster B** — main `.data`. **True scalars drained** after brief
+  143 wave 2 (cumulative 174 claims / 696 bytes). ~35-50 candidates
+  remain in size-1/2 + pointer + W6-rejected sub-pools, gated on
+  brief 148 cloud recipe research.
 - **Cluster C / D-1 / D-2** — ov004 sub-clusters (brief 141 sweep). 31
-  symbols. Ready for source-level claims once brief 146 fixes the
-  patcher.
+  symbols. **NOW UNBLOCKED** by brief 146; brief 147 is the wave
+  that ships them.
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
   via the variable-veneer-count patcher post-146.
 
@@ -148,22 +163,26 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge cloud brief 146 PR** when it opens. Gate:
-   3-region `ninja sha1` PASS for n=86 historical case AND n<86 new
-   case (decomper's research note has the reproducer). Watch for any
-   regression of the 1770+ test suite.
-2. **Scope brief 147** (decomper retry of brief 145) once 146 lands.
-   Same target as 145 (≥ 20 ov004 `.rodata` cluster claims) but now
-   with a working patcher. Decomper's PR #566 body lists three
-   confirmed reproducer shapes (Pattern 1 .c, Pattern 1 .s, Pattern 3
-   chunk) — all should now ship cleanly.
-3. **Watch for any new wall hypotheses** in upcoming wave PRs.
+1. **Verify + merge decomper brief 147 PR** when it opens. Gate:
+   3-region `ninja sha1` PASS + 3-region 27/27 modules OK. ≥ 20 ov004
+   `.rodata` claims expected; mix of Pattern 1 .c, Pattern 1 .s, and
+   Pattern 3 chunks (via brief 144's now-turnkey generator).
+2. **Verify + merge cloud brief 148 PR** when it opens. Smaller gate:
+   3-region SHA1 PASS on the 1-3 worked-example claims + new research
+   note markdownlint clean. Watch the recipe choice — if cloud picks
+   `.word <name>` in `.s` (cluster A precedent), confirm it works
+   cleanly in `.data` context too.
+3. **Scope brief 149 (decomper cluster B wave 3)** once brief 148
+   lands. Apply cloud's recipe to the remaining ~10-20 pointer
+   candidates + ~14 size-1/2 scalars. Likely splittable into two
+   waves if the recipes differ.
+4. **Watch for any new wall hypotheses** in upcoming wave PRs.
    Standing rule since brief 084's "3 walls not 1" methodology
    lesson: pre-empt symptom-vs-mechanism classification by requesting
    a cloud codegen-sweep brief before any wall gets a P-N or C-N
    number. C-23 candidate (MMIO register-base folding) from brief 086
-   was the last one of these; nothing new in the recent waves.
-4. **Pre-existing carryovers (unchanged):**
+   remains pending cloud sweep classification.
+5. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection check.
