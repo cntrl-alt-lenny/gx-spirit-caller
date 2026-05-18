@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**60 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**61 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (15)
-- [Uncategorised](#uncategorised) (1)
+- [Uncategorised](#uncategorised) (2)
 
 ## Analysis / worklist
 
@@ -406,4 +406,10 @@ _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CAT
 **generator for brief 119 cluster C Pattern 3.**
 
 Brief 119 identified 3 patterns for cluster C `.rodata` symbol carving:
+
+### `tools/strip_overlay_func_collisions.py`
+
+**patch ELF .o files to break the**
+
+mwldarm overlay-swap-blind veneer-generation cascade (brief 132).
 

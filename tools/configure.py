@@ -428,6 +428,19 @@ def main():
         # cross-platform (ninja's `find | xargs` breaks on Windows
         # cmd.exe).
         patch_align = "tools/patch_section_align.py"
+        # NOTE: brief 132 added `tools/strip_overlay_func_collisions.py`
+        # for symbol-collision research, but it is NOT wired into
+        # this rule because empirical testing showed mwldarm 2.0/sp1p5
+        # ignores both `STT_FUNC` symbol type and `SHF_EXECINSTR`
+        # section flag when deciding to emit interwork veneers. The
+        # tool is kept as a standalone research utility — invoke
+        # manually via `python tools/strip_overlay_func_collisions.py
+        # --config-dir config/<ver>/arm9 --delinks-dir build/<ver>/delinks`
+        # to enumerate collisions (783 ov002 FUNCs in ov004's
+        # .rodata VA range). See
+        # docs/research/ov004-thunk-section-fix.md (Phase 2 section)
+        # for the full investigation log and brief 133+ candidate
+        # plans (post-link binary patching).
         n.rule(
             name="delink",
             command=_wrap_chain_for_windows(
