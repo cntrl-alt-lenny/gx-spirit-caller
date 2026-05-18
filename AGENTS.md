@@ -313,24 +313,45 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](docs/briefs/136-usa-jpn-main-2byte-fix.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): **🔑 3-region
-  27/27 unlock.** USA + JPN main fails by exactly 2
-  bytes at file 0x89ac0 / 0x89b10 — BL offset
-  displacement (0xf4 = 244 byte). Function-tier
-  decomp gap; ~30 min to a few hours. Brief 134 left
-  this as out-of-scope follow-up. Branch:
-  `decomper/usa-jpn-main-2byte-fix`.
+- [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
+  — `cloud` (HIGH, **NOW ACTIVE**): **🔑 99.995% SHA1
+  gap closure.** `tools/clean_macos_junk.py` filters
+  `.DS_Store` / `._*` / `Thumbs.db` / `desktop.ini`
+  from `extract/<region>/files/` before `dsd rom
+  build`. EUR ROM diff drops 100,805 → 5 bytes.
+  Branch: `cloud/clean-macos-junk-filter`.
 
-- [`docs/briefs/137-sha1-gap-scoping.md`](docs/briefs/137-sha1-gap-scoping.md)
-  — `cloud` (HIGH): **🔑 SHA1-gap scoping.** EUR 27/27
-  modules but `ninja sha1` still fails. Bytes outside
-  dsd's module-checksum coverage. Bisect ROM-level
-  diffs (header / overlay table / FAT / banner /
-  padding), categorize, output brief 138+ plan.
-  Branch: `cloud/sha1-gap-scoping`.
+- [`docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md`](docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md)
+  — `decomper` (HIGH): two-part parallel-track. (1)
+  Cluster A wave 4 (100-300 of ~441 remaining in
+  small overlays). (2) Cluster C Pattern 3 wave 2
+  (5-10 of ~17 remaining main `.rodata` chunks via
+  brief 125 generator). Branch:
+  `decomper/cluster-a-wave-4-pattern3-wave-2`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](docs/briefs/136-usa-jpn-main-2byte-fix.md)
+  `decomper`, shipped in PR #551. **🎉🎉 3-REGION
+  27/27 MODULE BASELINE.** Root cause was duplicate
+  symbol `func_02094d18` across two real functions
+  in USA/JPN (brief 069 cross-region porter used EUR
+  address). Canonical SDK naming
+  (`SNDi_SetTrackParam`) at each region's correct
+  address breaks the duplicate. 4 symbols.txt edits
+  + 2 source extern renames. EUR preserved 27/27;
+  USA + JPN flipped 26/27 → 27/27.
+- [`docs/briefs/137-sha1-gap-scoping.md`](docs/briefs/137-sha1-gap-scoping.md)
+  `cloud`, shipped in PR #552. **🔑 99.995% of SHA1
+  gap is `.DS_Store` macOS metadata leakage.** EUR
+  diff 100,805 → 5 bytes after filter. Bisection
+  table per region with per-structure attribution.
+  Post-fix residue: 4 bytes ROM-header CRC16 + 1 byte
+  ov4 ram_size off-by-1024 (brief 134 patcher bug in
+  idempotent path). 3-brief unlock plan: brief 138
+  (filter) + brief 139 cloud-side patcher fix
+  + brief 140 (CRC16) = SHA1 PASS. Zero new toolchain
+  walls (W8+ candidates absent).
 
 - [`docs/briefs/134-ov004-binary-patch-phase3.md`](docs/briefs/134-ov004-binary-patch-phase3.md)
   `cloud`, shipped in PR #549. **🎉 26/27 BASELINE
