@@ -170,13 +170,29 @@ VENEER_SIZE = 12
 #   - a documentation anchor for the brief 134 baseline
 HISTORICAL_MAX_VENEER_COUNT = 86
 
-# Brief 142: the .ctor + pad cascade fix always recovers exactly
-# 8 bytes net regardless of veneer count. The linker LCF emits
-# `WRITEW(0)` after every overlay's .ctor (per-overlay-
-# unconditional, independent of the veneer pool), so `_fix_ctor_
-# and_pad` always replaces [built ctor=8 + pad=8] = 16 bytes with
-# [orig ctor=4 + 20B zero pad] = 24 bytes → +8 net.
-CTOR_PAD_FIX_NET_BYTES = 8
+# Brief 142 + 146: the .ctor + pad cascade fix recovers either 8
+# or 12 bytes net depending on whether mwldarm emitted the
+# `WRITEW(0)` terminator after the real .ctor entry.
+#
+# - Historical (n == HISTORICAL_MAX_VENEER_COUNT = 86): mwldarm
+#   emits [.ctor (4) + WRITEW(0) (4) + pad (8)] = 16 bytes. The
+#   fix replaces those 16 with [.ctor[0:4] + 20-byte zero pad]
+#   = 24 bytes → +8 net. This was brief 142's
+#   `CTOR_PAD_FIX_NET_BYTES = 8` constant.
+#
+# - Generic (n < 86, surfaced by brief 145 / PR #566): mwldarm
+#   emits [.ctor (4) + pad (8)] = 12 bytes (no terminator). The
+#   fix replaces those 12 with the same 24 → +12 net.
+#
+# Brief 146 detects the shape from the post-splice bytes at the
+# ctor file offset (see `_fix_ctor_and_pad`) and chooses the
+# right `fix_end` and net delta accordingly.
+CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR = 8
+CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR = 12
+# Brief 142 alias retained so existing tests that pinned the
+# +8 invariant against the historical-max case keep their
+# named-import contract.
+CTOR_PAD_FIX_NET_BYTES = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
 
 
 class PatchError(Exception):
@@ -189,17 +205,34 @@ def expected_output_delta_for(veneer_count: int) -> int:
 
     - `veneer_count == 0` → returns 0 (the patcher is a no-op; the
       binary is already orig-shape and no ctor/pad fix is applied).
-    - `veneer_count >= 1` → returns
-      `veneer_count * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES`
-      (= bytes spliced out minus bytes recovered by the ctor/pad
-      fix).
+    - `veneer_count == HISTORICAL_MAX_VENEER_COUNT` (== 86) →
+      `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR`
+      (= `86 * 12 - 8 = 1024`). Brief 142 historical case.
+    - `0 < veneer_count < HISTORICAL_MAX_VENEER_COUNT` →
+      `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`
+      (= `n * 12 - 12`). Brief 146 generic case: mwldarm drops the
+      `WRITEW(0)` terminator after .ctor when fewer overlays /
+      veneers force the layout pass, so the ctor/pad cluster is
+      12 bytes instead of 16.
 
-    Reduces to the brief 134 hard-coded constant for the historical
-    maximum: `86 * 12 - 8 = 1024`.
+    The n == 86 → +8 vs n < 86 → +12 boundary matches the empirical
+    observation in [`ov004-rodata-patcher-blocker.md`](../docs/research/ov004-rodata-patcher-blocker.md);
+    `_fix_ctor_and_pad` byte-detects the actual cluster shape at
+    patch time, while this helper provides the same answer derived
+    from `n` alone (used by `main()` to drive the YAML
+    `code_size` rewrite).
     """
     if veneer_count <= 0:
         return 0
-    return veneer_count * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES
+    if veneer_count >= HISTORICAL_MAX_VENEER_COUNT:
+        return (
+            veneer_count * VENEER_SIZE
+            - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
+        )
+    return (
+        veneer_count * VENEER_SIZE
+        - CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR
+    )
 
 
 def _scan_veneer_pool(data: bytes) -> tuple[int, list[tuple[int, int]]]:
@@ -283,25 +316,80 @@ def _splice_veneer_pool(
 
 def _fix_ctor_and_pad(
     data: bytearray, ctor_file_offset: int,
-) -> bytearray:
+) -> tuple[bytearray, int]:
     """After splice, replace the cluster of [.ctor + pad] at the
     post-splice file range with [orig .ctor first 4 bytes] +
-    [20 zero pad bytes]. Adds 8 bytes net.
+    [20 zero pad bytes].
+
+    Returns `(fixed_data, ctor_pad_net_bytes)` — the net bytes the
+    fix adds (either `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR` = 8
+    or `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR` = 12, depending on
+    the input cluster shape).
+
+    Brief 146 shape detection
+    -------------------------
+
+    mwldarm's ctor/pad cluster varies with the veneer count:
+
+    - n == 86 (historical): `[ctor (4) | WRITEW(0) (4) | pad (8)]`
+      = 16 bytes. `fix_end = ctor_file_offset + 16`, net = +8.
+    - n < 86 (generic, brief 145 / PR #566 finding): `[ctor (4) |
+      pad (8)]` = 12 bytes (no terminator). `fix_end =
+      ctor_file_offset + 12`, net = +12.
+
+    Discriminator — bytes 12-15 of the post-splice cluster region
+    (i.e. `data[ctor_file_offset + 12 : ctor_file_offset + 16]`):
+
+    - All zero → 16-byte cluster (we're still inside the 8-byte
+      pad; terminator was present).
+    - Any non-zero → 12-byte cluster (we've already entered the
+      shifted-forward `.data` section; no terminator).
+
+    Why bytes 12-15 (not bytes 4-7 as the brief / research-note
+    text suggests): at both shapes the bytes at offsets 4-11 are
+    zero — at n == 86 they are [WRITEW(0) (4) | pad-first-half (4)]
+    (all zeros), and at n < 86 they are the [pad (8)] (also all
+    zeros). The first 4 bytes that DIFFER between the two shapes
+    sit at offsets 12-15: at n == 86 they are the last 4 bytes of
+    the 8-byte pad (zeros), at n < 86 they are the first 4 bytes
+    of `.data` (non-zero — ".LZN" for ov004 EUR/USA/JPN per
+    [`ov004-rodata-patcher-blocker.md`](../docs/research/ov004-rodata-patcher-blocker.md)).
+    The brief's "bytes 4-7" wording was a small offset error in the
+    research note; this implementation uses the offset that actually
+    discriminates. Brain to confirm against real binaries on smoke
+    test; if `.data` content ever starts with a 4-byte-zero word
+    the discriminator would mis-classify and we'd need to fall
+    back to `n`-based shape inference (already encoded in
+    `expected_output_delta_for`).
 
     `ctor_file_offset` is the file offset of the post-splice .ctor
     (typically the orig .ctor's file offset — derived from
-    delinks.txt's `.ctor start:` minus the module base VA)."""
-    fix_end = ctor_file_offset + 16  # 8-byte built ctor + 8-byte pad
+    delinks.txt's `.ctor start:` minus the module base VA).
+    """
+    discriminator = bytes(
+        data[ctor_file_offset + 12 : ctor_file_offset + 16]
+    )
+    terminator_present = discriminator == b"\x00\x00\x00\x00"
+    if terminator_present:
+        # 16-byte cluster: [ctor (4) | WRITEW(0) (4) | pad (8)].
+        fix_end = ctor_file_offset + 16
+        net = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
+    else:
+        # 12-byte cluster: [ctor (4) | pad (8)]. Bytes 12-15 are
+        # the first 4 bytes of `.data` (already shifted forward).
+        fix_end = ctor_file_offset + 12
+        net = CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR
     ctor_first_4 = bytes(
         data[ctor_file_offset:ctor_file_offset + 4]
     )
     pad_20 = b"\x00" * 0x14
-    return (
+    fixed = (
         bytearray(data[:ctor_file_offset])
         + bytearray(ctor_first_4)
         + bytearray(pad_20)
         + bytearray(data[fix_end:])
     )
+    return fixed, net
 
 
 _RELOC_RE = re.compile(
@@ -471,6 +559,7 @@ def patch_ov004(
         return bytearray(data), {
             "veneers_spliced": 0,
             "ctor_pad_fixed": 0,
+            "ctor_pad_net": 0,
             "load_rewrites": 0,
             "bl_reencodes": 0,
             "already_patched": 1,
@@ -483,14 +572,37 @@ def patch_ov004(
     spliced = _splice_veneer_pool(
         bytearray(data), pool_start, veneer_count,
     )
-    fixed = _fix_ctor_and_pad(spliced, ctor_file_offset)
-    delta = expected_output_delta_for(veneer_count)
-    expected_output_size = len(data) - delta
+    # Brief 146: _fix_ctor_and_pad now byte-detects the ctor/pad
+    # cluster shape (16-byte WITH terminator at n=86, 12-byte
+    # WITHOUT terminator at n<86) and returns the actual net
+    # bytes added so the size validation can match either shape.
+    fixed, ctor_pad_net = _fix_ctor_and_pad(spliced, ctor_file_offset)
+    splice_delta = veneer_count * VENEER_SIZE
+    expected_output_size = len(data) - splice_delta + ctor_pad_net
     if len(fixed) != expected_output_size:
         raise PatchError(
             f"post-fix size {len(fixed)} != expected "
             f"{expected_output_size} (input {len(data)} - "
-            f"{delta}; veneer_count={veneer_count})"
+            f"{splice_delta} + {ctor_pad_net}; "
+            f"veneer_count={veneer_count})"
+        )
+    # Brief 146 sanity check: confirm the byte-detected shape
+    # matches the n-based inference. They should always agree —
+    # disagreement means either the discriminator misfired (e.g.
+    # `.data` started with a zero word) or mwldarm changed its
+    # emission pattern. Raise loudly rather than silently produce
+    # the wrong size.
+    inferred_delta = expected_output_delta_for(veneer_count)
+    actual_delta = splice_delta - ctor_pad_net
+    if inferred_delta != actual_delta:
+        raise PatchError(
+            f"ctor/pad shape mismatch: byte-detected net "
+            f"{ctor_pad_net} (actual delta {actual_delta}) "
+            f"disagrees with n-based inference (delta "
+            f"{inferred_delta}) for veneer_count={veneer_count}. "
+            f"Either the .data discriminator at bytes 12-15 "
+            f"misfired, or mwldarm's ctor emission rule "
+            f"changed. Investigate before re-running."
         )
 
     load_rewrites = _apply_load_rewrites(fixed, relocs, base_va)
@@ -501,6 +613,7 @@ def patch_ov004(
     return fixed, {
         "veneers_spliced": len(veneers),
         "ctor_pad_fixed": 1,
+        "ctor_pad_net": ctor_pad_net,
         "load_rewrites": load_rewrites,
         "bl_reencodes": bl_reencodes,
         "already_patched": 0,
