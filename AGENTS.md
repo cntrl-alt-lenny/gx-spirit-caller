@@ -313,27 +313,48 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/134-ov004-binary-patch-phase3.md`](docs/briefs/134-ov004-binary-patch-phase3.md)
-  — `cloud` (HIGH, **NOW ACTIVE**): **🔑 26/27 unlock
-  attempt #3.** Per brief 132's recommendation: post-
-  link binary patching of `arm9_ov004.bin`. Splice
-  1024-byte veneer pool, rewrite 158 `.rodata`
-  pointers, un-shift downstream `.data`/`.bss` by
-  0x400. Algorithm deterministic; false-positive
-  risk mitigated via `relocs.txt` intersection.
-  Branch: `cloud/ov004-binary-patch-phase3`.
+- [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](docs/briefs/136-usa-jpn-main-2byte-fix.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): **🔑 3-region
+  27/27 unlock.** USA + JPN main fails by exactly 2
+  bytes at file 0x89ac0 / 0x89b10 — BL offset
+  displacement (0xf4 = 244 byte). Function-tier
+  decomp gap; ~30 min to a few hours. Brief 134 left
+  this as out-of-scope follow-up. Branch:
+  `decomper/usa-jpn-main-2byte-fix`.
 
-- [`docs/briefs/135-cluster-d2-pattern3-wave-1.md`](docs/briefs/135-cluster-d2-pattern3-wave-1.md)
-  — `decomper` (HIGH): two-part parallel-track. (1)
-  Cluster D-2 wave 2 (10-15 of ~25-35 remaining
-  scalar arrays, strict-4-aligned per brief 126
-  refinement). (2) Cluster C Pattern 3 wave 1 (5-10
-  chunks via brief 125's generator from ~50-90
-  residue candidates Patterns 1+2 can't reach).
-  ov004 still skipped pending brief 134. Branch:
-  `decomper/cluster-d2-pattern3-wave-1`.
+- [`docs/briefs/137-sha1-gap-scoping.md`](docs/briefs/137-sha1-gap-scoping.md)
+  — `cloud` (HIGH): **🔑 SHA1-gap scoping.** EUR 27/27
+  modules but `ninja sha1` still fails. Bytes outside
+  dsd's module-checksum coverage. Bisect ROM-level
+  diffs (header / overlay table / FAT / banner /
+  padding), categorize, output brief 138+ plan.
+  Branch: `cloud/sha1-gap-scoping`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/134-ov004-binary-patch-phase3.md`](docs/briefs/134-ov004-binary-patch-phase3.md)
+  `cloud`, shipped in PR #549. **🎉 26/27 BASELINE
+  UNLOCKED: EUR 27/27 + USA 26/27 + JPN 26/27.**
+  First multi-region module-baseline milestone of the
+  session. 2 new tools wired into the build pipeline:
+  `tools/patch_ov004_veneers.py` (region-portable
+  veneer splicer + cascade fixer + reloc whitelist
+  pointer rewriter + ARM BL re-encoder) and
+  `tools/patch_module_literals.py` (generic post-link
+  literal rewriter). Both idempotent. **W7 wall FULLY
+  MITIGATED** via Phase 3b post-link binary patch.
+  18 new tests; 1708 total. SHA1 still fails for EUR
+  (bytes outside dsd module coverage — brief 137
+  scoping). USA/JPN main 2-byte residue (BL offset
+  0xf4 displacement) is brief 136 candidate.
+- [`docs/briefs/135-cluster-d2-pattern3-wave-1.md`](docs/briefs/135-cluster-d2-pattern3-wave-1.md)
+  `decomper`, shipped in PR #548. **26 effective
+  candidates** (19 D-2 + 7 Pattern 3 chunks). Self-
+  extend on both axes. D-2 sub-pool ~60-75% drained
+  (26/30-40 total). Pattern 3 generator validated at
+  scale across 7 main `.rodata` chunks. Generator
+  gap: `.word <name>` needs manual `.extern`
+  declarations (brief 137+ generator fix candidate).
 
 - [`docs/briefs/132-ov004-symbol-scoping-phase2.md`](docs/briefs/132-ov004-symbol-scoping-phase2.md)
   `cloud`, shipped in PR #546. **NO BASELINE FLIP;
