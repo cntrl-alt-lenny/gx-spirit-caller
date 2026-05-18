@@ -313,32 +313,61 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
-  — `cloud` (HIGH, **NOW ACTIVE**): **🎉 SHA1 FINAL
-  GATE.** Two parts, single PR. (1) Patcher off-by-
-  1024 fix — brief 134's `patch_ov004_veneers.py`
-  computes `expected_output_size` before the
-  already-patched check; closes the 1-byte ov4
-  `ram_size` diff. (2) ROM-header CRC16 — `tools/
-  patch_rom_header_crc.py` computes the standard NDS
-  CRC16 (poly `x^16+x^15+x^2+1`, init `0xFFFF`) over
-  `0xC0..0x15C` and `0x00..0x15D`, writes to ROM
-  `0x6C` and `0x15E`. Closes the 4 remaining bytes.
-  **End-to-end gate: `ninja sha1` PASSES for EUR /
-  USA / JPN.** Branch: `cloud/sha1-final-gate`.
+- [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise
+  `tools/patch_ov004_veneers.py` to accept variable
+  veneer counts (`n ∈ [0, 86]`). Brief 141 surfaced
+  the hard-coded `EXPECTED_VENEER_COUNT = 86` as a
+  blocker for ov004 `.rodata` cluster work —
+  source-level `.rodata` claims suppress mwldarm
+  veneer emission. Parameterise the cascade math on
+  the observed count. Critical: 3-region `ninja sha1`
+  PASS must be preserved. Branch:
+  `cloud/patch-veneers-variable-count`.
 
-- [`docs/briefs/141-ov004-cluster-sweep.md`](docs/briefs/141-ov004-cluster-sweep.md)
-  — `decomper` (HIGH): parallel-track multi-cluster
-  sweep of ov004 — now-accessible post brief 134's
-  binary patcher (W7 mitigation). Cluster C
-  (Pattern 1 `.rodata` chunks) + cluster D-1
-  (dispatch tables) + cluster D-2 (scalar arrays) +
-  optional Pattern 3. Target ≥ 25 symbols. Critical
-  verify: ov004 stays OK across all 3 regions.
-  Branch: `decomper/ov004-cluster-sweep`.
+- [`docs/briefs/143-cluster-b-wave-1.md`](docs/briefs/143-cluster-b-wave-1.md)
+  — `decomper` (MEDIUM): open cluster B — the last
+  unopened data-tier cluster. Brief 117 + brief 123
+  v3 refined sub-pool to **81 true scalars** (single
+  `unsigned int` / signed int / byte-width literals
+  in `.data`). Easiest decomp shape:
+  `unsigned int data_<addr> = 0x<value>;`. Target ≥
+  30 symbols, 2-4 modules per wave. Critical:
+  3-region 27/27 + `ninja sha1` PASS preserved.
+  Branch: `decomper/cluster-b-wave-1`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
+  `cloud`, shipped in PR #558. **🎉🎉🎉 `ninja sha1`
+  PASSES FOR EUR + USA + JPN.** First byte-identical
+  ROM rebuild in project history. Two parts, single
+  PR. Part 1: `expected_output_size_for(data, *,
+  already_patched)` helper extracted from
+  `patch_ov004_veneers.py`; branches on the existing
+  already-patched signal. Closes the 1-byte ov4
+  ram_size diff. Part 2: new
+  `tools/patch_rom_header_crc.py` — standard NDS
+  CRC16 + secure-area-CRC orig-copy shortcut.
+  **Brief-spec correction discovered**: 0x6C is the
+  Secure Area CRC16 (not Nintendo Logo); 0x15C is the
+  logo CRC and dsd already writes `0xCF56` correctly.
+  Secure-area CRC is COPIED from orig (computing
+  would require Blowfish-NDS cipher; built secure
+  area is byte-identical to orig). 15 new tests
+  (3 patcher + 12 CRC); total 1742. Brain pushed F401
+  unused-import fix.
+- [`docs/briefs/141-ov004-cluster-sweep.md`](docs/briefs/141-ov004-cluster-sweep.md)
+  `decomper`, shipped in PR #557. **31 symbols across
+  cluster C + D-1 + D-2.** First production ov004
+  cluster work post-W7 unlock. **New empirical W7
+  invariant**: source-level `.rodata` claims suppress
+  mwldarm veneer emission (86 → 9 with 2 .rodata
+  claims). Part 4 (Pattern 3 on `.rodata`) skipped to
+  preserve brief 134's 86-veneer assertion. ov004
+  D-1 + D-2 pools exhausted; cluster C `.data`
+  partial (25/92 strict-aligned drained). Brief 142
+  generalises the patcher to unlock .rodata work.
 - [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
   `cloud`, shipped in PR #555. **🔑 99.995% SHA1-gap
   closure shipped.** `tools/clean_macos_junk.py`
