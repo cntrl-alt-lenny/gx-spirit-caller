@@ -313,24 +313,53 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
-  — `cloud` (HIGH, **NOW ACTIVE**): **🔑 99.995% SHA1
-  gap closure.** `tools/clean_macos_junk.py` filters
-  `.DS_Store` / `._*` / `Thumbs.db` / `desktop.ini`
-  from `extract/<region>/files/` before `dsd rom
-  build`. EUR ROM diff drops 100,805 → 5 bytes.
-  Branch: `cloud/clean-macos-junk-filter`.
+- [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
+  — `cloud` (HIGH, **NOW ACTIVE**): **🎉 SHA1 FINAL
+  GATE.** Two parts, single PR. (1) Patcher off-by-
+  1024 fix — brief 134's `patch_ov004_veneers.py`
+  computes `expected_output_size` before the
+  already-patched check; closes the 1-byte ov4
+  `ram_size` diff. (2) ROM-header CRC16 — `tools/
+  patch_rom_header_crc.py` computes the standard NDS
+  CRC16 (poly `x^16+x^15+x^2+1`, init `0xFFFF`) over
+  `0xC0..0x15C` and `0x00..0x15D`, writes to ROM
+  `0x6C` and `0x15E`. Closes the 4 remaining bytes.
+  **End-to-end gate: `ninja sha1` PASSES for EUR /
+  USA / JPN.** Branch: `cloud/sha1-final-gate`.
 
-- [`docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md`](docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md)
-  — `decomper` (HIGH): two-part parallel-track. (1)
-  Cluster A wave 4 (100-300 of ~441 remaining in
-  small overlays). (2) Cluster C Pattern 3 wave 2
-  (5-10 of ~17 remaining main `.rodata` chunks via
-  brief 125 generator). Branch:
-  `decomper/cluster-a-wave-4-pattern3-wave-2`.
+- [`docs/briefs/141-ov004-cluster-sweep.md`](docs/briefs/141-ov004-cluster-sweep.md)
+  — `decomper` (HIGH): parallel-track multi-cluster
+  sweep of ov004 — now-accessible post brief 134's
+  binary patcher (W7 mitigation). Cluster C
+  (Pattern 1 `.rodata` chunks) + cluster D-1
+  (dispatch tables) + cluster D-2 (scalar arrays) +
+  optional Pattern 3. Target ≥ 25 symbols. Critical
+  verify: ov004 stays OK across all 3 regions.
+  Branch: `decomper/ov004-cluster-sweep`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
+  `cloud`, shipped in PR #555. **🔑 99.995% SHA1-gap
+  closure shipped.** `tools/clean_macos_junk.py`
+  removes `.DS_Store` / `._*` / `Thumbs.db` /
+  `desktop.ini` from a tree (`--include-dirs`
+  optional). Wired as standalone `cleanup_macos_junk`
+  ninja rule with phony driver + stamp +
+  `restat=True`. 19 unit tests. **3-region ROM diff
+  drops to exactly 5 bytes** (verified locally on
+  combined main: EUR + USA + JPN identical shape).
+  Brain pushed F401 unused-`os`-import fix.
+- [`docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md`](docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md)
+  `decomper`, shipped in PR #554. **305 effective
+  candidates** (target was ≥ 105; self-extend
+  exercised). Part 1: 298 .bss symbols across 17
+  small overlays — drains cluster A in one wave to
+  **~91% (1443 / 1586)**. Part 2: 7 Pattern 3 main
+  `.rodata` chunks (1048 bytes / 25 syms). Generator
+  gap exercised (`.word <name>` manual `.extern`).
+  Pre-existing Pattern 1 TUs removed where chunks
+  now cover them. 3-region 27/27 preserved.
 - [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](docs/briefs/136-usa-jpn-main-2byte-fix.md)
   `decomper`, shipped in PR #551. **🎉🎉 3-REGION
   27/27 MODULE BASELINE.** Root cause was duplicate
