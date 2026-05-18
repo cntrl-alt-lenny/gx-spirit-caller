@@ -121,9 +121,9 @@ into one cloud PR; on merge → `ninja sha1` PASSES.
   YAML-only second invocation; detect already-patched
   state and skip the delta subtraction. Closes the 1
   byte at ROM file `0x8b30a` (ov4 ram_size). **Part
-  2**: implement standard NDS CRC16 (poly `x^16 + x^15
-  + x^2 + 1`, init `0xFFFF`) over header `0xC0..0x15C`
-  (logo) and `0x00..0x15D` (header). Write to ROM
+  2**: implement standard NDS CRC16 (poly `x^16+x^15+x^2+1`,
+  init `0xFFFF`) over header `0xC0..0x15C` (logo) and
+  `0x00..0x15D` (header). Write to ROM
   offsets `0x6C` and `0x15E`. Wire as a post-rom_build
   ninja rule (`rom_header_crc`) modeled on brief 138's
   `cleanup_macos_junk` integration. Closes the
