@@ -28,6 +28,27 @@ Byte-pattern selection per symbol (in priority order):
   2. 4-byte value that resolves to a known symbol → `.word <name>`
   3. otherwise → `.byte 0xNN, 0xNN, ...`
 
+External-reference handling (brief 144)
+---------------------------------------
+
+For every `.word <name>` reference the generator emits, `<name>`
+must be visible to the assembler. Two cases:
+
+  - `<name>` is defined inside this chunk (i.e. it's one of the
+    chunk's `.global <name>` labels): nothing extra needed.
+  - `<name>` is NOT defined inside this chunk (a cross-chunk or
+    cross-module reference): the chunk needs a `.extern <name>`
+    declaration so mwasmarm can resolve the reference at link time.
+
+The generator now emits the required `.extern` lines automatically.
+Externs appear after `.section .rodata` and before the first
+`.global`, in the order of first occurrence, deduplicated. This
+matches the hand-edited convention established by briefs 135 wave
+1 + 139 wave 2 (which closed the gap manually post-generation).
+
+Before brief 144, every Pattern 3 wave (14 chunks shipped) had to
+hand-add 1-5 `.extern` lines per chunk. Brief 144 closes the gap.
+
 Usage:
 
   python tools/cluster_c_pattern3_gen.py --version eur --module main \\
@@ -38,6 +59,7 @@ Usage:
 
 Brief 125 deliverable. Brief 128 (decomper) wave applies the generator
 across the ~50-90 cluster C residue chunks per brief 119's pool estimate.
+Brief 144 added automatic `.extern` emission.
 """
 
 from __future__ import annotations
@@ -242,6 +264,47 @@ def _render_byte_directive(b: list[int], ctx: GenContext) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# External-reference detection — find symbols referenced by `.word` that
+# aren't defined inside the chunk (so they need `.extern` declarations).
+# Brief 144.
+# --------------------------------------------------------------------------- #
+
+# Pattern matches the single-line `.word <name>` directives emitted by
+# `_emit_directives_for_bytes`. The name token is anything up to
+# whitespace / end-of-line — symbol names in `symbols.txt` are plain
+# identifiers (no spaces, commas, etc.) so a non-whitespace run is
+# unambiguous. We deliberately ignore numeric `.word 0x...` (which the
+# generator never emits — unresolved pointers fall through to `.byte`).
+_WORD_REF_RE = re.compile(r"^\s*\.word\s+([A-Za-z_][A-Za-z0-9_]*)\s*$")
+
+
+def _collect_external_refs(
+    directive_lines: list[str],
+    local_names: set[str],
+) -> list[str]:
+    """Walk emitted directives and return the ordered, deduplicated
+    list of `.word <name>` targets that are NOT defined in
+    `local_names` (the chunk's own `.global` symbols).
+
+    Output order matches the order of first occurrence in
+    `directive_lines` — this matches the hand-edited convention
+    established by briefs 135 / 139 (extern block at the top of the
+    chunk, ordered by first reference)."""
+    seen: set[str] = set()
+    out: list[str] = []
+    for line in directive_lines:
+        m = _WORD_REF_RE.match(line)
+        if m is None:
+            continue
+        name = m.group(1)
+        if name in local_names or name in seen:
+            continue
+        seen.add(name)
+        out.append(name)
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Chunk discovery — find symbols in a [start, end) range.
 # --------------------------------------------------------------------------- #
 
@@ -374,6 +437,24 @@ def generate_chunk(
         sym_by_addr=sym_by_addr,
     )
 
+    # Emit per-symbol directives first so we can scan them for any
+    # `.word <external_name>` references that need `.extern`
+    # declarations (brief 144). Two-pass: pass 1 builds the symbol
+    # block + collects directives; pass 2 prepends the extern block.
+    local_names = {s.name for s in syms}
+    all_directives: list[str] = []
+    symbol_block: list[str] = []
+    for s, sz in zip(syms, sizes, strict=True):
+        off = s.addr - load_addr
+        body = bytes_source[off:off + sz]
+        symbol_block.append(f"        .global {s.name}")
+        symbol_block.append(f"{s.name}:")
+        directives = _emit_directives_for_bytes(body, s.addr, ctx)
+        symbol_block.extend(directives)
+        symbol_block.append("")
+        all_directives.extend(directives)
+    extern_names = _collect_external_refs(all_directives, local_names)
+
     # Assemble the .s file.
     lines: list[str] = []
     lines.append("; Cluster C Pattern 3 chunk — brief 125 generator output.")
@@ -385,15 +466,16 @@ def generate_chunk(
     lines.append("")
     lines.append("        .section .rodata")
     lines.append("")
-
-    for s, sz in zip(syms, sizes, strict=True):
-        off = s.addr - load_addr
-        body = bytes_source[off:off + sz]
-        lines.append(f"        .global {s.name}")
-        lines.append(f"{s.name}:")
-        directives = _emit_directives_for_bytes(body, s.addr, ctx)
-        lines.extend(directives)
+    if extern_names:
+        # Brief 144: `.word <name>` references to symbols defined
+        # outside this chunk need explicit `.extern` declarations
+        # so mwasmarm can resolve them at link time. Emitted in
+        # first-occurrence order, deduplicated.
+        for name in extern_names:
+            lines.append(f"        .extern {name}")
         lines.append("")
+
+    lines.extend(symbol_block)
     asm = "\n".join(lines)
 
     # delinks.txt entry.
