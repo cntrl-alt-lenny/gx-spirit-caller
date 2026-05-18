@@ -1,7 +1,7 @@
 ### cloud/ov004-binary-patch-phase3
 
-**Goal:** **🔑 ACTUAL 26/27 BASELINE UNLOCK (attempt
-#3).** Per brief 132's recommended brief-133-B
+**Goal:** **🔑 ACTUAL 26/27 BASELINE UNLOCK (attempt #3).**
+Per brief 132's recommended brief-133-B
 approach: post-link binary patching of
 `arm9_ov004.bin`. Brief 131 Phase 1 (ALIGNALL) reduced
 ov004 165K → 8125 bytes. Brief 132 Phase 2 falsified
