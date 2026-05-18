@@ -11,10 +11,12 @@ diff and outputs a brief 138+ application plan.
 - All 27 modules (ARM9 main, ITCM, DTCM, overlay 0-23)
   report OK via `dsd check modules`.
 - `ninja sha1` still reports:
+
   ```
   expected: 1da50df7c210fae96dc69b3825554b9ce13b4f75
   actual:   0367b729654a791a6c9c7e148ae09a791b790a5b
   ```
+
 - The 27/27 module baseline ≠ SHA1 match. Bytes
   outside dsd's per-module coverage must differ.
 
