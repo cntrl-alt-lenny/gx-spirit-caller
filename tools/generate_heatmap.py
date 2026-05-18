@@ -390,7 +390,7 @@ def main():
     parser.add_argument("--report", type=Path, default=None,
                         help="Path to report.json (default: build/<version>/report.json)")
     parser.add_argument("--out", type=Path, default=None,
-                        help="Path to output SVG (default: assets/progress-heatmap.svg)")
+                        help="Path to output SVG (default: assets/progress-heatmap-<version>.svg)")
     args = parser.parse_args()
 
     # NOTE: no --check mode here. The committed SVG is generated
@@ -402,7 +402,9 @@ def main():
     # `generate_briefs_index --check` only.
 
     report_path = args.report or (ROOT / "build" / args.version / "report.json")
-    out_path = args.out or (ROOT / "assets" / "progress-heatmap.svg")
+    out_path = args.out or (
+        ROOT / "assets" / f"progress-heatmap-{args.version}.svg"
+    )
 
     if report_path.exists():
         with report_path.open("r", encoding="utf-8") as f:
