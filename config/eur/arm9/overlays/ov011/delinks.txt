@@ -601,3 +601,7 @@ src/overlay011/data_ov011_021d38d0.c:
 src/overlay011/data_ov011_021d38f0.c:
     complete
     .data start:0x021d38f0 end:0x021d3900
+
+src/overlay011/data_ov011_021d38e8.c:
+    complete
+    .data start:0x021d38e8 end:0x021d38f0

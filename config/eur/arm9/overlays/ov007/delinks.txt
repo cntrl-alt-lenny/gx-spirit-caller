@@ -185,3 +185,15 @@ src/overlay007/ov007_021b2568.c:
 src/overlay007/ov007_021b2a98.c:
     complete
     .text start:0x021b2a98 end:0x021b2ac8
+
+src/overlay007/data_ov007_021b2fdc.c:
+    complete
+    .data start:0x021b2fdc end:0x021b2fe8
+
+src/overlay007/data_ov007_021b2fe8.c:
+    complete
+    .data start:0x021b2fe8 end:0x021b2ff4
+
+src/overlay007/data_ov007_021b2fd4.c:
+    complete
+    .data start:0x021b2fd4 end:0x021b2fdc

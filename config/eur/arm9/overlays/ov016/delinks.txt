@@ -162,3 +162,7 @@ src/overlay016/data_ov016_021b8e5c.c:
 src/overlay016/data_ov016_021b8e34.c:
     complete
     .rodata start:0x021b8e34 end:0x021b8e5c
+
+src/overlay016/data_ov016_021b940c.c:
+    complete
+    .data start:0x021b940c end:0x021b941c
