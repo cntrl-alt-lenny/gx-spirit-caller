@@ -55,7 +55,6 @@ Idempotent — already-NOTYPE symbols are skipped silently.
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import struct
 import sys
