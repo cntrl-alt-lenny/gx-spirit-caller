@@ -2,8 +2,9 @@
 
 """
 patch_ov004_veneers.py — post-link binary patcher that splices
-out mwldarm's 86 spurious thumb→arm interwork veneers from
-`build/<ver>/build/arm9_ov004.bin` (brief 134).
+out mwldarm's spurious thumb→arm interwork veneers from
+`build/<ver>/build/arm9_ov004.bin` (brief 134; generalised to
+variable veneer counts in brief 142).
 
 Context (W7 final mitigation tier)
 ----------------------------------
@@ -24,25 +25,47 @@ symbol type or section exec-flag. This left two options:
 - **Post-link binary patching (this tool, brief 132 Option B,
   brief 134)** — surgical, contained to ov004.
 
+Empirical veneer count is variable (brief 141 / 142)
+----------------------------------------------------
+
+Brief 134's first patcher hard-coded `EXPECTED_VENEER_COUNT = 86`
+because mwldarm emitted exactly 86 cross-overlay veneers at the
+source-coverage snapshot of the time. Brief 141 ran a `.rodata`
+sweep on ov004 and found that **locally-defined symbols in
+`.rodata` SUPPRESS veneer emission**: mwldarm resolves the
+pointer locally and skips the veneer. Adding 2 `.rodata` claims
+dropped the count from 86 → 9.
+
+So the 86 figure is empirical (driven by current source coverage),
+not structural. Brief 142 generalises the scanner + cascade math
+to accept any `n ∈ [0, HISTORICAL_MAX_VENEER_COUNT]`. The historical
+maximum is retained as a documentation constant + soft sanity bound;
+the actual splice acts on whatever count the scanner finds.
+
 How it works
 ------------
 
-The patcher consumes mwldarm's `arm9_ov004.bin` (269,216 bytes,
-+1024 vs orig) and produces a byte-identical-to-orig output
+The patcher consumes mwldarm's `arm9_ov004.bin` (= orig size
++ veneer-pool delta) and produces a byte-identical-to-orig output
 (268,192 bytes). Algorithm:
 
 1. **Locate veneer pool.** Scan for the 12-byte canonical pattern
-   `7847 c046 04f01fe5 <4-byte target>`. Expect exactly 86
-   contiguous matches at file 0x3fcfc..0x40104.
+   `7847 c046 04f01fe5 <4-byte target>`. Accept any contiguous run
+   of `n` matches (`0 ≤ n ≤ HISTORICAL_MAX_VENEER_COUNT`). If
+   `n == 0` the patcher returns early — there are no veneers to
+   splice and the binary already matches orig shape.
 
-2. **Splice veneer pool.** Remove the 1,032 bytes from the file.
-   Downstream sections shift left by 1,032.
+2. **Splice veneer pool.** Remove `n × 12` bytes from the file.
+   Downstream sections shift left by `n × 12`.
 
 3. **Fix .ctor + pad cascade.** Built has `.ctor` of 8 bytes
    (orig is 4 — extra `WRITEW(0)`) and pad of 8 bytes (orig is
-   20). After splice, replace 16 bytes [post-splice 0x3fd28..
-   0x3fd38] with [keep ctor-first-4-bytes] + [20 zero pad].
-   This adds 8 bytes, restoring file size to orig's 268,192.
+   20). After splice, replace 16 bytes [post-splice ctor offset]
+   with [keep ctor-first-4-bytes] + [20 zero pad]. This adds 8
+   bytes net regardless of `n` (the `WRITEW(0)` after .ctor is
+   per-overlay-unconditional in the linker LCF, independent of
+   the veneer pool). Net output delta vs input:
+   `n × 12 - 8` bytes (when `n ≥ 1`).
 
 4. **Rewrite literal pool entries (un-shift cascade).** For each
    `kind:load` reloc in `relocs.txt`, write the reloc's `to`
@@ -50,16 +73,15 @@ The patcher consumes mwldarm's `arm9_ov004.bin` (269,216 bytes,
    uses orig VAs, and after splice+fix the binary layout matches
    orig — so the file offsets are correct. This handles:
      - .text literal pool entries pointing to shifted .data/.bss
-       symbols (~402 words)
-     - .rodata pointers (158 of them point at veneer addresses;
-       the un-shift restores them to original ov002 addresses
-       since the veneers are gone)
-     - .init literal pool entries (4 of them in the static-init)
+       symbols
+     - .rodata pointers that target veneers (un-shift restores
+       them to the original ov002 addresses since the veneers
+       are gone). The exact count varies with `n`.
+     - .init literal pool entries
      - .data function-pointer entries
 
 5. **Re-encode .init ARM BLs.** The 2 ARM BL instructions in
-   `.init` were encoded by mwldarm using a shifted source-VA
-   (`.init` was at 0x02209e64 in built, vs 0x02209a5c in orig).
+   `.init` were encoded by mwldarm using a shifted source-VA.
    After splice, the .init function moves back to orig VA. The
    BL bytes need re-encoded offsets. For each
    `kind:arm_call` reloc whose `from` is in .init range, compute
@@ -74,11 +96,14 @@ Risk mitigation
   positions eliminates false positives. We only touch words at
   reloc `from` addresses; bytes elsewhere are untouched.
 - **Veneer pattern mismatch**: validates that the splice region
-  contains exactly 86 valid veneer patterns. Errors out
-  noisily if mwldarm's output changes shape (e.g. on a
-  toolchain upgrade).
+  contains a contiguous run of valid veneer patterns. Caps the
+  count at `HISTORICAL_MAX_VENEER_COUNT` as a sanity bound — a
+  larger count would indicate either a toolchain regression or
+  a false positive (the canonical prefix matching arbitrary
+  `.text`).
 - **Idempotent**: detects already-patched binaries (no veneer
-  pattern at expected location) and skips silently. Lets ninja
+  pattern at expected location, i.e. `n == 0` on a binary whose
+  size already matches orig) and skips silently. Lets ninja
   re-run the rule without harm.
 
 Usage
@@ -129,26 +154,72 @@ from pathlib import Path
 VENEER_PREFIX = bytes.fromhex("7847c04604f01fe5")
 VENEER_SIZE = 12
 
-# Across all 3 regions (EUR / USA / JPN) mwldarm emits exactly 86
-# spurious cross-overlay veneers for ov004 (brief 129 / 131 / 132
-# bisect). The pool size is 86 * 12 = 1032 bytes. The output
-# file is 1024 bytes smaller than the input after splice (the
-# 8-byte deficit is recovered by the ctor/pad fix).
-EXPECTED_VENEER_COUNT = 86
-EXPECTED_VENEER_POOL_SIZE = EXPECTED_VENEER_COUNT * VENEER_SIZE  # 1032
-EXPECTED_OUTPUT_DELTA = 1024  # input - output after full patch
+# Brief 134 / 142: historical maximum veneer count. At the brief 134
+# snapshot, mwldarm emitted exactly 86 spurious cross-overlay
+# veneers for ov004 across all 3 regions (EUR / USA / JPN). Brief
+# 141 found that locally-defined symbols in ov004's `.rodata`
+# SUPPRESS veneer emission (mwldarm resolves locally + skips the
+# veneer) — adding 2 such claims dropped the count to 9.
+#
+# So the 86 figure is EMPIRICAL (driven by current source coverage),
+# not structural. The scanner now accepts any `n ∈ [0, 86]` and the
+# cascade math derives the output-size delta from the observed n.
+# This constant is retained only as:
+#   - a soft upper bound (a count > 86 indicates a regression or
+#     a false-positive prefix match in `.text`)
+#   - a documentation anchor for the brief 134 baseline
+HISTORICAL_MAX_VENEER_COUNT = 86
+
+# Brief 142: the .ctor + pad cascade fix always recovers exactly
+# 8 bytes net regardless of veneer count. The linker LCF emits
+# `WRITEW(0)` after every overlay's .ctor (per-overlay-
+# unconditional, independent of the veneer pool), so `_fix_ctor_
+# and_pad` always replaces [built ctor=8 + pad=8] = 16 bytes with
+# [orig ctor=4 + 20B zero pad] = 24 bytes → +8 net.
+CTOR_PAD_FIX_NET_BYTES = 8
 
 
 class PatchError(Exception):
     """Patcher detected an unexpected input shape and aborted."""
 
 
+def expected_output_delta_for(veneer_count: int) -> int:
+    """How many bytes the patcher removes from the input for a
+    binary with `veneer_count` veneers.
+
+    - `veneer_count == 0` → returns 0 (the patcher is a no-op; the
+      binary is already orig-shape and no ctor/pad fix is applied).
+    - `veneer_count >= 1` → returns
+      `veneer_count * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES`
+      (= bytes spliced out minus bytes recovered by the ctor/pad
+      fix).
+
+    Reduces to the brief 134 hard-coded constant for the historical
+    maximum: `86 * 12 - 8 = 1024`.
+    """
+    if veneer_count <= 0:
+        return 0
+    return veneer_count * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES
+
+
 def _scan_veneer_pool(data: bytes) -> tuple[int, list[tuple[int, int]]]:
     """Scan the binary for the canonical veneer-pool region — a
-    contiguous run of `EXPECTED_VENEER_COUNT` veneers each starting
-    with `VENEER_PREFIX`. Returns (pool_file_offset, veneers) where
-    veneers is a list of (file_offset, target_VA). Raises
-    PatchError if the count is wrong or the pool isn't contiguous.
+    contiguous run of `n` veneers each starting with `VENEER_PREFIX`
+    (`0 ≤ n ≤ HISTORICAL_MAX_VENEER_COUNT`).
+
+    Returns `(pool_file_offset, veneers)` where `veneers` is a list
+    of `(file_offset, target_VA)` of length `n`. When `n == 0`
+    (binary already patched, or no veneers were emitted at all),
+    returns `(-1, [])`.
+
+    Brief 142: the count was a hard `== 86` assertion in the brief
+    134 patcher. It's now any non-negative count, because
+    source-level `.rodata` claims suppress veneer emission. The
+    `HISTORICAL_MAX_VENEER_COUNT` upper bound stays as a sanity
+    guard against runaway false-positive matches.
+
+    Raises `PatchError` if the pool exists but isn't contiguous,
+    or if the count exceeds the historical maximum.
 
     Auto-detects the pool location so the patcher works across all
     3 regions (EUR / USA / JPN) without hardcoded offsets.
@@ -163,13 +234,17 @@ def _scan_veneer_pool(data: bytes) -> tuple[int, list[tuple[int, int]]]:
         positions.append(pos)
         pos += 1
 
-    if len(positions) != EXPECTED_VENEER_COUNT:
+    if not positions:
+        return (-1, [])
+
+    if len(positions) > HISTORICAL_MAX_VENEER_COUNT:
         raise PatchError(
-            f"expected {EXPECTED_VENEER_COUNT} veneers in input "
-            f"(found {len(positions)}). The pool was contiguous "
-            f"in all 3 regions when last sampled; a count "
-            f"mismatch indicates either a toolchain change or a "
-            f"binary that's already partially patched."
+            f"found {len(positions)} veneer-prefix matches in input "
+            f"(> historical maximum {HISTORICAL_MAX_VENEER_COUNT}). "
+            f"Either mwldarm regressed and is emitting more veneers "
+            f"than the brief 134 baseline, or the canonical prefix "
+            f"is matching arbitrary `.text` (false positive). Bail "
+            f"rather than risk corrupting the binary."
         )
 
     # Verify the pool is contiguous (each veneer 12 bytes from
@@ -192,12 +267,17 @@ def _scan_veneer_pool(data: bytes) -> tuple[int, list[tuple[int, int]]]:
 
 
 def _splice_veneer_pool(
-    data: bytearray, pool_start: int,
+    data: bytearray, pool_start: int, veneer_count: int,
 ) -> bytearray:
-    """Return a NEW bytearray with the veneer pool removed.
-    Downstream sections shift left by `EXPECTED_VENEER_POOL_SIZE`
-    bytes (1032)."""
-    pool_end = pool_start + EXPECTED_VENEER_POOL_SIZE
+    """Return a NEW bytearray with the `veneer_count`-element
+    veneer pool removed starting at `pool_start`. Downstream
+    sections shift left by `veneer_count * VENEER_SIZE` bytes.
+
+    Brief 142: takes `veneer_count` explicitly so the splice
+    length tracks the scanner's actual finding rather than a
+    hard-coded `86 × 12`.
+    """
+    pool_end = pool_start + veneer_count * VENEER_SIZE
     return bytearray(data[:pool_start]) + bytearray(data[pool_end:])
 
 
@@ -339,21 +419,32 @@ def expected_output_size_for(
     data: bytes | bytearray,
     *,
     already_patched: bool,
+    veneer_count: int | None = None,
 ) -> int:
     """Compute the size the patched ov004 binary SHOULD have,
     derived from the input.
 
-    The off-by-1024 bug fix (brief 140 part 1): if `data` is
-    already patched (no veneers left), it's ALREADY at the
-    target size — don't subtract the delta again. Otherwise
-    the target size is the input minus the splice delta.
+    - If `already_patched` is True, `data` is ALREADY at the target
+      size — return `len(data)` unchanged (brief 140 part 1
+      off-by-1024 fix).
+    - Otherwise return `len(data) - expected_output_delta_for(n)`
+      where `n = veneer_count`. Brief 142: `veneer_count` is now
+      parameterised; the brief 134 patcher used a hard-coded 1024.
+      Passing `veneer_count=None` defaults to
+      `HISTORICAL_MAX_VENEER_COUNT` (delta = 1024) — backwards-
+      compatible with the brief 140 helper signature.
 
     Used by `main()` to drive the YAML `code_size` rewrite. Pure
     function — exposed so tests can pin the branching behaviour
     without round-tripping a real binary."""
     if already_patched:
         return len(data)
-    return len(data) - EXPECTED_OUTPUT_DELTA
+    n = (
+        HISTORICAL_MAX_VENEER_COUNT
+        if veneer_count is None
+        else veneer_count
+    )
+    return len(data) - expected_output_delta_for(n)
 
 
 def patch_ov004(
@@ -386,14 +477,20 @@ def patch_ov004(
         }
 
     pool_start, veneers = _scan_veneer_pool(data)
-    spliced = _splice_veneer_pool(bytearray(data), pool_start)
+    # Brief 142: splice length + size validation derive from the
+    # scanner's observed count, not a hard-coded 86 / 1024.
+    veneer_count = len(veneers)
+    spliced = _splice_veneer_pool(
+        bytearray(data), pool_start, veneer_count,
+    )
     fixed = _fix_ctor_and_pad(spliced, ctor_file_offset)
-    expected_output_size = len(data) - EXPECTED_OUTPUT_DELTA
+    delta = expected_output_delta_for(veneer_count)
+    expected_output_size = len(data) - delta
     if len(fixed) != expected_output_size:
         raise PatchError(
             f"post-fix size {len(fixed)} != expected "
             f"{expected_output_size} (input {len(data)} - "
-            f"{EXPECTED_OUTPUT_DELTA})"
+            f"{delta}; veneer_count={veneer_count})"
         )
 
     load_rewrites = _apply_load_rewrites(fixed, relocs, base_va)
@@ -546,8 +643,14 @@ def main() -> int:
     # into the YAML on the YAML-only re-invocation, which `dsd
     # rom build` then aligned to 0x413a0 and wrote into the ROM
     # overlay table — 512 bytes short of orig's 0x417a0.
+    #
+    # Brief 142 generalisation: pass the observed `veneers_spliced`
+    # count so the delta math tracks the scanner's actual finding
+    # rather than the historical-max constant.
     expected_output_size = expected_output_size_for(
-        data, already_patched=bool(stats["already_patched"]),
+        data,
+        already_patched=bool(stats["already_patched"]),
+        veneer_count=stats["veneers_spliced"],
     )
 
     def _do_yaml_patch() -> bool:
@@ -587,10 +690,11 @@ def main() -> int:
 
     yaml_changed = _do_yaml_patch()
 
+    pool_bytes = stats["veneers_spliced"] * VENEER_SIZE
     msg = (
         f"patched {args.binary}: "
         f"spliced {stats['veneers_spliced']} veneers "
-        f"({EXPECTED_VENEER_POOL_SIZE} bytes), "
+        f"({pool_bytes} bytes), "
         f"rewrote {stats['load_rewrites']} load literals, "
         f"re-encoded {stats['bl_reencodes']} .init ARM BLs"
     )
