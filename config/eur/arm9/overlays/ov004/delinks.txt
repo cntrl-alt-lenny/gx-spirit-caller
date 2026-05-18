@@ -123,3 +123,27 @@ src/overlay004/data/data_ov004_0220a0ac.c:
 src/overlay004/data/data_ov004_0220a2a0.c:
     complete
     .data start:0x0220a2a0 end:0x0220a2f8
+
+src/overlay004/data/data_ov004_02209f80.c:
+    complete
+    .data start:0x02209f80 end:0x02209f84
+
+src/overlay004/data/data_ov004_0220a0bc.c:
+    complete
+    .data start:0x0220a0bc end:0x0220a0c0
+
+src/overlay004/data/data_ov004_0220a290.c:
+    complete
+    .data start:0x0220a290 end:0x0220a294
+
+src/overlay004/data/data_ov004_0220a294.c:
+    complete
+    .data start:0x0220a294 end:0x0220a298
+
+src/overlay004/data/data_ov004_0220a298.c:
+    complete
+    .data start:0x0220a298 end:0x0220a29c
+
+src/overlay004/data/data_ov004_0220a29c.c:
+    complete
+    .data start:0x0220a29c end:0x0220a2a0

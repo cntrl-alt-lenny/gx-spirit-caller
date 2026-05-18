@@ -337,3 +337,27 @@ src/overlay005/data_ov005_021b158c.c:
 src/overlay005/bss/data_ov005_bss.s:
     complete
     .bss start:0x021b1d40 end:0x021b2280
+
+src/overlay005/data/data_ov005_021b17e0.c:
+    complete
+    .data start:0x021b17e0 end:0x021b17e4
+
+src/overlay005/data/data_ov005_021b1c8c.c:
+    complete
+    .data start:0x021b1c8c end:0x021b1c90
+
+src/overlay005/data/data_ov005_021b1c90.c:
+    complete
+    .data start:0x021b1c90 end:0x021b1c94
+
+src/overlay005/data/data_ov005_021b1c94.c:
+    complete
+    .data start:0x021b1c94 end:0x021b1c98
+
+src/overlay005/data/data_ov005_021b1c98.c:
+    complete
+    .data start:0x021b1c98 end:0x021b1c9c
+
+src/overlay005/data/data_ov005_021b1c9c.c:
+    complete
+    .data start:0x021b1c9c end:0x021b1ca0

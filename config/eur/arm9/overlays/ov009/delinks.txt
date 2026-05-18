@@ -124,3 +124,7 @@ src/overlay009/ov009_021ad204.c:
 src/overlay009/bss/data_ov009_bss.s:
     complete
     .bss start:0x021adbc0 end:0x0223dce0
+
+src/overlay009/data/data_ov009_021ada18.c:
+    complete
+    .data start:0x021ada18 end:0x021ada1c
