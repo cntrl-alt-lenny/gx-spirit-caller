@@ -8,46 +8,64 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-18 (Mac brain — brief 138 + 139 merge).
-**🎉🎉 SHA1 PATH IS 1 BRIEF AWAY.** Brief 138 (cloud) shipped the
-`.DS_Store` filter — **3-region ROM diff = 5 bytes verified** on
-combined main (EUR + USA + JPN identical shape). Brief 139
-(decomper) shipped cluster A wave 4 + Pattern 3 wave 2 — **305
-effective candidates** (298 .bss + 7 Pattern 3 chunks); cluster A
-drain ~91% (1443 / 1586). 3-region 27/27 baseline preserved. The
-remaining 5 bytes per region = **4 CRC16 header bytes + 1 patcher
-off-by-1024 byte**. **Brief 140 (cloud, this round)** wraps both
-fixes into one PR → `ninja sha1` PASSES.
+**Last updated:** 2026-05-18 (Mac brain — brief 140 + 141 merge).
+**🎉🎉🎉 `ninja sha1` PASSES FOR EUR + USA + JPN.** First
+byte-identical ROM rebuild in project history, across all three
+regions. The project's stated final gate is now green. Brief 140
+(cloud) closed the residue: secure-area CRC16 (copied from orig
+post-decryption — built secure area is byte-identical) + header
+CRC16 (computed via standard NDS algorithm) + patcher off-by-1024
+fix (already-patched detection in `patch_ov004_veneers.py`).
+**Important brief-spec correction**: 0x6C is the Secure Area
+CRC16 (not Nintendo Logo); 0x15C is the logo CRC and dsd already
+writes it correctly (`0xCF56` constant). Brief 141 (decomper) ran
+the first production ov004 cluster sweep post-W7 unlock: 31
+symbols across cluster C + D-1 + D-2, **drained ov004 D-1 + D-2
+pools to completion**. Surfaced a new empirical W7 invariant:
+source-level `.rodata` claims in ov004 suppress mwldarm veneer
+emission → patcher's hard-coded `EXPECTED_VENEER_COUNT=86`
+assertion fires. Brief 142 (cloud, next round) generalises the
+patcher.
 
 EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
 badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #555 — cloud / brief 138 (`.DS_Store` filter).** **🔑
-  99.995% SHA1-gap closure shipped.** `tools/clean_macos_junk.py`
-  recursively removes `.DS_Store` / `._*` / `Thumbs.db` /
-  `desktop.ini` from a directory tree (optional `--include-dirs`
-  for `.AppleDouble/` / `.fseventsd/` / `.Trashes/`
-  / `.Spotlight-*/`). Wired as a standalone `cleanup_macos_junk`
-  ninja rule with phony driver + stamp output + `restat=True` so
-  it runs every invocation but keeps rom_build's cache warm.
-  19 unit tests (filename / dirname classification, multi-depth
-  fixture clean, idempotence, missing-root paths, stamp
-  lifecycle, CLI multi-dir). **Verified locally:** EUR / USA /
-  JPN ROM diffs all drop to exactly 5 bytes; 3-region 27/27
-  preserved. Drop-in 99.995% gap closure.
-- **PR #554 — decomper / brief 139 (cluster A wave 4 +
-  Pattern 3 wave 2).** **305 effective candidates** (target was
-  ≥ 105; self-extend exercised). **Part 1**: 298 .bss symbols
-  across 17 small overlays (ov001/3/5/7/8/10/11/12/13/15/16/17/
-  18/19/20/22/23) — **drains the remaining cluster A pool in
-  one wave**. Cluster A cumulative: 1443 / 1586 ≈ **91%
-  drained**. Residue is ov004 (deferred to brief 141) +
-  pre-processed-overlay refinement. **Part 2**: 7 Pattern 3
-  chunks via `tools/cluster_c_pattern3_gen.py` (1048 bytes / 25
-  syms). Generator gap exercised (`.word <name>` manual
-  `.extern` declarations needed). 3-region 27/27 preserved.
+- **PR #558 — cloud / brief 140 (SHA1 final gate).**
+  **🎉🎉🎉 `ninja sha1` PASSES FOR EUR + USA + JPN.** The
+  project's stated final gate. Two parts, single PR. **Part 1**:
+  `patch_ov004_veneers.py` idempotent-path fix — extracted
+  `expected_output_size_for(data, *, already_patched)` helper;
+  branches on the existing already-patched signal. Closes the
+  1-byte ov4 ram_size diff. **Part 2**:
+  `tools/patch_rom_header_crc.py` — standard NDS CRC16
+  implementation (poly `x^16+x^15+x^2+1`, init `0xFFFF`, byte-at-
+  a-time LSB-first) + secure-area-CRC orig-copy shortcut.
+  **Brief-spec correction discovered**: 0x6C is the Secure
+  Area CRC16 (not the Nintendo Logo CRC); 0x15C is the logo CRC
+  and dsd already writes it correctly (verified `0xCF56`
+  constant across 3 regions). Secure-area CRC is COPIED from
+  orig (computing would require Blowfish-NDS cipher; our built
+  secure area is byte-identical to orig, so the post-decryption
+  CRC must match). 15 new tests (3 patcher + 12 CRC); total
+  1742. Configure.py adds orig baserom as implicit input to
+  rom_build. **Verified locally**: EUR + USA + JPN all
+  `ninja sha1: OK`.
+- **PR #557 — decomper / brief 141 (ov004 cluster sweep).**
+  **31 symbols** across cluster C (Pattern 1 `.data`, 25 syms)
+  + cluster D-1 (dispatch tables, 2) + cluster D-2 (strict-
+  aligned scalars, 4). First production ov004 cluster work
+  post-W7 unlock (brief 134). **Empirical W7 invariant
+  discovered**: source-level `.rodata` claims SUPPRESS mwldarm
+  veneer emission — adding 2 .rodata symbols dropped veneer
+  count from 86 → 9, breaking brief 134's hard-coded
+  `EXPECTED_VENEER_COUNT=86` assertion. Outcome: Part 4
+  (Pattern 3 on `.rodata`) skipped; all 31 claims in `.data`
+  only. Cluster D-1 + D-2 ov004 pools exhausted. ov004 cluster
+  C `.data` partial: 25/92 strict-aligned candidates drained.
+  Brief 142 (cloud, next round) generalises the patcher to
+  unlock `.rodata` cluster work.
 
 ## Cumulative pipeline state
 
@@ -79,6 +97,8 @@ badges directly; multi-module-OK is the visible milestone).
 | **SHA1-gap scoping (brief 137)** | **99.995% is `.DS_Store`** (100,805 → 5 bytes) | 3-brief unlock plan (138 / 139 / 140) → SHA1 PASS |
 | **`.DS_Store` filter shipped (brief 138)** | **🔑 3-region ROM diff = 5 bytes verified** | `tools/clean_macos_junk.py` + 19 tests; standalone ninja rule with phony + stamp + restat |
 | **Cluster A wave 4 + Pattern 3 wave 2 (brief 139)** | **305 effective** (298 .bss + 7 Pattern 3) | Cluster A drain 1145 → 1443 (~91%); 3-region 27/27 preserved |
+| **🎉🎉🎉 SHA1 FINAL GATE (brief 140)** | **`ninja sha1` PASSES for EUR + USA + JPN** | First byte-identical ROM rebuild in project history. `patch_rom_header_crc.py` + patcher idempotent-path fix + 15 tests |
+| **ov004 cluster sweep (brief 141)** | **31 ov004 syms** (25 C + 2 D-1 + 4 D-2) | First production ov004 cluster work; D-1 + D-2 pools exhausted; new W7 invariant (`.rodata` claims suppress veneers) |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -104,76 +124,90 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 138 + 139
-close and brief 140 + 141 queue lands.
+**Open PRs: 0** once this brain-PR for brief 140 + 141
+close and brief 142 + 143 queue lands.
 
-**🎉🎉 SHA1 PATH IS 1 BRIEF AWAY.** All three regions:
-**5-byte ROM diff verified on combined main.** Brief 140
-wraps the patcher off-by-1024 fix + CRC16 implementation
-into one cloud PR; on merge → `ninja sha1` PASSES.
+**🎉🎉🎉 SHA1 FINAL GATE PASSES.** EUR + USA + JPN all
+`ninja sha1: OK` (verified locally on combined main).
+First byte-identical ROM rebuild in project history.
+The project's stated final gate is green. Post-SHA1-PASS
+phase begins: maintenance discipline = every PR must
+preserve `ninja sha1` across 3 regions.
 
-**Cloud — brief 140 (HIGH, NEW): 🎉 SHA1 FINAL GATE**
+**Cloud — brief 142 (MEDIUM, NEW): patcher tolerance fix**
 
-- **`tools/patch_ov004_veneers.py` idempotent-path fix +
-  `tools/patch_rom_header_crc.py`.** Two parts, single
-  PR. **Part 1**: brief 134's patcher has an
-  `expected_output_size = len(data) - 1024` bug on the
-  YAML-only second invocation; detect already-patched
-  state and skip the delta subtraction. Closes the 1
-  byte at ROM file `0x8b30a` (ov4 ram_size). **Part
-  2**: implement standard NDS CRC16 (poly `x^16+x^15+x^2+1`,
-  init `0xFFFF`) over header `0xC0..0x15C` (logo) and
-  `0x00..0x15D` (header). Write to ROM
-  offsets `0x6C` and `0x15E`. Wire as a post-rom_build
-  ninja rule (`rom_header_crc`) modeled on brief 138's
-  `cleanup_macos_junk` integration. Closes the
-  remaining 4 bytes.
-  - End-to-end gate: `ninja sha1` PASSES for EUR + USA
-    + JPN. Project's stated final gate.
-  - Tests: idempotence regression (patcher) + CRC16
-    golden values (logo CRC16 = `0x6FF7` is constant
-    since the logo image is fixed).
-  - Branch: `cloud/sha1-final-gate`.
+- **`tools/patch_ov004_veneers.py` variable-count
+  generalisation.** Brief 141 surfaced a new empirical W7
+  invariant — source-level `.rodata` claims in ov004
+  suppress mwldarm veneer emission, dropping veneer count
+  from 86 → 9 (or 0 in fully-claimed state). Brief 134's
+  patcher has a hard-coded
+  `EXPECTED_VENEER_COUNT = 86` assertion that fires.
+  Brief 142 generalises the scanner to accept any count
+  `n ∈ [0, 86]` and parameterises the cascade math on
+  the observed count. Unlocks ov004 `.rodata` cluster
+  work (brief 144+ candidate).
+  - Critical: 3-region `ninja sha1` PASS preserved (this
+    patcher is on the SHA1-critical path).
+  - Tests: 0-veneer, 9-veneer, 86-veneer, intermediate
+    fixture cases.
+  - Branch: `cloud/patch-veneers-variable-count`.
 
-**Decomper — brief 141 (HIGH, NEW):**
+**Decomper — brief 143 (MEDIUM, NEW): cluster B wave 1**
 
-- **ov004 cluster sweep — multi-cluster, single overlay.**
-  Parallel-track decomper work while cloud closes the
-  SHA1 final gate. ov004 was deferred from cluster work
-  since brief 122 (W7 wall). Brief 134's binary patcher
-  unlocked it; checksum has been OK across all 3 regions
-  through every brief since. Sweep ov004 across cluster C
-  (Pattern 1 `.rodata` chunks) + cluster D-1 (dispatch
-  tables) + cluster D-2 (scalar arrays) + optional
-  Pattern 3 chunks.
-  - Target: ≥ 25 ov004 symbols total.
-  - Critical verify: ov004 stays OK across all 3 regions
-    (W7 patcher unaffected by cluster claims).
-  - Branch: `decomper/ov004-cluster-sweep`.
+- **Cluster B true scalars — open the last unopened
+  cluster.** Brief 117 scoped cluster B; brief 123 v3
+  refined to **81 true scalars** (single `unsigned int`
+  / signed int / byte-width literals in `.data`). Easiest
+  decomp shape: `unsigned int data_<addr> = 0x<value>;`.
+  Cover 2-4 modules per wave.
+  - Target: ≥ 30 cluster B true scalars.
+  - Critical: 3-region 27/27 + `ninja sha1` PASS
+    preserved.
+  - Branch: `decomper/cluster-b-wave-1`.
 
-**Data-tier backlog (post-139):**
+**Workflow note (process feedback from cloud brief 140 PR):**
 
-1. **Cluster B wave 1 — true scalars** (decomper).
-   81 true-scalar sub-pool per brief 123 v3.
-2. **Cross-region cluster A apply** — port the 1443
-   EUR cluster A symbols to USA + JPN (post brief 139
-   wave 4 drain).
-3. **3rd mega-array (`data_020b6ec4` 30 KB)** —
+> Two parallel agent sessions (briefs 139 + 141) running on
+> the same checkout BLEW AWAY cloud's untracked-file work on
+> the cloud branch by switching branches mid-session. Cloud
+> had to recover via stash + re-checkout + re-apply edits
+> multiple times. Recommendation: wrap cloud agent runs in
+> `git worktree` by default. Bit cloud twice (briefs 138 +
+> 140). Decomper already uses `gx-spirit-caller-decomper`
+> worktree.
+
+To address: consider running cloud agent in its own
+sibling worktree (e.g. `gx-spirit-caller-cloud`) the same
+way decomper does. Or: launch cloud agent runs with
+`isolation: "worktree"` flag on the agent invocation.
+
+**Data-tier backlog (post-141):**
+
+1. **Cluster B pointer sub-pool** (decomper, brief 144+).
+   32 cluster B pointers; need typedef research.
+2. **Cluster B unclassified** (brief 145+). 14 syms;
+   needs worklist refinement.
+3. **ov004 `.rodata` cluster wave 2** (decomper, blocked
+   on brief 142). Pattern 3 chunks + cluster C `.rodata`
+   in ov004.
+4. **ov004 `.data` cluster C wave 2** (decomper).
+   ~67/92 strict-aligned candidates remain in ov004.
+5. **Cross-region cluster A apply** — port the 1443
+   EUR cluster A symbols to USA + JPN.
+6. **3rd mega-array (`data_020b6ec4` 30 KB)** —
    biggest deferred Pattern 1 candidate.
-4. **Cluster D-3** via Pattern 3 generator (~20
+7. **Cluster D-3** via Pattern 3 generator (~20
    complex nested structs).
-5. **Single-pointer cluster D cleanup** — ~50 trivial
+8. **Single-pointer cluster D cleanup** — ~50 trivial
    pointer-code/pointer-data per brief 124.
-6. **Pattern 3 generator `.extern` emission fix** —
-   per brief 135 + 139 known-gap note (manual
-   `.extern` declarations needed for `.word <name>`).
-7. **`data_symbol_sizes.py` `kind:bss` extension** —
-   per brief 139 funnel (currently only covers
-   `kind:data`).
-8. **Cluster A residue in pre-processed overlays** —
-   refinements / sizes that wave 4 missed.
-9. **Cluster C Pattern 3 main `.rodata` cleanup** —
-   ~1-2 chunks remain per brief 139 drain trajectory.
+9. **Pattern 3 generator `.extern` emission fix** —
+   per brief 135 + 139 known-gap note.
+10. **`data_symbol_sizes.py` `kind:bss` extension** —
+    per brief 139 funnel.
+11. **Cluster A residue in pre-processed overlays.**
+12. **Cluster C Pattern 3 main `.rodata` cleanup** —
+    ~1-2 chunks remain.
 
 **Function-tier backlog (de-prioritized during data-tier
 session arc — revisit if data-tier proves slow):**
@@ -260,67 +294,75 @@ brief 111 permuter with longer budget).
 
 **Cumulative session arc framing:**
 EUR 1.79% / USA + JPN 0.70% (function-tier badge);
-**3-region 27/27 baseline** (every module OK across
-EUR + USA + JPN). Function-tier matching: ~140 EUR +
-~840 region-equivalents + 100 cross-project.
-**Data-tier: 1443 cluster A `.bss` syms (~91%
-drained) + 5 cluster E DTCM syms + 48 cluster D-1
-dispatch tables + 131 cluster C Pattern 1 syms + 2
-mega-arrays + 26 cluster D-2 arrays + 16 Pattern 3
+**🎉🎉🎉 3-REGION `ninja sha1` PASS** (first byte-
+identical ROM rebuild in project history). Function-tier
+matching: ~140 EUR + ~840 region-equivalents + 100 cross-
+project. **Data-tier: 1443 cluster A `.bss` syms (~91%
+drained) + 5 cluster E DTCM syms + 50 cluster D-1
+dispatch tables + 156 cluster C Pattern 1 syms + 2
+mega-arrays + 30 cluster D-2 arrays + 16 Pattern 3
 chunks + 3 Cat 1 main TU fixes + ov004 binary-patch
-tooling + `.DS_Store` filter.** ~1100+ cumulative
-session match-equivalents (function-tier) + ~1680
-data-tier symbols claimed. **🎉🎉 3-REGION 27/27
-module baseline + 5-byte ROM diff verified.** Path
-to first byte-identical ROM rebuild in project
-history is concretely **1 brief away** (brief 140 =
-patcher off-by-1024 fix + ROM-header CRC16 → `ninja
-sha1` PASSES).
+tooling + `.DS_Store` filter + ROM-header CRC patcher.**
+~1100+ cumulative session match-equivalents (function-
+tier) + ~1711 data-tier symbols claimed. **The project's
+stated final gate is now green.** Going forward: post-
+SHA1-PASS maintenance discipline — every PR must
+preserve `ninja sha1` across 3 regions. Remaining work
+is decomp completeness (cluster B + ov004 .rodata +
+cross-region applies + mega-arrays), no longer gating
+SHA1.
 
 ## Next-brain TODO
 
-1. **Verify + merge cloud brief 140 (SHA1 final
-   gate)** when it opens. **🎉 PROJECT'S STATED
-   FINAL GATE.** Verify gate: `ninja sha1` PASSES
-   for EUR, USA, JPN. Watch for: (a) patcher
-   idempotence regression — running patcher twice
-   on the same input must not double-subtract 1024
-   from ov4 `code_size`; (b) CRC16 golden values —
-   logo CRC16 is fixed at `0x6FF7` (header
-   `0xC0..0x15C` is the immutable Nintendo logo
-   image); (c) post-rom_build wiring must not break
-   `restat`-based caching.
-2. **Verify + merge decomper brief 141 (ov004
-   cluster sweep)** when it opens. 3-region 27/27
-   baseline preserved; **critical**: ov004 stays OK
-   across all 3 regions (cluster claims must not
-   disturb brief 134's W7 patcher). Watch for
-   delinks.txt conflicts (cloud brief 140 doesn't
-   touch delinks; should compose cleanly).
-3. **After 140 lands and `ninja sha1` PASSES:**
-   - Update state.md with the milestone framing —
-     **first byte-identical ROM rebuild in project
-     history**.
-   - Tag the commit; consider a release.
-   - File optional ds-decomp upstream issue for
-     CRC16 + OS-junk filtering (W8 candidate).
-4. **Brief 142+ candidates (queue after 140 + 141):**
-   - **Brief 142 — Cluster B wave 1** (decomper, 81
-     true scalars per brief 123 v3). New cluster
-     opens; pool depth unknown but estimated 1-3
-     waves.
-   - **Brief 143 — Cross-region cluster A apply** —
+1. **Verify + merge cloud brief 142 (patcher tolerance
+   fix)** when it opens. Critical: 3-region `ninja sha1`
+   PASS must be preserved (patcher is on SHA1 critical
+   path). Watch for: existing brief 134 regression tests
+   still pass; new tests cover 0/9/86/intermediate
+   veneer counts; cascade math correctly parameterised
+   on observed count.
+2. **Verify + merge decomper brief 143 (cluster B wave
+   1)** when it opens. 3-region 27/27 + `ninja sha1`
+   PASS preserved. Cluster B is `.data` scalars — single-
+   value decls. Watch for any per-module checksum shift
+   when new TUs land.
+3. **Post-SHA1-PASS maintenance discipline:**
+   - **Every PR going forward must preserve `ninja
+     sha1`** across 3 regions. This is the new floor.
+   - Consider adding `ninja sha1` to the required CI
+     gates (currently `pr-invariants` only checks
+     module-tier checksums).
+   - Tag the SHA1-pass commit; consider a release /
+     announcement.
+   - File optional ds-decomp upstream issues:
+     (a) OS-junk filename filtering (W8 candidate per
+     brief 137); (b) ROM-header CRC16 computation in
+     `rom build` (W8 candidate per brief 140 finding —
+     would let us remove our local patcher).
+4. **Brief 144+ candidates (queue after 142 + 143):**
+   - **Brief 144 — Cluster B pointer sub-pool**
+     (decomper, 32 syms; needs typedef research).
+   - **Brief 145 — ov004 `.rodata` cluster wave 2**
+     (decomper, blocked on brief 142 patcher fix).
+   - **Brief 146 — Pattern 3 generator `.extern`
+     emission fix** (cloud, small tooling per brief 135
+     + 139 known gap).
+   - **Brief 147 — `data_symbol_sizes.py` `kind:bss`
+     extension** (cloud, small tooling per brief 139
+     funnel).
+   - **Brief 148 — Cross-region cluster A apply** —
      port 1443 EUR cluster A symbols to USA + JPN.
-     Region-config plumbing per brief 116.
-   - **Brief 144 — Pattern 3 generator `.extern`
-     emission fix** (cloud, small tooling fix per
-     brief 135 + 139 known gap).
-   - **Brief 145 — `data_symbol_sizes.py`
-     `kind:bss` extension** (cloud, small tooling
-     per brief 139 funnel).
-   - **30 KB main mega-array** (`data_020b6ec4`)
-     final Pattern 1 mega.
-5. **Pre-existing carryovers (unchanged across the session):**
+   - **30 KB main mega-array** (`data_020b6ec4`) final
+     Pattern 1 mega.
+5. **Workflow improvement — cloud worktree isolation.**
+   Per cloud's brief 140 PR feedback: parallel agent
+   sessions on the same checkout caused cloud's
+   untracked-file work to get blown away when other
+   sessions switched branches. Recommend launching cloud
+   with `isolation: "worktree"` OR setting up a sibling
+   `gx-spirit-caller-cloud` worktree (matching
+   decomper's pattern).
+6. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection
