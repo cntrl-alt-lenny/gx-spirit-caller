@@ -313,31 +313,57 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise
-  `tools/patch_ov004_veneers.py` to accept variable
-  veneer counts (`n ∈ [0, 86]`). Brief 141 surfaced
-  the hard-coded `EXPECTED_VENEER_COUNT = 86` as a
-  blocker for ov004 `.rodata` cluster work —
-  source-level `.rodata` claims suppress mwldarm
-  veneer emission. Parameterise the cascade math on
-  the observed count. Critical: 3-region `ninja sha1`
-  PASS must be preserved. Branch:
-  `cloud/patch-veneers-variable-count`.
+- [`docs/briefs/144-pattern3-extern-emission-fix.md`](docs/briefs/144-pattern3-extern-emission-fix.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): fix
+  `tools/cluster_c_pattern3_gen.py` to emit `.extern`
+  declarations for `.word <name>` references. Long-
+  standing generator gap flagged in briefs 135 / 139 /
+  141 funnel notes; every Pattern 3 wave (14 chunks to
+  date) has manually added 1-5 externs per chunk.
+  Small tooling fix; high leverage on future waves.
+  Critical: 3-region SHA1 PASS preserved. Branch:
+  `cloud/pattern3-extern-emission-fix`.
 
-- [`docs/briefs/143-cluster-b-wave-1.md`](docs/briefs/143-cluster-b-wave-1.md)
-  — `decomper` (MEDIUM): open cluster B — the last
-  unopened data-tier cluster. Brief 117 + brief 123
-  v3 refined sub-pool to **81 true scalars** (single
-  `unsigned int` / signed int / byte-width literals
-  in `.data`). Easiest decomp shape:
-  `unsigned int data_<addr> = 0x<value>;`. Target ≥
-  30 symbols, 2-4 modules per wave. Critical:
-  3-region 27/27 + `ninja sha1` PASS preserved.
-  Branch: `decomper/cluster-b-wave-1`.
+- [`docs/briefs/145-ov004-rodata-cluster-wave.md`](docs/briefs/145-ov004-rodata-cluster-wave.md)
+  — `decomper` (HIGH): first ov004 `.rodata` cluster
+  wave — now-unlocked by brief 142's patcher
+  generalisation. Pattern 1 chunks (15-30) + Pattern 3
+  via brief 125 generator (3-8) + Cluster D candidates
+  if any. Target ≥ 20 ov004 `.rodata` symbols.
+  Critical: ov004 stays OK across 3 regions AND
+  3-region SHA1 PASS preserved. First production use
+  of brief 142's generalised patcher. Branch:
+  `decomper/ov004-rodata-cluster-wave`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
+  `cloud`, shipped in PR #562. Generalised
+  `tools/patch_ov004_veneers.py` to accept any veneer
+  count `n ∈ [0, HISTORICAL_MAX_VENEER_COUNT=86]`.
+  Replaced hard assertion with
+  `expected_output_delta_for(n) = n × 12 - 8` (0 for
+  n=0). 11 new tests (5 end-to-end across n=0/9/43/86
+  + 6 helper). Suite: 1758/1758. **3-region SHA1 PASS
+  preserved bit-for-bit.** Cloud ran in isolated
+  `gx-spirit-caller-cloud` worktree — no parallel-
+  session interference. Unlocks brief 145 ov004
+  `.rodata` cluster work.
+- [`docs/briefs/143-cluster-b-wave-1.md`](docs/briefs/143-cluster-b-wave-1.md)
+  `decomper`, shipped in PR #561. **First post-SHA1
+  decomp wave.** Opened cluster B — last unopened
+  data-tier cluster. **60 true scalars** (target ≥30;
+  self-extend 2×). Per-module: 36 main + 6 ov002 + 6
+  ov004 + 6 ov005 + 3 ov006 + 1 each on ov008/9/13.
+  Recipe: singleton `int data_<addr>=0x<value>;`.
+  **Empirical W6 cascade filter discovered**: `value
+  != 0` is critical (mwcc 2.0/sp1p5 emits `int x = 0`
+  to `.bss` not `.data`, shifting downstream sections
+  by 4 bytes per skipped scalar). Filter (size=4,
+  addr%4=0, value!=0) → all 60 land cleanly. **3-region
+  SHA1 PASS preserved.** Strict-aligned-nonzero sub-
+  pool drained 60/60. Brief 146+ candidates: 5 size-2
+  + 2 size-1 + 6 zero-value + 1 non-aligned residue.
 - [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
   `cloud`, shipped in PR #558. **🎉🎉🎉 `ninja sha1`
   PASSES FOR EUR + USA + JPN.** First byte-identical
