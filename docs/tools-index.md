@@ -387,7 +387,7 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 
 **post-link binary patcher that splices**
 
-out mwldarm's 86 spurious thumb→arm interwork veneers from `build/<ver>/build/arm9_ov004.bin` (brief 134).
+out mwldarm's spurious thumb→arm interwork veneers from `build/<ver>/build/arm9_ov004.bin` (brief 134; generalised to variable veneer counts in brief 142).
 
 ### `tools/patch_rom_header_crc.py`
 
