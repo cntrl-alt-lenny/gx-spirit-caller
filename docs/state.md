@@ -8,46 +8,50 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-18 (Mac brain — brief 132 + 133 merge).
-**🔑 Brief 132 Phase 2 falsified 3 sub-options; mwldarm veneer-
-trigger model documented empirically.** mwldarm uses ONLY resolved
-VA + section's owning MEMORY region (NOT symbol type, NOT exec
-flag). All 3 approaches (B v1 STT_FUNC strip / B v2 SHF_EXECINSTR
-clear / A `-overlaygroup`) failed. **Brief 134 candidate: post-link
-binary patching of `arm9_ov004.bin`** — splice veneer pool, rewrite
-pointers, un-shift downstream. Brief 132 brain pushed `5ee1d29` F401
-fix. **Brief 133 shipped 14 syms** (13 D-1 + 2nd mega-array
-`data_ov002_022bf3c4` 5376 bytes). **D-1 multi-pointer pool
-exhausted** (48/71 done; remaining 14 single-pointer + ov004-blocked).
-3-region 25/27 preserved.
+**Last updated:** 2026-05-18 (Mac brain — brief 134 + 135 merge).
+**🎉 EUR FLIPPED TO 27/27 (first time this session); USA + JPN to
+26/27.** Brief 134 Phase 3 post-link binary patcher landed — `tools/
+patch_ov004_veneers.py` + `tools/patch_module_literals.py` wired
+into build. Splice veneer pool + rewrite 1610 cascade-affected
+pointers via relocs.txt whitelist + un-shift downstream. **W7 wall
+FULLY MITIGATED** (Phase 1 ALIGNALL → Phase 2 falsified → Phase 3b
+binary patch = FINAL). **Brief 135 shipped 26 effective candidates**
+on top: 19 D-2 wave 2 + 7 Pattern 3 chunks via brief 125 generator.
+**SHA1 still fails for EUR** despite 27/27 — bytes outside dsd's
+module checks (ROM header / overlay table / similar). Brief 137
+candidate. **USA/JPN main 2-byte residue** (BL offset
+displacement) is brief 136 candidate.
 
 EUR **1.79%**, USA + JPN **0.70%** (data-tier doesn't update %
 badges directly; multi-module-OK is the visible milestone).
 
 ## Today's merges (just-landed)
 
-- **PR #545 — decomper / brief 133 (D-1 wave 3 + 2nd mega-array).**
-  **14 candidates byte-identical** (13 D-1 dispatch tables + 1
-  mega-array `data_ov002_022bf3c4` 5376 bytes). **D-1 multi-pointer
-  dispatch table pool exhausted** (48/71 = 67% drained; remaining
-  are 14 single-pointer + ov004-blocked). 2 of 3 mega-arrays done
-  (1 30 KB main mega remains). ov004 skip held correctly. Cumulative
-  cluster C/D arc: **190 symbols** across 7 briefs.
-- **PR #546 — cloud / brief 132 (ov004 Phase 2 symbol scoping).**
-  **🔑 Honest hand-back: no flip; empirical mwldarm-veneer-trigger
-  model documented.** All 3 approaches falsified empirically:
-  B v1 (STT_FUNC → STT_NOTYPE on 783 syms) no change; B v2
-  (SHF_EXECINSTR cleared on 47 .o files) no change; A
-  (`-overlaygroup`) works for isolation but breaks ~200 legitimate
-  cross-overlay refs. **mwldarm uses ONLY resolved VA + section's
-  owning MEMORY region** — not symbol type, not exec flag. Ships
-  `tools/strip_overlay_func_collisions.py` (standalone diagnostic,
-  not wired into build) + extended W7 mitigation tiers in research
-  note. **Brief 134 candidate: post-link binary patching of
-  `arm9_ov004.bin`** (Phase 3) — splice veneer pool, rewrite the
-  158 .rodata pointers, un-shift downstream by 0x400. Contained
-  to ov004, deterministic algorithm. Brain pushed `5ee1d29` F401
-  fix.
+- **PR #549 — cloud / brief 134 (OV004 Phase 3 binary patch).**
+  **🎉 26/27 baseline UNLOCKED. EUR 27/27 + USA 26/27 + JPN 26/27.**
+  First multi-region module-baseline milestone of the session. 2
+  new tools wired into the build pipeline:
+  - `tools/patch_ov004_veneers.py` — post-link patcher. Auto-
+    detects veneer pool (region-portable: EUR 0x3fcfc, USA/JPN
+    0x3fb7c). Splices 1032 bytes. Fixes .ctor + alignment-pad
+    cascade. Rewrites ~1610 cascade-affected pointers via
+    `relocs.txt` `kind:load` whitelist (false-positive-free).
+    Re-encodes 2 ARM BL instructions in `.init`. Patches
+    `arm9_overlays.yaml` ov004 metadata.
+  - `tools/patch_module_literals.py` — generic post-link load-
+    literal rewriter; chained after ov004 patcher to fix main's
+    10 cascade pointers.
+  Both idempotent on rebuild. **W7 wall FULLY MITIGATED**:
+  Phase 1 ALIGNALL → Phase 2 falsified → Phase 3b binary patch =
+  FINAL. 18 new tests; 1708 total. USA/JPN main retain 2-byte
+  pre-existing function-displacement diff (BL offset 0xf4 byte
+  displacement) — brief 136 candidate, unrelated to W7.
+- **PR #548 — decomper / brief 135 (D-2 wave 2 + Pattern 3 wave 1).**
+  **26 effective candidates** (19 D-2 syms + 7 Pattern 3 chunks).
+  Self-extend exercised on both axes. D-2 sub-pool ~60-75% drained.
+  Pattern 3 generator validated at scale across 7 main `.rodata`
+  chunks. Generator gap surfaced: `.word <name>` needs manual
+  `.extern` declarations (brief 137+ candidate for generator fix).
 
 ## Cumulative pipeline state
 
@@ -66,13 +70,15 @@ badges directly; multi-module-OK is the visible milestone).
 | **Cluster C wave 3 + Cat 1 main fix (brief 128)** | **39 C + 3 Cat 1 fixes = 42 syms / 4229 bytes** | Cat 1 byte-identical; main 21→16 bytes |
 | **Cluster C wave 4 + D-1 wave 2 (brief 130)** | **26 C + 1 mega-array + 15 D-1 = 42 syms** | First mega-array shipped (4632 bytes) |
 | **D-1 wave 3 + 2nd mega-array (brief 133)** | **13 D-1 + 5 KB mega = 14 syms** | D-1 multi-pointer pool exhausted (48/71) |
+| **D-2 wave 2 + Pattern 3 wave 1 (brief 135)** | **19 D-2 + 7 Pattern 3 chunks = 26 effective** | D-2 ~60-75% drained; Pattern 3 generator validated at scale |
 | **Cluster D recipe (brief 121)** | D-1 dispatch tables ~71 / D-2 scalar arrays ~30-40 | D-3 ~20 deferred or via Pattern 3 generator |
 | **data_worklist v3 (brief 123)** | 4-byte sub-shapes + refined cluster filters | brief 117 sub-class reproduced at 94% |
 | **Pattern 3 generator (brief 125)** | `tools/cluster_c_pattern3_gen.py` + 2 worked examples | Closes brief 119's FAILED Pattern 2 case |
-| **ARM9 main scoping (brief 127)** | **21 bytes / 6 symbols** | Cat 1 fixed in 128; 10 bytes cascade from OV004 (post brief 131) |
+| **ARM9 main scoping (brief 127)** | **21 bytes / 6 symbols** | Cat 1 fixed in 128; OV004 cascade fully fixed in 134 |
 | **OV004 scoping (brief 129)** | **86 spurious veneers** / ~165K bytes cascade | W7 wall identified |
 | **OV004 ALIGNALL Phase 1 (brief 131)** | **95% ov004 + 52% main diff reduction** | ov004: 165K→8125 bytes; main: 21→10 bytes |
-| **OV004 Phase 2 (brief 132)** | **NO FLIP; 3 approaches falsified** | mwldarm veneer model documented; brief 134 = Phase 3 |
+| **OV004 Phase 2 (brief 132)** | **NO FLIP; 3 approaches falsified** | mwldarm veneer model documented |
+| **OV004 Phase 3 binary patch (brief 134)** | **🎉 EUR 27/27 + USA 26/27 + JPN 26/27** | W7 FULLY MITIGATED; SHA1 still fails (ROM-level bytes outside dsd module coverage) |
 | Cross-region apply (briefs 075+078+090+094+110) | 419 ports + 35 region-only landings = ~837 region-matches |
 | Cross-project bulk-port (briefs 069+071+074+082) | 100 ports / 5840 bytes (region-neutral, applies × 3 future regions) |
 | Codegen-walls catalogued | **30 coercible** + **10 permanent** + 2 candidate + T-4 (analysis-tier) (C-25 / C-26 / C-27 / C-28 / C-29 / C-30 added this session; P-7 → C-27, P-8 → C-25, P-10 → C-29 promotions; **3 P-N → C-N permuter/sweep promotions total**) |
@@ -98,63 +104,48 @@ clean) via the Game Porting Toolkit cask path.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR for brief 132 + 133
-close and brief 134 + 135 queue lands.
+**Open PRs: 0** once this brain-PR for brief 134 + 135
+close and brief 136 + 137 queue lands.
 
-**DATA-TIER CONTINUES + 26/27 PATH SHIFTING TO PHASE 3.**
-D-1 multi-pointer pool exhausted (48/71). 2/3 mega-arrays
-shipped. Phase 2 symbol-scoping falsified all 3 approaches;
-post-link binary patching is the new path.
+**🎉 EUR 27/27 + USA/JPN 26/27.** First multi-region
+module-baseline unlock of the session. W7 wall fully
+mitigated via post-link binary patching. **SHA1 still
+fails for EUR despite 27/27** — ROM-level bytes outside
+dsd's module coverage. Path forward: USA/JPN main 2-byte
+fix + SHA1-gap scoping.
 
-**Cloud — brief 134 (HIGH, NEW):**
+**Decomper — brief 136 (HIGH, NEW):**
 
-- **OV004 Phase 3 — post-link binary patching.** **🔑
-  THE ACTUAL 26/27 UNLOCK (now Phase 3 attempt).** Per
-  brief 132's recommended brief-133-B plan: splice the
-  1024-byte veneer pool out of `arm9_ov004.bin`,
-  rewrite the 158 `.rodata` pointers that target
-  veneers back to their ultimate addresses, un-shift
-  the downstream `.data`/`.bss` by 0x400.
-  - **Algorithm is deterministic**; risk is moderate.
-    False-positive pointer-patch risk mitigated by
-    intersecting candidate pointers with dsd's
-    `relocs.txt` (only patch addresses that have
-    relocs against them).
-  - **Tool:** new `tools/patch_ov004_veneers.py` (or
-    extend an existing post-link patcher).
-  - **End-to-end test:** ov004's 8125-byte diff drops
-    to ~0; `dsd check modules` flips ov004 → OK;
-    main auto-flips on its 10 cascade bytes (was 9
-    cascade + 1 Cat 1, but brief 128 fixed Cat 1 in
-    source, so main should be at 0 post-Phase-3).
-  - Goal: **3-region baseline 25/27 → 27/27** if main
-    flips cleanly. **26/27 minimum.**
-  - Documentation: extend `docs/research/ov004-thunk-
-    section-fix.md` with Phase 3 results + final W7
-    mitigation. Update brief 113 risk-assessment note
-    retroactively.
-  Branch: `cloud/ov004-binary-patch-phase3`.
+- **USA/JPN main 2-byte fix.** Per brief 134's note:
+  USA + JPN main fails by exactly 2 bytes at file
+  0x89ac0 / 0x89b10 — pre-existing function-displacement
+  diff (BL offsets to a misplaced function, 0xf4 byte
+  displacement, 244 bytes). Function-tier decomp gap;
+  not W7-related. Goal: identify the displaced function
+  + fix the source to match orig placement. Expected
+  ~30 min to a few hours. **If successful: USA + JPN
+  flip to 27/27 → 3-region 27/27 module baseline.**
+  Branch: `decomper/usa-jpn-main-2byte-fix`.
 
-**Decomper — brief 135 (HIGH, NEW):**
+**Cloud — brief 137 (HIGH, NEW):**
 
-- **Cluster D-2 wave 2 + cluster C Pattern 3 wave 1.**
-  Two-part parallel-track while cloud works Phase 3.
-  D-1 multi-pointer pool is exhausted; pivot to:
-  - **Part 1 — Cluster D-2 wave 2.** Brief 121 codified
-    D-2 scalar array recipe; brief 126 shipped wave 1
-    (7 syms). ~25-35 remaining D-2 candidates per
-    brief 121's estimate. Target 10-15 in wave 2.
-    Recipe refinement reminder: D-2 also needs
-    strict 4-alignment (brief 126 finding).
-  - **Part 2 — Cluster C Pattern 3 wave 1.** Brief
-    125's generator (`tools/cluster_c_pattern3_gen.py`)
-    is ready; ~50-90 cluster C residue candidates
-    that Patterns 1 + 2 can't reach. Target 5-10
-    chunks in wave 1 using the generator. Most
-    candidates non-aligned individually but chunk-
-    aggregable.
-  ov004 candidates STILL SKIPPED until brief 134 Phase
-  3 lands. Branch: `decomper/cluster-d2-pattern3-wave-1`.
+- **SHA1-gap scoping** — why does EUR `dsd check
+  modules` report 27/27 but `ninja sha1` still fail?
+  The bytes that differ are outside dsd's per-module
+  coverage. Bisect:
+  - Run `cmp -l gx-spirit-caller_eur.nds <orig>` to
+    find every differing byte position.
+  - Map byte positions to ROM-level structures: ROM
+    header, overlay table, FAT (file allocation
+    table), title metadata, padding, banner, etc.
+  - Categorize the diff: ROM header? Overlay metadata?
+    Padding regions? Tool-output structures dsd
+    doesn't track?
+  - Output: brief 138+ application plan with per-
+    category recovery briefs.
+  - Risk assessment: may surface new toolchain walls
+    (W8+) or be straightforward metadata fixes.
+  Branch: `cloud/sha1-gap-scoping`.
 
 **Data-tier backlog (post-130/131):**
 
@@ -272,48 +263,48 @@ Function-tier matching: ~140 EUR + ~840 region-
 equivalents + 100 cross-project. **Data-tier: 1145
 cluster A `.bss` syms (~72% drained) + 5 cluster E
 DTCM syms + 48 cluster D-1 dispatch tables + 131
-cluster C Pattern 1 syms + 2 mega-arrays + 7 cluster
-D-2 arrays + 2 Pattern 3 worked examples + 3 Cat 1
-main TU fixes.** ~1100+ cumulative session match-
-equivalents (function-tier) + ~1343 data-tier symbols
-claimed. **26/27 path now Phase 3 (binary patching)**
-after brief 132 falsified Phase 2 symbol-attribute
-approaches. Brief 134 is the unlock attempt.
+cluster C Pattern 1 syms + 2 mega-arrays + 26 cluster
+D-2 arrays + 9 Pattern 3 chunks + 3 Cat 1 main TU
+fixes + ov004 binary-patch tooling.** ~1100+ cumulative
+session match-equivalents (function-tier) + ~1382 data-
+tier symbols claimed. **🎉 EUR 27/27 + USA/JPN 26/27
+module baseline** — first multi-region module-baseline
+milestone of the session. SHA1 still fails for EUR
+despite 27/27 — ROM-level bytes outside dsd module
+coverage (brief 137 scoping).
 
 ## Next-brain TODO
 
-1. **Verify + merge cloud brief 134 (OV004 Phase 3
-   binary patching) PR** when it opens. **🔑 26/27
-   baseline unlock attempt #3.** Verify gate: ov004
-   `dsd check modules` flips FAILED → OK; main auto-
-   flips on its 10 cascade bytes. Target: 3-region
-   baseline 25/27 → 27/27 if main flips clean;
-   **26/27 minimum**. If brief 134 also falls short,
-   honest hand-back with what was tried — Phase 3 is
-   the most concretely-scoped approach (deterministic
-   algorithm, contained to one file).
-2. **Verify + merge decomper brief 135 (D-2 wave 2
-   + Pattern 3 wave 1)** when it opens. EUR `ninja rom`
-   + `dsd check modules` 25/27 baseline preserved.
-   Watch for the 5 KB mega-array success (`data_022bf3c4`).
-3. **Scope brief 134+ after 132 + 133 close.** Options:
-   - **If brief 132 flipped to 26/27 or 27/27**: post-
-     unlock waves can include ov004 candidates
-     (cluster C / D-1 / D-2). Brief 134 candidate:
-     ov004 cluster sweep.
-   - **If brief 132 partial**: Phase 3 follow-up to
-     close remaining bytes.
-   - **Brief 135 — cluster C wave Pattern 3 application
-     via brief 125 generator** (decomper, ~50-90
-     candidates).
-   - **Brief 134 — cluster B wave 1** (decomper, 81
-     true scalars per brief 123 v3).
-   - **Brief 135 — cluster A wave 4** (decomper,
-     remaining small overlays).
-   - **Brief 136 — cross-region cluster A apply**
-     (decomper, port 1145 EUR symbols to USA + JPN).
-   - **Brief 137 — matched-TU byte-diff scanner**
-     (cloud tooling, optional per brief 127 spec).
+1. **Verify + merge decomper brief 136 (USA/JPN main
+   2-byte fix) PR** when it opens. **🔑 3-region 27/27
+   module unlock.** Verify gate: USA + JPN `dsd check
+   modules` flips main FAILED → OK. Likely a ~30-min
+   to few-hour source-tier fix (BL offset
+   displacement). If successful: 3 regions at 27/27.
+2. **Verify + merge cloud brief 137 (SHA1-gap scoping)
+   PR** when it opens. Scoping brief; output is brief
+   138+ application plan for ROM-level byte recovery
+   beyond dsd's module-checksum coverage.
+3. **Scope brief 138+ after 136 + 137 close.** Options:
+   - **If brief 137 finds tractable ROM-level work**:
+     application briefs to close those bytes.
+   - **OV004 cluster sweep** (decomper, now-accessible
+     post brief 134 unlock — was blocked since brief
+     122).
+   - **Cluster A wave 4** (decomper, remaining small
+     overlays).
+   - **Cluster B wave 1** (decomper, 81 true scalars).
+   - **Cluster D-2 wave 3** — close the remaining
+     ~6-16 D-2 sub-pool.
+   - **Pattern 3 wave 2+** — ~17 main `.rodata` chunks
+     remain.
+   - **30 KB main mega-array** (`data_020b6ec4`) —
+     final mega-array.
+   - **Cross-region cluster A apply** — port 1145 EUR
+     cluster A symbols to USA + JPN.
+   - **Pattern 3 generator gap fix** — `.extern`
+     emission for `.word` references per brief 135
+     note.
 4. **Pre-existing carryovers (unchanged across the session):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
