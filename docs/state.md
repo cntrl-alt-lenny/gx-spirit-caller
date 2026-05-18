@@ -109,20 +109,29 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
   via the variable-veneer-count patcher post-146.
 
-## Worktree convention — 3-worktree setup is standard
+## Worktree convention — isolation per agent, two equivalent mechanisms
 
-Per AGENTS.md (PR #564 documented this explicitly): each agent runs in
-its own sibling worktree to prevent parallel-session interference that
-bit briefs 138 + 140 earlier.
+Each agent runs in its own worktree to prevent parallel-session
+interference that bit briefs 138 + 140 earlier. **AGENTS.md is the
+canonical spec** (worktree-convention section there now covers both
+mechanisms — updated in this brain-PR). Two mechanisms are
+equivalent:
 
-| Worktree | Slug |
-|---|---|
-| `~/Dev/gx-spirit-caller` (or PC equivalent) | `brain` |
-| `~/Dev/gx-spirit-caller-decomper` | `decomper` |
-| `~/Dev/gx-spirit-caller-cloud` | `cloud` |
+- **Mac convention (manual sibling worktrees):** `~/Dev/gx-spirit-
+  caller`, `~/Dev/gx-spirit-caller-decomper`, `~/Dev/gx-spirit-caller-cloud`
+  — three siblings at the same depth, set up once via `git worktree
+  add`. Each has its own `orig/` baseroms. Adopted during the
+  SHA1-milestone arc; PR #564 documented this in state.md.
+- **Windows convention (Claude Code automatic sandboxes):** Claude
+  Code creates per-session worktrees inside `.claude/worktrees/<auto-
+  name>/` for each agent. No manual setup. They share the main
+  checkout's `orig/` baseroms. Side-effect: `gh pr merge --delete-
+  branch` may fail to clean up the local branch while the agent
+  session is active — harmless, server-side merge still succeeds.
 
 Brief 142's clean cloud-side work + brief 143's clean decomper-side work
-were the validation that 3-worktree separation is sufficient.
+were the validation that worktree separation (either mechanism) is
+sufficient.
 
 ## Brain-pattern locked
 

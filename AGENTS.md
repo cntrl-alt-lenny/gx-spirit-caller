@@ -112,35 +112,84 @@ paste to other agents, repeat.
 
 ### Worktree convention (multi-agent on the same machine)
 
-When `brain` and `decomper` are both running on the same physical
+When `brain`, `decomper`, and `cloud` are running on the same physical
 machine (the common case for cntrl_alt_lenny's setup), **they must
 work in separate git worktrees** so they don't fight over branch
-state in the same working directory. Standard layout:
+state in the same working directory. Two equivalent mechanisms exist;
+either is fine — pick by host:
+
+#### Mechanism A — manual sibling worktrees (Mac convention)
+
+Standard layout, three sibling directories at the same depth:
 
 | Worktree path                              | Slug      | Purpose                                          |
 |--------------------------------------------|-----------|--------------------------------------------------|
-| `/Users/leo/Dev/gx-spirit-caller`          | `brain`   | Main repo. Brain pulls main, reviews PRs, builds verifications. |
-| `/Users/leo/Dev/gx-spirit-caller-decomper` | `decomper`| Sibling worktree. Decomper checks out its own `decomper/cluster-prop-*` branches without touching brain's working state. |
+| `~/Dev/gx-spirit-caller`                   | `brain`   | Main repo. Brain pulls main, reviews PRs, builds verifications. |
+| `~/Dev/gx-spirit-caller-decomper`          | `decomper`| Sibling worktree. Decomper checks out its own `decomper/<scope>` branches without touching brain's working state. |
+| `~/Dev/gx-spirit-caller-cloud`             | `cloud`   | Sibling worktree. Cloud checks out its own `cloud/<scope>` branches the same way. Added in this session's PR #564 era — cloud now runs locally with the toolchain (was previously remote-only). |
 
-Add the decomper worktree once per machine via:
+Add the sibling worktrees once per machine:
 
 ```
-git worktree add /Users/leo/Dev/gx-spirit-caller-decomper main
-cp /Users/leo/Dev/gx-spirit-caller/orig/baserom_*.nds \
-   /Users/leo/Dev/gx-spirit-caller-decomper/orig/
+git worktree add ~/Dev/gx-spirit-caller-decomper main
+git worktree add ~/Dev/gx-spirit-caller-cloud    main
+cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
+   ~/Dev/gx-spirit-caller-decomper/orig/
+cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
+   ~/Dev/gx-spirit-caller-cloud/orig/
 ```
 
 Each worktree gets its own `orig/baserom_*.nds` (gitignored) and
 its own `build/` directory. The `.git` is shared via worktree
-mechanics, so commits/branches are visible across both — but
+mechanics, so commits/branches are visible across all three — but
 working-tree state (modified files, untracked files, current
 checkout) is isolated.
 
-When starting a new decomper session, point it at
-`/Users/leo/Dev/gx-spirit-caller-decomper` instead of the main
-clone. The cloud agent doesn't need a worktree — it runs without
-the local toolchain so it works on a remote / cloud LLM session
-and pushes branches directly.
+When starting a new decomper or cloud session, point it at the
+corresponding sibling directory instead of the main clone.
+
+#### Mechanism B — Claude Code automatic sandbox worktrees (Windows convention)
+
+Claude Code on Windows (or anywhere) automatically creates a
+per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`
+each time an agent session is launched. These provide identical
+isolation to the manual sibling worktrees above — decomper and cloud
+each get their own checkout of their working branch, independent of
+brain's main working state. No manual `git worktree add` needed.
+
+Example layout that appears automatically when both agents are running:
+
+```
+~/Dev/gx-spirit-caller/
+├── (brain main checkout — current branch + working state)
+└── .claude/worktrees/
+    ├── <auto-name-1>/      ← decomper's session, on decomper/<scope>
+    └── <auto-name-2>/      ← cloud's session,    on cloud/<scope>
+```
+
+The automatic worktrees share the main checkout's `orig/` baseroms
+(no copy needed) and are cleaned up when their session ends. They
+look funny-named (Docker-style) but the isolation is the same.
+
+**Side-effect to know about:** when brain runs `gh pr merge --delete-branch`,
+the local-branch cleanup can fail with *"branch X used by worktree at
+.claude/worktrees/Y"* — that's harmless; the server-side squash-merge
+still succeeds. The Claude Code worktree releases the branch when its
+session ends.
+
+#### Which mechanism to use
+
+Both achieve the same isolation goal. Pick by host convention:
+
+- **Mac:** mechanism A (manual sibling worktrees) — pattern adopted
+  during the SHA1-milestone arc per PR #564.
+- **Windows:** mechanism B (Claude Code automatic sandbox worktrees)
+  — pattern in use during the post-SHA1 arc; no manual setup needed.
+
+Brain does not strictly need either mechanism for review/merge work
+on its own — both mechanisms only matter when decomper and cloud run
+in parallel. A brain that's only verifying PRs and merging can work
+from the main checkout alone.
 
 ### Wine on macOS (post-deprecation)
 
