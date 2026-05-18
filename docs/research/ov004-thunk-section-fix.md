@@ -486,3 +486,153 @@ patching — the rest is deterministic re-shift arithmetic).
   brief 130's main Cat 1 source fix.
 - **Baseline unchanged from brief 131**: 25/27 across all 3
   regions. No regressions; no flips.
+
+---
+
+## Phase 3 (brief 134) — 🔑 BASELINE UNLOCK ACHIEVED
+
+**Brief 134 lands the post-link binary patcher Phase 2's 133-B
+plan recommended.** Result:
+
+- **EUR**: **27/27** (full match — main + ov004 + all 25 others OK)
+- **USA**: **26/27** (ov004 flips, main has 2-byte pre-existing
+  function-displacement diff unrelated to W7)
+- **JPN**: **26/27** (same as USA)
+
+This is the **first multi-module-baseline improvement since
+brief 116's 25/27 baseline**, satisfying brief 134's success
+criterion of "27/27 best case, 26/27 minimum".
+
+### What ships
+
+Two new tools chained into the link step:
+
+1. **`tools/patch_ov004_veneers.py`** — applies the full Phase
+   3 patch to ov004's flat binary:
+   - Auto-detects the 86-veneer pool by scanning for the
+     canonical 12-byte pattern `7847 c046 04f01fe5 <target>`.
+     Region-portable: EUR pool sits at file 0x3fcfc, USA / JPN
+     at 0x3fb7c.
+   - Splices the 1,032-byte pool out.
+   - Fixes the `.ctor` + alignment-pad cascade (built has
+     `.ctor` of 8 bytes from a trailing `WRITEW(0)` plus 8 bytes
+     of pad; orig has 4-byte `.ctor` + 20 zero pad — replace
+     16 bytes with 24, recovering the 8-byte deficit).
+   - Rewrites every `kind:load` reloc's literal-pool entry to
+     match the canonical `to_va` (un-shifts ~1,610 cascade-
+     affected pointers across `.text` / `.rodata` / `.init` /
+     `.data`).
+   - Re-encodes the 2 ARM BL instructions in `.init` for the
+     post-splice source VA (their encoded offsets had drifted
+     by 0x102 because mwldarm computed them for the pre-splice
+     `.init` VA).
+   - Also patches `arm9_overlays.yaml`: rewrites ov004's
+     `code_size + ctor_start + ctor_end` so `dsd rom build`
+     packs the patched binary correctly into the final ROM.
+
+2. **`tools/patch_module_literals.py`** — generic post-link
+   load-literal rewriter, applied to `arm9.bin` (main) for
+   the 10 cascade-affected pointers that target ov004's
+   pre-patch shifted `.bss` range. Idempotent on clean
+   modules; could be applied to any other binary that needs
+   cascade un-shift.
+
+### Wiring
+
+Both patchers chain off existing ninja rules:
+
+- **`mwld` rule** (where mwldarm writes the per-module `.bin`
+  files via LCF `MEMORY {... > build/<name>.bin }` directives):
+  runs `patch_ov004_veneers.py` then `patch_module_literals.py`.
+- **`rom_config` rule** (where `dsd rom config` reads the ELF
+  and writes `arm9_overlays.yaml`): runs `patch_ov004_veneers.py
+  --overlays-yaml` to fix the YAML metadata. The patcher detects
+  its idempotent state via the binary's contents and skips the
+  .bin patch on this second invocation.
+
+`dsd check modules` reads each .bin file directly (via the
+paths in `config.yaml`), so the patches are visible to the
+checksum check without further plumbing.
+
+### Verification
+
+```
+$ ninja check                              # EUR
+[3/4] dsd check modules ...
+[INFO ] Check ARM9 main: OK
+[INFO ] Check ITCM: OK
+[INFO ] Check DTCM: OK
+[INFO ] Check overlay 0..23: OK    (all 24 OK)
+```
+
+Same result for USA / JPN except `Check ARM9 main: checksum
+failed` (2-byte pre-existing diff at file 0x89ac0 / 0x89b10 —
+encoded BL offsets to a function that's misplaced in main's
+layout, unrelated to W7).
+
+### Updated W7 mitigation tiers — Phase 3 is the FINAL tier
+
+| Tier | Description | Status |
+|---|---|---|
+| 1 | `ALIGNALL(2)` on the affected overlay segment | ✅ brief 131 |
+| 2a | .o-level FUNC type / section flag rewriting | ❌ proven no-op (brief 132) |
+| 2b | `-overlaygroup` CLI injection | ❌ too aggressive (brief 132) |
+| 3a | Per-overlay link restructure | NOT NEEDED — superseded by 3b |
+| **3b** | **Post-link binary patching (this PR)** | ✅ **brief 134 — FINAL** |
+| 4 | Upstream dsd / mwldarm fixes | not actionable; not needed |
+
+### Algorithm details + tests
+
+The patcher is fully tested (18 new unit tests):
+
+- Veneer pool detection at arbitrary file offset (region-
+  portable)
+- Splice removes exactly 1032 bytes
+- ctor/pad fix replaces 16 bytes with 24 (net +8)
+- `kind:load` reloc rewrites + non-load reloc filter
+- ARM BL re-encode in `.init` range with correct sign-extended
+  imm24 round-trip
+- delinks.txt section-map parsing
+- overlays.yaml field rewriting + idempotence
+- Out-of-range relocs silently skipped
+
+### Why the EUR/USA/JPN main divergence?
+
+EUR main flips OK because the only main diffs were 10 cascade-
+shifted pointers (all in `kind:load` relocs targeting ov004's
+`.bss`/`.data` shifted range), which `patch_module_literals.py`
+un-shifts.
+
+USA/JPN main has 2 ADDITIONAL byte diffs at file 0x89ac0 and
+0x89b10: ARM BL instructions whose encoded offsets target a
+function at the wrong VA. orig has `eb002c94 / eb002c80` (target
+0x02094d18 / 0x02094d04), built has `eb002c57 / eb002c43`
+(target 0x02094c24 / 0x02094c10) — a 0xf4 = 244-byte function
+displacement. This is a function-tier issue unrelated to W7's
+veneer cascade; it's a pre-existing decomp gap for USA/JPN main
+that will resolve as more functions get source-matched in
+those regions. Brief 135+ candidate scope, not brief 134.
+
+### TL;DR for brain (Phase 3)
+
+- **🔑 26/27 baseline unlock ACHIEVED**: EUR 27/27, USA/JPN 26/27.
+  First multi-module flip since brief 116.
+- **Tool delivered: `tools/patch_ov004_veneers.py`** — splices
+  86 spurious veneers, fixes the cascade, rewrites overlays.yaml
+  metadata. Region-portable (auto-detects pool by pattern; reads
+  base VA + section ranges from delinks.txt).
+- **Tool delivered: `tools/patch_module_literals.py`** — generic
+  load-literal rewriter; chained after the ov004 patcher to fix
+  main's 10 cascade pointers.
+- **Both patchers wired into the build** (mwld + rom_config
+  ninja rules). Idempotent; rebuilds reproduce byte-identical
+  ov004.bin / main.bin from clean.
+- **18 new unit tests pass** (synthetic ELF / YAML / reloc
+  fixtures); full 1708-test suite green.
+- **No regressions**: every previously-OK module stays OK.
+- **W7 final mitigation tier (3b) documented** — post-link
+  binary patching is the supported escape hatch for mwldarm's
+  overlay-swap blindness. Phase 1 (ALIGNALL) still ships
+  alongside this for the in-section alignment cascade.
+- **Remaining USA / JPN main diff (2 bytes)**: pre-existing
+  function-displacement issue unrelated to W7; brief 135+ scope.
