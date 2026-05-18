@@ -26,6 +26,7 @@ sys.path.insert(0, str(_TOOLS))
 from analyze_symbols import ModuleData, Symbol  # noqa: E402
 from cluster_c_pattern3_gen import (  # noqa: E402
     GenContext,
+    _collect_external_refs,
     _deduce_sizes,
     _emit_directives_for_bytes,
     _escape_ascii_for_asm,
@@ -306,6 +307,238 @@ class TestGenerateChunkSmoke(unittest.TestCase):
             load_addr=0x100,
         )
         self.assertIn(".word target_ov", result.asm_source)
+
+
+# ---------------------------------------------------------------------- #
+# Brief 144: `.extern` emission for cross-chunk `.word` references.
+# ---------------------------------------------------------------------- #
+
+
+class TestCollectExternalRefs(unittest.TestCase):
+    """Unit-level coverage for `_collect_external_refs`.
+
+    The helper walks emitted directive lines, picks out
+    `.word <name>` references, and returns the ordered-unique list
+    of names NOT defined in the chunk's own `.global` set. This is
+    the single source of truth for which `.extern` lines the
+    generator emits."""
+
+    def test_extracts_extern_names_in_first_occurrence_order(self):
+        directives = [
+            "        .word extern_a",
+            "        .word extern_b",
+            "        .word extern_a",  # dupe — drop
+            "        .word extern_c",
+        ]
+        got = _collect_external_refs(directives, local_names=set())
+        self.assertEqual(got, ["extern_a", "extern_b", "extern_c"])
+
+    def test_excludes_locally_defined_names(self):
+        # `.word local_x` references the chunk's own symbol →
+        # no extern declaration needed.
+        directives = [
+            "        .word local_x",
+            "        .word extern_y",
+            "        .word local_z",
+            "        .word extern_w",
+        ]
+        got = _collect_external_refs(
+            directives, local_names={"local_x", "local_z"},
+        )
+        self.assertEqual(got, ["extern_y", "extern_w"])
+
+    def test_ignores_non_word_directives(self):
+        # `.ascii`, `.byte`, comments etc. must never produce
+        # extern declarations.
+        directives = [
+            '        .ascii "hello"',
+            "        .byte 0x42, 0x99",
+            "        .global some_sym",
+            "        ; comment line",
+            "        .word actual_extern",
+            "        .byte 0x00",
+        ]
+        got = _collect_external_refs(directives, local_names=set())
+        self.assertEqual(got, ["actual_extern"])
+
+    def test_empty_input_returns_empty(self):
+        self.assertEqual(_collect_external_refs([], set()), [])
+
+    def test_only_locals_returns_empty(self):
+        # All `.word` references hit local symbols → no externs.
+        directives = [
+            "        .word local_a",
+            "        .word local_b",
+        ]
+        got = _collect_external_refs(
+            directives, local_names={"local_a", "local_b"},
+        )
+        self.assertEqual(got, [])
+
+    def test_handles_func_underscore_prefix(self):
+        # Real-world: brief 135 chunks reference `func_02033de8`-
+        # style symbols. The regex must accept identifier chars
+        # (letters, digits, underscores).
+        directives = [
+            "        .word func_02033de8",
+            "        .word func_02034014",
+            "        .word data_020c3ca8",
+        ]
+        got = _collect_external_refs(directives, local_names=set())
+        self.assertEqual(
+            got,
+            ["func_02033de8", "func_02034014", "data_020c3ca8"],
+        )
+
+    def test_intra_chunk_reference_is_not_extern(self):
+        # The chunk references one of its OWN labels (e.g. a
+        # symbol earlier in the chunk pointing to a later symbol).
+        # No extern needed; the reference is intra-chunk.
+        directives = [
+            "        .word data_020b59ec",  # local
+            "        .word data_020c5a38",  # extern
+        ]
+        got = _collect_external_refs(
+            directives,
+            local_names={"data_020b59e0", "data_020b59ec"},
+        )
+        self.assertEqual(got, ["data_020c5a38"])
+
+
+class TestGenerateChunkExternEmission(unittest.TestCase):
+    """End-to-end shape: `generate_chunk` must place `.extern`
+    declarations in the output `.s` after `.section .rodata` and
+    before the first `.global`, matching the brief 135 / 139
+    hand-edited convention."""
+
+    def test_single_extern_appears_in_output(self):
+        # Chunk with one symbol containing one external `.word`
+        # reference. 0x021ab000 LE = 00 b0 1a 02.
+        bytes_source = b"\x00\xb0\x1a\x02"
+        syms_main = [_data_sym("data_100", "main", 0x100, size=4)]
+        syms_ov = [_data_sym("target_ov", "ov000", 0x021ab000, size=0)]
+        modules = {
+            "main": _module("main", syms_main),
+            "ov000": _module("ov000", syms_ov),
+        }
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x104,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        self.assertIn(".extern target_ov", result.asm_source)
+
+    def test_multiple_externs_deduplicated_and_ordered(self):
+        # Chunk with two symbols: first holds [extern_a, extern_b,
+        # extern_a, extern_c], second holds [extern_b again]. The
+        # extern block must list each unique name once, in
+        # first-occurrence order: extern_a, extern_b, extern_c.
+        # All targets are 4-byte aligned.
+        bytes_source = (
+            # data_100 (16 bytes): a, b, a, c
+            b"\x00\x00\x05\x02"  # 0x02050000 → extern_a
+            b"\x00\x00\x06\x02"  # 0x02060000 → extern_b
+            b"\x00\x00\x05\x02"  # dupe
+            b"\x00\x00\x07\x02"  # 0x02070000 → extern_c
+            # data_110 (4 bytes): b again
+            b"\x00\x00\x06\x02"  # extern_b dupe
+        )
+        syms_main = [
+            _data_sym("data_100", "main", 0x100, size=16),
+            _data_sym("data_110", "main", 0x110, size=4),
+        ]
+        syms_ext = [
+            _data_sym("extern_a", "ov000", 0x02050000, size=0),
+            _data_sym("extern_b", "ov000", 0x02060000, size=0),
+            _data_sym("extern_c", "ov000", 0x02070000, size=0),
+        ]
+        modules = {
+            "main": _module("main", syms_main),
+            "ov000": _module("ov000", syms_ext),
+        }
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x114,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        # Find the extern lines in the output.
+        extern_lines = [
+            ln.strip() for ln in result.asm_source.splitlines()
+            if ln.strip().startswith(".extern")
+        ]
+        self.assertEqual(
+            extern_lines,
+            [".extern extern_a", ".extern extern_b", ".extern extern_c"],
+        )
+
+    def test_intra_chunk_word_reference_is_not_extern(self):
+        # `data_104` is defined IN the chunk; `data_100`'s pointer
+        # at it should NOT produce a .extern declaration.
+        bytes_source = (
+            b"\x04\x01\x00\x00"  # 0x00000104 → data_104 (intra-chunk)
+            b"\x42\x42\x42\x42"  # data_104 (raw bytes)
+        )
+        syms_main = [
+            _data_sym("data_100", "main", 0x100, size=4),
+            _data_sym("data_104", "main", 0x104, size=4),
+        ]
+        modules = {"main": _module("main", syms_main)}
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x108,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        self.assertIn(".word data_104", result.asm_source)
+        self.assertNotIn(".extern data_104", result.asm_source)
+        # And no other extern was inferred.
+        for line in result.asm_source.splitlines():
+            self.assertFalse(
+                line.strip().startswith(".extern"),
+                f"unexpected .extern in output: {line!r}",
+            )
+
+    def test_no_externs_produces_no_extern_block(self):
+        # Chunk with zero external `.word` references: the output
+        # must contain no `.extern` lines AND no blank-line
+        # placeholder where the extern block would have been.
+        # (Backwards compatibility: matches brief 125 byte-for-
+        # byte for chunks that don't need externs.)
+        bytes_source = b"NAN(\x00"
+        syms = [_data_sym("data_100", "main", 0x100, size=5)]
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x104,
+            modules={"main": _module("main", syms)},
+            bytes_source=bytes_source + b"\xff\xff\xff",  # pad to 8
+            load_addr=0x100,
+        )
+        self.assertNotIn(".extern", result.asm_source)
+
+    def test_extern_block_placed_after_section_before_global(self):
+        # Topological: `.extern X` must appear AFTER `.section
+        # .rodata` and BEFORE the first `.global`. Matches the
+        # brief 135 / 139 hand-edited convention.
+        bytes_source = b"\x00\xb0\x1a\x02"  # → extern_y
+        syms_main = [_data_sym("data_100", "main", 0x100, size=4)]
+        syms_ext = [_data_sym("extern_y", "ov000", 0x021ab000, size=0)]
+        modules = {
+            "main": _module("main", syms_main),
+            "ov000": _module("ov000", syms_ext),
+        }
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x104,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        text = result.asm_source
+        section_pos = text.index(".section .rodata")
+        extern_pos = text.index(".extern extern_y")
+        global_pos = text.index(".global data_100")
+        self.assertLess(section_pos, extern_pos)
+        self.assertLess(extern_pos, global_pos)
 
 
 if __name__ == "__main__":
