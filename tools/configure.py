@@ -669,9 +669,29 @@ def main():
         )
         n.newline()
 
+        # Brief 140 part 2: `dsd rom build` leaves the secure-
+        # area CRC at 0x6C unset (zero) and writes a stale
+        # header CRC at 0x15E (CRC over a header that includes
+        # the wrong-zero 0x6C). The 4-byte residue brief 137
+        # attributed to ROM-header CRCs. Chain
+        # `patch_rom_header_crc.py` after the ROM is written:
+        # it copies the secure-area CRC from orig (the post-
+        # decryption CRC is identical because our built secure
+        # area is byte-identical to orig) and computes the
+        # header CRC over the now-canonical header bytes. The
+        # patcher is idempotent + writes only when bytes change
+        # so `ninja sha1`'s SHA-1 check stays cached on rebuilds
+        # that don't actually change the ROM.
+        patch_header_crc = "tools/patch_rom_header_crc.py"
         n.rule(
             name="rom_build",
-            command=f"{DSD} rom build --config $in --rom $out $arm7_bios_flag"
+            command=_wrap_chain_for_windows(
+                f"{DSD} rom build --config $in --rom $out "
+                f"$arm7_bios_flag"
+                f" && {PYTHON} {patch_header_crc}"
+                f" --rom $out"
+                f" --orig $orig_rom"
+            ),
         )
         n.newline()
 
@@ -898,11 +918,23 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     n.newline()
 
     rom_file = project.build_rom()
+    # Brief 140 part 2: thread the orig baserom path through to
+    # the patcher chained inside the rom_build rule. The orig is
+    # required for the secure-area CRC copy at 0x6C; configure.py
+    # already SHA-1-verifies it at config time so it's a known
+    # build dependency.
+    orig_rom = str(project.baserom())
     n.build(
         inputs=rom_config_file,
-        implicit=[DSD, cleanup_stamp],
+        implicit=[
+            DSD,
+            cleanup_stamp,
+            "tools/patch_rom_header_crc.py",
+            orig_rom,
+        ],
         rule="rom_build",
         outputs=rom_file,
+        variables={"orig_rom": orig_rom},
     )
     n.newline()
 
