@@ -642,6 +642,33 @@ def main():
         )
         n.newline()
 
+        # Brief 138: macOS Finder (and Windows Explorer) leak
+        # `.DS_Store` / `._*` / `Thumbs.db` / `desktop.ini` into
+        # `extract/<region>/files/` during development. `dsd rom
+        # build` scans that directory and includes every file it
+        # finds in the FNT / FAT — the extra `.DS_Store` entry
+        # shifts every downstream row, cascading ~100K bytes of
+        # ROM diff vs orig (99.995% of the post-brief-134 gap per
+        # brief 137's scoping). The `cleanup_macos_junk` rule
+        # runs before `rom_build` and removes those files. The
+        # stamp output + `restat=True` lets the cleanup execute
+        # every ninja invocation (so re-appearing junk gets
+        # caught) while keeping rom_build's cache warm when
+        # nothing actually changed. See
+        # docs/research/sha1-gap-scoping.md for the brief 137
+        # bisection + brief 138 fix scope.
+        clean_junk = "tools/clean_macos_junk.py"
+        n.rule(
+            name="cleanup_macos_junk",
+            command=(
+                f"{PYTHON} {clean_junk}"
+                f" --dir $cleanup_dir"
+                f" --stamp $out"
+            ),
+            restat=True,
+        )
+        n.newline()
+
         n.rule(
             name="rom_build",
             command=f"{DSD} rom build --config $in --rom $out $arm7_bios_flag"
@@ -841,10 +868,39 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     )
     n.newline()
 
+    # Brief 138: macOS-junk cleanup as a stand-alone rule that
+    # runs before `dsd rom build`. The stamp file is the rule's
+    # output; combined with `restat=True` on the rule, ninja only
+    # propagates downstream rebuilds when the cleanup actually
+    # modified something. The cleanup ITSELF runs on every ninja
+    # invocation because its input is a phony target that's
+    # always considered dirty — that way junk that re-appears
+    # after a build (e.g. user Finder-browses extract/) gets
+    # caught on the next `ninja rom` without manual intervention.
+    cleanup_stamp = str(
+        project.game_build / "cleanup_macos_junk.stamp"
+    )
+    cleanup_dir = str(project.game_extract / "files")
+    cleanup_always = f"cleanup_always_{project.game_version}"
+    n.build(
+        inputs=[],
+        rule="phony",
+        outputs=cleanup_always,
+    )
+    n.newline()
+    n.build(
+        inputs=[cleanup_always],
+        implicit=["tools/clean_macos_junk.py"],
+        rule="cleanup_macos_junk",
+        outputs=cleanup_stamp,
+        variables={"cleanup_dir": cleanup_dir},
+    )
+    n.newline()
+
     rom_file = project.build_rom()
     n.build(
         inputs=rom_config_file,
-        implicit=DSD,
+        implicit=[DSD, cleanup_stamp],
         rule="rom_build",
         outputs=rom_file,
     )
