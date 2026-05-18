@@ -575,15 +575,70 @@ def main():
         )
         n.newline()
 
+        # Brief 134 (W7 final mitigation): mwldarm produces both
+        # `arm9.o` (the linked ELF — declared output) AND the
+        # per-module flat binaries (`build/<region>/build/arm9.bin`,
+        # `arm9_ov*.bin`, etc.) as undeclared side effects, driven
+        # by the `MEMORY {... > build/<name>.bin }` directives in
+        # the LCF. Two patch passes chain off the link:
+        #
+        #   1. patch_ov004_veneers.py — splices mwldarm's 86
+        #      spurious thumb→arm interwork veneers out of ov004's
+        #      .bin and un-shifts the +0x400 cascade inside it
+        #      (1610 internal load literals + 2 .init ARM BLs).
+        #
+        #   2. patch_module_literals.py — applied to main.bin to
+        #      un-shift the 10 load-literal pointers that target
+        #      ov004's shifted .bss range from outside ov004.
+        #      Idempotent; runs on every rebuild but a no-op on
+        #      already-correct binaries.
+        #
+        # `dsd check modules` reads each .bin directly via the
+        # paths in `config.yaml`, so chaining these inside the
+        # mwld rule ensures the checksums reflect the patched
+        # state. See docs/research/ov004-thunk-section-fix.md
+        # for the full W7 history (Phase 1 ALIGNALL → Phase 2
+        # falsification → Phase 3 these tools).
+        patch_ov004 = "tools/patch_ov004_veneers.py"
+        patch_literals = "tools/patch_module_literals.py"
         n.rule(
             name="mwld",
-            command=f'{WINE} "{LD}" {LD_FLAGS} @$objects_file $lcf_file -o $out'
+            command=_wrap_chain_for_windows(
+                f'{WINE} "{LD}" {LD_FLAGS} @$objects_file '
+                f'$lcf_file -o $out'
+                f' && {PYTHON} {patch_ov004}'
+                f' --binary $ov004_bin'
+                f' --relocs $ov004_relocs'
+                f' --delinks $ov004_delinks'
+                f' && {PYTHON} {patch_literals}'
+                f' --binary $main_bin'
+                f' --relocs $main_relocs'
+                f' --base-va 0x02000000'
+            ),
         )
         n.newline()
 
+        # Brief 134 (W7 final mitigation, part 2): `dsd rom config`
+        # reads arm9.o (the LINKED ELF, pre-patch) and writes
+        # arm9_overlays.yaml + per-module yamls. The ov004 entry
+        # ends up with stale code_size + ctor_start + ctor_end
+        # (mwldarm's shifted values) because the ELF still reflects
+        # the pre-patch link layout. Chain patch_ov004_veneers.py
+        # with `--overlays-yaml` here so the YAML metadata is
+        # rewritten to match the patched .bin's actual size + orig
+        # ctor VAs. Without this, `dsd rom build` would mis-pack
+        # ov004 into the ROM (correct .bin content but wrong
+        # length/ctor declared in the overlays table).
         n.rule(
             name="rom_config",
-            command=f"{DSD} rom config --elf $in --config $config_path"
+            command=_wrap_chain_for_windows(
+                f"{DSD} rom config --elf $in --config $config_path"
+                f" && {PYTHON} {patch_ov004}"
+                f" --binary $ov004_bin"
+                f" --relocs $ov004_relocs"
+                f" --delinks $ov004_delinks"
+                f" --overlays-yaml $overlays_yaml"
+            ),
         )
         n.newline()
 
@@ -718,15 +773,43 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     objects_file = str(project.arm9_objects_txt())
     delink_file = str(project.arm9_delink_yaml())
     elf_file = str(project.arm9_o())
+    # Brief 134: pass the ov004 + main .bin / relocs paths to
+    # the mwld rule so the post-link patchers (veneer-splice for
+    # ov004; load-literal un-shift for main) can run as part of
+    # the link step. mwldarm writes per-module .bin files as
+    # LCF-driven side effects of the link; we patch them before
+    # any downstream consumer (dsd check modules, dsd rom build)
+    # reads them. Both patchers are idempotent.
+    ov004_bin = str(project.game_build / "build" / "arm9_ov004.bin")
+    ov004_relocs = str(
+        project.game_config / "arm9" / "overlays" / "ov004" / "relocs.txt"
+    )
+    ov004_delinks = str(
+        project.game_config / "arm9" / "overlays" / "ov004" / "delinks.txt"
+    )
+    main_bin = str(project.game_build / "build" / "arm9.bin")
+    main_relocs = str(project.game_config / "arm9" / "relocs.txt")
     n.build(
         inputs=project.source_object_files() + [lcf_file, objects_file, delink_file],
-        implicit=LD,
+        implicit=[
+            LD,
+            "tools/patch_ov004_veneers.py",
+            "tools/patch_module_literals.py",
+            ov004_relocs,
+            ov004_delinks,
+            main_relocs,
+        ],
         rule="mwld",
         outputs=elf_file,
         variables={
             "target_dir": str(project.game_build),
             "objects_file": objects_file,
             "lcf_file": lcf_file,
+            "ov004_bin": ov004_bin,
+            "ov004_relocs": ov004_relocs,
+            "ov004_delinks": ov004_delinks,
+            "main_bin": main_bin,
+            "main_relocs": main_relocs,
         },
     )
     n.newline()
@@ -735,12 +818,26 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     n.newline()
 
     rom_config_file = str(project.build_rom_config())
+    overlays_yaml = str(
+        project.game_build / "build" / "arm9_overlays.yaml"
+    )
     n.build(
         inputs=elf_file,
-        implicit=DSD,
+        implicit=[
+            DSD,
+            "tools/patch_ov004_veneers.py",
+            ov004_relocs,
+            ov004_delinks,
+        ],
         rule="rom_config",
         outputs=rom_config_file,
-        variables={"config_path": str(project.arm9_config_yaml())},
+        variables={
+            "config_path": str(project.arm9_config_yaml()),
+            "ov004_bin": ov004_bin,
+            "ov004_relocs": ov004_relocs,
+            "ov004_delinks": ov004_delinks,
+            "overlays_yaml": overlays_yaml,
+        },
     )
     n.newline()
 

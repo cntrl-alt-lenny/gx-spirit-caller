@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**61 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**63 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -18,7 +18,7 @@ git add docs/tools-index.md
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (15)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (17)
 - [Uncategorised](#uncategorised) (2)
 
 ## Analysis / worklist
@@ -371,11 +371,23 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 
 `.arm9` segment (and per-segment list) of a dsd-generated arm9.lcf.
 
+### `tools/patch_module_literals.py`
+
+**generic post-link literal-pool rewriter**
+
+(brief 134 companion to `patch_ov004_veneers.py`).
+
 ### `tools/patch_objects_legacy.py`
 
 **rewrite `func_X.o` -> `func_X.legacy.o`**
 
 (or `.legacy_sp3.o`) in the dsd-generated objects.txt for any source ending in one of the legacy routing suffixes.
+
+### `tools/patch_ov004_veneers.py`
+
+**post-link binary patcher that splices**
+
+out mwldarm's 86 spurious thumb→arm interwork veneers from `build/<ver>/build/arm9_ov004.bin` (brief 134).
 
 ### `tools/patch_section_align.py`
 
