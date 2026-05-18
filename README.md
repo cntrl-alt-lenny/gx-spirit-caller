@@ -11,7 +11,13 @@
 </p>
 
 <p align="center">
-  <strong>Per-region progress</strong><br>
+  <strong>🎉 Byte-identical ROM rebuild: EUR + USA + JPN</strong><br>
+  <img src="https://img.shields.io/badge/ninja%20sha1-PASS-brightgreen" alt="ninja sha1 passes">
+  <img src="https://img.shields.io/badge/modules-27%2F27%20%C3%97%203-brightgreen" alt="27/27 modules across 3 regions">
+</p>
+
+<p align="center">
+  <strong>Per-region code-tier progress</strong><br>
   <img src="https://img.shields.io/badge/EUR-1.79%25-red" alt="EUR Progress">
   <img src="https://img.shields.io/badge/USA-0.70%25-red" alt="USA Progress">
   <img src="https://img.shields.io/badge/JPN-0.70%25-red" alt="JPN Progress">
@@ -145,27 +151,52 @@ tracked placeholders.
 
 ## Progress
 
+Each region builds independently; the per-region heatmaps below
+visualise structural coverage (one rectangle per translation
+unit; area proportional to code + data bytes; fill color encodes
+match percentage from red 0% through orange/yellow to green
+100%). Hover any cell on a desktop browser for the exact name,
+size, and percentage.
+
+### EUR (`AYXP`)
+
 <p align="center">
-  <img src="assets/progress-heatmap.svg" alt="Decomp progress heatmap" width="100%">
+  <img src="assets/progress-heatmap-eur.svg" alt="EUR decomp progress heatmap" width="100%">
 </p>
 
-Each rectangle is one translation unit; area is proportional to total
-bytes (code + data); fill color encodes match percentage from red (0%)
-through orange/yellow to green (100%). Hover any cell on a desktop
-browser for the exact name, size, and percentage.
+### USA (`AYXE`)
+
+<p align="center">
+  <img src="assets/progress-heatmap-usa.svg" alt="USA decomp progress heatmap" width="100%">
+</p>
+
+### JPN (`AYXJ`)
+
+<p align="center">
+  <img src="assets/progress-heatmap-jpn.svg" alt="JPN decomp progress heatmap" width="100%">
+</p>
 
 ```bash
-python tools/progress.py            # human-readable table
-ninja heatmap                       # regenerate assets/progress-heatmap.svg
+python tools/progress.py --version eur    # human-readable table per region
+ninja heatmap                             # regenerates assets/progress-heatmap-<region>.svg
+                                          # for whichever region was configured
 ```
 
 `progress.py` reads `build/<ver>/report.json` once `ninja report` has run.
 Before that, it falls back to counting `function` entries in every
 `symbols.txt` so the denominator is non-zero from day one.
 
-The heatmap SVG is committed to the repo so it renders on GitHub. Run
-`ninja heatmap` after any change that affects matched %, then commit the
-updated SVG alongside your code change so the README badge stays current.
+The heatmap SVGs are committed to the repo so they render on GitHub.
+To regenerate all three after a change that affects matched %:
+
+```bash
+for v in eur usa jpn; do
+    python tools/configure.py "$v" && ninja heatmap
+done
+```
+
+Commit the updated SVGs alongside your code change so the README stays
+current.
 
 ## Toolchain
 

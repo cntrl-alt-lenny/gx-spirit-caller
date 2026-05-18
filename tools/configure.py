@@ -1261,7 +1261,12 @@ def add_progress_build(n: ninja_syntax.Writer, project: Project):
 
 
 def add_heatmap_build(n: ninja_syntax.Writer, project: Project):
-    heatmap_path = "assets/progress-heatmap.svg"
+    # Per-region SVG path so each region's heatmap coexists in the
+    # README without overwriting the others. `ninja heatmap`
+    # generates the current configured region; regenerating all
+    # three is `for v in eur usa jpn; do python tools/configure.py
+    # $v && ninja heatmap; done`.
+    heatmap_path = f"assets/progress-heatmap-{project.game_version}.svg"
     n.build(
         inputs=str(project.objdiff_report()),
         implicit=["tools/generate_heatmap.py"],
