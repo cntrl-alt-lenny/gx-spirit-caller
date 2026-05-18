@@ -367,12 +367,39 @@ context. Standing handoff conventions:
 - **Memory files are per-machine.** Each side's
   `~/.claude/projects/...` memory does NOT follow the role.
   State.md is the bridge.
-- **Worktree conventions:** main checkout for brain; sibling
-  worktree (`gx-spirit-caller-decomper`) for decomper when both
-  agents run on the same machine. Cloud branches arrive via
-  Claude Code's own sandbox worktrees (`.claude/worktrees/`)
-  and the brain can detached-checkout the branch by SHA to
-  avoid locking conflicts.
+- **Worktree conventions (UPDATED 2026-05-18):** the
+  **3-worktree setup** is the new normal whenever cloud +
+  decomper agents run on the same machine as the brain:
+  - **Brain**: main checkout at the repo root
+    (`gx-spirit-caller/`).
+  - **Decomper**: sibling worktree at
+    `gx-spirit-caller-decomper/` (parent dir).
+  - **Cloud**: sibling worktree at `gx-spirit-caller-cloud/`
+    (parent dir).
+
+  Create on a fresh machine with:
+
+  ```bash
+  cd /path/to/gx-spirit-caller          # main checkout
+  git worktree add ../gx-spirit-caller-decomper main
+  git worktree add ../gx-spirit-caller-cloud main
+  ```
+
+  **Worktrees are per-machine** — they live on local
+  filesystem and are NOT in the repo. Each machine that
+  runs the agent fleet has its own set. If a brain
+  inherits the role on a machine where the worktrees
+  haven't been created yet, set them up before kicking
+  off the next round's cloud / decomper agents — otherwise
+  parallel-session branch-switches in the main checkout
+  will blow away each others' uncommitted work
+  (documented historical pain from briefs 138 + 140).
+
+  The brain itself doesn't strictly need the sibling
+  worktrees for review / merge work — `gh pr merge` +
+  `git pull` on main is sufficient. The sibling worktrees
+  matter when cloud and decomper agents are actively
+  working in parallel.
 
 ## New agents?
 
