@@ -335,6 +335,27 @@ def parse_section_map(delinks_path: Path) -> dict[str, tuple[int, int]]:
     return sections
 
 
+def expected_output_size_for(
+    data: bytes | bytearray,
+    *,
+    already_patched: bool,
+) -> int:
+    """Compute the size the patched ov004 binary SHOULD have,
+    derived from the input.
+
+    The off-by-1024 bug fix (brief 140 part 1): if `data` is
+    already patched (no veneers left), it's ALREADY at the
+    target size — don't subtract the delta again. Otherwise
+    the target size is the input minus the splice delta.
+
+    Used by `main()` to drive the YAML `code_size` rewrite. Pure
+    function — exposed so tests can pin the branching behaviour
+    without round-tripping a real binary."""
+    if already_patched:
+        return len(data)
+    return len(data) - EXPECTED_OUTPUT_DELTA
+
+
 def patch_ov004(
     data: bytes | bytearray,
     relocs: list[tuple[int, str, int]],
@@ -515,7 +536,19 @@ def main() -> int:
         print(f"error: {args.binary}: {e}", file=sys.stderr)
         return 1
 
-    expected_output_size = len(data) - EXPECTED_OUTPUT_DELTA
+    # Brief 140 part 1 fix: the YAML `code_size` is the POST-PATCH
+    # ov004 binary size. If `data` already came in pre-patched
+    # (e.g. on the rom_config invocation that runs the patcher a
+    # second time after the .bin was already spliced by the mwld
+    # invocation), `len(data)` IS the post-patch size — DON'T
+    # subtract the delta again. The brief 134 patcher had this
+    # bug: it always subtracted, writing `268192 - 1024 = 267168`
+    # into the YAML on the YAML-only re-invocation, which `dsd
+    # rom build` then aligned to 0x413a0 and wrote into the ROM
+    # overlay table — 512 bytes short of orig's 0x417a0.
+    expected_output_size = expected_output_size_for(
+        data, already_patched=bool(stats["already_patched"]),
+    )
 
     def _do_yaml_patch() -> bool:
         if args.overlays_yaml is None:

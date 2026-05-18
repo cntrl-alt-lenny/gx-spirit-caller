@@ -32,6 +32,7 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from patch_ov004_veneers import (  # noqa: E402
+    EXPECTED_OUTPUT_DELTA,
     EXPECTED_VENEER_COUNT,
     EXPECTED_VENEER_POOL_SIZE,
     PatchError,
@@ -42,6 +43,7 @@ from patch_ov004_veneers import (  # noqa: E402
     _reencode_init_bls,
     _scan_veneer_pool,
     _splice_veneer_pool,
+    expected_output_size_for,
     parse_section_map,
     patch_overlays_yaml,
 )
@@ -334,6 +336,54 @@ class TestPatchOverlaysYaml(unittest.TestCase):
             self.assertFalse(changed)
         finally:
             path.unlink()
+
+
+class TestExpectedOutputSizeFor(unittest.TestCase):
+    """Regression test for the brief 140 part 1 off-by-1024 bug.
+
+    Before fix: `expected_output_size = len(data) - DELTA` was
+    computed UNCONDITIONALLY in main(), so on the YAML-only
+    second invocation (where `data` is already post-splice
+    268192 EUR) it derived 267168 — 1024 too small. The 267168
+    hit `arm9_overlays.yaml`'s `code_size`, then `dsd rom build`
+    aligned it to 0x413a0 and wrote that 512-bytes-short value
+    into the ROM overlay table at file offset 0x8b30a.
+
+    After fix: the computation branches on `already_patched`
+    via `expected_output_size_for()`."""
+
+    def test_pre_patched_input_subtracts_delta(self) -> None:
+        # Pre-patch ov004 (EUR): 269216 bytes → post-patch 268192.
+        pre_patch_size = 269216
+        data = bytearray(pre_patch_size)
+        got = expected_output_size_for(data, already_patched=False)
+        self.assertEqual(got, pre_patch_size - EXPECTED_OUTPUT_DELTA)
+        self.assertEqual(got, 268192)
+
+    def test_already_patched_input_uses_len_directly(self) -> None:
+        # Already-patched ov004 (EUR): 268192 bytes. With the bug,
+        # this would derive 267168. The fix returns 268192.
+        post_patch_size = 268192
+        data = bytearray(post_patch_size)
+        got = expected_output_size_for(data, already_patched=True)
+        self.assertEqual(got, post_patch_size)
+        self.assertEqual(got, 268192)
+        # Specifically, the OFF-BY-1024 value must NOT appear:
+        self.assertNotEqual(got, 267168)
+
+    def test_already_patched_regardless_of_size(self) -> None:
+        # USA / JPN ov004 has a different post-patch size
+        # (267808). The fix must work region-portably.
+        for post_patch_size in (267808, 268192, 269000):
+            data = bytearray(post_patch_size)
+            got = expected_output_size_for(
+                data, already_patched=True,
+            )
+            self.assertEqual(
+                got, post_patch_size,
+                f"already_patched: want len(data) for size "
+                f"{post_patch_size}",
+            )
 
 
 if __name__ == "__main__":
