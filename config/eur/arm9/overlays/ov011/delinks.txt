@@ -609,3 +609,7 @@ src/overlay011/data_ov011_021d38e8.c:
 src/overlay011/data_ov011_021d38bc.c:
     complete
     .data start:0x021d38bc end:0x021d38d0
+
+src/overlay011/bss/data_ov011_bss.s:
+    complete
+    .bss start:0x021d4000 end:0x021d4820

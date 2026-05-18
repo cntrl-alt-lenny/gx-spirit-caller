@@ -15,3 +15,7 @@ src/overlay013/data_ov013_021cb7b4.c:
 src/overlay013/data_ov013_021cb750.c:
     complete
     .rodata start:0x021cb750 end:0x021cb7b4
+
+src/overlay013/bss/data_ov013_bss.s:
+    complete
+    .bss start:0x021cbc00 end:0x021cc1e0

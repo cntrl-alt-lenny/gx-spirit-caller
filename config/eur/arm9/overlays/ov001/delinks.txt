@@ -7,3 +7,7 @@
 src/overlay001/data_ov001_021ca348.c:
     complete
     .rodata start:0x021ca348 end:0x021ca378
+
+src/overlay001/bss/data_ov001_bss.s:
+    complete
+    .bss start:0x021ca420 end:0x021ca440

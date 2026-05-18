@@ -27,3 +27,7 @@ src/overlay020/data_ov020_021adfbc.c:
 src/overlay020/data_ov020_021adfa8.c:
     complete
     .data start:0x021adfa8 end:0x021adfbc
+
+src/overlay020/bss/data_ov020_bss.s:
+    complete
+    .bss start:0x021ae060 end:0x021aeb00
