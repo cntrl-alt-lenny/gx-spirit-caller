@@ -29,3 +29,7 @@ src/overlay008/func_ov008_021ada90.c:
 src/overlay008/data_ov008_021b23e0.c:
     complete
     .rodata start:0x021b23e0 end:0x021b2430
+
+src/overlay008/bss/data_ov008_bss.s:
+    complete
+    .bss start:0x021b2780 end:0x021b2f40

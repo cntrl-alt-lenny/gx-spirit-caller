@@ -7711,14 +7711,6 @@ src/main/data_020b5b80.c:
     complete
     .rodata start:0x020b5b80 end:0x020b5e20
 
-src/main/data_020bee7c.c:
-    complete
-    .rodata start:0x020bee7c end:0x020bee84
-
-src/main/data_020bee84.c:
-    complete
-    .rodata start:0x020bee84 end:0x020beea4
-
 src/main/data_020beedc.c:
     complete
     .rodata start:0x020beedc end:0x020beefc
@@ -7783,10 +7775,6 @@ src/main/data_020c6390.c:
 src/main/data_020fe78c.c:
     complete
     .data start:0x020fe78c end:0x020fe7b8
-
-src/main/data_020bec44.c:
-    complete
-    .rodata start:0x020bec44 end:0x020bec4c
 
 src/main/data_020bff80.c:
     complete
@@ -8023,3 +8011,31 @@ src/main/data/data_020beb58.s:
 src/main/data/data_020bece4.s:
     complete
     .rodata start:0x020bece4 end:0x020bed6c
+
+src/main/data/data_020b476c.s:
+    complete
+    .rodata start:0x020b476c end:0x020b4908
+
+src/main/data/data_020bec3c.s:
+    complete
+    .rodata start:0x020bec3c end:0x020bec58
+
+src/main/data/data_020bee6c.s:
+    complete
+    .rodata start:0x020bee6c end:0x020beedc
+
+src/main/data/data_020bef5c.s:
+    complete
+    .rodata start:0x020bef5c end:0x020bef80
+
+src/main/data/data_020be820.s:
+    complete
+    .rodata start:0x020be820 end:0x020be9ac
+
+src/main/data/data_020c3188.s:
+    complete
+    .rodata start:0x020c3188 end:0x020c3198
+
+src/main/data/data_020c3b8c.s:
+    complete
+    .rodata start:0x020c3b8c end:0x020c3bbc

@@ -130,3 +130,7 @@ src/overlay017/data_ov017_021b7f3c.c:
 src/overlay017/data_ov017_021b7ed0.c:
     complete
     .rodata start:0x021b7ed0 end:0x021b7ef8
+
+src/overlay017/bss/data_ov017_bss.s:
+    complete
+    .bss start:0x021b8520 end:0x021b8ac0

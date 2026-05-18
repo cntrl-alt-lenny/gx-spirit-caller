@@ -90,3 +90,7 @@ src/overlay019/data_ov019_021b5a68.c:
 src/overlay019/data_ov019_021b5a28.c:
     complete
     .rodata start:0x021b5a28 end:0x021b5a50
+
+src/overlay019/bss/data_ov019_bss.s:
+    complete
+    .bss start:0x021b5e20 end:0x021b6940
