@@ -8039,3 +8039,147 @@ src/main/data/data_020c3188.s:
 src/main/data/data_020c3b8c.s:
     complete
     .rodata start:0x020c3b8c end:0x020c3bbc
+
+src/main/data/data_020c3e84.c:
+    complete
+    .data start:0x020c3e84 end:0x020c3e88
+
+src/main/data/data_020c3f48.c:
+    complete
+    .data start:0x020c3f48 end:0x020c3f4c
+
+src/main/data/data_020c3f8c.c:
+    complete
+    .data start:0x020c3f8c end:0x020c3f90
+
+src/main/data/data_020c59c0.c:
+    complete
+    .data start:0x020c59c0 end:0x020c59c4
+
+src/main/data/data_020c5db0.c:
+    complete
+    .data start:0x020c5db0 end:0x020c5db4
+
+src/main/data/data_020c6490.c:
+    complete
+    .data start:0x020c6490 end:0x020c6494
+
+src/main/data/data_020c68f8.c:
+    complete
+    .data start:0x020c68f8 end:0x020c68fc
+
+src/main/data/data_020c7ac0.c:
+    complete
+    .data start:0x020c7ac0 end:0x020c7ac4
+
+src/main/data/data_020c7b40.c:
+    complete
+    .data start:0x020c7b40 end:0x020c7b44
+
+src/main/data/data_020c8e80.c:
+    complete
+    .data start:0x020c8e80 end:0x020c8e84
+
+src/main/data/data_020c9690.c:
+    complete
+    .data start:0x020c9690 end:0x020c9694
+
+src/main/data/data_020fe808.c:
+    complete
+    .data start:0x020fe808 end:0x020fe80c
+
+src/main/data/data_020ff91c.c:
+    complete
+    .data start:0x020ff91c end:0x020ff920
+
+src/main/data/data_02101594.c:
+    complete
+    .data start:0x02101594 end:0x02101598
+
+src/main/data/data_02101e48.c:
+    complete
+    .data start:0x02101e48 end:0x02101e4c
+
+src/main/data/data_02101ea0.c:
+    complete
+    .data start:0x02101ea0 end:0x02101ea4
+
+src/main/data/data_02101ec4.c:
+    complete
+    .data start:0x02101ec4 end:0x02101ec8
+
+src/main/data/data_02101ecc.c:
+    complete
+    .data start:0x02101ecc end:0x02101ed0
+
+src/main/data/data_02101f30.c:
+    complete
+    .data start:0x02101f30 end:0x02101f34
+
+src/main/data/data_021021e0.c:
+    complete
+    .data start:0x021021e0 end:0x021021e4
+
+src/main/data/data_021021e8.c:
+    complete
+    .data start:0x021021e8 end:0x021021ec
+
+src/main/data/data_02102250.c:
+    complete
+    .data start:0x02102250 end:0x02102254
+
+src/main/data/data_02102298.c:
+    complete
+    .data start:0x02102298 end:0x0210229c
+
+src/main/data/data_02102498.c:
+    complete
+    .data start:0x02102498 end:0x0210249c
+
+src/main/data/data_0210249c.c:
+    complete
+    .data start:0x0210249c end:0x021024a0
+
+src/main/data/data_021024c0.c:
+    complete
+    .data start:0x021024c0 end:0x021024c4
+
+src/main/data/data_021024c4.c:
+    complete
+    .data start:0x021024c4 end:0x021024c8
+
+src/main/data/data_021026d8.c:
+    complete
+    .data start:0x021026d8 end:0x021026dc
+
+src/main/data/data_021026dc.c:
+    complete
+    .data start:0x021026dc end:0x021026e0
+
+src/main/data/data_021026e8.c:
+    complete
+    .data start:0x021026e8 end:0x021026ec
+
+src/main/data/data_021026f4.c:
+    complete
+    .data start:0x021026f4 end:0x021026f8
+
+src/main/data/data_02102700.c:
+    complete
+    .data start:0x02102700 end:0x02102704
+
+src/main/data/data_02102834.c:
+    complete
+    .data start:0x02102834 end:0x02102838
+
+src/main/data/data_02102838.c:
+    complete
+    .data start:0x02102838 end:0x0210283c
+
+src/main/data/data_02102a94.c:
+    complete
+    .data start:0x02102a94 end:0x02102a98
+
+src/main/data/data_02102aa0.c:
+    complete
+    .data start:0x02102aa0 end:0x02102aa4

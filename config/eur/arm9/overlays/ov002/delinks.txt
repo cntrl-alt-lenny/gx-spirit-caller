@@ -1943,3 +1943,27 @@ src/overlay002/data_ov002_022bf3c4.c:
 src/overlay002/data_ov002_022cacc0.c:
     complete
     .data start:0x022cacc0 end:0x022cad34
+
+src/overlay002/data/data_ov002_022ca9b4.c:
+    complete
+    .data start:0x022ca9b4 end:0x022ca9b8
+
+src/overlay002/data/data_ov002_022ca9b8.c:
+    complete
+    .data start:0x022ca9b8 end:0x022ca9bc
+
+src/overlay002/data/data_ov002_022cacbc.c:
+    complete
+    .data start:0x022cacbc end:0x022cacc0
+
+src/overlay002/data/data_ov002_022cad34.c:
+    complete
+    .data start:0x022cad34 end:0x022cad38
+
+src/overlay002/data/data_ov002_022ccbdc.c:
+    complete
+    .data start:0x022ccbdc end:0x022ccbe0
+
+src/overlay002/data/data_ov002_022cccbc.c:
+    complete
+    .data start:0x022cccbc end:0x022cccc0
