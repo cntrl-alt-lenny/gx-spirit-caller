@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**64 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**65 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -18,7 +18,7 @@ git add docs/tools-index.md
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (17)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (18)
 - [Uncategorised](#uncategorised) (3)
 
 ## Analysis / worklist
@@ -388,6 +388,12 @@ Note that this is emphatically not a required piece of Ninja; it's just a helpfu
 **post-link binary patcher that splices**
 
 out mwldarm's 86 spurious thumb→arm interwork veneers from `build/<ver>/build/arm9_ov004.bin` (brief 134).
+
+### `tools/patch_rom_header_crc.py`
+
+**write the secure-area CRC + header**
+
+CRC16 fields in an NDS ROM header (brief 140 part 2).
 
 ### `tools/patch_section_align.py`
 
