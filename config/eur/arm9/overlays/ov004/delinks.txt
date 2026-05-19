@@ -147,3 +147,19 @@ src/overlay004/data/data_ov004_0220a298.c:
 src/overlay004/data/data_ov004_0220a29c.c:
     complete
     .data start:0x0220a29c end:0x0220a2a0
+
+src/overlay004/data/data_ov004_02200dbc.s:
+    complete
+    .rodata start:0x02200dbc end:0x02200de8
+
+src/overlay004/data/data_ov004_02200de8.c:
+    complete
+    .rodata start:0x02200de8 end:0x02200df4
+
+src/overlay004/data/data_ov004_02200df4.s:
+    complete
+    .rodata start:0x02200df4 end:0x02200e00
+
+src/overlay004/data/data_ov004_02200e00.s:
+    complete
+    .rodata start:0x02200e00 end:0x02200f18
