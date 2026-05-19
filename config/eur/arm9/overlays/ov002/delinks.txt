@@ -1967,3 +1967,11 @@ src/overlay002/data/data_ov002_022ccbdc.c:
 src/overlay002/data/data_ov002_022cccbc.c:
     complete
     .data start:0x022cccbc end:0x022cccc0
+
+src/overlay002/data/data_ov002_022ccc5c.s:
+    complete
+    .data start:0x022ccc5c end:0x022cccbc
+
+src/overlay002/data/data_ov002_022cccc0.s:
+    complete
+    .data start:0x022cccc0 end:0x022ccd24
