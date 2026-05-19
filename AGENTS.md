@@ -362,30 +362,62 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply cloud's
-  brief 148 pointer recipe (`extern char <pointee>;
-  void *<slot> = &<pointee>;`) to the remaining ~20
-  cluster B pointer candidates. Target ≥ 15 claims.
-  Stretch: falsify exactly one of cloud's 3 size-1/2
-  workaround sketches (.s recipe / aligned(1) attr /
-  group-claim bundling). Critical: 3-region SHA1 PASS
-  preserved. Branch: `decomper/cluster-b-wave-3-pointer-apply`.
+- [`docs/briefs/151-ov004-rodata-cluster-wave-2.md`](docs/briefs/151-ov004-rodata-cluster-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): continue ov004
+  `.rodata` cluster work post brief 150's patcher
+  generalisation. Part 1: ship the ~6 candidates brief
+  147 had to defer when the patcher safety check fired
+  at n<9. Part 2: deeper sub-cluster drain — cluster A
+  `.bss` (39 candidates from brief 141 sweep), remaining
+  C / D-1 / D-2, more Pattern 3 chunks via brief 144's
+  turnkey generator. Target ≥ 20 claims with at least
+  one that drops `n` below 9 (end-to-end brief 150
+  validation). Critical: 3-region SHA1 PASS preserved.
+  Branch: `decomper/ov004-rodata-cluster-wave-2`.
 
-- [`docs/briefs/150-patcher-low-n-with-terminator.md`](docs/briefs/150-patcher-low-n-with-terminator.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): close the low-`n`
-  WITH_TERMINATOR boundary surfaced by brief 147 (PR
-  #572). Bisection found `n < 9` triggers a NEW patcher
-  boundary — mwldarm continues WITH_TERMINATOR shape
-  at very low n while brief 146's n-inference defaults
-  to NO_TERMINATOR. Recommended fix: Option A —
-  degrade n-inference from hard-check to warn, trust
-  byte-detection truth alone (per decomper's brief 147
-  funnel). Tests pin `n ∈ {0, 2, 7, 9, 43, 86}`.
-  Critical: 3-region SHA1 PASS preserved. Branch:
-  `cloud/patcher-low-n-with-terminator`.
+- [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](docs/briefs/152-cluster-b-size-1-2-workarounds.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): try size-1/2
+  alignment workarounds #2 (`__attribute__((aligned(1)))`)
+  + #3 (group claim — `unsigned int` bundle or struct
+  bundle). Brief 149 falsified #1 (.s with explicit
+  `.byte`). Document findings + lock recipe if any
+  PASSES. Unblocks ~13 size-1/2 cluster B candidates.
+  Critical: 3-region SHA1 PASS preserved across worked
+  examples. Branch: `cloud/cluster-b-size-1-2-workarounds`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
+  `decomper`, shipped in PR #575. **Cluster B pointer
+  pool fully drained**: 20 of 20 candidates via cloud's
+  locked recipe. 12 singletons + two 4-element + one
+  3-element fn-ptr "tables" + 1 ov004 (bss pointee).
+  Notable empirical correction: **REJECTED brief 148's
+  bundling-into-array hand-off** after `relocs.txt`
+  inspection showed each table slot is referenced by
+  name elsewhere. All 20 shipped as singletons to
+  preserve per-slot symbol identity. **Size-1
+  workaround #1 (.s with `.byte`) FALSIFIED** — same
+  1308 byte cascade as brief 148's naive .c attempt.
+  Self-extend gate: yield 100% PASS, bytes-matched
+  FAIL (80 B vs ≥250 B); wave 1 closes. **3-region SHA1
+  PASS + 27/27 OK preserved.**
+- [`docs/briefs/150-patcher-low-n-with-terminator.md`](docs/briefs/150-patcher-low-n-with-terminator.md)
+  `cloud`, shipped in PR #576. Option A shipped:
+  byte-detection authoritative in `_fix_ctor_and_pad`;
+  n-inference is now a hint via stderr note, not
+  fatal. **Patcher accepts any `n ∈ [0, 86]` cleanly.**
+  `expected_output_size_for` gains optional
+  `ctor_pad_net` parameter; `main()` passes
+  byte-detected truth into YAML rewrite. 8 new tests
+  (`TestLowNWithTerminator` + `TestExpectedOutputSize
+  ForCtorPadNet`). **Test suite 1784/1784.** Cloud
+  honestly documented end-to-end smoke limit: arbitrary
+  source claims can't reliably drop `n` (suppression
+  depends on slot being an ov002 cross-overlay pointer
+  target). **3-region SHA1 PASS preserved bit-for-bit
+  at historical n=86.** Brief 134 → 142 → 146 → 150
+  patcher chain complete.
 
 - [`docs/briefs/147-ov004-rodata-cluster-wave-retry.md`](docs/briefs/147-ov004-rodata-cluster-wave-retry.md)
   `decomper`, shipped in PR #572. **14 ov004 `.rodata`
