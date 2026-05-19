@@ -362,30 +362,83 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/144-pattern3-extern-emission-fix.md`](docs/briefs/144-pattern3-extern-emission-fix.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): fix
-  `tools/cluster_c_pattern3_gen.py` to emit `.extern`
-  declarations for `.word <name>` references. Long-
-  standing generator gap flagged in briefs 135 / 139 /
-  141 funnel notes; every Pattern 3 wave (14 chunks to
-  date) has manually added 1-5 externs per chunk.
-  Small tooling fix; high leverage on future waves.
-  Critical: 3-region SHA1 PASS preserved. Branch:
-  `cloud/pattern3-extern-emission-fix`.
+- [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply cloud's
+  brief 148 pointer recipe (`extern char <pointee>;
+  void *<slot> = &<pointee>;`) to the remaining ~20
+  cluster B pointer candidates. Target ≥ 15 claims.
+  Stretch: falsify exactly one of cloud's 3 size-1/2
+  workaround sketches (.s recipe / aligned(1) attr /
+  group-claim bundling). Critical: 3-region SHA1 PASS
+  preserved. Branch: `decomper/cluster-b-wave-3-pointer-apply`.
 
-- [`docs/briefs/145-ov004-rodata-cluster-wave.md`](docs/briefs/145-ov004-rodata-cluster-wave.md)
-  — `decomper` (HIGH): first ov004 `.rodata` cluster
-  wave — now-unlocked by brief 142's patcher
-  generalisation. Pattern 1 chunks (15-30) + Pattern 3
-  via brief 125 generator (3-8) + Cluster D candidates
-  if any. Target ≥ 20 ov004 `.rodata` symbols.
-  Critical: ov004 stays OK across 3 regions AND
-  3-region SHA1 PASS preserved. First production use
-  of brief 142's generalised patcher. Branch:
-  `decomper/ov004-rodata-cluster-wave`.
+- [`docs/briefs/150-patcher-low-n-with-terminator.md`](docs/briefs/150-patcher-low-n-with-terminator.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): close the low-`n`
+  WITH_TERMINATOR boundary surfaced by brief 147 (PR
+  #572). Bisection found `n < 9` triggers a NEW patcher
+  boundary — mwldarm continues WITH_TERMINATOR shape
+  at very low n while brief 146's n-inference defaults
+  to NO_TERMINATOR. Recommended fix: Option A —
+  degrade n-inference from hard-check to warn, trust
+  byte-detection truth alone (per decomper's brief 147
+  funnel). Tests pin `n ∈ {0, 2, 7, 9, 43, 86}`.
+  Critical: 3-region SHA1 PASS preserved. Branch:
+  `cloud/patcher-low-n-with-terminator`.
 
 ### Closed briefs (reference)
 
+- [`docs/briefs/147-ov004-rodata-cluster-wave-retry.md`](docs/briefs/147-ov004-rodata-cluster-wave-retry.md)
+  `decomper`, shipped in PR #572. **14 ov004 `.rodata`
+  syms across all 3 shapes proven** (Pattern 1 .c /
+  Pattern 1 .s / Pattern 3 chunk). Brief 146 patcher
+  validated at n=9 (NO_TERMINATOR path); brief 144 auto-
+  `.extern` emission verified turnkey. **Empirical
+  patcher limit surfaced**: bisection found `n < 9`
+  triggers a new boundary (mwldarm continues
+  WITH_TERMINATOR while brief 146's n-inference
+  defaults to NO_TERMINATOR) — safety check fires
+  correctly. Decomper shipped 14 (under ≥20 target)
+  without forcing the additional 6 candidates that
+  would have broken SHA1. Brief 150 closes the
+  boundary.
+- [`docs/briefs/148-cluster-b-pointer-typedef-research.md`](docs/briefs/148-cluster-b-pointer-typedef-research.md)
+  `cloud`, shipped in PR #573. Research brief, three
+  deliverables. (1) Pointer pool survey at
+  `docs/research/cluster-b-pointer-pool.md` (23
+  candidates: 15 data-pointers + 8 code-pointers).
+  (2) Recipe locked: `extern char <pointee>; void
+  *<slot> = &<pointee>;` (same shape as brief 121 /
+  130 D-1 wave 2). 3 worked examples shipped covering
+  3 edge cases (unclaimed pointee / claimed-with-typed-
+  array / code-pointer), all 3-region SHA1 PASS. Key
+  decisions documented: opaque `extern char` (not
+  typed) sidesteps cross-TU type-clash; reloc-based
+  `extern + &` (not literal cast) preserves cross-
+  region portability. (3) Size-1 spot-check FAILED
+  with naive `unsigned char data_X = 0xAB;` (mwcc
+  default 4-byte section alignment ≠ orig byte-tight;
+  1308 byte diff). 3 size-1 workaround sketches filed
+  for brief 149 stretch falsification.
+- [`docs/briefs/146-patcher-ctor-terminator-detection.md`](docs/briefs/146-patcher-ctor-terminator-detection.md)
+  `cloud`, shipped in PR #570. Two-path
+  `_fix_ctor_and_pad`: WITH_TERMINATOR (n=86,
+  preserves SHA1 PASS bit-for-bit) and NO_TERMINATOR
+  (0 < n < 86, new). **Cloud empirically corrected
+  the brief's recommended discriminator byte offset**
+  — brief said bytes 4-7, cloud used bytes 12-15
+  where `.LZN` marker differs from zero pad. Pinned
+  with dedicated test. Unblocks ov004 `.rodata`
+  source-level work (brief 147).
+- [`docs/briefs/144-pattern3-extern-emission-fix.md`](docs/briefs/144-pattern3-extern-emission-fix.md)
+  `cloud`, shipped in PR #565. Pattern 3 generator
+  now auto-emits `.extern` declarations for `.word
+  <name>` references. Eliminates 14 chunks' worth of
+  manual fixups. 1770/1770 tests post-merge.
+- [`docs/briefs/145-ov004-rodata-cluster-wave.md`](docs/briefs/145-ov004-rodata-cluster-wave.md)
+  `decomper`, shipped in PR #566. **BLOCKED writeup**
+  — no source changes; characterised the patcher bug
+  brief 146 then fixed. Clean discipline: 3
+  reproducer shapes documented; SHA1 not regressed.
 - [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
   `cloud`, shipped in PR #562. Generalised
   `tools/patch_ov004_veneers.py` to accept any veneer
