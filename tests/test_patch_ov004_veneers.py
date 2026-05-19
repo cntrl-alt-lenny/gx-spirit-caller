@@ -646,7 +646,11 @@ _SYNTH_PAD_8 = b"\x00" * 8
 _SYNTH_DATA_HEAD_4 = b"LZNC"
 
 
-def _build_synth_ov004(n: int) -> tuple[bytes, dict[str, tuple[int, int]]]:
+def _build_synth_ov004(
+    n: int,
+    *,
+    terminator: bool | None = None,
+) -> tuple[bytes, dict[str, tuple[int, int]]]:
     """Build a synthetic ov004-shaped binary with `n` veneers + a
     realistic ctor/pad cluster + a small `.data` tail. Returns
     (data, sections-map).
@@ -658,14 +662,28 @@ def _build_synth_ov004(n: int) -> tuple[bytes, dict[str, tuple[int, int]]]:
     `.rodata` claims), mwldarm omits the terminator and the cluster
     shrinks from 16 to 12 bytes.
 
+    Brief 150: brief 147 bisected a NEW boundary — at very low `n`
+    (empirically n=2 and n=7) mwldarm continues emitting the
+    WITH_TERMINATOR shape. The empirical boundary is somewhere
+    between n=7 (WITH) and n=9 (NO). To pin both paths
+    independently of the empirical guess, `terminator` is now an
+    explicit parameter:
+
+      - `terminator=None` (default): use brief 146's empirical
+        default (`True` when n == 86, `False` otherwise).
+      - `terminator=True`: force WITH_TERMINATOR (16-byte cluster).
+        Use to pin the low-n path brief 147 surfaced.
+      - `terminator=False`: force NO_TERMINATOR (12-byte cluster).
+        Use to pin the n=9 path brief 146 fixed at non-low n.
+
     Built-file layout (what mwldarm emits):
 
         [0..0x1000)            .text payload (0xAA filler)
         [0x1000..0x1000+n*12)  veneer pool
         [pool_end..ctor_end)   ctor + pad cluster — variable size:
-                                 n == 86 → 16 bytes
+                                 WITH terminator → 16 bytes
                                           [ctor(4) | WRITEW(0)(4) | pad(8)]
-                                 n  < 86 → 12 bytes
+                                 NO terminator → 12 bytes
                                           [ctor(4) | pad(8)]
         [ctor_end..ctor_end+4) `.data` head (non-zero — "LZNC")
         [...64 B total of `.data` tail with 0xBB filler...)
@@ -684,13 +702,17 @@ def _build_synth_ov004(n: int) -> tuple[bytes, dict[str, tuple[int, int]]]:
     targets = [0x02000000 + i * 4 for i in range(n)]
     pool = _veneer_pool(targets) if n > 0 else b""
 
-    if n == HISTORICAL_MAX_VENEER_COUNT:
-        # n == 86: terminator present → 16-byte cluster.
+    if terminator is None:
+        # Brief 146 empirical default: WITH at n=86, NO elsewhere.
+        use_terminator = (n == HISTORICAL_MAX_VENEER_COUNT)
+    else:
+        use_terminator = terminator
+
+    if use_terminator:
+        # WITH terminator → 16-byte cluster.
         ctor_pad = _SYNTH_CTOR_ENTRY + _SYNTH_WRITEW0 + _SYNTH_PAD_8
     else:
-        # n < 86 (and n == 0 too — though at n == 0 the patcher
-        # early-returns and never inspects this cluster): no
-        # terminator → 12-byte cluster.
+        # NO terminator → 12-byte cluster.
         ctor_pad = _SYNTH_CTOR_ENTRY + _SYNTH_PAD_8
 
     data_tail = _SYNTH_DATA_HEAD_4 + b"\xbb" * (
@@ -967,6 +989,172 @@ class TestPatcherOutputMatchesOrig(unittest.TestCase):
             self._first_100_bytes_hash(bytes(patched)),
             self._first_100_bytes_hash(orig),
         )
+
+
+# ---------------------------------------------------------------------- #
+# Brief 150 — low-n WITH_TERMINATOR + degraded n-inference cross-check.
+# ---------------------------------------------------------------------- #
+
+
+class TestLowNWithTerminator(unittest.TestCase):
+    """Brief 150: mwldarm keeps the WITH_TERMINATOR ctor shape at
+    very low veneer counts (empirically n=2 and n=7). Brief 146's
+    n-inference defaulted to NO_TERMINATOR for any 0 < n < 86 and
+    its hard cross-check blocked builds at low n. Brief 150
+    degrades the cross-check to a stderr note so byte-detection
+    (the truth source) drives the patcher, and the disagreement is
+    surfaced informationally instead of fatally.
+
+    These tests use `_build_synth_ov004(n, terminator=True)` to
+    construct synthetic inputs that mirror the bisection result —
+    low n + WITH_TERMINATOR shape — and pin that the patcher:
+
+      - byte-detects the shape correctly (ctor_pad_net = 8),
+      - produces the right post-patch size (orig-equivalent),
+      - emits the brief 150 note to stderr but does NOT raise.
+    """
+
+    def _patch(self, n: int, *, terminator: bool):
+        # Suppress the brief 150 note that fires on shape
+        # disagreement — tests that specifically assert the note
+        # is present capture stderr themselves (see
+        # `test_low_n_warn_surfaces_on_disagreement`).
+        import io
+        import contextlib
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(n, terminator=terminator)
+        with contextlib.redirect_stderr(io.StringIO()):
+            patched, stats = patch_ov004(data, [], sections)
+        return data, patched, stats
+
+    def test_low_n_2_with_terminator_succeeds(self) -> None:
+        # Brief 147 hit this exact case: n=2, WITH_TERMINATOR, the
+        # patcher hard-failed under brief 146's cross-check. With
+        # brief 150 it succeeds and the byte-detected ctor_pad_net
+        # is 8 (the WITH_TERMINATOR value).
+        data, patched, stats = self._patch(2, terminator=True)
+        self.assertEqual(stats["veneers_spliced"], 2)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+        # Splice removes 24 bytes (2 × 12); ctor/pad fix adds 8
+        # back; net output delta = 16.
+        self.assertEqual(len(data) - len(patched), 16)
+
+    def test_low_n_7_with_terminator_succeeds(self) -> None:
+        # Other low-n boundary case brief 147 surfaced. Same shape,
+        # different n. Confirms brief 150's behaviour isn't an n=2
+        # special case.
+        data, patched, stats = self._patch(7, terminator=True)
+        self.assertEqual(stats["veneers_spliced"], 7)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+        # Splice removes 84 (7 × 12); ctor/pad fix adds 8 → 76.
+        self.assertEqual(len(data) - len(patched), 76)
+
+    def test_low_n_warn_surfaces_on_disagreement(self) -> None:
+        # When byte-detection says WITH but n-inference says NO,
+        # the brief 150 note should hit stderr — without raising.
+        import io
+        import contextlib
+        from patch_ov004_veneers import patch_ov004
+
+        data, sections = _build_synth_ov004(2, terminator=True)
+        captured = io.StringIO()
+        with contextlib.redirect_stderr(captured):
+            patched, stats = patch_ov004(data, [], sections)
+        # No exception → reached here.
+        self.assertEqual(stats["veneers_spliced"], 2)
+        err = captured.getvalue()
+        # Brief 150 note keywords.
+        self.assertIn("shape disagrees with n-inference", err)
+        self.assertIn("byte-detected net 8", err)
+        self.assertIn("brief 150", err)
+
+    def test_n_inference_aligned_path_no_warn(self) -> None:
+        # When byte-detection agrees with n-inference (e.g. n=9
+        # with NO_TERMINATOR), no brief 150 note should be emitted.
+        import io
+        import contextlib
+        from patch_ov004_veneers import patch_ov004
+
+        data, sections = _build_synth_ov004(9, terminator=False)
+        captured = io.StringIO()
+        with contextlib.redirect_stderr(captured):
+            patched, stats = patch_ov004(data, [], sections)
+        self.assertEqual(stats["veneers_spliced"], 9)
+        err = captured.getvalue()
+        self.assertNotIn("shape disagrees", err)
+        self.assertNotIn("brief 150", err)
+
+    def test_with_terminator_at_n_equals_43_succeeds(self) -> None:
+        # Stress: synthetic WITH_TERMINATOR at a mid n value (43).
+        # mwldarm hasn't been observed emitting WITH at n=43 in
+        # practice, but the patcher must trust byte-detection and
+        # adapt without raising.
+        data, patched, stats = self._patch(43, terminator=True)
+        self.assertEqual(stats["veneers_spliced"], 43)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+        # Splice removes 516 (43 × 12); ctor/pad fix adds 8 → 508.
+        self.assertEqual(len(data) - len(patched), 508)
+
+
+class TestExpectedOutputSizeForCtorPadNet(unittest.TestCase):
+    """Brief 150: `expected_output_size_for` gains optional
+    `ctor_pad_net` parameter that takes precedence over n-inference
+    when supplied. Pins the new argument contract."""
+
+    def test_ctor_pad_net_takes_precedence(self) -> None:
+        # If byte-detection says WITH_TERMINATOR (net=8) at n=2,
+        # the helper must use the byte-detected value even though
+        # n-inference would return delta = 2*12 - 12 = 12 (giving
+        # output size = len - 12).
+        # With ctor_pad_net=8: output size = len - 2*12 + 8 = len - 16.
+        data = bytearray(100)
+        got = expected_output_size_for(
+            data, already_patched=False,
+            veneer_count=2, ctor_pad_net=8,
+        )
+        self.assertEqual(got, 100 - 16)
+        # Sanity: without ctor_pad_net, the n-inference path gives
+        # the WRONG answer (per brief 150) — len - 12.
+        got_n_only = expected_output_size_for(
+            data, already_patched=False, veneer_count=2,
+        )
+        self.assertEqual(got_n_only, 100 - 12)
+        self.assertNotEqual(got, got_n_only)
+
+    def test_ctor_pad_net_at_historical_max_matches(self) -> None:
+        # The byte-detected and n-inferred paths must agree at the
+        # n=86 historical case (both predict net=8 → delta=1024).
+        data = bytearray(100000)
+        got_byte = expected_output_size_for(
+            data, already_patched=False,
+            veneer_count=HISTORICAL_MAX_VENEER_COUNT,
+            ctor_pad_net=8,
+        )
+        got_n = expected_output_size_for(
+            data, already_patched=False,
+            veneer_count=HISTORICAL_MAX_VENEER_COUNT,
+        )
+        self.assertEqual(got_byte, got_n)
+        self.assertEqual(got_byte, 100000 - 1024)
+
+    def test_already_patched_ignores_ctor_pad_net(self) -> None:
+        # `already_patched=True` always returns len(data),
+        # regardless of either inference parameter.
+        data = bytearray(268192)
+        got = expected_output_size_for(
+            data, already_patched=True,
+            veneer_count=9, ctor_pad_net=8,
+        )
+        self.assertEqual(got, 268192)
 
 
 if __name__ == "__main__":
