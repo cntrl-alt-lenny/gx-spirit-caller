@@ -8,14 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-19 late, post-#578 + #579 merge, briefs
-153 + 154 queued. Brain back on Windows after Mac day. **🎉 SHA1
-FINAL GATE PASSES** across all 3 regions (brief 140, PR #558) and
-continues to hold after 6 post-SHA1 rounds. Current wavefront is
-**post-SHA1 polish** — ov004 `.rodata` wave 2 shipped 28 claims (40%
-over target, brief 151), cluster B size-1/2 recipe locked via
-workaround #3 bundle (brief 152), `arm9.lcf`'s `ALIGNALL(2)`
-root-caused as the alignment-cascade culprit (not mwcc).
+**Last updated:** 2026-05-19 evening, post-#582 merge + #581 HOLD,
+brief 155 queued (decomper main size-1/2 drain). Brain on Windows.
+**🎉 SHA1 FINAL GATE PASSES** across all 3 regions (brief 140, PR
+#558) and continues to hold after 7 post-SHA1 rounds. Cluster B
+size-1/2 overlay portion drained (brief 153, 6 bundles / 1560 B);
+main portion (~13 candidates) queued as brief 155. Cloud's brief
+154 PARTIAL — survey clean but worked-example reclassification
+broke EUR SHA1, awaiting cloud revert.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -55,6 +55,41 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **PR #582 — decomper / brief 153 cluster B size-1/2 wave.** ✅
+  **6 multi-symbol `.s` bundles** covering **1560 bytes** across
+  ov002 (2 bundles) + ov006 (4 bundles), absorbing 34 placeholder
+  neighbours. **Critical recipe adaptation:** decomper discovered
+  brief 152's `.c` recipe FAILS on overlays — `tools/patch_module_
+  literals.py` runs post-link on `arm9.bin` ONLY, not on overlays,
+  so `.c`-bundled absorbed placeholders' `kind:load` relocs
+  resolve to `0x00000000` on overlay link. First attempt dropped
+  EUR SHA1 PASS → FAIL with 194 byte diffs in ov006. Adapted to
+  Pattern-3-style multi-symbol `.s` chunks where each absorbed
+  placeholder gets its own `.global` label; doesn't contradict
+  brief 149's `.s` falsification (that was a single-symbol 1-byte
+  chunk; the cascade is a section-size-not-multiple-of-4 issue,
+  not a per-directive issue). 100% yield, 3-region SHA1 PASS,
+  27/27 OK preserved.
+
+### Holds (NOT merged this round)
+
+- **PR #581 — cloud / brief 154 ov004 reclassification.** 🚧
+  **HELD — EUR SHA1 PASS → FAIL on worked example.** Survey
+  itself (`docs/research/ov004-rodata-misclassification-
+  survey.md`, 622 candidates with confidence ratings) is clean.
+  The 1 HIGH-confidence worked example — reclassify
+  `data_ov004_021e2efc` from `data(any)` to `function(arm,
+  size=0x0, unknown)` — broke EUR SHA1 from `1da50df7…b4f75` to
+  `d83c6d20…fd3087`. Per brief 154's own success criterion
+  ("if a reclassification causes a SHA1 break, the candidate
+  was wrong; revert + lower confidence"), the candidate fails.
+  Cloud needs to revert the `symbols.txt` edit, downgrade
+  `0x021e2efc` from HIGH to MEDIUM in the survey + note the
+  SHA1-break observation, and re-push the PR with just the
+  survey + downgrade. Survey research itself is high-value;
+  the worked-example failure is a self-falsifying data point
+  the survey now incorporates.
 
 - **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
   **28 source-level claims** (40% over ≥ 20 target). Per-shape:
@@ -121,28 +156,25 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (cluster B size-1/2 drain):**
+**Decomper — one HIGH brief queued (main size-1/2 completer):**
 
-- **Brief 153 (HIGH, NEW)** — `decomper/cluster-b-size-1-2-wave`.
-  Apply brief 152's locked workaround #3 recipe (bundle into
-  `unsigned int[N]` covering the deduced range to next named
-  symbol) to drain cluster B's ~14-32 remaining size-1/2
-  candidates (cluster B main + brief 152's 18 overlay candidates
-  across ov002/ov006/ov008/other). Single-wave brief expected.
-  Self-extend gate unchanged.
+- **Brief 155 (HIGH, NEW)** — `decomper/cluster-b-size-1-2-main-wave`.
+  Apply brief 152's locked `.c` recipe (`unsigned int[N]` bundle)
+  to drain cluster B's ~13 remaining MAIN-module size-1/2
+  candidates. Critical: use the `.c` form (not brief 153's `.s`
+  adaptation) — `patch_module_literals.py` resolves
+  `kind:load` literals correctly on `arm9.bin`. Self-extend gate
+  unchanged. Single-wave brief expected.
 
-**Cloud — one MEDIUM brief queued (ov004 reclassification
-research):**
+**Cloud — recovery on PR #581 (not a new brief):**
 
-- **Brief 154 (MEDIUM, NEW)** — `cloud/ov004-rodata-symbol-
-  reclassification-research`. Survey ov004's misclassified-as-
-  `data` `.rodata` symbols in `symbols.txt`, propose
-  reclassifications to `func` for those whose bytes actually
-  read as ARM code, ship 1-2 HIGH-confidence reclassifications
-  as worked examples with 3-region SHA1 PASS. Optional bonus:
-  spot-check whether the reclassification drops ov004's veneer
-  count below 9 (brief 151's bonus-not-met). Unblocks brief 155+
-  (decomper) for further ov004 polish if the n<9 unlock works.
+- Cloud has unfinished work on **PR #581 (brief 154 PARTIAL)** —
+  revert the `symbols.txt` worked-example edit, update the
+  survey doc to downgrade `0x021e2efc` confidence + note the
+  SHA1-break observation as a self-falsifying data point, and
+  re-push for re-verify. Survey-only re-ship preserves the 410-
+  line research; brain merges once SHA1 PASS is confirmed.
+  No new brief queued for cloud this round — finish #581 first.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
