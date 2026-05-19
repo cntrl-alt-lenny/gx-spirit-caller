@@ -8,14 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-19 morning, post-#575 + #576 merge, briefs
-151 + 152 queued. Brain on Mac. **🎉 SHA1 FINAL GATE PASSES** across
-all 3 regions (brief 140, PR #558) and continues to hold after 5
-more post-SHA1 rounds. Current wavefront is **post-SHA1 polish** —
-cluster B pointer pool drained 20/20 (brief 149), W7 patcher fully
-generalised 134 → 142 → 146 → 150 (Option A shipped: byte-detection
-authoritative; n-inference is a hint), ov004 `.rodata` 14 syms
-shipped at n=9 (brief 147) with wave 2 unblocked.
+**Last updated:** 2026-05-19 late, post-#578 + #579 merge, briefs
+153 + 154 queued. Brain back on Windows after Mac day. **🎉 SHA1
+FINAL GATE PASSES** across all 3 regions (brief 140, PR #558) and
+continues to hold after 6 post-SHA1 rounds. Current wavefront is
+**post-SHA1 polish** — ov004 `.rodata` wave 2 shipped 28 claims (40%
+over target, brief 151), cluster B size-1/2 recipe locked via
+workaround #3 bundle (brief 152), `arm9.lcf`'s `ALIGNALL(2)`
+root-caused as the alignment-cascade culprit (not mwcc).
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -56,6 +56,31 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
+- **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
+  **28 source-level claims** (40% over ≥ 20 target). Per-shape:
+  25 Pattern 1 .c (`.data` strings, brief 141 orphan recovery —
+  the .c files were already in the working tree but were never
+  wired into delinks.txt), 2 D-1 dispatch tables, and 1 Pattern 3
+  mega chunk at `0x02200f18..0x02206738` covering a 22.5 KB
+  block with 2 symbols. Total: 23,432 bytes. 3-region SHA1 PASS +
+  27/27 OK preserved. **BONUS NOT MET**: couldn't drop ov004's
+  veneer count `n` below 9 — investigation showed remaining
+  candidates are ARM-code symbols misclassified as `data` in
+  `symbols.txt`. Brief 154 (cloud, queued) takes the
+  reclassification research as the next step.
+- **PR #579 — cloud / brief 152 cluster B size-1/2 workarounds.**
+  ✅ **Workaround #3 PASSES; workaround #2 FALSIFIED with root-
+  cause diagnosis.** Empirical finding: `arm9.lcf`'s
+  `ALIGNALL(2)` directive (not mwcc) is the alignment-cascade
+  culprit — the `.o` reports `Algn 2**0` correctly, but mwldarm
+  re-aligns every section to 4 bytes at link time, padding 3
+  bytes after a 1-byte section. Workaround #3 (bundle the size-
+  1/2 slot + zero-pad neighbours into `unsigned int[N]` covering
+  the deduced range to the next named symbol) sidesteps the
+  cascade. Worked example shipped: `data_021020b4` (16-int
+  bundle, 64 bytes). 3-region SHA1 PASS + 1784/1784 tests.
+  Research note at `docs/research/cluster-b-size-1-2-recipe.md`.
+  Recipe ready for brief 153 (decomper) to drain.
 - **PR #575 — decomper / brief 149 cluster B wave 3.** ✅
   **Cluster B pointer pool fully drained**: 20 of 20 remaining
   candidates shipped via brief 148's locked recipe. 8 data-pointer
@@ -96,28 +121,28 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (unlocked by brief 150):**
+**Decomper — one HIGH brief queued (cluster B size-1/2 drain):**
 
-- **Brief 151 (HIGH, NEW)** — `decomper/ov004-rodata-cluster-wave-2`.
-  Continue ov004 `.rodata` cluster work post brief 150's patcher
-  generalisation. Two parts: (1) ship the ~6 additional candidates
-  brief 147 had to defer when the patcher safety check fired at
-  n<9; (2) deeper sub-cluster drain — cluster A `.bss` (39
-  candidates from brief 141 sweep), remaining C / D-1 / D-2, more
-  Pattern 3 chunks via the now-turnkey generator. Target ≥ 20
-  claims with at least 1 claim that drops `n` below 9 (validates
-  brief 150 end-to-end). Self-extend gate unchanged.
+- **Brief 153 (HIGH, NEW)** — `decomper/cluster-b-size-1-2-wave`.
+  Apply brief 152's locked workaround #3 recipe (bundle into
+  `unsigned int[N]` covering the deduced range to next named
+  symbol) to drain cluster B's ~14-32 remaining size-1/2
+  candidates (cluster B main + brief 152's 18 overlay candidates
+  across ov002/ov006/ov008/other). Single-wave brief expected.
+  Self-extend gate unchanged.
 
-**Cloud — one MEDIUM brief queued (cluster B size-1/2 finish):**
+**Cloud — one MEDIUM brief queued (ov004 reclassification
+research):**
 
-- **Brief 152 (MEDIUM, NEW)** — `cloud/cluster-b-size-1-2-workarounds`.
-  Try the remaining 2 of cloud's 3 size-1/2 alignment workaround
-  sketches (brief 149 falsified #1: `.s` with explicit `.byte`).
-  Workaround #2: `__attribute__((aligned(1)))` on the C decl;
-  workaround #3: group claim (bundle 4-byte alignment slot as
-  `unsigned int` or struct). Document findings + lock recipe if
-  any PASSES; falsify all if none do. Unblocks ~13 size-1/2
-  cluster B candidates.
+- **Brief 154 (MEDIUM, NEW)** — `cloud/ov004-rodata-symbol-
+  reclassification-research`. Survey ov004's misclassified-as-
+  `data` `.rodata` symbols in `symbols.txt`, propose
+  reclassifications to `func` for those whose bytes actually
+  read as ARM code, ship 1-2 HIGH-confidence reclassifications
+  as worked examples with 3-region SHA1 PASS. Optional bonus:
+  spot-check whether the reclassification drops ov004's veneer
+  count below 9 (brief 151's bonus-not-met). Unblocks brief 155+
+  (decomper) for further ov004 polish if the n<9 unlock works.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
