@@ -4,11 +4,29 @@
 **Goal:** Identify `data`-classified symbols in
 `config/eur/arm9/overlays/ov004/symbols.txt` whose byte content
 in the original ROM is actually ARM code, propose reclassification
-to `func`, and ship 1-2 worked examples with 3-region SHA1 PASS.
+to `func`. Original intent included shipping 1-2 worked examples
+with 3-region SHA1 PASS; **the worked-example attempt fell to the
+verify gate (see *Worked-example falsification* below) — survey-
+only deliverable instead**.
 **Provenance:** brief 151 (PR #578) "BONUS NOT MET" investigation
 identified misclassified `.rodata` symbols as the gating
 dependency for further veneer-count reduction below the current
 n=9 floor.
+
+> **Calibration lesson:** brief 154 was the rare case where a
+> verify-gate failure produced more research value than success
+> would have. The single worked-example reclassification cloud
+> picked — `0x021e2efc`, supported by byte-confirmation from PR
+> #578 — broke EUR `ninja sha1` (`1da50df7…b4f75 → d83c6d20…fd3087`)
+> despite the bytes pattern-matching an ARM `STMFD` prologue.
+> That falsifies the "byte pattern + structural signal = real
+> code" inference for at least this slot. The 605 MEDIUM-cohort
+> candidates that share the same structural fingerprint must be
+> treated with the same scepticism until byte-disassembled in
+> context (a few ARM-prologue-shaped bytes mid-`.rodata` is
+> consistent with constant data that happens to look like a
+> prologue — e.g. a packed struct or table entry whose first
+> word coincidentally encodes an `stmfd` opcode).
 
 ## ⚠️ Toolchain-availability caveat
 
@@ -81,40 +99,52 @@ documented its byte content:
 
 ```text
 30 40 2d e9 04 d0 4d e2 ...
-  = e92d4030  STMFD SP!, {R4, R5, LR}
-  = e24dd004  SUB  SP, SP, #4
+  = e92d4030  STMFD SP!, {R4, R5, LR}  (← interpreted as ARM)
+  = e24dd004  SUB  SP, SP, #4          (← interpreted as ARM)
 ```
 
-This is a textbook ARM function prologue (push-LR-and-callee-saves,
-allocate stack frame). Classified in `symbols.txt` today as
-`data_ov004_021e2efc kind:data(any)`. **Confirmed misclassification.**
+The first 8 bytes pattern-match a textbook ARM function prologue
+when interpreted as instructions. Classified in `symbols.txt`
+today as `data_ov004_021e2efc kind:data(any)`. The original
+brief 154 draft promoted this to HIGH-confidence on the strength
+of the prologue match, but **the verify-gate falsified that
+promotion** — see *Worked-example falsification* below. The
+pattern match is necessary but not sufficient; this byte
+sequence may equally well be `.rodata` data whose first word
+coincidentally encodes a common opcode.
 
-Claiming `0x021e2efc` as `.rodata` data (PR #578's investigation
-path 2) dropped ov004's veneer count from `n=9` to `n=2` and
-fired brief 150's stderr note — i.e., the veneer-suppression
-mechanism saw the local definition. But because the bytes are
-code, claiming them as `.rodata` shifted link layout and broke
-SHA1. The fix this brief proposes — reclassify as `func` instead
-of claiming as `.rodata` — keeps the bytes in place while
-exporting them with the correct symbol kind. PR #578 was reverted;
-this PR replaces that approach with the symbol-export change.
+Separately, PR #578 measured that claiming `0x021e2efc` as
+`.rodata` data dropped ov004's veneer count from `n=9` to `n=2`
+(the brief 150 stderr note fired). That was reverted because
+claiming as `.rodata` shifted link layout and broke SHA1. This
+brief proposed an alternative — reclassify as `func` to keep
+bytes in place while flipping the symbol-export kind — but the
+verify-gate showed that approach also broke SHA1. The `n: 9 → 2`
+veneer-suppression unlock therefore remains gated on a different
+lever (likely full disassembly of the surrounding region to
+identify real code/data boundaries).
 
 ## Confidence ratings
 
-### HIGH (1 candidate)
+### HIGH (0 candidates after falsification)
 
-| vaddr | size | current kind | proposed kind | ARM-prologue match | veneer-drop hint |
-|---|---:|---|---|---|---|
-| `0x021e2efc` | (implicit ~0x22c via next data symbol; actual bounds TBD by decomper) | `data(any)` | `function(arm,size=0x0,unknown)` | ✓ `STMFD SP!, {R4, R5, LR}; SUB SP, SP, #4` (PR #578) | ✓ 9 → 2 observed when claimed as `.rodata` (PR #578) |
+The brief defined HIGH as "multiple ARM-prologue matches +
+correct alignment + size pattern". Cloud's initial draft promoted
+`0x021e2efc` to HIGH on the strength of PR #578's byte-confirmation
+(`30 40 2d e9 04 d0 4d e2 …` = canonical ARM `STMFD` prologue).
+**The verify-gate falsified that promotion** — reclassifying as
+`function(arm)` broke EUR `ninja sha1` (see *Worked-example
+falsification* below). After the revert, no candidate carries HIGH
+confidence in this survey: every entry below is at MEDIUM or LOW
+pending **per-target byte disassembly** (not just first-4-byte
+pattern match — the whole region needs to be disassembled in
+context to distinguish "real ARM code" from "constant data whose
+first word coincidentally encodes an opcode").
 
-This is the **worked example** shipped in this PR (see
-*Worked-example reclassification* below).
-
-### MEDIUM (605 candidates — structural signals only, byte
+### MEDIUM (606 candidates — structural signals only, byte
 confirmation pending)
 
-All 605 share the same structural fingerprint as the HIGH
-candidate:
+All 606 share a common structural fingerprint:
 
 - Classified `data(any)`.
 - 4-aligned.
@@ -126,11 +156,22 @@ candidate:
   region created by mwldarm's overlay-blind veneer emission
   (W7) cascade.
 
+`0x021e2efc` belongs to this cohort. Its byte-confirmation
+(per PR #578) **did not survive** the symbol-export reclassification
+verify-gate — see *Worked-example falsification* below. The
+remaining 605 candidates with the same structural fingerprint
+inherit the same caveat: **structural pattern + first-4-byte ARM
+match is not sufficient evidence of real code**. Promotion to
+HIGH requires per-target disassembly of the whole region in
+context, plus an independent verify-gate (e.g. SHA1 round-trip
+after reclassification, like this PR attempted) to confirm the
+slot is link-graph-safe.
+
 These cannot be promoted to HIGH without inspecting their bytes
 (`dsd dis` on the extracted `.bin`, or hex-viewing the
 `extract/eur/arm9/overlays/ov004.bin` directly). The brief
 specifically calls out byte inspection as the HIGH-promotion
-gate; the survey gives brain / decomper a 605-candidate
+gate; the survey gives brain / decomper a 606-candidate
 catalog to iterate against on the next wave.
 
 Spot list of the lowest 30 by address (full list reproducible
@@ -201,37 +242,105 @@ load site). Lowest priority for reclassification.
 | Already `function(*,unknown)` markers (handled by dsd init) | 9 |
 | Ambiguous-tagged data symbols at non-4-aligned addresses | 3 |
 
-## Worked-example reclassification
+## Worked-example falsification
 
-This PR reclassifies the **single HIGH-confidence candidate**
-(`0x021e2efc`) in `config/eur/arm9/overlays/ov004/symbols.txt`:
+Cloud's initial submission of this PR (#581) shipped a worked-
+example reclassification of `0x021e2efc`:
 
 ```diff
 -data_ov004_021e2efc kind:data(any) addr:0x021e2efc
 +func_ov004_021e2efc_unk kind:function(arm,size=0x0,unknown) addr:0x021e2efc
 ```
 
-The shape matches the existing precedent `func_ov004_021e7e30_unk`
-(itself a dsd-init-detected arm_call target with unknown bounds).
-`size=0x0,unknown` keeps the bounds question open — decomper or
-a follow-up brief can refine via disassembly once the
-reclassification is verified SHA1-safe.
+Rationale at the time:
 
-The brief's optional second worked example is **deliberately
-omitted** in this PR: cloud has only one byte-confirmed
-HIGH-confidence candidate (`0x021e2efc`, via PR #578). Picking
-a second from the 605 MEDIUM pool without byte inspection
-would be a coin-flip on SHA1; the brief explicitly says
-"if a reclassification causes a SHA1 break, the candidate was
-wrong; revert + lower confidence", which is a fragile
-remote-iteration loop. Shipping one verified-byte-shape
-candidate is the safer play. Brain or decomper can add the
-second example in a follow-up once a MEDIUM candidate has been
-byte-confirmed.
+- Bytes at the address pattern-match a canonical ARM `STMFD`
+  prologue per PR #578's byte log (`30 40 2d e9 04 d0 4d e2 …` =
+  `STMFD SP!, {R4, R5, LR}; SUB SP, SP, #4`).
+- Structural fingerprint matches the 606-candidate
+  load-from-`.rodata` cohort identified above.
+- Reclassification leaves bytes in place (no source claim, no
+  layout shift expected) — hypothesis was the symbol-export
+  kind-flip alone would preserve the veneer-suppression signal
+  observed in PR #578 (`n: 9 → 2`).
+
+**Brain's verify-gate result: EUR `ninja sha1` FAILED.** Expected
+ROM SHA1 `1da50df7c210fae96dc69b3825554b9ce13b4f75`; actual
+`d83c6d20…fd3087`. Per the brief's own success criterion
+("if a reclassification causes a SHA1 break, the candidate was
+wrong; revert + lower confidence rating"), the reclassification
+has been **reverted on this branch**. `0x021e2efc` is now classified
+back as `data(any)` and lives in the MEDIUM cohort with the other
+605 structurally-similar candidates.
+
+### What the falsification tells us
+
+The bytes at `0x021e2efc` pattern-match an ARM prologue, **but
+that's not sufficient evidence the slot is real code**. Possible
+explanations for the SHA1 failure consistent with the bytes
+looking like a prologue:
+
+1. **The bytes are data that incidentally encode an `stmfd` opcode.**
+   `e92d4030` is a 4-byte little-endian word that happens to
+   correspond to ARM `STMFD SP!, {R4, R5, LR}` when interpreted
+   as an instruction. The same word value can appear in a
+   struct, a function-pointer table entry, or any number of
+   data contexts where the first 4 bytes coincidentally encode
+   a common opcode pattern. The brief 145 PR #566 investigation
+   established only that the bytes LOOK like a prologue; it
+   never disassembled the rest of the region to confirm a
+   coherent function follows.
+
+2. **The slot is code but dsd's LCF emission treats `function(arm,
+   unknown)` differently than `data(any)`.** `dsd lcf` may place
+   `unknown`-size functions in a separate section, or omit them
+   from the link entirely, or add a `WRITEW(0)` terminator
+   downstream of the `.ctor` table that shifts subsequent
+   sections by 4 bytes. Without a closer look at the diff between
+   PR #581's failed build and main's working build, this can't
+   be ruled out.
+
+3. **The slot is code but mwldarm resolves the symbol kind in a
+   way that affects nearby placement.** mwldarm's overlay-blind
+   veneer-emission rule (W7) keys off symbol kind + memory-region
+   membership; flipping kind from `data` to `function` might
+   change which addresses mwldarm chooses to veneer-up or
+   resolve locally, indirectly shifting downstream bytes.
+
+Distinguishing (1) from (2)/(3) requires actual disassembly of
+the `0x021e2efc..0x021e3128` region (extending to the next data
+symbol) and comparing to mwldarm's emitted output post-
+reclassification. That's a brain-host task (needs the baserom
+and `dsd dis`); the structural metadata available to cloud can't
+distinguish them.
+
+### Generalisation to the MEDIUM cohort
+
+The 605 other candidates with the same structural fingerprint
+inherit the lesson: **first-4-byte pattern match against a
+canonical ARM opcode is too weak a signal**. Byte-confirmation
+of HIGH-promotion candidates must include at minimum:
+
+- Disassembly of the whole slot in context (not just the first
+  word).
+- Verification that the disassembled stream is a coherent
+  function (sensible reg-use, valid branches, plausible
+  epilogue — not random instruction garbage that happens to
+  parse).
+- An independent reclassification verify-gate (SHA1 round-trip
+  like this PR attempted) before the candidate ships.
+
+The original brief 154 specification of HIGH-confidence — "multiple
+ARM-prologue matches + correct alignment + size pattern" — held
+on the alignment and size signals for `0x021e2efc` (it is
+4-aligned with a 0x22c implicit size). The prologue-match signal
+proved too weak on its own. Future surveys should treat the
+"prologue match" criterion as **necessary but not sufficient**.
 
 ## Verify gate (brain runs pre-merge)
 
-3-region SHA1 PASS post-reclassification:
+3-region SHA1 PASS on the **survey-only state** of this PR (after
+the worked-example revert):
 
 ```text
 python tools/configure.py eur && ninja sha1   # must PASS
@@ -239,69 +348,27 @@ python tools/configure.py usa && ninja sha1   # must PASS
 python tools/configure.py jpn && ninja sha1   # must PASS
 ```
 
-Expected outcome paths:
+`config/eur/arm9/overlays/ov004/symbols.txt` is now back to its
+main state (apart from cosmetic line edits — see `git diff` against
+main for the empty-set delta on the symbols file). All three
+regions should pass trivially since this PR is now docs-only plus
+no-op config-state restoration.
 
-- **All three PASS.** Reclassification is layout-neutral
-  (bytes don't move; only the symbol-export kind changes).
-  Confirmation that `data → func` at fixed address doesn't shift
-  the link. Proceed to bonus check below.
-
-- **Any region FAILS.** The reclassification did affect link
-  layout — either dsd's LCF emission treats `function(arm,
-  unknown)` differently than `data(any)` (e.g., placing it in a
-  different section), or mwldarm resolved the symbol differently
-  in a way that affected nearby placement. Per the brief:
-  revert the symbols.txt change, downgrade `0x021e2efc` to
-  MEDIUM/LOW confidence in the survey, and document the
-  observed SHA1 delta as evidence that the byte-confirmation
-  alone isn't sufficient — symbol-export classification needs
-  link-graph verification too. If this happens, brief 155 picks
-  up the investigation.
-
-## Bonus deliverable — veneer-count hypothesis
+## Bonus deliverable — veneer-count hypothesis (status: deferred)
 
 PR #578 measured: claiming `0x021e2efc` as a `.rodata` data
-symbol dropped ov004's veneer count from `n=9` to `n=2` (the
-brief 150 stderr note FIRED, confirming the patcher path
-through the variable-count code).
+symbol dropped ov004's veneer count from `n=9` to `n=2`. This PR's
+original worked-example aimed to test whether reclassifying as
+`func` preserved the same drop without breaking SHA1.
 
-**Hypothesis:** reclassifying `0x021e2efc` as `func` (this PR's
-approach) preserves the same `n: 9 → 2` veneer drop because:
-
-1. The local-definition signal that suppresses cross-overlay
-   veneers depends on mwldarm finding a resolvable symbol at the
-   target address, regardless of symbol kind.
-2. The bytes don't move (reclassification doesn't claim source),
-   so SHA1 should hold if the suppression mechanism trips on
-   the kind-flip alone.
-
-If the hypothesis holds, brain will observe in the verify-gate
-output:
-
-```text
-patched build/eur/build/arm9_ov004.bin: spliced 2 veneers (24 bytes), ...
-note: 2-veneer ctor/pad shape disagrees with n-inference: ...
-       (brief 150). Common at n<9 where mwldarm keeps the
-       WITH_TERMINATOR shape that n-inference assumes only for n=86.
-```
-
-(or some other low-n stderr note from the brief 150 patcher path.)
-
-**If observed, that's the signal for brief 155** — decomper
-retries the suppressed candidates from brief 151's `n<9`
-investigation path. The same 605 MEDIUM-confidence candidates
-in this survey become high-priority for byte-inspection +
-reclassification in bulk.
-
-**If NOT observed** (i.e. veneer count stays at 9 after the
-reclassification), the suppression mechanism requires a
-`.rodata` source claim — not just a symbol-kind flip. In that
-case the survey's contribution is still useful for future
-disassembly-driven source claims, but the veneer-suppression
-unlock awaits a different lever (e.g., the 22.5 KB mega-block
-disassembly path the brief explicitly defers).
-
-Brain documents the observed `n=N` value in the merge PR body.
+**With the worked-example reverted, this hypothesis stays
+untested** — neither confirmed nor refuted by this PR's final
+state. The 22.5 KB mega-block disassembly path remains the
+alternative lever for `n<9` veneer suppression; brief 155+
+(decomper) can revisit the kind-flip approach against MEDIUM
+candidates that have been byte-confirmed via a different
+methodology (e.g. full-region disassembly + manual code/data
+boundary identification).
 
 ## Reproducibility
 
@@ -364,10 +431,10 @@ print(f"LOW (load-from-outside-only): {len(low_outside)}")
 print(f"LOW (no-inbound): {len(low_no_inbound)}")
 ```
 
-Expected output on the current main:
+Expected output on the current main (post-revert):
 
 ```text
-MEDIUM: 606  (includes the HIGH candidate 0x021e2efc)
+MEDIUM: 606  (includes the falsified-HIGH ex-candidate 0x021e2efc)
 LOW (load-from-outside-only): 15
 LOW (no-inbound): 1
 ```
@@ -377,21 +444,28 @@ filter result.)
 
 ## After this brief lands
 
-Per brief 154's "After this brief lands" section:
+Updated for the survey-only state of PR #581:
 
-1. Brain runs the 3-region SHA1 verify-gate (see above).
-2. If `0x021e2efc` reclassification preserves SHA1 PASS AND
-   drops veneers below 9, brain queues **brief 155** — decomper
-   wave to byte-inspect + reclassify additional MEDIUM
-   candidates in bulk, retrying the brief 151 suppressed claims
-   against the lower `n` floor.
-3. If reclassification preserves SHA1 but doesn't drop veneers,
-   the survey serves as a research catalog for the eventual
-   22.5 KB mega-`.rodata` disassembly pass (out of scope here).
-4. If reclassification breaks SHA1, brain reverts the
-   symbols.txt edit and downgrades `0x021e2efc` to MEDIUM in
-   this survey. The 605 MEDIUM candidates remain catalogued
-   for a different unlock approach.
+1. Brain runs the 3-region SHA1 verify-gate on the docs-only +
+   no-op-config-restoration PR. Expected: trivially all-PASS.
+2. The 606 MEDIUM-confidence catalog stays open. Brain decides
+   whether to spawn a follow-up brief that:
+   - Disassembles a small handful of MEDIUM candidates (5-10
+     spot checks) on a brain host to recalibrate the
+     prologue-match heuristic's hit rate — i.e. of N
+     byte-confirmed candidates, how many survive the
+     reclassification verify-gate? If most fail (like
+     `0x021e2efc` did), the MEDIUM cohort is mostly false
+     positives and reclassification isn't a viable
+     veneer-suppression lever.
+   - Pivots to the 22.5 KB mega-`.rodata` disassembly path
+     (brief 154's explicit non-scope), which is a more direct
+     route to bounding real `.rodata` boundaries.
+3. The `n<9` veneer-suppression bonus that PR #578 surfaced
+   remains an open question. The brief 150 stderr-note path
+   has been observed firing once (PR #578's revert investigation
+   path 2) but never within a SHA1-preserving claim. Any
+   follow-up should treat that as the gating success criterion.
 
 ## See also
 
