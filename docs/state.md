@@ -8,14 +8,14 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-19 morning, post-#572 + #573 merge, briefs
-149 + 150 queued. Brain on Mac. **🎉 SHA1 FINAL GATE PASSES** across
-all 3 regions (brief 140, PR #558) and continues to hold after 4
+**Last updated:** 2026-05-19 morning, post-#575 + #576 merge, briefs
+151 + 152 queued. Brain on Mac. **🎉 SHA1 FINAL GATE PASSES** across
+all 3 regions (brief 140, PR #558) and continues to hold after 5
 more post-SHA1 rounds. Current wavefront is **post-SHA1 polish** —
-cluster B (B-true scalars drained 174/~180; B-pointer recipe locked
-in brief 148), ov004 `.rodata` (3 reproducer shapes proven in brief
-147), and incremental W7 patcher generalisation (134 → 142 → 146 →
-150-queued).
+cluster B pointer pool drained 20/20 (brief 149), W7 patcher fully
+generalised 134 → 142 → 146 → 150 (Option A shipped: byte-detection
+authoritative; n-inference is a hint), ov004 `.rodata` 14 syms
+shipped at n=9 (brief 147) with wave 2 unblocked.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -56,80 +56,87 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **PR #572 — decomper / brief 147 ov004 `.rodata` retry.**
-  14 ov004 `.rodata` claims across all three shapes proven
-  (Pattern 1 .c / Pattern 1 .s / Pattern 3 chunk). Brief 144's
-  auto-`.extern` emission verified turnkey. **Brief 146 patcher
-  fix validated at n=9**: NO_TERMINATOR path engaged correctly,
-  3-region SHA1 PASS preserved + 3-region 27/27 OK.
-  **Empirical patcher limit surfaced**: bisection found
-  veneer_count < 9 triggers a NEW boundary — mwldarm continues
-  emitting WITH_TERMINATOR shape at very low n while brief 146's
-  n-inference defaults to NO_TERMINATOR, causing the byte-detect
-  vs n-inference disagreement → safety check fires (correctly!).
-  Decomper shipped 14 (under ≥20 target) without forcing the
-  6 candidates that would have broken SHA1. Brief 150 below
-  closes this last patcher boundary.
-- **PR #573 — cloud / brief 148 cluster B pointer pool.**
-  Research brief, three deliverables: (1) survey of 23 cluster B
-  pointer candidates at `docs/research/cluster-b-pointer-pool.md`;
-  (2) recipe locked: `extern char <pointee>; void *<slot> =
-  &<pointee>;` (same shape as brief 121 / 130 D-1 wave 2) — 3
-  worked examples covering 3 edge cases (unclaimed pointee /
-  claimed-with-typed-array pointee / code-pointer) all SHA1 PASS
-  in 3 regions; (3) size-1 spot-check FAILED with naive `unsigned
-  char data_X = 0xAB;` (mwcc default 4-byte section alignment ≠
-  orig byte-tight emission, 1308 byte diff). 3 size-1 workaround
-  sketches filed for brief 149 stretch falsification: `.s` recipe,
-  `__attribute__((aligned(1)))`, or group-claim bundling.
+- **PR #575 — decomper / brief 149 cluster B wave 3.** ✅
+  **Cluster B pointer pool fully drained**: 20 of 20 remaining
+  candidates shipped via brief 148's locked recipe. 8 data-pointer
+  singletons + 4 code-pointer singletons + two 4-element + one
+  3-element fn-ptr "table" + one ov004 (bss pointee). **3-region
+  SHA1 PASS + 27/27 OK preserved.** Notable empirical correction:
+  **REJECTED brief 148's bundling-into-array hand-off** — checked
+  `relocs.txt`, found each table slot is referenced by name from
+  other code, so bundling would break per-slot symbol identity.
+  All 20 shipped as singletons. **Size-1 workaround #1 (.s with
+  explicit `.byte`) FALSIFIED** — same 1308 byte / 32-byte
+  cascade as brief 148's naive .c attempt; mwasmarm respects the
+  same LCF section-alignment cascade as mwcc. Workarounds #2 +
+  #3 deferred to brief 152. Self-extend gate: yield 100% PASS,
+  bytes-matched FAIL (80 B vs ≥250 B — pointers are 4 B). Brief
+  closes after wave 1.
+- **PR #576 — cloud / brief 150 low-n WITH_TERMINATOR.** Option
+  A shipped (recommended): `_fix_ctor_and_pad`'s byte-detection
+  is now the authoritative truth source; n-inference is an
+  informational hint via stderr note on disagreement, not a
+  fatal error. **Patcher accepts any `n ∈ [0, 86]` cleanly.**
+  `expected_output_size_for` gains optional `ctor_pad_net`
+  parameter that takes precedence over n-inference; `main()`
+  passes the byte-detected truth into the YAML `code_size`
+  rewrite. 8 new tests (`TestLowNWithTerminator` +
+  `TestExpectedOutputSizeForCtorPadNet`) pin brief 147's n=2 +
+  n=7 failing cases under brief 150 + assert stderr note
+  semantics. **Test suite 1784/1784.** **3-region `ninja sha1`
+  PASS preserved bit-for-bit at the historical n=86 case.**
+  Cloud honestly documented test-scope limits: end-to-end smoke
+  via an arbitrary source claim couldn't drop `n` below 9
+  because suppression depends on the slot being an ov002
+  cross-overlay pointer target — reverse-lookup tool is brief
+  151+ territory. **Brief 134 → 142 → 146 → 150 patcher chain
+  complete** — W7 mitigation now fully general.
 
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (recipe locked):**
+**Decomper — one HIGH brief queued (unlocked by brief 150):**
 
-- **Brief 149 (HIGH, NEW)** — `decomper/cluster-b-wave-3-pointer-apply`.
-  Apply cloud's brief 148 pointer recipe to the remaining ~20
-  cluster B pointer candidates. Recipe is locked: `extern char
-  <pointee>; void *<slot> = &<pointee>;` (same shape as brief
-  121 / 130 D-1 wave 2). Target ≥ 15 claims. Stretch: falsify
-  exactly one of cloud's 3 size-1/2 workaround sketches (.s
-  recipe / aligned(1) attribute / group-claim bundling). Self-
-  extend gate unchanged.
+- **Brief 151 (HIGH, NEW)** — `decomper/ov004-rodata-cluster-wave-2`.
+  Continue ov004 `.rodata` cluster work post brief 150's patcher
+  generalisation. Two parts: (1) ship the ~6 additional candidates
+  brief 147 had to defer when the patcher safety check fired at
+  n<9; (2) deeper sub-cluster drain — cluster A `.bss` (39
+  candidates from brief 141 sweep), remaining C / D-1 / D-2, more
+  Pattern 3 chunks via the now-turnkey generator. Target ≥ 20
+  claims with at least 1 claim that drops `n` below 9 (validates
+  brief 150 end-to-end). Self-extend gate unchanged.
 
-**Cloud — one MEDIUM brief queued (patcher boundary):**
+**Cloud — one MEDIUM brief queued (cluster B size-1/2 finish):**
 
-- **Brief 150 (MEDIUM, NEW)** — `cloud/patcher-low-n-with-terminator`.
-  Close the low-n WITH_TERMINATOR boundary surfaced in brief 147.
-  Brief 146 generalised the patcher for `0 < n < 86` as NO_TERMINATOR,
-  but bisection found mwldarm continues emitting WITH_TERMINATOR
-  at very low n (n=2 / n=7 broken; n=9 OK). Two options: (A —
-  recommended) degrade n-inference from hard-check to warn, trust
-  byte-detection truth alone; (B) recalibrate n-based heuristic
-  against byte-detection at multiple n values. Decomper's brief
-  147 funnel recommended Option A. Tests pin behaviour at n ∈ {0,
-  2, 7, 9, 43, 86}.
+- **Brief 152 (MEDIUM, NEW)** — `cloud/cluster-b-size-1-2-workarounds`.
+  Try the remaining 2 of cloud's 3 size-1/2 alignment workaround
+  sketches (brief 149 falsified #1: `.s` with explicit `.byte`).
+  Workaround #2: `__attribute__((aligned(1)))` on the C decl;
+  workaround #3: group claim (bundle 4-byte alignment slot as
+  `unsigned int` or struct). Document findings + lock recipe if
+  any PASSES; falsify all if none do. Unblocks ~13 size-1/2
+  cluster B candidates.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
 - **Cluster A** — `.rodata` (briefs 132 → 139 main run, then post-SHA1
   follow-up via 141). Largely drained.
-- **Cluster B** — main `.data`. **True scalars drained** after brief
-  143 wave 2 (cumulative 174 claims / 696 bytes). **Pointer recipe
-  locked** by brief 148 (cloud) — `extern char ... void *... = &...`
-  shape, 3 worked examples shipped + 20 candidates remaining for
-  brief 149 (decomper) to apply. ~14 size-1/2 candidates blocked
-  on mwcc alignment recipe — 3 workaround sketches for brief 149
-  stretch falsification. ~21 W6-rejected (unaligned or zero-valued)
-  candidates remain — separate research (BSS handling).
-- **Cluster C / D-1 / D-2** — ov004 sub-clusters. Brief 141 sweep
-  shipped 31 `.data` syms. Brief 147 shipped 14 `.rodata` syms
-  across 3 shapes at n=9. **Patcher empirical limit n<9 surfaced**
-  (brief 147 funnel) — closes in brief 150 (cloud), unblocks brief
-  151+ ov004 `.rodata` wave 2.
+- **Cluster B** — main `.data`. **True scalars drained** (brief 143
+  cumulative 174 claims / 696 bytes). **Pointer pool drained
+  20/20** (brief 149) — recipe `extern char <pointee>; void *<slot>
+  = &<pointee>;` is locked. **Size-1 workaround #1 (.s) falsified**
+  (brief 149). Brief 152 (cloud, queued) tries workarounds #2 +
+  #3 on the ~14 size-1/2 residue. ~21 W6-rejected (unaligned or
+  zero-valued) candidates remain — separate BSS-handling research.
+- **Cluster C / D-1 / D-2** — ov004 sub-clusters. 31 `.data` syms
+  (brief 141) + 14 `.rodata` syms at n=9 (brief 147) = **45 total**.
+  Brief 151 (decomper, queued) ships the ~6 deferred candidates +
+  cluster A `.bss` (39 candidates from brief 141 sweep) + deeper
+  drain.
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
-  via the variable-veneer-count patcher post-146.
+  via the W7 patcher (now fully general 134 → 142 → 146 → 150).
 
 ## Worktree convention — isolation per agent, two equivalent mechanisms
 
@@ -170,22 +177,29 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 149 PR** when it opens. Gate:
-   3-region `ninja sha1` PASS + 3-region 27/27 modules OK. ≥ 15
-   cluster B pointer claims via brief 148's locked recipe. Watch
-   the optional size-1/2 stretch — if any of cloud's 3 sketches
-   works, capture it; if all 3 fail, scope a follow-up alignment
-   brief.
-2. **Verify + merge cloud brief 150 PR** when it opens. Gate:
-   3-region SHA1 PASS preserved + tests pin n ∈ {0, 2, 7, 9, 43, 86}.
-   Watch the choice between Option A (degrade n-inference to warn,
-   trust byte-detection alone) and Option B (recalibrate n-based
-   heuristic). Either should preserve the historical n=86 bit-for-
-   bit SHA1 PASS.
-3. **Scope brief 151 (decomper) once brief 150 lands** — ov004
-   `.rodata` wave 2 to ship the additional ~6 sub-cluster candidates
-   brief 147 had to leave on the table when the patcher safety check
-   fired. Plus deeper sub-cluster drain from brief 141's sweep table.
+1. **Verify + merge decomper brief 151 PR** when it opens. Gate:
+   3-region `ninja sha1` PASS + 3-region 27/27 modules OK. ≥ 20
+   ov004 source-level claims. At least one claim should drop `n`
+   below 9 (validates brief 150 end-to-end on real source). Watch
+   the patcher stderr note in the PR funnel — its appearance is
+   expected and not a failure.
+2. **Verify + merge cloud brief 152 PR** when it opens. Gate:
+   3-region SHA1 PASS preserved + new research findings in
+   markdownlint-clean note. Watch which workaround (if any)
+   locks — that determines brief 153 shape.
+3. **Scope brief 153+ candidates (queue after 151 + 152):**
+   - **If brief 152 locks a size-1/2 recipe**: brief 153 =
+     decomper cluster B size-1/2 wave (~13 candidates).
+   - **If brief 152 falsifies all 3 workarounds**: brief 153 =
+     cloud investigation into LCF script edits / mwcc flag survey.
+   - **Cluster B value=0 (BSS handling)**: ~21 W6-rejected
+     candidates — separate research.
+   - **30 KB main mega-array** (`data_020b6ec4`) — biggest
+     deferred Pattern 1 mega.
+   - **Cross-region cluster A apply** — port 1443 EUR cluster A
+     symbols to USA + JPN.
+   - **Cluster D-3 via Pattern 3 generator** — ~20 complex
+     nested structs.
 4. **Watch for any new wall hypotheses** in upcoming wave PRs.
    Standing rule since brief 084's "3 walls not 1" methodology
    lesson: pre-empt symptom-vs-mechanism classification by requesting
