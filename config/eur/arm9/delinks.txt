@@ -8639,3 +8639,15 @@ src/main/data/data_02101ec8.c:
 src/main/data/data_02101ed0.c:
     complete
     .data start:0x02101ed0 end:0x02101ed4
+
+src/main/data/data_020c3e68.c:
+    complete
+    .data start:0x020c3e68 end:0x020c3e6c
+
+src/main/data/data_021015e0.c:
+    complete
+    .data start:0x021015e0 end:0x021015e4
+
+src/main/data/data_02102688.c:
+    complete
+    .data start:0x02102688 end:0x0210268c
