@@ -200,8 +200,8 @@ class PatchError(Exception):
 
 
 def expected_output_delta_for(veneer_count: int) -> int:
-    """How many bytes the patcher removes from the input for a
-    binary with `veneer_count` veneers.
+    """**N-inference hint** for how many bytes the patcher removes
+    from the input — see the warning below.
 
     - `veneer_count == 0` → returns 0 (the patcher is a no-op; the
       binary is already orig-shape and no ctor/pad fix is applied).
@@ -212,15 +212,31 @@ def expected_output_delta_for(veneer_count: int) -> int:
       `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`
       (= `n * 12 - 12`). Brief 146 generic case: mwldarm drops the
       `WRITEW(0)` terminator after .ctor when fewer overlays /
-      veneers force the layout pass, so the ctor/pad cluster is
-      12 bytes instead of 16.
+      veneers force the layout pass.
 
-    The n == 86 → +8 vs n < 86 → +12 boundary matches the empirical
-    observation in [`ov004-rodata-patcher-blocker.md`](../docs/research/ov004-rodata-patcher-blocker.md);
-    `_fix_ctor_and_pad` byte-detects the actual cluster shape at
-    patch time, while this helper provides the same answer derived
-    from `n` alone (used by `main()` to drive the YAML
-    `code_size` rewrite).
+    ⚠ Brief 150: this n-based mapping is **wrong at very low n**.
+    Brief 147's bisection observed `n=2` and `n=7` keeping the
+    WITH_TERMINATOR shape (= 16-byte cluster, net +8) where this
+    function returns NO_TERMINATOR (= 12-byte cluster, net +12).
+    The empirical boundary is somewhere between n=7 (WITH) and n=9
+    (NO); we did not bisect further because the **byte-detection
+    in `_fix_ctor_and_pad` is the truth source** and the patcher
+    no longer hard-fails on n-inference disagreement (it logs a
+    note instead).
+
+    Production callers in `patch_ov004` use the byte-detected
+    `ctor_pad_net` from `stats`; the n-inference here is retained
+    only as:
+
+      1. The fallback path in `expected_output_size_for` when
+         `ctor_pad_net` is unavailable (e.g. older callers).
+      2. The informational compare value in `patch_ov004`'s
+         brief-150 warn note when the two disagree.
+
+    Both call sites are documented to prefer `ctor_pad_net` when
+    available. Test coverage pins both the n-inference contract
+    (this function) and the byte-detection contract
+    (`_fix_ctor_and_pad`) independently.
     """
     if veneer_count <= 0:
         return 0
@@ -508,19 +524,34 @@ def expected_output_size_for(
     *,
     already_patched: bool,
     veneer_count: int | None = None,
+    ctor_pad_net: int | None = None,
 ) -> int:
     """Compute the size the patched ov004 binary SHOULD have,
     derived from the input.
 
-    - If `already_patched` is True, `data` is ALREADY at the target
-      size — return `len(data)` unchanged (brief 140 part 1
-      off-by-1024 fix).
-    - Otherwise return `len(data) - expected_output_delta_for(n)`
-      where `n = veneer_count`. Brief 142: `veneer_count` is now
-      parameterised; the brief 134 patcher used a hard-coded 1024.
-      Passing `veneer_count=None` defaults to
-      `HISTORICAL_MAX_VENEER_COUNT` (delta = 1024) — backwards-
-      compatible with the brief 140 helper signature.
+    Argument precedence (brief 150):
+
+    1. `already_patched=True` → return `len(data)` unchanged
+       (brief 140 part 1 off-by-1024 fix).
+    2. `ctor_pad_net` provided → use the byte-detected truth.
+       Return `len(data) - veneer_count * VENEER_SIZE + ctor_pad_net`.
+       This is the authoritative path: `ctor_pad_net` comes from
+       `patch_ov004`'s stats, populated by `_fix_ctor_and_pad`'s
+       byte-level discriminator at runtime. **Use this when you
+       have access to `patch_ov004`'s stats** — it tracks
+       mwldarm's actual emission shape regardless of veneer count.
+    3. `ctor_pad_net is None` → fall back to n-based inference via
+       `expected_output_delta_for(veneer_count)`. Brief 150
+       degraded n-inference to a hint (the historical defaults
+       misclassify at very low n, where mwldarm keeps the
+       WITH_TERMINATOR cluster shape). This path is kept for
+       backwards-compat with brief 140 / 142's helper signature
+       and tests that pin the n-inference contract directly, but
+       new callers should pass `ctor_pad_net` whenever they have
+       it.
+    4. Both `veneer_count` and `ctor_pad_net` None → defaults
+       `veneer_count` to `HISTORICAL_MAX_VENEER_COUNT` (delta =
+       1024) before invoking the n-inference fallback.
 
     Used by `main()` to drive the YAML `code_size` rewrite. Pure
     function — exposed so tests can pin the branching behaviour
@@ -532,6 +563,11 @@ def expected_output_size_for(
         if veneer_count is None
         else veneer_count
     )
+    if ctor_pad_net is not None:
+        # Brief 150: byte-detected truth path — directly compute
+        # the post-patch size from the actual splice delta plus the
+        # byte-detected ctor/pad net. No dependency on n-inference.
+        return len(data) - n * VENEER_SIZE + ctor_pad_net
     return len(data) - expected_output_delta_for(n)
 
 
@@ -586,23 +622,46 @@ def patch_ov004(
             f"{splice_delta} + {ctor_pad_net}; "
             f"veneer_count={veneer_count})"
         )
-    # Brief 146 sanity check: confirm the byte-detected shape
-    # matches the n-based inference. They should always agree —
-    # disagreement means either the discriminator misfired (e.g.
-    # `.data` started with a zero word) or mwldarm changed its
-    # emission pattern. Raise loudly rather than silently produce
-    # the wrong size.
+    # Brief 150 — informational shape cross-check.
+    #
+    # Brief 146 used n-based inference as a hard cross-check against
+    # the byte-detected ctor/pad shape. Brief 147 / 150 found that
+    # n-inference is unreliable at low `n`: mwldarm continues to
+    # emit the WITH_TERMINATOR cluster shape at very low veneer
+    # counts (empirically n=2 and n=7), where the n=86-or-else-NO
+    # inference defaults wrong. Promoting the disagreement to a hard
+    # failure blocked brief 147's wave 1 extension at any source
+    # claim that dropped the count below 9.
+    #
+    # Brief 150 (Option A per the brief spec) downgrades the
+    # cross-check to a stderr warn. The byte-detection at
+    # `_fix_ctor_and_pad`'s discriminator (bytes 12-15 of the
+    # post-splice cluster) is the authoritative truth source — it
+    # observes the ACTUAL shape mwldarm emitted rather than
+    # inferring it from `n`. Agreement is logged silently;
+    # disagreement surfaces the n-inference's predicted value for
+    # the operator's awareness but does not block.
+    #
+    # If byte-detection itself ever misfires (e.g. a future ov004
+    # source-coverage state where `.data` starts with a 4-byte zero
+    # word), the geometric self-consistency check above WILL catch
+    # the wrong cluster length — `_fix_ctor_and_pad`'s `fix_end`
+    # and `net` are computed from the same `terminator_present`
+    # decision, so the output size stays consistent with the
+    # chosen shape even when that shape is wrong. The downstream
+    # SHA1 check catches content errors. Tests pin both edges.
     inferred_delta = expected_output_delta_for(veneer_count)
     actual_delta = splice_delta - ctor_pad_net
     if inferred_delta != actual_delta:
-        raise PatchError(
-            f"ctor/pad shape mismatch: byte-detected net "
-            f"{ctor_pad_net} (actual delta {actual_delta}) "
-            f"disagrees with n-based inference (delta "
-            f"{inferred_delta}) for veneer_count={veneer_count}. "
-            f"Either the .data discriminator at bytes 12-15 "
-            f"misfired, or mwldarm's ctor emission rule "
-            f"changed. Investigate before re-running."
+        print(
+            f"note: {veneer_count}-veneer ctor/pad shape disagrees "
+            f"with n-inference: byte-detected net {ctor_pad_net} "
+            f"(delta {actual_delta}) vs n-inferred delta "
+            f"{inferred_delta}. Byte-detection takes precedence; "
+            f"this is informational only (brief 150). Common at "
+            f"n<9 where mwldarm keeps the WITH_TERMINATOR shape "
+            f"that n-inference assumes only for n=86.",
+            file=sys.stderr,
         )
 
     load_rewrites = _apply_load_rewrites(fixed, relocs, base_va)
@@ -760,10 +819,22 @@ def main() -> int:
     # Brief 142 generalisation: pass the observed `veneers_spliced`
     # count so the delta math tracks the scanner's actual finding
     # rather than the historical-max constant.
+    #
+    # Brief 150 fix: ALSO pass the byte-detected `ctor_pad_net`
+    # from stats so the YAML uses the exact post-patch size mwldarm
+    # actually emitted, not the n-inference (which misclassifies
+    # the WITH_TERMINATOR shape at very low n). Without this, a
+    # source-claim wave that drops the veneer count to n=2 or n=7
+    # would write the wrong `code_size` into arm9_overlays.yaml
+    # and break SHA1 at the ROM-packaging step.
     expected_output_size = expected_output_size_for(
         data,
         already_patched=bool(stats["already_patched"]),
         veneer_count=stats["veneers_spliced"],
+        ctor_pad_net=(
+            stats["ctor_pad_net"]
+            if not stats["already_patched"] else None
+        ),
     )
 
     def _do_yaml_patch() -> bool:
