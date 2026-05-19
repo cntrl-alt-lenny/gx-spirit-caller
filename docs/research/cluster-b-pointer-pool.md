@@ -283,6 +283,24 @@ Each of these is one experimental commit away from a verdict. The
 spot-check confirms only that the **trivial** path doesn't work —
 none of the workarounds were tested by brief 148.
 
+### Brief 152 update — workaround verdicts
+
+Workaround verdicts after brief 149 + 152 (both detailed in
+[`cluster-b-size-1-2-recipe.md`](cluster-b-size-1-2-recipe.md)):
+
+| # | Recipe | Verdict |
+|---|---|---|
+| 1 | `.s` with `.byte` | **FAIL** (brief 149) |
+| 2 | `__attribute__((aligned(1)))` | **FAIL** (brief 152) — mwcc honours the hint, but `arm9.lcf`'s `ALIGNALL(2)` re-aligns at link time |
+| 3a | `unsigned int[N]` bundle | **PASS** (brief 152) |
+| 3b | `struct {...}` bundle | **PASS** (brief 152) |
+
+The bundle recipes succeed because the TU's `.data` section is
+a multiple of 4 bytes and naturally 4-aligned — `ALIGNALL(2)`
+adds zero padding. Brief 152 ships `data_021020b4` as a worked
+example using #3a. Brief 153 (decomper) is unblocked to apply
+to the remaining 18 size-1/2 overlay candidates.
+
 ## Brief 149 hand-off
 
 The pointer recipe is fully settled and re-applicable to the
