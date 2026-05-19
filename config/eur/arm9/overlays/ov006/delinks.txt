@@ -1256,3 +1256,19 @@ src/overlay006/data/data_ov006_021ceb00.c:
 src/overlay006/data/data_ov006_021cec00.c:
     complete
     .data start:0x021cec00 end:0x021cec04
+
+src/overlay006/data/data_ov006_021cde2c.s:
+    complete
+    .data start:0x021cde2c end:0x021cde48
+
+src/overlay006/data/data_ov006_021ce1e8.s:
+    complete
+    .data start:0x021ce1e8 end:0x021ce228
+
+src/overlay006/data/data_ov006_021ceb4c.s:
+    complete
+    .data start:0x021ceb4c end:0x021cebb4
+
+src/overlay006/data/data_ov006_021cec04.s:
+    complete
+    .data start:0x021cec04 end:0x021cf094
