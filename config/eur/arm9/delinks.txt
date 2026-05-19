@@ -8728,3 +8728,7 @@ src/main/data/data_021026fc.c:
     complete
     .data start:0x021026fc end:0x02102700
 
+
+src/main/data/data_021020b4.c:
+    complete
+    .data start:0x021020b4 end:0x021020f4
