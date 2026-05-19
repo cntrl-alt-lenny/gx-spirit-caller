@@ -101,8 +101,7 @@ approach.
 - The `n=2` and `n=7` cases (currently broken) must produce
   3-region SHA1 PASS post-fix.
 
-### Required smoke test (cloud runs pre-PR, brain re-runs
-pre-merge)
+### Required smoke test (cloud runs pre-PR, brain re-runs pre-merge)
 
 - `python -m unittest tests.test_patch_ov004_veneers` — all
   passing (38 baseline + new low-n tests).
