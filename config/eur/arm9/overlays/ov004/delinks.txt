@@ -163,3 +163,7 @@ src/overlay004/data/data_ov004_02200df4.s:
 src/overlay004/data/data_ov004_02200e00.s:
     complete
     .rodata start:0x02200e00 end:0x02200f18
+
+src/overlay004/data/data_ov004_0220a33c.c:
+    complete
+    .data start:0x0220a33c end:0x0220a340
