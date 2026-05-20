@@ -8,16 +8,17 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-20 morning, post-#584 + #581 merge,
-briefs 156 + 157 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
+**Last updated:** 2026-05-20 midday, post-#586 + #587 merge,
+briefs 158 + 159 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
 PASSES** across all 3 regions (brief 140, PR #558) and continues
-to hold after 8 post-SHA1 rounds. **Cluster B effectively
-closed** — pointer pool 23/23, true scalars 174/174 (size=4 W6-
-eligible), size-1/2 overlay 18/18 (brief 153), size-1/2 main 1/1
-(brief 152), value=0 main 18/21 (brief 155); only 3 W6-rejected
-+ residue remain. Brief 154 reframed as survey-only after the
-worked-example reclassification broke EUR SHA1 — clean recovery,
-606 MEDIUM-confidence catalog stands as research artifact.
+to hold after 9 post-SHA1 rounds. **Cluster D-3 OPENED** —
+brief 157 shipped 9 chunks / 6,664 bytes (80% over target); last
+unopened data-tier sub-cluster is now in active drain. Brief 156
+ov004 spot-disasm landed: **75% PASS rate** on MEDIUM cohort
+puts the byte-coherence signal in "cautious reclassification"
+zone, BUT byte coherence ≠ SHA1 safety (lcf re-emission for
+`function(arm, unknown)` shifts downstream bytes — a SEPARATE
+axis from byte-pattern coherence).
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -58,41 +59,38 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **PR #584 — decomper / brief 155 cluster B main W6-rejected
-  drain.** ✅ **16 multi-symbol `.c` bundles, 392 bytes, 100%
-  yield.** Pool pivot: brief 155 expected ~13 main size-1/2
-  candidates, but pool was empty (brief 152 already claimed
-  the only one). Decomper pivoted to adjacent residue —
-  cluster B's 21 W6-rejected (size=4 value=0) main candidates
-  that brief 143 wave 2's filter rejected for the same root
-  cause brief 152's bundle recipe addresses (mwcc emits all-
-  zero TUs to `.bss` instead of `.data`, breaking section
-  layout). **Same recipe applies; broader application.**
-  Drained 18 of 21 candidates (86%); 3 deferred sit between
-  already-claimed wave-2 single-int TUs (need wave-2 TU
-  rewrite — left as cluster B's final residue). **3-region
-  SHA1 PASS + 27/27 OK preserved.** Cluster B effectively
-  closed.
-- **PR #581 — cloud / brief 154 ov004 .rodata
-  misclassification survey.** ✅ **Recovery + reframe shipped:
-  survey-only after verify-gate falsification.** Initial PR
-  included a HIGH-confidence worked-example reclassification
-  of `0x021e2efc` from `data(any)` to `function(arm, size=0x0)`
-  based on canonical ARM STMFD prologue byte-pattern. **Brain
-  verify-gate caught it breaking EUR SHA1** (`1da50df7…b4f75 →
-  d83c6d20…fd3087`). Per the brief's own success criterion,
-  the candidate was falsified. Cloud reverted the
-  `symbols.txt` edit in commit `cb88ff9`, downgraded the
-  candidate from HIGH to MEDIUM, documented the falsification
-  + 3 hypotheses, and added a calibration lesson banner at
-  the top: first-4-byte ARM-opcode match is too weak a signal
-  alone; the 606 MEDIUM cohort that shares the falsified
-  candidate's structural fingerprint needs whole-region
-  disassembly + coherent-function verification before any
-  promotes to HIGH. **3-region SHA1 PASS preserved** (trivial
-  — final state is docs-only). Survey itself is a high-value
-  catalog (622 4-aligned data-classified symbols bucketed by
-  structural heuristics).
+- **PR #586 — decomper / brief 157 cluster D-3 wave 1.** ✅
+  **9 chunks, 6,664 bytes** — 80% over ≥5 target. Last
+  unopened data-tier sub-cluster opened. All chunks were
+  natively clean multi-symbol `.data` regions; brief 144's
+  auto-`.extern` generator + post-process `.rodata→.data` sed
+  (generator-gap workaround) shipped them mechanically. Bundle
+  recipe (brief 152/155) didn't trigger in wave 1 — all chunks
+  had clean `.data` shape. **Yield gate FAIL** (9/33=27%) was
+  deliberate (smallest chunks first to validate workflow). Wave
+  2 (brief 158) takes broader pool. **3-region SHA1 PASS +
+  27/27 OK preserved.** Generator gap surfaced: hardcoded
+  `.section .rodata` needs `--section data` flag (brief 159
+  cloud Part 1).
+- **PR #587 — cloud / brief 156 recipe addendum + MEDIUM
+  spot-disasm.** ✅ **Part 1**: 1-paragraph "Generalisation"
+  subsection in `cluster-b-size-1-2-recipe.md` capturing the
+  unified root-cause framing — bundle recipe drains BOTH
+  size-1/2 AND value=0 size=4 candidates (same `.data`
+  emission problem; both cases solved by forcing non-zero
+  content into the section). **Part 2**: 8-candidate spot-disasm
+  at `docs/research/ov004-rodata-misclassification-spot-disasm.md`.
+  **Hit rate: 75% PASS** (6/8), 1 AMBIGUOUS (the brief 154
+  known-fail), 1 FAIL (`0x02209a58` — `andeq` near `.rodata`
+  end, clearly data). **Key insight**: byte coherence ≠ SHA1
+  safety — dsd's lcf re-emission for `function(arm, unknown)`-
+  kinded symbols shifts downstream bytes. Cohort viable for
+  "cautious reclassification" only with per-candidate SHA1
+  round-trip gate. Bonus finding: non-STMFD controls (e.g.
+  `0x021e768c`) caught coherent THUNK patterns (`ldr r12,
+  [pc, #N]; bx r12`) — structural fingerprint flags non-
+  prologue ARM code too. Brain pushed MD018 lint fix to
+  un-wrap `#2/#3` and `mov r1, #32` lines.
 
 - **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
   **28 source-level claims** (40% over ≥ 20 target). Per-shape:
@@ -159,26 +157,29 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (open last unopened sub-cluster):**
+**Decomper — one HIGH brief queued (D-3 wave 2 broader pool):**
 
-- **Brief 157 (HIGH, NEW)** — `decomper/cluster-d3-wave-1`. Open
-  cluster D-3 (complex nested struct arrays, ~20 candidates per
-  brief 121). Use brief 144's auto-`.extern` Pattern 3 generator
-  + brief 152/155's bundle recipe for any zero-pad/sub-4-byte
-  residue inside chunks. Target ≥ 5 D-3 chunks. Self-extend gate
-  unchanged.
+- **Brief 158 (HIGH, NEW)** — `decomper/cluster-d3-wave-2`.
+  Continue cluster D-3 drain with broader selection (medium-size
+  300-2000 B chunks, mixed struct shapes, adjacent-to-claimed
+  regions). 24 candidates remain after wave 1's 9. Target ≥10
+  chunks with yield gate ≥40% (broader pool exposure, not just
+  safest picks). If brief 159 Part 1 lands first, use the new
+  `--section data` flag directly.
 
-**Cloud — one MEDIUM brief queued (two small follow-ups):**
+**Cloud — one MEDIUM brief queued (two tooling deliverables):**
 
-- **Brief 156 (MEDIUM, NEW)** — `cloud/cluster-b-recipe-addendum-medium-spot-disassembly`.
-  Two parts: (1) addendum to
-  `docs/research/cluster-b-size-1-2-recipe.md` documenting that
-  the bundle recipe also drains value=0 size=4 candidates (per
-  brief 155 finding); (2) spot-disassemble 5-10 MEDIUM-confidence
-  ov004 `.rodata` candidates from brief 154's catalog, report
-  PASS/AMBIGUOUS/FAIL per candidate. **Do NOT reclassify** — only
-  recalibrate the heuristic. Output guides brain's next ov004
-  decision (cautious reclass / reverse-lookup pivot / defer).
+- **Brief 159 (MEDIUM, NEW)** — `cloud/pattern3-section-flag-plus-reverse-lookup-tool`.
+  Two-part PR. **Part 1**: Pattern 3 generator gains
+  `--section {data,rodata}` flag (defaults `rodata` for back-
+  compat) — closes the generator gap brief 157 funnel surfaced.
+  **Part 2**: new reverse-lookup tool that parses ov002 relocs
+  + ov004 `.rodata` symbol table to enumerate (ov002_load_site,
+  ov004_rodata_slot) pairs. **Orthogonal-to-byte-coherence path
+  2** for n<9 (per brief 150 funnel) — identifies veneer-trigger
+  slots directly via the cross-overlay pointer graph. Output as
+  research note + optional one worked-example slot claim
+  validating that claiming such a slot drops n by 1.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
@@ -198,9 +199,12 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   reclassifying ARM-code-as-data symbols (brief 154 falsified
   the naive byte-pattern approach; brief 156 cloud spot-disasm
   recalibrates the heuristic).
-- **Cluster D-3** — complex nested struct arrays, ~20 candidates
-  per brief 121. **OPENING** via brief 157 (decomper, queued)
-  using brief 144's turnkey Pattern 3 generator + bundle recipe.
+- **Cluster D-3** — complex nested struct arrays, 33 total
+  candidates (brief 121 estimated ~20; actual is 33). **Wave 1
+  shipped 9 chunks / 6,664 bytes (brief 157)**; ~24 candidates
+  remain for brief 158 wave 2. Recipe uses brief 144's auto-
+  `.extern` Pattern 3 generator + brief 152/155 bundle recipe
+  for any zero-pad / sub-4-byte residue inside chunks.
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
   via the W7 patcher (now fully general 134 → 142 → 146 → 150).
 
@@ -243,29 +247,32 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 157 PR** when it opens. Gate:
-   3-region `ninja sha1` PASS + 3-region 27/27 modules OK. ≥ 5
-   D-3 chunks expected. Watch for any chunk that needs the
-   bundle recipe inside (brief 152/155 generalisation) — both
-   recipes are now established.
-2. **Verify + merge cloud brief 156 PR** when it opens. Gate:
-   3-region SHA1 PASS (trivial — docs-only) + markdownlint
-   clean. Read the spot-disasm PASS rate carefully — it
-   determines the next ov004 reclass strategy.
-3. **Scope brief 158+ candidates (queue after 156 + 157):**
-   - **If brief 156's MEDIUM hit rate ≥ 70%**: cautious
-     decomper reclassification brief with whole-region
-     disassembly + bisection.
-   - **If brief 156's MEDIUM hit rate < 30%**: cloud reverse-
-     lookup tool for ov002 cross-overlay pointer targets in
-     ov004 `.rodata` (the cleaner n<9 lever per brief 150
-     funnel).
-   - **30 KB main mega-array** (`data_020b6ec4`) — biggest
-     deferred Pattern 1 mega.
-   - **Cross-region cluster A apply** — port 1443 EUR cluster
-     A symbols to USA + JPN.
-   - **3 cluster B value=0 deferred candidates** — needs wave-2
-     TU rewrite of adjacent single-int TUs.
+1. **Verify + merge decomper brief 158 PR** when it opens. Gate:
+   3-region `ninja sha1` PASS + 3-region 27/27 modules OK. ≥10
+   D-3 chunks expected with yield gate ≥40%. Watch for any
+   bundle-recipe trigger inside chunks (would be first
+   production use inside D-3).
+2. **Verify + merge cloud brief 159 PR** when it opens. Gate:
+   3-region SHA1 PASS preserved + new tests for generator flag
+   + reverse-lookup tool runs cleanly. The optional worked-
+   example claim (one veneer-trigger slot) validates Part 2's
+   hypothesis — capture the observed veneer-count delta in the
+   PR funnel.
+3. **Scope brief 160+ candidates (queue after 158 + 159):**
+   - **If brief 158 self-extends to wave 3**: D-3 wave 3 to
+     close the pool.
+   - **If brief 158 closes D-3**: pivot to next data-tier
+     wave (30 KB main mega-array, or cross-region cluster A
+     apply).
+   - **If brief 159's worked-example validates**: cautious
+     decomper brief applying brief 159's reverse-lookup tool
+     output as the source-of-truth for n<9 ov004 `.rodata`
+     claims.
+   - **Path 1 (cautious reclassification of brief 156 PASS
+     candidates with per-candidate SHA1 round-trip gate)**
+     remains queued as alternative if path 2 stalls.
+   - **3 cluster B value=0 deferred candidates** — needs
+     wave-2 TU rewrite of adjacent single-int TUs.
    - **Cross-region cluster A apply** — port 1443 EUR cluster A
      symbols to USA + JPN.
    - **Cluster D-3 via Pattern 3 generator** — ~20 complex

@@ -362,28 +362,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/157-cluster-d3-wave-1.md`](docs/briefs/157-cluster-d3-wave-1.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): open cluster D-3
-  (complex nested struct arrays, ~20 candidates per brief
-  121). Use brief 144's auto-`.extern` Pattern 3 generator
-  + brief 152/155's bundle recipe for any zero-pad / sub-
-  4-byte residue inside chunks. Target ≥ 5 D-3 chunks.
-  Critical: 3-region SHA1 PASS preserved. Branch:
-  `decomper/cluster-d3-wave-1`.
+- [`docs/briefs/158-cluster-d3-wave-2.md`](docs/briefs/158-cluster-d3-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): continue cluster
+  D-3 drain. Wave 1 (brief 157) shipped 9 of 33 candidates
+  (deliberately conservative). Wave 2 takes broader pool
+  (medium-size 300-2000 B chunks, mixed struct shapes,
+  adjacent-to-claimed). Target ≥10 chunks, yield gate
+  ≥40%. If brief 159 Part 1 lands first, use the new
+  `--section data` flag. Critical: 3-region SHA1 PASS
+  preserved. Branch: `decomper/cluster-d3-wave-2`.
 
-- [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): two small follow-
-  ups. (1) Addendum to `docs/research/cluster-b-size-1-2-
-  recipe.md` documenting that bundle recipe drains value=0
-  size=4 candidates too (brief 155 finding). (2) Spot-
-  disassemble 5-10 MEDIUM-confidence ov004 `.rodata`
-  candidates from brief 154's catalog, report PASS/AMBIGUOUS/
-  FAIL per candidate. **Do NOT reclassify** — only recalibrate
-  the heuristic. Hit rate guides next ov004 strategy.
-  Critical: 3-region SHA1 PASS preserved (trivial — docs-
-  only). Branch: `cloud/cluster-b-recipe-addendum-medium-spot-disassembly`.
+- [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): two-part tooling
+  PR. Part 1: add `--section {data,rodata}` flag to
+  `tools/cluster_c_pattern3_gen.py` (closes brief 157
+  generator gap). Part 2: new reverse-lookup tool for
+  ov002 cross-overlay pointer targets in ov004 `.rodata`
+  (brief 150 funnel hand-off). Optional one worked-example
+  slot claim validating veneer-count delta. Critical:
+  3-region SHA1 PASS preserved. Branch:
+  `cloud/pattern3-section-flag-plus-reverse-lookup-tool`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/157-cluster-d3-wave-1.md`](docs/briefs/157-cluster-d3-wave-1.md)
+  `decomper`, shipped in PR #586. **🎉 Last unopened
+  data-tier sub-cluster opened.** 9 D-3 chunks, 6,664
+  bytes (80% over ≥5 target). All chunks natively clean
+  multi-symbol `.data`; brief 144 auto-`.extern` generator
+  + post-process `.rodata→.data` sed (generator gap)
+  shipped mechanically. Yield gate FAIL (9/33=27%,
+  deliberately conservative); wave 1 closes. Generator
+  gap surfaced for cloud brief 159 Part 1.
+- [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
+  `cloud`, shipped in PR #587. **Part 1**: recipe addendum
+  capturing bundle generalisation to value=0 size=4 (per
+  brief 155). **Part 2**: 8-candidate spot-disasm. **Hit
+  rate 75% PASS** (6/8 + 1 AMBIGUOUS = brief 154 known-
+  fail + 1 FAIL = `0x02209a58` clearly data). Key
+  insight: **byte coherence ≠ SHA1 safety** (lcf re-
+  emission shifts downstream bytes for `function(arm,
+  unknown)` kind). Cohort viable for "cautious
+  reclassification" ONLY with per-candidate SHA1 round-
+  trip gate. Bonus: non-STMFD controls caught coherent
+  THUNK patterns. Brain pushed MD018 lint fix.
 
 - [`docs/briefs/155-cluster-b-main-w6-rejected-drain.md`](docs/briefs/155-cluster-b-main-w6-rejected-drain.md)
   `decomper`, shipped in PR #584. **Cluster B
