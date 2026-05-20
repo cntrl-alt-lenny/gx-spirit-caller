@@ -1975,3 +1975,19 @@ src/overlay002/data/data_ov002_022ccc5c.s:
 src/overlay002/data/data_ov002_022cccc0.s:
     complete
     .data start:0x022cccc0 end:0x022ccd24
+
+src/overlay002/data/data_ov002_022cce28.s:
+    complete
+    .data start:0x022cce28 end:0x022ccfd8
+
+src/overlay002/data/data_ov002_022cd090.s:
+    complete
+    .data start:0x022cd090 end:0x022cd300
+
+src/overlay002/data/data_ov002_022ca9bc.s:
+    complete
+    .data start:0x022ca9bc end:0x022cacbc
+
+src/overlay002/data/data_ov002_022ccd24.s:
+    complete
+    .data start:0x022ccd24 end:0x022cce28
