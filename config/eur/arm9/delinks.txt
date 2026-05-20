@@ -8841,3 +8841,7 @@ src/main/data/data_02101928.s:
 src/main/data/data_020c7b44.s:
     complete
     .data start:0x020c7b44 end:0x020c8e80
+
+src/main/data/data_020b6ec4.s:
+    complete
+    .rodata start:0x020b6ec4 end:0x020be6c4
