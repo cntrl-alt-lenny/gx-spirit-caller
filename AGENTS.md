@@ -362,28 +362,57 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/158-cluster-d3-wave-2.md`](docs/briefs/158-cluster-d3-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): continue cluster
-  D-3 drain. Wave 1 (brief 157) shipped 9 of 33 candidates
-  (deliberately conservative). Wave 2 takes broader pool
-  (medium-size 300-2000 B chunks, mixed struct shapes,
-  adjacent-to-claimed). Target ≥10 chunks, yield gate
-  ≥40%. If brief 159 Part 1 lands first, use the new
-  `--section data` flag. Critical: 3-region SHA1 PASS
-  preserved. Branch: `decomper/cluster-d3-wave-2`.
+- [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): first production use
+  of brief 159 Part 2's reverse-lookup tool. Pick 3-5 high-
+  reference ov004 `.rodata` slots from
+  `docs/research/ov004-rodata-pointer-targets.md`, claim
+  each as Pattern 1 `.c`, **per-slot SHA1 round-trip** to
+  observe veneer-count drop. **Path-2 hypothesis test** —
+  symbol stays `data`-kinded (no lcf re-emission risk).
+  Outcome shapes brief 162+. Critical: 3-region SHA1 PASS
+  preserved on all kept claims. Branch:
+  `decomper/ov004-rodata-veneer-trigger-claims`.
 
-- [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): two-part tooling
-  PR. Part 1: add `--section {data,rodata}` flag to
-  `tools/cluster_c_pattern3_gen.py` (closes brief 157
-  generator gap). Part 2: new reverse-lookup tool for
-  ov002 cross-overlay pointer targets in ov004 `.rodata`
-  (brief 150 funnel hand-off). Optional one worked-example
-  slot claim validating veneer-count delta. Critical:
-  3-region SHA1 PASS preserved. Branch:
-  `cloud/pattern3-section-flag-plus-reverse-lookup-tool`.
+- [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](docs/briefs/161-pattern3-subsumed-ref-resolution.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): fix the structural
+  collision brief 158 surfaced. Pattern 3 chunks need to
+  reference subsumed placeholders inside brief 155 bundle
+  TUs. Sketch 2 chosen (cleanest): bundle TUs export inner
+  placeholders via `.global` aliases. Convert
+  `data_021017f0` as worked example; optionally ship
+  `data_02101928` Pattern 3 chunk end-to-end. Unblocks D-3
+  wave 3. Critical: 3-region SHA1 PASS preserved. Branch:
+  `cloud/pattern3-subsumed-ref-resolution`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/158-cluster-d3-wave-2.md`](docs/briefs/158-cluster-d3-wave-2.md)
+  `decomper`, shipped in PR #589. **12 chunks across 5
+  modules** (main + ov002 + ov006 + ov007 + ov021) / 5,852
+  bytes. First wave with overlay reach (wave 1 main-only).
+  Yield gate ≥40% MET (50%). Bundle recipe (brief 152/155)
+  didn't trigger in wave 2 — all chunks naturally clean.
+  **Structural collision surfaced**: `data_02101928` skipped
+  due to subsumed-ref into brief 155 bundle TU — 3 sketch
+  workarounds filed for brief 161 (cloud). Created
+  `arm9_ovNNN.bin` symlinks for ov002/6/7/21 (generator's
+  expected path mismatch — also brief 161 cleanup candidate).
+  3-region SHA1 PASS + 27/27 OK preserved.
+- [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
+  `cloud`, shipped in PR #590. **Part 1**: `--section
+  {auto,rodata,data}` flag (closes brief 157 generator
+  gap). Auto-detect via delinks.txt section table. 5 new
+  tests. **Part 2**: reverse-lookup tool
+  `find_ov004_rodata_pointer_targets.py` enumerates ov002
+  relocs into ov004's `.rodata` range. **4001 cross-overlay
+  refs across 219 distinct slots** against EUR. Top slot:
+  `data_ov004_021e2b15` (363 refs). 19 new tests; suite
+  1808/1808. **Critical observation**: brief 154's known-
+  fail `0x021e2efc` has 153 refs — confirms brief 156's
+  "byte coherence + cross-overlay pressure ≠ SHA1 safety".
+  **Path-2 infrastructure shipped.** Brain pushed F541 +
+  MD022 lint fixes.
 
 - [`docs/briefs/157-cluster-d3-wave-1.md`](docs/briefs/157-cluster-d3-wave-1.md)
   `decomper`, shipped in PR #586. **🎉 Last unopened
