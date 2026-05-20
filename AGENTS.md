@@ -362,30 +362,57 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): first production use
-  of brief 159 Part 2's reverse-lookup tool. Pick 3-5 high-
-  reference ov004 `.rodata` slots from
-  `docs/research/ov004-rodata-pointer-targets.md`, claim
-  each as Pattern 1 `.c`, **per-slot SHA1 round-trip** to
-  observe veneer-count drop. **Path-2 hypothesis test** —
-  symbol stays `data`-kinded (no lcf re-emission risk).
-  Outcome shapes brief 162+. Critical: 3-region SHA1 PASS
-  preserved on all kept claims. Branch:
-  `decomper/ov004-rodata-veneer-trigger-claims`.
+- [`docs/briefs/163-cluster-d3-wave-3.md`](docs/briefs/163-cluster-d3-wave-3.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): close cluster D-3 to
+  its structural floor. Ship remaining ~11 D-3 candidates +
+  ≥1 of the 2 deferred mega chunks (data_020c9694 14.8 KB,
+  data_020c7b44 4.9 KB). Tooling stack now fully turnkey
+  (brief 144 + 152/155 + 159 Part 1 + 161). Target ≥9
+  chunks. Updates cluster D-3 status line in state.md.
+  Critical: 3-region SHA1 PASS preserved. Branch:
+  `decomper/cluster-d3-wave-3`.
 
-- [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](docs/briefs/161-pattern3-subsumed-ref-resolution.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): fix the structural
-  collision brief 158 surfaced. Pattern 3 chunks need to
-  reference subsumed placeholders inside brief 155 bundle
-  TUs. Sketch 2 chosen (cleanest): bundle TUs export inner
-  placeholders via `.global` aliases. Convert
-  `data_021017f0` as worked example; optionally ship
-  `data_02101928` Pattern 3 chunk end-to-end. Unblocks D-3
-  wave 3. Critical: 3-region SHA1 PASS preserved. Branch:
-  `cloud/pattern3-subsumed-ref-resolution`.
+- [`docs/briefs/162-patcher-low-n-extended-coverage.md`](docs/briefs/162-patcher-low-n-extended-coverage.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher
+  `expected_output_delta_for(n)` to cover n=5 (and likely
+  n=4, 3, 1) empirically. Brief 150's stderr warn currently
+  fires at n=5 (byte-detected 52 vs formula 48); SHA1
+  PASSES via byte-detection but warning noise will fire on
+  every future path-2 claim. Either per-n override dict or
+  generalised formula refinement — both acceptable. Cleans
+  up the W7 patcher chain for the full reachable n range
+  (134 → 142 → 146 → 150 → 162). Critical: 3-region SHA1
+  PASS preserved. Branch:
+  `cloud/patcher-low-n-extended-coverage`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
+  `decomper`, shipped in PR #592. **🔬 Path-2 hypothesis
+  FALSIFIED but mechanism CONFIRMED.** 3 per-slot
+  experiments, 0 PASS (all reverted), research-note-only
+  merge. **Findings**: (1) any 4-aligned `.rodata` claim
+  suppresses 4 veneers in one step (9 → 5), block-level
+  not per-claim. (2) Brief 160's "drop n by 1 per claim"
+  FALSIFIED — empirical model is block-level. (3) **Patcher
+  math gap at n=5**: brief 150 covered n ∈ {0,2,7,9,43,86};
+  n=5 untested, byte-detected delta disagrees with formula.
+  Brief 162 closes this gap. (4) **Odd-aligned slots
+  shift the veneer pool by 2 B** → patcher contiguity
+  fails. Separate recipe needed. 3-region SHA1 PASS
+  preserved.
+- [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](docs/briefs/161-pattern3-subsumed-ref-resolution.md)
+  `cloud`, shipped in PR #593. Sketch 2 chosen (cleanest,
+  no generator/patcher change). Investigation: GNU
+  `__attribute__((alias))` only does address-equal aliases
+  in C → fall back to pure `.s` with `.global` labels at
+  each offset (brief 153 precedent). New
+  `tools/cluster_b_bundle.py` + `render_bundle_s()` helper
+  + 16 tests. **Part 2**: `data_021017f0` `.c` → `.s`
+  rewrite exports both `data_021017f0` and `data_021017f4`.
+  **BONUS**: shipped `data_02101928` Pattern 3 chunk end-
+  to-end (brief 158's deferred). Suite 1808 → 1824. 3-
+  region SHA1 PASS bit-for-bit preserved.
 
 - [`docs/briefs/158-cluster-d3-wave-2.md`](docs/briefs/158-cluster-d3-wave-2.md)
   `decomper`, shipped in PR #589. **12 chunks across 5
