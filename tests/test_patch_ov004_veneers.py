@@ -43,6 +43,7 @@ from patch_ov004_veneers import (  # noqa: E402
     CTOR_PAD_FIX_NET_BYTES,
     CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+    CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
     HISTORICAL_MAX_VENEER_COUNT,
     N_INFERENCE_OVERRIDES,
     PatchError,
@@ -650,7 +651,7 @@ _SYNTH_DATA_HEAD_4 = b"LZNC"
 def _build_synth_ov004(
     n: int,
     *,
-    terminator: bool | None = None,
+    terminator: bool | str | None = None,
 ) -> tuple[bytes, dict[str, tuple[int, int]]]:
     """Build a synthetic ov004-shaped binary with `n` veneers + a
     realistic ctor/pad cluster + a small `.data` tail. Returns
@@ -666,26 +667,34 @@ def _build_synth_ov004(
     Brief 150: brief 147 bisected a NEW boundary — at very low `n`
     (empirically n=2 and n=7) mwldarm continues emitting the
     WITH_TERMINATOR shape. The empirical boundary is somewhere
-    between n=7 (WITH) and n=9 (NO). To pin both paths
-    independently of the empirical guess, `terminator` is now an
-    explicit parameter:
+    between n=7 (WITH) and n=9 (NO).
+
+    Brief 164: a THIRD cluster shape — 28 bytes long — observed
+    empirically at n=5 (`[ctor(4) | WRITEW(0)(4) | pad(8) | 12
+    extra zero bytes]`). To pin all three paths independently of
+    the empirical guess, `terminator` is now a three-way knob:
 
       - `terminator=None` (default): use brief 146's empirical
         default (`True` when n == 86, `False` otherwise).
       - `terminator=True`: force WITH_TERMINATOR (16-byte cluster).
-        Use to pin the low-n path brief 147 surfaced.
+        Use to pin the brief 147 / 150 low-n path.
       - `terminator=False`: force NO_TERMINATOR (12-byte cluster).
-        Use to pin the n=9 path brief 146 fixed at non-low n.
+        Use to pin the brief 146 n=9 path.
+      - `terminator="long"`: force WITH_TERMINATOR_LONG (28-byte
+        cluster, brief 164). Use to pin the brief 160 / 164 n=5
+        path.
 
     Built-file layout (what mwldarm emits):
 
         [0..0x1000)            .text payload (0xAA filler)
         [0x1000..0x1000+n*12)  veneer pool
         [pool_end..ctor_end)   ctor + pad cluster — variable size:
-                                 WITH terminator → 16 bytes
-                                          [ctor(4) | WRITEW(0)(4) | pad(8)]
-                                 NO terminator → 12 bytes
-                                          [ctor(4) | pad(8)]
+                                 WITH terminator       → 16 bytes
+                                   [ctor(4) | WRITEW(0)(4) | pad(8)]
+                                 NO terminator         → 12 bytes
+                                   [ctor(4) | pad(8)]
+                                 WITH terminator LONG  → 28 bytes
+                                   [ctor(4) | WRITEW(0)(4) | pad(8) | 12 zeros]
         [ctor_end..ctor_end+4) `.data` head (non-zero — "LZNC")
         [...64 B total of `.data` tail with 0xBB filler...)
 
@@ -705,11 +714,16 @@ def _build_synth_ov004(
 
     if terminator is None:
         # Brief 146 empirical default: WITH at n=86, NO elsewhere.
-        use_terminator = (n == HISTORICAL_MAX_VENEER_COUNT)
-    else:
-        use_terminator = terminator
+        terminator = (n == HISTORICAL_MAX_VENEER_COUNT)
 
-    if use_terminator:
+    if terminator == "long":
+        # Brief 164: WITH terminator + 12 extra zero bytes → 28-byte
+        # cluster. Matches the empirical n=5 shape.
+        ctor_pad = (
+            _SYNTH_CTOR_ENTRY + _SYNTH_WRITEW0 + _SYNTH_PAD_8
+            + b"\x00" * 12
+        )
+    elif terminator:
         # WITH terminator → 16-byte cluster.
         ctor_pad = _SYNTH_CTOR_ENTRY + _SYNTH_WRITEW0 + _SYNTH_PAD_8
     else:
@@ -1173,27 +1187,33 @@ class TestNInferenceOverridesContract(unittest.TestCase):
     state). Brief 162 ships with one entry; future briefs add
     rows as additional n values are sampled."""
 
-    def test_table_contains_n5_with_terminator(self):
-        # Brief 162's empirical anchor: n=5 → WITH_TERMINATOR
-        # (ctor_pad_net=8). Captured by claiming
+    def test_table_contains_n5_with_terminator_long(self):
+        # Brief 164's empirical anchor: n=5 → WITH_TERMINATOR_LONG
+        # (ctor_pad_net=-4). Captured by claiming
         # `data_ov004_021f4a40` as a Pattern 1 .s chunk and
         # snapshotting the pre-patch arm9_ov004.bin produced by
-        # mwldarm. See the brief 162 PR write-up for the
-        # measurement steps.
+        # mwldarm. The 28-byte cluster mwldarm emits at n=5
+        # consumes 4 more cluster bytes than the fix writes back
+        # → net = -4. Updated from brief 162's +8 once the
+        # patcher learned to detect the 28-byte shape.
         self.assertIn(5, N_INFERENCE_OVERRIDES)
         self.assertEqual(
             N_INFERENCE_OVERRIDES[5],
-            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
         )
 
     def test_table_entries_are_valid_ctor_pad_net_values(self):
-        # Every entry must be either +8 (WITH_TERMINATOR) or +12
-        # (NO_TERMINATOR). Other values would mean a new ctor/pad
-        # shape was discovered, which is brief-level new news +
-        # would require updating `_fix_ctor_and_pad` first.
+        # Every entry must be one of the three known
+        # ctor_pad_net values: +8 (WITH_TERMINATOR), +12
+        # (NO_TERMINATOR), or -4 (WITH_TERMINATOR_LONG). Other
+        # values would mean a new ctor/pad shape was discovered,
+        # which is brief-level new news + would require updating
+        # `_fix_ctor_and_pad` to detect it before any override
+        # consumed it.
         valid = {
             CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
             CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
         }
         for n, net in N_INFERENCE_OVERRIDES.items():
             self.assertIn(
@@ -1219,16 +1239,17 @@ class TestExpectedOutputDeltaForOverrides(unittest.TestCase):
     empirical) + verify the resolution order doesn't disturb
     other n values."""
 
-    def test_n_equals_5_returns_with_terminator_delta(self):
-        # Brief 162's anchor empirical: n=5 → 5*12 - 8 = 52.
-        # Before brief 162, the formula returned 5*12 - 12 = 48
-        # (NO_TERMINATOR default), triggering the brief 150 warn
-        # at every n=5 build. Brief 162 silences that path.
+    def test_n_equals_5_returns_with_terminator_long_delta(self):
+        # Brief 164's anchor empirical: n=5 → 5*12 - (-4) = 64.
+        # Brief 162 set this to 5*12 - 8 = 52 (silencing the warn
+        # but not fixing SHA1); brief 164 corrected to -4 once
+        # `_fix_ctor_and_pad` learned to detect the 28-byte
+        # cluster shape and the SHA1 residual was closed.
         self.assertEqual(
             expected_output_delta_for(5),
-            5 * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+            5 * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
         )
-        self.assertEqual(expected_output_delta_for(5), 52)
+        self.assertEqual(expected_output_delta_for(5), 64)
 
     def test_n_equals_9_unchanged_no_terminator(self):
         # n=9 is NOT in the override dict — falls through to the
@@ -1267,38 +1288,133 @@ class TestExpectedOutputDeltaForOverrides(unittest.TestCase):
 
 
 class TestN5SilencesDisagreementNote(unittest.TestCase):
-    """Brief 162 success criterion: the brief 150 stderr
-    disagreement note must NOT fire at n=5 (the empirically-
-    observed WITH_TERMINATOR state). Drives the patcher
-    end-to-end against a synthetic n=5 WITH_TERMINATOR fixture
-    + asserts stderr stays clean."""
+    """Brief 162 → 164 success criterion: the brief 150 stderr
+    disagreement note must NOT fire at n=5 with the empirically-
+    observed WITH_TERMINATOR_LONG cluster (28 bytes). Drives the
+    patcher end-to-end against a synthetic n=5 fixture using the
+    `terminator='long'` knob brief 164 added + asserts stderr
+    stays clean."""
 
-    def test_no_stderr_note_at_n_5_with_terminator(self):
+    def test_no_stderr_note_at_n_5_with_terminator_long(self):
         import contextlib
         import io
         from patch_ov004_veneers import patch_ov004
 
-        # Build a synthetic n=5 input with explicit WITH_TERMINATOR
-        # cluster — exactly the shape brief 162 saw empirically.
-        data, sections = _build_synth_ov004(5, terminator=True)
+        # Build a synthetic n=5 input with explicit
+        # WITH_TERMINATOR_LONG cluster — exactly the shape brief
+        # 160 / 164 captured from real mwldarm output.
+        data, sections = _build_synth_ov004(5, terminator="long")
         captured = io.StringIO()
         with contextlib.redirect_stderr(captured):
             patched, stats = patch_ov004(data, [], sections)
-        # Patcher succeeded + byte-detected WITH_TERMINATOR.
+        # Patcher succeeded + byte-detected WITH_TERMINATOR_LONG.
         self.assertEqual(stats["veneers_spliced"], 5)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
+        )
+        # Crucial: no stderr noise — brief 164's override (and the
+        # walk-forward detector that returns the new value) makes
+        # byte-detection + n-inference agree.
+        err = captured.getvalue()
+        self.assertNotIn(
+            "shape disagrees with n-inference", err,
+            f"brief 150 disagreement note fired at n=5 — brief 164 "
+            f"override should have silenced it. stderr: {err!r}",
+        )
+        self.assertNotIn("brief 150", err)
+
+
+# ---------------------------------------------------------------------- #
+# Brief 164: walk-forward cluster detection. Pin the new 28-byte
+# WITH_TERMINATOR_LONG shape end-to-end + verify orig-byte equality.
+# ---------------------------------------------------------------------- #
+
+
+class TestPatcherOutputMatchesOrigAtN5(unittest.TestCase):
+    """Brief 164 success gate. The patcher applied to a synthetic
+    n=5 WITH_TERMINATOR_LONG input must produce output that is
+    byte-identical to `_build_orig_synth_ov004()` — the same
+    contract brief 146 pinned for n=86 and n=9. Brief 164 closes
+    this gate for n=5 specifically (where brief 160 measured a
+    +12-byte SHA1 residual against the real mwldarm output)."""
+
+    def test_orig_match_at_n_5_with_terminator_long(self):
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(5, terminator="long")
+        patched, stats = patch_ov004(data, [], sections)
+        orig = _build_orig_synth_ov004()
+        self.assertEqual(
+            len(patched), len(orig),
+            f"n=5 WITH_TERMINATOR_LONG output size {len(patched)} "
+            f"!= orig {len(orig)}",
+        )
+        self.assertEqual(
+            bytes(patched), orig,
+            "n=5 WITH_TERMINATOR_LONG output not byte-identical "
+            "to orig — brief 164's SHA1-residual fix regressed",
+        )
+        # Stats sanity: detected the 28-byte cluster shape.
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
+        )
+
+    def test_walk_forward_detects_n86_classic_shape(self):
+        # Regression guard: the walk-forward detector must STILL
+        # find the 16-byte cluster at the historical n=86 case
+        # (where the original brief 146 byte-12-15-zero check was
+        # the only signal). Walk should stop at offset 16 (where
+        # `.LZN` starts) → ctor_pad_net = +8.
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(
+            HISTORICAL_MAX_VENEER_COUNT, terminator=True,
+        )
+        patched, stats = patch_ov004(data, [], sections)
+        orig = _build_orig_synth_ov004()
+        self.assertEqual(bytes(patched), orig)
         self.assertEqual(
             stats["ctor_pad_net"],
             CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
         )
-        # Crucial: no stderr noise — brief 162 silences the brief
-        # 150 disagreement note at the n=5 state via the override.
-        err = captured.getvalue()
-        self.assertNotIn(
-            "shape disagrees with n-inference", err,
-            f"brief 150 disagreement note fired at n=5 — brief 162 "
-            f"override should have silenced it. stderr: {err!r}",
+
+    def test_walk_forward_detects_n9_no_terminator_shape(self):
+        # Regression guard: the walk-forward detector must STILL
+        # find the 12-byte cluster at the n=9 case (where bytes
+        # 12-15 ARE non-zero — the first `.data` word). Walk
+        # should stop at offset 12 → ctor_pad_net = +12.
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(9, terminator=False)
+        patched, stats = patch_ov004(data, [], sections)
+        orig = _build_orig_synth_ov004()
+        self.assertEqual(bytes(patched), orig)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
         )
-        self.assertNotIn("brief 150", err)
+
+
+class TestFixCtorAndPadWalkSafety(unittest.TestCase):
+    """Brief 164: the walk-forward cursor caps at MAX_CLUSTER_WORDS
+    (16 words = 64 bytes) before raising. Pin the cap behaviour so
+    a future mwldarm regression that emits an unbounded pad
+    cluster surfaces as a clear PatchError instead of silently
+    corrupting the output."""
+
+    def test_raises_on_unbounded_zero_run(self):
+        # Construct a synthetic cluster where the zero pad extends
+        # beyond the safety cap. Use 70 bytes of zero pad after
+        # the ctor entry — that's > 16 4-byte words.
+        from patch_ov004_veneers import _fix_ctor_and_pad
+        data = bytearray(
+            b"\xaa" * 0x1000  # text padding
+            + b"\xab\xcd\xef\x01"  # ctor entry
+            + b"\x00" * 80        # 80 zero bytes (> 16 * 4 = 64)
+            + b"LZNC"             # .data start
+            + b"\xbb" * 60        # .data tail
+        )
+        with self.assertRaisesRegex(PatchError, "more than"):
+            _fix_ctor_and_pad(data, 0x1000)
 
 
 if __name__ == "__main__":

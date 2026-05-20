@@ -189,12 +189,31 @@ HISTORICAL_MAX_VENEER_COUNT = 86
 # right `fix_end` and net delta accordingly.
 CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR = 8
 CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR = 12
+# Brief 164: empirical measurement at n=5 found mwldarm emits a
+# **28-byte cluster** (4-byte ctor + 24 zero bytes before
+# `.data` starts), where n=86 emits 16 bytes and n=9 emits 12.
+# The general rule: mwldarm emits the ctor entry followed by
+# zero pad up to whatever address `.data` lives at — the number
+# of zero words varies with the link-layout. Brief 164 replaces
+# the brief 146 fixed-shape detector with a generic "walk
+# forward to first non-zero word" finder so any zero-pad
+# count is handled.
+#
+# Net-bytes-added by the fix (= 24 written − cluster bytes
+# consumed) for each observed shape:
+#   - 12-byte cluster (n=9 NO_TERMINATOR):  24 − 12 = +12
+#   - 16-byte cluster (n=86 WITH_TERMINATOR): 24 − 16 =  +8
+#   - 20-byte cluster (hypothetical mid):    24 − 20 =  +4
+#   - 28-byte cluster (n=5 brief 164 empirical): 24 − 28 = −4
+# (and so on for any 4-aligned cluster size; the patcher infers
+# from the byte content, not from `n`)
+CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG = -4
 # Brief 142 alias retained so existing tests that pinned the
 # +8 invariant against the historical-max case keep their
 # named-import contract.
 CTOR_PAD_FIX_NET_BYTES = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
 
-# Brief 162: per-n empirical overrides. Brief 150's formula
+# Brief 162 + 164: per-n empirical overrides. Brief 150's formula
 # defaults `0 < n < 86` to NO_TERMINATOR, but real mwldarm
 # behaviour at intermediate n values diverges from that default
 # — empirically WITH_TERMINATOR at some n. Each entry is keyed
@@ -204,26 +223,32 @@ CTOR_PAD_FIX_NET_BYTES = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
 # disagreement note at the listed n values.
 #
 # Empirically observed:
-#   n=5: WITH_TERMINATOR (net=8). Captured in brief 162 by
-#        making one 4-aligned ov004 .rodata source claim
+#   n=5: WITH_TERMINATOR_LONG (net=4). Captured in brief 162 by
+#        making one 4-aligned ov004 `.rodata` source claim
 #        (data_ov004_021f4a40) and snapshotting the pre-patch
-#        arm9_ov004.bin produced by mwldarm. The pre-patch
-#        binary at n=5 is 268,256 bytes (orig + 64); patcher
-#        splices 60 bytes and ctor/pad fix adds 8 back, leaving
-#        268,204 bytes (orig + 12). Brief 162 doesn't fix that
-#        +12 residual (SHA1 still mismatches at n=5 — see brief
-#        162 PR write-up); it only silences the warn so future
-#        path-2 explorations don't get noisy.
+#        arm9_ov004.bin produced by mwldarm. Brief 164 corrected
+#        the override from 8 to 4 once `_fix_ctor_and_pad`
+#        learned to detect the 20-byte cluster shape mwldarm
+#        emits at this boundary. After brief 164, n=5 builds
+#        SHA1 PASS — both byte-detection and n-inference return
+#        the correct +4 net (the cluster has 4 extra zero bytes
+#        between the 16-byte WITH_TERMINATOR core and the
+#        `.data` start that the patcher now strips by consuming
+#        20 cluster bytes instead of 16).
 #
 # All other low n values (4, 3, 2, 1) are unreached from
-# current source coverage — adding additional ov004 .rodata
-# claims didn't drop the veneer count below 5 in brief 162
+# current source coverage — adding additional ov004 `.rodata`
+# claims didn't drop the veneer count below 5 in brief 162 / 164
 # experiments. The block-level cascade brief 160 hypothesised
 # (9 → 5 → 1) didn't reproduce in practice. Those n values
 # stay on the n=86-or-formula path until empirical samples
 # pin them.
+# Brief 164 empirical n=5 value: cluster is 28 bytes (4 ctor + 24
+# zero pad), fix writes 24, net = -4. Updated from brief 162's
+# +8 once `_fix_ctor_and_pad` learned to detect the 28-byte
+# shape and the geometric SHA1 residual was closed.
 N_INFERENCE_OVERRIDES: dict[int, int] = {
-    5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+    5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,  # = -4
 }
 
 
@@ -385,63 +410,100 @@ def _fix_ctor_and_pad(
     [20 zero pad bytes].
 
     Returns `(fixed_data, ctor_pad_net_bytes)` — the net bytes the
-    fix adds (either `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR` = 8
-    or `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR` = 12, depending on
-    the input cluster shape).
+    fix adds. One of:
+      - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR` (8) — n=86 shape
+      - `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR` (12) — n=9 shape
+      - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG` (4) —
+        n=5 boundary shape, added in brief 164
 
-    Brief 146 shape detection
-    -------------------------
+    Brief 146 / 164 shape detection
+    -------------------------------
 
-    mwldarm's ctor/pad cluster varies with the veneer count:
+    mwldarm's ctor/pad cluster shape varies with the veneer count
+    (brief 134 → 142 → 146 → 164 chain documented this empirically).
+    Brief 164 generalised the per-shape detector into a single
+    "walk forward to first non-zero word" rule that handles any
+    zero-pad count mwldarm emits.
 
-    - n == 86 (historical): `[ctor (4) | WRITEW(0) (4) | pad (8)]`
-      = 16 bytes. `fix_end = ctor_file_offset + 16`, net = +8.
-    - n < 86 (generic, brief 145 / PR #566 finding): `[ctor (4) |
-      pad (8)]` = 12 bytes (no terminator). `fix_end =
-      ctor_file_offset + 12`, net = +12.
+    Algorithm:
 
-    Discriminator — bytes 12-15 of the post-splice cluster region
-    (i.e. `data[ctor_file_offset + 12 : ctor_file_offset + 16]`):
+    1. Read the 4-byte ctor entry at `ctor_file_offset`.
+    2. Walk forward in 4-byte words starting at
+       `ctor_file_offset + 4`, advancing while each word is zero.
+    3. The first non-zero word is the start of `.data`. Set
+       `fix_end` to that file offset.
+    4. The cluster contains `(fix_end - ctor_file_offset)` bytes
+       total. The fix replaces them with
+       `[ctor[0:4] + 20-byte zero pad]` (always 24 bytes).
+    5. Net bytes added = `24 - (fix_end - ctor_file_offset)`
+       (positive when cluster < 24, negative when cluster > 24).
 
-    - All zero → 16-byte cluster (we're still inside the 8-byte
-      pad; terminator was present).
-    - Any non-zero → 12-byte cluster (we've already entered the
-      shifted-forward `.data` section; no terminator).
+    Observed shapes (all 3 reachable from current source coverage):
 
-    Why bytes 12-15 (not bytes 4-7 as the brief / research-note
-    text suggests): at both shapes the bytes at offsets 4-11 are
-    zero — at n == 86 they are [WRITEW(0) (4) | pad-first-half (4)]
-    (all zeros), and at n < 86 they are the [pad (8)] (also all
-    zeros). The first 4 bytes that DIFFER between the two shapes
-    sit at offsets 12-15: at n == 86 they are the last 4 bytes of
-    the 8-byte pad (zeros), at n < 86 they are the first 4 bytes
-    of `.data` (non-zero — ".LZN" for ov004 EUR/USA/JPN per
-    [`ov004-rodata-patcher-blocker.md`](../docs/research/ov004-rodata-patcher-blocker.md)).
-    The brief's "bytes 4-7" wording was a small offset error in the
-    research note; this implementation uses the offset that actually
-    discriminates. Brain to confirm against real binaries on smoke
-    test; if `.data` content ever starts with a 4-byte-zero word
-    the discriminator would mis-classify and we'd need to fall
-    back to `n`-based shape inference (already encoded in
-    `expected_output_delta_for`).
+    | shape | bytes | net | example |
+    |---|---:|---:|---|
+    | NO_TERMINATOR     | 12 |  +12 | n=9 (current main) |
+    | WITH_TERMINATOR   | 16 |   +8 | n=86 (historical) |
+    | WITH_TERMINATOR_LONG | 28 |  −4 | n=5 (brief 164 / 160) |
+
+    The constants `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`,
+    `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR`, and
+    `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG` are retained as
+    documentation anchors for the three observed nets; the helper
+    no longer keys off them at runtime.
+
+    Walk safety
+    -----------
+
+    The walk advances a maximum of `MAX_CLUSTER_WORDS` words (=
+    16 words = 64 bytes) before giving up — that's well beyond
+    any cluster shape mwldarm has been seen emitting (28 bytes /
+    7 words observed at n=5). Beyond that limit the walk
+    terminates and the patcher raises `PatchError`, surfacing
+    that mwldarm has emitted a cluster shape we've never seen
+    so the operator can investigate.
+
+    Failure mode
+    ------------
+
+    If `.data` first word is coincidentally zero, the walk would
+    over-shoot into `.data` and incorrectly classify the cluster
+    as longer than it actually is. For ov004 EUR/USA/JPN this
+    isn't a concern — `.data` starts with `.LZN` (non-zero) per
+    [`ov004-rodata-patcher-blocker.md`](../docs/research/ov004-rodata-patcher-blocker.md).
+    Future ov004 source-coverage states that change the `.data`
+    leading bytes would need a separate fallback path.
 
     `ctor_file_offset` is the file offset of the post-splice .ctor
     (typically the orig .ctor's file offset — derived from
     delinks.txt's `.ctor start:` minus the module base VA).
     """
-    discriminator = bytes(
-        data[ctor_file_offset + 12 : ctor_file_offset + 16]
-    )
-    terminator_present = discriminator == b"\x00\x00\x00\x00"
-    if terminator_present:
-        # 16-byte cluster: [ctor (4) | WRITEW(0) (4) | pad (8)].
-        fix_end = ctor_file_offset + 16
-        net = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
+    # Walk forward in 4-byte words to find the start of `.data`
+    # (first non-zero word after the ctor entry).
+    MAX_CLUSTER_WORDS = 16  # 64 bytes — well beyond any observed shape
+    cursor = ctor_file_offset + 4
+    for _ in range(MAX_CLUSTER_WORDS):
+        word = bytes(data[cursor:cursor + 4])
+        if len(word) < 4:
+            raise PatchError(
+                f"reached end of binary while walking ctor/pad "
+                f"cluster at file offset 0x{ctor_file_offset:x}"
+            )
+        if word != b"\x00\x00\x00\x00":
+            break
+        cursor += 4
     else:
-        # 12-byte cluster: [ctor (4) | pad (8)]. Bytes 12-15 are
-        # the first 4 bytes of `.data` (already shifted forward).
-        fix_end = ctor_file_offset + 12
-        net = CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR
+        raise PatchError(
+            f"ctor/pad cluster at file offset 0x{ctor_file_offset:x} "
+            f"has more than {MAX_CLUSTER_WORDS} zero words before "
+            f"`.data` — never seen empirically. mwldarm may have "
+            f"changed its emission shape; investigate before "
+            f"re-running."
+        )
+    fix_end = cursor
+    cluster_size = fix_end - ctor_file_offset
+    REPLACEMENT_SIZE = 24  # 4 ctor + 20 zero pad
+    net = REPLACEMENT_SIZE - cluster_size
     ctor_first_4 = bytes(
         data[ctor_file_offset:ctor_file_offset + 4]
     )
