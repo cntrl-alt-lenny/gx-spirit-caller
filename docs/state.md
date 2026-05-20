@@ -8,19 +8,18 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-20 afternoon, post-#589 + #590 merge,
-briefs 160 + 161 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
-PASSES** across all 3 regions (brief 140, PR #558) and continues
-to hold after 10 post-SHA1 rounds. **D-3 wave 2 shipped 12
-chunks across 5 modules (main + ov002 + ov006 + ov007 + ov021)
-/ 5,852 bytes / 50% yield**. **Reverse-lookup tool landed**
-(brief 159 Part 2): 4001 ov002→ov004 `.rodata` references
-across 219 distinct slots — path-2 infrastructure now in place
-for n<9 ov004 drain without reclassification risk. **New
-structural collision surfaced** (brief 158): Pattern 3 chunks
-need to reference subsumed placeholders inside brief 155
-bundle TUs; brief 161 (cloud, queued) ships the bundle-alias
-fix.
+**Last updated:** 2026-05-20 evening, post-#592 + #593 merge,
+briefs 162 + 163 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
+PASSES** across all 3 regions (brief 140, PR #558) and
+continues to hold after 11 post-SHA1 rounds. **Path 2
+falsified-but-mechanism-confirmed** (brief 160): per-claim
+suppression hypothesis FALSE, but block-level suppression
+(9 → 5 in one step) CONFIRMED + patcher math gap at n=5
+surfaced for brief 162 (cloud, queued) to close. **Bundle
+alias helper shipped** (brief 161) + data_02101928 unblocked
+end-to-end. D-3 at 22/33 + 1 bonus = ~23 chunks shipped
+across 3 waves; brief 163 (decomper, queued) wave 3 closes
+the pool.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -61,42 +60,42 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **PR #589 — decomper / brief 158 cluster D-3 wave 2.** ✅
-  **12 chunks across 5 modules** (main + ov002 + ov006 + ov007
-  + ov021) / 5,852 bytes. **First wave with overlay reach**
-  (wave 1 was main-only). Yield gate ≥40% MET (12/24=50%),
-  bytes gate trivially met. Brief 144 auto-`.extern` worked
-  on overlay chunks too. **Structural collision surfaced**:
-  `data_02101928` skipped because its `.word data_021017f4`
-  ref can't resolve — `data_021017f4` is a subsumed
-  placeholder inside brief 155's bundle TU. 3 workaround
-  sketches filed for brief 161 (cloud, queued). Created
-  `extract/eur/arm9/arm9_ovNNN.bin` symlinks for ov002/6/7/21
-  (generator's expected path didn't match actual layout —
-  also brief 161 cleanup candidate). 3-region SHA1 PASS +
-  27/27 OK preserved. Wave 1 closes; brief 161 wave 3
-  scope = remaining ~12 + 3 deferred (subsumed-ref + 14.8 KB
-  mega + 4.9 KB).
-- **PR #590 — cloud / brief 159 generator flag + reverse-
-  lookup tool.** ✅ **Part 1**: `--section {auto,rodata,data}`
-  flag added to `cluster_c_pattern3_gen.py`. Auto-detect via
-  `_parse_section_header()` reads delinks.txt section table to
-  pick the section covering `[start, end)`. Default `auto`,
-  falls back to `rodata` for back-compat. 5 new tests.
-  **Part 2**: `tools/find_ov004_rodata_pointer_targets.py`
-  enumerates ov002 relocs into ov004's `.rodata` range.
-  **Empirical result against EUR**: 4001 cross-overlay refs
-  across 219 distinct ov004 slots. 19 new tests.
-  Top-referenced: `data_ov004_021e2b15` (363 refs).
-  **Critical observation**: `data_ov004_021e2efc` (brief
-  154's known-fail) has 153 refs — has BOTH byte coherence
-  AND cross-overlay pressure, yet kind-flipping broke SHA1.
-  Confirms brief 156's "byte coherence ≠ SHA1 safety" finding:
-  the two signals together still aren't sufficient. SHA1
-  gate remains authoritative. **Path-2 infrastructure
-  shipped** (orthogonal-to-byte-coherence); brief 160
-  (decomper) tests the hypothesis with per-slot claims.
-  Suite 1808/1808. Brain pushed F541 + MD022 lint fixes.
+- **PR #592 — decomper / brief 160 path-2 falsified.** 🔬
+  **Path-2 hypothesis FALSIFIED, but mechanism CONFIRMED
+  at block-level granularity.** 3 per-slot experiments, 0
+  PASS (all reverted), research-note-only merge.
+  **Findings**: (1) Any 4-aligned `.rodata` Pattern 1 `.c`
+  source claim suppresses **4 veneers in one step (9 → 5)**
+  independent of which slot — mwldarm operates at section-
+  coverage granularity, NOT per-symbol. Brief 141/147 saw
+  the same 9-floor because of this. (2) Brief 160's
+  "drop n by 1 per claim" model FALSIFIED — empirical model
+  is block-level. (3) **Patcher math gap at n=5**: brief
+  150's table covered `n ∈ {0, 2, 7, 9, 43, 86}`; n=5 is
+  a new state where byte-detected delta (52) disagrees with
+  n-inference (48) by 4 B. Brief 150's stderr warn fires
+  correctly (SHA1 still PASSES via byte-detection
+  authoritative); brief 162 cleans up the noise. (4) **Odd-
+  aligned slots** (e.g. `0x021e2b15` addr%4==1) shift the
+  veneer pool by 2 B → patcher contiguity check fails.
+  Needs separate recipe (mwasmarm `.s` with explicit
+  `.align 0` or `__attribute__((aligned(1)))` on `.c`). All
+  3 regions SHA1 PASS + 27/27 OK preserved.
+- **PR #593 — cloud / brief 161 bundle alias helper +
+  worked example end-to-end.** ✅ Sketch 2 chosen (cleanest:
+  no generator change, no patcher change). **Investigation
+  finding**: GNU `__attribute__((alias))` can't introduce
+  offset aliases in C — only address-equal. Fall back to
+  pure `.s` with explicit `.global` labels at each offset
+  (per brief 153 size-1/2 overlay precedent). New
+  `tools/cluster_b_bundle.py` with `render_bundle_s()`
+  helper + 16 tests. **Part 2**: `data_021017f0` rewritten
+  from `.c` to `.s`, both `data_021017f0` and `data_021017f4`
+  exported at offsets 0 and +4. **BONUS**: shipped
+  `data_02101928` Pattern 3 chunk end-to-end (brief 158's
+  deferred candidate) — its `.word data_021017f4` reference
+  now resolves cleanly. Suite 1808 → 1824 (+16 tests). 3-
+  region SHA1 PASS bit-for-bit preserved.
 
 - **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
   **28 source-level claims** (40% over ≥ 20 target). Per-shape:
@@ -163,29 +162,30 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (path-2 worked examples):**
+**Decomper — one HIGH brief queued (close cluster D-3):**
 
-- **Brief 160 (HIGH, NEW)** — `decomper/ov004-rodata-veneer-trigger-claims`.
-  First production use of brief 159 Part 2's reverse-lookup
-  tool. Pick 3-5 high-reference ov004 `.rodata` slots from
-  `docs/research/ov004-rodata-pointer-targets.md`, claim each
-  as a Pattern 1 `.c`, **per-slot SHA1 round-trip** to observe
-  whether veneer count drops by 1. **Path-2 hypothesis test**
-  (orthogonal-to-byte-coherence — symbol stays `data`-kinded;
-  no lcf re-emission shift). Outcome determines brief 162+
-  shape (scale-up if validated, alternative pivot if not).
+- **Brief 163 (HIGH, NEW)** — `decomper/cluster-d3-wave-3`.
+  Ship remaining ~11 D-3 candidates in main pool + at least
+  one of the 2 deferred mega chunks (data_020c9694 14.8 KB,
+  data_020c7b44 4.9 KB). Tooling stack now fully turnkey
+  (brief 144 auto-`.extern` + brief 152/155 bundle + brief
+  159 Part 1 `--section data` + brief 161 alias helper).
+  Target ≥9 chunks (8 mid-size + ≥1 mega). Closes cluster
+  D-3 to its structural floor; updates state.md cluster-
+  status line.
 
-**Cloud — one MEDIUM brief queued (subsumed-ref bundle fix):**
+**Cloud — one MEDIUM brief queued (patcher low-n cleanup):**
 
-- **Brief 161 (MEDIUM, NEW)** — `cloud/pattern3-subsumed-ref-resolution`.
-  Fix the structural collision brief 158 surfaced. Pattern 3
-  chunks need to reference subsumed placeholders hidden
-  inside brief 155's bundle TUs. Sketch 2 chosen (cleanest):
-  bundle TUs export inner placeholders via `.global` aliases
-  at correct offsets. Convert `data_021017f0` bundle as
-  worked example; optionally ship `data_02101928` Pattern 3
-  chunk end-to-end. 1-2 regression tests pinning the new
-  shape.
+- **Brief 162 (MEDIUM, NEW)** — `cloud/patcher-low-n-extended-coverage`.
+  Extend `expected_output_delta_for(n)` to cover n=5 (and
+  likely n=4, 3, 1) empirically. Brief 150's stderr warn
+  currently fires at n=5 because the byte-detected delta
+  (52) disagrees with the formula (48). SHA1 still PASSES
+  (byte-detection authoritative per Option A), but the
+  warning noise will fire on every future path-2 claim.
+  Brief 162 calibrates the formula or adds a per-n override
+  dict. Bonus: future path-2 waves (brief 164+) run cleanly
+  without warning noise.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
@@ -205,14 +205,14 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   reclassifying ARM-code-as-data symbols (brief 154 falsified
   the naive byte-pattern approach; brief 156 cloud spot-disasm
   recalibrates the heuristic).
-- **Cluster D-3** — complex nested struct arrays. **Wave 1
-  shipped 9 chunks / 6,664 bytes (brief 157, main-only); wave
-  2 shipped 12 chunks / 5,852 bytes across 5 modules (brief
-  158, main + ov002/6/7/21)**. 21 / 33 base candidates drained
-  in 2 waves; ~12 remain plus 3 deferred (subsumed-ref
-  collision `data_02101928` — unblocked by brief 161 cloud
-  bundle-alias fix; mega `data_020c9694` 14.8 KB +
-  `data_020c7b44` 4.9 KB).
+- **Cluster D-3** — complex nested struct arrays. **3 waves
+  shipped: brief 157 (9 / 6,664 B main) + brief 158 (12 /
+  5,852 B across 5 modules) + brief 161 bonus
+  (data_02101928, formerly deferred subsumed-ref via brief
+  161 bundle-alias unblock)**. ~22 chunks / ~13 KB total to
+  date; ~11 remain in main + 2 mega (data_020c9694 14.8 KB,
+  data_020c7b44 4.9 KB) — brief 163 (queued) closes the
+  pool.
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
   via the W7 patcher (now fully general 134 → 142 → 146 → 150).
 
@@ -255,29 +255,33 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 160 PR** when it opens. Gate:
-   3-region `ninja sha1` PASS + 3-region 27/27 modules OK on
-   all kept claims. 3-5 high-reference slots tried; per-
-   candidate report with PASS+drop / PASS+no-drop / FAIL.
-   Outcome determines brief 162+ scope (scale-up vs alternative
-   pivot).
-2. **Verify + merge cloud brief 161 PR** when it opens. Gate:
-   3-region SHA1 PASS preserved + regression tests pin bundle-
-   alias shape. Optional `data_02101928` end-to-end ship
-   validates the unblock.
-3. **Scope brief 162+ candidates (queue after 160 + 161):**
-   - **If brief 160 path-2 validates**: scale-up wave claiming
-     dozens of high-reference slots (decomper).
-   - **If brief 160 path-2 fails**: pivot to path 1 (cautious
-     reclassification with per-candidate SHA1 gate per brief
-     156 hand-off) OR mega-array work (30 KB main).
-   - **If brief 161 lands**: D-3 wave 3 brief (decomper) to
-     ship `data_02101928` + the 3 deferred mega/subsumed
-     candidates.
-   - **Cross-region cluster A apply** — port 1443 EUR cluster
-     A symbols to USA + JPN.
-   - **3 cluster B value=0 deferred candidates** — needs wave-2
+1. **Verify + merge decomper brief 163 PR** when it opens.
+   Gate: 3-region `ninja sha1` PASS + 3-region 27/27 modules
+   OK. ≥9 chunks (8 mid-size + ≥1 mega). Watch the
+   cluster-status update in state.md — confirm cluster D-3
+   close framing accurately.
+2. **Verify + merge cloud brief 162 PR** when it opens.
+   Gate: 3-region SHA1 PASS preserved + new tests pin low-n
+   patcher behaviour + stderr warn no longer fires at n=5.
+   Watch the chosen approach (per-n dict vs generalised
+   formula) — either is fine.
+3. **Scope brief 164+ candidates (queue after 162 + 163):**
+   - **After brief 162 lands**: brief 164 = path-2 scale-up
+     wave (decomper) claiming 10-20 ov004 `.rodata` slots
+     in mwldarm-veneer-block-aligned groups. Each block-
+     suppression step drops 4 veneers; aim for n=9 → n=1
+     across 2-3 wave passes.
+   - **If brief 163 leaves residue**: D-3 wave 4 (rare;
+     wave 3 should close).
+   - **Cross-region cluster A apply** — port 1443 EUR
+     cluster A symbols to USA + JPN.
+   - **3 cluster B value=0 deferred candidates** — wave-2
      TU rewrite of adjacent single-int TUs.
+   - **30 KB main mega-array** (`data_020b6ec4`) if not
+     swept by brief 163 mega.
+   - **Odd-aligned ov004 .rodata slot recipe** (brief 160
+     finding #4) — separate cautious decomper brief if
+     path-2 scale-up runs into odd-aligned candidates.
    - **Cross-region cluster A apply** — port 1443 EUR cluster A
      symbols to USA + JPN.
    - **Cluster D-3 via Pattern 3 generator** — ~20 complex
