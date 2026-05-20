@@ -1991,3 +1991,7 @@ src/overlay002/data/data_ov002_022ca9bc.s:
 src/overlay002/data/data_ov002_022ccd24.s:
     complete
     .data start:0x022ccd24 end:0x022cce28
+
+src/overlay002/data/data_ov002_022cad38.s:
+    complete
+    .data start:0x022cad38 end:0x022cb96c

@@ -8837,3 +8837,7 @@ src/main/data/data_02102588.s:
 src/main/data/data_02101928.s:
     complete
     .data start:0x02101928 end:0x02101d20
+
+src/main/data/data_020c7b44.s:
+    complete
+    .data start:0x020c7b44 end:0x020c8e80

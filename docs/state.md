@@ -205,14 +205,16 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   reclassifying ARM-code-as-data symbols (brief 154 falsified
   the naive byte-pattern approach; brief 156 cloud spot-disasm
   recalibrates the heuristic).
-- **Cluster D-3** — complex nested struct arrays. **3 waves
-  shipped: brief 157 (9 / 6,664 B main) + brief 158 (12 /
-  5,852 B across 5 modules) + brief 161 bonus
-  (data_02101928, formerly deferred subsumed-ref via brief
-  161 bundle-alias unblock)**. ~22 chunks / ~13 KB total to
-  date; ~11 remain in main + 2 mega (data_020c9694 14.8 KB,
-  data_020c7b44 4.9 KB) — brief 163 (queued) closes the
-  pool.
+- **Cluster D-3** — complex nested struct arrays.
+  **EFFECTIVELY CLOSED** post brief 163 wave 3 (9 chunks /
+  ~12 KB shipped, including the 4.9 KB `data_020c7b44`
+  mega). 4 waves total: brief 157 (9 / 6,664 B main) +
+  brief 158 (12 / 5,852 B across 5 modules) + brief 161
+  bonus (data_02101928 via brief 161 bundle-alias unblock)
+  + brief 163 (9 / ~12 KB — 7 ov006 + 1 ov002 mid + 1 main
+  mega). **~31 chunks / ~30 KB shipped to date.** Residue:
+  2 hard candidates — `data_020c9694` (14.8 KB mega,
+  deferred) + `data_020e0e70` (366 B, non-4-aligned size).
 - **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
   via the W7 patcher (now fully general 134 → 142 → 146 → 150).
 
