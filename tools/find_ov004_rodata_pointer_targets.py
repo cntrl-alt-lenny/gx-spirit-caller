@@ -404,6 +404,7 @@ def render_markdown(rows: list[PointerTargetRow]) -> str:
         "\n"
     )
     interpretation = (
+        "\n"
         "## Interpretation\n"
         "\n"
         "ov002 + ov004 are mutually-exclusive overlays sharing base\n"
@@ -463,8 +464,8 @@ def render_text(rows: list[PointerTargetRow]) -> str:
     lines = [
         f"# ov004 .rodata pointer targets — {len(rows)} refs",
         "#",
-        f"#  from_va   from_function                kind          "
-        f"to_va     ov004_slot                              offset",
+        "#  from_va   from_function                kind          "
+        "to_va     ov004_slot                              offset",
     ]
     for r in rows:
         offset_str = f"+0x{r.offset_into_sym:x}" if r.offset_into_sym else "-"
