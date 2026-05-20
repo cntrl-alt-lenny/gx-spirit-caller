@@ -362,30 +362,56 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/163-cluster-d3-wave-3.md`](docs/briefs/163-cluster-d3-wave-3.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): close cluster D-3 to
-  its structural floor. Ship remaining ~11 D-3 candidates +
-  ≥1 of the 2 deferred mega chunks (data_020c9694 14.8 KB,
-  data_020c7b44 4.9 KB). Tooling stack now fully turnkey
-  (brief 144 + 152/155 + 159 Part 1 + 161). Target ≥9
-  chunks. Updates cluster D-3 status line in state.md.
-  Critical: 3-region SHA1 PASS preserved. Branch:
-  `decomper/cluster-d3-wave-3`.
+- [`docs/briefs/165-main-30kb-mega-array.md`](docs/briefs/165-main-30kb-mega-array.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): ship
+  `data_020b6ec4` — the 30 KB main `.rodata` mega that's
+  been the biggest deferred Pattern 1 candidate since
+  brief 130. Single chunk; substantial byte impact in one
+  wave. Use brief 144 auto-`.extern` + brief 159 Part 1
+  `--section`. If generator emits `.word .L_*` per brief
+  163 finding, manually replace with raw hex literals.
+  Target ≥20 KB matched. Critical: 3-region SHA1 PASS
+  preserved. Branch: `decomper/main-30kb-mega-array`.
 
-- [`docs/briefs/162-patcher-low-n-extended-coverage.md`](docs/briefs/162-patcher-low-n-extended-coverage.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher
-  `expected_output_delta_for(n)` to cover n=5 (and likely
-  n=4, 3, 1) empirically. Brief 150's stderr warn currently
-  fires at n=5 (byte-detected 52 vs formula 48); SHA1
-  PASSES via byte-detection but warning noise will fire on
-  every future path-2 claim. Either per-n override dict or
-  generalised formula refinement — both acceptable. Cleans
-  up the W7 patcher chain for the full reachable n range
-  (134 → 142 → 146 → 150 → 162). Critical: 3-region SHA1
-  PASS preserved. Branch:
-  `cloud/patcher-low-n-extended-coverage`.
+- [`docs/briefs/164-patcher-n5-residual-fix.md`](docs/briefs/164-patcher-n5-residual-fix.md)
+  — `cloud` (MEDIUM-HIGH, **NOW ACTIVE**): fix the
+  +12-byte SHA1 residual at n=5 that brief 160 surfaced.
+  Brief 162 silenced the warn but the underlying geometric
+  gap remains. **Critical-path** for path-2 scale-up:
+  bisect via `cmp -l` against orig, identify the +12 byte
+  region (extra ctor / extra pad / something else), extend
+  patcher to strip/fix. Tests pin n=5 SHA1-PASSING
+  behaviour. Once landed, brief 167+ ships path-2 scale-
+  up wave (decomper). W7 chain: 134 → 142 → 146 → 150 →
+  162 → 164. Branch: `cloud/patcher-n5-residual-fix`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/163-cluster-d3-wave-3.md`](docs/briefs/163-cluster-d3-wave-3.md)
+  `decomper`, shipped in PR #595. **🎉 Cluster D-3
+  EFFECTIVELY CLOSED.** 9 chunks / 12,528 B (7 ov006 0x280
+  + 1 ov002 mid + 1 main mega data_020c7b44 4,924 B).
+  Part 2 mega requirement met (≥ 4 KB). 4-wave total: 31
+  chunks / ~30 KB across 6 modules. Hard residue (2):
+  `data_020c9694` 14.8 KB mega + `data_020e0e70` 366 B
+  non-4-aligned. **3-region SHA1 PASS + 27/27 OK
+  preserved.** Tooling stack proved fully turnkey (brief
+  159 Part 1 flag verified, brief 144 auto-`.extern`
+  verified). New generator gap surfaced (local-label
+  `.word .L_*`); decomper manually fixed; brief 166+
+  candidate.
+- [`docs/briefs/162-patcher-low-n-extended-coverage.md`](docs/briefs/162-patcher-low-n-extended-coverage.md)
+  `cloud`, shipped in PR #596. Path A (per-n empirical
+  override dict). Empirical sampling captured n=5
+  `ctor_pad_net = 8` vs formula 12 → +4 disagreement
+  confirmed. n=4/3/2/1 unreachable from current source
+  coverage; left for future. New
+  `N_INFERENCE_OVERRIDES = {5: 8}`; resolution order n≤0
+  → 0, n==86 → 1024, n in OVERRIDES → custom, else
+  formula. 8 new tests; suite 1832/1832. **Important
+  caveat**: silences the warn, doesn't fix the +12-byte
+  SHA1 residual (brief 164 closes). W7 patcher chain:
+  134 → 142 → 146 → 150 → 162.
 
 - [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
   `decomper`, shipped in PR #592. **🔬 Path-2 hypothesis
