@@ -201,3 +201,7 @@ src/overlay007/data_ov007_021b2fd4.c:
 src/overlay007/bss/data_ov007_bss.s:
     complete
     .bss start:0x021b3480 end:0x02233580
+
+src/overlay007/data/data_ov007_021b30c0.s:
+    complete
+    .data start:0x021b30c0 end:0x021b3318
