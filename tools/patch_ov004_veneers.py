@@ -194,6 +194,38 @@ CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR = 12
 # named-import contract.
 CTOR_PAD_FIX_NET_BYTES = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
 
+# Brief 162: per-n empirical overrides. Brief 150's formula
+# defaults `0 < n < 86` to NO_TERMINATOR, but real mwldarm
+# behaviour at intermediate n values diverges from that default
+# — empirically WITH_TERMINATOR at some n. Each entry is keyed
+# by veneer count and maps to the byte-detected `ctor_pad_net`
+# observed against a real mwldarm output capture. Used by
+# `expected_output_delta_for` to silence the brief 150 stderr
+# disagreement note at the listed n values.
+#
+# Empirically observed:
+#   n=5: WITH_TERMINATOR (net=8). Captured in brief 162 by
+#        making one 4-aligned ov004 .rodata source claim
+#        (data_ov004_021f4a40) and snapshotting the pre-patch
+#        arm9_ov004.bin produced by mwldarm. The pre-patch
+#        binary at n=5 is 268,256 bytes (orig + 64); patcher
+#        splices 60 bytes and ctor/pad fix adds 8 back, leaving
+#        268,204 bytes (orig + 12). Brief 162 doesn't fix that
+#        +12 residual (SHA1 still mismatches at n=5 — see brief
+#        162 PR write-up); it only silences the warn so future
+#        path-2 explorations don't get noisy.
+#
+# All other low n values (4, 3, 2, 1) are unreached from
+# current source coverage — adding additional ov004 .rodata
+# claims didn't drop the veneer count below 5 in brief 162
+# experiments. The block-level cascade brief 160 hypothesised
+# (9 → 5 → 1) didn't reproduce in practice. Those n values
+# stay on the n=86-or-formula path until empirical samples
+# pin them.
+N_INFERENCE_OVERRIDES: dict[int, int] = {
+    5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+}
+
 
 class PatchError(Exception):
     """Patcher detected an unexpected input shape and aborted."""
@@ -203,26 +235,33 @@ def expected_output_delta_for(veneer_count: int) -> int:
     """**N-inference hint** for how many bytes the patcher removes
     from the input — see the warning below.
 
-    - `veneer_count == 0` → returns 0 (the patcher is a no-op; the
-      binary is already orig-shape and no ctor/pad fix is applied).
-    - `veneer_count == HISTORICAL_MAX_VENEER_COUNT` (== 86) →
-      `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR`
-      (= `86 * 12 - 8 = 1024`). Brief 142 historical case.
-    - `0 < veneer_count < HISTORICAL_MAX_VENEER_COUNT` →
-      `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`
-      (= `n * 12 - 12`). Brief 146 generic case: mwldarm drops the
-      `WRITEW(0)` terminator after .ctor when fewer overlays /
-      veneers force the layout pass.
+    Resolution order (brief 162 added the override lookup):
 
-    ⚠ Brief 150: this n-based mapping is **wrong at very low n**.
-    Brief 147's bisection observed `n=2` and `n=7` keeping the
-    WITH_TERMINATOR shape (= 16-byte cluster, net +8) where this
-    function returns NO_TERMINATOR (= 12-byte cluster, net +12).
-    The empirical boundary is somewhere between n=7 (WITH) and n=9
-    (NO); we did not bisect further because the **byte-detection
-    in `_fix_ctor_and_pad` is the truth source** and the patcher
-    no longer hard-fails on n-inference disagreement (it logs a
-    note instead).
+    1. `veneer_count <= 0` → returns 0 (the patcher is a no-op;
+       the binary is already orig-shape and no ctor/pad fix is
+       applied).
+    2. `veneer_count == HISTORICAL_MAX_VENEER_COUNT` (== 86) →
+       `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR`
+       (= `86 * 12 - 8 = 1024`). Brief 142 historical case.
+    3. `veneer_count in N_INFERENCE_OVERRIDES` → consult the
+       per-n empirical override dict (brief 162). Each entry
+       maps to the byte-detected `ctor_pad_net` observed against
+       a real mwldarm output capture at that n value. Currently
+       overrides `n=5` (brief 160 / brief 162 empirical:
+       WITH_TERMINATOR at n=5 despite the n<86 default below).
+    4. Otherwise `0 < veneer_count < HISTORICAL_MAX_VENEER_COUNT`
+       → `n * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`
+       (= `n * 12 - 12`). Brief 146 generic case: mwldarm drops
+       the `WRITEW(0)` terminator after .ctor when fewer overlays
+       / veneers force the layout pass.
+
+    ⚠ Brief 150: this n-based mapping was originally wrong at
+    very low n (brief 147 bisection found n=2 / n=7 use
+    WITH_TERMINATOR not NO_TERMINATOR). Brief 162's
+    `N_INFERENCE_OVERRIDES` table corrects the cases that have
+    been empirically sampled. The patcher continues to log a
+    stderr note on byte-vs-n-inference disagreement; only n
+    values in the override table go silent.
 
     Production callers in `patch_ov004` use the byte-detected
     `ctor_pad_net` from `stats`; the n-inference here is retained
@@ -244,6 +283,14 @@ def expected_output_delta_for(veneer_count: int) -> int:
         return (
             veneer_count * VENEER_SIZE
             - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
+        )
+    # Brief 162: empirical per-n override before the default
+    # formula. Each entry in N_INFERENCE_OVERRIDES is the
+    # observed ctor_pad_net at that n.
+    if veneer_count in N_INFERENCE_OVERRIDES:
+        return (
+            veneer_count * VENEER_SIZE
+            - N_INFERENCE_OVERRIDES[veneer_count]
         )
     return (
         veneer_count * VENEER_SIZE

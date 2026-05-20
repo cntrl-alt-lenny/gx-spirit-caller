@@ -44,6 +44,7 @@ from patch_ov004_veneers import (  # noqa: E402
     CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
     HISTORICAL_MAX_VENEER_COUNT,
+    N_INFERENCE_OVERRIDES,
     PatchError,
     VENEER_PREFIX,
     VENEER_SIZE,
@@ -1155,6 +1156,149 @@ class TestExpectedOutputSizeForCtorPadNet(unittest.TestCase):
             veneer_count=9, ctor_pad_net=8,
         )
         self.assertEqual(got, 268192)
+
+
+# ---------------------------------------------------------------------- #
+# Brief 162: empirical N_INFERENCE_OVERRIDES — silence the brief 150
+# stderr disagreement note at low-n WITH_TERMINATOR states.
+# ---------------------------------------------------------------------- #
+
+
+class TestNInferenceOverridesContract(unittest.TestCase):
+    """Brief 162: `N_INFERENCE_OVERRIDES` is the public per-n
+    empirical-correction table consumed by
+    `expected_output_delta_for`. Pin the dict's contract so a
+    later add/drop is intentional + visible (each entry encodes
+    an empirical mwldarm observation against the current source
+    state). Brief 162 ships with one entry; future briefs add
+    rows as additional n values are sampled."""
+
+    def test_table_contains_n5_with_terminator(self):
+        # Brief 162's empirical anchor: n=5 → WITH_TERMINATOR
+        # (ctor_pad_net=8). Captured by claiming
+        # `data_ov004_021f4a40` as a Pattern 1 .s chunk and
+        # snapshotting the pre-patch arm9_ov004.bin produced by
+        # mwldarm. See the brief 162 PR write-up for the
+        # measurement steps.
+        self.assertIn(5, N_INFERENCE_OVERRIDES)
+        self.assertEqual(
+            N_INFERENCE_OVERRIDES[5],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+
+    def test_table_entries_are_valid_ctor_pad_net_values(self):
+        # Every entry must be either +8 (WITH_TERMINATOR) or +12
+        # (NO_TERMINATOR). Other values would mean a new ctor/pad
+        # shape was discovered, which is brief-level new news +
+        # would require updating `_fix_ctor_and_pad` first.
+        valid = {
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+            CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
+        }
+        for n, net in N_INFERENCE_OVERRIDES.items():
+            self.assertIn(
+                net, valid,
+                f"override n={n} → {net} is not a known "
+                f"ctor_pad_net value (expected {valid})",
+            )
+
+    def test_table_keys_are_valid_veneer_counts(self):
+        # All entries must be in the valid n range — strictly
+        # less than HISTORICAL_MAX_VENEER_COUNT (which is handled
+        # by the n==86 branch of expected_output_delta_for) and
+        # strictly greater than 0 (n=0 is the no-op branch).
+        for n in N_INFERENCE_OVERRIDES:
+            self.assertGreater(n, 0)
+            self.assertLess(n, HISTORICAL_MAX_VENEER_COUNT)
+
+
+class TestExpectedOutputDeltaForOverrides(unittest.TestCase):
+    """Brief 162: `expected_output_delta_for` consults
+    `N_INFERENCE_OVERRIDES` before falling back to the n<86
+    NO_TERMINATOR formula. Pin the n=5 case (brief 162's worked
+    empirical) + verify the resolution order doesn't disturb
+    other n values."""
+
+    def test_n_equals_5_returns_with_terminator_delta(self):
+        # Brief 162's anchor empirical: n=5 → 5*12 - 8 = 52.
+        # Before brief 162, the formula returned 5*12 - 12 = 48
+        # (NO_TERMINATOR default), triggering the brief 150 warn
+        # at every n=5 build. Brief 162 silences that path.
+        self.assertEqual(
+            expected_output_delta_for(5),
+            5 * VENEER_SIZE - CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+        self.assertEqual(expected_output_delta_for(5), 52)
+
+    def test_n_equals_9_unchanged_no_terminator(self):
+        # n=9 is NOT in the override dict — falls through to the
+        # NO_TERMINATOR formula. Brief 146 empirical: 9*12 - 12 =
+        # 96. Brief 162's override change MUST NOT disturb this
+        # case (n=9 is current main state; SHA1 PASS depends on
+        # it).
+        self.assertEqual(expected_output_delta_for(9), 96)
+
+    def test_n_equals_86_unchanged_historical_max(self):
+        # n=86 historical baseline — same regression-guard purpose
+        # as `test_historical_max_delta_matches_brief134_constant`.
+        # Pinned here too because brief 162's override path runs
+        # BEFORE the n==86 branch — must short-circuit at the
+        # historical-max check, not consult the override table.
+        self.assertEqual(
+            expected_output_delta_for(HISTORICAL_MAX_VENEER_COUNT),
+            1024,
+        )
+
+    def test_non_override_low_n_still_uses_no_terminator(self):
+        # Brief 162 only pinned n=5. Other low-n values (4, 3, 2,
+        # 1) stay on the brief 146 NO_TERMINATOR formula until
+        # empirically sampled. Pin a representative — n=4 — at
+        # the formula value so a future override-without-test
+        # change gets caught.
+        if 4 in N_INFERENCE_OVERRIDES:
+            self.skipTest(
+                "n=4 has been added to the override dict; "
+                "this regression-guard test is obsolete + "
+                "should be updated to match the new empirical "
+                "value"
+            )
+        self.assertEqual(expected_output_delta_for(4), 4 * 12 - 12)
+        self.assertEqual(expected_output_delta_for(4), 36)
+
+
+class TestN5SilencesDisagreementNote(unittest.TestCase):
+    """Brief 162 success criterion: the brief 150 stderr
+    disagreement note must NOT fire at n=5 (the empirically-
+    observed WITH_TERMINATOR state). Drives the patcher
+    end-to-end against a synthetic n=5 WITH_TERMINATOR fixture
+    + asserts stderr stays clean."""
+
+    def test_no_stderr_note_at_n_5_with_terminator(self):
+        import contextlib
+        import io
+        from patch_ov004_veneers import patch_ov004
+
+        # Build a synthetic n=5 input with explicit WITH_TERMINATOR
+        # cluster — exactly the shape brief 162 saw empirically.
+        data, sections = _build_synth_ov004(5, terminator=True)
+        captured = io.StringIO()
+        with contextlib.redirect_stderr(captured):
+            patched, stats = patch_ov004(data, [], sections)
+        # Patcher succeeded + byte-detected WITH_TERMINATOR.
+        self.assertEqual(stats["veneers_spliced"], 5)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
+        )
+        # Crucial: no stderr noise — brief 162 silences the brief
+        # 150 disagreement note at the n=5 state via the override.
+        err = captured.getvalue()
+        self.assertNotIn(
+            "shape disagrees with n-inference", err,
+            f"brief 150 disagreement note fired at n=5 — brief 162 "
+            f"override should have silenced it. stderr: {err!r}",
+        )
+        self.assertNotIn("brief 150", err)
 
 
 if __name__ == "__main__":
