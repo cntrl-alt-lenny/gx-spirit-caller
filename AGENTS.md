@@ -362,30 +362,51 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/165-main-30kb-mega-array.md`](docs/briefs/165-main-30kb-mega-array.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): ship
-  `data_020b6ec4` — the 30 KB main `.rodata` mega that's
-  been the biggest deferred Pattern 1 candidate since
-  brief 130. Single chunk; substantial byte impact in one
-  wave. Use brief 144 auto-`.extern` + brief 159 Part 1
-  `--section`. If generator emits `.word .L_*` per brief
-  163 finding, manually replace with raw hex literals.
-  Target ≥20 KB matched. Critical: 3-region SHA1 PASS
-  preserved. Branch: `decomper/main-30kb-mega-array`.
+- [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](docs/briefs/167-ov004-rodata-path-2-scale-up.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): first scale-up wave
+  of path-2 ov004 `.rodata` source claims. Brief 164
+  unblocked SHA1 at n=5. Pick 5-10 slots spread across
+  visibly-distinct address ranges in brief 159's reverse-
+  lookup tool output; per-slot SHA1 round-trip; observe
+  veneer count progression. **Bonus**: at least one claim
+  dropping below n=5 validates multi-block cascade
+  hypothesis. Critical: 3-region SHA1 PASS preserved on all
+  kept claims. Branch: `decomper/ov004-rodata-path-2-scale-up`.
 
-- [`docs/briefs/164-patcher-n5-residual-fix.md`](docs/briefs/164-patcher-n5-residual-fix.md)
-  — `cloud` (MEDIUM-HIGH, **NOW ACTIVE**): fix the
-  +12-byte SHA1 residual at n=5 that brief 160 surfaced.
-  Brief 162 silenced the warn but the underlying geometric
-  gap remains. **Critical-path** for path-2 scale-up:
-  bisect via `cmp -l` against orig, identify the +12 byte
-  region (extra ctor / extra pad / something else), extend
-  patcher to strip/fix. Tests pin n=5 SHA1-PASSING
-  behaviour. Once landed, brief 167+ ships path-2 scale-
-  up wave (decomper). W7 chain: 134 → 142 → 146 → 150 →
-  162 → 164. Branch: `cloud/patcher-n5-residual-fix`.
+- [`docs/briefs/166-pattern3-generator-local-label-fix.md`](docs/briefs/166-pattern3-generator-local-label-fix.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): Pattern 3 generator
+  emit raw hex literal for `kind:label(arm)` cross-TU
+  references instead of `.word .L_*` (mwasmarm rejects —
+  local labels file-scoped). Closes brief 163's generator
+  gap. 1-2 regression tests + optional regeneration of
+  `data_020c7b44.s` (verify byte-identical to manual
+  patch). Critical: 3-region SHA1 PASS preserved. Branch:
+  `cloud/pattern3-generator-local-label-fix`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/165-main-30kb-mega-array.md`](docs/briefs/165-main-30kb-mega-array.md)
+  `decomper`, shipped in PR #598. 🎉 **Biggest single
+  deferred Pattern 1 candidate shipped.** `data_020b6ec4`
+  — 30,720 B (30.0 KB exact, 0x7800) in main `.rodata`,
+  single chunk via Pattern 3 generator. Brief 159 Part 1
+  `--section auto` detected `.rodata` correctly. 2
+  externs emitted cleanly. No `.L_*` refs (brief 163 gap
+  not exercised). Tooling stack proved fully turnkey on
+  biggest single mega. 3-region SHA1 PASS + 27/27 OK
+  preserved. Deferred-mega residue 2 → 1.
+- [`docs/briefs/164-patcher-n5-residual-fix.md`](docs/briefs/164-patcher-n5-residual-fix.md)
+  `cloud`, shipped in PR #599. 🔑 **n=5 SHA1 residual
+  CLOSED — path-2 unblocked.** Diagnosis: mwldarm at n=5
+  emits 28-byte cluster (`WITH_TERMINATOR_LONG` shape) vs
+  16-byte n=86 / 12-byte n=9. **Fix**: generic walk-forward
+  "first non-zero word" finder generalises across all 3
+  observed shapes. Walk safety cap at 16 words. Constants
+  + override updated. End-to-end verified: claim
+  `data_ov004_021f4a40` → 3-region SHA1 PASS at n=5;
+  revert → 3-region SHA1 PASS at n=9 (idempotent). 4 new
+  tests; suite 1832 → 1836. W7 chain: 134 → 142 → 146 →
+  150 → 162 → 164.
 
 - [`docs/briefs/163-cluster-d3-wave-3.md`](docs/briefs/163-cluster-d3-wave-3.md)
   `decomper`, shipped in PR #595. **🎉 Cluster D-3
