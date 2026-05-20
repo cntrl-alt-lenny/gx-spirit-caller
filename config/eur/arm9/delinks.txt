@@ -8773,7 +8773,7 @@ src/main/data/data_0210176c.c:
     complete
     .data start:0x0210176c end:0x02101778
 
-src/main/data/data_021017f0.c:
+src/main/data/data_021017f0.s:
     complete
     .data start:0x021017f0 end:0x021017fc
 
