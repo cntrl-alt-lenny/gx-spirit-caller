@@ -192,12 +192,12 @@ Disassembly:
 021f1b80: e92d4000  ← next function
 ```
 
-**Verdict: PASS.** Same shape as #2: short function with
-prologue, two `bl`s, a load-then-call to `0x21e7958`, sp
+**Verdict: PASS.** Same shape as candidate #2: short function
+with prologue, two `bl`s, a load-then-call to `0x21e7958`, sp
 restore, epilogue, literal pool word, next function. Note both
-#2 and #3 end their epilogue with a `bl 0x21e7958` — that's
-likely a shared subroutine entrypoint in the same `.rodata`
-region.
+candidates #2 and #3 end their epilogue with a `bl 0x21e7958`
+— that's likely a shared subroutine entrypoint in the same
+`.rodata` region.
 
 ### 4. `data_ov004_021f94b0` — PASS
 
@@ -289,8 +289,9 @@ Disassembly:
 
 **Verdict: PASS.** Non-prologue pattern: this is a **thunk
 sequence**. Two back-to-back `ldr r12, [pc, #N]; bx r12` blocks
-(with intervening literal pool word and an arg-setup `mov r1,
-#32` for the second thunk), then a normal function follows.
+(with intervening literal pool word and an arg-setup
+`mov r1, #32` for the second thunk), then a normal function
+follows.
 
 The control sample CAUGHT real code without a prologue. That's
 a useful finding: the structural fingerprint (single `load`
