@@ -17,6 +17,7 @@ and the chunk's TU silently breaks `dsd check modules`. Pin:
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -539,6 +540,112 @@ class TestGenerateChunkExternEmission(unittest.TestCase):
         global_pos = text.index(".global data_100")
         self.assertLess(section_pos, extern_pos)
         self.assertLess(extern_pos, global_pos)
+
+
+# ---------------------------------------------------------------------- #
+# Brief 159 part 1: --section flag (rodata default + data for D-3).
+# ---------------------------------------------------------------------- #
+
+
+class TestGenerateChunkSectionFlag(unittest.TestCase):
+    """Brief 159 part 1: `generate_chunk(..., section=...)` controls
+    both the `.section .X` directive in the emitted `.s` and the
+    `.X start:..` line in the delinks entry. Default `"rodata"` is
+    the brief 125 cluster C historical behaviour; `"data"` is the
+    brief 157 D-3 path that previously required sed post-processing."""
+
+    def _trivial_chunk(self, *, section: str = "rodata"):
+        from cluster_c_pattern3_gen import generate_chunk
+        bytes_source = b"NAN(\x00\xff\xff\xff"  # 8 B, ASCII + filler
+        syms = [_data_sym("data_100", "main", 0x100, size=8)]
+        return generate_chunk(
+            "eur", "main", start=0x100, end=0x108,
+            section=section,
+            modules={"main": _module("main", syms)},
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+
+    def test_default_section_is_rodata(self):
+        # Default preserves the brief 125 / 135 / 139 / 144 cluster C
+        # behaviour. Existing callers that omit `section` get the
+        # same output they always did.
+        result = self._trivial_chunk()
+        self.assertIn(".section .rodata", result.asm_source)
+        self.assertNotIn(".section .data", result.asm_source)
+        self.assertIn(".rodata start:0x00000100 end:0x00000108",
+                      result.delinks_entry)
+        self.assertNotIn(".data start:", result.delinks_entry)
+
+    def test_section_data_emits_data_directive(self):
+        # `section="data"` flips both call sites. Brief 157 D-3
+        # waves no longer need sed post-processing.
+        result = self._trivial_chunk(section="data")
+        self.assertIn(".section .data", result.asm_source)
+        self.assertNotIn(".section .rodata", result.asm_source)
+        self.assertIn(".data start:0x00000100 end:0x00000108",
+                      result.delinks_entry)
+        self.assertNotIn(".rodata start:", result.delinks_entry)
+
+    def test_unknown_section_raises(self):
+        # Only "rodata" and "data" are accepted. Other strings
+        # (e.g. ".text", "bss", typos) raise immediately rather
+        # than emitting an unsupported section directive that
+        # would silently produce a broken `.s`.
+        from cluster_c_pattern3_gen import generate_chunk
+        with self.assertRaises(ValueError) as ctx:
+            generate_chunk(
+                "eur", "main", start=0x100, end=0x108,
+                section="text",  # not allowed
+                modules={
+                    "main": _module(
+                        "main",
+                        [_data_sym("data_100", "main", 0x100, size=8)],
+                    ),
+                },
+                bytes_source=b"\x00" * 8,
+                load_addr=0x100,
+            )
+        self.assertIn("section=", str(ctx.exception))
+
+
+class TestDetectSection(unittest.TestCase):
+    """Brief 159 part 1: `_detect_section` reads delinks.txt's
+    section header and picks the section that fully contains the
+    requested [start, end) range. Used by the CLI to default
+    `--section auto` correctly per chunk."""
+
+    def _write_delinks(self, tmpdir, header_lines, tu_stanza=""):
+        """Write a synthetic delinks.txt with the given section
+        header lines, then a blank line + optional TU stanza."""
+        path = Path(tmpdir) / "delinks.txt"
+        path.write_text(
+            "\n".join(header_lines) + "\n\n" + tu_stanza,
+            encoding="utf-8",
+        )
+        return path
+
+    def test_parse_section_header_minimal(self):
+        from cluster_c_pattern3_gen import _parse_section_header
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write_delinks(d, [
+                "    .text       start:0x02000000 end:0x020b4320 kind:code align:32",
+                "    .rodata     start:0x020b4320 end:0x020c3bbc kind:rodata align:4",
+                "    .data       start:0x020c3bc0 end:0x02102c60 kind:data align:32",
+            ], tu_stanza="src/main/x.c:\n    complete\n")
+            sections = _parse_section_header(p)
+            self.assertEqual(sections, [
+                ("text",   0x02000000, 0x020b4320),
+                ("rodata", 0x020b4320, 0x020c3bbc),
+                ("data",   0x020c3bc0, 0x02102c60),
+            ])
+
+    def test_parse_section_header_missing_file_returns_empty(self):
+        from cluster_c_pattern3_gen import _parse_section_header
+        sections = _parse_section_header(
+            Path("/tmp/does-not-exist-159.txt"),
+        )
+        self.assertEqual(sections, [])
 
 
 if __name__ == "__main__":

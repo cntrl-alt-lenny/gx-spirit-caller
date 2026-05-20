@@ -97,31 +97,91 @@ def _extract_bin_path(version: str, module: str) -> Path:
     return extract_root / f"{module}.bin"
 
 
-def _module_load_addr(version: str, module: str) -> int:
-    """Load address of a module's binary. Parsed from the section
-    header in config/<ver>/<module>/delinks.txt."""
+def _module_delinks_path(version: str, module: str) -> Path:
+    """Where the module's `delinks.txt` lives. Split out from
+    `_module_load_addr` so both load-address parsing and the
+    `--section` auto-detection (brief 159 part 1) can share the
+    resolution rule."""
     config_root = ROOT / "config" / version / "arm9"
     if module == "main":
-        delinks = config_root / "delinks.txt"
-    elif module in ("itcm", "dtcm"):
-        delinks = config_root / module / "delinks.txt"
-    elif module.startswith("ov"):
-        delinks = config_root / "overlays" / module / "delinks.txt"
-    else:
-        delinks = config_root / module / "delinks.txt"
+        return config_root / "delinks.txt"
+    if module in ("itcm", "dtcm"):
+        return config_root / module / "delinks.txt"
+    if module.startswith("ov"):
+        return config_root / "overlays" / module / "delinks.txt"
+    return config_root / module / "delinks.txt"
+
+
+# Sentinel returned by `_parse_section_header` when the leading
+# section block is absent (rare; e.g. unit-test fixtures or a
+# module whose delinks.txt is empty).
+_NO_SECTIONS: list[tuple[str, int, int]] = []
+
+
+def _parse_section_header(delinks: Path) -> list[tuple[str, int, int]]:
+    """Read the leading section table of a `delinks.txt` and return
+    `[(section_name_without_dot, start, end), …]` in file order.
+
+    Stops at the first non-section line (typically the blank line
+    that precedes the TU stanzas). Returns an empty list if the
+    file is absent or has no section header (load_addr derivation
+    falls back to 0 in that case, matching prior behaviour)."""
     if not delinks.is_file():
-        return 0
+        return list(_NO_SECTIONS)
+    out: list[tuple[str, int, int]] = []
     with delinks.open() as f:
         for line in f:
             line = line.strip()
-            if line.startswith("."):
-                # First section line — start address is the load addr.
-                m = re.search(r"start:0x([0-9a-fA-F]+)", line)
-                if m:
-                    return int(m.group(1), 16)
-            if line and not line.startswith("."):
+            if not line:
+                # Trailing blank inside the header is tolerated;
+                # the loop terminates on the FIRST non-section
+                # non-blank line below.
+                continue
+            if not line.startswith("."):
                 break
-    return 0
+            m_name = re.match(r"\.(\w+)", line)
+            m_start = re.search(r"start:0x([0-9a-fA-F]+)", line)
+            m_end = re.search(r"end:0x([0-9a-fA-F]+)", line)
+            if m_name and m_start and m_end:
+                out.append((
+                    m_name.group(1),
+                    int(m_start.group(1), 16),
+                    int(m_end.group(1), 16),
+                ))
+    return out
+
+
+def _module_load_addr(version: str, module: str) -> int:
+    """Load address of a module's binary. The first section in
+    `delinks.txt`'s header table starts at the load address."""
+    sections = _parse_section_header(_module_delinks_path(version, module))
+    return sections[0][1] if sections else 0
+
+
+def _detect_section(
+    version: str,
+    module: str,
+    start: int,
+    end: int,
+) -> str | None:
+    """Auto-detect which section name covers `[start, end)` for
+    the given module, by scanning `delinks.txt`'s section header.
+    Returns the section name without leading dot (e.g. `"data"` or
+    `"rodata"`), or `None` if no section in the header fully
+    contains the range — caller falls back to the explicit
+    `section` argument or the `rodata` default.
+
+    Brief 159 part 1: lets `--section` default to auto-detection
+    instead of the brief 125 historical `rodata` hardcode. D-3
+    chunks (`.data`) and cluster C chunks (`.rodata`) become
+    distinguishable from the chunk's address alone, no flag
+    needed at the call site."""
+    for name, sec_start, sec_end in _parse_section_header(
+        _module_delinks_path(version, module),
+    ):
+        if sec_start <= start and end <= sec_end:
+            return name
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -378,6 +438,7 @@ def generate_chunk(
     start: int,
     end: int,
     *,
+    section: str = "rodata",
     modules: dict | None = None,
     bytes_source: bytes | None = None,
     load_addr: int | None = None,
@@ -385,12 +446,24 @@ def generate_chunk(
     """Top-level: generate the Pattern 3 chunk for [start, end) in
     `module`.
 
+    `section` controls both the `.section .<name>` directive at the
+    top of the generated `.s` and the `.<name>` line in the
+    delinks.txt entry. Must be one of `"rodata"` (brief 125 default —
+    cluster C) or `"data"` (brief 157 D-3). Brief 159 part 1 added
+    the parameter + auto-detection in the CLI; library callers can
+    set it directly.
+
     `modules`, `bytes_source`, `load_addr` are injectable for tests.
     In production they default to loading from the on-disk config +
     extract/ tree.
 
     Raises ValueError on alignment violations or if no symbols are
     found in the range."""
+    if section not in ("rodata", "data"):
+        raise ValueError(
+            f"section={section!r} not supported; pass 'rodata' "
+            f"(default, cluster C) or 'data' (cluster D-3)"
+        )
     _validate_chunk_alignment(start, end)
 
     if modules is None:
@@ -464,7 +537,7 @@ def generate_chunk(
                  f"({end - start} bytes, {len(syms)} symbols)")
     lines.append("; Generated by tools/cluster_c_pattern3_gen.py")
     lines.append("")
-    lines.append("        .section .rodata")
+    lines.append(f"        .section .{section}")
     lines.append("")
     if extern_names:
         # Brief 144: `.word <name>` references to symbols defined
@@ -483,7 +556,7 @@ def generate_chunk(
     delinks_entry = (
         f"{rel_asm}:\n"
         f"    complete\n"
-        f"    .rodata start:0x{start:08x} end:0x{end:08x}\n"
+        f"    .{section} start:0x{start:08x} end:0x{end:08x}\n"
     )
 
     return GeneratedChunk(
@@ -515,11 +588,48 @@ def main() -> int:
                     help="Chunk end address (4-aligned). e.g. 0x020c398c")
     ap.add_argument("--dry-run", action="store_true",
                     help="Print the .s + delinks entry to stdout; don't write files.")
+    ap.add_argument(
+        "--section",
+        choices=("auto", "rodata", "data"),
+        default="auto",
+        help=(
+            "Section to emit (controls both the `.section .X` "
+            "directive in the .s and the `.X start:..` line in the "
+            "delinks entry). `auto` (default) reads delinks.txt's "
+            "section header and picks the section that fully "
+            "contains [start, end). Falls back to `rodata` if no "
+            "section in the header matches — preserves brief 125 / "
+            "135 / 139 / 144 behaviour for cluster C callers. "
+            "`rodata` and `data` force the choice explicitly "
+            "(brief 159 part 1 added the flag; D-3 chunks live in "
+            ".data, cluster C in .rodata)."
+        ),
+    )
     args = ap.parse_args()
+
+    if args.section == "auto":
+        detected = _detect_section(
+            args.version, args.module, args.start, args.end,
+        )
+        if detected in ("rodata", "data"):
+            section = detected
+        else:
+            section = "rodata"
+            print(
+                f"note: --section auto: no header section in "
+                f"{_module_delinks_path(args.version, args.module)} "
+                f"fully contains 0x{args.start:08x}..0x{args.end:08x}; "
+                f"falling back to .rodata (brief 125 cluster C "
+                f"default). Pass --section explicitly to override.",
+                file=sys.stderr,
+            )
+    else:
+        section = args.section
 
     try:
         chunk = generate_chunk(
             args.version, args.module, args.start, args.end,
+            section=section,
         )
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
