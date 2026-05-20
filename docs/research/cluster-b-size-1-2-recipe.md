@@ -265,6 +265,42 @@ Brief 153 throughput estimate: 1 wave should drain all 18
 overlay candidates (most are likely zero-pad-followed singletons
 in `.data` clusters similar to `data_021020b4`).
 
+## Generalisation — recipe also drains value=0 size=4 (brief 155)
+
+Brief 155 (PR #584) pivoted from the (already-empty) size-1/2
+main pool to cluster B's 21 W6-rejected size=4 **value=0** main
+candidates — entries the brief 143 wave 2 filter rejected
+because all-zero scalars compile to `.bss`, breaking `.data`
+layout when the placeholder lives in `.data` in the orig
+binary. The same `unsigned int[N]` bundle recipe drained 18 of
+the 21 (16 bundles, 392 bytes, 100% yield). The 3 leftover
+candidates sit in 4-byte gaps between already-claimed wave-2
+single-int TUs and would need a wave-2 TU rewrite to bundle.
+
+**Same root cause from a different angle.** mwcc emits `.data`
+TUs whose section content is all-padding (zero bytes between
+strings/data for value=0 case; sub-4-byte sections for the
+size-1/2 case) in a way that breaks `.data` layout — either by
+mis-routing the TU to `.bss` (value=0) or by inviting the
+`ALIGNALL(2)` cascade after a sub-4-byte section (size-1/2).
+The bundle recipe forces non-zero content into the TU's `.data`
+section, which both:
+
+1. Prevents mwcc emitting the TU to `.bss`.
+2. Makes the section a 4-byte multiple, sidestepping
+   `ALIGNALL(2)` pad-cascade.
+
+Size-1/2 candidates hit both cases. Value=0 size=4 candidates
+hit case (1) only — they're already 4-byte sections, just
+zero-valued. Bundling with a non-zero neighbour is purely about
+forcing `.data` emission.
+
+See [PR #584](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/584)
+for the value=0 application: per-bundle anchor + range table,
+content highlights (the non-zero neighbours absorbed were
+mostly string literals like `"VER\0"`, `"%T"`, error messages,
+or numeric magic words), and the 3-region SHA1 PASS gate.
+
 ## Open follow-ups (out of brief 152's scope)
 
 - **Pool survey for size-1/2 candidates in overlays.** Brief
@@ -279,8 +315,9 @@ in `.data` clusters similar to `data_021020b4`).
   the worked-example layer.
 - **Cluster B value=0 sub-pool.** Brief 117 flagged 21
   size=4-W6-rejected entries where `addr%4 != 0` or `value==0`.
-  Value=0 needs `.bss` semantics; unaligned needs `.s` recipe.
-  Separate research brief.
+  Value=0 now drained by brief 155 (see *Generalisation*
+  section above). Unaligned (`addr%4 != 0`) still needs `.s`
+  recipe — separate research brief.
 
 ## Cross-references
 
