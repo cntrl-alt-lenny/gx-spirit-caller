@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**65 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**66 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (13)
+- [Analysis / worklist](#analysis--worklist) (14)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (9)
 - [Multi-region porting](#multi-region-porting) (3)
@@ -72,6 +72,12 @@ Complements `tools/analyze_symbols.py`'s bulk-group output. Bulk groups cluster 
 **transitive cascade finder.**
 
 Extends `find_cascades.py` (#132) from single-step to multi-step promotion prediction. Same graph semantics, recursive evaluation.
+
+### `tools/find_ov004_rodata_pointer_targets.py`
+
+**enumerate ov002 references**
+
+into ov004's `.rodata` VA range (brief 159 part 2).
 
 ### `tools/list_named_tier_callees.py`
 
