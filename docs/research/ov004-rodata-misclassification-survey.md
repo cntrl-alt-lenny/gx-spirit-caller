@@ -141,8 +141,7 @@ pattern match — the whole region needs to be disassembled in
 context to distinguish "real ARM code" from "constant data whose
 first word coincidentally encodes an opcode").
 
-### MEDIUM (606 candidates — structural signals only, byte
-confirmation pending)
+### MEDIUM (606 candidates — structural signals only, byte confirmation pending)
 
 All 606 share a common structural fingerprint:
 

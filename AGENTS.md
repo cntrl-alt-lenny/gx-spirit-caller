@@ -362,30 +362,82 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/151-ov004-rodata-cluster-wave-2.md`](docs/briefs/151-ov004-rodata-cluster-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): continue ov004
-  `.rodata` cluster work post brief 150's patcher
-  generalisation. Part 1: ship the ~6 candidates brief
-  147 had to defer when the patcher safety check fired
-  at n<9. Part 2: deeper sub-cluster drain — cluster A
-  `.bss` (39 candidates from brief 141 sweep), remaining
-  C / D-1 / D-2, more Pattern 3 chunks via brief 144's
-  turnkey generator. Target ≥ 20 claims with at least
-  one that drops `n` below 9 (end-to-end brief 150
-  validation). Critical: 3-region SHA1 PASS preserved.
-  Branch: `decomper/ov004-rodata-cluster-wave-2`.
+- [`docs/briefs/157-cluster-d3-wave-1.md`](docs/briefs/157-cluster-d3-wave-1.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): open cluster D-3
+  (complex nested struct arrays, ~20 candidates per brief
+  121). Use brief 144's auto-`.extern` Pattern 3 generator
+  + brief 152/155's bundle recipe for any zero-pad / sub-
+  4-byte residue inside chunks. Target ≥ 5 D-3 chunks.
+  Critical: 3-region SHA1 PASS preserved. Branch:
+  `decomper/cluster-d3-wave-1`.
 
-- [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](docs/briefs/152-cluster-b-size-1-2-workarounds.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): try size-1/2
-  alignment workarounds #2 (`__attribute__((aligned(1)))`)
-  + #3 (group claim — `unsigned int` bundle or struct
-  bundle). Brief 149 falsified #1 (.s with explicit
-  `.byte`). Document findings + lock recipe if any
-  PASSES. Unblocks ~13 size-1/2 cluster B candidates.
-  Critical: 3-region SHA1 PASS preserved across worked
-  examples. Branch: `cloud/cluster-b-size-1-2-workarounds`.
+- [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): two small follow-
+  ups. (1) Addendum to `docs/research/cluster-b-size-1-2-
+  recipe.md` documenting that bundle recipe drains value=0
+  size=4 candidates too (brief 155 finding). (2) Spot-
+  disassemble 5-10 MEDIUM-confidence ov004 `.rodata`
+  candidates from brief 154's catalog, report PASS/AMBIGUOUS/
+  FAIL per candidate. **Do NOT reclassify** — only recalibrate
+  the heuristic. Hit rate guides next ov004 strategy.
+  Critical: 3-region SHA1 PASS preserved (trivial — docs-
+  only). Branch: `cloud/cluster-b-recipe-addendum-medium-spot-disassembly`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/155-cluster-b-main-w6-rejected-drain.md`](docs/briefs/155-cluster-b-main-w6-rejected-drain.md)
+  `decomper`, shipped in PR #584. **Cluster B
+  effectively closed.** Pool pivot: main size-1/2 was
+  empty (brief 152 claimed only one); pivoted to cluster
+  B's 21 W6-rejected (size=4 value=0) main candidates.
+  16 multi-symbol bundles, 392 bytes, 100% yield, 18 of
+  21 candidates drained (86%); 3 deferred sit between
+  already-claimed wave-2 single-int TUs. **Same recipe
+  applies, broader application** — bundle forces non-zero
+  content into `.data`, preventing mwcc emission to `.bss`.
+  **3-region SHA1 PASS + 27/27 OK preserved.**
+- [`docs/briefs/154-ov004-rodata-symbol-reclassification-research.md`](docs/briefs/154-ov004-rodata-symbol-reclassification-research.md)
+  `cloud`, shipped in PR #581 (survey-only after recovery).
+  Initial submission included HIGH-confidence
+  reclassification of `0x021e2efc` that **brain verify-
+  gate caught breaking EUR SHA1**. Per brief's own
+  success criterion, candidate falsified. Recovery in
+  commit `cb88ff9`: reverted `symbols.txt` edit,
+  downgraded `0x021e2efc` from HIGH to MEDIUM,
+  documented falsification + 3 hypotheses, added
+  calibration lesson banner at top: first-4-byte ARM-
+  opcode match too weak alone; 606 MEDIUM cohort needs
+  whole-region disassembly + coherent-function verify-
+  gate before any promotes to HIGH. **3-region SHA1
+  PASS preserved.** Survey is high-value catalog (622
+  candidates bucketed by structural heuristics).
+- [`docs/briefs/153-cluster-b-size-1-2-overlay-wave.md`](docs/briefs/153-cluster-b-size-1-2-overlay-wave.md)
+  `decomper`, shipped in PR #582. **6 multi-symbol `.s`
+  bundles** covering **1560 bytes** across ov002 (2) +
+  ov006 (4), absorbing 34 placeholder neighbours.
+  **Critical recipe adaptation discovered**: brief 152's
+  `.c` recipe FAILS on overlays — `patch_module_literals.py`
+  runs post-link on `arm9.bin` ONLY. Adapted to Pattern-
+  3-style multi-symbol `.s` chunks where each absorbed
+  placeholder gets its own `.global` label. **3-region
+  SHA1 PASS preserved.**
+- [`docs/briefs/151-ov004-rodata-cluster-wave-2.md`](docs/briefs/151-ov004-rodata-cluster-wave-2.md)
+  `decomper`, shipped in PR #578. **28 source-level
+  claims** (40% over ≥20 target). 25 Pattern 1 .c
+  (brief 141 orphan recovery) + 2 D-1 + 1 Pattern 3
+  mega chunk at `0x02200f18..0x02206738` (22.5 KB, 2
+  symbols). 3-region SHA1 PASS preserved. BONUS not
+  met: couldn't drop `n` below 9 — remaining
+  candidates are ARM-code-as-data misclassifications,
+  handed off to brief 154.
+- [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](docs/briefs/152-cluster-b-size-1-2-workarounds.md)
+  `cloud`, shipped in PR #579. **Workaround #3 PASSES;
+  #2 FALSIFIED with root-cause diagnosis.** `arm9.lcf`'s
+  `ALIGNALL(2)` (not mwcc) is the alignment-cascade
+  culprit. Workaround #3 (`unsigned int[N]` bundle)
+  sidesteps. Worked example `data_021020b4` (16-int
+  bundle, 64 bytes). Recipe locked at
+  `docs/research/cluster-b-size-1-2-recipe.md`.
 
 - [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
   `decomper`, shipped in PR #575. **Cluster B pointer
