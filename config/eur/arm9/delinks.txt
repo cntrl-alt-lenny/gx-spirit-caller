@@ -8796,3 +8796,39 @@ src/main/data/data_02102844.c:
 src/main/data/data_02102b00.c:
     complete
     .data start:0x02102b00 end:0x02102b48
+
+src/main/data/data_020fdd80.s:
+    complete
+    .data start:0x020fdd80 end:0x020fde98
+
+src/main/data/data_020fb980.s:
+    complete
+    .data start:0x020fb980 end:0x020fbaa0
+
+src/main/data/data_020fe130.s:
+    complete
+    .data start:0x020fe130 end:0x020fe258
+
+src/main/data/data_020c4204.s:
+    complete
+    .data start:0x020c4204 end:0x020c44c4
+
+src/main/data/data_020f8c60.s:
+    complete
+    .data start:0x020f8c60 end:0x020f8fc8
+
+src/main/data/data_020fc160.s:
+    complete
+    .data start:0x020fc160 end:0x020fc558
+
+src/main/data/data_020c8e84.s:
+    complete
+    .data start:0x020c8e84 end:0x020c9690
+
+src/main/data/data_02101fb4.s:
+    complete
+    .data start:0x02101fb4 end:0x021020b4
+
+src/main/data/data_02102588.s:
+    complete
+    .data start:0x02102588 end:0x02102688
