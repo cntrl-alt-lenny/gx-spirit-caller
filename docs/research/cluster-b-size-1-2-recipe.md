@@ -160,9 +160,9 @@ declared a typed struct with named fields (per brief 117's "32
 typed pointer sub-cluster" hint, similar would apply to typed
 size-1/2 fields).
 
-#3a is simpler for the common case where the trailing bytes
-are zero-pad. #3b is preferable when the trailing bytes
-encode separate semantic fields.
+Sub-shape `#3a` is simpler for the common case where the
+trailing bytes are zero-pad. Sub-shape `#3b` is preferable
+when the trailing bytes encode separate semantic fields.
 
 ## Why no `data_021020b8`-only short bundle worked
 
