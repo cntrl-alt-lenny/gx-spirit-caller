@@ -4063,3 +4063,89 @@ Sorted by ov004 slot address, then by ov002 from-address.
 | `0x022c0138` | `(unknown)` | `load` | `0x02209868` | `data_ov004_02209868` |  |
 | `0x022c6c18` | `(unknown)` | `load` | `0x02209940` | `data_ov004_02209924` | +0x1c |
 | `0x022c6c30` | `(unknown)` | `load` | `0x022099cc` | `data_ov004_022099c6` | +0x6 |
+
+## Brief 160 path-2 experiment (decomper)
+
+**Hypothesis:** source-claiming an ov004 `.rodata` slot as Pattern 1
+`.c` (symbol stays `data`-kinded — no LCF re-emission risk vs brief
+154 path 1) should drop mwldarm's veneer count by 1 per claim
+(brief 141 / 147 empirical model).
+
+**Method:** ONE candidate at a time. Generate
+`const unsigned char data_ov004_<addr>[N] = {orig_bytes};`, add TU
+claim, 3-region `ninja sha1`, record veneer count + SHA1 outcome.
+
+### Per-slot results
+
+| Slot | Refs | Size | Align | Veneer drop | SHA1 outcome |
+|---|---:|---:|:---:|:---:|---|
+| `data_ov004_021ff0b4` | 360 | 2096 B | 4-aligned | 9 → 5 (−4) | FAIL: +12 byte size delta, ov004 cascades from file 0x3fd40 |
+| `data_ov004_021e2b15` | 363 | 999 B | odd | (n/a) | FAIL: patcher pool contiguity error (gap of 14 B between veneers — section misalignment from odd-addr claim) |
+| `data_ov004_021f4a40` | 146 | 152 B | 4-aligned | 9 → 5 (−4) | FAIL: identical hash to `021ff0b4` failure — n=5 patcher math off by 12 B regardless of which slot triggered it |
+
+### Findings
+
+1. **Path 2 mechanism CONFIRMED.** Any single 4-aligned `.rodata`
+   Pattern 1 `.c` source claim suppresses **4 veneers** in
+   one step (9 → 5), regardless of which slot is claimed. This
+   matches brief 141 / 147's empirical model that adding `.rodata`
+   source coverage drops the count — but the drop is **block-level
+   not per-claim**.
+
+2. **Brief 160 "drop n by 1 per claim" hypothesis FALSIFIED.** The
+   first `.rodata` claim of any kind triggers a 4-veneer
+   suppression cascade. Subsequent claims on the same module's
+   `.rodata` may add 0 (saturated) or jump again at the next
+   threshold — to be verified in a follow-up wave.
+
+3. **Patcher math gap at n=5 (brief 162+ candidate).** Brief 150
+   pinned WITH_TERMINATOR vs NO_TERMINATOR behaviour at
+   `n ∈ {0, 2, 7, 9, 43, 86}`. The new n=5 state surfaces a
+   12-byte size delta the byte-detection path doesn't catch:
+
+   ```
+   note: 5-veneer ctor/pad shape disagrees with n-inference:
+   byte-detected net 8 (delta 52) vs n-inferred delta 48.
+   Byte-detection takes precedence; this is informational only.
+   ```
+
+   Patched output is **268,204 bytes** vs orig **268,192** (+12 B).
+   The patcher's `expected_output_delta_for(5) = 5 × 12 − 8 = 52`
+   formula predicts input size `orig + 52 = 268,244` and output
+   `orig`. Actual mwldarm input was `268,256` (12 B larger than
+   formula predicts) → output overshoots orig by 12.
+
+4. **Odd-aligned slot claims (e.g. `021e2b15`, addr % 4 == 1)
+   shift the veneer pool by 2 bytes**, breaking the patcher's
+   contiguity check. Pattern 1 `.c` form puts the slot at the
+   delinks-claimed VA without alignment padding; mwldarm then
+   places downstream sections aligned to the slot's natural
+   alignment of 1, shifting the veneer pool. Odd-aligned ov004
+   `.rodata` slots aren't a path-2 fit.
+
+### Conclusion
+
+**Path 2 is partially viable.** The mechanism works (mwldarm
+respects the source-claimed symbol and suppresses cross-overlay
+veneers), but two blockers prevent SHA1-PASS application:
+
+- **Patcher math at n=5** (brief 162+ candidate): byte-detection
+  needs to handle the n=5 case OR n-inference needs another data
+  point added.
+- **Odd-aligned slots** are a permanent path-2 mismatch (Pattern 1
+  `.c` can't claim them without `.s` or `__attribute__((aligned(1)))`
+  experimentation).
+
+Per brief 160's exit criterion: **0 PASS → path 2 falsified for
+this hypothesis shape.** Brain investigates why; brief 162+ should
+extend the patcher's n-inference table to handle n=5 (then 4 +
+fall-through cases as more claims drop n further).
+
+### Decomper-side recommendation for brief 162+
+
+Once the patcher accepts n=5 cleanly, the path-2 wave can ship:
+- Pattern 1 `.c` claims on all 4-aligned top-refcount slots
+- Each claim suppresses 0-4 veneers depending on which veneer
+  block it's bound to
+- Expected: 10-20 ov004 source claims → SHA1 PASS across the n
+  cascade
