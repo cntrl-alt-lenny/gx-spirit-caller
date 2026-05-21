@@ -4149,3 +4149,94 @@ Once the patcher accepts n=5 cleanly, the path-2 wave can ship:
   block it's bound to
 - Expected: 10-20 ov004 source claims → SHA1 PASS across the n
   cascade
+
+## Brief 167 path-2 scale-up (decomper)
+
+**Setup:** brief 164 closed the n=5 SHA1 residual via the
+walk-forward cluster detector. This brief tests whether
+claiming 5-10 ov004 `.rodata` slots spread across distinct
+veneer blocks can drop `n` below 5 (target n ∈ {1, 0}).
+
+### Pre-flight: 9 baseline veneer targets
+
+Captured via patcher wrapper. Veneer pool sits at vaddr
+0x02200dbc..0x02200e28 (9 × 12 B) — these vaddrs sit inside
+brief 147's chunks but mwldarm still emits its pool there
+(the patcher splices them out post-link).
+
+Veneer targets:
+
+| File offset | Source vaddr | Target VA |
+|---|---|---|
+| 0x3705c | 0x02200dbc | 0x021b0e02 |
+| 0x37068 | 0x02200dc8 | 0x021b4002 |
+| 0x37074 | 0x02200dd4 | 0x02200acc |
+| 0x37080 | 0x02200de0 | 0x0208fc60 |
+| 0x3708c | 0x02200dec | 0x021ff92c |
+| 0x37098 | 0x02200df8 | 0x0208f8b8 |
+| 0x370a4 | 0x02200e04 | 0x0208fbf8 |
+| 0x370b0 | 0x02200e10 | 0x021ff8e4 |
+| 0x370bc | 0x02200e1c | 0x021ff9a0 |
+
+### Per-slot experiments
+
+| Slot | Refs | Size | After-claim n | SHA1 | Kept |
+|---|---:|---:|:---:|:---:|:---:|
+| `data_ov004_021ff0b4` | 360 | 2096 B | 9 → **5** (−4) | PASS | ✓ |
+| `data_ov004_021f4a40` | 146 | 152 B | 5 → 5 (+0) | PASS | ✓ |
+| `data_ov004_021e87ac` | 127 | 704 B | 5 → 5 (+0) | PASS | ✓ |
+| `data_ov004_021f4880` |  96 | 448 B | 5 → 5 (+0) | PASS | ✓ |
+| `data_ov004_021e3de8` | (band 1) | 376 B | 5 → **3** (−2) | **FAIL** | reverted |
+| `data_ov004_02206738` | (band 6) | 40 B | 5 → 5 (+0) | PASS | ✓ |
+| `data_ov004_02206760` | (band 6) | 1024 B | 5 → 5 (+0) | PASS | ✓ |
+
+### Findings
+
+1. **Brief 164's walk-forward cluster detector confirmed working
+   end-to-end on real source.** At n=5, SHA1 PASSES cleanly for
+   the first time post path-2 enablement — brief 160's blocker
+   is fully closed.
+
+2. **First production claim of the n=5 state shipped:**
+   `data_ov004_021ff0b4` (360 refs, 2096 B). The first ov004
+   `.rodata` source claim drops `n` from 9 → 5 in one step
+   (block-level cascade), matching brief 160's path-2-mechanism-
+   confirmed but-falsified finding.
+
+3. **Confirmed block-suppression hypothesis: drop below 5 is
+   possible.** `data_ov004_021e3de8` (size 0x178, contains 3
+   veneer-target loads at offsets +0xe8 / +0x168 / +0x174)
+   dropped `n` from 5 → 3 — suppressing 2 of the 9 veneers in
+   one claim. This is the first observed sub-5 state.
+
+4. **Patcher state at n=3 is untested (brief 168+ candidate).**
+   The n=3 claim broke SHA1 with brief 162's stderr note:
+   `byte-detected net 4 (delta 32) vs n-inferred delta 24`.
+   `N_INFERENCE_OVERRIDES = {5: 8}` doesn't cover n=3.
+   `data_ov004_021e3de8` reverted; brief 168+ should extend
+   `N_INFERENCE_OVERRIDES` (or generalise the byte-detection
+   path) to cover n=3 and other low-n states.
+
+5. **Far-apart slots from band 6 don't suppress veneers** —
+   claiming `data_ov004_02206738` + `data_ov004_02206760`
+   (band 6, ~24-26 KB beyond the n=5-trigger band) left `n`
+   at 5. The 4 remaining veneers correspond to loads inside
+   band 1's symbols (021ded69 / 021e191c — both odd-aligned
+   per brief 160 finding #4, and 021e3500 / 021e3de8 —
+   4-aligned but each triggers further drop into n<5
+   territory). **Band 1 symbols are the only known path to
+   sub-5; brief 168+ patcher work unblocks them.**
+
+### Wave outcome
+
+**6 path-2 claims kept** across 4 distinct bands. All at n=5
+(stable SHA1). Total bytes matched: 2,096 + 152 + 704 + 448 +
+40 + 1,024 = **4,464 B**. First production wave of brief
+164's walk-forward detector validates the patcher chain
+134 → 142 → 146 → 150 → 162 → 164 end-to-end.
+
+**Brief 167's primary goal (drop n below 5 with SHA1 PASS)
+not met** — confirmed n=3 is reachable but blocked by
+patcher's still-incomplete low-n table. Brief 168+ patcher
+extension unblocks band-1 claims, which then opens path-2
+scale-up to full ov004 .rodata source coverage.
