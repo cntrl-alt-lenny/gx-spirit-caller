@@ -3,3 +3,7 @@
     .ctor       start:0x021ad23c end:0x021ad23c kind:rodata align:4
     .data       start:0x021ad240 end:0x021ad780 kind:data align:32
     .bss        start:0x021ad780 end:0x021ae180 kind:bss align:32
+
+src/jpn/overlay018/bss/data_ov018_bss.s:
+    complete
+    .bss start:0x021ad780 end:0x021ae180

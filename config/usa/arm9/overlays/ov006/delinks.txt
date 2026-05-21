@@ -17,3 +17,7 @@ src/usa/overlay006/func_ov006_021c6ad0.c:
 src/usa/overlay006/ov006_021b5e50.c:
     complete
     .text start:0x021b5e50 end:0x021b5e60
+
+src/usa/overlay006/bss/data_ov006_bss.s:
+    complete
+    .bss start:0x021cf020 end:0x0225e080

@@ -7,3 +7,7 @@
 src/usa/overlay008/func_ov008_021b2288.c:
     complete
     .text start:0x021b2288 end:0x021b2294
+
+src/usa/overlay008/bss/data_ov008_bss.s:
+    complete
+    .bss start:0x021b2660 end:0x021b2e20

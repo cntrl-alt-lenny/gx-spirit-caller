@@ -12,3 +12,7 @@ src/jpn/overlay015/ov015_021b2234.c:
 src/jpn/overlay015/ov015_021b3f28.c:
     complete
     .text start:0x021b3f28 end:0x021b3f44
+
+src/jpn/overlay015/bss/data_ov015_bss.s:
+    complete
+    .bss start:0x021b5c20 end:0x021b67c0
