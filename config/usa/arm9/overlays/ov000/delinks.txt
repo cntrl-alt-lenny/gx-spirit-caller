@@ -7,3 +7,15 @@
 src/usa/overlay000/bss/data_ov000_bss.s:
     complete
     .bss start:0x021c7300 end:0x021c9c80
+
+src/usa/overlay000/data/data_ov000_021b67e8.c:
+    complete
+    .data start:0x021b67e8 end:0x021b67ec
+
+src/usa/overlay000/data/data_ov000_021b67ec.c:
+    complete
+    .data start:0x021b67ec end:0x021b67f0
+
+src/usa/overlay000/data/data_ov000_021b9ff4.c:
+    complete
+    .data start:0x021b9ff4 end:0x021b9ff8
