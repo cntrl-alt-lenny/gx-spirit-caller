@@ -67,6 +67,7 @@ based on brief 159's reverse-lookup table). For each variant:
    data_ov004_021ded69:
            .byte 0xAA, ...
    ```
+
 3. **Variant C**: Pattern 3 chunk via brief 125 generator
    covering the odd-aligned slot + its surrounding
    4-aligned context.
