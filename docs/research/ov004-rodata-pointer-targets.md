@@ -4240,3 +4240,66 @@ not met** — confirmed n=3 is reachable but blocked by
 patcher's still-incomplete low-n table. Brief 168+ patcher
 extension unblocks band-1 claims, which then opens path-2
 scale-up to full ov004 .rodata source coverage.
+
+## Brief 171 path-2 scale-up wave 2 (decomper)
+
+**Setup:** brief 168 closed the n=3 SHA1 residual via the
+walk-forward BL re-encoding generalisation
+(`_reencode_init_bls` → `_reencode_arm_bls`). This brief tests
+multi-band-1 cascade — can multiple band-1 claims drop n below
+the 3 reached in brief 167?
+
+### Per-slot results (band-1 4-aligned, 0x021de638..0x021e8000)
+
+| Slot | Size | After-claim n | SHA1 | Kept |
+|---|---:|:---:|:---:|:---:|
+| `data_ov004_021e3de8` | 376 B | 5 → **3** (−2) | PASS | ✓ |
+| `data_ov004_021e3500` | 2,280 B | 3 → **2** (−1) | PASS | ✓ |
+| `data_ov004_021e3f60` | 500 B | 2 → 2 (saturated) | PASS | ✓ |
+| `data_ov004_021e3128` | 268 B | 2 → 2 (saturated) | PASS | ✓ |
+| `data_ov004_021e2efc` | 556 B | 2 → 2 (saturated) | PASS | ✓ |
+
+**5 kept claims, 3,980 bytes matched.**
+
+### Findings
+
+1. **Brief 168 BL re-encoding generalisation validated end-to-end.**
+   `data_ov004_021e3de8` (brief 167's reverted n=5→3 attempt)
+   now ships cleanly with SHA1 PASS. The fix transfers from
+   synthetic test fixtures to real source.
+
+2. **🔑 Multi-band-1 cascade WORKS** — first observed n<3 state.
+   Combining `data_ov004_021e3de8` (drops n=5→3) with
+   `data_ov004_021e3500` (drops n=3→2) reaches **n=2 with SHA1
+   PASS**. Brief 162's `N_INFERENCE_OVERRIDES` doesn't have
+   n=2; the byte-detection path (brief 150 + 164) covers it.
+
+3. **Path-2 structural floor at n=2 with current tooling.**
+   The remaining 2 veneers target 0x021b0e02 + 0x021b4002
+   (ov002 territory). Pre-patch enumeration confirms they're
+   loaded from .rodata slots 0x021e0ecc + 0x021e1c10. Both
+   loads sit inside odd-aligned containing symbols
+   (`data_ov004_021ded69` + `data_ov004_021e191c`) — brief
+   160 finding #4 still applies (Pattern 1 .c can't claim
+   odd-aligned slots without alignment override). Three
+   additional band-1 claims (021e3f60, 021e3128, 021e2efc)
+   added zero further suppression — they didn't contain
+   veneer-target loads.
+
+4. **Stderr note new form at n=2:**
+   `byte-detected net -8 (delta 32) vs n-inferred delta 12`.
+   The byte-detected `net` is NEGATIVE 8 at n=2 — first
+   observed signed value. Byte-detection authoritative; SHA1
+   PASSES. Brief 173+ could document this as a known low-n
+   form.
+
+5. **Sub-2 requires odd-aligned-slot recipe (brief 173+
+   candidate).** To drop below n=2: need to claim
+   `data_ov004_021ded69` or `data_ov004_021e191c` (or any
+   containing symbol of the load slots). Both are
+   odd-aligned. Possible recipes to explore:
+   - `__attribute__((aligned(1))) const unsigned char ...`
+     (untested for path-2 case)
+   - mwasmarm `.s` with `.align 0` directive
+   - Pattern 3 chunk including the odd-aligned slot's
+     surrounding 4-aligned context
