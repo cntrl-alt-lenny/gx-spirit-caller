@@ -362,27 +362,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply brief 174's
-  `cluster_b_bundle_gen.py` to USA + JPN cluster B
-  residue at scale. ~104 region-matches potential. Brief
-  174 shipped 2 worked examples; scale up + investigate
-  ov006 sub-pool. Target ≥ 60 cross-region claims.
-  Critical: 3-region SHA1 PASS preserved + EUR
+- [`docs/briefs/178-cross-region-cluster-d3-with-generator.md`](docs/briefs/178-cross-region-cluster-d3-with-generator.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply brief 177's
+  `cross_region_chunk_extent.py` to USA + JPN cluster
+  D-3 — same scope brief 175 falsified. Brief 177
+  shipped 3 worked examples; scale to ~62 region-
+  matches. Target ≥ 30 cross-region D-3 chunks per
+  region. Critical: 3-region SHA1 PASS preserved + EUR
   bit-identical. Branch:
-  `decomper/cross-region-cluster-b-residue-with-generator`.
+  `decomper/cross-region-cluster-d3-with-generator`.
 
-- [`docs/briefs/177-unified-chunk-extent-generator.md`](docs/briefs/177-unified-chunk-extent-generator.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise brief
-  174's bundle-extent heuristic into region-aware
-  **chunk extent generator** for multi-symbol cases.
-  Per brief 175's hand-off. Unblocks brief 178+ D-3
-  cross-region retry + future cluster C / D-1 / D-2
-  cross-region work. Brief 174's tests must remain
-  green. Critical: 3-region SHA1 PASS preserved.
-  Branch: `cloud/unified-chunk-extent-generator`.
+- [`docs/briefs/179-patcher-variant-e-2byte-pool-shift.md`](docs/briefs/179-patcher-variant-e-2byte-pool-shift.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher to
+  handle 2-byte (or 1-3 byte) veneer pool shifts at
+  low n. Per brief 173's hand-off. Path-2 mechanism
+  works at veneer level (verified); only byte-layout
+  shift fails SHA1. Variant E closes the layout problem.
+  Unblocks brief 180+ path-2 final wave (n=2 → n=0).
+  W7 chain extends: 134 → 142 → 146 → 150 → 162 → 164
+  → 168 → 179. Critical: 3-region SHA1 PASS preserved.
+  Branch: `cloud/patcher-variant-e-2byte-pool-shift`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
+  `decomper`, shipped in PR #617. ✅ **Brief 174
+  generator validated at scale.** 32 cross-region
+  cluster B residue claims (16 USA + 16 JPN). **ov006
+  sub-pool resolved** via brief 174's more conservative
+  bundles (brief 170's 32-byte ordering shift no longer
+  triggers). Apply funnel 30 → 16 per region. Self-
+  extend gates met (53% yield + 500+ B). Residue 16
+  (size-1/2 + odd-aligned) deferred to brief 180+.
+  3-region SHA1 PASS + 27/27 OK preserved.
+- [`docs/briefs/177-unified-chunk-extent-generator.md`](docs/briefs/177-unified-chunk-extent-generator.md)
+  `cloud`, shipped in PR #618. 🎉 New
+  `tools/cross_region_chunk_extent.py` 3-phase
+  algorithm generalises brief 174 to multi-symbol
+  chunks. Brief 175's headline failure reproduces +
+  ships as worked example. 3 cross-region D-3 worked
+  examples (USA + JPN ov006 + USA main). Brief 174's
+  15 tests still green. Suite 1889 → 1904. Brain
+  pushed F401 ruff fix + manual delinks.txt merge
+  conflict resolution (both PRs touched same files;
+  additive merge).
 
 - [`docs/briefs/175-cross-region-cluster-d3-apply.md`](docs/briefs/175-cross-region-cluster-d3-apply.md)
   `decomper`, shipped in PR #614. 🔬 **Same failure
