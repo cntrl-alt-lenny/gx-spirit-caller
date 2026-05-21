@@ -431,12 +431,12 @@ def render_markdown(
         )
         lines.append("")
 
-    # Disassembly section — can't produce it from cloud, but tell
-    # the reader how.
+    # Disassembly section — can't produce it from scaffolder, but
+    # tell the reader how.
     lines.append("## Disassembly")
     lines.append("")
     lines.append(
-        "_The `.s` for this function isn't inlined — cloud can't "
+        "_The `.s` for this function isn't inlined — scaffolder can't "
         "run `dsd delink` / `mwccarm`. Run locally:_",
     )
     lines.append("")

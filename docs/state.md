@@ -21,9 +21,9 @@ chunk-extent generator shipped** (brief 177, cloud):
 generalises brief 174 to multi-symbol Pattern 3 chunks.
 Brief 175's headline failure reproduces + ships as worked
 example. Brief 178 (decomper, queued) scales to full
-cross-region D-3 (~62 region-matches). Brief 179 (cloud,
-queued) Variant E — patcher 2-byte pool-shift handling to
-close path-2 to n=0.
+cross-region D-3 (~62 region-matches). Brief 179
+(scaffolder, queued) Variant E — patcher 2-byte
+pool-shift handling to close path-2 to n=0.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -168,9 +168,11 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   scale to full ~62 region-matches. Target ≥ 30 cross-
   region D-3 chunks per region.
 
-**Cloud — one MEDIUM brief queued (patcher Variant E):**
+**Scaffolder — one MEDIUM brief queued (patcher Variant E):**
 
-- **Brief 179 (MEDIUM, NEW)** — `cloud/patcher-variant-e-2byte-pool-shift`.
+- **Brief 179 (MEDIUM, NEW)** — `cloud/patcher-variant-e-2byte-pool-shift`
+  (branch started under the prior `cloud/` slug; brief 180+
+  uses `scaffolder/` per the rename).
   Extend patcher to handle 2-byte (or 1-3 byte) veneer
   pool shifts at low n. Per brief 173's hand-off. **Path-2
   mechanism works at veneer level (all 3 brief 173
@@ -197,7 +199,7 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   `.rodata` syms (brief 151, 22.5 KB block included) = **73 total**.
   Veneer count n=9 lower bound — dropping below 9 requires
   reclassifying ARM-code-as-data symbols (brief 154 falsified
-  the naive byte-pattern approach; brief 156 cloud spot-disasm
+  the naive byte-pattern approach; brief 156 scaffolder spot-disasm
   recalibrates the heuristic).
 - **Cluster D-3** — complex nested struct arrays.
   **EFFECTIVELY CLOSED** post brief 163 wave 3 (9 chunks /
@@ -220,11 +222,15 @@ canonical spec** (worktree-convention section there now covers both
 mechanisms — updated in this brain-PR). Two mechanisms are
 equivalent:
 
-- **Mac convention (manual sibling worktrees):** `~/Dev/gx-spirit-
-  caller`, `~/Dev/gx-spirit-caller-decomper`, `~/Dev/gx-spirit-caller-cloud`
-  — three siblings at the same depth, set up once via `git worktree
+- **Mac convention (manual sibling worktrees):** `~/Dev/spirit-caller/brain`,
+  `~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder`
+  — three named siblings under one parent, set up once via `git worktree
   add`. Each has its own `orig/` baseroms. Adopted during the
   SHA1-milestone arc; PR #564 documented this in state.md.
+  Note: the on-disk `scaffolder` worktree may still be named `cloud`
+  on this machine; `git worktree move ~/Dev/spirit-caller/cloud
+  ~/Dev/spirit-caller/scaffolder` once no `cloud/*` branches are
+  checked out there.
 - **Windows convention (Claude Code automatic sandboxes):** Claude
   Code creates per-session worktrees inside `.claude/worktrees/<auto-
   name>/` for each agent. No manual setup. They share the main
@@ -239,7 +245,7 @@ sufficient.
 ## Brain-pattern locked
 
 - **Self-merge by default.** Brain reviews + merges autonomously per
-  cntrl_alt_lenny's stated working pattern. User gets the cloud /
+  cntrl_alt_lenny's stated working pattern. User gets the scaffolder /
   decomper messages afterward, doesn't gate each merge.
 - **PR-URL deliverable.** Every agent message MUST end with "push the
   branch, run `gh pr create`, reply with the PR URL." Brain verifies
@@ -256,7 +262,9 @@ sufficient.
    modules OK. ≥ 30 cross-region D-3 chunks per region.
    Watch for "needs hand-tuning" candidates — log for
    brief 180+ refinement if any.
-2. **Verify + merge cloud brief 179 PR** when it opens.
+2. **Verify + merge scaffolder brief 179 PR** when it opens.
+   Branch is `cloud/patcher-variant-e-2byte-pool-shift` (started
+   under the prior `cloud/` slug; the role is now `scaffolder`).
    Gate: 3-region SHA1 PASS preserved (current main n=2 +
    manual injection test at n=0). New tests pin 1-3 byte
    shift detection. Brief 180+ unlocked for path-2 final
@@ -281,9 +289,9 @@ sufficient.
 4. **Watch for any new wall hypotheses** in upcoming wave PRs.
    Standing rule since brief 084's "3 walls not 1" methodology
    lesson: pre-empt symptom-vs-mechanism classification by requesting
-   a cloud codegen-sweep brief before any wall gets a P-N or C-N
+   a scaffolder codegen-sweep brief before any wall gets a P-N or C-N
    number. C-23 candidate (MMIO register-base folding) from brief 086
-   remains pending cloud sweep classification.
+   remains pending scaffolder sweep classification.
 5. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
@@ -296,7 +304,7 @@ the local machine (toolchain + baserom on disk), not to a specific
 Claude session. State.md is the bridge. Standing conventions:
 
 - **Working pattern:** brain reviews + merges autonomously; user
-  receives the cloud / decomper messages afterward.
+  receives the scaffolder / decomper messages afterward.
 - **Verify command (Windows):** `python tools/configure.py eur &&
   ninja sha1 && python tools/configure.py usa && ninja sha1 && python
   tools/configure.py jpn && ninja sha1` — substitute `./dsd` and
@@ -308,5 +316,5 @@ Claude session. State.md is the bridge. Standing conventions:
 
 ## New agents?
 
-No. Continuing with 4-slot setup (brain + decomper + cloud +
+No. Continuing with 4-slot setup (brain + decomper + scaffolder +
 auto-progress-badge bot).

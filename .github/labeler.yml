@@ -6,7 +6,7 @@
 #   area:*   — what kind of change it is (tools / libs / src / docs / …)
 #              Matched on changed-file paths.
 #
-#   agent:*  — who the change is from (cloud / pc / brain).
+#   agent:*  — who the change is from (scaffolder / pc / brain).
 #              Matched on the branch name prefix.
 
 'area:tools':
@@ -48,12 +48,11 @@
       - 'assets/**'
 
 # agent:* — matched on the PR's head-branch prefix. Mirrors AGENTS.md
-# slugs. Each label matches both the current model-agnostic slug
-# (`cloud/`, `decomper/`, `brain/`) and the grandfathered `claude-*/`
-# prefixes from before the rename so historical PRs still label
+# slugs. Each label matches the current slug plus any grandfathered
+# prefixes from prior renames, so historical PRs still label
 # correctly. If a new agent joins, add its prefix here.
-'agent:cloud':
-  - head-branch: ['^cloud/', '^claude-cloud/']
+'agent:scaffolder':
+  - head-branch: ['^scaffolder/', '^cloud/', '^claude-cloud/']
 
 'agent:pc':
   - head-branch: ['^decomper/', '^claude-pc/']

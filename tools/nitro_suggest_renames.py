@@ -30,7 +30,7 @@ Candidate ranking:
     subsystem match (+), leaf-ness match (+)
   - Emit top-K candidates per target
 
-This is a scaffolding / recommendation tool. Cloud can run it, the
+This is a scaffolding / recommendation tool. Scaffolder can run it, the
 decomper reviews the report, applies the highest-confidence renames
 by hand. As renames land, re-running the tool should narrow
 remaining candidates (named callees make subsystem inference tighter).

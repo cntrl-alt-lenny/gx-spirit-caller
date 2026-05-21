@@ -25,7 +25,7 @@ This tool ranks by:
   3. Size bucket match (both ≤0x20, both 0x20-0x80, etc.)
   4. Mode match (arm vs thumb — signals mwcc invocation flags)
 
-No byte-level instruction matching — cloud can't run `dsd delink`.
+No byte-level instruction matching — scaffolder can't run `dsd delink`.
 Shape-level matching is enough to surface the best existing
 template for the decomper to adapt.
 

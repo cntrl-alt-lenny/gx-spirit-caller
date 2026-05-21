@@ -7,7 +7,7 @@ same directory.
 A "research note" is any markdown file in `docs/research/` whose
 first non-blank line is an H1 heading. The body's first non-blank
 prose paragraph (skipping italic-only lines like
-`_Generated 2026-MM-DD by cloud..._`) is the summary, capped at
+`_Generated 2026-MM-DD by scaffolder..._`) is the summary, capped at
 ~200 chars in the index table.
 
 This is the third member of the auto-generated docs trio:
@@ -92,7 +92,7 @@ def _is_italic_block_end(stripped: str) -> bool:
 def parse_research_note(path: Path) -> dict | None:
     """Extract heading + first prose paragraph from a research note.
 
-    Skips an italic byline block (`_Generated 2026-MM-DD by cloud
+    Skips an italic byline block (`_Generated 2026-MM-DD by scaffolder
     after ..._` — possibly multi-line) immediately after the heading
     if present. The first non-italic, non-blank prose paragraph
     becomes the summary. Returns None for files without an H1

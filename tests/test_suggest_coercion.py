@@ -11,7 +11,7 @@ Brief 062. Pins:
 Synthetic objdiff JSONs are minimal — just enough to trigger the
 rule's primary signature and exercise the confidence calculation.
 End-to-end integration against historical decomper PRs is run by
-the cloud author pre-push and recorded in the PR description; CI
+the scaffolder author pre-push and recorded in the PR description; CI
 keeps the unit-level pins.
 
 Run locally:

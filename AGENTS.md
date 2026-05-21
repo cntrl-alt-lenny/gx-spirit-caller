@@ -15,7 +15,7 @@ in plain English — see *Adding or retiring agents* near the bottom.
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, picks direction, merges PRs, adds/retires agents, final authority.                                                                              | —                                                              | —                                                                               |
 | **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
-| **cloud**         | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain.     | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
+| **scaffolder**    | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain. (Formerly `cloud`; renamed for role clarity — `-er` parallel with `decomper`. Historical PRs / branches retain the `cloud/` prefix.) | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **decomper**      | Any LLM session on cntrl_alt_lenny's PC or Mac, with toolchain + baserom (separate session from brain) | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
@@ -28,7 +28,7 @@ files under `.claude/agents/`:
 
 - [`.claude/agents/brain.md`](.claude/agents/brain.md) — coordinator
 - [`.claude/agents/decomper.md`](.claude/agents/decomper.md) — function matcher
-- [`.claude/agents/cloud.md`](.claude/agents/cloud.md) — scaffolder
+- [`.claude/agents/scaffolder.md`](.claude/agents/scaffolder.md) — scaffolder (formerly `cloud.md`)
 
 Each file captures the role's scope + hands-off paths + workflow loop
 so a fresh Claude Code session can load the appropriate subagent
@@ -112,32 +112,43 @@ paste to other agents, repeat.
 
 ### Worktree convention (multi-agent on the same machine)
 
-When `brain`, `decomper`, and `cloud` are running on the same physical
-machine (the common case for cntrl_alt_lenny's setup), **they must
-work in separate git worktrees** so they don't fight over branch
-state in the same working directory. Two equivalent mechanisms exist;
-either is fine — pick by host:
+When `brain`, `decomper`, and `scaffolder` are running on the same
+physical machine (the common case for cntrl_alt_lenny's setup),
+**they must work in separate git worktrees** so they don't fight
+over branch state in the same working directory. Two equivalent
+mechanisms exist; either is fine — pick by host:
 
 #### Mechanism A — manual sibling worktrees (Mac convention)
 
-Standard layout, three sibling directories at the same depth:
+Standard layout, three named sibling directories under a single
+`spirit-caller/` parent:
 
-| Worktree path                              | Slug      | Purpose                                          |
-|--------------------------------------------|-----------|--------------------------------------------------|
-| `~/Dev/gx-spirit-caller`                   | `brain`   | Main repo. Brain pulls main, reviews PRs, builds verifications. |
-| `~/Dev/gx-spirit-caller-decomper`          | `decomper`| Sibling worktree. Decomper checks out its own `decomper/<scope>` branches without touching brain's working state. |
-| `~/Dev/gx-spirit-caller-cloud`             | `cloud`   | Sibling worktree. Cloud checks out its own `cloud/<scope>` branches the same way. Added in this session's PR #564 era — cloud now runs locally with the toolchain (was previously remote-only). |
+| Worktree path                          | Slug         | Purpose                                          |
+|----------------------------------------|--------------|--------------------------------------------------|
+| `~/Dev/spirit-caller/brain`            | `brain`      | Main repo (owns `.git/`). Brain pulls main, reviews PRs, builds verifications. |
+| `~/Dev/spirit-caller/decomper`         | `decomper`   | Sibling worktree. Decomper checks out its own `decomper/<scope>` branches without touching brain's working state. |
+| `~/Dev/spirit-caller/scaffolder`       | `scaffolder` | Sibling worktree. Scaffolder checks out its own `scaffolder/<scope>` branches the same way. Added in PR #564 era — scaffolder now runs locally with the toolchain (was previously remote-only). |
 
 Add the sibling worktrees once per machine:
 
 ```
-git worktree add ~/Dev/gx-spirit-caller-decomper main
-git worktree add ~/Dev/gx-spirit-caller-cloud    main
-cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
-   ~/Dev/gx-spirit-caller-decomper/orig/
-cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
-   ~/Dev/gx-spirit-caller-cloud/orig/
+git worktree add ~/Dev/spirit-caller/decomper   main
+git worktree add ~/Dev/spirit-caller/scaffolder main
+cp ~/Dev/spirit-caller/brain/orig/baserom_*.nds \
+   ~/Dev/spirit-caller/decomper/orig/
+cp ~/Dev/spirit-caller/brain/orig/baserom_*.nds \
+   ~/Dev/spirit-caller/scaffolder/orig/
 ```
+
+> Historical notes: this layout replaced the prior flat-sibling layout
+> (`~/Dev/gx-spirit-caller{,-decomper,-cloud}`) in May 2026 — same
+> three-worktree isolation, just rehomed under one parent for tidiness.
+> The `scaffolder` slug was renamed from `cloud` in
+> `brain/rename-cloud-to-scaffolder`. On machines where the on-disk
+> worktree is still named `cloud`, finish the transition with
+> `git worktree move ~/Dev/spirit-caller/cloud ~/Dev/spirit-caller/scaffolder`
+> once no `cloud/*` branches are checked out there. Historical
+> branches on the `cloud/` prefix remain valid in git history.
 
 Each worktree gets its own `orig/baserom_*.nds` (gitignored) and
 its own `build/` directory. The `.git` is shared via worktree
@@ -145,7 +156,7 @@ mechanics, so commits/branches are visible across all three — but
 working-tree state (modified files, untracked files, current
 checkout) is isolated.
 
-When starting a new decomper or cloud session, point it at the
+When starting a new decomper or scaffolder session, point it at the
 corresponding sibling directory instead of the main clone.
 
 #### Mechanism B — Claude Code automatic sandbox worktrees (Windows convention)
@@ -153,18 +164,19 @@ corresponding sibling directory instead of the main clone.
 Claude Code on Windows (or anywhere) automatically creates a
 per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`
 each time an agent session is launched. These provide identical
-isolation to the manual sibling worktrees above — decomper and cloud
-each get their own checkout of their working branch, independent of
-brain's main working state. No manual `git worktree add` needed.
+isolation to the manual sibling worktrees above — decomper and
+scaffolder each get their own checkout of their working branch,
+independent of brain's main working state. No manual
+`git worktree add` needed.
 
 Example layout that appears automatically when both agents are running:
 
 ```
-~/Dev/gx-spirit-caller/
+~/Dev/spirit-caller/brain/   (or wherever the brain checkout lives)
 ├── (brain main checkout — current branch + working state)
 └── .claude/worktrees/
     ├── <auto-name-1>/      ← decomper's session, on decomper/<scope>
-    └── <auto-name-2>/      ← cloud's session,    on cloud/<scope>
+    └── <auto-name-2>/      ← scaffolder's session, on scaffolder/<scope>
 ```
 
 The automatic worktrees share the main checkout's `orig/` baseroms
@@ -187,9 +199,9 @@ Both achieve the same isolation goal. Pick by host convention:
   — pattern in use during the post-SHA1 arc; no manual setup needed.
 
 Brain does not strictly need either mechanism for review/merge work
-on its own — both mechanisms only matter when decomper and cloud run
-in parallel. A brain that's only verifying PRs and merging can work
-from the main checkout alone.
+on its own — both mechanisms only matter when decomper and scaffolder
+run in parallel. A brain that's only verifying PRs and merging can
+work from the main checkout alone.
 
 ### Wine on macOS (post-deprecation)
 
@@ -233,10 +245,12 @@ brain reads it cold to catch up in under a minute.
    job is to make the review/merge decision easy to approve, not to
    outsource the click.
 3. **One branch per task.** Branch name = `<agent-slug>/<kebab-scope>`,
-   e.g. `decomper/ov011-tail-wrappers`, `cloud/tier-delta`,
-   `brain/agents-rename`. One branch, one PR, one concern. (Older
-   branches in history use the pre-rename slugs `claude-pc`,
-   `claude-cloud`, `claude-brain`; those are grandfathered.)
+   e.g. `decomper/ov011-tail-wrappers`, `scaffolder/tier-delta`,
+   `brain/agents-rename`. One branch, one PR, one concern. Older
+   branches in history use earlier slugs (`claude-pc`,
+   `claude-cloud`, `claude-brain` from before the model-agnostic
+   rename; `cloud/*` from before the scaffolder rename); those
+   are grandfathered.
 4. **Stay inside your "Owns" column.** If the task needs a change in
    another agent's territory, either open a PR in that agent's scope
    (as them, not you) or ask cntrl_alt_lenny / the brain to re-partition.
@@ -245,9 +259,9 @@ brain reads it cold to catch up in under a minute.
    OK). Don't force-push. Describe in the PR body: what changed,
    why, any follow-ups.
 
-### Cloud autonomous work
+### Scaffolder autonomous work
 
-`cloud` fills idle time between briefs. Defaults:
+`scaffolder` fills idle time between briefs. Defaults:
 
 - **May open unbriefed:** new scripts in `tools/`, improvements to
   existing analyzer scripts, CI changes, PR reviews via GitHub MCP,
@@ -263,14 +277,17 @@ brain reads it cold to catch up in under a minute.
 
 `<agent-slug>/<kebab-case-scope>` — for example:
 
-  - `cloud/add-gx-headers`
+  - `scaffolder/add-gx-headers`
   - `decomper/ov011-tail-wrappers`
   - `brain/agents-rename`
 
 The slug left of `/` identifies which role owns pushes to that branch.
-No-one else touches it without coordination. Branches from before the
-model-agnostic rename (`claude-brain/*`, `claude-cloud/*`, `claude-pc/*`)
-remain valid in git history and don't need to be renamed.
+No-one else touches it without coordination. Branches from earlier
+slug eras remain valid in git history and don't need to be renamed:
+
+  - `cloud/*` — pre-scaffolder-rename (this session).
+  - `claude-brain/*`, `claude-cloud/*`, `claude-pc/*` — pre-
+    model-agnostic-rename.
 
 ## Pull-request workflow
 
@@ -315,10 +332,10 @@ with the toolchain installed). Responsibilities:
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's cntrl_alt_lenny's call.
 
-`cloud` supports the brain: it writes scaffolding, tools, and headers
-on its own branches, and can review PRs through GitHub MCP integrations,
-but all "does the rebuilt ROM still work?" questions are resolved by
-the brain.
+`scaffolder` supports the brain: it writes scaffolding, tools, and
+headers on its own branches, and can review PRs through GitHub MCP
+integrations, but all "does the rebuilt ROM still work?" questions
+are resolved by the brain.
 
 The role is tied to the repo, not to a specific LLM conversation — any
 fresh local session (Claude Code, Codex CLI, …) that reads this file
@@ -329,7 +346,7 @@ and has the toolchain installed can take over.
 cntrl_alt_lenny says, in plain English, something like:
 
 > *"Add Codex as an agent. It'll generate NitroSDK header declarations
-> under `libs/nitro/include/nitro/`. Move that path off Cloud."*
+> under `libs/nitro/include/nitro/`. Move that path off scaffolder."*
 
 The brain then:
 
@@ -373,15 +390,17 @@ itself:
   `decomper/cross-region-cluster-d3-with-generator`.
 
 - [`docs/briefs/179-patcher-variant-e-2byte-pool-shift.md`](docs/briefs/179-patcher-variant-e-2byte-pool-shift.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher to
-  handle 2-byte (or 1-3 byte) veneer pool shifts at
+  — `scaffolder` (MEDIUM, **NOW ACTIVE**): extend patcher
+  to handle 2-byte (or 1-3 byte) veneer pool shifts at
   low n. Per brief 173's hand-off. Path-2 mechanism
   works at veneer level (verified); only byte-layout
   shift fails SHA1. Variant E closes the layout problem.
   Unblocks brief 180+ path-2 final wave (n=2 → n=0).
   W7 chain extends: 134 → 142 → 146 → 150 → 162 → 164
   → 168 → 179. Critical: 3-region SHA1 PASS preserved.
-  Branch: `cloud/patcher-variant-e-2byte-pool-shift`.
+  Branch: `cloud/patcher-variant-e-2byte-pool-shift`
+  (started under the prior `cloud/` slug; brief 180+
+  uses `scaffolder/` per the rename).
 
 ### Closed briefs (reference)
 

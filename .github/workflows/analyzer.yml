@@ -9,7 +9,7 @@ name: Analyzer
 # progress-heatmap.svg — those require the baserom, which CI never has
 # access to. The tier-coloured heatmap alternative was explicitly
 # parked for a separate PR (see the PR #21 description / brain's
-# Cloud-autonomous-work assignment).
+# Scaffolder-autonomous-work assignment).
 
 on:
   pull_request:

@@ -25,7 +25,7 @@ Usage:
 
 Pinning policy:
 - We pin specific commits, not branch tips, so brief 066 / 068
-  experiments are reproducible across cloud runs.
+  experiments are reproducible across scaffolder runs.
 - When the implementation brief (068) updates the pinned commit,
   re-validate hit-rate numbers — upstream code/layout changes
   can shift fingerprint matches.

@@ -7,7 +7,7 @@ Pins the pure-function pieces — body extraction, substitution
 ordering, skip-reason detection, output-path / delinks-entry
 shape. The end-to-end `port_function` + `sweep_brief_068_csv`
 have a wine + mwccarm + region-bin dependency that isn't
-suitable for CI; cloud verifies those manually pre-push via the
+suitable for CI; scaffolder verifies those manually pre-push via the
 smoke-test on brief 069 wave 1's candidate list (see PR
 description).
 

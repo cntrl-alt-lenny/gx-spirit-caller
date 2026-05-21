@@ -248,7 +248,7 @@ class Cluster:
 # rest had different instruction sequences targeting different kinds of
 # symbols (function vs data) at the same `(offset, kind)` slot.
 #
-# Cloud has no access to the baserom or the toolchain, so it can't
+# Scaffolder has no access to the baserom or the toolchain, so it can't
 # inspect instruction bytes. But it CAN look up the *target* of each
 # reloc — and the target's TYPE (function / data) plus, for data
 # targets, the inferred SIZE BUCKET, are strong shape discriminators

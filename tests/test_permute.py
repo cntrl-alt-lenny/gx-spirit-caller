@@ -406,7 +406,7 @@ class TestStageWorkDir(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Brief 063 — auto-runner mode tests.
 #
-# We can't actually run decomp-permuter from cloud (no toolchain, no
+# We can't actually run decomp-permuter from scaffolder (no toolchain, no
 # baserom, no permuter clone in CI). The tests below cover the
 # wrapper logic — auto-install command shapes, output-dir scanning,
 # subprocess invocation building, byte-match detection, stdout
