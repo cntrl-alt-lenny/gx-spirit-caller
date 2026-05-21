@@ -80,13 +80,19 @@ The patcher consumes mwldarm's `arm9_ov004.bin` (= orig size
      - .init literal pool entries
      - .data function-pointer entries
 
-5. **Re-encode .init ARM BLs.** The 2 ARM BL instructions in
-   `.init` were encoded by mwldarm using a shifted source-VA.
-   After splice, the .init function moves back to orig VA. The
-   BL bytes need re-encoded offsets. For each
-   `kind:arm_call` reloc whose `from` is in .init range, compute
+5. **Re-encode ARM BLs that span the veneer pool.** Any ARM BL
+   whose source-target span CROSSED the veneer pool was encoded
+   by mwldarm using a layout where the target sat `n × 12` bytes
+   right of orig. After splice both source and target snap back
+   to orig VAs but the BL's `imm24` still points `n × 12` bytes
+   too far. For each `kind:arm_call` reloc, compute
    `imm24 = (to - from - 8) >> 2 & 0xffffff` and write back
-   preserving the top 8 cond/opcode bits.
+   preserving the top 8 cond/opcode bits. BLs whose source +
+   target are on the same side of the pool re-encode to the
+   bytes mwldarm already emitted (no-op short-circuit). Brief
+   134 / 142 only covered `.init` BLs (the only crossing case
+   at n=86); brief 168 broadened to all arm_call relocs after
+   n=3 surfaced a `.text` BL that also crossed the pool.
 
 Risk mitigation
 ---------------
@@ -203,11 +209,17 @@ CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR = 12
 # consumed) for each observed shape:
 #   - 12-byte cluster (n=9 NO_TERMINATOR):  24 − 12 = +12
 #   - 16-byte cluster (n=86 WITH_TERMINATOR): 24 − 16 =  +8
-#   - 20-byte cluster (hypothetical mid):    24 − 20 =  +4
+#   - 20-byte cluster (n=3 brief 168 empirical): 24 − 20 = +4
 #   - 28-byte cluster (n=5 brief 164 empirical): 24 − 28 = −4
 # (and so on for any 4-aligned cluster size; the patcher infers
 # from the byte content, not from `n`)
 CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG = -4
+# Brief 168: empirical measurement at n=3 found a 20-byte cluster
+# (4 ctor + 16 zero bytes) between the n=86 WITH_TERMINATOR (16
+# B) and the n=5 WITH_TERMINATOR_LONG (28 B). Walk-forward
+# detector handles it correctly out-of-the-box; named constant
+# documents the observed shape + serves as the n=3 override.
+CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID = 4
 # Brief 142 alias retained so existing tests that pinned the
 # +8 invariant against the historical-max case keep their
 # named-import contract.
@@ -236,19 +248,34 @@ CTOR_PAD_FIX_NET_BYTES = CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR
 #        `.data` start that the patcher now strips by consuming
 #        20 cluster bytes instead of 16).
 #
-# All other low n values (4, 3, 2, 1) are unreached from
-# current source coverage — adding additional ov004 `.rodata`
-# claims didn't drop the veneer count below 5 in brief 162 / 164
-# experiments. The block-level cascade brief 160 hypothesised
-# (9 → 5 → 1) didn't reproduce in practice. Those n values
-# stay on the n=86-or-formula path until empirical samples
-# pin them.
-# Brief 164 empirical n=5 value: cluster is 28 bytes (4 ctor + 24
-# zero pad), fix writes 24, net = -4. Updated from brief 162's
-# +8 once `_fix_ctor_and_pad` learned to detect the 28-byte
-# shape and the geometric SHA1 residual was closed.
+#   n=3: WITH_TERMINATOR_MID (net=4). Captured in brief 168 by
+#        claiming `data_ov004_021e3de8` (a band-1 Pattern 1
+#        chunk that further suppressed mwldarm's veneer emission
+#        from the brief 167 wave's n=5 down to n=3). The cluster
+#        is 20 bytes (4 ctor + 16 zero pad) — between the n=86
+#        WITH_TERMINATOR (16 B) and the n=5 WITH_TERMINATOR_LONG
+#        (28 B). Walk-forward detector handles it correctly;
+#        the override silences brief 150's stderr disagreement
+#        note at n=3 (was: "byte-detected net 4 vs n-inferred
+#        delta 24").
+#
+# All other low n values (4, 2, 1) remain unreached from current
+# source coverage — adding `data_021e3de8` to brief 167's wave
+# 1 dropped n=5 → n=3 (not below). Those n values stay on the
+# n=86-or-formula path until empirical samples pin them.
+#
+# Brief 168 SHA1-PASS context: at n=3 the patcher's geometric
+# splice + ctor/pad fix correctly produces an orig-sized output
+# (268,192 bytes), but a single `.text` ARM BL at va 0x021dbc14
+# (target va 0x021e7e30) ends up with a stale +36-byte offset
+# because mwldarm encoded it for the pre-splice layout where the
+# pool sat between source and target. Brief 168 extends BL
+# re-encoding to cover ANY arm_call reloc (not just `.init`-
+# resident ones) so this case is handled cleanly. See
+# `_reencode_arm_bls` for the broadened scope.
 N_INFERENCE_OVERRIDES: dict[int, int] = {
-    5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,  # = -4
+    5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,  # = -4 (brief 164)
+    3: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,   # = +4 (brief 168)
 }
 
 
@@ -413,7 +440,9 @@ def _fix_ctor_and_pad(
     fix adds. One of:
       - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR` (8) — n=86 shape
       - `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR` (12) — n=9 shape
-      - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG` (4) —
+      - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID` (4) —
+        n=3 boundary shape, added in brief 168
+      - `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG` (-4) —
         n=5 boundary shape, added in brief 164
 
     Brief 146 / 164 shape detection
@@ -438,19 +467,18 @@ def _fix_ctor_and_pad(
     5. Net bytes added = `24 - (fix_end - ctor_file_offset)`
        (positive when cluster < 24, negative when cluster > 24).
 
-    Observed shapes (all 3 reachable from current source coverage):
+    Observed shapes (all 4 reachable from current source coverage):
 
     | shape | bytes | net | example |
     |---|---:|---:|---|
-    | NO_TERMINATOR     | 12 |  +12 | n=9 (current main) |
-    | WITH_TERMINATOR   | 16 |   +8 | n=86 (historical) |
+    | NO_TERMINATOR        | 12 |  +12 | n=9 (current main) |
+    | WITH_TERMINATOR      | 16 |   +8 | n=86 (historical) |
+    | WITH_TERMINATOR_MID  | 20 |   +4 | n=3 (brief 168) |
     | WITH_TERMINATOR_LONG | 28 |  −4 | n=5 (brief 164 / 160) |
 
-    The constants `CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR`,
-    `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR`, and
-    `CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG` are retained as
-    documentation anchors for the three observed nets; the helper
-    no longer keys off them at runtime.
+    The four CTOR_PAD_FIX_NET_BYTES_* constants are retained as
+    documentation anchors for the observed nets; the helper no
+    longer keys off them at runtime.
 
     Walk safety
     -----------
@@ -565,22 +593,66 @@ def _apply_load_rewrites(
     return changed
 
 
-def _reencode_init_bls(
+def _reencode_arm_bls(
     data: bytearray,
     relocs: list[tuple[int, str, int]],
     base_va: int,
-    init_start_va: int,
-    init_end_va: int,
 ) -> int:
-    """Re-encode each ARM BL instruction in .init whose source-VA
-    changed due to the splice. Computes the correct 24-bit signed
-    offset from (from_va, to_va) and writes back preserving the
-    top 8 cond/opcode bits."""
+    """Re-encode each ARM BL instruction whose post-splice offset
+    differs from what mwldarm emitted. Computes the correct
+    24-bit signed offset from (from_va, to_va) and writes back
+    preserving the top 8 cond/opcode bits.
+
+    Brief 134 / 142 (.init scope)
+    ------------------------------
+
+    Brief 134's first patcher targeted only the 2 `kind:arm_call`
+    relocs in `.init` because at the brief 134 baseline (n=86)
+    those were the only BLs whose source-VA changed across the
+    splice. mwldarm encoded them for the post-veneer layout where
+    `.init` sat 86×12 = 1032 bytes RIGHT of orig — after splice
+    `.init` snaps back to orig VA but the BL's `imm24` still
+    points 1032 bytes too high. Re-encoding from `(to_va,
+    from_va)` (both orig VAs per relocs.txt) restores the correct
+    offset.
+
+    Brief 168 (full arm_call scope)
+    --------------------------------
+
+    Brief 167 first reached n=3 by claiming `data_021e3de8` — a
+    Pattern 1 band-1 chunk inside `.rodata`. At n=3 the pool's
+    file offset sits INSIDE `.rodata` at va 0x021e3de8, not at
+    the `.rodata`/`.init` boundary as at n=86. This surfaces a
+    new class of stale BL: a `.text` arm_call at va 0x021dbc14
+    targets a `.rodata`-resident code region at va 0x021e7e30 —
+    the pool sits between source and target, so post-splice the
+    target's file offset shifts LEFT by 36 bytes (3×12) but the
+    BL's `imm24` still points 36 bytes too high.
+
+    The fix broadens the filter: re-encode ANY `kind:arm_call`
+    reloc rather than only `.init`-resident ones. For BLs whose
+    source and target are on the same side of the pool, the
+    computed `new_word` equals the existing bytes (orig
+    encoding is already correct), and the `new_word == current`
+    short-circuit skips them — so the broadening is a strict
+    superset that's free at runtime for the common case.
+
+    Safety
+    ------
+
+    relocs.txt's `kind:arm_call` entries are generated by `dsd
+    delink` from the orig disassembly, so each `from_va` IS an
+    ARM BL instruction in orig and the recomputed encoding
+    matches orig bytes for the no-cross case. The brief 168
+    diagnosis enumerated all 2,019 arm_call relocs at the
+    `data_021e3de8` n=3 reproduction and confirmed exactly 3
+    crossed the pool (2 in `.init`, 1 in `.text`); broadening
+    the scope corrects the third one and leaves the other 2,016
+    bit-identical via the no-op short-circuit.
+    """
     changed = 0
     for from_va, kind, to_va in relocs:
         if kind != "arm_call":
-            continue
-        if not (init_start_va <= from_va < init_end_va):
             continue
         fo = from_va - base_va
         if fo < 0 or fo + 4 > len(data):
@@ -602,6 +674,8 @@ def _reencode_init_bls(
         struct.pack_into("<I", data, fo, new_word)
         changed += 1
     return changed
+
+
 
 
 _SECTION_LINE_RE = re.compile(
@@ -695,8 +769,12 @@ def patch_ov004(
 
     base_va = sections[".text"][0]
     ctor_start_va, ctor_end_va = sections[".ctor"]
-    init_start_va, init_end_va = sections[".init"]
     ctor_file_offset = ctor_start_va - base_va
+    # Brief 168: BL re-encoding (`_reencode_arm_bls`) no longer
+    # filters by `.init` range — it operates on all arm_call
+    # relocs and short-circuits when the offset is already
+    # correct. `sections[".init"]` is still asserted present
+    # below as a structural sanity bound on the section map.
 
     # Quick "already patched" check — no veneer pattern in the
     # binary means we either never had veneers or already spliced.
@@ -774,9 +852,9 @@ def patch_ov004(
         )
 
     load_rewrites = _apply_load_rewrites(fixed, relocs, base_va)
-    bl_reencodes = _reencode_init_bls(
-        fixed, relocs, base_va, init_start_va, init_end_va,
-    )
+    # Brief 168: _reencode_arm_bls covers ALL arm_call BLs (was
+    # `.init`-only prior to 168).
+    bl_reencodes = _reencode_arm_bls(fixed, relocs, base_va)
 
     return fixed, {
         "veneers_spliced": len(veneers),
@@ -989,7 +1067,7 @@ def main() -> int:
         f"spliced {stats['veneers_spliced']} veneers "
         f"({pool_bytes} bytes), "
         f"rewrote {stats['load_rewrites']} load literals, "
-        f"re-encoded {stats['bl_reencodes']} .init ARM BLs"
+        f"re-encoded {stats['bl_reencodes']} ARM BLs"
     )
     if yaml_changed:
         msg += (

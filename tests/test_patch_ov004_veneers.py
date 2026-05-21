@@ -44,6 +44,7 @@ from patch_ov004_veneers import (  # noqa: E402
     CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
+    CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
     HISTORICAL_MAX_VENEER_COUNT,
     N_INFERENCE_OVERRIDES,
     PatchError,
@@ -51,7 +52,7 @@ from patch_ov004_veneers import (  # noqa: E402
     VENEER_SIZE,
     _apply_load_rewrites,
     _fix_ctor_and_pad,
-    _reencode_init_bls,
+    _reencode_arm_bls,
     _scan_veneer_pool,
     _splice_veneer_pool,
     expected_output_delta_for,
@@ -282,9 +283,16 @@ class TestApplyLoadRewrites(unittest.TestCase):
         )
 
 
-class TestReencodeInitBls(unittest.TestCase):
+class TestReencodeArmBls(unittest.TestCase):
     """Verifies ARM BL re-encoding produces the correct 24-bit
-    signed offset for the post-splice source VA."""
+    signed offset for the post-splice source VA.
+
+    Brief 168: filter widened from `.init`-only (brief 134) to
+    ALL `kind:arm_call` relocs. Tests below pin both the
+    happy-path re-encoding AND the no-op short-circuit that
+    prevents the broadened scope from corrupting BLs whose
+    source-target span didn't cross the pool.
+    """
 
     def test_reencodes_bl_in_init(self) -> None:
         # Construct: .init at file 0x100 (base 0x021c9c60).
@@ -293,8 +301,6 @@ class TestReencodeInitBls(unittest.TestCase):
         #                = 0xe934 / 4 = 0x3a4d
         # Built has DIFFERENT (stale) encoding initially.
         base_va = 0x021c9c60
-        init_start_va = 0x021c9d60
-        init_end_va = 0x021c9d90
         from_va = 0x021c9d68
         to_va = 0x021d8640
 
@@ -305,9 +311,7 @@ class TestReencodeInitBls(unittest.TestCase):
         struct.pack_into("<I", data, fo, 0xeb000000 | 0x123456)
         relocs = [(from_va, "arm_call", to_va)]
 
-        n = _reencode_init_bls(
-            data, relocs, base_va, init_start_va, init_end_va,
-        )
+        n = _reencode_arm_bls(data, relocs, base_va)
         self.assertEqual(n, 1)
 
         # Verify the encoded offset round-trips.
@@ -320,24 +324,85 @@ class TestReencodeInitBls(unittest.TestCase):
         recovered_target = from_va + 8 + (imm24 << 2)
         self.assertEqual(recovered_target, to_va)
 
-    def test_skips_bls_outside_init(self) -> None:
-        base_va = 0x021c9c60
-        init_start_va = 0x021c9d60
-        init_end_va = 0x021c9d90
-        # BL OUTSIDE .init (in .text) — should not be re-encoded.
-        from_va = 0x021c9c80  # before .init
-        to_va = 0x02000000
+    def test_reencodes_bl_outside_init_when_stale(self) -> None:
+        # Brief 168: a `.text` BL whose post-splice offset differs
+        # from the stale mwldarm-emitted bytes MUST be re-encoded.
+        # Prior to brief 168, only `.init`-resident BLs were
+        # touched and this test case would have silently left
+        # the stale bytes in place — breaking SHA1 at n=3.
+        #
+        # Models the real brief 168 reproducer: BL at
+        # 0x021dbc14 (in .text) targeting 0x021e7e30 (also in
+        # .rodata/.text) — mwldarm encoded with imm24=0x308e
+        # (target +36 bytes too high because the n=3 pool sat
+        # between source and target). Brief 168 expects the
+        # patcher to re-encode to imm24=0x3085.
+        base_va = 0x021c9d60
+        from_va = 0x021dbc14
+        to_va = 0x021e7e30
+
+        data = bytearray(0x40000)
+        fo = from_va - base_va  # 0x11eb4
+        # Plant the STALE encoding mwldarm emitted: target +36.
+        struct.pack_into("<I", data, fo, 0xeb003085 | 9)  # 0xeb00308e
+        relocs = [(from_va, "arm_call", to_va)]
+
+        n = _reencode_arm_bls(data, relocs, base_va)
+        self.assertEqual(
+            n, 1,
+            "brief 168: .text arm_call should be re-encoded "
+            "even though it's outside .init",
+        )
+        new_word = struct.unpack_from("<I", data, fo)[0]
+        # imm24 = (0x021e7e30 - 0x021dbc14 - 8) >> 2
+        #       = (0xc214) >> 2 = 0x3085
+        self.assertEqual(new_word, 0xeb003085)
+
+    def test_no_op_when_bl_already_correct(self) -> None:
+        # Brief 168: BLs whose source + target are on the same
+        # side of the pool (the vast majority of arm_call relocs)
+        # have orig-correct bytes; re-encoding should be a no-op
+        # via the `new_word == current` short-circuit.
+        base_va = 0x021c9d60
+        from_va = 0x021c9d80
+        to_va = 0x021c9e00
+        # Correct imm24 = (0x021c9e00 - 0x021c9d80 - 8) >> 2
+        #               = 0x78 >> 2 = 0x1e
+        correct_word = 0xeb00001e
 
         data = bytearray(0x200)
         fo = from_va - base_va
-        original_word = 0xeb000000 | 0x123456
-        struct.pack_into("<I", data, fo, original_word)
+        struct.pack_into("<I", data, fo, correct_word)
         relocs = [(from_va, "arm_call", to_va)]
 
-        n = _reencode_init_bls(
-            data, relocs, base_va, init_start_va, init_end_va,
+        n = _reencode_arm_bls(data, relocs, base_va)
+        self.assertEqual(
+            n, 0,
+            "BL already correctly encoded → re-encoder is a no-op",
         )
+        # Bytes unchanged.
+        self.assertEqual(
+            struct.unpack_from("<I", data, fo)[0], correct_word,
+        )
+
+    def test_skips_non_arm_call_relocs(self) -> None:
+        # Other reloc kinds (load, thumb_call, etc.) are out of
+        # scope for the BL re-encoder.
+        base_va = 0x021c9d60
+        from_va = 0x021c9d80
+
+        data = bytearray(0x200)
+        fo = from_va - base_va
+        original_word = 0x12345678
+        struct.pack_into("<I", data, fo, original_word)
+        relocs = [
+            (from_va, "load", 0x021d0000),
+            (from_va + 4, "thumb_call", 0x021d1000),
+        ]
+
+        n = _reencode_arm_bls(data, relocs, base_va)
         self.assertEqual(n, 0)
+        # The load/thumb_call positions weren't touched.
         self.assertEqual(
             struct.unpack_from("<I", data, fo)[0], original_word,
         )
@@ -671,8 +736,13 @@ def _build_synth_ov004(
 
     Brief 164: a THIRD cluster shape — 28 bytes long — observed
     empirically at n=5 (`[ctor(4) | WRITEW(0)(4) | pad(8) | 12
-    extra zero bytes]`). To pin all three paths independently of
-    the empirical guess, `terminator` is now a three-way knob:
+    extra zero bytes]`).
+
+    Brief 168: a FOURTH cluster shape — 20 bytes long — observed
+    empirically at n=3 (`[ctor(4) | WRITEW(0)(4) | pad(8) | 4
+    extra zero bytes]`). Lives between the n=86 WITH (16 B) and
+    the n=5 WITH_LONG (28 B) shapes. `terminator` is now a
+    four-way knob:
 
       - `terminator=None` (default): use brief 146's empirical
         default (`True` when n == 86, `False` otherwise).
@@ -680,6 +750,8 @@ def _build_synth_ov004(
         Use to pin the brief 147 / 150 low-n path.
       - `terminator=False`: force NO_TERMINATOR (12-byte cluster).
         Use to pin the brief 146 n=9 path.
+      - `terminator="mid"`: force WITH_TERMINATOR_MID (20-byte
+        cluster, brief 168). Use to pin the brief 168 n=3 path.
       - `terminator="long"`: force WITH_TERMINATOR_LONG (28-byte
         cluster, brief 164). Use to pin the brief 160 / 164 n=5
         path.
@@ -693,6 +765,8 @@ def _build_synth_ov004(
                                    [ctor(4) | WRITEW(0)(4) | pad(8)]
                                  NO terminator         → 12 bytes
                                    [ctor(4) | pad(8)]
+                                 WITH terminator MID   → 20 bytes
+                                   [ctor(4) | WRITEW(0)(4) | pad(8) | 4 zeros]
                                  WITH terminator LONG  → 28 bytes
                                    [ctor(4) | WRITEW(0)(4) | pad(8) | 12 zeros]
         [ctor_end..ctor_end+4) `.data` head (non-zero — "LZNC")
@@ -722,6 +796,14 @@ def _build_synth_ov004(
         ctor_pad = (
             _SYNTH_CTOR_ENTRY + _SYNTH_WRITEW0 + _SYNTH_PAD_8
             + b"\x00" * 12
+        )
+    elif terminator == "mid":
+        # Brief 168: WITH terminator + 4 extra zero bytes → 20-byte
+        # cluster. Matches the empirical n=3 shape (between the
+        # n=86 WITH 16 B and the n=5 WITH_LONG 28 B).
+        ctor_pad = (
+            _SYNTH_CTOR_ENTRY + _SYNTH_WRITEW0 + _SYNTH_PAD_8
+            + b"\x00" * 4
         )
     elif terminator:
         # WITH terminator → 16-byte cluster.
@@ -1202,17 +1284,35 @@ class TestNInferenceOverridesContract(unittest.TestCase):
             CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
         )
 
+    def test_table_contains_n3_with_terminator_mid(self):
+        # Brief 168's empirical anchor: n=3 →
+        # WITH_TERMINATOR_MID (ctor_pad_net=+4). Captured by
+        # stacking `data_021e3de8` on top of brief 167's wave-1
+        # claims — the additional band-1 chunk dropped
+        # mwldarm's veneer count from the wave's n=5 down to
+        # n=3. The 20-byte cluster mwldarm emits at n=3 sits
+        # between the n=86 WITH_TERMINATOR (16 B) and the n=5
+        # WITH_TERMINATOR_LONG (28 B); the fix writes 24 →
+        # net = +4.
+        self.assertIn(3, N_INFERENCE_OVERRIDES)
+        self.assertEqual(
+            N_INFERENCE_OVERRIDES[3],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
+        )
+
     def test_table_entries_are_valid_ctor_pad_net_values(self):
-        # Every entry must be one of the three known
+        # Every entry must be one of the four known
         # ctor_pad_net values: +8 (WITH_TERMINATOR), +12
-        # (NO_TERMINATOR), or -4 (WITH_TERMINATOR_LONG). Other
-        # values would mean a new ctor/pad shape was discovered,
-        # which is brief-level new news + would require updating
+        # (NO_TERMINATOR), +4 (WITH_TERMINATOR_MID, brief 168),
+        # or -4 (WITH_TERMINATOR_LONG, brief 164). Other values
+        # would mean a new ctor/pad shape was discovered, which
+        # is brief-level new news + would require updating
         # `_fix_ctor_and_pad` to detect it before any override
         # consumed it.
         valid = {
             CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR,
             CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
             CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
         }
         for n, net in N_INFERENCE_OVERRIDES.items():
@@ -1391,6 +1491,181 @@ class TestPatcherOutputMatchesOrigAtN5(unittest.TestCase):
         self.assertEqual(
             stats["ctor_pad_net"],
             CTOR_PAD_FIX_NET_BYTES_NO_TERMINATOR,
+        )
+
+
+# ---------------------------------------------------------------------- #
+# Brief 168: n=3 walk-forward cluster + broadened arm_call re-encoding.
+# Pin the new 20-byte WITH_TERMINATOR_MID shape end-to-end + assert the
+# patcher re-encodes `.text` arm_call BLs that span the veneer pool.
+# ---------------------------------------------------------------------- #
+
+
+class TestN3SilencesDisagreementNote(unittest.TestCase):
+    """Brief 168 success criterion: the brief 150 stderr
+    disagreement note must NOT fire at n=3 with the empirically-
+    observed WITH_TERMINATOR_MID cluster (20 bytes). Mirrors
+    brief 164's n=5 silencer test for the new n=3 override."""
+
+    def test_no_stderr_note_at_n_3_with_terminator_mid(self):
+        import contextlib
+        import io
+        from patch_ov004_veneers import patch_ov004
+
+        data, sections = _build_synth_ov004(3, terminator="mid")
+        captured = io.StringIO()
+        with contextlib.redirect_stderr(captured):
+            patched, stats = patch_ov004(data, [], sections)
+        self.assertEqual(stats["veneers_spliced"], 3)
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
+        )
+        err = captured.getvalue()
+        self.assertNotIn(
+            "shape disagrees with n-inference", err,
+            f"brief 150 disagreement note fired at n=3 — brief 168 "
+            f"override should have silenced it. stderr: {err!r}",
+        )
+        self.assertNotIn("brief 150", err)
+
+
+class TestPatcherOutputMatchesOrigAtN3(unittest.TestCase):
+    """Brief 168 success gate. The patcher applied to a synthetic
+    n=3 WITH_TERMINATOR_MID input must produce output that is
+    byte-identical to `_build_orig_synth_ov004()` — the same
+    contract brief 146 / 164 pinned for n=86, n=9, and n=5."""
+
+    def test_orig_match_at_n_3_with_terminator_mid(self):
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(3, terminator="mid")
+        patched, stats = patch_ov004(data, [], sections)
+        orig = _build_orig_synth_ov004()
+        self.assertEqual(
+            len(patched), len(orig),
+            f"n=3 WITH_TERMINATOR_MID output size {len(patched)} "
+            f"!= orig {len(orig)}",
+        )
+        self.assertEqual(
+            bytes(patched), orig,
+            "n=3 WITH_TERMINATOR_MID output not byte-identical "
+            "to orig — brief 168's SHA1-residual fix regressed",
+        )
+        # Stats sanity: detected the 20-byte cluster shape.
+        self.assertEqual(
+            stats["ctor_pad_net"],
+            CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
+        )
+
+    def test_walk_forward_detects_n3_mid_shape(self):
+        # Walk-forward should stop at offset 20 (4 ctor + 16 zero
+        # bytes) → ctor_pad_net = +4 = WITH_TERMINATOR_MID.
+        from patch_ov004_veneers import _fix_ctor_and_pad
+        data, _sections = _build_synth_ov004(3, terminator="mid")
+        # After splice the pool is gone; ctor lives at file offset
+        # 0x1000 (= ctor_va - base_va) in the spliced data.
+        spliced = (
+            bytearray(data[:_SYNTH_TEXT_LEN])
+            + bytearray(data[_SYNTH_TEXT_LEN + 3 * VENEER_SIZE:])
+        )
+        _fixed, net = _fix_ctor_and_pad(spliced, _SYNTH_TEXT_LEN)
+        self.assertEqual(net, CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID)
+
+
+class TestArmCallReencodingSpansPool(unittest.TestCase):
+    """Brief 168: ANY `kind:arm_call` reloc whose source-target
+    span crosses the veneer pool must be re-encoded post-splice.
+    Prior to brief 168 only `.init`-resident arm_calls were
+    covered; the n=3 reproducer surfaced a `.text` BL at va
+    0x021dbc14 → 0x021e7e30 with the pool sitting between source
+    and target — that BL was the sole remaining byte-diff vs
+    orig.
+
+    These tests model the production layout end-to-end against a
+    synthetic n=3 fixture: plant a `.text` BL with mwldarm's
+    stale post-veneer encoding, then verify the patcher rewrites
+    it to the orig-correct encoding."""
+
+    def test_text_bl_spanning_pool_gets_reencoded(self):
+        # Mirror the real brief 168 reproducer geometry. The
+        # synth fixture has `.text` at [base_va, base_va + 0x1000)
+        # and the pool right after at file [0x1000, 0x1000+n*12).
+        # Plant a BL at .text offset 0x100 targeting a VA that
+        # lives PAST the pool in the orig (post-splice) layout.
+        from patch_ov004_veneers import patch_ov004
+        n = 3
+        data, sections = _build_synth_ov004(n, terminator="mid")
+        base_va = sections[".text"][0]
+        # Source BL: a .text address; target: a VA in .data
+        # (which sits after the cluster in orig layout). Both
+        # are real orig VAs per relocs.txt convention.
+        bl_source_va = base_va + 0x100
+        bl_target_va = sections[".data"][0]
+        # mwldarm encoded the BL in the PRE-splice layout where
+        # the target sat `n * VENEER_SIZE` bytes RIGHT of orig.
+        # So the stale `imm24` reflects an offset that's `n * 12`
+        # bytes too high vs the orig-truth `(to - from - 8) >> 2`.
+        stale_offset = (
+            bl_target_va + n * VENEER_SIZE - bl_source_va - 8
+        )
+        stale_imm24 = (stale_offset >> 2) & 0xffffff
+        stale_word = 0xeb000000 | stale_imm24
+        # Patch the synth data to plant the stale BL bytes (the
+        # fixture defaults to 0xAA filler in .text).
+        data_mut = bytearray(data)
+        bl_fo = bl_source_va - base_va
+        struct.pack_into("<I", data_mut, bl_fo, stale_word)
+        # Hand the patcher the matching reloc — relocs.txt
+        # always uses orig VAs.
+        relocs = [(bl_source_va, "arm_call", bl_target_va)]
+
+        patched, stats = patch_ov004(bytes(data_mut), relocs, sections)
+        self.assertEqual(stats["veneers_spliced"], n)
+        self.assertEqual(stats["bl_reencodes"], 1)
+        # After patch the .text BL bytes should match the
+        # orig-truth encoding — NOT the stale mwldarm-emitted
+        # bytes. Recompute the expected encoding from orig VAs.
+        expected_offset = bl_target_va - bl_source_va - 8
+        expected_imm24 = (expected_offset >> 2) & 0xffffff
+        expected_word = 0xeb000000 | expected_imm24
+        actual_word = struct.unpack_from("<I", patched, bl_fo)[0]
+        self.assertEqual(
+            actual_word, expected_word,
+            f"brief 168: .text arm_call BL at 0x{bl_source_va:08x} "
+            f"not re-encoded post-splice. "
+            f"got=0x{actual_word:08x} stale=0x{stale_word:08x} "
+            f"expected=0x{expected_word:08x}",
+        )
+
+    def test_text_bl_not_spanning_pool_is_unchanged(self):
+        # Counter-case: a `.text` BL whose target ALSO sits in
+        # `.text` (BEFORE the pool) doesn't have a stale offset
+        # — mwldarm encoded it for orig-truth because the
+        # source-target span doesn't include the pool. The
+        # patcher's `new_word == current` short-circuit must
+        # leave it bit-identical.
+        from patch_ov004_veneers import patch_ov004
+        n = 3
+        data, sections = _build_synth_ov004(n, terminator="mid")
+        base_va = sections[".text"][0]
+        bl_source_va = base_va + 0x200
+        bl_target_va = base_va + 0x300  # also in .text, no span
+        correct_offset = bl_target_va - bl_source_va - 8
+        correct_imm24 = (correct_offset >> 2) & 0xffffff
+        correct_word = 0xeb000000 | correct_imm24
+        data_mut = bytearray(data)
+        bl_fo = bl_source_va - base_va
+        struct.pack_into("<I", data_mut, bl_fo, correct_word)
+        relocs = [(bl_source_va, "arm_call", bl_target_va)]
+
+        patched, stats = patch_ov004(bytes(data_mut), relocs, sections)
+        # No re-encoding needed → no_op short-circuit kicks in.
+        self.assertEqual(stats["bl_reencodes"], 0)
+        actual_word = struct.unpack_from("<I", patched, bl_fo)[0]
+        self.assertEqual(
+            actual_word, correct_word,
+            "intra-.text BL with no pool-spanning offset should "
+            "be left bit-identical post-patch",
         )
 
 
