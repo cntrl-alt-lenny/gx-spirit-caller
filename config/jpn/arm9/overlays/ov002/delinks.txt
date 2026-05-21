@@ -464,3 +464,27 @@ src/jpn/overlay002/data/data_ov002_022ccf50.c:
 src/jpn/overlay002/data/data_ov002_022cc400.c:
     complete
     .data start:0x022cc400 end:0x022cc404
+
+src/jpn/overlay002/data/data_ov002_022ca8bc.s:
+    complete
+    .data start:0x022ca8bc end:0x022cabbc
+
+src/jpn/overlay002/data/data_ov002_022cabc0.s:
+    complete
+    .data start:0x022cabc0 end:0x022cac34
+
+src/jpn/overlay002/data/data_ov002_022cac38.s:
+    complete
+    .data start:0x022cac38 end:0x022cb8a8
+
+src/jpn/overlay002/data/data_ov002_022ccc30.s:
+    complete
+    .data start:0x022ccc30 end:0x022ccee4
+
+src/jpn/overlay002/data/data_ov002_022ccee4.s:
+    complete
+    .data start:0x022ccee4 end:0x022ccef8
+
+src/jpn/overlay002/data/data_ov002_022ccf9c.s:
+    complete
+    .data start:0x022ccf9c end:0x022cd220
