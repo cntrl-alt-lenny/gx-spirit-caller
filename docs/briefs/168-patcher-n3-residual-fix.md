@@ -19,10 +19,8 @@ Findings:
   from 5 → 3 (3 veneer-target loads at offsets +0xe8 /
   +0x168 / +0x174 inside the claim's size 0x178).
 - **Patcher broke SHA1 at n=3** with brief 162's stderr
-  note:
-  ```
-  byte-detected net 4 (delta 32) vs n-inferred delta 24
-  ```
+  note: `byte-detected net 4 (delta 32) vs n-inferred
+  delta 24`.
 - Claim reverted; brief 168+ flagged to extend coverage.
 
 The brief 162's `N_INFERENCE_OVERRIDES` dict only covers
