@@ -23,7 +23,6 @@ sys.path.insert(0, str(_TOOLS))
 
 from analyze_symbols import Symbol  # noqa: E402
 from cross_region_chunk_extent import (  # noqa: E402
-    AdjustedExtent,
     ChunkExtentError,
     adjust_chunk_extent,
 )
