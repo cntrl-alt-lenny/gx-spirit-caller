@@ -3306,3 +3306,7 @@ src/jpn/main/data/data_02102604.c:
 src/jpn/main/data/data_0210261c.c:
     complete
     .data start:0x0210261c end:0x02102620
+
+src/jpn/main/data/data_020ff828.c:
+    complete
+    .data start:0x020ff828 end:0x020ff834
