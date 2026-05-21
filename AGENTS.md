@@ -362,28 +362,50 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](docs/briefs/167-ov004-rodata-path-2-scale-up.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): first scale-up wave
-  of path-2 ov004 `.rodata` source claims. Brief 164
-  unblocked SHA1 at n=5. Pick 5-10 slots spread across
-  visibly-distinct address ranges in brief 159's reverse-
-  lookup tool output; per-slot SHA1 round-trip; observe
-  veneer count progression. **Bonus**: at least one claim
-  dropping below n=5 validates multi-block cascade
-  hypothesis. Critical: 3-region SHA1 PASS preserved on all
-  kept claims. Branch: `decomper/ov004-rodata-path-2-scale-up`.
+- [`docs/briefs/169-cross-region-cluster-a-apply.md`](docs/briefs/169-cross-region-cluster-a-apply.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): port 1,443 EUR
+  cluster A `.bss` claims to USA + JPN. Highest-leverage
+  cross-region wave on backlog (~2,886 region-matches one
+  pass). Brief 116 region-config precedent applies.
+  Cluster A is structural zero-fill — no per-region byte
+  differences expected. Target ≥ 1,000 per region.
+  Critical: 3-region SHA1 PASS preserved (EUR baseline +
+  USA + JPN new). Branch:
+  `decomper/cross-region-cluster-a-apply`.
 
-- [`docs/briefs/166-pattern3-generator-local-label-fix.md`](docs/briefs/166-pattern3-generator-local-label-fix.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): Pattern 3 generator
-  emit raw hex literal for `kind:label(arm)` cross-TU
-  references instead of `.word .L_*` (mwasmarm rejects —
-  local labels file-scoped). Closes brief 163's generator
-  gap. 1-2 regression tests + optional regeneration of
-  `data_020c7b44.s` (verify byte-identical to manual
-  patch). Critical: 3-region SHA1 PASS preserved. Branch:
-  `cloud/pattern3-generator-local-label-fix`.
+- [`docs/briefs/168-patcher-n3-residual-fix.md`](docs/briefs/168-patcher-n3-residual-fix.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher
+  coverage to n=3 (and likely n=4, 2, 1). Brief 167
+  reached n=3 for first time; `N_INFERENCE_OVERRIDES`
+  doesn't cover. Same brief 164 walk-forward methodology:
+  diagnose cluster shape at n=3, extend override table
+  (or detector). Opportunistic n=4/2/1 sampling. Tests pin
+  n=3 SHA1-PASSING. W7 chain extends 134 → 142 → 146 →
+  150 → 162 → 164 → 168. Critical: 3-region SHA1 PASS
+  preserved. Branch: `cloud/patcher-n3-residual-fix`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](docs/briefs/167-ov004-rodata-path-2-scale-up.md)
+  `decomper`, shipped in PR #602. 🔑 **First production
+  wave of brief 164's walk-forward detector.** 6 path-2
+  claims kept at n=5; 4,464 bytes; 3-region SHA1 PASS.
+  **🎉 Sub-5 state CONFIRMED REACHABLE**:
+  `data_ov004_021e3de8` drops n=5 → n=3 (validates brief
+  160's multi-block cascade end-to-end). Patcher broke at
+  n=3; claim reverted; brief 168 closes. 9-veneer baseline
+  target enumeration captured. Band-1 confirmed as only
+  sub-5 path. Both self-extend gates met (86% yield +
+  4,464 B); further sub-5 work gated on brief 168.
+- [`docs/briefs/166-pattern3-generator-local-label-fix.md`](docs/briefs/166-pattern3-generator-local-label-fix.md)
+  `cloud`, shipped in PR #601. Pattern 3 generator emits
+  raw hex literals for `kind:label(*)` refs; no `.extern`.
+  `_word_directive_for_target` helper centralises the
+  label-vs-named branch. `sym_by_addr` upgraded to carry
+  kind. Part 3 cross-verified: regen'd
+  `data_020c7b44.s` byte-functionally-identical to
+  manual patch (cosmetic whitespace only); kept hand-
+  patched file. 2 new tests; suite 1838/1838.
 
 - [`docs/briefs/165-main-30kb-mega-array.md`](docs/briefs/165-main-30kb-mega-array.md)
   `decomper`, shipped in PR #598. 🎉 **Biggest single

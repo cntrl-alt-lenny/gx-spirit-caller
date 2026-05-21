@@ -8,17 +8,19 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-20 evening, post-#598 + #599 merge,
-briefs 166 + 167 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
+**Last updated:** 2026-05-21 morning, post-#601 + #602 merge,
+briefs 168 + 169 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
 PASSES** across all 3 regions (brief 140, PR #558) and
-continues to hold after 13 post-SHA1 rounds. **🎉 30 KB
-main `.rodata` mega shipped** (`data_020b6ec4` — biggest
-deferred Pattern 1 candidate since brief 130, single
-chunk). **🔑 n=5 SHA1 residual CLOSED** via brief 164's
-**walk-forward cluster detector** — handles 3 observed
-mwldarm shapes (12/16/28-byte clusters);
-**path-2 NOW UNBLOCKED**. W7 patcher chain: 134 → 142 →
-146 → 150 → 162 → **164**.
+continues to hold after 14 post-SHA1 rounds. **🎉 First
+path-2 production wave shipped** (brief 167): 6 ov004
+`.rodata` claims at n=5; 4,464 bytes matched.
+**🎉 Sub-5 state CONFIRMED REACHABLE** — `data_ov004_021e3de8`
+demonstrably drops n=5 → n=3 (validates brief 160's
+multi-block cascade hypothesis end-to-end). n=3 broke SHA1
+on the new patcher boundary; brief 168 (cloud, queued)
+closes it via same brief 164 walk-forward methodology. W7
+patcher chain: 134 → 142 → 146 → 150 → 162 → 164 → **168
+queued**.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -59,38 +61,37 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **PR #598 — decomper / brief 165 30 KB main mega.** 🎉
-  **Biggest single deferred Pattern 1 candidate shipped.**
-  `data_020b6ec4` — 30,720 B (30.0 KB exact, 0x7800) in
-  main `.rodata`, single chunk via Pattern 3 generator.
-  Brief 159 Part 1 `--section auto` detected `.rodata`
-  correctly. 2 externs emitted cleanly. No `.L_*` refs
-  (brief 163 gap not exercised). No subsumed-placeholder
-  collisions. Tooling stack proved fully turnkey on biggest
-  single mega. **3-region SHA1 PASS + 27/27 OK preserved.**
-  Deferred-mega residue drops from 2 to 1 (only
-  `data_020c9694` 14.8 KB D-3 mega remains).
-- **PR #599 — cloud / brief 164 walk-forward cluster
-  detector.** 🔑 **n=5 SHA1 residual CLOSED — path-2
-  unblocked.** Diagnosis: mwldarm at n=5 emits a 28-byte
-  cluster (`WITH_TERMINATOR_LONG` shape) — `[ctor(4) |
-  WRITEW(0)(4) | pad(8) | 12 zero bytes]` — larger than
-  brief 146's 16-byte WITH_TERMINATOR. Brief 146's per-shape
-  `if/else` couldn't distinguish (bytes 12-15 zero in both),
-  consumed 16 bytes wrote 24 → +8 net but left 12 stray
-  zeros before `.data`. **Fix**: replaced per-shape detector
-  with **generic walk-forward "first non-zero word"
-  finder** — generalises across all 3 observed shapes (12 B
-  NO_TERMINATOR, 16 B WITH_TERMINATOR, 28 B
-  WITH_TERMINATOR_LONG). Walk caps at 16 words / 64 B
-  before `PatchError`. Constants + override updated:
-  `N_INFERENCE_OVERRIDES[5]` = -4 (was +8 from brief 162).
-  **Verification end-to-end**: claim `data_ov004_021f4a40`
-  → 3-region SHA1 PASS at n=5; revert → 3-region SHA1 PASS
-  at n=9 (idempotent). Source claim reverted before commit
-  per non-scope. 4 new tests across 2 classes; suite
-  1832 → 1836. W7 patcher chain: 134 → 142 → 146 → 150 →
-  162 → **164**.
+- **PR #602 — decomper / brief 167 path-2 scale-up wave 1.**
+  🔑 **First production wave of brief 164's walk-forward
+  cluster detector.** 6 path-2 source claims kept on ov004
+  `.rodata` at n=5; 4,464 bytes matched; 3-region SHA1 PASS.
+  **🎉 Sub-5 state CONFIRMED REACHABLE**:
+  `data_ov004_021e3de8` (band-1 slot with 3 veneer-target
+  loads) dropped n from 5 → 3 — **first observed sub-5
+  state** since brief 160 hypothesised the block-level
+  cascade. Patcher broke SHA1 at n=3
+  (`N_INFERENCE_OVERRIDES = {5: 8}` doesn't cover n=3);
+  brief 168 (queued) extends coverage via same brief 164
+  walk-forward methodology. Captured 9-veneer baseline
+  target enumeration for brief 168+ tooling. Band-1 confirmed
+  as only path to sub-5 (per brief 167 finding #5). Self-
+  extend both gates met (86% yield + 4,464 B); further sub-
+  5 claims gated on brief 168 patcher extension.
+- **PR #601 — cloud / brief 166 generator label-kind fix.**
+  Pattern 3 generator emits raw hex literals (`.word
+  0xADDR`) for `kind:label(*)` cross-TU references; no
+  `.extern` declaration. Closes brief 163's manual-patch
+  gap on `data_020c7b44`. `_word_directive_for_target`
+  helper centralises the label-vs-named branch.
+  `sym_by_addr` upgraded from `dict[int, str]` to
+  `dict[int, tuple[str, str]]` (name + kind). 2 new tests;
+  suite 1836 → 1838. **Part 3 cross-verification**:
+  regenerated brief 163's chunk and confirmed
+  byte-functionally-identical to decomper's manual patch
+  (only diff: trailing whitespace pre-existing pattern) —
+  kept the hand-patched file to avoid cosmetic-churn
+  commit. 3-region SHA1 PASS preserved (generator change
+  is build-graph-invariant when no chunks regenerated).
 
 - **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
   **28 source-level claims** (40% over ≥ 20 target). Per-shape:
@@ -157,28 +158,27 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (path-2 scale-up):**
+**Decomper — one HIGH brief queued (cross-region cluster A apply):**
 
-- **Brief 167 (HIGH, NEW)** — `decomper/ov004-rodata-path-2-scale-up`.
-  First scale-up wave of path-2 ov004 `.rodata` source
-  claims now that brief 164 closed the n=5 SHA1 residual.
-  Tests block-level multi-block cascade hypothesis: does
-  claiming slots in distinct veneer blocks drop n below 5?
-  Pick 5-10 slots spread across visibly-distinct address
-  ranges; per-slot SHA1 round-trip; observe veneer count.
-  Target: ≥ 5 kept claims with at least one drop below
-  n=5.
+- **Brief 169 (HIGH, NEW)** — `decomper/cross-region-cluster-a-apply`.
+  Highest-leverage cross-region wave on the backlog: port
+  the 1,443 EUR cluster A `.bss` claims to USA + JPN.
+  ~2,886 region-matches in one pass. Brief 116's region-
+  config plumbing precedent applies. Cluster A is
+  structural zero-fill (no per-region byte differences
+  expected). Target ≥ 1,000 cross-region claims per region.
 
-**Cloud — one MEDIUM brief queued (generator polish):**
+**Cloud — one MEDIUM brief queued (patcher n=3 extension):**
 
-- **Brief 166 (MEDIUM, NEW)** — `cloud/pattern3-generator-local-label-fix`.
-  Pattern 3 generator emit raw hex literal for `kind:label(arm)`
-  cross-TU references instead of `.word .L_*` (which mwasmarm
-  rejects — local labels are file-scoped). Closes brief 163's
-  generator gap that decomper manually patched on the 4.9 KB
-  `data_020c7b44` mega. 1-2 regression tests + optional
-  regeneration of `data_020c7b44.s` (verify byte-identical to
-  manual patch).
+- **Brief 168 (MEDIUM, NEW)** — `cloud/patcher-n3-residual-fix`.
+  Extend patcher low-n coverage to n=3 (and likely n=4, 2,
+  1). Brief 167 reached n=3 for the first time via
+  `data_ov004_021e3de8`; patcher broke SHA1 because
+  `N_INFERENCE_OVERRIDES = {5: 8}` doesn't cover n=3. Same
+  brief 164 walk-forward methodology applies. Opportunistic
+  n=4/2/1 sampling if reachable from band-1 claims.
+  Unblocks brief 170+ path-2 scale-up wave 2. W7 chain:
+  134 → 142 → 146 → 150 → 162 → 164 → 168.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
@@ -250,34 +250,29 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 167 PR** when it opens.
+1. **Verify + merge decomper brief 169 PR** when it opens.
    Gate: 3-region `ninja sha1` PASS + 3-region 27/27 modules
-   OK on all kept claims. ≥ 5 kept ov004 `.rodata` claims;
-   per-slot report documenting veneer-count progression.
-   Watch the **bonus** signal: did at least one claim drop
-   veneer count below n=5? Outcome guides brief 169+ shape.
-2. **Verify + merge cloud brief 166 PR** when it opens.
-   Gate: 3-region SHA1 PASS preserved + new tests pin label-
-   kind emission behaviour. If Part 3 regenerates
-   `data_020c7b44.s`, confirm byte-identical to decomper's
-   manual patch.
-3. **Scope brief 168+ candidates (queue after 166 + 167):**
-   - **If brief 167 drops n below 5**: brief 169 = brain
-     analyses block boundaries; brief 170 = decomper scale-
-     up wave 2 targeting more distinct blocks.
-   - **If brief 167 stays at n=5**: brief 169 = brain
-     analyses why (consider path-1 cautious reclassification
-     alternative).
-   - **Cluster D-3 hard residue** (`data_020c9694` 14.8 KB +
-     `data_020e0e70` 366 B non-4-aligned) — small cleanup
-     wave.
-   - **Cross-region cluster A apply** — port 1443 EUR
-     cluster A symbols to USA + JPN.
+   OK. ≥ 1,000 cross-region cluster A claims per region (USA
+   + JPN). Watch the EUR baseline — must remain bit-identical
+   (no regressions from any region-neutral source TU edits).
+2. **Verify + merge cloud brief 168 PR** when it opens.
+   Gate: 3-region SHA1 PASS preserved (current main n=9 +
+   manual injection test at n=3). New regression test pins
+   n=3 SHA1-PASSING behaviour. Watch for bonus low-n samples
+   (n=4, 2, 1) if reachable from band-1 cascade.
+3. **Scope brief 170+ candidates (queue after 168 + 169):**
+   - **After brief 168 lands**: brief 170 = path-2 scale-up
+     wave 2 at n=3 (decomper). Brief 167's band-1 enumeration
+     is the candidate list.
+   - **Cross-region cluster B / D-3 apply** — port the
+     cluster B (~231) + cluster D-3 (~31) claims to USA +
+     JPN. Similar leverage as brief 169.
+   - **Cluster D-3 hard residue** (14.8 KB mega + 366 B
+     non-aligned) — small cleanup.
    - **3 cluster B value=0 deferred candidates** — wave-2
      TU rewrite.
-   - **Odd-aligned ov004 `.rodata` slot recipe** (brief 160
-     finding #4) — separate cautious decomper brief if
-     scale-up surfaces odd-aligned high-ref slots.
+   - **Odd-aligned ov004 slot recipe** (brief 160 finding
+     #4) — cautious decomper brief if scale-up needs it.
    - **Cross-region cluster A apply** — port 1443 EUR cluster A
      symbols to USA + JPN.
    - **Cluster D-3 via Pattern 3 generator** — ~20 complex
