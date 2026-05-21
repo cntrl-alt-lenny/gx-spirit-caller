@@ -362,29 +362,57 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/169-cross-region-cluster-a-apply.md`](docs/briefs/169-cross-region-cluster-a-apply.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): port 1,443 EUR
-  cluster A `.bss` claims to USA + JPN. Highest-leverage
-  cross-region wave on backlog (~2,886 region-matches one
-  pass). Brief 116 region-config precedent applies.
-  Cluster A is structural zero-fill — no per-region byte
-  differences expected. Target ≥ 1,000 per region.
-  Critical: 3-region SHA1 PASS preserved (EUR baseline +
-  USA + JPN new). Branch:
-  `decomper/cross-region-cluster-a-apply`.
+- [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): path-2 scale-up
+  wave 2 at n=3 (and below if reachable). Brief 168
+  unblocked n=3; brief 167 identified band-1 as the only
+  sub-5 path. Exhaust band-1 candidates; test multi-
+  band-1 cascade (does combining drop n below 3?). Per-
+  slot SHA1 round-trip. Target ≥ 3 kept band-1 claims
+  with at least one sub-3 drop. Critical: 3-region SHA1
+  PASS preserved. Branch:
+  `decomper/ov004-rodata-path-2-scale-up-wave-2`.
 
-- [`docs/briefs/168-patcher-n3-residual-fix.md`](docs/briefs/168-patcher-n3-residual-fix.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher
-  coverage to n=3 (and likely n=4, 2, 1). Brief 167
-  reached n=3 for first time; `N_INFERENCE_OVERRIDES`
-  doesn't cover. Same brief 164 walk-forward methodology:
-  diagnose cluster shape at n=3, extend override table
-  (or detector). Opportunistic n=4/2/1 sampling. Tests pin
-  n=3 SHA1-PASSING. W7 chain extends 134 → 142 → 146 →
-  150 → 162 → 164 → 168. Critical: 3-region SHA1 PASS
-  preserved. Branch: `cloud/patcher-n3-residual-fix`.
+- [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise brief
+  169's per-region cluster A regen approach into a
+  reusable tool. Apply to cluster B (~174 claims) +
+  D-3 (~31 chunks) for cross-region ports (~530
+  region-matches). Reusable for future C / D-1 / D-2
+  waves. Critical: 3-region SHA1 PASS preserved + EUR
+  bit-identical. Branch:
+  `cloud/cross-region-cluster-bd3-apply-tooling`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/169-cross-region-cluster-a-apply.md`](docs/briefs/169-cross-region-cluster-a-apply.md)
+  `decomper`, shipped in PR #605. 🎉 **Largest single-
+  brief cross-region unlock.** 3,164 cluster A bss
+  claims across USA + JPN (1,582 per region = 100%
+  drain). USA + JPN went 0% → parity with EUR's
+  coverage. Smart approach: regenerated from each
+  region's own `symbols.txt` + `delinks.txt` rather
+  than mechanically porting EUR's address-shifted
+  files. 50 TUs total (25 per region). 3-region SHA1
+  PASS + 27/27 preserved; EUR bit-identical
+  regression verified.
+- [`docs/briefs/168-patcher-n3-residual-fix.md`](docs/briefs/168-patcher-n3-residual-fix.md)
+  `cloud`, shipped in PR #606. 🔑 **n=3 SHA1 residual
+  CLOSED via deeper-than-expected fix.** Diagnosis
+  showed the root cause was NOT a new cluster shape
+  (walk-forward detector handles n=3's 20-byte
+  `WITH_TERMINATOR_MID` correctly) but a single
+  `.text` ARM BL at va `0x021dbc14` with stale `imm24`
+  offset. Brief 134's `_reencode_init_bls` only
+  filtered `.init`-resident BLs; at n=3 the pool
+  sits *inside* `.rodata` and a third BL class
+  surfaces. **Fix**: renamed to `_reencode_arm_bls`,
+  dropped `.init` filter — re-encodes ANY arm_call
+  reloc (existing `new_word == current` short-circuit
+  makes 2,016/2,019 no-ops). 8 new tests; suite
+  1838 → 1846. Verified at n=3 + n=5 across 3
+  regions. W7 chain: 134 → 142 → 146 → 150 → 162 →
+  164 → **168**.
 
 - [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](docs/briefs/167-ov004-rodata-path-2-scale-up.md)
   `decomper`, shipped in PR #602. 🔑 **First production
