@@ -304,3 +304,23 @@ src/overlay004/data/data_ov004_02206738.c:
 src/overlay004/data/data_ov004_02206760.c:
     complete
     .rodata start:0x02206760 end:0x02206b60
+
+src/overlay004/data/data_ov004_021e3de8.c:
+    complete
+    .rodata start:0x021e3de8 end:0x021e3f60
+
+src/overlay004/data/data_ov004_021e3500.c:
+    complete
+    .rodata start:0x021e3500 end:0x021e3de8
+
+src/overlay004/data/data_ov004_021e3f60.c:
+    complete
+    .rodata start:0x021e3f60 end:0x021e4154
+
+src/overlay004/data/data_ov004_021e3128.c:
+    complete
+    .rodata start:0x021e3128 end:0x021e3234
+
+src/overlay004/data/data_ov004_021e2efc.c:
+    complete
+    .rodata start:0x021e2efc end:0x021e3128
