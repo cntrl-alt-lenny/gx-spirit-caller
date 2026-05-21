@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**68 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**69 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (18)
-- [Uncategorised](#uncategorised) (5)
+- [Uncategorised](#uncategorised) (6)
 
 ## Analysis / worklist
 
@@ -436,6 +436,12 @@ files (and optional directories) from a directory tree.
 **render brief 152/155 bundle TUs with**
 
 subsumed-placeholder aliases (brief 161 part 1).
+
+### `tools/cluster_b_bundle_gen.py`
+
+**automated bundle-extent selector +**
+
+`unsigned int[N]` source emitter for cluster B residue (brief 174).
 
 ### `tools/cluster_c_pattern3_gen.py`
 
