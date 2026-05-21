@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**69 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**70 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (18)
-- [Uncategorised](#uncategorised) (6)
+- [Uncategorised](#uncategorised) (7)
 
 ## Analysis / worklist
 
@@ -448,6 +448,12 @@ subsumed-placeholder aliases (brief 161 part 1).
 **generator for brief 119 cluster C Pattern 3.**
 
 Brief 119 identified 3 patterns for cluster C `.rodata` symbol carving:
+
+### `tools/cross_region_chunk_extent.py`
+
+**multi-symbol chunk-extent adjuster**
+
+for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 
 ### `tools/cross_region_cluster_apply.py`
 
