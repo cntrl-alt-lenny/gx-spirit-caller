@@ -3311,6 +3311,10 @@ src/usa/main/data/data_020ff828.c:
     complete
     .data start:0x020ff828 end:0x020ff834
 
+src/usa/main/data/data_020b425c.s:
+    complete
+    .rodata start:0x020b425c end:0x020b458c
+
 src/usa/main/data/data_020c69bc.c:
     complete
     .data start:0x020c69bc end:0x020c69d4
