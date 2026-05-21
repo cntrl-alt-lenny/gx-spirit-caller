@@ -16,8 +16,6 @@ heuristic against:
 
 from __future__ import annotations
 
-import re
-import struct
 import sys
 import unittest
 from pathlib import Path
@@ -30,7 +28,6 @@ from analyze_symbols import Symbol  # noqa: E402
 from cluster_b_bundle_gen import (  # noqa: E402
     Bundle,
     BundleExtentError,
-    WORD_SIZE,
     compute_bundle_extent,
     render_bundle_c,
 )
