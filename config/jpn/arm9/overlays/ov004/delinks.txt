@@ -76,3 +76,7 @@ src/jpn/overlay004/data/data_ov004_0220b24c.c:
 src/jpn/overlay004/data/data_ov004_0220a0dc.c:
     complete
     .data start:0x0220a0dc end:0x0220a0e0
+
+src/jpn/overlay004/data/data_ov004_02209d24.c:
+    complete
+    .data start:0x02209d24 end:0x02209d34

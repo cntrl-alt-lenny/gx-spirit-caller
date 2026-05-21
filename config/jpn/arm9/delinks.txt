@@ -3310,3 +3310,51 @@ src/jpn/main/data/data_0210261c.c:
 src/jpn/main/data/data_020ff828.c:
     complete
     .data start:0x020ff828 end:0x020ff834
+
+src/jpn/main/data/data_020c69bc.c:
+    complete
+    .data start:0x020c69bc end:0x020c69d4
+
+src/jpn/main/data/data_020ff840.c:
+    complete
+    .data start:0x020ff840 end:0x020ff880
+
+src/jpn/main/data/data_020ffc5c.c:
+    complete
+    .data start:0x020ffc5c end:0x020ffc70
+
+src/jpn/main/data/data_02100a90.c:
+    complete
+    .data start:0x02100a90 end:0x02100aa4
+
+src/jpn/main/data/data_021010f0.c:
+    complete
+    .data start:0x021010f0 end:0x0210110c
+
+src/jpn/main/data/data_021012f8.c:
+    complete
+    .data start:0x021012f8 end:0x02101304
+
+src/jpn/main/data/data_02101474.c:
+    complete
+    .data start:0x02101474 end:0x02101498
+
+src/jpn/main/data/data_0210168c.c:
+    complete
+    .data start:0x0210168c end:0x02101698
+
+src/jpn/main/data/data_02101c7c.c:
+    complete
+    .data start:0x02101c7c end:0x02101c88
+
+src/jpn/main/data/data_02101d18.c:
+    complete
+    .data start:0x02101d18 end:0x02101d38
+
+src/jpn/main/data/data_0210210c.c:
+    complete
+    .data start:0x0210210c end:0x02102120
+
+src/jpn/main/data/data_02102a20.c:
+    complete
+    .data start:0x02102a20 end:0x02102a68
