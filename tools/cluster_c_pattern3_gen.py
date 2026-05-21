@@ -59,7 +59,11 @@ Usage:
 
 Brief 125 deliverable. Brief 128 (decomper) wave applies the generator
 across the ~50-90 cluster C residue chunks per brief 119's pool estimate.
-Brief 144 added automatic `.extern` emission.
+Brief 144 added automatic `.extern` emission. Brief 166 added
+`kind:label(*)` cross-TU detection — those references now emit
+raw hex literals (`.word 0xADDR`) instead of `.word <name>`
+(which mwasmarm rejects because local labels are file-scoped
+in ELF). See `_word_directive_for_target` for the branch.
 """
 
 from __future__ import annotations
@@ -207,13 +211,20 @@ def _looks_like_ascii_string(b: bytes) -> bool:
 
 def _is_pointer_target_known(
     word: int,
-    sym_lookup: dict[int, str],
-) -> str | None:
+    sym_lookup: dict[int, tuple[str, str]],
+) -> tuple[str, str] | None:
     """If `word` is the address of a known symbol, return that
-    symbol's name. Otherwise None.
+    symbol's `(name, type)` tuple. Otherwise None.
 
-    The `sym_lookup` map is (addr → symbol_name) across ALL modules
-    (so cross-module references resolve)."""
+    The `sym_lookup` map is `(addr → (symbol_name, symbol_type))`
+    across ALL modules (so cross-module references resolve). The
+    `symbol_type` is the parsed `kind` from symbols.txt
+    (`"function"`, `"data"`, `"bss"`, `"label"`, …). Brief 166
+    upgraded the value type from `str` to `tuple[str, str]` so
+    callers can distinguish `kind:label(arm)` refs (which need
+    raw hex emission per the brief 163 mwasmarm limitation)
+    from other kinds (which keep the brief 144 named-extern
+    emission)."""
     return sym_lookup.get(word)
 
 
@@ -250,8 +261,44 @@ class GenContext:
     module: str
     bytes_source: bytes              # entire extract/arm9.bin (or per-module)
     load_addr: int                   # base address of bytes_source
-    sym_by_addr: dict[int, str]      # all named symbols across all modules
+    # Brief 166: `sym_by_addr` carries `(name, type)` tuples instead
+    # of bare names so `_emit_directives_for_bytes` can pick the
+    # right `.word <name>` vs `.word 0x<addr>` directive per the
+    # target symbol's kind. `type` is the parsed kind from
+    # symbols.txt — `"function"`, `"data"`, `"bss"`, `"label"`, etc.
+    sym_by_addr: dict[int, tuple[str, str]]
     indent: str = "        "         # 8-space mwasmarm convention
+
+
+def _word_directive_for_target(
+    word: int,
+    target: tuple[str, str],
+    ctx: GenContext,
+) -> str:
+    """Render the `.word` directive that resolves `word` to the
+    known symbol `target = (name, type)`.
+
+    Brief 166 split this out of `_emit_directives_for_bytes` so the
+    label-vs-named branch lives in exactly one place:
+
+      - `target` is `kind:label(*)` → emit raw hex literal
+        (`.word 0xADDR`). mwasmarm rejects `.word .L_*` because
+        local labels (`.L_*` per the dsd convention) are
+        file-scoped in ELF and not exported across TU boundaries.
+        The raw hex literal sidesteps the symbol-table lookup
+        entirely — the linker resolves the absolute address
+        directly. Brief 163 surfaced this on
+        `src/main/data/data_020c7b44.s`; the decomper hand-fixed
+        by replacing each `.word .L_<addr>` with `.word 0x<addr>`
+        and deleting the corresponding `.extern .L_<addr>` lines.
+      - Otherwise → emit the named reference (existing brief 144
+        behaviour); `_collect_external_refs` will pick up the
+        name and emit the matching `.extern` declaration.
+    """
+    name, kind_type = target
+    if kind_type == "label":
+        return f"{ctx.indent}.word 0x{word:08x}"
+    return f"{ctx.indent}.word {name}"
 
 
 def _emit_directives_for_bytes(
@@ -267,6 +314,10 @@ def _emit_directives_for_bytes(
     bytes 0-3 are a pointer + bytes 4-15 are non-pointer becomes:
         .word data_X            ; the pointer
         .byte 0x..., 0x..., ... ; the rest
+
+    Brief 166: `.word` directive shape depends on the target
+    symbol's kind. See `_word_directive_for_target` for the
+    label-vs-named branch.
     """
     if not b:
         return []
@@ -283,7 +334,7 @@ def _emit_directives_for_bytes(
         word = int.from_bytes(b, "little")
         target = _is_pointer_target_known(word, ctx.sym_by_addr)
         if target is not None:
-            return [f"{ctx.indent}.word {target}"]
+            return [_word_directive_for_target(word, target, ctx)]
     # For multi-word blocks, scan for 4-byte aligned pointer slots.
     if len(b) >= 4 and addr % 4 == 0:
         directives: list[str] = []
@@ -298,7 +349,9 @@ def _emit_directives_for_bytes(
                     if byte_buf:
                         directives.append(_render_byte_directive(byte_buf, ctx))
                         byte_buf = []
-                    directives.append(f"{ctx.indent}.word {target}")
+                    directives.append(
+                        _word_directive_for_target(word, target, ctx)
+                    )
                     i += 4
                     continue
             byte_buf.append(b[i])
@@ -478,11 +531,14 @@ def generate_chunk(
     if load_addr is None:
         load_addr = _module_load_addr(version, module)
 
-    # Cross-module symbol lookup for pointer resolution.
-    sym_by_addr: dict[int, str] = {}
+    # Cross-module symbol lookup for pointer resolution. Brief 166
+    # carries the symbol's `type` alongside the name so directive
+    # emission can branch on `kind:label(arm)` (raw hex) vs. all
+    # other kinds (named ref + .extern).
+    sym_by_addr: dict[int, tuple[str, str]] = {}
     for md in modules.values():
         for s in md.symbols:
-            sym_by_addr.setdefault(s.addr, s.name)
+            sym_by_addr.setdefault(s.addr, (s.name, s.type))
 
     syms = _symbols_in_range(modules, module, start, end)
     if not syms:

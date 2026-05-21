@@ -57,11 +57,34 @@ def _module(name: str, symbols: list[Symbol]) -> ModuleData:
 
 
 def _ctx(*, bytes_source: bytes = b"", load_addr: int = 0x02000000,
-         sym_by_addr: dict[int, str] | None = None) -> GenContext:
+         sym_by_addr: dict[int, str | tuple[str, str]] | None = None,
+         ) -> GenContext:
+    """Build a GenContext fixture for the generator tests.
+
+    Brief 166 changed `GenContext.sym_by_addr` from
+    `dict[int, str]` to `dict[int, tuple[str, str]]` (the type is
+    `(name, kind)` so the directive emitter can branch on
+    `kind:label(arm)` vs other kinds). This helper accepts BOTH
+    shapes for backwards compat with pre-brief-166 tests:
+
+      - `{addr: "name"}` — bare names get auto-wrapped to
+        `(name, "data")` so existing assertions keep their
+        existing emission shape.
+      - `{addr: ("name", "kind")}` — explicit shape for tests
+        that need to pin a non-data kind (e.g. brief 166's
+        label-kind regression tests).
+    """
+    raw = sym_by_addr or {}
+    normalised: dict[int, tuple[str, str]] = {}
+    for addr, value in raw.items():
+        if isinstance(value, tuple):
+            normalised[addr] = value
+        else:
+            normalised[addr] = (value, "data")
     return GenContext(
         version="eur", module="main",
         bytes_source=bytes_source, load_addr=load_addr,
-        sym_by_addr=sym_by_addr or {},
+        sym_by_addr=normalised,
     )
 
 
@@ -646,6 +669,93 @@ class TestDetectSection(unittest.TestCase):
             Path("/tmp/does-not-exist-159.txt"),
         )
         self.assertEqual(sections, [])
+
+
+# ---------------------------------------------------------------------- #
+# Brief 166: `kind:label(*)` reference emission — raw hex literal +
+# NO `.extern` for local-label symbol cross-TU refs.
+# ---------------------------------------------------------------------- #
+
+
+class TestLabelKindEmission(unittest.TestCase):
+    """Brief 166: `.word` directives that resolve to a
+    `kind:label(*)` symbol must emit a raw hex literal
+    (`.word 0xADDR`) instead of `.word <name>`, AND must NOT
+    trigger an `.extern <name>` declaration. mwasmarm rejects
+    `.word .L_*` because local labels (`.L_*` per dsd convention)
+    are file-scoped in ELF — not exported across TU boundaries.
+
+    Brief 163 surfaced this on `src/main/data/data_020c7b44.s`;
+    decomper hand-fixed by substituting `.word .L_<addr>` →
+    `.word 0x<addr>` + removing the matching `.extern .L_<addr>`
+    lines. Brief 166 makes the generator emit the correct shape
+    automatically."""
+
+    def test_single_label_ref_emits_raw_hex(self):
+        # Chunk with one `.word` reference to a `kind:label(arm)`
+        # symbol. The generator should emit `.word 0x02021008`
+        # (raw hex) — NOT `.word .L_02021008` (which mwasmarm
+        # rejects).
+        bytes_source = b"\x08\x10\x02\x02"  # LE = 0x02021008
+        syms_main = [_data_sym("data_100", "main", 0x100, size=4)]
+        syms_text = [
+            Symbol(
+                name=".L_02021008", module="main",
+                addr=0x02021008, size=0,
+                type="label", mode="arm",
+            ),
+        ]
+        modules = {
+            "main": _module("main", syms_main + syms_text),
+        }
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x104,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        # Raw hex literal landed in the .s — NOT the symbol name.
+        self.assertIn(".word 0x02021008", result.asm_source)
+        self.assertNotIn(".word .L_02021008", result.asm_source)
+        # And NO .extern was emitted for the label name (would be
+        # invalid C / ELF anyway — local-label exports).
+        self.assertNotIn(".extern .L_02021008", result.asm_source)
+
+    def test_mixed_label_and_data_refs_each_emitted_correctly(self):
+        # Chunk with two `.word` references: one to a `data` symbol
+        # (existing `.word <name>` + `.extern <name>` behaviour),
+        # one to a `label(arm)` symbol (brief 166's new `.word
+        # 0x<addr>` + no `.extern` behaviour).
+        bytes_source = (
+            b"\x18\x10\x02\x02"  # LE = 0x02021018 → label
+            b"\x00\xb0\x1a\x02"  # LE = 0x021ab000 → data
+        )
+        syms_main = [_data_sym("data_100", "main", 0x100, size=8)]
+        syms_other = [
+            Symbol(
+                name=".L_02021018", module="main",
+                addr=0x02021018, size=0,
+                type="label", mode="arm",
+            ),
+            _data_sym("data_target", "ov000", 0x021ab000, size=0),
+        ]
+        modules = {
+            "main": _module("main", syms_main + syms_other[:1]),
+            "ov000": _module("ov000", syms_other[1:]),
+        }
+        result = generate_chunk(
+            "eur", "main", start=0x100, end=0x108,
+            modules=modules,
+            bytes_source=bytes_source,
+            load_addr=0x100,
+        )
+        # Label ref → raw hex; no .extern for it.
+        self.assertIn(".word 0x02021018", result.asm_source)
+        self.assertNotIn(".extern .L_02021018", result.asm_source)
+        # Data ref → named `.word` AND a matching .extern (brief
+        # 144 emission carries forward unchanged).
+        self.assertIn(".word data_target", result.asm_source)
+        self.assertIn(".extern data_target", result.asm_source)
 
 
 if __name__ == "__main__":
