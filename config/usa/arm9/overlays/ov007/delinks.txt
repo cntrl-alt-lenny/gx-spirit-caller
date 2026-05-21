@@ -3,3 +3,7 @@
     .ctor       start:0x021b2e90 end:0x021b2e98 kind:rodata align:4
     .data       start:0x021b2ea0 end:0x021b3380 kind:data align:32
     .bss        start:0x021b3380 end:0x02233480 kind:bss align:32
+
+src/usa/overlay007/bss/data_ov007_bss.s:
+    complete
+    .bss start:0x021b3380 end:0x02233480

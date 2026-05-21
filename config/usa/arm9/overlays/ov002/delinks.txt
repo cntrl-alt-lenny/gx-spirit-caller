@@ -296,3 +296,7 @@ src/usa/overlay002/ov002_0220e65c.c:
 src/usa/overlay002/func_ov002_022648c8.c:
     complete
     .text start:0x022648c8 end:0x022648dc
+
+src/usa/overlay002/bss/data_ov002_bss.s:
+    complete
+    .bss start:0x022cd220 end:0x022d28a0
