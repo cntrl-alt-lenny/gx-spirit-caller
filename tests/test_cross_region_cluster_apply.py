@@ -28,7 +28,6 @@ from cross_region_cluster_apply import (  # noqa: E402
     ClaimedRange,
     DelinksMap,
     PointerCandidate,
-    RegionContext,
     RegionPaths,
     ScalarCandidate,
     enumerate_b_pointers,

@@ -387,8 +387,6 @@ def infer_symbol_sizes(
     out: dict[int, int] = {}
     # Sort once.
     sorted_syms = sorted(syms, key=lambda s: s.addr)
-    by_addr = {s.addr: s for s in sorted_syms}
-    addrs_sorted = sorted(by_addr.keys())
     for i, s in enumerate(sorted_syms):
         if s.size:
             out[s.addr] = s.size
@@ -396,7 +394,7 @@ def infer_symbol_sizes(
         # Find the next symbol's addr; cap at the containing
         # section's end.
         section_end = None
-        for sec_name, (sec_start, sec_end) in sections.items():
+        for sec_start, sec_end in sections.values():
             if sec_start <= s.addr < sec_end:
                 section_end = sec_end
                 break
