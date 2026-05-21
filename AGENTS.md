@@ -362,28 +362,49 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/172-cross-region-cluster-b-residue.md`](docs/briefs/172-cross-region-cluster-b-residue.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): close out cross-
-  region cluster B coverage. Apply brief 152/155 bundle
-  recipes manually for size-1/2 + value=0 sub-pools
-  (38 + 36 region-matches) + investigate ov006's 32-byte
-  `.data` ordering shift brief 170 surfaced (15/region).
-  ~104 region-matches target. Critical: 3-region SHA1
-  PASS preserved. Branch:
-  `decomper/cross-region-cluster-b-residue`.
+- [`docs/briefs/175-cross-region-cluster-d3-apply.md`](docs/briefs/175-cross-region-cluster-d3-apply.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply cluster D-3
+  cross-region to USA + JPN. ~31 EUR D-3 chunks × 2 =
+  ~62 region-matches. Either extend brief 170's
+  `d3-chunks` subcommand or apply manually. Target ≥ 20
+  cross-region chunks per region. Independent of brief
+  174 cloud work. Critical: 3-region SHA1 PASS
+  preserved + EUR bit-identical. Branch:
+  `decomper/cross-region-cluster-d3-apply`.
 
-- [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](docs/briefs/173-odd-aligned-slot-recipe-research.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): find a recipe for
-  sub-2 ov004 `.rodata` claims at odd-aligned
-  addresses. Brief 171 hit the path-2 floor at n=2 —
-  remaining 2 veneers target odd-aligned containing
-  symbols. Try `aligned(1)`, mwasmarm `.s` with
-  `.align 0`, Pattern 3 chunk with surrounding context.
-  Research-style — lock recipe or document falsification.
-  Critical: 3-region SHA1 PASS preserved. Branch:
-  `cloud/odd-aligned-slot-recipe-research`.
+- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](docs/briefs/174-bundle-extent-heuristic-generator.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): audit brief 152/
+  155 worked examples + build generator automating
+  bundle extent-selection heuristic. Per brief 172's
+  hand-off. Unblocks brief 176+ cross-region cluster B
+  residue retry. Tests verify brief 152's
+  `data_021020b4` regenerates byte-identical. Critical:
+  3-region SHA1 PASS preserved. Branch:
+  `cloud/bundle-extent-heuristic-generator`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/172-cross-region-cluster-b-residue.md`](docs/briefs/172-cross-region-cluster-b-residue.md)
+  `decomper`, shipped in PR #611. 🔬 **Hypothesis
+  falsified.** 4 bundle-apply iterations attempted, all
+  FAIL on USA + JPN cluster B residue. Root cause:
+  brief 152/155 bundle extents were hand-tuned per
+  candidate; mechanical apply has no such context. No
+  source changes shipped; baseline preserved. Brief
+  174 hand-off: cloud builds an extent-selection-
+  heuristic generator. Brain pushed drift-check regen
+  fix.
+- [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](docs/briefs/173-odd-aligned-slot-recipe-research.md)
+  `cloud`, shipped in PR #612. 🔬 **All 4 variants FAIL**
+  on `data_ov004_021ded69`. Root cause: mwldarm enforces
+  minimum 4-byte alignment on `.rodata` regardless of
+  source-side directives. **Critical positive finding**:
+  all 3 source variants successfully suppressed both
+  remaining veneers — path-2 mechanism works at veneer
+  level; SHA1 failure is purely byte-layout shift.
+  **Variant E proposal**: extend patcher to handle 2-byte
+  pool shifts at low n (brief 177+ candidate). Research
+  note + brief 174+ hand-off shipped.
 
 - [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
   `decomper`, shipped in PR #608. 🔑 **First sub-3
