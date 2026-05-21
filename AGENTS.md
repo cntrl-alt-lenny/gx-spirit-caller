@@ -362,28 +362,49 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): path-2 scale-up
-  wave 2 at n=3 (and below if reachable). Brief 168
-  unblocked n=3; brief 167 identified band-1 as the only
-  sub-5 path. Exhaust band-1 candidates; test multi-
-  band-1 cascade (does combining drop n below 3?). Per-
-  slot SHA1 round-trip. Target ≥ 3 kept band-1 claims
-  with at least one sub-3 drop. Critical: 3-region SHA1
+- [`docs/briefs/172-cross-region-cluster-b-residue.md`](docs/briefs/172-cross-region-cluster-b-residue.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): close out cross-
+  region cluster B coverage. Apply brief 152/155 bundle
+  recipes manually for size-1/2 + value=0 sub-pools
+  (38 + 36 region-matches) + investigate ov006's 32-byte
+  `.data` ordering shift brief 170 surfaced (15/region).
+  ~104 region-matches target. Critical: 3-region SHA1
   PASS preserved. Branch:
-  `decomper/ov004-rodata-path-2-scale-up-wave-2`.
+  `decomper/cross-region-cluster-b-residue`.
 
-- [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise brief
-  169's per-region cluster A regen approach into a
-  reusable tool. Apply to cluster B (~174 claims) +
-  D-3 (~31 chunks) for cross-region ports (~530
-  region-matches). Reusable for future C / D-1 / D-2
-  waves. Critical: 3-region SHA1 PASS preserved + EUR
-  bit-identical. Branch:
-  `cloud/cross-region-cluster-bd3-apply-tooling`.
+- [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](docs/briefs/173-odd-aligned-slot-recipe-research.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): find a recipe for
+  sub-2 ov004 `.rodata` claims at odd-aligned
+  addresses. Brief 171 hit the path-2 floor at n=2 —
+  remaining 2 veneers target odd-aligned containing
+  symbols. Try `aligned(1)`, mwasmarm `.s` with
+  `.align 0`, Pattern 3 chunk with surrounding context.
+  Research-style — lock recipe or document falsification.
+  Critical: 3-region SHA1 PASS preserved. Branch:
+  `cloud/odd-aligned-slot-recipe-research`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
+  `decomper`, shipped in PR #608. 🔑 **First sub-3
+  ov004 `.rodata` state shipped.** 5 band-1 4-aligned
+  claims kept; multi-band-1 cascade demonstrated n=9→
+  5→3→2. Path-2 structural floor at n=2 (remaining 2
+  veneers target odd-aligned containing symbols —
+  brief 160 finding #4 still applies). New signed-net
+  form at n=2 (`net -8`); byte-detection authoritative.
+  3-region SHA1 PASS + 27/27 preserved.
+- [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
+  `cloud`, shipped in PR #609. 🎉 **Cross-region
+  tooling shipped.** New
+  `tools/cross_region_cluster_apply.py` generalises
+  brief 169's per-region approach. 768 cluster B
+  claims across USA + JPN (384 per region, main + 10
+  overlays). Subcommands `b-scalars`, `b-pointers`,
+  `d3-chunks` (stub). Deferred sub-pools (size-1/2,
+  value=0, ov006) flagged for brief 172+ manual
+  application. 28 new tests; suite 1874 → 1902. Brain
+  pushed F401 + F841 + B007 ruff fixes.
 
 - [`docs/briefs/169-cross-region-cluster-a-apply.md`](docs/briefs/169-cross-region-cluster-a-apply.md)
   `decomper`, shipped in PR #605. 🎉 **Largest single-
