@@ -362,27 +362,47 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/175-cross-region-cluster-d3-apply.md`](docs/briefs/175-cross-region-cluster-d3-apply.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply cluster D-3
-  cross-region to USA + JPN. ~31 EUR D-3 chunks × 2 =
-  ~62 region-matches. Either extend brief 170's
-  `d3-chunks` subcommand or apply manually. Target ≥ 20
-  cross-region chunks per region. Independent of brief
-  174 cloud work. Critical: 3-region SHA1 PASS
-  preserved + EUR bit-identical. Branch:
-  `decomper/cross-region-cluster-d3-apply`.
+- [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
+  — `decomper` (HIGH, **NOW ACTIVE**): apply brief 174's
+  `cluster_b_bundle_gen.py` to USA + JPN cluster B
+  residue at scale. ~104 region-matches potential. Brief
+  174 shipped 2 worked examples; scale up + investigate
+  ov006 sub-pool. Target ≥ 60 cross-region claims.
+  Critical: 3-region SHA1 PASS preserved + EUR
+  bit-identical. Branch:
+  `decomper/cross-region-cluster-b-residue-with-generator`.
 
-- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](docs/briefs/174-bundle-extent-heuristic-generator.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): audit brief 152/
-  155 worked examples + build generator automating
-  bundle extent-selection heuristic. Per brief 172's
-  hand-off. Unblocks brief 176+ cross-region cluster B
-  residue retry. Tests verify brief 152's
-  `data_021020b4` regenerates byte-identical. Critical:
-  3-region SHA1 PASS preserved. Branch:
-  `cloud/bundle-extent-heuristic-generator`.
+- [`docs/briefs/177-unified-chunk-extent-generator.md`](docs/briefs/177-unified-chunk-extent-generator.md)
+  — `cloud` (MEDIUM, **NOW ACTIVE**): generalise brief
+  174's bundle-extent heuristic into region-aware
+  **chunk extent generator** for multi-symbol cases.
+  Per brief 175's hand-off. Unblocks brief 178+ D-3
+  cross-region retry + future cluster C / D-1 / D-2
+  cross-region work. Brief 174's tests must remain
+  green. Critical: 3-region SHA1 PASS preserved.
+  Branch: `cloud/unified-chunk-extent-generator`.
 
 ### Closed briefs (reference)
+
+- [`docs/briefs/175-cross-region-cluster-d3-apply.md`](docs/briefs/175-cross-region-cluster-d3-apply.md)
+  `decomper`, shipped in PR #614. 🔬 **Same failure
+  class as brief 172.** Attempted mechanical cross-
+  region apply of 59 EUR D-3 Pattern 3 chunks; **0
+  shipped** — all 72 generated chunks failed dsd
+  section-membership check at gap-file boundaries. Same
+  gap-extent issue. Brief 177 hand-off: cloud
+  generalises brief 174's heuristic into region-aware
+  chunk extent generator. No source kept; baseline
+  preserved. Brain pushed drift-check regen fix.
+- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](docs/briefs/174-bundle-extent-heuristic-generator.md)
+  `cloud`, shipped in PR #615. 🎉 **Heuristic locked +
+  generator shipped.** `tools/cluster_b_bundle_gen.py`
+  automates the brief 152/155 hand-tuned heuristic
+  (4-aligned end + named-symbol boundary + ≥ 1 non-zero
+  byte). Audit verified: all 4 EUR worked examples
+  regenerate byte-identical. USA + JPN `data_020ff828`
+  worked examples shipped + SHA1 PASS. 15 new tests;
+  suite 1874 → 1889. Brain pushed F401 ruff fixes.
 
 - [`docs/briefs/172-cross-region-cluster-b-residue.md`](docs/briefs/172-cross-region-cluster-b-residue.md)
   `decomper`, shipped in PR #611. 🔬 **Hypothesis

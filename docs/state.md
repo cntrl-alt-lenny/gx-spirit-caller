@@ -8,23 +8,23 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-21 evening, post-#611 + #612 merge,
-briefs 174 + 175 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
+**Last updated:** 2026-05-22 morning, post-#614 + #615 merge,
+briefs 176 + 177 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
 PASSES** across all 3 regions (brief 140, PR #558) and
-continues to hold after 17 post-SHA1 rounds.
-**🔬 Double-falsification round** — both briefs 172 +
-173 tested hypotheses, falsified them cleanly, and shipped
-research notes with concrete next-step proposals. **Brief
-172 falsification**: mechanical bundle apply doesn't work
-without per-candidate hand-tuning — needs a generator that
-encodes the brief 152/155 extent-selection heuristic
-(brief 174 cloud, queued). **Brief 173 falsification**: all
-3 source-level recipes (aligned(1), .s + .align 0, Pattern 3
-chunk) FAIL on odd-aligned ov004 `.rodata` because mwldarm
-enforces 4-byte alignment regardless of source-side
-directives. Variant E (patcher ext for 2-byte pool shift)
-proposed for brief 177+. Brief 175 (decomper, queued) takes
-cluster D-3 cross-region apply in parallel.
+continues to hold after 18 post-SHA1 rounds. **🎉 Bundle-
+extent heuristic locked + generator shipped** (brief 174,
+cloud): `cluster_b_bundle_gen.py` automates the heuristic
+that worked on EUR briefs 152/155 — 4-aligned end, named-
+symbol boundary, ≥ 1 non-zero byte. 4 EUR worked examples
+regenerate byte-identical; 2 cross-region worked examples
+(USA + JPN `data_020ff828`) ship + PASS. **Brief 175
+falsification**: mechanical D-3 cross-region apply hits
+the same gap-extent issue as brief 172 — different cluster,
+same root cause. Brief 177 (cloud, queued) generalises
+brief 174's heuristic into a region-aware chunk extent
+generator for multi-symbol cases. Brief 176 (decomper,
+queued) scales brief 174 to the full cluster B cross-region
+residue.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -65,41 +65,38 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **PR #611 — decomper / brief 172 cluster B bundle apply
-  falsified.** 🔬 **Hypothesis falsified — 4 iterations
-  attempted, all FAIL.** Brief 152/155's bundle recipe does
-  NOT mechanically apply to USA + JPN cluster B residue.
-  Each candidate needs per-symbol hand-tuning. Failures:
-  (1) Single-word bundle → mwldarm `.bss` routing cascade;
-  (2) Multi-word to next-named symbol → dsd section-
-  membership reject; (3) Zero-extend bundle → re-triggers
-  (2); (4) Iterative absorption → dsd reject or
-  over-absorption. **Root cause**: brief 152/155 extents
-  were hand-tuned per candidate (`data_021020b4[16]` chose
-  N=16 covering to next-named with non-zero content at
-  exact offset). No mechanical context. **Brief 174 hand-
-  off**: cloud builds an extent-selection-heuristic
-  generator. No source changes shipped; baseline preserved.
-  Brain pushed drift-check regen fix (research-index).
-- **PR #612 — cloud / brief 173 odd-aligned recipe
-  research.** 🔬 **All 4 source-level variants FAIL** on
-  `data_ov004_021ded69`. (A) `aligned(1)` C — ignored
-  by mwldarm, chunk shifted +1; (B) mwasmarm `.s` +
-  `.align 0` — shifted +3 to next 4-aligned VA; (C)
-  Pattern 3 multi-symbol chunk — shrank by 288 bytes
-  (.text classification conflict); (D) Bundle analog —
-  dsd containment check fails. **Root cause**: mwldarm
-  enforces minimum 4-byte alignment on `.rodata` section
-  placement regardless of source-side directives. **Critical
-  positive finding**: all 3 source variants successfully
-  **suppressed BOTH remaining veneers** (mwldarm emits 0
-  veneers when cross-overlay symbol is locally defined) —
-  path-2 mechanism works at veneer level; SHA1 failure is
-  purely byte-layout shift. **Variant E proposal**: extend
-  patcher to handle 2-byte (or 1-3 byte) veneer pool
-  shifts at low n (analogous to brief 164 walk-forward
-  generalisation). Research note shipped; brief 177+
-  candidate.
+- **PR #614 — decomper / brief 175 D-3 cross-region
+  falsified.** 🔬 **Same failure class as brief 172.**
+  Attempted mechanical cross-region apply of 59 EUR D-3
+  Pattern 3 chunks to USA + JPN with per-overlay base
+  shifts. **0 chunks shipped** — all 72 generated chunks
+  failed dsd section-membership check with the same shape:
+  EUR chunk's vaddr range, mapped to USA/JPN, slices
+  **through** gap-file inner symbols whose gap-inferred
+  sizes extend past the chunk's start. Same gap-extent
+  issue as brief 172. **Cluster A `.bss` (brief 169)
+  worked because it generated from each region's own
+  symbols.txt — self-consistent; brief 175 / 172 require
+  EUR↔region mapping where gap-file boundaries diverge.**
+  Brief 177 hand-off: cloud generalises brief 174's
+  heuristic into region-aware chunk extent generator.
+  No source kept; baseline preserved. Brain pushed
+  drift-check regen fix.
+- **PR #615 — cloud / brief 174 bundle-extent generator.**
+  🎉 **Heuristic locked + generator shipped.**
+  `tools/cluster_b_bundle_gen.py` automates brief 152/
+  155's hand-tuned heuristic: pick FIRST named symbol
+  AFTER candidate whose vaddr is 4-aligned, such that
+  `[candidate, next_vaddr)` contains ≥ 1 non-zero byte.
+  Three constraints each falsified-into-existence from
+  brief 152/155/172 failures. **Audit verified**: all 4
+  EUR worked examples (`data_021020b4`, `data_020c6a9c`,
+  `data_020ff908`, `data_020ff920`) regenerate
+  byte-identical. **Worked examples shipped**: USA + JPN
+  `data_020ff828` bundles (3 words / 12 B each absorbing
+  4-byte string at +4) — both regions SHA1 PASS. 15 new
+  tests across 3 classes; suite 1874 → 1889. Brain pushed
+  F401 ruff fixes (re/struct/WORD_SIZE).
 
 - **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
   **28 source-level claims** (40% over ≥ 20 target). Per-shape:
@@ -166,24 +163,26 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (cluster D-3 cross-region):**
+**Decomper — one HIGH brief queued (apply brief 174 generator at scale):**
 
-- **Brief 175 (HIGH, NEW)** — `decomper/cross-region-cluster-d3-apply`.
-  Apply cluster D-3 cross-region to USA + JPN. ~31 EUR D-3
-  chunks × 2 = ~62 region-matches. Either extend brief
-  170's `d3-chunks` subcommand or apply manually. Target
-  ≥ 20 cross-region chunks per region. Independent of
-  brief 174 cloud work.
+- **Brief 176 (HIGH, NEW)** — `decomper/cross-region-cluster-b-residue-with-generator`.
+  Apply brief 174's `cluster_b_bundle_gen.py` to USA + JPN
+  cluster B residue — same scope brief 172 falsified
+  mechanically. Brief 174 shipped 2 worked examples
+  (USA + JPN `data_020ff828`); scale to full ~104 region-
+  matches. Includes ov006 sub-pool retry with brief 174's
+  more conservative bundles. Target ≥ 60 cross-region
+  claims.
 
-**Cloud — one MEDIUM brief queued (bundle extent heuristic):**
+**Cloud — one MEDIUM brief queued (unified chunk extent generator):**
 
-- **Brief 174 (MEDIUM, NEW)** — `cloud/bundle-extent-heuristic-generator`.
-  Audit brief 152/155 worked examples + build a generator
-  that automates the bundle extent-selection heuristic.
-  Per brief 172's hand-off. Unblocks brief 176+ cross-
-  region cluster B residue retry. Includes regression
-  tests verifying brief 152's `data_021020b4` regenerates
-  byte-identical + 1-2 cross-region worked examples.
+- **Brief 177 (MEDIUM, NEW)** — `cloud/unified-chunk-extent-generator`.
+  Generalise brief 174's bundle-extent heuristic into a
+  region-aware **chunk extent generator** that handles
+  multi-symbol Pattern 3 chunks for cluster D-3 cross-
+  region. Per brief 175's hand-off. Unblocks brief 178+
+  decomper D-3 cross-region retry + future cluster C / D-1
+  / D-2 cross-region work.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
@@ -255,23 +254,24 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 175 PR** when it opens.
-   Gate: 3-region `ninja sha1` PASS + 3-region 27/27 modules
-   OK. ≥ 20 cross-region D-3 chunks per region. EUR
-   bit-identical regression check.
-2. **Verify + merge cloud brief 174 PR** when it opens.
-   Gate: 3-region SHA1 PASS preserved + brief 152's bundle
-   regenerates byte-identical + ≥ 1 cross-region worked
-   example PASSes. Confirms the heuristic is mechanical.
-3. **Scope brief 176+ candidates (queue after 174 + 175):**
-   - **After brief 174 lands**: brief 176 = decomper rerun
-     cross-region cluster B residue (size-1/2 + value=0 +
-     ov006) with the new generator.
-   - **Patcher Variant E** (brief 173 hand-off): brief 177+
-     cloud — handle 2-byte pool shift at low n. Closes
-     path-2 to n=0 (claim both odd-aligned ov004 candidates).
+1. **Verify + merge decomper brief 176 PR** when it opens.
+   Gate: 3-region `ninja sha1` PASS + 3-region 27/27
+   modules OK. ≥ 60 cross-region cluster B residue claims.
+   Watch ov006 sub-pool — if persistent pathology, brief
+   178+ refinement candidate.
+2. **Verify + merge cloud brief 177 PR** when it opens.
+   Gate: 3-region SHA1 PASS preserved + ≥ 2 brief 175
+   failing chunks regenerate cleanly as cross-region D-3
+   worked examples. Brief 174's regression tests still
+   green.
+3. **Scope brief 178+ candidates (queue after 176 + 177):**
+   - **After brief 177 lands**: brief 178 = decomper rerun
+     cross-region D-3 with the unified generator.
+   - **Patcher Variant E** (brief 173 hand-off): brief
+     179+ cloud — handle 2-byte pool shift at low n.
+     Closes path-2 to n=0.
    - **Cluster C / D-1 / D-2 cross-region** — extend brief
-     170's tool further.
+     177's tool further.
    - **Cluster D-3 hard residue** (14.8 KB mega + 366 B
      non-aligned) — small cleanup.
    - **3 cluster B value=0 EUR deferred candidates** —
