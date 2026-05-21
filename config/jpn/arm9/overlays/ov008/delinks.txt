@@ -11,3 +11,11 @@ src/jpn/overlay008/func_ov008_021b2288.c:
 src/jpn/overlay008/bss/data_ov008_bss.s:
     complete
     .bss start:0x021b2660 end:0x021b2e20
+
+src/jpn/overlay008/data/data_ov008_021b25f0.c:
+    complete
+    .data start:0x021b25f0 end:0x021b25f4
+
+src/jpn/overlay008/data/data_ov008_021b25f4.c:
+    complete
+    .data start:0x021b25f4 end:0x021b25f8

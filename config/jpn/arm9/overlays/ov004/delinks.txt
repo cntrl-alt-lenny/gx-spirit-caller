@@ -8,3 +8,71 @@
 src/jpn/overlay004/bss/data_ov004_bss.s:
     complete
     .bss start:0x0220b2a0 end:0x02293aa0
+
+src/jpn/overlay004/data/data_ov004_02209c54.c:
+    complete
+    .data start:0x02209c54 end:0x02209c58
+
+src/jpn/overlay004/data/data_ov004_02209c58.c:
+    complete
+    .data start:0x02209c58 end:0x02209c5c
+
+src/jpn/overlay004/data/data_ov004_02209c5c.c:
+    complete
+    .data start:0x02209c5c end:0x02209c60
+
+src/jpn/overlay004/data/data_ov004_02209d20.c:
+    complete
+    .data start:0x02209d20 end:0x02209d24
+
+src/jpn/overlay004/data/data_ov004_02209e5c.c:
+    complete
+    .data start:0x02209e5c end:0x02209e60
+
+src/jpn/overlay004/data/data_ov004_0220a030.c:
+    complete
+    .data start:0x0220a030 end:0x0220a034
+
+src/jpn/overlay004/data/data_ov004_0220a034.c:
+    complete
+    .data start:0x0220a034 end:0x0220a038
+
+src/jpn/overlay004/data/data_ov004_0220a038.c:
+    complete
+    .data start:0x0220a038 end:0x0220a03c
+
+src/jpn/overlay004/data/data_ov004_0220a03c.c:
+    complete
+    .data start:0x0220a03c end:0x0220a040
+
+src/jpn/overlay004/data/data_ov004_0220a0e0.c:
+    complete
+    .data start:0x0220a0e0 end:0x0220a0e4
+
+src/jpn/overlay004/data/data_ov004_0220a0e4.c:
+    complete
+    .data start:0x0220a0e4 end:0x0220a0e8
+
+src/jpn/overlay004/data/data_ov004_0220a0e8.c:
+    complete
+    .data start:0x0220a0e8 end:0x0220a0ec
+
+src/jpn/overlay004/data/data_ov004_0220a0ec.c:
+    complete
+    .data start:0x0220a0ec end:0x0220a0f0
+
+src/jpn/overlay004/data/data_ov004_0220aad0.c:
+    complete
+    .data start:0x0220aad0 end:0x0220aad4
+
+src/jpn/overlay004/data/data_ov004_0220b248.c:
+    complete
+    .data start:0x0220b248 end:0x0220b24c
+
+src/jpn/overlay004/data/data_ov004_0220b24c.c:
+    complete
+    .data start:0x0220b24c end:0x0220b250
+
+src/jpn/overlay004/data/data_ov004_0220a0dc.c:
+    complete
+    .data start:0x0220a0dc end:0x0220a0e0

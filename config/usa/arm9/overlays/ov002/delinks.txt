@@ -300,3 +300,167 @@ src/usa/overlay002/func_ov002_022648c8.c:
 src/usa/overlay002/bss/data_ov002_bss.s:
     complete
     .bss start:0x022cd220 end:0x022d28a0
+
+src/usa/overlay002/data/data_ov002_022ca7a0.c:
+    complete
+    .data start:0x022ca7a0 end:0x022ca7a4
+
+src/usa/overlay002/data/data_ov002_022ca7b4.c:
+    complete
+    .data start:0x022ca7b4 end:0x022ca7b8
+
+src/usa/overlay002/data/data_ov002_022ca8b4.c:
+    complete
+    .data start:0x022ca8b4 end:0x022ca8b8
+
+src/usa/overlay002/data/data_ov002_022ca8b8.c:
+    complete
+    .data start:0x022ca8b8 end:0x022ca8bc
+
+src/usa/overlay002/data/data_ov002_022cabbc.c:
+    complete
+    .data start:0x022cabbc end:0x022cabc0
+
+src/usa/overlay002/data/data_ov002_022cac34.c:
+    complete
+    .data start:0x022cac34 end:0x022cac38
+
+src/usa/overlay002/data/data_ov002_022cb958.c:
+    complete
+    .data start:0x022cb958 end:0x022cb95c
+
+src/usa/overlay002/data/data_ov002_022cbce8.c:
+    complete
+    .data start:0x022cbce8 end:0x022cbcec
+
+src/usa/overlay002/data/data_ov002_022cbcec.c:
+    complete
+    .data start:0x022cbcec end:0x022cbcf0
+
+src/usa/overlay002/data/data_ov002_022cbcf0.c:
+    complete
+    .data start:0x022cbcf0 end:0x022cbcf4
+
+src/usa/overlay002/data/data_ov002_022cbcf4.c:
+    complete
+    .data start:0x022cbcf4 end:0x022cbcf8
+
+src/usa/overlay002/data/data_ov002_022cbcf8.c:
+    complete
+    .data start:0x022cbcf8 end:0x022cbcfc
+
+src/usa/overlay002/data/data_ov002_022cbcfc.c:
+    complete
+    .data start:0x022cbcfc end:0x022cbd00
+
+src/usa/overlay002/data/data_ov002_022cbd00.c:
+    complete
+    .data start:0x022cbd00 end:0x022cbd04
+
+src/usa/overlay002/data/data_ov002_022cbd04.c:
+    complete
+    .data start:0x022cbd04 end:0x022cbd08
+
+src/usa/overlay002/data/data_ov002_022cbd08.c:
+    complete
+    .data start:0x022cbd08 end:0x022cbd0c
+
+src/usa/overlay002/data/data_ov002_022cbd0c.c:
+    complete
+    .data start:0x022cbd0c end:0x022cbd10
+
+src/usa/overlay002/data/data_ov002_022cbd10.c:
+    complete
+    .data start:0x022cbd10 end:0x022cbd14
+
+src/usa/overlay002/data/data_ov002_022cc5d4.c:
+    complete
+    .data start:0x022cc5d4 end:0x022cc5d8
+
+src/usa/overlay002/data/data_ov002_022cc5d8.c:
+    complete
+    .data start:0x022cc5d8 end:0x022cc5dc
+
+src/usa/overlay002/data/data_ov002_022cc5dc.c:
+    complete
+    .data start:0x022cc5dc end:0x022cc5e0
+
+src/usa/overlay002/data/data_ov002_022cc5e0.c:
+    complete
+    .data start:0x022cc5e0 end:0x022cc5e4
+
+src/usa/overlay002/data/data_ov002_022cc5e4.c:
+    complete
+    .data start:0x022cc5e4 end:0x022cc5e8
+
+src/usa/overlay002/data/data_ov002_022cc7fc.c:
+    complete
+    .data start:0x022cc7fc end:0x022cc800
+
+src/usa/overlay002/data/data_ov002_022cc800.c:
+    complete
+    .data start:0x022cc800 end:0x022cc804
+
+src/usa/overlay002/data/data_ov002_022cc804.c:
+    complete
+    .data start:0x022cc804 end:0x022cc808
+
+src/usa/overlay002/data/data_ov002_022cc808.c:
+    complete
+    .data start:0x022cc808 end:0x022cc80c
+
+src/usa/overlay002/data/data_ov002_022cc80c.c:
+    complete
+    .data start:0x022cc80c end:0x022cc810
+
+src/usa/overlay002/data/data_ov002_022cc810.c:
+    complete
+    .data start:0x022cc810 end:0x022cc814
+
+src/usa/overlay002/data/data_ov002_022cc814.c:
+    complete
+    .data start:0x022cc814 end:0x022cc818
+
+src/usa/overlay002/data/data_ov002_022cca44.c:
+    complete
+    .data start:0x022cca44 end:0x022cca48
+
+src/usa/overlay002/data/data_ov002_022ccae8.c:
+    complete
+    .data start:0x022ccae8 end:0x022ccaec
+
+src/usa/overlay002/data/data_ov002_022ccbc8.c:
+    complete
+    .data start:0x022ccbc8 end:0x022ccbcc
+
+src/usa/overlay002/data/data_ov002_022ccf20.c:
+    complete
+    .data start:0x022ccf20 end:0x022ccf24
+
+src/usa/overlay002/data/data_ov002_022ccf24.c:
+    complete
+    .data start:0x022ccf24 end:0x022ccf28
+
+src/usa/overlay002/data/data_ov002_022ccf30.c:
+    complete
+    .data start:0x022ccf30 end:0x022ccf34
+
+src/usa/overlay002/data/data_ov002_022ccf34.c:
+    complete
+    .data start:0x022ccf34 end:0x022ccf38
+
+src/usa/overlay002/data/data_ov002_022ccf40.c:
+    complete
+    .data start:0x022ccf40 end:0x022ccf44
+
+src/usa/overlay002/data/data_ov002_022ccf44.c:
+    complete
+    .data start:0x022ccf44 end:0x022ccf48
+
+src/usa/overlay002/data/data_ov002_022ccf50.c:
+    complete
+    .data start:0x022ccf50 end:0x022ccf54
+
+src/usa/overlay002/data/data_ov002_022cc400.c:
+    complete
+    .data start:0x022cc400 end:0x022cc404
