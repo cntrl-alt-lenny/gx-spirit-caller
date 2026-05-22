@@ -25,6 +25,7 @@ sys.path.insert(0, str(_TOOLS))
 
 from analyze_symbols import Reloc, Symbol  # noqa: E402
 from cross_region_cluster_apply import (  # noqa: E402
+    ChunkCandidate,
     ClaimedRange,
     DelinksMap,
     PointerCandidate,
@@ -32,6 +33,9 @@ from cross_region_cluster_apply import (  # noqa: E402
     ScalarCandidate,
     enumerate_b_pointers,
     enumerate_b_true_scalars,
+    enumerate_c_strings,
+    enumerate_d1_tables,
+    enumerate_d2_arrays,
     infer_symbol_sizes,
     is_addr_claimed,
     module_id_to_overlay_num,
@@ -39,6 +43,7 @@ from cross_region_cluster_apply import (  # noqa: E402
     parse_delinks,
     render_b_pointer,
     render_b_true_scalar,
+    render_d1_table,
     src_subdir_for_module,
 )
 
@@ -562,6 +567,392 @@ class TestRegionPaths(unittest.TestCase):
     def test_invalid_region_raises(self) -> None:
         with self.assertRaisesRegex(ValueError, "region"):
             RegionPaths.make("xxx", "main")
+
+
+# --------------------------------------------------------------------------- #
+# Brief 184 — cluster C / D-1 / D-2 enumeration + emission
+# --------------------------------------------------------------------------- #
+
+
+class TestEnumerateCStrings(unittest.TestCase):
+    """Brief 184 c-strings enumerator. Filters to unclaimed
+    `.rodata` `data_` symbols with non-zero content + size ≥ 1.
+    """
+
+    def _ctx(
+        self,
+        symbols,
+        claims=None,
+        words=None,
+        rodata_va=0x020b0000,
+        rodata_end=0x020b1000,
+        text_base=0x02000000,
+    ):
+        sections = {".rodata": (rodata_va, rodata_end)}
+        delinks = DelinksMap(sections=sections, claims=claims or [])
+        binary = _build_test_binary(rodata_va, words or {})
+        return _SynthCtx(
+            symbols=symbols,
+            relocs=[],
+            delinks=delinks,
+            binary=binary,
+            text_base=text_base,
+        )
+
+    def test_emits_non_zero_string_symbol(self) -> None:
+        syms = [
+            _sym("data_020b0000", 0x020b0000),
+            _sym("data_020b0008", 0x020b0008),  # next symbol → infers size = 8
+        ]
+        ctx = self._ctx(
+            syms,
+            # First word makes the content non-zero; second word
+            # extends the synth binary past the first symbol's
+            # inferred end (size=8 → covers [0x020b0000, 0x020b0008)).
+            words={0x020b0000: 0x48656c6c, 0x020b0004: 0x6f205743},
+        )
+        cands = enumerate_c_strings(ctx)
+        self.assertEqual(len(cands), 1)
+        self.assertEqual(cands[0].addr, 0x020b0000)
+        self.assertEqual(cands[0].section, ".rodata")
+        self.assertEqual(cands[0].shape, "string")
+
+    def test_skips_already_claimed_symbol(self) -> None:
+        syms = [
+            _sym("data_020b0000", 0x020b0000),
+            _sym("data_020b0008", 0x020b0008),
+        ]
+        ctx = self._ctx(
+            syms,
+            claims=[ClaimedRange(section=".rodata",
+                                 start=0x020b0000, end=0x020b0008)],
+            words={0x020b0000: 0xdeadbeef},
+        )
+        cands = enumerate_c_strings(ctx)
+        self.assertEqual(cands, [])
+
+    def test_skips_all_zero_content(self) -> None:
+        # All-zero `.rodata` is rare but plausible; skip to avoid
+        # mwcc mis-routing to `.bss`.
+        syms = [
+            _sym("data_020b0000", 0x020b0000),
+            _sym("data_020b0008", 0x020b0008),
+        ]
+        # words={} → binary is 0xcc-filled BUT the area in question
+        # isn't at our test va — the synth fills [text_base, max_va).
+        # Build a zeroed region manually.
+        sections = {".rodata": (0x020b0000, 0x020b1000)}
+        binary = b"\xcc" * 0x020b0000 + b"\x00" * 0x1000
+        delinks = DelinksMap(sections=sections, claims=[])
+        ctx = _SynthCtx(
+            symbols=syms, relocs=[], delinks=delinks, binary=binary,
+        )
+        cands = enumerate_c_strings(ctx)
+        self.assertEqual(cands, [])
+
+    def test_skips_size_lt_4_at_non_4_aligned_va(self) -> None:
+        # Out-of-scope: needs the brief 152 / 155 bundle recipe.
+        syms = [
+            _sym("data_020b0001", 0x020b0001),
+            _sym("data_020b0002", 0x020b0002),  # next at +1 → size=1
+        ]
+        ctx = self._ctx(
+            syms,
+            words={0x020b0000: 0xdeadbeef},  # any non-zero
+        )
+        cands = enumerate_c_strings(ctx)
+        # data_020b0001 has size=1 + non-4-aligned start — skipped.
+        # data_020b0002 has size=fill-to-section-end + non-4-aligned
+        # start, BUT size ≥ 4 lets it through. The bundle-territory
+        # gate only kicks in for size < 4.
+        for c in cands:
+            self.assertNotEqual(c.addr, 0x020b0001)
+
+    def test_skips_hand_named_symbol(self) -> None:
+        syms = [
+            _sym("BuildInfo", 0x020b0000),  # hand-named
+            _sym("data_020b0008", 0x020b0008),
+        ]
+        ctx = self._ctx(syms, words={0x020b0000: 0x12345678})
+        cands = enumerate_c_strings(ctx)
+        self.assertEqual(cands, [])  # hand-named filtered out
+
+
+class TestEnumerateD1Tables(unittest.TestCase):
+    """Brief 184 d1-tables enumerator. Filters to unclaimed `.data`
+    `data_` symbols sized ≥ 8 (multi-slot) with a `kind:load` reloc
+    on EVERY 4-byte slot.
+    """
+
+    def _ctx(
+        self,
+        symbols,
+        relocs=None,
+        claims=None,
+        words=None,
+        data_va=0x020e0000,
+        data_end=0x020e1000,
+        text_base=0x02000000,
+    ):
+        sections = {".data": (data_va, data_end)}
+        delinks = DelinksMap(sections=sections, claims=claims or [])
+        binary = _build_test_binary(data_va, words or {})
+        return _SynthCtx(
+            symbols=symbols,
+            relocs=relocs or [],
+            delinks=delinks,
+            binary=binary,
+            text_base=text_base,
+        )
+
+    def test_emits_8byte_two_slot_table(self) -> None:
+        # Two-slot dispatch table; both slots carry load relocs;
+        # pointees exist in the symbol table.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0008", 0x020e0008),  # next → size=8
+            _sym("target_a", 0x02001000, type_="data"),
+            _sym("target_b", 0x02001100, type_="data"),
+        ]
+        relocs = [
+            Reloc(src_addr=0x020e0000, src_module="main",
+                  dest_addr=0x02001000, dest_module="main",
+                  kind="load"),
+            Reloc(src_addr=0x020e0004, src_module="main",
+                  dest_addr=0x02001100, dest_module="main",
+                  kind="load"),
+        ]
+        ctx = self._ctx(syms, relocs=relocs)
+        cands = enumerate_d1_tables(ctx)
+        self.assertEqual(len(cands), 1)
+        c = cands[0]
+        self.assertEqual(c.addr, 0x020e0000)
+        self.assertEqual(c.size, 8)
+        self.assertEqual(c.shape, "d1-table")
+        self.assertEqual(len(c.table_entries), 2)
+        self.assertEqual(
+            [name for name, _ in c.table_entries],
+            ["target_a", "target_b"],
+        )
+
+    def test_skips_single_slot_pointer(self) -> None:
+        # 4-byte slot belongs to the b-pointers lane.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0004", 0x020e0004),
+            _sym("target_a", 0x02001000, type_="data"),
+        ]
+        relocs = [
+            Reloc(src_addr=0x020e0000, src_module="main",
+                  dest_addr=0x02001000, dest_module="main",
+                  kind="load"),
+        ]
+        ctx = self._ctx(syms, relocs=relocs)
+        self.assertEqual(enumerate_d1_tables(ctx), [])
+
+    def test_skips_table_with_missing_reloc(self) -> None:
+        # Multi-slot but only one slot has a reloc → not D-1.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e000c", 0x020e000c),  # size=12 (3 slots)
+            _sym("target_a", 0x02001000, type_="data"),
+        ]
+        relocs = [
+            Reloc(src_addr=0x020e0000, src_module="main",
+                  dest_addr=0x02001000, dest_module="main",
+                  kind="load"),
+            # slots at +4 and +8 have NO relocs.
+        ]
+        ctx = self._ctx(syms, relocs=relocs)
+        self.assertEqual(enumerate_d1_tables(ctx), [])
+
+    def test_marks_thumb_target(self) -> None:
+        # Pointee VA has bit 0 set → thumb function pointer.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0008", 0x020e0008),
+            Symbol(name="func_thumb", module="main",
+                   addr=0x02001500, size=0x20,
+                   type="function", mode="thumb"),
+            Symbol(name="func_arm", module="main",
+                   addr=0x02001600, size=0x20,
+                   type="function", mode="arm"),
+        ]
+        relocs = [
+            Reloc(src_addr=0x020e0000, src_module="main",
+                  dest_addr=0x02001501,  # thumb +1
+                  dest_module="main", kind="load"),
+            Reloc(src_addr=0x020e0004, src_module="main",
+                  dest_addr=0x02001600,
+                  dest_module="main", kind="load"),
+        ]
+        ctx = self._ctx(syms, relocs=relocs)
+        cands = enumerate_d1_tables(ctx)
+        self.assertEqual(len(cands), 1)
+        entries = cands[0].table_entries
+        self.assertEqual(entries[0], ("func_thumb", True))
+        # ARM target: mode='arm' → not thumb.
+        self.assertEqual(entries[1], ("func_arm", False))
+
+
+class TestEnumerateD2Arrays(unittest.TestCase):
+    """Brief 184 d2-arrays enumerator. Filters to unclaimed `.data`
+    `data_` symbols sized ≥ 8 + 4-aligned with NO load relocs on
+    any 4-byte slot.
+    """
+
+    def _ctx(
+        self,
+        symbols,
+        relocs=None,
+        words=None,
+        data_va=0x020e0000,
+        data_end=0x020e1000,
+        text_base=0x02000000,
+    ):
+        sections = {".data": (data_va, data_end)}
+        delinks = DelinksMap(sections=sections, claims=[])
+        binary = _build_test_binary(data_va, words or {})
+        return _SynthCtx(
+            symbols=symbols,
+            relocs=relocs or [],
+            delinks=delinks,
+            binary=binary,
+            text_base=text_base,
+        )
+
+    def test_emits_pure_content_array(self) -> None:
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0010", 0x020e0010),  # size=16
+        ]
+        ctx = self._ctx(
+            syms,
+            words={
+                0x020e0000: 0xaabbccdd,
+                0x020e0004: 0x11223344,
+                0x020e0008: 0x55667788,
+                0x020e000c: 0x99aabbcc,
+            },
+        )
+        cands = enumerate_d2_arrays(ctx)
+        self.assertEqual(len(cands), 1)
+        self.assertEqual(cands[0].addr, 0x020e0000)
+        self.assertEqual(cands[0].size, 16)
+        self.assertEqual(cands[0].shape, "d2-array")
+        # D-2 candidates carry no per-slot table_entries (those are
+        # D-1's domain).
+        self.assertEqual(cands[0].table_entries, ())
+
+    def test_skips_symbol_with_any_reloc(self) -> None:
+        # Even one load reloc means it's D-1 territory.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0008", 0x020e0008),
+        ]
+        relocs = [
+            Reloc(src_addr=0x020e0004, src_module="main",
+                  dest_addr=0x02001000, dest_module="main",
+                  kind="load"),
+        ]
+        ctx = self._ctx(syms, relocs=relocs,
+                        words={0x020e0000: 0xdeadbeef})
+        self.assertEqual(enumerate_d2_arrays(ctx), [])
+
+    def test_skips_size_lt_8(self) -> None:
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e0004", 0x020e0004),
+        ]
+        ctx = self._ctx(syms, words={0x020e0000: 0xdeadbeef})
+        self.assertEqual(enumerate_d2_arrays(ctx), [])
+
+    def test_skips_non_4_aligned_size(self) -> None:
+        # Size 12 is 4-aligned ✓; size 14 is not.
+        syms = [
+            _sym("data_020e0000", 0x020e0000),
+            _sym("data_020e000e", 0x020e000e),  # size=14, non-4-aligned
+        ]
+        ctx = self._ctx(
+            syms,
+            words={0x020e0000: 0xdeadbeef, 0x020e0008: 0xcafebabe},
+        )
+        self.assertEqual(enumerate_d2_arrays(ctx), [])
+
+
+class TestRenderD1Table(unittest.TestCase):
+    """Brief 184 D-1 emitter — produces a C source declaring extern
+    pointees + the void * array.
+    """
+
+    def test_simple_two_entry_table(self) -> None:
+        text = render_d1_table(
+            anchor_name="data_020e0000",
+            entries=(
+                ("target_a", False),
+                ("target_b", False),
+            ),
+        )
+        self.assertIn("extern char target_a;", text)
+        self.assertIn("extern char target_b;", text)
+        self.assertIn("void *data_020e0000[2] = {", text)
+        self.assertIn("&target_a,", text)
+        self.assertIn("&target_b,", text)
+        self.assertIn("};", text)
+
+    def test_thumb_target_gets_plus_one(self) -> None:
+        text = render_d1_table(
+            anchor_name="data_020e0000",
+            entries=(
+                ("func_thumb", True),
+                ("data_other", False),
+            ),
+        )
+        self.assertIn(
+            "(void *) ((char *) &func_thumb + 1),", text,
+        )
+        self.assertIn("&data_other,", text)
+
+    def test_duplicate_pointee_emits_one_extern(self) -> None:
+        text = render_d1_table(
+            anchor_name="data_020e0000",
+            entries=(
+                ("target_a", False),
+                ("target_a", False),  # same target twice
+                ("target_b", False),
+            ),
+        )
+        # 'extern char target_a;' appears exactly once.
+        self.assertEqual(text.count("extern char target_a;"), 1)
+        # The array still has 3 slots.
+        self.assertIn("void *data_020e0000[3]", text)
+
+    def test_empty_entries_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            render_d1_table(anchor_name="data_x", entries=())
+
+
+class TestChunkCandidateDataclass(unittest.TestCase):
+    """Light pin on the ChunkCandidate dataclass shape — guards
+    against accidental field drift that would break the JSON
+    preview path in `_run_chunk_subcommand`.
+    """
+
+    def test_defaults(self) -> None:
+        c = ChunkCandidate(
+            addr=0x020e0000, size=16, section=".data",
+            shape="d2-array",
+        )
+        self.assertEqual(c.table_entries, ())
+
+    def test_d1_table_carries_entries(self) -> None:
+        c = ChunkCandidate(
+            addr=0x020e0000, size=8, section=".data",
+            shape="d1-table",
+            table_entries=(("target_a", False), ("target_b", True)),
+        )
+        self.assertEqual(len(c.table_entries), 2)
+        self.assertEqual(c.table_entries[1], ("target_b", True))
 
 
 if __name__ == "__main__":
