@@ -30,6 +30,7 @@ from cluster_b_bundle_gen import (  # noqa: E402
     BundleExtentError,
     compute_bundle_extent,
     render_bundle_c,
+    render_bundle_s_bytewise,
 )
 
 
@@ -373,6 +374,319 @@ class TestRenderBundleC(unittest.TestCase):
         self.assertIn("data_Y_str", out)
         # "card" → 0x64726163 little-endian
         self.assertIn("0x64726163", out)
+
+
+# ---------------------------------------------------------------------------- #
+# Brief 185 — cap raise (1024 → 4096) + max_inner_symbols guardrail
+# ---------------------------------------------------------------------------- #
+
+
+class TestBrief185CapRaiseAndGuardrails(unittest.TestCase):
+    """Brief 185: the default `max_bundle_bytes` cap moved from
+    1024 → 4096 to accommodate `data_ov006_021ceae4`'s 1168-byte
+    bundle (deferred from brief 181). A new
+    `max_inner_symbols=16` per-cluster guardrail catches
+    pathological multi-segment cases that should route to
+    Pattern 3 instead.
+    """
+
+    BASE_VA = 0x02000000
+
+    def test_default_cap_admits_1168_byte_bundle(self):
+        # data_ov006_021ceae4's empirical case: 1168-byte bundle,
+        # 3 inner placeholders. Pre-brief-185 (cap=1024) → raises;
+        # post-brief-185 (cap=4096) → succeeds.
+        syms = [
+            _sym("anchor", 0x02000100),
+            _sym("inner_a", 0x02000102),
+            _sym("inner_b", 0x02000106),
+            _sym("inner_c", 0x0200034a),
+            _sym("terminator", 0x02000590),  # 0x490 = 1168 B
+        ]
+        sections = {".data": (0x02000100, 0x02000800)}
+        # Plant a non-zero byte so the heuristic accepts the
+        # bundle (≥ 1 non-zero requirement preserved).
+        binary = bytearray(b"\x00" * 0x800)
+        binary[0x100] = 0x74
+        bundle = compute_bundle_extent(
+            0x02000100, syms, sections, bytes(binary), self.BASE_VA,
+        )
+        self.assertEqual(bundle.size_bytes, 0x490)
+        self.assertEqual(len(bundle.inner_symbols), 3)
+
+    def test_default_cap_rejects_above_4096(self):
+        # Cap is now 4096 instead of 1024.
+        syms = [
+            _sym("anchor", 0x02000100),
+            _sym("terminator", 0x02001200),  # 0x1100 = 4352 B
+        ]
+        sections = {".data": (0x02000100, 0x02002000)}
+        binary = bytearray(b"\x00" * 0x2000)
+        binary[0x100] = 0x42
+        with self.assertRaisesRegex(BundleExtentError, "safety cap"):
+            compute_bundle_extent(
+                0x02000100, syms, sections, bytes(binary),
+                self.BASE_VA,
+            )
+
+    def test_max_inner_symbols_guardrail_rejects_pathological(self):
+        # > 16 inner placeholders → Pattern 3 territory; raise.
+        # All inner placeholders at non-4-aligned offsets so the
+        # walk doesn't terminate early; terminator at +0x80
+        # (4-aligned).
+        addrs = [0x02000100] + [
+            0x02000100 + 2 + 4 * i for i in range(20)
+        ] + [0x02000180]
+        syms = [_sym(f"s_{i}", a) for i, a in enumerate(addrs)]
+        sections = {".data": (0x02000100, 0x02000200)}
+        binary = bytearray(b"\x00" * 0x200)
+        binary[0x100] = 0x99
+        with self.assertRaisesRegex(
+            BundleExtentError, "max_inner_symbols",
+        ):
+            compute_bundle_extent(
+                0x02000100, syms, sections, bytes(binary),
+                self.BASE_VA,
+            )
+
+    def test_max_inner_symbols_override_allows_higher(self):
+        # Caller can opt out of the guardrail by raising the
+        # bound — same arg surface as max_bundle_bytes. Same
+        # non-4-aligned-stride pattern as the rejection test
+        # above so the walk picks the same +0x80 terminator.
+        addrs = [0x02000100] + [
+            0x02000100 + 2 + 4 * i for i in range(20)
+        ] + [0x02000180]
+        syms = [_sym(f"s_{i}", a) for i, a in enumerate(addrs)]
+        sections = {".data": (0x02000100, 0x02000200)}
+        binary = bytearray(b"\x00" * 0x200)
+        binary[0x100] = 0x99
+        bundle = compute_bundle_extent(
+            0x02000100, syms, sections, bytes(binary),
+            self.BASE_VA, max_inner_symbols=100,
+        )
+        self.assertEqual(len(bundle.inner_symbols), 20)
+
+    def test_at_default_cap_boundary_4096_accepted(self):
+        # Boundary: exactly 4096-byte bundle should be accepted
+        # (cap is `>`, not `>=`).
+        syms = [
+            _sym("anchor", 0x02000100),
+            _sym("terminator", 0x02001100),  # 4096 B exact
+        ]
+        sections = {".data": (0x02000100, 0x02002000)}
+        binary = bytearray(b"\x00" * 0x2000)
+        binary[0x100] = 0x42
+        bundle = compute_bundle_extent(
+            0x02000100, syms, sections, bytes(binary), self.BASE_VA,
+        )
+        self.assertEqual(bundle.size_bytes, 0x1000)
+
+
+# ---------------------------------------------------------------------------- #
+# Brief 185 — bytewise `.s` emitter
+# ---------------------------------------------------------------------------- #
+
+
+class TestRenderBundleSBytewise(unittest.TestCase):
+    """Brief 185: byte-granular `.s` emitter that handles
+    odd-offset inner aliases. Required for cluster B overlay
+    candidates where `patch_module_literals.py` doesn't run and
+    inner placeholders MUST be `.global`-exposed (per brief 181).
+    """
+
+    def _bundle(self, *, anchor_va=0x02000100):
+        return Bundle(
+            anchor_name="data_X",
+            anchor_vaddr=anchor_va,
+            end_vaddr=anchor_va + 8,
+            section=".data",
+            bytes_le=bytes([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88]),
+            inner_symbols=(("data_X_inner", 2),),
+        )
+
+    def test_emits_section_directive(self):
+        out = render_bundle_s_bytewise(self._bundle())
+        self.assertIn(".section .data", out)
+
+    def test_emits_anchor_label_and_globals(self):
+        out = render_bundle_s_bytewise(self._bundle())
+        self.assertIn(".global data_X", out)
+        self.assertIn("data_X:", out)
+        self.assertIn(".global data_X_inner", out)
+        self.assertIn("data_X_inner:", out)
+
+    def test_emits_bytes_at_correct_offsets(self):
+        # Anchor [0..2): 0x11, 0x22; inner [2..8): 0x33..0x88.
+        out = render_bundle_s_bytewise(self._bundle())
+        # Anchor segment.
+        self.assertIn("data_X:\n        .byte 0x11, 0x22", out)
+        # Inner segment.
+        self.assertIn(
+            "data_X_inner:\n        .byte 0x33, 0x44, 0x55, 0x66, 0x77, 0x88",
+            out,
+        )
+
+    def test_odd_offset_inner_alias_accepted(self):
+        # The whole point of this emitter: brief 181's worked
+        # examples used `.global` labels at non-4-aligned offsets
+        # (e.g. +2). The existing `cluster_b_bundle.py:
+        # render_bundle_s` rejects those; this one accepts them.
+        bundle = Bundle(
+            anchor_name="data_X",
+            anchor_vaddr=0x02000100,
+            end_vaddr=0x02000108,
+            section=".data",
+            bytes_le=bytes([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x01]),
+            inner_symbols=(
+                ("data_X_at_3", 3),  # odd offset!
+                ("data_X_at_5", 5),  # odd offset!
+            ),
+        )
+        out = render_bundle_s_bytewise(bundle)
+        # Anchor segment [0..3): 0xAA, 0xBB, 0xCC
+        self.assertIn(
+            "data_X:\n        .byte 0xaa, 0xbb, 0xcc", out,
+        )
+        # +3 inner segment [3..5): 0xDD, 0xEE
+        self.assertIn(
+            "data_X_at_3:\n        .byte 0xdd, 0xee", out,
+        )
+        # +5 inner segment [5..8): 0xFF, 0x00, 0x01
+        self.assertIn(
+            "data_X_at_5:\n        .byte 0xff, 0x00, 0x01", out,
+        )
+
+    def test_offset_out_of_bounds_raises(self):
+        bundle = Bundle(
+            anchor_name="data_X",
+            anchor_vaddr=0x02000100,
+            end_vaddr=0x02000108,
+            section=".data",
+            bytes_le=bytes(8),
+            inner_symbols=(("data_X_bad", 16),),  # past bundle end
+        )
+        with self.assertRaisesRegex(ValueError, "outside bundle"):
+            render_bundle_s_bytewise(bundle)
+
+    def test_bytes_per_line_formatting(self):
+        # 8 bytes per line is the default (brief 181's worked-
+        # example convention). 17 bytes → 3 lines (8+8+1).
+        bundle = Bundle(
+            anchor_name="data_X",
+            anchor_vaddr=0x02000100,
+            end_vaddr=0x02000114,  # 0x14 = 20 bytes, 4-aligned
+            section=".data",
+            bytes_le=bytes(range(20)),
+            inner_symbols=(),
+        )
+        out = render_bundle_s_bytewise(bundle)
+        byte_lines = [
+            line for line in out.splitlines()
+            if line.strip().startswith(".byte")
+        ]
+        # 20 bytes / 8 per line = 3 lines (8, 8, 4).
+        self.assertEqual(len(byte_lines), 3)
+        # Last line has 4 bytes.
+        self.assertEqual(byte_lines[-1].count(","), 3)
+
+
+# ---------------------------------------------------------------------------- #
+# Brief 185 — real-data smoke: data_ov006_021ceae4 worked example
+# ---------------------------------------------------------------------------- #
+
+
+class TestBrief185Ov006WorkedExample(unittest.TestCase):
+    """Brief 185's worked example: `data_ov006_021ceae4` is the
+    candidate brief 181 deferred. With the cap raised + the
+    bytewise emitter, the heuristic must reproduce a 1168-byte
+    bundle with 3 inner aliases at offsets +2, +6, +0x24a.
+    Cross-region: USA and JPN are byte-identical for this range.
+    """
+
+    REGIONS = ("usa", "jpn")
+    ANCHOR_VA = 0x021ceae4
+    EXPECTED_SIZE = 0x490  # 1168 bytes
+    EXPECTED_INNER = (
+        ("data_ov006_021ceae6", 0x2),
+        ("data_ov006_021ceaea", 0x6),
+        ("data_ov006_021ced2e", 0x24a),
+    )
+
+    def _ctx(self, region: str):
+        # Smoke test — needs the actual config/<region>/ tree.
+        # Skip if not present (e.g. CI sandbox without extracts).
+        cra = _TOOLS / "cross_region_cluster_apply.py"
+        if not cra.is_file():
+            self.skipTest("apply tool not present")
+        sys.path.insert(0, str(_TOOLS))
+        from cross_region_cluster_apply import RegionContext
+        try:
+            return RegionContext.load(region, "ov006")
+        except FileNotFoundError:
+            self.skipTest(
+                f"{region}/ov006 extract not present in this checkout"
+            )
+
+    def test_bundle_extent_matches_expected_per_region(self):
+        for region in self.REGIONS:
+            with self.subTest(region=region):
+                ctx = self._ctx(region)
+                base = min(
+                    s for s, _ in ctx.delinks.sections.values()
+                )
+                bundle = compute_bundle_extent(
+                    self.ANCHOR_VA, ctx.symbols,
+                    ctx.delinks.sections, ctx.binary, base,
+                )
+                self.assertEqual(bundle.anchor_vaddr, self.ANCHOR_VA)
+                self.assertEqual(
+                    bundle.size_bytes, self.EXPECTED_SIZE,
+                )
+                self.assertEqual(
+                    bundle.inner_symbols, self.EXPECTED_INNER,
+                )
+
+    def test_worked_example_artifact_matches_emitter(self):
+        # The src/<region>/overlay006/data/data_ov006_021ceae4.s
+        # file shipped with this brief must match what the
+        # generator currently emits. This pins the regression so
+        # future tool changes don't silently drift the artifact.
+        for region in self.REGIONS:
+            with self.subTest(region=region):
+                ctx = self._ctx(region)
+                base = min(
+                    s for s, _ in ctx.delinks.sections.values()
+                )
+                bundle = compute_bundle_extent(
+                    self.ANCHOR_VA, ctx.symbols,
+                    ctx.delinks.sections, ctx.binary, base,
+                )
+                expected = render_bundle_s_bytewise(
+                    bundle,
+                    extra_comment_lines=[
+                        "Brief 185 worked example — was deferred from brief 181 (PR #624)",
+                        "because the bundle extent (1168 B) exceeded the prior 1024-byte",
+                        "safety cap. Brief 185 raised the cap to 4096 + added the",
+                        f"max_inner_symbols guardrail; this {region.upper()} ov006 candidate",
+                        "now passes cleanly.",
+                    ],
+                )
+                artifact = (
+                    _ROOT / "src" / region / "overlay006"
+                    / "data" / "data_ov006_021ceae4.s"
+                )
+                self.assertTrue(
+                    artifact.is_file(),
+                    f"worked-example artifact {artifact} missing",
+                )
+                self.assertEqual(
+                    artifact.read_text(encoding="utf-8"),
+                    expected,
+                    f"{region} artifact has drifted from the "
+                    f"emitter output — regenerate via tools/"
+                    f"cluster_b_bundle_gen.py or update this test",
+                )
 
 
 if __name__ == "__main__":

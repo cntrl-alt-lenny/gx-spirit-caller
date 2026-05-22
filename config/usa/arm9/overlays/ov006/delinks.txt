@@ -89,3 +89,7 @@ src/usa/overlay006/data/data_ov006_021cdd0c.s:
 src/usa/overlay006/data/data_ov006_021cea2c.s:
     complete
     .data start:0x021cea2c end:0x021cea94
+
+src/usa/overlay006/data/data_ov006_021ceae4.s:
+    complete
+    .data start:0x021ceae4 end:0x021cef74
