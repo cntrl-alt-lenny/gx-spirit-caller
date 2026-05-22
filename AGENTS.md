@@ -364,19 +364,104 @@ itself:
 
 ### Open briefs
 
-- **Brief 182 (HIGH, NEW)** — `decomper` path-2 final wave
-  (n=2 → n=0). Claim `data_ov004_021ded69` +
-  `data_ov004_021e191c` via brief 173 Variant A
-  (`__attribute__((aligned(1)))` extern + delinks entry).
-  Unblocked by brief 180's map-driven layout reconstruction
-  (PR #623). Critical: 3-region SHA1 PASS preserved (n=2
-  baseline + new n=0 floor). Branch:
-  `decomper/path-2-final-wave-n2-to-n0`. Brief file not
-  yet authored — see *Today's merges* PR #623 entry in
-  state.md for the full hand-off context.
+- **Brief 188 (HIGH, NEW)** — `decomper` inaugural code-decomp
+  wave. **First code-decomp brief in 39 briefs (since pre-SHA1-
+  PASS, brief ~100).** Ship as many of the 12 trivial-bucket picks
+  from [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
+  as land cleanly (≥ 8 of 12 success bar). Walls policy: > 30 min
+  on a single pick → skip, document, move on. Critical: 3-region
+  `ninja sha1` PASS preserved + `matched_code_percent` ticks up
+  (first time the metric moves since SHA1 PASS at brief 140).
+  Branch: `decomper/code-decomp-wave-1-trivial`. Brief file not
+  authored (inline-spec in brain message).
+- **Brief 189 (MEDIUM, NEW)** — `scaffolder` wall pre-emption for
+  the first code-decomp wave. Audit the 40 easy + medium-easy
+  picks against [docs/research/codegen-walls.md](docs/research/codegen-walls.md),
+  produce top-3 wall research notes (recognition cues + workarounds +
+  permuter strategy), and refresh `tools/next_targets.py:reason` to
+  emit wall predictions. Branch: `scaffolder/first-wave-wall-pre-
+  emption`. Brief file not authored (inline-spec in brain message).
 
 ### Closed briefs (reference)
 
+- **Brief 187** — `scaffolder`, shipped in PR #633. 🎉 **Code-
+  decomp resumption prep.** Three-part pivot enabler: (1)
+  `tools/objdiff_filter_panic_units.py` filters 1,096 / 3,330
+  units that trip the ARM crash or have missing `.o` files;
+  `ninja report` now produces report.json in ~0.2 s — **revealing
+  matched_code_percent = 1.40 % (was 0.70 % via delinks-approx)
+  and matched_functions = 1,420 / 9,608 (14.78 %)**; upstream
+  [objdiff#352](https://github.com/encounter/objdiff/issues/352)
+  filed with minimal ELF reproducer. (2) 52-pick curated queue
+  (12 trivial + 25 easy + 15 medium-easy) at
+  `docs/research/code-decomp-resumption-queue.md`. (3)
+  `docs/decomp-workflow.md` refreshed with post-scaffold
+  resumption playbook + routing decision tree + 3-region
+  SHA1 PASS as headline gate. Brain pushed MD012 fix
+  (commit 38ec1e2 — 3 spots, triple-blank before bucket tables).
+  3-region SHA1 PASS preserved. 1973/1973 tests.
+- **Brief 182** — `decomper`, shipped in PR #632. 🎉
+  **W7 patcher chain CLOSED for EUR at n=0.** Both odd-aligned
+  EUR ov004 `.rodata` claims ship via brief 173 Variant A:
+  `data_ov004_021ded69` (8,780 B) + `data_ov004_021e191c`
+  (1,173 B) = 9,953 new EUR bytes. Decomper's prior three-
+  session investigation produced the brief 186 patcher fix
+  spec; with brief 186 in place, the same source-side recipe
+  lands clean. **W7 chain: 134 → 142 → 146 → 150 → 162 → 164
+  → 168 → 180 → 183 → 186 → 182** (closed for EUR; USA/JPN
+  cross-region deferred to brief 188+ per +36 B cascade
+  exceeding brief 180's MAX_SHIFT_BYTES=4 cap). 3-region
+  SHA1 PASS + 27/27 modules preserved. Self-extend survey:
+  35 odd-aligned ov004 data symbols total, 1 shipped, 34
+  remain (deferred — code-decomp pivot takes priority).
+- **Brief 186** — `scaffolder`, shipped in PR #631. 🎯
+  **Two parser gaps closed in `tools/patch_ov004_veneers.py`,
+  from the decomper's brief 182 diagnosis.** Gap A: new
+  `_MAP_SECTION_BOUNDARY_RE` parses `OV<NN>_<SECTION>_START/END`
+  markers; per-TU `built_end_va` extends to next TU's start
+  (closes the 167-byte trailing-region loss when last symbol
+  has size=0). Gap B: `.ctor` shift falls back to most recent
+  `.init` TU's shift when its own `shift_candidate` is None
+  and no prior `.ctor` TU exists (closes the +4 cascade for
+  `.p__sinit_*` ctor stubs whose hex encodes the pointed-to
+  function VA, not the slot VA). +256/-0, 4 new tests
+  (1969 → 1973), defensive max() semantic on Gap A. Real-
+  data confirmed on EUR map. 3-region SHA1 PASS at n=2
+  baseline preserved.
+- **Brief 185** — `scaffolder`, shipped in PR #630. 🎯
+  **Cluster B bundle cap raise + ov006 worked example.**
+  Brief 181 deferred `data_ov006_021ceae4` because the
+  computed extent (1168 B) exceeded the 1024-byte safety
+  cap in `cluster_b_bundle_gen.py`. Diagnosis: bundle MUST
+  end at a 4-aligned named symbol; no intermediate one exists
+  between `0x021ceae4` and `0x021cef74` (1168 B away).
+  Tightening the predicate (option a) was structurally
+  infeasible — chose option b: raise `max_bundle_bytes`
+  1024 → 4096 with new `max_inner_symbols=16` per-cluster
+  guardrail catching the *"wrong recipe, right size"* shape.
+  Worked example: `data_ov006_021ceae4.s` (USA + JPN ov006,
+  byte-identical cross-region). New `render_bundle_s_bytewise`
+  emitter for byte-granular .s output with `.global` labels
+  at non-4-aligned offsets. 1956 → 1969 tests. Research note
+  at `docs/research/cluster-b-bundle-cap-raise.md`.
+- **Brief 184** — `scaffolder`, shipped in PR #629. 🎯
+  **Cluster C / D-1 / D-2 cross-region subcommands.** Direct
+  continuation of [PR #626's research note](docs/research/chunk-extent-generalisation.md):
+  brief 177's `adjust_chunk_extent` is already cluster-agnostic;
+  this brief wires three new subcommands into
+  `tools/cross_region_cluster_apply.py` (`c-strings`,
+  `d1-tables`, `d2-tables`) following the existing `b-scalars` /
+  `b-pointers` shape. Real-data dry-run smoke: EUR 1855 emit /
+  741 skip; USA 1947 emit / 754 skip; JPN 1948 emit / 754
+  skip across all three subcommands. 1937 → 1956 tests
+  (+19). Pure tools work; no source ships here — decomper's
+  brief 188+ owns the apply at scale.
+- **Brief 183** — `scaffolder`, shipped in PR #627. 🎯
+  **ov004 patcher `.bss` TU filter.** `parse_link_map_ov004`
+  was including `.bss` TUs in the section layout walk,
+  causing offset miscalculation when `.bss` zero-fill
+  appeared between `.data` TUs. Filter drops them at parse
+  time. Small, focused fix. 3-region SHA1 PASS preserved.
 - **Brief 181** — `decomper`, shipped in PR #624. ✅ Bridge
   wave during brief 180 in-flight. Three sub-targets:
   (1) cluster B size-1/2 + odd-aligned cross-region —
