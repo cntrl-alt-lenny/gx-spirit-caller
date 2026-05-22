@@ -650,10 +650,15 @@ def parse_link_map_ov004(
     `overlay_header` defaults to `.ov004` (the only one the patcher
     needs); kept as an arg for unit-test isolation.
 
-    Raises `PatchError` if:
-      - The overlay header isn't found.
-      - A TU section has |shift| > `MAX_SHIFT_BYTES` (brief 180
-        safety cap).
+    The parser is purely descriptive: it produces `MapTUSection`
+    entries with whatever shifts the map reports. `MAX_SHIFT_BYTES`
+    is NOT enforced here — see `_layout_reconstruct` for the
+    runtime cap (PR #623 brain-review feedback: enforcing the cap
+    in the parser broke the rom_config-pass second invocation
+    where the pool-spliced bin pairs with a still-pre-splice map
+    that reports `+n × 12`-byte shifts).
+
+    Raises `PatchError` only if the overlay header isn't found.
     """
     lines = map_text.splitlines()
     in_block = False
@@ -729,15 +734,13 @@ def parse_link_map_ov004(
             # section, so propagating the trailing shift is safe.
             prior = [t for t in out if t.section == g["section"]]
             shift = prior[-1].shift if prior else 0
-        if abs(shift) > MAX_SHIFT_BYTES:
-            raise PatchError(
-                f"TU {g['tu_file']} ({g['section']}) has shift "
-                f"{shift:+d} bytes "
-                f"(|shift| > MAX_SHIFT_BYTES = {MAX_SHIFT_BYTES}); "
-                f"structural regression suspected — bail rather "
-                f"than relocate a TU section whose layout cause we "
-                f"have not characterised."
-            )
+        # NOTE: `MAX_SHIFT_BYTES` is NOT enforced here — see
+        # `_layout_reconstruct` for the runtime cap. Brain caught a
+        # production regression on PR #623 where the parser raised
+        # on pool-induced `+n × 12`-byte shifts during the
+        # rom_config-pass second invocation (pool already spliced,
+        # map still reports pre-splice shifts). The cap belongs at
+        # the actual copy site, not in the descriptive map parser.
         out.append(MapTUSection(
             section=g["section"],
             tu_file=g["tu_file"],
@@ -812,7 +815,24 @@ def _layout_reconstruct(
     zero-fills the gaps), so the zero default reproduces orig
     content there.
 
+    Brief 180 `MAX_SHIFT_BYTES` safety cap (PR #623 brain-review):
+    fires per-TU at the copy site, NOT in the parser. Reason: at
+    the rom_config-pass second invocation the linker map still
+    reports pool-induced shifts of `+n × 12` bytes on post-pool
+    TUs (the link only runs once per ninja graph; mwld + rom_config
+    re-invoke the patcher against the same map). Routing must reach
+    `_is_orig_shape` first and short-circuit to the idempotent path
+    before any shifted TU bytes get copied — so the cap only
+    matters when we're about to do the copy.
+    `_layout_reconstruct` is the only place that would actually
+    corrupt output if a > 4 shift were applied, so enforcing the
+    cap here is both necessary and sufficient.
+
     Returns `(output, tus_copied)`.
+
+    Raises `PatchError` if any TU has `|shift| > MAX_SHIFT_BYTES`
+    or if the TU's built / orig range falls outside the input /
+    output bounds.
     """
     base_va = orig_sections[".text"][0]
     data_end_va = orig_sections[".data"][1]
@@ -820,6 +840,15 @@ def _layout_reconstruct(
     output = bytearray(orig_size)
     tus_copied = 0
     for tu in tu_sections:
+        if abs(tu.shift) > MAX_SHIFT_BYTES:
+            raise PatchError(
+                f"TU {tu.tu_file} ({tu.section}) has shift "
+                f"{tu.shift:+d} bytes "
+                f"(|shift| > MAX_SHIFT_BYTES = {MAX_SHIFT_BYTES}); "
+                f"structural regression suspected — bail rather "
+                f"than relocate a TU section whose layout cause we "
+                f"have not characterised."
+            )
         built_fo = tu.built_start_va - base_va
         orig_fo = tu.orig_start_va - base_va
         size = tu.size

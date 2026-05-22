@@ -1844,19 +1844,42 @@ class TestParseLinkMapOv004(unittest.TestCase):
         self.assertEqual(len(tus), 1)
         self.assertEqual(tus[0].shift, 0)
 
-    def test_shift_above_max_raises(self):
-        # Brief 180 piece 4: |shift| > MAX_SHIFT_BYTES surfaces as
-        # PatchError. Use a TU shifted by MAX_SHIFT_BYTES + 1.
+    def test_parser_does_not_enforce_max_shift_cap(self):
+        # PR #623 brain-review fix: `MAX_SHIFT_BYTES` is enforced
+        # at the copy site (`_layout_reconstruct`), NOT in the
+        # parser. The parser produces TU entries with whatever
+        # shifts the map reports, including pool-induced shifts of
+        # `+n × VENEER_SIZE` that the rom_config-pass second
+        # invocation sees. The actual safety net is the routing
+        # in `patch_ov004` (pool-presence + idempotence checks)
+        # backed by `_layout_reconstruct`'s per-TU cap.
         bad_shift = MAX_SHIFT_BYTES + 1
         body = (
             f"  021DE63{bad_shift + 8:X} 00000004 .rodata "
             "data_ov004_021de638	(tu_a.o)\n"
             "#>021DE650          OV004_RODATA_END (linker command file)\n"
         )
-        with self.assertRaisesRegex(
-            PatchError, r"MAX_SHIFT_BYTES",
-        ):
-            parse_link_map_ov004(_synth_ov004_map(body))
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, bad_shift)
+
+    def test_parser_handles_pool_sized_shift(self):
+        # Production case: at n=2 EUR's rom_config-pass second
+        # invocation the map reports a +24-byte shift for
+        # `data_ov004_021e2efc.o (.rodata)` (= 2 × VENEER_SIZE).
+        # Pre-fix the parser raised here and `dsd rom build`
+        # failed. Post-fix the parser is purely descriptive and
+        # produces the TU entry; routing in `patch_ov004` takes
+        # the idempotent path before reaching
+        # `_layout_reconstruct`'s cap check.
+        body = (
+            "  02200118 00000004 .rodata data_ov004_02200100	"
+            "(post_pool_tu.o)\n"
+            "#>02200120          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, 24)
 
     def test_shift_at_max_accepted(self):
         # Boundary: |shift| == MAX_SHIFT_BYTES is accepted (the
@@ -2065,6 +2088,44 @@ class TestLayoutReconstruct(unittest.TestCase):
         with self.assertRaisesRegex(PatchError, "out of bounds for orig"):
             _layout_reconstruct(data, tus, sections)
 
+    def test_shift_above_max_raises_at_copy_site(self):
+        # PR #623 brain-review: `MAX_SHIFT_BYTES` is enforced
+        # here at the copy site, not in `parse_link_map_ov004`.
+        # A TU with `|shift| > MAX_SHIFT_BYTES` surfaces as a
+        # PatchError before any bytes get moved.
+        sections = self._sections()
+        data = bytes(0x100)
+        bad_shift = MAX_SHIFT_BYTES + 1
+        tus = [MapTUSection(
+            section=".rodata", tu_file="bad_shift.o",
+            built_start_va=0x02000010 + bad_shift,
+            built_end_va=0x02000014 + bad_shift,
+            orig_start_va=0x02000010,
+            orig_end_va=0x02000014,
+        )]
+        with self.assertRaisesRegex(PatchError, "MAX_SHIFT_BYTES"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_shift_at_max_accepted_at_copy_site(self):
+        # Boundary: |shift| == MAX_SHIFT_BYTES copies cleanly —
+        # this is the brief 179 empirical cap (+4 by the `.init`
+        # boundary), not a regression.
+        sections = self._sections()
+        data = bytearray(0x100)
+        payload = b"\x11\x22\x33\x44"
+        # Place payload at built fo 0x14 (= 0x10 + MAX_SHIFT_BYTES).
+        data[0x10 + MAX_SHIFT_BYTES:0x14 + MAX_SHIFT_BYTES] = payload
+        tus = [MapTUSection(
+            section=".rodata", tu_file="at_cap.o",
+            built_start_va=0x02000010 + MAX_SHIFT_BYTES,
+            built_end_va=0x02000014 + MAX_SHIFT_BYTES,
+            orig_start_va=0x02000010,
+            orig_end_va=0x02000014,
+        )]
+        output, _ = _layout_reconstruct(data, tus, sections)
+        # Payload moved to its orig position.
+        self.assertEqual(bytes(output[0x10:0x14]), payload)
+
 
 class TestUnconditionalRewrites(unittest.TestCase):
     """Brief 180 piece 1: `_apply_load_rewrites` and
@@ -2235,6 +2296,68 @@ class TestPatchOv004WithMap(unittest.TestCase):
         # Output is the orig-shape synth (text + 24-byte cluster
         # + data tail) — same as the no-map splice path's output.
         self.assertEqual(bytes(patched), _build_orig_synth_ov004())
+
+    def test_post_splice_invocation_idempotent_despite_pool_shift_in_map(self):
+        # Brief 180 production regression — caught by brain's
+        # `ninja sha1` pass on PR #623's first revision.
+        #
+        # On the rom_config rule's SECOND patcher invocation the
+        # `.bin` has already been spliced by the mwld rule's FIRST
+        # invocation, so the pool is gone and routing enters the
+        # `not pool_present` branch. The linker map is unchanged
+        # between invocations (the link only runs once per ninja
+        # graph), so it still reports the PRE-splice cascade — at
+        # production n=2 EUR that's a +24-byte shift on the
+        # `data_ov004_021e2efc.o` TU and similar post-pool TUs.
+        #
+        # The bug: `parse_link_map_ov004`'s MAX_SHIFT_BYTES check
+        # fired BEFORE `_is_orig_shape` could detect that the
+        # input is already in orig shape and route to the
+        # idempotent rewrites-only branch. The patcher bailed
+        # with `PatchError: |shift| > MAX_SHIFT_BYTES = 4` and
+        # `dsd rom build` then failed to package ov004.
+        #
+        # Fix: move the cap out of the parser (where it's a static
+        # invariant) into `_layout_reconstruct` (where it's a
+        # runtime guard against actually copying bytes with a
+        # suspect shift). The parser now produces TU sections
+        # with whatever shifts the map reports; idempotence
+        # check + layout-reconstruction guard remain the actual
+        # safety net. Aligns with brief 179's framing of the cap
+        # as "runtime structural-regression safety net".
+        from patch_ov004_veneers import patch_ov004
+        sections = self._orig_sized_sections()
+        # Synthesise a non-empty `.init` containing the ctor target
+        # so the `_is_orig_shape` heuristic can detect orig shape.
+        sections = dict(sections)
+        sections[".init"] = (0x02200800, 0x02200810)
+        base_va = sections[".text"][0]
+        orig_size = sections[".data"][1] - base_va
+        # Pre-spliced input: orig-shape bytes, no veneer pool, no
+        # cascade. Plant the `.ctor` pointer at orig fo 0x1000
+        # pointing into `.init` range so `_is_orig_shape` returns
+        # True.
+        data = bytearray(orig_size)
+        struct.pack_into("<I", data, 0x1000, 0x02200800)
+        # Map declares a TU with shift = +24 (mirrors production
+        # n=2 EUR's `data_ov004_021e2efc.o` post-pool placement).
+        # Without the routing fix, parser would raise here.
+        body = (
+            "  02200118 00000010 .rodata data_ov004_02200100	"
+            "(post_pool_tu.o)\n"
+            "#>02201058          OV004_DATA_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        # The bug-pin contract: this call must NOT raise. Pre-fix
+        # it raises PatchError from `parse_link_map_ov004`;
+        # post-fix it returns the idempotent rewrites-only output.
+        patched, stats = patch_ov004(
+            bytes(data), [], sections, map_text=map_text,
+        )
+        self.assertEqual(stats["already_patched"], 1)
+        self.assertEqual(stats.get("layout_reconstructed", 0), 0)
+        # Output is unchanged (idempotent path).
+        self.assertEqual(bytes(patched), bytes(data))
 
     def test_idempotence_on_already_orig_shape(self):
         # When the input is already in orig shape (the second
