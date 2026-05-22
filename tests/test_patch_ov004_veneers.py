@@ -1912,6 +1912,39 @@ class TestParseLinkMapOv004(unittest.TestCase):
         self.assertEqual(tus[0].built_end_va, 0x021DE648)
         self.assertEqual(tus[1].built_start_va, 0x021DE648)
 
+    def test_bss_tu_filtered_out(self):
+        # Brief 183: the parser's contract is "TUs with bytes in
+        # the binary" — `.bss` TUs are filtered out because their
+        # content is zero-init at runtime, not stored in the flat
+        # .bin. Mirrors the real ov004 layout (n=2 EUR has one
+        # `data_ov004_bss.o (.bss)` TU spanning 0x88800 bytes
+        # past the .bin's 0x417a0 end).
+        body = (
+            "  021DE638 00000010 .rodata data_ov004_021de638	"
+            "(shared.o)\n"
+            "  021DE648 00088800 .bss    data_ov004_bss	"
+            "(data_ov004_bss.o)\n"
+            "#>02266E48          OV004_BSS_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        # Only the `.rodata` TU survives; `.bss` is filtered.
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].section, ".rodata")
+
+    def test_only_bss_in_overlay_returns_empty(self):
+        # Edge case: a hypothetical overlay whose only TU is
+        # `.bss` (impossible for ov004 but worth pinning the
+        # parser semantic). Parser returns an empty list — no
+        # PatchError, since "no TUs" isn't an error condition,
+        # just means there's nothing for reconstruction to copy.
+        body = (
+            "  021DE638 00000100 .bss    data_ov004_bss	"
+            "(data_ov004_bss.o)\n"
+            "#>021DE738          OV004_BSS_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(tus, [])
+
 
 class TestIsOrigShape(unittest.TestCase):
     """Brief 180: the `.ctor`-pointer idempotence guard for the
@@ -2358,6 +2391,82 @@ class TestPatchOv004WithMap(unittest.TestCase):
         self.assertEqual(stats.get("layout_reconstructed", 0), 0)
         # Output is unchanged (idempotent path).
         self.assertEqual(bytes(patched), bytes(data))
+
+    def test_bss_tu_not_copied_during_reconstruction(self):
+        # Brief 183 production regression — decomper hit this on
+        # brief 182's path-2 final wave (n=2 → n=0 with both
+        # `data_ov004_021ded69` + `data_ov004_021e191c` staged).
+        #
+        # Bug: `_layout_reconstruct` iterated EVERY `MapTUSection`
+        # returned by `parse_link_map_ov004`, including the `.bss`
+        # TU. `.bss` content lives outside the overlay binary
+        # (zero-init at runtime — the loader allocates + zeroes it
+        # from the overlay table's `bss_size`, no bytes in the
+        # flat .bin), so the existing built-bounds check
+        # (`built_fo + size > len(data)`) trips on the first
+        # `.bss` TU. At n=2 main this never surfaced because the
+        # cascade gate (`any(tu.shift != 0)`) was False — the
+        # splice path ran and reconstruction never iterated TUs.
+        # At n=0 + path-2 claims staged the cascade fires and the
+        # `.bss` TU blows up the copy loop.
+        #
+        # Real-world map shape (n=2 EUR confirmed): one .bss TU
+        # `data_ov004_bss.o` with built_start_va = 0x0220b520,
+        # built_end_va = 0x02293d20, size 0x88800 (~558 KB). The
+        # ov004 binary is 0x417a0 (~268 KB), so
+        # `built_fo + size = 0x41ec0 + 0x88800 = 0xca6c0 > 0x417a0`.
+        #
+        # Fix (brain-preferred Option A): filter `section == ".bss"`
+        # out of `parse_link_map_ov004`'s output. The parser's
+        # contract becomes "TUs with bytes in the binary" —
+        # `.bss` violates that invariant by construction.
+        from patch_ov004_veneers import patch_ov004
+        sections = self._orig_sized_sections()
+        sections = dict(sections)
+        # Synthesise a .bss section that extends well past .data
+        # (mirrors the real ov004 layout where .bss spans
+        # ~0x88000 bytes outside the .bin).
+        sections[".bss"] = (0x02201058, 0x02289858)
+        base_va = sections[".text"][0]
+        orig_size = sections[".data"][1] - base_va  # = 0x1058
+        # Pre-patch input: orig-sized, no veneer pool. Plant the
+        # ctor pointer at orig fo 0x1004 (shifted, NOT at orig
+        # position) so `_is_orig_shape` returns False and the
+        # reconstruction path fires (alongside the cascade gate).
+        sections[".init"] = (0x02200900, 0x02200910)  # 16-byte init
+        data = bytearray(orig_size)
+        # Place a 16-byte payload at BUILT fo 0x400 (built VA
+        # base+0x400). Its ORIG fo is 0x3FC (shift = +4).
+        payload = b"\xaa\xbb\xcc\xdd" * 4
+        data[0x400:0x410] = payload
+        # Map declares the shifted .rodata TU PLUS a .bss TU
+        # whose bounds extend past the binary. Without the fix,
+        # `_layout_reconstruct` trips on the .bss TU.
+        body = (
+            f"  {base_va + 0x400:08X} 00000010 .rodata "
+            f"data_ov004_{base_va + 0x3FC:08x}	(shifted.o)\n"
+            # The .bss TU — its `built_start_va + size` lands far
+            # past `len(data)` and would trip the bounds check
+            # if the loop tried to copy it.
+            "  02201058 00088800 .bss    data_ov004_bss	"
+            "(data_ov004_bss.o)\n"
+            "#>02289858          OV004_BSS_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        # The bug-pin contract: this call must NOT raise. Pre-fix
+        # it raises PatchError from `_layout_reconstruct`'s
+        # bounds check; post-fix the `.bss` TU is filtered out
+        # of `parse_link_map_ov004`'s output and reconstruction
+        # only touches TUs with actual binary content.
+        patched, stats = patch_ov004(
+            bytes(data), [], sections, map_text=map_text,
+        )
+        self.assertEqual(stats["layout_reconstructed"], 1)
+        # Only the .rodata TU is reconstructed; the .bss TU
+        # never reaches `_layout_reconstruct`.
+        self.assertEqual(stats["tus_copied"], 1)
+        # Payload landed at its orig position.
+        self.assertEqual(bytes(patched[0x3FC:0x40C]), payload)
 
     def test_idempotence_on_already_orig_shape(self):
         # When the input is already in orig shape (the second

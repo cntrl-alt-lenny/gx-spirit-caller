@@ -658,6 +658,16 @@ def parse_link_map_ov004(
     where the pool-spliced bin pairs with a still-pre-splice map
     that reports `+n × 12`-byte shifts).
 
+    Parser invariant — **the returned list contains only TUs with
+    bytes in the overlay binary**. `.bss` TUs are filtered out:
+    `.bss` content is zero-init at runtime (the loader allocates
+    + zeroes it from the overlay table's `bss_size`, no bytes in
+    the flat .bin), so layout reconstruction has nothing to copy
+    for them. This filter is the brief 183 fix for the production
+    regression decomper hit on brief 182's path-2 final wave —
+    pre-fix `_layout_reconstruct` tripped its built-bounds check
+    on the first `.bss` TU when the cascade gate fired at n=0.
+
     Raises `PatchError` only if the overlay header isn't found.
     """
     lines = map_text.splitlines()
@@ -718,6 +728,21 @@ def parse_link_map_ov004(
 
     out: list[MapTUSection] = []
     for g in groups:
+        # Brief 183 production regression — decomper hit this on
+        # brief 182's path-2 final wave (n=0 with two source
+        # claims staged). `.bss` content lives outside the
+        # overlay binary (zero-init at runtime; the loader
+        # allocates + zeroes it from the overlay table's
+        # `bss_size`, no bytes in the flat .bin), so a `.bss` TU
+        # has nothing for layout reconstruction to copy. Real
+        # ov004 ships one such TU: `data_ov004_bss.o (.bss)`
+        # built_start_va=0x0220b520, size=0x88800 — past the
+        # .bin's 0x417a0 end. Filtering at the parser layer
+        # keeps the parser's contract clean ("TUs with bytes in
+        # the binary") and frees `_layout_reconstruct`'s loop
+        # body from per-iteration section-type checks.
+        if g["section"] == ".bss":
+            continue
         built_start = g["built_start_va"]
         built_end = g["built_end_va_max"]
         if built_end <= built_start:
