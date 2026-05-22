@@ -386,6 +386,21 @@ loop (earlier than the git-level `.githooks/pre-push`):
   on errors. Bypass with `SKIP_INVARIANTS_HOOK=1 git push ...`
   or `git push --no-verify`. Same backstop as `.githooks/pre-push`
   but catches the drift earlier in the agent turn.
+- **Stop** → `.claude/hooks/save_agent_reply.py` captures the
+  final assistant turn of every agent session and writes it to a
+  shared inbox at `<repo-shared-git-dir>/agent-inbox/<role>-latest.md`
+  (i.e. `.git/agent-inbox/` of the main clone). The brain reads
+  these to see what the decomper / scaffolder said in sessions that
+  didn't ship a PR — blocked-on-non-scope, research-only, aborted —
+  without the human user shuttling text manually. Role is inferred
+  from the worktree's basename (`brain` / `decomper` / `scaffolder`
+  per project convention). Inbox lives inside `.git/` so it's never
+  version-controlled, never needs a gitignore entry, and travels
+  with no per-machine setup beyond what's already required
+  (`python3` + `git`). Also appends to a rolling `<role>-log.md`
+  so prior session replies aren't lost. Non-blocking by design:
+  any error (no transcript, malformed event, disk full, etc.)
+  exits silently with code 0.
 
 These hooks are opt-in per Claude Code session — they only fire
 when Claude Code reads `.claude/settings.json`. Raw `git` from a
