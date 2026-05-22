@@ -8849,3 +8849,15 @@ src/main/data/data_020b6ec4.s:
 src/main/data/data_020e0e70.s:
     complete
     .data start:0x020e0e70 end:0x020e1090
+
+src/main/func_020b3808.s:
+    complete
+    .text start:0x020b3808 end:0x020b3814
+
+src/main/func_0208b0f0.c:
+    complete
+    .text start:0x0208b0f0 end:0x0208b0fc
+
+src/main/func_0208b0fc.c:
+    complete
+    .text start:0x0208b0fc end:0x0208b108
