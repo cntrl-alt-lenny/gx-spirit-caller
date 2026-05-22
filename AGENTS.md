@@ -364,28 +364,69 @@ itself:
 
 ### Open briefs
 
-- [`docs/briefs/178-cross-region-cluster-d3-with-generator.md`](docs/briefs/178-cross-region-cluster-d3-with-generator.md)
-  — `decomper` (HIGH, **NOW ACTIVE**): apply brief 177's
-  `cross_region_chunk_extent.py` to USA + JPN cluster
-  D-3 — same scope brief 175 falsified. Brief 177
-  shipped 3 worked examples; scale to ~62 region-
-  matches. Target ≥ 30 cross-region D-3 chunks per
-  region. Critical: 3-region SHA1 PASS preserved + EUR
-  bit-identical. Branch:
-  `decomper/cross-region-cluster-d3-with-generator`.
-
-- [`docs/briefs/179-patcher-variant-e-2byte-pool-shift.md`](docs/briefs/179-patcher-variant-e-2byte-pool-shift.md)
-  — `scaffolder` (MEDIUM, **NOW ACTIVE**): extend patcher
-  to handle 2-byte (or 1-3 byte) veneer pool shifts at
-  low n. Per brief 173's hand-off. Path-2 mechanism
-  works at veneer level (verified); only byte-layout
-  shift fails SHA1. Variant E closes the layout problem.
-  Unblocks brief 180+ path-2 final wave (n=2 → n=0).
-  W7 chain extends: 134 → 142 → 146 → 150 → 162 → 164
-  → 168 → 179. Critical: 3-region SHA1 PASS preserved.
-  Branch: `cloud/patcher-variant-e-2byte-pool-shift`.
+- **Brief 182 (HIGH, NEW)** — `decomper` path-2 final wave
+  (n=2 → n=0). Claim `data_ov004_021ded69` +
+  `data_ov004_021e191c` via brief 173 Variant A
+  (`__attribute__((aligned(1)))` extern + delinks entry).
+  Unblocked by brief 180's map-driven layout reconstruction
+  (PR #623). Critical: 3-region SHA1 PASS preserved (n=2
+  baseline + new n=0 floor). Branch:
+  `decomper/path-2-final-wave-n2-to-n0`. Brief file not
+  yet authored — see *Today's merges* PR #623 entry in
+  state.md for the full hand-off context.
 
 ### Closed briefs (reference)
+
+- **Brief 181** — `decomper`, shipped in PR #624. ✅ Bridge
+  wave during brief 180 in-flight. Three sub-targets:
+  (1) cluster B size-1/2 + odd-aligned cross-region —
+  3 bundles per region × USA + JPN = 6 ships + ov002
+  bonus; (2) 3 cluster B value=0 EUR deferred (W6-rejected
+  wave-2 rewrite) — 2 main rewrites absorbing 3 placeholders
+  + bonus cross-region absorbing 6 more; (3) cluster D-3
+  `data_020e0e70` (366 B → 544 B Pattern 3 chunk absorbing
+  `data_020e0fde`). Bytes: EUR 556, USA 148, JPN 148.
+  3-region SHA1 PASS + 27/27 preserved. Brief file not
+  authored (inline-spec in brain message + PR body).
+- **Brief 180** — `scaffolder`, shipped in PR #623. 🎉
+  **Variant E proper — map-driven layout reconstruction.**
+  Four pieces: (1) dropped `veneer_count > 0` gate on
+  load-rewrite + ARM-BL re-encode passes (closes n=0
+  17-byte residue); (2) `--map` CLI arg plumbed through
+  `rom_config` rule; (3) `parse_link_map_ov004` +
+  `_layout_reconstruct` helpers with per-TU bounds
+  (sidesteps brief 179's ~21 KB gap-marker stranding);
+  (4) `MAX_SHIFT_BYTES = 4` cap. **Brain caught routing-
+  order bug** on first verify: parser raised on shift > 4
+  BEFORE the `_is_orig_shape` idempotence guard ran.
+  Scaffolder picked Option A (move cap into
+  `_layout_reconstruct`) + 4 new regression tests in
+  commit adc44f6. Suite 1930 → 1934. 3-region SHA1 PASS
+  preserved at n=2. **W7 chain extends: 134 → 142 → 146
+  → 150 → 162 → 164 → 168 → 180.** Brief 182 unblocked.
+  Brief file not authored (inline-spec in brain message +
+  PR body). 558 + 645 + 20 LOC.
+- **Brief 179** — `scaffolder`, shipped in PR #621. 🔬
+  **Variant E (1–3 byte pool shift) FALSIFIED.** Empirical
+  repro on EUR `data_ov004_021ded69` Variant A claim:
+  actual failure mode is multi-segment `.rodata` layout
+  cascade (+0/+1/+2/+4 across 4 TU boundaries, absorbed
+  by 16-vs-20 `.ctor`-pad delta). Pure pool-shift
+  detection — even with `MAX_SHIFT_BYTES = 3` — cannot
+  close SHA1. Ships ONLY the research note
+  (`docs/research/ov004-odd-aligned-layout-cascade.md`) +
+  brief 180 reformulation spec; no patcher / source /
+  delinks changes. 3-region SHA1 PASS preserved at n=2.
+- **Brief 178** — `decomper`, shipped in PR #620. 🎉
+  **Largest cross-region D-3 unlock — 74 chunks shipped
+  (247% of ≥30 target).** Method: brief 177's
+  `cross_region_chunk_extent.py` for extent adjustment +
+  **recursive split-around-pre-existing-TUs pass** to
+  maximize coverage (13 → 37 per region). 80,152 bytes
+  new region-specific data (40,076 per region). Per-
+  region per-module: 18 main + 6 ov002 + 11 ov006 + 1
+  ov007 + 1 ov021. 3-region SHA1 PASS + 27/27 modules
+  preserved. Brain pushed drift-check regen fix on rebase.
 
 - [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
   `decomper`, shipped in PR #617. ✅ **Brief 174
