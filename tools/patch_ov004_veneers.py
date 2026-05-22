@@ -596,6 +596,20 @@ _MAP_LINKER_SYM_RE = re.compile(
 )
 _MAP_SECTION_HDR_RE = re.compile(r"^#\s+(\.\S+)\s*$")
 
+# Brief 186 Gap A: linker section boundary markers in the .ov004
+# block. mwldarm emits these for each overlay section pair
+# (TEXT/RODATA/INIT/CTOR/DATA/BSS) at the section's start and end
+# VAs. The parser uses the END markers to bound each TU section's
+# trailing range — TUs with size=0 final symbols (e.g. `$a`/`$d`
+# mapping syms or `func_*_unk` placeholders that close a
+# `_dsd_gap@ov004_X.o`) otherwise lose the bytes between the last
+# symbol's start VA and the next TU's start VA.
+_MAP_SECTION_BOUNDARY_RE = re.compile(
+    r"^#>([0-9A-Fa-f]+)\s+"
+    r"OV\d+_(TEXT|RODATA|INIT|CTOR|DATA|BSS)_(START|END)\s+"
+    r"\(linker command file\)\s*$"
+)
+
 # Dsd's symbol-naming convention encodes the symbol's orig VA in the
 # name itself: e.g. `data_ov004_021ded69`, `func_ov004_021c9d8c`. For
 # each named symbol that matches this pattern we can compute the TU
@@ -688,6 +702,19 @@ def parse_link_map_ov004(
             f"linker map has no `# {overlay_header}` overlay block"
         )
 
+    # Brief 186 Gap A: collect the linker's section-end markers in
+    # one pre-pass so we can bound each TU section's trailing
+    # range. `OV004_<section>_END` lines mark the exclusive end VA
+    # of each physical section.
+    section_ends: dict[str, int] = {}
+    for line in overlay_lines:
+        m_bnd = _MAP_SECTION_BOUNDARY_RE.match(line)
+        if m_bnd is None or m_bnd.group(3) != "END":
+            continue
+        section_ends["." + m_bnd.group(2).lower()] = int(
+            m_bnd.group(1), 16,
+        )
+
     # Group entries by (tu_file, section). Switching either field
     # closes the current group and opens a new one. Mapping
     # symbols / local labels / zero-size markers contribute to the
@@ -726,6 +753,44 @@ def parse_link_map_ov004(
     if current is not None:
         groups.append(current)
 
+    # Brief 186 Gap A: extend each TU section's built_end_va past
+    # the last symbol's `va + size` to the START of the next TU
+    # in the same physical section (or the section's END marker
+    # for the trailing TU). mwldarm packs TUs contiguously within
+    # a section, so the bytes between the last symbol's logical
+    # end and the next TU's start belong to THIS TU — they're
+    # part of the TU's emitted content even when no named symbol
+    # covers them. Pre-fix, TUs whose final symbol had size=0
+    # (`$a`/`$d` mapping syms or `_unk` thumb-classify placeholders
+    # that frequently close `_dsd_gap@ov004_X.o` runs) lost up to
+    # ~200 bytes of trailing content because `_layout_reconstruct`
+    # never copied the unbounded tail.
+    by_section: dict[str, list[dict]] = {}
+    for g in groups:
+        by_section.setdefault(g["section"], []).append(g)
+    for section_groups in by_section.values():
+        # Map line order already sorts by built_start_va within a
+        # section; defensive re-sort in case of future map-format
+        # quirks.
+        section_groups.sort(key=lambda g: g["built_start_va"])
+        for i, g in enumerate(section_groups):
+            if i + 1 < len(section_groups):
+                next_start = section_groups[i + 1]["built_start_va"]
+            elif g["section"] in section_ends:
+                next_start = section_ends[g["section"]]
+            else:
+                # Section without a linker END marker (synthetic
+                # fixtures, malformed maps): fall back to the
+                # max(va+size) bound from the symbol walk.
+                next_start = g["built_end_va_max"]
+            # The fix never SHRINKS the bound — keep whichever is
+            # larger between the symbol-derived max and the
+            # next-TU/section-end value. This guards against
+            # overlapping-TU edge cases (which shouldn't happen
+            # but stays defensive).
+            if next_start > g["built_end_va_max"]:
+                g["built_end_va_max"] = next_start
+
     out: list[MapTUSection] = []
     for g in groups:
         # Brief 183 production regression — decomper hit this on
@@ -759,6 +824,31 @@ def parse_link_map_ov004(
             # section, so propagating the trailing shift is safe.
             prior = [t for t in out if t.section == g["section"]]
             shift = prior[-1].shift if prior else 0
+            # Brief 186 Gap B: ov004's only `.ctor` TU carries a
+            # `.p__sinit_ov004_<hex>` symbol whose leading `.p`
+            # makes `_SYMBOL_ORIG_VA_RE` skip it (the hex encodes
+            # the POINTED-TO function's orig VA, not the pointer
+            # slot's own — extending the regex would silently
+            # mis-compute the shift). The "prior TU in section"
+            # fallback above is `None` for this single-TU case →
+            # shift defaulted to 0, leaving the `.ctor` pointer
+            # bytes at their +n×12-shifted built file offset on
+            # the splice path (or +cascade on the layout path)
+            # and writing the wrong bytes into the orig `.ctor`
+            # slot.
+            #
+            # `.ctor` immediately follows `.init` in the mwldarm
+            # overlay layout and shares its cascade — the `.ctor`
+            # table entry is the function pointer for the `.init`
+            # `__sinit_*` function, so they shift in lockstep.
+            # Fall back to the most recent `.init` TU's shift
+            # when no prior `.ctor` TU exists.
+            if g["section"] == ".ctor" and not prior:
+                prior_init = [
+                    t for t in out if t.section == ".init"
+                ]
+                if prior_init:
+                    shift = prior_init[-1].shift
         # NOTE: `MAX_SHIFT_BYTES` is NOT enforced here — see
         # `_layout_reconstruct` for the runtime cap. Brain caught a
         # production regression on PR #623 where the parser raised
