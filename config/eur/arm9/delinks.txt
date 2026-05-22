@@ -8861,3 +8861,23 @@ src/main/func_0208b0f0.c:
 src/main/func_0208b0fc.c:
     complete
     .text start:0x0208b0fc end:0x0208b108
+
+src/main/SNDi_SetTrackParam.legacy.c:
+    complete
+    .text start:0x02094d18 end:0x02094d4c
+
+src/main/func_02095108.legacy.c:
+    complete
+    .text start:0x02095108 end:0x02095130
+
+src/main/func_02095130.legacy.c:
+    complete
+    .text start:0x02095130 end:0x02095158
+
+src/main/func_020951a8.legacy.c:
+    complete
+    .text start:0x020951a8 end:0x020951d0
+
+src/main/func_02001d0c.c:
+    complete
+    .text start:0x02001d0c end:0x02001d68

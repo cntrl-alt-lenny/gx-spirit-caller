@@ -332,3 +332,19 @@ src/overlay004/data/data_ov004_021ded69.c:
 src/overlay004/data/data_ov004_021e191c.c:
     complete
     .rodata start:0x021e191c end:0x021e1db1
+
+src/overlay004/func_ov004_021cb278.c:
+    complete
+    .text start:0x021cb278 end:0x021cb290
+
+src/overlay004/func_ov004_021cdd1c.c:
+    complete
+    .text start:0x021cdd1c end:0x021cdd38
+
+src/overlay004/func_ov004_021cfb84.c:
+    complete
+    .text start:0x021cfb84 end:0x021cfba0
+
+src/overlay004/func_ov004_021d3dc8.c:
+    complete
+    .text start:0x021d3dc8 end:0x021d3ddc
