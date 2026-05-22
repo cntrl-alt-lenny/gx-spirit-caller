@@ -37,7 +37,7 @@ Three AI agents, one human. Each has a narrow job.
 | **cntrl_alt_lenny** | meatspace | You. Sets priorities, picks direction, merges PRs. |
 | **brain** | local LLM session (Claude Code or Codex CLI), PC or Mac | Reviews and merges PRs. Runs `ninja` / `dsd` locally to verify each PR doesn't break the build. Writes task briefs. Keeps `AGENTS.md` / `docs/state.md` current. |
 | **decomper** | local LLM session (separate from brain) | The actual decomper. Matches individual functions. Writes C source in `src/`. Renames symbols. |
-| **scaffolder** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. (Formerly `cloud`; renamed for role clarity.) |
+| **scaffolder** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. (Formerly `scaffolder`; renamed for role clarity.) |
 
 Why the split? Matching a function is a focused, iterative task (one
 person on one function at a time). Tool-building is parallel work that
@@ -398,10 +398,7 @@ A pull request is just a git branch with a note attached. The flow is:
 
 1. An agent writes code on a branch named like `scaffolder/foo` or
    `decomper/bar`. The `<agent>/<slug>` shape is a convention so
-   everyone can see at a glance who made it. (Branches from earlier
-   slug eras stay valid in history: `cloud/*` pre-scaffolder-rename;
-   `claude-cloud/*` / `claude-pc/*` / `claude-brain/*` pre-
-   model-agnostic-rename.)
+   everyone can see at a glance who made it.
 2. The agent pushes the branch and opens a PR via the GitHub API. This
    doesn't change `main`; it just says "here's a proposed change".
 3. Brain reviews it: reads the diff, runs `ninja` / `dsd check modules`

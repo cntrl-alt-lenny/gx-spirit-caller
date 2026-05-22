@@ -16,7 +16,7 @@ generator validated at scale**: brief 176 (decomper) shipped
 32 cross-region cluster B residue claims via brief 174's
 generator — ov006 sub-pool's brief-170 pathology RESOLVED
 via the more conservative bundles. **🎉 Unified
-chunk-extent generator shipped** (brief 177, cloud):
+chunk-extent generator shipped** (brief 177, scaffolder):
 `cross_region_chunk_extent.py` 3-phase algorithm
 generalises brief 174 to multi-symbol Pattern 3 chunks.
 Brief 175's headline failure reproduces + ships as worked
@@ -78,7 +78,7 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   region). Residue 16 (size-1/2 + odd-aligned) deferred
   to brief 180+. **3-region SHA1 PASS + 27/27 OK
   preserved.**
-- **PR #618 — cloud / brief 177 unified chunk-extent
+- **PR #618 — scaffolder / brief 177 unified chunk-extent
   generator.** 🎉 New `tools/cross_region_chunk_extent.py`
   generalises brief 174's bundle heuristic to multi-symbol
   Pattern 3 chunks. **3-phase algorithm**: Phase A lowers
@@ -104,9 +104,9 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   27/27 OK preserved. **BONUS NOT MET**: couldn't drop ov004's
   veneer count `n` below 9 — investigation showed remaining
   candidates are ARM-code symbols misclassified as `data` in
-  `symbols.txt`. Brief 154 (cloud, queued) takes the
+  `symbols.txt`. Brief 154 (scaffolder, queued) takes the
   reclassification research as the next step.
-- **PR #579 — cloud / brief 152 cluster B size-1/2 workarounds.**
+- **PR #579 — scaffolder / brief 152 cluster B size-1/2 workarounds.**
   ✅ **Workaround #3 PASSES; workaround #2 FALSIFIED with root-
   cause diagnosis.** Empirical finding: `arm9.lcf`'s
   `ALIGNALL(2)` directive (not mwcc) is the alignment-cascade
@@ -135,7 +135,7 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   #3 deferred to brief 152. Self-extend gate: yield 100% PASS,
   bytes-matched FAIL (80 B vs ≥250 B — pointers are 4 B). Brief
   closes after wave 1.
-- **PR #576 — cloud / brief 150 low-n WITH_TERMINATOR.** Option
+- **PR #576 — scaffolder / brief 150 low-n WITH_TERMINATOR.** Option
   A shipped (recommended): `_fix_ctor_and_pad`'s byte-detection
   is now the authoritative truth source; n-inference is an
   informational hint via stderr note on disagreement, not a
@@ -170,9 +170,7 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Scaffolder — one MEDIUM brief queued (patcher Variant E):**
 
-- **Brief 179 (MEDIUM, NEW)** — `cloud/patcher-variant-e-2byte-pool-shift`
-  (branch started under the prior `cloud/` slug; brief 180+
-  uses `scaffolder/` per the rename).
+- **Brief 179 (MEDIUM, NEW)** — branch `cloud/patcher-variant-e-2byte-pool-shift`.
   Extend patcher to handle 2-byte (or 1-3 byte) veneer
   pool shifts at low n. Per brief 173's hand-off. **Path-2
   mechanism works at veneer level (all 3 brief 173
@@ -227,10 +225,6 @@ equivalent:
   — three named siblings under one parent, set up once via `git worktree
   add`. Each has its own `orig/` baseroms. Adopted during the
   SHA1-milestone arc; PR #564 documented this in state.md.
-  Note: the on-disk `scaffolder` worktree may still be named `cloud`
-  on this machine; `git worktree move ~/Dev/spirit-caller/cloud
-  ~/Dev/spirit-caller/scaffolder` once no `cloud/*` branches are
-  checked out there.
 - **Windows convention (Claude Code automatic sandboxes):** Claude
   Code creates per-session worktrees inside `.claude/worktrees/<auto-
   name>/` for each agent. No manual setup. They share the main
@@ -238,7 +232,7 @@ equivalent:
   branch` may fail to clean up the local branch while the agent
   session is active — harmless, server-side merge still succeeds.
 
-Brief 142's clean cloud-side work + brief 143's clean decomper-side work
+Brief 142's clean scaffolder-side work + brief 143's clean decomper-side work
 were the validation that worktree separation (either mechanism) is
 sufficient.
 
@@ -263,8 +257,7 @@ sufficient.
    Watch for "needs hand-tuning" candidates — log for
    brief 180+ refinement if any.
 2. **Verify + merge scaffolder brief 179 PR** when it opens.
-   Branch is `cloud/patcher-variant-e-2byte-pool-shift` (started
-   under the prior `cloud/` slug; the role is now `scaffolder`).
+   Branch: `cloud/patcher-variant-e-2byte-pool-shift`.
    Gate: 3-region SHA1 PASS preserved (current main n=2 +
    manual injection test at n=0). New tests pin 1-3 byte
    shift detection. Brief 180+ unlocked for path-2 final
