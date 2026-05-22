@@ -19,14 +19,26 @@ So the project is a long series of small wins: match one function,
 commit, match the next, commit, until the whole ROM is in C source and
 the hashes line up.
 
-Current status: ~1.3% of the code matched (per the README badge,
-which tracks byte-accurate progress). ~98.7% to go. The "easy" tier
-sits at ~84% matched, the "medium" tier at ~80%, but those are
+Current status (post brief 187 — start of the code-decomp
+resumption wave):
+
+| Metric | Value | Source |
+|---|---|---|
+| 3-region `ninja sha1` | **PASS** (EUR + USA + JPN) | brief 140, holding 22 rounds |
+| `dsd check modules` | **27 / 27 OK × 3 regions** | post brief 140 / 141 |
+| Matched data | 86.14 % | `tools/progress.py` |
+| Matched code (objdiff-verified) | **1.40 %** | `build/eur/report.json` |
+| Matched functions (objdiff-verified) | **14.78 %** (1,420 / 9,608) | `build/eur/report.json` |
+
+The "matched code" figure is the headline. `tools/progress.py`'s
+delinks-based approximation under-counts — the canonical metric is
+the objdiff-verified `matched_code_percent` in
+`build/eur/report.json`, unblocked by brief 187 Part 1's filter
+(`tools/objdiff_filter_panic_units.py`). The "easy" tier sits at
+~85 % matched and "medium" at ~80 %, but those are
 function-count percentages — the bulk of the ROM lives in the
-"hard" tier (~2%) where each function takes more work. This is
-normal for a fresh decomp — the early sinit/stub waves clear the
-trivial shapes, then momentum builds as the tooling and conventions
-settle. Live stats live in [`docs/state.md`](state.md).
+"hard" tier (~4 %) where each function takes more work. Live
+stats live in [`docs/state.md`](state.md).
 
 ## The cast
 
@@ -339,15 +351,19 @@ That number can be misleading if you're new:
   units are complete". Most of the ROM isn't carved into TUs yet, so
   60/60 is technically correct but doesn't mean the whole ROM is
   matched. The byte percentage is the honest number.
-- **`ninja check` modules 24/27.** This is a separate metric. `dsd`
-  verifies each module round-trips byte-identically through its
-  analysis pipeline (not the actual ROM match). Three modules fail
-  for structural reasons (placeholder symbols from `--allow-unknown-
-  function-calls`, see `CLAUDE.md`). Fixing those is a separate kind
-  of work.
+- **`ninja check` modules 27/27 × 3 regions.** This used to be
+  24/27 (three placeholder-symbol failures in main / dtcm / ov004
+  per `--allow-unknown-function-calls`). Brief 140 / 141 closed the
+  gap; brief 140 hit 3-region `ninja sha1` PASS. The module check
+  is now a quick smoke test rather than the headline gate.
 
-The goal is "the SHA-1 of the rebuilt ROM matches the baserom SHA-1".
-Everything else is a proxy.
+The headline gate **is now `ninja sha1` PASS across all 3 regions**
+(brief 140, holding through 22+ post-SHA1 rounds). Every PR must
+preserve that floor — if any region drops from PASS → FAIL, the PR
+doesn't merge. Brain re-verifies pre-merge.
+
+The terminal goal stays "the SHA-1 of the rebuilt ROM matches the
+baserom SHA-1 across EUR + USA + JPN". Everything else is a proxy.
 
 ## Local setup extras (optional but recommended)
 
@@ -456,14 +472,14 @@ change passes through brain's local verification before landing on
   (sinit tier sits at 100%). Brief 003's bulk-template wave + brief
   009's one-off `__sinit_ov002_022ca7e8` (asm-void escape for mwcc's
   RHS-first ordering) covered the full set.
-- **"Failing modules?"**  Three of 27 modules (main, dtcm, ov004)
-  don't round-trip through `dsd check modules` yet. That's a
-  structural issue with placeholder symbols injected by
-  `--allow-unknown-function-calls` during `dsd init`.
-  [`docs/research/ov004-bss-shift.md`](research/ov004-bss-shift.md)
-  documents one specific symptom (a 0x400-byte BSS-layout shift on
-  ov004 caused by the same root cause). Fixable, deferred until it
-  becomes a bottleneck.
+- **"Failing modules?"**  Historically three of 27 modules
+  (main, dtcm, ov004) didn't round-trip through `dsd check
+  modules`. Brief 140 / 141 closed that gap — now 27 / 27 OK across
+  all three regions, holding through 22+ post-SHA1 rounds. ov004's
+  specific 0x400-byte BSS-layout shift (documented in
+  [`docs/research/ov004-bss-shift.md`](research/ov004-bss-shift.md))
+  was the W7 patcher chain's motivating case; briefs 134 → 180 →
+  186 closed it.
 
 ## Where to dig deeper
 
@@ -481,6 +497,205 @@ change passes through brain's local verification before landing on
 - **Reference projects** — `CLAUDE.md` lists two similar decomps
   (dqix, SonicRushAdventure-Decomp) that inspired this project's
   layout.
+
+## Code-decomp resumption — the post-scaffold playbook
+
+The first 9 days post-SHA1 ran 39 briefs of infrastructure (patcher
+chain through brief 186, cluster B/C/D residue cleanup, cross-
+region apply tooling). With brief 182 closing the W7 patcher chain
+at n=0, **the team's center of gravity moves back to code decomp**.
+This section is the resumption playbook.
+
+### Pick a candidate
+
+Start from [`docs/research/code-decomp-resumption-queue.md`](research/code-decomp-resumption-queue.md)
+— brief 187 Part 2's curated 52-pick list (12 Trivial, 25 Easy, 15
+Medium-easy). Each row carries module / addr / size / call count /
+shape hint.
+
+For arbitrary picks beyond the curated queue, regenerate the full
+worklist:
+
+```bash
+python tools/next_targets.py --version eur               # all unmatched, easiest-first
+python tools/next_targets.py --version eur --tier easy   # easy tier only
+python tools/next_targets.py --version eur --tier hard --size-max 0x60  # narrow query
+```
+
+### Routing decision flow — what to do BEFORE writing C
+
+Before opening a decomp.me scratch on a candidate, check the asm
+shape against [`docs/research/codegen-walls.md`](research/codegen-walls.md)'s
+wall taxonomy. The decision tree:
+
+1. **Disassemble** the target via `objdiff-cli` GUI or `./dsd dis
+   build/eur/delinks/<unit>.o`. Look at the first ~10
+   instructions + the trailing literal pool.
+
+2. **Cross-check** the asm against each "Recognition cue" /
+   "Use when" block in `codegen-walls.md`:
+   - 3+ adjacent `ldr rN, [pc, #imm]` of nearby MMIO addresses
+     + `ands rN, ...; bne` → **C-23 (MMIO base-folding)** →
+     route through `*.legacy.c`.
+   - 2 instructions materialising a constant pair where one
+     derives from the other → **C-15 (flat-thunk arg setup)** →
+     `*.legacy.c`.
+   - Indirect-call dispatch with pool-dedup → **C-24** →
+     `*.legacy_sp3.c`.
+   - Adjacent `bic`/`orr` pairs on the same register at different
+     bit positions → **C-22 (adjacent-bitfield)** → keep default
+     SP, declare each window as a separate bitfield.
+   - Default → **mwcc 2.0/sp1p5** (no routing suffix).
+
+3. **Route by filename suffix:**
+   - `src/<module>/<file>.c` → mwcc 2.0/sp1p5 (default).
+   - `src/<module>/<file>.legacy.c` → mwcc 1.2/sp2p3 (Style A
+     epilogue, C-15 / C-23 / C-26 routing).
+   - `src/<module>/<file>.legacy_sp3.c` → mwcc 1.2/sp3 (C-24
+     dispatch routing).
+
+4. **When to file a wall research brief instead of attempting:**
+   - Target's asm doesn't match any documented wall AND looks like
+     it might be a structurally different shape (e.g. an unusual
+     prologue or epilogue, an unknown peephole effect).
+   - Brief 084's "3 walls not 1" methodology: if N candidates
+     share what *looks* like a wall, confirm via codegen sweep
+     before classifying. File a `cloud/<wall-N>-sweep` research
+     brief; brief 088 (C-23 MMIO) is the template.
+
+5. **When to mark known-wall-skip:**
+   - Target hits a documented wall whose recipe doesn't apply
+     (e.g. C-24 dispatch but the target's call site shape
+     differs). Add a `// codegen-wall: C-N — not amenable to
+     this recipe because…` comment in `src/` (matched mode) or
+     skip + flag in your brief deliverable. Don't burn iterations
+     on a wall whose recipe was already falsified.
+
+### Run the match
+
+Standard objdiff loop:
+
+```bash
+ninja                      # rebuild after editing src/
+ninja objdiff              # regenerate per-unit diff database
+ninja report               # aggregate report.json (post brief 187 filter)
+```
+
+`ninja report` now produces `build/eur/report.json` end-to-end —
+brief 187 Part 1's filter drops the ~20 panic-causing units +
+~1000 unmatched-routing-tier units before `objdiff-cli` runs. The
+report is the canonical metric; track `matched_code_percent` and
+`matched_functions` deltas across PRs.
+
+For interactive diffing, the objdiff GUI works on the same
+filtered units. The 20-ish dropped panic units are mostly
+`_dsd_gap@main_181-202` TUs whose `.text` has no `STT_FUNC`
+symbol — there's nothing to diff there interactively either.
+
+### Stage a decomp.me scratch
+
+For Easy / Medium-easy candidates, use the scratch flow:
+
+```bash
+# Emit the preprocessed context for paste-into-decomp.me.
+ninja build/eur/path/to/file.ctx.c
+
+# Or use the brief 098 wrapper that bundles asm + context + reloc
+# info into a single LLM-ready prompt.
+python tools/scratch_bundle.py --prompt --version eur \
+    --module ov006 --addr 0x021d3dc8
+```
+
+The `--prompt` flag emits a structured prompt ready to paste into
+an LLM (or decomp.me's AI suggestion box). The bundle includes:
+- The extracted ARM asm at the target.
+- The `.ctx.c` preprocessed context (headers, types, etc.).
+- Caller / callee names from `find_callsites.py`.
+- Known walls applicable to the target.
+
+### Use the permuter on near-matches
+
+If a match gets to 90 %+ but isn't byte-identical, stage a
+decomp-permuter workspace:
+
+```bash
+python tools/permute.py --version eur --module ov006 \
+    --addr 0x021d3dc8 --setup
+# Run the permuter:
+cd perm_work/<auto-name>/
+./run.sh
+```
+
+The wrapper sets up the candidate source, the extracted asm, and
+the permuter settings (`permuter_settings.toml`). The permuter
+randomly mutates the C source (variable order, types, expression
+forms) and tries to match the asm byte-identically.
+
+### Track progress
+
+After every match:
+
+```bash
+ninja                         # rebuild
+ninja report                  # regenerate report.json
+python tools/progress.py      # human-readable summary
+```
+
+Per-PR delta:
+
+```bash
+# Pre-merge regression check (see § "Catching match-depth
+# regressions before merge" above).
+cp build/eur/report.json /tmp/before.json
+# ... apply PR ...
+cp build/eur/report.json /tmp/after.json
+python tools/ci_format_diff_reasons.py /tmp/before.json /tmp/after.json
+```
+
+### 3-region SHA1 PASS gate — non-negotiable
+
+Every code-decomp PR must preserve `ninja sha1` PASS for all
+three regions. This has been the floor since brief 140. Verify
+locally:
+
+```bash
+python tools/configure.py eur && ninja sha1   # → "OK"
+python tools/configure.py usa && ninja sha1   # → "OK"
+python tools/configure.py jpn && ninja sha1   # → "OK"
+```
+
+Brain re-runs all three pre-merge regardless. Don't push a PR
+that fails any region — fix locally first.
+
+### Data-cluster tooling (mostly hands-off for code decomp)
+
+The infrastructure phase shipped a substantial data-cluster
+toolkit. Code decomp rarely needs these directly, but they show up
+in cross-references. Quick map:
+
+| Tool | Purpose | Brief |
+|---|---|---|
+| `tools/cluster_b_bundle_gen.py` | Cluster B bundle-extent heuristic | 174 / 185 |
+| `tools/cluster_b_bundle.py` | Bundle `.s` emitter w/ aliases | 161 / 185 (bytewise) |
+| `tools/cluster_c_pattern3_gen.py` | `.rodata`/`.data` Pattern 3 generator | 125 / 144 / 166 |
+| `tools/cross_region_chunk_extent.py` | Multi-symbol extent adjuster | 177 |
+| `tools/cross_region_cluster_apply.py` | Cross-region cluster apply orchestrator | 170 / 184 |
+| `tools/objdiff_filter_panic_units.py` | objdiff.json filter (brief 187 Part 1) | 187 |
+
+The cluster apply tool has subcommands per cluster: `b-scalars`,
+`b-pointers`, `c-strings`, `d1-tables`, `d2-tables`. Code-decomp
+PRs shouldn't touch these — they're decomper's data lane (or
+scaffolder's tooling-extension lane). If a code-decomp candidate
+depends on an unclaimed data symbol, file a data-cluster brief
+rather than shipping the data inline.
+
+### After a PR lands
+
+Brain updates `docs/state.md` § *Today's merges* with the
+shipped match count + delta. The `cascades-diff.yml` CI workflow
+auto-comments per-rename cascade impact. If your match opened up
+sibling candidates (renaming X promoted N hard-tier siblings to
+medium-tier), the workflow surfaces that.
 
 ## TL;DR for a new vibe coder
 

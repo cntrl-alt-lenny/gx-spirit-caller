@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**70 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**71 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (18)
-- [Uncategorised](#uncategorised) (7)
+- [Uncategorised](#uncategorised) (8)
 
 ## Analysis / worklist
 
@@ -460,6 +460,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/objdiff_filter_panic_units.py`
+
+**filter objdiff.json to exclude**
+
+units that crash `objdiff-cli report generate` (brief 187).
 
 ### `tools/strip_overlay_func_collisions.py`
 
