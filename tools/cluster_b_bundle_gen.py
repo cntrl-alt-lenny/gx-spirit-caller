@@ -171,7 +171,8 @@ def compute_bundle_extent(
     binary: bytes,
     binary_base_vaddr: int,
     *,
-    max_bundle_bytes: int = 1024,
+    max_bundle_bytes: int = 4096,
+    max_inner_symbols: int = 16,
 ) -> Bundle:
     """**The brief 174 heuristic.** Walk forward through named
     symbols from `candidate_vaddr`; return the bundle terminating
@@ -191,12 +192,25 @@ def compute_bundle_extent(
     - `binary`: the region's extracted module binary (raw bytes).
     - `binary_base_vaddr`: VA of `binary[0]` (typically the
       module's `.text` start).
-    - `max_bundle_bytes`: safety cap. The audit of brief
-      152/155 showed bundles up to 64 bytes; the cap is
-      deliberately generous so future cases with larger gap
-      chains still terminate, but raises a clear error if
-      something pathological is happening (e.g. an entire
-      `.data` section is all zero).
+    - `max_bundle_bytes`: safety cap on bundle byte size. Brief
+      174's audit of brief 152/155 showed bundles up to 64
+      bytes; brief 181 deferred `data_ov006_021ceae4` because
+      the cap was 1024 and that case requires 1168 bytes. Brief
+      185 raised the default to 4096 (3.5x headroom over the
+      empirical max) and added the `max_inner_symbols`
+      guardrail. Pathological cases (e.g. an entire `.data`
+      section being all-zero) still raise via the non-zero-byte
+      requirement below.
+    - `max_inner_symbols`: per-cluster guardrail (brief 185).
+      A bundle absorbs all named placeholders inside its range
+      via `.global` aliases (for overlays) or via the patcher
+      (for main). The cluster B recipe is intended for SMALL
+      placeholder clusters — brief 152/155's worked examples
+      had ≤ 2 inner symbols, brief 185's worked example has 3.
+      Bundles with > 16 inner symbols indicate the candidate is
+      better served by a Pattern 3 multi-symbol `.s` chunk
+      (`cluster_c_pattern3_gen.py`); raising prevents accidental
+      misuse on multi-segment ranges.
 
     Returns a `Bundle` describing the selected extent + the
     bytes inside it + the subsumed inner symbols.
@@ -208,6 +222,11 @@ def compute_bundle_extent(
       `sections`.
     - No named symbol exists after the candidate inside the
       same section.
+    - The minimum-non-zero-byte bundle exceeds
+      `max_bundle_bytes` (safety cap).
+    - The minimum-non-zero-byte bundle has more than
+      `max_inner_symbols` subsumed placeholders (per-cluster
+      guardrail — recommend Pattern 3 routing).
     - All candidate bundles up to `max_bundle_bytes` are
       all-zero (would route to `.bss`).
     """
@@ -284,7 +303,11 @@ def compute_bundle_extent(
                 f"{next_sym.name}@0x{next_vaddr:08x} but bundle "
                 f"size {size} exceeds the safety cap "
                 f"{max_bundle_bytes}. Either raise the cap or "
-                f"investigate — a > 1 KB bundle is unusual."
+                f"route the candidate through a Pattern 3 "
+                f"multi-symbol chunk (`cluster_c_pattern3_gen.py`) "
+                f"— bundles much larger than this indicate a "
+                f"multi-segment range that the cluster B recipe "
+                f"is not the right tool for."
             )
         fo = candidate_vaddr - binary_base_vaddr
         if fo < 0 or fo + size > len(binary):
@@ -300,6 +323,22 @@ def compute_bundle_extent(
                 for s in section_after
                 if candidate_vaddr < s.addr < next_vaddr
             )
+            # Brief 185 per-cluster guardrail: cluster B is for
+            # small placeholder clusters (brief 152/155 had ≤ 2
+            # inner; brief 185's `data_ov006_021ceae4` has 3).
+            # > 16 inner symbols means the candidate is in a
+            # multi-segment range that Pattern 3 handles better.
+            if len(inner) > max_inner_symbols:
+                raise BundleExtentError(
+                    f"candidate at 0x{candidate_vaddr:08x}: bundle "
+                    f"[0x{candidate_vaddr:08x}, 0x{next_vaddr:08x}) "
+                    f"absorbs {len(inner)} subsumed placeholders "
+                    f"(> max_inner_symbols={max_inner_symbols} "
+                    f"guardrail). The cluster B recipe is "
+                    f"intended for SMALL placeholder clusters; "
+                    f"route this candidate through "
+                    f"`cluster_c_pattern3_gen.py` instead."
+                )
             return Bundle(
                 anchor_name=candidate_sym.name,
                 anchor_vaddr=candidate_vaddr,
@@ -420,6 +459,148 @@ def render_bundle_c(
         )
         lines.append(f"    0x{w:08x},{comment_str}")
     lines.append("};")
+    return "\n".join(lines) + "\n"
+
+
+def render_bundle_s_bytewise(
+    bundle: Bundle,
+    *,
+    bytes_per_line: int = 8,
+    extra_comment_lines: list[str] | None = None,
+) -> str:
+    """Brief 185 byte-granular `.s` emitter.
+
+    Brief 161 part 1 added `cluster_b_bundle.py:render_bundle_s` for
+    the brief 158 collision case where bundle-with-zero-pad lost
+    inner-symbol exports. That emitter is `.word`-only (4-byte
+    units) and rejects aliases at non-4-aligned offsets.
+
+    Brief 181's worked examples (`data_ov006_021cdd0c.s`,
+    `data_ov006_021cea2c.s`) emit `.byte` directives with
+    `.global` labels at potentially-odd offsets — required for
+    cluster B overlay candidates where:
+
+      - `patch_module_literals.py` doesn't run on overlay binaries
+        (per brief 181 commit message), so inner placeholders MUST
+        be exposed as `.global` symbols for mwldarm to resolve
+        their `kind:load` relocs at link time.
+      - Inner placeholders frequently land at non-4-aligned
+        offsets (e.g. size-2 strings at +2 within a bundle).
+
+    This emitter handles both: arbitrary `.byte` content with
+    `.global` labels at any byte offset, deterministic byte-per-
+    line formatting for diff readability.
+
+    Output shape:
+
+        ; <comment block>
+        ;
+
+                .section .data
+
+                .global <anchor>
+        <anchor>:
+                .byte 0xNN, 0xNN, ...
+                .byte 0xNN, 0xNN, ...
+
+                .global <inner_0>
+        <inner_0>:
+                .byte 0xNN, 0xNN, ...
+                ...
+
+    `bytes_per_line=8` matches brief 181's worked examples.
+    """
+    anchor = bundle.anchor_name
+    data = bundle.bytes_le
+    # Build offset → alias_name lookup. The anchor itself is
+    # always at offset 0; inner symbols come from
+    # `bundle.inner_symbols`.
+    aliases: list[tuple[int, str]] = [(0, anchor)]
+    for name, offset in bundle.inner_symbols:
+        if not (0 < offset < bundle.size_bytes):
+            raise ValueError(
+                f"inner symbol {name} offset 0x{offset:x} outside "
+                f"bundle bounds [0, {bundle.size_bytes})"
+            )
+        aliases.append((offset, name))
+    aliases.sort(key=lambda x: x[0])
+
+    lines: list[str] = []
+    lines.append(
+        "; Cluster B bundle — brief 185 byte-granular `.s` "
+        "emitter (overlay-safe form)."
+    )
+    lines.append(";")
+    lines.append(
+        f"; Anchor: {anchor} @ 0x{bundle.anchor_vaddr:08x}, "
+        f"size {bundle.size_bytes} bytes "
+        f"({bundle.size_bytes // WORD_SIZE} words). Bundle "
+        f"terminates at"
+    )
+    lines.append(
+        f"; the next 4-aligned named symbol "
+        f"(0x{bundle.end_vaddr:08x})."
+    )
+    if bundle.inner_symbols:
+        lines.append(";")
+        lines.append(
+            "; Subsumed placeholders (`.global` labels at the "
+            "right byte offsets keep load relocs"
+        )
+        lines.append(
+            "; resolvable by mwldarm at link time — required "
+            "for overlay modules where the post-link"
+        )
+        lines.append(
+            "; `patch_module_literals.py` patcher doesn't run "
+            "per brief 181):"
+        )
+        for name, offset in bundle.inner_symbols:
+            lines.append(
+                f";   - {name} @ +0x{offset:x} "
+                f"(VA 0x{bundle.anchor_vaddr + offset:08x})"
+            )
+    lines.append(";")
+    lines.append(
+        "; Bundle extent chosen by tools/cluster_b_bundle_gen.py "
+        "(brief 174 heuristic;"
+    )
+    lines.append(
+        "; brief 185 raised the safety cap from 1024 → 4096 + "
+        "added the per-cluster"
+    )
+    lines.append(
+        "; max_inner_symbols guardrail for multi-segment cases)."
+    )
+    if extra_comment_lines:
+        lines.append(";")
+        for cl in extra_comment_lines:
+            lines.append(f"; {cl}" if cl else ";")
+    lines.append("")
+    lines.append("        .section .data")
+    lines.append("")
+
+    # Emit each (label, bytes) segment in offset order. Segment
+    # span: from this alias's offset to the next alias's offset
+    # (or bundle end for the last alias).
+    for i, (offset, name) in enumerate(aliases):
+        segment_end = (
+            aliases[i + 1][0] if i + 1 < len(aliases)
+            else bundle.size_bytes
+        )
+        segment = data[offset:segment_end]
+        if i > 0:
+            lines.append("")
+        lines.append(f"        .global {name}")
+        lines.append(f"{name}:")
+        if not segment:
+            # Zero-length label (unusual but possible if two
+            # aliases share an offset — defensive). No `.byte`.
+            continue
+        for off in range(0, len(segment), bytes_per_line):
+            row = segment[off:off + bytes_per_line]
+            byte_lits = ", ".join(f"0x{b:02x}" for b in row)
+            lines.append(f"        .byte {byte_lits}")
     return "\n".join(lines) + "\n"
 
 
