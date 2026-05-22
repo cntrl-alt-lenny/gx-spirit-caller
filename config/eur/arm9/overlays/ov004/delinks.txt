@@ -324,3 +324,11 @@ src/overlay004/data/data_ov004_021e3128.c:
 src/overlay004/data/data_ov004_021e2efc.c:
     complete
     .rodata start:0x021e2efc end:0x021e3128
+
+src/overlay004/data/data_ov004_021ded69.c:
+    complete
+    .rodata start:0x021ded69 end:0x021e0fb5
+
+src/overlay004/data/data_ov004_021e191c.c:
+    complete
+    .rodata start:0x021e191c end:0x021e1db1
