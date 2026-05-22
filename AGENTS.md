@@ -15,7 +15,7 @@ in plain English — see *Adding or retiring agents* near the bottom.
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, picks direction, merges PRs, adds/retires agents, final authority.                                                                              | —                                                              | —                                                                               |
 | **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
-| **cloud**         | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain.     | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
+| **scaffolder**    | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain.                                                                                                                                | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **decomper**      | Any LLM session on cntrl_alt_lenny's PC or Mac, with toolchain + baserom (separate session from brain) | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
@@ -28,7 +28,7 @@ files under `.claude/agents/`:
 
 - [`.claude/agents/brain.md`](.claude/agents/brain.md) — coordinator
 - [`.claude/agents/decomper.md`](.claude/agents/decomper.md) — function matcher
-- [`.claude/agents/cloud.md`](.claude/agents/cloud.md) — scaffolder
+- [`.claude/agents/scaffolder.md`](.claude/agents/scaffolder.md) — scaffolder
 
 Each file captures the role's scope + hands-off paths + workflow loop
 so a fresh Claude Code session can load the appropriate subagent
@@ -112,32 +112,37 @@ paste to other agents, repeat.
 
 ### Worktree convention (multi-agent on the same machine)
 
-When `brain`, `decomper`, and `cloud` are running on the same physical
-machine (the common case for cntrl_alt_lenny's setup), **they must
-work in separate git worktrees** so they don't fight over branch
-state in the same working directory. Two equivalent mechanisms exist;
-either is fine — pick by host:
+When `brain`, `decomper`, and `scaffolder` are running on the same
+physical machine (the common case for cntrl_alt_lenny's setup),
+**they must work in separate git worktrees** so they don't fight
+over branch state in the same working directory. Two equivalent
+mechanisms exist; either is fine — pick by host:
 
 #### Mechanism A — manual sibling worktrees (Mac convention)
 
-Standard layout, three sibling directories at the same depth:
+Standard layout, three named sibling directories under a single
+`spirit-caller/` parent:
 
-| Worktree path                              | Slug      | Purpose                                          |
-|--------------------------------------------|-----------|--------------------------------------------------|
-| `~/Dev/gx-spirit-caller`                   | `brain`   | Main repo. Brain pulls main, reviews PRs, builds verifications. |
-| `~/Dev/gx-spirit-caller-decomper`          | `decomper`| Sibling worktree. Decomper checks out its own `decomper/<scope>` branches without touching brain's working state. |
-| `~/Dev/gx-spirit-caller-cloud`             | `cloud`   | Sibling worktree. Cloud checks out its own `cloud/<scope>` branches the same way. Added in this session's PR #564 era — cloud now runs locally with the toolchain (was previously remote-only). |
+| Worktree path                          | Slug         | Purpose                                          |
+|----------------------------------------|--------------|--------------------------------------------------|
+| `~/Dev/spirit-caller/brain`            | `brain`      | Main repo (owns `.git/`). Brain pulls main, reviews PRs, builds verifications. |
+| `~/Dev/spirit-caller/decomper`         | `decomper`   | Sibling worktree. Decomper checks out its own `decomper/<scope>` branches without touching brain's working state. |
+| `~/Dev/spirit-caller/scaffolder`       | `scaffolder` | Sibling worktree. Scaffolder checks out its own `scaffolder/<scope>` branches the same way. Added in PR #564 era — scaffolder now runs locally with the toolchain (was previously remote-only). |
 
 Add the sibling worktrees once per machine:
 
 ```
-git worktree add ~/Dev/gx-spirit-caller-decomper main
-git worktree add ~/Dev/gx-spirit-caller-cloud    main
-cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
-   ~/Dev/gx-spirit-caller-decomper/orig/
-cp ~/Dev/gx-spirit-caller/orig/baserom_*.nds \
-   ~/Dev/gx-spirit-caller-cloud/orig/
+git worktree add ~/Dev/spirit-caller/decomper   main
+git worktree add ~/Dev/spirit-caller/scaffolder main
+cp ~/Dev/spirit-caller/brain/orig/baserom_*.nds \
+   ~/Dev/spirit-caller/decomper/orig/
+cp ~/Dev/spirit-caller/brain/orig/baserom_*.nds \
+   ~/Dev/spirit-caller/scaffolder/orig/
 ```
+
+> Historical note: this layout replaced the prior flat-sibling
+> `~/Dev/gx-spirit-caller{,-decomper,-scaffolder}` in May 2026 — same
+> three-worktree isolation, just rehomed under one parent for tidiness.
 
 Each worktree gets its own `orig/baserom_*.nds` (gitignored) and
 its own `build/` directory. The `.git` is shared via worktree
@@ -145,7 +150,7 @@ mechanics, so commits/branches are visible across all three — but
 working-tree state (modified files, untracked files, current
 checkout) is isolated.
 
-When starting a new decomper or cloud session, point it at the
+When starting a new decomper or scaffolder session, point it at the
 corresponding sibling directory instead of the main clone.
 
 #### Mechanism B — Claude Code automatic sandbox worktrees (Windows convention)
@@ -153,18 +158,19 @@ corresponding sibling directory instead of the main clone.
 Claude Code on Windows (or anywhere) automatically creates a
 per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`
 each time an agent session is launched. These provide identical
-isolation to the manual sibling worktrees above — decomper and cloud
-each get their own checkout of their working branch, independent of
-brain's main working state. No manual `git worktree add` needed.
+isolation to the manual sibling worktrees above — decomper and
+scaffolder each get their own checkout of their working branch,
+independent of brain's main working state. No manual
+`git worktree add` needed.
 
 Example layout that appears automatically when both agents are running:
 
 ```
-~/Dev/gx-spirit-caller/
+~/Dev/spirit-caller/brain/   (or wherever the brain checkout lives)
 ├── (brain main checkout — current branch + working state)
 └── .claude/worktrees/
     ├── <auto-name-1>/      ← decomper's session, on decomper/<scope>
-    └── <auto-name-2>/      ← cloud's session,    on cloud/<scope>
+    └── <auto-name-2>/      ← scaffolder's session, on scaffolder/<scope>
 ```
 
 The automatic worktrees share the main checkout's `orig/` baseroms
@@ -187,9 +193,9 @@ Both achieve the same isolation goal. Pick by host convention:
   — pattern in use during the post-SHA1 arc; no manual setup needed.
 
 Brain does not strictly need either mechanism for review/merge work
-on its own — both mechanisms only matter when decomper and cloud run
-in parallel. A brain that's only verifying PRs and merging can work
-from the main checkout alone.
+on its own — both mechanisms only matter when decomper and scaffolder
+run in parallel. A brain that's only verifying PRs and merging can
+work from the main checkout alone.
 
 ### Wine on macOS (post-deprecation)
 
@@ -233,10 +239,8 @@ brain reads it cold to catch up in under a minute.
    job is to make the review/merge decision easy to approve, not to
    outsource the click.
 3. **One branch per task.** Branch name = `<agent-slug>/<kebab-scope>`,
-   e.g. `decomper/ov011-tail-wrappers`, `cloud/tier-delta`,
-   `brain/agents-rename`. One branch, one PR, one concern. (Older
-   branches in history use the pre-rename slugs `claude-pc`,
-   `claude-cloud`, `claude-brain`; those are grandfathered.)
+   e.g. `decomper/ov011-tail-wrappers`, `scaffolder/tier-delta`,
+   `brain/agents-rename`. One branch, one PR, one concern.
 4. **Stay inside your "Owns" column.** If the task needs a change in
    another agent's territory, either open a PR in that agent's scope
    (as them, not you) or ask cntrl_alt_lenny / the brain to re-partition.
@@ -245,9 +249,9 @@ brain reads it cold to catch up in under a minute.
    OK). Don't force-push. Describe in the PR body: what changed,
    why, any follow-ups.
 
-### Cloud autonomous work
+### Scaffolder autonomous work
 
-`cloud` fills idle time between briefs. Defaults:
+`scaffolder` fills idle time between briefs. Defaults:
 
 - **May open unbriefed:** new scripts in `tools/`, improvements to
   existing analyzer scripts, CI changes, PR reviews via GitHub MCP,
@@ -263,14 +267,12 @@ brain reads it cold to catch up in under a minute.
 
 `<agent-slug>/<kebab-case-scope>` — for example:
 
-  - `cloud/add-gx-headers`
+  - `scaffolder/add-gx-headers`
   - `decomper/ov011-tail-wrappers`
   - `brain/agents-rename`
 
 The slug left of `/` identifies which role owns pushes to that branch.
-No-one else touches it without coordination. Branches from before the
-model-agnostic rename (`claude-brain/*`, `claude-cloud/*`, `claude-pc/*`)
-remain valid in git history and don't need to be renamed.
+No-one else touches it without coordination.
 
 ## Pull-request workflow
 
@@ -315,10 +317,10 @@ with the toolchain installed). Responsibilities:
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's cntrl_alt_lenny's call.
 
-`cloud` supports the brain: it writes scaffolding, tools, and headers
-on its own branches, and can review PRs through GitHub MCP integrations,
-but all "does the rebuilt ROM still work?" questions are resolved by
-the brain.
+`scaffolder` supports the brain: it writes scaffolding, tools, and
+headers on its own branches, and can review PRs through GitHub MCP
+integrations, but all "does the rebuilt ROM still work?" questions
+are resolved by the brain.
 
 The role is tied to the repo, not to a specific LLM conversation — any
 fresh local session (Claude Code, Codex CLI, …) that reads this file
@@ -329,7 +331,7 @@ and has the toolchain installed can take over.
 cntrl_alt_lenny says, in plain English, something like:
 
 > *"Add Codex as an agent. It'll generate NitroSDK header declarations
-> under `libs/nitro/include/nitro/`. Move that path off Cloud."*
+> under `libs/nitro/include/nitro/`. Move that path off scaffolder."*
 
 The brain then:
 
@@ -373,8 +375,8 @@ itself:
   `decomper/cross-region-cluster-d3-with-generator`.
 
 - [`docs/briefs/179-patcher-variant-e-2byte-pool-shift.md`](docs/briefs/179-patcher-variant-e-2byte-pool-shift.md)
-  — `cloud` (MEDIUM, **NOW ACTIVE**): extend patcher to
-  handle 2-byte (or 1-3 byte) veneer pool shifts at
+  — `scaffolder` (MEDIUM, **NOW ACTIVE**): extend patcher
+  to handle 2-byte (or 1-3 byte) veneer pool shifts at
   low n. Per brief 173's hand-off. Path-2 mechanism
   works at veneer level (verified); only byte-layout
   shift fails SHA1. Variant E closes the layout problem.
@@ -396,7 +398,7 @@ itself:
   (size-1/2 + odd-aligned) deferred to brief 180+.
   3-region SHA1 PASS + 27/27 OK preserved.
 - [`docs/briefs/177-unified-chunk-extent-generator.md`](docs/briefs/177-unified-chunk-extent-generator.md)
-  `cloud`, shipped in PR #618. 🎉 New
+  `scaffolder`, shipped in PR #618. 🎉 New
   `tools/cross_region_chunk_extent.py` 3-phase
   algorithm generalises brief 174 to multi-symbol
   chunks. Brief 175's headline failure reproduces +
@@ -413,12 +415,12 @@ itself:
   region apply of 59 EUR D-3 Pattern 3 chunks; **0
   shipped** — all 72 generated chunks failed dsd
   section-membership check at gap-file boundaries. Same
-  gap-extent issue. Brief 177 hand-off: cloud
+  gap-extent issue. Brief 177 hand-off: scaffolder
   generalises brief 174's heuristic into region-aware
   chunk extent generator. No source kept; baseline
   preserved. Brain pushed drift-check regen fix.
 - [`docs/briefs/174-bundle-extent-heuristic-generator.md`](docs/briefs/174-bundle-extent-heuristic-generator.md)
-  `cloud`, shipped in PR #615. 🎉 **Heuristic locked +
+  `scaffolder`, shipped in PR #615. 🎉 **Heuristic locked +
   generator shipped.** `tools/cluster_b_bundle_gen.py`
   automates the brief 152/155 hand-tuned heuristic
   (4-aligned end + named-symbol boundary + ≥ 1 non-zero
@@ -434,11 +436,11 @@ itself:
   brief 152/155 bundle extents were hand-tuned per
   candidate; mechanical apply has no such context. No
   source changes shipped; baseline preserved. Brief
-  174 hand-off: cloud builds an extent-selection-
+  174 hand-off: scaffolder builds an extent-selection-
   heuristic generator. Brain pushed drift-check regen
   fix.
 - [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](docs/briefs/173-odd-aligned-slot-recipe-research.md)
-  `cloud`, shipped in PR #612. 🔬 **All 4 variants FAIL**
+  `scaffolder`, shipped in PR #612. 🔬 **All 4 variants FAIL**
   on `data_ov004_021ded69`. Root cause: mwldarm enforces
   minimum 4-byte alignment on `.rodata` regardless of
   source-side directives. **Critical positive finding**:
@@ -459,7 +461,7 @@ itself:
   form at n=2 (`net -8`); byte-detection authoritative.
   3-region SHA1 PASS + 27/27 preserved.
 - [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
-  `cloud`, shipped in PR #609. 🎉 **Cross-region
+  `scaffolder`, shipped in PR #609. 🎉 **Cross-region
   tooling shipped.** New
   `tools/cross_region_cluster_apply.py` generalises
   brief 169's per-region approach. 768 cluster B
@@ -482,7 +484,7 @@ itself:
   PASS + 27/27 preserved; EUR bit-identical
   regression verified.
 - [`docs/briefs/168-patcher-n3-residual-fix.md`](docs/briefs/168-patcher-n3-residual-fix.md)
-  `cloud`, shipped in PR #606. 🔑 **n=3 SHA1 residual
+  `scaffolder`, shipped in PR #606. 🔑 **n=3 SHA1 residual
   CLOSED via deeper-than-expected fix.** Diagnosis
   showed the root cause was NOT a new cluster shape
   (walk-forward detector handles n=3's 20-byte
@@ -511,7 +513,7 @@ itself:
   sub-5 path. Both self-extend gates met (86% yield +
   4,464 B); further sub-5 work gated on brief 168.
 - [`docs/briefs/166-pattern3-generator-local-label-fix.md`](docs/briefs/166-pattern3-generator-local-label-fix.md)
-  `cloud`, shipped in PR #601. Pattern 3 generator emits
+  `scaffolder`, shipped in PR #601. Pattern 3 generator emits
   raw hex literals for `kind:label(*)` refs; no `.extern`.
   `_word_directive_for_target` helper centralises the
   label-vs-named branch. `sym_by_addr` upgraded to carry
@@ -531,7 +533,7 @@ itself:
   biggest single mega. 3-region SHA1 PASS + 27/27 OK
   preserved. Deferred-mega residue 2 → 1.
 - [`docs/briefs/164-patcher-n5-residual-fix.md`](docs/briefs/164-patcher-n5-residual-fix.md)
-  `cloud`, shipped in PR #599. 🔑 **n=5 SHA1 residual
+  `scaffolder`, shipped in PR #599. 🔑 **n=5 SHA1 residual
   CLOSED — path-2 unblocked.** Diagnosis: mwldarm at n=5
   emits 28-byte cluster (`WITH_TERMINATOR_LONG` shape) vs
   16-byte n=86 / 12-byte n=9. **Fix**: generic walk-forward
@@ -557,7 +559,7 @@ itself:
   `.word .L_*`); decomper manually fixed; brief 166+
   candidate.
 - [`docs/briefs/162-patcher-low-n-extended-coverage.md`](docs/briefs/162-patcher-low-n-extended-coverage.md)
-  `cloud`, shipped in PR #596. Path A (per-n empirical
+  `scaffolder`, shipped in PR #596. Path A (per-n empirical
   override dict). Empirical sampling captured n=5
   `ctor_pad_net = 8` vs formula 12 → +4 disagreement
   confirmed. n=4/3/2/1 unreachable from current source
@@ -584,7 +586,7 @@ itself:
   fails. Separate recipe needed. 3-region SHA1 PASS
   preserved.
 - [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](docs/briefs/161-pattern3-subsumed-ref-resolution.md)
-  `cloud`, shipped in PR #593. Sketch 2 chosen (cleanest,
+  `scaffolder`, shipped in PR #593. Sketch 2 chosen (cleanest,
   no generator/patcher change). Investigation: GNU
   `__attribute__((alias))` only does address-equal aliases
   in C → fall back to pure `.s` with `.global` labels at
@@ -604,12 +606,12 @@ itself:
   didn't trigger in wave 2 — all chunks naturally clean.
   **Structural collision surfaced**: `data_02101928` skipped
   due to subsumed-ref into brief 155 bundle TU — 3 sketch
-  workarounds filed for brief 161 (cloud). Created
+  workarounds filed for brief 161 (scaffolder). Created
   `arm9_ovNNN.bin` symlinks for ov002/6/7/21 (generator's
   expected path mismatch — also brief 161 cleanup candidate).
   3-region SHA1 PASS + 27/27 OK preserved.
 - [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
-  `cloud`, shipped in PR #590. **Part 1**: `--section
+  `scaffolder`, shipped in PR #590. **Part 1**: `--section
   {auto,rodata,data}` flag (closes brief 157 generator
   gap). Auto-detect via delinks.txt section table. 5 new
   tests. **Part 2**: reverse-lookup tool
@@ -631,9 +633,9 @@ itself:
   + post-process `.rodata→.data` sed (generator gap)
   shipped mechanically. Yield gate FAIL (9/33=27%,
   deliberately conservative); wave 1 closes. Generator
-  gap surfaced for cloud brief 159 Part 1.
+  gap surfaced for scaffolder brief 159 Part 1.
 - [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
-  `cloud`, shipped in PR #587. **Part 1**: recipe addendum
+  `scaffolder`, shipped in PR #587. **Part 1**: recipe addendum
   capturing bundle generalisation to value=0 size=4 (per
   brief 155). **Part 2**: 8-candidate spot-disasm. **Hit
   rate 75% PASS** (6/8 + 1 AMBIGUOUS = brief 154 known-
@@ -657,7 +659,7 @@ itself:
   content into `.data`, preventing mwcc emission to `.bss`.
   **3-region SHA1 PASS + 27/27 OK preserved.**
 - [`docs/briefs/154-ov004-rodata-symbol-reclassification-research.md`](docs/briefs/154-ov004-rodata-symbol-reclassification-research.md)
-  `cloud`, shipped in PR #581 (survey-only after recovery).
+  `scaffolder`, shipped in PR #581 (survey-only after recovery).
   Initial submission included HIGH-confidence
   reclassification of `0x021e2efc` that **brain verify-
   gate caught breaking EUR SHA1**. Per brief's own
@@ -691,7 +693,7 @@ itself:
   candidates are ARM-code-as-data misclassifications,
   handed off to brief 154.
 - [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](docs/briefs/152-cluster-b-size-1-2-workarounds.md)
-  `cloud`, shipped in PR #579. **Workaround #3 PASSES;
+  `scaffolder`, shipped in PR #579. **Workaround #3 PASSES;
   #2 FALSIFIED with root-cause diagnosis.** `arm9.lcf`'s
   `ALIGNALL(2)` (not mwcc) is the alignment-cascade
   culprit. Workaround #3 (`unsigned int[N]` bundle)
@@ -701,7 +703,7 @@ itself:
 
 - [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
   `decomper`, shipped in PR #575. **Cluster B pointer
-  pool fully drained**: 20 of 20 candidates via cloud's
+  pool fully drained**: 20 of 20 candidates via scaffolder's
   locked recipe. 12 singletons + two 4-element + one
   3-element fn-ptr "tables" + 1 ov004 (bss pointee).
   Notable empirical correction: **REJECTED brief 148's
@@ -715,7 +717,7 @@ itself:
   FAIL (80 B vs ≥250 B); wave 1 closes. **3-region SHA1
   PASS + 27/27 OK preserved.**
 - [`docs/briefs/150-patcher-low-n-with-terminator.md`](docs/briefs/150-patcher-low-n-with-terminator.md)
-  `cloud`, shipped in PR #576. Option A shipped:
+  `scaffolder`, shipped in PR #576. Option A shipped:
   byte-detection authoritative in `_fix_ctor_and_pad`;
   n-inference is now a hint via stderr note, not
   fatal. **Patcher accepts any `n ∈ [0, 86]` cleanly.**
@@ -746,7 +748,7 @@ itself:
   would have broken SHA1. Brief 150 closes the
   boundary.
 - [`docs/briefs/148-cluster-b-pointer-typedef-research.md`](docs/briefs/148-cluster-b-pointer-typedef-research.md)
-  `cloud`, shipped in PR #573. Research brief, three
+  `scaffolder`, shipped in PR #573. Research brief, three
   deliverables. (1) Pointer pool survey at
   `docs/research/cluster-b-pointer-pool.md` (23
   candidates: 15 data-pointers + 8 code-pointers).
@@ -764,17 +766,17 @@ itself:
   1308 byte diff). 3 size-1 workaround sketches filed
   for brief 149 stretch falsification.
 - [`docs/briefs/146-patcher-ctor-terminator-detection.md`](docs/briefs/146-patcher-ctor-terminator-detection.md)
-  `cloud`, shipped in PR #570. Two-path
+  `scaffolder`, shipped in PR #570. Two-path
   `_fix_ctor_and_pad`: WITH_TERMINATOR (n=86,
   preserves SHA1 PASS bit-for-bit) and NO_TERMINATOR
   (0 < n < 86, new). **Cloud empirically corrected
   the brief's recommended discriminator byte offset**
-  — brief said bytes 4-7, cloud used bytes 12-15
+  — brief said bytes 4-7, scaffolder used bytes 12-15
   where `.LZN` marker differs from zero pad. Pinned
   with dedicated test. Unblocks ov004 `.rodata`
   source-level work (brief 147).
 - [`docs/briefs/144-pattern3-extern-emission-fix.md`](docs/briefs/144-pattern3-extern-emission-fix.md)
-  `cloud`, shipped in PR #565. Pattern 3 generator
+  `scaffolder`, shipped in PR #565. Pattern 3 generator
   now auto-emits `.extern` declarations for `.word
   <name>` references. Eliminates 14 chunks' worth of
   manual fixups. 1770/1770 tests post-merge.
@@ -784,16 +786,16 @@ itself:
   brief 146 then fixed. Clean discipline: 3
   reproducer shapes documented; SHA1 not regressed.
 - [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
-  `cloud`, shipped in PR #562. Generalised
+  `scaffolder`, shipped in PR #562. Generalised
   `tools/patch_ov004_veneers.py` to accept any veneer
   count `n ∈ [0, HISTORICAL_MAX_VENEER_COUNT=86]`.
   Replaced hard assertion with
   `expected_output_delta_for(n) = n × 12 - 8` (0 for
   n=0). 11 new tests (5 end-to-end across n=0/9/43/86
   + 6 helper). Suite: 1758/1758. **3-region SHA1 PASS
-  preserved bit-for-bit.** Cloud ran in isolated
-  `gx-spirit-caller-cloud` worktree — no parallel-
-  session interference. Unlocks brief 145 ov004
+  preserved bit-for-bit.** Scaffolder ran in an isolated
+  worktree — no parallel-session interference. Unlocks
+  brief 145 ov004
   `.rodata` cluster work.
 - [`docs/briefs/143-cluster-b-wave-1.md`](docs/briefs/143-cluster-b-wave-1.md)
   `decomper`, shipped in PR #561. **First post-SHA1
@@ -811,7 +813,7 @@ itself:
   pool drained 60/60. Brief 146+ candidates: 5 size-2
   + 2 size-1 + 6 zero-value + 1 non-aligned residue.
 - [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
-  `cloud`, shipped in PR #558. **🎉🎉🎉 `ninja sha1`
+  `scaffolder`, shipped in PR #558. **🎉🎉🎉 `ninja sha1`
   PASSES FOR EUR + USA + JPN.** First byte-identical
   ROM rebuild in project history. Two parts, single
   PR. Part 1: `expected_output_size_for(data, *,
@@ -841,7 +843,7 @@ itself:
   partial (25/92 strict-aligned drained). Brief 142
   generalises the patcher to unlock .rodata work.
 - [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
-  `cloud`, shipped in PR #555. **🔑 99.995% SHA1-gap
+  `scaffolder`, shipped in PR #555. **🔑 99.995% SHA1-gap
   closure shipped.** `tools/clean_macos_junk.py`
   removes `.DS_Store` / `._*` / `Thumbs.db` /
   `desktop.ini` from a tree (`--include-dirs`
@@ -872,19 +874,19 @@ itself:
   + 2 source extern renames. EUR preserved 27/27;
   USA + JPN flipped 26/27 → 27/27.
 - [`docs/briefs/137-sha1-gap-scoping.md`](docs/briefs/137-sha1-gap-scoping.md)
-  `cloud`, shipped in PR #552. **🔑 99.995% of SHA1
+  `scaffolder`, shipped in PR #552. **🔑 99.995% of SHA1
   gap is `.DS_Store` macOS metadata leakage.** EUR
   diff 100,805 → 5 bytes after filter. Bisection
   table per region with per-structure attribution.
   Post-fix residue: 4 bytes ROM-header CRC16 + 1 byte
   ov4 ram_size off-by-1024 (brief 134 patcher bug in
   idempotent path). 3-brief unlock plan: brief 138
-  (filter) + brief 139 cloud-side patcher fix
+  (filter) + brief 139 scaffolder-side patcher fix
   + brief 140 (CRC16) = SHA1 PASS. Zero new toolchain
   walls (W8+ candidates absent).
 
 - [`docs/briefs/134-ov004-binary-patch-phase3.md`](docs/briefs/134-ov004-binary-patch-phase3.md)
-  `cloud`, shipped in PR #549. **🎉 26/27 BASELINE
+  `scaffolder`, shipped in PR #549. **🎉 26/27 BASELINE
   UNLOCKED: EUR 27/27 + USA 26/27 + JPN 26/27.**
   First multi-region module-baseline milestone of the
   session. 2 new tools wired into the build pipeline:
@@ -908,7 +910,7 @@ itself:
   declarations (brief 137+ generator fix candidate).
 
 - [`docs/briefs/132-ov004-symbol-scoping-phase2.md`](docs/briefs/132-ov004-symbol-scoping-phase2.md)
-  `cloud`, shipped in PR #546. **NO BASELINE FLIP;
+  `scaffolder`, shipped in PR #546. **NO BASELINE FLIP;
   3 approaches falsified empirically.** B v1
   (STT_FUNC→STT_NOTYPE on 783 syms) no change; B v2
   (SHF_EXECINSTR cleared on 47 .o files) no change;
@@ -939,7 +941,7 @@ itself:
   Cumulative cluster C/D arc: **176 symbols** across
   6 briefs.
 - [`docs/briefs/131-ov004-thunk-section-fix.md`](docs/briefs/131-ov004-thunk-section-fix.md)
-  `cloud`, shipped in PR #543. **🔑 Phase 1 ALIGNALL
+  `scaffolder`, shipped in PR #543. **🔑 Phase 1 ALIGNALL
   partial unlock: 95% ov004 + 52% main byte-diff
   reduction.** No baseline flips yet. 4 sub-options
   tried, all hit walls (`-nointerworking` regresses
@@ -959,7 +961,7 @@ itself:
   pending OV004 cascade). 3 mega-arrays deferred
   (30 KB / 5 KB / 4.6 KB).
 - [`docs/briefs/129-ov004-checksum-scoping.md`](docs/briefs/129-ov004-checksum-scoping.md)
-  `cloud`, shipped in PR #540. **🔑 ROOT CAUSE: 86
+  `scaffolder`, shipped in PR #540. **🔑 ROOT CAUSE: 86
   spurious mwldarm thumb→arm veneers in `.rodata`.**
   Brief 113's Cat 4 hypothesis confirmed empirically.
   All targets resolve to ov002 (mutually-exclusive
@@ -981,7 +983,7 @@ itself:
   `data_ov002_022c357c` 19,488 bytes. Cumulative
   cluster C/D arc: 95 symbols / 47K bytes.
 - [`docs/briefs/127-arm9-main-checksum-scoping.md`](docs/briefs/127-arm9-main-checksum-scoping.md)
-  `cloud`, shipped in PR #536. **🔑 ARM9 main gap is
+  `scaffolder`, shipped in PR #536. **🔑 ARM9 main gap is
   only 21 bytes / 6 symbols** (brief 113 hypothesis
   falsified). 3 categories: Cat 1 = 5 bytes / 3
   wrong-target TUs (`func_02048f98`, `func_02052bc4`,
@@ -1002,7 +1004,7 @@ itself:
   size variance wide (16-byte → 320-byte). ~28% of
   ~71 D-1 pool drained; 4-6 waves close it.
 - [`docs/briefs/125-cluster-c-pattern3-generator.md`](docs/briefs/125-cluster-c-pattern3-generator.md)
-  `cloud`, shipped in PR #534. **343-line generator
+  `scaffolder`, shipped in PR #534. **343-line generator
   at `tools/cluster_c_pattern3_gen.py` + 34 new
   tests.** Closes brief 119's FAILED Pattern 2 case
   (`data_020c387c` "NAN(/INFINITY" — 0x10b-byte
@@ -1021,7 +1023,7 @@ itself:
   cascade. Pool drain: 110-150 Pattern 1 candidates
   remain.
 - [`docs/briefs/123-data-worklist-v3.md`](docs/briefs/123-data-worklist-v3.md)
-  `cloud`, shipped in PR #531. **data_worklist v3
+  `scaffolder`, shipped in PR #531. **data_worklist v3
   ships with 3 new size-4 sub-shapes:** string-ascii4
   (≥1 printable + nulls), pointer-code (LE u32 →
   `.text`), pointer-data (LE u32 → `.data`/`.rodata`/
@@ -1040,7 +1042,7 @@ itself:
   **Cluster A coverage cumulative: 1145 / 1586 = ~72%
   drained** across briefs 116 + 118 + 120.
 - [`docs/briefs/121-cluster-d-pattern2-research.md`](docs/briefs/121-cluster-d-pattern2-research.md)
-  `cloud`, shipped in PR #528. **Cluster D split into
+  `scaffolder`, shipped in PR #528. **Cluster D split into
   3 sub-clusters:** D-1 dispatch tables (~71, `.c`
   extern + `void*[]`, naturally 4-aligned) / D-2
   scalar arrays (~30-40, typed `.c` no const) / D-3
@@ -1060,7 +1062,7 @@ itself:
   main). Cluster A coverage cumulative: **970 / 1586
   = ~61% drained.**
 - [`docs/briefs/119-cluster-c-strings-research.md`](docs/briefs/119-cluster-c-strings-research.md)
-  `cloud`, shipped in PR #525. **NEW WALL W6
+  `scaffolder`, shipped in PR #525. **NEW WALL W6
   DISCOVERED:** mwldarm rounds `.rodata` section size
   to 4-byte alignment + dsd LCF `.ctor` `ALIGN(32)`
   cascade → 5-byte symbol shifts everything by 32
@@ -1083,7 +1085,7 @@ itself:
   still FAILED (cross-module relocs in `.text`/`.data`
   remain — separate scope).
 - [`docs/briefs/117-cluster-b-scalars-research.md`](docs/briefs/117-cluster-b-scalars-research.md)
-  `cloud`, shipped in PR #521. **W4 resolved + multi-
+  `scaffolder`, shipped in PR #521. **W4 resolved + multi-
   global wall surfaced + 47% sub-classification.** mwcc
   2.0/sp1p5 places `int x = N;` in `.data`
   automatically (no attribute needed). BUT mwcc reorders
@@ -1106,7 +1108,7 @@ itself:
   based on delinks.txt address claims). USA + JPN remain
   at 24/27 pending brief 116 part 2 cross-region parity.
 - [`docs/briefs/114-data-worklist-v2.md`](docs/briefs/114-data-worklist-v2.md)
-  `cloud`, shipped in PR #518. **data_worklist.py v2
+  `scaffolder`, shipped in PR #518. **data_worklist.py v2
   ships with all 5 cluster filters** + sanity-check
   passes (cluster A = 85.34% of pool, matches brief
   113's prediction). **Bonus: bug fix** — analyze_symbols
@@ -1127,7 +1129,7 @@ itself:
   range-check, callee-save reload-over-spill). 7th
   NEGATIVE-finding confirmation.
 - [`docs/briefs/113-data-tier-scoping.md`](docs/briefs/113-data-tier-scoping.md)
-  `cloud`, shipped in PR #515. **STRATEGIC PIVOT.**
+  `scaffolder`, shipped in PR #515. **STRATEGIC PIVOT.**
   Data tier is 2.0× larger than code (4.78 MB at 0%
   matched). 85% is `.bss` (zero-fill, structurally
   easier than function-tier). **5-cluster taxonomy** +
@@ -1145,7 +1147,7 @@ itself:
   overrides; zero refusals). First multi-region badge
   advance since brief 094 wave 2.
 - [`docs/briefs/111-p10-permuter-callee-save.md`](docs/briefs/111-p10-permuter-callee-save.md)
-  `cloud`, shipped in PR #513. **2 byte-identical
+  `scaffolder`, shipped in PR #513. **2 byte-identical
   recoveries: C-29 + C-30.** C-29: P-10 → C-29
   promotion via permuter at 1200s × 4 threads (4×
   brief 105's budget). Recipe: literally `if (!p)`
@@ -1172,7 +1174,7 @@ itself:
   escalation threshold). Cumulative C-class chain
   101+102+104+106+108: **46 ports / 3208 bytes**.
 - [`docs/briefs/109-brief-106-residue-research.md`](docs/briefs/109-brief-106-residue-research.md)
-  `cloud`, shipped in PR #510. **C-28 RECOVERY + P-10
+  `scaffolder`, shipped in PR #510. **C-28 RECOVERY + P-10
   PERMANENT + 3 partial classifications.** C-28
   (predicated-cascade collapse, explicit-intermediate
   recipe) is the third "split-statement intermediate"
@@ -1196,7 +1198,7 @@ itself:
   miss flagged: future brief specs need explicit
   already-shipped exclusion lists for sub-pool overlap.
 - [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
-  `cloud`, shipped in PR #506. **Brief 097 residue
+  `scaffolder`, shipped in PR #506. **Brief 097 residue
   classification COMPLETE.** **C-27** = pool-word
   DUPLICATION wall, supersedes P-7. Dual-extern +
   symbols.txt alias recipe; 120-compile sweep on
@@ -1222,14 +1224,14 @@ itself:
   #500 (workflows fired only after merge-conflict
   resolution push).
 - [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
-  `cloud`, shipped in PR #504. **1 base recovery
+  `scaffolder`, shipped in PR #504. **1 base recovery
   (`func_02033488`) + P-9 scope refinement.** Wall
   applies to MASK form (`cond ? -1 : 0`), NOT EARLY-
   RETURN form (`if (cond) return -1; ...`). 36-candidate
   strict pool partitions: ~⅓ early-return (natural-
   source recoverable) / ~⅔ mask (true permanent). The
   recovery was iter-1 base form match, not a permuter
-  mutation — cloud framed it as scope refinement, not
+  mutation — scaffolder framed it as scope refinement, not
   C-N promotion. Permuter rescue rate: 20% (1/5) vs
   brief 098's 33% (1/3) — permuter more useful for
   reg-alloc walls than IR-lowering walls.
@@ -1248,7 +1250,7 @@ itself:
   `0032550` to retrigger CI that didn't initially fire +
   close/reopen the PR for the same reason.
 - [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
-  `cloud`, shipped in PR #501. **New P-9 entry: mvnNE-
+  `scaffolder`, shipped in PR #501. **New P-9 entry: mvnNE-
   write peephole gap.** 90 compiles (6 variants × 15
   SPs) all miss — mwcc 2.0 lowers `cond ? -1 : 0` as
   `mov + rsb` instead of direct `mvnNE rN, #0` across
@@ -1271,7 +1273,7 @@ itself:
   blocked. 12 distinct sub-patterns under the C-24
   umbrella covered.
 - [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
-  `cloud`, shipped in PR #497. **2 new entries: C-25 +
+  `scaffolder`, shipped in PR #497. **2 new entries: C-25 +
   C-26.** C-25 (W-N store-reload, default `2.0/*` SPs)
   is the **first W-class → C-class promotion** via
   permuter discovery + post-hoc sweep. C-26 (critical-
@@ -1296,7 +1298,7 @@ itself:
   as backlog. Throughput: ~200-230 iter / 60s / thread.
   Brain queued brief 100 to codify the W-N recipe.
 - [`docs/briefs/099-medium-tier-walls-research.md`](docs/briefs/099-medium-tier-walls-research.md)
-  `cloud`, shipped in PR #495. **NEW C-24 entry: indirect-
+  `scaffolder`, shipped in PR #495. **NEW C-24 entry: indirect-
   call dispatch + pool-dedup wall.** First wall in catalog
   using `.legacy_sp3.c` (mwcc 1.2/sp3) recipe — completes
   the C-15 (`.legacy.c`) / C-23 (`.legacy.c` dual) / C-24
@@ -1308,7 +1310,7 @@ itself:
   candidates match the signature; 3 strict-signature
   matches. Brief 101 queued to apply at scale.
 - [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
-  `cloud`, shipped in PR #492. Project-side shim (over
+  `scaffolder`, shipped in PR #492. Project-side shim (over
   upstreaming patches). 4 vendor patches stored as Python
   string-replacements with guard substring for
   idempotency; 2 per-run rewrites (`compile.sh && strip`
@@ -1345,7 +1347,7 @@ itself:
   proportionally). 64 unrecovered: 4 collisions + 34
   undefined-callee + 3 byte-diff + 23 other-refused.
 - [`docs/briefs/095-port-to-region-d2-v2.md`](docs/briefs/095-port-to-region-d2-v2.md)
-  `cloud`, shipped in PR #489. **D2 v2 + D3 both shipped.**
+  `scaffolder`, shipped in PR #489. **D2 v2 + D3 both shipped.**
   D2 v2: LOW→MEDIUM auto-promote (N=5 / min-agreement=3
   consensus shift) eliminates the manual `--confidence-
   floor LOW` override. D3: data-shift consensus (min-
@@ -1365,7 +1367,7 @@ itself:
   source-form recipe. 2 new wall candidates surfaced
   (W-stack-split 2dp, W-popcount-mask-order 1dp).
 - [`docs/briefs/093-permuter-vs-p4-validation.md`](docs/briefs/093-permuter-vs-p4-validation.md)
-  `cloud`, shipped in PR #487. **P-4 family confirmed
+  `scaffolder`, shipped in PR #487. **P-4 family confirmed
   permanent.** Permuter ran ~900 thread-iterations against
   `func_02000cc4`'s entry_ptr variant; best score 80
   (baseline 265). The 6 divergent byte positions at score
@@ -1387,7 +1389,7 @@ itself:
   rename bug. 2 legacy_sp3 refusals (data-symbol resolution
   gap, candidate for D3).
 - [`docs/briefs/091-c22-v2-expansion.md`](docs/briefs/091-c22-v2-expansion.md)
-  `cloud`, shipped in PR #484. **6-walls-not-1 finding** —
+  `scaffolder`, shipped in PR #484. **6-walls-not-1 finding** —
   extends brief 084's 3-walls methodology. Brief 081 + 086
   C-22 cluster (6 candidates by symptom) had 6 distinct root
   causes; only 2 were actual C-22. 135 compiles across 2
@@ -1406,7 +1408,7 @@ itself:
   (`func_02001c98`) + 2 more C-22 datapoints (brief 091 v2
   expansion) + S-2a loop-counter signedness extension to S-2.
 - [`docs/briefs/088-mmio-base-folding-wall-sweep.md`](docs/briefs/088-mmio-base-folding-wall-sweep.md)
-  `cloud`, shipped in PR #481. **C-23 classification: NEW
+  `scaffolder`, shipped in PR #481. **C-23 classification: NEW
   ENTRY** (per brief 084's "3-walls-not-1" methodology). 75-
   compile sweep (5 variants × 15 SPs) confirmed C-23 carries
   TWO peepholes (base-folding + ANDS→TST) sharing the C-15
@@ -1415,7 +1417,7 @@ itself:
   4 confirmed instances; `.legacy_sp3.c` is 4 bytes shorter
   (epilogue change, NOT byte-identical).
 - [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](docs/briefs/084-c22-struct-pointer-corruption-wall.md)
-  `cloud`, shipped in PR #471. Codified C-22 adjacent-bitfield
+  `scaffolder`, shipped in PR #471. Codified C-22 adjacent-bitfield
   wall from brief 081 chain's 3 datapoints. Bitfield-via-
   union recipe validated in production (brief 086 wave 3
   `func_02001c98`). Brief 091 (v2 expansion) refines for
@@ -1427,11 +1429,11 @@ itself:
   pool. Cumulative cross-project: 100 ports (99 pokediamond
   + 1 pokeheartgold).
 - [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
-  `cloud`, shipped in PR #473. `--run` mode for
+  `scaffolder`, shipped in PR #473. `--run` mode for
   `tools/permute.py`. Active for hard-tier candidates that
   hit close-but-not-byte-identical states.
 - [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
-  `cloud`, originally shipped via PR #429; correction
+  `scaffolder`, originally shipped via PR #429; correction
   applied via brief 080 (PR #465). Folded into the
   cross-project pipeline.
 - [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
@@ -1445,17 +1447,17 @@ itself:
   cumulative invocation rate, rule engine is long-tail
   accelerator at ≤0x40 band (not first-pass tool).
 - [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](docs/briefs/079-cross-apply-tool-v2-fixes.md)
-  `cloud`, shipped in PR #463. D1 v2 overlay-prefix rename
+  `scaffolder`, shipped in PR #463. D1 v2 overlay-prefix rename
   + D2 v2 reloc-mask offset fix (closes Thumb-2 BL
   half-mask trap). ~30 cross-region ports unlocked for
   brief 085 (future).
 - [`docs/briefs/080-pokeheartgold-extension-research.md`](docs/briefs/080-pokeheartgold-extension-research.md)
-  `cloud`, shipped in PR #465. VERDICT: GO-WITH-CAVEATS.
+  `scaffolder`, shipped in PR #465. VERDICT: GO-WITH-CAVEATS.
   Brief 066 correction: nitrocrypto is `.s` not `.c`. Real
   unlock is 39 portable `.c` files across NitroSDK +
   MSL_C + dsprot at 2.0/sp2p2 (one SP rev off ours).
   Estimated ~50-80 ports/region after disambiguation.
-  Plus cloud-research-archaeology lessons writeup
+  Plus scaffolder-research-archaeology lessons writeup
   shipped via PR #466.
 - [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #461. 11 of 40 target — below
@@ -1466,7 +1468,7 @@ itself:
   brief 079), ~5 substantive byte-collision (D2 v2 in
   brief 079). Pipeline cap with current tools ~70 ports.
 - [`docs/briefs/077-strip-static-keyword.md`](docs/briefs/077-strip-static-keyword.md)
-  `cloud`, shipped in PR #459. 2-line static-strip regex
+  `scaffolder`, shipped in PR #459. 2-line static-strip regex
   + 5 tests. Followed by PR #460 (brief 077.b — `static
   inline` extension after family survey ruled out other
   family members).
@@ -1481,7 +1483,7 @@ itself:
   corruption (brief 077), pool depth bias future waves toward
   substantive ports only.
 - [`docs/briefs/076-cross-apply-libs-port-improvements.md`](docs/briefs/076-cross-apply-libs-port-improvements.md)
-  `cloud`, shipped in PR #456. D1 overlay-port regex + D2
+  `scaffolder`, shipped in PR #456. D1 overlay-port regex + D2
   raw-bytes + reloc-parity fallback. Sweep shows **17 size-
   16+ unlocks on existing libs/nitro sample** plus 29 overlay
   ports unlocked. D2's strictly-conservative-fallback design
@@ -1498,7 +1500,7 @@ itself:
   0.6-0.7% because refused pool was trivial bytes). Three
   follow-up vectors surfaced; D1 + D2 become brief 076.
 - [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
-  `cloud`, shipped in PR #451. **Approach A extended** (function
+  `scaffolder`, shipped in PR #451. **Approach A extended** (function
   + data-ref rename via parallel-reloc bridge). 1-port worked
   example (`func_02007218.legacy.c`) verifies 3-region 24/27
   baseline preserved. New tool: `tools/cross_apply_libs_port.py`.
@@ -1506,7 +1508,7 @@ itself:
   brief 076 if Approach A's semantic noise bites decomper
   iteration. Followed by brief 075 (full 87-port batch).
 - [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
-  `cloud`, shipped in PR #449. Full struct defs for
+  `scaffolder`, shipped in PR #449. Full struct defs for
   `_OSThread`, `_OSThreadQueue`, `OSMutex` + transitive deps
   (OSContext, CPContext). 300-sample sweep: struct-access
   drops 118 → 80 (-38). 3 of 5 OS_thread.c / OS_mutex.c
@@ -1517,14 +1519,14 @@ itself:
   ports / 0.88) + #445 (wave 2, 13 ports / 0.68 — below
   floor). **Cumulative 87 cross-project ports** at the
   closure. Wave 2 surfaced three driver-quality findings now
-  on cloud's queue: D5 full-struct vendoring (brief 072),
+  on scaffolder's queue: D5 full-struct vendoring (brief 072),
   per-region cross-application refactor (brief 073), D1
-  ambiguous-addr disambiguation. Plus cloud shipped #444
+  ambiguous-addr disambiguation. Plus scaffolder shipped #444
   (TU-collision pre-filter + ish-mismatch) and #446
   (STT_NOTYPE r-value classification) in parallel — both
   silent-corruption fixes the next cross-project wave needs.
 - [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
-  `cloud`, **fully closed** across PRs #438 (D1 callee remap),
+  `scaffolder`, **fully closed** across PRs #438 (D1 callee remap),
   #440 (D4 data-ref remap), #441 (D2+D3 vendored framework).
   D1+D4+D2+D3 combined: 171 compile-ready candidates against
   the pokediamond NitroSDK + libnns pool (3.4× brief 071's
@@ -1551,7 +1553,7 @@ itself:
   the multi-region investment was scoped for. Followed by
   brief 069 (cross-project bulk-port, now ACTIVE).
 - [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](docs/briefs/068-cross-project-byte-fingerprint-pass.md)
-  `cloud`, shipped in PR #432. `tools/external_obj.py` +
+  `scaffolder`, shipped in PR #432. `tools/external_obj.py` +
   `find_external_source.py --byte-scan` mode. **5/5 perfect
   1.000 byte-sim matches** on pokediamond's `OS_tick.c` with
   contiguous EUR addresses (0x020930a0 → 0x020931f8). Critical
@@ -1560,7 +1562,7 @@ itself:
   to our `.legacy.c` SP. Hit rate jumps from 80-95% to 100%
   sample-validated. CSV contract shipped for brief 069.
 - [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
-  `cloud`, shipped in PR #429. **VERDICT: GO** with refined
+  `scaffolder`, shipped in PR #429. **VERDICT: GO** with refined
   estimates. SP-distance matrix is the dominant risk model:
   pokediamond (one SP rev → 80-95%), pokeheartgold (50-70%),
   st (skip — different ISA family). Bonus finding: pokeheartgold's
@@ -1572,7 +1574,7 @@ itself:
   → 900-1800 cross-region matches). Followed by brief 068 (impl)
   + brief 069 (bulk-port wave).
 - [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
-  `cloud`, shipped in PR #422. `tools/suggest_coercion.py` v0
+  `scaffolder`, shipped in PR #422. `tools/suggest_coercion.py` v0
   rule engine over objdiff JSON + codegen-walls.md catalog.
   Two-mode CLI (auto-locate + JSON-in). 5 walls in v0 (C-15,
   P-1, S-1, C-20, C-1). Doc-as-source-of-truth (anchors only,
@@ -1580,7 +1582,7 @@ itself:
   Hit-rate measurement deferred to decomper's next iterative
   wave per the brief's spec.
 - [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
-  `cloud`, full chain shipped across PRs #418 (part 1, byte-
+  `scaffolder`, full chain shipped across PRs #418 (part 1, byte-
   disambiguation) + #419 (part 2, `tools/port_to_region.py`) +
   #420 (part 3, parallel-region builds). **All 3 deliverables
   closed.** v2 disambiguation: 20% → 57% single-HIGH unique
@@ -1591,7 +1593,7 @@ itself:
   065 unblocked; **wave 1 closed at 88 matches / 100%
   precision** (PR #423).
 - [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
-  `cloud`, shipped in PR #414. **VERDICT: GO.** 74.8%
+  `scaffolder`, shipped in PR #414. **VERDICT: GO.** 74.8%
   HIGH-confidence pairings across 500-sample stratified survey
   (peaking 90.6% in ≤0x40 band, 100% in medium). USA + JPN are
   pairwise-identical in function count to EUR (1 extra function
@@ -1621,16 +1623,16 @@ itself:
   `decomper`, full chain shipped across PRs #383 / #385 / #387
   (waves 18/19/20). **22 matches / 948 bytes / 69% combined
   yield.** Beat brief 053's 884-byte chain. 4 C-16 W-H wins via
-  natural C; multi-module twin pattern strong. Triggered cloud
+  natural C; multi-module twin pattern strong. Triggered scaffolder
   C-17 / C-18 / C-19 autonomous fold-ins.
 - [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
   `decomper`, full chain shipped across PRs #374 / #378 / #380
   (waves 15/16/17). **19 matches / 884 bytes combined at 66%
   yield.** Strategic byte-volume pivot validated. Brief 055
   continues the pattern. Wave 16 surfaced C-1r over-predication
-  (cloud confirmed permanent in PR #379).
+  (scaffolder confirmed permanent in PR #379).
 - [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
-  `cloud`, shipped in PR #375. Two deliverables: (1) C-15 vs P-1
+  `scaffolder`, shipped in PR #375. Two deliverables: (1) C-15 vs P-1
   wall family note (cross-links + discriminator table); (2)
   **C-16 / W-H** ldr-r1-vs-ip flipped coercible.
 - [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
@@ -1639,7 +1641,7 @@ itself:
   separate-scope, 22 siblings). All 14 reclassify to easy
   (82.7% → 84.0%).
 - [`docs/briefs/052-wave-12-wall-investigations.md`](docs/briefs/052-wave-12-wall-investigations.md)
-  `cloud`, shipped in PR #369. Three deliverables: C-2a
+  `scaffolder`, shipped in PR #369. Three deliverables: C-2a
   struct-copy refinement (cracks brief 022's historic
   `func_0208904c` miss); **C-15 / W-G** mvn-vs-sub peephole
   classified as routing-tractable; ov004 BSS investigation
@@ -1648,11 +1650,11 @@ itself:
   `decomper`, full chain shipped across PRs #359 + #362 + #366
   (waves 10/11/12). **34 matches at ~87% combined yield.** Wave
   10 validated cap-raise to 0x28; wave 11 took both C-14 W-F
-  unblocks first try; wave 12 took 11/15 from cloud's PR #363
+  unblocks first try; wave 12 took 11/15 from scaffolder's PR #363
   rescan list and reclassified them all to easy tier — empirically
   validating the "easy-tier reopened" finding.
 - [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
-  `cloud`, shipped in PR #360. Two deliverables: (1) **C-13**
+  `scaffolder`, shipped in PR #360. Two deliverables: (1) **C-13**
   folded (predicated if-X order, from wave 9). (2) **W-F →
   C-14 coercible** (r2-vs-r1 reg-alloc; specific C variation
   flips). Two unblocks for decomper queued.
@@ -1662,7 +1664,7 @@ itself:
   validated. Strong repeated-twin signal observed (compounding
   via find_shape_templates).
 - [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
-  `cloud`, shipped in PR #351. **C-12 push-r0 thunk via asm void**
+  `scaffolder`, shipped in PR #351. **C-12 push-r0 thunk via asm void**
   — mwcc inline asm coerces; verified across all 15 SPs in
   toolchain (none emit push-r0 from C source). Two immediate
   unblocks: `func_02093294`, `func_02092f04`. Decomper picks
@@ -1682,17 +1684,17 @@ itself:
   041's declare-order r4↔r5 trick doesn't transfer to sp3.
   Self-extend allowance preserved (2 follow-ups remaining).
 - [`docs/briefs/045-sp3-routing-implementation.md`](docs/briefs/045-sp3-routing-implementation.md)
-  `cloud`, shipped in PR #340. Third compiler routing tier
+  `scaffolder`, shipped in PR #340. Third compiler routing tier
   (`*.legacy_sp3.c` → mwcc 1.2/sp3) implemented next to existing
   tiers. Brain ran the dual-tier smoke test before merging
   (lcf + objects.txt agreed on both `.legacy.o` and
-  `.legacy_sp3.o`). Brain pushed a follow-up commit on cloud's
+  `.legacy_sp3.o`). Brain pushed a follow-up commit on scaffolder's
   branch to regenerate `docs/tools-index.md` after CI caught the
   drift; small miss, no rework needed.
 - [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
-  `cloud`, shipped in PR #337. Sp3 sweep verdict: **ship the
+  `scaffolder`, shipped in PR #337. Sp3 sweep verdict: **ship the
   third tier**. 7 sp3-unique medium+easy candidates (borderline
-  range), but cloud's cross-cutting argument about the 416
+  range), but scaffolder's cross-cutting argument about the 416
   hard-tier candidates as future leverage convinced brain to
   override the conservative default. Brief 045 implements.
 - [`docs/briefs/043-medium-tier-wave-4.md`](docs/briefs/043-medium-tier-wave-4.md)
@@ -1700,7 +1702,7 @@ itself:
   100% per-attempt yield.** W-A unblock confirmed first-try via
   C-9. Medium tier 69.9% → 75.6%. Decomper is on a streak.
 - [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
-  `cloud`, shipped in PR #334. 310-line update to codegen-walls.md
+  `scaffolder`, shipped in PR #334. 310-line update to codegen-walls.md
   documenting W-A..W-D + coercion attempts. **W-A flipped to C-9
   coercible** (uninitialised temp trick); **W-B verified
   byte-identical via mwcc 1.2/sp3** (T-3 tooling-tractable —
@@ -1721,7 +1723,7 @@ itself:
   shapes; `unsigned short` return type controls halfword extend
   emission. 4 walls (W-A..W-D) documented for brief 042.
 - [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
-  `cloud`, shipped in PR #330. `tools/patch_objects_legacy.py`
+  `scaffolder`, shipped in PR #330. `tools/patch_objects_legacy.py`
   post-process script + 20 unit tests. Chained into the lcf
   ninja rule. **Brain ran brief 038's exact reproducer end-to-
   end before merging this time** — link step succeeded; arm9.lcf
@@ -1733,21 +1735,21 @@ itself:
   Empty commit; bug analysis is the deliverable. Triggered
   brief 039.
 - [`docs/briefs/037-dual-compiler-routing.md`](docs/briefs/037-dual-compiler-routing.md)
-  `cloud`, shipped in PR #327. Per-TU dual-compiler routing via
+  `scaffolder`, shipped in PR #327. Per-TU dual-compiler routing via
   `*.legacy.c` filename convention. **Brain merged this without
   running the brief's required end-to-end smoke test** — the
   test would have caught the `dsd lcf` inconsistency that
   blocked brief 038. Brief 039 is the post-process workaround;
   the routing core itself is sound.
 - [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
-  `cloud`, shipped in PR #325. **Style A wall fully diagnosed** —
+  `scaffolder`, shipped in PR #325. **Style A wall fully diagnosed** —
   mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 (all SPs) and
   1.2/sp3+ emit Style B. Verified byte-identical against 2 of
   brief 034's targets. Matches pokediamond's dual-compiler
-  pattern. Brief 037 (cloud) operationalises; brief 038
+  pattern. Brief 037 (scaffolder) operationalises; brief 038
   (decomper) consumes.
 - [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
-  `cloud`, shipped in PR #322. Refined codegen-walls.md C-1
+  `scaffolder`, shipped in PR #322. Refined codegen-walls.md C-1
   with the ≤3-op if-body predication threshold + new P-6
   permanent entry. Quantification updated: permanent 29 → 32
   drops (62% → 68%), coercible-but-missed 9 → 6 drops (19% →
@@ -1757,7 +1759,7 @@ itself:
   but discovered the **Style A vs Style B epilogue wall** —
   blocks every IRQ-bracket / Task-Locked / Fill32-pattern
   medium-tier candidate attempted. Empty commit; the analysis
-  IS the deliverable. Triggered brief 036 (cloud research)
+  IS the deliverable. Triggered brief 036 (scaffolder research)
   immediately.
 - [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
   `decomper`, shipped in PR #320. **3 byte-identical matches at
@@ -1768,7 +1770,7 @@ itself:
   refinement proposal (predicated-exec ≤3-op limit) handed to
   brief 035; explicit pivot-to-medium-tier recommendation.
 - [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
-  `cloud`, shipped in PR #317. 641-line research note at
+  `scaffolder`, shipped in PR #317. 641-line research note at
   `docs/research/codegen-walls.md`; 15 codegen walls classified
   into coercible-with-knowledge (8, accounting for 19% of past
   drops), permanent (5, 62%), and edge cases (3, 17%). Plus 2
@@ -1803,15 +1805,15 @@ itself:
   for cluster orientation, asm-read still the bottleneck on the
   C-write step.
 - [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
-  `cloud`, shipped in PR #307. Migrated macOS brain onboarding
+  `scaffolder`, shipped in PR #307. Migrated macOS brain onboarding
   off `wine-stable` (disabled 2026-09-01) onto **Gcenx's Game
   Porting Toolkit cask**. Brain locally verified end-to-end
   (24/27 baseline preserved with the new wine binary; 20 unit
   tests including 4 new `TestResolveMacosWine` cases pass).
   AGENTS.md *Brain onboarding* step 6 + *Wine on macOS* section
-  updated by cloud as part of the PR.
+  updated by scaffolder as part of the PR.
 - [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
-  `cloud`, shipped in PR #304. `tools/find_shape_templates.py` —
+  `scaffolder`, shipped in PR #304. `tools/find_shape_templates.py` —
   679-line tool + 532 lines of tests. Opcode-sequence Levenshtein
   scoring across the matched corpus with stat-based dsd-dis caching.
   Sample output on brief-020 anchor returns expected siblings at
@@ -1828,14 +1830,14 @@ itself:
   templates under the lifted 15-cap; excellent reg-alloc notes
   carry over for future heterogeneous-cluster pilots.
 - [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
-  `cloud`, shipped in PR #299. 348-line research note diagnosing
+  `scaffolder`, shipped in PR #299. 348-line research note diagnosing
   the two persistently-stuck top-of-pool ov006 clusters as
   heterogeneous bags (≥15 / ≥8 distinct shapes hiding behind
   identical fingerprints). Predicted yields are correct, not bugged.
   Recommendation: build `find_shape_templates.py` (now scoped as
   brief 025).
 - [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
-  `cloud`, shipped in PR #296. Cleared 7 pre-existing markdown-lint
+  `scaffolder`, shipped in PR #296. Cleared 7 pre-existing markdown-lint
   errors and patched `tools/generate_tool_index.py` to compute
   GFM-style heading slugs going forward (root-cause fix, not just
   symptoms).
@@ -1846,11 +1848,11 @@ itself:
   of the brief's per-bit-position hand-patches. Updated the
   brief-template guidance in brief 022.
 - [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
-  `cloud`, shipped in PR #292. Fresh-clone bootstrap fix —
+  `scaffolder`, shipped in PR #292. Fresh-clone bootstrap fix —
   `outputs=[CC, LD, ASM]` in the `download_tool` rule. Verified by
   brain via the documented `rm -rf tools/mwccarm` smoke test.
 - [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
-  `cloud`. **First half** shipped in PR #243 (cluster fingerprint
+  `scaffolder`. **First half** shipped in PR #243 (cluster fingerprint
   subdivision). **Second half** (`propagate_template --substitute-imm`)
   *superseded* by the post-#255 hard-tier clustering pivot — see
   `docs/state.md` for the narrative.
@@ -1876,7 +1878,7 @@ itself:
   `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
   matched (8 trivial + 5 easy-tier leaves).
 - [`docs/briefs/002-analyzer-bulk-groups.md`](docs/briefs/002-analyzer-bulk-groups.md)
-  `claude-cloud`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
+  `scaffolder`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
   with 382 bulk groups covering 8009 functions.
 - [`docs/briefs/003-sinit-bulk-match.md`](docs/briefs/003-sinit-bulk-match.md)
   `claude-pc`, shipped across the sinit wave PRs. Matched the

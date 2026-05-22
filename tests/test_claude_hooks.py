@@ -205,7 +205,7 @@ class TestPreBashGating(unittest.TestCase):
         rc, _, _ = _run_hook(
             _HOOKS_DIR / "pre_bash.py",
             {"tool_name": "Bash", "tool_input": {
-                "command": "git push origin cloud/x",
+                "command": "git push origin scaffolder/x",
             }},
             env_extra={"SKIP_INVARIANTS_HOOK": "1"},
         )

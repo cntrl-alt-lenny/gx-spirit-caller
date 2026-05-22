@@ -6,7 +6,7 @@ into ov004's `.rodata` VA range (brief 159 part 2).
 Background — brief 150 / 156 funnel
 -----------------------------------
 
-Cloud's brief 150 (PR #576) made the patcher tolerate any veneer
+Scaffolder's brief 150 (PR #576) made the patcher tolerate any veneer
 count `n ∈ [0, 86]`. Brief 156 (PR #587) spot-disassembled 8
 ov004 `.rodata` MEDIUM candidates and found 6/8 (75%) showed
 coherent ARM-code bytes — but with the critical caveat that
@@ -391,7 +391,7 @@ def render_markdown(rows: list[PointerTargetRow]) -> str:
     header = (
         "# ov004 `.rodata` pointer-target enumeration\n"
         "\n"
-        "**Brief:** 159 part 2 (cloud autonomous research).\n"
+        "**Brief:** 159 part 2 (scaffolder autonomous research).\n"
         "**Generator:** `tools/find_ov004_rodata_pointer_targets.py`.\n"
         "**Input:** "
         "`config/eur/arm9/overlays/ov002/relocs.txt` (relocs sourced "
@@ -425,7 +425,7 @@ def render_markdown(rows: list[PointerTargetRow]) -> str:
         "\n"
         "The verification path — pick one slot, claim it, rebuild,\n"
         "observe the veneer count — is decomper-owned per brief\n"
-        "158+ scope (the tool runs in cloud; the worked-example\n"
+        "158+ scope (the tool runs in scaffolder; the worked-example\n"
         "claim runs in a follow-up decomper brief).\n"
         "\n"
     )

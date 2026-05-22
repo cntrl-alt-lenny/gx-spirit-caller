@@ -4,7 +4,7 @@ wine-runner resolution, and dual-compiler routing.
 Scoped to the pure source-discovery / classifier helpers and the
 constants that drive the build.ninja generator. End-to-end
 ninja-generation testing requires the actual toolchain (mwccarm,
-dsd, wibo, a baserom), which the cloud environment doesn't have —
+dsd, wibo, a baserom), which the scaffolder environment doesn't have —
 brain/decomper verifies the full pipeline on merge. These tests
 pin the parts we CAN exercise in isolation:
 

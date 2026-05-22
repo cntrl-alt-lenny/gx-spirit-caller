@@ -25,7 +25,7 @@ If missing, offer to build it first:
 python tools/nitro_dict.py build --nitro-sdk /path/to/NitroSDK-clone
 ```
 
-The typical clone target is `/tmp/NitroSDK` (cloud sessions) or `../NitroSDK` (local); check both. If no clone exists, the user has to clone `https://github.com/ntrtwl/NitroSDK` first.
+The typical clone target is `/tmp/NitroSDK` (scaffolder sessions) or `../NitroSDK` (local); check both. If no clone exists, the user has to clone `https://github.com/ntrtwl/NitroSDK` first.
 
 Invoke:
 

@@ -113,7 +113,7 @@ ADJACENCY_BONUS_WINDOW = 0x1000
 #
 # Decomper's #208 specifically suggested body-pattern matching to
 # cut the false-positive rate. Reloc-sig is a safe approximation
-# of body shape (cloud can compute it from relocs.txt without
+# of body shape (scaffolder can compute it from relocs.txt without
 # disassembly — we already use it in pattern_library.py #160 and
 # propagate_template.py).
 _W_CALLER_JACCARD = 0.50

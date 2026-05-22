@@ -58,7 +58,7 @@ class TestParseResearchNote(unittest.TestCase):
             path.write_text(
                 "# Round 2\n"
                 "\n"
-                "_Generated 2026-04-23 by `cloud` on brain's request._\n"
+                "_Generated 2026-04-23 by `scaffolder` on brain's request._\n"
                 "\n"
                 "**Run provenance**: Tool: foo. Dict: bar. Real summary text.\n",
                 encoding="utf-8",
@@ -75,7 +75,7 @@ class TestParseResearchNote(unittest.TestCase):
             path.write_text(
                 "# Multi-line byline\n"
                 "\n"
-                "_Generated 2026-04-24 by cloud on brain's request after\n"
+                "_Generated 2026-04-24 by scaffolder on brain's request after\n"
                 "PR #190 landed. Preview of what brief 016's PR would\n"
                 "look like._\n"
                 "\n"
@@ -162,7 +162,7 @@ class TestParseResearchNote(unittest.TestCase):
             path.write_text(
                 "# Status-style\n"
                 "\n"
-                "**Status:** research writeup, cloud-written. Brain to review.\n",
+                "**Status:** research writeup, scaffolder-written. Brain to review.\n",
                 encoding="utf-8",
             )
             parsed = parse_research_note(path)
@@ -264,7 +264,7 @@ class TestTruncateBalanced(unittest.TestCase):
         # on first generation because the cut left an unclosed
         # backtick at position ~197.
         s = (
-            '**Status**: research writeup, cloud-written. Brain to scope as '
+            '**Status**: research writeup, scaffolder-written. Brain to scope as '
             "followup to decomper's #208 finding, or close as \"won't fix, "
             "use workaround\" if the inline .c escape-hatch (direct `asm "
             "void` body) is deemed sufficient."

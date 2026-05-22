@@ -2,7 +2,7 @@ name: PR labeler
 
 # Auto-labels every PR by:
 #   * changed-file paths (area:tools / libs / config / src / docs / ci / assets)
-#   * head-branch prefix (agent:cloud / agent:pc / agent:brain)
+#   * head-branch prefix (agent:scaffolder / agent:pc / agent:brain)
 #
 # Config lives in .github/labeler.yml.
 #
@@ -45,7 +45,7 @@ jobs:
           )
           # `agent:*` labels — distinct hues per session.
           declare -A agent=(
-            ["agent:cloud"]="006b75"
+            ["agent:scaffolder"]="006b75"
             ["agent:pc"]="b60205"
             ["agent:brain"]="e99695"
           )

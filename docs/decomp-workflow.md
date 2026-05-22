@@ -37,7 +37,7 @@ Three AI agents, one human. Each has a narrow job.
 | **cntrl_alt_lenny** | meatspace | You. Sets priorities, picks direction, merges PRs. |
 | **brain** | local LLM session (Claude Code or Codex CLI), PC or Mac | Reviews and merges PRs. Runs `ninja` / `dsd` locally to verify each PR doesn't break the build. Writes task briefs. Keeps `AGENTS.md` / `docs/state.md` current. |
 | **decomper** | local LLM session (separate from brain) | The actual decomper. Matches individual functions. Writes C source in `src/`. Renames symbols. |
-| **cloud** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. |
+| **scaffolder** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. (Formerly `scaffolder`; renamed for role clarity.) |
 
 Why the split? Matching a function is a focused, iterative task (one
 person on one function at a time). Tool-building is parallel work that
@@ -310,7 +310,7 @@ Open `/tmp/delta.md` in the editor. The renderer surfaces:
 - **Bucket-count delta** — per-bucket before/after/Δ table.
 
 If there's a regression, paste the rendered Markdown into a PR
-review comment and hand it back to the author. Agents (cloud /
+review comment and hand it back to the author. Agents (scaffolder /
 decomper) consume review bodies as first-class feedback, so the
 paste-into-review flow closes the loop without any CI infrastructure.
 
@@ -379,7 +379,7 @@ loop (earlier than the git-level `.githooks/pre-push`):
   discover -s tests` if ruff was clean. Non-blocking — surfaces
   issues in tool output so the agent can fix before committing.
   Addresses the "F401 unused import found at commit time" class
-  of friction seen across multiple cloud sessions.
+  of friction seen across multiple scaffolder sessions.
 - **PreToolUse on Bash** → `.claude/hooks/pre_bash.py` inspects
   the Bash command for `git push`; if it matches, runs
   `check_match_invariants.py --version eur` and BLOCKS (exit 2)
@@ -396,11 +396,9 @@ Code uses both paths and checks complementarily.
 
 A pull request is just a git branch with a note attached. The flow is:
 
-1. An agent writes code on a branch named like `cloud/foo` or
+1. An agent writes code on a branch named like `scaffolder/foo` or
    `decomper/bar`. The `<agent>/<slug>` shape is a convention so
-   everyone can see at a glance who made it. (Branches from before
-   the model-agnostic slug rename use `claude-cloud/*` / `claude-pc/*`
-   / `claude-brain/*` in history.)
+   everyone can see at a glance who made it.
 2. The agent pushes the branch and opens a PR via the GitHub API. This
    doesn't change `main`; it just says "here's a proposed change".
 3. Brain reviews it: reads the diff, runs `ninja` / `dsd check modules`
@@ -431,14 +429,14 @@ change passes through brain's local verification before landing on
   [`docs/research/codegen-walls.md`](research/codegen-walls.md)
   catalogues the 27-and-counting recurring divergences with worked
   C source for each.
-- **"Why can't cloud just run the build?"**  Cloud as a *role* is
-  designed to be runnable in a stateless web session without
-  toolchain access; that's what keeps tool-building parallel to
-  matching. A particular cloud session may happen to have the
-  toolchain installed (e.g. on the same machine as brain) but the
-  role's *outputs* — tools, headers, docs — are valid to ship
-  without verifying the rebuilt ROM. Brain is the always-local role
-  that runs the build to verify PRs before merge.
+- **"Why can't scaffolder just run the build?"**  Scaffolder as a
+  *role* is designed to be runnable in a stateless web session
+  without toolchain access; that's what keeps tool-building
+  parallel to matching. A particular scaffolder session may happen
+  to have the toolchain installed (e.g. on the same machine as
+  brain) but the role's *outputs* — tools, headers, docs — are
+  valid to ship without verifying the rebuilt ROM. Brain is the
+  always-local role that runs the build to verify PRs before merge.
 - **"sinit outliers?"**  All 51 `__sinit_*` functions are now matched
   (sinit tier sits at 100%). Brief 003's bulk-template wave + brief
   009's one-off `__sinit_ov002_022ca7e8` (asm-void escape for mwcc's

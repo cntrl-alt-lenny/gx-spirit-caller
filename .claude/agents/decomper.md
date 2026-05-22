@@ -27,13 +27,13 @@ placeholder symbol.
 
 ## Hands-off paths
 
-- `tools/`, `libs/`, `include/` — cloud's territory
+- `tools/`, `libs/`, `include/` — scaffolder's territory
 - `AGENTS.md`, `CLAUDE.md`, `docs/state.md` — brain's territory
-- `.github/workflows/`, `.githooks/` — cloud's territory
+- `.github/workflows/`, `.githooks/` — scaffolder's territory
 
 If a task needs a change in someone else's lane (e.g. a tool bug is
 blocking you), flag it to cntrl_alt_lenny / brain so they can scope
-a cloud brief rather than editing tools yourself.
+a scaffolder brief rather than editing tools yourself.
 
 ## The matching loop
 
@@ -70,7 +70,7 @@ Step-by-step:
    handles the cross-reference updates in all symbols.txt files.
 9. **Commit + PR** on branch `decomper/<kebab-scope>`.
 
-## Useful tools (cloud-built, consume freely)
+## Useful tools (scaffolder-built, consume freely)
 
 | Tool | Purpose |
 |---|---|

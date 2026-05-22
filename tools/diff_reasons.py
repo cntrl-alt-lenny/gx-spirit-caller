@@ -47,7 +47,7 @@ Usage:
 
 Report not found? Tool exits cleanly with a guidance message —
 objdiff's `report.json` only exists after a local `ninja report`
-run with a baserom. In the cloud / CI context, treat a missing
+run with a baserom. In the scaffolder / CI context, treat a missing
 report as "nothing to classify".
 """
 
@@ -158,7 +158,7 @@ class ClassifiedReport:
 
 def load_report(path: Path) -> dict | None:
     """Read objdiff's report.json. Returns None if the file is
-    missing (common in cloud / CI — no baserom, no `ninja report`);
+    missing (common in scaffolder / CI — no baserom, no `ninja report`);
     the caller decides whether that's an error or a graceful no-op."""
     if not path.is_file():
         return None
@@ -418,7 +418,7 @@ def main() -> int:
             f"\n"
             f"Generate one with `ninja report` (requires a local "
             f"baserom + full toolchain) and re-run this tool. In "
-            f"cloud / CI, a missing report means \"nothing to "
+            f"scaffolder / CI, a missing report means \"nothing to "
             f"classify yet\" — treat as a no-op.",
             file=sys.stdout,
         )

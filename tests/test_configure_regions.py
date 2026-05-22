@@ -13,7 +13,7 @@ Convention (deliverable-2 strawman):
 
 End-to-end build verification (does `ninja rom` produce a valid ROM
 for each region? does `dsd check modules` hit the 24/27 baseline?)
-needs the actual toolchain; cloud verifies this manually pre-push
+needs the actual toolchain; scaffolder verifies this manually pre-push
 and brain / decomper repeats on merge. The PR description records
 the manual results.
 
