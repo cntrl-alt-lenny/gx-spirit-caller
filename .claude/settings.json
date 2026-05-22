@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "description": "Project-level Claude Code settings for the Yu-Gi-Oh GX Spirit Caller decomp. Hooks enforce ruff/test/invariants gates so the agent catches drift in-loop rather than at CI, and capture session-end summaries to a shared inbox so the brain can read what the other agents said without manual copy-paste. Keep in sync with docs/decomp-workflow.md § Local setup extras.",
+  "description": "Project-level Claude Code settings for the Yu-Gi-Oh GX Spirit Caller decomp. Hooks enforce ruff/test/invariants gates so the agent catches drift in-loop rather than at CI, and capture session-end summaries to a shared inbox so the brain can read what the other agents said without manual copy-paste. Keep in sync with docs/decomp-workflow.md § Local setup extras. Hook interpreter is `python3` — macOS ships no plain `python` since 3.x (Apple's bundled CLT only provides `python3`); Linux + Windows both have `python3` on PATH by convention. Don't change to `python`.",
   "hooks": {
     "PostToolUse": [
       {
@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .claude/hooks/post_edit.py"
+            "command": "python3 .claude/hooks/post_edit.py"
           }
         ]
       }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .claude/hooks/pre_bash.py"
+            "command": "python3 .claude/hooks/pre_bash.py"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .claude/hooks/save_agent_reply.py"
+            "command": "python3 .claude/hooks/save_agent_reply.py"
           }
         ]
       }
