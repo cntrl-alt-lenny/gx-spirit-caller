@@ -178,8 +178,10 @@ class TestPrintSummary(unittest.TestCase):
         self.assertIn("Data symbols", out)
         self.assertIn("ov005", out)
         self.assertIn("main", out)
-        # main is in FAILING_MODULES → expect a [FAIL] tag.
-        self.assertIn("[FAIL]", out)
+        # Brief 189 Part 3: FAILING_MODULES is now empty (3-region
+        # SHA1 PASS holds since brief 140). The `[FAIL]` tag no
+        # longer appears for any module under normal operation.
+        self.assertNotIn("[FAIL]", out)
 
     def test_fails_gracefully_on_empty_input(self):
         buf = io.StringIO()
@@ -225,8 +227,11 @@ class TestWriteMd(unittest.TestCase):
         # Last-symbol size renders as a literal `?` marker.
         self.assertIn("`?`", text)
 
-    def test_md_marks_failing_modules(self):
-        # 'main' is in FAILING_MODULES.
+    def test_md_no_longer_marks_modules_failing_post_brief_140(self):
+        # Brief 189 Part 3: with `FAILING_MODULES` empty, no module
+        # gets the `**FAIL**` annotation (the 24/27 baseline that
+        # motivated the tag is closed; 27/27 modules OK across all
+        # regions since brief 140).
         sym = Symbol(name="x", module="main", addr=0x2000000, size=0,
                      type="data", mode="any")
         per_module = {"main": {0x2000000: None}}
@@ -234,7 +239,7 @@ class TestWriteMd(unittest.TestCase):
             out = Path(td) / "data_sizes.md"
             write_md(out, per_module, {"main": [sym]}, top_per_module=5)
             text = out.read_text()
-        self.assertIn("**FAIL**", text)
+        self.assertNotIn("**FAIL**", text)
 
     def test_md_top_per_module_limit_respected(self):
         # 10 data symbols, top_per_module=3 → only 3 should appear.

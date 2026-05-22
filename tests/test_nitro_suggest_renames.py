@@ -178,13 +178,15 @@ class TestIsTractable(unittest.TestCase):
             edges_call=edges, matched={}, min_callers=1,
         ))
 
-    def test_failing_module_rejected_by_default(self):
-        # main / dtcm / ov004 are in FAILING_MODULES per
-        # analyze_symbols. Default filter excludes them — renames
-        # there don't unblock anything while the module fails
-        # module-check for structural reasons.
+    def test_failing_module_accepted_post_brief_140(self):
+        # Brief 189 Part 3: `FAILING_MODULES` is now empty
+        # (brief 140 closed the 24/27 gap; 27/27 modules OK ×
+        # 3 regions). The historical exclusion was for modules
+        # that failed `dsd check modules`; no module currently
+        # fails, so `is_tractable` accepts `main` / `dtcm` /
+        # `ov004` symbols by default.
         sym = _sym("func_main_02000b60", "main", 0x02000b60, size=0x10)
-        self.assertFalse(is_tractable(
+        self.assertTrue(is_tractable(
             sym, modules={"main": _module("main", [sym])},
             edges_call=_edges_with_n_callers(("main", 0x02000b60), 3),
             matched={},
@@ -486,7 +488,12 @@ class TestCollectCandidates(unittest.TestCase):
         cands = collect_candidates(modules, edges, matched)
         self.assertEqual([c.target.addr for c in cands], [0x100])
 
-    def test_failing_module_excluded_by_default(self):
+    def test_no_modules_excluded_post_brief_140(self):
+        # Brief 189 Part 3: `FAILING_MODULES` is now empty, so
+        # `collect_candidates` no longer excludes any module by
+        # default — `main` symbols appear alongside overlays
+        # (which is correct: `main` is module-check OK since
+        # brief 140 / 141 hit 27/27 across all regions).
         syms = [
             _sym("func_main_02000b60", "main", 0x02000b60, size=0x10),
             _sym("func_ov005_100", "ov005", 0x100, size=0x10),
@@ -500,9 +507,13 @@ class TestCollectCandidates(unittest.TestCase):
             for i in range(2):
                 edges[("driver", 0x100 + i)].add((s.module, s.addr))
         cands = collect_candidates(modules, edges, {})
-        addrs = [(c.target.module, c.target.addr) for c in cands]
-        # main is in FAILING_MODULES → excluded by default.
-        self.assertEqual(addrs, [("ov005", 0x100)])
+        addrs = sorted(
+            (c.target.module, c.target.addr) for c in cands
+        )
+        self.assertEqual(
+            addrs,
+            [("main", 0x02000b60), ("ov005", 0x100)],
+        )
 
     def test_failing_module_included_with_flag(self):
         syms = [_sym("func_main_02000b60", "main", 0x02000b60, size=0x10)]

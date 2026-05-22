@@ -33,10 +33,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Per CLAUDE.md — the three modules currently failing `dsd check modules`.
-# Functions in these modules are higher-risk first targets because layout
-# drift may break the match independent of the function's correctness.
-FAILING_MODULES: set[str] = {"main", "dtcm", "ov004"}
+# Brief 187 / 189 update: this set used to be `{"main", "dtcm",
+# "ov004"}` — the three modules failing `dsd check modules` before
+# brief 140's 3-region SHA1 PASS. Brief 140 + 141 closed the gap
+# (27/27 modules OK × 3 regions, holding); brief 187 stripped the
+# stale annotation from the curated queue + workflow doc; brief
+# 189 empties this set so freshly-generated `next_targets.md` /
+# `next_targets.json` no longer carry the obsolete
+# `[NB: <module> module checksum failing]` parenthetical. The
+# set is kept (rather than removed entirely) so callers that
+# import `FAILING_MODULES` still work; if a future module
+# regression flips a module back to failing, populate this set
+# instead of restoring the constant.
+FAILING_MODULES: set[str] = set()
 
 # Reloc kinds that represent a control-flow edge (caller → callee).
 CALL_RELOC_KINDS: set[str] = {

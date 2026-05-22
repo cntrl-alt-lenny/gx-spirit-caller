@@ -390,13 +390,21 @@ class TestClassify(unittest.TestCase):
         self.assertEqual(t.tier, "medium")
         self.assertEqual(t.callees_named, 1)
 
-    def test_failing_module_annotation(self):
-        # Failing-module status is advisory (in the reason string),
-        # not a tier demotion.
+    def test_failing_module_annotation_empty_post_brief_140(self):
+        # Brief 189 Part 3: `FAILING_MODULES` is now an empty set
+        # (brief 140 closed the 24/27 → 27/27 gap; brief 187
+        # stripped the stale annotation from the curated queue
+        # doc; brief 189 empties the constant so freshly-generated
+        # reasons no longer carry the `[NB: ... checksum
+        # failing]` parenthetical). If a future module regression
+        # surfaces, populate `FAILING_MODULES` to restore the
+        # annotation.
         s = make_symbol("func_01", "main", 0x100, size=0x4)
         t = classify(s, self.empty_graph, self.modules)
         self.assertEqual(t.tier, "trivial")
-        self.assertIn("main module checksum failing", t.reason)
+        self.assertNotIn("module checksum failing", t.reason)
+        # The reason still includes the leaf description.
+        self.assertIn("bx lr", t.reason)
 
 
 # --------------------------------------------------------------------------- #
