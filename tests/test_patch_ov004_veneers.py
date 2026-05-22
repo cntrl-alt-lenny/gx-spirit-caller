@@ -1945,6 +1945,172 @@ class TestParseLinkMapOv004(unittest.TestCase):
         tus = parse_link_map_ov004(_synth_ov004_map(body))
         self.assertEqual(tus, [])
 
+    def test_brief_186_gap_a_and_b_combined_fixture(self):
+        # Brief 186 combined regression — pins BOTH parser gaps
+        # the decomper's brief 182 investigation surfaced. One
+        # fixture, both fixes covered (per the brief's "one
+        # regression fixture covering BOTH gaps" requirement).
+        #
+        # Gap A — `_dsd_gap@ov004_36.o (.rodata)` TU's trailing
+        # symbol is a size=0 `func_ov004_*_unk` thumb-classify
+        # marker at 0x021DEC98. Without the fix, parser bounds
+        # the TU at `max(va + size) = 0x021DEC98` and the bytes
+        # between there and the next TU's start (0x021DED69)
+        # never get copied during layout reconstruction → 208
+        # B of `.rodata` content drops out. With the fix, the
+        # TU's built_end_va extends to 0x021DED69.
+        #
+        # Gap B — `.ctor` TU has only the synthesised
+        # `.p__sinit_ov004_02209a5c` symbol whose leading `.p`
+        # makes `_SYMBOL_ORIG_VA_RE` skip it. As the only `.ctor`
+        # TU in the overlay, the "prior TU in section" fallback
+        # is empty → shift defaulted to 0. With the fix, the
+        # `.ctor` shift falls back to the preceding `.init` TU's
+        # shift (`sinit_ov004_02209a5c.o` here, +4 cascade).
+        body = (
+            # .rodata block — Gap A trigger.
+            "#>021DE638          OV004_RODATA_START "
+            "(linker command file)\n"
+            "  021DE638 00000000 .rodata .rodata	"
+            "(_dsd_gap@ov004_36.o)\n"
+            "  021DE638 00000010 .rodata data_ov004_021de638	"
+            "(_dsd_gap@ov004_36.o)\n"
+            # Trailing size=0 `_unk` symbol — the Gap A pattern.
+            "  021DEC98 00000000 .rodata func_ov004_021dec99_unk	"
+            "(_dsd_gap@ov004_36.o)\n"
+            "  021DEC98 00000000 .rodata $t	"
+            "(_dsd_gap@ov004_36.o)\n"
+            # Next TU — its built_start_va bounds the previous TU.
+            "  021DED69 00000010 .rodata data_ov004_021ded69	"
+            "(data_ov004_021ded69.o)\n"
+            "#>021DED79          OV004_RODATA_END "
+            "(linker command file)\n"
+            # .init block — pinning the +4 shift Gap B inherits.
+            "#>02209A5C          OV004_INIT_START "
+            "(linker command file)\n"
+            "  02209A60 0000002C .init   "
+            "__sinit_ov004_02209a5c	"
+            "(sinit_ov004_02209a5c.o)\n"
+            "#>02209A8C          OV004_INIT_END "
+            "(linker command file)\n"
+            # .ctor block — Gap B trigger. ONLY `.p__sinit_*`,
+            # which the regex skips.
+            "#>02209A8C          OV004_CTOR_START "
+            "(linker command file)\n"
+            "  02209A8C 00000004 .ctor   "
+            ".p__sinit_ov004_02209a5c	"
+            "(_dsd_gap@ov004_36.o)\n"
+            "  02209A8C 00000000 .ctor   .ctor	"
+            "(_dsd_gap@ov004_36.o)\n"
+            "#>02209A90          OV004_CTOR_END "
+            "(linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+
+        # ---- Gap A assertion ----
+        rodata_gap = next(
+            t for t in tus
+            if t.section == ".rodata"
+            and t.tu_file == "_dsd_gap@ov004_36.o"
+        )
+        # Pre-fix: built_end_va would be 0x021DEC98 (max of
+        # va+size = 0x021DE638+0x10 = 0x021DE648 and 0x021DEC98+0
+        # = 0x021DEC98). Post-fix: extended to 0x021DED69 (next
+        # TU's built_start_va).
+        self.assertEqual(rodata_gap.built_end_va, 0x021DED69)
+        # Sanity: the extension picks up 0x021DED69 - 0x021DEC98
+        # = 0xD1 = 209 bytes of trailing content. Matches the
+        # 167+ B residue the decomper reported (delta ≈ off-by-
+        # one in the exclusive bound).
+        self.assertGreaterEqual(
+            rodata_gap.size,
+            0x021DED69 - 0x021DEC98,
+        )
+
+        # ---- Gap B assertion ----
+        ctor = next(t for t in tus if t.section == ".ctor")
+        init = next(t for t in tus if t.section == ".init")
+        # The `.init` TU's shift is derived from
+        # `__sinit_ov004_02209a5c` directly (matches the regex).
+        # built 0x02209A60 - orig 0x02209A5C = +4.
+        self.assertEqual(init.shift, 4)
+        # Pre-fix: ctor shift would default to 0 (regex skips
+        # `.p__sinit_*`, no prior `.ctor` TU). Post-fix: falls
+        # back to the `.init` TU's shift = +4.
+        self.assertEqual(ctor.shift, 4)
+        # And the ctor's orig_start_va lines up with the
+        # linker-marker `OV004_CTOR_START` (0x02209A88), confirming
+        # the shift is correctly applied.
+        self.assertEqual(ctor.orig_start_va, 0x02209A88)
+
+    def test_brief_186_last_tu_in_section_uses_end_marker(self):
+        # Gap A coverage for the trailing-TU case: when the
+        # final TU in a section has no successor inside the
+        # section, the fix falls back to the linker's
+        # `OV<NN>_<SECTION>_END` marker for the end VA.
+        body = (
+            "#>021DE638          OV004_RODATA_START "
+            "(linker command file)\n"
+            "  021DE638 00000010 .rodata "
+            "data_ov004_021de638	"
+            "(only_one.o)\n"
+            # No size=0 trailing symbol — but the TU's last
+            # symbol ends at 0x021DE648 while the linker's
+            # section end is at 0x021DE700. Without the fix,
+            # the parser would stop at 0x021DE648 and miss
+            # 0xB8 = 184 bytes of trailing section content.
+            "#>021DE700          OV004_RODATA_END "
+            "(linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].built_end_va, 0x021DE700)
+
+    def test_brief_186_gap_a_does_not_shrink_existing_end(self):
+        # Defensive: the fix uses `max(symbol-derived bound,
+        # next-TU/section-end value)` — it MUST NOT shrink the
+        # built_end_va if a TU's last symbol legitimately
+        # extends past where the linker would otherwise place
+        # the next TU (an edge case that shouldn't happen, but
+        # the implementation should not corrupt the bound).
+        body = (
+            "  021DE638 00000020 .rodata "
+            "data_ov004_021de638	(a.o)\n"
+            # Next TU starts BEFORE the previous symbol's end
+            # (deliberately malformed to exercise the max-only
+            # semantic).
+            "  021DE640 00000010 .rodata "
+            "data_ov004_021de640	(b.o)\n"
+            "#>021DE650          OV004_RODATA_END "
+            "(linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        # First TU's symbol-derived bound: 0x021DE658.
+        # Next-TU start: 0x021DE640. max() keeps 0x021DE658.
+        first = next(t for t in tus if t.tu_file == "a.o")
+        self.assertEqual(first.built_end_va, 0x021DE658)
+
+    def test_brief_186_gap_b_falls_back_to_zero_without_init(self):
+        # Defensive: the Gap B fix ONLY kicks in when a `.init`
+        # TU exists upstream. If a `.ctor` `.p__sinit_*` TU
+        # appears in isolation (synthetic / malformed map),
+        # behaviour falls through to the original "shift = 0"
+        # default — same as pre-fix. Guards against the fix
+        # silently inferring nonsense shifts from unrelated
+        # state.
+        body = (
+            "#>02209A8C          OV004_CTOR_START "
+            "(linker command file)\n"
+            "  02209A8C 00000004 .ctor   "
+            ".p__sinit_ov004_02209a5c	"
+            "(orphan.o)\n"
+            "#>02209A90          OV004_CTOR_END "
+            "(linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        ctor = next(t for t in tus if t.section == ".ctor")
+        self.assertEqual(ctor.shift, 0)
+
 
 class TestIsOrigShape(unittest.TestCase):
     """Brief 180: the `.ctor`-pointer idempotence guard for the
