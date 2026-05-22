@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "description": "Project-level Claude Code settings for the Yu-Gi-Oh GX Spirit Caller decomp. Hooks enforce ruff/test/invariants gates so the agent catches drift in-loop rather than at CI. Keep in sync with docs/decomp-workflow.md § Local setup extras.",
+  "description": "Project-level Claude Code settings for the Yu-Gi-Oh GX Spirit Caller decomp. Hooks enforce ruff/test/invariants gates so the agent catches drift in-loop rather than at CI, and capture session-end summaries to a shared inbox so the brain can read what the other agents said without manual copy-paste. Keep in sync with docs/decomp-workflow.md § Local setup extras.",
   "hooks": {
     "PostToolUse": [
       {
@@ -20,6 +20,17 @@
           {
             "type": "command",
             "command": "python .claude/hooks/pre_bash.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/save_agent_reply.py"
           }
         ]
       }
