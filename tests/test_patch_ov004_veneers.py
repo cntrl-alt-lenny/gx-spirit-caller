@@ -46,17 +46,22 @@ from patch_ov004_veneers import (  # noqa: E402
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
     HISTORICAL_MAX_VENEER_COUNT,
+    MAX_SHIFT_BYTES,
     N_INFERENCE_OVERRIDES,
+    MapTUSection,
     PatchError,
     VENEER_PREFIX,
     VENEER_SIZE,
     _apply_load_rewrites,
     _fix_ctor_and_pad,
+    _is_orig_shape,
+    _layout_reconstruct,
     _reencode_arm_bls,
     _scan_veneer_pool,
     _splice_veneer_pool,
     expected_output_delta_for,
     expected_output_size_for,
+    parse_link_map_ov004,
     parse_section_map,
     patch_overlays_yaml,
 )
@@ -1690,6 +1695,769 @@ class TestFixCtorAndPadWalkSafety(unittest.TestCase):
         )
         with self.assertRaisesRegex(PatchError, "more than"):
             _fix_ctor_and_pad(data, 0x1000)
+
+
+def _synth_ov004_map(body: str) -> str:
+    """Wrap a snippet of `.ov004`-block lines in the surrounding
+    map-file scaffolding the parser expects. `body` is interpreted
+    verbatim — no leading-newline trimming."""
+    return (
+        "# Link map of Entry\n"
+        "  02000000 00000000 .text   $a	(_dsd_gap@main_1.o)\n"
+        "# .ov004\n"
+        f"{body}"
+        "# .ov005\n"
+        "  03000000 00000000 .text   $a	(_dsd_gap@ov005_1.o)\n"
+        "# Memory map:\n"
+        "# Link end time: Thu May 21 16:39:25 2026\n"
+    )
+
+
+class TestParseLinkMapOv004(unittest.TestCase):
+    """Brief 180: linker-map parser. Validates per-TU section
+    grouping, shift derivation from named symbols, MAX_SHIFT_BYTES
+    safety cap, and the `_dsd_gap@ov004_X.o` zero-size-marker
+    handling that the per-symbol prototype in brief 179's research
+    note bisected onto.
+    """
+
+    def test_no_overlay_block_raises(self):
+        # A map with no `.ov004` block surfaces as a clear error.
+        text = (
+            "# Link map of Entry\n"
+            "# .ov002\n"
+            "  021AA000 00000004 .text   foo	(foo.o)\n"
+            "# Memory map:\n"
+        )
+        with self.assertRaisesRegex(PatchError, "no `# .ov004`"):
+            parse_link_map_ov004(text)
+
+    def test_single_unshifted_tu(self):
+        # One TU, one named symbol, shift = 0 (identity placement).
+        body = (
+            "#>021DE638          OV004_RODATA_START (linker command file)\n"
+            "  021DE638 00000014 .rodata data_ov004_021de638	"
+            "(data_ov004_021de638.o)\n"
+            "#>021DE64C          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        tu = tus[0]
+        self.assertEqual(tu.section, ".rodata")
+        self.assertEqual(tu.tu_file, "data_ov004_021de638.o")
+        self.assertEqual(tu.built_start_va, 0x021DE638)
+        self.assertEqual(tu.built_end_va, 0x021DE64C)
+        self.assertEqual(tu.orig_start_va, 0x021DE638)
+        self.assertEqual(tu.orig_end_va, 0x021DE64C)
+        self.assertEqual(tu.shift, 0)
+        self.assertEqual(tu.size, 0x14)
+
+    def test_single_shifted_tu(self):
+        # One TU with a +4 shift — the symbol's name encodes the
+        # orig VA, so the parser subtracts that from the built VA
+        # to derive the shift.
+        body = (
+            "  021DE63C 00000010 .rodata data_ov004_021de638	"
+            "(data_ov004_021de638.o)\n"
+            "#>021DE64C          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        tu = tus[0]
+        self.assertEqual(tu.built_start_va, 0x021DE63C)
+        self.assertEqual(tu.orig_start_va, 0x021DE638)
+        self.assertEqual(tu.shift, 4)
+        self.assertEqual(tu.size, 0x10)
+
+    def test_multi_segment_cascade(self):
+        # Brief 179's reproducer shape: three TUs with +0/+1/+4
+        # cumulative shifts. Each TU has one named symbol from
+        # which the parser derives the shift.
+        body = (
+            "  021DE638 00000004 .rodata data_ov004_021de638	"
+            "(tu_a.o)\n"
+            "  021DE63D 00000004 .rodata data_ov004_021de63c	"
+            "(tu_b.o)\n"
+            "  021DE645 00000004 .rodata data_ov004_021de641	"
+            "(tu_c.o)\n"
+            "#>021DE649          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual([t.tu_file for t in tus], ["tu_a.o", "tu_b.o", "tu_c.o"])
+        self.assertEqual([t.shift for t in tus], [0, 1, 4])
+
+    def test_zero_size_marker_followed_by_real_symbol(self):
+        # `_dsd_gap@ov004_X.o` TUs often open with a zero-size
+        # `.rodata .rodata` marker before the first real symbol.
+        # The marker's `.rodata` token doesn't match the dsd
+        # orig-VA regex, so shift derivation must come from the
+        # first NAMED symbol within the same TU. Built VAs land
+        # +4 right of orig (matches brief 179's cascade-segment
+        # boundary upper bound).
+        body = (
+            "  021DE63C 00000000 .rodata .rodata	"
+            "(_dsd_gap@ov004_35.o)\n"
+            "  021DE640 00000010 .rodata data_ov004_021de63c	"
+            "(_dsd_gap@ov004_35.o)\n"
+            "#>021DE650          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        tu = tus[0]
+        # Built start tracks the zero-marker line at 0x021DE63C,
+        # NOT the later "data_*" symbol at 0x021DE640.
+        self.assertEqual(tu.built_start_va, 0x021DE63C)
+        # Shift derived from the named symbol: 021DE640 - 021DE63C = 4.
+        self.assertEqual(tu.shift, 4)
+        # ...and applied uniformly to the TU's start (orig start
+        # = built start - shift).
+        self.assertEqual(tu.orig_start_va, 0x021DE63C - 4)
+
+    def test_unnamed_tu_propagates_prior_shift(self):
+        # A TU whose only entries are mapping symbols (`$a`/`$d`/
+        # `$t`) or pointer-table targets like `.p__sinit_*` lacks a
+        # dsd orig-VA-encoded symbol. The parser propagates the
+        # most recent prior shift in the same physical section.
+        # (Real-world hit: ov004 `.ctor` has a `.p__sinit_*` entry
+        # that doesn't fit the orig-VA-from-name pattern.)
+        body = (
+            "  021DE638 00000004 .rodata data_ov004_021de634	"
+            "(tu_a.o)\n"
+            "  021DE63C 00000004 .rodata $d	(tu_b.o)\n"
+            "#>021DE640          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 2)
+        # tu_a: shift = 021DE638 - 021DE634 = 4.
+        self.assertEqual(tus[0].shift, 4)
+        # tu_b: shift propagates from tu_a → also 4.
+        self.assertEqual(tus[1].shift, 4)
+
+    def test_first_unnamed_tu_defaults_to_zero_shift(self):
+        # If no prior TU in the same section exists, the parser
+        # treats the unnamed TU as identity-placed (shift = 0).
+        body = (
+            "  021DE638 00000004 .rodata $d	(unnamed.o)\n"
+            "#>021DE63C          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, 0)
+
+    def test_parser_does_not_enforce_max_shift_cap(self):
+        # PR #623 brain-review fix: `MAX_SHIFT_BYTES` is enforced
+        # at the copy site (`_layout_reconstruct`), NOT in the
+        # parser. The parser produces TU entries with whatever
+        # shifts the map reports, including pool-induced shifts of
+        # `+n × VENEER_SIZE` that the rom_config-pass second
+        # invocation sees. The actual safety net is the routing
+        # in `patch_ov004` (pool-presence + idempotence checks)
+        # backed by `_layout_reconstruct`'s per-TU cap.
+        bad_shift = MAX_SHIFT_BYTES + 1
+        body = (
+            f"  021DE63{bad_shift + 8:X} 00000004 .rodata "
+            "data_ov004_021de638	(tu_a.o)\n"
+            "#>021DE650          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, bad_shift)
+
+    def test_parser_handles_pool_sized_shift(self):
+        # Production case: at n=2 EUR's rom_config-pass second
+        # invocation the map reports a +24-byte shift for
+        # `data_ov004_021e2efc.o (.rodata)` (= 2 × VENEER_SIZE).
+        # Pre-fix the parser raised here and `dsd rom build`
+        # failed. Post-fix the parser is purely descriptive and
+        # produces the TU entry; routing in `patch_ov004` takes
+        # the idempotent path before reaching
+        # `_layout_reconstruct`'s cap check.
+        body = (
+            "  02200118 00000004 .rodata data_ov004_02200100	"
+            "(post_pool_tu.o)\n"
+            "#>02200120          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, 24)
+
+    def test_shift_at_max_accepted(self):
+        # Boundary: |shift| == MAX_SHIFT_BYTES is accepted (the
+        # empirical brief 179 cascade reaches +4 by the .init
+        # boundary; we must not reject our own production case).
+        body = (
+            f"  021DE63{MAX_SHIFT_BYTES + 8:X} 00000004 .rodata "
+            "data_ov004_021de638	(tu_a.o)\n"
+            "#>021DE640          OV004_RODATA_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 1)
+        self.assertEqual(tus[0].shift, MAX_SHIFT_BYTES)
+
+    def test_separate_sections_isolated(self):
+        # A TU's `.rodata` and `.init` are separate TU sections in
+        # the parser's output even when they share a `.o` file —
+        # the linker emits them at different addresses.
+        body = (
+            "  021DE638 00000010 .rodata data_ov004_021de638	"
+            "(shared.o)\n"
+            "  021DE648 0000000C .init   __sinit_ov004_021de648	"
+            "(shared.o)\n"
+            "#>021DE654          OV004_INIT_END (linker command file)\n"
+        )
+        tus = parse_link_map_ov004(_synth_ov004_map(body))
+        self.assertEqual(len(tus), 2)
+        self.assertEqual([t.section for t in tus], [".rodata", ".init"])
+        # Both share file but each carries its own bounds.
+        self.assertEqual(tus[0].built_end_va, 0x021DE648)
+        self.assertEqual(tus[1].built_start_va, 0x021DE648)
+
+
+class TestIsOrigShape(unittest.TestCase):
+    """Brief 180: the `.ctor`-pointer idempotence guard for the
+    layout-reconstruction path. Without this check, a second
+    patcher invocation over an already-reconstructed `.bin` would
+    re-run the TU-copy loop with built file offsets that now hold
+    orig content, scrambling the output.
+    """
+
+    def _sections(self, ctor_va: int, init_range: tuple[int, int]):
+        return {
+            ".text": (0x021c9d60, ctor_va),  # arbitrary text range
+            ".init": init_range,
+            ".ctor": (ctor_va, ctor_va + 4),
+            ".data": (ctor_va + 0x14, ctor_va + 0x1014),
+        }
+
+    def test_returns_true_when_ctor_points_into_init(self):
+        # Post-patch layout: orig `.ctor` file offset contains a
+        # pointer into orig `.init`.
+        base_va = 0x021c9d60
+        ctor_va = 0x02209a88
+        init_range = (0x02209a5c, 0x02209a88)
+        sections = self._sections(ctor_va, init_range)
+        ctor_fo = ctor_va - base_va
+        data = bytearray(ctor_fo + 0x20)
+        struct.pack_into("<I", data, ctor_fo, 0x02209a5c)
+        self.assertTrue(_is_orig_shape(data, sections))
+
+    def test_returns_false_when_ctor_holds_instruction_bytes(self):
+        # Pre-patch: orig `.ctor` fo holds the last instruction of
+        # `.init` (e.g. `bx lr` = 0xE12FFF1E), which decodes as a
+        # nonsense VA outside `.init`.
+        base_va = 0x021c9d60
+        ctor_va = 0x02209a88
+        init_range = (0x02209a5c, 0x02209a88)
+        sections = self._sections(ctor_va, init_range)
+        ctor_fo = ctor_va - base_va
+        data = bytearray(ctor_fo + 0x20)
+        struct.pack_into("<I", data, ctor_fo, 0xE12FFF1E)
+        self.assertFalse(_is_orig_shape(data, sections))
+
+    def test_returns_false_when_value_below_init_start(self):
+        # Boundary check: a value just below `.init` start is
+        # NOT orig shape.
+        base_va = 0x021c9d60
+        ctor_va = 0x02209a88
+        init_range = (0x02209a5c, 0x02209a88)
+        sections = self._sections(ctor_va, init_range)
+        ctor_fo = ctor_va - base_va
+        data = bytearray(ctor_fo + 0x20)
+        struct.pack_into("<I", data, ctor_fo, init_range[0] - 1)
+        self.assertFalse(_is_orig_shape(data, sections))
+
+    def test_returns_false_when_init_range_empty(self):
+        # Synthetic fixtures with an empty `.init` range trivially
+        # return False — guards the layout-reconstruction path
+        # against firing on unrelated synth inputs.
+        base_va = 0x021c9d60
+        ctor_va = 0x02209a88
+        empty_init = (ctor_va, ctor_va)
+        sections = self._sections(ctor_va, empty_init)
+        ctor_fo = ctor_va - base_va
+        data = bytearray(ctor_fo + 0x20)
+        struct.pack_into("<I", data, ctor_fo, 0x02209a5c)
+        self.assertFalse(_is_orig_shape(data, sections))
+
+    def test_returns_false_when_ctor_offset_out_of_range(self):
+        # Tiny inputs that don't even contain the .ctor file
+        # offset are not orig shape — guards the bounds check.
+        ctor_va = 0x02209a88
+        init_range = (0x02209a5c, 0x02209a88)
+        sections = self._sections(ctor_va, init_range)
+        # Input too short to contain orig .ctor fo.
+        data = bytearray(4)
+        self.assertFalse(_is_orig_shape(data, sections))
+
+
+class TestLayoutReconstruct(unittest.TestCase):
+    """Brief 180: `_layout_reconstruct` builds an orig-sized
+    bytearray by copying each TU section from its built file offset
+    to its orig file offset. Bytes outside any TU section default
+    to zero — those positions hold inter-TU alignment padding in
+    both built and orig binaries.
+    """
+
+    def _sections(self) -> dict[str, tuple[int, int]]:
+        return {
+            ".text": (0x02000000, 0x02000010),
+            ".rodata": (0x02000010, 0x02000020),
+            ".init": (0x02000020, 0x02000024),
+            ".ctor": (0x02000024, 0x02000028),
+            ".data": (0x02000028, 0x02000030),
+        }
+
+    def test_identity_copy_when_all_shifts_zero(self):
+        # Each TU placed at its orig position; reconstruction is a
+        # straight copy of input bytes into output.
+        sections = self._sections()
+        data = bytes(range(0x30))
+        tus = [
+            MapTUSection(
+                section=".text", tu_file="a.o",
+                built_start_va=0x02000000,
+                built_end_va=0x02000010,
+                orig_start_va=0x02000000,
+                orig_end_va=0x02000010,
+            ),
+            MapTUSection(
+                section=".data", tu_file="b.o",
+                built_start_va=0x02000028,
+                built_end_va=0x02000030,
+                orig_start_va=0x02000028,
+                orig_end_va=0x02000030,
+            ),
+        ]
+        output, tus_copied = _layout_reconstruct(data, tus, sections)
+        self.assertEqual(tus_copied, 2)
+        self.assertEqual(len(output), 0x30)
+        # .text copy (0..0x10) preserved.
+        self.assertEqual(bytes(output[0:0x10]), data[0:0x10])
+        # .data copy (0x28..0x30) preserved.
+        self.assertEqual(bytes(output[0x28:0x30]), data[0x28:0x30])
+
+    def test_shifted_tu_unshifts(self):
+        # Input has a TU at built fo 0x14 (built VA 0x02000014);
+        # the TU's orig fo is 0x10. The reconstruction moves the
+        # 4-byte payload left by 4.
+        sections = self._sections()
+        data = bytearray(0x30)
+        payload = b"\x11\x22\x33\x44"
+        data[0x14:0x18] = payload
+        tus = [MapTUSection(
+            section=".rodata", tu_file="shifted.o",
+            built_start_va=0x02000014,
+            built_end_va=0x02000018,
+            orig_start_va=0x02000010,
+            orig_end_va=0x02000014,
+        )]
+        output, _ = _layout_reconstruct(data, tus, sections)
+        # Payload moved to orig position.
+        self.assertEqual(bytes(output[0x10:0x14]), payload)
+        # Built position now zero (uninitialised, no TU covers it).
+        self.assertEqual(bytes(output[0x14:0x18]), b"\x00" * 4)
+
+    def test_built_out_of_bounds_raises(self):
+        # A TU whose built range extends past the input bytes
+        # surfaces as a clear PatchError (rather than silently
+        # truncating).
+        sections = self._sections()
+        data = bytes(0x20)  # too short
+        tus = [MapTUSection(
+            section=".data", tu_file="bad.o",
+            built_start_va=0x02000028,
+            built_end_va=0x02000030,
+            orig_start_va=0x02000028,
+            orig_end_va=0x02000030,
+        )]
+        with self.assertRaisesRegex(PatchError, "out of bounds for input"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_orig_out_of_bounds_raises(self):
+        # A TU whose orig range extends past the output bytes
+        # surfaces as a clear PatchError.
+        sections = self._sections()
+        data = bytes(0x100)  # ample input
+        tus = [MapTUSection(
+            section=".data", tu_file="bad.o",
+            built_start_va=0x02000000,
+            built_end_va=0x02000040,
+            orig_start_va=0x02000000,
+            orig_end_va=0x02000040,  # 0x40 > orig_size 0x30
+        )]
+        with self.assertRaisesRegex(PatchError, "out of bounds for orig"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_shift_above_max_raises_at_copy_site(self):
+        # PR #623 brain-review: `MAX_SHIFT_BYTES` is enforced
+        # here at the copy site, not in `parse_link_map_ov004`.
+        # A TU with `|shift| > MAX_SHIFT_BYTES` surfaces as a
+        # PatchError before any bytes get moved.
+        sections = self._sections()
+        data = bytes(0x100)
+        bad_shift = MAX_SHIFT_BYTES + 1
+        tus = [MapTUSection(
+            section=".rodata", tu_file="bad_shift.o",
+            built_start_va=0x02000010 + bad_shift,
+            built_end_va=0x02000014 + bad_shift,
+            orig_start_va=0x02000010,
+            orig_end_va=0x02000014,
+        )]
+        with self.assertRaisesRegex(PatchError, "MAX_SHIFT_BYTES"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_shift_at_max_accepted_at_copy_site(self):
+        # Boundary: |shift| == MAX_SHIFT_BYTES copies cleanly —
+        # this is the brief 179 empirical cap (+4 by the `.init`
+        # boundary), not a regression.
+        sections = self._sections()
+        data = bytearray(0x100)
+        payload = b"\x11\x22\x33\x44"
+        # Place payload at built fo 0x14 (= 0x10 + MAX_SHIFT_BYTES).
+        data[0x10 + MAX_SHIFT_BYTES:0x14 + MAX_SHIFT_BYTES] = payload
+        tus = [MapTUSection(
+            section=".rodata", tu_file="at_cap.o",
+            built_start_va=0x02000010 + MAX_SHIFT_BYTES,
+            built_end_va=0x02000014 + MAX_SHIFT_BYTES,
+            orig_start_va=0x02000010,
+            orig_end_va=0x02000014,
+        )]
+        output, _ = _layout_reconstruct(data, tus, sections)
+        # Payload moved to its orig position.
+        self.assertEqual(bytes(output[0x10:0x14]), payload)
+
+
+class TestUnconditionalRewrites(unittest.TestCase):
+    """Brief 180 piece 1: `_apply_load_rewrites` and
+    `_reencode_arm_bls` now run on every code path — at n=0 (no
+    pool) those passes still close 17 bytes of `.text` + `.data`
+    residue per brief 179's bisection. Without piece 1, the
+    pre-brief-180 `data.find(VENEER_PREFIX) < 0` short-circuit
+    returned the input unchanged at n=0 and lost those 17 bytes.
+    """
+
+    def test_n0_no_map_still_runs_load_rewrites(self):
+        # n=0 synth + a single stale `kind:load` reloc. The load
+        # value at the reloc's `from` fo is wrong (mwldarm emitted
+        # a shifted VA); the patcher must un-shift it even though
+        # no veneer pool is present.
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(0)
+        data = bytearray(data)
+        base_va = sections[".text"][0]
+        # Plant a stale load value INSIDE .text. Pick fo 0x40 (well
+        # inside the 0x1000 text padding).
+        stale_fo = 0x40
+        from_va = base_va + stale_fo
+        struct.pack_into("<I", data, stale_fo, 0xDEADBEEF)
+        relocs = [(from_va, "load", 0x12345678)]
+        patched, stats = patch_ov004(bytes(data), relocs, sections)
+        # The patcher SHOULD have rewritten the load value.
+        self.assertEqual(stats["load_rewrites"], 1)
+        self.assertEqual(stats["veneers_spliced"], 0)
+        self.assertEqual(
+            struct.unpack_from("<I", patched, stale_fo)[0],
+            0x12345678,
+            "n=0 + no map: load rewrites must still close the "
+            "brief 179 17-byte residue",
+        )
+
+    def test_n0_no_map_no_relocs_is_bit_identical(self):
+        # n=0 + empty relocs + no map: output must equal input.
+        # Confirms the new unconditional path doesn't introduce
+        # spurious byte changes when there's no work to do.
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(0)
+        patched, stats = patch_ov004(data, [], sections)
+        self.assertEqual(bytes(patched), bytes(data))
+        self.assertEqual(stats["load_rewrites"], 0)
+        self.assertEqual(stats["bl_reencodes"], 0)
+        self.assertEqual(stats["veneers_spliced"], 0)
+
+
+class TestPatchOv004WithMap(unittest.TestCase):
+    """Brief 180: end-to-end behaviour of `patch_ov004` when given
+    an `arm9.o.xMAP`. Routing rules:
+
+      - map shows any non-zero TU shift → layout-reconstruction path
+      - map shows all-zero shifts (or no map) → splice / no-pool path
+      - reconstructed output is orig-sized regardless of input size
+    """
+
+    def _orig_sized_sections(self) -> dict[str, tuple[int, int]]:
+        # Matches `_build_synth_ov004`'s ORIG layout: 4 KB text,
+        # 4-byte ctor, 20-byte pad, 64-byte data.
+        return {
+            ".text": (0x02200000, 0x02201000),
+            ".rodata": (0x02201000, 0x02201000),
+            ".init": (0x02201000, 0x02201000),
+            ".ctor": (0x02201000, 0x02201004),
+            ".data": (0x02201018, 0x02201058),
+        }
+
+    def test_map_with_no_cascade_routes_to_no_pool_branch(self):
+        # Map shows all TUs at orig position → layout_reconstructed
+        # NOT triggered → falls through to splice path → no pool
+        # found → rewrites-only branch.
+        from patch_ov004_veneers import patch_ov004
+        data, sections = _build_synth_ov004(0)
+        # Map snippet with one identity-placed TU.
+        body = (
+            "  02200000 00001000 .text   data_ov004_02200000	"
+            "(text_tu.o)\n"
+            "#>02201000          OV004_TEXT_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        patched, stats = patch_ov004(data, [], sections, map_text=map_text)
+        self.assertEqual(stats.get("layout_reconstructed", 0), 0)
+        self.assertEqual(stats["veneers_spliced"], 0)
+        # No work to do → input bytes preserved.
+        self.assertEqual(bytes(patched), bytes(data))
+
+    def test_map_with_cascade_triggers_reconstruction(self):
+        # Build a synthetic input with content at a "shifted" built
+        # file offset; the map identifies the shift. The patcher's
+        # reconstruction copies the content to the orig file
+        # offset.
+        from patch_ov004_veneers import patch_ov004
+        sections = self._orig_sized_sections()
+        base_va = sections[".text"][0]
+        # Orig binary spans [base, base + 0x1058). Build an input
+        # of the SAME size (no veneer pool — n=0 cascade case).
+        orig_size = sections[".data"][1] - base_va
+        data = bytearray(orig_size)
+        # Plant a 16-byte payload at BUILT fo 0x200 (= built VA
+        # base+0x200). Its ORIG fo is 0x1FC (shift = +4). Use a
+        # large gap from the orig position so the source and
+        # destination ranges don't overlap (cleaner assertion).
+        payload = b"\xaa\xbb\xcc\xdd" * 4
+        data[0x200:0x210] = payload
+        body = (
+            f"  {base_va + 0x200:08X} 00000010 .rodata "
+            f"data_ov004_{base_va + 0x1FC:08x}	(shifted.o)\n"
+            "#>02201058          OV004_DATA_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        # Provide empty relocs to keep this test focused on the
+        # layout path. .ctor entry at orig fo 0x1000 will be zero
+        # (uninitialised) — _is_orig_shape returns False, so the
+        # reconstruction path fires.
+        patched, stats = patch_ov004(
+            bytes(data), [], sections, map_text=map_text,
+        )
+        self.assertEqual(stats["layout_reconstructed"], 1)
+        self.assertEqual(stats["tus_copied"], 1)
+        self.assertEqual(len(patched), orig_size)
+        # Payload moved from built fo 0x200 → orig fo 0x1FC.
+        self.assertEqual(bytes(patched[0x1FC:0x20C]), payload)
+        # Built position now zero (the reconstruction's output
+        # bytearray is zero-init and no TU covers the post-shift
+        # gap at 0x20C..0x210).
+        self.assertEqual(bytes(patched[0x20C:0x210]), b"\x00" * 4)
+
+    def test_pool_present_skips_map_parsing(self):
+        # Brief 180 routing rule #1: when the veneer pool is
+        # present in the input, `patch_ov004` MUST take the
+        # splice path and NEVER consult the map. Reason: at n>0
+        # the map's post-pool TUs report a `+n * VENEER_SIZE`
+        # shift that exceeds MAX_SHIFT_BYTES, and the splice
+        # path already handles pool removal cleanly. Brief 168's
+        # n=2 SHA1 PASS depends on this routing.
+        #
+        # This test passes a syntactically-valid map containing
+        # a TU section whose shift WOULD trip the cap if parsed
+        # (+24, just like the real n=2 EUR production map). If
+        # the routing accidentally parses the map, this test
+        # surfaces the regression as a PatchError; if routing
+        # is correct, the patcher proceeds to the splice path
+        # and returns a successfully spliced output.
+        from patch_ov004_veneers import patch_ov004
+        n = 2
+        data, sections = _build_synth_ov004(
+            n, terminator=True,  # n=2 brief 147 empirical
+        )
+        # Build a map whose only TU has shift = +24 (would trip
+        # MAX_SHIFT_BYTES = 4 if parsed). The pool-present
+        # routing must skip parsing entirely.
+        body = (
+            "  02201018 00000010 .rodata data_ov004_02201000	"
+            "(would_blow_up.o)\n"
+            "#>02201058          OV004_DATA_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        # If routing is broken, patch_ov004 raises PatchError
+        # from inside parse_link_map_ov004; if correct, it
+        # returns a normal splice result.
+        patched, stats = patch_ov004(
+            data, [], sections, map_text=map_text,
+        )
+        self.assertEqual(stats["veneers_spliced"], n)
+        self.assertEqual(stats.get("layout_reconstructed", 0), 0)
+        # Output is the orig-shape synth (text + 24-byte cluster
+        # + data tail) — same as the no-map splice path's output.
+        self.assertEqual(bytes(patched), _build_orig_synth_ov004())
+
+    def test_post_splice_invocation_idempotent_despite_pool_shift_in_map(self):
+        # Brief 180 production regression — caught by brain's
+        # `ninja sha1` pass on PR #623's first revision.
+        #
+        # On the rom_config rule's SECOND patcher invocation the
+        # `.bin` has already been spliced by the mwld rule's FIRST
+        # invocation, so the pool is gone and routing enters the
+        # `not pool_present` branch. The linker map is unchanged
+        # between invocations (the link only runs once per ninja
+        # graph), so it still reports the PRE-splice cascade — at
+        # production n=2 EUR that's a +24-byte shift on the
+        # `data_ov004_021e2efc.o` TU and similar post-pool TUs.
+        #
+        # The bug: `parse_link_map_ov004`'s MAX_SHIFT_BYTES check
+        # fired BEFORE `_is_orig_shape` could detect that the
+        # input is already in orig shape and route to the
+        # idempotent rewrites-only branch. The patcher bailed
+        # with `PatchError: |shift| > MAX_SHIFT_BYTES = 4` and
+        # `dsd rom build` then failed to package ov004.
+        #
+        # Fix: move the cap out of the parser (where it's a static
+        # invariant) into `_layout_reconstruct` (where it's a
+        # runtime guard against actually copying bytes with a
+        # suspect shift). The parser now produces TU sections
+        # with whatever shifts the map reports; idempotence
+        # check + layout-reconstruction guard remain the actual
+        # safety net. Aligns with brief 179's framing of the cap
+        # as "runtime structural-regression safety net".
+        from patch_ov004_veneers import patch_ov004
+        sections = self._orig_sized_sections()
+        # Synthesise a non-empty `.init` containing the ctor target
+        # so the `_is_orig_shape` heuristic can detect orig shape.
+        sections = dict(sections)
+        sections[".init"] = (0x02200800, 0x02200810)
+        base_va = sections[".text"][0]
+        orig_size = sections[".data"][1] - base_va
+        # Pre-spliced input: orig-shape bytes, no veneer pool, no
+        # cascade. Plant the `.ctor` pointer at orig fo 0x1000
+        # pointing into `.init` range so `_is_orig_shape` returns
+        # True.
+        data = bytearray(orig_size)
+        struct.pack_into("<I", data, 0x1000, 0x02200800)
+        # Map declares a TU with shift = +24 (mirrors production
+        # n=2 EUR's `data_ov004_021e2efc.o` post-pool placement).
+        # Without the routing fix, parser would raise here.
+        body = (
+            "  02200118 00000010 .rodata data_ov004_02200100	"
+            "(post_pool_tu.o)\n"
+            "#>02201058          OV004_DATA_END (linker command file)\n"
+        )
+        map_text = _synth_ov004_map(body)
+        # The bug-pin contract: this call must NOT raise. Pre-fix
+        # it raises PatchError from `parse_link_map_ov004`;
+        # post-fix it returns the idempotent rewrites-only output.
+        patched, stats = patch_ov004(
+            bytes(data), [], sections, map_text=map_text,
+        )
+        self.assertEqual(stats["already_patched"], 1)
+        self.assertEqual(stats.get("layout_reconstructed", 0), 0)
+        # Output is unchanged (idempotent path).
+        self.assertEqual(bytes(patched), bytes(data))
+
+    def test_idempotence_on_already_orig_shape(self):
+        # When the input is already in orig shape (the second
+        # patcher invocation in the rom_config pass), the layout-
+        # reconstruction path must short-circuit via the
+        # `_is_orig_shape` guard — re-running would corrupt the
+        # output.
+        from patch_ov004_veneers import patch_ov004
+        sections = self._orig_sized_sections()
+        base_va = sections[".text"][0]
+        orig_size = sections[".data"][1] - base_va
+        # Build an "already-patched" input: `.ctor` pointer sits
+        # at orig fo and points into `.init` range. We synthesise
+        # a non-empty `.init` for this test (the production case
+        # has __sinit there).
+        sections = dict(sections)
+        sections[".init"] = (0x02200800, 0x02200810)  # 16-byte init
+        data = bytearray(orig_size)
+        # Place the .ctor pointer at orig fo 0x1000 pointing to
+        # 0x02200800 (= .init start).
+        struct.pack_into("<I", data, 0x1000, 0x02200800)
+        # Map declares a shifted TU (so cascade is detected) but
+        # the idempotence check catches the orig-shape input.
+        body = (
+            "  02200004 00000004 .rodata data_ov004_02200000	"
+            "(shifted.o)\n"
+            "#>02201058          OV004_DATA_END (linker command file)\n"
+        )
+        patched, stats = patch_ov004(
+            bytes(data), [], sections, map_text=_synth_ov004_map(body),
+        )
+        self.assertEqual(stats["already_patched"], 1)
+        self.assertEqual(stats.get("layout_reconstructed", 0), 0)
+        # Output is unchanged (no rewrites, no copies).
+        self.assertEqual(bytes(patched), bytes(data))
+
+
+class TestCliMapArgument(unittest.TestCase):
+    """Brief 180 piece 2: `--map` CLI arg routing. Validates that
+    the argument is plumbed through to `patch_ov004` (when given)
+    and that omission falls back to the splice path.
+    """
+
+    def _write_tmp(
+        self, suffix: str, content: bytes | str,
+    ) -> Path:
+        f = tempfile.NamedTemporaryFile(
+            "wb" if isinstance(content, bytes) else "w",
+            suffix=suffix, delete=False,
+        )
+        if isinstance(content, bytes):
+            f.write(content)
+        else:
+            f.write(content)
+        f.close()
+        return Path(f.name)
+
+    def test_missing_map_path_errors(self):
+        # `--map /nonexistent.xMAP` surfaces the read error
+        # cleanly without crashing the CLI.
+        import contextlib
+        import io
+        from patch_ov004_veneers import main as patcher_main
+        # Need a valid binary + relocs + delinks to reach the map
+        # read step. Build minimal stand-ins.
+        binary = self._write_tmp(".bin", b"\x00" * 0x1100)
+        relocs = self._write_tmp(".txt", "")
+        delinks = self._write_tmp(
+            ".txt",
+            "\n".join([
+                "    .text       start:0x02200000 end:0x02201000 kind:code align:32",
+                "    .init       start:0x02201000 end:0x02201000 kind:code align:4",
+                "    .ctor       start:0x02201000 end:0x02201004 kind:rodata align:4",
+                "    .data       start:0x02201018 end:0x02201058 kind:data align:32",
+                "",
+            ]),
+        )
+        argv_backup = sys.argv
+        sys.argv = [
+            "patch_ov004_veneers.py",
+            "--binary", str(binary),
+            "--relocs", str(relocs),
+            "--delinks", str(delinks),
+            "--map", "/this/path/does/not/exist.xMAP",
+        ]
+        # Capture stderr so the expected error message doesn't
+        # pollute the test runner's output.
+        stderr_buf = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(stderr_buf):
+                rc = patcher_main()
+        finally:
+            sys.argv = argv_backup
+            binary.unlink()
+            relocs.unlink()
+            delinks.unlink()
+        self.assertEqual(rc, 1)
+        self.assertIn(
+            "/this/path/does/not/exist.xMAP", stderr_buf.getvalue(),
+        )
 
 
 if __name__ == "__main__":
