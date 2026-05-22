@@ -89,7 +89,6 @@ refresh in this same PR documents the routing-decision flow.
 ## Trivial (≤ 0x20, no calls) — 12 picks
 
 
-
 | # | Module | Addr | Size | Calls | Name | Reason |
 |---|--------|------|-----:|------:|------|--------|
 | 1 | `ov003` | `0x021ca2b8` | `0x4` | 0 | `func_ov003_021ca2b8` | leaf, 4B - likely `bx lr` or SWI stub |
@@ -108,7 +107,6 @@ refresh in this same PR documents the routing-decision flow.
 **Recommended approach:** Leaf functions, often `bx lr` / single-instruction stubs. Direct-write the C source from disassembly inspection. decomp.me scratch unnecessary for cases this small.
 
 ## Easy (≤ 0x60, ≤ 2 calls) — 25 picks
-
 
 
 | # | Module | Addr | Size | Calls | Name | Reason |
@@ -142,7 +140,6 @@ refresh in this same PR documents the routing-decision flow.
 **Recommended approach:** Wrappers, simple helpers, BIOS-svc thunks. Use decomp.me scratch + `tools/scratch_bundle.py --prompt` to seed the LLM context. Mwccarm 2.0/sp1p5 default routing.
 
 ## Medium-easy (≤ 0x100, ≤ 4 calls) — 15 picks
-
 
 
 | # | Module | Addr | Size | Calls | Name | Reason |
