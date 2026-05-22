@@ -488,3 +488,7 @@ src/jpn/overlay002/data/data_ov002_022ccee4.s:
 src/jpn/overlay002/data/data_ov002_022ccf9c.s:
     complete
     .data start:0x022ccf9c end:0x022cd220
+
+src/jpn/overlay002/data/data_ov002_022ccb68.s:
+    complete
+    .data start:0x022ccb68 end:0x022ccb6c
