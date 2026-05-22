@@ -148,6 +148,7 @@ import argparse
 import re
 import struct
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -277,6 +278,26 @@ N_INFERENCE_OVERRIDES: dict[int, int] = {
     5: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_LONG,  # = -4 (brief 164)
     3: CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,   # = +4 (brief 168)
 }
+
+# Brief 180: layout-reconstruction safety bound. Brief 179 empirically
+# measured the maximum cumulative `.rodata` TU-section shift at +4
+# bytes by the `.init` boundary (`data_ov004_021ded69` Variant A
+# claim, cascade: +0 → +1 → +2 → +4). A larger cumulative shift would
+# indicate either a structural regression in mwldarm's behaviour or
+# a `.o`-level alignment surprise we have not characterised yet —
+# in either case the patcher should bail rather than silently
+# attempt to relocate sections that may not be safe to move.
+#
+# The cap applies to the absolute per-TU shift observed in the
+# linker map (`|built_va - orig_va|` for any single TU section).
+# `_load_map_tu_sections` raises `PatchError` if it sees a shift
+# above this bound.
+#
+# Set to 4 (not 3 — brief 179 documented the +4 boundary
+# empirically). Brief 179's research note `docs/research/
+# ov004-odd-aligned-layout-cascade.md` records the segment-by-
+# segment shift table that motivated this cap.
+MAX_SHIFT_BYTES = 4
 
 
 class PatchError(Exception):
@@ -545,6 +566,281 @@ def _fix_ctor_and_pad(
     return fixed, net
 
 
+# --- Linker map parsing (brief 180) -----------------------------------
+#
+# mwldarm's `arm9.o.xMAP` is the truth source for the post-link layout.
+# Each overlay's block starts with `# .ovNNN` and contains:
+#
+#   - `#>VA  NAME (linker command file)` lines for LCF-defined
+#     boundary symbols (e.g. `#>02209A74  OV004_INIT_END (...)`)
+#   - `  VA  SIZE  SECTION  SYMBOL\t(FILE)` lines for every emitted
+#     symbol, grouped first by physical section and then by source
+#     `.o` (a single `.o` contributes one TU section per physical
+#     section it has content in).
+#
+# Brief 179's research note bisected the n=0 +
+# `data_ov004_021ded69` Variant A claim into a multi-segment
+# `.rodata` layout cascade (+0/+1/+2/+4 byte shifts across 4
+# segments, absorbed by a 16-vs-20 `.ctor`-pad delta). The
+# per-TU section bounds give us the truth source needed to
+# relocate each segment from its built file offset to its
+# orig file offset — the per-symbol prototype the research
+# note tried first stranded ~21 KB inside `_dsd_gap@ov004_X.o`
+# zero-size markers, which only the section-level bounds
+# capture.
+_MAP_SYMBOL_LINE_RE = re.compile(
+    r"^\s+([0-9A-Fa-f]+)\s+([0-9A-Fa-f]+)\s+(\.\S+)\s+(\S+)\s+\(([^)]+)\)\s*$"
+)
+_MAP_LINKER_SYM_RE = re.compile(
+    r"^#>([0-9A-Fa-f]+)\s+(\S+)\s+\(linker command file\)\s*$"
+)
+_MAP_SECTION_HDR_RE = re.compile(r"^#\s+(\.\S+)\s*$")
+
+# Dsd's symbol-naming convention encodes the symbol's orig VA in the
+# name itself: e.g. `data_ov004_021ded69`, `func_ov004_021c9d8c`. For
+# each named symbol that matches this pattern we can compute the TU
+# section's shift directly. Other symbols (mapping syms `$a`/`$d`/
+# `$t`, local labels `.L_*`, ctor table targets `.p__sinit_*`) are
+# skipped — they reference orig VAs that don't match the OWNING
+# symbol's position, so they can't be used for shift computation.
+_SYMBOL_ORIG_VA_RE = re.compile(
+    r"^(?:data|func|__sinit)_(?:ov\d+|main)_([0-9a-fA-F]{8})$"
+)
+
+
+@dataclass
+class MapTUSection:
+    """A translation-unit's physical-section span derived from
+    `arm9.o.xMAP`. One TU contributes one TUSection per physical
+    section (`.text` / `.rodata` / `.init` / `.ctor` / `.data`)
+    it has content in.
+
+    `built_start_va` / `built_end_va` come straight from the map
+    (first line's VA → last line's `va + size`). `orig_start_va`
+    / `orig_end_va` are derived by subtracting the TU's shift,
+    where shift = `built_va - orig_va` for any named symbol
+    inside the TU (the shift is uniform within a TU section
+    because the linker places the TU's bytes contiguously).
+    """
+
+    section: str
+    tu_file: str
+    built_start_va: int
+    built_end_va: int
+    orig_start_va: int
+    orig_end_va: int
+
+    @property
+    def size(self) -> int:
+        return self.built_end_va - self.built_start_va
+
+    @property
+    def shift(self) -> int:
+        return self.built_start_va - self.orig_start_va
+
+
+def parse_link_map_ov004(
+    map_text: str,
+    *,
+    overlay_header: str = ".ov004",
+) -> list[MapTUSection]:
+    """Parse mwldarm's `.xMAP` text and return per-TU section spans
+    for the named overlay.
+
+    `overlay_header` defaults to `.ov004` (the only one the patcher
+    needs); kept as an arg for unit-test isolation.
+
+    Raises `PatchError` if:
+      - The overlay header isn't found.
+      - A TU section has |shift| > `MAX_SHIFT_BYTES` (brief 180
+        safety cap).
+    """
+    lines = map_text.splitlines()
+    in_block = False
+    overlay_lines: list[str] = []
+    for line in lines:
+        m_hdr = _MAP_SECTION_HDR_RE.match(line)
+        if m_hdr is not None:
+            if m_hdr.group(1) == overlay_header:
+                in_block = True
+                continue
+            if in_block:
+                break
+        if in_block:
+            overlay_lines.append(line)
+    if not overlay_lines:
+        raise PatchError(
+            f"linker map has no `# {overlay_header}` overlay block"
+        )
+
+    # Group entries by (tu_file, section). Switching either field
+    # closes the current group and opens a new one. Mapping
+    # symbols / local labels / zero-size markers contribute to the
+    # group bounds only via their built VA (size=0) and don't
+    # disturb the shift calculation.
+    groups: list[dict] = []
+    current: dict | None = None
+    for line in overlay_lines:
+        m_sym = _MAP_SYMBOL_LINE_RE.match(line)
+        if m_sym is None:
+            continue
+        va = int(m_sym.group(1), 16)
+        size = int(m_sym.group(2), 16)
+        section = m_sym.group(3)
+        symbol = m_sym.group(4)
+        tu_file = m_sym.group(5)
+        key = (tu_file, section)
+        if current is None or current["key"] != key:
+            if current is not None:
+                groups.append(current)
+            current = {
+                "key": key,
+                "tu_file": tu_file,
+                "section": section,
+                "built_start_va": va,
+                "built_end_va_max": va + size,
+                "shift_candidate": None,
+            }
+        else:
+            if va + size > current["built_end_va_max"]:
+                current["built_end_va_max"] = va + size
+        if current["shift_candidate"] is None:
+            m_orig = _SYMBOL_ORIG_VA_RE.match(symbol)
+            if m_orig is not None:
+                current["shift_candidate"] = va - int(m_orig.group(1), 16)
+    if current is not None:
+        groups.append(current)
+
+    out: list[MapTUSection] = []
+    for g in groups:
+        built_start = g["built_start_va"]
+        built_end = g["built_end_va_max"]
+        if built_end <= built_start:
+            # All-zero-size TU (e.g. a `.rodata .rodata` marker
+            # with no real content). Skip — nothing to copy.
+            continue
+        shift = g["shift_candidate"]
+        if shift is None:
+            # No named symbol with a dsd orig-VA encoding inside
+            # this TU. Propagate the shift from the most recent
+            # prior TU in the same physical section. If no prior
+            # exists, treat shift as 0 (TU is identity-placed). The
+            # cascade in brief 179's research note is monotonic per
+            # section, so propagating the trailing shift is safe.
+            prior = [t for t in out if t.section == g["section"]]
+            shift = prior[-1].shift if prior else 0
+        if abs(shift) > MAX_SHIFT_BYTES:
+            raise PatchError(
+                f"TU {g['tu_file']} ({g['section']}) has shift "
+                f"{shift:+d} bytes "
+                f"(|shift| > MAX_SHIFT_BYTES = {MAX_SHIFT_BYTES}); "
+                f"structural regression suspected — bail rather "
+                f"than relocate a TU section whose layout cause we "
+                f"have not characterised."
+            )
+        out.append(MapTUSection(
+            section=g["section"],
+            tu_file=g["tu_file"],
+            built_start_va=built_start,
+            built_end_va=built_end,
+            orig_start_va=built_start - shift,
+            orig_end_va=built_end - shift,
+        ))
+    return out
+
+
+def _is_orig_shape(
+    data: bytes | bytearray,
+    sections: dict[str, tuple[int, int]],
+) -> bool:
+    """Detect a binary that already has orig-shape layout — used to
+    short-circuit a second patcher pass over an already-reconstructed
+    `arm9_ov004.bin`.
+
+    Heuristic: ov004's only `.ctor` entry is a pointer to
+    `__sinit_ov004_*` whose VA lies within orig `.init`. After
+    layout reconstruction (or after the brief 134/142/… splice
+    path), this 4-byte pointer sits at orig `.ctor`'s file offset
+    and its little-endian decoded value lands in
+    `[orig .init start, orig .init end)`. Pre-patch binaries
+    (either with cascade OR with veneer pool) have other content at
+    that file offset — typically the last instruction word of
+    `.init`'s `__sinit_ov004_*` function — so the value falls
+    outside `.init`'s VA range.
+
+    Brief 180 needs this because the patcher runs twice in the
+    build graph: first via `mwld`'s post-link hook (operating on
+    the raw `mwldarm` output), then via `rom_config` (which re-
+    invokes the patcher with the same `arm9.o.xMAP` so it can
+    re-write `arm9_overlays.yaml`). The map still reports
+    cascade shifts in both passes (mwldarm doesn't re-link
+    between them), but the second pass MUST NOT re-run the
+    reconstruction over the already-orig-shape binary — that
+    would copy bytes from "built file offsets" that now hold
+    orig content, scrambling the output. The cheap .ctor-pointer
+    check is robust enough to gate this and keeps `patch_ov004`
+    idempotent.
+
+    Synthetic fixtures with an empty `.init` range trivially
+    return False (no value is in an empty range), which routes
+    them to the splice path — matching the test contract.
+    """
+    base_va = sections[".text"][0]
+    ctor_start_va, _ = sections[".ctor"]
+    init_start_va, init_end_va = sections[".init"]
+    if init_end_va <= init_start_va:
+        return False
+    ctor_fo = ctor_start_va - base_va
+    if ctor_fo < 0 or ctor_fo + 4 > len(data):
+        return False
+    val = struct.unpack_from("<I", data, ctor_fo)[0]
+    return init_start_va <= val < init_end_va
+
+
+def _layout_reconstruct(
+    data: bytes | bytearray,
+    tu_sections: list[MapTUSection],
+    orig_sections: dict[str, tuple[int, int]],
+) -> tuple[bytearray, int]:
+    """Build an orig-shape bytearray by copying each TU section from
+    its built file offset to its orig file offset.
+
+    The output is sized to the orig binary length (`.text` start →
+    `.data` end, per `delinks.txt`). Bytes not covered by any TU
+    section default to zero — those positions hold inter-TU
+    alignment padding in both the built and orig binaries (mwldarm
+    zero-fills the gaps), so the zero default reproduces orig
+    content there.
+
+    Returns `(output, tus_copied)`.
+    """
+    base_va = orig_sections[".text"][0]
+    data_end_va = orig_sections[".data"][1]
+    orig_size = data_end_va - base_va
+    output = bytearray(orig_size)
+    tus_copied = 0
+    for tu in tu_sections:
+        built_fo = tu.built_start_va - base_va
+        orig_fo = tu.orig_start_va - base_va
+        size = tu.size
+        if built_fo < 0 or built_fo + size > len(data):
+            raise PatchError(
+                f"TU {tu.tu_file} ({tu.section}) built range "
+                f"[{tu.built_start_va:08x}, {tu.built_end_va:08x}) "
+                f"out of bounds for input ({len(data):#x} bytes)"
+            )
+        if orig_fo < 0 or orig_fo + size > orig_size:
+            raise PatchError(
+                f"TU {tu.tu_file} ({tu.section}) orig range "
+                f"[{tu.orig_start_va:08x}, {tu.orig_end_va:08x}) "
+                f"out of bounds for orig output "
+                f"({orig_size:#x} bytes)"
+            )
+        output[orig_fo:orig_fo + size] = data[built_fo:built_fo + size]
+        tus_copied += 1
+    return output, tus_copied
+
+
 _RELOC_RE = re.compile(
     r"from:0x([0-9a-f]+)\s+kind:(\w+)\s+to:0x([0-9a-f]+)"
 )
@@ -758,14 +1054,55 @@ def patch_ov004(
     data: bytes | bytearray,
     relocs: list[tuple[int, str, int]],
     sections: dict[str, tuple[int, int]],
+    *,
+    map_text: str | None = None,
 ) -> tuple[bytearray, dict[str, int]]:
     """Apply the full Phase-3 patch to `data`. Returns
     (patched_bytes, stats) where `stats` reports each step's
-    change count. Idempotent: if `data` is already patched (no
-    veneers present), returns unchanged.
+    change count. Idempotent: re-running on already-patched bytes
+    is a no-op aside from harmless load-rewrite / BL-re-encode
+    short-circuits.
 
     `sections` is the parsed delinks.txt section map; must include
-    `.text`, `.ctor`, `.init`."""
+    `.text`, `.ctor`, `.init`, `.data`.
+
+    Brief 180: pipeline routing
+    ---------------------------
+
+    The `map_text` argument is the contents of `arm9.o.xMAP` (the
+    linker map mwldarm emits beside `arm9.o`). Routing rule:
+
+      1. **Pool present in input** (`VENEER_PREFIX` matches) → the
+         brief 134/142/146/164/168 splice path runs. The map is
+         NOT consulted: at n > 0 the map's post-pool TUs report a
+         `+n × 12`-byte shift that would trip
+         `MAX_SHIFT_BYTES`, and the splice path already handles
+         pool removal + `.ctor`-pad recovery via its own byte-
+         level reasoning. Brief 168's n=2 SHA1 PASS relies on
+         this.
+
+      2. **No pool + map shows cascade** (any TU `shift != 0`) →
+         layout-reconstruction path. A fresh orig-shape bytearray
+         is built by copying each TU section's bytes from the
+         input's built file offset to the orig file offset. This
+         closes the multi-segment `.rodata` cascade that brief
+         179 bisected at the `data_ov004_021ded69` Variant A
+         claim (`docs/research/ov004-odd-aligned-layout-cascade.md`).
+         `_is_orig_shape` guards against the rom_config-pass
+         second invocation re-running reconstruction over the
+         already-orig binary.
+
+      3. **No pool + no cascade (or no map)** → run load rewrites
+         + BL re-encoding unconditionally on the input. Brief
+         180 piece 1: those passes still need to close the 17-
+         byte `.text` (15) + `.data` (2) residue brief 179
+         documented at n=0, even when no pool exists.
+
+    Pre-brief-180, `_apply_load_rewrites` and `_reencode_arm_bls`
+    ran only on the splice path with `n > 0`. They now run on
+    every routing outcome — short-circuits make them no-ops when
+    the bytes are already correct, so the idempotence contract
+    is preserved on the rom_config re-invocation."""
 
     base_va = sections[".text"][0]
     ctor_start_va, ctor_end_va = sections[".ctor"]
@@ -776,17 +1113,101 @@ def patch_ov004(
     # correct. `sections[".init"]` is still asserted present
     # below as a structural sanity bound on the section map.
 
-    # Quick "already patched" check — no veneer pattern in the
-    # binary means we either never had veneers or already spliced.
-    if data.find(VENEER_PREFIX) < 0:
-        return bytearray(data), {
+    # Brief 180 routing rule
+    # ----------------------
+    #
+    # 1. Pool present in input → use the brief 134/142/146/164/168
+    #    splice path. The map MUST NOT be consulted in this branch:
+    #    at n > 0 the map's post-pool TUs report a `+n × 12` shift
+    #    that exceeds `MAX_SHIFT_BYTES`, and the splice path
+    #    already handles pool removal + `.ctor`-pad recovery via
+    #    its own byte-level reasoning. Brief 168's n=2 SHA1 PASS
+    #    relies on this.
+    #
+    # 2. No pool + map shows cascade (any TU `shift != 0`) →
+    #    layout-reconstruction path (brief 180 proper). This is
+    #    the n=0 + odd-aligned-claim case brief 179 bisected.
+    #
+    # 3. No pool + no cascade (or no map) → input is in orig shape
+    #    (the second patcher pass in the `rom_config` rule, or a
+    #    callsite with no map at all). Run load rewrites + BL
+    #    re-encoding unconditionally per brief 180 piece 1 — those
+    #    pass short-circuit when bytes are already correct, so
+    #    idempotence is preserved.
+    pool_present = data.find(VENEER_PREFIX) >= 0
+
+    if not pool_present:
+        tu_sections: list[MapTUSection] = []
+        if map_text is not None:
+            tu_sections = parse_link_map_ov004(map_text)
+        layout_cascade = any(tu.shift != 0 for tu in tu_sections)
+        if layout_cascade:
+            # Brief 180 idempotence guard for the layout-
+            # reconstruction path. A second invocation over the
+            # already-reconstructed `.bin` would corrupt output
+            # (the map still reports pre-patch cascade shifts but
+            # the bytes are already at orig positions).
+            if _is_orig_shape(data, sections):
+                output = bytearray(data)
+                load_rewrites = _apply_load_rewrites(
+                    output, relocs, base_va,
+                )
+                bl_reencodes = _reencode_arm_bls(
+                    output, relocs, base_va,
+                )
+                return output, {
+                    "veneers_spliced": 0,
+                    "ctor_pad_fixed": 0,
+                    "ctor_pad_net": 0,
+                    "load_rewrites": load_rewrites,
+                    "bl_reencodes": bl_reencodes,
+                    "already_patched": 1,
+                    "layout_reconstructed": 0,
+                    "tus_copied": 0,
+                }
+            output, tus_copied = _layout_reconstruct(
+                data, tu_sections, sections,
+            )
+            # Apply load rewrites + BL re-encoding on the
+            # reconstructed output. relocs.txt VAs are orig VAs;
+            # the output now has orig layout, so `from_va -
+            # base_va` indexes correctly.
+            load_rewrites = _apply_load_rewrites(
+                output, relocs, base_va,
+            )
+            bl_reencodes = _reencode_arm_bls(
+                output, relocs, base_va,
+            )
+            return output, {
+                "veneers_spliced": 0,
+                "ctor_pad_fixed": 0,
+                "ctor_pad_net": 0,
+                "load_rewrites": load_rewrites,
+                "bl_reencodes": bl_reencodes,
+                "already_patched": 0,
+                "layout_reconstructed": 1,
+                "tus_copied": tus_copied,
+            }
+        # No pool, no cascade. Either the input is already
+        # orig-shape (rom_config-pass second invocation) or a
+        # synthetic / callsite without a map. Brief 180 piece 1:
+        # run load rewrites + BL re-encoding unconditionally so
+        # the n=0 17-byte `.text` + `.data` residue brief 179
+        # documented gets closed even in this branch.
+        output = bytearray(data)
+        load_rewrites = _apply_load_rewrites(output, relocs, base_va)
+        bl_reencodes = _reencode_arm_bls(output, relocs, base_va)
+        return output, {
             "veneers_spliced": 0,
             "ctor_pad_fixed": 0,
             "ctor_pad_net": 0,
-            "load_rewrites": 0,
-            "bl_reencodes": 0,
+            "load_rewrites": load_rewrites,
+            "bl_reencodes": bl_reencodes,
             "already_patched": 1,
+            "layout_reconstructed": 0,
+            "tus_copied": 0,
         }
+    # Pool present — drop through to the existing splice path.
 
     pool_start, veneers = _scan_veneer_pool(data)
     # Brief 142: splice length + size validation derive from the
@@ -863,6 +1284,8 @@ def patch_ov004(
         "load_rewrites": load_rewrites,
         "bl_reencodes": bl_reencodes,
         "already_patched": 0,
+        "layout_reconstructed": 0,
+        "tus_copied": 0,
     }
 
 
@@ -949,6 +1372,19 @@ def main() -> int:
              "rewritten to match the post-patch binary (needed for "
              "`dsd rom build` to pack ov004 correctly into the ROM).",
     )
+    ap.add_argument(
+        "--map", type=Path, default=None,
+        help="Optional: path to mwldarm's arm9.o.xMAP. Brief 180 "
+             "layout-reconstruction input. When provided, the "
+             "patcher inspects per-TU section shifts in `.ov004` "
+             "and — if any TU is shifted vs orig — copies each "
+             "TU section's bytes from built file offset to orig "
+             "file offset. Used to close the multi-segment "
+             "`.rodata` layout cascade brief 179 bisected at the "
+             "data_ov004_021ded69 Variant A claim. Without the "
+             "map, the patcher falls back to the brief 134/142/"
+             "146/164/168 splice path.",
+    )
     args = ap.parse_args()
 
     try:
@@ -967,7 +1403,10 @@ def main() -> int:
         print(f"error: read {args.delinks}: {e}", file=sys.stderr)
         return 1
 
-    required = (".text", ".ctor", ".init")
+    # Brief 180: .data is required too, alongside the historical
+    # .text/.ctor/.init trio — `_layout_reconstruct` derives the
+    # output binary size from `.text` start → `.data` end.
+    required = (".text", ".ctor", ".init", ".data")
     missing = [s for s in required if s not in sections]
     if missing:
         print(
@@ -976,6 +1415,16 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+
+    # Brief 180: optional --map argument. When absent, patcher
+    # falls back to the brief 134/142/146/164/168 splice path.
+    map_text: str | None = None
+    if args.map is not None:
+        try:
+            map_text = args.map.read_text(encoding="utf-8")
+        except OSError as e:
+            print(f"error: read {args.map}: {e}", file=sys.stderr)
+            return 1
 
     # Compute YAML metadata from sections.
     ctor_start_va, ctor_end_va = sections[".ctor"]
@@ -987,7 +1436,9 @@ def main() -> int:
     yaml_ctor_end = ctor_end_va + 4
 
     try:
-        patched, stats = patch_ov004(data, relocs, sections)
+        patched, stats = patch_ov004(
+            data, relocs, sections, map_text=map_text,
+        )
     except PatchError as e:
         print(f"error: {args.binary}: {e}", file=sys.stderr)
         return 1
@@ -1014,15 +1465,22 @@ def main() -> int:
     # source-claim wave that drops the veneer count to n=2 or n=7
     # would write the wrong `code_size` into arm9_overlays.yaml
     # and break SHA1 at the ROM-packaging step.
-    expected_output_size = expected_output_size_for(
-        data,
-        already_patched=bool(stats["already_patched"]),
-        veneer_count=stats["veneers_spliced"],
-        ctor_pad_net=(
-            stats["ctor_pad_net"]
-            if not stats["already_patched"] else None
-        ),
-    )
+    if stats.get("layout_reconstructed"):
+        # Brief 180: the reconstructed output is already sized to
+        # the orig binary (`.text` start → `.data` end). The
+        # n-inference + ctor-pad math doesn't apply on this path —
+        # use the reconstructed length directly.
+        expected_output_size = len(patched)
+    else:
+        expected_output_size = expected_output_size_for(
+            data,
+            already_patched=bool(stats["already_patched"]),
+            veneer_count=stats["veneers_spliced"],
+            ctor_pad_net=(
+                stats["ctor_pad_net"]
+                if not stats["already_patched"] else None
+            ),
+        )
 
     def _do_yaml_patch() -> bool:
         if args.overlays_yaml is None:
@@ -1042,10 +1500,31 @@ def main() -> int:
             )
             return False
 
-    if stats["already_patched"]:
-        # .bin already patched; still try to keep the overlays
-        # YAML in sync (idempotent).
-        if _do_yaml_patch():
+    # Brief 180: even on the "already patched" path, load rewrites
+    # / BL re-encodes may have changed bytes (run unconditionally
+    # per piece 1). Write the .bin back whenever any work was done.
+    # On the steady-state rom_config re-invocation against the
+    # already-patched .bin, rewrites short-circuit (the bytes are
+    # already correct) so this stays a no-op.
+    bin_changed = (
+        stats["veneers_spliced"] > 0
+        or stats.get("layout_reconstructed", 0) > 0
+        or stats["load_rewrites"] > 0
+        or stats["bl_reencodes"] > 0
+    )
+    if bin_changed:
+        try:
+            args.binary.write_bytes(bytes(patched))
+        except OSError as e:
+            print(f"error: write {args.binary}: {e}", file=sys.stderr)
+            return 1
+
+    yaml_changed = _do_yaml_patch()
+
+    if not bin_changed:
+        # `.bin` already in final shape (idempotent re-run). If we
+        # still patched the YAML, log that; otherwise stay silent.
+        if yaml_changed:
             print(
                 f"patched {args.overlays_yaml}: ov004 code_size + "
                 f"ctor_start + ctor_end rewritten to orig values",
@@ -1053,22 +1532,23 @@ def main() -> int:
             )
         return 0
 
-    try:
-        args.binary.write_bytes(bytes(patched))
-    except OSError as e:
-        print(f"error: write {args.binary}: {e}", file=sys.stderr)
-        return 1
-
-    yaml_changed = _do_yaml_patch()
-
     pool_bytes = stats["veneers_spliced"] * VENEER_SIZE
-    msg = (
-        f"patched {args.binary}: "
-        f"spliced {stats['veneers_spliced']} veneers "
-        f"({pool_bytes} bytes), "
-        f"rewrote {stats['load_rewrites']} load literals, "
-        f"re-encoded {stats['bl_reencodes']} ARM BLs"
-    )
+    if stats.get("layout_reconstructed"):
+        # Brief 180: report TU-copy count + rewrite counts.
+        msg = (
+            f"patched {args.binary}: layout-reconstructed "
+            f"{stats['tus_copied']} TU sections, "
+            f"rewrote {stats['load_rewrites']} load literals, "
+            f"re-encoded {stats['bl_reencodes']} ARM BLs"
+        )
+    else:
+        msg = (
+            f"patched {args.binary}: "
+            f"spliced {stats['veneers_spliced']} veneers "
+            f"({pool_bytes} bytes), "
+            f"rewrote {stats['load_rewrites']} load literals, "
+            f"re-encoded {stats['bl_reencodes']} ARM BLs"
+        )
     if yaml_changed:
         msg += (
             f"; also patched {args.overlays_yaml} "

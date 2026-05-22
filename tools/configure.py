@@ -601,6 +601,15 @@ def main():
         # falsification → Phase 3 these tools).
         patch_ov004 = "tools/patch_ov004_veneers.py"
         patch_literals = "tools/patch_module_literals.py"
+        # Brief 180: pass mwldarm's `arm9.o.xMAP` as a new patcher
+        # input. The map is auto-emitted beside `arm9.o` because
+        # `LD_FLAGS` includes `-map closure,unused`. The patcher
+        # uses the per-TU section bounds in the `.ov004` block to
+        # close the multi-segment `.rodata` layout cascade brief
+        # 179 bisected at the `data_ov004_021ded69` Variant A
+        # claim (`docs/research/ov004-odd-aligned-layout-cascade.md`).
+        # Falls back to the brief 134/142/146/164/168 splice path
+        # when the map shows no cascade.
         n.rule(
             name="mwld",
             command=_wrap_chain_for_windows(
@@ -610,6 +619,7 @@ def main():
                 f' --binary $ov004_bin'
                 f' --relocs $ov004_relocs'
                 f' --delinks $ov004_delinks'
+                f' --map $arm9_map'
                 f' && {PYTHON} {patch_literals}'
                 f' --binary $main_bin'
                 f' --relocs $main_relocs'
@@ -637,6 +647,7 @@ def main():
                 f" --binary $ov004_bin"
                 f" --relocs $ov004_relocs"
                 f" --delinks $ov004_delinks"
+                f" --map $arm9_map"
                 f" --overlays-yaml $overlays_yaml"
             ),
         )
@@ -836,6 +847,12 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     )
     main_bin = str(project.game_build / "build" / "arm9.bin")
     main_relocs = str(project.game_config / "arm9" / "relocs.txt")
+    # Brief 180: mwldarm emits `arm9.o.xMAP` beside `arm9.o` (driven
+    # by `-map closure,unused` in `LD_FLAGS`). The map is the truth
+    # source for `patch_ov004_veneers.py`'s layout-reconstruction
+    # path — closes the multi-segment `.rodata` cascade brief 179
+    # bisected at the `data_ov004_021ded69` Variant A claim.
+    arm9_map = f"{elf_file}.xMAP"
     n.build(
         inputs=project.source_object_files() + [lcf_file, objects_file, delink_file],
         implicit=[
@@ -855,6 +872,7 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
             "ov004_bin": ov004_bin,
             "ov004_relocs": ov004_relocs,
             "ov004_delinks": ov004_delinks,
+            "arm9_map": arm9_map,
             "main_bin": main_bin,
             "main_relocs": main_relocs,
         },
@@ -875,6 +893,7 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
             "tools/patch_ov004_veneers.py",
             ov004_relocs,
             ov004_delinks,
+            arm9_map,
         ],
         rule="rom_config",
         outputs=rom_config_file,
@@ -883,6 +902,7 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
             "ov004_bin": ov004_bin,
             "ov004_relocs": ov004_relocs,
             "ov004_delinks": ov004_delinks,
+            "arm9_map": arm9_map,
             "overlays_yaml": overlays_yaml,
         },
     )
