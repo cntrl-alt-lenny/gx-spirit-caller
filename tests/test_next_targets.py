@@ -26,6 +26,8 @@ sys.path.insert(0, str(_TOOLS))
 
 from analyze_symbols import Symbol, Target  # noqa: E402
 from next_targets import (  # noqa: E402
+    _annotate_reason_with_walls,
+    _load_wall_predictions,
     _module_name_from_delinks_path,
     build_worklist,
     collect_matched_ranges,
@@ -357,6 +359,76 @@ class TestWriteJson(unittest.TestCase):
         self.assertEqual(entry["addr"], "0x00000100")
         self.assertEqual(entry["size"], 0x10)
         self.assertEqual(entry["name"], "x")
+
+
+class TestBrief189WallPredictionAnnotation(unittest.TestCase):
+    """Brief 189 Part 3: `next_targets.py` consumes
+    `predict_walls.py`'s JSON output and appends `[walls: …]` to
+    each target's `reason` when predictions exist. Replaces the
+    pre-brief-140 `[NB: <module> module checksum failing]` note
+    (modules now 27/27 OK across all regions).
+    """
+
+    def test_annotate_no_walls_leaves_reason_unchanged(self):
+        t = _target("main", 0x100, reason="leaf, 16B, no calls")
+        out = _annotate_reason_with_walls(t, {})
+        self.assertEqual(out, "leaf, 16B, no calls")
+
+    def test_annotate_appends_walls_suffix(self):
+        t = _target("main", 0x2094d18, reason="40B, all 1 callees named")
+        predictions = {
+            "main:0x02094d18": [
+                {"id": "StyleA", "cue": "..."},
+            ],
+        }
+        out = _annotate_reason_with_walls(t, predictions)
+        self.assertEqual(
+            out,
+            "40B, all 1 callees named  [walls: StyleA]",
+        )
+
+    def test_annotate_multiple_walls_comma_separated(self):
+        t = _target("itcm", 0x01ff86fc, reason="116B")
+        predictions = {
+            "itcm:0x01ff86fc": [
+                {"id": "StyleA", "cue": "a"},
+                {"id": "C-1", "cue": "b"},
+            ],
+        }
+        out = _annotate_reason_with_walls(t, predictions)
+        self.assertEqual(out, "116B  [walls: StyleA, C-1]")
+
+    def test_annotate_unknown_key_returns_unchanged(self):
+        t = _target("main", 0x999, reason="X")
+        predictions = {
+            "main:0x02094d18": [{"id": "StyleA", "cue": "..."}],
+        }
+        # Target's key doesn't match any prediction → no suffix.
+        out = _annotate_reason_with_walls(t, predictions)
+        self.assertEqual(out, "X")
+
+    def test_load_wall_predictions_missing_file(self):
+        # No build/<region>/analysis/wall_predictions.json → empty
+        # dict. `next_targets.py` degrades gracefully.
+        # The loader looks under ROOT, but we can't reasonably
+        # redirect ROOT here. The function should return {}
+        # for any version whose predictions file is absent.
+        # Use a non-existent region name.
+        out = _load_wall_predictions("nonexistent_region_xyz")
+        self.assertEqual(out, {})
+
+
+class TestBrief189FailingModulesEmpty(unittest.TestCase):
+    """Brief 189 Part 3: `analyze_symbols.FAILING_MODULES` is now
+    empty (brief 140 closed the 24/27 → 27/27 module gap, and
+    brief 187 stripped the stale annotation from the queue doc).
+    Reasons no longer carry `[NB: <module> module checksum
+    failing]` parentheticals.
+    """
+
+    def test_failing_modules_is_empty_set(self):
+        from analyze_symbols import FAILING_MODULES
+        self.assertEqual(FAILING_MODULES, set())
 
 
 if __name__ == "__main__":
