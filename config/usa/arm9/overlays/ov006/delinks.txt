@@ -81,3 +81,11 @@ src/usa/overlay006/data/data_ov006_021ce530.s:
 src/usa/overlay006/data/data_ov006_021ce9e4.s:
     complete
     .data start:0x021ce9e4 end:0x021cea0c
+
+src/usa/overlay006/data/data_ov006_021cdd0c.s:
+    complete
+    .data start:0x021cdd0c end:0x021cdd28
+
+src/usa/overlay006/data/data_ov006_021cea2c.s:
+    complete
+    .data start:0x021cea2c end:0x021cea94

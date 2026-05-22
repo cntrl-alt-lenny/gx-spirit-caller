@@ -3057,7 +3057,7 @@ src/usa/main/data/data_02101e50.c:
 
 src/usa/main/data/data_02102100.c:
     complete
-    .data start:0x02102100 end:0x02102104
+    .data start:0x02102100 end:0x02102108
 
 src/usa/main/data/data_02102108.c:
     complete
@@ -3161,7 +3161,7 @@ src/usa/main/data/data_021029b0.c:
 
 src/usa/main/data/data_021029b4.c:
     complete
-    .data start:0x021029b4 end:0x021029b8
+    .data start:0x021029b4 end:0x021029c0
 
 src/usa/main/data/data_021029c0.c:
     complete

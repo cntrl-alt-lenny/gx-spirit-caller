@@ -8118,7 +8118,7 @@ src/main/data/data_02101f30.c:
 
 src/main/data/data_021021e0.c:
     complete
-    .data start:0x021021e0 end:0x021021e4
+    .data start:0x021021e0 end:0x021021e8
 
 src/main/data/data_021021e8.c:
     complete
@@ -8178,7 +8178,7 @@ src/main/data/data_02102838.c:
 
 src/main/data/data_02102a94.c:
     complete
-    .data start:0x02102a94 end:0x02102a98
+    .data start:0x02102a94 end:0x02102aa0
 
 src/main/data/data_02102aa0.c:
     complete
@@ -8845,3 +8845,7 @@ src/main/data/data_020c7b44.s:
 src/main/data/data_020b6ec4.s:
     complete
     .rodata start:0x020b6ec4 end:0x020be6c4
+
+src/main/data/data_020e0e70.s:
+    complete
+    .data start:0x020e0e70 end:0x020e1090
