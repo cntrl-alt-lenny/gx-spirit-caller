@@ -121,6 +121,21 @@ from analyze_symbols import (  # noqa: E402
     parse_symbols_file,
 )
 
+# Brief 184: brief 177's extent adjuster + brief 125's Pattern 3
+# emitter are the building blocks for the cluster C / D-1 / D-2
+# cross-region subcommands. Per the brief 184 audit (research note
+# `docs/research/chunk-extent-generalisation.md`), the extent
+# adjuster's 3-phase algorithm is already cluster-agnostic — the
+# new subcommands just call it with per-cluster `require_nonzero`
+# rules and route the output to per-cluster emitters.
+#
+# `cross_region_chunk_extent` imports `RegionPaths` + `parse_delinks`
+# back from this module for its own CLI (`cmd_adjust`), so a
+# top-level import here would cycle. Brief 184 keeps that import
+# lazy inside `apply_chunk_candidate` to break the cycle.
+from cluster_c_pattern3_gen import generate_chunk as generate_pattern3_chunk  # noqa: E402
+from analyze_symbols import load_all  # noqa: E402
+
 
 # --------------------------------------------------------------------------- #
 # Region + module path resolution
@@ -587,6 +602,272 @@ def enumerate_b_pointers(ctx: RegionContext) -> list[PointerCandidate]:
 
 
 # --------------------------------------------------------------------------- #
+# Cluster C / D-1 / D-2 candidate enumeration (brief 184)
+# --------------------------------------------------------------------------- #
+#
+# Per the brief 184 research note `docs/research/chunk-extent-
+# generalisation.md`, these three subcommands share a common shape:
+#
+#   1. Enumerate unclaimed candidate symbols in the relevant section
+#      using cluster-specific predicates (string / dispatch-table /
+#      mixed-array).
+#   2. For each candidate, ask `cross_region_chunk_extent.
+#      adjust_chunk_extent` to compute a clean `[start, end)` that
+#      satisfies the 4-aligned + named-boundary constraints
+#      (Phase A / B / C in the brief 177 algorithm). The adjuster is
+#      cluster-agnostic — the only per-cluster knob is
+#      `require_nonzero`, auto-detected from the section name
+#      (`.data` → True, `.rodata` → False).
+#   3. Emit the chunk source through the per-cluster emitter (Pattern
+#      3 `.s` for C and D-2; C-source `void *[]` array for D-1) and
+#      queue the delinks stanza.
+#
+# Brief 184 ships these as enumeration + emission only. Decomper's
+# brief 185+ owns the apply waves that drain the resulting pools.
+
+
+@dataclass
+class ChunkCandidate:
+    """A candidate `[addr, addr + size)` chunk that's a viable input
+    to `adjust_chunk_extent`. The adjuster may extend `[start, end)`
+    via its Phase A / B passes before the chunk emitter runs."""
+
+    addr: int            # target_start
+    size: int            # target_end - target_start (inferred)
+    section: str         # ".rodata" or ".data"
+    shape: str           # "string" / "d1-table" / "d2-array"
+    # D-1 only: per-slot reloc info for the C-source emitter.
+    table_entries: tuple[tuple[str, bool], ...] = ()
+    # (pointee_name, is_thumb) per 4-byte slot, in slot order.
+
+
+def _is_data_named(sym: Symbol) -> bool:
+    """Common filter for `data_` symbols in the dsd convention.
+    Hand-named symbols (e.g. `BuildInfo`) are excluded — they're
+    already decoded by upstream work and don't need cross-region
+    apply."""
+    return (
+        sym.type == "data"
+        and sym.name.startswith("data_")
+        and not sym.name.startswith("_dsd_gap")
+    )
+
+
+def enumerate_c_strings(ctx: RegionContext) -> list[ChunkCandidate]:
+    """Cluster C Pattern 1: single-symbol `.rodata` byte arrays
+    (strings, const tables, etc.) that haven't been claimed yet.
+
+    Filter:
+      - Symbol in `.rodata` section.
+      - Not already claimed in delinks.txt (idempotent).
+      - Size inferred from the next-symbol delta is ≥ 1 byte.
+      - Byte content is NOT all-zero (avoids matching uninitialised
+        ranges that mwcc would emit to `.bss`).
+      - Excludes symbols whose first byte is at a non-4-aligned VA
+        AND whose size is < 4 — those need brief 152 / 155 bundle
+        recipes (out of scope here; bundle work stays in the
+        `b-scalars` / `b-pointers` lane).
+
+    `adjust_chunk_extent` handles the 4-aligned end + named-symbol
+    boundary downstream; this enumeration only proposes target
+    ranges. The adjuster may extend the range to absorb neighbours
+    via its Phase A / B passes.
+    """
+    rodata = ctx.delinks.sections.get(".rodata")
+    if rodata is None:
+        return []
+    ro_lo, ro_hi = rodata
+    sizes = infer_symbol_sizes(ctx.symbols, ctx.delinks.sections)
+    out: list[ChunkCandidate] = []
+    for sym in ctx.symbols:
+        if not _is_data_named(sym):
+            continue
+        if not (ro_lo <= sym.addr < ro_hi):
+            continue
+        if is_addr_claimed(ctx.delinks, ".rodata", sym.addr):
+            continue
+        size = sizes.get(sym.addr, 0)
+        if size < 1:
+            continue
+        # Skip bundle-territory symbols (size < 4 + non-4-aligned
+        # addr). brief 152's recipe owns those — separate lane.
+        if size < 4 and sym.addr % 4 != 0:
+            continue
+        fo = ctx.file_offset_for(sym.addr)
+        if fo is None or fo + size > len(ctx.binary):
+            continue
+        content = ctx.binary[fo:fo + size]
+        if not any(b for b in content):
+            # All-zero `.rodata` is unusual but possible (empty
+            # initialiser tables). Skip rather than risk mwcc
+            # mis-routing to `.bss`. Decomper can hand-claim if
+            # any matter.
+            continue
+        out.append(ChunkCandidate(
+            addr=sym.addr, size=size,
+            section=".rodata", shape="string",
+        ))
+    return out
+
+
+def enumerate_d1_tables(ctx: RegionContext) -> list[ChunkCandidate]:
+    """Cluster D-1: `.data` dispatch / pointer tables.
+
+    Filter:
+      - Symbol in `.data` section.
+      - Not already claimed.
+      - Size inferred ≥ 8 bytes AND 4-aligned (= ≥ 2 pointer slots
+        of 4 bytes each; smaller slots are cluster B's pointer
+        territory).
+      - EVERY 4-byte slot inside `[addr, addr + size)` is a
+        `kind:load` reloc source — the dispatch-table shape per
+        brief 121.
+      - All pointee VAs resolve to known symbols in this region's
+        module index (same-module resolution per brief 148's
+        precedent; cross-module pointees defer to decomper).
+
+    `table_entries` carries `(pointee_name, is_thumb)` per slot in
+    slot order for the C-source emitter.
+    """
+    data = ctx.delinks.sections.get(".data")
+    if data is None:
+        return []
+    da_lo, da_hi = data
+    sizes = infer_symbol_sizes(ctx.symbols, ctx.delinks.sections)
+
+    # Index load relocs by src_addr (slot address) → Reloc.
+    relocs_by_src: dict[int, Reloc] = {}
+    for r in ctx.relocs:
+        if r.kind == "load" and da_lo <= r.src_addr < da_hi:
+            relocs_by_src.setdefault(r.src_addr, r)
+
+    sym_by_addr = {s.addr: s for s in ctx.symbols}
+    out: list[ChunkCandidate] = []
+    for sym in ctx.symbols:
+        if not _is_data_named(sym):
+            continue
+        if not (da_lo <= sym.addr < da_hi):
+            continue
+        if is_addr_claimed(ctx.delinks, ".data", sym.addr):
+            continue
+        size = sizes.get(sym.addr, 0)
+        if size < 8 or size % 4 != 0:
+            continue
+        # Single-slot pointers belong to the b-pointers lane —
+        # skip them here so the recipes don't overlap.
+        if size == 4:
+            continue
+        n_slots = size // 4
+        entries: list[tuple[str, bool]] = []
+        all_slots_have_reloc = True
+        for i in range(n_slots):
+            slot_va = sym.addr + i * 4
+            reloc = relocs_by_src.get(slot_va)
+            if reloc is None:
+                all_slots_have_reloc = False
+                break
+            # Same-module resolution (MVP per b-pointers).
+            if reloc.dest_module != overlay_num_to_module_id(
+                ctx.paths.overlay_num,
+            ):
+                all_slots_have_reloc = False
+                break
+            pointee = sym_by_addr.get(reloc.dest_addr)
+            is_thumb = False
+            if pointee is None:
+                pointee = sym_by_addr.get(reloc.dest_addr & ~1)
+                if pointee is not None and (reloc.dest_addr & 1):
+                    is_thumb = True
+            if pointee is None:
+                all_slots_have_reloc = False
+                break
+            entries.append((
+                pointee.name,
+                is_thumb or (
+                    pointee.is_function and pointee.mode == "thumb"
+                ),
+            ))
+        if not all_slots_have_reloc:
+            continue
+        out.append(ChunkCandidate(
+            addr=sym.addr, size=size,
+            section=".data", shape="d1-table",
+            table_entries=tuple(entries),
+        ))
+    return out
+
+
+def enumerate_d2_arrays(ctx: RegionContext) -> list[ChunkCandidate]:
+    """Cluster D-2: `.data` mixed byte/short/int arrays without
+    relocs.
+
+    Filter:
+      - Symbol in `.data` section.
+      - Not already claimed.
+      - Size inferred ≥ 8 bytes AND 4-aligned.
+      - NO `kind:load` reloc covers any 4-byte slot inside
+        `[addr, addr + size)` — pure-content arrays, no pointer
+        slots (those are D-1 territory; the b-pointers lane owns
+        single-slot pointers).
+      - Byte content is NOT all-zero.
+
+    Reloc-target resolution timing (research note § 6 clarification):
+    D-2 arrays by definition have NO relocs in scope, so there are
+    no pointer-target dependencies to resolve. The Pattern 3
+    emitter (`cluster_c_pattern3_gen.generate_chunk`) inspects each
+    4-byte slot and if it happens to MATCH a known symbol VA from
+    `modules.values()` it emits `.word <name>` + a corresponding
+    `.extern <name>` declaration (brief 144). When no such match
+    exists the slot lands as raw `.byte` / `.word` literal bytes.
+    Either way the resolution happens AT EMIT TIME inside
+    `generate_chunk` (not at apply time in this enumerator), and
+    relies on the EUR-or-region symbol table that `load_all` reads
+    from `config/<region>/`. No additional plumbing required —
+    same path D-3 used in brief 178.
+    """
+    data = ctx.delinks.sections.get(".data")
+    if data is None:
+        return []
+    da_lo, da_hi = data
+    sizes = infer_symbol_sizes(ctx.symbols, ctx.delinks.sections)
+
+    # Pre-index slot addresses that have any load reloc — any
+    # match means the symbol is D-1 territory.
+    reloc_src_addrs: set[int] = {
+        r.src_addr for r in ctx.relocs
+        if r.kind == "load" and da_lo <= r.src_addr < da_hi
+    }
+
+    out: list[ChunkCandidate] = []
+    for sym in ctx.symbols:
+        if not _is_data_named(sym):
+            continue
+        if not (da_lo <= sym.addr < da_hi):
+            continue
+        if is_addr_claimed(ctx.delinks, ".data", sym.addr):
+            continue
+        size = sizes.get(sym.addr, 0)
+        if size < 8 or size % 4 != 0:
+            continue
+        # Skip any symbol whose slots overlap a load reloc — D-1.
+        if any(
+            (sym.addr + i * 4) in reloc_src_addrs
+            for i in range(size // 4)
+        ):
+            continue
+        fo = ctx.file_offset_for(sym.addr)
+        if fo is None or fo + size > len(ctx.binary):
+            continue
+        if not any(b for b in ctx.binary[fo:fo + size]):
+            continue
+        out.append(ChunkCandidate(
+            addr=sym.addr, size=size,
+            section=".data", shape="d2-array",
+        ))
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Recipe emission
 # --------------------------------------------------------------------------- #
 
@@ -631,6 +912,207 @@ def render_b_pointer(c: PointerCandidate) -> str:
     else:
         body += f"void *{c.name} = &{c.pointee_name};\n"
     return body
+
+
+def render_d1_table(
+    *,
+    anchor_name: str,
+    entries: tuple[tuple[str, bool], ...],
+) -> str:
+    """Brief 184 cluster D-1 dispatch-table emitter. Produces a C
+    source that declares `extern char <pointee>;` for every unique
+    target plus a `void *<anchor>[N] = { &t0, &t1, ... }` array.
+    Thumb targets use the `+1` convention (brief 121).
+
+    Pure C output — mwldarm emits the load relocs at link time the
+    same way it does for the b-pointers single-slot recipe.
+    """
+    if not entries:
+        raise ValueError("d1-table must have at least one entry")
+    # Deduplicate externs in first-occurrence order so the diff is
+    # stable across re-runs.
+    seen: set[str] = set()
+    extern_decls: list[str] = []
+    for pointee_name, _ in entries:
+        if pointee_name in seen:
+            continue
+        seen.add(pointee_name)
+        extern_decls.append(f"extern char {pointee_name};")
+
+    body_lines = [
+        "/* Brief 184 cross-region cluster D-1 dispatch table.",
+        " *",
+        " * Generated by tools/cross_region_cluster_apply.py from the",
+        " * region's own symbols.txt + relocs.txt. Each 4-byte slot",
+        " * carries a `kind:load` reloc whose `to:` VA resolves to",
+        " * one of the externs declared below; mwldarm emits the",
+        " * actual address bytes at link time. Recipe per brief 124",
+        " * cluster D-1 + brief 148's thumb `+1` convention.",
+        " */",
+        "",
+    ]
+    body_lines.extend(extern_decls)
+    body_lines.append("")
+    body_lines.append(f"void *{anchor_name}[{len(entries)}] = {{")
+    for pointee_name, is_thumb in entries:
+        if is_thumb:
+            body_lines.append(
+                f"    (void *) ((char *) &{pointee_name} + 1),"
+            )
+        else:
+            body_lines.append(f"    &{pointee_name},")
+    body_lines.append("};")
+    return "\n".join(body_lines) + "\n"
+
+
+# --------------------------------------------------------------------------- #
+# Chunk-emission glue — brief 184 routes c-strings + d2-arrays
+# through brief 125's Pattern 3 generator, while d1-tables uses the
+# bespoke C-source emitter above (cleaner for pointer arrays than
+# the `.s` per-byte form).
+# --------------------------------------------------------------------------- #
+
+
+@dataclass
+class ChunkApplyResult:
+    """One per-candidate outcome — either an emitted claim or a
+    'needs hand-tuning' skip with the offending error.
+
+    `adjusted` is typed loosely as `object | None` to avoid a top-
+    level import of `cross_region_chunk_extent.AdjustedExtent`
+    (which would cycle back to this module's `RegionPaths`); the
+    field carries an `AdjustedExtent` at runtime when set.
+    """
+
+    candidate: ChunkCandidate
+    adjusted: object | None
+    status: str  # "applied" / "needs_hand_tuning" / "skipped_overlap"
+    error: str | None = None
+    output_path: Path | None = None
+    delinks_stanza: str | None = None
+
+
+def _asm_claim_file_path(ctx: RegionContext, addr: int) -> Path:
+    """`.s` variant of `claim_file_path`. Pattern 3 chunks use `.s`
+    so the assembler can emit the right `.byte` / `.ascii` / `.word`
+    mix per brief 125's algorithm."""
+    if ctx.paths.overlay_num is None:
+        name = f"data_{addr:08x}.s"
+    else:
+        name = f"data_ov{ctx.paths.overlay_num:03d}_{addr:08x}.s"
+    return ctx.paths.src_data_dir / name
+
+
+def _src_relpath_asm(ctx: RegionContext, addr: int) -> str:
+    return str(_asm_claim_file_path(ctx, addr).relative_to(ROOT))
+
+
+def apply_chunk_candidate(
+    ctx: RegionContext,
+    cand: ChunkCandidate,
+    *,
+    dry_run: bool,
+    applied_ranges: list[tuple[str, int, int]] | None = None,
+    modules: dict | None = None,
+) -> ChunkApplyResult:
+    """Run extent adjuster → emitter → file writer for one
+    candidate. Returns the per-candidate result so the caller can
+    aggregate JSON / stderr reports.
+
+    `applied_ranges` is an optional list of `(section, start, end)`
+    tuples for chunks already applied earlier in this same run. The
+    adjuster might extend a candidate's range to overlap an
+    earlier chunk; we detect that here and skip the second one
+    rather than emit a delinks conflict. (`is_addr_claimed` only
+    sees delinks.txt as-loaded, not in-flight applies.)
+
+    `modules` is the optional pre-loaded `load_all` symbol graph.
+    Passed through to `generate_pattern3_chunk` so multi-candidate
+    runs avoid re-parsing the region's full config tree per chunk.
+    """
+    # Lazy import — breaks the cycle with `cross_region_chunk_extent`
+    # (which imports `RegionPaths` + `parse_delinks` from this
+    # module for its own CLI).
+    from cross_region_chunk_extent import (  # noqa: PLC0415
+        ChunkExtentError,
+        adjust_chunk_extent,
+    )
+    target_end = cand.addr + cand.size
+    try:
+        adj = adjust_chunk_extent(
+            cand.addr, target_end,
+            ctx.symbols, ctx.delinks.sections,
+            ctx.binary,
+            min(s for s, _ in ctx.delinks.sections.values()),
+            section_name=cand.section,
+        )
+    except ChunkExtentError as e:
+        return ChunkApplyResult(
+            candidate=cand, adjusted=None,
+            status="needs_hand_tuning", error=str(e),
+        )
+
+    # In-flight overlap check.
+    if applied_ranges is not None:
+        for sec, lo, hi in applied_ranges:
+            if sec != adj.section:
+                continue
+            if adj.start < hi and adj.end > lo:
+                return ChunkApplyResult(
+                    candidate=cand, adjusted=adj,
+                    status="skipped_overlap",
+                    error=(
+                        f"adjusted range overlaps in-flight "
+                        f"chunk [{lo:#x}, {hi:#x})"
+                    ),
+                )
+
+    if cand.shape == "d1-table":
+        body = render_d1_table(
+            anchor_name=f"data_{adj.start:08x}" if ctx.paths.overlay_num is None
+            else f"data_ov{ctx.paths.overlay_num:03d}_{adj.start:08x}",
+            entries=cand.table_entries,
+        )
+        file_path, stanza = write_claim(
+            ctx, adj.start, body, adj.section,
+            adj.size_bytes, dry_run=dry_run,
+        )
+    else:
+        # c-strings / d2-arrays — route through Pattern 3 generator
+        # (the universal `.s` emitter from brief 125 + brief 144's
+        # extern handling + brief 166's `kind:label(*)` raw-hex
+        # fallback). Section flag matches the candidate (`.rodata`
+        # for cluster C, `.data` for D-2).
+        chunk = generate_pattern3_chunk(
+            version=ctx.paths.region,
+            module=overlay_num_to_module_id(ctx.paths.overlay_num),
+            start=adj.start,
+            end=adj.end,
+            section=adj.section.lstrip("."),
+            modules=modules,
+            bytes_source=ctx.binary,
+        )
+        # Override the generator's hard-coded EUR-shape output path
+        # with the region's per-region path.
+        file_path = _asm_claim_file_path(ctx, adj.start)
+        rel_asm = _src_relpath_asm(ctx, adj.start)
+        if not dry_run:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(chunk.asm_source, encoding="utf-8")
+        stanza = (
+            f"\n{rel_asm}:\n"
+            f"    complete\n"
+            f"    {adj.section} start:0x{adj.start:08x} "
+            f"end:0x{adj.end:08x}\n"
+        )
+
+    if applied_ranges is not None:
+        applied_ranges.append((adj.section, adj.start, adj.end))
+
+    return ChunkApplyResult(
+        candidate=cand, adjusted=adj, status="applied",
+        output_path=file_path, delinks_stanza=stanza,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -788,13 +1270,163 @@ def cmd_d3_chunks(args: argparse.Namespace) -> int:
     return 2
 
 
+# --------------------------------------------------------------------------- #
+# Brief 184: cluster C / D-1 / D-2 subcommand handlers
+# --------------------------------------------------------------------------- #
+#
+# Each cmd_* function follows the same shape as `cmd_b_scalars`
+# (load context → enumerate → emit per candidate → append delinks
+# stanzas). The only per-cluster knob is the enumerator + the
+# emitter route inside `apply_chunk_candidate`. Per the brief 184
+# research note, no changes to `cross_region_chunk_extent.py` are
+# needed — its 3-phase algorithm is already cluster-agnostic.
+
+
+def _run_chunk_subcommand(
+    args: argparse.Namespace,
+    *,
+    label: str,
+    enumerate_fn,
+) -> int:
+    """Shared body for c-strings / d1-tables / d2-tables.
+
+    `enumerate_fn(ctx) -> list[ChunkCandidate]` is the per-cluster
+    enumerator; everything else is identical across the three
+    subcommands.
+    """
+    ctx = RegionContext.load(args.region, args.module)
+    cands = enumerate_fn(ctx)
+    if args.json:
+        # JSON preview — list candidates, no apply.
+        import json
+        print(json.dumps([
+            {
+                "addr": f"0x{c.addr:08x}",
+                "size_bytes": c.size,
+                "section": c.section,
+                "shape": c.shape,
+                "table_entries": [
+                    {"pointee": p, "is_thumb": t}
+                    for p, t in c.table_entries
+                ] if c.table_entries else [],
+            }
+            for c in cands
+        ], indent=2))
+        return 0
+    if not cands:
+        print(
+            f"{args.region}/{args.module}: 0 {label} candidates",
+            file=sys.stderr,
+        )
+        return 0
+
+    applied_ranges: list[tuple[str, int, int]] = []
+    stanzas: list[str] = []
+    applied = 0
+    skipped: list[ChunkApplyResult] = []
+    # Pre-load the region's full config tree once. Pattern 3
+    # generator's cross-symbol resolution needs this for
+    # `.word <name>` + `.extern` emission (brief 144). Passing
+    # the cached dict avoids re-parsing per candidate.
+    modules = load_all(ROOT / "config" / args.region)
+    for c in cands:
+        result = apply_chunk_candidate(
+            ctx, c,
+            dry_run=args.dry_run,
+            applied_ranges=applied_ranges,
+            modules=modules,
+        )
+        if result.status == "applied":
+            assert result.delinks_stanza is not None
+            stanzas.append(result.delinks_stanza)
+            applied += 1
+        else:
+            skipped.append(result)
+    if not args.dry_run:
+        append_delinks_stanzas(ctx.paths.delinks_txt, stanzas)
+    prefix = "(dry-run) " if args.dry_run else ""
+    print(
+        f"{args.region}/{args.module}: "
+        f"{prefix}emitted {applied} {label} claim(s) "
+        f"({len(skipped)} skipped — needs hand-tuning or "
+        f"in-flight overlap)",
+        file=sys.stderr,
+    )
+    if skipped:
+        for r in skipped[:5]:
+            print(
+                f"  skip @ 0x{r.candidate.addr:08x} "
+                f"size={r.candidate.size}: {r.status} — {r.error}",
+                file=sys.stderr,
+            )
+        if len(skipped) > 5:
+            print(
+                f"  ... and {len(skipped) - 5} more skips",
+                file=sys.stderr,
+            )
+    return 0
+
+
+def cmd_c_strings(args: argparse.Namespace) -> int:
+    """Cluster C `.rodata` strings + byte-array constants.
+    Emits Pattern 3 `.s` chunks via brief 125's generator.
+
+    Per the brief 184 research note § 3.1: cluster C content is
+    region-specific (USA strings differ from JPN strings differ
+    from EUR per brief 122), so this command reads the REGION's
+    own `.bin` for bytes — no EUR-to-region porting.
+    """
+    return _run_chunk_subcommand(
+        args, label="cluster C string", enumerate_fn=enumerate_c_strings,
+    )
+
+
+def cmd_d1_tables(args: argparse.Namespace) -> int:
+    """Cluster D-1 `.data` dispatch / pointer tables.
+    Emits a C-source `void *<anchor>[N] = { &t0, &t1, ... }` array
+    plus `extern char <t>;` declarations per pointee (brief 124 +
+    brief 148 thumb `+1` convention).
+
+    Same-module pointee resolution only (MVP, mirrors b-pointers);
+    cross-module pointees defer to decomper hand-claim.
+    """
+    return _run_chunk_subcommand(
+        args, label="cluster D-1 dispatch-table",
+        enumerate_fn=enumerate_d1_tables,
+    )
+
+
+def cmd_d2_tables(args: argparse.Namespace) -> int:
+    """Cluster D-2 `.data` mixed byte / short / int arrays without
+    relocs. Emits Pattern 3 `.s` chunks via brief 125's generator
+    with `.data` section.
+
+    Per the brief 184 research note § 3.3: reloc-target resolution
+    happens AT EMIT TIME inside `generate_chunk` (not at apply
+    time in the enumerator). D-2 arrays by definition have no
+    relocs in scope, so the generator's slot-VA → known-symbol
+    matching emits `.word <name>` + `.extern` only when a content
+    word happens to coincide with a symbol VA. No additional
+    plumbing needed — same path D-3 (brief 178) used.
+    """
+    return _run_chunk_subcommand(
+        args, label="cluster D-2 array",
+        enumerate_fn=enumerate_d2_arrays,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="cross_region_cluster_apply.py",
         description=(
-            "Per-region claim regenerator for cluster B + D-3 "
-            "cross-region application (brief 170 — generalises "
-            "brief 169's cluster A approach)."
+            "Per-region claim regenerator for cluster B / C / D-1 "
+            "/ D-2 / D-3 cross-region application. Brief 170 shipped "
+            "cluster B (`b-scalars` / `b-pointers`). Brief 184 added "
+            "cluster C / D-1 / D-2 (`c-strings` / `d1-tables` / "
+            "`d2-tables`) via brief 177's extent adjuster + brief "
+            "125's Pattern 3 generator. D-3 stays a stub here; "
+            "brief 178 drove D-3 chunks via `cluster_c_pattern3_gen.py` "
+            "directly."
         ),
     )
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -844,6 +1476,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _common(s)
     s.set_defaults(func=cmd_d3_chunks)
+
+    # Brief 184 subcommands.
+    s = sub.add_parser(
+        "c-strings",
+        help="Enumerate + emit cluster C .rodata strings / "
+             "byte-array constants (brief 184; Pattern 3 .s).",
+    )
+    _common(s)
+    s.set_defaults(func=cmd_c_strings)
+
+    s = sub.add_parser(
+        "d1-tables",
+        help="Enumerate + emit cluster D-1 .data dispatch / "
+             "pointer tables (brief 184; C-source void *[] array).",
+    )
+    _common(s)
+    s.set_defaults(func=cmd_d1_tables)
+
+    s = sub.add_parser(
+        "d2-tables",
+        help="Enumerate + emit cluster D-2 .data mixed byte / "
+             "short / int arrays without relocs (brief 184; "
+             "Pattern 3 .s with `.data` section).",
+    )
+    _common(s)
+    s.set_defaults(func=cmd_d2_tables)
 
     return p
 
