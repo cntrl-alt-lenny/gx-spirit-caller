@@ -8,22 +8,21 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-22 afternoon, post-#617 + #618 merge,
-briefs 178 + 179 queued. Brain on Mac. **🎉 SHA1 FINAL GATE
-PASSES** across all 3 regions (brief 140, PR #558) and
-continues to hold after 19 post-SHA1 rounds. **🎉 Bundle
-generator validated at scale**: brief 176 (decomper) shipped
-32 cross-region cluster B residue claims via brief 174's
-generator — ov006 sub-pool's brief-170 pathology RESOLVED
-via the more conservative bundles. **🎉 Unified
-chunk-extent generator shipped** (brief 177, scaffolder):
-`cross_region_chunk_extent.py` 3-phase algorithm
-generalises brief 174 to multi-symbol Pattern 3 chunks.
-Brief 175's headline failure reproduces + ships as worked
-example. Brief 178 (decomper, queued) scales to full
-cross-region D-3 (~62 region-matches). Brief 179
-(scaffolder, queued) Variant E — patcher 2-byte
-pool-shift handling to close path-2 to n=0.
+**Last updated:** 2026-05-22 evening, post-#620/#621/#622/#623/#624
+merge wave. Brain on Mac. **🎉 SHA1 FINAL GATE PASSES**
+across all 3 regions (brief 140, PR #558) and continues to
+hold after 22 post-SHA1 rounds. **🎉 Cross-region D-3 at
+scale**: brief 178 (decomper, PR #620) shipped **74 cross-
+region D-3 chunks** (247% of ≥30 target) via brief 177's
+unified generator — 80,152 bytes of new region-specific data.
+**🎉 Patcher Variant E shipped** (brief 180, PR #623):
+`patch_ov004_veneers.py` gains map-driven layout
+reconstruction; W7 chain extends 134 → 142 → 146 → 150 →
+162 → 164 → 168 → 180. **Brief 181 cleanup wave** (decomper,
+PR #624) closed cluster B size-1/2 cross-region residue +
+cluster B value=0 EUR deferred + cluster D-3 366 B non-
+aligned residue. Path-2 final wave (n=2 → n=0) **now
+unblocked** by brief 180 — queued as brief 182.
 
 ## The headline — SHA1 PASS achieved (briefs 137 → 140)
 
@@ -63,6 +62,76 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **PR #622 — brain / cloud→scaffolder rename + extended
+  cleanup.** Two-commit PR: initial in-repo rename (agent
+  files, AGENTS.md table, CI labeler, tools docstrings)
+  + extended cleanup commit that drops all forward-facing
+  `cloud` references in `AGENTS.md`, `docs/state.md`,
+  `docs/decomp-workflow.md`, `.claude/agents/scaffolder.md`
+  (History section removed), and `tests/test_generate_research_index.py`
+  fixtures. Preserved (intentional): 5 factual branch-name
+  references to `cloud/patcher-variant-e-2byte-pool-shift`
+  (real git artifact), generic `cloud LLM session` in
+  brain-runs-locally rationale, `iCloud-share` in
+  onboarding. Suite 1904/1904 + EUR SHA1 PASS.
+- **PR #621 — scaffolder / brief 179 Variant E
+  FALSIFIED.** 🔬 1–3 byte veneer-pool shift model
+  disproven via empirical reproduction on EUR
+  `data_ov004_021ded69` Variant A. Actual root cause:
+  multi-segment `.rodata` layout cascade (+0/+1/+2/+4
+  across 4 TU boundaries, absorbed by 16-vs-20 `.ctor`-pad
+  delta). Pure pool-shift detection — even with
+  `MAX_SHIFT_BYTES = 3` — cannot close SHA1. Ships ONLY
+  the research note (`docs/research/ov004-odd-aligned-
+  layout-cascade.md`) + brief 180 reformulation spec; no
+  patcher / source / delinks changes. 3-region SHA1 PASS
+  preserved at n=2.
+- **PR #620 — decomper / brief 178 cross-region D-3 at
+  scale.** 🎉 **74 cross-region D-3 chunks** shipped (37
+  USA + 37 JPN, 247% over ≥30 target). 80,152 bytes of
+  new region-specific data (40,076 per region). Per-
+  region per-module: 18 main + 6 ov002 + 11 ov006 + 1
+  ov007 + 1 ov021. Method: brief 177's
+  `cross_region_chunk_extent.py` for extent adjustment +
+  **recursive split-around-pre-existing-TUs pass** to
+  maximize coverage (13 → 37 per region). 3-region SHA1
+  PASS + 27/27 modules preserved. Brain pushed drift-
+  check regen fix on rebase.
+- **PR #623 — scaffolder / brief 180 patcher Variant E
+  proper.** 🎉 **W7 chain extends to brief 180.** Four
+  pieces: (1) dropped `veneer_count > 0` gate on load-
+  rewrite + ARM-BL re-encode passes; (2) `--map` CLI arg
+  plumbed through `rom_config` rule; (3) map-driven per-
+  TU layout reconstruction (~558 LOC) with
+  `parse_link_map_ov004` + `_layout_reconstruct` (per-TU
+  bounds, not per-symbol — sidesteps the ~21 KB gap-
+  marker stranding); (4) `MAX_SHIFT_BYTES = 4` cap.
+  **Brain caught a routing-order bug** on first verify
+  pass: parser raised on shift > 4 BEFORE the
+  `_is_orig_shape` idempotence guard ran, breaking n=2
+  production. Scaffolder picked Option A (move cap out
+  of parser into `_layout_reconstruct`) and shipped the
+  fix in commit adc44f6 + 4 new regression tests. Suite
+  1930 → 1934. 3-region SHA1 PASS preserved at n=2.
+  Brief 182 (decomper path-2 final wave dropping n=2 →
+  n=0) now unblocked.
+- **PR #624 — decomper / brief 181 cluster B residue +
+  cluster D-3 small-residue cleanup.** Bridge wave while
+  brief 180 was in flight. Three sub-targets in one PR:
+  (1) cluster B size-1/2 + odd-aligned cross-region —
+  3 bundles per region × USA + JPN = 6 ships + ov002
+  bonus; (2) 3 cluster B value=0 EUR deferred (W6-
+  rejected wave-2 rewrite) — 2 main rewrites absorbing
+  3 placeholders + bonus cross-region absorbing 6 more
+  across USA + JPN; (3) cluster D-3 `data_020e0e70`
+  (366 B → 544 B Pattern 3 chunk absorbing
+  `data_020e0fde`). Bytes: EUR 556, USA 148, JPN 148.
+  3-region SHA1 PASS + 27/27 modules preserved.
+  Skipped: `data_ov006_021ceae4` (>1024 B safety cap),
+  `data_ov002_022ccc2e` (odd-aligned, needs brief 180
+  recipe — now unblocked), `data_020c9694` 14.8 KB
+  D-3 mega (separate brief).
 
 - **PR #617 — decomper / brief 176 cluster B residue at
   scale.** ✅ **Brief 174 generator validated at scale.**
@@ -159,39 +228,37 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 **Open PRs: 0** once this brain-PR lands.
 
-**Decomper — one HIGH brief queued (apply brief 177 at scale):**
+**Decomper — brief 182 queued (path-2 final wave, now
+unblocked by brief 180):**
 
-- **Brief 178 (HIGH, NEW)** — `decomper/cross-region-cluster-d3-with-generator`.
-  Apply brief 177's `cross_region_chunk_extent.py` to
-  USA + JPN cluster D-3 — same scope brief 175 falsified
-  mechanically. Brief 177 shipped 3 worked examples;
-  scale to full ~62 region-matches. Target ≥ 30 cross-
-  region D-3 chunks per region.
+- **Brief 182 (HIGH, NEW)** — `decomper/path-2-final-wave-n2-to-n0`.
+  Claim `data_ov004_021ded69` + `data_ov004_021e191c`
+  via brief 173 Variant A (`__attribute__((aligned(1)))`
+  extern + delinks entry). With brief 180's map-driven
+  layout reconstruction now landed, the patcher handles
+  the layout cascade and the source claims close path-2
+  to its structural floor at n=0. Self-extend if other
+  odd-aligned ov004 candidates surface. Critical:
+  3-region SHA1 PASS preserved (current main n=2 +
+  new n=0 floor).
 
-**Scaffolder — one MEDIUM brief queued (patcher Variant E):**
-
-- **Brief 179 (MEDIUM, NEW)** — branch `cloud/patcher-variant-e-2byte-pool-shift`.
-  Extend patcher to handle 2-byte (or 1-3 byte) veneer
-  pool shifts at low n. Per brief 173's hand-off. **Path-2
-  mechanism works at veneer level (all 3 brief 173
-  variants suppressed both remaining veneers); only the
-  byte-layout shift fails SHA1.** Variant E closes the
-  layout problem. After this lands, brief 180+ ships
-  path-2 final wave dropping n=2 → n=0. W7 chain
-  extends: 134 → 142 → 146 → 150 → 162 → 164 → 168 →
-  179.
+**Scaffolder — no brief queued yet.** Candidates for
+brief 183+ enumerated under *Next-brain TODO* below.
+Scaffolder may pick up autonomous-work fill (per AGENTS.md
+§ Scaffolder autonomous work) while brain scopes.
 
 ## Active clusters (post-SHA1 polish wavefront)
 
 - **Cluster A** — `.rodata` (briefs 132 → 139 main run, then post-SHA1
   follow-up via 141). Largely drained.
-- **Cluster B** — main `.data`. **EFFECTIVELY CLOSED**: true scalars
-  174/174 (brief 143), pointer pool 23/23 (brief 149), size-1/2
-  overlay 18/18 (brief 153), size-1/2 main 1/1 (brief 152), W6-
-  rejected (value=0 size=4) main 18/21 (brief 155). 3 deferred
-  W6-rejected candidates remain (sit between already-claimed
-  wave-2 single-int TUs; wave-2 rewrite needed). Recipe locked
-  for both bundle-with-zero-pad and bundle-with-value=0 shapes.
+- **Cluster B** — main `.data`. **FULLY CLOSED** post brief 181:
+  true scalars 174/174 (brief 143), pointer pool 23/23 (brief 149),
+  size-1/2 overlay 18/18 (brief 153), size-1/2 main 1/1 (brief 152),
+  W6-rejected value=0 main 21/21 (brief 155 + brief 181 deferred
+  drain), size-1/2 cross-region 6 ships (brief 181), W6-rejected
+  cross-region 6 ships (brief 181). One in-scope skip:
+  `data_ov002_022ccc2e` (odd-aligned, deferred to brief 183+
+  with brief 180 recipe). Recipe locked across all known shapes.
 - **Cluster C / D-1 / D-2** — ov004 sub-clusters. 31 `.data` syms
   (brief 141) + 14 `.rodata` syms at n=9 (brief 147) + 28
   `.rodata` syms (brief 151, 22.5 KB block included) = **73 total**.
@@ -200,17 +267,19 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   the naive byte-pattern approach; brief 156 scaffolder spot-disasm
   recalibrates the heuristic).
 - **Cluster D-3** — complex nested struct arrays.
-  **EFFECTIVELY CLOSED** post brief 163 wave 3 (9 chunks /
-  ~12 KB shipped, including the 4.9 KB `data_020c7b44`
-  mega). 4 waves total: brief 157 (9 / 6,664 B main) +
-  brief 158 (12 / 5,852 B across 5 modules) + brief 161
-  bonus (data_02101928 via brief 161 bundle-alias unblock)
-  + brief 163 (9 / ~12 KB — 7 ov006 + 1 ov002 mid + 1 main
-  mega). **~31 chunks / ~30 KB shipped to date.** Residue:
-  2 hard candidates — `data_020c9694` (14.8 KB mega,
-  deferred) + `data_020e0e70` (366 B, non-4-aligned size).
-- **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework). Continuing
-  via the W7 patcher (now fully general 134 → 142 → 146 → 150).
+  **EFFECTIVELY CLOSED** post brief 178 + 181. EUR run:
+  brief 157 (9 / 6,664 B main) + brief 158 (12 / 5,852 B
+  across 5 modules) + brief 161 bonus (data_02101928) +
+  brief 163 (9 / ~12 KB) + brief 181 (`data_020e0e70`
+  366 B → 544 B Pattern 3 chunk). Cross-region run:
+  brief 178 (74 chunks / 80,152 bytes across USA + JPN —
+  largest single brief). **~105 chunks / ~110 KB shipped
+  to date.** Residue: 1 hard candidate — `data_020c9694`
+  (14.8 KB mega, queued as brief 183+).
+- **Cluster D** — `.bss`/zeros (briefs 130 + 142 framework).
+  W7 patcher chain extends: 134 → 142 → 146 → 150 → 162 →
+  164 → 168 → **180** (map-driven layout reconstruction).
+  Path-2 final wave at n=0 queued as brief 182.
 
 ## Worktree convention — isolation per agent, two equivalent mechanisms
 
@@ -251,41 +320,43 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge decomper brief 178 PR** when it opens.
-   Gate: 3-region `ninja sha1` PASS + 3-region 27/27
-   modules OK. ≥ 30 cross-region D-3 chunks per region.
-   Watch for "needs hand-tuning" candidates — log for
-   brief 180+ refinement if any.
-2. **Verify + merge scaffolder brief 179 PR** when it opens.
-   Branch: `cloud/patcher-variant-e-2byte-pool-shift`.
-   Gate: 3-region SHA1 PASS preserved (current main n=2 +
-   manual injection test at n=0). New tests pin 1-3 byte
-   shift detection. Brief 180+ unlocked for path-2 final
-   wave dropping n=2 → n=0.
-3. **Scope brief 180+ candidates (queue after 178 + 179):**
-   - **After brief 179 lands**: brief 180 = decomper
-     path-2 final wave (odd-aligned ov004 claims via brief
-     173's locked recipe; reaches n=0).
-   - **Cluster C / D-1 / D-2 cross-region** — extend brief
-     177's tool further.
-   - **Cluster B size-1/2 + odd-aligned cross-region**
-     (brief 176 residue, 16 candidates) — needs new
-     recipe path.
-   - **Cluster D-3 hard residue** (14.8 KB mega + 366 B
-     non-aligned) — small cleanup.
-   - **3 cluster B value=0 EUR deferred candidates** —
-     wave-2 TU rewrite.
-   - **Cross-region cluster A apply** — port 1443 EUR cluster A
-     symbols to USA + JPN.
-   - **Cluster D-3 via Pattern 3 generator** — ~20 complex
-     nested structs.
-4. **Watch for any new wall hypotheses** in upcoming wave PRs.
+1. **Verify + merge decomper brief 182 PR** when it opens.
+   Branch: `decomper/path-2-final-wave-n2-to-n0`. Gate:
+   3-region `ninja sha1` PASS at n=0 floor (NEW gate) +
+   n=2 baseline preserved bit-identical + 3-region 27/27
+   modules OK. With brief 180's map-driven reconstruction
+   live, the odd-aligned claims should ship cleanly per
+   brief 179's empirical analysis. Closes the W7 chain at
+   its structural floor.
+2. **Scope brief 183+ candidates:**
+   - **Cluster D-3 14.8 KB mega `data_020c9694`** —
+     dedicated brief. Largest remaining D-3 residue;
+     brief 181 explicitly deferred.
+   - **Cluster C / D-1 / D-2 cross-region** — extend
+     brief 177's `cross_region_chunk_extent.py` generator
+     to non-D-3 patterns. Scaffolder may need to generalise
+     the tool first (currently D-3-specialised); brief
+     177's framework is the seed.
+   - **`data_ov002_022ccc2e` odd-aligned size=2 claim** —
+     brief 181 deferred (no nearby 4-aligned predecessor).
+     With brief 180's recipe now live, this should be
+     reachable. Small target but closes brief 181's only
+     in-scope skip.
+   - **`data_ov006_021ceae4` extent > 1024 B** — brief
+     181 hit the safety cap. Either tighten the heuristic
+     or run the brief 174/177 generator on the chunk
+     specifically.
+   - **Scaffolder autonomous-work fill** — candidates from
+     prior research debt: C-23 MMIO register-base folding
+     classification (brief 086 carryover), ov005
+     placeholder-name warnings cleanup (sweep brief).
+3. **Watch for any new wall hypotheses** in upcoming wave PRs.
    Standing rule since brief 084's "3 walls not 1" methodology
    lesson: pre-empt symptom-vs-mechanism classification by requesting
    a scaffolder codegen-sweep brief before any wall gets a P-N or C-N
    number. C-23 candidate (MMIO register-base folding) from brief 086
    remains pending scaffolder sweep classification.
-5. **Pre-existing carryovers (unchanged):**
+4. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection check.
