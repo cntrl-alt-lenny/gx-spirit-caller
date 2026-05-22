@@ -33,3 +33,7 @@ src/overlay003/data_ov003_021cf0f4.c:
 src/overlay003/bss/data_ov003_bss.s:
     complete
     .bss start:0x021cf6c0 end:0x021cfc40
+
+src/overlay003/ov003_021ca2b8.s:
+    complete
+    .text start:0x021ca2b8 end:0x021ca2bc

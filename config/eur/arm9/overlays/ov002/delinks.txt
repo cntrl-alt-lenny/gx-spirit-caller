@@ -1995,3 +1995,7 @@ src/overlay002/data/data_ov002_022ccd24.s:
 src/overlay002/data/data_ov002_022cad38.s:
     complete
     .data start:0x022cad38 end:0x022cb96c
+
+src/overlay002/func_ov002_021b91c4.c:
+    complete
+    .text start:0x021b91c4 end:0x021b91d0
