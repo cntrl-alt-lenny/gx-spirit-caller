@@ -8,19 +8,29 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-23 afternoon, post-#635/#636 through #644/#645
-merge wave (10 briefs closed since last brain-PR). Brain on Mac.
-**🎉 POST-PIVOT METHODOLOGY VALIDATED.** Three named walls
-(C-31/C-32/C-33) shipped with locked recipes + classifier detection +
-worked examples. Permuter batch pipeline operational. 21+ `.s` ships
-across 4 drain briefs (188/195/197 + 191/192/194 worked examples).
-**Current metrics (post-merge of #644+#645):** `matched_code_percent
-1.4102 %`, `matched_functions 1430 / 9617 (14.87 %)`, `complete_units
-1428 / 2293`, `fuzzy_match_percent 1.4584 %`.
+**Last updated:** 2026-05-23 evening, post-#647/#648 + this brain-PR.
+Brain on Mac. **🎉 ~200 PREVIOUSLY-INVISIBLE MATCHES RECOVERED.**
+This brain-PR's matched_functions investigation found that brief 187's
+`objdiff_filter_panic_units.py` was silently dropping every `.legacy.c`
+unit (~200 of them) because dsd emits objdiff.json entries with bare
+`.o` paths even for `.legacy.c` sources, while mwcc produces
+`.legacy.o`. The filter's "missing file" branch swallowed them all.
+Fixed by rewriting target/base paths using `source_path` as the
+authoritative routing signal. **Current metrics (post-fix):**
+`matched_code_percent 1.7190 %` (was 1.4102 %, +0.3084), `matched_
+functions 1628 / 9801 (16.61 %)` (was 1430, **+198 functions**),
+`complete_units 1613 / 2479` (+198), `fuzzy_match_percent 1.4584 %`.
 
-**Two open lanes:** brief 198 (decomper permuter wave — THE strategic
-test of permuter viability on Cluster E + B) + brief 199 (scaffolder
-C-23 MMIO base-folding wall — independent lane).
+**Strategic context:** Brief 198 returned "permuter not viable for
+Cluster B + E" (0/9 converged); brief 199 closed C-23 wall with a
+sharp insight that "C-23 + StyleA stacked" is actually one wall.
+Next round splits along brief 198's data: brief 200 (scaffolder)
+investigates the 480-500 plateau as a shared codegen mechanism;
+brief 201 (decomper) does manual decomp.me iteration on the 3
+closest-score picks (220-315 range — within manual reach).
+
+**Two open lanes:** brief 200 (scaffolder codegen-sweep) + brief 201
+(decomper decomp.me iteration). See § *In flight* below.
 
 ## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
@@ -100,6 +110,51 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **Brain-PR (this one) — matched_functions fix + macOS permuter
+  workarounds + housekeeping.** 🎉 **+198 matched_functions recovered.**
+  Three-part PR. (1) `objdiff_filter_panic_units.py` was silently
+  dropping every `.legacy.c` unit because dsd emits objdiff.json
+  entries with bare `.o` paths while mwcc produces `.legacy.o` —
+  filter's "missing file" branch swallowed them. New
+  `_legacy_suffix_from_source` + `_rewrite_path_for_legacy` helpers
+  reconcile the two using `source_path` as the authoritative routing
+  signal. `matched_code_percent 1.4102 → 1.7190` (+0.3084), function
+  count 1430 → 1628. (2) `tools/permute.py` macOS workarounds folded
+  in: `expected_disasm_path` scans the tree-mirroring layout when the
+  flat path is absent (was symlink-required); `install_permuter_deps`
+  detects PEP 668 externally-managed-environment refusal and auto-
+  creates `.venv_permuter/` then patches `sys.path` so the venv's
+  deps import in-process (no re-exec). (3) AGENTS.md + state.md
+  closing brief 198 + 199, queueing brief 200 + 201. 2073 → 2088
+  tests (+15 new objdiff filter tests; +5 permute fixes covering
+  flat/mirror/PEP668 cases).
+- **PR #648 — decomper / brief 198 permuter wave 0/9 converged.**
+  🔬 Strategic finding: permuter isn't the right tool for Cluster
+  B + E walls. Phase 1 wrote 9 `.c` stubs (gitignored from delinks
+  — artifacts only). Phase 2 ran `permute_batch.py` with
+  120s/1800s/4-thread budget — all picks hit budget; best scores
+  220 → 590. **5 picks plateaued at 480–500** (E-12/13/14 +
+  B-22/B-24 — shared codegen mechanism, brief 200 scope). 3 picks
+  at 220-315 (E-07/E-08/B-08 — manual-iteration reach, brief 201
+  scope). 1 pick at 590 with 53 variants (B-18 — hardware-register-
+  fold per brief 190, deferred). Real-world macOS workarounds
+  documented (`.venv_permuter` + disasm path symlinks) — folded
+  into this brain-PR as proper fixes.
+- **PR #647 — scaffolder / brief 199 C-23 wall closed.** 🎯 Pick #5
+  (`func_02096434`, 0x6c) shipped clean as `.legacy.c`. **Key
+  insight: C-23 + StyleA "stacked walls" from brief 193 is ONE wall
+  with ONE recipe** (sub-sp + Style A epilogue is the natural mwcc
+  1.2/sp2p3 shape for this call layout). Classifier expanded with
+  4 new C-23 signals beyond brief 086's MMIO range: DTCM kernel,
+  duplicate refs, clustered pool, contiguous-pool false-positive
+  doc. Surfaced 4 more C-23 candidates for brief 200+ drain
+  (`OSi_PostIrqEvent`, `func_02021b38`, `func_02093dc8` + pick #5
+  shipped). Constant-folding trap documented: naive `*(int *)
+  (base + offset)` folds even at `.legacy.c` tier — keep base +
+  offset separate in source. 2068 → 2073 tests.
+
+### Earlier this round (#635 → #646 from previous brain-PR)
 
 - **PR #645 — decomper / brief 197 Track A 13/13 + Track B documented.**
   🎉 **13 of 13 ov011 C-32 picks ship via brief 192's locked recipe**
@@ -431,31 +486,32 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands. Both agents have just
-received the brief 198 / 199 kickoffs:
+received the brief 200 / 201 kickoffs:
 
-**Decomper — brief 198 in flight:**
+**Scaffolder — brief 200 in flight:**
 
-- **Brief 198 (HIGH, NEW)** — `decomper/permuter-wave-cluster-be-execution`.
-  **THE strategic test of permuter viability.** Write `.c` stubs
-  for the 9 picks in `docs/research/cluster-b-e-permuter-targets.json`
-  (brief 196 surfaced 9/9 `stub_missing` as the actual gap), then
-  drive `tools/permute_batch.py --per-pick-seconds 120
-  --total-seconds 1800 --threads 4`. Bar: ≥ 1 of 9 converging is
-  viable; 3+ unlocks a recipe pattern for the wider Cluster E/B
-  family. 0 means permuter isn't the right tool here and we need
-  decomp.me + hand-iterated source shapes. **Headline expectation:
-  first C-source `matched_functions` increment since brief 190.**
+- **Brief 200 (HIGH, NEW)** — `scaffolder/permuter-plateau-codegen-sweep`.
+  Codegen-sweep on the 480-500 permuter plateau from brief 198.
+  Per brief 084's "3 walls not 1" methodology, treat the 5 picks
+  (E-12/13/14, B-22, B-24) that bottomed out at the same score
+  band as evidence of ONE shared mechanism, not 5 separate walls.
+  Three deliverables: side-by-side disasm survey across the 5
+  picks (what diverges in the closest permuter variants?),
+  hypothesis + classification (new C-N if a shared mechanism
+  surfaces), best-effort recipe + worked example. Research-first
+  brief — outcomes vary; classification IS the deliverable.
 
-**Scaffolder — brief 199 in flight:**
+**Decomper — brief 201 in flight:**
 
-- **Brief 199 (MEDIUM, NEW)** — `scaffolder/c23-mmio-base-folding-wall`.
-  C-23 MMIO register-base folding wall research — long-standing
-  carryover from brief 086. Same shape as C-31/C-32/C-33 (briefs
-  191/192/194): empirical reproduction on a concrete candidate
-  (brief 193 pick #5 `func_02096434` is "StyleA + C-23 stacked"),
-  recipe selection (source coercion vs `.s` routing vs patcher
-  extension), worked example shipping clean, taxonomy + classifier
-  + research note. Independent of brief 198 — different lane.
+- **Brief 201 (HIGH, NEW)** — `decomper/decomp-me-iteration-best-scores`.
+  Manual decomp.me iteration on brief 198's 3 closest-score picks:
+  E-07 (`func_02023f7c`, best 220), E-08 (`func_02026fd8`, best 230),
+  B-08 (`func_0205da2c`, best 315). Permuter got within manual reach
+  but couldn't close — decomp.me + objdiff's source-shape iteration
+  is the next tool. Bar: ≥ 1 of 3 ships — **first matched_functions
+  increment via decomp.me workflow.** 3-of-3 is the dream. Even 0
+  with documented residuals would inform whether the 220-315 score
+  range is genuinely closable by hand.
 
 ## Active clusters (post-pivot reality)
 
@@ -550,47 +606,49 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 198 PR** (decomper permuter wave) when
-   it opens. Branch: `decomper/permuter-wave-cluster-be-execution`.
-   Gate: 3-region `ninja sha1` PASS + 27/27 modules + every shipped
-   match individually 3-region-verified. **Headline event to watch:
-   `matched_functions` increments for the first time since brief
-   190.** Even 1 of 9 converging is a strategic win — it proves
-   permuter is viable for the Cluster E/B wall family and unlocks
-   the pattern for the ~30+ unaudited similar picks across the queue.
-   Honest documentation of failures is as valuable as ships — read
-   the "no_match" entries in the PR body carefully.
-2. **Verify + merge brief 199 PR** (scaffolder C-23 wall) when it
-   opens. Branch: `scaffolder/c23-mmio-base-folding-wall`. Tools +
-   docs + 1 worked example — 3-region SHA1 PASS required since
-   the worked example touches source. Cross-check the C-23
-   classifier against brief 193 pick #5 + 2+ survey-surfaced
-   candidates.
-3. **Scope brief 200+ based on brief 198 outcome:**
-   - **If permuter ≥ 3 converges:** scaffolder 200 surveys the
-     queue for more permuter-ready picks (likely 30+); decomper
-     201 ships another permuter wave with the expanded worklist.
-   - **If permuter 1–2 converges:** mixed signal. Scaffolder 200
-     investigates WHY the 1–2 worked when others didn't — likely
-     a sub-family within Cluster E/B that's particularly permuter-
-     amenable. Decomper 201 does another small batch in that
-     sub-family.
-   - **If permuter 0 converges:** permuter isn't the right tool for
-     Cluster E/B. Scaffolder 200 builds decomp.me scratch +
-     iteration tooling (briefs 062 / 063 territory — auto-runner,
-     diff-to-coercion suggester); decomper 201 grinds with manual
-     iteration. The wider wall family then waits for a different
-     mechanism.
-4. **Scope brief 201 (scaffolder)** as a follow-on candidate list
-   to keep ready:
+1. **Verify + merge brief 200 PR** (scaffolder codegen-sweep on
+   480-500 plateau) when it opens. Branch:
+   `scaffolder/permuter-plateau-codegen-sweep`. Tools + docs +
+   possibly 1 worked example. EUR-only SHA1 PASS sufficient if
+   no source ships; full 3-region if a worked example lands.
+   Read the disasm-survey table carefully — that's the deliverable
+   even if no recipe emerges. Look for whether the 5 picks DO
+   share a mechanism or whether they happened to plateau at the
+   same band coincidentally.
+2. **Verify + merge brief 201 PR** (decomper decomp.me iteration)
+   when it opens. Branch: `decomper/decomp-me-iteration-best-scores`.
+   3-region SHA1 PASS required for each shipped match. **Headline
+   event to watch: `matched_functions` increments via the decomp.me
+   workflow** — first since the new measurement (1628 baseline).
+   Even 0 ships with documented residuals is informative.
+3. **Scope brief 202+ based on brief 200 + 201 outcomes:**
+   - **If brief 200 surfaces a shared C-34/P-N wall:** brief 202
+     (decomper) writes worked examples for 1-2 of the plateau picks
+     using the new recipe. Brief 203 (scaffolder) refines the
+     classifier with detection.
+   - **If brief 200 finds 5 separate sub-walls:** brief 202
+     (scaffolder) picks the most common sub-wall and produces a
+     focused recipe; brief 203 (decomper) drains.
+   - **If brief 201 ships ≥ 2 of 3:** brief 202 (decomper) scales
+     decomp.me iteration to more picks from the queue at similar
+     score ranges. Brief 203 (scaffolder) builds decomp.me upload
+     automation to multiply throughput.
+   - **If brief 201 ships 0:** the 220-315 score range isn't manually
+     closable either. Different mechanism needed for the wider
+     Cluster B + E family — could be a permuter-library-with-hints
+     expansion or a deeper mwcc-2.0 reg-allocator investigation.
+4. **Scope brief 203+ scaffolder candidates** to keep ready:
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
    - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
      isn't always mwcc 1.2 routing; refine the C-15 predictor
    - **Decomp.me scratch upload automation** — productivity
-     multiplier
-   - **Permuter library / hint expansion** — if brief 198's
-     converged picks reveal hint patterns, codify them
+     multiplier (becomes high-priority if brief 201 succeeds)
+   - **Permuter library / hint expansion** — if brief 200's
+     codegen-sweep reveals reg-alloc hint patterns, codify them
+   - **C-23 candidates from brief 199's survey** (`OSi_PostIrqEvent`,
+     `func_02021b38`, `func_02093dc8`) — recipe is locked; quick
+     decomper drain when convenient
 5. **Deferred indefinitely (per pivot discipline):**
    - `data_020c9694` 14.8 KB D-3 mega
    - `data_ov002_022ccc2e` odd-aligned size=2
@@ -622,6 +680,19 @@ sufficient.
      `.github/scripts/upsert-pr-comment.sh`, REST-only, 3-retry,
      fail-soft). `pr-tier-delta` and 5 sibling workflows no longer
      fail on transient API 401s.
+   - `objdiff_filter_panic_units.py` fixed to handle `.legacy.c`
+     paths properly (this brain-PR). dsd emits `.o` paths; mwcc
+     produces `.legacy.o` / `.legacy_sp3.o`. Filter now rewrites
+     via `source_path` as the authoritative routing signal.
+     **+198 matched_functions previously invisible** were the
+     immediate recovery; the fix permanently closes the gap for
+     all future `.legacy.c` ships.
+   - `tools/permute.py` macOS workarounds folded in (this brain-PR):
+     PEP 668 externally-managed-environment fallback auto-creates
+     `.venv_permuter/` and patches `sys.path` in-process; disasm
+     path resolver scans the tree-mirroring layout (`disasm/src/
+     <path>/func_<addr>.s`) when the flat layout is absent.
+     Brief 198's symlink workarounds no longer needed.
 
 ## Cross-machine handoff notes
 

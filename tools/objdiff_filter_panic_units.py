@@ -269,6 +269,44 @@ def has_addressable_text_code(elf_path: Path) -> bool:
 has_nonempty_text_section = has_addressable_text_code
 
 
+def _legacy_suffix_from_source(source_path: str) -> str | None:
+    """Infer the `.legacy.o` / `.legacy_sp3.o` filename suffix
+    that mwcc + dsd will produce for this unit, based on the
+    source file's filename routing convention.
+
+    Background: dsd emits objdiff.json entries with `target_path` /
+    `base_path` stripped of the `.legacy` / `.legacy_sp3` filename
+    infix — both point at a bare `<name>.o`. But mwcc compiles
+    `<name>.legacy.c` to `<name>.legacy.o` (and `<name>.legacy_sp3.c`
+    to `<name>.legacy_sp3.o`) — so the actual artifact lives at a
+    different filename than dsd advertises. Pre-brief-199 the
+    filter dropped these units as "target_path missing" — pick #5
+    (`func_02096434.legacy.c`, brief 199 worked example) shipped
+    cleanly to the build but never registered in
+    `matched_functions`. This helper recovers the correct suffix
+    from the `source_path` field, which dsd preserves as-is.
+    """
+    if source_path.endswith(".legacy.c"):
+        return ".legacy.o"
+    if source_path.endswith(".legacy_sp3.c"):
+        return ".legacy_sp3.o"
+    return None
+
+
+def _rewrite_path_for_legacy(rel_path: str, suffix: str) -> str:
+    """Replace the trailing `.o` in `rel_path` with `suffix`
+    (`.legacy.o` or `.legacy_sp3.o`). Leaves the rest of the
+    relative path untouched so `(project_root / new_rel).resolve()`
+    still works the same way the original logic did.
+
+    Empty / non-`.o` paths pass through unchanged — defensive
+    against malformed objdiff.json entries.
+    """
+    if not rel_path.endswith(".o"):
+        return rel_path
+    return rel_path[: -len(".o")] + suffix
+
+
 def filter_objdiff_json(
     path: Path,
     *,
@@ -281,6 +319,16 @@ def filter_objdiff_json(
     `(unit_name, reason)` tuples for the dropped units. Useful
     for the operator log + the research note's "what got
     filtered" appendix.
+
+    Brief 199 followup: before dropping a unit as "target_path
+    missing," check whether its `source_path` field indicates a
+    `.legacy.c` / `.legacy_sp3.c` routing tier. If so, rewrite
+    `target_path` + `base_path` to point at the actual built
+    artifact (`<name>.legacy.o` / `<name>.legacy_sp3.o`). dsd
+    advertises a bare `.o` filename in those fields but mwcc
+    produces the suffixed name — the rewrite reconciles the two
+    so `matched_functions` correctly counts shipped `.legacy.c`
+    units (pick #5 in brief 199 was the canary).
     """
     project_root = project_root or path.resolve().parent
     with path.open("r", encoding="utf-8") as f:
@@ -292,11 +340,45 @@ def filter_objdiff_json(
         target_path_rel = unit.get("target_path", "")
         target_path = (project_root / target_path_rel).resolve()
         if not target_path.is_file():
-            reasons.append((
-                unit.get("name", "?"),
-                "target_path missing — unmatched routing-tier unit",
-            ))
-            continue
+            # Brief 199 followup: try the .legacy.o / .legacy_sp3.o
+            # variant before giving up. dsd strips the suffix from
+            # target_path even though mwcc preserves it in the .o
+            # filename — rewrite both paths if the variant exists.
+            metadata = unit.get("metadata", {}) or {}
+            source_path = metadata.get("source_path", "") or ""
+            legacy_suffix = _legacy_suffix_from_source(source_path)
+            if legacy_suffix is not None:
+                rewritten_target_rel = _rewrite_path_for_legacy(
+                    target_path_rel, legacy_suffix,
+                )
+                rewritten_target = (
+                    project_root / rewritten_target_rel
+                ).resolve()
+                base_path_rel = unit.get("base_path", "")
+                rewritten_base_rel = _rewrite_path_for_legacy(
+                    base_path_rel, legacy_suffix,
+                )
+                rewritten_base = (
+                    project_root / rewritten_base_rel
+                ).resolve()
+                if rewritten_target.is_file() and rewritten_base.is_file():
+                    unit["target_path"] = rewritten_target_rel
+                    unit["base_path"] = rewritten_base_rel
+                    target_path = rewritten_target
+                else:
+                    reasons.append((
+                        unit.get("name", "?"),
+                        "target_path missing — "
+                        f"{legacy_suffix} variant also missing "
+                        "(unmatched routing-tier unit)",
+                    ))
+                    continue
+            else:
+                reasons.append((
+                    unit.get("name", "?"),
+                    "target_path missing — unmatched routing-tier unit",
+                ))
+                continue
         if not has_addressable_text_code(target_path):
             reasons.append((
                 unit.get("name", "?"),

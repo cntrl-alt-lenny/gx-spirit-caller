@@ -510,13 +510,40 @@ def expected_object_path(build_root: Path, module: str, source_c: str | None) ->
 
 
 def expected_disasm_path(build_root: Path, module: str, addr: int) -> Path:
-    """Where `dsd dis` drops the per-module assembly. Convention taken
-    from the decomper's earlier investigation: `build/disasm/` with
-    files named by module + _dsd_gap range. This path is indicative;
-    the decomper confirms by listing the directory."""
-    if module == "main":
-        return build_root / "disasm" / f"main_{addr:08x}.s"
-    return build_root / "disasm" / f"{module}_{addr:08x}.s"
+    """Where `dsd dis` drops the per-module assembly.
+
+    Two layouts coexist in the wild:
+
+    1. **Flat module-prefixed** (legacy convention referenced in
+       brief 063): `build/disasm/<module>_<addr:08x>.s` with
+       `main` collapsing to `main_<addr>.s`.
+    2. **Source-tree-mirroring** (what `dsd dis` actually produces
+       today — confirmed empirically in brief 198): files live at
+       `build/disasm/src/<path>/func_<addr:08x>.s`, mirroring the
+       source tree under `src/`. Brief 198 worked around this with
+       hand-created symlinks; this function now scans the tree
+       so the symlinks aren't needed.
+
+    Resolution order: check the flat path first (cheap, exact),
+    then glob the mirroring tree for the first `func_<addr>.s`.
+    Falls back to the flat path so the caller's `.is_file()` check
+    still produces an informative "run dsd dis first" message
+    when neither layout has output yet.
+    """
+    flat = build_root / "disasm" / f"{module}_{addr:08x}.s"
+    if flat.is_file():
+        return flat
+    # Tree-mirroring layout — dsd dis produces files named
+    # `func_<addr>.s` somewhere under build_root/disasm/. Glob is
+    # bounded by the disasm tree's natural size (one file per
+    # carved TU). First match wins; modules don't collide because
+    # dsd places each function under its source TU's directory.
+    disasm_root = build_root / "disasm"
+    if disasm_root.is_dir():
+        needle = f"func_{addr:08x}.s"
+        for candidate in disasm_root.rglob(needle):
+            return candidate
+    return flat
 
 
 def render_run_sh(
@@ -746,6 +773,39 @@ def ensure_permuter_installed(
     return vendor_dir
 
 
+def _ensure_permuter_venv(log=print) -> Path:
+    """Create `.venv_permuter/` if it doesn't exist and return its
+    path. Used as the PEP 668 fallback when the active Python rejects
+    `pip install` with `externally-managed-environment` (Homebrew,
+    Debian, and similar distros).
+
+    Idempotent: a venv that's already present is reused as-is.
+    Gitignored at the repo level — see brief 198 + .gitignore.
+    """
+    venv_root = ROOT / ".venv_permuter"
+    if not (venv_root / "bin" / "python").is_file():
+        log("  creating .venv_permuter/ (PEP 668 fallback)...")
+        subprocess.run(
+            [sys.executable, "-m", "venv", str(venv_root)],
+            check=True,
+        )
+    return venv_root
+
+
+def _add_venv_to_sys_path(venv_root: Path) -> None:
+    """Add the venv's site-packages to `sys.path` so subsequent
+    `import nacl / toml / Levenshtein` calls in THIS process can
+    resolve the deps without a re-exec.
+
+    Globs the lib tree because the python<X.Y> minor varies by host.
+    Idempotent — paths already in sys.path are skipped.
+    """
+    import glob
+    for sp in glob.glob(str(venv_root / "lib" / "python*" / "site-packages")):
+        if sp not in sys.path:
+            sys.path.insert(0, sp)
+
+
 def install_permuter_deps(
     deps: tuple[str, ...] = PERMUTER_PIP_DEPS,
     *,
@@ -753,17 +813,24 @@ def install_permuter_deps(
     run_pip=None,
     log=print,
 ) -> None:
-    """Install permuter's pip deps into the current Python env. The
-    upstream repo has no requirements.txt — its README lists
-    `pynacl toml Levenshtein`. We skip `pynacl` because we only run
-    single-host `-j` mode, never the distributed `permuter@home` (`-J`)
-    mode that uses it.
+    """Install permuter's pip deps. The upstream repo has no
+    requirements.txt — its README lists `pynacl toml Levenshtein`.
+    We skip `pynacl` because we only run single-host `-j` mode,
+    never the distributed `permuter@home` (`-J`) mode that uses it.
+
+    Strategy:
+      1. Try `pip install` against the active Python. Fast no-op
+         on already-installed (re-runs are cheap).
+      2. If pip refuses with PEP 668 `externally-managed-environment`
+         (macOS Homebrew / Debian / some distros), fall back to a
+         project-local `.venv_permuter/` venv and install there
+         instead, then patch `sys.path` so this process can `import`
+         the deps without a re-exec.
 
     `run_pip` is injectable for tests. `python_exe` defaults to
     `sys.executable` (the same Python that's running this script).
-    Already-installed deps are pip's no-op fast path; no version
-    pinning here intentionally — upstream doesn't pin and we don't
-    want to surprise users with a downgrade.
+    No version pinning here intentionally — upstream doesn't pin
+    and we don't want to surprise users with a downgrade.
     """
     if not deps:
         return
@@ -773,7 +840,22 @@ def install_permuter_deps(
         lambda c: subprocess.run(c, check=True, capture_output=True, text=True)
     )
     log(f"  installing pip deps: {' '.join(deps)}...")
-    runner(cmd)
+    try:
+        runner(cmd)
+    except subprocess.CalledProcessError as e:
+        stderr = e.stderr or ""
+        # PEP 668 externally-managed: fall back to a project-local
+        # venv. The marker substring is stable across pip versions
+        # (it's the error class name pip prints).
+        if "externally-managed-environment" not in stderr:
+            raise
+        log("  pip refused (PEP 668 externally-managed); using .venv_permuter/...")
+        venv_root = _ensure_permuter_venv(log=log)
+        venv_py = str(venv_root / "bin" / "python")
+        runner([venv_py, "-m", "pip", "install", *deps])
+        # Make the venv's deps importable in this process — avoids
+        # the re-exec pattern that would otherwise be needed.
+        _add_venv_to_sys_path(venv_root)
 
 
 # --------------------------------------------------------------------------- #

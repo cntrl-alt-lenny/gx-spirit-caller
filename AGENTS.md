@@ -364,30 +364,56 @@ itself:
 
 ### Open briefs
 
-- **Brief 198 (HIGH, NEW)** — `decomper` permuter wave. **The
-  strategic test of permuter viability.** Write `.c` stubs for the
-  9 Cluster B + E picks in [docs/research/cluster-b-e-permuter-targets.json](docs/research/cluster-b-e-permuter-targets.json)
-  (brief 196 wired the wrapper + worklist, surfaced 9/9
-  `stub_missing` as the actual gap), then drive `tools/permute_batch.py`
-  with `--per-pick-seconds 120 --total-seconds 1800 --threads 4`.
-  Bar: ≥ 1 of 9 converging proves permuter viable; 3+ unlocks a
-  recipe pattern for the wider Cluster E/B family across the queue.
-  0 means permuter isn't the right tool here and we need decomp.me +
-  hand-iterated source shapes (different mechanism). **Headline
-  expectation: first C-source `matched_functions` increment since
-  brief 190.** Branch: `decomper/permuter-wave-cluster-be-execution`.
-- **Brief 199 (MEDIUM, NEW)** — `scaffolder` C-23 MMIO register-base
-  folding wall research. Long-standing carryover from brief 086;
-  brief 193 pick #5 was explicitly "StyleA + C-23 stacked." Same
-  shape as C-31/C-32/C-33 (briefs 191/192/194): research +
-  empirical reproduction on a concrete candidate, recipe selection
-  (source coercion / `.s` routing / patcher), worked example
-  shipping clean, taxonomy + classifier + research note. Branch:
-  `scaffolder/c23-mmio-base-folding-wall`. **Independent of brief
-  198** (different lane).
+- **Brief 200 (HIGH, NEW)** — `scaffolder` codegen-sweep on the
+  480–500 permuter plateau. Brief 198 (PR #648) ran permuter on
+  9 Cluster B + E picks; **5 of 9 plateaued at scores 480–500**
+  despite finding 3–5 distinct source variants each. Per brief
+  084's "3 walls not 1" methodology this is investigated as ONE
+  shared codegen mechanism, not 5 separate issues. Affected:
+  E-12 / E-13 / E-14 (`func_02024574` + clones), B-22
+  (`func_0200b0c8`), B-24 (`func_ov011_021d2ca8`). Three
+  deliverables: side-by-side disasm survey, hypothesis +
+  classification (next C-N if a shared mechanism is identified),
+  best-effort recipe + worked example. Branch:
+  `scaffolder/permuter-plateau-codegen-sweep`.
+- **Brief 201 (HIGH, NEW)** — `decomper` manual decomp.me iteration
+  on brief 198's best-score picks. The 3 picks at scores 220–315
+  (E-07 `func_02023f7c`, E-08 `func_02026fd8`, B-08
+  `func_0205da2c`) are WITHIN MANUAL-ITERATION REACH of orig.
+  Bar: ≥ 1 of 3 ships — **first matched_functions increment since
+  brief 190 from manual decomp.me workflow**. 3-of-3 is the dream;
+  even 0 with documented residuals informs the next round.
+  Branch: `decomper/decomp-me-iteration-best-scores`.
 
 ### Closed briefs (reference)
 
+- **Brief 199** — `scaffolder`, shipped in PR #647. 🎯 **C-23 MMIO
+  register-base folding wall — recipe + classifier expansion +
+  worked example.** Brief 193 pick #5 (`func_02096434`, 0x6c)
+  shipped clean as `.legacy.c`; **key insight: C-23 + StyleA
+  "stacked walls" is ONE wall with ONE recipe** (the sub-sp + Style A
+  epilogue shape that mwcc 1.2/sp2p3 emits naturally for this call
+  layout). Constant-folding trap documented: a naive
+  `*(int*)(base + offset)` C expression compiles to a single
+  folded pool word even at `.legacy.c` tier — keep base + offset
+  separate in source. Classifier expanded with 4 new C-23 signals:
+  main MMIO `0x04000xxx`, DTCM kernel `0x027ffcxx`-`0x027fffxx`,
+  duplicate refs, clustered pool. Surfaced 4 more C-23 candidates
+  for brief 200+ drain (`OSi_PostIrqEvent`, `func_02021b38`,
+  `func_02093dc8`, plus pick #5 shipped). 2068 → 2073 tests (+5).
+- **Brief 198** — `decomper`, shipped in PR #648. 🔬 **Permuter
+  wave — 0 of 9 converged. Strategic finding: permuter isn't the
+  right tool for Cluster B + E walls.** Phase 1 wrote 9 `.c`
+  stubs (gitignored from delinks — research artifacts).
+  Phase 2 ran `permute_batch.py` with 120s/1800s/4-thread budget.
+  All picks ran to budget; best scores ranged 220 (E-07) to 590
+  (B-18, 53 variants found). **5 picks plateaued at 480-500** —
+  shared codegen mechanism (brief 200 scope). 3 picks at 220-315
+  within manual-iteration reach (brief 201 scope). 1 pick at 590
+  with 53 variants deferred (hardware-register-fold per brief 190).
+  Documented macOS permuter workarounds (`.venv_permuter/`
+  + disasm path symlinks) as scaffolder follow-ups — folded into
+  this brain-PR as proper fixes. 3-region SHA1 PASS preserved.
 - **Brief 197** — `decomper`, shipped in PR #645. 🎉 **Track A 13/13
   ov011 C-32 ship clean** (above the ≥ 10 target). 5.6 KB of
   `.text` across 13 functions, 30 hand-encoded cross-overlay BLs via
