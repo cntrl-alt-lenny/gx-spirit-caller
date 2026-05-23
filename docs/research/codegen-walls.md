@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (34 patterns)
+## Coercible-with-knowledge (35 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4461,6 +4461,128 @@ void` (mwasmarm's literal-pool dedup still fires), found the
 example, and added the `tools/predict_walls.py` `C-34`
 detector. Full diagnosis + recipe rationale at
 [`first-wave-wall-address-cse.md`](first-wave-wall-address-cse.md).
+
+### C-35. Routing trilemma — combined codegen walls + `.s` + patcher trim-protect
+
+> **Wall family note — C-35 vs C-34 vs P-11.** C-35 is a
+> COMPOSITE recipe wall, not a new codegen mechanism. It fires
+> when a function combines multiple individually-classified
+> walls (e.g. C-34 address-CSE + P-11-class reg-allocator
+> divergence + strength-reduction-vs-keep-multiplication) in a
+> way that no single mwcc routing tier matches:
+>
+> | Tier | Pool ref | Push list | Loop shape |
+> |---|---|---|---|
+> | `.c` (mwcc 2.0/sp1p5) | CSE → 1 slot | `{r4, lr}` | strength-reduced |
+> | `.legacy.c` (1.2/sp2p3) | CSE → 1 slot | `{r4, lr}` | strength-reduced |
+> | `.legacy_sp3.c` (1.2/sp3) | CSE → 1 slot | `{r4, lr}` | strength-reduced |
+> | **Orig** | **2 slots** | **{r3, r4, r5, lr}** | **lsl in addressing mode** |
+>
+> Brief 204 swept all 15 available mwccarm variants (1.2/{base,
+> sp2, sp2p3, sp3, sp4}, 2.0/{base, sp1, sp1p2, sp1p5, sp1p6,
+> sp1p7, sp2, sp2p2, sp2p3, sp2p4}). None reproduce the orig's
+> 4-reg push + duplicate pool + non-strength-reduced loop combo.
+> The recipe is the same as C-34: pure `.s` with explicit
+> `.word` pool slots — bypasses both mwcc IR-CSE AND mwasmarm
+> literal-pool dedup AND, by writing assembly directly, sets
+> the exact push list + loop addressing mode.
+
+**Target asm — `func_02021b38` (brief 204 worked example):**
+
+```text
+
+stmdb sp!, {r3, r4, r5, lr}     ; ← 4-reg push (mwcc emits {r4, lr})
+ldr   r4, .L_DATA_A             ; pool slot A
+ldr   r2, .L_SIZE
+mov   r5, r0
+mov   r1, r4
+mov   r0, #0x0
+bl    Fill32
+ldr   r0, .L_CFG_TABLE
+ldr   r2, .L_DATA_B
+ldr   r0, [r0, #0x38]
+str   r5, [r2, #0xb0]
+mov   r0, r0, lsl #0x10
+ldr   r1, .L_DATA_A2            ; ← duplicate ref (C-34)
+mov   r0, r0, lsr #0x10
+str   r0, [r1, #0x4]
+mov   r2, #0x0
+mvn   r1, #0x0
+.L_loop:
+  add r0, r4, r2, lsl #0x4      ; ← non-strength-reduced (mwcc emits add #16)
+  add r2, r2, #0x1
+  str r1, [r0, #0x48]
+  cmp r2, #0x100
+  blt .L_loop
+mov   r0, #0x1
+ldmia sp!, {r3, r4, r5, pc}
+.L_DATA_A:    .word data_02197434
+.L_SIZE:      .word 0x000034a8
+.L_CFG_TABLE: .word data_021040ac
+.L_DATA_B:    .word data_02198434
+.L_DATA_A2:   .word data_02197434
+
+```
+
+**`.s` recipe + patcher trim-protect.** Brief 204 also found
+that `tools/patch_section_align.py`'s `trim_text_section_padding`
+heuristic falsely trims `.s` files ending in reloc-placeholder
+pool words. The pre-fix logic was "trim 2 bytes when `sh_size %
+4 == 0` AND last 2 bytes are `0x00 0x00`" — but a trailing
+`.word data_sym` reloc placeholder is `0x00 0x00 0x00 0x00`
+(filled by the linker), satisfying the trigger while NOT being
+mwasm padding. The fix: also check that no relocation patches
+the last 4 bytes of the section. If `.rel.text` (or `.rela.text`)
+has an `r_offset` in `[sh_size - 4, sh_size)`, skip the trim.
+
+Brief 202's E-07 worked example also exhibited this trim
+false-positive, but the next TU in its delinks chain
+(`func_02023fec.c`, a named .c file with a specific address)
+let mwldarm re-align the boundary at link time. func_02021b38's
+next TU is a `_dsd_gap@main_NN.o` gap-fill (no specific address),
+so mwldarm placed it contiguously after the 0x72-byte trimmed
+.o → cascade-shifted the next function by 2 bytes. Brief 204's
+patcher fix makes the trim safe for both cases.
+
+**C that miscodes the wall.** Brief 203's natural-form
+`.legacy.c` got 4 of 7 visible divergences right:
+correct callee-saved reg choice (r4), correct mvn-for-(-1),
+correct `lsl/lsr 16` halfword zero-extend, correct `bl Fill32`
+position. But missed:
+
+  - 2-reg push `{r4, lr}` vs orig's 4-reg `{r3, r4, r5, lr}`
+  - Single pool slot for `data_02197434` vs orig's 2 slots
+  - Strength-reduced loop `add ip, #16` vs orig's `add r0, r4,
+    r2, lsl #4` in addressing mode
+
+`.c` / `.legacy.c` / `.legacy_sp3.c` all produce variants of
+"compact push + CSE pool + strength-reduced loop." Brief 204
+swept all 15 mwccarm variants with the same negative result.
+
+**Use when:** the classifier flags BOTH C-34 (duplicate pool
+load) AND C-23 (≥ 3 pc-loads / clustered pool) — that's the
+"this function has 5+ pool references + duplicate-target slot"
+signal characteristic of combined codegen walls. Pre-routing
+the function as `.s` skips brief 203's per-tier iteration
+cycle.
+
+**Cross-corpus survey notes:** brief 204's empirical scope was
+`func_02021b38` only. A `predict_walls.py --version eur
+--module main` full-scan against the brief-203 candidate
+queue would identify other C-23+C-34 composite picks the
+classifier already flags.
+
+**Provenance:** brief 203 (PR #654) shipped 2 of 3 C-23 picks
+cleanly via the brief 199 `.legacy.c` recipe + extensions. The
+3rd pick (`func_02021b38`) didn't close — combined codegen
+walls. Brief 204 (this entry) swept all 15 mwccarm variants
+(found no single-tier match), tried the brief 202 C-34 `.s`
+recipe (worked at the function level), surfaced a patcher
+trim false-positive that broke the cascade-fill case, fixed the
+patcher's `trim_text_section_padding` heuristic with reloc-
+protection, shipped the worked example, and adds composite
+classification. Full diagnosis at
+[`first-wave-wall-routing-trilemma.md`](first-wave-wall-routing-trilemma.md).
 
 ## Permanent (11 patterns)
 

@@ -63,9 +63,20 @@ E_SHSTRNDX = 0x32    # uint16: index of string-table section header
 # Offsets within each Elf32_Shdr.
 SH_NAME = 0x00           # uint32: byte offset into .shstrtab
 SH_TYPE = 0x04
+SH_FLAGS = 0x08          # uint32: section flags
 SH_OFFSET = 0x10         # uint32: file offset of this section's bytes
 SH_SIZE = 0x14           # uint32: byte length of the section
+SH_LINK = 0x18           # uint32: section-specific link
+SH_INFO = 0x1C           # uint32: section-specific info (rel: target section idx)
 SH_ADDRALIGN = 0x20      # uint32: alignment constraint (what we rewrite)
+SH_ENTSIZE = 0x24        # uint32: per-entry size for tables
+
+# ELF section types we care about for the trim-protect path
+SHT_REL = 9
+SHT_RELA = 4
+
+# ELF32 Rel entry layout (.rel.text):
+REL_OFFSET = 0x00        # uint32: byte offset into the relocated section
 
 # The target alignment we want `.text` sections to land at. mwasmarm
 # emits 4; we rewrite to 2 so the linker lets Thumb TUs sit at the
@@ -183,6 +194,59 @@ def patch_text_sections(
     return buf, changes
 
 
+def _section_index_by_name(
+    buf: bytes | bytearray, shstrtab: bytes,
+    e_shoff: int, e_shentsize: int, e_shnum: int,
+    target_name: str,
+) -> int | None:
+    """Return the ELF section header index for `target_name`, or None."""
+    for i in range(e_shnum):
+        sh_off = e_shoff + i * e_shentsize
+        name_off = _read_u32(buf, sh_off + SH_NAME)
+        if name_off >= len(shstrtab):
+            continue
+        if _read_cstring(shstrtab, name_off) == target_name:
+            return i
+    return None
+
+
+def _rel_offsets_targeting_section(
+    buf: bytes | bytearray, shstrtab: bytes,
+    e_shoff: int, e_shentsize: int, e_shnum: int,
+    target_section_idx: int,
+) -> set[int]:
+    """Brief 204: collect every relocation `r_offset` that targets a
+    given section. Used to protect legitimate trailing pool-word
+    relocation placeholders from the mwasm-padding trim heuristic.
+
+    A `.rel.<name>` section has `sh_info == target_section_idx` and
+    `sh_entsize == 8` (Rel) or 12 (Rela). Each entry's first u32 is
+    `r_offset` — the byte offset INSIDE the target section that the
+    relocation patches.
+
+    Returns a set of `r_offset` values. Empty set if no `.rel.<name>`
+    section exists (e.g. fully-resolved .o or unrelocatable .text).
+    """
+    out: set[int] = set()
+    for i in range(e_shnum):
+        sh_off = e_shoff + i * e_shentsize
+        sh_type = _read_u32(buf, sh_off + SH_TYPE)
+        if sh_type not in (SHT_REL, SHT_RELA):
+            continue
+        if _read_u32(buf, sh_off + SH_INFO) != target_section_idx:
+            continue
+        sh_offset = _read_u32(buf, sh_off + SH_OFFSET)
+        sh_size = _read_u32(buf, sh_off + SH_SIZE)
+        ent_size = _read_u32(buf, sh_off + SH_ENTSIZE)
+        if ent_size == 0:
+            continue
+        for ent_off in range(sh_offset, sh_offset + sh_size, ent_size):
+            if ent_off + 4 > len(buf):
+                break
+            out.add(_read_u32(buf, ent_off + REL_OFFSET))
+    return out
+
+
 def trim_text_section_padding(
     data: bytes | bytearray,
 ) -> tuple[bytearray, list[tuple[str, int, int]]]:
@@ -200,16 +264,26 @@ def trim_text_section_padding(
     This function walks section headers. For each `.text*` section
     where:
       - `sh_size % 4 == 0` (mwasm padding lands on a 4-multiple), AND
-      - the last 2 bytes of the section's content are `0x00 0x00`
+      - the last 2 bytes of the section's content are `0x00 0x00`,
+      - AND NO relocation patches the last 4 bytes (brief 204 fix:
+        otherwise a legit reloc-placeholder pool word's trailing
+        zeros look like mwasm padding to the heuristic).
     …it trims `sh_size` by 2. Returns (patched_bytes, changes) where
     each change is `(name, old_size, new_size)`.
 
     The trim-trigger is deliberately narrow: only even-sized `.text`
-    sections with trailing NULs qualify. Legit 8-byte Thumb functions
-    that happen to end in `bx lr; nop` have the `nop` encoded as
-    `0xBF00` (or `0x46C0`), not `0x0000`, so they don't match the
-    trigger. `0x0000` is not a valid Thumb instruction in the
-    ARMv5TE ISA — it's mwasm's pad byte, period.
+    sections with trailing NULs AND no protecting reloc qualify.
+    Legit 8-byte Thumb functions that happen to end in `bx lr; nop`
+    have the `nop` encoded as `0xBF00` (or `0x46C0`), not `0x0000`,
+    so they don't match the byte-pattern trigger. `0x0000` is not a
+    valid Thumb instruction in the ARMv5TE ISA — it's mwasm's pad
+    byte, period.
+
+    Brief 204's `.s` files (e.g. `func_02021b38.s`) end in a `.word
+    data_sym` pool slot which appears as `0x00 0x00 0x00 0x00` in
+    the .o (the linker fills these via the reloc). Without the
+    reloc-protection check, the trim heuristic would shave 2 bytes
+    off legitimate function content and cascade-shift the next TU.
     """
     _check_elf_magic(data)
     buf = bytearray(data)
@@ -234,6 +308,19 @@ def trim_text_section_padding(
             content_off + cur_size - 2:content_off + cur_size
         ])
         if last_two != b"\x00\x00":
+            continue
+        # Brief 204: reloc-protection. If the .o has a relocation
+        # whose r_offset is within the last 4 bytes of this .text
+        # section, those zeros are a reloc placeholder (pool word
+        # to be patched at link time), NOT mwasm padding. Don't
+        # trim.
+        reloc_offsets = _rel_offsets_targeting_section(
+            buf, shstrtab, e_shoff, e_shentsize, e_shnum, i,
+        )
+        protect_start = cur_size - 4
+        if any(
+            protect_start <= ro < cur_size for ro in reloc_offsets
+        ):
             continue
         new_size = cur_size - 2
         _write_u32(buf, sh_off + SH_SIZE, new_size)

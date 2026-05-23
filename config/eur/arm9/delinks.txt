@@ -5412,6 +5412,10 @@ src/main/func_02021b28.c:
     complete
     .text start:0x02021b28 end:0x02021b38
 
+src/main/func_02021b38.s:
+    complete
+    .text start:0x02021b38 end:0x02021bac
+
 
 
 
