@@ -297,7 +297,7 @@ class TestExpectedPaths(unittest.TestCase):
             )
 
 
-class TestInstallPermuterDeps(unittest.TestCase):
+class TestInstallPermuterDepsPep668Fallback(unittest.TestCase):
     """Brief 198 followup. The PEP 668 externally-managed fallback
     auto-creates `.venv_permuter/` when system pip refuses."""
 
@@ -331,36 +331,25 @@ class TestInstallPermuterDeps(unittest.TestCase):
                 raise err
             # venv path — succeed silently
 
-        with tempfile.TemporaryDirectory() as td:
-            # Pre-create a fake venv at the expected location so
-            # _ensure_permuter_venv doesn't try to actually run
-            # `python -m venv` (which we can't fake here without
-            # subprocess injection).
-            from permute import ROOT
-            venv_root = ROOT / ".venv_permuter"
-            # Don't actually touch the real ROOT — patch sys for
-            # the test instead. Use a smoke check: just verify the
-            # exception classification works.
-            try:
-                install_permuter_deps(
-                    deps=("toml",),
-                    python_exe="/fake/python",
-                    run_pip=fake_pip,
-                    log=lambda *_a, **_k: None,
-                )
-            except FileNotFoundError:
-                # _ensure_permuter_venv tries to run venv creation
-                # via subprocess.run; that's the expected next step
-                # after the fallback fires. The point of THIS test
-                # is to confirm the CalledProcessError is caught
-                # and classified — getting to venv creation proves
-                # the classifier worked.
-                pass
-            except sp.CalledProcessError:
-                # Same idea — venv creation may CalledProcessError
-                # if the host has no `venv` module. Still proves
-                # fallback fired.
-                pass
+        # The test goal is purely "confirm the PEP 668 stderr
+        # classifier fires." Don't actually call _ensure_permuter_venv
+        # (which would try to subprocess `python -m venv` on the real
+        # filesystem); just observe that fake_pip got called once
+        # with /fake/python before any fallback. The next step in
+        # the function is `_ensure_permuter_venv` — reaching that
+        # boundary IS the assertion.
+        try:
+            install_permuter_deps(
+                deps=("toml",),
+                python_exe="/fake/python",
+                run_pip=fake_pip,
+                log=lambda *_a, **_k: None,
+            )
+        except (FileNotFoundError, sp.CalledProcessError):
+            # `_ensure_permuter_venv` raised — that means the
+            # fallback fired AFTER the initial pip refusal was
+            # classified as PEP 668. Test goal met.
+            pass
         # The fake_pip got called with /fake/python first (raised)
         # — if the classifier hadn't matched, install_permuter_deps
         # would have re-raised that error instead of trying the

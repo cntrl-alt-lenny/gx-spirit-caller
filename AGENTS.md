@@ -393,14 +393,14 @@ itself:
   shipped clean as `.legacy.c`; **key insight: C-23 + StyleA
   "stacked walls" is ONE wall with ONE recipe** (the sub-sp + Style A
   epilogue shape that mwcc 1.2/sp2p3 emits naturally for this call
-  layout). Constant-folding trap documented: naive `*(int *)(base
-  + offset)` compiles to a single folded pool word even at
-  `.legacy.c` tier — keep base + offset separate. Classifier
-  expanded with 4 new C-23 signals: main MMIO `0x04000xxx`, DTCM
-  kernel `0x027ff[c-f]xx`, duplicate refs, clustered pool.
-  Surfaced 4 more C-23 candidates for brief 200+ drain
-  (`OSi_PostIrqEvent`, `func_02021b38`, `func_02093dc8`, plus
-  pick #5 shipped). 2068 → 2073 tests (+5).
+  layout). Constant-folding trap documented: a naive
+  `*(int*)(base + offset)` C expression compiles to a single
+  folded pool word even at `.legacy.c` tier — keep base + offset
+  separate in source. Classifier expanded with 4 new C-23 signals:
+  main MMIO `0x04000xxx`, DTCM kernel `0x027ffcxx`-`0x027fffxx`,
+  duplicate refs, clustered pool. Surfaced 4 more C-23 candidates
+  for brief 200+ drain (`OSi_PostIrqEvent`, `func_02021b38`,
+  `func_02093dc8`, plus pick #5 shipped). 2068 → 2073 tests (+5).
 - **Brief 198** — `decomper`, shipped in PR #648. 🔬 **Permuter
   wave — 0 of 9 converged. Strategic finding: permuter isn't the
   right tool for Cluster B + E walls.** Phase 1 wrote 9 `.c`
