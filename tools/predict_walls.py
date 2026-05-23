@@ -63,6 +63,12 @@ predicate) need source-level context and aren't emitted here.
     pool slots for the same data symbol; mwcc 2.0 IR-CSE
     collapses to 1). Routes through `.s` with explicit
     `.word` per pool slot per brief 202 recipe.
+  - **C-35** — routing trilemma: composite signal firing when
+    C-23 AND C-34 both fire on the same function. Indicates
+    combined codegen walls where no single mwcc tier matches.
+    Same `.s` recipe as C-34; the composite cue pre-routes
+    away from the `.legacy.c` retry loop the individual signals
+    would otherwise suggest. Brief 204.
   - **C-33** — `.legacy.c` cascade risk (main module, function
     size > 0x50, StyleA or C-15 wall predicted). Brief 193's
     PR #640 surfaced this: any `.legacy.c` added to `src/main/`
@@ -742,6 +748,42 @@ def detect_address_cse(
     )]
 
 
+def detect_routing_trilemma(
+    walls: list[WallPrediction],
+) -> list[WallPrediction]:
+    """C-35 detector — composite over EXISTING wall predictions
+    (brief 204).
+
+    Fires when a function combines BOTH:
+      - C-34 (address-CSE / duplicate pool ref), AND
+      - C-23 (≥ 3 pc-relative loads + clustered or MMIO pool)
+
+    The C-23 + C-34 stack is characteristic of "routing trilemma"
+    picks where no single mwcc tier (`.c`, `.legacy.c`,
+    `.legacy_sp3.c`) produces all of: orig's push list +
+    duplicate pool ref + non-strength-reduced loop. Brief 204
+    swept all 15 available mwccarm variants and confirmed none
+    match. The recipe is the same as C-34 (pure `.s` with
+    explicit `.word` pool slots) but the composite cue
+    pre-routes the decomper away from the `.legacy.c` retry
+    loop the C-23 + C-34 individual signals would otherwise
+    suggest.
+
+    Pure function: takes the OTHER detectors' output. Returns
+    empty list when the composite signal doesn't fire.
+    """
+    ids = {w.wall_id for w in walls}
+    if "C-23" not in ids or "C-34" not in ids:
+        return []
+    return [WallPrediction(
+        "C-35",
+        "C-23 + C-34 stack — routing trilemma "
+        "(no mwcc tier matches all combined codegen walls); "
+        "ship as `.s` per brief 204 recipe (extends C-34's "
+        "`.s` recipe to multi-wall composites)",
+    )]
+
+
 # Brief 194: empirical size threshold above which a `.legacy.c`
 # routed function triggers Cluster F's ov004 cascade (~+64 B per
 # TU). PR #640 observed cascades on 0x68 and 0x6c picks but not
@@ -867,6 +909,9 @@ def predict_module(
         walls.extend(detect_legacy_c_cascade_risk(
             walls, module=module, size=s.size,
         ))
+        # Brief 204: C-35 is a composite over the wall set —
+        # triggers on C-23 + C-34 stack (routing trilemma).
+        walls.extend(detect_routing_trilemma(walls))
         out[key] = [
             {"id": w.wall_id, "cue": w.cue} for w in walls
         ]
@@ -959,6 +1004,8 @@ def main(argv: list[str] | None = None) -> int:
         walls.extend(detect_legacy_c_cascade_risk(
             walls, module=args.module, size=args.size,
         ))
+        # Brief 204 — C-35 routing-trilemma composite.
+        walls.extend(detect_routing_trilemma(walls))
         for w in walls:
             print(f"  {w.wall_id}: {w.cue}")
         if not walls:

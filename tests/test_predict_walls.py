@@ -21,6 +21,7 @@ from predict_walls import (  # noqa: E402
     detect_address_cse,
     detect_cross_overlay_bl,
     detect_legacy_c_cascade_risk,
+    detect_routing_trilemma,
     detect_walls,
 )
 
@@ -985,6 +986,82 @@ class TestAddressCSEDetection(unittest.TestCase):
             "", addr=0x02000000, size=0x100,
         )
         self.assertEqual(walls, [])
+
+
+class TestRoutingTrilemmaDetection(unittest.TestCase):
+    """C-35 detector (brief 204) — composite signal that fires when
+    C-23 AND C-34 both fire on the same function. Marks the
+    function as a "routing trilemma" pick where combined codegen
+    walls mean no single mwcc tier matches.
+    """
+
+    @staticmethod
+    def _wall(wall_id: str, cue: str = "test cue") -> WallPrediction:
+        return WallPrediction(wall_id, cue)
+
+    def test_c23_plus_c34_fires(self):
+        # The brief 204 reference signal: both C-23 and C-34
+        # fire on the same function.
+        walls = [
+            self._wall("C-23"),
+            self._wall("C-34"),
+        ]
+        composite = detect_routing_trilemma(walls)
+        self.assertEqual(len(composite), 1)
+        self.assertEqual(composite[0].wall_id, "C-35")
+        self.assertIn("routing trilemma", composite[0].cue)
+        self.assertIn("brief 204", composite[0].cue)
+
+    def test_c23_plus_c34_with_additional_walls_still_fires(self):
+        # func_02021b38's actual classifier output has 5 walls
+        # (C-23, C-15, C-1, C-34, C-33); C-35 fires regardless.
+        walls = [
+            self._wall("C-23"),
+            self._wall("C-15"),
+            self._wall("C-1"),
+            self._wall("C-34"),
+            self._wall("C-33"),
+        ]
+        composite = detect_routing_trilemma(walls)
+        self.assertEqual(len(composite), 1)
+        self.assertEqual(composite[0].wall_id, "C-35")
+
+    def test_c34_alone_does_not_fire(self):
+        # C-34 alone (like brief 202's E-07) does NOT trigger
+        # the composite — that's the simpler single-wall case
+        # where the C-34 recipe applies cleanly.
+        walls = [self._wall("C-34")]
+        self.assertEqual(detect_routing_trilemma(walls), [])
+
+    def test_c23_alone_does_not_fire(self):
+        # C-23 alone (like brief 199's pick #5) does NOT trigger
+        # — the C-23 `.legacy.c` recipe handles those.
+        walls = [self._wall("C-23")]
+        self.assertEqual(detect_routing_trilemma(walls), [])
+
+    def test_other_walls_alone_dont_fire(self):
+        # Unrelated walls — StyleA + C-1 + P-11 — don't trigger.
+        walls = [
+            self._wall("StyleA"),
+            self._wall("C-1"),
+            self._wall("P-11"),
+        ]
+        self.assertEqual(detect_routing_trilemma(walls), [])
+
+    def test_empty_walls_doesnt_fire(self):
+        # Defensive: empty input returns empty list.
+        self.assertEqual(detect_routing_trilemma([]), [])
+
+    def test_c32_plus_c34_does_not_fire(self):
+        # C-32 (cross-overlay BL) + C-34 — different family
+        # (the BL wall is independent of the pool wall). The
+        # routing trilemma is specifically the C-23 + C-34
+        # combo.
+        walls = [
+            self._wall("C-32"),
+            self._wall("C-34"),
+        ]
+        self.assertEqual(detect_routing_trilemma(walls), [])
 
 
 if __name__ == "__main__":
