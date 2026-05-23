@@ -79,26 +79,14 @@ jobs:
       - name: Upsert PR comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Find any prior analyzer comment on this PR and update it in
-        # place, so the PR timeline isn't spammed with a new comment on
-        # every push. Falls back to creating one if none exists.
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        # Idempotent comment upsert via shared script — REST API only,
+        # retry on transient 401s, fail-soft if all retries exhaust.
+        # See .github/scripts/upsert-pr-comment.sh for the rationale.
         run: |
-          set -euo pipefail
-          MARKER='<sub>🤖 Posted by `.github/workflows/analyzer.yml`'
-          PR=${{ github.event.pull_request.number }}
-          existing_id=$(
-            gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
-              --jq ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
-              | head -n1 || true
-          )
-          if [ -n "${existing_id}" ]; then
-            gh api --method PATCH \
-              "repos/${{ github.repository }}/issues/comments/${existing_id}" \
-              -f body="$(cat /tmp/comment.md)"
-          else
-            gh pr comment "${PR}" --body-file /tmp/comment.md \
-                --repo "${{ github.repository }}"
-          fi
+          .github/scripts/upsert-pr-comment.sh \
+            '<sub>🤖 Posted by `.github/workflows/analyzer.yml`' \
+            /tmp/comment.md
 
   main-baseline:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
