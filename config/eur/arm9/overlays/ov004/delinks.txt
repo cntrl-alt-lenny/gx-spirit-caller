@@ -348,3 +348,7 @@ src/overlay004/func_ov004_021cfb84.c:
 src/overlay004/func_ov004_021d3dc8.c:
     complete
     .text start:0x021d3dc8 end:0x021d3ddc
+
+src/overlay004/func_ov004_021dbdbc.s:
+    complete
+    .text start:0x021dbdbc end:0x021dbdc4
