@@ -247,6 +247,115 @@ class TestWallPredictionShape(unittest.TestCase):
         self.assertEqual(wp.cue, "some cue")
 
 
+class TestInterworkVeneerDetection(unittest.TestCase):
+    """Brief 191 C-31: mwldarm interwork veneer / long-distance
+    trampoline. Detected via byte-pattern signatures in the hex
+    column of objdump output, not via mnemonics — the function's
+    bytes carry a distinctive `4b00 4718 ...` (Thumb) or `e59fN000
+    e12fff1N ...` (ARM) signature that the classifier matches
+    after objdump's misinterpretation of the Thumb halfwords as
+    ARM words.
+    """
+
+    def test_thumb_8byte_veneer_canonical_shape(self):
+        # `func_ov004_021dbdbc` shape:
+        #   4b 00 47 18    ; Thumb `ldr r3, [pc, #0]; bx r3`
+        #   b4 ec 06 02    ; .word 0x0206ecb4
+        # objdump's binary-mode ARM disasm reads these 8 bytes as
+        # two ARM words: `47184b00` then `0206ecb4`.
+        asm = _wrap_asm(
+            _objdump_line(0x1205c, "47184b00", "ldrmi\tr4, [r8, -r0]"),
+            _objdump_line(0x12060, "0206ecb4", "andeq\tlr, r6, #0xb400"),
+        )
+        walls = detect_walls(asm)
+        wall_ids = {w.wall_id for w in walls}
+        self.assertIn("C-31", wall_ids)
+        # The cue text mentions the Thumb routing.
+        cue = next(w.cue for w in walls if w.wall_id == "C-31")
+        self.assertIn(".thumb", cue)
+
+    def test_arm_12byte_trampoline_canonical_shape(self):
+        # `func_0209085c` shape:
+        #   00 10 9f e5    ; ARM `ldr r1, [pc]`
+        #   11 ff 2f e1    ; `bx r1`
+        #   b0 09 09 02    ; .word 0x020909b0
+        # All three lines are real ARM instructions; the regex
+        # matches `e59f1000` + `e12fff11`.
+        asm = _wrap_asm(
+            _objdump_line(0x9085c, "e59f1000", "ldr\tr1, [pc]"),
+            _objdump_line(0x90860, "e12fff11", "bx\tr1"),
+            _objdump_line(0x90864, "020909b0", "andeq\tr9, r9, #0xb0"),
+        )
+        walls = detect_walls(asm)
+        wall_ids = {w.wall_id for w in walls}
+        self.assertIn("C-31", wall_ids)
+        cue = next(w.cue for w in walls if w.wall_id == "C-31")
+        self.assertIn(".arm", cue)
+
+    def test_arm_12byte_trampoline_ip_scratch(self):
+        # ip-register variant — `func_0206ecb4` shape:
+        #   00 c0 9f e5    ; `ldr ip, [pc]`
+        #   1c ff 2f e1    ; `bx ip`
+        #   68 de 06 02    ; .word 0x0206de68
+        asm = _wrap_asm(
+            _objdump_line(0x6ecb4, "e59fc000", "ldr\tip, [pc]"),
+            _objdump_line(0x6ecb8, "e12fff1c", "bx\tip"),
+            _objdump_line(0x6ecbc, "0206de68", "andeq\tsp, r6, #..."),
+        )
+        walls = detect_walls(asm)
+        self.assertIn("C-31", {w.wall_id for w in walls})
+
+    def test_thumb_12byte_veneer_with_prefix(self):
+        # `func_ov004_021dbdc4` shape (pick #12 from brief 188):
+        #   0a 70 01 4b    ; `strb r2, [r1]; ldr r3, [pc, #4]`
+        #   18 47 c0 46    ; `bx r3; nop (mov r8, r8)`
+        #   a0 ee 06 02    ; .word 0x0206eea0
+        # The middle word `46c04718` is the bx+nop signature —
+        # distinctive enough to flag without ambiguity.
+        asm = _wrap_asm(
+            _objdump_line(0x12064, "4b01700a", "blmi\t0x6e094"),
+            _objdump_line(0x12068, "46c04718", "<UNDEFINED>"),
+            _objdump_line(0x1206c, "0206eea0", "andeq\tlr, r6, #0xa00"),
+        )
+        walls = detect_walls(asm)
+        wall_ids = {w.wall_id for w in walls}
+        self.assertIn("C-31", wall_ids)
+        cue = next(w.cue for w in walls if w.wall_id == "C-31")
+        self.assertIn("side-effect prefix", cue)
+
+    def test_no_match_for_unrelated_8byte_function(self):
+        # A `push {lr}; bx lr` style 8-byte function — same size
+        # as the Thumb veneer but different byte pattern. Must
+        # NOT trigger C-31.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e92d4000", "stmfd\tsp!, {lr}"),
+            _objdump_line(0x104, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-31", {w.wall_id for w in walls})
+
+    def test_no_match_for_unrelated_12byte_function(self):
+        # 12-byte ARM function that isn't a trampoline. Must
+        # NOT trigger C-31.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e3a00007", "mov\tr0, #7"),
+            _objdump_line(0x104, "e1a01000", "mov\tr1, r0"),
+            _objdump_line(0x108, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-31", {w.wall_id for w in walls})
+
+    def test_no_match_for_thumb_8byte_non_veneer(self):
+        # 8-byte Thumb function whose hex bytes don't match
+        # `47184bXX`. Must NOT trigger C-31.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "47702000", "ldrmi\tr2, [r0]"),
+            _objdump_line(0x104, "12345678", "..."),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-31", {w.wall_id for w in walls})
+
+
 class TestEmptyAsm(unittest.TestCase):
     """Defensive: empty / malformed asm returns an empty wall list,
     not a crash. Used by `predict_walls.py` when a function's

@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (30 patterns)
+## Coercible-with-knowledge (31 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -3728,6 +3728,153 @@ variant D (shift-based bit extraction + dual-extern) hit
 byte-identical at all 10 mwcc 2.0/* SPs. End-to-end validated;
 src committed. Classified as **C-30 — pool-DUP + shift-bit
 extension of C-27**.
+
+### C-31. mwldarm interwork veneer — `.s` with explicit mode directive
+
+> **Wall family note — C-31 vs C-24.** Both involve indirect-
+> jump shapes (`ldr rN, [pool]; bx rN`). C-24 is about *source-
+> level* indirect-call dispatch where the user's C code chooses
+> the function-pointer table layout; routing through
+> `.legacy_sp3.c` (mwcc 1.2/sp3) recovers the matching dispatch
+> code. C-31 is about *linker-emitted* interwork shims —
+> mwldarm 2.0/sp1p5 auto-generates these to bridge Thumb/ARM
+> mode boundaries or long-distance branches, and they appear
+> in `symbols.txt` as ordinary `func_<addr>` entries even
+> though they're not source-authored. C-24 fires on functions
+> with non-trivial bodies; C-31 fires on the 8-byte / 12-byte
+> shim shape itself.
+>
+> | Wall | C-24 | C-31 |
+> |---|---|---|
+> | **Source origin** | user `.c` indirect call | mwldarm-emitted shim |
+> | **Body size** | function body + dispatch | 8 B (Thumb) or 12 B (ARM) |
+> | **Recipe** | `.legacy_sp3.c` routing | `.s` with `.thumb`/`.arm` directive |
+
+**Recognition cue (asm-level):**
+
+The function body is exactly 8 bytes (Thumb form) or 12 bytes
+(ARM form), and matches one of:
+
+```text
+; Thumb 8 B — Thumb caller → ARM target interwork shim
+4b 00       ldr   r3, [pc, #0]   ; pc = veneer + 4, so [pc+0] = veneer + 4 = .word slot
+47 18       bx    r3
+<4 bytes>   .word target_va
+
+; ARM 12 B — long-distance branch trampoline (in-mode)
+00 ?0 9f e5 ldr   rN, [pc]
+?c ff 2f e1 bx    rN
+<4 bytes>   .word target_va
+
+; Thumb 12 B — Thumb shim with pre-store side effect
+<2 bytes>   strb / strh / str rN, [rM]   ; one pre-store instruction
+4b 00       ldr   r3, [pc, #0]
+47 18       bx    r3
+00 00       nop                          ; alignment padding
+<4 bytes>   .word target_va
+```
+
+The `.word target_va` is in another module's `.text` (cross-
+module veneer) OR exceeds the direct-branch range (~32 MB from
+the veneer's own VA — long-distance trampoline).
+
+**mwldarm's role:** at link time, mwldarm 2.0/sp1p5 scans
+`relocs.txt`-equivalent ELF reloc entries for `thumb_call`
+crossing into ARM mode (or vice versa) and for `arm_call` /
+`thumb_call` where the target is too far. For each such reloc
+it allocates a veneer at a stable address inside the calling
+overlay's `.text`. The veneer becomes a named function in
+`symbols.txt` post-extraction because dsd sees a callable
+entry at that address.
+
+**C that miscodes the wall:**
+
+The natural tail-call wrapper looks innocent but explodes:
+
+```c
+extern void func_<target_va>(void);
+void func_<veneer_va>(void) { func_<target_va>(); }
+```
+
+mwcc 2.0/sp1p5 emits this as 12+ bytes of ARM (`push {lr}; bl
+target; pop {pc}`) regardless of source mode. For an 8-byte
+Thumb veneer target the size + alignment mismatch cascades
+the surrounding link layout (brief 191 Part 1 reproduction:
+~159 KB byte-diff in `arm9_ov004.bin`, 19,693 divergence
+runs, +5 byte `.rodata` shift exceeding the brief 180 patcher
+cap).
+
+**`.s` that coerces it (verified byte-identical against
+`func_ov004_021dbdbc`):**
+
+```text
+        .text
+        .global func_<veneer_va>
+        .thumb                  ; or .arm for the 12-byte ARM form
+func_<veneer_va>:
+        ldr     r3, [pc, #0]
+        bx      r3
+        .word   <target_va>
+```
+
+Critical details:
+
+- **`.thumb` directive** (not `.thumb_func` — mwasmarm
+  rejects the GNU symbol-type marker). The encoding-mode
+  switch is mandatory; without it mwasmarm assembles the
+  `ldr; bx` as 32-bit ARM instructions and the size doubles.
+- **`.global` only** — no `.thumb_func` / no interwork
+  attributes / no `extern` reference for the target. mwldarm
+  resolves the literal-pool VA at link time via the orig-VA
+  reloc machinery dsd ships.
+- **Literal pool inline** as `.word <target_va>` — not via
+  named extern; mwasmarm doesn't need a `.pool` directive
+  because the `.word` is already at the correct PC-relative
+  offset.
+
+Verified: 3-region `ninja sha1` PASS preserved when shipped
+as `src/overlay004/func_ov004_021dbdbc.s` (the brief 191
+worked example).
+
+**Per-shape recipe table:**
+
+| Shape | Mode directive | Scratch reg | Body |
+|---|---|---|---|
+| 8 B Thumb | `.thumb` | `r3` | `ldr r3, [pc, #0]; bx r3; .word target` |
+| 12 B ARM | `.arm` | `ip` or `r1` | `ldr rN, [pc]; bx rN; .word target` |
+| 12 B Thumb + prefix | `.thumb` | `r3` | `<pre-store>; ldr r3, [pc, #4]; bx r3; nop; .word target` |
+
+**Use when:** target asm exactly matches one of the recognition
+cues AND the `.word`-slot target VA is in another module's
+`.text` (cross-module) or > 32 MB from the veneer's own VA
+(long-distance). The `tools/predict_walls.py` `InterworkVeneer`
+classifier (brief 191) auto-flags these picks.
+
+**Cross-corpus survey notes:** the 5 affected picks from brief
+188 PR #636 form the initial population:
+
+| Pick | Module | Addr | Size | Mode | Target |
+|---|---|---|---:|---|---|
+| #3 | ov004 | `0x021dbdbc` | 8 | Thumb | `func_0206ecb4` (in main) |
+| #4 | ov004 | `0x021dbdd0` | 8 | Thumb | `func_0206eecc` (in main) |
+| #5 | ov004 | `0x021de280` | 8 | Thumb | `func_02091768` (in main) |
+| #9 | main | `0x0209085c` | 12 | ARM | `func_020909b0` (in main, long-distance) |
+| #12 | ov004 | `0x021dbdc4` | 12 | Thumb | `func_0206eea0` (in main, with pre-store) |
+
+Picks #3, #4, #5 are byte-identical except for the literal-
+pool target VA — brief 192+ drains them by copying the brief
+191 worked example.
+
+**Provenance:** decomper brief 188 (PR #636) surfaced the
+cluster empirically and tagged it as "likely mwldarm interwork
+veneers" without a recipe. Brief 191 (this entry) classified
+the wall, reproduced the cascade with byte-level evidence,
+shipped the `.s` + `.thumb` directive recipe as a worked
+example on pick #3, and extended
+[`tools/predict_walls.py`](../../tools/predict_walls.py) with
+an `InterworkVeneer` detector so future trivial-bucket waves
+pre-route affected picks. Full diagnosis +
+recipe rationale at [`first-wave-wall-mwldarm-interwork.md`](first-wave-wall-mwldarm-interwork.md).
 
 ## Permanent (10 patterns)
 

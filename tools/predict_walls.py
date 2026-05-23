@@ -320,6 +320,72 @@ def detect_walls(asm: str) -> list[WallPrediction]:
             "permuter via brief 098",
         ))
 
+    # ----- C-31 mwldarm interwork veneer.
+    #
+    # Brief 191: 8-byte Thumb veneer OR 12-byte ARM trampoline
+    # shape that mwldarm auto-emits for cross-mode / long-distance
+    # calls. Recognition cues:
+    #
+    #   1. Thumb 8 B (2 disasm lines, force-thumb OFF — objdump
+    #      decodes as ARM): first hex word matches `47184bXX`
+    #      (= Thumb `4b XX 47 18` little-endian = `ldr r3, [pc, #N];
+    #      bx r3`). XX = 0 for the canonical `[pc, #0]` form.
+    #   2. ARM 12 B (3 disasm lines): first hex word matches
+    #      `e59f.000` (= `ldr rN, [pc]`) AND second hex word
+    #      matches `e12fff1.` (= `bx rN`).
+    #
+    # Both shapes end with a `.word target_va` literal whose value
+    # determines whether the cross-mode/long-distance trigger
+    # fires — we can't verify that from disasm text alone (no VA
+    # info in --disassembler-options=binary output), but the
+    # 8 B / 12 B + shim-bytes match is specific enough that
+    # false positives are unlikely.
+    hex_words = []
+    for line in lines:
+        m = re.search(r":\t([0-9a-f]{8})\s+", line)
+        if m:
+            hex_words.append(m.group(1))
+    # 8-byte Thumb veneer: exactly 2 hex words, first matches
+    # `47184bXX` (the `XX` is the pool-offset nibble).
+    if len(hex_words) == 2 and re.match(
+        r"^47184b[0-9a-f][0-9a-f]$", hex_words[0],
+    ):
+        walls.append(WallPrediction(
+            "C-31",
+            "Thumb 8-byte mwldarm interwork veneer (`ldr r3, "
+            "[pc, #N]; bx r3; .word target`) — ship as `.s` with "
+            "explicit `.thumb` directive per brief 191 recipe",
+        ))
+    # 12-byte ARM trampoline: 3 hex words, ldr [pc] + bx + .word.
+    elif (
+        len(hex_words) == 3
+        and re.match(r"^e59f[0-9a-f]000$", hex_words[0])
+        and re.match(r"^e12fff1[0-9a-f]$", hex_words[1])
+    ):
+        walls.append(WallPrediction(
+            "C-31",
+            "ARM 12-byte mwldarm trampoline (`ldr rN, [pc]; bx "
+            "rN; .word target`) — ship as `.s` with explicit "
+            "`.arm` directive per brief 191 recipe",
+        ))
+    # 12-byte Thumb veneer with 2-byte side-effect prefix:
+    # 3 hex words, second word is the merged `bx r3` + `nop`
+    # halfwords (= 0x46c04718 little-endian) — distinctive
+    # enough to flag without ambiguity. The pre-store prefix
+    # varies (strb / strh / str / mov), so we recognise via
+    # the middle word rather than the first.
+    elif (
+        len(hex_words) == 3
+        and hex_words[1] == "46c04718"
+    ):
+        walls.append(WallPrediction(
+            "C-31",
+            "Thumb 12-byte mwldarm veneer with side-effect "
+            "prefix (`<prefix>; ldr r3, [pc, #4]; bx r3; nop; "
+            ".word target`) — ship as `.s` with explicit "
+            "`.thumb` directive per brief 191 recipe",
+        ))
+
     return walls
 
 
