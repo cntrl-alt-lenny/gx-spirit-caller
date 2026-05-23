@@ -386,6 +386,155 @@ class TestP9Detection(unittest.TestCase):
         self.assertNotIn("P-9", {w.wall_id for w in walls})
 
 
+class TestP11Detection(unittest.TestCase):
+    """P-11: mwcc 2.0/sp1p5 reg-allocator plateau (brief 200).
+
+    Fires on functions size 0x5c-0x74 with EITHER:
+      - 3+ callee-saved register push + ≥1 bl + ≥2 cond branches
+      - `sub sp, #N` stack-scratch prologue + ≥1 bl + ≥1 cond branch
+
+    Permuter scored these picks 480-500 with 3-5 source variants
+    explored — the reg-alloc choice is downstream of source-shape
+    iteration. Permanent wall under current tools.
+    """
+
+    def _make_body(self, n_instrs):
+        """Generate N filler instruction lines so the size-bytes
+        heuristic computes to the right range."""
+        return [
+            _objdump_line(
+                0x100 + i * 4, "e3a00000", "mov\tr0, #0",
+            )
+            for i in range(n_instrs)
+        ]
+
+    def test_e12_shape_3_callees_2_cond_1_bl(self):
+        # E-12 reference shape: 0x74 = 29 instructions, 4-reg push
+        # (r4/r5/r6/lr = 3 callee), 1 bl, 3 cond branches.
+        body = self._make_body(20)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4070", "push\t{r4, r5, r6, lr}"),
+            *body,
+            _objdump_line(0x60, "0a000005", "beq\t0x80"),
+            _objdump_line(0x64, "da000007", "ble\t0x90"),
+            _objdump_line(0x68, "bafffff8", "blt\t0x40"),
+            _objdump_line(0x6c, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x70, "e8bd8070", "pop\t{r4, r5, r6, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("P-11", ids, msg=f"walls={walls}")
+
+    def test_b22_shape_3_callees_4_cond_3_bl(self):
+        # B-22 reference: 0x5c = 23 instructions, multi-callee
+        # push, multiple bl in body, multiple cond branches.
+        body = self._make_body(14)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4070", "push\t{r4, r5, r6, lr}"),
+            *body,
+            _objdump_line(0x3c, "0a000011", "beq\t0x80"),
+            _objdump_line(0x40, "da000007", "ble\t0x60"),
+            _objdump_line(0x44, "bafffff7", "blt\t0x40"),
+            _objdump_line(0x48, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x4c, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x50, "0a000000", "beq\t0x60"),
+            _objdump_line(0x54, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x58, "e8bd8070", "pop\t{r4, r5, r6, pc}"),
+        )
+        walls = detect_walls(asm)
+        self.assertIn("P-11", {w.wall_id for w in walls})
+
+    def test_b24_shape_stack_scratch_alt_path(self):
+        # B-24 reference: `push {r4, lr}` + `sub sp, #16` scratch,
+        # 1 bl, 1 cond branch, 0x5c size. The stack-scratch
+        # alt-path fires here (1 callee-saved is below the
+        # main-path threshold of 3).
+        body = self._make_body(17)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e24dd010", "sub\tsp, sp, #16"),
+            *body,
+            _objdump_line(0x4c, "0a000002", "beq\t0x60"),
+            _objdump_line(0x50, "ebf8cee1", "bl\t0xffe3cb10"),
+            _objdump_line(0x54, "e28dd010", "add\tsp, sp, #16"),
+            _objdump_line(0x58, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        self.assertIn(
+            "P-11", {w.wall_id for w in walls},
+            msg=f"walls={walls}",
+        )
+        # Cue should mention stack-scratch path, not 3+ callees.
+        cue = next(w.cue for w in walls if w.wall_id == "P-11")
+        self.assertIn("stack-scratch", cue)
+
+    def test_small_leaf_no_match(self):
+        # B-08 / tiny leaf shape: 7 instructions, 0x1c bytes. Way
+        # below the size floor.
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4000", "push\t{lr}"),
+            _objdump_line(0x4, "e24dd004", "sub\tsp, sp, #4"),
+            _objdump_line(0x8, "e5900000", "ldr\tr0, [r0]"),
+            _objdump_line(0xc, "eb01578c", "bl\t0xb3870"),
+            _objdump_line(0x10, "e1a00001", "mov\tr0, r1"),
+            _objdump_line(0x14, "e28dd004", "add\tsp, sp, #4"),
+            _objdump_line(0x18, "e8bd8000", "ldmfd\tsp!, {pc}"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("P-11", {w.wall_id for w in walls})
+
+    def test_too_large_no_match(self):
+        # A function > 0x74 doesn't fire even with all other
+        # signals present — the plateau is specifically the
+        # 0x5c-0x74 range.
+        body = self._make_body(30)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4070", "push\t{r4, r5, r6, lr}"),
+            *body,
+            _objdump_line(0x80, "0a000005", "beq\t0xb0"),
+            _objdump_line(0x84, "da000007", "ble\t0xa0"),
+            _objdump_line(0x88, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x8c, "e8bd8070", "pop\t{r4, r5, r6, pc}"),
+        )
+        walls = detect_walls(asm)
+        # Function is ~0x90 (36 instructions) — above the
+        # plateau range; should not fire.
+        self.assertNotIn("P-11", {w.wall_id for w in walls})
+
+    def test_no_helper_call_no_match(self):
+        # 0x70 size + 3 callees + 2 cond branches BUT no `bl` —
+        # the plateau wall specifically involves
+        # spill-vs-keep-live decisions around a helper call.
+        # Without the bl, mwcc has no pressure to spill, so the
+        # divergence doesn't manifest.
+        body = self._make_body(24)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4070", "push\t{r4, r5, r6, lr}"),
+            *body,
+            _objdump_line(0x68, "0a000005", "beq\t0x80"),
+            _objdump_line(0x6c, "da000007", "ble\t0x80"),
+            _objdump_line(0x70, "e8bd8070", "pop\t{r4, r5, r6, pc}"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("P-11", {w.wall_id for w in walls})
+
+    def test_single_callee_no_scratch_no_match(self):
+        # `push {r4, lr}` + no sub-sp — only 1 callee-saved, no
+        # scratch. Neither main-path nor alt-path fires.
+        body = self._make_body(20)
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            *body,
+            _objdump_line(0x58, "0a000005", "beq\t0x70"),
+            _objdump_line(0x5c, "eb000000", "bl\t0x1000"),
+            _objdump_line(0x60, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        # Has bl + 1 cond + size in range, but no multi-callee
+        # AND no stack-scratch — should NOT fire.
+        self.assertNotIn("P-11", {w.wall_id for w in walls})
+
+
 class TestWallPredictionShape(unittest.TestCase):
     """Pin the WallPrediction dataclass shape — downstream
     consumers (next_targets.py JSON output) read `.wall_id` and

@@ -4311,7 +4311,7 @@ measure per-section modal deviation, and extended
 `C-33` composite-risk detector. Full diagnosis + fix mechanism
 at [`first-wave-wall-legacy-c-cascade.md`](first-wave-wall-legacy-c-cascade.md).
 
-## Permanent (10 patterns)
+## Permanent (11 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -4944,6 +4944,159 @@ NOT) instead of `if (p == 0) return -1;` (equality with 0).
 Both forms are semantically identical; mwcc 2.0 compiles them
 to DIFFERENT control-flow shapes. P-10 is no longer permanent
 for this pattern — see C-29 for the codified recipe.
+
+### P-11. mwcc 2.0 reg-allocator plateau on mid-size helper-call functions
+
+> **Wall family note — see also P-4, P-8, brief 198.** P-11 is
+> the umbrella for mwcc 2.0/sp1p5 register-allocator
+> divergences that **resist both permuter and source-shape
+> iteration** at the 0x5c-0x74 size range. P-4 (r2-vs-r3 swap
+> on thunks) and P-8 (r0-only vs r0→r1→r0 bit-chain) are
+> narrower instances of the same family on smaller / specific
+> shapes; P-11 covers the larger mid-size cohort surfaced by
+> brief 198's permuter wave.
+>
+> **Discriminator vs C-23 / C-32 / C-33:** P-11 picks have
+> NORMAL pool-load shape (1 pc-load OR 2 distinct targets, NOT
+> the duplicate-pool-ref clustering C-23 fires on). They have
+> NORMAL BL relocations (no `module:none` cross-overlay
+> hardcodes C-32 fires on). They DON'T trigger the brief 194
+> patcher cascade (their `.legacy.c` routing isn't required —
+> they emit Style B `pop {pc}` epilogues natively). The wall is
+> purely "mwcc 2.0 picked different callee-saved registers /
+> different addressing-mode strategy than orig" — downstream
+> of source-shape decisions.
+
+**Target asm (E-12 `func_02024574`, 0x74 = 29 insns):**
+
+```text
+
+push  {r4, r5, r6, lr}
+ldr   r1, [pc, #96]            ; r1 = &data_0219a8ec (pool word A)
+mov   r4, r0                    ; r4 = arg
+ldr   r5, [r1, #4]              ; r5 = data.count
+ldr   r1, [pc, #88]             ; r1 = &data_0219a8ec (pool word B, SAME VALUE)
+cmp   r5, #0
+mov   r3, #0
+ble   .L_skip
+ldr   r2, [r1]                  ; r2 = data.array
+.Lloop:
+  ldr   r0, [r2]
+  cmp   r0, #0
+  beq   .L_skip
+  add   r3, r3, #1
+  cmp   r3, r5
+  add   r2, r2, #364
+  blt   .Lloop
+.L_skip:
+  cmp   r3, r5
+  mov   r0, #0
+  popge {r4, r5, r6, pc}
+  mov   r2, #364
+  mul   r5, r3, r2
+  ldr   r6, [r1]                ; r6 = data.array (3rd r1-deref)
+  add   r1, r6, r5              ; r1 = base + offset
+  bl    Fill32
+  str   r4, [r6, r5]
+  add   r0, r6, r5
+  pop   {r4, r5, r6, pc}
+.word data_0219a8ec
+.word data_0219a8ec             ; SAME pool value — distinct word
+
+```
+
+**mwcc 2.0/sp1p5 emits when miscoded (default `.c` routing):**
+
+```text
+
+push  {r4, r5, r6, lr}
+ldr   r1, [pc, #96]            ; r1 = &data_0219a8ec
+mov   r4, r0
+ldr   r2, [r1, #4]              ; r2 (NOT r5) = count
+mov   r3, #0
+cmp   r2, #0
+ble   .L_skip
+ldr   r1, [r1]                  ; r1 = data.array (deref in place)
+.Lloop:
+  ldr   r0, [r1]
+  cmp   r0, #0
+  beq   .L_skip
+  add   r3, r3, #1
+  cmp   r3, r2
+  add   r1, r1, #364
+  blt   .Lloop
+.L_skip:
+  cmp   r3, r2
+  mov   r0, #0
+  popge {r4, r5, r6, pc}
+  mov   r2, #364
+  mul   r5, r3, r2
+  ldr   r1, [pc, #20]            ; reload base (SINGLE pool word)
+  ldr   r6, [r1]
+  ...
+
+```
+
+Visible divergences:
+
+1. **Pool count**: orig has 2 pool words (same value); built has
+   1. mwcc 2.0 deduped the pool.
+2. **Count register**: orig uses r5 (callee-saved), built uses
+   r2 (caller-saved). mwcc 2.0 chose the cheaper register but
+   would need to spill across the Fill32 call later.
+3. **Cursor register**: orig uses r2 walking with `add r2, #364`;
+   built uses r1 walking the same way. Choice flows from #2.
+
+**Permuter outcome (brief 198):** 3 source variants explored
+over 120 s × 4 threads, plateau at score 480. Source-level
+mutations (variable renames, type juggles, reorderings) don't
+reach the reg-allocator's choice. Brief 200 attempted
+`volatile`-qualified field reads to defeat CSE; shifted the
+shape (added a 2nd pool ref) but didn't byte-match.
+
+**Affected picks (brief 200 survey, 5 of 9 brief 198 picks):**
+
+| Pick | Module | Addr | Size | Best score (brief 198) | Sub-shape |
+|---|---|---|---:|---:|---|
+| E-12 `func_02024574` | main | `0x02024574` | 0x74 | 480 | find-empty-slot (stride 0x16c) |
+| E-13 `func_020270d0` | main | `0x020270d0` | 0x74 | 485 | clone of E-12 (stride 0xe0) |
+| E-14 `func_02028790` | main | `0x02028790` | 0x74 | 485 | clone of E-12 (stride 0x19c) |
+| B-22 `func_0200b0c8` | main | `0x0200b0c8` | 0x5c | 500 | array destructor with in-loop bl |
+| B-24 `func_ov011_021d2ca8` | ov011 | `0x021d2ca8` | 0x5c | 490 | struct field setter w/ useless-spill stack scratch |
+
+**Recipe status: NONE** (Permanent — no source-shape iteration
+yet found that reaches mwcc 2.0's reg-alloc choice). Picks in
+this cohort: defer or escalate to scaffolder reg-alloc-hint
+research (separate brief candidate). Future briefs may discover
+a coercion that promotes this to C-N — precedent:
+[C-29 supersedes P-10](#c-29-if-p-idiom-for-short-tail-early-return-supersedes-p-10),
+[C-27 supersedes P-7](#c-27-pool-word-duplication-two-distinct-externs-symbolstxt-alias-supersedes-p-7).
+
+**Recognition cue.** Detected by
+[`tools/predict_walls.py`](../../tools/predict_walls.py)'s
+`P-11` rule. Fires on functions with size 0x5c-0x74 + EITHER:
+
+  - 3+ callee-saved registers in push + ≥1 `bl` + ≥2 cond
+    branches (E-12/13/14, B-22 shape), OR
+  - `sub sp, #N` stack-scratch prologue (N ∈ {8, 16, 20, 24, 32}) +
+    ≥1 `bl` + ≥1 cond branch (B-24 shape — fewer cond branches
+    because the stack-scratch pattern is the primary signal).
+
+False-positive rate: low — the size-range + multi-callee +
+helper-call combo is fairly specific. The classifier emits a
+"no recipe yet" cue so downstream consumers don't waste
+iterations on these picks.
+
+**Provenance:** brief 198 (PR #648) ran permuter against 9
+Cluster B + E picks; 5 plateaued at scores 480-500. Brief 200
+(this entry) characterised the shared mechanism (mwcc 2.0
+reg-allocator divergence at the 0x5c-0x74 size range with
+helper-call-in-body), confirmed it's distinct from the
+existing wall taxonomy via byte-level disasm comparison, added
+the `P-11` classifier rule, and shipped the detection so
+brief 201+ can pre-flag affected picks rather than burn
+permuter cycles on them. Full diagnosis at
+[`first-wave-wall-reg-alloc-plateau.md`](first-wave-wall-reg-alloc-plateau.md).
 
 ## Codegen-inherent edge cases (3 patterns)
 

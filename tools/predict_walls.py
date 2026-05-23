@@ -42,6 +42,13 @@ predicate) need source-level context and aren't emitted here.
     (not `bx lr`). Routes through `.legacy_sp3.c`.
   - **P-9** — conditional `mvn{cond}` — mwcc 2.0 may not
     peephole this; permuter via brief 098.
+  - **P-11** — mwcc 2.0/sp1p5 reg-allocator plateau (brief
+    200). Functions sized 0x5c-0x74 with 3+ callee-saved
+    register push + helper-call in/after a loop body + 2+
+    conditional branches plateau at score 480-500 under
+    permuter (brief 198). Mechanism is downstream of source-
+    shape iteration — permuter mutations don't reach it. No
+    recipe yet; budget zero matches under current tools.
   - **C-31** — mwldarm interwork veneer (8 B Thumb, 12 B ARM,
     12 B Thumb-with-prefix). Routes through `.s` with explicit
     mode directive per brief 191 recipe.
@@ -431,6 +438,133 @@ def detect_walls(asm: str) -> list[WallPrediction]:
             "P-9",
             "conditional `mvn{cond}` — mwcc 2.0 may not peephole; "
             "permuter via brief 098",
+        ))
+
+    # ----- P-11 mwcc 2.0 reg-allocator plateau (brief 200).
+    #
+    # Brief 198 ran permuter against 9 Cluster B + E picks. 5 of
+    # the 9 plateaued in score 480-500 despite finding 3-5 source
+    # variants each. Brief 200 codegen sweep identified the
+    # mechanism: mwcc 2.0/sp1p5's reg-allocator picks different
+    # callee-saved registers + addressing-mode strategies than
+    # orig for functions in the 0x5c-0x74 size range that have:
+    #
+    #   - **Multi-callee-saved push** (3+ regs besides lr in
+    #     `push {...}`) — the function holds multiple
+    #     pointers/counts live across a call.
+    #   - **Helper call in or after a loop body** (`bl` inside
+    #     loop OR after the loop's epilogue) — forces register
+    #     spill/preserve decisions.
+    #   - **Multi-conditional control flow** (≥2 conditional
+    #     branches `b{eq,ne,lt,...}`) — mwcc weighs predication
+    #     vs branch-to-tail choices.
+    #
+    # Permuter mutates SOURCE-level constructs (variable renames,
+    # type juggles, reorderings); the reg-alloc choice is
+    # downstream of source — an mwcc internal decision based on
+    # liveness analysis. Mutations don't reach it.
+    #
+    # **Recipe status: NONE** (permanent under current tools).
+    # Brief 200 attempted `volatile`-qualified field reads as a
+    # coercion to defeat CSE on the dual pool-load — shifted the
+    # shape but didn't byte-match. Future briefs may discover a
+    # source coercion that promotes this to C-N (precedent:
+    # C-29 supersedes P-10).
+    has_multi_callee_save_push = False
+    for line in lines[:3]:
+        # Objdump emits either `push {r4, r5, lr}` (modern) OR
+        # `stmfd sp!, {r4, r5, lr}` (historical) depending on
+        # version. Accept both.
+        m = re.search(
+            r"(?:stmfd\s+sp!,?\s*|push\s+)\{([^}]+)\}", line,
+        )
+        if m:
+            regs = m.group(1)
+            # Count callee-saved registers (r4-r11). lr is
+            # universal; r4+ saved are the "this function holds
+            # state live across calls" signal.
+            callee_regs = sum(
+                1 for r in (
+                    "r4", "r5", "r6", "r7", "r8", "r9", "r10",
+                    "r11", "fp", "sl",
+                )
+                if r in regs
+            )
+            if callee_regs >= 3:
+                has_multi_callee_save_push = True
+            break
+    # Lines are already stripped + filtered by `":\t" in line`,
+    # so disasm format is `<hex_addr>:\t<hex_word> \t<mnem>\t...`.
+    # Match on `\tbl\b` (helper call) and `\tb<cond>\b` (cond
+    # branch) which are the post-mnemonic markers.
+    bl_count = sum(
+        1 for line in lines
+        if re.search(r"\tbl\b", line)
+    )
+    cond_branch_count = sum(
+        1 for line in lines
+        if re.search(
+            r"\tb(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le)\b",
+            line,
+        )
+    )
+    # Function size from disasm-line count. Each non-pool line
+    # is one instruction (4 bytes ARM). Pool words appear as
+    # `<addr>:\t<hex>\t.word\t…` OR as decoded-as-instruction
+    # garbage in -D binary mode; filter to the "mnemonic looks
+    # like instruction" set via mnemonic class match.
+    instr_lines = [
+        line for line in lines
+        if re.search(
+            r"\t("
+            r"add|sub|mov|mvn|mul|cmp|cmn|tst|teq|and|orr|eor|bic|"
+            r"ldr|str|ldm|stm|push|pop|ldmfd|ldmia|ldmib|stmfd|stmia|stmib|"
+            r"b|bl|bx|blx|bxj|"
+            r"lsl|lsr|asr|ror|rrx"
+            r")\w*\b",
+            line,
+        )
+    ]
+    size_bytes = len(instr_lines) * 4
+    # Alternative B-24 signature: `push {r4, lr}` + `sub sp, #N`
+    # for stack scratch (N >= 8) — a different reg-alloc shape in
+    # the same plateau family. mwcc emits "useless register
+    # spills" to the scratch slots (writes that are never read
+    # back). 1 cond branch is enough on this path because the
+    # spill pattern itself is the signal.
+    has_stack_scratch = any(
+        re.search(r"\tsub\s+sp,\s*sp,\s*#(8|16|2[04]|3[02])\b", line)
+        for line in lines[:3]
+    )
+    plateau_main = (
+        has_multi_callee_save_push
+        and bl_count >= 1
+        and cond_branch_count >= 2
+    )
+    plateau_alt_scratch = (
+        has_stack_scratch
+        and bl_count >= 1
+        and cond_branch_count >= 1
+    )
+    if (
+        (plateau_main or plateau_alt_scratch)
+        and 0x5c <= size_bytes <= 0x74
+    ):
+        if plateau_main:
+            cue_shape = (
+                f"3+ callee-saved push + {bl_count} bl + "
+                f"{cond_branch_count} cond branches"
+            )
+        else:
+            cue_shape = (
+                f"stack-scratch prologue + {bl_count} bl + "
+                f"{cond_branch_count} cond branch(es)"
+            )
+        walls.append(WallPrediction(
+            "P-11",
+            f"size {size_bytes:#x} + {cue_shape} "
+            "— mwcc 2.0 reg-allocator plateau (brief 200; "
+            "permuter scored 480-500; no recipe yet)",
         ))
 
     # ----- C-31 mwldarm interwork veneer.
