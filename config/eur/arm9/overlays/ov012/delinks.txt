@@ -35,3 +35,7 @@ src/overlay012/data_ov012_021cc080.c:
 src/overlay012/bss/data_ov012_bss.s:
     complete
     .bss start:0x021cc6a0 end:0x021ccc00
+
+src/overlay012/func_ov012_021c9d8c.s:
+    complete
+    .text start:0x021c9d8c end:0x021c9da0
