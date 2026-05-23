@@ -1,0 +1,48 @@
+; func_02023478 — brief 205 / Phase 2: C-34 candidate. Duplicate
+; pool entries for the same data symbol; pure `.s` recipe per
+; brief 202 (`func_02023f7c.s`). Subsequent duplicate `.word`
+; entries use literal values instead of symbol references to
+; defeat the patcher's trim heuristic (PR #115 / brief 204).
+
+        .text
+        .extern data_0219a8dc
+        .extern Task_InvokeLocked
+        .extern func_0208e5ec
+        .global func_02023478
+        .arm
+func_02023478:
+    stmdb sp!, {r3, r4, lr}
+    sub sp, sp, #0x4
+    ldr r0, .L_020234ec
+    ldr r4, .L_020234f0
+    ldr r0, [r0, #0x0]
+    cmp r0, #0x0
+    beq .L_020234a4
+    ldr r0, [r4, #0x0]
+    bl Task_InvokeLocked
+    mov r0, #0x0
+    str r0, [r4, #0x0]
+.L_020234a4:
+    mov r3, #0x4000000
+    ldr r1, [r3, #0x0]
+    ldr r0, [r3, #0x0]
+    and r1, r1, #0x1f00
+    mov r2, r1, lsr #0x8
+    bic r1, r0, #0x1f00
+    bic r0, r2, #0x1
+    orr r0, r1, r0, lsl #0x8
+    ldr r2, .L_020234f4
+    str r0, [r3, #0x0]
+    mov r0, #0x0
+    mov r1, #0x1f
+    mov r3, #0x3f
+    str r0, [sp, #0x0]
+    bl func_0208e5ec
+    mov r0, #0x1
+    add sp, sp, #0x4
+    ldmia sp!, {r3, r4, pc}
+.L_020234ec:
+        .word   data_0219a8dc
+.L_020234f0:
+        .word   0x0219a8dc                       ; literal value of `data_0219a8dc` — bypasses patcher trim
+.L_020234f4: .word 0x7fff
