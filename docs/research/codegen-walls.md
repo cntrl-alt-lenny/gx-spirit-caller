@@ -5070,7 +5070,7 @@ this cohort: defer or escalate to scaffolder reg-alloc-hint
 research (separate brief candidate). Future briefs may discover
 a coercion that promotes this to C-N — precedent:
 [C-29 supersedes P-10](#c-29-if-p-idiom-for-short-tail-early-return-supersedes-p-10),
-[C-27 supersedes P-7](#c-27-pool-word-duplication-two-distinct-externs-symbolstxt-alias-supersedes-p-7).
+and C-27 supersedes P-7 (see C-27's entry above).
 
 **Recognition cue.** Detected by
 [`tools/predict_walls.py`](../../tools/predict_walls.py)'s

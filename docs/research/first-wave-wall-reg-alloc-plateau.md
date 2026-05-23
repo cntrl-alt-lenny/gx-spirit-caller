@@ -237,10 +237,10 @@ match.
 
 **Attempt: `.legacy.c` routing (mwcc 1.2/sp2p3).** Brief 086's
 recipe for the dual-pool-load shape. Result: legacy.c emits
-0x84 bytes vs orig's 0x74 — 16 bytes longer due to `sub sp,
-#4` prologue + Style A epilogue (`pop {r4-r7, lr}; bx lr`).
-Orig is Style B (`pop {r4, r5, r6, pc}`), so `.legacy.c` is
-the wrong tier.
+0x84 bytes vs orig's 0x74 — 16 bytes longer due to a
+`sub sp, #4` prologue + Style A epilogue
+(`pop {r4-r7, lr}; bx lr`). Orig is Style B
+(`pop {r4, r5, r6, pc}`), so `.legacy.c` is the wrong tier.
 
 **Attempt: structural simplification.** Tried inlining the
 loop body to remove the goto, hoping to shift the reg-alloc.
