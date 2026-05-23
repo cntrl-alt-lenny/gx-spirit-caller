@@ -77,26 +77,12 @@ jobs:
       - name: Upsert PR comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Same upsert pattern as analyzer.yml — find any prior
-        # match-invariants comment via the footer marker and patch
-        # it in place, otherwise create one.
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        # Shared upsert script — see .github/scripts/upsert-pr-comment.sh.
         run: |
-          set -euo pipefail
-          MARKER='<sub>🤖 Posted by `.github/workflows/match-invariants.yml`'
-          PR=${{ github.event.pull_request.number }}
-          existing_id=$(
-            gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
-              --jq ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
-              | head -n1 || true
-          )
-          if [ -n "${existing_id}" ]; then
-            gh api --method PATCH \
-              "repos/${{ github.repository }}/issues/comments/${existing_id}" \
-              -f body="$(cat /tmp/comment.md)"
-          else
-            gh pr comment "${PR}" --body-file /tmp/comment.md \
-                --repo "${{ github.repository }}"
-          fi
+          .github/scripts/upsert-pr-comment.sh \
+            '<sub>🤖 Posted by `.github/workflows/match-invariants.yml`' \
+            /tmp/comment.md
 
       - name: Block merge on error-severity issues only
         # Warnings are informational (brief 003 intentional-placeholder
