@@ -8,47 +8,59 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-22 late evening, post-#629/#630/#631/#632/#633
-merge wave. Brain on Mac. **🎉 PIVOT TO CODE DECOMP RESUMPTION** —
-the 39-brief post-SHA1 scaffold phase is officially DONE. W7 patcher
-chain CLOSED for EUR at n=0 (brief 182, PR #632); `ninja report`
-revived via brief 187's ARM-crash filter (PR #633) — objdiff-verified
-metrics now visible. **matched_code_percent = 1.40 %** (was 0.70 %
-via delinks-approx — undercount artifact, not regression);
-**matched_functions = 1,420 / 9,608 (14.78 %)**; **complete_units =
-1,381 / 2,234**. First code-decomp briefs in 39 briefs now in flight:
-brief 188 (decomper, trivial-bucket wave 1) + brief 189 (scaffolder,
-wall pre-emption for the easy + medium-easy buckets).
+**Last updated:** 2026-05-23 afternoon, post-#635/#636 through #644/#645
+merge wave (10 briefs closed since last brain-PR). Brain on Mac.
+**🎉 POST-PIVOT METHODOLOGY VALIDATED.** Three named walls
+(C-31/C-32/C-33) shipped with locked recipes + classifier detection +
+worked examples. Permuter batch pipeline operational. 21+ `.s` ships
+across 4 drain briefs (188/195/197 + 191/192/194 worked examples).
+**Current metrics (post-merge of #644+#645):** `matched_code_percent
+1.4102 %`, `matched_functions 1430 / 9617 (14.87 %)`, `complete_units
+1428 / 2293`, `fuzzy_match_percent 1.4584 %`.
 
-## The current headline — pivot from scaffold to code decomp
+**Two open lanes:** brief 198 (decomper permuter wave — THE strategic
+test of permuter viability on Cluster E + B) + brief 199 (scaffolder
+C-23 MMIO base-folding wall — independent lane).
 
-The 39-brief stretch (141 → 187) since SHA1 PASS shipped: 8 patcher,
-16 data clusters, 7 data-routing fixes, 4 tooling, 4 research,
-**zero code-decomp**. Matched_code stayed at the pre-pivot value the
-entire time. Brain audited the trajectory mid-session 2026-05-22 and
-flagged the infrastructure trap: each individual brief was defensible,
-cumulative result was zero movement on the actual deliverable. Brief
-182 + 186 + 187 together became the pivot enablers:
+## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
-1. **Brief 186 — patcher gap closure** (scaffolder, PR #631). Two
-   specific parser gaps the decomper diagnosed across three failed
-   brief 182 attempts: TU trailing-range loss when last symbol has
-   size=0 (Gap A); `.ctor` shift defaulting to 0 instead of inheriting
-   from `.init` (Gap B). +256/-0, 4 new tests, defensive max() guard.
-2. **Brief 182 — W7 chain close** (decomper, PR #632). Both
-   odd-aligned EUR ov004 `.rodata` claims ship clean with brief 186
-   in place. 9,953 new EUR bytes. n=2 → n=0 floor. **W7 chain:
-   134 → 142 → 146 → 150 → 162 → 164 → 168 → 180 → 183 → 186 → 182
-   CLOSED for EUR.**
-3. **Brief 187 — code-decomp resumption prep** (scaffolder, PR #633).
-   Three-part pivot enabler: (a) `tools/objdiff_filter_panic_units.py`
-   drops 1,096 / 3,330 units that trip the ARM crash or have missing
-   `.o` files — `ninja report` works again, in ~0.2 s; upstream
-   [objdiff#352](https://github.com/encounter/objdiff/issues/352)
-   filed. (b) 52-pick curated queue (12 trivial + 25 easy + 15
-   medium-easy) at `docs/research/code-decomp-resumption-queue.md`.
-   (c) `docs/decomp-workflow.md` refreshed with the post-scaffold
-   resumption playbook + routing decision tree.
+The pivot from scaffold to code decomp landed cleanly. 10 briefs
+shipped against the post-SHA1 resumption queue + wall taxonomy:
+
+| Brief | Agent | Result | Headline |
+|---|---|---|---|
+| 188 | decomper | 5/12 trivial ships | First code-decomp brief in 39 briefs |
+| 189 | scaffolder | Wall classifier shipped | `predict_walls.py` foundation |
+| 190 | decomper | 10/25 easy ships | +0.0093 % matched_code; 4 wall clusters surfaced |
+| 191 | scaffolder | C-31 wall closed | Recipe + classifier + 100% detection |
+| 192 | scaffolder | C-32 wall closed | Recipe + classifier + 16-pick ov011 scan |
+| 193 | decomper | 0/15 medium-easy | Surfaced Cluster E + F mechanisms |
+| 194 | scaffolder | C-33 wall closed | Per-section modal-deviation patcher cap |
+| 195 | decomper | **8/8 recipe drain** | 100% recipe-locked throughput |
+| 196 | scaffolder | Permuter wrapper shipped | 9-pick worklist + outcome schema |
+| 197 | decomper | **13/13 ov011 C-32 drain** | Above target + Track B documented |
+
+**Three named walls (C-31/C-32/C-33)** now have locked recipes +
+classifier detection in `tools/predict_walls.py`. The post-pivot
+methodology has a steady cadence: decomper either drains recipe-
+locked picks (briefs 195/197 averaged 95% throughput) or surfaces
+wall mechanisms when something new fires (briefs 188/190/193); the
+scaffolder converts wall mechanisms into recipes (briefs 191/192/194)
+or builds pipeline infrastructure (briefs 187/189/196).
+
+**The unsolved problem:** `matched_functions` has NOT moved since
+brief 190. Briefs 195 + 197 shipped 21 `.s` files (which tick
+`complete_units` but not `matched_functions`); the C-source matches
+brief 188 + 190 produced were small and the well of "trivially
+matchable" picks ran dry. Brief 198 is the strategic bet that
+permuter can crack the Cluster E / B picks where mwcc-shape
+iteration is the bottleneck. Outcome answer due next round.
+
+## The previous headline — pivot from scaffold to code decomp (briefs 182 → 187)
+
+Three pivot-enabler briefs closed the W7 patcher chain at n=0 + revived
+`ninja report` (objdiff-verified metrics) + published the 52-pick
+curated queue. See PR #634 for the brain-PR that captured the pivot.
 
 ## The previous headline — SHA1 PASS achieved (briefs 137 → 140, 2026-05-13)
 
@@ -88,6 +100,92 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **PR #645 — decomper / brief 197 Track A 13/13 + Track B documented.**
+  🎉 **13 of 13 ov011 C-32 picks ship via brief 192's locked recipe**
+  (above ≥ 10 target). 5.6 KB `.text` across 13 functions, 30 hand-
+  encoded cross-overlay BLs. `/tmp/c32_emit.py` helper automated `.s`
+  generation from orig bytes — sidesteps transcription error across
+  thousands of instructions. Track B 0/2 lands on brief 193 pick #2
+  re-attempt: `.legacy.c` builds cleanly (brief 194's Cluster F fix
+  empirically confirmed) but is structurally different from orig;
+  `.c` (mwcc 2.0) closest variant is do-while form with 14 residual
+  diffs (reg-allocator preference — escalates to brief 198+ permuter).
+  Surfaces C-15 prediction caveat: `mvn #0` in orig doesn't always
+  mean mwcc 1.2. `complete_units` 1415 → 1428. 3-region SHA1 PASS +
+  27/27 OK.
+- **PR #644 — scaffolder / brief 196 permuter batch wrapper.** 🎯
+  `tools/permute_batch.py` wraps brief 098's single-shot permuter
+  for worklist-driven batch use with budgets + threads + structured
+  results JSON (match / no_match / timeout / stub_missing /
+  import_failed / budget_exhausted). 9-pick worklist for Cluster B +
+  E published. Dry-run finding: 9/9 picks `stub_missing` — the actual
+  gap is between "skip during decomp wave" and "drive permuter
+  against the result," NOT permuter viability. **Brief 198 (decomper)
+  closes the gap by writing the stubs.** 2032 → 2068 tests (+36).
+- **PR #643 — scaffolder / brief 194 C-33 wall + patcher cap revision.**
+  🎯 Brilliant diagnostic move: brief 193's "+64 byte cascade" turned
+  out to be a *virtual LCF accounting artifact*, not a physical shift.
+  120 TU sections all shifted by the same +64-to-+68 magnitude (modal
+  100% consensus on `.text` and `.data`). New `_section_modal_shifts()`
+  measures deviation from PER-SECTION modal; absolute cap fires only
+  when a TU moves INDEPENDENTLY from its section's bulk. Unblocks ALL
+  `.legacy.c` > 0x50 routing — substantial mid-tier work. Honest
+  worked-example caveat: fix unblocks the BUILD pipeline but byte-
+  matching brief 193's affected picks is Cluster E permuter territory.
+  +1150/-15, 2032/2032 tests (+20).
+- **PR #642 — decomper / brief 195 recipe drain 8/8 ships.** 🎉
+  **100% recipe-locked throughput.** Drained all C-31 + C-32 locked
+  picks from briefs 191/192: 4 cluster-A cross-overlay BL picks +
+  4 mwldarm interwork picks. `.s` files per recipes. One mwasmarm-
+  dialect snag fixed inline (`lsl`/`lsr` aren't standalone mnemonics
+  in ARM mode). `complete_units` 1407 → 1415.
+- **PR #640 — decomper / brief 193 medium-easy 0/15.** 🔬 Pivot's
+  first wash brief but high diagnostic yield. Two new wall clusters
+  documented: **Cluster E (mwcc reg-alloc + scheduling drift)** —
+  5 picks affected, permuter territory; **Cluster F (`.legacy.c`
+  cascade)** — 3 picks affected, forward-progress blocker for ALL
+  `.legacy.c` > 0x50 (closed by brief 194). Pick #19 correctly flagged
+  as mis-tagged in brief 190's queue.
+- **PR #639 — scaffolder / brief 192 C-32 cross-overlay BL wall.**
+  🎯 Recipe + classifier + worked example. ov011/ov012/ov013
+  functions with `bl <hardcoded VA>` to shared-base-range addresses;
+  dsd emits orig bytes with NO `R_ARM_PC24` reloc. Recipe: `.s` with
+  hand-encoded BL `.word`. Worked example: `func_ov011_021d2c64.s`
+  (40 B). Three shared-base ranges documented. Full ov011 scan found
+  12 additional C-32 hits (brief 197 drained them). +763 LOC, 2012
+  tests.
+- **PR #638 — scaffolder / brief 191 C-31 mwldarm interwork wall.**
+  🎯 Recipe + classifier + worked example. `ldr rN, [pc, …]; bx rN;
+  .word target` pattern causes multi-KB cascade when source-claimed
+  (mwldarm re-emits veneers when its native slots are user-claimed).
+  Empirical repro: 158,713 B (59.2%) divergence with 19,693 runs.
+  Recipe: `.s` with `.thumb` directive (NOT `.thumb_func`). Three
+  shape signatures classified. 100% detection on all 5 brief-188
+  affected picks. +588 LOC, 2005 tests.
+- **PR #637 — decomper / brief 190 easy-bucket 10/25 ships.** ✅
+  `matched_code_percent` +0.0093% (5.5× brief 188's delta). +6
+  matched_functions. Four new wall clusters surfaced from skipped
+  picks (3 became named walls in briefs 191/192/194; 1 became
+  Cluster E for permuter).
+- **PR #636 — decomper / brief 188 first code-decomp wave.** 🎉
+  **First code-decomp brief in 39 briefs.** 5/12 trivial picks
+  ship; matched_code +0.0017%, matched_functions +4 — **first
+  positive metric movement since SHA1 PASS at brief 140.** Per-pick
+  wall classification surfaced C-31 mwldarm interwork (5 of 7
+  skipped) + 2 epilogue orphans.
+- **PR #635 — scaffolder / brief 189 wall pre-emption classifier.**
+  🎯 `tools/predict_walls.py` (480 LOC) — disasm-based wall
+  classifier. Project-wide tally: C-1 3,980 / StyleA 2,074 / C-15 869
+  / C-22 286 / P-9 225 / C-24 212 (out of 9,849 scanned). Top-3 wall
+  research notes shipped. `next_targets.py:reason` now emits
+  `[walls: ...]`. Foundation that briefs 191/192/194 extended.
+- **PR #634 — brain / housekeeping for 182-187 pivot capture.**
+  AGENTS.md + state.md captured the W7 closure + post-SHA1 scaffold
+  done declaration. Fixed `python` → `python3` in Stop hook (silent
+  failure on Mac since macOS ships no plain `python`).
+
+### Earlier (PR #629 → #633 from the previous brain-PR — see PR #634 body)
 
 - **PR #633 — scaffolder / brief 187 code-decomp resumption prep.**
   🎉 **Pivot enabler shipped.** Three-part single PR. (1) Diagnosed
@@ -333,33 +431,31 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands. Both agents have just
-received the inaugural post-pivot kickoffs:
+received the brief 198 / 199 kickoffs:
 
-**Decomper — brief 188 in flight:**
+**Decomper — brief 198 in flight:**
 
-- **Brief 188 (HIGH, NEW)** — `decomper/code-decomp-wave-1-trivial`.
-  **First code-decomp brief in 39 briefs.** Ship as many of the
-  12 trivial-bucket picks from brief 187's curated queue as land
-  cleanly (success bar: ≥ 8 of 12). All targets are leaf
-  functions, sizes 4–12 bytes; most are likely `bx lr` returns,
-  BIOS SWI thunks (`svc #n; bx lr; .pool`), simple field
-  accessors (`ldr r0, [r0, #N]; bx lr`), or constant returns.
-  Walls policy: > 30 minutes on a single pick → skip, document,
-  move on (wall investigations are scaffolder lane — brief 189+).
-  Critical: 3-region SHA1 PASS preserved + `matched_code_percent`
-  ticks UP for the first time since SHA1 PASS at brief 140.
+- **Brief 198 (HIGH, NEW)** — `decomper/permuter-wave-cluster-be-execution`.
+  **THE strategic test of permuter viability.** Write `.c` stubs
+  for the 9 picks in `docs/research/cluster-b-e-permuter-targets.json`
+  (brief 196 surfaced 9/9 `stub_missing` as the actual gap), then
+  drive `tools/permute_batch.py --per-pick-seconds 120
+  --total-seconds 1800 --threads 4`. Bar: ≥ 1 of 9 converging is
+  viable; 3+ unlocks a recipe pattern for the wider Cluster E/B
+  family. 0 means permuter isn't the right tool here and we need
+  decomp.me + hand-iterated source shapes. **Headline expectation:
+  first C-source `matched_functions` increment since brief 190.**
 
-**Scaffolder — brief 189 in flight:**
+**Scaffolder — brief 199 in flight:**
 
-- **Brief 189 (MEDIUM, NEW)** — `scaffolder/first-wave-wall-pre-
-  emption`. Audit the 40 easy + medium-easy picks against
-  `docs/research/codegen-walls.md`; classify each as no-wall /
-  wall-predicted / wall-ambiguous; produce focused research notes
-  for the top-3 walls most frequently predicted (recognition cues,
-  workarounds, permuter strategy, `.c` / `.legacy.c` / `.legacy_sp3.c`
-  routing). Refresh `tools/next_targets.py:reason` to emit wall
-  predictions inline (brief 187 flagged the stale "module checksum
-  failing" annotation as out-of-scope follow-up).
+- **Brief 199 (MEDIUM, NEW)** — `scaffolder/c23-mmio-base-folding-wall`.
+  C-23 MMIO register-base folding wall research — long-standing
+  carryover from brief 086. Same shape as C-31/C-32/C-33 (briefs
+  191/192/194): empirical reproduction on a concrete candidate
+  (brief 193 pick #5 `func_02096434` is "StyleA + C-23 stacked"),
+  recipe selection (source coercion vs `.s` routing vs patcher
+  extension), worked example shipping clean, taxonomy + classifier
+  + research note. Independent of brief 198 — different lane.
 
 ## Active clusters (post-pivot reality)
 
@@ -454,61 +550,78 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 188 PR** (decomper, trivial-bucket
-   wave 1) when it opens. Branch: `decomper/code-decomp-wave-1-
-   trivial`. Gate: 3-region `ninja sha1` PASS + 27/27 modules +
-   `matched_code_percent` ticks UP (any positive delta — this
-   is the headline event). Expect ≥ 8 of 12 picks shipped; if
-   fewer, dig into the "skipped" rationales in the PR body
-   before merging — that's signal about whether the curated
-   queue's trivial-bucket bar was set right.
-2. **Verify + merge brief 189 PR** (scaffolder, wall pre-
-   emption) when it opens. Branch: `scaffolder/first-wave-wall-
-   pre-emption`. Tools + docs PR — EUR-only SHA1 PASS sufficient
-   per the verify gate. The top-3 wall research notes are the
-   real deliverable; read them carefully — they'll set the
-   recognition-cue baseline for brief 190+.
-3. **Scope brief 190 (decomper, easy-bucket wave 2)** after
-   brief 188 + 189 land. Pre-condition: brief 189's wall
-   predictions must be available for the 25 easy-bucket picks
-   (size 0x20–0x60). Budget: 1–2 sessions, expect ~15 of 25
-   picks to ship (walls predicted in 189 will reduce the success
-   bar honestly).
-4. **Scope brief 191 (scaffolder)** as a follow-on. Candidates:
-   - **Permuter wrapper integration** for medium-easy bucket
-     (briefs 096, 098 territory) — pre-empt medium walls.
-   - **Decomp.me scratch upload automation** — currently manual
-     copy-paste; automation would multiply throughput.
-   - **C-N wall workaround for whichever walls brief 190 hits
-     hardest** — driven by data, not speculation.
-   - **The "single biggest blocker" thing** — whatever brief 190
-     surfaces as the dominant blocker becomes brief 191's target.
+1. **Verify + merge brief 198 PR** (decomper permuter wave) when
+   it opens. Branch: `decomper/permuter-wave-cluster-be-execution`.
+   Gate: 3-region `ninja sha1` PASS + 27/27 modules + every shipped
+   match individually 3-region-verified. **Headline event to watch:
+   `matched_functions` increments for the first time since brief
+   190.** Even 1 of 9 converging is a strategic win — it proves
+   permuter is viable for the Cluster E/B wall family and unlocks
+   the pattern for the ~30+ unaudited similar picks across the queue.
+   Honest documentation of failures is as valuable as ships — read
+   the "no_match" entries in the PR body carefully.
+2. **Verify + merge brief 199 PR** (scaffolder C-23 wall) when it
+   opens. Branch: `scaffolder/c23-mmio-base-folding-wall`. Tools +
+   docs + 1 worked example — 3-region SHA1 PASS required since
+   the worked example touches source. Cross-check the C-23
+   classifier against brief 193 pick #5 + 2+ survey-surfaced
+   candidates.
+3. **Scope brief 200+ based on brief 198 outcome:**
+   - **If permuter ≥ 3 converges:** scaffolder 200 surveys the
+     queue for more permuter-ready picks (likely 30+); decomper
+     201 ships another permuter wave with the expanded worklist.
+   - **If permuter 1–2 converges:** mixed signal. Scaffolder 200
+     investigates WHY the 1–2 worked when others didn't — likely
+     a sub-family within Cluster E/B that's particularly permuter-
+     amenable. Decomper 201 does another small batch in that
+     sub-family.
+   - **If permuter 0 converges:** permuter isn't the right tool for
+     Cluster E/B. Scaffolder 200 builds decomp.me scratch +
+     iteration tooling (briefs 062 / 063 territory — auto-runner,
+     diff-to-coercion suggester); decomper 201 grinds with manual
+     iteration. The wider wall family then waits for a different
+     mechanism.
+4. **Scope brief 201 (scaffolder)** as a follow-on candidate list
+   to keep ready:
+   - **C-24 wall** (predicated cascade research from brief 103):
+     pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
+   - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
+     isn't always mwcc 1.2 routing; refine the C-15 predictor
+   - **Decomp.me scratch upload automation** — productivity
+     multiplier
+   - **Permuter library / hint expansion** — if brief 198's
+     converged picks reveal hint patterns, codify them
 5. **Deferred indefinitely (per pivot discipline):**
    - `data_020c9694` 14.8 KB D-3 mega
    - `data_ov002_022ccc2e` odd-aligned size=2
    - 34 remaining odd-aligned ov004 data symbols (brief 182
      self-extend pool)
-   - USA + JPN cross-region apply of brief 182's claims
-     (+36 B cascade exceeds `MAX_SHIFT_BYTES = 4`)
+   - USA + JPN cross-region apply of brief 182's claims (+36 B
+     cascade exceeds `MAX_SHIFT_BYTES = 4`)
    - Cluster C / D-1 / D-2 cross-region apply at scale (brief
      184 wired the subcommands; never run)
-   - These items are NOT lost — they're recorded here. If a
-     code-decomp brief actively blocks on one, file as the
-     followup it deserves; otherwise leave them.
-6. **Watch for any new wall hypotheses** in upcoming wave PRs.
-   Standing rule since brief 084's "3 walls not 1" methodology
-   lesson: pre-empt symptom-vs-mechanism classification by
-   requesting a scaffolder codegen-sweep brief before any wall
-   gets a P-N or C-N number. Brief 189 is the first systematic
-   application of this rule post-pivot.
-7. **Pre-existing carryovers (unchanged):**
+   - Brief 190 Cluster D (predicated saturation chains, 3-4 picks)
+     — waits for a C-1 saturation recipe or permuter coverage
+   - Brief 188 epilogue orphans (2 picks) — likely linker-emitted
+     scaffolding or dead code
+   - These items are NOT lost. If a code-decomp brief actively
+     blocks on one, file the followup it deserves; otherwise
+     leave them.
+6. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection check.
-   - Brain hook interpreter (`.claude/settings.json`) — FIXED in
-     this brain-PR (`python` → `python3` for macOS + Linux + Windows
-     portability). Agent-inbox should populate from the next
-     session-end onward.
+7. **Known infrastructure state:**
+   - Agent-inbox hook fix landed in PR #634 but agent sessions
+     started BEFORE that PR will continue to silently fail (Claude
+     Code reads `.claude/settings.json` once at session start).
+     Inbox populates from next FRESH session start onward — brain
+     should mention "exit your previous session" explicitly in
+     kickoffs until it stops being a problem.
+   - CI comment-upsert workflows hardened in PR #641 (shared
+     `.github/scripts/upsert-pr-comment.sh`, REST-only, 3-retry,
+     fail-soft). `pr-tier-delta` and 5 sibling workflows no longer
+     fail on transient API 401s.
 
 ## Cross-machine handoff notes
 
