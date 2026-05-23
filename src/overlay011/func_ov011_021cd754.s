@@ -1,0 +1,132 @@
+; func_ov011_021cd754: C-32 cross-overlay BL wall — brief 192 recipe.
+; Brief 197 Track A drain. 492 bytes; module:none BLs hand-encoded.
+
+        .text
+        .extern func_ov010_021b3774
+        .extern func_ov011_021cd700
+        .global func_ov011_021cd754
+        .arm
+func_ov011_021cd754:
+        .word   0xe92d4ff8
+        .word   0xe24dd098
+        .word   0xe59f71cc
+        .word   0xe59f51cc
+        .word   0xe28d2018
+        .word   0xe3a0403e
+        .word   0xe5d53000
+        .word   0xe5d51001
+        .word   0xe2855002
+        .word   0xe5c23000
+        .word   0xe5c21001
+        .word   0xe2822002
+        .word   0xe2544001
+        .word   0x1afffff7
+        .word   0xe59f31a4
+        .word   0xe5d51000
+        .word   0xe59332a4
+        .word   0xe28d6018
+        .word   0xe1a03983
+        .word   0xe1a08e23
+        .word   0xe2485001
+        .word   0xe3a03019
+        .word   0xe0266395
+        .word   0xe2404001
+        .word   0xe0843104
+        .word   0xe1580000
+        .word   0xe0860003
+        .word   0xe58d0008
+        .word   0xe3a00000
+        .word   0xe58d0004
+        .word   0xe5c21000
+        .word   0x028dd098
+        .word   0x08bd8ff8
+        .word   0xe5971270
+        .word   0xe59d2004
+        .word   0xe3813802
+        .word   0xe2870f85
+        .word   0xe3a01020
+        .word   0xe5872218
+        .word   0xe587222c
+        .word   0xe5873270
+        .word   0xebff97bd                      ; bl 0x021b36f4 (cross-overlay)
+        .word   0xe59d0008
+        .word   0xe1d030d0
+        .word   0xe3530000
+        .word   0x0a000041
+        .word   0xe59d0004
+        .word   0xe3a08001
+        .word   0xe3500000
+        .word   0xc3a0a001
+        .word   0xd3a0a000
+        .word   0xe3530000
+        .word   0xaa000017
+        .word   0xe3a01000
+        .word   0xe2410001
+        .word   0xe3a02018
+        .word   0xe0400003
+        .word   0xe0050290
+        .word   0xe59f40f8
+        .word   0xe2422019
+        .word   0xe19430f5
+        .word   0xe0844005
+        .word   0xe1530002
+        .word   0x0a000005
+        .word   0xe3e02000
+        .word   0xe2811001
+        .word   0xe1a03101
+        .word   0xe19430f3
+        .word   0xe1530002
+        .word   0x1afffffa
+        .word   0xe35a0000
+        .word   0xc3a02001
+        .word   0xd3a02000
+        .word   0xe2411001
+        .word   0xe3e08000
+        .word   0xe041a002
+        .word   0xea000000
+        .word   0xe2430001
+        .word   0xe59f20a8
+        .word   0xe3a01018
+        .word   0xe0292190
+        .word   0xe3a06000
+        .word   0xe3a05a01
+        .word   0xe28db00c
+        .word   0xe3e04000
+        .word   0xea00000b
+        .word   0xe089010a
+        .word   0xe1d000f2
+        .word   0xe1a01601
+        .word   0xe58d100c
+        .word   0xe58d5000
+        .word   0xe1a01600
+        .word   0xe5970214
+        .word   0xe58d1010
+        .word   0xe58d6014
+        .word   0xe89b000e
+        .word   0xebff979e                      ; bl 0x021b3754 (cross-overlay)
+        .word   0xe08aa008
+        .word   0xe1a0010a
+        .word   0xe19910f0
+        .word   0xe1510004
+        .word   0x0a000001
+        .word   0xe35a0000
+        .word   0xaaffffed
+        .word   0xe59d0008
+        .word   0xe1f030d1
+        .word   0xe58d0008
+        .word   0xe59d0004
+        .word   0xe3530000
+        .word   0xe2800001
+        .word   0xe58d0004
+        .word   0x1affffbd
+        .word   0xe5970214
+        .word   0xe3a01001
+        bl      func_ov010_021b3774
+        bl      func_ov011_021cd700
+        .word   0xe587022c
+        .word   0xe28dd098
+        .word   0xe8bd8ff8
+        .word   0x021d403c                      ; load to 0x021d403c (mod=overlay(11))
+        .word   0x021d323c                      ; load to 0x021d323c (mod=overlay(11))
+        .word   0x021d4000                      ; load to 0x021d4000 (mod=overlay(11))
+        .word   0x021d32ba                      ; load to 0x021d32ba (mod=overlay(11))
