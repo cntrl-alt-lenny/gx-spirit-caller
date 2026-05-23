@@ -352,3 +352,15 @@ src/overlay004/func_ov004_021d3dc8.c:
 src/overlay004/func_ov004_021dbdbc.s:
     complete
     .text start:0x021dbdbc end:0x021dbdc4
+
+src/overlay004/func_ov004_021dbdc4.s:
+    complete
+    .text start:0x021dbdc4 end:0x021dbdd0
+
+src/overlay004/func_ov004_021dbdd0.s:
+    complete
+    .text start:0x021dbdd0 end:0x021dbdd8
+
+src/overlay004/func_ov004_021de280.s:
+    complete
+    .text start:0x021de280 end:0x021de288
