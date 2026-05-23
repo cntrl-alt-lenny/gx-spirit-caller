@@ -364,26 +364,150 @@ itself:
 
 ### Open briefs
 
-- **Brief 188 (HIGH, NEW)** — `decomper` inaugural code-decomp
-  wave. **First code-decomp brief in 39 briefs (since pre-SHA1-
-  PASS, brief ~100).** Ship as many of the 12 trivial-bucket picks
-  from [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
-  as land cleanly (≥ 8 of 12 success bar). Walls policy: > 30 min
-  on a single pick → skip, document, move on. Critical: 3-region
-  `ninja sha1` PASS preserved + `matched_code_percent` ticks up
-  (first time the metric moves since SHA1 PASS at brief 140).
-  Branch: `decomper/code-decomp-wave-1-trivial`. Brief file not
-  authored (inline-spec in brain message).
-- **Brief 189 (MEDIUM, NEW)** — `scaffolder` wall pre-emption for
-  the first code-decomp wave. Audit the 40 easy + medium-easy
-  picks against [docs/research/codegen-walls.md](docs/research/codegen-walls.md),
-  produce top-3 wall research notes (recognition cues + workarounds +
-  permuter strategy), and refresh `tools/next_targets.py:reason` to
-  emit wall predictions. Branch: `scaffolder/first-wave-wall-pre-
-  emption`. Brief file not authored (inline-spec in brain message).
+- **Brief 198 (HIGH, NEW)** — `decomper` permuter wave. **The
+  strategic test of permuter viability.** Write `.c` stubs for the
+  9 Cluster B + E picks in [docs/research/cluster-b-e-permuter-targets.json](docs/research/cluster-b-e-permuter-targets.json)
+  (brief 196 wired the wrapper + worklist, surfaced 9/9
+  `stub_missing` as the actual gap), then drive `tools/permute_batch.py`
+  with `--per-pick-seconds 120 --total-seconds 1800 --threads 4`.
+  Bar: ≥ 1 of 9 converging proves permuter viable; 3+ unlocks a
+  recipe pattern for the wider Cluster E/B family across the queue.
+  0 means permuter isn't the right tool here and we need decomp.me +
+  hand-iterated source shapes (different mechanism). **Headline
+  expectation: first C-source `matched_functions` increment since
+  brief 190.** Branch: `decomper/permuter-wave-cluster-be-execution`.
+- **Brief 199 (MEDIUM, NEW)** — `scaffolder` C-23 MMIO register-base
+  folding wall research. Long-standing carryover from brief 086;
+  brief 193 pick #5 was explicitly "StyleA + C-23 stacked." Same
+  shape as C-31/C-32/C-33 (briefs 191/192/194): research +
+  empirical reproduction on a concrete candidate, recipe selection
+  (source coercion / `.s` routing / patcher), worked example
+  shipping clean, taxonomy + classifier + research note. Branch:
+  `scaffolder/c23-mmio-base-folding-wall`. **Independent of brief
+  198** (different lane).
 
 ### Closed briefs (reference)
 
+- **Brief 197** — `decomper`, shipped in PR #645. 🎉 **Track A 13/13
+  ov011 C-32 ship clean** (above the ≥ 10 target). 5.6 KB of
+  `.text` across 13 functions, 30 hand-encoded cross-overlay BLs via
+  brief 192's locked recipe; used a `/tmp/c32_emit.py` helper to
+  automate `.s` generation. Track B 0/2 lands on brief 193 pick #2
+  re-attempt: `.legacy.c` (with brief 194's Cluster F fix in place)
+  builds cleanly but is structurally different from orig (different
+  reg save list + prologue — mwcc 1.2 was NOT the orig compiler);
+  `.c` (mwcc 2.0) closest variant is the do-while form with 14
+  residual diffs (reg-allocator preference — orig uses r5/r6 swapped
+  vs built). **Brief 194's Cluster F cap fix empirically confirmed
+  working.** Brief 198+ permuter is the natural fit for the do-while
+  residual. `complete_units` 1415 → 1428 (+13). 3-region SHA1 PASS +
+  27/27 OK.
+- **Brief 196** — `scaffolder`, shipped in PR #644. 🎯 **Permuter
+  batch wrapper shipped.** `tools/permute_batch.py` wraps brief 098's
+  `permute.py` for worklist-driven batch use with per-pick + total
+  wall-clock budgets, threads, structured results JSON
+  (`match` / `no_match` / `timeout` / `stub_missing` / `import_failed`
+  / `budget_exhausted`). 9-pick worklist for Cluster B + E published
+  at `docs/research/cluster-b-e-permuter-targets.json`. Dry-run
+  finding: 9/9 picks `stub_missing` — confirms the actual pipeline
+  gap is between "skip during decomp wave" and "drive permuter
+  against the result," NOT permuter viability. **Brief 198 (decomper)
+  closes the gap by writing the stubs.** 2032 → 2068 tests (+36).
+  3-region SHA1 PASS preserved.
+- **Brief 195** — `decomper`, shipped in PR #642. 🎉 **8 / 8 recipe
+  drain clean.** Drained all locked-recipe wall picks from briefs
+  191 (C-31) + 192 (C-32): 4 cluster-A cross-overlay BL picks
+  (#1, #2, #4, #20) + 4 mwldarm interwork picks from brief 188
+  backlog (#4, #5, #9, #12). `.s` files with hand-encoded BLs
+  (C-32) or `.thumb` directive (C-31). One mwasmarm-dialect snag
+  fixed inline (`lsl`/`lsr` aren't standalone mnemonics in ARM mode
+  — must be `mov rD, rS, lsl/lsr #N`). `complete_units` 1407 → 1415
+  (+8). 3-region SHA1 PASS + 27/27 OK + 0 match-invariants errors.
+- **Brief 194** — `scaffolder`, shipped in PR #643. 🎯 **C-33
+  `.legacy.c` cascade wall — patcher cap revised from absolute to
+  per-section modal-deviation.** Brilliant diagnosis: brief 193's
+  "+64 byte cascade" turned out to be a *virtual LCF accounting
+  artifact*, not a physical shift. 120 TU sections all shifted by
+  the same +64-to-+68 magnitude (modal 100% consensus on `.text`
+  and `.data`). New `_section_modal_shifts()` measures deviation
+  from PER-SECTION modal; absolute cap fires only when a TU moves
+  INDEPENDENTLY from its section's bulk (genuine structural
+  regression). New `--dump-shifts` patcher flag for diagnostics.
+  Worked-example caveat honest: fix unblocks the BUILD pipeline (no
+  more MAX_SHIFT_BYTES bail on `.legacy.c` > 0x50) but byte-matching
+  brief 193's affected picks is now Cluster E (permuter) territory.
+  +1150/-15, 2032/2032 tests (+20).
+- **Brief 193** — `decomper`, shipped in PR #640. 🔬 **0 / 15 ships,
+  two new wall clusters documented.** Medium-easy bucket attempted
+  on 5 of 15 picks; all 5 failed. **Cluster E (mwcc reg-alloc +
+  scheduling drift)**: 5 picks affected (#7, #8, #12, #13, #14) —
+  semantically correct C but mwcc picks different scratch registers
+  / CSE / schedule than orig. Permuter territory. **Cluster F
+  (`.legacy.c` triggers ov004 cascade)**: 3 picks affected (#2, #5,
+  #7) — `.legacy.c` files > ~0x50 bytes blow past brief 180's
+  MAX_SHIFT_BYTES = 4 (mwcc 1.2 emits more `.text` bytes than 2.0).
+  Forward-progress blocker for ALL future StyleA/C-15 routing >
+  0x50 — closed by brief 194. Pivot's first wash brief but high
+  diagnostic yield.
+- **Brief 192** — `scaffolder`, shipped in PR #639. 🎯 **C-32
+  cross-overlay hardcoded BL wall — recipe + classifier + worked
+  example.** Brief 190 cluster-A pattern: ov011/ov012/ov013
+  functions with `bl <hardcoded VA>` to addresses in shared-base
+  ranges — dsd emits orig bytes with NO `R_ARM_PC24` reloc because
+  the analyzer can't pick the owner module. Recipe: `.s` with
+  hand-encoded BL `.word` (precedent at `src/main/func_020b3814.s`).
+  Worked example: `src/overlay011/func_ov011_021d2c64.s` (pick #15,
+  40 B ARM, 1 hardcoded BL). Three shared-base ranges documented in
+  the research note. New `detect_cross_overlay_bl()` classifier
+  consulting `relocs.txt` for `module:none` arm_calls. Full ov011
+  scan surfaced 12 additional C-32 hits beyond cluster-A (brief 197
+  drained them all). Brief 190 pick #19 correctly identified as
+  MIS-TAGGED (it has `module:main` BLs, not C-32). +763 LOC,
+  2012/2012 tests (+7).
+- **Brief 191** — `scaffolder`, shipped in PR #638. 🎯 **C-31
+  mwldarm interwork veneer wall — recipe + classifier + worked
+  example.** Brief 188 pattern: `ldr rN, [pc, …]; bx rN; .word
+  target` shape causes multi-KB downstream cascade when source-
+  claimed (mwldarm re-emits veneers elsewhere when its native slots
+  are user-claimed). Empirical repro: `func_ov004_021dbdbc` showed
+  158,713 B (59.2%) divergence with 19,693 divergence runs +
+  patcher bail at MAX_SHIFT_BYTES = 4. Recipe: `.s` with `.thumb`
+  directive (NOT `.thumb_func` — mwasmarm rejects it). Worked
+  example: `src/overlay004/func_ov004_021dbdbc.s` (pick #3 from
+  brief 188). Three shape signatures classified (Thumb 8 B, ARM 12 B,
+  Thumb 12 B with side-effect prefix). 100% detection on all 5
+  brief-188 affected picks. +588 LOC, 2005/2005 tests (+7).
+- **Brief 190** — `decomper`, shipped in PR #637. ✅ **10 / 25
+  easy-bucket picks ship** (matched_code +0.0093%, 5.5× brief 188's
+  delta). StyleA 4/5, C-22 1/1, C-1 0/5 (false-positive heavy per
+  brief 189's caveat), none-predicted 5/14. **Four new wall clusters
+  surfaced from skipped picks:** Cluster A — cross-overlay hardcoded
+  BLs (6 picks → became C-32 in brief 192); Cluster B — mwcc 2.0
+  elides what orig emits (4 picks → permuter territory); Cluster C
+  — ov004 MAX_SHIFT_BYTES cap (1 pick → folded into C-33 brief 194);
+  Cluster D — predicated saturation chains (3-4 picks, `.legacy.c`
+  insufficient). +6 matched_functions. 3-region SHA1 PASS + 27/27 OK.
+- **Brief 189** — `scaffolder`, shipped in PR #635. 🎯 **Wall
+  pre-emption classifier shipped.** Audited the 40 easy + medium-
+  easy picks against codegen-walls.md taxonomy via regex-based
+  recognition cues. Project-wide tally: C-1 3,980 / StyleA 2,074 /
+  C-15 869 / C-22 286 / P-9 225 / C-24 212 (out of 9,849 functions
+  scanned). New `tools/predict_walls.py` (480 LOC) — disasm-based
+  classifier generating `build/<region>/analysis/wall_predictions.json`.
+  `tools/next_targets.py:reason` now emits `[walls: ...]` annotation
+  per pick. Top-3 wall research notes shipped (StyleA, C-1, C-15).
+  Stale `FAILING_MODULES` set in `analyze_symbols.py` zeroed (the
+  24/27-modules-failing baseline closed at brief 140). +25 tests
+  (1973 → 1998). Brief 189 became the foundation classifier that
+  briefs 191/192/194 extended.
+- **Brief 188** — `decomper`, shipped in PR #636. 🎉 **FIRST CODE-
+  DECOMP BRIEF IN 39 BRIEFS** (since pre-SHA1-PASS, brief ~100).
+  5/12 trivial picks ship (below ≥ 8 target but matched_code +0.0017%,
+  matched_functions +4 — **first positive metric movement since
+  SHA1 PASS at brief 140**). Per-pick wall classification surfaced
+  the C-31 mwldarm interwork veneer family (5 of 7 skipped picks)
+  + 2 epilogue orphans. Honest documentation of the wall mechanism
+  became brief 191's spec.
 - **Brief 187** — `scaffolder`, shipped in PR #633. 🎉 **Code-
   decomp resumption prep.** Three-part pivot enabler: (1)
   `tools/objdiff_filter_panic_units.py` filters 1,096 / 3,330
