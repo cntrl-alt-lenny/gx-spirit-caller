@@ -51,6 +51,15 @@ predicate) need source-level context and aren't emitted here.
     consulting `relocs.txt` (NOT disasm), because the bare `bl
     <hex>` shape is ambiguous between resolvable and
     unresolvable cross-overlay BLs.
+  - **C-33** — `.legacy.c` cascade risk (main module, function
+    size > 0x50, StyleA or C-15 wall predicted). Brief 193's
+    PR #640 surfaced this: any `.legacy.c` added to `src/main/`
+    for a function past the threshold shifts every ov004 TU
+    uniformly by ~+64 B, tripping `MAX_SHIFT_BYTES = 4` in the
+    brief 180 patcher. Brief 194's patcher fix (per-section
+    modal-deviation cap) unblocks the route. Detection is a
+    composite — flagged only when an existing StyleA/C-15
+    prediction is amplified by the module + size criteria.
 
 Walls NOT detected here (require source context):
 
@@ -448,6 +457,62 @@ def detect_cross_overlay_bl(
     )]
 
 
+# Brief 194: empirical size threshold above which a `.legacy.c`
+# routed function triggers Cluster F's ov004 cascade (~+64 B per
+# TU). PR #640 observed cascades on 0x68 and 0x6c picks but not
+# on brief 190's 0x28..0x34 SNDi wrappers — set the threshold at
+# 0x50 (rounded down conservatively).
+LEGACY_C_CASCADE_SIZE_THRESHOLD = 0x50
+
+
+def detect_legacy_c_cascade_risk(
+    walls: list[WallPrediction],
+    *,
+    module: str,
+    size: int,
+) -> list[WallPrediction]:
+    """C-33 detector — composite risk on top of an existing
+    StyleA or C-15 prediction.
+
+    A `.legacy.c` claim in `src/main/` for a function size above
+    `LEGACY_C_CASCADE_SIZE_THRESHOLD` (= 0x50) triggers brief
+    193's Cluster F cascade (every ov004 TU shifts uniformly by
+    ~+64 B in the linker map, exceeding the old brief 180
+    `MAX_SHIFT_BYTES = 4` cap). Brief 194's patcher fix unblocks
+    the BUILD pipeline (per-section modal-deviation cap), but
+    byte-matching the function itself may still need permuter
+    work — surface the risk so the decomper plans accordingly.
+
+    Triggers when:
+
+    1. Function is in `main` (the cascade is specific to ARM9
+       growth shifting ov004; `src/overlay*/` `.legacy.c` claims
+       don't reproduce it).
+    2. Function size > `LEGACY_C_CASCADE_SIZE_THRESHOLD`.
+    3. At least one of `StyleA` or `C-15` is already predicted
+       (those route through `.legacy.c`; the cascade is gated on
+       routing tier, not the wall shape alone).
+
+    Pure function: no I/O.
+    """
+    if module != "main":
+        return []
+    if size <= LEGACY_C_CASCADE_SIZE_THRESHOLD:
+        return []
+    legacy_routing_walls = {"StyleA", "C-15"}
+    matched = [w.wall_id for w in walls if w.wall_id in legacy_routing_walls]
+    if not matched:
+        return []
+    return [WallPrediction(
+        "C-33",
+        f"main function size 0x{size:x} + {'/'.join(matched)} "
+        "wall(s) → `.legacy.c` routing would trigger Cluster F "
+        "cascade (~+64 B ov004 TU shift). Brief 194 patcher fix "
+        "unblocks the build pipeline; byte-match may still need "
+        "permuter — plan accordingly.",
+    )]
+
+
 def _module_relocs_path(region: str, module: str) -> Path | None:
     """Map module → relocs.txt path. Mirrors `_module_text_base`."""
     if module == "main":
@@ -506,6 +571,11 @@ def predict_module(
             walls.extend(detect_cross_overlay_bl(
                 relocs_text, s.addr, s.size,
             ))
+        # Brief 194: C-33 is a composite over the disasm-based
+        # predictions, gated on module + size.
+        walls.extend(detect_legacy_c_cascade_risk(
+            walls, module=module, size=s.size,
+        ))
         out[key] = [
             {"id": w.wall_id, "cue": w.cue} for w in walls
         ]
@@ -590,6 +660,10 @@ def main(argv: list[str] | None = None) -> int:
                 relocs_path.read_text(encoding="utf-8"),
                 args.address, args.size,
             ))
+        # Brief 194 — C-33 risk composite.
+        walls.extend(detect_legacy_c_cascade_risk(
+            walls, module=args.module, size=args.size,
+        ))
         for w in walls:
             print(f"  {w.wall_id}: {w.cue}")
         if not walls:

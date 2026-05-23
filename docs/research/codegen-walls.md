@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (32 patterns)
+## Coercible-with-knowledge (33 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4033,6 +4033,188 @@ pick #19 mis-tag, and extended
 [`tools/predict_walls.py`](../../tools/predict_walls.py) with
 a `CrossOverlayBL` detector. Full diagnosis + recipe rationale
 at [`first-wave-wall-cross-overlay-bl.md`](first-wave-wall-cross-overlay-bl.md).
+
+### C-33. `.legacy.c` cascade — per-section modal-deviation cap
+
+> **Wall family note — C-33 vs C-31 / C-32.** All three involve
+> the patcher's `MAX_SHIFT_BYTES` mechanism, but for different
+> structural reasons. C-31 (mwldarm interwork veneer) is about
+> a function whose bytes literally ARE a `ldr/bx/.word` shim;
+> the cascade is a byte-divergence in the surrounding `.text`
+> when the shim's size shifts. C-32 (cross-overlay hardcoded
+> BL) is about a function with `module:none` BL relocs that
+> mwldarm can't symbolically resolve — the failure is a hard
+> link error, not a cascade. **C-33 is a LCF-level cascade**:
+> adding a `.legacy.c` (mwcc 1.2/sp2p3) to `src/main/` for a
+> function past a size threshold makes ARM9 grow enough that
+> mwldarm places ov004 ~64 B later in its virtual VA accounting.
+> Every ov004 TU's linker-map shift jumps to +64 / +68, far
+> exceeding the brief 180 `MAX_SHIFT_BYTES = 4` cap. Brief 194
+> diagnoses this is a UNIFORM bodily shift (not structural
+> regression) and refines the cap to measure against per-section
+> MODAL shift, unblocking the route.
+>
+> | Wall | C-31 | C-32 | C-33 |
+> |---|---|---|---|
+> | **Failure** | byte cascade in linked overlay | hard link error | patcher MAX_SHIFT bail |
+> | **Trigger** | source-claim of veneer shape | `module:none` arm_call | `.legacy.c` size > 0x50 in main |
+> | **Mechanism** | shim re-emission size mismatch | unresolved-extern | LCF virtual padding from ARM9 growth |
+> | **Recipe** | `.s` + `.thumb`/`.arm` directive | `.s` + hand-encoded `.word` BL | patcher per-section modal cap |
+> | **Source change** | function body | function body | none — fix is patcher-only |
+
+**Recognition cue (composite — module + size + existing wall):**
+
+The C-33 risk fires when ALL three hold:
+
+1. Function lives in `main` (ARM9). Same wall + size in an
+   overlay does NOT reproduce the cascade — the LCF placement
+   of ov004 depends on ARM9's end, not on overlay sizes.
+2. Function size > `0x50` bytes (empirical threshold from
+   PR #640: brief 190's smaller `.legacy.c` files at 0x28..0x34
+   did NOT trigger; brief 193's 0x68+ candidates do).
+3. At least one of `StyleA` (Style A epilogue → `.legacy.c`
+   routing) or `C-15` (constant-pair via `mvn`/`mov-sub` →
+   `.legacy.c` routing) is independently predicted. The
+   cascade fires on the LEGACY ROUTING TIER specifically;
+   `.c` (mwcc 2.0/sp1p5) or `.legacy_sp3.c` (mwcc 1.2/sp3)
+   don't trigger it.
+
+The classifier emits `C-33` as a composite alongside the
+underlying StyleA/C-15 prediction.
+
+**Cascade fingerprint (empirical, PR #640 + brief 194 Part 1):**
+
+Inspect `arm9.o.xMAP` with the new `--dump-shifts` flag:
+
+```bash
+python tools/patch_ov004_veneers.py \
+    --binary build/eur/build/arm9_ov004.bin \
+    --relocs config/eur/arm9/overlays/ov004/relocs.txt \
+    --delinks config/eur/arm9/overlays/ov004/delinks.txt \
+    --map build/eur/arm9.o.xMAP \
+    --dump-shifts
+```
+
+The Cluster F shape is unambiguous:
+
+| Section | TUs | Modal shift | Spread |
+|---|---:|---:|---|
+| `.text` | 35 | +64 | all at +64 (consensus 100%) |
+| `.rodata` | 28 | +68 | 22 at +68; 5 at +64..+67 (brief 180 cascade region) |
+| `.init` | 1 | +68 | — |
+| `.ctor` | 1 | +68 | — |
+| `.data` | 56 | +64 | all at +64 (consensus 100%) |
+
+Total: **120 TUs all shifted by +64 to +68 bytes**. Pre-brief-
+194 the patcher bails on TU 41's +64 shift (FIFO order in the
+parser). Brief 194's fix recognises the uniform bodily shift
+and routes through `_layout_reconstruct` normally.
+
+**C that miscodes the wall:**
+
+A perfectly valid `.legacy.c` per the C-15 / StyleA recipe:
+
+```c
+/* func_0200b2f4 (0x68 bytes, C-15 mvn r4, #0 pattern) */
+int func_0200b2f4(struct Out *out, ...) {
+    int neg_one = ~0;        /* mwcc 1.2/sp2p3 emits mvn r4, #0 */
+    int twelve = 12;
+    /* ... loop body ... */
+}
+```
+
+Build result (pre-brief-194 patcher):
+
+```text
+error: build/eur/build/arm9_ov004.bin: TU _dsd_gap@ov004_41.o
+       (.text) has shift +64 bytes
+       (|shift| > MAX_SHIFT_BYTES = 4);
+       structural regression suspected — bail rather than
+       relocate a TU section whose layout cause we have not
+       characterised.
+```
+
+Brief 180's cap was set on the assumption that any shift > 4 B
+indicates an uncharacterised layout regression. Brief 194's
+investigation shows the +64 shift is structurally safe (uniform
+bodily relocation; physical bytes still align to orig FOs once
+the LCF virtual padding is subtracted).
+
+**Patcher fix (verified byte-identical at baseline + with
+deliberate cascade):**
+
+The cap now measures deviation from the per-section MODAL
+shift, not from zero. `MAX_SHIFT_BYTES = 4` still catches the
+original target (a TU moving independently from its section's
+bulk = genuine structural regression); the bulk shift goes
+through `_layout_reconstruct` unchanged.
+
+Physical FO formula:
+
+```text
+physical_byte_shift = tu.shift - text_modal_shift
+built_fo = orig_fo + physical_byte_shift
+```
+
+Where `text_modal_shift` is the `.text` section's modal shift
+(the LCF virtual padding baseline). For ov004's brief 194
+profile, `text_modal_shift = +64`, so:
+
+- `.text` TUs at shift +64: `physical_byte_shift = 0` →
+  built_fo = orig_fo (the TU's bytes are already at orig FO).
+- `.rodata` TUs at shift +68: `physical_byte_shift = +4` →
+  built_fo = orig_fo + 4 (the brief 180 cascade vestige).
+- A hypothetical outlier at shift +75 in `.text`: deviation
+  from .text modal = +11 > MAX_SHIFT_BYTES → raise (genuine
+  regression).
+
+A modal-consensus threshold (`MODAL_CONSENSUS_FRACTION = 0.5`)
+also fires if no clear majority emerges — guards against
+ambiguous modal picks in synthetic / pathological inputs.
+
+**Diagnostic: `--dump-shifts`.**
+[`tools/patch_ov004_veneers.py`](../../tools/patch_ov004_veneers.py)
+gains a CLI flag that parses `--map` and prints each TU's
+section / shift / built+orig VA range, sorted by |shift|
+descending, with a `*` marker on TUs that would trip the cap.
+Use this when investigating future MAX_SHIFT-related failures.
+
+Verified: 3-region `ninja sha1` PASS preserved at baseline (no
+new claim), AND ov004's binary is byte-identical to orig (`sha1
+54014c93…`) — the patcher's load/BL re-encoding passes still
+run unchanged on the reconstruction output.
+
+**Use when:** the `tools/predict_walls.py` `C-33` classifier
+flags a pick. Brief 194's patcher fix unblocks the BUILD
+pipeline; byte-matching the function itself may still need
+permuter work because the source-level pattern that triggered
+the StyleA/C-15 wall is independent of the cascade. Plan the
+permuter wave (brief 195+ scaffolder) for any unmatched picks.
+
+**Cross-corpus survey notes:** the 3 affected picks from brief
+193 PR #640 Cluster F:
+
+| Pick | Module | Addr | Size | Underlying wall | Notes |
+|---|---|---|---:|---|---|
+| #2 | `main` | `0x0200b2f4` | `0x68` | C-15 | mwcc 2.0 epilogue actually matches; `.c` route is correct |
+| #5 | `main` | `0x02096434` | `0x6c` | StyleA + MMIO fold | StyleA + C-23 routing both needed |
+| #7 | `main` | `0x02023f7c` | `0x70` | (none / Cluster E) | mwcc reg-alloc drift — permuter case |
+
+All three trip the patcher cap pre-brief-194. With the fix, all
+three BUILD through (the `_layout_reconstruct` algorithm copies
+TUs to orig FOs cleanly). The byte-match of the function body
+itself is a separate decomp problem; permuter handles those.
+
+**Provenance:** decomper brief 193 (PR #640) surfaced Cluster F
+empirically and documented the cascade fingerprint
+(`MAX_SHIFT_BYTES` trip on TU 41 at +32 to +64 B). Brief 194
+(this entry) instrumented the patcher with `--dump-shifts`,
+reproduced + diagnosed the cascade as a UNIFORM LCF-virtual
+shift (not structural regression), refined `MAX_SHIFT_BYTES` to
+measure per-section modal deviation, and extended
+[`tools/predict_walls.py`](../../tools/predict_walls.py) with a
+`C-33` composite-risk detector. Full diagnosis + fix mechanism
+at [`first-wave-wall-legacy-c-cascade.md`](first-wave-wall-legacy-c-cascade.md).
 
 ## Permanent (10 patterns)
 
