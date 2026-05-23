@@ -18,6 +18,7 @@ sys.path.insert(0, str(_TOOLS))
 from predict_walls import (  # noqa: E402
     LEGACY_C_CASCADE_SIZE_THRESHOLD,
     WallPrediction,
+    detect_address_cse,
     detect_cross_overlay_bl,
     detect_legacy_c_cascade_risk,
     detect_walls,
@@ -864,6 +865,126 @@ class TestLegacyCCascadeDetection(unittest.TestCase):
         # Defensive: the threshold is exposed for tests to adapt
         # if it ever changes.
         self.assertEqual(LEGACY_C_CASCADE_SIZE_THRESHOLD, 0x50)
+
+
+class TestAddressCSEDetection(unittest.TestCase):
+    """C-34 detector (brief 202) — consults relocs.txt for 2+
+    `kind:load to:<addr>` entries with the SAME target inside
+    the function's `[addr, addr+size)` range.
+
+    Brief 201 found that mwcc 2.0/sp1p5 IR-CSE collapses
+    duplicate-target pool loads into a single slot. Recipe:
+    `.s` with explicit `.word` directives per pool slot.
+    """
+
+    def test_e07_single_duplicate_pair(self):
+        # E-07's exact relocs: two loads at 0x02023fe4 +
+        # 0x02023fe8 (the function's trailing pool block) both
+        # targeting `0x0219a8e4`. Single duplicate-target pair.
+        relocs = (
+            "from:0x02023fe4 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02023fe8 kind:load to:0x0219a8e4 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02023f7c, size=0x70,
+        )
+        self.assertEqual(len(walls), 1)
+        self.assertEqual(walls[0].wall_id, "C-34")
+        self.assertIn("0x0219a8e4", walls[0].cue)
+        self.assertIn("0x02023fe4", walls[0].cue)
+        self.assertIn("0x02023fe8", walls[0].cue)
+
+    def test_e08_clone_shape(self):
+        # E-08's analogous shape — clone of E-07 with different
+        # data symbol.
+        relocs = (
+            "from:0x02027040 kind:load to:0x0219a924 module:main\n"
+            "from:0x02027044 kind:load to:0x0219a924 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02026fd8, size=0x70,
+        )
+        self.assertEqual(len(walls), 1)
+        self.assertEqual(walls[0].wall_id, "C-34")
+
+    def test_triple_duplicate_pool_slots(self):
+        # Hypothetical: 3+ pool slots for the same symbol. The
+        # detector emits one C-34 prediction with all slot
+        # addresses listed.
+        relocs = (
+            "from:0x02000100 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000104 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000108 kind:load to:0x0219a8e4 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02000000, size=0x200,
+        )
+        self.assertEqual(len(walls), 1)
+        self.assertIn("0x02000100", walls[0].cue)
+        self.assertIn("0x02000104", walls[0].cue)
+        self.assertIn("0x02000108", walls[0].cue)
+
+    def test_two_independent_duplicate_pairs(self):
+        # Two different data symbols, each loaded by 2+ slots.
+        # The detector emits ONE prediction covering BOTH pairs.
+        relocs = (
+            "from:0x02000100 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000104 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000108 kind:load to:0x0219b000 module:main\n"
+            "from:0x0200010c kind:load to:0x0219b000 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02000000, size=0x200,
+        )
+        self.assertEqual(len(walls), 1)
+        cue = walls[0].cue
+        self.assertIn("2 address-CSE candidates", cue)
+        self.assertIn("0x0219a8e4", cue)
+        self.assertIn("0x0219b000", cue)
+
+    def test_single_load_no_match(self):
+        # Each load target referenced once — no CSE candidate.
+        relocs = (
+            "from:0x02000100 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000104 kind:load to:0x0219b000 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02000000, size=0x200,
+        )
+        self.assertEqual(walls, [])
+
+    def test_arm_call_relocs_ignored(self):
+        # `kind:arm_call` with duplicate targets is C-32-territory
+        # (cross-overlay BL), NOT C-34. The C-34 detector must
+        # only match `kind:load`.
+        relocs = (
+            "from:0x02000100 kind:arm_call to:0x0219a8e4 module:main\n"
+            "from:0x02000104 kind:arm_call to:0x0219a8e4 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02000000, size=0x200,
+        )
+        self.assertEqual(walls, [])
+
+    def test_duplicate_outside_function_range(self):
+        # Two `kind:load to:<same addr>` BUT outside the
+        # `[addr, addr+size)` window — they belong to a
+        # different function. C-34 must not fire.
+        relocs = (
+            "from:0x02000500 kind:load to:0x0219a8e4 module:main\n"
+            "from:0x02000504 kind:load to:0x0219a8e4 module:main\n"
+        )
+        walls = detect_address_cse(
+            relocs, addr=0x02000000, size=0x100,
+        )
+        self.assertEqual(walls, [])
+
+    def test_empty_relocs_text(self):
+        # Defensive — empty input returns empty list.
+        walls = detect_address_cse(
+            "", addr=0x02000000, size=0x100,
+        )
+        self.assertEqual(walls, [])
 
 
 if __name__ == "__main__":

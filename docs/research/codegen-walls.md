@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (33 patterns)
+## Coercible-with-knowledge (34 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4310,6 +4310,157 @@ measure per-section modal deviation, and extended
 [`tools/predict_walls.py`](../../tools/predict_walls.py) with a
 `C-33` composite-risk detector. Full diagnosis + fix mechanism
 at [`first-wave-wall-legacy-c-cascade.md`](first-wave-wall-legacy-c-cascade.md).
+
+### C-34. Address-CSE — `.s` with explicit dual pool words
+
+> **Wall family note — C-34 vs C-23 vs C-27.** All three are
+> pool-word-related but distinct.
+>
+> | Wall | Pattern | Recipe |
+> |---|---|---|
+> | **C-23** | Multiple `ldr [pc, ...]` of NEARBY constants (e.g. 4 MMIO regs at `0x04000280/90/98/a0`) — mwcc 2.0 base-folds to 1 base + offsets. | `.legacy.c` routing (mwcc 1.2/sp2p3 lacks the base-fold peephole). |
+> | **C-27** | Two C externs naming the SAME address via `symbols.txt` alias trick — produces 2 pool entries for what mwcc thinks are 2 distinct symbols. | C source declares two `extern T sym_a;` + `extern T sym_b;` and `symbols.txt` aliases one to the other. |
+> | **C-34** (this entry) | Two `ldr [pc, ...]` of the SAME symbol — orig has 2 distinct pool slots; mwcc 2.0 address-CSE collapses to 1 slot + `mov rN, rM` reuse. Routing tier doesn't help (`.legacy.c` produces a totally different shape). C-27's alias trick would work in principle but requires polluting `symbols.txt`. | `.s` with explicit `.word` pool directives — bypasses BOTH mwcc's IR-CSE AND mwasmarm's literal-pool dedup. |
+>
+> **Quick discriminator:** read the orig pool block at the tail
+> of the function. If two adjacent `.word` slots hold the SAME
+> value (e.g. `.word data_X; .word data_X`), and the function
+> body has two `ldr rN, [pc, #...]` pointing to those two slots
+> separately → C-34.
+
+**Target asm (`func_02023f7c`, 0x70 = 26 insns + 2 pool words):**
+
+```text
+
+push  {r3, r4, r5, lr}
+ldr   r4, .L_POOL_A         ; r4 = &data_0219a8e4 (slot A)
+mov   r5, r0
+mov   r1, r4
+mov   r0, #0
+mov   r2, #8
+bl    Fill32                ; Fill32(0, &data, 8)
+ldr   r0, .L_POOL_B         ; r0 = &data_0219a8e4 (slot B)  ←
+str   r5, [r0, #4]
+ldr   r0, [r0]              ; r0 = data.handle
+cmp   r0, #0
+bne   .L_done
+ldr   r1, [r4, #4]          ; r1 = data.saved_arg
+mov   r0, #0x88
+mul   r5, r1, r0
+mov   r0, r5
+mov   r1, #4
+mov   r2, #0
+bl    Task_PostLocked
+mov   r1, r0
+mov   r2, r5
+mov   r0, #0
+str   r1, [r4]
+bl    Fill32
+.L_done:
+mov   r0, #1
+ldmia sp!, {r3, r4, r5, pc}
+.L_POOL_A: .word data_0219a8e4
+.L_POOL_B: .word data_0219a8e4   ← SAME value, distinct slot
+
+```
+
+**mwcc 2.0/sp1p5 emits when miscoded (default `.c` routing):**
+
+```text
+
+push  {r3, r4, r5, lr}
+ldr   r4, [pc, #92]          ; one pool word
+mov   r5, r0
+...
+bl    Fill32
+mov   r0, r4                ; ← address-CSE: r0 = r4 (no reload)
+str   r5, [r0, #4]
+...
+
+```
+
+1-instruction diff: orig emits `ldr r0, [pc, #...]` at offset
+0x1c; mwcc 2.0 emits `mov r0, r4`. The function size shrinks
+by 4 bytes (1 fewer pool word).
+
+**Source coercion attempts (all failed — see brief 201):**
+
+| Attempt | Result |
+|---|---|
+| Bare `extern T sym;` | mwcc IR-CSE collapses |
+| `volatile T sym;` | volatile affects loads/stores, not address computation |
+| Pointer alias `T *q = &sym;` after first use | mwcc CSEs across call boundaries |
+| `.legacy.c` routing (mwcc 1.2/sp2p3) | Completely different shape (StyleA epilogue + sub-sp + reg swap) |
+| `.legacy_sp3.c` routing (mwcc 1.2/sp3) | Same divergence as `.legacy.c` |
+| `asm void` + `nofralloc` (brief 202 attempt) | Bypasses mwcc IR-CSE but mwasmarm STILL dedupes literal pool when `ldr rN, =sym` is used. Two `ldr` instructions, but both point to a SINGLE pool slot. |
+
+**`.s` that coerces it (verified byte-identical against
+`func_02023f7c`, default `.s` routing):**
+
+```text
+        .text
+        .extern data_0219a8e4
+        .extern Fill32
+        .extern Task_PostLocked
+        .global func_02023f7c
+        .arm
+func_02023f7c:
+        stmdb   sp!, {r3, r4, r5, lr}
+        ldr     r4, .L_POOL_A           ; r4 = &data (slot A)
+        ...
+        ldr     r0, .L_POOL_B           ; r0 = &data (slot B)
+        ...
+        ldmia   sp!, {r3, r4, r5, pc}
+.L_POOL_A:
+        .word   data_0219a8e4
+.L_POOL_B:
+        .word   data_0219a8e4
+```
+
+Critical details:
+
+- **Label-based `ldr rN, label` syntax** (not `ldr rN, =sym`). The
+  `=sym` macro asks mwasmarm to allocate a literal-pool slot;
+  mwasmarm dedupes by VALUE. Explicit labels pointing at
+  separate `.word` directives bypass dedup.
+- **Two distinct labels** (`.L_POOL_A`, `.L_POOL_B`) each followed
+  by their own `.word data_0219a8e4`. mwasmarm doesn't merge
+  identical `.word` directives — they're treated as opaque
+  data.
+- **`.extern data_0219a8e4`** declares the symbol so the linker
+  resolves the `.word` references.
+- **No `.thumb`/`.arm_func` markers needed** — function shape is
+  pure ARM with standard ABI; the `.global` + `.arm` directives
+  suffice.
+
+Verified: 3-region `ninja sha1` PASS when shipped as
+`src/main/func_02023f7c.s` (brief 202 worked example).
+
+**Use when:** orig pool block has two or more `.word` slots
+holding the SAME data symbol value at distinct addresses, AND
+the function body has multiple `ldr [pc, #...]` instructions
+pointing to those slots separately. The
+`tools/predict_walls.py` `C-34` detector flags affected picks.
+
+**Cross-corpus survey notes:** brief 198's permuter wave
+identified the wall on two clones (E-07 / E-08); both ship via
+the brief 202 `.s` recipe.
+
+| Pick | Module | Addr | Size | Symbol | Notes |
+|---|---|---|---:|---|---|
+| E-07 `func_02023f7c` | main | `0x02023f7c` | 0x70 | data_0219a8e4 | brief 202 worked example (this entry) |
+| E-08 `func_02026fd8` | main | `0x02026fd8` | 0x70 | data_0219a8c8 | Clone of E-07 (different state symbol + multiplier). Same recipe applies; decomper brief 203+ ships. |
+
+**Provenance:** brief 198 (PR #648) ran permuter against the
+9-pick Cluster B + E worklist; E-07 / E-08 bottomed at 1-insn
+diffs. Brief 201 (PR #651) confirmed the residual is mwcc 2.0
+address-CSE and ruled out `volatile` + pointer alias + all
+three routing tiers. Brief 202 (this entry) ruled out `asm
+void` (mwasmarm's literal-pool dedup still fires), found the
+`.s` + explicit-label recipe, shipped E-07 as the worked
+example, and added the `tools/predict_walls.py` `C-34`
+detector. Full diagnosis + recipe rationale at
+[`first-wave-wall-address-cse.md`](first-wave-wall-address-cse.md).
 
 ## Permanent (11 patterns)
 
