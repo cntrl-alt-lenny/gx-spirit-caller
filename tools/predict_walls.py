@@ -58,6 +58,11 @@ predicate) need source-level context and aren't emitted here.
     consulting `relocs.txt` (NOT disasm), because the bare `bl
     <hex>` shape is ambiguous between resolvable and
     unresolvable cross-overlay BLs.
+  - **C-34** — address-CSE: 2+ `kind:load` relocs with the
+    SAME `to:` target inside the function (orig has duplicate
+    pool slots for the same data symbol; mwcc 2.0 IR-CSE
+    collapses to 1). Routes through `.s` with explicit
+    `.word` per pool slot per brief 202 recipe.
   - **C-33** — `.legacy.c` cascade risk (main module, function
     size > 0x50, StyleA or C-15 wall predicted). Brief 193's
     PR #640 surfaced this: any `.legacy.c` added to `src/main/`
@@ -686,6 +691,57 @@ def detect_cross_overlay_bl(
     )]
 
 
+def detect_address_cse(
+    relocs_text: str, addr: int, size: int,
+) -> list[WallPrediction]:
+    """C-34 detector — consults relocs.txt for 2+ `kind:load`
+    entries with the SAME `to:` target inside the function's
+    `[addr, addr+size)` range.
+
+    Brief 202: orig has TWO distinct pool slots holding the
+    SAME data symbol address; mwcc 2.0/sp1p5's IR-CSE pass
+    collapses them to one slot when compiling natural C
+    source. Routing through `.legacy.c` produces a completely
+    different shape. Recipe: ship as `.s` with explicit
+    `.word` directives per pool slot — bypasses both mwcc's
+    IR-CSE and mwasmarm's literal-pool dedup.
+
+    Pure function — callers do the I/O. Returns an empty list
+    when no duplicate-target loads fall inside the function's
+    range.
+    """
+    targets_by_value: dict[int, list[int]] = {}
+    for line in relocs_text.splitlines():
+        m = _RELOC_RE.match(line.strip())
+        if not m:
+            continue
+        frm, kind, to, _modu = m.groups()
+        if kind != "load":
+            continue
+        f_addr = int(frm, 16)
+        if not (addr <= f_addr < addr + size):
+            continue
+        targets_by_value.setdefault(int(to, 16), []).append(f_addr)
+    duplicate_targets = [
+        (val, slots) for val, slots in targets_by_value.items()
+        if len(slots) >= 2
+    ]
+    if not duplicate_targets:
+        return []
+    summary_parts = []
+    for val, slots in duplicate_targets:
+        slot_addrs = ", ".join(f"0x{s:08x}" for s in slots)
+        summary_parts.append(f"0x{val:08x} @ [{slot_addrs}]")
+    return [WallPrediction(
+        "C-34",
+        f"{len(duplicate_targets)} address-CSE candidate"
+        f"{'s' if len(duplicate_targets) > 1 else ''}: "
+        f"{'; '.join(summary_parts)} — mwcc 2.0 will dedupe "
+        "to 1 slot; ship as `.s` with explicit `.word` per "
+        "pool slot per brief 202 recipe",
+    )]
+
+
 # Brief 194: empirical size threshold above which a `.legacy.c`
 # routed function triggers Cluster F's ov004 cascade (~+64 B per
 # TU). PR #640 observed cascades on 0x68 and 0x6c picks but not
@@ -800,6 +856,12 @@ def predict_module(
             walls.extend(detect_cross_overlay_bl(
                 relocs_text, s.addr, s.size,
             ))
+            # Brief 202: C-34 address-CSE detector — same
+            # relocs.txt source as C-32; orthogonal signal
+            # (duplicate-target loads vs module:none calls).
+            walls.extend(detect_address_cse(
+                relocs_text, s.addr, s.size,
+            ))
         # Brief 194: C-33 is a composite over the disasm-based
         # predictions, gated on module + size.
         walls.extend(detect_legacy_c_cascade_risk(
@@ -885,9 +947,13 @@ def main(argv: list[str] | None = None) -> int:
         # Brief 192 — also run the relocs-based C-32 detector.
         relocs_path = _module_relocs_path(args.version, args.module)
         if relocs_path is not None and relocs_path.is_file():
+            relocs_text = relocs_path.read_text(encoding="utf-8")
             walls.extend(detect_cross_overlay_bl(
-                relocs_path.read_text(encoding="utf-8"),
-                args.address, args.size,
+                relocs_text, args.address, args.size,
+            ))
+            # Brief 202 — C-34 address-CSE detector.
+            walls.extend(detect_address_cse(
+                relocs_text, args.address, args.size,
             ))
         # Brief 194 — C-33 risk composite.
         walls.extend(detect_legacy_c_cascade_risk(
