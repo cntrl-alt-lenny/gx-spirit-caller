@@ -364,29 +364,46 @@ itself:
 
 ### Open briefs
 
-- **Brief 202 (HIGH, NEW)** — `scaffolder` address-CSE wall
-  research for E-07 / E-08. Brief 201 documented mwcc 2.0's
-  address-CSE pass collapsing two pool entries (for the SAME data
-  symbol) into one slot — 1-insn diff each, the closest possible
-  miss. Decomper tried volatile, pointer aliasing, all three
-  routing tiers; none broke the CSE. Brief 201 explicitly handed
-  off: "needs scaffolder-tier intervention (inline asm escape or
-  codegen flag)." Three deliverables: empirical investigation,
-  recipe selection (inline asm vs compiler flag vs pragma vs
-  routing vs acknowledge-as-P-N), worked example or P-N
-  classification. Branch: `scaffolder/address-cse-wall`.
-- **Brief 203 (HIGH, NEW)** — `decomper` C-23 candidate drain.
-  Brief 199's expanded classifier surfaced 3 candidates beyond
-  pick #5: `OSi_PostIrqEvent` (0x9c, clustered pool),
-  `func_02021b38` (0x74, clustered pool), `func_02093dc8` (0x70,
-  DMA register access via main MMIO). Recipe is locked from
-  brief 199 — `.legacy.c` routing + keep base + offset separate
-  in source. Bar: ≥ 2 of 3 ship (3-of-3 expected). **Expected +3
-  matched_functions if all three close — first multi-pick C-source
-  wave since brief 188.** Branch: `decomper/c23-survey-drain`.
+- **Brief 204 (HIGH, NEW)** — `scaffolder` routing-trilemma research
+  on `func_02021b38`. Brief 203 left this pick as un-wired stub:
+  orig has THREE shapes (compact push + duplicate-pool ref +
+  non-strength-reduced loop) that no single mwcc tier in the current
+  toolchain produces. Investigate older mwcc variants (2.0/sp1p3,
+  2.0/sp1p4, 1.0 if available), per-TU compiler flags, source-shape
+  hybrids, or `.s` fallback. Classify as C-N if recipe ships,
+  P-N if permanent. Branch: `scaffolder/routing-trilemma-research`.
+- **Brief 205 (HIGH, NEW)** — `decomper` E-08 ship + C-34
+  full-corpus drain. Phase 1: ship `func_02026fd8` via brief
+  202's C-34 `.s` recipe (clone of E-07, locked recipe).
+  Phase 2: full EUR scan via `python3.13 tools/predict_walls.py
+  --version eur` for additional C-34 candidates sized 0x40-0x100
+  in main, drain whatever surfaces (0-5 expected). Branch:
+  `decomper/c34-drain-e08-plus-full-scan`.
 
 ### Closed briefs (reference)
 
+- **Brief 203** — `decomper`, shipped in PR #654. 🎯 **2/3 C-23
+  ships + 2 new recipe extensions.** `OSi_PostIrqEvent` (0x9c)
+  + `func_02093dc8` (0x70) shipped clean. `func_02021b38` (0x74)
+  left as un-wired stub — routing trilemma (compact push + dup
+  pool + non-strength-reduced loop, no single mwcc tier produces
+  all three). **Two recipe extensions discovered during the
+  drain:** (1) inline-expression form `int mask = 1 << data[idx]`
+  anchors callee-saved reg from first use (not the two-statement
+  form); (2) `&base[expr]` forces pool load for variable index
+  (direct subscript constant-folds). Brief 199's recipe is now
+  more general. +3 complete_units; matched_functions ticks under-
+  reported due to reloc-record divergence (see
+  [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md)).
+- **Brief 202** — `scaffolder`, shipped in PR #653. 🎯 **C-34
+  address-CSE wall closed with `.s` recipe + worked example.**
+  NOT classified as P-12 — recipe found. Two-layer CSE bypass
+  required: mwcc IR-CSE (defeated by `.s`) AND mwasmarm pool
+  dedup (defeated by explicit `.word data_<addr>` directives at
+  distinct labels, NOT the `=sym` macro). E-07 (`func_02023f7c`,
+  0x70) shipped. New `detect_address_cse` consults relocs.txt
+  for 2+ `kind:load to:<same addr>` entries. 8 new tests
+  (2080 → 2110). Brief 199 + 200 cohorts correctly DON'T fire.
 - **Brief 201** — `decomper`, shipped in PR #651. 🎯 **First
   matched_functions increment via decomp.me workflow.** B-08
   (`func_0205da2c`) shipped as `.legacy_sp3.c` — the explicit-
