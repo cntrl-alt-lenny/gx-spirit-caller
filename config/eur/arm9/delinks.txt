@@ -3504,6 +3504,10 @@ src/main/func_02096228.c:
     complete
     .text start:0x02096228 end:0x02096234
 
+src/main/func_02096434.legacy.c:
+    complete
+    .text start:0x02096434 end:0x020964a0
+
 
 
 

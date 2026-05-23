@@ -2607,6 +2607,101 @@ entry, not just a C-15 sub-family". Brief 088 (PR #?) ran the
 methodology, confirming distinct peephole machinery from C-15
 and pinning the recipe + cross-corpus survey notes.
 
+#### Brief 199 — expanded signal set + DTCM kernel block + pick #5 worked example
+
+**Discriminator beyond the brief 086 MMIO-block signal.**
+Brief 193 (PR #640) flagged pick #5 (`func_02096434`) as "StyleA
++ C-23 stacked" and skipped it. The function's pool words are
+`0x021a8288` (BSS) and `0x027ffc00` (DTCM kernel block) — NOT
+in the `0x04000xxx` block the brief 086 detector was tuned to.
+But the function still has the C-23 wall: two separate `ldr r3`
+of `0x027ffc00`, one per if/else branch, against the
+mwcc-2.0-fold's natural shape of "load once before the cmp".
+
+Brief 199 expands the C-23 detection signal set to also cover:
+
+| Signal | Description | Picks it catches |
+|---|---|---|
+| **(a) main MMIO** | pool literal in `0x04000xxx` range | brief 086 originals (divider, GX matrix) |
+| **(b) DTCM kernel block** | pool literal in `0x027ff[c-f]xx` range — IRQ state, OS handles, kernel work area at top of DTCM | brief 199 pick #5 (`func_02096434`) |
+| **(c) duplicate pool ref** | same `@ 0xADDR` referenced by 2+ `ldr` (mwcc 2.0 would fold; 1.2/sp2p3 doesn't) | brief 199 pick #5; brief 086's `func_0208e664` |
+| **(d) clustered pool** | 3+ distinct pool targets within ±0x20 of each other (mwcc 2.0 base-folds; 1.2/sp2p3 emits per-slot) | `OSi_PostIrqEvent` (3-field cluster of `0x021a635x`); `func_02021b38` |
+
+Any one signal is sufficient — they all point to the same
+recipe (`.legacy.c` routing). The classifier surfaces each cue
+that fires so the decomper knows which discriminator triggered.
+
+**Worked example — pick #5 (`func_02096434`):** ships in
+[`src/main/func_02096434.legacy.c`](../../src/main/func_02096434.legacy.c).
+Function semantics: write per-slot value into a BSS array AND
+mirror its truthiness as a bit in an OS-IRQ-state word at
+`0x027fff88` (= `0x027ffc00 + 0x388`), bracketed by
+`OS_DisableIrq` / `OS_RestoreIrq`. The orig has 27 insns + 3
+pool words = 0x6c. The two `ldr r3, =0x027ffc00` loads (one per
+if/else branch) BOTH point at the same pool word — that's the
+duplicate-pool-ref signal.
+
+**Source-shape trap (brief 199 Part 1 reproduction).** The
+naive C with constant-folded MMIO offset:
+
+```c
+*(int *)(0x027ffc00 + 0x388) |= (1U << slot);  /* mwcc 1.2/
+                                                  sp2p3 folds
+                                                  this CONSTANT
+                                                  at compile time
+                                                  into a single
+                                                  0x027fff88 pool
+                                                  word + `[r3]`
+                                                  access */
+```
+
+…compiles to a SINGLE pool word `0x027fff88` and `ldr r2, [r3]`
+(no offset). Orig has TWO pool words `0x027ffc00, 0x027ffc00`
+and `ldr r2, [r3, #0x388]`. Constant-folding happens at the C
+expression level, BEFORE mwcc's SP-tier-specific peephole pass —
+so changing the routing tier doesn't unfold it. The source must
+keep the base + offset SEPARATE for mwcc to materialise the
+base into a register and emit `[r3, #imm]`.
+
+**Source recipe.** Bind the base to a `volatile int *` local
+and access via index:
+
+```c
+volatile int *block = (volatile int *)0x027ffc00;
+if (value != 0) {
+    block[226] = block[226] | (1U << slot);   /* 226 * 4 = 0x388 */
+} else {
+    block[226] = block[226] & ~(1U << slot);
+}
+```
+
+`block[226]` compiles to `ldr/str [r3, #904]` with r3 holding
+`0x027ffc00`. The pool word stays unfolded. Verified byte-
+identical to orig.
+
+(The `*(int *)(0x027ffc00 + 0x388)` trap also explains why
+brief 086 used `vu16 *p_divcnt = (vu16 *)0x04000280` — separate
+pointer locals per base. The recipe generalises: keep
+volatile-typed base pointers separate from their offsets.)
+
+**Confirmed instances (brief 199 expansion):**
+
+- `func_02096434` (brief 199 pick #5, this entry) — DTCM kernel
+  block + duplicate pool ref, OS-IRQ-state bit mirror, 0x6c.
+
+**Brief 199 classifier survey (4 additional C-23 candidates
+beyond the brief 086 originals):**
+
+| Candidate | Module | Addr | Size | Signal | Status |
+|---|---|---|---:|---|---|
+| `OSi_PostIrqEvent` | main | `0x020904d4` | 0x9c | 5 pc loads + clustered pool (`0x021a6354/8/c`) | brief 200+ candidate |
+| `func_02021b38` | main | `0x02021b38` | 0x74 | 5 pc loads + clustered pool | brief 200+ candidate |
+| `func_02093dc8` | main | `0x02093dc8` | 0x70 | 3 pc loads + main MMIO + duplicate ref (DMA) | brief 200+ candidate |
+| (extension TBD) | — | — | — | — | — |
+
+Full diagnosis + recipe rationale at
+[`first-wave-wall-mmio-base-folding.md`](first-wave-wall-mmio-base-folding.md).
+
 ### C-24. Indirect-call dispatch with pool-dedup — `.legacy_sp3.c` routing
 
 > **Wall family note — C-24 vs C-23 vs C-15.** All three are
