@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**72 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**73 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (14)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (9)
+- [Match acceleration](#match-acceleration) (10)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
@@ -192,6 +192,12 @@ propose the best-fit template for a new target.
 **bootstrap (and optionally auto-run) decomp-permuter for a single function.**
 
 Decomp-permuter (https://github.com/simonlindholm/decomp-permuter) is the standard matching-accelerator for NDS/GC/N64 decomps. Given a C source and a target assembly, it applies bounded random permutations (variable renames, type juggle…
+
+### `tools/permute_batch.py`
+
+**worklist-driven batch wrapper around**
+
+`tools/permute.py`.
 
 ### `tools/propagate_template.py`
 

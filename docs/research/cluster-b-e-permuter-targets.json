@@ -1,0 +1,109 @@
+{
+  "_schema": "permute_batch worklist (brief 196)",
+  "_doc": [
+    "9 picks from briefs 190 + 193 where the failure mode is mwcc",
+    "register-allocation or expression-scheduling drift. Cluster B",
+    "= brief 190 PR #637 mwcc-elide variants (#8/#18/#22/#24).",
+    "Cluster E = brief 193 PR #640 reg-alloc drift (#7/#8/#12/#13/#14).",
+    "",
+    "Per-pick fields:",
+    "  - id          : human label (e.g. 'B-08' for brief 190 pick #8).",
+    "  - module      : 'main' / 'itcm' / 'dtcm' / 'ovNNN'.",
+    "  - address     : hex VA of the function.",
+    "  - size        : function size in bytes.",
+    "  - name        : current symbols.txt name.",
+    "  - cluster     : 'B' (brief 190) or 'E' (brief 193).",
+    "  - hint        : free-text routing / recipe hint for the decomper.",
+    "",
+    "Notes on stub status:",
+    "  Neither brief 190 nor brief 193 left .c stubs for these picks",
+    "  (they attempted-and-reverted or skipped outright). The brief 196",
+    "  wrapper expects pre-staged stubs at src/<module>/func_<addr>.c;",
+    "  picks without stubs surface as 'stub_missing' in the result",
+    "  summary. Brief 198+ (decomper) creates stubs based on the wall",
+    "  surface the wrapper documents."
+  ],
+  "picks": [
+    {
+      "id": "B-08",
+      "module": "main",
+      "address": "0x0205da2c",
+      "size": 28,
+      "name": "func_0205da2c",
+      "cluster": "B",
+      "hint": "1 callee. Cluster B = mwcc 2.0 elides what orig emits. Reg-choice + unused-local elision class."
+    },
+    {
+      "id": "B-18",
+      "module": "itcm",
+      "address": "0x01ff8770",
+      "size": 80,
+      "name": "func_01ff8770",
+      "cluster": "B",
+      "hint": "2 callees. ITCM-resident; check whether permuter's compile.sh handles ITCM include path correctly."
+    },
+    {
+      "id": "B-22",
+      "module": "main",
+      "address": "0x0200b0c8",
+      "size": 92,
+      "name": "func_0200b0c8",
+      "cluster": "B",
+      "hint": "Brief 098 listed this as the P-4 control (expected ZERO recovery; brief 091/093 ruled out). Useful as sanity gate that the wrapper terminates cleanly on a known-unmatched pick."
+    },
+    {
+      "id": "B-24",
+      "module": "ov011",
+      "address": "0x021d2ca8",
+      "size": 92,
+      "name": "func_ov011_021d2ca8",
+      "cluster": "B",
+      "hint": "1 callee. Overlay-resident; cross-overlay BL surface unknown — confirm via relocs.txt before staging."
+    },
+    {
+      "id": "E-07",
+      "module": "main",
+      "address": "0x02023f7c",
+      "size": 112,
+      "name": "func_02023f7c",
+      "cluster": "E",
+      "hint": "Cluster E = mwcc reg-alloc drift. Per brief 193 PR #640: orig loads data pointer into r4 (callee-saved) referencing the literal twice; mwcc 2.0/sp1p5 loads into r1 (caller-saved) and CSEs the two literal refs into one."
+    },
+    {
+      "id": "E-08",
+      "module": "main",
+      "address": "0x02026fd8",
+      "size": 112,
+      "name": "func_02026fd8",
+      "cluster": "E",
+      "hint": "Per brief 193 PR #640: clone-of-#7 — same reg-alloc drift class. A converged recipe for E-07 likely applies here."
+    },
+    {
+      "id": "E-12",
+      "module": "main",
+      "address": "0x02024574",
+      "size": 116,
+      "name": "func_02024574",
+      "cluster": "E",
+      "hint": "Cluster E reg-alloc drift, distinct shape from E-07 family."
+    },
+    {
+      "id": "E-13",
+      "module": "main",
+      "address": "0x020270d0",
+      "size": 116,
+      "name": "func_020270d0",
+      "cluster": "E",
+      "hint": "Per brief 193 PR #640: clone-of-#12. Same recipe pool as E-12."
+    },
+    {
+      "id": "E-14",
+      "module": "main",
+      "address": "0x02028790",
+      "size": 116,
+      "name": "func_02028790",
+      "cluster": "E",
+      "hint": "Per brief 193 PR #640: clone-of-#12. Same recipe pool as E-12."
+    }
+  ]
+}
