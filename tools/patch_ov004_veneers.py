@@ -297,7 +297,43 @@ N_INFERENCE_OVERRIDES: dict[int, int] = {
 # empirically). Brief 179's research note `docs/research/
 # ov004-odd-aligned-layout-cascade.md` records the segment-by-
 # segment shift table that motivated this cap.
+#
+# Brief 194 — `.legacy.c` cascade unblock
+# ---------------------------------------
+#
+# `MAX_SHIFT_BYTES` is now measured AGAINST THE PER-SECTION
+# MODAL SHIFT, not against zero. Brief 193 surfaced a wall
+# class where adding a `.legacy.c` to `src/main/` for a function
+# > ~0x50 bytes triggers a UNIFORM shift across every TU in
+# ov004 (typically +64 / +68 bytes). The shift is bodily —
+# mwldarm placed all of ov004 later in the link because main
+# grew. Each section's TUs share the same shift magnitude (per-
+# section modal); the byte content per TU is unchanged.
+#
+# This shape is structurally safe to relocate — copy each TU's
+# bytes from built FO to orig FO, identical to brief 180's
+# existing reconstruction algorithm. The 4-byte cap was over-
+# conservative for the bodily-relocation case. The new
+# definition — deviation from per-section modal ≤ 4 bytes —
+# still catches the original target (a TU moving independently
+# from its section's bulk shift = structural regression) but
+# allows the uniform-shift case through.
+#
+# Detection is via `_section_modal_shifts()` below; the cap
+# check in `_layout_reconstruct` uses `tu.shift - modal` rather
+# than `tu.shift` directly. Brief 194's investigation +
+# rationale: `docs/research/first-wave-wall-legacy-c-cascade.md`.
 MAX_SHIFT_BYTES = 4
+
+# Brief 194 — per-section modal-consensus requirement.
+#
+# When checking deviation from per-section modal, also require
+# that a supermajority of TUs in the section agree with the
+# modal. Otherwise the "modal" is meaningless (e.g. 50/50 split
+# between two shift values = arbitrary pick by min-|shift| tie-
+# break). 0.5 is the threshold; brief 194 ov004 empirically
+# shows > 95% per-section consensus on the .legacy.c cascade.
+MODAL_CONSENSUS_FRACTION = 0.5
 
 
 class PatchError(Exception):
@@ -915,6 +951,113 @@ def _is_orig_shape(
     return init_start_va <= val < init_end_va
 
 
+def _section_modal_shifts(
+    tu_sections: list[MapTUSection],
+) -> dict[str, tuple[int, float]]:
+    """Per-section (modal_shift, consensus_fraction).
+
+    Brief 194 — when `.legacy.c` claims grow main and shift all
+    of ov004 bodily, the cascade is structurally uniform per
+    section (every TU in `.text` shifts by the same amount,
+    every TU in `.data` likewise, etc.). The per-section modal
+    is the shift the bulk of TUs share; the consensus_fraction
+    is `count_at_modal / total_in_section`.
+
+    Returned modal value, on ties, is the shift closest to 0
+    (preserves the original brief-180 semantics when the
+    cascade is small / mixed).
+
+    Used by `_layout_reconstruct` to validate that deviations
+    from the modal (the actual structural-regression signal)
+    stay within `MAX_SHIFT_BYTES`, rather than the absolute
+    shift from orig.
+    """
+    by_section: dict[str, dict[int, int]] = {}
+    for tu in tu_sections:
+        by_section.setdefault(tu.section, {})
+        by_section[tu.section][tu.shift] = (
+            by_section[tu.section].get(tu.shift, 0) + 1
+        )
+    out: dict[str, tuple[int, float]] = {}
+    for section, counts in by_section.items():
+        total = sum(counts.values())
+        # Break ties by min(|shift|) — at equal counts, prefer the
+        # shift closer to zero (preserves brief 180's "expect
+        # small shifts" baseline behaviour when no clear majority
+        # exists).
+        modal_shift, modal_count = min(
+            counts.items(), key=lambda kv: (-kv[1], abs(kv[0])),
+        )
+        out[section] = (modal_shift, modal_count / total)
+    return out
+
+
+def dump_tu_shifts(
+    tu_sections: list[MapTUSection],
+    *,
+    out=sys.stderr,
+) -> None:
+    """Brief 194 diagnostic — print each TU section's built/orig VA
+    + shift sorted by |shift| descending.
+
+    Used by the `--dump-shifts` CLI flag and by tests to inspect
+    cascade shape on `.legacy.c`-induced layout cascades. Pure
+    formatting helper; does not touch the binary.
+
+    Each row reports:
+
+    - the `.section` (`.text` / `.rodata` / `.init` / `.ctor` /
+      `.data`) — separates the cascade into per-section subgroups
+      (mwldarm packs each physical section independently),
+    - the originating `.o` TU file (`_dsd_gap@ov004_NN.o` for
+      gap-fill blocks; named TUs for source-claimed objects),
+    - built VA range (where mwldarm placed the TU in the as-linked
+      binary),
+    - orig VA range (where dsd's reloc map says the TU should be),
+    - the shift (`built - orig`), signed, in bytes.
+
+    A non-zero shift means the TU is misplaced relative to orig.
+    `_layout_reconstruct` will move it back UP TO the
+    `MAX_SHIFT_BYTES = 4` cap; anything beyond that aborts. Brief
+    194's investigation hinges on the SHAPE of the cascade above
+    that cap — is it a uniform delta affecting many TUs (size
+    threshold cross, mwcc 1.2/sp2p3 vs 2.0/sp1p5 emission size), a
+    spike on a single TU (veneer-pool relocation), or a per-TU
+    progressive drift (structural regression)?
+    """
+    ranked = sorted(
+        tu_sections, key=lambda tu: (-abs(tu.shift), tu.section, tu.tu_file),
+    )
+    nonzero = sum(1 for tu in tu_sections if tu.shift != 0)
+    over_cap = sum(
+        1 for tu in tu_sections if abs(tu.shift) > MAX_SHIFT_BYTES
+    )
+    max_abs_shift = max(
+        (abs(tu.shift) for tu in tu_sections), default=0,
+    )
+    print(
+        f"# arm9_ov004.bin TU-shift dump: {len(tu_sections)} TU "
+        f"sections, {nonzero} non-zero shift, {over_cap} over "
+        f"MAX_SHIFT_BYTES={MAX_SHIFT_BYTES} cap, "
+        f"max |shift|={max_abs_shift} B",
+        file=out,
+    )
+    print(
+        f"# {'section':<8} {'shift':>6}  {'tu_file':<40}  "
+        f"built_va         orig_va",
+        file=out,
+    )
+    for tu in ranked:
+        marker = "*" if abs(tu.shift) > MAX_SHIFT_BYTES else " "
+        print(
+            f"{marker} {tu.section:<8} {tu.shift:+6d}  "
+            f"{tu.tu_file:<40}  "
+            f"[{tu.built_start_va:08x}, {tu.built_end_va:08x})  "
+            f"[{tu.orig_start_va:08x}, {tu.orig_end_va:08x})",
+            file=out,
+        )
+
+
 def _layout_reconstruct(
     data: bytes | bytearray,
     tu_sections: list[MapTUSection],
@@ -954,23 +1097,67 @@ def _layout_reconstruct(
     orig_size = data_end_va - base_va
     output = bytearray(orig_size)
     tus_copied = 0
+    # Brief 194 — Cluster F (`.legacy.c` cascade) decode.
+    #
+    # The linker map reports per-TU `built_start_va` values that
+    # carry a LCF-level VIRTUAL padding: when `OV004_TEXT_START`
+    # advances past orig `.text` start (e.g. by 64 bytes because
+    # the preceding overlay grew due to a `.legacy.c` adding
+    # bytes to ARM9), mwldarm reports every ov004 TU shifted by
+    # ~64 bytes. But the .bin file itself does NOT physically
+    # include those padding bytes — mwldarm packs section content
+    # tightly starting at FO 0. Empirical confirmation: byte
+    # comparison of built vs orig ov004 binaries shows
+    # `func_ov004_021c9d60`'s content at FO 0 in BOTH, even when
+    # the map says it's at built_va 0x021c9da0 (+64).
+    #
+    # Therefore the right physical byte shift is NOT
+    # `tu.built_start_va - tu.orig_start_va` (the map's shift) but
+    # rather that minus the LCF virtual padding. We use the
+    # `.text` section's modal shift as the virtual-padding
+    # baseline: .text TUs that follow the bulk are at orig FO in
+    # the .bin (physical shift 0); .rodata TUs that follow ITS
+    # bulk are at orig FO + (rodata_modal - text_modal), which is
+    # the brief 180 cascade vestige.
+    #
+    # The cap check uses deviation from PER-SECTION modal — that
+    # catches a TU moving independently of its section's bulk
+    # (genuine structural regression) without false-positiving on
+    # uniform LCF-induced shifts.
+    modal = _section_modal_shifts(tu_sections)
+    text_modal = modal.get(".text", (0, 1.0))[0]
     for tu in tu_sections:
-        if abs(tu.shift) > MAX_SHIFT_BYTES:
+        section_modal, consensus = modal.get(tu.section, (0, 1.0))
+        deviation = tu.shift - section_modal
+        if (
+            abs(deviation) > MAX_SHIFT_BYTES
+            or consensus < MODAL_CONSENSUS_FRACTION
+        ):
             raise PatchError(
                 f"TU {tu.tu_file} ({tu.section}) has shift "
                 f"{tu.shift:+d} bytes "
-                f"(|shift| > MAX_SHIFT_BYTES = {MAX_SHIFT_BYTES}); "
+                f"(deviation {deviation:+d} from section modal "
+                f"{section_modal:+d}, "
+                f"consensus {consensus:.0%}; "
+                f"|deviation| > MAX_SHIFT_BYTES = {MAX_SHIFT_BYTES}"
+                f" OR consensus < {MODAL_CONSENSUS_FRACTION:.0%}); "
                 f"structural regression suspected — bail rather "
                 f"than relocate a TU section whose layout cause we "
                 f"have not characterised."
             )
-        built_fo = tu.built_start_va - base_va
+        # Brief 194 physical-FO formula: subtract the .text modal
+        # (the LCF virtual padding) from each TU's reported shift
+        # to get the actual byte offset of the TU's content in
+        # the built .bin.
+        physical_byte_shift = tu.shift - text_modal
         orig_fo = tu.orig_start_va - base_va
+        built_fo = orig_fo + physical_byte_shift
         size = tu.size
         if built_fo < 0 or built_fo + size > len(data):
             raise PatchError(
                 f"TU {tu.tu_file} ({tu.section}) built range "
                 f"[{tu.built_start_va:08x}, {tu.built_end_va:08x}) "
+                f"physical_fo={built_fo:#x} size={size:#x} "
                 f"out of bounds for input ({len(data):#x} bytes)"
             )
         if orig_fo < 0 or orig_fo + size > orig_size:
@@ -1529,6 +1716,14 @@ def main() -> int:
              "map, the patcher falls back to the brief 134/142/"
              "146/164/168 splice path.",
     )
+    ap.add_argument(
+        "--dump-shifts", action="store_true",
+        help="Brief 194 diagnostic: parse --map, print each TU "
+             "section's built/orig VA + shift to stderr (sorted by "
+             "|shift| descending), then exit without patching. Used "
+             "to investigate when MAX_SHIFT_BYTES (= 4) trips — see "
+             "docs/research/first-wave-wall-legacy-c-cascade.md.",
+    )
     args = ap.parse_args()
 
     try:
@@ -1569,6 +1764,25 @@ def main() -> int:
         except OSError as e:
             print(f"error: read {args.map}: {e}", file=sys.stderr)
             return 1
+
+    # Brief 194 diagnostic — print per-TU shifts and exit. Used
+    # to investigate when MAX_SHIFT_BYTES trips on `.legacy.c`-
+    # induced cascades. Runs before the patch path so it works
+    # even when the cap WOULD fire on the regular invocation.
+    if args.dump_shifts:
+        if map_text is None:
+            print(
+                "error: --dump-shifts requires --map",
+                file=sys.stderr,
+            )
+            return 1
+        try:
+            tu_sections = parse_link_map_ov004(map_text)
+        except PatchError as e:
+            print(f"error: parse {args.map}: {e}", file=sys.stderr)
+            return 1
+        dump_tu_shifts(tu_sections)
+        return 0
 
     # Compute YAML metadata from sections.
     ctor_start_va, ctor_end_va = sections[".ctor"]

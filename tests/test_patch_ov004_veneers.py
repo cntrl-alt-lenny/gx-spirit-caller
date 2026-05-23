@@ -47,6 +47,7 @@ from patch_ov004_veneers import (  # noqa: E402
     CTOR_PAD_FIX_NET_BYTES_WITH_TERMINATOR_MID,
     HISTORICAL_MAX_VENEER_COUNT,
     MAX_SHIFT_BYTES,
+    MODAL_CONSENSUS_FRACTION,
     N_INFERENCE_OVERRIDES,
     MapTUSection,
     PatchError,
@@ -58,7 +59,9 @@ from patch_ov004_veneers import (  # noqa: E402
     _layout_reconstruct,
     _reencode_arm_bls,
     _scan_veneer_pool,
+    _section_modal_shifts,
     _splice_veneer_pool,
+    dump_tu_shifts,
     expected_output_delta_for,
     expected_output_size_for,
     parse_link_map_ov004,
@@ -2288,20 +2291,40 @@ class TestLayoutReconstruct(unittest.TestCase):
             _layout_reconstruct(data, tus, sections)
 
     def test_shift_above_max_raises_at_copy_site(self):
-        # PR #623 brain-review: `MAX_SHIFT_BYTES` is enforced
-        # here at the copy site, not in `parse_link_map_ov004`.
-        # A TU with `|shift| > MAX_SHIFT_BYTES` surfaces as a
-        # PatchError before any bytes get moved.
+        # PR #623 brain-review: `MAX_SHIFT_BYTES` is enforced here
+        # at the copy site, not in `parse_link_map_ov004`. Brief
+        # 194 refines the cap to "deviation from per-section
+        # modal" — so the test now needs MULTIPLE TUs where one
+        # stands out from its section's bulk shift.
         sections = self._sections()
         data = bytes(0x100)
         bad_shift = MAX_SHIFT_BYTES + 1
-        tus = [MapTUSection(
-            section=".rodata", tu_file="bad_shift.o",
-            built_start_va=0x02000010 + bad_shift,
-            built_end_va=0x02000014 + bad_shift,
-            orig_start_va=0x02000010,
-            orig_end_va=0x02000014,
-        )]
+        # Three .rodata TUs: two at modal shift +0, one at
+        # +(MAX_SHIFT_BYTES+1). The bad TU's deviation from modal
+        # (+5) exceeds the cap → raise.
+        tus = [
+            MapTUSection(
+                section=".rodata", tu_file="a.o",
+                built_start_va=0x02000010,
+                built_end_va=0x02000014,
+                orig_start_va=0x02000010,
+                orig_end_va=0x02000014,
+            ),
+            MapTUSection(
+                section=".rodata", tu_file="b.o",
+                built_start_va=0x02000014,
+                built_end_va=0x02000018,
+                orig_start_va=0x02000014,
+                orig_end_va=0x02000018,
+            ),
+            MapTUSection(
+                section=".rodata", tu_file="bad.o",
+                built_start_va=0x02000018 + bad_shift,
+                built_end_va=0x0200001c + bad_shift,
+                orig_start_va=0x02000018,
+                orig_end_va=0x0200001c,
+            ),
+        ]
         with self.assertRaisesRegex(PatchError, "MAX_SHIFT_BYTES"):
             _layout_reconstruct(data, tus, sections)
 
@@ -2733,6 +2756,259 @@ class TestCliMapArgument(unittest.TestCase):
         self.assertIn(
             "/this/path/does/not/exist.xMAP", stderr_buf.getvalue(),
         )
+
+
+class TestSectionModalShifts(unittest.TestCase):
+    """Brief 194 — per-section modal shift computation.
+
+    The modal is the most common shift value in a section; ties
+    break toward |shift|=0 (preserves brief 180 small-shift
+    intuition when no clear majority exists).
+    """
+
+    def _tu(self, section: str, shift: int, name: str = "x.o") -> MapTUSection:
+        return MapTUSection(
+            section=section, tu_file=name,
+            built_start_va=0x02000000 + shift,
+            built_end_va=0x02000004 + shift,
+            orig_start_va=0x02000000,
+            orig_end_va=0x02000004,
+        )
+
+    def test_uniform_section_modal_unanimous(self):
+        # Three .text TUs all at shift +64 — modal +64, 100% consensus.
+        tus = [self._tu(".text", 64, f"a{i}.o") for i in range(3)]
+        modal = _section_modal_shifts(tus)
+        self.assertEqual(modal[".text"], (64, 1.0))
+
+    def test_modal_picks_majority(self):
+        # 3 TUs at +64, 1 TU at +0 — modal +64 (75% consensus).
+        tus = [self._tu(".text", 64, f"a{i}.o") for i in range(3)]
+        tus.append(self._tu(".text", 0, "outlier.o"))
+        modal = _section_modal_shifts(tus)
+        self.assertEqual(modal[".text"], (64, 0.75))
+
+    def test_tie_break_prefers_zero(self):
+        # 2 TUs at +0, 2 TUs at +8 — equal counts, modal prefers 0
+        # (closer to zero).
+        tus = (
+            [self._tu(".text", 0, f"a{i}.o") for i in range(2)]
+            + [self._tu(".text", 8, f"b{i}.o") for i in range(2)]
+        )
+        modal = _section_modal_shifts(tus)
+        self.assertEqual(modal[".text"][0], 0)
+        self.assertEqual(modal[".text"][1], 0.5)
+
+    def test_per_section_independent(self):
+        # Two sections with different modal shifts — .text +64, .rodata +68.
+        tus = (
+            [self._tu(".text", 64, f"t{i}.o") for i in range(3)]
+            + [self._tu(".rodata", 68, f"r{i}.o") for i in range(3)]
+        )
+        modal = _section_modal_shifts(tus)
+        self.assertEqual(modal[".text"][0], 64)
+        self.assertEqual(modal[".rodata"][0], 68)
+
+
+class TestLegacyCCascadeFix(unittest.TestCase):
+    """Brief 194 — `.legacy.c` cascade unblock via per-section
+    modal-deviation cap.
+
+    Empirical finding from Part 1: adding a `.legacy.c` to
+    `src/main/` for a function > ~0x50 bytes shifts every ov004
+    TU uniformly by +64..+68 bytes (LCF virtual padding from
+    ARM9 growth). The shift is bodily, not structural —
+    relocating each TU to its orig FO is byte-safe. The fix
+    measures cap-deviation against the per-section modal so
+    the bulk shift doesn't trigger the cap; only TUs that
+    deviate from their section's bulk shift do.
+    """
+
+    def _sections(self) -> dict[str, tuple[int, int]]:
+        return {
+            ".text":   (0x02000000, 0x02000010),
+            ".rodata": (0x02000010, 0x02000020),
+            ".init":   (0x02000020, 0x02000024),
+            ".ctor":   (0x02000024, 0x02000028),
+            ".data":   (0x02000028, 0x02000030),
+        }
+
+    def test_uniform_text_modal_64_accepted(self):
+        # All three .text TUs share shift +64 — modal +64, every
+        # TU's deviation = 0, no PatchError. Physical FO is
+        # `orig_fo + (shift - text_modal) = orig_fo + 0`, so the
+        # copy reads at orig FO in the .bin.
+        sections = self._sections()
+        data = bytearray(0x100)
+        # Payloads at orig FOs (the bin's physical layout).
+        data[0:4] = b"\x11\x22\x33\x44"
+        data[4:8] = b"\x55\x66\x77\x88"
+        data[8:0xc] = b"\x99\xaa\xbb\xcc"
+        tus = [
+            MapTUSection(
+                section=".text", tu_file=f"a{i}.o",
+                built_start_va=0x02000000 + i * 4 + 64,
+                built_end_va=0x02000004 + i * 4 + 64,
+                orig_start_va=0x02000000 + i * 4,
+                orig_end_va=0x02000004 + i * 4,
+            )
+            for i in range(3)
+        ]
+        output, copied = _layout_reconstruct(data, tus, sections)
+        self.assertEqual(copied, 3)
+        self.assertEqual(bytes(output[0:0xc]), bytes(data[0:0xc]))
+
+    def test_uniform_rodata_with_text_baseline(self):
+        # `.text` modal +64 (the LCF virtual padding baseline).
+        # `.rodata` modal +68 — implies a +4 physical byte cascade
+        # inside ov004's binary, on top of the +64 LCF shift.
+        # Physical FO for .rodata TUs = orig_fo + (68 - 64) = +4.
+        sections = self._sections()
+        data = bytearray(0x100)
+        # Place .text bytes at orig FO 0..4.
+        data[0:4] = b"\x11\x22\x33\x44"
+        # Place .rodata bytes at orig FO+4 (= 0x14).
+        data[0x14:0x18] = b"\xaa\xbb\xcc\xdd"
+        tus = [
+            MapTUSection(
+                section=".text", tu_file="t.o",
+                built_start_va=0x02000040,
+                built_end_va=0x02000044,
+                orig_start_va=0x02000000,
+                orig_end_va=0x02000004,
+            ),
+            MapTUSection(
+                section=".rodata", tu_file="r.o",
+                built_start_va=0x02000054,
+                built_end_va=0x02000058,
+                orig_start_va=0x02000010,
+                orig_end_va=0x02000014,
+            ),
+        ]
+        output, copied = _layout_reconstruct(data, tus, sections)
+        self.assertEqual(copied, 2)
+        # .text TU bytes at orig FO 0..4 (no cascade).
+        self.assertEqual(bytes(output[0:4]), b"\x11\x22\x33\x44")
+        # .rodata TU bytes at orig FO 0x10..0x14 (physical was +4).
+        self.assertEqual(bytes(output[0x10:0x14]), b"\xaa\xbb\xcc\xdd")
+
+    def test_outlier_tu_in_section_raises(self):
+        # Three .text TUs at shift +64 (modal), one outlier at +75
+        # — the outlier's deviation (+11) exceeds MAX_SHIFT_BYTES,
+        # raises PatchError. Catches the genuine structural
+        # regression case the cap was designed for.
+        sections = self._sections()
+        data = bytes(0x100)
+        tus = (
+            [
+                MapTUSection(
+                    section=".text", tu_file=f"good{i}.o",
+                    built_start_va=0x02000000 + i * 4 + 64,
+                    built_end_va=0x02000004 + i * 4 + 64,
+                    orig_start_va=0x02000000 + i * 4,
+                    orig_end_va=0x02000004 + i * 4,
+                )
+                for i in range(3)
+            ]
+            + [
+                MapTUSection(
+                    section=".text", tu_file="outlier.o",
+                    built_start_va=0x0200000c + 75,
+                    built_end_va=0x02000010 + 75,
+                    orig_start_va=0x0200000c,
+                    orig_end_va=0x02000010,
+                ),
+            ]
+        )
+        with self.assertRaisesRegex(PatchError, "deviation"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_low_consensus_raises(self):
+        # Two TUs at +64, two at +0 — consensus 50% (equal split).
+        # Tie-break picks modal +0 (closer to zero), consensus
+        # 50% / total 4 = 0.5 — not strictly LESS than the
+        # threshold (also 0.5), so consensus check passes. But the
+        # +64-shifted TUs deviate by +64 from modal +0 → cap
+        # fires.
+        sections = self._sections()
+        data = bytes(0x100)
+        tus = [
+            MapTUSection(
+                section=".text", tu_file=f"a{i}.o",
+                built_start_va=0x02000000 + i * 4,
+                built_end_va=0x02000004 + i * 4,
+                orig_start_va=0x02000000 + i * 4,
+                orig_end_va=0x02000004 + i * 4,
+            )
+            for i in range(2)
+        ] + [
+            MapTUSection(
+                section=".text", tu_file=f"b{i}.o",
+                built_start_va=0x02000008 + i * 4 + 64,
+                built_end_va=0x0200000c + i * 4 + 64,
+                orig_start_va=0x02000008 + i * 4,
+                orig_end_va=0x0200000c + i * 4,
+            )
+            for i in range(2)
+        ]
+        with self.assertRaisesRegex(PatchError, "deviation"):
+            _layout_reconstruct(data, tus, sections)
+
+    def test_modal_consensus_threshold_documented(self):
+        # Sanity: the consensus threshold is exposed as a module-
+        # level constant so downstream test fixtures can adapt if
+        # the threshold ever changes.
+        self.assertGreater(MODAL_CONSENSUS_FRACTION, 0.0)
+        self.assertLessEqual(MODAL_CONSENSUS_FRACTION, 1.0)
+
+
+class TestDumpTuShifts(unittest.TestCase):
+    """Brief 194 `--dump-shifts` diagnostic — used to investigate
+    cascade shape when MAX_SHIFT_BYTES trips.
+    """
+
+    def test_dump_format(self):
+        import io
+        buf = io.StringIO()
+        tus = [
+            MapTUSection(
+                section=".text", tu_file="a.o",
+                built_start_va=0x02000000, built_end_va=0x02000010,
+                orig_start_va=0x02000000, orig_end_va=0x02000010,
+            ),
+            MapTUSection(
+                section=".rodata", tu_file="b.o",
+                built_start_va=0x02000050,
+                built_end_va=0x02000054,
+                orig_start_va=0x02000010,
+                orig_end_va=0x02000014,
+            ),
+        ]
+        dump_tu_shifts(tus, out=buf)
+        out = buf.getvalue()
+        # Header line.
+        self.assertIn("TU-shift dump", out)
+        self.assertIn("MAX_SHIFT_BYTES=4", out)
+        # Both TUs appear.
+        self.assertIn("a.o", out)
+        self.assertIn("b.o", out)
+        # Sort: largest |shift| first → b.o (shift +64) before
+        # a.o (shift 0).
+        b_idx = out.index("b.o")
+        a_idx = out.index("a.o")
+        self.assertLess(b_idx, a_idx)
+        # Over-cap marker (`*`) on b.o.
+        b_line = [
+            line for line in out.splitlines() if "b.o" in line
+        ][0]
+        self.assertTrue(b_line.startswith("*"))
+
+    def test_dump_empty(self):
+        import io
+        buf = io.StringIO()
+        dump_tu_shifts([], out=buf)
+        out = buf.getvalue()
+        self.assertIn("0 TU sections", out)
 
 
 if __name__ == "__main__":

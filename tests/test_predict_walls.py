@@ -16,8 +16,10 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from predict_walls import (  # noqa: E402
+    LEGACY_C_CASCADE_SIZE_THRESHOLD,
     WallPrediction,
     detect_cross_overlay_bl,
+    detect_legacy_c_cascade_risk,
     detect_walls,
 )
 
@@ -472,6 +474,99 @@ class TestCrossOverlayBLDetection(unittest.TestCase):
             relocs, addr=0x02050000, size=0x20,
         )
         self.assertEqual(walls, [])
+
+
+class TestLegacyCCascadeDetection(unittest.TestCase):
+    """C-33 detector (brief 194) — composite risk on top of an
+    existing StyleA / C-15 prediction. Gated on module == 'main'
+    and function size > 0x50. Pure function: takes already-
+    detected walls + module + size; no I/O.
+    """
+
+    @staticmethod
+    def _wall(wall_id: str) -> WallPrediction:
+        return WallPrediction(wall_id, f"({wall_id} cue)")
+
+    def test_main_stylea_above_threshold_flags(self):
+        # Pick #5's shape — main 0x6c function with StyleA wall.
+        walls = [self._wall("StyleA")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x6c,
+        )
+        self.assertEqual(len(c33), 1)
+        self.assertEqual(c33[0].wall_id, "C-33")
+        self.assertIn("StyleA", c33[0].cue)
+        self.assertIn("0x6c", c33[0].cue)
+
+    def test_main_c15_above_threshold_flags(self):
+        # Pick #2's shape — main 0x68 function with C-15 wall.
+        walls = [self._wall("C-15")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x68,
+        )
+        self.assertEqual(len(c33), 1)
+        self.assertEqual(c33[0].wall_id, "C-33")
+        self.assertIn("C-15", c33[0].cue)
+
+    def test_main_stylea_below_threshold_does_not_flag(self):
+        # Brief 190's SNDi wrappers — main StyleA but 0x28 < 0x50.
+        # No C-33 (those don't trigger the cascade).
+        walls = [self._wall("StyleA")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x28,
+        )
+        self.assertEqual(c33, [])
+
+    def test_main_at_threshold_does_not_flag(self):
+        # Boundary: size == threshold is NOT flagged (strict >).
+        walls = [self._wall("StyleA")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=LEGACY_C_CASCADE_SIZE_THRESHOLD,
+        )
+        self.assertEqual(c33, [])
+
+    def test_overlay_function_does_not_flag(self):
+        # PR #640's empirical scope: only main-module `.legacy.c`
+        # claims trigger Cluster F. Same wall + size profile in an
+        # overlay should NOT flag.
+        walls = [self._wall("StyleA")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="ov007", size=0x6c,
+        )
+        self.assertEqual(c33, [])
+
+    def test_no_legacy_routing_walls_does_not_flag(self):
+        # Pick #7's shape — main 0x70 with no StyleA/C-15. The
+        # decomper would route to `.c` (no cascade). No C-33.
+        walls: list[WallPrediction] = []
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x70,
+        )
+        self.assertEqual(c33, [])
+
+    def test_unrelated_walls_alone_dont_flag(self):
+        # Function with C-22 (bitfield) at large size — doesn't
+        # route through `.legacy.c`, so no C-33.
+        walls = [self._wall("C-22")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x80,
+        )
+        self.assertEqual(c33, [])
+
+    def test_mixed_walls_with_legacy_routing_flags(self):
+        # Function with C-15 + C-22 — C-15 triggers, C-22 is
+        # incidental.
+        walls = [self._wall("C-15"), self._wall("C-22")]
+        c33 = detect_legacy_c_cascade_risk(
+            walls, module="main", size=0x68,
+        )
+        self.assertEqual(len(c33), 1)
+        self.assertEqual(c33[0].wall_id, "C-33")
+
+    def test_threshold_documented(self):
+        # Defensive: the threshold is exposed for tests to adapt
+        # if it ever changes.
+        self.assertEqual(LEGACY_C_CASCADE_SIZE_THRESHOLD, 0x50)
 
 
 if __name__ == "__main__":
