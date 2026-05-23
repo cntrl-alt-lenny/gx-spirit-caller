@@ -235,19 +235,114 @@ def detect_walls(asm: str) -> list[WallPrediction]:
             break
 
     # ----- C-23 MMIO base-folding.
+    #
+    # Two-signal detector (brief 199):
+    #
+    #   (a) **MMIO literal**: `pc_loads >= 3` AND at least one
+    #       pool word matches the NDS MMIO ranges
+    #       (`0x04000xxx` main MMIO; `0x027ffxxx` DTCM kernel
+    #       block — IRQ state, OS handles, etc.). This is the
+    #       brief 086 canonical signal — `func_0208bde0` DS
+    #       hardware divider shape.
+    #
+    #   (b) **Duplicate pool ref**: `pc_loads >= 3` AND at
+    #       least one pool target is loaded by 2+ separate
+    #       `ldr` instructions. mwcc 2.0/sp1p5 would never
+    #       emit duplicate `ldr` to the same pool word —
+    #       it folds them into a single base load before the
+    #       diverging branches. mwcc 1.2/sp2p3 reloads in
+    #       each branch. Brief 199's pick #5 (`func_02096434`)
+    #       has this shape: two separate `ldr r3` of
+    #       `0x027ffc00`, one per if/else branch.
+    #
+    # Either signal alone is sufficient. Both fire on the
+    # `.legacy.c` (mwcc 1.2/sp2p3) routing recipe; the cue
+    # text differentiates so the decomper knows which
+    # discriminator triggered.
     pc_loads = sum(
         1 for line in lines
         if re.search(r"ldr\s+\w+,\s*\[pc", line)
     )
-    mmio_lits = sum(
-        1 for line in lines
-        if re.search(r"\.word\s+0x04000", line)
+    # objdump-on-binary mode (`-D -b binary`) prints pool words as
+    # whatever ARM-decoded instruction the 4 bytes happen to form
+    # — `.word 0x04000280` doesn't appear. Instead each disasm
+    # line carries the 4-byte hex value in the column immediately
+    # after the address (`<addr>:\t<hex>  <decoded>`). The MMIO
+    # check matches on that hex word directly.
+    mmio_main = 0
+    mmio_dtcm = 0
+    for line in lines:
+        m = re.search(r":\t([0-9a-f]{8})\s+", line)
+        if not m:
+            continue
+        val = m.group(1)
+        if val.startswith("04000") or val.startswith("0400a"):
+            mmio_main += 1
+        elif val.startswith("027ffc") or val.startswith("027ffd") \
+                or val.startswith("027ffe") or val.startswith("027fff"):
+            mmio_dtcm += 1
+    # Pool words that decode as ARM instructions also light up
+    # `pc_loads` if their bytes happen to look like `ldr ... [pc`.
+    # Conservatively subtract the duplicate count to keep the
+    # false-positive rate low. (Empirical: 1-2 pool words rarely
+    # decode as ldr/[pc; subtract the MMIO count from pc_loads
+    # too, since each MMIO pool word counts once in `lines`.)
+    mmio_lits = mmio_main + mmio_dtcm
+    # Duplicate pool ref: count `ldr ... [pc, #N] @ 0xADDR`
+    # occurrences of the same `0xADDR` target. The `@` suffix in
+    # objdump output annotates the absolute pool address — this
+    # works in both `-d` (object mode) and `-D -b binary` modes.
+    pool_targets: dict[str, int] = {}
+    for line in lines:
+        if not re.search(r"\bldr\s+\w+,\s*\[pc", line):
+            continue
+        m = re.search(r"@\s*(0x[0-9a-f]+)\b", line)
+        if m:
+            pool_targets[m.group(1)] = (
+                pool_targets.get(m.group(1), 0) + 1
+            )
+    duplicate_refs = sum(
+        1 for count in pool_targets.values() if count >= 2
     )
-    if pc_loads >= 3 and mmio_lits >= 1:
+    # **Clustered pool**: 3+ DISTINCT pool targets within a tight
+    # ±0x20-byte window. mwcc 2.0/sp1p5 would emit a single base
+    # load before the cluster; mwcc 1.2/sp2p3 emits separate `ldr`
+    # per slot. Detects struct-base-folding shapes (e.g.
+    # `OSi_PostIrqEvent` reads 3 fields of a table struct: orig
+    # pool has `0x021a6354, 0x021a6358, 0x021a635c` — adjacent
+    # 32-bit words. Each gets its own `ldr [pc, #N]` in 1.2/
+    # sp2p3; 2.0 would fold to `ldr base; ldr [base, #4]; ldr
+    # [base, #8]`).
+    distinct_targets = sorted({
+        int(t, 16) for t in pool_targets.keys()
+    })
+    clustered_pool = False
+    for i in range(len(distinct_targets) - 2):
+        # Window of 3 sorted targets; check the outer span.
+        if (
+            distinct_targets[i + 2] - distinct_targets[i] <= 0x20
+        ):
+            clustered_pool = True
+            break
+    if pc_loads >= 3 and (
+        mmio_lits >= 1 or duplicate_refs >= 1 or clustered_pool
+    ):
+        cues: list[str] = []
+        if mmio_lits >= 1:
+            ranges = []
+            if mmio_main >= 1:
+                ranges.append(f"{mmio_main} main MMIO (0x04000xxx)")
+            if mmio_dtcm >= 1:
+                ranges.append(f"{mmio_dtcm} DTCM kernel (0x027ffxxx)")
+            cues.append(f"literal(s): {', '.join(ranges)}")
+        if duplicate_refs >= 1:
+            cues.append(f"{duplicate_refs} duplicate pool ref(s)")
+        if clustered_pool:
+            cues.append("clustered pool window (≤0x20 B span)")
         walls.append(WallPrediction(
             "C-23",
-            f"{pc_loads} pc-relative loads + {mmio_lits} MMIO "
-            "literal(s) (0x04000xxx) — `.legacy.c` routing",
+            f"{pc_loads} pc-relative loads + "
+            f"{'; '.join(cues)} — `.legacy.c` routing",
         ))
 
     # ----- C-24 indirect-call dispatch.

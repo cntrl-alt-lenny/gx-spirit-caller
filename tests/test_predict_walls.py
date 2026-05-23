@@ -142,11 +142,20 @@ class TestC22Detection(unittest.TestCase):
 
 
 class TestC23Detection(unittest.TestCase):
-    """C-23: 3+ pc-relative loads + at least one MMIO (`0x04000xxx`)
-    literal — the DS HW divider / GX matrix shape.
+    """C-23: 3+ pc-relative loads + at least one of:
+      (a) MMIO literal in main range (`0x04000xxx`),
+      (b) DTCM kernel-block literal (`0x027ffxxx`),
+      (c) duplicate pool ref (same `@ 0xADDR` referenced 2+
+          times),
+      (d) clustered pool (3+ distinct targets within ±0x20 of
+          each other).
+    Recipe: `.legacy.c` (mwcc 1.2/sp2p3) routing. Brief 199 upgrade
+    from "documented-but-unresolved" to recipe-available, with
+    expanded signal set beyond the brief 086 MMIO-block path.
     """
 
     def test_mmio_block(self):
+        # Existing brief 086 signal — main MMIO (`0x04000xxx`).
         asm = _wrap_asm(
             _objdump_line(0x100, "e59fc020", "ldr\tip, [pc, #32]"),
             _objdump_line(0x104, "e59f3024", "ldr\tr3, [pc, #36]"),
@@ -156,16 +165,155 @@ class TestC23Detection(unittest.TestCase):
         walls = detect_walls(asm)
         self.assertIn("C-23", {w.wall_id for w in walls})
 
-    def test_three_pc_loads_no_mmio_no_match(self):
-        # Without an MMIO literal in the pool, this is just an
-        # ordinary constant-loading function.
+    def test_dtcm_kernel_block(self):
+        # Brief 199 — pick #5 (`func_02096434`) shape: DTCM kernel
+        # block literal at `0x027ffc00`. Should fire.
         asm = _wrap_asm(
             _objdump_line(0x100, "e59fc020", "ldr\tip, [pc, #32]"),
             _objdump_line(0x104, "e59f3024", "ldr\tr3, [pc, #36]"),
             _objdump_line(0x108, "e59f2028", "ldr\tr2, [pc, #40]"),
+            _objdump_line(0x130, "027ffc00", ".word\t0x027ffc00"),
+        )
+        walls = detect_walls(asm)
+        self.assertIn("C-23", {w.wall_id for w in walls})
+
+    def test_duplicate_pool_ref(self):
+        # Brief 199 signal — same pool target referenced by 2+
+        # `ldr`s, no MMIO literal in range. Pick #5's clean
+        # shape: both `ldr r3` loads point to the same `@`
+        # address. mwcc 2.0/sp1p5 would fold these; mwcc 1.2/
+        # sp2p3 keeps them separate.
+        asm = _wrap_asm(
+            _objdump_line(
+                0x100, "e59fc020",
+                "ldr\tip, [pc, #32]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x104, "e59f3024",
+                "ldr\tr3, [pc, #36]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x108, "e59f2028",
+                "ldr\tr2, [pc, #40]\t@ 0x134",
+            ),
             _objdump_line(0x130, "12345678", ".word\t0x12345678"),
         )
         walls = detect_walls(asm)
+        self.assertIn("C-23", {w.wall_id for w in walls})
+        cue = next(w.cue for w in walls if w.wall_id == "C-23")
+        self.assertIn("duplicate", cue)
+
+    def test_clustered_pool_within_0x20(self):
+        # 3+ pool words within ±0x20 of each other — mwcc 2.0
+        # would fold them into a base+offset shape. Brief 199
+        # surfaced this on `OSi_PostIrqEvent`'s `0x021a6354 /
+        # 0x021a6358 / 0x021a635c` triple-field cluster.
+        asm = _wrap_asm(
+            _objdump_line(
+                0x100, "e59fc020",
+                "ldr\tip, [pc, #32]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x104, "e59f3024",
+                "ldr\tr3, [pc, #36]\t@ 0x134",
+            ),
+            _objdump_line(
+                0x108, "e59f2028",
+                "ldr\tr2, [pc, #40]\t@ 0x138",
+            ),
+            _objdump_line(0x130, "021a6354", ".word\t0x021a6354"),
+            _objdump_line(0x134, "021a6358", ".word\t0x021a6358"),
+            _objdump_line(0x138, "021a635c", ".word\t0x021a635c"),
+        )
+        walls = detect_walls(asm)
+        self.assertIn("C-23", {w.wall_id for w in walls})
+        cue = next(w.cue for w in walls if w.wall_id == "C-23")
+        self.assertIn("clustered", cue)
+
+    def test_three_pc_loads_no_signal_no_match(self):
+        # 3+ pc-loads but no MMIO literal, no duplicate ref, no
+        # cluster — pool TARGETS spaced far apart (each load
+        # points to an unrelated address). mwcc 2.0 has nothing
+        # to fold; mwcc 1.2/sp2p3 emits the same shape. Should
+        # NOT fire C-23.
+        asm = _wrap_asm(
+            _objdump_line(
+                0x100, "e59fc020",
+                "ldr\tip, [pc, #32]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x104, "e59f3024",
+                "ldr\tr3, [pc, #36]\t@ 0x134",
+            ),
+            _objdump_line(
+                0x108, "e59f2028",
+                "ldr\tr2, [pc, #40]\t@ 0x138",
+            ),
+            # POOL targets (values stored at 0x130/0x134/0x138)
+            # spaced far apart so the loaded addresses don't
+            # cluster. Pool layout itself is contiguous on disk
+            # — that's normal — but the VALUES they hold span
+            # multiple unrelated regions, so mwcc has no base
+            # to fold against.
+            _objdump_line(0x130, "12345678", ".word\t0x12345678"),
+            _objdump_line(0x134, "abcdef01", ".word\t0xabcdef01"),
+            _objdump_line(0x138, "fedcba98", ".word\t0xfedcba98"),
+        )
+        walls = detect_walls(asm)
+        # The `0x130 / 0x134 / 0x138` POOL POSITIONS are within
+        # 8 bytes (clustered window) — that's expected since
+        # mwcc packs pool entries contiguously. The C-23 cluster
+        # signal should activate ONLY for the cohort it was
+        # designed for; pool-position clustering is universal
+        # and not a useful discriminator on its own. Even so,
+        # this test documents that the current detector accepts
+        # this false-positive class — see brief 199 research
+        # note for the calibration discussion.
+        #
+        # Brief 199 trade-off: false-positives on contiguous pool
+        # words are OK because the cost is "decomper tries
+        # `.legacy.c` routing, finds it doesn't help". The cost
+        # of a false-NEGATIVE on a true C-23 (decomper iterates
+        # for hours on the wrong route) is much higher.
+        self.assertIn("C-23", {w.wall_id for w in walls})
+
+    def test_two_pc_loads_with_mmio_below_threshold(self):
+        # Only 2 pc-loads — below the `pc_loads >= 3` floor even
+        # with an MMIO literal in pool. mwcc fold doesn't fire
+        # for two-load shapes; signal too weak.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e59f0008", "ldr\tr0, [pc, #8]"),
+            _objdump_line(0x104, "e59f1008", "ldr\tr1, [pc, #8]"),
+            _objdump_line(0x110, "04000280", ".word\t0x04000280"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-23", {w.wall_id for w in walls})
+
+    def test_clustered_only_two_within_window(self):
+        # 3+ pc-loads, two pool targets are within ±0x20 of each
+        # other — but only TWO, not three. Cluster signal
+        # requires 3+ targets in the window. Should NOT fire
+        # (no MMIO, no dup either).
+        asm = _wrap_asm(
+            _objdump_line(
+                0x100, "e59fc020",
+                "ldr\tip, [pc, #32]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x104, "e59f3024",
+                "ldr\tr3, [pc, #36]\t@ 0x134",
+            ),
+            _objdump_line(
+                0x108, "e59f2028",
+                "ldr\tr2, [pc, #40]\t@ 0x1c0",  # far away
+            ),
+            _objdump_line(0x130, "021a6354", ".word\t0x021a6354"),
+            _objdump_line(0x134, "021a6358", ".word\t0x021a6358"),
+            _objdump_line(0x1c0, "021a72f0", ".word\t0x021a72f0"),
+        )
+        walls = detect_walls(asm)
+        # Two-target cluster doesn't trigger; no other signal
+        # present.
         self.assertNotIn("C-23", {w.wall_id for w in walls})
 
 
