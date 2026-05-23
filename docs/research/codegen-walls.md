@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (31 patterns)
+## Coercible-with-knowledge (32 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -3875,6 +3875,164 @@ example on pick #3, and extended
 an `InterworkVeneer` detector so future trivial-bucket waves
 pre-route affected picks. Full diagnosis +
 recipe rationale at [`first-wave-wall-mwldarm-interwork.md`](first-wave-wall-mwldarm-interwork.md).
+
+### C-32. Cross-overlay hardcoded BL — `.s` with hand-encoded `.word`
+
+> **Wall family note — C-32 vs C-31.** Both ship as `.s` with
+> raw `.word` directives. C-31 (mwldarm interwork veneer) is
+> about a *whole function* whose body is an 8/12-byte shim that
+> mwldarm auto-emits — the entire function lives in the .word
+> literal pool. C-32 (this entry) is about a *regular function
+> body* containing one or more `bl` instructions that target a
+> cross-overlay address dsd can't resolve to a specific module —
+> the function has normal ARM code interleaved with hand-encoded
+> `.word`-BL escapes. C-31 fires on shim shapes; C-32 fires on
+> ordinary functions that happen to BL into a multi-overlay
+> shared-base address range.
+>
+> | Wall | C-31 | C-32 |
+> |---|---|---|
+> | **Source origin** | mwldarm-emitted shim | user-authored function |
+> | **Body shape** | only the shim (`ldr; bx; .word`) | ordinary function w/ embedded hardcoded BL |
+> | **Failure mode** | layout cascade (~KB byte-diff) | hard link error (`Undefined : "func_<addr>"`) |
+> | **Recipe** | `.s` + `.thumb`/`.arm` directive | `.s` + `bl <symbol>` for resolvable + `.word <bl-encoding>` for hardcoded |
+
+**Recognition cue (relocs-level):**
+
+The function's `relocs.txt` contains one or more entries:
+
+```text
+from:0x<addr_inside_func> kind:arm_call to:0x<target> module:none
+```
+
+The `module:none` marker indicates dsd's reloc analysis could
+not attribute the BL target to a single module because the
+target VA falls inside a multi-overlay shared-base range. In
+this game three such ranges exist (per
+`extract/eur/arm9_overlays/overlays.yaml`):
+
+| Shared base | Overlays | Max end |
+|---|---|---:|
+| `0x021aa4a0` | ov000, ov002, ov005, ov008, ov009, ov018, ov020, ov021, ov022 | `0x022cd300` |
+| `0x021b2280` | ov006, ov007, ov010, ov014, ov015, ov016, ov017, ov019, ov023 | `0x021cf140` |
+| `0x021c9d60` | ov001, ov003, ov004, ov011, ov012, ov013 | `0x0220b500` |
+
+A BL into any of these ranges from a function in a different
+overlay group is potentially `module:none`. The reloc kind
+(`module:none` vs `module:<name>`) is the only reliable
+disambiguator — the bare `bl <hex>` instruction shape alone
+appears for both resolvable and unresolvable cross-overlay
+BLs.
+
+**C that miscodes the wall:**
+
+```c
+extern void func_021b5500(void);
+void func_ov011_021d2c64(int *out) {
+    /* ... */
+    func_021b5500();   /* mwldarm cannot resolve */
+    /* ... */
+}
+```
+
+Build result:
+
+```text
+mwldarm.exe: Undefined : "func_021b5500"
+mwldarm.exe: Referenced from "func_ov011_021d2c64" in ov011_021d2c64.o
+mwldarm.exe: alert: Link failed.
+```
+
+The link aborts before any layout cascade can manifest — there
+is no built `.bin` to diff. The brief 180 patcher never runs.
+
+**`.s` that coerces it (verified byte-identical against
+`func_ov011_021d2c64`):**
+
+```text
+        .text
+        .extern Task_PostLocked
+        .global func_ov011_021d2c64
+        .arm
+func_ov011_021d2c64:
+        stmdb   sp!, {r3, r4, r5, lr}
+        mov     r5, r0
+        mov     r0, #0x44
+        mov     r1, #0x4
+        mov     r2, #0x0
+        bl      Task_PostLocked
+        mov     r4, r0
+        .word   0xebff8a1e                      ; bl 0x021b5500 (cross-overlay, mod:none)
+        str     r4, [r5]
+        ldmia   sp!, {r3, r4, r5, pc}
+```
+
+Critical details:
+
+- **Two BL classes, two recipes.** Resolvable BLs (those with
+  `module:main` or `module:overlay(N)` in relocs.txt) use the
+  mnemonic form `bl <symbol>` and let mwldarm compute the
+  link-time displacement. Hardcoded BLs (`module:none`) use a
+  raw `.word <encoded_bl>` directive.
+- **BL encoding formula.** For `bl <target>` at PC `<addr>`:
+
+  ```text
+  offset    = (target - (addr + 8)) / 4         ; signed
+  imm24     = offset & 0xffffff                 ; bottom 24 bits
+  encoding  = 0xeb000000 | imm24                ; ARM bl-cond-AL opcode
+  ```
+
+  This must match the baserom bytes at `addr` verbatim — verify
+  before shipping.
+- **Host function pinned at orig VA.** The dsd/mwldarm overlay-
+  layout LCF + brief 180 patcher keep the host function's
+  `.o` section anchored at the original VA. The precomputed
+  cross-overlay BL displacement stays correct after link.
+- **Precedent.** [`src/main/func_020b3814.s`](../../src/main/func_020b3814.s)
+  uses the same hand-encoded-`.word` pattern for inter-function
+  branches into private `.L_*` labels of a sibling `.o` —
+  different wall class (P-7-adjacent), same technique.
+
+Verified: 3-region `ninja sha1` PASS preserved when shipped
+as `src/overlay011/func_ov011_021d2c64.s` (the brief 192
+worked example).
+
+**Use when:** target function's `relocs.txt` has at least one
+`kind:arm_call to:<addr> module:none` entry inside the
+function's `[addr, addr+size)` range. The
+`tools/predict_walls.py` `CrossOverlayBL` classifier (brief
+192) auto-flags these picks.
+
+**Cross-corpus survey notes:** the 6 affected picks from brief
+190 PR #637 cluster A (one mis-tagged):
+
+| Pick | Module | Addr | Size | Hardcoded BLs | Resolvable BLs | Status |
+|---|---|---|---:|---:|---:|---|
+| #1 | `ov013` | `0x021c9d60` | `0x14` | 2 (→ 0x021b0b44, 0x021b2420) | 1 | brief 192 recipe |
+| #2 | `ov012` | `0x021c9d8c` | `0x14` | 2 (→ 0x021b0b44, 0x021b2420) | 1 | brief 192 recipe |
+| #4 | `ov011` | `0x021ca0ac` | `0x18` | 2 (→ 0x021b0b44, 0x021b2420) | 2 | brief 192 recipe |
+| #15 | `ov011` | `0x021d2c64` | `0x28` | 1 (→ 0x021b5500) | 1 | **shipped** as `.s` |
+| #19 | `main` | `0x020323f4` | `0x58` | **0** | 4 | mis-tagged — NOT C-32 |
+| #20 | `ov011` | `0x021ca03c` | `0x58` | 2 (→ 0x021b142c, 0x021b284c) | 2 | brief 192 recipe |
+
+Picks #1, #2, #4 share the `(0x021b0b44, 0x021b2420)` target
+pair — likely a common boot helper. Pick #20 has a different
+pair `(0x021b142c, 0x021b284c)`. Brief 193+ drains them by
+copying the brief 192 recipe.
+
+**Provenance:** decomper brief 190 (PR #637) surfaced the
+cluster empirically as "Cluster A — Cross-overlay hardcoded
+BLs (6 picks)" with two proposed options: (1) extend dsd to
+emit placeholder symbols for the unresolved targets, (2) ship
+as `.s` with hand-encoded BL `.word`s. Brief 192 (this entry)
+ruled out option (1) as out-of-scope (requires upstream dsd
+changes), classified the wall, reproduced the link-failure
+mode with byte-level evidence, shipped the `.s` + hand-encoded
+`.word` recipe as a worked example on pick #15, corrected the
+pick #19 mis-tag, and extended
+[`tools/predict_walls.py`](../../tools/predict_walls.py) with
+a `CrossOverlayBL` detector. Full diagnosis + recipe rationale
+at [`first-wave-wall-cross-overlay-bl.md`](first-wave-wall-cross-overlay-bl.md).
 
 ## Permanent (10 patterns)
 

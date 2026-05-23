@@ -17,6 +17,7 @@ sys.path.insert(0, str(_TOOLS))
 
 from predict_walls import (  # noqa: E402
     WallPrediction,
+    detect_cross_overlay_bl,
     detect_walls,
 )
 
@@ -368,6 +369,109 @@ class TestEmptyAsm(unittest.TestCase):
     def test_only_scaffolding_no_instructions(self):
         asm = _wrap_asm()
         self.assertEqual(detect_walls(asm), [])
+
+
+class TestCrossOverlayBLDetection(unittest.TestCase):
+    """C-32 detector (brief 192) consults relocs.txt for
+    `kind:arm_call to:<addr> module:none` entries inside the
+    function's address range. The bare `bl <hex>` shape alone
+    is ambiguous — `module:none` is the only reliable cue.
+    """
+
+    def test_single_hardcoded_bl_in_range(self):
+        """Pick #15's shape — one cross-overlay BL inside a
+        40-byte function. Should flag C-32 with the target VA.
+        """
+        relocs = (
+            "from:0x021d2c78 kind:arm_call to:0x020067fc module:main\n"
+            "from:0x021d2c80 kind:arm_call to:0x021b5500 module:none\n"
+        )
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x021d2c64, size=0x28,
+        )
+        self.assertEqual(len(walls), 1)
+        self.assertEqual(walls[0].wall_id, "C-32")
+        self.assertIn("0x021b5500", walls[0].cue)
+        self.assertIn("hardcoded BL", walls[0].cue)
+
+    def test_multiple_hardcoded_bls_in_range(self):
+        """Pick #1 / #2 / #4 / #20 shape — two cross-overlay BLs.
+        Should flag once with both targets enumerated.
+        """
+        relocs = (
+            "from:0x021c9d60 kind:arm_call to:0x021b0b44 module:none\n"
+            "from:0x021c9d64 kind:arm_call to:0x021b2420 module:none\n"
+            "from:0x021c9d68 kind:arm_call to:0x021c9d80 module:overlay(13)\n"
+        )
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x021c9d60, size=0x14,
+        )
+        self.assertEqual(len(walls), 1)
+        self.assertEqual(walls[0].wall_id, "C-32")
+        self.assertIn("0x021b0b44", walls[0].cue)
+        self.assertIn("0x021b2420", walls[0].cue)
+        self.assertIn("2 cross-overlay", walls[0].cue)
+
+    def test_only_resolvable_bls(self):
+        """Pick #19's shape — four `module:main` arm_calls, zero
+        `module:none`. Should NOT flag C-32.
+        """
+        relocs = (
+            "from:0x020323fc kind:arm_call to:0x020937a4 module:main\n"
+            "from:0x02032428 kind:arm_call to:0x020937a4 module:main\n"
+            "from:0x02032438 kind:arm_call to:0x020937b8 module:main\n"
+            "from:0x02032440 kind:arm_call to:0x020937b8 module:main\n"
+            "from:0x02032448 kind:load to:0x0219b2b4 module:main\n"
+        )
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x020323f4, size=0x58,
+        )
+        self.assertEqual(walls, [])
+
+    def test_no_relocs_in_function(self):
+        """Leaf function with no relocs at all (no calls, no
+        loads) — should NOT flag C-32. Defensive: empty relocs
+        list is the boring no-op path.
+        """
+        relocs = "from:0x02000000 kind:arm_call to:0x02100000 module:main\n"
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x02050000, size=0x20,
+        )
+        self.assertEqual(walls, [])
+
+    def test_module_none_outside_function_range(self):
+        """`module:none` reloc exists but belongs to a different
+        function — should NOT flag C-32 for our target function.
+        Guards against the off-by-one of cross-function bleed.
+        """
+        relocs = (
+            "from:0x021ca000 kind:arm_call to:0x021b1000 module:none\n"
+        )
+        # Our function is at 0x021d0000, well separated from the
+        # reloc's from address.
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x021d0000, size=0x40,
+        )
+        self.assertEqual(walls, [])
+
+    def test_empty_relocs_text(self):
+        """Defensive — empty input returns empty list."""
+        walls = detect_cross_overlay_bl("", addr=0x02000000, size=0x10)
+        self.assertEqual(walls, [])
+
+    def test_non_arm_call_module_none_ignored(self):
+        """`module:none` on a non-arm_call (e.g. a load or
+        thumb_call edge case) should NOT trigger the C-32 detector
+        — the recipe is specific to ARM-mode BLs.
+        """
+        relocs = (
+            "from:0x02050000 kind:load to:0x021b1000 module:none\n"
+            "from:0x02050010 kind:thumb_call to:0x021b1000 module:none\n"
+        )
+        walls = detect_cross_overlay_bl(
+            relocs, addr=0x02050000, size=0x20,
+        )
+        self.assertEqual(walls, [])
 
 
 if __name__ == "__main__":

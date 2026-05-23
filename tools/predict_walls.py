@@ -42,6 +42,15 @@ predicate) need source-level context and aren't emitted here.
     (not `bx lr`). Routes through `.legacy_sp3.c`.
   - **P-9** — conditional `mvn{cond}` — mwcc 2.0 may not
     peephole this; permuter via brief 098.
+  - **C-31** — mwldarm interwork veneer (8 B Thumb, 12 B ARM,
+    12 B Thumb-with-prefix). Routes through `.s` with explicit
+    mode directive per brief 191 recipe.
+  - **C-32** — cross-overlay hardcoded BL (`kind:arm_call
+    to:<addr> module:none` reloc). Routes through `.s` with
+    hand-encoded `.word`-BL per brief 192 recipe. Detected by
+    consulting `relocs.txt` (NOT disasm), because the bare `bl
+    <hex>` shape is ambiguous between resolvable and
+    unresolvable cross-overlay BLs.
 
 Walls NOT detected here (require source context):
 
@@ -389,6 +398,70 @@ def detect_walls(asm: str) -> list[WallPrediction]:
     return walls
 
 
+_RELOC_RE = re.compile(
+    r"from:0x([0-9a-f]+)\s+kind:(\w+)\s+to:0x([0-9a-f]+)\s+module:(\S+)",
+)
+
+
+def detect_cross_overlay_bl(
+    relocs_text: str, addr: int, size: int,
+) -> list[WallPrediction]:
+    """C-32 detector — consults relocs.txt (NOT disasm) for
+    `kind:arm_call to:<addr> module:none` entries falling inside
+    the function's `[addr, addr+size)` range.
+
+    Brief 192's recognition cue: dsd cannot pick the owning
+    module for cross-overlay BLs targeting a multi-overlay
+    shared-base address. The reloc kind is the only reliable
+    disambiguator — bare `bl <hex>` shape alone appears for both
+    resolvable and unresolvable cross-overlay BLs.
+
+    Pure function: `relocs_text` is the file's full text, not a
+    path; callers do the I/O. Returns an empty list when no
+    `module:none` arm_call falls inside `[addr, addr+size)`.
+    """
+    hardcoded_targets: list[int] = []
+    for line in relocs_text.splitlines():
+        m = _RELOC_RE.match(line.strip())
+        if not m:
+            continue
+        frm, kind, to, modu = m.groups()
+        if kind != "arm_call" or modu != "none":
+            continue
+        f_addr = int(frm, 16)
+        if not (addr <= f_addr < addr + size):
+            continue
+        hardcoded_targets.append(int(to, 16))
+    if not hardcoded_targets:
+        return []
+    target_summary = ", ".join(
+        f"0x{t:08x}" for t in hardcoded_targets
+    )
+    return [WallPrediction(
+        "C-32",
+        f"{len(hardcoded_targets)} cross-overlay hardcoded BL"
+        f"{'s' if len(hardcoded_targets) > 1 else ''} "
+        f"(target{'s' if len(hardcoded_targets) > 1 else ''}: "
+        f"{target_summary}) — `kind:arm_call module:none` "
+        "reloc; ship as `.s` with hand-encoded `.word` per "
+        "brief 192 recipe",
+    )]
+
+
+def _module_relocs_path(region: str, module: str) -> Path | None:
+    """Map module → relocs.txt path. Mirrors `_module_text_base`."""
+    if module == "main":
+        return ROOT / f"config/{region}/arm9/relocs.txt"
+    if module in ("itcm", "dtcm"):
+        return ROOT / f"config/{region}/arm9/{module}/relocs.txt"
+    if module.startswith("ov"):
+        return (
+            ROOT
+            / f"config/{region}/arm9/overlays/{module}/relocs.txt"
+        )
+    return None
+
+
 def predict_module(
     region: str, module: str,
     *, objdump: str = "arm-none-eabi-objdump",
@@ -407,6 +480,15 @@ def predict_module(
     if not sym_path.is_file():
         return {}
     symbols = parse_symbols_file(sym_path, module)
+    # Brief 192 — load relocs.txt once per module for C-32
+    # detection. If the file is missing (e.g. itcm/dtcm without
+    # relocs), C-32 is skipped silently.
+    relocs_path = _module_relocs_path(region, module)
+    relocs_text = (
+        relocs_path.read_text(encoding="utf-8")
+        if relocs_path is not None and relocs_path.is_file()
+        else ""
+    )
     out: dict[str, list[dict]] = {}
     for s in symbols:
         if s.type != "function":
@@ -417,10 +499,13 @@ def predict_module(
         asm = disasm_function(
             region, module, s.addr, s.size, objdump=objdump,
         )
-        if asm is None:
-            out[key] = []
-            continue
-        walls = detect_walls(asm)
+        walls: list[WallPrediction] = []
+        if asm is not None:
+            walls.extend(detect_walls(asm))
+        if relocs_text:
+            walls.extend(detect_cross_overlay_bl(
+                relocs_text, s.addr, s.size,
+            ))
         out[key] = [
             {"id": w.wall_id, "cue": w.cue} for w in walls
         ]
@@ -498,6 +583,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 1
         walls = detect_walls(asm)
+        # Brief 192 — also run the relocs-based C-32 detector.
+        relocs_path = _module_relocs_path(args.version, args.module)
+        if relocs_path is not None and relocs_path.is_file():
+            walls.extend(detect_cross_overlay_bl(
+                relocs_path.read_text(encoding="utf-8"),
+                args.address, args.size,
+            ))
         for w in walls:
             print(f"  {w.wall_id}: {w.cue}")
         if not walls:
