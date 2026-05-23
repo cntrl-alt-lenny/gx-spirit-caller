@@ -8,29 +8,30 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-23 evening, post-#647/#648 + this brain-PR.
-Brain on Mac. **🎉 ~200 PREVIOUSLY-INVISIBLE MATCHES RECOVERED.**
-This brain-PR's matched_functions investigation found that brief 187's
-`objdiff_filter_panic_units.py` was silently dropping every `.legacy.c`
-unit (~200 of them) because dsd emits objdiff.json entries with bare
-`.o` paths even for `.legacy.c` sources, while mwcc produces
-`.legacy.o`. The filter's "missing file" branch swallowed them all.
-Fixed by rewriting target/base paths using `source_path` as the
-authoritative routing signal. **Current metrics (post-fix):**
-`matched_code_percent 1.7190 %` (was 1.4102 %, +0.3084), `matched_
-functions 1628 / 9801 (16.61 %)` (was 1430, **+198 functions**),
-`complete_units 1613 / 2479` (+198), `fuzzy_match_percent 1.4584 %`.
+**Last updated:** 2026-05-23 evening, post-#649/#651 + this brain-PR.
+Brain on Mac. **🎉 FIRST C-SOURCE MATCH VIA DECOMP.ME WORKFLOW** —
+B-08 `func_0205da2c` shipped as `.legacy_sp3.c` in brief 201 (PR #651);
+the explicit-stack + Style B `pop {pc}` shape is mwcc 1.2/sp3's
+preferred form for short LR-only wrappers. **P-11 wall classified**
+(brief 200, PR #649): 5 brief-198 picks share mwcc 2.0 reg-allocator
++ liveness divergence; documented as permanent under current tools,
+may promote to C-N if a coercion is found. **Current metrics:**
+`matched_code_percent 1.7201 %`, `matched_functions 1629 / 9801
+(16.62 %)`, `complete_units 1614 / 2480`. Across the post-pivot arc
+(briefs 188 → 201), `matched_functions` has gone from 1420 → 1629
+(+209 — most of which were the +198 recovery from brief 199's
+`.legacy.c` filter fix in PR #650; +11 from actual new C-source
+matches).
 
-**Strategic context:** Brief 198 returned "permuter not viable for
-Cluster B + E" (0/9 converged); brief 199 closed C-23 wall with a
-sharp insight that "C-23 + StyleA stacked" is actually one wall.
-Next round splits along brief 198's data: brief 200 (scaffolder)
-investigates the 480-500 plateau as a shared codegen mechanism;
-brief 201 (decomper) does manual decomp.me iteration on the 3
-closest-score picks (220-315 range — within manual reach).
+**Strategic context:** brief 200's P-11 plus brief 201's
+address-CSE wall on E-07/E-08 (1-insn diff each, decomper handoff
+to scaffolder) mean the next round is wall-resolution + recipe
+drain. Brief 202 (scaffolder) researches the address-CSE wall;
+brief 203 (decomper) drains brief 199's 3 unshipped C-23 candidates
+using the locked recipe.
 
-**Two open lanes:** brief 200 (scaffolder codegen-sweep) + brief 201
-(decomper decomp.me iteration). See § *In flight* below.
+**Two open lanes:** brief 202 (scaffolder address-CSE wall) + brief 203
+(decomper C-23 drain). See § *In flight* below.
 
 ## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
@@ -111,7 +112,33 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
-- **Brain-PR (this one) — matched_functions fix + macOS permuter
+- **PR #651 — decomper / brief 201 first C-source via decomp.me
+  workflow.** 🎯 **B-08 `func_0205da2c` matched as `.legacy_sp3.c`.**
+  Three-routing-tier verification table documented (`.c` wrong reg
+  alloc; `.legacy.c` wrong epilogue style; `.legacy_sp3.c` ✓ — explicit
+  sub-sp + Style B `pop {pc}`). Permuter couldn't find this because
+  the wall was a ROUTING decision, not a source-shape one. E-07 + E-08
+  hit a new wall (1-insn diff each — mwcc 2.0 address-CSE collapses
+  two pool entries to one slot); handed off to scaffolder brief 202.
+  Bonus finding: brief 199's "two pool loads" comment is imprecise
+  (both target SAME pool slot — mwcc had already CSE'd). 3-region
+  SHA1 PASS. matched_code_percent 1.7190 → 1.7201, matched_functions
+  1628 → 1629.
+- **PR #649 — scaffolder / brief 200 P-11 reg-allocator plateau.** 🎯
+  Brief 198's 5 plateau picks (E-12/13/14, B-22, B-24) classified as
+  ONE shared wall — mwcc 2.0 reg-allocator + liveness divergence at
+  0x5c-0x74 sizes with helper-call-in-body. Three sub-shapes
+  documented: find-empty-slot template, array destructor with
+  in-loop bl, useless-spill stack-scratch. All recipe attempts failed
+  (volatile / `.legacy.c` / structural simplification) — P-11
+  classified as permanent under current tools, may promote to C-N if
+  a coercion is found (precedent: C-29 supersedes P-10, C-27
+  supersedes P-7). Two-path detector in `predict_walls.py` fires on
+  all 5 picks; brief 199's pick #5 correctly does NOT fire (C-23,
+  not P-11). 2073 → 2080 tests. Brain pushed lint fix (broken link
+  fragment + line wrapping that started with `#4`).
+
+- **Brain-PR (previous) — matched_functions fix + macOS permuter
   workarounds + housekeeping.** 🎉 **+198 matched_functions recovered.**
   Three-part PR. (1) `objdiff_filter_panic_units.py` was silently
   dropping every `.legacy.c` unit because dsd emits objdiff.json
@@ -486,32 +513,32 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands. Both agents have just
-received the brief 200 / 201 kickoffs:
+received the brief 202 / 203 kickoffs:
 
-**Scaffolder — brief 200 in flight:**
+**Scaffolder — brief 202 in flight:**
 
-- **Brief 200 (HIGH, NEW)** — `scaffolder/permuter-plateau-codegen-sweep`.
-  Codegen-sweep on the 480-500 permuter plateau from brief 198.
-  Per brief 084's "3 walls not 1" methodology, treat the 5 picks
-  (E-12/13/14, B-22, B-24) that bottomed out at the same score
-  band as evidence of ONE shared mechanism, not 5 separate walls.
-  Three deliverables: side-by-side disasm survey across the 5
-  picks (what diverges in the closest permuter variants?),
-  hypothesis + classification (new C-N if a shared mechanism
-  surfaces), best-effort recipe + worked example. Research-first
-  brief — outcomes vary; classification IS the deliverable.
+- **Brief 202 (HIGH, NEW)** — `scaffolder/address-cse-wall`.
+  Brief 201 documented mwcc 2.0's address-CSE pass collapsing two
+  pool entries (for the SAME data symbol) into one slot — produces
+  1-insn diff each on E-07 + E-08, the closest possible miss.
+  Decomper tried `volatile`, pointer aliasing, all three routing
+  tiers; none broke the CSE. Brief 201 handed off: "needs
+  scaffolder-tier intervention (inline asm escape or codegen
+  flag)." Same shape as C-31/C-32/C-33/C-23/P-11: research +
+  recipe + classifier + worked example or P-N classification.
+  Options to investigate: inline asm, compiler flag, pragma,
+  routing trick, acknowledge as permanent P-12.
 
-**Decomper — brief 201 in flight:**
+**Decomper — brief 203 in flight:**
 
-- **Brief 201 (HIGH, NEW)** — `decomper/decomp-me-iteration-best-scores`.
-  Manual decomp.me iteration on brief 198's 3 closest-score picks:
-  E-07 (`func_02023f7c`, best 220), E-08 (`func_02026fd8`, best 230),
-  B-08 (`func_0205da2c`, best 315). Permuter got within manual reach
-  but couldn't close — decomp.me + objdiff's source-shape iteration
-  is the next tool. Bar: ≥ 1 of 3 ships — **first matched_functions
-  increment via decomp.me workflow.** 3-of-3 is the dream. Even 0
-  with documented residuals would inform whether the 220-315 score
-  range is genuinely closable by hand.
+- **Brief 203 (HIGH, NEW)** — `decomper/c23-survey-drain`. Brief
+  199's expanded C-23 classifier surfaced 3 candidates beyond
+  pick #5: `OSi_PostIrqEvent` (0x9c clustered pool),
+  `func_02021b38` (0x74 clustered pool), `func_02093dc8` (0x70
+  DMA MMIO). Recipe is LOCKED from brief 199 — `.legacy.c`
+  routing + keep base + offset separate in source. Bar: ≥ 2 of 3.
+  **Expected +3 matched_functions if all three close — first
+  multi-pick C-source wave since brief 188.**
 
 ## Active clusters (post-pivot reality)
 
@@ -606,49 +633,47 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 200 PR** (scaffolder codegen-sweep on
-   480-500 plateau) when it opens. Branch:
-   `scaffolder/permuter-plateau-codegen-sweep`. Tools + docs +
-   possibly 1 worked example. EUR-only SHA1 PASS sufficient if
-   no source ships; full 3-region if a worked example lands.
-   Read the disasm-survey table carefully — that's the deliverable
-   even if no recipe emerges. Look for whether the 5 picks DO
-   share a mechanism or whether they happened to plateau at the
-   same band coincidentally.
-2. **Verify + merge brief 201 PR** (decomper decomp.me iteration)
-   when it opens. Branch: `decomper/decomp-me-iteration-best-scores`.
-   3-region SHA1 PASS required for each shipped match. **Headline
-   event to watch: `matched_functions` increments via the decomp.me
-   workflow** — first since the new measurement (1628 baseline).
-   Even 0 ships with documented residuals is informative.
-3. **Scope brief 202+ based on brief 200 + 201 outcomes:**
-   - **If brief 200 surfaces a shared C-34/P-N wall:** brief 202
-     (decomper) writes worked examples for 1-2 of the plateau picks
-     using the new recipe. Brief 203 (scaffolder) refines the
-     classifier with detection.
-   - **If brief 200 finds 5 separate sub-walls:** brief 202
-     (scaffolder) picks the most common sub-wall and produces a
-     focused recipe; brief 203 (decomper) drains.
-   - **If brief 201 ships ≥ 2 of 3:** brief 202 (decomper) scales
-     decomp.me iteration to more picks from the queue at similar
-     score ranges. Brief 203 (scaffolder) builds decomp.me upload
-     automation to multiply throughput.
-   - **If brief 201 ships 0:** the 220-315 score range isn't manually
-     closable either. Different mechanism needed for the wider
-     Cluster B + E family — could be a permuter-library-with-hints
-     expansion or a deeper mwcc-2.0 reg-allocator investigation.
-4. **Scope brief 203+ scaffolder candidates** to keep ready:
+1. **Verify + merge brief 202 PR** (scaffolder address-CSE wall)
+   when it opens. Branch: `scaffolder/address-cse-wall`. Tools +
+   docs + possibly 1 worked example. Full 3-region SHA1 PASS
+   required if a worked example ships (touches source). The
+   most informative outcome is option-(a) inline asm — that's the
+   only attempt brief 201 didn't already try. Read the recipe-
+   attempt log carefully; classification as P-12 is also a valid
+   outcome.
+2. **Verify + merge brief 203 PR** (decomper C-23 drain) when it
+   opens. Branch: `decomper/c23-survey-drain`. 3-region SHA1 PASS
+   per shipped pick. **Headline event: matched_functions ticks +N
+   where N = shipped count** — first multi-pick wave since brief
+   188. 3-of-3 expected; 2-of-3 is the realistic floor.
+3. **Scope brief 204+ based on outcomes:**
+   - **If brief 202 ships a recipe (any option):** brief 204
+     (decomper) wires E-07 + E-08 with the recipe; brief 205
+     (scaffolder) audits the wider queue for address-CSE pickups.
+   - **If brief 202 classifies as P-12 permanent:** brief 204
+     (decomper) skips P-11 + P-12 picks via worklist filter;
+     decomp.me iteration scales to more 220-315 score picks if
+     brief 201 results suggest that workflow is repeatable.
+   - **If brief 203 ships ≥ 2 of 3:** brief 204 (scaffolder)
+     audits the queue for more C-23 candidates beyond brief 199's
+     surfaced 4 (full-corpus rescan with the expanded signal set).
+     Brief 205 (decomper) drains them.
+   - **If brief 203 ships 0:** something's wrong with the C-23
+     classifier or the recipe — investigate before scaling.
+4. **Scope brief 205+ scaffolder candidates** to keep ready:
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
    - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
      isn't always mwcc 1.2 routing; refine the C-15 predictor
    - **Decomp.me scratch upload automation** — productivity
-     multiplier (becomes high-priority if brief 201 succeeds)
-   - **Permuter library / hint expansion** — if brief 200's
-     codegen-sweep reveals reg-alloc hint patterns, codify them
-   - **C-23 candidates from brief 199's survey** (`OSi_PostIrqEvent`,
-     `func_02021b38`, `func_02093dc8`) — recipe is locked; quick
-     decomper drain when convenient
+     multiplier (brief 201's success makes this higher priority)
+   - **P-11 reg-alloc-hint research** — brief 200 left this open
+     as a separate brief candidate; sweep mwcc 2.0 SPs +
+     optimization levels on E-12 to see if any produce orig form
+   - **Brief 201's "two pool loads" correction in C-23 entry** —
+     trivial doc edit (mwcc CSE'd already; the recipe still
+     works but the explanation in pick #5's `.legacy.c` worked
+     example is imprecise)
 5. **Deferred indefinitely (per pivot discipline):**
    - `data_020c9694` 14.8 KB D-3 mega
    - `data_ov002_022ccc2e` odd-aligned size=2

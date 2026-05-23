@@ -364,29 +364,53 @@ itself:
 
 ### Open briefs
 
-- **Brief 200 (HIGH, NEW)** — `scaffolder` codegen-sweep on the
-  480–500 permuter plateau. Brief 198 (PR #648) ran permuter on
-  9 Cluster B + E picks; **5 of 9 plateaued at scores 480–500**
-  despite finding 3–5 distinct source variants each. Per brief
-  084's "3 walls not 1" methodology this is investigated as ONE
-  shared codegen mechanism, not 5 separate issues. Affected:
-  E-12 / E-13 / E-14 (`func_02024574` + clones), B-22
-  (`func_0200b0c8`), B-24 (`func_ov011_021d2ca8`). Three
-  deliverables: side-by-side disasm survey, hypothesis +
-  classification (next C-N if a shared mechanism is identified),
-  best-effort recipe + worked example. Branch:
-  `scaffolder/permuter-plateau-codegen-sweep`.
-- **Brief 201 (HIGH, NEW)** — `decomper` manual decomp.me iteration
-  on brief 198's best-score picks. The 3 picks at scores 220–315
-  (E-07 `func_02023f7c`, E-08 `func_02026fd8`, B-08
-  `func_0205da2c`) are WITHIN MANUAL-ITERATION REACH of orig.
-  Bar: ≥ 1 of 3 ships — **first matched_functions increment since
-  brief 190 from manual decomp.me workflow**. 3-of-3 is the dream;
-  even 0 with documented residuals informs the next round.
-  Branch: `decomper/decomp-me-iteration-best-scores`.
+- **Brief 202 (HIGH, NEW)** — `scaffolder` address-CSE wall
+  research for E-07 / E-08. Brief 201 documented mwcc 2.0's
+  address-CSE pass collapsing two pool entries (for the SAME data
+  symbol) into one slot — 1-insn diff each, the closest possible
+  miss. Decomper tried volatile, pointer aliasing, all three
+  routing tiers; none broke the CSE. Brief 201 explicitly handed
+  off: "needs scaffolder-tier intervention (inline asm escape or
+  codegen flag)." Three deliverables: empirical investigation,
+  recipe selection (inline asm vs compiler flag vs pragma vs
+  routing vs acknowledge-as-P-N), worked example or P-N
+  classification. Branch: `scaffolder/address-cse-wall`.
+- **Brief 203 (HIGH, NEW)** — `decomper` C-23 candidate drain.
+  Brief 199's expanded classifier surfaced 3 candidates beyond
+  pick #5: `OSi_PostIrqEvent` (0x9c, clustered pool),
+  `func_02021b38` (0x74, clustered pool), `func_02093dc8` (0x70,
+  DMA register access via main MMIO). Recipe is locked from
+  brief 199 — `.legacy.c` routing + keep base + offset separate
+  in source. Bar: ≥ 2 of 3 ship (3-of-3 expected). **Expected +3
+  matched_functions if all three close — first multi-pick C-source
+  wave since brief 188.** Branch: `decomper/c23-survey-drain`.
 
 ### Closed briefs (reference)
 
+- **Brief 201** — `decomper`, shipped in PR #651. 🎯 **First
+  matched_functions increment via decomp.me workflow.** B-08
+  (`func_0205da2c`) shipped as `.legacy_sp3.c` — the explicit-
+  stack + Style B `pop {pc}` shape is mwcc 1.2/sp3's preferred
+  form for short LR-only wrappers. Routing decision (not source
+  shape) was the unlock; permuter couldn't find this because
+  permuter perturbs source, not tier. E-07 + E-08 hit a new
+  address-CSE wall (brief 202 scope — mwcc 2.0 collapses two
+  pool entries to one slot, 1-insn diff each). Bonus finding:
+  brief 199's "two pool loads" comment imprecise — both `ldr r3`
+  target the SAME pool slot at offset 0x68 (mwcc CSE'd already).
+  3-region SHA1 PASS. matched_code_percent 1.7190 → 1.7201
+  (+0.0011), matched_functions 1628 → 1629 (+1).
+- **Brief 200** — `scaffolder`, shipped in PR #649. 🎯 **P-11
+  reg-allocator plateau classified.** 5 brief-198 picks (E-12/13/14,
+  B-22, B-24) share mwcc 2.0 reg-allocator + liveness divergence
+  at 0x5c-0x74 sizes with helper-call-in-body. Three sub-shapes
+  documented (find-empty-slot template, array destructor with
+  in-loop bl, useless-spill stack-scratch). Recipe attempts all
+  failed (volatile / .legacy.c / structural simplification);
+  classified as P-11 (permanent, may promote to C-N if a
+  coercion is found per C-29/C-27 precedent). Two-path classifier
+  in `tools/predict_walls.py` fires on all 5 picks; brief 199
+  pick #5 correctly doesn't fire. 2073 → 2080 tests (+7).
 - **Brief 199** — `scaffolder`, shipped in PR #647. 🎯 **C-23 MMIO
   register-base folding wall — recipe + classifier expansion +
   worked example.** Brief 193 pick #5 (`func_02096434`, 0x6c)
