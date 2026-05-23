@@ -65,6 +65,10 @@ src/overlay011/ov011_021d2c5c.c:
     complete
     .text start:0x021d2c5c end:0x021d2c64
 
+src/overlay011/func_ov011_021d2c64.s:
+    complete
+    .text start:0x021d2c64 end:0x021d2c8c
+
 
 
 
