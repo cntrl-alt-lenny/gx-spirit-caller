@@ -8893,3 +8893,11 @@ src/main/func_0209085c.s:
 src/main/func_0205da2c.legacy_sp3.c:
     complete
     .text start:0x0205da2c end:0x0205da48
+
+src/main/OSi_PostIrqEvent.legacy.c:
+    complete
+    .text start:0x020904d4 end:0x02090570
+
+src/main/func_02093dc8.legacy.c:
+    complete
+    .text start:0x02093dc8 end:0x02093e38
