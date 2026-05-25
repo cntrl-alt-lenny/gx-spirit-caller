@@ -91,6 +91,7 @@ unsigned short f(struct Outer *p, unsigned short v) {
 ```
 
 mwcc 2.0 emits:
+
 ```asm
 ldrh  r0, [r0, #0x34]               ; folded offset
 strh  r1, [r0, #0x34]
@@ -98,6 +99,7 @@ bx    lr
 ```
 
 Orig:
+
 ```asm
 add   r2, r0, #0x24                 ; substruct base
 ldrh  r0, [r2, #0x10]               ; field-in-substruct offset
