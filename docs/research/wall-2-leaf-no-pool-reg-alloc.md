@@ -49,6 +49,7 @@ void f(struct W *w, unsigned short v) {
 ```
 
 mwcc 2.0 emits:
+
 ```asm
 ldr   r2, [r0, #0]                  ; single load of *w->inner
 cmp   r2, #0
@@ -60,6 +61,7 @@ bx    lr
 ```
 
 Orig:
+
 ```asm
 ldr   r3, [r0, #0]
 cmp   r3, #0

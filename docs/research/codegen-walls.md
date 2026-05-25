@@ -4718,6 +4718,7 @@ byte-for-byte. Verified empirically across 23 source variants ×
     `src/main/func_020a584c.legacy.c`.
   - **N=24** — `.c` (mwcc 2.0/sp1p5) with the shift-extract
     idiom adapted for byte width:
+
     ```c
     int g(void) {
         int x = global_struct.field;  /* byte at offset 0x58 */
@@ -4726,6 +4727,7 @@ byte-for-byte. Verified empirically across 23 source variants ×
         return 0;
     }
     ```
+
     No worked example shipped — needs the extern symbol
     structure that varies per pick; recipe documented for
     decomper to apply (brief 215+ candidate territory).
