@@ -8,23 +8,41 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-25, post-#665 + #666 merge. Brain back on
-Windows (verifying with `ninja sha1`, EUR-only — 3-region check
-deferred until Windows brain has all three USA/JPN extracts; the
-PRs touched tools + .s sources only, EUR PASS is sufficient
-evidence per cloud's own test plans). **Brief 210 (`$d` → `$a`
-rewriter, scaffolder) and brief 211 (literal-tail drain + BIOS
-thunk pre-empt, decomper) both shipped.** Brief 210 lifted
-`matched_code_percent` from 1.84% → 3.71% (+1.87 pp) and resolved
-21 of 23 brief 209 stragglers. Brief 211 shipped 5/5 literal-tail
-picks (only 1 was the true brief-208-unblocked shape; other 4 had
-symbol-ref tails already covered by brief 204) and pre-empted the
-BIOS-thunk family check (all already matched by the brief 207 +
-209 chain — brain's PR #662 survey was already stale). **Current
-metrics (post-#666 merge):** `matched_functions 1698 / 9801
-(17.32%)`, `matched_code_percent 3.71%`, `fuzzy_match_percent
-4.51%`. **Brain reminder:** any survey older than ~3 briefs is
-suspect; re-validate before scoping (brief 211's Phase 2 finding).
+**Last updated:** 2026-05-25, post-#668 + #669 merge. Brain on
+Windows. **Brief 212 (`$d`/`$a` rewriter audit + pass-2 trailing
+collapse, scaffolder) and brief 213 (trivial-bucket revalidated
+sweep + Entry match, decomper) both shipped.**
+
+Brief 212 flipped both remaining brief-209 stragglers
+(`func_ov011_021cb574`, `func_ov011_021d02a4`) via a pass-2
+collapse that zeros trailing `$a` markers so mwasm and dsd-delink
+converge on implicit-`$d` to end-of-text. Audit predicted +11
+flips; actual incremental over brief 213 alone was +7 (dry-run
+shifted shape on some candidates once #669's new src landed).
+New `--sweep` mode for post-fix idempotency.
+
+Brief 213 shipped 31 trivial-bucket picks (4 + 8 + 18 across
+three waves; the 18 are an `ov002:0x0226acf8` dispatcher cluster,
+all `.s`) plus `Entry` to 100% via a 3-region `relocs.txt` add
+(same `$d`-family cause as brief 209, config-side fix this time).
+Re-validated brief 211's survey-staleness rule: fresh
+`next_targets.py` showed 156 unmatched easy-tier picks (not the
+survey's "231 trivial") — now 125 after the drain. New wall
+candidate surfaced: bit-test → 0/1 idiom (4 picks shipped as `.s`
+because mwcc 2.0 collapses plain `(x & 1) ? 1 : 0` to `tst r0,#1`
+— a C-N classifier + recipe attempt is the natural brief 214
+(scaffolder) candidate).
+
+**Current metrics (post-#668 + #669 merge, EUR):**
+`matched_functions 1740 / 9801 (17.75 %)`,
+`matched_code_percent 4.9799 %`, `fuzzy_match_percent 5.6781 %`,
+`complete_units 1703 / 2602 (65.45 %)`. 3-region SHA1 PASS
+preserved per decomper's verify.
+
+**Brain reminder (new this round):** state.md baseline
+`matched_functions=1698` was stale at brief 213 start; fresh
+build showed 1701. Always reconfigure + `ninja report` after
+every merge wave before quoting metrics.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -39,17 +57,13 @@ project pursues TWO goals in parallel, not either-or:
    explicitly bullish on AI-tool improvement (6-18 months) cutting
    this much shorter. The project will continue regardless.
 
-**Brain-PR investigations this round:**
-- [`brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md):
-  empirically diagnosed brief 206's 23 stragglers — bottom tier (13
-  ov011) has a structural unrelocated-byte comparison gap not closeable
-  without resolver extension (Option B). 7 close picks (95-100%/80-95%/
-  50-80%) are decomper brief 209's Phase 2 target.
-- [`unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md):
-  strategic compass — 8,149 unmatched functions, breakdown by
-  size/module, identifies BIOS-thunk family (~30 named SWI thunks)
-  as the highest-leverage easy pick available + recommends brief
-  210-215 sequencing.
+**Brain-PR investigations this round:** None — verification +
+housekeeping only. The agent PRs each authored their own research
+notes:
+[`d-a-rewriter-corpus-audit.md`](docs/research/d-a-rewriter-corpus-audit.md)
+(brief 212) and
+[`trivial-bucket-revalidated-2026-05-25.md`](docs/research/trivial-bucket-revalidated-2026-05-25.md)
+(brief 213).
 
 **Headline metric shift this round.** Investigation found that
 `matched_functions` is systematically under-counting `.legacy.c`
@@ -62,19 +76,25 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes:** brief 210 (scaffolder mwasmarm `$d` → `$a`
-rewriter — closes the metric gap for all 23 stragglers) + brief
-211 (decomper literal-tail drain + BIOS thunk family drain —
-~35-pick candidate, biggest single drain yet). See § *In flight*
-below.
+**No open lanes after this merge.** Both agents idle pending
+brain's next scoping. Candidates queued in *Next-brain TODO*
+below: bit-test → 0/1 idiom C-N research (scaffolder), continue
+trivial-bucket drain or start hard-bucket pilot (decomper), plus
+the `arm9.o.xMAP` configure-graph gap as a scaffolder
+infrastructure brief.
 
-**Brain methodology update (this PR):** added a "empirical
-hypothesis testing — non-negotiable for pre-validation" entry
-to the session-patterns memory file. Brain pre-validations
-must run the falsification test before claiming a root cause;
-brief 209's `.word`-to-mnemonic test correctly identified the
-real mechanism after brain's PR #662 hypothesis turned out
-wrong.
+**Brain methodology update (PR #664):** "empirical hypothesis
+testing — non-negotiable for pre-validation." Brain
+pre-validations must run the falsification test before claiming
+a root cause; brief 209's `.word`-to-mnemonic test correctly
+identified the real mechanism after brain's PR #662 hypothesis
+turned out wrong.
+
+**Brain methodology update (this PR):** "always reconfigure +
+`ninja report` after a merge wave before quoting metrics."
+Decomper's brief 213 had to recompute the matched_functions
+baseline because state.md's quoted 1698 was stale (real was
+1701 post-#666/#667 once a fresh build ran).
 
 ## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
@@ -155,6 +175,52 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
+- **PR #669 — decomper / brief 213 trivial-bucket revalidated sweep
+  + Entry match.** 🎯 **31 ships** (4 + 8 + 18 across three waves).
+  Wave 3 was an `ov002:0x0226acf8` dispatcher cluster — 18 thin
+  trampolines all shipped as `.s` since the shape is mechanical.
+  Plus `Entry` lifted 98.73% → 100% via a 3-region `relocs.txt`
+  addition (`from:0x02000928 kind:load to:0x02000b68 module:main`)
+  — same `$d`-family root cause as brief 209, config-side
+  remediation. Re-validated the survey-staleness rule from brief
+  211: fresh `next_targets.py` showed 156 unmatched easy-tier (not
+  the 2026-05-25 survey's "231 trivial" size-only bucket), now
+  125 post-drain. New wall candidate surfaced: bit-test → 0/1
+  idiom (`lsl r0,r0,#31; movs r0,r0,lsr #31; movne/moveq`) — 4
+  picks shipped as `.s` because mwcc 2.0 collapses plain
+  `(x & 1) ? 1 : 0` to `tst r0,#1`. Queued as brief 214 candidate.
+  Side find: state.md baseline `matched_functions=1698` was stale;
+  fresh build at brief 213 start showed 1701 (brain hadn't rebuilt
+  objdiff post-#666/#667). Metric deltas: `complete_units` 1672 →
+  1703 (+31), `matched_functions` 1701 → 1733 (+32). 3-region SHA1
+  PASS + 27/27 OK + 0 invariant errors.
+- **PR #668 — scaffolder / brief 212 `$d`/`$a` rewriter audit +
+  pass-2 trailing collapse.** 🎯 **Both unflipped brief-209
+  stragglers landed at `matched=1/1, fuzzy=100`.**
+  `func_ov011_021cb574` and `func_ov011_021d02a4`. Root cause:
+  asymmetric `$d` emission (mwasmarm: one `$d` per `.word` *run*;
+  dsd-delink: one `$d` per pool *entry*); when a `cond==0xF` data
+  word is followed by ARM-like words, pass 1's per-symbol promotion
+  produces divergent shapes between the two sides. Pass 2 zeros
+  trailing `$a` markers after the last data marker so both sides
+  converge on implicit-`$d` to end-of-text. Audit dry-run predicted
+  +11 flips; actual incremental over brief 213 was +7 (predictions
+  shifted shape on some candidates once brief 213's new src
+  landed). New `--sweep` mode for post-fix idempotency checking.
+  9 new tests, 25/25 pass; ruff clean. EUR SHA1 PASS preserved
+  (tools-only PR, no source touches).
+- **Brain-PR (this one) — close briefs 212 + 213 + Windows
+  worktree-repair + xMAP infra gap noted.** 🔬 Verification +
+  housekeeping. Repaired the `decomper/` and `scaffolder/` worktree
+  pointer files (stale paths from a parent-dir rename
+  `gx-spirit-caller-NEW` → `gx-spirit-caller`) via
+  `git worktree repair` before the agents could git-fetch. Brain
+  re-verified post-merge metrics from decomper worktree (brain has
+  no build state on this Windows install). Surfaced a long-standing
+  `configure.py` gap: `arm9.o.xMAP` (mwldarm linker map side-output)
+  is referenced as an input in `build.ninja` but no rule produces
+  it — bites fresh worktrees that haven't built before (scaffolder
+  worktree triggered this). Queued as scaffolder brief 216 candidate.
 - **PR #661 — decomper / brief 209 straggler root-cause diagnosed.**
   🔬 Investigation-only PR. All 23 stragglers (units at
   complete_code=100 + low fuzzy_match) traced to a single mechanism:
@@ -684,30 +750,9 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR lands. Both agents have just
-received the brief 210 / 211 kickoffs:
-
-**Scaffolder — brief 210 in flight:**
-
-- **Brief 210 (HIGH, NEW)** — `scaffolder/arm-mapping-symbol-rewrite`.
-  Post-process mwasmarm `$d` → `$a` mapping symbols for `.word`
-  values that decode as valid ARM instructions. Per brief 209
-  rec #1 — least-invasive remediation, no source touches, no
-  recipe changes. Wire into the objdiff_report pipeline alongside
-  brief 206's `resolve_relocs`. Predicted recovery: matched_functions
-  1687 → ~1710 (+23 stragglers flip).
-
-**Decomper — brief 211 in flight:**
-
-- **Brief 211 (HIGH, NEW)** —
-  `decomper/literal-tail-drain-plus-bios-thunk-family`. Two-phase
-  drain. Phase 1: 5 literal-tail picks deferred from brief 209
-  (brief 208's C-36 fix now makes the recipe locked). Phase 2:
-  ~30 named BIOS SWI thunks (`LZ77UnCompReadByCallbackWrite16bit`,
-  `Div`, `CpuSet`, etc.) at 4 bytes each — highest-leverage easy
-  pick per brain's unmatched-pool survey. Expected total ~35
-  ships if Phase 2 finds a uniform recipe; biggest single drain
-  candidate yet.
+**Open PRs: 0** once this brain-PR lands. **Both agents idle —
+no briefs in flight.** Brain to scope next-round kickoffs based
+on the candidates listed in *Next-brain TODO* below.
 
 ## Active clusters (post-pivot reality)
 
@@ -755,15 +800,15 @@ different reloc records than dsd's delink (post-link bytes match
 indicator. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Current (post brief 203 merge):**
+**Current (post #668 + #669 merge):**
 
 | Metric | Value | Notes |
 |---|---|---|
-| **complete_units** | **1,667 / 2,553** | SHA1-aligned headline. +286 over the post-pivot arc (1,381 baseline at brief 187). |
-| matched_code_percent | **4.1567 %** | post-brief-206/208 — honest metric. +0.63pp this round from brief 208's worked example + reclassifications. |
-| matched_functions | **1,687 / 9,801** (17.21 %) | brief 209 diagnosed the 23 stragglers as a `$d` mapping-symbol issue (brief 210 will recover them). Per [`brief-209-stragger-investigation.md`](docs/research/brief-209-stragger-investigation.md). |
-| fuzzy_match_percent | **4.1904 %** | +2.31pp this round — most sensitive to new ships |
-| complete_code_percent | (per-unit) | for individual ships, 100% means byte-identical at the linker level |
+| **complete_units** | **1,703 / 2,602** | SHA1-aligned headline. 65.45 %. +36 over post-#666/#667 (1,667 baseline at last round). |
+| matched_code_percent | **4.9799 %** | +0.82 pp this round (brief 213's 31 ships + brief 212's straggler flips combined). |
+| matched_functions | **1,740 / 9,801** (17.75 %) | +42 over post-#666/#667 baseline of 1,698. Includes brief 212 closing the last two `$d`-family stragglers. |
+| fuzzy_match_percent | **5.6781 %** | +1.17 pp this round |
+| complete_code_percent | (per-unit) | for individual ships, 100 % means byte-identical at the linker level |
 
 **Resumption queue:** [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
 — 52 picks across trivial (12) / easy (25) / medium-easy (15).
@@ -814,38 +859,44 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 210 PR** (scaffolder `$d` → `$a`
-   rewriter) when it opens. Branch:
-   `scaffolder/arm-mapping-symbol-rewrite`. Tools-only or
-   tools+1-worked-example. **Headline event to watch:** all 23
-   brief 209 stragglers flip to `matched_functions: 1/1`,
-   expected to land matched_functions at ~1710. If <20 of 23
-   flip, the rewriter has a coverage gap that needs investigation.
-2. **Verify + merge brief 211 PR** (decomper literal-tail drain
-   + BIOS thunk family) when it opens. Branch:
-   `decomper/literal-tail-drain-plus-bios-thunk-family`. Two-phase.
-   Phase 1 expectation: ≥ 4 of 5 literal-tail picks. Phase 2
-   expectation: 5-30 BIOS thunks (depends on shape uniformity).
-   3-region SHA1 PASS per shipped pick.
-3. **Scope brief 212+ based on outcomes:**
-   - **If brief 210 closes the metric gap (≥ 20 stragglers flip):**
-     brief 212 (scaffolder) audits the corpus for OTHER `$d`-tagged
-     `.s` ships that may benefit; brief 213 (decomper) starts the
-     hard-bucket pilot per [`unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md).
-   - **If brief 210 partial-closes (10-19 flip):** brief 212
-     (scaffolder) extends the rewriter for the unflipped cases.
-   - **If brief 210 fails (<10 flip):** brief 209's diagnosis was
-     correct mechanism but wrong fix path; brief 212 investigates
-     mwasm post-processing alternatives.
-   - **If brief 211 Phase 2 finds a uniform BIOS-thunk recipe:**
-     brief 213 (decomper) continues the easy-bucket sweep with
-     the curated queue's full set + new wall predictions.
-   - **Brief 213-215 — full trivial-bucket sweep + hard-bucket
-     pilot.** Per the strategic survey: 231 unmatched trivial
-     picks (only ~50 covered to date), highest-leverage easy
-     work. Plus one hard-bucket pilot per round for Track 2
-     progress.
-4. **Scope brief 209+ scaffolder candidates** to keep ready:
+1. **Scope brief 214 (scaffolder).** Top candidate:
+   **bit-test → 0/1 idiom C-N research.** Brief 213 surfaced 4
+   picks that shipped as `.s` because mwcc 2.0 collapses plain
+   `(x & 1) ? 1 : 0` to `tst r0,#1` instead of the orig
+   `lsl r0,r0,#31; movs r0,r0,lsr #31; movne r0,#1; moveq r0,#0`.
+   Investigate whether `(unsigned)x << 31 >> 31 != 0` or another
+   idiom reaches the orig shape under any tier; if not, classify
+   as C-N wall and ship a recipe. Sibling candidates if 214
+   needs a smaller scope: brief 201's "two pool loads" C-23 doc
+   correction (trivial); C-24 wall classifier extension; brief
+   197's mis-tagged C-15 `mvn #0` predictor refinement.
+2. **Scope brief 215 (decomper).** Two paths:
+   - **Continue trivial-bucket drain.** ~125 unmatched easy-tier
+     picks remaining per brief 213's revalidation. Brief 213's
+     recipe set (pool-load setters/getters, trampoline clusters,
+     bit-test `.s`) should drain another 20-40 in one round.
+   - **Hard-bucket pilot.** Per long-standing TODO + Track 2
+     emphasis. Pick ONE function ≥ 0x400 bytes (engine / game-loop
+     territory), treat as a multi-session decomp project, document
+     the process as the template for future hard-bucket work.
+     Slower headline impact but directly serves the
+     "human-readable C for every function" goal.
+   - Brain's recommendation: continue trivial-bucket drain this
+     round (momentum + easier verification cycle), pilot the
+     hard bucket as brief 217+ once the easy-tier remainder
+     plateaus.
+3. **Scope brief 216 (scaffolder, infrastructure) candidate.**
+   `configure.py` `arm9.o.xMAP` rule gap surfaced in this
+   brain-PR. mwldarm emits `.xMAP` as a side-output of the link
+   step; configure.py doesn't declare it as a build output. Fresh
+   worktrees with no prior `build/eur/` can't bootstrap — `ninja
+   sha1` errors with `arm9.o.xMAP missing and no known rule to
+   make it`. Decomper has it on disk from prior builds so doesn't
+   hit. Fix: add `.xMAP` as an explicit output of the mwldarm
+   link rule in `configure.py`. Small change, removes a real
+   onboarding pothole. Test plan: validate by deleting the file
+   from a worktree's build/ and confirming ninja regenerates it.
+4. **Scope brain candidates to keep ready:**
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
    - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
@@ -897,7 +948,33 @@ sufficient.
      **+198 matched_functions previously invisible** were the
      immediate recovery; the fix permanently closes the gap for
      all future `.legacy.c` ships.
-   - `tools/permute.py` macOS workarounds folded in (this brain-PR):
+   - **Worktree-pointer breakage from parent-dir rename** (fixed
+     this brain-PR via `git worktree repair`): the parent dir was
+     renamed `gx-spirit-caller-NEW` → `gx-spirit-caller` at some
+     point; `decomper/.git` + `scaffolder/.git` (and the
+     corresponding `brain/.git/worktrees/<slug>/gitdir`
+     back-pointers) kept the stale `-NEW` paths. Symptom: agent
+     worktrees can't run git commands. Fix is non-destructive —
+     `git worktree repair <path>...` from the main worktree
+     rewrites all four pointer files. Future brains starting on
+     a renamed-parent setup should `git worktree list` and check
+     for `prunable` markers before assuming agent worktrees work.
+   - **Brief 212 `TestStragglerSmoke` becomes idempotent-no-op
+     post-merge.** The two tests (`test_021cb574_collapses_one_trailing_a`
+     + `test_021d02a4_collapses_four_trailing_a`) load `.o.resolved`
+     files from a sibling decomper build and expect the rewriter to
+     collapse 1 / 4 trailing `$a` markers. Pre-#668 they passed; post-
+     #668 they FAIL because decomper's post-merge rebuild ran the
+     rewriter in production, so the on-disk `.o.resolved` files are
+     already collapsed (`trailing_promoted_collapsed: 0` on re-run).
+     Not a regression — test design depends on pre-rewriter build
+     state that no longer exists in normal workflows. Fix candidate
+     for whichever scaffolder brief touches `patch_arm_mapping_symbols.py`
+     next: either (a) check for already-collapsed shape and skip,
+     (b) read pre-resolve `.o` files instead of `.o.resolved`, or
+     (c) check in a fixture rather than depending on a build
+     artifact.
+   - `tools/permute.py` macOS workarounds folded in (PR #655):
      PEP 668 externally-managed-environment fallback auto-creates
      `.venv_permuter/` and patches `sys.path` in-process; disasm
      path resolver scans the tree-mirroring layout (`disasm/src/
