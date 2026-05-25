@@ -2028,3 +2028,15 @@ src/overlay002/func_ov002_02247b6c.s:
 src/overlay002/func_ov002_022b595c.s:
     complete
     .text start:0x022b595c end:0x022b8098
+
+src/overlay002/func_ov002_021aba60.s:
+    complete
+    .text start:0x021aba60 end:0x021ae3f0
+
+src/overlay002/func_ov002_021d9828.s:
+    complete
+    .text start:0x021d9828 end:0x021dbd48
+
+src/overlay002/func_ov002_0220eb00.s:
+    complete
+    .text start:0x0220eb00 end:0x02210104
