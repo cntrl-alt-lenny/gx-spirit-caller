@@ -370,6 +370,36 @@ candidate queue.)*
 
 ### Closed briefs (reference)
 
+- **Brief 215** — `decomper`, shipped in PR #671. 🎯 **46
+  trivial-bucket ships** (12 + 8 + 26 across three waves), well
+  above the 20-40 target. Easy-tier matched ratio 88.7 % → 92.9 %;
+  unmatched easy-tier 125 → 79 picks. Recipe routing 6 C + 40 `.s`
+  (brief 210 `$d → $a` chain credits all `.s` cleanly).
+  **Two new walls flagged for scaffolder follow-on:** Wall 1 —
+  swap-tail-call register temp (3 picks; mwcc 2.0 picks r2 but
+  orig wants r3; 4 source forms tried, none reach r3). Wall 2 —
+  leaf-no-pool reg-alloc divergence (39 of 79 remaining easy-tier
+  picks; major drain blocker; mwcc 2.0's register choices +
+  scheduling diverge from orig in ways that don't track to
+  source-form differences — scaffolder brief 216 candidate).
+  3-region SHA1 PASS + 27/27 modules + 0 invariant errors.
+- **Brief 214** — `scaffolder`, shipped in PR #672. 🎯 **C-37
+  bit-test → 0/1 idiom unlocked.** Found a C source idiom
+  (`unsigned t = (unsigned)(x << 31) >> 31; if (t != 0u) return 1;
+  return 0;`) that produces orig bytes byte-identically under mwcc
+  1.2/sp2p3 — mwcc 2.0 collapses to `tst r0, #1` peephole, mwcc
+  1.2 doesn't. Three jointly-required source elements pinned
+  (shift-extract via unsigned cast, named temp, explicit
+  `if (t != 0u) return 1; return 0;`). Classified as C-37 in
+  `codegen-walls.md`, hex-tail detector added to `predict_walls.py`
+  covering 4 polarity × shift-width combos. Worked example:
+  `src/main/func_020a584c.legacy.c` replaces the brief 213 `.s`.
+  2 byte-low C-37 variants remain as `.s` — decomper follow-up.
+  Drive-by: brief 212 `TestStragglerSmoke` design-issue (flagged
+  in brain-PR #670) accepted. Bonus finding: scaffolder worktree
+  has mwccarm.exe downloaded locally — direct compiler invocation
+  works for variant-matrix testing (only ninja/dsd/objdiff are
+  off-limits). EUR SHA1 PASS preserved.
 - **Brief 213** — `decomper`, shipped in PR #669. 🎯 **31
   trivial-bucket ships + `Entry` to 100%.** Three waves
   (4 + 8 + 18); wave 3 is an `ov002:0x0226acf8` dispatcher

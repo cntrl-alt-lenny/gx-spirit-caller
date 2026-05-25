@@ -8,41 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-25, post-#668 + #669 merge. Brain on
-Windows. **Brief 212 (`$d`/`$a` rewriter audit + pass-2 trailing
-collapse, scaffolder) and brief 213 (trivial-bucket revalidated
-sweep + Entry match, decomper) both shipped.**
+**Last updated:** 2026-05-25, post-#671 + #672 merge. Brain on
+Windows. **Brief 214 (C-37 bit-test → 0/1 idiom recipe + detector,
+scaffolder) and brief 215 (trivial-bucket wave 2, decomper) both
+shipped.**
 
-Brief 212 flipped both remaining brief-209 stragglers
-(`func_ov011_021cb574`, `func_ov011_021d02a4`) via a pass-2
-collapse that zeros trailing `$a` markers so mwasm and dsd-delink
-converge on implicit-`$d` to end-of-text. Audit predicted +11
-flips; actual incremental over brief 213 alone was +7 (dry-run
-shifted shape on some candidates once #669's new src landed).
-New `--sweep` mode for post-fix idempotency.
+Brief 214 found that the orig bit-test → 0/1 idiom IS reachable
+from C — the source `unsigned t = (unsigned)(x << 31) >> 31; if
+(t != 0u) return 1; return 0;` produces orig bytes byte-identically
+under mwcc 1.2/sp2p3 (legacy tier). mwcc 2.0 collapses to a
+`tst r0, #1` peephole; mwcc 1.2 doesn't have that peephole and
+keeps the lsl/lsr shape. Classified as **C-37** in
+`codegen-walls.md` with a hex-tail detector covering 4 polarity ×
+shift-width combos. Shipped 1 worked example
+(`src/main/func_020a584c.legacy.c`), deleted the `.s`. 2 byte-low
+C-37 variants remain as `.s` — recipe documented for decomper
+follow-up.
 
-Brief 213 shipped 31 trivial-bucket picks (4 + 8 + 18 across
-three waves; the 18 are an `ov002:0x0226acf8` dispatcher cluster,
-all `.s`) plus `Entry` to 100% via a 3-region `relocs.txt` add
-(same `$d`-family cause as brief 209, config-side fix this time).
-Re-validated brief 211's survey-staleness rule: fresh
-`next_targets.py` showed 156 unmatched easy-tier picks (not the
-survey's "231 trivial") — now 125 after the drain. New wall
-candidate surfaced: bit-test → 0/1 idiom (4 picks shipped as `.s`
-because mwcc 2.0 collapses plain `(x & 1) ? 1 : 0` to `tst r0,#1`
-— a C-N classifier + recipe attempt is the natural brief 214
-(scaffolder) candidate).
+Brief 215 shipped 46 trivial-bucket picks (12 + 8 + 26 across
+three waves) — well above the 20-40 target. Easy-tier matched
+ratio: 88.7 % → 92.9 %; unmatched easy-tier 125 → 79 picks. **Two
+new walls flagged:** Wall 1 — swap-tail-call register temp (mwcc 2.0
+picks r2 but orig wants r3; 3 picks affected, scaffolder investigation
+candidate). Wall 2 — leaf-no-pool reg-alloc divergence (39 of 79
+remaining easy-tier picks are this shape; **the major drain blocker
+for the trivial bucket** — high-value scaffolder classifier candidate).
 
-**Current metrics (post-#668 + #669 merge, EUR):**
-`matched_functions 1740 / 9801 (17.75 %)`,
-`matched_code_percent 4.9799 %`, `fuzzy_match_percent 5.6781 %`,
-`complete_units 1703 / 2602 (65.45 %)`. 3-region SHA1 PASS
-preserved per decomper's verify.
+**Bonus finding from scaffolder:** the scaffolder worktree has
+mwccarm.exe downloaded locally (only `ninja`/`dsd`/`objdiff` are
+truly off-limits). Direct compiler invocation works for
+variant-matrix testing, which is how brief 214 nailed the C-37
+recipe. Worth a `.claude/agents/scaffolder.md` clarification next
+round.
 
-**Brain reminder (new this round):** state.md baseline
-`matched_functions=1698` was stale at brief 213 start; fresh
-build showed 1701. Always reconfigure + `ninja report` after
-every merge wave before quoting metrics.
+**Current metrics (post-#671 + #672 merge, EUR):**
+`matched_functions 1786 / 9801 (18.22 %)`,
+`matched_code_percent 5.0263 %`, `fuzzy_match_percent 5.7246 %`,
+`complete_units 1749 / 2660 (65.75 %)`. 3-region SHA1 PASS
+preserved.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -58,12 +61,10 @@ project pursues TWO goals in parallel, not either-or:
    this much shorter. The project will continue regardless.
 
 **Brain-PR investigations this round:** None — verification +
-housekeeping only. The agent PRs each authored their own research
-notes:
-[`d-a-rewriter-corpus-audit.md`](docs/research/d-a-rewriter-corpus-audit.md)
-(brief 212) and
-[`trivial-bucket-revalidated-2026-05-25.md`](docs/research/trivial-bucket-revalidated-2026-05-25.md)
-(brief 213).
+housekeeping only. Scaffolder's brief 214 research note at
+[`bit-test-0-or-1-idiom.md`](docs/research/bit-test-0-or-1-idiom.md)
+is the standout artifact this round (full 23-source × 8-tier
+variant matrix + C-37 recipe).
 
 **Headline metric shift this round.** Investigation found that
 `matched_functions` is systematically under-counting `.legacy.c`
@@ -77,11 +78,11 @@ decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
 **No open lanes after this merge.** Both agents idle pending
-brain's next scoping. Candidates queued in *Next-brain TODO*
-below: bit-test → 0/1 idiom C-N research (scaffolder), continue
-trivial-bucket drain or start hard-bucket pilot (decomper), plus
-the `arm9.o.xMAP` configure-graph gap as a scaffolder
-infrastructure brief.
+brain's next scoping. Top candidate this round: **Wall 2 — leaf-no-pool
+reg-alloc divergence classifier (scaffolder).** 39 of 79 remaining
+easy-tier picks are blocked by this single mechanism — closing it
+unblocks the biggest trivial-bucket drain available. See
+*Next-brain TODO* below for the full candidate queue.
 
 **Brain methodology update (PR #664):** "empirical hypothesis
 testing — non-negotiable for pre-validation." Brain
@@ -175,6 +176,53 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
 
+- **PR #671 — decomper / brief 215 trivial-bucket wave 2.** 🎯
+  **46 ships** (12 + 8 + 26 across three waves), well above the
+  20-40 target. Easy-tier matched ratio 88.7 % → 92.9 %; unmatched
+  easy-tier 125 → 79 picks. Recipe routing: 6 C + 40 `.s` (the
+  brief 210 `$d → $a` patcher chain handles all `.s` ships as
+  `matched_functions: 1/1`). **Two new walls flagged for scaffolder
+  follow-on:** Wall 1 — swap-tail-call register temp (mwcc 2.0
+  picks r2; orig wants r3; 3 picks affected; tried 4 source forms,
+  none reach r3). Wall 2 — leaf-no-pool reg-alloc divergence (39
+  of 79 remaining easy-tier picks share this shape — major drain
+  blocker; mwcc 2.0's register choices + instruction scheduling
+  diverge from orig in ways that don't track to source-form
+  differences). Picks deferred: 1 `func_020b3648` (branches OUT of
+  its own range) + 17 Thumb picks (untouched this round; brief 191
+  C-31 recipe applies to interwork shims; others need their own
+  recipe — suggest a dedicated Thumb sweep). 3-region SHA1 PASS +
+  27/27 OK + 0 invariant errors.
+- **PR #672 — scaffolder / brief 214 C-37 bit-test/byte-zero 0/1
+  idiom — recipe + worked example + detector.** 🎯 **C-37 recipe
+  unlocked.** Source idiom
+  `unsigned t = (unsigned)(x << 31) >> 31; if (t != 0u) return 1;
+  return 0;` produces orig bytes byte-identically under mwcc
+  1.2/sp2p3 (legacy tier). mwcc 2.0 has a `tst r0, #1` peephole
+  that defeats it; mwcc 1.2 doesn't, and keeps the lsl/lsr shape.
+  Three jointly-required source elements pinned: (1) shift-extract
+  via unsigned cast (NOT mask); (2) stored in a named temp;
+  (3) explicit `if (t != 0u) return 1; return 0;`. Shipped 1
+  worked example (`src/main/func_020a584c.legacy.c`), deleted the
+  `.s`. New C-37 detector in `tools/predict_walls.py` covering
+  4 polarity × shift-width combos. 2 byte-low C-37 variants remain
+  as `.s` — recipe documented for decomper follow-up. Drive-by:
+  brief 212's `TestStragglerSmoke` tests updated to accept post-fix
+  idempotent state (the design-issue I flagged in last round's
+  brain-PR — scaffolder fixed it). Bonus finding: scaffolder
+  worktree has mwccarm.exe downloaded locally — direct compiler
+  invocation worked for the 23×8 variant matrix, bypassing the
+  ninja/dsd/objdiff orchestration constraint. EUR SHA1 PASS
+  preserved (tools + 1 worked-example swap).
+- **Brain-PR (this one) — close briefs 214 + 215, log Wall 1 + 2
+  for scaffolder follow-on.** 🔬 Verification + housekeeping. Both
+  PRs verified standalone in decomper + combined-merge for #672 on
+  top of #671. EUR SHA1 PASS preserved through both. AGENTS.md
+  Open briefs already empty from last round; added 214 + 215 to
+  Closed briefs. Next-brain TODO updated with Wall 2 classifier as
+  top scaffolder candidate (39 of 79 remaining easy-tier picks
+  blocked by single mechanism) + 2-byte-low C-37 + Thumb sweep as
+  decomper continuation options.
 - **PR #669 — decomper / brief 213 trivial-bucket revalidated sweep
   + Entry match.** 🎯 **31 ships** (4 + 8 + 18 across three waves).
   Wave 3 was an `ov002:0x0226acf8` dispatcher cluster — 18 thin
@@ -800,15 +848,16 @@ different reloc records than dsd's delink (post-link bytes match
 indicator. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Current (post #668 + #669 merge):**
+**Current (post #671 + #672 merge):**
 
 | Metric | Value | Notes |
 |---|---|---|
-| **complete_units** | **1,703 / 2,602** | SHA1-aligned headline. 65.45 %. +36 over post-#666/#667 (1,667 baseline at last round). |
-| matched_code_percent | **4.9799 %** | +0.82 pp this round (brief 213's 31 ships + brief 212's straggler flips combined). |
-| matched_functions | **1,740 / 9,801** (17.75 %) | +42 over post-#666/#667 baseline of 1,698. Includes brief 212 closing the last two `$d`-family stragglers. |
-| fuzzy_match_percent | **5.6781 %** | +1.17 pp this round |
+| **complete_units** | **1,749 / 2,660** | SHA1-aligned headline. 65.75 %. +46 over post-#668/#669 (1,703 baseline at last round). |
+| matched_code_percent | **5.0263 %** | +0.046 pp this round — mostly `.s` ships which are headline-light but complete-units-heavy. |
+| matched_functions | **1,786 / 9,801** (18.22 %) | +46 over post-#668/#669 baseline of 1,740. The brief 210 `$d → $a` chain credits `.s` ships cleanly now. |
+| fuzzy_match_percent | **5.7246 %** | +0.047 pp this round |
 | complete_code_percent | (per-unit) | for individual ships, 100 % means byte-identical at the linker level |
+| **easy-tier matched ratio** | **92.9 %** | up from 88.7 %. 79 unmatched easy-tier picks remain, of which 39 are Wall-2-blocked (leaf-no-pool reg-alloc divergence). |
 
 **Resumption queue:** [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
 — 52 picks across trivial (12) / easy (25) / medium-easy (15).
@@ -859,44 +908,65 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Scope brief 214 (scaffolder).** Top candidate:
-   **bit-test → 0/1 idiom C-N research.** Brief 213 surfaced 4
-   picks that shipped as `.s` because mwcc 2.0 collapses plain
-   `(x & 1) ? 1 : 0` to `tst r0,#1` instead of the orig
-   `lsl r0,r0,#31; movs r0,r0,lsr #31; movne r0,#1; moveq r0,#0`.
-   Investigate whether `(unsigned)x << 31 >> 31 != 0` or another
-   idiom reaches the orig shape under any tier; if not, classify
-   as C-N wall and ship a recipe. Sibling candidates if 214
-   needs a smaller scope: brief 201's "two pool loads" C-23 doc
-   correction (trivial); C-24 wall classifier extension; brief
-   197's mis-tagged C-15 `mvn #0` predictor refinement.
-2. **Scope brief 215 (decomper).** Two paths:
-   - **Continue trivial-bucket drain.** ~125 unmatched easy-tier
-     picks remaining per brief 213's revalidation. Brief 213's
-     recipe set (pool-load setters/getters, trampoline clusters,
-     bit-test `.s`) should drain another 20-40 in one round.
-   - **Hard-bucket pilot.** Per long-standing TODO + Track 2
-     emphasis. Pick ONE function ≥ 0x400 bytes (engine / game-loop
-     territory), treat as a multi-session decomp project, document
-     the process as the template for future hard-bucket work.
-     Slower headline impact but directly serves the
-     "human-readable C for every function" goal.
-   - Brain's recommendation: continue trivial-bucket drain this
-     round (momentum + easier verification cycle), pilot the
-     hard bucket as brief 217+ once the easy-tier remainder
+1. **Scope brief 216 (scaffolder).** TOP CANDIDATE this round:
+   **Wall 2 — leaf-no-pool reg-alloc divergence classifier.** Brief
+   215 surfaced this as the major drain blocker on the trivial
+   bucket: 39 of 79 remaining easy-tier picks share the shape
+   (small leaf functions, no pool, mostly struct-field access with
+   multiple loads/stores; mwcc 2.0's register choices + scheduling
+   diverge from orig in ways that don't track to source-form
+   differences). Worked examples from brief 215 PR body:
+   `func_0207d36c` (u16 xchg at struct offset, 0% fuzzy),
+   `func_0207db74` (copy + zero, 0% fuzzy), `func_02087d10`
+   (null-guarded nested setter, 37.5 % fuzzy), `func_02078ec8`
+   (50 % fuzzy). Goal: either (a) find a source recipe that
+   reaches the orig shape (long-shot — brief 215 already tried
+   the obvious C forms), or (b) classify as P-12 (permanent wall)
+   with a detector signal so decomper routes straight to `.s`
+   for these without iteration cycles. Either way unblocks the
+   biggest single trivial-bucket lane.
+2. **Scope brief 217 (decomper).** Easy-tier remainder drain.
+   ~40 picks remain that aren't Wall-2-blocked (79 total minus 39
+   Wall 2). Includes:
+   - **2 byte-low C-37 variants** (`func_ov000_021ab6cc.s`,
+     `func_ov000_021af5c0.s`) — brief 214 documented the recipe
+     but didn't ship them. Quick wins.
+   - **17 Thumb picks** — brief 191 C-31 recipe applies to
+     interwork shims; others need their own recipe. Could be a
+     dedicated Thumb sweep brief if many share shapes.
+   - **3 Wall 1 picks** (swap-tail-call register temp) — defer
+     until scaffolder's optional Wall 1 investigation lands, OR
+     ship as `.s` to clear the lane.
+   - Whatever else remains in the 40-pick "everything else"
+     residue.
+   - Target: 20+ ships, surface any further wall patterns.
+3. **Scope brief 218 (scaffolder) candidate.** Wall 1 —
+   swap-tail-call register temp. Brief 215 found 3 picks
+   (`func_0207842c`, `func_02078444`, `func_ov002_0229cd70`) where
+   orig wants `mov r3, r0; mov r0, r1; mov r1, r3` but plain
+   mwcc 2.0 picks r2 instead. Tried 4 source forms, none reach r3.
+   Smaller scope than Wall 2 (3 picks, not 39) but same flavour of
+   reg-alloc divergence. Reasonable as a 2-3 hour scaffolder
+   investigation once Wall 2 lands.
+4. **Carryover candidates from prior rounds:**
+   - **configure.py `arm9.o.xMAP` rule gap** — fresh worktrees
+     can't bootstrap a clean `ninja sha1` because the linker map
+     side-output isn't declared as a build output. Brief 216
+     candidate or sibling of brief 218. Onboarding pothole.
+   - **`.claude/agents/scaffolder.md` clarification** — scaffolder
+     discovered (brief 214) that mwccarm.exe is downloadable to
+     the worktree and runs natively; only `ninja`/`dsd`/`objdiff`
+     orchestration is off-limits. Worth a one-paragraph role-doc
+     update to unlock direct-compiler variant-matrix work for
+     future scaffolder briefs. Brain-side edit; can fold into the
+     next housekeeping brain-PR.
+   - **Hard-bucket pilot** (Track 2 long-form decomp). Stays
+     parked as brief 219+ candidate once easy-tier residue
      plateaus.
-3. **Scope brief 216 (scaffolder, infrastructure) candidate.**
-   `configure.py` `arm9.o.xMAP` rule gap surfaced in this
-   brain-PR. mwldarm emits `.xMAP` as a side-output of the link
-   step; configure.py doesn't declare it as a build output. Fresh
-   worktrees with no prior `build/eur/` can't bootstrap — `ninja
-   sha1` errors with `arm9.o.xMAP missing and no known rule to
-   make it`. Decomper has it on disk from prior builds so doesn't
-   hit. Fix: add `.xMAP` as an explicit output of the mwldarm
-   link rule in `configure.py`. Small change, removes a real
-   onboarding pothole. Test plan: validate by deleting the file
-   from a worktree's build/ and confirming ninja regenerates it.
-4. **Scope brain candidates to keep ready:**
+   - Brief 213's brief-201 doc correction, C-24 wall extension,
+     C-15 `mvn #0` refinement, P-11 reg-alloc-hint research —
+     all still available as smaller scaffolder slots.
+5. **Scope brain candidates to keep ready:**
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
    - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
@@ -910,7 +980,7 @@ sufficient.
      trivial doc edit (mwcc CSE'd already; the recipe still
      works but the explanation in pick #5's `.legacy.c` worked
      example is imprecise)
-5. **Deferred indefinitely (per pivot discipline):**
+6. **Deferred indefinitely (per pivot discipline):**
    - `data_020c9694` 14.8 KB D-3 mega
    - `data_ov002_022ccc2e` odd-aligned size=2
    - 34 remaining odd-aligned ov004 data symbols (brief 182
@@ -926,11 +996,11 @@ sufficient.
    - These items are NOT lost. If a code-decomp brief actively
      blocks on one, file the followup it deserves; otherwise
      leave them.
-6. **Pre-existing carryovers (unchanged):**
+7. **Pre-existing carryovers (unchanged):**
    - `func_ov021_021aaf58` placeholder-in-complete-TU warning.
    - ov005 placeholder-name warnings.
    - `match-invariants` not yet a required branch-protection check.
-7. **Known infrastructure state:**
+8. **Known infrastructure state:**
    - Agent-inbox hook fix landed in PR #634 but agent sessions
      started BEFORE that PR will continue to silently fail (Claude
      Code reads `.claude/settings.json` once at session start).
