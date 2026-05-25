@@ -8,6 +8,10 @@ src/overlay008/func_ov008_021b23ac.c:
     complete
     .text start:0x021b23ac end:0x021b23b8
 
+src/overlay008/func_ov008_021b1ee0.c:
+    complete
+    .text start:0x021b1ee0 end:0x021b1ef4
+
 
 
 
