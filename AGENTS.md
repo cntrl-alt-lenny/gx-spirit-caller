@@ -364,28 +364,62 @@ itself:
 
 ### Open briefs
 
-- **Brief 210 (HIGH, NEW)** — `scaffolder` post-process mwasmarm
-  `$d` → `$a` mapping symbols. Brief 209's root-cause diagnosis
-  identified all 23 stragglers as victims of mwasmarm tagging
-  `.word 0xHEX` directives as data; objdiff reads them as data
-  not code → fuzzy < 30% even when bytes are byte-identical.
-  Brief 210 implements brief 209's recommended path #1: post-build
-  rewrite `$d` → `$a` for `.word` values that decode as valid ARM
-  instructions. Least invasive (no source touches, no recipe
-  changes). Predicted recovery: matched_functions 1687 → ~1710
-  (+23 stragglers flip). Branch: `scaffolder/arm-mapping-symbol-rewrite`.
-- **Brief 211 (HIGH, NEW)** — `decomper` literal-tail drain +
-  BIOS thunk family drain. Two-phase. Phase 1: drain 5 literal-tail
-  picks deferred by brief 209 (brief 208's patcher fix makes the
-  recipe locked). Phase 2: drain ~30 named BIOS SWI thunks
-  (`LZ77UnCompReadByCallbackWrite16bit`, `Div`, `CpuSet`, etc.) at
-  4 bytes each — highest-leverage easy pick per
-  [`docs/research/unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md).
-  Expected total: ~35 ships, biggest single drain candidate yet.
-  Branch: `decomper/literal-tail-drain-plus-bios-thunk-family`.
+*(None — both agents idle pending next-round scoping. See
+[`docs/state.md`](docs/state.md) § Next-brain TODO for the
+candidate queue.)*
 
 ### Closed briefs (reference)
 
+- **Brief 213** — `decomper`, shipped in PR #669. 🎯 **31
+  trivial-bucket ships + `Entry` to 100%.** Three waves
+  (4 + 8 + 18); wave 3 is an `ov002:0x0226acf8` dispatcher
+  cluster shipped mechanically as `.s`. `Entry` lifted from
+  98.73% via a 3-region `relocs.txt` addition — same `$d`-family
+  cause as brief 209, config-side remediation. Re-validated
+  brief 211's survey-staleness rule: the 2026-05-25 survey's
+  "231 trivial" was a size-only bucket; fresh `next_targets.py`
+  showed 156 unmatched easy-tier, now 125 after the drain.
+  Surfaced bit-test → 0/1 idiom (`lsl/movs lsr; movne/moveq`) as
+  a new C-N wall candidate (4 picks shipped as `.s` because mwcc
+  2.0 collapses plain `(x & 1) ? 1 : 0` to `tst r0,#1`). Side
+  find: state.md's quoted `matched_functions=1698` was stale;
+  fresh build showed 1701. Metric deltas: `complete_units` 1672
+  → 1703 (+31), `matched_functions` 1701 → 1733 (+32). 3-region
+  SHA1 PASS + 27/27 modules + 0 invariant errors.
+- **Brief 212** — `scaffolder`, shipped in PR #668. 🎯 **Both
+  remaining brief-209 stragglers flip to 100%.**
+  `func_ov011_021cb574` and `func_ov011_021d02a4` close via a new
+  pass-2 trailing-collapse in `patch_arm_mapping_symbols.py` —
+  zeros trailing `$a` markers after the last `$d` data marker so
+  mwasm-built and dsd-delinked sides converge on implicit-`$d` to
+  end-of-text. Root cause: asymmetric `$d` emission (mwasm: one
+  `$d` per `.word` run; dsd: one `$d` per pool entry). Audit
+  dry-run predicted +11 flips; actual incremental over brief 213
+  was +7 (predictions shifted shape once #669's new src landed).
+  New `--sweep` mode for post-fix idempotency. 9 new tests
+  (16 → 25), ruff clean, EUR SHA1 PASS preserved.
+- **Brief 211** — `decomper`, shipped in PR #665. 🎯 **5/5
+  literal-tail picks shipped, BIOS-thunk family pre-empted as
+  no-op.** Phase 1 drained all 5 brief-209-deferred picks via
+  vanilla brief 202 `.s` recipe + brief 208's enhanced patcher
+  (only 1 was a true literal-tail; other 4 had symbol-ref tails
+  covered by brief 204). Phase 2 found all ~30 candidate BIOS
+  thunks were ALREADY matched by the brief 207 + 209 chain —
+  brain's PR #662 survey was stale. Empirical lesson captured
+  in headline: surveys older than ~3 briefs need re-validation
+  before scoping. `complete_units` +5, `matched_functions` +5.
+- **Brief 210** — `scaffolder`, shipped in PR #666. 🎯 **21 of
+  23 brief-209 stragglers flip to 100%.** New
+  `tools/patch_arm_mapping_symbols.py` (444 LOC) — walks `.symtab`,
+  finds `$d` mapping symbols pointing into `.text`, per-symbol
+  promotes all-arm / partial-arm / all-data ranges. Permissive
+  `is_likely_arm_instruction` heuristic (any non-`0xF` condition,
+  reject zero-word) — false-positives harmless because brief 210
+  invariant is byte-identical `.text` post-resolve. Wired into
+  `objdiff_report` chain alongside brief 206's resolve-relocs.
+  `matched_code_percent` 1.84 % → 3.71 % (+1.87 pp);
+  `matched_functions` 1687 → 1698 (+11). 2 unflipped stragglers
+  at 99.74 % / 98.76 % — both closed by brief 212.
 - **Brief 209** — `decomper`, shipped in PR #661. 🔬 **Root cause:
   mwasmarm `$d` mapping symbols.** Brain pre-validation hypothesis
   (address resolution gap) FALSIFIED empirically: brief 209 promoted
