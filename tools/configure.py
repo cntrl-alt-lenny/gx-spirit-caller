@@ -928,6 +928,20 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
         ],
         rule="mwld",
         outputs=elf_file,
+        # `arm9.o.xMAP` is a side-effect output of the mwldarm link
+        # (driven by `-map closure,unused` in LD_FLAGS). Declared
+        # here as an implicit_output so downstream consumers
+        # (`patch_ov004_veneers.py` via the `arm9_map` implicit
+        # input + the `rom_config` rule's implicit dependency below)
+        # see a clean dependency edge. Without this, fresh worktrees
+        # without a pre-existing `build/<ver>/arm9.o.xMAP` fail with
+        # "missing implicit dependency" during `ninja sha1` — brief
+        # 215 flagged this as a bootstrap blocker for any fresh
+        # scaffolder checkout. Brief 216 ships the declaration; the
+        # `-map` flag in LD_FLAGS already guarantees the file gets
+        # emitted, so this is purely a graph-correctness fix, no
+        # behavioral change for builds that previously succeeded.
+        implicit_outputs=arm9_map,
         variables={
             "target_dir": str(project.game_build),
             "objects_file": objects_file,

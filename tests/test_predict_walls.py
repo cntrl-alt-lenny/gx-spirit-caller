@@ -1359,5 +1359,118 @@ class TestC37Detection(unittest.TestCase):
         self.assertNotIn("C-37", {w.wall_id for w in walls})
 
 
+class TestC38Detection(unittest.TestCase):
+    """C-38: leaf-no-pool reg-alloc + CSE divergence.
+
+    Brief 216: small leaf functions doing struct-field load/store
+    with no pool reference and no callsite. mwcc 2.0 emits
+    early-returns + CSEs the repeated outer-pointer deref; orig
+    keeps the explicit deref and uses predicated execution. The
+    detector flags the shape so decomper routes to `.legacy.c`
+    with the substruct-ptr / char-cast / re-deref recipe rather
+    than burning iteration cycles on plain `.c` attempts.
+    """
+
+    def test_func_02087d10_shape_fires(self):
+        """The canonical brief 215 canary: null-guarded nested
+        setter with re-deref on the second store."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5903000", "ldr\tr3, [r0, #0]"),
+            _objdump_line(0x104, "e3530000", "cmp\tr3, #0"),
+            _objdump_line(0x108, "13a02001", "movne\tr2, #1"),
+            _objdump_line(0x10c, "11c323b4",
+                          "strneh\tr2, [r3, #0x34]"),
+            _objdump_line(0x110, "15900000", "ldrne\tr0, [r0, #0]"),
+            _objdump_line(0x114, "11c013b8",
+                          "strneh\tr1, [r0, #0x38]"),
+            _objdump_line(0x118, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c38 = [w for w in walls if w.wall_id == "C-38"]
+        self.assertEqual(len(c38), 1)
+        self.assertIn("leaf-no-pool", c38[0].cue)
+        self.assertIn("`.legacy.c`", c38[0].cue)
+
+    def test_func_0207d36c_shape_fires(self):
+        """Simpler u16 xchg with substruct-ptr intermediate."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e2802024",
+                          "add\tr2, r0, #0x24"),
+            _objdump_line(0x104, "e1d201b0",
+                          "ldrh\tr0, [r2, #0x10]"),
+            _objdump_line(0x108, "e1c211b0",
+                          "strh\tr1, [r2, #0x10]"),
+            _objdump_line(0x10c, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c38 = [w for w in walls if w.wall_id == "C-38"]
+        self.assertEqual(len(c38), 1)
+
+    def test_pool_load_skips_c38(self):
+        """A function that loads from a literal pool (`ldr rN,
+        [pc, #imm]`) is NOT C-38 — pool-loaded picks are
+        Wall-1 territory (different recipe family)."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e59f0014",
+                          "ldr\tr0, [pc, #0x14]"),
+            _objdump_line(0x104, "e5900058",
+                          "ldr\tr0, [r0, #0x58]"),
+            _objdump_line(0x108, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-38", {w.wall_id for w in walls})
+
+    def test_callsite_skips_c38(self):
+        """A function with a `bl` callsite is NOT C-38 — Wall-2
+        scope is leaf functions only."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900000", "ldr\tr0, [r0, #0]"),
+            _objdump_line(0x104, "eb000000", "bl\t0x10c"),
+            _objdump_line(0x108, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-38", {w.wall_id for w in walls})
+
+    def test_zero_load_store_skips_c38(self):
+        """A function with no load/store is NOT C-38 — too
+        trivial to exhibit the reg-alloc divergence."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e3a00000", "mov\tr0, #0"),
+            _objdump_line(0x104, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-38", {w.wall_id for w in walls})
+
+    def test_not_ending_in_bx_lr_skips_c38(self):
+        """A function ending in a tail-call (`bx ip`) or pool
+        word is NOT C-38 — those have their own wall families."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900000", "ldr\tr0, [r0, #0]"),
+            _objdump_line(0x104, "e5901004", "ldr\tr1, [r0, #4]"),
+            _objdump_line(0x108, "e12fff1c", "bx\tip"),  # tail call
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-38", {w.wall_id for w in walls})
+
+    def test_c37_takes_priority_over_c38(self):
+        """When both C-37 (bit-test idiom) and C-38 (leaf-no-pool)
+        would fire on the same disasm, C-37 wins — the more
+        specific shape gets the routing recommendation."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x104, "e1a00f80",
+                          "mov\tr0, r0, lsl #31"),
+            _objdump_line(0x108, "e1b00fa0",
+                          "movs\tr0, r0, lsr #31"),
+            _objdump_line(0x10c, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x110, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x114, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-37", ids)
+        self.assertNotIn("C-38", ids)
+
+
 if __name__ == "__main__":
     unittest.main()

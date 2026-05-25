@@ -108,6 +108,39 @@ predicate) need source-level context and aren't emitted here.
     #0` for "1 if zero/clear") and both shift widths (24, 31)
     on r0. See `docs/research/bit-test-0-or-1-idiom.md` for
     the matrix.
+  - **C-38** — leaf-no-pool reg-alloc + CSE divergence.
+    Small leaf functions doing struct-field load/store with
+    no pool reference and no callsite. mwcc 2.0 emits
+    early-returns (`bxeq lr` form) and CSEs repeated outer-
+    pointer derefs; the orig uses predicated execution
+    (`movne` / `strneh` / `ldrne` form) and keeps the
+    second deref explicit. Brief 215 attempted 8 picks as
+    plain C — all 8 failed at 0-60% fuzzy. Brief 216's
+    variant matrix found 4 of 7 reach orig bytes byte-for-
+    byte under the legacy `mwcc 1.2/sp2p3` tier from
+    specific source recipes:
+      1. `void *` outer field (not typed struct ptr) +
+         char-arithmetic for field access — keeps the
+         explicit offset arithmetic orig has.
+      2. Re-deref the outer pointer in the second store
+         instead of caching — defeats mwcc CSE on the
+         double-load shape.
+      3. Substruct pointer cached in a named local —
+         forces the `add rN, r0, #imm` intermediate that
+         orig uses instead of folding to a single offset.
+      4. `volatile` annotation for side-effect-only reads
+         — defeats DCE on dummy loads (and the volatile
+         sub-variant reaches under mwcc 2.0 too, no legacy
+         needed).
+    Routes: `.legacy.c` for predicated-exec / CSE-divergent
+    picks; plain `.c` (mwcc 2.0) for the volatile side-
+    effect sub-pattern. Detector flags the shape via
+    disasm signature (no pool ref + no call + >=1 load/
+    store + ends in `bx lr`) and surfaces the recipe
+    family so decomper picks the route at brief time
+    instead of burning C iterations. See
+    `docs/research/wall-2-leaf-no-pool-reg-alloc.md` for
+    the variant matrix.
 
 Walls NOT detected here (require source context):
 
@@ -770,6 +803,68 @@ def detect_walls(asm: str) -> list[WallPrediction]:
             walls.append(WallPrediction(
                 "C-37",
                 f"bit-test -> 0/1 idiom ({variant}) — {route}",
+            ))
+
+    # ----- C-38 leaf-no-pool reg-alloc + CSE divergence (brief 216).
+    #
+    # Brief 215 identified Wall 2 — small leaf functions doing
+    # struct-field load/store where mwcc 2.0's reg-alloc + CSE
+    # diverge from orig. mwcc 2.0 emits early-returns + CSEs the
+    # repeated outer-pointer deref; orig has predicated execution
+    # + keeps the second deref. Brief 216's variant matrix found
+    # 4 of 7 canaries reach orig bytes byte-for-byte under
+    # `mwcc 1.2/sp2p3` with substruct-ptr / char-cast / re-deref
+    # recipes; the volatile sub-pattern reaches under mwcc 2.0 too.
+    #
+    # Detection cue: function has no pool reference (no `ldr rN,
+    # [pc, ...]`), no callsite (`bl` / `blx`), >= 1 load OR store,
+    # and ends in `bx lr` (0xe12fff1e). The combination separates
+    # Wall 2 from C-31/32/24/etc. (which all involve pool or
+    # cross-mode dispatch) and from leaf functions too simple to
+    # exhibit the reg-alloc divergence (zero ld/st).
+    #
+    # Avoid double-fire: skip if C-37 already fired (the bit-test
+    # tail is a more specific shape, takes priority for routing
+    # recommendation).
+    has_c37 = any(w.wall_id == "C-37" for w in walls)
+    if not has_c37 and len(hex_words) >= 2:
+        # Scan all hex words for pool / call / ld-st / final-bx.
+        has_pool_load = any(
+            re.match(r"^e59f[0-9a-f]{4}$", hw)
+            or re.match(r"^e51f[0-9a-f]{4}$", hw)
+            for hw in hex_words
+        )
+        has_call = any(
+            # bl (any cond, including AL): bits 27-24 = 1011 ->
+            # high nibble of byte at offset 3 has bit 1 set
+            (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000
+            or (int(hw, 16) & 0x0FFF_FFF0) == 0x012F_FF30
+            for hw in hex_words
+        )
+        n_ld_st = 0
+        for hw in hex_words:
+            w = int(hw, 16)
+            # word ldr/str: bits 27-26 = 01 (single data transfer)
+            if (w & 0x0C00_0000) == 0x0400_0000:
+                n_ld_st += 1
+                continue
+            # halfword/byte extra ldrh/strh/ldrsb/ldrsh: bits 27-25
+            # = 000, bit 7=1, bit 4=1, bits 6-5 = halfword/byte form
+            if (w & 0x0E00_00F0) == 0x0000_00B0:  # ldrh/strh
+                n_ld_st += 1
+        ends_bx_lr = hex_words[-1] == "e12fff1e"
+        if (
+            not has_pool_load
+            and not has_call
+            and n_ld_st >= 1
+            and ends_bx_lr
+        ):
+            walls.append(WallPrediction(
+                "C-38",
+                f"leaf-no-pool reg-alloc/CSE divergence "
+                f"({n_ld_st} load/store, no pool, no call) — try "
+                "`.legacy.c` with substruct-ptr / char-cast / "
+                "re-deref recipe (brief 216 matrix)",
             ))
 
     return walls
