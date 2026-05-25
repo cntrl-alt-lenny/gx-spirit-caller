@@ -259,3 +259,49 @@ followup territory.
   Thumb-skip, mass-rename fallback, idempotency, malformed
   input, real-fixture smoke.
 - This file — appended this section.
+
+## Brief 212 outcome — pass 2 collapse closes both stragglers
+
+**Status (2026-05-25):** the residual divergence on the two
+stragglers had a concrete, structural root cause — NOT a
+post-resolve literal mismatch as this section originally
+speculated. See
+[`docs/research/d-a-rewriter-corpus-audit.md`](d-a-rewriter-corpus-audit.md)
+for the full investigation; summary here.
+
+**Mechanism**: asymmetric `$d` emission between mwasmarm (one
+`$d` per `.word` *run*) and dsd delink (one `$d` per *pool
+entry*). When a literal pool contains a `cond==0xF` word like
+`0xffe01fff` (a common mask constant) followed by ARM-like
+words, pass 1's per-symbol promotion produces divergent shapes:
+mwasm's split-`$d` extends implicit-`$d` to end-of-`.text`;
+dsd's per-entry `$d`s after the data word get individually
+promoted to `$a`. The mapping divergence classifies those
+trailing bytes as code on the dsd side, data on the mwasm
+side. The exact `1520 × (1 - 99.7368)% = 4 bytes` (1 word) and
+`1292 × (1 - 98.7616)% = 16 bytes` (4 words) match the trailing
+words after `0xffe01fff` in each straggler's pool.
+
+**Fix**: pass 2 added to `rewrite_mapping_symbols` — after the
+per-symbol promotion pass, zero `st_name` on every `$a` whose
+`st_value > last_data_offset`. Both sides converge on
+implicit-`$d` from the last data marker to end-of-`.text`,
+matching dsd's intended pool extent. Idempotent.
+
+**Corpus impact**: 12 units total benefit (10 target-only,
+2 both-sides), 11 of them currently uncredited stragglers in
+the 89.66% – 99.80% fuzzy range that slipped below brief 209's
+fuzzy-<70% investigation threshold. Predicted aggregate:
+`matched_functions +11` post-fix. Needs brain's local
+`ninja report` to confirm.
+
+**Files touched** (in brief 212 PR):
+
+- `tools/patch_arm_mapping_symbols.py` — pass 2 collapse +
+  `--sweep` audit mode + `process_o_file(..., dry_run=True)`.
+- `tests/test_patch_arm_mapping_symbols.py` — 9 new tests
+  (5 collapse-behaviour synthetic, 2 straggler smoke,
+  1 sweep, 1 dry-run).
+- `docs/research/d-a-rewriter-corpus-audit.md` — new audit
+  report.
+- This file — appended this section.

@@ -39,7 +39,9 @@ from patch_arm_mapping_symbols import (  # noqa: E402
     STT_OBJECT,
     MappingSymbolRewriteError,
     is_likely_arm_instruction,
+    process_o_file,
     rewrite_mapping_symbols,
+    sweep_objdiff_json,
 )
 
 
@@ -537,6 +539,289 @@ class TestMalformedInput(unittest.TestCase):
     def test_truncated_header_raises(self) -> None:
         with self.assertRaises(MappingSymbolRewriteError):
             rewrite_mapping_symbols(b"\x7fELF" + b"\x00" * 10)
+
+
+# --------------------------------------------------------------------------- #
+# Brief 212 — trailing-promotion collapse + sweep mode
+# --------------------------------------------------------------------------- #
+
+
+class TestTrailingPromotionCollapse(unittest.TestCase):
+    """Pass 2 — when per-entry `$d` markers from a dsd-style delink
+    surround a trailing data `$d`, the ARM-like words after it get
+    promoted individually to `$a`. The mwasm-built side has implicit-
+    `$d` coverage there instead. Pass 2 collapses the over-promoted
+    trailing `$a`s by zeroing their `st_name`, so enumerators see
+    implicit-`$d` on both sides. See brief 212 corpus audit report.
+    """
+
+    def test_trailing_arm_after_data_d_collapsed(self) -> None:
+        # Reproduce the straggler shape: per-entry $d markers in a
+        # pool, including one cond=0xF data word and one ARM-like
+        # word AFTER it. Pre-pass-1: $a@0, $d@4 ARM, $d@8 ARM,
+        # $d@12 cond=0xF, $d@16 ARM. Pass 1 promotes the three
+        # ARM-like $d's to $a. Pass 2 should collapse the trailing
+        # $a@16 because it's after the only remaining $d@12.
+        text = (
+            struct.pack("<I", 0xE92D4070)   # 0x00 ARM (code)
+            + struct.pack("<I", 0xE3A00001)   # 0x04 ARM (pool word 1 → promote)
+            + struct.pack("<I", 0xE3A00002)   # 0x08 ARM (pool word 2 → promote)
+            + struct.pack("<I", 0xFFE01FFF)   # 0x0C cond=0xF (data, stays)
+            + struct.pack("<I", 0x0400000C)   # 0x10 ARM (pool word 3 → COLLAPSED)
+        )
+        elf = _build_arm_elf(
+            text_bytes=text,
+            mapping_symbols=[
+                ("$a", 0), ("$d", 4), ("$d", 8), ("$d", 12), ("$d", 16),
+            ],
+        )
+        new_elf, info = rewrite_mapping_symbols(elf)
+        # Pass 1: 3 promoted ($d@4, $d@8, $d@16), 1 left as data ($d@12).
+        self.assertEqual(info["d_promoted"], 3)
+        self.assertEqual(info["d_left_as_data"], 1)
+        # Pass 2: $a@16 (just promoted) is > last_data_offset (12),
+        # so it's collapsed. Trailing_promoted_collapsed counts it.
+        self.assertEqual(info["trailing_promoted_collapsed"], 1)
+        # Post-rewrite mapping: $a@0, $a@4, $a@8, $d@12. NO $a@16.
+        marks = _collect_mapping(new_elf)
+        offsets = [v for _, v, _ in marks]
+        self.assertNotIn(16, offsets, "trailing $a@16 should be collapsed")
+        # The remaining symbols are intact.
+        self.assertEqual(
+            sorted((n, v) for n, v, _ in marks),
+            [("$a", 0), ("$a", 4), ("$a", 8), ("$d", 12)],
+        )
+
+    def test_no_collapse_when_all_data(self) -> None:
+        # When the trailing $a is from a PRE-EXISTING $a (not a
+        # promotion in this run), the collapse rule still removes
+        # it — by design. The corpus shape doesn't have code after
+        # trailing pool data, so this is the right call. Test
+        # documents the behavior so future readers don't regress
+        # the rule into "only promoted symbols collapse".
+        text = (
+            struct.pack("<I", 0xE92D4070)   # ARM code
+            + struct.pack("<I", 0xFFE01FFF)   # data
+            + struct.pack("<I", 0xE3A00001)   # ARM (real $a in symtab)
+        )
+        elf = _build_arm_elf(
+            text_bytes=text,
+            mapping_symbols=[("$a", 0), ("$d", 4), ("$a", 8)],
+        )
+        new_elf, info = rewrite_mapping_symbols(elf)
+        # $d@4 covers [4, 8). 0xFFE01FFF is data → stays. d_seen=1,
+        # d_left=1, d_promoted=0. Pass 2 finds $a@8 (real, not just
+        # promoted) > last_data=4, collapses it.
+        self.assertEqual(info["trailing_promoted_collapsed"], 1)
+        marks = _collect_mapping(new_elf)
+        offsets = [v for _, v, _ in marks]
+        self.assertNotIn(8, offsets)
+
+    def test_no_collapse_when_no_data_d(self) -> None:
+        # When pass 1 promotes ALL $d's (no data $d remains),
+        # last_data_offset is None and pass 2 doesn't fire. Trailing
+        # $a's stay intact — they're not "after a data marker"
+        # since there's no data marker.
+        text = (
+            struct.pack("<I", 0xE92D4070)
+            + struct.pack("<I", 0xE3A00001)
+            + struct.pack("<I", 0xE3A00002)
+            + struct.pack("<I", 0xE3A00003)
+        )
+        elf = _build_arm_elf(
+            text_bytes=text,
+            mapping_symbols=[("$a", 0), ("$d", 4), ("$d", 8), ("$d", 12)],
+        )
+        new_elf, info = rewrite_mapping_symbols(elf)
+        # All $d → $a.
+        self.assertEqual(info["d_promoted"], 3)
+        self.assertEqual(info["d_left_as_data"], 0)
+        # No data $d, no collapse.
+        self.assertEqual(info["trailing_promoted_collapsed"], 0)
+        marks = _collect_mapping(new_elf)
+        # All four mapping symbols still present, all $a.
+        self.assertEqual(len(marks), 4)
+        for name, _v, _t in marks:
+            self.assertEqual(name, "$a")
+
+    def test_middle_a_preserved(self) -> None:
+        # $a's in the middle of code regions (before the last $d)
+        # are NOT collapsed. Only $a's whose st_value > the LAST $d
+        # are touched. This protects real $a markers from mnemonic
+        # emission that sit in normal code regions.
+        text = (
+            struct.pack("<I", 0xE92D4070)   # 0x00 code
+            + struct.pack("<I", 0xE3A00001)   # 0x04 $a (real, from bl mnemonic)
+            + struct.pack("<I", 0xE3A00002)   # 0x08 $d ARM → promoted
+            + struct.pack("<I", 0xFFE01FFF)   # 0x0C $d data (stays)
+        )
+        elf = _build_arm_elf(
+            text_bytes=text,
+            mapping_symbols=[
+                ("$a", 0), ("$a", 4), ("$d", 8), ("$d", 12),
+            ],
+        )
+        new_elf, info = rewrite_mapping_symbols(elf)
+        # $d@8 → $a, $d@12 stays as data.
+        self.assertEqual(info["d_promoted"], 1)
+        self.assertEqual(info["d_left_as_data"], 1)
+        # $a@0, $a@4, $a@8 (just promoted) are all <= last_data@12,
+        # so NONE collapse. $a@4 (middle real $a) is preserved.
+        self.assertEqual(info["trailing_promoted_collapsed"], 0)
+        marks = _collect_mapping(new_elf)
+        offsets = [v for _, v, _ in marks]
+        self.assertIn(4, offsets)
+
+    def test_idempotency_after_collapse(self) -> None:
+        # Re-running the rewriter on a post-collapse file should
+        # produce no further changes — even though the trailing $a
+        # is gone, the post-pass-2 state has fewer mapping symbols
+        # for pass 1 to see and pass 2 finds no $a beyond last_data.
+        text = (
+            struct.pack("<I", 0xE92D4070)
+            + struct.pack("<I", 0xE3A00001)
+            + struct.pack("<I", 0xFFE01FFF)
+            + struct.pack("<I", 0x0400000C)
+        )
+        elf = _build_arm_elf(
+            text_bytes=text,
+            mapping_symbols=[
+                ("$a", 0), ("$d", 4), ("$d", 8), ("$d", 12),
+            ],
+        )
+        once, info1 = rewrite_mapping_symbols(elf)
+        twice, info2 = rewrite_mapping_symbols(once)
+        self.assertEqual(once, twice)
+        # Second pass: $d@8 still as data, no $a to collapse.
+        self.assertEqual(info2["trailing_promoted_collapsed"], 0)
+
+
+class TestStragglerSmoke(unittest.TestCase):
+    """Verify the brief 212 fix on the brief 209 stragglers' real
+    `.o.resolved` files, if a sibling decomper worktree has built
+    them. Skipped on fresh checkouts."""
+
+    def _decomper_build(self) -> Path | None:
+        """Look for a sibling decomper worktree's build tree. Brief
+        212 was implemented on a Windows host where the worktrees
+        sit at `C:/Users/leona/Dev/gx-spirit-caller/<role>/`. Tests
+        check a few common parent layouts before giving up."""
+        candidates = [
+            Path("../decomper/build/eur"),
+            Path("../../decomper/build/eur"),
+            Path("C:/Users/leona/Dev/gx-spirit-caller/decomper/build/eur"),
+        ]
+        for c in candidates:
+            if c.is_dir():
+                return c.resolve()
+        return None
+
+    def test_021cb574_collapses_one_trailing_a(self) -> None:
+        dec = self._decomper_build()
+        if dec is None:
+            self.skipTest("no decomper build tree found")
+        delinks = list(
+            dec.glob("delinks/**/func_ov011_021cb574.o.resolved")
+        )
+        if not delinks:
+            self.skipTest("straggler delink .o.resolved not present")
+        buf = delinks[0].read_bytes()
+        _new_buf, info = rewrite_mapping_symbols(buf)
+        # Brief 212 expectation: collapse exactly 1 trailing $a (the
+        # 0x0400000c word after the 0xffe01fff data word).
+        self.assertEqual(info["trailing_promoted_collapsed"], 1)
+
+    def test_021d02a4_collapses_four_trailing_a(self) -> None:
+        dec = self._decomper_build()
+        if dec is None:
+            self.skipTest("no decomper build tree found")
+        delinks = list(
+            dec.glob("delinks/**/func_ov011_021d02a4.o.resolved")
+        )
+        if not delinks:
+            self.skipTest("straggler delink .o.resolved not present")
+        buf = delinks[0].read_bytes()
+        _new_buf, info = rewrite_mapping_symbols(buf)
+        # Brief 212 expectation: 4 trailing $a's collapsed (the four
+        # ARM-like pool entries after the 0xffe01fff data word).
+        self.assertEqual(info["trailing_promoted_collapsed"], 4)
+
+
+class TestSweepMode(unittest.TestCase):
+    """`--sweep` audit mode: walk an objdiff.json without modifying
+    the .o files, return per-unit shape rows + would_change flag."""
+
+    def test_sweep_returns_per_unit_rows(self) -> None:
+        # Build two minimal ELFs — one all-arm, one all-data — and
+        # a synthetic objdiff.json pointing at them. The sweep
+        # walker should return one row per (unit, kind) pair with
+        # pre/post shape counts and a would_change flag.
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            arm_elf = _build_arm_elf(
+                text_bytes=struct.pack("<I", 0xE92D4070)
+                + struct.pack("<I", 0xE8BD8070),
+                mapping_symbols=[("$a", 0), ("$d", 4)],
+            )
+            data_elf = _build_arm_elf(
+                text_bytes=struct.pack("<I", 0)
+                + struct.pack("<I", 0),
+                mapping_symbols=[("$d", 0)],
+            )
+            (tmp_path / "arm.o").write_bytes(arm_elf)
+            (tmp_path / "data.o").write_bytes(data_elf)
+            json_path = tmp_path / "objdiff.json"
+            json_path.write_text(json.dumps({
+                "units": [
+                    {"name": "u_arm", "target_path": "arm.o",
+                     "base_path": "arm.o"},
+                    {"name": "u_data", "target_path": "data.o",
+                     "base_path": "data.o"},
+                ],
+            }))
+            rows = sweep_objdiff_json(json_path)
+            # 2 units × 2 kinds = 4 rows.
+            self.assertEqual(len(rows), 4)
+            # Files on disk unchanged (sweep is read-only).
+            self.assertEqual(
+                (tmp_path / "arm.o").read_bytes(), arm_elf,
+                "sweep must not modify .o files",
+            )
+            self.assertEqual(
+                (tmp_path / "data.o").read_bytes(), data_elf,
+            )
+            # The arm file would change ($d→$a), the data file wouldn't.
+            by_name = {(r["name"], r["kind"]): r for r in rows}
+            self.assertTrue(by_name[("u_arm", "target")]["would_change"])
+            self.assertFalse(by_name[("u_data", "target")]["would_change"])
+
+
+class TestDryRunOption(unittest.TestCase):
+    """`process_o_file(..., dry_run=True)` computes changes without
+    writing them back. Used by `--sweep` internally and by other
+    audit tooling."""
+
+    def test_dry_run_does_not_write(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "test.o"
+            elf = _build_arm_elf(
+                text_bytes=struct.pack("<I", 0xE92D4070)
+                + struct.pack("<I", 0xE8BD8070),
+                mapping_symbols=[("$a", 0), ("$d", 4)],
+            )
+            p.write_bytes(elf)
+            changed, info = process_o_file(p, dry_run=True)
+            self.assertTrue(changed)
+            self.assertEqual(info["d_promoted"], 1)
+            # File on disk is unchanged.
+            self.assertEqual(p.read_bytes(), elf)
+            # Without dry_run, file gets modified.
+            changed2, _info2 = process_o_file(p, dry_run=False)
+            self.assertTrue(changed2)
+            self.assertNotEqual(p.read_bytes(), elf)
 
 
 if __name__ == "__main__":
