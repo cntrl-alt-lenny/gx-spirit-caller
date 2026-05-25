@@ -4626,7 +4626,7 @@ src/main/func_02092368.s:
     complete
     .text start:0x02092368 end:0x02092380
 
-src/main/func_0207d36c.s:
+src/main/func_0207d36c.legacy.c:
     complete
     .text start:0x0207d36c end:0x0207d37c
 
@@ -4638,7 +4638,7 @@ src/main/func_02067b8c.s:
     complete
     .text start:0x02067b8c end:0x02067ba8
 
-src/main/func_02087d10.s:
+src/main/func_02087d10.legacy.c:
     complete
     .text start:0x02087d10 end:0x02087d2c
 

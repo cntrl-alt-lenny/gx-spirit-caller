@@ -4718,6 +4718,7 @@ byte-for-byte. Verified empirically across 23 source variants ×
     `src/main/func_020a584c.legacy.c`.
   - **N=24** — `.c` (mwcc 2.0/sp1p5) with the shift-extract
     idiom adapted for byte width:
+
     ```c
     int g(void) {
         int x = global_struct.field;  /* byte at offset 0x58 */
@@ -4726,6 +4727,7 @@ byte-for-byte. Verified empirically across 23 source variants ×
         return 0;
     }
     ```
+
     No worked example shipped — needs the extern symbol
     structure that varies per pick; recipe documented for
     decomper to apply (brief 215+ candidate territory).
@@ -4755,6 +4757,87 @@ mwccarm directly invokable, found the exact source idiom under
 legacy + 2.0 tiers, shipped `func_020a584c.legacy.c` as a
 worked example, added the detector + tests. Full matrix at
 [`bit-test-0-or-1-idiom.md`](bit-test-0-or-1-idiom.md).
+
+### C-38. Leaf-no-pool reg-alloc + CSE divergence
+
+**The wall.** Small leaf functions (size ≤ 0x20, no callsite,
+no pool reference) doing struct-field load/store where mwcc
+2.0's reg-alloc and CSE diverge from orig in two consistent
+ways:
+
+  1. **CSE collapses repeated outer-pointer deref**. When the
+     source has `*w->inner` twice (e.g. once before a guard
+     check, once inside), mwcc 2.0 caches into a single load
+     and reuses. The orig has two explicit `ldr` instructions
+     against the same `[r0, #0]` slot.
+  2. **Early-return instead of predicated execution**. mwcc 2.0
+     prefers `cmp + bxeq lr + <body>` (early-return); the orig
+     uses `cmp + movne/strneh/ldrne` (predicated execution
+     across the whole body). The two shapes differ in
+     instruction count AND opcode.
+
+Brief 215 (PR #671) attempted 8 picks (`func_0207d36c`,
+`_0207db74`, `_02087d10`, `_02078ec8`, `_0207d304`, `_0207dee0`,
+`_02078ed8`, `_02078eec`) as plain `.c` under mwcc 2.0 — all
+failed at 0-60% fuzzy. The shapes are tiny (10-28 bytes) and
+should be trivially expressible in C, but mwcc 2.0's
+peepholes consistently produce a different shape than orig.
+
+**The fix.** Brief 216's variant matrix (4 canaries × ~5
+source variants × 8 mwccarm tiers) found the orig shape
+reaches under `mwcc 1.2/sp2p3` (legacy tier) from these
+recipe ingredients:
+
+  1. **`void *` outer field** (NOT a typed struct pointer) +
+     char-arithmetic for field access. Forces explicit
+     `add rN, r0, #imm` for the substruct base instead of
+     mwcc 2.0's folded offset.
+  2. **Re-deref the outer pointer in the second store** rather
+     than caching to a local. mwcc 1.2 doesn't apply CSE
+     across the explicit re-deref; mwcc 2.0 does.
+  3. **Substruct pointer cached in a named local** — keeps the
+     `add rN, r0, #0x24` intermediate the orig has for
+     multi-field substruct access. Use a `struct Sub`
+     declaration so the field access is natural.
+  4. **`volatile` annotation for side-effect-only reads** —
+     defeats DCE on dummy loads. The volatile sub-variant
+     ALSO reaches under mwcc 2.0 — no legacy needed.
+
+Routes:
+
+  - **`.legacy.c`** for picks needing predicated execution or
+    CSE divergence (the common case — `func_02087d10`,
+    `_0207d36c`, `_0207db74` all need this tier).
+  - **`.c`** with `volatile` for the side-effect-load
+    sub-pattern (`func_02078ec8` — mwcc 2.0 reaches).
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-38 when ALL of:
+
+  - No pool reference (no `ldr rN, [pc, #imm]`).
+  - No callsite (no `bl` / `blx`).
+  - ≥ 1 word load OR halfword load/store anywhere in the
+    function.
+  - Ends in `bx lr` (0xe12fff1e).
+
+C-37 takes priority — if the bit-test tail is present, the
+detector recommends the C-37 recipe instead. The cue text
+includes the load/store count so decomper sees how
+"struct-accessor-shaped" the pick is.
+
+**Use when:** the classifier flags C-38 — try `.legacy.c`
+with the substruct-ptr + char-cast + re-deref recipe (see
+`docs/research/wall-2-leaf-no-pool-reg-alloc.md` for the full
+variant matrix and worked examples).
+
+**Provenance:** brief 215 (PR #671) flagged Wall 2 as the
+major drain blocker on the trivial bucket (39 of 79
+remaining easy-tier picks share the shape). Brief 216 (this
+entry) ran the variant matrix on 4 canaries, found the
+recipe reaches under mwcc 1.2/sp2p3 byte-for-byte, shipped
+`func_02087d10.legacy.c` + `func_0207d36c.legacy.c` as
+worked examples, added the detector + tests. Full matrix at
+[`wall-2-leaf-no-pool-reg-alloc.md`](wall-2-leaf-no-pool-reg-alloc.md).
 
 ## Permanent (11 patterns)
 
