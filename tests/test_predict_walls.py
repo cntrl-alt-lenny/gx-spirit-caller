@@ -1215,5 +1215,149 @@ class TestC36Detection(unittest.TestCase):
         self.assertEqual(preds, [])
 
 
+class TestC37Detection(unittest.TestCase):
+    """C-37: bit-test / byte-zero check normalised to 0/1 via the
+    redundant-tail idiom.
+
+    Brief 214 found four polarity × shift-width combinations in the
+    wild — bit-0 extract (`lsl/lsr #31`) and byte-low zero check
+    (`lsl/lsr #24`), each with `1-if-set` and `1-if-zero` mov
+    polarities. The detector matches all four via exact hex word
+    tails ending in `bx lr`.
+    """
+
+    def test_bit0_extract_returns_1_if_set(self):
+        """func_020a584c shape: bit-0 of a word → 0 or 1.
+        Idiom from brief 213 wave 1."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x104, "e1a00f80",
+                          "mov\tr0, r0, lsl #31"),
+            _objdump_line(0x108, "e1b00fa0",
+                          "movs\tr0, r0, lsr #31"),
+            _objdump_line(0x10c, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x110, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x114, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c37 = [w for w in walls if w.wall_id == "C-37"]
+        self.assertEqual(len(c37), 1)
+        self.assertIn("bit-0 extract", c37[0].cue)
+        self.assertIn("`.legacy.c`", c37[0].cue)
+
+    def test_byte_zero_check_returns_1_if_zero(self):
+        """func_ov000_021ab6cc shape: low byte of *(global + 0x58)
+        zero → return 1. Idiom from brief 213 wave 2."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e59f0014",
+                          "ldr\tr0, [pc, #0x14]"),
+            _objdump_line(0x104, "e5900058",
+                          "ldr\tr0, [r0, #0x58]"),
+            _objdump_line(0x108, "e1a00c00",
+                          "mov\tr0, r0, lsl #24"),
+            _objdump_line(0x10c, "e1b00c20",
+                          "movs\tr0, r0, lsr #24"),
+            _objdump_line(0x110, "03a00001", "moveq\tr0, #1"),
+            _objdump_line(0x114, "13a00000", "movne\tr0, #0"),
+            _objdump_line(0x118, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c37 = [w for w in walls if w.wall_id == "C-37"]
+        self.assertEqual(len(c37), 1)
+        self.assertIn("byte-low extract", c37[0].cue)
+        self.assertIn("1 if zero", c37[0].cue)
+        # Byte-low extract routes to plain `.c` (mwcc 2.0 reaches).
+        self.assertIn("idiom", c37[0].cue)
+
+    def test_bit0_extract_returns_1_if_zero(self):
+        """Inverted polarity of the bit-0 idiom (moveq #1; movne #0).
+        Synthetic — no canonical pick observed yet, but the
+        detector should still flag for safety."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x104, "e1a00f80",
+                          "mov\tr0, r0, lsl #31"),
+            _objdump_line(0x108, "e1b00fa0",
+                          "movs\tr0, r0, lsr #31"),
+            _objdump_line(0x10c, "03a00001", "moveq\tr0, #1"),
+            _objdump_line(0x110, "13a00000", "movne\tr0, #0"),
+            _objdump_line(0x114, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c37 = [w for w in walls if w.wall_id == "C-37"]
+        self.assertEqual(len(c37), 1)
+        self.assertIn("1 if zero", c37[0].cue)
+
+    def test_byte_extract_returns_1_if_set(self):
+        """Inverted polarity for byte-low check (movne #1; moveq #0).
+        Synthetic — covers the fourth polarity combination."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900058",
+                          "ldr\tr0, [r0, #0x58]"),
+            _objdump_line(0x104, "e1a00c00",
+                          "mov\tr0, r0, lsl #24"),
+            _objdump_line(0x108, "e1b00c20",
+                          "movs\tr0, r0, lsr #24"),
+            _objdump_line(0x10c, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x110, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x114, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        c37 = [w for w in walls if w.wall_id == "C-37"]
+        self.assertEqual(len(c37), 1)
+        self.assertIn("byte-low extract", c37[0].cue)
+        self.assertIn("1 if set", c37[0].cue)
+
+    def test_no_match_when_bx_lr_missing(self):
+        """The detector requires `bx lr` (0xe12fff1e) as the very
+        last word. A function ending differently (e.g. with a
+        trailing literal pool word) should NOT match — the tail
+        check is anchored on the final word."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e1a00f80",
+                          "mov\tr0, r0, lsl #31"),
+            _objdump_line(0x104, "e1b00fa0",
+                          "movs\tr0, r0, lsr #31"),
+            _objdump_line(0x108, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x10c, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x110, "e12fff1e", "bx\tlr"),
+            # trailing data word — disrupts the tail check
+            _objdump_line(0x114, "deadbeef", ".word\t0xdeadbeef"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-37", {w.wall_id for w in walls})
+
+    def test_no_match_for_tst_form(self):
+        """The mwcc 2.0 collapsed form `tst r0, #1; movne #1;
+        moveq #0; bx lr` is NOT a C-37 — it's the well-matched
+        shape that doesn't need legacy routing. The detector
+        must distinguish."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x104, "e3100001", "tst\tr0, #1"),
+            _objdump_line(0x108, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x10c, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x110, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-37", {w.wall_id for w in walls})
+
+    def test_no_match_for_shift_pair_without_movXX_tail(self):
+        """The shift pair alone (without the redundant 0/1
+        materialisation tail) shouldn't fire. mwcc compiling the
+        bitfield idiom often produces `lsl/lsr; bx lr` — which
+        is the simpler 12-byte shape, not C-37."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x104, "e1a00f80",
+                          "mov\tr0, r0, lsl #31"),
+            _objdump_line(0x108, "e1a00fa0",
+                          "mov\tr0, r0, lsr #31"),  # no `s` flag
+            _objdump_line(0x10c, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-37", {w.wall_id for w in walls})
+
+
 if __name__ == "__main__":
     unittest.main()

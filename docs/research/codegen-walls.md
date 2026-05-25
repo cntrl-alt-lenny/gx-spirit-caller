@@ -4648,6 +4648,114 @@ protect and found the literal-tail case still fails. Brief
 example. Full diagnosis at
 [`first-wave-wall-literal-tail-trim.md`](first-wave-wall-literal-tail-trim.md).
 
+### C-37. Bit-test / byte-zero check normalised to 0/1 via redundant-tail idiom
+
+**The wall.** mwcc 2.0/sp1p5 collapses `(x & 1) ? 1 : 0` to
+`tst r0, #1; movne #1; moveq #0; bx lr` (5 instructions). The
+orig has the longer 6-instruction `lsl/lsr/movne/moveq/bx`
+shape:
+
+```asm
+ldr   r0, [r0, #0x4]
+mov   r0, r0, lsl #31      ; bit-0 -> bit-31
+movs  r0, r0, lsr #31      ; back to bit-0, set flags
+movne r0, #1               ; redundant — value already 0/1
+moveq r0, #0               ; ditto
+bx    lr
+```
+
+The `movne #1; moveq #0` tail is functionally redundant after
+the `movs lsr #31` (which already leaves 0 or 1 in r0). mwcc
+1.2 lacks the bit-test peephole, so it emits the explicit
+shift-test sequence; mwcc 2.0's peephole spots `(x << N) >> N`
+as a mask and collapses to `tst rN, #(1<<N)`.
+
+Two sub-variants exist in the corpus:
+
+  - **N=31 (bit-0 extract)** — `lsl/lsr #31`. Returns the value
+    of bit 0 as 0 or 1. Only the legacy tier reaches the orig
+    shape; mwcc 2.0 always collapses. Pick: `func_020a584c`
+    (brief 213 wave 1).
+  - **N=24 (byte-low zero check)** — `lsl/lsr #24`. Returns 1
+    if the low byte is zero, else 0 (note inverted polarity:
+    `moveq #1; movne #0`). mwcc 2.0 reaches the orig shape
+    from the `(unsigned)(x << 24) >> 24` idiom directly — the
+    bit-test peephole only fires on `N==1` (single-bit) tests,
+    not 8-bit. Picks: `func_ov000_021ab6cc`,
+    `func_ov000_021af5c0` (brief 213 wave 2).
+
+**The fix.** Source idiom that defeats the bit-test peephole
+under mwcc 2.0 (or works directly on either tier when N=24):
+
+```c
+int f(int *p) {
+    unsigned t = (unsigned)(p[1] << 31) >> 31;
+    if (t != 0u) return 1;
+    return 0;
+}
+```
+
+Two structural choices matter:
+
+  1. **Shift-extract via temp** (`unsigned t = (unsigned)(x <<
+     N) >> N`) — NOT `(x & mask)` or `(x & 1) ? ...`. The shift
+     form leaves the compiler's analysis less able to recognise
+     "this is a bit test" and skip the explicit shift emission.
+  2. **`if (t != 0u) return 1; return 0;`** — NOT `return t !=
+     0u;` or `return t ? 1 : 0;`. The explicit if/return forces
+     mwcc to materialise the literal 0/1 with mov{cond}
+     instructions rather than reusing the register value (which
+     it knows is already 0 or 1).
+
+Together these defeat both peepholes and reach the orig shape
+byte-for-byte. Verified empirically across 23 source variants ×
+8 mwcc revisions in brief 214's matrix (see
+[`bit-test-0-or-1-idiom.md`](bit-test-0-or-1-idiom.md)).
+
+**Recipe.**
+
+  - **N=31** — `.legacy.c` (mwcc 1.2/sp2p3). Worked example:
+    `src/main/func_020a584c.legacy.c`.
+  - **N=24** — `.c` (mwcc 2.0/sp1p5) with the shift-extract
+    idiom adapted for byte width:
+    ```c
+    int g(void) {
+        int x = global_struct.field;  /* byte at offset 0x58 */
+        unsigned t = ((unsigned)x << 24) >> 24;
+        if (t == 0u) return 1;
+        return 0;
+    }
+    ```
+    No worked example shipped — needs the extern symbol
+    structure that varies per pick; recipe documented for
+    decomper to apply (brief 215+ candidate territory).
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+matches on the function's TAIL — exact 5-word hex sequence
+anchored on `bx lr` (0xe12fff1e). The detector covers all
+four polarity × shift-width combinations:
+
+| lsl word    | lsr word    | mov #1     | mov #0     | Variant                  |
+|-------------|-------------|------------|------------|--------------------------|
+| `e1a00f80`  | `e1b00fa0`  | `13a00001` | `03a00000` | bit-0, 1 if set          |
+| `e1a00f80`  | `e1b00fa0`  | `03a00001` | `13a00000` | bit-0, 1 if zero         |
+| `e1a00c00`  | `e1b00c20`  | `13a00001` | `03a00000` | byte-low, 1 if set       |
+| `e1a00c00`  | `e1b00c20`  | `03a00001` | `13a00000` | byte-low, 1 if zero      |
+
+Scope: r0 destination only (all brief 213/214 picks use r0).
+Future widening to other Rd registers when surfaced.
+
+**Use when:** the classifier flags C-37 — route to `.legacy.c`
+if N=31, plain `.c` (with shift-extract idiom) if N=24.
+
+**Provenance:** brief 213 (PR #669) shipped 3 picks as `.s`
+when plain C didn't reach. Brief 214 (this entry) ran a 23
+× 8 source × tier matrix on a Windows scaffolder host with
+mwccarm directly invokable, found the exact source idiom under
+legacy + 2.0 tiers, shipped `func_020a584c.legacy.c` as a
+worked example, added the detector + tests. Full matrix at
+[`bit-test-0-or-1-idiom.md`](bit-test-0-or-1-idiom.md).
+
 ## Permanent (11 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source

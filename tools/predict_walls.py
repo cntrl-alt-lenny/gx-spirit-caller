@@ -89,6 +89,25 @@ predicate) need source-level context and aren't emitted here.
     affected functions so the decomper knows the path is
     open. Brief 207 PR #660 deferred 6 picks for exactly this
     reason — all now shippable under the brief 208 build.
+  - **C-37** — bit-test / byte-zero check normalised to 0/1
+    via the redundant-tail idiom: `lsl #N; movs lsr #N;
+    mov{cond} #1; mov{!cond} #0; bx lr` where N is 31
+    (bit-0 extract) or 24 (low-byte zero check). mwcc 2.0
+    collapses the natural `(x & 1) ? 1 : 0` C form to `tst
+    r0, #1; movne #1; moveq #0` — 1 instruction shorter,
+    different shape. Brief 214's variant matrix found the
+    shape DOES reach from C, but only under the legacy
+    `1.2/sp2p3` tier (mwcc 1.2 lacks the bit-test peephole
+    mwcc 2.0 added). Source idiom for bit-extract:
+    `unsigned t = (unsigned)(x << 31) >> 31; if (t != 0u)
+    return 1; return 0;` Routes through `.legacy.c`. The
+    byte-zero variant (N=24) reaches from mwcc 2.0 directly
+    via the same shift-extract source — only the bit-0 form
+    triggers the peephole. Detector matches both polarities
+    (`movne #1; moveq #0` for "1 if set"; `moveq #1; movne
+    #0` for "1 if zero/clear") and both shift widths (24, 31)
+    on r0. See `docs/research/bit-test-0-or-1-idiom.md` for
+    the matrix.
 
 Walls NOT detected here (require source context):
 
@@ -687,6 +706,71 @@ def detect_walls(asm: str) -> list[WallPrediction]:
             ".word target`) — ship as `.s` with explicit "
             "`.thumb` directive per brief 191 recipe",
         ))
+
+    # ----- C-37 bit-test / byte-zero check normalised to 0/1.
+    #
+    # Brief 214: the redundant-tail idiom:
+    #
+    #     mov  rD, rS, lsl #N         ; N = 24 (byte) or 31 (bit-0)
+    #     movs rD, rS, lsr #N         ; mirror shift, set flags
+    #     mov{cond}  rD, #1           ; cond is NE (returns 1 if set)
+    #     mov{!cond} rD, #0           ;        OR EQ (returns 1 if zero)
+    #     bx   lr
+    #
+    # mwcc 2.0/sp1p5 collapses `(x & 1) ? 1 : 0` to `tst r0, #1;
+    # movne #1; moveq #0` — 1 instruction shorter, different shape.
+    # The legacy tier (`mwcc 1.2/sp2p3`) doesn't have this peephole
+    # and emits the orig shape from the source idiom
+    # `unsigned t = (unsigned)(x << 31) >> 31; if (t != 0u) ...`.
+    #
+    # For the byte-zero (N=24) variant, mwcc 2.0 ALSO reaches the
+    # orig shape from the same source pattern — only the bit-0
+    # (N=31) variant triggers the peephole. So C-37 splits into
+    # two sub-routes: N=31 -> `.legacy.c`; N=24 -> `.c` with the
+    # specific shift-extract idiom (NOT `(x & 0xff) == 0`).
+    #
+    # Detection uses the hex_words list collected for C-31 and
+    # matches on the function's TAIL (last 5 hex words):
+    #
+    #   - lsl #N word: 0xe1a00X80 where X = (N/2) & 0xf
+    #     (N=24 -> 0xe1a00c00; N=31 -> 0xe1a00f80)
+    #   - movs lsr #N word: 0xe1b00X20 (N=24) or 0xe1b00Xa0 (N=31)
+    #     The bottom nibble (0x20 vs 0xa0) encodes the shift-type
+    #     bits (01=lsr) + amount LSBs combined; we hard-code the
+    #     two exact values rather than re-derive.
+    #   - movne/moveq r0, #1 / r0, #0 in either polarity
+    #   - bx lr (0xe12fff1e) as the very last word
+    #
+    # Scope: r0 only (all brief 213/214 picks use r0). Future
+    # widening to other Rd registers when surfaced.
+    C37_TAILS = {
+        # (lsl_word, lsr_word, mov_first, mov_second): variant_label
+        ("e1a00c00", "e1b00c20", "13a00001", "03a00000"):
+            "byte-low extract, 1 if set",
+        ("e1a00c00", "e1b00c20", "03a00001", "13a00000"):
+            "byte-low extract, 1 if zero",
+        ("e1a00f80", "e1b00fa0", "13a00001", "03a00000"):
+            "bit-0 extract, 1 if set",
+        ("e1a00f80", "e1b00fa0", "03a00001", "13a00000"):
+            "bit-0 extract, 1 if zero",
+    }
+    if len(hex_words) >= 5 and hex_words[-1] == "e12fff1e":
+        tail = tuple(hex_words[-5:-1])
+        if tail in C37_TAILS:
+            variant = C37_TAILS[tail]
+            # Determine routing based on shift width
+            shift_amt = 31 if "f80" in tail[0] else 24
+            if shift_amt == 31:
+                route = "`.legacy.c` (mwcc 1.2/sp2p3 — mwcc 2.0 " \
+                        "peepholes this to `tst` shape)"
+            else:
+                route = "`.c` with `(unsigned)(x << 24) >> 24` " \
+                        "idiom (mwcc 2.0 reaches; not the natural " \
+                        "`(x & 0xff)` form)"
+            walls.append(WallPrediction(
+                "C-37",
+                f"bit-test -> 0/1 idiom ({variant}) — {route}",
+            ))
 
     return walls
 
