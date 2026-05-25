@@ -481,6 +481,10 @@ def rewrite_mapping_symbols(
       - `mass_renamed`: `True` if the strtab-overwrite fallback
         fired (only when no existing `$a` slot exists AND all
         `$d` ranges were all-arm)
+      - `trailing_promoted_collapsed`: number of promoted-`$a`
+        symbols (originally `$d`) zeroed out in pass 2 because
+        they followed the last stayed-`$d` and represented
+        over-promotion of per-entry pool markers
       - `strtab_size`: the strtab's `sh_size` (for diagnostics)
 
     Idempotent: after the first pass, all `$d` symbols either
@@ -501,6 +505,39 @@ def rewrite_mapping_symbols(
       3. **all-data range** — no change. Common for inline
          literal pools and the canonical `$d` shape mwccarm
          emits.
+
+    Pass 2 — trailing-promotion collapse (brief 212)
+    ------------------------------------------------
+
+    After per-symbol pass 1, scan the post-pass-1 mapping symbols
+    for the last `$d` that stayed as data. Any `$a` symbol AFTER
+    that offset that was PROMOTED in pass 1 (originally `$d`, now
+    `$a` because its single-word range decoded as ARM-like) is
+    zeroed out (st_name = 0) so enumerators skip it.
+
+    Why this matters (brief 212 corpus-wide audit): asymmetric
+    `$d` emission between mwasmarm (one `$d` for a whole `.word`
+    run) and dsd's delink (one `$d` per pool entry) is fine when
+    the rewriter's per-symbol promotion produces matching shapes.
+    It breaks when the literal pool contains a single
+    `cond==0xF` word (e.g. `0xffe01fff`, a common mask constant)
+    near — but NOT AT — the end: mwasm's side splits its single
+    `$d` to mark `0xffe01fff` as data and implicit-`$d` extends
+    to end-of-section; dsd's side has per-entry `$d` markers and
+    pass 1 over-promotes the ARM-like words AFTER `0xffe01fff`
+    individually, leaving a trailing `$a` that classifies those
+    bytes as code. Pass 2 reverts the trailing per-entry
+    over-promotion so both sides agree the implicit `$d` runs
+    from the last data marker to end-of-`.text`.
+
+    Real `$a` markers (originally `$a` in the symtab — e.g. from
+    a real `bl`/`bx` mnemonic) are NEVER touched. Only the
+    promoted ones (tracked by their sym_offset in pass 1) are
+    eligible for collapse.
+
+    See `docs/research/d-a-rewriter-corpus-audit.md` for the
+    straggler diagnosis and `docs/research/brief-209-stragger-
+    investigation.md` § "Brief 212 outcome".
     """
     out = bytearray(buf)
     info = {
@@ -509,6 +546,7 @@ def rewrite_mapping_symbols(
         "d_split": 0,
         "d_left_as_data": 0,
         "mass_renamed": False,
+        "trailing_promoted_collapsed": 0,
         "strtab_size": 0,
     }
 
@@ -581,10 +619,16 @@ def rewrite_mapping_symbols(
         out, strtab_offset, strtab_size_estimate=strtab_size or 0x10000,
     )
     if a_offset is not None:
+        # Pass 1: per-symbol promote / split / leave. Track which
+        # `$d` stayed as data (all-data or post-split) so pass 2
+        # can find the latest data offset.
+        last_data_offset: int | None = None
         for sym, boundary, range_start, range_end in d_classified:
             if boundary == range_start:
                 # All data — leave alone.
                 info["d_left_as_data"] += 1
+                if last_data_offset is None or range_start > last_data_offset:
+                    last_data_offset = range_start
                 continue
             if boundary == range_end:
                 # All ARM — promote to $a. Two updates:
@@ -614,6 +658,49 @@ def rewrite_mapping_symbols(
                 "<I", out, sym.sym_offset + ST_VALUE, boundary,
             )
             info["d_split"] += 1
+            if last_data_offset is None or boundary > last_data_offset:
+                last_data_offset = boundary
+
+        # Pass 2 — trailing-promotion collapse. When dsd's per-pool-
+        # entry `$d` emission combines with pass 1's per-symbol
+        # promotion, the side with per-entry markers ends up with
+        # `$a` markers AFTER the last data `$d` (one per pool word
+        # whose value happens to decode as ARM-like). The other side
+        # (mwasm-built, one `$d` per `.word` run) gets the entire
+        # tail covered by a single split `$d` that extends implicit-
+        # `$d` to end-of-`.text`. The asymmetry classifies the same
+        # bytes as code on one side and data on the other, which is
+        # exactly the brief 209 straggler shape (1-4 instruction
+        # mismatch on the trailing pool words after `0xffe01fff`).
+        #
+        # Fix: zero `st_name` on every `$a` with `st_value >
+        # last_data_offset`. This removes those `$a` markers from
+        # any enumerator's view (mapping syms with name index 0 are
+        # treated as anonymous/skip), so implicit-`$d` extends from
+        # the last data marker to end-of-section on both sides.
+        #
+        # Safety: this catches ALL trailing `$a`s, not just ones we
+        # just promoted. That's deliberate — the rewriter is
+        # idempotent so a second invocation can't see the "I just
+        # promoted this" set. Sweeping every trailing `$a` is also
+        # the right call structurally: the trailing region of any
+        # function-as-its-own-TU `.s` is always its literal pool
+        # (data); a real `$a` after the pool start would require
+        # executable code AFTER the pool, which doesn't appear in
+        # this corpus (every `.s` ship surveyed for brief 212 has
+        # code-then-pool layout, no code-after-pool).
+        if last_data_offset is not None:
+            # Re-enumerate post-pass-1 to find any $a > last_data.
+            post_syms = _enumerate_mapping_symbols(
+                out, text_idx, symtab_offset, symtab_size,
+                strtab_offset,
+            )
+            for s in post_syms:
+                if s.name == "$a" and s.st_value > last_data_offset:
+                    struct.pack_into(
+                        "<I", out, s.sym_offset + ST_NAME, 0,
+                    )
+                    info["trailing_promoted_collapsed"] += 1
         return bytes(out), info
 
     # Mass-rename fallback: no existing $a in strtab. Only safe if
@@ -654,11 +741,16 @@ def rewrite_mapping_symbols(
 
 def process_o_file(
     path: Path,
+    *,
+    dry_run: bool = False,
 ) -> tuple[bool, dict]:
     """Apply `rewrite_mapping_symbols` to the file in-place. Returns
     `(changed, info)` where `changed` is `True` if any rewrite
     happened. Idempotent — re-running on a file that has nothing
     to promote is a fast no-op.
+
+    With `dry_run=True`, computes what would change but does NOT
+    write back to disk. Used by `--sweep` audit mode.
     """
     try:
         buf = path.read_bytes()
@@ -672,8 +764,9 @@ def process_o_file(
         info["d_promoted"] > 0
         or info["d_split"] > 0
         or info["mass_renamed"]
+        or info.get("trailing_promoted_collapsed", 0) > 0
     )
-    if changed:
+    if changed and not dry_run:
         path.write_bytes(new_buf)
     return changed, info
 
@@ -721,14 +814,123 @@ def process_objdiff_json(
     return processed, skipped, failures
 
 
+# --------------------------------------------------------------------------- #
+# Sweep / audit mode — brief 212
+# --------------------------------------------------------------------------- #
+
+
+def sweep_objdiff_json(
+    path: Path,
+    *,
+    project_root: Path | None = None,
+) -> list[dict]:
+    """Audit-mode walk: for every unit in `path`, run the rewriter
+    against target + base `.o`s WITHOUT modifying them, and return
+    a per-unit row of pre/post mapping-symbol counts and the
+    rewriter's `info` dict.
+
+    Used by the brief 212 corpus audit (and `--sweep` CLI) to
+    surface units where the rewriter has nothing to do (no-op),
+    where it makes a partial change (split / trailing-collapse),
+    and where it makes no headway despite ARM-like data (blind
+    spot). Idempotent — sweep against an already-rewritten tree
+    reports zero changes everywhere.
+
+    Each row has keys:
+      - `name`: the unit name from objdiff.json (post-step
+        relative paths usually look like
+        `build/eur/src/<module>/<func>.o.resolved`)
+      - `kind`: `"target"` (built side) or `"base"` (orig/dsd
+        delink side)
+      - `path`: absolute path of the .o file inspected
+      - `text_size`, `pre_a_count`, `pre_d_count`,
+        `post_a_count`, `post_d_count`: shape stats
+      - `info`: the `rewrite_mapping_symbols` info dict
+      - `would_change`: True if the rewriter would alter the file
+    """
+    project_root = (project_root or path.parent).resolve()
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    units = data.get("units", [])
+    rows: list[dict] = []
+    for unit in units:
+        unit_name = unit.get("name", "?")
+        for kind, key in (("target", "target_path"), ("base", "base_path")):
+            rel = unit.get(key, "")
+            if not rel:
+                continue
+            full = (project_root / rel).resolve()
+            if not full.is_file():
+                rows.append({
+                    "name": unit_name, "kind": kind, "path": str(full),
+                    "error": "file not found",
+                })
+                continue
+            try:
+                buf = full.read_bytes()
+            except OSError as e:
+                rows.append({
+                    "name": unit_name, "kind": kind, "path": str(full),
+                    "error": f"read error: {e}",
+                })
+                continue
+            try:
+                pre = _shape_counts(buf)
+                new_buf, info = rewrite_mapping_symbols(buf)
+                post = _shape_counts(new_buf)
+            except MappingSymbolRewriteError as e:
+                rows.append({
+                    "name": unit_name, "kind": kind, "path": str(full),
+                    "error": f"rewrite error: {e}",
+                })
+                continue
+            would_change = (
+                info["d_promoted"] > 0
+                or info["d_split"] > 0
+                or info["mass_renamed"]
+                or info.get("trailing_promoted_collapsed", 0) > 0
+            )
+            rows.append({
+                "name": unit_name, "kind": kind, "path": str(full),
+                "text_size": pre[0],
+                "pre_a_count": pre[1], "pre_d_count": pre[2],
+                "post_a_count": post[1], "post_d_count": post[2],
+                "info": info, "would_change": would_change,
+            })
+    return rows
+
+
+def _shape_counts(buf: bytes) -> tuple[int, int, int]:
+    """Return `(text_size, $a count, $d count)` from buf's symtab.
+
+    Defensive: returns `(0, 0, 0)` on parse errors so the caller
+    can still emit a row even when the file is malformed.
+    """
+    try:
+        (text_idx, _text_off, text_size,
+         sym_off, sym_size, str_off) = _find_text_symtab_strtab(buf)
+    except MappingSymbolRewriteError:
+        return 0, 0, 0
+    try:
+        syms = _enumerate_mapping_symbols(
+            buf, text_idx, sym_off, sym_size, str_off,
+        )
+    except MappingSymbolRewriteError:
+        return text_size, 0, 0
+    a = sum(1 for s in syms if s.name == "$a")
+    d = sum(1 for s in syms if s.name == "$d")
+    return text_size, a, d
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=(
             "Rewrite `$d` mapping symbols to `$a` for .text "
             "ranges that decode as ARM instructions. Brief 210 "
             "fix for objdiff matched_functions under-counting "
-            "on brief 192's C-32 hand-encoded BL recipe. "
-            "Idempotent."
+            "on brief 192's C-32 hand-encoded BL recipe. Brief "
+            "212 added pass-2 trailing-promotion collapse and "
+            "the --sweep audit mode. Idempotent."
         ),
     )
     ap.add_argument(
@@ -746,10 +948,86 @@ def main(argv: list[str] | None = None) -> int:
         "--verbose", "-v", action="store_true",
         help="Print the full failure list (default just summary).",
     )
+    ap.add_argument(
+        "--sweep", action="store_true",
+        help="Audit mode (brief 212): walk every unit + run the "
+             "rewriter against target/base .o files WITHOUT "
+             "modifying them, then print a per-unit table of "
+             "pre/post $a + $d counts. Useful for surfacing "
+             "blind spots (rewriter no-op despite obvious need) "
+             "and verifying the rewriter is idempotent across a "
+             "tree. Combine with --verbose for per-unit detail.",
+    )
+    ap.add_argument(
+        "--sweep-only-changed", action="store_true",
+        help="Sweep mode (requires --sweep): only print units "
+             "where the rewriter would change at least one .o. "
+             "Quick way to find what's left after the rewriter "
+             "has already run (idempotent expectation = empty "
+             "output).",
+    )
     args = ap.parse_args(argv)
     if not args.in_path.is_file():
         print(f"error: {args.in_path} not found", file=sys.stderr)
         return 1
+
+    if args.sweep:
+        rows = sweep_objdiff_json(
+            args.in_path, project_root=args.project_root,
+        )
+        # Group by unit name; print one table row per unit pair.
+        units: dict[str, dict[str, dict]] = {}
+        for r in rows:
+            units.setdefault(r["name"], {})[r["kind"]] = r
+        printed = 0
+        hdr = (
+            f"{'unit':<60} {'b$a':>4} {'b$d':>4} {'bp$a':>4} {'bp$d':>4} "
+            f"{'B$a':>4} {'B$d':>4} {'Bp$a':>4} {'Bp$d':>4} {'B?Δ':>4}"
+        )
+        print(hdr)
+        print("-" * len(hdr))
+        for uname, kinds in sorted(units.items()):
+            t = kinds.get("target", {})
+            b = kinds.get("base", {})
+            change_target = t.get("would_change", False)
+            change_base = b.get("would_change", False)
+            if args.sweep_only_changed and not (change_target or change_base):
+                continue
+            mark = "*" if (change_target or change_base) else ""
+            def fmt(d, k):
+                v = d.get(k)
+                return str(v) if v is not None else "-"
+            print(
+                f"{uname[:60]:<60} "
+                f"{fmt(t,'pre_a_count'):>4} {fmt(t,'pre_d_count'):>4} "
+                f"{fmt(t,'post_a_count'):>4} {fmt(t,'post_d_count'):>4} "
+                f"{fmt(b,'pre_a_count'):>4} {fmt(b,'pre_d_count'):>4} "
+                f"{fmt(b,'post_a_count'):>4} {fmt(b,'post_d_count'):>4} "
+                f"{mark:>4}"
+            )
+            printed += 1
+        print(
+            f"sweep: {len(units)} units inspected, "
+            f"{printed} rows printed",
+            file=sys.stderr,
+        )
+        if args.verbose:
+            # Dump full info dicts for changed-only or all per flag.
+            for uname, kinds in sorted(units.items()):
+                change = (
+                    kinds.get("target", {}).get("would_change", False)
+                    or kinds.get("base", {}).get("would_change", False)
+                )
+                if args.sweep_only_changed and not change:
+                    continue
+                print(f"\n  {uname}:", file=sys.stderr)
+                for kind, r in kinds.items():
+                    print(
+                        f"    {kind}: {r.get('info', r.get('error'))}",
+                        file=sys.stderr,
+                    )
+        return 0
+
     processed, skipped, failures = process_objdiff_json(
         args.in_path, project_root=args.project_root,
     )
