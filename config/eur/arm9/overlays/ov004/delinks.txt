@@ -75,6 +75,10 @@ src/overlay004/func_ov004_021d38b4.c:
     complete
     .text start:0x021d38b4 end:0x021d38c4
 
+src/overlay004/func_ov004_021db860.c:
+    complete
+    .text start:0x021db860 end:0x021db874
+
 libs/nitro/func_ov004_021c9eec.legacy.c:
     complete
     .text start:0x021c9eec end:0x021c9ef0
