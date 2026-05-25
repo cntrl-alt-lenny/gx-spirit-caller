@@ -1324,3 +1324,8 @@ src/overlay006/data/data_ov006_021cd808.s:
 src/overlay006/data/data_ov006_021cda88.s:
     complete
     .data start:0x021cda88 end:0x021cdd08
+
+
+src/overlay006/func_ov006_021be948.s:
+    complete
+    .text start:0x021be948 end:0x021bee68

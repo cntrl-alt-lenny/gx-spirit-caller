@@ -11,3 +11,8 @@ src/overlay001/data_ov001_021ca348.c:
 src/overlay001/bss/data_ov001_bss.s:
     complete
     .bss start:0x021ca420 end:0x021ca440
+
+
+src/overlay001/func_ov001_021ca144.s:
+    complete
+    .text start:0x021ca144 end:0x021ca2d8

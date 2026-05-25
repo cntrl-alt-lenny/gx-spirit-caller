@@ -86,3 +86,8 @@ src/overlay014/bss/data_ov014_bss.s:
 src/overlay014/data_ov014_021b4bf8.c:
     complete
     .rodata start:0x021b4bf8 end:0x021b4c08
+
+
+src/overlay014/func_ov014_021b2908.s:
+    complete
+    .text start:0x021b2908 end:0x021b2eec

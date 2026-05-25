@@ -2003,3 +2003,28 @@ src/overlay002/func_ov002_021b91c4.c:
 src/overlay002/func_ov002_02211808.c:
     complete
     .text start:0x02211808 end:0x02211824
+
+
+src/overlay002/func_ov002_021c4c9c.s:
+    complete
+    .text start:0x021c4c9c end:0x021c7f48
+
+src/overlay002/func_ov002_021e4ba8.s:
+    complete
+    .text start:0x021e4ba8 end:0x021e71a4
+
+src/overlay002/func_ov002_022476e8.s:
+    complete
+    .text start:0x022476e8 end:0x022477a0
+
+src/overlay002/func_ov002_02247ad8.s:
+    complete
+    .text start:0x02247ad8 end:0x02247b6c
+
+src/overlay002/func_ov002_02247b6c.s:
+    complete
+    .text start:0x02247b6c end:0x022482d0
+
+src/overlay002/func_ov002_022b595c.s:
+    complete
+    .text start:0x022b595c end:0x022b8098
