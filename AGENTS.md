@@ -15,7 +15,7 @@ in plain English — see *Adding or retiring agents* near the bottom.
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, picks direction, merges PRs, adds/retires agents, final authority.                                                                              | —                                                              | —                                                                               |
 | **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
-| **scaffolder**    | Any LLM session without local toolchain access (Claude web, Codex web, …)                 | **Scaffolder & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Cannot run local builds, so delegates verification to brain.                                                                                                                                | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
+| **scaffolder**    | Any LLM session in a sibling worktree with mwccarm but without the full build pipeline (baserom / `dsd` / `objdiff`) | **Scaffolder, source-recipe researcher & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Runs **direct `mwccarm.exe` variant matrices** for source-codegen wall research (briefs 214, 216 pattern — compile snippet, parse ELF, diff bytes against orig delinks). Cannot run `ninja rom` / `dsd check modules` / `ninja objdiff`, so delegates **final ROM** verification to brain.                                                                                                                                | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **decomper**      | Any LLM session on cntrl_alt_lenny's PC or Mac, with toolchain + baserom (separate session from brain) | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
 Extend this table when a new agent joins; see *Adding or retiring
@@ -364,12 +364,64 @@ itself:
 
 ### Open briefs
 
-*(None — both agents idle pending next-round scoping. See
-[`docs/state.md`](docs/state.md) § Next-brain TODO for the
-candidate queue.)*
+- **Brief 218** — `scaffolder`. **Wall 1 broader + brief 214 Shape B
+  verdict.** Two-investigation brief, variant-matrix pattern per
+  briefs 214/216. (A) Empirically test reg-allocator hints on the 4
+  Wall 1 canaries (3 swap-tail-call + the new non-swap
+  `func_ov002_021b4254` from brief 217); ship recipe (C-39) or
+  classify permanent (P-12). (B) Re-test brief 214 Shape B on the 2
+  actual picks (`func_ov000_021ab6cc`, `func_ov000_021af5c0`) with
+  full struct context — brief 217 falsified the synthetic-snippet
+  claim. Outcome: P-12 amendment to bit-test-0-or-1-idiom.md, or a
+  new full-context recipe. Branch:
+  `scaffolder/wall-1-broader-and-c37-shape-b-verdict`.
+- **Brief 219** — `decomper`. **C-38 drain via brief 216 recipes.**
+  Apply Recipes A/B/C/D from `wall-2-leaf-no-pool-reg-alloc.md` to
+  the 38 remaining unmatched easy-tier picks (all leaf-no-pool, sizes
+  0x10-0x20). Includes shipping brief 216's documented-but-unshipped
+  canaries (`func_0207db74` Recipe C, `func_02078ec8` Recipe D). Aim
+  for ≥35 of 38 ships, easy-tier matched ratio 96.6 % → 99 %+.
+  Stretch: brief 214 Shape B re-test on the 2 picks with full struct
+  context. Branch: `decomper/c38-drain-easy-tier-remainder`.
 
 ### Closed briefs (reference)
 
+- **Brief 217** — `decomper`, shipped in PR #675. 🎯 **41 easy-tier
+  ships + brief 214 Shape B falsified.** Easy-tier matched ratio
+  92.9 % → 96.6 %; unmatched 79 → 38 picks. Recipe routing 7 C +
+  34 `.s`. C-success rate 17 % (vs 13 % brief 215, 26 % brief 213)
+  reflects the harder slice of easy-tier. **Empirical falsification:**
+  brief 214 § Shape B claimed `b2`/`b4` reach 32-byte orig shape via
+  mwcc 2.0; tested on actual picks both mwcc 2.0 AND 1.2/sp2p3
+  collapse to a 5-insn `ands; moveq #1; movne #0; bx lr` (20B), NOT
+  orig's 7-insn `lsl/lsr; movs; moveq/movne; bx lr` (28B). 2 picks
+  remain `.s` — flagged for brief 218 verdict (P-12 or new recipe).
+  **Wall 1 broader finding:** `func_ov002_021b4254` is a pool-load +
+  tail-call with **no swap**, just orig r2 vs mwcc r1 — same
+  reg-allocator family as brief 215's swap-tail-call Wall 1 but a
+  wider trigger. Brief 218 candidate. Metric deltas: `matched_functions`
+  1786 → 1827 (+41), `complete_units` 1749 → 1790 (+41),
+  `matched_code_percent` 5.026 → 5.072 (+0.046 pp). 3-region SHA1
+  PASS + 27/27 modules + 0 invariant errors.
+- **Brief 216** — `scaffolder`, shipped in PR #674. 🎯 **C-38 Wall 2
+  leaf-no-pool reg-alloc unlocked.** Variant matrix (7 canaries × 7
+  source forms × 8 tiers) found 4 of 7 canaries reach orig
+  byte-for-byte under mwcc 1.2/sp2p3 (legacy), and the side-effect-
+  read sub-pattern reaches under mwcc 2.0 with `volatile`. Three
+  source recipes pinned (Recipe A: null-guarded nested setter with
+  re-deref + char-cast; Recipe B: substruct-ptr exchange with cached
+  substruct base; Recipe C: copy-and-zero substruct ptr; Recipe D:
+  volatile side-effect read). 2 worked examples shipped
+  (`src/main/func_02087d10.legacy.c` Recipe A,
+  `src/main/func_0207d36c.legacy.c` Recipe B). C-38 detector added
+  to `tools/predict_walls.py` (+ 7 unit tests); hits 18 strict
+  Wall-2 picks on the current EUR worklist (100 % of brief-215's
+  canaries). 3 deferred canaries — sub-pattern variations needing
+  more source iteration. Drive-by: `tools/configure.py` xMAP rule
+  gap closed (declares `arm9.o.xMAP` as ninja output for clean fresh-
+  clone bootstrap). Research note:
+  `docs/research/wall-2-leaf-no-pool-reg-alloc.md`. EUR SHA1 PASS
+  preserved.
 - **Brief 215** — `decomper`, shipped in PR #671. 🎯 **46
   trivial-bucket ships** (12 + 8 + 26 across three waves), well
   above the 20-40 target. Easy-tier matched ratio 88.7 % → 92.9 %;
