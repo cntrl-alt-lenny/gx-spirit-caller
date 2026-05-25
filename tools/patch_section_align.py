@@ -39,6 +39,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import re
 import struct
 import sys
 from pathlib import Path
@@ -249,6 +250,8 @@ def _rel_offsets_targeting_section(
 
 def trim_text_section_padding(
     data: bytes | bytearray,
+    *,
+    delinks_slot_size: int | None = None,
 ) -> tuple[bytearray, list[tuple[str, int, int]]]:
     """Reverse mwasmarm's automatic 4-byte-size `.text` padding.
 
@@ -267,23 +270,40 @@ def trim_text_section_padding(
       - the last 2 bytes of the section's content are `0x00 0x00`,
       - AND NO relocation patches the last 4 bytes (brief 204 fix:
         otherwise a legit reloc-placeholder pool word's trailing
-        zeros look like mwasm padding to the heuristic).
+        zeros look like mwasm padding to the heuristic),
+      - AND `delinks_slot_size` either is `None` or differs from
+        `sh_size` (brief 208 fix: if delinks declares the TU's
+        intended `.text` size and mwasm emitted exactly that many
+        bytes, the trailing zeros are real literal content, not
+        padding — don't trim).
     …it trims `sh_size` by 2. Returns (patched_bytes, changes) where
     each change is `(name, old_size, new_size)`.
 
     The trim-trigger is deliberately narrow: only even-sized `.text`
-    sections with trailing NULs AND no protecting reloc qualify.
-    Legit 8-byte Thumb functions that happen to end in `bx lr; nop`
-    have the `nop` encoded as `0xBF00` (or `0x46C0`), not `0x0000`,
-    so they don't match the byte-pattern trigger. `0x0000` is not a
-    valid Thumb instruction in the ARMv5TE ISA — it's mwasm's pad
-    byte, period.
+    sections with trailing NULs AND no protecting reloc AND no
+    delinks-size match qualify. Legit 8-byte Thumb functions that
+    happen to end in `bx lr; nop` have the `nop` encoded as
+    `0xBF00` (or `0x46C0`), not `0x0000`, so they don't match the
+    byte-pattern trigger. `0x0000` is not a valid Thumb instruction
+    in the ARMv5TE ISA — it's mwasm's pad byte, period.
 
     Brief 204's `.s` files (e.g. `func_02021b38.s`) end in a `.word
     data_sym` pool slot which appears as `0x00 0x00 0x00 0x00` in
     the .o (the linker fills these via the reloc). Without the
     reloc-protection check, the trim heuristic would shave 2 bytes
     off legitimate function content and cascade-shift the next TU.
+
+    Brief 208 adds a complementary safety net for cases brief 204
+    can't cover: a `.s` file whose last pool entry is a LITERAL
+    `.word 0x7fff` (or any value < 0x01000000) has NO relocation
+    on its last 4 bytes — but its trailing 2 bytes ARE
+    `0x00 0x00`. The reloc-protection check passes (no protecting
+    reloc exists) so brief 204 would still trim. The delinks-
+    slot-size check catches this: delinks.txt declares the TU's
+    `.text` slot as exactly N bytes (`end - start`); if mwasm
+    emitted exactly N bytes, those trailing zeros are part of the
+    literal payload, not padding. See `docs/research/
+    first-wave-wall-literal-tail-trim.md`.
     """
     _check_elf_magic(data)
     buf = bytearray(data)
@@ -309,6 +329,16 @@ def trim_text_section_padding(
         ])
         if last_two != b"\x00\x00":
             continue
+        # Brief 208: delinks-slot-size match. If delinks declares
+        # the TU's `.text` slot as exactly `cur_size` bytes, mwasm
+        # emitted a literal trailing pool word and the trailing
+        # zeros are real content (e.g. `.word 0x7fff` → bytes
+        # `ff 7f 00 00`). Don't trim.
+        if (
+            delinks_slot_size is not None
+            and cur_size == delinks_slot_size
+        ):
+            continue
         # Brief 204: reloc-protection. If the .o has a relocation
         # whose r_offset is within the last 4 bytes of this .text
         # section, those zeros are a reloc placeholder (pool word
@@ -328,16 +358,126 @@ def trim_text_section_padding(
     return buf, changes
 
 
+# --------------------------------------------------------------------------- #
+# Delinks-aware slot-size lookup (brief 208)
+# --------------------------------------------------------------------------- #
+
+# Match a TU declaration header in delinks.txt. The format is a
+# source-path line ending in `:` followed by indented attributes.
+# Example matching shape:
+#
+#     src/main/func_02023478.s:
+#         complete
+#         .text start:0x02023478 end:0x020234f8
+#
+# We capture the source path so we can map it back to the input .s
+# file the patcher was just invoked on. The trailing colon is
+# required to distinguish a TU header from a comment line.
+_DELINKS_TU_HEADER_RE = re.compile(
+    r"^(?P<path>[^\s:#][^\s:]*\.[csS](?:pp)?):\s*$",
+)
+# Match the `.text start:0xXXXX end:0xYYYY` line under a TU header.
+# Brief 208's slot size = end - start. Allow either lower or upper
+# hex case to match the rest of dsd's mixed-case output.
+_DELINKS_TEXT_RANGE_RE = re.compile(
+    r"^\s+\.text\s+start:0x(?P<start>[0-9a-fA-F]+)\s+"
+    r"end:0x(?P<end>[0-9a-fA-F]+)\s*$",
+)
+
+
+def _lookup_delinks_slot_size(
+    delinks_paths: list[Path],
+    source_path: str,
+) -> int | None:
+    """Scan `delinks_paths` for the TU whose header matches
+    `source_path`, return its `.text` slot size (`end - start`),
+    or `None` when no match.
+
+    `source_path` is matched against the captured TU header path
+    using two normalisations:
+      1. Exact string equality after normalising both to forward
+         slashes (handles Windows backslashes in `ninja`'s `$in`).
+      2. Suffix match: a TU header `src/main/foo.s` matches a
+         caller-side `/abs/build/dir/src/main/foo.s` so the
+         lookup works regardless of whether `$in` is the relative
+         or absolute path. Brief 208's mwasm rule passes `$in`
+         which is the source-relative path, but the helper is
+         designed to be robust to either.
+
+    Multiple delinks files are scanned in order; the first match
+    wins. Brief 208 expects one match across the entire project
+    (each `.s` file is referenced exactly once in exactly one
+    delinks.txt).
+
+    Pure function — does its own I/O on `delinks_paths`. Returns
+    `None` for any of:
+      - empty `delinks_paths` list
+      - `source_path` not found in any file
+      - matched TU header has no `.text start:... end:...` line
+        (defensive; shouldn't happen for well-formed delinks)
+    """
+    norm_source = source_path.replace("\\", "/")
+    for path in delinks_paths:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        # Walk line by line; when we see a TU header that matches
+        # `source_path`, the NEXT line beginning with whitespace +
+        # `.text` is the one whose `end - start` is the slot size.
+        # `complete` / `incomplete` / other attribute lines under
+        # the same TU header are skipped via the loop continuing
+        # until we hit a `.text` line OR a new (unindented) line
+        # that signals we left the TU.
+        in_match = False
+        for line in text.splitlines():
+            if not in_match:
+                m = _DELINKS_TU_HEADER_RE.match(line)
+                if not m:
+                    continue
+                tu_path = m.group("path").replace("\\", "/")
+                if tu_path == norm_source or norm_source.endswith(
+                    "/" + tu_path,
+                ):
+                    in_match = True
+                continue
+            # In-match state: look for the .text range or a new TU
+            # header (which would end the search without a match).
+            range_m = _DELINKS_TEXT_RANGE_RE.match(line)
+            if range_m:
+                start = int(range_m.group("start"), 16)
+                end = int(range_m.group("end"), 16)
+                if end >= start:
+                    return end - start
+                return None
+            # A blank line or a new TU header ends the in-match
+            # window without finding a `.text` line — defensive
+            # only; well-formed delinks always have one.
+            if _DELINKS_TU_HEADER_RE.match(line):
+                in_match = False
+                # Re-check this line in case the new header
+                # also matches (very unlikely but cheap).
+                continue
+    return None
+
+
 def patch_file(
     path: Path, *,
     target_align: int = TARGET_ALIGN,
     trim_padding: bool = False,
+    delinks_slot_size: int | None = None,
 ) -> int:
     """Patch `path` in-place. Returns exit code: 0 = success,
     1 = parse error (stderr-logged).
 
     With `trim_padding=True`, also runs `trim_text_section_padding`
     — needed for mwasm's 4-byte size-pad artifact (PR #115).
+
+    Brief 208: `delinks_slot_size`, when not `None`, is the
+    expected `.text` byte count from delinks.txt's `end - start`
+    for this TU. Used to suppress false-positive trims when mwasm
+    emitted exactly the intended number of bytes (literal-tail
+    case). See `trim_text_section_padding` docstring.
     """
     try:
         original = path.read_bytes()
@@ -350,7 +490,9 @@ def patch_file(
         )
         size_changes: list[tuple[str, int, int]] = []
         if trim_padding:
-            patched, size_changes = trim_text_section_padding(patched)
+            patched, size_changes = trim_text_section_padding(
+                patched, delinks_slot_size=delinks_slot_size,
+            )
     except ELFParseError as e:
         print(f"error: {path}: {e}", file=sys.stderr)
         return 1
@@ -407,6 +549,24 @@ def main() -> int:
              "have the padding artifact; alignment patching alone "
              "suffices for them.",
     )
+    ap.add_argument(
+        "--delinks", type=Path, action="append", default=None,
+        help="Brief 208: path to a delinks.txt file. Pass once per "
+             "module's delinks.txt (project usually has one for "
+             "arm9 main + one per overlay). Combined with "
+             "--source-path, the patcher looks up the intended "
+             "`.text` slot size for the TU and suppresses "
+             "false-positive trims when mwasm emitted exactly that "
+             "many bytes (literal-tail case — see "
+             "docs/research/first-wave-wall-literal-tail-trim.md).",
+    )
+    ap.add_argument(
+        "--source-path", type=str, default=None,
+        help="Brief 208: path of the `.s` source file the input "
+             "`.o` was compiled from. Required when --delinks is "
+             "provided. Used as the TU-header lookup key in "
+             "delinks.txt.",
+    )
     args = ap.parse_args()
     if args.dir is not None and args.paths:
         print("error: --dir and positional paths are mutually exclusive",
@@ -424,12 +584,25 @@ def main() -> int:
         # No .o files found — silent success. `dsd delink` may
         # legitimately produce zero gaps on a fully-carved module.
         return 0
+
+    # Brief 208: look up the delinks slot size once per invocation.
+    # The mwasm rule passes a single source-path + delinks-list per
+    # .o; in --dir mode the lookup is skipped (delinks-slot-size
+    # protection is per-TU and --dir is meant for bulk dsd gap-
+    # object patching where the slot size doesn't apply anyway).
+    delinks_slot_size: int | None = None
+    if args.delinks and args.source_path:
+        delinks_slot_size = _lookup_delinks_slot_size(
+            args.delinks, args.source_path,
+        )
+
     rc = 0
     for p in targets:
         result = patch_file(
             p,
             target_align=args.target_align,
             trim_padding=args.trim_padding,
+            delinks_slot_size=delinks_slot_size,
         )
         if result != 0:
             rc = result

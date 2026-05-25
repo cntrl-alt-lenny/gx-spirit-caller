@@ -21,6 +21,7 @@ from predict_walls import (  # noqa: E402
     detect_address_cse,
     detect_cross_overlay_bl,
     detect_legacy_c_cascade_risk,
+    detect_literal_tail_trim_trap,
     detect_routing_trilemma,
     detect_walls,
 )
@@ -1062,6 +1063,156 @@ class TestRoutingTrilemmaDetection(unittest.TestCase):
             self._wall("C-34"),
         ]
         self.assertEqual(detect_routing_trilemma(walls), [])
+
+
+class TestC36Detection(unittest.TestCase):
+    """Brief 208: literal-tail trim-trap detector.
+
+    Fires when (a) the function's last 4 bytes encode a small
+    literal (top 2 bytes == 0x00) AND (b) no relocation patches
+    the last 4 bytes. Both conditions are needed — a reloc on
+    the tail means brief 204 already handles it; non-zero high
+    byte means the tail is real ARM/Thumb instruction bytes,
+    not a literal.
+
+    Tests cover the six known-affected picks from brief 207
+    PR #660, plus a representative set of negatives.
+    """
+
+    # -- positive cases (must fire C-36) --
+
+    def test_func_02023478_canonical(self) -> None:
+        """The canonical brief 208 worked example: last `.word
+        0x7fff` → trailing bytes `ff 7f 00 00`. No reloc on
+        the last 4 bytes."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\xff\x7f\x00\x00",
+            relocs_text="",
+            addr=0x02023478, size=0x80,
+        )
+        ids = [p.wall_id for p in preds]
+        self.assertEqual(ids, ["C-36"])
+        self.assertIn("0x7fff", preds[0].cue)
+
+    def test_func_020212cc(self) -> None:
+        """Brief 207 deferred pick: last `.word 0x618` → bytes
+        `18 06 00 00`."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x18\x06\x00\x00",
+            relocs_text="",
+            addr=0x020212cc, size=0x80,
+        )
+        self.assertEqual([p.wall_id for p in preds], ["C-36"])
+
+    def test_ov002_021aba60(self) -> None:
+        """Last `.word 0xffff` → bytes `ff ff 00 00`."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\xff\xff\x00\x00",
+            relocs_text="",
+            addr=0x021aba60, size=0x40,
+        )
+        self.assertEqual([p.wall_id for p in preds], ["C-36"])
+        self.assertIn("0xffff", preds[0].cue)
+
+    def test_ov018_021ab1c4(self) -> None:
+        """Last `.word 0x1ff` → bytes `ff 01 00 00`."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\xff\x01\x00\x00",
+            relocs_text="",
+            addr=0x021ab1c4, size=0x40,
+        )
+        self.assertEqual([p.wall_id for p in preds], ["C-36"])
+
+    def test_zero_literal_still_fires(self) -> None:
+        """Edge case: a literal `.word 0x0` — last 4 bytes all
+        zero. Still a trim trap (the patcher's heuristic
+        triggers on last 2 bytes == 0x00, regardless of the
+        first 2). The brief 208 guard covers this."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x00\x00\x00\x00",
+            relocs_text="",
+            addr=0x02000000, size=0x20,
+        )
+        self.assertEqual([p.wall_id for p in preds], ["C-36"])
+
+    # -- negative cases (must NOT fire C-36) --
+
+    def test_reloc_covers_tail_does_not_fire(self) -> None:
+        """If a `.rel.text`-equivalent reloc patches any byte in
+        the last 4 bytes, brief 204's existing protection
+        handles it — no C-36 needed."""
+        # addr+size-4 = 0x02023574; relocs.txt has a load there.
+        relocs = (
+            "from:0x02023574 kind:load to:0x021a6354 module:main\n"
+        )
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\xff\x7f\x00\x00",
+            relocs_text=relocs,
+            addr=0x02023478, size=0x100,  # last4 = [0x02023574..0x02023578)
+        )
+        self.assertEqual(preds, [])
+
+    def test_real_instruction_tail_does_not_fire(self) -> None:
+        """Most functions end in a return like `pop {pc}` /
+        `ldmia sp!, {lr,pc}` whose high byte is non-zero.
+        These must NOT fire C-36."""
+        # ldmia sp!, {r4, lr, pc} = 0xe8bd9010 in LE → bytes
+        # `10 90 bd e8`. High byte 0xe8 (non-zero).
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x10\x90\xbd\xe8",
+            relocs_text="",
+            addr=0x02023478, size=0x80,
+        )
+        self.assertEqual(preds, [])
+
+    def test_high_byte_nonzero_does_not_fire(self) -> None:
+        """A literal whose top BYTE (not just top 2 bytes) is
+        non-zero — e.g. `.word 0x01000000` → bytes `00 00 00 01`.
+        The patcher's trim heuristic only triggers on last 2
+        bytes == 0x00 0x00; with the top byte non-zero, the
+        trim doesn't fire so C-36 needn't either.
+
+        This pins the "high byte non-zero" branch of the
+        detector — i.e. the negative case where brief 207's
+        literal-promotion workaround WOULD have worked
+        (literals ≥ 0x01000000 are already trim-safe)."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x00\x00\x00\x01",
+            relocs_text="",
+            addr=0x02023478, size=0x80,
+        )
+        self.assertEqual(preds, [])
+
+    def test_short_input_does_not_fire(self) -> None:
+        """Defensive: a function smaller than 4 bytes (or a
+        truncated read) shouldn't crash — return empty."""
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x00\x00\x00",  # only 3 bytes
+            relocs_text="",
+            addr=0x02000000, size=0x10,
+        )
+        self.assertEqual(preds, [])
+
+    def test_brief_205_shipped_ship_does_not_fire(self) -> None:
+        """Sanity check: a shipped `.s` from brief 205 ends in
+        a SYMBOL reference (e.g. `.word data_0219a8dc`). The
+        symbol resolves to an address like `0x0219a8dc` → in
+        the .o it's `00 00 00 00` (linker fills via reloc), but
+        the reloc IS present so brief 204 already protects.
+        The C-36 detector also passes — reloc check trips first
+        and returns empty."""
+        # func_02021b38 from brief 204: last reloc would be at
+        # addr 0x02021bac - 4 = 0x02021ba8 against data_X.
+        relocs = (
+            "from:0x02021ba8 kind:load "
+            "to:0x021a6354 module:main\n"
+        )
+        preds = detect_literal_tail_trim_trap(
+            orig_last4=b"\x00\x00\x00\x00",
+            relocs_text=relocs,
+            addr=0x02021b38, size=0x74,
+        )
+        self.assertEqual(preds, [])
 
 
 if __name__ == "__main__":

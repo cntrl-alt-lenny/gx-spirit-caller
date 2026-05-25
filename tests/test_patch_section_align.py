@@ -41,6 +41,7 @@ from patch_section_align import (  # noqa: E402
     SH_OFFSET,
     SH_SIZE,
     TARGET_ALIGN,
+    _lookup_delinks_slot_size,
     main,
     patch_file,
     patch_text_sections,
@@ -540,6 +541,271 @@ class TestDirMode(unittest.TestCase):
             patched = obj.read_bytes()
             self.assertEqual(_sh_addralign_of(patched, ".text"), 2)
             self.assertEqual(_sh_addralign_of(patched, ".rodata"), 4)
+
+
+class TestLookupDelinksSlotSize(unittest.TestCase):
+    """Brief 208: parse delinks.txt for a TU's intended `.text`
+    slot size. The slot size is `end - start` from the
+    `.text start:0xXXXX end:0xYYYY` line under the TU header."""
+
+    def _write_delinks(self, td: Path, content: str) -> Path:
+        p = td / "delinks.txt"
+        p.write_text(content, encoding="utf-8")
+        return p
+
+    def test_finds_exact_match(self) -> None:
+        # Realistic delinks.txt snippet shaped like the production
+        # file in `config/eur/arm9/`.
+        body = (
+            "src/main/func_02023478.s:\n"
+            "    complete\n"
+            "    .text start:0x02023478 end:0x020234f8\n"
+            "\n"
+            "src/main/func_02023f7c.s:\n"
+            "    complete\n"
+            "    .text start:0x02023f7c end:0x02023fec\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = self._write_delinks(Path(td), body)
+            size = _lookup_delinks_slot_size(
+                [p], "src/main/func_02023478.s",
+            )
+            self.assertEqual(size, 0x80)
+
+    def test_finds_second_tu(self) -> None:
+        # The second TU's slot size — confirms the search doesn't
+        # bail after the first TU.
+        body = (
+            "src/main/func_02023478.s:\n"
+            "    complete\n"
+            "    .text start:0x02023478 end:0x020234f8\n"
+            "\n"
+            "src/main/func_02023f7c.s:\n"
+            "    complete\n"
+            "    .text start:0x02023f7c end:0x02023fec\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = self._write_delinks(Path(td), body)
+            size = _lookup_delinks_slot_size(
+                [p], "src/main/func_02023f7c.s",
+            )
+            self.assertEqual(size, 0x70)
+
+    def test_returns_none_when_source_missing(self) -> None:
+        body = (
+            "src/main/func_02023478.s:\n"
+            "    complete\n"
+            "    .text start:0x02023478 end:0x020234f8\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = self._write_delinks(Path(td), body)
+            size = _lookup_delinks_slot_size(
+                [p], "src/main/never_existed.s",
+            )
+            self.assertIsNone(size)
+
+    def test_handles_multiple_delinks_files(self) -> None:
+        # Project has one delinks.txt per module — `arm9 main` +
+        # overlays. The helper accepts multiple paths and returns
+        # the first match.
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            main_dl = root / "main_delinks.txt"
+            main_dl.write_text(
+                "src/main/foo.s:\n"
+                "    complete\n"
+                "    .text start:0x02000000 end:0x02000040\n",
+                encoding="utf-8",
+            )
+            ov_dl = root / "ov_delinks.txt"
+            ov_dl.write_text(
+                "src/overlay002/bar.s:\n"
+                "    complete\n"
+                "    .text start:0x021aba60 end:0x021aba84\n",
+                encoding="utf-8",
+            )
+            # Should find each in its own file.
+            self.assertEqual(
+                _lookup_delinks_slot_size(
+                    [main_dl, ov_dl], "src/main/foo.s",
+                ),
+                0x40,
+            )
+            self.assertEqual(
+                _lookup_delinks_slot_size(
+                    [main_dl, ov_dl], "src/overlay002/bar.s",
+                ),
+                0x24,
+            )
+
+    def test_handles_absolute_source_path(self) -> None:
+        # ninja's `$in` is sometimes the path relative to the
+        # project root and sometimes absolute (depends on whether
+        # the rule got an absolute path). The helper does a suffix
+        # match in addition to exact equality so either form works.
+        body = (
+            "src/main/func_02023478.s:\n"
+            "    complete\n"
+            "    .text start:0x02023478 end:0x020234f8\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = self._write_delinks(Path(td), body)
+            size = _lookup_delinks_slot_size(
+                [p], "/abs/path/to/repo/src/main/func_02023478.s",
+            )
+            self.assertEqual(size, 0x80)
+
+    def test_handles_windows_backslashes(self) -> None:
+        # Ninja on Windows may pass paths with backslashes. The
+        # helper normalises before matching so the lookup still
+        # works.
+        body = (
+            "src/main/func_02023478.s:\n"
+            "    complete\n"
+            "    .text start:0x02023478 end:0x020234f8\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = self._write_delinks(Path(td), body)
+            size = _lookup_delinks_slot_size(
+                [p], r"src\main\func_02023478.s",
+            )
+            self.assertEqual(size, 0x80)
+
+    def test_empty_delinks_list_returns_none(self) -> None:
+        self.assertIsNone(
+            _lookup_delinks_slot_size([], "src/main/foo.s"),
+        )
+
+    def test_missing_file_is_skipped_silently(self) -> None:
+        # An unreadable / missing delinks file path doesn't crash —
+        # the helper continues to the next. Same defensive behaviour
+        # as objdiff_filter_panic_units.
+        with tempfile.TemporaryDirectory() as td:
+            real = Path(td) / "real.txt"
+            real.write_text(
+                "src/main/foo.s:\n"
+                "    complete\n"
+                "    .text start:0x02000000 end:0x02000040\n",
+                encoding="utf-8",
+            )
+            missing = Path(td) / "does-not-exist.txt"
+            size = _lookup_delinks_slot_size(
+                [missing, real], "src/main/foo.s",
+            )
+            self.assertEqual(size, 0x40)
+
+
+class TestTrimDelinksSlotGuard(unittest.TestCase):
+    """Brief 208: `delinks_slot_size` parameter on
+    `trim_text_section_padding`. When the section's sh_size matches
+    the declared slot, the trim is suppressed (literal-tail case)."""
+
+    def _build_elf_with_text_content(self, content: bytes) -> bytes:
+        # Same fixture shape as TestTrimTextSectionPadding above.
+        shstr = b"\x00.text\x00.shstrtab\x00"
+        text_off = 0x34
+        text_size = len(content)
+        shstr_off = text_off + text_size
+        shdr_off = shstr_off + len(shstr)
+        headers = (
+            _shdr(0, 0, 0, 0, 0)
+            + _shdr(
+                shstr.index(b".text"), 1, text_off, text_size, 2,
+            )
+            + _shdr(
+                shstr.index(b".shstrtab"), 3, shstr_off,
+                len(shstr), 1,
+            )
+        )
+        return _ehdr(shdr_off, 3, 2) + content + shstr + headers
+
+    def test_no_trim_when_slot_size_matches(self) -> None:
+        # The CENTRAL brief 208 invariant. `.s` file with last
+        # literal `.word 0x7fff` → trailing bytes `ff 7f 00 00`.
+        # mwasm emits exactly 0x80 bytes (= delinks slot size).
+        # Without the brief 208 guard, the trim heuristic would
+        # shave 2 bytes (last_two == 0x00 0x00, no protecting
+        # reloc). With delinks_slot_size=0x80 passed in, the trim
+        # is suppressed.
+        content = b"\x00" * (0x80 - 4) + b"\xff\x7f\x00\x00"
+        blob = self._build_elf_with_text_content(content)
+        # Pre-condition: without guard, this would trim.
+        _, changes_no_guard = trim_text_section_padding(blob)
+        self.assertEqual(
+            changes_no_guard, [(".text", 0x80, 0x7e)],
+            msg="sanity: literal-tail case trims without brief 208 guard",
+        )
+        # With the brief 208 guard, no trim.
+        _, changes_guarded = trim_text_section_padding(
+            blob, delinks_slot_size=0x80,
+        )
+        self.assertEqual(
+            changes_guarded, [],
+            msg=(
+                "brief 208 invariant: when sh_size matches the "
+                "delinks slot size, the trim must be suppressed. "
+                "Without this guard, the literal-tail trim trap "
+                "corrupts every `.s` ship whose last pool entry "
+                "is a small literal."
+            ),
+        )
+
+    def test_trim_still_fires_when_size_differs(self) -> None:
+        # Real mwasm padding case: 6-byte Thumb thunk → 8-byte
+        # padded section, delinks declares a 6-byte slot. The
+        # brief 208 guard does NOT apply (sh_size != slot_size);
+        # trim still fires.
+        content = b"\x05\xdf\x70\x47\x00\x00\x00\x00"
+        blob = self._build_elf_with_text_content(content)
+        _, changes = trim_text_section_padding(
+            blob, delinks_slot_size=6,
+        )
+        self.assertEqual(changes, [(".text", 8, 6)])
+
+    def test_none_slot_size_preserves_brief_204_behaviour(self) -> None:
+        # When --delinks isn't passed (delinks_slot_size=None),
+        # the old brief 204 behaviour holds: trim fires on the
+        # mwasm-padding pattern unless a reloc protects the tail.
+        content = b"\x05\xdf\x70\x47\x00\x00\x00\x00"
+        blob = self._build_elf_with_text_content(content)
+        _, changes = trim_text_section_padding(
+            blob, delinks_slot_size=None,
+        )
+        self.assertEqual(changes, [(".text", 8, 6)])
+
+    def test_patch_file_end_to_end_with_delinks_guard(self) -> None:
+        # Full pipeline: build a literal-tail .o, pass through
+        # patch_file with delinks_slot_size set, verify sh_size is
+        # PRESERVED.
+        content = b"\x00" * (0x80 - 4) + b"\xff\x7f\x00\x00"
+        blob = self._build_elf_with_text_content(content)
+        # Force the .text addralign to 4 so the regular alignment
+        # patcher has something to do (and patch_file returns
+        # success with changes recorded).
+        blob = bytearray(blob)
+        shoff = struct.unpack_from("<I", blob, E_SHOFF)[0]
+        # idx 1 is .text in this fixture.
+        struct.pack_into(
+            "<I", blob, shoff + SHDR_SIZE + SH_ADDRALIGN, 4,
+        )
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "func.o"
+            p.write_bytes(blob)
+            rc = patch_file(
+                p, trim_padding=True, delinks_slot_size=0x80,
+            )
+            self.assertEqual(rc, 0)
+            patched = p.read_bytes()
+            shoff2 = struct.unpack_from("<I", patched, E_SHOFF)[0]
+            text_hdr = shoff2 + SHDR_SIZE  # idx 1
+            sh_size = struct.unpack_from(
+                "<I", patched, text_hdr + SH_SIZE,
+            )[0]
+            self.assertEqual(
+                sh_size, 0x80,
+                msg="brief 208: sh_size must stay 0x80 when "
+                "delinks declares the slot at 0x80",
+            )
 
 
 if __name__ == "__main__":

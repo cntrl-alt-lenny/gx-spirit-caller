@@ -1,14 +1,31 @@
-; func_02023478 — brief 207 / Phase 1: previously deferred by brief
-; 205 (last pool entry `.word 0x7fff` triggered the
-; patcher-trim-padding heuristic; literal-promotion workaround
-; couldn't apply because 0x7fff's high bits are zero). Brief 204
-; (PR #656) landed a relocation-aware trim-protect in
-; `tools/patch_section_align.py` that inspects `.rel.text` offsets
-; to distinguish real pool content from mwasm 4-byte size-padding.
-; With that fix in main, this pick ships with the vanilla brief 202
-; recipe (explicit `.word data_<sym>` per pool slot — both slots use
-; the symbol reference; the linker resolves both to byte-identical
-; values).
+; func_02023478 — brief 208 worked example for the literal-tail
+; trim trap (C-36). Deferred path:
+;
+;   - Brief 205 first encountered this pick and deferred it (last
+;     pool entry `.word 0x7fff` → bytes `ff 7f 00 00`, last 2 bytes
+;     match the patcher trim heuristic; literal-promotion workaround
+;     couldn't apply because 0x7fff's high bits are already zero).
+;   - Brief 204 (PR #656) added reloc-protection to
+;     `trim_text_section_padding`, but that only covers relocation
+;     tails. The 0x7fff slot has NO reloc — it's a raw literal —
+;     so the trim still fires.
+;   - Brief 207 (PR #660) re-attempted and surfaced the residual
+;     gap. Deferred at `.s.deferred` for brief 208 to close.
+;   - Brief 208 adds a complementary `--delinks` / `--source-path`
+;     pair to `patch_section_align.py` that cross-references the
+;     TU's intended `.text` slot size from delinks.txt. If mwasm
+;     emitted exactly the declared size, the trim is suppressed —
+;     resolving the literal-tail false positive without weakening
+;     the brief 204 reloc-protection for legitimate mwasm padding.
+;
+; Recipe: vanilla brief 202 `.s` (two pool slots referencing the
+; same `data_0219a8dc` symbol — mwcc 2.0's IR-CSE would collapse
+; them to one slot in C source, breaking byte-match; explicit
+; `.word`s bypass that). Last pool slot is the literal mask
+; `.word 0x7fff` (C-23 saturation pattern). See:
+;
+;   - docs/research/first-wave-wall-literal-tail-trim.md
+;   - docs/research/codegen-walls.md § C-36
 
         .text
         .extern data_0219a8dc

@@ -520,12 +520,32 @@ def main():
         # 4-byte multiple with trailing 0x0000 bytes. For size-6
         # thunks (VBlankIntrWait, Mod) that's a 2-byte cascade shift
         # at link time. The trim path reverses it at the .o level.
+        #
+        # Brief 208 extends the trim path with delinks-aware false-
+        # positive suppression: `.s` files whose last pool entry
+        # is a small literal (e.g. `.word 0x7fff` → trailing bytes
+        # `00 00`) trip brief 204's trim heuristic but should NOT
+        # be trimmed — the trailing zeros are real literal content,
+        # not mwasm padding. The `--delinks` / `--source-path` pair
+        # lets the patcher cross-reference the TU's intended slot
+        # size from delinks.txt. If mwasm emitted exactly the
+        # declared slot size, the trim is suppressed. See
+        # docs/research/first-wave-wall-literal-tail-trim.md.
         patch_align = "tools/patch_section_align.py"
+        delinks_args = " ".join(
+            f"--delinks {d}" for d in project.delinks_files
+        )
         mwasm_cmd = _wrap_chain_for_windows(
             f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
             f' && {PYTHON} {patch_align} --trim-padding $out'
+            f' {delinks_args} --source-path $in'
         )
-        mwasm_implicit = [ASM, patch_align]
+        # The delinks files are read by the patcher at compile
+        # time. Adding them to mwasm_implicit makes ninja rebuild
+        # the .o whenever delinks.txt changes — important because
+        # a TU's slot size in delinks.txt drives the trim-protect
+        # decision.
+        mwasm_implicit = [ASM, patch_align] + list(project.delinks_files)
         n.rule(
             name="mwasm",
             command=mwasm_cmd,
