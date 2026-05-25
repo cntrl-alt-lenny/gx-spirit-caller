@@ -712,25 +712,37 @@ def main():
         )
         n.newline()
 
-        # Brief 187 Part 1: filter objdiff.json before `objdiff-cli
-        # report generate` consumes it. Two problems block report
-        # generation today and the filter sidesteps both until
-        # upstream fixes land + unmatched routing-tier units gain
-        # source:
+        # Brief 187 Part 1 + brief 206: two post-processing steps
+        # run before `objdiff-cli report generate` consumes the
+        # `objdiff.json`. Both rewrite the JSON in place and are
+        # idempotent.
+        #
+        # Step 1 — `objdiff_filter_panic_units.py` (brief 187):
+        # drop units that would crash report generation:
         #   (a) `objdiff-cli` panics on code-less ELF objects
         #       (~20 `_dsd_gap@main` data-only TUs trigger the ARM
         #       arch crash at `objdiff-core/src/arch/arm.rs:130`).
         #   (b) Unmatched `.legacy`/`.legacy_sp3` units reference
         #       `.o` files that don't exist yet — `Failed to open`.
-        # The filter runs in-place; re-running is a no-op (units
-        # already pruned). See
-        # `docs/research/objdiff-arm-crash-workaround.md` for the
-        # diagnosis + upstream issue link.
+        # See `docs/research/objdiff-arm-crash-workaround.md`.
+        #
+        # Step 2 — `objdiff_resolve_relocs.py` (brief 206): apply
+        # relocations on both target + base `.o` to a fictional
+        # virtual base address, strip the reloc tables, write
+        # `*.resolved` sidecars and repoint the JSON at them. This
+        # closes the `matched_functions` under-counting gap that
+        # affects every `.legacy.c` / `.legacy_sp3.c` / `.s` ship
+        # — see `docs/research/objdiff-fuzzy-vs-complete-metric.md`
+        # for the diagnosis. Without this step,
+        # `matched_functions` is a strict lower bound on real
+        # matches; with it, the metric becomes accurate.
         objdiff_filter = "tools/objdiff_filter_panic_units.py"
+        objdiff_resolve = "tools/objdiff_resolve_relocs.py"
         n.rule(
             name="objdiff_report",
             command=_wrap_chain_for_windows(
                 f"{PYTHON} {objdiff_filter} --in objdiff.json"
+                f" && {PYTHON} {objdiff_resolve} --in objdiff.json"
                 f" && {OBJDIFF} report generate -o $out"
             ),
         )
