@@ -31,3 +31,8 @@ src/overlay020/data_ov020_021adfa8.c:
 src/overlay020/bss/data_ov020_bss.s:
     complete
     .bss start:0x021ae060 end:0x021aeb00
+
+
+src/overlay020/func_ov020_021abbe8.s:
+    complete
+    .text start:0x021abbe8 end:0x021ac394

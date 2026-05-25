@@ -170,3 +170,12 @@ src/overlay016/data_ov016_021b940c.c:
 src/overlay016/bss/data_ov016_bss.s:
     complete
     .bss start:0x021b9740 end:0x021bb4c0
+
+
+src/overlay016/func_ov016_021b2d4c.s:
+    complete
+    .text start:0x021b2d4c end:0x021b2f6c
+
+src/overlay016/func_ov016_021b8774.s:
+    complete
+    .text start:0x021b8774 end:0x021b894c

@@ -37,3 +37,32 @@ src/overlay008/bss/data_ov008_bss.s:
 src/overlay008/data/data_ov008_021b2710.c:
     complete
     .data start:0x021b2710 end:0x021b2714
+
+
+src/overlay008/func_ov008_021aa94c.s:
+    complete
+    .text start:0x021aa94c end:0x021aaab4
+
+src/overlay008/func_ov008_021ac2ac.s:
+    complete
+    .text start:0x021ac2ac end:0x021ac35c
+
+src/overlay008/func_ov008_021adaa8.s:
+    complete
+    .text start:0x021adaa8 end:0x021adbbc
+
+src/overlay008/func_ov008_021adc44.s:
+    complete
+    .text start:0x021adc44 end:0x021ae3a0
+
+src/overlay008/func_ov008_021ae3a0.s:
+    complete
+    .text start:0x021ae3a0 end:0x021ae674
+
+src/overlay008/func_ov008_021ae70c.s:
+    complete
+    .text start:0x021ae70c end:0x021aedfc
+
+src/overlay008/func_ov008_021b01d8.s:
+    complete
+    .text start:0x021b01d8 end:0x021b03b8
