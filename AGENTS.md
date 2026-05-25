@@ -364,28 +364,53 @@ itself:
 
 ### Open briefs
 
-- **Brief 208 (HIGH, NEW)** — `scaffolder` literal-tail trim trap
-  patcher enhancement + classifier (C-36). Brief 207 surfaced a new
-  failure mode: `.s` files where the last pool entry is a LITERAL
-  small value with `\x00\x00` high bytes (e.g. `0x7fff`, `0x868`,
-  `0x1ff`). Brief 204's reloc-protected trim still fires because
-  no relocation is present. Fix: cross-reference delinks.txt slot
-  size during the trim pass; never trim when mwasm-emitted size
-  matches the intended slot. ~6 affected picks waiting (1 worked
-  example + 5 for decomper brief 209 drain). Branch:
-  `scaffolder/literal-tail-trim-trap`.
-- **Brief 209 (HIGH, NEW)** — `decomper` literal-tail drain + brief
-  206 straggler investigation. Phase 1 (depends on brief 208): drain
-  5 literal-tail picks via the now-locked recipe. Phase 2: investigate
-  brief 206's 23 stragglers — brain has done the pre-validation
-  ([`docs/research/brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md))
-  showing the bottom tier (13 ov011 picks) has a structural reloc-
-  comparison gap, not a recipe bug. Brief 209 confirms or revises +
-  closes the 7 close picks (95-100% + 80-95% + 50-80%). Branch:
-  `decomper/literal-tail-drain-plus-stragger-investigation`.
+- **Brief 210 (HIGH, NEW)** — `scaffolder` post-process mwasmarm
+  `$d` → `$a` mapping symbols. Brief 209's root-cause diagnosis
+  identified all 23 stragglers as victims of mwasmarm tagging
+  `.word 0xHEX` directives as data; objdiff reads them as data
+  not code → fuzzy < 30% even when bytes are byte-identical.
+  Brief 210 implements brief 209's recommended path #1: post-build
+  rewrite `$d` → `$a` for `.word` values that decode as valid ARM
+  instructions. Least invasive (no source touches, no recipe
+  changes). Predicted recovery: matched_functions 1687 → ~1710
+  (+23 stragglers flip). Branch: `scaffolder/arm-mapping-symbol-rewrite`.
+- **Brief 211 (HIGH, NEW)** — `decomper` literal-tail drain +
+  BIOS thunk family drain. Two-phase. Phase 1: drain 5 literal-tail
+  picks deferred by brief 209 (brief 208's patcher fix makes the
+  recipe locked). Phase 2: drain ~30 named BIOS SWI thunks
+  (`LZ77UnCompReadByCallbackWrite16bit`, `Div`, `CpuSet`, etc.) at
+  4 bytes each — highest-leverage easy pick per
+  [`docs/research/unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md).
+  Expected total: ~35 ships, biggest single drain candidate yet.
+  Branch: `decomper/literal-tail-drain-plus-bios-thunk-family`.
 
 ### Closed briefs (reference)
 
+- **Brief 209** — `decomper`, shipped in PR #661. 🔬 **Root cause:
+  mwasmarm `$d` mapping symbols.** Brain pre-validation hypothesis
+  (address resolution gap) FALSIFIED empirically: brief 209 promoted
+  a `.word` to mnemonic on `func_ov011_021ca9e8` and observed fuzzy
+  go DOWN (13% → 3%) instead of UP. Real diagnosis: mwasmarm tags
+  `.word 0xHEX` with `$d` (data) mapping symbols; objdiff reads
+  these as data, not code; mixed `$a`/`$d` is worse than pure `$d`.
+  All 23 stragglers categorize cleanly under existing recipes — no
+  new wall, no recipe regression, just a metric under-counting
+  issue. Three remediation paths proposed; brain queued path #1 as
+  brief 210. Phase 1 (literal-tail drain) deferred to brief 211
+  since brief 208 had to land first.
+- **Brief 208** — `scaffolder`, shipped in PR #663. 🎯 **C-36
+  literal-tail trim trap closed.** Two-guard patcher fix: brief
+  204's reloc-protection handles cascade-fill, brief 208's new
+  delinks-aware slot-size check handles literal-tail. Patcher
+  reads delinks.txt to get the TU's intended `.text` size; trim
+  suppressed when mwasm-emitted size matches the declared size
+  (mwasm padding always rounds UP, so equality means trailing
+  zeros are content). New `detect_literal_tail_trim_trap` (C-36)
+  classifier. Worked example: `func_02023478.s` (the canary pick
+  brief 207 deferred). 18 new tests (2150 → 2168). Classifier
+  validates all 5 brief-207-deferred picks fire correctly; the
+  6th was a brief-207 mis-listing (symbol-ref tail, already
+  covered by brief 204).
 - **Brief 207** — `decomper`, shipped in PR #660. 🎯 **32 of 33
   C-34/C-35 rescan drain shipped** (biggest single drain to date,
   above brief 205's 20/21). 5 main + 27 overlay picks. 1 deferred
