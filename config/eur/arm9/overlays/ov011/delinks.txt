@@ -9,6 +9,10 @@ src/overlay011/ov011_021c9e80.c:
     complete
     .text start:0x021c9e80 end:0x021c9e8c
 
+src/overlay011/func_ov011_021d0c1c.c:
+    complete
+    .text start:0x021d0c1c end:0x021d0c38
+
 
 
 

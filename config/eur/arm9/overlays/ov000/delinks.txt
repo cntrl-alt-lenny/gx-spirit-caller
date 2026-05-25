@@ -16,6 +16,14 @@ src/overlay000/func_ov000_021af5c0.s:
     complete
     .text start:0x021af5c0 end:0x021af5e0
 
+src/overlay000/func_ov000_021aae54.c:
+    complete
+    .text start:0x021aae54 end:0x021aae70
+
+src/overlay000/func_ov000_021af4bc.c:
+    complete
+    .text start:0x021af4bc end:0x021af4d8
+
 
 
 
