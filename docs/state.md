@@ -8,20 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-23 evening, post-#656/#657 + this brain-PR.
-Brain on Mac. **🎉 C-35 ROUTING TRILEMMA CLASSIFIED + C-34 FULL-
-CORPUS DRAIN (20/21).** Brief 204 (PR #656) classified C-35
-(composite C-23+C-34 stack) and fixed a patcher trim trap that
-broke cascade-fill placement. Brief 205 (PR #657) drained 20 of
-21 C-34 picks in a single round — biggest drain since brief 197.
-**Current metrics (post-merge):** `complete_units 1636 / 2507`
-(canonical headline); `matched_code_percent 1.7260 %`;
-`matched_functions 1630 / 9801` (a strict lower bound — see
-under-count note). **Brief 206 pre-validation in this brain-PR:**
-profile of the 47 units currently sitting at `complete_code=100%`
-but `matched_functions=None` — brief 206's reloc-resolution fix
-will recover all of them (1630 → 1677, +47). Canary list at
-[`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
+**Last updated:** 2026-05-25 afternoon, post-#659/#660 + this brain-PR.
+Brain on Mac. **🎉 BIGGEST METRIC ROUND OF THE POST-PIVOT ARC.**
+Brief 206 (PR #659) shipped the reloc-resolution harness — closes
+the `matched_functions` accounting gap for `.legacy.c`/`.legacy_sp3.c`
+ships; +24 matched_functions from previously-shipped picks finally
+counting. Brief 207 (PR #660) drained 32 of 33 C-34/C-35 picks via
+full-corpus rescan — biggest single drain to date. **Current
+metrics (post-merge):** `complete_units 1666 / 2553` (canonical),
+`matched_code_percent 3.5278%` (was 1.7260% — **+1.81pp in one
+round**, biggest single-round delta), `matched_functions 1684 /
+9801 (17.18%)`, `fuzzy_match_percent 4.1904%`.
+
+**Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
+project pursues TWO goals in parallel, not either-or:
+1. **Track 1 — byte-identical ROM from controlled source.**
+   `complete_units` is the gauge. Currently 1666/2553 (65.3%).
+   Recipe pipeline mature; `.s` ships handle hard walls. Estimated
+   30-50 more rounds at current pace to complete (~4-7 weeks).
+2. **Track 2 — human-readable C source for every function.**
+   `matched_functions` minus `.s`-via-recovery is the gauge.
+   Currently ~280 actual C-source matches across 9,801 functions.
+   Multi-year arc at current pace, but cntrl_alt_lenny is
+   explicitly bullish on AI-tool improvement (6-18 months) cutting
+   this much shorter. The project will continue regardless.
+
+**Brain-PR investigations this round:**
+- [`brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md):
+  empirically diagnosed brief 206's 23 stragglers — bottom tier (13
+  ov011) has a structural unrelocated-byte comparison gap not closeable
+  without resolver extension (Option B). 7 close picks (95-100%/80-95%/
+  50-80%) are decomper brief 209's Phase 2 target.
+- [`unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md):
+  strategic compass — 8,149 unmatched functions, breakdown by
+  size/module, identifies BIOS-thunk family (~30 named SWI thunks)
+  as the highest-leverage easy pick available + recommends brief
+  210-215 sequencing.
 
 **Headline metric shift this round.** Investigation found that
 `matched_functions` is systematically under-counting `.legacy.c`
@@ -34,10 +56,9 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes:** brief 206 (scaffolder reloc-resolution
-harness — closes the headline-metric gap) + brief 207 (decomper
-`func_02023478` ship + C-34/C-35 rescan drain). See § *In flight*
-below.
+**Two open lanes:** brief 208 (scaffolder literal-tail trim trap
++ C-36 classifier) + brief 209 (decomper literal-tail drain + brief
+206 straggler investigation). See § *In flight* below.
 
 ## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
@@ -117,6 +138,36 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **PR #660 — decomper / brief 207 C-34/C-35 rescan drain 32/33.**
+  🎯 **Biggest single drain to date.** 5 main + 27 overlay picks
+  via the now-locked brief 202 C-34 `.s` recipe. Full-corpus EUR
+  rescan via brief 204's C-35 composite classifier; overlay picks
+  were out-of-scope in brief 205. 1 deferred (`func_02023478`) —
+  surfaced a NEW failure mode beyond brief 204's reloc-only trim
+  protection: literal-tail (no relocation) trim. ~5 sibling picks
+  affected. Queued as brief 208. +32 complete_units (1636 → 1666).
+- **PR #659 — scaffolder / brief 206 objdiff resolve-relocs harness
+  shipped.** 🎯 **matched_functions accounting permanently fixed.**
+  `tools/objdiff_resolve_relocs.py` applies `R_ARM_ABS32` +
+  `R_ARM_PC24` to a fictional fixed base before objdiff compares.
+  All 21 high-confidence canaries from brain-PR #658 flipped to
+  `matched_functions: 1/1`. Recovery: matched_functions 1430 →
+  1654 (+224 cumulative across the arc; +24 against the immediate
+  prior measurement). Brain pushed research-index regen on
+  review-fix. 2117 → 2146 tests.
+- **Brain-PR (this one) — brief 209 stragger pre-validation +
+  unmatched function pool survey + two-track strategic capture.**
+  🔬 Three research artifacts + housekeeping. (1) Brief 209
+  pre-validation: empirically diagnosed brief 206's 23 stragglers,
+  showing the bottom-tier 13 ov011 picks have a structural
+  unrelocated-byte gap (not a recipe bug); 7 close picks remain
+  for brief 209 Phase 2. (2) Strategic survey: 8,149 unmatched
+  functions categorised by size/module; identifies BIOS-thunk
+  family as highest-leverage easy pick (~30 named SWI thunks
+  shippable in one brief). (3) state.md captures the two-track
+  strategic direction (byte-identical + human-readable C, both
+  pursued in parallel) per cntrl_alt_lenny's 2026-05-25 framing.
 
 - **PR #657 — decomper / brief 205 C-34 full-scan drain 20/21.**
   🎯 Phase 1 (E-08) + Phase 2 (full EUR scan harvest). 20 of 21
@@ -584,30 +635,27 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands. Both agents have just
-received the brief 206 / 207 kickoffs:
+received the brief 208 / 209 kickoffs:
 
-**Scaffolder — brief 206 in flight:**
+**Scaffolder — brief 208 in flight:**
 
-- **Brief 206 (HIGH, NEW)** — `scaffolder/objdiff-resolve-relocs`.
-  Per
-  [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md)
-  option (3): post-build script that relocates both .o files to a
-  fixed base address before objdiff compares — eliminates the
-  reloc-record divergence between mwcc-built and dsd-delinked
-  unrelocated bytes. Predicted recovery: **+47 matched_functions**
-  (1630 → 1677), per concrete profile in
-  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
-  Restores `matched_functions` as a meaningful headline rather
-  than a strict lower bound.
+- **Brief 208 (HIGH, NEW)** — `scaffolder/literal-tail-trim-trap`.
+  Patcher enhancement to cross-reference delinks.txt slot size
+  during the trim pass; new C-36 classifier for `.word <small
+  literal>` tails. Brief 207 surfaced ~6 affected picks (1 worked
+  example for brief 208, 5 deferred for brief 209 drain).
 
-**Decomper — brief 207 in flight:**
+**Decomper — brief 209 in flight:**
 
-- **Brief 207 (HIGH, NEW)** — `decomper/c34-c35-rescan-drain`.
-  Phase 1: ship `func_02023478` (the C-34 pick brief 205 deferred
-  — brief 204's patcher trim fix makes the workaround unnecessary).
-  Phase 2: full EUR rescan using the C-35 composite classifier,
-  drain any picks brief 205's sweep missed (could include overlay
-  modules + size-window edges). Recipe is locked.
+- **Brief 209 (HIGH, NEW)** —
+  `decomper/literal-tail-drain-plus-stragger-investigation`.
+  Phase 1 (depends on brief 208): drain the 5 literal-tail picks.
+  Phase 2: investigate brief 206's 23 stragglers (brain pre-
+  validation at
+  [`docs/research/brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md)
+  reduces this to confirming the 13-pick ov011 bottom-tier
+  diagnosis + closing the 7 close picks). Verdict on resolver
+  Option A vs B is the brief 210+ scoping signal.
 
 ## Active clusters (post-pivot reality)
 
@@ -659,10 +707,10 @@ indicator. Full diagnosis:
 
 | Metric | Value | Notes |
 |---|---|---|
-| **complete_units** | **1,636 / 2,507** | SHA1-aligned headline. +255 over the post-pivot arc (1,381 baseline at brief 187). |
-| matched_code_percent | 1.7260 % | strict lower bound; under-counts due to reloc-record divergence |
-| matched_functions | 1,630 / 9,801 | same caveat — brief 206 will recover +47 of these (target: 1,677); see [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md) |
-| fuzzy_match_percent | 1.8787 % | climbed +0.15% in brief 205's drain — most sensitive to recipe-locked `.s` ships |
+| **complete_units** | **1,666 / 2,553** | SHA1-aligned headline. +285 over the post-pivot arc (1,381 baseline at brief 187). |
+| matched_code_percent | **3.5278 %** | post-brief-206 — now an honest metric, no longer a strict lower bound. +1.81pp this round alone. |
+| matched_functions | **1,684 / 9,801** (17.18 %) | post-brief-206 — accounting fixed; ~13 ov011 stragglers structurally under-counted per [`brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md) but rest is accurate |
+| fuzzy_match_percent | **4.1904 %** | +2.31pp this round — most sensitive to new ships |
 | complete_code_percent | (per-unit) | for individual ships, 100% means byte-identical at the linker level |
 
 **Resumption queue:** [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
@@ -714,34 +762,40 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 206 PR** (scaffolder reloc-resolution
-   harness) when it opens. Branch:
-   `scaffolder/objdiff-resolve-relocs`. Read the impact table —
-   it should show `matched_functions` jumping from 1630 toward
-   1677. Specifically check the canary list at
-   [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md):
-   if `OSi_PostIrqEvent.legacy` and `func_020988a8` (highest
-   fuzzy) flip to `matched_functions: 1/1`, the fix is working.
-2. **Verify + merge brief 207 PR** (decomper `func_02023478` +
-   C-34/C-35 rescan drain) when it opens. Branch:
-   `decomper/c34-c35-rescan-drain`. 3-region SHA1 PASS per
-   shipped pick. **Headline event: complete_units += N**.
-3. **Scope brief 208+ based on outcomes:**
-   - **If brief 206 ships the reloc resolver:** brief 208
-     (scaffolder) could file the upstream objdiff issue per
-     research note's option (1), so future tool versions handle
-     the divergence natively. Or pick up a fresh wall-research
-     target.
-   - **If brief 206 partial-ships (e.g. handles .legacy.c but
-     not .s):** brief 208 (scaffolder) extends the resolver to
-     cover the remaining cases. Likely needs special handling
-     for zero-reloc .s units.
-   - **If brief 207 surfaces additional C-34/C-35 picks beyond
-     ~5:** brief 208 (decomper) continues draining.
-   - **Either way:** by brief 208 the matched_functions metric
-     should be accurate and the wall taxonomy reasonably complete.
-     Project shifts back to recipe-drain mode + occasional new-
-     wall research.
+1. **Verify + merge brief 208 PR** (scaffolder literal-tail trim
+   trap) when it opens. Branch: `scaffolder/literal-tail-trim-trap`.
+   Tools + tests + 1 worked example. 3-region SHA1 PASS required.
+   Confirm C-36 detector fires on the 6 affected picks and DOESN'T
+   fire on the brief 205/207 .s ships that succeeded.
+2. **Verify + merge brief 209 PR** (decomper literal-tail drain +
+   stragger investigation) when it opens. Branch:
+   `decomper/literal-tail-drain-plus-stragger-investigation`.
+   Phase 1 deps brief 208 (literal-tail drain — recipe-locked).
+   Phase 2 deliverable is the verdict on resolver Option A
+   ("accept under-count") vs Option B ("extend resolver for `.word
+   <BL>` ships") per [`docs/research/brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md).
+3. **Scope brief 210+ based on outcomes:**
+   - **If brief 209 Phase 2 picks Option A (accept under-count):**
+     brief 210 (decomper) — BIOS thunk family drain (~30 named SWI
+     thunks per [`unmatched-function-pool-survey-2026-05-25.md`](docs/research/unmatched-function-pool-survey-2026-05-25.md)).
+     Highest-leverage easy pick available — already-named identity,
+     uniform recipe, +30 functions in one round.
+   - **If brief 209 Phase 2 picks Option B (extend resolver):**
+     brief 210 (scaffolder) — extends `objdiff_resolve_relocs.py`
+     for the `.word <BL>`-shaped no-reloc case. ~100-150 LOC,
+     closes the metric gap permanently for C-32 ships.
+   - **Brief 211 (scaffolder)** — fresh wall-taxonomy completion
+     sweep. Brief 187's curated queue is ~80% drained; the next 52
+     picks won't be as homogeneous. Audit unmatched-named functions
+     for unrecognised wall patterns. Target: 2-3 new walls
+     identified.
+   - **Brief 212-214 (decomper)** — full trivial-bucket sweep
+     using brief 211's expanded taxonomy. Expected +80-150 ships
+     over 2-3 rounds.
+   - **Brief 215+ — hard-bucket pilot.** Pick one large gameplay
+     function (>0x400). Long-form decomp project. Template for
+     future hard-bucket work + concrete pursuit of Track 2 (human-
+     readable C source).
 4. **Scope brief 209+ scaffolder candidates** to keep ready:
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
