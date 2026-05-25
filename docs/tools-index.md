@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**73 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**74 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (18)
-- [Uncategorised](#uncategorised) (9)
+- [Uncategorised](#uncategorised) (10)
 
 ## Analysis / worklist
 
@@ -472,6 +472,12 @@ cluster B + D-3 cross-region application (brief 170).
 **filter objdiff.json to exclude**
 
 units that crash `objdiff-cli report generate` (brief 187).
+
+### `tools/objdiff_resolve_relocs.py`
+
+**resolve relocations in ELF .o files to a**
+
+fixed fictional virtual base address, strip the relocation tables, write `*.resolved.o` sidecars. Brief 206 workaround for objdiff's `matched_functions` metric under-counting `.legacy.c` / `.legacy_sp3.c` / `.s` ship paths.
 
 ### `tools/predict_walls.py`
 
