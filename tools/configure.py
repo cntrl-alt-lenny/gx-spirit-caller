@@ -732,10 +732,10 @@ def main():
         )
         n.newline()
 
-        # Brief 187 Part 1 + brief 206: two post-processing steps
-        # run before `objdiff-cli report generate` consumes the
-        # `objdiff.json`. Both rewrite the JSON in place and are
-        # idempotent.
+        # Brief 187 / 206 / 210: three post-processing steps run
+        # before `objdiff-cli report generate` consumes the
+        # `objdiff.json`. All three rewrite their inputs in place
+        # and are idempotent.
         #
         # Step 1 — `objdiff_filter_panic_units.py` (brief 187):
         # drop units that would crash report generation:
@@ -749,20 +749,33 @@ def main():
         # Step 2 — `objdiff_resolve_relocs.py` (brief 206): apply
         # relocations on both target + base `.o` to a fictional
         # virtual base address, strip the reloc tables, write
-        # `*.resolved` sidecars and repoint the JSON at them. This
-        # closes the `matched_functions` under-counting gap that
-        # affects every `.legacy.c` / `.legacy_sp3.c` / `.s` ship
-        # — see `docs/research/objdiff-fuzzy-vs-complete-metric.md`
-        # for the diagnosis. Without this step,
-        # `matched_functions` is a strict lower bound on real
-        # matches; with it, the metric becomes accurate.
+        # `*.resolved` sidecars and repoint the JSON at them.
+        # Closes the `matched_functions` under-counting gap for
+        # every `.legacy.c` / `.legacy_sp3.c` / `.s` ship — see
+        # `docs/research/objdiff-fuzzy-vs-complete-metric.md`.
+        #
+        # Step 3 — `patch_arm_mapping_symbols.py` (brief 210):
+        # rewrite `$d` mapping symbols to `$a` for `.text` ranges
+        # that decode as ARM instructions. mwasmarm tags every
+        # `.word 0xHEX` directive as `$d` (data), so brief 192's
+        # C-32 hand-encoded cross-overlay BL recipe produces .o
+        # files with their entire `.text` marked as data even
+        # though the bytes are byte-identical ARM instructions.
+        # objdiff's diff reader treats those as data → low
+        # `fuzzy_match_percent`. This step rewrites the mapping
+        # symbols so objdiff sees the right code/data boundaries
+        # on both sides. See `docs/research/
+        # brief-209-stragger-investigation.md` for the diagnosis
+        # and the per-pick verdict matrix this step addresses.
         objdiff_filter = "tools/objdiff_filter_panic_units.py"
         objdiff_resolve = "tools/objdiff_resolve_relocs.py"
+        objdiff_mapping = "tools/patch_arm_mapping_symbols.py"
         n.rule(
             name="objdiff_report",
             command=_wrap_chain_for_windows(
                 f"{PYTHON} {objdiff_filter} --in objdiff.json"
                 f" && {PYTHON} {objdiff_resolve} --in objdiff.json"
+                f" && {PYTHON} {objdiff_mapping} --in objdiff.json"
                 f" && {OBJDIFF} report generate -o $out"
             ),
         )
@@ -1313,6 +1326,8 @@ def add_objdiff_builds(n: ninja_syntax.Writer, project: Project):
         implicit=[
             OBJDIFF,
             "tools/objdiff_filter_panic_units.py",
+            "tools/objdiff_resolve_relocs.py",
+            "tools/patch_arm_mapping_symbols.py",
         ] + project.source_object_files(),
         rule="objdiff_report",
         outputs=str(project.objdiff_report()),
