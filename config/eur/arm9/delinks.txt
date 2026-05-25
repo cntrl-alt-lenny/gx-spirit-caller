@@ -8997,3 +8997,7 @@ src/main/func_02093dc8.legacy.c:
 src/main/func_02023478.s:
     complete
     .text start:0x02023478 end:0x020234f8
+
+src/main/func_020212cc.s:
+    complete
+    .text start:0x020212cc end:0x0202142c
