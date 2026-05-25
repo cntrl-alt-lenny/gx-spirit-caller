@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (35 patterns)
+## Coercible-with-knowledge (36 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4583,6 +4583,70 @@ patcher's `trim_text_section_padding` heuristic with reloc-
 protection, shipped the worked example, and adds composite
 classification. Full diagnosis at
 [`first-wave-wall-routing-trilemma.md`](first-wave-wall-routing-trilemma.md).
+
+### C-36. Literal-tail trim trap — delinks-aware patcher guard
+
+**The wall.** A function ends with a pool entry that's a small
+literal (`.word 0x7fff`, `.word 0x618`, `.word 0xffff`, etc.)
+whose top 2 bytes are `0x00 0x00`. There is NO relocation on
+those last 4 bytes — the value IS the literal, not a symbol
+ref the linker fills in. Without brief 208's fix, the patcher's
+`trim_text_section_padding` (brief 204) shaves 2 bytes off the
+emitted `.text` section because:
+
+  - `sh_size % 4 == 0` ✓ (literal pool words are 4-byte aligned)
+  - Last 2 bytes are `0x00 0x00` ✓ (the literal's high half)
+  - No relocation in last 4 bytes ✓ (it's a literal, not a sym)
+
+Brief 204's reloc-protection check passes (no protecting reloc
+exists) so the trim still fires — corrupting the literal pool
+slot and cascade-shifting every downstream byte. Brief 207
+PR #660 surfaced six picks deferred for exactly this reason:
+
+| Module | Address | Last `.word` | Trailing bytes |
+|---|---|---|---|
+| main | `func_02023478` | `0x7fff` | `ff 7f 00 00` |
+| main | `func_020212cc` | `0x618` | `18 06 00 00` |
+| ov002 | `0x021aba60` | `0xffff` | `ff ff 00 00` |
+| ov002 | `0x021d9828` | `0x868` | `68 08 00 00` |
+| ov002 | `0x0220eb00` | `0x868` | `68 08 00 00` |
+| ov018 | `0x021ab1c4` | `0x1ff` | `ff 01 00 00` |
+
+**The fix.** `tools/patch_section_align.py` gains a
+`--delinks <path>` (repeatable) + `--source-path <path>` CLI
+pair. The patcher cross-references the TU's intended `.text`
+slot size from delinks.txt (`end - start`) and suppresses the
+trim when `sh_size` matches. mwasm padding ALWAYS makes
+`sh_size > intended_slot_size`; if they match, the trailing
+zeros are literal content, not padding.
+
+**Recipe.** Vanilla brief 202 `.s` — explicit `.word`
+directives per pool slot. No workaround needed beyond shipping
+under the brief 208 build (configure.py wires `--delinks` and
+`--source-path` into the mwasm ninja rule automatically). Brief
+207's literal-promotion workaround attempt (force the high
+byte non-zero by adding bytes) overflows the next slot; it
+doesn't work for cases where the literal value is needed
+intact (`0x7fff` IS a 16-bit mask the function uses).
+
+**Recognition cue.** `tools/predict_walls.py`'s
+`detect_literal_tail_trim_trap` consults orig bytes + relocs:
+fires when (a) function's last 4 bytes encode a value <
+`0x01000000` (trailing 2 bytes == `0x00 0x00`) AND (b) no
+relocation lands in the last 4 bytes. The cue spells out the
+exact literal value for the decomper.
+
+**Use when:** the classifier flags C-36 — ship as `.s` per
+brief 202 recipe. Brief 208 patcher guard handles the trim
+case automatically; no source-side workaround needed.
+
+**Provenance:** brief 205 (PR #657) deferred `func_02023478`
+when the literal-tail pattern broke its first ship attempt.
+Brief 207 (PR #660) re-attempted post brief 204's reloc-
+protect and found the literal-tail case still fails. Brief
+208 (this entry) ships the patcher fix + classifier + worked
+example. Full diagnosis at
+[`first-wave-wall-literal-tail-trim.md`](first-wave-wall-literal-tail-trim.md).
 
 ## Permanent (11 patterns)
 

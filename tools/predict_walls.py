@@ -78,6 +78,17 @@ predicate) need source-level context and aren't emitted here.
     modal-deviation cap) unblocks the route. Detection is a
     composite — flagged only when an existing StyleA/C-15
     prediction is amplified by the module + size criteria.
+  - **C-36** — literal-tail trim trap: function ends with a
+    pool entry literal (`.word 0x7fff` and similar small
+    values) whose top 2 bytes are `0x00 0x00`, AND no
+    relocation covers the last 4 bytes. Without brief 208's
+    delinks-aware trim guard, the patcher's
+    `trim_text_section_padding` (brief 204) shaves 2 bytes
+    off the section, cascade-shifting every downstream byte.
+    Brief 208 ships the patcher fix; this detector flags
+    affected functions so the decomper knows the path is
+    open. Brief 207 PR #660 deferred 6 picks for exactly this
+    reason — all now shippable under the brief 208 build.
 
 Walls NOT detected here (require source context):
 
@@ -198,6 +209,39 @@ def disasm_function(
     if r.returncode != 0:
         return None
     return r.stdout
+
+
+def read_function_bytes(
+    region: str, module: str, addr: int, size: int,
+) -> bytes | None:
+    """Read `size` raw bytes from `module`'s binary at virtual
+    address `addr`. Mirrors `disasm_function`'s base-address logic
+    but returns the raw bytes (no objdump invocation).
+
+    Brief 208's C-36 detector needs the last 4 bytes of every
+    function to check for the literal-tail trim-trap signal.
+    Disassembling the whole function then reparsing for the last
+    word is workable but expensive; raw-byte read is one mmap +
+    one slice.
+
+    Returns `None` when the binary is missing, the address is
+    below the module's `.text` base, or the read would extend
+    past EOF.
+    """
+    base = _module_text_base(region, module)
+    bin_path = _module_bin_path(region, module)
+    if base is None or not bin_path.is_file():
+        return None
+    fo = addr - base
+    if fo < 0:
+        return None
+    try:
+        buf = bin_path.read_bytes()
+    except OSError:
+        return None
+    if fo + size > len(buf):
+        return None
+    return buf[fo:fo + size]
 
 
 @dataclass
@@ -748,6 +792,77 @@ def detect_address_cse(
     )]
 
 
+def detect_literal_tail_trim_trap(
+    orig_last4: bytes,
+    relocs_text: str,
+    addr: int,
+    size: int,
+) -> list[WallPrediction]:
+    """C-36 detector — literal-tail trim trap (brief 208).
+
+    Detection signal: the function's last 4 bytes in orig binary
+    encode a small literal (high byte == 0x00 → trailing 2 bytes
+    are `0x00 0x00`), AND no relocation lands in those last 4
+    bytes.
+
+    Without brief 208's delinks-aware trim guard, such functions
+    cannot be shipped as `.s` — the patcher's
+    `trim_text_section_padding` shaves the last 2 bytes off the
+    `.text` section (because the trailing zeros look like mwasm
+    padding), cascading every downstream byte.
+
+    Brief 204 fixed the relocation-tail case (last 4 bytes
+    covered by a `.rel.text` entry → don't trim). Brief 208 fixes
+    the literal-tail case (delinks declares the slot size →
+    don't trim if mwasm emitted exactly that). This detector
+    flags functions whose orig matches the literal-tail shape so
+    decompers know to ship them under the brief 208 build (don't
+    need to invent a workaround — the patcher handles it).
+
+    Concrete picks brief 207's PR #660 surfaced as deferred for
+    exactly this reason (all should fire C-36):
+    - `main:func_02023478` (last `.word 0x7fff` → `ff 7f 00 00`)
+    - `main:func_020212cc` (last `.word 0x618` → `18 06 00 00`)
+    - `ov002:021aba60` (last `.word 0xffff` → `ff ff 00 00`)
+    - `ov002:021d9828`, `ov002:0220eb00` (last `.word 0x868`)
+    - `ov018:021ab1c4` (last `.word 0x1ff` → `ff 01 00 00`)
+
+    Pure function. `orig_last4` is the function's tail bytes
+    (typically obtained via `read_function_bytes(region, module,
+    addr, size)[-4:]`). Returns `[]` when the literal-tail
+    pattern doesn't fire.
+    """
+    if len(orig_last4) < 4:
+        return []
+    # Trailing 2 bytes must be 0x00 0x00 — that's what the trim
+    # heuristic actually keys off. Equivalent to "high byte of
+    # the LE 32-bit word is 0x00" plus "second-highest byte is
+    # 0x00", which means the literal is < 0x00010000.
+    if orig_last4[-1] != 0x00 or orig_last4[-2] != 0x00:
+        return []
+    # If a relocation patches any of the last 4 bytes, brief 204
+    # already handles the case — no C-36 needed.
+    last4_start = addr + size - 4
+    for line in relocs_text.splitlines():
+        m = _RELOC_RE.match(line.strip())
+        if not m:
+            continue
+        frm = int(m.group(1), 16)
+        if last4_start <= frm < addr + size:
+            return []
+    # Reconstruct the LE 32-bit literal value for the human-
+    # readable cue.
+    literal = int.from_bytes(orig_last4, "little")
+    return [WallPrediction(
+        "C-36",
+        f"literal-tail trim trap — last pool word is `.word "
+        f"0x{literal:x}` (no reloc on last 4 bytes; trailing "
+        "`0x00 0x00` matches mwasm padding pattern). Brief 208 "
+        "patcher guard suppresses the false-positive trim; ship "
+        "as `.s` per brief 202 recipe — no workaround needed.",
+    )]
+
+
 def detect_routing_trilemma(
     walls: list[WallPrediction],
 ) -> list[WallPrediction]:
@@ -904,6 +1019,18 @@ def predict_module(
             walls.extend(detect_address_cse(
                 relocs_text, s.addr, s.size,
             ))
+        # Brief 208: C-36 literal-tail trim-trap detector — reads
+        # the function's last 4 bytes from the binary. If they
+        # encode a small literal AND no reloc covers the tail,
+        # the function would trip the brief 204 trim heuristic
+        # without brief 208's delinks-slot-size guard.
+        orig_bytes = read_function_bytes(
+            region, module, s.addr, s.size,
+        )
+        if orig_bytes is not None and len(orig_bytes) >= 4:
+            walls.extend(detect_literal_tail_trim_trap(
+                orig_bytes[-4:], relocs_text, s.addr, s.size,
+            ))
         # Brief 194: C-33 is a composite over the disasm-based
         # predictions, gated on module + size.
         walls.extend(detect_legacy_c_cascade_risk(
@@ -991,6 +1118,7 @@ def main(argv: list[str] | None = None) -> int:
         walls = detect_walls(asm)
         # Brief 192 — also run the relocs-based C-32 detector.
         relocs_path = _module_relocs_path(args.version, args.module)
+        relocs_text = ""
         if relocs_path is not None and relocs_path.is_file():
             relocs_text = relocs_path.read_text(encoding="utf-8")
             walls.extend(detect_cross_overlay_bl(
@@ -999,6 +1127,15 @@ def main(argv: list[str] | None = None) -> int:
             # Brief 202 — C-34 address-CSE detector.
             walls.extend(detect_address_cse(
                 relocs_text, args.address, args.size,
+            ))
+        # Brief 208 — C-36 literal-tail trim-trap detector.
+        orig_bytes = read_function_bytes(
+            args.version, args.module, args.address, args.size,
+        )
+        if orig_bytes is not None and len(orig_bytes) >= 4:
+            walls.extend(detect_literal_tail_trim_trap(
+                orig_bytes[-4:], relocs_text,
+                args.address, args.size,
             ))
         # Brief 194 — C-33 risk composite.
         walls.extend(detect_legacy_c_cascade_risk(

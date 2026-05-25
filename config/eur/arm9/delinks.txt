@@ -8993,3 +8993,7 @@ src/main/OSi_PostIrqEvent.legacy.c:
 src/main/func_02093dc8.legacy.c:
     complete
     .text start:0x02093dc8 end:0x02093e38
+
+src/main/func_02023478.s:
+    complete
+    .text start:0x02023478 end:0x020234f8
