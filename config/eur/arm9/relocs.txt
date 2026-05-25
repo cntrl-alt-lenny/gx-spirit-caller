@@ -8,6 +8,7 @@ from:0x020008f8 kind:arm_call to:0x020b41bc module:main
 from:0x020008fc kind:arm_call to:0x02000b64 module:main
 from:0x02000900 kind:arm_call to:0x020b4284 module:main
 from:0x02000918 kind:load to:0x027e0000 module:dtcm
+from:0x02000928 kind:load to:0x02000b68 module:main
 from:0x02000930 kind:load to:0x01ff8180 module:itcm
 from:0x02000934 kind:load to:0x02000c34 module:main
 from:0x02000b3c kind:load to:0x027e0021 module:dtcm

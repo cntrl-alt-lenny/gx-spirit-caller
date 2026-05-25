@@ -8,6 +8,14 @@ src/overlay000/ov000_021aa4b4.c:
     complete
     .text start:0x021aa4b4 end:0x021aa4c4
 
+src/overlay000/func_ov000_021ab6cc.s:
+    complete
+    .text start:0x021ab6cc end:0x021ab6ec
+
+src/overlay000/func_ov000_021af5c0.s:
+    complete
+    .text start:0x021af5c0 end:0x021af5e0
+
 
 
 
