@@ -364,24 +364,45 @@ itself:
 
 ### Open briefs
 
-- **Brief 206 (HIGH, NEW)** — `scaffolder` objdiff reloc-resolution
-  harness — close the `matched_functions` under-counting gap.
-  Per `docs/research/objdiff-fuzzy-vs-complete-metric.md` option (3):
-  post-build script to relocate both .o files to a fixed base
-  before objdiff compares, eliminating the reloc-record divergence
-  between mwcc's output and dsd's delink. Expected recovery:
-  **+47 matched_functions** (1630 → 1677); concrete canary list at
-  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
-  Branch: `scaffolder/objdiff-resolve-relocs`.
-- **Brief 207 (HIGH, NEW)** — `decomper` `func_02023478` ship +
-  C-34/C-35 rescan drain. Brief 204's patcher trim-protect makes
-  the previously-deferred pick shippable. Phase 1: ship
-  `func_02023478`. Phase 2: full EUR rescan using the new C-35
-  composite classifier, drain any picks the brief 205 sweep
-  missed. Branch: `decomper/c34-c35-rescan-drain`.
+- **Brief 208 (HIGH, NEW)** — `scaffolder` literal-tail trim trap
+  patcher enhancement + classifier (C-36). Brief 207 surfaced a new
+  failure mode: `.s` files where the last pool entry is a LITERAL
+  small value with `\x00\x00` high bytes (e.g. `0x7fff`, `0x868`,
+  `0x1ff`). Brief 204's reloc-protected trim still fires because
+  no relocation is present. Fix: cross-reference delinks.txt slot
+  size during the trim pass; never trim when mwasm-emitted size
+  matches the intended slot. ~6 affected picks waiting (1 worked
+  example + 5 for decomper brief 209 drain). Branch:
+  `scaffolder/literal-tail-trim-trap`.
+- **Brief 209 (HIGH, NEW)** — `decomper` literal-tail drain + brief
+  206 straggler investigation. Phase 1 (depends on brief 208): drain
+  5 literal-tail picks via the now-locked recipe. Phase 2: investigate
+  brief 206's 23 stragglers — brain has done the pre-validation
+  ([`docs/research/brief-209-stragger-prevalidation.md`](docs/research/brief-209-stragger-prevalidation.md))
+  showing the bottom tier (13 ov011 picks) has a structural reloc-
+  comparison gap, not a recipe bug. Brief 209 confirms or revises +
+  closes the 7 close picks (95-100% + 80-95% + 50-80%). Branch:
+  `decomper/literal-tail-drain-plus-stragger-investigation`.
 
 ### Closed briefs (reference)
 
+- **Brief 207** — `decomper`, shipped in PR #660. 🎯 **32 of 33
+  C-34/C-35 rescan drain shipped** (biggest single drain to date,
+  above brief 205's 20/21). 5 main + 27 overlay picks. 1 deferred
+  (`func_02023478`) — surfaced a NEW failure mode beyond brief 204's
+  trim-protect: literal-tail (no reloc) trim trap. Brief 207's PR
+  body proposes the patcher enhancement; queued as brief 208.
+  +32 complete_units.
+- **Brief 206** — `scaffolder`, shipped in PR #659. 🎯 **objdiff
+  reloc-resolution harness shipped — matched_functions accounting
+  fixed.** `tools/objdiff_resolve_relocs.py` applies `R_ARM_ABS32`
+  + `R_ARM_PC24` relocations to a fictional fixed base before
+  objdiff compares, eliminating the reloc-record divergence from
+  briefs 199/203/205. Wired into the `objdiff_report` ninja rule.
+  All 21 high-confidence canaries from brain-PR #658 flipped to
+  `matched_functions: 1/1`. Recovery: matched_functions 1430 → 1654
+  (+224 cumulative across the post-pivot arc). Brain pushed
+  research-index regen on review fix. 2117 → 2146 tests.
 - **Brief 205** — `decomper`, shipped in PR #657. 🎯 **20 of 21
   C-34 picks shipped** (full-corpus drain — well above 1-5
   realistic expectation). +20 complete_units. Surfaced + worked
