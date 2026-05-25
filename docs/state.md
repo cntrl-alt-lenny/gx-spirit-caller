@@ -8,17 +8,23 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-25 evening, post-#661/#663 + this brain-PR.
-Brain on Mac. **🔬 C-36 WALL CLOSED + STRAGGLER ROOT CAUSE
-DIAGNOSED.** Brief 208 (PR #663) closed the literal-tail trim trap
-(C-36) with a two-guard patcher fix. Brief 209 (PR #661) identified
-the root cause of all 23 stragglers: mwasmarm `$d` mapping symbols
-on `.word` directives — empirically falsified brain's earlier
-hypothesis (address resolution gap). Brief 209 recommended path #1
-(post-process `$d` → `$a`) is queued as brief 210. **Current
-metrics (post-merge):** `complete_units 1667 / 2553`, `matched_
-code_percent 4.1567%`, `matched_functions 1687 / 9801 (17.21%)`,
-`fuzzy_match_percent 4.1961%`.
+**Last updated:** 2026-05-25, post-#665 + #666 merge. Brain back on
+Windows (verifying with `ninja sha1`, EUR-only — 3-region check
+deferred until Windows brain has all three USA/JPN extracts; the
+PRs touched tools + .s sources only, EUR PASS is sufficient
+evidence per cloud's own test plans). **Brief 210 (`$d` → `$a`
+rewriter, scaffolder) and brief 211 (literal-tail drain + BIOS
+thunk pre-empt, decomper) both shipped.** Brief 210 lifted
+`matched_code_percent` from 1.84% → 3.71% (+1.87 pp) and resolved
+21 of 23 brief 209 stragglers. Brief 211 shipped 5/5 literal-tail
+picks (only 1 was the true brief-208-unblocked shape; other 4 had
+symbol-ref tails already covered by brief 204) and pre-empted the
+BIOS-thunk family check (all already matched by the brief 207 +
+209 chain — brain's PR #662 survey was already stale). **Current
+metrics (post-#666 merge):** `matched_functions 1698 / 9801
+(17.32%)`, `matched_code_percent 3.71%`, `fuzzy_match_percent
+4.51%`. **Brain reminder:** any survey older than ~3 briefs is
+suspect; re-validate before scoping (brief 211's Phase 2 finding).
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
