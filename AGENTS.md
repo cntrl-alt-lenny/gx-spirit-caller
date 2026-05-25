@@ -364,24 +364,42 @@ itself:
 
 ### Open briefs
 
-- **Brief 204 (HIGH, NEW)** — `scaffolder` routing-trilemma research
-  on `func_02021b38`. Brief 203 left this pick as un-wired stub:
-  orig has THREE shapes (compact push + duplicate-pool ref +
-  non-strength-reduced loop) that no single mwcc tier in the current
-  toolchain produces. Investigate older mwcc variants (2.0/sp1p3,
-  2.0/sp1p4, 1.0 if available), per-TU compiler flags, source-shape
-  hybrids, or `.s` fallback. Classify as C-N if recipe ships,
-  P-N if permanent. Branch: `scaffolder/routing-trilemma-research`.
-- **Brief 205 (HIGH, NEW)** — `decomper` E-08 ship + C-34
-  full-corpus drain. Phase 1: ship `func_02026fd8` via brief
-  202's C-34 `.s` recipe (clone of E-07, locked recipe).
-  Phase 2: full EUR scan via `python3.13 tools/predict_walls.py
-  --version eur` for additional C-34 candidates sized 0x40-0x100
-  in main, drain whatever surfaces (0-5 expected). Branch:
-  `decomper/c34-drain-e08-plus-full-scan`.
+- **Brief 206 (HIGH, NEW)** — `scaffolder` objdiff reloc-resolution
+  harness — close the `matched_functions` under-counting gap.
+  Per `docs/research/objdiff-fuzzy-vs-complete-metric.md` option (3):
+  post-build script to relocate both .o files to a fixed base
+  before objdiff compares, eliminating the reloc-record divergence
+  between mwcc's output and dsd's delink. Expected recovery:
+  **+47 matched_functions** (1630 → 1677); concrete canary list at
+  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
+  Branch: `scaffolder/objdiff-resolve-relocs`.
+- **Brief 207 (HIGH, NEW)** — `decomper` `func_02023478` ship +
+  C-34/C-35 rescan drain. Brief 204's patcher trim-protect makes
+  the previously-deferred pick shippable. Phase 1: ship
+  `func_02023478`. Phase 2: full EUR rescan using the new C-35
+  composite classifier, drain any picks the brief 205 sweep
+  missed. Branch: `decomper/c34-c35-rescan-drain`.
 
 ### Closed briefs (reference)
 
+- **Brief 205** — `decomper`, shipped in PR #657. 🎯 **20 of 21
+  C-34 picks shipped** (full-corpus drain — well above 1-5
+  realistic expectation). +20 complete_units. Surfaced + worked
+  around a patcher trim trap (later fixed by brief 204):
+  duplicate-slot-as-literal + last-pool-entry-as-literal tricks
+  defeat the 4-byte `\x00\x00` trim trigger. 1 pick deferred
+  (`func_02023478`) — last pool entry value too small to promote;
+  now shippable post-brief-204.
+- **Brief 204** — `scaffolder`, shipped in PR #656. 🎯 **C-35
+  routing trilemma classified + patcher trim-protect.** Swept all
+  15 mwccarm variants on `func_02021b38` — confirmed no native
+  tier matches (orig combo of compact push + duplicate-pool ref +
+  non-strength-reduced loop is unreachable). Applied brief 202's
+  `.s` recipe; surfaced a patcher trim false-positive that broke
+  cascade-fill placement; fixed via reloc-protection in
+  `tools/patch_section_align.py::trim_text_section_padding`. New
+  C-35 composite detector flags C-23 + C-34 stacks (e.g.
+  `func_02021b38`). 2110 → 2117 tests.
 - **Brief 203** — `decomper`, shipped in PR #654. 🎯 **2/3 C-23
   ships + 2 new recipe extensions.** `OSi_PostIrqEvent` (0x9c)
   + `func_02093dc8` (0x70) shipped clean. `func_02021b38` (0x74)

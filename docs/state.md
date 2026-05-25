@@ -8,17 +8,20 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-23 evening, post-#653/#654 + this brain-PR.
-Brain on Mac. **🎉 C-34 ADDRESS-CSE WALL CLOSED + 2 NEW RECIPE
-EXTENSIONS** — brief 202 (PR #653) found a `.s` recipe for the
-brief 201 hand-off (NOT P-12 permanent — actual recipe shipped);
-brief 203 (PR #654) closed 2 of 3 C-23 picks and discovered two
-new source-shape rules for variable-index MMIO. **Current metrics
-(post-merge):** `complete_units 1617 / 2483` (the canonical
-headline); `matched_code_percent 1.7248 %`; `matched_functions
-1630 / 9801` (a strict lower bound — under-counts by ~10-15
-across the arc due to `.legacy.c` / `.s` reloc-record divergence
-from dsd's delink; see new research note).
+**Last updated:** 2026-05-23 evening, post-#656/#657 + this brain-PR.
+Brain on Mac. **🎉 C-35 ROUTING TRILEMMA CLASSIFIED + C-34 FULL-
+CORPUS DRAIN (20/21).** Brief 204 (PR #656) classified C-35
+(composite C-23+C-34 stack) and fixed a patcher trim trap that
+broke cascade-fill placement. Brief 205 (PR #657) drained 20 of
+21 C-34 picks in a single round — biggest drain since brief 197.
+**Current metrics (post-merge):** `complete_units 1636 / 2507`
+(canonical headline); `matched_code_percent 1.7260 %`;
+`matched_functions 1630 / 9801` (a strict lower bound — see
+under-count note). **Brief 206 pre-validation in this brain-PR:**
+profile of the 47 units currently sitting at `complete_code=100%`
+but `matched_functions=None` — brief 206's reloc-resolution fix
+will recover all of them (1630 → 1677, +47). Canary list at
+[`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
 
 **Headline metric shift this round.** Investigation found that
 `matched_functions` is systematically under-counting `.legacy.c`
@@ -31,9 +34,10 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes:** brief 204 (scaffolder routing-trilemma
-research on `func_02021b38`) + brief 205 (decomper E-08 ship +
-C-34 full-corpus drain). See § *In flight* below.
+**Two open lanes:** brief 206 (scaffolder reloc-resolution
+harness — closes the headline-metric gap) + brief 207 (decomper
+`func_02023478` ship + C-34/C-35 rescan drain). See § *In flight*
+below.
 
 ## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
 
@@ -113,6 +117,42 @@ region from PASS → FAIL, it does not merge. Cloud and decomper both
 verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 
 ## Today's merges (just-landed)
+
+- **PR #657 — decomper / brief 205 C-34 full-scan drain 20/21.**
+  🎯 Phase 1 (E-08) + Phase 2 (full EUR scan harvest). 20 of 21
+  picks shipped via brief 202's C-34 `.s` recipe — biggest drain
+  since brief 197's 13/13. Surfaced + worked around a patcher
+  trim trap (later properly fixed by brief 204): duplicate-slot-
+  as-literal + last-pool-entry-as-literal defeat the 4-byte
+  `\x00\x00` trim trigger. 1 pick deferred (`func_02023478`) —
+  last pool entry too small to promote; now shippable post-204.
+  +20 complete_units (1617 → 1636).
+- **PR #656 — scaffolder / brief 204 C-35 routing trilemma +
+  patcher trim-protect.** 🎯 Multi-track win. (1) Swept all 15
+  mwccarm variants on `func_02021b38` — confirmed no native tier
+  produces orig's compact-push + dup-pool + non-strength-reduced-
+  loop combo (trilemma is real). (2) Applied brief 202's `.s`
+  recipe; shipped `func_02021b38.s` as worked example. (3)
+  Surfaced + fixed a patcher trim false-positive in
+  `tools/patch_section_align.py::trim_text_section_padding` —
+  added reloc-protection that prevents trimming when `.rel.text`
+  has an `r_offset` in the last 4 bytes. PR #115's Thumb-thunk
+  fix surface preserved. (4) New C-35 composite detector
+  (C-23 + C-34) flags routing-trilemma picks. 2110 → 2117 tests.
+- **Brain-PR (this one) — brief 206 pre-validation + .codex
+  cleanup + 204/205 housekeeping.** 🔬 Diagnostic + janitorial.
+  (1) Profile of the 47 units currently sitting at
+  `complete_code_percent=100` but `matched_functions=None` —
+  brief 206 will recover all of them (predicted: 1630 → 1677).
+  Concrete canary list at
+  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
+  (2) `.codex/` cleanup: renamed `cloud.toml` → `scaffolder.toml`,
+  updated content (cloud → scaffolder throughout 3 files),
+  removed bogus Codex.ai URL convention, fixed `hooks.json`'s
+  hardcoded `/Users/leo/Dev/gx-spirit-caller/` paths (relative
+  now) + `python` → `python3` (same fix as `.claude/settings.json`
+  in PR #634). (3) AGENTS.md / state.md rotated for 204/205
+  closure + 206/207 queuing.
 
 - **PR #654 — decomper / brief 203 C-23 drain 2/3 + recipe
   extensions.** 🎯 `OSi_PostIrqEvent` (0x9c) + `func_02093dc8`
@@ -544,28 +584,30 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
 ## In flight (post this brain-PR)
 
 **Open PRs: 0** once this brain-PR lands. Both agents have just
-received the brief 204 / 205 kickoffs:
+received the brief 206 / 207 kickoffs:
 
-**Scaffolder — brief 204 in flight:**
+**Scaffolder — brief 206 in flight:**
 
-- **Brief 204 (HIGH, NEW)** — `scaffolder/routing-trilemma-research`.
-  Brief 203 left `func_02021b38` as an un-wired stub with a clear
-  failure mode: orig has THREE shapes (compact push + duplicate-
-  pool ref + non-strength-reduced loop) that no single mwcc tier
-  in the current toolchain produces. Brief 204 investigates older
-  mwcc variants (2.0/sp1p3, 2.0/sp1p4, 1.0 if downloadable),
-  per-TU compiler flags, source-shape hybrids, or `.s` fallback.
-  Classify as C-N if recipe ships, P-N if permanent.
+- **Brief 206 (HIGH, NEW)** — `scaffolder/objdiff-resolve-relocs`.
+  Per
+  [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md)
+  option (3): post-build script that relocates both .o files to a
+  fixed base address before objdiff compares — eliminates the
+  reloc-record divergence between mwcc-built and dsd-delinked
+  unrelocated bytes. Predicted recovery: **+47 matched_functions**
+  (1630 → 1677), per concrete profile in
+  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
+  Restores `matched_functions` as a meaningful headline rather
+  than a strict lower bound.
 
-**Decomper — brief 205 in flight:**
+**Decomper — brief 207 in flight:**
 
-- **Brief 205 (HIGH, NEW)** — `decomper/c34-drain-e08-plus-full-scan`.
-  Phase 1: ship E-08 (`func_02026fd8`, 0x70) via brief 202's
-  C-34 `.s` recipe (clone of E-07, locked). Phase 2: full EUR
-  scan via `python3.13 tools/predict_walls.py --version eur` for
-  additional C-34 candidates sized 0x40-0x100 in main; drain
-  whatever surfaces (0-5 expected). Recipe is locked from brief
-  202 — each pick is a recipe-drain shot.
+- **Brief 207 (HIGH, NEW)** — `decomper/c34-c35-rescan-drain`.
+  Phase 1: ship `func_02023478` (the C-34 pick brief 205 deferred
+  — brief 204's patcher trim fix makes the workaround unnecessary).
+  Phase 2: full EUR rescan using the C-35 composite classifier,
+  drain any picks brief 205's sweep missed (could include overlay
+  modules + size-window edges). Recipe is locked.
 
 ## Active clusters (post-pivot reality)
 
@@ -617,9 +659,10 @@ indicator. Full diagnosis:
 
 | Metric | Value | Notes |
 |---|---|---|
-| **complete_units** | **1,617 / 2,483** | SHA1-aligned headline. +236 over the post-pivot arc (1,381 baseline at brief 187). |
-| matched_code_percent | 1.7248 % | strict lower bound; under-counts due to reloc-record divergence |
-| matched_functions | 1,630 / 9,801 | same caveat — useful as a regression-spotter, not a progress headline |
+| **complete_units** | **1,636 / 2,507** | SHA1-aligned headline. +255 over the post-pivot arc (1,381 baseline at brief 187). |
+| matched_code_percent | 1.7260 % | strict lower bound; under-counts due to reloc-record divergence |
+| matched_functions | 1,630 / 9,801 | same caveat — brief 206 will recover +47 of these (target: 1,677); see [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md) |
+| fuzzy_match_percent | 1.8787 % | climbed +0.15% in brief 205's drain — most sensitive to recipe-locked `.s` ships |
 | complete_code_percent | (per-unit) | for individual ships, 100% means byte-identical at the linker level |
 
 **Resumption queue:** [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
@@ -671,36 +714,35 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Verify + merge brief 204 PR** (scaffolder routing-trilemma
-   research on `func_02021b38`) when it opens. Branch:
-   `scaffolder/routing-trilemma-research`. Read the per-tier
-   investigation log — even a P-N classification is a real
-   deliverable (catalogs the limit of our current toolchain).
-   Full 3-region SHA1 PASS if a recipe + worked example ships.
-2. **Verify + merge brief 205 PR** (decomper E-08 + C-34 drain)
-   when it opens. Branch: `decomper/c34-drain-e08-plus-full-scan`.
-   3-region SHA1 PASS per shipped pick. **Headline event:
-   complete_units += N where N = total picks shipped** (NOT
-   matched_functions — see canonical metric note above; C-34
-   `.s` ships systematically don't tick matched_functions).
-3. **Scope brief 206+ based on outcomes:**
-   - **If brief 204 ships a recipe:** brief 206 (scaffolder)
-     audits the corpus for other routing-trilemma candidates
-     using the new classifier; brief 207 (decomper) drains.
-   - **If brief 204 classifies as P-N:** brief 206 (decomper)
-     re-attempts more decomp.me iteration on the 220-315 score
-     picks brief 201 documented but didn't ship.
-   - **If brief 205 surfaces 5+ C-34 candidates:** brief 206
-     (decomper) drains additional picks; brief 207 (scaffolder)
-     considers extending the C-34 classifier for variant shapes.
-   - **Either way:** brief 206+ should consider the
-     matched_functions under-counting investigation. Three paths
-     listed in
-     [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md);
-     option (3) — post-build script to relocate both `.o` files
-     to a fixed base before objdiff compares — is the tractable
-     local path.
-4. **Scope brief 207+ scaffolder candidates** to keep ready:
+1. **Verify + merge brief 206 PR** (scaffolder reloc-resolution
+   harness) when it opens. Branch:
+   `scaffolder/objdiff-resolve-relocs`. Read the impact table —
+   it should show `matched_functions` jumping from 1630 toward
+   1677. Specifically check the canary list at
+   [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md):
+   if `OSi_PostIrqEvent.legacy` and `func_020988a8` (highest
+   fuzzy) flip to `matched_functions: 1/1`, the fix is working.
+2. **Verify + merge brief 207 PR** (decomper `func_02023478` +
+   C-34/C-35 rescan drain) when it opens. Branch:
+   `decomper/c34-c35-rescan-drain`. 3-region SHA1 PASS per
+   shipped pick. **Headline event: complete_units += N**.
+3. **Scope brief 208+ based on outcomes:**
+   - **If brief 206 ships the reloc resolver:** brief 208
+     (scaffolder) could file the upstream objdiff issue per
+     research note's option (1), so future tool versions handle
+     the divergence natively. Or pick up a fresh wall-research
+     target.
+   - **If brief 206 partial-ships (e.g. handles .legacy.c but
+     not .s):** brief 208 (scaffolder) extends the resolver to
+     cover the remaining cases. Likely needs special handling
+     for zero-reloc .s units.
+   - **If brief 207 surfaces additional C-34/C-35 picks beyond
+     ~5:** brief 208 (decomper) continues draining.
+   - **Either way:** by brief 208 the matched_functions metric
+     should be accurate and the wall taxonomy reasonably complete.
+     Project shifts back to recipe-drain mode + occasional new-
+     wall research.
+4. **Scope brief 209+ scaffolder candidates** to keep ready:
    - **C-24 wall** (predicated cascade research from brief 103):
      pending classifier upgrade, same shape as C-23/C-31/C-32/C-33
    - **Brief 197's mis-tagged C-15 prediction caveat** — `mvn #0`
