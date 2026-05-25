@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**74 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**75 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -18,7 +18,7 @@ git add docs/tools-index.md
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (18)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (10)
 
 ## Analysis / worklist
@@ -376,6 +376,12 @@ Git hooks normally live in `.git/hooks/`, which is untracked. That's fine for pe
 **Python module for generating .ninja files.**
 
 Note that this is emphatically not a required piece of Ninja; it's just a helpful utility for build-file-generation systems that already use Python.
+
+### `tools/patch_arm_mapping_symbols.py`
+
+**rewrite mwasmarm `$d` mapping**
+
+symbols to `$a` when the underlying 4-byte words decode as ARM instructions. Brief 210 fix for objdiff's `matched_functions` under-counting on brief 192's C-32 hand-encoded cross-overlay BL recipe and related `.s` patterns.
 
 ### `tools/patch_lcf_arm9_align.py`
 

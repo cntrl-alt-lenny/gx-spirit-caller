@@ -176,3 +176,86 @@ conditional, Phase 2 (this investigation) shipped independently.
   206's metric documentation
 - `tools/patch_section_align.py` — patcher (potential extension
   point for the proposed scaffolder fix #1)
+
+## Brief 210 outcome — fix landed via `patch_arm_mapping_symbols.py`
+
+**Status (2026-05-26):** option (1) above shipped as
+`tools/patch_arm_mapping_symbols.py`. It's wired into the
+`objdiff_report` ninja rule between
+`objdiff_resolve_relocs.py` (brief 206) and `objdiff-cli
+report generate`. Both target + base `.o.resolved` files are
+rewritten in-place: every `$d` mapping symbol whose covered
+range decodes as ARM instructions has its `st_name` repointed
+at the existing `$a\0` strtab entry (plus `st_info` flipped to
+`STT_FUNC`); partial-arm ranges get the `$d`'s `st_value`
+moved to the code/data boundary; all-data ranges and Thumb
+files (`$t` present) are left alone.
+
+**Heuristic** (`is_likely_arm_instruction`): accepts any
+non-`0xF` condition + rejects zero-word. Designed PERMISSIVE
+for brief 210's use case — both files in the comparison have
+byte-identical `.text` post-resolve, so a false-positive on
+"this data word looks like ARM" is harmless: BOTH files get
+the same promotion based on byte value, the mapping shapes
+stay consistent, and the comparison still works. The first
+iteration used an AL-only heuristic and mis-classified
+predicated EQ instructions from brief 192 recipes (LDREQ,
+CMPEQ, LDMEQIA) as data, mis-placing the `$d`/`$a` boundary
+and triggering objdiff's ARM crash (`arm.rs:130` — same panic
+family brief 187 documented, different root cause).
+
+**Per-pick verdict (post-brief-210):**
+
+| Pick | Pre-brief-210 fuzzy | Post-brief-210 |
+|---|---:|---|
+| All 13 ov011 C-32 picks | 0% – 30% | 11 **FLIP**, 1 NEAR (99.74%), 1 NO (98.76%) |
+| 4 `.legacy` picks | 45% – 69% | **FLIP** all 4 (100%) |
+| `func_0205da2c.legacy_sp3` | 42% | **FLIP** (100%) |
+| `func_ov012_021c9d8c` + `func_ov013_021c9d60` | 60% | **FLIP** (100%) |
+| `func_020b3808` + `func_ov011_021ca0ac` | 66% | **FLIP** (100%) |
+| `func_0209d724.legacy` | 69% | **FLIP** (100%) |
+
+**Aggregate:** **21 of 23 stragglers flip to
+`matched_functions: 1/1, fuzzy: 100%`**. 1 near-flip at
+99.74% (`func_ov011_021cb574`). 1 at 98.76%
+(`func_ov011_021d02a4`) — both above the 95% threshold but
+not quite at byte-identical match shape; suspected residual
+mapping or reloc divergence outside brief 210's scope.
+
+**Headline metric impact (EUR, fresh `ninja report`):**
+
+| Metric | Pre brief 210 | Post brief 210 | Δ |
+|---|---:|---:|---:|
+| `matched_functions` | 1687 | 1698 | +11 |
+| `complete_units` | 1667 | 1667 | (unchanged) |
+| `matched_code_percent` | 1.84% | **3.71%** | +1.87 pp |
+| `fuzzy_match_percent` | 1.88% | **4.51%** | +2.63 pp |
+
+The `matched_functions` delta is smaller than the brief's
+predicted +23 because brief 210's measurement baseline was
+1687 (post brief 206 + brief 208 merges), not the 1673 the
+brief assumed. The two-percentage-point jumps in
+`matched_code_percent` and `fuzzy_match_percent` are the
+larger story — those measure the byte-level shape match,
+which the `$d` → `$a` rewrite directly improves.
+
+**Out of scope (residual 2 picks):**
+`func_ov011_021cb574` (99.74% fuzzy) and
+`func_ov011_021d02a4` (98.76% fuzzy) don't flip — close but
+not byte-identical at the linker level. Both probably have a
+single residual divergence outside the mapping-symbol
+mechanism (e.g., a literal pool entry whose value would
+differ between built and orig post-resolve). Brief 211+
+followup territory.
+
+**Files touched** (in brief 210 PR):
+
+- `tools/patch_arm_mapping_symbols.py` — new tool (444 LOC).
+- `tools/configure.py` — wires the tool into the
+  `objdiff_report` ninja rule chain
+  (filter → resolve → mapping → report).
+- `tests/test_patch_arm_mapping_symbols.py` — 16 new tests
+  covering heuristic, all-arm promotion, partial-arm split,
+  Thumb-skip, mass-rename fallback, idempotency, malformed
+  input, real-fixture smoke.
+- This file — appended this section.
