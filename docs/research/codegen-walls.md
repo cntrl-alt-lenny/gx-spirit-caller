@@ -5251,7 +5251,7 @@ the natural recipe ships byte-identical 3/3. Detector + 3
 unit tests added. Full matrix at
 [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](brief-229-c39c-d-pilots-and-c38-nonleaf.md).
 
-## Permanent (11 patterns)
+## Permanent (13 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -6083,6 +6083,151 @@ the `P-11` classifier rule, and shipped the detection so
 brief 201+ can pre-flag affected picks rather than burn
 permuter cycles on them. Full diagnosis at
 [`first-wave-wall-reg-alloc-plateau.md`](first-wave-wall-reg-alloc-plateau.md).
+
+### P-12. Non-leaf chained-cast reg-alloc divergence
+
+**The wall.** Brief 225 locked the C-38 chained-cast leaf recipe
+(`func_0207d304.legacy.c`) — `(unsigned short)(unsigned char)*p`
+via named locals preserves both cast steps under mwcc 1.2/sp2p3
+because the legacy compiler lacks the cast-coalescing peephole
+mwcc 2.0 has. Brief 227 deferred two non-leaf siblings
+(`func_0207db8c`, `func_0207dbf8`) — allocator-like functions
+that use the same chained-cast idiom for a flag-byte check inside
+a body wrapping alignment math + `Fill32` zero-fill. Brief 229
+filed them as a P-12 candidate (recipe extends, but reg-alloc
+differs from orig).
+
+Brief 231 ran the falsification matrix (9 source-shape variants
+× 5 mwcc tiers) and confirmed: **the chained-cast idiom DOES
+preserve under mwcc 1.2/sp2p3 and 1.2/sp3** (the `and #0xff;
+lsl/lsr #16; ands #1` sequence emits as orig has). **But mwcc's
+register allocator consistently puts `end` in r0 instead of r3**
+across all tested variants:
+
+- v1 (struct ptr + inline chained cast): end in r0, fold collapsed
+- v2 (u32-word + inline `((u16)(u8)*p) & 1`): end in r0, fold collapsed
+- v3 (named-local chained cast): end in r0, cast PRESERVED ✓
+- v4 (keep `end` alive via Fill32 size): same as v3
+- v5 (register hint on `end`): no effect
+- v6 (inline `aligned` via temp): same as v3
+- v7 (volatile flag_word + 2.0/sp1p5): **end in r3** ✓ — but fold collapsed AND r4/r5 swapped
+- v8 (volatile + 1.2/sp3): end back to r0
+- v9 (mask before end load): same as v3, end still in r0
+
+No single (source, tier) pair produces all THREE features
+together:
+
+| Feature | 2.0/sp1p5 | 1.2/sp2p3 | 1.2/sp3 |
+|---|:---:|:---:|:---:|
+| Right prologue/epilogue | ✓ | ✗ Style A | ✓ (matches orig sp3-style) |
+| Chained cast preserved | ✗ folded | ✓ | ✓ |
+| `end` in r3 | only with volatile + r4/r5 swap | ✗ | ✗ |
+
+mwcc 1.2's register allocator looks at the post-`mov r5, r0`
+state, sees `r0` is free (self moved to r5), and uses r0 for
+the first load. mwcc 2.0 with volatile shuffles allocator
+state enough to choose r3 — but volatile also defeats the
+cast preservation (mwcc 2.0 still folds even with volatile on
+the pointer).
+
+**Falsification matrix:**
+
+`func_0207db8c` orig reg-alloc:
+- r3 = end (from `ldr r3, [r5, #4]`)
+- r0 = align - 1 → then start
+- r1 = size → end - size → flag-cast-then-Fill32-arg1
+- r2 = ~mask → end - aligned
+- r4 = aligned (callee-saved)
+- r5 = self (callee-saved)
+
+mwcc 1.2/sp3 v3 reg-alloc:
+- r0 = end (first load, clobbers self after mov r5, r0)
+- r2 = align - 1
+- r3 = ~mask
+- r2 = end - size (reused)
+- r1 = start → flag → cast
+- r4 = aligned (matches!)
+- r5 = self (matches!)
+
+The r4/r5 callee-saved choices MATCH orig — only the scratch
+registers (r0-r3) differ.
+
+**Verdict — permanent.** mwcc 1.2's register allocator's
+"first-fit-after-mov" heuristic doesn't accept source-level
+nudges. Even rewriting the source as a multi-statement form
+with explicit intermediate locals doesn't change the choice.
+Decomper should NOT iterate on chained-cast non-leaf picks;
+budget zero ships for this family.
+
+**Affected picks:** `func_0207db8c` (76 B), `func_0207dbf8`
+(60 B). Both shipped as `.s` since brief 207 (PR #659).
+
+**Provenance:** brief 225 leaf recipe (`func_0207d304.legacy.c`),
+brief 227 deferred non-leaf siblings as scaffolder candidate,
+brief 229 filed as P-12 candidate, brief 231 (this entry)
+locked as P-12 with falsification matrix. Full diagnosis at
+[`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
+
+### P-13. C-39c bitfield-packing cross-tier irreducible
+
+**The wall.** Brief 229 cataloged C-39c (bitfield packing into
+a single u16 helper argument) as a tier-mismatch wall: no single
+mwcc tier delivers all required features. Brief 231 attempted
+cross-tier workarounds and additional source variants — the
+verdict is that C-39c is **cross-tier irreducible** even with
+the workarounds.
+
+**Tested combinations:**
+
+- All 5 mwcc tiers (2.0/sp1p5, 1.2/sp2, 1.2/sp2p3, 1.2/sp3,
+  1.2/sp4) on the v1 baseline — all produce IDENTICAL output:
+  TCO via `bx ip` + folded masks. **TCO is consistent across
+  all available mwcc versions.**
+- Named-local mask split (`unsigned int t1 = a & 0xff; unsigned
+  int t2 = (b & 0xff) << 8;`) under 1.2/sp3 → preserves
+  `and+and+orr` shape AND right outer prologue/epilogue. But
+  scheduling: mwcc places `lsr r8, r0, #16` (the `(u16) cast)
+  BEFORE `mov r6, #0` (the i = 0 init). Orig has the opposite
+  order. The 4 mov instructions following are independent ops
+  that mwcc's scheduler reorders.
+
+**Three failure modes across the 3 brief 229 picks:**
+
+| Pick | Size | Failure mode |
+|---|---|---|
+| `021d59cc` | 60 B | mwcc TCO's `return helper(...)` to `bx ip` across ALL tiers. No source idiom defeats TCO without ALSO breaking another feature (union forces memory-pack; extra calls add unwanted code). |
+| `021d5b28` | 88 B | Right outer shape + right pack + close reg-alloc, but scheduler reorders `mov r6, #0` and `lsr r8, r0, #16` (independent ops). No source-level dependency forces orig's specific schedule. |
+| `021d5c50` | 84 B | mwcc 1.2 always emits `push {regs, lr} + sub sp, #4` for unaligned reg counts. Orig has direct `push {r3, ...}` style. mwcc 2.0 has right prologue but folds masks. |
+
+**Cross-tier workarounds attempted in brief 231:**
+
+1. **All 5 tiers on v1 baseline** — identical output across all,
+   confirms TCO is mwcc-version-independent.
+2. **Declaration-order swap (`int j, i`)** — under 1.2/sp3,
+   nudges loop variable reg allocation (`j` in r7, `i` in r6
+   matching orig) but instruction SCHEDULING still differs.
+3. **Early `i = 0` assignment** — changes scheduling AND
+   reg-alloc; moves further from orig.
+4. **Do-while loop form** — different label structure, same
+   scheduling issue.
+5. **Register storage class** — ignored by mwcc.
+
+**Verdict — permanent.** C-39c picks must remain `.s`. The
+known C-39c hits in ov002 (`021aba60`, `021d9828`, `021f6304`,
+`021ff6d0`) are all already shipped as `.s` under brief 207's
+C-34 recipe (they have additional C-34 cross-overlay BL walls).
+The 3 brief 229 deferred picks (`021d59cc`, `021d5b28`,
+`021d5c50`) should also remain `.s` — no cross-tier recipe
+unlocks them.
+
+**Affected picks:** ~10-30 C-39c-shaped picks remain in the
+codebase. Most are already C-34-walled and shipped as `.s`.
+Brief 231 conclusion: do not pilot C-39c further.
+
+**Provenance:** brief 229 documented as tier-mismatch wall,
+brief 231 (this entry) ran cross-tier workaround matrix and
+locked as P-13. Full diagnosis at
+[`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
 
 ## Codegen-inherent edge cases (3 patterns)
 
