@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (36 patterns)
+## Coercible-with-knowledge (39 patterns)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4838,6 +4838,134 @@ recipe reaches under mwcc 1.2/sp2p3 byte-for-byte, shipped
 `func_02087d10.legacy.c` + `func_0207d36c.legacy.c` as
 worked examples, added the detector + tests. Full matrix at
 [`wall-2-leaf-no-pool-reg-alloc.md`](wall-2-leaf-no-pool-reg-alloc.md).
+
+### C-39. Non-leaf C-37 — bit-0 extract wrapped in helper call
+
+**The wall.** Brief 220's hard-tier survey identified 455 picks
+in the unclassified slice containing the `lsl rX, rY, #31; lsr
+rX, rZ, #31` bit-extract pattern (the same shape as C-37 Shape
+A) but in a **non-leaf** function body — i.e. the function has
+a stack frame (`push {…, lr}` entry) and at least one `bl`
+helper call. C-37's tail-pattern detector only recognises the
+LEAF form (lsl/lsr right before `bx lr`), so this family was
+falling through to "unclassified". 20.6% of unclassified
+hard-tier picks share this shape — the single biggest
+recognisable slice in that bucket.
+
+The codegen issue is the same as C-37: mwcc 2.0/sp1p5 has a
+peephole that collapses `(unsigned)(x << 31) >> 31` and
+`(x & 1)` to `ands #1` (or `tst #1`), but the orig has the
+explicit `lsl/lsr #31` shift pair. The natural C source forms
+hit the peephole; only specific source idioms bypass it.
+
+**The fix.** Brief 218's **bitfield-struct recipe** (originally
+for C-37 Shape B byte-zero check) generalises: declare the
+loaded storage container as a struct with a 1-bit bitfield
+covering the extracted bit position, and access via the
+bitfield. mwcc 2.0/sp1p5's bitfield-extract code path emits
+the canonical `lsl #N; lsr #N` shift pair instead of the
+mask peephole — independently of whether the function is
+leaf or non-leaf.
+
+Canonical recipe for bit-0 of a halfword at struct offset 2:
+
+```c
+struct Self {
+    unsigned short pad0;          /* offset 0 */
+    unsigned short bit0  : 1;     /* offset 2, bit 0 */
+    unsigned short rest  : 15;
+};
+
+extern void helper(struct Self *self, unsigned int bit);
+
+int func_X(struct Self *self) {
+    helper(self, self->bit0);
+    return 1;
+}
+```
+
+mwcc 2.0/sp1p5 emits:
+
+```
+push  {r3, lr}
+ldrh  r1, [r0, #2]                ; halfword load (matches orig)
+lsl   r1, r1, #31                 ; bit-extract (canonical shift pair)
+lsr   r1, r1, #31
+bl    helper
+mov   r0, #1
+pop   {r3, pc}
+```
+
+Three shipped worked examples (brief 222 pilot):
+
+  - `src/overlay002/func_ov002_0223fd10.c` — canonical 5-insn
+    shape (helper + return 1).
+  - `src/overlay002/func_ov002_02231f2c.c` — same shape +
+    literal-31 helper arg loaded before the lsl/lsr.
+  - `src/overlay002/func_ov002_021f609c.c` — multi-bitfield
+    variant with three different field widths (1-bit, 6-bit,
+    9-bit) extracted across the function body, plus a tag
+    check that emits `beq` (skip body) via natural
+    `if (cond) { ... }` form.
+
+**Sub-patterns recipe extends to:**
+
+- Bit-extract from u32 word field (use `unsigned int bit0 : 1`
+  with the right pad width — caveat: this changes the load
+  from `ldrh` to `ldr`, may not match orig if orig has `ldrh`).
+- Multi-bitfield extracts in the same function (declare a
+  struct per halfword/word storage container, each with the
+  appropriate bitfield layout — see worked example
+  `func_ov002_021f609c.c`).
+- Predicated execution vs explicit branch: natural
+  `if (cond) { body; }` C form yields `beq + body` (matches
+  orig); `if (cond) goto end; ... end:` may also work but
+  isn't needed.
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-39 when ALL of:
+
+  - Function entry is `push {…, lr}` (non-leaf marker — lr in
+    push reg list).
+  - Body contains `lsl rX, rY, #31` (encoding `e1a0_?f8_?`).
+  - Body contains `lsr rX, rZ, #31` (encoding `e1a0_?fa_?`).
+  - Body contains a `bl` instruction.
+  - C-37 has NOT already fired (the leaf tail-pattern takes
+    priority — C-37 picks ship under that recipe).
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5
+tier) — unlike C-37 Shape A which needed `.legacy.c`, the
+non-leaf bitfield recipe works under the default tier
+because the bitfield code path bypasses the peephole at the
+2.0/sp1p5 stage.
+
+**Use when:** the classifier flags C-39 — declare a bitfield
+struct matching the orig's load shape (halfword bitfield for
+`ldrh`-loaded fields, word bitfield for `ldr`-loaded fields),
+access via the bitfield, ship `.c`. Iterate on field widths
+if the orig has multiple bitfields — orig's `lsl #N; lsr #M`
+sequence encodes the bit position + width
+(width = 32 - max(L, R), offset from L+R-32).
+
+**Near-misses observed in pilot:**
+
+- **Complex scheduling**: Pick 4 (`func_ov010_021b238c`, 104 B)
+  matched the bit-extract shape but mwcc didn't replicate
+  orig's pre-branch instruction ordering (orig schedules
+  ldrsh+ldrsh+sub before the lsl/lsr; mwcc reorders).
+  Probably a scheduling-not-source wall. Defer to brief 224+
+  scaffolder follow-on if pattern recurs.
+- **Multi-bl dispatch**: Pick 5 (`func_ov002_0222bc1c`, 396 B)
+  was a switch-table with 10 helper calls. Beyond pilot scope;
+  recipe would need per-case bitfield work + match the
+  table-dispatch shape. Brief 224+ candidate.
+
+**Provenance:** brief 220 (PR #681) identified the candidate
+slice (455 picks). Brief 222 (this entry) ran the pilot — 3
+of 5 picks shipped byte-identical under the bitfield recipe;
+2 near-misses documented. Added the detector + 5 tests.
+Full matrix at
+[`brief-222-c39-non-leaf-bitfield.md`](brief-222-c39-non-leaf-bitfield.md).
 
 ## Permanent (11 patterns)
 

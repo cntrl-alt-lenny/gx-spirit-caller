@@ -1359,6 +1359,100 @@ class TestC37Detection(unittest.TestCase):
         self.assertNotIn("C-37", {w.wall_id for w in walls})
 
 
+class TestC39Detection(unittest.TestCase):
+    """C-39: non-leaf C-37 — bit-0 extract (`lsl/lsr #31`) inside a
+    function with a stack frame + helper call. Brief 222 pilot found
+    that brief 218's bitfield-struct recipe extends from C-37 leaf
+    shape to this non-leaf variant under default mwcc 2.0/sp1p5.
+
+    The detector fires when:
+      - function entry is `push {…, lr}` (non-leaf marker — lr in
+        the push list);
+      - body contains `lsl rX, rY, #31` (encoding `e1a0_?f8_?`);
+      - body contains `lsr rX, rZ, #31` (encoding `e1a0_?fa_?`);
+      - body contains a `bl` instruction (cond=AL bit 27-24=1011);
+      - C-37 has NOT already fired (the leaf shape takes priority).
+    """
+
+    def test_brief222_pilot1_canonical(self):
+        """`func_ov002_0223fd10` canonical shape: u16 load +
+        bit-0 extract + helper(self, bit) + return 1."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d010b2", "ldrh\tr1, [r0, #2]"),
+            _objdump_line(0x8, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0xc, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x10, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x14, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x18, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        c39 = [w for w in walls if w.wall_id == "C-39"]
+        self.assertEqual(len(c39), 1)
+        self.assertIn("non-leaf", c39[0].cue)
+        self.assertIn("bitfield-struct recipe", c39[0].cue)
+
+    def test_brief222_pilot2_with_literal_arg(self):
+        """`func_ov002_02231f2c`: same shape + literal-31 second
+        helper arg loaded before the lsl/lsr."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d000b2", "ldrh\tr0, [r0, #2]"),
+            _objdump_line(0x8, "e3a0101f", "mov\tr1, #31"),
+            _objdump_line(0xc, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x10, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x14, "ebfe9a3e", "bl\t0x2e3a0"),
+            _objdump_line(0x18, "e3a00000", "mov\tr0, #0"),
+            _objdump_line(0x1c, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        c39 = [w for w in walls if w.wall_id == "C-39"]
+        self.assertEqual(len(c39), 1)
+
+    def test_leaf_c37_does_not_fire_c39(self):
+        """The leaf C-37 shape (lsl/lsr #31 at the function tail,
+        no `bl`) should fire C-37, NOT C-39. C-37's tail-match
+        takes priority."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e5900004", "ldr\tr0, [r0, #4]"),
+            _objdump_line(0x4, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x8, "e1b00fa0", "lsrs\tr0, r0, #31"),
+            _objdump_line(0xc, "13a00001", "movne\tr0, #1"),
+            _objdump_line(0x10, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x14, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-37", ids)
+        self.assertNotIn("C-39", ids)
+
+    def test_non_leaf_without_lsl_lsr_does_not_fire(self):
+        """A non-leaf function that doesn't have the lsl/lsr 31
+        bit-extract should NOT fire C-39 even if it has push + bl."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x8, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0xc, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertNotIn("C-39", ids)
+
+    def test_leaf_with_bit_extract_does_not_fire_c39(self):
+        """A leaf function with lsl/lsr 31 but no push/bl should
+        not fire C-39. (This is essentially a C-37-without-tail —
+        rare in practice but the detector must still exclude it.)"""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x4, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x8, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertNotIn("C-39", ids)
+
+
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
 

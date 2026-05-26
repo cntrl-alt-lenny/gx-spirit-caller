@@ -805,6 +805,71 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 f"bit-test -> 0/1 idiom ({variant}) — {route}",
             ))
 
+    # ----- C-39 non-leaf C-37 (bit-0 extract via lsl/lsr 31 wrapped
+    # in helper-call body). Brief 222.
+    #
+    # Brief 220's hard-tier survey identified 455 hard-tier picks
+    # containing a `lsl rX, rY, #31; lsr rX, rZ, #31` bit-extract
+    # in a NON-LEAF body (function has push/stmdb + bl). C-37's
+    # tail-pattern detector only fires on the LEAF form (lsl/lsr
+    # right before `bx lr`), so these picks fell through to the
+    # "unclassified" bucket. Brief 222 pilot confirmed that brief
+    # 218's bitfield-struct recipe (a halfword `unsigned short
+    # bit0 : 1` field) reaches orig under the default mwcc
+    # 2.0/sp1p5 tier across multiple non-leaf shapes:
+    #
+    #   - simplest (1 bl, no conditional)
+    #   - with literal-arg helper
+    #   - multi-bitfield with if-skip body
+    #
+    # Detection encoding:
+    #   - lsl #31 on any reg: 0xe1a0_?f8_? (Rd nibble at [15:12],
+    #     Rm nibble at [3:0])
+    #   - lsr #31 on any reg: 0xe1a0_?fa_? (same layout, different
+    #     shift type bits)
+    # The two instructions need not be back-to-back in the disasm
+    # (mwcc may schedule other ops between them), but they must
+    # both be present in the function body, and the function must
+    # be non-leaf (have at least one `bl` or `stmdb`/`push`).
+    #
+    # Avoid double-fire: skip if C-37 already fired (the LEAF tail
+    # pattern is a more specific shape than the body pattern).
+    has_c37 = any(w.wall_id == "C-37" for w in walls)
+    if not has_c37 and len(hex_words) >= 4:
+        has_lsl31 = any(
+            re.match(r"^e1a0[0-9a-f]f8[0-9a-f]$", hw)
+            for hw in hex_words
+        )
+        has_lsr31 = any(
+            re.match(r"^e1a0[0-9a-f]fa[0-9a-f]$", hw)
+            for hw in hex_words
+        )
+        has_bl = any(
+            (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000
+            for hw in hex_words
+        )
+        # Non-leaf check: function has push/stmdb at entry
+        # (0xe92d_xxxx with a register list including lr in the
+        # mask). Conservatively, accept any e92d_xxxx where the
+        # mask has bit 14 (lr) set.
+        is_non_leaf = False
+        if hex_words:
+            entry = int(hex_words[0], 16)
+            if (entry & 0xFFFF_0000) == 0xE92D_0000 and (entry & 0x0000_4000):
+                is_non_leaf = True
+        if has_lsl31 and has_lsr31 and has_bl and is_non_leaf:
+            walls.append(WallPrediction(
+                "C-39",
+                "non-leaf bit-0 extract (lsl #31; lsr #31) in a "
+                "function with helper call — same bitfield-struct "
+                "recipe as brief 218's C-37 Shape B applies. "
+                "Declare a `unsigned short field : 1;` halfword "
+                "bitfield on the loaded storage container; mwcc "
+                "2.0/sp1p5 emits the canonical shift pair instead "
+                "of the `ands #1` / `tst #1` peephole. Brief 222 "
+                "pilot — 3/5 worked examples shipped.",
+            ))
+
     # ----- C-38 leaf-no-pool reg-alloc + CSE divergence (brief 216).
     #
     # Brief 215 identified Wall 2 — small leaf functions doing
@@ -826,8 +891,10 @@ def detect_walls(asm: str) -> list[WallPrediction]:
     # Avoid double-fire: skip if C-37 already fired (the bit-test
     # tail is a more specific shape, takes priority for routing
     # recommendation).
-    has_c37 = any(w.wall_id == "C-37" for w in walls)
-    if not has_c37 and len(hex_words) >= 2:
+    has_c37_or_c39 = any(
+        w.wall_id in ("C-37", "C-39") for w in walls
+    )
+    if not has_c37_or_c39 and len(hex_words) >= 2:
         # Scan all hex words for pool / call / ld-st / final-bx.
         has_pool_load = any(
             re.match(r"^e59f[0-9a-f]{4}$", hw)
