@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (39 patterns)
+## Coercible-with-knowledge (39 patterns, 2 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -4966,6 +4966,189 @@ of 5 picks shipped byte-identical under the bitfield recipe;
 2 near-misses documented. Added the detector + 5 tests.
 Full matrix at
 [`brief-222-c39-non-leaf-bitfield.md`](brief-222-c39-non-leaf-bitfield.md).
+
+### C-39a. Sign-check via dead-arg helper-reuse (sub-shape of C-39)
+
+**The wall.** Within the C-39 population, a second-order shape
+variation defeats the brief 222 base recipe: orig emits
+`movs rX, r0; bmi .end` after a helper `bl` — semantically a
+sign-test on the helper return — but mwcc 2.0/sp1p5 with the
+natural source `int n = helper(...); if (n >= 0) helper2(arg);`
+emits `cmp r0, #0; blt .end` instead. Same byte count, different
+bytes. Brief 224's drain wave attempted the natural recipe
+on this sub-shape and 24 of 25 picks reached only 84% fuzzy.
+
+The peephole that produces `movs rX, r0; bmi` from `mov rX, r0;
+cmp rX, #0; blt` requires two source preconditions:
+
+1. **n must be live in a non-r0 register at the test site.**
+   Otherwise mwcc skips the `mov` and emits `cmp r0, #0` directly.
+2. **The condition must be a pure sign test (`n < 0` / `n >= 0`).**
+   `n > 0` needs both Z and N flags; mwcc keeps the explicit
+   `cmp` for that case (which is sub-shape C-39b).
+
+**The fix.** Force precondition 1 by declaring helper2 to take
+`n` as a second argument and call it as `helper2(arg, n)`. Even
+if helper2 effectively ignores the second arg, mwcc allocates n
+to r1 (the next free arg register) and peepholes
+`mov r1, r0; cmp r1, #0; blt` into `movs r1, r0; bmi`.
+
+Canonical recipe (sign-check sub-shape, single helper):
+
+```c
+struct Self {
+    unsigned short bit0  : 1;
+    unsigned short rest  : 15;
+};
+struct Outer { unsigned short pad0; struct Self f2; struct Self f4; };
+
+extern int helper1(unsigned int bit, unsigned int other);
+extern void helper2(unsigned int bit, int n);   /* note: takes n */
+
+int func_X(struct Outer *p) {
+    int n = helper1(p->f2.bit0, p->f4.bit0);
+    if (n >= 0) {
+        helper2(p->f2.bit0, n);     /* pass n — forces live-in-r1 */
+    }
+    return 1;
+}
+```
+
+mwcc 2.0/sp1p5 emits (matches orig):
+
+```
+...
+bl    helper1
+movs  r1, r0                  ; r1 = n, set flags
+bmi   .end                    ; branch if N (n < 0)
+...
+bl    helper2                 ; helper2(bit, n)  with r1 = n
+.end:
+mov   r0, #1
+pop   {r4, pc}
+```
+
+**Variant — return 0 + literal-1 arg + `rsb` bit-invert.**
+The same recipe extends to a `1 - p->f2.bit0` bit-invert
+(produces `rsb r0, rX, #1`) and a `mov r2, #1` literal arg,
+with `return 0;`. See `func_ov002_022237a0.c`.
+
+**Three shipped worked examples (brief 226 pilot, 3/3 ship):**
+
+- `src/overlay002/func_ov002_021f4cd4.c` — canonical 17-insn
+  shape (bit0 + field9 helper1; bit0 + n helper2).
+- `src/overlay002/func_ov002_021f84ec.c` — same shape, different
+  helper2 symbol. This was brief 224's canary that reached 84%
+  before the dead-arg trick was understood.
+- `src/overlay002/func_ov002_022237a0.c` — `1 - bit0` (rsb)
+  variant + u32 bitfield for the second arg + return 0.
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-39a (in addition to base C-39) when:
+
+- A `movs rD, r0` instruction (`e1b0_D000`, D = 1..f) appears
+  AFTER the first `bl`.
+- A `bmi` instruction (`4a__`) appears within 1-2 instructions
+  after the `movs`.
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5).
+Both C-39 and C-39a fire; the C-39a hint surfaces the
+dead-arg trick the decomper needs.
+
+**Use when:** classifier flags C-39 + C-39a. Apply the base
+C-39 bitfield recipe AND extend helper2's signature to take
+`n` as an additional argument. The extra arg is harmless
+(orig's helper2 may or may not use it; what matters is that
+mwcc keeps n live in r1 for the peephole).
+
+**Provenance:** brief 224 (PR #687) identified the sub-shape as
+the major near-miss family. Brief 226 (this entry) ran the
+variant matrix — 10 candidate idioms tested, only the
+helper-takes-n trick locks. 3/3 picks ship byte-identical.
+Detector + 5 tests added. Full matrix at
+[`brief-226-c39-subclass-sign-check-helper-reuse.md`](brief-226-c39-subclass-sign-check-helper-reuse.md).
+
+### C-39b. Helper-return reuse (sub-shape of C-39)
+
+**The wall.** Within the C-39 population, a third sub-shape:
+orig emits `mov rX, r0` (no S-suffix) after a `bl`, with rX
+either (i) compared via a subsequent `cmp rX, #0; ble .end`,
+(ii) passed as an argument to a subsequent helper, or (iii)
+preserved across another `bl` and used in a comparison
+afterwards. mwcc 2.0/sp1p5 with the natural source
+`int n = helper(...); if (n > 0) helper2(arg);` emits
+`cmp r0, #0; ble .end` instead (n dies in r0 because mwcc
+optimises away the unnecessary copy).
+
+This is the **non-peepholed** sibling of C-39a: `n > 0`
+needs both Z and N flags (so the `mov + cmp` can't collapse
+to `movs`), and helper-return-reuse keeps n live across a
+second call (so it goes into a callee-saved register like
+r4).
+
+**The fix.** Same fundamental trick as C-39a: keep `n` live
+in a non-r0 register by USING IT later. Three common idioms:
+
+1. **Helper2 takes n as 2nd arg + sign-check via `n > 0`:**
+   `if (n > 0) helper2(arg, n, 0, 0);` — emits
+   `mov r1, r0; cmp r1, #0; ble`.
+2. **Cross-call comparison (`n >= helper2(self)`):**
+   `int n = helper1(...); return n >= helper2(self);` — n
+   is saved in r4 (callee-saved) across helper2 because it's
+   needed AFTER helper2 returns. Emits the
+   `mov r4, r0; ... bl helper2; cmp r4, r0; movge/movlt`
+   pattern.
+3. **Helper2 takes n + no sign-check at all:**
+   `int n = helper1(...); helper2(arg, n);` — emits
+   `mov r1, r0` after first bl, then helper2 setup.
+
+**Three shipped worked examples (brief 226 pilot, 3/3 ship):**
+
+- `src/overlay002/func_ov002_021f8490.c` — classic
+  `if (n > 0)` form (idiom 1). Brief 222/224 recipe shape
+  (`func_ov002_021f4a00.c` is the same pattern with a
+  preceding tag-check).
+- `src/overlay002/func_ov002_02206454.c` — cross-call
+  comparison (idiom 2). n in r4 across helper2, then
+  `cmp r4, r0; movge/movlt; pop`.
+- `src/overlay002/func_ov002_021f49d0.c` — no sign-check
+  (idiom 3). n stored in r1 across bitfield extracts,
+  passed to helper2 as 2nd arg.
+
+**Caveat — XOR operand ordering.** Idiom 3's worked example
+(`021f49d0`) extracts two bitfield bits and XORs them in the
+helper2 arg. mwcc schedules bit-extracts in source-expression
+order; for the orig's `lsl r0, r2, #17; lsl r2, r2, #31; ...
+eor r0, r0, r2 lsr #31` sequence to match, the source must be
+`p->f2.bit0 ^ p->f2.bit14` (bit0 first lexically) — the
+reversed form `bit14 ^ bit0` emits the bit-extracts in the
+opposite order, producing the same XOR semantically but
+byte-different instructions.
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-39b (in addition to base C-39) when:
+
+- A `mov rD, r0` instruction (`e1a0_D000`, D = 1..4 — typical
+  helper-arg / callee-saved targets) appears AFTER the first
+  `bl`.
+
+The detector intentionally restricts D to r1-r4 (the common
+helper-reuse targets); broader matches would over-fire on
+generic reg-to-reg copies unrelated to helper-reuse.
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5).
+Both C-39 and C-39b fire when applicable; the C-39b hint
+surfaces the named-local + later-use trick.
+
+**Use when:** classifier flags C-39 + C-39b. Identify which
+idiom from the three above matches the orig's post-helper
+pattern, and apply the corresponding source recipe.
+
+**Provenance:** brief 224 (PR #687) locked idiom 1 in
+`func_ov002_021f4a00.c`. Brief 226 (this entry) confirmed
+the recipe generalises across all three idioms — 3/3 picks
+ship byte-identical. Detector + tests added. Full matrix at
+[`brief-226-c39-subclass-sign-check-helper-reuse.md`](brief-226-c39-subclass-sign-check-helper-reuse.md).
 
 ## Permanent (11 patterns)
 
