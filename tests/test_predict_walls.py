@@ -1609,6 +1609,74 @@ class TestC39SubShapeDetection(unittest.TestCase):
         self.assertIn("C-39", ids)
         self.assertNotIn("C-39a", ids)
 
+    def test_d1_multi_call_reread_fires_c39d(self):
+        """func_ov002_02204f28: ldrh [r4, #2] before bl, then
+        ldrh [r4, #2] after bl — same [rB, #N] pair. Should fire
+        C-39 base + C-39d."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x8, "e1d400b2", "ldrh\tr0, [r4, #2]"),
+            _objdump_line(0xc, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x10, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x14, "e2600001", "rsb\tr0, r0, #1"),
+            _objdump_line(0x18, "ebfffffe", "bl\t0x0"),
+            # RE-READ same offset after bl:
+            _objdump_line(0x1c, "e1d410b2", "ldrh\tr1, [r4, #2]"),
+            _objdump_line(0x20, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x24, "e1a00f81", "lsl\tr0, r1, #31"),
+            _objdump_line(0x28, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x2c, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x30, "e0840000", "add\tr0, r4, r0"),
+            _objdump_line(0x34, "e3500004", "cmp\tr0, #4"),
+            _objdump_line(0x38, "a3a00001", "movge\tr0, #1"),
+            _objdump_line(0x3c, "b3a00000", "movlt\tr0, #0"),
+            _objdump_line(0x40, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertIn("C-39d", ids)
+        c39d = next(w for w in walls if w.wall_id == "C-39d")
+        self.assertIn("re-read", c39d.cue)
+
+    def test_single_ldrh_does_not_fire_c39d(self):
+        """A C-39 pick with only one ldrh of [rB, #N] (no re-read
+        after bl) should NOT fire C-39d — only base C-39."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d010b2", "ldrh\tr1, [r0, #2]"),
+            _objdump_line(0x8, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0xc, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x10, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x14, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x18, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-39d", ids)
+
+    def test_ldrh_different_offsets_does_not_fire_c39d(self):
+        """A function with `ldrh [r4, #2]` then `ldrh [r4, #4]`
+        after bl (DIFFERENT offsets) is not a re-read — should NOT
+        fire C-39d."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x8, "e1d400b2", "ldrh\tr0, [r4, #2]"),
+            _objdump_line(0xc, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x10, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x14, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x18, "e1d400b4", "ldrh\tr0, [r4, #4]"),
+            _objdump_line(0x1c, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x20, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-39d", ids)
+
 
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
