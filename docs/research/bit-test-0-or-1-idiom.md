@@ -140,31 +140,96 @@ under mwcc 2.0 (and under mwcc 1.2 for some elements). The
 combination is precisely fragile enough that mwcc 1.2 emits the
 explicit shift-test-materialise sequence the orig has.
 
-## Shape B — byte-zero check matrix (mwcc 2.0 also works)
+## Shape B — byte-zero check (bitfield recipe, brief 218)
 
-Same source idiom adapted for byte extract:
+⚠️ **The brief 214 Shape B claim was wrong**, falsified by brief
+217's empirical retest:
+
+> brief 217: All mwcc tiers collapse `(unsigned)x << 24 >> 24 == 0`
+> to a 5-insn `ands; moveq #1; movne #0; bx lr` shape (20B), NOT
+> orig's 7-insn `lsl/lsr; movs; moveq/movne; bx lr` (28B). The
+> direct-shift idiom **does not** reach orig on either mwcc tier.
+
+**Brief 218 found the correct recipe.** A **bitfield-struct read**
+of the low byte under the default mwcc 2.0/sp1p5 tier produces
+the orig shape exactly:
 
 ```c
-extern int *gptr;
-int f(void) {
-    int x = gptr[0x16];                              /* word at byte offset 0x58 */
-    unsigned t = ((unsigned)x << 24) >> 24;          /* zero-extend low byte */
-    if (t == 0u) return 1;                           /* note inverted polarity */
-    return 0;
+struct LowByteStruct {
+    unsigned int low8 : 8;
+    unsigned int upper : 24;
+};
+
+extern struct LowByteStruct data_ov000_021c7530[];
+
+int func_ov000_021ab6cc(void) {
+    return data_ov000_021c7530[0x58 / 4].low8 == 0;
 }
 ```
 
-Produces the orig shape on **mwcc 2.0/sp1p5** AND legacy tiers
-(byte extract has no peephole equivalent). Verified empirically
-in the variant matrix — variants `b2` and `b4` reach 32-byte
-shape with the canonical `lsl #24 / lsr #24` body.
+Compiled with default `mwccarm 2.0/sp1p5 -O4,p -enum int
+-char signed -str noreuse -proc arm946e ...`, this produces
+verbatim:
 
-**Not shipped as worked example** in brief 214: the 2 Shape B
-picks (`func_ov000_021ab6cc`, `func_ov000_021af5c0`) require
-matching struct declarations for the extern symbol
-(`data_ov000_021c7530` etc.), which varies per-pick and crosses
-into decomper's domain. Recipe documented above for decomper to
-apply in a follow-up brief.
+```
+e59f0014  ldr   r0, [pc, #20]
+e5900058  ldr   r0, [r0, #0x58]
+e1a00c00  mov   r0, r0, lsl #24
+e1b00c20  movs  r0, r0, lsr #24
+03a00001  moveq r0, #1
+13a00000  movne r0, #0
+e12fff1e  bx    lr
+```
+
+Byte-identical to orig. Same recipe works for `func_ov000_021af5c0`
+(offset `0x34` instead of `0x58`).
+
+### Why bitfield works where `(unsigned)x << 24 >> 24` fails
+
+mwcc 2.0/sp1p5's `(unsigned)x << 24 >> 24` peephole recognises
+the shift pair as a byte mask and folds to `ands r0, r0, #0xff`.
+**The bitfield read goes through a different code path**: the
+compiler emits the canonical bitfield-extract sequence
+(`lsl #24; lsrs #24` for an `unsigned : 8` field at the low
+end), and that sequence doesn't go through the mask peephole.
+
+The `if (t != 0u) return 0; return 1;` brief 214 used didn't
+help because the peephole fires earlier in the lowering pipeline
+(during shift-pair recognition), before the comparison structure
+is established.
+
+### Variant matrix retest (brief 218)
+
+Run on the actual picks with `data_ov000_021c7530` / `_021c758c`
+binding context (not a stripped snippet). Tiers: all 5 from the
+canonical pool (1.2/base, 1.2/sp2p3, 1.2/sp3, 2.0/sp1p5,
+2.0/sp2p4).
+
+| C source                                          | 1.2 tiers (all)                 | 2.0/sp1p5                       | 2.0/sp2p4                       | Match |
+|---------------------------------------------------|---------------------------------|---------------------------------|---------------------------------|-------|
+| `(uint8_t)x == 0` via `ldrb`                      | `ldrb` shape (5 insn, 20 B)     | `ldrb` shape                    | `ldrb` shape                    | NO    |
+| explicit shifts in locals: `s1=v<<24; s2=s1>>24;` | `ands #0xff` shape (5 insn)     | `ands #0xff` shape              | `ands #0xff` shape              | NO    |
+| `volatile` cast on shift result                    | 13+ insn with stack frame       | 14+ insn                        | 14+ insn                        | NO    |
+| inverted polarity `if (t) return 0;`               | `ands #0xff` shape              | `ands #0xff` shape              | `ands #0xff` shape              | NO    |
+| multiply-shift `v * 0x01000000u >> 24`             | `ands #0xff` shape              | `ands #0xff` shape              | `ands #0xff` shape              | NO    |
+| **bitfield struct, `low8 : 8` field == 0**         | `ldrb` (1.2 emits ldrb)         | **`lsl #24 / lsrs #24` ✓**      | **`lsl #24 / lsrs #24` ✓**      | **YES on 2.0** |
+
+The bitfield recipe is **unique to 2.0**. 1.2 tiers see the
+bitfield read and emit `ldrb` (because 1.2 has a ldrb peephole
+that fires on bitfield-byte-low reads). Only the 2.0 family
+emits the explicit shift pair.
+
+This means the two picks should ship as plain `.c` (not
+`.legacy.c`). Verified: 3-region `ninja sha1` PASS preserved.
+
+### Shipped (brief 218)
+
+- `src/overlay000/func_ov000_021ab6cc.c` — NEW (replaces
+  `.s` shipped by brief 217).
+- `src/overlay000/func_ov000_021af5c0.c` — NEW (replaces
+  `.s` shipped by brief 217).
+- This research note's § Shape B amended with the falsification
+  + bitfield recipe.
 
 ## What got shipped
 
