@@ -870,6 +870,96 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 "pilot — 3/5 worked examples shipped.",
             ))
 
+            # ----- C-39 sub-classifications (brief 226).
+            #
+            # C-39a — sign-check via dead-arg helper-reuse. Orig
+            # emits `movs rD, r0; bmi .end` after a `bl` (the
+            # peepholed form of `mov rD, r0; cmp rD, #0; blt`).
+            # The peephole only fires for `n < 0` sign tests AND
+            # when n is live in a non-r0 register at the test
+            # site. Recipe: pass n as helper2's second arg —
+            # forces mwcc to allocate n to r1.
+            #
+            # C-39b — helper-reuse (n preserved across or used as
+            # later helper arg). Orig emits `mov rD, r0` after a
+            # `bl`, with rD then either compared (`cmp rD, #0;
+            # ble`) or passed as a subsequent helper arg.
+            # Recipe: named local n + use as helper2 arg, or
+            # cross-call comparison `n >= helper2(...)`.
+            #
+            # Both encoded as additional WallPredictions; the base
+            # C-39 still fires. has_c37_or_c39 check downstream
+            # still gates correctly (C-39 always present when
+            # C-39a/b is).
+            #
+            # Signature encodings (ARM, all little-endian):
+            #   movs rD, r0   : e1b0 D000  (D=Rd nibble at byte 2)
+            #   mov  rD, r0   : e1a0 D000  (D=Rd nibble at byte 2)
+            #   bmi  <off>    : 4a XX XX XX  (cond=MI, branch opcode)
+            #   cmp  rD, #0   : e35D 0000  (D=Rd nibble at byte 1)
+            #
+            # The detector requires the relevant pattern to appear
+            # AFTER a `bl` so the test/copy is unambiguously of
+            # the helper return.
+            bl_indices = [
+                i for i, hw in enumerate(hex_words)
+                if (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000
+            ]
+            if bl_indices:
+                first_bl = bl_indices[0]
+                tail = hex_words[first_bl + 1:]
+                # C-39a: movs rD, r0 immediately followed (within 2
+                # instructions, allowing for an interleaved ldrh)
+                # by bmi.
+                for i, hw in enumerate(tail):
+                    if re.match(r"^e1b0[1-9a-f]000$", hw):
+                        # Look ahead 1-2 instructions for bmi.
+                        for j in range(i + 1, min(i + 3, len(tail))):
+                            if tail[j].startswith("4a"):
+                                walls.append(WallPrediction(
+                                    "C-39a",
+                                    "C-39 sign-check sub-shape: "
+                                    "`movs rX, r0; bmi .end` after "
+                                    "helper bl. Brief 226 recipe — "
+                                    "declare helper2 to take n as a "
+                                    "second arg, then "
+                                    "`int n = helper1(...); if "
+                                    "(n >= 0) helper2(arg, n);` "
+                                    "Forces mwcc to allocate n to "
+                                    "r1 and peephole `mov+cmp` to "
+                                    "`movs`. See "
+                                    "`docs/research/"
+                                    "brief-226-c39-subclass-sign-"
+                                    "check-helper-reuse.md`.",
+                                ))
+                                break
+                        else:
+                            continue
+                        break
+                # C-39b: mov rD, r0 (NOT movs) after bl, with rD
+                # being r1-r4 (helper-arg or callee-saved
+                # candidate). Distinct from C-39a by the absence
+                # of S-flag.
+                for hw in tail:
+                    if re.match(r"^e1a0[1-4]000$", hw):
+                        walls.append(WallPrediction(
+                            "C-39b",
+                            "C-39 helper-reuse sub-shape: `mov rX, "
+                            "r0` (non-peepholed) after helper bl. "
+                            "Brief 226 recipe — named local n + "
+                            "use as helper2 arg "
+                            "(`helper2(arg, n, 0, 0)`) or "
+                            "cross-call compare "
+                            "(`return n >= helper2(...)`). The "
+                            "named local forces mwcc to allocate "
+                            "n to a non-r0 register, preventing "
+                            "the `cmp r0, #0` collapse. See "
+                            "`docs/research/"
+                            "brief-226-c39-subclass-sign-check-"
+                            "helper-reuse.md`.",
+                        ))
+                        break
+
     # ----- C-38 leaf-no-pool reg-alloc + CSE divergence (brief 216).
     #
     # Brief 215 identified Wall 2 — small leaf functions doing

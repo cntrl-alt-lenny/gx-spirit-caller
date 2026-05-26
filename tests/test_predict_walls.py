@@ -1453,6 +1453,163 @@ class TestC39Detection(unittest.TestCase):
         self.assertNotIn("C-39", ids)
 
 
+class TestC39SubShapeDetection(unittest.TestCase):
+    """C-39a / C-39b sub-classifications added by brief 226.
+
+    Brief 226 identified two second-order shapes within the C-39
+    population that defeat the brief 222 base recipe:
+
+      - **C-39a (sign-check via dead-arg helper-reuse)**: orig has
+        `movs rX, r0; bmi .end` after a `bl` — the peepholed form of
+        `mov rX, r0; cmp rX, #0; blt`. The peephole only fires when
+        n is live in a non-r0 register at the test site AND the
+        condition is a pure sign test (`n < 0`).
+
+      - **C-39b (helper-reuse)**: orig has `mov rX, r0` (no S-suffix)
+        after a `bl`, with rX then either compared (`cmp rX, #0;
+        ble`) or passed as a subsequent helper arg. The mov is
+        non-peepholed because n is used later (as cmp operand or
+        helper arg).
+
+    Both sub-shapes co-exist with the base C-39 wall; the sub-shape
+    predictions add a recipe hint without suppressing C-39.
+    """
+
+    def test_a1_canonical_sign_check_fires_c39a(self):
+        """func_ov002_021f4cd4 — the canonical C-39a shape:
+        bl helper1; movs r1, r0; bmi .end; ..."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x8, "e1d410b2", "ldrh\tr1, [r4, #2]"),
+            _objdump_line(0xc, "e1d400b4", "ldrh\tr0, [r4, #4]"),
+            _objdump_line(0x10, "e1a02f81", "lsl\tr2, r1, #31"),
+            _objdump_line(0x14, "e1a01880", "lsl\tr1, r0, #17"),
+            _objdump_line(0x18, "e1a00fa2", "lsr\tr0, r2, #31"),
+            _objdump_line(0x1c, "e1a01ba1", "lsr\tr1, r1, #23"),
+            _objdump_line(0x20, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x24, "e1b01000", "movs\tr1, r0"),
+            _objdump_line(0x28, "4a000003", "bmi\t0x3c"),
+            _objdump_line(0x2c, "e1d400b2", "ldrh\tr0, [r4, #2]"),
+            _objdump_line(0x30, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x34, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x38, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x3c, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x40, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertIn("C-39a", ids)
+        c39a = next(w for w in walls if w.wall_id == "C-39a")
+        self.assertIn("movs", c39a.cue)
+        self.assertIn("bmi", c39a.cue)
+
+    def test_b1_helper_reuse_fires_c39b(self):
+        """func_ov002_021f8490 — the canonical C-39b shape:
+        bl helper1; mov r1, r0; cmp r1, #0; ble .end; ...
+
+        Note: this pick does NOT have the `lsl/lsr #31` bit-extract
+        pre-helper — the helper takes `self` only. So base C-39
+        doesn't fire here; C-39b is the only sub-shape signal.
+        This test verifies C-39b can fire as a secondary cue on
+        the broader helper-reuse population, not just C-39 picks.
+
+        For a pick that fires BOTH C-39 and C-39b, see
+        `test_b3_fires_both_c39_and_c39b`.
+        """
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x8, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0xc, "e1a01000", "mov\tr1, r0"),
+            _objdump_line(0x10, "e3510000", "cmp\tr1, #0"),
+            _objdump_line(0x14, "da000005", "ble\t0x30"),
+            _objdump_line(0x18, "e1d400b2", "ldrh\tr0, [r4, #2]"),
+            _objdump_line(0x1c, "e3a02000", "mov\tr2, #0"),
+            _objdump_line(0x20, "e1a03002", "mov\tr3, r2"),
+            _objdump_line(0x24, "e1a00f80", "lsl\tr0, r0, #31"),
+            _objdump_line(0x28, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x2c, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x30, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x34, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        # B1 has lsl/lsr #31 in body + push + bl + non-leaf, so
+        # base C-39 fires. C-39b also fires due to `mov r1, r0`
+        # after first bl.
+        self.assertIn("C-39", ids)
+        self.assertIn("C-39b", ids)
+        c39b = next(w for w in walls if w.wall_id == "C-39b")
+        self.assertIn("helper-reuse", c39b.cue)
+        # Sign-check sub-shape should NOT fire (no `movs` after bl).
+        self.assertNotIn("C-39a", ids)
+
+    def test_b3_fires_both_c39_and_c39b(self):
+        """func_ov002_021f49d0 — helper-reuse without sign check.
+        bl helper; mov r1, r0; <bitfield extract>; bl helper2; ...
+
+        Confirms C-39 base fires (bit-0 extract present) AND C-39b
+        sub-shape fires (mov rX, r0 after first bl)."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a04000", "mov\tr4, r0"),
+            _objdump_line(0x8, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0xc, "e1d420b2", "ldrh\tr2, [r4, #2]"),
+            _objdump_line(0x10, "e1a01000", "mov\tr1, r0"),
+            _objdump_line(0x14, "e1a00882", "lsl\tr0, r2, #17"),
+            _objdump_line(0x18, "e1a02f82", "lsl\tr2, r2, #31"),
+            _objdump_line(0x1c, "e1a00fa0", "lsr\tr0, r0, #31"),
+            _objdump_line(0x20, "e0200fa2", "eor\tr0, r0, r2, lsr #31"),
+            _objdump_line(0x24, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x28, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x2c, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertIn("C-39b", ids)
+        self.assertNotIn("C-39a", ids)
+
+    def test_c39_without_sub_shape_signal(self):
+        """A C-39 pick that has neither `movs rX, r0` nor `mov rX, r0`
+        after the helper bl should fire C-39 only — no sub-shape."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d010b2", "ldrh\tr1, [r0, #2]"),
+            _objdump_line(0x8, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0xc, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x10, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x14, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x18, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-39a", ids)
+        self.assertNotIn("C-39b", ids)
+
+    def test_movs_to_r0_does_not_fire_c39a(self):
+        """`movs r0, r0` (Rd=0) is a degenerate self-flag-set; it
+        does NOT match the C-39a pattern (which requires r1-r15)."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x4, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0x8, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0xc, "ebfffffe", "bl\t0x0"),
+            # movs r0, r0 — Rd=0, should NOT be C-39a:
+            _objdump_line(0x10, "e1b00000", "movs\tr0, r0"),
+            _objdump_line(0x14, "4a000000", "bmi\t0x1c"),
+            _objdump_line(0x18, "e1a00000", "nop\t"),
+            _objdump_line(0x1c, "e8bd8010", "pop\t{r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-39a", ids)
+
+
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
 
