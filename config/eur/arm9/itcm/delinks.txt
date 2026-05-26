@@ -1,2 +1,6 @@
     .text       start:0x01ff8000 end:0x01ff886c kind:code align:32
     .bss        start:0x01ff8880 end:0x01ff8880 kind:bss align:32
+
+src/main/itcm/func_01ff8400.s:
+    complete
+    .text start:0x01ff8400 end:0x01ff8414

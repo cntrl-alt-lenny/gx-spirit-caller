@@ -1329,3 +1329,11 @@ src/overlay006/data/data_ov006_021cda88.s:
 src/overlay006/func_ov006_021be948.s:
     complete
     .text start:0x021be948 end:0x021bee68
+
+src/overlay006/func_ov006_021b6d00.s:
+    complete
+    .text start:0x021b6d00 end:0x021b6d1c
+
+src/overlay006/func_ov006_021b8f88.s:
+    complete
+    .text start:0x021b8f88 end:0x021b8fa8

@@ -2168,3 +2168,19 @@ src/overlay002/func_ov002_02295418.s:
     complete
     .text start:0x02295418 end:0x02295438
 
+
+src/overlay002/func_ov002_021e2e18.s:
+    complete
+    .text start:0x021e2e18 end:0x021e2e38
+
+src/overlay002/func_ov002_02200630.s:
+    complete
+    .text start:0x02200630 end:0x02200650
+
+src/overlay002/func_ov002_022961a0.s:
+    complete
+    .text start:0x022961a0 end:0x022961bc
+
+src/overlay002/func_ov002_022a1870.s:
+    complete
+    .text start:0x022a1870 end:0x022a1890
