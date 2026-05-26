@@ -364,32 +364,64 @@ itself:
 
 ### Open briefs
 
-- **Brief 222** — `scaffolder`. **C-39 pilot — non-leaf C-37
-  bitfield recipe extension.** Brief 220's survey identified 454
-  hard-tier picks (20.6 % of unclassified) sharing the `lsl #31;
-  lsr #31` bit-extract shape wrapped in non-leaf helper-call code.
-  Brief 218's bitfield-struct recipe likely applies. Pilot: pick 5
-  representative picks (mix of sizes 60-300 B), apply the bitfield
-  recipe, verify byte-identical. If ≥3 ship: extend C-37 detector
-  to recognise the non-leaf shape, classify as **C-39** in
-  `codegen-walls.md`, ship worked examples. If <3 ship: document
-  the failure modes for brief 224+ research. Optional drive-by:
-  brief 216's 3 deferred canaries (`func_0207d304`,
-  `func_02078ed8`, `func_02078eec`) — variant-matrix work on the
-  remaining C-38 sub-patterns. Branch:
-  `scaffolder/c39-non-leaf-bitfield-pilot`.
-- **Brief 223** — `decomper`. **Hard-tier drain wave 1: C-23 solo
-  + StyleA solo.** Brief 220's survey ranked these as the top-2
-  highest-yield mechanical drains (276 + 355 picks). Drain 30-50
-  picks across the two families using mature recipes (C-23 via
-  `.legacy.c` per brief 199; StyleA via `.legacy.c` per
-  `style-a-epilogue.md`). Brief 221's lesson: don't default to
-  `.s` when the recipe is mature — try the `.c` first, ship `.s`
-  only if the recipe genuinely doesn't reach. Target: hard-tier
-  5.3 % → 5.7-5.9 %. Branch: `decomper/hard-tier-drain-c23-stylea`.
+- **Brief 224** — `decomper`. **C-39 drain wave 1.** Brief 222
+  locked the C-39 recipe (bitfield struct read + non-leaf shape)
+  and the detector surfaces **480 SOLO C-39 picks** + 977 compound
+  picks (1,457 total, 18.4 % of hard tier — the single biggest
+  classified bit-extract opportunity). Drain 15-25 picks from the
+  480-pick solo cohort using brief 222's locked recipe. Cap
+  per-pick effort at ~10-15 min (brief 223 surfaced that hard-tier
+  picks need 10-30 min variant-matrix; cap is meant to keep wave
+  throughput up). Expected: ~12-20 `.c` ships + ~3-8 `.s` ships
+  for stubborn shapes. Target: hard-tier 5.6 % → 5.8-5.9 %.
+  Branch: `decomper/c39-drain-wave1`.
+- **Brief 225** — `scaffolder`. **C-39 sub-pattern research +
+  brief 216 deferred canaries.** Two parallel investigations.
+  (A) Brief 222 deferred 2 picks: `func_ov010_021b238c` (104 B,
+  near-miss at 85 % fuzzy due to scheduling) and
+  `func_ov002_0222bc1c` (396 B switch-table dispatch). Variant-
+  matrix work on these to either find sub-recipes (extend C-39 with
+  C-39a / C-39b sub-shapes) or document failure modes for future
+  research. (B) Brief 216's 3 deferred Wall 2 canaries
+  (`func_0207d304`, `func_02078ed8`, `func_02078eec`) — sub-pattern
+  variations of C-38 that the brief 216 4-recipe set didn't cover.
+  Branch: `scaffolder/c39-subpatterns-and-c38-deferred`.
 
 ### Closed briefs (reference)
 
+- **Brief 223** — `decomper`, shipped in PR #683. 🎯 **29 hard-tier
+  ships (5.3 % → 5.6 %).** First hard-tier wave per brief 220's
+  survey. 28 `.s` + 1 `.legacy.c` (`func_020115a8` — 12-field
+  struct init under mwcc 1.2/sp2p3). **Honest reality check on the
+  brief's 25-40 `.legacy.c` target:** got 1 of 29. Hard-tier
+  C-23/StyleA solo picks are structurally MORE complex than
+  easy/medium ones; each needs 10-30 min variant-matrix work to
+  reach byte-match — the brief's mechanical-throughput model
+  doesn't apply. PR body recommends brief 224+ either reduce wave
+  count + extend per-pick budget OR accept lower `.legacy.c` ratio
+  for hard tier. Deferred: 311 solo C-23 + 488 solo StyleA picks
+  remain unmatched (tractable when individual picks need
+  rename/API work). Metric deltas: `matched_functions` 1883 →
+  1912 (+29), `complete_units` 1846 → 1875 (+29). 3-region SHA1
+  PASS preserved.
+- **Brief 222** — `scaffolder`, shipped in PR #684. 🎯 **C-39
+  CLASSIFIED — biggest bit-extract opportunity in hard tier.**
+  Pilot result: 3 of 5 picks byte-identical under brief 218's
+  bitfield-struct recipe. Recipe holds for non-leaf C-37 shapes
+  (mwcc 2.0/sp1p5 bitfield code path is independent of leaf/
+  non-leaf distinction; the mask peephole fires upstream of the
+  bitfield extract). New **C-39** entry in `codegen-walls.md` +
+  detector in `predict_walls.py` + 5 unit tests + 3 worked
+  examples (`func_ov002_0223fd10.c`, `func_ov002_02231f2c.c`,
+  `func_ov002_021f609c.c` — sizes 28-64 B). **Full-corpus hit
+  count: 1,467 C-39 hits across 9,849 functions; 1,457 in hard
+  tier (18.4 %); 480 SOLO C-39 — biggest mechanical drain
+  cohort, larger than C-23 solo + StyleA solo combined.** Two
+  picks deferred: scheduling-divergence sub-shape
+  (`func_ov010_021b238c`, near-miss at 85 % fuzzy) and switch-
+  table dispatch sub-shape (`func_ov002_0222bc1c`, 396 B). Both
+  feed brief 225 scaffolder follow-on. Research note:
+  [`brief-222-c39-non-leaf-bitfield.md`](docs/research/brief-222-c39-non-leaf-bitfield.md).
 - **Brief 221** — `decomper`, shipped in PR #680. 🎯 **Medium-tier
   100 % matched (161 / 161).** 18 ships drained the unmatched
   medium cohort. After easy-tier closed in brief 219, medium is
