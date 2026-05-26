@@ -8,25 +8,29 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-26, post-#692 + #693 merge. Brain on Mac.
-**Brief 228 (C-39 drain wave 3, decomper) and brief 229 (C-39c/d
-pilots + C-38 non-leaf, scaffolder) both shipped.**
+**Last updated:** 2026-05-26, post-#695 + #696 merge. Brain on Mac.
+**Brief 230 (C-39 wave 4, decomper) and brief 231 (C-39c P-13 +
+C-38 non-leaf P-12, scaffolder) both shipped.**
 
-🎯 **C-39 family now structured into base + 3 sub-classifications
-(a/b/d).** Brief 228 shipped **31 .c byte-identical on first
-attempt** by mining the C-39-alone cohort and surfacing 8+ recipe
-variants under the bool-from-helper umbrella (plus a NEW Shape α
-2-helper pipeline). Brief 229 locked C-39d (multi-call re-read) —
-the recipe is "natural source" with no volatile/clobber idiom
-needed; mwcc 2.0/sp1p5 already preserves the re-read for narrow
-struct field loads via TBAA conservatism. C-39c (bitfield
-packing) is a tier-mismatch wall — no single tier delivers all
-required features. Hard-tier matched 6.2 % → **6.8 %** (578 /
-8,351). C-39 family drain estimate post-brief-229:
-**~400-500 picks unlocked** across a + b + d sub-shapes.
+🎯 **C-39 family research complete — 3 sub-classes locked + 1
+permanent.** Brief 230 drained 31 more C-39d-solo picks (31/32
+ratio, 1 revert). Brief 231 closed C-39c as **P-13 (cross-tier
+irreducible)** and C-38 non-leaf as **P-12 (reg-alloc divergence)**
+with full falsification matrices — 0 ships but high-value negative
+result that saves future rounds from re-trying these directions.
+`codegen-walls.md` now has **13 permanent walls**. Hard-tier
+matched 6.8 % → **7.2 %** (609 / 8,351). C-39 family drain status:
+~400-500 picks unlocked across a/b/d; C-39c (~10-30 picks) +
+C-38 non-leaf (~2 picks) closed permanent.
 
-**`matched_functions`: 1994 / 9801 (20.34 %)** — second
-consecutive round crossing the 20 % milestone with margin.
+**`matched_functions`: 2025 / 9801 (20.66 %)** — third consecutive
+round above 20 %.
+
+**New methodology insight from brief 230:** `if (x == 0) return
+CONST; rest;` vs `if (x) { rest; } return CONST;` compile to
+DIFFERENT codegen (inline conditional pop vs branch +
+fall-through). The branch-form match against orig is now part of
+the recipe-selection checklist.
 
 Brief 224 (decomper) ran C-39 drain wave 1. **25 ships, hard-tier
 5.6 % → 6.0 %.** Routing: 24 `.s` + 1 `.c` upgrade
@@ -59,25 +63,25 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#692 + #693 merge, EUR):**
-`matched_functions 1994 / 9801 (20.34 %)`,
-`matched_code_percent ~5.46 %`, `complete_units ~1957 / 2966
-(~66.0 %)`. 3-region SHA1 PASS preserved.
+**Current metrics (post-#695 + #696 merge, EUR):**
+`matched_functions 2025 / 9801 (20.66 %)`,
+`matched_code_percent ~5.49 %`, `complete_units ~1988 / 2997
+(~66.3 %)`. 3-region SHA1 PASS preserved.
 
-**Tier breakdown (post-#692/#693):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard 6.8 %** (578 /
-8,351 matched, 7,773 unmatched — was 6.4 % pre-merge).
+**Tier breakdown (post-#695/#696):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 7.2 %** (609 /
+8,351 matched, 7,742 unmatched — was 6.8 % pre-merge).
 
-**Two open lanes after this merge.** **Brief 230 (decomper)** —
-C-39 drain wave 4 (cohort hunting). Apply brief 228's recipe-
-variant taxonomy + brief 229's C-39d detector to hunt the
-next-largest uniform cohort. Target: 25-40 ships, hard-tier 6.8 %
-→ 7.2-7.5 %. **Brief 231 (scaffolder)** — C-39c tier-mismatch
-workaround pilots + C-38 non-leaf P-12 verdict. Try cross-tier
-combinations (manual StyleA prologue + sp2p3 body, etc.) for
-C-39c; lock P-12 classification or find a reg-alloc coercion
-idiom for the C-38 non-leaf chained-cast picks. Both kickoffs
-sent.
+**Two open lanes after this merge.** **Brief 232 (decomper)** —
+C-39 drain wave 5 (next cohort: C-39b-solo or C-39+b+d compound,
+both ~140-160 picks each). Target: 25-40 ships, hard-tier 7.2 %
+→ 7.5-7.8 %. **Brief 233 (scaffolder)** — pivot to next-highest-
+yield investigation now that C-39 research is essentially done:
+(A) MMIO bit-extract pilot (4 picks from brief 219, could extend
+to hundreds of hard-tier candidates), (B) C-1 + C-23 compound
+research (2,933 hard-tier picks fire both — the "iterative core"
+brief 220 flagged as not batchable; manual variant-matrix on 2-3
+picks may unlock). Both kickoffs sent.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -986,29 +990,26 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Brief 230 (decomper)** — C-39 drain wave 4 (cohort hunting).
-   Kicked off this round. Apply brief 228's recipe-variant
-   taxonomy (V1-V9 + Shape α) and brief 229's C-39d detector to
-   hunt the next-largest uniform cohort. Target: 25-40 ships,
-   hard-tier 6.8 % → 7.2-7.5 %.
-2. **Brief 231 (scaffolder)** — C-39c tier-mismatch workaround
-   + C-38 non-leaf P-12 verdict. Kicked off this round. (A)
-   Cross-tier combination pilots for C-39c (manual StyleA + sp2p3
-   body, inline asm bridge, multi-TU). (B) Lock P-12 classification
-   for C-38 non-leaf reg-alloc, OR find a coercion idiom.
-3. **Brief 232 candidates** (post-230/231):
-   - **C-39c drain wave** if brief 231 finds a workaround.
-   - **C-39 mega-batch wave** — combine all 4 sub-classifications
-     (a/b/d + base) into one cross-shape uniform-batch wave;
-     could ship 50+ if the recipe-variant taxonomy holds.
-   - **MMIO bit-extract recipe research** (scaffolder) — brief
-     219 surfaced 4 picks; could extend to hard-tier candidates.
-   - **C-1 + C-23 compound research** — 2,933 picks fire both,
-     iterative core. Variant-matrix on 2-3 picks might unlock.
+1. **Brief 232 (decomper)** — C-39 drain wave 5 (continuation).
+   Kicked off this round. Pick next-largest uniform cohort
+   (C-39b-solo 157 picks or C-39+b+d compound 137 picks). Apply
+   brief 230's variant taxonomy. Target: 25-40 ships, hard-tier
+   7.2 % → 7.5-7.8 %.
+2. **Brief 233 (scaffolder)** — MMIO bit-extract pilot + C-1 +
+   C-23 compound research. Kicked off this round. C-39 family
+   research is essentially complete (3/4 locked + 1 P-13).
+   Pivot to next-highest-yield: (A) MMIO bit-extract — brief 219
+   surfaced 4 picks; brief 220 estimated ~100s of hard-tier
+   candidates. (B) C-1 + C-23 compound — 2,933 picks fire both;
+   variant-matrix on 2-3 picks may unlock the compound recipe.
+3. **Brief 234 candidates** (post-232/233):
+   - **C-40 / C-41 drain wave** if brief 233 locks recipes.
+   - **C-39 mega-batch wave** — combine a/b/d + base into one
+     cross-shape uniform-batch using brief 230's variant table.
    - **Permuter wave 2** on hard-tier picks — brief 198 left
-     this open; might benefit from brief 218 bitfield insight.
-   - **`.s` → `.c` upgrade pass on accumulated punts** — brief 221
-     + 223 + 224 + 228's deferred a-solo/b-solo cohorts; ~100+ `.s`
+     this open; brief 218 bitfield insight may help.
+   - **`.s` → `.c` upgrade pass on accumulated punts** — brief
+     221 + 223 + 224 + 228 + 230's deferred cohorts; ~100+ `.s`
      ships with non-permanent walls.
 4. **Carryover candidates from prior rounds:**
    - **Hard-bucket pilot** (Track 2 long-form decomp). Brief 220

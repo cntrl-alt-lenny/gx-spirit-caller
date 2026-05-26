@@ -364,31 +364,69 @@ itself:
 
 ### Open briefs
 
-- **Brief 230** — `decomper`. **C-39 drain wave 4 (cohort
-  hunting).** Brief 228 surfaced 8+ recipe variants (V1-V9 +
-  Shape α 2-helper pipeline) by mining the C-39-alone cohort for
-  uniform-shape sub-batches. Brief 229 locked C-39d (multi-call
-  re-read) — drain estimate 100-150 picks. Brief 230 continues
-  the uniform-sub-shape playbook: hunt for the next-largest
-  uniform cohort using brief 228's variant taxonomy + brief 229's
-  C-39d detector. Target: 25-40 ships, hard-tier 6.8 % →
-  7.2-7.5 %. Branch: `decomper/c39-drain-wave4-cohort-hunt`.
-- **Brief 231** — `scaffolder`. **Two follow-on investigations:
-  C-39c tier-mismatch wall workaround + C-38 non-leaf reg-alloc
-  P-12 verdict.** Brief 229 found C-39c (bitfield packing) is a
-  tier-mismatch wall — 2.0 has the outer shape + mask folds,
-  sp2p3 has the masks + StyleA epilogue, sp3 has the masks + extra
-  `sub sp, #4`. No single tier delivers all features. (A) Try
-  cross-tier combinations: mwcc 2.0 with manual StyleA hand-
-  written prologue + sp2p3 recipe, OR inline asm bridge between
-  tiers, OR multi-TU compilation per pick. (B) Brief 229's C-38
-  non-leaf chained-cast filed as P-12 candidate (recipe extends
-  but reg-alloc differs). Lock the P-12 classification with
-  falsification matrix, OR find a reg-alloc coercion idiom.
-  Branch: `scaffolder/c39c-cross-tier-and-c38-nonleaf-p12`.
+- **Brief 232** — `decomper`. **C-39 drain wave 5 (continuation).**
+  Brief 230 confirmed the 31-ship cadence holds across the C-39d-
+  solo cohort (432 picks; ~150-200 still solo after wave 4 leftover).
+  Three open cohorts post-brief-230: C-39+b-solo (157), C-39+b+d
+  compound (137), C-39-alone (609). Pick the next-largest uniform
+  sub-batch from C-39b-solo or the b+d compound + apply brief
+  230's variant taxonomy. Target: 25-40 ships, hard-tier 7.2 % →
+  7.5-7.8 %. Branch: `decomper/c39-drain-wave5`.
+- **Brief 233** — `scaffolder`. **MMIO bit-extract + C-1+C-23
+  compound research.** With C-39 sub-family at 3/4 locked (a/b/d)
+  + 1 permanent (c → P-13) and C-38 non-leaf locked as P-12, the
+  C-39 family research is essentially complete. Time to pivot to
+  the next-highest-yield investigation: (A) MMIO bit-extract — brief
+  219 surfaced 4 picks sharing `ldr base; ldrh value; and; asr;
+  lsl; add base2; bx` shape. Brief 220 survey estimated this
+  family could cover ~100s of hard-tier candidates. Variant-matrix
+  pilot 5 picks. (B) C-1 + C-23 compound — 2,933 hard-tier picks
+  fire both (the "iterative core" brief 220 flagged as not
+  batchable). Pick 2-3 representative picks, variant-matrix
+  manually, see if any single source-shape unlocks the compound.
+  If A or B locks: classify as C-40 / C-41. Branch:
+  `scaffolder/mmio-bit-extract-and-c1-c23-compound`.
 
 ### Closed briefs (reference)
 
+- **Brief 231** — `scaffolder`, shipped in PR #695. 🎯 **2
+  permanent walls locked (P-12 + P-13) with full falsification
+  matrices — 0 ships, high-value negative result.** **P-13 (C-39c
+  cross-tier irreducible):** all 5 mwcc tiers produce IDENTICAL
+  output for the v1 baseline (TCO + mask-fold are mwcc-version-
+  spanning, not tier-specific). Best variant (v5 decl-swap under
+  1.2/sp3) reaches outer shape + pack + reg-alloc, but mwcc's
+  scheduler reorders 4 independent ops; no source-level dependency
+  forces orig's schedule. **P-12 (non-leaf chained-cast reg-alloc
+  divergence):** chained-cast extends to non-leaf, but mwcc puts
+  `end` in r0 instead of orig's r3 across all tested combinations.
+  9 variants × 5 tiers, no (tier, variant) pair gives all 3
+  required features (prologue, cast preserved, reg-alloc).
+  `codegen-walls.md` now has 13 permanent walls. **Value of
+  negative result:** tells brain not to retry cross-tier mwcc-
+  version variants for C-39c, not to iterate on non-leaf chained-
+  cast picks for byte-match, frees brief 232+ from re-trying
+  these directions. Research note:
+  [`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](docs/research/brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
+- **Brief 230** — `decomper`, shipped in PR #696. 🎯 **31 .c ships
+  (31/32, one revert), hard-tier 6.8 % → 7.2 %.** Drained the
+  C-39d-solo cohort (432 candidates pre-brief). 4 recipe sub-
+  patterns surfaced: **Pattern Dα** (`if (helper1) { return helper2
+  <CMP> N; } return 0;` if-then form), **Pattern Dβ** (early-
+  return with `popne`/`popgt` + bool tail), **Pattern Dγ** (D1
+  dual-call same-helper return 0 — brief 229 canonical),
+  **Pattern Dδ** (brief 227-shape singles flagged C-39d, V11-V14
+  variants). **New methodology insight:** `if (x == 0) return
+  CONST; rest;` vs `if (x) { rest; } return CONST;` compile to
+  DIFFERENT codegen (former emits inline conditional pop; latter
+  emits branch + fall-through). Branch form must match orig.
+  C-39d cohort has higher source-shape diversity than wave 2/3 —
+  per-shape disasm decode needed instead of single-batch uniform
+  writing. 1 escape reverted (early-pop-vs-ternary divergence,
+  brief 232+ candidate). Metric deltas: `matched_functions` 1994
+  → 2025 (+31), `complete_units` ~1957 → ~1988 (+31). 3-region
+  SHA1 PASS. Research note:
+  [`brief-230-c39-wave4-cohort-hunt.md`](docs/research/brief-230-c39-wave4-cohort-hunt.md).
 - **Brief 229** — `scaffolder`, shipped in PR #693. 🎯 **C-39d
   locked (3/3, natural re-read recipe)** + C-39c near-miss +
   C-38 non-leaf P-12 candidate. **Key insight: C-39d's recipe
