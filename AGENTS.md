@@ -364,32 +364,57 @@ itself:
 
 ### Open briefs
 
-- **Brief 226** — `scaffolder`. **C-39 sub-classification pilot
-  (sign-check + helper-return reuse).** Brief 224 identified 4
-  second-order shape variations of C-39 blocking volume `.c`
-  upgrades; each needs 20-40 min/pick (above brief 224's 10-15
-  min cap). Brief 226 takes 2 of the 4 — **sign-check vs comparison**
-  (orig `movs r1, r0; bmi .end` vs mwcc `cmp r0, #0; blt .end`)
-  and **helper-return reuse** (orig stores helper result in
-  callee-saved reg + uses later) — and runs variant-matrix per
-  brief 218/222 pattern. Pilot 3 picks per shape (6 total). If
-  ≥2 ship per shape: classify as C-39a / C-39b in `codegen-walls.md`,
-  ship worked examples, extend detector. Decomper then drains
-  mechanically in brief 228+. Branch:
-  `scaffolder/c39-subclass-sign-check-helper-reuse`.
-- **Brief 227** — `decomper`. **C-38 chained-cast corpus drain +
-  C-39 sub-wave.** Brief 225 found that brief 216's deferred
-  canary `func_0207d304` reaches under mwcc 1.2/sp2p3 — a new
-  "redundant cast" C-38 sub-pattern (`(u16)(u8)*p` keeps both
-  casts under legacy tier). Corpus-scan for `and #0xff; lsl #16;
-  lsr #16` tail in hard-tier `.s` ships → drain mechanically.
-  Plus: drain 10-15 more C-39 solo picks at the original 10-15
-  min/pick cap (brief 224's pace was confirmed sustainable).
-  Target: hard-tier 6.0 % → 6.3-6.5 %. Branch:
-  `decomper/c38-chained-cast-c39-wave2`.
+- **Brief 228** — `decomper`. **C-39 drain wave 3 (a/b sub-shapes
+  + boolean-from-helper continuation).** Brief 226 locked C-39a
+  (sign-check) and C-39b (helper-return reuse) sub-classifications.
+  Brief 227 showed the "scan disasm first, filter by exact sub-
+  shape, batch-write" methodology converts 19/19 mechanically on
+  a single-sub-shape wave. Brief 228 applies the same playbook:
+  pick a uniform sub-shape cohort (C-39a OR C-39b OR another
+  "boolean-from-helper" variant), drain 20-30 picks. Target:
+  hard-tier 6.2 % → 6.5-6.8 %. Branch:
+  `decomper/c39-drain-wave3-sub-shapes`.
+- **Brief 229** — `scaffolder`. **C-39 sub-shape 3/4 pilot
+  (bitfield packing + multi-call re-read) + C-38 chained-cast
+  non-leaf investigation.** Two parallel investigations. (A)
+  Brief 224's remaining 2 second-order C-39 shapes:
+  bitfield-packing-into-helper-args and multi-call-re-read. Pilot
+  3 picks per shape, lock recipes if ≥2 ship → classify C-39c /
+  C-39d. (B) Brief 227 deferred 2 non-leaf C-38 chained-cast picks
+  (`func_0207db8c`, `func_0207dbf8`); variant-matrix investigation
+  to see if brief 225's leaf recipe extends to non-leaf shapes.
+  Branch: `scaffolder/c39-subclass-bitfield-multicall-c38-nonleaf`.
 
 ### Closed briefs (reference)
 
+- **Brief 227** — `decomper`, shipped in PR #690. 🎯 **19/19 .c
+  ships, hard-tier 6.0 % → 6.2 %.** Methodology breakthrough:
+  scan disasm FIRST, filter by exact sub-shape, batch-write C.
+  All 19 picks converged on a single "boolean-from-helper" sub-
+  shape derivable from brief 222's bitfield recipe + a single C
+  conditional operator (`!=`, `==`, `>`, `>=`, `<`, `<=` against
+  const 0 or 2). No escapes, no `.s` fallback. **This is the
+  19/19 ratio vs brief 224's 1/25 — uniform-sub-shape waves close
+  mechanically.** Part A (C-38 chained-cast corpus): 0 ships (only
+  2 strict-tail hits remain, both non-leaf — deferred to brief 229
+  scaffolder lane). Metric deltas: `matched_functions` 1940 →
+  1959 (+19), `complete_units` 1903 → 1922 (+19). 3-region SHA1
+  PASS preserved. Research note:
+  [`brief-227-c38-chained-cast-c39-wave2.md`](docs/research/brief-227-c38-chained-cast-c39-wave2.md).
+- **Brief 226** — `scaffolder`, shipped in PR #689. 🎯 **C-39a +
+  C-39b sub-classifications locked (3/3 ships per sub-shape).**
+  **C-39a (sign-check)** recipe: dead-arg helper-reuse —
+  `int n = helper(args); ...; if (n >= 0) helper2(arg, n, 0, 0);`
+  Variant matrix found only the dead-arg + if-then form locks the
+  `movs r1, r0; bmi` shape; early-return form emits
+  predicated-execution instead. **C-39b (helper-return reuse)**
+  recipe: 3 idioms generalise (named local rv + if-then,
+  cross-call compare, no-sign-check direct). 6 worked examples
+  shipped in `src/overlay002/`. Detector extended with sub-shape
+  signatures + 5 new unit tests. Drain estimate per scaffolder:
+  ~250-300 additional C-39 picks unlocked for brief 228+. Research
+  note:
+  [`brief-226-c39-subclass-sign-check-helper-reuse.md`](docs/research/brief-226-c39-subclass-sign-check-helper-reuse.md).
 - **Brief 225** — `scaffolder`, shipped in PR #686. 🎯 **1 ship +
   4 documented near-misses with full falsification matrices.**
   Two parallel investigations. Shipped: `func_0207d304.legacy.c`
