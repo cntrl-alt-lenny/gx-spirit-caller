@@ -474,3 +474,7 @@ src/overlay000/func_ov000_021ac85c.c:
 src/overlay000/data_ov000_021b56b4.c:
     complete
     .rodata start:0x021b56b4 end:0x021b572c
+
+src/overlay000/func_ov000_021ac890.s:
+    complete
+    .text start:0x021ac890 end:0x021ac8b0
