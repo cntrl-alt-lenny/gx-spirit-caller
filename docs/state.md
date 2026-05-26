@@ -8,25 +8,25 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-26, post-#689 + #690 merge. Brain on Mac.
-**Brief 226 (C-39 sub-classification, scaffolder) and brief 227
-(C-38 chained-cast + C-39 wave 2, decomper) both shipped.**
+**Last updated:** 2026-05-26, post-#692 + #693 merge. Brain on Mac.
+**Brief 228 (C-39 drain wave 3, decomper) and brief 229 (C-39c/d
+pilots + C-38 non-leaf, scaffolder) both shipped.**
 
-🎯 **Methodology breakthrough this round + 20 % milestone
-crossed.** Brief 227 shipped **19/19 .c byte-identical** vs brief
-224's 1/25 by changing the selection strategy: **scan disasm
-FIRST, filter by exact sub-shape, batch-write C.** Uniform-
-sub-shape waves close mechanically; mixed-sub-shape waves
-require per-pick variant-matrix work. This is a transferable
-insight for all future mechanical drains. Hard-tier matched
-6.0 % → **6.2 %** (538 / 8,351). Brief 226 locked C-39a + C-39b
-sub-classifications (3/3 ships per sub-shape) — drain estimate
-~250-300 more C-39 picks unlocked. C-39 family alone is now
-structured into base + 2 sub-classifications with a clear path
-to 4 (briefs 229+).
+🎯 **C-39 family now structured into base + 3 sub-classifications
+(a/b/d).** Brief 228 shipped **31 .c byte-identical on first
+attempt** by mining the C-39-alone cohort and surfacing 8+ recipe
+variants under the bool-from-helper umbrella (plus a NEW Shape α
+2-helper pipeline). Brief 229 locked C-39d (multi-call re-read) —
+the recipe is "natural source" with no volatile/clobber idiom
+needed; mwcc 2.0/sp1p5 already preserves the re-read for narrow
+struct field loads via TBAA conservatism. C-39c (bitfield
+packing) is a tier-mismatch wall — no single tier delivers all
+required features. Hard-tier matched 6.2 % → **6.8 %** (578 /
+8,351). C-39 family drain estimate post-brief-229:
+**~400-500 picks unlocked** across a + b + d sub-shapes.
 
-**`matched_functions` crossed 20 % for the first time** —
-1963 / 9801 (20.03 %).
+**`matched_functions`: 1994 / 9801 (20.34 %)** — second
+consecutive round crossing the 20 % milestone with margin.
 
 Brief 224 (decomper) ran C-39 drain wave 1. **25 ships, hard-tier
 5.6 % → 6.0 %.** Routing: 24 `.s` + 1 `.c` upgrade
@@ -59,27 +59,25 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#689 + #690 merge, EUR):**
-`matched_functions 1963 / 9801 (20.03 %)`,
-`matched_code_percent 5.4263 %`, `fuzzy_match_percent 6.1246 %`,
-`complete_units 1926 / 2935 (65.62 %)`. 3-region SHA1 PASS
-preserved.
+**Current metrics (post-#692 + #693 merge, EUR):**
+`matched_functions 1994 / 9801 (20.34 %)`,
+`matched_code_percent ~5.46 %`, `complete_units ~1957 / 2966
+(~66.0 %)`. 3-region SHA1 PASS preserved.
 
-**Tier breakdown (post-#689/#690):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard 6.4 %** (538 /
-8,351 matched, 7,813 unmatched — was 6.0 % pre-merge). Brief 228
-(decomper) does C-39 drain wave 3 (a/b sub-shapes); brief 229
-(scaffolder) pilots C-39c/d sub-shapes + C-38 chained-cast
-non-leaf investigation.
+**Tier breakdown (post-#692/#693):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 6.8 %** (578 /
+8,351 matched, 7,773 unmatched — was 6.4 % pre-merge).
 
-**Two open lanes after this merge.** **Brief 228 (decomper)** —
-C-39 drain wave 3 applying the uniform-sub-shape methodology
-(scan-first, filter-by-shape, batch-write) on a C-39a OR C-39b
-OR boolean-from-helper cohort. Target: 20-30 ships, hard-tier
-6.4 % → 6.7-7.0 %. **Brief 229 (scaffolder)** — C-39c
-(bitfield-packing) + C-39d (multi-call re-read) sub-classification
-pilots + brief 227's 2 non-leaf C-38 chained-cast deferred picks
-investigation. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 230 (decomper)** —
+C-39 drain wave 4 (cohort hunting). Apply brief 228's recipe-
+variant taxonomy + brief 229's C-39d detector to hunt the
+next-largest uniform cohort. Target: 25-40 ships, hard-tier 6.8 %
+→ 7.2-7.5 %. **Brief 231 (scaffolder)** — C-39c tier-mismatch
+workaround pilots + C-38 non-leaf P-12 verdict. Try cross-tier
+combinations (manual StyleA prologue + sp2p3 body, etc.) for
+C-39c; lock P-12 classification or find a reg-alloc coercion
+idiom for the C-38 non-leaf chained-cast picks. Both kickoffs
+sent.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -132,14 +130,12 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes after this merge.** **Brief 228 (decomper)** —
-C-39 drain wave 3. Apply the uniform-sub-shape methodology
-(scan-first, filter-by-shape, batch-write) on a C-39a OR C-39b
-OR boolean-from-helper cohort. Target: 20-30 ships, hard-tier
-6.4 % → 6.7-7.0 %. **Brief 229 (scaffolder)** — C-39c
-(bitfield-packing) + C-39d (multi-call re-read) sub-classification
-pilots + brief 227's 2 non-leaf C-38 chained-cast deferred picks
-investigation. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 230 (decomper)** —
+C-39 drain wave 4 (cohort hunting). Apply brief 228's recipe-
+variant taxonomy + brief 229's C-39d detector to hunt the
+next-largest uniform cohort. Target: 25-40 ships. **Brief 231
+(scaffolder)** — C-39c tier-mismatch workaround (cross-tier
+pilots) + C-38 non-leaf P-12 verdict. Both kickoffs sent.
 
 **Brain methodology update (PR #664):** "empirical hypothesis
 testing — non-negotiable for pre-validation." Brain
@@ -990,29 +986,30 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Brief 228 (decomper)** — C-39 drain wave 3. Kicked off this
-   round. Apply uniform-sub-shape methodology (scan-first,
-   filter-by-shape, batch-write) on C-39a OR C-39b OR
-   boolean-from-helper cohort. Target: 20-30 ships, hard-tier
-   6.4 % → 6.7-7.0 %.
-2. **Brief 229 (scaffolder)** — C-39c (bitfield-packing) + C-39d
-   (multi-call re-read) sub-classification pilots + brief 227's
-   2 non-leaf C-38 chained-cast deferred picks. Kicked off this
-   round.
-3. **Brief 230 candidates** (post-228/229):
-   - **C-39c / C-39d drain wave** if brief 229 locks recipes.
-   - **C-39 cross-shape uniform-batch waves** — combine brief
-     227's methodology with sub-shape detector hits for
-     larger waves (30-50 ships).
+1. **Brief 230 (decomper)** — C-39 drain wave 4 (cohort hunting).
+   Kicked off this round. Apply brief 228's recipe-variant
+   taxonomy (V1-V9 + Shape α) and brief 229's C-39d detector to
+   hunt the next-largest uniform cohort. Target: 25-40 ships,
+   hard-tier 6.8 % → 7.2-7.5 %.
+2. **Brief 231 (scaffolder)** — C-39c tier-mismatch workaround
+   + C-38 non-leaf P-12 verdict. Kicked off this round. (A)
+   Cross-tier combination pilots for C-39c (manual StyleA + sp2p3
+   body, inline asm bridge, multi-TU). (B) Lock P-12 classification
+   for C-38 non-leaf reg-alloc, OR find a coercion idiom.
+3. **Brief 232 candidates** (post-230/231):
+   - **C-39c drain wave** if brief 231 finds a workaround.
+   - **C-39 mega-batch wave** — combine all 4 sub-classifications
+     (a/b/d + base) into one cross-shape uniform-batch wave;
+     could ship 50+ if the recipe-variant taxonomy holds.
    - **MMIO bit-extract recipe research** (scaffolder) — brief
      219 surfaced 4 picks; could extend to hard-tier candidates.
    - **C-1 + C-23 compound research** — 2,933 picks fire both,
      iterative core. Variant-matrix on 2-3 picks might unlock.
    - **Permuter wave 2** on hard-tier picks — brief 198 left
      this open; might benefit from brief 218 bitfield insight.
-   - **`.s` → `.c` upgrade pass on brief 221 + 223 + 224 punts**
-     — accumulated ~60+ `.s` ships with non-permanent walls;
-     could revisit with extended variant-matrix budget.
+   - **`.s` → `.c` upgrade pass on accumulated punts** — brief 221
+     + 223 + 224 + 228's deferred a-solo/b-solo cohorts; ~100+ `.s`
+     ships with non-permanent walls.
 4. **Carryover candidates from prior rounds:**
    - **Hard-bucket pilot** (Track 2 long-form decomp). Brief 220
      is the structural prerequisite for this.

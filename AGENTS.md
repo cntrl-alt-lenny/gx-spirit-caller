@@ -364,29 +364,65 @@ itself:
 
 ### Open briefs
 
-- **Brief 228** — `decomper`. **C-39 drain wave 3 (a/b sub-shapes
-  + boolean-from-helper continuation).** Brief 226 locked C-39a
-  (sign-check) and C-39b (helper-return reuse) sub-classifications.
-  Brief 227 showed the "scan disasm first, filter by exact sub-
-  shape, batch-write" methodology converts 19/19 mechanically on
-  a single-sub-shape wave. Brief 228 applies the same playbook:
-  pick a uniform sub-shape cohort (C-39a OR C-39b OR another
-  "boolean-from-helper" variant), drain 20-30 picks. Target:
-  hard-tier 6.2 % → 6.5-6.8 %. Branch:
-  `decomper/c39-drain-wave3-sub-shapes`.
-- **Brief 229** — `scaffolder`. **C-39 sub-shape 3/4 pilot
-  (bitfield packing + multi-call re-read) + C-38 chained-cast
-  non-leaf investigation.** Two parallel investigations. (A)
-  Brief 224's remaining 2 second-order C-39 shapes:
-  bitfield-packing-into-helper-args and multi-call-re-read. Pilot
-  3 picks per shape, lock recipes if ≥2 ship → classify C-39c /
-  C-39d. (B) Brief 227 deferred 2 non-leaf C-38 chained-cast picks
-  (`func_0207db8c`, `func_0207dbf8`); variant-matrix investigation
-  to see if brief 225's leaf recipe extends to non-leaf shapes.
-  Branch: `scaffolder/c39-subclass-bitfield-multicall-c38-nonleaf`.
+- **Brief 230** — `decomper`. **C-39 drain wave 4 (cohort
+  hunting).** Brief 228 surfaced 8+ recipe variants (V1-V9 +
+  Shape α 2-helper pipeline) by mining the C-39-alone cohort for
+  uniform-shape sub-batches. Brief 229 locked C-39d (multi-call
+  re-read) — drain estimate 100-150 picks. Brief 230 continues
+  the uniform-sub-shape playbook: hunt for the next-largest
+  uniform cohort using brief 228's variant taxonomy + brief 229's
+  C-39d detector. Target: 25-40 ships, hard-tier 6.8 % →
+  7.2-7.5 %. Branch: `decomper/c39-drain-wave4-cohort-hunt`.
+- **Brief 231** — `scaffolder`. **Two follow-on investigations:
+  C-39c tier-mismatch wall workaround + C-38 non-leaf reg-alloc
+  P-12 verdict.** Brief 229 found C-39c (bitfield packing) is a
+  tier-mismatch wall — 2.0 has the outer shape + mask folds,
+  sp2p3 has the masks + StyleA epilogue, sp3 has the masks + extra
+  `sub sp, #4`. No single tier delivers all features. (A) Try
+  cross-tier combinations: mwcc 2.0 with manual StyleA hand-
+  written prologue + sp2p3 recipe, OR inline asm bridge between
+  tiers, OR multi-TU compilation per pick. (B) Brief 229's C-38
+  non-leaf chained-cast filed as P-12 candidate (recipe extends
+  but reg-alloc differs). Lock the P-12 classification with
+  falsification matrix, OR find a reg-alloc coercion idiom.
+  Branch: `scaffolder/c39c-cross-tier-and-c38-nonleaf-p12`.
 
 ### Closed briefs (reference)
 
+- **Brief 229** — `scaffolder`, shipped in PR #693. 🎯 **C-39d
+  locked (3/3, natural re-read recipe)** + C-39c near-miss +
+  C-38 non-leaf P-12 candidate. **Key insight: C-39d's recipe
+  is "natural source" — reference the field twice across helper
+  calls; mwcc 2.0/sp1p5 already preserves the re-read for narrow
+  struct field loads via TBAA conservatism.** No volatile, no asm
+  clobber needed. Brief 224's hypothesis (multi-call re-read
+  needs CSE-defeat idiom) was wrong — mwcc already declines to
+  CSE narrow field loads across calls. **C-39c (bitfield packing)
+  is a tier-mismatch wall** — no single tier delivers all
+  required features (outer shape, mask folds, StyleA epilogue,
+  `sub sp, #4`). Documented. **C-38 non-leaf chained-cast** —
+  recipe extends but reg-alloc differs from orig. Filed as P-12
+  candidate. Drain estimate per scaffolder: ~100-150 C-39d picks
+  + brief 226's ~250-300 a/b = **~400-500 total C-39 sub-shape
+  drain picks** for brief 230+. Research note:
+  [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](docs/research/brief-229-c39c-d-pilots-and-c38-nonleaf.md).
+  Pre-merge gotcha caught: ternary polarity (`m < 1 ? 0 : 2` vs
+  `m >= 1 ? 2 : 0`) emits different `movge`/`movlt` order — SHA1
+  caught it; fixed by flipping polarity.
+- **Brief 228** — `decomper`, shipped in PR #692. 🎯 **31 .c
+  ships byte-identical on first attempt, hard-tier 6.4 % →
+  6.8 %.** Continued brief 227's uniform-shape playbook by mining
+  the **C-39-alone cohort** (1072 picks). Surfaced **8+ recipe
+  variants** under the bool-from-helper umbrella: V1 (`mvn ~0`),
+  V2 (`rsb 1-`, dominant: 11 picks), V3 (lit-arg), V4 (r1
+  channel), V5 (3-arg with f0), V7 (4-arg), V8 (literal-middle),
+  V9a/b (composed) — plus **new Shape α** 2-helper pipeline (2
+  picks). C-39a-solo (19 picks) and C-39b-solo (297 picks)
+  cohorts have high source-shape diversity — strict-clone scans
+  returned 0; deferred to brief 230+. Metric deltas:
+  `matched_functions` 1963 → 1994 (+31), `complete_units` 1926
+  → 1957 (+31). 3-region SHA1 PASS. Research note:
+  [`brief-228-c39-wave3-sub-shapes.md`](docs/research/brief-228-c39-wave3-sub-shapes.md).
 - **Brief 227** — `decomper`, shipped in PR #690. 🎯 **19/19 .c
   ships, hard-tier 6.0 % → 6.2 %.** Methodology breakthrough:
   scan disasm FIRST, filter by exact sub-shape, batch-write C.
