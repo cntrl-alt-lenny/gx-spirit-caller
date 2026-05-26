@@ -154,11 +154,11 @@ collapses (the cast-coalescing peephole is too aggressive).
 But reg-alloc differs from orig: orig's allocator keeps `end` in
 r3 throughout the function; my v3/v4 keeps `end` in r0 and shuffles
 through r1/r3. The chained-cast instructions are present but use
-different registers (e.g., orig `ldr r0, [r5, #-4]; and r0, r0,
-#0xff; mov r0, r0, lsl #16; mov r0, r0, lsr #16; ands r0, r0, #1`
-vs mine `ldr r1, [r5, #-4]; and r1, r1, #0xff; lsl r1, r1, #16;
-lsr r1, r1, #16; ands r1, r1, #1` — same instructions, different
-Rd).
+different registers (e.g., orig
+`ldr r0, [r5, #-4]; and r0, r0, #0xff; mov r0, r0, lsl #16; mov r0, r0, lsr #16; ands r0, r0, #1`
+vs mine
+`ldr r1, [r5, #-4]; and r1, r1, #0xff; lsl r1, r1, #16; lsr r1, r1, #16; ands r1, r1, #1`
+— same instructions, different Rd).
 
 Additional structural mismatch: 1.2/sp3 emits `push {r4, r5, lr};
 sub sp, sp, #4` (4-byte stack pad). Orig has `stmdb sp!, {r4, r5,

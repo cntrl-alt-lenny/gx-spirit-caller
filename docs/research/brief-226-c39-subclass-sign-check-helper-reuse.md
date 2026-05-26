@@ -25,6 +25,7 @@ Brief 226 closes both sub-classifications as **recipe-shippable**.
 ### C-39a — sign-check via dead-arg helper-reuse
 
 **Source:**
+
 ```c
 int n = helper1(...);
 if (n >= 0) {
@@ -34,7 +35,8 @@ return X;
 ```
 
 **Codegen produced (mwcc 2.0/sp1p5):**
-```
+
+```text
 bl    helper1
 movs  r1, r0            ; r1 = n, set flags
 bmi   .end              ; branch if N (n < 0)
@@ -59,35 +61,41 @@ case lands in C-39b.
 
 **Three idioms ship under this sub-shape:**
 
-1. **Sign-check via `n > 0` + helper2 takes n** (canonical case,
-   shape brief 224 locked):
-   ```c
-   int n = helper1(...);
-   if (n > 0) {
-       helper2(arg, n, 0, 0);
-   }
-   return 1;
-   ```
-   Emits `mov r1, r0; cmp r1, #0; ble .end; ...`.
+**Idiom 1 — Sign-check via `n > 0` + helper2 takes n** (canonical
+case, shape brief 224 locked):
 
-2. **Cross-call comparison** — n preserved across a second helper
-   call and compared with its return:
-   ```c
-   int n = helper1(args);
-   return n >= helper2(self);
-   ```
-   Emits `mov r4, r0; ... bl helper2; cmp r4, r0; movge/movlt; pop`.
-   n goes into r4 (callee-saved) because helper2 clobbers r0-r3.
+```c
+int n = helper1(...);
+if (n > 0) {
+    helper2(arg, n, 0, 0);
+}
+return 1;
+```
 
-3. **No sign-check** — n stored across bitfield extracts and
-   passed to helper2 as 2nd arg:
-   ```c
-   int n = helper1(self);
-   helper2(self->f2.bit_a ^ self->f2.bit_b, n);
-   return 1;
-   ```
-   Emits `mov r1, r0` after first bl, then bitfield setup, then
-   bl helper2 with r1 still holding n.
+Emits `mov r1, r0; cmp r1, #0; ble .end; ...`.
+
+**Idiom 2 — Cross-call comparison** — n preserved across a second
+helper call and compared with its return:
+
+```c
+int n = helper1(args);
+return n >= helper2(self);
+```
+
+Emits `mov r4, r0; ... bl helper2; cmp r4, r0; movge/movlt; pop`.
+n goes into r4 (callee-saved) because helper2 clobbers r0-r3.
+
+**Idiom 3 — No sign-check** — n stored across bitfield extracts and
+passed to helper2 as 2nd arg:
+
+```c
+int n = helper1(self);
+helper2(self->f2.bit_a ^ self->f2.bit_b, n);
+return 1;
+```
+
+Emits `mov r1, r0` after first bl, then bitfield setup, then
+bl helper2 with r1 still holding n.
 
 ## Variant matrix (sub-shape A)
 
@@ -110,8 +118,8 @@ default mwcc 2.0/sp1p5. Only v10b reached byte-identical:
 **Insight:** the recipe requires BOTH (i) helper2 to declare `n` as a
 later arg, AND (ii) the control flow to be `if (n >= 0) { ... }
 return X;` (NOT early-return `if (n < 0) return X; ...`). With
-early-return, mwcc collapses to conditional execution (`movmi r0,
-#X; popmi`) instead of `bmi` branch.
+early-return, mwcc collapses to conditional execution
+(`movmi r0, #X; popmi`) instead of `bmi` branch.
 
 ## Variant matrix (sub-shape B)
 

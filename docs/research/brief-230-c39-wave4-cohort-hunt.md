@@ -135,8 +135,8 @@ All in `src/overlay002/`:
 ## One reverted attempt — `func_ov002_02295b08`
 
 Shape was `if (helper1) { inner } return 0;` where the inner block
-had a single-helper `helper2(!bit0) == 0` check. Orig had `moveq r0,
-#1; popeq` (early-pop on eq) + fall-through to `mov #0; pop`.
+had a single-helper `helper2(!bit0) == 0` check. Orig had
+`moveq r0, #1; popeq` (early-pop on eq) + fall-through to `mov #0; pop`.
 
 Tried both straight `return helper2 == 0` and nested `if (helper2 ==
 0) return 1;` forms — neither produced the early-pop pattern.

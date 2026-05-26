@@ -127,9 +127,9 @@ Two-arg helper where self stays live in r0 and `1-bit0` goes into r1
 return helper(self->f2.bit0, self->f0, 0) <CMP> N;
 ```
 
-3-arg helper using both bit0 and self->f0 plus a literal 0. mwcc
-emits `ldrh r3, [r0, #2]; ldrh r1, [r0]; mov r2, #0; lsl r0, r3,
-#31; lsr r0, r0, #31`. Ships: 3 picks (02201a40, 02203aec, 02206fe4).
+3-arg helper using both bit0 and self->f0 plus a literal 0. mwcc emits
+`ldrh r3, [r0, #2]; ldrh r1, [r0]; mov r2, #0; lsl r0, r3, #31; lsr r0, r0, #31`.
+Ships: 3 picks (02201a40, 02203aec, 02206fe4).
 
 ### V7 — helper(self, bit0, -1, 0)
 
