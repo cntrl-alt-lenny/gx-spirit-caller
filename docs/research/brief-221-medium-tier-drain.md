@@ -87,16 +87,35 @@ their specific shape matters for an API or rename.
 | **Medium tier %** | **100.0% (161/161)** ✓ |
 | `ninja check` | pre-existing ov004 sinit error (not introduced) |
 
-## What this brief did NOT do
+## What this brief did NOT do (initial pass)
 
-- **No .c upgrades**: the brief's "Recipe routing per wall family"
-  section recommended .legacy.c for StyleA (3 picks) + C-23 (1) +
-  C-33 (2) + C-36 (3) + C-15 (1). 10 picks total. Each would
-  need per-function variant-matrix testing under the recommended
-  tier to confirm byte-match. Brief 221 shipped them all as .s
-  instead — get to 100% first, upgrade selectively later. The
-  shipped .s files preserve the recipe-classification metadata
-  in their headers so a future brief can pick them up.
+- **No .c upgrades in the first commit**: shipped all 18 as .s to
+  get to 100% medium tier first. Brain reissued the brief asking
+  for the 6-8 .c upgrades — the second commit (below) attempted
+  them.
+
+## Recipe-upgrade attempts (second pass)
+
+After the initial .s-only ship, attempted .legacy.c / .c
+upgrades for the picks the brief flagged as recipe-routable:
+
+| Pick | Walls | Recipe attempted | Result |
+|---|---|---|:---:|
+| `itcm:func_01ff8770` | StyleA | `.legacy.c` (DMA programmer recipe from brief 201's func_02093dc8) | ✓ MATCH |
+| `itcm:func_01ff86fc` | StyleA, C-1 | `.legacy.c` (same DMA recipe + dummy-read for reset path) | ✗ no match (dummy `(void)*dma` doesn't reproduce orig's exact reg-alloc) |
+| `main:func_0207c20c` | StyleA, C-33 | `.legacy.c` (early-return ladder, raw `OS_DisableIrq()` result threaded through) | ✗ no match (reg-alloc diverges; orig uses r2 for data pointer, mine uses r1) |
+| C-23 / C-33 picks | (C-23, C-15, P-11 mixed) | not attempted | (P-11 dominates; permanent) |
+| C-36 picks | (all paired with C-1) | not attempted | (C-1 dominates; permanent) |
+
+**Net result: 1 of 18 upgraded to .legacy.c** (`func_01ff8770`).
+The remaining 17 stay as .s. The brief's "6-8 expected .c upgrades"
+was optimistic — most of the picks with recipe flags also have a
+PERMANENT wall (C-1 or P-11) as a co-flag that blocks the .c
+path even when the recipe-eligible flag is present.
+
+The brief 222+ recommendation: tackle recipe upgrades selectively
+when individual picks need a rename / API surface, not as a
+blanket pass.
 
 - **No fuzzy_match polish**: per brief 209 documentation, `.s`
   files with hand-encoded `.word` directives sit at low fuzzy in
