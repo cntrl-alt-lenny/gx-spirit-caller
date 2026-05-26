@@ -4953,15 +4953,31 @@ literal-pool policy at build time, which we can't replicate.
 `func_0207f4f8`. **2 of 47 (4%)**, but commonly co-occurs with
 other patterns in partial-match drops.
 
-### P-4. r2-vs-r3 scratch register selection on swap-shape thunks
+### P-4. Tiny-thunk reg-allocator divergence (formerly "swap-shape")
 
-For a tail-call thunk that swaps two argument positions
-(`return target(b, a)`), mwcc reliably picks **r2** as the spill
-register; target ROM uses **r3**. Both choices are
+For a tiny thunk where mwcc must pick a scratch register for
+a swap temp or pool-load pointer (`return target(b, a)` or
+`return target(arr[idx*N])`), mwcc reliably picks the
+**lowest-numbered free register** while the target ROM picks a
+**higher-numbered one** (typically by one). Both choices are
 semantically valid; only the byte-encoded register field
 differs.
 
-**What was tried in brief 031 (none worked):**
+**Two empirically observed sub-shapes (brief 218):**
+
+| Sub-shape | mwcc picks | Orig picks | Example |
+|-----------|------------|------------|---------|
+| Swap-tail-call (`return target(b, a)`) | r2 | r3 | `func_0207842c`, `_02078444`, `_ov002_0229cd70`, `_02052ddc` |
+| Pool-load + tail-call (no swap) | r1 | r2 | `func_ov002_021b4254` |
+| Fnptr-cache `ldr rN, [ptr]; bx rN`     | r0  | r1  | wave-17 `func_02084a9c`, `_02084ac4` |
+
+The first sub-shape was documented in brief 031 (this entry's
+original scope). The second was surfaced in brief 217 as a
+"broader Wall 1" finding and confirmed in brief 218: it's the
+same underlying mechanism (allocator picks the lowest free
+register), not specific to swap shapes.
+
+**What was tried in brief 031 / 218 (none worked):**
 
 1. 2-arg signature with target also 2-arg → 66% partial (r2 vs r3)
 2. 4-arg passthrough (`int func(int,int,int,int)`) → mwcc adds
@@ -4969,12 +4985,40 @@ differs.
 3. 3-arg signature with one unused param → still r2
 4. Target re-declared with real arity → adds `bl + ldmia` frame
 5. `void *` first-arg cast → also breaks tail-call
+6. **`register int t asm("r3") = a;`** (brief 218) → mwccarm
+   1.2/sp* family rejects asm register binding; 2.0 family
+   silently ignores it (still emits r2).
+7. **Inline asm clobber list** `asm volatile("" ::: "r3");`
+   (brief 218) → mwcc parses the empty asm but doesn't honor
+   the clobber list (mwcc inline asm is non-GCC, doesn't
+   support clobber annotations). Still emits r2.
+8. **register storage-class** `register int t = a;` (brief 218,
+   plain `register` without asm binding) → same r2 output across
+   all 5 tiers.
+9. **Extra local consuming a reg** `int extra_local = extra_var;
+   ... + (extra_local & 0)` (brief 218) → mwcc dead-code-
+   eliminates the local before allocation. Still r2.
+10. **Function-pointer indirection** `extern fn_t fp; fp(b, a);`
+    (brief 218) → DOES use r3 for the swap temp, but adds 6
+    extra insns (stack frame for non-leaf call). Function size
+    no longer matches orig.
+11. **3-arg with c live** `func(c); return target(b, a);` (brief
+    218) → adds a stack frame + bl call; swap temp moves to a
+    callee-saved register entirely.
+12. **2nd arg used in expression** `return target(arr[idx*N])
+    + extra` (brief 218 broader sub-shape) → mwcc keeps r1
+    live for `extra`, picks **r2** for the data ptr (matching
+    orig's register), but the function body grows by 4+ insns
+    (frame, add). Different overall shape.
 
 **Why permanent (today):** brief 029 had noted that 4-arg
 passthrough triggers r3 scratch; that hint applies to
 straight-passthrough thunks but **not to swap-shape thunks**.
 The reg-allocator's scoring of r2 vs r3 on swap shapes appears
-to be mwcc-version specific.
+to be mwcc-version specific. Brief 218 confirmed: 12 source-
+form variants exercised across all 5 mwccarm tiers (1.2/base,
+1.2/sp2p3, 1.2/sp3, 2.0/sp1p5, 2.0/sp2p4) — none reach the
+orig register choice while preserving the 5-insn function shape.
 
 **Affected drops:** brief 031 `func_02052ddc`, `_0207842c`,
 `_02078444`, `_ov002_0229cd70` (all 66% partial; identical-asm
@@ -4982,8 +5026,10 @@ group of 3 cross-overlay siblings + 1 main); brief 053
 self-extend 2 / wave 17 (PR #380) added `func_02084a9c` +
 `_02084ac4` (r0-vs-r1 ldr-dest on fnptr-cache shape — a
 different reg-allocator-pick variant in the same single-byte-
-divergence family). **6 of 80 (8%)** across the canonical
-swap-thunk and fnptr-cache shapes.
+divergence family); brief 217 added `func_ov002_021b4254`
+(broader pool-load + tail-call shape — r1 vs r2). **7 of 80+
+(~9%)** across the canonical swap-thunk, fnptr-cache, and
+pool-load tail-call shapes.
 
 **Coercion fallback (brief 054 sweep on wave-17 targets):** the
 `asm void` + `nofralloc` recipe from C-12 / C-16 also works
