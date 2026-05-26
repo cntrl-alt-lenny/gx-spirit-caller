@@ -24,8 +24,8 @@ Brief 225's worked example (`func_0207d304.legacy.c`) used a chained
 
 ### Corpus scan results
 
-Scanned `src/**/*.s` for the tail signature `and #0xff; mov ... lsl
-#0x10; mov ... lsr #0x10; bx lr`:
+Scanned `src/**/*.s` for the tail signature
+`and #0xff; mov ... lsl #0x10; mov ... lsr #0x10; bx lr`:
 
 | Filter | Hits |
 |---|---:|
