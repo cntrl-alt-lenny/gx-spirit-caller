@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (39 patterns, 2 sub-classifications)
+## Coercible-with-knowledge (39 patterns, 3 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -5149,6 +5149,107 @@ pattern, and apply the corresponding source recipe.
 the recipe generalises across all three idioms — 3/3 picks
 ship byte-identical. Detector + tests added. Full matrix at
 [`brief-226-c39-subclass-sign-check-helper-reuse.md`](brief-226-c39-subclass-sign-check-helper-reuse.md).
+
+### C-39d. Multi-call re-read (sub-shape of C-39)
+
+**The wall.** Brief 224 catalogued a "multi-call sequences with
+no CSE on volatile fields" sub-shape: orig emits the SAME
+`ldrh rX, [rY, #N]` halfword load TWICE — once before a helper
+`bl` and once after — when the same struct field is referenced
+on both sides of the call. Brief 224 hypothesised mwcc would
+CSE the read and a special source idiom (volatile pointer,
+asm clobber, function-call barrier) would be needed to defeat
+the CSE.
+
+Brief 229's variant matrix found the hypothesis was wrong:
+**mwcc 2.0/sp1p5 already preserves the re-read** for narrow
+struct field loads across helper calls. The compiler can't
+prove the helper doesn't alias `self` (TBAA conservatism for
+narrow integral loads), so it conservatively re-emits the load.
+
+The "natural source" recipe — write the field reference twice
+in the source code, no volatile, no asm — produces the orig
+pattern directly.
+
+Canonical recipe:
+
+```c
+struct Self {
+    unsigned short bit0 : 1;
+    unsigned short rest : 15;
+};
+struct Outer {
+    unsigned short pad0;
+    struct Self f2;
+};
+
+extern int helper(unsigned int bit);
+
+int func_X(struct Outer *self) {
+    int a = helper(self->f2.bit0);            /* 1st read */
+    int b = helper(1 - self->f2.bit0);        /* 2nd read — emits re-read */
+    return (a + b) >= 4;
+}
+```
+
+mwcc 2.0/sp1p5 emits (matches orig):
+
+```
+ldrh r0, [r4, #2]               ; first read
+lsl/lsr #31                      ; bit0
+bl   helper
+ldrh r1, [r4, #2]               ; RE-READ (no CSE)
+lsl/lsr #31                      ; bit0 again
+bl   helper
+```
+
+**Why no CSE?** mwcc's intermediate representation treats
+narrow halfword loads through pointer parameters as
+potentially-aliased by intervening function calls. A pointer
+escape analysis pass could prove `helper` doesn't see `self`,
+but mwcc 2.0/sp1p5 doesn't run that pass. So the re-read is
+emitted "by default."
+
+This is the OPPOSITE of how brief 224 catalogued it: the
+re-read is mwcc's NATURAL behaviour, not a special pattern
+that needs defeating.
+
+**Three shipped worked examples (brief 229 pilot, 3/3 ship):**
+
+- `src/overlay002/func_ov002_02204f28.c` — two calls to the
+  SAME helper with `!bit0` and `bit0` args.
+- `src/overlay002/func_ov002_02200378.c` — two DIFFERENT
+  helpers (helper1 then helper2) with a pool-loaded literal
+  arg (`0x14f8`).
+- `src/overlay002/func_ov002_02200650.c` — same helper twice
+  with `bit0` and `!bit0`, plus ternary `m >= 1 ? 2 : 0` tail.
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-39d (in addition to base C-39) when:
+
+- Two `ldrh rX, [rY, #N]` instructions reference the SAME
+  `(rY, N)` pair, with at least one `bl` between them.
+
+The detector parses the disasm text for the `(base, offset)`
+pair because ARM's halfword-load encoding splits the offset
+across the instruction's nibbles, making a pure regex match
+on the raw hex unreliable.
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5).
+No special idiom needed.
+
+**Use when:** classifier flags C-39 + C-39d. Write the field
+reference twice in source code (or use the same expression
+naturally — `helper(self->f.bit0)` followed by
+`helper(self->f.bit0)` works). The re-read emerges
+automatically.
+
+**Provenance:** brief 224 (PR #687) catalogued the
+"multi-call no CSE" sub-shape as one of 4 second-order
+variations. Brief 229 (this entry) ran the variant matrix —
+the natural recipe ships byte-identical 3/3. Detector + 3
+unit tests added. Full matrix at
+[`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](brief-229-c39c-d-pilots-and-c38-nonleaf.md).
 
 ## Permanent (11 patterns)
 

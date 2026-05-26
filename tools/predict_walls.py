@@ -960,6 +960,59 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                         ))
                         break
 
+            # ----- C-39d (brief 229) — multi-call re-read.
+            #
+            # Sub-shape D: orig emits TWO `ldrh rX, [rY, #N]` loads
+            # of the SAME offset, one before and one after a `bl`.
+            # Brief 224 hypothesised this was an mwcc CSE-defeat
+            # wall; brief 229 found mwcc 2.0/sp1p5 already preserves
+            # the re-read for narrow struct field loads across helper
+            # calls (TBAA conservatism — mwcc can't prove the helper
+            # doesn't alias `self`).
+            #
+            # Recipe: natural source. No volatile, no asm clobber
+            # needed. mwcc emits the re-read automatically.
+            #
+            # Signature: 2+ `ldrh rX, [rY, #N]` at the SAME N, with
+            # at least one `bl` between them. Encoding:
+            #   ldrh rD, [rB, #imm] : e1dB D0bN where N is the
+            #   high nibble of the offset.
+            # We pattern-match the (Rb, offset) pair by parsing
+            # the ldrh disassembly text since the offset
+            # encoding is split across nibbles.
+            ldrh_re = re.compile(
+                r"ldrh\tr\d+, \[r(\d+), #(\d+|0x[0-9a-f]+)\]"
+            )
+            ldrh_seen_before_bl = set()
+            ldrh_after_bl = set()
+            saw_bl = False
+            for line in lines:
+                m = ldrh_re.search(line)
+                if m:
+                    key = (m.group(1), m.group(2))
+                    if not saw_bl:
+                        ldrh_seen_before_bl.add(key)
+                    else:
+                        if key in ldrh_seen_before_bl:
+                            ldrh_after_bl.add(key)
+                if "\tbl\t" in line:
+                    saw_bl = True
+            if ldrh_after_bl:
+                walls.append(WallPrediction(
+                    "C-39d",
+                    "C-39 multi-call re-read sub-shape: a bitfield "
+                    "halfword load is repeated before AND after a "
+                    "helper bl (same [rB, #N] pair). Brief 229 "
+                    "recipe — natural source code; mwcc 2.0/sp1p5 "
+                    "does NOT CSE the re-read across the helper "
+                    "call (TBAA conservatism for narrow loads). "
+                    "Write `helper(self->f.bit0); ... "
+                    "helper(self->f.bit0)` and the orig pattern "
+                    "emerges. No volatile or asm-clobber needed. "
+                    "See `docs/research/"
+                    "brief-229-c39c-d-pilots-and-c38-nonleaf.md`.",
+                ))
+
     # ----- C-38 leaf-no-pool reg-alloc + CSE divergence (brief 216).
     #
     # Brief 215 identified Wall 2 — small leaf functions doing
