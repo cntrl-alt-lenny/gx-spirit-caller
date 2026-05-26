@@ -9342,7 +9342,7 @@ src/main/func_0208b0d0.s:
     complete
     .text start:0x0208b0d0 end:0x0208b0f0
 
-src/main/func_0208deec.s:
+src/main/func_0208deec.c:
     complete
     .text start:0x0208deec end:0x0208df0c
 

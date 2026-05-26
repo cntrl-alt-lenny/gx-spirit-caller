@@ -1791,5 +1791,119 @@ class TestC38Detection(unittest.TestCase):
         self.assertNotIn("C-38", ids)
 
 
+class TestC40Detection(unittest.TestCase):
+    """C-40: MMIO bit-extract -> VRAM/base address (brief 233).
+
+    7-instruction leaf functions reading a u16 from a 0x04001xxx
+    MMIO register, masking a bit-field, scaling via asr+lsl, adding
+    a base address, then returning. Detector matches on the exact
+    body shape + 0x04001xxx pool word.
+    """
+
+    def _build_mmio_asm(self, mask_w, asr_w, lsl_w, pool_w):
+        return _wrap_asm(
+            _objdump_line(0x100, "e59f0014",
+                          "ldr\tr0, [pc, #0x14]"),
+            _objdump_line(0x104, "e1d000b0",
+                          "ldrh\tr0, [r0, #0]"),
+            _objdump_line(0x108, f"{mask_w:08x}",
+                          "and\tr0, r0, #imm"),
+            _objdump_line(0x10c, f"{asr_w:08x}",
+                          "mov\tr0, r0, asr #N"),
+            _objdump_line(0x110, f"{lsl_w:08x}",
+                          "mov\tr0, r0, lsl #M"),
+            _objdump_line(0x114, "e2800662",
+                          "add\tr0, r0, #0x6200000"),
+            _objdump_line(0x118, "e12fff1e", "bx\tlr"),
+            _objdump_line(0x11c, f"{pool_w:08x}",
+                          f".word\t{pool_w:#x}"),
+        )
+
+    def test_func_0208deec_shape_fires(self):
+        """Canonical brief 233 canary: mask 0x3c, asr #2, lsl #0xe,
+        pool 0x0400100a (VRAMCNT_E)."""
+        asm = self._build_mmio_asm(
+            0xe200003c, 0xe1a00140, 0xe1a00700, 0x0400100a,
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 1)
+        self.assertIn("MMIO bit-extract", c40[0].cue)
+        self.assertIn("0400100a", c40[0].cue)
+        self.assertIn("asr #2", c40[0].cue)
+        self.assertIn("lsl #14", c40[0].cue)
+
+    def test_func_0208e1ac_shape_fires(self):
+        """Brief 233 canary 2: mask 0x1f00, asr #8, lsl #0xb."""
+        asm = self._build_mmio_asm(
+            0xe2000c1f, 0xe1a00440, 0xe1a00580, 0x0400100a,
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 1)
+        self.assertIn("asr #8", c40[0].cue)
+        self.assertIn("lsl #11", c40[0].cue)
+
+    def test_alt_pool_addr_0x04001008_fires(self):
+        """Sibling MMIO register (0x04001008 = VRAMCNT_C/D)
+        must also fire."""
+        asm = self._build_mmio_asm(
+            0xe200003c, 0xe1a00140, 0xe1a00700, 0x04001008,
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 1)
+        self.assertIn("04001008", c40[0].cue)
+
+    def test_non_mmio_pool_does_not_fire(self):
+        """A pool word OUTSIDE the 0x04001xxx MMIO range should
+        not fire C-40 — the wall is specifically about NDS9
+        hardware register reads."""
+        asm = self._build_mmio_asm(
+            0xe200003c, 0xe1a00140, 0xe1a00700, 0x021a6354,
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 0)
+
+    def test_missing_asr_does_not_fire(self):
+        """If the third mov uses lsr (not asr), the shape doesn't
+        match orig's signed-shift family — bit 6 = 0 (lsl/lsr)
+        vs 1 (asr/ror). Detector's mask gates on the shift-type
+        nibble."""
+        asm = self._build_mmio_asm(
+            0xe200003c,
+            0xe1a00120,    # mov r0, r0, lsr #2 (bit 6 = 0)
+            0xe1a00700,
+            0x0400100a,
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 0)
+
+    def test_wrong_ldrh_form_does_not_fire(self):
+        """ldrsh (signed) instead of ldrh (unsigned) — the orig
+        recipe specifically uses the unsigned u16 load."""
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e59f0014",
+                          "ldr\tr0, [pc, #0x14]"),
+            _objdump_line(0x104, "e1d000f0",  # ldrsh, not ldrh
+                          "ldrsh\tr0, [r0, #0]"),
+            _objdump_line(0x108, "e200003c",
+                          "and\tr0, r0, #0x3c"),
+            _objdump_line(0x10c, "e1a00140",
+                          "mov\tr0, r0, asr #2"),
+            _objdump_line(0x110, "e1a00700",
+                          "mov\tr0, r0, lsl #0xe"),
+            _objdump_line(0x114, "e2800662",
+                          "add\tr0, r0, #0x6200000"),
+            _objdump_line(0x118, "e12fff1e", "bx\tlr"),
+            _objdump_line(0x11c, "0400100a", ".word\t0x0400100a"),
+        )
+        walls = detect_walls(asm)
+        c40 = [w for w in walls if w.wall_id == "C-40"]
+        self.assertEqual(len(c40), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
