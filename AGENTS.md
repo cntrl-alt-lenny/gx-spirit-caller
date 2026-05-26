@@ -364,28 +364,60 @@ itself:
 
 ### Open briefs
 
-- **Brief 220** — `scaffolder`. **Hard-tier wall classification
-  survey.** Easy + trivial + sinit + named all 100 % matched after
-  #677. Next mile: medium (18 picks, well-classified) and hard
-  (7,911 picks, mostly unclassified). Brief 220 runs
-  `predict_walls.py` against the full hard-tier worklist, groups by
-  wall family, identifies the top 10 unclassified shapes, and lands
-  a `docs/research/hard-tier-wall-survey.md` that brain uses to
-  scope the next 5-10 rounds of decomper drains. Research-only — no
-  ships. Optional drive-by: investigate brief 216's 3 deferred
-  canaries (`func_0207d304`, `func_02078ed8`, `func_02078eec`) if
-  the survey finishes fast. Branch:
-  `scaffolder/hard-tier-wall-survey`.
-- **Brief 221** — `decomper`. **Medium-tier drain.** All 18
-  unmatched medium-tier picks have wall classifications from
-  `predict_walls.py` (C-1, C-36, P-11, C-15, C-23, C-33, StyleA).
-  Apply existing recipes per the classifier output. Expected: ~10
-  C-success (StyleA, C-23, C-33 are mature) + ~8 `.s` ships (C-1
-  and P-11 are permanent). Target: medium-tier 88.8 % → 100 %.
-  Branch: `decomper/medium-tier-drain`.
+- **Brief 222** — `scaffolder`. **C-39 pilot — non-leaf C-37
+  bitfield recipe extension.** Brief 220's survey identified 454
+  hard-tier picks (20.6 % of unclassified) sharing the `lsl #31;
+  lsr #31` bit-extract shape wrapped in non-leaf helper-call code.
+  Brief 218's bitfield-struct recipe likely applies. Pilot: pick 5
+  representative picks (mix of sizes 60-300 B), apply the bitfield
+  recipe, verify byte-identical. If ≥3 ship: extend C-37 detector
+  to recognise the non-leaf shape, classify as **C-39** in
+  `codegen-walls.md`, ship worked examples. If <3 ship: document
+  the failure modes for brief 224+ research. Optional drive-by:
+  brief 216's 3 deferred canaries (`func_0207d304`,
+  `func_02078ed8`, `func_02078eec`) — variant-matrix work on the
+  remaining C-38 sub-patterns. Branch:
+  `scaffolder/c39-non-leaf-bitfield-pilot`.
+- **Brief 223** — `decomper`. **Hard-tier drain wave 1: C-23 solo
+  + StyleA solo.** Brief 220's survey ranked these as the top-2
+  highest-yield mechanical drains (276 + 355 picks). Drain 30-50
+  picks across the two families using mature recipes (C-23 via
+  `.legacy.c` per brief 199; StyleA via `.legacy.c` per
+  `style-a-epilogue.md`). Brief 221's lesson: don't default to
+  `.s` when the recipe is mature — try the `.c` first, ship `.s`
+  only if the recipe genuinely doesn't reach. Target: hard-tier
+  5.3 % → 5.7-5.9 %. Branch: `decomper/hard-tier-drain-c23-stylea`.
 
 ### Closed briefs (reference)
 
+- **Brief 221** — `decomper`, shipped in PR #680. 🎯 **Medium-tier
+  100 % matched (161 / 161).** 18 ships drained the unmatched
+  medium cohort. After easy-tier closed in brief 219, medium is
+  the **second fully-drained tier**. Routing: 17 `.s` + 1
+  `.legacy.c` (StyleA recipe for `func_01ff8770` — though the PR
+  body misstated this as "all 18 as `.s`"). Brain housekeeping
+  notes that the 10 picks with non-permanent recipe classifications
+  (StyleA × 3 effective, C-23 × 1, C-33 × 2, C-15 × 1, C-36 × 3)
+  could have shipped as `.c` / `.legacy.c` if the brief had run
+  variant-matrix per pick — deferred to brief 223+ as optional
+  `.s` → `.c` upgrades. Metric deltas: `matched_functions` 1865 →
+  1883 (+18), `complete_units` 1828 → 1846 (+18). 3-region SHA1
+  PASS preserved.
+- **Brief 220** — `scaffolder`, shipped in PR #681. 🎯 **Hard-tier
+  wall classification survey.** Research-only deliverable. Mapped
+  7,911 hard-tier unmatched picks to wall families: 72.1 % fire
+  ≥1 detector, 27.9 % unclassified. **Top finding:** 454 picks
+  in the unclassified slice share the `lsl #31; lsr #31` bit-
+  extract shape wrapped in non-leaf code — candidate **C-39**
+  classification (brief 218's bitfield recipe likely applies).
+  **C-1 + C-23 co-dominance:** 2,933 picks fire both (37 % of
+  hard tier) — the iterative core; brain shouldn't budget batch
+  drains for these. **Top mechanical drains identified:** C-23
+  solo (276 picks), C-1 solo (444), StyleA solo (355), C-38 brief
+  216 recipes (222), C-22 solo (33). Brief 222 (C-39 pilot) and
+  brief 223 (C-23 + StyleA drain) directly seeded by this survey.
+  Research note:
+  [`hard-tier-wall-survey.md`](docs/research/hard-tier-wall-survey.md).
 - **Brief 219** — `decomper`, shipped in PR #677. 🎯 **Easy-tier
   100 % matched (1110 / 1110).** 40 ships drained the remaining
   easy-tier cohort: 2 worked C examples (Recipe C
