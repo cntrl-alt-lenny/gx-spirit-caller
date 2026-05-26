@@ -364,31 +364,65 @@ itself:
 
 ### Open briefs
 
-- **Brief 224** — `decomper`. **C-39 drain wave 1.** Brief 222
-  locked the C-39 recipe (bitfield struct read + non-leaf shape)
-  and the detector surfaces **480 SOLO C-39 picks** + 977 compound
-  picks (1,457 total, 18.4 % of hard tier — the single biggest
-  classified bit-extract opportunity). Drain 15-25 picks from the
-  480-pick solo cohort using brief 222's locked recipe. Cap
-  per-pick effort at ~10-15 min (brief 223 surfaced that hard-tier
-  picks need 10-30 min variant-matrix; cap is meant to keep wave
-  throughput up). Expected: ~12-20 `.c` ships + ~3-8 `.s` ships
-  for stubborn shapes. Target: hard-tier 5.6 % → 5.8-5.9 %.
-  Branch: `decomper/c39-drain-wave1`.
-- **Brief 225** — `scaffolder`. **C-39 sub-pattern research +
-  brief 216 deferred canaries.** Two parallel investigations.
-  (A) Brief 222 deferred 2 picks: `func_ov010_021b238c` (104 B,
-  near-miss at 85 % fuzzy due to scheduling) and
-  `func_ov002_0222bc1c` (396 B switch-table dispatch). Variant-
-  matrix work on these to either find sub-recipes (extend C-39 with
-  C-39a / C-39b sub-shapes) or document failure modes for future
-  research. (B) Brief 216's 3 deferred Wall 2 canaries
-  (`func_0207d304`, `func_02078ed8`, `func_02078eec`) — sub-pattern
-  variations of C-38 that the brief 216 4-recipe set didn't cover.
-  Branch: `scaffolder/c39-subpatterns-and-c38-deferred`.
+- **Brief 226** — `scaffolder`. **C-39 sub-classification pilot
+  (sign-check + helper-return reuse).** Brief 224 identified 4
+  second-order shape variations of C-39 blocking volume `.c`
+  upgrades; each needs 20-40 min/pick (above brief 224's 10-15
+  min cap). Brief 226 takes 2 of the 4 — **sign-check vs comparison**
+  (orig `movs r1, r0; bmi .end` vs mwcc `cmp r0, #0; blt .end`)
+  and **helper-return reuse** (orig stores helper result in
+  callee-saved reg + uses later) — and runs variant-matrix per
+  brief 218/222 pattern. Pilot 3 picks per shape (6 total). If
+  ≥2 ship per shape: classify as C-39a / C-39b in `codegen-walls.md`,
+  ship worked examples, extend detector. Decomper then drains
+  mechanically in brief 228+. Branch:
+  `scaffolder/c39-subclass-sign-check-helper-reuse`.
+- **Brief 227** — `decomper`. **C-38 chained-cast corpus drain +
+  C-39 sub-wave.** Brief 225 found that brief 216's deferred
+  canary `func_0207d304` reaches under mwcc 1.2/sp2p3 — a new
+  "redundant cast" C-38 sub-pattern (`(u16)(u8)*p` keeps both
+  casts under legacy tier). Corpus-scan for `and #0xff; lsl #16;
+  lsr #16` tail in hard-tier `.s` ships → drain mechanically.
+  Plus: drain 10-15 more C-39 solo picks at the original 10-15
+  min/pick cap (brief 224's pace was confirmed sustainable).
+  Target: hard-tier 6.0 % → 6.3-6.5 %. Branch:
+  `decomper/c38-chained-cast-c39-wave2`.
 
 ### Closed briefs (reference)
 
+- **Brief 225** — `scaffolder`, shipped in PR #686. 🎯 **1 ship +
+  4 documented near-misses with full falsification matrices.**
+  Two parallel investigations. Shipped: `func_0207d304.legacy.c`
+  (20 B) — orig has `ldrh + and #0xff + lsl #16 + lsr #16`, a
+  chained `(u16)(u8)*p` cast where mwcc 2.0 peepholes the
+  redundant `lsl/lsr #16` pair but mwcc 1.2/sp2p3 preserves both.
+  Extends **C-38 family** with new "redundant-cast" sub-shape —
+  route-tier wall, not source-form wall. Near-misses (4 picks):
+  A1 `func_ov010_021b238c` (DCE of unused local), A2
+  `func_ov002_0222bc1c` (396 B switch-table — beyond pilot scope),
+  B2 `func_02078ed8` (DCE of unused `*p` load across all 5 tiers
+  + volatile + inline-asm clobber), B3 `func_02078eec` (u64 pack
+  via `(u64)hi << 32 | lo` emits extra zero-ext insns — likely
+  hand-written `.s` or RealView `__value_in_regs`). All 4
+  documented with full 5-tier × 5-10 idiom matrices.
+  Brief 226+ scaffolder followup: deeper investigation of
+  DCE-defeat idioms (A1/B2 family) and u64-pack/value-in-regs
+  family (B3) if more candidates surface. Research note:
+  [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
+- **Brief 224** — `decomper`, shipped in PR #687. 🎯 **25 ships,
+  hard-tier 5.6 % → 6.0 %.** First C-39 drain wave (24 `.s` + 1
+  `.c` upgrade `func_ov002_021f4a00.c`). Below 10-18 `.c` target
+  — got 1 of 25 due to second-order shape variations. **Identified
+  4 second-order C-39 shape variations** blocking volume `.c`
+  upgrades at hard tier: (1) sign-check vs comparison
+  (`movs; bmi` vs `cmp; blt`), (2) bitfield packing into helper
+  args, (3) helper-return reuse (callee-saved storage), (4)
+  multi-call sequences (re-read explicitly). Each needs 20-40
+  min/pick — above brief 224's 10-15 min cap. Brief 226 takes 2
+  of these as sub-classification pilots. Metric deltas:
+  `matched_functions` 1915 → 1940 (+25), `complete_units` 1878 →
+  1903 (+25). 3-region SHA1 PASS preserved. Research note:
+  [`brief-224-c39-wave1.md`](docs/research/brief-224-c39-wave1.md).
 - **Brief 223** — `decomper`, shipped in PR #683. 🎯 **29 hard-tier
   ships (5.3 % → 5.6 %).** First hard-tier wave per brief 220's
   survey. 28 `.s` + 1 `.legacy.c` (`func_020115a8` — 12-field
