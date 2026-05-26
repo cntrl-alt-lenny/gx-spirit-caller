@@ -8,55 +8,57 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-26, post-#680 + #681 merge. Brain on Mac.
-**Brief 220 (hard-tier wall survey, scaffolder) and brief 221
-(medium-tier drain, decomper) both shipped.**
+**Last updated:** 2026-05-26, post-#683 + #684 merge. Brain on Mac.
+**Brief 222 (C-39 classified, scaffolder) and brief 223 (hard-tier
+wave 1, decomper) both shipped.**
 
-🎯 **MILESTONE: trivial + easy + sinit + named + medium tiers all
-100 % matched.** Only hard-tier remains (440 / 8,351 = 5.3 %
-matched, 7,911 unmatched). The medium-tier drain closed the
-second tier in two rounds; hard-tier is the long arc and is now
-the entirety of the unmatched pool.
+🎯 **Hard-tier drain begins.** All easier tiers (trivial + easy +
+sinit + named + medium) remain 100 % matched. Hard-tier moved from
+5.3 % → 5.6 % matched (469 / 8,351). The biggest news is brief 222
+unlocked **C-39** — bitfield struct recipe for non-leaf bit-extract
+shapes — and the detector now surfaces **1,457 hard-tier picks
+(18.4 %, with 480 SOLO C-39)** as the single largest classified
+mechanical drain cohort in the project, larger than C-23 + StyleA
+solo combined.
 
-Brief 220 (scaffolder) shipped the hard-tier wall classification
-survey — research-only deliverable. Mapped 7,911 hard-tier unmatched
-picks to wall families: **72.1 %** fire at least one
-`predict_walls.py` detector; **27.9 %** are unclassified.
-**Top finding:** 454 picks in the unclassified slice share the
-`lsl #31; lsr #31` bit-extract shape wrapped in non-leaf code —
-candidate **C-39** classification (brief 218's bitfield recipe
-likely applies). **C-1 + C-23 co-dominance:** 2,933 picks fire
-both (37 % of hard tier) — these are the iterative core; brain
-shouldn't budget batch drains for them. **Top mechanical drain
-candidates ranked by yield:** C-23 solo (276), C-1 solo (444),
-StyleA solo (355), C-38 brief 216 recipes (222), C-22 solo (33).
-Research note:
-[`hard-tier-wall-survey.md`](docs/research/hard-tier-wall-survey.md).
+Brief 222 (scaffolder) extended brief 218's bitfield-struct recipe
+from C-37 leaf shape to non-leaf shapes. **Pilot result: 3 of 5
+picks byte-identical.** Recipe holds: mwcc 2.0/sp1p5's bitfield
+code path is independent of leaf/non-leaf distinction. New **C-39**
+entry in `codegen-walls.md` + detector in `predict_walls.py` +
+3 worked examples in `src/overlay002/`. **Full-corpus hit count:
+1,467 C-39 hits; 1,457 in hard tier (18.4 %); 480 SOLO C-39** —
+the single biggest mechanical drain cohort, larger than C-23 solo
+(276) + StyleA solo (355) combined. Two picks deferred for brief
+225: scheduling-divergence sub-shape (`func_ov010_021b238c`) and
+switch-table dispatch sub-shape (`func_ov002_0222bc1c`). Research
+note:
+[`brief-222-c39-non-leaf-bitfield.md`](docs/research/brief-222-c39-non-leaf-bitfield.md).
 
-Brief 221 (decomper) drained the final 18 medium-tier picks.
-**Medium-tier matched 88.8 % → 100 %** (161 / 161). Routing: 17
-`.s` + 1 `.legacy.c` (StyleA recipe for `func_01ff8770`). Note:
-the PR body misstated this as "all 18 as `.s`" — the actual diff
-shows the StyleA .legacy.c ship. Brief was conservative — 10 picks
-had non-permanent recipe classifications that could have shipped
-as `.c` / `.legacy.c` with variant-matrix work, but the brief's
-"mechanical apply the recipe" interpretation defaulted them to
-`.s`. Brief 223 explicitly flags this as a lesson — when the
-recipe is mature, try the `.c` first.
+Brief 223 (decomper) ran the first hard-tier drain wave. **29 ships
+(5.3 % → 5.6 %):** 28 `.s` + 1 `.legacy.c` (`func_020115a8`,
+12-field struct init under mwcc 1.2/sp2p3). **Important reality
+check on the brief's 25-40 `.legacy.c` target:** got 1 of 29.
+Hard-tier C-23/StyleA solo picks are structurally MORE complex
+than easy/medium ones — each needs 10-30 min variant-matrix work
+to reach byte-match, so the brief's mechanical-throughput model
+doesn't apply at hard tier. Brief 224 incorporates this lesson:
+cap per-pick effort, target 15-25 picks per wave (not 30-50),
+expected `.c` ratio higher because the C-39 recipe is more locked
+than C-23/StyleA-solo on hard-tier picks.
 
-**Current metrics (post-#680 + #681 merge, EUR):**
-`matched_functions 1883 / 9801 (19.21 %)`,
-`matched_code_percent 5.1975 %`, `fuzzy_match_percent 5.8957 %`,
-`complete_units 1846 / 2799 (65.95 %)`. 3-region SHA1 PASS
+**Current metrics (post-#683 + #684 merge, EUR):**
+`matched_functions 1915 / 9801 (19.54 %)`,
+`matched_code_percent 5.2931 %`, `fuzzy_match_percent 5.9914 %`,
+`complete_units 1878 / 2846 (66.0 %)`. 3-region SHA1 PASS
 preserved.
 
-**Tier breakdown (post-#680/#681):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium **100 %** (161 / 161, was 88.8
-% pre-merge), hard 5.3 % (440 / 8351, 7911 unmatched). Hard-tier
-is the entirety of the remaining unmatched pool. Brief 222
-(scaffolder) pilots the C-39 bitfield recipe extension; brief 223
-(decomper) starts hard-tier drain with the top-2 mechanical
-families.
+**Tier breakdown (post-#683/#684):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 5.6 %** (469 /
+8,351 matched, 7,879 unmatched — was 5.3 % pre-merge). Hard tier
+is the only remaining bucket. Brief 224 (decomper) does C-39
+drain wave 1 (480 solo candidates); brief 225 (scaffolder)
+investigates C-39 sub-patterns + brief 216 deferred canaries.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -109,18 +111,16 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes after this merge.** **Brief 222 (scaffolder)** —
-C-39 pilot. Test brief 218's bitfield-struct recipe against 5
-non-leaf C-37 hard-tier picks (from brief 220 survey's 454-pick
-slice). If ≥3 ship → extend C-37 detector + classify as C-39
-(`codegen-walls.md`). If <3 → document failure modes for brief
-224+. **Brief 223 (decomper)** — first hard-tier drain wave.
-Target: C-23 solo (276 candidates) + StyleA solo (355 candidates).
-Drain 30-50 picks across the two families using mature recipes.
-**Important lesson capture:** brief 221's "all 18 as .s" approach
-was overly conservative; brief 223 should try `.c`/`.legacy.c`
-FIRST when the recipe is mature, ship `.s` only if the recipe
-genuinely doesn't reach. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 224 (decomper)** —
+C-39 drain wave 1. Drain 15-25 picks from brief 222's 480 SOLO
+C-39 candidates using the locked bitfield-struct recipe. Cap
+per-pick effort at ~10-15 min (brief 223 surfaced 10-30 min
+variant-matrix cost at hard tier; cap maintains throughput).
+Target: hard-tier 5.6 % → 5.8-5.9 %. **Brief 225 (scaffolder)** —
+C-39 sub-pattern research + brief 216 deferred canaries.
+Variant-matrix on brief 222's 2 deferred picks (scheduling +
+switch-table sub-shapes) and brief 216's 3 deferred Wall 2
+canaries. Both kickoffs sent.
 
 **Brain methodology update (PR #664):** "empirical hypothesis
 testing — non-negotiable for pre-validation." Brain
@@ -971,36 +971,35 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Brief 222 (scaffolder)** — C-39 pilot. Kicked off this
-   round. Test brief 218's bitfield-struct recipe against 5
-   representative picks from brief 220 survey's 454-candidate
-   non-leaf C-37 slice. If ≥3 ship: extend C-37 detector, classify
-   as C-39 in `codegen-walls.md`. If <3: document failure modes
-   for brief 224+ research. Optional drive-by: brief 216's 3
-   deferred Wall 2 canaries.
-2. **Brief 223 (decomper)** — hard-tier drain wave 1. Kicked off
-   this round. Drain 30-50 picks from C-23 solo (276 candidates)
-   + StyleA solo (355 candidates) using mature recipes. Target:
-   hard-tier 5.3 % → 5.7-5.9 %. Brief 221 lesson encoded:
-   prioritise `.c`/`.legacy.c` over `.s` when recipe is mature.
-3. **Brief 224 candidates** (post-222/223):
-   - **C-39 drain wave** if brief 222 ships ≥3 worked examples —
-     could be a ~50-100 pick drain depending on detector
-     accuracy.
-   - **Hard-tier drain wave 2** scaling up the brief 223
-     mechanical drain (C-1 solo, C-22 solo, C-38 brief 216 hard-
-     tier picks).
+1. **Brief 224 (decomper)** — C-39 drain wave 1. Kicked off this
+   round. Drain 15-25 picks from brief 222's 480 SOLO C-39 cohort
+   using the locked bitfield-struct recipe. Cap per-pick effort
+   at ~10-15 min. Target: hard-tier 5.6 % → 5.8-5.9 %.
+2. **Brief 225 (scaffolder)** — C-39 sub-pattern research +
+   brief 216 deferred canaries. Kicked off this round. (A)
+   Variant-matrix on brief 222's 2 deferred picks
+   (`func_ov010_021b238c` scheduling sub-shape,
+   `func_ov002_0222bc1c` switch-table dispatch). (B) Brief 216's
+   3 deferred Wall 2 canaries.
+3. **Brief 226 candidates** (post-224/225):
+   - **C-39 drain wave 2** — scale up from brief 224's pace.
+     480 SOLO + 977 compound = ~1,457 candidates, so multiple
+     waves are coming.
+   - **C-23 solo drain continuation** — brief 223 surfaced that
+     hard-tier C-23 needs per-pick variant-matrix (10-30 min).
+     With reduced-wave scope (10-15 picks vs 30-50), brief 226
+     could ship 5-10 `.legacy.c` reliably.
    - **MMIO bit-extract recipe research** (scaffolder) — brief
      219 surfaced 4 picks; could extend to ~100s of hard-tier
-     candidates per brief 220 survey.
+     candidates.
    - **C-1 + C-23 compound research** — 2,933 picks fire both,
      iterative core. Scaffolder variant-matrix on 2-3 picks
      might unlock a recipe class.
    - **Permuter wave 2** on hard-tier picks — brief 198 left
      this open; might benefit from brief 218 bitfield insight.
-   - **`.s` → `.c` upgrade pass on brief 221's 10 punted picks**
-     (non-permanent walls, mature recipes available, but `.s`
-     shipped for build-state safety).
+   - **`.s` → `.c` upgrade pass on brief 221's 10 punted picks +
+     brief 223's 28 `.s` ships** — non-permanent walls with mature
+     recipes, brief 224+ could revisit with variant-matrix budget.
 4. **Carryover candidates from prior rounds:**
    - **Hard-bucket pilot** (Track 2 long-form decomp). Brief 220
      is the structural prerequisite for this.
