@@ -364,28 +364,69 @@ itself:
 
 ### Open briefs
 
-- **Brief 218** — `scaffolder`. **Wall 1 broader + brief 214 Shape B
-  verdict.** Two-investigation brief, variant-matrix pattern per
-  briefs 214/216. (A) Empirically test reg-allocator hints on the 4
-  Wall 1 canaries (3 swap-tail-call + the new non-swap
-  `func_ov002_021b4254` from brief 217); ship recipe (C-39) or
-  classify permanent (P-12). (B) Re-test brief 214 Shape B on the 2
-  actual picks (`func_ov000_021ab6cc`, `func_ov000_021af5c0`) with
-  full struct context — brief 217 falsified the synthetic-snippet
-  claim. Outcome: P-12 amendment to bit-test-0-or-1-idiom.md, or a
-  new full-context recipe. Branch:
-  `scaffolder/wall-1-broader-and-c37-shape-b-verdict`.
-- **Brief 219** — `decomper`. **C-38 drain via brief 216 recipes.**
-  Apply Recipes A/B/C/D from `wall-2-leaf-no-pool-reg-alloc.md` to
-  the 38 remaining unmatched easy-tier picks (all leaf-no-pool, sizes
-  0x10-0x20). Includes shipping brief 216's documented-but-unshipped
-  canaries (`func_0207db74` Recipe C, `func_02078ec8` Recipe D). Aim
-  for ≥35 of 38 ships, easy-tier matched ratio 96.6 % → 99 %+.
-  Stretch: brief 214 Shape B re-test on the 2 picks with full struct
-  context. Branch: `decomper/c38-drain-easy-tier-remainder`.
+- **Brief 220** — `scaffolder`. **Hard-tier wall classification
+  survey.** Easy + trivial + sinit + named all 100 % matched after
+  #677. Next mile: medium (18 picks, well-classified) and hard
+  (7,911 picks, mostly unclassified). Brief 220 runs
+  `predict_walls.py` against the full hard-tier worklist, groups by
+  wall family, identifies the top 10 unclassified shapes, and lands
+  a `docs/research/hard-tier-wall-survey.md` that brain uses to
+  scope the next 5-10 rounds of decomper drains. Research-only — no
+  ships. Optional drive-by: investigate brief 216's 3 deferred
+  canaries (`func_0207d304`, `func_02078ed8`, `func_02078eec`) if
+  the survey finishes fast. Branch:
+  `scaffolder/hard-tier-wall-survey`.
+- **Brief 221** — `decomper`. **Medium-tier drain.** All 18
+  unmatched medium-tier picks have wall classifications from
+  `predict_walls.py` (C-1, C-36, P-11, C-15, C-23, C-33, StyleA).
+  Apply existing recipes per the classifier output. Expected: ~10
+  C-success (StyleA, C-23, C-33 are mature) + ~8 `.s` ships (C-1
+  and P-11 are permanent). Target: medium-tier 88.8 % → 100 %.
+  Branch: `decomper/medium-tier-drain`.
 
 ### Closed briefs (reference)
 
+- **Brief 219** — `decomper`, shipped in PR #677. 🎯 **Easy-tier
+  100 % matched (1110 / 1110).** 40 ships drained the remaining
+  easy-tier cohort: 2 worked C examples (Recipe C
+  `func_0207db74.legacy.c`, Recipe D `func_02078ec8.c` — both brief
+  216 canaries finally shipped) plus 38 `.s` ships for the
+  heterogeneous remainder (4 bit-test, 4 MMIO field-extract, 2
+  predicated struct-init, 2 word-fill loops, 2 memcpy/strcpy, 3
+  Thumb, 1 mid-function tail-call hand-encoded as `.word 0xea000003`,
+  20 misc). C-success rate 5 % (2/40) — sharp drop from brief 217's
+  17 % reflects the genuinely hard residue. Metric deltas:
+  `matched_functions` 1827 → 1865 (+38), `complete_units` 1790 →
+  1828 (+38). Surfaced 2 candidate new recipe families for
+  brief 220+ research: **MMIO bit-extract** (4 picks share
+  `ldr base; ldrh value; and; asr; lsl; add base2; bx` shape) and
+  **conditional-return 0/1** (4 picks return `(cond) ? 0 : 1`).
+  3-region SHA1 PASS preserved.
+- **Brief 218** — `scaffolder`, shipped in PR #678. 🎯 **P-4 extended
+  + Shape B BIG REVERSAL — bitfield recipe ships.** Two parallel
+  investigations. (A) Wall 1 broader: 12 variants × 5 mwccarm tiers
+  on 4 canaries (3 swap-tail + brief 217's `func_ov002_021b4254`
+  non-swap pool-load). Zero variants reach orig while preserving
+  the 5-insn shape; two informative near-misses (fnptr indirection
+  uses r3 but +6 insns; 2nd-arg-live shifts r1 → r2 but +4 insns
+  + stack frame). Classified as **P-4 extended** — renamed from
+  "r2-vs-r3 scratch register selection on swap-shape thunks" →
+  "Tiny-thunk reg-allocator divergence" with 3 sub-shapes (swap,
+  pool-load tail, fnptr-cache). (B) Shape B verdict: **brief 214's
+  shift-pair recipe falsified, NEW bitfield recipe found**. Source
+  `struct { unsigned int low8 : 8; unsigned int upper : 24; };` +
+  `return arr[idx].low8 == 0;` under default mwcc 2.0/sp1p5
+  produces orig bytes byte-for-byte — bitfield extracts go through
+  a different code path than the `(unsigned)x << 24 >> 24` peephole
+  that brief 217 hit. Both Shape B picks
+  (`func_ov000_021ab6cc.c`, `func_ov000_021af5c0.c`) ship as
+  plain `.c`. Brief 214's "32-byte shape" claim was likely a
+  mis-measurement (function size including internal pool word).
+  Research note:
+  [`brief-218-wall-1-broader-and-shape-b.md`](docs/research/brief-218-wall-1-broader-and-shape-b.md).
+  Brain housekeeping caught + fixed missed `delinks.txt` update
+  during merge prep (3-region SHA1 PASS confirmed on the fixed
+  state).
 - **Brief 217** — `decomper`, shipped in PR #675. 🎯 **41 easy-tier
   ships + brief 214 Shape B falsified.** Easy-tier matched ratio
   92.9 % → 96.6 %; unmatched 79 → 38 picks. Recipe routing 7 C +

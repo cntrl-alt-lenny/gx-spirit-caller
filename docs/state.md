@@ -8,45 +8,54 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-25, post-#674 + #675 merge. Brain back on
-Mac. **Brief 216 (C-38 Wall 2 leaf-no-pool reg-alloc, scaffolder)
-and brief 217 (easy-tier remainder, decomper) both shipped.**
+**Last updated:** 2026-05-26, post-#677 + #678 merge. Brain on Mac.
+**Brief 218 (P-4 extended + Shape B bitfield recipe, scaffolder) and
+brief 219 (C-38 easy-tier drain, decomper) both shipped.**
 
-Brief 216 unlocked Wall 2 as a recipe wall, not permanent. Variant
-matrix (7 canaries × 7 source forms × 8 tiers) found 4 of 7
-canaries reach orig byte-for-byte under mwcc 1.2/sp2p3 (legacy).
-Three source recipes pinned: Recipe A — null-guarded nested setter
-with re-deref + char-cast (worked example
-`src/main/func_02087d10.legacy.c`); Recipe B — substruct-ptr exchange
-with cached substruct base (worked example
-`src/main/func_0207d36c.legacy.c`); Recipe C — copy-and-zero
-substruct ptr (documented, not yet shipped); Recipe D — `volatile`
-side-effect read (documented, not yet shipped, reaches under BOTH
-mwcc tiers). Classified as **C-38** in `codegen-walls.md`. Detector
-hits 18 strict Wall-2 picks on the EUR worklist (100 % of brief 215
-canaries). Drive-by: `tools/configure.py` xMAP rule gap closed
-(declares `arm9.o.xMAP` as ninja output for clean fresh-clone
-bootstrap). Research note:
-[`wall-2-leaf-no-pool-reg-alloc.md`](docs/research/wall-2-leaf-no-pool-reg-alloc.md).
+🎯 **MILESTONE: trivial + easy + sinit + named tiers all 100 %
+matched.** Next mile is medium (18 picks remaining, all
+well-classified) followed by hard (7,911 picks, mostly
+unclassified). The "easy bucket" arc that started ~brief 188 is
+done; the project's headline shifts from "drain easy-tier" to
+"investigate the long tail."
 
-Brief 217 drained 41 easy-tier picks (7 C + 34 `.s`); easy-tier
-matched 92.9 % → 96.6 %; unmatched 79 → 38. **Two empirical
-findings from the drain:** (a) brief 214 Shape B claim FALSIFIED —
-tested on actual picks both mwcc 2.0 AND 1.2/sp2p3 collapse to a
-5-insn `ands r0, #0xff; moveq #1; movne #0; bx lr` (20B) shape, NOT
-orig's 7-insn `lsl/lsr; movs; moveq/movne; bx lr` (28B). Brief 214's
-research-note matrix claim (`b2`/`b4` variants reach 32-byte shape)
-can't be reproduced on the real picks. (b) **Wall 1 broader than
-initially scoped** — `func_ov002_021b4254` is a pool-load +
-tail-call with **no swap**, orig r2 vs mwcc r1, same reg-allocator
-family as the 3 brief-215 swap-tail-call picks but a wider trigger.
-Both findings feed brief 218 (scaffolder).
+Brief 218 (scaffolder) resolved two empirical questions from brief
+217. **Investigation A — Wall 1 broader:** 12 variants × 5 mwccarm
+tiers across 4 canaries (3 swap-tail-call + the new
+`func_ov002_021b4254` non-swap pool-load). Zero variants reach orig
+while preserving the 5-insn shape; classified as **P-4 extended**
+(renamed from "r2-vs-r3 scratch register selection on swap-shape
+thunks" → "Tiny-thunk reg-allocator divergence" with 3 sub-shapes).
+**Investigation B — Shape B BIG REVERSAL:** brief 214's
+shift-pair-cast recipe doesn't reach orig (brief 217 was right) BUT
+a NEW bitfield struct recipe DOES — `struct LowByteStruct { unsigned
+int low8 : 8; ... };` + `arr[idx].low8 == 0` produces orig bytes
+byte-for-byte under DEFAULT mwcc 2.0/sp1p5. Bitfield extracts go
+through a different code path than the `(unsigned)x << 24 >> 24`
+peephole. Both Shape B picks ship as plain `.c` (not `.legacy.c`).
+Research note:
+[`brief-218-wall-1-broader-and-shape-b.md`](docs/research/brief-218-wall-1-broader-and-shape-b.md).
 
-**Current metrics (post-#674 + #675 merge, EUR):**
-`matched_functions 1827 / 9801 (18.64 %)`,
-`matched_code_percent 5.0725 %`, `fuzzy_match_percent 5.7707 %`,
-`complete_units 1790 / 2720 (65.81 %)`. 3-region SHA1 PASS
+Brief 219 (decomper) drained the final 40 easy-tier picks (2 C
+worked examples + 38 `.s`). Easy-tier matched 96.6 % → **100 %**
+(1110 / 1110). C-success rate 5 % (2/40) — sharp drop from
+brief 217's 17 % reflects the genuinely hard residue. Surfaced 2
+candidate new recipe families for future scaffolder rounds: **MMIO
+bit-extract** (4 picks share `ldr base; ldrh value; and; asr; lsl;
+add base2; bx` shape) and **conditional-return 0/1**
+(4 picks return `(cond) ? 0 : 1`).
+
+**Current metrics (post-#677 + #678 merge, EUR):**
+`matched_functions 1865 / 9801 (19.03 %)`,
+`matched_code_percent 5.1203 %`, `fuzzy_match_percent 5.8186 %`,
+`complete_units 1828 / 2778 (65.80 %)`. 3-region SHA1 PASS
 preserved.
+
+**Tier breakdown (post-#677/#678):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 88.8 % (143 / 161, 18 unmatched),
+hard 5.3 % (440 / 8351, 7911 unmatched). Brief 220 (scaffolder)
+runs hard-tier wall classification survey; brief 221 (decomper)
+drains the 18 medium-tier picks via existing recipes.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -61,24 +70,26 @@ project pursues TWO goals in parallel, not either-or:
    explicitly bullish on AI-tool improvement (6-18 months) cutting
    this much shorter. The project will continue regardless.
 
-**Brain-PR investigations this round:** None substantive —
-verification + housekeeping. Scaffolder's brief 216 research note at
-[`wall-2-leaf-no-pool-reg-alloc.md`](docs/research/wall-2-leaf-no-pool-reg-alloc.md)
-is the standout artifact (7 canaries × 7 source variants × 8 tiers
-matrix + Recipes A/B/C/D). Brief 217's empirical falsification of
-brief 214 Shape B is the second standout — solid demonstration of
-the "non-negotiable falsification" methodology brain pinned to
-memory in PR #664. C-38 detector sweep across the EUR binary
-surfaces 483 candidate functions (most already matched / out-of-
-tier); the 18 unmatched-easy strict hits are brief 219's drain
-target.
+**Brain-PR investigations this round:** Verification + housekeeping
++ caught a missed `delinks.txt` update on brief 218's PR (the `.s`
+→ `.c` swap had to update `config/eur/arm9/overlays/ov000/delinks.txt`;
+scaffolder shipped the source files but forgot the build manifest).
+Fix landed pre-merge; CI's match-invariants check correctly blocked
+the merge until the inconsistency was resolved. **Two standout
+artifacts this round:** (1) brief 218's bitfield Shape B recipe —
+empirically falsified brief 217's falsification of brief 214 (i.e.
+brief 217 was right that brief 214's shift-pair recipe doesn't
+work, but a different recipe DOES — methodology lesson: "recipe
+falsification doesn't mean the wall is permanent; it means try a
+different recipe class"). (2) brief 219's clean 100 % easy-tier
+close — the headline transition from "easy-tier drain" to
+"medium + hard tier" investigation.
 
-**Wall 1 status:** numbered but not yet formally classified.
-Brief 218 will either ship C-39 (recipe found) or P-12 (permanent
-with falsification matrix) per the canary outcomes. The brief 217
-finding generalises Wall 1 from "swap-tail-call register temp" to
-"reg-allocator picks lowest-numbered free reg when orig used higher"
-— same family, wider trigger.
+**Wall 1 status:** classified as **P-4 extended** per brief 218.
+"Tiny-thunk reg-allocator divergence" now covers 3 sub-shapes
+(swap-tail, pool-load tail, fnptr-cache). Permanent under current
+toolchain — informative near-misses captured for future research
+if mwcc options ever change.
 
 **Headline metric shift this round.** Investigation found that
 `matched_functions` is systematically under-counting `.legacy.c`
@@ -91,12 +102,14 @@ vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
 [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
-**Two open lanes after this merge.** **Brief 218 (scaffolder)** —
-Wall 1 broader investigation + brief 214 Shape B verdict, two
-parallel variant-matrix probes per brief 214/216 pattern. **Brief
-219 (decomper)** — C-38 drain across the 38 unmatched easy-tier
-picks via brief 216 Recipes A/B/C/D, targeting easy-tier 96.6 %
-→ 99 %+. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 220 (scaffolder)** —
+hard-tier wall classification survey (research-only, no ships). Map
+the 7,911 hard-tier picks to wall families, surface the top 10
+unclassified shapes. Sets the runway for the next 5-10 decomper
+rounds. **Brief 221 (decomper)** — drain the 18 medium-tier picks
+via existing recipes (C-1, C-36, P-11, C-15, C-23, C-33, StyleA all
+have mature paths). Target: medium-tier 88.8 % → 100 %. Both
+kickoffs sent.
 
 **Brain methodology update (PR #664):** "empirical hypothesis
 testing — non-negotiable for pre-validation." Brain
@@ -105,12 +118,30 @@ a root cause; brief 209's `.word`-to-mnemonic test correctly
 identified the real mechanism after brain's PR #662 hypothesis
 turned out wrong.
 
-**Brain methodology update (this PR):** "rebase open PRs onto
+**Brain methodology update (this PR):** "reconfigure after rebase
+that changes source TU paths." Brief 218 rebased onto post-#677
+main, which had brief 219's `.s` → `.legacy.c` swap for
+`func_0207db74`. The old `build/eur/build.ninja` still referenced
+the deleted `.s`; `ninja sha1` failed until `configure.py` re-ran.
+Sibling of the existing "always reconfigure before quoting metrics"
+lesson.
+
+**Brain methodology update (this PR):** "recipe falsification ≠
+permanent wall." Brief 217 falsified brief 214's Shape B
+shift-pair-cast recipe (empirically didn't reach orig on the actual
+picks). Brief 218 found a NEW recipe (bitfield struct read) that
+DOES reach. The methodology lesson: when a recipe is empirically
+falsified, the wall isn't automatically permanent — try other
+recipe classes (bitfield, union, intrinsic, address-arithmetic,
+volatile, etc.) before classifying as P-N.
+
+**Brain methodology update (last PR):** "rebase open PRs onto
 post-merge main BEFORE merging the second one." Brief 217's PR had
 markdownlint failing on lines fixed by brief 216 — rebasing onto
 post-216 main cleared the CI failure without any new edits. Cheap
 when remembered; otherwise burns a force-push + CI cycle on the
-agent's branch chasing a stale conflict.
+agent's branch chasing a stale conflict. (Applied again this round
+on brief 218 — same playbook works.)
 
 **Brain methodology update (this PR):** "always reconfigure +
 `ninja report` after a merge wave before quoting metrics."
@@ -929,38 +960,38 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Brief 218 (scaffolder)** — Wall 1 broader + brief 214 Shape B
-   verdict. Kicked off this round. Two parallel investigations: (A)
-   4-canary reg-allocator variant matrix (3 swap-tail-call from brief
-   215 + `func_ov002_021b4254` non-swap from brief 217); ship C-39
-   recipe or P-12 permanent. (B) Brief 214 Shape B re-test on the 2
-   actual picks (`func_ov000_021ab6cc`, `func_ov000_021af5c0`) with
-   full struct context to either find a new recipe or amend
-   `bit-test-0-or-1-idiom.md` § Shape B with P-12 falsification.
-2. **Brief 219 (decomper)** — C-38 drain. Kicked off this round.
-   Apply brief 216 Recipes A/B/C/D to 38 unmatched easy-tier picks.
-   Includes shipping brief 216's documented-but-unshipped canaries
-   (`func_0207db74` Recipe C, `func_02078ec8` Recipe D). Stretch:
-   brief 214 Shape B re-test on the same 2 picks brief 218 is also
-   targeting — independent measurement is useful either way.
-3. **Brief 220 candidates** (post-218/219):
-   - **Wall 1 / C-39 recipe drain** if brief 218 finds a recipe.
-     Likely 5-15 additional picks across the corpus once the
-     detector lands and the worklist gets re-scanned.
-   - **Brief 216 deferred canaries** (`func_0207d304`,
-     `func_02078ed8`, `func_02078eec`) — sub-pattern variations of
-     C-38 that brief 216's 4-recipe set didn't cover. Scaffolder
-     follow-on if brief 218 finishes A+B fast.
-   - **Medium-tier first pass.** Easy-tier should plateau around
-     99 % matched after brief 219; medium-tier is 161 picks total
-     (88.8 % matched, 18 unmatched). Manageable single-brief size
-     for a first sweep.
+1. **Brief 220 (scaffolder)** — hard-tier wall classification
+   survey. Kicked off this round. Research-only, no ships.
+   Run `predict_walls.py` against full hard-tier worklist
+   (7,911 picks), group by wall family, identify the top 10
+   unclassified shapes. Output: `docs/research/hard-tier-wall-
+   survey.md` that brain uses to scope the next 5-10 rounds.
+   Optional drive-by: brief 216's 3 deferred Wall 2 canaries
+   (`func_0207d304`, `func_02078ed8`, `func_02078eec`) if survey
+   finishes fast.
+2. **Brief 221 (decomper)** — medium-tier drain. Kicked off this
+   round. All 18 unmatched medium-tier picks have wall
+   classifications from `predict_walls.py` (C-1, C-36, P-11,
+   C-15, C-23, C-33, StyleA). Apply existing recipes. Target:
+   medium-tier 88.8 % → 100 %. Expected ~10 C-success + ~8 `.s`
+   ships (C-1 and P-11 are permanent).
+3. **Brief 222 candidates** (post-220/221):
+   - **Hard-tier drain wave 1** based on brief 220's survey
+     output. The wall-family count determines the wave shape —
+     could be a single-recipe drain (if one family dominates) or
+     a mixed wave (5-10 picks across several families).
+   - **MMIO bit-extract recipe research** (scaffolder) — brief
+     219 surfaced 4 picks sharing `ldr base; ldrh value; and;
+     asr; lsl; add base2; bx` shape. Variant-matrix candidate.
+   - **Conditional-return 0/1 recipe research** (scaffolder) —
+     brief 219 surfaced 4 picks returning `(cond) ? 0 : 1` that
+     might extend brief 214's C-37 family.
+   - **Permuter wave 2** on hard-tier picks — brief 198 left
+     this as an open lane; might benefit from the brief 218
+     bitfield-vs-shift-pair insight.
 4. **Carryover candidates from prior rounds:**
-   - **`.claude/agents/scaffolder.md` clarification** — brief 216's
-     sibling bonus item #1. Brain-side edit (folded into this
-     housekeeping brain-PR).
-   - **Hard-bucket pilot** (Track 2 long-form decomp). Stays
-     parked until easy + medium plateau.
+   - **Hard-bucket pilot** (Track 2 long-form decomp). Brief 220
+     is the structural prerequisite for this.
    - Brief 213's brief-201 doc correction, C-24 wall extension,
      C-15 `mvn #0` refinement, P-11 reg-alloc-hint research —
      all still available as smaller scaffolder slots.
