@@ -4646,9 +4646,6 @@ src/main/func_02078ec8.c:
     complete
     .text start:0x02078ec8 end:0x02078ed8
 
-src/main/func_0207d304.s:
-    complete
-    .text start:0x0207d304 end:0x0207d318
 
 src/main/func_02054b00.s:
     complete
@@ -9546,3 +9543,7 @@ src/main/func_0206d79c.s:
 src/main/func_02085864.s:
     complete
     .text start:0x02085864 end:0x02085888
+
+src/main/func_0207d304.legacy.c:
+    complete
+    .text start:0x0207d304 end:0x0207d318
