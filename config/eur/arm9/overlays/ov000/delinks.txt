@@ -478,3 +478,11 @@ src/overlay000/data_ov000_021b56b4.c:
 src/overlay000/func_ov000_021ac890.s:
     complete
     .text start:0x021ac890 end:0x021ac8b0
+
+src/overlay000/func_ov000_021aae34.c:
+    complete
+    .text start:0x021aae34 end:0x021aae54
+
+src/overlay000/func_ov000_021aaec4.c:
+    complete
+    .text start:0x021aaec4 end:0x021aaee4

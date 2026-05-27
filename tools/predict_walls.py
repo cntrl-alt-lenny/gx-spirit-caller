@@ -1275,6 +1275,44 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 "(brief 235 recipe)",
             ))
 
+    # ----- C-42 multi-call thunk hint (brief 237).
+    #
+    # Brief 237's hard-tier landscape survey identified the
+    # dominant unclassified cluster: small (≤64 B) functions with
+    # 1-3 helper calls, no bitfield extracts, no MMIO writes, no
+    # chained casts — just natural call sequences. 861 picks fit
+    # this shape (50% of unclassified, 11% of all hard-tier).
+    #
+    # NOT a wall in the traditional sense — these ship under
+    # natural source code with no special idiom. The "hint" tells
+    # decomper to drain mechanically (transcribe call sequence from
+    # disasm) rather than search for a recipe.
+    #
+    # Signature:
+    #   - size ≤ 64 B (small)
+    #   - has at least one bl instruction
+    #   - no other wall predictions fired (no C-1, C-22, C-23,
+    #     C-37/39 family, C-40/41, etc.)
+    #
+    # Emit only when len(walls) == 0 at end of detect_walls.
+    if not walls and len(hex_words) <= 16:
+        has_bl = any(
+            (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000
+            for hw in hex_words
+        )
+        if has_bl:
+            walls.append(WallPrediction(
+                "C-42",
+                "Multi-call thunk — small (≤64 B) function with "
+                "helper calls but no bitfield/MMIO/predicate walls. "
+                "Brief 237 hint: ships under natural C with no "
+                "special idiom. Read orig disasm, transcribe the "
+                "call sequence with externs for helpers + pool "
+                "symbols. 5/5 pilot picks shipped first-attempt. "
+                "See `docs/research/"
+                "brief-237-hard-tier-landscape-survey.md`.",
+            ))
+
     return walls
 
 

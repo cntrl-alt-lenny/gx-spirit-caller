@@ -1771,6 +1771,64 @@ class TestC41Detection(unittest.TestCase):
         self.assertNotIn("C-41", ids)
 
 
+class TestC42Detection(unittest.TestCase):
+    """C-42 multi-call thunk hint (brief 237).
+
+    NOT a wall in the traditional sense — flags small functions
+    with helper calls but no other wall signatures, signalling
+    that the natural recipe should work.
+    """
+
+    def test_small_multi_call_no_other_walls_fires_c42(self):
+        """A 32 B function with `push/bl/cmp/popeq/.../bl/pop`
+        and no bit-extract / MMIO / predication should fire C-42."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x8, "e3500000", "cmp\tr0, #0"),
+            _objdump_line(0xc, "08bd8008", "popeq\t{r3, pc}"),
+            _objdump_line(0x10, "e3a0001a", "mov\tr0, #26"),
+            _objdump_line(0x14, "e3a01001", "mov\tr1, #1"),
+            _objdump_line(0x18, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x1c, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-42", ids)
+        c42 = next(w for w in walls if w.wall_id == "C-42")
+        self.assertIn("Multi-call thunk", c42.cue)
+
+    def test_c39_pick_does_not_fire_c42(self):
+        """A C-39 pick (has bit-extract) should NOT fire C-42 —
+        the hint is exclusive of other wall predictions."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d010b2", "ldrh\tr1, [r0, #2]"),
+            _objdump_line(0x8, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0xc, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x10, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x14, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x18, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-42", ids)
+
+    def test_large_function_does_not_fire_c42(self):
+        """A function with > 16 instructions (~64 B) should NOT
+        fire C-42 — the hint is scoped to small thunks."""
+        lines = [_objdump_line(0x0, "e92d4008", "push\t{r3, lr}")]
+        for i in range(18):
+            lines.append(_objdump_line(4 + i * 4, "e1a00000", "nop\t"))
+        lines.append(_objdump_line(0x4c, "ebfffffe", "bl\t0x0"))
+        lines.append(_objdump_line(0x50, "e8bd8008", "pop\t{r3, pc}"))
+        asm = _wrap_asm(*lines)
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertNotIn("C-42", ids)
+
+
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
 

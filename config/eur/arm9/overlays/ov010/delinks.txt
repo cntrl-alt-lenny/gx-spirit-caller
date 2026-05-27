@@ -391,3 +391,7 @@ src/overlay010/bss/data_ov010_bss.s:
 src/overlay010/func_ov010_021b3a1c.s:
     complete
     .text start:0x021b3a1c end:0x021b3c38
+
+src/overlay010/func_ov010_021b2bf8.c:
+    complete
+    .text start:0x021b2bf8 end:0x021b2c18
