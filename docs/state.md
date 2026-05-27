@@ -8,9 +8,36 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-27, post-#701 + #702 merge. Brain on Mac.
-**Brief 234 (C-39 wave 6 + C-40 cleanup, decomper) and brief 235
-(C-39e + C-41 NEW WALL + 232 deferred, scaffolder) both shipped.**
+**Last updated:** 2026-05-27, post-#704 + #705 merge. Brain on Mac.
+**Brief 236 (C-39 wave 7 + C-39e cohort, decomper) and brief 237
+(hard-tier landscape survey + C-42 NEW WALL, scaffolder) both
+shipped.**
+
+🎯 **C-42 NEW WALL CLASSIFIED — multi-call thunk hint.** Brief 237
+piloted 5 picks from the dominant unclassified hard-tier cluster
+(861 picks, 50% of unclassified). **5/5 shipped byte-identical on
+first attempt** under natural source — these picks aren't a wall,
+they're shape-unrecognised. C-42 is therefore a hint (mechanical
+drain unlock), not a recipe. **~600-800 picks accessible from the
+C-42 cluster expected to ship first-attempt** in subsequent
+mechanical drains — roughly 100-130 hours of decomper work
+available. This is the biggest single-round unlock since C-39
+family was classified.
+
+🎯 **Hard-tier landscape resurveyed (brief 237).** Unclassified
+slice dropped 27.9% → 22.4% (-484 picks) thanks to retroactive
+C-39 family classification. New histogram: C-39 base 1279, C-39d
+562, C-39b 304, C-39a 40, C-39e 25 — total ~2210 picks now
+correctly tagged. Unclassified residue 1725 (22.4%) — multi-call
+thunk shape dominates, plus heterogeneous one-offs.
+
+Brief 236 shipped 31 .c (28 C-39b mixed cohort + 3 C-39e cohort
+drain). Hard-tier ~7.79% → ~8.16%. 2 picks deferred
+(`021e27c0`, `02206608` — C-39e prologue but divergent body,
+flagged for brief 239 sub-pattern review). Methodology lesson
+reconfirmed: multi-bitfield interleaved scheduling ships under
+natural source (brief 224's old hypothesis was wrong); 5-arg
+helpers with stack-spill ship via natural C signature.
 
 🎯 **C-41 NEW WALL LOCKED — MMIO bit-clear + tail-call.** Brief
 235's broader-0x04001xxx pilot found 4 sibling picks
@@ -77,36 +104,58 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#701 + #702 merge, EUR):**
-`matched_functions 2063 / 9621 (21.44 %)` (denominator narrowed
-as new `.c` shipped),
-`matched_code_percent 5.8764 %`, `fuzzy_match_percent 6.6038 %`,
-`complete_units 2026 / 3103 (65.29 %)`. 3-region SHA1 PASS
-preserved.
+**Current metrics (post-#704 + #705 merge, EUR):**
+`matched_functions 2134 / 9801 (21.77 %)` — **+71 functions** vs
+last round, biggest single-round jump in many waves,
+`matched_code_percent 5.8355 %`, `complete_code_percent 6.5391 %`,
+`complete_units 2097 / 3214 (65.25 %)` — **+71 units**. 3-region
+SHA1 PASS preserved.
 
-**Tier breakdown (post-#701/#702):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard ~7.8 %**
-(estimated +0.4 pp from brief 234's 31 .c + brief 235's 10 ships
-combined — was 7.42 % pre-merge).
+**Tier breakdown (post-#704/#705):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 8.16 %** (brief
+236's reported delta).
 
 **Wall taxonomy after this merge.** Active C-class: C-1 through
-C-41 (41 named recipes). C-39 family: base + a + b + d + e
-(5 active sub-shapes) + c → P-13 (permanent). Permanent walls:
-P-1 through P-13 (13 entries). **No remaining strict-C-40 cleanup
-queued; broader-0x04001xxx corpus is heterogeneous, per-pick
-decomper work.**
+**C-42 (42 named recipes)** — C-42 is the multi-call thunk hint
+(not a wall but a shape-recognizer for ~600-800 mechanical-drain
+picks). C-39 family unchanged: base + a + b + d + e (5 active) +
+c → P-13. Permanent walls: P-1 through P-13.
 
-**Two open lanes after this merge.** **Brief 236 (decomper)** —
-C-39 drain wave 7: continue C-39b-solo (~95 remaining) + drain
-C-39e cohort using brief 235's locked recipe (6+ candidates
-already scanned in ov002, estimated 10-20 total). Target: 25-40
-ships, hard-tier 7.8 % → 8.1-8.4 %. **Brief 237 (scaffolder)** —
-hard-tier landscape survey: re-run brief 220's pattern-scan
-against the post-C-39-drain unmatched pool to identify the
-next-biggest cluster after C-39 is exhausted, plus 2 small
-pilots: (A) extend C-39e detector across all overlays, (B) two
-or three speculative recipe attempts on the next-largest
-candidate cluster. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 238 (decomper)** —
+C-42 first mechanical drain wave. Apply natural recipes to ~30-50
+picks from the 861-pick C-42 cluster (brief 237 surfaced sample
+shapes: conditional helper2 + literals, struct field rw, two
+helpers with pool-loaded data, helper1 saved across void helper2,
+single helper + fnptr arg + bool). Target: 30-50 ships, hard-tier
+8.16 % → 8.5-8.8 %. **Brief 239 (scaffolder)** — (A) brief 236's
+2 deferred C-39e picks (`021e27c0`, `02206608` — C-39e prologue
+but divergent body) sub-classification; (B) brief 237's 2
+deferred recipe gotchas codified (`return r` vs `return 0`, array
+extern vs scalar extern); (C) audit brief 237's C-42 detector
+against the 861-pick cluster — false-positive rate? cohort
+sub-clusters worth pre-tagging? Both kickoffs to be sent.
+
+**Brain-PR investigations this round:** (1) Spawned 3 research
+agents — surveyed DS decomp ecosystem, objdiff/dsd upstream, and
+permuter/mwccarm tooling. Top findings: objdiff v2.7.1 → v3.7.1
+upgrade has ARM-relevant fixes (R_ARM_THM_PC8/PC11 reloc support
+helps C-31; v3.6.0 #316 may recover matched_functions metric
+under-count); calcrom.py from pret/pokeplatinum provides
+per-overlay code/data/pointer breakdown that directly addresses
+our reloc-record divergence visibility; Macabeus's
+Mizuchi+Kappa Claude-driven matching pipeline (74 % match rate on
+ARMv4T/IDO) is closest external analog to our methodology and
+could be a 10x force multiplier. (2) Spawned 2 follow-up agents:
+sandboxed objdiff v3.7.1 upgrade trial (worktree, no merge) and
+calcrom.py port (modifies tools/). Both in flight at PR-close
+time; results feed brief 240+ kickoffs.
+
+**Brain methodology update (this round):** "verify and apply
+ecosystem findings as part of the round-close, not as a separate
+arc." The 3-agent research scrape produced concrete actionables
+(objdiff upgrade, calcrom.py, dsd categories, Mizuchi pilot) that
+fit naturally into the regular round cadence — no separate
+"research debt" arc needed.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
