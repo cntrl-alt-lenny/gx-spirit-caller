@@ -1034,6 +1034,52 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                     "brief-229-c39c-d-pilots-and-c38-nonleaf.md`.",
                 ))
 
+            # ----- C-39e (brief 235) — null+helper-at-top.
+            #
+            # Sub-shape E: orig emits `movs rN, r1` at function start
+            # (S=1 mov from arg1 into callee-saved reg) immediately
+            # followed by `moveq r0, #0; popeq {...}`. The pattern
+            # tests `arg1 == 0` AND simultaneously preserves arg1
+            # for a later use (typically helper2 at function tail).
+            # Recipe: natural `if (arg1 == 0) return 0; ...; return
+            # helper2(self, arg1);` with arg1 used past the
+            # intermediate helper1 call.
+            #
+            # Signature: `movs rN, r1` (e1b0_N001 with N=4 typically)
+            # within first 4 instructions, with `moveq r0, #0`
+            # (e3a0_0000 = mov r0, #0 — but actually 03a00000 EQ form)
+            # and `popeq` (08bd_xxxx — ldmeqia sp!) immediately
+            # following.
+            #
+            # Scan first 6 hex words for the pattern.
+            head_words = hex_words[:6]
+            has_movs_r4_r1 = any(
+                re.match(r"^e1b0[1-9a-f]001$", hw)
+                for hw in head_words
+            )
+            has_moveq_r0_0 = any(
+                hw == "03a00000" for hw in head_words
+            )
+            has_popeq = any(
+                re.match(r"^08bd[89][0-9a-f]{3}$", hw)
+                for hw in head_words
+            )
+            if has_movs_r4_r1 and has_moveq_r0_0 and has_popeq:
+                walls.append(WallPrediction(
+                    "C-39e",
+                    "C-39 null+helper-at-top sub-shape: `movs rN, r1; "
+                    "moveq r0, #0; popeq {regs, pc}` at function start. "
+                    "Orig tests `arg1 == 0` immediately AND preserves "
+                    "arg1 in a callee-saved register for use past an "
+                    "intermediate helper call. Brief 235 recipe — "
+                    "natural `if (arg1 == 0) return 0; if (helper1("
+                    "self, ...) == 0) return 0; return helper2(self, "
+                    "arg1);` form. The `movs` is the peepholed combo "
+                    "of `mov r4, r1` (spill to callee-saved) + "
+                    "`cmp r1, #0` (early-test). See `docs/research/"
+                    "brief-235-c39e-c40-broader-and-232-deferred.md`.",
+                ))
+
     # ----- C-38 leaf-no-pool reg-alloc + CSE divergence (brief 216).
     #
     # Brief 215 identified Wall 2 — small leaf functions doing
@@ -1166,6 +1212,67 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 "plain `.c` with `#define REG (*(volatile "
                 "unsigned short *)0xADDR)` macro + single-expression "
                 "nested shifts (brief 233 recipe)",
+            ))
+
+    # ----- C-41 MMIO bit-clear + tail-call (brief 235).
+    #
+    # Brief 235 piloted the broader 0x04001xxx pool corpus beyond
+    # strict C-40 (MMIO bit-extract). Found a coherent sibling
+    # family: leaf functions that read an MMIO register, clear a
+    # single bit (typically 0x80000000 or 0x40000000 — DISPCNT
+    # display-control bits), write back, then tail-call a helper
+    # with a data-symbol address.
+    #
+    # Shape (7 insns + 3 pool words):
+    #
+    #     ldr  r2, [pc, #N0]     ; r2 = 0x04001000 (MMIO addr)
+    #     ldr  ip, [pc, #N1]     ; ip = helper func ptr (reloc)
+    #     ldr  r1, [r2]          ; r1 = *MMIO
+    #     ldr  r0, [pc, #N2]     ; r0 = data ptr (reloc)
+    #     bic  r1, r1, #IMM      ; clear bit (0x40000000 or 0x80000000)
+    #     str  r1, [r2]          ; write back
+    #     bx   ip                ; tail-call helper(data_ptr)
+    #     .word 0x04001000       ; MMIO addr literal
+    #     .word helper           ; reloc
+    #     .word data             ; reloc
+    #
+    # 4 known picks (0208cc18, 0208cc40, 0208ce48, 0208ce70) all
+    # ship under natural `*MMIO &= ~MASK; return helper(arg);` form.
+    #
+    # Recipe: plain `.c` with `#define MMIO (*(volatile unsigned int
+    # *)0x04001000)`, declare helper + data as extern, return the
+    # helper call.
+    if (
+        len(hex_words) >= 7
+        and len(hex_words[-3]) == 8
+        and hex_words[-3].startswith("04001")
+    ):
+        try:
+            body = [int(w, 16) for w in hex_words[-10:-3]]
+        except (IndexError, ValueError):
+            body = []
+        if (
+            len(body) == 7
+            and (body[0] & 0xFFFF_F000) == 0xE59F_2000   # ldr r2, [pc, #N]
+            and (body[1] & 0xFFFF_F000) == 0xE59F_C000   # ldr ip, [pc, #N]
+            and body[2] == 0xE592_1000                    # ldr r1, [r2]
+            and (body[3] & 0xFFFF_F000) == 0xE59F_0000   # ldr r0, [pc, #N]
+            and (body[4] & 0xFFFF_F000) == 0xE3C1_1000   # bic r1, r1, #imm
+            and body[5] == 0xE582_1000                    # str r1, [r2]
+            and body[6] == 0xE12F_FF1C                    # bx ip
+        ):
+            # Decode bic immediate (8-bit rotated)
+            bic_imm = body[4] & 0xFFF
+            imm_val = bic_imm & 0xFF
+            rot = ((bic_imm >> 8) & 0xF) * 2
+            actual = ((imm_val >> rot) | (imm_val << (32 - rot))) & 0xFFFFFFFF if rot else imm_val
+            walls.append(WallPrediction(
+                "C-41",
+                f"MMIO bit-clear + tail-call (bic #{hex(actual)}, "
+                f"MMIO=0x{hex_words[-3]}) — ship as plain `.c` with "
+                "`#define MMIO (*(volatile unsigned int *)0xADDR)` "
+                "macro + `*MMIO &= ~MASK; return helper(data);` "
+                "(brief 235 recipe)",
             ))
 
     return walls

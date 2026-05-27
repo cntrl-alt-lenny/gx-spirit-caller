@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (39 patterns, 3 sub-classifications)
+## Coercible-with-knowledge (41 patterns, 4 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -5251,6 +5251,86 @@ the natural recipe ships byte-identical 3/3. Detector + 3
 unit tests added. Full matrix at
 [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](brief-229-c39c-d-pilots-and-c38-nonleaf.md).
 
+### C-39e. Null+helper-at-top (sub-shape of C-39)
+
+**The wall.** A late-discovered sub-shape from brief 232's drain
+wave 5: orig emits `movs rN, r1; moveq r0, #0; popeq {regs, pc}`
+at function start when the C tests `arg1 == 0` immediately, AND
+arg1 is preserved past an intermediate helper call for use at
+the function tail (typically `return helper2(self, arg1)`).
+
+```asm
+push  {r3, r4, r5, lr}
+movs  r4, r1                    ; r4 = arg1, set flags from arg1
+mov   r5, r0                    ; save self in callee-saved
+moveq r0, #0                    ; if arg1 == 0: return 0
+popeq {r3, r4, r5, pc}
+... ldrh + bit-extract + bl helper1 + early-return-on-zero ...
+mov   r0, r5
+mov   r1, r4                    ; r1 = arg1 (restored from r4)
+bl    helper2                   ; helper2(self, arg1)
+pop   {r3, r4, r5, pc}
+```
+
+The `movs r4, r1` is mwcc's peepholed combo of `mov r4, r1`
+(spill arg1 to callee-saved for later use) + `cmp r1, #0`
+(early-test for null). Both operations fold into one
+flag-setting `movs`.
+
+**The fix.** Natural source recipe:
+
+```c
+int func(struct Self *self, int arg1) {
+    if (arg1 == 0) return 0;
+    if (helper1(self, ...) == 0) return 0;
+    return helper2(self, arg1);
+}
+```
+
+Three structural conditions:
+
+1. `arg1 == 0` test at function top (forces early `movs r4, r1`).
+2. arg1 is used past an intermediate call (forces spill to
+   callee-saved r4).
+3. `if (helper1(...) == 0) return 0` intermediate (matches the
+   middle of the orig structure).
+
+**Three shipped worked examples (brief 235 pilot, 3/3 ship):**
+
+- `src/overlay002/func_ov002_0228b810.c` (64 B) — canonical
+  with helper1 taking `(self, bit0)`.
+- `src/overlay002/func_ov002_0228b850.c` (68 B) — variant with
+  `1 - bit0` (rsb).
+- `src/overlay002/func_ov002_0228b894.c` (52 B) — simplest;
+  helper1 takes only `(self)`, no bit-extract.
+
+**Recognition cue.** `tools/predict_walls.py` flags C-39e (in
+addition to base C-39) when:
+
+- `movs rD, r1` (`e1b0_D001`, D=1..f) appears in the first 6
+  instructions.
+- Followed in same window by `moveq r0, #0` (`03a00000`) and
+  `popeq` (`08bd_8xxx` — ldmeqia sp! with PC in reg list).
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5).
+
+**Use when:** classifier flags C-39 + C-39e. Apply the natural
+recipe: early-null-check + intermediate helper + final
+helper-with-arg1. mwcc emits the `movs/moveq/popeq` pattern
+automatically.
+
+**Cohort size.** Brief 232 found 2 known picks (0228b810,
+0228b850); brief 235 scan found 6 additional candidates of
+similar shape in ov002 (021e27c0, 02206608, 0220c010, 0228ab68,
+0228aba0, 0228b894). Estimated cohort: 10-20 picks across all
+overlays.
+
+**Provenance:** brief 232 (PR #699) surfaced 2 unshipped picks
+with this shape during the C-39b drain wave. Brief 235 (this
+entry) piloted both + 1 simpler variant — 3/3 ship byte-identical
+on first attempt. Detector + 2 unit tests added. Full matrix at
+[`brief-235-c39e-c40-broader-and-232-deferred.md`](brief-235-c39e-c40-broader-and-232-deferred.md).
+
 ### C-40. MMIO bit-extract -> VRAM/base address
 
 **The wall.** Leaf functions that read a u16 from a `0x04001xxx`
@@ -5325,6 +5405,94 @@ shape reaches under all 8 tiers from the macro idiom, shipped
 `func_0208deec.c` as the worked example, added the C-40
 detector + 6 unit tests, classified the family. Full matrix
 at [`mmio-bit-extract.md`](mmio-bit-extract.md).
+
+### C-41. MMIO bit-clear + tail-call
+
+**The wall.** Leaf functions that read an MMIO register
+(typically `0x04001000` DISPCNT), clear a single bit
+(`0x80000000` BG3 enable or `0x40000000` BG2 enable), write
+back, then tail-call a helper with a data-symbol address.
+Brief 235's broader-C-40 corpus pilot identified 4 picks
+sharing this exact shape.
+
+```asm
+ldr  r2, .L_mmio          ; r2 = 0x04001000
+ldr  ip, .L_helper        ; ip = &helper (reloc)
+ldr  r1, [r2]             ; r1 = *MMIO
+ldr  r0, .L_data          ; r0 = data ptr (reloc)
+bic  r1, r1, #IMM         ; clear bit (0x80000000 or 0x40000000)
+str  r1, [r2]             ; write back
+bx   ip                   ; tail-call helper(data)
+.word 0x04001000
+.word helper
+.word data
+```
+
+**The fix.** Natural source recipe:
+
+```c
+#define MMIO (*(volatile unsigned int *)0x04001000)
+extern int helper(void *arg);
+extern char data_symbol[];
+
+int func(void) {
+    MMIO &= ~MASK;
+    return helper(data_symbol);
+}
+```
+
+Three structural elements:
+
+1. **MMIO read-modify-write through `volatile`** — produces the
+   `ldr/bic/str` triple.
+2. **`return helper(data_symbol)` tail call** — mwcc emits
+   `bx ip` (tail-call via register loaded from pool), NOT
+   `bl + pop`.
+3. **External helper + external data symbol** — both go in the
+   function's pool with relocations.
+
+mwcc 2.0/sp1p5 emits the orig shape directly on first attempt.
+
+**Four shipped worked examples (brief 235 pilot, 4/4 ship):**
+
+- `src/main/func_0208cc18.c` (40 B) — mask 0x80000000, helper
+  func_0208cd64, data 021a631c.
+- `src/main/func_0208cc40.c` (40 B) — mask 0x40000000, helper
+  func_0208cd64, data 021a631a.
+- `src/main/func_0208ce48.c` (40 B) — mask 0x80000000, helper
+  func_0208cf6c, data 021a631c.
+- `src/main/func_0208ce70.c` (40 B) — mask 0x40000000, helper
+  func_0208cf6c, data 021a631a.
+
+All 4 share the recipe; only the bit-mask, helper symbol, and
+data symbol vary. Mechanical to copy-adapt.
+
+**Recognition cue.** `tools/predict_walls.py` flags C-41 when
+all of:
+
+- 7-instruction body: `ldr r2,[pc]; ldr ip,[pc]; ldr r1,[r2];
+  ldr r0,[pc]; bic r1,r1,#imm; str r1,[r2]; bx ip`.
+- One of the pool words is `0x04001xxx` (NDS9 MMIO range).
+
+**Routes:** ship as **plain `.c`** (default mwcc 2.0/sp1p5).
+
+**Use when:** classifier flags C-41 — copy the recipe template,
+fill in mask + helper + data symbol from the orig disasm.
+External symbols need to be declared `extern` to get pool-slot
+relocations.
+
+**Cohort size.** 4 known picks in main module. Broader
+0x04001xxx pool corpus is heterogeneous (different shapes per
+pick — MMIO conditional dispatch, switch tables, multi-step
+read/write); each non-C-41 broader shape needs its own
+per-pick recipe.
+
+**Provenance:** brief 235 (this entry) piloted the broader
+0x04001xxx pool corpus to test if C-40 recipe extends. Found
+C-41 as a coherent sibling family (4/4 ship), with the
+remaining broader picks being heterogeneous one-off shapes.
+Detector + 2 unit tests added. Full matrix at
+[`brief-235-c39e-c40-broader-and-232-deferred.md`](brief-235-c39e-c40-broader-and-232-deferred.md).
 
 ## Permanent (13 patterns)
 
