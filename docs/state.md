@@ -8,29 +8,34 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-26, post-#695 + #696 merge. Brain on Mac.
-**Brief 230 (C-39 wave 4, decomper) and brief 231 (C-39c P-13 +
-C-38 non-leaf P-12, scaffolder) both shipped.**
+**Last updated:** 2026-05-27, post-#698 + #699 merge. Brain on Mac.
+**Brief 232 (C-39 wave 5, decomper) and brief 233 (C-40 MMIO
+bit-extract locked, scaffolder) both shipped.**
 
-🎯 **C-39 family research complete — 3 sub-classes locked + 1
-permanent.** Brief 230 drained 31 more C-39d-solo picks (31/32
-ratio, 1 revert). Brief 231 closed C-39c as **P-13 (cross-tier
-irreducible)** and C-38 non-leaf as **P-12 (reg-alloc divergence)**
-with full falsification matrices — 0 ships but high-value negative
-result that saves future rounds from re-trying these directions.
-`codegen-walls.md` now has **13 permanent walls**. Hard-tier
-matched 6.8 % → **7.2 %** (609 / 8,351). C-39 family drain status:
-~400-500 picks unlocked across a/b/d; C-39c (~10-30 picks) +
-C-38 non-leaf (~2 picks) closed permanent.
+🎯 **C-40 LOCKED — a new wall family.** Brief 233 found the MMIO
+bit-extract recipe reaches under ALL mwccarm tiers (no legacy
+needed). 4 brief-219-deferred picks now have a locked recipe; 1
+worked example shipped + 3 more queued for brief 234 mechanical
+cleanup. Insight: mwcc emits `asr` (not `lsr`) because masked
+`unsigned short` promotes to signed int per C integer-promotion
+rules — three jointly-required source elements (macro-wrap,
+single-expression nested shifts, `+ BASE` direct on shift result
+with `void *` return). Broader `0x04001xxx` corpus: 459 candidates
+await brief 235 pilot. **Path B (C-1+C-23 compound) documented
+as already-resolved via `.legacy.c` routing** — no new compound
+recipe needed; the 2,933 picks brief 220 flagged as "iterative
+core" are per-pick decomper work, not scaffolder research.
 
-**`matched_functions`: 2025 / 9801 (20.66 %)** — third consecutive
-round above 20 %.
+Brief 232 shipped 35 ships in the C-39b-solo cohort (hard-tier
+7.21 % → 7.42 %, slightly under target). Surfaced 5 sub-patterns
+(E1-E5, E5 dominant with 30 of 35). Confirmed brief 230's
+branch-form lesson at scale (32 early-return + 3 if-then). **New
+sub-shape surfaced:** `movs r4, r1` (S=1) entry pattern emitted
+when C tests `arg1 == 0` immediately at function start — 2 known
+picks, unambiguous codegen, feeds brief 235's C-39e pilot.
 
-**New methodology insight from brief 230:** `if (x == 0) return
-CONST; rest;` vs `if (x) { rest; } return CONST;` compile to
-DIFFERENT codegen (inline conditional pop vs branch +
-fall-through). The branch-form match against orig is now part of
-the recipe-selection checklist.
+**`matched_functions`: 2063 / 9801 (21.05 %)** — fourth round
+above 20 % milestone.
 
 Brief 224 (decomper) ran C-39 drain wave 1. **25 ships, hard-tier
 5.6 % → 6.0 %.** Routing: 24 `.s` + 1 `.c` upgrade
@@ -63,25 +68,26 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#695 + #696 merge, EUR):**
-`matched_functions 2025 / 9801 (20.66 %)`,
-`matched_code_percent ~5.49 %`, `complete_units ~1988 / 2997
-(~66.3 %)`. 3-region SHA1 PASS preserved.
+**Current metrics (post-#698 + #699 merge, EUR):**
+`matched_functions 2063 / 9801 (21.05 %)`,
+`matched_code_percent 5.6840 %`, `fuzzy_match_percent 6.3823 %`,
+`complete_units 2026 / 3105 (65.25 %)`. 3-region SHA1 PASS
+preserved.
 
-**Tier breakdown (post-#695/#696):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard 7.2 %** (609 /
-8,351 matched, 7,742 unmatched — was 6.8 % pre-merge).
+**Tier breakdown (post-#698/#699):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard ~7.42 %** (~620 /
+8,351 matched — was 7.2 % pre-merge).
 
-**Two open lanes after this merge.** **Brief 232 (decomper)** —
-C-39 drain wave 5 (next cohort: C-39b-solo or C-39+b+d compound,
-both ~140-160 picks each). Target: 25-40 ships, hard-tier 7.2 %
-→ 7.5-7.8 %. **Brief 233 (scaffolder)** — pivot to next-highest-
-yield investigation now that C-39 research is essentially done:
-(A) MMIO bit-extract pilot (4 picks from brief 219, could extend
-to hundreds of hard-tier candidates), (B) C-1 + C-23 compound
-research (2,933 hard-tier picks fire both — the "iterative core"
-brief 220 flagged as not batchable; manual variant-matrix on 2-3
-picks may unlock). Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 234 (decomper)** —
+C-39 drain wave 6 (continue C-39b-solo, 122 remaining) + C-40
+3-pick mechanical cleanup (`func_0208df40`, `_0208e1ac`,
+`_0208e200`). Target: 25-35 ships, hard-tier 7.42 % → 7.7-7.9 %.
+**Brief 235 (scaffolder)** — three small pilots: (A) C-39e
+sub-classification on brief 232's new `movs r4, r1` null+helper-
+at-top sub-shape (2 known picks), (B) brief 232's 2 deferred
+picks (double-call disjunction + cross-call dead-store), (C)
+broader-C-40 corpus pilot — 459 broader `0x04001xxx`-pool
+candidates beyond strict C-40. Both kickoffs sent.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
@@ -990,27 +996,33 @@ sufficient.
 
 ## Next-brain TODO
 
-1. **Brief 232 (decomper)** — C-39 drain wave 5 (continuation).
-   Kicked off this round. Pick next-largest uniform cohort
-   (C-39b-solo 157 picks or C-39+b+d compound 137 picks). Apply
-   brief 230's variant taxonomy. Target: 25-40 ships, hard-tier
-   7.2 % → 7.5-7.8 %.
-2. **Brief 233 (scaffolder)** — MMIO bit-extract pilot + C-1 +
-   C-23 compound research. Kicked off this round. C-39 family
-   research is essentially complete (3/4 locked + 1 P-13).
-   Pivot to next-highest-yield: (A) MMIO bit-extract — brief 219
-   surfaced 4 picks; brief 220 estimated ~100s of hard-tier
-   candidates. (B) C-1 + C-23 compound — 2,933 picks fire both;
-   variant-matrix on 2-3 picks may unlock the compound recipe.
-3. **Brief 234 candidates** (post-232/233):
-   - **C-40 / C-41 drain wave** if brief 233 locks recipes.
-   - **C-39 mega-batch wave** — combine a/b/d + base into one
-     cross-shape uniform-batch using brief 230's variant table.
+1. **Brief 234 (decomper)** — C-39 drain wave 6 + C-40 3-pick
+   mechanical cleanup. Kicked off this round. (A) Continue
+   C-39b-solo drain (122 picks remain after brief 232's 35).
+   (B) Ship the 3 remaining brief-219 C-40 picks via brief 233's
+   locked recipe (`func_0208df40`, `_0208e1ac`, `_0208e200`).
+   Target: 25-35 ships, hard-tier 7.42 % → 7.7-7.9 %.
+2. **Brief 235 (scaffolder)** — Three small pilots. Kicked off
+   this round. (A) **C-39e sub-classification** on brief 232's
+   new `movs r4, r1` null+helper-at-top sub-shape (2 known
+   picks `0228b810`, `0228b850`); if ≥2 ship, classify + extend
+   detector. (B) **Brief 232's 2 deferred picks**:
+   `func_ov002_02295284` (double-call disjunction),
+   `func_ov002_0220673c` (cross-call compare with dead-store
+   artifact). (C) **Broader-C-40 corpus pilot**: brief 233 noted
+   459 broader `0x04001xxx`-pool occurrences beyond the 4 strict
+   C-40 picks; pilot 5 picks outside the strict signature.
+3. **Brief 236 candidates** (post-234/235):
+   - **C-39e drain wave** if brief 235 (A) locks.
+   - **Broader-C-40 / C-42 drain wave** if brief 235 (C) locks.
+   - **C-39 mega-batch wave** — combine a/b/d/e + base into one
+     cross-shape uniform-batch using brief 230 + 232's variant
+     tables.
    - **Permuter wave 2** on hard-tier picks — brief 198 left
      this open; brief 218 bitfield insight may help.
    - **`.s` → `.c` upgrade pass on accumulated punts** — brief
-     221 + 223 + 224 + 228 + 230's deferred cohorts; ~100+ `.s`
-     ships with non-permanent walls.
+     221 + 223 + 224 + 228 + 230 + 232's deferred cohorts;
+     ~100+ `.s` ships with non-permanent walls.
 4. **Carryover candidates from prior rounds:**
    - **Hard-bucket pilot** (Track 2 long-form decomp). Brief 220
      is the structural prerequisite for this.

@@ -364,31 +364,79 @@ itself:
 
 ### Open briefs
 
-- **Brief 232** — `decomper`. **C-39 drain wave 5 (continuation).**
-  Brief 230 confirmed the 31-ship cadence holds across the C-39d-
-  solo cohort (432 picks; ~150-200 still solo after wave 4 leftover).
-  Three open cohorts post-brief-230: C-39+b-solo (157), C-39+b+d
-  compound (137), C-39-alone (609). Pick the next-largest uniform
-  sub-batch from C-39b-solo or the b+d compound + apply brief
-  230's variant taxonomy. Target: 25-40 ships, hard-tier 7.2 % →
-  7.5-7.8 %. Branch: `decomper/c39-drain-wave5`.
-- **Brief 233** — `scaffolder`. **MMIO bit-extract + C-1+C-23
-  compound research.** With C-39 sub-family at 3/4 locked (a/b/d)
-  + 1 permanent (c → P-13) and C-38 non-leaf locked as P-12, the
-  C-39 family research is essentially complete. Time to pivot to
-  the next-highest-yield investigation: (A) MMIO bit-extract — brief
-  219 surfaced 4 picks sharing `ldr base; ldrh value; and; asr;
-  lsl; add base2; bx` shape. Brief 220 survey estimated this
-  family could cover ~100s of hard-tier candidates. Variant-matrix
-  pilot 5 picks. (B) C-1 + C-23 compound — 2,933 hard-tier picks
-  fire both (the "iterative core" brief 220 flagged as not
-  batchable). Pick 2-3 representative picks, variant-matrix
-  manually, see if any single source-shape unlocks the compound.
-  If A or B locks: classify as C-40 / C-41. Branch:
-  `scaffolder/mmio-bit-extract-and-c1-c23-compound`.
+- **Brief 234** — `decomper`. **C-39 drain wave 6 + C-40 3-pick
+  mechanical cleanup.** Brief 232 shipped 35 in the C-39b-solo
+  cohort (122 picks remain) and surfaced the new
+  `null+helper-at-top` (`movs r4, r1` early-return) sub-shape on
+  2 picks. Brief 234 (A) drains 20-30 more C-39b-solo using brief
+  232's E1-E5 sub-pattern taxonomy; (B) ships the 3 remaining
+  brief-219 C-40 picks (`func_0208df40`, `func_0208e1ac`,
+  `func_0208e200`) via brief 233's locked recipe. Target: 25-35
+  ships, hard-tier 7.42 % → 7.7-7.9 %. Branch:
+  `decomper/c39-drain-wave6-and-c40-cleanup`.
+- **Brief 235** — `scaffolder`. **C-39e (null+helper-at-top)
+  sub-classification pilot + brief 232 deferred picks +
+  broader-C-40 corpus pilot.** Three small investigations.
+  (A) Brief 232's new `movs r4, r1` null+helper-at-top sub-shape:
+  pilot 3 picks (cohort small but the codegen is unambiguous). If
+  ≥2 ship: classify as C-39e, extend detector. (B) Brief 232's 2
+  deferred picks: `func_ov002_02295284` (double-call disjunction)
+  and `func_ov002_0220673c` (cross-call compare with dead-store
+  artifact) — variant-matrix to see if either reaches. (C) Broader
+  C-40 corpus: brief 233 noted 459 broader `0x04001xxx`-pool
+  occurrences beyond the 4 strict C-40 picks. Pilot 5 picks
+  outside the strict signature — if the bit-extract recipe extends
+  to MMIO reads with different bodies, classify as C-40-broader
+  or C-42. Branch:
+  `scaffolder/c39e-pilot-c40-broader-and-232-deferred`.
 
 ### Closed briefs (reference)
 
+- **Brief 233** — `scaffolder`, shipped in PR #698. 🎯 **C-40
+  MMIO bit-extract recipe LOCKED — works under ALL mwccarm tiers
+  (no legacy needed).** Path A: 4 brief-219 picks (`func_0208deec`
+  + 3 siblings) read u16 from `0x04001xxx` VRAMCNT registers and
+  extract bit-fields → VRAM page address. Variant matrix found
+  one canonical recipe reaches under all 8 tiers via three
+  jointly-required elements: macro-wrap of MMIO cast,
+  single-expression nested shifts, and `+ BASE` direct on shift
+  result with `void *` return. Mechanism: mwcc emits `asr`
+  (not `lsr`) because masked `unsigned short` promotes to signed
+  `int` per C integer-promotion rules. 1 worked example shipped
+  (`src/main/func_0208deec.c`) + C-40 detector + 6 unit tests.
+  Detector: 100 % known-pick coverage, 0 false positives across
+  a 5000-pick sweep. Broader `0x04001xxx`-pool corpus: 463
+  occurrences; strict C-40 shape covers 4; 459 broader candidates
+  await brief 235 pilot. **Path B (C-1+C-23 compound):**
+  documented as already-resolved via `.legacy.c` routing per
+  brief 199's precedent. No new compound recipe needed; the
+  "iterative core" label refers to per-pick decomper work, not
+  scaffolder research. Brief 235+ scaffolder could extract
+  recurring source-shape templates from shipped `.legacy.c` picks
+  (template clustering similar to brief 159's pattern_library)
+  but that's not blocking. Research note:
+  [`mmio-bit-extract.md`](docs/research/mmio-bit-extract.md).
+- **Brief 232** — `decomper`, shipped in PR #699. 🎯 **35 .c
+  ships in the C-39b-solo cohort, hard-tier 7.21 % → 7.42 %.**
+  Slightly under the 7.5-7.8 % target (+0.21 pp vs +0.3-0.6 pp)
+  due to per-pick recipe discovery overhead. Surfaced 5 sub-
+  patterns under the umbrella: **E1** cross-call compare
+  (brief 226 Idiom 2), **E2** helper + conditional helper2 +
+  return helper1, **E3** 2-helper sequence with `~0` sentinel,
+  **E4** helper-reuse + early-return + tail, **E5** early-
+  return-then-tail (DOMINANT, 30 of 35 ships). Brief 230's
+  branch-form lesson confirmed at scale: 32 early-return + 3
+  if-then ships. **New sub-shape surfaced:** `movs r4, r1`
+  (S=1) entry pattern emitted when C tests `arg1 == 0`
+  immediately at function start. Worked examples: `0228b810`,
+  `0228b850`. Cohort small (2 known) but codegen is
+  unambiguous — feeds brief 235 for C-39e candidate. 2 picks
+  deferred (`02295284` double-call disjunction; `0220673c`
+  cross-call compare with dead-store artifact). Detector
+  improvement: brief 215's C-39b regex `mov rD, r0` matched
+  shifts (`mov rD, r0, lsl/lsr`) as false positives; tightened
+  to `mov rD, r0$` — 116 → 76 candidates. Research note:
+  [`brief-232-c39-drain-wave-5.md`](docs/research/brief-232-c39-drain-wave-5.md).
 - **Brief 231** — `scaffolder`, shipped in PR #695. 🎯 **2
   permanent walls locked (P-12 + P-13) with full falsification
   matrices — 0 ships, high-value negative result.** **P-13 (C-39c
