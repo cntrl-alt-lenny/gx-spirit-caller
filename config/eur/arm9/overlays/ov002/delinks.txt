@@ -3103,3 +3103,11 @@ src/overlay002/func_ov002_021f4d18.c:
 src/overlay002/func_ov002_021ded30.c:
     complete
     .text start:0x021ded30 end:0x021ded54
+
+src/overlay002/func_ov002_021e27c0.c:
+    complete
+    .text start:0x021e27c0 end:0x021e2818
+
+src/overlay002/func_ov002_02206608.c:
+    complete
+    .text start:0x02206608 end:0x02206668

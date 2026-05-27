@@ -1295,22 +1295,61 @@ def detect_walls(asm: str) -> list[WallPrediction]:
     #     C-37/39 family, C-40/41, etc.)
     #
     # Emit only when len(walls) == 0 at end of detect_walls.
+    #
+    # Brief 239 audit: tightened to exclude large-stack-frame
+    # functions (sub sp, sp, #N where N > 16) — these are
+    # buffer-passing thunks (~2.7% of fires) which need different
+    # recipes. Without this filter, FP rate was 2.7% (15 of 554
+    # unmatched C-42 picks).
+    #
+    # Brief 239 sub-shape histogram (554 unmatched picks):
+    #   A1_single_bl_bool_tail   (cmp + movge/movle return)
+    #   A2_single_bl_pool_arg    (helper takes pool constant)
+    #   A3_single_bl_plain       (largest; 189 picks)
+    #   B1_two_bl_early_return   (popeq between calls)
+    #   B2_two_bl_field_write    (helper + str field after)
+    #   B3_two_bl_save_r4        (mov r4, r0 across 2nd call)
+    #   B4_two_bl_pool_args      (both calls take pool args)
+    #   B5_two_bl_plain          (two helpers, no fancy state)
+    #   C_three_or_more_bl       (multi-call chain)
     if not walls and len(hex_words) <= 16:
         has_bl = any(
             (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000
             for hw in hex_words
         )
-        if has_bl:
+        # Filter: exclude large-stack-frame functions
+        # (sub sp, sp, #N with N > 16) — these are buffer-passing
+        # thunks, not simple multi-call thunks.
+        has_big_stack = False
+        for hw in hex_words:
+            v = int(hw, 16)
+            # sub sp, sp, #imm: 0xE24D_Drrr where rrr is rotated imm
+            if (v & 0xFFFF_F000) == 0xE24D_D000:
+                imm_byte = v & 0xFF
+                rot = ((v >> 8) & 0xF) * 2
+                imm = ((imm_byte >> rot) | (imm_byte << (32 - rot))) & 0xFFFFFFFF if rot else imm_byte
+                if imm > 16:
+                    has_big_stack = True
+                    break
+        if has_bl and not has_big_stack:
+            # Sub-shape classification (hint for decomper)
+            n_bl = sum(1 for hw in hex_words
+                       if (int(hw, 16) & 0x0F00_0000) == 0x0B00_0000)
+            n_pool = sum(1 for hw in hex_words
+                         if (int(hw, 16) & 0xFFFF_F000) == 0xE59F_0000)
+            sub = (
+                f"{n_bl}bl/{n_pool}pool"
+            )
             walls.append(WallPrediction(
                 "C-42",
-                "Multi-call thunk — small (≤64 B) function with "
-                "helper calls but no bitfield/MMIO/predicate walls. "
-                "Brief 237 hint: ships under natural C with no "
-                "special idiom. Read orig disasm, transcribe the "
-                "call sequence with externs for helpers + pool "
-                "symbols. 5/5 pilot picks shipped first-attempt. "
-                "See `docs/research/"
-                "brief-237-hard-tier-landscape-survey.md`.",
+                f"Multi-call thunk ({sub}) — small (≤64 B) function "
+                "with helper calls but no bitfield/MMIO/predicate "
+                "walls. Brief 237 hint: ships under natural C with "
+                "no special idiom. 5/5 pilot picks shipped first-"
+                "attempt. Brief 239 audit: 97% true-positive rate "
+                "after stack-frame filter (excludes buffer-pass "
+                "thunks). See `docs/research/"
+                "brief-239-c39e-sub-c42-audit-gotchas.md`.",
             ))
 
     return walls
