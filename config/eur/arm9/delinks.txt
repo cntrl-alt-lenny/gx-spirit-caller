@@ -9346,15 +9346,15 @@ src/main/func_0208deec.c:
     complete
     .text start:0x0208deec end:0x0208df0c
 
-src/main/func_0208df40.s:
+src/main/func_0208df40.c:
     complete
     .text start:0x0208df40 end:0x0208df60
 
-src/main/func_0208e1ac.s:
+src/main/func_0208e1ac.c:
     complete
     .text start:0x0208e1ac end:0x0208e1cc
 
-src/main/func_0208e200.s:
+src/main/func_0208e200.c:
     complete
     .text start:0x0208e200 end:0x0208e220
 
