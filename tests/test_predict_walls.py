@@ -1677,6 +1677,99 @@ class TestC39SubShapeDetection(unittest.TestCase):
         self.assertIn("C-39", ids)
         self.assertNotIn("C-39d", ids)
 
+    def test_e1_null_helper_at_top_fires_c39e(self):
+        """func_ov002_0228b810: `movs r4, r1; moveq r0, #0; popeq`
+        at function start should fire C-39 + C-39e."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4038", "push\t{r3, r4, r5, lr}"),
+            _objdump_line(0x4, "e1b04001", "movs\tr4, r1"),
+            _objdump_line(0x8, "e1a05000", "mov\tr5, r0"),
+            _objdump_line(0xc, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x10, "08bd8038", "popeq\t{r3, r4, r5, pc}"),
+            _objdump_line(0x14, "e1d510b2", "ldrh\tr1, [r5, #2]"),
+            _objdump_line(0x18, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0x1c, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x20, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x24, "e3500000", "cmp\tr0, #0"),
+            _objdump_line(0x28, "03a00000", "moveq\tr0, #0"),
+            _objdump_line(0x2c, "08bd8038", "popeq\t{r3, r4, r5, pc}"),
+            _objdump_line(0x30, "e1a00005", "mov\tr0, r5"),
+            _objdump_line(0x34, "e1a01004", "mov\tr1, r4"),
+            _objdump_line(0x38, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x3c, "e8bd8038", "pop\t{r3, r4, r5, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertIn("C-39e", ids)
+        c39e = next(w for w in walls if w.wall_id == "C-39e")
+        self.assertIn("null+helper-at-top", c39e.cue)
+
+    def test_no_movs_r4_r1_does_not_fire_c39e(self):
+        """A C-39 pick without the early `movs rN, r1; popeq` pattern
+        should NOT fire C-39e — only base C-39."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e1d010b2", "ldrh\tr1, [r0, #2]"),
+            _objdump_line(0x8, "e1a01f81", "lsl\tr1, r1, #31"),
+            _objdump_line(0xc, "e1a01fa1", "lsr\tr1, r1, #31"),
+            _objdump_line(0x10, "ebfff76a", "bl\t0x93630"),
+            _objdump_line(0x14, "e3a00001", "mov\tr0, #1"),
+            _objdump_line(0x18, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-39", ids)
+        self.assertNotIn("C-39e", ids)
+
+
+class TestC41Detection(unittest.TestCase):
+    """C-41: MMIO bit-clear + tail-call.
+
+    Brief 235 piloted the broader 0x04001xxx pool corpus and found
+    a coherent sibling family: leaf functions that read an MMIO
+    register, clear a bit, write back, then tail-call a helper.
+    """
+
+    def test_canonical_mmio_bit_clear_tail_call_fires_c41(self):
+        """func_0208cc18 canonical shape: ldr/ldr/ldr/ldr/bic/str/bx ip
+        + 3 pool words including 0x04001000."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e59f2014", "ldr\tr2, [pc, #20]"),
+            _objdump_line(0x4, "e59fc014", "ldr\tip, [pc, #20]"),
+            _objdump_line(0x8, "e5921000", "ldr\tr1, [r2]"),
+            _objdump_line(0xc, "e59f0010", "ldr\tr0, [pc, #16]"),
+            _objdump_line(0x10, "e3c11102", "bic\tr1, r1, #-2147483648"),
+            _objdump_line(0x14, "e5821000", "str\tr1, [r2]"),
+            _objdump_line(0x18, "e12fff1c", "bx\tip"),
+            _objdump_line(0x1c, "04001000", ".word\t0x04001000"),
+            _objdump_line(0x20, "00000000", ".word\t0x00000000"),
+            _objdump_line(0x24, "00000000", ".word\t0x00000000"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-41", ids)
+        c41 = next(w for w in walls if w.wall_id == "C-41")
+        self.assertIn("MMIO bit-clear", c41.cue)
+
+    def test_no_bic_does_not_fire_c41(self):
+        """A 7-instruction function with 0x04001xxx pool but no `bic`
+        should not fire C-41."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e59f0014", "ldr\tr0, [pc, #20]"),
+            _objdump_line(0x4, "e1d000b0", "ldrh\tr0, [r0]"),
+            _objdump_line(0x8, "e200003c", "and\tr0, r0, #60"),
+            _objdump_line(0xc, "e1a00140", "asr\tr0, r0, #2"),
+            _objdump_line(0x10, "e1a00700", "lsl\tr0, r0, #14"),
+            _objdump_line(0x14, "e2800662", "add\tr0, r0, #102760448"),
+            _objdump_line(0x18, "e12fff1e", "bx\tlr"),
+            _objdump_line(0x1c, "0400100a", ".word\t0x0400100a"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-40", ids)
+        self.assertNotIn("C-41", ids)
+
 
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
