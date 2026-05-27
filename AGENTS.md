@@ -364,36 +364,68 @@ itself:
 
 ### Open briefs
 
-- **Brief 236** — `decomper`. **C-39 drain wave 7: C-39b-solo
-  continuation + C-39e cohort drain.** Two combined drains using
-  brief 232's E1-E5 sub-pattern taxonomy + brief 235's locked
-  C-39e recipe. (A) C-39b-solo: ~95 picks remain after brief 234;
-  same recipe as briefs 226/230/232/234. (B) C-39e: brief 235
-  scan flagged 6 candidates in ov002 (021e27c0, 02206608,
-  0220c010, 0228ab68, 0228aba0, 0228b894 — last one already
-  shipped by brief 235 as worked example) — drain the remaining
-  5+ using `if (arg1 == 0) return 0; if (helper1(...) == 0)
-  return 0; return helper2(self, arg1);` template. Target: 25-40
-  ships, hard-tier 7.8 % → 8.1-8.4 %. Verify gate: 3-region
-  `ninja sha1` PASS. Branch:
-  `decomper/c39-drain-wave7-and-c39e-cohort`.
-- **Brief 237** — `scaffolder`. **Hard-tier landscape survey +
-  C-39e cross-overlay detector extension + next-cluster pilots.**
-  Three deliverables. (A) Re-run brief 220's hard-tier pattern
-  scan against the current unmatched pool — what's the biggest
-  unclassified cluster after C-39 family is mostly drained?
-  Histogram the remaining ~7,700 hard-tier picks by shape feature
-  (bitfield, MMIO, struct-ptr deref, helper sequence, etc.).
-  (B) Extend `tools/predict_walls.py` C-39e detector to scan all
-  overlays + report cohort size — does the 10-20 estimate hold,
-  or is C-39e larger? (C) Pilot 3-5 picks in the largest
-  unclassified cluster from (A) using the variant-matrix
-  methodology (5 source forms × 8 mwcc tiers) — if any ship,
-  classify as new C-N; if all wall, document as P-N candidates.
-  Verify: scaffolder direct-mwcc only, no `ninja sha1` requirement.
-  Branch: `scaffolder/c39e-broader-and-next-cluster-survey`.
+- **Brief 238** — `decomper`. **C-42 first mechanical drain
+  wave.** Apply natural recipes to 30-50 picks from the 861-pick
+  C-42 cluster (brief 237 classified this as the dominant
+  unclassified hard-tier shape — multi-call thunks 32-64 B with
+  helper calls, no bit-extracts/MMIO/predicates). Brief 237's 5
+  worked examples cover the sub-shapes: (i) conditional helper2 +
+  literals (`021b0c34`), (ii) struct field rw (`ov000_021aaec4`),
+  (iii) two helpers with pool-loaded data (`ov010_021b2bf8`),
+  (iv) helper1 saved across void helper2 (`ov000_021aae34`),
+  (v) single helper + fnptr arg + bool (`0220868c`). **Recipe
+  gotchas** (per brief 237): use `int r = h(); if (r == 0)
+  return r;` not `if (h() == 0) return 0;` (the latter emits an
+  extra `moveq r0, #0`); pool data symbols are `extern char
+  data_xxx[]` not `extern int g_xxx`. Target: 30-50 ships,
+  hard-tier 8.16 % → 8.5-8.8 %. Verify gate: 3-region
+  `ninja sha1` PASS. Branch: `decomper/c42-drain-wave1`.
+- **Brief 239** — `scaffolder`. **C-39e sub-pattern + C-42
+  audit + recipe-gotcha codification.** Three small deliverables.
+  (A) Brief 236's 2 deferred C-39e picks (`021e27c0`, `02206608`)
+  — C-39e prologue but divergent body (bne-branch / nested
+  bitfield). Variant matrix to classify: extends C-39e, or new
+  C-39e sub-shape (C-39e1)? (B) Audit `tools/predict_walls.py`
+  C-42 detector against the full 861-pick cluster: how many false
+  positives if we run it now? Are there sub-clusters worth pre-
+  tagging for brief 238+ (e.g. struct-rw vs literal-pool vs
+  fnptr)? (C) Codify brief 237's two recipe gotchas into the
+  recipe-library reference doc (`docs/research/recipe-gotchas.md`
+  or similar) — `return r` vs `return 0` peephole; array extern
+  vs scalar extern pool form. Verify: scaffolder direct-mwcc
+  only, no SHA1 requirement. Branch:
+  `scaffolder/c39e-sub-c42-audit-and-recipe-gotchas`.
 
 ### Closed briefs (reference)
+
+- **Brief 237** — `scaffolder`, shipped in PR #705. 🎯 **C-42
+  multi-call thunk NEW WALL classified — biggest single-round
+  unlock since C-39.** Three deliverables, all clean wins.
+  (A) Hard-tier landscape resurveyed: unclassified slice dropped
+  27.9 % → 22.4 % (−484 picks) via retroactive C-39 family
+  classification (base 1279, C-39d 562, C-39b 304, C-39a 40,
+  C-39e 25). (B) C-39e cross-overlay scan: 27 picks total, ALL
+  in ov002 (consistent with brief 235's 10-20 estimate). (C) C-42
+  pilot: 5/5 ships byte-identical first-attempt under natural
+  source from the dominant unclassified cluster (861 picks).
+  **C-42 is a HINT not a recipe wall** — these picks aren't a
+  matching obstacle, they're shape-unrecognised. ~600-800 picks
+  expected mechanical drain via brief 238+. Detector + 3 unit
+  tests added. 2 recipe gotchas surfaced (return-r-vs-return-0,
+  array-vs-scalar extern). Research note:
+  [`brief-237-hard-tier-landscape-survey.md`](docs/research/brief-237-hard-tier-landscape-survey.md).
+- **Brief 236** — `decomper`, shipped in PR #704. 🎯 **31 .c
+  ships across C-39 wave 7 + C-39e cohort. Hard-tier 7.79 % →
+  8.16 %.** (A) C-39e cohort: 3 of 5 listed candidates shipped
+  (`0220c010`, `0228ab68`, `0228aba0`); 2 deferred (`021e27c0`,
+  `02206608` — divergent body, flagged for brief 239 sub-pattern
+  review). (B) Mixed C-39 cohort drain: 28 ships via brief
+  227/228/232 patterns (2 C-39b-solo if-then, 26 C-39-alone-no-
+  sub including 5-arg stack-spill and multi-bitfield interleaved
+  scheduling). **Methodology lessons reconfirmed:** multi-bitfield
+  interleaved scheduling ships under natural source (brief 224's
+  hypothesis falsified at scale); 5-arg helpers ship via natural
+  C signature (AAPCS handled automatically). 100 % C-yield wave.
 
 - **Brief 235** — `scaffolder`, shipped in PR #701. 🎯 **C-39e
   + C-41 NEW WALL both locked; 10 ships total.** Three small
