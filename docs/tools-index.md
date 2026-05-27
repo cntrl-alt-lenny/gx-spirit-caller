@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**75 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**76 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (10)
+- [Uncategorised](#uncategorised) (11)
 
 ## Analysis / worklist
 
@@ -436,6 +436,12 @@ README.md's per-region shields.io badges to match.
 ## Uncategorised
 
 _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/calcrom.py`
+
+**Per-overlay code/data/pointer breakdown for Yu-Gi-Oh! GX Spirit Caller.**
+
+Ported from pret/pokeplatinum's `.github/calcrom/calcrom.py` (MIT-ish "unlicense", per pokeplatinum's LICENSE — no header carried upstream), re-targeted at this project's directory layout:
 
 ### `tools/clean_macos_junk.py`
 
