@@ -6261,8 +6261,8 @@ the workarounds.
 - Named-local mask split (`unsigned int t1 = a & 0xff; unsigned
   int t2 = (b & 0xff) << 8;`) under 1.2/sp3 → preserves
   `and+and+orr` shape AND right outer prologue/epilogue. But
-  scheduling: mwcc places `lsr r8, r0, #16` (the `(u16) cast)
-  BEFORE `mov r6, #0` (the i = 0 init). Orig has the opposite
+  scheduling: mwcc places `lsr r8, r0, #16` (the `(u16)` cast)
+  BEFORE `mov r6, #0` (the `i = 0` init). Orig has the opposite
   order. The 4 mov instructions following are independent ops
   that mwcc's scheduler reorders.
 

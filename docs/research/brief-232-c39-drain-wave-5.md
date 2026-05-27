@@ -14,8 +14,7 @@ guidance (recipe locked, smaller per-pick effort).
 
 3-region SHA1 PASS preserved (EUR/USA/JPN).
 
-## Recipe survey: 116 unshipped C-39b candidates → 76 after
-detector tightening
+## Recipe survey: 116 unshipped C-39b candidates → 76 after detector tightening
 
 Brief 215's "swap-tail-call register temp" detector regex
 (`mov rD, r0`) was too permissive — matched `mov rD, r0, lsl/lsr ...`
