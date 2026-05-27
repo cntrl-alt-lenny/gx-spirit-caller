@@ -364,33 +364,69 @@ itself:
 
 ### Open briefs
 
-- **Brief 234** — `decomper`. **C-39 drain wave 6 + C-40 3-pick
-  mechanical cleanup.** Brief 232 shipped 35 in the C-39b-solo
-  cohort (122 picks remain) and surfaced the new
-  `null+helper-at-top` (`movs r4, r1` early-return) sub-shape on
-  2 picks. Brief 234 (A) drains 20-30 more C-39b-solo using brief
-  232's E1-E5 sub-pattern taxonomy; (B) ships the 3 remaining
-  brief-219 C-40 picks (`func_0208df40`, `func_0208e1ac`,
-  `func_0208e200`) via brief 233's locked recipe. Target: 25-35
-  ships, hard-tier 7.42 % → 7.7-7.9 %. Branch:
-  `decomper/c39-drain-wave6-and-c40-cleanup`.
-- **Brief 235** — `scaffolder`. **C-39e (null+helper-at-top)
-  sub-classification pilot + brief 232 deferred picks +
-  broader-C-40 corpus pilot.** Three small investigations.
-  (A) Brief 232's new `movs r4, r1` null+helper-at-top sub-shape:
-  pilot 3 picks (cohort small but the codegen is unambiguous). If
-  ≥2 ship: classify as C-39e, extend detector. (B) Brief 232's 2
-  deferred picks: `func_ov002_02295284` (double-call disjunction)
-  and `func_ov002_0220673c` (cross-call compare with dead-store
-  artifact) — variant-matrix to see if either reaches. (C) Broader
-  C-40 corpus: brief 233 noted 459 broader `0x04001xxx`-pool
-  occurrences beyond the 4 strict C-40 picks. Pilot 5 picks
-  outside the strict signature — if the bit-extract recipe extends
-  to MMIO reads with different bodies, classify as C-40-broader
-  or C-42. Branch:
-  `scaffolder/c39e-pilot-c40-broader-and-232-deferred`.
+- **Brief 236** — `decomper`. **C-39 drain wave 7: C-39b-solo
+  continuation + C-39e cohort drain.** Two combined drains using
+  brief 232's E1-E5 sub-pattern taxonomy + brief 235's locked
+  C-39e recipe. (A) C-39b-solo: ~95 picks remain after brief 234;
+  same recipe as briefs 226/230/232/234. (B) C-39e: brief 235
+  scan flagged 6 candidates in ov002 (021e27c0, 02206608,
+  0220c010, 0228ab68, 0228aba0, 0228b894 — last one already
+  shipped by brief 235 as worked example) — drain the remaining
+  5+ using `if (arg1 == 0) return 0; if (helper1(...) == 0)
+  return 0; return helper2(self, arg1);` template. Target: 25-40
+  ships, hard-tier 7.8 % → 8.1-8.4 %. Verify gate: 3-region
+  `ninja sha1` PASS. Branch:
+  `decomper/c39-drain-wave7-and-c39e-cohort`.
+- **Brief 237** — `scaffolder`. **Hard-tier landscape survey +
+  C-39e cross-overlay detector extension + next-cluster pilots.**
+  Three deliverables. (A) Re-run brief 220's hard-tier pattern
+  scan against the current unmatched pool — what's the biggest
+  unclassified cluster after C-39 family is mostly drained?
+  Histogram the remaining ~7,700 hard-tier picks by shape feature
+  (bitfield, MMIO, struct-ptr deref, helper sequence, etc.).
+  (B) Extend `tools/predict_walls.py` C-39e detector to scan all
+  overlays + report cohort size — does the 10-20 estimate hold,
+  or is C-39e larger? (C) Pilot 3-5 picks in the largest
+  unclassified cluster from (A) using the variant-matrix
+  methodology (5 source forms × 8 mwcc tiers) — if any ship,
+  classify as new C-N; if all wall, document as P-N candidates.
+  Verify: scaffolder direct-mwcc only, no `ninja sha1` requirement.
+  Branch: `scaffolder/c39e-broader-and-next-cluster-survey`.
 
 ### Closed briefs (reference)
+
+- **Brief 235** — `scaffolder`, shipped in PR #701. 🎯 **C-39e
+  + C-41 NEW WALL both locked; 10 ships total.** Three small
+  pilots all landed. (A) C-39e `null+helper-at-top` sub-shape:
+  3/3 ship from natural recipe (`if (arg1 == 0) return 0; if
+  (helper1(...) == 0) return 0; return helper2(self, arg1);`)
+  under default mwcc 2.0/sp1p5 — mwcc peephole-fuses `mov r4, r1;
+  cmp r1, #0` → `movs r4, r1`. (B) Brief 232's 2 deferred picks
+  (`func_ov002_02295284` + `_0220673c`) BOTH recovered with
+  natural recipes — confirms brief 232's "bookkeeping noise from
+  per-pick effort cap, not recipe failure" hypothesis. (C) Broader
+  0x04001xxx pilot: 4 sibling picks (`func_0208cc18` / `_0208cc40`
+  / `_0208ce48` / `_0208ce70`) cluster into NEW WALL **C-41 MMIO
+  bit-clear + tail-call** — `MMIO &= ~MASK; return helper(data);`
+  ships under default mwcc. Remaining ~455 broader-0x04001xxx picks
+  are heterogeneous one-off shapes (no further bulk research
+  expected). Also shipped 3 brief-234-overlap C-40 picks as bonus
+  (resolved in rebase by keeping brief 234's bytes — identical).
+  C-39e detector + C-41 detector + 4 unit tests added. Research
+  note:
+  [`brief-235-c39e-c40-broader-and-232-deferred.md`](docs/research/brief-235-c39e-c40-broader-and-232-deferred.md).
+- **Brief 234** — `decomper`, shipped in PR #702. 🎯 **31 .c
+  ships in the C-39 wave 6 + C-40 mechanical cleanup. Hard-tier
+  ~7.42 % → ~7.79 %.** (A) Drained 28 C-39b-solo picks using brief
+  232's E1-E5 sub-pattern taxonomy, slightly under the 30-pick
+  target (per-pick recipe-discovery overhead per usual). (B)
+  Shipped brief 233's 3 remaining C-40 picks (`func_0208df40`,
+  `_0208e1ac`, `_0208e200`) byte-identically on first attempt via
+  the locked MMIO bit-extract recipe — confirms C-40 reaches
+  under default mwcc across multiple worked examples. Recipe
+  routing: 31 `.c`, 0 `.s` — first decomper brief of this round
+  with 100% C-source yield. ~95 C-39b-solo picks remain for brief
+  236 wave 7.
 
 - **Brief 233** — `scaffolder`, shipped in PR #698. 🎯 **C-40
   MMIO bit-extract recipe LOCKED — works under ALL mwccarm tiers

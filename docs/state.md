@@ -8,34 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-27, post-#698 + #699 merge. Brain on Mac.
-**Brief 232 (C-39 wave 5, decomper) and brief 233 (C-40 MMIO
-bit-extract locked, scaffolder) both shipped.**
+**Last updated:** 2026-05-27, post-#701 + #702 merge. Brain on Mac.
+**Brief 234 (C-39 wave 6 + C-40 cleanup, decomper) and brief 235
+(C-39e + C-41 NEW WALL + 232 deferred, scaffolder) both shipped.**
 
-🎯 **C-40 LOCKED — a new wall family.** Brief 233 found the MMIO
-bit-extract recipe reaches under ALL mwccarm tiers (no legacy
-needed). 4 brief-219-deferred picks now have a locked recipe; 1
-worked example shipped + 3 more queued for brief 234 mechanical
-cleanup. Insight: mwcc emits `asr` (not `lsr`) because masked
-`unsigned short` promotes to signed int per C integer-promotion
-rules — three jointly-required source elements (macro-wrap,
-single-expression nested shifts, `+ BASE` direct on shift result
-with `void *` return). Broader `0x04001xxx` corpus: 459 candidates
-await brief 235 pilot. **Path B (C-1+C-23 compound) documented
-as already-resolved via `.legacy.c` routing** — no new compound
-recipe needed; the 2,933 picks brief 220 flagged as "iterative
-core" are per-pick decomper work, not scaffolder research.
+🎯 **C-41 NEW WALL LOCKED — MMIO bit-clear + tail-call.** Brief
+235's broader-0x04001xxx pilot found 4 sibling picks
+(`func_0208cc18` / `_0208cc40` / `_0208ce48` / `_0208ce70`)
+sharing the same 7-instruction shape: read DISPCNT, `bic` one
+bit, write back, tail-call helper(data). All 4 ship from a
+single natural recipe — `MMIO &= ~MASK; return helper(data);` —
+under default mwcc 2.0/sp1p5. C-41 detector + 2 unit tests
+added. The remaining ~455 broader-0x04001xxx picks are
+heterogeneous one-off shapes; no further bulk-recipe scaffolder
+work expected there — per-pick decomper territory.
 
-Brief 232 shipped 35 ships in the C-39b-solo cohort (hard-tier
-7.21 % → 7.42 %, slightly under target). Surfaced 5 sub-patterns
-(E1-E5, E5 dominant with 30 of 35). Confirmed brief 230's
-branch-form lesson at scale (32 early-return + 3 if-then). **New
-sub-shape surfaced:** `movs r4, r1` (S=1) entry pattern emitted
-when C tests `arg1 == 0` immediately at function start — 2 known
-picks, unambiguous codegen, feeds brief 235's C-39e pilot.
+🎯 **C-39e LOCKED — null+helper-at-top sub-shape.** Brief 232's
+2 known picks (`0228b810`, `0228b850`) + 1 simpler variant
+(`0228b894`) all ship 3/3 from a natural recipe:
+`if (arg1 == 0) return 0; if (helper1(...) == 0) return 0;
+return helper2(self, arg1);` mwcc emits `movs r4, r1` as a
+peephole-fused mov+cmp when arg1 is both spilled to callee-saved
+AND tested for null at function top. Detector + 2 unit tests
+added. Brief 235 scan found 6 additional candidates in ov002 —
+cohort estimated 10-20 picks total, feeds brief 236 drain.
 
-**`matched_functions`: 2063 / 9801 (21.05 %)** — fourth round
-above 20 % milestone.
+**Brief 232's 2 deferred picks both recovered** in brief 235
+with natural recipes (`func_ov002_02295284` double-call
+disjunction + `func_ov002_0220673c` cross-call compare with
+dead-store) — confirms brief 232's "bookkeeping noise from
+per-pick effort cap, not recipe failure" framing.
+
+**Brief 234 shipped 31 .c files** (C-39 wave 6 + 3-pick C-40
+mechanical cleanup using brief 233's locked recipe). Brief 235
+also shipped the 3 C-40 picks as bonus during its broader-corpus
+pilot, which produced add/add rebase conflicts (resolved in
+favour of brief 234's already-merged bytes — both versions byte-
+identical, just attribution).
 
 Brief 224 (decomper) ran C-39 drain wave 1. **25 ships, hard-tier
 5.6 % → 6.0 %.** Routing: 24 `.s` + 1 `.c` upgrade
@@ -68,26 +77,36 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#698 + #699 merge, EUR):**
-`matched_functions 2063 / 9801 (21.05 %)`,
-`matched_code_percent 5.6840 %`, `fuzzy_match_percent 6.3823 %`,
-`complete_units 2026 / 3105 (65.25 %)`. 3-region SHA1 PASS
+**Current metrics (post-#701 + #702 merge, EUR):**
+`matched_functions 2063 / 9621 (21.44 %)` (denominator narrowed
+as new `.c` shipped),
+`matched_code_percent 5.8764 %`, `fuzzy_match_percent 6.6038 %`,
+`complete_units 2026 / 3103 (65.29 %)`. 3-region SHA1 PASS
 preserved.
 
-**Tier breakdown (post-#698/#699):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard ~7.42 %** (~620 /
-8,351 matched — was 7.2 % pre-merge).
+**Tier breakdown (post-#701/#702):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard ~7.8 %**
+(estimated +0.4 pp from brief 234's 31 .c + brief 235's 10 ships
+combined — was 7.42 % pre-merge).
 
-**Two open lanes after this merge.** **Brief 234 (decomper)** —
-C-39 drain wave 6 (continue C-39b-solo, 122 remaining) + C-40
-3-pick mechanical cleanup (`func_0208df40`, `_0208e1ac`,
-`_0208e200`). Target: 25-35 ships, hard-tier 7.42 % → 7.7-7.9 %.
-**Brief 235 (scaffolder)** — three small pilots: (A) C-39e
-sub-classification on brief 232's new `movs r4, r1` null+helper-
-at-top sub-shape (2 known picks), (B) brief 232's 2 deferred
-picks (double-call disjunction + cross-call dead-store), (C)
-broader-C-40 corpus pilot — 459 broader `0x04001xxx`-pool
-candidates beyond strict C-40. Both kickoffs sent.
+**Wall taxonomy after this merge.** Active C-class: C-1 through
+C-41 (41 named recipes). C-39 family: base + a + b + d + e
+(5 active sub-shapes) + c → P-13 (permanent). Permanent walls:
+P-1 through P-13 (13 entries). **No remaining strict-C-40 cleanup
+queued; broader-0x04001xxx corpus is heterogeneous, per-pick
+decomper work.**
+
+**Two open lanes after this merge.** **Brief 236 (decomper)** —
+C-39 drain wave 7: continue C-39b-solo (~95 remaining) + drain
+C-39e cohort using brief 235's locked recipe (6+ candidates
+already scanned in ov002, estimated 10-20 total). Target: 25-40
+ships, hard-tier 7.8 % → 8.1-8.4 %. **Brief 237 (scaffolder)** —
+hard-tier landscape survey: re-run brief 220's pattern-scan
+against the post-C-39-drain unmatched pool to identify the
+next-biggest cluster after C-39 is exhausted, plus 2 small
+pilots: (A) extend C-39e detector across all overlays, (B) two
+or three speculative recipe attempts on the next-largest
+candidate cluster. Both kickoffs sent.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
