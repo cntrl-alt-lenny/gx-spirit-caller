@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (41 patterns, 4 sub-classifications)
+## Coercible-with-knowledge (42 patterns, 4 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -5493,6 +5493,116 @@ C-41 as a coherent sibling family (4/4 ship), with the
 remaining broader picks being heterogeneous one-off shapes.
 Detector + 2 unit tests added. Full matrix at
 [`brief-235-c39e-c40-broader-and-232-deferred.md`](brief-235-c39e-c40-broader-and-232-deferred.md).
+
+### C-42. Multi-call thunk (no special idiom; natural recipe)
+
+**Not a wall in the traditional sense** — this is a coherent
+unclassified cluster that ships under natural C with no special
+idiom. Brief 237 surfaced it as the **dominant unclassified
+hard-tier cluster**: 861 picks out of 1725 unclassified (50%
+of unclassified, 11% of all hard-tier).
+
+**The shape.** Small (typically 32-64 B) thunk-like functions
+that call 1-3 helpers with literal arguments, struct-field
+loads, or pool-loaded function/data pointers. No bitfield
+extracts, no MMIO writes, no chained casts — just a sequence
+of helper calls with light data shuffling.
+
+Sub-shapes within C-42:
+
+1. **Conditional helper2 + literal args** — `if (helper1() == 0)
+   return r; return helper2(LIT1, LIT2);` (e.g.,
+   `func_ov002_021b0c34`).
+2. **Helper1 + field load + helper2 + field write** — `helper1(self);
+   helper2(self->field); self->field = 0;` (e.g.,
+   `func_ov000_021aaec4`).
+3. **Two helpers with pool-loaded args** — `helper1(GLOBAL1);
+   helper2(GLOBAL2);` where GLOBALs are external data symbols
+   pool-loaded as abs32 relocations (e.g.,
+   `func_ov010_021b2bf8`).
+4. **Helper1 + helper2 + return helper1's value** — `int n =
+   helper1(args); helper2(); return n;` — mwcc spills n to r4
+   (callee-saved) (e.g., `func_ov000_021aae34`).
+5. **Single helper + fn-pointer arg + bool-from-cmp tail** —
+   `return helper(x, &fn) > 0;` — pool-loads function pointer,
+   emits standard bool-from-comparison tail (e.g.,
+   `func_ov002_0220868c`).
+
+**The recipe.** Natural source code. Match the orig disasm's
+call sequence + arg setup. Use:
+
+- `extern int helper(...)` for each helper symbol
+- `extern char data_xxx[]` for pool-loaded data symbols
+  (relocation form)
+- `extern int func_xxx(...)` for pool-loaded function pointers
+- Literal integer constants for pool-loaded literal args (not
+  pointers)
+
+The pool-slot kind (data relocation vs literal constant) is
+determined by inspecting the `.word` directive in the orig
+disasm: relocations have `R_ARM_ABS32` annotations, literals
+don't.
+
+**Recipe-mismatch failure modes observed during pilot:**
+
+- v1 of pick `021b0c34` used `return 0;` after the early-exit
+  branch, which emitted `moveq r0, #0` (1 extra instruction).
+  Fix: use `return r;` where r is the named local holding
+  helper1's return value — mwcc treats r as already 0 and
+  emits just `popeq`. (See file comment in
+  `func_ov002_021b0c34.c`.)
+- v1 of pick `021b2bf8` used `extern int g_arg1` (pointer to
+  int, with implicit indirect load). Orig has the pool slot
+  itself as an address, not a pointer to an address. Fix: use
+  `extern char data_symbol[]` (array form) which references
+  the address directly.
+
+**Five shipped worked examples (brief 237 pilot, 5/5 ship):**
+
+- `src/overlay002/func_ov002_021b0c34.c` (32 B) — conditional
+  helper2 + literals (sub-shape 1).
+- `src/overlay000/func_ov000_021aaec4.c` (32 B) — struct field
+  read/write (sub-shape 2).
+- `src/overlay010/func_ov010_021b2bf8.c` (32 B) — two helpers
+  with pool-loaded data symbols (sub-shape 3).
+- `src/overlay000/func_ov000_021aae34.c` (32 B) — helper1
+  saved across void helper2 (sub-shape 4).
+- `src/overlay002/func_ov002_0220868c.c` (32 B) — single
+  helper + fn-pointer arg + bool tail (sub-shape 5).
+
+**Recognition cue.** `tools/predict_walls.py` flags C-42 (as a
+hint, NOT a wall warning) when:
+
+- Function size ≤ 64 B
+- ≥1 `bl` instruction (non-leaf)
+- No bit-extract pattern (`lsl/lsr #31`, no C-39 family fire)
+- No MMIO pool word (no C-40/C-41 family fire)
+- No predicated chain (no C-1 fire)
+
+The detector emits "natural recipe candidate — see brief 237"
+as the cue, signalling to decomper that this pick is
+drain-ready without special research.
+
+**Routes:** plain `.c` (mwcc 2.0/sp1p5). No legacy needed.
+
+**Use when:** classifier flags C-42 (as a hint). Read orig
+disasm; transcribe the call sequence as natural C. Pool slots
+are externs (data symbols, function pointers, or literals).
+Most picks ship on first attempt.
+
+**Cohort size.** ~861 picks in the unclassified slice match
+this shape. Estimated drain rate: high (most ship first-attempt
+under natural recipe), with the per-pick effort dominated by
+"identify the helper signatures from disasm" rather than recipe
+research.
+
+**Provenance:** brief 220 (PR #681) surveyed the hard-tier
+unclassified slice but classified it as "no known recipe."
+Brief 237 (this entry) drilled into the slice, found the
+dominant sub-cluster is recipe-shippable under natural source,
+shipped 5 worked examples (5/5 byte-identical first-attempt),
+added the C-42 detector hint. Full survey at
+[`brief-237-hard-tier-landscape-survey.md`](brief-237-hard-tier-landscape-survey.md).
 
 ## Permanent (13 patterns)
 
