@@ -5251,6 +5251,81 @@ the natural recipe ships byte-identical 3/3. Detector + 3
 unit tests added. Full matrix at
 [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](brief-229-c39c-d-pilots-and-c38-nonleaf.md).
 
+### C-40. MMIO bit-extract -> VRAM/base address
+
+**The wall.** Leaf functions that read a u16 from a `0x04001xxx`
+MMIO register, mask a bit-field, scale via `asr+lsl` shifts,
+then add a base address (typically `0x06200000` VRAM) and
+return. Brief 219 deferred 4 picks (`func_0208deec`,
+`_0208df40`, `_0208e1ac`, `_0208e200`) as `.s` because no C
+recipe was known.
+
+```asm
+ldr   r0, .L_pool                ; pool load
+ldrh  r0, [r0, #0]               ; u16 read
+and   r0, r0, #MASK              ; bit-field mask
+mov   r0, r0, asr #SHIFT1        ; normalise (signed shift)
+mov   r0, r0, lsl #SHIFT2        ; scale to page size
+add   r0, r0, #BASE              ; add result base
+bx    lr
+.word 0x0400100a OR 0x04001008   ; pool word — DS NDS9 register addr
+```
+
+**The fix.** Brief 233's variant matrix found the orig shape
+reaches under EVERY mwccarm tier from this idiom:
+
+```c
+#define REG (*(volatile unsigned short *)0xADDR)
+void *f(void) {
+    return (void *)((((REG & MASK) >> SHIFT1) << SHIFT2)
+                    + BASE);
+}
+```
+
+Three structural elements jointly required:
+
+  1. **Macro-wrap of the MMIO cast** (or equivalent inline
+     `*(volatile unsigned short *)0xADDR`) — keeps the cast
+     embedded in-expression. A named-temp form
+     (`volatile unsigned short *reg = ...; v = *reg;`) flips
+     mwcc's shift type from `asr` to `lsr`.
+  2. **Single-expression nested shifts**: `((REG & MASK) >>
+     SHIFT1) << SHIFT2`. Splitting via temps collapses the
+     two shifts to one combined shift of the fused offset.
+  3. **`+ BASE` direct on the shift result + cast to `void *`**
+     — preserves the `add r0, r0, #0x6200000` instruction.
+
+mwcc emits `asr` because the masked value treats the
+`unsigned short` MMIO read as a signed `int` after C's
+integer-promotion rules — `>> SHIFT1` on a signed int is
+implementation-defined-as-arithmetic on mwccarm.
+
+Routes through plain `.c` (mwcc 2.0/sp1p5 — no legacy needed).
+
+**Recognition cue.** `tools/predict_walls.py`'s `detect_walls`
+flags C-40 when ALL of:
+
+  - Pool word in 0x04001xxx range (NDS9 MMIO).
+  - 7-instruction body matching: `ldr [pc] + ldrh [r0,#0]
+    + and + mov asr + mov lsl + add imm + bx lr`.
+
+The cue text includes the extracted mask, asr amount, lsl
+amount, and pool addr for decomper visibility.
+
+**Use when:** the classifier flags C-40 — ship as plain `.c`
+with the macro recipe above. The mask, shift amounts, and
+pool address vary per pick; the recipe template is mechanical
+to adapt.
+
+**Provenance:** brief 219 (PR #682) shipped 4 picks as `.s`
+("MMIO field-extract — likely closable from C but needs its
+own recipe"). Brief 233 (this entry) ran the variant matrix
+across 9 source variants × 8 mwccarm tiers, found the orig
+shape reaches under all 8 tiers from the macro idiom, shipped
+`func_0208deec.c` as the worked example, added the C-40
+detector + 6 unit tests, classified the family. Full matrix
+at [`mmio-bit-extract.md`](mmio-bit-extract.md).
+
 ## Permanent (13 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source

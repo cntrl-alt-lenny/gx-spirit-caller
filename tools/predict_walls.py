@@ -141,6 +141,27 @@ predicate) need source-level context and aren't emitted here.
     instead of burning C iterations. See
     `docs/research/wall-2-leaf-no-pool-reg-alloc.md` for
     the variant matrix.
+  - **C-40** — MMIO bit-extract → VRAM/base address. Leaf
+    function reading a u16 from a `0x04001xxx` MMIO
+    register, masking a bit-field, scaling via `asr+lsl`
+    shifts, then adding a base (typically `0x06200000`
+    VRAM). Brief 219 deferred 4 picks as `.s`; brief 233's
+    variant matrix found the orig shape reaches under EVERY
+    mwccarm tier from this idiom:
+        #define REG (*(volatile unsigned short *)0xADDR)
+        void *f(void) {
+            return (void *)((((REG & MASK) >> S1) << S2)
+                            + BASE);
+        }
+    Three structural elements jointly required: macro-wrap
+    of the MMIO cast (forces direct expression-use, no
+    intermediate temp), single-expression nested shifts
+    (splitting via temp collapses both shifts to one), and
+    `+ BASE` direct on the shift result (cast to `void *`).
+    Routes through plain `.c` (mwcc 2.0/sp1p5 — no legacy
+    needed). Detector matches on the 7-instruction body
+    shape + `0x04001xxx` pool word. See
+    `docs/research/mmio-bit-extract.md` for the matrix.
 
 Walls NOT detected here (require source context):
 
@@ -1075,6 +1096,76 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 f"({n_ld_st} load/store, no pool, no call) — try "
                 "`.legacy.c` with substruct-ptr / char-cast / "
                 "re-deref recipe (brief 216 matrix)",
+            ))
+
+    # ----- C-40 MMIO bit-extract (brief 233).
+    #
+    # Brief 219 deferred 4 picks (func_0208deec, _0208df40, _0208e1ac,
+    # _0208e200) as `.s` — leaf functions reading a u16 from a
+    # `0x04001xxx` MMIO register, masking a bit-field, scaling via
+    # asr+lsl shifts, then adding a base address (typically
+    # `0x06200000` VRAM) and returning. Brief 233 found the orig
+    # shape reaches under EVERY mwccarm tier from this idiom:
+    #
+    #     #define REG (*(volatile unsigned short *)0xADDR)
+    #     void *f(void) {
+    #         return (void *)((((REG & MASK) >> SHIFT1) << SHIFT2)
+    #                         + BASE);
+    #     }
+    #
+    # Detection cue (matches the 7-instruction shape from
+    # disasm + pool word in `objdump -b binary` output):
+    #
+    #     ldr  r0, [pc, #N]      ; e59f00NN — pool load
+    #     ldrh r0, [r0, #0]      ; e1d000b0 — unsigned u16 read
+    #     and  r0, r0, #imm      ; e2000xxx — bit-field mask
+    #     mov  r0, r0, asr #N1   ; e1a00xxx — sign shift right
+    #     mov  r0, r0, lsl #N2   ; e1a00xxx — logical shift left
+    #     add  r0, r0, #BASE     ; e2800xxx — add to base
+    #     bx   lr                ; e12fff1e
+    #     .word 0x0400100x       ; MMIO addr (DS NDS9 region)
+    #
+    # The MMIO pool address (`0x0400xxxx` range — NDS9 hardware
+    # registers) is the most specific marker. Combined with the
+    # `ldrh + and + asr + lsl + add + bx lr` body it's
+    # unambiguous.
+    if (
+        len(hex_words) >= 7
+        and hex_words[-1] == "0400100a"  # most common pool addr
+        or len(hex_words) >= 7
+        and hex_words[-1] == "04001008"
+        or len(hex_words) >= 7
+        and len(hex_words[-1]) == 8
+        and hex_words[-1].startswith("04001")
+    ):
+        # Check the 7-instruction body shape (last word is pool,
+        # second-to-last is bx lr, before that is add-immediate).
+        # Walk backwards from the pool word.
+        try:
+            body = [int(w, 16) for w in hex_words[-8:-1]]
+        except (IndexError, ValueError):
+            body = []
+        if (
+            len(body) == 7
+            and (body[0] & 0xFFFF_F000) == 0xE59F_0000   # ldr r0, [pc, #N]
+            and body[1] == 0xE1D0_00B0                    # ldrh r0, [r0, #0]
+            and (body[2] & 0xFFFF_F000) == 0xE200_0000   # and r0, r0, #imm
+            and (body[3] & 0xFFFF_F060) == 0xE1A0_0040   # mov r0, r0, asr #N
+            and (body[4] & 0xFFFF_F060) == 0xE1A0_0000   # mov r0, r0, lsl #N
+            and (body[5] & 0xFFFF_F000) == 0xE280_0000   # add r0, r0, #imm
+            and body[6] == 0xE12F_FF1E                    # bx lr
+        ):
+            mask = body[2] & 0xFFF
+            # asr amount: bits 11-7 of mov instruction
+            asr_amt = (body[3] >> 7) & 0x1F
+            lsl_amt = (body[4] >> 7) & 0x1F
+            walls.append(WallPrediction(
+                "C-40",
+                f"MMIO bit-extract (mask=#{mask:#x}, asr #{asr_amt}, "
+                f"lsl #{lsl_amt}, pool=0x{hex_words[-1]}) — ship as "
+                "plain `.c` with `#define REG (*(volatile "
+                "unsigned short *)0xADDR)` macro + single-expression "
+                "nested shifts (brief 233 recipe)",
             ))
 
     return walls
