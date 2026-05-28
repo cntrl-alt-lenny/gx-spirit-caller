@@ -8,17 +8,62 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#715 + #716 merge. Brain on Mac.
-**Brief 242 (C-42 reg-alloc divergence — 4/4 locked, scaffolder)
-and brief 243 (C-42 opportunistic drain wave 3 — 22 ships,
-decomper) both shipped.**
+**Last updated:** 2026-05-28, post-#718 + #719 merge. Brain on Mac.
+**Brief 244 (C-42 reg-alloc patterns 6-10 — 5/5 locked,
+scaffolder) and brief 245 (C-42 opportunistic drain wave 4 — 33
+ships at 94% C-yield, decomper) both shipped.**
 
-**Current metrics (post-#715 + #716 merge, EUR):**
-`matched_functions 2212 / 9801 (22.57 %)` (+30 vs last round),
-`matched_code_percent 5.9662 %`, `complete_code_percent 6.6698 %`,
-`complete_units 2175 / 3330 (65.32 %)` (+30). 3-region SHA1 PASS
-preserved. **Hard-tier 8.88 %** (brief 243 reported delta from
-8.62 %).
+**Current metrics (post-#718 + #719 merge, EUR):**
+`matched_functions 2252 / 9801 (22.98 %)` (+40 vs last round),
+`matched_code_percent 6.0351 %`, `complete_code_percent 6.7388 %`,
+`complete_units 2215 / 3394 (65.26 %)` (+40). 3-region SHA1 PASS
+preserved. **Hard-tier 9.28 %** (brief 245 reported delta from
+8.88 %).
+
+🎯 **Brief 244 — 5/5 reg-alloc patterns LOCKED, no P-14
+again.** Brief 243's 5 new sub-patterns (6-10) all yielded to
+brief 242's methodology. Pattern 6 (pointer-double-store) → gotcha
+8 family (return helper_ret keeps r0 live). Pattern 7 (switch-on-
+ldrh) + Pattern 10 (indexed-ldr) → gotcha 7 direct (2-arg / 3-arg
+pass-through). Pattern 8 (stmia fusion miss) → gotcha 10
+(`.legacy_sp3.c` — was a tier misclassification, not reg-alloc).
+Pattern 9 (loop counter / index) → **NEW gotcha 11**
+(declaration order — declare loop var FIRST). 7 worked examples
+shipped. recipe-gotchas.md now 11 gotchas + 6-step diagnostic
+order. **The "reg-alloc divergence" framing is now a settled
+solved class — methodology + catalog converge fast on any new
+escape pattern in this family.**
+
+🎯 **Brief 245 — 33 .c at 94% C-yield, the highest yield of any
+C-42 wave so far.** Decomper drained 33 of 35 attempted (12 main
++ 21 ov002), shattering brief 243's empirical 70-75% expectation.
+The expanded recipe library (gotchas 1-11 + 4-step diagnostic) is
+now mature enough that high-yield mechanical drain dominates over
+escape-pattern discovery. Sub-shape coverage: tag6 bitfield
+single-helper (10), tag6 bitfield if-else 2-helper (7), pool +
+global check (3), pool-deref 2-fields + helper (3), sp3-routing
+ptr-null + helper (4), sp3-routing other (6). Only **2 escapes**
+filed for brief 246: `02087528` (objdiff fuzzy 66% despite
+matching bytes — relocation scoring issue), `02259f74` (`movhi`
+unsigned-compare variant of sub-shape 2 — gotcha 7 doesn't
+generalise to this variant).
+
+**C-42 cohort drain progress.** Total drained across waves 1-4:
+brief 238 (30) + brief 240 (8) + brief 241 deferred (8) + brief
+243 (22) + brief 245 (33) = **101 picks** of ~860 original C-42
+cohort. Remaining ~445 picks (more after brief 244 expanded
+detector coverage, but approximate scale stable). At 94 % yield
+this wave, cohort exhaustion expected around wave 7-8 if
+trajectory holds — possibly faster as the gotcha library matures.
+
+**Methodology pattern fully validated — "scaffolder unblocks,
+decomper surfaces."** Briefs 240→241→242→243→244→245 are 3
+complete iterations of this cadence. Average per iteration: +30
+ships, +1-3 new gotchas, +5 sub-shapes documented. Each
+scaffolder round has locked 100 % of the escape patterns
+surfaced by the prior decomper round (no P-14 needed in either
+242 or 244). **Confidence is high that this cadence will fully
+drain C-42 in 3-5 more iterations.**
 
 🎯 **Brief 242 — 4/4 reg-alloc sub-shapes LOCKED, no P-14.**
 Brief 240's halt-trigger was an incomplete diagnosis — all 4
@@ -68,20 +113,28 @@ iteration nets +20-30 ships and +1-4 new gotchas. Likely the
 dominant cadence for the next 5-10 rounds while the C-42 cluster
 drains.
 
-**Two open lanes after this merge.** **Brief 244 (scaffolder)** —
-investigate brief 243's 5 NEW reg-alloc sub-patterns (6-10).
-Apply gotchas 7/8/9/10 systematically + new variants (pointer
-typedefs, struct-field reorder, loop counter explicit-init, etc).
-If 2+ sub-patterns lock: ship 5-10 worked examples + extend
-gotchas doc to 11+. Unblocks the ~150 remaining safe-profile
-picks that brief 243 escaped on. **Brief 245 (decomper)** —
-opportunistic C-42 drain wave 4. Apply brief 242's full
-recipe-gotchas library (10 gotchas) + brief 243's expanded
-sub-shape library (17-20). Avoid brief 243's 5 new sub-patterns
-(6-10). Expect 70-75% C-yield per brief 243's empirical finding
-— halt on repeat escapes per the now-established methodology.
-Target 20-30 ships, hard-tier 8.88% → 9.1-9.3%. Both kickoffs
-sent.
+**Two open lanes after this merge.** **Brief 246 (scaffolder)** —
+investigate brief 245's 2 escapes. `02087528`: objdump bytes
+match orig but objdiff reports fuzzy 66 % — relocation scoring
+or addend issue (related to known objdiff #346 / our v3.7.1
+trial findings). `02259f74`: `movhi` unsigned-compare variant of
+sub-shape 2 — gotcha 7 doesn't generalise to this `movhi` form.
+Determine whether 02087528 is a tooling issue (note for future
+objdiff upgrade trial) or a missing recipe; if 02259f74 is a new
+sub-pattern, classify (gotcha 12+?) and extend the library.
+Likely small scope this round (only 2 escapes) — opportunity
+to also continue brief 241 (B) next-cluster scout work or
+audit the now-very-mature recipe-gotchas.md for refactor or
+inversion-of-control opportunities. **Brief 247 (decomper)** —
+C-42 opportunistic drain wave 5 with the full 11-gotcha library.
+Expected yield: 85-94 % range (brief 245's 94 % was the high
+watermark; sustain around 85-90 %). Target 25-40 ships,
+hard-tier 9.28 % → 9.6-9.9 %. Drain priority: continue ov002 +
+main strategic mix. Both kickoffs sent.
+
+---
+
+## Previous round — briefs 240 + 241 (post-#712 + #713)
 
 ---
 
