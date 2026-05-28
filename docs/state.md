@@ -8,10 +8,45 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-27, post-#704 + #705 merge. Brain on Mac.
-**Brief 236 (C-39 wave 7 + C-39e cohort, decomper) and brief 237
-(hard-tier landscape survey + C-42 NEW WALL, scaffolder) both
-shipped.**
+**Last updated:** 2026-05-28, post-#709 + #710 merge. Brain on Mac.
+**Brief 238 (C-42 first drain wave, decomper) and brief 239
+(C-39e generalises + C-42 audit + recipe gotchas + calcrom
+verdict, scaffolder) both shipped.**
+
+🎯 **C-42 drain underway — 30 ships first wave, taxonomy
+expanding.** Brief 238 cashed in brief 237's C-42 classification:
+30 .c shipped, hard-tier 8.16% → 8.52%. **Strategic drain hit:
+14 main + 16 ov002** per calcrom debt-reduction guidance.
+C-yield was 81% (not 95% target) — 7 escapes were struct-layout
+/ pool-deref edge cases (mwcc's `add r4, r0, #N; ldr [r4, #M]`
+split for large field offsets). **6 NEW C-42 sub-shapes
+surfaced** beyond brief 237's 5 (sub-shapes 6-11): chain
+`helper2(self, helper1_ret)`, 2-helper preserving (self, arg1),
+arg-insert thunk with literal, store + cond-skip + helper,
+save/clear/helper/restore, pool-deref + helper. C-42 family
+taxonomy now 11 sub-shapes documented.
+
+🎯 **Brief 239 quad-deliverable, mixed but all valuable.**
+(A) Brief 236's 2 deferred C-39e picks both LOCK under natural
+recipes — C-39e recipe generalises to complex bodies (NOT a new
+sub-shape). New gotcha surfaced: `&&` short-circuit merges
+duplicate-call paths. (B) C-42 detector audit: 97.3% TP rate
+(2.7% FP, below threshold). Tightened to exclude `sub sp, sp,
+#N>16` large-stack-frame buffer-pass thunks. 9-way sub-shape
+histogram added for decomper pre-tagging (A3 single-bl-plain
+189 picks dominant, B5 two-bl-plain 92, C three-or-more-bl 91).
+(C) Recipe-gotchas reference doc shipped at
+`docs/research/recipe-gotchas.md` — 6 patterns catalogued
+(return-r-vs-return-0, array-vs-scalar extern, ternary polarity,
+XOR operand ordering, if-then vs early-return for bmi, mask <
+0xff triggers C-1 predication) + pre-flight checklist.
+**(D) NEGATIVE RESULT — brain's calcrom interpretation corrected.**
+The "matched_functions > complete_units" delta is NOT a "missing
+complete markers" indicator — it's the natural state for
+multi-fn-per-TU TUs. All 9 "affected" overlays already have 100%
+complete delinks. Mf − cu delta = avg fns-per-TU × num multi-fn
+TUs. **Brain methodology lesson:** do not treat the mf > cu
+delta as actionable bookkeeping; it's a counting artifact.
 
 🎯 **C-42 NEW WALL CLASSIFIED — multi-call thunk hint.** Brief 237
 piloted 5 picks from the dominant unclassified hard-tier cluster
@@ -104,58 +139,52 @@ candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
 [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
-**Current metrics (post-#704 + #705 merge, EUR):**
-`matched_functions 2134 / 9801 (21.77 %)` — **+71 functions** vs
-last round, biggest single-round jump in many waves,
-`matched_code_percent 5.8355 %`, `complete_code_percent 6.5391 %`,
-`complete_units 2097 / 3214 (65.25 %)` — **+71 units**. 3-region
+**Current metrics (post-#709 + #710 merge, EUR):**
+`matched_functions 2166 / 9801 (22.10 %)` — **+32 functions**
+(30 brief 238 + 2 brief 239 — exact reconcile),
+`matched_code_percent 5.8882 %`, `complete_code_percent 6.5918 %`,
+`complete_units 2129 / 3263 (65.25 %)` — **+32 units**. 3-region
 SHA1 PASS preserved.
 
-**Tier breakdown (post-#704/#705):** trivial 100 %, easy 100 %,
-sinit 100 %, named 100 %, medium 100 %, **hard 8.16 %** (brief
-236's reported delta).
+**Tier breakdown (post-#709/#710):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 8.52 %** (brief
+238's reported delta; +0.36 pp).
 
 **Wall taxonomy after this merge.** Active C-class: C-1 through
-**C-42 (42 named recipes)** — C-42 is the multi-call thunk hint
-(not a wall but a shape-recognizer for ~600-800 mechanical-drain
-picks). C-39 family unchanged: base + a + b + d + e (5 active) +
-c → P-13. Permanent walls: P-1 through P-13.
+C-42 (42 named recipes). **C-42 family expanded to 11 sub-shapes**
+(brief 237's 5 + brief 238's 6 new). C-39 family unchanged:
+base + a + b + d + e (5 active) + c → P-13. Permanent walls:
+P-1 through P-13. **Detector tightened in brief 239:** C-42 now
+excludes `sub sp, sp, #N>16` (97.3 % TP rate, 2.7 % FP).
 
-**Two open lanes after this merge.** **Brief 238 (decomper)** —
-C-42 first mechanical drain wave. Apply natural recipes to ~30-50
-picks from the 861-pick C-42 cluster (brief 237 surfaced sample
-shapes: conditional helper2 + literals, struct field rw, two
-helpers with pool-loaded data, helper1 saved across void helper2,
-single helper + fnptr arg + bool). Target: 30-50 ships, hard-tier
-8.16 % → 8.5-8.8 %. **Brief 239 (scaffolder)** — (A) brief 236's
-2 deferred C-39e picks (`021e27c0`, `02206608` — C-39e prologue
-but divergent body) sub-classification; (B) brief 237's 2
-deferred recipe gotchas codified (`return r` vs `return 0`, array
-extern vs scalar extern); (C) audit brief 237's C-42 detector
-against the 861-pick cluster — false-positive rate? cohort
-sub-clusters worth pre-tagging? Both kickoffs to be sent.
+**Two open lanes after this merge.** **Brief 240 (decomper)** —
+C-42 second drain wave with the audit-refined detector + brief
+239's 9-way sub-shape histogram. Target: 40-60 ships, hard-tier
+8.52 % → 9.0-9.4 %. **Brief 241 (scaffolder)** — (A) investigate
+brief 238's 7 deferred picks (struct-layout / pool-deref edge
+cases — `add rN, r0, #N; ldr [rN, #M]` split pattern for large
+field offsets); (B) survey what comes after C-42 drain in the
+unclassified hard-tier residue (1725 picks − ~554 C-42 unmatched
+left after wave 2 ≈ 1170 residue picks for next-cluster scout);
+(C) reconcile calcrom.py interpretation in tooling docs +
+README — the mf > cu finding from brief 239 (D) updates the
+metric canon understanding.
 
-**Brain-PR investigations this round:** (1) Spawned 3 research
-agents — surveyed DS decomp ecosystem, objdiff/dsd upstream, and
-permuter/mwccarm tooling. Top findings: objdiff v2.7.1 → v3.7.1
-upgrade has ARM-relevant fixes (R_ARM_THM_PC8/PC11 reloc support
-helps C-31; v3.6.0 #316 may recover matched_functions metric
-under-count); calcrom.py from pret/pokeplatinum provides
-per-overlay code/data/pointer breakdown that directly addresses
-our reloc-record divergence visibility; Macabeus's
-Mizuchi+Kappa Claude-driven matching pipeline (74 % match rate on
-ARMv4T/IDO) is closest external analog to our methodology and
-could be a 10x force multiplier. (2) Spawned 2 follow-up agents:
-sandboxed objdiff v3.7.1 upgrade trial (worktree, no merge) and
-calcrom.py port (modifies tools/). Both in flight at PR-close
-time; results feed brief 240+ kickoffs.
+**Brain-PR investigations last round:** 3 ecosystem-survey
+research agents + 2 follow-up agents (calcrom.py port shipped in
+PR #707; objdiff v3.7.1 upgrade trial captured as defer-verdict
+research note in PR #708). Research adoption arc closed — next
+candidate from the punch list is Mizuchi mwccarm fork (Tier A #5,
+2-3 days dedicated brief) when prioritised.
 
-**Brain methodology update (this round):** "verify and apply
-ecosystem findings as part of the round-close, not as a separate
-arc." The 3-agent research scrape produced concrete actionables
-(objdiff upgrade, calcrom.py, dsd categories, Mizuchi pilot) that
-fit naturally into the regular round cadence — no separate
-"research debt" arc needed.
+**Brain methodology update (this round):** "metric interpretation
+must be empirically validated before issuing as a directive."
+Brain's brief 239 (D) directive — "flip delinks.txt markers in
+overlays where mf > cu" — was based on misinterpreting calcrom
+output. Scaffolder's audit found the gap is a natural artifact
+of multi-fn-per-TU counting, not a missing-marker indicator. No
+ships needed for (D). Brain should treat new metrics as
+hypotheses needing validation runs, not as commands.
 
 **Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
 project pursues TWO goals in parallel, not either-or:
