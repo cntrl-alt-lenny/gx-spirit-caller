@@ -179,3 +179,11 @@ src/overlay016/func_ov016_021b2d4c.s:
 src/overlay016/func_ov016_021b8774.s:
     complete
     .text start:0x021b8774 end:0x021b894c
+
+src/overlay016/func_ov016_021b3560.c:
+    complete
+    .text start:0x021b3560 end:0x021b3594
+
+src/overlay016/func_ov016_021b5154.c:
+    complete
+    .text start:0x021b5154 end:0x021b5188

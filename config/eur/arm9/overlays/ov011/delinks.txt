@@ -690,3 +690,11 @@ src/overlay011/func_ov011_021cd6e0.s:
 src/overlay011/func_ov011_021d2ca8.s:
     complete
     .text start:0x021d2ca8 end:0x021d2d04
+
+src/overlay011/func_ov011_021c9d60.c:
+    complete
+    .text start:0x021c9d60 end:0x021c9d80
+
+src/overlay011/func_ov011_021c9d80.c:
+    complete
+    .text start:0x021c9d80 end:0x021c9da0

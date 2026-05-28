@@ -9879,3 +9879,11 @@ src/main/func_02089bd4.legacy_sp3.c:
 src/main/func_02089c0c.legacy_sp3.c:
     complete
     .text start:0x02089c0c end:0x02089c44
+
+src/main/func_0205ae4c.c:
+    complete
+    .text start:0x0205ae4c end:0x0205ae8c
+
+src/main/func_0205ae8c.c:
+    complete
+    .text start:0x0205ae8c end:0x0205aecc
