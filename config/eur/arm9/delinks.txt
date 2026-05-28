@@ -9864,3 +9864,10 @@ src/main/func_02005210.legacy_sp3.c:
     complete
     .text start:0x02005210 end:0x02005240
 
+src/main/func_020305d8.c:
+    complete
+    .text start:0x020305d8 end:0x02030608
+
+src/main/func_020a6b30.c:
+    complete
+    .text start:0x020a6b30 end:0x020a6b54
