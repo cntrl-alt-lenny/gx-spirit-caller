@@ -162,6 +162,15 @@ predicate) need source-level context and aren't emitted here.
     needed). Detector matches on the 7-instruction body
     shape + `0x04001xxx` pool word. See
     `docs/research/mmio-bit-extract.md` for the matrix.
+  - **C-43** — packed stack-local struct builder. Small
+    sp3-style wrapper that writes a few halfword fields into a
+    stack-local struct, materialises its address
+    (`add rD, sp, #0`), and passes &local to a helper. Ships
+    under plain `.c` via the gotcha-13 recipe: type the
+    stack-passed value args `int` (so mwcc emits `ldr`, not
+    `ldrh`) and narrow to u16 on the `strh` store; use explicit
+    u16 pad fields for the gaps. Detector fires before the
+    generic C-42 hint. Brief 250 (Family 5, 4 picks).
 
 Walls NOT detected here (require source context):
 
@@ -1274,6 +1283,62 @@ def detect_walls(asm: str) -> list[WallPrediction]:
                 "macro + `*MMIO &= ~MASK; return helper(data);` "
                 "(brief 235 recipe)",
             ))
+
+    # ----- C-43 packed stack-local struct builder (brief 250).
+    #
+    # Brief 249's Family 5 escape (sig 4459b2cf, 4 picks across
+    # ov016/17/19): a small sp3-style wrapper that builds a packed
+    # struct in a stack-local, writes a few halfword fields into
+    # it, materialises its address (`add rD, sp, #0`), and passes
+    # &local as a helper pointer arg.
+    #
+    # Brief 250 classified this as a COERCIBLE C-wall: the
+    # `add rD, sp, #0` materialisation reproduces under natural C;
+    # brief 249's 69% miss was an arg-WIDTH typing trap, not the
+    # materialisation. The recipe (gotcha 13): declare the
+    # stack-passed value args `int` (word) so mwcc loads them with
+    # `ldr` (matching orig), let the narrowing to u16 happen on
+    # the `strh` store, and use explicit u16 pad fields for the
+    # struct gaps. See docs/research/brief-250-*.md.
+    #
+    # Signature (distinct from the generic C-42 hint, which would
+    # otherwise fire because `sub sp, #12` <= the 16-byte filter):
+    #   - `add rD, sp, #0` (e28d_d000 with imm == 0, Rd != sp)
+    #   - >= 1 `strh rN, [sp, #imm]` (e1cd_xxBx) — halfword field
+    #     writes into the local
+    #   - >= 1 `bl` (passes &local to a helper)
+    # Emitted before the C-42 block so the more specific recipe
+    # wins over the generic "natural recipe" hint.
+    word_vals = [int(hw, 16) for hw in hex_words]
+    # `add rD, sp, #0` = e28d_d000 with imm12 == 0; Rn fixed to sp
+    # (0xD at bits 19-16), Rd (bits 15-12) free but != sp.
+    has_add_sp0 = any(
+        (v & 0xFFFF_0FFF) == 0xE28D_0000
+        and ((v >> 12) & 0xF) != 0xD
+        for v in word_vals
+    )
+    # `strh rT, [sp, #imm]` = e1cd_xxBx; Rn fixed to sp, the 0xB
+    # nibble (bits 7-4) is the halfword-store sub-opcode.
+    n_strh_sp = sum(
+        1 for v in word_vals if (v & 0xFFFF_00F0) == 0xE1CD_00B0
+    )
+    has_bl_c43 = any(
+        (v & 0x0F00_0000) == 0x0B00_0000 for v in word_vals
+    )
+    if not walls and has_add_sp0 and n_strh_sp >= 1 and has_bl_c43:
+        walls.append(WallPrediction(
+            "C-43",
+            f"Packed stack-local struct builder ({n_strh_sp} strh "
+            "field writes + `add rD, sp, #0` + helper call) — "
+            "ships under natural C via the gotcha-13 recipe. KEY: "
+            "type stack-passed value args `int` (-> `ldr`), NOT "
+            "their narrow u16 field type (-> `ldrh`); the narrowing "
+            "happens on the `strh` store. Use explicit u16 pad "
+            "fields for the struct gaps and pass &local as the "
+            "helper arg. Brief 250 (Family 5, 4 picks). See "
+            "`docs/research/brief-250-c42-escape-classify-"
+            "family5-n3-family7.md`.",
+        ))
 
     # ----- C-42 multi-call thunk hint (brief 237).
     #

@@ -83,6 +83,8 @@ Detailed write-ups follow below.
 | Predicated tail collapse for sign-check | 5 | `if-then` not early-return |
 | C-1 predication (orig has bitfield, mine has `tst`) | 6 | use bitfield-extract not `& MASK` |
 | Pool-arg loaded with extra `ldr` deref | 2 | `extern char data[]` not `extern int data` |
+| Stack-arg loads `ldrh`, orig has `ldr` (stack-local struct builder) | 13 | type stack value args `int`, narrow on the `strh` store |
+| Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
 file) also serve as a fallback when the table doesn't match.
@@ -882,6 +884,71 @@ extra args.
 
 ---
 
+## Gotcha 13 — int-typed stack args for the stack-local struct builder
+
+**Symptom**: a wrapper that builds a packed struct on the stack
+from its arguments and passes `&local` to a helper matches the orig
+*except* the stack-passed value args load with `ldrh` (halfword)
+where the orig has `ldr` (word). The `add rN, sp, #0` that
+materializes `&local`, and the `strh` field writes, are already
+correct — only the incoming-arg load widths diverge.
+
+**Pattern**: mwcc loads an incoming argument with the width of its
+*declared type*. The orig declares the value args wider than the
+struct field (typically `int`/word) and lets the narrowing to `u16`
+happen on the `strh` store. Declaring the args as the narrow field
+type (`u16`/`unsigned short`) makes mwcc emit `ldrh` instead.
+
+### Wrong (yields `ldrh` on the stack args)
+
+```c
+typedef unsigned short u16;
+struct P { u16 f0; u16 f2; u16 gap4; u16 f6; u16 f8; u16 gap10; };
+extern void helper(int a0, int a1, int a2, void *p);
+
+void f(int a0, int a1, int a2, u16 a3, u16 A, u16 B, u16 C) {
+    struct P local;
+    local.f0 = a3; local.f2 = A; local.f6 = B; local.f8 = C;
+    helper(a0, a1, a2, &local);
+}
+```
+
+mwcc loads the stack args A/B/C with `ldrh [sp, #N]` — a 3-of-13
+instruction delta vs orig's `ldr` (≈69% fuzzy).
+
+### Right (matches orig — stack value args `int`)
+
+```c
+void f(int a0, int a1, int a2, u16 a3, int A, int B, int C) {
+    struct P local;
+    local.f0 = a3;            /* r3 reg arg -> strh */
+    local.f2 = A;             /* int stack arg -> ldr, narrowed on strh */
+    local.f6 = B;
+    local.f8 = C;
+    helper(a0, a1, a2, &local);
+}
+```
+
+mwcc loads A/B/C with `ldr` (word), narrows to `u16` on the `strh`
+store, and emits `add r3, sp, #0` mid-write — byte-identical to orig.
+
+### Why
+
+The arg's declared width drives the load instruction (`ldr` vs
+`ldrh`), independent of how it's later stored. The struct gaps must
+be explicit `u16` pad fields so the writes land at the orig's
+offsets (0/2/6/8 with gaps at 4/10). The `&local` materialization is
+*not* the issue — it reproduces under any of these forms.
+
+### Where surfaced
+
+Brief 249 deferred Family 5 (`func_ov016_021b3560` + 3 ov016/17/19
+siblings) at 69% fuzzy with `u16` args; brief 250 found the
+arg-width coercion and classified it as **C-43** (codegen-walls).
+One recipe drains all 4 family members.
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
@@ -951,6 +1018,9 @@ Before writing the C source for a new pick:
     in 2-arg ptr-copy thunks (gotcha 9).
 12. **`stmfd; sub sp, #4` prologue → use `*.legacy_sp3.c`**
     routing (gotcha 10). Not a reg-alloc issue.
+13. **Stack-local struct builder with `ldrh`/`ldr` arg-load
+    mismatch** — type the stack-passed value args `int` (word),
+    narrow to the field type on the `strh` store (gotcha 13).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.

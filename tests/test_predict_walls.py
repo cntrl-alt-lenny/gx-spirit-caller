@@ -1829,6 +1829,73 @@ class TestC42Detection(unittest.TestCase):
         self.assertNotIn("C-42", ids)
 
 
+class TestC43Detection(unittest.TestCase):
+    """C-43 packed stack-local struct builder (brief 250, Family 5).
+
+    Small sp3-style wrapper that writes halfword fields into a
+    stack-local, materialises its address (`add rD, sp, #0`), and
+    passes &local to a helper. Coercible via the gotcha-13 recipe
+    (type stack-passed value args `int` -> `ldr`, not `ldrh`).
+    """
+
+    def test_family5_shape_fires_c43_not_c42(self):
+        """The func_ov016_021b3560 pilot encodings: the C-43
+        recipe wins over the generic C-42 hint."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4018", "push\t{r3, r4, lr}"),
+            _objdump_line(0x4, "e24dd00c", "sub\tsp, sp, #12"),
+            _objdump_line(0x8, "e59d4018", "ldr\tr4, [sp, #24]"),
+            _objdump_line(0xc, "e59de01c", "ldr\tlr, [sp, #28]"),
+            _objdump_line(0x10, "e59dc020", "ldr\tip, [sp, #32]"),
+            _objdump_line(0x14, "e1cd30b0", "strh\tr3, [sp]"),
+            _objdump_line(0x18, "e28d3000", "add\tr3, sp, #0"),
+            _objdump_line(0x1c, "e1cd40b2", "strh\tr4, [sp, #2]"),
+            _objdump_line(0x20, "e1cde0b6", "strh\tlr, [sp, #6]"),
+            _objdump_line(0x24, "e1cdc0b8", "strh\tip, [sp, #8]"),
+            _objdump_line(0x28, "ebfffffe", "bl\t0x52c"),
+            _objdump_line(0x2c, "e28dd00c", "add\tsp, sp, #12"),
+            _objdump_line(0x30, "e8bd8018", "pop\t{r3, r4, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertIn("C-43", ids, msg=f"walls={walls}")
+        self.assertNotIn("C-42", ids)
+        c43 = next(w for w in walls if w.wall_id == "C-43")
+        # Cue must steer toward the int-arg-width recipe.
+        self.assertIn("int", c43.cue)
+        self.assertIn("strh", c43.cue)
+
+    def test_generic_thunk_does_not_fire_c43(self):
+        """A plain multi-call thunk (no `add rD, sp, #0`, no
+        strh-to-stack) stays C-42, never C-43."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x8, "e3500000", "cmp\tr0, #0"),
+            _objdump_line(0xc, "08bd8008", "popeq\t{r3, pc}"),
+            _objdump_line(0x10, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x14, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        ids = {w.wall_id for w in walls}
+        self.assertNotIn("C-43", ids)
+        self.assertIn("C-42", ids)
+
+    def test_add_sp0_without_strh_does_not_fire_c43(self):
+        """`add rD, sp, #0` alone (no halfword field writes) is
+        not the C-43 builder shape."""
+        asm = _wrap_asm(
+            _objdump_line(0x0, "e92d4008", "push\t{r3, lr}"),
+            _objdump_line(0x4, "e24dd008", "sub\tsp, sp, #8"),
+            _objdump_line(0x8, "e28d0000", "add\tr0, sp, #0"),
+            _objdump_line(0xc, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x10, "e28dd008", "add\tsp, sp, #8"),
+            _objdump_line(0x14, "e8bd8008", "pop\t{r3, pc}"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("C-43", {w.wall_id for w in walls})
+
+
 class TestC38Detection(unittest.TestCase):
     """C-38: leaf-no-pool reg-alloc + CSE divergence.
 
