@@ -8,16 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#721 + #722 merge. Brain on Mac.
-**Brief 246 (C-42 wave 4 escapes — both unlocked via gotcha 7,
-scaffolder) and brief 247 (C-42 opportunistic drain wave 5 — 19
-ships at 73% C-yield, decomper) both shipped.**
+**Last updated:** 2026-05-28, post-#724 + #725 merge. Brain on Mac.
+**Brief 248 (C-42 wave 5 escapes — 3/4 locked + N3 falsified,
+scaffolder) and brief 249 (C-42 drain wave 6 — 27 ships at 93 %
+C-yield via sibling-family hunt, decomper) both shipped.** main
+Lint restored to green (brief-246 fence + brief-248 atx fixes —
+main had been red on Lint since #721).
 
-**Current metrics (post-#721 + #722 merge, EUR):**
-`matched_functions 2273 / 9801 (23.19 %)` (+21 vs last round),
-`matched_code_percent 6.0759 %`, `complete_code_percent 6.7795 %`,
-`complete_units 2236 / 3422 (65.34 %)` (+21). 3-region SHA1 PASS
-preserved.
+**Current metrics (post-#724 + #725 merge, EUR — reconfigured +
+`ninja sha1` + `ninja report` on d2607c3):**
+`complete_units 2266 / 3475 (65.21 %)` (+30 vs prior 2236) —
+SHA1-aligned headline. `complete_code_percent 6.8386 %`,
+`matched_code_percent 6.0986 %`. `matched_functions 2282 / 9801
+(23.28 %)` (+9; under-counts `.s` / reloc-divergent ships per
+metric canon). 3-region SHA1 PASS preserved across EUR + USA + JPN.
+
+🎯 **Brief 249 — sibling-family hunt validated the homogeneity
+hypothesis.** 27 .c at 93 % C-yield vs wave 5's 73 % random-pick:
++20 pp from selection discipline alone. 6 of 6 shipping families
+hit 100 % within-family yield (no partials). Cohort 154 / ~860
+drained; ~330 distinct signatures remain — long-tail singletons,
+yields projected to diminish past wave ~8. 2 escapes → brief 250.
+
+⚠️ **Brief 248 — 3/4 escapes locked, N3 falsified.** N1 → gotcha
+12; N2 → switch/case; N4 → gotcha 7 (3-arg). N3 (nested struct
+ptr-alias) falsified — mwcc combine-struct-offsets sticky, no
+source idiom forces it; deferred to brief 250 (paired with the
+similar Family-5 stack-local case). Symptom→gotcha table +
+homogeneity strategy landed in recipe-gotchas.md (now 12 gotchas).
+
+🧭 **Next round queued (250 + 251).** Scaffolder 250: classify
+brief 249's Family 5 + N3 jointly (struct-base address
+materialization — coercible C-wall or new P-wall?) + confirm
+Family 7 is the existing P-1 (NOT a new peephole — see
+codegen-walls § P-1) + refresh codegen-walls § C-42. Decomper
+251: productionize `tools/c42_family_hunter.py` from the brief-249
+prototype + C-42 drain wave 7 (avoid Family 5/7) + report the
+family-size histogram so the brain can time the pivot off C-42.
+**C-42 is ~2-3 high-yield waves from exhaustion** — start lining
+up the next cluster/track (permuter wave, `.s`→`.c` upgrade pass,
+or the Track-2 hard-bucket pilot).
 
 🎯 **Brief 246 — both brief 245 escapes resolved via existing
 gotcha 7.** No new gotcha needed. Key methodology lesson surfaced:

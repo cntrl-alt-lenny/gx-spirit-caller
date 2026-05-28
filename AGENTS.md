@@ -364,72 +364,88 @@ itself:
 
 ### Open briefs
 
-- **Brief 248** — `scaffolder`. **Brief 247's 4 NEW escape
-  patterns + symptom→gotcha lookup decision + homogeneity
-  lesson write-up.** Three deliverables. (A) Investigate brief
-  247's 4 NEW escape patterns N1-N4. Apply the proven catalog +
-  variant-matrix methodology (4th iteration). **N1**: sub-shape
-  2 with trailing void helper — gotcha 8 (return matches LIT)
-  doesn't apply when there's a `bl` after the field write.
-  Variant: split into two sequential statements? Use volatile
-  to suppress fusion? **N2**: predication collapse — `if (X)
-  return 0` collapses to `moveq + popeq` even with braces,
-  overriding gotcha 5 (if-then vs early-return polarity). Test
-  whether brace style or assignment vs return matters when the
-  predicate is a function-call result rather than a variable.
-  **N3**: nested struct ptr-alias — mwcc inlines `&self->inner`
-  to single offset; orig pre-computes the alias in a callee-
-  saved reg. Variant: explicit local pointer aliasing the
-  inner struct? Different access pattern (member-by-member vs
-  block)? **N4**: 2-helper if-else r3 vs r1 reg-alloc — orig
-  picks r3 for pool temp; ours picks r1 with no obvious
-  source-side lever. Try gotcha 7 with varied arg counts,
-  gotcha 11 (declaration order), and the "dummy 3rd arg
-  forces r3-routing" hypothesis. Read brief 247's research
-  note at
-  `docs/research/brief-247-c42-opportunistic-drain-wave5.md`
-  for diff samples. **Success criterion:** 2+ of 4 patterns
-  lock → ship 2-5 worked examples + extend gotchas doc to
-  12+. (B) Decide on brief 246's proposed symptom→gotcha
-  lookup table addition to recipe-gotchas.md. If it serves
-  brief 249+ decomper better than the current narrative,
-  land it. If not, document why and close out the proposal.
-  (C) Write up brief 247's "sub-shape homogeneity drives
-  yield" lesson as a recipe-gotchas.md or codegen-walls.md
-  addition. Empirical pattern: wave 4 with 25 same-recipe
-  siblings → 94% yield; wave 5 with shape-diverse picks →
-  73%. Strategic implication: hunt sibling families. This
-  belongs as a documented planning heuristic for future
-  decomper briefs. Verify: scaffolder direct-mwcc only, no
-  SHA1 requirement. Branch:
-  `scaffolder/c42-wave5-escapes-and-sub-shape-homogeneity`.
-- **Brief 249** — `decomper`. **C-42 drain wave 6, sibling-
-  family-first strategy.** Apply brief 247's empirical
-  lesson: yield correlates with sub-shape homogeneity, not
-  library maturity. **New strategy: hunt sibling families
-  and exhaust each before moving on, rather than picking
-  randomly from the cohort.** Enumerate cohort sizes per
-  sub-shape family using brief 239's histogram + brief
-  244's tightened C-42 detector. Sub-shape families to
-  prioritise (per brief 245's 94 % wave): tag6 bitfield
-  single-helper, tag6 bitfield if-else 2-helper, pool +
-  global check, pool-deref 2-fields + helper, sp3-routing
-  thunks (`.legacy_sp3.c`). For each family, drain the
-  largest cohort first. **Avoid brief 247's 4 escape patterns
-  N1-N4** until brief 248 lands their classifications.
-  Recipe-gotchas mandatory pre-flight: `docs/research/recipe-gotchas.md`
-  (11 gotchas + 6-step diagnostic order). **Drain priority:**
-  ov002 + main strategic mix per calcrom debt-reduction.
-  Target 25-40 ships, hard-tier toward 9.6-10.0 %. **Expected
-  C-yield: 85-94 %** — same as brief 245's high watermark,
-  achieved via sibling-hunting strategy. Hard cap on per-
-  pick effort: 10 minutes. Halt on repeat escapes per
-  established methodology. Verify gate: 3-region
-  `ninja sha1` PASS. Branch:
-  `decomper/c42-drain-wave6-sibling-hunt`.
+- **Brief 250** — `scaffolder`. **Classify brief 249's 2
+  deferred escape families + revisit N3.** Two investigations +
+  one doc update. (A) **Family 5 + N3 — joint struct-base
+  address-materialization investigation.** Both share one
+  symptom class: orig materializes an intermediate struct-base
+  address that mwcc instead folds into each access's offset.
+  *Family 5* (`func_ov016_021b3560` + 3 ov016/17/19 siblings,
+  pilot 69 % fuzzy): packed **stack-local** struct, orig emits
+  `add r3, sp, #0` mid-write; brief 249 tried explicit gap
+  fields (pad at offsets 4 + 10) and mwcc didn't reproduce it.
+  *N3* (brief 248 pick, falsified there): **heap** struct
+  ptr-alias, orig pre-computes `add r4, r0, #0x1fc` in a
+  callee-save reg; brief 248 found mwcc's combine-struct-offsets
+  pass sticky. Hypothesis: one underlying mwcc behavior. Run the
+  variant matrix on BOTH (union / `__attribute__((packed))`
+  local, explicit local pointer alias, char-cast arithmetic,
+  helper-takes-inner-struct, member-by-member vs block access,
+  `volatile`). If any idiom forces materialization → new C-wall
+  + recipe + classifier + tests. If none → new P-wall; document
+  the falsification with the empirical-test discipline (state
+  the falsifiable prediction, run the cheapest test, report).
+  (B) **Family 7 = confirm existing P-1, do NOT research as
+  new.** brief 249's Family 7 (`func_0201b690` + 2 siblings,
+  pilot 85 % fuzzy: `(unsigned char)x` → mwcc `and r0, #0xff`
+  vs orig `lsl #24; lsr #24`) is the textbook P-1 zero-extend
+  mask-collapse. **Read `docs/research/codegen-walls.md` § P-1
+  first (~lines 1238-1262): P-1 is shape-collapse, NOT a
+  peephole — `(x << K) >> K` C source still collapses to `and`
+  on every SP. The brief-249 framing ("find the shift form that
+  defeats the peephole") is exactly the misconception that note
+  warns against; no such form exists.** Only lead worth a test:
+  keep the value `unsigned char`-typed end-to-end so no explicit
+  cast is emitted (codegen-walls ~line 1749). If that doesn't
+  reproduce `lsl; lsr`, classify the 3 picks P-1-blocked and add
+  them to the P-1 census. (C) Update `docs/research/codegen-walls.md`
+  § C-42 with waves 5-6 outcomes + the Family-5/N3 verdict +
+  Family-7→P-1 mapping so the taxonomy reflects reality. Verify:
+  scaffolder direct-mwcc only, no SHA1 requirement. Branch:
+  `scaffolder/c42-escapes-family5-n3-and-family7-p1`.
+- **Brief 251** — `decomper`. **Productionize the family-hunter
+  tool + C-42 drain wave 7.** (A) Productionize brief 249's
+  `/tmp/scan_families.py` prototype as `tools/c42_family_hunter.py`
+  + a test in `tests/`: canonicalize each gap-obj function's
+  disasm (abstract registers / addresses / immediates, preserve
+  opcodes + structure), SHA-1 the signature, bucket + sort by
+  family size; emit a ranked family worklist over the remaining
+  ~330-signature cohort. (B) **C-42 drain wave 7, sibling-family-
+  first**, using the new tool to pick the largest remaining
+  families. **AVOID Family 5 + Family 7 until brief 250 classifies
+  them.** Recipe-gotchas mandatory pre-flight:
+  `docs/research/recipe-gotchas.md` (12 gotchas + symptom→gotcha
+  table + 6-step diagnostic order). Target 20-35 ships at 85-93 %
+  C-yield. **Also report the family-size histogram from the new
+  tool** — brief 249 projects yield diminishing past wave ~8 as
+  long-tail singletons dominate; the brain needs the distribution
+  to time the pivot off C-42. Hard cap 10 min/pick; halt on
+  repeat escapes. Verify gate: 3-region `ninja sha1` PASS.
+  Branch: `decomper/c42-family-hunter-and-drain-wave7`.
 
 ### Closed briefs (reference)
 
+- **Brief 249** — `decomper`, shipped in PR #725. ✅ **27 .c at
+  93 % C-yield via sibling-family hunt** (8 main + 6 ov002 + 12
+  ov006 + 1 ov021). Validated brief 247's homogeneity
+  hypothesis: 6 of 6 shipping families hit 100 % within-family
+  yield; +20 pp over wave 5's random-pick 73 %. Gotcha refinement
+  surfaced: invert the if-polarity so the body sits inside the
+  `if` → forces orig's branch-around-to-shared-epilogue shape.
+  2 escapes deferred to brief 250 (Family 5 packed stack-local
+  struct, Family 7 `(unsigned char)` cast). Cohort: 154 of ~860
+  drained; ~330 distinct signatures remain. Also fixed the
+  brief-246 markdownlint fence errors.
+- **Brief 248** — `scaffolder`, shipped in PR #724. 🎯 **3 of 4
+  brief-247 escapes LOCKED + 1 falsification.** N1 → new gotcha
+  12 (trailing-helper LIT-match). N2 → switch/case unlocks (the
+  if-then form doesn't). N4 → gotcha 7 with 3-arg pass-through.
+  N3 (nested struct ptr-alias) → FALSIFICATION (combine-struct-
+  offsets sticky; deferred to brief 250, paired with Family 5).
+  Also landed: symptom→gotcha lookup table at the top of
+  recipe-gotchas.md + sub-shape homogeneity strategy section.
+  recipe-gotchas.md now 12 gotchas + 7-step diagnostic + symptom
+  table.
 - **Brief 247** — `decomper`, shipped in PR #722. ⚠️ **19 .c
   ships at 73 % C-yield, halted at first repeat escape.** 18
   main + 1 ov002. 4 NEW escape patterns surfaced (N1-N4) for
