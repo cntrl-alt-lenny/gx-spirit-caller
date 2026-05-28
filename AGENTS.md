@@ -40,9 +40,9 @@ you change the owns/hands-off columns here, update the matching
 
 ### Why the brain runs locally (PC or Mac), not on a cloud session
 
-The brain needs to actually execute `ninja`, `./dsd.exe check modules`,
-`python tools/progress.py`, etc. to verify that incoming PRs don't
-regress the build. Web/cloud LLM sessions don't have the baserom or
+The brain needs to actually execute the build gate — `ninja sha1`
+(3-region byte-identical rebuild) + `tools/check_match_invariants.py` —
+to verify that incoming PRs don't regress the build. Web/cloud LLM sessions don't have the baserom or
 the toolchain, so they can *design* work and *review diffs* but can't
 *prove the ROM still builds*. Putting the brain on a local machine
 means one session can both decide and verify, which is the difference
@@ -294,17 +294,23 @@ No-one else touches it without coordination.
 2. Open a PR titled with a short summary of the change (under 70 chars).
 3. PR description says: **what** changed, **why** (link the task brief
    or a sentence of context), anything the reviewer should know.
-4. **Brain reviews locally** — pulls the branch, runs the appropriate
-   subset of `ninja rom` / `./dsd check modules` / `ninja objdiff` /
-   `python tools/progress.py` to verify the PR doesn't regress the
-   baseline, then summarizes for cntrl_alt_lenny in plain English:
-   what changed, why it's safe, what's next. cntrl_alt_lenny doesn't
-   need to read the diff — the summary is the interface.
-5. **Brain offers to merge.** On cntrl_alt_lenny's OK (explicit "merge
-   it" or a thumbs-up), merge with `gh pr merge <N> --squash
-   --delete-branch` (squash matches the existing commit history).
-   When cntrl_alt_lenny is AFK, the brain self-merges and notes so in
-   the PR body — see *Rules every agent follows* §2.
+4. **Brain reviews locally** — checks out the branch and runs the
+   merge gate: `python3.13 tools/configure.py <region>` then
+   `ninja sha1` for EUR + USA + JPN (3-region SHA1 PASS is the floor),
+   plus `tools/check_match_invariants.py` and the test suite. For
+   tools-only / docs-only PRs that don't touch the build path, EUR
+   SHA1 (or just the tests) is sufficient. The brain pastes the actual
+   command tails — see *§ Verify gate and round discipline*. It then
+   summarizes for cntrl_alt_lenny in plain English: what changed, why
+   it's safe, what's next — cntrl_alt_lenny doesn't need to read the
+   diff, the summary is the interface.
+5. **Brain merges.** Self-merge by default once the gate passes (the
+   brain-pattern is locked): `gh pr merge <N> --squash --delete-branch`
+   (squash matches the existing commit history). cntrl_alt_lenny
+   retains veto and can gate any specific merge, but does not sign off
+   on each one. Destructive ops (merge, force-push, branch-delete) are
+   authorized only by a human paste or the brain's own SHA1 PASS — see
+   *§ Verify gate and round discipline* item 4.
 6. After merge, delete the branch. If `--delete-branch` fails from a
    worktree because `main` is checked out in the main clone, finish
    with `git push origin --delete <branch>`.
@@ -318,16 +324,18 @@ with the toolchain installed). Responsibilities:
   - Writes **task briefs** for other agents on request — a short spec
     with scope, non-scope, success criteria, suggested branch name,
     and the files they'll touch.
-  - Reviews PRs from every agent locally: pulls the branch, runs
-    `ninja rom`, `./dsd.exe check modules`, `python tools/progress.py`
-    (and `python tools/analyze_symbols.py` once that lands) to verify
-    the PR doesn't regress any module's checksum or the target list.
-  - **Summarizes every PR for cntrl_alt_lenny in plain English before
-    merging** — what changed, why it's safe, what's next. Brain has
-    the context; cntrl_alt_lenny shouldn't have to reverse-engineer
-    the diff to approve. Then offers to merge; executes on OK. This
-    applies even to brain-authored PRs (e.g. AGENTS.md edits, briefs,
-    baserom-hash records) — cntrl_alt_lenny still gets the yes/no.
+  - Reviews PRs from every agent locally: checks out the branch and
+    runs the merge gate — `ninja sha1` across EUR + USA + JPN (3-region
+    byte-identical rebuild) + `tools/check_match_invariants.py` + the
+    test suite — pasting the actual command tails per *§ Verify gate
+    and round discipline*.
+  - **Summarizes every PR for cntrl_alt_lenny in plain English** — what
+    changed, why it's safe, what's next. Brain has the context;
+    cntrl_alt_lenny shouldn't have to reverse-engineer the diff. Then
+    self-merges once the gate passes (the brain-pattern is locked);
+    cntrl_alt_lenny retains veto but doesn't sign off on each one. This
+    applies even to brain-authored PRs (AGENTS.md edits, briefs,
+    baserom-hash records).
   - Flags scope violations politely and suggests how to re-slice.
   - Does **not** set product priorities; that's cntrl_alt_lenny's call.
 
