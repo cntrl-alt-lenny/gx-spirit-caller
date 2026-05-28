@@ -31,8 +31,8 @@ taxonomy now 11 sub-shapes documented.
 recipes — C-39e recipe generalises to complex bodies (NOT a new
 sub-shape). New gotcha surfaced: `&&` short-circuit merges
 duplicate-call paths. (B) C-42 detector audit: 97.3% TP rate
-(2.7% FP, below threshold). Tightened to exclude `sub sp, sp,
-#N>16` large-stack-frame buffer-pass thunks. 9-way sub-shape
+(2.7% FP, below threshold). Tightened to exclude
+`sub sp, sp, #N>16` large-stack-frame buffer-pass thunks. 9-way sub-shape
 histogram added for decomper pre-tagging (A3 single-bl-plain
 189 picks dominant, B5 two-bl-plain 92, C three-or-more-bl 91).
 (C) Recipe-gotchas reference doc shipped at
