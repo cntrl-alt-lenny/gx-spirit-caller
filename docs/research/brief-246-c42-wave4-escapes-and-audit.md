@@ -48,6 +48,7 @@ Brief 245's claim that objdump shows byte-identical was wrong. A
 careful disasm comparison shows a register-allocation diff:
 
 **Mine** (brief 245's recipe):
+
 ```text
 ldr   r1, [r0, #8]    ; r1 (mine)
 cmp   r1, #0
@@ -57,6 +58,7 @@ lsl   r0, r1, r0
 ```
 
 **Orig**:
+
 ```text
 ldr   r2, [r0, #8]    ; r2 (orig)
 cmp   r2, #0

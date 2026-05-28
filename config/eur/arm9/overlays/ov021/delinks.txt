@@ -93,3 +93,7 @@ src/overlay021/data_ov021_021ac9e0.c:
 src/overlay021/data/data_ov021_021acb20.s:
     complete
     .data start:0x021acb20 end:0x021ace14
+
+src/overlay021/func_ov021_021aa820.c:
+    complete
+    .text start:0x021aa820 end:0x021aa848
