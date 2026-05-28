@@ -8,17 +8,66 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#718 + #719 merge. Brain on Mac.
-**Brief 244 (C-42 reg-alloc patterns 6-10 — 5/5 locked,
-scaffolder) and brief 245 (C-42 opportunistic drain wave 4 — 33
-ships at 94% C-yield, decomper) both shipped.**
+**Last updated:** 2026-05-28, post-#721 + #722 merge. Brain on Mac.
+**Brief 246 (C-42 wave 4 escapes — both unlocked via gotcha 7,
+scaffolder) and brief 247 (C-42 opportunistic drain wave 5 — 19
+ships at 73% C-yield, decomper) both shipped.**
 
-**Current metrics (post-#718 + #719 merge, EUR):**
-`matched_functions 2252 / 9801 (22.98 %)` (+40 vs last round),
-`matched_code_percent 6.0351 %`, `complete_code_percent 6.7388 %`,
-`complete_units 2215 / 3394 (65.26 %)` (+40). 3-region SHA1 PASS
-preserved. **Hard-tier 9.28 %** (brief 245 reported delta from
-8.88 %).
+**Current metrics (post-#721 + #722 merge, EUR):**
+`matched_functions 2273 / 9801 (23.19 %)` (+21 vs last round),
+`matched_code_percent 6.0759 %`, `complete_code_percent 6.7795 %`,
+`complete_units 2236 / 3422 (65.34 %)` (+21). 3-region SHA1 PASS
+preserved.
+
+🎯 **Brief 246 — both brief 245 escapes resolved via existing
+gotcha 7.** No new gotcha needed. Key methodology lesson surfaced:
+**count the orig's desired temp register FIRST, then gotcha 7
+mechanically picks the right arg count**. Important correction:
+brief 245 misdiagnosed `02087528` as an objdiff scoring quirk —
+it was actually real reg-alloc divergence (bytes really didn't
+match). objdiff was correct. The new diagnostic discipline
+prevents this misdiagnosis going forward. Cluster scout repeated:
+no new >100-pick clusters after C-42 drain. Top-5 unchanged from
+brief 241 (55/45/40/26/20 picks). C-42 itself dropped from 851 to
+539 unmatched picks across waves 1-4 — the drain is coming out of
+C-42's own population, not adjacent clusters. Brief 246 also
+proposed an additive symptom→gotcha lookup table for
+recipe-gotchas.md (deferred to brain decision, not landed).
+
+⚠️ **Brief 247 — 19 .c at 73% C-yield, surfaced 4 NEW escape
+patterns.** Halted at first repeat escape per brief discipline.
+**Important new lesson surfaced: yield correlates with sub-shape
+homogeneity, not recipe-library maturity.** Wave 4's 94% yield
+came from sibling families (tag6+sp3 same-recipe 25 times). Wave
+5's 73% yield came from main-heavy thunks where each pick had a
+unique shape. The yield drop isn't a recipe-library regression —
+it's that the remaining cohort is shape-diverse. **For brief 249+:
+hunt sibling families and exhaust them, not random picks from the
+cohort.** 4 new escape patterns filed for brief 248:
+- **N1** sub-shape 2 with trailing void helper (gotcha 8 doesn't
+  apply when there's a `bl` after the field write)
+- **N2** predication collapse (`if (X) return 0` collapses to
+  `moveq+popeq` even with braces — overrides gotcha 5)
+- **N3** nested struct ptr-alias (mwcc inlines `&self->inner` to
+  a single offset; orig pre-computes the alias in a callee-save reg)
+- **N4** 2-helper if-else r3 vs r1 reg-alloc (orig picks r3 for
+  pool temp; ours picks r1; no obvious source-side lever)
+
+**C-42 cohort drain progress** (now 5 waves):
+brief 238 (30) + brief 240 (8) + brief 241 deferred (8) + brief
+243 (22) + brief 245 (33) + brief 247 (19) = **127 picks** of
+~860 original C-42 cohort. Remaining ~535-540 picks. With brief
+247's lesson now folded in, brief 249+ should pursue
+sibling-family hunting for sustained 85-94% yield rather than the
+73% baseline.
+
+**The "scaffolder unblocks, decomper surfaces" cadence is now
+fully validated across 4 iterations.** Brief 246 resolved 2/2
+escapes (100% lock rate sustained: 9 of 9 patterns across briefs
+242/244/246). Methodology + catalog converge fast on any new
+escape — the catalog is mature enough that escapes increasingly
+turn out to be misapplications of existing gotchas rather than
+genuinely new patterns.
 
 🎯 **Brief 244 — 5/5 reg-alloc patterns LOCKED, no P-14
 again.** Brief 243's 5 new sub-patterns (6-10) all yielded to
@@ -113,24 +162,37 @@ iteration nets +20-30 ships and +1-4 new gotchas. Likely the
 dominant cadence for the next 5-10 rounds while the C-42 cluster
 drains.
 
-**Two open lanes after this merge.** **Brief 246 (scaffolder)** —
-investigate brief 245's 2 escapes. `02087528`: objdump bytes
-match orig but objdiff reports fuzzy 66 % — relocation scoring
-or addend issue (related to known objdiff #346 / our v3.7.1
-trial findings). `02259f74`: `movhi` unsigned-compare variant of
-sub-shape 2 — gotcha 7 doesn't generalise to this `movhi` form.
-Determine whether 02087528 is a tooling issue (note for future
-objdiff upgrade trial) or a missing recipe; if 02259f74 is a new
-sub-pattern, classify (gotcha 12+?) and extend the library.
-Likely small scope this round (only 2 escapes) — opportunity
-to also continue brief 241 (B) next-cluster scout work or
-audit the now-very-mature recipe-gotchas.md for refactor or
-inversion-of-control opportunities. **Brief 247 (decomper)** —
-C-42 opportunistic drain wave 5 with the full 11-gotcha library.
-Expected yield: 85-94 % range (brief 245's 94 % was the high
-watermark; sustain around 85-90 %). Target 25-40 ships,
-hard-tier 9.28 % → 9.6-9.9 %. Drain priority: continue ov002 +
-main strategic mix. Both kickoffs sent.
+**Two open lanes after this merge.** **Brief 248 (scaffolder)**
+— investigate brief 247's 4 NEW escape patterns N1-N4 (sub-shape
+2 with trailing void helper, predication collapse, nested
+struct ptr-alias, 2-helper r3 vs r1). Apply the now-proven
+catalog-+-variant-matrix methodology (4th iteration). Plus
+decision on brief 246's proposed symptom→gotcha lookup table.
+Plus opportunity to extend the recipe-gotchas catalogue
+narrative with brief 247's "sub-shape homogeneity drives yield"
+lesson — this is a strategic methodology insight that future
+briefs will reference. **Brief 249 (decomper)** — C-42 drain
+wave 6, sibling-family-first strategy. Apply brief 247's
+empirical lesson: hunt sibling families and exhaust each before
+moving on. Sub-shape families to enumerate first (per brief
+247's high-yield wave 4 pattern): tag6 bitfield siblings,
+sp3-routing thunks (`.legacy_sp3.c`), pool + global check
+clusters, pool-deref 2-fields + helper. Use brief 239's
+sub-shape histogram to enumerate cohort sizes per family.
+Target 25-40 ships at 85-94% C-yield (sustained brief 245
+trajectory). Avoid brief 247's 4 escape patterns until brief
+248 lands their recipes. Both kickoffs sent.
+
+**Brain methodology insight (this round, NOT yet in
+docs/research/) — "sub-shape homogeneity drives yield".** Brief
+247 surfaced an empirical pattern: a 33-ship wave with 25 from
+same-recipe siblings yields 94%; a 26-ship wave with each pick
+shape-diverse yields 73%. The recipe library isn't the
+bottleneck at wave 5+ — the **selection strategy** is. Future
+decomper briefs should explicitly favour sibling-family drains
+over random picks from the cohort. Worth documenting in
+codegen-walls.md or recipe-gotchas.md as a brief-249 deliverable
+or brief-248 (C) write-up.
 
 ---
 
