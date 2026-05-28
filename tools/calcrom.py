@@ -388,6 +388,12 @@ def print_summary(region: str, report_measures: dict, totals: dict) -> None:
     print(f"  complete_units       {cu} / {tu}  ({pct(cu, tu):.2f}%)")
     print(f"  complete_code        {cc} / {tc}  ({ccp:.4f}%)")
     print()
+    print("  Note: matched_functions > complete_units is NATURAL — mf counts")
+    print("  per function while cu counts per TU. Multi-fn-per-TU shipping")
+    print("  contributes N to mf and 1 to cu. The delta is NOT a 'missing")
+    print("  complete marker' indicator (see brief 239 (D) for the empirical")
+    print("  audit: 0 incomplete entries across all 9 overlays where mf > cu).")
+    print()
     ptr_total = totals["ptr_linked"] + totals["ptr_hardcoded"]
     print("Pointer inventory (from config/<region>/**/relocs.txt + delinks.txt):")
     print(f"  total relocations     {ptr_total}")
