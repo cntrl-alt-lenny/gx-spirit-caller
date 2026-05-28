@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**76 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**77 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (11)
+- [Uncategorised](#uncategorised) (12)
 
 ## Analysis / worklist
 
@@ -436,6 +436,12 @@ README.md's per-region shields.io badges to match.
 ## Uncategorised
 
 _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/c42_family_hunter.py`
+
+**cluster the unmatched C-42 cohort into exact**
+
+sibling families by canonicalized-disasm signature.
 
 ### `tools/calcrom.py`
 

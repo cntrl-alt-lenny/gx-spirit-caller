@@ -286,3 +286,23 @@ src/overlay015/data_ov015_021b5cbc.c:
 src/overlay015/bss/data_ov015_bss.s:
     complete
     .bss start:0x021b5d40 end:0x021b68e0
+
+src/overlay015/func_ov015_021b2db8.c:
+    complete
+    .text start:0x021b2db8 end:0x021b2ddc
+
+src/overlay015/func_ov015_021b2450.c:
+    complete
+    .text start:0x021b2450 end:0x021b2480
+
+src/overlay015/func_ov015_021b25f8.c:
+    complete
+    .text start:0x021b25f8 end:0x021b2630
+
+src/overlay015/func_ov015_021b28f0.c:
+    complete
+    .text start:0x021b28f0 end:0x021b2924
+
+src/overlay015/func_ov015_021b235c.c:
+    complete
+    .text start:0x021b235c end:0x021b238c
