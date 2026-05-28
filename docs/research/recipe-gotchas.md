@@ -399,6 +399,85 @@ is the foundation of the entire C-39 sub-shape family.
 
 ---
 
+## Gotcha 7 — arg-count tunes the temp register
+
+**Symptom**: the body is right but the temp register for a
+field load (e.g. `ldrh r1, [r0, #N]`) is one register lower or
+higher than orig (orig uses r3, you get r1).
+
+**Pattern**: mwcc's allocator chooses the temp register for a
+short-lived value based on which arg-passing registers (r0-r3)
+are "live" for the upcoming `bl`. Each pass-through arg shifts
+the temp one register higher.
+
+### Wrong (yields r1 temp)
+
+```c
+extern void helper1(struct Self *self);
+extern void helper2(struct Self *self);
+
+void func(struct Self *self) {
+    if (self->f10) helper1(self);
+    else helper2(self);
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+ldrh  r1, [r0, #10]     <-- r1 (only r0 is live for call)
+cmp   r1, #0
+beq   .else
+bl    helper1
+pop
+.else:
+bl    helper2
+pop
+```
+
+### Right (yields r3 temp — matches orig)
+
+```c
+extern void helper1(struct Self *self, int a, int b);
+extern void helper2(struct Self *self, int a, int b);
+
+void func(struct Self *self, int a, int b) {
+    if (self->f10) helper1(self, a, b);
+    else helper2(self, a, b);
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+ldrh  r3, [r0, #10]     <-- r3 (r0, r1, r2 live for call)
+cmp   r3, #0
+...
+```
+
+### Why
+
+mwcc avoids allocating temp registers to regs that hold incoming
+args meant for an upcoming call. With 3 args (r0, r1, r2), the
+allocator skips to r3. With 1 arg (just r0), r1 is free for
+temp.
+
+### Where surfaced
+
+Brief 241 (C-42 sub-shape drain). Forced register allocation for
+`021eeea4`, `02242e30`, `022951a4` via arg-count tuning.
+
+### Discovery: count helper args first
+
+When the orig disasm shows a temp at r2 or r3, count the args the
+helper(s) call with. The orig signature dictates the allocator
+state. A 0-arg helper means r1 is free for temp; 3-arg keeps r1
+and r2 live, pushing temp to r3.
+
+---
+
 ## Pre-flight checklist for new picks
 
 Before writing the C source for a new pick:
@@ -422,6 +501,9 @@ Before writing the C source for a new pick:
    `extern char data[]` form (gotcha 2).
 8. **For sign-check + helper-reuse** — use if-then NOT
    early-return (gotcha 5).
+9. **Count helper args first** — match the orig's temp-register
+   index by setting pass-through arg count: r1 temp → 0-1 args,
+   r2 temp → 2 args, r3 temp → 3 args (gotcha 7).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
