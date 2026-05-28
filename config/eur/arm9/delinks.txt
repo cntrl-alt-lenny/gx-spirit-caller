@@ -9835,3 +9835,32 @@ src/main/func_020873cc.c:
 src/main/func_02034754.c:
     complete
     .text start:0x02034754 end:0x02034784
+
+src/main/func_0201ed3c.c:
+    complete
+    .text start:0x0201ed3c end:0x0201ed74
+
+src/main/func_0201ed74.c:
+    complete
+    .text start:0x0201ed74 end:0x0201edac
+
+src/main/func_0201edac.c:
+    complete
+    .text start:0x0201edac end:0x0201ede4
+
+src/main/func_0201ede4.c:
+    complete
+    .text start:0x0201ede4 end:0x0201ee1c
+
+src/main/func_02004f58.legacy_sp3.c:
+    complete
+    .text start:0x02004f58 end:0x02004f88
+
+src/main/func_02004f88.legacy_sp3.c:
+    complete
+    .text start:0x02004f88 end:0x02004fb8
+
+src/main/func_02005210.legacy_sp3.c:
+    complete
+    .text start:0x02005210 end:0x02005240
+
