@@ -3191,3 +3191,27 @@ src/overlay002/func_ov002_02207e68.c:
 src/overlay002/func_ov002_0228ab3c.c:
     complete
     .text start:0x0228ab3c end:0x0228ab68
+
+src/overlay002/func_ov002_021aea58.c:
+    complete
+    .text start:0x021aea58 end:0x021aea7c
+
+src/overlay002/func_ov002_021f9954.c:
+    complete
+    .text start:0x021f9954 end:0x021f9978
+
+src/overlay002/func_ov002_02208bb0.c:
+    complete
+    .text start:0x02208bb0 end:0x02208bd4
+
+src/overlay002/func_ov002_02218740.c:
+    complete
+    .text start:0x02218740 end:0x02218764
+
+src/overlay002/func_ov002_022301a8.c:
+    complete
+    .text start:0x022301a8 end:0x022301cc
+
+src/overlay002/func_ov002_02244064.c:
+    complete
+    .text start:0x02244064 end:0x02244088
