@@ -139,3 +139,7 @@ src/overlay017/bss/data_ov017_bss.s:
 src/overlay017/func_ov017_021b680c.s:
     complete
     .text start:0x021b680c end:0x021b6f40
+
+src/overlay017/func_ov017_021b405c.c:
+    complete
+    .text start:0x021b405c end:0x021b4090

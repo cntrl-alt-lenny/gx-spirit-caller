@@ -94,3 +94,7 @@ src/overlay019/data_ov019_021b5a28.c:
 src/overlay019/bss/data_ov019_bss.s:
     complete
     .bss start:0x021b5e20 end:0x021b6940
+
+src/overlay019/func_ov019_021b3f00.c:
+    complete
+    .text start:0x021b3f00 end:0x021b3f34
