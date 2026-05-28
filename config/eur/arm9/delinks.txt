@@ -9699,3 +9699,15 @@ src/main/func_02087d2c.legacy_sp3.c:
 src/main/func_02087d54.legacy_sp3.c:
     complete
     .text start:0x02087d54 end:0x02087d7c
+
+src/main/func_02062438.c:
+    complete
+    .text start:0x02062438 end:0x02062468
+
+src/main/func_02062468.c:
+    complete
+    .text start:0x02062468 end:0x02062498
+
+src/main/func_0208b0a4.legacy_sp3.c:
+    complete
+    .text start:0x0208b0a4 end:0x0208b0d0

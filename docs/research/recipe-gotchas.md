@@ -631,13 +631,108 @@ entirely.
 
 ---
 
+## Gotcha 11 — local-variable declaration order picks callee-save reg
+
+**Symptom**: a function with multiple long-lived locals (a loop
+index and a counter, for example) saves the wrong one to r4 vs r5.
+Orig has counter in r5 + loop var in r4; mine has counter in r4
++ loop var in r5.
+
+**Pattern**: mwcc allocates callee-save registers (r4, r5, r6, ...)
+to long-lived locals in **declaration order**. The variable
+declared FIRST gets r4, the next gets r5, etc. Saved function args
+get the highest indices first (r5, r6 used for the saved args).
+
+### Wrong (count declared first)
+
+```c
+int func(int self) {
+    int count = 0;
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (helper(self, i)) count++;
+    }
+    return count;
+}
+```
+
+mwcc emits:
+
+```text
+mov r4, #0     <-- count goes to r4
+...
+mov r5, r4     <-- i = 0 (from r4)
+loop:
+mov r1, r5     <-- i passed as arg
+add r5, #1     <-- i++
+addne r4, #1   <-- count++ if helper returned non-zero
+cmp r5, #5
+blt loop
+mov r0, r4     <-- return count
+```
+
+### Right (i declared first)
+
+```c
+int func(int self) {
+    int i;
+    int count = 0;
+    for (i = 0; i < 5; i++) {
+        if (helper(self, i)) count++;
+    }
+    return count;
+}
+```
+
+mwcc emits:
+
+```text
+mov r5, #0     <-- count goes to r5
+...
+mov r4, r5     <-- i = 0 (from r5)
+loop:
+mov r1, r4     <-- i passed as arg
+add r4, #1     <-- i++
+addne r5, #1   <-- count++ if helper returned non-zero
+cmp r4, #5
+blt loop
+mov r0, r5     <-- return count
+```
+
+### Why
+
+mwcc walks variable declarations in source order and assigns
+callee-save register slots top-down. The first declaration claims
+r4; subsequent ones get r5, r6, etc. The init-expression in the
+declarator does NOT change the order — only the textual
+declaration order matters.
+
+### Where surfaced
+
+Brief 244 (pattern 9 — loop counter/index reg-alloc, 2 picks:
+021bc68c + 021bbd14). Brief 243 reported "swapping declaration
+order didn't help" — but that brief was swapping inside a
+combined declaration. The form that works is putting the loop
+variable FIRST (as a separate declaration, before count).
+
+### Discovery: read orig's `mov r5, #0; mov r4, r5` pattern
+
+When orig has the init `mov rX, #0; mov rY, rX` (assigns 0 to one
+reg then propagates to another), the FIRST register-assigned-zero
+is the one whose source-declaration came first. Match by declaring
+that variable first in the C source.
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
 when picking temp registers. Apply in order:
 
 1. **Try all 8 tiers first** (gotcha 10). Sometimes the
-   "wrong reg" is actually a wrong-tier symptom.
+   "wrong reg" is actually a wrong-tier symptom — especially if
+   mwcc 2.0/sp1p5 emits `stmia` fusion that orig lacks (brief 244
+   pattern 8).
 2. **Count helper args** (gotcha 7). Adjust function signature
    to push the temp to the orig's register.
 3. **Make the return type match the last literal write**
@@ -646,8 +741,15 @@ when picking temp registers. Apply in order:
 4. **Combine int-return + both-args** (gotcha 9). When the
    helper takes the function's args, returning the helper's
    result forces a 3-register live set across the bl.
+5. **`int func + return helper_ret` keeps r0 live post-bl**
+   — useful when the body has 2 store-blocks that each reload a
+   pointer from the same source; the live r0 forces the 2nd
+   reload to a different register (brief 244 pattern 6).
+6. **Swap local declaration order** (gotcha 11). When the
+   divergence is on callee-save registers (r4/r5/r6), the source-
+   order of variable declarations dictates allocator order.
 
-If none of (1)-(4) work, the divergence may be a genuine
+If none of (1)-(6) work, the divergence may be a genuine
 allocator quirk — file under wall class P-14 or similar (no
 known recipe).
 
