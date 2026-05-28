@@ -8,46 +8,57 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#724 + #725 merge. Brain on Mac.
-**Brief 248 (C-42 wave 5 escapes — 3/4 locked + N3 falsified,
-scaffolder) and brief 249 (C-42 drain wave 6 — 27 ships at 93 %
-C-yield via sibling-family hunt, decomper) both shipped.** main
-Lint restored to green (brief-246 fence + brief-248 atx fixes —
-main had been red on Lint since #721).
+**Last updated:** 2026-05-28, post-#727 + #729 merge. Brain on Mac.
+**Brief 250 (classify C-42 escapes — Family 5 → C-43 coercible, N3 →
+P-14 permanent, Family 7 → existing P-1, scaffolder) and brief 251
+(productionize `c42_family_hunter.py` + C-42 drain wave 7 — 29 ships,
+decomper) both shipped.**
 
-**Current metrics (post-#724 + #725 merge, EUR — reconfigured +
-`ninja sha1` + `ninja report` on d2607c3):**
-`complete_units 2266 / 3475 (65.21 %)` (+30 vs prior 2236) —
-SHA1-aligned headline. `complete_code_percent 6.8386 %`,
-`matched_code_percent 6.0986 %`. `matched_functions 2282 / 9801
-(23.28 %)` (+9; under-counts `.s` / reloc-divergent ships per
-metric canon). 3-region SHA1 PASS preserved across EUR + USA + JPN.
+**Current metrics (post-#727 + #729 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 3a71b52, clean tree):**
+`complete_units 2295 / 3520 (65.20 %)` (+29 vs prior 2266) —
+SHA1-aligned headline. `matched_code_percent 6.1489 %`.
+`matched_functions 2307 / 9801` (+25; under-counts per metric canon).
+3-region SHA1 PASS established on #729 (the byte-shipping PR); #727
+ships no `.c`, so USA/JPN unchanged and EUR was reconfirmed on merged
+main.
 
-🎯 **Brief 249 — sibling-family hunt validated the homogeneity
-hypothesis.** 27 .c at 93 % C-yield vs wave 5's 73 % random-pick:
-+20 pp from selection discipline alone. 6 of 6 shipping families
-hit 100 % within-family yield (no partials). Cohort 154 / ~860
-drained; ~330 distinct signatures remain — long-tail singletons,
-yields projected to diminish past wave ~8. 2 escapes → brief 250.
+🧭 **C-42 is at the pivot point.** Brief 251's family-hunter histogram:
+329 distinct signatures left, **81 % singletons** — the homogeneous
+vein is nearly mined out. **Wave 8 (brief 253) is the last sibling-
+family pass; then pivot off C-42.** Brief 252 (scaffolder) scouts the
+next track in parallel.
 
-⚠️ **Brief 248 — 3/4 escapes locked, N3 falsified.** N1 → gotcha
-12; N2 → switch/case; N4 → gotcha 7 (3-arg). N3 (nested struct
-ptr-alias) falsified — mwcc combine-struct-offsets sticky, no
-source idiom forces it; deferred to brief 250 (paired with the
-similar Family-5 stack-local case). Symptom→gotcha table +
-homogeneity strategy landed in recipe-gotchas.md (now 12 gotchas).
+🎯 **Brief 250 — 2 new walls + 1 confirmation; joint hypothesis
+falsified.** Family 5 → **C-43** coercible (gotcha 13: type stack args
+`int` → `ldr`; one recipe drains all 4). N3 → **P-14** permanent
+(12-bit-immediate offset fold; Probe B out-of-range splits to the orig
+shape — mechanism pinned). Family 7 = existing **P-1** (literal
+`(x<<24)>>24` still collapses to `and`). C-43 detector + negative tests
+in `predict_walls.py`.
 
-🧭 **Next round queued (250 + 251).** Scaffolder 250: classify
-brief 249's Family 5 + N3 jointly (struct-base address
-materialization — coercible C-wall or new P-wall?) + confirm
-Family 7 is the existing P-1 (NOT a new peephole — see
-codegen-walls § P-1) + refresh codegen-walls § C-42. Decomper
-251: productionize `tools/c42_family_hunter.py` from the brief-249
-prototype + C-42 drain wave 7 (avoid Family 5/7) + report the
-family-size histogram so the brain can time the pivot off C-42.
-**C-42 is ~2-3 high-yield waves from exhaustion** — start lining
-up the next cluster/track (permuter wave, `.s`→`.c` upgrade pass,
-or the Track-2 hard-bucket pilot).
+✅ **Brief 251 — 29 .c at 100 % within-attempted yield + the tool.**
+`c42_family_hunter.py` (28-case test) clusters the cohort by
+canonicalized-disasm signature. 4 first-attempt misses all closed by
+the existing catalog (no new escapes — catalog is mature). Caveat:
+cross-overlay siblings can reference different per-overlay data symbols.
+
+🤖 **Workflow hardening (Opus 4.8 system-card review).** PR #728 landed
+the paste-or-FAIL gate, captured-state block, metric provenance,
+authorization-source rule, end-of-round checklist + untrusted-content
+rule. This round added falsification-for-permanence/scoping claims,
+test-must-red-on-bad-input, Success-is-the-artifact (not C-yield), and
+neutral "what-didn't-land" reporting. Posture: 4.8's diligence gains are
+short-context; the brain is in the long regime the evals don't cover, so
+integrity = captured artifacts, not narrative. See AGENTS.md § Verify
+gate and round discipline.
+
+🧭 **Next round queued (252 + 253).** Scaffolder 252: next-track scout
+(rank the largest non-C-42 cohort + recommend the post-C-42 direction;
+every claim carries a falsification test). Decomper 253: C-42 drain
+wave 8 — the 4 C-43 / Family-5 picks (gotcha 13) + winnable size-2/3
+families; STOP-and-report the rest as P-N candidates; report final
+cohort state for the pivot.
 
 🎯 **Brief 246 — both brief 245 escapes resolved via existing
 gotcha 7.** No new gotcha needed. Key methodology lesson surfaced:
