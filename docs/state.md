@@ -8,17 +8,84 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#712 + #713 merge. Brain on Mac.
-**Brief 240 (C-42 wave 2, decomper — halted at 8/15) and brief
-241 (C-42 deferred drain + cluster scout + calcrom canon,
-scaffolder) both shipped.**
+**Last updated:** 2026-05-28, post-#715 + #716 merge. Brain on Mac.
+**Brief 242 (C-42 reg-alloc divergence — 4/4 locked, scaffolder)
+and brief 243 (C-42 opportunistic drain wave 3 — 22 ships,
+decomper) both shipped.**
 
-**Current metrics (post-#712 + #713 merge, EUR):**
-`matched_functions 2182 / 9801 (22.26 %)` (+48 vs last round),
-`matched_code_percent 5.9145 %`, `complete_code_percent 6.6181 %`,
-`complete_units 2145 / 3289 (65.22 %)` (+48). 3-region SHA1 PASS
-preserved. **Hard-tier 8.62 %** (brief 240 reported delta from
-8.52 %).
+**Current metrics (post-#715 + #716 merge, EUR):**
+`matched_functions 2212 / 9801 (22.57 %)` (+30 vs last round),
+`matched_code_percent 5.9662 %`, `complete_code_percent 6.6698 %`,
+`complete_units 2175 / 3330 (65.32 %)` (+30). 3-region SHA1 PASS
+preserved. **Hard-tier 8.88 %** (brief 243 reported delta from
+8.62 %).
+
+🎯 **Brief 242 — 4/4 reg-alloc sub-shapes LOCKED, no P-14.**
+Brief 240's halt-trigger was an incomplete diagnosis — all 4
+documented sub-shapes ship under natural recipes with the right
+gotcha combination. Sub-shape 1 (tag6 bitfield, 5+ picks) reaches
+via gotcha 7 (arg-count) direct. Sub-shape 2 (pool + 2 global
+writes) reaches via **NEW gotcha 8** (return LIT reuses last
+`mov r0, #LIT`, forcing pool to r1). Sub-shape 3 (ptr-copy +
+helper + LIT-write) reaches via **NEW gotcha 9** (helper takes
+both args + int return → r2 temp + r1 LIT). Sub-shape 4 (stmfd +
+sub sp #4, 6+ picks) is NOT reg-alloc at all — it's a routing
+tier mismatch, fixed by **NEW gotcha 10** (use `*.legacy_sp3.c`).
+8 worked examples shipped (2 main `.legacy_sp3.c`, 6 ov002 `.c`).
+recipe-gotchas.md extended by 3 gotchas + 3 checklist items +
+4-step diagnostic order. **~500 C-42 picks across these
+sub-shapes now unblocked for mechanical drain.**
+
+⚠️ **Brief 243 — 22 ships at 71% C-yield, halted on 5 NEW
+reg-alloc sub-patterns.** Decomper drained 22 of 31 attempted
+C-42 picks (5 main + 17 ov002), expanding the recipe library by
+5 more documented sub-shapes (17-20 + single-helper conditional
+thunks). Hard-tier 8.62% → 8.88%. C-yield 71% (below 85%
+target) — halted per brief stop-rule after 9 escapes surfaced 5
+**new** reg-alloc sub-patterns beyond brief 240's set: (6)
+pointer-double-store reg choice (2 picks), (7) switch-on-ldrh
+reg choice (1), (8) stmia fusion miss (1), (9) loop counter/index
+reg-alloc (4), (10) indexed-ldr reg choice (1). 3 source-side
+controls tried (explicit local var decls, struct vs ptr types,
+declaration-order swaps) — none deterministically shift mwcc's
+allocator. Filed for brief 244 scaffolder.
+
+**Empirical cohort sizing finding (brief 243).** Brief 240's
+"safe profile" (2+ args + no bitfield) is smaller than estimated:
+~250 main+ov002 metric-safe candidates → only 22 ship first-
+attempt (71% yield). Remaining ~150 hit one of the 5 new
+sub-patterns. **Wave 4+ should expect 70-75% yield without
+source-side controls** — until brief 244 cracks more reg-alloc
+patterns, the natural yield is bounded around 70-75%.
+
+**Methodology pattern emerging — "scaffolder unblocks, decomper
+surfaces."** Briefs 240/241/242/243 are the second iteration of
+a clear pattern: decomper drains until repeat reg-alloc escapes
+trigger a halt, scaffolder runs a focused variant matrix against
+the documented escape shapes and locks recipes, decomper drains
+the unblocked picks and surfaces the next batch of escapes. Each
+iteration nets +20-30 ships and +1-4 new gotchas. Likely the
+dominant cadence for the next 5-10 rounds while the C-42 cluster
+drains.
+
+**Two open lanes after this merge.** **Brief 244 (scaffolder)** —
+investigate brief 243's 5 NEW reg-alloc sub-patterns (6-10).
+Apply gotchas 7/8/9/10 systematically + new variants (pointer
+typedefs, struct-field reorder, loop counter explicit-init, etc).
+If 2+ sub-patterns lock: ship 5-10 worked examples + extend
+gotchas doc to 11+. Unblocks the ~150 remaining safe-profile
+picks that brief 243 escaped on. **Brief 245 (decomper)** —
+opportunistic C-42 drain wave 4. Apply brief 242's full
+recipe-gotchas library (10 gotchas) + brief 243's expanded
+sub-shape library (17-20). Avoid brief 243's 5 new sub-patterns
+(6-10). Expect 70-75% C-yield per brief 243's empirical finding
+— halt on repeat escapes per the now-established methodology.
+Target 20-30 ships, hard-tier 8.88% → 9.1-9.3%. Both kickoffs
+sent.
+
+---
+
+## Previous round — briefs 240 + 241 (post-#712 + #713)
 
 ⚠️ **Brief 240 partial — reg-alloc divergence escape surfaced.**
 Decomper hit a recurring escape: mwcc 2.0/sp1p5 picks `r1` for
@@ -60,26 +127,12 @@ with sample picks — no cluster crosses the 100-pick pilot
 threshold, meaning the next wall isn't a single big cohort.
 Deferred to brief 244+ if needed.
 
-**Two open lanes after this merge.** **Brief 242 (scaffolder)** —
-investigate brief 240's reg-alloc divergence escape. Apply brief
-241's gotcha 7 (arg count) systematically + try other source-side
-knobs (dummy/unused arg positions, declaration ordering, register
-hints via attributes, restrict/volatile placement, return-type
-variation). If recipe locks for 2+ sub-shapes: ship 5-10 worked
-examples + extend gotchas doc — unblocks ~500 picks for brief
-244+ drain. **Brief 243 (decomper)** — opportunistic C-42 drain
-at high yield. Stay clear of brief 240's escape pattern; target
-brief 240's empirical safe profile (2+ explicit args + no
-bitfield extract). Use brief 239's sub-shape histogram (A3
-single-bl-plain 189 picks, B5 two-bl-plain 92) + brief 241's
-expanded recipe library. Target 20-30 ships at 85%+ C-yield.
-Both kickoffs to be sent.
-
-**Brain methodology re-confirmed this round:** when a sub-shape
-produces repeat escapes within a single decomper session, halt
-and surface to scaffolder rather than grind. Brief 240's halt at
-53% C-yield cost ~32 missed ships but unlocks the path to ~500
-in subsequent rounds once brief 242 lands a reg-alloc recipe.
+**Brain methodology re-confirmed (brief 240 round):** when a
+sub-shape produces repeat escapes within a single decomper
+session, halt and surface to scaffolder rather than grind. Brief
+240's halt at 53% C-yield cost ~32 missed ships but unlocked the
+path to ~500 in subsequent rounds — and brief 242 then locked all
+4 escape sub-shapes the next round, validating the bet.
 
 ---
 
