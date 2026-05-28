@@ -129,7 +129,8 @@ Updated `tools/predict_walls.py` C-42 detector:
   decomper drain pre-tagging
 
 Sample updated cue:
-```
+
+```text
 Multi-call thunk (1bl/0pool) — small (≤64 B) function with
 helper calls but no bitfield/MMIO/predicate walls. Brief 237
 hint: ships under natural C with no special idiom. ...
