@@ -364,50 +364,82 @@ itself:
 
 ### Open briefs
 
-- **Brief 240** — `decomper`. **C-42 second drain wave (with
-  audit-refined detector + sub-shape histogram).** Brief 239
-  tightened the C-42 detector to 97 % TP (excludes `sub sp, sp,
-  #N>16`) and added a 9-way sub-shape histogram for pre-tagging.
-  Brief 238 surfaced 6 new C-42 sub-shapes (taxonomy now 11
-  total). Apply natural recipes to 40-60 picks from the ~554
-  C-42 unmatched picks. **Strategic drain priority:** still
-  prefer main + ov002 picks where equally tractable (calcrom debt
-  reduction). **Sub-shape priority order** (largest cohorts
-  first per brief 239's histogram): A3 single-bl-plain (189),
-  B5 two-bl-plain (92), C three-or-more-bl (91). **Recipe gotcha
-  pre-flight reading required:** `docs/research/recipe-gotchas.md`
-  (6 patterns + checklist). **C-yield target: 85 %+** (brief 238
-  was 81 % due to struct-layout escapes — brief 241 scaffolder
-  is investigating those). Target: 40-60 ships, hard-tier 8.52 %
-  → 9.0-9.4 %. Verify gate: 3-region `ninja sha1` PASS. Branch:
-  `decomper/c42-drain-wave2`.
-- **Brief 241** — `scaffolder`. **Brief 238 deferred picks +
-  next-cluster scout + calcrom-canon reconciliation.** Three
-  deliverables. (A) Brief 238's 7 deferred C-42 picks all share
-  a struct-layout / pool-deref edge case — mwcc emits `add rN,
-  r0, #N; ldr [rN, #M]` split for large field offsets where orig
-  uses a direct `ldr [r0, #N+M]`. Variant matrix to find the
-  source form that emits the direct-offset shape (likely
-  involves struct typedefs with different field offsets, or
-  pointer-arithmetic cast). If recipe locks: classify as C-43
-  (struct-layout-large-offset) or fold under C-42 sub-shape;
-  ship 1-3 worked examples + extend detector. (B) Next-cluster
-  scout: brief 237's unclassified residue was 1725 picks; after
-  brief 238 + 240 wave 2 drain the C-42 cluster, roughly 1170
-  unclassified residue remain. Histogram by shape feature to
-  identify the next-biggest cluster after C-42 (anything
-  exceeding 100 picks) — repeat brief 237's methodology.
-  (C) Reconcile calcrom interpretation in
-  `memory/reference_metric_canon.md` and any tooling docs.
-  Brief 239 (D) corrected brain's interpretation: mf > cu is a
-  natural multi-fn-per-TU artifact, not a missing-marker
-  indicator. Update tooling output (`tools/calcrom.py` print
-  format if needed) and docs to make this distinction explicit
-  for future brains. Verify: scaffolder direct-mwcc only, no
-  SHA1 requirement. Branch:
-  `scaffolder/c42-deferred-next-cluster-and-calcrom-canon`.
+- **Brief 242** — `scaffolder`. **Reg-alloc divergence escape
+  investigation.** Brief 240 surfaced a recurring escape: mwcc
+  2.0/sp1p5 picks `r1` for free-scratch where orig used `r2`
+  (or vice versa). Same instructions, same control flow, same
+  opcodes — only register choice differs. Affects ~5 C-42
+  sub-shapes across ~500 remaining picks: (1) tag6 bitfield
+  extract (5+ picks), (2) pool-data + global field write,
+  (3) helper-returns-ptr + field write, (4) `stmfd; sub sp, #4`
+  prologue thunks (6+ picks), (5) `*p = *q; helper(p); *p = LIT`.
+  Brief 240's 8 shipped picks share an empirical
+  ships-without-walls profile (2+ explicit args + no bitfield
+  extract) — start the investigation there. **Primary lever:
+  brief 241's gotcha 7 (arg-count tunes the temp register).**
+  Apply systematically across all 5 sub-shapes. Secondary
+  levers: dummy/unused arg at varied positions, declaration
+  ordering, explicit register hints via attributes,
+  restrict/volatile placement, return-type variation, struct
+  field reordering. **Success criterion:** recipe locks for at
+  least 2 of the 5 sub-shapes — ship 5-10 worked examples +
+  extend `docs/research/recipe-gotchas.md` with the reg-alloc
+  recipe family. **Negative result also OK:** full
+  falsification matrix that documents this as P-N (permanent)
+  with the 5 sub-shapes explicitly listed. Verify: scaffolder
+  direct-mwcc only, no SHA1 requirement. Branch:
+  `scaffolder/c42-reg-alloc-divergence-investigation`.
+- **Brief 243** — `decomper`. **Opportunistic C-42 drain at
+  high yield.** Stay clear of brief 240's escape pattern.
+  Target brief 240's empirical safe profile: picks with 2+
+  explicit args AND no bitfield extract. Use brief 239's
+  sub-shape histogram (A3 single-bl-plain 189 picks, B5
+  two-bl-plain 92, C three-or-more-bl 91) to enumerate
+  candidates; cross-reference with brief 240's 5 escape
+  sub-shapes and SKIP any that overlap. Apply brief 241's
+  expanded recipe library (16 C-42 sub-shapes documented).
+  **Recipe-gotchas mandatory pre-flight:**
+  `docs/research/recipe-gotchas.md` (7 patterns). **Drain
+  priority:** prefer main + ov002 where equally tractable
+  (calcrom debt). Target: 20-30 ships at 85%+ C-yield. Hard
+  cap on per-pick effort to avoid the brief 240 spiral —
+  defer at the first repeat reg-alloc divergence. Verify gate:
+  3-region `ninja sha1` PASS. Branch:
+  `decomper/c42-opportunistic-drain-wave3`.
 
 ### Closed briefs (reference)
+
+- **Brief 241** — `scaffolder`, shipped in PR #713. 🎯 **All 3
+  deliverables landed.** (A) Brief 238's 7 deferred picks all
+  ship byte-identical under natural recipes — NOT a new wall
+  class. Folded as 5 new C-42 sub-shapes (struct-large-offset,
+  clamp, sp3-dup-helper, helper3-u64-return, cmp-dispatch-switch).
+  7 worked examples shipped (5 in main, 3 in ov002). New recipe
+  gotcha 7 (arg-count tunes the temp register) added to
+  recipe-gotchas.md — feeds brief 242 systematic investigation.
+  (B) Next-cluster scout: 1204 unclassified post-C-42 picks
+  profiled, top-5 clusters identified, none crosses 100-pick
+  pilot threshold (deferred to brief 244+ as needed). (C)
+  Calcrom canon reconciliation: tools/calcrom.py now emits an
+  inline explanatory note clarifying that `matched_functions >
+  complete_units` is a natural multi-fn-per-TU artifact, not
+  actionable bookkeeping; `reference_metric_canon.md` updated
+  with brief 239 (D) empirical findings.
+- **Brief 240** — `decomper`, shipped in PR #712. ⚠️ **Partial
+  ship — halted at 8/15 (53% C-yield) per brief guidance.**
+  Hard-tier 8.52 % → 8.62 %. The repeat escape that triggered
+  the halt: mwcc 2.0/sp1p5 register-allocation divergence —
+  picks `r1` for free-scratch where orig used `r2` (or vice
+  versa), across 5 recurring sub-shapes. 4 source-form
+  variations tried did not shift mwcc's choice. 8 shipped picks
+  (all `src/main`) share the empirical safe profile: 2+
+  explicit args + no bitfield extract. Brief 242 scaffolder
+  investigation queued for systematic reg-alloc recipe search;
+  brief 243 decomper continues opportunistic drain on the safe
+  profile. **Methodology re-confirmed:** when a sub-shape
+  produces repeat escapes within a single decomper session,
+  halt and surface — cost ~32 missed ships this round but
+  unlocks the path to ~500 in subsequent rounds.
 
 - **Brief 239** — `scaffolder`, shipped in PR #709. 🎯 **C-39e
   generalises + C-42 audit (97 % TP) + recipe-gotchas codified +

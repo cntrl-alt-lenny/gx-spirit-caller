@@ -8,7 +8,83 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#709 + #710 merge. Brain on Mac.
+**Last updated:** 2026-05-28, post-#712 + #713 merge. Brain on Mac.
+**Brief 240 (C-42 wave 2, decomper — halted at 8/15) and brief
+241 (C-42 deferred drain + cluster scout + calcrom canon,
+scaffolder) both shipped.**
+
+**Current metrics (post-#712 + #713 merge, EUR):**
+`matched_functions 2182 / 9801 (22.26 %)` (+48 vs last round),
+`matched_code_percent 5.9145 %`, `complete_code_percent 6.6181 %`,
+`complete_units 2145 / 3289 (65.22 %)` (+48). 3-region SHA1 PASS
+preserved. **Hard-tier 8.62 %** (brief 240 reported delta from
+8.52 %).
+
+⚠️ **Brief 240 partial — reg-alloc divergence escape surfaced.**
+Decomper hit a recurring escape: mwcc 2.0/sp1p5 picks `r1` for
+free-scratch where orig used `r2` (or vice versa). Same
+instructions, control flow, opcodes — only register choice
+differs. 4 source-form variations tried (extra unused arg,
+struct layouts, extern forms, return type) did not shift mwcc's
+choice. Affects ~5 sub-shapes across the ~500 remaining C-42
+picks: (1) tag6 bitfield extract (5+ picks), (2) pool-data +
+global field write, (3) helper-returns-ptr + field write,
+(4) `stmfd; sub sp, #4` prologue thunks (6+ picks), (5)
+`*p = *q; helper(p); *p = LIT`. Decomper halted at 8/15 (53%
+C-yield) per brief guidance — exactly the right move. 8 ships
+landed in `src/main`, all sharing the empirical
+ships-without-walls profile: 2+ explicit args, no bitfield
+extract.
+
+🎯 **Brief 241 (A) locked brief 238's 7 deferred picks.** All
+ship byte-identical under natural recipes — NOT a new wall class.
+Folded as 5 new C-42 sub-shapes (struct-large-offset, clamp,
+sp3-dup-helper, helper3-u64-return, cmp-dispatch-switch). C-42
+family taxonomy now 16 sub-shapes documented (brief 237's 5 +
+brief 238's 6 + brief 241's 5). **New recipe gotcha 7
+(arg-count tunes the temp register)** added to recipe-gotchas.md
+— directly applicable to brief 240's escape pattern, queued for
+brief 242 systematic investigation.
+
+🎯 **Brief 241 (C) calcrom canon corrected.** Brief 239 (D)
+empirically falsified brain's interpretation: the
+`matched_functions > complete_units` delta is a natural multi-fn-
+per-TU counting artifact, NOT a missing-marker indicator.
+Calcrom output now annotates this inline; `reference_metric_canon.md`
+updated. Brain methodology lesson reconfirmed: don't ship plans
+based on metric-artifact misreads.
+
+🎯 **Brief 241 (B) next-cluster scout.** Post-C-42-drain
+unclassified residue is 1204 picks. Top 5 clusters histogrammed
+with sample picks — no cluster crosses the 100-pick pilot
+threshold, meaning the next wall isn't a single big cohort.
+Deferred to brief 244+ if needed.
+
+**Two open lanes after this merge.** **Brief 242 (scaffolder)** —
+investigate brief 240's reg-alloc divergence escape. Apply brief
+241's gotcha 7 (arg count) systematically + try other source-side
+knobs (dummy/unused arg positions, declaration ordering, register
+hints via attributes, restrict/volatile placement, return-type
+variation). If recipe locks for 2+ sub-shapes: ship 5-10 worked
+examples + extend gotchas doc — unblocks ~500 picks for brief
+244+ drain. **Brief 243 (decomper)** — opportunistic C-42 drain
+at high yield. Stay clear of brief 240's escape pattern; target
+brief 240's empirical safe profile (2+ explicit args + no
+bitfield extract). Use brief 239's sub-shape histogram (A3
+single-bl-plain 189 picks, B5 two-bl-plain 92) + brief 241's
+expanded recipe library. Target 20-30 ships at 85%+ C-yield.
+Both kickoffs to be sent.
+
+**Brain methodology re-confirmed this round:** when a sub-shape
+produces repeat escapes within a single decomper session, halt
+and surface to scaffolder rather than grind. Brief 240's halt at
+53% C-yield cost ~32 missed ships but unlocks the path to ~500
+in subsequent rounds once brief 242 lands a reg-alloc recipe.
+
+---
+
+## Previous round — briefs 238 + 239 (post-#709 + #710)
+
 **Brief 238 (C-42 first drain wave, decomper) and brief 239
 (C-39e generalises + C-42 audit + recipe gotchas + calcrom
 verdict, scaffolder) both shipped.**
