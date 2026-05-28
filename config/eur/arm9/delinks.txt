@@ -9619,3 +9619,35 @@ src/main/func_0207dcf8.c:
 src/main/func_0206b568.c:
     complete
     .text start:0x0206b568 end:0x0206b590
+
+src/main/func_02088518.c:
+    complete
+    .text start:0x02088518 end:0x02088540
+
+src/main/func_0207f8a0.c:
+    complete
+    .text start:0x0207f8a0 end:0x0207f8c8
+
+src/main/func_02038958.c:
+    complete
+    .text start:0x02038958 end:0x02038984
+
+src/main/func_0204fc9c.c:
+    complete
+    .text start:0x0204fc9c end:0x0204fcc0
+
+src/main/func_02068b94.c:
+    complete
+    .text start:0x02068b94 end:0x02068bb8
+
+src/main/func_02057d2c.c:
+    complete
+    .text start:0x02057d2c end:0x02057d5c
+
+src/main/func_02058070.c:
+    complete
+    .text start:0x02058070 end:0x020580a0
+
+src/main/func_020643ac.c:
+    complete
+    .text start:0x020643ac end:0x020643d8
