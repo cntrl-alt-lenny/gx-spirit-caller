@@ -13,6 +13,82 @@ decomper skip the fail-and-iterate loop.
 
 ---
 
+## Pick-selection strategy: sibling-family drains beat random cohort picks
+
+Brief 247 surfaced an empirical pattern across 5 C-42 waves:
+
+| Wave | Brief | Picks | C-yield | Profile |
+|---|---|---:|---:|---|
+| 1 | 238 | 30 | 81% | mixed cohort, post-detector |
+| 2 | 240 | 8 | 53% | mixed cohort, surfaced reg-alloc wall |
+| 3 | 243 | 22 | 71% | mixed cohort with novel sub-shapes |
+| 4 | 245 | **33** | **94%** | **17 tag6 siblings + 9 sp3 siblings** |
+| 5 | 247 | 19 | 73% | varied main thunks |
+
+Wave 4 hit 94% yield because it leaned on two high-homogeneity
+families:
+
+- **tag6 bitfield siblings** — 17/17 ships, all via gotcha 7
+- **sp3 routing siblings** — 9/10 ships, all via gotcha 10
+
+Wave 5 hit 73% with 4 NEW escape classes in 19 attempts. The
+recipe library wasn't the bottleneck — pick selection was.
+
+### Lesson
+
+The yield-driver at this stage is **sub-shape homogeneity**, not
+catalog breadth. When the cohort still has 400+ undrained picks,
+prefer to drain sibling families completely before sampling
+diverse shapes. This:
+
+1. Amortizes the gotcha-7-style fiddling across many ships
+2. Surfaces sub-shape boundaries (when a "sibling" needs a
+   different recipe, you've found a new sub-shape)
+3. Keeps the C-yield rate above the 85% target
+
+When the cohort thins out and only diverse shapes remain, expect
+yield to drop back to 70-75% — that's the natural floor for
+varied pilots, not a recipe regression.
+
+### When to pivot
+
+If the next wave hits sustained <70% yield and the gotcha
+catalog has stabilized for 2+ waves, the cohort is exhausted of
+high-homogeneity targets. Pivot to a different wall class
+(brief 241 cluster scout output for candidates).
+
+---
+
+## Quick reference: symptom → gotcha
+
+When the orig disasm shows a near-miss vs your build, scan this
+table FIRST. The mapping says which gotcha + variant to apply.
+Detailed write-ups follow below.
+
+| Symptom (orig vs mine) | Likely gotcha | Variant |
+|---|---|---|
+| Wrong temp reg: orig r1, mine r0 | 7 | 1-arg pass-through |
+| Wrong temp reg: orig r2, mine r1 | 7 | 2-arg pass-through |
+| Wrong temp reg: orig r3, mine r1/r2 | 7 | 3-arg pass-through |
+| Wrong stack-save reg: orig r4, mine r5 (or vice versa) | 11 | swap declaration order |
+| Pool/literal swap: orig r1 holds pool, mine r0 | 8 / 12 | `return LIT` (8), or trailing helper takes LIT (12) |
+| Pool/literal swap with int-return body | 9 | int-return + both incoming args to helper |
+| stmfd + sub sp prologue mismatch | 10 | `.legacy_sp3.c` filename suffix |
+| `str + str` pair instead of `stmia` fusion | 10 | `.legacy_sp3.c` (mwcc 1.2/sp3 doesn't fuse) |
+| Predication collapse (orig has `bne`, mine has `moveq + popeq`) | (N2 variant) | switch + case + default form |
+| Extra `moveq r0, #0` before `popeq` in mine | 1 | `return r;` with named local |
+| Wrong cond predicate (orig `movge`, mine `movlt`) | 3 | swap ternary polarity |
+| Wrong sub/cmp opcode (orig `sub+cmp+movle`, mine `subs+movmi`) | (clamp form) | `r <= 0` not `r < 0` |
+| Wrong XOR operand order | 4 | swap `a ^ b` to match orig schedule |
+| Predicated tail collapse for sign-check | 5 | `if-then` not early-return |
+| C-1 predication (orig has bitfield, mine has `tst`) | 6 | use bitfield-extract not `& MASK` |
+| Pool-arg loaded with extra `ldr` deref | 2 | `extern char data[]` not `extern int data` |
+
+Steps 1-4 of the 6-step diagnostic order (at the bottom of the
+file) also serve as a fallback when the table doesn't match.
+
+---
+
 ## Gotcha 1 — `return r` vs `return 0` (helper null-check tail)
 
 **Symptom**: an extra `moveq r0, #0` (or `mov r0, #0`) between
@@ -724,6 +800,88 @@ that variable first in the C source.
 
 ---
 
+## Gotcha 12 — trailing-helper LIT-match for pool/literal swap
+
+**Symptom**: the same pool/literal swap as gotcha 8, but the
+function has a TRAILING helper call after the field write instead
+of returning. Gotcha 8's `return LIT` trick doesn't apply because
+the trailing bl trashes r0 before the return.
+
+**Pattern**: if the trailing helper takes the same literal that
+the field write uses, mwcc CSEs `mov r0, #LIT` across both the
+field-write source AND the helper arg setup. The CSE forces the
+pool to a non-r0 register.
+
+### Wrong (pool ends up in r0)
+
+```c
+extern void helper1(int x);
+extern void helper2(void);
+void func(void) {
+    helper1(1);
+    data->f12 = 1;
+    helper2();           /* helper2 takes 0 args */
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+mov   r0, #1
+bl    helper1
+ldr   r0, [pc, #...]   <-- r0 = pool (wrong, orig has r1)
+mov   r1, #1
+str   r1, [r0, #12]
+bl    helper2
+pop
+```
+
+### Right (pool to r1)
+
+```c
+extern void helper1(int x);
+extern void helper2(int x);  /* note: helper2 takes the LIT */
+void func(void) {
+    helper1(1);
+    data->f12 = 1;
+    helper2(1);           /* same LIT as field write */
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+mov   r0, #1
+bl    helper1
+ldr   r1, [pc, #...]   <-- r1 = pool (matches orig)
+mov   r0, #1           <-- CSEd: holds #1 for both str AND helper2
+str   r0, [r1, #12]
+bl    helper2
+pop
+```
+
+### Why
+
+mwcc's allocator sees that r0 must hold #1 going into the bl. It
+can't use r0 for the long-lived pool because the bl needs r0 = 1.
+The pool gets allocated to r1.
+
+### Where surfaced
+
+Brief 248 pattern N1 (`func_020a6b30`). Generalizes gotcha 8 to
+the trailing-call case.
+
+### When to apply
+
+If the orig has the pattern `helper1(K); data->f = K; helper2();`
+and your build puts the pool in r0, change the helper2 signature
+to take the same K. Compatible with any helper that ignores
+extra args.
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
@@ -748,8 +906,12 @@ when picking temp registers. Apply in order:
 6. **Swap local declaration order** (gotcha 11). When the
    divergence is on callee-save registers (r4/r5/r6), the source-
    order of variable declarations dictates allocator order.
+7. **Trailing-helper LIT-match** (gotcha 12). For sub-shape 2
+   patterns with a trailing bl after the field write, make the
+   helper take the same literal as the field write so mwcc CSEs
+   r0 across both.
 
-If none of (1)-(6) work, the divergence may be a genuine
+If none of (1)-(7) work, the divergence may be a genuine
 allocator quirk — file under wall class P-14 or similar (no
 known recipe).
 
