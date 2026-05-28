@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (42 patterns, 4 sub-classifications)
+## Coercible-with-knowledge (43 patterns, 4 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -5604,7 +5604,119 @@ shipped 5 worked examples (5/5 byte-identical first-attempt),
 added the C-42 detector hint. Full survey at
 [`brief-237-hard-tier-landscape-survey.md`](brief-237-hard-tier-landscape-survey.md).
 
-## Permanent (13 patterns)
+**Drain progress + escape classification (waves 1–6, briefs
+238–250).** Cumulative C-42 drain across 6 waves: **154 picks** of
+the original ~860 cohort; remaining ≈362 picks / ≈330 distinct
+signatures (long-tail singletons dominate past wave ~8). The
+sibling-family-first strategy (brief 247 hypothesis, brief 249
+confirmation) sustains 93–94% C-yield by exhausting one disasm
+signature at a time vs ~73% for random picks. As the cohort thins,
+escapes are no longer "new recipes" — they are sub-shapes that carve
+off C-42 into their own wall entry:
+
+- **Wave 5 (brief 248)** surfaced 4 reg-alloc escapes; 3 locked to
+  existing gotchas (12 / switch-shape / 7), 1 (**N3**) deferred.
+- **Wave 6 (brief 249)** shipped 27 picks across 6 families at 93%
+  yield; 2 single-pick families deferred (**Family 5**, **Family 7**).
+- **Brief 250** classified all three deferrals:
+  - **Family 5** (`func_ov016_021b3560` + 3 ov016/17/19 siblings) →
+    carved off to **[C-43](#c-43-packed-stack-local-struct-builder)**
+    (coercible; the `add r3, sp, #0` materialization reproduces
+    naturally — the 69% miss was an arg-WIDTH typing trap). These 4
+    picks are **C-43, not C-42**.
+  - **N3** (`func_02032724`) → **[P-14](#p-14-sub-struct-base-offset-fold-in-range)**
+    (permanent; mwcc folds the sub-struct offset into the access
+    immediate whenever it fits the 12-bit range).
+  - **Family 7** (`func_0201b690` + `func_02018dcc` + `func_02019184`)
+    → the existing **[P-1](#p-1-shift-pair-vs-mask-collapse)** (byte
+    zero-extend `lsl;lsr` → `and #mask`). Not a new wall.
+
+  Full diagnosis at
+  [`brief-250-c42-escape-classify-family5-n3-family7.md`](brief-250-c42-escape-classify-family5-n3-family7.md).
+
+### C-43. Packed stack-local struct builder
+
+> **Wall family note — C-43 vs C-42.** C-43 is a C-42 sub-shape that
+> the generic C-42 hint mis-classifies: a small `sub sp, #N` (N ≤ 16)
+> thunk passes the C-42 stack-frame filter, so without C-43 the
+> classifier emits the bare "natural recipe" hint and the decomper
+> hits the arg-width trap below. The `predict_walls.py` C-43 detector
+> fires first (on `add rD, sp, #0` + `strh [sp, …]` + `bl`) and
+> points at the specific recipe.
+
+**Target asm (`func_ov016_021b3560`, 0x34 = 13 insns):**
+
+```text
+
+push  {r3, r4, lr}
+sub   sp, sp, #12
+ldr   r4, [sp, #24]        ; stack value arg A — WORD load
+ldr   lr, [sp, #28]        ; stack value arg B
+ldr   ip, [sp, #32]        ; stack value arg C
+strh  r3, [sp]             ; local@0 = a3
+add   r3, sp, #0           ; materialize &local (reuse freed r3)
+strh  r4, [sp, #2]         ; local@2 = A  (truncate to u16 on store)
+strh  lr, [sp, #6]         ; local@6 = B  (GAP at offset 4)
+strh  ip, [sp, #8]         ; local@8 = C
+bl    func_ov016_021b3498  ; helper(r0, r1, r2, &local)  (GAP at 10)
+add   sp, sp, #12
+pop   {r3, r4, pc}
+
+```
+
+A wrapper that builds a packed struct in a stack-local from its
+arguments, materializes `&local`, and passes it as a helper pointer
+arg. Halfword fields at offsets 0/2/6/8 with gaps at 4 and 10.
+
+**mwcc miscoded (stack value args typed `u16`):** identical except
+the three stack-arg loads become `ldrh` (halfword) instead of `ldr`
+(word) — a 3-of-13-instruction delta (~69% fuzzy). The `add r3,
+sp, #0` materialization is **already correct**; it was never the
+blocker.
+
+**C that coerces it (verified byte-identical against
+`func_ov016_021b3560`):**
+
+```c
+typedef unsigned short u16;
+struct P { u16 f0; u16 f2; u16 gap4; u16 f6; u16 f8; u16 gap10; };
+extern void helper(int a0, int a1, int a2, void *p);
+
+void f(int a0, int a1, int a2, u16 a3, int A, int B, int C) {
+    struct P local;
+    local.f0 = a3;            /* r3 reg arg -> strh */
+    local.f2 = A;             /* int stack arg -> ldr, narrowed on strh */
+    local.f6 = B;
+    local.f8 = C;
+    helper(a0, a1, a2, &local);
+}
+```
+
+Critical detail: **the stack-passed value args are `int` (word), not
+their narrow `u16` field type.** mwcc loads an incoming arg with its
+declared width; declaring them `int` emits `ldr` (matching orig), and
+the narrowing to `u16` happens on the `strh` store. The struct gaps
+are explicit `u16` pad fields so the four writes land at 0/2/6/8.
+See [recipe-gotchas.md gotcha 13](recipe-gotchas.md).
+
+**Routes:** plain `.c` (mwcc 2.0/sp1p5). No legacy needed.
+
+**Cross-corpus survey:** 4 picks, byte-identical 13-insn body (differ
+only by the helper symbol each calls). One recipe drains all 4.
+
+| Pick | Module | Helper |
+|---|---|---|
+| `func_ov016_021b3560` | ov016 | `func_ov016_021b3498` |
+| `func_ov016_021b5154` | ov016 | `func_ov016_021b509c` |
+| `func_ov017_021b405c` | ov017 | `func_ov017_021b3fa4` |
+| `func_ov019_021b3f00` | ov019 | `func_ov019_021b3e38` |
+
+**Provenance:** brief 249 (PR #725) piloted `func_ov016_021b3560` at
+69% fuzzy with explicit gap fields and deferred Family 5; brief 250
+(this entry) ran the variant matrix, found the arg-width coercion,
+shipped the classifier + gotcha 13.
+
+## Permanent (14 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -5662,6 +5774,18 @@ collapse to `and #0xffff` even on mwcc 1.2/sp2p3. **17 of 69
 drops (25%)** — by far the largest single wall in this set,
 and the most-frequently-misapplied wall (see *Wall family
 note* in C-15 entry above).
+
+Brief 250 added the C-42 wave-6 **Family 7** (3 main picks, the
+only main functions with the P-1 zero-extend getter tail `ldr …;
+lsl #K; lsr #K; pop` reading `base[n].field`): `func_0201b690`
+(`lsl/lsr #24` byte → `and #0xff`), `func_02018dcc` (`#31` bit0 →
+`and #1`), `func_02019184` (`#24` + `#28`, predicated). Brief 249
+piloted `func_0201b690` at 85% and mis-framed it as "find the
+shift form that defeats the peephole." Brief 250's variant matrix
+confirmed even the literal `((unsigned)x << 24) >> 24` C source
+collapses to `and` — P-1 is shape-collapse, no shift form exists.
+The body up to the extract matches orig byte-for-byte; only the
+final extract diverges. Classified **P-1-blocked**.
 
 ### P-2. ldmia / ldmib / stmia fusion (bidirectional)
 
@@ -6581,6 +6705,102 @@ Brief 231 conclusion: do not pilot C-39c further.
 brief 231 (this entry) ran cross-tier workaround matrix and
 locked as P-13. Full diagnosis at
 [`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
+
+### P-14. Sub-struct base-offset fold (in-range)
+
+> **Wall family note — P-14 vs C-34.** Both are "mwcc reuses an
+> address computation," but they target different machinery and have
+> opposite resolutions. **C-34** is pool-literal CSE (two `ldr [pc,
+> …]` of the same symbol collapse to one slot + `mov`) and has an
+> `.s`-with-dual-`.word` recipe. **P-14** is addressing-mode
+> offset-folding (a sub-struct base + field offset folds into one
+> base-relative immediate) — there are no pool words involved and no
+> C-source recipe. They only look alike at the "orig keeps a base in
+> a callee-saved reg" surface level.
+
+**The wall.** When source accesses a field of a sub-struct at a
+compile-time-constant offset (`self->inner.field`, or any pointer
+mwcc can prove equals `self + K`), and the field's **combined** offset
+from the outer base fits the addressing mode's 12-bit immediate
+(≤ `0xfff` for word `ldr`/`str`), mwcc propagates the constant offset
+into each access and CSEs the **outer** base. It emits a single
+`[self, #combined]` access, never the intermediate `add rN, self, #K`
+followed by `[rN, #inner_off]` that the orig has.
+
+**Target asm (`func_02032724`, 0x24):**
+
+```text
+
+push  {r4, lr}
+add   r4, r0, #0x1fc       ; materialize &self->inner
+ldr   r1, [r4, #0xc80]     ; inner.field  (combined = 0xe7c)
+cmp   r1, #0
+popeq {r4, pc}
+bl    func_02032e6c
+mov   r0, #0
+str   r0, [r4, #0xc80]     ; reuse r4 base across the call
+pop   {r4, pc}
+
+```
+
+**mwcc emits (any in-range source idiom):**
+
+```text
+
+push  {r4, lr}
+mov   r4, r0
+ldr   r1, [r4, #0xe7c]     ; folded: 0x1fc + 0xc80
+cmp   r1, #0
+popeq {r4, pc}
+bl    func_02032e6c
+mov   r0, #0
+str   r0, [r4, #0xe7c]
+pop   {r4, pc}
+
+```
+
+**Falsifiable prediction (brief 250):** if any C idiom binds
+`&self->inner` to a value mwcc keeps across the call AND uses for the
+field accesses, mwcc emits the orig's split. **Cheapest test:** the
+6-idiom matrix on the in-range pick.
+
+| Idiom | Result |
+|---|---|
+| nested/block `self->inner.field` | folded `[r4, #0xe7c]` |
+| pointer alias `struct Inner *p = &self->inner` | folded |
+| `(struct Inner *)((char *)self + 0x1fc)` | folded |
+| helper takes `&inner` | `add #0x1fc` only as a throwaway bl arg; accesses still folded |
+| `volatile int *` field | DIFFERENT split `0x27c`/`0xc00` — non-matching |
+| `char *base = &self->inner` + cast back | folded |
+
+**Result — none reproduce orig.** Two diagnostic probes pin the
+mechanism: two distinct in-range fields still fold (`[r4,#0xe7c]` +
+`[r4,#0xe80]`); pushing the combined offset out of range (`0x1fc +
+0xf00 = 0x10fc > 0xfff`) makes mwcc **split** into the exact orig
+shape (`add r4, r0, #0x1fc; ldr/str [r4, #0xf00]`). So the fold is
+purely an addressing-mode-immediate decision. `func_02032724`'s
+`0xe7c` fits → mwcc always folds → no C idiom forces the in-range
+split. The orig's split came from a compiler/source where `&inner`
+was not a provable constant offset from `self`.
+
+**Not classifier-detectable.** An in-range folded access (`ldr rN,
+[rM, #imm]` with `imm ≤ 0xfff`, reused across a `bl`) is byte-
+indistinguishable from any ordinary far-field access; a detector would
+fire on essentially every struct-heavy function. No
+`predict_walls.py` entry — the wall is recognized by comparing orig
+disasm (`add rN, base, #K` + small offset) against the natural build's
+folded single offset.
+
+**Affected picks:** `func_02032724` (the brief-248 N3 escape).
+Out-of-range siblings — where the combined offset exceeds `0xfff` —
+would ship under natural C (mwcc is *forced* to split and matches
+orig); only the in-range case is walled.
+
+**Provenance:** brief 247 surfaced (N3), brief 248 first falsified
+(heap ptr-alias, 6 variants), brief 250 (this entry) ran the joint
+Family-5/N3 investigation, added the immediate-range probe, and locked
+P-14. Full diagnosis at
+[`brief-250-c42-escape-classify-family5-n3-family7.md`](brief-250-c42-escape-classify-family5-n3-family7.md).
 
 ## Codegen-inherent edge cases (3 patterns)
 
