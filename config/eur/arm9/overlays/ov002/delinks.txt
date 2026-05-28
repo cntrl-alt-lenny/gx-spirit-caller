@@ -3215,3 +3215,19 @@ src/overlay002/func_ov002_022301a8.c:
 src/overlay002/func_ov002_02244064.c:
     complete
     .text start:0x02244064 end:0x02244088
+
+src/overlay002/func_ov002_021bbd14.c:
+    complete
+    .text start:0x021bbd14 end:0x021bbd54
+
+src/overlay002/func_ov002_021bc68c.c:
+    complete
+    .text start:0x021bc68c end:0x021bc6c4
+
+src/overlay002/func_ov002_02241bc4.c:
+    complete
+    .text start:0x02241bc4 end:0x02241bf8
+
+src/overlay002/func_ov002_022b36f0.c:
+    complete
+    .text start:0x022b36f0 end:0x022b3720
