@@ -506,40 +506,61 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 252** — `scaffolder`. **Scout the next track after
-  C-42.** C-42 is near-exhausted (brief 251 histogram: 329
-  distinct signatures, 81 % singletons). (A) Survey the NON-C-42
-  unmatched cohort with existing landscape tooling
-  (`find_pattern_clusters` / `predict_walls.py` / hard-tier
-  survey); rank the next-largest coercible families/walls; for
-  the top candidate propose a classification + recipe sketch +
-  the picks it would unblock. (B) Recommend ONE post-C-42 track
-  with evidence (cohort size, expected yield): permuter wave on
-  hard-tier reg-alloc; `.s`→`.c` upgrade pass on accumulated
-  punts; or the Track-2 hard-bucket long-form decomp. Discipline:
-  every "coercible" / "permanent" claim carries a one-line
-  falsification test (pilot compile, predicted vs bytes). Direct-
-  mwcc only, no SHA1. Branch: `scaffolder/post-c42-next-track-scout`.
-- **Brief 253** — `decomper`. **C-42 drain wave 8 (the last
-  sibling-family pass).** (A) Ship the 4 C-43 / Family-5 picks
-  (`func_ov016_021b3560` + 3 ov016/17/19 siblings) via brief
-  250's gotcha-13 recipe (type stack-passed value args `int`
-  → `ldr`, narrow on the `strh` store, explicit u16 pad fields).
-  (B) Run `tools/c42_family_hunter.py`; drain the size-3 +
-  winnable size-2 families with clear catalog recipes. Any family
-  that resists the 10-min/pick cap → STOP, report it as a
-  P-1 / P-14 / reg-alloc-plateau candidate with objdiff evidence;
-  do NOT grind or ship a near-match. Caveat (brief 251): cross-
-  overlay "identical" siblings can reference different per-overlay
-  data symbols — confirm each twin's `.word` / `bl` targets.
-  **Success = per-pick 3-region `ninja sha1` PASS + objdiff 100 %
-  line pasted, NOT `complete_units` / C-yield.** Report which
-  families did NOT ship and why. This is the LAST C-42 wave —
-  report final cohort state for the pivot. Branch:
-  `decomper/c42-drain-wave8-final`.
+- **Brief 254** — `scaffolder`. **Track-2 leading-edge pilot +
+  classify brief 253's C-42 resisters.** Direct-mwcc only, no SHA1.
+  (A) **Resolve the pivot direction empirically.** The brain's
+  independent swarm flagged ~631 solo-C-23 (276) + solo-StyleA
+  (355) `.legacy.c` picks as Track-2's cheap leading edge; brief
+  252 found those sole-prediction counts OVER-FIRE. Compile 2-3
+  representative solo-C-23 + 2-3 solo-StyleA picks (≤0x100) via the
+  mature `.legacy.c` routing tier; report per-pick ships-byte-
+  identical vs over-fire, with the diff as evidence. Decides whether
+  brief 256 launches a Track-2 leading-edge drain or Track-2 needs
+  full cold RE. (B) **Classify brief 253's 8 non-shipping C-42
+  families** (PR #733): confirm the 4 reg-alloc-plateau families
+  (`0ca11024`, `96d2a201`, `e7e4cff1`, `ef19bc9a`) as P-14 / P-11 +
+  census; run the variant matrix on `2b07f982` (mwcc -O4 fuses a
+  contiguous `==` set into a range check) and classify; triage the
+  3 unclassified (`0d484478`, `29f7d996`, `378a6647`). Every
+  permanence claim carries a falsification test. Branch:
+  `scaffolder/track2-leading-edge-pilot-and-c42-resisters`.
+- **Brief 255** — `decomper`. **C-39 ov002 bit-extract drain,
+  wave 1 (first post-C-42 wave).** Drain the ~121 sole-C-39 ≤0x80
+  ov002 picks, smallest-first, using brief 252's pilot-verified
+  recipe: bitfield struct `{u16 f0; u16 bit0:1; u16 rest:15;}` +
+  `helper(self, 1 - self->bit0)` (bitfield not `& 1`, `1 - x` not
+  `== 0` — both required per 252's contrast probes); map wrapper
+  variants (XOR / sign-check / reg-alloc) to gotchas 4 / 5 / 7.
+  Re-confirm pilot `func_ov002_0223fd2c` first. Expected yield
+  70-90 %. Caveat (brief 253): twin picks can reference different
+  per-overlay data symbols — confirm each pick's `.word` / `bl`
+  targets. **Success = per-pick 3-region `ninja sha1` PASS +
+  objdiff 100 % line, NOT `complete_units` / C-yield.** Report
+  non-shippers as P-N candidates with evidence; 10-min/pick cap.
+  Branch: `decomper/c39-ov002-bit-extract-drain-wave1`.
 
 ### Closed briefs (reference)
 
+- **Brief 253** — `decomper`, shipped in PR #733. ✅ **20 .c at
+  100 % objdiff across 9 families — the C-42 pivot is confirmed.**
+  4 C-43 / Family-5 picks (gotcha 13) + 16 size-2-family picks. 8
+  families did NOT ship, reported with diff evidence as P-N
+  candidates (4 reg-alloc-plateau → P-14, 1 optimizer range-fusion
+  `2b07f982`, 3 unclassified) → brief 254. Final C-42 cohort: 316
+  unmatched / 306 signatures, 297 singletons (94 %); only 8
+  non-coercible multi-member families left. Sibling-draining
+  exhausted; waves 1-8 drained 203 picks. complete_units 2295 → 2315.
+- **Brief 252** — `scaffolder`, shipped in PR #732. 🧭 **Next-track
+  scout: no next C-42, but C-39 bit-extract is under-drained.**
+  Exact-sibling families exhausted (`find_pattern_clusters` tops at
+  28 picks / 33 % yield). Top near-term: a 121-pick sole-C-39 ≤0x80
+  ov002 cohort — pilot `func_ov002_0223fd2c` compiled byte-identical
+  (bitfield + `1 - self->bit0`), 70-90 % expected → brief 255.
+  Standing tracks: permuter on the 1203 no-prediction residue (needs
+  its own pilot), `.s`→`.c` = 0 headline (already complete), Track-2
+  long-form = 933 funcs / 49 % of unmatched bytes. Honestly flagged
+  the "1215 C-39" overstatement + the C-1 / C-23 / StyleA cue
+  over-fires.
 - **Brief 251** — `decomper`, shipped in PR #729. ✅ **29 .c at
   100 % within-attempted C-yield across 14 families + the
   family-hunter tool.** Productionized `tools/c42_family_hunter.py`

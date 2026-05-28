@@ -8,57 +8,63 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-28, post-#727 + #729 merge. Brain on Mac.
-**Brief 250 (classify C-42 escapes — Family 5 → C-43 coercible, N3 →
-P-14 permanent, Family 7 → existing P-1, scaffolder) and brief 251
-(productionize `c42_family_hunter.py` + C-42 drain wave 7 — 29 ships,
-decomper) both shipped.**
+**Last updated:** 2026-05-29, post-#732 + #733 merge. Brain on Mac.
+**Brief 252 (next-track scout, scaffolder) + brief 253 (C-42 drain
+wave 8 final — 20 .c, decomper) both shipped. C-42 sibling-draining is
+DONE (waves 1-8 = 203 picks); the project is pivoting.**
 
-**Current metrics (post-#727 + #729 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 3a71b52, clean tree):**
-`complete_units 2295 / 3520 (65.20 %)` (+29 vs prior 2266) —
-SHA1-aligned headline. `matched_code_percent 6.1489 %`.
-`matched_functions 2307 / 9801` (+25; under-counts per metric canon).
-3-region SHA1 PASS established on #729 (the byte-shipping PR); #727
-ships no `.c`, so USA/JPN unchanged and EUR was reconfirmed on merged
-main.
+**Current metrics (post-#732 + #733 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 6e9eb82, clean tree):**
+`complete_units 2315 / 3552 (65.17 %)` (+20 vs prior 2295) —
+SHA1-aligned headline. `matched_functions 2329 / 9801` (+22;
+under-counts per metric canon). 3-region SHA1 PASS established on #733
+(#732 is docs-only).
 
-🧭 **C-42 is at the pivot point.** Brief 251's family-hunter histogram:
-329 distinct signatures left, **81 % singletons** — the homogeneous
-vein is nearly mined out. **Wave 8 (brief 253) is the last sibling-
-family pass; then pivot off C-42.** Brief 252 (scaffolder) scouts the
-next track in parallel.
+🧭 **PIVOT DECISION (reconciled from two independent reads).** C-42's
+exact-sibling vein is exhausted (only 297 singletons + 8 non-coercible
+families left). The scaffolder's brief-252 scout and the brain's
+independent pivot-analysis swarm AGREED on the big picture (no next
+C-42; `.s`→`.c` and data-tier = 0 headline; Track-2 hard-bucket is the
+long-term real-RE pivot) but CLASHED on one point: the swarm's Track-2
+"leading edge" (~631 solo-C-23/StyleA picks) rests on counts brief 252
+says over-fire. Resolution:
+- **Near-term (brief 255, decomper):** bank the cheap win — the
+  scaffolder pilot-verified a 121-pick C-39 ov002 bit-extract cohort
+  (byte-identical pilot, 70-90 % expected). First post-C-42 drain.
+- **Settle the clash (brief 254, scaffolder):** compile a handful of the
+  disputed solo-C-23 / StyleA picks → ship-or-over-fire verdict decides
+  whether brief 256 launches a Track-2 leading-edge drain or full cold RE.
+- **Also 254:** classify brief 253's 8 non-shipping C-42 families
+  (4 reg-alloc → P-14, 1 range-fusion `2b07f982`, 3 unclassified).
+- **Dropped:** `.s`→`.c` (0 headline — shipped `.s` already counts
+  `complete`) and the data tier (0 headline + 0 SHA1). Permuter reserved
+  as a per-pick fall-through (cite brief-198's plateau, not "0/9").
 
-🎯 **Brief 250 — 2 new walls + 1 confirmation; joint hypothesis
-falsified.** Family 5 → **C-43** coercible (gotcha 13: type stack args
-`int` → `ldr`; one recipe drains all 4). N3 → **P-14** permanent
-(12-bit-immediate offset fold; Probe B out-of-range splits to the orig
-shape — mechanism pinned). Family 7 = existing **P-1** (literal
-`(x<<24)>>24` still collapses to `and`). C-43 detector + negative tests
-in `predict_walls.py`.
+🎯 **Brief 253 — C-42 pivot confirmed.** 20 .c at 100 % objdiff (4
+C-43/Family-5 via gotcha 13 + 16 size-2). 8 families reported as P-N
+candidates with diff evidence (not ground on) → brief 254. Followed the
+new conventions: reported the objdiff line not the metric, neutral
+"what-didn't-land".
 
-✅ **Brief 251 — 29 .c at 100 % within-attempted yield + the tool.**
-`c42_family_hunter.py` (28-case test) clusters the cohort by
-canonicalized-disasm signature. 4 first-attempt misses all closed by
-the existing catalog (no new escapes — catalog is mature). Caveat:
-cross-overlay siblings can reference different per-overlay data symbols.
+🧭 **Brief 252 — no next C-42, but C-39 under-drained.** Exact-sibling
+families exhausted (`find_pattern_clusters` tops at 28 picks / 33 %).
+121-pick sole-C-39 ≤0x80 ov002 cohort pilot-verified → brief 255.
+Standing tracks sized honestly (permuter / `.s`→`.c` = 0 / Track-2 =
+49 % of unmatched bytes).
 
-🤖 **Workflow hardening (Opus 4.8 system-card review).** PR #728 landed
-the paste-or-FAIL gate, captured-state block, metric provenance,
-authorization-source rule, end-of-round checklist + untrusted-content
-rule. This round added falsification-for-permanence/scoping claims,
-test-must-red-on-bad-input, Success-is-the-artifact (not C-yield), and
-neutral "what-didn't-land" reporting. Posture: 4.8's diligence gains are
-short-context; the brain is in the long regime the evals don't cover, so
-integrity = captured artifacts, not narrative. See AGENTS.md § Verify
-gate and round discipline.
+🤖 **Workflow hardening (Opus 4.8 review, PRs #728 + #730 + #731).** The
+verify gate is now paste-the-output: paste-or-FAIL SHA1 tails, captured
+state block, metric provenance, authorization-source for destructive
+ops, end-of-round checklist; + falsification-for-permanence claims,
+test-must-red-on-bad-input, Success = artifact, neutral what-didn't-land,
+untrusted-content rule. Posture: 4.8's diligence gains are short-context;
+the brain runs in the long regime the evals don't cover → integrity =
+captured artifacts, not narrative. Both agents already show these
+unprompted (brief 253's evidence-backed non-shippers). See AGENTS.md
+§ Verify gate and round discipline.
 
-🧭 **Next round queued (252 + 253).** Scaffolder 252: next-track scout
-(rank the largest non-C-42 cohort + recommend the post-C-42 direction;
-every claim carries a falsification test). Decomper 253: C-42 drain
-wave 8 — the 4 C-43 / Family-5 picks (gotcha 13) + winnable size-2/3
-families; STOP-and-report the rest as P-N candidates; report final
-cohort state for the pivot.
+🧭 **Next round queued (254 + 255):** above. Brief 256's direction
+depends on 254(A)'s Track-2 ship-or-over-fire verdict.
 
 🎯 **Brief 246 — both brief 245 escapes resolved via existing
 gotcha 7.** No new gotcha needed. Key methodology lesson surfaced:
