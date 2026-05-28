@@ -478,6 +478,181 @@ and r2 live, pushing temp to r3.
 
 ---
 
+## Gotcha 8 — return-value reuses the last literal write
+
+**Symptom**: a function writes a literal value to a struct/global
+field and orig "happens to" return that same value via the same
+register the field write used. Your `void`-returning version
+allocates a different register for the field write.
+
+**Pattern**: when a function ends with `field = LIT; return;`,
+mwcc 2.0 picks the first-free register for the LIT write (often
+r0). When the function returns that same LIT via `return LIT;`,
+mwcc CSE's the move — the same `mov r0, #LIT` does double duty
+as the field-write source AND the return value. This forces
+*other* allocations (like a pool address) to use a different
+register.
+
+### Wrong (void return, pool in r0)
+
+```c
+extern struct GlobalState data;
+extern void helper(void);
+void func(void) {
+    helper();
+    data.f3316 = 0;
+    data.f3332 = 1;
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+bl    helper
+ldr   r0, [pc, #...]   <-- r0 = pool
+mov   r1, #0
+str   r1, [r0, #0xcf4]
+mov   r1, #1
+str   r1, [r0, #0xd04]
+pop
+```
+
+### Right (int return matching last literal, pool in r1)
+
+```c
+extern struct GlobalState data;
+extern void helper(void);
+int func(void) {
+    helper();
+    data.f3316 = 0;
+    data.f3332 = 1;
+    return 1;          /* same as last field write */
+}
+```
+
+mwcc emits:
+
+```text
+push  {r3, lr}
+bl    helper
+ldr   r1, [pc, #...]   <-- r1 = pool (forced!)
+mov   r0, #0
+str   r0, [r1, #0xcf4]
+mov   r0, #1            <-- same instruction for write + return
+str   r0, [r1, #0xd04]
+pop
+```
+
+### Where surfaced
+
+Brief 242 (C-42 reg-alloc divergence sub-shape 2). The `return 1`
+hint shifts the pool address allocation to r1.
+
+---
+
+## Gotcha 9 — int-return + both-args keeps r1 alive past bl
+
+**Symptom**: in a 2-arg function (dst, src), orig uses r2 for a
+short-lived u16 temp and r1 for a post-bl LIT load. Your version
+puts the temp in r1 and the LIT in r0.
+
+**Pattern**: mwcc allocates registers based on "what's live
+across the bl". When the helper takes both incoming args
+(`helper(dst, src)`) AND the function returns the helper's int
+return, mwcc:
+
+1. Sees r0 = helper return → live after bl → can't reuse for LIT
+2. Sees r1 = src → live up to bl → can't reuse for u16 temp
+3. Allocates r2 for the u16 temp (lowest-free that won't
+   collide)
+4. Reuses r1 for the LIT load (now-dead post-bl)
+
+### Wrong (1-arg helper, void return)
+
+```c
+extern void helper(unsigned short *dst);
+void func(unsigned short *dst, unsigned short *src) {
+    *dst = *src;       /* mwcc puts u16 temp in r1 */
+    helper(dst);
+    *dst = 0x183e;     /* mwcc puts LIT in r0 */
+}
+```
+
+### Right (both args + int return)
+
+```c
+extern int helper(unsigned short *dst, unsigned short *src);
+int func(unsigned short *dst, unsigned short *src) {
+    int r;
+    *dst = *src;          /* mwcc puts u16 temp in r2 */
+    r = helper(dst, src); /* r1 now committed to helper arg */
+    *dst = 0x183e;        /* mwcc puts LIT in r1 (post-bl) */
+    return r;
+}
+```
+
+### Where surfaced
+
+Brief 242 (C-42 reg-alloc divergence sub-shape 3). The
+both-args + int-return combination shifts both the u16 temp and
+the LIT load to the correct registers simultaneously.
+
+---
+
+## Gotcha 10 — `stmfd {lr} + sub sp #4` is a 1.2/sp3 routing tier
+
+**Symptom**: a small function with prologue `stmfd sp!, {lr}; sub
+sp, sp, #4` (8-byte align via explicit sub) is observed in orig
+but mwcc 2.0/sp1p5 emits `push {r3, lr}` (8-byte align via dummy
+r3 save).
+
+**Pattern**: this is NOT a reg-alloc issue. mwcc 1.2/sp3 (the
+"legacy_sp3" routing tier) emits the `stmfd; sub sp` shape while
+mwcc 2.0/sp1p5 emits the `push {r3, lr}` shape. Route the file
+through `*.legacy_sp3.c` to get the 1.2/sp3 compiler.
+
+### Indicators
+
+- `stmfd sp!, {lr}` (e92d4000) followed by `sub sp, sp, #4`
+  (e24dd004)
+- `ldmfd sp!, {pc}` (e8bd8000) epilogue (style A pop with pc)
+- Function size typically 0x20-0x40 (very short thunk)
+
+### Where surfaced
+
+Brief 242 (sub-shape 4 of brief 240's reg-alloc escape). Brief
+240 misclassified this as a reg-alloc divergence; brief 242
+empirically showed it's a routing-tier mismatch.
+
+The lesson: BEFORE assuming reg-alloc divergence, sweep all 8
+mwcc tiers — sometimes the divergence is the wrong tier
+entirely.
+
+---
+
+## Pre-flight: when reg-alloc divergence appears
+
+mwcc's register allocator considers what's "live across the bl"
+when picking temp registers. Apply in order:
+
+1. **Try all 8 tiers first** (gotcha 10). Sometimes the
+   "wrong reg" is actually a wrong-tier symptom.
+2. **Count helper args** (gotcha 7). Adjust function signature
+   to push the temp to the orig's register.
+3. **Make the return type match the last literal write**
+   (gotcha 8). Useful when the function writes a literal and
+   the return value would naturally hold that literal.
+4. **Combine int-return + both-args** (gotcha 9). When the
+   helper takes the function's args, returning the helper's
+   result forces a 3-register live set across the bl.
+
+If none of (1)-(4) work, the divergence may be a genuine
+allocator quirk — file under wall class P-14 or similar (no
+known recipe).
+
+---
+
 ## Pre-flight checklist for new picks
 
 Before writing the C source for a new pick:
@@ -504,6 +679,14 @@ Before writing the C source for a new pick:
 9. **Count helper args first** — match the orig's temp-register
    index by setting pass-through arg count: r1 temp → 0-1 args,
    r2 temp → 2 args, r3 temp → 3 args (gotcha 7).
+10. **Match return type to last literal write** — if orig writes
+    a literal LIT to a field then returns, declare the function
+    `int` returning `LIT` (gotcha 8). Forces other allocations
+    to non-r0.
+11. **Combine int-return + both-args** to push a u16 temp to r2
+    in 2-arg ptr-copy thunks (gotcha 9).
+12. **`stmfd; sub sp, #4` prologue → use `*.legacy_sp3.c`**
+    routing (gotcha 10). Not a reg-alloc issue.
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.

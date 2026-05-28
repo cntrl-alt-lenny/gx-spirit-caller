@@ -9691,3 +9691,11 @@ src/main/func_020190fc.c:
 src/main/func_02034360.c:
     complete
     .text start:0x02034360 end:0x02034388
+
+src/main/func_02087d2c.legacy_sp3.c:
+    complete
+    .text start:0x02087d2c end:0x02087d54
+
+src/main/func_02087d54.legacy_sp3.c:
+    complete
+    .text start:0x02087d54 end:0x02087d7c
