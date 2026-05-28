@@ -364,50 +364,79 @@ itself:
 
 ### Open briefs
 
-- **Brief 242** — `scaffolder`. **Reg-alloc divergence escape
-  investigation.** Brief 240 surfaced a recurring escape: mwcc
-  2.0/sp1p5 picks `r1` for free-scratch where orig used `r2`
-  (or vice versa). Same instructions, same control flow, same
-  opcodes — only register choice differs. Affects ~5 C-42
-  sub-shapes across ~500 remaining picks: (1) tag6 bitfield
-  extract (5+ picks), (2) pool-data + global field write,
-  (3) helper-returns-ptr + field write, (4) `stmfd; sub sp, #4`
-  prologue thunks (6+ picks), (5) `*p = *q; helper(p); *p = LIT`.
-  Brief 240's 8 shipped picks share an empirical
-  ships-without-walls profile (2+ explicit args + no bitfield
-  extract) — start the investigation there. **Primary lever:
-  brief 241's gotcha 7 (arg-count tunes the temp register).**
-  Apply systematically across all 5 sub-shapes. Secondary
-  levers: dummy/unused arg at varied positions, declaration
-  ordering, explicit register hints via attributes,
-  restrict/volatile placement, return-type variation, struct
-  field reordering. **Success criterion:** recipe locks for at
-  least 2 of the 5 sub-shapes — ship 5-10 worked examples +
-  extend `docs/research/recipe-gotchas.md` with the reg-alloc
-  recipe family. **Negative result also OK:** full
-  falsification matrix that documents this as P-N (permanent)
-  with the 5 sub-shapes explicitly listed. Verify: scaffolder
+- **Brief 244** — `scaffolder`. **5 NEW reg-alloc sub-patterns
+  investigation (continuation of brief 242 methodology).** Brief
+  243 surfaced 5 new reg-alloc sub-patterns beyond brief 240's
+  set during opportunistic C-42 drain. Apply brief 242's proven
+  methodology (gotchas 7-10 + variant matrix). The 5 sub-patterns:
+  **(6) Pointer-double-store reg choice** — 2 picks; `ldr r1` vs
+  `ldr r0` for 2nd struct-ptr reload. **(7) Switch-on-ldrh reg
+  choice** — 1 pick; `ldrh r2` vs `ldrh r1` for switch temp.
+  **(8) stmia fusion miss** — 1 pick; two `str` instructions
+  instead of one `stmia`. **(9) Loop counter / index reg-alloc**
+  — 4 picks; counter holds in r5 vs r4 (or swap). **(10)
+  Indexed-ldr reg choice** — 1 pick; similar to (6) with
+  `[rN, rM, lsl]`. Read brief 243's research note at
+  `docs/research/brief-243-c42-opportunistic-drain-wave3.md` for
+  per-pattern picks + diff samples. Brief 243 already tried
+  explicit local-var decls, struct vs ptr types, declaration-order
+  swaps — none worked deterministically. **Primary new levers:**
+  gotcha 7 with varied arg counts, gotcha 8 with literal-mov
+  reordering, gotcha 9 (helper return type) varied widths, gotcha
+  10 (.legacy_sp3 routing) for any sub-pattern with `stmfd; sub
+  sp` prologue. **Success criterion:** 2+ sub-patterns lock → ship
+  5-10 worked examples + extend recipe-gotchas.md to 11+ gotchas.
+  **Negative result also OK:** full falsification matrix as P-14
+  with the 5 sub-patterns explicitly listed. Verify: scaffolder
   direct-mwcc only, no SHA1 requirement. Branch:
-  `scaffolder/c42-reg-alloc-divergence-investigation`.
-- **Brief 243** — `decomper`. **Opportunistic C-42 drain at
-  high yield.** Stay clear of brief 240's escape pattern.
-  Target brief 240's empirical safe profile: picks with 2+
-  explicit args AND no bitfield extract. Use brief 239's
-  sub-shape histogram (A3 single-bl-plain 189 picks, B5
-  two-bl-plain 92, C three-or-more-bl 91) to enumerate
-  candidates; cross-reference with brief 240's 5 escape
-  sub-shapes and SKIP any that overlap. Apply brief 241's
-  expanded recipe library (16 C-42 sub-shapes documented).
-  **Recipe-gotchas mandatory pre-flight:**
-  `docs/research/recipe-gotchas.md` (7 patterns). **Drain
-  priority:** prefer main + ov002 where equally tractable
-  (calcrom debt). Target: 20-30 ships at 85%+ C-yield. Hard
-  cap on per-pick effort to avoid the brief 240 spiral —
-  defer at the first repeat reg-alloc divergence. Verify gate:
+  `scaffolder/c42-reg-alloc-investigation-wave2`.
+- **Brief 245** — `decomper`. **C-42 opportunistic drain wave
+  4.** Continue the brief 243 methodology with the expanded
+  recipe library. Apply brief 242's full recipe-gotchas (10
+  gotchas) + brief 243's expanded C-42 sub-shape library
+  (sub-shapes 17-20 + single-helper conditional thunks).
+  **Avoid brief 243's 5 new sub-patterns (6-10)** — list in brief
+  244 above for cross-reference. Use brief 239's sub-shape
+  histogram to enumerate candidates outside those 5. **Recipe
+  gotchas mandatory pre-flight:** `docs/research/recipe-gotchas.md`
+  (10 patterns now). **Drain priority:** prefer main + ov002
+  where equally tractable. Target: 20-30 ships, hard-tier 8.88 %
+  → 9.1-9.3 %. Expect 70-75 % C-yield per brief 243's empirical
+  cohort sizing finding — halt on repeat escapes per the
+  now-established methodology (this is the 3rd iteration of the
+  scaffolder-unblocks-decomper-surfaces pattern). Verify gate:
   3-region `ninja sha1` PASS. Branch:
-  `decomper/c42-opportunistic-drain-wave3`.
+  `decomper/c42-opportunistic-drain-wave4`.
 
 ### Closed briefs (reference)
+
+- **Brief 243** — `decomper`, shipped in PR #716. ⚠️ **22 .c
+  ships at 71% C-yield, halted on 5 new reg-alloc sub-patterns.**
+  Hard-tier 8.62 % → 8.88 %. Shipped 5 main + 17 ov002, expanding
+  the C-42 recipe library by 5 new sub-shapes (17 bit-set +
+  4-arg helper + tst-bool tail with 6 picks in 021de* sibling
+  family, 18 3-way switch on helper return, 19 2-helper chain
+  with return passed forward, 20 conditional 2nd helper based on
+  1st's return, plus 5 single-helper conditional thunks). 9
+  escapes filed for brief 244: pointer-double-store, switch-on-
+  ldrh, stmia fusion miss, loop counter reg-alloc, indexed-ldr
+  reg choice. **Empirical finding:** the brief 240 "safe
+  profile" cohort is smaller than estimated — wave 4+ should
+  expect 70-75% C-yield without source-side controls.
+- **Brief 242** — `scaffolder`, shipped in PR #715. 🎯 **All 4
+  reg-alloc sub-shapes LOCKED — no P-14 needed.** Brief 240's
+  halt-trigger was an incomplete diagnosis. Sub-shape 1 (tag6
+  bitfield) reaches via gotcha 7 direct. Sub-shape 2 (pool + 2
+  global writes) → **NEW gotcha 8** (return LIT reuses last
+  `mov r0, #LIT`). Sub-shape 3 (ptr-copy + helper + LIT-write)
+  → **NEW gotcha 9** (helper takes both args + int return → r2
+  temp + r1 LIT). Sub-shape 4 (stmfd + sub sp #4) is NOT
+  reg-alloc — routing tier mismatch fixed by **NEW gotcha 10**
+  (use `*.legacy_sp3.c`). 8 worked examples shipped (2 main
+  `.legacy_sp3.c`, 6 ov002 `.c`). recipe-gotchas.md extended by
+  3 gotchas + 3 checklist items + 4-step diagnostic order. **~500
+  C-42 picks across these sub-shapes now unblocked for mechanical
+  drain in brief 243/245+.**
 
 - **Brief 241** — `scaffolder`, shipped in PR #713. 🎯 **All 3
   deliverables landed.** (A) Brief 238's 7 deferred picks all
