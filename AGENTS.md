@@ -364,56 +364,102 @@ itself:
 
 ### Open briefs
 
-- **Brief 246** — `scaffolder`. **Brief 245's 2 escapes
-  investigation + opportunistic next-step.** Two specific
-  escapes from brief 245's wave 4 drain. (A) `02087528` —
-  objdump bytes match orig but objdiff reports `fuzzy_match`
-  66 % rather than `matched`. Likely a relocation-scoring or
-  addend issue related to objdiff #346 (see
-  `docs/research/objdiff-v371-upgrade-trial.md`). Investigate:
-  is the .o relocation table different from orig in a way that
-  trips objdiff's strict reloc check? If so, this is a tooling
-  workaround opportunity (similar to brief 206's resolve-relocs
-  harness); document and either patch
-  `tools/objdiff_resolve_relocs.py` to handle this case or note
-  for the v3.7.1 upgrade follow-up. (B) `02259f74` — `movhi`
-  unsigned-compare variant of sub-shape 2 (pool + global check).
-  Gotcha 7 (arg count) doesn't generalise because the `movhi`
-  form (mwcc's signed/unsigned predication choice) needs a
-  different source idiom. Classify: extend gotcha 7 with an
-  unsigned-comparison clause, OR fold as new gotcha 12. **Brief
-  is small** (only 2 escapes) — if you finish quickly,
-  opportunity to: (i) audit recipe-gotchas.md for consolidation
-  opportunities (11 gotchas + 6 diagnostic steps is getting
-  unwieldy — does a flowchart or decision-tree representation
-  serve future briefs better?), or (ii) revisit brief 241 (B)
-  next-cluster scout to see whether the post-C-42-drain
-  unclassified residue has shifted (any new >100-pick clusters
-  emerged?). Verify: scaffolder direct-mwcc only, no SHA1
-  requirement. Branch: `scaffolder/c42-wave4-escapes-and-audit`.
-- **Brief 247** — `decomper`. **C-42 opportunistic drain wave
-  5.** Continue the scaffolder-unblocks-decomper-surfaces
-  cadence — this is iteration 4. Recipe-gotchas library is now
-  11 gotchas + 6-step diagnostic order; brief 245's 94 %
-  C-yield demonstrates the library is mature enough for
-  high-yield mechanical drain. Apply the full library plus the
-  expanded C-42 sub-shape catalogue (25+ documented sub-shapes
-  across briefs 237/238/241/243/245). **Avoid brief 245's 2
-  flagged shapes** until brief 246 lands their classifications:
-  `02087528` (objdiff reloc-scoring issue), `02259f74` (`movhi`
-  unsigned-compare variant). **Recipe gotchas mandatory
-  pre-flight:** `docs/research/recipe-gotchas.md`. **Drain
-  priority:** continue the ov002 + main strategic mix per
-  calcrom debt-reduction (run `python3.13 tools/calcrom.py eur`
-  for current snapshot if you need a tiebreaker). Target:
-  25-40 ships, hard-tier 9.28 % → 9.6-9.9 %. **Expected
-  C-yield: 85-94 %** — sustain brief 245's high watermark
-  range. Hard cap on per-pick effort: 10 minutes. Halt on
-  repeat escapes per the now-mature methodology. Verify gate:
-  3-region `ninja sha1` PASS. Branch:
-  `decomper/c42-opportunistic-drain-wave5`.
+- **Brief 248** — `scaffolder`. **Brief 247's 4 NEW escape
+  patterns + symptom→gotcha lookup decision + homogeneity
+  lesson write-up.** Three deliverables. (A) Investigate brief
+  247's 4 NEW escape patterns N1-N4. Apply the proven catalog +
+  variant-matrix methodology (4th iteration). **N1**: sub-shape
+  2 with trailing void helper — gotcha 8 (return matches LIT)
+  doesn't apply when there's a `bl` after the field write.
+  Variant: split into two sequential statements? Use volatile
+  to suppress fusion? **N2**: predication collapse — `if (X)
+  return 0` collapses to `moveq + popeq` even with braces,
+  overriding gotcha 5 (if-then vs early-return polarity). Test
+  whether brace style or assignment vs return matters when the
+  predicate is a function-call result rather than a variable.
+  **N3**: nested struct ptr-alias — mwcc inlines `&self->inner`
+  to single offset; orig pre-computes the alias in a callee-
+  saved reg. Variant: explicit local pointer aliasing the
+  inner struct? Different access pattern (member-by-member vs
+  block)? **N4**: 2-helper if-else r3 vs r1 reg-alloc — orig
+  picks r3 for pool temp; ours picks r1 with no obvious
+  source-side lever. Try gotcha 7 with varied arg counts,
+  gotcha 11 (declaration order), and the "dummy 3rd arg
+  forces r3-routing" hypothesis. Read brief 247's research
+  note at
+  `docs/research/brief-247-c42-opportunistic-drain-wave5.md`
+  for diff samples. **Success criterion:** 2+ of 4 patterns
+  lock → ship 2-5 worked examples + extend gotchas doc to
+  12+. (B) Decide on brief 246's proposed symptom→gotcha
+  lookup table addition to recipe-gotchas.md. If it serves
+  brief 249+ decomper better than the current narrative,
+  land it. If not, document why and close out the proposal.
+  (C) Write up brief 247's "sub-shape homogeneity drives
+  yield" lesson as a recipe-gotchas.md or codegen-walls.md
+  addition. Empirical pattern: wave 4 with 25 same-recipe
+  siblings → 94% yield; wave 5 with shape-diverse picks →
+  73%. Strategic implication: hunt sibling families. This
+  belongs as a documented planning heuristic for future
+  decomper briefs. Verify: scaffolder direct-mwcc only, no
+  SHA1 requirement. Branch:
+  `scaffolder/c42-wave5-escapes-and-sub-shape-homogeneity`.
+- **Brief 249** — `decomper`. **C-42 drain wave 6, sibling-
+  family-first strategy.** Apply brief 247's empirical
+  lesson: yield correlates with sub-shape homogeneity, not
+  library maturity. **New strategy: hunt sibling families
+  and exhaust each before moving on, rather than picking
+  randomly from the cohort.** Enumerate cohort sizes per
+  sub-shape family using brief 239's histogram + brief
+  244's tightened C-42 detector. Sub-shape families to
+  prioritise (per brief 245's 94 % wave): tag6 bitfield
+  single-helper, tag6 bitfield if-else 2-helper, pool +
+  global check, pool-deref 2-fields + helper, sp3-routing
+  thunks (`.legacy_sp3.c`). For each family, drain the
+  largest cohort first. **Avoid brief 247's 4 escape patterns
+  N1-N4** until brief 248 lands their classifications.
+  Recipe-gotchas mandatory pre-flight: `docs/research/recipe-gotchas.md`
+  (11 gotchas + 6-step diagnostic order). **Drain priority:**
+  ov002 + main strategic mix per calcrom debt-reduction.
+  Target 25-40 ships, hard-tier toward 9.6-10.0 %. **Expected
+  C-yield: 85-94 %** — same as brief 245's high watermark,
+  achieved via sibling-hunting strategy. Hard cap on per-
+  pick effort: 10 minutes. Halt on repeat escapes per
+  established methodology. Verify gate: 3-region
+  `ninja sha1` PASS. Branch:
+  `decomper/c42-drain-wave6-sibling-hunt`.
 
 ### Closed briefs (reference)
+
+- **Brief 247** — `decomper`, shipped in PR #722. ⚠️ **19 .c
+  ships at 73 % C-yield, halted at first repeat escape.** 18
+  main + 1 ov002. 4 NEW escape patterns surfaced (N1-N4) for
+  brief 248: sub-shape 2 with trailing void helper, predication
+  collapse, nested struct ptr-alias, 2-helper r3 vs r1
+  reg-alloc. **Important new methodology lesson:** sub-shape
+  homogeneity drives yield. Wave 4's 94 % came from same-recipe
+  sibling drains; wave 5's 73 % came from shape-diverse main
+  thunks. The recipe library isn't the bottleneck — selection
+  strategy is. Brief 249 picks up the sibling-hunting strategy.
+  Cohort progress: 127 of ~860 C-42 picks drained across 5
+  waves.
+- **Brief 246** — `scaffolder`, shipped in PR #721. 🎯 **2/2
+  brief 245 escapes resolved via existing gotcha 7 — no new
+  gotcha needed.** Both turned out to be standard gotcha 7
+  applications at the WRONG arg count. (A) `02087528`: brief 245
+  misdiagnosed as objdiff scoring quirk — actually real reg-alloc
+  divergence (r1 vs r2 for temp). objdiff was correct all along;
+  bytes did NOT match. 2-arg pass-through (gotcha 7) ships
+  byte-identical. (B) `02259f74`: `movhi` unsigned-compare
+  variant. Brief 245 tried 2-arg (pool to r2, wrong). Correct
+  fix: 1-arg pass-through (pool to r1). Ships byte-identical on
+  first try. **Methodology lesson surfaced:** count the orig's
+  desired temp register FIRST, then gotcha 7 mechanically picks
+  the right arg count. (C) Cluster scout repeated — no new
+  >100-pick clusters; top-5 unchanged from brief 241
+  (55/45/40/26/20). C-42 itself dropped 851 → 539 unmatched
+  across waves 1-4. Brief 246 also proposed an additive
+  symptom→gotcha lookup table for recipe-gotchas.md — deferred
+  to brief 248 decision.
 
 - **Brief 245** — `decomper`, shipped in PR #719. 🎯 **33 .c
   ships at 94 % C-yield — the highest yield of any C-42 wave so
