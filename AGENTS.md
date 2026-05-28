@@ -364,39 +364,88 @@ itself:
 
 ### Open briefs
 
-- **Brief 238** — `decomper`. **C-42 first mechanical drain
-  wave.** Apply natural recipes to 30-50 picks from the 861-pick
-  C-42 cluster (brief 237 classified this as the dominant
-  unclassified hard-tier shape — multi-call thunks 32-64 B with
-  helper calls, no bit-extracts/MMIO/predicates). Brief 237's 5
-  worked examples cover the sub-shapes: (i) conditional helper2 +
-  literals (`021b0c34`), (ii) struct field rw (`ov000_021aaec4`),
-  (iii) two helpers with pool-loaded data (`ov010_021b2bf8`),
-  (iv) helper1 saved across void helper2 (`ov000_021aae34`),
-  (v) single helper + fnptr arg + bool (`0220868c`). **Recipe
-  gotchas** (per brief 237): use `int r = h(); if (r == 0)
-  return r;` not `if (h() == 0) return 0;` (the latter emits an
-  extra `moveq r0, #0`); pool data symbols are `extern char
-  data_xxx[]` not `extern int g_xxx`. Target: 30-50 ships,
-  hard-tier 8.16 % → 8.5-8.8 %. Verify gate: 3-region
-  `ninja sha1` PASS. Branch: `decomper/c42-drain-wave1`.
-- **Brief 239** — `scaffolder`. **C-39e sub-pattern + C-42
-  audit + recipe-gotcha codification.** Three small deliverables.
-  (A) Brief 236's 2 deferred C-39e picks (`021e27c0`, `02206608`)
-  — C-39e prologue but divergent body (bne-branch / nested
-  bitfield). Variant matrix to classify: extends C-39e, or new
-  C-39e sub-shape (C-39e1)? (B) Audit `tools/predict_walls.py`
-  C-42 detector against the full 861-pick cluster: how many false
-  positives if we run it now? Are there sub-clusters worth pre-
-  tagging for brief 238+ (e.g. struct-rw vs literal-pool vs
-  fnptr)? (C) Codify brief 237's two recipe gotchas into the
-  recipe-library reference doc (`docs/research/recipe-gotchas.md`
-  or similar) — `return r` vs `return 0` peephole; array extern
-  vs scalar extern pool form. Verify: scaffolder direct-mwcc
-  only, no SHA1 requirement. Branch:
-  `scaffolder/c39e-sub-c42-audit-and-recipe-gotchas`.
+- **Brief 240** — `decomper`. **C-42 second drain wave (with
+  audit-refined detector + sub-shape histogram).** Brief 239
+  tightened the C-42 detector to 97 % TP (excludes `sub sp, sp,
+  #N>16`) and added a 9-way sub-shape histogram for pre-tagging.
+  Brief 238 surfaced 6 new C-42 sub-shapes (taxonomy now 11
+  total). Apply natural recipes to 40-60 picks from the ~554
+  C-42 unmatched picks. **Strategic drain priority:** still
+  prefer main + ov002 picks where equally tractable (calcrom debt
+  reduction). **Sub-shape priority order** (largest cohorts
+  first per brief 239's histogram): A3 single-bl-plain (189),
+  B5 two-bl-plain (92), C three-or-more-bl (91). **Recipe gotcha
+  pre-flight reading required:** `docs/research/recipe-gotchas.md`
+  (6 patterns + checklist). **C-yield target: 85 %+** (brief 238
+  was 81 % due to struct-layout escapes — brief 241 scaffolder
+  is investigating those). Target: 40-60 ships, hard-tier 8.52 %
+  → 9.0-9.4 %. Verify gate: 3-region `ninja sha1` PASS. Branch:
+  `decomper/c42-drain-wave2`.
+- **Brief 241** — `scaffolder`. **Brief 238 deferred picks +
+  next-cluster scout + calcrom-canon reconciliation.** Three
+  deliverables. (A) Brief 238's 7 deferred C-42 picks all share
+  a struct-layout / pool-deref edge case — mwcc emits `add rN,
+  r0, #N; ldr [rN, #M]` split for large field offsets where orig
+  uses a direct `ldr [r0, #N+M]`. Variant matrix to find the
+  source form that emits the direct-offset shape (likely
+  involves struct typedefs with different field offsets, or
+  pointer-arithmetic cast). If recipe locks: classify as C-43
+  (struct-layout-large-offset) or fold under C-42 sub-shape;
+  ship 1-3 worked examples + extend detector. (B) Next-cluster
+  scout: brief 237's unclassified residue was 1725 picks; after
+  brief 238 + 240 wave 2 drain the C-42 cluster, roughly 1170
+  unclassified residue remain. Histogram by shape feature to
+  identify the next-biggest cluster after C-42 (anything
+  exceeding 100 picks) — repeat brief 237's methodology.
+  (C) Reconcile calcrom interpretation in
+  `memory/reference_metric_canon.md` and any tooling docs.
+  Brief 239 (D) corrected brain's interpretation: mf > cu is a
+  natural multi-fn-per-TU artifact, not a missing-marker
+  indicator. Update tooling output (`tools/calcrom.py` print
+  format if needed) and docs to make this distinction explicit
+  for future brains. Verify: scaffolder direct-mwcc only, no
+  SHA1 requirement. Branch:
+  `scaffolder/c42-deferred-next-cluster-and-calcrom-canon`.
 
 ### Closed briefs (reference)
+
+- **Brief 239** — `scaffolder`, shipped in PR #709. 🎯 **C-39e
+  generalises + C-42 audit (97 % TP) + recipe-gotchas codified +
+  calcrom interpretation corrected — 2 ships, 4 high-value
+  deliverables.** (A) Brief 236's 2 deferred C-39e picks
+  (`021e27c0` bne-skip + cross-call compare;
+  `02206608` bit-equality + merged-tail) both LOCK byte-identical
+  under natural recipes. C-39e recipe generalises to complex
+  bodies — **NOT a new sub-shape**. New gotcha: `&&` short-circuit
+  merges duplicate-call paths. (B) C-42 detector audit: 97.3 % TP
+  (15 FP of 569 candidates), tightened to exclude `sub sp, sp,
+  #N>16` large-stack-frame buffer-pass thunks. Added 9-way
+  sub-shape histogram (A3 dominant at 189 picks). (C) Recipe-
+  gotchas reference doc shipped at
+  `docs/research/recipe-gotchas.md` — 6 patterns catalogued.
+  **(D) NEGATIVE RESULT — brain's calcrom directive was wrong.**
+  All 9 "affected" overlays already have 100 % complete delinks.
+  The `mf > cu` delta is a natural multi-fn-per-TU artifact, not
+  a missing-marker indicator. Brain should not treat this delta
+  as actionable bookkeeping. Research note:
+  [`brief-239-c39e-sub-c42-audit-gotchas.md`](docs/research/brief-239-c39e-sub-c42-audit-gotchas.md).
+- **Brief 238** — `decomper`, shipped in PR #710. 🎯 **30 .c
+  ships in the C-42 first mechanical drain. Hard-tier 8.16 % →
+  8.52 % (+0.36 pp).** Strategic drain hit: 14 main + 16 ov002
+  (calcrom debt reduction guidance landed). C-yield 30/37 = 81 %
+  — slightly below the 95 % target. 7 escapes are struct-layout
+  / pool-deref edge cases (mwcc's `add rN, r0, #N; ldr [rN, #M]`
+  split pattern for large field offsets) flagged for brief 241
+  scaffolder review. **6 NEW C-42 sub-shapes surfaced** beyond
+  brief 237's 5: chain `helper2(self, helper1_ret)`, 2-helper
+  preserving (self, arg1), arg-insert thunk with literal,
+  store + cond-skip + helper, save/clear/helper/restore,
+  pool-deref + helper. Wall family taxonomy now 11 sub-shapes.
+  Methodology lessons reconfirmed: mwcc 2.0 = C89 (no
+  mid-scope declarations); early-return vs `return r` form
+  depends on whether orig has the redundant `moveq r0, #0`
+  (read orig disasm first). Research note:
+  [`brief-238-c42-drain-wave1.md`](docs/research/brief-238-c42-drain-wave1.md).
 
 - **Brief 237** — `scaffolder`, shipped in PR #705. 🎯 **C-42
   multi-call thunk NEW WALL classified — biggest single-round
