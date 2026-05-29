@@ -8,40 +8,37 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#750 + #751 merge. Brain on Mac.
-**Brief 264 (StyleA over-fire tier → 5 reusable templates, scaffolder) +
-brief 265 (over-fire wave 2 + C-39 hard-tail CLOSED — 27 .c, decomper)
-both shipped. C-39 fully done; the over-fire drain continues on the
-reliable StyleA-family vein.**
+**Last updated:** 2026-05-29, post-#753 + #754 merge. Brain on Mac.
+**Brief 266 (frameless-leaf tier fully unblocked — all coercible,
++gotcha 17, scaffolder) + brief 267 (over-fire wave 3 — 24 .c, decomper)
+both shipped. The StyleA template vein is drained; the freshly-unblocked
+tiers (frameless-diverse, C-23-MMIO) are next.**
 
-**Current metrics (post-#750 + #751 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 651a208, clean tree):**
-`complete_units 2466 / 3766 (65.48 %)` (+27 vs prior 2439) —
-SHA1-aligned headline. `matched_functions 2480 / 9801` (+27). 3-region
-SHA1 PASS established on #751 (#750 is docs/tools-only).
+**Current metrics (post-#753 + #754 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 8ef5486, clean tree):**
+`complete_units 2490 / 3797 (65.58 %)` (+24 vs prior 2466) —
+SHA1-aligned headline. `matched_functions 2504 / 9801` (+24). 3-region
+SHA1 PASS established on #754 (#753 is docs-only).
 
-🎯 **Brief 265 — 27 .c at 100 % objdiff (82 % yield).** **C-39 hard tail
-7/7 — fully CLOSED** (gotcha 16 also cracked the brief-257 byte-pack
-carry-over; only the P-11 CSE field-temp residue remains). Over-fire 20:
-StyleA-real 14 (100 % via templates), frameless-leaf 6/12. Finding:
-StyleA helper-families are the reliable 100 % vein; the frameless-leaf
-tier splits ~50/50; C23-noMMIO is a fresh untouched tier.
+🎯 **Brief 267 — 24 .c at 100 % objdiff (89 % yield).** Next-tier StyleA
+families (dd30 ×7, 928cc ×3, …) + the fresh C23-noMMIO tier 8/8 (LCG / MD5
+constants found by grep). **Pivot signal: the StyleA template-family vein
+is drained** — the ~570 remaining StyleA picks are heterogeneous (~50 %
+regime) → brief 268 sub-classifies them.
 
-🎯 **Brief 264 — StyleA over-fire tier (614) → 5 helper-family
-templates** (all `.legacy.c`, byte-identical): c94 5-arg (12, one shape)
-+ arg-shuffle + `global = helper()` + 6-arg-stack + two-void-call. Landed
-in recipe-gotchas § StyleA over-fire families + a c94 stub-emitter
-(`tools/stylea_c94_stub.py`, negative tests, SHA1-gated). The throughput
-multiplier for the drain.
+🎯 **Brief 266 — frameless-leaf tier fully unblocked.** All 6 reverted
+non-shippers coercible (predication → switch, bit-insert → gotcha 16 +
+shift, dead-store/re-read → **new gotcha 17 `volatile`**); no permanent
+wall. The diverse tail is now drainable (→ brief 269).
 
-🧭 **Where we are: deep in the over-fire cheap drain (~30 waves of
-runway).** Brief 267 = wave 3 (batch the StyleA families via 264's
-templates + open the fresh C23-noMMIO tier + clean frameless-leaf
-shapes). Brief 266 = classify the frameless-leaf diverse-tail /
-over-fire non-shipper quirks (predication-vs-branch, bit-insert-mask,
-dead-store elision — lift it off ~50 %). After the over-fire cohort,
-genuine Track-2 cold-RE (with the m2c / dsd-ghidra accelerators below) is
-the track. Settled-permanent: P-11 (CSE field-temp). The ntrtwl branch
+🧭 **Where we are: over-fire cheap drain, the freshly-unblocked tiers.**
+Brief 269 = wave 4 (the now-coercible frameless-leaf diverse tail via
+gotchas 16/17 + the genuine C-23 real-MMIO tier ~220 + more C23-noMMIO).
+Brief 268 = sub-classify the heterogeneous StyleA tail (~570) into more
+coercible families (OS_RestoreIrq ×18 etc.) — the proven "heterogeneous →
+families" multiplier. The over-fire cohort still has good-yield runway;
+genuine Track-2 cold-RE (m2c / dsd-ghidra below) is the track after.
+Settled-permanent: P-11 (CSE field-temp). The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
 
