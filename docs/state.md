@@ -8,43 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#747 + #748 merge. Brain on Mac.
-**Brief 262 (C-39 hard tail — 4/6 coercible, § C-39 CLOSED, scaffolder) +
-brief 263 (over-fire drain wave 1 — 35 .c at 100 %, decomper) both
-shipped. The over-fire pivot is highly productive; ~30 waves of cheap
-runway ahead.**
+**Last updated:** 2026-05-29, post-#750 + #751 merge. Brain on Mac.
+**Brief 264 (StyleA over-fire tier → 5 reusable templates, scaffolder) +
+brief 265 (over-fire wave 2 + C-39 hard-tail CLOSED — 27 .c, decomper)
+both shipped. C-39 fully done; the over-fire drain continues on the
+reliable StyleA-family vein.**
 
-**Current metrics (post-#747 + #748 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 65f6f6c, clean tree):**
-`complete_units 2439 / 3736 (65.28 %)` (+35 vs prior 2404 — biggest
-round) — SHA1-aligned headline. `matched_functions 2453 / 9801` (+35).
-3-region SHA1 PASS established on #748 (#747 is docs-only).
+**Current metrics (post-#750 + #751 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 651a208, clean tree):**
+`complete_units 2466 / 3766 (65.48 %)` (+27 vs prior 2439) —
+SHA1-aligned headline. `matched_functions 2480 / 9801` (+27). 3-region
+SHA1 PASS established on #751 (#750 is docs/tools-only).
 
-🎯 **Brief 263 — over-fire wave 1: 35 .c at 100 % yield.** All via
-EXISTING recipes (StyleA-real `.legacy.c` ×22, frameless-leaf ×9,
-C23-noMMIO ×2, C-39g ×2) — zero cold-RE; brief 256's thesis holds. The
-cheap over-fire worklist is bigger than the 584 estimate: StyleA lr-save
-614 + C-23 220 + frameless-leaf 217 + C23-noMMIO 29 ≈ **30 waves of
-runway**. Found the `func_02094c94` 5-arg StyleA helper-family (12 picks,
-one source shape) → brief 264 recipe-packs the StyleA families.
+🎯 **Brief 265 — 27 .c at 100 % objdiff (82 % yield).** **C-39 hard tail
+7/7 — fully CLOSED** (gotcha 16 also cracked the brief-257 byte-pack
+carry-over; only the P-11 CSE field-temp residue remains). Over-fire 20:
+StyleA-real 14 (100 % via templates), frameless-leaf 6/12. Finding:
+StyleA helper-families are the reliable 100 % vein; the frameless-leaf
+tier splits ~50/50; C23-noMMIO is a fresh untouched tier.
 
-🎯 **Brief 262 — § C-39 CLOSED, no new permanent wall.** 4 of 6 hard-tail
-shapes coercible now (stride-reuse was a misdiagnosis; +gotcha 16
-arg-bit-packing via `unsigned char`); the other 2 = the known P-11 CSE
-field-temp. The deferred-resister→coercible pattern held emphatically
-(db973→C-39f, global-chase→C-39g, now the hard tail). C-39 toolkit:
-gotchas 4/5/6/7/14/15/16 + shift-form / invert-polarity / shared-epilogue
-/ arg-liveness.
+🎯 **Brief 264 — StyleA over-fire tier (614) → 5 helper-family
+templates** (all `.legacy.c`, byte-identical): c94 5-arg (12, one shape)
++ arg-shuffle + `global = helper()` + 6-arg-stack + two-void-call. Landed
+in recipe-gotchas § StyleA over-fire families + a c94 stub-emitter
+(`tools/stylea_c94_stub.py`, negative tests, SHA1-gated). The throughput
+multiplier for the drain.
 
 🧭 **Where we are: deep in the over-fire cheap drain (~30 waves of
-runway).** Brief 265 = over-fire wave 2 (batch the StyleA families via
-brief 264's templates) + an opportunistic sweep of brief 262's
-now-coercible C-39 hard-tail shapes. Brief 264 = recipe-pack the StyleA
-helper families (throughput multiplier). After the over-fire cohort,
+runway).** Brief 267 = wave 3 (batch the StyleA families via 264's
+templates + open the fresh C23-noMMIO tier + clean frameless-leaf
+shapes). Brief 266 = classify the frameless-leaf diverse-tail /
+over-fire non-shipper quirks (predication-vs-branch, bit-insert-mask,
+dead-store elision — lift it off ~50 %). After the over-fire cohort,
 genuine Track-2 cold-RE (with the m2c / dsd-ghidra accelerators below) is
-the track. Settled-permanent reg-alloc class: CSE field-temp (P-11). The
-ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked, verified,
-awaiting a land/hold call.
+the track. Settled-permanent: P-11 (CSE field-temp). The ntrtwl branch
+(`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
+land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
