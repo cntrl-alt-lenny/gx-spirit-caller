@@ -506,40 +506,61 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 264** — `scaffolder`. **Lock the over-fire StyleA
-  helper-family recipe templates (throughput multiplier).**
-  Direct-mwcc only, no SHA1. Brief 263 hit 100 % over-fire yield
-  and found the StyleA-real tier (614 picks) is dominated by
-  regular helper-families it named: the `func_02094c94` 5-arg
-  `helper(code, a0[, a1], 0, 0)` family (12 picks, one source
-  shape), plus arg-shuffle, `global = helper()`, and 6-arg-stack
-  helper shapes. Lock the canonical `.legacy.c` recipe TEMPLATE per
-  regular shape (so brief 265+ batch-drains a whole family from one
-  source pattern), each validated byte-identical via direct-mwcc on
-  a representative pick. Land them as a "StyleA over-fire families"
-  section in recipe-gotchas.md. Every template carries a
-  falsification test. Branch:
-  `scaffolder/overfire-stylea-family-recipes`.
-- **Brief 265** — `decomper`. **Over-fire cohort drain, wave 2 +
-  opportunistic C-39 hard-tail sweep.** (A) Continue the over-fire
-  drain in brief 256/263 cheapest-first order (StyleA-real
-  `.legacy.c` → frameless-leaf → C23-noMMIO), target ~35+ picks.
-  Run `c42_family_hunter.py` (or its signature approach) over the
-  StyleA-real tier to batch the biggest helper-families first; if
-  brief 264's recipe templates have landed, apply them per family;
-  else proceed pick-by-pick. (B) Opportunistically sweep the C-39
-  hard-tail shapes brief 262 made coercible: stride-reuse
-  (`0220b420`, `0228abd8`), multi-helper-`pre()` (`02294b64`),
-  arg-bit-packing via the **`unsigned char` type** (gotcha 16;
-  `02231f4c` + likely the brief-257 carry-over `021f4d3c`),
-  global-3-way-`switch` (`0222b2e0`). **Success = per-pick 3-region
-  `ninja sha1` PASS + objdiff 100 % line, NOT `complete_units` /
-  C-yield.** Report non-shippers as P-N candidates + over-fire
-  yield by tier. 10-min/pick cap. Branch:
-  `decomper/overfire-drain-wave2`.
+- **Brief 266** — `scaffolder`. **Classify the frameless-leaf
+  diverse-tail / over-fire non-shipper shapes.** Direct-mwcc only,
+  no SHA1. Brief 265 hit 100 % on StyleA + the clean frameless-leaf
+  front, but the frameless-leaf *diverse tail* ran ~50 % and 6 picks
+  reverted as P-candidates with recurring mwcc-codegen quirks (NOT a
+  new wall). Find the source lever per quirk (→ gotcha) or classify
+  P:
+  - **predication-vs-branch** const-compare (`0202f3e8`, 50 %) —
+    orig branches; mwcc predicates a `K+9`-reuse compare.
+  - **bit/byte-insert mask** sequences (`021ab32c`, `021abf50`,
+    `021ac508`, 30-33 %).
+  - **dead-store / literal-reread elision** in struct copy/init
+    (`020a6d94` 77 %, `02092614` 42 %).
+  The decomper noted these are "likely coercible past the 10-min
+  cap" — find the lever that makes them quick (or confirm P). Every
+  claim carries a falsification test. Branch:
+  `scaffolder/overfire-frameless-leaf-tail-classify`.
+- **Brief 267** — `decomper`. **Over-fire cohort drain, wave 3.**
+  Per brief 265 the reliable vein is the StyleA helper-families
+  (100 % from brief 264's 5 templates). (A) Batch-drain the StyleA
+  helper-families via brief 264's templates (recipe-gotchas
+  § StyleA over-fire families) — finish the c94 family + the
+  `func_0209b4a4` dispatch family + templates B-E across the 614
+  tier (`tools/stylea_c94_stub.py` can pre-generate c94 candidates,
+  still `ninja sha1`-gated). (B) Drain the **clean** frameless-leaf
+  shapes only (struct-copy / field-arith / bit-compare) + open the
+  fresh **C23-noMMIO** tier (~29 ≤0x40, untouched). **Skip** the
+  diverse frameless-leaf tail + the 6 reverted P-candidates — brief
+  266 is classifying those. Target ~35+ picks. **Success = per-pick
+  3-region `ninja sha1` PASS + objdiff 100 % line, NOT
+  `complete_units` / C-yield.** Report non-shippers as P-N
+  candidates + over-fire yield by tier. 10-min/pick cap. Branch:
+  `decomper/overfire-drain-wave3`.
 
 ### Closed briefs (reference)
 
+- **Brief 265** — `decomper`, shipped in PR #751. ✅ **27 .c at
+  100 % objdiff, 82 % yield (27/33).** (B) **C-39 hard tail 7/7 —
+  CLOSED** (all 6 brief-262 coercible shapes ship; gotcha 16 also
+  cracked the brief-257 byte-pack carry-over; only the P-11 CSE
+  field-temp residue remains). (A) over-fire 20: StyleA-real 14
+  (100 % via templates), frameless-leaf 6/12. **Finding: StyleA
+  helper-families are the reliable 100 % vein; the frameless-leaf
+  tier splits ~50/50; C23-noMMIO is a fresh untouched tier.** 6
+  non-shippers = per-pick mwcc quirks → brief 266 (not a new wall).
+  complete_units 2439 → 2466.
+- **Brief 264** — `scaffolder`, shipped in PR #750. 🎯 **StyleA
+  over-fire tier (614) reduces to 5 helper-family templates** (all
+  `.legacy.c`, byte-identical): A = c94 5-arg (12 picks, one
+  shape), B = arg-shuffle, C = `global = helper()`, D = 6-arg-stack,
+  E = two-void-call. Landed in recipe-gotchas § StyleA over-fire
+  families. Stretch: `tools/stylea_c94_stub.py` (c94-only
+  disasm→`.legacy.c` emitter, returns None otherwise; 9 tests incl.
+  negatives — still SHA1-gated). No new gotcha (all gotcha-10
+  routing); the value is the per-shape template.
 - **Brief 263** — `decomper`, shipped in PR #748. ✅ **35 .c at
   100 % yield (35/35)** — over-fire drain wave 1, the pivot off
   C-39. All via EXISTING recipes (StyleA-real `.legacy.c` ×22,
