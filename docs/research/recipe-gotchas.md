@@ -88,6 +88,9 @@ Detailed write-ups follow below.
 | Bit-0 table index `table[bit0]`: pools/index regs all shifted + orig has redundant `and #1` | 14 | 3-arg helper `helper(self, arg1, v)` + write index `(self->bit0 & 1)` |
 | `global->ptr->field` chase temps land low (r1/r2) vs orig r3/ip (or global r1 vs orig r0) | 15 | match orig's incoming-arg liveness: forward the args orig forwards, or declare `void` if it takes none |
 | Orig has `and #0xff` on a provably-small value; mine folds it away | 16 | route through an `unsigned char` local/cast (the type forces it; explicit `& 0xff` does not) |
+| Orig keeps a dead store (`p->f=x; p->f=y`) or re-reads a just-stored value; mine elides/CSEs it | 17 | mark the field(s) `volatile` (+ a delayed-temp for any reused load) |
+| Const-compare `a0==K\|\|a0==K+n`: mine predicates (`moveq#1/movne#0`), orig branches (`bne` to shared `return 0`) | (switch) | `switch(a0){case K: case K+n: return 1;} return 0;` (defeats predication; brief 266) |
+| Bit/byte field-insert: orig `lsl#K; orr rN, lsr#M`, mine optimal `orr rN, lsl#pos` | 16 + shift-form | u8/u16-cast the value + write the insert as `((x<<K)>>M)`, not value-level `<<pos` |
 | Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
@@ -1109,6 +1112,54 @@ Brief 262 hard-tail triage — arg-bit-packing pick `func_ov002_02231f4c`
 (byte-identical with the u8 cast; 22/22). Likely also recovers brief
 257's byte-pack mask-fold class (`021f4d3c`).
 
+Brief 266 also used it for byte-FIELD inserts: `021ac508`
+(`(f4 & ~0xff0000) | ((u8)a1 << 16)`) needs the u8 cast to keep the
+`and #0xff` orig has (the `<< 24` would otherwise discard the high bits
+and let mwcc fold the mask).
+
+---
+
+## Gotcha 17 — `volatile` to keep a dead store / literal re-read
+
+**Symptom**: orig writes a field twice (`p->f = x; p->f = y;` — the
+first store dead) or re-reads a just-stored value (`p->f = 0;
+p->g = p->f;` — re-loading the 0), but your build elides the dead store
+or CSEs the re-read (it knows the value), shipping a few instructions
+short.
+
+**Pattern**: mwcc's dead-store elimination + load-after-store CSE are
+on at `-O4`. The orig was compiled from source where these stores /
+loads could not be optimized away — almost always because the field is
+`volatile` (memory-mapped or hardware-observed state). Declaring the
+field(s) `volatile` makes mwcc emit every store and every load
+verbatim, in order.
+
+### Wrong (mwcc elides / CSEs)
+
+```c
+struct S { int f0, f4; };
+void f(struct S *p) { p->f4 = 0; p->f0 = p->f4; }   /* mwcc: str 0; str 0 (no reload) */
+```
+
+### Right (volatile preserves the re-read)
+
+```c
+struct S { volatile int f0, f4; };
+void f(struct S *p) { p->f4 = 0; p->f0 = p->f4; }   /* str 0; ldr f4; str -> matches orig */
+```
+
+For a dead double-store, mark the doubly-written field `volatile`. Note
+the order/reg-alloc may still need a nudge — a value reused across the
+dead store wants a single load held in one register; declare a temp at
+block top and assign it *after* the preceding statement (C89 forbids a
+mid-block declaration) so the load lands where orig has it.
+
+### Where surfaced
+
+Brief 266 frameless-leaf tail: `02092614` (literal re-read, volatile
+struct, 12/12 byte-identical) and `020a6d94` (dead double-store +
+`f24` re-load, volatile `f40`/`f24` + a delayed temp for `f32`, 12/12).
+
 ---
 
 ## Pre-flight: when reg-alloc divergence appears
@@ -1194,6 +1245,9 @@ Before writing the C source for a new pick:
 16. **Orig keeps a redundant `and #0xff` your build folds** — route the
     value through an `unsigned char` local/cast; the type forces the
     mask where an explicit `& 0xff` is folded (gotcha 16).
+17. **Orig keeps a dead store / literal re-read your build elides** —
+    mark the field(s) `volatile`; add a delayed temp for any value
+    reused across the dead store (gotcha 17).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
