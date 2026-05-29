@@ -360,11 +360,25 @@ def detect_walls(asm: str) -> list[WallPrediction]:
         )
         or any("pop" in line and ", pc" in line for line in lines)
     )
-    if has_bx_lr_epilogue and not has_pop_pc:
+    # A *real* Style-A function saves `lr` in the prologue
+    # (`stmfd`/`push {..., lr}`) and restores it WITHOUT `pc`
+    # (`ldmfd {..., lr}`), then `bx lr` separately — that is the shape
+    # `.legacy.c` (mwcc 1.2/sp2p3) emits and mwcc 2.0/sp1p5 does not.
+    # A FRAMELESS LEAF (no `lr` save) also ends in `bx lr`, but that is
+    # the native leaf epilogue on BOTH tiers, so routing is irrelevant.
+    # Brief 256 confirmed by direct mwcc: frameless-leaf solo-StyleA
+    # picks ship byte-identical on the DEFAULT tier — the bare
+    # `bx lr` cue over-fires on them. Require the `lr`-save prologue.
+    has_lr_save = any(
+        re.search(r"\b(stmfd|stmdb|push)\b.*\blr\b", line)
+        for line in lines
+    )
+    if has_bx_lr_epilogue and not has_pop_pc and has_lr_save:
         walls.append(WallPrediction(
             "StyleA",
-            "epilogue uses `bx lr` separate from "
-            "`ldmfd sp!, {...}` — `.legacy.c` routing required",
+            "lr-saving prologue + `bx lr` separate from "
+            "`ldmfd sp!, {...}` — real Style-A; `.legacy.c` routing "
+            "required (frameless-leaf `bx lr` excluded — brief 260)",
         ))
 
     # ----- C-12 push-r0 arg-preserving thunk.
@@ -468,17 +482,25 @@ def detect_walls(asm: str) -> list[WallPrediction]:
         ):
             clustered_pool = True
             break
-    if pc_loads >= 3 and (
-        mmio_lits >= 1 or duplicate_refs >= 1 or clustered_pool
-    ):
+    # Brief 260 refinement: REQUIRE an actual MMIO pool literal.
+    # Brief 199 also fired on `duplicate_refs` / `clustered_pool`
+    # ALONE (regular-RAM pool refs), on the theory that mwcc 2.0 folds
+    # them. Brief 256 disproved that empirically: solo-C-23 no-MMIO
+    # picks (duplicate + clustered) ship byte-identical on the DEFAULT
+    # tier — mwcc 2.0 RELOADS the pool ptr, it does not fold. So those
+    # were false positives; routing is irrelevant. `duplicate_refs` /
+    # `clustered_pool` are kept only as extra CUE context when an MMIO
+    # literal is also present, not as independent triggers. The
+    # brief-199 DTCM duplicate-ref case (`0x027ffc00`) still fires —
+    # it counts as `mmio_dtcm`.
+    if pc_loads >= 3 and mmio_lits >= 1:
         cues: list[str] = []
-        if mmio_lits >= 1:
-            ranges = []
-            if mmio_main >= 1:
-                ranges.append(f"{mmio_main} main MMIO (0x04000xxx)")
-            if mmio_dtcm >= 1:
-                ranges.append(f"{mmio_dtcm} DTCM kernel (0x027ffxxx)")
-            cues.append(f"literal(s): {', '.join(ranges)}")
+        ranges = []
+        if mmio_main >= 1:
+            ranges.append(f"{mmio_main} main MMIO (0x04000xxx)")
+        if mmio_dtcm >= 1:
+            ranges.append(f"{mmio_dtcm} DTCM kernel (0x027ffxxx)")
+        cues.append(f"literal(s): {', '.join(ranges)}")
         if duplicate_refs >= 1:
             cues.append(f"{duplicate_refs} duplicate pool ref(s)")
         if clustered_pool:
