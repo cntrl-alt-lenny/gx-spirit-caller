@@ -8,40 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#744 + #745 merge. Brain on Mac.
-**Brief 260 (global-ptr-chase → C-39g coercible + over-fire detectors
-refined, scaffolder) + brief 261 (C-39 ov002 drain wave 4 — 24 .c,
-decomper) both shipped. C-39's cheap vein is mined out (cohort ~70 %
-drained); pivoting to the over-fire cohort.**
+**Last updated:** 2026-05-29, post-#747 + #748 merge. Brain on Mac.
+**Brief 262 (C-39 hard tail — 4/6 coercible, § C-39 CLOSED, scaffolder) +
+brief 263 (over-fire drain wave 1 — 35 .c at 100 %, decomper) both
+shipped. The over-fire pivot is highly productive; ~30 waves of cheap
+runway ahead.**
 
-**Current metrics (post-#744 + #745 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 87c6c2d, clean tree):**
-`complete_units 2404 / 3684 (65.26 %)` (+24 vs prior 2380) —
-SHA1-aligned headline. `matched_functions 2418 / 9801` (+24). 3-region
-SHA1 PASS established on #745 (#744 is docs/tools-only).
+**Current metrics (post-#747 + #748 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 65f6f6c, clean tree):**
+`complete_units 2439 / 3736 (65.28 %)` (+35 vs prior 2404 — biggest
+round) — SHA1-aligned headline. `matched_functions 2453 / 9801` (+35).
+3-region SHA1 PASS established on #748 (#747 is docs-only).
 
-🎯 **Brief 261 — 24 .c (16 C-39f + 8 wrappers); C-39 cohort 121 → 36.**
-~70 % drained; the ~28 remaining are a harder composite tail. The cheap
-C-39 vein is mined out — pivot to the over-fire cohort (higher
-throughput) rather than a dedicated C-39 wave 5.
+🎯 **Brief 263 — over-fire wave 1: 35 .c at 100 % yield.** All via
+EXISTING recipes (StyleA-real `.legacy.c` ×22, frameless-leaf ×9,
+C23-noMMIO ×2, C-39g ×2) — zero cold-RE; brief 256's thesis holds. The
+cheap over-fire worklist is bigger than the 584 estimate: StyleA lr-save
+614 + C-23 220 + frameless-leaf 217 + C23-noMMIO 29 ≈ **30 waves of
+runway**. Found the `func_02094c94` 5-arg StyleA helper-family (12 picks,
+one source shape) → brief 264 recipe-packs the StyleA families.
 
-🎯 **Brief 260 — global-ptr-chase → C-39g COERCIBLE + detectors
-refined.** Both brief-259 resisters recovered via arg-liveness matching
-(gotcha 15); distinct from the CSE field-temp P-11. predict_walls StyleA
-(lr-save) + C-23 (real-MMIO) cues refined — cuts ~214 + ~236 over-fires;
-the red-on-bad-input gate verified.
+🎯 **Brief 262 — § C-39 CLOSED, no new permanent wall.** 4 of 6 hard-tail
+shapes coercible now (stride-reuse was a misdiagnosis; +gotcha 16
+arg-bit-packing via `unsigned char`); the other 2 = the known P-11 CSE
+field-temp. The deferred-resister→coercible pattern held emphatically
+(db973→C-39f, global-chase→C-39g, now the hard tail). C-39 toolkit:
+gotchas 4/5/6/7/14/15/16 + shift-form / invert-polarity / shared-epilogue
+/ arg-liveness.
 
-🧭 **Pivot to the over-fire cohort (the next big cheap vein).** Brief 263
-starts draining the 584-pick over-fire cohort (brief 256 sized + tiered,
-brief 260 cleaned the detector): ~417 genuinely cheap via EXISTING
-recipes (C23 no-MMIO natural / Style-A `.legacy.c` routing) — no cold-RE.
-Brief 262 classifies + closes the C-39 hard tail (~28) in parallel (the
-deferred-resister→coercible pattern says some may yet be recoverable).
-After the over-fire cohort (~4-8 waves), genuine Track-2 cold-RE (with
-the m2c / dsd-ghidra accelerators below) is the track. Settled-permanent
-reg-alloc class: CSE field-temp (P-11). The ntrtwl branch
-(`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
-land/hold call.
+🧭 **Where we are: deep in the over-fire cheap drain (~30 waves of
+runway).** Brief 265 = over-fire wave 2 (batch the StyleA families via
+brief 264's templates) + an opportunistic sweep of brief 262's
+now-coercible C-39 hard-tail shapes. Brief 264 = recipe-pack the StyleA
+helper families (throughput multiplier). After the over-fire cohort,
+genuine Track-2 cold-RE (with the m2c / dsd-ghidra accelerators below) is
+the track. Settled-permanent reg-alloc class: CSE field-temp (P-11). The
+ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked, verified,
+awaiting a land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
