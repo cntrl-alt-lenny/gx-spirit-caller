@@ -10063,3 +10063,87 @@ src/main/func_02094fa0.legacy.c:
 src/main/func_0209bd64.legacy.c:
     complete
     .text start:0x0209bd64 end:0x0209bd98
+
+src/main/func_0209eb00.legacy.c:
+    complete
+    .text start:0x0209eb00 end:0x0209eb48
+
+src/main/func_0209edc8.legacy.c:
+    complete
+    .text start:0x0209edc8 end:0x0209ee10
+
+src/main/func_0209efe8.legacy.c:
+    complete
+    .text start:0x0209efe8 end:0x0209f030
+
+src/main/func_0209f0d8.legacy.c:
+    complete
+    .text start:0x0209f0d8 end:0x0209f120
+
+src/main/func_0209f120.legacy.c:
+    complete
+    .text start:0x0209f120 end:0x0209f168
+
+src/main/func_0209f168.legacy.c:
+    complete
+    .text start:0x0209f168 end:0x0209f1b0
+
+src/main/func_0209f030.legacy.c:
+    complete
+    .text start:0x0209f030 end:0x0209f070
+
+src/main/func_0209c0a0.legacy.c:
+    complete
+    .text start:0x0209c0a0 end:0x0209c0cc
+
+src/main/func_0202250c.c:
+    complete
+    .text start:0x0202250c end:0x02022540
+
+src/main/func_020a991c.c:
+    complete
+    .text start:0x020a991c end:0x020a9950
+
+src/main/func_02095cc8.legacy.c:
+    complete
+    .text start:0x02095cc8 end:0x02095cfc
+
+src/main/func_02095cfc.legacy.c:
+    complete
+    .text start:0x02095cfc end:0x02095d34
+
+src/main/func_02095d34.legacy.c:
+    complete
+    .text start:0x02095d34 end:0x02095d6c
+
+src/main/func_02097ff0.legacy.c:
+    complete
+    .text start:0x02097ff0 end:0x02098038
+
+src/main/func_02098104.legacy.c:
+    complete
+    .text start:0x02098104 end:0x0209815c
+
+src/main/func_02099298.c:
+    complete
+    .text start:0x02099298 end:0x020992d8
+
+src/main/func_020215ec.c:
+    complete
+    .text start:0x020215ec end:0x0202162c
+
+src/main/func_02034054.c:
+    complete
+    .text start:0x02034054 end:0x02034094
+
+src/main/func_0206e474.legacy.c:
+    complete
+    .text start:0x0206e474 end:0x0206e4a4
+
+src/main/func_0209d758.legacy.c:
+    complete
+    .text start:0x0209d758 end:0x0209d788
+
+src/main/func_0209e4f8.legacy.c:
+    complete
+    .text start:0x0209e4f8 end:0x0209e524
