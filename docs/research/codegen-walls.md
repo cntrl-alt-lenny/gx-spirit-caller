@@ -5392,15 +5392,19 @@ the reg-alloc exactly but leaves the `and #1` gap; `v1` (3-arg helper +
 reg-alloc — disproof would be a single source form needing neither
 lever, which does not exist.
 
-**Cohort size (~11 picks, ov002).** Family `db973`
-(`02205508` / `0220c940` / `0220e108`) + relatives `8446c`
-(`02206490` / `02208720`), `f030a` (`02204a68` / `0220b208`), `46a3d`
-(`022958a8` / `02296f54`), `e9e9e` (`022056f0` / `0220aa64`). All share
-the identical `ldrh ip; lsl;lsr; and ip,#1; mul r2,ip,r2; ldr r2,[r3,r2]`
-core (confirmed on `0220c940` / `0220e108` / `02206490`); per-pick
-variation is the guard polarity (`cmp #0`/`#1`) + trailing wrappers,
-handled by the standard catalog. The per-pick helper is per-overlay —
-confirm each `.word` / `bl` target before cloning (brief 251 caveat).
+**Cohort size (~17 picks, ov002).** Brief 256 scoped 11; brief 257's
+wave-2 scan found 6 more with the identical `and ip,#1; mul stride;
+ldr [base, idx]` core (`0222a648`, `0220b6dc`, `0220bbd0`, `02238820`,
+`02234894`, `0220e2f0`), so the census is **~17, not 11**. Original 11:
+family `db973` (`02205508` / `0220c940` / `0220e108`) + relatives
+`8446c` (`02206490` / `02208720`), `f030a` (`02204a68` / `0220b208`),
+`46a3d` (`022958a8` / `02296f54`), `e9e9e` (`022056f0` / `0220aa64`).
+All share the identical `ldrh ip; lsl;lsr; and ip,#1; mul r2,ip,r2;
+ldr r2,[r3,r2]` core (confirmed on `0220c940` / `0220e108` /
+`02206490`); per-pick variation is the guard polarity (`cmp #0`/`#1`) +
+trailing wrappers, handled by the standard catalog. The per-pick helper
+is per-overlay — confirm each `.word` / `bl` target before cloning
+(brief 251 caveat).
 
 **Routes:** plain `.c` (mwcc 2.0/sp1p5). No legacy needed.
 
@@ -5409,6 +5413,59 @@ evidence; brief 256 (this entry) ran the variant matrix, found both
 levers, and shipped the byte-identical recipe. See
 [`brief-256-c39-table-index-and-overfire-scope.md`](brief-256-c39-table-index-and-overfire-scope.md)
 and [recipe-gotchas.md gotcha 14](recipe-gotchas.md).
+
+### C-39 residue: CSE field-temp reg-alloc plateau (P-11-class)
+
+**Not a coercible sub-shape** — a C-39 reg-alloc RESIDUE that brief 258
+classified as a **P-11**-family plateau (added to the P-11 census).
+Mechanism: the `@2` bitfield container is read once at function entry
+and CSE'd for a range/branch test **plus** ≥2 bitfield helper-args of a
+≥3-arg helper. orig holds the container in a HIGH register (r3 or r2);
+mwcc 2.0/sp1p5 takes the LOWEST-FREE register (r1) at the entry `ldrh`
+(only r0=self is live). Otherwise byte-identical.
+
+**Target asm (`func_ov002_02200084`, 0x3c — field in r3):**
+
+```text
+
+push  {r3, lr}
+ldrh  r3, [r0, #2]           ; field → r3 (orig) / r1 (mwcc)
+lsl r2,r3,#20; lsr r2,r2,#26 ; b11_6 range test (scratch r2)
+cmp r2,#2; bne .else
+ldrh  r2, [r0]               ; self->f0 (arg2)
+lsl r0,r3,#31; lsl r1,r3,#26 ; bit0 (arg0), b5_1 (arg1) — both from the field reg
+lsr r0,r0,#31; lsr r1,r1,#27
+bl    func_ov002_021b4098    ; helper(bit0, b5_1, f0)  — 3 args
+pop   {r3, pc}
+```
+
+**Falsifiable claim:** *some source form makes mwcc keep the field in
+r2/r3 with no other divergence.* **Falsified — 9 source forms (brief
+258):**
+
+| Form | Field reg | Other divergence |
+|---|---|---|
+| member bitfields (natural) | **r1** | none — else byte-identical |
+| named `unsigned` + `>>/&` masks | r3 | extraction becomes `lsr/and` (wrong) |
+| named `unsigned` + `(x<<K)>>K` | r3 | bit0 collapses to `and #1` (P-1) |
+| `signed int` local | r3 | `asr` (sign-extend) |
+| local bitfield-struct copy | r3 | adds `strh r3,[sp]` spill + scratch r1 |
+| union word + bitfield view | r1 | (word local dead) == natural |
+
+The two requirements conflict: **bit0-as-`lsl/lsr` needs a bitfield
+(which CSEs the container to r1); field-in-r3 needs a named local
+(which collapses bit0 to `and` or spills a struct copy).** No form
+yields field-in-r3 cleanly. gotcha-7-resistant: the field is loaded
+before any helper-arg register commits, and adding args to push the
+temp higher would change the function shape (orig takes only `self`).
+The permuter is the untested fall-through (cite P-11 / brief-198
+precedent, not a run this session).
+
+**Affected picks (3, ov002):** `02200084` (field→r3, deep-verified),
+`02292020` (field→r2), `022319f4` (field→r3). See the
+[P-11 census](#p-11-mwcc-20-reg-allocator-plateau-on-mid-size-helper-call-functions)
+and
+[`brief-258-c39-cse-field-temp-and-taxonomy.md`](brief-258-c39-cse-field-temp-and-taxonomy.md).
 
 ### C-40. MMIO bit-extract -> VRAM/base address
 
@@ -6633,6 +6690,20 @@ but the siblings differ because they are *different source* (e.g.
 swapped helper arg order); the binding constraint is the *per-member*
 operand-reg plateau, confirmed individually. Full diagnosis:
 [`brief-254-track2-leading-edge-and-c42-resisters.md`](brief-254-track2-leading-edge-and-c42-resisters.md).
+
+**Census addition — brief 258 (C-39 CSE field-temp, ~0x3c).** Three
+C-39 reg-alloc residue picks (`02200084` field→r3, `02292020`
+field→r2, `022319f4` field→r3): a `@2` bitfield container read once at
+entry and CSE'd for a range test + ≥2 bitfield helper-args of a ≥3-arg
+helper. orig holds it in a high reg (r2/r3); mwcc takes the
+lowest-free r1. **Falsification (9 source forms):** the natural
+bitfield form is byte-identical EXCEPT the container reg (r1 vs r3);
+every form that reaches r3 introduces a new divergence (bit0
+`and`-collapse for shift forms, a stack spill for struct copies). No
+clean lever. Full diagnosis + matrix in the
+[C-39 residue note](#c-39-residue-cse-field-temp-reg-alloc-plateau-p-11-class)
+and
+[`brief-258-c39-cse-field-temp-and-taxonomy.md`](brief-258-c39-cse-field-temp-and-taxonomy.md).
 
 **Recipe status: NONE** (Permanent — no source-shape iteration
 yet found that reaches mwcc 2.0's reg-alloc choice). Picks in
