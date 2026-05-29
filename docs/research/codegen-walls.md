@@ -5331,6 +5331,85 @@ entry) piloted both + 1 simpler variant — 3/3 ship byte-identical
 on first attempt. Detector + 2 unit tests added. Full matrix at
 [`brief-235-c39e-c40-broader-and-232-deferred.md`](brief-235-c39e-c40-broader-and-232-deferred.md).
 
+### C-39f. Bit-0-indexed strided table lookup (sub-shape of C-39)
+
+**The wall.** A C-39 bit-0 extract used as the index into a strided
+table: `table[self->bit0]` over a byte-strided base, then a
+null-guard + tail helper. Brief 255 (drain wave 1) reported it as a
+resister at 43.75% with a two-part divergence — a register-allocation
+miss (orig field→ip, pools→r2/r3; mine field→r2, pools→r0/r1) **plus**
+a redundant `and rN, rN, #1` index mask the natural build omitted.
+Brief 256 found both halves are coercible.
+
+**Target asm (`func_ov002_02205508`, 0x40):**
+
+```text
+
+push  {r3, lr}
+ldrh  ip, [r0, #2]            ; field → ip (NOT r2)
+ldr   r2, [pc, #40]          ; stride 0x868 → r2
+ldr   r3, [pc, #40]          ; base → r3
+lsl   ip, ip, #31
+lsr   ip, ip, #31            ; bit0 extract
+and   ip, ip, #1             ; REDUNDANT (ip already 0/1) — but present
+mul   r2, ip, r2            ; r2 = bit0 * 0x868
+ldr   r2, [r3, r2]          ; r2 = table[bit0]  (= helper arg2)
+cmp   r2, #0
+moveq r0, #0
+popeq {r3, pc}
+bl    func_ov002_021ff3bc    ; helper(self, arg1, r2)
+pop   {r3, pc}
+
+```
+
+**The fix (two independent levers — verified byte-identical):**
+
+```c
+struct S { unsigned short f0; unsigned short bit0:1; unsigned short rest:15; };
+extern char base[];                                   /* the strided table */
+extern int helper(struct S *self, int arg1, int v);   /* 3-arg: keeps r0/r1 live */
+
+int f(struct S *self, int arg1) {
+    int v = *(int *)(base + (self->bit0 & 1) * 0x868); /* `& 1` => redundant `and #1` */
+    if (v == 0) return 0;
+    return helper(self, arg1, v);                      /* forces index → ip, pools → r2/r3 */
+}
+```
+
+1. **Reg-alloc lever — 3-arg helper `helper(self, arg1, v)`.** Keeping
+   `self` (r0) and `arg1` (r1) live as the helper's first two args
+   forces mwcc to spill the whole index computation into ip + r2/r3
+   and land the table value in r2 (= arg2). This is the gotcha-7
+   mechanism (live args push the temp). A 2-arg helper reverts to the
+   brief-255 `field→r2, pools→r0/r1` miss.
+2. **Redundant-mask lever — explicit `& 1` on the bitfield index.**
+   mwcc faithfully emits the otherwise-redundant `and rN, rN, #1`
+   after the bitfield extract. Without it, a 1-instruction gap remains.
+
+**Falsification (brief 256):** `v0` (3-arg helper, no `& 1`) reproduces
+the reg-alloc exactly but leaves the `and #1` gap; `v1` (3-arg helper +
+`& 1`) is byte-identical (16/16 words). A 2-arg helper would revert the
+reg-alloc — disproof would be a single source form needing neither
+lever, which does not exist.
+
+**Cohort size (~11 picks, ov002).** Family `db973`
+(`02205508` / `0220c940` / `0220e108`) + relatives `8446c`
+(`02206490` / `02208720`), `f030a` (`02204a68` / `0220b208`), `46a3d`
+(`022958a8` / `02296f54`), `e9e9e` (`022056f0` / `0220aa64`). All share
+the identical `ldrh ip; lsl;lsr; and ip,#1; mul r2,ip,r2; ldr r2,[r3,r2]`
+core (confirmed on `0220c940` / `0220e108` / `02206490`); per-pick
+variation is the guard polarity (`cmp #0`/`#1`) + trailing wrappers,
+handled by the standard catalog. The per-pick helper is per-overlay —
+confirm each `.word` / `bl` target before cloning (brief 251 caveat).
+
+**Routes:** plain `.c` (mwcc 2.0/sp1p5). No legacy needed.
+
+**Provenance:** brief 255 (PR #736) filed it as a resister with diff
+evidence; brief 256 (this entry) ran the variant matrix, found both
+levers, and shipped the byte-identical recipe. See
+[`brief-256-c39-table-index-and-overfire-scope.md`](brief-256-c39-table-index-and-overfire-scope.md)
+and [recipe-gotchas.md gotcha 14](recipe-gotchas.md).
+
 ### C-40. MMIO bit-extract -> VRAM/base address
 
 **The wall.** Leaf functions that read a u16 from a `0x04001xxx`

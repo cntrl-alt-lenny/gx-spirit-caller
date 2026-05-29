@@ -85,6 +85,7 @@ Detailed write-ups follow below.
 | C-1 predication (orig has bitfield, mine has `tst`) | 6 | use bitfield-extract not `& MASK` |
 | Pool-arg loaded with extra `ldr` deref | 2 | `extern char data[]` not `extern int data` |
 | Stack-arg loads `ldrh`, orig has `ldr` (stack-local struct builder) | 13 | type stack value args `int`, narrow on the `strh` store |
+| Bit-0 table index `table[bit0]`: pools/index regs all shifted + orig has redundant `and #1` | 14 | 3-arg helper `helper(self, arg1, v)` + write index `(self->bit0 & 1)` |
 | Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
@@ -950,6 +951,63 @@ One recipe drains all 4 family members.
 
 ---
 
+## Gotcha 14 — bit-0-indexed table lookup: 3-arg helper + explicit `& 1`
+
+**Symptom**: a C-39 bit-0 extract used as a strided-table index
+(`table[self->bit0]`) ships ~44% with TWO divergences at once — the
+index/pool registers are all shifted (orig field→ip, pools→r2/r3;
+mine field→r2, pools→r0/r1), AND the orig has a redundant
+`and rN, rN, #1` after the `lsl#31;lsr#31` extract that your build
+omits.
+
+**Pattern**: two independent levers, both needed.
+
+1. **Reg-alloc**: the orig passes the table value as a 3rd arg to a
+   tail helper, `helper(self, arg1, v)`. Declaring the helper with 3
+   args keeps `self` (r0) + `arg1` (r1) live across the index
+   computation, so mwcc spills the index into `ip` and the pools into
+   `r2`/`r3`, landing the loaded value in `r2` (= arg2). A 2-arg
+   helper frees r0/r1 and mwcc uses them for the index (the miss).
+2. **Redundant mask**: writing the index as `(self->bit0 & 1)` makes
+   mwcc emit the otherwise-redundant `and rN, rN, #1` the orig has.
+
+### Wrong (2-arg helper, no mask → 44% miss)
+
+```c
+int v = *(int *)(base + self->bit0 * 0x868);
+if (v == 0) return 0;
+return helper(self, v);             /* frees r1 → index lands in r0/r1 */
+```
+
+### Right (matches orig — byte-identical)
+
+```c
+struct S { unsigned short f0; unsigned short bit0:1; unsigned short rest:15; };
+extern char base[];
+extern int helper(struct S *self, int arg1, int v);
+
+int f(struct S *self, int arg1) {
+    int v = *(int *)(base + (self->bit0 & 1) * 0x868);  /* `& 1` → redundant `and #1` */
+    if (v == 0) return 0;
+    return helper(self, arg1, v);                       /* 3 args → index to ip/r2/r3 */
+}
+```
+
+### Why
+
+The redundant `& 1` on a 1-bit bitfield is a no-op in C, but mwcc
+emits the `and #1` faithfully. The 3-arg helper is the gotcha-7
+mechanism applied to a table-index temp: live incoming args reserve
+r0/r1, pushing the temp computation to the scratch/high registers.
+
+### Where surfaced
+
+Brief 255 deferred the `db973` family + relatives (~11 ov002 picks)
+as a resister; brief 256 found both levers and classified it as
+**C-39f** (codegen-walls). Pilot `func_ov002_02205508` byte-identical.
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
@@ -1022,6 +1080,10 @@ Before writing the C source for a new pick:
 13. **Stack-local struct builder with `ldrh`/`ldr` arg-load
     mismatch** — type the stack-passed value args `int` (word),
     narrow to the field type on the `strh` store (gotcha 13).
+14. **Bit-0-indexed table lookup `table[self->bit0]`** — use a
+    3-arg helper `helper(self, arg1, v)` (keeps r0/r1 live → index to
+    ip/r2/r3) and write the index `(self->bit0 & 1)` for the
+    redundant `and #1` (gotcha 14).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
