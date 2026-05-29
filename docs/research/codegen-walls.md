@@ -4841,6 +4841,25 @@ worked examples, added the detector + tests. Full matrix at
 
 ### C-39. Non-leaf C-37 — bit-0 extract wrapped in helper call
 
+> **Status — CLOSED (brief 262).** The ov002 ≤0x80 C-39 cohort is
+> ~70% drained (waves 1-4) and its hard tail is classified: NO new
+> permanent wall. Sub-shapes: a/b/d/e + **C-39f** (bit0-table-index,
+> gotcha 14) + **C-39g** (global-ptr-chase, gotcha 15). Brief 262
+> triaged the ~28-pick hard tail and found 4 of 6 shapes coercible
+> with existing levers + the new **gotcha 16** (u8-cast forces a
+> redundant `& 0xff`): stride-reuse (`0220b420`/`0228abd8`,
+> byte-identical — the bound derives from the live stride via mwcc's
+> `add rN, stride, #K` peephole), multi-helper-`pre()` chains
+> (`02294b64`, shift-form + invert-polarity), arg-bit-packing
+> (`02231f4c`, gotcha 16, byte-identical), and global 3-way switches
+> (`0222b2e0`, `switch`+shared-epilogue `break`, byte-identical). The
+> 2 that resist (`02205c4c` weird range/mask, `0220000c` composite)
+> reduce to the already-classified **P-11 CSE field-temp** (the `@2`
+> field CSE'd for a range test + bit0 lands in a low reg vs orig's
+> high reg) — not new walls. Remaining C-39 picks are opportunistic
+> decomper cleanup, not a dedicated wave. Full triage:
+> [`brief-262-c39-hard-tail-classify-and-close.md`](brief-262-c39-hard-tail-classify-and-close.md).
+
 **The wall.** Brief 220's hard-tier survey identified 455 picks
 in the unclassified slice containing the `lsl rX, rY, #31; lsr
 rX, rZ, #31` bit-extract pattern (the same shape as C-37 Shape
