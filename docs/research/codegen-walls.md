@@ -6527,6 +6527,34 @@ shape (added a 2nd pool ref) but didn't byte-match.
 | B-22 `func_0200b0c8` | main | `0x0200b0c8` | 0x5c | 500 | array destructor with in-loop bl |
 | B-24 `func_ov011_021d2ca8` | ov011 | `0x021d2ca8` | 0x5c | 490 | struct field setter w/ useless-spill stack scratch |
 
+**Census addition — brief 254 (small-function reg-alloc plateaus,
+below the 0x5c-0x74 detector floor).** Four C-42 wave-8 resister
+families (brief 253) are the SAME mechanism — mwcc 2.0 picks a
+different operand / save-order register than orig and no source-form
+variant reaches it — on **~0x40 functions**, smaller than the
+documented P-11 range. They are NOT detected by the current `P-11`
+rule (size floor); recognized by orig-vs-build disasm comparison.
+
+| Family | Members | Module | Divergence |
+|---|---|---|---|
+| `0ca11024` | `func_02032efc` / `func_02032f38` | main | `mla rD,r6,rS,rN` operand-reg assignment (5-variant falsification, brief 254) |
+| `e7e4cff1` | `func_02032e8c` / `func_02032ec4` | main | same IRQ-accessor source-family as `0ca11024` (add-offset index) |
+| `96d2a201` | `func_02054fd0` / `func_02055000` | main | stack-arg setup, siblings swap r1↔r2 |
+| `ef19bc9a` | `func_ov002_02238bc8` / `func_ov002_0226db7c` | ov002 | pool-load reg + callee-save order swap |
+
+**Falsification (brief 254, `0ca11024`):** 5 source forms (`fe7c +
+arg1*12`, `arg1*12 + fe7c`, base-temp, multiply-temp, `12*arg1`) all
+emit `mla r1,r6,r1,r2` (constant in the multiplier reg); orig has
+`mla r1,r6,r2,r1` (loaded value in the addend/accumulator reg). A
+single source that reproduced orig's operand assignment would
+disprove the P-11 classification — none did. The permuter is the
+untested fall-through (P-11 precedent: it does not crack these).
+Note: brief 253 framed these as "siblings can't share one source,"
+but the siblings differ because they are *different source* (e.g.
+swapped helper arg order); the binding constraint is the *per-member*
+operand-reg plateau, confirmed individually. Full diagnosis:
+[`brief-254-track2-leading-edge-and-c42-resisters.md`](brief-254-track2-leading-edge-and-c42-resisters.md).
+
 **Recipe status: NONE** (Permanent — no source-shape iteration
 yet found that reaches mwcc 2.0's reg-alloc choice). Picks in
 this cohort: defer or escalate to scaffolder reg-alloc-hint
