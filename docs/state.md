@@ -8,37 +8,38 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#735 + #736 merge. Brain on Mac.
-**Brief 254 (Track-2 pilot + classify C-42 resisters, scaffolder) +
-brief 255 (C-39 ov002 bit-extract drain wave 1 — 24 .c, decomper) both
-shipped. Post-C-42 pivot underway — cheap recipe-drain continues on C-39.**
+**Last updated:** 2026-05-29, post-#738 + #739 merge. Brain on Mac.
+**Brief 256 (db973→C-39f coercible + over-fire cohort sized, scaffolder)
++ brief 257 (C-39 wave 2 + 2 recovered C-42 picks — 18 .c, decomper)
+both shipped. Cheap recipe-drain continues; C-39 is ~1 wave from done.**
 
-**Current metrics (post-#735 + #736 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on f5d29a0, clean tree):**
-`complete_units 2339 / 3589 (65.17 %)` (+24 vs prior 2315) —
-SHA1-aligned headline. `matched_functions 2353 / 9801` (+24). 3-region
-SHA1 PASS established on #736 (#735 is docs-only).
+**Current metrics (post-#738 + #739 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 8963850, clean tree):**
+`complete_units 2357 / 3618 (65.15 %)` (+18 vs prior 2339) —
+SHA1-aligned headline. `matched_functions 2371 / 9801` (+18). 3-region
+SHA1 PASS established on #739 (#738 is docs-only).
 
-🧭 **PIVOT RESOLVED — recipe-drain continuation, not cold-RE yet.** Brief
-254 compiled the swarm's disputed "Track-2 leading edge" (~631
-solo-C-23/StyleA picks): ALL ship byte-identical but NONE is cold-RE —
-they're detector OVER-FIRES that drain cheap (C-23 no-MMIO → natural
-recipe, default tier; real Style-A → `.legacy.c` routing). The swarm and
-brief 252 were each half-right: a cheap cohort exists, it just isn't
-"Track-2." Genuine Track-2 (933 funcs >0x200 = 49 % of unmatched bytes)
-stays a separate, expensive cold-RE track for later. Cheap-drain runway
-left (no cold-RE needed yet): ~80 C-39 wrappers + ~11 C-39 table-index
-(256 to classify) + the over-fire cohort (256 to size) + 2 recovered
-C-42 picks → several more waves.
+🎯 **Brief 256 — db973 → C-39f COERCIBLE; over-fire cohort sized (584).**
+The deferred table-index resister is a new coercible sub-shape (C-39f +
+gotcha 14: a 3-arg helper forces the index reg-alloc + explicit `& 1`
+reproduces the redundant mask; 16/16 pilot). The over-fire cohort (the
+"Track-2 leading edge" that was really detector noise) = 584 picks, of
+which ~417 genuinely cheap (236 C23-noMMIO natural + 214 StyleA-frameless-
+leaf + 132 StyleA-real routing); none needs cold-RE. Drain order set for
+brief 260+.
 
-🎯 **Brief 255 — 24 .c at 86 % yield, first post-C-42 wave.** C-39 ov002
-bit-extract via the brief-252 recipe; pilot re-confirmed. 4 resisters
-reported with diff evidence; filed the `db973` table-index sub-shape
-(~11 picks) → brief 256.
+🎯 **Brief 257 — 18 .c at 86 %; both recovered C-42 picks shipped.** C-39
+wave 2 (14 wrappers) + `2b07f982` (switch ×2) + `29f7d996` (2-D table ×2).
+3 non-shippers with evidence → a CSE field-temp reg-alloc class (→ brief
+258) + a byte-pack no-lever. C-39f census is bigger than 11 (≥6 more
+found). ~55 sole-C-39 ≤0x80 left → ~1 more wave (brief 259).
 
-🎯 **Brief 254 — Track-2 resolved + `2b07f982` recovered via `switch`**
-(falsifies brief 253's P-lean). 4 resisters confirmed **P-11** (not P-14
-— correction); `29f7d996` likely-coercible (2-D table → brief 257).
+🧭 **Cheap-drain runway (no cold-RE needed yet):** brief 259 finishes
+C-39 (remaining wrappers + the ~17 C-39f via gotcha 14); then the 584-pick
+over-fire cohort feeds ~3-4 more waves (brief 260+). Genuine Track-2
+cold-RE (with the m2c / dsd-ghidra accelerators below) is the track after
+that. The ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked,
+verified, awaiting a land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
