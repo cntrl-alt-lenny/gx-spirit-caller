@@ -87,6 +87,7 @@ Detailed write-ups follow below.
 | Stack-arg loads `ldrh`, orig has `ldr` (stack-local struct builder) | 13 | type stack value args `int`, narrow on the `strh` store |
 | Bit-0 table index `table[bit0]`: pools/index regs all shifted + orig has redundant `and #1` | 14 | 3-arg helper `helper(self, arg1, v)` + write index `(self->bit0 & 1)` |
 | `global->ptr->field` chase temps land low (r1/r2) vs orig r3/ip (or global r1 vs orig r0) | 15 | match orig's incoming-arg liveness: forward the args orig forwards, or declare `void` if it takes none |
+| Orig has `and #0xff` on a provably-small value; mine folds it away | 16 | route through an `unsigned char` local/cast (the type forces it; explicit `& 0xff` does not) |
 | Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
@@ -1067,6 +1068,49 @@ self-derived, so r1/r2 are unavoidably free and there is no lever.
 
 ---
 
+## Gotcha 16 — `unsigned char` type forces a redundant `& 0xff`
+
+**Symptom**: orig keeps an `and rN, rN, #0xff` on a value the
+compiler can prove is already < 256 (e.g. `(cond) + 2`, a small
+runtime-packed field); your build folds the mask away, so you are one
+instruction short in an arg-packing or byte-pack sequence.
+
+**Pattern**: mwcc range-analyses the expression and drops a provably-
+redundant `& 0xff`. An explicit `(x & 0xff)` in C does NOT help — mwcc
+still proves `x < 256` and folds it. The lever is the **type**: route
+the value through an `unsigned char` local/cast, so the byte truncation
+is part of the value's type and mwcc materialises it as `and #0xff`.
+
+### Wrong (mask folded away)
+
+```c
+int packed = ((((g.fcec == bit0) + 2) & 0xff) << 4) | 1;  /* & 0xff folds */
+helper(a, b, (u16)packed, 0);
+```
+
+### Right (u8 type forces `and #0xff`)
+
+```c
+unsigned char t = (g.fcec == bit0) + 2;   /* the TYPE forces the mask */
+helper(a, b, (u16)((t << 4) | 1), 0);
+```
+
+### Why
+
+`(x & 0xff)` is a value-level mask the optimiser may prove redundant.
+An `unsigned char` object has a width; assigning to it (or casting to
+it) is a truncation mwcc emits as `and #0xff` even when the source
+value is provably small. The `(u16)`/`(u8)` *type* survives where the
+explicit `& 0xff` *expression* is folded.
+
+### Where surfaced
+
+Brief 262 hard-tail triage — arg-bit-packing pick `func_ov002_02231f4c`
+(byte-identical with the u8 cast; 22/22). Likely also recovers brief
+257's byte-pack mask-fold class (`021f4d3c`).
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
@@ -1147,6 +1191,9 @@ Before writing the C source for a new pick:
     orig's incoming-arg liveness: forward the args orig forwards to
     the tail helper, or declare the function `void` if it takes none
     (gotcha 15).
+16. **Orig keeps a redundant `and #0xff` your build folds** — route the
+    value through an `unsigned char` local/cast; the type forces the
+    mask where an explicit `& 0xff` is folded (gotcha 16).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
