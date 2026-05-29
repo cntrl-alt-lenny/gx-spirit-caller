@@ -506,42 +506,54 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 266** — `scaffolder`. **Classify the frameless-leaf
-  diverse-tail / over-fire non-shipper shapes.** Direct-mwcc only,
-  no SHA1. Brief 265 hit 100 % on StyleA + the clean frameless-leaf
-  front, but the frameless-leaf *diverse tail* ran ~50 % and 6 picks
-  reverted as P-candidates with recurring mwcc-codegen quirks (NOT a
-  new wall). Find the source lever per quirk (→ gotcha) or classify
-  P:
-  - **predication-vs-branch** const-compare (`0202f3e8`, 50 %) —
-    orig branches; mwcc predicates a `K+9`-reuse compare.
-  - **bit/byte-insert mask** sequences (`021ab32c`, `021abf50`,
-    `021ac508`, 30-33 %).
-  - **dead-store / literal-reread elision** in struct copy/init
-    (`020a6d94` 77 %, `02092614` 42 %).
-  The decomper noted these are "likely coercible past the 10-min
-  cap" — find the lever that makes them quick (or confirm P). Every
-  claim carries a falsification test. Branch:
-  `scaffolder/overfire-frameless-leaf-tail-classify`.
-- **Brief 267** — `decomper`. **Over-fire cohort drain, wave 3.**
-  Per brief 265 the reliable vein is the StyleA helper-families
-  (100 % from brief 264's 5 templates). (A) Batch-drain the StyleA
-  helper-families via brief 264's templates (recipe-gotchas
-  § StyleA over-fire families) — finish the c94 family + the
-  `func_0209b4a4` dispatch family + templates B-E across the 614
-  tier (`tools/stylea_c94_stub.py` can pre-generate c94 candidates,
-  still `ninja sha1`-gated). (B) Drain the **clean** frameless-leaf
-  shapes only (struct-copy / field-arith / bit-compare) + open the
-  fresh **C23-noMMIO** tier (~29 ≤0x40, untouched). **Skip** the
-  diverse frameless-leaf tail + the 6 reverted P-candidates — brief
-  266 is classifying those. Target ~35+ picks. **Success = per-pick
-  3-region `ninja sha1` PASS + objdiff 100 % line, NOT
-  `complete_units` / C-yield.** Report non-shippers as P-N
-  candidates + over-fire yield by tier. 10-min/pick cap. Branch:
-  `decomper/overfire-drain-wave3`.
+- **Brief 268** — `scaffolder`. **Classify the heterogeneous StyleA
+  over-fire tail into sub-families.** Direct-mwcc only, no SHA1.
+  Brief 267 drained the StyleA template-family vein; the ~570
+  remaining StyleA-real picks are heterogeneous and the decomper
+  flagged them as a ~50 % grind. But the proven pattern is that a
+  "heterogeneous tail" decomposes into more coercible families (c94,
+  b4a4, dd30… each was one recipe → many picks). Cluster the ~570
+  into sub-families and lock a recipe template per coercible family.
+  Named clusters to start: **OS_RestoreIrq criticals ×18** (likely
+  one template), **NO_BL leaf grab-bag ×25**, **memcpy wrappers ×5**,
+  + the brief-267 **Copy32 VRAM-copy P-candidate** (`0208fd30` /
+  `0208fd90` / `0208fe58` — `if(*g!=-1 && size>0x30) big_copy else
+  Copy32`). Per family: a recipe template (→ batch-drain) or genuine
+  one-off/P. Land templates in recipe-gotchas § StyleA over-fire
+  families. Every claim carries a falsification test. Branch:
+  `scaffolder/overfire-stylea-tail-subfamilies`.
+- **Brief 269** — `decomper`. **Over-fire cohort drain, wave 4 —
+  the freshly-unblocked tiers.** (A) Drain the **frameless-leaf
+  diverse tail** that brief 266 just made coercible: predication →
+  `switch`, bit-insert → gotcha 16 + explicit `(x<<K)>>M`,
+  dead-store/re-read → **gotcha 17** (`volatile` + targeted/delayed
+  temp). Should run high-yield now. (B) Continue the **C23-noMMIO**
+  tier (100 % so far) and open the genuine **C-23 real-MMIO** tier
+  (~220, untouched) via the existing C-23 `.legacy.c` MMIO recipe
+  (briefs 199/203). **Skip** the heterogeneous StyleA tail (brief
+  268 is sub-classifying it) + the Copy32 P-candidate. Target ~35+
+  picks. **Success = per-pick 3-region `ninja sha1` PASS + objdiff
+  100 % line, NOT `complete_units` / C-yield.** Report non-shippers
+  as P-N candidates + yield by tier. 10-min/pick cap. Branch:
+  `decomper/overfire-drain-wave4`.
 
 ### Closed briefs (reference)
 
+- **Brief 267** — `decomper`, shipped in PR #754. ✅ **24 .c at
+  100 % objdiff (89 % yield).** 16 StyleA-real (next-tier helper-
+  families: dd30 guard-chain ×7, 928cc global-ptr ×3, …) + 8
+  C23-noMMIO (fresh tier, 100 % — LCG / MD5 constants found by grep).
+  **Pivot signal: the StyleA template-family vein is drained** — the
+  ~570 remaining StyleA picks are heterogeneous (~50 % regime) →
+  brief 268 sub-classifies them. Copy32 VRAM-copy family (3)
+  reverted (a lead, not P). complete_units 2466 → 2490.
+- **Brief 266** — `scaffolder`, shipped in PR #753. 🎯 **All 6
+  frameless-leaf non-shippers COERCIBLE — none P.** Levers:
+  predication → `switch`; bit-insert → gotcha 16 + explicit
+  `(x<<K)>>M`; dead-store/re-read → **new gotcha 17** (`volatile` +
+  targeted/delayed temp). The frameless-leaf diverse tail is now
+  fully drainable (→ brief 269). 5 byte-identical pilots; no new
+  wall.
 - **Brief 265** — `decomper`, shipped in PR #751. ✅ **27 .c at
   100 % objdiff, 82 % yield (27/33).** (B) **C-39 hard tail 7/7 —
   CLOSED** (all 6 brief-262 coercible shapes ship; gotcha 16 also
