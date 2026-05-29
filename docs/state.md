@@ -8,37 +8,35 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#738 + #739 merge. Brain on Mac.
-**Brief 256 (db973→C-39f coercible + over-fire cohort sized, scaffolder)
-+ brief 257 (C-39 wave 2 + 2 recovered C-42 picks — 18 .c, decomper)
-both shipped. Cheap recipe-drain continues; C-39 is ~1 wave from done.**
+**Last updated:** 2026-05-29, post-#741 + #742 merge. Brain on Mac.
+**Brief 258 (CSE field-temp = P-11 + C-39 taxonomy refresh, scaffolder)
++ brief 259 (C-39 ov002 drain wave 3 — 23 .c, decomper) both shipped.
+Cheap recipe-drain continues; C-39 wants one more wave (259's scoping
+correction: the C-39f cohort is bigger than thought).**
 
-**Current metrics (post-#738 + #739 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 8963850, clean tree):**
-`complete_units 2357 / 3618 (65.15 %)` (+18 vs prior 2339) —
-SHA1-aligned headline. `matched_functions 2371 / 9801` (+18). 3-region
-SHA1 PASS established on #739 (#738 is docs-only).
+**Current metrics (post-#741 + #742 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on d042e92, clean tree):**
+`complete_units 2380 / 3650 (65.21 %)` (+23 vs prior 2357) —
+SHA1-aligned headline. `matched_functions 2394 / 9801` (+23). 3-region
+SHA1 PASS established on #742 (#741 is docs-only).
 
-🎯 **Brief 256 — db973 → C-39f COERCIBLE; over-fire cohort sized (584).**
-The deferred table-index resister is a new coercible sub-shape (C-39f +
-gotcha 14: a 3-arg helper forces the index reg-alloc + explicit `& 1`
-reproduces the redundant mask; 16/16 pilot). The over-fire cohort (the
-"Track-2 leading edge" that was really detector noise) = 584 picks, of
-which ~417 genuinely cheap (236 C23-noMMIO natural + 214 StyleA-frameless-
-leaf + 132 StyleA-real routing); none needs cold-RE. Drain order set for
-brief 260+.
+🎯 **Brief 259 — 23 .c (21 C-39f via gotcha 14 + 2 wrappers).** The
+two-lever C-39f recipe generalized across all variants. Scoping
+correction: the C-39f sub-shape is ~42 (not 17), so C-39 ov002 needs a
+wave 4 — ~57 drainable ≤0x80 picks remain (~20 C-39f + ~37 wrappers).
+New resister class surfaced: global-ptr-chase reg-alloc (→ brief 260).
 
-🎯 **Brief 257 — 18 .c at 86 %; both recovered C-42 picks shipped.** C-39
-wave 2 (14 wrappers) + `2b07f982` (switch ×2) + `29f7d996` (2-D table ×2).
-3 non-shippers with evidence → a CSE field-temp reg-alloc class (→ brief
-258) + a byte-pack no-lever. C-39f census is bigger than 11 (≥6 more
-found). ~55 sole-C-39 ≤0x80 left → ~1 more wave (brief 259).
+🎯 **Brief 258 — CSE field-temp = P-11 (permanent).** 9 source forms;
+structural tension (bitfield → r1 vs named-local → `and`-collapse), no
+clean lever. Added to the P-11 census. § C-39 taxonomy refreshed
+(C-39f census 11 → ~17 + residue note).
 
-🧭 **Cheap-drain runway (no cold-RE needed yet):** brief 259 finishes
-C-39 (remaining wrappers + the ~17 C-39f via gotcha 14); then the 584-pick
-over-fire cohort feeds ~3-4 more waves (brief 260+). Genuine Track-2
-cold-RE (with the m2c / dsd-ghidra accelerators below) is the track after
-that. The ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked,
+🧭 **Cheap-drain runway (no cold-RE needed yet):** brief 261 closes C-39
+(~57 picks); then the 584-pick over-fire cohort feeds ~3-4 more waves
+(262+); genuine Track-2 cold-RE (with the m2c / dsd-ghidra accelerators
+below) is the track after that. Two reg-alloc resister classes are now
+P-11 / P-11-class (CSE field-temp settled; global-ptr-chase → brief 260).
+The ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked,
 verified, awaiting a land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**

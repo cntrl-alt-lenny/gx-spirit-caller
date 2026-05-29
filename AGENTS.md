@@ -506,41 +506,54 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 258** — `scaffolder`. **Classify the CSE field-temp
-  reg-alloc class + refresh the C-39 taxonomy.** Direct-mwcc only,
-  no SHA1. (A) **Classify the CSE field-temp class** (brief 257's
-  ask): `02200084` (wave 1) + `02292020` + `022319f4` (wave 2) —
-  same mechanism: when the `@2` field is CSE'd for a range/branch
-  test AND `bit0` with a ≥3-arg helper, orig keeps the field in
-  r2/r3 but mwcc allocates r1 (field loaded at entry, before the
-  helper-arg regs commit → allocator takes the lowest free reg;
-  gotcha-7-resistant). Variant matrix: a source lever (coercible →
-  new C-39 sub-shape + gotcha) or a P-11 plateau? Pilot `02200084`.
-  (B) **Refresh `codegen-walls.md` § C-39**: fold in C-39f (gotcha
-  14, bit0-table-index — census is now ~17, not brief 256's 11;
-  brief 257 found ≥6 more: `0222a648` / `0220b6dc` / `0220bbd0` /
-  `02238820` / `02234894` / `0220e2f0`) + the CSE-field-temp
-  verdict. Every claim carries a falsification test. Branch:
-  `scaffolder/c39-cse-field-temp-and-taxonomy`.
-- **Brief 259** — `decomper`. **C-39 ov002 drain wave 3 (final
-  C-39 wave).** (A) Finish the remaining drainable sole-C-39 ≤0x80
-  ov002 wrappers (incl. the global-deref-guard variants brief 257
-  deferred), smallest-first, via the bitfield recipe + gotchas
-  4/5/7. (B) Drain the C-39f bit0-table-index picks via brief 256's
-  gotcha 14 (3-arg helper forces the index reg-alloc + explicit
-  `(self->bit0 & 1)` reproduces the `and #1`): the ~11 named + brief
-  257's ≥6 more (`0222a648` / `0220b6dc` / `0220bbd0` / `02238820` /
-  `02234894` / `0220e2f0`). **Skip the CSE field-temp class**
-  (`02200084` / `02292020` / `022319f4`) — brief 258 owns it.
-  **Success = per-pick 3-region `ninja sha1` PASS + objdiff 100 %
-  line, NOT `complete_units` / C-yield.** Report non-shippers as
-  P-N candidates; 10-min/pick cap. This should close the ov002
-  sole-C-39 ≤0x80 cohort; report what's left + the next cohort
-  (the brief-256 over-fire worklist). Branch:
-  `decomper/c39-ov002-drain-wave3`.
+- **Brief 260** — `scaffolder`. **Classify the global-ptr-chase
+  reg-alloc class + refine the over-firing predict_walls cues.**
+  Direct-mwcc only, no SHA1. (A) **Classify the global-ptr-chase
+  class** (brief 259's new resister): `0223ba28` + `02273b54` —
+  `global->ptr->field` chain temps land in low regs vs orig's
+  r3/ip. Variant matrix: a source lever (coercible → new sub-shape
+  + gotcha) or a P-11-class plateau (like the CSE field-temp)?
+  Pilot `0223ba28`. (B) **Refine the over-firing StyleA / C-23 cues
+  in `predict_walls.py`** (brief 256's now-due follow-up): split
+  StyleA frameless-leaf vs real by lr-save, and require an actual
+  MMIO ref for C-23 — cut the FP rate so the brief-256 over-fire
+  worklist + future scans are trustworthy. Update the tests (the
+  brain will red-check the new detector on a known bad input).
+  Every claim carries a falsification test. Branch:
+  `scaffolder/global-chase-class-and-predict-walls-refine`.
+- **Brief 261** — `decomper`. **C-39 ov002 drain wave 4 (close the
+  cohort).** Per brief 259, ~57 drainable sole-C-39 ≤0x80 ov002
+  picks remain. (A) Drain the ~20 remaining C-39f bit0-table-index
+  via gotcha 14 (higher-variation: 2-D `mla` / 2-helper /
+  `pre()`-compare forms). (B) Drain the ~37 other wrappers (clean
+  helper-chains; the global-deref-guard variants). **Skip** the CSE
+  field-temp class (P-11, brief 258) and the global-ptr-chase class
+  (`0223ba28` / `02273b54` — brief 260 classifying). **Success =
+  per-pick 3-region `ninja sha1` PASS + objdiff 100 % line, NOT
+  `complete_units` / C-yield.** Report non-shippers as P-N
+  candidates; 10-min/pick cap. This should close the ov002 sole-C-39
+  ≤0x80 cohort — confirm the brief-256 over-fire worklist (584
+  picks) as the next cohort. Branch:
+  `decomper/c39-ov002-drain-wave4`.
 
 ### Closed briefs (reference)
 
+- **Brief 259** — `decomper`, shipped in PR #742. ✅ **23 .c at
+  100 % objdiff** (21 C-39f via gotcha 14 + 2 wrappers). The
+  two-lever C-39f recipe held across all variants. Scoping
+  correction: C-39f is actually ~42 (not 17) — 24 more found this
+  wave; cohort NOT closed (~57 drainable left → wave 4). 5
+  non-shippers with evidence: 2 CSE field-temp (= brief 258's
+  P-11), 2 NEW global-ptr-chase reg-alloc (→ brief 260), 1
+  byte-pack carry-over. complete_units 2357 → 2380.
+- **Brief 258** — `scaffolder`, shipped in PR #741. 🎯 **CSE
+  field-temp = P-11 plateau (permanent), not coercible.** 9 source
+  forms tested; bit0-as-`lsl/lsr` needs a bitfield (→ container
+  CSEs to r1) while field-in-r3 needs a named local (→ bit0
+  collapses to `and`, P-1) — a structural tension, no clean lever.
+  Added to the P-11 census (permuter = untested fall-through).
+  Also refreshed § C-39 (C-39f census 11 → ~17 + the CSE-field-temp
+  residue note).
 - **Brief 257** — `decomper`, shipped in PR #739. ✅ **18 .c at
   100 % objdiff, 86 % yield (18/21).** C-39 wave 2 (14 wrappers) +
   both recovered C-42 picks shipped first-try (`2b07f982` switch ×2,
