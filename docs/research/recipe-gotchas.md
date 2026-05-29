@@ -76,6 +76,7 @@ Detailed write-ups follow below.
 | stmfd + sub sp prologue mismatch | 10 | `.legacy_sp3.c` filename suffix |
 | `str + str` pair instead of `stmia` fusion | 10 | `.legacy_sp3.c` (mwcc 1.2/sp3 doesn't fuse) |
 | Predication collapse (orig has `bne`, mine has `moveq + popeq`) | (N2 variant) | switch + case + default form |
+| Contiguous `==`-chain fused to range check (orig `cmp #N; cmpne #N+1; cmpne #N+2`, mine `mvn/sub; cmp #2; movls`) | (switch shape) | `switch(n){case N: case N+1: case N+2: …}` defeats mwcc -O4 range-fusion (brief 254 `2b07f982`) |
 | Extra `moveq r0, #0` before `popeq` in mine | 1 | `return r;` with named local |
 | Wrong cond predicate (orig `movge`, mine `movlt`) | 3 | swap ternary polarity |
 | Wrong sub/cmp opcode (orig `sub+cmp+movle`, mine `subs+movmi`) | (clamp form) | `r <= 0` not `r < 0` |
