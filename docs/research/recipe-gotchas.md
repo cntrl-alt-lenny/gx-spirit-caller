@@ -86,6 +86,7 @@ Detailed write-ups follow below.
 | Pool-arg loaded with extra `ldr` deref | 2 | `extern char data[]` not `extern int data` |
 | Stack-arg loads `ldrh`, orig has `ldr` (stack-local struct builder) | 13 | type stack value args `int`, narrow on the `strh` store |
 | Bit-0 table index `table[bit0]`: pools/index regs all shifted + orig has redundant `and #1` | 14 | 3-arg helper `helper(self, arg1, v)` + write index `(self->bit0 & 1)` |
+| `global->ptr->field` chase temps land low (r1/r2) vs orig r3/ip (or global r1 vs orig r0) | 15 | match orig's incoming-arg liveness: forward the args orig forwards, or declare `void` if it takes none |
 | Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
@@ -1008,6 +1009,64 @@ as a resister; brief 256 found both levers and classified it as
 
 ---
 
+## Gotcha 15 — global-ptr-chase: match the orig's incoming-arg liveness
+
+**Symptom**: a function that chases `global -> ptr -> field` (one or
+more pool/pointer indirections) before a bit-extract ships at 40-70%
+because the chase temps land in low registers (r1/r2 / r1) where orig
+has high ones (r3/ip / r0).
+
+**Pattern**: this is gotcha 7's mechanism (arg liveness controls temp
+allocation) applied to a pointer chase. The chase temps occupy
+whatever registers are NOT held by live incoming args. So the fix is
+to reconstruct the function's EXACT incoming-arg signature:
+
+- If the orig tail-forwards args to a helper (`return helper(arg0,
+  arg1, arg2)`), **declare and forward them** — keeping r1/r2 live
+  pushes the chase to r3/ip.
+- If the orig takes NO args (loads a global into r0 and reuses it),
+  **declare the function `void`** — freeing r0 lets the global land in
+  r0 (lowest-free) and be reused. A stray live arg pushes it to r1.
+
+### Wrong (chase lands low)
+
+```c
+int f(int arg0) {                       /* missing the forwarded args */
+    struct Inner *p = g.ptr;            /* global->ptr */
+    if (arg0 == (p->f2.bit0 ^ p->f2.bit14))
+        return helper(arg0, 0, 0);      /* r1/r2 dead -> chase to r1/r2 */
+    return 0;
+}
+```
+
+### Right (chase to r3/ip — matches orig)
+
+```c
+int f(int arg0, int arg1, int arg2) {
+    struct Inner *p = g.ptr;
+    if (arg0 == (p->f2.bit0 ^ p->f2.bit14))
+        return helper(arg0, arg1, arg2); /* forwarded args keep r1/r2 live */
+    return 0;
+}
+```
+
+### Why
+
+The chase pointer/field temps are computed before the tail call. mwcc
+allocates them to the lowest-free registers; the incoming args that
+are live until the call reserve r0/r1/r2, so the chase spills to r3/ip.
+Match the orig's live-arg set and the registers fall into place.
+
+### Where surfaced
+
+Brief 259 deferred `0223ba28` (43%) + `02273b54` (69%) as a
+global-chase reg-alloc class; brief 260 recovered both byte-identical
+and classified it **C-39g** (codegen-walls). Distinct from the CSE
+field-temp P-11 plateau (gotcha-less): there the helper's args are all
+self-derived, so r1/r2 are unavoidably free and there is no lever.
+
+---
+
 ## Pre-flight: when reg-alloc divergence appears
 
 mwcc's register allocator considers what's "live across the bl"
@@ -1084,6 +1143,10 @@ Before writing the C source for a new pick:
     3-arg helper `helper(self, arg1, v)` (keeps r0/r1 live → index to
     ip/r2/r3) and write the index `(self->bit0 & 1)` for the
     redundant `and #1` (gotcha 14).
+15. **`global->ptr->field` chase temps land in low regs** — match the
+    orig's incoming-arg liveness: forward the args orig forwards to
+    the tail helper, or declare the function `void` if it takes none
+    (gotcha 15).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.

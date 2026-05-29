@@ -5414,6 +5414,57 @@ levers, and shipped the byte-identical recipe. See
 [`brief-256-c39-table-index-and-overfire-scope.md`](brief-256-c39-table-index-and-overfire-scope.md)
 and [recipe-gotchas.md gotcha 14](recipe-gotchas.md).
 
+### C-39g. Global-ptr-chase reg-alloc (sub-shape of C-39)
+
+**Coercible** (unlike the CSE field-temp residue below). A C-39 pick
+that chases `global -> ptr -> field` (one or more pool/pointer
+indirections) before the bit-extract, where the chase temps land in
+the wrong registers. Brief 259 deferred two as resisters
+(`0223ba28` 43%, `02273b54` 69%); brief 260 recovered both
+byte-identical. The lever is **arg-liveness matching** (gotcha 7's
+mechanism): the chase temps occupy whatever registers are NOT held by
+live incoming args, so reconstruct the function's exact incoming-arg
+signature and the chase lands in orig's registers.
+
+**`0223ba28` (chase temps wanted r3/ip, mwcc gave r1/r2):**
+
+```text
+push  {r3, lr}
+ldr   r3, [pc, #..]          ; &global
+ldr   r3, [r3, #0x48c]       ; global->ptr   (chase, r3)
+ldrh  ip, [r3, #2]           ; ptr->f2       (field, ip)
+lsl r3,ip,#17; lsl ip,ip,#31; lsr r3,r3,#31; eor r3,r3,ip,lsr#31  ; bit14 ^ bit0
+cmp   r0, r3                 ; r0 = arg0 (live!)
+movne r0, #0; popne
+bl    func_ov002_0223b864    ; helper(arg0, arg1, arg2) — args forwarded
+pop   {r3, pc}
+```
+
+Recipe: the function takes `(arg0, arg1, arg2)` and tail-forwards them;
+**forwarding `arg1`/`arg2` keeps r1/r2 live**, pushing the chase to
+r3/ip. Without the forwarded args (`helper(arg0, 0, 0)`) the chase
+lands in r1/r2 — the 43% miss. (Also gotcha 4: source `bit0 ^ bit14`
+gives orig's bit14-first extract order.)
+
+**`02273b54` (global wanted r0, mwcc gave r1):** the function takes
+**no args**; the global is loaded into r0 and reused (`ldr r0, &g; ldrh
+r1, [r0, #22]; ...; ldr r0, [r0]`). Declaring it `int f(void)` frees r0,
+so the global lands in r0 (lowest-free) and is reused — byte-identical.
+A stray live arg pushes the global to r1 (the 69% miss).
+
+**Falsification (brief 260):** `0223ba28` v0 (forward args) byte-
+identical / v2 (no forward) → r1/r2 miss; `02273b54` `void` form byte-
+identical. A form that matched WITHOUT matching the orig's arg-liveness
+would disprove the lever — none found; the v0-vs-v2 contrast confirms
+it. Distinct from the CSE field-temp residue (P-11): there the helper's
+args are all self-derived, leaving r1/r2 unavoidably free (no lever);
+here the function's arg-liveness IS the lever.
+
+**Cohort:** the two named picks (ov002); more global-chase C-39 picks
+are expected in the wrapper residue. Routes plain `.c`. See
+[recipe-gotchas.md gotcha 15](recipe-gotchas.md) and
+[`brief-260-global-chase-class-and-predict-walls-refine.md`](brief-260-global-chase-class-and-predict-walls-refine.md).
+
 ### C-39 residue: CSE field-temp reg-alloc plateau (P-11-class)
 
 **Not a coercible sub-shape** — a C-39 reg-alloc RESIDUE that brief 258

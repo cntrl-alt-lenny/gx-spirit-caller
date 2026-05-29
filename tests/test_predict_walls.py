@@ -85,6 +85,33 @@ class TestStyleADetection(unittest.TestCase):
         wall_ids = {w.wall_id for w in walls}
         self.assertNotIn("StyleA", wall_ids)
 
+    def test_frameless_leaf_bx_lr_skips_style_a(self):
+        # Brief 260 refinement: a frameless LEAF (no `lr`-save
+        # prologue) ending in `bx lr` is the native leaf epilogue on
+        # BOTH tiers — NOT real Style A. The bare-`bx lr` cue used to
+        # over-fire here (brief 256 found these ship byte-identical on
+        # the DEFAULT tier). REDS on the pre-refinement detector.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e3520000", "cmp\tr2, #0"),
+            _objdump_line(0x104, "13a02001", "movne\tr2, #1"),
+            _objdump_line(0x108, "e5801098", "str\tr1, [r0, #152]"),
+            _objdump_line(0x10c, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertNotIn("StyleA", {w.wall_id for w in walls})
+
+    def test_real_style_a_with_callee_save_fires(self):
+        # Real Style A: saves callee-saved + `lr`, restores WITHOUT
+        # `pc`, then `bx lr`. The lr-save prologue is the gate.
+        asm = _wrap_asm(
+            _objdump_line(0x100, "e92d4010", "push\t{r4, lr}"),
+            _objdump_line(0x104, "ebfffffe", "bl\t0x0"),
+            _objdump_line(0x108, "e8bd4010", "ldmfd\tsp!, {r4, lr}"),
+            _objdump_line(0x10c, "e12fff1e", "bx\tlr"),
+        )
+        walls = detect_walls(asm)
+        self.assertIn("StyleA", {w.wall_id for w in walls})
+
 
 class TestC15Detection(unittest.TestCase):
     """C-15: constant-pair derivation. mwcc 1.2 form is `mov rN,
@@ -145,16 +172,16 @@ class TestC22Detection(unittest.TestCase):
 
 
 class TestC23Detection(unittest.TestCase):
-    """C-23: 3+ pc-relative loads + at least one of:
-      (a) MMIO literal in main range (`0x04000xxx`),
-      (b) DTCM kernel-block literal (`0x027ffxxx`),
-      (c) duplicate pool ref (same `@ 0xADDR` referenced 2+
-          times),
-      (d) clustered pool (3+ distinct targets within ±0x20 of
-          each other).
-    Recipe: `.legacy.c` (mwcc 1.2/sp2p3) routing. Brief 199 upgrade
-    from "documented-but-unresolved" to recipe-available, with
-    expanded signal set beyond the brief 086 MMIO-block path.
+    """C-23: 3+ pc-relative loads AND an actual MMIO pool literal —
+    main range (`0x04000xxx`) or DTCM kernel block (`0x027ffxxx`).
+    Recipe: `.legacy.c` (mwcc 1.2/sp2p3) routing.
+
+    Brief 260 refinement: an MMIO literal is now REQUIRED. The brief-199
+    `duplicate pool ref` / `clustered pool` signals no longer fire on
+    their own (regular-RAM pool refs) — brief 256 showed by direct mwcc
+    that mwcc 2.0/sp1p5 reloads such pool ptrs rather than folding, so
+    those picks ship on the DEFAULT tier and the cue over-fired. The two
+    signals survive only as extra cue context when MMIO is also present.
     """
 
     def test_mmio_block(self):
@@ -180,12 +207,13 @@ class TestC23Detection(unittest.TestCase):
         walls = detect_walls(asm)
         self.assertIn("C-23", {w.wall_id for w in walls})
 
-    def test_duplicate_pool_ref(self):
-        # Brief 199 signal — same pool target referenced by 2+
-        # `ldr`s, no MMIO literal in range. Pick #5's clean
-        # shape: both `ldr r3` loads point to the same `@`
-        # address. mwcc 2.0/sp1p5 would fold these; mwcc 1.2/
-        # sp2p3 keeps them separate.
+    def test_duplicate_pool_ref_no_mmio_skips(self):
+        # Brief 260 refinement: a duplicate pool ref WITHOUT an MMIO
+        # literal no longer fires. Brief 256 showed by direct mwcc
+        # that mwcc 2.0/sp1p5 RELOADS such pool ptrs (it does not
+        # fold) — these ship byte-identical on the DEFAULT tier, so
+        # the old `duplicate_refs`-alone trigger was a false positive.
+        # REDS on the pre-refinement detector (which fired here).
         asm = _wrap_asm(
             _objdump_line(
                 0x100, "e59fc020",
@@ -202,15 +230,38 @@ class TestC23Detection(unittest.TestCase):
             _objdump_line(0x130, "12345678", ".word\t0x12345678"),
         )
         walls = detect_walls(asm)
+        self.assertNotIn("C-23", {w.wall_id for w in walls})
+
+    def test_duplicate_pool_ref_with_mmio_keeps_cue(self):
+        # When an MMIO literal IS present, the duplicate-ref signal
+        # survives as extra CUE context (not as the trigger).
+        asm = _wrap_asm(
+            _objdump_line(
+                0x100, "e59fc020",
+                "ldr\tip, [pc, #32]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x104, "e59f3024",
+                "ldr\tr3, [pc, #36]\t@ 0x130",
+            ),
+            _objdump_line(
+                0x108, "e59f2028",
+                "ldr\tr2, [pc, #40]\t@ 0x134",
+            ),
+            _objdump_line(0x130, "04000280", ".word\t0x04000280"),
+        )
+        walls = detect_walls(asm)
         self.assertIn("C-23", {w.wall_id for w in walls})
         cue = next(w.cue for w in walls if w.wall_id == "C-23")
         self.assertIn("duplicate", cue)
 
-    def test_clustered_pool_within_0x20(self):
-        # 3+ pool words within ±0x20 of each other — mwcc 2.0
-        # would fold them into a base+offset shape. Brief 199
-        # surfaced this on `OSi_PostIrqEvent`'s `0x021a6354 /
-        # 0x021a6358 / 0x021a635c` triple-field cluster.
+    def test_clustered_pool_no_mmio_skips(self):
+        # Brief 260 refinement: a regular-RAM clustered-pool window
+        # WITHOUT an MMIO literal no longer fires. Brief 256 found
+        # these ship on the DEFAULT tier (mwcc 2.0 does not always
+        # fold a clustered struct-field pool into base+offset), so
+        # the `clustered_pool`-alone trigger was a false positive.
+        # REDS on the pre-refinement detector (which fired here).
         asm = _wrap_asm(
             _objdump_line(
                 0x100, "e59fc020",
@@ -229,9 +280,7 @@ class TestC23Detection(unittest.TestCase):
             _objdump_line(0x138, "021a635c", ".word\t0x021a635c"),
         )
         walls = detect_walls(asm)
-        self.assertIn("C-23", {w.wall_id for w in walls})
-        cue = next(w.cue for w in walls if w.wall_id == "C-23")
-        self.assertIn("clustered", cue)
+        self.assertNotIn("C-23", {w.wall_id for w in walls})
 
     def test_three_pc_loads_no_signal_no_match(self):
         # 3+ pc-loads but no MMIO literal, no duplicate ref, no
@@ -263,22 +312,14 @@ class TestC23Detection(unittest.TestCase):
             _objdump_line(0x138, "fedcba98", ".word\t0xfedcba98"),
         )
         walls = detect_walls(asm)
-        # The `0x130 / 0x134 / 0x138` POOL POSITIONS are within
-        # 8 bytes (clustered window) — that's expected since
-        # mwcc packs pool entries contiguously. The C-23 cluster
-        # signal should activate ONLY for the cohort it was
-        # designed for; pool-position clustering is universal
-        # and not a useful discriminator on its own. Even so,
-        # this test documents that the current detector accepts
-        # this false-positive class — see brief 199 research
-        # note for the calibration discussion.
-        #
-        # Brief 199 trade-off: false-positives on contiguous pool
-        # words are OK because the cost is "decomper tries
-        # `.legacy.c` routing, finds it doesn't help". The cost
-        # of a false-NEGATIVE on a true C-23 (decomper iterates
-        # for hours on the wrong route) is much higher.
-        self.assertIn("C-23", {w.wall_id for w in walls})
+        # Brief 260: the `0x130 / 0x134 / 0x138` POOL POSITIONS are
+        # within 8 bytes (clustered window) — but that is universal
+        # (mwcc packs pool entries contiguously) and was the brief-199
+        # false-positive class this test used to *document* (it
+        # previously asserted C-23 IN). With no MMIO literal present,
+        # the refined detector correctly does NOT fire — the name now
+        # matches the behavior. REDS on the pre-refinement detector.
+        self.assertNotIn("C-23", {w.wall_id for w in walls})
 
     def test_two_pc_loads_with_mmio_below_threshold(self):
         # Only 2 pc-loads — below the `pc_loads >= 3` floor even
