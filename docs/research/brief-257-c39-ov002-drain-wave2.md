@@ -76,8 +76,9 @@ lowest free reg. **3 picks in this class now (02200084 / 02292020 /
 ### Byte-pack mask fold (1) — `021f4d3c`
 
 `(b1_5 & 0xff) << 8` — mwcc proves the 5-bit field is < 256 and folds
-the mask into shifts (`lsl#24; …lsr#16`); orig keeps `and #0xff; …lsl
-#8`. No source form observed that forces the explicit `and` on a
+the mask into shifts (`lsl#24; …lsr#16`); orig keeps
+`and #0xff; …lsl #8`. No source form observed that forces the explicit
+`and` on a
 provably-small bitfield. 86.7 % (the bit0 half matches; only the b1_5
 mask diverges).
 
