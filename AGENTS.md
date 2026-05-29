@@ -506,41 +506,62 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 254** — `scaffolder`. **Track-2 leading-edge pilot +
-  classify brief 253's C-42 resisters.** Direct-mwcc only, no SHA1.
-  (A) **Resolve the pivot direction empirically.** The brain's
-  independent swarm flagged ~631 solo-C-23 (276) + solo-StyleA
-  (355) `.legacy.c` picks as Track-2's cheap leading edge; brief
-  252 found those sole-prediction counts OVER-FIRE. Compile 2-3
-  representative solo-C-23 + 2-3 solo-StyleA picks (≤0x100) via the
-  mature `.legacy.c` routing tier; report per-pick ships-byte-
-  identical vs over-fire, with the diff as evidence. Decides whether
-  brief 256 launches a Track-2 leading-edge drain or Track-2 needs
-  full cold RE. (B) **Classify brief 253's 8 non-shipping C-42
-  families** (PR #733): confirm the 4 reg-alloc-plateau families
-  (`0ca11024`, `96d2a201`, `e7e4cff1`, `ef19bc9a`) as P-14 / P-11 +
-  census; run the variant matrix on `2b07f982` (mwcc -O4 fuses a
-  contiguous `==` set into a range check) and classify; triage the
-  3 unclassified (`0d484478`, `29f7d996`, `378a6647`). Every
-  permanence claim carries a falsification test. Branch:
-  `scaffolder/track2-leading-edge-pilot-and-c42-resisters`.
-- **Brief 255** — `decomper`. **C-39 ov002 bit-extract drain,
-  wave 1 (first post-C-42 wave).** Drain the ~121 sole-C-39 ≤0x80
-  ov002 picks, smallest-first, using brief 252's pilot-verified
-  recipe: bitfield struct `{u16 f0; u16 bit0:1; u16 rest:15;}` +
-  `helper(self, 1 - self->bit0)` (bitfield not `& 1`, `1 - x` not
-  `== 0` — both required per 252's contrast probes); map wrapper
-  variants (XOR / sign-check / reg-alloc) to gotchas 4 / 5 / 7.
-  Re-confirm pilot `func_ov002_0223fd2c` first. Expected yield
-  70-90 %. Caveat (brief 253): twin picks can reference different
-  per-overlay data symbols — confirm each pick's `.word` / `bl`
-  targets. **Success = per-pick 3-region `ninja sha1` PASS +
+- **Brief 256** — `scaffolder`. **Classify the C-39 table-index
+  sub-shape + scope the over-fire cohort.** Direct-mwcc only, no
+  SHA1. (A) **Classify the `db973` family** (brief 255's ask): the
+  `table[self->bit0]` strided-lookup C-39 sub-shape (~11 picks —
+  `02205508` / `0220c940` / `0220e108` + `8446c` / `f030a` /
+  `46a3d` / `e9e9e`). The miss is reg-alloc (orig field→ip,
+  pools→r2/r3) + a redundant `and #1` index mask. Variant matrix:
+  find a source form that reproduces orig's reg-alloc AND drops the
+  mask (coercible → new C-39 sub-shape + recipe), or classify P-N
+  reg-alloc plateau. Pilot `02205508`. (B) **Scope + triage the
+  over-fire cohort** (brief 254): the solo-C-23 (no-MMIO → natural
+  recipe, default tier) + solo-StyleA (frameless-leaf-trivial vs
+  real-Style-A → `.legacy.c` routing) picks that over-fire the
+  detectors but ship cheap. Do NOT trust the C-23/StyleA labels —
+  triage by ACTUAL tier via direct mwcc. Produce a sized, tiered
+  worklist (default-tier-natural / `.legacy.c`-routing / trivial-
+  leaf) for brief 258. Every claim carries a falsification test.
+  Branch: `scaffolder/c39-table-index-and-overfire-scope`.
+- **Brief 257** — `decomper`. **C-39 ov002 drain wave 2 + the 2
+  recovered C-42 resisters.** (A) Continue the C-39 ov002 sole-C-39
+  ≤0x80 drain, smallest-first (~80 drainable wrappers remain per
+  brief 255), with the verified bitfield recipe `{u16 f0; u16
+  bit0:1; u16 rest:15;}` + `helper(self, 1 - self->bit0)`; map
+  wrappers to gotchas 4/5/7; match the helper arg's u16-vs-int type
+  to the disasm. **Skip the `db973` bit0-table-index family** —
+  brief 256 owns it. (B) Ship the 2 C-42 picks brief 254 recovered:
+  `2b07f982` via the switch form `switch(n){case 0x4b:case 0x4c:
+  case 0x4d:return 0;}` (defeats -O4 range-fusion; 254 got 13/13);
+  `29f7d996` via the 2-D table index `*(u16*)(base+(arg0&1)*stride
+  +arg1*20)`. **Success = per-pick 3-region `ninja sha1` PASS +
   objdiff 100 % line, NOT `complete_units` / C-yield.** Report
-  non-shippers as P-N candidates with evidence; 10-min/pick cap.
-  Branch: `decomper/c39-ov002-bit-extract-drain-wave1`.
+  non-shippers as P-N candidates; 10-min/pick cap. Branch:
+  `decomper/c39-ov002-drain-wave2`.
 
 ### Closed briefs (reference)
 
+- **Brief 255** — `decomper`, shipped in PR #736. ✅ **24 .c at
+  100 % objdiff, 86 % yield (24/28)** — first post-C-42 wave. C-39
+  ov002 bit-extract cohort via the brief-252 bitfield recipe; pilot
+  re-confirmed. 4 resisters reported with diff evidence; the
+  `db973` `table[self->bit0]` strided-lookup sub-shape (~11 picks)
+  filed for brief 256. ~80 drainable wrappers + ~11 table-lookup +
+  ~4 complex remain → ~1-2 more C-39 waves. complete_units 2315 → 2339.
+- **Brief 254** — `scaffolder`, shipped in PR #735. 🎯 **Track-2
+  pivot resolved + 1 C-42 resister recovered.** (A) The swarm's
+  "631 solo-C-23/StyleA = Track-2 leading edge" premise is WRONG:
+  all 4 pilots ship byte-identical but NONE is cold-RE — they're
+  detector over-fires that drain cheap as natural-recipe (C-23
+  no-MMIO, default tier) or `.legacy.c` routing (real Style-A). So
+  brief 256 scopes that cheap over-fire cohort; genuine Track-2
+  (933 funcs >0x200) stays a separate expensive track. (B) Of brief
+  253's 8 resisters: `2b07f982` COERCIBLE via `switch` (13/13 —
+  falsifies the P-lean); 4 are **P-11** (not P-14 — correction;
+  small reg-alloc plateau); `29f7d996` likely-coercible (2-D table,
+  decomper pilot); `0d484478` cross-tier, `378a6647` P-leaning.
+  Falsification-test ledger included.
 - **Brief 253** — `decomper`, shipped in PR #733. ✅ **20 .c at
   100 % objdiff across 9 families — the C-42 pivot is confirmed.**
   4 C-43 / Family-5 picks (gotcha 13) + 16 size-2-family picks. 8

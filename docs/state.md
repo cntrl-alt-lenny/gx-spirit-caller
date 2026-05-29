@@ -8,49 +8,51 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#732 + #733 merge. Brain on Mac.
-**Brief 252 (next-track scout, scaffolder) + brief 253 (C-42 drain
-wave 8 final — 20 .c, decomper) both shipped. C-42 sibling-draining is
-DONE (waves 1-8 = 203 picks); the project is pivoting.**
+**Last updated:** 2026-05-29, post-#735 + #736 merge. Brain on Mac.
+**Brief 254 (Track-2 pilot + classify C-42 resisters, scaffolder) +
+brief 255 (C-39 ov002 bit-extract drain wave 1 — 24 .c, decomper) both
+shipped. Post-C-42 pivot underway — cheap recipe-drain continues on C-39.**
 
-**Current metrics (post-#732 + #733 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 6e9eb82, clean tree):**
-`complete_units 2315 / 3552 (65.17 %)` (+20 vs prior 2295) —
-SHA1-aligned headline. `matched_functions 2329 / 9801` (+22;
-under-counts per metric canon). 3-region SHA1 PASS established on #733
-(#732 is docs-only).
+**Current metrics (post-#735 + #736 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on f5d29a0, clean tree):**
+`complete_units 2339 / 3589 (65.17 %)` (+24 vs prior 2315) —
+SHA1-aligned headline. `matched_functions 2353 / 9801` (+24). 3-region
+SHA1 PASS established on #736 (#735 is docs-only).
 
-🧭 **PIVOT DECISION (reconciled from two independent reads).** C-42's
-exact-sibling vein is exhausted (only 297 singletons + 8 non-coercible
-families left). The scaffolder's brief-252 scout and the brain's
-independent pivot-analysis swarm AGREED on the big picture (no next
-C-42; `.s`→`.c` and data-tier = 0 headline; Track-2 hard-bucket is the
-long-term real-RE pivot) but CLASHED on one point: the swarm's Track-2
-"leading edge" (~631 solo-C-23/StyleA picks) rests on counts brief 252
-says over-fire. Resolution:
-- **Near-term (brief 255, decomper):** bank the cheap win — the
-  scaffolder pilot-verified a 121-pick C-39 ov002 bit-extract cohort
-  (byte-identical pilot, 70-90 % expected). First post-C-42 drain.
-- **Settle the clash (brief 254, scaffolder):** compile a handful of the
-  disputed solo-C-23 / StyleA picks → ship-or-over-fire verdict decides
-  whether brief 256 launches a Track-2 leading-edge drain or full cold RE.
-- **Also 254:** classify brief 253's 8 non-shipping C-42 families
-  (4 reg-alloc → P-14, 1 range-fusion `2b07f982`, 3 unclassified).
-- **Dropped:** `.s`→`.c` (0 headline — shipped `.s` already counts
-  `complete`) and the data tier (0 headline + 0 SHA1). Permuter reserved
-  as a per-pick fall-through (cite brief-198's plateau, not "0/9").
+🧭 **PIVOT RESOLVED — recipe-drain continuation, not cold-RE yet.** Brief
+254 compiled the swarm's disputed "Track-2 leading edge" (~631
+solo-C-23/StyleA picks): ALL ship byte-identical but NONE is cold-RE —
+they're detector OVER-FIRES that drain cheap (C-23 no-MMIO → natural
+recipe, default tier; real Style-A → `.legacy.c` routing). The swarm and
+brief 252 were each half-right: a cheap cohort exists, it just isn't
+"Track-2." Genuine Track-2 (933 funcs >0x200 = 49 % of unmatched bytes)
+stays a separate, expensive cold-RE track for later. Cheap-drain runway
+left (no cold-RE needed yet): ~80 C-39 wrappers + ~11 C-39 table-index
+(256 to classify) + the over-fire cohort (256 to size) + 2 recovered
+C-42 picks → several more waves.
 
-🎯 **Brief 253 — C-42 pivot confirmed.** 20 .c at 100 % objdiff (4
-C-43/Family-5 via gotcha 13 + 16 size-2). 8 families reported as P-N
-candidates with diff evidence (not ground on) → brief 254. Followed the
-new conventions: reported the objdiff line not the metric, neutral
-"what-didn't-land".
+🎯 **Brief 255 — 24 .c at 86 % yield, first post-C-42 wave.** C-39 ov002
+bit-extract via the brief-252 recipe; pilot re-confirmed. 4 resisters
+reported with diff evidence; filed the `db973` table-index sub-shape
+(~11 picks) → brief 256.
 
-🧭 **Brief 252 — no next C-42, but C-39 under-drained.** Exact-sibling
-families exhausted (`find_pattern_clusters` tops at 28 picks / 33 %).
-121-pick sole-C-39 ≤0x80 ov002 cohort pilot-verified → brief 255.
-Standing tracks sized honestly (permuter / `.s`→`.c` = 0 / Track-2 =
-49 % of unmatched bytes).
+🎯 **Brief 254 — Track-2 resolved + `2b07f982` recovered via `switch`**
+(falsifies brief 253's P-lean). 4 resisters confirmed **P-11** (not P-14
+— correction); `29f7d996` likely-coercible (2-D table → brief 257).
+
+🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
+Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
+ARM decompiler that knows mwcc, the genuine Track-2 accelerator (pilot
+free via decomp.me Decompile button); (2) **dsd-ghidra** (Ghidra primed
+with our symbols) + **dsd `sig`** (auto-ID lib funcs) — both unused;
+(3) **TWEWY** (CC0, our exact 2.0/sp1p5) = the one net-new SDK port pool.
+We're the most tooling-advanced project in the ecosystem (codegen-walls.md
+leads). ⚠️ **Two spawned Claude Code sessions** (origin 1dfcadb5…) acted
+on the ntrtwl finding and left it uncommitted on main; brain preserved +
+verified it on branch `brain/ntrtwl-vendor-pool-review` (49 tests pass,
+ruff clean). Finding: the ntrtwl wireless pool is ~99 % already-complete
+(33 net-new, 5 exclusive) — NOT a goldmine; see `reference_ntrtwl_pool`
+memory + `ntrtwl-nitrosdk-feasibility.md`. Branch awaits a land/hold call.
 
 🤖 **Workflow hardening (Opus 4.8 review, PRs #728 + #730 + #731).** The
 verify gate is now paste-the-output: paste-or-FAIL SHA1 tails, captured
