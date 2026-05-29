@@ -506,38 +506,58 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 260** — `scaffolder`. **Classify the global-ptr-chase
-  reg-alloc class + refine the over-firing predict_walls cues.**
-  Direct-mwcc only, no SHA1. (A) **Classify the global-ptr-chase
-  class** (brief 259's new resister): `0223ba28` + `02273b54` —
-  `global->ptr->field` chain temps land in low regs vs orig's
-  r3/ip. Variant matrix: a source lever (coercible → new sub-shape
-  + gotcha) or a P-11-class plateau (like the CSE field-temp)?
-  Pilot `0223ba28`. (B) **Refine the over-firing StyleA / C-23 cues
-  in `predict_walls.py`** (brief 256's now-due follow-up): split
-  StyleA frameless-leaf vs real by lr-save, and require an actual
-  MMIO ref for C-23 — cut the FP rate so the brief-256 over-fire
-  worklist + future scans are trustworthy. Update the tests (the
-  brain will red-check the new detector on a known bad input).
-  Every claim carries a falsification test. Branch:
-  `scaffolder/global-chase-class-and-predict-walls-refine`.
-- **Brief 261** — `decomper`. **C-39 ov002 drain wave 4 (close the
-  cohort).** Per brief 259, ~57 drainable sole-C-39 ≤0x80 ov002
-  picks remain. (A) Drain the ~20 remaining C-39f bit0-table-index
-  via gotcha 14 (higher-variation: 2-D `mla` / 2-helper /
-  `pre()`-compare forms). (B) Drain the ~37 other wrappers (clean
-  helper-chains; the global-deref-guard variants). **Skip** the CSE
-  field-temp class (P-11, brief 258) and the global-ptr-chase class
-  (`0223ba28` / `02273b54` — brief 260 classifying). **Success =
-  per-pick 3-region `ninja sha1` PASS + objdiff 100 % line, NOT
-  `complete_units` / C-yield.** Report non-shippers as P-N
-  candidates; 10-min/pick cap. This should close the ov002 sole-C-39
-  ≤0x80 cohort — confirm the brief-256 over-fire worklist (584
-  picks) as the next cohort. Branch:
-  `decomper/c39-ov002-drain-wave4`.
+- **Brief 262** — `scaffolder`. **Classify the C-39 ov002 hard
+  tail + close C-39.** Direct-mwcc only, no SHA1. Brief 261 left
+  ~28 deferred C-39 picks (multi-helper-`pre()` chains, global
+  3-way switches, stride-reuse/constant-fold compares,
+  arg-bit-packing) and recommended leaving them as opportunistic
+  cleanup. Triage them — the pattern (db973→C-39f,
+  global-chase→C-39g) is that deferred resisters keep turning
+  coercible with the right lever, so one classification pass is
+  worth it. Per shape: a source lever (coercible → new C-39
+  sub-shape + gotcha, for an opportunistic decomper sweep) or P-N
+  (→ census, permuter fodder). Confirm the stride-reuse picks
+  (`0220b420`, `0228abd8` — orig `add rN, stride, #K` vs C
+  constant-folding `0x868+K`) as P or find a lever. Outcome: a
+  coercible-vs-P verdict per shape + § C-39 marked closed (cheap
+  vein mined out). Every claim carries a falsification test.
+  Branch: `scaffolder/c39-hard-tail-classify-and-close`.
+- **Brief 263** — `decomper`. **Over-fire cohort drain, wave 1
+  (the next big cheap vein).** C-39's cheap vein is mined out
+  (brief 261); pivot to the 584-pick over-fire cohort that brief
+  256 sized + tiered and brief 260's refined detector validated.
+  (A) Drain ~30-40 picks in brief 256's cheapest-first order:
+  StyleA-real (`.legacy.c` routing) → small StyleA-frameless-leaf
+  (default tier, native leaf) → small C23-noMMIO (default-tier
+  natural recipe). These ship via EXISTING recipes (routing +
+  natural C) — no new wall. (B) Opportunistically sweep the 2
+  C-39g picks now coercible via brief 260's gotcha 15 (`0223ba28`,
+  `02273b54` — arg-liveness lever). **Success = per-pick 3-region
+  `ninja sha1` PASS + objdiff 100 % line, NOT `complete_units` /
+  C-yield.** Report non-shippers as P-N candidates + the over-fire
+  yield by tier (so the brain can size the remaining ~550).
+  10-min/pick cap. Branch: `decomper/overfire-drain-wave1`.
 
 ### Closed briefs (reference)
 
+- **Brief 261** — `decomper`, shipped in PR #745. ✅ **24 .c at
+  100 % objdiff** (16 C-39f + 8 wrappers). C-39 ov002 cohort
+  121 → 36 (~70 % drained). New levers (gotcha 7 on the 2-D index,
+  invert-polarity, the C89 mid-block-decl trap). **The cheap C-39
+  vein is mined out** — the ~28 remaining are a harder composite
+  tail; recommended pivoting to the over-fire cohort rather than a
+  dedicated wave 5. 3 resisters (stride-reuse ×2 lean-P, 1
+  composite). complete_units 2380 → 2404.
+- **Brief 260** — `scaffolder`, shipped in PR #744. 🎯 **global-
+  ptr-chase → C-39g COERCIBLE + over-fire detectors refined.** (A)
+  Both brief-259 resisters recovered byte-identical via arg-liveness
+  matching (forward incoming args → chase temps land in r3/ip/r0);
+  filed C-39g + gotcha 15. Distinct from the CSE field-temp P-11
+  (there args are self-derived = no lever). (B) Refined
+  predict_walls StyleA (require an lr-saving prologue) + C-23
+  (require actual MMIO) cues — cuts ~214 StyleA + ~236 C-23
+  over-fires; the red-on-bad-input gate verified (4 skip-tests red
+  on the old detector). Suite 2267.
 - **Brief 259** — `decomper`, shipped in PR #742. ✅ **23 .c at
   100 % objdiff** (21 C-39f via gotcha 14 + 2 wrappers). The
   two-lever C-39f recipe held across all variants. Scoping
