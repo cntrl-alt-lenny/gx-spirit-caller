@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**77 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**78 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (12)
+- [Uncategorised](#uncategorised) (13)
 
 ## Analysis / worklist
 
@@ -508,4 +508,10 @@ code-decomp resumption wave (brief 189).
 **patch ELF .o files to break the**
 
 mwldarm overlay-swap-blind veneer-generation cascade (brief 132).
+
+### `tools/stylea_c94_stub.py`
+
+**Emit a candidate `.legacy.c` stub for a StyleA c94 5-arg helper-family**
+
+pick from its disassembly (brief 264, stretch goal).
 

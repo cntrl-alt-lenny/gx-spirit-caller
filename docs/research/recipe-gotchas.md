@@ -1200,6 +1200,83 @@ through this checklist before iterating.
 
 ---
 
+## StyleA over-fire families (batch-drain recipe templates)
+
+The over-fire StyleA-real tier (~614 lr-save picks, brief 263) is
+dominated by a handful of regular helper-family shapes. Each ships
+**byte-identical** from one source TEMPLATE on the `.legacy.c` routing
+tier (mwcc 1.2/sp2p3 — the Style-A epilogue `stmfd {lr}; sub sp,#4 …
+add sp; ldmfd {lr}; bx lr`; gotcha 10). Name the file `*.legacy.c`.
+Brief 264 locked these on representative picks; brief 265+ batch-drains
+a whole family by transcribing only the per-pick literal + arg-shape.
+
+**Universal falsification test:** compile the template as `*.legacy.c`
+(sp2p3) → predict byte-identical to the named orig. A `sp1p5` compile
+emits the wrong epilogue (`push {r3, lr}` / `pop {r3, pc}`), which is
+the symptom that flags the family in the first place.
+
+### Family A — c94 5-arg helper (12 picks, `func_02094c94`)
+
+`helper(CODE, a0, a1, 0, 0)` — a 5-arg call (r0=CODE, r1=a0, r2=a1,
+r3=0, `[sp]`=0). Three arg-shapes, all from one source pattern:
+
+```c
+extern int func_02094c94(int code, int a0, int a1, int z3, int z4);
+
+void f_1arg(int a0)          { func_02094c94(CODE, a0,  0, 0, 0); }  /* 02094cec */
+void f_noarg(void)           { func_02094c94(CODE, -1,  0, 0, 0); }  /* 02094d80 */
+void f_2arg(int a0, int a1)  { func_02094c94(CODE, a0, a1, 0, 0); }  /* 02094e0c */
+```
+
+Per pick: read the `mov r0, #CODE` literal (e.g. 22/24/32) and the
+arg-shape from the disasm. Validated byte-identical on all three
+(`02094cec` / `02094d80` / `02094e0c`).
+
+### Family B — arg-shuffle (3 picks, `func_02094688`)
+
+Forwards incoming args to the helper in a shuffled order, returns 0:
+
+```c
+extern int func_02094688(int x, int y, int z);
+int f(int a0, int a1, int a2, int a3) { func_02094688(a2, a1, a3); return 0; }
+```
+
+Validated byte-identical on `02097ce8` (helper gets `(a2, a1, a3)`).
+
+### Family C — `global = helper()` (2 picks)
+
+```c
+extern int helper(void);
+extern int data_X;
+void f(void) { data_X = helper(); }
+```
+
+Validated byte-identical on `0208f284` (`data_021a6338 =
+func_0208ce48()`).
+
+### Family D — 6-arg-stack helper (2 picks)
+
+`helper(a0, a1, a2, 0, 0, a3)` — two stack args (`[sp]`=0, `[sp+4]`=a3):
+
+```c
+extern int helper(int a0, int a1, int a2, int z3, int z4, int a3);
+void f(int a0, int a1, int a2, int a3) { helper(a0, a1, a2, 0, 0, a3); }
+```
+
+Validated byte-identical on `0206ed54`.
+
+### Family E — two-void-call (base shape)
+
+```c
+extern void h1(int); extern void h2(int);
+void f(void) { h1(K1); h2(K2); }
+```
+
+Validated byte-identical on `02094c70` (`func_02093c10(3);
+func_02093d44(0);`).
+
+---
+
 ## Contributing
 
 When a new gotcha surfaces during a worked-example ship, append
