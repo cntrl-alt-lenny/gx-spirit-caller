@@ -603,6 +603,10 @@ src/overlay002/func_ov002_0226b034.s:
     complete
     .text start:0x0226b034 end:0x0226b054
 
+src/overlay002/func_ov002_0226b054.c:
+    complete
+    .text start:0x0226b054 end:0x0226b094
+
 src/overlay002/func_ov002_0226b094.s:
     complete
     .text start:0x0226b094 end:0x0226b0b0
@@ -651,6 +655,10 @@ src/overlay002/func_ov002_0226b298.s:
 src/overlay002/func_ov002_021ae3f0.c:
     complete
     .text start:0x021ae3f0 end:0x021ae400
+
+src/overlay002/func_ov002_021ae400.c:
+    complete
+    .text start:0x021ae400 end:0x021ae430
 
 
 
@@ -2156,6 +2164,34 @@ src/overlay002/func_ov002_021e2b1c.s:
     complete
     .text start:0x021e2b1c end:0x021e2b3c
 
+src/overlay002/func_ov002_021e2b3c.c:
+    complete
+    .text start:0x021e2b3c end:0x021e2bd4
+
+src/overlay002/func_ov002_021e2c5c.c:
+    complete
+    .text start:0x021e2c5c end:0x021e2cd4
+
+src/overlay002/func_ov002_0223de94.c:
+    complete
+    .text start:0x0223de94 end:0x0223def4
+
+src/overlay002/func_ov002_021e286c.c:
+    complete
+    .text start:0x021e286c end:0x021e28b4
+
+src/overlay002/func_ov002_021d59cc.c:
+    complete
+    .text start:0x021d59cc end:0x021d5a08
+
+src/overlay002/func_ov002_022592ec.c:
+    complete
+    .text start:0x022592ec end:0x02259324
+
+src/overlay002/func_ov002_0225935c.c:
+    complete
+    .text start:0x0225935c end:0x022593a8
+
 src/overlay002/func_ov002_021e358c.s:
     complete
     .text start:0x021e358c end:0x021e35ac
@@ -3220,9 +3256,17 @@ src/overlay002/func_ov002_021bbd14.c:
     complete
     .text start:0x021bbd14 end:0x021bbd54
 
+src/overlay002/func_ov002_021bc618.c:
+    complete
+    .text start:0x021bc618 end:0x021bc68c
+
 src/overlay002/func_ov002_021bc68c.c:
     complete
     .text start:0x021bc68c end:0x021bc6c4
+
+src/overlay002/func_ov002_021bc6c4.c:
+    complete
+    .text start:0x021bc6c4 end:0x021bc6e8
 
 src/overlay002/func_ov002_02241bc4.c:
     complete
@@ -3532,6 +3576,10 @@ src/overlay002/func_ov002_021b3e5c.c:
 src/overlay002/func_ov002_021b3e94.c:
     complete
     .text start:0x021b3e94 end:0x021b3ecc
+
+src/overlay002/func_ov002_021b3ecc.c:
+    complete
+    .text start:0x021b3ecc end:0x021b3f0c
 
 src/overlay002/func_ov002_02208760.c:
     complete
