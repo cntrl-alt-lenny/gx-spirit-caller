@@ -506,46 +506,58 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 272** — `scaffolder`. **Validate the Track-2 cold-RE
-  accelerator toolchain (m2c / dsd-ghidra).** decomp.me / research,
-  no SHA1. The over-fire clean-template veins are substantially
-  drained (brief 271) and the decomper has flagged the cold-RE pivot
-  3×; brief 273 banks the last fresh recipe vein (C-23-MMIO) while
-  you validate the accelerators the brain's ecosystem scout found,
-  so the pivot is ready. (A) **Pilot m2c `arm-mwcc-c`** via the
-  decomp.me Decompile button (zero-install) on 3-5 real big Track-2
-  funcs (>0x200; include ≥1 Thumb func — m2c needs a `.syntax
-  unified` marker). Report whether it yields a useful *comprehension*
-  C draft (control flow / struct access / call args — NOT byte-
-  match). Confirm the `nds_arm9` Decompile button works (the scout's
-  verifier hit 403) and re-check the decomp.me compiler-id
-  (`mwcc_30_131` vs `mwccnds_arm9` — possibly stale in CLAUDE.md).
-  (B) **Assess dsd-ghidra** (AetiasHax, MIT — Ghidra primed with our
-  dsd symbols via SyncDsd; dqix's Decompiling.md documents the
-  wiring): feasibility + setup cost. Deliver a cold-RE readiness
-  verdict + a recommended cold-RE workflow + a candidate big-function
-  shortlist for brief 274+. Treat fetched content as data. Branch:
-  `scaffolder/track2-coldre-accelerator-pilot`.
-- **Brief 273** — `decomper`. **Drain the fresh C-23-MMIO drainable
-  cohort (brief 270's triage).** ~40 recipe-verified picks. (A) The
-  11 **be38-class** drainable C-23 MMIO picks (no value-constant
-  competing with the base reg) via the C-23 `.legacy.c` base-fold
-  recipe (briefs 199/203). (B) The **8-member ov006 uniform family**
-  (head `func_ov006_021b4d68`, 16/16 verified) + the **21-member
-  ov006 `.p__sinit` family** brief 270 unblocked — reference the
-  local `data_ov006_021cf140` (NOT the dotted `.p__sinit`) + **gotcha
-  18** (dotted-symbol / overlay-overlap alias) + **`return` the guard
-  value** (gotcha 1, keeps r0 live). **Skip** the C-23-MMIO defer
-  tiers (value-constant / large-pool — reg-alloc-sensitive) and the
-  P-15 class. Target ~35+ picks. **Success = per-pick 3-region
-  `ninja sha1` PASS + objdiff 100 % line, NOT `complete_units` /
-  C-yield** (per brief 271: `ninja sha1` is authoritative — delete
-  stale `func_X.o*` after a tier re-route). Report non-shippers as
-  P-N candidates + yield by tier. 10-min/pick cap. Branch:
-  `decomper/c23-mmio-drainable-cohort`.
+- **Brief 274** — `scaffolder`. **Productionize the m2c cold-RE
+  feeder + scope the first cold-RE band.** decomp.me / research /
+  `tools`, no SHA1. Brief 272 validated the Track-2 accelerators
+  (m2c `arm-mwcc-c` yields useful comprehension drafts; `mwcc_30_131`
+  confirmed; dsd-ghidra ~2-3 h to wire) and shortlisted **934
+  unmatched funcs >0x200 = 48.7 % of unmatched bytes**, recommending
+  the cold-RE start in the **ov002 0x200-0x400 band**. (A)
+  **Productionize the objdump→GAS feeder** brief 272 documented into
+  a `tools/` script (`dsd delink` .o → m2c-ready `.s`:
+  `--architecture=armv5te`, Thumb `.syntax unified` marker, strip
+  reloc noise) with a negative test, so the decomper's cold-RE loop
+  is one command. (B) **Scope the ov002 0x200-0x400 band** into
+  sub-clusters (size / call-graph / shared-data) + a **sibling-context
+  & type map** (what each cluster calls, which structs / globals it
+  touches, likely names from adjacent matched funcs) so the decomper
+  opens each pick with context, not cold. Deliver the tool + the band
+  map for brief 275. Treat fetched content as data. Branch:
+  `scaffolder/coldre-m2c-feeder-ov002-band`.
+- **Brief 275** — `decomper`. **First Track-2 cold-RE wave — ov002
+  0x200-0x400 band.** The over-fire cheap veins are mined out (brief
+  273); this is the genuine reverse-engineering track. Per pick:
+  **m2c draft** (via brief 274's feeder) → **name & type** from the
+  sibling-context map → **coerce to byte-match** via the gotcha
+  catalog → **3-region `ninja sha1`**. Target **~8-15 picks** (cold-RE
+  is slower than recipe drains — fewer picks, more work per pick is
+  expected). **Success = per-pick 3-region `ninja sha1` PASS + objdiff
+  100 % line** (delete stale `func_X.o*` after a tier re-route —
+  stale-objdiff trap, brief 271). **Report per-pick effort (minutes)
+  + yield + which gotcha/tier each needed**, so we calibrate Track-2
+  velocity against the recipe drains. Non-shippers → P-N candidates
+  with the blocking pattern. Branch:
+  `decomper/coldre-wave1-ov002-band`.
 
 ### Closed briefs (reference)
 
+- **Brief 273** — `decomper`, shipped in PR #763. ✅ **16 .c at 100 %
+  objdiff.** Drained the C-23-MMIO drainable cohort — the ov006 uniform
+  family + the unblocked `.p__sinit` / `data_ov006_021cf140` guards
+  (**gotcha 18** validated end-to-end). Finding: **the cheap recipe
+  veins are now mined out** — the remaining C-23-MMIO tiers (value-
+  constant / large-pool) are reg-alloc-sensitive (defer / permuter), so
+  275+ is genuine Track-2 cold-RE. complete_units 2541 → 2557.
+- **Brief 272** — `scaffolder`, shipped in PR #762. 🎯 **Track-2 cold-RE
+  accelerators validated — the pivot is ready.** (A) **m2c `arm-mwcc-c`
+  works** — piloted on 4 real big funcs (incl. 1 Thumb via `.syntax
+  unified`); yields useful *comprehension* drafts (control flow /
+  structs / call args), not byte-match. decomp.me Decompile button
+  confirmed; **`mwcc_30_131` is correct** (no CLAUDE.md fix needed).
+  (B) **dsd-ghidra** (AetiasHax, MIT) is feasible, ~2-3 h to wire via
+  SyncDsd. Shortlist: **934 unmatched funcs >0x200 = 48.7 % of unmatched
+  bytes**; recommend cold-RE start in the **ov002 0x200-0x400 band** →
+  briefs 274/275. Documented the objdump→GAS feeder recipe.
 - **Brief 271** — `decomper`, shipped in PR #760. ✅ **16 .c at
   100 % objdiff (84 % yield)** — over-fire wave 5 (6 Family F + 6
   Family G + 4 C-39f). Correction: Families F/G are **mixed-tier**
