@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**79 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**80 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (14)
+- [Analysis / worklist](#analysis--worklist) (15)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (11)
 - [Multi-region porting](#multi-region-porting) (3)
@@ -102,6 +102,12 @@ Walks every `config/<ver>/arm9/**/relocs.txt`, counts the control-flow edges bet
 **Reports decomp progress for Yu-Gi-Oh! GX Spirit Caller.**
 
 Three sources, in order of preference (descending fidelity):
+
+### `tools/size_census.py`
+
+**bucket every UNMATCHED function by size, per module.**
+
+Brief 277 found the cold-RE knee: functions ≲ 0x100 bytes / ~25 instructions hand-match in 5-15 min (the schedule + register allocation are forced at that size); above it they wall on mwcc reg-alloc, which the permuter (brief 276) doesn'…
 
 ### `tools/tier_classifier.py`
 

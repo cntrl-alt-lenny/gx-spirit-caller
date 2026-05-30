@@ -70,6 +70,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("progress", "analysis", "Analysis / worklist"),
     ("overlay_coupling", "analysis", "Analysis / worklist"),
     ("data_symbol_sizes", "analysis", "Analysis / worklist"),
+    ("size_census", "analysis", "Analysis / worklist"),
     ("diff_reasons", "analysis", "Analysis / worklist"),
     ("bulk_rename_candidates", "rename-support", "Rename support"),
     ("bulk_data_candidates", "rename-support", "Rename support"),
