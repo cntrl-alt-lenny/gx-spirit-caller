@@ -506,42 +506,65 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 278** — `scaffolder`. **Size the hand-matchable harvest
-  project-wide + deepen the ov002 Cluster A map.** decomp.me / research
-  / `tools`, no SHA1. Wave 2 (brief 277) found the clean knee:
-  funcs `≤~0x100` / ~25 instrs hand-match in ~5-15 min (12/13 shipped);
-  above it they wall on reg-alloc, and the permuter only anneals
-  *scheduling*, **not** reg-alloc (brief 276). So the strategy is
-  **drain the small cohort by hand; the big cohort waits for a
-  reg-alloc tool.** (A) **Project-wide size census** — bucket every
-  *unmatched* function (arm9 main + all overlays) by size
-  (`≤0x100` / `0x100-0x200` / `>0x200`); report **count + byte-volume
-  per bucket per module** and rank modules by small-cohort richness.
-  Deliver the **hand-matchable runway** (how many funcs + bytes the
-  proven recipe can take, and in what order) — this sizes the cold-RE
-  opportunity and says which module to drain after ov002. A `tools/`
-  census script + test if it generalizes. (B) **Deepen the ov002
-  Cluster A map** (the 141-func `0x868` per-player core — the decomper's
-  stated next hand-target): per-function role / size / type so wave 3
-  opens with context. Treat fetched content as data. Branch:
-  `scaffolder/harvest-census-clusterA-map`.
-- **Brief 279** — `decomper`. **Cold-RE wave 3 — drain the rest of
-  ov002's small hubs + open Cluster A.** Wave 2's recipe holds:
-  `tools/m2c_feed.py` draft → name/type from the **12 banked verbs** +
-  band map → coerce → **3-region `ninja sha1`**. Targets (smallest-
-  first, same `≤0x100` knee): (1) the **remaining open `<0x100` hubs**
-  (`0225764c` 0x8c + the appendix mid-tier `0x10c-0x168` while they stay
-  forced); (2) **begin Cluster A** (the `0x868` per-player core) —
-  `0226b054` / `021b3ecc` proved the `0x868` recipe (gotcha 14 +
-  brief-271 2-D) still holds, so the cluster is drainable. Apply the new
-  **gotchas 20 / 21 / 22** + the extern-struct anti-fold. **Defer any pick
-  that walls on reg-alloc past ~15 min to the permuter list** — don't
-  grind (brief 276: the permuter plateaus on reg-alloc, so a walled pick
-  waits for a *tool*, not more time). Target ~8-15 picks; keep banking
-  hub verbs. Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/coldre-wave3-clusterA`.
+- **Brief 280** — `scaffolder`. **Triage main's 2025 `<0x100` cohort
+  for SDK source-mining (a faster track than hand-RE).** decomp.me /
+  research / `tools`, no SHA1. The brief-278 census found **arm9 main
+  holds 2025 `<0x100` unmatched funcs — the single richest vein** — but
+  much of main is **NitroSDK / MSL / runtime**, matchable by
+  *identifying the library function and compiling its known source*, not
+  hand-RE. Potentially a much faster pipeline than the ov002 hand-drain;
+  size + de-risk it. (A) **Identify** how many of main's 2025 `<0x100`
+  funcs are recognizable library code: run **dsd `sig`** (auto-ID lib
+  funcs — the ecosystem-scout find, still unused) + match against known
+  **NitroSDK / MSL** signatures and the **TWEWY** CC0 pool (our exact
+  `2.0/sp1p5`). Report a defensible **SDK-matchable estimate** (count +
+  which libraries). (B) **Pilot** the source-mining loop end-to-end on
+  **3-5** identified funcs: library source → compile under our cflags →
+  confirm byte-identical vs the delinked `.o` (objdiff, no SHA1).
+  Deliver the estimate + a **source-mining recipe** + the pilot results,
+  so brief 282+ can open the main-SDK track in parallel with the ov002
+  hand-drain. Treat fetched content as data; no piped install. Branch:
+  `scaffolder/main-sdk-sourcemine-triage`.
+- **Brief 281** — `decomper`. **Cold-RE wave 4 — keep draining ov002's
+  simple-shape `<0x100` vein.** Wave 3 refined the knee: **the axis is
+  control-flow *shape*, not byte size** — straight-line / simple-
+  accessor / dispatcher shapes byte-match (7/7 batch on the `0x868`
+  handler family); **loops + multi-value liveness wall on reg-alloc even
+  at 0x24** (the permuter's wall too). So target **simple-shape** funcs;
+  skip loop/liveness bodies. Recipe unchanged: `tools/m2c_feed.py` draft
+  → name/type from the banked Cluster-A verbs + band map → coerce →
+  **3-region `ninja sha1`**. ov002 still has **~1850 `<0x100`** funcs
+  (census) — plenty of runway; pull the next simple-shape batch (more
+  `0x868`-family members, simple accessors/dispatchers; the band map
+  flags matched-callee anchors). **Triage by shape from the m2c draft;
+  send anything loop/liveness-heavy to the permuter list** (don't grind
+  — wave 3 confirmed even tiny loops wall). Apply gotchas 20 / 21 / 22 +
+  the extern-struct anti-fold. Target ~8-15 picks; keep banking verbs.
+  Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/coldre-wave4-ov002-simple`.
 
 ### Closed briefs (reference)
+
+- **Brief 279** — `decomper`, shipped in PR #772. ✅ **10 cold-RE picks,
+  3-region SHA1 PASS — the `0x868` core opened + the knee sharpened.** A
+  uniform 2-D `0x868` handler family (7 drained in one batch) + 2 group-2
+  sinks + the last small hub (`0225764c`). **Key refinement: the knee is
+  control-flow *shape*, not byte size** — straight-line / simple-accessor
+  / dispatcher shapes match at any small size; **loops + multi-value
+  liveness wall on reg-alloc even at 0x24** (the permuter's wall too, so
+  the split is by shape). Banked more Cluster-A verbs; filed the loop/
+  liveness picks to the permuter list. complete_units 2569 → 2579.
+- **Brief 278** — `scaffolder`, shipped in PR #771. 🗺️ **The hand-
+  matchable runway + the ov002 Cluster A deep map.** (A)
+  `tools/size_census.py` (+8 tests): **4858 `<0x100` unmatched funcs
+  project-wide** (~614 KB) = the hand-drain runway; the `>0x200` cohort
+  is 945 funcs but **49 % of unmatched *bytes*** (reg-alloc-tool
+  territory). Richest veins: **main 2025** (likely NitroSDK/MSL →
+  *source-mining*, NOT hand-RE), **ov002 1887**, then ov006 / ov004 / …
+  (B) Cluster A (the 141 `0x868` funcs) is **uniformly above the knee** —
+  permuter territory, NOT immediate hand-work; the hand-work is the small
+  funcs touching the same global. Reframes 280 (main-SDK triage) + 281
+  (ov002 simple-shape).
 
 - **Brief 277** — `decomper`, shipped in PR #769. ✅ **12 hubs shipped,
   3-region SHA1 PASS — the small-func thesis confirmed emphatically.**

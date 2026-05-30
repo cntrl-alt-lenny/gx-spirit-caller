@@ -8,44 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#768 + #769 merge. Brain on Mac.
-**Brief 276 (permuter re-validated + piloted, scaffolder) + brief 277
-(cold-RE wave 2 — 12 hubs, decomper) both shipped. The small-func thesis is
-confirmed: hand-draining `≤0x100` hubs WORKS (12/13, ~5-15 min each); the
-permuter helps with scheduling but plateaus on reg-alloc. Strategy locked:
-keep hand-draining the small cohort (278/279); the big cohort waits for a
-reg-alloc tool.**
+**Last updated:** 2026-05-30, post-#771 + #772 merge. Brain on Mac.
+**Brief 278 (hand-matchable size census + Cluster A map, scaffolder) + brief
+279 (cold-RE wave 3 — 10 picks, decomper) both shipped. Crossed 66 %. The
+census sized the runway (4858 `<0x100` funcs) and the knee sharpened to
+*control-flow shape, not size*. Next: scaffolder triages main's 2025-func SDK
+vein for source-mining (280); decomper keeps draining ov002's simple-shape
+vein (281).**
 
-**Current metrics (post-#768 + #769 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 87de7b1, clean tree):**
-`complete_units 2569 / 3894 (65.97 %)` (+12 vs prior 2557) — SHA1-aligned
-headline. `matched_functions 2606 / 9801` (+12). **% near-flat because the
-reconfigure grew the denominator (3877 → 3894) as the 12 new delink blocks
-split units** — the honest signal is +12 functions. 3-region SHA1 PASS
-reproduced (gate holds; #768 is research-only).
+**Current metrics (post-#771 + #772 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on bb911b9, clean tree):**
+`complete_units 2579 / 3907 (66.01 %)` (+10 vs prior 2569) — SHA1-aligned
+headline. `matched_functions 2616 / 9801` (+10). Denominator drifted
+3894 → 3907 (10 new delink blocks split units); honest signal is +10
+functions. 3-region SHA1 PASS reproduced (gate holds; #771 is research-only).
 
-✅ **Brief 277 — 12 small ov002 hubs shipped, 3-region SHA1 PASS.** 12/13
-hand-matched in ~5-15 min (vs wave 1's 0/2 on the big band). **Proof the
-wall is size / reg-alloc DOF, not comprehension** — the arg-pack schedule
-that walls the big `021d91e0` matches trivially on the 0x48 `021e286c`. Knee
-≈ `0x100` / ~25 instrs. Banked 12 hub verbs + gotchas 20/21/22.
+✅ **Brief 279 — 10 cold-RE picks, 3-region SHA1 PASS — the `0x868` core
+opened.** A uniform 2-D `0x868` handler family (7 in one batch) + 2 sinks +
+the last small hub. **Knee sharpened: the axis is control-flow *shape*, not
+byte size** — simple-accessor / dispatcher shapes match at any small size;
+**loops + multi-value liveness wall on reg-alloc even at 0x24** (the
+permuter's wall too). Loop/liveness picks → permuter list.
 
-🧪 **Brief 276 — permuter re-validated + piloted (works, not a silver
-bullet).** (Already wired from brief 096 — not a from-scratch build.) Anneals
-*scheduling* (`021d91e0` −39 %) but **hard-plateaus on reg-alloc** (`021b05d0`
-0 improvement — P-11). Keep it for scheduling-class picks; it does **not**
-crack the systematic reg-alloc wall. Matches briefs 196/198/200.
+🗺️ **Brief 278 — the hand-matchable runway + Cluster A deep map.**
+`tools/size_census.py`: **4858 `<0x100` unmatched funcs project-wide**
+(~614 KB) = the hand-drain runway; `>0x200` = 945 funcs but **49 % of
+unmatched *bytes*** (reg-alloc-tool territory). Richest veins: **main 2025**
+(likely NitroSDK/MSL → *source-mining*, not hand-RE), **ov002 1887**, then
+ov006 / ov004 / … Cluster A (the 141 `0x868` funcs) is uniformly above the
+knee.
 
-🧭 **Where we are: hand-draining small hubs is the velocity engine.** Wave 2
-proved small (`≤0x100`) funcs match by hand and big ones don't; the permuter
-is a marginal scheduling-helper, not the unlock — so don't over-invest in it.
-Next: **brief 278** = scaffolder sizes the **hand-matchable harvest project-
-wide** (size-census every unmatched func → the runway + drain order) and
-deepens the ov002 Cluster A map; **brief 279** = decomper runs **wave 3** —
-the rest of ov002's small hubs + opens Cluster A (the `0x868` core), same
-recipe, defer reg-alloc walls to the permuter list. Settled-permanent: P-11,
-P-15. The ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked,
-verified, awaiting a land/hold call.
+🧭 **Where we are: two tracks open.** Hand-draining ov002's simple-shape
+`<0x100` vein is the proven velocity engine (66 % now). The census revealed a
+*second* track: main's 2025-func SDK vein may be matchable by **source-mining**
+(identify the lib func + compile its known source via dsd `sig` / the TWEWY
+CC0 pool) — far faster than hand-RE if it pans out. Next: **brief 280** =
+scaffolder triages + pilots the main-SDK source-mine; **brief 281** = decomper
+runs cold-RE **wave 4** on ov002 simple-shape funcs (skip loops → permuter).
+Settled-permanent: P-11, P-15. The ntrtwl branch
+(`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
+land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
