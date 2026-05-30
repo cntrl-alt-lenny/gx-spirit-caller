@@ -8,40 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#762 + #763 merge. Brain on Mac.
-**Brief 272 (Track-2 cold-RE accelerators validated, scaffolder) + brief
-273 (C-23-MMIO drainable cohort — 16 .c, decomper) both shipped. The cheap
-recipe veins are now mined out; the cold-RE pivot begins — briefs 274/275
-open Track-2 on the ov002 0x200-0x400 band.**
+**Last updated:** 2026-05-30, post-#765 + #766 merge. Brain on Mac.
+**Brief 274 (m2c feeder tool + ov002 band map, scaffolder) + brief 275
+(cold-RE wave 1 = calibration, decomper) both shipped. First cold-RE round:
+0 .c shipped — comprehension is solved (m2c), but byte-match (mwcc reg-alloc)
+is the wall. Next: scaffolder de-risks a permuter (276); decomper pivots to
+the small hubs/leaves where hand-matching still works (277).**
 
-**Current metrics (post-#762 + #763 merge, EUR — reconfigured +
-`ninja sha1` PASS + `ninja report` on 6a09ea7, clean tree):**
-`complete_units 2557 / 3877 (65.95 %)` (+16 vs prior 2541) —
-SHA1-aligned headline. `matched_functions 2594 / 9801`. 3-region
-SHA1 PASS established on #763 (#762 is research-only).
+**Current metrics (post-#765 + #766 merge, EUR):**
+`complete_units 2557 / 3877 (65.95 %)` — **unchanged this round (0 .c
+shipped)**. Both PRs are tools/docs only; `git diff fc92c6b..b015a0d`
+touches zero ROM build inputs → ROM byte-identical, `ninja sha1` PASS
+carries over from 6a09ea7. `matched_functions 2594 / 9801`.
 
-🎯 **Brief 273 — 16 .c at 100 % objdiff.** Drained the C-23-MMIO drainable
-cohort (ov006 uniform family + the unblocked `data_ov006_021cf140` guards;
-gotcha 18 validated end-to-end). **Finding: the cheap recipe veins are now
-mined out** — the remaining C-23-MMIO tiers are reg-alloc-sensitive
-(defer / permuter), so 275+ is genuine cold-RE.
+📋 **Brief 275 — cold-RE wave 1 = calibration (0 ships / 2 attempted,
+~90 min).** The m2c pipeline is validated end-to-end (drafts recover control
+flow / structs / call args / C-39f indices). **Key finding: comprehension is
+solved (~2 min/pick); byte-match is the wall** — a 0x200-0x400 *branchy* func
+vs mwcc's exact reg-alloc / schedule is multi-hour, <1 ship/hr. 28/260 band
+picks triaged: all complex, no easy sub-cohort. → the real gap is a
+PERMUTER, and hand-targets should be `<0x100`.
 
-🎯 **Brief 272 — Track-2 cold-RE accelerators validated.** m2c `arm-mwcc-c`
-yields useful comprehension drafts (4-func pilot, incl. a Thumb func);
-`mwcc_30_131` confirmed correct; dsd-ghidra ~2-3 h to wire. Shortlist:
-**934 unmatched funcs >0x200 = 48.7 % of unmatched bytes**; cold-RE starts
-in the ov002 0x200-0x400 band.
+🛠️ **Brief 274 — m2c feeder tool + ov002 band map.** `tools/m2c_feed.py`
+(one-command m2c drafts; ARM/Thumb auto-detect; 18 tests incl. non-vacuous
+negatives). Band map: **ov002 is a COLD overlay (0 named funcs)** → context
+is structural; **RE the ~30 small hubs first — they name the verbs for all
+260 band funcs.** Clusters A 141 / B 41 / C 16 / D 12 / IND 47.
 
-🧭 **Where we are: the cold-RE pivot begins.** The recipe-drain era is over
-(over-fire veins drained brief 271; the last C-23-MMIO vein drained brief
-273). Briefs 274/275 open **Track-2 cold-RE**: brief 274 = productionize
-the m2c objdump→GAS feeder as a `tools/` script + scope the ov002
-0x200-0x400 band into clusters with a sibling-context/type map; brief 275 =
-the first cold-RE wave (~8-15 picks) on that band, reporting per-pick
-effort/yield to calibrate Track-2 velocity vs the recipe drains.
-Settled-permanent: P-11, P-15. The ntrtwl branch
-(`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
-land/hold call.
+🧭 **Where we are: cold-RE is harder than the recipe drains — re-aiming.**
+Wave 1 proved big branchy funcs don't hand-match; the value of the round is
+the calibration + the validated tool. Two complementary next bets: **brief
+276** = scaffolder stands up + pilots **decomp-permuter** on wave 1's 2
+deferred picks (does it crack the reg-alloc wall? if so the whole 0x200-0x400
+band opens); **brief 277** = decomper pivots to the **small leaf/hub funcs
+(`<0x100`)** where hand reg-alloc still matches — re-establishes ship velocity
+AND banks the hub names for the band. Settled-permanent: P-11, P-15. The
+ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked, verified,
+awaiting a land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real

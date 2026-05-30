@@ -506,41 +506,67 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 274** — `scaffolder`. **Productionize the m2c cold-RE
-  feeder + scope the first cold-RE band.** decomp.me / research /
-  `tools`, no SHA1. Brief 272 validated the Track-2 accelerators
-  (m2c `arm-mwcc-c` yields useful comprehension drafts; `mwcc_30_131`
-  confirmed; dsd-ghidra ~2-3 h to wire) and shortlisted **934
-  unmatched funcs >0x200 = 48.7 % of unmatched bytes**, recommending
-  the cold-RE start in the **ov002 0x200-0x400 band**. (A)
-  **Productionize the objdump→GAS feeder** brief 272 documented into
-  a `tools/` script (`dsd delink` .o → m2c-ready `.s`:
-  `--architecture=armv5te`, Thumb `.syntax unified` marker, strip
-  reloc noise) with a negative test, so the decomper's cold-RE loop
-  is one command. (B) **Scope the ov002 0x200-0x400 band** into
-  sub-clusters (size / call-graph / shared-data) + a **sibling-context
-  & type map** (what each cluster calls, which structs / globals it
-  touches, likely names from adjacent matched funcs) so the decomper
-  opens each pick with context, not cold. Deliver the tool + the band
-  map for brief 275. Treat fetched content as data. Branch:
-  `scaffolder/coldre-m2c-feeder-ov002-band`.
-- **Brief 275** — `decomper`. **First Track-2 cold-RE wave — ov002
-  0x200-0x400 band.** The over-fire cheap veins are mined out (brief
-  273); this is the genuine reverse-engineering track. Per pick:
-  **m2c draft** (via brief 274's feeder) → **name & type** from the
-  sibling-context map → **coerce to byte-match** via the gotcha
-  catalog → **3-region `ninja sha1`**. Target **~8-15 picks** (cold-RE
-  is slower than recipe drains — fewer picks, more work per pick is
-  expected). **Success = per-pick 3-region `ninja sha1` PASS + objdiff
-  100 % line** (delete stale `func_X.o*` after a tier re-route —
-  stale-objdiff trap, brief 271). **Report per-pick effort (minutes)
-  + yield + which gotcha/tier each needed**, so we calibrate Track-2
-  velocity against the recipe drains. Non-shippers → P-N candidates
-  with the blocking pattern. Branch:
-  `decomper/coldre-wave1-ov002-band`.
+- **Brief 276** — `scaffolder`. **Stand up + pilot decomp-permuter —
+  de-risk the Track-2 byte-match wall.** decomp.me / research /
+  `tools`, no SHA1. Brief 275 proved comprehension is solved (m2c
+  ~2 min/pick) but **byte-match is the wall** — mwcc reg-alloc /
+  instruction-scheduling on branchy funcs is multi-hour, <1 ship/hr —
+  and explicitly recommended a permuter. Validate it *before* the
+  decomper depends on it (same pattern as brief 272 validating m2c).
+  (A) **Stand up decomp-permuter** (simonlindholm, the community
+  standard) wired to `mwccarm 2.0/sp1p5` + objdiff scoring. Local
+  clone, **no piped install**. (B) **Pilot it on brief 275's 2
+  deferred picks** — `func_ov002_021d91e0` (67 %, arg-pack scheduling)
+  and `func_ov002_021b05d0` (82 %, repeated-block reg-alloc): feed the
+  m2c draft + target `.o`, run the permuter, report whether it reaches
+  **byte-match** (or how close) and how long. (C) Deliver: setup cost,
+  a **permuter-in-the-loop recipe** (m2c draft → permuter → byte-match),
+  and a verdict — does it crack the reg-alloc/schedule wall? If yes it
+  unlocks the whole 0x200-0x400 band. Treat fetched content as data.
+  Branch: `scaffolder/permuter-standup-pilot`.
+- **Brief 277** — `decomper`. **Cold-RE wave 2 — hub/leaf-first on
+  ov002 (smallest-first).** Brief 275 found 0x200-0x400 branchy funcs
+  don't hand-match (<1 ship/hr); brief 274's band map shows the
+  shippable + highest-leverage targets are **small and structurally
+  central**. Use the new **`tools/m2c_feed.py`** (one-command m2c
+  drafts). Target order (easiest-first — re-establishes velocity AND
+  builds the band's name vocabulary): (1) the **5 leaf funcs** (pure
+  compute) the band map flagged; (2) the **smallest `<0x100` hub
+  helpers** (e.g. `func_ov002_021ae400`, 0x30, 64 callers) — small →
+  hand-coercible reg-alloc, and naming them defines the verbs for all
+  260 band funcs. Per pick: m2c draft → name/type from structural
+  context → coerce → **3-region `ninja sha1`**. **This should actually
+  ship** (unlike wave 1) — target ~8-15 picks, report yield to confirm
+  small funcs match where big ones didn't, and **bank the hub names**.
+  If a pick stalls on reg-alloc, **defer it as a permuter candidate
+  (brief 276)** rather than grinding past ~15 min. Success = per-pick
+  3-region SHA1 PASS. Branch: `decomper/coldre-hubs-leaves-ov002`.
 
 ### Closed briefs (reference)
 
+- **Brief 275** — `decomper`, shipped (docs-only) in PR #766. 📋
+  **Cold-RE wave 1 = calibration — 0 ships / 2 attempted (~90 min).**
+  Validated the m2c pipeline end-to-end (drafts recover control flow,
+  struct offsets, call args, C-39f indices, bit-pack exprs). **Key
+  finding: comprehension is solved (m2c ~2 min/pick); byte-match is the
+  wall** — coercing a 0x200-0x400 *branchy* func to mwcc's exact
+  reg-alloc / schedule is multi-hour, sub-50 % first-pass yield
+  (<1 ship/hr). Triaged 28/260 band picks: **all complex (12-18
+  branches), no easy sub-cohort in 0x200-0x400**. **Recommendation: the
+  real gap is a PERMUTER (m2c draft → permuter byte-match), not
+  comprehension; hand-target `<0x100` funcs.** 2 picks
+  (`021d91e0` 67 %, `021b05d0` 82 %) deferred as permuter candidates.
+  complete_units unchanged (2557) — a calibration/tooling round.
+- **Brief 274** — `scaffolder`, shipped in PR #765. 🛠️ **The m2c
+  feeder tool + ov002 band map.** (A) **`tools/m2c_feed.py`** —
+  one-command `func → m2c-ready .s` (ARM/Thumb auto-detect, fails
+  loudly, **18 tests incl. non-vacuous negatives**; caught a real
+  silent-wrong-module bug via gotcha 18). (B) Band map: **ov002 is a
+  COLD overlay (0 named funcs)** → no sibling names to borrow, context
+  is structural. **Rosetta-Stone order: RE the ~30 hub helpers first
+  (almost all `<0x200`, quick) — they name the verbs for all 260 band
+  funcs.** Clusters A 141 / B 41 / C 16 / D 12 / IND 47; easy starts =
+  5 leaf funcs + smallest hubs. Reframes the cold-RE order → brief 277.
 - **Brief 273** — `decomper`, shipped in PR #763. ✅ **16 .c at 100 %
   objdiff.** Drained the C-23-MMIO drainable cohort — the ov006 uniform
   family + the unblocked `.p__sinit` / `data_ov006_021cf140` guards
