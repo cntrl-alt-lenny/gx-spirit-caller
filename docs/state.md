@@ -8,43 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#765 + #766 merge. Brain on Mac.
-**Brief 274 (m2c feeder tool + ov002 band map, scaffolder) + brief 275
-(cold-RE wave 1 = calibration, decomper) both shipped. First cold-RE round:
-0 .c shipped — comprehension is solved (m2c), but byte-match (mwcc reg-alloc)
-is the wall. Next: scaffolder de-risks a permuter (276); decomper pivots to
-the small hubs/leaves where hand-matching still works (277).**
+**Last updated:** 2026-05-30, post-#768 + #769 merge. Brain on Mac.
+**Brief 276 (permuter re-validated + piloted, scaffolder) + brief 277
+(cold-RE wave 2 — 12 hubs, decomper) both shipped. The small-func thesis is
+confirmed: hand-draining `≤0x100` hubs WORKS (12/13, ~5-15 min each); the
+permuter helps with scheduling but plateaus on reg-alloc. Strategy locked:
+keep hand-draining the small cohort (278/279); the big cohort waits for a
+reg-alloc tool.**
 
-**Current metrics (post-#765 + #766 merge, EUR):**
-`complete_units 2557 / 3877 (65.95 %)` — **unchanged this round (0 .c
-shipped)**. Both PRs are tools/docs only; `git diff fc92c6b..b015a0d`
-touches zero ROM build inputs → ROM byte-identical, `ninja sha1` PASS
-carries over from 6a09ea7. `matched_functions 2594 / 9801`.
+**Current metrics (post-#768 + #769 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 87de7b1, clean tree):**
+`complete_units 2569 / 3894 (65.97 %)` (+12 vs prior 2557) — SHA1-aligned
+headline. `matched_functions 2606 / 9801` (+12). **% near-flat because the
+reconfigure grew the denominator (3877 → 3894) as the 12 new delink blocks
+split units** — the honest signal is +12 functions. 3-region SHA1 PASS
+reproduced (gate holds; #768 is research-only).
 
-📋 **Brief 275 — cold-RE wave 1 = calibration (0 ships / 2 attempted,
-~90 min).** The m2c pipeline is validated end-to-end (drafts recover control
-flow / structs / call args / C-39f indices). **Key finding: comprehension is
-solved (~2 min/pick); byte-match is the wall** — a 0x200-0x400 *branchy* func
-vs mwcc's exact reg-alloc / schedule is multi-hour, <1 ship/hr. 28/260 band
-picks triaged: all complex, no easy sub-cohort. → the real gap is a
-PERMUTER, and hand-targets should be `<0x100`.
+✅ **Brief 277 — 12 small ov002 hubs shipped, 3-region SHA1 PASS.** 12/13
+hand-matched in ~5-15 min (vs wave 1's 0/2 on the big band). **Proof the
+wall is size / reg-alloc DOF, not comprehension** — the arg-pack schedule
+that walls the big `021d91e0` matches trivially on the 0x48 `021e286c`. Knee
+≈ `0x100` / ~25 instrs. Banked 12 hub verbs + gotchas 20/21/22.
 
-🛠️ **Brief 274 — m2c feeder tool + ov002 band map.** `tools/m2c_feed.py`
-(one-command m2c drafts; ARM/Thumb auto-detect; 18 tests incl. non-vacuous
-negatives). Band map: **ov002 is a COLD overlay (0 named funcs)** → context
-is structural; **RE the ~30 small hubs first — they name the verbs for all
-260 band funcs.** Clusters A 141 / B 41 / C 16 / D 12 / IND 47.
+🧪 **Brief 276 — permuter re-validated + piloted (works, not a silver
+bullet).** (Already wired from brief 096 — not a from-scratch build.) Anneals
+*scheduling* (`021d91e0` −39 %) but **hard-plateaus on reg-alloc** (`021b05d0`
+0 improvement — P-11). Keep it for scheduling-class picks; it does **not**
+crack the systematic reg-alloc wall. Matches briefs 196/198/200.
 
-🧭 **Where we are: cold-RE is harder than the recipe drains — re-aiming.**
-Wave 1 proved big branchy funcs don't hand-match; the value of the round is
-the calibration + the validated tool. Two complementary next bets: **brief
-276** = scaffolder stands up + pilots **decomp-permuter** on wave 1's 2
-deferred picks (does it crack the reg-alloc wall? if so the whole 0x200-0x400
-band opens); **brief 277** = decomper pivots to the **small leaf/hub funcs
-(`<0x100`)** where hand reg-alloc still matches — re-establishes ship velocity
-AND banks the hub names for the band. Settled-permanent: P-11, P-15. The
-ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked, verified,
-awaiting a land/hold call.
+🧭 **Where we are: hand-draining small hubs is the velocity engine.** Wave 2
+proved small (`≤0x100`) funcs match by hand and big ones don't; the permuter
+is a marginal scheduling-helper, not the unlock — so don't over-invest in it.
+Next: **brief 278** = scaffolder sizes the **hand-matchable harvest project-
+wide** (size-census every unmatched func → the runway + drain order) and
+deepens the ov002 Cluster A map; **brief 279** = decomper runs **wave 3** —
+the rest of ov002's small hubs + opens Cluster A (the `0x868` core), same
+recipe, defer reg-alloc walls to the permuter list. Settled-permanent: P-11,
+P-15. The ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) stays parked,
+verified, awaiting a land/hold call.
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
