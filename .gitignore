@@ -57,3 +57,7 @@ Files to be Reviewed/
 
 # Brief 198 permuter venv (macOS externally-managed Python workaround)
 .venv_permuter/
+
+# pycparser tables (decomp-permuter leaves these in CWD)
+/parser.out
+/yacctab.py
