@@ -96,6 +96,7 @@ CATEGORIES: list[tuple[str, str, str]] = [
     ("transform_dep", "infrastructure", "Infrastructure / build-patching"),
     ("scaffold_batch", "rename-support", "Rename support"),
     ("m2ctx", "match-acceleration", "Match acceleration"),
+    ("m2c_feed", "match-acceleration", "Match acceleration"),
 ]
 
 # Category rendering order. Readers scan top-down — put the
