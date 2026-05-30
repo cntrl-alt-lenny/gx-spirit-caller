@@ -8,40 +8,38 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#759 + #760 merge. Brain on Mac.
-**Brief 270 (C-23-MMIO triaged + ov006 `.p__sinit` family freed,
-scaffolder) + brief 271 (over-fire wave 5 — 16 .c, decomper) both shipped.
-Over-fire clean-template veins substantially drained (65.88 %); the cold-RE
-pivot is near — validating its accelerators while one fresh recipe vein
-remains.**
+**Last updated:** 2026-05-30, post-#762 + #763 merge. Brain on Mac.
+**Brief 272 (Track-2 cold-RE accelerators validated, scaffolder) + brief
+273 (C-23-MMIO drainable cohort — 16 .c, decomper) both shipped. The cheap
+recipe veins are now mined out; the cold-RE pivot begins — briefs 274/275
+open Track-2 on the ov002 0x200-0x400 band.**
 
-**Current metrics (post-#759 + #760 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 453061e, clean tree):**
-`complete_units 2541 / 3857 (65.88 %)` (+16 vs prior 2525) —
-SHA1-aligned headline. `matched_functions 2555 / 9801` (+16). 3-region
-SHA1 PASS established on #760 (#759 is docs-only).
+**Current metrics (post-#762 + #763 merge, EUR — reconfigured +
+`ninja sha1` PASS + `ninja report` on 6a09ea7, clean tree):**
+`complete_units 2557 / 3877 (65.95 %)` (+16 vs prior 2541) —
+SHA1-aligned headline. `matched_functions 2594 / 9801`. 3-region
+SHA1 PASS established on #763 (#762 is research-only).
 
-🎯 **Brief 271 — 16 .c at 100 % objdiff (84 % yield).** Over-fire wave 5
-(Family F/G + C-39f). Correction: Families F/G are MIXED-tier (per-pick
-`.legacy.c` / `.c` / `.legacy_sp3.c` — confirm the epilogue). Documented a
-stale-objdiff trap (`ninja sha1` is authoritative, not a stale objdiff).
-**Finding: the over-fire clean-template veins are substantially drained;
-the per-pick tail is ~50-70 %.**
+🎯 **Brief 273 — 16 .c at 100 % objdiff.** Drained the C-23-MMIO drainable
+cohort (ov006 uniform family + the unblocked `data_ov006_021cf140` guards;
+gotcha 18 validated end-to-end). **Finding: the cheap recipe veins are now
+mined out** — the remaining C-23-MMIO tiers are reg-alloc-sensitive
+(defer / permuter), so 275+ is genuine cold-RE.
 
-🎯 **Brief 270 — C-23 MMIO triaged + the "blocked" ov006 family freed.**
-The C-23 MMIO tier is 95 % reg-alloc-sensitive (only 11 be38-class
-drainable). The ov006 `.p__sinit` family is NOT blocked — the address is a
-clean `data_ov006_021cf140` alias (overlay overlap); + gotchas 18/19. ~29
-fresh drainable picks → brief 273.
+🎯 **Brief 272 — Track-2 cold-RE accelerators validated.** m2c `arm-mwcc-c`
+yields useful comprehension drafts (4-func pilot, incl. a Thumb func);
+`mwcc_30_131` confirmed correct; dsd-ghidra ~2-3 h to wire. Shortlist:
+**934 unmatched funcs >0x200 = 48.7 % of unmatched bytes**; cold-RE starts
+in the ov002 0x200-0x400 band.
 
-🧭 **Where we are: the last fresh recipe vein + cold-RE prep.** Brief 273 =
-drain the fresh ~40-pick C-23-MMIO drainable cohort (11 be38-class + the
-unblocked ov006 families). Brief 272 = **validate the Track-2 cold-RE
-accelerators** (m2c via decomp.me + dsd-ghidra, from the ecosystem scout)
-— the decomper has flagged the cold-RE pivot 3×, and after brief 273's
-vein the over-fire cheap drain is done. So 274+ likely begins genuine
-Track-2 cold-RE (the per-pick over-fire tail is opportunistic / permuter
-fodder). Settled-permanent: P-11, P-15. The ntrtwl branch
+🧭 **Where we are: the cold-RE pivot begins.** The recipe-drain era is over
+(over-fire veins drained brief 271; the last C-23-MMIO vein drained brief
+273). Briefs 274/275 open **Track-2 cold-RE**: brief 274 = productionize
+the m2c objdump→GAS feeder as a `tools/` script + scope the ov002
+0x200-0x400 band into clusters with a sibling-context/type map; brief 275 =
+the first cold-RE wave (~8-15 picks) on that band, reporting per-pick
+effort/yield to calibrate Track-2 velocity vs the recipe drains.
+Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
 
