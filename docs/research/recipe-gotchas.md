@@ -1317,6 +1317,22 @@ Before writing the C source for a new pick:
     masked byte can flip mwcc from a framed `bl`+`pop` into a frameless
     tail-call `bx` — inline the cast where the orig is framed (gotcha 22;
     brief 277 `021d59cc`).
+23. **Dense `switch` → jump table.** Consecutive `case` values lower to
+    `sub; sub; cmp #n; addls pc, pc, idx, lsl #2` + a `b` dispatch table.
+    Write it as a `switch`; the case **bodies emit in source order**, so
+    order them to match the orig block layout (gotcha 23; brief 281
+    `021b90a8`/`021b9144`).
+24. **Small-set membership → bitmask, not cmp-chain.** mwcc compiles
+    `x ∈ {a,b,c}`-returns-bool as `(1 << x) & MASK`. A `switch` / `||`
+    over few cases gives a cmp-chain instead. For the bitmask + exact 0/1
+    polarity write `int r = 0; if ((unsigned)x > max) return r;
+    if ((1 << x) & MASK) r = 1; return r;` (gotcha 24; brief 281
+    `021b9144`).
+25. **Only bitfields force `lsl;lsr` masking.** Both `x & MASK`
+    (non-encodable MASK) and `(x << N) >> N` are canonicalised by mwcc to
+    a **pooled-constant `and`**. To reproduce orig's `lsl #(32-off-N);
+    lsr #(32-N)` read a real bitfield (`struct { u32 f : N; }` via a
+    pointer — extends gotcha 21) (gotcha 25; brief 281 `021b90a8`).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
