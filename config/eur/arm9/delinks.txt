@@ -10147,3 +10147,49 @@ src/main/func_0209d758.legacy.c:
 src/main/func_0209e4f8.legacy.c:
     complete
     .text start:0x0209e4f8 end:0x0209e524
+
+src/main/func_0202f3e8.c:
+    complete
+    .text start:0x0202f3e8 end:0x0202f410
+
+src/main/func_02092614.c:
+    complete
+    .text start:0x02092614 end:0x02092644
+
+src/main/func_020a6d94.c:
+    complete
+    .text start:0x020a6d94 end:0x020a6dc4
+
+src/main/func_0208be38.legacy.c:
+    complete
+    .text start:0x0208be38 end:0x0208be70
+
+src/main/func_0208ccf4.c:
+    complete
+    .text start:0x0208ccf4 end:0x0208cd18
+
+src/main/func_0208cd18.c:
+    complete
+    .text start:0x0208cd18 end:0x0208cd3c
+
+src/main/func_0208cefc.c:
+    complete
+    .text start:0x0208cefc end:0x0208cf20
+
+src/main/func_0208cf20.c:
+    complete
+    .text start:0x0208cf20 end:0x0208cf44
+
+src/main/func_0202adf8.c:
+    complete
+    .text start:0x0202adf8 end:0x0202ae1c
+
+src/main/func_0202c24c.c:
+    complete
+    .text start:0x0202c24c end:0x0202c270
+
+src/main/func_0202c490.c:
+    complete
+    .text start:0x0202c490 end:0x0202c4b4
+
+
