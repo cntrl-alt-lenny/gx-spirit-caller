@@ -8,37 +8,38 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-29, post-#753 + #754 merge. Brain on Mac.
-**Brief 266 (frameless-leaf tier fully unblocked — all coercible,
-+gotcha 17, scaffolder) + brief 267 (over-fire wave 3 — 24 .c, decomper)
-both shipped. The StyleA template vein is drained; the freshly-unblocked
-tiers (frameless-diverse, C-23-MMIO) are next.**
+**Last updated:** 2026-05-30, post-#756 + #757 merge. Brain on Mac.
+**Brief 268 (StyleA tail → Families F/G coercible + new P-15, scaffolder)
++ brief 269 (over-fire wave 4 — 35 .c, decomper) both shipped. Over-fire
+drain healthy at 65.84 %; the productive families (F/G, C-39f-table) + the
+C-23-MMIO triage are next.**
 
-**Current metrics (post-#753 + #754 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 8ef5486, clean tree):**
-`complete_units 2490 / 3797 (65.58 %)` (+24 vs prior 2466) —
-SHA1-aligned headline. `matched_functions 2504 / 9801` (+24). 3-region
-SHA1 PASS established on #754 (#753 is docs-only).
+**Current metrics (post-#756 + #757 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 32698b0, clean tree):**
+`complete_units 2525 / 3835 (65.84 %)` (+35 vs prior 2490) —
+SHA1-aligned headline. `matched_functions 2539 / 9801` (+35). 3-region
+SHA1 PASS established on #757 (#756 is docs-only).
 
-🎯 **Brief 267 — 24 .c at 100 % objdiff (89 % yield).** Next-tier StyleA
-families (dd30 ×7, 928cc ×3, …) + the fresh C23-noMMIO tier 8/8 (LCG / MD5
-constants found by grep). **Pivot signal: the StyleA template-family vein
-is drained** — the ~570 remaining StyleA picks are heterogeneous (~50 %
-regime) → brief 268 sub-classifies them.
+🎯 **Brief 269 — 35 .c at 100 % objdiff (85 % yield).** Frameless-leaf
+diverse tail 5/5 + a **20-member C-39f indexed-`0x868`-table family** (both
+index forms need explicit `& 1`) + C-41 / Fill32-tail / C23-noMMIO 9/9.
+Flag: the "easy 220" C-23 real-MMIO tier is reg-alloc-sensitive, with a
+17-member ov006 family blocked by a dotted `.p__sinit` symbol → brief 270.
 
-🎯 **Brief 266 — frameless-leaf tier fully unblocked.** All 6 reverted
-non-shippers coercible (predication → switch, bit-insert → gotcha 16 +
-shift, dead-store/re-read → **new gotcha 17 `volatile`**); no permanent
-wall. The diverse tail is now drainable (→ brief 269).
+🎯 **Brief 268 — StyleA tail → 2 template families + 1 new permanent
+wall.** Family F (IRQ critical-section wrapper ×21) + Family G (memset
+wrapper ×8) coercible; Copy32 VRAM-copy ×3 → new **P-15** (legacy-tier
+reg-alloc + const-CSE plateau, permuter territory); the NO_BL leaf
+grab-bag (~70) is per-pick. The heterogeneous→families multiplier holds
+for shell clusters, not leaf grab-bags.
 
-🧭 **Where we are: over-fire cheap drain, the freshly-unblocked tiers.**
-Brief 269 = wave 4 (the now-coercible frameless-leaf diverse tail via
-gotchas 16/17 + the genuine C-23 real-MMIO tier ~220 + more C23-noMMIO).
-Brief 268 = sub-classify the heterogeneous StyleA tail (~570) into more
-coercible families (OS_RestoreIrq ×18 etc.) — the proven "heterogeneous →
-families" multiplier. The over-fire cohort still has good-yield runway;
-genuine Track-2 cold-RE (m2c / dsd-ghidra below) is the track after.
-Settled-permanent: P-11 (CSE field-temp). The ntrtwl branch
+🧭 **Where we are: over-fire cheap drain (65.84 %), the productive
+families.** Brief 271 = wave 5 (batch Families F/G via 268's templates +
+more C-39f-table + C-41/Fill32 tails + clean C23-noMMIO). Brief 270 =
+triage the C-23 real-MMIO tier (simple vs reg-alloc-sensitive) + lock a
+`.p__sinit` dotted-symbol alias to unblock the ov006 family (17). Good-
+yield runway remains; genuine Track-2 cold-RE (m2c / dsd-ghidra below) is
+the track after. Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
 
