@@ -506,39 +506,58 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 268** — `scaffolder`. **Classify the heterogeneous StyleA
-  over-fire tail into sub-families.** Direct-mwcc only, no SHA1.
-  Brief 267 drained the StyleA template-family vein; the ~570
-  remaining StyleA-real picks are heterogeneous and the decomper
-  flagged them as a ~50 % grind. But the proven pattern is that a
-  "heterogeneous tail" decomposes into more coercible families (c94,
-  b4a4, dd30… each was one recipe → many picks). Cluster the ~570
-  into sub-families and lock a recipe template per coercible family.
-  Named clusters to start: **OS_RestoreIrq criticals ×18** (likely
-  one template), **NO_BL leaf grab-bag ×25**, **memcpy wrappers ×5**,
-  + the brief-267 **Copy32 VRAM-copy P-candidate** (`0208fd30` /
-  `0208fd90` / `0208fe58` — `if(*g!=-1 && size>0x30) big_copy else
-  Copy32`). Per family: a recipe template (→ batch-drain) or genuine
-  one-off/P. Land templates in recipe-gotchas § StyleA over-fire
-  families. Every claim carries a falsification test. Branch:
-  `scaffolder/overfire-stylea-tail-subfamilies`.
-- **Brief 269** — `decomper`. **Over-fire cohort drain, wave 4 —
-  the freshly-unblocked tiers.** (A) Drain the **frameless-leaf
-  diverse tail** that brief 266 just made coercible: predication →
-  `switch`, bit-insert → gotcha 16 + explicit `(x<<K)>>M`,
-  dead-store/re-read → **gotcha 17** (`volatile` + targeted/delayed
-  temp). Should run high-yield now. (B) Continue the **C23-noMMIO**
-  tier (100 % so far) and open the genuine **C-23 real-MMIO** tier
-  (~220, untouched) via the existing C-23 `.legacy.c` MMIO recipe
-  (briefs 199/203). **Skip** the heterogeneous StyleA tail (brief
-  268 is sub-classifying it) + the Copy32 P-candidate. Target ~35+
-  picks. **Success = per-pick 3-region `ninja sha1` PASS + objdiff
-  100 % line, NOT `complete_units` / C-yield.** Report non-shippers
-  as P-N candidates + yield by tier. 10-min/pick cap. Branch:
-  `decomper/overfire-drain-wave4`.
+- **Brief 270** — `scaffolder`. **Triage the C-23 real-MMIO tier +
+  unblock the `.p__sinit` dotted-symbol refs.** Direct-mwcc only,
+  no SHA1. Brief 269 found the "easy 220" C-23 real-MMIO tier is
+  reg-alloc-sensitive (a `0x1000`-style constant temp competes with
+  the MMIO base reg) and a 17-member ov006 family is *blocked* by a
+  guard global named `.p__sinit_ov003_021cf114` (a dotted compiler
+  symbol unreferenceable from plain C). (A) **Split the C-23 MMIO
+  tier**: simple single-register-init MMIO (drainable via the C-23
+  `.legacy.c` recipe, briefs 199/203) vs clustered-pool /
+  reg-alloc-sensitive (per-pick / defer) — give the decomper a
+  drainable sub-worklist. (B) **`.p__sinit` alias mechanism**:
+  research + lock the cleanest way to reference a dotted
+  `.p__sinit_*` symbol from C with the right reloc (asm-label
+  `extern … asm(".p__sinit_…")`, a symbols.txt alias, or a header
+  shim); validate it compiles + emits the needed reloc via
+  direct-mwcc, so brief 271+ can drain the 17-member ov006 family.
+  Every claim carries a falsification test. Branch:
+  `scaffolder/c23-mmio-triage-and-sinit-alias`.
+- **Brief 271** — `decomper`. **Over-fire cohort drain, wave 5 —
+  the productive families.** Per brief 269's "still-productive"
+  list. (A) Batch-drain **Family F** (IRQ critical-section wrapper
+  ×21) + **Family G** (`func_020945f4` memset wrapper ×8) via brief
+  268's templates (recipe-gotchas § StyleA over-fire families F/G).
+  (B) Drain more of the **C-39f indexed-`0x868`-table family**
+  (beyond ≤0x40 — both index forms need the explicit `& 1`) + the
+  **C-41 MMIO-bit-clear** + **Fill32 tail-init** families + clean
+  **C23-noMMIO**. **Skip** the reg-alloc-sensitive C-23-MMIO picks
+  and the blocked ov006 family (brief 270 is triaging/unblocking
+  those) + the P-15 Copy32 class. Target ~35+ picks. **Success =
+  per-pick 3-region `ninja sha1` PASS + objdiff 100 % line, NOT
+  `complete_units` / C-yield.** Report non-shippers as P-N
+  candidates + yield by tier. 10-min/pick cap. Branch:
+  `decomper/overfire-drain-wave5`.
 
 ### Closed briefs (reference)
 
+- **Brief 269** — `decomper`, shipped in PR #757. ✅ **35 .c at
+  100 % objdiff (85 % yield).** Frameless-leaf diverse tail 5/5
+  (brief-266 coercibles all ship) + a **20-member C-39f indexed-
+  `0x868`-table family** (both index forms need explicit `& 1`) +
+  C-41 / Fill32-tail / C23-noMMIO 9/9. Flagged: the C-23 real-MMIO
+  tier (220) is reg-alloc-sensitive (NOT the easy 220 it looked),
+  with a 17-member ov006 family blocked by a dotted `.p__sinit`
+  symbol → brief 270. complete_units 2490 → 2525.
+- **Brief 268** — `scaffolder`, shipped in PR #756. 🎯 **StyleA tail
+  → 2 more template families + 1 new permanent wall.** Family F (IRQ
+  critical-section wrapper ×21) + Family G (memset wrapper ×8) =
+  COERCIBLE templates; Copy32 VRAM-copy ×3 = new **P-15** (legacy-
+  tier reg-alloc + const-CSE plateau, P-11 sibling, permuter
+  territory); the NO_BL leaf grab-bag (~70) is per-pick (splits like
+  the frameless tail). The "heterogeneous → families" multiplier
+  holds for regular shell clusters, not leaf grab-bags.
 - **Brief 267** — `decomper`, shipped in PR #754. ✅ **24 .c at
   100 % objdiff (89 % yield).** 16 StyleA-real (next-tier helper-
   families: dd30 guard-chain ×7, 928cc global-ptr ×3, …) + 8
