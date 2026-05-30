@@ -3850,3 +3850,87 @@ src/overlay002/func_ov002_022b3760.c:
 src/overlay002/func_ov002_021b009c.c:
     complete
     .text start:0x021b009c end:0x021b00d0
+
+src/overlay002/func_ov002_021c3cc8.c:
+    complete
+    .text start:0x021c3cc8 end:0x021c3cf0
+
+src/overlay002/func_ov002_021afba0.c:
+    complete
+    .text start:0x021afba0 end:0x021afbc4
+
+src/overlay002/func_ov002_021ff690.c:
+    complete
+    .text start:0x021ff690 end:0x021ff6d0
+
+src/overlay002/func_ov002_021b8fcc.c:
+    complete
+    .text start:0x021b8fcc end:0x021b9000
+
+src/overlay002/func_ov002_021ff91c.c:
+    complete
+    .text start:0x021ff91c end:0x021ff954
+
+src/overlay002/func_ov002_022003c4.c:
+    complete
+    .text start:0x022003c4 end:0x02200400
+
+src/overlay002/func_ov002_02202470.c:
+    complete
+    .text start:0x02202470 end:0x022024a8
+
+src/overlay002/func_ov002_02203670.c:
+    complete
+    .text start:0x02203670 end:0x022036a8
+
+src/overlay002/func_ov002_02204cb8.c:
+    complete
+    .text start:0x02204cb8 end:0x02204cf4
+
+src/overlay002/func_ov002_02204f6c.c:
+    complete
+    .text start:0x02204f6c end:0x02204fa8
+
+src/overlay002/func_ov002_0220575c.c:
+    complete
+    .text start:0x0220575c end:0x02205794
+
+src/overlay002/func_ov002_02208448.c:
+    complete
+    .text start:0x02208448 end:0x02208480
+
+src/overlay002/func_ov002_022090f4.c:
+    complete
+    .text start:0x022090f4 end:0x02209130
+
+src/overlay002/func_ov002_02209160.c:
+    complete
+    .text start:0x02209160 end:0x0220919c
+
+src/overlay002/func_ov002_02209a70.c:
+    complete
+    .text start:0x02209a70 end:0x02209aac
+
+src/overlay002/func_ov002_0220a10c.c:
+    complete
+    .text start:0x0220a10c end:0x0220a148
+
+src/overlay002/func_ov002_0220a1dc.c:
+    complete
+    .text start:0x0220a1dc end:0x0220a218
+
+src/overlay002/func_ov002_0220b120.c:
+    complete
+    .text start:0x0220b120 end:0x0220b158
+
+src/overlay002/func_ov002_0220c7f4.c:
+    complete
+    .text start:0x0220c7f4 end:0x0220c830
+
+src/overlay002/func_ov002_022923d0.c:
+    complete
+    .text start:0x022923d0 end:0x02292404
+
+src/overlay002/func_ov002_02294d24.c:
+    complete
+    .text start:0x02294d24 end:0x02294d5c
