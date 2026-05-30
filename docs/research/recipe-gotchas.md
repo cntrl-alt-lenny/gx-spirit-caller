@@ -1195,6 +1195,48 @@ If none of (1)-(7) work, the divergence may be a genuine
 allocator quirk — file under wall class P-14 or similar (no
 known recipe).
 
+## Gotcha 18 — dotted compiler symbols + overlay-overlap aliasing
+
+**Symptom.** A guard/data global whose address `objdiff` displays as a
+dotted compiler symbol — e.g. `.p__sinit_ov003_021cf114` (`__sinit` =
+MWCC static-init routine; `.p__sinit` = its pointer word). The leading
+dot + embedded dots make it an invalid C identifier; the family looks
+"blocked."
+
+**Reality.** It is almost always **overlay overlap**: a *different*
+overlay's symbol sharing the same address (the two overlays are never
+resident together). Check `config/<region>/.../<ovN>/relocs.txt`:
+`from:… to:0xADDR module:overlay(N)` names the module `dsd` actually
+resolves the reference to. The gap-obj reloc carries the **local** name
+(`data_ovN_<addr>`), a clean C identifier already `.global`-defined in
+that overlay's `bss/*.s` — reference **that**, not the dotted symbol.
+
+**mwcc cannot reference a dotted symbol from C anyway.** GCC asm-labels
+are NOT supported: `extern int x asm(".p__sinit_…");` errors —
+mwcc reserves `asm("rN")` (post-decl) for *global register variables*
+only. For a genuinely-dotted symbol with no dsd-local alias, add a
+one-line `.global <clean_alias>` at that address in the overlay's
+bss/data `.s` and reference the alias. **Falsification:** the gap-obj
+`R_ARM_ABS32` symbol name IS the name to write; if `relocs.txt` says
+`module:overlay(self)`, the local `data_*` symbol is correct and no
+alias is needed. (Surfaced brief 270, the ov006 cf140 family.)
+
+## Gotcha 19 — commutative-operand order controls pool + operand slots
+
+**Symptom.** A commutative op (`orr`/`and`/`add`/`eor`) of two
+pool-loaded globals matches every instruction *except* the operand
+assignment (`orr r1, r2, r1, lsl #1` vs orig `orr r1, r1, r2, lsl #1`),
+and/or the two pool `.word`s are in swapped order.
+
+**Cause.** mwcc evaluates the source operands left-to-right; the first
+operand referenced claims the first pool slot and the first temp
+register. orig evaluated the **shifted / first-loaded** term first.
+
+**Fix.** Write the term orig loads first on the left:
+`(data_A << 1) | data_B`, not `data_B | (data_A << 1)`. **Falsification:**
+swapping the source operand order swaps the `.word` order + the `orr`
+register operands. (Surfaced brief 270, `func_ov006_021b4d68`.)
+
 ---
 
 ## Pre-flight checklist for new picks
@@ -1248,6 +1290,13 @@ Before writing the C source for a new pick:
 17. **Orig keeps a dead store / literal re-read your build elides** —
     mark the field(s) `volatile`; add a delayed temp for any value
     reused across the dead store (gotcha 17).
+18. **Guard global shows as a dotted `.p__sinit_*` symbol** — it is
+    overlay overlap; check `<ovN>/relocs.txt` for the resolving module
+    and reference the dsd-local `data_ovN_<addr>` (already in the bss
+    `.s`), not the dotted name (gotcha 18).
+19. **Commutative op of two pool globals has swapped operands** — write
+    the term orig loads first on the left (`(A << 1) | B`), controlling
+    pool + register slot order (gotcha 19).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.

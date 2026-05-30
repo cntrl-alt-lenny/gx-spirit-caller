@@ -242,6 +242,37 @@ Brief 200+ can tighten the cluster check (e.g. require the
 loaded VALUES themselves to cluster, not just the pool offsets)
 if the false-positive rate proves disruptive in practice.
 
+## Reg-alloc-sensitive subset — drainable vs defer (brief 270)
+
+`.legacy.c` routing fixes the **base-fold**, but only when base-folding
+is the function's ONLY divergence. Brief 270 triaged the 221 unmatched
+real-MMIO picks and found **only 11 are cleanly drainable** — the rest
+(95 %) carry a *second* divergence: a materialized VALUE-constant that
+competes with the MMIO base register for allocation.
+
+**Discriminator.** `func_0208be38` (shipped) and `func_0208be9c`
+(failed) are near-identical MMIO inits; `be9c` differs only by storing
+`mov r3, #0x1000` — a value-constant that must hold a register
+alongside the 3 MMIO bases, shifting the allocation. So:
+
+> **Drainable** iff the function materializes **no value-constant** —
+> no `mov rN, #K` with `K ≥ 0x100`, and no pool `.word` that is a value
+> (`< 0x01000000`, e.g. a mask `0x1ff`) rather than an address.
+> Otherwise → **defer** (per-pick / permuter; same class as P-11/P-15).
+
+| Tier | n | Signal |
+|---|--:|---|
+| Drainable (`be38`-class) | 11 | no value-constant; small; ≤6 pool bases |
+| Defer — value-constant | 146 | `mov #K≥0x100` or pool value-word competes with base |
+| Defer — large/many-pool | 63 | n > 24 or > 6 bases |
+
+Verified byte-identical this session: `func_ov006_021b4d68` (a uniform
+8-member ov006 family: guard → compute globals → write one MMIO reg →
+`return 1`). Full worklist + the `0x1ff`/`0x1000` defer-anchor pilots in
+[`brief-270-c23-mmio-triage-and-sinit-alias.md`](brief-270-c23-mmio-triage-and-sinit-alias.md).
+Note gotcha 19 (commutative-operand order) applies to these globals-OR
+shapes.
+
 ## Cross-references
 
 - [`docs/research/codegen-walls.md` § C-23](codegen-walls.md#c-23)
