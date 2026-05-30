@@ -1329,6 +1329,57 @@ void f(void) { h1(K1); h2(K2); }
 Validated byte-identical on `02094c70` (`func_02093c10(3);
 func_02093d44(0);`).
 
+### Family F — IRQ critical-section wrapper (21 picks, brief 268)
+
+The NitroSDK critical section. `OS_DisableIrq()` returns the old IRQ
+state; it must survive the inner work to reach `OS_RestoreIrq`, so mwcc
+parks it in callee-saved **r4** — which IS the Style-A frame. The inner
+`<work>` is ordinary per-pick C; this is a *shell* template.
+
+```c
+typedef int OSIntrMode;
+extern OSIntrMode OS_DisableIrq(void);
+extern OSIntrMode OS_RestoreIrq(OSIntrMode);
+
+void f(struct Self *self) {
+    OSIntrMode old = OS_DisableIrq();
+    /* ... per-pick work ... */ if (self->f64 != 2) helper(&self->f9c);
+    OS_RestoreIrq(old);
+}
+```
+
+Validated byte-identical on `02091af4` (15/15). 21 regular
+`[Disable, ≤1 helper, Restore]` shells; 140 `OS_RestoreIrq` callers
+total share the shell with larger bodies.
+
+### Family G — `func_020945f4` memset wrapper (8 picks, brief 268)
+
+`func_020945f4` is the game's **memset** (`void(void *ptr, int val,
+unsigned count)`). The wrappers call it + return; the surrounding body
+varies, so this is a *recipe* (not a fixed source): transcribe the
+`memset` call naturally + the per-pick body, route `.legacy.c`, add
+gotcha 17 (`volatile`) where a re-read / dead-store tail appears.
+
+```c
+extern void func_020945f4(void *ptr, int val, unsigned count);
+int f(int a0, unsigned a1, int a2, unsigned a3) {       /* 0206fc2c 16/16 */
+    if (a3 < a1) { unsigned n = a1 - a3; func_020945f4((void*)a2, a0, n); a2 += n; }
+    return a2;
+}
+```
+
+Validated byte-identical on `0206fc2c` (16/16, conditional fill) and
+`02097810` (14/14, fill + gotcha-17 re-read tail).
+
+> **Not every StyleA leaf is a template.** The NO_BL leaf grab-bag
+> (brief 268) does NOT batch — it is the brief-266 frameless-tail shape
+> population *plus a frame*, coercible per-pick via the same gotchas
+> (16 / 17 / `switch` / `volatile`-MMIO; e.g. MMIO bitfield `0208c98c`
+> 16/16 via a `volatile` register). A fraction hit the P-15 reg-alloc
+> plateau (frame-vs-frameless) — skip those. The **Copy32 VRAM-copy**
+> family (`0208fd30/fd90/fe58`) is **P-15**, not a recipe. See
+> [`codegen-walls.md`](codegen-walls.md) § P-15.
+
 ---
 
 ## Contributing

@@ -5922,7 +5922,7 @@ only by the helper symbol each calls). One recipe drains all 4.
 (this entry) ran the variant matrix, found the arg-width coercion,
 shipped the classifier + gotcha 13.
 
-## Permanent (14 patterns)
+## Permanent (15 patterns)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -7049,6 +7049,95 @@ orig); only the in-range case is walled.
 Family-5/N3 investigation, added the immediate-range probe, and locked
 P-14. Full diagnosis at
 [`brief-250-c42-escape-classify-family5-n3-family7.md`](brief-250-c42-escape-classify-family5-n3-family7.md).
+
+### P-15. Legacy-tier (1.2/sp2p3) reg-alloc + const-CSE plateau
+
+> **Wall family note — the legacy-tier sibling of P-11.** P-11 is the
+> umbrella for **mwcc 2.0/sp1p5** register-allocator divergences that
+> resist source-shape iteration. P-15 is the same plateau on the
+> **mwcc 1.2/sp2p3** (`.legacy.c` / Style-A) tier: a StyleA function
+> whose natural C is *structurally identical* to orig but allocates
+> registers differently, and no source shape steers the allocator.
+> Surfaced by brief 268's Copy32 cluster.
+
+**The wall.** A short branch-shared-value wrapper — two call targets,
+each consuming the same incoming pointers in different argument
+positions — forces mwcc to hold the args in "neutral" holding
+registers across the branch. mwcc 1.2/sp2p3 and the orig build pick
+*different* holding registers (and different constant-materialization
+strategies), both correct, neither reachable from the other via C.
+
+**Target asm (`func_0208fe58`, the Copy32 `else`-folds member):**
+
+```text
+
+push  {r4, lr}                 ; orig: dst parked in callee-saved r4
+mov   r4, r0                   ; dst -> r4
+ldr   r0, [r3]                 ; v = data_0210249c
+mvn   ip, #0                   ; -1 (not an encodable cmp immediate)
+mov   lr, r1                   ; src -> lr (claims lr, forcing dst -> r4)
+mov   r3, r2                   ; size evacuated r2 -> r3
+cmp   r0, ip
+beq   .L_copy32
+cmp   r3, #0x30
+bls   .L_copy32
+mov   r1, r4
+add   r2, lr, #0x7000000       ; CONST + src, per-branch
+bl    func_02094030
+pop   {r4, lr}; bx lr
+.L_copy32:
+mov   r0, r4
+mov   r2, r3                   ; size r3 -> r2
+add   r1, lr, #0x7000000
+bl    Copy32
+pop   {r4, lr}; bx lr
+
+```
+
+**mwcc 1.2/sp2p3 emits (natural C, any of 10 variants):**
+
+```text
+
+stmfd sp!, {lr}                ; only lr saved — dst NOT in a callee-saved reg
+mov   lr, r0                   ; dst -> lr (caller-saved)
+ldr   r0, [r3]
+mvn   r3, #0                   ; -1
+mov   ip, r1                   ; src -> ip
+cmp   r0, r3
+...                            ; size kept in r2 (no evacuation)
+add   r2, ip, #0x7000000       ; same const-fold, different regs
+...
+
+```
+
+`dst` is provably **not** live across either call (each branch consumes
+it before its `bl`), so orig's callee-saved `r4` is a pure allocator
+preference — the natural build always uses the tighter caller-saved
+packing (`push {lr}` vs orig's `push {r4, lr}`). For the
+`0208fd30`/`0208fd90` members there is a **second** axis: orig hoists
+the VRAM `CONST` into a register (`add r2, ip, lr`) where the natural C
+folds it into the add immediate.
+
+**Falsifiable prediction (brief 268).** Any natural compile yields one
+saved register (`push {lr}`) where orig has two (`push {r4, lr}`). A
+coercion must reproduce orig's `dst`→r4 allocation. **10 source
+variants** (condition reorder, signed/unsigned `size`, hoisted
+`srcAddr` temp, pointer-typed global compare, 4-arg signature,
+`volatile` global, …) — none flips it. Same compiler for orig and the
+probes, so the divergence is allocator-internal.
+
+**Not classifier-detectable / not `predict_walls`-actionable.**
+predict_walls already correctly flags the whole tier StyleA; P-15 is a
+*match-difficulty* verdict, not a new cue. Recognized only by comparing
+orig (`push {r4, …}`) against the natural build's tighter frame.
+
+**Affected picks:** `func_0208fd30` `func_0208fd90` `func_0208fe58`
+(Copy32 VRAM-copy family); plus a fraction of the brief-268 NO_BL leaf
+grab-bag (e.g. `func_020905dc`, frame-vs-frameless on the same plateau).
+**Permuter territory** — if a future permuter run lands orig's
+allocation, demote; it resists direct source iteration. Full diagnosis
+at
+[`brief-268-overfire-stylea-tail-subfamilies.md`](brief-268-overfire-stylea-tail-subfamilies.md).
 
 ## Codegen-inherent edge cases (3 patterns)
 
