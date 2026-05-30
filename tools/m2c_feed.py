@@ -59,7 +59,12 @@ _SYM_RE = re.compile(
 
 
 class FeedError(Exception):
-    """Loud, user-facing failure (maps to a non-zero exit)."""
+    """Loud, user-facing failure — bad/unknown/empty input (exit 1)."""
+
+
+class ObjdumpMissing(Exception):
+    """The objdump binary is unavailable (exit 2). Distinct from a
+    usage error so input mistakes are reported even without objdump."""
 
 
 def _symbols_files(region: str) -> list[Path]:
@@ -263,6 +268,12 @@ def feed(region: str, target: str, objdump: str, obj: str | None = None,
             if obj is None:
                 raise
             name = target
+    # The target resolved; only NOW require objdump (input errors above are
+    # reported even on a host without arm-none-eabi-binutils).
+    if shutil.which(objdump) is None and not Path(objdump).exists():
+        raise ObjdumpMissing(
+            f"{objdump} not found on PATH (brew install arm-none-eabi-binutils)"
+        )
     if obj is None:
         obj = find_object(region, name, objdump, module)
     if isa is None:
@@ -290,15 +301,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-o", "--out", default=None, help="output .s (default stdout)")
     args = ap.parse_args(argv)
 
-    if shutil.which(args.objdump) is None and not Path(args.objdump).exists():
-        print(f"error: {args.objdump} not found on PATH "
-              f"(brew install arm-none-eabi-binutils)", file=sys.stderr)
-        return 2
-
     isa_override = "arm" if args.arm else ("thumb" if args.thumb else None)
     try:
         text = feed(args.version, args.target, args.objdump,
                     obj=args.obj, isa_override=isa_override, module_hint=args.module)
+    except ObjdumpMissing as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     except FeedError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
