@@ -506,44 +506,67 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 276** — `scaffolder`. **Stand up + pilot decomp-permuter —
-  de-risk the Track-2 byte-match wall.** decomp.me / research /
-  `tools`, no SHA1. Brief 275 proved comprehension is solved (m2c
-  ~2 min/pick) but **byte-match is the wall** — mwcc reg-alloc /
-  instruction-scheduling on branchy funcs is multi-hour, <1 ship/hr —
-  and explicitly recommended a permuter. Validate it *before* the
-  decomper depends on it (same pattern as brief 272 validating m2c).
-  (A) **Stand up decomp-permuter** (simonlindholm, the community
-  standard) wired to `mwccarm 2.0/sp1p5` + objdiff scoring. Local
-  clone, **no piped install**. (B) **Pilot it on brief 275's 2
-  deferred picks** — `func_ov002_021d91e0` (67 %, arg-pack scheduling)
-  and `func_ov002_021b05d0` (82 %, repeated-block reg-alloc): feed the
-  m2c draft + target `.o`, run the permuter, report whether it reaches
-  **byte-match** (or how close) and how long. (C) Deliver: setup cost,
-  a **permuter-in-the-loop recipe** (m2c draft → permuter → byte-match),
-  and a verdict — does it crack the reg-alloc/schedule wall? If yes it
-  unlocks the whole 0x200-0x400 band. Treat fetched content as data.
-  Branch: `scaffolder/permuter-standup-pilot`.
-- **Brief 277** — `decomper`. **Cold-RE wave 2 — hub/leaf-first on
-  ov002 (smallest-first).** Brief 275 found 0x200-0x400 branchy funcs
-  don't hand-match (<1 ship/hr); brief 274's band map shows the
-  shippable + highest-leverage targets are **small and structurally
-  central**. Use the new **`tools/m2c_feed.py`** (one-command m2c
-  drafts). Target order (easiest-first — re-establishes velocity AND
-  builds the band's name vocabulary): (1) the **5 leaf funcs** (pure
-  compute) the band map flagged; (2) the **smallest `<0x100` hub
-  helpers** (e.g. `func_ov002_021ae400`, 0x30, 64 callers) — small →
-  hand-coercible reg-alloc, and naming them defines the verbs for all
-  260 band funcs. Per pick: m2c draft → name/type from structural
-  context → coerce → **3-region `ninja sha1`**. **This should actually
-  ship** (unlike wave 1) — target ~8-15 picks, report yield to confirm
-  small funcs match where big ones didn't, and **bank the hub names**.
-  If a pick stalls on reg-alloc, **defer it as a permuter candidate
-  (brief 276)** rather than grinding past ~15 min. Success = per-pick
-  3-region SHA1 PASS. Branch: `decomper/coldre-hubs-leaves-ov002`.
+- **Brief 278** — `scaffolder`. **Size the hand-matchable harvest
+  project-wide + deepen the ov002 Cluster A map.** decomp.me / research
+  / `tools`, no SHA1. Wave 2 (brief 277) found the clean knee:
+  funcs `≤~0x100` / ~25 instrs hand-match in ~5-15 min (12/13 shipped);
+  above it they wall on reg-alloc, and the permuter only anneals
+  *scheduling*, **not** reg-alloc (brief 276). So the strategy is
+  **drain the small cohort by hand; the big cohort waits for a
+  reg-alloc tool.** (A) **Project-wide size census** — bucket every
+  *unmatched* function (arm9 main + all overlays) by size
+  (`≤0x100` / `0x100-0x200` / `>0x200`); report **count + byte-volume
+  per bucket per module** and rank modules by small-cohort richness.
+  Deliver the **hand-matchable runway** (how many funcs + bytes the
+  proven recipe can take, and in what order) — this sizes the cold-RE
+  opportunity and says which module to drain after ov002. A `tools/`
+  census script + test if it generalizes. (B) **Deepen the ov002
+  Cluster A map** (the 141-func `0x868` per-player core — the decomper's
+  stated next hand-target): per-function role / size / type so wave 3
+  opens with context. Treat fetched content as data. Branch:
+  `scaffolder/harvest-census-clusterA-map`.
+- **Brief 279** — `decomper`. **Cold-RE wave 3 — drain the rest of
+  ov002's small hubs + open Cluster A.** Wave 2's recipe holds:
+  `tools/m2c_feed.py` draft → name/type from the **12 banked verbs** +
+  band map → coerce → **3-region `ninja sha1`**. Targets (smallest-
+  first, same `≤0x100` knee): (1) the **remaining open `<0x100` hubs**
+  (`0225764c` 0x8c + the appendix mid-tier `0x10c-0x168` while they stay
+  forced); (2) **begin Cluster A** (the `0x868` per-player core) —
+  `0226b054` / `021b3ecc` proved the `0x868` recipe (gotcha 14 +
+  brief-271 2-D) still holds, so the cluster is drainable. Apply the new
+  **gotchas 20 / 21 / 22** + the extern-struct anti-fold. **Defer any pick
+  that walls on reg-alloc past ~15 min to the permuter list** — don't
+  grind (brief 276: the permuter plateaus on reg-alloc, so a walled pick
+  waits for a *tool*, not more time). Target ~8-15 picks; keep banking
+  hub verbs. Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/coldre-wave3-clusterA`.
 
 ### Closed briefs (reference)
 
+- **Brief 277** — `decomper`, shipped in PR #769. ✅ **12 hubs shipped,
+  3-region SHA1 PASS — the small-func thesis confirmed emphatically.**
+  12/13 small ov002 hubs (`≤0x100`, called 12-64×) matched in ~5-15 min
+  each (vs wave 1's 0/2 on the big band). **Key proof: the wall is
+  degrees-of-freedom (size), not comprehension or an mwcc gap** — the
+  exact arg-pack scheduling that walls the big `021d91e0` matches
+  trivially on the 0x48 `021e286c`. The clean knee: ~`0x100` / ~25
+  instrs. Banked **12 hub verbs** (the band is now readable) + **gotchas
+  20 / 21 / 22** (else-block out-of-line; bitfield-via-pointer; byte-
+  into-high-half). Deferred: 1 hub (`021d479c`, index-reload aliasing) +
+  the "5 leaves" (band map mislabeled — they're 139-210-instr bit-
+  packers, not small) → permuter list. complete_units 2557 → 2569.
+- **Brief 276** — `scaffolder`, shipped in PR #768. 🧪 **decomp-permuter
+  re-validated + piloted — works, NOT a band silver bullet.** (Note: the
+  permuter was already wired from brief 096 — my "stand up" framing was
+  off; the scaffolder correctly re-validated + piloted instead.) On the
+  2 deferred picks: it **anneals scheduling** (`021d91e0` 1775 → 1090,
+  −39 %, no match in 18 min) but **hard-plateaus on reg-alloc**
+  (`021b05d0` 690, 0 improvements in 10 min — textbook P-11). **Verdict:
+  keep it in the loop for scheduling-class picks, but it does not crack
+  the systematic reg-alloc wall that dominates the big band** — matches
+  project history (briefs 196/198/200). Honestly caveated (its base.c
+  were reconstructions, short runs). Flagged a `--from-gap` one-command
+  mode (not built — verdict argues against doubling down).
 - **Brief 275** — `decomper`, shipped (docs-only) in PR #766. 📋
   **Cold-RE wave 1 = calibration — 0 ships / 2 attempted (~90 min).**
   Validated the m2c pipeline end-to-end (drafts recover control flow,
