@@ -1297,6 +1297,26 @@ Before writing the C source for a new pick:
 19. **Commutative op of two pool globals has swapped operands** — write
     the term orig loads first on the left (`(A << 1) | B`), controlling
     pool + register slot order (gotcha 19).
+20. **Orig jumps *forward* to a block your build places inline** — mwcc
+    emits the `if`-body inline (fall-through) and the `else` out-of-line
+    (forward branch, placed last). To match an orig where a block is
+    jumped-to and physically last, that block must be the `else`. Invert
+    the condition: `if (A==0 || B!=K) { common } else { special }` keeps
+    the common path inline and the special/dispatch path out-of-line
+    (gotcha 20; brief 277 `021e2c5c`/`021e2b3c`).
+21. **Bitfield read spills to the stack / adds a frame** — reading a
+    bitfield through a *named struct local* (`VBits v = *p; … v.b0`) gives
+    the struct a stack home → frame + dead spill. Read through a
+    **bitfield-struct pointer** (`((VBits*)p)->b0`) so the word loads once
+    into a register and both fields extract in-register — frameless leaf
+    (gotcha 21; brief 277 `0223de94`).
+22. **Byte packed into the high half folds to `lsl#24`+`lsr#16`** —
+    `(x & 0xff) << 8` fuses to `(x<<24) >>u 16`; write `(unsigned char)x
+    << 8` for orig's `and #0xff` + barrel `lsl #8` (the gotcha-16 u8 cast
+    supplies the `and`). Corollary: adding a *named local* to host the
+    masked byte can flip mwcc from a framed `bl`+`pop` into a frameless
+    tail-call `bx` — inline the cast where the orig is framed (gotcha 22;
+    brief 277 `021d59cc`).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
