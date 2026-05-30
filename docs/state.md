@@ -8,38 +8,40 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#756 + #757 merge. Brain on Mac.
-**Brief 268 (StyleA tail → Families F/G coercible + new P-15, scaffolder)
-+ brief 269 (over-fire wave 4 — 35 .c, decomper) both shipped. Over-fire
-drain healthy at 65.84 %; the productive families (F/G, C-39f-table) + the
-C-23-MMIO triage are next.**
+**Last updated:** 2026-05-30, post-#759 + #760 merge. Brain on Mac.
+**Brief 270 (C-23-MMIO triaged + ov006 `.p__sinit` family freed,
+scaffolder) + brief 271 (over-fire wave 5 — 16 .c, decomper) both shipped.
+Over-fire clean-template veins substantially drained (65.88 %); the cold-RE
+pivot is near — validating its accelerators while one fresh recipe vein
+remains.**
 
-**Current metrics (post-#756 + #757 merge, EUR — reconfigured +
-`ninja sha1` OK + `ninja report` on 32698b0, clean tree):**
-`complete_units 2525 / 3835 (65.84 %)` (+35 vs prior 2490) —
-SHA1-aligned headline. `matched_functions 2539 / 9801` (+35). 3-region
-SHA1 PASS established on #757 (#756 is docs-only).
+**Current metrics (post-#759 + #760 merge, EUR — reconfigured +
+`ninja sha1` OK + `ninja report` on 453061e, clean tree):**
+`complete_units 2541 / 3857 (65.88 %)` (+16 vs prior 2525) —
+SHA1-aligned headline. `matched_functions 2555 / 9801` (+16). 3-region
+SHA1 PASS established on #760 (#759 is docs-only).
 
-🎯 **Brief 269 — 35 .c at 100 % objdiff (85 % yield).** Frameless-leaf
-diverse tail 5/5 + a **20-member C-39f indexed-`0x868`-table family** (both
-index forms need explicit `& 1`) + C-41 / Fill32-tail / C23-noMMIO 9/9.
-Flag: the "easy 220" C-23 real-MMIO tier is reg-alloc-sensitive, with a
-17-member ov006 family blocked by a dotted `.p__sinit` symbol → brief 270.
+🎯 **Brief 271 — 16 .c at 100 % objdiff (84 % yield).** Over-fire wave 5
+(Family F/G + C-39f). Correction: Families F/G are MIXED-tier (per-pick
+`.legacy.c` / `.c` / `.legacy_sp3.c` — confirm the epilogue). Documented a
+stale-objdiff trap (`ninja sha1` is authoritative, not a stale objdiff).
+**Finding: the over-fire clean-template veins are substantially drained;
+the per-pick tail is ~50-70 %.**
 
-🎯 **Brief 268 — StyleA tail → 2 template families + 1 new permanent
-wall.** Family F (IRQ critical-section wrapper ×21) + Family G (memset
-wrapper ×8) coercible; Copy32 VRAM-copy ×3 → new **P-15** (legacy-tier
-reg-alloc + const-CSE plateau, permuter territory); the NO_BL leaf
-grab-bag (~70) is per-pick. The heterogeneous→families multiplier holds
-for shell clusters, not leaf grab-bags.
+🎯 **Brief 270 — C-23 MMIO triaged + the "blocked" ov006 family freed.**
+The C-23 MMIO tier is 95 % reg-alloc-sensitive (only 11 be38-class
+drainable). The ov006 `.p__sinit` family is NOT blocked — the address is a
+clean `data_ov006_021cf140` alias (overlay overlap); + gotchas 18/19. ~29
+fresh drainable picks → brief 273.
 
-🧭 **Where we are: over-fire cheap drain (65.84 %), the productive
-families.** Brief 271 = wave 5 (batch Families F/G via 268's templates +
-more C-39f-table + C-41/Fill32 tails + clean C23-noMMIO). Brief 270 =
-triage the C-23 real-MMIO tier (simple vs reg-alloc-sensitive) + lock a
-`.p__sinit` dotted-symbol alias to unblock the ov006 family (17). Good-
-yield runway remains; genuine Track-2 cold-RE (m2c / dsd-ghidra below) is
-the track after. Settled-permanent: P-11, P-15. The ntrtwl branch
+🧭 **Where we are: the last fresh recipe vein + cold-RE prep.** Brief 273 =
+drain the fresh ~40-pick C-23-MMIO drainable cohort (11 be38-class + the
+unblocked ov006 families). Brief 272 = **validate the Track-2 cold-RE
+accelerators** (m2c via decomp.me + dsd-ghidra, from the ecosystem scout)
+— the decomper has flagged the cold-RE pivot 3×, and after brief 273's
+vein the over-fire cheap drain is done. So 274+ likely begins genuine
+Track-2 cold-RE (the per-pick over-fire tail is opportunistic / permuter
+fodder). Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
 
