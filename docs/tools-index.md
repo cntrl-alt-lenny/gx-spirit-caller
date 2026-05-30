@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**78 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**79 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (14)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (10)
+- [Match acceleration](#match-acceleration) (11)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
@@ -176,6 +176,12 @@ exact reloc signature, where at least one is already matched and at least one is
 **surface clone-candidate matched functions**
 
 for an unmatched target by opcode-sequence similarity.
+
+### `tools/m2c_feed.py`
+
+**one-command objdump→GAS feeder for the m2c cold-RE loop.**
+
+Brief 272 validated m2c `arm-mwcc-c` as a Track-2 comprehension-draft accelerator, but feeding it meant a manual objdump dance: dump the gap object, hand-strip the address/hex columns, rewrite branch targets, resolve the literal pool, an…
 
 ### `tools/m2ctx.py`
 
