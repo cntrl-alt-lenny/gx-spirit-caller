@@ -8,43 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#780 + #781 merge. Brain on Mac.
-**Brief 284 (shape scorer + ranked family worklist, scaffolder) + brief 285
-(cold-RE wave 6 — 12 picks, decomper) both shipped. The family worklist is in:
-ov002's `<0x100` cohort is 69 % hand-drainable, and the top batch is a
-**~101-member `0x868` accessor family** (one proven recipe). Next: scaffolder
-builds a compile-verified `ov002_core.h` so the families batch (286); decomper
-runs wave 7 on the 101-member family — the multiplier wave (287).**
+**Last updated:** 2026-05-30, post-#783 + #784 merge. Brain on Mac.
+**Brief 286 (`ov002_core.h` proven, scaffolder) + brief 287 (cold-RE wave 7 —
+15 picks, decomper) both shipped. The multiplier worked: the `0x868` accessor
+family batched on one recipe to **+15 — the biggest wave yet** (~80 members
+remain). The scaffolder delivered a byte-verified core-types header. Next:
+scaffolder cracks the sharp add-order residue (288); decomper adopts the header
++ keeps batching the families on wave 8 (289).**
 
-**Current metrics (post-#780 + #781 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 0aa844d, clean tree):**
-`complete_units 2612 / 3951 (66.11 %)` (+12 vs prior 2600) — SHA1-aligned
-headline. `matched_functions 2649 / 9801` (+12). Denominator drifted
-3934 → 3951; honest signal is +12 functions. 3-region SHA1 PASS reproduced
-(gate holds; #780 is research-only).
+**Current metrics (post-#783 + #784 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on bf3a38a, clean tree):**
+`complete_units 2627 / 3979` (**+15** vs prior 2612) · `matched_functions
+2664 / 9801` (**+15**). ⚠️ **The % ticked DOWN 66.11 → 66.02 % — NOT a
+regression** (3-region SHA1 all PASS, +15 real functions). The reconfigure
+grew the unit-denominator +28 (3951 → 3979) as the 15 delink blocks re-split
+units — a known `complete_units` instability. **The monotonic view is
+`matched_functions / 9801 = 27.18 %`** (stable denominator) and the absolute
+**+15 functions**. Treat the absolute count, not the %, as the signal.
 
-✅ **Brief 285 — 12 cold-RE picks, 3-region SHA1 PASS — drain is recipe-driven
-+ high-throughput.** 12/15 attempted (3 misses → permuter: scheduling /
-2-bitfield / callee-save). Built its own in-process shape-triage scan
-(converged with brief 284) → ~140 simple-shape `<0x58` candidates surfaced.
-No new gotcha (catalog 23-26 covered it). Banked 3 more family recipes.
+✅ **Brief 287 — 15 cold-RE picks, 3-region SHA1 PASS — the multiplier wave.**
+The `0x868` accessor family batched on one recipe (rep `021e77fc` locked the
+skeleton; 14 guard/tail variants). Not a blind template but the skeleton is
+uniform. ~80 members remain → wave 8. Banked sub-recipes (b0-guard operand
+order; `idx>4` vs `>=5`; f30 `mla`-fold). Residue → permuter: a sharp
+**5-member add-order group** (gotcha-19, one root cause).
 
-🗺️ **Brief 284 — shape scorer + ranked family worklist.** `size_census.py
---shape` classifies simple / dispatcher / permuter (loop = backward branch).
-ov002 `<0x100` is **69 % hand-drainable** (1277 / 1851; loop third 574 →
-permuter). **Top batch: the `0x868` accessor family ~101 members** (44 pure
-wrappers; brief-282 recipe). + arg-pack ~44 (→ permuter) + shared-sink
-families (`0229ade0` ×46, `021ff3bc` ×37, `021ca2b8` ×35, `02253458` ×37).
+🧱 **Brief 286 — `ov002_core.h` proven.** A research-artifact header
+(per-player `0x868` layout + sub-row + `f30:13`/`b0` bitfields + 9 shared-sink
+signatures), **byte-verified on 8 sample members across 4 families**. The
+decomper copies it into the build path + `#include`s it (brief 289) → the
+~225-func family worklist batches with shared validated types.
 
-🧭 **Where we are: the multiplier wave is set up.** The simple-shape hand-drain
-is steady (~12/wave, 66.11 %; ~1265 hand-drainable left in ov002, 4858
-project-wide). The biggest available batch is the **~101-member `0x868`
-accessor family** (one recipe). Live lever: **brief 286** = scaffolder builds a
-compile-verified `ov002_core.h` (per-player struct + shared-sink signatures)
-so families 1-3 (~225 funcs) batch-drain with shared validated types; **brief
-287** = decomper wave 7 batches the accessor family (44 pure wrappers first,
-~15-20 picks). The reg-alloc-walled cohorts (the 574 ov002 loops + the `>0x200`
-= 49 % of unmatched bytes) still wait for a tool; permuter list accumulating.
+🧭 **Where we are: the family batch-drain is the engine.** Wave 7 hit +15 on
+one recipe; ~80 accessor members + the shared-sink families (~225 total) are
+queued behind the proven header. Live levers: **brief 288** = scaffolder cracks
+the 5-member add-order residue (source lever, or the permuter's *favorable*
+scheduling-class case); **brief 289** = decomper wave 8 adopts `ov002_core.h`
+and batches the families. The reg-alloc-walled cohorts (the 574 ov002 loops +
+the `>0x200` = 49 % of unmatched bytes) still wait for a tool.
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
