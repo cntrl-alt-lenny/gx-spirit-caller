@@ -1333,6 +1333,15 @@ Before writing the C source for a new pick:
     a **pooled-constant `and`**. To reproduce orig's `lsl #(32-off-N);
     lsr #(32-N)` read a real bitfield (`struct { u32 f : N; }` via a
     pointer — extends gotcha 21) (gotcha 25; brief 281 `021b90a8`).
+26. **Pass-through params reserve their registers.** When a function
+    forwards an incoming arg unchanged to a callee, that arg's register
+    (`r0`/`r1`/…) stays reserved across the whole body, pushing temps to
+    higher registers. If a pick is byte-exact except for a **+1 register
+    offset** on an index/value temp, check whether the orig passes a
+    parameter through to a call your model dropped — restore the forwarded
+    arg (a `(void)arg` cast does **not** work; mwcc drops the dead param).
+    The lever for the `0x868` per-player accessor tier (gotcha 26; brief
+    283 `021ba1a0` family, `021bcfe4`).
 
 If a pilot pick ships at 80-95% fuzzy on first attempt, walk
 through this checklist before iterating.
