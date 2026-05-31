@@ -8,43 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#771 + #772 merge. Brain on Mac.
-**Brief 278 (hand-matchable size census + Cluster A map, scaffolder) + brief
-279 (cold-RE wave 3 — 10 picks, decomper) both shipped. Crossed 66 %. The
-census sized the runway (4858 `<0x100` funcs) and the knee sharpened to
-*control-flow shape, not size*. Next: scaffolder triages main's 2025-func SDK
-vein for source-mining (280); decomper keeps draining ov002's simple-shape
-vein (281).**
+**Last updated:** 2026-05-30, post-#774 + #775 merge. Brain on Mac.
+**Brief 280 (main-SDK source-mining triage, scaffolder) + brief 281 (cold-RE
+wave 4 — 10 picks, decomper) both shipped. The SDK shortcut is a *modest*
+add-on (main's unmatched cohort is 76 % game code), NOT the bulk win — SDK
+leaves just fold into the hand-drain. The better lead: wave 4's next wall is
+*recoverable* (wrong-signature register numbering, not fundamental reg-alloc).
+Next: scaffolder recovers the canonical accessor signature (282); decomper
+rides it on wave 5 (283).**
 
-**Current metrics (post-#771 + #772 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on bb911b9, clean tree):**
-`complete_units 2579 / 3907 (66.01 %)` (+10 vs prior 2569) — SHA1-aligned
-headline. `matched_functions 2616 / 9801` (+10). Denominator drifted
-3894 → 3907 (10 new delink blocks split units); honest signal is +10
-functions. 3-region SHA1 PASS reproduced (gate holds; #771 is research-only).
+**Current metrics (post-#774 + #775 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 2c72e42, clean tree):**
+`complete_units 2589 / 3919 (66.06 %)` (+10 vs prior 2579) — SHA1-aligned
+headline. `matched_functions 2626 / 9801` (+10). Denominator drifted
+3907 → 3919; honest signal is +10 functions. 3-region SHA1 PASS reproduced
+(gate holds; #774 is research-only).
 
-✅ **Brief 279 — 10 cold-RE picks, 3-region SHA1 PASS — the `0x868` core
-opened.** A uniform 2-D `0x868` handler family (7 in one batch) + 2 sinks +
-the last small hub. **Knee sharpened: the axis is control-flow *shape*, not
-byte size** — simple-accessor / dispatcher shapes match at any small size;
-**loops + multi-value liveness wall on reg-alloc even at 0x24** (the
-permuter's wall too). Loop/liveness picks → permuter list.
+✅ **Brief 281 — 10 cold-RE picks, 3-region SHA1 PASS — shape-triage works,
+next wall is recoverable.** Every straight-line / call-combinator /
+dispatcher matched (often first-try); loops triaged out. Banked gotchas
+23/24/25 (dense-switch jump table / small-set bitmask / bitfield `lsl;lsr`).
+**New wall: signature-driven register numbering** — ~5 `0x868` accessors are
+1-reg-off because the *minimal* `f(int arg0)` signatures free regs the
+original reserved. **Recoverable** (→ brief 282), not fundamental reg-alloc.
 
-🗺️ **Brief 278 — the hand-matchable runway + Cluster A deep map.**
-`tools/size_census.py`: **4858 `<0x100` unmatched funcs project-wide**
-(~614 KB) = the hand-drain runway; `>0x200` = 945 funcs but **49 % of
-unmatched *bytes*** (reg-alloc-tool territory). Richest veins: **main 2025**
-(likely NitroSDK/MSL → *source-mining*, not hand-RE), **ov002 1887**, then
-ov006 / ov004 / … Cluster A (the 141 `0x868` funcs) is uniformly above the
-knee.
+🔬 **Brief 280 — SDK source-mining is modest + contingent, NOT the bulk
+track.** main's 2025 `<0x100` is **76 % game code**; ≤453 library candidates,
+confident floor ~70-100 (CP/math + MMIO). dsd `sig` ships only 2 sigs. Pilot:
+recognition gets ~90 % but the **last-mile coercion is the same as hand-RE
+without an exact same-version vendored source**. Verdict: **don't build a
+separate pipeline — SDK leaves fold into the hand-drain.** (Vendoring test
+= a documented contingent option if we ever want the ~70-100 families.)
 
-🧭 **Where we are: two tracks open.** Hand-draining ov002's simple-shape
-`<0x100` vein is the proven velocity engine (66 % now). The census revealed a
-*second* track: main's 2025-func SDK vein may be matchable by **source-mining**
-(identify the lib func + compile its known source via dsd `sig` / the TWEWY
-CC0 pool) — far faster than hand-RE if it pans out. Next: **brief 280** =
-scaffolder triages + pilots the main-SDK source-mine; **brief 281** = decomper
-runs cold-RE **wave 4** on ov002 simple-shape funcs (skip loops → permuter).
+🧭 **Where we are: one proven engine + a recoverable accelerator.** The ov002
+simple-shape `<0x100` hand-drain is the velocity engine (66.06 %, ~1840 left
+in ov002, 4858 project-wide). The SDK "second track" turned out modest — its
+leaves just join the drain. The live lever is **brief 282**: recover the
+canonical `0x868`-accessor signature/struct, which would convert the 1-reg-off
+accessor *tier* from permuter-candidates into ships. **Brief 283** = decomper
+wave 5, applying it. The reg-alloc-walled `>0x200` cohort (49 % of unmatched
+bytes) still waits for a tool.
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
