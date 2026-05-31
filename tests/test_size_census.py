@@ -25,6 +25,8 @@ from size_census import (  # noqa: E402
     is_claimed,
     parse_claimed_text,
     parse_functions,
+    shape_class,
+    shape_features,
     unmatched,
 )
 
@@ -108,6 +110,83 @@ class TestAggregate(unittest.TestCase):
         s = aggregate({})
         self.assertEqual(s["ranking"], [])
         self.assertEqual(s["totals"]["<0x100"]["count"], 0)
+
+
+class TestShape(unittest.TestCase):
+    """shape_features / shape_class are pure (no build) — CI-safe.
+
+    Instruction lists are (addr, mnemonic) pairs as collect_shapes parses
+    them from objdump. Addresses matter only for the backward-branch =
+    loop test.
+    """
+
+    def test_straight_line_accessor_is_simple(self):
+        # load / compute / bl helper / return — no branches
+        insns = [
+            (0x00, "ldr r1, [r0, #0x30]"),
+            (0x04, "add r1, r1, #1"),
+            (0x08, "bl 21b91c4 <func_ov002_021b91c4>"),
+            (0x0C, "pop {r4, pc}"),
+        ]
+        f = shape_features(insns)
+        self.assertEqual(f, {"insns": 4, "calls": 1, "branches": 0, "loops": 0})
+        self.assertEqual(shape_class(f), "simple")
+
+    def test_bl_and_blx_are_calls_not_branches(self):
+        insns = [
+            (0x00, "bl 21b2ebc <func_ov002_021b2ebc>"),
+            (0x04, "blx r3"),
+        ]
+        f = shape_features(insns)
+        self.assertEqual(f["calls"], 2)
+        self.assertEqual(f["branches"], 0)
+
+    def test_bx_is_neither_call_nor_branch(self):
+        # bx lr is a return; bx must not be miscounted as a forward branch
+        f = shape_features([(0x00, "bx lr")])
+        self.assertEqual(f, {"insns": 1, "calls": 0, "branches": 0, "loops": 0})
+
+    def test_forward_conditional_branch_is_a_branch_not_a_loop(self):
+        insns = [
+            (0x00, "cmp r0, #0"),
+            (0x04, "beq 10 <skip>"),   # forward (target > addr) → branch, not loop
+            (0x08, "mov r0, #1"),
+            (0x10, "pop {pc}"),
+        ]
+        f = shape_features(insns)
+        self.assertEqual(f["branches"], 1)
+        self.assertEqual(f["loops"], 0)
+
+    def test_backward_branch_is_a_loop_and_classes_permuter(self):
+        insns = [
+            (0x00, "mov r2, #0"),
+            (0x04, "ldrb r1, [r0, r2]"),
+            (0x08, "add r2, r2, #1"),
+            (0x0C, "cmp r2, r3"),
+            (0x10, "blt 4 <loop>"),    # backward (target ≤ addr) → loop
+            (0x14, "pop {pc}"),
+        ]
+        f = shape_features(insns)
+        self.assertEqual(f["loops"], 1)
+        self.assertEqual(shape_class(f), "permuter")  # any loop → permuter
+
+    def test_many_forward_branches_no_loop_is_dispatcher(self):
+        # a switch / multi-guard: >3 branches, none backward → still hand-RE
+        insns = [(i * 4, f"beq {0x100 + i} <case>") for i in range(5)]
+        f = shape_features(insns)
+        self.assertEqual(f["branches"], 5)
+        self.assertEqual(f["loops"], 0)
+        self.assertEqual(shape_class(f), "dispatcher")
+
+    def test_three_branches_is_still_simple(self):
+        insns = [(i * 4, f"bne {0x200 + i} <fwd>") for i in range(3)]
+        f = shape_features(insns)
+        self.assertEqual(shape_class(f), "simple")  # boundary: ≤3 branches
+
+    def test_empty_is_simple(self):
+        f = shape_features([])
+        self.assertEqual(f, {"insns": 0, "calls": 0, "branches": 0, "loops": 0})
+        self.assertEqual(shape_class(f), "simple")
 
 
 class TestIntegrationRealConfig(unittest.TestCase):
