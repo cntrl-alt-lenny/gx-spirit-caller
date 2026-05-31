@@ -8,46 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#774 + #775 merge. Brain on Mac.
-**Brief 280 (main-SDK source-mining triage, scaffolder) + brief 281 (cold-RE
-wave 4 — 10 picks, decomper) both shipped. The SDK shortcut is a *modest*
-add-on (main's unmatched cohort is 76 % game code), NOT the bulk win — SDK
-leaves just fold into the hand-drain. The better lead: wave 4's next wall is
-*recoverable* (wrong-signature register numbering, not fundamental reg-alloc).
-Next: scaffolder recovers the canonical accessor signature (282); decomper
-rides it on wave 5 (283).**
+**Last updated:** 2026-05-30, post-#777 + #778 merge. Brain on Mac.
+**Brief 282 (canonical accessor signature recovered, scaffolder) + brief 283
+(cold-RE wave 5 — 11 picks, decomper) both shipped. The accessor lever is
+cracked: both agents independently found the same fix (pass-through params
+reserve registers → gotcha 26), unblocking the `0x868` accessor tier. The
+simple-shape hand-drain is now "reliable" (8/8 first-try). Next: scaffolder
+mines the next batch-drainable family (284); decomper rides wave 6 (285).**
 
-**Current metrics (post-#774 + #775 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 2c72e42, clean tree):**
-`complete_units 2589 / 3919 (66.06 %)` (+10 vs prior 2579) — SHA1-aligned
-headline. `matched_functions 2626 / 9801` (+10). Denominator drifted
-3907 → 3919; honest signal is +10 functions. 3-region SHA1 PASS reproduced
-(gate holds; #774 is research-only).
+**Current metrics (post-#777 + #778 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on d32d2a8, clean tree):**
+`complete_units 2600 / 3934 (66.09 %)` (+11 vs prior 2589) — SHA1-aligned
+headline. `matched_functions 2637 / 9801` (+11). Denominator drifted
+3919 → 3934; honest signal is +11 functions. 3-region SHA1 PASS reproduced
+(gate holds; #778 is research-only).
 
-✅ **Brief 281 — 10 cold-RE picks, 3-region SHA1 PASS — shape-triage works,
-next wall is recoverable.** Every straight-line / call-combinator /
-dispatcher matched (often first-try); loops triaged out. Banked gotchas
-23/24/25 (dense-switch jump table / small-set bitmask / bitfield `lsl;lsr`).
-**New wall: signature-driven register numbering** — ~5 `0x868` accessors are
-1-reg-off because the *minimal* `f(int arg0)` signatures free regs the
-original reserved. **Recoverable** (→ brief 282), not fundamental reg-alloc.
+✅ **Brief 283 — 11 cold-RE picks, 3-region SHA1 PASS — accessor lever
+cracked + generalised.** The per-player accessors pass args through to a
+callee, reserving `r0`/`r1` so the index temp colours `r2`/`ip` — restoring
+the pass-through (not a `(void)` cast) flips the deferred accessors to ships.
+Banked **gotcha 26**; generalises to the whole `0x868` tier. + 8 new
+simple-shape, all first-try.
 
-🔬 **Brief 280 — SDK source-mining is modest + contingent, NOT the bulk
-track.** main's 2025 `<0x100` is **76 % game code**; ≤453 library candidates,
-confident floor ~70-100 (CP/math + MMIO). dsd `sig` ships only 2 sigs. Pilot:
-recognition gets ~90 % but the **last-mile coercion is the same as hand-RE
-without an exact same-version vendored source**. Verdict: **don't build a
-separate pipeline — SDK leaves fold into the hand-drain.** (Vendoring test
-= a documented contingent option if we ever want the ~70-100 families.)
+🔑 **Brief 282 — canonical `0x868`-accessor signature recovered + verified.**
+The wave-4 wall is a signature-liveness artifact: forward the incoming args to
+the row helper. 3/5 deferred flip byte-identical with `f(int player, int idx)`
++ a 13-bit bitfield struct; the other 2 re-diagnosed as different walls (leaf
+reg-alloc; predication) → permuter. **Converged with the decomper's
+independent G26 — strong cross-validation.**
 
-🧭 **Where we are: one proven engine + a recoverable accelerator.** The ov002
-simple-shape `<0x100` hand-drain is the velocity engine (66.06 %, ~1840 left
-in ov002, 4858 project-wide). The SDK "second track" turned out modest — its
-leaves just join the drain. The live lever is **brief 282**: recover the
-canonical `0x868`-accessor signature/struct, which would convert the 1-reg-off
-accessor *tier* from permuter-candidates into ships. **Brief 283** = decomper
-wave 5, applying it. The reg-alloc-walled `>0x200` cohort (49 % of unmatched
-bytes) still waits for a tool.
+🧭 **Where we are: the hand-drain is humming + families are the multiplier.**
+The ov002 simple-shape `<0x100` drain is reliable (66.09 %, ~1830 left in
+ov002, 4858 project-wide), and the `0x868` accessor tier is now hand-drainable
+(G26). The biggest waves come from **uniform families** (wave 3: 7-batch;
+wave 5: the accessor tier) — so the live lever is **brief 284**: mine ov002 for
+the next batch-drainable family + a shape scorer, so the decomper drains
+families not singletons. **Brief 285** = decomper wave 6, batching them. The
+reg-alloc-walled `>0x200` cohort (49 % of unmatched bytes) still waits for a
+tool; the permuter list is accumulating (leaf / predication / loops).
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.

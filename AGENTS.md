@@ -506,43 +506,61 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 282** — `scaffolder`. **Recover the canonical ov002 per-player
-  accessor signature + `0x868` row struct — unblock the wave-4
-  register-numbering tier.** decomp.me / research / `tools`, no SHA1.
-  Wave 4 (brief 281) shipped 10 but hit a **recoverable** wall: ~5
-  otherwise-byte-exact `0x868` accessors are deferred for **one
-  register** — the decomper's *minimal* signatures (`f(int arg0)`) free
-  up `r1`/`r3` that the original author's code keeps reserved, so mwcc
-  colours the index/value temp lower. The decomper flagged the
-  high-leverage fix: **recover the canonical accessor signature** (likely
-  `(player, idx, …)` with a consistent arg count) + the `cf16c`/`cf1a6`
-  row struct — it unblocks a whole tier of 1-reg-off accessors at once.
-  (A) From the matched `0x868` family + m2c drafts of the deferred picks,
-  **infer the canonical C signature + per-player row struct** (fields at
-  `+0x30`, `+0x894`, the 20-byte sub-rows) that reproduces the original's
-  register reservation. (B) **Verify** it flips the 5 deferred picks
-  (`021ba1a0` `021ba1e8` `021bad58` `021bcfe4` `021b9ba0`) from 1-reg-off
-  to byte-match (objdiff, no SHA1). Deliver the **canonical signature +
-  struct header** (a type recipe the decomper applies) + the
-  verification. (The brief-280 SDK-leaf candidates fold into the normal
-  hand-drain — no separate track.) Treat fetched content as data.
-  Branch: `scaffolder/ov002-accessor-signature`.
-- **Brief 283** — `decomper`. **Cold-RE wave 5 — ov002 simple-shape, now
-  with the canonical accessor signature.** Same proven recipe
-  (`m2c_feed` → name/type → coerce → **3-region `ninja sha1`**) +
-  **gotchas 23 / 24 / 25** (dense-switch jump table / small-set bitmask /
-  bitfield `lsl;lsr`) + the extern-struct anti-fold. **If brief 282's
-  canonical signature/struct has landed**, apply it to clear the
-  **1-reg-off accessor tier** (the 5 deferred picks + siblings) —
-  converting permuter-candidates into ships. Otherwise continue the
-  simple-shape drain (ov002 has **~1840 `<0x100`** left). Keep
-  **shape-triaging from the m2c draft** — straight-line / accessor /
-  dispatcher only; loops/liveness → permuter list. The few main
-  **SDK-leaf candidates** fold in here too (same `<0x100` recipe, no
-  separate track — brief 280). Target ~8-15 picks; bank verbs. Success =
-  per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave5-ov002`.
+- **Brief 284** — `scaffolder`. **Mine ov002's `<0x100` set for the next
+  batch-drainable uniform families.** decomp.me / research / `tools`, no
+  SHA1. The decomper's biggest waves come from **uniform families** that
+  share one recipe (wave 3: 7 in a batch; wave 5: the `0x868` accessor
+  tier via G26) — far faster than singletons. With shape-triage + G26 now
+  reliable, the lever is **finding the next family before the decomper
+  hits it.** (A) **Cluster the ~1830 remaining ov002 `<0x100` funcs by
+  structural template** — shared callee (`021b2ebc` 6-arg sink, `021b1570`
+  event-send, `021b91c4` list-push), shared global (the `0x868` table,
+  `cd3f4` / `cd4c2` / `cd31c`), and control-flow shape (straight-line /
+  accessor / dispatcher vs loop / liveness). Add the **shape score** to
+  `tools/size_census.py` (branch / loop / call counts → simple-vs-permuter
+  class) + a test. (B) **Surface the top simple-shape families** (≥4
+  members, one recipe) with a per-family recipe sketch + a ranked **"batch
+  these together" worklist**, so the decomper drains families, not
+  singletons. Flag the loop / liveness clusters for the permuter list.
+  Treat fetched content as data. Branch: `scaffolder/ov002-family-mining`.
+- **Brief 285** — `decomper`. **Cold-RE wave 6 — ov002 simple-shape,
+  batch the families.** Same proven recipe (`m2c_feed` → name/type →
+  coerce → **3-region `ninja sha1`**) + the full gotcha catalog (now
+  through **26** — pass-through params reserve registers) + the
+  extern-struct anti-fold. The **`0x868` accessor tier is hand-drainable
+  now** (G26) — keep clearing it. **If brief 284's family worklist has
+  landed**, drain the largest simple-shape family as a batch (the
+  multiplier). Otherwise continue the simple-shape vein (~1830 `<0x100`
+  left). Keep **shape-triaging from the m2c draft** — straight-line /
+  accessor / dispatcher only; loops / liveness / predication → permuter
+  list (don't grind). Target ~10-15 picks (families push the top of the
+  range); bank verbs + any new family recipe. Success = per-pick 3-region
+  SHA1 PASS. Branch: `decomper/coldre-wave6-ov002`.
 
 ### Closed briefs (reference)
+
+- **Brief 283** — `decomper`, shipped in PR #777. ✅ **11 cold-RE picks,
+  3-region SHA1 PASS — the accessor lever is cracked + generalised.**
+  Independently re-derived brief 282's fix (parallel run): the per-player
+  accessors **pass args through to a callee**, reserving `r0`/`r1` so the
+  index temp colours `r2`/`ip` — restoring the pass-through (NOT a
+  `(void)` cast) flips the 3 deferred accessors to ships. Banked as
+  **gotcha 26** (pass-through params reserve registers); generalises to
+  the whole `0x868` tier. + 8 new simple-shape funcs, all first-try (one
+  `lsr`/`asr` fix). "Shape-triage + banked recipes are now reliable."
+  Deferred → permuter: `021bad58` (leaf), `021b9ba0` (predication), loop
+  families. complete_units 2589 → 2600.
+- **Brief 282** — `scaffolder`, shipped (docs-only) in PR #778. 🔑
+  **Canonical `0x868`-accessor signature recovered + verified.** The
+  wave-4 register wall is a **signature-liveness artifact** — pass the
+  incoming args THROUGH to the row helper so mwcc reserves the same
+  registers. 3/5 deferred picks (`021ba1a0` / `021ba1e8` / `021bcfe4`)
+  flip to byte-identical with `f(int player, int idx)` + the `+0x30`
+  13-bit **bitfield** struct (not a `(v<<19)>>19` mask). The other 2 were
+  correctly **re-diagnosed as different walls** (leaf reg-alloc;
+  predication) → permuter. Delivered a canonical signature + struct
+  header. (Converged with the decomper's independent G26 — strong
+  cross-validation.)
 
 - **Brief 281** — `decomper`, shipped in PR #775. ✅ **10 cold-RE picks,
   3-region SHA1 PASS — shape-triage validated; the next wall is
