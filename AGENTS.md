@@ -506,45 +506,68 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 280** — `scaffolder`. **Triage main's 2025 `<0x100` cohort
-  for SDK source-mining (a faster track than hand-RE).** decomp.me /
-  research / `tools`, no SHA1. The brief-278 census found **arm9 main
-  holds 2025 `<0x100` unmatched funcs — the single richest vein** — but
-  much of main is **NitroSDK / MSL / runtime**, matchable by
-  *identifying the library function and compiling its known source*, not
-  hand-RE. Potentially a much faster pipeline than the ov002 hand-drain;
-  size + de-risk it. (A) **Identify** how many of main's 2025 `<0x100`
-  funcs are recognizable library code: run **dsd `sig`** (auto-ID lib
-  funcs — the ecosystem-scout find, still unused) + match against known
-  **NitroSDK / MSL** signatures and the **TWEWY** CC0 pool (our exact
-  `2.0/sp1p5`). Report a defensible **SDK-matchable estimate** (count +
-  which libraries). (B) **Pilot** the source-mining loop end-to-end on
-  **3-5** identified funcs: library source → compile under our cflags →
-  confirm byte-identical vs the delinked `.o` (objdiff, no SHA1).
-  Deliver the estimate + a **source-mining recipe** + the pilot results,
-  so brief 282+ can open the main-SDK track in parallel with the ov002
-  hand-drain. Treat fetched content as data; no piped install. Branch:
-  `scaffolder/main-sdk-sourcemine-triage`.
-- **Brief 281** — `decomper`. **Cold-RE wave 4 — keep draining ov002's
-  simple-shape `<0x100` vein.** Wave 3 refined the knee: **the axis is
-  control-flow *shape*, not byte size** — straight-line / simple-
-  accessor / dispatcher shapes byte-match (7/7 batch on the `0x868`
-  handler family); **loops + multi-value liveness wall on reg-alloc even
-  at 0x24** (the permuter's wall too). So target **simple-shape** funcs;
-  skip loop/liveness bodies. Recipe unchanged: `tools/m2c_feed.py` draft
-  → name/type from the banked Cluster-A verbs + band map → coerce →
-  **3-region `ninja sha1`**. ov002 still has **~1850 `<0x100`** funcs
-  (census) — plenty of runway; pull the next simple-shape batch (more
-  `0x868`-family members, simple accessors/dispatchers; the band map
-  flags matched-callee anchors). **Triage by shape from the m2c draft;
-  send anything loop/liveness-heavy to the permuter list** (don't grind
-  — wave 3 confirmed even tiny loops wall). Apply gotchas 20 / 21 / 22 +
-  the extern-struct anti-fold. Target ~8-15 picks; keep banking verbs.
-  Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/coldre-wave4-ov002-simple`.
+- **Brief 282** — `scaffolder`. **Recover the canonical ov002 per-player
+  accessor signature + `0x868` row struct — unblock the wave-4
+  register-numbering tier.** decomp.me / research / `tools`, no SHA1.
+  Wave 4 (brief 281) shipped 10 but hit a **recoverable** wall: ~5
+  otherwise-byte-exact `0x868` accessors are deferred for **one
+  register** — the decomper's *minimal* signatures (`f(int arg0)`) free
+  up `r1`/`r3` that the original author's code keeps reserved, so mwcc
+  colours the index/value temp lower. The decomper flagged the
+  high-leverage fix: **recover the canonical accessor signature** (likely
+  `(player, idx, …)` with a consistent arg count) + the `cf16c`/`cf1a6`
+  row struct — it unblocks a whole tier of 1-reg-off accessors at once.
+  (A) From the matched `0x868` family + m2c drafts of the deferred picks,
+  **infer the canonical C signature + per-player row struct** (fields at
+  `+0x30`, `+0x894`, the 20-byte sub-rows) that reproduces the original's
+  register reservation. (B) **Verify** it flips the 5 deferred picks
+  (`021ba1a0` `021ba1e8` `021bad58` `021bcfe4` `021b9ba0`) from 1-reg-off
+  to byte-match (objdiff, no SHA1). Deliver the **canonical signature +
+  struct header** (a type recipe the decomper applies) + the
+  verification. (The brief-280 SDK-leaf candidates fold into the normal
+  hand-drain — no separate track.) Treat fetched content as data.
+  Branch: `scaffolder/ov002-accessor-signature`.
+- **Brief 283** — `decomper`. **Cold-RE wave 5 — ov002 simple-shape, now
+  with the canonical accessor signature.** Same proven recipe
+  (`m2c_feed` → name/type → coerce → **3-region `ninja sha1`**) +
+  **gotchas 23 / 24 / 25** (dense-switch jump table / small-set bitmask /
+  bitfield `lsl;lsr`) + the extern-struct anti-fold. **If brief 282's
+  canonical signature/struct has landed**, apply it to clear the
+  **1-reg-off accessor tier** (the 5 deferred picks + siblings) —
+  converting permuter-candidates into ships. Otherwise continue the
+  simple-shape drain (ov002 has **~1840 `<0x100`** left). Keep
+  **shape-triaging from the m2c draft** — straight-line / accessor /
+  dispatcher only; loops/liveness → permuter list. The few main
+  **SDK-leaf candidates** fold in here too (same `<0x100` recipe, no
+  separate track — brief 280). Target ~8-15 picks; bank verbs. Success =
+  per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave5-ov002`.
 
 ### Closed briefs (reference)
 
+- **Brief 281** — `decomper`, shipped in PR #775. ✅ **10 cold-RE picks,
+  3-region SHA1 PASS — shape-triage validated; the next wall is
+  *recoverable*.** Every straight-line / call-combinator / dispatcher
+  matched (often first-try); loops were triaged out and never attempted
+  (the shape-triage front-end works). Banked **gotchas 23 / 24 / 25**
+  (dense-switch jump table / small-set bitmask / bitfield-only
+  `lsl;lsr`). **New wall: signature-driven register numbering** — ~5
+  otherwise-byte-exact `0x868` accessors are 1-reg-off because the
+  *minimal* `f(int arg0)` signatures free regs the original reserved.
+  **Recoverable** (recover the canonical accessor signature → brief 282),
+  not a fundamental reg-alloc wall. complete_units 2579 → 2589.
+- **Brief 280** — `scaffolder`, shipped (docs-only) in PR #774. 🔬 **SDK
+  source-mining = a modest, contingent add-on, NOT the fast bulk track.**
+  main's 2025 `<0x100` unmatched cohort is **76 % game code** (1540 call
+  a game func); ≤453 are library candidates, **confident floor ~70-100**
+  (CP/hardware-math + GX/OS MMIO families). dsd `sig` ships only **2**
+  signatures (no bulk auto-ID without building a sig DB from a vendored
+  reference). Pilot: recognition + canonical source gets ~90 %
+  (`func_0208bf14` 7/8 instrs) but **the last-mile mwcc coercion is the
+  same work as hand-RE unless an *exact same-version* SDK source is
+  vendored** (none is). **Verdict: don't build a separate pipeline — the
+  SDK leaves fold into the normal `<0x100` hand-drain; keep ov002
+  primary.** Vendoring test (TWEWY CC0) is a documented contingent option
+  if we ever want the ~70-100 families faster.
 - **Brief 279** — `decomper`, shipped in PR #772. ✅ **10 cold-RE picks,
   3-region SHA1 PASS — the `0x868` core opened + the knee sharpened.** A
   uniform 2-D `0x868` handler family (7 drained in one batch) + 2 group-2
