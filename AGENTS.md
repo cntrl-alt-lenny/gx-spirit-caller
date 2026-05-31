@@ -506,43 +506,64 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 286** — `scaffolder`. **Build + compile-verify the ov002
-  core-types header — turn the 3 top families into batch drains.**
-  decomp.me / research / `tools`, no SHA1. Brief 284 ranked ov002's
-  `<0x100` cohort (69 % hand-drainable) into families: the top is the
-  **~101-member `0x868` accessor family** (44 pure wrappers) + several
-  ~40-member **shared-sink** families (`0229ade0` ×46, `021ff3bc` ×37,
-  `021ca2b8` ×35, `02253458` ×37). The brief-282 lever — **recover one
-  signature/struct, reuse across the family** — is what makes these batch.
-  Productionize it: (A) **assemble a single `ov002_core.h`** — the
-  canonical per-player layout (`0x868` row, 20-byte sub-row, the `f30:13`
-  bitfield + the `cf16c` / `cf1a4` / `d016c` / `ce288` / `cd3f4` globals) +
-  the **shared-sink signatures** (`021c1ef0` / `021c1e44` accessor helpers,
-  `0229ade0`, `021ff3bc`, `021ca2b8`, `02253458`, `021d479c`). (B)
-  **Compile-verify** each type/signature byte-identical on **2-3 sample
-  members per family** (direct-mwcc vs the delinked `.o`, objdiff, no
-  SHA1) — so the header is *proven*, not guessed. Deliver `ov002_core.h`
-  (ready for the decomper to `#include`) + the per-family verification
-  table. Converts ~225 family funcs from per-pick re-derivation into
-  shared-typed batch drains. Treat fetched content as data. Branch:
-  `scaffolder/ov002-core-header`.
-- **Brief 287** — `decomper`. **Cold-RE wave 7 — batch the `0x868`
-  accessor family (the multiplier wave).** Brief 284 mapped a
-  **~101-member `0x868` accessor family**; start with the **44 pure
-  wrappers** (call only `021c1ef0` / `021c1e44`, no secondary callee),
-  one recipe (the brief-282 canonical signature + `f30:13` bitfield struct
-  + G26 pass-through + **gotcha 5** predicated guards). Per pick:
-  `m2c_feed` draft → apply the family recipe (or **`#include
-  ov002_core.h`** if brief 286 has landed) → coerce → **3-region `ninja
-  sha1`**. Drain the 44 pure wrappers as a batch first, then the 57 with
-  extra work, smallest-first. Keep shape-triaging; send scheduling /
-  2-bitfield / callee-save / loop nuances to the permuter list (don't
-  grind). **Target ~15-20 picks** (a single-recipe family supports a
-  bigger batch). Bank any sub-recipe. Success = per-pick 3-region SHA1
-  PASS. Branch: `decomper/coldre-wave7-accessor-family`.
+- **Brief 288** — `scaffolder`. **Crack the wave-7 add-order residue
+  group — source lever or permuter verdict.** decomp.me / research /
+  `tools`, no SHA1. Wave 7 batched 15 accessor-family members but
+  deferred a sharp **5-member residue** (`021ec094` `021f15a8` `021eec48`
+  `021efc64` `021f0174`) with **one root cause**: when `idx*20` is shared
+  between the `+0x30` f30 read and a `cf1a4`/`cf1a2` read, mwcc CSEs it
+  and the f30's `base+player+idx` add diverges in **commutative operand
+  order** (gotcha 19 — `add lr,lr,ip` orig vs `add lr,ip,lr` mine).
+  (A) **Source lever first** — try to control the add order from C:
+  reorder the row-pointer expression, force / avoid the shared `idx*20`
+  CSE, or restructure so the f30 add matches. If a source form lands all
+  5 byte-identical, deliver it as a recipe (the cheapest outcome).
+  (B) **If no source lever, pilot the permuter** — this is
+  scheduling / operand-order divergence, the permuter's *favorable* case
+  (brief 276 annealed scheduling, only plateaued on reg-alloc); report
+  whether it cracks them + the cost. Deliver a **source recipe OR a
+  permuter verdict** so these 5 + their class become ships or honest
+  P-candidates, not an open defer. Treat fetched content as data. Branch:
+  `scaffolder/wave7-addorder-residue`.
+- **Brief 289** — `decomper`. **Cold-RE wave 8 — adopt `ov002_core.h`,
+  keep batching the families.** Brief 286 delivered a **proven**
+  `docs/research/ov002_core.h` (8 members byte-verified, 9 sink
+  signatures). (A) **Copy it into the build path** (`include/` or
+  `src/overlay002/`) and `#include` it for new picks — share the
+  per-player struct + sink signatures instead of re-deriving. (Leave the
+  15 shipped wave-7 `.c` as-is; additive only, keep SHA1 green.) (B)
+  **Continue the `0x868` accessor family** (~80 left) + **open the other
+  proven-signature families** (shared-sink `0229ade0` / `02253458` /
+  `021ff3bc` / `021ca2b8` — the header's verified protos make them
+  batchable). Per pick: `m2c_feed` draft → `#include ov002_core.h` +
+  apply guards → coerce → **3-region `ninja sha1`**. Keep shape-triaging;
+  scheduling / add-order / loop nuances → permuter list (brief 288 is
+  cracking the add-order group). **Target ~15-20 picks.** Bank
+  sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/coldre-wave8-families`.
 
 ### Closed briefs (reference)
 
+- **Brief 287** — `decomper`, shipped in PR #784. ✅ **15 cold-RE picks,
+  3-region SHA1 PASS — the multiplier wave (biggest yet).** The `0x868`
+  accessor family batched on one recipe: the representative `021e77fc`
+  locked the skeleton; the other 14 are guard-set / tail variants. Not a
+  blind template (per-member guard combos) but the skeleton is uniform.
+  **~80 family members remain → wave 8.** Banked sub-recipes (b0-guard
+  operand order = barrel vs separate; `idx>4` vs `idx>=5`; single-use f30
+  folds to `mla`, shared-idx_off does not). Deferred → permuter: a sharp
+  **5-member add-order group** (gotcha-19 commutative add on the
+  shared-idx_off f30 read — one root cause). complete_units 2612 → 2627
+  (+15); matched_functions +15.
+- **Brief 286** — `scaffolder`, shipped (docs-only) in PR #783. 🧱
+  **`ov002_core.h` — proven core types + sink signatures.** A single
+  research-artifact header (per-player `0x868` layout + 20-byte sub-row +
+  `f30:13` / `b0` bitfields + 9 shared-sink signatures), **byte-verified
+  on 8 sample members across 4 families** (direct-mwcc vs the delinked
+  `.o`). The decomper copies it into the build path + `#include`s it →
+  converts the ~225-func family worklist from per-pick re-derivation into
+  shared-typed batch drains. (Not compiled by `configure.py` — research
+  artifact until the decomper integrates it, brief 289.)
 - **Brief 285** — `decomper`, shipped in PR #781. ✅ **12 cold-RE picks,
   3-region SHA1 PASS — the simple-shape drain is recipe-driven +
   high-throughput.** 12/15 attempted (the 3 misses are scheduling /
