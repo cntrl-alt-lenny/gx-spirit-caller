@@ -82,6 +82,46 @@ def is_claimed(addr: int, intervals: list[tuple[int, int]]) -> bool:
     return any(lo <= addr < hi for lo, hi in intervals)
 
 
+# --- shape score (brief 284) --------------------------------------------
+# Control-flow shape predicts cold-RE tractability better than byte size
+# (brief 279/281): straight-line / accessor / dispatcher shapes hand-match;
+# loops + multi-value liveness wall on mwcc reg-alloc (the permuter's wall).
+_BRANCH_RE = re.compile(
+    r"b(?:eq|ne|lt|gt|ge|le|ls|hi|cs|cc|mi|pl|vs|vc|al)?(?:\.[wn])?\s+([0-9a-f]+)\b"
+)
+
+
+def shape_features(insns: list[tuple[int, str]]) -> dict:
+    """Count calls / branches / loops from (addr, mnemonic) instructions.
+
+    A loop is a BACKWARD branch (target ≤ the branch's own address) — the
+    cheap, reliable signal for the liveness wall. `bl`/`bx` are excluded
+    from branches (they are calls / returns, not control flow within).
+    """
+    calls = branches = loops = 0
+    for addr, m in insns:
+        if re.match(r"blx?\b", m):
+            calls += 1
+            continue
+        if m.startswith("bx"):
+            continue
+        mb = _BRANCH_RE.match(m)
+        if mb:
+            branches += 1
+            if int(mb.group(1), 16) <= addr:
+                loops += 1
+    return {"insns": len(insns), "calls": calls, "branches": branches, "loops": loops}
+
+
+def shape_class(feats: dict) -> str:
+    """`simple` / `dispatcher` (both hand-drainable) vs `permuter` (loop)."""
+    if feats["loops"]:
+        return "permuter"          # loop / liveness — the reg-alloc wall
+    if feats["branches"] <= 3:
+        return "simple"            # straight-line / accessor
+    return "dispatcher"            # many branches, no loop — still hand-matches
+
+
 def unmatched(funcs: list[tuple[str, int, int]],
               intervals: list[tuple[int, int]]) -> list[tuple[str, int, int]]:
     return [f for f in funcs if not is_claimed(f[1], intervals)]
@@ -133,6 +173,39 @@ def collect(version: str, only: str | None = None) -> dict[str, list[tuple[str, 
     return per_module
 
 
+def collect_shapes(version: str, module: str, objdump: str = "arm-none-eabi-objdump") -> dict:
+    """Shape-class the module's UNMATCHED functions from the delinked gap
+    objects. Build-dependent (needs `build/<ver>/delinks` + objdump) — the
+    shape needs instructions, unlike the byte-free size census. Returns
+    {func: {**shape_features, "class": …, "size": …}}.
+    """
+    import subprocess
+    delinks = ROOT / f"build/{version}/delinks"
+    unm = {n: s for n, _, s in collect(version, module).get(module, [])}
+    out = {}
+    cur = None
+    for obj in sorted(delinks.glob(f"_dsd_gap@{module}_*.o")):
+        dis = subprocess.run([objdump, "-d", "--architecture=armv5te", str(obj)],
+                             capture_output=True, text=True).stdout
+        for line in dis.splitlines():
+            h = re.match(r"^[0-9a-f]+ <(func_\S+)>:", line)
+            if h:
+                cur = h.group(1) if h.group(1) in unm and h.group(1) not in out else None
+                if cur:
+                    out[cur] = []
+                continue
+            if cur is None:
+                continue
+            mi = re.match(r"^\s+([0-9a-f]+):\t[0-9a-f ]{8,}\t(\S.*)", line)
+            if mi:
+                out[cur].append((int(mi.group(1), 16), mi.group(2).strip()))
+    result = {}
+    for fn, insns in out.items():
+        feats = shape_features(insns)
+        result[fn] = {**feats, "class": shape_class(feats), "size": unm.get(fn, 0)}
+    return result
+
+
 def render(summary: dict) -> str:
     lines = []
     t = summary["totals"]
@@ -170,7 +243,33 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--version", default="eur", choices=VALID_REGIONS)
     ap.add_argument("--module", default=None, help="restrict to one module (e.g. ov002)")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--shape", action="store_true",
+                    help="shape-class unmatched funcs (needs --module + a built "
+                         "build/<ver>/delinks; simple/dispatcher = hand-drainable, "
+                         "permuter = loop)")
     args = ap.parse_args(argv)
+
+    if args.shape:
+        if not args.module:
+            print("error: --shape requires --module (e.g. --module ov002)", file=sys.stderr)
+            return 1
+        shapes = collect_shapes(args.version, args.module)
+        if not shapes:
+            print(f"error: no shapes for {args.module} (run `ninja` to build "
+                  f"build/{args.version}/delinks first?)", file=sys.stderr)
+            return 1
+        if args.json:
+            print(json.dumps(shapes, indent=2))
+        else:
+            dist = {}
+            for v in shapes.values():
+                dist[v["class"]] = dist.get(v["class"], 0) + 1
+            hand = dist.get("simple", 0) + dist.get("dispatcher", 0)
+            print(f"{args.module} unmatched shapes ({len(shapes)} funcs):")
+            for cls in ("simple", "dispatcher", "permuter"):
+                print(f"  {cls:11s} {dist.get(cls, 0):5d}")
+            print(f"  {'hand-drainable':11s} {hand:5d}  (simple+dispatcher)")
+        return 0
 
     per_module = collect(args.version, args.module)
     if not per_module:
