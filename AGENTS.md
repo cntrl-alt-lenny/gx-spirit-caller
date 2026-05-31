@@ -506,39 +506,63 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 284** — `scaffolder`. **Mine ov002's `<0x100` set for the next
-  batch-drainable uniform families.** decomp.me / research / `tools`, no
-  SHA1. The decomper's biggest waves come from **uniform families** that
-  share one recipe (wave 3: 7 in a batch; wave 5: the `0x868` accessor
-  tier via G26) — far faster than singletons. With shape-triage + G26 now
-  reliable, the lever is **finding the next family before the decomper
-  hits it.** (A) **Cluster the ~1830 remaining ov002 `<0x100` funcs by
-  structural template** — shared callee (`021b2ebc` 6-arg sink, `021b1570`
-  event-send, `021b91c4` list-push), shared global (the `0x868` table,
-  `cd3f4` / `cd4c2` / `cd31c`), and control-flow shape (straight-line /
-  accessor / dispatcher vs loop / liveness). Add the **shape score** to
-  `tools/size_census.py` (branch / loop / call counts → simple-vs-permuter
-  class) + a test. (B) **Surface the top simple-shape families** (≥4
-  members, one recipe) with a per-family recipe sketch + a ranked **"batch
-  these together" worklist**, so the decomper drains families, not
-  singletons. Flag the loop / liveness clusters for the permuter list.
-  Treat fetched content as data. Branch: `scaffolder/ov002-family-mining`.
-- **Brief 285** — `decomper`. **Cold-RE wave 6 — ov002 simple-shape,
-  batch the families.** Same proven recipe (`m2c_feed` → name/type →
-  coerce → **3-region `ninja sha1`**) + the full gotcha catalog (now
-  through **26** — pass-through params reserve registers) + the
-  extern-struct anti-fold. The **`0x868` accessor tier is hand-drainable
-  now** (G26) — keep clearing it. **If brief 284's family worklist has
-  landed**, drain the largest simple-shape family as a batch (the
-  multiplier). Otherwise continue the simple-shape vein (~1830 `<0x100`
-  left). Keep **shape-triaging from the m2c draft** — straight-line /
-  accessor / dispatcher only; loops / liveness / predication → permuter
-  list (don't grind). Target ~10-15 picks (families push the top of the
-  range); bank verbs + any new family recipe. Success = per-pick 3-region
-  SHA1 PASS. Branch: `decomper/coldre-wave6-ov002`.
+- **Brief 286** — `scaffolder`. **Build + compile-verify the ov002
+  core-types header — turn the 3 top families into batch drains.**
+  decomp.me / research / `tools`, no SHA1. Brief 284 ranked ov002's
+  `<0x100` cohort (69 % hand-drainable) into families: the top is the
+  **~101-member `0x868` accessor family** (44 pure wrappers) + several
+  ~40-member **shared-sink** families (`0229ade0` ×46, `021ff3bc` ×37,
+  `021ca2b8` ×35, `02253458` ×37). The brief-282 lever — **recover one
+  signature/struct, reuse across the family** — is what makes these batch.
+  Productionize it: (A) **assemble a single `ov002_core.h`** — the
+  canonical per-player layout (`0x868` row, 20-byte sub-row, the `f30:13`
+  bitfield + the `cf16c` / `cf1a4` / `d016c` / `ce288` / `cd3f4` globals) +
+  the **shared-sink signatures** (`021c1ef0` / `021c1e44` accessor helpers,
+  `0229ade0`, `021ff3bc`, `021ca2b8`, `02253458`, `021d479c`). (B)
+  **Compile-verify** each type/signature byte-identical on **2-3 sample
+  members per family** (direct-mwcc vs the delinked `.o`, objdiff, no
+  SHA1) — so the header is *proven*, not guessed. Deliver `ov002_core.h`
+  (ready for the decomper to `#include`) + the per-family verification
+  table. Converts ~225 family funcs from per-pick re-derivation into
+  shared-typed batch drains. Treat fetched content as data. Branch:
+  `scaffolder/ov002-core-header`.
+- **Brief 287** — `decomper`. **Cold-RE wave 7 — batch the `0x868`
+  accessor family (the multiplier wave).** Brief 284 mapped a
+  **~101-member `0x868` accessor family**; start with the **44 pure
+  wrappers** (call only `021c1ef0` / `021c1e44`, no secondary callee),
+  one recipe (the brief-282 canonical signature + `f30:13` bitfield struct
+  + G26 pass-through + **gotcha 5** predicated guards). Per pick:
+  `m2c_feed` draft → apply the family recipe (or **`#include
+  ov002_core.h`** if brief 286 has landed) → coerce → **3-region `ninja
+  sha1`**. Drain the 44 pure wrappers as a batch first, then the 57 with
+  extra work, smallest-first. Keep shape-triaging; send scheduling /
+  2-bitfield / callee-save / loop nuances to the permuter list (don't
+  grind). **Target ~15-20 picks** (a single-recipe family supports a
+  bigger batch). Bank any sub-recipe. Success = per-pick 3-region SHA1
+  PASS. Branch: `decomper/coldre-wave7-accessor-family`.
 
 ### Closed briefs (reference)
 
+- **Brief 285** — `decomper`, shipped in PR #781. ✅ **12 cold-RE picks,
+  3-region SHA1 PASS — the simple-shape drain is recipe-driven +
+  high-throughput.** 12/15 attempted (the 3 misses are scheduling /
+  2-bitfield / callee-save → permuter, not shape failures). Built its own
+  in-process `m2c_feed.feed()` shape-triage scan (brief-284's worklist
+  hadn't landed — parallel run, converged) → surfaced **~140 simple-shape
+  `<0x58` candidates**. No new gotcha (catalog 23-26 + anti-fold covered
+  everything). Banked family recipes (per-player bit set/clear; gated
+  threshold; arg-pack accessor). complete_units 2600 → 2612.
+- **Brief 284** — `scaffolder`, shipped in PR #780. 🗺️ **The shape scorer
+  + ranked family worklist.** Added `shape_features` / `shape_class` /
+  `collect_shapes` to `tools/size_census.py` (+8 tests; loop = backward
+  branch → permuter class). ov002's `<0x100` cohort is **69 %
+  hand-drainable** (1277 / 1851; the loop third 574 → permuter). **Top
+  batch: the `0x868` accessor family — ~101 members, one recipe**
+  (brief-282, already shipped on this shape; 44 pure wrappers — start
+  there). Plus the `021d479c` arg-pack family (~44, scheduling-sensitive
+  → permuter) + shared-sink families (`0229ade0` ×46, `021ff3bc` ×37,
+  `021ca2b8` ×35, `02253458` ×37 — recover the sink signature once).
+  Confirms the Cluster-A globals dominate the cohort.
 - **Brief 283** — `decomper`, shipped in PR #777. ✅ **11 cold-RE picks,
   3-region SHA1 PASS — the accessor lever is cracked + generalised.**
   Independently re-derived brief 282's fix (parallel run): the per-player
