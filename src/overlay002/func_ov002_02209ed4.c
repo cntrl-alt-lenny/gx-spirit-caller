@@ -1,0 +1,27 @@
+/* func_ov002_02209ed4: C-39d 021ca2b8 predicate — require 021ca2b8(bit0) and
+ * 021bc8c8(bit0, bit0, field5), then return 2 if 022536e8(bit0, f0, 0) fires. */
+
+struct Func02209ed4F2 {
+    unsigned short bit0 : 1;
+    unsigned short field5 : 5;
+    unsigned short rest : 10;
+};
+
+struct Func02209ed4Self {
+    unsigned short f0;
+    struct Func02209ed4F2 f2;
+};
+
+extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021bc8c8(unsigned int bit, unsigned int bit2, unsigned int field5);
+extern int func_ov002_022536e8(unsigned int bit, unsigned int f0, int z);
+
+int func_ov002_02209ed4(struct Func02209ed4Self *self) {
+    if (func_ov002_021ca2b8(self->f2.bit0) == 0)
+        return 0;
+    if (func_ov002_021bc8c8(self->f2.bit0, self->f2.bit0, self->f2.field5) == 0)
+        return 0;
+    if (func_ov002_022536e8(self->f2.bit0, self->f0, 0) != 0)
+        return 2;
+    return 0;
+}
