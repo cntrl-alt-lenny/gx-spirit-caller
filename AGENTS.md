@@ -506,42 +506,63 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 290** — `scaffolder`. **Build the `.s` escape-hatch generator
-  + size the canonicalisation-residue class.** decomp.me / research /
-  `tools`, no SHA1. Brief 288 proved the wave-7 add-order residue is
-  byte-identical-except-one-instruction, **unmatchable by C or the
-  permuter** (mwcc canonicalises a CSE'd-temp commutative add invariant
-  to source), fixed only by the **`.s` asm escape hatch** (precedent
-  `func_ov002_021ff3bc.s`, brief 207). This class **recurs every wave**
-  (wave 8 added 3 reg-numbering picks), so productionize the hatch.
-  (A) **Build a `tools/` `.s` generator**: compile the byte-near C →
-  `objdump` → apply the known one-instruction fix (operand-order flip /
-  register renumber) → emit `src/…/func.s` → **verify byte-identical** vs
-  the delinked `.o`. Test it on the **5 wave-7** (`021ec094` `021f15a8`
-  `021eec48` `021efc64` `021f0174`) **+ 3 wave-8** (`021e8b34` `021eb128`
-  `021ebf40`) residue picks → 8 verified `.s`. (B) **Size the class** —
-  scan ov002's `<0x100` for the byte-identical-except-canonicalisation
-  shape (add-order / reg-numbering): how many `.s`-hatch ships does it
-  unlock? Deliver the generator + the 8 verified `.s` (the decomper
-  ships them) + the class size. Treat fetched content as data. Branch:
-  `scaffolder/asm-escape-hatch-tool`.
-- **Brief 291** — `decomper`. **Cold-RE wave 9 — open the remaining
-  shared-sink families + ship the residue via `.s`.** Recipe unchanged:
-  `m2c_feed` draft → `#include ov002_core.h` + guards → coerce →
-  **3-region `ninja sha1`**. (A) **Open the remaining proven-signature
-  families** — `0229ade0` (×46), `021ff3bc` (×37), `021ca2b8` (×35) — the
-  header's verified protos make them batchable like `02253458` was (wave
-  8's cleanest family). (B) **Ship the add-order / reg-numbering residue
-  via the `.s` hatch** (brief 290's generator + recipe, precedent
-  `021ff3bc.s`): the 5 wave-7 + 3 wave-8 picks become `.s` ships (one
-  instruction fixed, byte-verified). Keep shape-triaging; genuine loop /
-  liveness bodies stay deferred (not the `.s`-hatch class). **Target
-  ~15-20 picks** (families + the `.s` batch). Bank sub-recipes. Success =
-  per-pick 3-region SHA1 PASS. Branch:
-  `decomper/coldre-wave9-families-asm`.
+- **Brief 292** — `scaffolder`. **Consolidate the `.s` generators +
+  characterize the loop / big-function cohort (the hard bucket).**
+  decomp.me / research / `tools`, no SHA1. **(A) Consolidate — quick.**
+  Wave 9 produced **two** `.s` generators in parallel (your
+  `tools/asm_escape.py` — REFUSE-guarded + self-verifying — and the
+  decomper's `tools/gen_asm_tu.py`). Standardize on **`asm_escape.py`**
+  (the safe-by-construction one); fold in any syntax coverage
+  `gen_asm_tu.py` has that it lacks, **retire `gen_asm_tu.py`**, update
+  the tool index. (Brief 293 tells the decomper to use `asm_escape.py`, so
+  the retire is collision-free.) **(B) Characterize the hard bucket — the
+  main deliverable.** The hand-drain + `.s` hatch cover the *simple-shape*
+  `<0x100` cohort; the **574 ov002 loop funcs + the `>0x200` cohort
+  (49 % of unmatched bytes)** are the genuinely-unsolved remainder. Map
+  it: (1) **sub-classify the loops** — is there a hand-matchable sub-class
+  (simple counted loop / single live value) vs the truly reg-alloc-walled?
+  Quantify each. (2) **Pilot the permuter on 2-3 *larger* funcs**
+  (`>0x200`, where it has the *reschedulable slack* brief 288 said it
+  needs — the opposite of the tight accessors): does it crack any? (3)
+  Deliver a **completion-ceiling estimate** — what % the current toolkit
+  (hand + `.s` hatch) reaches, and what's left for a future tool. Treat
+  fetched content as data. Branch: `scaffolder/loop-cohort-characterization`.
+- **Brief 293** — `decomper`. **Cold-RE wave 10 — keep batching the
+  families + the `.s`-hatch class.** Recipe unchanged: `m2c_feed` draft →
+  `#include ov002_core.h` + guards → coerce → **3-region `ninja sha1`**;
+  `.s` residue via **`tools/asm_escape.py`** (the canonical generator —
+  **we're standardizing on it; don't extend `gen_asm_tu.py`**, it's being
+  retired in brief 292). (A) **Continue the sink families** (`0229ade0` /
+  `021ff3bc` / `021ca2b8` + any new uniform family the m2c triage
+  surfaces). (B) **Drain the `.s`-hatch class** — brief 290 sized it at
+  **~93 `<0x100` canonicalisation-residue funcs** (47 accessor-helper
+  members); `asm_escape.py` REFUSES anything that isn't a pure
+  one-instruction canonicalisation swap, so the batch is safe. Keep
+  shape-triaging; loop / liveness bodies stay deferred (brief 292 is
+  characterizing them). **Target ~15-20 picks.** Bank sub-recipes.
+  Success = per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave10`.
 
 ### Closed briefs (reference)
 
+- **Brief 291** — `decomper`, shipped in PR #790. ✅ **16 cold-RE picks
+  (7 `.c` + 9 `.s`), 3-region SHA1 PASS — sink families opened + the `.s`
+  hatch productionized.** Opened the `0229ade0` / `021ff3bc` / `021ca2b8`
+  shared-sink families via `.c` + the header. Shipped the 8 wave-7/8
+  canonicalisation residue via `.s` (built `tools/gen_asm_tu.py` — a
+  UAL→mwasm syntax bridge). **Metric note:** both `complete_units` AND
+  `matched_functions` ticked +16 — the `.s` ships registered in
+  matched_functions (contrary to the pre-#206 canon; the reloc harness
+  appears to have fixed it). complete_units 2644 → 2660 (+16).
+- **Brief 290** — `scaffolder`, shipped in PR #789. 🛠️
+  **`tools/asm_escape.py` — the safe `.s` generator + class size.**
+  Safe-by-construction: classifies every divergence, emits `.s` ONLY if
+  every diff is a commutative-operand swap, else **REFUSES** (live-tested:
+  wrong-logic C → REFUSE, can't paper over a real mismatch); self-verifies
+  by assembling with `mwasmarm` + byte-comparing vs the delinked `.o`.
+  Class size: **~93 `<0x100` ov002 funcs** carry the canonicalisation
+  signature (47 accessor-helper members) = the hatch's runway. ⚠️ Collided
+  with the decomper's parallel `gen_asm_tu.py` (two `.s` generators) →
+  consolidate on `asm_escape.py` (brief 292).
 - **Brief 289** — `decomper`, shipped in PR #786. ✅ **17 cold-RE picks,
   3-region SHA1 PASS — header adopted + the cleanest family yet.**
   `ov002_core.h` copied into `src/overlay002/` + `#include`d (eliminates
