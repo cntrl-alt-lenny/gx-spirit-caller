@@ -7,13 +7,13 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**80 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**81 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
 - [Analysis / worklist](#analysis--worklist) (15)
 - [Rename support](#rename-support) (7)
-- [Match acceleration](#match-acceleration) (11)
+- [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
 - [Hygiene / invariants](#hygiene--invariants) (1)
@@ -164,6 +164,12 @@ The decomp loop spends real time on per-function setup: pick the target, look up
 ## Match acceleration
 
 _Tools that compress the decomp iteration loop: context assembly, template matching, permuter workspace staging._
+
+### `tools/asm_escape.py`
+
+**generate a byte-exact `.s` escape hatch for a function**
+
+that mwcc compiles byte-identical-EXCEPT one commutative-operand-order instruction (brief 290; the wall proven in brief 288).
 
 ### `tools/cluster_wave_propagate.py`
 
