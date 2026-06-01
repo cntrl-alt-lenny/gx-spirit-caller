@@ -540,6 +540,32 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Closed briefs (reference)
 
+- **Brief 305** — `decomper`, shipped in PR #811. ⚠️ **5 cold-RE
+  picks + dispatcher premise corrected.** Original brief hoped the
+  `0x100-0x200` dispatcher band would be a clean-C goldmine; turned
+  out NOT — `021bab38` (canonical 6-way value-map dispatcher) failed
+  `ninja sha1` twice via a new **switch-case-body layout wall**
+  (sibling of brief 295's block-layout wall). Sparse state-machine
+  dispatchers same story. Decomper shipped 5 `<0x100` picks instead
+  (`02285984`, `02258384`, `02223d48`, `0223b400`, `021f89e8`), all
+  `.c`, all 3-region SHA1 PASS. 3 near-misses register-walled and
+  deferred to GLOBAL_ASM tail (`0228de04`, `02237960`, `021d81d4`).
+  Strategy inflection flagged in PR body — decomper to use brief
+  302's `asm_escape.py --whole-function` for ov002 walled tail, OR
+  pivot to fresh overlay. Brain queued the GLOBAL_ASM-tail path as
+  brief 306.
+- **Brief 304** — `scaffolder`, shipped in PR #810. 🎯 **Co-drain on
+  ov006 validated — 12 matched `.c`.** First matching wave from
+  scaffolder; the research/prep arc is complete, this is a SECOND
+  draining stream collision-free by construction (own
+  `src/overlay006/`, own `delinks.txt`, own header). Brain 3-region
+  SHA1 PASS gated on merge. 3 banked families
+  (callback-dispatch ×5, 5-iter per-index ×2, guarded-call+clear ×1)
+  + 4 singletons. `docs/research/ov006_core.h` promoted to
+  `src/overlay006/ov006_core.h`. Note for wave 2: 3 functions
+  (`021b2b08`, `021b2c9c`, `021b56d8`) were already matched on the
+  branch — reverted, not double-shipped. Pull latest `delinks.txt`
+  and subtract before continuing.
 - **Brief 303** — `decomper`, shipped in PR #808. ✅ **7 cold-RE picks
   (all `.c`), 3-region SHA1 PASS — a lower-yield wave (`<0x100`
   depleting).** The last clean forwarders + a `ce950` flag-post family;
