@@ -8,42 +8,41 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#804 + #805 merge. Brain on Mac.
-**Brief 300 (ov006 pre-map + cross-overlay confirmation, scaffolder) + brief
-301 (cold-RE wave 14 — 12 picks, decomper) both shipped. +12. The role pivot
-worked — clean separation, **zero collision** (scaffolder on ov006, decomper
-sole-owns ov002 build files). Strategic confirmation: **the reachable playbook
-generalizes across overlays** (ov006 84 % / ov004 79 % / ov011 89 % reachable)
-— the post-ov002 runway is real and uniform, not a cliff. Next: scaffolder
-builds the last toolkit piece (whole-function ship-as-`.s` endgame mode, 302);
-decomper wave 15 (303).**
+**Last updated:** 2026-05-30, post-#807 + #808 merge. Brain on Mac.
+**Brief 302 (GLOBAL_ASM endgame tool, scaffolder) + brief 303 (cold-RE wave 15
+— 7 picks, decomper) both shipped. +7. Two inflections: (1) **the toolkit is
+complete** — `asm_escape.py --whole-function` ships any walled func as
+byte-exact `.s` (readiness, not used yet); (2) **the decomper's yield dropped
+to 7** — ov002's `<0x100` clean zone is depleting into register walls. So
+**co-drain begins**: the scaffolder starts a SECOND drain stream on **ov006**
+(its own mapped overlay — collision-free, brain gates 3-region SHA1 on merge),
+while the decomper shifts to ov002's `0x100-0x200` tier. ~2× throughput.**
 
-**Current metrics (post-#804 + #805 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on d4be779, clean tree):**
-**+12 `complete_units`** (2716 → 2728) — the headline (all `.c`).
-`matched_functions` also +12 (2753 → 2765). The % (2728 / 4134 = 65.99) is
+**Current metrics (post-#807 + #808 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 8e45a11, clean tree):**
+**+7 `complete_units`** (2728 → 2735) — the headline (all `.c`).
+`matched_functions` also +7 (2765 → 2772). The % (2735 / 4146 = 65.97) is
 denominator-noisy — **lead with the absolute +N**.
 
-✅ **Brief 301 — 12 cold-RE picks (all `.c`, `<0x100`), 3-region SHA1 PASS.**
-Continued the `<0x100` fast zone (the `021d479c` event-post family — still
-rich). Added its sink decl directly to `ov002_core.h` (sole owner; zero
-header collision this round).
+✅ **Brief 303 — 7 cold-RE picks, 3-region SHA1 PASS (lower-yield wave).**
+ov002's `<0x100` clean zone is **depleting** — the remainder is increasingly
+**register-numbering-walled** (reg-walls in non-loop bodies too; the shape
+"reachable" estimate was a bit optimistic). → shift to `0x100-0x200` (305).
 
-🗺️ **Brief 300 — ov006 pre-mapped; the runway holds across overlays.** The
-`<0x100`-reachable playbook **generalizes**: ov006 84 % reachable
-(simple-dominated), ov004 79 %, ov011 89 % — *not a cliff*. ov006 is the next
-target and even faster (56 % of its reachable callers hit only matched sinks).
-Starter `docs/research/ov006_core.h` sketched.
+🧰 **Brief 302 — the toolkit is complete.** `asm_escape.py --whole-function`
+emits a walled func's orig disasm verbatim as a byte-verified `.s`. Every
+unmatched func now has a ship path (C / canon-`.s` / whole-`.s`). Readiness
+for the walled tail — C-drain stays the priority; not used yet.
 
-🧭 **Where we are: steady-state execution; toolkit nearly complete.** Endgame
-settled (C-drain the ~50 % reachable; ship-as-`.s` the walled tail) and now
-**confirmed to hold across overlays** — many overlays of reachable runway
-after ov002. The decomper is the engine (~12-16/wave). The scaffolder's
-forward-prep is nearly exhausted; **brief 302 builds the last toolkit piece**
-(the whole-function ship-as-`.s` endgame mode — readiness for the walled tail).
-After it, the scaffolder's distinct work winds down → **co-drain (speed, on
-request) or occasional cadence.** Settled-permanent: P-11, P-15. ntrtwl branch
-parked indefinitely (land/drop on request).
+🧭 **Where we are: co-drain begins (two parallel streams).** The research/prep
+arc + the toolkit are done; the decomper's ov002 `<0x100` is slowing. So the
+scaffolder pivots from prep to a **second drain stream on ov006** (84 %
+reachable, even faster; collision-free — different overlay, brain 3-region-
+gates its EUR-objdiff `.c` on merge). Net: decomper=ov002 (shift to
+`0x100-0x200`), scaffolder=ov006, ~2× throughput. Endgame unchanged (ship-as-
+`.s` the walled tail at the end; tool ready). The user delegated the co-drain
+call; started with this recap + an off-ramp (say "hold the scaffolder" to
+revert). Settled-permanent: P-11, P-15. ntrtwl parked (land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
