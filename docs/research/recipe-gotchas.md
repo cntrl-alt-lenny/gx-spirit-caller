@@ -1237,6 +1237,21 @@ register. orig evaluated the **shifted / first-loaded** term first.
 swapping the source operand order swaps the `.word` order + the `orr`
 register operands. (Surfaced brief 270, `func_ov006_021b4d68`.)
 
+**Hard variant — CSE'd computed temp (NO source lever; brief 288).** When
+one operand is not a pool global but a **CSE'd computed value** shared
+across two reads — e.g. `idx*20` reused by an `f30` slot read and a
+parallel `cf1a4`/`cf1a2` read, giving `add ACC, idx20` (ours) vs orig
+`add idx20`-last — the lever above **does not work**: mwcc canonicalises
+the operand order independent of source operand order (swapping it is a
+no-op) and of expression structure (naming a temp / `+=` accumulate /
+array indexing all perturb the prologue instead). The wave-7 ov002
+accessor residue (`021ec094`, `021f15a8`, `021eec48`, `021efc64`,
+`021f0174`) is byte-identical except this one add; **neither source nor
+the permuter** (1484 iterations, floor = base score) reaches it. Outcome:
+**`.s` asm escape hatch** (one-line operand flip; precedent
+`func_ov002_021ff3bc.s`) or documented permanent C-wall — see
+`brief-288-wave7-addorder-residue.md`.
+
 ---
 
 ## Pre-flight checklist for new picks
