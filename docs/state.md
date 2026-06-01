@@ -8,42 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#792 + #793 merge. Brain on Mac.
-**Brief 292 (consolidate `.s` tools + map the ceiling, scaffolder) + brief 293
-(cold-RE wave 10 — 16 picks, decomper) both shipped. +16. The `.s` tools are
-now one (`asm_escape.py`); its REFUSE guard caught 2 false-ship attempts (zero
-slipped). **The project's ceiling is now mapped:** the current toolkit reaches
-~50 % of remaining ov002 bytes; **~46 % is reg-alloc-walled** and needs a new
-tool. Next: scaffolder scouts whether that wall is crossable (294); decomper
-keeps draining the ~50 % reachable (295).**
+**Last updated:** 2026-05-30, post-#795 + #796 merge. Brain on Mac.
+**Brief 294 (reg-alloc wall scout, scaffolder) + brief 295 (cold-RE wave 11 —
+14 picks, decomper) both shipped. +14. **The strategic arc is complete:** the
+scout RESOLVED the endgame — the reg-alloc wall is unsolved *everywhere* (the
+whole mwcc scene runs the same permuter; ship-as-`.s` is the scene-standard
+endgame for the walled tail; all mwcc C-levers inert). So the plan is settled:
+keep draining the ~50 % reachable in C (~130 waves), ship-as-`.s` the ~46 %
+walled tail at the end. Now steady-state execution. Next: scaffolder pre-maps
+the `0x100-0x200` tier to hold velocity (296); decomper wave 12 (297).**
 
-**Current metrics (post-#792 + #793 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 32b44c4, clean tree):**
-**+16 `complete_units`** (2660 → 2676) — the headline. This wave = 12 `.s` +
-4 `.c`. `matched_functions` also +16 (2697 → 2713) — confirms `.s` now ticks
-it (post-#206 reloc harness). ⚠️ The `complete_units` % (2676 / 4060 = 65.91)
-is denominator-noisy — **lead with the absolute +N**.
+**Current metrics (post-#795 + #796 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 189e38e, clean tree):**
+**+14 `complete_units`** (2676 → 2690) — the headline. This wave = 5 `.s` +
+9 `.c`. `matched_functions` also +14 (2713 → 2727). ⚠️ The `complete_units` %
+(2690 / 4080 = 65.93) is denominator-noisy — **lead with the absolute +N**.
 
-✅ **Brief 293 — 16 cold-RE picks (12 `.s` + 4 `.c`), 3-region SHA1 PASS.**
-The `.s` hatch is now a mechanical drain step (byte-near C → `asm_escape.py`
-→ ship the byte-verified `.s`). The **REFUSE guard caught 2** non-canonical
-funcs (count mismatch + whole-function reg-numbering) — **zero false ships**.
+✅ **Brief 295 — 14 cold-RE picks (5 `.s` + 9 `.c`), 3-region SHA1 PASS.**
+Continued the reachable `<0x100` drain — open families + 5 `.s`-hatch picks.
+Deferred (correctly): register-numbering + bit-order walls (`bit14 ^ bit0`
+swaps the `lsl`s — sibling to reg-numbering, not C-controllable).
 
-🧭 **Brief 292 — the project's ceiling is mapped (the key finding).** Of
-remaining ov002 (3156 funcs / 1.05 MB): **~50 % of bytes is hand/`.s`-reachable
-(~2066 funcs — many waves of runway), ~46 % is reg-alloc-walled.** The walled
-cohort = the loop funcs (**85 % call-in-loop**; only ~10 % simple-leaf loops
-hand-match) + the call-heavy `>0x200` band. **The permuter does NOT cross it
-even on large funcs** (−37 % scheduling, 0 matches) — the wall is *allocation*,
-not slack. Needs a new reg-alloc-aware capability.
+🧭 **Brief 294 — the reg-alloc wall is unsolved everywhere; endgame settled.**
+No allocation oracle / reg-alloc-aware permuter exists anywhere; the scene's
+endgame for the unmatchable tail is **ship-as-`.s`** (`NON_MATCHING` /
+`GLOBAL_ASM`) — exactly our `.s` hatch. All untried mwcc levers inert
+(`register` ignored by mwcc 2.0; duplication folds; `volatile` no-op). So:
+**C-drain the reachable now, `.s`-tail the walled ~46 % at the end.**
 
-🧭 **Where we are: a fast engine for ~50 %, an honest ceiling on the rest.**
-The family batch-drain + `.s` hatch clear the reachable cohort at ~16/wave —
-**~130 waves of ov002 runway remain**, so the drain continues (295). The
-**endgame fork** (the user's call, NOT urgent): (A) C-purist, leave ~46 %
-blocked; (B) ship-as-`.s` the walled funcs (SHA1-complete, not "true" C); (C)
-build a reg-alloc-aware tool. **Brief 294** scouts prior art (how the GC/Wii
-mwcc decomp scene handles this) + a crossability verdict to inform the fork.
+🧭 **Where we are: steady-state execution — the research arc is done.** The
+family batch-drain + `.s` hatch clear the reachable cohort at ~14-16/wave;
+**~130 waves of ov002 runway remain**. Endgame settled (ship-as-`.s` tail; the
+user can steer the philosophy but the default plan holds). Now the job is
+throughput: **brief 296** = scaffolder pre-maps the `0x100-0x200` band (695
+funcs — the next tier up) + extends `ov002_core.h`, so velocity holds as the
+`<0x100` sweet spot depletes; **brief 297** = decomper wave 12 keeps draining
+`<0x100` + begins the `0x100-0x200` tier.
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
