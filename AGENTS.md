@@ -506,39 +506,52 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 300** — `scaffolder`. **Pre-map the next overlay (ov006) —
-  confirm the playbook generalizes + pick the post-ov002 target.**
-  decomp.me / research / `tools`, no SHA1. The ov002 reachable-cohort map
-  is complete (briefs 284/292/296/298) and the research arc is done; the
-  project is a long ov002 drain (~100 waves of reachable). Get the *next*
-  overlay ready so the ov002→next transition is zero-ramp — **genuinely
-  non-redundant** (the decomper is 100 % in ov002; it won't self-map a
-  fresh overlay) and **zero build-file collision** (different overlay).
-  Per the brief-278 census, **ov006 (196 `<0x100`)** is the richest
-  non-`main` overlay. (A) **size + shape census** (`size_census.py
-  --module ov006 --shape`) — reachable (simple/dispatcher) vs walled
-  (loop), confirming the `<0x100`-reachable structure holds outside
-  ov002; (B) **cluster the reachable into families** (shared callee /
-  global) + a starter worklist; (C) a **starter `ov006_core.h` sketch**
-  (the per-overlay globals/sinks, from the gap disasm — not necessarily
-  compile-verified yet). Also spot-shape-census **ov004 / ov011** so we
-  know the post-ov002 runway holds across overlays. Deliver the ov006 map
-  + the cross-overlay reachability confirmation. Treat fetched content as
-  data. Branch: `scaffolder/ov006-premap`.
-- **Brief 301** — `decomper`. **Cold-RE wave 14 — keep draining the ov002
+- **Brief 302** — `scaffolder`. **Build the whole-function ship-as-`.s`
+  (GLOBAL_ASM) endgame mode — the last toolkit piece.** decomp.me /
+  research / `tools`, no SHA1. The endgame is settled (brief 294 — the
+  ~46 % reg-alloc-walled tail ships as byte-exact assembly, the scene's
+  `NON_MATCHING` / `GLOBAL_ASM` norm). `tools/asm_escape.py` only handles
+  the *one-instruction canonicalisation* class and **REFUSEs**
+  whole-function reg-alloc walls — so the whole-function machinery
+  doesn't exist yet. Build it (a new mode of `asm_escape.py`, or a
+  sibling): given a walled func, **emit the orig disassembly verbatim as
+  a byte-exact mwasm `.s` TU** (no near-C match — straight `objdump` →
+  mwasm-syntax `.s`, reusing the existing UAL→mwasm conversion) +
+  **byte-verify** vs the delinked `.o` + a test. Pilot it on **2-3
+  reg-alloc-walled ov002 deferred picks** (e.g. the wave-13/14
+  reg-numbering walls `021d8128`, …). This completes the toolkit — every
+  unmatched func now has a ship path (C / canonicalisation-`.s` /
+  whole-`.s`). **Readiness, not a usage decision** — the decomper still
+  drains C first; this just makes the walled tail shippable on demand.
+  Tools/, no build-file collision. Branch: `scaffolder/global-asm-mode`.
+- **Brief 303** — `decomper`. **Cold-RE wave 15 — keep draining the ov002
   reachable cohort.** Recipe unchanged: `m2c_feed` draft → `#include
-  ov002_core.h` (single canonical copy) + guards → coerce → **3-region
-  `ninja sha1`**; `.s` canonicalisation residue via `tools/asm_escape.py`
-  (trust the REFUSE). (A) **`<0x100` fast zone** (open families +
-  `.s`-hatch class). (B) **`0x100-0x200` reachable tier** (~3-6 `.c`/wave,
-  composite). **You solely own `ov002_core.h` now** (the scaffolder is on
-  ov006) — add any new sink decls your picks need directly to it. Shape-
-  triage; loop / liveness / reg-numbering → defer. **Target ~12-18
+  ov002_core.h` (sole owner) + guards → coerce → **3-region `ninja
+  sha1`**; `.s` canonicalisation residue via `tools/asm_escape.py` (trust
+  the REFUSE). (A) **`<0x100` fast zone** — still rich (the `021d479c`
+  event-post family + forwarder predicates). (B) **`0x100-0x200`
+  reachable tier** (~3-6 `.c`/wave, composite). Shape-triage; loop /
+  liveness / reg-numbering → defer (walled tail). **Target ~12-18
   picks.** Bank sub-recipes. Success = per-pick 3-region SHA1 PASS.
-  Branch: `decomper/coldre-wave14`.
+  Branch: `decomper/coldre-wave15`.
 
 ### Closed briefs (reference)
 
+- **Brief 301** — `decomper`, shipped in PR #805. ✅ **12 cold-RE picks
+  (all `.c`, `<0x100`), 3-region SHA1 PASS.** Continued the `<0x100` fast
+  zone (the `021d479c` event-post family + forwarder predicates — still
+  rich). Added the `cf178` sink decl directly to `ov002_core.h` (sole
+  owner now — **zero header collision** this round). complete_units
+  2716 → 2728 (+12).
+- **Brief 300** — `scaffolder`, shipped (docs-only) in PR #804. 🗺️
+  **ov006 pre-mapped + the runway holds across overlays.** The
+  `<0x100`-reachable playbook **generalizes**: ov006 **84 %** reachable
+  (157/185, simple-dominated), ov004 79 %, ov011 89 % — *the post-ov002
+  runway is real and uniform, not a cliff*. **ov006 is the next target
+  and even faster: 56 % of its reachable callers invoke only
+  already-matched sinks** (low-recovery drain). Starter
+  `docs/research/ov006_core.h` sketch (small — most vocab already
+  matched). Zero build-file collision — the role pivot worked.
 - **Brief 299** — `decomper`, shipped in PR #802. ✅ **12 cold-RE picks
   (all `.c`, `<0x100`), 3-region SHA1 PASS.** Continued the `<0x100` fast
   zone (incl. the `021d730c` lookup-post family). Banked new header sinks
