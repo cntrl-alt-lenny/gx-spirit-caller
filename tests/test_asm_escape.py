@@ -90,6 +90,13 @@ class TestSyntaxConversion(unittest.TestCase):
         self.assertEqual(to_mwasm("lsl r3, r3, #19"), "mov r3, r3, lsl #19")
         self.assertEqual(to_mwasm("lsrs r3, r3, #19"), "movs r3, r3, lsr #19")
 
+    def test_conditional_shift(self):  # folded in from gen_asm_tu (brief 292)
+        self.assertEqual(to_mwasm("lsleq r0, r0, #1"), "moveq r0, r0, lsl #1")
+        self.assertEqual(to_mwasm("asrne r2, r2, #2"), "movne r2, r2, asr #2")
+
+    def test_conditional_pop(self):
+        self.assertEqual(to_mwasm("popne {r4, pc}"), "ldmneia sp!, {r4, pc}")
+
     def test_passthrough_plain_ops(self):
         self.assertEqual(to_mwasm("add r3, r3, r4"), "add r3, r3, r4")
 

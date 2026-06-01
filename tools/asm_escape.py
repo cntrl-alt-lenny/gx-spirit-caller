@@ -38,6 +38,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ARCH = "armv5te"
 COMMUTATIVE = {"add", "and", "orr", "eor", "mul"}
+CONDS = {"eq", "ne", "cs", "cc", "mi", "pl", "vs", "vc", "hi", "ls",
+         "ge", "lt", "gt", "le", "al", "hs", "lo"}
 
 # mwcc / mwasm invocations mirror the build.ninja `mwcc` + `mwasm` rules.
 _CFLAGS = ("-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
@@ -88,17 +90,28 @@ def hex_imm(mn: str) -> str:
 
 
 def to_mwasm(mn: str) -> str:
-    """Convert objdump ARM syntax to mwasmarm syntax (the project's `.s`)."""
+    """Convert objdump ARM (UAL) syntax to the project's mwasmarm `.s` dialect.
+
+    Covers the shapes both wave-9 generators handled (brief 292 consolidation):
+    push/pop(+cond) -> stmdb/ldmia; lsl/lsr/asr/ror(+s)(+cond) -> the
+    mov/movs(+cond) rD, rM, <shift> #imm form mwasmarm expects.
+    """
     m = re.match(r"push\s+(\{.*\})$", mn)
     if m:
         return "stmdb sp!, " + m.group(1)
-    m = re.match(r"pop(\w{2})?\s+(\{.*\})$", mn)
+    m = re.match(r"pop([a-z]{2})?\s+(\{.*\})$", mn)
     if m:
-        return f"ldm{m.group(1) or ''}ia sp!, {m.group(2)}"
-    # shift mnemonics -> mov/movs rD, rM, <shift> #imm  (legacy mwasm form)
-    m = re.match(r"(lsl|lsr|asr|ror)(s)?\s+(\w+), (\w+), (#?\w+)$", mn)
+        cc = m.group(1) if m.group(1) in CONDS else ""
+        return f"ldm{cc}ia sp!, {m.group(2)}"
+    # shift mnemonics (+ optional s flag, + optional condition) ->
+    # mov/movs(+cond) rD, rM, <shift> #imm  (legacy mwasm form)
+    m = re.match(r"(lsl|lsr|asr|ror)(s)?([a-z]{2})?\s+(\w+), (\w+), (#?\w+)$", mn)
     if m:
-        return f"mov{m.group(2) or ''} {m.group(3)}, {m.group(4)}, {m.group(1)} {m.group(5)}"
+        sh, sflag, cc = m.group(1), m.group(2) or "", m.group(3) or ""
+        if cc and cc not in CONDS:
+            return mn          # not a condition we recognise — leave as-is
+        mov = "movs" if sflag else "mov"
+        return f"{mov}{cc} {m.group(4)}, {m.group(5)}, {sh} {m.group(6)}"
     return mn
 
 
@@ -191,8 +204,11 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
         pm = re.search(r"\[pc, #(\d+)\]", mn)
         if pm:
             mn = re.sub(r"\[pc, #\d+\]", lit[w["addr"] + 8 + int(pm.group(1))], mn)
-        if re.match(r"bl ", mn) and w["reloc"]:
-            mn = "bl " + w["reloc"]
+        # external call/branch (b / bl / blx, PC24 reloc) -> use the symbol;
+        # internal (conditional) branches carry no reloc and keep their target.
+        bm = re.match(r"(bl|blx|b)(\S*)\s", mn)
+        if bm and w["reloc"]:
+            mn = f"{bm.group(1)}{bm.group(2)} {w['reloc']}"
         body.append("    " + hex_imm(mn))
     return "\n".join(head + body + pool) + "\n"
 
