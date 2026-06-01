@@ -1,7 +1,19 @@
 #!/usr/bin/env python3.13
-"""asm_escape.py — generate a byte-exact `.s` escape hatch for a function
-that mwcc compiles byte-identical-EXCEPT one commutative-operand-order
-instruction (brief 290; the wall proven in brief 288).
+"""asm_escape.py — generate a byte-exact `.s` for a function the C path can't
+match. Two modes:
+
+  * `--c <byte-near.c>` — CANONICALISATION fix (brief 290): the function is
+    byte-identical-EXCEPT one commutative-operand-order instruction; emit the
+    orig (with that operand order) and verify. REFUSEs anything that is not a
+    clean single swap (fix those in C).
+  * `--whole-function` — WHOLE-FUNCTION ship (GLOBAL_ASM endgame, brief 302):
+    emit the entire original disassembly verbatim as a byte-exact mwasm TU, no
+    C match required. The endgame for the ~46% reg-alloc-walled tail (brief
+    294) — every unmatched function now has a ship path (C / canon-.s /
+    whole-.s). Readiness, not a usage decision: the decomper still drains C
+    first; this just makes the walled tail shippable on demand.
+
+The canonicalisation class: an accessor where `idx*20` is CSE'd (shared between the +0x30
 
 The class: an accessor where `idx*20` is CSE'd (shared between the +0x30
 `f30` read and a parallel `cf1a4`/`cf1a2` read), so mwcc canonicalises the
@@ -147,6 +159,32 @@ def pool_addrs(instrs: list[dict]) -> set[int]:
     return pool
 
 
+# A within-function conditional/unconditional branch: `b`/`beq`/`bne`/… to an
+# absolute hex target, with NO reloc. (bl/blx/bx are excluded — bl/blx carry a
+# PC24 reloc to an external symbol; bx is register-indirect.)
+_BRANCH_RE = re.compile(
+    r"^b(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)?(\.[wn])?\s+([0-9a-f]+)$")
+
+
+def branch_targets(instrs: list[dict]) -> set[int]:
+    """Addresses targeted by INTERNAL branches (no reloc, target within the
+    function). The whole-function `.s` mode emits a `.L_<addr>` label at each
+    so mwasmarm can resolve the branch (objdump prints absolute hex targets).
+    The canonicalisation class is straight-line, so this is empty there."""
+    addrs = {w["addr"] for w in instrs}
+    pool = pool_addrs(instrs)
+    targets = set()
+    for w in instrs:
+        if w["reloc"] or w["addr"] in pool:   # skip relocs + literal-pool words
+            continue
+        m = _BRANCH_RE.match(w["mnem"])
+        if m:
+            t = int(m.group(3), 16)
+            if t in addrs and t not in pool:
+                targets.add(t)
+    return targets
+
+
 def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], list[str]]:
     """Return (fixes, refusals). A fix is (index, my_mnem, orig_mnem) for a
     commutative-operand-order divergence. `refusals` lists any divergence
@@ -173,10 +211,21 @@ def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], lis
     return fixes, refusals
 
 
-def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
-    """Emit the mwasmarm `.s` from the ORIGINAL instruction stream (byte-exact;
-    the commutative fix is already in orig's operand order). Pool words become
-    explicit `.word` slots referenced by `_LITn` labels."""
+def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
+             whole: bool = False) -> str:
+    """Emit a byte-exact mwasmarm `.s` from the ORIGINAL instruction stream.
+
+    Two modes share this emitter:
+      * canonicalisation hatch (brief 290, default) — straight-line, `fixes`
+        documents the single commutative-operand correction in the header;
+      * whole-function GLOBAL_ASM ship (brief 302, `whole=True`) — the entire
+        original disassembly verbatim, for reg-alloc-walled functions with no
+        C match (brief 294). This needs INTERNAL-branch local labels, which
+        the straight-line hatch never had.
+
+    Pool words become `.word` slots referenced by `_LITn`; internal branch
+    targets get `.L_<addr>` labels; external calls (bl/b/blx + reloc) use the
+    symbol."""
     lit: dict[int, str] = {}
     for w in orig:
         m = re.search(r"\[pc, #(\d+)\]", w["mnem"])
@@ -184,12 +233,18 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
             lit[w["addr"] + 8 + int(m.group(1))] = ""
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
+    labels = {a: f".L_{a:x}" for a in branch_targets(orig)}
     externs = sorted({w["reloc"] for w in orig if w["reloc"]})
 
-    head = [f"; {func} — .s escape hatch (brief 290): mwcc is byte-identical except",
-            "; the commutative add-operand order below (a CSE'd-temp wall, brief 288)."]
-    for idx, my_mn, orig_mn in fixes:
-        head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
+    if whole:
+        head = [f"; {func} — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):",
+                "; the original disassembly emitted verbatim as a byte-exact mwasm TU.",
+                "; For reg-alloc-walled functions with no C match (brief 294 endgame)."]
+    else:
+        head = [f"; {func} — .s escape hatch (brief 290): mwcc is byte-identical except",
+                "; the commutative add-operand order below (a CSE'd-temp wall, brief 288)."]
+        for idx, my_mn, orig_mn in (fixes or []):
+            head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
     head += ["", "        .text"]
     head += [f"        .extern {e}" for e in externs]
     head += [f"        .global {func}", "        .arm", f"{func}:"]
@@ -200,12 +255,17 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
             val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
             pool.append(f"{lit[w['addr']]}: .word {val}")
             continue
+        if w["addr"] in labels:
+            body.append(f"{labels[w['addr']]}:")
         mn = to_mwasm(w["mnem"])
         pm = re.search(r"\[pc, #(\d+)\]", mn)
         if pm:
             mn = re.sub(r"\[pc, #\d+\]", lit[w["addr"] + 8 + int(pm.group(1))], mn)
-        # external call/branch (b / bl / blx, PC24 reloc) -> use the symbol;
-        # internal (conditional) branches carry no reloc and keep their target.
+        # internal branch (no reloc, target within func) -> local label
+        ib = _BRANCH_RE.match(w["mnem"])
+        if ib and not w["reloc"] and int(ib.group(3), 16) in labels:
+            mn = re.sub(re.escape(ib.group(3)) + r"$", labels[int(ib.group(3), 16)], mn)
+        # external call/branch (b / bl / blx, PC24 reloc) -> use the symbol.
         bm = re.match(r"(bl|blx|b)(\S*)\s", mn)
         if bm and w["reloc"]:
             mn = f"{bm.group(1)}{bm.group(2)} {w['reloc']}"
@@ -313,15 +373,59 @@ def generate(func: str, c_file: str, version: str, out: str | None) -> int:
     return 1
 
 
+def generate_whole(func: str, version: str, out: str | None) -> int:
+    """Whole-function GLOBAL_ASM ship (brief 302): emit the original
+    disassembly verbatim as a byte-exact mwasm `.s` — no C, no near-match.
+    The endgame for reg-alloc-walled functions (brief 294)."""
+    tmp = ROOT / "build" / "_asm_escape"
+    tmp.mkdir(parents=True, exist_ok=True)
+    asm_o = str(tmp / f"{func}.asm.o")
+
+    orig_obj = gap_object(version, func)
+    if not orig_obj:
+        print(f"error: {func} not found in build/{version}/delinks "
+              f"(already matched, or run `ninja` first?)", file=sys.stderr)
+        return 2
+    orig = parse_objdump(disasm(orig_obj), func)
+    if not orig:
+        print(f"error: {func} has no disassembly in {orig_obj}", file=sys.stderr)
+        return 2
+
+    s = emit_asm(func, orig, whole=True)
+    out_path = out or str(tmp / f"{func}.s")
+    Path(out_path).write_text(s, encoding="utf-8")
+
+    if not assemble(out_path, asm_o):
+        print(f"error: emitted {out_path} did not assemble", file=sys.stderr)
+        return 2
+    ok, diffs = bytes_match(asm_o, orig_obj, func)
+    if ok:
+        print(f"{func}: ✅ whole-function .s byte-identical vs delinked .o "
+              f"({len(orig)} words) -> {out_path}")
+        return 0
+    print(f"{func}: ❌ emitted whole-function .s did NOT verify:")
+    for d in diffs[:8]:
+        print("   ", d)
+    return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
-        description="Generate a byte-exact .s escape hatch from byte-near C "
-                    "(commutative-operand-order canonicalisation wall).")
-    ap.add_argument("function", help="func_ov002_XXXX")
-    ap.add_argument("--c", required=True, help="byte-near C source for the function")
+        description="Byte-exact .s escape hatch. Two modes: --c <byte-near.c> "
+                    "(canonicalisation-fix, brief 290) or --whole-function "
+                    "(ship the whole original function as .s, GLOBAL_ASM "
+                    "endgame for reg-alloc walls, brief 302).")
+    ap.add_argument("function", help="func_ovNNN_XXXX")
+    ap.add_argument("--c", default=None, help="byte-near C source (canonicalisation-fix mode)")
+    ap.add_argument("--whole-function", action="store_true",
+                    help="emit the whole original function as a byte-exact .s (no C)")
     ap.add_argument("--version", default="eur")
     ap.add_argument("--out", default=None, help="output .s path (default: build/_asm_escape/)")
     args = ap.parse_args(argv)
+    if args.whole_function:
+        return generate_whole(args.function, args.version, args.out)
+    if not args.c:
+        ap.error("provide either --c <byte-near.c> (canonicalisation fix) or --whole-function")
     return generate(args.function, args.c, args.version, args.out)
 
 

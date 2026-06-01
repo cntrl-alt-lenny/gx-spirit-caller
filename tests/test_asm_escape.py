@@ -23,6 +23,7 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from asm_escape import (  # noqa: E402
+    branch_targets,
     classify_fixes,
     emit_asm,
     hex_imm,
@@ -31,6 +32,22 @@ from asm_escape import (  # noqa: E402
     pool_addrs,
     to_mwasm,
 )
+
+# A small loop+exit function for the whole-function mode (brief 302): a
+# back-edge `b 8` (loop top) and a forward `bge 1c` (exit), plus an external
+# `bl` (reloc). Internal branch targets: 0x8 and 0x1c.
+_LOOP = """\
+00000000 <func_loop>:
+   0:\te92d4010 \tpush\t{r4, lr}
+   4:\te3a04000 \tmov\tr4, #0
+   8:\te3540005 \tcmp\tr4, #5
+   c:\taa000003 \tbge\t1c <.L_exit>
+  10:\teb000000 \tbl\t8 <func_helper>
+\t\t\t10: R_ARM_PC24\tfunc_helper-0x8
+  14:\te2844001 \tadd\tr4, r4, #1
+  18:\teafffffa \tb\t8 <.L_top>
+  1c:\te8bd8010 \tpop\t{r4, pc}
+"""
 
 # addr 0x28 / 0x2c are the targets of the two `ldr [pc, #N]` loads below.
 _DIS = """\
@@ -164,6 +181,39 @@ class TestEmit(unittest.TestCase):
         self.assertIn("add r3, r3, r4", s)                # corrected order
         self.assertIn("ldr r4, _LIT0", s)                 # pc-rel load -> label
         self.assertIn("fix [4]", s)                       # documented
+
+
+class TestWholeFunction(unittest.TestCase):
+    """The GLOBAL_ASM whole-function mode (brief 302)."""
+
+    def test_branch_targets_internal_only(self):
+        w = parse_objdump(_LOOP, "func_loop")
+        # 0x8 (back-edge `b 8`) and 0x1c (`bge 1c`); the bl (reloc) is NOT a target
+        self.assertEqual(branch_targets(w), {0x8, 0x1C})
+
+    def test_branch_targets_none_for_straightline(self):
+        self.assertEqual(branch_targets(parse_objdump(ORIG, "func_t")), set())
+
+    def test_whole_emit_labels_and_branches(self):
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True)
+        self.assertIn("GLOBAL_ASM", s)                 # whole-function header
+        self.assertIn("        .global func_loop", s)
+        self.assertIn("stmdb sp!, {r4, lr}", s)        # push converted
+        self.assertIn(".L_8:", s)                       # back-edge target label
+        self.assertIn(".L_1c:", s)                      # exit target label
+        self.assertIn("b .L_8", s)                      # back-edge -> label
+        self.assertIn("bge .L_1c", s)                   # forward branch -> label
+        self.assertIn("bl func_helper", s)              # external call -> symbol
+        self.assertIn("        .extern func_helper", s)
+        self.assertNotIn("b 8", s)                      # no raw numeric branch target
+
+    def test_canonicalisation_mode_unchanged(self):
+        # whole=False keeps the brief-290 header + no .L_ labels (straight-line)
+        s = emit_asm("func_t", parse_objdump(ORIG, "func_t"),
+                     [(4, "add r3, r4, r3", "add r3, r3, r4")])
+        self.assertIn("escape hatch (brief 290)", s)
+        self.assertNotIn("GLOBAL_ASM", s)
+        self.assertNotIn(".L_", s)
 
 
 if __name__ == "__main__":
