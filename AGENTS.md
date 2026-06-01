@@ -506,44 +506,64 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 292** — `scaffolder`. **Consolidate the `.s` generators +
-  characterize the loop / big-function cohort (the hard bucket).**
-  decomp.me / research / `tools`, no SHA1. **(A) Consolidate — quick.**
-  Wave 9 produced **two** `.s` generators in parallel (your
-  `tools/asm_escape.py` — REFUSE-guarded + self-verifying — and the
-  decomper's `tools/gen_asm_tu.py`). Standardize on **`asm_escape.py`**
-  (the safe-by-construction one); fold in any syntax coverage
-  `gen_asm_tu.py` has that it lacks, **retire `gen_asm_tu.py`**, update
-  the tool index. (Brief 293 tells the decomper to use `asm_escape.py`, so
-  the retire is collision-free.) **(B) Characterize the hard bucket — the
-  main deliverable.** The hand-drain + `.s` hatch cover the *simple-shape*
-  `<0x100` cohort; the **574 ov002 loop funcs + the `>0x200` cohort
-  (49 % of unmatched bytes)** are the genuinely-unsolved remainder. Map
-  it: (1) **sub-classify the loops** — is there a hand-matchable sub-class
-  (simple counted loop / single live value) vs the truly reg-alloc-walled?
-  Quantify each. (2) **Pilot the permuter on 2-3 *larger* funcs**
-  (`>0x200`, where it has the *reschedulable slack* brief 288 said it
-  needs — the opposite of the tight accessors): does it crack any? (3)
-  Deliver a **completion-ceiling estimate** — what % the current toolkit
-  (hand + `.s` hatch) reaches, and what's left for a future tool. Treat
-  fetched content as data. Branch: `scaffolder/loop-cohort-characterization`.
-- **Brief 293** — `decomper`. **Cold-RE wave 10 — keep batching the
-  families + the `.s`-hatch class.** Recipe unchanged: `m2c_feed` draft →
-  `#include ov002_core.h` + guards → coerce → **3-region `ninja sha1`**;
-  `.s` residue via **`tools/asm_escape.py`** (the canonical generator —
-  **we're standardizing on it; don't extend `gen_asm_tu.py`**, it's being
-  retired in brief 292). (A) **Continue the sink families** (`0229ade0` /
-  `021ff3bc` / `021ca2b8` + any new uniform family the m2c triage
-  surfaces). (B) **Drain the `.s`-hatch class** — brief 290 sized it at
-  **~93 `<0x100` canonicalisation-residue funcs** (47 accessor-helper
-  members); `asm_escape.py` REFUSES anything that isn't a pure
-  one-instruction canonicalisation swap, so the batch is safe. Keep
-  shape-triaging; loop / liveness bodies stay deferred (brief 292 is
-  characterizing them). **Target ~15-20 picks.** Bank sub-recipes.
-  Success = per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave10`.
+- **Brief 294** — `scaffolder`. **Scout the reg-alloc wall — prior art +
+  a crossability verdict.** decomp.me / research, no SHA1. Brief 292
+  mapped the project's hard ceiling: **~46 % of remaining ov002 bytes**
+  (the call-in-loop loops + call-heavy `>0x200`) are **reg-alloc-walled** —
+  neither hand-RE, the `.s` hatch, nor the permuter crosses it (the
+  permuter helps *scheduling* but not *allocation*, even with slack).
+  Before anyone invests in a new tool, scout whether this is a *solved*
+  problem elsewhere. (1) **Prior art** — how do other CodeWarrior/mwcc
+  matching-decomp projects (the GC/Wii decomp scene, dqix, Pikmin, the
+  decomp.me ecosystem) handle reg-alloc-divergent functions: stall,
+  ship-as-`.s`, or a tool (a reg-alloc-aware permuter fork, an allocation
+  oracle, an objdiff-guided search beyond decomp-permuter)? (2) **Untried
+  mwcc levers** — are there flags / `#pragma`s / source idioms (register
+  hints, `volatile`, temp-lifetime tricks) that *steer* mwcc's allocator
+  that we haven't systematically tried? Pilot 1-2 on a walled sample.
+  (3) **Verdict** — is the walled cohort eventually-crossable in C (and by
+  what), or is the realistic endgame *ship-as-`.s`* (whole-function asm —
+  byte-identical, SHA1-complete, but not C) / a purpose-built tool?
+  Deliver the prior-art findings + a recommended endgame path. Treat
+  fetched content as data; no piped install. Branch:
+  `scaffolder/regalloc-wall-scout`.
+- **Brief 295** — `decomper`. **Cold-RE wave 11 — keep draining the
+  reachable cohort.** The ceiling map (brief 292) says ~50 % of remaining
+  ov002 is hand/`.s`-reachable (~2066 funcs — many waves of runway); keep
+  mining it. Recipe unchanged: `m2c_feed` draft → `#include ov002_core.h`
+  + guards → coerce → **3-region `ninja sha1`**; `.s` canonicalisation
+  residue via **`tools/asm_escape.py`** (REFUSE-guarded — it correctly
+  deferred 2 non-canonicalisation funcs in wave 10, zero false ships;
+  trust the REFUSE). (A) **Continue the open families** (`0229ade0` /
+  `021ff3bc` / `021ca2b8` + the `02253458` tail + any new uniform family).
+  (B) **Keep draining the `.s`-hatch class** (~93-func runway). Shape-
+  triage; **loop / liveness / whole-function-reg-numbering bodies stay
+  deferred** — they're the reg-alloc-walled cohort (brief 294 scouts
+  whether it's crossable). **Target ~15-20 picks.** Bank sub-recipes.
+  Success = per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave11`.
 
 ### Closed briefs (reference)
 
+- **Brief 293** — `decomper`, shipped in PR #793. ✅ **16 cold-RE picks
+  (12 `.s` + 4 `.c`), 3-region SHA1 PASS — the `.s` hatch is a mechanical
+  drain step.** Drained 12 of the canonicalisation class via
+  `tools/asm_escape.py` (byte-near C → run tool → ship the byte-verified
+  `.s`) + 4 `.c` family members. **The REFUSE guard caught 2
+  non-canonicalisation funcs** (a count mismatch + a whole-function
+  reg-numbering wall, `0220623c`) — deferred with **zero false ships**
+  (the safety property working). complete_units 2660 → 2676 (+16;
+  matched_functions also +16).
+- **Brief 292** — `scaffolder`, shipped in PR #792. 🧭 **Consolidated the
+  `.s` tools + mapped the project's ceiling.** (A) Standardized on
+  `asm_escape.py` (folded in `gen_asm_tu.py`'s conditional-shift + `b`/
+  `blx` coverage; retired `gen_asm_tu.py`; regression-verified). (B) **The
+  hard bucket: of remaining ov002 (3156 funcs / 1.05 MB), the current
+  toolkit reaches ~50 % of bytes; ~46 % is reg-alloc-walled** — the loop
+  cohort is **85 % call-in-loop** (only ~10 % simple-leaf loops
+  hand-match), plus the call-heavy `>0x200` band. **The permuter doesn't
+  cross it even on large funcs** (−37 % scheduling, 0 matches). The walled
+  cohort needs a new reg-alloc-aware capability → brief 294 scouts prior
+  art.
 - **Brief 291** — `decomper`, shipped in PR #790. ✅ **16 cold-RE picks
   (7 `.c` + 9 `.s`), 3-region SHA1 PASS — sink families opened + the `.s`
   hatch productionized.** Opened the `0229ade0` / `021ff3bc` / `021ca2b8`
