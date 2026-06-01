@@ -84,7 +84,7 @@ def parse_objdump(text: str, func: str) -> list[dict]:
 
 def hex_imm(mn: str) -> str:
     """mwasmarm wants hex immediates: `#20` -> `#0x14`."""
-    return re.sub(r"#(\d+)\b", lambda m: "#0x%x" % int(m.group(1)), mn)
+    return re.sub(r"#(\d+)\b", lambda m: f"#0x{int(m.group(1)):x}", mn)
 
 
 def to_mwasm(mn: str) -> str:
@@ -146,7 +146,7 @@ def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], lis
     if len(code_m) != len(code_o):
         refusals.append(f"instruction count differs: C={len(code_m)} orig={len(code_o)}")
         return fixes, refusals
-    for i, (a, b) in enumerate(zip(code_m, code_o)):
+    for i, (a, b) in enumerate(zip(code_m, code_o, strict=False)):
         if a["reloc"] and b["reloc"]:
             if a["reloc"] != b["reloc"]:
                 refusals.append(f"[{i}] reloc target {a['reloc']} vs {b['reloc']}")
@@ -173,7 +173,7 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
         lit[a] = f"_LIT{i}"
     externs = sorted({w["reloc"] for w in orig if w["reloc"]})
 
-    head = ["; %s — .s escape hatch (brief 290): mwcc is byte-identical except" % func,
+    head = [f"; {func} — .s escape hatch (brief 290): mwcc is byte-identical except",
             "; the commutative add-operand order below (a CSE'd-temp wall, brief 288)."]
     for idx, my_mn, orig_mn in fixes:
         head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
@@ -184,7 +184,7 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple]) -> str:
     body, pool = [], []
     for w in orig:
         if w["addr"] in lit:
-            val = w["reloc"] if w["reloc"] else "0x%08x" % int(w["bytes"], 16)
+            val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
             pool.append(f"{lit[w['addr']]}: .word {val}")
             continue
         mn = to_mwasm(w["mnem"])
@@ -238,7 +238,7 @@ def bytes_match(a_obj: str, orig_obj: str, func: str) -> tuple[bool, list[str]]:
     a = parse_objdump(disasm(a_obj), func)
     o = parse_objdump(disasm(orig_obj), func)
     diffs = []
-    for i, (x, y) in enumerate(zip(a, o)):
+    for i, (x, y) in enumerate(zip(a, o, strict=False)):
         if x["reloc"] and y["reloc"]:
             if x["reloc"] != y["reloc"]:
                 diffs.append(f"[{i}] reloc {x['reloc']} vs {y['reloc']}")
