@@ -8,42 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#801 + #802 merge. Brain on Mac.
-**Brief 298 (header de-dupe + last tier map, scaffolder) + brief 299 (cold-RE
-wave 13 — 12 picks, decomper) both shipped. +12. The header is now single-
-canonical (`src/overlay002/ov002_core.h`; the research duplicate is gone) and
-**every reachable ov002 tier is mapped** — the research arc is fully done. A
-header-edit collision (both touched it) auto-merged + 3-region SHA1-validated;
-**header ownership → decomper henceforth.** The scaffolder pivots to
-**pre-mapping the next overlay (ov006)** — non-redundant, zero-collision
-forward-prep (300); decomper wave 14 (301).**
+**Last updated:** 2026-05-30, post-#804 + #805 merge. Brain on Mac.
+**Brief 300 (ov006 pre-map + cross-overlay confirmation, scaffolder) + brief
+301 (cold-RE wave 14 — 12 picks, decomper) both shipped. +12. The role pivot
+worked — clean separation, **zero collision** (scaffolder on ov006, decomper
+sole-owns ov002 build files). Strategic confirmation: **the reachable playbook
+generalizes across overlays** (ov006 84 % / ov004 79 % / ov011 89 % reachable)
+— the post-ov002 runway is real and uniform, not a cliff. Next: scaffolder
+builds the last toolkit piece (whole-function ship-as-`.s` endgame mode, 302);
+decomper wave 15 (303).**
 
-**Current metrics (post-#801 + #802 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on afb71b4, clean tree):**
-**+12 `complete_units`** (2704 → 2716) — the headline (all `.c`).
-`matched_functions` also +12 (2741 → 2753). The % (2716 / 4117 = 65.97) is
+**Current metrics (post-#804 + #805 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on d4be779, clean tree):**
+**+12 `complete_units`** (2716 → 2728) — the headline (all `.c`).
+`matched_functions` also +12 (2753 → 2765). The % (2728 / 4134 = 65.99) is
 denominator-noisy — **lead with the absolute +N**.
 
-✅ **Brief 299 — 12 cold-RE picks (all `.c`, `<0x100`), 3-region SHA1 PASS.**
-Continued the `<0x100` fast zone (incl. the `021d730c` lookup-post family).
-Its new header sinks auto-merged cleanly with the scaffolder's consolidation
-(brain-validated by the 3-region gate on the merged header).
+✅ **Brief 301 — 12 cold-RE picks (all `.c`, `<0x100`), 3-region SHA1 PASS.**
+Continued the `<0x100` fast zone (the `021d479c` event-post family — still
+rich). Added its sink decl directly to `ov002_core.h` (sole owner; zero
+header collision this round).
 
-🧹 **Brief 298 — header de-duped; the reachable map is complete.**
-`ov002_core.h` is now one canonical build file (research duplicate deleted).
-Last tier mapped: **`>0x200` non-loop (197 funcs) is 95 % dispatcher** —
-reachable, highest per-function effort. Every reachable tier now mapped.
+🗺️ **Brief 300 — ov006 pre-mapped; the runway holds across overlays.** The
+`<0x100`-reachable playbook **generalizes**: ov006 84 % reachable
+(simple-dominated), ov004 79 %, ov011 89 % — *not a cliff*. ov006 is the next
+target and even faster (56 % of its reachable callers hit only matched sinks).
+Starter `docs/research/ov006_core.h` sketched.
 
-🧭 **Where we are: pure steady-state execution.** Endgame settled (C-drain the
-~50 % reachable, ~100 waves; ship-as-`.s` the ~46 % walled tail at the end);
-research arc done; reachable map complete; header consolidated + decomper-owned.
-The decomper is the engine (~12-16/wave). **Scaffolder-role call (user
-deferred to brain):** co-drain was the speed option, but this round's header
-collision showed the build-file merge friction isn't worth it for a non-tech-
-owned grind — so the scaffolder stays in its zero-collision lane: **forward-prep
-(pre-map ov006, the next overlay — brief 300).** User can still pick co-drain
-for max speed (brain manages the friction) on request. Settled-permanent: P-11,
-P-15. ntrtwl branch parked indefinitely (land/drop on request).
+🧭 **Where we are: steady-state execution; toolkit nearly complete.** Endgame
+settled (C-drain the ~50 % reachable; ship-as-`.s` the walled tail) and now
+**confirmed to hold across overlays** — many overlays of reachable runway
+after ov002. The decomper is the engine (~12-16/wave). The scaffolder's
+forward-prep is nearly exhausted; **brief 302 builds the last toolkit piece**
+(the whole-function ship-as-`.s` endgame mode — readiness for the walled tail).
+After it, the scaffolder's distinct work winds down → **co-drain (speed, on
+request) or occasional cadence.** Settled-permanent: P-11, P-15. ntrtwl branch
+parked indefinitely (land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
