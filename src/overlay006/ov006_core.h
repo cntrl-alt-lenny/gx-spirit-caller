@@ -150,4 +150,73 @@ extern void func_020057dc(void (*cb)(void));   /* default-handler register */
 extern void func_0201261c(void);
 extern void func_020071a4(int, int, void *);
 
+/* =======================================================================
+ * §VERIFIED — brief 309 wave 3 (byte-proven, same EUR-objdiff gate). 27 .c.
+ * The SAME 8-state machine, drained much deeper: this wave banks the per-state
+ * "full init" (0x220), "enter" (0x44/0x80), "step" (0x70/short), "finalize"
+ * (0x40), "audio init" (0xa4/0xc4) methods + the main-engine BGn toggle and two
+ * more dispatch variants. Structs: 021cf140 0224f1b0 0224f1fc 0224f248 0224f290
+ * 0224f2e8 0224f330 0224f38c (+ audio sub-structs 0224f1c0 0224f20c 0224f254
+ * 0224f2f4). Full recipes: docs/research/brief-309-ov006-wave3-drain.md.
+ * ======================================================================= */
+
+/* --- "full init" family (7 members, the headline) ----------------------
+ * int f(int a): bind 4 VRAM banks via func_02094504, reset engines, configure
+ * the 2D engines one of two ways per `a`, blank main DISPCNT mode, switch the
+ * sub engine into display mode, prime two render flags, arm frame/HBlank IRQs,
+ * then `state[2] = a; return 1`. ~0x220 each; CLONE-BY-ONE-WORD — members differ
+ * ONLY in the trailing per-state struct pointer. mwcc reproduces every quirk
+ * (mov r2,r0/r1 const-reuse, the `a==0` branchless bool, the 5-arg stack call)
+ * with no coaxing. Members↔struct: 021b2400·021cf140 021b2fb0·0224f1b0
+ * 021b359c·0224f1fc 021b3b40·0224f248 021b43d8·0224f290 021b4ad8·0224f2e8
+ * 021b50b0·0224f330. (Each member's end = the state's family-D enter start.) */
+extern int func_ov006_021b2400(int);          /* full-init seed; clone for the rest */
+
+/* --- "enter" families (call the full-init, then per-subobject setup) ----
+ * 0x44 (2): f43d8/f50b0(arg); 2nd-subsystem(dataX, state[3]); 3rd(dataY);
+ *           state[0]=4; return 1.   021b46b8·0224f290  021b5390·0224f330.
+ * 0x80 (3): f359c/f3b40/f4ad8(1); func_ov006_021b9ef8(0225c4dc, K, 0); then 6
+ *           fixed per-subobject calls; state[0]=4; return 1. K (mode) varies:
+ *           021b387c(0224f1fc,K=2) 021b3e20(0224f248,K=3) 021b4db8(0224f2e8,K=5). */
+extern void func_ov006_021b9ef8(void *, int, int);
+
+/* --- "step" family (7 fixed per-subobject updates + enter, 0x70 / short) -
+ * func_ov006_021cb0a0/_021cac30/_021c9ef4/_021c757c/_021c6990/_021c159c/_021ba090
+ * over the seven 0225xxxx subobjects, then the state's family-D enter, then
+ * `state[0]=1; return 1` (the mov #1 is reused as both the store and the return).
+ *  021b3ea0(0224f248,enter 021b3d60)  021b4e38(0224f2e8,enter 021b4cf8).
+ *  021b5a2c: the 8th state's trimmed step (one update + enter 021b5924, state
+ *  0224f38c). */
+
+/* --- "finalize" family (0x40, 2 members) -------------------------------
+ *   f64d0/f6694(data448, state[3]); 4 fixed shutdown calls; state[0]=5; return 1.
+ *   021b2f70·0224f1b0  021b355c·0224f1fc.  (data_ov006_0224f448 is the shared arg.) */
+extern char data_ov006_0224f448[];            /* shared "enter"/"finalize" arg ptr */
+
+/* --- main-engine DISPCNT BGn toggle (0x58, 3 leaf members) --------------
+ * The MAIN-engine (0x04000000) twin of wave-2 family E — same dup-RMW-per-branch
+ * recipe, `int f(void *this, int on)`, leaf (`bx lr`). Toggled bits: 0x2 →
+ * 021c1770 021c5d98; 0xc → 021c6fa0. */
+
+/* --- "audio init" family (0xa4 plain / 0xc4 channel-gated) --------------
+ * Open the per-state sound bank, program the active channel into the mixer
+ * stages, set master volume, bind the wave archive (func_0200197c(4, 021cf1b0,
+ * 0x80000)), route the channel, prime the handle, fire func_020373cc(0x24,1,0,-1),
+ * then `status[0] = 2; return 1`. The channel is the low 3 bits of word[1] of the
+ * global mode object data_02104f4c — read it through an unsigned :3 bitfield so
+ * mwcc emits the `lsl #29; lsr #29` extraction (an `& 7` would emit `and`). The
+ * -1 arg materialises as `sub r3,r2,#1` (reusing the 0) with no coaxing.
+ * 0xa4 (3): 021b2324(bank 021cf174,status 021cf140) 021b3a64(0224f254,0224f248)
+ *           021b49fc(0224f2f4,0224f2e8).
+ * 0xc4 (2): adds `if (chan==0) func_020018d4(0xa0); else func_02001b18(0xa2);`
+ *   — write the test as `==0` so the ==0 path is the fall-through the orig uses.
+ *   021b2eac(bank 0224f1c0,status 0224f1b0) 021b3498(0224f20c,0224f1fc). */
+extern struct { int w0; unsigned chan : 3; } data_02104f4c;  /* global mode; chan=word[1]&7 */
+
+/* --- dispatch variants (extend family A, 0x5c, 2 members) ---------------
+ * Same  cb = table[state[0]]; if (cb){ if(cb()) state[1]=0; return 0; }  core;
+ * no-cb tail does func_020071a4(4, 1, data) then returns a per-member constant:
+ *   021b22c8: state 021cf140 / table 021cbac0 / data 021d6ed0 — tail returns 1.
+ *   021b343c: state 0224f1fc / table 021cbb20 / data 021cb518 — tail returns 0. */
+
 #endif /* OV006_CORE_H */
