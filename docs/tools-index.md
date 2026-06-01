@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**82 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**81 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (14)
+- [Uncategorised](#uncategorised) (13)
 
 ## Analysis / worklist
 
@@ -502,12 +502,6 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
-
-### `tools/gen_asm_tu.py`
-
-**convert a m2c_feed GAS dump of an orig function into a**
-
-mwasmarm-assemblable .s translation unit (the brief-290 ".s escape hatch").
 
 ### `tools/objdiff_filter_panic_units.py`
 
