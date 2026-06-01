@@ -87,4 +87,67 @@ extern void func_02006e1c(int);               /* main-arm9 sink (also used by 02
 extern char data_ov006_02257548[];            /* u16 fields +0x6c/+0x76 — 021be558 delta-compare */
 /* data_ov006_021cf140 (above): the notify-on-truthy status word (021b2b08/2c9c, matched on branch). */
 
+/* =======================================================================
+ * §VERIFIED — brief 307 wave 2 (byte-proven, same EUR-objdiff gate). 26 .c:
+ * three 8-member clone families (D/E/F) + two dispatch-family variants.
+ * Full recipes + per-pick table: docs/research/brief-307-ov006-wave2-drain.md.
+ * The D/E/F families and the dispatch family are the per-state methods of the
+ * SAME state machine (they share the 0224f1xx/0224f2xx/0224f3xx structs).
+ * ======================================================================= */
+
+/* --- family D: display-blank "enter" (8 members) -----------------------
+ * Clear both engines' DISPCNT display-mode bits, run the per-frame update,
+ * then fire the teardown hook iff the per-state struct's +8 word is live:
+ *   *(vu32*)0x04000000 &= ~0x1f00; *(vu32*)0x04001000 &= ~0x1f00;
+ *   func_020210b8(); if (state[2]) func_0200ad90(); return 1;
+ * Clone by the per-state struct (same structs as the dispatch family).
+ * gotcha: write the SUB register as an inline cast `*(vu32*)0x04001000`,
+ * NOT derived from the main pointer, or mwcc swaps the r0/r1 value/address
+ * allocation (61% vs 100%).
+ * Members: 021b2620 021b31d0 021b37bc 021b3d60 021b45f8 021b4cf8 021b52d0
+ *          021b5924  (structs 021cf140 0224f1b0 0224f1fc 0224f248 0224f290
+ *          0224f2e8 0224f330 0224f38c). */
+extern void func_020210b8(void);              /* per-frame display update */
+extern void func_0200ad90(void);              /* teardown hook */
+extern int  data_ov006_0224f1b0[];            /* per-state struct (also 021b2e58 dispatch state) */
+extern int  data_ov006_0224f1fc[];            /* per-state struct */
+
+/* --- family E: sub-DISPCNT BGn toggle (8 members) ----------------------
+ *   int f(void *this, int on) {
+ *     vu32 *r = (vu32*)0x04001000;
+ *     if (on) { u32 mode=(*r&0x1f00)>>8, base=*r&~0x1f00;
+ *               *r = base | ((mode |  BIT) << 8); }
+ *     else    { ...                       (mode & ~BIT) ...        }
+ *     return 1; }
+ * gotcha: the RMW is DUPLICATED per branch (cmp at top); compute `mode` then
+ * `base` as separate temps IN THAT ORDER, or the allocation diverges.
+ * Members by BIT: 0x2 → 021c81c0 021ca400; 0x4 → 021c821c 021ca45c 021cadc8;
+ *  0x8 → 021bee68 021c4518 021c6640.  reg 0x04001000 throughout. */
+
+/* --- family F: per-state "enter"+probe (8 members) ---------------------
+ *   int f(void){ int a=021ba0f0(0225c4dc), b=021c15a4(0225cb5c);
+ *     021c6998(0225de70); INIT_A();
+ *     021ba1f0(0225c4dc); 021c1650(0225cb5c); 021c6a3c(0225de70); INIT_B();
+ *     int ok = a && b; if (ok) status[0] = VAL; return ok; }
+ * gotcha: store `a && b` to a temp so mwcc materialises the branchless
+ * cmp/cmpne/movne/moveq bool the orig uses. VAL varies per member (mostly 3).
+ * Members (INIT_A, INIT_B, status, VAL):
+ *   021b2804 (2668,2690,021cf140,3)   021b2de0 (2668,2690,021cf140,0xf)
+ *   021b33c4 (3218,3240,0224f1b0,3)   021b39a4 (3804,382c,0224f1fc,3)
+ *   021b3f10 (3da8,3dd0,0224f248,3)   021b493c (4640,4668,0224f290,6)
+ *   021b4ea8 (4d40,4d68,0224f2e8,3)   021b559c (5318,5340,0224f330,6) */
+extern int  func_ov006_021c15a4(void *);      /* probe B (returns status) */
+
+/* --- dispatch-family variants (extend brief-304 family A, 2 members) ---
+ * Same  cb = table[state[0]]; if (cb){ if(cb()) state[1]=0; return 0; }  core,
+ * but the no-callback tail does work (a real bl ⇒ no gotcha-5 predication):
+ *   021b2e58: state 0224f1b0 / table 021cbb08 — else func_020057dc(
+ *             func_0201261c); return 0;
+ *   021b4048: state 0224f290 / table 021cbb50, state[4]=2 prologue — else
+ *             func_020071a4(4, 1, &data_ov006_021cb518); return 1; */
+extern int (*data_ov006_021cbb08[])(void);     /* dispatch table — 021b2e58 */
+extern void func_020057dc(void (*cb)(void));   /* default-handler register */
+extern void func_0201261c(void);
+extern void func_020071a4(int, int, void *);
+
 #endif /* OV006_CORE_H */
