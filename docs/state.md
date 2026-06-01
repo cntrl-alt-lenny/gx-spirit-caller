@@ -8,44 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#783 + #784 merge. Brain on Mac.
-**Brief 286 (`ov002_core.h` proven, scaffolder) + brief 287 (cold-RE wave 7 —
-15 picks, decomper) both shipped. The multiplier worked: the `0x868` accessor
-family batched on one recipe to **+15 — the biggest wave yet** (~80 members
-remain). The scaffolder delivered a byte-verified core-types header. Next:
-scaffolder cracks the sharp add-order residue (288); decomper adopts the header
-+ keeps batching the families on wave 8 (289).**
+**Last updated:** 2026-05-30, post-#786 + #787 merge. Brain on Mac.
+**Brief 288 (add-order residue = C-wall → `.s` hatch, scaffolder) + brief 289
+(cold-RE wave 8 — 17 picks, decomper) both shipped. New record wave (+17): the
+decomper adopted `ov002_core.h` into the build + opened the `02253458` family
+(16 members, "cleanest yet"). The residue class is settled — an honest C-wall
+the permuter can't touch, shippable via the `.s` asm hatch. Next: scaffolder
+productionizes the `.s` hatch (290); decomper opens the remaining sink families
++ ships the residue via `.s` (291).**
 
-**Current metrics (post-#783 + #784 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on bf3a38a, clean tree):**
-`complete_units 2627 / 3979` (**+15** vs prior 2612) · `matched_functions
-2664 / 9801` (**+15**). ⚠️ **The % ticked DOWN 66.11 → 66.02 % — NOT a
-regression** (3-region SHA1 all PASS, +15 real functions). The reconfigure
-grew the unit-denominator +28 (3951 → 3979) as the 15 delink blocks re-split
-units — a known `complete_units` instability. **The monotonic view is
-`matched_functions / 9801 = 27.18 %`** (stable denominator) and the absolute
-**+15 functions**. Treat the absolute count, not the %, as the signal.
+**Current metrics (post-#786 + #787 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 27ca112, clean tree):**
+**+17 `complete_units`** (2627 → 2644) — the SHA1-aligned ship count, the
+headline (ticks for `.c` AND `.s`). `matched_functions` also +17 (2664 →
+2681) this round, but it **under-counts `.s` ships** (zero relocs; metric
+canon) so it will diverge once brief 291's `.s` batch lands — secondary.
+⚠️ **Don't track the `complete_units` *percentage*** (2644 / 4012 = 65.90,
+down from 66.02): the reconfigure grows `total_units` as units re-split
+(+33 this round), so the ratio is noisy — **NOT a regression** (3-region
+SHA1 all PASS, +17 real). **Lead with the absolute +N per round.**
 
-✅ **Brief 287 — 15 cold-RE picks, 3-region SHA1 PASS — the multiplier wave.**
-The `0x868` accessor family batched on one recipe (rep `021e77fc` locked the
-skeleton; 14 guard/tail variants). Not a blind template but the skeleton is
-uniform. ~80 members remain → wave 8. Banked sub-recipes (b0-guard operand
-order; `idx>4` vs `>=5`; f30 `mla`-fold). Residue → permuter: a sharp
-**5-member add-order group** (gotcha-19, one root cause).
+✅ **Brief 289 — 17 cold-RE picks, 3-region SHA1 PASS — record wave + header
+adopted.** `ov002_core.h` now in `src/overlay002/` + `#include`d (kills the
+per-pick struct boilerplate). Opened the **`02253458` "post list event"
+family** (16/17 members; read the guard chain, assemble — the cleanest
+template yet). Deferred → `.s` / permuter: 3 key-decode + 3 add-order.
 
-🧱 **Brief 286 — `ov002_core.h` proven.** A research-artifact header
-(per-player `0x868` layout + sub-row + `f30:13`/`b0` bitfields + 9 shared-sink
-signatures), **byte-verified on 8 sample members across 4 families**. The
-decomper copies it into the build path + `#include`s it (brief 289) → the
-~225-func family worklist batches with shared validated types.
+⚖️ **Brief 288 — add-order residue = honest permanent C-wall.** No source
+lever; the permuter does NOT crack it (1484 iters, 0 matches). Refines brief
+276: the permuter needs **reschedulable slack** (larger funcs) — useless on
+tight `<0x100` accessors. Home = the **`.s` asm escape hatch** (one-instruction
+flip; precedent `021ff3bc.s`). Closed, not an open defer.
 
-🧭 **Where we are: the family batch-drain is the engine.** Wave 7 hit +15 on
-one recipe; ~80 accessor members + the shared-sink families (~225 total) are
-queued behind the proven header. Live levers: **brief 288** = scaffolder cracks
-the 5-member add-order residue (source lever, or the permuter's *favorable*
-scheduling-class case); **brief 289** = decomper wave 8 adopts `ov002_core.h`
-and batches the families. The reg-alloc-walled cohorts (the 574 ov002 loops +
-the `>0x200` = 49 % of unmatched bytes) still wait for a tool.
+🧭 **Where we are: the batch-drain is the engine; the residue now has a home.**
++17 this wave; the shared-sink families (`0229ade0` ×46, `021ff3bc` ×37,
+`021ca2b8` ×35) are queued behind the proven header. Live levers: **brief 290**
+= scaffolder productionizes the `.s` escape-hatch generator (the
+canonicalisation residue recurs ~3-5/wave) + sizes the class; **brief 291** =
+decomper wave 9 opens the remaining sink families + ships the residue via `.s`.
+The reg-alloc-walled cohorts (the 574 ov002 loops + the `>0x200` = 49 % of
+unmatched bytes) still wait for a tool.
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
