@@ -8,45 +8,41 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#795 + #796 merge. Brain on Mac.
-**Brief 294 (reg-alloc wall scout, scaffolder) + brief 295 (cold-RE wave 11 —
-14 picks, decomper) both shipped. +14. **The strategic arc is complete:** the
-scout RESOLVED the endgame — the reg-alloc wall is unsolved *everywhere* (the
-whole mwcc scene runs the same permuter; ship-as-`.s` is the scene-standard
-endgame for the walled tail; all mwcc C-levers inert). So the plan is settled:
-keep draining the ~50 % reachable in C (~130 waves), ship-as-`.s` the ~46 %
-walled tail at the end. Now steady-state execution. Next: scaffolder pre-maps
-the `0x100-0x200` tier to hold velocity (296); decomper wave 12 (297).**
+**Last updated:** 2026-05-30, post-#798 + #799 merge. Brain on Mac.
+**Brief 296 (`0x100-0x200` tier map + header, scaffolder) + brief 297 (cold-RE
+wave 12 — 14 picks, decomper) both shipped. +14. Steady-state execution: the
+decomper drains the `<0x100` fast zone (~12/wave) + opened the `0x100-0x200`
+tier (~3-6/wave, composite/slower). **The scaffolder's research arc is
+wrapping** — its maps now partly duplicate the decomper's self-triage. Next:
+scaffolder de-dupes the header + maps the last reachable tier (298, a capstone);
+decomper wave 13 (299). Open question for the user: the scaffolder's role
+post-research (co-drain a slice / forward-prep / lower cadence).**
 
-**Current metrics (post-#795 + #796 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 189e38e, clean tree):**
-**+14 `complete_units`** (2676 → 2690) — the headline. This wave = 5 `.s` +
-9 `.c`. `matched_functions` also +14 (2713 → 2727). ⚠️ The `complete_units` %
-(2690 / 4080 = 65.93) is denominator-noisy — **lead with the absolute +N**.
+**Current metrics (post-#798 + #799 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 0a7eea9, clean tree):**
+**+14 `complete_units`** (2690 → 2704) — the headline (all `.c` this wave).
+`matched_functions` also +14 (2727 → 2741). The % (2704 / 4103 = 65.90) is
+denominator-noisy — **lead with the absolute +N**.
 
-✅ **Brief 295 — 14 cold-RE picks (5 `.s` + 9 `.c`), 3-region SHA1 PASS.**
-Continued the reachable `<0x100` drain — open families + 5 `.s`-hatch picks.
-Deferred (correctly): register-numbering + bit-order walls (`bit14 ^ bit0`
-swaps the `lsl`s — sibling to reg-numbering, not C-controllable).
+✅ **Brief 297 — 14 cold-RE picks (all `.c`), 3-region SHA1 PASS.** 12 from the
+`<0x100` tail + 2 opening the `0x100-0x200` tier. Velocity on the new tier
+~3-6/wave (composite bodies, per-function hand-RE — no batch-clone).
 
-🧭 **Brief 294 — the reg-alloc wall is unsolved everywhere; endgame settled.**
-No allocation oracle / reg-alloc-aware permuter exists anywhere; the scene's
-endgame for the unmatchable tail is **ship-as-`.s`** (`NON_MATCHING` /
-`GLOBAL_ASM`) — exactly our `.s` hatch. All untried mwcc levers inert
-(`register` ignored by mwcc 2.0; duplication folds; `volatile` no-op). So:
-**C-drain the reachable now, `.s`-tail the walled ~46 % at the end.**
+🗺️ **Brief 296 — the `0x100-0x200` tier map.** 58 % reachable (404 non-loop) /
+42 % loop-walled; reuses the `<0x100` vocabulary (same hubs / sinks) but the
+reachable members are **composite** (3-7 sinks, no pure wrappers) → shared
+header vocabulary is the lever, not batch-clone. ⚠️ Header divergence (two
+copies) → de-dupe in 298.
 
-🧭 **Where we are: steady-state execution — the research arc is done.** The
-family batch-drain + `.s` hatch clear the reachable cohort at ~14-16/wave;
-**~130 waves of ov002 runway remain**. Endgame settled (ship-as-`.s` tail; the
-user can steer the philosophy but the default plan holds). Now the job is
-throughput: **brief 296** = scaffolder pre-maps the `0x100-0x200` band (695
-funcs — the next tier up) + extends `ov002_core.h`, so velocity holds as the
-`<0x100` sweet spot depletes; **brief 297** = decomper wave 12 keeps draining
-`<0x100` + begins the `0x100-0x200` tier.
-Settled-permanent: P-11, P-15. The ntrtwl branch
-(`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
-land/hold call.
+🧭 **Where we are: steady-state execution; the research arc is done.** Endgame
+settled (C-drain the ~50 % reachable now, ~130 waves; ship-as-`.s` the ~46 %
+walled tail at the end). The decomper is the engine. **The scaffolder's
+research/mapping is winding down** (the decomper self-serves maps) — brief 298
+is a capstone (header de-dupe + the last tier map); after it the open question
+is the scaffolder's role: **co-drain a disjoint slice** for throughput, keep on
+forward-prep, or run on a lower cadence. Settled-permanent: P-11, P-15. The
+ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) is parked indefinitely — no
+action pending (land/drop on request; no longer surfaced each round).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
