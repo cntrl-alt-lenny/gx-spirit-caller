@@ -8,41 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#798 + #799 merge. Brain on Mac.
-**Brief 296 (`0x100-0x200` tier map + header, scaffolder) + brief 297 (cold-RE
-wave 12 — 14 picks, decomper) both shipped. +14. Steady-state execution: the
-decomper drains the `<0x100` fast zone (~12/wave) + opened the `0x100-0x200`
-tier (~3-6/wave, composite/slower). **The scaffolder's research arc is
-wrapping** — its maps now partly duplicate the decomper's self-triage. Next:
-scaffolder de-dupes the header + maps the last reachable tier (298, a capstone);
-decomper wave 13 (299). Open question for the user: the scaffolder's role
-post-research (co-drain a slice / forward-prep / lower cadence).**
+**Last updated:** 2026-05-30, post-#801 + #802 merge. Brain on Mac.
+**Brief 298 (header de-dupe + last tier map, scaffolder) + brief 299 (cold-RE
+wave 13 — 12 picks, decomper) both shipped. +12. The header is now single-
+canonical (`src/overlay002/ov002_core.h`; the research duplicate is gone) and
+**every reachable ov002 tier is mapped** — the research arc is fully done. A
+header-edit collision (both touched it) auto-merged + 3-region SHA1-validated;
+**header ownership → decomper henceforth.** The scaffolder pivots to
+**pre-mapping the next overlay (ov006)** — non-redundant, zero-collision
+forward-prep (300); decomper wave 14 (301).**
 
-**Current metrics (post-#798 + #799 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 0a7eea9, clean tree):**
-**+14 `complete_units`** (2690 → 2704) — the headline (all `.c` this wave).
-`matched_functions` also +14 (2727 → 2741). The % (2704 / 4103 = 65.90) is
+**Current metrics (post-#801 + #802 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on afb71b4, clean tree):**
+**+12 `complete_units`** (2704 → 2716) — the headline (all `.c`).
+`matched_functions` also +12 (2741 → 2753). The % (2716 / 4117 = 65.97) is
 denominator-noisy — **lead with the absolute +N**.
 
-✅ **Brief 297 — 14 cold-RE picks (all `.c`), 3-region SHA1 PASS.** 12 from the
-`<0x100` tail + 2 opening the `0x100-0x200` tier. Velocity on the new tier
-~3-6/wave (composite bodies, per-function hand-RE — no batch-clone).
+✅ **Brief 299 — 12 cold-RE picks (all `.c`, `<0x100`), 3-region SHA1 PASS.**
+Continued the `<0x100` fast zone (incl. the `021d730c` lookup-post family).
+Its new header sinks auto-merged cleanly with the scaffolder's consolidation
+(brain-validated by the 3-region gate on the merged header).
 
-🗺️ **Brief 296 — the `0x100-0x200` tier map.** 58 % reachable (404 non-loop) /
-42 % loop-walled; reuses the `<0x100` vocabulary (same hubs / sinks) but the
-reachable members are **composite** (3-7 sinks, no pure wrappers) → shared
-header vocabulary is the lever, not batch-clone. ⚠️ Header divergence (two
-copies) → de-dupe in 298.
+🧹 **Brief 298 — header de-duped; the reachable map is complete.**
+`ov002_core.h` is now one canonical build file (research duplicate deleted).
+Last tier mapped: **`>0x200` non-loop (197 funcs) is 95 % dispatcher** —
+reachable, highest per-function effort. Every reachable tier now mapped.
 
-🧭 **Where we are: steady-state execution; the research arc is done.** Endgame
-settled (C-drain the ~50 % reachable now, ~130 waves; ship-as-`.s` the ~46 %
-walled tail at the end). The decomper is the engine. **The scaffolder's
-research/mapping is winding down** (the decomper self-serves maps) — brief 298
-is a capstone (header de-dupe + the last tier map); after it the open question
-is the scaffolder's role: **co-drain a disjoint slice** for throughput, keep on
-forward-prep, or run on a lower cadence. Settled-permanent: P-11, P-15. The
-ntrtwl branch (`brain/ntrtwl-vendor-pool-review`) is parked indefinitely — no
-action pending (land/drop on request; no longer surfaced each round).
+🧭 **Where we are: pure steady-state execution.** Endgame settled (C-drain the
+~50 % reachable, ~100 waves; ship-as-`.s` the ~46 % walled tail at the end);
+research arc done; reachable map complete; header consolidated + decomper-owned.
+The decomper is the engine (~12-16/wave). **Scaffolder-role call (user
+deferred to brain):** co-drain was the speed option, but this round's header
+collision showed the build-file merge friction isn't worth it for a non-tech-
+owned grind — so the scaffolder stays in its zero-collision lane: **forward-prep
+(pre-map ov006, the next overlay — brief 300).** User can still pick co-drain
+for max speed (brain manages the friction) on request. Settled-permanent: P-11,
+P-15. ntrtwl branch parked indefinitely (land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
