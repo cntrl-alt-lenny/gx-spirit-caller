@@ -143,28 +143,38 @@ related to open issues #17 / #20 / #23.
 
 ## Current round-trip status (all three regions)
 
-With the workaround above plus the rest of the pipeline, `ninja rom`
-succeeds end-to-end for all three regions and produces
-`gx-spirit-caller_<eur|usa|jpn>.nds`. Module-level checksum state vs
-the baserom (from `dsd check modules`):
+**Byte-identical ROM rebuild achieved — all three regions.** `ninja rom`
+builds `gx-spirit-caller_<eur|usa|jpn>.nds`, and `ninja sha1` (the
+project's final gate) now PASSES byte-for-byte against each baserom.
+All 27 modules × 3 regions check green (`dsd check modules`) — the
+former ARM9 main / DTCM / overlay 4 checksum diffs are resolved.
 
-| Module       | EUR              | USA              | JPN              |
-|--------------|------------------|------------------|------------------|
-| ARM9 main    | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
-| ITCM         | ✅ OK            | ✅ OK            | ✅ OK            |
-| DTCM         | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
-| Overlay 0    | ✅ OK            | ✅ OK            | ✅ OK            |
-| Overlay 1–3  | ✅ OK            | ✅ OK            | ✅ OK            |
-| Overlay 4    | ❌ checksum diff | ❌ checksum diff | ❌ checksum diff |
-| Overlay 5–23 | ✅ OK            | ✅ OK            | ✅ OK            |
+Re-verified 2026-06-01: for each of `eur` / `usa` / `jpn`,
+`python tools/configure.py <ver> && rm -f objdiff.json
+gx-spirit-caller_<ver>.nds && ninja sha1` exits 0 (`sha1.py` reports
+`OK`; `cmp -l` against the baserom reports 0 differing bytes).
 
-**24 of 27 modules round-trip byte-identically per region** — the same
-exact pattern across all three. The 3 failures are almost certainly
-artifacts of the placeholder symbols that
-`--allow-unknown-function-calls` injected; expect them to resolve as the
-cross-module relocations in ARM9 main / DTCM / overlay 4 are manually
-filled in (or as the upstream analyzer improves). `ninja sha1` is the
-final gate and will stay red until all 27 modules check green.
+How the last bytes closed: with every module's checksum green, `ninja
+sha1` still diffed on bytes *outside* dsd's per-module coverage (FNT /
+FAT, ROM header, overlay table). Brief 137 scoped that residual — see
+[`docs/research/sha1-gap-scoping.md`](docs/research/sha1-gap-scoping.md)
+— and briefs 138–140 closed it with three build-chain fixes:
+
+1. **`.DS_Store` build-junk filter** (brief 138, PR #555):
+   `tools/clean_macos_junk.py` strips macOS metadata from
+   `extract/<region>/files/` before `dsd rom build` scans it — this
+   alone collapsed the EUR diff from 100,805 → 5 bytes (99.995% of it).
+2. **`patch_ov004_veneers.py` off-by-1024 fix** (brief 140, PR #558):
+   the idempotent re-run path no longer derives a 1024-bytes-short
+   `code_size`, so ov4's overlay-table `ram_size` matches orig.
+3. **ROM-header CRC16 patcher** (brief 140, PR #558):
+   `tools/patch_rom_header_crc.py` writes the secure-area CRC at `0x6C`
+   (copied from orig) and the header CRC at `0x15E` (computed) — both
+   left unset by `dsd rom build`.
+
+These took EUR to 0 bytes; the 2-byte USA / JPN main
+function-displacement the scoping doc flagged out-of-scope (Cat ζ) has
+since closed too, so all three regions match — not just EUR.
 
 `configure.py` filters per-region source trees automatically:
 `src/<region>/` is region-specific (USA / JPN ports from
