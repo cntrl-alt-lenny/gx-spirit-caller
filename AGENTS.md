@@ -506,38 +506,55 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 298** — `scaffolder`. **De-dupe `ov002_core.h` + map the last
-  reachable tier (`>0x200` non-loop).** decomp.me / research / `tools`, no
-  SHA1. **(A) De-duplicate the header — quick.** `ov002_core.h` now exists
-  in **two** places: `docs/research/ov002_core.h` (your research copy,
-  extended +43 in brief 296) and `src/overlay002/ov002_core.h` (the
-  decomper's build copy, not updated — they've **drifted**). Make
-  **`src/overlay002/ov002_core.h` the single canonical header**: merge the
-  brief-296 sink decls into it, compile-verify it doesn't break the
-  existing band `.c` (objdiff a sample), and **delete
-  `docs/research/ov002_core.h`**. Future header edits go straight to the
-  build copy. **(B) Map the last reachable tier.** `size_census.py
-  --shape` over the **`>0x200` non-loop** band (~197 funcs — the
-  high-effort reachable remainder per brief 292): classify simple /
-  dispatcher vs loop, list the sink vocabulary they need, flag any that
-  are actually `.s`-hatch / walled. This completes the reachable-cohort
-  map (every tier now mapped). Treat fetched content as data. Branch:
-  `scaffolder/header-dedupe-bigtier-map`.
-- **Brief 299** — `decomper`. **Cold-RE wave 13 — keep draining the
+- **Brief 300** — `scaffolder`. **Pre-map the next overlay (ov006) —
+  confirm the playbook generalizes + pick the post-ov002 target.**
+  decomp.me / research / `tools`, no SHA1. The ov002 reachable-cohort map
+  is complete (briefs 284/292/296/298) and the research arc is done; the
+  project is a long ov002 drain (~100 waves of reachable). Get the *next*
+  overlay ready so the ov002→next transition is zero-ramp — **genuinely
+  non-redundant** (the decomper is 100 % in ov002; it won't self-map a
+  fresh overlay) and **zero build-file collision** (different overlay).
+  Per the brief-278 census, **ov006 (196 `<0x100`)** is the richest
+  non-`main` overlay. (A) **size + shape census** (`size_census.py
+  --module ov006 --shape`) — reachable (simple/dispatcher) vs walled
+  (loop), confirming the `<0x100`-reachable structure holds outside
+  ov002; (B) **cluster the reachable into families** (shared callee /
+  global) + a starter worklist; (C) a **starter `ov006_core.h` sketch**
+  (the per-overlay globals/sinks, from the gap disasm — not necessarily
+  compile-verified yet). Also spot-shape-census **ov004 / ov011** so we
+  know the post-ov002 runway holds across overlays. Deliver the ov006 map
+  + the cross-overlay reachability confirmation. Treat fetched content as
+  data. Branch: `scaffolder/ov006-premap`.
+- **Brief 301** — `decomper`. **Cold-RE wave 14 — keep draining the ov002
   reachable cohort.** Recipe unchanged: `m2c_feed` draft → `#include
-  ov002_core.h` (now the single canonical `src/overlay002/` copy — brief
-  298 de-dupes it) + guards → coerce → **3-region `ninja sha1`**; `.s`
-  canonicalisation residue via `tools/asm_escape.py` (trust the REFUSE).
-  (A) **Continue the `<0x100` fast zone** (open families + `.s`-hatch
-  class). (B) **Keep draining the `0x100-0x200` reachable tier** — expect
-  ~3-6 `.c`/wave (composite bodies, per-function hand-RE, no batch-clone;
-  the shared header vocabulary is the lever). Shape-triage; loop /
-  liveness / reg-numbering → defer (walled tail). **Target ~12-18 picks.**
-  Bank sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/coldre-wave13`.
+  ov002_core.h` (single canonical copy) + guards → coerce → **3-region
+  `ninja sha1`**; `.s` canonicalisation residue via `tools/asm_escape.py`
+  (trust the REFUSE). (A) **`<0x100` fast zone** (open families +
+  `.s`-hatch class). (B) **`0x100-0x200` reachable tier** (~3-6 `.c`/wave,
+  composite). **You solely own `ov002_core.h` now** (the scaffolder is on
+  ov006) — add any new sink decls your picks need directly to it. Shape-
+  triage; loop / liveness / reg-numbering → defer. **Target ~12-18
+  picks.** Bank sub-recipes. Success = per-pick 3-region SHA1 PASS.
+  Branch: `decomper/coldre-wave14`.
 
 ### Closed briefs (reference)
 
+- **Brief 299** — `decomper`, shipped in PR #802. ✅ **12 cold-RE picks
+  (all `.c`, `<0x100`), 3-region SHA1 PASS.** Continued the `<0x100` fast
+  zone (incl. the `021d730c` lookup-post family). Banked new header sinks
+  for the band (`021b8fcc` / `021c2084` accessor guards) — which
+  **auto-merged cleanly** with the scaffolder's header consolidation
+  (brain validated: 3-region SHA1 PASS on the merged header). complete_units
+  2704 → 2716 (+12).
+- **Brief 298** — `scaffolder`, shipped in PR #801. 🧹 **Header de-duped +
+  the reachable map is complete.** `ov002_core.h` is now a **single
+  canonical file** (`src/overlay002/`; the `docs/research/` duplicate
+  deleted, brief-296 sinks merged — careful not to break the 24 includers).
+  (B) The last tier mapped: **`>0x200` non-loop (197 funcs / 194 KB) is
+  95 % dispatcher** — reachable but the highest per-function effort; the
+  header already covers it. **Every reachable tier is now mapped.**
+  ⚠️ Header-edit collision with wave-13 (both touched it) — resolved by
+  auto-merge + SHA1; **header ownership → decomper henceforth** (brief 301).
 - **Brief 297** — `decomper`, shipped in PR #799. ✅ **14 cold-RE picks
   (all `.c`), 3-region SHA1 PASS.** 12 from the `<0x100` simple-wrapper
   tail + **2 from the new `0x100-0x200` tier** (opened it). Built its own
