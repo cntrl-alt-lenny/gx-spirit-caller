@@ -506,37 +506,56 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 302** — `scaffolder`. **Build the whole-function ship-as-`.s`
-  (GLOBAL_ASM) endgame mode — the last toolkit piece.** decomp.me /
-  research / `tools`, no SHA1. The endgame is settled (brief 294 — the
-  ~46 % reg-alloc-walled tail ships as byte-exact assembly, the scene's
-  `NON_MATCHING` / `GLOBAL_ASM` norm). `tools/asm_escape.py` only handles
-  the *one-instruction canonicalisation* class and **REFUSEs**
-  whole-function reg-alloc walls — so the whole-function machinery
-  doesn't exist yet. Build it (a new mode of `asm_escape.py`, or a
-  sibling): given a walled func, **emit the orig disassembly verbatim as
-  a byte-exact mwasm `.s` TU** (no near-C match — straight `objdump` →
-  mwasm-syntax `.s`, reusing the existing UAL→mwasm conversion) +
-  **byte-verify** vs the delinked `.o` + a test. Pilot it on **2-3
-  reg-alloc-walled ov002 deferred picks** (e.g. the wave-13/14
-  reg-numbering walls `021d8128`, …). This completes the toolkit — every
-  unmatched func now has a ship path (C / canonicalisation-`.s` /
-  whole-`.s`). **Readiness, not a usage decision** — the decomper still
-  drains C first; this just makes the walled tail shippable on demand.
-  Tools/, no build-file collision. Branch: `scaffolder/global-asm-mode`.
-- **Brief 303** — `decomper`. **Cold-RE wave 15 — keep draining the ov002
-  reachable cohort.** Recipe unchanged: `m2c_feed` draft → `#include
-  ov002_core.h` (sole owner) + guards → coerce → **3-region `ninja
-  sha1`**; `.s` canonicalisation residue via `tools/asm_escape.py` (trust
-  the REFUSE). (A) **`<0x100` fast zone** — still rich (the `021d479c`
-  event-post family + forwarder predicates). (B) **`0x100-0x200`
-  reachable tier** (~3-6 `.c`/wave, composite). Shape-triage; loop /
-  liveness / reg-numbering → defer (walled tail). **Target ~12-18
-  picks.** Bank sub-recipes. Success = per-pick 3-region SHA1 PASS.
-  Branch: `decomper/coldre-wave15`.
+- **Brief 304** — `scaffolder`. **Co-drain: start matching ov006's
+  reachable cohort (a second drain stream, collision-free).** decomp.me /
+  direct-mwcc / objdiff — **no SHA1** (the **brain 3-region-gates on
+  merge**). The research/prep arc is complete (toolkit + all maps done);
+  the scaffolder's highest-value use now is a **second draining stream**.
+  Working a **different overlay (ov006)** than the decomper (ov002) makes
+  this **zero build-file collision** — separate `src/overlay006/`,
+  separate `config/eur/arm9/overlays/ov006/delinks.txt`, separate header.
+  You mapped ov006 in brief 300 (84 % reachable, 56 % low-recovery).
+  Start draining: (A) **promote `docs/research/ov006_core.h` →
+  `src/overlay006/ov006_core.h`** (you own it); (B) drain the **88
+  all-matched-callee reachable funcs first** (fastest — `extern` the
+  matched sink + write the body); (C) produce **`.c` that objdiff **100 %**
+  vs the delinked `.o` (EUR)** + the `complete` delink entries.
+  **Per-pick gate = EUR objdiff 100 %** (you can't run 3-region SHA1 —
+  the brain reproduces it on merge + defers any region-mismatch). Target
+  **~8-12 ov006 picks** (first wave, expect ramp-up). Bank the ov006
+  family recipes. Branch: `scaffolder/ov006-wave1`.
+- **Brief 305** — `decomper`. **Cold-RE wave 16 — ov002, shift to the
+  `0x100-0x200` tier.** Wave 15 (7 picks) signals the `<0x100` clean zone
+  is depleting — the remainder is increasingly **register-numbering-walled**
+  (byte-temp order / global-in-reg / RMW addressing — the walled tail,
+  ship-as-`.s` later). Shift emphasis: (A) **`0x100-0x200` reachable
+  tier** (the composite dispatchers — now the richest clean-C vein,
+  ~3-6 `.c`/wave) + (B) the **remaining clean `<0x100`** (forwarders /
+  flag-posts that aren't reg-walled). Recipe unchanged (`m2c_feed` →
+  `#include ov002_core.h` (sole owner) → coerce → 3-region `ninja sha1`);
+  canonicalisation residue via `asm_escape.py`. **Defer register-walled
+  funcs** — they're the GLOBAL_ASM endgame tail (tool now ready, brief
+  302; not used yet). **Target ~10-15 picks.** Bank sub-recipes.
+  Success = per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave16`.
 
 ### Closed briefs (reference)
 
+- **Brief 303** — `decomper`, shipped in PR #808. ✅ **7 cold-RE picks
+  (all `.c`), 3-region SHA1 PASS — a lower-yield wave (`<0x100`
+  depleting).** The last clean forwarders + a `ce950` flag-post family;
+  **~10 near-misses deferred register-walled.** Finding: ov002's `<0x100`
+  clean zone is depleting — the remainder is increasingly
+  **register-numbering-walled** (reg-walls appear in non-loop bodies too,
+  so the "reachable" shape estimate was slightly optimistic). → shift to
+  the `0x100-0x200` tier (brief 305). complete_units 2728 → 2735 (+7).
+- **Brief 302** — `scaffolder`, shipped in PR #807. 🧰 **Whole-function
+  ship-as-`.s` (GLOBAL_ASM) mode — the toolkit is complete.**
+  `asm_escape.py --whole-function` emits the orig disassembly verbatim as
+  a byte-exact mwasm `.s` TU (no near-C match) + **byte-verifies** vs the
+  delinked `.o` (22 tests, +4). Every unmatched func now has a ship path:
+  C / canonicalisation-`.s` / whole-`.s`. Readiness for the walled tail —
+  **not used yet** (C-drain stays priority). Last forward-prep task → the
+  scaffolder pivots to **co-draining ov006** (brief 304).
 - **Brief 301** — `decomper`, shipped in PR #805. ✅ **12 cold-RE picks
   (all `.c`, `<0x100`), 3-region SHA1 PASS.** Continued the `<0x100` fast
   zone (the `021d479c` event-post family + forwarder predicates — still
