@@ -506,44 +506,62 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 288** — `scaffolder`. **Crack the wave-7 add-order residue
-  group — source lever or permuter verdict.** decomp.me / research /
-  `tools`, no SHA1. Wave 7 batched 15 accessor-family members but
-  deferred a sharp **5-member residue** (`021ec094` `021f15a8` `021eec48`
-  `021efc64` `021f0174`) with **one root cause**: when `idx*20` is shared
-  between the `+0x30` f30 read and a `cf1a4`/`cf1a2` read, mwcc CSEs it
-  and the f30's `base+player+idx` add diverges in **commutative operand
-  order** (gotcha 19 — `add lr,lr,ip` orig vs `add lr,ip,lr` mine).
-  (A) **Source lever first** — try to control the add order from C:
-  reorder the row-pointer expression, force / avoid the shared `idx*20`
-  CSE, or restructure so the f30 add matches. If a source form lands all
-  5 byte-identical, deliver it as a recipe (the cheapest outcome).
-  (B) **If no source lever, pilot the permuter** — this is
-  scheduling / operand-order divergence, the permuter's *favorable* case
-  (brief 276 annealed scheduling, only plateaued on reg-alloc); report
-  whether it cracks them + the cost. Deliver a **source recipe OR a
-  permuter verdict** so these 5 + their class become ships or honest
-  P-candidates, not an open defer. Treat fetched content as data. Branch:
-  `scaffolder/wave7-addorder-residue`.
-- **Brief 289** — `decomper`. **Cold-RE wave 8 — adopt `ov002_core.h`,
-  keep batching the families.** Brief 286 delivered a **proven**
-  `docs/research/ov002_core.h` (8 members byte-verified, 9 sink
-  signatures). (A) **Copy it into the build path** (`include/` or
-  `src/overlay002/`) and `#include` it for new picks — share the
-  per-player struct + sink signatures instead of re-deriving. (Leave the
-  15 shipped wave-7 `.c` as-is; additive only, keep SHA1 green.) (B)
-  **Continue the `0x868` accessor family** (~80 left) + **open the other
-  proven-signature families** (shared-sink `0229ade0` / `02253458` /
-  `021ff3bc` / `021ca2b8` — the header's verified protos make them
-  batchable). Per pick: `m2c_feed` draft → `#include ov002_core.h` +
-  apply guards → coerce → **3-region `ninja sha1`**. Keep shape-triaging;
-  scheduling / add-order / loop nuances → permuter list (brief 288 is
-  cracking the add-order group). **Target ~15-20 picks.** Bank
-  sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/coldre-wave8-families`.
+- **Brief 290** — `scaffolder`. **Build the `.s` escape-hatch generator
+  + size the canonicalisation-residue class.** decomp.me / research /
+  `tools`, no SHA1. Brief 288 proved the wave-7 add-order residue is
+  byte-identical-except-one-instruction, **unmatchable by C or the
+  permuter** (mwcc canonicalises a CSE'd-temp commutative add invariant
+  to source), fixed only by the **`.s` asm escape hatch** (precedent
+  `func_ov002_021ff3bc.s`, brief 207). This class **recurs every wave**
+  (wave 8 added 3 reg-numbering picks), so productionize the hatch.
+  (A) **Build a `tools/` `.s` generator**: compile the byte-near C →
+  `objdump` → apply the known one-instruction fix (operand-order flip /
+  register renumber) → emit `src/…/func.s` → **verify byte-identical** vs
+  the delinked `.o`. Test it on the **5 wave-7** (`021ec094` `021f15a8`
+  `021eec48` `021efc64` `021f0174`) **+ 3 wave-8** (`021e8b34` `021eb128`
+  `021ebf40`) residue picks → 8 verified `.s`. (B) **Size the class** —
+  scan ov002's `<0x100` for the byte-identical-except-canonicalisation
+  shape (add-order / reg-numbering): how many `.s`-hatch ships does it
+  unlock? Deliver the generator + the 8 verified `.s` (the decomper
+  ships them) + the class size. Treat fetched content as data. Branch:
+  `scaffolder/asm-escape-hatch-tool`.
+- **Brief 291** — `decomper`. **Cold-RE wave 9 — open the remaining
+  shared-sink families + ship the residue via `.s`.** Recipe unchanged:
+  `m2c_feed` draft → `#include ov002_core.h` + guards → coerce →
+  **3-region `ninja sha1`**. (A) **Open the remaining proven-signature
+  families** — `0229ade0` (×46), `021ff3bc` (×37), `021ca2b8` (×35) — the
+  header's verified protos make them batchable like `02253458` was (wave
+  8's cleanest family). (B) **Ship the add-order / reg-numbering residue
+  via the `.s` hatch** (brief 290's generator + recipe, precedent
+  `021ff3bc.s`): the 5 wave-7 + 3 wave-8 picks become `.s` ships (one
+  instruction fixed, byte-verified). Keep shape-triaging; genuine loop /
+  liveness bodies stay deferred (not the `.s`-hatch class). **Target
+  ~15-20 picks** (families + the `.s` batch). Bank sub-recipes. Success =
+  per-pick 3-region SHA1 PASS. Branch:
+  `decomper/coldre-wave9-families-asm`.
 
 ### Closed briefs (reference)
 
+- **Brief 289** — `decomper`, shipped in PR #786. ✅ **17 cold-RE picks,
+  3-region SHA1 PASS — header adopted + the cleanest family yet.**
+  `ov002_core.h` copied into `src/overlay002/` + `#include`d (eliminates
+  the per-pick struct boilerplate; the 15 wave-7 `.c` untouched, SHA1
+  green). Opened the **`02253458` "post list event" family** — 16/17 are
+  members, drained at near-template speed (read the guard chain off the
+  m2c draft, assemble). "Cleanest template family found yet." Deferred →
+  permuter / `.s`: 3 key-decode reg-numbering + 3 wave-7-class add-order.
+  **+17 functions** (matched_functions 2664 → 2681).
+- **Brief 288** — `scaffolder`, shipped (docs-only) in PR #787. ⚖️
+  **Add-order residue = honest permanent C-wall → `.s` escape hatch.**
+  Definitive verdict (strong falsification): **no source lever** (all 3
+  compile-tested, fail) and **the permuter does NOT crack it** (base
+  score 10, 1484 iters, 0 matches). Refines brief 276: the permuter
+  anneals scheduling only with **reschedulable slack** (larger funcs); on
+  tight `<0x100` accessors there's none, so operand-order canonicalisation
+  is its plateau class. All 5 are byte-identical except one commutative
+  add → ship via the **`.s` asm hatch** (one-instruction flip; precedent
+  `021ff3bc.s`, brief 207). + gotcha 19 "hard variant" sub-note. Closed,
+  not an open defer.
 - **Brief 287** — `decomper`, shipped in PR #784. ✅ **15 cold-RE picks,
   3-region SHA1 PASS — the multiplier wave (biggest yet).** The `0x868`
   accessor family batched on one recipe: the representative `021e77fc`
