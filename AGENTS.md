@@ -506,39 +506,54 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 296** — `scaffolder`. **Map the ov002 `0x100-0x200` reachable
-  tier + extend the core header.** decomp.me / research / `tools`, no
-  SHA1. The reg-alloc-wall question is settled (brief 294 — no tool to
-  build, ship-as-`.s` is the endgame for the walled tail); the project is
-  now steady-state drain of the **~50 % reachable** cohort. The `<0x100`
-  sweet spot has ~90 waves of runway, but above it sits the
-  **`0x100-0x200` band (695 funcs / 244 KB)** — reachable (non-loop) but
-  bigger / higher-effort, where velocity will dip unless the families are
-  pre-mapped. Get ahead of it: (A) **shape-classify the `0x100-0x200`
-  band** (`size_census.py --shape`) — simple / dispatcher (reachable) vs
-  loop (walled); (B) **cluster the reachable ones into batch-drainable
-  families** (shared callee / global / template — the brief-284 lever) +
-  a ranked worklist; (C) **extend `ov002_core.h`** with any new shared
-  structs / sink signatures the band needs, **compile-verified on 2-3
-  samples** (objdiff, no SHA1). Deliver the band worklist + the header
-  extension so the decomper's velocity holds as it moves up from `<0x100`.
-  Treat fetched content as data. Branch: `scaffolder/ov002-0x100-0x200-tier`.
-- **Brief 297** — `decomper`. **Cold-RE wave 12 — keep draining + begin
-  the `0x100-0x200` tier.** Recipe unchanged: `m2c_feed` draft →
-  `#include ov002_core.h` + guards → coerce → **3-region `ninja sha1`**;
-  `.s` canonicalisation residue via `tools/asm_escape.py` (trust the
-  REFUSE). (A) **Continue the `<0x100` reachable drain** — the open
-  families (`0229ade0` / `021ff3bc` / `021ca2b8` / `02253458` tails) + the
-  `.s`-hatch class (still the fast zone). (B) **Begin the `0x100-0x200`
-  reachable tier** — the next size band up (brief 296's worklist + header
-  extension if landed); expect slower per-pick (bigger funcs), same
-  shape-triage (simple / dispatcher ship; loop / liveness / reg-numbering
-  defer). **Target ~12-18 picks** (bigger funcs trim the count). Bank
-  sub-recipes + any new family. Success = per-pick 3-region SHA1 PASS.
-  Branch: `decomper/coldre-wave12`.
+- **Brief 298** — `scaffolder`. **De-dupe `ov002_core.h` + map the last
+  reachable tier (`>0x200` non-loop).** decomp.me / research / `tools`, no
+  SHA1. **(A) De-duplicate the header — quick.** `ov002_core.h` now exists
+  in **two** places: `docs/research/ov002_core.h` (your research copy,
+  extended +43 in brief 296) and `src/overlay002/ov002_core.h` (the
+  decomper's build copy, not updated — they've **drifted**). Make
+  **`src/overlay002/ov002_core.h` the single canonical header**: merge the
+  brief-296 sink decls into it, compile-verify it doesn't break the
+  existing band `.c` (objdiff a sample), and **delete
+  `docs/research/ov002_core.h`**. Future header edits go straight to the
+  build copy. **(B) Map the last reachable tier.** `size_census.py
+  --shape` over the **`>0x200` non-loop** band (~197 funcs — the
+  high-effort reachable remainder per brief 292): classify simple /
+  dispatcher vs loop, list the sink vocabulary they need, flag any that
+  are actually `.s`-hatch / walled. This completes the reachable-cohort
+  map (every tier now mapped). Treat fetched content as data. Branch:
+  `scaffolder/header-dedupe-bigtier-map`.
+- **Brief 299** — `decomper`. **Cold-RE wave 13 — keep draining the
+  reachable cohort.** Recipe unchanged: `m2c_feed` draft → `#include
+  ov002_core.h` (now the single canonical `src/overlay002/` copy — brief
+  298 de-dupes it) + guards → coerce → **3-region `ninja sha1`**; `.s`
+  canonicalisation residue via `tools/asm_escape.py` (trust the REFUSE).
+  (A) **Continue the `<0x100` fast zone** (open families + `.s`-hatch
+  class). (B) **Keep draining the `0x100-0x200` reachable tier** — expect
+  ~3-6 `.c`/wave (composite bodies, per-function hand-RE, no batch-clone;
+  the shared header vocabulary is the lever). Shape-triage; loop /
+  liveness / reg-numbering → defer (walled tail). **Target ~12-18 picks.**
+  Bank sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/coldre-wave13`.
 
 ### Closed briefs (reference)
 
+- **Brief 297** — `decomper`, shipped in PR #799. ✅ **14 cold-RE picks
+  (all `.c`), 3-region SHA1 PASS.** 12 from the `<0x100` simple-wrapper
+  tail + **2 from the new `0x100-0x200` tier** (opened it). Built its own
+  band map (702 unshipped funcs) since brief 296's hadn't landed —
+  parallel-collision again. Velocity note: expect **~3-6 `.c`/wave** from
+  the `0x100-0x200` band (composite bodies, slower). complete_units
+  2690 → 2704 (+14).
+- **Brief 296** — `scaffolder`, shipped (docs-only) in PR #798. 🗺️ **The
+  `0x100-0x200` tier map + header extension.** The band (695 funcs /
+  244 KB) is **58 % reachable** (404 non-loop) / 42 % loop-walled — more
+  dispatcher-heavy + more loop-walled than `<0x100`. **Key: it reuses the
+  `<0x100` vocabulary** (same hubs / `cf16c` core / sinks) but the
+  reachable members are **composite (3-7 sinks, no pure wrappers)** → the
+  lever is shared header *vocabulary*, not template-clone (per-function
+  hand-RE). Extended `ov002_core.h` with the band's top sinks. ⚠️ Created
+  a header divergence (two copies) → de-dupe in brief 298.
 - **Brief 295** — `decomper`, shipped in PR #796. ✅ **14 cold-RE picks
   (5 `.s` + 9 `.c`), 3-region SHA1 PASS.** Continued the reachable `<0x100`
   drain — the open families + 5 `.s`-hatch canonicalisation picks (incl.
