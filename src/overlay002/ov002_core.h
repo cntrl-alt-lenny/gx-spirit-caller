@@ -16,6 +16,7 @@
 #ifndef OV002_CORE_H
 #define OV002_CORE_H
 
+typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned int   u32;
 
