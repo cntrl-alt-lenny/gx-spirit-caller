@@ -25,6 +25,7 @@ typedef unsigned int   u32;
  * a player's region with (player & 1) * 0x868 as a BYTE offset.            */
 extern char data_ov002_022cf16c[];   /* row table (0x868/player) [member3] */
 extern int  data_ov002_022cf17c[];   /* per-player count table (0x260 list) [member2] */
+extern char data_ov002_022cf178[];   /* per-player event count table */
 extern int  data_ov002_022cf184[];   /* per-player count table (0x3a0 list) [shipped 021ba1e8] */
 extern char data_ov002_022ce950[];   /* per-player field table (+0x80c scalar) [member1] */
 extern char data_ov002_022d016c[];   /* per-player field table (+0xcec scalar) [member1*] */
