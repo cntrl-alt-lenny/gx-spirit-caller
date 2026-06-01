@@ -167,9 +167,9 @@ _Tools that compress the decomp iteration loop: context assembly, template match
 
 ### `tools/asm_escape.py`
 
-**generate a byte-exact `.s` escape hatch for a function**
+**generate a byte-exact `.s` for a function the C path can't**
 
-that mwcc compiles byte-identical-EXCEPT one commutative-operand-order instruction (brief 290; the wall proven in brief 288).
+match. Two modes:
 
 ### `tools/cluster_wave_propagate.py`
 
