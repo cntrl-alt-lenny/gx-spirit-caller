@@ -8,46 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#786 + #787 merge. Brain on Mac.
-**Brief 288 (add-order residue = C-wall → `.s` hatch, scaffolder) + brief 289
-(cold-RE wave 8 — 17 picks, decomper) both shipped. New record wave (+17): the
-decomper adopted `ov002_core.h` into the build + opened the `02253458` family
-(16 members, "cleanest yet"). The residue class is settled — an honest C-wall
-the permuter can't touch, shippable via the `.s` asm hatch. Next: scaffolder
-productionizes the `.s` hatch (290); decomper opens the remaining sink families
-+ ships the residue via `.s` (291).**
+**Last updated:** 2026-05-30, post-#789 + #790 merge. Brain on Mac.
+**Brief 290 (`.s` generator + class size, scaffolder) + brief 291 (cold-RE
+wave 9 — 16 picks, decomper) both shipped. +16 (7 `.c` sink-family + 9 `.s`
+residue): the `.s` hatch is productionized and the three shared-sink families
+are open. The hatch's runway is ~93 ov002 funcs. ⚠️ Both agents built a `.s`
+generator in parallel (collision) — consolidating on the scaffolder's safe
+`asm_escape.py` (292). Next: scaffolder consolidates + characterizes the hard
+loop/big cohort (292); decomper wave 10 keeps batching (293).**
 
-**Current metrics (post-#786 + #787 merge, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 27ca112, clean tree):**
-**+17 `complete_units`** (2627 → 2644) — the SHA1-aligned ship count, the
-headline (ticks for `.c` AND `.s`). `matched_functions` also +17 (2664 →
-2681) this round, but it **under-counts `.s` ships** (zero relocs; metric
-canon) so it will diverge once brief 291's `.s` batch lands — secondary.
-⚠️ **Don't track the `complete_units` *percentage*** (2644 / 4012 = 65.90,
-down from 66.02): the reconfigure grows `total_units` as units re-split
-(+33 this round), so the ratio is noisy — **NOT a regression** (3-region
-SHA1 all PASS, +17 real). **Lead with the absolute +N per round.**
+**Current metrics (post-#789 + #790 merge, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 8ffd8f2, clean tree):**
+**+16 `complete_units`** (2644 → 2660) — the SHA1-aligned ship count, the
+headline. This wave = 7 `.c` + 9 `.s`. **Metric update:** `matched_functions`
+*also* ticked +16 (2681 → 2697) — the 9 `.s` ships **did** register in it,
+contrary to the old "`.s` never ticks matched_functions" canon (the brief-206
+reloc harness apparently fixed it). Both metrics now agree. ⚠️ The
+`complete_units` % (2660 / 4035 = 65.92) is still denominator-noisy (total_units
++23) — **lead with the absolute +N**, not the %.
 
-✅ **Brief 289 — 17 cold-RE picks, 3-region SHA1 PASS — record wave + header
-adopted.** `ov002_core.h` now in `src/overlay002/` + `#include`d (kills the
-per-pick struct boilerplate). Opened the **`02253458` "post list event"
-family** (16/17 members; read the guard chain, assemble — the cleanest
-template yet). Deferred → `.s` / permuter: 3 key-decode + 3 add-order.
+✅ **Brief 291 — 16 cold-RE picks (7 `.c` + 9 `.s`), 3-region SHA1 PASS.**
+Opened the `0229ade0` / `021ff3bc` / `021ca2b8` shared-sink families via the
+header; shipped the 8 wave-7/8 canonicalisation residue through the `.s` hatch.
+Loop / liveness bodies stay deferred.
 
-⚖️ **Brief 288 — add-order residue = honest permanent C-wall.** No source
-lever; the permuter does NOT crack it (1484 iters, 0 matches). Refines brief
-276: the permuter needs **reschedulable slack** (larger funcs) — useless on
-tight `<0x100` accessors. Home = the **`.s` asm escape hatch** (one-instruction
-flip; precedent `021ff3bc.s`). Closed, not an open defer.
+🛠️ **Brief 290 — the safe `.s` generator + class size.** `tools/asm_escape.py`
+is **REFUSE-guarded** (emits `.s` only when every diff is a commutative-operand
+swap; else refuses — can't paper over a real mismatch) + self-verifying. The
+canonicalisation class is **~93 `<0x100` ov002 funcs** (the hatch's runway).
+Collided with the decomper's parallel `gen_asm_tu.py` → consolidate (292).
 
-🧭 **Where we are: the batch-drain is the engine; the residue now has a home.**
-+17 this wave; the shared-sink families (`0229ade0` ×46, `021ff3bc` ×37,
-`021ca2b8` ×35) are queued behind the proven header. Live levers: **brief 290**
-= scaffolder productionizes the `.s` escape-hatch generator (the
-canonicalisation residue recurs ~3-5/wave) + sizes the class; **brief 291** =
-decomper wave 9 opens the remaining sink families + ships the residue via `.s`.
-The reg-alloc-walled cohorts (the 574 ov002 loops + the `>0x200` = 49 % of
-unmatched bytes) still wait for a tool.
+🧭 **Where we are: a fast engine, a safe hatch — and one hard bucket left.**
+The family batch-drain + `.s` hatch reliably clear the *simple-shape* `<0x100`
+cohort (~16/wave). What they do NOT touch: the **574 ov002 loop funcs + the
+`>0x200` cohort (49 % of unmatched bytes)** — the reg-alloc-walled remainder.
+Live levers: **brief 292** = scaffolder consolidates the `.s` tools + **finally
+characterizes that hard bucket** (loop sub-classes, a permuter pilot on *larger*
+funcs where it has slack, a completion-ceiling estimate); **brief 293** =
+decomper wave 10 keeps batching families + the `.s`-hatch class.
 Settled-permanent: P-11, P-15. The ntrtwl branch
 (`brain/ntrtwl-vendor-pool-review`) stays parked, verified, awaiting a
 land/hold call.
