@@ -8,33 +8,31 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post-#825 / #826 merge. Brain on Mac.
-**Brief 314 (ov006 co-drain wave 6, +16) + brief 315 (ov011 clean-C wave 4,
-+2 — TAPPED) both shipped — +18, 67.14 %. First overlay-transition: both
-streams' clean-C veins are mined, so next round both pivot to fresh overlays
-(decomper → ov004, scaffolder → ov000).** (Reminder: ~67 % done; `ninja sha1`
-is the floor, not the finish line.)
+**Last updated:** 2026-06-02, post-#828 / #829 merge. Brain on Mac.
+**Brief 316 (ov004 clean-C wave 1, decomper, +17) + brief 317 (ov000 co-drain
+wave 1, scaffolder, +11) both shipped — +28, 67.13 %. Both fresh-overlay
+pivots succeeded: the recipe + core-header transfer cleanly per overlay, and
+ov000's overlay-0/2 quirk didn't bite (3-region PASS).** (Reminder: ~67 %
+done; `ninja sha1` is the floor, not the finish line.)
 
-**Current metrics (post-#825/#826 merge, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 8b3c137, clean tree):**
-**`complete_units 2907 / 4330 (67.14 %)`** (+18 vs prior 2889).
-`matched_functions 2944 / 9801` (+18). 3-region SHA1 PASS reproduced
-(eur / usa / jpn all OK).
+**Current metrics (post-#828/#829 merge, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 5344b06, clean tree):**
+**`complete_units 2935 / 4372 (67.13 %)`** (+28 vs prior 2907).
+`matched_functions 2972 / 9801` (+28). 3-region SHA1 PASS reproduced
+(eur / usa / jpn all `nds: OK`).
 
-🔀 **Overlay status (transition).** **ov011 TAPPED** (51 `.c`, clean-C done).
-**ov006 largely mined** (150 matched, thinning). **ov002 paused** (walled
-tail = GLOBAL_ASM endgame). → both streams pivot to fresh overlays.
+🔀 **Two parallel clean-C streams (fresh overlays).** **decomper → ov004**
+(wave 1 = 17 `.c`; ~168 reachable). **scaffolder → ov000** (wave 1 = 11 `.c`;
+~63 reachable). **Done/tapped:** ov011 (51), ov006 (150). **ov002 paused**
+(walled tail = GLOBAL_ASM endgame).
 
-🧭 **Where we are: first overlay-transition.** The two clean-C streams drained
-ov006 + ov011 to the reachable bottom (the "flag-when-thinning" instruction
-worked — both reported + recommended). Pivoting to the next-richest untapped:
-**decomper → ov004** (168 `<0x100`, richest; benign symbol-drift noted, gate
-on `ninja sha1` not `ninja check`), **scaffolder → ov000** (~63; overlay-0/2
-shared-base quirk flagged). Census runway after these: ov008 / ov010 / ov016 /
-ov005 … (many overlays). Endgame unchanged: ship-as-`.s` the walled tails at
-the very end (tool ready, brief 302; unused). Next: **brief 316** (decomper
-ov004 w1) + **brief 317** (scaffolder ov000 w1) — both wave-1 ramp-ups
-(survey + first picks).
+🧭 **Where we are: post-transition, the overlay-pivot playbook is proven.**
+Both streams opened fresh overlays cleanly in wave 1 (recipe + per-overlay
+`ovNNN_core.h` transfer; ov000's overlay-0/2 quirk handled — 3-region PASS).
+Multi-overlay runway confirmed: ov004 (~168) + ov000 (~63), then ov008 /
+ov010 / ov016 / ov005 … many overlays. Endgame unchanged: ship-as-`.s` the
+walled tails at the very end (tool ready, brief 302; unused). Next:
+**brief 318** (decomper ov004 w2) + **brief 319** (scaffolder ov000 w2).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
