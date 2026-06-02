@@ -279,4 +279,34 @@ extern int func_ov006_021b6ad8(void *base, int sel, int idx, int d); /* region g
  * (state 0224f290 / table 021cbb50) with a state[4]=1 prologue + no-cb tail
  * `*(021040ac+60)=state[6]; func_020071a4(4,1,021cb518)`. */
 
+/* =======================================================================
+ * §VERIFIED — brief 314 wave 6 (byte-proven; EUR ninja sha1 OK). 16 .c.
+ * ov006 clean-C is THINNING (150/395 matched; the ≤0x100 simple cohort is
+ * mined out — see brief-314 cohort sizing). The two families below are the
+ * last cohesive veins; the rest of the tail is reg-alloc/scheduling walls.
+ * ======================================================================= */
+
+/* --- init-sequence family (5: 021b5524/48b8/5490/4818/3290) ------------
+ * A per-region kick + 0-2 node registrations, then this invariant 6-sink
+ * init over the per-region globals, then a state-word seed:               */
+extern void func_ov006_021c155c(void *p);
+extern void func_ov006_021c6964(void *p);   /* 021c757c in some members */
+extern void func_ov006_021c755c(void *p);
+extern void func_ov006_021c9ed4(void *p);   /* 021c9ef4 in some members */
+extern void func_ov006_021cac10(void *p);   /* 021cac30 in some members */
+extern void func_ov006_021cb030(int *arr);  /* clears 0225e138, lazy-allocs 5 slots */
+extern void func_ov006_021b9ef8(void *p, int a, int b);   /* node register */
+
+/* --- centred-text-layout family (5: 021c4768/46c0/bf454/6798/4b20) -----
+ * q=func_0208dd9c(); 02001d0c(buf,pal,3); 02001d68(mode); 02001d98(buf,5);
+ * g=func_0202c0c0(glyph); func_02004f58(buf,g,(char*)q+64,
+ *   X - func_02005554(g,12,5)/2, 5|12, 12); 02001d98(buf,-1).  Members vary:
+ * buf offset, palette, glyph (literal / table[obj[n]] / obj[n]+const), X.   */
+extern int  func_0202c0c0(int glyph_id);       /* glyph -> sprite (main) */
+extern int  func_02005554(int g, int a, int b);/* measure width (main) */
+extern void func_02004f58(void *buf, int g, void *base, int x, int e, int f); /* emit (main) */
+extern void func_02001d0c(void *buf, int pal, int b);
+extern void func_02001d98(void *buf, int a);
+extern void func_02001d68(int mode);           /* mode = data_02104f4c.chan (:3) */
+
 #endif /* OV006_CORE_H */
