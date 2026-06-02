@@ -19,6 +19,8 @@ extern char data_ov004_0220b500[];   /* primary BSS state struct             */
 extern char data_ov004_0220b568[];   /* parallel table, indexed [idx << 2]   */
 extern char data_ov004_02211490[];   /* record A (init/reset target)         */
 extern char data_ov004_02211538[];   /* record B (init target)               */
+extern char data_ov004_022915e8[];   /* global lock flag (timer gate)         */
+extern char data_ov004_0220e500[];   /* secondary state struct               */
 
 /* --- data_ov004_0220b500 field map (byte offsets; § = byte-verified) ------
  *   +0x84    current-id latch (set-if-changed, then func_021c9ef0(id+219))  §
@@ -57,6 +59,33 @@ extern char data_ov004_02211538[];   /* record B (init target)               */
  *
  * WALL: 021d8d1c (MMIO BLDCNT bitfield RMW — orig uses ip scratch for field>>8,
  * mwcc reuses r2; 1 reg off).
+ * ======================================================================= */
+
+/* =======================================================================
+ * §VERIFIED — brief 318 wave 2 (15 picks, EUR ninja sha1 OK). Per-pick table in
+ * docs/research/brief-318-ov004-clean-c-wave2.md.
+ *
+ * Families added:
+ *  - id-latch sib 021da848; handle-free sib 021cfba0 (x3).
+ *  - status-message: 021ceb24, 021d97c8, 021d9778, 021ce9e4, 021d9724
+ *    (buf = 2-u16 local {tag, b500.field}; 02034888(3,buf,4); then
+ *     func_02037208(ID, -1, 0, 1) -> mwcc emits `mov rX,#ID; sub rY,rX,#(ID+1)`,
+ *     does NOT fold the -1. ids 66/58/56 confirmed.)
+ *  - timer-setter 021d47bc/021d4958; struct-copy dispatch 021cc74c
+ *    (Copy32(dst,src,n)/Fill32(val,dst,n) + guard-flip); state-machine 021d7c00;
+ *    cell-config 021da898 (021ca0a4 6-arg).
+ *
+ * WALLS (defer; reg-alloc/permuter tail):
+ *  - changed-bool family (~8: 021d48bc 021d52a0 021d4044 021d427c 021d43a0
+ *    021d4d8c 021d4804 021d5a10): `int c=0; if(rec.unk38){rec.unk38=0;c=1;}
+ *    if(c)...` — orig reuses the dead unk38 reg (r0) for c; mwcc picks fresh r1.
+ *    1 reg off on every member; unsteerable (store-c, !!, temp all fail).
+ *  - two-const message (021d1264/021d12b0/021d1308): buf-const + b500-field-const
+ *    swap ip<->lr.
+ *  - materialized-bool-global `if(g!=0)return` (021d4870/021d57ec): orig
+ *    materialises movne#1;moveq#0, mwcc branches direct.
+ *  - fn-ptr B6C dispatch (021cb518/021d6ed0): data_021040ac.B6C++ field-pool
+ *    (== ov011 021d0afc wall). field-pool RMW 021cc2a4; base+212 pool 021d641c.
  * ======================================================================= */
 
 #endif /* OV004_CORE_H */
