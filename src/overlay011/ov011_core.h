@@ -74,4 +74,33 @@ extern char data_ov011_021d4674[];   /* parallel coord array Y', stride 0x28 */
  * 021ca600 / 021ca630 / 021ccf3c. SINGLE-field RMW is fine.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 311 wave 2 (18 picks, EUR ninja sha1 OK). Per-pick table
+ * in docs/research/brief-311-ov011-clean-c-wave2.md.
+ *
+ * New families (clone targets for wave 3):
+ *  - 4660-slot id RMW + flag:   021d0ed0 (set), 021d0e88 (search loop)  [sib]
+ *  - counted-loop init:         021d1884 (10×, stride 0x28), 021cc3d4 (5× +RMW)
+ *  - block-copy switch:         021cc9b4 (2-case + 12B struct copy -> ldm/stm)
+ *  - MMIO BG-scroll double:     021cc948 (0x04000010/14, guarded)
+ *  - ||-with-embedded-assign:   021cb218 (cached base across calls)
+ *  - 2-RMW split by calls:      021cff9c (each isolated -> single-field, fine)
+ *
+ * Recipe levers proven this wave (see brief 311 for detail):
+ *  - struct-copy `*(blk3*)dst = *(blk3*)src` (3 ints) -> ldm/stm; sparse 2-case
+ *    switch lowers to cmp/beq chain (NOT a jump table -> dodges layout wall).
+ *  - cached `char *b = data_…;` holds the base callee-saved ACROSS calls/loops.
+ *  - swap LOCAL DECLARATION ORDER to flip a clean 2-reg r4/r5 (ip/lr) swap.
+ *  - `v=B; if(c) v=A;` (uncond default + 1 cond move) vs `v=c?A:B` (both cond).
+ *  - byte extract via `(unsigned)(x<<24)>>24` (NOT (u8)x -> `and #255`).
+ *
+ * WALL additions (defer; GLOBAL_ASM/permuter tail):
+ *  - field-address pooling on a POST-CALL single access: a lone RMW/`+=1` after
+ *    a call fuses `base+off` into the pool instead of `[base,#off]`; cached-base
+ *    does not recover it. (021ccf8c, 021cefb4, 021d0afc, 021d0b4c)
+ *  - `(n<<K1)>>K2` nibble-reposition fuses to `& mask` (skips lsr;lsl). (021ceffc)
+ *  - load-dest reg-numbering (r0 vs r1) clean 2-reg cascade. (021d20e8, 021d18b4)
+ *  - arg-eval-order (right-to-left) reg cascade. (021cd700, 021ce344)
+ * ======================================================================= */
+
 #endif /* OV011_CORE_H */
