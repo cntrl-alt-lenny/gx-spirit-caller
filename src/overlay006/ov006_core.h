@@ -248,4 +248,35 @@ extern void func_02006e1c(int h);                       /* release handle (main)
 /* data_02104f4c.chan (the unsigned :3 mode field, declared above) is also the
  * mode source for the call orchestrators 021c1680 / 021b565c this wave. */
 
+/* =======================================================================
+ * §VERIFIED — brief 312 wave 5 (byte-proven; EUR ninja sha1 OK). 15 .c.
+ * ======================================================================= */
+
+/* --- command-record family (0201e5b8) extended ------------------------
+ * The dominant ov006 composite: h=02006c0c(table,4,0); 0201d47c(cmd);
+ * <set cmd[40] fields>; 0201e5b8(cmd); 02006e1c(h). Field +0=h; the +20
+ * field RE-READ must be `unsigned short` (ldrh, not ldrsh). Variants:
+ *   config-prefixed (021c16d8 data_021cddc0 / 021c5d00 data_021ce16c): a
+ *     leading `*(vu16*)0x0400000a=(*r&~3)|3; *(vu16*)..=(*r&0x43)|0xd00`.
+ *   conditional clone-3 (021c12fc/13c4/148c): if(entry){02091554→02006c0c→
+ *     record, fields scaled from `slot`} else 02094504 clear. TWO-BUFFER
+ *     frame: declare cmd[40] BEFORE buf[32] (mwcc gives the LAST-declared
+ *     local the LOWEST sp offset). Members differ in 2 globals + 2 consts
+ *     (field base +829/+845, slot +5/+9).
+ * Store-scheduling siblings 021ca678 / 021c11c8 wall (ship-as-.s). */
+extern void func_02091554(void *out, void *a, int b);   /* record descriptor build (main) */
+extern int  func_02094504(int a, void *b, int c);        /* region clear (main) */
+
+/* --- guard + switch (jump-table) shape --------------------------------
+ * A switch on a dense 0..3 range compiles to `cmp #3; addls pc,pc,sel<<2`
+ * ONLY if all four cases are named (else mwcc emits an if-chain) — write
+ * `case 2: case 3: default:` even when they collapse to the default.
+ * Members: 021b6be0 (ptr select, no guard), 021b6ca0 / 021b6c30 (guard via
+ * func_ov006_021b6ad8 then field/-1/0). */
+extern int func_ov006_021b6ad8(void *base, int sel, int idx, int d); /* region guard */
+
+/* dispatch family gains: 021b2280 (state 021cf140 / table 021cbac0); 021b3fd8
+ * (state 0224f290 / table 021cbb50) with a state[4]=1 prologue + no-cb tail
+ * `*(021040ac+60)=state[6]; func_020071a4(4,1,021cb518)`. */
+
 #endif /* OV006_CORE_H */
