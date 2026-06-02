@@ -47,7 +47,7 @@ any of these (e.g. wiki, CI, docs), just describe what changed and why.
 
 - [ ] `ninja` rebuilds cleanly
 - [ ] `ninja objdiff` shows the function(s) matched
-- [ ] `ninja check` passes (dsd module + symbol consistency)
+- [ ] `ninja sha1` passes (the project gate — byte-identical ROM, all 3 regions) and `dsd check modules` is green. (`dsd check symbols` is **informational only** — it has known pre-existing noise on unmatched gap data; see [`docs/research/ov004-check-symbols-diagnosis.md`](../docs/research/ov004-check-symbols-diagnosis.md).)
 - [ ] Symbol renamed in `symbols.txt` if a function newly matched
 - [ ] `assets/progress-heatmap.svg` regenerated and committed if matched % changed
 - [ ] No comments explaining what well-named identifiers already convey
