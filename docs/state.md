@@ -8,43 +8,37 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post-#818 / #819 / #820 merge. Brain on Mac.
-**Brief 310 (ov006 co-drain wave 4, scaffolder, +20) + brief 311 (ov011
-clean-C wave 2, decomper, +18) both shipped — +38, the biggest round yet
-(the co-drain doubling at work). Plus the spawned ov004 diagnosis (#818):
-the `ninja check` symbol failure is benign systemic label-drift,
-ROM-irrelevant — leave it.** (Reminder: the project is ~67 % done; the
-`ninja sha1` round-trip is the floor, not the finish line.)
+**Last updated:** 2026-06-02, post-#822 / #823 merge. Brain on Mac.
+**Brief 312 (ov006 co-drain wave 5, +15) + brief 313 (ov011 clean-C wave 3,
++12) both shipped — +27, crossed 67 %. Steady two-stream drain.** (Reminder:
+the project is ~67 % done; the `ninja sha1` round-trip is the floor, not the
+finish line.)
 
-**Current metrics (post-#818/#819/#820 merge, EUR — brain reconfigured +
-3-region `ninja sha1` PASS + `ninja report` on 2562252, clean tree):**
-**`complete_units 2862 / 4290 (66.71 %)`** (+38 vs prior 2824).
-`matched_functions 2899 / 9801` (+38). 3-region SHA1 PASS reproduced
+**Current metrics (post-#822/#823 merge, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 49601e1, clean tree):**
+**`complete_units 2889 / 4308 (67.06 %)`** (+27 vs prior 2862).
+`matched_functions 2926 / 9801` (+27). 3-region SHA1 PASS reproduced
 (eur / usa / jpn all OK).
 
-🔀 **Two parallel clean-C streams (~38/round).** **decomper → ov011**
-(clean-C; 89 % reachable; waves 1-2 = 37 `.c`). **scaffolder → ov006**
-(co-drain; 84 % reachable; waves 1-4 = 85 `.c`). **ov002 paused** —
-clean-C tapped; walled tail reserved for the GLOBAL_ASM endgame.
+🔀 **Two parallel clean-C streams.** **decomper → ov011** (waves 1-3 =
+49 `.c`; started ~87 reachable). **scaffolder → ov006** (waves 1-5 =
+100 `.c`; started ~157 reachable). **ov002 paused** — clean-C tapped;
+walled tail reserved for the GLOBAL_ASM endgame.
 
-🔬 **ov004 diagnosis (#818) — benign, leave it.** `dsd check symbols`
-fails (678 errors = auto-name **label** drift, data +4 off after link);
-**ROM-irrelevant** (`ninja sha1` PASS ×3, `dsd check modules` green ×27).
-NOT force-fixed (mass re-address risks the byte-identical build for zero
-gain). `dsd check symbols` is informational, not the gate; PR-template
-line corrected. Root cause: `docs/research/ov004-check-symbols-diagnosis.md`.
+🧭 **Where we are: steady-state, ~27-38/round.** Both overlays are **past
+halfway** on their reachable cohorts (ov006 ~100/157, ov011 ~49/87) — the
+**next-overlay transition approaches**; briefs 314/315 ask each agent to flag
+in its PR when its cohort thins, so we pick the next overlay (ov004 79 % /
+ov011-then-others) for the following wave. Endgame unchanged: C-drain the
+reachable; **ship-as-`.s` the walled tails at the very end** (tool ready,
+brief 302; unused). Next: **brief 314** (scaffolder ov006 wave 6) + **brief
+315** (decomper ov011 wave 4), both pull-latest + subtract-matched first.
 
-🧱 **Settled walls:** P-11, P-15, the **switch-case-body layout wall**
-(brief 305 — mwcc's case-body physical order is uncontrollable from C;
-ov002's `0x100-0x200` dispatcher bulk is walled → GLOBAL_ASM-tail).
-
-🧭 **Where we are: steady-state, two clean-C streams.** Both agents drain
-fresh/rich overlays at ~38/round combined; the cross-overlay runway (brief
-300) is confirmed real (many overlays of `<0x100` reachable work). Endgame
-unchanged: C-drain the reachable; **ship-as-`.s` the walled tails at the
-very end** (tool ready, brief 302; unused). Next: **brief 312** (scaffolder
-ov006 wave 5) + **brief 313** (decomper ov011 wave 3), both pull-latest +
-subtract-matched first. ntrtwl parked (land/drop on request).
+🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
+(brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
+(#818 diagnosis, `docs/research/ov004-check-symbols-diagnosis.md`); the
+project gate is `ninja sha1` + `dsd check modules`. ntrtwl branch parked
+(land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
