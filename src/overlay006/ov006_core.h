@@ -219,4 +219,33 @@ extern struct { int w0; unsigned chan : 3; } data_02104f4c;  /* global mode; cha
  *   021b22c8: state 021cf140 / table 021cbac0 / data 021d6ed0 — tail returns 1.
  *   021b343c: state 0224f1fc / table 021cbb20 / data 021cb518 — tail returns 0. */
 
+/* =======================================================================
+ * §VERIFIED — brief 310 wave 4 (byte-proven, same EUR-objdiff gate). 20 .c.
+ * ======================================================================= */
+
+/* --- 021b805c subobject-setup family (4 members) -----------------------
+ * [if (flag)] { func_ov006_021b805c(p); func_02012454(arg, p + 292); }
+ * func_ov006_021b8d6c(p); return 1;   — clone by guard + the 02012454 arg:
+ *   021b6870 unconditional, arg 0;   021b6694 guarded, arg 0;
+ *   021b64d0 guarded, arg *(int*)(data_021040ac + 0xc3c);
+ *   021b5db4 unconditional, Copy32(p+292, data_02105a4c, 292) instead of 02012454. */
+extern void func_ov006_021b805c(void *p);     /* subobject reset (unmatched local) */
+extern void func_ov006_021b8e1c(void *p);     /* setup-family pass (021b5db4) */
+/* func_ov006_021b8d6c / func_02012454 already used elsewhere; Copy32/Fill32 = main. */
+
+/* --- 0201e5b8 command-record family (stack-struct submit) --------------
+ * h = func_02006c0c(table, 4, 0); func_0201d47c(cmd); <set cmd fields>;
+ * func_0201e5b8(cmd); func_02006e1c(h); return 1.  cmd is a ~40-byte stack
+ * record; field +0 = h, others per member. GOTCHA: the +20 field RE-READ
+ * must be `unsigned short` (ldrh) — a signed `short` emits ldrsh and diffs.
+ * Member 021c74e0 verified; 021ca678/021c12fc are siblings (store-schedule
+ * sensitive — see brief 310 deferrals). */
+extern int  func_02006c0c(void *table, int b, int c);  /* alloc handle (main) */
+extern void func_0201d47c(void *cmd);                   /* fill command record (main) */
+extern void func_0201e5b8(void *cmd);                   /* submit command record (main) */
+extern void func_02006e1c(int h);                       /* release handle (main) */
+
+/* data_02104f4c.chan (the unsigned :3 mode field, declared above) is also the
+ * mode source for the call orchestrators 021c1680 / 021b565c this wave. */
+
 #endif /* OV006_CORE_H */
