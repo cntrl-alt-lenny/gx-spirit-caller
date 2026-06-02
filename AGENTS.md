@@ -506,29 +506,43 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 314** — `scaffolder`. **Co-drain wave 6 — continue the ov006
-  stream.** decomp.me / direct-mwcc / objdiff — **no SHA1** (the brain
-  3-region-gates on merge). Continue ov006 (waves 1-5 = **100 `.c`**).
-  **First: pull latest `config/eur/arm9/overlays/ov006/delinks.txt` and
-  SUBTRACT the already-matched set** (don't double-ship; `verify.py`).
-  Collision-free footing (own `src/overlay006/`, own ov006 delinks, own
-  `ov006_core.h`). Drain the next family cohorts / all-matched-callee
-  funcs. **Per-pick gate = EUR objdiff 100 %**; brain reproduces 3-region
-  SHA1 on merge. Target **~15-25 picks**. **If ov006's reachable cohort
-  is thinning** (started ~157 reachable; ~100 shipped), say so in the PR
-  — we'll pick the next overlay for wave 7. Branch: `scaffolder/ov006-wave6`.
-- **Brief 315** — `decomper`. **ov011 clean-C wave 4 — continue the
-  drain.** ov011 waves 1-3 = **49 `.c`**; keep going on the reachable
-  `<0x100` cohort (started ~87 reachable). Recipe: `m2c_feed` → `#include
-  ov011_core.h` + guards → coerce → **3-region `ninja sha1`**;
-  canonicalisation residue via `asm_escape.py` (trust the REFUSE). Pull
-  latest ov011 delinks + subtract the matched set. Family-first. **Target
-  ~12-18 picks.** **If ov011's reachable is thinning, flag it** (next
-  overlay for wave 5). Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/ov011-wave4`.
+- **Brief 316** — `decomper`. **Pivot to ov004 — clean-C wave 1 (fresh
+  overlay).** ov011 clean-C is **tapped** (brief 315: 2 stragglers left);
+  your own survey flagged **ov004 as the richest untapped vein (168
+  `<0x100`, 39 `<0x40`)**. Pivot there: survey → build
+  `src/overlay004/ov004_core.h` (per-overlay globals / sinks) → drain the
+  reachable `<0x100` cohort, family-first. Recipe unchanged: `m2c_feed` →
+  `#include ov004_core.h` + guards → coerce → **3-region `ninja sha1`**;
+  canonicalisation residue via `asm_escape.py`. **⚠️ ov004 has a
+  pre-existing, benign `dsd check symbols` data-label drift (brief-818
+  diagnosis — ROM-irrelevant). Do NOT chase it; the gate is `ninja sha1`
+  (as always), not `ninja check`.** Target ~12-18 picks (wave-1 ramp-up:
+  survey + first picks). Branch: `decomper/ov004-wave1`.
+- **Brief 317** — `scaffolder`. **Pivot to ov000 — co-drain wave 1 (fresh
+  overlay).** ov006's hand-matchable vein is **largely mined** (brief 314
+  thinning verdict: 16 of ~40 examined). Pivot the second stream to
+  **ov000** — next-richest untapped (~63 `<0x100`, census brief 278) —
+  **collision-free** (decomper takes ov004; you take ov000: separate
+  `src/overlay000/`, ov000 delinks, `ov000_core.h`). (A) **Survey ov000**
+  (`size_census.py --module ov000 --shape`) + a starter
+  `src/overlay000/ov000_core.h`; (B) drain the reachable `<0x100` cohort,
+  all-matched-callee / family-first. **⚠️ Heads-up: ov000 shares a base
+  address with ov002 (overlay-swap; CLAUDE.md bootstrapping) — watch for
+  overlay-overlap dotted-symbol aliases (gotcha 18); flag anything weird.**
+  **Per-pick gate = EUR objdiff 100 %**; the brain reproduces 3-region
+  SHA1 on merge. Target **~10-15 picks** (wave-1 ramp-up). Branch:
+  `scaffolder/ov000-wave1`.
 
 ### Closed briefs (reference)
 
+- **Brief 315** — `decomper`, shipped in PR #825. ✅ **2 matched ov011
+  `.c`, 3-region SHA1 PASS — ov011 clean-C TAPPED.** Cohort drained; the
+  decomper surveyed and recommended pivoting to **ov004** (richest
+  untapped: 168 `<0x100`) → brief 316. ov011 final: 51 `.c`.
+- **Brief 314** — `scaffolder`, shipped in PR #826. ✅ **16 matched ov006
+  `.c` (co-drain wave 6).** EUR objdiff 100 %, brain 3-region SHA1 gated
+  (PASS). **Thinning verdict: ov006's clean-C vein is largely mined** (16
+  of ~40 examined) → pivot to ov000 (brief 317). ov006 matched 134 → 150.
 - **Brief 313** — `decomper`, shipped in PR #823. ✅ **12 matched ov011
   `.c` (clean-C wave 3), 3-region SHA1 PASS.** ov011 stream 49 `.c`
   (waves 1-3).

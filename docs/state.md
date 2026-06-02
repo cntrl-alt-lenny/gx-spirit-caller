@@ -8,31 +8,33 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post-#822 / #823 merge. Brain on Mac.
-**Brief 312 (ov006 co-drain wave 5, +15) + brief 313 (ov011 clean-C wave 3,
-+12) both shipped — +27, crossed 67 %. Steady two-stream drain.** (Reminder:
-the project is ~67 % done; the `ninja sha1` round-trip is the floor, not the
-finish line.)
+**Last updated:** 2026-06-02, post-#825 / #826 merge. Brain on Mac.
+**Brief 314 (ov006 co-drain wave 6, +16) + brief 315 (ov011 clean-C wave 4,
++2 — TAPPED) both shipped — +18, 67.14 %. First overlay-transition: both
+streams' clean-C veins are mined, so next round both pivot to fresh overlays
+(decomper → ov004, scaffolder → ov000).** (Reminder: ~67 % done; `ninja sha1`
+is the floor, not the finish line.)
 
-**Current metrics (post-#822/#823 merge, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 49601e1, clean tree):**
-**`complete_units 2889 / 4308 (67.06 %)`** (+27 vs prior 2862).
-`matched_functions 2926 / 9801` (+27). 3-region SHA1 PASS reproduced
+**Current metrics (post-#825/#826 merge, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 8b3c137, clean tree):**
+**`complete_units 2907 / 4330 (67.14 %)`** (+18 vs prior 2889).
+`matched_functions 2944 / 9801` (+18). 3-region SHA1 PASS reproduced
 (eur / usa / jpn all OK).
 
-🔀 **Two parallel clean-C streams.** **decomper → ov011** (waves 1-3 =
-49 `.c`; started ~87 reachable). **scaffolder → ov006** (waves 1-5 =
-100 `.c`; started ~157 reachable). **ov002 paused** — clean-C tapped;
-walled tail reserved for the GLOBAL_ASM endgame.
+🔀 **Overlay status (transition).** **ov011 TAPPED** (51 `.c`, clean-C done).
+**ov006 largely mined** (150 matched, thinning). **ov002 paused** (walled
+tail = GLOBAL_ASM endgame). → both streams pivot to fresh overlays.
 
-🧭 **Where we are: steady-state, ~27-38/round.** Both overlays are **past
-halfway** on their reachable cohorts (ov006 ~100/157, ov011 ~49/87) — the
-**next-overlay transition approaches**; briefs 314/315 ask each agent to flag
-in its PR when its cohort thins, so we pick the next overlay (ov004 79 % /
-ov011-then-others) for the following wave. Endgame unchanged: C-drain the
-reachable; **ship-as-`.s` the walled tails at the very end** (tool ready,
-brief 302; unused). Next: **brief 314** (scaffolder ov006 wave 6) + **brief
-315** (decomper ov011 wave 4), both pull-latest + subtract-matched first.
+🧭 **Where we are: first overlay-transition.** The two clean-C streams drained
+ov006 + ov011 to the reachable bottom (the "flag-when-thinning" instruction
+worked — both reported + recommended). Pivoting to the next-richest untapped:
+**decomper → ov004** (168 `<0x100`, richest; benign symbol-drift noted, gate
+on `ninja sha1` not `ninja check`), **scaffolder → ov000** (~63; overlay-0/2
+shared-base quirk flagged). Census runway after these: ov008 / ov010 / ov016 /
+ov005 … (many overlays). Endgame unchanged: ship-as-`.s` the walled tails at
+the very end (tool ready, brief 302; unused). Next: **brief 316** (decomper
+ov004 w1) + **brief 317** (scaffolder ov000 w1) — both wave-1 ramp-ups
+(survey + first picks).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
