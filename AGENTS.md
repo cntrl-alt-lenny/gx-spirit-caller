@@ -506,34 +506,49 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 310** — `scaffolder`. **Co-drain wave 4 — continue the ov006
+- **Brief 312** — `scaffolder`. **Co-drain wave 5 — continue the ov006
   stream.** decomp.me / direct-mwcc / objdiff — **no SHA1** (the brain
-  3-region-gates on merge). Continue the ov006 second-stream drain
-  (waves 1-3 = briefs 304/307/309 shipped 12 + 26 + 27 = **65 `.c`**).
-  **First: pull latest `config/eur/arm9/overlays/ov006/delinks.txt` and
-  SUBTRACT the already-matched set** — per the brief-304 note, some funcs
-  get matched between waves; don't double-ship (use the `verify.py`
-  byte-word comparator). Stay on the collision-free footing (own
-  `src/overlay006/`, own ov006 delinks, own `ov006_core.h`). Drain the
-  next ov006 family cohorts / all-matched-callee funcs. **Per-pick gate =
-  EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge +
-  defers any region-mismatch. Target **~15-25 picks**. Bank ov006 family
-  recipes. Branch: `scaffolder/ov006-wave4`.
-- **Brief 311** — `decomper`. **ov011 clean-C wave 2 — continue the
-  fresh-overlay drain.** ov002's clean-C zone is tapped (register-numbering
-  + switch-case-body-layout walls); its walled tail is **reserved for the
-  GLOBAL_ASM endgame, not now** (you correctly pivoted off it at brief
-  308). You opened **ov011** (clean-C wave 1 = brief 308, 19 `.c`); keep
-  going — ov011 is **89 % reachable** (brief 300). Recipe: `m2c_feed` →
-  `#include` the ov011 header + guards → coerce → **3-region `ninja
-  sha1`**; canonicalisation residue via `asm_escape.py` (trust the
-  REFUSE). Pull latest ov011 delinks + subtract the matched set. Drain
-  the reachable `<0x100` cohort (family-first). **Target ~12-18 picks.**
-  Bank sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/ov011-wave2`.
+  3-region-gates on merge). Continue ov006 (waves 1-4 = briefs
+  304/307/309/310 shipped 12 + 26 + 27 + 20 = **85 `.c`**). **First: pull
+  latest `config/eur/arm9/overlays/ov006/delinks.txt` and SUBTRACT the
+  already-matched set** (don't double-ship; `verify.py` byte-word
+  comparator). Collision-free footing (own `src/overlay006/`, own ov006
+  delinks, own `ov006_core.h`). Drain the next family cohorts /
+  all-matched-callee funcs. **Per-pick gate = EUR objdiff 100 %**; the
+  brain reproduces 3-region SHA1 on merge + defers any region-mismatch.
+  Target **~15-25 picks**. Bank ov006 recipes. Branch:
+  `scaffolder/ov006-wave5`.
+- **Brief 313** — `decomper`. **ov011 clean-C wave 3 — continue the
+  fresh-overlay drain.** ov011 wave 2 shipped 18 (brief 311, 58 %
+  attempt-rate); keep going on ov011's reachable `<0x100` cohort (**89 %
+  reachable**, brief 300). Recipe: `m2c_feed` → `#include ov011_core.h` +
+  guards → coerce → **3-region `ninja sha1`**; canonicalisation residue
+  via `asm_escape.py` (trust the REFUSE). Pull latest ov011 delinks +
+  subtract the matched set. Family-first. **Target ~12-18 picks.** Bank
+  sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/ov011-wave3`.
 
 ### Closed briefs (reference)
 
+- **Brief 311** — `decomper`, shipped in PR #820. ✅ **18 matched ov011
+  `.c` (clean-C wave 2), 3-region SHA1 PASS.** 18 / 31 attempted (58 %;
+  the 13 misses are register-walled). ov011 second-overlay drain healthy
+  (waves 1-2 = 37 `.c`). Owns `ov011_core.h`.
+- **Brief 310** — `scaffolder`, shipped in PR #819. ✅ **20 matched ov006
+  `.c` (co-drain wave 4).** EUR objdiff 100 %, brain 3-region SHA1 gated
+  on merge (PASS); all 20 confirmed dropped from the regenerated gap
+  objects (no double-ship — the subtract-matched-set step works). ov006
+  stream now 85 `.c` (waves 1-4).
+- **ov004 symbol diagnosis** — spawned task, shipped (docs-only) in PR
+  #818. 🔬 **The ov004 `ninja check` failure is benign + systemic, not a
+  5-symbol typo.** `dsd check symbols` fails with **678 errors** (657
+  ov004 + 21 ARM9 main) = auto-generated `data_<addr>` **label** drift
+  (data lands +4 bytes off after link; 645/654 ov004 off by one word) —
+  **ROM-irrelevant** (`ninja sha1` PASS ×3, `dsd check modules` green ×27).
+  NOT force-fixed (mass re-address risks the byte-identical build for zero
+  ROM gain). Verdict: **leave it** — `dsd check symbols` is informational,
+  not the gate; corrected the misleading PR-template line. Full root-cause:
+  `docs/research/ov004-check-symbols-diagnosis.md`.
 - **Brief 309** — `scaffolder`, shipped in PR #814. ✅ **27 matched ov006
   `.c` (co-drain wave 3).** Per-state method families; EUR objdiff 100 %,
   brain 3-region SHA1 gated on merge (PASS). The ov006 second stream is
