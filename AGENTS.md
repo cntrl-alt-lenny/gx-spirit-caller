@@ -506,30 +506,35 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 312** — `scaffolder`. **Co-drain wave 5 — continue the ov006
+- **Brief 314** — `scaffolder`. **Co-drain wave 6 — continue the ov006
   stream.** decomp.me / direct-mwcc / objdiff — **no SHA1** (the brain
-  3-region-gates on merge). Continue ov006 (waves 1-4 = briefs
-  304/307/309/310 shipped 12 + 26 + 27 + 20 = **85 `.c`**). **First: pull
-  latest `config/eur/arm9/overlays/ov006/delinks.txt` and SUBTRACT the
-  already-matched set** (don't double-ship; `verify.py` byte-word
-  comparator). Collision-free footing (own `src/overlay006/`, own ov006
-  delinks, own `ov006_core.h`). Drain the next family cohorts /
-  all-matched-callee funcs. **Per-pick gate = EUR objdiff 100 %**; the
-  brain reproduces 3-region SHA1 on merge + defers any region-mismatch.
-  Target **~15-25 picks**. Bank ov006 recipes. Branch:
-  `scaffolder/ov006-wave5`.
-- **Brief 313** — `decomper`. **ov011 clean-C wave 3 — continue the
-  fresh-overlay drain.** ov011 wave 2 shipped 18 (brief 311, 58 %
-  attempt-rate); keep going on ov011's reachable `<0x100` cohort (**89 %
-  reachable**, brief 300). Recipe: `m2c_feed` → `#include ov011_core.h` +
-  guards → coerce → **3-region `ninja sha1`**; canonicalisation residue
-  via `asm_escape.py` (trust the REFUSE). Pull latest ov011 delinks +
-  subtract the matched set. Family-first. **Target ~12-18 picks.** Bank
-  sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
-  `decomper/ov011-wave3`.
+  3-region-gates on merge). Continue ov006 (waves 1-5 = **100 `.c`**).
+  **First: pull latest `config/eur/arm9/overlays/ov006/delinks.txt` and
+  SUBTRACT the already-matched set** (don't double-ship; `verify.py`).
+  Collision-free footing (own `src/overlay006/`, own ov006 delinks, own
+  `ov006_core.h`). Drain the next family cohorts / all-matched-callee
+  funcs. **Per-pick gate = EUR objdiff 100 %**; brain reproduces 3-region
+  SHA1 on merge. Target **~15-25 picks**. **If ov006's reachable cohort
+  is thinning** (started ~157 reachable; ~100 shipped), say so in the PR
+  — we'll pick the next overlay for wave 7. Branch: `scaffolder/ov006-wave6`.
+- **Brief 315** — `decomper`. **ov011 clean-C wave 4 — continue the
+  drain.** ov011 waves 1-3 = **49 `.c`**; keep going on the reachable
+  `<0x100` cohort (started ~87 reachable). Recipe: `m2c_feed` → `#include
+  ov011_core.h` + guards → coerce → **3-region `ninja sha1`**;
+  canonicalisation residue via `asm_escape.py` (trust the REFUSE). Pull
+  latest ov011 delinks + subtract the matched set. Family-first. **Target
+  ~12-18 picks.** **If ov011's reachable is thinning, flag it** (next
+  overlay for wave 5). Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/ov011-wave4`.
 
 ### Closed briefs (reference)
 
+- **Brief 313** — `decomper`, shipped in PR #823. ✅ **12 matched ov011
+  `.c` (clean-C wave 3), 3-region SHA1 PASS.** ov011 stream 49 `.c`
+  (waves 1-3).
+- **Brief 312** — `scaffolder`, shipped in PR #822. ✅ **15 matched ov006
+  `.c` (co-drain wave 5).** EUR objdiff 100 %, brain 3-region SHA1 gated
+  on merge (PASS). ov006 stream 100 `.c` (waves 1-5).
 - **Brief 311** — `decomper`, shipped in PR #820. ✅ **18 matched ov011
   `.c` (clean-C wave 2), 3-region SHA1 PASS.** 18 / 31 attempted (58 %;
   the 13 misses are register-walled). ov011 second-overlay drain healthy
