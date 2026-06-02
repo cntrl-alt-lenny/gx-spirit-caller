@@ -1712,3 +1712,84 @@ src/overlay006/func_ov006_021b3498.c:
     complete
     .text start:0x021b3498 end:0x021b355c
 
+
+src/overlay006/func_ov006_021b47d8.c:
+    complete
+    .text start:0x021b47d8 end:0x021b4818
+
+src/overlay006/func_ov006_021b5074.c:
+    complete
+    .text start:0x021b5074 end:0x021b50b0
+
+src/overlay006/func_ov006_021b565c.c:
+    complete
+    .text start:0x021b565c end:0x021b56d8
+
+src/overlay006/func_ov006_021b5db4.c:
+    complete
+    .text start:0x021b5db4 end:0x021b5dec
+
+src/overlay006/func_ov006_021b64d0.c:
+    complete
+    .text start:0x021b64d0 end:0x021b6508
+
+src/overlay006/func_ov006_021b6694.c:
+    complete
+    .text start:0x021b6694 end:0x021b66c4
+
+src/overlay006/func_ov006_021b6870.c:
+    complete
+    .text start:0x021b6870 end:0x021b6898
+
+src/overlay006/func_ov006_021b8d08.c:
+    complete
+    .text start:0x021b8d08 end:0x021b8d30
+
+src/overlay006/func_ov006_021b8d30.c:
+    complete
+    .text start:0x021b8d30 end:0x021b8d6c
+
+src/overlay006/func_ov006_021b8de0.c:
+    complete
+    .text start:0x021b8de0 end:0x021b8e1c
+
+src/overlay006/func_ov006_021be8c4.c:
+    complete
+    .text start:0x021be8c4 end:0x021be8ec
+
+src/overlay006/func_ov006_021c1680.c:
+    complete
+    .text start:0x021c1680 end:0x021c16c8
+
+src/overlay006/func_ov006_021c5084.c:
+    complete
+    .text start:0x021c5084 end:0x021c50c4
+
+src/overlay006/func_ov006_021c5cc0.c:
+    complete
+    .text start:0x021c5cc0 end:0x021c5d00
+
+src/overlay006/func_ov006_021c6c34.c:
+    complete
+    .text start:0x021c6c34 end:0x021c6c78
+
+src/overlay006/func_ov006_021c6f40.c:
+    complete
+    .text start:0x021c6f40 end:0x021c6f7c
+
+src/overlay006/func_ov006_021c74e0.c:
+    complete
+    .text start:0x021c74e0 end:0x021c7554
+
+src/overlay006/func_ov006_021ca3a0.c:
+    complete
+    .text start:0x021ca3a0 end:0x021ca3e0
+
+src/overlay006/func_ov006_021cad34.c:
+    complete
+    .text start:0x021cad34 end:0x021cada4
+
+src/overlay006/func_ov006_021cb0a0.c:
+    complete
+    .text start:0x021cb0a0 end:0x021cb0d8
+
