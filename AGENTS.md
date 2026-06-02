@@ -506,40 +506,48 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 304** — `scaffolder`. **Co-drain: start matching ov006's
-  reachable cohort (a second drain stream, collision-free).** decomp.me /
-  direct-mwcc / objdiff — **no SHA1** (the **brain 3-region-gates on
-  merge**). The research/prep arc is complete (toolkit + all maps done);
-  the scaffolder's highest-value use now is a **second draining stream**.
-  Working a **different overlay (ov006)** than the decomper (ov002) makes
-  this **zero build-file collision** — separate `src/overlay006/`,
-  separate `config/eur/arm9/overlays/ov006/delinks.txt`, separate header.
-  You mapped ov006 in brief 300 (84 % reachable, 56 % low-recovery).
-  Start draining: (A) **promote `docs/research/ov006_core.h` →
-  `src/overlay006/ov006_core.h`** (you own it); (B) drain the **88
-  all-matched-callee reachable funcs first** (fastest — `extern` the
-  matched sink + write the body); (C) produce **`.c` that objdiff **100 %**
-  vs the delinked `.o` (EUR)** + the `complete` delink entries.
-  **Per-pick gate = EUR objdiff 100 %** (you can't run 3-region SHA1 —
-  the brain reproduces it on merge + defers any region-mismatch). Target
-  **~8-12 ov006 picks** (first wave, expect ramp-up). Bank the ov006
-  family recipes. Branch: `scaffolder/ov006-wave1`.
-- **Brief 305** — `decomper`. **Cold-RE wave 16 — ov002, shift to the
-  `0x100-0x200` tier.** Wave 15 (7 picks) signals the `<0x100` clean zone
-  is depleting — the remainder is increasingly **register-numbering-walled**
-  (byte-temp order / global-in-reg / RMW addressing — the walled tail,
-  ship-as-`.s` later). Shift emphasis: (A) **`0x100-0x200` reachable
-  tier** (the composite dispatchers — now the richest clean-C vein,
-  ~3-6 `.c`/wave) + (B) the **remaining clean `<0x100`** (forwarders /
-  flag-posts that aren't reg-walled). Recipe unchanged (`m2c_feed` →
-  `#include ov002_core.h` (sole owner) → coerce → 3-region `ninja sha1`);
-  canonicalisation residue via `asm_escape.py`. **Defer register-walled
-  funcs** — they're the GLOBAL_ASM endgame tail (tool now ready, brief
-  302; not used yet). **Target ~10-15 picks.** Bank sub-recipes.
-  Success = per-pick 3-region SHA1 PASS. Branch: `decomper/coldre-wave16`.
+- **Brief 310** — `scaffolder`. **Co-drain wave 4 — continue the ov006
+  stream.** decomp.me / direct-mwcc / objdiff — **no SHA1** (the brain
+  3-region-gates on merge). Continue the ov006 second-stream drain
+  (waves 1-3 = briefs 304/307/309 shipped 12 + 26 + 27 = **65 `.c`**).
+  **First: pull latest `config/eur/arm9/overlays/ov006/delinks.txt` and
+  SUBTRACT the already-matched set** — per the brief-304 note, some funcs
+  get matched between waves; don't double-ship (use the `verify.py`
+  byte-word comparator). Stay on the collision-free footing (own
+  `src/overlay006/`, own ov006 delinks, own `ov006_core.h`). Drain the
+  next ov006 family cohorts / all-matched-callee funcs. **Per-pick gate =
+  EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge +
+  defers any region-mismatch. Target **~15-25 picks**. Bank ov006 family
+  recipes. Branch: `scaffolder/ov006-wave4`.
+- **Brief 311** — `decomper`. **ov011 clean-C wave 2 — continue the
+  fresh-overlay drain.** ov002's clean-C zone is tapped (register-numbering
+  + switch-case-body-layout walls); its walled tail is **reserved for the
+  GLOBAL_ASM endgame, not now** (you correctly pivoted off it at brief
+  308). You opened **ov011** (clean-C wave 1 = brief 308, 19 `.c`); keep
+  going — ov011 is **89 % reachable** (brief 300). Recipe: `m2c_feed` →
+  `#include` the ov011 header + guards → coerce → **3-region `ninja
+  sha1`**; canonicalisation residue via `asm_escape.py` (trust the
+  REFUSE). Pull latest ov011 delinks + subtract the matched set. Drain
+  the reachable `<0x100` cohort (family-first). **Target ~12-18 picks.**
+  Bank sub-recipes. Success = per-pick 3-region SHA1 PASS. Branch:
+  `decomper/ov011-wave2`.
 
 ### Closed briefs (reference)
 
+- **Brief 309** — `scaffolder`, shipped in PR #814. ✅ **27 matched ov006
+  `.c` (co-drain wave 3).** Per-state method families; EUR objdiff 100 %,
+  brain 3-region SHA1 gated on merge (PASS). The ov006 second stream is
+  productive (waves 1-3 = 65 `.c`).
+- **Brief 308** — `decomper`, shipped in PR #815. ✅ **19 matched ov011
+  `.c` (clean-C wave 1 — fresh-overlay pivot).** The decomper **pivoted
+  off** the ov002 GLOBAL_ASM tail (brief 306, queued by #812 but
+  **superseded** — no PR) to a fresh overlay (**ov011**, 89 % reachable)
+  for clean-C velocity. ov002's walled tail stays reserved for the
+  GLOBAL_ASM endgame (not started). Mirrors the scaffolder's ov006
+  wave-1 playbook.
+- **Brief 307** — `scaffolder`, shipped in PR #813. ✅ **26 matched ov006
+  `.c` (co-drain wave 2).** ov006 family cohorts; EUR objdiff 100 %,
+  brain-gated (PASS).
 - **Brief 305** — `decomper`, shipped in PR #811. ⚠️ **5 cold-RE
   picks + dispatcher premise corrected.** Original brief hoped the
   `0x100-0x200` dispatcher band would be a clean-C goldmine; turned

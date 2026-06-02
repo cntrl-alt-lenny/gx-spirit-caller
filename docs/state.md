@@ -8,61 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-05-30, post-#810 + #811 merge. Brain on
-Windows. **Brief 304 (ov006 co-drain wave 1, scaffolder, 12 matched
-`.c`) + brief 305 (ov002 cold-RE wave 16 — 5 picks + dispatcher
-premise corrected, decomper) both shipped. +17 in one round.**
+**Last updated:** 2026-06-02, post yesterday's Windows session (main
+5cbc263). Brain back on Mac. **Caught up on 13 commits + reconciled the
+bookkeeping. +89 functions over ~6 waves across three overlays.**
+⚠️ **#816's "ninja sha1 PASSES for all 3 regions" is a STALE-DOC
+CLEANUP, not completion** — the ROM has round-tripped byte-identically
+for ages (unmatched funcs build from orig gap bytes; `ninja sha1` is the
+per-pick floor, not the finish line). The project is **66.45 % done**.
 
-**Current metrics (post-#810 + #811 merge, EUR — reconfigured +
-3-region `ninja sha1` PASS verified locally from decomper worktree,
-clean tree):** `matched_functions 2789 / 9801 (28.46 %)`,
-`matched_code_percent 7.6301 %`, `complete_units 2752 / 4177`. 3-region
-SHA1 PASS preserved (eur / usa / jpn all `nds: OK`). +17 vs the
-2772 baseline at post-#807/#808.
+**Current metrics (post yesterday, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 5cbc263, clean tree):**
+**`complete_units 2824 / 4250 (66.45 %)`** (+89 vs my last Mac state
+2735). `matched_functions 2861 / 9801`. **3-region SHA1 PASS reproduced
+by the brain** (eur / usa / jpn all OK) — the #816 round-trip claim holds.
 
-🎯 **Brief 304 — co-drain on ov006 validated.** First matching wave
-on ov006 from scaffolder; 12 `.c` ships, all EUR objdiff 100% byte-
-identical, brain 3-region SHA1 gated on merge (PASS). 3 banked
-families (callback-dispatch ×5, 5-iter per-index ×2, guarded-call+clear
-×1) + 4 singletons. `docs/research/ov006_core.h` promoted to
-`src/overlay006/ov006_core.h`. **Note for next scaffolder wave:**
-3 further functions (`021b2b08`, `021b2c9c`, `021b56d8`) were
-already matched on the branch — scaffolder reverted, not double-
-shipped. Pull latest `delinks.txt` and subtract the matched set
-before wave 2. The co-drain pivot is working — collision-free by
-construction.
+🔀 **Three drain streams now (co-drain working).** (1) **decomper → ov011**
+clean-C (pivoted off ov002; brief 308, 19 `.c`). (2) **scaffolder → ov006**
+co-drain (briefs 304 / 307 / 309 = **65 `.c`**). (3) **ov002 paused** —
+clean-C tapped; its walled tail **reserved for the GLOBAL_ASM endgame**,
+not started (the decomper correctly chose clean-C velocity over
+ship-as-`.s`).
 
-⚠️ **Brief 305 — dispatcher premise corrected.** The original brief
-hoped `0x100-0x200` band dispatchers would be a clean-C goldmine.
-**They're not.** `021bab38` (canonical clean value-map dispatcher, 6-way
-jump table, no mutation/loop/uninit-var) **failed `ninja sha1` twice**
-— mwcc lays case bodies out in a physical order source-reordering
-can't reproduce. This is a new **switch-case-body layout wall** (sibling
-of brief 295's block-layout wall, equally uncontrollable from C).
-Sparse state-machine dispatchers are out too (global mutation +
-block-layout). **The band's clean-C dispatcher subset is ~0.** Decomper
-shipped 5 `<0x100` picks instead (all `.c`, 3-region SHA1 PASS):
-`02285984` · `02258384` · `02223d48` · `0223b400` · `021f89e8`.
-Near-misses register-walled and deferred to GLOBAL_ASM tail:
-`0228de04`, `02237960`, `021d81d4`.
+🧱 **Key finding (brief 305): the `0x100-0x200` dispatcher band is NOT a
+clean-C goldmine.** A new **switch-case-body layout wall** — mwcc's
+case-body physical order is uncontrollable from C (sibling of the
+block-layout wall). So ov002's remaining bulk is walled → GLOBAL_ASM-tail
+territory, deferred to the endgame.
 
-🧭 **Where we are: strategy inflection at end of brief 305.** Decomper
-flagged it in the PR body: ov002 clean-C is now gated by **both**
-register-numbering AND switch-case-body layout walls (~4-7 clean per
-wave and falling). The right move per decomper's recommendation is
-to **start using the GLOBAL_ASM `.s` tool (asm_escape.py --whole-
-function from brief 302) for ov002's walled tail** — it's the only
-mechanism that drains the bulk of what remains in ov002 — and/or
-**pivot the decomper to a fresh overlay** for clean-C velocity.
-
-**Brain's call (queued for brief 306):** decomper pivots to GLOBAL_ASM
-walled-tail drain on ov002. Reasons: (1) completes ov002 to fully-
-matched (Track 1 win — `complete_units` headline), (2) uses the
-toolkit specifically built for this moment (brief 302), (3) doesn't
-collide with scaffolder on ov006, (4) once ov002 is fully matched
-decomper can pivot to a fresh overlay for clean-C velocity next.
-Scaffolder continues ov006 co-drain wave 2 (brief 307) with the
-3-already-matched delinks.txt subtraction folded in.
+🧭 **Where we are: steady-state, three parallel streams.** ov002 clean-C
+is essentially tapped; the decomper + scaffolder run clean-C on fresh /
+rich overlays (ov011 89 % reachable, ov006 84 %) — the cross-overlay
+runway (brief 300) is confirmed real. Endgame unchanged: C-drain the
+reachable across overlays; **ship-as-`.s` the walled tails (ov002 +
+others) at the very end** (tool ready, brief 302; not used yet). Next:
+**brief 310** (scaffolder ov006 wave 4) + **brief 311** (decomper ov011
+wave 2), both pulling latest delinks + subtracting the matched set first.
+Settled-permanent: P-11, P-15, the switch-case-body layout wall.
+ntrtwl parked (land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
