@@ -141,4 +141,23 @@ extern char data_ov011_021d4674[];   /* parallel coord array Y', stride 0x28 */
  *    no-op-mask logic (021d2008); overlay-swap unnamed bl targets (021ca0ac).
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 315 wave 4 (2 picks, EUR ninja sha1 OK). ***ov011 clean-C
+ * is TAPPED*** — see docs/research/brief-315-ov011-clean-c-wave4.md.
+ *  - 021ccad8: view-mode-3 coord-change detector (021d1080 out-param + RMW).
+ *  - 021caafc: coord classification readback (021ca400 + dual 305f/3178 table).
+ *
+ * Recipe banked: mwcc's signed `/4096` is `asr #11; add ..,lsr #20; asr #12`
+ * (i.e. `(x + ((x>>11)>>>20)) >> 12`) — write the plain `expr / 4096` (021cc814,
+ * which 1-reg-walled on an unrelated load-dest).
+ *
+ * STATUS: the reachable <0x100 cohort is down to 6 (2 shipped here, 4 walled:
+ * 021cc814 load-dest 1-reg, 021cd2d4 multi-table, 021cfa50 field-pool, 021cca04
+ * fold+predication+alloc). The 0x100-0x200 tier (13 funcs) is all large
+ * composites (jump tables, state machines, value-maps, accumulation loops,
+ * fixed-point render) — GLOBAL_ASM/permuter territory. WAVE 5 SHOULD PIVOT to a
+ * fresh overlay: ov004 (168 <0x100 / 39 <0x40, richest) > ov000 (65/17) >
+ * ov008 (49/4). The cell-config / cached-base / guard-flip recipes carry over.
+ * ======================================================================= */
+
 #endif /* OV011_CORE_H */
