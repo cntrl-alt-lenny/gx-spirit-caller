@@ -8,43 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post yesterday's Windows session (main
-5cbc263). Brain back on Mac. **Caught up on 13 commits + reconciled the
-bookkeeping. +89 functions over ~6 waves across three overlays.**
-⚠️ **#816's "ninja sha1 PASSES for all 3 regions" is a STALE-DOC
-CLEANUP, not completion** — the ROM has round-tripped byte-identically
-for ages (unmatched funcs build from orig gap bytes; `ninja sha1` is the
-per-pick floor, not the finish line). The project is **66.45 % done**.
+**Last updated:** 2026-06-02, post-#818 / #819 / #820 merge. Brain on Mac.
+**Brief 310 (ov006 co-drain wave 4, scaffolder, +20) + brief 311 (ov011
+clean-C wave 2, decomper, +18) both shipped — +38, the biggest round yet
+(the co-drain doubling at work). Plus the spawned ov004 diagnosis (#818):
+the `ninja check` symbol failure is benign systemic label-drift,
+ROM-irrelevant — leave it.** (Reminder: the project is ~67 % done; the
+`ninja sha1` round-trip is the floor, not the finish line.)
 
-**Current metrics (post yesterday, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 5cbc263, clean tree):**
-**`complete_units 2824 / 4250 (66.45 %)`** (+89 vs my last Mac state
-2735). `matched_functions 2861 / 9801`. **3-region SHA1 PASS reproduced
-by the brain** (eur / usa / jpn all OK) — the #816 round-trip claim holds.
+**Current metrics (post-#818/#819/#820 merge, EUR — brain reconfigured +
+3-region `ninja sha1` PASS + `ninja report` on 2562252, clean tree):**
+**`complete_units 2862 / 4290 (66.71 %)`** (+38 vs prior 2824).
+`matched_functions 2899 / 9801` (+38). 3-region SHA1 PASS reproduced
+(eur / usa / jpn all OK).
 
-🔀 **Three drain streams now (co-drain working).** (1) **decomper → ov011**
-clean-C (pivoted off ov002; brief 308, 19 `.c`). (2) **scaffolder → ov006**
-co-drain (briefs 304 / 307 / 309 = **65 `.c`**). (3) **ov002 paused** —
-clean-C tapped; its walled tail **reserved for the GLOBAL_ASM endgame**,
-not started (the decomper correctly chose clean-C velocity over
-ship-as-`.s`).
+🔀 **Two parallel clean-C streams (~38/round).** **decomper → ov011**
+(clean-C; 89 % reachable; waves 1-2 = 37 `.c`). **scaffolder → ov006**
+(co-drain; 84 % reachable; waves 1-4 = 85 `.c`). **ov002 paused** —
+clean-C tapped; walled tail reserved for the GLOBAL_ASM endgame.
 
-🧱 **Key finding (brief 305): the `0x100-0x200` dispatcher band is NOT a
-clean-C goldmine.** A new **switch-case-body layout wall** — mwcc's
-case-body physical order is uncontrollable from C (sibling of the
-block-layout wall). So ov002's remaining bulk is walled → GLOBAL_ASM-tail
-territory, deferred to the endgame.
+🔬 **ov004 diagnosis (#818) — benign, leave it.** `dsd check symbols`
+fails (678 errors = auto-name **label** drift, data +4 off after link);
+**ROM-irrelevant** (`ninja sha1` PASS ×3, `dsd check modules` green ×27).
+NOT force-fixed (mass re-address risks the byte-identical build for zero
+gain). `dsd check symbols` is informational, not the gate; PR-template
+line corrected. Root cause: `docs/research/ov004-check-symbols-diagnosis.md`.
 
-🧭 **Where we are: steady-state, three parallel streams.** ov002 clean-C
-is essentially tapped; the decomper + scaffolder run clean-C on fresh /
-rich overlays (ov011 89 % reachable, ov006 84 %) — the cross-overlay
-runway (brief 300) is confirmed real. Endgame unchanged: C-drain the
-reachable across overlays; **ship-as-`.s` the walled tails (ov002 +
-others) at the very end** (tool ready, brief 302; not used yet). Next:
-**brief 310** (scaffolder ov006 wave 4) + **brief 311** (decomper ov011
-wave 2), both pulling latest delinks + subtracting the matched set first.
-Settled-permanent: P-11, P-15, the switch-case-body layout wall.
-ntrtwl parked (land/drop on request).
+🧱 **Settled walls:** P-11, P-15, the **switch-case-body layout wall**
+(brief 305 — mwcc's case-body physical order is uncontrollable from C;
+ov002's `0x100-0x200` dispatcher bulk is walled → GLOBAL_ASM-tail).
+
+🧭 **Where we are: steady-state, two clean-C streams.** Both agents drain
+fresh/rich overlays at ~38/round combined; the cross-overlay runway (brief
+300) is confirmed real (many overlays of `<0x100` reachable work). Endgame
+unchanged: C-drain the reachable; **ship-as-`.s` the walled tails at the
+very end** (tool ready, brief 302; unused). Next: **brief 312** (scaffolder
+ov006 wave 5) + **brief 313** (decomper ov011 wave 3), both pull-latest +
+subtract-matched first. ntrtwl parked (land/drop on request).
 
 🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
 Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
