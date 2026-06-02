@@ -103,4 +103,42 @@ extern char data_ov011_021d4674[];   /* parallel coord array Y', stride 0x28 */
  *  - arg-eval-order (right-to-left) reg cascade. (021cd700, 021ce344)
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 313 wave 3 (12 picks, EUR ninja sha1 OK; the hard tail).
+ * Per-pick table in docs/research/brief-313-ov011-clean-c-wave3.md.
+ *
+ * CELL-CONFIG SINK FAMILIES cracked (the headline lever — these sinks are
+ * stack-arg-heavy with NO prior C convention; reconstruct from the frame:
+ * r0-r3 = args 1-4, sp[0],sp[4],… = args 5+, locals sit ABOVE the outgoing-arg
+ * area; mwcc emits `stmib` for the consecutive arg stores):
+ *  - func_0201e964(mode, h->unk2C, &cfg, 0, …8 stack ints): 021cc8bc, 021cc424,
+ *    021cc5c4  [arg2 is h->unk2C; cfg = 2-int local OR an incoming pointer]
+ *  - func_0201eaa0(mode, h, p5, sub, …): 021cbb64  [arg2 is h itself]
+ *  - func_0201ef90(&f0, &f1, &f2, 0x6800, …, &data_3138[(arg0-1)*16], …):
+ *    021cd048  [address-of-field args: `s + 0xBC` -> `add r0,r4,#188`]
+ * Handle tables: 021d4110/4120/4140/4154/4174 and ov000 021c75cc, indexed
+ * [idx<<2]; h->unk2C at +0x2C; release via func_0207fd28(h, 0x1000).
+ *
+ * Recipe levers proven this wave:
+ *  - for(;;){ if(!cond) break; … } defeats mwcc while-loop ROTATION (top-test
+ *    preserved, no peeled+duplicated tail). (021d0c38)
+ *  - switch over {0,1} with NO default leaves the temp uninitialised — the orig
+ *    uses the stale register on the default path. (021ca324)
+ *  - guard-flip block layout: write `if (hot){ …; return; } cold();` so the cold
+ *    path lands last (matches orig bne-to-end), NOT `if(!hot){cold;return;}`. (021cad00)
+ *  - (reconfirmed) cached-base across calls/loops (021cb500/021d0c38);
+ *    declaration-order reg-flip i-before-ptr (021cf228).
+ *
+ * WALL additions (defer; GLOBAL_ASM/permuter tail — ov011 has reached the ov002
+ * brief-305 inflection: the reachable <0x100 cohort is now hard-tail only):
+ *  - load-/mul-dest reg-numbering 2-reg swap (021d0bb0, 021d1080/1110).
+ *  - stmib-grouping scheduling on the 8-param eaa0 variants — the extra
+ *    p7&0xFFFF arg splits the 3rd store out. (021cc194, 021cc27c, 021cd0dc)
+ *  - table-walk base-selection + count reload (32d8/334a stride 114): 021cd190,
+ *    021cd1fc, 021cd268.
+ *  - predication-vs-branch on dual-assignment if/else (021ceebc); dense
+ *    jump-table layout (021d1f04); idx-N constant fold (021cd574); duplicated/
+ *    no-op-mask logic (021d2008); overlay-swap unnamed bl targets (021ca0ac).
+ * ======================================================================= */
+
 #endif /* OV011_CORE_H */
