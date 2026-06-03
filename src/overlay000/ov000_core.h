@@ -110,7 +110,49 @@ extern struct Ov000Row data_ov000_021c7530[];
  *    allocator puts the loaded value in r0 / the ptr in r1 and won't reorder.
  *  - 021aa840 CSE near-miss: 21v22, mwcc hoists the obj+256 base the orig
  *    recomputes per branch.
- *  - 021ae218 / 021adc50 / 021ad540: complex orchestrators (nested goto-tail
- *    control flow / many-stack-arg calls) — wave-3 dedicated RE.              */
+ *  - 021ae218 / 021adc50: complex orchestrators (nested goto-tail control
+ *    flow / many-stack-arg calls) — dedicated RE.                            */
+
+/* ====================================================================== *
+ *  §VERIFIED — co-drain wave 3 (brief 321). 3 more .c, all EUR objdiff    *
+ *  100% + clean re-delink drop-out + EUR `ninja sha1` OK. 36 -> 39.        *
+ *  THINNING CONFIRMED: clean-C yield 11 (w1) -> 13 (w2) -> 3 (w3). The     *
+ *  easy read/predicate/RMW shapes are mined; the residue is fixed-point    *
+ *  math, multi-field PACKs, and big command-record builders.               *
+ * ====================================================================== */
+
+/* The 3 picks:
+ *  - 021ac050 saturating-subtract u16 clamp (sibling of 021abfbc/abfec).
+ *  - 021ad540 + 021ad49c OBJECT-BUILDER clone pair (the wave-2 "021ad540
+ *    dedicated-RE" item — matched FIRST TRY once modeled). Differ only in
+ *    the object table + two window-size constants.                          */
+
+/* OBJECT-BUILDER family template (021ad540/021ad49c; 021ac920 2-byte near):
+ *   obj = table[idx];                       // ldr r5,[tableptr, idx<<2]
+ *   if (a1 != -1) func_0201e800(obj, (unsigned short)a1);
+ *   func_0201e964(1, obj->f44, a4, 0, 0, 0, a3, a2, WIN_W, WIN_H, a5, 0);
+ *   if (a1 == -1) { func_0201e7ec(obj,1); func_0207fd28(obj,4096); }
+ * Sinks recovered: func_0201e800(void*,int) re-init; func_0201e964(...12 args,
+ * 4 reg + 8 stack) window build; func_0201e7ec(void*,int); func_0207fd28(
+ * void*,int) free; tables data_ov000_021c760c[] / 021c7604[] (stride-4 obj
+ * ptr arrays). 12-arg call: args 4..11 at sp+0..28; the 5th-incoming-arg is
+ * read at [sp+56] (after push of 6 regs + sub sp,#32). See 021aca28 recipe 6. */
+
+/* Wave-3 walls / near-misses (permuter or dedicated-RE / .s — NOT co-drain):
+ *  - 021ac920 (0x108 guarded builder): 66v66, byte-identical EXCEPT the entry
+ *    guard loads obj->f104 into r0 (mine) vs r3 (orig) — pure reg-numbering,
+ *    PERMUTER-TRIVIAL. Needs `volatile` flags to stop mwcc caching the +152
+ *    word in a callee-saved reg (orig re-reads each use). Recovers sinks
+ *    0201ef90 (10-arg) / 0201ef10 / 0201e7e0 / 0201ede4 when landed.
+ *  - 021abf78 u16 clamp: 17v17 reg-numbering (byte->r2 vs r1), won't flip.
+ *  - 021acdcc: 17v18, mwcc drops the redundant `and #0xff` the orig keeps
+ *    before the 8-bit-field-at-bit8 insert (bitfield-insert codegen).
+ *  - 021ae42c: bx-ip POOLED tail-call (orig pools the far 021ae510); the
+ *    standalone direct-mwcc compile emits bl+frame — a link-layout artifact,
+ *    not reproducible here (matches once linked / via the brain on merge).
+ *  - Fixed-point (smull/mla) class: 021ae510, 021ab01c, 021aaee4, 021aa8d4,
+ *    021ac578 (distance test), 021acc58 — m2c/permuter territory.
+ *  - command-record builders: 021ad660/021ad8dc (0x27c clone pair, dual record
+ *    + MMIO + packs), 021abd50, 021af5e0 — dedicated RE.                     */
 
 #endif /* OV000_CORE_H */
