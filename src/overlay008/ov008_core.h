@@ -84,7 +84,31 @@ extern char data_ov008_021b2790[];
  *    asr-round divides — m2c/permuter.
  *  - BYTE-COMBINE stride-52 builders (021acfa0/ac208/aceac/adbbc): index =
  *    byte0+byte1 of a u16, then row[idx*52] writes + a bitfield store.
- *  - 021b2268 guarded-setter: 29v31, a pool-layout offset only (likely matches
- *    on the real link; brain to confirm on merge). */
+ *  - 021b2268 guarded-setter: 29v31 — NOT a pool artifact (wave-2 sha1 gate
+ *    FAILED); a real codegen diff. Needs RE/permuter. */
+
+/* ====================================================================== *
+ *  §VERIFIED — co-drain wave 2 (brief 325). 1 .c (medium tier). 24 -> 25.  *
+ *  YIELD-DROP FLAG: the 0x98-0xf4 tier is PERMUTER/M2C-BOUND, not direct-  *
+ *  mwcc. 7 funcs probed, 1 clean. The blockers are mwcc CODEGEN choices    *
+ *  (reg-alloc, scheduling, peephole), not modelling — see brief 325.       *
+ * ====================================================================== */
+/* Pick: 021aa578 bounds-check — `func_02006110(&A,&B)` (2 out-ptrs) then a
+ *   4-way comparison. RECIPE: a 0/1-returning compare chain must be
+ *   `if (A && B && C && D) return 1; return 0;` — the && short-circuits each
+ *   clause to a SHARED `return 0` (orig's forward branches); separate
+ *   `if(x)return 0;` get predicated (popgt) and a boolean `return A&&B&&..;`
+ *   computes booleans — both diverge.
+ * Walls confirmed permuter/m2c (do NOT spend more direct-mwcc here):
+ *   - command-record packs 021abba0/abb08/aba3c: 20v20 REG-ALLOC (orig puts
+ *     a0-K in a fresh reg + reuses for the word; mwcc subtracts a0 in-place).
+ *     Stable across 4 operand orderings.
+ *   - byte-combine builders 021acfa0/ac208/aceac/adbbc: mwcc PEEPHOLEs
+ *     (hw<<24)>>24 -> `and #0xff` so it can't fold into the index add (orig
+ *     keeps the shift) -> count + reg-pressure diverge (23v30).
+ *   - fixed-point 021ac430/ac4d0/af4c4: signed %8 via (x<<29)..ror#29 + loops.
+ *   - 021aafa4 indirect-dispatch: 22v25, BLOCK instruction-scheduling (orig
+ *     interleaves the global-load between the two field-clears) after fixing
+ *     popeq/beq + offset-fold + caching. Emblematic of the tier. */
 
 #endif /* OV008_CORE_H */
