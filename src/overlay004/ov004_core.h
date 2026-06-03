@@ -21,6 +21,7 @@ extern char data_ov004_02211490[];   /* record A (init/reset target)         */
 extern char data_ov004_02211538[];   /* record B (init target)               */
 extern char data_ov004_022915e8[];   /* global lock flag (timer gate)         */
 extern char data_ov004_0220e500[];   /* secondary state struct               */
+extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
 
 /* --- data_ov004_0220b500 field map (byte offsets; § = byte-verified) ------
  *   +0x84    current-id latch (set-if-changed, then func_021c9ef0(id+219))  §
@@ -86,6 +87,27 @@ extern char data_ov004_0220e500[];   /* secondary state struct               */
  *    materialises movne#1;moveq#0, mwcc branches direct.
  *  - fn-ptr B6C dispatch (021cb518/021d6ed0): data_021040ac.B6C++ field-pool
  *    (== ov011 021d0afc wall). field-pool RMW 021cc2a4; base+212 pool 021d641c.
+ * ======================================================================= */
+
+/* =======================================================================
+ * §VERIFIED — brief 320 wave 3 (6 picks, EUR ninja sha1 OK). EASY CLEAN TIER
+ * THINNING (17->15->6). Per-pick table in brief-320-ov004-clean-c-wave3.md.
+ *  - 021d3818 (MMIO/sound teardown), 021da91c (toggle + tail-call), 021cbf84
+ *    (cell-config sib), 021d3d2c (sound+flag dispatch), 021d13dc/021cea48 (msg).
+ *
+ * Recipes: tail-call (void fn, last stmt func_X(), no frame -> `bx ip`; dcheck
+ * normalises bx<reg>); a `mov r0,#0` before a dispatch branch is the callee ARG
+ * (021d1118(0)); `-N` literal quirk works for any sink (0208e2f4(reg,28,-16) ->
+ * mov;sub); re-read a field when orig reloads it (021cea48); cell-config base is
+ * NOT cached when calls separate the accesses (021cbf84 vs 021da898 which is).
+ *
+ * NEW WALLS: loop strength-reduction (021d7854/021dab1c — mwcc keeps a separate
+ * i*N counter vs orig inline `add base,i,lsl#k`); fn-ptr-by-field reg (021d5b14);
+ * magic-/1000 division (021d3de4); stack-heavy sinks (021ca0a4/cb778/cb568).
+ *
+ * THINNING FLAG: the changed-bool family (~19) is the dominant remainder ->
+ * PERMUTER PASS is the biggest unlock. Else clean-C ~6/wave, or pivot overlay.
+ * The 0x100-0x200 ov004 tier is untouched.
  * ======================================================================= */
 
 #endif /* OV004_CORE_H */
