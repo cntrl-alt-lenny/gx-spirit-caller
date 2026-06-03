@@ -68,3 +68,27 @@ src/overlay020/func_ov020_021aa7ac.c:
 src/overlay020/func_ov020_021aa6cc.c:
     complete
     .text start:0x021aa6cc end:0x021aa700
+
+src/overlay020/func_ov020_021aab7c.c:
+    complete
+    .text start:0x021aab7c end:0x021aabf0
+
+src/overlay020/func_ov020_021aabf0.c:
+    complete
+    .text start:0x021aabf0 end:0x021aac78
+
+src/overlay020/func_ov020_021aac78.c:
+    complete
+    .text start:0x021aac78 end:0x021aad10
+
+src/overlay020/func_ov020_021aa9e8.c:
+    complete
+    .text start:0x021aa9e8 end:0x021aaa80
+
+src/overlay020/func_ov020_021aa67c.c:
+    complete
+    .text start:0x021aa67c end:0x021aa6cc
+
+src/overlay020/func_ov020_021ab798.c:
+    complete
+    .text start:0x021ab798 end:0x021ab7dc
