@@ -8,34 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post-#834 / #835 merge. Brain on Mac.
-**Brief 320 (ov004 clean-C wave 3, +6) + brief 321 (ov000 co-drain wave 3,
-+3) both shipped — +9 (a thinning round). Second overlay-transition: both
-overlays' clean-C tapped, so next round both pivot (decomper → ov010,
-scaffolder → ov008).** (Reminder: ~67 % done; `ninja sha1` is the floor, not
-the finish line.)
+**Last updated:** 2026-06-03, post-#838 / #837 merge. Brain on Mac.
+**Brief 322 (ov010 clean-C wave 1, +15) + brief 323 (ov008 co-drain wave 1,
++12) both shipped — +27, two fresh overlays opened. Both fan out next:
+decomper → ov016 (ov010 residue reg-alloc-walled); scaffolder stays on ov008
+wave 2 (medium tier not mined).** (Reminder: ~67 % done; `ninja sha1` is the
+floor, not the finish line.)
 
-**Current metrics (post-#834/#835 merge, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on 85a698a, clean tree):**
-**`complete_units 2972 / 4418 (67.27 %)`** (+9 vs prior 2963).
-`matched_functions 3009 / 9801` (+9). 3-region SHA1 PASS reproduced
+**Current metrics (post-#838/#837 merge, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 22894dc, clean tree):**
+**`complete_units 2999 / 4448 (67.42 %)`** (+27 vs prior 2972).
+`matched_functions 3036 / 9801` (+27). 3-region SHA1 PASS reproduced
 (eur / usa / jpn all OK).
 
-🔀 **Overlay status (2nd transition).** **ov004 thinned** (~38 clean; walled
-tail → GLOBAL_ASM). **ov000 mined** (~27). Done earlier: ov011 (51), ov006
-(150). **ov002 paused.** → both pivot to fresh overlays.
+🔀 **Overlay status.** **ov010** wave 1 = 15 (revived dormant overlay, 13
+pre-matched br251); residue reg-alloc/framing-walled → **pivot to ov016**.
+**ov008** wave 1 = 12 (12 → 24); easy `<0x98` tier drained, the `0x98–0xf4`
+**medium tier (~20) NOT mined** → **ov008 wave 2**. Done earlier: ov004 (~38),
+ov000 (~27), ov011 (51), ov006 (150). **ov002 paused.**
+
+🧰 **Recipe banked this round — DIVMOD via explicit `func_020b3870`** (quotient
+r0; remainder `(int)((long long)…>>32)` = r1). The C `/`/`%` operators emit
+`bl _s32_div_f` (undefined → **passes dcheck, FAILS `ninja sha1` at LINK** —
+invisible until link). Now in `ov010_core.h`; carried into the ov016 brief.
 
 📐 **Calibration (recurring):** per-overlay clean-C yield ≈ **HALF the shape-
-"reachable" estimate** (register-walls in non-loop bodies too). So each small
-overlay gives ~20-40 clean `.c` then thins — streams pivot every ~2-3 waves.
+"reachable" estimate** (register-walls in non-loop bodies too). Small overlays
+give a fat wave 1 then thin; pivot when the residue turns wall-dominated.
 
-🧭 **Where we are: chewing through the small overlays.** Both pivot: **decomper
-→ ov010** (~40), **scaffolder → ov008** (~48). Census small-overlay runway
-after these: ov016 / ov005 / ov015 / ov020 / ov017 … Once the small-overlay
-clean-C is exhausted (~several more waves), the remaining bulk = **main** (2025
-— SDK source-mining, modest per #280) + the **walled tails** (ov002 1887 / ov004
-/ etc. — GLOBAL_ASM endgame). Endgame unchanged. Next: **brief 322** (decomper
-ov010 w1) + **brief 323** (scaffolder ov008 w1).
+🧭 **Where we are: chewing through the small overlays.** decomper **→ ov016**
+(~39); scaffolder **→ ov008 wave 2** (~20 medium). Census small-overlay runway
+after: ov005 / ov015 / ov020 / ov017 … The **reg-alloc-walled tail is
+accumulating** across overlays (ov004/ov010/ov008 near-misses) — reserved for
+the permuter/GLOBAL_ASM endgame, run at the very end (tool ready, brief 302;
+unused). Once the small-overlay clean-C is exhausted (~several more waves), the
+remaining bulk = **main** (2025 — SDK source-mining, modest per #280) + the
+**walled tails** (ov002 1887 / etc.). Next: **brief 324** (decomper ov016 w1)
++ **brief 325** (scaffolder ov008 w2).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
