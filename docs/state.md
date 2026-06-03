@@ -8,30 +8,34 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-02, post-#831 / #832 merge. Brain on Mac.
-**Brief 318 (ov004 clean-C wave 2, +15) + brief 319 (ov000 co-drain wave 2,
-+13) both shipped — +28, 67.20 %; `matched_functions` crossed 3000. Steady
-two-overlay drain.** (Reminder: ~67 % done; `ninja sha1` is the floor, not the
-finish line.)
+**Last updated:** 2026-06-02, post-#834 / #835 merge. Brain on Mac.
+**Brief 320 (ov004 clean-C wave 3, +6) + brief 321 (ov000 co-drain wave 3,
++3) both shipped — +9 (a thinning round). Second overlay-transition: both
+overlays' clean-C tapped, so next round both pivot (decomper → ov010,
+scaffolder → ov008).** (Reminder: ~67 % done; `ninja sha1` is the floor, not
+the finish line.)
 
-**Current metrics (post-#831/#832 merge, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on d0ddd90, clean tree):**
-**`complete_units 2963 / 4409 (67.20 %)`** (+28 vs prior 2935).
-`matched_functions 3000 / 9801` (+28). 3-region SHA1 PASS reproduced
+**Current metrics (post-#834/#835 merge, EUR — brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on 85a698a, clean tree):**
+**`complete_units 2972 / 4418 (67.27 %)`** (+9 vs prior 2963).
+`matched_functions 3009 / 9801` (+9). 3-region SHA1 PASS reproduced
 (eur / usa / jpn all OK).
 
-🔀 **Two parallel clean-C streams.** **decomper → ov004** (waves 1-2 = 32 `.c`;
-~168 reachable). **scaffolder → ov000** (waves 1-2 = 24 `.c`; ~63 reachable).
-**Done/tapped:** ov011 (51), ov006 (150). **ov002 paused** (walled tail =
-GLOBAL_ASM endgame).
+🔀 **Overlay status (2nd transition).** **ov004 thinned** (~38 clean; walled
+tail → GLOBAL_ASM). **ov000 mined** (~27). Done earlier: ov011 (51), ov006
+(150). **ov002 paused.** → both pivot to fresh overlays.
 
-🧭 **Where we are: steady-state, two fresh overlays at ~28/round.** The
-overlay-pivot playbook is proven (recipe + per-overlay `ovNNN_core.h` transfer
-cleanly). Multi-overlay runway: ov004 + ov000 in progress, then ov008 / ov010
-/ ov016 / ov005 … many overlays. Endgame unchanged: ship-as-`.s` the walled
-tails at the very end (tool ready, brief 302; unused). Next: **brief 320**
-(decomper ov004 w3) + **brief 321** (scaffolder ov000 w3), both
-flag-if-thinning.
+📐 **Calibration (recurring):** per-overlay clean-C yield ≈ **HALF the shape-
+"reachable" estimate** (register-walls in non-loop bodies too). So each small
+overlay gives ~20-40 clean `.c` then thins — streams pivot every ~2-3 waves.
+
+🧭 **Where we are: chewing through the small overlays.** Both pivot: **decomper
+→ ov010** (~40), **scaffolder → ov008** (~48). Census small-overlay runway
+after these: ov016 / ov005 / ov015 / ov020 / ov017 … Once the small-overlay
+clean-C is exhausted (~several more waves), the remaining bulk = **main** (2025
+— SDK source-mining, modest per #280) + the **walled tails** (ov002 1887 / ov004
+/ etc. — GLOBAL_ASM endgame). Endgame unchanged. Next: **brief 322** (decomper
+ov010 w1) + **brief 323** (scaffolder ov008 w1).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
