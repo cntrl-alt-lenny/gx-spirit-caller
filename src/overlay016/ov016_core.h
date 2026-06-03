@@ -27,6 +27,11 @@ extern char data_ov016_021b9740[];   /* record array, stride 84 (+140 field)  */
 extern char data_ov016_021bab44[];   /* subsystem A state                     */
 extern char data_ov016_021bb2c4[];   /* subsystem B state                     */
 extern char data_ov016_021bb1a4[];   /* per-row built-object handles (+12 stride) */
+extern char data_ov016_021b939c[];   /* number-format glyph table (func_02091554) */
+extern char data_ov016_021b96d8[];   /* row-group-5 cell configs (stride 24) */
+extern char data_ov016_021b96f0[];
+extern char data_ov016_021b9708[];
+extern char data_ov016_021b9720[];
 
 /* =======================================================================
  * §VERIFIED — brief 324 wave 1 (15 picks, EUR/USA/JPN ninja sha1 OK). Per-pick
@@ -70,7 +75,47 @@ extern char data_ov016_021bb1a4[];   /* per-row built-object handles (+12 stride
  *  - fn-ptr dispatch (021b2824): inline conditional-return vs branched epilogue +
  *    reg rename. loop/dispatcher class (021b23b4/5244/5390/7694/7718/22d8-recurse).
  *  - bitfield-pack command builders (021b6074/2a8c/5188); fixed-point mul-loops
- *    (021b3a78); magic-/10 number-format (021b5fb0); 10-arg ambiguous (021b398c).
+ *    (021b3a78). (021b398c + 021b5fb0 were listed here but MATCHED in wave 2.)
+ * ======================================================================= */
+
+/* =======================================================================
+ * §VERIFIED — brief 326 wave 2 / consolidate (4 picks, EUR/USA/JPN ninja sha1
+ * OK). Per-pick table in docs/research/brief-326-ov016-clean-c-wave2.md.
+ *
+ * Picks (the remaining clean mid-tier composites):
+ *  - 021b398c: list-object rebuild — the SAME 10-arg func_0201ef90 template as the
+ *    8a30 family, minus the guarded-release (layer 2, depth 512). The wave-1
+ *    "10-arg ambiguous" worry dissolved once the template was understood; the
+ *    func_0201e7e0()/func_02093820() prelude are plain void(void) calls.
+ *  - 021b5fb0: clamped 2-digit number draw. The `/10`/`%10` are CONSTANT-divisor
+ *    -> inline smull-magic (0x66666667) and MATCH; mwcc recomputes `x/10` inside
+ *    `x%10` exactly like orig (no problematic CSE). buf[128]+local[8] frame.
+ *  - 021b7504: card stat panel — calls 60cc once + 5fb0 x3 at fixed VRAM cells
+ *    (((a2*3 + 732/733/734) << 7) + 0x6600000). Two gotchas: the 0..99 clamp is
+ *    UNSIGNED (`unsigned c; if (c>99)` -> movhi, not movgt); and `v=a2*3` must be
+ *    placed at first-use (after the first byte load) or mwcc hoists it 1 slot.
+ *  - 021b8cd8: 5th row-group-rebuild family member — u16 guard `(u16)*(p+464)`,
+ *    palette arg = `(u16)*(p+464)+75` (re-read inline each call, NOT cached),
+ *    data stride 24, ef90 consts 90112/2048, ede4 -> data_021bb1a4+28.
+ *
+ * RECIPE refinement: a CONSTANT divisor (/10, %10) inlines as smull-magic and
+ * matches via the plain C operators — the _s32_div_f trap is VARIABLE-divisor
+ * only. The `(u16 field) + k` palette arg re-reads (ldrh) per use; don't cache.
+ *
+ * WALL CLASS (endgame/permuter — do NOT force, brief 326):
+ *  - reg-swap pair 021b287c/28f4 (uniform r1<->r2; flipping operands inverts the
+ *    branch) and 021b6074 (a1+2/a0-13 r1<->ip, 22/22) — pure reg-alloc.
+ *  - MMIO-bitfield-shuffle dispatchers 021b6f08/32f0/3174: the
+ *    `*reg=(*reg&~0x1F00)|(((*reg&0x1F00)>>8 & ~N)<<8)` field-modify idiom
+ *    (double-read + and/lsr/bic/orr) + literal-reuse (`sub r,#129` for -128 off a
+ *    live 1) + inline-vs-outlined returns. 021b2824 fn-ptr dispatch; 021b5390
+ *    value-map (inline vs branched const returns); 021b82e4 (-160 via `84-244`).
+ *  - loops/recursion: 021b22d8 (recursive quicksort), 021b60cc/296c (tile-draw
+ *    fixed-point loops), 021b61dc/2b2c (init + nested tile loops), 5284/5424/
+ *    7fbc/7694/75c8/23b4/5244/2a8c/3a78/5188/7718/5dd0.
+ *
+ * THINNING: clean tier is DRAINED (4 this wave vs 15 in wave 1). ov016 should
+ * PIVOT next wave; the residue is the wall class above (permuter/.s/loop endgame).
  * ======================================================================= */
 
 #endif /* OV016_CORE_H */
