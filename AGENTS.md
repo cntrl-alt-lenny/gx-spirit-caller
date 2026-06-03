@@ -506,43 +506,61 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 324** — `decomper`. **Pivot to ov016 — clean-C wave 1 (fresh
-  overlay).** ov010 wave 1 shipped 15 but the residue is
-  **reg-alloc/framing-walled** (brief 322: 6 defers; uniform 1-instr
-  misses → permuter/GLOBAL_ASM endgame, not fresh clean shapes). A fresh
-  overlay's easy tier out-yields ov010's wall-dominated tail, so pivot to
-  **ov016** (~39 `<0x100`, census brief 278; the brief-322 named target)
-  — **collision-free** (scaffolder stays on ov008). Survey
-  (`size_census.py --module ov016 --shape`) → build
-  `src/overlay016/ov016_core.h` (cached-base mandatory) → drain the
-  reachable `<0x100` cohort, family-first. Recipe: `m2c_feed` → `#include
-  ov016_core.h` → coerce → **3-region `ninja sha1`** (gate, NOT `ninja
-  check`); residue via `asm_escape.py`. **Carry the divmod gotcha:** the
-  runtime signed divmod is an *explicit* `func_020b3870` call (quotient
-  r0; remainder `(int)((long long)func_020b3870(a,b) >> 32)`) — the C
-  `/`/`%` operators emit `bl _s32_div_f` (undefined → **passes dcheck,
-  FAILS `ninja sha1` at link**). **Audit each carve size against the gap
-  symbol table** before the gate (brief 322 caught a 0x60-vs-0x5c
-  overlap). **Calibration: clean-C yield ≈ half the shape-"reachable"
-  estimate.** Target ~12-18 picks. **Flag thinning.** Branch:
-  `decomper/ov016-wave1`.
-- **Brief 325** — `scaffolder`. **ov008 — co-drain wave 2 (medium tier).**
-  ov008 wave 1 shipped 12 (12 → 24); the easy `<0x98` tier is drained but
-  this is a **yield *transition*, NOT mined** (brief 323) — the
-  `0x98–0xf4` cohort (~20 funcs) is a rich *medium* tier. Drain it,
-  family-first: **(1) command-record pack family** (`021abba0`,
-  `021abb08`, `021aba3c` — `buf[0]=…; strh CONST,buf+4;
-  020944a4(buf,02005dac(2,0),8)`; shared `0201e5b8`/`02006e1c` sinks
-  already recovered); **(2) byte-combine stride-52 builders** (`021acfa0`,
-  `021ac208`, `021aceac`, `021adbbc`); **(3) fixed-point / div-magic**
-  (`021ac430`, `021ac4d0`, `021af4c4`). **Also confirm `021b2268`**
-  (wave-1 29v31 pool-layout near-miss — should match once linked; ship if
-  it does). **Per-pick gate = EUR objdiff 100 %**; the brain reproduces
-  3-region SHA1 on merge. Update `src/overlay008/ov008_core.h`. Target
-  ~10-15 picks. **Flag thinning.** Branch: `scaffolder/ov008-wave2`.
+- **Brief 326** — `decomper`. **ov016 — clean-C wave 2 (consolidate).**
+  ov016 wave 1 shipped 15 (top of target); the two anchor families
+  (row-group-rebuild, sprite-cell-draw) are drained but **~6-10 mid-tier
+  composites remain** (brief 324 leaned "continue ov016") — finish them
+  before pivoting. Targets: the `<0x100` composites and any clean shapes
+  the family sweep skipped (e.g. `021b398c` ambiguous 10-arg, `021b7504`
+  magic-const stat-draw, `021b22d8` recursive quicksort if tractable).
+  Recipe unchanged: `m2c_feed` → `#include ov016_core.h` → coerce →
+  **3-region `ninja sha1`** (gate, NOT `ninja check`); carve-size audit;
+  the carried divmod gotcha. **Do NOT force the permuter-class
+  near-misses** — the reg-swap pair (`021b287c`/`28f4`, uniform r1↔r2)
+  and the `021b2824` dispatcher are well-characterised 1-instr misses →
+  leave them for the GLOBAL_ASM/permuter endgame; note them in
+  `ov016_core.h` if not already. Target ~6-10 picks. **Flag thinning**
+  (likely pivots after this wave). Branch: `decomper/ov016-wave2`.
+- **Brief 327** — `scaffolder`. **Pivot to ov005 — co-drain wave 1 (fresh
+  overlay).** ov008 wave 2 proved the `0x98–0xf4` medium tier is
+  **permuter/m2c-bound, NOT direct-mwcc** (brief 325: 1 shipped of 7
+  probed; `021b2268` built + `ninja sha1` FAILED = real codegen diff, not
+  a pool artifact). Direct-mwcc is productive on **fresh easy `<0x98`
+  tiers**, so pivot to **ov005** (~35 `<0x100`, census brief 278) —
+  **collision-free** (decomper stays on ov016). (A) **Survey ov005**
+  (`size_census.py --module ov005 --shape`; confirm it is not an
+  overlay-swap sibling à la ov000/ov002) + a starter
+  `src/overlay005/ov005_core.h` (cached-base mandatory); (B) drain the
+  reachable `<0x98` cohort, all-matched-callee / family-first. **Per-pick
+  gate = EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge.
+  **Leave the ov008 medium tier alone** — it is parked for the
+  permuter/decomper endgame (near-misses catalogued in `ov008_core.h`);
+  don't re-probe it with direct-mwcc. Target ~12-15 picks (wave-1
+  ramp-up). **Flag thinning.** Branch: `scaffolder/ov005-wave1`.
 
 ### Closed briefs (reference)
 
+- **Brief 325** — `scaffolder`, shipped in PR #841. ✅ **ov008 co-drain
+  wave 2 — 1 matched `.c` + YIELD-DROP flag.** The `0x98–0xf4` medium
+  tier is **permuter/m2c-bound, NOT direct-mwcc** (7 probed, 1 landed;
+  `021b2268` built + `ninja sha1` **FAILED** = real codegen diff, not a
+  pool artifact → reverted). Tier is byte-present + ~half-RE-able but the
+  *wrong tool* for direct-mwcc → **parked for the permuter/decomper
+  endgame** (near-misses catalogued: command-record packs 20v20 reg-alloc,
+  `021aafa4` 22v25 block-sched, `021aa4a0` 27v27 mask-sched, byte-combine
+  `(x<<24)>>24` peephole). Pivot scaffolder to **ov005** → brief 327.
+  ov008 final (direct-mwcc): ~25 `.c`. Banked: 0/1 compare = `if(A&&B&&…)
+  return 1; return 0;` (shared `return 0` epilogue).
+- **Brief 324** — `decomper`, shipped in PR #840. ✅ **ov016 clean-C
+  wave 1 — 15 matched `.c`, 3-region SHA1 PASS.** Strong pivot (top of
+  target) — two anchor families: **row-group-rebuild ×4** (`021b8a30`
+  …8bf4) + **sprite-cell-draw ×2** (`021b3498`/`509c`, 12-arg
+  `func_0201e964` object-builder, same template as ov000). Banked: **MMIO
+  double-RMW via *absolute* addresses** (shared `char*` local → wrong
+  reg); `func_02094688` = `MI_CpuCopy(SRC,DST,n)`; **constant-divisor
+  `/10` inlines smull-magic & MATCHES** (only *variable* divisors hit the
+  `_s32_div_f` trap). Residue ~6-10 composites → wave 2 (brief 326);
+  reg-swap pair `021b287c`/`28f4` → permuter endgame.
 - **Brief 323** — `scaffolder`, shipped in PR #837. ✅ **ov008 co-drain
   wave 1 — 12 matched `.c` (12 → 24).** EUR objdiff 100 %, brain
   3-region SHA1 gated (PASS). Easy `<0x98` tier drained; the `0x98–0xf4`
