@@ -506,23 +506,40 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 320** — `decomper`. **ov004 clean-C wave 3 — continue.** ov004
-  waves 1-2 = **32 `.c`** (~168 reachable). Recipe: `m2c_feed` → `#include
-  ov004_core.h` + guards → coerce → **3-region `ninja sha1`** (the gate,
-  NOT `ninja check`); canonicalisation residue via `asm_escape.py`. Pull
-  latest ov004 delinks + subtract the matched set. Family-first. **Target
-  ~12-18 picks.** **If ov004's reachable thins, flag it** (next overlay).
-  Branch: `decomper/ov004-wave3`.
-- **Brief 321** — `scaffolder`. **ov000 co-drain wave 3 — continue.**
-  ov000 waves 1-2 = **24 `.c`** (~63 reachable — past 1/3). Pull latest
-  ov000 delinks + subtract the matched set. Own `src/overlay000/` / ov000
-  delinks / `ov000_core.h`; collision-free (decomper on ov004). **Per-pick
-  gate = EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge.
-  **Target ~10-15 picks.** **If ov000's reachable thins, flag it** (next
-  overlay). Branch: `scaffolder/ov000-wave3`.
+- **Brief 322** — `decomper`. **Pivot to ov010 — clean-C wave 1 (fresh
+  overlay).** ov004's easy clean tier is **thinning** (brief 320: 6, down
+  from 17 → 15; the rest is reg-alloc / permuter walled tail → reserved
+  for the GLOBAL_ASM endgame). Pivot to **ov010** (~40 `<0x100`, census
+  brief 278) — **collision-free** (scaffolder takes ov008). Survey →
+  build `src/overlay010/ov010_core.h` → drain the reachable `<0x100`
+  cohort, family-first. Recipe: `m2c_feed` → `#include ov010_core.h` →
+  coerce → **3-region `ninja sha1`** (gate, NOT `ninja check`); residue
+  via `asm_escape.py`. **Calibration: per-overlay clean-C yield runs
+  ~half the shape-"reachable" estimate** (walls in non-loop bodies too) —
+  expect ~1-2 waves then thinning. Target ~12-18 picks (wave-1 ramp-up).
+  **Flag thinning.** Branch: `decomper/ov010-wave1`.
+- **Brief 323** — `scaffolder`. **Pivot to ov008 — co-drain wave 1 (fresh
+  overlay).** ov000's clean cohort is **mined** (brief 321: 3 shipped, 62
+  residue all walled). Pivot to **ov008** (~48 `<0x100`, your own rec) —
+  **collision-free** (decomper takes ov010). (A) **Survey ov008**
+  (`size_census.py --module ov008 --shape`) + a starter
+  `src/overlay008/ov008_core.h`; (B) drain the reachable `<0x100` cohort,
+  all-matched-callee / family-first. **Per-pick gate = EUR objdiff
+  100 %**; the brain reproduces 3-region SHA1 on merge. Target ~10-15
+  picks (wave-1 ramp-up). **Flag thinning.** Branch: `scaffolder/ov008-wave1`.
 
 ### Closed briefs (reference)
 
+- **Brief 321** — `scaffolder`, shipped in PR #835. ✅ **ov000 co-drain
+  wave 3 — 3 matched `.c` + THINNING verdict.** ov000 clean cohort mined
+  (62 residue all examined → walled, not clean-C). Recommended pivot to
+  **ov008** → brief 323. ov000 final: ~27 `.c`.
+- **Brief 320** — `decomper`, shipped in PR #834. ✅ **ov004 clean-C
+  wave 3 — 6 `.c`, 3-region SHA1 PASS + THINNING flag.** Down from
+  17 → 15 → 6; the ov004 remainder is reg-alloc / permuter walled tail
+  (→ GLOBAL_ASM endgame). Pivot to ov010 → brief 322. ov004 clean ~38
+  `.c`. **Calibration: per-overlay clean-C yield ≈ half the shape-
+  "reachable" estimate** (walls in non-loop bodies).
 - **Brief 319** — `scaffolder`, shipped in PR #832. ✅ **ov000 co-drain
   wave 2 — 13 matched `.c`.** EUR objdiff 100 %, brain 3-region SHA1
   gated (PASS). ov000 stream 24 `.c` (waves 1-2).
