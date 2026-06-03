@@ -46,6 +46,7 @@ clean-C in ov020"), I pivoted to clean-C that wave 1 deferred as *medium*
 | 6 | `021ab798` | 0x44 | 2-call layout-metrics accessor |
 
 ### Recipe levers that DID land here (clean-C, not the §WALL)
+
 - **Field store-order** (BG-config family, the headline): a 0x28-byte stack
   `BgCfg` filled by `func_0201d47c`, then f14/f18/f0 bitfield writes, committed
   by `func_0201e5b8`. The seed shipped at **93%** with one diff — the final `f0`
