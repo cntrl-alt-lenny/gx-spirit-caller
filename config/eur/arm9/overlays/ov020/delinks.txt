@@ -40,3 +40,31 @@ src/overlay020/func_ov020_021abbe8.s:
 src/overlay020/func_ov020_021ab7dc.c:
     complete
     .text start:0x021ab7dc end:0x021ab81c
+
+src/overlay020/func_ov020_021ab0ac.c:
+    complete
+    .text start:0x021ab0ac end:0x021ab0d8
+
+src/overlay020/func_ov020_021ab418.c:
+    complete
+    .text start:0x021ab418 end:0x021ab43c
+
+src/overlay020/func_ov020_021aae0c.c:
+    complete
+    .text start:0x021aae0c end:0x021aae48
+
+src/overlay020/func_ov020_021ab06c.c:
+    complete
+    .text start:0x021ab06c end:0x021ab0ac
+
+src/overlay020/func_ov020_021ab3c8.c:
+    complete
+    .text start:0x021ab3c8 end:0x021ab418
+
+src/overlay020/func_ov020_021aa7ac.c:
+    complete
+    .text start:0x021aa7ac end:0x021aa80c
+
+src/overlay020/func_ov020_021aa6cc.c:
+    complete
+    .text start:0x021aa6cc end:0x021aa700
