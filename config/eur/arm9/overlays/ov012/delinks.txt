@@ -44,3 +44,27 @@ src/overlay012/func_ov012_021c9d8c.s:
 src/overlay012/func_ov012_021c9f48.s:
     complete
     .text start:0x021c9f48 end:0x021ca18c
+src/overlay012/func_ov012_021c9d60.c:
+    complete
+    .text start:0x021c9d60 end:0x021c9d8c
+
+src/overlay012/func_ov012_021ca3fc.c:
+    complete
+    .text start:0x021ca3fc end:0x021ca450
+
+src/overlay012/func_ov012_021caf44.c:
+    complete
+    .text start:0x021caf44 end:0x021caf80
+
+src/overlay012/func_ov012_021cbeb4.c:
+    complete
+    .text start:0x021cbeb4 end:0x021cbf74
+
+src/overlay012/func_ov012_021cbf74.c:
+    complete
+    .text start:0x021cbf74 end:0x021cc01c
+
+src/overlay012/func_ov012_021ca2a0.c:
+    complete
+    .text start:0x021ca2a0 end:0x021ca340
+
