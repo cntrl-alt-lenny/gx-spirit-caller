@@ -71,3 +71,23 @@ src/overlay018/func_ov018_021aace4.c:
 src/overlay018/func_ov018_021aaaf0.c:
     complete
     .text start:0x021aaaf0 end:0x021aabd8
+
+src/overlay018/func_ov018_021aabd8.c:
+    complete
+    .text start:0x021aabd8 end:0x021aace4
+
+src/overlay018/func_ov018_021ad118.c:
+    complete
+    .text start:0x021ad118 end:0x021ad1f4
+
+src/overlay018/func_ov018_021aa880.c:
+    complete
+    .text start:0x021aa880 end:0x021aa920
+
+src/overlay018/func_ov018_021ad1f4.c:
+    complete
+    .text start:0x021ad1f4 end:0x021ad2e4
+
+src/overlay018/func_ov018_021ab13c.c:
+    complete
+    .text start:0x021ab13c end:0x021ab1c4

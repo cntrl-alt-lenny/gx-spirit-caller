@@ -62,6 +62,15 @@ extern char data_ov018_021ad738[]; /* cell-archive id table [mode<<5 + n*4]  */
  *   021aaaf0  gauge-row dispatcher — OamCtl guard + ternary + switch; calls
  *             021aaa88 / 021aa9b8 / 021aaa3c
  *
+ * §VERIFIED — brief 338 wave 2 (5 picks, EUR objdiff 100% + sha1 OK). The
+ *  medium clone-sibling tier; the easy clones were drained in wave 1.
+ *   021aabd8  gauge-row dispatcher sibling of 021aaaf0 + per-cell OAM mask loop
+ *             + bit0 early-out (decl-order: st first -> r4)
+ *   021ad118  two-loop RGB555 min-reduce + rescale over 021ace68/021acf80
+ *   021aa880  2-layer label draw (mode-getter + [mode][a0] table + alloc/draw/free)
+ *   021ad1f4  brighten twin of 021ad118 (min vs 0x200; clamp to 0x1ff)
+ *   021ab13c  shoulder-button handler, sibling of 021ab054 (bits 0x8/0x2 -> |2/|4)
+ *
  * §RECIPE INSIGHTS harvested this wave (added to docs/research):
  *  - RETURN-VALUE-NOT-VOID: a tail `*p += f() << k` where the orig keeps r0
  *    (f's return) live through ldmia means the fn RETURNS that count; a void
@@ -78,9 +87,20 @@ extern char data_ov018_021ad738[]; /* cell-archive id table [mode<<5 + n*4]  */
  *  - SWITCH for out-of-line case bodies: `if(s==A||s==B){}else if(s==C){}`
  *    lays the first body inline; a `switch` with `case A: case B:` gives the
  *    orig forward-branch-to-body layout (021aaaf0 84%->100%).
+ *  - [wave 2] DECLARATION-ORDER controls callee-saved register numbering: the
+ *    order locals are declared steers which callee-saved reg each receives.
+ *    Swapping two pointer decls fixed an r4/r5 swap (021aabd8 80->100); a
+ *    three-way reorder (i, min, count) fixed a 4-register permutation
+ *    (021ad118 76->100). The general form of the wave-1 reg-choice levers.
+ *  - [wave 2] REGISTER-CLAMP-TEMP: clamping an address-taken variable in place
+ *    (`if (v>hi) v=hi;`) emits a conditional STORE then a reload; compute into a
+ *    register temp, clamp the temp, assign once (021ad1f4 85->100).
+ *  - [wave 2] UNSIGNED for lsr-not-asr: `(u16)(x>>16)` on a signed int shifts
+ *    with asr; make the source `unsigned` so the high-half extract is lsr
+ *    (021ad118). Declare the address-taken locals FIRST to fix their stack slots.
  *
- * §DEFERRED — Mac/permuter candidates (reshape levers TRIED where noted; do
- *  NOT grind these on Windows):
+ * §DEFERRED — Mac/permuter + hard tier (reshape levers TRIED where noted; do
+ *  NOT grind these on Windows). The tractable clone tier is now DRAINED:
  *   021ace14 (77%) fn-ptr step dispatcher: mwcc pools data_021040ac+0xb6c
  *     into one literal ([r,#0]); orig keeps [base,#0xb6c]. 3 source forms
  *     (RMW / char* local / read-temp-write) all pool. Codegen-choice.
@@ -90,8 +110,16 @@ extern char data_ov018_021ad738[]; /* cell-archive id table [mode<<5 + n*4]  */
  *   021aa9b8 (not attempted) angle->cell tail-call: magic-multiply signed div
  *     (/60 then /17) + the same +0x66/+0x900 split. Magic-constant repro is
  *     permuter-class.
- *   021ad118 (not attempted) two-loop min/rescale (0xdc): dense; a possible
- *     future wave, not a wall.
+ *   021ace68 (0x118) RGB555->HSV decompose: heavy min/max-chain branching + 3x
+ *     func_020b3870 divmod + 3-way hue dispatch. Reconstructable but very
+ *     fiddly; near-permuter.
+ *   021acf80 (0x198) HSV->RGB recombine: magic-multiply divisions (0xb60b60b7,
+ *     0x80808081, 0x88888889) + 6-way sextant switch. Permuter-class.
+ *   021aaddc (0x278, 153 insns) touch sprite-position builder: long repetitive
+ *     block-per-case, high mismatch risk. Long-tail, not a clean win.
+ *   021ab4f4 (0x1a0, 99 insns) MMIO screen/blend setup: long straight-line.
+ *   021aa4a0 (0x15c) RGB555-pack to scattered MMIO: 8x unrolled, uncertain
+ *     shift codegen.  021ab694 (0x1634) huge controller.
  * ======================================================================= */
 
 #endif /* OV018_CORE_H */
