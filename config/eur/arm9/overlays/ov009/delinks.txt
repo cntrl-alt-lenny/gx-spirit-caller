@@ -128,3 +128,35 @@ src/overlay009/bss/data_ov009_bss.s:
 src/overlay009/data/data_ov009_021ada18.c:
     complete
     .data start:0x021ada18 end:0x021ada1c
+src/overlay009/func_ov009_021ab32c.c:
+    complete
+    .text start:0x021ab32c end:0x021ab374
+
+src/overlay009/func_ov009_021ab8c8.c:
+    complete
+    .text start:0x021ab8c8 end:0x021ab910
+
+src/overlay009/func_ov009_021ad1bc.c:
+    complete
+    .text start:0x021ad1bc end:0x021ad204
+
+src/overlay009/func_ov009_021ab74c.c:
+    complete
+    .text start:0x021ab74c end:0x021ab7b4
+
+src/overlay009/func_ov009_021ad6bc.c:
+    complete
+    .text start:0x021ad6bc end:0x021ad73c
+
+src/overlay009/func_ov009_021ad73c.c:
+    complete
+    .text start:0x021ad73c end:0x021ad7d4
+
+src/overlay009/func_ov009_021ab7b4.c:
+    complete
+    .text start:0x021ab7b4 end:0x021ab838
+
+src/overlay009/func_ov009_021ab848.c:
+    complete
+    .text start:0x021ab848 end:0x021ab8c8
+
