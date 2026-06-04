@@ -98,3 +98,23 @@ src/overlay019/bss/data_ov019_bss.s:
 src/overlay019/func_ov019_021b3f00.c:
     complete
     .text start:0x021b3f00 end:0x021b3f34
+
+src/overlay019/func_ov019_021b3028.c:
+    complete
+    .text start:0x021b3028 end:0x021b3068
+
+src/overlay019/func_ov019_021b4ed0.c:
+    complete
+    .text start:0x021b4ed0 end:0x021b4f1c
+
+src/overlay019/func_ov019_021b2610.c:
+    complete
+    .text start:0x021b2610 end:0x021b266c
+
+src/overlay019/func_ov019_021b2728.c:
+    complete
+    .text start:0x021b2728 end:0x021b27a0
+
+src/overlay019/func_ov019_021b27a0.c:
+    complete
+    .text start:0x021b27a0 end:0x021b2818
