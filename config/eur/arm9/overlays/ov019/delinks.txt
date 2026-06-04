@@ -118,3 +118,19 @@ src/overlay019/func_ov019_021b2728.c:
 src/overlay019/func_ov019_021b27a0.c:
     complete
     .text start:0x021b27a0 end:0x021b2818
+
+src/overlay019/func_ov019_021b266c.c:
+    complete
+    .text start:0x021b266c end:0x021b26d0
+
+src/overlay019/func_ov019_021b49bc.c:
+    complete
+    .text start:0x021b49bc end:0x021b4a4c
+
+src/overlay019/func_ov019_021b4560.c:
+    complete
+    .text start:0x021b4560 end:0x021b45fc
+
+src/overlay019/func_ov019_021b2818.c:
+    complete
+    .text start:0x021b2818 end:0x021b28dc

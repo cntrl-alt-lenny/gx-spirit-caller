@@ -40,16 +40,33 @@ extern char data_02104f4c[];         /* system work: +0x928 boot/page counter   
  *             order matches — `px < r->x + r->w` flips it (80%->100%)
  *   021b27a0  alt-input sibling of 021b2728 (func_02006148 / func_0200617c)
  *
- * §DEFERRED (Mac/permuter + big-render tier):
- *   021b4c30 (70%) scene-B intro advance: caller-saved flag-load r0-vs-r1 (the
- *     flag has no call-arg use, so mwcc parks it in r1; not declaration-order
- *     reachable — same class as ov017 021b33dc/61dc).
- *   021b26d0 script-step dispatcher: the increment block's base/zero/index
- *     post-blx rotation (identical to ov017 021b2c8c, ~72% wall).
- *   021b3068 (261 insns) / 021b4a4c (120 insns): big render builders (the
- *     func_0201e964 cell-config family + sprite loops). func_0201e964 recipe
- *     applies but the length is long-tail.
- *   021b3f34 coord-offset wrapper (stack-struct build + forward); medium.
+ * §VERIFIED — brief 342 wave 2 (4 picks, EUR objdiff 100% + sha1 OK):
+ *   021b266c  paired-scene teardown: direct-MMIO DISPCNT clear (ov018 021accc8
+ *             recipe: inline `*(int*)0x4000000`, not a bound base) + call chain
+ *   021b49bc  scene-B teardown: dual guarded commit (func_0201ef3c) + Task_Invoke
+ *   021b4560  dual render-task stop (func_0208f458/f3e4/f38c + Task_InvokeLocked,
+ *             handle pair re-loaded inline); const-reuse (0x200,0x200)
+ *   021b2818  number-render: magic-multiply /10 and %10 REPRODUCE exactly from a
+ *             clean `a1/10` / `a1%10` on a signed int (same compiler) — unlike
+ *             the HSV-buried magic in ov018 021acf80. Banks: clean /N div matches.
+ *
+ * §DEFERRED (Mac/permuter + big-render tier; catalogued by class):
+ *   021b4c30 (70%) caller-saved flag-load r0-vs-r1 (flag has no call-arg use, so
+ *     mwcc parks it in r1; not decl-order reachable — like ov017 021b33dc/61dc).
+ *   021b26d0 script-step dispatcher: increment base/zero/index post-blx rotation
+ *     (identical to ov017 021b2c8c, ~72%).
+ *   021b28dc (73%) OAM-packet bit-pack: caller-saved lr<->r12 swap + orr operand
+ *     order in the pack; logic correct, register choice Mac-only.
+ *   021b4324 (63%) row hit-test loop: callee-saved permutation BUT entangled with
+ *     the param + an address-taken &rect — decl-order does NOT reach it. REFINES
+ *     the lever: it cracks PURE loop-local permutations (ov018 021ad118), not
+ *     ones tangled with params/address-taken pointers.
+ *   021b3f34 (77%) coord-offset wrapper: orig uses ldrsh (signed) inline; mwcc
+ *     truncation-optimizes my `src[i]+d` to ldrh; forcing ldrsh via int temps
+ *     spills extra regs (50%). Signed-load codegen choice, Mac-only.
+ *   021b3068 (261 insns) / 021b4a4c (120 insns) / 021b4258 (two-loop init):
+ *     big render/init builders (func_0201e964 family + ldrsh strided copies),
+ *     long-tail. 021b4f1c jump-table value-remapper (dense switch + counters).
  * ======================================================================= */
 
 #endif /* OV019_CORE_H */
