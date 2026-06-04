@@ -91,3 +91,15 @@ src/overlay014/data_ov014_021b4bf8.c:
 src/overlay014/func_ov014_021b2908.s:
     complete
     .text start:0x021b2908 end:0x021b2eec
+
+src/overlay014/func_ov014_021b34f0.c:
+    complete
+    .text start:0x021b34f0 end:0x021b3568
+
+src/overlay014/func_ov014_021b25b0.c:
+    complete
+    .text start:0x021b25b0 end:0x021b2644
+
+src/overlay014/func_ov014_021b3440.c:
+    complete
+    .text start:0x021b3440 end:0x021b34f0
