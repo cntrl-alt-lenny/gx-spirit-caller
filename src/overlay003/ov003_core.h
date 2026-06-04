@@ -44,4 +44,50 @@ extern char data_ov003_021cf72c[];
  * (021ceb84 / 021cbdf4 / 021cc010) and the big render setups (021cd358 / 021cedf8
  * / 021cd420 / 021cd628 / 021cc8b8 ... -- register/stack-arg-dense). */
 
+/* ====================================================================== *
+ *  §VERIFIED — co-drain wave 2 (brief 341). 2 .c, EUR objdiff 100% + ninja *
+ *  rom OK. TIER TRANSITION: wave 1 drained the clean per-state-method vein; *
+ *  the wave-2 residue is uniformly Mac-lane (SR / scheduling / coin-flip /  *
+ *  permutation). Only the two below were direct-mwcc-tractable.            *
+ * ====================================================================== */
+/* Picks:
+ *  - 021ccd20 BG-map rect fill (h*w cells, (tile|pal<<12), tile wrapping at 16
+ *    bits, rows step 0x20). KEY: the tile wrap must be UNSIGNED --
+ *    `tile = (unsigned)(tile + 1) << 16 >> 16;` emits `lsr` (the orig); a signed
+ *    `(tile+1)<<16>>16` emits `asr` and misses (95.8%).
+ *  - 021ca10c full scene teardown (0xf0; matched first try). Inline-cast display
+ *    blank `*(vu32*)0x04000000 &= ~0x1f00` on both engines; bind `b=(vu32*)
+ *    0x04001010` so `(int)b - 0xfc0` derives via `sub`; -0x10 materialized from
+ *    func_0208e2f4(addr,0x3f,-0x10); XOR-mix data_021040ac[0xc48] ^= [0xc3c] ^
+ *    021cf6c0[0x4c]; func_020057dc(func_0201261c) re-registers vblank. Returns 1.
+ *
+ * DEFERRED this wave (attempted + catalogued -> Mac lane), by miss-class:
+ *  - SR (strength-reduction): 021cc010 / 021cbf08 sprite-band loops (clone pair,
+ *    48%). The orig lowers one row base as a 2-step `lr<<5; +<<1` and keeps the
+ *    other as a decrementing counter; mwcc folds the first to a single `<<6`. No
+ *    C form blocks the fold (same wall as the ov005 byte-sum SR).
+ *  - SCHEDULING: 021cd358 dense func_0201ef90 marshalling (43%). TWO reshapes DID
+ *    land here (see notes below) but the residue is genuine instruction schedule
+ *    (batched stmia vs split str; the r4-r8 vs r3-r7 spread; address-add order).
+ *  - CALLER-SAVED COIN-FLIP: 021cbdf4 logo composite (87-89.5%). Escaping stack
+ *    struct {int hi; short attr}; mwcc puts const->r2 / computed->r3 regardless of
+ *    assignment OR store order (tried both) -- the orig is the reverse because the
+ *    trailing func_02005dac(1,0) reserves r0/r1. Not C-steerable (= 021cbe8c class).
+ *  - CALLEE-SAVED PERMUTATION: 021ceb84 (62%) 4-iter sprite build, kind/fmt/affine/
+ *    ybase permuted across r6-r9; declaration-order made it worse.
+ *  - STACK-LAYOUT: 021cedf8 (64%) 11-arg func_0201e964 builder; frame split + an
+ *    extra r3 save diverge.
+ *
+ * Two NEW reshape levers learned on 021cd358 (portable, even though the func
+ * itself stays Mac-lane):
+ *  (1) AVOID mla base-fusion: a shared `char *row = o + i*S;` local fuses to one
+ *      `mla`; when the orig keeps `i*S` (mul) and `o` separate (each pointer
+ *      `o + off + i*S`), DO NOT bind the base -- inline `i*S` into every pointer
+ *      expr so only that product is CSE'd (22% -> 25%, and unlocked the r7/r8
+ *      base-batching the orig wants).
+ *  (2) SWITCH BLOCK ORDER follows source case order: an out-of-line `default`
+ *      after the cases is emitted LAST; add an explicit `case 0:` (sharing the
+ *      default value) FIRST so mwcc lays the jump-table bodies out ascending like
+ *      the orig (25% -> 43%). */
+
 #endif /* OV003_CORE_H */
