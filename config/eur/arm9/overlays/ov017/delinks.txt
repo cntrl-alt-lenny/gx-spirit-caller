@@ -183,3 +183,15 @@ src/overlay017/func_ov017_021b7490.c:
 src/overlay017/func_ov017_021b7578.c:
     complete
     .text start:0x021b7578 end:0x021b768c
+
+src/overlay017/func_ov017_021b3fa4.c:
+    complete
+    .text start:0x021b3fa4 end:0x021b405c
+
+src/overlay017/func_ov017_021b63ec.c:
+    complete
+    .text start:0x021b63ec end:0x021b646c
+
+src/overlay017/func_ov017_021b4db0.c:
+    complete
+    .text start:0x021b4db0 end:0x021b4df8
