@@ -362,3 +362,23 @@ src/overlay015/func_ov015_021b238c.c:
     complete
     .text start:0x021b238c end:0x021b23f4
 
+src/overlay015/func_ov015_021b3170.c:
+    complete
+    .text start:0x021b3170 end:0x021b31f0
+
+src/overlay015/func_ov015_021b4740.c:
+    complete
+    .text start:0x021b4740 end:0x021b47cc
+
+src/overlay015/func_ov015_021b3614.c:
+    complete
+    .text start:0x021b3614 end:0x021b36c4
+
+src/overlay015/func_ov015_021b46c8.c:
+    complete
+    .text start:0x021b46c8 end:0x021b4740
+
+src/overlay015/func_ov015_021b3028.c:
+    complete
+    .text start:0x021b3028 end:0x021b30b0
+
