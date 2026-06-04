@@ -37,3 +37,47 @@ src/overlay003/bss/data_ov003_bss.s:
 src/overlay003/ov003_021ca2b8.s:
     complete
     .text start:0x021ca2b8 end:0x021ca2bc
+src/overlay003/func_ov003_021ca0c8.c:
+    complete
+    .text start:0x021ca0c8 end:0x021ca10c
+
+src/overlay003/func_ov003_021cce58.c:
+    complete
+    .text start:0x021cce58 end:0x021ccea4
+
+src/overlay003/func_ov003_021ccd80.c:
+    complete
+    .text start:0x021ccd80 end:0x021ccdb8
+
+src/overlay003/func_ov003_021ca1fc.c:
+    complete
+    .text start:0x021ca1fc end:0x021ca254
+
+src/overlay003/func_ov003_021ccdb8.c:
+    complete
+    .text start:0x021ccdb8 end:0x021ccdf0
+
+src/overlay003/func_ov003_021ca254.c:
+    complete
+    .text start:0x021ca254 end:0x021ca2b4
+
+src/overlay003/func_ov003_021cef78.c:
+    complete
+    .text start:0x021cef78 end:0x021cefec
+
+src/overlay003/func_ov003_021cefec.c:
+    complete
+    .text start:0x021cefec end:0x021cf064
+
+src/overlay003/func_ov003_021ccdf0.c:
+    complete
+    .text start:0x021ccdf0 end:0x021cce58
+
+src/overlay003/func_ov003_021cf064.c:
+    complete
+    .text start:0x021cf064 end:0x021cf0dc
+
+src/overlay003/func_ov003_021ceeb4.c:
+    complete
+    .text start:0x021ceeb4 end:0x021cef78
+
