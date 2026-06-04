@@ -3,7 +3,7 @@
 # Brief 341 — ov003 clean-C wave 2 (the tier transition)
 
 **Brief:** 341 (scaffolder, co-drain). Branch off fresh `origin/main` (after
-#855 / #856 landed), re-`dis` so wave-1's 11 are subtracted, continue the
+\#855 / #856 landed), re-`dis` so wave-1's 11 are subtracted, continue the
 per-state methods / dispatch / bounds / cell-lookup families over
 `data_ov003_021cf6c0`, full recipe library incl. the new declaration-order
 callee-saved lever. Per-pick gate = EUR objdiff 100%; the brain runs the
