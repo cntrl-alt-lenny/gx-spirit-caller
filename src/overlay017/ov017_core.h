@@ -70,4 +70,31 @@ extern char data_ov017_021b877c[];   /* render-job handle array [0/4/8]      */
  *    class ov011 deferred. (NOT a signature/layout issue — genuinely allocator.)
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 334 wave 2 (3 picks, EUR objdiff 100% + sha1 OK). The
+ * easy/clean tier is DRAINED; wave 2 hit the tier transition (cf. ov015 w2).
+ * Per-pick table in docs/research/brief-334-ov017-clean-c-wave2.md.
+ *
+ *  - cell-config sink (func_0201e964 10-arg, ov011 021cc8bc lineage): 021b3fa4
+ *    (box-render sink for the matched 021b4090). func_0201e964(2, h->2c, &cfg,
+ *    0, …8 stack ints); cfg = 2-int {x<<12, y<<12} local.
+ *  - rect-scan loop: 021b63ec (min(arg->n,5) rows; LEVER: assign the rect
+ *    consts in orig order — `int y;` declared but assigned AFTER x/w so 0x10
+ *    materialises last; a y=0x10 init flips the mov order, 90%->100%).
+ *  - single MMIO bitfield RMW: 021b4db0 (0x04001000 field bit-clear; two
+ *    `volatile` reads reproduce the orig's read-twice; & 0x1f00 encodable).
+ *
+ * §TIER-TRANSITION (the rest of the ov017 gap is allocator/scheduling/fold
+ *  near-misses — reshape levers TRIED, all resisted; these are permuter/Mac
+ *  candidates, NOT Windows-reshapeable. Do NOT grind a wave 3 on these):
+ *  - 021b33dc state-machine: switch-discriminant r0-vs-r1 (3 forms = 93%).
+ *  - 021b61dc text-render: load-dest r0/r1 cascade on a 2-field address (91%).
+ *  - 021b768c title-centre: orig keeps a `pos+x` add that mwcc folds (pos==0);
+ *    explicit-temp did not unfold it (95%).
+ *  - 021b6610 param-apply jump table: per-case base-reg reuse + const-hoist (60%).
+ *  - 021b6774 job-teardown loop: switch-with-held-consts in a loop (40%).
+ *  RECOMMENDATION: pivot the next clean-C wave to a fresh overlay; reserve the
+ *  above + 021b2c8c for the Mac permuter.
+ * ======================================================================= */
+
 #endif /* OV017_CORE_H */
