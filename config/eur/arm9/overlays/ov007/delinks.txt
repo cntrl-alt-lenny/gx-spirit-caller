@@ -205,3 +205,27 @@ src/overlay007/bss/data_ov007_bss.s:
 src/overlay007/data/data_ov007_021b30c0.s:
     complete
     .data start:0x021b30c0 end:0x021b3318
+
+src/overlay007/func_ov007_021b2d0c.c:
+    complete
+    .text start:0x021b2d0c end:0x021b2d3c
+
+src/overlay007/func_ov007_021b24a4.c:
+    complete
+    .text start:0x021b24a4 end:0x021b24e0
+
+src/overlay007/func_ov007_021b24e0.c:
+    complete
+    .text start:0x021b24e0 end:0x021b2560
+
+src/overlay007/func_ov007_021b2920.c:
+    complete
+    .text start:0x021b2920 end:0x021b299c
+
+src/overlay007/func_ov007_021b2b74.c:
+    complete
+    .text start:0x021b2b74 end:0x021b2c44
+
+src/overlay007/func_ov007_021b2c58.c:
+    complete
+    .text start:0x021b2c58 end:0x021b2ce8
