@@ -55,4 +55,32 @@ extern char data_ov021_0222cf44[];
  * div-by-5, 021ab090/021abd78/021abcac/021abbc8/021aae68 0xb8-0xec render, +
  * the 0x100+ tier). */
 
+/* ====================================================================== *
+ *  §VERIFIED — co-drain wave 2 (brief 337). 6 .c, all EUR objdiff 100% +  *
+ *  ninja rom OK. The per-state STEP machines + their render bodies.       *
+ * ====================================================================== */
+/* Picks:
+ *  - 021ab090 4-state step machine (jump table on +0x38; case 3 returns 0, the
+ *    others bump +0x40 and return 1) — sibling of the wave-1 3-state 021aaa40.
+ *  - 021aa908 main frame driver (loop both step machines per +0x30 tick, commit,
+ *    latch state=3 on completion).
+ *  - 021abbc8 main-engine capture-arm (sibling of wave-1 sub-engine 021aadbc;
+ *    split `|0x204 |0x400`, base+0xe reuse, data_02104f4c.chan `:3` bitfield).
+ *  - 021abd78 / 021aae68 / 021abcac render bodies: VRAM clear + glyph measure +
+ *    centre-clamp + N-arg blit. 021aae68 uses `col % 16` (mwcc's signed-mod-16
+ *    idiom matches as written) and a ternary table select + signed `/2`.
+ *
+ * NEW reshape lever (021aa908, 60%->100%): when a loop function rotates the
+ * register assignment of its loop-counter / accumulator / struct-base, declare
+ * the COUNTER and ACCUMULATOR locals BEFORE the `char *base` local — mwcc then
+ * gives them the low callee-saved regs (r4/r5) and the base the high one (r6),
+ * matching the orig.
+ *
+ * DEFERRED (NOT shipped — Mac lane): 021ab9d0 (78% reg-choice, wave 1);
+ * 021aa4a0 (permuter blx); 021aba18 / 021abaa0 / 021aaf5c (random-unique loops —
+ * 28%, mwcc strength-reduces the o[0x60+i*4] accesses to a base pointer where
+ * the orig recomputes base+index; same SR class as ov015 021af704); the 0x100+
+ * bodies (021aab7c 0x1e0 / 021aa5cc / 021ab150 / 021ab3fc / 021ab6c0 — big
+ * register-choice-dense state bodies). */
+
 #endif /* OV021_CORE_H */
