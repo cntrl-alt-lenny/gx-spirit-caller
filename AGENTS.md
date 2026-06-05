@@ -506,43 +506,63 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 348** — `decomper`. **Pivot to ov002 — deep-drain wave 1 (big
-  overlay).** The small-overlay easy-clean-C skim is **done** (Windows
-  briefs 326-347 opened every code overlay + main's easy tier was mined
-  in the early era). The two biggest matchable veins left are **ov002**
-  (1484 units, ~878 done — paused since the early era, NOT mined out) and
-  **main**'s hard tier. Take **ov002** — it's the decomper's job (big,
-  mixed easy/hard bodies; hand-RE; 3-region `ninja sha1`). **(A)** Survey
-  (`size_census.py --module ov002 --shape`) + extend
-  `src/overlay002/ov002_core.h`. **(B)** Drain small-first: the easy
-  accessor/dispatch tier first, then hand-RE the matchable mid bodies.
-  **⚠️ gotcha-18: ov002 shares base `0x021aaee0` with ov000 (overlay-swap
-  group {0,2,5,8})** — per-overlay delinks isolate it (an ov002 func at
-  addr X ≠ ov000's); `ninja sha1` PASS proves byte-clean isolation. Gate
-  = **3-region `ninja sha1`** (NOT `ninja check`); carve-size audit; the
-  divmod gotcha (variable divisors → explicit `func_020b3870`).
-  **Classify the residue** as you go (matchable-C vs reg-alloc-walled →
-  the `.s`/permuter endgame) so we can size the back half. Target ~12-18.
-  **Collision-free** (scaffolder takes main). Branch:
-  `decomper/ov002-wave1`.
-- **Brief 349** — `scaffolder`. **main — easy-tier straggler sweep
-  wave 1.** With every overlay's easy tier skimmed, the remaining
-  direct-mwcc vein is **main**'s unmined easy stragglers (main has 1168
-  `.c` from the early era, but new sinks named during the Windows session
-  may have made fresh simple shapes reachable). **(A)** Survey main's
-  unmatched **simplest `<0x80`** cohort (`size_census.py --module main
-  --shape`, simple shapes only); **(B)** drain them with the full mature
-  recipe library, all-matched-callee / family-first. **Per-pick gate =
-  EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge.
-  **This wave doubles as a probe:** if the easy-tier yield is low (≲5),
-  that confirms the direct-mwcc easy lane is exhausted game-wide → flag
-  it and we'll repurpose the lane next round. **Leave ov002 alone**
-  (decomper owns it) and **don't re-attack catalogued reg-alloc misses**
-  (re-sweep pilot brief 340 proved that yields 0). Target ~5-12.
-  **Collision-free** (decomper takes ov002). Branch: `scaffolder/main-stragglers-wave1`.
+- **Brief 350** — `decomper`. **ov002 — deep-drain wave 2.** Wave 1
+  shipped 19 (above target); ov002 is a **deep, high-yield matchable-C
+  vein** (brief 348: ~62 % matchable, the ~1088 permuter bodies a
+  *minority*) — stay here for several waves. **(A)** Continue small-first
+  through the **0x2c–0x40 tier**, then start the **matchable mid bodies
+  (0x40–0x100)**; the **pass-through lever** (forwarders keep args live
+  → bumps the body's scratch reg; converts apparent 1-reg-off accessors
+  into clean C) + the bitfield-struct recipes carry directly. **(B) NEW —
+  dual-compile before declaring a wall:** brief 349 found ~50 % of main's
+  "walls" were **legacy-codegen** — try `*.legacy.c` (mwcc 1.2/sp2p3,
+  Style-A) on any 2.0 near-miss (predication-vs-branch / Style-A epilogue
+  `pop {r4,lr};bx lr` are the tells) before deferring it. Route the
+  legacy-frame stragglers (`021b91d0`) to `.legacy.c`. Gate = **3-region
+  `ninja sha1`** (NOT `ninja check`); carve-size audit; gotcha-18
+  (ov000 overlay-swap); divmod gotcha. **Classify residue** (matchable
+  vs walled). Target ~15-19. **Collision-free** (scaffolder on main).
+  Branch: `decomper/ov002-wave2`.
+- **Brief 351** — `scaffolder`. **main — easy-tier wave 2 (dual-compile).**
+  Wave 1 shipped 11 (NOT exhausted — the lane was mis-measured); main's
+  easy tier is a **live, singleton-heavy vein at ~50 % of clean shapes
+  WHEN dual-compiled**. **(A)** Continue the unmatched `<0x80` simple
+  cohort; **(B) dual-compile EVERY candidate** — build both `*.c` (mwcc
+  2.0) and `*.legacy.c` (1.2/sp2p3) and ship whichever hits EUR objdiff
+  100 % before calling anything a wall. **(C)** Keep the **comparator fix**
+  (span `.L_*` sublabels when reading dsd gap objects — they split funcs
+  at internal labels; without it, whole-function matches read as false
+  near-misses); consider committing a canonical `tools/verify.py` so it
+  can't regress. **Per-pick gate = EUR objdiff 100 %**; brain reproduces
+  3-region SHA1 on merge. **Leave ov002 alone.** Target ~10-15.
+  **Collision-free** (decomper on ov002). Branch: `scaffolder/main-wave2`.
+  **→ NEXT (flagged): the legacy-lever re-sweep of the catalogued
+  reg-alloc backlog** (brief 340's "yields 0" never tried `.legacy.c`) is
+  the priority experiment once main thins — pilot ~15-20 misses across
+  ov004/006/011, report recovery; brief 340's "dead backlog" verdict is
+  now PROVISIONAL.
 
 ### Closed briefs (reference)
 
+- **Brief 349** — `scaffolder`, shipped in PR #867. ✅ **main easy-tier
+  stragglers wave 1 — 11 `.c` (NOT exhausted) + two measurement-bug
+  fixes.** The probe DISPROVED "exhausted": (1) **comparator bug** — the
+  reconstructed `verify.py` stopped at the first `.L_` sublabel (dsd gap
+  objects split funcs at internal labels), reporting whole-function
+  matches as false near-misses (2 sampled were byte-identical all along);
+  fixed to span `.L_*`. (2) **legacy lever** — ~50 % of main's "walls"
+  match under mwcc 1.2 `*.legacy.c`; dual-compiling tripled yield. **Both
+  bugs INFLATED the catalogued backlog (false negatives only — nothing
+  wrong shipped).** → main wave 2 (brief 351) + the backlog re-sweep is
+  now a live experiment.
+- **Brief 348** — `decomper`, shipped in PR #866. ✅ **ov002 deep-drain
+  wave 1 — 19 matched `.c`, 3-region SHA1 PASS** (above target). The
+  **pass-through lever** is the dominant recipe — ov002 forwarders keep
+  args live by passing them through to the sink, bumping the body's
+  scratch reg; this converts apparent "1-reg-off" accessors into clean C
+  (19/20 matched). Verdict: **ov002 is a deep, high-yield matchable-C
+  vein (~62 %); the ~1088 permuter bodies are a minority** → keep the
+  decomper here several waves (brief 350).
 - **Briefs 326–347** — **WINDOWS SESSION (22 PRs #843–#864, +152
   `complete_units`).** Brain ran on Windows; Mac brain reconciled the
   bookkeeping on return (gate re-verified: **3-region `ninja sha1` PASS**
