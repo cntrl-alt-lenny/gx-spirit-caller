@@ -189,4 +189,42 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  * are matchable-in-principle-but-codegen-finicky — slower hand-RE, partial wall.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 352 deep-drain wave 3 (16 picks, EUR/USA/JPN ninja sha1 OK).
+ * Per-pick table in docs/research/brief-352-ov002-deep-drain-wave3.md. The
+ * "select the fast sub-tier" strategy held: 16 of ~22 attempted (the misses are
+ * the codegen-finicky sub-tier, deferred as planned).
+ *
+ * NEW — INDIRECT-DISPATCH FAMILY (02257594/c54/ca8): resolve a record, then
+ * tail-`blx` a handler stored in it:
+ *   char *r = func_02257464(arg0);
+ *   int (*fn)(void*,int);
+ *   if (r == 0 || (fn = *(int (**)(void*,int))(r + OFF)) == 0) return 1;
+ *   return fn(arg0, arg1);                       // OFF = 12 / 16 / 20
+ * mwcc emits `blx r2`. (dcheck gotcha: objdump renders `blx reg` as
+ * `msr SP_hyp, reg, LSR pc` — the LSR form, distinct from `bx`'s LSL form;
+ * teach the comparator both, else a true match shows as a 1-line near-miss.)
+ *
+ * Recipes reused / extended:
+ *  - 021d479c ARG-PACK family now has 3-payload members: 021d87a4
+ *    `(pack(41), (u16)arg1, (u16)arg2, 0)`; 021e1aec `(pack(51), 13, (u16)arg2,
+ *    (u16)arg1)`.
+ *  - per-player 0x868 stride + Ov002Slot.id (32-bit holder, lsl#19;lsr#19):
+ *    0228dda8 `base = cf16c + (arg0&1)*0x868; ((Ov002Slot*)(base+arg1*20+48))->id`.
+ *  - pass-through arg1 (02237960/0223405c — the d016c value lands in r2 => r1
+ *    live); a `>> 1` bit-test needs an UNSIGNED holder (else `asr` not `lsr`).
+ *  - load-ORDER steers reg-alloc: declare the operand the orig loads FIRST first
+ *    (0220ced8: `int b=…+2152; int a=…+0;` to match `ldr r2,[+2152]` first).
+ *  - a forwarder that RETURNS 0 after its last call (not the call's result) —
+ *    `f(...); return 0;` — orig has a trailing `mov r0,#0` (0222b704).
+ *
+ * DEFERRED (codegen-finicky sub-tier, NOT walls): mirror-reg twins (0220cff8 is
+ * 02206100's reg-mirror), multi-store scheduling (022592b8/02259324 — base/zero
+ * reg + lazy cd73c load), range-opt of `==N||==N+1[||N+2]` (0220cf0c/022abf88 —
+ * mwcc folds to `sub;cmp;movls`). These go to a later permuter/hand-RE pass.
+ *
+ * Picks: 0220b740 0226db7c 022859b4 02286978 0220ced8 02237960 0223405c 02257594
+ *   02257c54 02257ca8 0228dda8 021d87a4 021e1aec 02202318 0226ad24 0222b704.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
