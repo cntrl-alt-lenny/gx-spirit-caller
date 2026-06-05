@@ -109,4 +109,41 @@ extern void func_ov002_021b1570(int a, int b, u16 *out, int kind);/* [shipped vi
 extern int  func_ov002_021b8fcc(int player, int idx);            /* [member 021ea1b4] accessor guard */
 extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int d); /* [member 021ea1b4] */
 
+/* =======================================================================
+ * §VERIFIED — brief 348 deep-drain wave 1 (19 picks, EUR/USA/JPN ninja sha1 OK).
+ * Per-pick table in docs/research/brief-348-ov002-deep-drain-wave1.md. The
+ * small accessor/forwarder/predicate tier (0x24-0x28) is RICHLY matchable-C:
+ * 19/20 attempted matched on the first or second pass; the apparent reg-misses
+ * are all the PASS-THROUGH LEVER, not reg-walls.
+ *
+ * THE LEVER (re-confirmed, dominant): an ov002 forwarder keeps its incoming args
+ * LIVE by passing them THROUGH to the sink, which bumps the scratch reg the body
+ * uses. Diagnose from the orig: a base/temp in r2 (not r1) => 1 pass-through arg
+ * (r1 live); a temp in r3 => 2 pass-through args (r1,r2 live). Match by declaring
+ * the sink with that arity and forwarding (021b4204/422c/022038b0 = +arg1;
+ * 021f0f58 = +arg1,arg2; 021f2068 = +arg1,arg2). A forwarder that keeps r0 across
+ * the call RETURNS the sink's result (021f0f58 — 0x183e store goes to r1, not r0).
+ *
+ * Other recipes confirmed this wave:
+ *  - tail-call: `return sink(...)` with no frame -> `ldr ip,=sink; ...; bx ip`
+ *    (021ae680/0226b274/022953c4/0220d070).
+ *  - value-map `v = arg ? 1 : 0` must be the `if` form (`v=0; if(arg)v=1;`) to get
+ *    `mov#0;movne#1`, NOT the ternary (`movne#1;moveq#0`) (021ff14c).
+ *  - bitfields: bit0 via `struct{u16 b0:1;}` (lsl#31;lsr#31, NOT &1); a multi-field
+ *    holder `struct{u16 b0:1; u16 f1:5;}` reads once + extracts both (0220d070).
+ *  - ASYMMETRIC shift extract is safe as raw C `(unsigned)(x<<17)>>23` (mwcc does
+ *    NOT fold unequal shifts; only symmetric `(x<<N)>>N` folds to a mask) (02208668).
+ *
+ * Picks: 021ae680 021e7584 021f0f58 021ff14c 02208668 0224326c 0226b274 0229d2c8
+ *   0229d9f8 021de4b0 02203558 021cb084 02222040 022953c4 021b4204 021b422c
+ *   022038b0 021f2068 0220d070.
+ * HELD: 021b91d0 (int-swap with an `stmfd {r3}; sub sp,#4` legacy frame -> a
+ *   compiler-routing candidate (.legacy.c?), NOT a reg-wall).
+ * CLASSIFICATION: census = 1109 simple + 629 dispatcher (1738 hand-drainable) vs
+ *   1088 permuter — ~62% matchable-C / ~38% reg-walled. This wave confirms the
+ *   "simple" tier is genuinely matchable once the lever is applied.
+ * GOTCHA-18: cross-wire check clean (no pick references an ov000 symbol); the
+ *   3-region sha1 PASS proves the {0,2,5,8} base-0x021aaee0 overlap is byte-isolated.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
