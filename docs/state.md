@@ -8,49 +8,48 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-03, post-#840 / #841 merge. Brain on Mac.
-**Brief 324 (ov016 clean-C wave 1, +15) + brief 325 (ov008 co-drain wave 2,
-+1) shipped — +16. ov016 = a strong fresh pivot (2 families); ov008 wave 2
-hit the predicted yield-drop (medium tier is permuter-bound, not direct-mwcc).
-decomper → ov016 wave 2 (finish composites); scaffolder pivots → fresh ov005.**
-(Reminder: ~67 % *units*, but only ~9.5 % by *code bytes* — `ninja sha1` is the
-floor; the walled bulk is the back half.)
+**Last updated:** 2026-06-05, post-#864 (Windows session) — reconciled by
+the Mac brain. **Briefs 326–347 ran on Windows: 22 PRs (#843–#864), +152
+`complete_units`, every remaining code overlay opened/drained.** Gate
+re-verified on return. **Milestone: the small-overlay easy-clean-C skim is
+EXHAUSTED game-wide** — next phase is the big modules' hard tier (ov002 /
+main) + the permuter/`.s` endgame. (Reminder: **68 % *units* but only
+~10 % by *code bytes*** — the walled bulk is the back half.)
 
-**Current metrics (post-#840/#841 merge, EUR — brain reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on c6e67d2, clean tree):**
-**`complete_units 3015 / 4465 (67.52 %)`** (+16 vs prior 2999).
-`matched_functions 3052 / 9801` (+16). 3-region SHA1 PASS reproduced
-(eur / usa / jpn all OK). **Code-byte tier: ~9.5 % (badge) — the small-first
-strategy means matched funcs are ~7× smaller than the unmatched average.**
+**Current metrics (post-#864, EUR — Mac brain reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on `5f49b0a`, clean tree):**
+**`complete_units 3167 / 4644 (68.20 %)`** (+152 vs 3015 when I left for
+Windows). `matched_functions 3204 / 9801`. **Code-byte tier ~10.2 %**
+(badge 10.32 %; `complete_code 244240/2384236`). 3-region SHA1 PASS
+reproduced (eur / usa / jpn all OK) — the 22 Windows PRs did not break the
+round-trip.
 
-🔀 **Overlay status.** **ov016** wave 1 = 15 (strong pivot; anchors =
-row-group-rebuild ×4 + sprite-cell-draw ×2); ~6-10 composites left →
-**wave 2**. **ov008** wave 2 = 1 (12 → 25); the `0x98–0xf4` medium tier is
-**permuter/m2c-bound, NOT direct-mwcc** (`021b2268` built + sha1 FAILED =
-real diff) → **parked for endgame**, scaffolder **pivots to ov005**. Done
-earlier: ov010 (15), ov004 (~38), ov000 (~27), ov011 (51), ov006 (150).
-**ov002 paused.**
+🔀 **Overlay coverage: COMPLETE (wave-1 everywhere).** All code overlays
+000-021 opened; ov022/023 are data/bss, ov001 is one `.s` func. Windows
+yields fell along the tail (ov005 20, ov021 18, ov018 17, ov015 17 …→
+ov014 3, ov013 5, ov007 6). **No fresh easy overlay remains.** `main` is
+NOT fresh either (1168 `.c` from the early era). **ov002** (1484 units,
+~878 done) was paused, not mined — the biggest single matchable vein left.
 
-🧰 **Recipes banked this round (ov016):** MMIO double-RMW must use **absolute
-addresses** (a shared `char*` local picks the wrong reg); `func_02094688` =
-`MI_CpuCopy(SRC,DST,n)`; **constant-divisor `/10` inlines smull-magic and
-MATCHES** — only *variable* divisors hit the `_s32_div_f` trap (refines last
-round's divmod gotcha).
+🧰 **Strategic findings from Windows:** (1) **declaration-order lever**
+(brief 338) — source decl order steers callee-saved register *numbering*;
+real but **narrow**. (2) **re-sweep pilot** (brief 340) — re-attacking the
+catalogued reg-alloc backlog recovered **0**; the ~435-func backlog
+(ov004≈123, ov006≈76, ov011≈46 …, in `ovNNN_core.h` §WALL) is genuinely
+**permuter/Mac-bound — do NOT re-sweep with direct-mwcc**.
 
-⚠️ **Inflection: the medium tiers are direct-mwcc-dead.** For the *first time
-both* streams handed back walled piles in one round (ov016 reg-swaps + the
-whole ov008 `0x98–0xf4` tier). The easy-tier skim still yields (ov016 = 15),
-but the per-overlay walled residue is **accumulating fast** and is well-
-characterised (reg-alloc + block-schedule near-misses). Still reserved for the
-permuter/GLOBAL_ASM endgame (tool ready, brief 302; unused) — but the endgame
-is the larger share of what's left, consistent with the ~9.5 % code-byte tier.
+⚠️ **Phase transition (this is the story now).** The easy-clean-C era is
+over. What's left: **(a)** big-module hard tier = matchable-C-via-hand-RE
+(ov002 ~600 units, main's harder bodies); **(b)** the ~435 reg-alloc
+near-miss backlog (some permuter-recoverable, most `.s`-bound); **(c)**
+data/walled tails (`.s` GLOBAL_ASM endgame, tool ready brief 302, still
+unused). We are NOT at the `.s` endgame yet — (a) still yields matchable C.
 
-🧭 **Where we are.** decomper **→ ov016 wave 2** (~6-10 composites);
-scaffolder **→ ov005** (~35 `<0x100`, fresh easy tier). Census runway after:
-ov015 / ov020 / ov017 … Once the small-overlay easy tiers exhaust, the bulk =
-**main** (2025 — SDK source-mining) + the **walled tails** (ov002 1887 + the
-accumulating per-overlay residue). Next: **brief 326** (decomper ov016 w2)
-+ **brief 327** (scaffolder ov005 w1).
+🧭 **Where we are.** decomper **→ ov002 deep-drain wave 1** (hand-RE the
+big overlay; 3-region sha1; gotcha-18 overlay-swap); scaffolder **→ main
+easy-tier straggler sweep** (a probe — low yield confirms the direct-mwcc
+lane is done game-wide → repurpose). Collision-free. Next: **brief 348**
+(decomper ov002 w1) + **brief 349** (scaffolder main stragglers).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
