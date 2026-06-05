@@ -8,47 +8,44 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-05, post-#869 / #870 merge. Brain on Mac.
-**Brief 350 (ov002 deep-drain w2, +17) + brief 351 (main w2, +15) shipped
-— +32. Both veins stay rich:** ov002 majority-matchable (decomper → w3,
-selecting the easy sub-tier); main FAR from thinning (~369 `≤0x40` left,
-scaffolder → w3, now **tri-compile**). (Reminder: **68 % *units* but only
-~10 % by *code bytes*** — the back half is big functions, but matchable-C
-runway is much larger than the "phase-transition" framing feared.)
+**Last updated:** 2026-06-05, post-#872 / #873 merge. Brain on Mac.
+**Brief 352 (ov002 deep-drain w3, +16) + brief 353 (main w3, +14) shipped
+— +30. Steady-state; both veins still rich** (ov002 ~16/wave on the fast
+sub-tier; main ~330 `≤0x40` left). decomper → ov002 w4, scaffolder →
+main w4. (Reminder: **68 % *units* but only ~10 % by *code bytes*** — the
+back half is big functions, but matchable-C runway stays large.)
 
-**Current metrics (post-#869/#870, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on `0089460`, clean tree):**
-**`complete_units 3229 / 4723 (68.37 %)`** (+32 vs 3197).
-`matched_functions 3266 / 9801`. **Code-byte tier 10.35 %**
-(`complete_code 246864/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
+**Current metrics (post-#872/#873, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on `923a11e`, clean tree):**
+**`complete_units 3259 / 4768`** (**+30** vs 3229; `matched_functions
+3296 / 9801`, +30). **Code-byte tier 10.42 %** (`complete_code
+248332/2384236`). 3-region SHA1 PASS (eur / usa / jpn). *(% reads 68.35
+vs 68.37 only because reconfigure re-split +45 units into the denominator
+— lead with the absolute +30; the % is denominator-noisy.)*
 
-🔀 **Two rich veins, both continuing.** **ov002** w2 = 17 — the
-`0x2c–0x40` tier SPLITS: **forwarder/predicate/family shapes yield fast**
-vs an **arithmetic/inline-branch slow partial-wall** → wave 3 *selects*
-the easy sub-tier. **ov002 is a 2.0 cohort — `.legacy.c` is NOT its
-lever** (main-specific; brief 350 negative finding). **main** w2 = 15 —
-the lever is now **TRI-compile** (2.0 → 1.2/sp2p3 → 1.2/sp3; `sub sp,#4`
-sp3 tier = 4/15, not rare); ~68 % of sampled candidates match; **~369
-`≤0x40` candidates remain → far from thinning.**
+🔀 **Two rich veins, both continuing.** **ov002** w3 = 16 — select-the-
+fast-sub-tier holds (~16/wave; misses = the deferred finicky sub-tier).
+Banked a new **indirect-dispatch family** (`02257594`/`c54`/`ca8`, `blx`
+fn-ptr) + grew the arg-pack family; the finicky defers accumulate into a
+**permuter/hand-RE backlog**. ov002 stays 2.0-only (no dual-compile).
+**main** w3 = 14 — tri-compile (~54 % yield); **sp3 is now the LARGEST
+legacy tier (5/14)**; **~330 `≤0x40` candidates remain → still rich.**
 
-🧰 **Tooling hardened:** `tools/verify.py --cc all` (+ test) committed
-(brief 351) — the comparator `.L_*` fix + tri-compile are now permanent,
-can't regress in a future reconstructed harness.
+📈 **Trend / outlook.** Byte tier creeps (9.5 → 10.42 % over recent
+rounds) because picks are small, but the *count* of matchable-C left is
+large: ov002 (hundreds) + main (~330 `≤0x40` + more above) + the
+untested legacy/sp3 backlog re-sweep. `tools/verify.py --cc all`
+(comparator `.L_*` fix + tri-compile) is committed + tested. The `.s`
+GLOBAL_ASM endgame (tool ready, brief 302) stays **deferred** — still
+finding real C.
 
-📈 **Trend / outlook.** The byte tier creeps (9.5 → 10.35 % over the last
-few rounds) because picks are small, but the *count* of matchable-C left
-is large: ov002 (~hundreds of bodies) + main (~369 `≤0x40` + more above)
-+ the still-untested legacy/sp3 backlog re-sweep. The `.s` GLOBAL_ASM
-endgame (tool ready, brief 302) stays **deferred** — we keep finding real
-C, not walls.
-
-🧭 **Where we are.** decomper **→ ov002 w3** (select forwarder/predicate/
-family shapes; defer arithmetic bodies; 3-region sha1; gotcha-18);
-scaffolder **→ main w3** (tri-compile every candidate). Collision-free.
-**Still flagged (after main thins):** the **legacy/sp3-lever re-sweep of
-the catalogued backlog** (ov004/006/011 §WALL) — brief 340's "yields 0"
-never tried `.legacy.c`/`.legacy_sp3.c`; verdict stays PROVISIONAL. Next:
-**brief 352** (decomper ov002 w3) + **brief 353** (scaffolder main w3).
+🧭 **Where we are.** decomper **→ ov002 w4** (select fast shapes + sweep
+the indirect-dispatch / arg-pack families; defer finicky; 3-region sha1);
+scaffolder **→ main w4** (tri-compile every candidate). Collision-free.
+**Deferred (not walls):** varargs forwarder family (`020a9764`+) needs a
+`stdarg.h` shim. **Still flagged (after main thins):** the legacy/sp3
+re-sweep of the catalogued backlog (ov004/006/011 §WALL) — verdict stays
+PROVISIONAL. Next: **brief 354** (ov002 w4) + **brief 355** (main w4).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
