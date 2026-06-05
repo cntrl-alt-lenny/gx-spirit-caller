@@ -506,40 +506,62 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 326** — `decomper`. **ov016 — clean-C wave 2 (consolidate).**
-  ov016 wave 1 shipped 15 (top of target); the two anchor families
-  (row-group-rebuild, sprite-cell-draw) are drained but **~6-10 mid-tier
-  composites remain** (brief 324 leaned "continue ov016") — finish them
-  before pivoting. Targets: the `<0x100` composites and any clean shapes
-  the family sweep skipped (e.g. `021b398c` ambiguous 10-arg, `021b7504`
-  magic-const stat-draw, `021b22d8` recursive quicksort if tractable).
-  Recipe unchanged: `m2c_feed` → `#include ov016_core.h` → coerce →
-  **3-region `ninja sha1`** (gate, NOT `ninja check`); carve-size audit;
-  the carried divmod gotcha. **Do NOT force the permuter-class
-  near-misses** — the reg-swap pair (`021b287c`/`28f4`, uniform r1↔r2)
-  and the `021b2824` dispatcher are well-characterised 1-instr misses →
-  leave them for the GLOBAL_ASM/permuter endgame; note them in
-  `ov016_core.h` if not already. Target ~6-10 picks. **Flag thinning**
-  (likely pivots after this wave). Branch: `decomper/ov016-wave2`.
-- **Brief 327** — `scaffolder`. **Pivot to ov005 — co-drain wave 1 (fresh
-  overlay).** ov008 wave 2 proved the `0x98–0xf4` medium tier is
-  **permuter/m2c-bound, NOT direct-mwcc** (brief 325: 1 shipped of 7
-  probed; `021b2268` built + `ninja sha1` FAILED = real codegen diff, not
-  a pool artifact). Direct-mwcc is productive on **fresh easy `<0x98`
-  tiers**, so pivot to **ov005** (~35 `<0x100`, census brief 278) —
-  **collision-free** (decomper stays on ov016). (A) **Survey ov005**
-  (`size_census.py --module ov005 --shape`; confirm it is not an
-  overlay-swap sibling à la ov000/ov002) + a starter
-  `src/overlay005/ov005_core.h` (cached-base mandatory); (B) drain the
-  reachable `<0x98` cohort, all-matched-callee / family-first. **Per-pick
-  gate = EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge.
-  **Leave the ov008 medium tier alone** — it is parked for the
-  permuter/decomper endgame (near-misses catalogued in `ov008_core.h`);
-  don't re-probe it with direct-mwcc. Target ~12-15 picks (wave-1
-  ramp-up). **Flag thinning.** Branch: `scaffolder/ov005-wave1`.
+- **Brief 348** — `decomper`. **Pivot to ov002 — deep-drain wave 1 (big
+  overlay).** The small-overlay easy-clean-C skim is **done** (Windows
+  briefs 326-347 opened every code overlay + main's easy tier was mined
+  in the early era). The two biggest matchable veins left are **ov002**
+  (1484 units, ~878 done — paused since the early era, NOT mined out) and
+  **main**'s hard tier. Take **ov002** — it's the decomper's job (big,
+  mixed easy/hard bodies; hand-RE; 3-region `ninja sha1`). **(A)** Survey
+  (`size_census.py --module ov002 --shape`) + extend
+  `src/overlay002/ov002_core.h`. **(B)** Drain small-first: the easy
+  accessor/dispatch tier first, then hand-RE the matchable mid bodies.
+  **⚠️ gotcha-18: ov002 shares base `0x021aaee0` with ov000 (overlay-swap
+  group {0,2,5,8})** — per-overlay delinks isolate it (an ov002 func at
+  addr X ≠ ov000's); `ninja sha1` PASS proves byte-clean isolation. Gate
+  = **3-region `ninja sha1`** (NOT `ninja check`); carve-size audit; the
+  divmod gotcha (variable divisors → explicit `func_020b3870`).
+  **Classify the residue** as you go (matchable-C vs reg-alloc-walled →
+  the `.s`/permuter endgame) so we can size the back half. Target ~12-18.
+  **Collision-free** (scaffolder takes main). Branch:
+  `decomper/ov002-wave1`.
+- **Brief 349** — `scaffolder`. **main — easy-tier straggler sweep
+  wave 1.** With every overlay's easy tier skimmed, the remaining
+  direct-mwcc vein is **main**'s unmined easy stragglers (main has 1168
+  `.c` from the early era, but new sinks named during the Windows session
+  may have made fresh simple shapes reachable). **(A)** Survey main's
+  unmatched **simplest `<0x80`** cohort (`size_census.py --module main
+  --shape`, simple shapes only); **(B)** drain them with the full mature
+  recipe library, all-matched-callee / family-first. **Per-pick gate =
+  EUR objdiff 100 %**; the brain reproduces 3-region SHA1 on merge.
+  **This wave doubles as a probe:** if the easy-tier yield is low (≲5),
+  that confirms the direct-mwcc easy lane is exhausted game-wide → flag
+  it and we'll repurpose the lane next round. **Leave ov002 alone**
+  (decomper owns it) and **don't re-attack catalogued reg-alloc misses**
+  (re-sweep pilot brief 340 proved that yields 0). Target ~5-12.
+  **Collision-free** (decomper takes ov002). Branch: `scaffolder/main-stragglers-wave1`.
 
 ### Closed briefs (reference)
 
+- **Briefs 326–347** — **WINDOWS SESSION (22 PRs #843–#864, +152
+  `complete_units`).** Brain ran on Windows; Mac brain reconciled the
+  bookkeeping on return (gate re-verified: **3-region `ninja sha1` PASS**
+  on `5f49b0a`, `complete_units 3167/4644 68.20 %`, byte tier ~10.2 %).
+  **Opened/drained every remaining code overlay** (yields dropping along
+  the tail): ov016 w2 (4), ov005 (13+7), ov020 (7+6), ov015 (12+5),
+  ov017 (10+3), ov021 (12+6), ov018 (12+5), ov003 (11+2), ov019 (5+4),
+  ov009 (8), ov012 (6), ov014 (3), ov007 (6), ov013 (5). **Two strategic
+  results:** (1) **declaration-order lever** (brief 338) — source decl
+  order steers callee-saved register *numbering*, cracked a 4-reg
+  permutation; but **NARROW**. (2) **re-sweep pilot** (brief 340) —
+  re-attacking the catalogued reg-alloc backlog with the full library
+  recovered **0**; the ~435-func deferred backlog (ov004≈123, ov006≈76,
+  ov011≈46 …, catalogued across `ovNNN_core.h` §TIER-TRANSITION/§WALL) is
+  **genuinely permuter/Mac-bound — do NOT re-sweep**. **Net: the small-
+  overlay easy-clean-C skim is exhausted game-wide** → next phase = the
+  big modules' hard tier (ov002 / main) + the permuter/`.s` endgame
+  (briefs 348/349 open it). Individual brief docs:
+  `docs/research/brief-3{26..47}-*.md`.
 - **Brief 325** — `scaffolder`, shipped in PR #841. ✅ **ov008 co-drain
   wave 2 — 1 matched `.c` + YIELD-DROP flag.** The `0x98–0xf4` medium
   tier is **permuter/m2c-bound, NOT direct-mwcc** (7 probed, 1 landed;
