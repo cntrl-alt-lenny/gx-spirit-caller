@@ -146,4 +146,47 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  *   3-region sha1 PASS proves the {0,2,5,8} base-0x021aaee0 overlap is byte-isolated.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 350 deep-drain wave 2 (17 picks, EUR/USA/JPN ninja sha1 OK).
+ * Per-pick table in docs/research/brief-350-ov002-deep-drain-wave2.md.
+ *
+ * KEY FINDING — the 0x2c-0x40 tier SPLITS into two sub-classes:
+ *  (a) clean forwarders / predicates (wave-1 shapes: tail-call arg-pack, guard +
+ *      sink + compare, sibling predicates) — HIGH match rate. All 17 picks here.
+ *  (b) arithmetic-combine / inline-vs-branch bodies — CODEGEN-SENSITIVE near-miss
+ *      (mwcc -O4 makes choices the orig avoided): byte-pack (`(x&0xFF)<<8` →
+ *      `lsl#24;lsr#16` vs orig `and;orr lsl#8`); range-opt (`k==6||7||8` →
+ *      `sub;cmp;movls` vs orig 3 cmps); inline-vs-outlined const returns; "keep
+ *      r0 for the return value, temp in r2" reg choice. These are NOT walls
+ *      (logic is right) but resist hand-RE — a soft-wall sub-tier. SELECT (a),
+ *      defer (b).
+ *
+ * Recipes added:
+ *  - PASS-THROUGH to a core.h-declared sink whose prototype is too-few-args: call
+ *    via a fn-ptr cast `((R(*)(T*,int))func)(self, arg1)` — emits a clean DIRECT
+ *    `bl` and sets up the extra live arg (021b0623c... i.e. 0220623c).
+ *  - 021d479c ARG-PACK FAMILY: `func_021d479c((u16)((arg0?0x8000:0)|KIND),
+ *    (u16)arg1, tag, 0)` tail-call. Members 021d873c/8770 (kind 41), 021df708
+ *    (43, tag1), 021e278c (81).
+ *  - flag-compare-vs-bitfield: `if (*(int*)(d016c+3308) == self->b0)` folds the
+ *    bitfield `>>31` into the cmp (`cmp ip,r2,lsr#31`); inline return-0 matches
+ *    when it's the FIRST/only such return (02206100/34); branches when a later
+ *    return-0 is shared (02216530 — defer).
+ *
+ * LEGACY (dual-compile) FINDING: these are mwcc-2.0 functions (orig epilogues are
+ * `pop {r3,pc}` / `bx lr`). The .legacy.c (1.2/sp2p3) compile produces a DIFFERENT
+ * frame (`stmfd {lr}; sub sp,#4; bx lr`) — it does NOT match. So the predication-
+ * vs-branch near-miss here is a 2.0-internal codegen choice, NOT legacy; dual-
+ * compile does not rescue them. (Contrast: main's stragglers ARE legacy.)
+ *   021b91d0 (the held swap): its `stmfd {r3}; sub sp,#4; …; bx lr` frame matches
+ *   NEITHER 2.0 NOR sp2p3 NOR sp3 (sp3 epilogue is `pop {pc}`) — a genuine
+ *   straggler (-O0 or hand-asm), candidate for .s escape.
+ *
+ * Picks: 0220b1dc 0220623c 0228a888 0228a974 0229e814 022aec44 0220de28 0220cd40
+ *   02215bc4 021d873c 021d8770 021df708 021e278c 02206100 02206134 02208004 021ded54.
+ * CLASSIFICATION refinement: matchable-C bucket (census ~1738) is real, but its
+ * EASY sub-tier is the forwarders/predicates; the arithmetic/inline-branch bodies
+ * are matchable-in-principle-but-codegen-finicky — slower hand-RE, partial wall.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
