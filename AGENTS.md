@@ -506,44 +506,55 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 350** — `decomper`. **ov002 — deep-drain wave 2.** Wave 1
-  shipped 19 (above target); ov002 is a **deep, high-yield matchable-C
-  vein** (brief 348: ~62 % matchable, the ~1088 permuter bodies a
-  *minority*) — stay here for several waves. **(A)** Continue small-first
-  through the **0x2c–0x40 tier**, then start the **matchable mid bodies
-  (0x40–0x100)**; the **pass-through lever** (forwarders keep args live
-  → bumps the body's scratch reg; converts apparent 1-reg-off accessors
-  into clean C) + the bitfield-struct recipes carry directly. **(B) NEW —
-  dual-compile before declaring a wall:** brief 349 found ~50 % of main's
-  "walls" were **legacy-codegen** — try `*.legacy.c` (mwcc 1.2/sp2p3,
-  Style-A) on any 2.0 near-miss (predication-vs-branch / Style-A epilogue
-  `pop {r4,lr};bx lr` are the tells) before deferring it. Route the
-  legacy-frame stragglers (`021b91d0`) to `.legacy.c`. Gate = **3-region
-  `ninja sha1`** (NOT `ninja check`); carve-size audit; gotcha-18
-  (ov000 overlay-swap); divmod gotcha. **Classify residue** (matchable
-  vs walled). Target ~15-19. **Collision-free** (scaffolder on main).
-  Branch: `decomper/ov002-wave2`.
-- **Brief 351** — `scaffolder`. **main — easy-tier wave 2 (dual-compile).**
-  Wave 1 shipped 11 (NOT exhausted — the lane was mis-measured); main's
-  easy tier is a **live, singleton-heavy vein at ~50 % of clean shapes
-  WHEN dual-compiled**. **(A)** Continue the unmatched `<0x80` simple
-  cohort; **(B) dual-compile EVERY candidate** — build both `*.c` (mwcc
-  2.0) and `*.legacy.c` (1.2/sp2p3) and ship whichever hits EUR objdiff
-  100 % before calling anything a wall. **(C)** Keep the **comparator fix**
-  (span `.L_*` sublabels when reading dsd gap objects — they split funcs
-  at internal labels; without it, whole-function matches read as false
-  near-misses); consider committing a canonical `tools/verify.py` so it
-  can't regress. **Per-pick gate = EUR objdiff 100 %**; brain reproduces
-  3-region SHA1 on merge. **Leave ov002 alone.** Target ~10-15.
-  **Collision-free** (decomper on ov002). Branch: `scaffolder/main-wave2`.
-  **→ NEXT (flagged): the legacy-lever re-sweep of the catalogued
-  reg-alloc backlog** (brief 340's "yields 0" never tried `.legacy.c`) is
-  the priority experiment once main thins — pilot ~15-20 misses across
-  ov004/006/011, report recovery; brief 340's "dead backlog" verdict is
-  now PROVISIONAL.
+- **Brief 352** — `decomper`. **ov002 — deep-drain wave 3 (select the
+  easy sub-tier).** Wave 2 shipped 17; ov002 stays **majority-matchable**,
+  but brief 350 split the `0x2c–0x40` tier in two: the **forwarder /
+  predicate / family shapes yield fast**, while the **arithmetic /
+  inline-branch sub-tier is a slow partial-wall**. **Select the
+  forwarder/predicate/family shapes** (pass-through lever, the
+  fn-ptr-cast pass-through, the `021d479c` arg-pack family,
+  bitfield-struct recipes) and **defer the codegen-finicky arithmetic
+  bodies** to a later permuter/hand-RE pass. **Note: dual-compile does
+  NOT apply to ov002** — it's a 2.0 cohort (brief 350 confirmed; legacy
+  is main-specific). Gate = **3-region `ninja sha1`** (NOT `ninja check`);
+  carve-size audit; gotcha-18 (ov000 overlay-swap); divmod gotcha. Keep
+  classifying residue. Target ~14-17. **Collision-free** (scaffolder on
+  main). Branch: `decomper/ov002-wave3`.
+- **Brief 353** — `scaffolder`. **main — easy-tier wave 3 (tri-compile).**
+  Wave 2 shipped 15; main is **far from thinning — ~369 candidates `≤0x40`
+  remain** at ~68 % tri-compile yield. **(A)** Continue the unmatched
+  `<0x80` simple cohort. **(B) TRI-compile every candidate** —
+  `tools/verify.py --cc all` builds 2.0 → 1.2/sp2p3 → 1.2/sp3 and ships
+  whichever hits EUR objdiff 100 %; the **sp3 tier (`*.legacy_sp3.c`,
+  `sub sp,#4` + Style-B `pop {pc}`) is NOT rare** on main (4/15 last
+  wave) — don't skip it. Don't call anything a wall until all three
+  compilers are tried. **Per-pick gate = EUR objdiff 100 %**; brain
+  reproduces 3-region SHA1 on merge. **Leave ov002 alone.** Target
+  ~12-15. **Collision-free** (decomper on ov002). Branch:
+  `scaffolder/main-wave3`.
+  **→ STILL FLAGGED (after main thins): the legacy/sp3-lever re-sweep of
+  the catalogued reg-alloc backlog** (ov004/006/011 §WALL) — brief 340's
+  "yields 0" never tried `.legacy.c`/`.legacy_sp3.c`. Priority experiment;
+  brief 340's "dead backlog" verdict stays PROVISIONAL. Not yet — main's
+  richer.
 
 ### Closed briefs (reference)
 
+- **Brief 351** — `scaffolder`, shipped in PR #869. ✅ **main easy-tier
+  wave 2 — 15 `.c` (TRI-compile) + canonical `tools/verify.py`.** The
+  dual-compile lever became **tri**-compile: 4 picks needed mwcc **1.2/sp3**
+  (`*.legacy_sp3.c`, `sub sp,#4` + Style-B `pop {pc}`). ~68 % of sampled
+  candidates matched (15/22). **main is far from thinning — ~369 `≤0x40`
+  candidates remain.** Committed `tools/verify.py --cc all` (+ test) so the
+  comparator `.L_*` fix + tri-compile can't regress. → main wave 3
+  (brief 353).
+- **Brief 350** — `decomper`, shipped in PR #870. ✅ **ov002 deep-drain
+  wave 2 — 17 matched `.c`, 3-region SHA1 PASS.** Sub-classified the
+  `0x2c–0x40` tier: **forwarder/predicate/family shapes yield fast;
+  arithmetic/inline-branch is a slow partial-wall** → select the former.
+  Banked: fn-ptr-cast pass-through, `021d479c` arg-pack family.
+  **Negative finding: ov002 is a 2.0 cohort — `.legacy.c` dual-compile is
+  NOT its lever** (that's main-specific). → ov002 wave 3 (brief 352).
 - **Brief 349** — `scaffolder`, shipped in PR #867. ✅ **main easy-tier
   stragglers wave 1 — 11 `.c` (NOT exhausted) + two measurement-bug
   fixes.** The probe DISPROVED "exhausted": (1) **comparator bug** — the
