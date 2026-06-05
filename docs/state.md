@@ -8,48 +8,47 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-05, post-#866 / #867 merge. Brain on Mac.
-**Brief 348 (ov002 deep-drain w1, +19) + brief 349 (main stragglers w1,
-+11) shipped — +30. Both BEAT expectations and the main probe REVISED last
-round's "backlog is dead" verdict (see ⚠️ below).** decomper → ov002 w2
-(deep matchable vein); scaffolder → main w2 (dual-compile). (Reminder:
-**68 % *units* but only ~10 % by *code bytes*** — the back half is big
-functions.)
+**Last updated:** 2026-06-05, post-#869 / #870 merge. Brain on Mac.
+**Brief 350 (ov002 deep-drain w2, +17) + brief 351 (main w2, +15) shipped
+— +32. Both veins stay rich:** ov002 majority-matchable (decomper → w3,
+selecting the easy sub-tier); main FAR from thinning (~369 `≤0x40` left,
+scaffolder → w3, now **tri-compile**). (Reminder: **68 % *units* but only
+~10 % by *code bytes*** — the back half is big functions, but matchable-C
+runway is much larger than the "phase-transition" framing feared.)
 
-**Current metrics (post-#866/#867, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on `6935b7a`, clean tree):**
-**`complete_units 3197 / 4680 (68.31 %)`** (+30 vs 3167).
-`matched_functions 3234 / 9801`. **Code-byte tier 10.29 %**
-(`complete_code 245384/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
+**Current metrics (post-#869/#870, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on `0089460`, clean tree):**
+**`complete_units 3229 / 4723 (68.37 %)`** (+32 vs 3197).
+`matched_functions 3266 / 9801`. **Code-byte tier 10.35 %**
+(`complete_code 246864/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
 
-🔀 **The two big veins are LIVE.** **ov002** w1 = 19 (above target) — the
-**pass-through lever** (forwarders keep args live → bump the body's
-scratch reg) converts apparent "1-reg-off" accessors into clean C (19/20).
-Verdict: ov002 is a **deep matchable-C vein (~62 %)**, the ~1088 permuter
-bodies a *minority* → keep the decomper here several waves. **main** w1 =
-11 (NOT exhausted — the probe disproved it).
+🔀 **Two rich veins, both continuing.** **ov002** w2 = 17 — the
+`0x2c–0x40` tier SPLITS: **forwarder/predicate/family shapes yield fast**
+vs an **arithmetic/inline-branch slow partial-wall** → wave 3 *selects*
+the easy sub-tier. **ov002 is a 2.0 cohort — `.legacy.c` is NOT its
+lever** (main-specific; brief 350 negative finding). **main** w2 = 15 —
+the lever is now **TRI-compile** (2.0 → 1.2/sp2p3 → 1.2/sp3; `sub sp,#4`
+sp3 tier = 4/15, not rare); ~68 % of sampled candidates match; **~369
+`≤0x40` candidates remain → far from thinning.**
 
-⚠️ **CORRECTION — the "backlog is dead" verdict (brief 340) is now
-PROVISIONAL.** The main probe found **two measurement bugs that inflated
-the catalogued ~435 backlog** (false negatives only — nothing wrong
-shipped): (1) **comparator bug** — the reconstructed `verify.py` stopped
-at the first `.L_` sublabel (dsd gap objects split funcs at internal
-labels), reading whole-function matches as false near-misses (now fixed
-to span `.L_*`). (2) **legacy lever** — **~50 % of main's "walls" match
-under mwcc 1.2 `*.legacy.c`**; brief 340's re-sweep only tried the
-declaration-order lever on the **default 2.0 compiler — never `.legacy.c`**.
-So some unknown fraction of the 435 is recoverable. **Dual-compile is now
-standard** (try `.legacy.c` before declaring any wall).
+🧰 **Tooling hardened:** `tools/verify.py --cc all` (+ test) committed
+(brief 351) — the comparator `.L_*` fix + tri-compile are now permanent,
+can't regress in a future reconstructed harness.
 
-🧭 **Where we are.** decomper **→ ov002 w2** (deep vein; pass-through
-lever + dual-compile; 3-region sha1; gotcha-18); scaffolder **→ main w2**
-(dual-compile every candidate; ~50 % of clean shapes). Collision-free.
-**Priority experiment QUEUED:** the **legacy-lever re-sweep of the
-catalogued backlog** (pilot ~15-20 misses across ov004/006/011 with
-`.legacy.c`) — runs once main thins; could reclaim a chunk of the 435.
-The `.s` GLOBAL_ASM endgame (tool ready, brief 302) stays deferred —
-matchable-C runway just got *bigger*, not smaller. Next: **brief 350**
-(decomper ov002 w2) + **brief 351** (scaffolder main w2).
+📈 **Trend / outlook.** The byte tier creeps (9.5 → 10.35 % over the last
+few rounds) because picks are small, but the *count* of matchable-C left
+is large: ov002 (~hundreds of bodies) + main (~369 `≤0x40` + more above)
++ the still-untested legacy/sp3 backlog re-sweep. The `.s` GLOBAL_ASM
+endgame (tool ready, brief 302) stays **deferred** — we keep finding real
+C, not walls.
+
+🧭 **Where we are.** decomper **→ ov002 w3** (select forwarder/predicate/
+family shapes; defer arithmetic bodies; 3-region sha1; gotcha-18);
+scaffolder **→ main w3** (tri-compile every candidate). Collision-free.
+**Still flagged (after main thins):** the **legacy/sp3-lever re-sweep of
+the catalogued backlog** (ov004/006/011 §WALL) — brief 340's "yields 0"
+never tried `.legacy.c`/`.legacy_sp3.c`; verdict stays PROVISIONAL. Next:
+**brief 352** (decomper ov002 w3) + **brief 353** (scaffolder main w3).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
