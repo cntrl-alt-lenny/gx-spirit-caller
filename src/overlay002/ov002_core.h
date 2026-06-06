@@ -354,4 +354,36 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  *   021b9ba0 021d5ab4.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 360 ov002 byte-pack drain wave (2 `.c`, EUR/USA/JPN
+ * ninja sha1 OK). VEIN RECALIBRATION: the byte-pack class is far thinner
+ * than 358's "~30-50" (that was the whole arg-pack family). Full report in
+ * docs/research/brief-360-ov002-bytepack-drain.md.
+ *
+ * MEASUREMENT (117 uncarved func_021d479c callers):
+ *  - byte-pack-payload (orr ...,lsl#8) = 15, but ALL LARGE (0xd0-0x1560)
+ *    except the already-drained small 021d5xxx cluster. The 13 big ones are
+ *    command-builders (real RE, not a drain).
+ *  - ~100 non-byte-pack arg-packs = finicky 1-2-reg-off near-misses:
+ *    reg-mirror/reg-alloc (021e2cd4/021d81d4/021df62c/021d677c/0223a3b0 —
+ *    per-player math shifts the whole allocation), scheduling (0225a51c/
+ *    021b0184/021b01f4 — a global load hoisted), inline-branch/case-order
+ *    (02211934). Route, don't grind: scheduling→permuter (358 harness gaps),
+ *    reg-alloc→.s, large→RE.
+ *  - Realistic clean byte-pack total ~9 (7 in 358 + this wave's 2) — TAPPED.
+ *
+ * NEW template: 0223a87c = MEDIUM GUARD-CHAIN BYTE-PACK — N guards that
+ * branch to a shared `return 0` (goto end lever, 358) + arg-pack with (u8)
+ * byte-pack payloads. Scales to the 13 large builders if a future pass wants
+ * them. 021d8414 = 7-arg (u8) byte-pack.
+ *
+ * GOTCHAS: mwcc is C89 (declare before statements; mid-block `int v=...` is a
+ * syntax error). A core.h-declared guard sink must be used at its declared
+ * arity/type (func_021c1e44(self,a,b); func_0223de94 returns u16).
+ *
+ * .c picks: 021d8414 0223a87c.
+ * RECO: pivot clean-C to a fresh overlay; ov002's arg-pack tail is a
+ * permuter/.s endgame, not a drain.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
