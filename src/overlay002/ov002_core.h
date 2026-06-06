@@ -310,4 +310,48 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  *   02271a78 0229d154 0226b0f0 0226b22c.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 358 ov002 ROUTING/CONVERSION pass (6 `.c` + 17 `.s`,
+ * EUR/USA/JPN ninja sha1 OK). Converted 27 catalogued backlog funcs; the
+ * breakdown sizes the real matchable-vs-walled split. Full report in
+ * docs/research/brief-358-ov002-routing-pass.md.
+ *
+ * RECOVERY BREAKDOWN:
+ *  - C-via-lever = 6 (byte-pack arg-pack family via the (u8) cast).
+ *  - C-via-permuter = 0 (the permuter PLATEAUS on the reg-mirror residue —
+ *    02267f90: 477 iterations stuck at base score 45. Confirms: permuter
+ *    anneals scheduling, NOT reg-alloc).
+ *  - .s whole-function = 17 (reg-mirror + predicate-branch + range-opt +
+ *    loop-SR + legacy + reg-alloc walls).
+ *  - deferred = 4 (scheduling-class: 021d90c0 + store-sched 0226acf8/
+ *    022592b8/02259324 — permuter-recoverable in principle but blocked by
+ *    asm_escape's trailing-pool bug + dsd-dis not emitting a target .s for
+ *    these overlay-swap gap funcs).
+ *
+ * NEW levers:
+ *  - the (u8) byte-pack lever recovers the func_021d479c ARG-PACK FAMILY
+ *    (125 callers, the 021d5xxx cluster): full arg-pack tail-calls
+ *    (guard + bit0/`>>1` derivations + `(u8)lo|((u8)hi<<8)` payload + stacked
+ *    u16 args). 021d5d08/5c50/5be0/5a6c/5ca4/5a08. A DRAIN vein, not a wall.
+ *  - `if (r == 0) return r;` (the guard value, already in r0) elides the
+ *    `moveq` that `return 0` adds (021d5c50/5be0/5ca4).
+ *  - INLINE-vs-BRANCH: a `goto shared_label` (or `switch` for a value chain)
+ *    makes mwcc BRANCH the early `return CONST` to a shared epilogue — but
+ *    ONLY when >=2 returns share it (02267f90 goto, 021efd38 switch,
+ *    0220d7c0 goto). A SINGLE early-return predicates regardless (021f95f8,
+ *    0220c2c0); frameless predicates too (02201e38, 02205dc8). And even when
+ *    the structure matches, a reg-mirror residue can remain -> .s.
+ *
+ * WALL VERDICTS (route, don't grind): reg-mirror (single-return predicate-
+ * branch, base-reg r1-vs-r2) and range-opt (mwcc range-opts contiguous value
+ * sets where orig used cmp;cmpne) are .s-only — the permuter plateaus and
+ * asm_escape --c refuses them (not a commutative swap). --whole-function is
+ * the escape. The byte-pack + scheduling classes are real C.
+ *
+ * .c picks: 021d5d08 021d5c50 021d5be0 021d5a6c 021d5ca4 021d5a08.
+ * .s picks: 02267f90 021efd38 0220d7c0 0220599c 021f95f8 0220c2c0 02201e38
+ *   02205dc8 0220cf0c 022abf88 0220cff8 02273b1c 022576d8 0223b3cc 021b91d0
+ *   021b9ba0 021d5ab4.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
