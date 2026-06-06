@@ -227,4 +227,45 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  *   02257c54 02257ca8 0228dda8 021d87a4 021e1aec 02202318 0226ad24 0222b704.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 354 deep-drain wave 4 (14 picks, EUR/USA/JPN ninja sha1 OK).
+ * Per-pick table in docs/research/brief-354-ov002-deep-drain-wave4.md. HARDER
+ * tier this wave (0x3c-0x44): the easy forwarder/predicate shapes thin and the
+ * codegen-finicky class grows, so yield landed at the target floor (14).
+ *
+ * FAMILY SWEEP (reloc-grep the gap objs for callers of a sink):
+ *  - func_02257464 (indirect-dispatch resolver): 12 callers, but the SIMPLE
+ *    blx-form family is drained (wave 3); the rest are loops/struct-builders.
+ *  - func_021d479c (arg-pack sink): 126 callers — a big vein, but most remaining
+ *    are byte-pack-finicky (`and #255; orr …,lsl#8`) or guarded-with-byte-pack.
+ *    The clean ones are simple-(u16)-cast tail-calls (021d90c0 = kind 58 with
+ *    (u8)arg1 + lo/hi u16 of arg2 — needs `(unsigned)arg2 >> 16` for lsr).
+ *
+ * NEW / refined recipes:
+ *  - the PASS-THROUGH LEVER also rescues "mirror-reg" near-misses: when the holder
+ *    lands in r2 (not r1) on a PURE-looking predicate, the sink takes a live arg
+ *    — forward it (02292020: func_02291160(arg0, arg1) -> holder to r2, matches).
+ *  - u16-HOLDER slot id: `struct { u16 id : 13; }` for an ldrh-loaded id (distinct
+ *    from core.h's 32-bit Ov002Slot); asymmetric index `(unsigned)(x<<23)>>21`
+ *    (0220a94c/aa20, kind-8 guard + d0250 table + tail-call).
+ *  - DUAL-BITFIELD holder `struct { u16 b0:1; u16 :11; u16 f12:2; }` reads the u16
+ *    once and extracts bit0 + a high field (02292020/0220b094).
+ *  - value-map `r = 0; if (v <= N) r = 1; return r;` (pre-zeroed) emits `movls`
+ *    WITHOUT the `movhi` that `return v <= N` adds (02209004).
+ *  - multi-counter OR predicate `a>0 || b>0 || c>0` -> cmp/cmple chain (022b3910).
+ *
+ * DEFERRED (the dominant near-miss class now — ROUTE to permuter / .s /
+ * asm_escape --c, which is 2.0-OK for ov002, NOT grind):
+ *  - INLINE-vs-BRANCH: a guard's `return 0` inlines (`movne#0;popne`) where the
+ *    orig branches to a shared ret-0 epilogue. Unsteerable by C form (the `&&`
+ *    rewrite changes the LAST condition's handling). 02267f90, 021efd38 (3-way
+ *    dispatch), the 02201e38/0220d7c0/02205dc8 bitfield-bit-compare family,
+ *    0220599c (guard+tail-call).
+ *  - mirror-reg with no sink to forward to (0220cff8); multi-store scheduling;
+ *    021b9210 (held-offset reg-alloc); byte-pack (021d5xxx arg-pack cluster).
+ *
+ * Picks: 021de598 022090b8 0220a148 02281994 0220444c 02242570 021decdc 0220b094
+ *   022b3910 021d1be4 0220a94c 0220aa20 02209004 02292020.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
