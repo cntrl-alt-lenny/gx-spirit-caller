@@ -506,42 +506,61 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 362** — `decomper`. **Legacy/sp3 + new-lever re-sweep PILOT of
-  the ov004/006/011 wall backlog (the long-flagged experiment).** Both
-  fresh-clean-C veins thinned this round (ov002 byte-pack tapped; main at
-  the pivot floor), so the **timing is finally right** for the priority
-  experiment. Re-attack the **catalogued reg-alloc backlog** (ov004≈123,
-  ov006≈76, ov011≈46 — `ovNNN_core.h` §WALL) with the **levers that did
-  not exist when these were catalogued** (Windows era): **tri-compile**
-  (`.legacy.c` / `.legacy_sp3.c`), the **`(u8)` byte-pack cast**,
-  **dispatch-order inversion**, and the **pass-through lever**. **Sample
-  ~15-20** catalogued misses across the three overlays and **report the
-  recovery rate** (C-recovered / still-walled) — that decides whether to
-  scale to the full ~435. Gate = **3-region `ninja sha1`**. **Fallback
-  (if recovery <~20 %):** the backlog is genuinely `.s`-bound — pivot
-  instead to a **fresh-overlay easy-tier re-sweep with the new levers**
-  (brief-360 rec: the Windows-drained overlays may re-open). **Collision-
-  free** (scaffolder on main). Branch: `decomper/backlog-resweep-pilot`.
-- **Brief 363** — `scaffolder`. **Permuter PILOT on the main near-miss
-  backlog (pivot off direct-drain).** main's direct-mwcc yield declined
-  three waves (16→13→10) — pivot to the **vendored permuter**
-  (`tools/_vendor/decomp-permuter`), the higher-EV lane. Run it on the
-  routed **scheduling / commutative** near-misses (the class the permuter
-  *can* anneal — NOT reg-alloc, which it plateaus on). Start with the
-  well-characterised batch: the **`||`-equality base+offset family**
-  (`02031794` / `0202ef08` / `0202f59c` / `02031764`), the
-  **commutative-operand canonicalisations** (`020195b8`, `020536d0`), and
-  the **stride-24 peephole-splits** (`02018dcc`, `0201b690`). Ship
-  whatever anneals to **EUR objdiff 100 %** as C; **report the permuter
-  hit rate** (N permuted → M matched). **Gotcha:** objdiff-100 % ≠ link
-  for `data`/non-bss reloc refs (a w7 pick dropped at link) — the brain's
-  3-region `ninja sha1` is the real gate on merge. **Fallback (if the
-  permuter underperforms):** main wave 8 (~235 `≤0x40` left). **Collision-
-  free** (decomper on ov004/006/011). Branch: `scaffolder/main-permuter`.
+- **Brief 364** — `decomper`. **Fresh-overlay re-sweep with the new
+  C-levers (the re-sweep fallback).** Verdict from brief 362: the
+  catalogued ov004/006/011 backlog is **dead** — ~69 % stale (155/225
+  already shipped) and the genuine residue is `.s`-bound; **tri-compile
+  recovers NOTHING on 2.0 overlays** (legacy is *main*-only). So take the
+  fallback: pick a **Windows-drained overlay** (survey to choose; **NOT
+  main, NOT ov002**) and re-attack its remaining easy tier + near-misses
+  with the **C-source levers** — `(u8)` byte-pack cast, dispatch-order
+  inversion, `goto`, pass-through. **(Skip tri-compile — overlays are
+  2.0.)** **Opportunistically permute** any **commutative-operand /
+  peephole-split** near-misses you hit (now proven — brief 363; non-
+  overlay-swap overlays only). **Optional cheap mop-up:** the simple
+  status-message stragglers across ov004/006/011 match under **plain
+  2.0** with today's recipes (a short pass, not a campaign). Gate =
+  **3-region `ninja sha1`**. Report yield + which lever carried it.
+  **Collision-free** (scaffolder on main). Branch:
+  `decomper/overlay-resweep`.
+- **Brief 365** — `scaffolder`. **SCALE the permuter on main (proven
+  lane).** Brief 363 = **3/8 (37.5 %), a conservative floor** — the
+  permuter cracked **100 % of the commutative/peephole batch (3/3)**; the
+  pilot was skewed toward the *resistant* `||`-equality class. Scale it
+  on the **commutative-operand / peephole-split / reg-mirror / scheduling
+  residue** (the large waves-1-7 pile declared walls because hand-C
+  couldn't flip operand order or dodge a peephole — the permuter's
+  wheelhouse, **under-represented in the pilot → expect a higher rate**).
+  **Do NOT permute** the `||`-equality family (4) or pure frame-style
+  misses — they **plateau** → `.s`-escape or leave walled. **Retry
+  `020536d0` once at a 600 s budget** (closest miss). Harness flow (banked
+  in brief 363): carve TU (`.c`+`delinks complete`) → `ninja <tu>.o` →
+  `dsd dis -c … -a build/eur/disasm` → **bridge the name** → `tools/
+  permute.py func_<a> --run --max-seconds N --threads 6`. **Per-pick gate
+  = EUR objdiff 100 %**, but **watch data-relocs** (objdiff-100 % ≠ link;
+  brain 3-region `ninja sha1` is the gate on merge). **Report the hit
+  rate.** **Collision-free** (decomper on an overlay). Branch:
+  `scaffolder/main-permuter-scale`.
   **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile.
 
 ### Closed briefs (reference)
 
+- **Brief 363** — `scaffolder`, shipped in PR #888. ✅ **permuter PILOT on
+  main near-misses — 3/8 (37.5 %), ABOVE the scale bar.** Class-determined:
+  the permuter **cracks commutative-operand** (`020195b8`) **+ peephole-
+  split** (`02018dcc`/`0201b690`) — it mutates the C *shape* hand-C can't
+  (var-reuse flips add-order; dead-var shift dodges `and#1`/`and#0xff`).
+  **Plateaus on `||`-equality CSE-of-base (4/4) + frame push-vs-subsp** →
+  route those to `.s`. **SCALE** (brief 365) on the commutative/peephole/
+  reg-mirror/scheduling residue. Harness flow banked.
+- **Brief 362** — `decomper`, shipped in PR #887. ✅ **ov004/006/011
+  backlog re-sweep PILOT — 2 recoveries, TAKE THE FALLBACK.** Two
+  structural findings: **(1) the catalog is ~69 % STALE** (155/225 already
+  shipped → real backlog ~70 not 435: ov004 27 / ov006 13 / ov011 30);
+  **(2) tri-compile recovers NOTHING** — ov004/006/011 are **2.0 overlays**
+  (legacy is *main*-only). The 2 recoveries were the same stale status-
+  message shape under plain 2.0, a family already mostly shipped. **Don't
+  campaign the backlog — pivot to a fresh-overlay re-sweep** (brief 364).
 - **Brief 361** — `scaffolder`, shipped in PR #885. ✅ **main easy-tier
   wave 7 — 10 `.c` (tri-compile) + PIVOT FLAG.** Yield trend 16→13→10
   (waves 5-6-7); per-pick cost rising. → pivot to the permuter backlog
