@@ -10491,3 +10491,33 @@ src/main/func_020852cc.legacy_sp3.c:
 src/main/func_02089c44.legacy_sp3.c:
     complete
     .text start:0x02089c44 end:0x02089c74
+src/main/func_0206844c.c:
+    complete
+    .text start:0x0206844c end:0x02068480
+src/main/func_0204f998.c:
+    complete
+    .text start:0x0204f998 end:0x0204f9cc
+src/main/func_020672f4.c:
+    complete
+    .text start:0x020672f4 end:0x02067328
+src/main/func_02067608.c:
+    complete
+    .text start:0x02067608 end:0x0206763c
+src/main/func_02070f44.c:
+    complete
+    .text start:0x02070f44 end:0x02070f78
+src/main/func_0206afb8.c:
+    complete
+    .text start:0x0206afb8 end:0x0206afec
+src/main/func_0206bf60.legacy.c:
+    complete
+    .text start:0x0206bf60 end:0x0206bf94
+src/main/func_0206bfdc.legacy.c:
+    complete
+    .text start:0x0206bfdc end:0x0206c010
+src/main/func_020746ec.legacy.c:
+    complete
+    .text start:0x020746ec end:0x02074720
+src/main/func_0206c2c0.legacy.c:
+    complete
+    .text start:0x0206c2c0 end:0x0206c2f4
