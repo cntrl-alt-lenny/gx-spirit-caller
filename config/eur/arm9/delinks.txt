@@ -10521,3 +10521,12 @@ src/main/func_020746ec.legacy.c:
 src/main/func_0206c2c0.legacy.c:
     complete
     .text start:0x0206c2c0 end:0x0206c2f4
+src/main/func_020195b8.c:
+    complete
+    .text start:0x020195b8 end:0x020195ec
+src/main/func_02018dcc.c:
+    complete
+    .text start:0x02018dcc end:0x02018e00
+src/main/func_0201b690.c:
+    complete
+    .text start:0x0201b690 end:0x0201b6c4
