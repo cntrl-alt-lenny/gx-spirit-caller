@@ -506,24 +506,27 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 364** — `decomper`. **Fresh-overlay re-sweep with the new
-  C-levers (the re-sweep fallback).** Verdict from brief 362: the
-  catalogued ov004/006/011 backlog is **dead** — ~69 % stale (155/225
-  already shipped) and the genuine residue is `.s`-bound; **tri-compile
-  recovers NOTHING on 2.0 overlays** (legacy is *main*-only). So take the
-  fallback: pick a **Windows-drained overlay** (survey to choose; **NOT
-  main, NOT ov002**) and re-attack its remaining easy tier + near-misses
-  with the **C-source levers** — `(u8)` byte-pack cast, dispatch-order
-  inversion, `goto`, pass-through. **(Skip tri-compile — overlays are
-  2.0.)** **Opportunistically permute** any **commutative-operand /
-  peephole-split** near-misses you hit (now proven — brief 363; non-
-  overlay-swap overlays only). **Optional cheap mop-up:** the simple
-  status-message stragglers across ov004/006/011 match under **plain
-  2.0** with today's recipes (a short pass, not a campaign). Gate =
-  **3-region `ninja sha1`**. Report yield + which lever carried it.
-  **Collision-free** (scaffolder on main). Branch:
-  `decomper/overlay-resweep`.
-- **Brief 365** — `scaffolder`. **SCALE the permuter on main (proven
+- **Brief 366** — `decomper`. **ov004 — drain the missed ARM
+  builder/status-message family (normal wave).** Brief 364 found drained
+  overlays **do re-open**, but **not via the named C-levers** (those gave
+  0 on ov004) — via **missed clean ARM builders** the Windows waves never
+  attempted. Drain that family: **~32 uncarved sink-callers** (callers of
+  `func_02037208` / `02034888` / `0201cd1c` / `020124a4`) — the simple
+  ones match with the **cached-base + buf-setup recipes** (e.g. `021d66f4`
+  plain builder; `021d1360` status-message with **mandatory cached base**
+  `char *b = data_0220b500` across calls). A **normal drain wave**, not a
+  routing pass; **don't** reach for the byte-pack/`goto` levers here (they
+  need a fresh easy tier the drained overlay lacks — save them for the
+  next overlay's *first* drain). Gate = **3-region `ninja sha1`**; carve
+  audit. Target ~12-18. **Collision-free** (scaffolder on main). Branch:
+  `decomper/ov004-builders`.
+  **→ NEXT (pre-announced, the bigger prize): brief 368 = a Thumb-compile
+  harness rule** (`*.thumb.c` → `-proc` emitting the ARMv4T-interworking
+  frame) — opens the whole `021dbxxx`–`021ddxxx` Thumb cohort (dozens of
+  clean utility funcs; only the frameless subset recovers without it,
+  1 shipped in 364 = the project's first Thumb `.c`, `021dd350`).
+- **Brief 365** ⏳ **(IN PROGRESS — scaffolder still running; dirty
+  worktree, no PR yet)** — `scaffolder`. **SCALE the permuter on main (proven
   lane).** Brief 363 = **3/8 (37.5 %), a conservative floor** — the
   permuter cracked **100 % of the commutative/peephole batch (3/3)**; the
   pilot was skewed toward the *resistant* `||`-equality class. Scale it
@@ -545,6 +548,15 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Closed briefs (reference)
 
+- **Brief 364** — `decomper`, shipped in PR #890. ✅ **ov004 overlay
+  re-sweep — 3 recoveries + re-open findings.** Drained overlays **do
+  re-open**, but **none of the 4 named C-levers carried a single
+  recovery** — via two OTHER veins: **(1) missed clean ARM builders**
+  (~32 uncarved sink-callers the Windows waves skipped → normal drain,
+  brief 366) and **(2) the Thumb cohort** (`021dd350` = project's FIRST
+  Thumb `.c`; call-having Thumb needs a `*.thumb.c` harness rule → brief
+  368, the bigger prize). Lesson: the byte-pack/`goto` levers are for a
+  *fresh* overlay's first drain, not re-sweeps.
 - **Brief 363** — `scaffolder`, shipped in PR #888. ✅ **permuter PILOT on
   main near-misses — 3/8 (37.5 %), ABOVE the scale bar.** Class-determined:
   the permuter **cracks commutative-operand** (`020195b8`) **+ peephole-

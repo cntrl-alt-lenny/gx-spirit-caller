@@ -8,41 +8,38 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-05, post-#887 / #888 merge. Brain on Mac.
-**Brief 362 (re-sweep pilot, +2) + brief 363 (permuter pilot, +3) shipped
-— +5 (small; the payoff was the VERDICTS). The two backlog-conversion
-pilots resolved the strategy: the PERMUTER lane works (scale it); the
-catalogued "435 backlog" is mostly a myth (dead end).** (Reminder: **69 %
-*units* but only ~10.7 % by *code bytes***.)
+**Last updated:** 2026-06-05, post-#890 merge (decomper half). Brain on
+Mac. **Brief 364 (ov004 re-sweep, +3) shipped; brief 365 (permuter scale)
+⏳ STILL RUNNING (scaffolder mid-wave, no PR yet — permuter is slow).**
+Half-round: merged the decomper, queued its next (366), left 365 open.
+(Reminder: **69 % *units* but only ~10.7 % by *code bytes***.)
 
-**Current metrics (post-#887/#888, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on `3a54c83`, clean tree):**
-**`complete_units 3368 / 4896 (68.79 %)`** (**+5** vs 3363).
-`matched_functions 3405 / 9801` (+5). **Code-byte tier 10.67 %**
-(`complete_code 254516/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
+**Current metrics (post-#890, EUR — reconfigured + 3-region `ninja sha1`
+PASS + `ninja report` on `7f7b7b8`, clean tree):**
+**`complete_units 3371 / 4901 (68.78 %)`** (**+3** vs 3368).
+`matched_functions 3408 / 9801` (+3). **Code-byte tier 10.68 %**
+(`complete_code 254738/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
 
-✅ **Permuter pilot = SCALE IT.** 3/8 (37.5 %) is a **conservative floor**
-— the permuter cracked **100 % of the commutative/peephole batch (3/3)**:
-it mutates the C *shape* hand-writing can't (var-reuse flips add-order; a
-dead-var shift dodges an `and#1`/`and#0xff` peephole). It **plateaus** on
-`||`-equality CSE-of-base (0/4) + frame push-vs-subsp → those go to `.s`.
-**The permuter is now the primary lane for recovering C from the near-miss
-backlog.**
+🔎 **Overlay re-sweep verdict (brief 364):** drained overlays **DO
+re-open** — but **none of the 4 named C-levers carried a recovery**.
+Re-opening came from two other veins: **(1) missed clean ARM builders**
+(~32 uncarved sink-callers the Windows waves skipped → a normal drain
+wave = brief 366, the next step) and **(2) the Thumb cohort** (`021dd350`
+= the project's FIRST Thumb `.c`; the call-having bulk needs a `*.thumb.c`
+harness rule = brief 368, **the bigger prize** — dozens of utility funcs).
+Lesson: the byte-pack/`goto` levers are for a *fresh* overlay's first
+drain, not re-sweeps.
 
-❌ **Re-sweep pilot = dead end (myth-busted).** The catalogued
-ov004/006/011 "~435 walls" is **~69 % STALE** (155/225 already shipped →
-**real backlog ~70**, not 435). And **tri-compile recovers NOTHING on
-those 2.0 overlays** (legacy is *main*-only). The genuine residue is
-`.s`-bound. → don't campaign it.
+✅ **Permuter (from last round) = the primary backlog lane** — it cracks
+the commutative/peephole classes hand-C can't reach; plateaus on
+`||`-equality CSE + frame (→ `.s`). Brief 365 is scaling it on main now.
 
-🔁 **Where we are (post-pilot lanes).** **scaffolder → brief 365** = SCALE
-the permuter on main's commutative/peephole/reg-mirror/scheduling residue
-(under-represented in the pilot → expect >37.5 %). **decomper → brief 364**
-= fresh-overlay re-sweep with the C-levers (`(u8)`, dispatch-inversion,
-`goto`, pass-through — NOT tri-compile) + opportunistic permute, on a
-Windows-drained overlay. Collision-free (overlay vs main). **Deferred:**
-varargs `stdarg.h` shim; `asm_escape --c` tri-compile. Next: **brief 364**
-(decomper overlay re-sweep) + **brief 365** (scaffolder permuter scale).
+🔁 **Where we are.** **decomper → brief 366** (ov004 missed-builder drain;
+then 368 = Thumb harness). **scaffolder → brief 365** (permuter scale on
+main — IN PROGRESS; review when its PR lands). Collision-free (overlay vs
+main). **Deferred:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile.
+Next merge: **brief 365** (scaffolder permuter, pending) → then **brief
+366** (decomper) result.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
