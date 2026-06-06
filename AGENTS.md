@@ -506,41 +506,56 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 356** — `decomper`. **ov002 — deep-drain wave 5 (last select
-  wave).** Wave 4 dipped to 14: the easy `≤0x38` shapes are **largely
-  drained** and from `0x3c` up the codegen-finicky class dominates (brief
-  354 = "easy yield is now tier-bound"). **One more select wave** — work
-  the **untouched `≤0x38` clusters in fresh address regions** (the
-  worklist still has some by address), plus any remaining
-  indirect-dispatch / arg-pack family members. **Defer the finicky bodies**
-  (inline/branch, mirror-reg, scheduling) — they're now a **sizable,
-  uniform backlog** for the dedicated routing/permuter pass next
-  (pre-announced: **brief 358** = the decomper's ov002 routing pass —
-  permuter on the scheduling class for real C, `asm_escape --c` on the
-  2.0 canonicalisation class). ov002 is 2.0-only — no dual-compile. Gate
-  = **3-region `ninja sha1`**; carve audit; gotcha-18; divmod. Target
-  ~10-14; **flag the easy-tier exhaustion clearly** so we trigger 358.
-  **Collision-free** (scaffolder on main). Branch: `decomper/ov002-wave5`.
-- **Brief 357** — `scaffolder`. **main — easy-tier wave 5 (tri-compile).**
-  Wave 4 shipped 13 C + 1 routed `.s`; main is **still not thinning —
-  ~305 candidates `≤0x40`** remain at a steady ~50–55 % tri-compile yield.
-  **(A)** Continue the unmatched `<0x80` simple cohort. **(B) TRI-compile
-  every candidate** (`tools/verify.py --cc all`); last wave **legacy/sp2p3
-  was the DOMINANT tier (8/13 C)** — main's Style-A / predicated-guard
-  cohort runs deep, so try all three. **(C)** Route obvious endgame
-  residue out of the way: pure canonicalisation miss → `asm_escape.py`
-  `.s`; reg-choice miss → permuter backlog. **Per-pick gate = EUR objdiff
-  100 %**; brain reproduces 3-region SHA1 on merge. **Leave ov002 alone.**
-  Target ~12-15. **Collision-free** (decomper on ov002). Branch:
-  `scaffolder/main-wave5`.
-  **→ DEFERRED (not walls):** the **varargs forwarder family** (`020a9764`+)
-  needs a `stdarg.h`/`va_list` shim; a `asm_escape --c` tri-compile
-  extension would let sp3/sp2p3 canonicalisation misses ship as 1-line
-  `.s`. **→ STILL FLAGGED (after main thins): the legacy/sp3 re-sweep of
-  the catalogued ov004/006/011 wall backlog.**
+- **Brief 358** — `decomper`. **ov002 — routing / permuter pass (the
+  transition).** ov002's pure-easy `≤0x38` vein is **exhausted** (brief
+  356: ~27 left, half finicky — "stop hand-selecting"). Pivot to a
+  **conversion pass** on the catalogued finicky backlog
+  (`ov002_core.h` §WALL / defers), in this order — lead with the cheap C
+  recoveries, escape only true walls:
+  **(1)** RE-TRY the **byte-pack near-misses with the new `(u8)` cast
+  lever FIRST** — `(u8)lo|((u8)hi<<8)` reproduces `and;and;orr` (matches)
+  vs the `lsl#24;lsr#16` peephole; this recovers several as **clean C**.
+  **(2)** Apply the **dispatch-order inversion** lever (write the 2-way
+  `if` so the orig's `bhi`/branch-the-special-case shape falls out) where
+  it fits. **(3) Permuter** the predicate-vs-branch / store-scheduling /
+  mirror-reg / reg-choice residue (real C when it anneals). **(4)
+  `asm_escape --c` (2.0-only)** for the *true canonicalisation* misses →
+  surgical `.s`. **Report the recovery breakdown** (C-via-lever /
+  C-via-permuter / `.s`) so we learn ov002's matchable-vs-walled split.
+  Gate = **3-region `ninja sha1`**; gotcha-18. This is a conversion pass
+  (yield variable, not a fresh drain). **Collision-free** (scaffolder on
+  main). Branch: `decomper/ov002-routing`.
+- **Brief 359** — `scaffolder`. **main — easy-tier wave 6 (tri-compile).**
+  Wave 5 shipped 16 (above target); main is **still not thinning — ~257
+  candidates `≤0x40`** at a steady ~50 % yield (now into the `0x30` tier;
+  the recurring families — out-param queries, `&&`-chains, comparators,
+  call-sequences — still match across all three compilers). **(A)**
+  Continue the `<0x80` simple cohort. **(B) TRI-compile every candidate**
+  (`tools/verify.py --cc all`). **(C)** The **`||`-equality base+offset
+  family** is a clean batch (`02031794`, `0202ef08`, `0202f59c`,
+  `02031764`) — route together to the permuter / `.s`. **Per-pick gate =
+  EUR objdiff 100 %**; brain reproduces 3-region SHA1 on merge. **Leave
+  ov002 alone.** Target ~12-16. **Collision-free** (decomper on ov002).
+  Branch: `scaffolder/main-wave6`.
+  **→ DEFERRED:** varargs family (`020a9764`+, `stdarg.h` shim);
+  `asm_escape --c` tri-compile extension. **→ FLAGGED (after main thins):
+  the legacy/sp3 re-sweep of the catalogued ov004/006/011 wall backlog.**
 
 ### Closed briefs (reference)
 
+- **Brief 357** — `scaffolder`, shipped in PR #878. ✅ **main easy-tier
+  wave 5 — 16 `.c` (tri-compile, above target).** Yield held ~50 % into
+  the `0x30` tier; recurring shape families still match. **~257 `≤0x40`
+  remain → main still rich** (wave 6). New clean batch: the `||`-equality
+  base+offset family (`02031794`/`0202ef08`/`0202f59c`/`02031764`).
+- **Brief 356** — `decomper`, shipped in PR #879. ✅ **ov002 deep-drain
+  wave 5 (last select) — 12 matched `.c`, 3-region SHA1 PASS.** Drained
+  the last easy `≤0x38` shapes (**~27 left, half finicky → easy tier
+  EXHAUSTED**) and **partially un-walled two deferred classes** with two
+  new C levers: the **`(u8)` byte-pack cast** (`and;and;orr` vs the
+  `lsl;lsr` peephole) and **dispatch-order inversion** (`bhi`/branch-the-
+  special-case). → triggers the **ov002 routing/permuter pass (brief
+  358)**.
 - **Brief 355** — `scaffolder`, shipped in PR #875. ✅ **main easy-tier
   wave 4 — 13 tri-compiled C + 1 routed `.s`.** legacy/sp2p3 was the
   *dominant* tier (8/13). **main still not thinning — ~305 `≤0x40`
