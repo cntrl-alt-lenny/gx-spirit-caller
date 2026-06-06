@@ -506,41 +506,55 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 360** — `decomper`. **ov002 — byte-pack drain wave (real C,
-  fresh vein).** The routing pass (brief 358) proved the **`(u8)`
-  byte-pack class is a real-C vein** (6 C / 0 permuter / 17 `.s`) — and
-  the **`func_021d479c` arg-pack family is ~30-50 matchable funcs**. Work
-  it as a **NORMAL drain wave** (not a routing pass): apply the `(u8)`
-  cast lever (`(u8)lo|((u8)hi<<8)` → `and;and;orr`, matches) across the
-  `021d479c` family + the **per-player slot-dispatcher sub-family**
-  (`021d677c` / `021d7054` / `021d7100`). Gate = **3-region `ninja sha1`**;
-  carve audit; gotcha-18; divmod. **Don't re-grind the walled tail** —
-  the reg-mirror / predicate-branch class is now correctly an
-  `asm_escape --whole-function` `.s` endgame (17 banked); the scheduling
-  class (~4) waits on two harness fixes (asm_escape pool-tail; permuter
-  target-`.s` for overlay-swap gap funcs) — defer. Target ~12-18.
-  **Collision-free** (scaffolder on main). Branch:
-  `decomper/ov002-bytepack`.
-- **Brief 361** — `scaffolder`. **main — easy-tier wave 7 (tri-compile).**
-  Wave 6 shipped 13; main keeps producing (**~245 `≤0x40` remain**) but
-  the **per-pick cost is rising** — yield fell to ~36 % (`0x30`/`0x34`
-  tier is more reg/scheduling/peephole-sensitive). Still worth a wave:
-  **(A)** continue the `<0x80` simple cohort; **(B) TRI-compile every
-  candidate** (`tools/verify.py --cc all`); the recurring families
-  (out-param queries, `&&`-chains, comparators, call-sequences) carry the
-  clean picks. **Per-pick gate = EUR objdiff 100 %**; brain reproduces
-  3-region SHA1 on merge. **Leave ov002 alone.** Target ~10-14.
-  **Collision-free** (decomper on ov002). Branch: `scaffolder/main-wave7`.
-  **→ PERMUTER NOW VENDORED** (`tools/_vendor/decomp-permuter`): the
-  routed near-miss backlog (`||`-equality family, commutative-operand
-  canonicalisations `02053600`/`020195b8`, stride-24 peephole-splits,
-  reg-choice pile) is becoming the **higher-leverage lane** as main's
-  per-pick cost climbs — pivot to it when wave-7 yield drops below ~10.
-  **→ DEFERRED/FLAGGED:** varargs `stdarg.h` shim; `asm_escape --c`
-  tri-compile; legacy/sp3 re-sweep of the ov004/006/011 backlog.
+- **Brief 362** — `decomper`. **Legacy/sp3 + new-lever re-sweep PILOT of
+  the ov004/006/011 wall backlog (the long-flagged experiment).** Both
+  fresh-clean-C veins thinned this round (ov002 byte-pack tapped; main at
+  the pivot floor), so the **timing is finally right** for the priority
+  experiment. Re-attack the **catalogued reg-alloc backlog** (ov004≈123,
+  ov006≈76, ov011≈46 — `ovNNN_core.h` §WALL) with the **levers that did
+  not exist when these were catalogued** (Windows era): **tri-compile**
+  (`.legacy.c` / `.legacy_sp3.c`), the **`(u8)` byte-pack cast**,
+  **dispatch-order inversion**, and the **pass-through lever**. **Sample
+  ~15-20** catalogued misses across the three overlays and **report the
+  recovery rate** (C-recovered / still-walled) — that decides whether to
+  scale to the full ~435. Gate = **3-region `ninja sha1`**. **Fallback
+  (if recovery <~20 %):** the backlog is genuinely `.s`-bound — pivot
+  instead to a **fresh-overlay easy-tier re-sweep with the new levers**
+  (brief-360 rec: the Windows-drained overlays may re-open). **Collision-
+  free** (scaffolder on main). Branch: `decomper/backlog-resweep-pilot`.
+- **Brief 363** — `scaffolder`. **Permuter PILOT on the main near-miss
+  backlog (pivot off direct-drain).** main's direct-mwcc yield declined
+  three waves (16→13→10) — pivot to the **vendored permuter**
+  (`tools/_vendor/decomp-permuter`), the higher-EV lane. Run it on the
+  routed **scheduling / commutative** near-misses (the class the permuter
+  *can* anneal — NOT reg-alloc, which it plateaus on). Start with the
+  well-characterised batch: the **`||`-equality base+offset family**
+  (`02031794` / `0202ef08` / `0202f59c` / `02031764`), the
+  **commutative-operand canonicalisations** (`020195b8`, `020536d0`), and
+  the **stride-24 peephole-splits** (`02018dcc`, `0201b690`). Ship
+  whatever anneals to **EUR objdiff 100 %** as C; **report the permuter
+  hit rate** (N permuted → M matched). **Gotcha:** objdiff-100 % ≠ link
+  for `data`/non-bss reloc refs (a w7 pick dropped at link) — the brain's
+  3-region `ninja sha1` is the real gate on merge. **Fallback (if the
+  permuter underperforms):** main wave 8 (~235 `≤0x40` left). **Collision-
+  free** (decomper on ov004/006/011). Branch: `scaffolder/main-permuter`.
+  **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile.
 
 ### Closed briefs (reference)
 
+- **Brief 361** — `scaffolder`, shipped in PR #885. ✅ **main easy-tier
+  wave 7 — 10 `.c` (tri-compile) + PIVOT FLAG.** Yield trend 16→13→10
+  (waves 5-6-7); per-pick cost rising. → pivot to the permuter backlog
+  (brief 363). Gotcha banked: an 11th pick (`func_020489c4`) hit objdiff
+  100 % but **dropped at the link gate** (`data` reloc) — objdiff-100 %
+  ≠ link; `ninja sha1` is the gate.
+- **Brief 360** — `decomper`, shipped in PR #884. ✅ **ov002 byte-pack
+  drain — 2 `.c` + VEIN RECALIBRATION.** The `(u8)` byte-pack vein is
+  **far thinner than the 358 estimate** — realistic clean count ~9 (7 in
+  358 + 2 here), now **tapped**. Remainder: 13 large byte-pack builders
+  (0x19c-0x1560, RE-only) + ~100 finicky arg-packs (permuter/`.s`). →
+  pivot the clean-C decomper off ov002 (brief 362). `0223a87c` guard-chain
+  template banked for the medium builders.
 - **Brief 359** — `scaffolder`, shipped in PR #881. ✅ **main easy-tier
   wave 6 — 13 `.c` (tri-compile).** Yield dipped to ~36 % as the tier
   deepened to `0x30`/`0x34` (more reg/scheduling/peephole-sensitive).
