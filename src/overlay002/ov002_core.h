@@ -268,4 +268,46 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  *   022b3910 021d1be4 0220a94c 0220aa20 02209004 02292020.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 356 deep-drain wave 5 (12 picks, EUR/USA/JPN ninja sha1 OK).
+ * The LAST pure-easy select wave: the ≤0x38 vein is now exhausted (27 uncarved
+ * ≤0x38 remain, ~half catalogued finicky-defers). Per-pick table + the full
+ * exhaustion census in docs/research/brief-356-ov002-deep-drain-wave5.md.
+ *
+ * NEW levers (two of them PARTIALLY UN-WALL formerly-deferred classes):
+ *  - DISPATCH-ORDER INVERSION: a 2-way `if (k > N) special(); else default()` where
+ *    the orig BRANCHES the >N case (default inline) → write `if (k <= N) return
+ *    default(); return special();` so mwcc emits `bhi special`. The C condition's
+ *    polarity picks which arm inlines (021f81a4, 0223b430 — both first came out
+ *    `bls`/`ble` inverted).
+ *  - THE `(u8)` BYTE-PACK LEVER: `(u8)lo | ((u8)hi << 8)` compiles to
+ *    `and; and; orr …,lsl#8` (matches orig), whereas `(lo&0xff)|((hi&0xff)<<8)`
+ *    triggers mwcc's `lsl#24; …lsr#16` peephole. The `(u8)` cast is the steer
+ *    (0226b0f0/22c). ⇒ brief 358 should RE-TRY the catalogued byte-pack near-misses
+ *    with this cast before sending them to the permuter.
+ *  - HALFWORD SINK PARAMS ARE `u16`, NOT `short`: a sink that `strh`-stores its args
+ *    must declare them u16, else CALLERS truncate with `asr` (sign-extend) where the
+ *    orig uses `lsr` (0226acf8's callers; the sink itself stays deferred on store-
+ *    scheduling).
+ *  - ternary `arg1 ? 2 : arg0` (else = an incoming arg already in r0) → `cmp r1,#0;
+ *    movne r0,#2` (no moveq) (02271a78).
+ *  - counter loop `for (i<N) if (a[i]) a[i+K]++` matches byte-exact (no strength-
+ *    reduction) (0229d154); but a loop that RETURNS `base+i*8` DOES get an induction
+ *    var (0223b3cc walled) — "loop" is not uniformly a defer, the return-of-addr
+ *    sub-shape is.
+ *
+ * DEFERRED this wave (added to the brief-358 backlog, by class):
+ *  - predicate-vs-branch (021f95f8, 0220c2c0): mwcc PREDICATES the early `return
+ *    CONST` (`movne#1;popne`) where orig branches — survives C-form inversion,
+ *    firmly the unsteerable inline/branch class. → permuter / asm_escape --c.
+ *  - store-scheduling (0226acf8: str,strh,str,strh vs orig's grouped str,str,strh,
+ *    strh). reg-choice (022576d8: ldr into r1 vs r0). instruction-scheduling
+ *    (021d90c0 — CORRECTS the wave-4 note: it is NOT clean, it's a 1-insn `lsr/and`
+ *    swap → permuter). loop-SR (0223b3cc). mirror-no-sink (02273b1c). range-opt
+ *    (022abf88).
+ *
+ * Picks: 021f81a4 0223b430 0221292c 0228de04 022477a0 022b9350 021f85f8 02288214
+ *   02271a78 0229d154 0226b0f0 0226b22c.
+ * ======================================================================= */
+
 #endif /* OV002_CORE_H */
