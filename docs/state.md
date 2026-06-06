@@ -8,43 +8,42 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-05, post-#881 / #882 merge. Brain on Mac.
-**Brief 358 (ov002 routing pass, +6 C +17 `.s`) + brief 359 (main w6, +13)
-shipped — +36 (the `.s` batch counts). The routing pass gave the clearest
-read yet on the hard tier (see ⚠️).** decomper → ov002 byte-pack drain
-(real C); scaffolder → main w7. (Reminder: **69 % *units* but only
-~10.6 % by *code bytes***.)
+**Last updated:** 2026-06-05, post-#884 / #885 merge. Brain on Mac.
+**Brief 360 (ov002 byte-pack, +2) + brief 361 (main w7, +10) shipped —
++12 (small: both fresh-clean-C veins thinned at once). 🔻 PHASE PIVOT:
+the "find fresh easy C" era is winding down → both agents move to
+BACKLOG CONVERSION.** (Reminder: **69 % *units* but only ~10.7 % by
+*code bytes***.)
 
-**Current metrics (post-#881/#882, EUR — reconfigured + 3-region
-`ninja sha1` PASS + `ninja report` on `6515fab`, clean tree):**
-**`complete_units 3351 / 4873 (68.77 %)`** (**+36** vs 3315).
-`matched_functions 3388 / 9801` (+36). **Code-byte tier 10.63 %**
-(`complete_code 253372/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
+**Current metrics (post-#884/#885, EUR — reconfigured + 3-region
+`ninja sha1` PASS + `ninja report` on `35cc6ce`, clean tree):**
+**`complete_units 3363 / 4891 (68.76 %)`** (**+12** vs 3351).
+`matched_functions 3400 / 9801` (+12). **Code-byte tier 10.66 %**
+(`complete_code 254196/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
 
-⚠️ **The routing pass = the clearest hard-tier read yet.** ov002's
-catalogued finicky backlog (27 funcs) split: **6 C-via-lever** (the `(u8)`
-byte-pack class is real C) / **0 C-via-permuter** (the permuter
-**plateaus** on reg-mirror) / **17 `.s`** (reg-mirror / predicate-branch /
-reg-alloc walls — proven unmatchable) / 4 deferred. **Read: the hard
-backlog is ~74 % genuinely `.s`-bound, ~26 % lever-recoverable as C.**
-This is the first concrete measure of how much of the *back half* is
-assembly-bound vs C — and it says a real chunk will ship as `.s`. The
-17 were proven walls (levers + permuter tried first), so `.s` is correct,
-not premature; the byte tier ticked +0.09 because they're whole functions.
+🔻 **Both fresh veins thinned this round.** **ov002 byte-pack** = 2 +
+recalibration: the `(u8)` vein was ~9 (not 30-50), now **tapped**; the
+remainder is large-RE / permuter / `.s`. **main** w7 = 10 + pivot flag:
+direct-mwcc yield declined **16→13→10** (waves 5-6-7), per-pick cost
+rising. Both agents recommend pivoting — and the timing is finally right
+for the long-flagged backlog work.
 
-🔀 **But ov002 still has a fresh real-C vein.** The `(u8)` lever unlocked
-the **`func_021d479c` byte-pack arg-pack family (~30-50 funcs)** → drain
-it as a normal wave (brief 360). **main** w6 = 13 — yield dipped to ~36 %
-as the tier deepened to `0x30`/`0x34`; **~245 `≤0x40` remain**, per-pick
-cost rising. **Permuter now vendored** (`tools/_vendor/decomp-permuter`).
+🔁 **THE PIVOT (both agents → backlog conversion):**
+**decomper → brief 362** = the **legacy/sp3 + new-lever re-sweep PILOT of
+the ov004/006/011 wall backlog** (~435 catalogued reg-alloc misses, never
+tried with tri-compile / `(u8)` / dispatch-inversion). Sample ~15-20,
+report recovery rate → decide whether to scale.
+**scaffolder → brief 363** = the **permuter PILOT** (`tools/_vendor/
+decomp-permuter`) on main's routed scheduling/commutative near-misses
+(the class the permuter *can* anneal). Report the hit rate.
 
-🧭 **Where we are.** decomper **→ ov002 byte-pack drain** (021d479c family
-+ per-player slot-dispatchers; real C); scaffolder **→ main w7**
-(tri-compile; permuter backlog becomes higher-leverage when yield <~10).
-Collision-free. **Deferred:** varargs `stdarg.h` shim; `asm_escape --c`
-tri-compile; 2 permuter/asm_escape harness gaps. **Flagged:** legacy/sp3
-re-sweep of the ov004/006/011 backlog. Next: **brief 360** (ov002
-byte-pack) + **brief 361** (main w7).
+📈 **Outlook.** Byte tier 10.66 %. The remaining work is now: (a) the two
+backlog-conversion pilots (this round answers "how much of the catalogued
+backlog is still C?"); (b) main's ~235 `≤0x40` fallback; (c) surgical
+`.s` for proven walls (~74 % of hard backlogs, per brief 358). Collision-
+free (ov004/006/011 vs main). **Deferred:** varargs `stdarg.h` shim;
+`asm_escape --c` tri-compile. Next: **brief 362** (decomper re-sweep) +
+**brief 363** (scaffolder permuter).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
