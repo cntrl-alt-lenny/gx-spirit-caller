@@ -103,3 +103,11 @@ src/overlay014/func_ov014_021b25b0.c:
 src/overlay014/func_ov014_021b3440.c:
     complete
     .text start:0x021b3440 end:0x021b34f0
+
+src/overlay014/func_ov014_021b3fc4.s:
+    complete
+    .text start:0x021b3fc4 end:0x021b4040
+
+src/overlay014/func_ov014_021b4248.s:
+    complete
+    .text start:0x021b4248 end:0x021b4294

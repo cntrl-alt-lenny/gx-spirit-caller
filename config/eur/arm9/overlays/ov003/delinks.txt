@@ -93,3 +93,11 @@ src/overlay003/func_ov003_021ca10c.c:
 src/overlay003/func_ov003_021cbdf4.s:
     complete
     .text start:0x021cbdf4 end:0x021cbe8c
+
+src/overlay003/func_ov003_021ceb84.s:
+    complete
+    .text start:0x021ceb84 end:0x021cec24
+
+src/overlay003/func_ov003_021cedf8.s:
+    complete
+    .text start:0x021cedf8 end:0x021ceeb4
