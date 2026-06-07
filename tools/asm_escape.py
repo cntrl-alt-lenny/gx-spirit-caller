@@ -47,7 +47,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from get_platform import exe_launch_prefix
+from get_platform import exe_launch_prefix, get_platform
 
 ROOT = Path(__file__).resolve().parent.parent
 ARCH = "armv5te"
@@ -64,6 +64,26 @@ _CFLAGS = ("-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
 # (no `wine` arg to do the lookup); wine accepts the absolute path too.
 _MWCC = str(ROOT / "tools/mwccarm/2.0/sp1p5/mwccarm.exe")
 _MWASM = str(ROOT / "tools/mwccarm/2.0/sp1p5/mwasmarm.exe")
+
+
+def _binutil(name: str) -> str:
+    """Resolve an arm-none-eabi binutil to the downloaded copy under
+    `tools/arm-none-eabi/bin` (brief 369: `download_tool.py arm-binutils`).
+
+    Returns the ABSOLUTE path so the `.s` lane is turnkey (brief 371) — a bare
+    name only resolves if that dir is on `PATH`, and otherwise dies with a
+    FileNotFoundError under native `CreateProcess` (same class of bug the
+    absolute `_MWCC`/`_MWASM` paths fix). Falls back to the bare name when the
+    download isn't present, so a system-installed toolchain (Linux/macOS on
+    `PATH`) keeps working.
+    """
+    p = get_platform()
+    exe = p.exe if p is not None else ""
+    cand = ROOT / "tools" / "arm-none-eabi" / "bin" / f"{name}{exe}"
+    return str(cand) if cand.exists() else name
+
+
+_OBJDUMP = _binutil("arm-none-eabi-objdump")
 
 
 # ----------------------------------------------------------------------- pure
@@ -128,6 +148,15 @@ def to_mwasm(mn: str) -> str:
             return mn          # not a condition we recognise — leave as-is
         mov = "movs" if sflag else "mov"
         return f"{mov}{cc} {m.group(4)}, {m.group(5)}, {sh} {m.group(6)}"
+    # conditional load/store with a size suffix: the GNU/xPack objdump prints
+    # <op><size><cond> (e.g. `strhls`, `ldrbne`), but mwasmarm — and the
+    # Mac-generated ships (`streqh`, `strltb`, `ldrneh`) — want <op><cond><size>
+    # (`strlsh`). Reorder. Forms with only one of {size, cond} (`strh`, `streq`)
+    # don't match and pass through unchanged (already valid).
+    m = re.match(r"(ldr|str)(sh|sb|h|b|d)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|"
+                 r"gt|le|al|hs|lo)(\b.*)?$", mn)
+    if m:
+        return f"{m.group(1)}{m.group(3)}{m.group(2)}{m.group(4) or ''}"
     return mn
 
 
@@ -285,7 +314,7 @@ def _run(cmd, **kw):
 
 def disasm(obj: str) -> str:
     p = obj if os.path.isabs(obj) else str(ROOT / obj)
-    return _run(["arm-none-eabi-objdump", "-d", "-r", f"--architecture={ARCH}", p]).stdout
+    return _run([_OBJDUMP, "-d", "-r", f"--architecture={ARCH}", p]).stdout
 
 
 def gap_object(version: str, func: str) -> str | None:
@@ -294,7 +323,7 @@ def gap_object(version: str, func: str) -> str | None:
     delinks = ROOT / f"build/{version}/delinks"
     defre = re.compile(rf"F \.text\s+[0-9a-f]+ {re.escape(func)}\b")
     for o in sorted(glob.glob(str(delinks / "_dsd_gap@*.o"))):
-        if defre.search(_run(["arm-none-eabi-objdump", "-t", o]).stdout):
+        if defre.search(_run([_OBJDUMP, "-t", o]).stdout):
             return o
     return None
 

@@ -117,6 +117,17 @@ class TestSyntaxConversion(unittest.TestCase):
     def test_passthrough_plain_ops(self):
         self.assertEqual(to_mwasm("add r3, r3, r4"), "add r3, r3, r4")
 
+    def test_conditional_ldst_size_reorder(self):  # brief 371: xPack objdump order
+        # GNU/xPack objdump prints <op><size><cond>; mwasmarm wants
+        # <op><cond><size>. Reorder the size suffix after the condition.
+        self.assertEqual(to_mwasm("strhls r0, [r1]"), "strlsh r0, [r1]")
+        self.assertEqual(to_mwasm("ldrbne r2, [r3, #0x4]"), "ldrneb r2, [r3, #0x4]")
+        self.assertEqual(to_mwasm("ldrsheq r0, [r1]"), "ldreqsh r0, [r1]")
+        # forms with only a size OR only a condition are already valid: untouched
+        self.assertEqual(to_mwasm("strh r0, [r1]"), "strh r0, [r1]")
+        self.assertEqual(to_mwasm("streq r0, [r1]"), "streq r0, [r1]")
+        self.assertEqual(to_mwasm("ldr r0, [r1]"), "ldr r0, [r1]")
+
 
 class TestCommutativeSwap(unittest.TestCase):
     def test_positive(self):

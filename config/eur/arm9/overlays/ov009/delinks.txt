@@ -160,3 +160,7 @@ src/overlay009/func_ov009_021ab848.c:
     complete
     .text start:0x021ab848 end:0x021ab8c8
 
+
+src/overlay009/func_ov009_021ac458.s:
+    complete
+    .text start:0x021ac458 end:0x021ac4d0
