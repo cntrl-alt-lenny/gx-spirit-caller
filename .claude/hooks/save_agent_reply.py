@@ -67,11 +67,18 @@ from datetime import datetime
 from pathlib import Path
 
 
+# This script lives at <worktree>/.claude/hooks/save_agent_reply.py, so its
+# own path identifies the worktree — independent of the session's cwd, which
+# Claude Code may set to a non-git parent dir (observed on Windows), where a
+# cwd-relative `git` call fails and the inbox is silently never written.
+_REPO = Path(__file__).resolve().parents[2]
+
+
 def _git(args: list[str]) -> str | None:
-    """Run a git command, return stdout stripped, or None on failure."""
+    """Run git in this script's own worktree; return stdout stripped or None."""
     try:
         return subprocess.check_output(
-            ["git", *args],
+            ["git", "-C", str(_REPO), *args],
             stderr=subprocess.DEVNULL,
             text=True,
         ).strip()
@@ -179,9 +186,9 @@ def main() -> int:
         return 0
     common = Path(common_dir)
     if not common.is_absolute():
-        # `--git-common-dir` returns a relative path inside the worktree
-        # when the worktree IS the main checkout. Resolve against cwd.
-        common = (Path.cwd() / common).resolve()
+        # `--git-common-dir` returns a path relative to the worktree when
+        # the worktree IS the main checkout. Resolve against the repo root.
+        common = (_REPO / common).resolve()
     inbox = common / "agent-inbox"
     inbox.mkdir(parents=True, exist_ok=True)
     _seed_readme(inbox)
