@@ -100,6 +100,7 @@ TIER-2b probes; the class is settled.
 | block-layout (branch-displacement) | ov014 `021b274c` (0xc0, 95.8%)/`021b2644` (0xa8) | block placement |
 
 ### Lower-confidence MEDIUM (could promote on a crack)
+
 | addr | mod | size | class |
 |---|---|---|---|
 | `021acf80` | ov018 | 0x198 | HSV→RGB: 3 magic-mult divs BURIED in a 6-way sextant switch — CSE/scheduling interaction (clean magic-div is *drainable*, see exclude; the buried form is permuter-MEDIUM) |
