@@ -47,6 +47,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from get_platform import exe_launch_prefix
+
 ROOT = Path(__file__).resolve().parent.parent
 ARCH = "armv5te"
 COMMUTATIVE = {"add", "and", "orr", "eor", "mul"}
@@ -58,8 +60,10 @@ _CFLAGS = ("-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
            "-fp soft -inline noauto -Cpp_exceptions off -RTTI off -interworking "
            "-w off -sym on -gccinc -nolink -msgstyle gcc -i include "
            "-i libs/runtime/include -i libs/nitro/include -lang=c").split()
-_MWCC = "tools/mwccarm/2.0/sp1p5/mwccarm.exe"
-_MWASM = "tools/mwccarm/2.0/sp1p5/mwasmarm.exe"
+# Absolute paths so the bare .exe resolves when launched natively on Windows
+# (no `wine` arg to do the lookup); wine accepts the absolute path too.
+_MWCC = str(ROOT / "tools/mwccarm/2.0/sp1p5/mwccarm.exe")
+_MWASM = str(ROOT / "tools/mwccarm/2.0/sp1p5/mwasmarm.exe")
 
 
 # ----------------------------------------------------------------------- pure
@@ -298,14 +302,14 @@ def gap_object(version: str, func: str) -> str | None:
 def compile_c(c_file: str, version: str, out: str) -> bool:
     if os.path.exists(out):
         os.remove(out)
-    _run(["wine", _MWCC, *_CFLAGS, "-d", version, "-c", os.path.abspath(c_file), "-o", out])
+    _run([*exe_launch_prefix(), _MWCC, *_CFLAGS, "-d", version, "-c", os.path.abspath(c_file), "-o", out])
     return os.path.exists(out)
 
 
 def assemble(s_file: str, out: str) -> bool:
     if os.path.exists(out):
         os.remove(out)
-    _run(["wine", _MWASM, "-proc", "arm5TE", "-msgstyle", "gcc", "-g", "-o", out, s_file])
+    _run([*exe_launch_prefix(), _MWASM, "-proc", "arm5TE", "-msgstyle", "gcc", "-g", "-o", out, s_file])
     return os.path.exists(out)
 
 

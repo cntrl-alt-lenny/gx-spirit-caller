@@ -32,18 +32,60 @@ def wibo_url(tag: str) -> str:
 def objdiff_url(tag: str) -> str:
     return f'https://github.com/encounter/objdiff/releases/download/{tag}/objdiff-cli-{platform.system}-{platform.machine}{platform.exe}'
 
+def arm_binutils_url(tag: str) -> str:
+    # xPack arm-none-eabi-gcc bundles arm-none-eabi-objdump + arm-none-eabi-as,
+    # the only binutils the .s/permuter lanes need (brief 369). Whole-toolchain
+    # zip; we extract just those two binaries (+ deps) below. tag e.g. v15.2.1-1.1.
+    sysmap = {"windows": "win32", "linux": "linux", "macos": "darwin"}
+    archmap = {"x86_64": "x64", "arm64": "arm64", "aarch64": "arm64"}
+    ver = tag.lstrip("v")
+    triple = f'{sysmap[platform.system]}-{archmap[platform.machine]}'
+    return (f'https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/'
+            f'releases/download/{tag}/xpack-arm-none-eabi-gcc-{ver}-{triple}.zip')
+
 TOOLS = {
     "dsd": dsd_url,
     "mwccarm": mwccarm_url,
     "wibo": wibo_url,
     "objdiff": objdiff_url,
+    "arm-binutils": arm_binutils_url,
 }
 
 
 download_url = TOOLS[args.tool](args.tag)
 print(f'\nDownloading {args.tool} {args.tag}...')
 response = requests.get(download_url)
-if download_url.endswith('.zip'):
+if args.tool == "arm-binutils":
+    # The xPack zip is the whole gcc toolchain (~1 GB unpacked). We only need
+    # arm-none-eabi-objdump + arm-none-eabi-as, so extract just those (+ their
+    # runtime deps) into <path>/bin, flattening the `xpack-<ver>/bin/` prefix.
+    # Windows: the deps are DLLs alongside the .exes. Other hosts link their
+    # deps from the bundle's lib/ via rpath, so pull lib/ too.
+    import re
+    zf = zipfile.ZipFile(io.BytesIO(response.content))
+    exe = re.escape(platform.exe)
+    bin_re = re.compile(
+        rf'/bin/(arm-none-eabi-objdump{exe}|arm-none-eabi-as{exe}'
+        + (r'|[^/]+\.dll' if platform.system == 'windows' else r'') + r')$')
+    lib_re = (None if platform.system == 'windows'
+              else re.compile(r'(/lib/.*|/arm-none-eabi/lib/.*)'))
+    bindir = args.path / "bin"
+    bindir.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for member in zf.namelist():
+        if bin_re.search(member):
+            out = bindir / member.split('/bin/')[-1]
+            out.write_bytes(zf.read(member))
+            out.chmod(out.stat().st_mode | stat.S_IEXEC)
+            count += 1
+        elif lib_re is not None and lib_re.search(member) and not member.endswith('/'):
+            rel = member.split('/', 1)[1]  # drop the xpack-<ver>/ prefix
+            out = args.path / rel
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_bytes(zf.read(member))
+            count += 1
+    print(f'Extracted {count} arm-binutils file(s) to {args.path}')
+elif download_url.endswith('.zip'):
     zip_file = zipfile.ZipFile(io.BytesIO(response.content))
     zip_file.extractall(args.path)
 else:
