@@ -10530,3 +10530,35 @@ src/main/func_02018dcc.c:
 src/main/func_0201b690.c:
     complete
     .text start:0x0201b690 end:0x0201b6c4
+src/main/func_02031794.s:
+    complete
+    .text start:0x02031794 end:0x020317c0
+
+src/main/func_0202ef08.s:
+    complete
+    .text start:0x0202ef08 end:0x0202ef38
+
+src/main/func_0202f59c.s:
+    complete
+    .text start:0x0202f59c end:0x0202f5cc
+
+src/main/func_02031764.s:
+    complete
+    .text start:0x02031764 end:0x02031794
+
+src/main/func_0205d688.s:
+    complete
+    .text start:0x0205d688 end:0x0205d6bc
+
+src/main/func_020536d0.s:
+    complete
+    .text start:0x020536d0 end:0x02053704
+
+src/main/func_0207da48.s:
+    complete
+    .text start:0x0207da48 end:0x0207da7c
+
+src/main/func_0207da1c.s:
+    complete
+    .text start:0x0207da1c end:0x0207da48
+
