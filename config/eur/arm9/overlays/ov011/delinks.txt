@@ -906,3 +906,7 @@ src/overlay011/func_ov011_021d1f9c.c:
 src/overlay011/func_ov011_021d2d44.c:
     complete
     .text start:0x021d2d44 end:0x021d2d6c
+
+src/overlay011/func_ov011_021d20e8.s:
+    complete
+    .text start:0x021d20e8 end:0x021d2118

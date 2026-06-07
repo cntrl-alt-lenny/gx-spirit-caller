@@ -229,3 +229,7 @@ src/overlay007/func_ov007_021b2b74.c:
 src/overlay007/func_ov007_021b2c58.c:
     complete
     .text start:0x021b2c58 end:0x021b2ce8
+
+src/overlay007/func_ov007_021b2e84.s:
+    complete
+    .text start:0x021b2e84 end:0x021b2ee4
