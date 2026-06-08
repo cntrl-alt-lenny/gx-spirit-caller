@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**83 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**84 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (15)
+- [Uncategorised](#uncategorised) (16)
 
 ## Analysis / worklist
 
@@ -526,6 +526,12 @@ fixed fictional virtual base address, strip the relocation tables, write `*.reso
 **disasm-based codegen-wall prediction for the**
 
 code-decomp resumption wave (brief 189).
+
+### `tools/sort_delinks.py`
+
+**canonicalize a dsd ``delinks.txt`` by sorting its TU blocks**
+
+into ascending address order (brief 389).
 
 ### `tools/strip_overlay_func_collisions.py`
 
