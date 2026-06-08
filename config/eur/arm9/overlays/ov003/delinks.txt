@@ -101,3 +101,11 @@ src/overlay003/func_ov003_021ceb84.s:
 src/overlay003/func_ov003_021cedf8.s:
     complete
     .text start:0x021cedf8 end:0x021ceeb4
+
+src/overlay003/func_ov003_021cc010.s:
+    complete
+    .text start:0x021cc010 end:0x021cc0d8
+
+src/overlay003/func_ov003_021cbf08.s:
+    complete
+    .text start:0x021cbf08 end:0x021cc010

@@ -68,3 +68,11 @@ src/overlay012/func_ov012_021ca2a0.c:
     complete
     .text start:0x021ca2a0 end:0x021ca340
 
+
+src/overlay012/func_ov012_021caea8.s:
+    complete
+    .text start:0x021caea8 end:0x021caf44
+
+src/overlay012/func_ov012_021caf80.s:
+    complete
+    .text start:0x021caf80 end:0x021cb088

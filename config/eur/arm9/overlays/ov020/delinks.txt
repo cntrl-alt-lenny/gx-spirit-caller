@@ -92,3 +92,23 @@ src/overlay020/func_ov020_021aa67c.c:
 src/overlay020/func_ov020_021ab798.c:
     complete
     .text start:0x021ab798 end:0x021ab7dc
+
+src/overlay020/func_ov020_021aae64.s:
+    complete
+    .text start:0x021aae64 end:0x021aaeac
+
+src/overlay020/func_ov020_021ab364.s:
+    complete
+    .text start:0x021ab364 end:0x021ab3c8
+
+src/overlay020/func_ov020_021ab43c.s:
+    complete
+    .text start:0x021ab43c end:0x021ab4a0
+
+src/overlay020/func_ov020_021ada1c.s:
+    complete
+    .text start:0x021ada1c end:0x021ada6c
+
+src/overlay020/func_ov020_021ab0d8.s:
+    complete
+    .text start:0x021ab0d8 end:0x021ab1dc
