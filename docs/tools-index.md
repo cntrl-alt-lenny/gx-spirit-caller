@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**82 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**83 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (14)
+- [Uncategorised](#uncategorised) (15)
 
 ## Analysis / worklist
 
@@ -502,6 +502,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/m2c_bootstrap.py`
+
+**vendor m2c (the asm->C decompiler) at a pinned commit,**
+
+mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 
 ### `tools/objdiff_filter_panic_units.py`
 
