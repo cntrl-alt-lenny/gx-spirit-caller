@@ -227,5 +227,31 @@ class TestWholeFunction(unittest.TestCase):
         self.assertNotIn(".L_", s)
 
 
+class TestDisasmZeroFlag(unittest.TestCase):
+    """brief 375: disasm() must pass objdump `-z` (--disassemble-zeroes) so a
+    freshly-assembled all-zero literal pool isn't collapsed to a single `...`
+    line — which would drop those words and cascade their relocs onto the
+    preceding instruction (a spurious reloc diff vs the delinked orig)."""
+
+    def test_disasm_passes_disassemble_zeroes(self):
+        import asm_escape
+        captured = {}
+
+        class _R:
+            stdout = ""
+
+        def fake_run(cmd, **kw):
+            captured["cmd"] = cmd
+            return _R()
+
+        orig = asm_escape._run
+        asm_escape._run = fake_run
+        try:
+            asm_escape.disasm("foo.o")
+        finally:
+            asm_escape._run = orig
+        self.assertIn("-z", captured["cmd"])
+
+
 if __name__ == "__main__":
     unittest.main()

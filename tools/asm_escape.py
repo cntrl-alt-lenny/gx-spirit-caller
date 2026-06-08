@@ -314,7 +314,15 @@ def _run(cmd, **kw):
 
 def disasm(obj: str) -> str:
     p = obj if os.path.isabs(obj) else str(ROOT / obj)
-    return _run([_OBJDUMP, "-d", "-r", f"--architecture={ARCH}", p]).stdout
+    # `-z` (--disassemble-zeroes): without it, objdump COLLAPSES a run of zero
+    # words into a single `\t...` line. A freshly-assembled `.s` has its literal
+    # pool as 0x00000000 placeholders (the real value comes from a link-time
+    # R_ARM_ABS32 reloc), so objdump elides those words — then parse_objdump
+    # never appends them and their reloc lines cascade onto the PRECEDING
+    # instruction (e.g. the final `pop {…pc}`), producing a spurious reloc diff
+    # vs the delinked orig (whose pool words are non-zero and print in full).
+    # `-z` makes both sides render every word, so they parse symmetrically.
+    return _run([_OBJDUMP, "-d", "-r", "-z", f"--architecture={ARCH}", p]).stdout
 
 
 def gap_object(version: str, func: str) -> str | None:
