@@ -4,7 +4,7 @@
 
 **Brief:** 375 (decomper). Wave 3 of draining the overlay reg-alloc (TIER-3
 plateau) backlog through the Windows `.s` lane (waves 1+2 = briefs 371/373, PRs
-#895/#896). Continue from wave 2; `asm_escape --whole-function` each; leave `main`
+\#895/#896). Continue from wave 2; `asm_escape --whole-function` each; leave `main`
 + `ov002` to the scaffolder. Gate: 3-region `ninja sha1`.
 
 ## Result

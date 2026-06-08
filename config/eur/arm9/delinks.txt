@@ -10594,3 +10594,7 @@ src/main/func_020908c0.s:
     complete
     .text start:0x020908c0 end:0x020908f0
 
+src/main/func_02067328.s:
+    complete
+    .text start:0x02067328 end:0x02067354
+
