@@ -128,6 +128,14 @@ class TestSyntaxConversion(unittest.TestCase):
         self.assertEqual(to_mwasm("streq r0, [r1]"), "streq r0, [r1]")
         self.assertEqual(to_mwasm("ldr r0, [r1]"), "ldr r0, [r1]")
 
+    def test_bare_stm_ldm_gets_ia(self):  # brief 377: objdump omits default IA
+        self.assertEqual(to_mwasm("stm sp, {r4, r5}"), "stmia sp, {r4, r5}")
+        self.assertEqual(to_mwasm("ldm r0, {r1, r2}"), "ldmia r0, {r1, r2}")
+        self.assertEqual(to_mwasm("stmeq sp, {r0, r3}"), "stmeqia sp, {r0, r3}")
+        # explicit modes already carry a suffix -> passed through unchanged
+        self.assertEqual(to_mwasm("stmdb sp!, {r4, lr}"), "stmdb sp!, {r4, lr}")
+        self.assertEqual(to_mwasm("ldmia sp!, {r4, pc}"), "ldmia sp!, {r4, pc}")
+
 
 class TestCommutativeSwap(unittest.TestCase):
     def test_positive(self):

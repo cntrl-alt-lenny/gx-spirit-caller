@@ -112,3 +112,7 @@ src/overlay020/func_ov020_021ada1c.s:
 src/overlay020/func_ov020_021ab0d8.s:
     complete
     .text start:0x021ab0d8 end:0x021ab1dc
+
+src/overlay020/func_ov020_021ab9d0.s:
+    complete
+    .text start:0x021ab9d0 end:0x021aba54

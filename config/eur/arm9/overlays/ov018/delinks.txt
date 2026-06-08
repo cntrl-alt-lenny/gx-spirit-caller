@@ -91,3 +91,7 @@ src/overlay018/func_ov018_021ad1f4.c:
 src/overlay018/func_ov018_021ab13c.c:
     complete
     .text start:0x021ab13c end:0x021ab1c4
+
+src/overlay018/func_ov018_021aaa3c.s:
+    complete
+    .text start:0x021aaa3c end:0x021aaa88
