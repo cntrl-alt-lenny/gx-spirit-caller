@@ -382,3 +382,11 @@ src/overlay015/func_ov015_021b3028.c:
     complete
     .text start:0x021b3028 end:0x021b30b0
 
+
+src/overlay015/func_ov015_021b30f0.s:
+    complete
+    .text start:0x021b30f0 end:0x021b3168
+
+src/overlay015/func_ov015_021b43a8.s:
+    complete
+    .text start:0x021b43a8 end:0x021b4444

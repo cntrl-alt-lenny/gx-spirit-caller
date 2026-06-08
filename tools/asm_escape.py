@@ -157,6 +157,15 @@ def to_mwasm(mn: str) -> str:
                  r"gt|le|al|hs|lo)(\b.*)?$", mn)
     if m:
         return f"{m.group(1)}{m.group(3)}{m.group(2)}{m.group(4) or ''}"
+    # bare stm/ldm: objdump omits the default `ia` addressing mode (e.g.
+    # `stm sp, {r4, r5}`), but mwasmarm requires it explicit -> `stmia`. The
+    # conditional bare form `stmeq sp, {…}` -> `stmeqia sp, {…}`. push/pop are
+    # handled above; explicit modes (`stmdb`/`ldmib`/…) already carry a suffix
+    # with no space before it, so they don't match and pass through.
+    m = re.match(r"(stm|ldm)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)?"
+                 r"(\s+.*)$", mn)
+    if m:
+        return f"{m.group(1)}{m.group(2) or ''}ia{m.group(3)}"
     return mn
 
 

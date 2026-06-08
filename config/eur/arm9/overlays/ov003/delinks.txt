@@ -109,3 +109,7 @@ src/overlay003/func_ov003_021cc010.s:
 src/overlay003/func_ov003_021cbf08.s:
     complete
     .text start:0x021cbf08 end:0x021cc010
+
+src/overlay003/func_ov003_021cd358.s:
+    complete
+    .text start:0x021cd358 end:0x021cd420
