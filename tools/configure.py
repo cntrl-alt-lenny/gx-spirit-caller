@@ -91,6 +91,20 @@ LEGACY_C_SUFFIX = ".legacy.c"  # filename routing convention
 # (`func_020467f4`) byte-matches under sp3.
 LEGACY_SP3_MWCC_VERSION = "1.2/sp3"
 LEGACY_SP3_C_SUFFIX = ".legacy_sp3.c"  # filename routing convention
+# Thumb routing tier — the overlay's `021dbxxx`-`021ddxxx` Thumb
+# utility cohort. The original ROM compiled this Thumb code with the
+# legacy mwcc 1.2 (NOT the default 2.0/sp1p5): a call-having Thumb TU
+# needs the ARMv4T-safe interworking frame `push {lr}; sub sp, #4` …
+# `add sp, #4; pop {r3}; bx r3`, which 1.2/sp2p3 emits and 2.0/sp1p5
+# (`pop {r3, pc}`) does not. It is a *compiler-version* difference, not
+# a `-proc` one (1.2/sp2p3 emits `bx r3` under the standard `-proc
+# arm946e`). So this tier reuses LEGACY_MWCC_VERSION (1.2/sp2p3) — the
+# same binary as `.legacy.c` — under a distinct suffix so the Thumb
+# cohort stays self-documenting and separable from the ARM Style-A
+# tier. Source files carry `#pragma thumb on`. 4-aligned starts only
+# (mwcc emits Thumb `.text` with sh_addralign=4; 2-aligned funcs still
+# need the `.s` escape). brief 393; docs/research/brief-393-*.md.
+THUMB_C_SUFFIX = ".thumb.c"  # filename routing convention
 DECOMP_ME_COMPILER = "mwcc_30_131"
 
 # Known-good SHA-1 hashes of clean baserom dumps, keyed by version.
@@ -502,6 +516,29 @@ def main():
         )
         n.newline()
 
+        # Thumb-cohort per-TU rule. Files routed via the `*.thumb.c`
+        # suffix (`is_thumb_c()`) compile through the legacy mwcc
+        # 1.2/sp2p3 binary (LEGACY_CC) — the only version that emits
+        # the ARMv4T interworking frame the original Thumb cohort uses
+        # (`push {lr}; sub sp, #4` … `pop {r3}; bx r3`); the default
+        # 2.0 compiler emits `pop {r3, pc}` and never byte-matches a
+        # call-having Thumb TU. Same CC_FLAGS / CC_INCLUDES (incl.
+        # `-proc arm946e` — the frame is version-, not proc-, driven)
+        # and the same `transform_dep` tail as the other tiers; only
+        # the binary path differs. Source files carry `#pragma thumb
+        # on`. See THUMB_C_SUFFIX above + docs/research/brief-393-*.md.
+        mwcc_thumb_cmd = f'{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_thumb_implicit = [LEGACY_CC]
+        if platform.system != "windows":
+            mwcc_thumb_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_thumb_implicit.append(transform_dep)
+        n.rule(
+            name="mwcc_thumb",
+            command=mwcc_thumb_cmd,
+            depfile="$basefile.d",
+        )
+        n.newline()
+
         # Assembly rule — unlocks the .s escape hatch for the Thumb
         # section-alignment wall (see docs/research/thumb-align-wall.md).
         # Scoped just to .s files under src/ + libs/; .c files stay on
@@ -826,6 +863,7 @@ def main():
             mwcc_implicit,
             mwcc_legacy_implicit,
             mwcc_legacy_sp3_implicit,
+            mwcc_thumb_implicit,
         )
         add_mwasm_builds(n, project, mwasm_implicit)
         add_mwld_and_rom_builds(n, project)
@@ -1055,6 +1093,7 @@ def add_mwcc_builds(
     mwcc_implicit: list,
     mwcc_legacy_implicit: list,
     mwcc_legacy_sp3_implicit: list,
+    mwcc_thumb_implicit: list,
 ):
     """Emit one mwcc build per .c / .cpp file under src/ + libs/.
 
@@ -1063,14 +1102,21 @@ def add_mwcc_builds(
 
       - `*.legacy_sp3.c` → `mwcc_legacy_sp3` rule
         (mwcc 1.2/sp3, sub-sp prologue + Style B epilogue).
+      - `*.thumb.c` → `mwcc_thumb` rule
+        (mwcc 1.2/sp2p3 + `#pragma thumb on`; ARMv4T interworking
+        frame for the call-having Thumb cohort).
       - `*.legacy.c` → `mwcc_legacy` rule
         (mwcc 1.2/sp2p3, sub-sp prologue + Style A epilogue).
       - everything else → default `mwcc` rule
         (mwcc 2.0/sp1p5, r3-spill prologue + Style B epilogue).
 
+    `.thumb.c` is checked before `.legacy.c` only for clarity; the
+    two share the 1.2/sp2p3 binary, so the order between them is not
+    correctness-sensitive (a `.thumb.c` is never also a `.legacy.c`).
+
     See docs/research/sp3-routing-decision.md (brief 044) for the
-    3-tier discriminator and the per-compiler prologue/epilogue
-    sweep that motivated each routing tier.
+    3-tier ARM discriminator and docs/research/brief-393-*.md for the
+    Thumb tier.
     """
     for source_file in get_c_cpp_files(
             [src_path, libs_path], region=project.game_version):
@@ -1083,6 +1129,9 @@ def add_mwcc_builds(
         if is_legacy_sp3_c(source_file):
             rule = "mwcc_legacy_sp3"
             implicit = mwcc_legacy_sp3_implicit
+        elif is_thumb_c(source_file):
+            rule = "mwcc_thumb"
+            implicit = mwcc_thumb_implicit
         elif is_legacy_c(source_file):
             rule = "mwcc_legacy"
             implicit = mwcc_legacy_implicit
@@ -1248,6 +1297,16 @@ def is_legacy_sp3_c(name):
     routing. See LEGACY_SP3_C_SUFFIX above and
     docs/research/sp3-routing-decision.md (brief 044)."""
     return str(name).endswith(LEGACY_SP3_C_SUFFIX)
+
+
+def is_thumb_c(name):
+    """A `.thumb.c` file routes through the legacy mwcc 1.2/sp2p3
+    binary (same as `.legacy.c`) so the overlay Thumb cohort gets the
+    ARMv4T interworking frame the original ROM used. The source must
+    carry `#pragma thumb on`; only 4-aligned-start funcs qualify
+    (2-aligned still need the `.s` escape). See THUMB_C_SUFFIX above
+    and docs/research/brief-393-*.md."""
+    return str(name).endswith(THUMB_C_SUFFIX)
 
 
 def is_asm(name):

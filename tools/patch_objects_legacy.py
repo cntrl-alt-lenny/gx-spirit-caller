@@ -63,23 +63,34 @@ from progress import parse_delinks_file  # noqa: E402
 
 LEGACY_C_SUFFIX = ".legacy.c"
 LEGACY_SP3_C_SUFFIX = ".legacy_sp3.c"
-# Mirror configure.py's LEGACY_C_SUFFIX / LEGACY_SP3_C_SUFFIX
-# constants. Kept duplicated rather than imported because
-# configure.py runs argparse at module load — importing it from a
-# small post-process script would force a synthetic argv dance just
-# to use a couple of strings. The
+THUMB_C_SUFFIX = ".thumb.c"
+# Mirror configure.py's LEGACY_C_SUFFIX / LEGACY_SP3_C_SUFFIX /
+# THUMB_C_SUFFIX constants. Kept duplicated rather than imported
+# because configure.py runs argparse at module load — importing it
+# from a small post-process script would force a synthetic argv dance
+# just to use a couple of strings. The
 # tests/test_patch_objects_legacy.py file has regression checks
 # pinning the duplications in sync.
+#
+# `.thumb.c` (brief 393) rides the same dsd-lcf objects.txt bug as the
+# legacy tiers: its `mwcc_thumb` rule emits `func_X.thumb.o` but dsd
+# writes `func_X.o` into objects.txt, so mwldarm can't find it. The
+# generic rewrite below (qualifier = suffix minus `.c`) fixes
+# `.thumb.c` the same way it fixes `.legacy[_sp3].c`.
 
 # Order matters when checking which suffix a path ends with — the
 # longer suffix (`.legacy_sp3.c`) must be checked BEFORE the shorter
 # (`.legacy.c`) only if one were a tail of the other. They aren't
 # (sp3 has `_sp3` between `legacy` and `.c`), so endswith() on
 # either is unambiguous, but we sort longest-first for defensiveness
-# in case a future tier adds a suffix that does overlap.
+# in case a future tier adds a suffix that does overlap. (Despite the
+# `LEGACY_` name this tuple is the full set of non-default routing
+# suffixes — `.thumb.c` is not "legacy" but shares the objects.txt
+# rewrite mechanism exactly.)
 LEGACY_SUFFIXES: tuple[str, ...] = (
     LEGACY_SP3_C_SUFFIX,
     LEGACY_C_SUFFIX,
+    THUMB_C_SUFFIX,
 )
 
 

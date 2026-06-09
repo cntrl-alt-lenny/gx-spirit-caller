@@ -58,7 +58,15 @@ class TestSuffixConstantInSync(unittest.TestCase):
             configure.LEGACY_SP3_C_SUFFIX,
         )
 
-    def test_legacy_suffixes_tuple_contains_both(self):
+    def test_thumb_matches_configure_constant(self):
+        # Brief 393: Thumb routing tier (mwcc 1.2/sp2p3 + #pragma
+        # thumb on). Pin the patcher's duplicate against configure.py.
+        self.assertEqual(
+            patch_objects_legacy.THUMB_C_SUFFIX,
+            configure.THUMB_C_SUFFIX,
+        )
+
+    def test_legacy_suffixes_tuple_contains_all(self):
         # Pin the membership of LEGACY_SUFFIXES so a future tier
         # addition can't quietly drop one of the existing entries.
         self.assertIn(
@@ -67,6 +75,10 @@ class TestSuffixConstantInSync(unittest.TestCase):
         )
         self.assertIn(
             patch_objects_legacy.LEGACY_SP3_C_SUFFIX,
+            patch_objects_legacy.LEGACY_SUFFIXES,
+        )
+        self.assertIn(
+            patch_objects_legacy.THUMB_C_SUFFIX,
             patch_objects_legacy.LEGACY_SUFFIXES,
         )
 
@@ -100,6 +112,17 @@ class TestBuggyAndFixedSuffixes(unittest.TestCase):
             patch_objects_legacy.buggy_and_fixed_suffixes(
                 Path("src/main/CpuSet.c"),
             )
+
+    def test_thumb_overlay_path(self):
+        # Brief 393 Thumb tier — `func_X.thumb.c` must rewrite to
+        # `func_X.thumb.o` (qualifier `.thumb`), same dsd lcf bug.
+        buggy, fixed = patch_objects_legacy.buggy_and_fixed_suffixes(
+            Path("src/overlay004/func_ov004_021dbea0.thumb.c"),
+        )
+        self.assertEqual(buggy, "src/overlay004/func_ov004_021dbea0.o")
+        self.assertEqual(
+            fixed, "src/overlay004/func_ov004_021dbea0.thumb.o",
+        )
 
     def test_legacy_sp3_main_path(self):
         # Brief 045 third tier — sp3 routing. Same dsd lcf bug

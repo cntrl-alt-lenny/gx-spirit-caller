@@ -110,4 +110,54 @@ extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
  * The 0x100-0x200 ov004 tier is untouched.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 393 (16 picks, 3-region ninja sha1 EUR/USA/JPN OK). The
+ * real-C the Windows .s-pivot skipped (brief 364 surfaced both veins). Per-pick
+ * table in docs/research/brief-393-ov004-realc.md.
+ *
+ * VEIN B — the cursor-validation + status-message FAMILY (8 ARM .c):
+ *  021cc3c0 021daa48 021d2550 021cc2f0 021da978 021cec8c 021ceb6c 021d02f4.
+ *  One template, parameterised. Shape:
+ *    int r=0; int z,y,x;   // DECLARE z,y,x (last-declared = lowest sp offset:
+ *                          //   x@sp0, y@sp4, z@sp8 to match the out-call &args)
+ *    if (func_02006194()!=0 || func_0200617c()!=0) {     // short-circuit ||
+ *        func_0200612c(&z,&x); func_02006110(&z,&y);      // out-param fills
+ *        if (x<32 && y<30 && z>=LO && z<HI) {  // mwcc: ldrlt-predicated &&
+ *            r=1; if (func_0200617c()!=0) { *(int*)(b+OFF)=K; msg(); } }
+ *    } else if (*(u16*)(data_02104bac+84) & 2) { r=1; ...msg... }
+ *    return r;
+ *  msg() = `func_02037208(ID,-1,0,r)` — the `-1` is `mov rX,#ID;sub rY,rX,#ID+1`
+ *  (mwcc does NOT fold; ID 58/66). PASS the return var `r` as arg4 (mov r3,r5),
+ *  NOT a literal 1. Pass var `r` to stores too so mwcc shares the reg. Idioms:
+ *  early-out `if(*(int*)(b+92)!=0) return r;` -> predicated `popne`; the `r-2`
+ *  trick (`*(int*)(b+144)=r-2` => `sub rX,r5,#2` for the constant -1); cache the
+ *  data_02104bac flags word in a local before two `tst`. SWITCH dispatch needs a
+ *  real `switch` (cmp/beq-chain) NOT if-else-if (which inlines bodies).
+ *  func_02006194 takes NO arg here (decl `(void)`; the other-TU `(int)` decl is
+ *  per-TU). DEFER: 021d9d58 (body matches, prologue SCHEDULE near-miss — mwcc
+ *  hoists the b500[92] branch-load before the e500 store; permuter target).
+ *
+ * VEIN A — the THUMB cohort, via the NEW *.thumb.c HARNESS (8 Thumb .c):
+ *  021dbea0 021dbfa8 021dc0e8 021dc128 021dc19c 021dbf6c 021dbecc 021dc154.
+ *  THE UNLOCK: call-having Thumb needs the ARMv4T interworking frame
+ *  `push{lr};sub sp,#4` … `add sp,#4;pop{r3};bx r3`, which is emitted by mwcc
+ *  *1.2/sp2p3* (the existing legacy compiler) — NOT 2.0/sp1p5 (`pop{r3,pc}`). It
+ *  is a COMPILER-VERSION difference, not a -proc one (1.2/sp2p3 emits `bx r3`
+ *  under the standard -proc arm946e). configure.py routes `*.thumb.c` ->
+ *  mwcc_thumb (= 1.2/sp2p3); source carries `#pragma thumb on`. patch_objects_
+ *  legacy.py extended to rewrite func_X.thumb.o (same dsd-lcf objects.txt bug).
+ *  4-ALIGNED STARTS ONLY (mwcc emits Thumb sh_addralign=4); 2-aligned still .s.
+ *  The cohort is a crypto/util library: XOR (021dbfa8), table CRC-32
+ *  (021dc0e8 byte loop / 021dc128 finalize `^0xFFFFFFFF`), RC4 PRGA (021dc154),
+ *  keystream-XOR (021dc19c), interleave (021dbf6c), init-seq (021dbecc).
+ *  Recipes: divmod helpers func_020b3870 (q=`extern int`->r0) / func_020b3a7c
+ *  (rem=`extern long long`->`(int)(x>>32)`=r1); keystream XOR needs a TEMP
+ *  (`uchar k=f(); dst[i]=k^src[i]`) to put k in r1 not r0 (reg-alloc); CRC
+ *  finalize `(uchar)(crc ^ 0xFFFFFFFF)`. dcheck: drop trailing literal-pool
+ *  `.word` (m2c_feed folds pools into `ldr =sym`; objdump shows the word).
+ *  ~37 more 4-aligned call-having Thumb funcs remain = a DRAIN VEIN for future
+ *  waves. WALL: frameless reg-mirror (021dc0ac CRC-table-gen — instructions
+ *  identical, register NUMBERS shifted; -> permuter/.s, like 021dcbcc).
+ * ======================================================================= */
+
 #endif /* OV004_CORE_H */
