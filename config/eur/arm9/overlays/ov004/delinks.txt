@@ -776,3 +776,24 @@ src/overlay004/func_ov004_021dc238.thumb.c:
     complete
     .text start:0x021dc238 end:0x021dc2cc
 
+
+src/overlay004/func_ov004_021dc7bc.thumb.c:
+    complete
+    .text start:0x021dc7bc end:0x021dc81e
+
+src/overlay004/func_ov004_021dd150.thumb.c:
+    complete
+    .text start:0x021dd150 end:0x021dd20c
+
+
+src/overlay004/func_ov004_021dd040.thumb.c:
+    complete
+    .text start:0x021dd040 end:0x021dd150
+
+src/overlay004/func_ov004_021dcf38.thumb.c:
+    complete
+    .text start:0x021dcf38 end:0x021dd040
+
+src/overlay004/func_ov004_021dcd64.thumb.c:
+    complete
+    .text start:0x021dcd64 end:0x021dce74
