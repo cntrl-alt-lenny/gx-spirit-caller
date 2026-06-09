@@ -160,4 +160,36 @@ extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
  *  identical, register NUMBERS shifted; -> permuter/.s, like 021dcbcc).
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 395 (14 Thumb .c, 3-region ninja sha1 OK). Thumb-cohort
+ * DRAIN wave 1 (no harness change — plain *.thumb.c, #pragma thumb on). Per-pick
+ * table in docs/research/brief-395-ov004-thumb-drain-wave1.md.
+ *  021dbddc 021dbe40 021dbf48 021dbe78 021dd20c 021dd5f0 021dd244 021dbd34
+ *  021dbd84 021dc954 021dbfd4 021dd27c 021dccc8 021dd59c.
+ * NEW recipes:
+ *  - STACK-ARG PASS-THROUGH FORWARDER: 6-param func (p1-4 in r0-3, p5/p6 at
+ *    caller sp[16]/sp[20]), byte-write then forward p1-4 UNCHANGED to a 5-arg
+ *    sink (p5 on stack). `void f(int a,b,c,d,uchar*e,int g){*e=g;sink(a,b,c,d,e);}`
+ *    keeps a-d in r0-3 (no movs), spills e to sp[0]. (Was the un-decodable
+ *    "stack-arg" class.)
+ *  - COMBINED long-long DIVMOD decl: a TU needing BOTH q and rem of the same
+ *    helper declares it ONCE `extern long long func_020b3870(int,int)`; q=`(int)x`
+ *    (r0), rem=`(int)(x>>32)` (r1). (021dbfd4.)
+ *  - dispatch-order INVERSION (021dd20c/021dbf48): orig branches the equal/<=0
+ *    case FORWARD to a shared `return 0` -> write `if(NOT-that){body}return 0;`.
+ *  - POST-INCREMENT placement (021dbfd4): `buf[i]^=key[ki++]` emits ki++ right
+ *    after the key load (not after the store).
+ *  - `~0`/`~1` ERROR CODES (021dccc8): `r=~0` reuses the result reg (=0) for mvns.
+ *  - memcmp loop (021dbe78): fold the byte-compare INTO the while condition
+ *    `while(count-->0 && (d=*p0-*p1)==0){p0++;p1++;}` for the rotated layout.
+ *  - bswap (021dbd34/84): objdump halfword display is per-hw LE — read the 4 raw
+ *    BYTES. OR-tree matches right-associated `a|(b|(c|d))`.
+ *  - struct-init const 0xC0A80B01 = 192.168.11.1 (021dd59c network config).
+ * DEFERRED -> permuter/.s/wave-2: 021dc1cc (RC4 KSA — spill-choice reg-alloc,
+ * orig spills N keeps S[i]; 53v50), 021dbdf4 (fixed-pt 64-bit, pool straddles fn
+ * boundary), 021dcd1c (scan+dispatch, r0-vs-const param ambiguous cold).
+ * REMAINING: ~21 call-having Thumb (>=0x5c: multi-stack-arg builders 021dc350/
+ * c418/c500, larger crypto 021dc020/c238/ca68/dd374, the 0xaec 021dd648).
+ * ======================================================================= */
+
 #endif /* OV004_CORE_H */
