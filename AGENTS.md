@@ -506,43 +506,62 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 395** — `decomper`. **ov004 — DRAIN the Thumb cohort (wave 1 of
-  the new lane brief 393 opened).** Brief 393 stood up the `*.thumb.c`
-  harness and proved the call-having Thumb frame is a **compiler-VERSION**
-  thing (mwcc **1.2/sp2p3** = the `.legacy.c` binary) **not** a `-proc`
-  thing — so **no harness change is needed now**, just write `.thumb.c`
-  files (each carries `#pragma thumb on`). The harness opened **~37 more
-  4-aligned call-having Thumb funcs** in `021dbxxx`–`021ddxxx` — a coherent
-  crypto/util library, a real vein not a wall. **Sweep it sorted
-  small-first.** Recipes (banked b393): the **divmod helpers**
-  `func_020b3870` (signed) / `func_020b3a7c` — quotient via `extern int`→r0,
-  remainder via `extern long long` + `(int)(x>>32)`→r1; **NEVER C `/`/`%`**
-  (emits `_s32_div_f`, passes dcheck but **FAILS the link**). Keystream-XOR
-  needs a **temp** (`uchar k=f(); dst[i]=k^src[i]`) to land `k` in r1.
-  **Skip reg-mirror** (the `021dc0ac`/`021dcbcc` class — register-NUMBER
-  shifts every compiler reproduces) → `.s`/permuter. **4-aligned starts
-  only** (mwcc emits Thumb `.text` `sh_addralign=4`; 2-aligned still need
-  `.s`). Vein B (the ARM cursor/status-message family) is drained at the
-  clean small tier — lower priority than this Thumb vein. Gate = **3-region
-  `ninja sha1`**; carve-size audit. Target ~12-18. **Collision-free**
-  (scaffolder on ov002). Branch: `decomper/ov004-thumb`.
-- **Brief 396** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
-  wave 13 (continue the byte-completion grind).** The `.s` endgame is the
+- **Brief 397** — `decomper`. **ov004 — Thumb-cohort drain WAVE 2 (the
+  harder `≥0x5c` tier).** Wave 1 (brief 395) drained the small/clean Thumb
+  tier (14 `.c`); **~21 call-having Thumb funcs remain**, trending harder:
+  the **multi-stack-arg builders** `021dc350`/`021dc418`/`021dc500` (attack
+  with the **stack-arg pass-through-forwarder** recipe banked in 395 — args
+  forwarded unchanged to a sink, p5/p6 spilled to `sp[0]`/`sp[4]`), the
+  **medium crypto** `021dc020`/`021dc238`/`021dca68`/`021dd374`, and the
+  `0xaec` giant `021dd648` (RE-tier — last, if at all). **Re-attempt the 3
+  deferred:** `021dbdf4` (fixed-point, pool straddles the gap-object
+  boundary — tractable with care), `021dcd1c` (ambiguous param — pull the
+  caller's prototype first); **route `021dc1cc`** (RC4 KSA, spill-choice
+  reg-alloc 53-vs-50) **to `.s`** — it's the catalogued reg-alloc wall, not
+  C-recoverable. No harness change (the rule shipped in 393); `.thumb.c` +
+  `#pragma thumb on`, **4-aligned starts only**. Gate = **3-region `ninja
+  sha1`**; carve-size audit. Target ~6-10 (harder tier — lower yield than
+  w1 is expected). **Collision-free** (scaffolder on ov002). Branch:
+  `decomper/ov004-thumb-w2`.
+- **Brief 398** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
+  wave 14 (continue the byte-completion grind).** The `.s` endgame is the
   volume lane (permuter niche — brief 383; clean-C tapped). Continue the
-  **upper-half `≤0x60` cohort** — wave 12 left **~68 shippable** (~8 waves
-  of runway; the classifier scored 24/26 clean). You remain the **SOLE
+  **upper-half `≤0x60` cohort** — wave 13 left **~62 shippable** (~7-8 waves
+  of runway; the classifier scored 23/28 clean). You remain the **SOLE
   owner of `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it
   canonically sorted (`tools/sort_delinks.py`). Per-pick `asm_escape
   --whole-function` byte-identity **+ the `kind:bss` link gate** (drop any
   candidate whose `data_` ref is `kind:data(any)` — it `Undefined`-fails
-  the link even at objdiff-100 %, per briefs 361/364). EUR `ninja sha1`
+  the link even at objdiff-100 %, per briefs 361/364; the known wave-9
+  `kind:data` trio + the 5 wave-13 drops stay parked). EUR `ninja sha1`
   per-pick; brain reproduces 3-region SHA1 on merge. Target ~8.
-  **Collision-free** (decomper on ov004). Branch: `scaffolder/ov002-s-13`.
+  **Collision-free** (decomper on ov004). Branch: `scaffolder/ov002-s-14`.
   **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
   the permuter stays a precision tool for confirmed pure-commutative walls.
 
 ### Closed briefs (reference)
 
+- **Brief 395** — `decomper`, shipped in PR #922. ✅ **ov004 Thumb-cohort
+  drain wave 1 — 14 byte-identical `.thumb.c`, no harness change.** Drained
+  the small/clean Thumb tier (`021dbxxx`–`021ddxxx` crypto/util lib) through
+  the existing `mwcc_thumb` rule. New recipes banked (`ov004_core.h`
+  §VERIFIED b395): **stack-arg pass-through forwarders** (6-param, p5/p6 on
+  the caller stack forwarded to a 5-arg sink — cracks the old "stack-arg
+  undecodable" class); **combined `long long` divmod decl** (one
+  `extern long long`, `(int)x`=quot / `(int)(x>>32)`=rem for a TU using
+  both); dispatch-order inversion; post-incr `key[ki++]`; `~0`/`~1` reuses
+  the result reg; `memcmp` folds the compare into the while-cond; bswap
+  OR-tree right-assoc + the objdump-halfword-LE gotcha. **3 deferred →
+  w2/`.s`** (`021dc1cc` RC4-KSA spill-choice reg-alloc → `.s`; `021dbdf4`
+  fixed-point pool-straddle; `021dcd1c` ambiguous param). **~21 harder Thumb
+  funcs remain (`≥0x5c` tier)** → brief 397.
+- **Brief 396** — `scaffolder`, shipped in PR #921. ✅ **ov002 reg-alloc →
+  `.s`, upper-half wave 13 — 8 ships (0x48–0x50).** All `asm_escape
+  --whole-function` byte-identical + `kind:bss` link-clean (classifier
+  swept 28, 23 clean; 5 `kind:data` correctly dropped). Carve audit `.s`
+  func-entries 241 → 249 (+8 exact; explicit overlap scan over 1192 `.text`
+  intervals = NONE). **~62 shippable `≤0x60` remain (~7-8 waves)** → brief
+  398. Running total scaffolder reg-alloc `.s`: 104 (main 17, ov002 87).
 - **Brief 393** — `decomper`, shipped in PR #918. ✅ **ov004 real-C —
   16 byte-identical (8 ARM `.c` + 8 Thumb `.thumb.c`) + the `.thumb.c`
   harness.** **KEY FINDING (corrects the brief): the call-having Thumb
