@@ -192,4 +192,39 @@ extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
  * c418/c500, larger crypto 021dc020/c238/ca68/dd374, the 0xaec 021dd648).
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 397 (8 Thumb .c, 3-region ninja sha1 OK). Thumb-cohort DRAIN
+ * wave 2 (the harder >=0x5c tier). Per-pick table in
+ * docs/research/brief-397-ov004-thumb-drain-wave2.md.
+ *  021dbdf4 021dc418 021dc3b8 021dc350 021dc500 021dc2cc 021dc020 021dc238.
+ * The harder tier yielded because it COMPOSES the wave-1 primitives (builders +
+ * RC4 orchestrators chaining 021dbddc/dbfd4/dbfa8/dbf6c/dc128/dc19c).
+ * NEW recipes:
+ *  - 64-bit ACCUMULATE: `long long s=0; s+=(long long)q1; s+=(long long)q2;` keeps
+ *    {hi:lo} across the 2nd call (a one-shot `s=(ll)a+(ll)b` defers sign-ext +
+ *    diverges). STRUCT COPY `Pair l=*(Pair*)p;` batches load-load-store-store (vs
+ *    int[] a[0]=b[0] which mwcc does conservatively). Shared pool const: 2 `x*K`
+ *    mults CSE to one pool word but two ldr — write K twice. (021dbdf4.)
+ *  - MULTI-STACK-ARG PASS-THROUGH BUILDER (021dc418/c350/c500): 5th-7th params at
+ *    caller sp[N]; sink's outgoing stack args go to sp[0/4/8], r0-3 unmoved. A
+ *    struct field read with PER-USE signedness is real: a3[0] ldrsh for two calls
+ *    + ldrh for one -> `(unsigned short)a3[0]` on just that one. ldrsb stack param
+ *    = `signed char` param.
+ *  - S-BOX-IN-state[2] (021dc2cc/c238): RC4 orchestrators store the alloc straight
+ *    into the state struct: `state[2]=(int)alloc;` so that slot IS the S-box; free
+ *    `(void*)state[2]`. The state lives on the stack (sp+0 or sp+4), the alloc at
+ *    state[2].
+ *  - cmp-ORDER via TEMP (021dc238): `int crc=f(); if(crc!=x)` -> `cmp r0,rX`
+ *    (result first); inline `if(f()!=x)` -> `cmp rX,r0`.
+ * DEFERRED -> permuter/.s (reg/slot-alloc near-misses, do NOT grind): 021dcd1c
+ * (found/i reg swap 31/31; param ambiguity RESOLVED = f(a0,a1), not-found cmp
+ * a0==0x1000), 021dd2c8 (count/rec8 + 2-slot swap 63/63), 021dc1cc (RC4 KSA
+ * spill-choice). GOTCHA: `asm_escape --whole-function` can't parse a THUMB gap obj
+ * ("no disassembly in _dsd_gap@…" — resolves ARM per-fn syms, not Thumb) -> the .s
+ * route for Thumb reg-walls needs an asm_escape Thumb fix or the scaffolder lane.
+ * WALLS: 021dca68 (PC-rel JUMP TABLE `add rN,pc;ldrh;bx rN`), 021dd374/021dd648
+ * (RE-tier). REMAINING ~16 (incl untried mediums 021dbc8c/c474/c570/c664/c7bc/
+ * c830/c998/cbf0/cd64/ce74/cf38/dd040/dd150) = a wave-3, lower yield.
+ * ======================================================================= */
+
 #endif /* OV004_CORE_H */
