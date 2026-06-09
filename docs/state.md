@@ -8,25 +8,25 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-09 (Mac), post briefs **395 + 396** merge.
-**This round (2 PRs):** **#922** decomper ov004 Thumb-cohort drain wave 1
-(14 `.thumb.c`, NO harness change — reused the b393 `mwcc_thumb` rule);
-**#921** scaffolder ov002 `.s` upper-half wave 13 (8 ships). 22 carves,
-all gate-verified. **`.thumb.c` drain works as a repeatable lane.**
+**Last updated:** 2026-06-09 (Mac), post briefs **397 + 398** merge.
+**This round (2 PRs):** **#925** decomper ov004 Thumb-cohort drain wave 2
+(8 `.thumb.c` + recovered the `021dbdf4` deferral, no harness change —
+composed-builder/orchestrator tier); **#924** scaffolder ov002 `.s`
+upper-half wave 14 (8 ships). 16 carves, all gate-verified. **Tooling gap
+found: `asm_escape --whole-function` can't parse Thumb gap objects → Thumb
+reg-walls are `.s`-blocked (left on the gap; brief 397).**
 
-**Current metrics (EUR — reconfigured at `91d05fc` via `configure.py eur`,
+**Current metrics (EUR — reconfigured at `14d4ab8` via `configure.py eur`,
 `ninja objdiff`+`report` regenerated this session, clean tree):**
-**`complete_units 3581 / 5174 (69.21 %)`**. `matched_functions 3618 / 9779`.
-**Code-byte tier 11.48 %** (`complete_code 273478 / 2382976`). **3-region
+**`complete_units 3589 / 5185 (69.22 %)`**. `matched_functions 3626 / 9771`.
+**Code-byte tier 11.51 %** (`complete_code 274118 / 2382080`). **3-region
 `ninja sha1` PASS (eur / usa / jpn)** reproduced this session on the merged
-main — both PRs byte-correct. ⚠️ **METRIC CAVEAT: the report under-counts
-`.thumb.c` carves** — the report's per-unit delta was only +8 (≈ the 8 `.s`)
-while 22 funcs shipped; the 14 Thumb carves ARE in delinks (22 `.thumb`
-entries total), built (`.thumb.o`), and linked (SHA1-proven), but objdiff
-doesn't surface them as distinct complete units by address. **The SHA1 gate
-is the ship-count source of truth, not `complete_units`** (extends the
-`matched_functions` reloc-divergence note). (Reminder: **~69 % *units*,
-~11.5 % by *code bytes*.**)
+main — both PRs byte-correct. ⚠️ **METRIC CAVEAT (recurring): the report
+under-counts `.thumb.c` carves** — per-unit delta +8 (≈ the 8 `.s`) while
+16 funcs shipped; the 8 Thumb carves ARE in delinks + built (`.thumb.o`) +
+linked (SHA1-proven), but objdiff doesn't surface them as distinct units by
+address. **SHA1 is the ship-count truth, not `complete_units`.** (Reminder:
+**~69 % *units*, ~11.5 % by *code bytes*.**)
 
 **Prior (Windows session 2, briefs 366–392): ~24 PRs (#892–#915), THE
 PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
@@ -46,14 +46,15 @@ ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
 Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 397** = **Thumb-cohort drain WAVE 2** (the harder
-`≥0x5c` tier: stack-arg builders `021dc350`/`c418`/`c500` via the w1
-pass-through recipe, medium crypto `021dc020`/`c238`/`ca68`/`dd374`, the
-`0xaec` giant `021dd648`; re-try the 3 w1 deferrals, route the RC4-KSA
-reg-alloc to `.s`). ~21 funcs left, lower yield expected. **scaffolder →
-brief 398** = continue **ov002 `.s` upper-half wave 14** (SOLE owner of the
-ov002 delinks; ~62 shippable `≤0x60` left, ~7-8 waves). Both queued;
-decomper-ov004 / scaffolder-ov002 stays collision-free.
+**decomper → brief 399** = **Thumb-cohort drain WAVE 3** (the ~13 untried
+medium funcs `021dbc8c`/`c474`/`c570`/`c664`/`c7bc`/`c830`/`c998`/`cbf0`/
+`cd64`/`ce74`/`cf38`/`dd040`/`dd150`) **+ PIVOT-WATCH** (if <~4 clean / mostly
+walls, the Thumb vein is tapped → wave 4 pivots to a fresh overlay). Skip
+the 3 `.s`-blocked reg-walls + jump-table + RE giants. **scaffolder → brief
+400** = continue **ov002 `.s` upper-half wave 15** (SOLE owner of the ov002
+delinks; ~54 shippable `≤0x60` left, ~6-7 waves; `kind:data` fraction
+rising in the `0x54`-`0x58` band). Both queued; decomper-ov004 /
+scaffolder-ov002 stays collision-free.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it

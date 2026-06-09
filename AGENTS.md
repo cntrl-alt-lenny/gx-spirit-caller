@@ -506,40 +506,68 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 397** — `decomper`. **ov004 — Thumb-cohort drain WAVE 2 (the
-  harder `≥0x5c` tier).** Wave 1 (brief 395) drained the small/clean Thumb
-  tier (14 `.c`); **~21 call-having Thumb funcs remain**, trending harder:
-  the **multi-stack-arg builders** `021dc350`/`021dc418`/`021dc500` (attack
-  with the **stack-arg pass-through-forwarder** recipe banked in 395 — args
-  forwarded unchanged to a sink, p5/p6 spilled to `sp[0]`/`sp[4]`), the
-  **medium crypto** `021dc020`/`021dc238`/`021dca68`/`021dd374`, and the
-  `0xaec` giant `021dd648` (RE-tier — last, if at all). **Re-attempt the 3
-  deferred:** `021dbdf4` (fixed-point, pool straddles the gap-object
-  boundary — tractable with care), `021dcd1c` (ambiguous param — pull the
-  caller's prototype first); **route `021dc1cc`** (RC4 KSA, spill-choice
-  reg-alloc 53-vs-50) **to `.s`** — it's the catalogued reg-alloc wall, not
-  C-recoverable. No harness change (the rule shipped in 393); `.thumb.c` +
-  `#pragma thumb on`, **4-aligned starts only**. Gate = **3-region `ninja
-  sha1`**; carve-size audit. Target ~6-10 (harder tier — lower yield than
-  w1 is expected). **Collision-free** (scaffolder on ov002). Branch:
-  `decomper/ov004-thumb-w2`.
-- **Brief 398** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
-  wave 14 (continue the byte-completion grind).** The `.s` endgame is the
+- **Brief 399** — `decomper`. **ov004 — Thumb-cohort drain WAVE 3 (the
+  untried medium residue) + PIVOT-WATCH.** Waves 1-2 (briefs 395/397 =
+  14+8 `.thumb.c`) drained the small/clean + composed-builder tiers.
+  **~13 untried medium funcs remain:** `021dbc8c`, `021dc474`, `021dc570`,
+  `021dc664`, `021dc7bc`, `021dc830`, `021dc998`, `021dcbf0`, `021dcd64`,
+  `021dce74`, `021dcf38`, `021dd040`, `021dd150` — sweep these with the
+  banked recipe kit. No harness change; `.thumb.c` + `#pragma thumb on`,
+  **4-aligned starts only**. **SKIP / defer (do NOT grind):** the 3
+  reg-alloc near-misses (`021dcd1c`, `021dd2c8`, `021dc1cc`) — they need a
+  `.s` escape, **but `asm_escape --whole-function` CANNOT parse a Thumb gap
+  object** (it resolves ARM per-fn syms only; brief 397) → these are
+  **tooling-blocked**, leave them on the gap (they still link); the
+  jump-table (`021dca68`) and RE giants (`021dd374`/`021dd648`). **PIVOT
+  SIGNAL:** if the 13 mediums yield **< ~4** clean or are mostly walls, STOP
+  and say so in the brief doc — the Thumb vein is then tapped and wave 4
+  pivots the decomper to a fresh overlay (the clean-C levers shine on fresh
+  easy tiers, per brief 364). Gate = **3-region `ninja sha1`**; carve-size
+  audit. Target ~4-8 (lower yield expected). **Collision-free** (scaffolder
+  on ov002). Branch: `decomper/ov004-thumb-w3`.
+- **Brief 400** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
+  wave 15 (continue the byte-completion grind).** The `.s` endgame is the
   volume lane (permuter niche — brief 383; clean-C tapped). Continue the
-  **upper-half `≤0x60` cohort** — wave 13 left **~62 shippable** (~7-8 waves
-  of runway; the classifier scored 23/28 clean). You remain the **SOLE
-  owner of `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it
-  canonically sorted (`tools/sort_delinks.py`). Per-pick `asm_escape
-  --whole-function` byte-identity **+ the `kind:bss` link gate** (drop any
-  candidate whose `data_` ref is `kind:data(any)` — it `Undefined`-fails
-  the link even at objdiff-100 %, per briefs 361/364; the known wave-9
-  `kind:data` trio + the 5 wave-13 drops stay parked). EUR `ninja sha1`
-  per-pick; brain reproduces 3-region SHA1 on merge. Target ~8.
-  **Collision-free** (decomper on ov004). Branch: `scaffolder/ov002-s-14`.
+  **upper-half `≤0x60` cohort** — wave 14 left **~54 shippable** (~6-7 waves
+  of runway; the classifier scored 23/30 clean, but the **`kind:data`
+  fraction is rising into the `0x54`-`0x58` band** — 7/30 drops vs 5/28 in
+  w13). You remain the **SOLE owner of
+  `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it canonically
+  sorted (`tools/sort_delinks.py`). Per-pick `asm_escape --whole-function`
+  byte-identity **+ the `kind:bss` link gate** (drop any candidate whose
+  `data_` ref is `kind:data(any)` — it `Undefined`-fails the link even at
+  objdiff-100 %, per briefs 361/364; the 7-member parked `kind:data` set
+  stays parked). EUR `ninja sha1` per-pick; brain reproduces 3-region SHA1
+  on merge. Target ~8. **Collision-free** (decomper on ov004). Branch:
+  `scaffolder/ov002-s-15`.
   **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
-  the permuter stays a precision tool for confirmed pure-commutative walls.
+  the **`asm_escape` Thumb-gap-object fix** (would unblock the Thumb
+  reg-walls for `.s` — candidate tooling brief); the permuter stays a
+  precision tool for confirmed pure-commutative walls.
 
 ### Closed briefs (reference)
+
+- **Brief 397** — `decomper`, shipped in PR #925. ✅ **ov004 Thumb-cohort
+  drain wave 2 — 8 byte-identical `.thumb.c` (+1 recovered deferral),
+  no harness change.** Drained the composed builder/orchestrator tier (it
+  reuses the wave-1 primitives): multi-stack-arg builders, RC4
+  orchestrators, recovered `021dbdf4` (fixed-point). New recipes: 64-bit
+  `s+=(long long)q` accumulate, struct-copy batch loads, signed-byte stack
+  params, S-box-in-`state[2]`, cmp-order-via-temp. **TOOLING GAP found:
+  `asm_escape --whole-function` cannot parse a Thumb gap object** (resolves
+  ARM per-fn syms only) → the Thumb reg-walls (`021dcd1c`/`021dd2c8`/
+  `021dc1cc`) can't be `.s`-escaped yet; left on the gap. **~16 remain**
+  (3 reg-walls + jump-table `021dca68` + RE giants `021dd374`/`021dd648`
+  + 13 untried mediums) → brief 399.
+- **Brief 398** — `scaffolder`, shipped in PR #924. ✅ **ov002 reg-alloc →
+  `.s`, upper-half wave 14 — 8 ships (all 0x50).** All `asm_escape
+  --whole-function` byte-identical + `kind:bss` link-clean (one is a valid
+  cross-module ref to **main** bss `021064a8`, sha1-validated; classifier
+  swept 30, 23 clean; 7 `kind:data` dropped). Carve 249 → 257 (+8; explicit
+  1200-interval overlap scan = NONE; adjacent-but-disjoint `0228bb58`/
+  `0228bba8` noted). **`kind:data` fraction rising in the `0x54`-`0x58`
+  band; ~54 shippable `≤0x60` remain (~6-7 waves)** → brief 400. Running
+  total scaffolder reg-alloc `.s`: 112 (main 17, ov002 95).
 
 - **Brief 395** — `decomper`, shipped in PR #922. ✅ **ov004 Thumb-cohort
   drain wave 1 — 14 byte-identical `.thumb.c`, no harness change.** Drained
