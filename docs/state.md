@@ -8,22 +8,27 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-06, post Windows-session-2 + Mac reconcile.
-**Briefs 366–392 ran on Windows: ~24 PRs (#892–#915), +186 `complete_units`,
-byte tier 10.68 → 11.34 %. THE PIVOT = the `.s` ENDGAME** (the permuter
-proved niche; clean-C is tapped) — both agents `.s`-converting the
-reg-alloc walls at scale. Mac brain reconciled: gate re-verified, ruff
-regression fixed (#916), both open `.s` PRs merged. (Reminder: **69 %
-*units*, ~11.3 % by *code bytes* — the `.s` endgame moves bytes fast.**)
+**Last updated:** 2026-06-09 (Mac), post briefs **393 + 394** merge.
+**This round (2 PRs):** **#918** decomper ov004 real-C (16: 8 ARM `.c` +
+8 Thumb `.thumb.c`) **+ the `.thumb.c` harness**; **#919** scaffolder ov002
+`.s` upper-half wave 12 (8 ships). 24 carves, all gate-verified.
+**Headline finding: the call-having Thumb interworking frame is a
+COMPILER-VERSION thing (mwcc 1.2/sp2p3 = the `.legacy.c` binary), NOT
+`-proc`** — opens ~37 more 4-aligned call-having Thumb funcs in
+`021dbxxx`–`021ddxxx` (a crypto/util lib) → the new decomper lane (brief
+395).
 
-**Current metrics (post-#914, EUR — reconfigured + 3-region `ninja sha1`
-PASS + `ninja report` on `09703a8`, clean tree):**
-**`complete_units 3557 / 5143 (69.16 %)`** (+186 vs 3371 when I left for
-Windows). `matched_functions 3594 / 9801`. **Code-byte tier 11.34 %**
-(`complete_code 270454/2384236`) — up **+0.66** over the session (whole-
-function `.s` shifts more bytes than small clean-C picks). 3-region SHA1
-PASS (eur / usa / jpn) — the `.s` waves + my delinks union-resolution are
-byte-correct.
+**Current metrics (EUR — reconfigured at `71b6271` via `configure.py eur`,
+`ninja report` regenerated this session, clean tree):**
+**`complete_units 3573 / 5163 (69.20 %)`**. `matched_functions 3610 / 9793`.
+**Code-byte tier 11.45 %** (`complete_code 272858 / 2383766`). **3-region
+`ninja sha1` PASS (eur / usa / jpn)** reproduced this session on the merged
+main — both PRs byte-correct. (Reminder: **~69 % *units*, ~11.4 % by *code
+bytes* — the `.s` endgame moves bytes fast.**)
+
+**Prior (Windows session 2, briefs 366–392): ~24 PRs (#892–#915), THE
+PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
+agents `.s`-converting reg-alloc walls at scale; Mac reconciled (#916/#917).
 
 🔻 **Permuter = NICHE, not the primary lane (corrects last round).** Brief
 383: **0 shipped recoveries** over briefs 379/381/383 — the catalogued
@@ -38,13 +43,15 @@ joined ov002 lower-half; scaffolder did main + ov002 upper-half (8/wave).
 ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
 Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
 
-🔁 **Where we are (post-reconcile lanes — now collision-free by module).**
-**decomper → brief 393** = grab the **remaining REAL C the `.s`-push
-skipped**: the ov004 **Thumb cohort** (dozens; needs a `*.thumb.c` harness
-rule) + the **ARM builder family** (~32, no harness). Real C > `.s`.
-**scaffolder → brief 394** = continue **ov002 `.s` upper-half** (now SOLE
-owner of the ov002 delinks → no more collision). Next: **393** (decomper
-real-C) + **394** (scaffolder `.s`).
+🔁 **Where we are (lanes — collision-free by module).**
+**decomper → brief 395** = **DRAIN the ov004 Thumb cohort** (the
+`021dbxxx`–`021ddxxx` crypto/util lib the b393 harness opened, ~37 funcs).
+No harness change needed — just `.thumb.c` files (1.2/sp2p3 + `#pragma
+thumb on`); sweep sorted small-first; skip the reg-mirror class → `.s`.
+Real C, the higher-value lane. **scaffolder → brief 396** = continue
+**ov002 `.s` upper-half wave 13** (SOLE owner of the ov002 delinks; ~68
+shippable `≤0x60` left, ~8 waves). Both queued; decomper-ov004 /
+scaffolder-ov002 stays collision-free.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
