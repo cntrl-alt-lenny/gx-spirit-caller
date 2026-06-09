@@ -60,7 +60,7 @@ def _addr_of(block):
 
 
 def sort_delinks(path):
-    with open(path, "r", newline="") as f:
+    with open(path, newline="") as f:
         text = f.read()
     nl = "\r\n" if "\r\n" in text else "\n"
     lines = text.split(nl)
