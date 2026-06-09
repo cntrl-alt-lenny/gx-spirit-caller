@@ -227,4 +227,30 @@ extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
  * c830/c998/cbf0/cd64/ce74/cf38/dd040/dd150) = a wave-3, lower yield.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 399 (5 Thumb .c, 3-region ninja sha1 OK). Thumb-cohort DRAIN
+ * wave 3 + PIVOT-WATCH. Per-pick table in
+ * docs/research/brief-399-ov004-thumb-drain-wave3.md.
+ *  021dc7bc 021dd150 021dd040 021dcf38 021dcd64 (dispatchers/handlers/orchestrator).
+ * The clean CONTROL-FLOW tier is now DRAINED; the residue = data-shaping BUILDERS
+ * (021dc474/c570/c664/dbc8c — matchable but high cost), jump-table walls (021dc830/
+ * cbf0/ca68), switch-tree (021dc998), + 1 struct near-miss (021dce74).
+ * NEW recipes: DEFER a base pointer past the entry guard (`char *p; if(arg0!=K)
+ * return; p=arg1+12;` — top-of-fn decl hoists+diverges); REUSED ptr (>=2 uses) stays
+ * in a reg w/ a 2nd `adds` for the field offset, ONE use FOLDS (`arg1+12`+16 ->
+ * arg1+28, the 021dce74 wall); cache `rec+4` for the 2nd of two re-reads (`int *v=
+ * (int*)(rec+4); ... *(int*)(rec+4) ... *v`); SHARED-RETURN switch (`case K:x=f();
+ * break; ... return x;` not `case K:return f();`).
+ * ⚠️ LESSON: dcheck does NOT validate pool CONSTANT VALUES (it canon's `ldr[pc,#N]`
+ * ->pool + drops trailing `.word`) — a wrong literal/pool-order/bl-target PASSES
+ * dcheck but FAILS ninja sha1 (021dcd64: mis-read LE bytes `00 10 00 00` as 0x1010,
+ * true=0x1000; 1 byte -> 128KB ROM diff via ov004 compression). `ninja sha1` is the
+ * ONLY gate. FAST pinpoint: `cmp build/<v>/build/arm9_ov004.bin extract/<v>/
+ * arm9_overlays/ov004.bin` -> byte off -> addr `0x021c9d60+off` -> function.
+ * PIVOT-WATCH VERDICT: 5>=4 so NOT tapped, but the named-recipe yield is thinning;
+ * wave 4 -> either grind the 4 builders (low funcs/hr) OR PIVOT to a fresh overlay's
+ * easy clean-C (brief 364: levers shine on fresh-easy not drained-residue). The
+ * Thumb cohort's EASY clean-C is effectively tapped.
+ * ======================================================================= */
+
 #endif /* OV004_CORE_H */
