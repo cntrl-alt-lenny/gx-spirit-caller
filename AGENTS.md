@@ -506,41 +506,67 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 393** — `decomper`. **ov004 — grab the remaining REAL C the
-  `.s`-pivot skipped (Thumb harness + cohort + ARM builders).** The
-  Windows session pivoted hard to the `.s` endgame and **never did the
-  real-C work the overlay re-sweep (brief 364) surfaced** — that's clean C
-  (not walls), higher-value than `.s`. Two veins, both ov004: **(A)** the
-  **`021dbxxx`–`021ddxxx` Thumb cohort** (dozens of clean utility funcs) —
-  stand up the **`*.thumb.c` harness rule** (`configure.py`: a `-proc`
-  that emits the ARMv4T-interworking frame) so the **call-having** Thumb
-  funcs build (only the frameless subset recovers without it — `021dd350`,
-  the project's first Thumb `.c`, shipped in 364; 4-aligned starts only).
-  **(B)** the **missed ARM builder/status-message family** (~32 uncarved
-  callers of `func_02037208` / `02034888` / `0201cd1c` / `020124a4`;
-  cached-base + buf-setup recipes — `021d66f4` plain builder; `021d1360`
-  status-message with mandatory cached base `char *b = data_0220b500`).
-  **(B) needs no harness — do it first / as the fallback if the Thumb rule
-  fights you.** Gate = **3-region `ninja sha1`**; carve audit. Target
-  ~12-18 (real C). **Collision-free** (scaffolder on ov002). Branch:
-  `decomper/ov004-realc`.
-- **Brief 394** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
-  wave 12 (continue the byte-completion grind).** The `.s` endgame is the
-  volume lane (the permuter is niche — brief 383; clean-C is tapped). main
-  + ov002's reg-alloc walls are proven non-C-recoverable → bank them as
-  whole-function `.s` toward 100 % byte-completion. Continue the **upper-
-  half `≤0x60` cohort** (~71 candidates after wave 11, ~9 waves of runway;
-  verifies ~100 % with the store-merge fix). **You are now the SOLE owner
-  of `config/eur/arm9/overlays/ov002/delinks.txt`** (the decomper moved to
-  ov004 → **no more delinks collision**); keep it canonically sorted
-  (`tools/sort_delinks.py`). Per-pick `ninja sha1`/objdiff; brain
-  reproduces 3-region SHA1 on merge. Target ~8. **Collision-free**
-  (decomper on ov004). Branch: `scaffolder/ov002-s-12`.
+- **Brief 395** — `decomper`. **ov004 — DRAIN the Thumb cohort (wave 1 of
+  the new lane brief 393 opened).** Brief 393 stood up the `*.thumb.c`
+  harness and proved the call-having Thumb frame is a **compiler-VERSION**
+  thing (mwcc **1.2/sp2p3** = the `.legacy.c` binary) **not** a `-proc`
+  thing — so **no harness change is needed now**, just write `.thumb.c`
+  files (each carries `#pragma thumb on`). The harness opened **~37 more
+  4-aligned call-having Thumb funcs** in `021dbxxx`–`021ddxxx` — a coherent
+  crypto/util library, a real vein not a wall. **Sweep it sorted
+  small-first.** Recipes (banked b393): the **divmod helpers**
+  `func_020b3870` (signed) / `func_020b3a7c` — quotient via `extern int`→r0,
+  remainder via `extern long long` + `(int)(x>>32)`→r1; **NEVER C `/`/`%`**
+  (emits `_s32_div_f`, passes dcheck but **FAILS the link**). Keystream-XOR
+  needs a **temp** (`uchar k=f(); dst[i]=k^src[i]`) to land `k` in r1.
+  **Skip reg-mirror** (the `021dc0ac`/`021dcbcc` class — register-NUMBER
+  shifts every compiler reproduces) → `.s`/permuter. **4-aligned starts
+  only** (mwcc emits Thumb `.text` `sh_addralign=4`; 2-aligned still need
+  `.s`). Vein B (the ARM cursor/status-message family) is drained at the
+  clean small tier — lower priority than this Thumb vein. Gate = **3-region
+  `ninja sha1`**; carve-size audit. Target ~12-18. **Collision-free**
+  (scaffolder on ov002). Branch: `decomper/ov004-thumb`.
+- **Brief 396** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
+  wave 13 (continue the byte-completion grind).** The `.s` endgame is the
+  volume lane (permuter niche — brief 383; clean-C tapped). Continue the
+  **upper-half `≤0x60` cohort** — wave 12 left **~68 shippable** (~8 waves
+  of runway; the classifier scored 24/26 clean). You remain the **SOLE
+  owner of `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it
+  canonically sorted (`tools/sort_delinks.py`). Per-pick `asm_escape
+  --whole-function` byte-identity **+ the `kind:bss` link gate** (drop any
+  candidate whose `data_` ref is `kind:data(any)` — it `Undefined`-fails
+  the link even at objdiff-100 %, per briefs 361/364). EUR `ninja sha1`
+  per-pick; brain reproduces 3-region SHA1 on merge. Target ~8.
+  **Collision-free** (decomper on ov004). Branch: `scaffolder/ov002-s-13`.
   **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
   the permuter stays a precision tool for confirmed pure-commutative walls.
 
 ### Closed briefs (reference)
 
+- **Brief 393** — `decomper`, shipped in PR #918. ✅ **ov004 real-C —
+  16 byte-identical (8 ARM `.c` + 8 Thumb `.thumb.c`) + the `.thumb.c`
+  harness.** **KEY FINDING (corrects the brief): the call-having Thumb
+  interworking frame (`push {lr}; sub sp, #4` … `pop {r3}; bx r3`) is a
+  COMPILER-VERSION difference — mwcc `1.2/sp2p3`, the SAME binary as
+  `.legacy.c` — NOT a `-proc` one** (it emits `bx r3` under the standard
+  `-proc arm946e`; 2.0 merges the return into `pop {pc}`). Harness =
+  `configure.py` `mwcc_thumb` rule reusing `LEGACY_CC` + a `.thumb.c`
+  suffix (`is_thumb_c()`), `patch_objects_legacy.py` adds `.thumb.c` to the
+  objects.txt-rewrite set, +2 test pins; sources carry `#pragma thumb on`.
+  **4-aligned starts only** (2-aligned → `.s`). Opens **~37 more
+  call-having Thumb funcs** (`021dbxxx`–`021ddxxx` crypto/util lib) →
+  **brief 395**. Vein B (ARM cursor-validation/status-message family) =
+  8 `.c`, drained at the clean small tier. 2 deferred → permuter/`.s`
+  (`021d9d58` prologue-schedule, `021dc0ac` reg-mirror).
+- **Brief 394** — `scaffolder`, shipped in PR #919. ✅ **ov002 reg-alloc →
+  `.s`, upper-half wave 12 — 8 ships (0x40–0x48).** All `asm_escape
+  --whole-function` byte-identical + `kind:bss` link-clean (classifier
+  swept 26, 24 clean; the 2 `kind:data` candidates correctly dropped — they
+  `Undefined`-fail the link). Carve audit `.s` func-entries 233 → 241 (+8
+  exact, 0 overlaps); delinks re-sorted to 0 inversions. Worktree hygiene:
+  removed 13 stale untracked `src/main/*.c` (duplicate-symbol hazard,
+  preserved to `/tmp`). **~68 shippable `≤0x60` remain (~8 waves)** →
+  **brief 396**.
 - **Briefs 365–392** — **WINDOWS SESSION 2 (~24 PRs #892–#915, +160
   `complete_units`; byte tier 10.68 → 11.25 %).** Brain ran on Windows;
   Mac brain reconciled on return (gate re-verified **3-region `ninja sha1`
