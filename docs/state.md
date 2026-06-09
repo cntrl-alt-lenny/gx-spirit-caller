@@ -8,25 +8,28 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-09 (Mac), post briefs **397 + 398** merge.
-**This round (2 PRs):** **#925** decomper ov004 Thumb-cohort drain wave 2
-(8 `.thumb.c` + recovered the `021dbdf4` deferral, no harness change —
-composed-builder/orchestrator tier); **#924** scaffolder ov002 `.s`
-upper-half wave 14 (8 ships). 16 carves, all gate-verified. **Tooling gap
-found: `asm_escape --whole-function` can't parse Thumb gap objects → Thumb
-reg-walls are `.s`-blocked (left on the gap; brief 397).**
+**Last updated:** 2026-06-09 (Mac), post briefs **399 + 400** merge.
+**This round (2 PRs):** **#928** decomper ov004 Thumb-cohort drain wave 3
+(5 `.thumb.c` — the clean control-flow tier is now drained → **decomper
+pivots off Thumb at 401**); **#927** scaffolder ov002 `.s` upper-half wave
+15 (8 ships). 13 carves, all gate-verified. **Thumb cohort total = 54 funcs
+(harness + 3 waves); residue = builders + walls.**
 
-**Current metrics (EUR — reconfigured at `14d4ab8` via `configure.py eur`,
+**Current metrics (EUR — reconfigured at `a10d835` via `configure.py eur`,
 `ninja objdiff`+`report` regenerated this session, clean tree):**
-**`complete_units 3589 / 5185 (69.22 %)`**. `matched_functions 3626 / 9771`.
-**Code-byte tier 11.51 %** (`complete_code 274118 / 2382080`). **3-region
-`ninja sha1` PASS (eur / usa / jpn)** reproduced this session on the merged
-main — both PRs byte-correct. ⚠️ **METRIC CAVEAT (recurring): the report
-under-counts `.thumb.c` carves** — per-unit delta +8 (≈ the 8 `.s`) while
-16 funcs shipped; the 8 Thumb carves ARE in delinks + built (`.thumb.o`) +
-linked (SHA1-proven), but objdiff doesn't surface them as distinct units by
-address. **SHA1 is the ship-count truth, not `complete_units`.** (Reminder:
-**~69 % *units*, ~11.5 % by *code bytes*.**)
+**`complete_units 3597 / 5196 (69.23 %)`**. `matched_functions 3634 / 9766`.
+**Code-byte tier 11.54 %** (`complete_code`). **3-region `ninja sha1` PASS
+(eur / usa / jpn)** reproduced this session on the merged main — both PRs
+byte-correct. ⚠️ **METRIC CAVEAT (recurring): the report under-counts
+`.thumb.c` carves** — per-unit delta +8 (≈ the 8 `.s`) for 13 ships; the 5
+Thumb carves are in delinks + built + linked (SHA1-proven). **SHA1 is the
+ship-count truth, not `complete_units`.** (Reminder: **~69 % *units*,
+~11.5 % by *code bytes*.**)
+
+**Overlay census (this session, `_dsd_gap` uncarved funcs):** ov002 2564
+(scaffolder), main 2677 (legacy/region-complex, parked), **ov006 171 /
+ov011 71 / ov008 65 / ov000 57 / ov010 46 / ov016 39 / ov005 32 / ov017 29
+(largest never-tracked)** — the decomper's 401 pivot-scout pool.
 
 **Prior (Windows session 2, briefs 366–392): ~24 PRs (#892–#915), THE
 PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
@@ -46,14 +49,13 @@ ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
 Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 399** = **Thumb-cohort drain WAVE 3** (the ~13 untried
-medium funcs `021dbc8c`/`c474`/`c570`/`c664`/`c7bc`/`c830`/`c998`/`cbf0`/
-`cd64`/`ce74`/`cf38`/`dd040`/`dd150`) **+ PIVOT-WATCH** (if <~4 clean / mostly
-walls, the Thumb vein is tapped → wave 4 pivots to a fresh overlay). Skip
-the 3 `.s`-blocked reg-walls + jump-table + RE giants. **scaffolder → brief
-400** = continue **ov002 `.s` upper-half wave 15** (SOLE owner of the ov002
-delinks; ~54 shippable `≤0x60` left, ~6-7 waves; `kind:data` fraction
-rising in the `0x54`-`0x58` band). Both queued; decomper-ov004 /
+**decomper → brief 401** = **PIVOT off the tapped Thumb cohort — scout +
+drain a fresh overlay's easy clean-C** (census pool above; best shots
+**ov006** missed-family re-sweep à la b364 + **ov017** fresh; pick ONE, own
+its delinks, stay OFF ov002/`main`). **scaffolder → brief 402** = continue
+**ov002 `.s` upper-half wave 16** (SOLE owner of the ov002 delinks; ~46
+shippable `≤0x60` left, ~5-6 waves; `kind:data` drop rate climbing — step
+to `0x60`+ if the band thins). Both queued; decomper-fresh-overlay /
 scaffolder-ov002 stays collision-free.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
