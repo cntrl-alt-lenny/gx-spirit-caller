@@ -8,38 +8,43 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-05, post-#890 merge (decomper half). Brain on
-Mac. **Brief 364 (ov004 re-sweep, +3) shipped; brief 365 (permuter scale)
-⏳ STILL RUNNING (scaffolder mid-wave, no PR yet — permuter is slow).**
-Half-round: merged the decomper, queued its next (366), left 365 open.
-(Reminder: **69 % *units* but only ~10.7 % by *code bytes***.)
+**Last updated:** 2026-06-06, post Windows-session-2 + Mac reconcile.
+**Briefs 366–392 ran on Windows: ~24 PRs (#892–#915), +186 `complete_units`,
+byte tier 10.68 → 11.34 %. THE PIVOT = the `.s` ENDGAME** (the permuter
+proved niche; clean-C is tapped) — both agents `.s`-converting the
+reg-alloc walls at scale. Mac brain reconciled: gate re-verified, ruff
+regression fixed (#916), both open `.s` PRs merged. (Reminder: **69 %
+*units*, ~11.3 % by *code bytes* — the `.s` endgame moves bytes fast.**)
 
-**Current metrics (post-#890, EUR — reconfigured + 3-region `ninja sha1`
-PASS + `ninja report` on `7f7b7b8`, clean tree):**
-**`complete_units 3371 / 4901 (68.78 %)`** (**+3** vs 3368).
-`matched_functions 3408 / 9801` (+3). **Code-byte tier 10.68 %**
-(`complete_code 254738/2384236`). 3-region SHA1 PASS (eur / usa / jpn).
+**Current metrics (post-#914, EUR — reconfigured + 3-region `ninja sha1`
+PASS + `ninja report` on `09703a8`, clean tree):**
+**`complete_units 3557 / 5143 (69.16 %)`** (+186 vs 3371 when I left for
+Windows). `matched_functions 3594 / 9801`. **Code-byte tier 11.34 %**
+(`complete_code 270454/2384236`) — up **+0.66** over the session (whole-
+function `.s` shifts more bytes than small clean-C picks). 3-region SHA1
+PASS (eur / usa / jpn) — the `.s` waves + my delinks union-resolution are
+byte-correct.
 
-🔎 **Overlay re-sweep verdict (brief 364):** drained overlays **DO
-re-open** — but **none of the 4 named C-levers carried a recovery**.
-Re-opening came from two other veins: **(1) missed clean ARM builders**
-(~32 uncarved sink-callers the Windows waves skipped → a normal drain
-wave = brief 366, the next step) and **(2) the Thumb cohort** (`021dd350`
-= the project's FIRST Thumb `.c`; the call-having bulk needs a `*.thumb.c`
-harness rule = brief 368, **the bigger prize** — dozens of utility funcs).
-Lesson: the byte-pack/`goto` levers are for a *fresh* overlay's first
-drain, not re-sweeps.
+🔻 **Permuter = NICHE, not the primary lane (corrects last round).** Brief
+383: **0 shipped recoveries** over briefs 379/381/383 — the catalogued
+"commutative/peephole" tier was mislabeled; the genuine pure-commutative
+subset is tiny. The permuter stays a *precision* tool. **m2c was vendored**
+(a useful clean-C accelerator). **Volume now = `.s` + residual clean-C.**
 
-✅ **Permuter (from last round) = the primary backlog lane** — it cracks
-the commutative/peephole classes hand-C can't reach; plateaus on
-`||`-equality CSE + frame (→ `.s`). Brief 365 is scaling it on main now.
+🪓 **The `.s` endgame (the volume lane).** main + ov002 reg-alloc walls are
+**proven non-C-recoverable** → bank them as whole-function `.s` toward
+100 % byte-completion. Decomper drained the overlay backlog (thinned) then
+joined ov002 lower-half; scaffolder did main + ov002 upper-half (8/wave).
+ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
+Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
 
-🔁 **Where we are.** **decomper → brief 366** (ov004 missed-builder drain;
-then 368 = Thumb harness). **scaffolder → brief 365** (permuter scale on
-main — IN PROGRESS; review when its PR lands). Collision-free (overlay vs
-main). **Deferred:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile.
-Next merge: **brief 365** (scaffolder permuter, pending) → then **brief
-366** (decomper) result.
+🔁 **Where we are (post-reconcile lanes — now collision-free by module).**
+**decomper → brief 393** = grab the **remaining REAL C the `.s`-push
+skipped**: the ov004 **Thumb cohort** (dozens; needs a `*.thumb.c` harness
+rule) + the **ARM builder family** (~32, no harness). Real C > `.s`.
+**scaffolder → brief 394** = continue **ov002 `.s` upper-half** (now SOLE
+owner of the ov002 delinks → no more collision). Next: **393** (decomper
+real-C) + **394** (scaffolder `.s`).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it

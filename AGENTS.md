@@ -506,48 +506,62 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 366** — `decomper`. **ov004 — drain the missed ARM
-  builder/status-message family (normal wave).** Brief 364 found drained
-  overlays **do re-open**, but **not via the named C-levers** (those gave
-  0 on ov004) — via **missed clean ARM builders** the Windows waves never
-  attempted. Drain that family: **~32 uncarved sink-callers** (callers of
-  `func_02037208` / `02034888` / `0201cd1c` / `020124a4`) — the simple
-  ones match with the **cached-base + buf-setup recipes** (e.g. `021d66f4`
-  plain builder; `021d1360` status-message with **mandatory cached base**
-  `char *b = data_0220b500` across calls). A **normal drain wave**, not a
-  routing pass; **don't** reach for the byte-pack/`goto` levers here (they
-  need a fresh easy tier the drained overlay lacks — save them for the
-  next overlay's *first* drain). Gate = **3-region `ninja sha1`**; carve
-  audit. Target ~12-18. **Collision-free** (scaffolder on main). Branch:
-  `decomper/ov004-builders`.
-  **→ NEXT (pre-announced, the bigger prize): brief 368 = a Thumb-compile
-  harness rule** (`*.thumb.c` → `-proc` emitting the ARMv4T-interworking
-  frame) — opens the whole `021dbxxx`–`021ddxxx` Thumb cohort (dozens of
-  clean utility funcs; only the frameless subset recovers without it,
-  1 shipped in 364 = the project's first Thumb `.c`, `021dd350`).
-- **Brief 365** ⏳ **(IN PROGRESS — scaffolder still running; dirty
-  worktree, no PR yet)** — `scaffolder`. **SCALE the permuter on main (proven
-  lane).** Brief 363 = **3/8 (37.5 %), a conservative floor** — the
-  permuter cracked **100 % of the commutative/peephole batch (3/3)**; the
-  pilot was skewed toward the *resistant* `||`-equality class. Scale it
-  on the **commutative-operand / peephole-split / reg-mirror / scheduling
-  residue** (the large waves-1-7 pile declared walls because hand-C
-  couldn't flip operand order or dodge a peephole — the permuter's
-  wheelhouse, **under-represented in the pilot → expect a higher rate**).
-  **Do NOT permute** the `||`-equality family (4) or pure frame-style
-  misses — they **plateau** → `.s`-escape or leave walled. **Retry
-  `020536d0` once at a 600 s budget** (closest miss). Harness flow (banked
-  in brief 363): carve TU (`.c`+`delinks complete`) → `ninja <tu>.o` →
-  `dsd dis -c … -a build/eur/disasm` → **bridge the name** → `tools/
-  permute.py func_<a> --run --max-seconds N --threads 6`. **Per-pick gate
-  = EUR objdiff 100 %**, but **watch data-relocs** (objdiff-100 % ≠ link;
-  brain 3-region `ninja sha1` is the gate on merge). **Report the hit
-  rate.** **Collision-free** (decomper on an overlay). Branch:
-  `scaffolder/main-permuter-scale`.
-  **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile.
+- **Brief 393** — `decomper`. **ov004 — grab the remaining REAL C the
+  `.s`-pivot skipped (Thumb harness + cohort + ARM builders).** The
+  Windows session pivoted hard to the `.s` endgame and **never did the
+  real-C work the overlay re-sweep (brief 364) surfaced** — that's clean C
+  (not walls), higher-value than `.s`. Two veins, both ov004: **(A)** the
+  **`021dbxxx`–`021ddxxx` Thumb cohort** (dozens of clean utility funcs) —
+  stand up the **`*.thumb.c` harness rule** (`configure.py`: a `-proc`
+  that emits the ARMv4T-interworking frame) so the **call-having** Thumb
+  funcs build (only the frameless subset recovers without it — `021dd350`,
+  the project's first Thumb `.c`, shipped in 364; 4-aligned starts only).
+  **(B)** the **missed ARM builder/status-message family** (~32 uncarved
+  callers of `func_02037208` / `02034888` / `0201cd1c` / `020124a4`;
+  cached-base + buf-setup recipes — `021d66f4` plain builder; `021d1360`
+  status-message with mandatory cached base `char *b = data_0220b500`).
+  **(B) needs no harness — do it first / as the fallback if the Thumb rule
+  fights you.** Gate = **3-region `ninja sha1`**; carve audit. Target
+  ~12-18 (real C). **Collision-free** (scaffolder on ov002). Branch:
+  `decomper/ov004-realc`.
+- **Brief 394** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
+  wave 12 (continue the byte-completion grind).** The `.s` endgame is the
+  volume lane (the permuter is niche — brief 383; clean-C is tapped). main
+  + ov002's reg-alloc walls are proven non-C-recoverable → bank them as
+  whole-function `.s` toward 100 % byte-completion. Continue the **upper-
+  half `≤0x60` cohort** (~71 candidates after wave 11, ~9 waves of runway;
+  verifies ~100 % with the store-merge fix). **You are now the SOLE owner
+  of `config/eur/arm9/overlays/ov002/delinks.txt`** (the decomper moved to
+  ov004 → **no more delinks collision**); keep it canonically sorted
+  (`tools/sort_delinks.py`). Per-pick `ninja sha1`/objdiff; brain
+  reproduces 3-region SHA1 on merge. Target ~8. **Collision-free**
+  (decomper on ov004). Branch: `scaffolder/ov002-s-12`.
+  **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
+  the permuter stays a precision tool for confirmed pure-commutative walls.
 
 ### Closed briefs (reference)
 
+- **Briefs 365–392** — **WINDOWS SESSION 2 (~24 PRs #892–#915, +160
+  `complete_units`; byte tier 10.68 → 11.25 %).** Brain ran on Windows;
+  Mac brain reconciled on return (gate re-verified **3-region `ninja sha1`
+  PASS**; fixed a ruff regression in `sort_delinks.py`, PR #916; merged
+  the two open `.s` PRs). **THE PIVOT: the `.s` endgame.** **(1) Permuter =
+  NICHE** (brief 383): 0 shipped recoveries over briefs 379/381/383 — the
+  catalogued "commutative/peephole" tier was mislabeled; the genuine
+  subset is tiny. Permuter is now a *precision* tool, not a volume lane.
+  **(2) m2c vendored** (briefs 381/383) — a useful clean-C/comprehension
+  accelerator; pair with reshape, not only the permuter. **(3) Ported the
+  `.s`/permuter lane to Windows** (WSL + binutils + download_tool fixes,
+  briefs 369/379). **(4) Both agents → reg-alloc → `.s` at scale:** the
+  decomper drained the **overlay** backlog (371/373/375/377, thinned →
+  joined ov002 lower-half 385/387/389/391); the scaffolder did **main +
+  ov002 upper-half** (372/374/376/378/380/382/384/386/388/390/392, 8/wave).
+  Delinks-collision (both on `ov002/delinks.txt`) managed with
+  **`tools/sort_delinks.py`** + sorted blocks. **My queued 365 (permuter
+  scale) was superseded by 379-383; 366 (ov004 builders) was skipped for
+  the `.s` pivot → revived as brief 393 (real C).** ov002 `.s` runway is
+  long (~260 lower + ~71 upper small-band uncarved). Individual docs:
+  `docs/research/brief-3{66..92}-*.md`.
 - **Brief 364** — `decomper`, shipped in PR #890. ✅ **ov004 overlay
   re-sweep — 3 recoveries + re-open findings.** Drained overlays **do
   re-open**, but **none of the 4 named C-levers carried a single
