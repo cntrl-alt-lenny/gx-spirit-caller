@@ -261,5 +261,138 @@ class TestDisasmZeroFlag(unittest.TestCase):
         self.assertIn("-z", captured["cmd"])
 
 
+class TestClassifyDataRefs(unittest.TestCase):
+    """brief 406: the kind:data link preflight. Fixtures mirror the real
+    shapes: A-aligned = the shipped wave-9 trio (data_…22cad34 has its own
+    carved TU); B-gap = uncarved data (dsd gap object defines it GLOBAL);
+    C-absorbed = the brief-361 `data_020ff924` bundle-absorption that
+    mwldarm Undefined-failed (reproduced live this brief); OFFSET = an
+    interior pool word emit_asm would silently truncate; MISADDRESSED = a
+    mis-sized/mis-addressed data carve (range starts at no data symbol) —
+    the Verify-gate item 7 negative."""
+
+    SYMBOLS = "\n".join([
+        "func_test kind:function(arm,size=0x10) addr:0x02000000",
+        "data_a kind:data(any) addr:0x02100000",
+        "data_b kind:data(any) addr:0x02100010",
+        "data_c kind:data(any) addr:0x02100020",
+        "bss_x kind:bss addr:0x02200000",
+    ])
+
+    @staticmethod
+    def _relocs(*targets):
+        return "\n".join(
+            f"from:0x{0x02000000 + 4 * i:08x} kind:load to:0x{t:08x} module:x"
+            for i, t in enumerate(targets))
+
+    def _verdicts(self, relocs, delinks):
+        from asm_escape import classify_data_refs
+        return classify_data_refs(self.SYMBOLS, relocs, delinks, "func_test")
+
+    def test_a_aligned_carved_tu_links(self):
+        v = self._verdicts(
+            self._relocs(0x02100000),
+            "src/x/data_a.c:\n    complete\n"
+            "    .data start:0x02100000 end:0x02100010\n")
+        self.assertEqual([x["verdict"] for x in v], ["A-aligned"])
+
+    def test_b_gap_links(self):
+        v = self._verdicts(self._relocs(0x02100010), "")
+        self.assertEqual([x["verdict"] for x in v], ["B-gap"])
+
+    def test_c_absorbed_refused(self):
+        # data_b absorbed into data_a's bundle TU (range spans both) — the
+        # brief-361 class: no linkable definition for data_b.
+        v = self._verdicts(
+            self._relocs(0x02100010),
+            "src/x/data_a.c:\n    complete\n"
+            "    .data start:0x02100000 end:0x02100020\n")
+        self.assertEqual([x["verdict"] for x in v], ["C-absorbed"])
+        self.assertIn("data_a", v[0]["note"])
+
+    def test_offset_interior_word_refused(self):
+        # pool word at data_b+4: emit_asm drops the addend -> refuse.
+        v = self._verdicts(
+            self._relocs(0x02100014),
+            "src/x/data_b.c:\n    complete\n"
+            "    .data start:0x02100010 end:0x02100020\n")
+        self.assertEqual([x["verdict"] for x in v], ["OFFSET"])
+
+    def test_misaddressed_carve_red(self):
+        # the negative the brief demands: a carve range starting at NO data
+        # symbol (mis-sized/mis-addressed delinks entry) must scream, not pass.
+        v = self._verdicts(
+            self._relocs(0x02100010),
+            "src/x/data_bad.c:\n    complete\n"
+            "    .data start:0x0210000c end:0x02100018\n")
+        self.assertEqual([x["verdict"] for x in v], ["MISADDRESSED"])
+
+    def test_bss_target_not_gated(self):
+        self.assertEqual(self._verdicts(self._relocs(0x02200000), ""), [])
+
+    def test_rodata_carve_counts(self):
+        v = self._verdicts(
+            self._relocs(0x02100020),
+            "src/x/data_c.c:\n    complete\n"
+            "    .rodata start:0x02100020 end:0x02100024\n")
+        self.assertEqual([x["verdict"] for x in v], ["A-aligned"])
+
+
+class TestThumbMode(unittest.TestCase):
+    """brief 406 stretch: the Thumb gap-object fix. parse_objdump must accept
+    4-hex halfwords and `xxxx yyyy` 32-bit pairs (bl); to_mwasm_thumb maps the
+    UAL spellings onto mwasmarm's legacy Thumb dialect (probed live: the UAL
+    flag-setting names are rejected; reg-reg `movs` is the lsls-#0 encoding,
+    NOT legacy `mov` which assembles to adds-#0); pool_addrs uses the Thumb
+    pc-rel base Align(addr+4, 4)."""
+
+    _THUMB = """\
+00000000 <func_thumb>:
+   0:\tb5f0      \tpush\t{r4, r5, r6, r7, lr}
+   2:\t2000      \tmovs\tr0, #0
+   4:\t0019      \tmovs\tr1, r3
+   6:\t4902      \tldr\tr1, [pc, #8]\t@ (10 <func_thumb+0x10>)
+   8:\tf7ff fffa \tbl\t0 <func_thumb>
+\t\t\t8: R_ARM_THM_PC22\tfunc_ext
+   c:\td0f8      \tbeq.n\t0 <func_thumb>
+   e:\tbdf0      \tpop\t{r4, r5, r6, r7, pc}
+  10:\t12345678\t.word\t0x12345678
+"""
+
+    def test_parse_halfwords_and_pairs(self):
+        words = parse_objdump(self._THUMB, "func_thumb")
+        self.assertEqual([w["bytes"] for w in words],
+                         ["b5f0", "2000", "0019", "4902", "f7fffffa",
+                          "d0f8", "bdf0", "12345678"])
+        self.assertEqual(words[4]["reloc"], "func_ext")
+
+    def test_thumb_pool_base(self):
+        words = parse_objdump(self._THUMB, "func_thumb")
+        # ldr at 0x6: Align(0x6+4, 4) + 8 = 0x8 + 8 = 0x10
+        self.assertEqual(pool_addrs(words, thumb=True), {0x10})
+
+    def test_to_mwasm_thumb_dialect(self):
+        from asm_escape import to_mwasm_thumb
+        self.assertEqual(to_mwasm_thumb("movs r0, #0"), "mov r0, #0")
+        self.assertEqual(to_mwasm_thumb("movs r1, r3"), "lsl r1, r3, #0x0")
+        self.assertEqual(to_mwasm_thumb("lsls r0, r1, #2"), "lsl r0, r1, #2")
+        self.assertEqual(to_mwasm_thumb("adds r0, r0, r1"), "add r0, r0, r1")
+        self.assertEqual(to_mwasm_thumb("negs r3, r3"), "neg r3, r3")
+        self.assertEqual(to_mwasm_thumb("beq.n 20"), "beq 20")
+        self.assertEqual(to_mwasm_thumb("push {r4, lr}"), "push {r4, lr}")
+        self.assertEqual(to_mwasm_thumb("cmp r5, #0"), "cmp r5, #0")
+
+    def test_thumb_emit_has_thumb_directive_and_aligned_pool(self):
+        words = parse_objdump(self._THUMB, "func_thumb")
+        s = emit_asm("func_thumb", words, whole=True, thumb=True)
+        self.assertIn(".thumb", s)
+        self.assertNotIn(".arm", s)
+        self.assertIn(".align 2", s)
+        self.assertIn("_LIT0: .word 0x12345678", s)
+        self.assertIn("mov r0, #0x0", s)
+        self.assertIn("lsl r1, r3, #0x0", s)
+        self.assertIn("bl func_ext", s)
+
+
 if __name__ == "__main__":
     unittest.main()
