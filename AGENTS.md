@@ -506,50 +506,92 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 401** — `decomper`. **PIVOT off the (tapped) Thumb cohort —
-  scout + drain a fresh overlay's easy clean-C.** Brief 399 drained the
-  last clean Thumb control-flow tier; the residue is high-cost builders +
-  walls → pivot (the decomper's own w3 recommendation; brief-364 lesson:
-  the levers shine on a *fresh easy tier*, not a drained residue). **Census
-  (report.json this session, uncarved `_dsd_gap` funcs, excluding ov002 =
-  scaffolder and ov004 = current): ov006 171 / ov011 71 / ov008 65 / ov000
-  57 / ov010 46 / ov016 39 / ov005 32 / ov017 29.** **Scout 2-3, then drain
-  the richest easy (`≤0x100`) tier.** Best shots: **ov006** (biggest
-  residue — it was the *scaffolder's* direct-mwcc co-drain, so a clean-C eye
-  may find **missed sink-caller families**, the brief-364 playbook that
-  re-opened ov004 — NOT the named C-levers, which scored 0 on re-sweeps),
-  and **ov017** (the largest never-tracked overlay = genuinely fresh). Pure
-  2.0 clean-C (per-func 1.2 tri-compile only if a frame/epilogue demands
-  it). **Pick ONE overlay, own its `delinks.txt`. Stay OFF ov002 AND `main`
-  (the scaffolder's domains — `main` is also region-complex + a 2677-func
-  vein parked for later).** Gate = **3-region `ninja sha1`**; carve-size
-  audit; **`ninja sha1` is the only gate — dcheck does NOT validate pool
-  constant *values*/order/bl-targets** (brief 399: 1 wrong pool word passed
-  dcheck, failed sha1). Target ~10-18 (a fresh w1 calibrates yield — report
-  it + recommend continue-or-repick). **Collision-free** (scaffolder on
-  ov002). Branch: `decomper/<chosen-overlay>-realc` (name it for the pick).
-- **Brief 402** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
-  wave 16 (continue the byte-completion grind).** The `.s` endgame is the
-  volume lane (permuter niche — brief 383; clean-C tapped). Continue the
-  **upper-half `≤0x60` cohort** — wave 15 left **~46 shippable** (~5-6 waves
-  of runway). **Watch:** the `kind:data` drop rate is climbing (18 → 23 →
-  26 % over w13-14-15) as you work the `0x54`-`0x5c` band — **past `0x60`
-  the pool re-widens**, so if this band thins, step up to `0x60`-`0x6c`. You
-  remain the **SOLE owner of `config/eur/arm9/overlays/ov002/delinks.txt`**
-  — keep it canonically sorted (`tools/sort_delinks.py`). Per-pick
-  `asm_escape --whole-function` byte-identity **+ the `kind:bss` link gate**
-  (drop any `kind:data(any)` ref — it `Undefined`-fails the link even at
-  objdiff-100 %, per briefs 361/364; the 9-member parked set stays parked).
-  EUR `ninja sha1` per-pick; brain reproduces 3-region SHA1 on merge.
-  Target ~8. **Collision-free** (decomper off ov002). Branch:
-  `scaffolder/ov002-s-16`.
+- **Brief 403** — `decomper`. **Diagnose-and-ROUTE wave 1 on the ARM
+  overlay residue: permuter for freshly-verified single-transform
+  near-misses, `.s` for the rest (settles 383-vs-401).** Brief 401:
+  project-wide easy clean-C is mined; the dominant residue is
+  reg-alloc-finicky. Brief 383: the permuter went 0-for-the-*catalogued*
+  tiers (labels stale/mislabeled) — but brief 363 proved it cracks
+  GENUINELY-pure single-transform diffs (commutative-operand,
+  peephole-split). Synthesis: the permuter only ever gets a target whose
+  diff YOU re-verified fresh this wave; everything else ships `.s`.
+  **Wave shape = brief 358 routing (ship both lanes):** (1) re-diagnose
+  each target against a FRESH ninja-built `.o` (brief 362: stale `.o` →
+  phantom ip↔lr swaps) + confirm genuinely uncarved (gap obj, not on
+  origin/main); (2) single-transform diffs only (commutative order,
+  peephole-split, const-materialisation — e.g. zero-materialised-twice)
+  → `tools/permute.py <addr> --run --max-seconds 900` (overlay-aware:
+  resolves overlay symbols/delinks); plateau = STOP, route on; (3)
+  reg-mirror / reg-pressure / CSE-of-base / scheduling-interleave →
+  `asm_escape --whole-function` `.s` (ARM only — Thumb gap objs
+  unsupported, skip the ov004 Thumb walls) + the `kind:bss` link gate
+  (drop `kind:data` refs); (4) jump-table / switch-tree / RE giants stay
+  parked. **Seed targets (re-verify each):** ov017 `021b2c8c`
+  (zero-materialised-twice, 1 instr) / `021b33dc` (switch-val r0↔r1) /
+  `021b2280` (mask low-vs-high) / `021b66a8` (spills → likely `.s`);
+  ov000 `021ac920` (66v66, 2 bytes off at entry); ov008 `021aafa4`
+  (22v25 block-schedule) / `021aa4a0` (popcount mask-sched) /
+  command-record packs (20v20 → `.s`); ov005 `021acfb0` (24v26 post-blx
+  sched, same class as `021aafa4`); ov016 `021b287c`/`021b28f4`
+  (uniform r1↔r2 — short probe, then `.s`) / `021b2824` (fn-ptr
+  dispatch). Harvest more from these overlays' small uncarved tier as
+  the wave needs. **Deliverable beyond ships: the permuter hit-rate on
+  freshly-diagnosed single-transform targets** — the number that decides
+  whether the permuter stays in the loop or the endgame is pure `.s` +
+  patient builders. Report the split (C-via-permuter / `.s` / deferred)
+  à la 358. Target ~10-16 ships total (mostly `.s` is fine). Gate =
+  **3-region `ninja sha1`**; carve-size audit; sorted delinks per
+  overlay touched ({0,5,8,16,17} carves are isolation-safe — the
+  {0,2,5,8} overlay-swap group is handled per-overlay, sha1 proves).
+  **Collision-free: stay OFF ov002 (scaffolder) and `main`.** Branch:
+  `decomper/route-w1`.
+- **Brief 404** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
+  wave 17 (continue the byte-completion grind).** The `.s` endgame is
+  the volume lane; wave 16 widened enumeration to **`≤0x6c`** (pool ~90
+  uncarved / ~72 clean → **~9 waves runway**). You remain the **SOLE
+  owner of `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it
+  canonically sorted (`tools/sort_delinks.py`). Per-pick `asm_escape
+  --whole-function` byte-identity **+ the `kind:bss` link gate** (drop
+  any `kind:data(any)` ref — it `Undefined`-fails the link even at
+  objdiff-100 %, per briefs 361/364; the parked set is now 10). EUR
+  `ninja sha1` per-pick; brain reproduces 3-region SHA1 on merge.
+  **Watch:** the `kind:data` drop rate climbed 18 → 23 → 26 → 28 % over
+  w13-16 — if the `≤0x6c` clean pool thins below ~2 waves of runway,
+  report a step-up-vs-pivot recommendation instead of forcing the band.
+  Target ~8. **Collision-free** (decomper off ov002 — on ov017/ov016/
+  ov008/ov005/ov000 delinks this round). Branch: `scaffolder/ov002-s-17`.
   **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
-  the **`asm_escape` Thumb-gap-object fix** (would unblock the Thumb
-  reg-walls for `.s` — candidate tooling brief); the permuter stays a
-  precision tool for confirmed pure-commutative walls.
+  the **`asm_escape` Thumb-gap-object fix** (would unblock the ov004
+  Thumb reg-walls for `.s` — queue as a tooling brief if brief 403's
+  `.s` lane proves out).
 
 ### Closed briefs (reference)
 
+- **Brief 401** — `decomper`, shipped in PR #931. ✅ **Fresh-overlay
+  scout — 0 matched (deliberate calibration): NO fresh easy clean-C
+  overlay remains; stop queueing fresh-overlay drains.** Census fixes:
+  count carved funcs by `.text start:` ADDRESS, not the `func_` name
+  regex (the scaffolder names its carves `ovNNN_XXXX.c` → ov006 = 182
+  carved, not 242); ov017 WAS tracked (brief 332 w1 + `ov017_core.h`).
+  The brief-364 missed-sink-family bet is dead on ov006 (small
+  sink-callers all carved per-func). ov017 calibration 4/4 attempted =
+  ALL 1-2-instr reg-alloc / const-materialisation near-misses (the
+  permuter/`.s` class): `021b2c8c` zero-materialised-twice, `021b2280`
+  mask low-vs-high derive, `021b66a8` extra callee-saved spills,
+  `021b33dc` switch-val r0↔r1. Re-pick ranking: permuter on fresh
+  single-transform misses > `.s` byte-completion > patient builders
+  (~5-8/wave) → brief 403. Doc:
+  `docs/research/brief-401-fresh-overlay-scout.md`.
+- **Brief 402** — `scaffolder`, shipped in PR #930. ✅ **ov002 `.s`
+  upper-half wave 16 — 8 ships (all 0x58); enumeration widened to
+  `≤0x6c`.** All `asm_escape --whole-function` byte-identical +
+  `kind:bss` link-clean (classifier swept 36 → 26 clean / 10 dropped on
+  `kind:data`; `022536e8` completes the wave-9 trio; parked set now 10).
+  Carve 265 → 273, 0 overlaps across 1216 `.text` intervals, delinks
+  additions-only + sorted. `kind:data` drop rate 18 → 23 → 26 → 28 %
+  (w13-16), but `≤0x6c` re-expands the pool: ~72 clean → ~9 waves
+  runway. Running scaffolder reg-alloc `.s` total: **128** (main 17,
+  ov002 111). 3-region SHA1 reproduced on merge.
 - **Brief 399** — `decomper`, shipped in PR #928. ✅ **ov004 Thumb-cohort
   drain wave 3 — 5 byte-identical `.thumb.c`; the clean control-flow tier
   is now drained.** Above the pivot floor (≥4), so no pivot mid-wave, but
