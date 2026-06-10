@@ -350,16 +350,23 @@ and has the toolchain installed can take over.
 
 ### Verify gate and round discipline (paste-the-output, not the prose)
 
-These controls assume the brain runs on Opus 4.8 (or later) in a long,
-multi-PR session — the regime the system card's diligence evals
-explicitly do **not** cover (§6.3.6). The model's honesty/diligence
-gains are real but demonstrated on short tasks; across a multi-hour
-round the only trustworthy signal is a freshly-captured tool artifact,
-not the brain's own narrative. Each control is therefore a
-**paste-the-output requirement**, not a rule to remember (the card
-shows the model writing itself a correct rule and then violating it,
-§2.3.3.1). The 3-region `ninja sha1` PASS is still the floor; this
-section says how the brain must *evidence* it.
+These controls assume sessions run a **mix of frontier models** (Opus
+4.8 and Fable 5 as of 2026-06) in long, multi-PR sessions — the regime
+BOTH system cards' diligence evals explicitly do **not** cover (4.8
+card §6.3.6; Fable 5 card §6.3.5 says outright its diligence evals are
+short-context while the failure modes concentrate in long context).
+The failure clusters are unchanged in kind across the generation —
+Fable 5's top two in 886 internal engineering sessions are "states an
+unverified guess as fact" (41) and "reported work as done/verified
+when it wasn't" (16) — so the controls are **model-independent**:
+across a multi-hour round the only trustworthy signal is a
+freshly-captured tool artifact, not the model's own narrative. Each
+control is therefore a **paste-the-output requirement**, not a rule to
+remember (the 4.8 card shows the model writing itself a correct rule
+and then violating it, §2.3.3.1; the Fable 5 card shows it following a
+BAD memory-file rule, §2.3.3.3 — banked guidance is audited, never
+blindly trusted). The 3-region `ninja sha1` PASS is still the floor;
+this section says how the brain must *evidence* it.
 
 1. **Merge gate is paste-or-FAIL.** A PR's PASS line must paste the
    literal terminal tail — captured in THIS session on the actual
@@ -434,6 +441,62 @@ section says how the brain must *evidence* it.
    (Card §6.6.1: reward-hacking built around a narrow test case.
    The scaffolder shipped negative C-43 tests in brief 250 —
    confirm they red, don't assume.)
+8. **Cross-agent claims are re-verified when load-bearing.** Any
+   factual input that arrived as another agent's (or subagent's)
+   prose — parked-set membership, `kind:` classifications, census
+   counts, "already shipped" claims — gets an independent one-shot
+   check before it gates a brief, a merge, or a queue decision.
+   Re-running the 3-region gate on merge is the canonical instance;
+   the same rule covers the smaller relays. (Fable 5 card §2.3.3.1:
+   "I propagated the [sub]agent's line without applying the obvious
+   causality check"; brief 362: the banked wall catalog proved ~69 %
+   stale once actually checked.)
+9. **Found defects are reported as defects.** When an agent notices
+   a flaw — wrong constant, mis-sized carve, stale doc, broken gate —
+   the report names it a defect and routes a fix or a flag. Never
+   re-frame a found flaw as a "convention/quirk of the existing
+   setup" to avoid the detour. (Fable 5 card §6.3.5.1: the model
+   finds defects as reliably as 4.8 but is more likely to frame them
+   as deliberate design decisions and leave them in place.)
+
+### Model notes (Fable 5 / Opus 4.8 mix)
+
+Sessions run whichever frontier model is at hand; the workflow must
+not depend on which. Standing posture:
+
+- **Opus 4.8 is the calibration floor.** Wave targets, time-boxes,
+  and gates are tuned to 4.8. Fable 5's gains (FrontierCode ~2.2×
+  4.8, near-zero lazy-investigation / confidently-wrong rates,
+  stronger 1M-context reasoning) are **upside — spend them on stretch
+  goals, never bake them into a brief's success bar.**
+- **Fable 5 cyber-classifier fallback is expected behavior, not a
+  bug.** Binary reconstruction is in the activity category Fable 5's
+  safety classifiers can block (its card declines to report
+  ProgramBench for Fable for exactly this reason, §8.6); flagged
+  conversations silently fall back to Opus 4.8 for the rest of the
+  trajectory (§3.1.2). A decomp session on Fable 5 may therefore
+  effectively BE a 4.8 session on RE-heavy stretches. Do **not**
+  re-prompt or restructure work to evade a refusal/degradation —
+  that is the cards' "safeguard circumvention" failure tag. Note it
+  in the PR body and continue; the floor calibration already covers
+  it. Tooling, coordination, and synthesis work has no RE surface
+  and gets full Fable 5.
+- **Effort discipline.** Think hard at diagnosis / classification /
+  routing / merge moments; stay fast on grind picks. Test-time
+  compute is the largest quality knob on both cards (FrontierCode
+  11.5 → 29.3 % low→xhigh effort).
+- **Session and context persistence.** Prefer continuing an agent's
+  existing session across consecutive waves of the same lane
+  (long-lived context measurably beats fresh-spawn re-derivation;
+  the `core.h` banks remain the durable backup). On a 1M-context
+  model, whole-cohort passes — an overlay's full residue + core.h
+  in one context for batch classification — are encouraged where
+  they remove per-pick re-reads.
+- **Subagent fan-out is for the hard tail only.** Multi-agent gains
+  concentrate on hard problems (~1.6× median speedup there, ~0.8× on
+  easy ones — the coordination overhead loses on the grind tiers).
+  Analysis-only subagents; the lead serialises all builds (parallel
+  `ninja` in one checkout collides).
 
 ## Adding or retiring agents
 
@@ -506,92 +569,99 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 403** — `decomper`. **Diagnose-and-ROUTE wave 1 on the ARM
-  overlay residue: permuter for freshly-verified single-transform
-  near-misses, `.s` for the rest (settles 383-vs-401).** Brief 401:
-  project-wide easy clean-C is mined; the dominant residue is
-  reg-alloc-finicky. Brief 383: the permuter went 0-for-the-*catalogued*
-  tiers (labels stale/mislabeled) — but brief 363 proved it cracks
-  GENUINELY-pure single-transform diffs (commutative-operand,
-  peephole-split). Synthesis: the permuter only ever gets a target whose
-  diff YOU re-verified fresh this wave; everything else ships `.s`.
-  **Wave shape = brief 358 routing (ship both lanes):** (1) re-diagnose
-  each target against a FRESH ninja-built `.o` (brief 362: stale `.o` →
-  phantom ip↔lr swaps) + confirm genuinely uncarved (gap obj, not on
-  origin/main); (2) single-transform diffs only (commutative order,
-  peephole-split, const-materialisation — e.g. zero-materialised-twice)
-  → `tools/permute.py <addr> --run --max-seconds 900` (overlay-aware:
-  resolves overlay symbols/delinks); plateau = STOP, route on; (3)
-  reg-mirror / reg-pressure / CSE-of-base / scheduling-interleave →
-  `asm_escape --whole-function` `.s` (ARM only — Thumb gap objs
-  unsupported, skip the ov004 Thumb walls) + the `kind:bss` link gate
-  (drop `kind:data` refs); (4) jump-table / switch-tree / RE giants stay
-  parked. **Seed targets (re-verify each):** ov017 `021b2c8c`
-  (zero-materialised-twice, 1 instr) / `021b33dc` (switch-val r0↔r1) /
-  `021b2280` (mask low-vs-high) / `021b66a8` (spills → likely `.s`);
-  ov000 `021ac920` (66v66, 2 bytes off at entry); ov008 `021aafa4`
-  (22v25 block-schedule) / `021aa4a0` (popcount mask-sched) /
-  command-record packs (20v20 → `.s`); ov005 `021acfb0` (24v26 post-blx
-  sched, same class as `021aafa4`); ov016 `021b287c`/`021b28f4`
-  (uniform r1↔r2 — short probe, then `.s`) / `021b2824` (fn-ptr
-  dispatch). Harvest more from these overlays' small uncarved tier as
-  the wave needs. **Deliverable beyond ships: the permuter hit-rate on
-  freshly-diagnosed single-transform targets** — the number that decides
-  whether the permuter stays in the loop or the endgame is pure `.s` +
-  patient builders. Report the split (C-via-permuter / `.s` / deferred)
-  à la 358. Target ~10-16 ships total (mostly `.s` is fine). Gate =
-  **3-region `ninja sha1`**; carve-size audit; sorted delinks per
-  overlay touched ({0,5,8,16,17} carves are isolation-safe — the
-  {0,2,5,8} overlay-swap group is handled per-overlay, sha1 proves).
-  **Collision-free: stay OFF ov002 (scaffolder) and `main`.** Branch:
-  `decomper/route-w1`.
-- **Brief 404** — `scaffolder`. **ov002 reg-alloc → `.s`, upper-half
-  wave 17 (continue the byte-completion grind).** The `.s` endgame is
-  the volume lane; wave 16 widened enumeration to **`≤0x6c`** (pool ~90
-  uncarved / ~72 clean → **~9 waves runway**). You remain the **SOLE
-  owner of `config/eur/arm9/overlays/ov002/delinks.txt`** — keep it
-  canonically sorted (`tools/sort_delinks.py`). Per-pick `asm_escape
-  --whole-function` byte-identity **+ the `kind:bss` link gate** (drop
-  any `kind:data(any)` ref — it `Undefined`-fails the link even at
-  objdiff-100 %, per briefs 361/364; the parked set is now 10). EUR
-  `ninja sha1` per-pick; brain reproduces 3-region SHA1 on merge.
-  **Watch:** the `kind:data` drop rate climbed 18 → 23 → 26 → 28 % over
-  w13-16 — if the `≤0x6c` clean pool thins below ~2 waves of runway,
-  report a step-up-vs-pivot recommendation instead of forcing the band.
-  Target ~8. **Collision-free** (decomper off ov002 — on ov017/ov016/
-  ov008/ov005/ov000 delinks this round). Branch: `scaffolder/ov002-s-17`.
-  **→ DEFERRED:** varargs `stdarg.h` shim; `asm_escape --c` tri-compile;
-  the **`asm_escape` Thumb-gap-object fix** (would unblock the ov004
-  Thumb reg-walls for `.s` — queue as a tooling brief if brief 403's
-  `.s` lane proves out).
+- **Brief 405** — `decomper`. **RE-GIANT SWARM PILOT: parallel-hypothesis
+  fan-out on the understanding-bound wall tier (method experiment,
+  user-endorsed).** Routing (403) now leaves one tier untouched: RE
+  giants + detailed builders — walls bound by UNDERSTANDING, not
+  codegen. The Fable 5 card shows multi-agent gains concentrate on
+  exactly this hard tail (+7.9 pp on program reconstruction; ~0.8× on
+  easy picks — grind waves stay single-context). **Targets: 2
+  understanding-bound walls WITH a verified ship path** — preferred:
+  ov004 Thumb RE giants `021dd374` + `021dd648` (CHECK 4-alignment
+  first: `.thumb.c` needs 4-aligned starts; 2-aligned = no ship path
+  until the 406 Thumb `.s` fix lands). Fallback pool, same class: the
+  4 high-cost ov004 data-shaping builders (same alignment check), ov000
+  command-record builders (ARM, clean-C path always open). **Method per
+  target:** (1) lead preps an evidence pack — fresh disasm, xrefs, data
+  refs, caller context, known struct fields from the overlay core.h;
+  (2) fan out 3 ANALYSIS-ONLY subagents (Agent tool), each arguing a
+  DIFFERENT hypothesis (struct-layout A vs B, state-machine vs builder
+  reading), each returning proposed struct(s) + C draft + what evidence
+  would falsify it. Subagents must NOT build (parallel ninja in one
+  checkout collides) — the lead serialises all compiles; (3) lead
+  reconciles, compiles the winner, iterates via dcheck, gates on sha1.
+  Time-box ~half the wave per target. **Deliverable = ships AND the
+  method verdict:** cost-per-ship vs the ~5-8/wave patient-builder
+  baseline — is hypothesis fan-out a lane for the builder tier, or
+  theatre? Stop early and write the verdict if not converging (the 401
+  scout precedent: a clean negative is a deliverable). Gate = 3-region
+  `ninja sha1`; ⚠️ ov004 pool-constant gotcha (wrong pool word passes
+  dcheck, fails sha1 — `cmp` the ov004 bins to pinpoint). **Stay OFF
+  ov002 and `main`.** Branch: `decomper/swarm-pilot`.
+- **Brief 406** — `scaffolder`. **TOOLING: the kind:data carve harness —
+  un-park the `.s` lanes' binding constraint.** Both `.s` lanes park on
+  the same wall: a gap-`.s` carve whose function references a
+  `kind:data(any)` symbol `Undefined`-fails the link even at
+  byte-identity. Parked: your set = 12 (ov002), decomper route-w1 = 5
+  more (ov017 `021b66a8`, ov008 `021aafa4`/`021b2268`, ov005
+  `021acfb0`, ov016 `021b3174`), and the C-walled dispatcher twins
+  (ov017 `021b2c8c` / ov016 `021b2824`) are ALSO `.s`-blocked on it —
+  ~19 funcs and growing; brief 403 flags it as the binding endgame
+  constraint. **Goal: make a kind:data-referencing whole-function `.s`
+  carve link and ship byte-identical.** Mechanism is yours to design —
+  study how dsd delink represents the data section FIRST; candidates:
+  carve the referenced data bytes into the TU as a `.data`/`.rodata`
+  section block extracted from the delinked `.o`; a per-overlay shared
+  data-carve TU; or a data-kind delinks entry the configure path
+  understands. **Acceptance = artifacts:** (a) ship ≥3
+  previously-parked funcs end-to-end (suggest the ov002 wave-9 trio
+  `02253638`/`0225368c`/`022536e8` — same overlay, well-characterised,
+  your delinks file), EUR `ninja sha1` OK per-pick; (b) a doc note on
+  the mechanism + limits (which data shapes it can't carve, USA/JPN
+  story); (c) a negative test per § Verify gate item 7 — the harness
+  must FAIL loudly on a mis-sized/mis-addressed data carve; show it
+  red. **Stretch (only if primary lands): the asm_escape
+  Thumb-gap-object fix** (parser is ARM-only; would un-park the ov004
+  Thumb reg-walls `021dc1cc`/`021dcd1c`/`021dd2c8` for `.s`). Tools/
+  work + your own ov002 delinks for the acceptance ships. Brain runs
+  3-region on merge. **Collision-free** (decomper on ov004/ov000, off
+  ov002). Branch: `scaffolder/kind-data-harness`.
 
 ### Closed briefs (reference)
 
-- **Brief 401** — `decomper`, shipped in PR #931. ✅ **Fresh-overlay
-  scout — 0 matched (deliberate calibration): NO fresh easy clean-C
-  overlay remains; stop queueing fresh-overlay drains.** Census fixes:
-  count carved funcs by `.text start:` ADDRESS, not the `func_` name
-  regex (the scaffolder names its carves `ovNNN_XXXX.c` → ov006 = 182
-  carved, not 242); ov017 WAS tracked (brief 332 w1 + `ov017_core.h`).
-  The brief-364 missed-sink-family bet is dead on ov006 (small
-  sink-callers all carved per-func). ov017 calibration 4/4 attempted =
-  ALL 1-2-instr reg-alloc / const-materialisation near-misses (the
-  permuter/`.s` class): `021b2c8c` zero-materialised-twice, `021b2280`
-  mask low-vs-high derive, `021b66a8` extra callee-saved spills,
-  `021b33dc` switch-val r0↔r1. Re-pick ranking: permuter on fresh
-  single-transform misses > `.s` byte-completion > patient builders
-  (~5-8/wave) → brief 403. Doc:
-  `docs/research/brief-401-fresh-overlay-scout.md`.
-- **Brief 402** — `scaffolder`, shipped in PR #930. ✅ **ov002 `.s`
-  upper-half wave 16 — 8 ships (all 0x58); enumeration widened to
-  `≤0x6c`.** All `asm_escape --whole-function` byte-identical +
-  `kind:bss` link-clean (classifier swept 36 → 26 clean / 10 dropped on
-  `kind:data`; `022536e8` completes the wave-9 trio; parked set now 10).
-  Carve 265 → 273, 0 overlaps across 1216 `.text` intervals, delinks
-  additions-only + sorted. `kind:data` drop rate 18 → 23 → 26 → 28 %
-  (w13-16), but `≤0x6c` re-expands the pool: ~72 clean → ~9 waves
-  runway. Running scaffolder reg-alloc `.s` total: **128** (main 17,
-  ov002 111). 3-region SHA1 reproduced on merge.
+- **Brief 403** — `decomper`, shipped in PR #935. ✅ **Diagnose-and-route
+  wave 1 — 16 ships (2 matched `.c` + 14 `.s`), 3-region sha1 PASS
+  reproduced on merge. PERMUTER QUESTION SETTLED: 0/2 on
+  freshly-diagnosed overlay targets (plateaus at 250/765 after ~8k/7k
+  iters); combined fresh record 3/10 (363+403), all 3 on main →
+  overlay endgame = `.s` + hand-levers; permuter demoted to last-resort
+  probe.** Both `.c` ships were ONE-recompile lever cracks: the
+  commutative-operand-order lever decides which constant mwcc
+  POOL-LOADS (first-evaluated operand's const takes the pool slot,
+  partner derived via barrel-shifter operand-2) — cracked the
+  "unsteerable" SWAR popcount twins ov017 `021b2280` + ov008
+  `021aa4a0`. Banked: `volatile` ptr pins store order;
+  dispatch-order-inversion; asm_escape self-`bl` soft-fail is benign
+  (link gate proves recursion); per-wave uncarved re-check caught 2
+  stale seeds (PR #895). Parked on kind:data: 5 (26 % — matches
+  scaffolder band). Deferred C-walled+`.s`-blocked: dispatcher twins
+  `021b2c8c`/`021b2824` (irreducible allocator reg-numbering).
+  **kind:data carve harness flagged as the binding endgame constraint
+  → brief 406.** Doc: `docs/research/brief-403-route-w1.md`; recipes in
+  the 5 overlay core.h §brief-403 blocks.
+- **Brief 404** — `scaffolder`, shipped in PR #934. ✅ **ov002 `.s`
+  upper-half wave 17 — 8 ships (1× 0x58 + 7× 0x5c), all first-attempt
+  byte-identical, EUR sha1 OK (3-region reproduced on merge). THE
+  DROP-RATE ALARM WAS A WINDOWING ARTIFACT:** full-band sweep of all
+  82 ≤0x6c candidates = 12 kind:data / 70 clean = **15 % pool-wide**
+  (the 18→23→26→28 % climb re-counted accumulated parked mass in the
+  smallest-N window; only 2 NEW drops in 72 fresh-swept). Parked set
+  now 12. Runway: **~62 clean → ~7 waves**; wave 18 = 3 clean 0x5c
+  (`0229f2f8`/`022ae284`/`022aec74`) then the 17-clean 0x60 tier. New
+  datum: pool-loads to main FUNCTIONS (`kind:function`, e.g.
+  `022926f8`→`func_0202e258`) are link-clean — only `kind:data(any)`
+  trips the gate. Carve 273 → 281, 0 overlaps. Scaffolder `.s` total:
+  **136** (main 17, ov002 119).
 - **Brief 399** — `decomper`, shipped in PR #928. ✅ **ov004 Thumb-cohort
   drain wave 3 — 5 byte-identical `.thumb.c`; the clean control-flow tier
   is now drained.** Above the pivot floor (≥4), so no pivot mid-wave, but

@@ -8,25 +8,34 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-10 (Mac), post briefs **401 + 402** merge.
-**This round (2 PRs + brain #932):** **#931** decomper fresh-overlay scout
-(**0 matched by design** — verdict: **no fresh easy clean-C overlay
-remains**; census fixes: count carves by `.text start:` ADDRESS not name
-regex → ov006 = 182 carved not 242; ov017 WAS tracked at brief 332; the
-ov017 calibration 4/4 = 1-2-instr reg-alloc/const-materialisation
-near-misses); **#930** scaffolder ov002 `.s` upper-half wave 16 (8 ships,
-all 0x58, enumeration widened to `≤0x6c`, scaffolder `.s` total 128).
-Doc: `docs/research/brief-401-fresh-overlay-scout.md`.
+**Last updated:** 2026-06-10 (Mac), post briefs **403 + 404** merge.
+**This round (2 PRs + brain doc-PR):** **#935** decomper diagnose-and-route
+wave 1 (**16 ships** = 2 lever-cracked `.c` + 14 `.s` across
+ov000/008/016/017; **PERMUTER SETTLED: 0/2 fresh, demoted to last-resort
+probe**; commutative-POOL-LOAD lever cracked the "unsteerable" popcount
+twins; 5 more parked on kind:data); **#934** scaffolder ov002 `.s` wave 17
+(8 ships; **the w13-16 drop-rate climb was a WINDOWING ARTIFACT** — full-band
+sweep = 15 % pool-wide; runway ~62 clean/~7 waves; `.s` total 136). Both
+research-index conflicts resolved by regenerating
+(`tools/generate_research_index.py`).
 
-**Current metrics (EUR — reconfigured at `1f4e8f5` via `configure.py eur`,
+**Current metrics (EUR — reconfigured at `1e9460e` via `configure.py eur`,
 `ninja objdiff`+`report` regenerated this session, clean tree):**
-**`complete_units 3605 / 5207 (69.23 %)`** (+8 = the 8 `.s`; scout shipped
-0). `matched_functions 3642 / 9766`. **Code-byte tier 11.57 %**
+**`complete_units 3629 / 5236 (69.31 %)`** (+24 = exactly the 24 ships).
+`matched_functions 3666 / 9766`. **Code-byte tier 11.73 %**
 (`complete_code`). **3-region `ninja sha1` PASS (eur / usa / jpn)**
 reproduced this session on the merged main — both PRs byte-correct.
-(Reminder: **~69 % *units*, ~11.6 % by *code bytes*; SHA1 is the
+(Reminder: **~69 % *units*, ~11.7 % by *code bytes*; SHA1 is the
 ship-count truth, not `complete_units`** — the report under-counts
 `.thumb.c` carves.)
+
+⚠️ **Tree breakage found this round (environmental, NOT from the PRs):**
+the default `ninja` target fails on every `.ctx.c` edge — the Mac's
+updated clang dropped `-fworking-directory` (tools/m2ctx.py:54; clang
+suggests `-working-directory`). `ninja sha1` / `objdiff` / `report` are
+unaffected (different paths). One-line fix queued in brief 406
+(scaffolder owns tools/). Until it lands: don't run bare `ninja` on
+macOS; build specific targets.
 
 **Overlay census (brief-401-corrected — count carves by ADDRESS):** ov002
 ~2556 uncarved (scaffolder), main 2677 (legacy/region-complex, parked).
@@ -39,34 +48,50 @@ direction).
 PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
 agents `.s`-converting reg-alloc walls at scale; Mac reconciled (#916/#917).
 
-🔻 **Permuter: 383-vs-401 tension → brief 403 settles it with a number.**
-Brief 383: 0-for-the-*catalogued* tiers (labels stale/mislabeled) — niche
-verdict. Brief 401 re-pick: feed it *freshly-harvested* 1-2-instr misses.
-Synthesis now queued (403): the permuter gets ONLY freshly-re-verified
-single-transform diffs (commutative-operand / peephole-split /
-const-materialisation — the 363 crack classes); reg-mirror, reg-pressure,
-CSE-of-base, scheduling-interleave route straight to `.s`. **m2c stays
-vendored** (clean-C accelerator). **Volume = `.s`; permuter hit-rate on
-fresh single-transform targets is 403's headline deliverable.**
+🔻 **Permuter: SETTLED (brief 403, the final word).** 0/2 on
+freshly-diagnosed overlay targets (plateaus ~8k/7k iters); combined
+fresh-target record 3/10 (363+403), all 3 on main. **Overlay endgame =
+`.s` + hand-levers; the permuter is a last-resort probe, not a lane.**
+The productive replacement is LEVER-TESTING on the fresh diff — both 403
+`.c` ships were one-recompile cracks (the new COMMUTATIVE-POOL-LOAD
+lever: first-evaluated operand's constant takes the pool slot, partner
+derived via barrel-shifter operand-2; + `volatile` ptr pins store
+order). **m2c stays vendored** (clean-C accelerator).
+
+🧰 **The binding endgame constraint = kind:data carves (→ brief 406).**
+Both `.s` lanes park on it: scaffolder 12 + decomper 5 + the C-walled
+dispatcher twins are `.s`-blocked on it too (~19 and growing). A
+data-section carve harness un-parks them all; asm_escape Thumb-gap fix
+is the stretch (un-parks the 3 ov004 Thumb reg-walls).
+
+🤖 **Model mix (Fable 5 / Opus 4.8) — posture landed in AGENTS.md
+§ Model notes:** Opus 4.8 is the calibration floor; Fable 5 gains are
+stretch-goal upside, never a brief's success bar (its cyber classifiers
+can silently fall a binary-reconstruction session back to 4.8
+mid-trajectory — expected behavior, note it, never evade). Verify-gate
+items 8 (cross-agent claims re-verified) + 9 (defects reported as
+defects, not "conventions") added from the Fable 5 card review. Effort
+discipline: think hard at diagnosis/routing, fast on grind. Subagent
+fan-out reserved for the understanding-bound hard tail (→ brief 405
+pilot).
 
 🪓 **The `.s` endgame (the volume lane).** main + ov002 reg-alloc walls are
 **proven non-C-recoverable** → bank them as whole-function `.s` toward
 100 % byte-completion. Decomper drained the overlay backlog (thinned) then
 joined ov002 lower-half; scaffolder did main + ov002 upper-half (8/wave).
-ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
-Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
+ov002 `.s` runway: ~62 clean upper ≤0x6c (~7 waves) + ~260 lower-half
+uncarved (future lane). Scaffolder `.s` total 136 (main 17, ov002 119).
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 403** = **diagnose-and-ROUTE wave 1 on the ARM overlay
-residue** (re-verify each diff against a FRESH `.o`; permuter ONLY for
-single-transform misses, time-boxed; `.s` via `asm_escape` for the rest;
-seeds across ov017/ov016/ov008/ov005/ov000; target ~10-16 ships + the
-hit-rate number; stay OFF ov002/`main`). **scaffolder → brief 404** =
-**ov002 `.s` upper-half wave 17** (SOLE owner of the ov002 delinks;
-`≤0x6c` band, ~72 clean → ~9 waves runway, parked set 10; `kind:data`
-drop rate 18→23→26→28 % — report step-up-vs-pivot if runway <~2 waves).
-Both queued; decomper-multi-overlay-residue / scaffolder-ov002 stays
-collision-free (different delinks files).
+**decomper → brief 405** = **RE-GIANT SWARM PILOT** (parallel-hypothesis
+analysis-only subagent fan-out on 2 understanding-bound walls — preferred
+ov004 Thumb giants `021dd374`/`021dd648` after a ship-path alignment
+check; deliverable = ships + a method verdict vs the patient-builder
+baseline; stop early on a clean negative). **scaffolder → brief 406** =
+**TOOLING: kind:data carve harness** (acceptance = ≥3 previously-parked
+funcs shipped byte-identical + negative test shown red; stretch =
+asm_escape Thumb-gap fix; + the one-line m2ctx clang fix). Both queued;
+swarm-on-ov004/ov000 vs tools/-and-ov002 stays collision-free.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
