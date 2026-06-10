@@ -253,4 +253,37 @@ extern char data_ov004_0220f228[];   /* f228 record array (stride 84)        */
  * Thumb cohort's EASY clean-C is effectively tapped.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 405 RE-giant swarm pilot (1 ship, 3-region sha1 OK).
+ * 021dd374 (0x210 flag-gated record serializer) SHIPPED byte-exact via the
+ * 3-hypothesis fan-out method (first compile, dcheck 216/216 + ov004 cmp).
+ *  - Sinks (all matched): 021dbe5c=memset(dst,(u8)v,n); 021dbe68=memcpy(dst,
+ *    src,n) (swaps to MI_CpuCopy); 021dbd08=strlen; 021dd350=validate_ascii
+ *    (32..127, nonzero=bad); 021dbd6c=bswap16; 021de250=alloc(n);
+ *    021de23c=free(p); 021dd590=set_error(code).
+ *  - Struct: data_02291d38/e68/f98 are a 3-elem array of a 0x130 Desc
+ *    {int len@4; char name@8; u8 block[4][0x40]@0x30/70/B0/F0}. The 4 are
+ *    reached by SEPARATE `ldr =sym` (NOT array-index) — declare 4 externs.
+ *  - CFG: 4 `if(*flags & bit)` sections; A/B copy-4-blocks THEN validate name;
+ *    C/D validate block(len-1) FIRST. strlen RE-CALLED (not cached) -> 2 bl
+ *    per section. r5==0 = early `return -1` (no cleanup); validation fails =
+ *    shared `goto fail` (021dbe5c(r5,0,340)).
+ *  - ⚠️ POOL GOTCHA reconfirmed: m2c_feed/m2c mis-resolved the 021dbe5c 3rd
+ *    arg (literal 0x154=340) as `&data_02291630` — passing the symbol PASSES
+ *    dcheck, FAILS sha1. Resolve literal pool words from objdump `-s`, not m2c.
+ *    Other literals: r5=arg0+0x117; sectionD dest r5+0x133; clear arg0[0x116]=0.
+ *
+ * §NEAR-MISS (P-405, parked — Thumb reg-numbering wall, no .s escape):
+ *  - 021dc664 (0x158 builder, richer sibling of byte-matched 021dc500): the
+ *    fan-out produced a 143/143 STRUCTURALLY-EXACT draft (correct sinks/types/
+ *    CFG/the {s8 f0; short f2,f4} stack struct + payload at (char*)&f4+2). It
+ *    does NOT ship: residual = a1<->(r5+24) callee-reg MIRROR (orig a1=r7,
+ *    r5+24=r6; mwcc flips it) cascading ~6 renames + a T1-vs-T2 `adds #2`
+ *    encoding on the sp+22 payload address. Both are pure codegen (the
+ *    reg-numbering wall, briefs 401/403) — C-unsteerable (tried inline/decl-
+ *    reorder/separate-buffer). Thumb has NO asm_escape `.s` route (brief 406
+ *    targets the fix). Draft preserved off-tree. Caller 021dc7bc passes 3
+ *    args -> sig int f(int a0_dead, void *a1, int a2). UN-PARK when 406 lands.
+ * ======================================================================= */
+
 #endif /* OV004_CORE_H */
