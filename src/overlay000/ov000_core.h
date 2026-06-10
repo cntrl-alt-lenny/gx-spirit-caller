@@ -155,4 +155,10 @@ extern struct Ov000Row data_ov000_021c7530[];
  *  - command-record builders: 021ad660/021ad8dc (0x27c clone pair, dual record
  *    + MMIO + packs), 021abd50, 021af5e0 — dedicated RE.                     */
 
+/* §VERIFIED — brief 403 route-w1: 021ac920 (the object-builder 2-byte near-
+ * miss above) re-diagnosed fresh = the entry param-save/first-load interleave
+ * (`ldr r3,[r6,#104]` scheduled between the `mov r6,r0` and `mov r5,r1` saves)
+ * — scheduling-interleave class, NOT const-mat → shipped whole-function .s
+ * (kind:data-clean, asm_escape byte-identical, link-proven, 3-region sha1). */
+
 #endif /* OV000_CORE_H */

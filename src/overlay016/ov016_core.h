@@ -118,4 +118,26 @@ extern char data_ov016_021b9720[];
  * PIVOT next wave; the residue is the wall class above (permuter/.s/loop endgame).
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 403 route-w1 (diagnose-and-route; 3-region sha1 OK).
+ * Shipped as whole-function .s (asm_escape, byte-identical + link-proven):
+ *  - 021b22d8 recursive quicksort. NOTE: asm_escape's pre-link word-compare
+ *    soft-FAILS on the two recursive self-`bl`s (reloc placeholder
+ *    0xebfffffe vs orig's resolved displacement) — benign; the link gate
+ *    (per-overlay bin cmp / ninja sha1) proves it. Pattern for any
+ *    self-calling .s escape.
+ *  - 021b5390 value-map; 021b6f08 + 021b32f0 MMIO-bitfield-shuffle
+ *    dispatchers (the catalogued inline-vs-outline + literal-reuse wall).
+ * PARKED (kind:data(any) refs — .s would Undefined-fail the link):
+ *  - 021b3174 (3rd MMIO-shuffle; refs data_ov016_021b9000/900a/9014).
+ * DEFERRED (permuter-resistant, no .s fallback — kind:data table ref):
+ *  - 021b2824 fn-ptr step dispatcher (twin of ov017 021b2c8c, instruction-
+ *    identical): after dispatch-order inversion (`if (fn != 0) {...}
+ *    return 1;` branches instead of predicating) and a `volatile` state ptr
+ *    (pins idx-store-then-zero-store source order), the residue is a PURE
+ *    3-reg rotation {base,zero,idx} orig {r0,r1,r2} vs mwcc {r2,r0,r1} —
+ *    the reg-numbering class the permuter measurably can't anneal
+ *    (900s/8k iters, score stuck 250; cf. brief 358's 02267f90 plateau).
+ * ======================================================================= */
+
 #endif /* OV016_CORE_H */

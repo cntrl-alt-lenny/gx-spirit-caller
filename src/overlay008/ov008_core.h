@@ -111,4 +111,29 @@ extern char data_ov008_021b2790[];
  *     interleaves the global-load between the two field-clears) after fixing
  *     popeq/beq + offset-fold + caching. Emblematic of the tier. */
 
+/* ====================================================================== *
+ *  §VERIFIED — brief 403 route-w1 (diagnose-and-route; 3-region sha1 OK). *
+ * ====================================================================== */
+/* Shipped:
+ *  - 021aa4a0 SWAR popcount: MATCHED as C — instruction-identical twin of
+ *    ov017 021b2280; the COMMUTATIVE-OPERAND-ORDER lever (HIGH-mask term
+ *    first in each `+` so mwcc pool-loads the high constant and derives
+ *    the low via `lsr` in operand-2). See ov017_core.h §brief-403.
+ *  - command-record packs 021aba3c/abb08/abba0 (20v20 reg-alloc, stable
+ *    across operand orders) + fixed-point 021ac430/ac4d0/af4c4 (signed-%8
+ *    ror idiom): shipped whole-function .s (kind:data-clean, asm_escape
+ *    byte-identical + link-proven).
+ * PARKED (kind:data(any) refs — .s would Undefined-fail the link):
+ *  - 021aafa4 (block-sched wall; refs data_ov008_021b2440 kind:data);
+ *  - 021b2268 guarded-setter (refs data_ov008_021b270c/275c kind:data).
+ * Byte-combine builders (peephole-split class): 021acfa0 PERMUTER-PROBED
+ * this wave (900s/~7k iters, base 1890 -> best 765, NO match) then shipped
+ * whole-function .s. The permuter DID find the peephole dodge direction —
+ * a variable shift amount (`b0 = 24; b0 = v << b0;`) survives where the
+ * literal dead-var (`b0 = v << 24;` then `b0 >> 24`) copy-propagates away
+ * — but the residual load-hoist/store-sink + r4-r6 spill cascade did not
+ * close. Siblings ac208/aceac/adbbc stay catalogued: same root cause;
+ * route them .s (all kind:data-clean) unless a longer/seeded permuter run
+ * is worth it. */
+
 #endif /* OV008_CORE_H */
