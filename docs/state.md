@@ -8,38 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-09 (Mac), post briefs **399 + 400** merge.
-**This round (2 PRs):** **#928** decomper ov004 Thumb-cohort drain wave 3
-(5 `.thumb.c` — the clean control-flow tier is now drained → **decomper
-pivots off Thumb at 401**); **#927** scaffolder ov002 `.s` upper-half wave
-15 (8 ships). 13 carves, all gate-verified. **Thumb cohort total = 54 funcs
-(harness + 3 waves); residue = builders + walls.**
+**Last updated:** 2026-06-10 (Mac), post briefs **401 + 402** merge.
+**This round (2 PRs + brain #932):** **#931** decomper fresh-overlay scout
+(**0 matched by design** — verdict: **no fresh easy clean-C overlay
+remains**; census fixes: count carves by `.text start:` ADDRESS not name
+regex → ov006 = 182 carved not 242; ov017 WAS tracked at brief 332; the
+ov017 calibration 4/4 = 1-2-instr reg-alloc/const-materialisation
+near-misses); **#930** scaffolder ov002 `.s` upper-half wave 16 (8 ships,
+all 0x58, enumeration widened to `≤0x6c`, scaffolder `.s` total 128).
+Doc: `docs/research/brief-401-fresh-overlay-scout.md`.
 
-**Current metrics (EUR — reconfigured at `a10d835` via `configure.py eur`,
+**Current metrics (EUR — reconfigured at `1f4e8f5` via `configure.py eur`,
 `ninja objdiff`+`report` regenerated this session, clean tree):**
-**`complete_units 3597 / 5196 (69.23 %)`**. `matched_functions 3634 / 9766`.
-**Code-byte tier 11.54 %** (`complete_code`). **3-region `ninja sha1` PASS
-(eur / usa / jpn)** reproduced this session on the merged main — both PRs
-byte-correct. ⚠️ **METRIC CAVEAT (recurring): the report under-counts
-`.thumb.c` carves** — per-unit delta +8 (≈ the 8 `.s`) for 13 ships; the 5
-Thumb carves are in delinks + built + linked (SHA1-proven). **SHA1 is the
-ship-count truth, not `complete_units`.** (Reminder: **~69 % *units*,
-~11.5 % by *code bytes*.**)
+**`complete_units 3605 / 5207 (69.23 %)`** (+8 = the 8 `.s`; scout shipped
+0). `matched_functions 3642 / 9766`. **Code-byte tier 11.57 %**
+(`complete_code`). **3-region `ninja sha1` PASS (eur / usa / jpn)**
+reproduced this session on the merged main — both PRs byte-correct.
+(Reminder: **~69 % *units*, ~11.6 % by *code bytes*; SHA1 is the
+ship-count truth, not `complete_units`** — the report under-counts
+`.thumb.c` carves.)
 
-**Overlay census (this session, `_dsd_gap` uncarved funcs):** ov002 2564
-(scaffolder), main 2677 (legacy/region-complex, parked), **ov006 171 /
-ov011 71 / ov008 65 / ov000 57 / ov010 46 / ov016 39 / ov005 32 / ov017 29
-(largest never-tracked)** — the decomper's 401 pivot-scout pool.
+**Overlay census (brief-401-corrected — count carves by ADDRESS):** ov002
+~2556 uncarved (scaffolder), main 2677 (legacy/region-complex, parked).
+Per-overlay residue is now **reg-alloc-finicky near-misses + detailed
+builders + jump-table/switch-tree walls everywhere** — no fresh easy
+clean-C tier anywhere (the brief-401 verdict that sets the 403 routing
+direction).
 
 **Prior (Windows session 2, briefs 366–392): ~24 PRs (#892–#915), THE
 PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
 agents `.s`-converting reg-alloc walls at scale; Mac reconciled (#916/#917).
 
-🔻 **Permuter = NICHE, not the primary lane (corrects last round).** Brief
-383: **0 shipped recoveries** over briefs 379/381/383 — the catalogued
-"commutative/peephole" tier was mislabeled; the genuine pure-commutative
-subset is tiny. The permuter stays a *precision* tool. **m2c was vendored**
-(a useful clean-C accelerator). **Volume now = `.s` + residual clean-C.**
+🔻 **Permuter: 383-vs-401 tension → brief 403 settles it with a number.**
+Brief 383: 0-for-the-*catalogued* tiers (labels stale/mislabeled) — niche
+verdict. Brief 401 re-pick: feed it *freshly-harvested* 1-2-instr misses.
+Synthesis now queued (403): the permuter gets ONLY freshly-re-verified
+single-transform diffs (commutative-operand / peephole-split /
+const-materialisation — the 363 crack classes); reg-mirror, reg-pressure,
+CSE-of-base, scheduling-interleave route straight to `.s`. **m2c stays
+vendored** (clean-C accelerator). **Volume = `.s`; permuter hit-rate on
+fresh single-transform targets is 403's headline deliverable.**
 
 🪓 **The `.s` endgame (the volume lane).** main + ov002 reg-alloc walls are
 **proven non-C-recoverable** → bank them as whole-function `.s` toward
@@ -49,14 +57,16 @@ ov002 `.s` runway is long (~260 lower + ~71 upper small-band uncarved).
 Collision (both on `ov002/delinks.txt`) managed via `tools/sort_delinks.py`.
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 401** = **PIVOT off the tapped Thumb cohort — scout +
-drain a fresh overlay's easy clean-C** (census pool above; best shots
-**ov006** missed-family re-sweep à la b364 + **ov017** fresh; pick ONE, own
-its delinks, stay OFF ov002/`main`). **scaffolder → brief 402** = continue
-**ov002 `.s` upper-half wave 16** (SOLE owner of the ov002 delinks; ~46
-shippable `≤0x60` left, ~5-6 waves; `kind:data` drop rate climbing — step
-to `0x60`+ if the band thins). Both queued; decomper-fresh-overlay /
-scaffolder-ov002 stays collision-free.
+**decomper → brief 403** = **diagnose-and-ROUTE wave 1 on the ARM overlay
+residue** (re-verify each diff against a FRESH `.o`; permuter ONLY for
+single-transform misses, time-boxed; `.s` via `asm_escape` for the rest;
+seeds across ov017/ov016/ov008/ov005/ov000; target ~10-16 ships + the
+hit-rate number; stay OFF ov002/`main`). **scaffolder → brief 404** =
+**ov002 `.s` upper-half wave 17** (SOLE owner of the ov002 delinks;
+`≤0x6c` band, ~72 clean → ~9 waves runway, parked set 10; `kind:data`
+drop rate 18→23→26→28 % — report step-up-vs-pivot if runway <~2 waves).
+Both queued; decomper-multi-overlay-residue / scaffolder-ov002 stays
+collision-free (different delinks files).
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
