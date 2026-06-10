@@ -97,4 +97,30 @@ extern char data_ov017_021b877c[];   /* render-job handle array [0/4/8]      */
  *  above + 021b2c8c for the Mac permuter.
  * ======================================================================= */
 
+/* =======================================================================
+ * §VERIFIED — brief 403 route-w1 (diagnose-and-route; 3-region sha1 OK).
+ *  - 021b2280 SWAR popcount: MATCHED as C via the COMMUTATIVE-OPERAND-ORDER
+ *    lever — write the HIGH-mask term FIRST in each `+`:
+ *        x = ((x & 0xaaaaaaaa) >> 1) + (x & 0x55555555);  (etc.)
+ *    mwcc pool-loads the constant of the FIRST-evaluated operand and
+ *    derives the other via the barrel shifter in operand-2 (`and rD, rX,
+ *    rM, lsr #1`); low-mask-first C made it load 0x5555… (the brief-401
+ *    "mask low-vs-high derive" miss). Last step stays shift-extract:
+ *    ((x << 16) >> 16) — 0xffff is not ARM-encodable, no and-reduce.
+ *    One recompile; no permuter needed. SAME C ships the instruction-
+ *    identical ov008 twin 021aa4a0.
+ *  - 021b33dc state-machine (switch-val r0<->r1) + 021b768c title-centre
+ *    (unfoldable pos+x add): shipped whole-function .s (kind:data-clean).
+ * PARKED (kind:data(any) ref blocks .s; C walled):
+ *  - 021b66a8 struct-init (extra r6/r7 spills + sub;cmp vs subs — reg-
+ *    pressure class; refs data_ov017_021b7ed0 kind:data).
+ * DEFERRED (permuter-resistant, no .s fallback — kind:data table ref):
+ *  - 021b2c8c fn-ptr step dispatcher (= ov016 021b2824, instruction-
+ *    identical twin): dispatch-order inversion + `volatile int *state`
+ *    (pins store order: idx then zero) reduce the diff to a PURE 3-reg
+ *    rotation {base,zero,idx} = orig {r0,r1,r2} vs mwcc {r2,r0,r1}.
+ *    Permuter 900s/8k iters plateaued at 250 (reg-numbering class, cf.
+ *    brief 358). Explicit z/t temps copy-propagate away; not C-steerable.
+ * ======================================================================= */
+
 #endif /* OV017_CORE_H */

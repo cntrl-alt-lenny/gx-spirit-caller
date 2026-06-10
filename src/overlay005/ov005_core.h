@@ -53,7 +53,10 @@ extern struct { int w0; unsigned chan : 3; } data_02104f4c;
  *    shared return-0.
  *  - node compare+mla: 021ab2e0.
  * Deferred near-miss: 021acfb0 indirect-dispatch (blx) — 24v26 post-blx block
- *   scheduling, same permuter class as ov008 021aafa4. */
+ *   scheduling, same permuter class as ov008 021aafa4.
+ *   [brief 403]: PARKED for the .s lane too — refs data_ov005_021b17e8
+ *   kind:data(any) (Undefined-fails the delink link); revisit if a data
+ *   carve for 021b17e8 lands. */
 
 /* ====================================================================== *
  *  §VERIFIED — co-drain wave 2 (brief 329). 7 .c, all EUR objdiff 100% +  *
