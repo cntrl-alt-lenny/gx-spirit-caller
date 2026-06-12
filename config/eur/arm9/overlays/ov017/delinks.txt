@@ -17,6 +17,10 @@ src/overlay017/func_ov017_021b2c48.c:
     complete
     .text start:0x021b2c48 end:0x021b2c8c
 
+src/overlay017/func_ov017_021b2c8c.s:
+    complete
+    .text start:0x021b2c8c end:0x021b2ce4
+
 
 src/overlay017/func_ov017_021b2ce4.c:
     complete
@@ -89,6 +93,10 @@ src/overlay017/func_ov017_021b63ec.c:
 src/overlay017/func_ov017_021b6610.s:
     complete
     .text start:0x021b6610 end:0x021b66a8
+
+src/overlay017/func_ov017_021b66a8.s:
+    complete
+    .text start:0x021b66a8 end:0x021b6774
 
 src/overlay017/ov017_stubs_b6804.c:
     complete
@@ -215,4 +223,3 @@ src/overlay017/data_ov017_021b8228.c:
 src/overlay017/bss/data_ov017_bss.s:
     complete
     .bss start:0x021b8520 end:0x021b8ac0
-
