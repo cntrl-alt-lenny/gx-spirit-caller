@@ -49,9 +49,13 @@ with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
     tmpFileName = tmp_file.name
 
     try:
+        # No -fworking-directory: it only affects linemarkers, which -P
+        # suppresses anyway, and Apple clang (macOS `gcc`) rejects the GCC
+        # spelling (brief 406). Relative include paths already resolve via
+        # cwd=root_dir.
         ctx: str = subprocess.check_output([
             'gcc',
-            '-E', '-P', '-fworking-directory', '-undef', '-dD',
+            '-E', '-P', '-undef', '-dD',
             *CXX_FLAGS,
             tmp_file.name,
         ], cwd=root_dir, encoding=args.encoding)

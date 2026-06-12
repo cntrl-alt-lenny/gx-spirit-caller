@@ -35,8 +35,15 @@ Pipeline (build-dependent, --version's build/ must exist):
 
 The decomper ships the emitted `.s` (this tool does not commit it).
 
+Both modes run the kind:data link PREFLIGHT first (brief 406): every
+kind:data load-target is classified A-aligned / B-gap (linkable) or
+C-absorbed / OFFSET / MISADDRESSED (REFUSE — the carve would Undefined-fail
+or silently mislink). `--classify-data` runs the preflight standalone for
+wave sweeps. See the section comment above classify_data_refs().
+
 The PURE helpers (parse_objdump / to_mwasm / hex_imm / classify_fixes /
-emit_asm) are unit-tested in tests/test_asm_escape.py with no build.
+emit_asm / classify_data_refs) are unit-tested in tests/test_asm_escape.py
+with no build.
 """
 from __future__ import annotations
 
@@ -105,13 +112,18 @@ def parse_objdump(text: str, func: str) -> list[dict]:
             break
         if not cur:
             continue
-        mi = re.match(r"^\s+([0-9a-f]+):\t([0-9a-f]{8})(?:\s+(.*))?$", line)
+        # ARM: one 8-hex word. Thumb: a 4-hex halfword, or a `xxxx yyyy`
+        # pair for 32-bit encodings (bl/blx) — normalise the pair to 8 hex
+        # (brief 406 stretch: the Thumb gap-object fix).
+        mi = re.match(r"^\s+([0-9a-f]+):\t([0-9a-f]{8}|[0-9a-f]{4} [0-9a-f]{4}"
+                      r"|[0-9a-f]{4})(?:\s+(.*))?$", line)
         if mi:
             mn = mi.group(3) or ""
             mn = re.sub(r"\s*[@;].*$", "", mn)      # drop objdump comments
             mn = re.sub(r"\s*<[^>]*>", "", mn)      # drop <symbol+0x..> annot
             mn = re.sub(r"\s+", " ", mn).strip()
-            out.append({"addr": int(mi.group(1), 16), "bytes": mi.group(2),
+            out.append({"addr": int(mi.group(1), 16),
+                        "bytes": mi.group(2).replace(" ", ""),
                         "mnem": mn, "reloc": None})
             continue
         rl = re.search(r"R_ARM_\S+\s+(\S+)", line)
@@ -169,6 +181,34 @@ def to_mwasm(mn: str) -> str:
     return mn
 
 
+# UAL flag-setting low-reg ops whose legacy-mwasm Thumb spelling drops the
+# `s` (the encoding always sets flags; mwasm rejects the UAL name) — probed
+# against mwasmarm 2.0/sp1p5 (brief 406 stretch).
+_THUMB_UNSUFFIX = {"movs", "adds", "subs", "lsls", "lsrs", "asrs", "rors",
+                   "ands", "orrs", "eors", "bics", "negs", "muls", "mvns",
+                   "adcs", "sbcs"}
+
+
+def to_mwasm_thumb(mn: str) -> str:
+    """objdump UAL Thumb -> mwasmarm legacy Thumb dialect (brief 406 stretch).
+
+    push/pop are native Thumb mnemonics (NO stmdb/ldmia conversion — that is
+    the ARM path's job); `.n`/`.w` width suffixes are objdump artifacts; the
+    flag-setting low-reg ALU names lose their UAL `s`."""
+    mn = re.sub(r"^(b[a-z]{0,2})\.n\b", r"\1", mn)       # beq.n -> beq, b.n -> b
+    mn = re.sub(r"^(\w+)\.w\b", r"\1", mn)
+    # reg-reg `movs rX, rY` is UAL sugar for the 0x0000-family encoding
+    # `lsls rX, rY, #0`; legacy `mov rX, rY` assembles to `adds rX, rY, #0`
+    # (0x1c00-family) — a byte mismatch. Emit the explicit shift form.
+    m = re.match(r"^movs (\w+), (r\d+)$", mn)
+    if m:
+        return f"lsl {m.group(1)}, {m.group(2)}, #0x0"
+    parts = mn.split(None, 1)
+    if parts and parts[0] in _THUMB_UNSUFFIX:
+        mn = parts[0][:-1] + ((" " + parts[1]) if len(parts) > 1 else "")
+    return mn
+
+
 def _operands(mnem: str) -> tuple[str, list[str]]:
     parts = mnem.split(None, 1)
     op = parts[0]
@@ -189,15 +229,17 @@ def is_commutative_swap(my_mn: str, orig_mn: str) -> bool:
     return oa[0] == ob[0] and oa[1:] != ob[1:] and sorted(oa[1:]) == sorted(ob[1:])
 
 
-def pool_addrs(instrs: list[dict]) -> set[int]:
+def pool_addrs(instrs: list[dict], thumb: bool = False) -> set[int]:
     """Addresses of literal-pool words = the targets of `ldr rX, [pc, #N]`.
     Robust across objdump renderings (orig delinked words decode as raw
-    data / ASCII, my mwasm words as `.word`); the ldr target is invariant."""
+    data / ASCII, my mwasm words as `.word`); the ldr target is invariant.
+    ARM pc-rel base = addr+8; Thumb = Align(addr+4, 4) (brief 406 stretch)."""
     pool = set()
     for w in instrs:
         m = re.search(r"\[pc, #(\d+)\]", w["mnem"])
         if m:
-            pool.add(w["addr"] + 8 + int(m.group(1)))
+            base = ((w["addr"] + 4) & ~3) if thumb else w["addr"] + 8
+            pool.add(base + int(m.group(1)))
     return pool
 
 
@@ -208,13 +250,13 @@ _BRANCH_RE = re.compile(
     r"^b(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)?(\.[wn])?\s+([0-9a-f]+)$")
 
 
-def branch_targets(instrs: list[dict]) -> set[int]:
+def branch_targets(instrs: list[dict], thumb: bool = False) -> set[int]:
     """Addresses targeted by INTERNAL branches (no reloc, target within the
     function). The whole-function `.s` mode emits a `.L_<addr>` label at each
     so mwasmarm can resolve the branch (objdump prints absolute hex targets).
     The canonicalisation class is straight-line, so this is empty there."""
     addrs = {w["addr"] for w in instrs}
-    pool = pool_addrs(instrs)
+    pool = pool_addrs(instrs, thumb)
     targets = set()
     for w in instrs:
         if w["reloc"] or w["addr"] in pool:   # skip relocs + literal-pool words
@@ -254,7 +296,7 @@ def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], lis
 
 
 def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
-             whole: bool = False) -> str:
+             whole: bool = False, thumb: bool = False) -> str:
     """Emit a byte-exact mwasmarm `.s` from the ORIGINAL instruction stream.
 
     Two modes share this emitter:
@@ -268,20 +310,25 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     Pool words become `.word` slots referenced by `_LITn`; internal branch
     targets get `.L_<addr>` labels; external calls (bl/b/blx + reloc) use the
     symbol."""
+    def _pc_base(addr: int) -> int:
+        return ((addr + 4) & ~3) if thumb else addr + 8
+
     lit: dict[int, str] = {}
     for w in orig:
         m = re.search(r"\[pc, #(\d+)\]", w["mnem"])
         if m:
-            lit[w["addr"] + 8 + int(m.group(1))] = ""
+            lit[_pc_base(w["addr"]) + int(m.group(1))] = ""
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
-    labels = {a: f".L_{a:x}" for a in branch_targets(orig)}
+    labels = {a: f".L_{a:x}" for a in branch_targets(orig, thumb)}
     externs = sorted({w["reloc"] for w in orig if w["reloc"]})
 
     if whole:
         head = [f"; {func} — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):",
                 "; the original disassembly emitted verbatim as a byte-exact mwasm TU.",
                 "; For reg-alloc-walled functions with no C match (brief 294 endgame)."]
+        if thumb:
+            head.append("; Thumb gap-object mode (brief 406 stretch).")
     else:
         head = [f"; {func} — .s escape hatch (brief 290): mwcc is byte-identical except",
                 "; the commutative add-operand order below (a CSE'd-temp wall, brief 288)."]
@@ -289,20 +336,23 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
     head += ["", "        .text"]
     head += [f"        .extern {e}" for e in externs]
-    head += [f"        .global {func}", "        .arm", f"{func}:"]
+    head += [f"        .global {func}", "        .thumb" if thumb else "        .arm",
+             f"{func}:"]
 
     body, pool = [], []
     for w in orig:
         if w["addr"] in lit:
             val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
+            if not pool and thumb:
+                pool.append("    .align 2")   # halfword stream may end unaligned
             pool.append(f"{lit[w['addr']]}: .word {val}")
             continue
         if w["addr"] in labels:
             body.append(f"{labels[w['addr']]}:")
-        mn = to_mwasm(w["mnem"])
+        mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
         pm = re.search(r"\[pc, #(\d+)\]", mn)
         if pm:
-            mn = re.sub(r"\[pc, #\d+\]", lit[w["addr"] + 8 + int(pm.group(1))], mn)
+            mn = re.sub(r"\[pc, #\d+\]", lit[_pc_base(w["addr"]) + int(pm.group(1))], mn)
         # internal branch (no reloc, target within func) -> local label
         ib = _BRANCH_RE.match(w["mnem"])
         if ib and not w["reloc"] and int(ib.group(3), 16) in labels:
@@ -313,6 +363,171 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             mn = f"{bm.group(1)}{bm.group(2)} {w['reloc']}"
         body.append("    " + hex_imm(mn))
     return "\n".join(head + body + pool) + "\n"
+
+
+# --------------------------------------------------- kind:data link preflight
+#
+# Brief 406. A carved `.s` TU references data by NAME (`.extern data_X` +
+# `.word data_X`), so the link needs a symbol named data_X. Three classes:
+#
+#   A-aligned   the address is covered by a carved data TU whose delinks range
+#               starts exactly at the symbol -> the TU defines the global ->
+#               links. (Cluster-era per-symbol carves, briefs 143-163.)
+#   B-gap       no carve covers it -> dsd delink emits the symbol as a GLOBAL
+#               in the module's data gap object -> links. (xMAP-verified.)
+#   C-absorbed  a carved range STARTS BEFORE the symbol: the address was
+#               absorbed into a bundle TU under the bundle-base name (e.g.
+#               `data_020ff920[16]` absorbing 0x020ff924, brief 155) and has
+#               NO linkable definition -> mwldarm `Undefined : "data_X"`
+#               (brief 361's func_020489c4). REFUSE before emitting.
+#
+# Two more REFUSE shapes the emitter would otherwise silently mangle:
+#   OFFSET        a pool word targeting symbol+N (interior word): emit_asm
+#                 strips the +N (parse_objdump drops reloc addend suffixes),
+#                 the byte-verify is reloc-modulo so it would pass, and the
+#                 corruption only surfaces at `ninja sha1`. Refuse up front.
+#   MISADDRESSED  a covering carve range whose start matches NO data symbol —
+#                 a mis-sized / mis-addressed data carve in delinks.txt.
+#                 That is a config defect; refuse and name the TU.
+#
+# `kind:bss` refs stay out of scope here: bss has no file bytes, the gap/lcf
+# path has always linked it (the .s waves' standing gate).
+
+def _module_config(version: str, func: str) -> Path:
+    """The config dir holding symbols/relocs/delinks for `func`'s module."""
+    m = re.match(r"func_ov(\d{3})_", func)
+    if m:
+        return ROOT / f"config/{version}/arm9/overlays/ov{m.group(1)}"
+    return ROOT / f"config/{version}/arm9"
+
+
+def classify_data_refs(symbols_text: str, relocs_text: str, delinks_text: str,
+                       func: str) -> list[dict]:
+    """PURE: classify every kind:data load-target of `func` for linkability.
+
+    Returns one dict per data ref: {sym, target, verdict, tu, note} with
+    verdict in {A-aligned, B-gap, C-absorbed, OFFSET, MISADDRESSED}.
+    Empty list = no kind:data refs (nothing to gate). bss refs are skipped.
+    """
+    import bisect
+
+    faddr = fsize = None
+    syms: list[tuple[int, str, str]] = []     # (addr, name, kind) — ALL kinds
+    for line in symbols_text.splitlines():
+        m = re.match(rf"{re.escape(func)} kind:function\(\w+,size=0x([0-9a-f]+)\)"
+                     r" addr:0x([0-9a-f]+)", line)
+        if m:
+            fsize, faddr = int(m.group(1), 16), int(m.group(2), 16)
+        m2 = re.match(r"(\S+) kind:(data\([^)]*\)|bss|function\([^)]*\)|label.*?)"
+                      r" .*?addr:0x([0-9a-f]+)", line)
+        if m2:
+            kind = "data" if m2.group(2).startswith("data(") else m2.group(2).split("(")[0]
+            syms.append((int(m2.group(3), 16), m2.group(1), kind))
+    if faddr is None:
+        return [{"sym": None, "target": None, "verdict": "MISADDRESSED",
+                 "tu": None, "note": f"{func} not in symbols.txt"}]
+    syms.sort()
+    saddrs = [a for a, _, _ in syms]
+    daddrs = {a for a, _, k in syms if k == "data"}
+
+    targets = []
+    for line in relocs_text.splitlines():
+        m = re.match(r"from:0x([0-9a-f]+) kind:load to:0x([0-9a-f]+)", line)
+        if m and faddr <= int(m.group(1), 16) < faddr + fsize:
+            targets.append(int(m.group(2), 16))
+
+    carves: list[tuple[int, int, str]] = []
+    cur = None
+    for line in delinks_text.splitlines():
+        s = line.strip()
+        if s.endswith(":") and (s.startswith("src/") or s.startswith("libs/")):
+            cur = s[:-1]
+        m = re.search(r"\.(?:data|rodata) start:0x([0-9a-f]+) end:0x([0-9a-f]+)", line)
+        if m:
+            carves.append((int(m.group(1), 16), int(m.group(2), 16), cur))
+
+    out = []
+    for t in sorted(set(targets)):
+        i = bisect.bisect_right(saddrs, t) - 1
+        if i < 0:
+            continue                      # below every symbol: unresolvable here
+        saddr, sname, skind = syms[i]
+        if skind != "data":
+            continue                      # bss/function/label target: not gated here
+        cov = next(((cs, ce, tu) for cs, ce, tu in carves if cs <= t < ce), None)
+        if cov is None:
+            v = {"verdict": "B-gap", "tu": None,
+                 "note": "no data carve covers it -> dsd gap object defines the "
+                         "symbol GLOBAL; .extern links"}
+        else:
+            cs, ce, tu = cov
+            if cs not in daddrs:
+                v = {"verdict": "MISADDRESSED", "tu": tu,
+                     "note": f"carve range 0x{cs:08x}..0x{ce:08x} starts at no "
+                             "data symbol — mis-sized/mis-addressed data carve"}
+            elif cs < saddr or (cs == saddr and t > saddr):
+                base = syms[bisect.bisect_right(saddrs, cs) - 1][1]
+                if cs < saddr:
+                    v = {"verdict": "C-absorbed", "tu": tu,
+                         "note": f"absorbed into bundle TU (base {base}); "
+                                 f"data_… has NO linkable definition -> mwldarm "
+                                 f"Undefined (brief 361 class)"}
+                else:
+                    v = {"verdict": "OFFSET", "tu": tu,
+                         "note": f"pool word targets {sname}+0x{t - saddr:x}; "
+                                 "emit_asm drops the addend -> silent corruption "
+                                 "caught only at sha1. Unsupported"}
+            elif cs == saddr == t:
+                v = {"verdict": "A-aligned", "tu": tu,
+                     "note": "symbol-aligned carved TU defines the global; "
+                             ".extern links"}
+            else:   # cs == saddr < t handled above; anything else is suspect
+                v = {"verdict": "MISADDRESSED", "tu": tu,
+                     "note": f"carve 0x{cs:08x}..0x{ce:08x} vs target "
+                             f"0x{t:08x}: unexpected geometry"}
+        out.append({"sym": sname, "target": t, **v})
+    return out
+
+
+def _gap_defines_data(version: str, sym: str) -> bool:
+    """Build-dependent confirmation for a B-gap verdict: some delinked gap .o
+    defines `sym` as a GLOBAL data/rodata symbol."""
+    import glob
+    defre = re.compile(rf"g\s+O\s+\.(?:data|rodata)\s+[0-9a-f]+\s+{re.escape(sym)}\b")
+    for o in sorted(glob.glob(str(ROOT / f"build/{version}/delinks/_dsd_gap@*.o"))):
+        if defre.search(_run([_OBJDUMP, "-t", o]).stdout):
+            return True
+    return False
+
+
+def preflight_data_refs(func: str, version: str, verify_gap: bool = True) -> int:
+    """Gate a carve on its kind:data refs. 0 = linkable (or none), 1 = REFUSE."""
+    cfg = _module_config(version, func)
+    try:
+        verdicts = classify_data_refs(
+            (cfg / "symbols.txt").read_text(encoding="utf-8"),
+            (cfg / "relocs.txt").read_text(encoding="utf-8"),
+            (cfg / "delinks.txt").read_text(encoding="utf-8"), func)
+    except FileNotFoundError as e:
+        print(f"error: preflight could not read module config: {e}", file=sys.stderr)
+        return 1
+    bad = False
+    for v in verdicts:
+        ok = v["verdict"] in ("A-aligned", "B-gap")
+        if v["verdict"] == "B-gap" and verify_gap and not _gap_defines_data(version, v["sym"]):
+            ok = False
+            v["note"] = ("classified B-gap but NO gap object defines the symbol "
+                         "— unlinkable (absorbed without a symbols.txt carve?)")
+        tag = "ok" if ok else "REFUSE"
+        tu = f" [{v['tu']}]" if v["tu"] else ""
+        print(f"  data-ref {v['sym']} @0x{v['target']:08x}: {v['verdict']} ({tag}){tu}")
+        print(f"      {v['note']}")
+        bad |= not ok
+    if bad:
+        print(f"{func}: ❌ kind:data preflight REFUSED — the carve would not "
+              f"link (or would mislink). Do not ship; see verdicts above.")
+        return 1
+    return 0
 
 
 # ------------------------------------------------------------- build-dependent
@@ -332,6 +547,18 @@ def disasm(obj: str) -> str:
     # vs the delinked orig (whose pool words are non-zero and print in full).
     # `-z` makes both sides render every word, so they parse symmetrically.
     return _run([_OBJDUMP, "-d", "-r", "-z", f"--architecture={ARCH}", p]).stdout
+
+
+def is_thumb(version: str, func: str) -> bool:
+    """True if symbols.txt marks `func` kind:function(thumb,…) (brief 406
+    stretch: the Thumb gap-object mode)."""
+    cfg = _module_config(version, func)
+    try:
+        text = (cfg / "symbols.txt").read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return False
+    return re.search(rf"^{re.escape(func)} kind:function\(thumb,", text,
+                     re.MULTILINE) is not None
 
 
 def gap_object(version: str, func: str) -> str | None:
@@ -392,6 +619,8 @@ def generate(func: str, c_file: str, version: str, out: str | None) -> int:
         print(f"error: {func} not found in build/{version}/delinks "
               f"(already matched, or run `ninja` first?)", file=sys.stderr)
         return 2
+    if preflight_data_refs(func, version):
+        return 1
 
     mine = parse_objdump(disasm(my_o), func)
     orig = parse_objdump(disasm(orig_obj), func)
@@ -436,12 +665,14 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
         print(f"error: {func} not found in build/{version}/delinks "
               f"(already matched, or run `ninja` first?)", file=sys.stderr)
         return 2
+    if preflight_data_refs(func, version):
+        return 1
     orig = parse_objdump(disasm(orig_obj), func)
     if not orig:
         print(f"error: {func} has no disassembly in {orig_obj}", file=sys.stderr)
         return 2
 
-    s = emit_asm(func, orig, whole=True)
+    s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func))
     out_path = out or str(tmp / f"{func}.s")
     Path(out_path).write_text(s, encoding="utf-8")
 
@@ -469,9 +700,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--c", default=None, help="byte-near C source (canonicalisation-fix mode)")
     ap.add_argument("--whole-function", action="store_true",
                     help="emit the whole original function as a byte-exact .s (no C)")
+    ap.add_argument("--classify-data", action="store_true",
+                    help="kind:data link preflight only (brief 406): print per-ref "
+                         "A-aligned/B-gap/C-absorbed/OFFSET/MISADDRESSED verdicts, "
+                         "no .s emitted; exit 1 on any unlinkable ref")
     ap.add_argument("--version", default="eur")
     ap.add_argument("--out", default=None, help="output .s path (default: build/_asm_escape/)")
     args = ap.parse_args(argv)
+    if args.classify_data:
+        rc = preflight_data_refs(args.function, args.version)
+        if rc == 0:
+            print(f"{args.function}: ✅ kind:data preflight clean — carve will link")
+        return rc
     if args.whole_function:
         return generate_whole(args.function, args.version, args.out)
     if not args.c:
