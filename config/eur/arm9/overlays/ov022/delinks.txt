@@ -4,6 +4,22 @@
     .data       start:0x021ab9a0 end:0x021abaa0 kind:data align:32
     .bss        start:0x021abaa0 end:0x021acc40 kind:bss align:32
 
+src/overlay022/func_ov022_021aa680.s:
+    complete
+    .text start:0x021aa680 end:0x021aa6e0
+
+src/overlay022/func_ov022_021aa6e0.s:
+    complete
+    .text start:0x021aa6e0 end:0x021aa758
+
+src/overlay022/func_ov022_021ab3f0.s:
+    complete
+    .text start:0x021ab3f0 end:0x021ab460
+
+src/overlay022/func_ov022_021ab460.s:
+    complete
+    .text start:0x021ab460 end:0x021ab4b0
+
 src/overlay022/data_ov022_021ab8a8.c:
     complete
     .rodata start:0x021ab8a8 end:0x021ab8e4
