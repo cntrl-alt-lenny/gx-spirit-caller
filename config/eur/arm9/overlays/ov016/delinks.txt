@@ -25,6 +25,10 @@ src/overlay016/func_ov016_021b27cc.c:
     complete
     .text start:0x021b27cc end:0x021b2824
 
+src/overlay016/func_ov016_021b2824.s:
+    complete
+    .text start:0x021b2824 end:0x021b287c
+
 src/overlay016/func_ov016_021b287c.s:
     complete
     .text start:0x021b287c end:0x021b28f4
@@ -54,6 +58,10 @@ src/overlay016/func_ov016_021b2cf4.c:
 src/overlay016/func_ov016_021b2d4c.s:
     complete
     .text start:0x021b2d4c end:0x021b2f6c
+
+src/overlay016/func_ov016_021b3174.s:
+    complete
+    .text start:0x021b3174 end:0x021b32f0
 
 src/overlay016/func_ov016_021b32f0.s:
     complete
@@ -290,4 +298,3 @@ src/overlay016/data_ov016_021b940c.c:
 src/overlay016/bss/data_ov016_bss.s:
     complete
     .bss start:0x021b9740 end:0x021bb4c0
-
