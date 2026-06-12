@@ -9,8 +9,7 @@ end-to-end + a mechanism/limits doc + a negative test shown red (Verify gate
 item 7). Stretch: the asm_escape Thumb-gap-object fix. Plus the `m2ctx.py`
 macOS clang flag one-liner.
 
-## Headline — the wall was 5 % real: ALL 12 ov002 parked funcs shipped, the
-## harness is a 5-verdict link preflight, and the Thumb stretch landed 3/3
+## Headline — the wall was 5 % real: ALL 12 ov002 parked funcs shipped, the harness is a 5-verdict link preflight, and the Thumb stretch landed 3/3
 
 The study phase **falsified the blanket park rule**. "Any `kind:data` ref
 `Undefined`-fails the link" (briefs 361/364, applied to ~19 parked funcs) is
