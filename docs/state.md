@@ -8,8 +8,37 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-14 (Mac), post briefs **405–411** merge.
-**This round (7 PRs):
+**Last updated:** 2026-06-14 (Mac, brain on Opus 4.8), post briefs
+**412+413** merge. **This round (2 PRs, all agents on Sonnet 4.6 Max):**
+- **#944** scaffolder ov002 `.s` wave 21 (brief 412): **20 ships** (12
+  lower-pool — band exhausted at ≤0x6c — + 8 upper-half 0x58); found an
+  enumeration bug (false-candidate pool 190→127). `.s` total ≈196.
+- **#945** decomper thin-overlay sweep (brief 413): **290 ships** across
+  12 overlays; found+fixed an ov011/delinks.txt parse bug; documented
+  asm-fail triage (~13 not-shipped → seed brief 415). **This TAPPED the
+  mechanical overlay sweep.**
+
+**Total: 310 ships this round.** 3-region `ninja sha1` PASS reproduced on
+the integration tree + EUR re-confirmed on merged main.
+
+🤖 **MODEL-MIX DECISION (2026-06-14, grounded — see AGENTS.md § Model
+notes → Per-role recommendation).** This round ran entirely on **Sonnet
+4.6 Max** (brain + both agents) → 310 clean ships, gate green, agents
+found+fixed 2 real bugs. With the deterministic gate, a weaker model
+ships *fewer* answers, never *wrong* ones. Cost: Opus 4.8 = ~1.67×
+Sonnet 4.6 (not ~5×) → low-stakes, pick by capability-fit. **Decision:
+scaffolder→Sonnet (permanent); decomper→Sonnet for sweeps / Opus 4.8 for
+RE rounds; brain→Opus 4.8 (cheap insurance on the judgment seat);
+Fable 5→skip on RE lanes (classifier fallback negates it).**
+
+📊 **Uncarved-function census (fresh, this round):** main **2678**
+(parked/legacy), ov002 **2490** (scaffolder's lane — huge runway),
+**557 everything else** (ov004 162 = richest hard residue, then ov006 72
+/ ov000 56 / ov008 54 / ov010 46 / …). The mechanical `.s` overlay sweep
+is **tapped** outside ov002 → decomper pivots to the ov004 hard residue
+(brief 415).
+
+**Prior round (briefs 405–411, 7 PRs, 68 ships):**
 - #937** decomper RE-giant swarm pilot (brief 405): **1 ship** (ov004
   `021dd374` Thumb, first-compile byte-exact); P-405 `021dc664` = 143/143
   structural near-miss; **METHOD VERDICT: fan-out = comprehension tool, not
@@ -29,15 +58,14 @@ log --oneline -20` and the open-PR list fill in whatever this misses.
 - **#942** scaffolder ov002 `.s` lower-pool wave 20 (brief 411): **12 ships**
   (sizes 0x2c–0x6c, lower address band — confirms lower pool is productive).
 
-**Total: 68 ships this round.**
+**(Prior round total: 68 ships.)**
 
 **Current metrics (EUR — `configure.py eur`, `ninja objdiff`+`report`
 regenerated 2026-06-14 on merged main, 3-region sha1 PASS this session):**
-**`complete_units 3696 / 5309 (69.62 %)`** (+67 vs prior 3629/5236; +73
-total units from new overlay TUs). `matched_functions 3733 / 9765`.
-**Code-byte tier 11.32 %** (denominator grew with newly-covered overlay TUs;
-`complete_units` remains the headline). **3-region `ninja sha1` PASS
-(eur / usa / jpn)** reproduced on the fully-merged main this session.
+**`complete_units 4006 / 5491 (72.96 %)`** (+310 = exactly the 310 ships;
++182 total units from new overlay TUs — crossed 70%). `matched_functions
+4040 / 9765`. **3-region `ninja sha1` PASS (eur / usa / jpn)** reproduced
+on the fully-merged main this session.
 Note: Thumb `.s` ships under-count in `complete_units` (metric-canon gotcha);
 SHA1 is the ship-count truth.
 

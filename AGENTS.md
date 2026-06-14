@@ -498,6 +498,38 @@ not depend on which. Standing posture:
   Analysis-only subagents; the lead serialises all builds (parallel
   `ninja` in one checkout collides).
 
+#### Per-role model recommendation (decided 2026-06-14, grounded)
+
+The deterministic 3-region `ninja sha1` gate means **a weaker model
+cannot ship a wrong answer — only fewer answers** (more skips/retries).
+Model choice on the mechanical lanes therefore trades *throughput*, not
+*correctness*. Evidence: briefs 412+413 ran **entirely on Sonnet 4.6
+Max** (brain + both agents) → **310 byte-identical ships, 3-region gate
+green, agents independently found+fixed 2 real bugs** (ov011 delinks
+parse bug; correct asm-fail triage). Cost fact: Opus 4.8 ($5/$25 per
+Mtok) is only **~1.67× Sonnet 4.6** ($3/$15), not the historical ~5× —
+so the gap is low-stakes; pick by capability-fit, not cost.
+
+- **Scaffolder → Sonnet 4.6 Max** (permanent). Pure mechanical,
+  gate-protected `.s` grind; `asm_escape` commoditised it. No measurable
+  Opus benefit. (If pushing cost further: the pure grind is the one
+  place Haiku 4.5 *could* be piloted — but pilot it, don't assume it;
+  Haiku is 200K-context, and these are long multi-wave sessions.)
+- **Decomper → Sonnet 4.6 Max for mechanical/sweep rounds; Opus 4.8 Max
+  for understanding-bound RE rounds** (the brief-405/415 giant-
+  reconstruction profile). Tag each decomper brief with the model.
+- **Brain → Opus 4.8 Max** (the one retained premium). Cheapest seat to
+  keep on Opus (one session, low token volume vs. the grind) and the
+  highest-leverage for judgment (routing, cross-agent claim re-verify,
+  merge gating) — the long-context regime where the cards' diligence
+  edge matters most. **Insurance, not necessity**: brain-on-Sonnet ran
+  clean this round; the gate catches anything load-bearing.
+- **Fable 5: skip for the decomp RE lanes.** Its cyber-classifier
+  fallback (above) silently drops binary-reconstruction trajectories to
+  4.8 anyway, so its 2× (vs 4.8) / 3.3× (vs Sonnet) premium buys nothing
+  on RE turns. Marginal for the brain (no RE surface, but a low-volume
+  seat — only if max judgment matters and cost is no object).
+
 ## Adding or retiring agents
 
 cntrl_alt_lenny says, in plain English, something like:
@@ -626,34 +658,63 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
   work + your own ov002 delinks for the acceptance ships. Brain runs
   3-region on merge. **Collision-free** (decomper on ov004/ov000, off
   ov002). Branch: `scaffolder/kind-data-harness`.
-- **Brief 412** — `scaffolder`. **ov002 `.s` wave 21 — continue the
-  whole-function `.s` lane from latest `main` (post wave 20 / PR #942).
-  Use `asm_escape --classify-data --version eur` preflight on every
-  candidate; park only on `REFUSE` verdicts (none expected in clean
-  band). Sweep both the upper-half ≤0x6c tier AND the lower-pool band
-  (wave 20 proved the lower pool productive — addresses from `021a…`
-  through `021b…` in the ≤0x6c window). Target ~8–12 ships. EUR
-  `ninja sha1` per-pick; delinks sorted after each addition; carve-size
-  / zero-overlap audit per batch. Brain runs 3-region on merge. Stay
-  off any overlay the decomper touched (ov004/005/008/016/017/018/020/
-  021/022/023/012/013). Branch: `scaffolder/ov002-s-21`.**
-- **Brief 413** — `decomper`. **Thin-overlay sweep expansion — continue
-  the `asm_escape --whole-function` pass across un-exhausted overlays.**
-  Seed from the 3 optional extras deferred in PR #943:
-  `ov008/021b2200`, `ov012/021cc01c`, `ov013/021cb700` — try these
-  first (classify-data preflight → whole-function → EUR sha1 per pick).
-  Then sweep remaining overlays not yet covered in the tail-escape pass:
-  ov001, ov003, ov006 residue, ov007, ov009, ov011 residue, ov012,
-  ov013, ov014, ov015, ov019 (and any others with uncarved `.text`
-  symbols). Per overlay: (1) list uncarved `.text` symbols from
-  `config/eur/arm9/overlays/ovXXX/symbols.txt`; (2) `asm_escape
-  --classify-data --version eur` preflight; (3) `asm_escape
-  --whole-function` on clean candidates; (4) delinks + sort + overlap
-  audit. Run all-3-region sha1 on the final tree before the PR. Stay
-  off ov002 (scaffolder). Branch: `decomper/overlay-sweep-2`.**
+- **Brief 414** — `scaffolder` (recommended model: **Sonnet 4.6 Max** —
+  pure mechanical gate-protected grind). **ov002 `.s` wave 22 — continue
+  the whole-function `.s` lane from latest `main` (post wave 21 / PR
+  #944).** Runway is enormous: **2490 ov002 functions still uncarved**
+  (most above the easy ≤0x6c band, but that band still has the wave-21
+  leftovers + the next size tier). `asm_escape --classify-data --version
+  eur` preflight every candidate; park only on `REFUSE`. Sweep upper-half
+  ≤0x6c first, then the lower pool, then begin probing the next size tier
+  (0x70–0x90) — report where byte-identity starts breaking (that's the
+  asm_escape capability edge). Target ~12–20 ships. EUR `ninja sha1`
+  per-pick; sort delinks; carve-size / zero-overlap audit. Brain runs
+  3-region on merge. Stay off every non-ov002 overlay. Branch:
+  `scaffolder/ov002-s-22`.
+- **Brief 415** — `decomper` (recommended model: **Opus 4.8 Max** — this
+  is the understanding-bound hard tier where the higher ceiling earns its
+  ~1.67× cost). **PIVOT: the mechanical overlay `.s` sweep is TAPPED.**
+  Post-PR-#945, only **557 functions remain uncarved outside ov002/main**,
+  and they are the *hard residue* the sweep deliberately skipped. **ov004
+  is the richest target: 162 uncarved** (its RE giants, Thumb reg-walls,
+  and the asm-fail cases). This round is **diagnose-and-drain on ov004**:
+  (1) Characterise the 162 into buckets — (a) RE-giant / matched-C
+  (genuine decomp; use the brief-405 LEANER protocol: lead draft + ONE
+  adversarial "falsify + find the sibling/caller" agent, not 3 from
+  scratch), (b) reg-alloc walls that are `.s`-carveable today, (c)
+  asm-fail / tooling-blocked (ldr-pool-out-of-range needs multi-pool;
+  `bl fffe…` DTCM/ITCM needs symbol resolution; non-4-aligned Thumb).
+  (2) Ship everything in buckets (a) and (b). (3) Report the bucket (c)
+  count + shape as a candidate **scaffolder tooling brief** (asm_escape
+  multi-pool + DTCM/ITCM-symbol + Thumb-non-4-aligned would unlock the
+  rest). ⚠️ ov004 pool-constant gotcha: a wrong pool word passes dcheck,
+  fails sha1 — `cmp build/<v>/build/arm9_ov004.bin
+  extract/<v>/arm9_overlays/ov004.bin`. Gate = 3-region `ninja sha1`.
+  Stay off ov002 and `main`. Branch: `decomper/ov004-hard-residue`.
 
 ### Closed briefs (reference)
 
+- **Brief 412** — `scaffolder`, shipped in PR #944. ✅ **ov002 `.s` wave
+  21 — 20 ships** (12 lower-pool, band exhausted at ≤0x6c + 8 upper-half
+  0x58). All byte-identical first attempt; 0 kind:data REFUSEs. Found an
+  **enumeration bug**: prior waves searched `func_ov002_*` in delinks but
+  some early carves used the `ov002_*.c` naming (no `func_` prefix) —
+  fixed to address-range overlap, false-candidate pool 190→127.
+  Scaffolder `.s` total ≈196. Ran entirely on **Sonnet 4.6 Max**.
+  3-region gate reproduced on merge.
+- **Brief 413** — `decomper`, shipped in PR #945. ✅ **Thin-overlay sweep
+  — 290 ships across 12 overlays** (ov001/003/006/007/008/009/011/012/
+  013/014/015/019; ov006:99, ov011:71 the largest). All byte-identical;
+  ran 3-region sha1 on-branch. Found+fixed an **ov011/delinks.txt parse
+  bug** (missing newline concatenated a `.bss` end-address with the next
+  filename). Documented asm-fail triage (NOT shipped): ldr-pool-out-of-
+  range (2 large funcs), `bl fffe…` DTCM/ITCM (5 ov012 + 5 ov013),
+  1 unknown-shape — these seed brief 415's bucket (c). **This sweep
+  TAPPED the mechanical overlay vein: only 557 funcs remain uncarved
+  outside ov002(2490)/main(2678), and they're the hard residue.** Ran
+  entirely on **Sonnet 4.6 Max** — the decisive data point for the
+  model-mix decision (see § Model notes → Per-role recommendation).
+  3-region gate reproduced on merge.
 - **Brief 403** — `decomper`, shipped in PR #935. ✅ **Diagnose-and-route
   wave 1 — 16 ships (2 matched `.c` + 14 `.s`), 3-region sha1 PASS
   reproduced on merge. PERMUTER QUESTION SETTLED: 0/2 on
