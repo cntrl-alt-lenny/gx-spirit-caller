@@ -8,34 +8,41 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-10 (Mac), post briefs **403 + 404** merge.
-**This round (2 PRs + brain doc-PR):** **#935** decomper diagnose-and-route
-wave 1 (**16 ships** = 2 lever-cracked `.c` + 14 `.s` across
-ov000/008/016/017; **PERMUTER SETTLED: 0/2 fresh, demoted to last-resort
-probe**; commutative-POOL-LOAD lever cracked the "unsteerable" popcount
-twins; 5 more parked on kind:data); **#934** scaffolder ov002 `.s` wave 17
-(8 ships; **the w13-16 drop-rate climb was a WINDOWING ARTIFACT** — full-band
-sweep = 15 % pool-wide; runway ~62 clean/~7 waves; `.s` total 136). Both
-research-index conflicts resolved by regenerating
-(`tools/generate_research_index.py`).
+**Last updated:** 2026-06-14 (Mac), post briefs **405–411** merge.
+**This round (7 PRs):
+- #937** decomper RE-giant swarm pilot (brief 405): **1 ship** (ov004
+  `021dd374` Thumb, first-compile byte-exact); P-405 `021dc664` = 143/143
+  structural near-miss; **METHOD VERDICT: fan-out = comprehension tool, not
+  volume lane** (leaner protocol recommended: lead draft + 1 adversarial
+  agent).
+- **#938** scaffolder kind:data harness (brief 406): **BINDING CONSTRAINT
+  DISSOLVED** — A-aligned + B-gap link today; `asm_escape` classify-data
+  5-verdict preflight wired in; **12 parked ov002 funcs shipped**; Thumb
+  gap-object parser fix; m2ctx.py clang fix.
+- **#941** decomper kind:data + Thumb unpark wave (brief 407): **11 ships**
+  (5 kind:data parks + 2 dispatcher twins + 3 Thumb `.s` + 1 P-405 stretch),
+  all-3-region sha1 OK in PR.
+- **#939** scaffolder ov002 `.s` wave 18 (brief 408): **8 ships** (0x5c–0x60).
+- **#943** decomper thin-overlay sweep (brief 409): **16 ships** across
+  ov018/020/021/022/023; 3 optional extras seeded to brief 413.
+- **#940** scaffolder ov002 `.s` wave 19 (brief 410): **8 ships** (0x60).
+- **#942** scaffolder ov002 `.s` lower-pool wave 20 (brief 411): **12 ships**
+  (sizes 0x2c–0x6c, lower address band — confirms lower pool is productive).
 
-**Current metrics (EUR — reconfigured at `1e9460e` via `configure.py eur`,
-`ninja objdiff`+`report` regenerated this session, clean tree):**
-**`complete_units 3629 / 5236 (69.31 %)`** (+24 = exactly the 24 ships).
-`matched_functions 3666 / 9766`. **Code-byte tier 11.73 %**
-(`complete_code`). **3-region `ninja sha1` PASS (eur / usa / jpn)**
-reproduced this session on the merged main — both PRs byte-correct.
-(Reminder: **~69 % *units*, ~11.7 % by *code bytes*; SHA1 is the
-ship-count truth, not `complete_units`** — the report under-counts
-`.thumb.c` carves.)
+**Total: 68 ships this round.**
 
-⚠️ **Tree breakage found this round (environmental, NOT from the PRs):**
-the default `ninja` target fails on every `.ctx.c` edge — the Mac's
-updated clang dropped `-fworking-directory` (tools/m2ctx.py:54; clang
-suggests `-working-directory`). `ninja sha1` / `objdiff` / `report` are
-unaffected (different paths). One-line fix queued in brief 406
-(scaffolder owns tools/). Until it lands: don't run bare `ninja` on
-macOS; build specific targets.
+**Current metrics (EUR — `configure.py eur`, `ninja objdiff`+`report`
+regenerated 2026-06-14 on merged main, 3-region sha1 PASS this session):**
+**`complete_units 3696 / 5309 (69.62 %)`** (+67 vs prior 3629/5236; +73
+total units from new overlay TUs). `matched_functions 3733 / 9765`.
+**Code-byte tier 11.32 %** (denominator grew with newly-covered overlay TUs;
+`complete_units` remains the headline). **3-region `ninja sha1` PASS
+(eur / usa / jpn)** reproduced on the fully-merged main this session.
+Note: Thumb `.s` ships under-count in `complete_units` (metric-canon gotcha);
+SHA1 is the ship-count truth.
+
+Previously: *tree breakage from `m2ctx.py -fworking-directory`* — **FIXED in
+brief 406 / PR #938.** `ninja sha1` / `objdiff` / `report` all run clean.
 
 **Overlay census (brief-401-corrected — count carves by ADDRESS):** ov002
 ~2556 uncarved (scaffolder), main 2677 (legacy/region-complex, parked).
@@ -58,40 +65,32 @@ lever: first-evaluated operand's constant takes the pool slot, partner
 derived via barrel-shifter operand-2; + `volatile` ptr pins store
 order). **m2c stays vendored** (clean-C accelerator).
 
-🧰 **The binding endgame constraint = kind:data carves (→ brief 406).**
-Both `.s` lanes park on it: scaffolder 12 + decomper 5 + the C-walled
-dispatcher twins are `.s`-blocked on it too (~19 and growing). A
-data-section carve harness un-parks them all; asm_escape Thumb-gap fix
-is the stretch (un-parks the 3 ov004 Thumb reg-walls).
+🧰 **kind:data constraint DISSOLVED (brief 406).** The binding wall was
+5% real: A-aligned + B-gap both link today; only C-absorbed (no named def)
+Undefined-fails. `asm_escape` now preflights every carve (5 verdicts). All
+~19 previously-parked funcs classified A or B → shipped in briefs 406–407.
+The dispatcher twins and ov004 Thumb reg-walls also unparked (B-gap +
+Thumb-gap parser fix). **No new kind:data backlog.** Park rule going forward:
+park on REFUSE, not on kind:data presence.
 
-🤖 **Model mix (Fable 5 / Opus 4.8) — posture landed in AGENTS.md
-§ Model notes:** Opus 4.8 is the calibration floor; Fable 5 gains are
-stretch-goal upside, never a brief's success bar (its cyber classifiers
-can silently fall a binary-reconstruction session back to 4.8
-mid-trajectory — expected behavior, note it, never evade). Verify-gate
-items 8 (cross-agent claims re-verified) + 9 (defects reported as
-defects, not "conventions") added from the Fable 5 card review. Effort
-discipline: think hard at diagnosis/routing, fast on grind. Subagent
-fan-out reserved for the understanding-bound hard tail (→ brief 405
-pilot).
+🤖 **Model mix (Fable 5 / Opus 4.8) — posture in AGENTS.md § Model notes:**
+4.8 = calibration floor; Fable 5 gains = stretch upside; classifier fallback
+= expected behavior (note, never evade). Swarm fan-out verdict (brief 405):
+use for comprehension-bound giants + a leaner protocol (lead draft + 1
+adversarial agent), not as a volume lane.
 
-🪓 **The `.s` endgame (the volume lane).** main + ov002 reg-alloc walls are
-**proven non-C-recoverable** → bank them as whole-function `.s` toward
-100 % byte-completion. Decomper drained the overlay backlog (thinned) then
-joined ov002 lower-half; scaffolder did main + ov002 upper-half (8/wave).
-ov002 `.s` runway: ~62 clean upper ≤0x6c (~7 waves) + ~260 lower-half
-uncarved (future lane). Scaffolder `.s` total 136 (main 17, ov002 119).
+🪓 **The `.s` endgame (the volume lane).** Scaffolder: ov002 upper + lower pool
+at ~8–12/wave. Through brief 411 (PR #942): **scaffolder `.s` total ~176**
+(main 17 + ov002 ~159; running both halves now). Decomper: expanding thin-overlay
+sweep (ov018/020/021/022/023 tapped in brief 409; ov008/012/013 seeded for brief
+413). **Brief 412 = scaffolder ov002 wave 21; brief 413 = decomper overlay-sweep-2.**
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 405** = **RE-GIANT SWARM PILOT** (parallel-hypothesis
-analysis-only subagent fan-out on 2 understanding-bound walls — preferred
-ov004 Thumb giants `021dd374`/`021dd648` after a ship-path alignment
-check; deliverable = ships + a method verdict vs the patient-builder
-baseline; stop early on a clean negative). **scaffolder → brief 406** =
-**TOOLING: kind:data carve harness** (acceptance = ≥3 previously-parked
-funcs shipped byte-identical + negative test shown red; stretch =
-asm_escape Thumb-gap fix; + the one-line m2ctx clang fix). Both queued;
-swarm-on-ov004/ov000 vs tools/-and-ov002 stays collision-free.
+**decomper → brief 413** = thin-overlay sweep expansion (optional extras from
+#943 + un-touched overlays ov001/003/006-residue/007/009/011-residue/012/013/
+014/015/019). **scaffolder → brief 412** = ov002 `.s` wave 21 (upper-half
+≤0x6c + lower-pool band; ~8–12 target). Collision-free: scaffolder owns ov002;
+decomper on all others.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it

@@ -626,6 +626,31 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
   work + your own ov002 delinks for the acceptance ships. Brain runs
   3-region on merge. **Collision-free** (decomper on ov004/ov000, off
   ov002). Branch: `scaffolder/kind-data-harness`.
+- **Brief 412** — `scaffolder`. **ov002 `.s` wave 21 — continue the
+  whole-function `.s` lane from latest `main` (post wave 20 / PR #942).
+  Use `asm_escape --classify-data --version eur` preflight on every
+  candidate; park only on `REFUSE` verdicts (none expected in clean
+  band). Sweep both the upper-half ≤0x6c tier AND the lower-pool band
+  (wave 20 proved the lower pool productive — addresses from `021a…`
+  through `021b…` in the ≤0x6c window). Target ~8–12 ships. EUR
+  `ninja sha1` per-pick; delinks sorted after each addition; carve-size
+  / zero-overlap audit per batch. Brain runs 3-region on merge. Stay
+  off any overlay the decomper touched (ov004/005/008/016/017/018/020/
+  021/022/023/012/013). Branch: `scaffolder/ov002-s-21`.**
+- **Brief 413** — `decomper`. **Thin-overlay sweep expansion — continue
+  the `asm_escape --whole-function` pass across un-exhausted overlays.**
+  Seed from the 3 optional extras deferred in PR #943:
+  `ov008/021b2200`, `ov012/021cc01c`, `ov013/021cb700` — try these
+  first (classify-data preflight → whole-function → EUR sha1 per pick).
+  Then sweep remaining overlays not yet covered in the tail-escape pass:
+  ov001, ov003, ov006 residue, ov007, ov009, ov011 residue, ov012,
+  ov013, ov014, ov015, ov019 (and any others with uncarved `.text`
+  symbols). Per overlay: (1) list uncarved `.text` symbols from
+  `config/eur/arm9/overlays/ovXXX/symbols.txt`; (2) `asm_escape
+  --classify-data --version eur` preflight; (3) `asm_escape
+  --whole-function` on clean candidates; (4) delinks + sort + overlap
+  audit. Run all-3-region sha1 on the final tree before the PR. Stay
+  off ov002 (scaffolder). Branch: `decomper/overlay-sweep-2`.**
 
 ### Closed briefs (reference)
 
@@ -662,6 +687,77 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
   `022926f8`→`func_0202e258`) are link-clean — only `kind:data(any)`
   trips the gate. Carve 273 → 281, 0 overlaps. Scaffolder `.s` total:
   **136** (main 17, ov002 119).
+- **Brief 405** — `decomper`, shipped in PR #937. ✅ **RE-GIANT SWARM PILOT
+  — 1 ship + method verdict.** Target 1 (`func_ov004_021dd374`, 0x210
+  Thumb flag-gated record serializer): **SHIPPED byte-exact on the first
+  compile** (dcheck 216/216; 3-region sha1 OK). 3 subagents argued
+  different struct-layout hypotheses; the fan-out converged decisively
+  (H1 falsified its own reading; H3 found the header-CSE + strlen-recall
+  details; H2 pinned the early-`return -1` CFG). Pool gotcha confirmed:
+  m2c/m2c_feed mis-resolved `021dbe5c` 3rd-arg literal as `&sym`; lead
+  resolved all 4 literals from `objdump -s` + reloc table during prep.
+  Target 2 (`func_ov004_021dc664`, 0x158 builder): **143/143 structural
+  match, does NOT ship** — reg-numbering wall + T1/T2 `adds #2` encoding;
+  C-unsteerable + no Thumb `.s` path yet → P-405, banked in `ov004_core.h`.
+  **METHOD VERDICT: fan-out reliably solves UNDERSTANDING, not CODEGEN.**
+  It is a lane for the genuinely understanding-bound (T1 → first-compile
+  ship), theatre for codegen-walled ones. At ~1 ship/~300k+ subagent
+  tokens it **loses to the ~5-8/wave patient baseline on ship-RATE** but
+  wins as a comprehension/de-risk tool. Recommended leaner protocol: **lead
+  draft + a single adversarial "falsify + find the sibling/caller" agent**
+  rather than 3 from-scratch readings. No classifier fallback observed.
+  Doc: `docs/research/brief-405-swarm-pilot.md`.
+- **Brief 406** — `scaffolder`, shipped in PR #938. ✅ **kind:data carve
+  harness — BINDING CONSTRAINT DISSOLVED UNDER STUDY.** The blanket
+  "kind:data ref Undefined-fails" rule (briefs 361/364) was true ONLY for
+  C-absorbed (address absorbed mid-bundle, no named def). **A-aligned** and
+  **B-gap** both link today. The ~19 parked funcs decomposed 7A + 12B + 0C
+  — all shippable all along (Verify-gate item 8 failure shape: unverified
+  classification propagated from brief 361). New **5-verdict preflight** in
+  `asm_escape` (`classify_data_refs()` — A-aligned/B-gap OK; C-absorbed/
+  OFFSET/MISADDRESSED REFUSE-and-exit). New park rule: **park on REFUSE,
+  not on kind:data presence.** Acceptance: **12 previously-parked ov002
+  funcs shipped** (asked ≥3); ov002 parked set = 0. Negative tests shown
+  red (C-absorbed refuses at emit; deliberate bypass reproduces
+  `Undefined: "data_020ff924"`). Stretch: **Thumb gap-object fix landed**
+  in `parse_objdump` (halfword/pair parse, Thumb pool base, `.align 2`,
+  UAL→legacy dialect, `movs`→`lsl rX,rY,#0`) — 3 parked ov004 Thumb
+  reg-walls (`021dc1cc`/`021dcd1c`/`021dd2c8`) now have a `.s` path.
+  m2ctx.py: dropped `-fworking-directory` (Mac clang fix; green). 2355
+  tests passed. Decomper unblocked ~10 ships. Doc:
+  `docs/research/brief-406-kind-data-harness.md`.
+- **Brief 407** — `decomper`, shipped in PR #941. ✅ **kind:data and Thumb
+  unpark wave — 11 ships.** Immediately after brief-406 landed, decomper
+  cleared the parked set using the new preflight: 5 kind:data parks
+  (ov017/`021b66a8` A-aligned; ov008/`021aafa4` + `021b2268` B-gap;
+  ov005/`021acfb0` B-gap; ov016/`021b3174` B-gap); 2 dispatcher twins
+  (ov017/`021b2c8c` + ov016/`021b2824`, both B-gap); 3 Thumb `.s` escape
+  targets from brief-406 stretch (ov004/`021dc1cc`/`021dcd1c`/`021dd2c8`);
+  stretch ship: ov004/`021dc664` (the P-405 structural match, now ships as
+  Thumb `.s`). All-3-region sha1 OK. Delinks sorted + zero-overlap on all 5
+  touched overlays.
+- **Brief 408** — `scaffolder`, shipped in PR #939. ✅ **ov002 `.s`
+  upper-half wave 18 — 8 ships** (3× 0x5c + 5× 0x60). All first-attempt
+  byte-identical; kind:data preflight clean on all 8; EUR sha1 OK. No
+  tooling changes. Brain 3-region gate on merge: EUR/USA/JPN all OK.
+  Doc: `docs/research/brief-408-ov002-s-convert-wave18.md`.
+- **Brief 409** — `decomper`, shipped in PR #943. ✅ **Thin-overlay sweep
+  — 16 ships across ov018/ov020/ov021/ov022/ov023.** First expansion
+  beyond the previously-targeted overlay pool; all candidates preflight
+  clean (B-gap data ref or no data refs). All-3-region sha1 OK in the PR.
+  3 optional extras deferred to keep PR reviewable: `ov008/021b2200`,
+  `ov012/021cc01c`, `ov013/021cb700` — these seed brief 413.
+- **Brief 410** — `scaffolder`, shipped in PR #940. ✅ **ov002 `.s`
+  upper-half wave 19 — 8 ships** (8× 0x60; 1 candidate skipped — did not
+  assemble; 1 replacement swept in). All byte-identical; EUR sha1 OK.
+  Brain 3-region gate on merge: EUR/USA/JPN all OK.
+  Doc: `docs/research/brief-410-ov002-s-convert-wave19.md`.
+- **Brief 411** — `scaffolder`, shipped in PR #942. ✅ **ov002 `.s`
+  lower-pool wave 20 — 12 ships** (sizes 0x2c–0x6c; lower address range
+  `021a…`–`021b…`). 3 candidates skipped (already matched on main). All
+  byte-identical; EUR sha1 OK. Confirms lower pool is productive alongside
+  the upper-half lane. Brain 3-region gate on merge: EUR/USA/JPN all OK.
+  Doc: `docs/research/brief-411-ov002-s-convert-wave20.md`.
 - **Brief 399** — `decomper`, shipped in PR #928. ✅ **ov004 Thumb-cohort
   drain wave 3 — 5 byte-identical `.thumb.c`; the clean control-flow tier
   is now drained.** Above the pivot floor (≥4), so no pivot mid-wave, but
