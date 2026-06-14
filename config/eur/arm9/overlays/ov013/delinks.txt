@@ -4,46 +4,62 @@
     .data       start:0x021cb920 end:0x021cbc00 kind:data align:32
     .bss        start:0x021cbc00 end:0x021cc1e0 kind:bss align:32
 
+src/overlay013/func_ov013_021c9d60.s:
+    complete
+    .text start:0x021c9d60 end:0x021c9d74
+src/overlay013/func_ov013_021c9d74.s:
+    complete
+    .text start:0x021c9d74 end:0x021c9ff8
+
 src/overlay013/ov013_021c9ff8.c:
     complete
     .text start:0x021c9ff8 end:0x021ca024
 
-src/overlay013/data_ov013_021cb7b4.c:
+src/overlay013/func_ov013_021ca024.s:
     complete
-    .rodata start:0x021cb7b4 end:0x021cb91c
+    .text start:0x021ca024 end:0x021ca15c
 
-src/overlay013/data_ov013_021cb750.c:
+src/overlay013/func_ov013_021ca15c.s:
     complete
-    .rodata start:0x021cb750 end:0x021cb7b4
+    .text start:0x021ca15c end:0x021ca294
 
-src/overlay013/bss/data_ov013_bss.s:
-    complete
-    .bss start:0x021cbc00 end:0x021cc1e0
-
-src/overlay013/data/data_ov013_021cbb1c.c:
-    complete
-    .data start:0x021cbb1c end:0x021cbb20
-
-src/overlay013/func_ov013_021c9d60.s:
-    complete
-    .text start:0x021c9d60 end:0x021c9d74
 src/overlay013/func_ov013_021ca294.c:
     complete
     .text start:0x021ca294 end:0x021ca2b8
-
-src/overlay013/func_ov013_021cb644.c:
-    complete
-    .text start:0x021cb644 end:0x021cb674
-
-src/overlay013/func_ov013_021ca618.c:
-    complete
-    .text start:0x021ca618 end:0x021ca68c
 
 src/overlay013/func_ov013_021ca5d4.c:
     complete
     .text start:0x021ca5d4 end:0x021ca618
 
+src/overlay013/func_ov013_021ca618.c:
+    complete
+    .text start:0x021ca618 end:0x021ca68c
+
 src/overlay013/func_ov013_021ca68c.c:
     complete
     .text start:0x021ca68c end:0x021ca70c
 
+
+src/overlay013/func_ov013_021cb644.c:
+    complete
+    .text start:0x021cb644 end:0x021cb674
+
+src/overlay013/func_ov013_021cb700.s:
+    complete
+    .text start:0x021cb700 end:0x021cb750
+
+src/overlay013/data_ov013_021cb750.c:
+    complete
+    .rodata start:0x021cb750 end:0x021cb7b4
+
+src/overlay013/data_ov013_021cb7b4.c:
+    complete
+    .rodata start:0x021cb7b4 end:0x021cb91c
+
+src/overlay013/data/data_ov013_021cbb1c.c:
+    complete
+    .data start:0x021cbb1c end:0x021cbb20
+
+src/overlay013/bss/data_ov013_bss.s:
+    complete
+    .bss start:0x021cbc00 end:0x021cc1e0
