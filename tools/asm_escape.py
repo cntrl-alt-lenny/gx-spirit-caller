@@ -42,8 +42,8 @@ or silently mislink). `--classify-data` runs the preflight standalone for
 wave sweeps. See the section comment above classify_data_refs().
 
 The PURE helpers (parse_objdump / to_mwasm / hex_imm / classify_fixes /
-emit_asm / classify_data_refs) are unit-tested in tests/test_asm_escape.py
-with no build.
+emit_asm / diff_words / classify_data_refs) are unit-tested in
+tests/test_asm_escape.py with no build.
 """
 from __future__ import annotations
 
@@ -264,13 +264,21 @@ def is_commutative_swap(my_mn: str, orig_mn: str) -> bool:
 
 
 def pool_addrs(instrs: list[dict], thumb: bool = False) -> set[int]:
-    """Addresses of literal-pool words = the targets of `ldr rX, [pc, #N]`.
+    """Addresses of literal-pool words = the targets of `ldr rX, [pc, #±N]`.
     Robust across objdump renderings (orig delinked words decode as raw
     data / ASCII, my mwasm words as `.word`); the ldr target is invariant.
-    ARM pc-rel base = addr+8; Thumb = Align(addr+4, 4) (brief 406 stretch)."""
+    ARM pc-rel base = addr+8; Thumb = Align(addr+4, 4) (brief 406 stretch).
+
+    The offset is SIGNED: a large function (body > ~4 KB) gets an INTERMEDIATE
+    literal pool that mwcc threads through the code so every `ldr [pc, …]`
+    stays within the ±4 KB ARM offset field — words BEHIND such a load are
+    reached by a backward `[pc, #-N]` (brief 418). Both directions are pool
+    words; detecting only `#+N` (the pre-418 regex) missed the backward half,
+    so objdump's data rendering of those words leaked into the `.s` (the
+    `....`/ASCII-gutter "Undefined macro or opcode" wave-23 capability edge)."""
     pool = set()
     for w in instrs:
-        m = re.search(r"\[pc, #(\d+)\]", w["mnem"])
+        m = re.search(r"\[pc, #(-?\d+)\]", w["mnem"])
         if m:
             base = ((w["addr"] + 4) & ~3) if thumb else w["addr"] + 8
             pool.add(base + int(m.group(1)))
@@ -343,13 +351,22 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
 
     Pool words become `.word` slots referenced by `_LITn`; internal branch
     targets get `.L_<addr>` labels; external calls (bl/b/blx + reloc) use the
-    symbol."""
+    symbol.
+
+    Pool words are emitted INLINE at their original position in the stream
+    (NOT collected and appended at the end), so an INTERMEDIATE pool — the
+    mid-function `.word` island a big function threads through its code to
+    keep every `ldr [pc, …]` within the ±4 KB ARM offset field (brief 418) —
+    lands at the same address as the original and mwasmarm computes the
+    identical pc-relative offsets. A trailing-only pool is the degenerate
+    case: its words are last in the stream, so inline == appended (the
+    pre-418 behaviour, preserved byte-for-byte)."""
     def _pc_base(addr: int) -> int:
         return ((addr + 4) & ~3) if thumb else addr + 8
 
     lit: dict[int, str] = {}
     for w in orig:
-        m = re.search(r"\[pc, #(\d+)\]", w["mnem"])
+        m = re.search(r"\[pc, #(-?\d+)\]", w["mnem"])
         if m:
             lit[_pc_base(w["addr"]) + int(m.group(1))] = ""
     for i, a in enumerate(sorted(lit)):
@@ -373,6 +390,8 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     head += [f"        .global {func}", "        .thumb" if thumb else "        .arm",
              f"{func}:"]
 
+    body: list[str] = []
+    in_pool = False   # track pool RUNS so each Thumb pool island realigns once
     # Detect tail-call branches (forward branch to the byte IMMEDIATELY AFTER
     # the function's last word, no reloc). These occur when a function jumps
     # to the next function in the gap object without a reloc. We emit a local
@@ -393,21 +412,21 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
                 end_targets.add(t)
     if end_targets:
         end_label = ".L_FUNCEND"
-
-    body, pool = [], []
     for w in orig:
         if w["addr"] in lit:
             val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
-            if not pool and thumb:
-                pool.append("    .align 2")   # halfword stream may end unaligned
-            pool.append(f"{lit[w['addr']]}: .word {val}")
+            if thumb and not in_pool:
+                body.append("    .align 2")   # halfword stream realigns before a pool
+            in_pool = True
+            body.append(f"{lit[w['addr']]}: .word {val}")   # emit INLINE, in place
             continue
+        in_pool = False
         if w["addr"] in labels:
             body.append(f"{labels[w['addr']]}:")
         mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
-        pm = re.search(r"\[pc, #(\d+)\]", mn)
+        pm = re.search(r"\[pc, #(-?\d+)\]", mn)
         if pm:
-            mn = re.sub(r"\[pc, #\d+\]", lit[_pc_base(w["addr"]) + int(pm.group(1))], mn)
+            mn = re.sub(r"\[pc, #-?\d+\]", lit[_pc_base(w["addr"]) + int(pm.group(1))], mn)
         # internal branch (no reloc, target within func) -> local label
         ib = _BRANCH_RE.match(w["mnem"])
         if ib and not w["reloc"]:
@@ -430,7 +449,41 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             mn = f".word 0x{int(w['bytes'], 16):08x}"
         body.append("    " + hex_imm(mn))
     suffix = [f"{end_label}:"] if end_label else []
-    return "\n".join(head + body + pool + suffix) + "\n"
+    return "\n".join(head + body + suffix) + "\n"
+
+
+def diff_words(mine: list[dict], orig: list[dict]) -> list[str]:
+    """PURE byte-compare of two parsed word streams (mine vs delinked orig),
+    reloc words modulo. Returns human-readable diffs; empty list = match.
+
+    Each literal-pool word is checked by the invariant for its KIND:
+
+      * relocated (a pool pointer to a symbol, or a `bl`) — the delinked orig
+        carries an R_ARM_ABS32/PC24 placeholder (bytes 0 + reloc) and my
+        freshly-assembled .o carries the same reloc, so the resolved bytes
+        differ BY CONSTRUCTION. Compare by SYMBOL NAME, not bytes. A reloc on
+        one side only is a parse artifact of the same word and is tolerated.
+
+      * raw constant (an inline `.word N` island — the intermediate-pool case,
+        brief 418) — NEITHER side has a reloc, so the BYTES are the invariant
+        and a mismatch is a real corruption that MUST be flagged.
+
+    The pre-418 comparator tolerated ANY byte mismatch whose rendering started
+    with `.word` — but mwasmarm marks every emitted pool word `$d`, so objdump
+    prints my side `.word 0x…` for EVERY pool word, raw constants included.
+    That silently swallowed a mis-emitted raw pool constant (a wrong `.word`
+    value or a dropped intermediate-pool word): the safety-net hole this brief
+    closes. Verify-gate item 7 demands a corrupted pool word go RED — proven in
+    tests/test_asm_escape.py (TestDiffWordsPoolGuard, shown red before green)."""
+    diffs: list[str] = []
+    for i, (x, y) in enumerate(zip(mine, orig, strict=False)):
+        if x["reloc"] or y["reloc"]:
+            if x["reloc"] and y["reloc"] and x["reloc"] != y["reloc"]:
+                diffs.append(f"[{i}] reloc {x['reloc']} vs {y['reloc']}")
+            continue
+        if x["bytes"] != y["bytes"]:
+            diffs.append(f"[{i}] {x['bytes']}({x['mnem']}) vs {y['bytes']}({y['mnem']})")
+    return diffs
 
 
 # --------------------------------------------------- kind:data link preflight
@@ -661,22 +714,10 @@ def assemble(s_file: str, out: str) -> bool:
 
 
 def bytes_match(a_obj: str, orig_obj: str, func: str) -> tuple[bool, list[str]]:
-    """Byte-compare `func` in two objects, reloc words (bl/pool) modulo."""
-    a = parse_objdump(disasm(a_obj), func)
-    o = parse_objdump(disasm(orig_obj), func)
-    diffs = []
-    for i, (x, y) in enumerate(zip(a, o, strict=False)):
-        if x["reloc"] and y["reloc"]:
-            if x["reloc"] != y["reloc"]:
-                diffs.append(f"[{i}] reloc {x['reloc']} vs {y['reloc']}")
-            continue
-        if x["reloc"] != y["reloc"] or x["bytes"] != y["bytes"]:
-            # tolerate the trailing pool-word rendering difference (a reloc'd
-            # word vs a literal); only flag a real code-byte mismatch.
-            if x["mnem"].startswith(".word") or y["mnem"].startswith(".word") \
-               or not x["mnem"] or not y["mnem"]:
-                continue
-            diffs.append(f"[{i}] {x['bytes']}({x['mnem']}) vs {y['bytes']}({y['mnem']})")
+    """Byte-compare `func` in two objects, reloc words (bl/pool) modulo.
+    The word-by-word comparison is the pure `diff_words` (brief 418)."""
+    diffs = diff_words(parse_objdump(disasm(a_obj), func),
+                       parse_objdump(disasm(orig_obj), func))
     return (not diffs), diffs
 
 
