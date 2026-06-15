@@ -16,26 +16,26 @@ func_ov016_021b28f4:
     bl func_02006148
     bl func_0200617c
     cmp r0, #0x0
-    beq .L_6c
+    beq .L_688
     ldrh r1, [r4]
     ldr r2, [sp, #0x4]
     cmp r1, r2
-    bgt .L_6c
+    bgt .L_688
     ldrb r0, [r4, #0x4]
     add r0, r1, r0
     cmp r0, r2
-    ble .L_6c
+    ble .L_688
     ldrh r1, [r4, #0x2]
     ldr r2, [sp]
     cmp r1, r2
-    bgt .L_6c
+    bgt .L_688
     ldrb r0, [r4, #0x5]
     add r0, r1, r0
     cmp r0, r2
     addgt sp, sp, #0x8
     movgt r0, #0x1
     ldmgtia sp!, {r4, pc}
-.L_6c:
+.L_688:
     mov r0, #0x0
     add sp, sp, #0x8
     ldmia sp!, {r4, pc}
