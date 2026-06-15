@@ -8,18 +8,25 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-14 (Mac, brain on Opus 4.8), post briefs
-**412+413** merge. **This round (2 PRs, all agents on Sonnet 4.6 Max):**
-- **#944** scaffolder ov002 `.s` wave 21 (brief 412): **20 ships** (12
-  lower-pool — band exhausted at ≤0x6c — + 8 upper-half 0x58); found an
-  enumeration bug (false-candidate pool 190→127). `.s` total ≈196.
-- **#945** decomper thin-overlay sweep (brief 413): **290 ships** across
-  12 overlays; found+fixed an ov011/delinks.txt parse bug; documented
-  asm-fail triage (~13 not-shipped → seed brief 415). **This TAPPED the
-  mechanical overlay sweep.**
+**Last updated:** 2026-06-15 (Mac, brain on Opus 4.8), post briefs
+**414+415** merge. **This round (2 PRs, both agents ran on CODEX):**
+- **#947** scaffolder ov002 `.s` wave 22 (brief 414): **12 ships**
+  (≤0x6c leftovers + into 0x70–0x90); **capability edge NOT reached —
+  byte-identity held through 0x90**, next tier still open. `.s` total ≈208.
+- **#946** decomper ov004 hard-residue drain (brief 415): **138 ARM `.s`
+  ships** (of 162 probed); parked 24 (9 kind:data C-absorbed, 4 Thumb
+  emitter-blocked, 11 Thumb-corridor-drift). **Finding: the "hard residue"
+  was ~85% mechanical `.s`, not RE** (ov004 was excluded from the b413
+  sweep → its ARM funcs were just un-swept). New tooling shape: **Thumb-
+  corridor drift** (carving ARM shifts pre-existing Thumb bytes) →
+  scaffolder Thumb-emitter tooling brief pending, sized by b417.
 
-**Total: 310 ships this round.** 3-region `ninja sha1` PASS reproduced on
-the integration tree + EUR re-confirmed on merged main.
+**Total: 150 ships this round.** 3-region `ninja sha1` PASS verified on the
+integration tree (EUR/USA/JPN) + EUR re-confirmed on merged main. Codex
+showed good gate-discipline (conservative parks on drift). Reinforces the
+model-mix finding: the deterministic gate makes ANY frontier model
+(Sonnet / Opus / Codex) safe on the mechanical lanes — choice is
+throughput, not correctness.
 
 🤖 **MODEL-MIX DECISION (2026-06-14, grounded — see AGENTS.md § Model
 notes → Per-role recommendation).** This round ran entirely on **Sonnet
@@ -31,12 +38,16 @@ scaffolder→Sonnet (permanent); decomper→Sonnet for sweeps / Opus 4.8 for
 RE rounds; brain→Opus 4.8 (cheap insurance on the judgment seat);
 Fable 5→skip on RE lanes (classifier fallback negates it).**
 
-📊 **Uncarved-function census (fresh, this round):** main **2678**
-(parked/legacy), ov002 **2490** (scaffolder's lane — huge runway),
-**557 everything else** (ov004 162 = richest hard residue, then ov006 72
-/ ov000 56 / ov008 54 / ov010 46 / …). The mechanical `.s` overlay sweep
-is **tapped** outside ov002 → decomper pivots to the ov004 hard residue
-(brief 415).
+📊 **Uncarved-function census.** main **2678** (parked/legacy — the
+endgame boss), ov002 **~2478** (scaffolder's lane — huge runway), and
+**~419 everything else** after ov004's drain: ov006 72 / ov000 56 / ov008
+54 / ov010 46 / ov016 33 / ov005 31 / ov017 24 / ov020 20 / … plus ov004's
+24 parked (15 Thumb-tooling-blocked). **Brief 415 recalibration:** that
+"hard residue" is mostly mechanical un-swept `.s`, not RE → brief 417
+drains it on Sonnet/Codex; RE (Opus) stays reserved for a *confirmed*
+wall. **Pending tooling brief:** Thumb-emitter (corridor-drift / multi-
+pool / non-4-aligned) for the scaffolder, once b417 sizes the project-wide
+Thumb-blocked count.
 
 **Prior round (briefs 405–411, 7 PRs, 68 ships):**
 - #937** decomper RE-giant swarm pilot (brief 405): **1 ship** (ov004
@@ -61,11 +72,11 @@ is **tapped** outside ov002 → decomper pivots to the ov004 hard residue
 **(Prior round total: 68 ships.)**
 
 **Current metrics (EUR — `configure.py eur`, `ninja objdiff`+`report`
-regenerated 2026-06-14 on merged main, 3-region sha1 PASS this session):**
-**`complete_units 4006 / 5491 (72.96 %)`** (+310 = exactly the 310 ships;
-+182 total units from new overlay TUs — crossed 70%). `matched_functions
-4040 / 9765`. **3-region `ninja sha1` PASS (eur / usa / jpn)** reproduced
-on the fully-merged main this session.
+regenerated 2026-06-15 on merged main, 3-region sha1 PASS this session):**
+**`complete_units 4156 / 5607 (74.12 %)`** (+150 = exactly the 150 ships).
+`matched_functions 4189 / 9765`. **3-region `ninja sha1` PASS
+(eur / usa / jpn)** verified on the integration tree + EUR re-confirmed on
+merged main.
 Note: Thumb `.s` ships under-count in `complete_units` (metric-canon gotcha);
 SHA1 is the ship-count truth.
 
@@ -107,18 +118,21 @@ park on REFUSE, not on kind:data presence.
 use for comprehension-bound giants + a leaner protocol (lead draft + 1
 adversarial agent), not as a volume lane.
 
-🪓 **The `.s` endgame (the volume lane).** Scaffolder: ov002 upper + lower pool
-at ~8–12/wave. Through brief 411 (PR #942): **scaffolder `.s` total ~176**
-(main 17 + ov002 ~159; running both halves now). Decomper: expanding thin-overlay
-sweep (ov018/020/021/022/023 tapped in brief 409; ov008/012/013 seeded for brief
-413). **Brief 412 = scaffolder ov002 wave 21; brief 413 = decomper overlay-sweep-2.**
+🪓 **The `.s` endgame (the volume lane).** Scaffolder: ov002 grind,
+~12–20/wave; **`.s` total ≈208** through wave 22 (PR #947); 0x70–0x90 tier
+byte-clean (edge not yet found). Decomper: drained ov004 (138, PR #946),
+now sweeping the remaining overlay residue. Project at **74.12% units**.
+Endgame veins: ov002 (~2478, scaffolder), the ~419 other-overlay residue
+(decomper, mostly mechanical), and main (2678, parked — the real boss).
 
 🔁 **Where we are (lanes — collision-free by module).**
-**decomper → brief 413** = thin-overlay sweep expansion (optional extras from
-#943 + un-touched overlays ov001/003/006-residue/007/009/011-residue/012/013/
-014/015/019). **scaffolder → brief 412** = ov002 `.s` wave 21 (upper-half
-≤0x6c + lower-pool band; ~8–12 target). Collision-free: scaffolder owns ov002;
-decomper on all others.
+**scaffolder → brief 416** = ov002 `.s` wave 23 (push past 0x90, find the
+asm_escape capability edge). **decomper → brief 417** = residue
+diagnose-and-drain across ov006/000/008/010/016/017/005/020/… (mostly
+mechanical `.s`; bucket RE / kind:data / Thumb-tooling-blocked; size the
+project-wide Thumb-tooling prize). Both Sonnet/Codex-class — mechanical.
+**Pending: scaffolder Thumb-emitter tooling brief** once b417 sizes it.
+Collision-free: scaffolder owns ov002; decomper on all others.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it

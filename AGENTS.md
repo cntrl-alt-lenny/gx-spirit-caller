@@ -601,99 +601,72 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 405** — `decomper`. **RE-GIANT SWARM PILOT: parallel-hypothesis
-  fan-out on the understanding-bound wall tier (method experiment,
-  user-endorsed).** Routing (403) now leaves one tier untouched: RE
-  giants + detailed builders — walls bound by UNDERSTANDING, not
-  codegen. The Fable 5 card shows multi-agent gains concentrate on
-  exactly this hard tail (+7.9 pp on program reconstruction; ~0.8× on
-  easy picks — grind waves stay single-context). **Targets: 2
-  understanding-bound walls WITH a verified ship path** — preferred:
-  ov004 Thumb RE giants `021dd374` + `021dd648` (CHECK 4-alignment
-  first: `.thumb.c` needs 4-aligned starts; 2-aligned = no ship path
-  until the 406 Thumb `.s` fix lands). Fallback pool, same class: the
-  4 high-cost ov004 data-shaping builders (same alignment check), ov000
-  command-record builders (ARM, clean-C path always open). **Method per
-  target:** (1) lead preps an evidence pack — fresh disasm, xrefs, data
-  refs, caller context, known struct fields from the overlay core.h;
-  (2) fan out 3 ANALYSIS-ONLY subagents (Agent tool), each arguing a
-  DIFFERENT hypothesis (struct-layout A vs B, state-machine vs builder
-  reading), each returning proposed struct(s) + C draft + what evidence
-  would falsify it. Subagents must NOT build (parallel ninja in one
-  checkout collides) — the lead serialises all compiles; (3) lead
-  reconciles, compiles the winner, iterates via dcheck, gates on sha1.
-  Time-box ~half the wave per target. **Deliverable = ships AND the
-  method verdict:** cost-per-ship vs the ~5-8/wave patient-builder
-  baseline — is hypothesis fan-out a lane for the builder tier, or
-  theatre? Stop early and write the verdict if not converging (the 401
-  scout precedent: a clean negative is a deliverable). Gate = 3-region
-  `ninja sha1`; ⚠️ ov004 pool-constant gotcha (wrong pool word passes
-  dcheck, fails sha1 — `cmp` the ov004 bins to pinpoint). **Stay OFF
-  ov002 and `main`.** Branch: `decomper/swarm-pilot`.
-- **Brief 406** — `scaffolder`. **TOOLING: the kind:data carve harness —
-  un-park the `.s` lanes' binding constraint.** Both `.s` lanes park on
-  the same wall: a gap-`.s` carve whose function references a
-  `kind:data(any)` symbol `Undefined`-fails the link even at
-  byte-identity. Parked: your set = 12 (ov002), decomper route-w1 = 5
-  more (ov017 `021b66a8`, ov008 `021aafa4`/`021b2268`, ov005
-  `021acfb0`, ov016 `021b3174`), and the C-walled dispatcher twins
-  (ov017 `021b2c8c` / ov016 `021b2824`) are ALSO `.s`-blocked on it —
-  ~19 funcs and growing; brief 403 flags it as the binding endgame
-  constraint. **Goal: make a kind:data-referencing whole-function `.s`
-  carve link and ship byte-identical.** Mechanism is yours to design —
-  study how dsd delink represents the data section FIRST; candidates:
-  carve the referenced data bytes into the TU as a `.data`/`.rodata`
-  section block extracted from the delinked `.o`; a per-overlay shared
-  data-carve TU; or a data-kind delinks entry the configure path
-  understands. **Acceptance = artifacts:** (a) ship ≥3
-  previously-parked funcs end-to-end (suggest the ov002 wave-9 trio
-  `02253638`/`0225368c`/`022536e8` — same overlay, well-characterised,
-  your delinks file), EUR `ninja sha1` OK per-pick; (b) a doc note on
-  the mechanism + limits (which data shapes it can't carve, USA/JPN
-  story); (c) a negative test per § Verify gate item 7 — the harness
-  must FAIL loudly on a mis-sized/mis-addressed data carve; show it
-  red. **Stretch (only if primary lands): the asm_escape
-  Thumb-gap-object fix** (parser is ARM-only; would un-park the ov004
-  Thumb reg-walls `021dc1cc`/`021dcd1c`/`021dd2c8` for `.s`). Tools/
-  work + your own ov002 delinks for the acceptance ships. Brain runs
-  3-region on merge. **Collision-free** (decomper on ov004/ov000, off
-  ov002). Branch: `scaffolder/kind-data-harness`.
-- **Brief 414** — `scaffolder` (recommended model: **Sonnet 4.6 Max** —
-  pure mechanical gate-protected grind). **ov002 `.s` wave 22 — continue
-  the whole-function `.s` lane from latest `main` (post wave 21 / PR
-  #944).** Runway is enormous: **2490 ov002 functions still uncarved**
-  (most above the easy ≤0x6c band, but that band still has the wave-21
-  leftovers + the next size tier). `asm_escape --classify-data --version
-  eur` preflight every candidate; park only on `REFUSE`. Sweep upper-half
-  ≤0x6c first, then the lower pool, then begin probing the next size tier
-  (0x70–0x90) — report where byte-identity starts breaking (that's the
-  asm_escape capability edge). Target ~12–20 ships. EUR `ninja sha1`
-  per-pick; sort delinks; carve-size / zero-overlap audit. Brain runs
-  3-region on merge. Stay off every non-ov002 overlay. Branch:
-  `scaffolder/ov002-s-22`.
-- **Brief 415** — `decomper` (recommended model: **Opus 4.8 Max** — this
-  is the understanding-bound hard tier where the higher ceiling earns its
-  ~1.67× cost). **PIVOT: the mechanical overlay `.s` sweep is TAPPED.**
-  Post-PR-#945, only **557 functions remain uncarved outside ov002/main**,
-  and they are the *hard residue* the sweep deliberately skipped. **ov004
-  is the richest target: 162 uncarved** (its RE giants, Thumb reg-walls,
-  and the asm-fail cases). This round is **diagnose-and-drain on ov004**:
-  (1) Characterise the 162 into buckets — (a) RE-giant / matched-C
-  (genuine decomp; use the brief-405 LEANER protocol: lead draft + ONE
-  adversarial "falsify + find the sibling/caller" agent, not 3 from
-  scratch), (b) reg-alloc walls that are `.s`-carveable today, (c)
-  asm-fail / tooling-blocked (ldr-pool-out-of-range needs multi-pool;
-  `bl fffe…` DTCM/ITCM needs symbol resolution; non-4-aligned Thumb).
-  (2) Ship everything in buckets (a) and (b). (3) Report the bucket (c)
-  count + shape as a candidate **scaffolder tooling brief** (asm_escape
-  multi-pool + DTCM/ITCM-symbol + Thumb-non-4-aligned would unlock the
-  rest). ⚠️ ov004 pool-constant gotcha: a wrong pool word passes dcheck,
-  fails sha1 — `cmp build/<v>/build/arm9_ov004.bin
-  extract/<v>/arm9_overlays/ov004.bin`. Gate = 3-region `ninja sha1`.
-  Stay off ov002 and `main`. Branch: `decomper/ov004-hard-residue`.
+- **Brief 416** — `scaffolder` (recommended model: **Sonnet 4.6 Max** —
+  mechanical gate-protected grind). **ov002 `.s` wave 23 — continue the
+  whole-function `.s` lane from latest `main` (post wave 22 / PR #947).**
+  Runway remains huge: **~2478 ov002 functions uncarved.** Wave 22 probed
+  the `0x70-0x90` tier and stayed byte-identical through `0x90` WITHOUT
+  hitting the capability edge — so keep climbing the size tier this wave
+  (start with the 8 probe-only leftovers `0220184c`/`022020e0`/`022021b8`/
+  `02202350`/`0220257c`/`022025f4`/`022027b0`/`02202c8c`, then push past
+  `0x90`). `asm_escape --classify-data --version eur` preflight every
+  candidate; park only on `REFUSE`. **Report where byte-identity finally
+  breaks — that size threshold is the asm_escape capability edge and tells
+  us when a tooling brief beats more grind.** Target ~12–20 ships. EUR
+  `ninja sha1` per-pick; sort delinks; carve-size / zero-overlap audit.
+  Brain runs 3-region on merge. Stay off every non-ov002 overlay. Branch:
+  `scaffolder/ov002-s-23`.
+- **Brief 417** — `decomper` (recommended model: **Sonnet 4.6 Max** —
+  **calibration update:** brief 415 proved the ov004 "hard residue" was
+  ~85% mechanical `.s` (138/162), NOT reverse-engineering — so the
+  residue-drain phase is mechanical, not RE; Opus is reserved for a
+  *confirmed* RE wall, which we keep not hitting). **Residue
+  diagnose-and-drain across the remaining non-ov002/main overlays.** After
+  ov004 (-138), ~419 funcs remain uncarved outside ov002/main — biggest
+  pools: ov006 72, ov000 56, ov008 54, ov010 46, ov016 33, ov005 31,
+  ov017 24, ov020 20, plus smaller. Same protocol as 415: per overlay,
+  `asm_escape --classify-data --version eur` → `--whole-function` → ship
+  every byte-identical ARM `.s`; bucket the rest into (a) genuine RE/
+  matched-C (use the brief-405 LEANER protocol — lead draft + ONE
+  adversarial falsifier — only if a func has no `.s` route), (b)
+  kind:data C-absorbed REFUSE, (c) Thumb-tooling-blocked (corridor-drift
+  / multi-pool / non-4-aligned — same shapes Codex hit in ov004). **Key
+  deliverable: a project-wide count of bucket (c)** — that sizes the
+  pending **scaffolder Thumb-emitter tooling brief** (Thumb corridor/gap-
+  object integration + multi-pool + non-4-aligned Thumb; would un-park
+  ov004's 15 Thumb funcs + the equivalents you find here). ⚠️ ov004-style
+  pool-constant gotcha on any overlay: a wrong pool word passes dcheck,
+  fails sha1 — `cmp build/<v>/build/arm9_ovXXX.bin
+  extract/<v>/arm9_overlays/ovXXX.bin` per touched overlay. Watch for the
+  Codex Thumb-corridor-drift effect (carving ARM funcs shifted pre-
+  existing Thumb-corridor bytes) — gate 3-region `ninja sha1` and park
+  anything that drifts. Stay off ov002 and `main`. Branch:
+  `decomper/overlay-residue-drain`.
 
 ### Closed briefs (reference)
 
+- **Brief 414** — `scaffolder` (ran on **Codex**), shipped in PR #947. ✅
+  **ov002 `.s` wave 22 — 12 ships** (upper-half ≤0x6c leftovers + into the
+  0x70–0x90 tier). All byte-identical; 0 REFUSE. **Capability edge NOT
+  reached — byte-identity held through 0x90**, so the next size tier is
+  still open (8 probe-only clean leftovers carried to wave 23). Scaffolder
+  `.s` total ≈208. 3-region gate reproduced on merge.
+- **Brief 415** — `decomper` (ran on **Codex**), shipped in PR #946. ✅
+  **ov004 hard-residue drain — 138 ARM `.s` ships.** Probed all 162; 153
+  classify-data clean / 9 REFUSE; 149 byte-identical / 4 asm-fail. Shipped
+  138 ARM; parked 24 (9 kind:data C-absorbed, 4 Thumb emitter-blocked, 11
+  Thumb-corridor SHA-blocked). **Key finding: the "hard residue" was ~85%
+  mechanical `.s`, NOT RE** (ov004 was excluded from the brief-413 sweep,
+  so its ARM funcs were simply un-swept) — the brief-405 RE protocol was
+  not needed. **New tooling shape identified: Thumb-corridor drift** —
+  carving ARM funcs shifted pre-existing Thumb-corridor bytes, so the 11
+  individually-byte-identical Thumb funcs were correctly PARKED (shipping
+  them failed the all-149 sha1). Genuine RE giant `021dd648` (0xaec,
+  recursive) parked on Thumb tooling, not RE. → next: scaffolder Thumb-
+  emitter tooling brief (corridor/gap integration + multi-pool + non-4-
+  aligned), sized by brief 417's project-wide bucket-(c) count. 3-region
+  gate reproduced on merge. **Codex round: good gate-discipline — found+
+  fixed nothing-broke, parked conservatively on drift.**
 - **Brief 412** — `scaffolder`, shipped in PR #944. ✅ **ov002 `.s` wave
   21 — 20 ships** (12 lower-pool, band exhausted at ≤0x6c + 8 upper-half
   0x58). All byte-identical first attempt; 0 kind:data REFUSEs. Found an
