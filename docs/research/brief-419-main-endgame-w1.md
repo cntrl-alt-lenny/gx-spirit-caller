@@ -1,6 +1,6 @@
 # Brief 419 — Main (arm9) Endgame Wave 1
 
-**PR:** TBD  
+**PR:** #951  
 **Branch:** `decomper/main-endgame-w1`  
 **Date:** 2026-06-15  
 **Method:** `asm_escape --whole-function` sweep over all uncarved arm9 main functions
