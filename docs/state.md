@@ -9,7 +9,39 @@ minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
 **Last updated:** 2026-06-15 (Mac, brain on Opus 4.8), post briefs
-**416+417** merge. **This round (2 PRs, both agents ran on CODEX):**
+**418+419** merge. **🎯 THIS ROUND = LANDMARK: 2,612 ships, crossed 90% units.**
+- **#950** scaffolder (brief 418): asm_escape **intermediate-literal-pool
+  support** (the ~0x1040 edge) + comparator-hole fix (diff_words by reloc) +
+  **12 above-edge ov002 ships**. Negative test shown red-before-green.
+- **#951** decomper (brief 419): **2,600 arm9 `main` `.s` ships** — essentially
+  the entire main vein in one wave. + 6 asm_escape instruction fixes (MCR/MRC,
+  rrx, cond LDM/STM, ALU S+cond, tail-call `.L_FUNCEND`, cross-fn branch) +
+  a size-overrun false-pass fix (`parse_objdump` + `zip(strict=False)`).
+  Main residue parked: 53 kind:data + 6 intermediate-pool (→418 tool) + 15 asm-fail.
+
+**Metrics (objdiff-verified, EUR, post-merge):** **`complete_units 7190/7943
+(90.52%)`** (+2612 = exactly the ships), `matched_functions 7220/9765
+(73.94%)`, **code-bytes 1387438/2380434 (58.29%)** (was ~11% two rounds ago;
+main is the biggest code module so it moved the byte metric enormously — the
+"29%" was a mid-build delinks-approximate read). 3-region `ninja sha1` PASS
+(EUR/USA/JPN) verified on the integration tree + main == that tree (content
+diff empty). **NB:** these are byte-identical `.s` carves (assembly), not C
+decomp — the ROM round-trips from source; readable-C is a separate later pass.
+
+⚠️ **TWO operational hazards hit this round (both recovered, banked):**
+1. **`tools/asm_escape.py` COLLISION** — brief 418 (tooling) and brief 419
+   (needed 6 fixes to carve main) both edited it → merge conflict. Brain
+   reconciled (inline-pool emission + tail-call detection + diff_words +
+   the 6 main fixes; 43 tests pass). LESSON: don't queue two briefs that both
+   edit the shared tool in one round, or expect+plan the reconcile.
+2. **WINESERVER DEADLOCK at build step 0** — the first EUR gate hung 38 min at
+   0% CPU / 0 objects (stale wineserver lock; even `-j1` didn't help). Fix:
+   `pkill wineserver` + relaunch with FULL parallelism (the `-j1` caution is
+   only for concurrent *cross-worktree* wine; single-worktree wants `-j`).
+   Relaunch built 17k+ objects fast. **Brain gate recipe: if a build shows 0
+   `.o` + 0% CPU after a few min, kill wineserver and relaunch parallel.**
+
+**Prior round (briefs 416+417, 2 PRs, both agents ran on CODEX):**
 - **#949** scaffolder ov002 `.s` wave 23 (brief 416): **67 ships** via a
   size ladder 0x74→~0x1040. **CAPABILITY EDGE FOUND ~0x1040–0x109c**:
   intermediate literal pools (`....` mwasmarm can't assemble) → brief 418
@@ -41,15 +73,17 @@ scaffolder→Sonnet (permanent); decomper→Sonnet for sweeps / Opus 4.8 for
 RE rounds; brain→Opus 4.8 (cheap insurance on the judgment seat);
 Fable 5→skip on RE lanes (classifier fallback negates it).**
 
-📊 **Uncarved-function census (post-b416/417).** **main ~2678** (the
-endgame boss — now the largest vein; decomper opens it in b419), **ov002
-~2400** (scaffolder; below the ~0x1040 intermediate-pool edge is mechanical,
-above needs b418 tooling), **other overlays ~100** (drained — ~75 reg-alloc
-walls + 10 kind:data + 15 Thumb-tooling-blocked). **Two tooling unlocks now
-gate the large-func tier:** (1) intermediate-literal-pool support
-(asm_escape) — the ~0x1040 capability edge, blocks large funcs in BOTH
-ov002 and main → **brief 418**; (2) Thumb-emitter (corridor/multi-pool/
-non-4-aligned) — 15 ov004 + equivalents → pending, after 418.
+📊 **Uncarved-function census (post-b418/419).** **main** = essentially DONE
+(2600 carved); residue **74** (53 kind:data + 6 intermediate-pool[now have the
+418 tool] + 15 asm-fail). **ov002** ~2400 uncarved BUT the large-func tier is
+now UNBLOCKED (brief 418 intermediate-pool tool) → scaffolder can drain it all.
+**other overlays** ~100 (~75 reg-alloc walls + 10 kind:data + 15 ov004
+Thumb-tooling-blocked → pending Thumb-emitter brief). At 90.52% units, the
+remaining ~750 incomplete units = ov002 large tier + the ~74 main residue +
+the overlay walls + Thumb. **NEW FRONTIER (user-requested): USA/JPN source
+port** — all 3 ROMs already round-trip, but USA/JPN source-match is ~0.7%
+(they relink delinked objects); most funcs are region-identical so EUR `.s`/`.c`
+should port via `tools/port_to_region.py`. Scout queued (b421).
 
 **Prior round (briefs 405–411, 7 PRs, 68 ships):**
 - #937** decomper RE-giant swarm pilot (brief 405): **1 ship** (ov004
@@ -73,14 +107,14 @@ non-4-aligned) — 15 ov004 + equivalents → pending, after 418.
 
 **(Prior round total: 68 ships.)**
 
-**Current metrics (EUR — `configure.py eur`, `ninja objdiff`+`report`
-regenerated 2026-06-15 on merged main, 3-region sha1 PASS this session):**
-**`complete_units 4578 / 5906 (77.51 %)`** (+422 = exactly the 422 ships).
-`matched_functions 4611 / 9765`. **3-region `ninja sha1` PASS
-(eur / usa / jpn)** verified on the integration tree + re-confirmed on the
-fixed merged main.
-Note: Thumb `.s` ships under-count in `complete_units` (metric-canon gotcha);
-SHA1 is the ship-count truth.
+**Current metrics (EUR — objdiff-verified on merged main, 3-region sha1 PASS):**
+**`complete_units 7190 / 7943 (90.52 %)`** (+2612 = exactly the ships),
+`matched_functions 7220 / 9765 (73.94 %)`, **code-bytes 1387438 / 2380434
+(58.29 %)** (was ~11 % two rounds ago — the main carves moved it enormously).
+3-region `ninja sha1` PASS (eur / usa / jpn) on the integration tree; final
+main content-identical to it.
+Note: `.s` ships are byte-identical assembly, not C (round-trips, readable-C is
+a later pass); Thumb `.s` under-counts in `complete_units` (metric-canon).
 
 Previously: *tree breakage from `m2ctx.py -fworking-directory`* — **FIXED in
 brief 406 / PR #938.** `ninja sha1` / `objdiff` / `report` all run clean.
@@ -121,22 +155,21 @@ use for comprehension-bound giants + a leaner protocol (lead draft + 1
 adversarial agent), not as a volume lane.
 
 🪓 **The `.s` endgame (the volume lane).** Project at **77.51% units**.
-Scaffolder `.s` total ≈275 (ov002 wave 23). The overlay vein is drained;
-the two remaining big veins are **ov002** (~2400, scaffolder) and **main**
-(~2678, decomper now). Both have a large-func tier blocked by the
-intermediate-literal-pool edge (~0x1040) → the b418 tooling unlock is the
-multiplier that opens it across both.
+Project at **90.52% units / 58.29% code**. main is essentially carved (2600);
+the intermediate-pool tool (b418) unblocked ov002's large tier. Remaining EUR
+work: ov002 large tier (scaffolder, now unblocked), ~74 main residue, overlay
+walls, Thumb. Then the USA/JPN port frontier opens.
 
 🔁 **Where we are (lanes — collision-free by module).**
-**scaffolder → brief 418** = TOOLING: asm_escape intermediate-literal-pool
-support (the ~0x1040 edge; fix already scoped in the b416 doc — detect
-`....`, emit inline `.word`, handle backward `[pc,#-N]`); ship ≥5
-above-edge ov002 funcs + negative test. **decomper → brief 419** = OPEN
-MAIN: characterize + drain main's `.s`-carveable tier (2678 uncarved, the
-endgame boss; ⚠️ USA/JPN region divergence → gate all 3 yourself; dedup vs
-current main). Both Sonnet/Codex-class. **Pending after 418: Thumb-emitter
-tooling** (15 ov004 + equivalents). Collision-free: scaffolder owns
-tools/+ov002; decomper on main.
+**scaffolder → brief 420** = ov002 full drain WITH the new intermediate-pool
+tool (the large ≥0x109c tier is now shippable — drain it + continue the
+mechanical tiers; big vein). **decomper → brief 421** = (1) finish main
+residue (6 intermediate-pool via the 418 tool + classify the 53 kind:data A/B
+vs C + 15 asm-fail), then (2) **USA/JPN port SCOUT** — quantify how much of
+EUR's matched `.s`/`.c` ports clean via `tools/port_to_region.py`, pilot a
+sample, size the divergent residue (mostly in main). Both Sonnet/Codex-class.
+**Pending: Thumb-emitter tooling** (15 ov004). Collision-free: scaffolder
+tools/+ov002; decomper main+region configs.
 
 🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
 (brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it

@@ -471,6 +471,23 @@ this section says how the brain must *evidence* it.
     not the branch** (caught brief 417 / PR #948: ov010 `021b27d8` +
     ov017 `021b2c8c`). Tell sweep agents to dedup against *current main*,
     not just their branch base.
+11. **Two build/merge hazards on big rounds (banked brief 419).**
+    (a) **Shared-tool collision:** if a `decomper` brief needs an
+    `asm_escape` fix to carve (it did for `main` — 6 instruction
+    handlers) AND a `scaffolder` tooling brief edits the same file, the
+    squash-merges conflict. Brain reconciles at the integration tree
+    (combine both feature sets; `pytest tests/test_asm_escape.py` must
+    pass) — and should AVOID queuing two same-tool briefs in one round,
+    or flag the expected conflict up front. `asm_escape.py` is a dev
+    tool, NOT a build input, so the conflict never affects the ROM —
+    the committed `.s` files are what gate.
+    (b) **Wineserver deadlock at build step 0:** a gate that sits at
+    **0 `.o` built / 0% CPU** for minutes is HUNG on a stale wineserver
+    lock, not slow (caught brief 419: 38 min wasted). `-j1` does NOT
+    avoid it (that caution is only for concurrent *cross-worktree* wine;
+    idle agents = single worktree = use full `-j`). Recipe: `pkill -9
+    wineserver` then relaunch `ninja sha1` with default parallelism.
+    Confirm health by watching the `.o` count climb, don't wait blind.
 
 ### Model notes (Fable 5 / Opus 4.8 mix)
 
@@ -614,46 +631,57 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 418** — `scaffolder` (recommended model: **Sonnet 4.6 Max**,
-  escalate to Opus only if the pc-relative encoding gets hairy).
-  **TOOLING: asm_escape intermediate-literal-pool support — un-park the
-  capability edge wave 23 found.** Above ~0x1040–0x109c, ov002 functions
-  carry *intermediate* literal pools (mid-function `....` bytes in the
-  disasm) that `mwasmarm` rejects ("Undefined macro or opcode: ...."). The
-  edge is pool-density-dependent, not a pure byte count, and it blocks the
-  entire large-function tier project-wide (ov002 AND main). Wave 23's doc
-  (`brief-416-…`) already scoped the fix: (a) detect `....` runs in
-  `parse_objdump` and emit them as inline `.word N` data, (b) handle
-  backward `[pc, #-N]` pc-relative loads to intermediate pools, (c) keep
-  the existing trailing-pool path working. **Acceptance = artifacts:**
-  ship ≥5 previously-above-edge ov002 funcs end-to-end (the wave-23
-  rejects are the candidate list), EUR `ninja sha1` OK per-pick; a doc
-  note on the mechanism + remaining limits; a NEGATIVE test (§ Verify gate
-  item 7) that fails loudly on a mis-emitted intermediate pool, shown red.
-  Tools/ + your own ov002 delinks for the acceptance ships. Brain runs
-  3-region on merge. **Collision-free** (decomper on `main`, off ov002).
-  Branch: `scaffolder/intermediate-pool-tool`.
-- **Brief 419** — `decomper` (recommended model: **Sonnet 4.6 Max** —
-  mechanical sweep). **OPEN THE ENDGAME: main (arm9) — 2678 uncarved, the
-  largest remaining vein.** The overlay residue is drained (brief 417 took
-  355; only ~100 walls/tooling-blocked remain outside ov002/main). Main is
-  now the bulk of what's left. It already has 17 shipped `.s`, so the lane
-  is proven. This round = **characterize + drain main's `.s`-carveable
-  tier**: list uncarved `.text` symbols in `config/eur/arm9/symbols.txt`
-  (and the `_dsd_gap@main_*` objects), `asm_escape --classify-data
-  --version eur` → `--whole-function`, ship every byte-identical ARM `.s`.
-  Bucket the rest to **size the main endgame**: (a) `.s`-carveable now,
-  (b) intermediate-pool-blocked (→ brief 418 tooling), (c) Thumb-blocked,
-  (d) kind:data REFUSE, (e) genuine RE. ⚠️ **main carries USA/JPN region
-  divergence** (the historic 2-byte main-function-displacement) — a carve
-  that's EUR-clean can break USA/JPN, so **gate all 3 regions yourself**
-  and park anything region-divergent with a note. Pool-constant gotcha
-  applies (wrong word passes dcheck, fails sha1). Dedup against *current
-  main* (some main funcs are already carved). Stay off ov002 and every
-  overlay. Branch: `decomper/main-endgame-w1`.
+- **Brief 420** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 full drain WITH the new intermediate-pool tool.** Brief 418
+  landed `asm_escape` intermediate-literal-pool support, so ov002's
+  large-function tier (≥0x109c, the wave-23 capability edge) is now
+  shippable. ov002 still has **~2400 uncarved** — drain it: take the
+  large ≥0x109c tier first (the newly-unblocked funcs, biggest per-ship
+  code-byte gain), then continue the remaining mechanical tiers.
+  Per-pick: `asm_escape --classify-data --version eur` (park only on
+  REFUSE) → `--whole-function` (byte-identical) → sorted delink + carve-
+  size/zero-overlap audit → EUR `ninja sha1`. **Dedup vs current main**
+  (§ Verify gate item 10). Target ~30–60 ships (large funcs ship fast
+  now). Brain runs 3-region on merge. Stay off `main` + every overlay.
+  Branch: `scaffolder/ov002-large-drain`.
+- **Brief 421** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Two parts: close main, then open the USA/JPN frontier.** (1) **Finish
+  the ~74 main residue:** the 6 intermediate-pool-blocked now carve with
+  the brief-418 tool; `--classify-data` the 53 kind:data (A-aligned/B-gap
+  ship, C-absorbed park) and handle the 15 asm-fail (bucket what still
+  can't carve). (2) **USA/JPN port SCOUT (user-requested frontier):** all
+  3 ROMs already round-trip, but USA/JPN source-match is ~0.7% — they
+  relink delinked objects, not matched source. Most functions are
+  region-identical, so EUR's matched `.s`/`.c` should port via
+  `tools/port_to_region.py`. Deliverable: **quantify** — how many EUR
+  matches port clean to USA and JPN (region-identical), how big the
+  divergent residue is (concentrated in `main` — the 2-byte displacement
+  — and the overlay-swap group), and a **piloted sample** (port ~10 funcs
+  to USA, gate USA `ninja sha1`). Write it up as the USA/JPN endgame plan.
+  ⚠️ region-divergence + pool-constant gotchas; gate all 3 regions on any
+  ship. Branch: `decomper/main-residue-and-region-scout`.
 
 ### Closed briefs (reference)
 
+- **Brief 418** — `scaffolder`, shipped in PR #950. ✅ **asm_escape
+  intermediate-literal-pool support** (the ~0x1040 capability edge):
+  inline `.word` emission in stream order + signed backward `[pc,#-N]`
+  loads + the `diff_words` reloc-based comparator (closed a hole where
+  `bytes_match` silently tolerated corrupted pool words — shown
+  red-before-green per Verify item 7). **12 above-edge ov002 ships**
+  (0x109c–0x1e98). 43 tests pass. Unblocks the large-func tier in ov002
+  AND main. 3-region gate reproduced on merge.
+- **Brief 419** — `decomper`, shipped in PR #951. ✅ **arm9 main endgame
+  wave 1 — 2,600 `.s` ships** (essentially the whole main vein). + 6
+  `asm_escape` fixes to carve main (MCR/MRC, rrx, cond LDM/STM, ALU
+  S+cond, tail-call `.L_FUNCEND`, cross-fn branch) + a size-overrun
+  false-pass fix (`parse_objdump` over-read + `zip(strict=False)` swallowed
+  trailing bytes → +0x3930 ROM inflation; now caught). Residue: 53
+  kind:data + 6 intermediate-pool + 15 asm-fail. **Crossed 90% units
+  (90.52%) / 58% code-bytes.** ⚠️ Both this and #950 edited `asm_escape.py`
+  → brain reconciled at the integration tree (Verify item 11a); first EUR
+  gate hit a wineserver deadlock, cleared per item 11b. 3-region sha1 PASS
+  verified; final main content-identical to the gated integration tree.
 - **Brief 416** — `scaffolder` (ran on **Codex**), shipped in PR #949. ✅
   **ov002 `.s` wave 23 — 67 ships** via a systematic size ladder from 0x74
   through ~0x1040. **CAPABILITY EDGE FOUND at ~0x1040–0x109c:** above it,
