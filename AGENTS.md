@@ -458,6 +458,19 @@ this section says how the brain must *evidence* it.
    setup" to avoid the detour. (Fable 5 card §6.3.5.1: the model
    finds defects as reliably as 4.8 but is more likely to frame them
    as deliberate design decisions and leave them in place.)
+10. **Pre-merge: scan touched delinks for duplicate blocks.** A sweep
+    PR that re-derives a function ALREADY carved on main (by an earlier
+    round) doubles its delink block on squash-merge → `dsd lcf` fails
+    with "overlaps with previous file". An agent's on-branch sha1 can be
+    green (its branch has 1 entry) yet the merged main breaks (base 0 +
+    main 1 + branch 1 = 2 on the 3-way add-add). Brain runs, on the
+    integration tree before merge:
+    `for f in <touched delinks>; do grep -oE 'func_ov[0-9]+_[0-9a-f]+\.s' $f | sort | uniq -d; done`
+    — any output ⇒ remove the duplicate block(s) (the `.s` is unchanged),
+    re-run the gate. **This is exactly why brain gates the integration,
+    not the branch** (caught brief 417 / PR #948: ov010 `021b27d8` +
+    ov017 `021b2c8c`). Tell sweep agents to dedup against *current main*,
+    not just their branch base.
 
 ### Model notes (Fable 5 / Opus 4.8 mix)
 
@@ -601,50 +614,67 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 416** — `scaffolder` (recommended model: **Sonnet 4.6 Max** —
-  mechanical gate-protected grind). **ov002 `.s` wave 23 — continue the
-  whole-function `.s` lane from latest `main` (post wave 22 / PR #947).**
-  Runway remains huge: **~2478 ov002 functions uncarved.** Wave 22 probed
-  the `0x70-0x90` tier and stayed byte-identical through `0x90` WITHOUT
-  hitting the capability edge — so keep climbing the size tier this wave
-  (start with the 8 probe-only leftovers `0220184c`/`022020e0`/`022021b8`/
-  `02202350`/`0220257c`/`022025f4`/`022027b0`/`02202c8c`, then push past
-  `0x90`). `asm_escape --classify-data --version eur` preflight every
-  candidate; park only on `REFUSE`. **Report where byte-identity finally
-  breaks — that size threshold is the asm_escape capability edge and tells
-  us when a tooling brief beats more grind.** Target ~12–20 ships. EUR
-  `ninja sha1` per-pick; sort delinks; carve-size / zero-overlap audit.
-  Brain runs 3-region on merge. Stay off every non-ov002 overlay. Branch:
-  `scaffolder/ov002-s-23`.
-- **Brief 417** — `decomper` (recommended model: **Sonnet 4.6 Max** —
-  **calibration update:** brief 415 proved the ov004 "hard residue" was
-  ~85% mechanical `.s` (138/162), NOT reverse-engineering — so the
-  residue-drain phase is mechanical, not RE; Opus is reserved for a
-  *confirmed* RE wall, which we keep not hitting). **Residue
-  diagnose-and-drain across the remaining non-ov002/main overlays.** After
-  ov004 (-138), ~419 funcs remain uncarved outside ov002/main — biggest
-  pools: ov006 72, ov000 56, ov008 54, ov010 46, ov016 33, ov005 31,
-  ov017 24, ov020 20, plus smaller. Same protocol as 415: per overlay,
-  `asm_escape --classify-data --version eur` → `--whole-function` → ship
-  every byte-identical ARM `.s`; bucket the rest into (a) genuine RE/
-  matched-C (use the brief-405 LEANER protocol — lead draft + ONE
-  adversarial falsifier — only if a func has no `.s` route), (b)
-  kind:data C-absorbed REFUSE, (c) Thumb-tooling-blocked (corridor-drift
-  / multi-pool / non-4-aligned — same shapes Codex hit in ov004). **Key
-  deliverable: a project-wide count of bucket (c)** — that sizes the
-  pending **scaffolder Thumb-emitter tooling brief** (Thumb corridor/gap-
-  object integration + multi-pool + non-4-aligned Thumb; would un-park
-  ov004's 15 Thumb funcs + the equivalents you find here). ⚠️ ov004-style
-  pool-constant gotcha on any overlay: a wrong pool word passes dcheck,
-  fails sha1 — `cmp build/<v>/build/arm9_ovXXX.bin
-  extract/<v>/arm9_overlays/ovXXX.bin` per touched overlay. Watch for the
-  Codex Thumb-corridor-drift effect (carving ARM funcs shifted pre-
-  existing Thumb-corridor bytes) — gate 3-region `ninja sha1` and park
-  anything that drifts. Stay off ov002 and `main`. Branch:
-  `decomper/overlay-residue-drain`.
+- **Brief 418** — `scaffolder` (recommended model: **Sonnet 4.6 Max**,
+  escalate to Opus only if the pc-relative encoding gets hairy).
+  **TOOLING: asm_escape intermediate-literal-pool support — un-park the
+  capability edge wave 23 found.** Above ~0x1040–0x109c, ov002 functions
+  carry *intermediate* literal pools (mid-function `....` bytes in the
+  disasm) that `mwasmarm` rejects ("Undefined macro or opcode: ...."). The
+  edge is pool-density-dependent, not a pure byte count, and it blocks the
+  entire large-function tier project-wide (ov002 AND main). Wave 23's doc
+  (`brief-416-…`) already scoped the fix: (a) detect `....` runs in
+  `parse_objdump` and emit them as inline `.word N` data, (b) handle
+  backward `[pc, #-N]` pc-relative loads to intermediate pools, (c) keep
+  the existing trailing-pool path working. **Acceptance = artifacts:**
+  ship ≥5 previously-above-edge ov002 funcs end-to-end (the wave-23
+  rejects are the candidate list), EUR `ninja sha1` OK per-pick; a doc
+  note on the mechanism + remaining limits; a NEGATIVE test (§ Verify gate
+  item 7) that fails loudly on a mis-emitted intermediate pool, shown red.
+  Tools/ + your own ov002 delinks for the acceptance ships. Brain runs
+  3-region on merge. **Collision-free** (decomper on `main`, off ov002).
+  Branch: `scaffolder/intermediate-pool-tool`.
+- **Brief 419** — `decomper` (recommended model: **Sonnet 4.6 Max** —
+  mechanical sweep). **OPEN THE ENDGAME: main (arm9) — 2678 uncarved, the
+  largest remaining vein.** The overlay residue is drained (brief 417 took
+  355; only ~100 walls/tooling-blocked remain outside ov002/main). Main is
+  now the bulk of what's left. It already has 17 shipped `.s`, so the lane
+  is proven. This round = **characterize + drain main's `.s`-carveable
+  tier**: list uncarved `.text` symbols in `config/eur/arm9/symbols.txt`
+  (and the `_dsd_gap@main_*` objects), `asm_escape --classify-data
+  --version eur` → `--whole-function`, ship every byte-identical ARM `.s`.
+  Bucket the rest to **size the main endgame**: (a) `.s`-carveable now,
+  (b) intermediate-pool-blocked (→ brief 418 tooling), (c) Thumb-blocked,
+  (d) kind:data REFUSE, (e) genuine RE. ⚠️ **main carries USA/JPN region
+  divergence** (the historic 2-byte main-function-displacement) — a carve
+  that's EUR-clean can break USA/JPN, so **gate all 3 regions yourself**
+  and park anything region-divergent with a note. Pool-constant gotcha
+  applies (wrong word passes dcheck, fails sha1). Dedup against *current
+  main* (some main funcs are already carved). Stay off ov002 and every
+  overlay. Branch: `decomper/main-endgame-w1`.
 
 ### Closed briefs (reference)
 
+- **Brief 416** — `scaffolder` (ran on **Codex**), shipped in PR #949. ✅
+  **ov002 `.s` wave 23 — 67 ships** via a systematic size ladder from 0x74
+  through ~0x1040. **CAPABILITY EDGE FOUND at ~0x1040–0x109c:** above it,
+  functions carry *intermediate* literal pools (`....` bytes mwasmarm
+  can't assemble) — pool-density-dependent, not pure byte count. Scoped
+  the fix → brief 418. `.s` total ≈275. 3-region gate reproduced on merge.
+- **Brief 417** — `decomper` (ran on **Codex**), shipped in PR #948. ✅
+  **Overlay-residue drain — 355 `.s` ships across 11 overlays** (ov000 56,
+  ov005 31, ov006 66, ov008 54, ov010 46, ov016 33, ov017 24, ov018 7,
+  ov020 19, ov021 8, ov022 11). **This drains the non-ov002/main overlay
+  vein** — residue now ~100: (a) ~75 reg-alloc/sched walls, (b) 10
+  kind:data/pool-const, (c) **15 Thumb-tooling-blocked** (sizes the pending
+  Thumb-emitter brief). Flagged + recovered a concurrency artifact (11
+  parallel wine jobs → spurious no-match for ov006/ov008; serial re-pass
+  recovered 120; cap concurrent sweeps ≤4). ⚠️ **DEFECT caught at brain
+  integration gate (NOT on-branch):** the sweep re-derived `ov010/021b27d8`
+  + `ov017/021b2c8c` already on main → squash-merge doubled their delink
+  blocks → `dsd lcf` "overlaps with previous file". Brain hotfix removed
+  the dup blocks (PR-after `4d0122fd`); 3-region re-verified. New verify-
+  gate item 10 (pre-merge dup scan) banks the lesson. 3-region gate
+  reproduced on merge.
 - **Brief 414** — `scaffolder` (ran on **Codex**), shipped in PR #947. ✅
   **ov002 `.s` wave 22 — 12 ships** (upper-half ≤0x6c leftovers + into the
   0x70–0x90 tier). All byte-identical; 0 REFUSE. **Capability edge NOT
