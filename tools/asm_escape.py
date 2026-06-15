@@ -169,6 +169,14 @@ def to_mwasm(mn: str) -> str:
                  r"gt|le|al|hs|lo)(\b.*)?$", mn)
     if m:
         return f"{m.group(1)}{m.group(3)}{m.group(2)}{m.group(4) or ''}"
+    # Conditional LDM/STM with explicit addressing mode: objdump emits
+    # <op><mode><cond> (e.g. `ldmfdne`, `stmfdeq`) but mwasmarm requires
+    # <op><cond><mode> (`ldmnefd`, `stmeqfd`). Reorder the condition before
+    # the mode suffix.
+    _COND_PAT = r"(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)"
+    m = re.match(r"(stm|ldm)(fd|fa|ea|ed|ia|ib|da|db)" + _COND_PAT + r"(\s.*)?$", mn)
+    if m:
+        return f"{m.group(1)}{m.group(3)}{m.group(2)}{m.group(4) or ''}"
     # bare stm/ldm: objdump omits the default `ia` addressing mode (e.g.
     # `stm sp, {r4, r5}`), but mwasmarm requires it explicit -> `stmia`. The
     # conditional bare form `stmeq sp, {…}` -> `stmeqia sp, {…}`. push/pop are
@@ -178,6 +186,32 @@ def to_mwasm(mn: str) -> str:
                  r"(\s+.*)$", mn)
     if m:
         return f"{m.group(1)}{m.group(2) or ''}ia{m.group(3)}"
+    # MCR/MRC (+ MCR2/MRC2): objdump emits bare coprocessor number + `crN`
+    # register names + `{N}` Op2 (`mcr 15, 0, r0, cr7, cr10, {4}`) but
+    # mwasmarm wants `p` prefix, `cN` names, bare Op2 integer
+    # (`mcr p15, 0, r0, c7, c10, 4`).
+    m = re.match(r"(mcr2?|mrc2?)(\s+)(\d+),\s*(\d+),\s*(\w+),\s*cr(\d+),\s*cr(\d+)"
+                 r"(?:,\s*\{(\d+)\})?$", mn, re.IGNORECASE)
+    if m:
+        op2 = f", {m.group(8)}" if m.group(8) is not None else ""
+        return (f"{m.group(1)}{m.group(2)}p{m.group(3)}, {m.group(4)}, "
+                f"{m.group(5)}, c{m.group(6)}, c{m.group(7)}{op2}")
+    # rrx / rrxs / rrx{cond} / rrxs{cond}: objdump shorthand; mwasmarm needs
+    # mov{cond}{s} Rd, Rm, rrx (condition before S flag in output).
+    m = re.match(r"(rrxs?)([a-z]{2})?\s+(\w+), (\w+)$", mn)
+    if m:
+        sflag = "s" if m.group(1) == "rrxs" else ""
+        cc = m.group(2) or ""
+        if cc and cc not in CONDS:
+            return mn
+        return f"mov{cc}{sflag} {m.group(3)}, {m.group(4)}, rrx"
+    # ALU instructions with S-before-condition: objdump emits <op>s<cond>
+    # (e.g., `andseq`, `subsge`) but mwasmarm requires <op><cond>s.
+    # Placed after shift/rrx/ldm-stm/ldr-str handlers so those run first.
+    _COND_LIST = (r"(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)")
+    m = re.match(r"^(\w+?)s" + _COND_LIST + r"(\s.*)?$", mn)
+    if m:
+        return f"{m.group(1)}{m.group(2)}s{m.group(3) or ''}"
     return mn
 
 
@@ -339,6 +373,27 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     head += [f"        .global {func}", "        .thumb" if thumb else "        .arm",
              f"{func}:"]
 
+    # Detect tail-call branches (forward branch to the byte IMMEDIATELY AFTER
+    # the function's last word, no reloc). These occur when a function jumps
+    # to the next function in the gap object without a reloc. We emit a local
+    # end-label after the pool; the relative offset is the same as the original.
+    # Branches to addresses FARTHER forward (cross-function jumps into the body
+    # of another function) or BACKWARD (cross-function backward jumps) cannot
+    # be reproduced via a label — emit them as .word instead (see fallback below).
+    instr_addrs = {w["addr"] for w in orig}
+    all_func_addrs = set(instr_addrs) | set(lit.keys())
+    approx_func_end = (max(all_func_addrs) + 4) if all_func_addrs else 0
+    end_label: str | None = None
+    end_targets: set[int] = set()
+    for w in orig:
+        ib = _BRANCH_RE.match(w["mnem"])
+        if ib and not w["reloc"]:
+            t = int(ib.group(3), 16)
+            if t not in instr_addrs and t not in lit and t == approx_func_end:
+                end_targets.add(t)
+    if end_targets:
+        end_label = ".L_FUNCEND"
+
     body, pool = [], []
     for w in orig:
         if w["addr"] in lit:
@@ -355,14 +410,27 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             mn = re.sub(r"\[pc, #\d+\]", lit[_pc_base(w["addr"]) + int(pm.group(1))], mn)
         # internal branch (no reloc, target within func) -> local label
         ib = _BRANCH_RE.match(w["mnem"])
-        if ib and not w["reloc"] and int(ib.group(3), 16) in labels:
-            mn = re.sub(re.escape(ib.group(3)) + r"$", labels[int(ib.group(3), 16)], mn)
+        if ib and not w["reloc"]:
+            t = int(ib.group(3), 16)
+            if t in labels:
+                mn = re.sub(re.escape(ib.group(3)) + r"$", labels[t], mn)
+            elif t in end_targets and end_label:
+                # tail-call branch past function end -> local end-label
+                mn = re.sub(re.escape(ib.group(3)) + r"$", end_label, mn)
         # external call/branch (b / bl / blx, PC24 reloc) -> use the symbol.
         bm = re.match(r"(bl|blx|b)(\S*)\s", mn)
         if bm and w["reloc"]:
             mn = f"{bm.group(1)}{bm.group(2)} {w['reloc']}"
+        # Fixed-address branch/call with no reloc and a raw hex target not
+        # resolved above (not an internal label, not a tail-call, not an extern
+        # reloc): emit the instruction's raw encoding as a literal word — the
+        # encoding is already fixed in the original binary with no relocatable
+        # slot. This covers bl/b/blx to cross-module hardcoded addresses.
+        elif re.match(r"b[a-z]*\s+[0-9a-f]+$", mn) and not w["reloc"]:
+            mn = f".word 0x{int(w['bytes'], 16):08x}"
         body.append("    " + hex_imm(mn))
-    return "\n".join(head + body + pool) + "\n"
+    suffix = [f"{end_label}:"] if end_label else []
+    return "\n".join(head + body + pool + suffix) + "\n"
 
 
 # --------------------------------------------------- kind:data link preflight
@@ -561,6 +629,12 @@ def is_thumb(version: str, func: str) -> bool:
                      re.MULTILINE) is not None
 
 
+def _resolve_tail_calls(func: str, orig: list[dict], symbols_text: str) -> None:
+    """No-op placeholder — tail-call detection moved into emit_asm (avoids
+    creating reloc records that break bytes_match against the unlinked gap .o).
+    Kept for call-site hygiene in generate_whole."""
+
+
 def gap_object(version: str, func: str) -> str | None:
     """The delinked gap .o that defines `func` (build/<ver>/delinks)."""
     import glob
@@ -672,6 +746,12 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
         print(f"error: {func} has no disassembly in {orig_obj}", file=sys.stderr)
         return 2
 
+    cfg = _module_config(version, func)
+    try:
+        sym_text = (cfg / "symbols.txt").read_text(encoding="utf-8")
+    except FileNotFoundError:
+        sym_text = ""
+    _resolve_tail_calls(func, orig, sym_text)
     s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func))
     out_path = out or str(tmp / f"{func}.s")
     Path(out_path).write_text(s, encoding="utf-8")
