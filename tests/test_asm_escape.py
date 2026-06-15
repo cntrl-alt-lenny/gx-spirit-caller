@@ -25,6 +25,7 @@ sys.path.insert(0, str(_TOOLS))
 from asm_escape import (  # noqa: E402
     branch_targets,
     classify_fixes,
+    diff_words,
     emit_asm,
     hex_imm,
     is_commutative_swap,
@@ -392,6 +393,90 @@ class TestThumbMode(unittest.TestCase):
         self.assertIn("mov r0, #0x0", s)
         self.assertIn("lsl r1, r3, #0x0", s)
         self.assertIn("bl func_ext", s)
+
+
+class TestIntermediatePool(unittest.TestCase):
+    """brief 418: a large function threads an INTERMEDIATE literal pool through
+    its code so every `ldr [pc, …]` stays within the ±4 KB ARM offset field.
+    Words BEHIND such a load are reached by a backward `[pc, #-N]`; the pool
+    must be emitted INLINE at its address (not appended at the end) so the
+    pc-relative offsets reproduce byte-for-byte. The fixture: a one-word pool
+    island at 0xc reached ONLY by a backward load (the pre-418 blind spot) and
+    a second at 0x10 reached by a forward load, with code after both."""
+
+    _MID = """\
+00000000 <func_mid>:
+   0:\te92d4010 \tpush\t{r4, lr}
+   4:\te59f1004 \tldr\tr1, [pc, #4]\t@ 10 <.L_fwd>
+   8:\tea000002 \tb\t18 <.L_resume>
+   c:\t11111111                                ....
+  10:\t22222222                                ....
+  14:\te51f3010 \tldr\tr3, [pc, #-16]\t@ c <.L_bwd>
+  18:\te8bd8010 \tpop\t{r4, pc}
+"""
+
+    def test_backward_load_is_a_pool_word(self):
+        # 0xc is reached ONLY by the backward [pc, #-16] at 0x14; the pre-418
+        # `#(\d+)` regex missed it, so it leaked into the .s as a `....` word.
+        self.assertEqual(pool_addrs(parse_objdump(self._MID, "func_mid")),
+                         {0xC, 0x10})
+
+    def test_pool_emitted_inline_not_appended(self):
+        s = emit_asm("func_mid", parse_objdump(self._MID, "func_mid"), whole=True)
+        # both pool words become inline .word slots (no `....` gutter leak)
+        self.assertIn("_LIT0: .word 0x11111111", s)   # the backward-only word
+        self.assertIn("_LIT1: .word 0x22222222", s)
+        self.assertNotIn("....", s)                    # nothing leaked as data
+        self.assertEqual(s.count("11111111"), 1)       # only the .word, no leak
+        # forward load -> _LIT1 (0x10), backward load -> _LIT0 (0xc)
+        self.assertIn("ldr r1, _LIT1", s)
+        self.assertIn("ldr r3, _LIT0", s)
+        # INLINE: the pool sits before the trailing pop, not after it
+        self.assertLess(s.index("_LIT0: .word"), s.index("ldmia sp!, {r4, pc}"))
+
+
+class TestDiffWordsPoolGuard(unittest.TestCase):
+    """brief 418, Verify-gate item 7: diff_words is the safety net generate_whole
+    trusts. The pre-418 comparator tolerated ANY byte mismatch whose rendering
+    started with `.word` — but mwasmarm marks every emitted pool word `$d`, so
+    objdump prints MY side `.word 0x…` for EVERY pool word, raw constants
+    included. A corrupted raw pool constant therefore slipped through GREEN.
+    These cases are the RED that must be seen before the green is trusted: the
+    corrupted-pool test FAILS against the pre-418 tolerance and passes now."""
+
+    @staticmethod
+    def _w(b, mnem, reloc=None):
+        return {"addr": 0, "bytes": b, "mnem": mnem, "reloc": reloc}
+
+    def test_identical_raw_pool_matches(self):
+        # my side renders `.word 0x…`, orig renders the data gutter; bytes equal
+        mine = [self._w("000015d5", ".word 0x000015d5")]
+        orig = [self._w("000015d5", "....")]
+        self.assertEqual(diff_words(mine, orig), [])
+
+    def test_corrupted_raw_pool_is_flagged_red(self):
+        # THE hole: one-bit-off pool constant, my side still renders `.word`.
+        # Must be flagged — this assertion is RED against the pre-418 tolerance.
+        mine = [self._w("000015d4", ".word 0x000015d4")]
+        orig = [self._w("000015d5", "....")]
+        self.assertTrue(diff_words(mine, orig),
+                        "a corrupted raw pool word MUST be flagged, not tolerated")
+
+    def test_symbol_pointer_matches_by_name(self):
+        # a relocated pool pointer: bytes differ by construction (0 + ABS32 vs
+        # resolved), so compare by symbol — same symbol -> match
+        mine = [self._w("00000000", ".word data_x", "data_ov002_x")]
+        orig = [self._w("00000000", "....", "data_ov002_x")]
+        self.assertEqual(diff_words(mine, orig), [])
+
+    def test_symbol_pointer_wrong_target_flagged(self):
+        mine = [self._w("00000000", ".word data_y", "data_ov002_y")]
+        orig = [self._w("00000000", "....", "data_ov002_x")]
+        self.assertTrue(diff_words(mine, orig))
+
+    def test_code_byte_mismatch_flagged(self):
+        self.assertTrue(diff_words([self._w("e3a00001", "mov r0, #1")],
+                                   [self._w("e3a00000", "mov r0, #0")]))
 
 
 if __name__ == "__main__":
