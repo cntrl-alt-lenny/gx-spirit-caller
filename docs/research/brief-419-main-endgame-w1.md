@@ -35,30 +35,36 @@ REFUSE rate: 2.0% — nearly all main functions are data-ref-clean.
 ## asm_escape fixes required (applied to `tools/asm_escape.py`)
 
 ### 1. MCR/MRC coprocessor instruction conversion (b419)
+
 objdump emits: `mcr 15, 0, r0, cr7, cr10, {4}`  
 mwasmarm needs: `mcr p15, 0, r0, c7, c10, 4`  
 Fix: regex in `to_mwasm()` adds `p`-prefix to coprocessor number and `c`-prefix to register names.
 
 ### 2. Tail-call branch (b419)
+
 Functions that branch to the immediately following function have no reloc record for the
 branch target. The target address is not in the function's instruction set. Fix: detect
 forward branches past the function end → emit `.L_FUNCEND:` label after pool words.
 
 ### 3. Conditional LDM/STM mode+condition reorder (b419)
+
 objdump emits `ldmfdne`, `ldmfdeq`, etc. (condition AFTER addressing mode suffix).  
 mwasmarm requires condition BEFORE suffix: `ldmnefd`, `ldmeqfd`.  
 Fix: regex in `to_mwasm()` matches `(ldm|stm)(fd|fa|ea|ed|ia|ib|da|db)(cond)(...)` and
 reorders to `(ldm|stm)(cond)(mode)(...)`.
 
 ### 4. rrx / rrxs shorthand (b419)
+
 objdump emits `rrxs r1, r1`; mwasmarm needs `movs r1, r1, rrx`.  
 Fix: handler in `to_mwasm()` detects `rrx[s][cond]` and expands to `mov[cond][s] Rd, Rm, rrx`.
 
 ### 5. ALU S+condition reorder (b419)
+
 objdump emits `<op>s<cond>` (e.g. `andseq`, `subsge`); mwasmarm requires `<op><cond>s`.  
 Fix: general regex `^(\w+?)s(COND_LIST)(\s.*)?$` reorders condition before S flag.
 
 ### 6. Cross-function backward/forward branch detection (b419)
+
 Original tail-call detection added ALL non-in-function branch targets to `end_targets`,
 causing `.L_FUNCEND` to be placed at wrong position for branches that jump into another
 function's body or backwards (cross-function).  
@@ -66,6 +72,7 @@ Fix: only add to `end_targets` if `t == approx_func_end` (exactly one word after
 last instruction/pool word).
 
 ### 7. Size overrun bug fix (post-sweep, b419)
+
 **Root cause:** `parse_objdump()` stops at the next `<func_...>:` label in the gap object
 disassembly. When a gap object contained an unshipped function with no `func_` label
 immediately after a shipped function, `parse_objdump` continued past the declared end
