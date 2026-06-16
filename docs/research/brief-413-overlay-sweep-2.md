@@ -51,6 +51,7 @@ All three regions run in this branch before the PR (saves a brain round-trip).
 Two failure modes observed; both are skip-and-document:
 
 ### ldr-pool-out-of-range
+
 Functions larger than ~4 KB generate a literal pool that `mwasmarm` cannot
 reach with a single `ldr`/`ldrh` from the function body. The emitted `.s`
 assembles with "Offset to address out of range" errors.
@@ -61,6 +62,7 @@ assembles with "Offset to address out of range" errors.
 | 021bf844 | 0x13d0 | ov006 |
 
 ### bl fffe… — unsymbolized DTCM/ITCM calls
+
 The disassembler emits raw hex branch targets for DTCM/ITCM addresses that
 have no symbol. `mwasmarm` cannot assemble an unknown `bl` target.
 
@@ -78,10 +80,12 @@ have no symbol. `mwasmarm` cannot assemble an unknown `bl` target.
 | 021cb674 | ov013 |
 
 ### Assembly failure (unknown shape)
+
 `ov006/021ba364` emitted a `.s` that did not assemble; root cause not diagnosed
 (neither bl-fffe nor confirmed ldr-pool). Skipped.
 
 ## Stubs / already-matched (not-found)
+
 A handful of 4-byte functions were already covered in multi-function TUs;
 `asm_escape` reports "not found in build/eur/delinks". Skipped without action:
 
@@ -89,6 +93,7 @@ ov006: 021b5c28, 021b9ef4, 021c1558, 021c19a4
 ov019: 021b2ae4, 021b465c, 021b52ec
 
 ## Notable ov011 delinks bug
+
 During batch-3 appending, a missing newline concatenated the `.bss` section
 end address with the following `src/overlay011/func_ov011_021d0cac.s:` path
 on a single line, causing dsd to fail with:

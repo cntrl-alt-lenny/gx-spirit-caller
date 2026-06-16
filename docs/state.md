@@ -55,7 +55,7 @@ decomp — the ROM round-trips from source; readable-C is a separate later pass.
 3-region `ninja sha1` PASS verified on the integration tree + on fixed main.
 
 ⚠️ **DEFECT caught at the integration gate (the gate earned its keep):**
-#948's sweep re-derived `ov010/021b27d8` + `ov017/021b2c8c` (already on
+PR #948's sweep re-derived `ov010/021b27d8` + `ov017/021b2c8c` (already on
 main from earlier rounds) → squash-merge **doubled** their delink blocks →
 `dsd lcf` "overlaps with previous file", main briefly broke. The agent's
 on-branch sha1 was green (its branch had 1 entry); the doubling is a 3-way
