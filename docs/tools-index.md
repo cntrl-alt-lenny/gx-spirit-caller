@@ -365,7 +365,7 @@ A "brief" is a markdown file named `NNN-slug.md` whose first non-blank line has 
 
 **Generates an SVG treemap visualizing decomp progress per unit.**
 
-Reads build/<version>/report.json (objdiff-cli format) and writes assets/progress-heatmap.svg. Each rectangle is one translation unit; area is proportional to total bytes (code + data); fill color encodes match percentage from red (0%) t…
+Reads build/<version>/report.json (objdiff-cli format) and writes assets/progress-heatmap.svg. Each rectangle is one translation unit; area is proportional to CODE bytes and fill color encodes the CODE match percentage from red (0%) thro…
 
 ### `tools/generate_research_index.py`
 
