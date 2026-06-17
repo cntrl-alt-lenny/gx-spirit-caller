@@ -19,7 +19,7 @@ This wave is the **0x64–0x70** band (the smallest uncarved upper-half funcs:
 `dsd dis` still aborts with `index out of bounds: the len is 640 but the index
 is 640` at `cli/src/cmd/dis.rs:267` (main func `0x02099928`'s pre-code constant
 pool, post-brief-419 main endgame) and emits **0 gap files**. Worked around as in
-#954 — no `dis` needed:
+PR #954 — no `dis` needed:
 
 1. **Enumerate** uncarved = `symbols.txt` funcs **minus** the `delinks.txt`
    carved set (sizes from `symbols.txt`); the delinked gap `.o` from
