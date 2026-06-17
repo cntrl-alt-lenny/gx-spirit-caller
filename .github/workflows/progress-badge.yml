@@ -13,9 +13,11 @@ on:
       # New matched source files — the actual progress.
       - 'src/**/*.c'
       - 'src/**/*.cpp'
+      - 'src/**/*.s'
       # Progress tooling itself.
       - 'tools/progress.py'
       - 'tools/update_progress_badge.py'
+      - 'tools/generate_heatmap.py'
       # README so a manual badge edit doesn't get stuck stale.
       - 'README.md'
   schedule:
@@ -50,13 +52,21 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Update README badge
+      - name: Update README badge + progress heatmaps
         id: update
         run: |
           # Multi-region: no --version flag → tool iterates over
           # all 3 regions (EUR/USA/JPN). Per PR #411's refactor.
           python tools/update_progress_badge.py
-          if git diff --quiet README.md; then
+          # Heatmaps regenerate from the committed delinks.txt (the
+          # no-baserom synthesis path in generate_heatmap.py), so CI
+          # CAN keep them live here — unlike the report.json path,
+          # which needs the baserom CI never has. Keeps the chart as
+          # current as the badge instead of drifting for weeks.
+          for v in eur usa jpn; do
+            python tools/generate_heatmap.py --version "$v"
+          done
+          if git diff --quiet README.md assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -72,28 +82,38 @@ jobs:
           # default workflow-token-push-doesn't-trigger-workflows rule
           # already covers this, but the marker makes the intent explicit
           # in the commit log.
-          MSG="chore: update README progress badge [skip ci]"
+          MSG="chore: update progress badge + heatmaps [skip ci]"
+
+          # Recompute badge + all three heatmaps. Heatmaps use the
+          # no-baserom delinks-synthesis path, so this is safe in CI.
+          regen() {
+            python tools/update_progress_badge.py
+            for v in eur usa jpn; do
+              python tools/generate_heatmap.py --version "$v"
+            done
+          }
+          tracked='README.md assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg'
 
           # Rebase-on-failure retry: if main moves between checkout
-          # and push, reset to the new tip, recompute the badge, and
-          # retry. Bounded to 3 attempts so a fully-broken state can
-          # still fail the workflow rather than spin forever.
+          # and push, reset to the new tip, recompute, and retry.
+          # Bounded to 3 attempts so a fully-broken state can still
+          # fail the workflow rather than spin forever.
           for attempt in 1 2 3; do
-            git add README.md
+            git add $tracked
             git commit -m "$MSG"
             if git push origin HEAD:main; then
               echo "pushed on attempt $attempt"
               exit 0
             fi
             # Push rejected — main moved. Reset to its new tip and
-            # recompute. If the badge is already correct on the new
-            # tip, the next iteration's `git diff --quiet` will be
+            # recompute. If badge + heatmaps are already correct on the
+            # new tip, the next iteration's `git diff --quiet` will be
             # clean and we exit 0 with no push needed.
             git fetch origin main
             git reset --hard origin/main
-            python tools/update_progress_badge.py
-            if git diff --quiet README.md; then
-              echo "main already has the correct badge after rebase; nothing to do"
+            regen
+            if git diff --quiet $tracked; then
+              echo "main already current after rebase; nothing to do"
               exit 0
             fi
           done
