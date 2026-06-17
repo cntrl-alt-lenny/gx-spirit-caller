@@ -1,0 +1,40 @@
+; func_ov002_02239700 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern func_ov002_021d94ac
+        .extern func_ov002_0225764c
+        .global func_ov002_02239700
+        .arm
+func_ov002_02239700:
+    stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+    mov r7, #0x0
+    ldr r4, _LIT0
+    mov r9, r0
+    mov r5, #0x2
+    mov r6, r7
+.L_130:
+    mov r8, r6
+.L_134:
+    mov r0, r9
+    mov r1, r7
+    mov r2, r8
+    bl func_ov002_0225764c
+    cmp r0, #0x0
+    beq .L_160
+    mov r0, r7
+    mov r1, r8
+    mov r2, r5
+    mov r3, r4
+    bl func_ov002_021d94ac
+.L_160:
+    add r8, r8, #0x1
+    cmp r8, #0x4
+    ble .L_134
+    add r7, r7, #0x1
+    cmp r7, #0x2
+    blt .L_130
+    mov r0, #0x0
+    ldmia sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
+_LIT0: .word 0x00001a90
