@@ -3163,6 +3163,22 @@ src/usa/main/func_0209a748.c:
     complete
     .text start:0x0209a748 end:0x0209a760
 
+src/usa/main/func_0209ad68.legacy.c:
+    complete
+    .text start:0x0209ad68 end:0x0209ada4
+
+src/usa/main/func_0209ae54.legacy.c:
+    complete
+    .text start:0x0209ae54 end:0x0209ae90
+
+src/usa/main/func_0209af20.legacy.c:
+    complete
+    .text start:0x0209af20 end:0x0209af5c
+
+src/usa/main/func_0209afc4.legacy.c:
+    complete
+    .text start:0x0209afc4 end:0x0209b000
+
 src/usa/main/func_0209b458.c:
     complete
     .text start:0x0209b458 end:0x0209b468
@@ -3324,6 +3340,10 @@ src/usa/main/func_020a5784.c:
     complete
     .text start:0x020a5784 end:0x020a57a0
 
+src/usa/main/func_020a5c60.c:
+    complete
+    .text start:0x020a5c60 end:0x020a5c80
+
 libs/nitro/func_020a60c0.legacy.c:
     complete
     .text start:0x020a5fcc end:0x020a6008
@@ -3344,9 +3364,18 @@ libs/nitro/func_020a66a4.legacy.c:
     complete
     .text start:0x020a65b0 end:0x020a65f4
 
+src/usa/main/func_020a68dc.legacy.c:
+    complete
+    .text start:0x020a68dc end:0x020a690c
+
 src/usa/main/func_020a6a3c.c:
     complete
     .text start:0x020a6a3c end:0x020a6a60
+
+src/usa/main/func_020a6bd4.c:
+    complete
+    .text start:0x020a6bd4 end:0x020a6bec
+
 
 src/usa/main/func_020a72e0.c:
     complete
