@@ -76,12 +76,15 @@ class TestMatchPct(unittest.TestCase):
              "matched_data": 25, "total_data": 50}
         self.assertEqual(match_pct(m), 0.5)
 
-    def test_code_and_data_combined(self):
-        # matched_code + matched_data over total_code + total_data.
+    def test_code_only_ignores_data(self):
+        # Code-only: data is excluded entirely, so a unit with little
+        # matched code but fully-matched data still reads low. This is
+        # the fix — USA/JPN sit at ~1% code but ~86% data, and the old
+        # combined metric rendered them misleadingly green.
         m = {"matched_code": 10, "total_code": 40,
-             "matched_data": 30, "total_data": 60}
-        # (10 + 30) / (40 + 60) = 40 / 100 = 0.4
-        self.assertEqual(match_pct(m), 0.4)
+             "matched_data": 60, "total_data": 60}
+        # 10 / 40 = 0.25 — the 100%-matched data is ignored.
+        self.assertEqual(match_pct(m), 0.25)
 
     def test_accepts_string_values(self):
         # objdiff's str-coded bytes must round-trip.
