@@ -5,8 +5,15 @@ Generates an SVG treemap visualizing decomp progress per unit.
 
 Reads build/<version>/report.json (objdiff-cli format) and writes
 assets/progress-heatmap.svg. Each rectangle is one translation unit;
-area is proportional to total bytes (code + data); fill color encodes
+area is proportional to CODE bytes and fill color encodes the CODE
 match percentage from red (0%) through orange/yellow to green (100%).
+
+Data bytes are excluded from both area and colour. Data is structurally
+~85%-"matched" (delinked raw bytes) in every region regardless of decomp
+effort, and it's ~2/3 of total bytes — so mixing it in dominated the
+colour and made barely-started regions (USA/JPN at ~1% code) look
+misleadingly green. The header still reports the data % separately. This
+keeps the map consistent with the code-only badge (update_progress_badge.py).
 
 Run after `ninja report`:
 
@@ -59,8 +66,12 @@ def short_name(unit_name: str) -> str:
 
 
 def match_pct(measures: dict) -> float:
-    total = as_int(measures.get("total_code")) + as_int(measures.get("total_data"))
-    matched = as_int(measures.get("matched_code")) + as_int(measures.get("matched_data"))
+    # Code-only — consistent with the badge. Data is excluded because it
+    # is structurally ~85%-matched (delinked) in every region and is
+    # ~2/3 of total bytes, so including it dominated the colour and made
+    # barely-started regions look green. See the module docstring.
+    total = as_int(measures.get("total_code"))
+    matched = as_int(measures.get("matched_code"))
     return (matched / total) if total else 0.0
 
 
@@ -143,7 +154,7 @@ def render_svg(report: dict, version: str) -> str:
     sized = []
     for u in units:
         m = u.get("measures", {})
-        size = as_int(m.get("total_code")) + as_int(m.get("total_data"))
+        size = as_int(m.get("total_code"))   # code-only: data cells drop out
         if size > 0:
             sized.append((size, u))
     sized.sort(reverse=True, key=lambda t: t[0])
@@ -190,7 +201,7 @@ def render_svg(report: dict, version: str) -> str:
         f'<text x="14" y="38" class="subtitle">'
         f'code {code_pct:.2f}% • data {data_pct:.2f}% • '
         f'units {units_done}/{units_total} • '
-        f'27 translation units sized by total bytes'
+        f'cells = code, sized + coloured by code match'
         f'</text>'
     )
 
@@ -199,8 +210,8 @@ def render_svg(report: dict, version: str) -> str:
         m = unit.get("measures", {})
         pct = match_pct(m)
         fill = color_for(pct)
-        size_bytes = as_int(m.get("total_code")) + as_int(m.get("total_data"))
-        matched_bytes = as_int(m.get("matched_code")) + as_int(m.get("matched_data"))
+        size_bytes = as_int(m.get("total_code"))
+        matched_bytes = as_int(m.get("matched_code"))
         kb = size_bytes / 1024.0
         name = short_name(unit["name"])
         text_fill = text_color_for_bg(fill)
