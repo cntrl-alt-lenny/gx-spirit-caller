@@ -1,0 +1,64 @@
+; func_ov002_02252d98 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern data_ov002_022cf16c
+        .extern data_ov002_022cf184
+        .extern func_0202b8a8
+        .extern func_02030b84
+        .extern func_02031684
+        .extern func_ov002_021ca3f0
+        .extern func_ov002_02253458
+        .global func_ov002_02252d98
+        .arm
+func_ov002_02252d98:
+    stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+    mov r7, r0
+    ldr r0, _LIT0
+    and r2, r7, #0x1
+    mul r1, r2, r0
+    ldr r0, _LIT1
+    mov r4, #0x0
+    ldr r0, [r0, r1]
+    cmp r0, #0x0
+    ldmlsia sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
+    ldr r0, _LIT2
+    mov r8, #0xc
+    add r6, r0, r1
+    add r5, r6, #0x3a0
+.L_38:
+    ldr r0, [r5]
+    mov r0, r0, lsl #0x13
+    mov r9, r0, lsr #0x13
+    mov r0, r9
+    bl func_0202b8a8
+    cmp r0, #0x5
+    bgt .L_98
+    mov r0, r9
+    bl func_02031684
+    cmp r0, #0x0
+    beq .L_98
+    mov r0, r7
+    mov r1, r9
+    bl func_ov002_021ca3f0
+    cmp r0, #0x0
+    beq .L_98
+    mov r0, r9
+    bl func_02030b84
+    cmp r0, #0x0
+    beq .L_98
+    mov r0, r7
+    mov r1, r8
+    mov r2, r4
+    bl func_ov002_02253458
+.L_98:
+    ldr r0, [r6, #0x18]
+    add r4, r4, #0x1
+    cmp r4, r0
+    add r5, r5, #0x4
+    bcc .L_38
+    ldmia sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
+_LIT0: .word 0x00000868
+_LIT1: .word data_ov002_022cf184
+_LIT2: .word data_ov002_022cf16c
