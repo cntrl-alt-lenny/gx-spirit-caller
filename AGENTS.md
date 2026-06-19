@@ -631,39 +631,55 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
 
 ### Open briefs
 
-- **Brief 450** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 UPPER-half `.s` drain — continue the lane (post brief 448 / PR
-  #985).** Proven mechanical vein: reg-alloc/plateau walls ≥0x02234000 →
-  `asm_escape --whole-function`, ~28/wave, ~92% clean rate. Now in the
-  0xa8–0xcc band having crossed >0xc0; ~64 left in 0x81–0xc0 + more above.
-  Keep the two skip-lists current (`build/known_drops_ov002.txt` =
-  byte/arg-pack + kind:data; `build/known_verifyfail_ov002.txt` = soft
-  `to_mwasm` gaps). Per-pick `--classify-data` (park REFUSE) →
-  `--whole-function` → sorted delink + zero-overlap audit → EUR
-  `ninja sha1`. **Dedup vs current main** (Verify item 10). **Re-run a
-  baseline build step once if `dsd delink`/`mwasmarm` flakes under
-  parallelism — that's the large-tree transient, not broken main** (Verify
-  item 11b). Stay UPPER-half (decomper is off ov002 this round → lower half
-  is idle, leave it). Target ~28. Branch: `scaffolder/ov002-upper-wN`.
-- **Brief 451** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **PIVOT to the USA/JPN region-port frontier — the biggest untapped easy
-  vein (user-requested).** The `main` `.c` clean-port lane drained at brief
-  439 (USA 330 + JPN 330 = 660 ports). Two moves brief 439 flagged: **(1)
-  SDK-name alias quick win** — 47/region funcs (94 total) are byte-portable
-  but call SDK funcs named in EUR / addr-named in-region (`Fill32`,
-  `OS_RestoreIrq`, …) → undefined; aliasing **2 symbols × 2 regions
-  unblocks all 94** at once. Do this first, sha1-validate. **(2) Overlay
-  region-port lane** — the scout found overlays port mostly clean (ov002
-  1299/1375, ov004 243/276, ov011 171/193, …); `port_to_region.py` works on
-  overlay `.c` identically — **likely many hundreds of clean ports**. Drain
-  the cleanest overlays first; gate USA+JPN `ninja sha1` per batch. This
-  drives USA/JPN source-match up massively and mechanically. Leave `main`'s
-  283/region divergent tail (real per-region decomp) for a later RE brief.
-  ⚠️ region-divergence + pool-constant gotchas; gate all 3 on any ship.
-  Branch: `decomper/region-port-overlays-w1`.
+- **Brief 452** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 UPPER-half `.s` drain — wave 12 (post brief 450 / PR #986).**
+  Same proven lane. Runway 705 uncarved upper-half: ≤0x80 = 23 (prior-wave
+  skip residue — worth a reclaim-probe), 0x81–0xc0 = 35 (thinning),
+  0xc1–0x100 = 138, >0x100 = the rest (large funcs, ship fast). 32 clean
+  probes were held from wave 11 — start there. **Byte-pack drops begin
+  ≥0xd0**, so expect the skip-lists to grow as you climb. Per-pick
+  `--classify-data` (park REFUSE) → `--whole-function` → newline-guarded
+  sorted delink + zero-overlap audit → EUR `ninja sha1`; **dedup vs current
+  main** (item 10); re-run a flaked baseline step (item 11b). Stay
+  UPPER-half (lower idle). Target ~28–40. Branch: `scaffolder/ov002-upper-w12`.
+- **Brief 453** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Region-port Part 2 — the OVERLAY-port lane (the big USA/JPN vein, now
+  de-risked).** Brief 451 w1 shipped the SDK-alias quick win (98 ports) and
+  characterized the two batch-method hazards; this wave runs the bulk.
+  Overlays port mostly clean per the scout (ov002 1299/1375, ov004 243/276,
+  ov011 171/193, …) — **likely many hundreds of clean ports**, the lever
+  that actually moves USA/JPN code-bytes (now ~1.3%). Method: `port_to_region.py`
+  on overlay `.c`, **cleanest overlays first**, in batches; gate **USA + JPN
+  `ninja sha1` per batch**. **Handle the two hazards (from 451 w1):**
+  (1) **duplicate-shape twins** — byte-identical funcs differing only in an
+  immediate cause byte-sim to mis-resolve to one target; rebuild the
+  bijection from the distinguishing immediate (read it from the baserom
+  gap-object disasm), park siblings with no region match. (2) **region-
+  divergent struct offsets** — a port can build+link clean yet FAIL sha1 on
+  a diverged offset literal; localise by diffing the **UNCOMPRESSED**
+  `arm9.bin`/overlay bin vs a clean-region reference (ARM9/overlays are
+  BLZ-compressed — one byte cascades ~35KB in ROM), then PARK the divergent
+  func (it's real per-region decomp). Gate all 3 regions on any ship.
+  Branch: `decomper/region-port-overlays-w2`.
 
 ### Closed briefs (reference)
 
+- **Brief 450** — `scaffolder`, shipped in PR #986. ✅ **ov002 UPPER `.s`
+  wave 11 — 28 ships** (100% probe yield in 0x80–0x98; byte-pack drops start
+  ≥0xd0). Found+fixed a real `delinks.txt` trailing-newline gotcha (main's
+  file had no final `\n`, so a naïve append fused blocks → deterministic
+  `dsd` parse error at a named file:line — distinct from the transient).
+  Upper-half runway 705. 3-region gate reproduced on merge.
+- **Brief 451 w1** — `decomper`, shipped in PR #987. ✅ **Region-port Part 1
+  — SDK-name alias quick win: 98 ports (49 USA + 49 JPN).** Aliased
+  `OS_RestoreIrq`(@0x020936d0) + `Fill32`(@0x020943cc) × 2 regions → unblocked
+  the byte-portable callers; 5/region parked region-divergent. **Characterized
+  the two batch-method hazards for Part 2** (→ brief 453): (1) duplicate-shape
+  twins (byte-identical but for an immediate) mis-resolve under byte-sim →
+  rebuild bijection from the distinguishing immediate; (2) region-divergent
+  struct-offset literals build+link clean but fail sha1 → localise via
+  UNCOMPRESSED arm9.bin diff (BLZ amplifies 1 byte → ~35KB), park divergent.
+  USA now matched_fn 9.87% / code 1.39% (from 9.29%/1.24%). 3-region sha1 PASS.
 - **Briefs 420–449 (WINDOWS ARC, ~30 briefs, PRs #952–#985)** — run by the
   Windows brain; merged, not individually logged here (git log + PR bodies
   are the record). Two lanes: **(A) ov002 `.s` drain split by half** —

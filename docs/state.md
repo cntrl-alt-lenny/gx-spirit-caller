@@ -8,8 +8,17 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8) — **CATCH-UP after the
-WINDOWS ARC (briefs 420–449, ~30 briefs, PRs #952–#985, all merged; the
+**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 450+451
+merge** (3-region sha1 PASS verified). **This round:** #986 scaffolder ov002
+UPPER `.s` wave 11 (28 ships; fixed a delinks trailing-newline gotcha); #987
+decomper region-port Part 1 — SDK-name alias quick win (98 ports: 49 USA + 49
+JPN; aliased OS_RestoreIrq + Fill32 × 2 regions) + characterized 2 batch
+hazards (twin mis-resolution, region-divergent struct offsets). **USA now
+matched_fn 9.87% / code 1.39%** (from 9.29%/1.24%). **Lanes next:** scaffolder
+→ **452** (ov002 UPPER wave 12); decomper → **453** (region-port Part 2 = the
+OVERLAY-port lane, the big USA/JPN vein, now de-risked).
+
+**↓ Below: CATCH-UP after the WINDOWS ARC (briefs 420–449, PRs #952–#985; the
 Windows brain didn't refresh this log, so git log + PR bodies are the record).**
 
 **Windows arc summary — two lanes:**
