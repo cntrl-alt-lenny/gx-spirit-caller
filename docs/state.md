@@ -8,15 +8,33 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 450+451
-merge** (3-region sha1 PASS verified). **This round:** #986 scaffolder ov002
-UPPER `.s` wave 11 (28 ships; fixed a delinks trailing-newline gotcha); #987
-decomper region-port Part 1 — SDK-name alias quick win (98 ports: 49 USA + 49
-JPN; aliased OS_RestoreIrq + Fill32 × 2 regions) + characterized 2 batch
-hazards (twin mis-resolution, region-divergent struct offsets). **USA now
-matched_fn 9.87% / code 1.39%** (from 9.29%/1.24%). **Lanes next:** scaffolder
-→ **452** (ov002 UPPER wave 12); decomper → **453** (region-port Part 2 = the
-OVERLAY-port lane, the big USA/JPN vein, now de-risked).
+**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 452+453
+merge** (final 3-region sha1 PASS verified on merged main). **This round:**
+- **#988** scaffolder ov002 UPPER `.s` wave 12 — **58 ships** (whole ≤0xc0 tier;
+  the 23 ≤0x80 "skip residue" were MISSED not dropped, 23/23 clean).
+- **#989** decomper region-port wave 10 — **1,624 ov002 `.c` ports (812 USA +
+  812 JPN)**, the overlay-port lane at scale. **⚠️ LANDED BY THE BRAIN** — the
+  decomper session ended before its ship step (1,624 files sat untracked, no
+  commit/push/PR/doc). Brain verified, found the gate failed on ONE divergent
+  func/region (`func_ov002_02296a18`, struct-offset immediate — objdiff-complete
+  but ROM-sha1-FAIL), parked it (uncompressed-bin `cmp` localise → dsd auto-gap),
+  re-gated USA+JPN OK, then committed/pushed/PR'd the clean ~1,620 + wrote the doc.
+  **KEY LESSON (in brief 455): objdiff per-unit is NOT sufficient for region
+  ports — gate the per-region ROM sha1.**
+
+**Metrics (objdiff-verified, merged main):**
+- **EUR: units 7928/8715 (90.97%), matched_fn 81.50%, code 66.63%.**
+- **USA & JPN (identical): units 63.44%, matched_fn 18.10%, code 3.26%.**
+  🎯 The overlay-port lane WORKED: USA matched_fn **9.3%→18.1% (doubled)**, code
+  **1.4%→3.3% (>2×)** from the 812 ov002 ports. The lever is confirmed; ~487
+  more ov002/region + other overlays (ov004/ov011/ov000…) remain.
+
+**Lanes next:** scaffolder → **454** (ov002 UPPER `.s` wave 13, the 0xc1–0x100
+tier); decomper → **455** (region-port wave 11 — finish ov002 + next overlays;
+MANDATORY per-region ROM sha1 per batch + park divergent + RUN THE SHIP STEP).
+
+---
+**Prior round (briefs 450+451):**
 
 **↓ Below: CATCH-UP after the WINDOWS ARC (briefs 420–449, PRs #952–#985; the
 Windows brain didn't refresh this log, so git log + PR bodies are the record).**
