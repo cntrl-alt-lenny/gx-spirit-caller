@@ -629,37 +629,77 @@ Two more rules the brain bakes into every kickoff (system card §6.3.7,
   open framing is what surfaces problems; never relabel a wall or
   fabricate a passing result to dodge reporting a dead end.
 
+Three more clauses (process polish from the 2026-06-19 tool-scout swarm,
+plus the recurring ship-step miss):
+
+- **RUN THE SHIP STEP — non-negotiable, stated twice.** Agents have
+  ended a session with all work uncommitted in their worktree **three
+  rounds running** (briefs 453, 454, 455), forcing the brain to verify +
+  commit + PR loose output. Put at BOTH the top and the closer of every
+  kickoff: *"Your LAST actions must be: `git add` your work → commit →
+  `git push` → `gh pr create` → reply with the PR URL. Generating the
+  files is NOT done; the PR is done."* Until the P2 batch-driver (which
+  commits-on-pass) lands, the brain checks `git -C <worktree> status`
+  on every 'done' and lands loose work — don't trust 'done' = pushed.
+- **C-violation auto-fix + partial snapshot (stolen from Kappa/Mizuchi/
+  snowboardkids2).** Decomper kickoffs: before each compile, hoist any
+  mid-block declarations to block top and call the divmod helper
+  explicitly (the two most common mwcc/C-89 violations); and keep a
+  `base_n.c` of the closest partial match, never overwriting it, so an
+  iteration that regresses can fall back. No-cost habit; reduces churn.
+- **Explicit STOP condition.** Each kickoff names when to stop (target
+  count reached, or N consecutive walls), so a wave ends cleanly with a
+  shipped PR rather than drifting.
+
 ### Open briefs
 
-- **Brief 454** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 UPPER-half `.s` drain — wave 13 (post brief 452 / PR #988).** Wave
-  12 drained the whole ≤0xc0 tier (58 ships). Now climb the **0xc1–0x100
-  tier (~138 funcs)** then >0x100. **Byte-pack drops begin ≥0xd0** — expect
-  REFUSE/verify-fail to grow; keep the skip-lists current and report the
-  clean-rate so we can see where the lane's tail is. Per-pick
-  `--classify-data` (park REFUSE) → `--whole-function` → newline-guarded
-  sorted delink + zero-overlap audit → EUR `ninja sha1`; **dedup vs current
-  main** (item 10); re-run a flaked baseline step (item 11b). Stay
-  UPPER-half. Target ~28–40. Branch: `scaffolder/ov002-upper-w13`.
-- **Brief 455** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Region-port wave 11 — finish ov002 + next overlays.** Wave 10 (brief
-  453) ported 812/region of ov002 (≈1299 portable) → **~487/region ov002
-  funcs remain**, then the other overlays (ov004 243/276, ov011 171/193,
-  ov000, …). Continue `port_to_region.py`, cleanest first, in batches.
-  **⚠️ MANDATORY LESSON from wave 10: objdiff per-unit is NOT sufficient
-  validation — a divergent port scored objdiff-complete yet failed ROM
-  sha1** (`func_ov002_02296a18`, a struct-offset immediate objdiff doesn't
-  byte-check). So: **gate per-region ROM `ninja sha1` on every batch**; when
-  it fails, localise the divergent func via `cmp` of the **UNCOMPRESSED**
-  module bin (`build/<r>/build/arm9_ovNNN.bin` vs `extract/<r>/arm9_overlays/
-  ovNNN.bin`) → **park** it (remove `.c` + delink entry; dsd auto-gaps to
-  original bytes). Also handle duplicate-shape twins (rebuild bijection from
-  the distinguishing immediate). **RUN YOUR SHIP STEP** (commit/push/PR +
-  research doc) — wave 10 ended without it and the brain had to land it.
-  Branch: `decomper/region-port-w11`.
+- **Brief 456** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **TOOLING — build the batch-carve driver (swarm finding P2).** The
+  mechanical lanes (ov002 `.s` carve, region port) are DETERMINISTIC — no
+  LLM needed — so a thin driver can drain hundreds/wave and (critically)
+  **commit-on-pass, fixing the recurring ship-step miss**. Build
+  `tools/batch_carve.py`: (1) enumerate uncarved candidates in a scope
+  (overlay + size/addr filter, minus delinks, minus skip-lists); (2) per
+  candidate run `asm_escape --classify-data` then `--whole-function`
+  (park REFUSE / non-byte-identical, append to skip-list); (3) add the
+  sorted delink block (newline-guarded) + dedup-vs-main (item 10); (4)
+  every N passes run `ninja sha1` and **commit-on-pass / reset-on-fail**;
+  (5) emit a pass/park report. **Acceptance:** the tool + a PILOTED ov002
+  `.s` wave shipped THROUGH it (≥ the manual ~40-60/wave rate, EUR sha1
+  green, auto-committed), a negative test (a deliberately corrupt carve is
+  parked, shown red), and a doc. Keep it generic enough that the region
+  port can reuse the same driver later. Branch: `scaffolder/batch-carve-tool`.
+- **Brief 457** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Peer-corpus idiom mining (swarm finding P3) — crack the wall residue.**
+  **RushRE/SonicRushAdventure-Decomp is a BIT-IDENTICAL compiler — mwccarm
+  2.0/sp1p5, exactly ours**; pret/pokeplatinum is ~100% matched C one
+  sub-rev off (sp1p2). Read-only pass (clone/browse on GitHub, do NOT
+  vendor their SDK artifacts — license + sub-rev skew). Harvest matched-C
+  **idioms for our OPEN wall classes** — reg-alloc/scheduling, byte-pack,
+  fixed-point smull/mla, divmod-helper, cached-base — and NitroSDK
+  function names/struct conventions. Then **apply**: take a handful of
+  known-walled EUR funcs (from the overlay core.h WALL notes) and try the
+  harvested idioms; ship any that crack to 3-region `ninja sha1`. Bank the
+  idiom crib in the relevant core.h + a research doc. **Acceptance:** an
+  idiom crib doc + ≥1 confirmed wall cracked-and-shipped (clean negative OK
+  if none transfer — that's a real finding). **RUN YOUR SHIP STEP**
+  (commit/push/PR). Branch: `decomper/peer-corpus-mining`.
 
 ### Closed briefs (reference)
 
+- **Brief 454** — `scaffolder`, shipped in PR #990 (**brain committed** —
+  session ended pre-ship-step). ✅ **ov002 UPPER `.s` wave 13 — 40 ships**
+  (0xc1–0x100 tier). Dup-clean, sorted, EUR sha1 OK.
+- **Brief 455** — `decomper`, shipped in PR #991 (**brain committed** —
+  session ended pre-ship-step). ✅ **Region-port wave 11 — 1,164 `.c` ports
+  across 20 overlays (582 USA + 582 JPN)**: ov000/003/004/005/006/007/008/
+  009/010/011/012/013/014/015/016/017/018/019/020/021 + ov002-finish (ov006
+  143, ov011 85, ov004 59, ov000 57…). **Clean on the first gate — USA + JPN
+  sha1 OK with NO brain salvage** (the decomper applied the b453 per-region-
+  gate lesson and parked its own divergent funcs). The overlay-port lever
+  keeps delivering. 3-region gate reproduced on merge. **NB: 3rd round
+  running the agent skipped commit/push/PR — ship-step enforcement now in
+  AGENTS.md kickoff conventions; the P2 batch-driver (brief 456) auto-commits.**
 - **Brief 452** — `scaffolder`, shipped in PR #988. ✅ **ov002 UPPER `.s`
   wave 12 — 58 ships** (drained the entire ≤0xc0 tier, 100% probe yield).
   Finding: the 23 "skip residue" ≤0x80 funcs from wave 11 were MISSED, not

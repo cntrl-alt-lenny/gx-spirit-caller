@@ -8,8 +8,34 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 452+453
-merge** (final 3-region sha1 PASS verified on merged main). **This round:**
+**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 454+455
+merge** (final 3-region sha1 PASS on merged main). **This round:**
+- **#990** scaffolder ov002 UPPER `.s` wave 13 — **40 ships** (0xc1–0x100 tier).
+- **#991** decomper region-port wave 11 — **1,164 `.c` ports across 20 overlays
+  (582 USA + 582 JPN)**; clean on the first gate (decomper parked its own
+  divergent funcs per the b453 lesson — no brain salvage).
+- **Both agents skipped the ship step (3rd round running)** → brain verified +
+  committed + PR'd both. Ship-step enforcement now in AGENTS.md kickoff
+  conventions; the P2 batch-driver (brief 456) auto-commits to fix it structurally.
+
+**Metrics (objdiff-verified, merged main):** EUR units **91.07%** / matched_fn
+81.90% / code **66.99%**. USA & JPN (identical) units **64.98%** / matched_fn
+**24.05%** / code **5.44%**. 🎯 The overlay-port lane keeps compounding: USA
+matched_fn 9% → 18% → **24%** and code 1.2% → 3.3% → **5.4%** over three port waves.
+
+🛰️ **TOOL-SCOUT SWARM (2026-06-19, 225 agents, ~7.1M tok):** verdict = our
+toolchain is scene-standard / at-frontier; 77/100 candidates rejected. Findings
+APPLIED: (a) process-polish + ship-step enforcement → AGENTS.md; (b) **P2
+batch-driver = brief 456 (scaffolder)**, **P3 peer-corpus idiom mining = brief
+457 (decomper)**. P1 (embedding retriever) + decomp.dev dashboard deferred.
+Full report: `docs/research/tool-scout-swarm-2026-06-19.md`. LLM byte-exact
+matching = partial win for ≤~0x100 tier, NOT the hard-residue unlock.
+
+**Lanes next:** scaffolder → **456** (build batch-carve driver, pilot on an
+ov002 wave); decomper → **457** (peer-corpus idiom mining, crack wall residue).
+
+---
+**Prior round (briefs 452+453):**
 - **#988** scaffolder ov002 UPPER `.s` wave 12 — **58 ships** (whole ≤0xc0 tier;
   the 23 ≤0x80 "skip residue" were MISSED not dropped, 23/23 clean).
 - **#989** decomper region-port wave 10 — **1,624 ov002 `.c` ports (812 USA +
