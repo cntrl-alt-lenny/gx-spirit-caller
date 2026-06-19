@@ -8,8 +8,41 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-15 (Mac, brain on Opus 4.8), post briefs
-**418+419** merge. **🎯 THIS ROUND = LANDMARK: 2,612 ships, crossed 90% units.**
+**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8) — **CATCH-UP after the
+WINDOWS ARC (briefs 420–449, ~30 briefs, PRs #952–#985, all merged; the
+Windows brain didn't refresh this log, so git log + PR bodies are the record).**
+
+**Windows arc summary — two lanes:**
+- **(A) ov002 `.s` drain, split by half** — scaffolder UPPER (≥0x02234000,
+  ~28/wave, briefs 430/…/448), decomper LOWER (40–50/wave, briefs 441/…/449,
+  size filter now ≤0xc0). Both have MANY waves left (lower half: 288+ ≤0xc0
+  candidates; upper: ~64 in 0x81–0xc0 + more above). ov002 `.s` totals: lower
+  276 (waves 1–9), upper ~10×28.
+- **(B) USA/JPN region-port lane** — decomper, briefs 431–439: ported EUR
+  `main` `.c` to both regions = **660 ports (USA 330 + JPN 330)**. main `.c`
+  clean-port lane DRAINED at b439 → decomper moved to ov002 lower. Region
+  residue/region: 47 SDK-name-blocked (alias 2 syms → unblock 94), 14
+  marginal, 283 divergent (real RE). **Next easy vein: OVERLAY region-port**
+  (ov002 1299/1375 etc. port-clean — hundreds of clean ports) → brief 451.
+
+**Metrics (objdiff-verified this session, post-arc):**
+- **EUR: `complete_units 7842/8629 (90.88%)`, matched_fn 80.61%, code-bytes
+  66.11%** (was 90.52%/73.94%/58.29% at b419 — the ov002 drains pushed code
+  +8pp). EUR `ninja sha1` PASS (re-gated this session after the 30 merges).
+- **USA / JPN: gating in progress this session** (verifying the 660 region
+  ports + the shared tree); numbers to fill on completion.
+
+**Lanes now:** scaffolder → **brief 450** (ov002 UPPER `.s`, continue);
+decomper → **brief 451** (PIVOT to USA/JPN region-port: SDK-alias quick win +
+the overlay-port lane — the user-requested frontier). ov002 LOWER idles 1 round.
+
+Op-note (re-derived on Windows): large-tree transient `dsd delink`/`mwasmarm`
+crashes under heavy parallelism — re-run a flaked baseline step before calling
+it broken main (= Verify item 11b).
+
+---
+
+**Prior landmark (briefs 418+419, Mac):** **2,612 ships, crossed 90% units.**
 - **#950** scaffolder (brief 418): asm_escape **intermediate-literal-pool
   support** (the ~0x1040 edge) + comparator-hole fix (diff_words by reloc) +
   **12 above-edge ov002 ships**. Negative test shown red-before-green.
