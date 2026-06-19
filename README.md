@@ -19,8 +19,8 @@
 <p align="center">
   <strong>Per-region code-tier progress</strong><br>
   <img src="https://img.shields.io/badge/EUR-66.29%25-yellowgreen" alt="EUR Progress">
-  <img src="https://img.shields.io/badge/USA-1.24%25-red" alt="USA Progress">
-  <img src="https://img.shields.io/badge/JPN-1.24%25-red" alt="JPN Progress">
+  <img src="https://img.shields.io/badge/USA-1.39%25-red" alt="USA Progress">
+  <img src="https://img.shields.io/badge/JPN-1.39%25-red" alt="JPN Progress">
 </p>
 
 <p align="center">
