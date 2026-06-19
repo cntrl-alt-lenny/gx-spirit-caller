@@ -29,8 +29,12 @@ Windows brain didn't refresh this log, so git log + PR bodies are the record).**
 - **EUR: `complete_units 7842/8629 (90.88%)`, matched_fn 80.61%, code-bytes
   66.11%** (was 90.52%/73.94%/58.29% at b419 — the ov002 drains pushed code
   +8pp). EUR `ninja sha1` PASS (re-gated this session after the 30 merges).
-- **USA / JPN: gating in progress this session** (verifying the 660 region
-  ports + the shared tree); numbers to fill on completion.
+- **USA: `units 916/1472 (62.23%)`, matched_fn 9.29%, code-bytes 1.24%**;
+  **JPN: identical** (916/1472, 9.29%, 1.24%). Both `ninja sha1` PASS
+  (byte-identical ROMs — round-trip DONE). Source-match is EARLY: the 660
+  `main` `.c` ports moved code ~0.70% → 1.24% (main bytes are huge; ports
+  were a fraction). **The overlay-port lane (b451) is the lever** — overlays
+  port-clean and are a big share, so USA/JPN code should climb fast there.
 
 **Lanes now:** scaffolder → **brief 450** (ov002 UPPER `.s`, continue);
 decomper → **brief 451** (PIVOT to USA/JPN region-port: SDK-alias quick win +
