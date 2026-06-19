@@ -1,0 +1,32 @@
+/* func_0200bd04: allocate (n*8)-byte block via Task_PostLocked,
+ * zero it via Fill32 if non-null, return pointer.
+ *
+ *     stmdb sp!, {r3, r4, r5, lr}
+ *     mov   r5, r0, lsl #0x3      ; r5 = n * 8
+ *     mov   r0, r5
+ *     mov   r1, #0x4
+ *     mov   r2, #0x0
+ *     bl    Task_PostLocked
+ *     movs  r4, r0                ; r4 = ptr, set flags
+ *     beq   .L_0200bd50
+ *     mov   r1, r4
+ *     mov   r2, r5
+ *     mov   r0, #0x0
+ *     bl    Fill32
+ *  .L_0200bd50:
+ *     mov   r0, r4
+ *     ldmia sp!, {r3, r4, r5, pc}
+ */
+
+extern int  Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void Fill32(int v, void *dst, int size);
+
+void *func_0200bd04(int n) {
+    void *p;
+    int size = n << 3;
+    p = (void *)Task_PostLocked((void *)size, 4, 0);
+    if (p) {
+        Fill32(0, p, size);
+    }
+    return p;
+}
