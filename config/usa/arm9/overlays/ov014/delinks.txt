@@ -5,6 +5,18 @@
     .data       start:0x021b4bc0 end:0x021b4f40 kind:data align:32
     .bss        start:0x021b4f40 end:0x02235080 kind:bss align:32
 
+src/usa/overlay014/func_ov014_021b24b0.c:
+    complete
+    .text start:0x021b24b0 end:0x021b2544
+
+src/usa/overlay014/func_ov014_021b3340.c:
+    complete
+    .text start:0x021b3340 end:0x021b33f0
+
+src/usa/overlay014/func_ov014_021b33f0.c:
+    complete
+    .text start:0x021b33f0 end:0x021b3468
+
 src/usa/overlay014/bss/data_ov014_bss.s:
     complete
     .bss start:0x021b4f40 end:0x02235080

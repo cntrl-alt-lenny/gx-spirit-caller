@@ -4,10 +4,86 @@
     .data       start:0x021abdc0 end:0x021acda0 kind:data align:32
     .bss        start:0x021acda0 end:0x0222d000 kind:bss align:32
 
-src/usa/overlay021/bss/data_ov021_bss.s:
+src/usa/overlay021/func_ov021_021aa434.c:
     complete
-    .bss start:0x021acda0 end:0x0222d000
+    .text start:0x021aa434 end:0x021aa4c0
+
+src/usa/overlay021/func_ov021_021aa4c0.c:
+    complete
+    .text start:0x021aa4c0 end:0x021aa4ec
+
+src/usa/overlay021/func_ov021_021aa6f8.c:
+    complete
+    .text start:0x021aa6f8 end:0x021aa740
+
+src/usa/overlay021/func_ov021_021aa740.c:
+    complete
+    .text start:0x021aa740 end:0x021aa768
+
+src/usa/overlay021/func_ov021_021aa768.c:
+    complete
+    .text start:0x021aa768 end:0x021aa7b8
+
+src/usa/overlay021/func_ov021_021aa7b8.c:
+    complete
+    .text start:0x021aa7b8 end:0x021aa7f4
+
+src/usa/overlay021/func_ov021_021aa7f4.c:
+    complete
+    .text start:0x021aa7f4 end:0x021aa828
+
+src/usa/overlay021/func_ov021_021aa828.c:
+    complete
+    .text start:0x021aa828 end:0x021aa8d4
+
+src/usa/overlay021/func_ov021_021aa8dc.c:
+    complete
+    .text start:0x021aa8dc end:0x021aa91c
+
+src/usa/overlay021/func_ov021_021aa91c.c:
+    complete
+    .text start:0x021aa91c end:0x021aa960
+
+src/usa/overlay021/func_ov021_021aa960.c:
+    complete
+    .text start:0x021aa960 end:0x021aa9f4
+
+src/usa/overlay021/func_ov021_021aa9fc.c:
+    complete
+    .text start:0x021aa9fc end:0x021aaa9c
+
+src/usa/overlay021/func_ov021_021aacdc.c:
+    complete
+    .text start:0x021aacdc end:0x021aad88
+
+src/usa/overlay021/func_ov021_021aad88.c:
+    complete
+    .text start:0x021aad88 end:0x021aae74
+
+src/usa/overlay021/func_ov021_021aaf7c.c:
+    complete
+    .text start:0x021aaf7c end:0x021aafb0
+
+src/usa/overlay021/func_ov021_021aafb0.c:
+    complete
+    .text start:0x021aafb0 end:0x021ab068
+
+src/usa/overlay021/func_ov021_021abae8.c:
+    complete
+    .text start:0x021abae8 end:0x021abbcc
+
+src/usa/overlay021/func_ov021_021abbcc.c:
+    complete
+    .text start:0x021abbcc end:0x021abc98
+
+src/usa/overlay021/func_ov021_021abc98.c:
+    complete
+    .text start:0x021abc98 end:0x021abd50
 
 src/usa/overlay021/data/data_ov021_021aca40.s:
     complete
     .data start:0x021aca40 end:0x021acd3c
+
+src/usa/overlay021/bss/data_ov021_bss.s:
+    complete
+    .bss start:0x021acda0 end:0x0222d000

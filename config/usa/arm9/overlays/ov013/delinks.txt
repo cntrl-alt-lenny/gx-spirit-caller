@@ -4,10 +4,26 @@
     .data       start:0x021cb840 end:0x021cbb20 kind:data align:32
     .bss        start:0x021cbb20 end:0x021cc100 kind:bss align:32
 
-src/usa/overlay013/bss/data_ov013_bss.s:
+src/usa/overlay013/ov013_021c9f18.c:
     complete
-    .bss start:0x021cbb20 end:0x021cc100
+    .text start:0x021c9f18 end:0x021c9f44
+
+src/usa/overlay013/func_ov013_021ca1b4.c:
+    complete
+    .text start:0x021ca1b4 end:0x021ca1d8
+
+src/usa/overlay013/func_ov013_021ca4f4.c:
+    complete
+    .text start:0x021ca4f4 end:0x021ca538
+
+src/usa/overlay013/func_ov013_021cb564.c:
+    complete
+    .text start:0x021cb564 end:0x021cb594
 
 src/usa/overlay013/data/data_ov013_021cba3c.c:
     complete
     .data start:0x021cba3c end:0x021cba40
+
+src/usa/overlay013/bss/data_ov013_bss.s:
+    complete
+    .bss start:0x021cbb20 end:0x021cc100
