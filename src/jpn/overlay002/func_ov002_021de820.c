@@ -1,0 +1,18 @@
+/* func_ov002_021de820: C-42 — bit-set + 4-arg helper + tst-bool tail.
+ *
+ *   push {r4, lr}
+ *   add r1, r2, r1, lsl #4         ; bit = c + (b << 4)
+ *   mov r2, #1; mov r4, r2, lsl r1  ; mask = 1 << bit
+ *   mov r1, r4; mov r2, #0xb; mov r3, #0
+ *   bl func_ov002_021de044(a, mask, 0xb, 0)
+ *   tst r4, r0; movne r0, #1; moveq r0, #0
+ *   pop
+ */
+
+extern int func_ov002_021de044(int a, unsigned int mask, int k1, int k2);
+
+int func_ov002_021de820(int a, int b, int c) {
+    int bit = c + (b << 4);
+    unsigned int mask = 1u << bit;
+    return (func_ov002_021de044(a, mask, 0xb, 0) & mask) ? 1 : 0;
+}
