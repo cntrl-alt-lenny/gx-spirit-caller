@@ -4,6 +4,30 @@
     .data       start:0x021cc1c0 end:0x021cc5c0 kind:data align:32
     .bss        start:0x021cc5c0 end:0x021ccb20 kind:bss align:32
 
+src/usa/overlay012/func_ov012_021c9c80.c:
+    complete
+    .text start:0x021c9c80 end:0x021c9cac
+
+src/usa/overlay012/func_ov012_021ca1c0.c:
+    complete
+    .text start:0x021ca1c0 end:0x021ca260
+
+src/usa/overlay012/ov012_021ca260.c:
+    complete
+    .text start:0x021ca260 end:0x021ca28c
+
+src/usa/overlay012/func_ov012_021ca31c.c:
+    complete
+    .text start:0x021ca31c end:0x021ca370
+
+src/usa/overlay012/func_ov012_021cae64.c:
+    complete
+    .text start:0x021cae64 end:0x021caea0
+
+src/usa/overlay012/func_ov012_021cbe94.c:
+    complete
+    .text start:0x021cbe94 end:0x021cbf3c
+
 src/usa/overlay012/bss/data_ov012_bss.s:
     complete
     .bss start:0x021cc5c0 end:0x021ccb20

@@ -4,6 +4,78 @@
     .data       start:0x021ad240 end:0x021ad780 kind:data align:32
     .bss        start:0x021ad780 end:0x021ae180 kind:bss align:32
 
+src/usa/overlay018/func_ov018_021aa6b4.c:
+    complete
+    .text start:0x021aa6b4 end:0x021aa738
+
+src/usa/overlay018/func_ov018_021aa738.c:
+    complete
+    .text start:0x021aa738 end:0x021aa7a0
+
+src/usa/overlay018/func_ov018_021aa7a0.c:
+    complete
+    .text start:0x021aa7a0 end:0x021aa840
+
+src/usa/overlay018/func_ov018_021aa840.c:
+    complete
+    .text start:0x021aa840 end:0x021aa898
+
+src/usa/overlay018/func_ov018_021aa898.c:
+    complete
+    .text start:0x021aa898 end:0x021aa8d8
+
+src/usa/overlay018/func_ov018_021aa9a8.c:
+    complete
+    .text start:0x021aa9a8 end:0x021aaa10
+
+src/usa/overlay018/func_ov018_021aaa10.c:
+    complete
+    .text start:0x021aaa10 end:0x021aaaf8
+
+src/usa/overlay018/func_ov018_021aaaf8.c:
+    complete
+    .text start:0x021aaaf8 end:0x021aac04
+
+src/usa/overlay018/func_ov018_021aac04.c:
+    complete
+    .text start:0x021aac04 end:0x021aac84
+
+src/usa/overlay018/func_ov018_021aac84.c:
+    complete
+    .text start:0x021aac84 end:0x021aacb0
+
+src/usa/overlay018/func_ov018_021aacb0.c:
+    complete
+    .text start:0x021aacb0 end:0x021aacfc
+
+src/usa/overlay018/func_ov018_021aaf74.c:
+    complete
+    .text start:0x021aaf74 end:0x021ab05c
+
+src/usa/overlay018/func_ov018_021ab05c.c:
+    complete
+    .text start:0x021ab05c end:0x021ab0e4
+
+src/usa/overlay018/func_ov018_021ab3ac.c:
+    complete
+    .text start:0x021ab3ac end:0x021ab414
+
+src/usa/overlay018/func_ov018_021acbf0.c:
+    complete
+    .text start:0x021acbf0 end:0x021accc8
+
+src/usa/overlay018/func_ov018_021accc8.c:
+    complete
+    .text start:0x021accc8 end:0x021acd3c
+
+src/usa/overlay018/func_ov018_021ad040.c:
+    complete
+    .text start:0x021ad040 end:0x021ad11c
+
+src/usa/overlay018/func_ov018_021ad11c.c:
+    complete
+    .text start:0x021ad11c end:0x021ad20c
+
 src/usa/overlay018/bss/data_ov018_bss.s:
     complete
     .bss start:0x021ad780 end:0x021ae180

@@ -4,13 +4,77 @@
     .data       start:0x021b2320 end:0x021b2660 kind:data align:32
     .bss        start:0x021b2660 end:0x021b2e20 kind:bss align:32
 
+src/usa/overlay008/func_ov008_021aa42c.c:
+    complete
+    .text start:0x021aa42c end:0x021aa460
+
+src/usa/overlay008/func_ov008_021aa460.c:
+    complete
+    .text start:0x021aa460 end:0x021aa498
+
+src/usa/overlay008/func_ov008_021aa498.c:
+    complete
+    .text start:0x021aa498 end:0x021aa4f8
+
+src/usa/overlay008/func_ov008_021aa4f8.c:
+    complete
+    .text start:0x021aa4f8 end:0x021aa510
+
+src/usa/overlay008/func_ov008_021aa820.c:
+    complete
+    .text start:0x021aa820 end:0x021aa86c
+
+src/usa/overlay008/func_ov008_021ab040.c:
+    complete
+    .text start:0x021ab040 end:0x021ab084
+
+src/usa/overlay008/func_ov008_021ac4b0.c:
+    complete
+    .text start:0x021ac4b0 end:0x021ac4f0
+
+src/usa/overlay008/func_ov008_021ad96c.c:
+    complete
+    .text start:0x021ad96c end:0x021ad984
+
+src/usa/overlay008/func_ov008_021aecd8.c:
+    complete
+    .text start:0x021aecd8 end:0x021aed30
+
+src/usa/overlay008/func_ov008_021aed30.c:
+    complete
+    .text start:0x021aed30 end:0x021aed88
+
+src/usa/overlay008/func_ov008_021aed88.c:
+    complete
+    .text start:0x021aed88 end:0x021aedf4
+
+src/usa/overlay008/ov008_021b1ce8.c:
+    complete
+    .text start:0x021b1ce8 end:0x021b1cfc
+
+src/usa/overlay008/func_ov008_021b1dbc.c:
+    complete
+    .text start:0x021b1dbc end:0x021b1dd0
+
+src/usa/overlay008/func_ov008_021b1dd0.c:
+    complete
+    .text start:0x021b1dd0 end:0x021b1e04
+
+src/usa/overlay008/func_ov008_021b1f04.c:
+    complete
+    .text start:0x021b1f04 end:0x021b1f40
+
+src/usa/overlay008/func_ov008_021b2078.c:
+    complete
+    .text start:0x021b2078 end:0x021b20dc
+
+src/usa/overlay008/func_ov008_021b2120.c:
+    complete
+    .text start:0x021b2120 end:0x021b2144
+
 src/usa/overlay008/func_ov008_021b2288.c:
     complete
     .text start:0x021b2288 end:0x021b2294
-
-src/usa/overlay008/bss/data_ov008_bss.s:
-    complete
-    .bss start:0x021b2660 end:0x021b2e20
 
 src/usa/overlay008/data/data_ov008_021b25f0.c:
     complete
@@ -19,3 +83,7 @@ src/usa/overlay008/data/data_ov008_021b25f0.c:
 src/usa/overlay008/data/data_ov008_021b25f4.c:
     complete
     .data start:0x021b25f4 end:0x021b25f8
+
+src/usa/overlay008/bss/data_ov008_bss.s:
+    complete
+    .bss start:0x021b2660 end:0x021b2e20
