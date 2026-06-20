@@ -237,6 +237,138 @@ src/usa/overlay004/func_ov004_021db64c.c:
     complete
     .text start:0x021db64c end:0x021db660
 
+src/usa/overlay004/func_ov004_021dbbc8.thumb.c:
+    complete
+    .text start:0x021dbbc8 end:0x021dbbe0
+
+src/usa/overlay004/func_ov004_021dbbe0.thumb.c:
+    complete
+    .text start:0x021dbbe0 end:0x021dbc2c
+
+src/usa/overlay004/func_ov004_021dbc2c.thumb.c:
+    complete
+    .text start:0x021dbc2c end:0x021dbc46
+
+src/usa/overlay004/func_ov004_021dbc8c.thumb.c:
+    complete
+    .text start:0x021dbc8c end:0x021dbcb8
+
+src/usa/overlay004/func_ov004_021dbcb8.thumb.c:
+    complete
+    .text start:0x021dbcb8 end:0x021dbd1c
+
+src/usa/overlay004/func_ov004_021dbd34.thumb.c:
+    complete
+    .text start:0x021dbd34 end:0x021dbd58
+
+src/usa/overlay004/func_ov004_021dbd58.thumb.c:
+    complete
+    .text start:0x021dbd58 end:0x021dbd92
+
+src/usa/overlay004/func_ov004_021dbd94.thumb.c:
+    complete
+    .text start:0x021dbd94 end:0x021dbdbe
+
+src/usa/overlay004/func_ov004_021dbdc0.thumb.c:
+    complete
+    .text start:0x021dbdc0 end:0x021dbe0a
+
+src/usa/overlay004/func_ov004_021dbe0c.thumb.c:
+    complete
+    .text start:0x021dbe0c end:0x021dbe96
+
+src/usa/overlay004/func_ov004_021dbed4.thumb.c:
+    complete
+    .text start:0x021dbed4 end:0x021dbf14
+
+src/usa/overlay004/func_ov004_021dbf14.thumb.c:
+    complete
+    .text start:0x021dbf14 end:0x021dbf40
+
+src/usa/overlay004/func_ov004_021dbf40.thumb.c:
+    complete
+    .text start:0x021dbf40 end:0x021dbf86
+
+src/usa/overlay004/func_ov004_021dbf88.thumb.c:
+    complete
+    .text start:0x021dbf88 end:0x021dbfb8
+
+src/usa/overlay004/func_ov004_021dc024.thumb.c:
+    complete
+    .text start:0x021dc024 end:0x021dc0b8
+
+src/usa/overlay004/func_ov004_021dc0b8.thumb.c:
+    complete
+    .text start:0x021dc0b8 end:0x021dc13c
+
+src/usa/overlay004/func_ov004_021dc13c.thumb.c:
+    complete
+    .text start:0x021dc13c end:0x021dc1a4
+
+src/usa/overlay004/func_ov004_021dc1a4.thumb.c:
+    complete
+    .text start:0x021dc1a4 end:0x021dc202
+
+src/usa/overlay004/func_ov004_021dc204.thumb.c:
+    complete
+    .text start:0x021dc204 end:0x021dc260
+
+src/usa/overlay004/func_ov004_021dc2ec.thumb.c:
+    complete
+    .text start:0x021dc2ec end:0x021dc35c
+
+src/usa/overlay004/func_ov004_021dc5a8.thumb.c:
+    complete
+    .text start:0x021dc5a8 end:0x021dc60a
+
+src/usa/overlay004/func_ov004_021dc740.thumb.c:
+    complete
+    .text start:0x021dc740 end:0x021dc784
+
+src/usa/overlay004/func_ov004_021dcab4.thumb.c:
+    complete
+    .text start:0x021dcab4 end:0x021dcb08
+
+src/usa/overlay004/func_ov004_021dcb50.thumb.c:
+    complete
+    .text start:0x021dcb50 end:0x021dcc60
+
+src/usa/overlay004/func_ov004_021dcd24.thumb.c:
+    complete
+    .text start:0x021dcd24 end:0x021dce2c
+
+src/usa/overlay004/func_ov004_021dce2c.thumb.c:
+    complete
+    .text start:0x021dce2c end:0x021dcf3c
+
+src/usa/overlay004/func_ov004_021dcf3c.thumb.c:
+    complete
+    .text start:0x021dcf3c end:0x021dcff8
+
+src/usa/overlay004/func_ov004_021dcff8.thumb.c:
+    complete
+    .text start:0x021dcff8 end:0x021dd030
+
+src/usa/overlay004/func_ov004_021dd030.thumb.c:
+    complete
+    .text start:0x021dd030 end:0x021dd068
+
+src/usa/overlay004/func_ov004_021dd068.thumb.c:
+    complete
+    .text start:0x021dd068 end:0x021dd0b4
+
+src/usa/overlay004/func_ov004_021dd160.thumb.c:
+    complete
+    .text start:0x021dd160 end:0x021dd370
+
+src/usa/overlay004/func_ov004_021dd388.thumb.c:
+    complete
+    .text start:0x021dd388 end:0x021dd3dc
+
+src/usa/overlay004/func_ov004_021dd3dc.thumb.c:
+    complete
+    .text start:0x021dd3dc end:0x021dd414
+
 src/usa/overlay004/data/data_ov004_02209c54.c:
     complete
     .data start:0x02209c54 end:0x02209c58
