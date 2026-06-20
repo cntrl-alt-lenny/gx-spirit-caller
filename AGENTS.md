@@ -653,37 +653,29 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 456** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **TOOLING — build the batch-carve driver (swarm finding P2).** The
-  mechanical lanes (ov002 `.s` carve, region port) are DETERMINISTIC — no
-  LLM needed — so a thin driver can drain hundreds/wave and (critically)
-  **commit-on-pass, fixing the recurring ship-step miss**. Build
-  `tools/batch_carve.py`: (1) enumerate uncarved candidates in a scope
-  (overlay + size/addr filter, minus delinks, minus skip-lists); (2) per
-  candidate run `asm_escape --classify-data` then `--whole-function`
-  (park REFUSE / non-byte-identical, append to skip-list); (3) add the
-  sorted delink block (newline-guarded) + dedup-vs-main (item 10); (4)
-  every N passes run `ninja sha1` and **commit-on-pass / reset-on-fail**;
-  (5) emit a pass/park report. **Acceptance:** the tool + a PILOTED ov002
-  `.s` wave shipped THROUGH it (≥ the manual ~40-60/wave rate, EUR sha1
-  green, auto-committed), a negative test (a deliberately corrupt carve is
-  parked, shown red), and a doc. Keep it generic enough that the region
-  port can reuse the same driver later. Branch: `scaffolder/batch-carve-tool`.
-- **Brief 457** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Peer-corpus idiom mining (swarm finding P3) — crack the wall residue.**
-  **RushRE/SonicRushAdventure-Decomp is a BIT-IDENTICAL compiler — mwccarm
-  2.0/sp1p5, exactly ours**; pret/pokeplatinum is ~100% matched C one
-  sub-rev off (sp1p2). Read-only pass (clone/browse on GitHub, do NOT
-  vendor their SDK artifacts — license + sub-rev skew). Harvest matched-C
-  **idioms for our OPEN wall classes** — reg-alloc/scheduling, byte-pack,
-  fixed-point smull/mla, divmod-helper, cached-base — and NitroSDK
-  function names/struct conventions. Then **apply**: take a handful of
-  known-walled EUR funcs (from the overlay core.h WALL notes) and try the
-  harvested idioms; ship any that crack to 3-region `ninja sha1`. Bank the
-  idiom crib in the relevant core.h + a research doc. **Acceptance:** an
-  idiom crib doc + ≥1 confirmed wall cracked-and-shipped (clean negative OK
-  if none transfer — that's a real finding). **RUN YOUR SHIP STEP**
-  (commit/push/PR). Branch: `decomper/peer-corpus-mining`.
+- **Brief 458** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 `.s` at SCALE via `tools/batch_carve.py` (the new tool).** The
+  driver shipped 50/50 clean in its pilot (PR #992) and auto-commits on
+  green — now run it big. Drive the ov002 UPPER-half remaining size tiers
+  (0x101–0x140 = 135, 0x141–0x200 = 195, >0x200 = 179): `batch_carve.py`
+  with a generous `--limit` and `--batch ~25`, let it park
+  REFUSE/verify-fail and commit-on-pass. **Report the clean-rate per tier**
+  (byte-pack drops climb with size — this maps the lane's real tail).
+  Push the auto-commits + open ONE PR for the wave. The tool already does
+  dedup/sort/newline-guard/gate-retry; your job is to run it at scale and
+  read the results. Branch: `scaffolder/ov002-batchdrain-w1`.
+- **Brief 459** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Region-port wave 12 — keep the USA/JPN lever going (now 24% fn / 5.4%
+  code).** Continue `port_to_region.py` across the remaining portable
+  overlay funcs (finish the 20 overlays you started + any untouched) at
+  scale; per-region ROM `ninja sha1` per batch; localise+park divergent
+  funcs (uncompressed-bin `cmp`). **BONUS — apply the brief-457 crib:** any
+  overlay func that calls NitroSDK math (`FX_Mul`/`FX_Sqrt`/`FX_Div`/the
+  Q12 idioms) or matches a banked idiom → match it as `.c` (named SDK
+  calls), not just `.s`. Consider reusing the **batch_carve commit-on-pass
+  pattern** for the port loop if it adapts cleanly (the tool's `Ops` seam
+  is generic). **RUN YOUR SHIP STEP** (commit/push/PR + per-overlay
+  port/park counts). Branch: `decomper/region-port-w12`.
 
 ### Closed briefs (reference)
 
@@ -700,6 +692,25 @@ plus the recurring ship-step miss):
   keeps delivering. 3-region gate reproduced on merge. **NB: 3rd round
   running the agent skipped commit/push/PR — ship-step enforcement now in
   AGENTS.md kickoff conventions; the P2 batch-driver (brief 456) auto-commits.**
+- **Brief 456** — `scaffolder`, shipped in PR #992. ✅ **`tools/batch_carve.py`
+  — the deterministic-lane driver (swarm finding P2), + 50 ov002 `.s` shipped
+  THROUGH it.** Commit-on-pass / red→bisect-and-park; 22 tests (negative parks
+  shown red-before-green); a **6-agent adversarial safety review before touching
+  real git** hardened the co-lane-shared `delinks.txt` handling (revert by
+  in-memory reconstruction not `git checkout`; refuse-if-dirty; commit only if
+  HEAD advanced; gate-green only on `<rom>: OK`; contention-timeout defers, never
+  false-parks). Pilot: 50/50 clean, 100% rate, 2 auto-commits. **Both agents
+  ran their ship step this round** (the enforcement held). EUR sha1 OK; 3-region
+  on merge. This is the throughput multiplier + the structural ship-step fix.
+- **Brief 457** — `decomper`, shipped in PR #993. ✅ **Peer-corpus idiom mining
+  (P3) — cracked the FX_Mul fixed-point wall.** `func_02018f2c` `.s`→matched
+  `.c` (3-region OK): a NitroSDK Q12 distance func; the inline `smull;adds#0x800;
+  …` wall is verbatim `FX_Mul` from RushRE's **bit-identical** `fx.h`. Banked SDK
+  identities (`func_0208bf3c`=FX_Sqrt, `0208c490`=FX_Div) + an idiom crib
+  (`brief-457-…` + ov000_core.h). Honest negatives: pokeplatinum strips NitroSDK
+  source (dead end for fx bodies); the hard reg-alloc/CSE tier (VEC_CrossProduct/
+  DotProduct near-misses) does NOT crack on idioms → permuter/`.s` per canon. **The
+  crib cracks the TRACTABLE tier; corroborates the swarm/b405 verdict.**
 - **Brief 452** — `scaffolder`, shipped in PR #988. ✅ **ov002 UPPER `.s`
   wave 12 — 58 ships** (drained the entire ≤0xc0 tier, 100% probe yield).
   Finding: the 23 "skip residue" ≤0x80 funcs from wave 11 were MISSED, not

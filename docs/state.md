@@ -8,8 +8,30 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 454+455
-merge** (final 3-region sha1 PASS on merged main). **This round:**
+**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 456+457
+merge** (final 3-region sha1 PASS on merged main). **This round = the swarm
+findings PAID OFF:**
+- **#992** scaffolder built **`tools/batch_carve.py`** (swarm P2): deterministic-
+  lane driver, commit-on-pass / red→bisect-park, 22 tests, a 6-agent adversarial
+  safety review before touching real git; **shipped 50 ov002 `.s` THROUGH it,
+  auto-committed**. The ship-step problem is now structurally solved.
+- **#993** decomper (swarm P3) **cracked the FX_Mul fixed-point wall**:
+  `func_02018f2c` `.s`→`.c` 3-region OK (NitroSDK Q12 dist; `FX_Mul` verbatim
+  from RushRE's bit-identical `fx.h`). Banked SDK identities (FX_Sqrt/FX_Div) +
+  an idiom crib. Honest negative: hard reg-alloc tier still doesn't crack on
+  idioms (corroborates the swarm/b405 verdict).
+- **BOTH agents ran their ship step** (the AGENTS.md enforcement held).
+
+**Metrics:** EUR units **91.20%** / matched_fn **82.42%** / code **67.46%**
+(+50 ov002 .s + FX .c). USA & JPN ~unchanged (24.05% fn / 5.44% code — only the
+1 FX `main` func touched all 3; the region lever moves on the port waves).
+
+**Lanes next:** scaffolder → **458** (ov002 `.s` at SCALE via `batch_carve.py` —
+0x101+ tiers, big auto-committed wave); decomper → **459** (region-port wave 12,
+keep the USA/JPN lever going + apply the FX/SDK crib to overlay SDK-math callers).
+
+---
+**Prior round (briefs 454+455):**
 - **#990** scaffolder ov002 UPPER `.s` wave 13 — **40 ships** (0xc1–0x100 tier).
 - **#991** decomper region-port wave 11 — **1,164 `.c` ports across 20 overlays
   (582 USA + 582 JPN)**; clean on the first gate (decomper parked its own
