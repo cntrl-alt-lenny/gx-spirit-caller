@@ -5,6 +5,10 @@
     .data       start:0x021b8960 end:0x021b8b20 kind:data align:32
     .bss        start:0x021b8b20 end:0x021b9f00 kind:bss align:32
 
+src/jpn/overlay010/ov010_021b2234.c:
+    complete
+    .text start:0x021b2234 end:0x021b2248
+
 src/jpn/overlay010/ov010_021b2248.c:
     complete
     .text start:0x021b2248 end:0x021b225c
@@ -105,6 +109,10 @@ src/jpn/overlay010/func_ov010_021b3f3c.c:
     complete
     .text start:0x021b3f3c end:0x021b3f90
 
+src/jpn/overlay010/func_ov010_021b3f90.c:
+    complete
+    .text start:0x021b3f90 end:0x021b4044
+
 src/jpn/overlay010/func_ov010_021b4044.c:
     complete
     .text start:0x021b4044 end:0x021b4094
@@ -128,6 +136,10 @@ src/jpn/overlay010/func_ov010_021b66ec.c:
 src/jpn/overlay010/func_ov010_021b6714.c:
     complete
     .text start:0x021b6714 end:0x021b6768
+
+src/jpn/overlay010/func_ov010_021b6768.c:
+    complete
+    .text start:0x021b6768 end:0x021b681c
 
 src/jpn/overlay010/func_ov010_021b681c.c:
     complete
