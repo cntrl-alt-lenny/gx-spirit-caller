@@ -1,0 +1,115 @@
+; func_ov002_02275ab4 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern data_ov002_022cd300
+        .extern data_ov002_022cf16c
+        .extern func_ov002_021bc288
+        .extern func_ov002_021bc68c
+        .extern func_ov002_02275860
+        .extern func_ov002_02275938
+        .extern func_ov002_02275a14
+        .global func_ov002_02275ab4
+        .arm
+func_ov002_02275ab4:
+    stmdb sp!, {r3, r4, r5, r6, r7, lr}
+    mov r6, r1
+    mov r5, r2
+    add r4, r6, r5
+    mov r7, r0
+    cmp r4, #0xa
+    movgt r0, #0x0
+    ldmgtia sp!, {r3, r4, r5, r6, r7, pc}
+    ldr r1, _LIT0
+    ldr r2, _LIT1
+    and r3, r7, #0x1
+    mla r2, r3, r1, r2
+    mov r1, #0x14
+    mla r1, r4, r1, r2
+    ldr r1, [r1, #0x30]
+    mov r1, r1, lsl #0x13
+    movs r1, r1, lsr #0x13
+    moveq r0, #0x0
+    ldmeqia sp!, {r3, r4, r5, r6, r7, pc}
+    ldr r3, _LIT2
+    ldrb r1, [r3, #0x8]
+    cmp r1, #0x0
+    bne .L_a8
+    bl func_ov002_021bc68c
+    cmp r0, #0x0
+    bne .L_e8
+    ldr r0, _LIT2
+    ldr r0, [r0]
+    mov r0, r0, lsl #0x1f
+    cmp r7, r0, lsr #0x1f
+    movne r0, #0x0
+    ldmneia sp!, {r3, r4, r5, r6, r7, pc}
+    cmp r4, #0x4
+    movgt r0, #0x0
+    ldmgtia sp!, {r3, r4, r5, r6, r7, pc}
+    mov r0, r7
+    mov r1, r4
+    bl func_ov002_021bc288
+    cmp r0, #0x0
+    bne .L_e8
+    mov r0, #0x0
+    ldmia sp!, {r3, r4, r5, r6, r7, pc}
+.L_a8:
+    cmp r1, #0x0
+    mov r0, #0x0
+    ble .L_e8
+    and ip, r7, #0xff
+    and r2, r4, #0xff
+    orr r2, ip, r2, lsl #0x8
+    mov r2, r2, lsl #0x10
+    mov r4, r2, lsr #0x10
+.L_c8:
+    add r2, r3, r0, lsl #0x1
+    ldrh r2, [r2, #0x10]
+    cmp r4, r2
+    moveq r0, #0x0
+    ldmeqia sp!, {r3, r4, r5, r6, r7, pc}
+    add r0, r0, #0x1
+    cmp r0, r1
+    blt .L_c8
+.L_e8:
+    ldr r0, _LIT2
+    ldr r1, _LIT3
+    ldr r0, [r0]
+    mov r0, r0, lsl #0x9
+    mov r2, r0, lsr #0x11
+    cmp r2, r1
+    beq .L_120
+    add r0, r1, #0x1
+    cmp r2, r0
+    beq .L_134
+    add r0, r1, #0x25
+    cmp r2, r0
+    beq .L_148
+    b .L_15c
+.L_120:
+    mov r0, r7
+    mov r1, r6
+    mov r2, r5
+    bl func_ov002_02275860
+    ldmia sp!, {r3, r4, r5, r6, r7, pc}
+.L_134:
+    mov r0, r7
+    mov r1, r6
+    mov r2, r5
+    bl func_ov002_02275938
+    ldmia sp!, {r3, r4, r5, r6, r7, pc}
+.L_148:
+    mov r0, r7
+    mov r1, r6
+    mov r2, r5
+    bl func_ov002_02275a14
+    ldmia sp!, {r3, r4, r5, r6, r7, pc}
+.L_15c:
+    mov r0, #0x0
+    ldmia sp!, {r3, r4, r5, r6, r7, pc}
+_LIT0: .word 0x00000868
+_LIT1: .word data_ov002_022cf16c
+_LIT2: .word data_ov002_022cd300
+_LIT3: .word 0x000019a3
