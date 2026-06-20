@@ -2552,7 +2552,7 @@ src/main/func_02018ecc.s:
     complete
     .text start:0x02018ecc end:0x02018f2c
 
-src/main/func_02018f2c.s:
+src/main/func_02018f2c.c:
     complete
     .text start:0x02018f2c end:0x02018f80
 

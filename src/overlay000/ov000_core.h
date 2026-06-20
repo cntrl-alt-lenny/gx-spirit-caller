@@ -152,6 +152,15 @@ extern struct Ov000Row data_ov000_021c7530[];
  *    not reproducible here (matches once linked / via the brain on merge).
  *  - Fixed-point (smull/mla) class: 021ae510, 021ab01c, 021aaee4, 021aa8d4,
  *    021ac578 (distance test), 021acc58 — m2c/permuter territory.
+ *    ** brief 457 PEER-CORPUS CRIB (RushRE = bit-identical mwccarm 2.0/sp1p5):
+ *       the inline `smull;adds#0x800;adc;lsr#0xc;orr ...,lsl#0x14` IS NitroSDK
+ *         FX_Mul(v1,v2) = (fx32)(((s64)(v1)*(v2) + 0x800LL) >> 12)   [Q12]
+ *       Distance = FX_Sqrt(FX_Mul(dx,dx) + FX_Mul(dy,dy)).  func_0208bf3c =
+ *       FX_Sqrt, func_0208c490 = FX_Div (variable divisor only; CONSTANT divisor
+ *       inlines as the umull/mla magic = FX_Mul by a const reciprocal & MATCHES).
+ *       The pure-FX_Mul/distance tier CRACKS (shipped main/func_02018f2c); these
+ *       6 add FX_Div/FX_Atan2/magic-const on top → still reg-alloc-finicky.
+ *       Full crib: docs/research/brief-457-peer-corpus-idiom-crib.md            */
  *  - command-record builders: 021ad660/021ad8dc (0x27c clone pair, dual record
  *    + MMIO + packs), 021abd50, 021af5e0 — dedicated RE.                     */
 
