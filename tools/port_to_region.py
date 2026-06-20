@@ -707,6 +707,9 @@ def compute_output_path(
     elif name_stem.endswith(".legacy"):
         routing_suffix = ".legacy"
         name_stem = name_stem[:-len(".legacy")]
+    elif name_stem.endswith(".thumb"):
+        routing_suffix = ".thumb"
+        name_stem = name_stem[:-len(".thumb")]
 
     new_filename = f"{target_stem}{routing_suffix}{suffix}"
     src_subdir = module_to_src_dir(module)
