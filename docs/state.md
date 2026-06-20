@@ -8,8 +8,33 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-19 (Mac, brain on Opus 4.8), **post briefs 456+457
-merge** (final 3-region sha1 PASS on merged main). **This round = the swarm
+**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 458+459
+merge** (final 3-region sha1 PASS on merged main). **This round = batch_carve
+at full scale + region porter fixed:**
+- **#995** scaffolder **507 ov002 UPPER `.s`** via `batch_carve.py` (the swarm
+  P2 tool) — the **ov002 UPPER-half ARM lane is FULLY DRAINED** (99.6% clean,
+  2 kind:data parked). Finding: byte-pack drops DON'T climb with size (clean to
+  ~2700-byte funcs). ⚠️ ran as a detached `bash &` (invisible to the app UI) →
+  b460 asks for a UI-trackable launch.
+- **#994** decomper region-port w12 — 20 `.c` ports + **2 real porter bug fixes**
+  (`overlays(N,M)` plural + `_unk` symbols).
+- ⚠️ **DEFECT caught at the brain gate:** #994 hand-authored 2 ov010 funcs
+  (×USA/JPN) using `data_ov010_021b9160/9790` but omitted the `extern` decls →
+  USA/JPN "undefined identifier" (EUR passed, no EUR consumer → #994's own gate
+  missed it). Brain fix `193a8afd` added the decls; all 20 ports kept. **New
+  gotcha (brief 461 + below): a region-only `.c` needs its extern decls in the
+  region `ovNNN_core.h`; an EUR-only gate won't catch a USA/JPN compile fail.**
+
+**Metrics:** EUR units **94.04%** / matched_fn **87.61%** / code **79.35%**
+(+507 large ov002 .s → code +12pp, units 91→94%). USA & JPN units 65.10% /
+matched_fn 24.15% / code 5.48%.
+
+**Lanes next:** scaffolder → **460** (batch_carve on ov002 LOWER + remaining EUR
+ARM veins; UI-trackable launch); decomper → **461** (region-port w13 at scale,
+porter fixed; mind the extern-decl gotcha).
+
+---
+**Prior round (briefs 456+457):** **This round = the swarm
 findings PAID OFF:**
 - **#992** scaffolder built **`tools/batch_carve.py`** (swarm P2): deterministic-
   lane driver, commit-on-pass / red→bisect-park, 22 tests, a 6-agent adversarial

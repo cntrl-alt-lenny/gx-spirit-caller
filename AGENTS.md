@@ -653,32 +653,56 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 458** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 `.s` at SCALE via `tools/batch_carve.py` (the new tool).** The
-  driver shipped 50/50 clean in its pilot (PR #992) and auto-commits on
-  green — now run it big. Drive the ov002 UPPER-half remaining size tiers
-  (0x101–0x140 = 135, 0x141–0x200 = 195, >0x200 = 179): `batch_carve.py`
-  with a generous `--limit` and `--batch ~25`, let it park
-  REFUSE/verify-fail and commit-on-pass. **Report the clean-rate per tier**
-  (byte-pack drops climb with size — this maps the lane's real tail).
-  Push the auto-commits + open ONE PR for the wave. The tool already does
-  dedup/sort/newline-guard/gate-retry; your job is to run it at scale and
-  read the results. Branch: `scaffolder/ov002-batchdrain-w1`.
-- **Brief 459** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Region-port wave 12 — keep the USA/JPN lever going (now 24% fn / 5.4%
-  code).** Continue `port_to_region.py` across the remaining portable
-  overlay funcs (finish the 20 overlays you started + any untouched) at
-  scale; per-region ROM `ninja sha1` per batch; localise+park divergent
-  funcs (uncompressed-bin `cmp`). **BONUS — apply the brief-457 crib:** any
-  overlay func that calls NitroSDK math (`FX_Mul`/`FX_Sqrt`/`FX_Div`/the
-  Q12 idioms) or matches a banked idiom → match it as `.c` (named SDK
-  calls), not just `.s`. Consider reusing the **batch_carve commit-on-pass
-  pattern** for the port loop if it adapts cleanly (the tool's `Ops` seam
-  is generic). **RUN YOUR SHIP STEP** (commit/push/PR + per-overlay
-  port/park counts). Branch: `decomper/region-port-w12`.
+- **Brief 460** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **`batch_carve.py` on the next EUR ARM veins (ov002 UPPER is fully
+  drained — 507 ships, b458).** Point the tool at: (1) **ov002 LOWER-half**
+  (`addr < 0x02234000`) — the decomper drained ~276 there earlier; carve
+  the remaining uncarved ARM funcs; (2) then **scan other overlays + main**
+  for any remaining uncarved ARM residue and drive those. **Report runway**
+  per scope — if the EUR ARM lane is nearly exhausted, FLAG it so we pivot
+  (Thumb-emitter tooling, or generalising `batch_carve` for the region-port
+  lane). ⚠️ **Run the tool via a UI-trackable mechanism** (the harness
+  background-task, or keep the session attached) — NOT a detached
+  `bash … &` (b458 ran invisibly to the app; the work was fine but the user
+  couldn't see it). It still auto-commits on green; open ONE PR. Dedup vs
+  current main (item 10). Branch: `scaffolder/batchdrain-w2`.
+- **Brief 461** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Region-port wave 13 at SCALE — porter now bug-fixed (b459).** The two
+  `_port_overlay.py` fixes (overlay-swap plural `overlays(N,M)` + `_unk`
+  symbols) cleared the silent `write-failed` parks — so the funcs that
+  failed in b455/b459 now port. Go big again (like the 1,164-port wave):
+  re-attempt the previously-write-failed funcs + drive the remaining
+  portable funcs across all overlays. Per-region ROM `ninja sha1` per batch;
+  localise+park divergent funcs (uncompressed-bin `cmp`). Apply the b457
+  FX/SDK crib where overlay funcs call NitroSDK math. ⚠️ **EXTERN-DECL
+  GOTCHA (b459 defect, caught at the brain gate): a region-only `.c` (port
+  or hand-authored) that references a `data_*`/`func_*` symbol needs its
+  `extern` decl in the REGION `ovNNN_core.h` (`src/<region>/overlayNNN/`).
+  The EUR build won't compile a USA/JPN-only `.c`, so a missing decl passes
+  EUR sha1 but fails USA/JPN with "undefined identifier" — your own
+  3-region gate must actually COMPILE all three (don't trust an EUR-only
+  pass).** **RUN YOUR SHIP STEP** (commit/push/PR + per-overlay counts).
+  Branch: `decomper/region-port-w13`.
 
 ### Closed briefs (reference)
 
+- **Brief 458** — `scaffolder`, shipped in PR #995. ✅ **ov002 UPPER-half `.s`
+  at scale via `batch_carve.py` — 507 ships / 509 candidates (2 kind:data
+  parked), 99.6% clean-rate, 11 auto-commits.** The ov002 UPPER-half ARM lane
+  is **FULLY DRAINED.** **Finding: byte-pack drops do NOT climb with size** —
+  0 verify-fails across all tiers, even at 0xa8c (~2700-byte funcs); the lane's
+  only residue is 2 kind:data syms. The swarm's P2 tool delivered ~5-7× a manual
+  wave in one autonomous run. ⚠️ ran as a detached `bash &` (invisible to the
+  app UI though the work was fine) → brief 460 asks for a UI-trackable launch.
+  3-region gate reproduced on merge. ov002 delinks merge: #995 was a strict
+  superset of main (0 funcs lost) → took theirs, dup-clean.
+- **Brief 459** — `decomper`, shipped in PR #994. ✅ **Region-port wave 12 —
+  20 `.c` ports (10/region) across ov000/010/011/012/013 + 2 real porter bug
+  fixes.** The fixes in `_port_overlay.py` cleared silent `write-failed` parks
+  since b455: (1) `overlays(N,M,…)` plural form in `_norm_mod` (overlay-swap
+  zones); (2) `_unk`-suffixed symbols invisible to `SYMBOL_RE`'s `\b`. Small
+  wave (the fixes were the point) → brief 461 goes big again now they're fixed.
+  3-region sha1 OK. Both agents ran their ship step this round.
 - **Brief 454** — `scaffolder`, shipped in PR #990 (**brain committed** —
   session ended pre-ship-step). ✅ **ov002 UPPER `.s` wave 13 — 40 ships**
   (0xc1–0x100 tier). Dup-clean, sorted, EUR sha1 OK.
