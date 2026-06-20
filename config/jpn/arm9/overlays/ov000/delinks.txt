@@ -48,6 +48,10 @@ src/jpn/overlay000/ov000_021aadd8.c:
     complete
     .text start:0x021aadd8 end:0x021aade4
 
+src/jpn/overlay000/func_ov000_021aade4.c:
+    complete
+    .text start:0x021aade4 end:0x021aae04
+
 src/jpn/overlay000/ov000_021ab13c.c:
     complete
     .text start:0x021ab13c end:0x021ab178
