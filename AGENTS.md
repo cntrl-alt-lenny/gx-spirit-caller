@@ -653,39 +653,66 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 460** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **`batch_carve.py` on the next EUR ARM veins (ov002 UPPER is fully
-  drained — 507 ships, b458).** Point the tool at: (1) **ov002 LOWER-half**
-  (`addr < 0x02234000`) — the decomper drained ~276 there earlier; carve
-  the remaining uncarved ARM funcs; (2) then **scan other overlays + main**
-  for any remaining uncarved ARM residue and drive those. **Report runway**
-  per scope — if the EUR ARM lane is nearly exhausted, FLAG it so we pivot
-  (Thumb-emitter tooling, or generalising `batch_carve` for the region-port
-  lane). ⚠️ **Run the tool via a UI-trackable mechanism** (the harness
-  background-task, or keep the session attached) — NOT a detached
-  `bash … &` (b458 ran invisibly to the app; the work was fine but the user
-  couldn't see it). It still auto-commits on green; open ONE PR. Dedup vs
-  current main (item 10). Branch: `scaffolder/batchdrain-w2`.
-- **Brief 461** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Region-port wave 13 at SCALE — porter now bug-fixed (b459).** The two
-  `_port_overlay.py` fixes (overlay-swap plural `overlays(N,M)` + `_unk`
-  symbols) cleared the silent `write-failed` parks — so the funcs that
-  failed in b455/b459 now port. Go big again (like the 1,164-port wave):
-  re-attempt the previously-write-failed funcs + drive the remaining
-  portable funcs across all overlays. Per-region ROM `ninja sha1` per batch;
-  localise+park divergent funcs (uncompressed-bin `cmp`). Apply the b457
-  FX/SDK crib where overlay funcs call NitroSDK math. ⚠️ **EXTERN-DECL
-  GOTCHA (b459 defect, caught at the brain gate): a region-only `.c` (port
-  or hand-authored) that references a `data_*`/`func_*` symbol needs its
-  `extern` decl in the REGION `ovNNN_core.h` (`src/<region>/overlayNNN/`).
-  The EUR build won't compile a USA/JPN-only `.c`, so a missing decl passes
-  EUR sha1 but fails USA/JPN with "undefined identifier" — your own
-  3-region gate must actually COMPILE all three (don't trust an EUR-only
-  pass).** **RUN YOUR SHIP STEP** (commit/push/PR + per-overlay counts).
-  Branch: `decomper/region-port-w13`.
+- **Brief 462** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 LOWER-half ARM `.s` drain via `batch_carve` — the EUR ARM lane is
+  NOT exhausted (b460's "exhausted" census was WRONG).** ⚠️ b460/#997
+  asserted "ov002 lower-half (addr < 0x02234000) is empty — drained by the
+  decomper" — but a brain runway scout + authoritative spot-check **REFUTED
+  it**: ov002 has **~1,042 genuinely-uncarved ARM funcs** (3,777 symbols −
+  2,735 carved by delink), almost all in the LOWER half — e.g.
+  `func_ov002_021ab874` (`kind:function(arm,size=0x1ec)`, no delink, no src),
+  `func_ov002_021ae7b8` (size=0xe4). These are real ARM functions; the
+  decomper drained far less of the lower half than assumed. This is the
+  BIGGEST mechanical lane open (~1,000 funcs ≈ 2+ batch_carve waves).
+  TASK: (1) point `batch_carve` at the ov002 **full lower-half range**
+  (`addr < 0x02234000`); the b406 `--classify-data` preflight parks the
+  kind:data, the per-pick gate isolates the overlay-swap zone (0x021aa4a0+,
+  ov000/002/005/008/009 share base — per-overlay delinks isolate it, sha1
+  proves it). (2) Drive at scale, commit-on-pass, **report the real carvable
+  count** (settles the census). (3) EUR **Thumb** is a separate thin lane
+  (ov004 only: 48 uncarved, 32 ≤0x40 ≈ 1 wave) — defer it; flag if you want
+  it next. ⚠️ UI-trackable launch (not a detached `bash … &`). One PR. Dedup
+  vs main (item 10). Branch: `scaffolder/ov002-lower-w1`.
+- **Brief 463** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Region-port wave 14 — continue the ARM `.c` lever at scale (porter fully
+  fixed; ov004 Thumb done b461).** A brain runway scout sized the remaining
+  un-ported EUR ARM `.c` at **~812** (USA & JPN each ~2,765 already ported,
+  74%). The headroom is CONCENTRATED — aim in this order: **main (~385
+  remaining) → ov006 (~116) → ov002 (~79)** = ~71% of all runway; then the
+  tail (ov005 ~33, ov000 ~27, ov011 ~25, ov010 ~20, ov015 ~17, ov016 ~16,
+  ov017 ~15, …). **Verify the per-overlay remaining count with your own tool
+  before each batch** (the scout's first pass under-counted by missing the
+  b453 merge — trust your `port_to_region` enumerate over my estimate).
+  Per-region ROM `ninja sha1` per batch; localise+park divergent funcs
+  (uncompressed-bin `cmp`). Apply the b457 FX/SDK crib. ⚠️ **EXTERN-DECL
+  GOTCHA (b459, banked):
+  a region-only `.c` referencing a `data_*`/`func_*` symbol needs its
+  `extern` decl in the REGION `ovNNN_core.h` — an EUR-only pass is NOT a
+  3-region pass; your gate must COMPILE all three.** **RUN YOUR SHIP STEP**
+  (commit/push/PR + per-overlay counts). Branch: `decomper/region-port-w14`.
 
 ### Closed briefs (reference)
 
+- **Brief 460** — `scaffolder`, shipped in PR #997. ✅ 48 real ov002 gap ships
+  (0xec–0x100, 48/48 clean, gate-green). ⚠️ **but its "EUR ARM lane FULLY
+  EXHAUSTED" census was WRONG** — a brain runway scout + authoritative spot-check
+  (b461 round) REFUTED it: ov002 has **~1,042 genuinely-uncarved ARM funcs**
+  (3,777 symbols − 2,735 carved), almost all in the LOWER half (e.g.
+  `func_ov002_021ab874` size=0x1ec, no delink/src). #997 ASSUMED the decomper
+  drained the lower half; it did not. → **brief 462 redirected to drain the ov002
+  lower-half ARM lane (the biggest mechanical vein open), not the thin Thumb
+  pilot.** LESSON: a "lane exhausted" census must be an authoritative
+  enumeration of the FULL address range, not an assumption about another agent's
+  prior work. Clean merge; 3-region gate reproduced.
+- **Brief 461** — `decomper`, shipped in PR #996. ✅ **First Thumb region-port
+  wave — 66 `.thumb.c` ports on ov004 (33 USA + 33 JPN) + 3 porter fixes** that
+  unlock the Thumb lane: `.thumb` routing suffix in `port_to_region.py`, `.thumb`
+  stem-strip in `_port_overlay.py`, and a **Thumb-aware `bytes_clean` comparator**
+  (Thumb BL/BLX = two 2-byte halfwords; dsd records the reloc at the *second*
+  halfword → the 4-byte ARM window mis-rejected 7 funcs; fixed with 2-byte
+  halfword windows). ov004 Thumb lane drained (36 total: 33 ported, 7 no-sibling,
+  1 divergent parked). 3-region sha1 OK; clean merge. The b459 extern-decl gotcha
+  did not recur (ports, not hand-authored).
 - **Brief 458** — `scaffolder`, shipped in PR #995. ✅ **ov002 UPPER-half `.s`
   at scale via `batch_carve.py` — 507 ships / 509 candidates (2 kind:data
   parked), 99.6% clean-rate, 11 auto-commits.** The ov002 UPPER-half ARM lane

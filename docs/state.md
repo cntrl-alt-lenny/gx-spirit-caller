@@ -8,8 +8,35 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 458+459
-merge** (final 3-region sha1 PASS on merged main). **This round = batch_carve
+**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 460+461
+merge** (final 3-region sha1 PASS on merged main). **This round = Thumb
+region-port lane opened + a census correction caught by a brain scout:**
+- **#997** scaffolder — 48 real ov002 gap ships (0xec–0x100, 48/48 clean). ⚠️
+  **but its "EUR ARM lane fully exhausted" census was REFUTED** by a brain
+  runway-scout Workflow (4 read-only scouts) + authoritative spot-check: ov002
+  has **~1,042 genuinely-uncarved ARM funcs** (3,777 symbols − 2,735 carved),
+  almost all LOWER-half (`func_ov002_021ab874` size=0x1ec etc.). #997 ASSUMED
+  the decomper drained the lower half; it didn't. → **brief 462 redirected to
+  drain the ov002 lower-half ARM lane (~1,000 funcs, the biggest open vein),
+  not a thin Thumb pilot.** LESSON: an "exhausted" census must enumerate the
+  FULL range authoritatively, not assume another agent's prior work.
+- **#996** decomper — **first Thumb region-port wave: 66 `.thumb.c` (ov004,
+  33 USA + 33 JPN) + 3 porter fixes** (`.thumb` routing/stem-strip + a
+  Thumb-aware halfword reloc comparator: Thumb BL/BLX reloc lands on the 2nd
+  halfword → the 4-byte ARM window mis-rejected 7 funcs). ov004 Thumb drained.
+- **Runway scout (Workflow, 5 agents, ~276k tok):** ARM census REFUTED (above);
+  Thumb CONFIRMED concentrated in ov004 (thin ~1 wave); region-port runway
+  corrected to **~812 remaining**, top = main(385)/ov006(116)/ov002(79);
+  integration audit = no blockers (comparator sound, no stale files).
+- Both agents ran their ship step; both PRs merged clean (no conflicts).
+
+**Metrics:** EUR units **94.53%** / matched_fn **88.10%** / code **79.85%**
+(48 gap ships). USA & JPN units **64.86%** / matched_fn **24.23%** / code
+**5.49%** (66 ov004 Thumb ports added). EUR essentially complete; USA/JPN
+runway = the ~812-port region lane (b463) + b462's ov002-lower EUR `.s`.
+
+---
+**Prior round (briefs 458+459):** **This round = batch_carve
 at full scale + region porter fixed:**
 - **#995** scaffolder **507 ov002 UPPER `.s`** via `batch_carve.py` (the swarm
   P2 tool) — the **ov002 UPPER-half ARM lane is FULLY DRAINED** (99.6% clean,
