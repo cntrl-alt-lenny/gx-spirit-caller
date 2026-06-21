@@ -8,8 +8,29 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 460+461
-merge** (final 3-region sha1 PASS on merged main). **This round = Thumb
+**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 462+463
+merge** (final 3-region sha1 PASS on merged main). **This round = ov002 lower-half
+ARM lane confirmed + region-port clean lane found winding down:**
+- **#999** scaffolder (b462) — **100 ov002 LOWER-half ARM `.s`** (2 batch_carve
+  batches), EUR sha1 OK. **Confirms the lane #997 wrongly called empty** (the
+  b461 scout was right). ⚠️ **ship-step miss:** session ended after carving
+  batch 2 but before its commit-on-pass gate — brain re-gated (all 100 clean,
+  dup-clean), committed batch 2, pushed, opened the PR. ~942 ARM funcs remain.
+- **#998** decomper (b463) — **20 main `.c` ports + `port_main()` support**
+  (main = 0x02000000 base + arm9.bin). **KEY FINDING: the clean region-port lane
+  is winding down** — 0 new clean ports across all 22 overlays; main residue =
+  256 no-sibling + 26 divergent. This reconciles the b461 scout's "812 remaining"
+  (most of it is non-portable, not clean runway). → b465 redirected to
+  investigate/unlock the 256 main no-sibling = the real remaining USA/JPN lever.
+- Both PRs merged clean (no conflicts); both gates green.
+
+**Metrics:** EUR units **94.58%** / matched_fn **89.12%** / code **80.42%**
+(crossed 80% code; +100 ov002 lower `.s`). USA & JPN units **64.94%** /
+matched_fn **24.33%** / code **5.51%** (+20 main ports). EUR ~complete; USA/JPN
+growth now gated on the b465 no-sibling investigation + b464 ov002-lower `.s`.
+
+---
+**Prior round (briefs 460+461):** **This round = Thumb
 region-port lane opened + a census correction caught by a brain scout:**
 - **#997** scaffolder — 48 real ov002 gap ships (0xec–0x100, 48/48 clean). ⚠️
   **but its "EUR ARM lane fully exhausted" census was REFUTED** by a brain

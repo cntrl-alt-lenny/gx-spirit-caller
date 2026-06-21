@@ -653,46 +653,58 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 462** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 LOWER-half ARM `.s` drain via `batch_carve` — the EUR ARM lane is
-  NOT exhausted (b460's "exhausted" census was WRONG).** ⚠️ b460/#997
-  asserted "ov002 lower-half (addr < 0x02234000) is empty — drained by the
-  decomper" — but a brain runway scout + authoritative spot-check **REFUTED
-  it**: ov002 has **~1,042 genuinely-uncarved ARM funcs** (3,777 symbols −
-  2,735 carved by delink), almost all in the LOWER half — e.g.
-  `func_ov002_021ab874` (`kind:function(arm,size=0x1ec)`, no delink, no src),
-  `func_ov002_021ae7b8` (size=0xe4). These are real ARM functions; the
-  decomper drained far less of the lower half than assumed. This is the
-  BIGGEST mechanical lane open (~1,000 funcs ≈ 2+ batch_carve waves).
-  TASK: (1) point `batch_carve` at the ov002 **full lower-half range**
-  (`addr < 0x02234000`); the b406 `--classify-data` preflight parks the
-  kind:data, the per-pick gate isolates the overlay-swap zone (0x021aa4a0+,
-  ov000/002/005/008/009 share base — per-overlay delinks isolate it, sha1
-  proves it). (2) Drive at scale, commit-on-pass, **report the real carvable
-  count** (settles the census). (3) EUR **Thumb** is a separate thin lane
-  (ov004 only: 48 uncarved, 32 ≤0x40 ≈ 1 wave) — defer it; flag if you want
-  it next. ⚠️ UI-trackable launch (not a detached `bash … &`). One PR. Dedup
-  vs main (item 10). Branch: `scaffolder/ov002-lower-w1`.
-- **Brief 463** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Region-port wave 14 — continue the ARM `.c` lever at scale (porter fully
-  fixed; ov004 Thumb done b461).** A brain runway scout sized the remaining
-  un-ported EUR ARM `.c` at **~812** (USA & JPN each ~2,765 already ported,
-  74%). The headroom is CONCENTRATED — aim in this order: **main (~385
-  remaining) → ov006 (~116) → ov002 (~79)** = ~71% of all runway; then the
-  tail (ov005 ~33, ov000 ~27, ov011 ~25, ov010 ~20, ov015 ~17, ov016 ~16,
-  ov017 ~15, …). **Verify the per-overlay remaining count with your own tool
-  before each batch** (the scout's first pass under-counted by missing the
-  b453 merge — trust your `port_to_region` enumerate over my estimate).
-  Per-region ROM `ninja sha1` per batch; localise+park divergent funcs
-  (uncompressed-bin `cmp`). Apply the b457 FX/SDK crib. ⚠️ **EXTERN-DECL
+- **Brief 464** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 LOWER-half ARM `.s` drain w2 — the lane is CONFIRMED real (b462
+  shipped 100, EUR sha1 OK).** ~942 uncarved ARM funcs remain in ov002
+  (mostly lower-half). Continue `batch_carve` over the lower-half range
+  (`addr < 0x02234000`); the b406 preflight parks kind:data, the per-pick
+  gate isolates the overlay-swap zone (0x021aa4a0+). ⚠️ **SHIP-STEP FIX (b462
+  miss):** last wave you carved batch 2 but the session ended before its
+  commit-on-pass gate ran — the brain had to re-gate + commit + open the PR.
+  This time run a **BOUNDED wave** (`--limit ~150`) that COMPLETES inside the
+  session, then your LAST actions are: confirm the final `ninja sha1` is
+  green → `git push` → `gh pr create` → reply with the PR URL. Don't leave an
+  uncommitted batch. UI-trackable launch (not detached `bash … &`); dedup vs
+  main (item 10). Branch: `scaffolder/ov002-lower-w2`.
+- **Brief 465** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **Investigate + unlock the MAIN `no-sibling` residue — the clean region-port
+  lane is winding down (b463: 0 new clean ports across all 22 overlays; main =
+  20 ported + 256 no-sibling + 26 divergent).** The big remaining USA/JPN
+  lever is those **256 main `no-sibling` funcs** (`port_to_region` found no
+  USA/JPN counterpart). INVESTIGATE which they are: (a) **dsd-unnamed-but-
+  present** — a real USA/JPN function exists at the address-corresponding
+  location but dsd never named it → RECOVERABLE (name the sibling + byte-verify
+  the port), vs (b) **genuinely region-divergent** (different code) → park for
+  per-region RE. If a porter improvement (auto-name the sibling at the matched
+  addr + byte-verify) recovers a meaningful chunk, **port them at scale**
+  (per-region ROM `ninja sha1`; localise divergents via uncompressed-bin
+  `cmp`). **Report the recoverable count** — it decides whether USA/JPN
+  region-port stays a lane or you pivot to EUR clean-C RE next round. ⚠️ stay
+  OFF ov002 (the scaffolder owns it now). ⚠️ **EXTERN-DECL
   GOTCHA (b459, banked):
   a region-only `.c` referencing a `data_*`/`func_*` symbol needs its
   `extern` decl in the REGION `ovNNN_core.h` — an EUR-only pass is NOT a
   3-region pass; your gate must COMPILE all three.** **RUN YOUR SHIP STEP**
-  (commit/push/PR + per-overlay counts). Branch: `decomper/region-port-w14`.
+  (commit/push/PR + recoverable-count report). Branch:
+  `decomper/main-nosibling-w1`.
 
 ### Closed briefs (reference)
 
+- **Brief 462** — `scaffolder`, shipped in PR #999. ✅ **100 ov002 LOWER-half ARM
+  `.s` (2× batch_carve batches) — CONFIRMS the lane b460 wrongly called empty.**
+  EUR sha1 OK; parked 2 kind:data + 1 verify-fail. ⚠️ **ship-step miss:** the
+  session ended after carving batch 2 but before its commit-on-pass gate — brain
+  re-gated the worktree (EUR sha1 OK with all 100, dup-clean), committed batch 2,
+  pushed, and opened the PR. → b464 asks for a bounded wave that completes
+  in-session + an explicit final commit/push/PR. ~942 ov002 ARM funcs remain.
+- **Brief 463** — `decomper`, shipped in PR #998. ✅ **20 main `.c` ports (10/
+  region) + `port_main()` porter support** (main = 0x02000000 base + arm9.bin).
+  **KEY FINDING: the clean region-port lane is winding down** — 0 new clean ports
+  across all 22 overlays; main residue = **256 no-sibling + 26 divergent**
+  (matches b439's 283 divergent). Reconciles the b461 scout's "812 remaining":
+  most of it is non-portable (divergent/no-sibling), not clean runway. → b465
+  redirected to investigate/unlock the 256 main no-sibling (the real remaining
+  USA/JPN lever). 3-region sha1 OK; clean merge; b459 extern gotcha didn't recur.
 - **Brief 460** — `scaffolder`, shipped in PR #997. ✅ 48 real ov002 gap ships
   (0xec–0x100, 48/48 clean, gate-green). ⚠️ **but its "EUR ARM lane FULLY
   EXHAUSTED" census was WRONG** — a brain runway scout + authoritative spot-check
