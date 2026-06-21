@@ -3578,6 +3578,15 @@ libs/nitro/func_02092934.legacy.c:
 src/usa/main/func_0209294c.s:
     complete
     .text start:0x0209294c end:0x02092960
+src/usa/main/func_02092960.s:
+    complete
+    .text start:0x02092960 end:0x02092974
+src/usa/main/func_02092b90.s:
+    complete
+    .text start:0x02092b90 end:0x02092ba4
+src/usa/main/func_02092ba4.s:
+    complete
+    .text start:0x02092ba4 end:0x02092bb8
 
 libs/nitro/func_02092e4c.legacy.c:
     complete
