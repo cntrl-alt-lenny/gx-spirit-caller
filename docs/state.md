@@ -8,8 +8,29 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-21 (Mac, brain on Opus 4.8), **post briefs 464+465
-merge** (final 3-region sha1 PASS on merged main — clean `rm -rf build/*` rebuild).
+**Last updated:** 2026-06-21 (Mac, brain on Opus 4.8), **post briefs 466+467
+merge** (final 3-region sha1 PASS on merged main). **This round = the USA/JPN `.s`
+megalever OPENED — both agents now run mechanical batch_carve (dual lane):**
+- **#1003** scaffolder (b466) — 77 ov002 lower-half ARM `.s`. **Found a verify-fail
+  WALL at the 0xbc–0xcc size band** (52%→2% clean), recovering to 100% at 0xcc+ —
+  size-driven (not overlay-swap), likely byte-pack/mwcc threshold; 73 parked
+  (permuter/RE). **621 carvable funcs remain above 0xcc.** → b468 continues above
+  the wall.
+- **#1002** decomper (b467) — **USA/JPN `.s` drain pilot CONFIRMED: 135 USA main
+  `.s`, 90-98% clean, USA sha1 green every gate** + `batch_carve --srcdir` flag.
+  **The new primary USA/JPN growth lever** (region-port clean lane tapped).
+  Census: **~8,500 decomper-owned uncarved funcs** (USA main 3,082 + USA overlays
+  1,164 + JPN ≈equal). `--min-addr 0x02000000` mandatory for main. → b469 scales.
+- DUAL-LANE wine-coexist works (`--gate-timeout 180`; 2 managed GateTimeouts on
+  the scaffolder side). Both PRs merged clean; 22 batch_carve tests pass.
+
+**Metrics:** EUR units **94.95%** / matched_fn **91.45%** / code **82.12%**
+(+77 ov002 `.s`). **USA moved on the pilot: units 64.93→65.24%, matched_fn
+24.34→25.72%, code 5.51→5.56%** (+135 USA main `.s`). JPN flat (64.93%/24.34%/
+5.51% — pilot was USA-only; b469 brings JPN). The USA/JPN `.s` lever is live.
+
+---
+**Prior round (briefs 464+465):**
 **This round = ov002-lower lane scaling + region-port clean lane CONFIRMED tapped:**
 - **#1001** scaffolder (b464) — **150 ov002 lower-half ARM `.s`** (3× `--limit 50`
   batches, 100% clean). Pinned the root cause of #997's bad census: **`batch_carve

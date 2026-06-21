@@ -653,40 +653,53 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 466** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 LOWER-half ARM `.s` drain w3 — continue (b464 shipped 150, 100%
-  clean; ~772 carvable funcs remain ≈ 5 waves).** Same proven recipe:
-  `batch_carve` over the lower-half range with **chunked `--limit 50`
-  batches** (each commits durably in ~5 min, under the ~8–10 min background
-  cap — this is what fixed the b462 ship-step miss; keep it). Contiguous size
-  band continues from ~0xb8. b406 preflight parks kind:data; per-pick gate
-  isolates the overlay-swap zone. **Your LAST actions: confirm final
-  `ninja sha1` green → push → `gh pr create` → reply with the PR URL** (clean
-  worktree, no uncommitted batch). UI-trackable launch; dedup vs main (item
-  10). Branch: `scaffolder/ov002-lower-w3`.
-- **Brief 467** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **PILOT the USA/JPN `.s` mechanical drain — the new USA/JPN growth lane (the
-  region-port clean lane is TAPPED: b465 verdict, main no-sibling = 0
-  recoverable / 239 divergent).** USA/JPN code is only **5.51%** (94%+ is dsd
-  auto-gap = orig bytes, not source) — the SAME `asm_escape`/`batch_carve`
-  mechanical carve that took EUR ov002 from 67→80% applies directly to USA/JPN
-  gaps (region-agnostic; divergence is irrelevant when you carve the region's
-  OWN bytes as `.s`). TASK — a CONTAINED pilot: (1) pick ONE rich uncarved USA
-  module — **USA `main` or a USA overlay, NOT ov002** (scaffolder owns it); (2)
-  confirm `batch_carve`/`asm_escape` gate on the **USA** region (`configure
-  usa`), measure the USA/JPN `.s` runway; (3) drain a first wave + ship.
-  ⚠️ **`--min-addr` gotcha:** batch_carve's default min-addr is `0x02234000`
-  (this is what made #997's census miss the ov002 lower half) — set it per
-  module so you enumerate the FULL range. ⚠️ **WINE-DEADLOCK:** the scaffolder
-  is running EUR `batch_carve` concurrently — both spawn wine on the shared
-  wineserver. Gate with **`-j1`**; if you hit `0 progress + 0% CPU` for >5 min,
-  YOU are the resumable side → `pkill -f 'asm_escape'` (your own job), let the
-  scaffolder proceed, then retry (b454 recovery protocol). **Report yield +
-  the USA/JPN runway** — decides if this scales to the primary USA/JPN lane.
-  **RUN YOUR SHIP STEP** (commit/push/PR). Branch: `decomper/usajpn-sdrain-w1`.
+- **Brief 468** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 LOWER-half ARM `.s` drain w4 — continue ABOVE the 0xcc wall (b466
+  shipped 77; 621 carvable funcs remain ≈ 4 waves).** ⚠️ **b466 found a
+  verify-fail wall at the 0xbc–0xcc size band** (52%→2% clean), recovering to
+  100% at 0xcc+ — size-driven (not overlay-swap; spans both 0x021b/0x022
+  addrs), likely byte-pack/mwcc threshold. **SKIP the 0xbc–0xcc band** (set
+  `--min-size 0xcc` or carve above it); the parked ~73 are a permuter/RE
+  cohort for later — don't re-grind them. Same chunked `--limit 50` recipe.
+  ⚠️ **WINE-COEXIST:** the decomper runs USA `batch_carve` concurrently — gate
+  with `--gate-timeout 180`; on a GateTimeout wait for decomper-idle, revert
+  the trailing-newline artifact (`git checkout config/eur/arm9/overlays/ov002/
+  delinks.txt`), retry. **LAST actions: final `ninja sha1` green → push →
+  `gh pr create` → PR URL** (clean worktree). Branch: `scaffolder/ov002-lower-w4`.
+- **Brief 469** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **SCALE the USA/JPN `.s` mechanical drain — pilot CONFIRMED (b467: 135 USA
+  main `.s`, 90-98% clean, USA sha1 green every gate; this is now the primary
+  USA/JPN growth lever).** Runway is huge: USA main ~2,947 remain, USA overlays
+  (non-ov002) ~1,164, JPN ~equal — **~8,500 decomper-owned funcs total.** Drive
+  it: continue **USA main** to depletion, then **JPN main** (`--version jpn
+  --srcdir src/jpn/main`), then USA/JPN overlays (NOT ov002 = scaffolder's).
+  Recipe (b467, now in `batch_carve`): `--version <r> --srcdir src/<r>/<mod>
+  --min-addr 0x02000000` (main) — **the `--min-addr` default 0x02234000
+  enumerates 0 main candidates, always override.** Chunked `--limit 50`,
+  commit-on-pass. ⚠️ **WINE-COEXIST** with the scaffolder's EUR lane:
+  `--gate-timeout 180`; if `0 progress + 0% CPU` >5 min, YOU kill your own
+  `asm_escape` job (resumable side) + retry (b454). **LAST actions: final
+  per-region `ninja sha1` green → push → `gh pr create` → PR URL.** Report the
+  shipped count + remaining runway. Branch: `decomper/usajpn-sdrain-w2`.
 
 ### Closed briefs (reference)
 
+- **Brief 466** — `scaffolder`, shipped in PR #1003. ✅ **77 ov002 lower-half ARM
+  `.s`** (size band 0xbc–0xdc). **KEY FINDING: a verify-fail WALL at 0xbc–0xcc**
+  (52%→2% clean), recovering to 100% at 0xcc+ — size-driven (not overlay-swap;
+  parked funcs span both 0x021b/0x022 addrs), likely byte-pack/mwcc threshold.
+  73 verify-fails parked (permuter/RE cohort). **621 carvable funcs remain above
+  0xcc** (~4 waves). → b468 continues above 0xcc, skips the wall band. 3-region
+  gate reproduced.
+- **Brief 467** — `decomper`, shipped in PR #1002. ✅ **USA/JPN `.s` drain pilot
+  CONFIRMED — 135 USA main `.s` (90-98% clean, USA sha1 green every gate)** +
+  `batch_carve --srcdir` flag (region-specific `.s` output). **This is the new
+  primary USA/JPN growth lever** (region-port clean lane is tapped). Census:
+  USA main ~3,082 uncarved (664KB), USA overlays (non-ov002) ~1,164, JPN ≈equal
+  = **~8,500 decomper-owned funcs.** Confirmed: `--min-addr 0x02000000` mandatory
+  for main (default 0x02234000 → 0 candidates); 0 REFUSE; wine-coexist with the
+  scaffolder fine via `--gate-timeout 180`. → b469 scales it. 22 batch_carve
+  tests still pass; 3-region gate reproduced.
 - **Brief 464** — `scaffolder`, shipped in PR #1001. ✅ **150 ov002 lower-half ARM
   `.s` (3× `--limit 50` batches, size band 0x94–0xb8), 100% clean, 0 REFUSE/0
   verify-fail.** Found the ROOT CAUSE of #997's bad census: **`batch_carve
