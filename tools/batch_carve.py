@@ -571,13 +571,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--verifyfail-list", default=None)
     ap.add_argument("--dry-run", action="store_true",
                     help="enumerate + classify only; no carve/gate/commit")
+    ap.add_argument("--srcdir", default=None,
+                    help="override .s output directory (default: scope.srcdir = "
+                         "src/main or src/overlayNNN). Use src/usa/main for USA carves "
+                         "so they stay region-specific and don't pollute the EUR baseline.")
     args = ap.parse_args(argv)
 
     scope = Scope(version=args.version, overlay=args.overlay, min_addr=args.min_addr,
                   min_size=args.min_size, max_size=args.max_size)
     ops = Ops(version=args.version, call_timeout=args.call_timeout,
               gate_timeout=args.gate_timeout, gate_retries=args.gate_retries)
-    carver = BatchCarver(scope, ops, batch=args.batch,
+    carver = BatchCarver(scope, ops, batch=args.batch, srcdir=args.srcdir,
                          skip_path=args.skip_list, verifyfail_path=args.verifyfail_list,
                          dry_run=args.dry_run)
     try:
