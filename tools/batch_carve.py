@@ -40,14 +40,19 @@ Safety
 from __future__ import annotations
 
 import argparse
+import fcntl
 import os
 import re
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# Shared lock file so concurrent EUR + USA/JPN batch_carve processes serialise
+# their wine/mwldarm link step (only one region links at a time).
+_GATE_LOCK = "/tmp/spirit-caller-gate.lock"
 
 # --------------------------------------------------------------------------- #
 # PURE helpers (unit-tested, no build, no git)                                 #
@@ -74,8 +79,21 @@ def func_addr(func: str) -> int:
     return int(func.rsplit("_", 1)[-1], 16)
 
 
+_DELINK_HDR_RE = re.compile(r"(?:\S+/)?(func_\w+)\.\S+:$")
+
 def carved_addrs(delinks_text: str) -> set[int]:
-    return {int(m.group(1), 16) for m in _START_RE.finditer(delinks_text)}
+    # Include both start: addresses AND name-derived addresses from headers.
+    # Some symbols have a name that doesn't match their ROM addr (thunks/trampolines),
+    # so checking both prevents re-queuing already-delinked symbols.
+    addrs = {int(m.group(1), 16) for m in _START_RE.finditer(delinks_text)}
+    for line in delinks_text.splitlines():
+        m = _DELINK_HDR_RE.match(line.strip())
+        if m:
+            try:
+                addrs.add(func_addr(m.group(1)))
+            except ValueError:
+                pass
+    return addrs
 
 
 def parse_skiplist(text: str) -> set[str]:
@@ -231,13 +249,33 @@ class Ops:
         modes so a concurrent-build deadlock never false-parks a clean carve:
           * a completed run that is not OK  -> return False (real RED -> bisect);
           * EVERY attempt killed by `gate_timeout` (a wineserver deadlock with a
-            co-lane) -> raise GateTimeout -> the batch is DEFERRED, not parked."""
+            co-lane) -> raise GateTimeout -> the batch is DEFERRED, not parked.
+
+        Uses a cross-process file lock (_GATE_LOCK) so concurrent EUR + USA/JPN
+        batch_carve lanes serialise their mwldarm link step — only one region
+        links at a time, eliminating wineserver deadlocks between co-lanes."""
         to = self.gate_timeout or None
         completed_any = False
         for _ in range(self.gate_retries + 1):
             try:
-                self._run(["python3.13", "tools/configure.py", self.version], timeout=to)
-                r = self._run(["ninja", "sha1"], timeout=to)
+                # Acquire exclusive cross-process lock before calling wine.
+                # Spin-wait (1 s polls) up to gate_timeout seconds; if we can't
+                # get the lock in time, treat it like a TimeoutExpired so the
+                # batch is deferred (not parked) and we retry next round.
+                lock_deadline = time.monotonic() + (to or 600.0)
+                with open(_GATE_LOCK, "w") as _lf:
+                    while True:
+                        try:
+                            fcntl.flock(_lf, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                            break
+                        except BlockingIOError:
+                            if time.monotonic() > lock_deadline:
+                                raise subprocess.TimeoutExpired(
+                                    "flock", to or 600.0
+                                )
+                            time.sleep(1)
+                    self._run(["python3.13", "tools/configure.py", self.version], timeout=to)
+                    r = self._run(["ninja", "sha1"], timeout=to)
             except subprocess.TimeoutExpired:
                 self._kill_orphans()
                 continue

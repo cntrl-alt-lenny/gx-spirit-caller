@@ -278,10 +278,10 @@ def pool_addrs(instrs: list[dict], thumb: bool = False) -> set[int]:
     `....`/ASCII-gutter "Undefined macro or opcode" wave-23 capability edge)."""
     pool = set()
     for w in instrs:
-        m = re.search(r"\[pc, #(-?\d+)\]", w["mnem"])
+        m = re.search(r"\[pc(?:, #(-?\d+))?\]", w["mnem"])
         if m:
             base = ((w["addr"] + 4) & ~3) if thumb else w["addr"] + 8
-            pool.add(base + int(m.group(1)))
+            pool.add(base + (int(m.group(1)) if m.group(1) else 0))
     return pool
 
 
@@ -366,9 +366,9 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
 
     lit: dict[int, str] = {}
     for w in orig:
-        m = re.search(r"\[pc, #(-?\d+)\]", w["mnem"])
+        m = re.search(r"\[pc(?:, #(-?\d+))?\]", w["mnem"])
         if m:
-            lit[_pc_base(w["addr"]) + int(m.group(1))] = ""
+            lit[_pc_base(w["addr"]) + (int(m.group(1)) if m.group(1) else 0)] = ""
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
     labels = {a: f".L_{a:x}" for a in branch_targets(orig, thumb)}
@@ -424,9 +424,10 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
         if w["addr"] in labels:
             body.append(f"{labels[w['addr']]}:")
         mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
-        pm = re.search(r"\[pc, #(-?\d+)\]", mn)
+        pm = re.search(r"\[pc(?:, #(-?\d+))?\]", mn)
         if pm:
-            mn = re.sub(r"\[pc, #-?\d+\]", lit[_pc_base(w["addr"]) + int(pm.group(1))], mn)
+            offset = int(pm.group(1)) if pm.group(1) else 0
+            mn = re.sub(r"\[pc(?:, #-?\d+)?\]", lit[_pc_base(w["addr"]) + offset], mn)
         # internal branch (no reloc, target within func) -> local label
         ib = _BRANCH_RE.match(w["mnem"])
         if ib and not w["reloc"]:
