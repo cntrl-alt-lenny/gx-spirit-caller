@@ -4,6 +4,10 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/usa/main/func_02000c44.c:
+    complete
+    .text start:0x02000c44 end:0x02000c4c
+
 src/usa/main/func_02000cb4.c:
     complete
     .text start:0x02000cb4 end:0x02000cc4

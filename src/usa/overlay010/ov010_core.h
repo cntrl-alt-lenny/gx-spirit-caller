@@ -16,7 +16,9 @@
 extern char data_ov010_021b8c08[];   /* view/mode state struct               */
 extern char data_ov010_021b8c44[];   /* message-window fade state (+100/+104) */
 extern char data_ov010_021b9784[];   /* object-manager A (handle at +144)    */
+extern char data_ov010_021b9790[];   /* object-manager A config slot         */
 extern char data_ov010_021b90b4[];   /* object-manager B (handles +296/+300) */
+extern char data_ov010_021b9160[];   /* object-manager A panel state             */
 extern char data_ov010_021b9260[];   /* panel/cursor state A (sel +0, flags +544) */
 extern char data_ov010_021b9890[];   /* panel/cursor state B (sib of 9260)   */
 extern char data_ov010_021b98f0[];   /* config record                       */
