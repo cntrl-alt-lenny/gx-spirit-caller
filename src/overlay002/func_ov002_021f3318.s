@@ -1,0 +1,56 @@
+; func_ov002_021f3318 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern data_ov002_022cd3f4
+        .extern data_ov002_022cf16c
+        .extern data_ov002_022cf1a4
+        .extern func_ov002_021c1e44
+        .global func_ov002_021f3318
+        .arm
+func_ov002_021f3318:
+    stmdb sp!, {r4, lr}
+    ldrh r3, [r0, #0x2]
+    mov r3, r3, lsl #0x1f
+    cmp r1, r3, lsr #0x1f
+    moveq r0, #0x0
+    ldmeqia sp!, {r4, pc}
+    cmp r2, #0x5
+    movge r0, #0x0
+    ldmgeia sp!, {r4, pc}
+    ldr ip, _LIT0
+    and lr, r1, #0x1
+    mul r4, lr, ip
+    mov r3, #0x14
+    mul lr, r2, r3
+    ldr ip, _LIT1
+    add r3, ip, r4
+    add r3, r3, lr
+    ldr r3, [r3, #0x30]
+    mov r3, r3, lsl #0x13
+    movs r3, r3, lsr #0x13
+    moveq r0, #0x0
+    ldmeqia sp!, {r4, pc}
+    ldr r3, _LIT2
+    add r3, r3, r4
+    ldrh r3, [lr, r3]
+    cmp r3, #0x0
+    moveq r0, #0x0
+    ldmeqia sp!, {r4, pc}
+    ldr r3, _LIT3
+    ldr ip, [r3]
+    cmp ip, r1
+    ldreq r3, [r3, #0x1c]
+    cmpeq r3, r2
+    movne r0, #0x0
+    ldmneia sp!, {r4, pc}
+    bl func_ov002_021c1e44
+    cmp r0, #0x0
+    moveq r0, #0x1
+    movne r0, #0x0
+    ldmia sp!, {r4, pc}
+_LIT0: .word 0x00000868
+_LIT1: .word data_ov002_022cf16c
+_LIT2: .word data_ov002_022cf1a4
+_LIT3: .word data_ov002_022cd3f4
