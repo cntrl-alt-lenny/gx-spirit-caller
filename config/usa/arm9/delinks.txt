@@ -3469,6 +3469,10 @@ src/usa/main/func_0209075c.c:
     complete
     .text start:0x0209075c end:0x02090774
 
+src/usa/main/func_02090774.s:
+    complete
+    .text start:0x02090774 end:0x02090780
+
 src/usa/main/func_02090808.s:
     complete
     .text start:0x02090808 end:0x02090810
