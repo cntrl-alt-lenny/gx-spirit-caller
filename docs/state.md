@@ -8,8 +8,32 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-20 (Mac, brain on Opus 4.8), **post briefs 462+463
-merge** (final 3-region sha1 PASS on merged main). **This round = ov002 lower-half
+**Last updated:** 2026-06-21 (Mac, brain on Opus 4.8), **post briefs 464+465
+merge** (final 3-region sha1 PASS on merged main — clean `rm -rf build/*` rebuild).
+**This round = ov002-lower lane scaling + region-port clean lane CONFIRMED tapped:**
+- **#1001** scaffolder (b464) — **150 ov002 lower-half ARM `.s`** (3× `--limit 50`
+  batches, 100% clean). Pinned the root cause of #997's bad census: **`batch_carve
+  --min-addr` defaults to 0x02234000** → prior censuses only saw the upper half.
+  **772 carvable ov002 lower funcs remain** (~5 waves). Ship-step fixed (chunked
+  batches under the background cap; clean worktree).
+- **#1000** decomper (b465) — **main no-sibling VERDICT: exhausted** (0/256
+  recoverable; 239 divergent, 17 size-mismatch, 1 byte-identical ported). Region-
+  port clean lane fully tapped → b467 pivots decomper to the **USA/JPN `.s`
+  mechanical drain** (USA/JPN code is only 5.51% — the biggest untapped lever).
+- ⚠️ **#1000 mislabeled a cosmetic ov010 extern reorg as a "b459 bug fix (stale
+  `.o`)" — INACCURATE:** the decls were present on main since b459 (`193a8afd`);
+  the clean `rm -rf build/*` 3-region gate passed, debunking the stale-`.o` claim.
+  The merge left DUPLICATE externs in usa/jpn ov010_core.h (legal C); **brain
+  deduped** (byte-neutral, re-gated usa/jpn OK). b459 stands as a correct fix.
+- Both PRs merged clean; clean-rebuild 3-region gate green.
+
+**Metrics:** EUR units **94.75%** / matched_fn **90.66%** (crossed 90%) / code
+**81.45%** (+150 ov002 lower `.s`). USA & JPN units **64.93%** / matched_fn
+**24.34%** / code **5.51%**. EUR ~complete; USA/JPN code (5.51%) = the megalever
+b467 pilots (`.s` mechanical drain, the region-port clean lane being tapped).
+
+---
+**Prior round (briefs 462+463):** **This round = ov002 lower-half
 ARM lane confirmed + region-port clean lane found winding down:**
 - **#999** scaffolder (b462) — **100 ov002 LOWER-half ARM `.s`** (2 batch_carve
   batches), EUR sha1 OK. **Confirms the lane #997 wrongly called empty** (the

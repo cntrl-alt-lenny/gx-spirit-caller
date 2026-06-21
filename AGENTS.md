@@ -653,43 +653,57 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 464** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 LOWER-half ARM `.s` drain w2 — the lane is CONFIRMED real (b462
-  shipped 100, EUR sha1 OK).** ~942 uncarved ARM funcs remain in ov002
-  (mostly lower-half). Continue `batch_carve` over the lower-half range
-  (`addr < 0x02234000`); the b406 preflight parks kind:data, the per-pick
-  gate isolates the overlay-swap zone (0x021aa4a0+). ⚠️ **SHIP-STEP FIX (b462
-  miss):** last wave you carved batch 2 but the session ended before its
-  commit-on-pass gate ran — the brain had to re-gate + commit + open the PR.
-  This time run a **BOUNDED wave** (`--limit ~150`) that COMPLETES inside the
-  session, then your LAST actions are: confirm the final `ninja sha1` is
-  green → `git push` → `gh pr create` → reply with the PR URL. Don't leave an
-  uncommitted batch. UI-trackable launch (not detached `bash … &`); dedup vs
-  main (item 10). Branch: `scaffolder/ov002-lower-w2`.
-- **Brief 465** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **Investigate + unlock the MAIN `no-sibling` residue — the clean region-port
-  lane is winding down (b463: 0 new clean ports across all 22 overlays; main =
-  20 ported + 256 no-sibling + 26 divergent).** The big remaining USA/JPN
-  lever is those **256 main `no-sibling` funcs** (`port_to_region` found no
-  USA/JPN counterpart). INVESTIGATE which they are: (a) **dsd-unnamed-but-
-  present** — a real USA/JPN function exists at the address-corresponding
-  location but dsd never named it → RECOVERABLE (name the sibling + byte-verify
-  the port), vs (b) **genuinely region-divergent** (different code) → park for
-  per-region RE. If a porter improvement (auto-name the sibling at the matched
-  addr + byte-verify) recovers a meaningful chunk, **port them at scale**
-  (per-region ROM `ninja sha1`; localise divergents via uncompressed-bin
-  `cmp`). **Report the recoverable count** — it decides whether USA/JPN
-  region-port stays a lane or you pivot to EUR clean-C RE next round. ⚠️ stay
-  OFF ov002 (the scaffolder owns it now). ⚠️ **EXTERN-DECL
-  GOTCHA (b459, banked):
-  a region-only `.c` referencing a `data_*`/`func_*` symbol needs its
-  `extern` decl in the REGION `ovNNN_core.h` — an EUR-only pass is NOT a
-  3-region pass; your gate must COMPILE all three.** **RUN YOUR SHIP STEP**
-  (commit/push/PR + recoverable-count report). Branch:
-  `decomper/main-nosibling-w1`.
+- **Brief 466** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 LOWER-half ARM `.s` drain w3 — continue (b464 shipped 150, 100%
+  clean; ~772 carvable funcs remain ≈ 5 waves).** Same proven recipe:
+  `batch_carve` over the lower-half range with **chunked `--limit 50`
+  batches** (each commits durably in ~5 min, under the ~8–10 min background
+  cap — this is what fixed the b462 ship-step miss; keep it). Contiguous size
+  band continues from ~0xb8. b406 preflight parks kind:data; per-pick gate
+  isolates the overlay-swap zone. **Your LAST actions: confirm final
+  `ninja sha1` green → push → `gh pr create` → reply with the PR URL** (clean
+  worktree, no uncommitted batch). UI-trackable launch; dedup vs main (item
+  10). Branch: `scaffolder/ov002-lower-w3`.
+- **Brief 467** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **PILOT the USA/JPN `.s` mechanical drain — the new USA/JPN growth lane (the
+  region-port clean lane is TAPPED: b465 verdict, main no-sibling = 0
+  recoverable / 239 divergent).** USA/JPN code is only **5.51%** (94%+ is dsd
+  auto-gap = orig bytes, not source) — the SAME `asm_escape`/`batch_carve`
+  mechanical carve that took EUR ov002 from 67→80% applies directly to USA/JPN
+  gaps (region-agnostic; divergence is irrelevant when you carve the region's
+  OWN bytes as `.s`). TASK — a CONTAINED pilot: (1) pick ONE rich uncarved USA
+  module — **USA `main` or a USA overlay, NOT ov002** (scaffolder owns it); (2)
+  confirm `batch_carve`/`asm_escape` gate on the **USA** region (`configure
+  usa`), measure the USA/JPN `.s` runway; (3) drain a first wave + ship.
+  ⚠️ **`--min-addr` gotcha:** batch_carve's default min-addr is `0x02234000`
+  (this is what made #997's census miss the ov002 lower half) — set it per
+  module so you enumerate the FULL range. ⚠️ **WINE-DEADLOCK:** the scaffolder
+  is running EUR `batch_carve` concurrently — both spawn wine on the shared
+  wineserver. Gate with **`-j1`**; if you hit `0 progress + 0% CPU` for >5 min,
+  YOU are the resumable side → `pkill -f 'asm_escape'` (your own job), let the
+  scaffolder proceed, then retry (b454 recovery protocol). **Report yield +
+  the USA/JPN runway** — decides if this scales to the primary USA/JPN lane.
+  **RUN YOUR SHIP STEP** (commit/push/PR). Branch: `decomper/usajpn-sdrain-w1`.
 
 ### Closed briefs (reference)
 
+- **Brief 464** — `scaffolder`, shipped in PR #1001. ✅ **150 ov002 lower-half ARM
+  `.s` (3× `--limit 50` batches, size band 0x94–0xb8), 100% clean, 0 REFUSE/0
+  verify-fail.** Found the ROOT CAUSE of #997's bad census: **`batch_carve
+  --min-addr` defaults to `0x02234000`** → prior censuses silently saw only the
+  upper half. Post-wave dry-run: **772 carvable ov002 lower funcs remain** (≈5
+  waves). Ship-step fixed via chunked batches under the ~8–10 min background cap
+  (clean worktree, no orphan batch). 3-region gate reproduced.
+- **Brief 465** — `decomper`, shipped in PR #1000. ✅ **Main no-sibling lane
+  VERDICT: exhausted.** Classified all 256: **0 unnamed-but-present (recoverable)**,
+  239 genuinely divergent, 17 named-but-different-size, 1 byte-identical
+  (`func_02000c44`, ported USA+JPN). So region-port (clean) is fully tapped →
+  b467 pivots the decomper to the USA/JPN `.s` mechanical drain. ⚠️ **its PR
+  claimed it "fixed a still-present b459 extern-decl bug (b459 only passed on
+  stale `.o`)" — INACCURATE:** the decls were present on main since b459
+  (`193a8afd`, verified); #1000's diff removes-and-re-adds the same two decls
+  (cosmetic relocation + comments), all 3 regions keep both. Clean 3-region gate
+  (`rm -rf build/*`) confirmed no real extern bug. Don't record b459 as failed.
 - **Brief 462** — `scaffolder`, shipped in PR #999. ✅ **100 ov002 LOWER-half ARM
   `.s` (2× batch_carve batches) — CONFIRMS the lane b460 wrongly called empty.**
   EUR sha1 OK; parked 2 kind:data + 1 verify-fail. ⚠️ **ship-step miss:** the

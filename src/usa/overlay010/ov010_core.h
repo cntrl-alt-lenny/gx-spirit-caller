@@ -23,8 +23,6 @@ extern char data_ov010_021b9260[];   /* panel/cursor state A (sel +0, flags +544
 extern char data_ov010_021b9890[];   /* panel/cursor state B (sib of 9260)   */
 extern char data_ov010_021b98f0[];   /* config record                       */
 extern char data_ov010_021b98a8[];   /* config record                       */
-extern char data_ov010_021b9160[];
-extern char data_ov010_021b9790[];
 
 /* --- shared sinks (extern from existing decls) ----------------------------
  *   func_020b3870(a, b)                 signed divmod helper (see DIVMOD below)
