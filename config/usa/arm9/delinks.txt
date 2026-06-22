@@ -3592,6 +3592,10 @@ src/usa/main/func_02092ba4.s:
     complete
     .text start:0x02092ba4 end:0x02092bb8
 
+src/usa/main/func_02092d50.s:
+    complete
+    .text start:0x02092d50 end:0x02092d64
+
 libs/nitro/func_02092e4c.legacy.c:
     complete
     .text start:0x02092d64 end:0x02092d74
