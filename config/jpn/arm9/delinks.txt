@@ -3761,10 +3761,16 @@ libs/nitro/func_02092668.legacy.c:
 src/jpn/main/func_0209275c.s:
     complete
     .text start:0x0209275c end:0x02092778
-
 libs/nitro/func_02092860.legacy.c:
     complete
     .text start:0x02092778 end:0x02092784
+
+src/jpn/main/func_020927e4.s:
+    complete
+    .text start:0x020927e4 end:0x02092800
+src/jpn/main/func_02092800.s:
+    complete
+    .text start:0x02092800 end:0x0209281c
 
 libs/nitro/func_02092928.legacy.c:
     complete
