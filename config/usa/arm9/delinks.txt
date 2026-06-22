@@ -3772,7 +3772,9 @@ libs/nitro/func_02092860.legacy.c:
 src/usa/main/func_020927e4.s:
     complete
     .text start:0x020927e4 end:0x02092800
-
+src/usa/main/func_02092800.s:
+    complete
+    .text start:0x02092800 end:0x0209281c
 libs/nitro/func_02092928.legacy.c:
     complete
     .text start:0x02092840 end:0x0209284c
@@ -3780,6 +3782,10 @@ libs/nitro/func_02092928.legacy.c:
 libs/nitro/func_02092934.legacy.c:
     complete
     .text start:0x0209284c end:0x02092858
+
+src/usa/main/func_02092858.s:
+    complete
+    .text start:0x02092858 end:0x02092874
 
 src/usa/main/func_0209294c.s:
     complete
