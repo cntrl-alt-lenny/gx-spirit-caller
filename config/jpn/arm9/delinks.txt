@@ -4269,6 +4269,10 @@ src/jpn/main/func_020a5560.c:
     complete
     .text start:0x020a5560 end:0x020a5574
 
+src/jpn/main/func_020a5758.s:
+    complete
+    .text start:0x020a5758 end:0x020a5770
+
 src/jpn/main/func_020a5770.c:
     complete
     .text start:0x020a5770 end:0x020a5784
