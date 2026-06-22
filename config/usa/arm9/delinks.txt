@@ -1152,7 +1152,6 @@ src/usa/main/func_02023520.c:
 src/usa/main/func_02023ed4.s:
     complete
     .text start:0x02023ed4 end:0x02023ef8
-
 src/usa/main/func_02023ef8.c:
     complete
     .text start:0x02023ef8 end:0x02023f28
@@ -1378,6 +1377,9 @@ src/usa/main/func_0202c3f8.c:
     complete
     .text start:0x0202c3f8 end:0x0202c418
 
+src/usa/main/func_0202c418.s:
+    complete
+    .text start:0x0202c418 end:0x0202c43c
 src/usa/main/func_0202c43c.c:
     complete
     .text start:0x0202c43c end:0x0202c460
@@ -1547,6 +1549,21 @@ src/usa/main/func_02032668.c:
     complete
     .text start:0x02032668 end:0x02032680
 
+src/usa/main/func_020326d0.s:
+    complete
+    .text start:0x020326d0 end:0x020326f4
+src/usa/main/func_020326f4.s:
+    complete
+    .text start:0x020326f4 end:0x02032718
+src/usa/main/func_0203276c.s:
+    complete
+    .text start:0x0203276c end:0x02032790
+src/usa/main/func_02032810.s:
+    complete
+    .text start:0x02032810 end:0x02032834
+src/usa/main/func_02032988.s:
+    complete
+    .text start:0x02032988 end:0x020329ac
 src/usa/main/func_020329ac.s:
     complete
     .text start:0x020329ac end:0x020329c4
@@ -1671,6 +1688,9 @@ src/usa/main/func_02033ed8.s:
 src/usa/main/func_02033fc4.s:
     complete
     .text start:0x02033fc4 end:0x02033fdc
+src/usa/main/func_02034044.s:
+    complete
+    .text start:0x02034044 end:0x02034068
 src/usa/main/func_02034068.s:
     complete
     .text start:0x02034068 end:0x02034080
@@ -1898,6 +1918,9 @@ src/usa/main/func_0203c6a8.c:
     complete
     .text start:0x0203c6a8 end:0x0203c6bc
 
+src/usa/main/func_0203c6bc.s:
+    complete
+    .text start:0x0203c6bc end:0x0203c6e0
 src/usa/main/func_0203c7c4.s:
     complete
     .text start:0x0203c7c4 end:0x0203c7d4
@@ -2026,6 +2049,9 @@ src/usa/main/func_0204545c.legacy_sp3.c:
     complete
     .text start:0x0204545c end:0x0204547c
 
+src/usa/main/func_0204547c.s:
+    complete
+    .text start:0x0204547c end:0x020454a0
 src/usa/main/func_020454a0.c:
     complete
     .text start:0x020454a0 end:0x020454bc
@@ -2178,6 +2204,10 @@ src/usa/main/func_0204f9b0.legacy_sp3.c:
 src/usa/main/func_0204f9dc.legacy_sp3.c:
     complete
     .text start:0x0204f9dc end:0x0204fa08
+
+src/usa/main/func_0204fc28.s:
+    complete
+    .text start:0x0204fc28 end:0x0204fc4c
 
 src/usa/main/func_02051e20.legacy_sp3.c:
     complete
