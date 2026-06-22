@@ -1,0 +1,16 @@
+; func_02091618 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern func_020936a8
+        .extern func_02093bf0
+        .global func_02091618
+        .arm
+func_02091618:
+    stmfd sp!, {lr}
+    sub sp, sp, #0x4
+    bl func_020936a8
+.L_c:
+    bl func_02093bf0
+    b .L_c
