@@ -88,6 +88,10 @@ src/overlay018/func_ov018_021ab4f4.s:
     complete
     .text start:0x021ab4f4 end:0x021ab694
 
+src/overlay018/func_ov018_021ab694.s:
+    complete
+    .text start:0x021ab694 end:0x021accc8
+
 src/overlay018/func_ov018_021accc8.c:
     complete
     .text start:0x021accc8 end:0x021acda0
