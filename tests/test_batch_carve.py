@@ -19,6 +19,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -110,6 +111,77 @@ class TestPureHelpers(unittest.TestCase):
         self.assertEqual(bisect_plan([1, 2, 3, 4]), [[1, 2], [3, 4]])
         self.assertEqual(bisect_plan([1]), [])
         self.assertEqual(bisect_plan([]), [])
+
+
+# --------------------------------------------------------------------------- #
+# Platform-specific Ops paths                                                  #
+# --------------------------------------------------------------------------- #
+
+class TestOpsPlatformPaths(unittest.TestCase):
+    def test_windows_skips_posix_process_tools(self):
+        ops = bc.Ops("eur", platform="win32")
+        with mock.patch.object(bc.subprocess, "run") as run:
+            ops._kill_orphans()
+            ops._wait_wine_quiet(max_wait=0)
+        run.assert_not_called()
+
+    def test_windows_python_subprocesses_use_current_interpreter(self):
+        ops = bc.Ops("eur", platform="win32")
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, timeout=None):
+            calls.append(cmd)
+            stdout = ""
+            if "--classify-data" in cmd:
+                stdout = "clean"
+            elif "--whole-function" in cmd:
+                stdout = "byte-identical"
+            elif cmd == ["ninja", "sha1"]:
+                stdout = "gx-spirit-caller_eur.nds: OK"
+            return mock.Mock(returncode=0, stdout=stdout, stderr="")
+
+        with mock.patch.object(ops, "_run", side_effect=fake_run):
+            self.assertEqual(ops.classify("func_02000000"), "clean")
+            self.assertEqual(
+                ops.whole_function("func_02000000", "unused-output.s"),
+                "pass",
+            )
+            ops.sort_delinks("config/eur/arm9/delinks.txt")
+            self.assertTrue(ops.gate())
+
+        python_scripts = [
+            (cmd[0], cmd[1])
+            for cmd in calls
+            if len(cmd) > 1 and cmd[1].startswith("tools/")
+        ]
+        self.assertEqual(
+            python_scripts,
+            [
+                (sys.executable, "tools/asm_escape.py"),
+                (sys.executable, "tools/asm_escape.py"),
+                (sys.executable, "tools/sort_delinks.py"),
+                (sys.executable, "tools/configure.py"),
+            ],
+        )
+
+    @unittest.skipIf(sys.platform == "win32", "POSIX-only flock behaviour")
+    def test_posix_gate_lock_is_exclusive(self):
+        import fcntl
+
+        ops = bc.Ops("eur", platform=sys.platform)
+        with tempfile.TemporaryDirectory() as tmp:
+            old_lock = bc._GATE_LOCK
+            bc._GATE_LOCK = Path(tmp) / "gate.lock"
+            try:
+                with ops._gate_lock(1):
+                    with bc._GATE_LOCK.open("w", encoding="utf-8") as competitor:
+                        with self.assertRaises(BlockingIOError):
+                            fcntl.flock(
+                                competitor,
+                                fcntl.LOCK_EX | fcntl.LOCK_NB,
+                            )
+            finally:
+                bc._GATE_LOCK = old_lock
 
 
 # --------------------------------------------------------------------------- #

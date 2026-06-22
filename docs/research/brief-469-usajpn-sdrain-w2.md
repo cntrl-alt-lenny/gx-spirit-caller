@@ -26,6 +26,7 @@ is a per-batch `ninja sha1`-gated `[auto, … sha1 OK]` commit, so the floor is
 durable regardless of how a wave ends.
 
 **Operational lessons banked:**
+
 - A speculative wave-4 "salvage" of 11 *un-gate-confirmed* carves was committed
   then **reverted** — one broke the USA link (deterministic SHA1 mismatch). Never
   trust a batch whose own gate didn't complete; the per-batch `ninja sha1` is the
@@ -45,7 +46,7 @@ durable regardless of how a wave ends.
 objdump renders a zero-offset PC load as bare **`[pc]`** (not `[pc, #0]`), so a
 function like `func_02090774`:
 
-```
+```armasm
 ldr r1, [pc]      ; load the word immediately after `bx r1`
 bx  r1
 .word func_020908c8
@@ -148,16 +149,14 @@ doesn't re-bisect known culprits.
 
 ## Recommended recipe for the brain (continue at scale)
 
-```
+```console
 # one clean rebuild first so the delink references match committed delinks.txt
-python3.13 tools/configure.py <ver> && ninja sha1
+python tools/configure.py <ver>
+ninja sha1
 # then drain (sequential per version; --batch 10):
-PYTHONUNBUFFERED=1 python3.13 -u tools/batch_carve.py \
-  --version <usa|jpn> --min-addr 0x02000000 --srcdir src/<ver>/main \
-  --batch 10 --limit 300 --gate-timeout 240 --call-timeout 60 \
-  --skip-list build/known_drops_<ver>_main.txt \
-  --verifyfail-list build/known_verifyfail_<ver>_main.txt
+python -u tools/batch_carve.py --version <usa|jpn> --min-addr 0x02000000 --srcdir src/<ver>/main --batch 10 --limit 300 --gate-timeout 240 --call-timeout 60 --skip-list build/known_drops_<ver>_main.txt --verifyfail-list build/known_verifyfail_<ver>_main.txt
 ```
+
 Overlays: swap `--overlay ovNNN --min-addr <base> --srcdir src/<ver>/overlayNNN`.
 
 ## Recommendation for the brain

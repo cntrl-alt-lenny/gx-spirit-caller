@@ -22,24 +22,25 @@ and `src/jpn/main/` — region-specific source trees).
 `BatchCarver.__init__` already accepted `srcdir: str | None`.
 
 Correct invocation for USA main drain:
+
+```console
+python tools/batch_carve.py --version usa --min-addr 0x02000000 --srcdir src/usa/main --batch 25 --limit 50 --gate-timeout 180 --call-timeout 60
 ```
-python3.13 tools/batch_carve.py \
-  --version usa \
-  --min-addr 0x02000000 \      # CRITICAL: full range (default 0x02234000 = upper-half only)
-  --srcdir src/usa/main \
-  --batch 25 --limit 50 \
-  --gate-timeout 180 --call-timeout 60
-```
+
+The `--min-addr 0x02000000` argument is critical: the default
+`0x02234000` only covers the upper-half address range.
 
 Delink entries written to `config/usa/arm9/delinks.txt` as `src/usa/main/func_XXXX.s:`.
 
 ## USA/JPN .s Runway
 
 ### USA main (arm9 main, NOT ov002)
+
 - **3,082 uncarved ARM functions** — **664KB** of `.s` potential
 - Size distribution peaks at 0x40–0xbf (1,390 funcs, ~99KB)
 
 ### USA overlays (non-ov002)
+
 | Overlay | Funcs | KB  |
 |---------|-------|-----|
 | ov006   | 245   | 84  |

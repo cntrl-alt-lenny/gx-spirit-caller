@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**84 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**85 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (16)
+- [Uncategorised](#uncategorised) (17)
 
 ## Analysis / worklist
 
@@ -454,6 +454,12 @@ README.md's per-region shields.io badges to match.
 ## Uncategorised
 
 _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/batch_carve.py`
+
+**automate the DETERMINISTIC mechanical carve lanes (brief 456).**
+
+The ov002 `.s` reg-alloc lane and the region-port lane are deterministic: a candidate either passes a byte-exact gate or it doesn't — no LLM judgement. This driver enumerates uncarved candidates in a scope, runs the per-candidate verific…
 
 ### `tools/c42_family_hunter.py`
 

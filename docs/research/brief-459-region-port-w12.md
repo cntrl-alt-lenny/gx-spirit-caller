@@ -34,7 +34,7 @@ captures two classes of residual:
 1. **Recently added EUR `.c` files** — the decomper added new `.c` files to
    ov010/011/012/013 between b455 and now (wave 1 clean-C work from briefs 308–322).
    These were not in b455's "already-ported" set because they existed before b455.
-   
+
    Wait — actually re-analysis: ALL of these ov010/011 files existed in the EUR
    source tree before b455. The b455 porter found them as `clean ports: 3/4` but
    then they all hit `write-failed`. This wave FIXED the bugs that caused the
@@ -56,6 +56,7 @@ failed → fell through to raw-addr check → no `0x021ab32c` literal in source 
 write-failed park.
 
 **Fix:** Extend `_norm_mod` to handle the plural form by taking the first overlay:
+
 ```python
 mm2 = re.match(r"overlays\(([\d,]+)\)", m)
 if mm2:
@@ -77,6 +78,7 @@ literals → not found → write-failed park.
 
 **Fix:** In the raw-addr fallback section, after exhausting literal forms, also
 check for the `_unk` suffix pattern and substitute:
+
 ```python
 mod_prefix = f"_{mod}" if mod != "main" else ""
 for kind in ("func", "data"):
@@ -99,6 +101,7 @@ future reference if the script is reset or re-run.
 ## Runway
 
 The mechanical ARM-function overlay port lane is now essentially exhausted:
+
 - All 22 in-use overlays (ov000–ov021) have been processed
 - Remaining "no-sibling" parks are genuinely region-divergent (different layouts)
 - The next new ports require: (a) new EUR `.c` files from decomper/scaffolder
