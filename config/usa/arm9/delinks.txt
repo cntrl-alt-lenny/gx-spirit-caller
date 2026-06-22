@@ -3642,6 +3642,9 @@ src/usa/main/func_02093534.c:
     complete
     .text start:0x02093534 end:0x02093544
 
+src/usa/main/func_020936e8.s:
+    complete
+    .text start:0x020936e8 end:0x020936fc
 src/usa/main/func_02093714.s:
     complete
     .text start:0x02093714 end:0x02093720
@@ -3663,6 +3666,9 @@ libs/nitro/func_02093bf0.legacy.c:
     complete
     .text start:0x02093afc end:0x02093b08
 
+src/usa/main/func_02093b08.s:
+    complete
+    .text start:0x02093b08 end:0x02093b1c
 src/usa/main/func_02093b1c.s:
     complete
     .text start:0x02093b1c end:0x02093b2c
@@ -3797,6 +3803,10 @@ src/usa/main/func_0209517c.legacy.c:
 src/usa/main/func_020951b0.legacy.c:
     complete
     .text start:0x020951b0 end:0x020951dc
+
+src/usa/main/func_020951dc.s:
+    complete
+    .text start:0x020951dc end:0x020951f0
 
 src/usa/main/func_020951f0.c:
     complete
