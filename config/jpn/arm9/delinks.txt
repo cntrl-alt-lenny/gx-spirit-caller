@@ -3782,7 +3782,6 @@ libs/nitro/func_02092934.legacy.c:
 src/jpn/main/func_02092858.s:
     complete
     .text start:0x02092858 end:0x02092874
-
 src/jpn/main/func_0209294c.s:
     complete
     .text start:0x0209294c end:0x02092960
@@ -4136,6 +4135,10 @@ src/jpn/main/func_02098618.legacy.c:
 src/jpn/main/func_02098694.legacy.c:
     complete
     .text start:0x02098694 end:0x020986b0
+
+src/jpn/main/func_02098be8.s:
+    complete
+    .text start:0x02098be8 end:0x02098c04
 
 src/jpn/main/func_02099b30.c:
     complete
