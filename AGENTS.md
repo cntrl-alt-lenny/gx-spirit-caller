@@ -684,6 +684,24 @@ plus the recurring ship-step miss):
 
 ### Closed briefs (reference)
 
+- **Brief 468** — `scaffolder`, shipped in PR #1005. ⚠️ **Only +2 ov002 lower `.s`
+  — CONTENTION-LIMITED, not a clean-rate problem (0 verify-fail above 0xcc).**
+  KEY FINDING: **two `batch_carve` lanes CANNOT share the machine-wide wineserver**
+  — the decomper building continuously (USA micro-waves) meant the wineserver never
+  idled long enough for an EUR gate to finish; every `--gate-timeout 180/240/300`
+  timed out, and `--limit 25/50` runs hit the ~8–10 min background-task kill while
+  waiting. Mitigations (timing windows, longer timeouts, SIGSTOP watchdog) all
+  insufficient. **Recommendation (brain-owned): don't run both batch_carve drivers
+  concurrently — serialize / single heavy lane.** 619 ov002 funcs remain above
+  0xcc; the lane is healthy and drains ~150/uncontended-wave.
+- **Brief 469** — `decomper`, shipped in PR #1004. ✅ **USA/JPN `.s` drain at SCALE:
+  +386 USA main + 140 JPN main `.s` (526 total), ~96-99% clean, 3-region green.**
+  + 3 tooling fixes (all in `tools/`, scaffolder untouched): **Fix 1** asm_escape
+  bare `[pc]` (no `#0`) pool-detector miss → was parking short PC-rel thunks;
+  **Fix 2** batch_carve `carved_addrs()` now unions name-derived addrs (legacy.c
+  re-selection); **Fix 3** wine-contention robustness (`_wait_wine_quiet()` before
+  link + `GateTimeout` caught in `_bisect`). The USA/JPN megalever is the project's
+  growth frontier now. JPN main opened (`--version jpn --srcdir src/jpn/main`).
 - **Brief 466** — `scaffolder`, shipped in PR #1003. ✅ **77 ov002 lower-half ARM
   `.s`** (size band 0xbc–0xdc). **KEY FINDING: a verify-fail WALL at 0xbc–0xcc**
   (52%→2% clean), recovering to 100% at 0xcc+ — size-driven (not overlay-swap;

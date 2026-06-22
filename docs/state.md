@@ -8,8 +8,34 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-21 (Mac, brain on Opus 4.8), **post briefs 466+467
-merge** (final 3-region sha1 PASS on merged main). **This round = the USA/JPN `.s`
+**Last updated:** 2026-06-22 (Mac, brain on Opus 4.8), **post briefs 468+469
+merge** (final 3-region sha1 PASS — EUR verified for real, not "by construction").
+**This round = USA/JPN `.s` drain at scale + the dual-lane wineserver-contention
+verdict (this is why the round dragged + needed manual pause/resume):**
+- **#1004** decomper (b469) — **+386 USA main + 140 JPN main `.s` (526)**, ~96-99%
+  clean, 3-region green. + 3 `tools/` fixes: asm_escape bare `[pc]` pool miss;
+  batch_carve `carved_addrs()` name-derived addrs; wine-contention robustness
+  (`_wait_wine_quiet()` before link + `GateTimeout` caught in `_bisect`). JPN main
+  opened. The USA/JPN megalever is the growth frontier.
+- **#1005** scaffolder (b468) — only **+2 ov002 lower `.s`, CONTENTION-LIMITED**
+  (0 verify-fail above 0xcc; the low count is the wineserver, not clean-rate).
+  ⚠️ **VERDICT: two `batch_carve` lanes CANNOT share the machine-wide wineserver**
+  — continuous decomper building starved every EUR gate (all timed out). → don't
+  run both batch_carve drivers concurrently; single heavy lane / serialize. 619
+  ov002 funcs remain above 0xcc.
+- ⚠️ **OPEN DECISION (next round): lane strategy.** USA/JPN `.s` (decomper) is the
+  megalever + frontier; EUR ov002 (scaffolder) is nearly done + lower-value. Brain
+  to pick single-lane vs retry-dual-with-fixed-tool (#1004's flock-lock +
+  `_wait_wine_quiet` now on main for BOTH lanes) — pending user input.
+
+**Metrics:** EUR units **94.95%** / matched_fn **91.47%** / code **82.14%** (+2).
+**USA jumped: units 65.24→66.68%, matched_fn 25.72→29.66% (+3.9pp), code
+5.56→6.13%** (+386 main `.s`). **JPN moved too: units 64.93→65.25%, matched_fn
+24.34→25.77% (+1.4pp), code 5.51→5.56%** (+140 main `.s`). The USA/JPN `.s`
+megalever moves BOTH regions — the project's growth engine.
+
+---
+**Prior round (briefs 466+467):** **This round = the USA/JPN `.s`
 megalever OPENED — both agents now run mechanical batch_carve (dual lane):**
 - **#1003** scaffolder (b466) — 77 ov002 lower-half ARM `.s`. **Found a verify-fail
   WALL at the 0xbc–0xcc size band** (52%→2% clean), recovering to 100% at 0xcc+ —
