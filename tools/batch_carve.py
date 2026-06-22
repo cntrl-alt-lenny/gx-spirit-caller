@@ -207,7 +207,7 @@ class Ops:
             subprocess.run(["pkill", "-f", exe], capture_output=True)
         subprocess.run(["pkill", "-f", "ninja sha1"], capture_output=True)
 
-    def _wait_wine_quiet(self, deadline: float) -> None:
+    def _wait_wine_quiet(self, max_wait: float = 900.0) -> None:
         """Block until no foreign `mwldarm.exe` link is in flight, so we never
         start our own link concurrently with a co-lane's. The GPTK wineserver
         deadlocks when two mwldarm.exe write `arm9.o` at once ("Can't write
@@ -215,13 +215,19 @@ class Ops:
         lane even when the co-lane's batch_carve predates the flock gate-lock
         (an old-code scaffolder won't take the lock, but we can still see its
         mwldarm in the process table and wait it out). When we hold this window
-        AND our flock, our link runs alone. Raises TimeoutExpired if no quiet
-        window opens before `deadline` (-> batch deferred, retried next round —
-        never killing the co-lane's in-flight link, unlike _kill_orphans)."""
+        AND our flock, our link runs alone.
+
+        Patient and best-effort: polls up to `max_wait` seconds on its OWN
+        budget (decoupled from the link `gate_timeout`, so a busy co-lane never
+        eats the link's time). On expiry it simply RETURNS and lets the link
+        proceed — the link's own timeout+retry is the backstop. It never
+        raises and never kills the co-lane's in-flight link (unlike
+        _kill_orphans), so the two lanes cooperate instead of thrashing."""
+        deadline = time.monotonic() + max_wait
         while subprocess.run(["pgrep", "-f", "mwldarm.exe"],
                              capture_output=True).returncode == 0:
             if time.monotonic() > deadline:
-                raise subprocess.TimeoutExpired("wine-quiet", 0)
+                return
             time.sleep(2)
 
     def classify(self, func: str) -> str:
@@ -294,7 +300,8 @@ class Ops:
                     self._run(["python3.13", "tools/configure.py", self.version], timeout=to)
                     # Wait for a quiet wine window (no co-lane mwldarm) before
                     # our own link, so the two never collide on the wineserver.
-                    self._wait_wine_quiet(lock_deadline)
+                    # Patient, on its own budget; returns best-effort on expiry.
+                    self._wait_wine_quiet()
                     r = self._run(["ninja", "sha1"], timeout=to)
             except subprocess.TimeoutExpired:
                 self._kill_orphans()
@@ -525,11 +532,23 @@ class BatchCarver:
             return
         for half in bisect_plan(carves):
             self._reapply(half, symbols)
-            if not self._write_delinks(symbols) and self.ops.gate():
-                self.log(f"     half of {len(half)} OK -> commit")
-                self._commit_or_abort(symbols)
-            else:
-                self._bisect(half, symbols, kind=kind)
+            if not self._write_delinks(symbols):
+                try:
+                    green = self.ops.gate()
+                except GateTimeout:
+                    # contention during bisect -> defer this half cleanly
+                    # rather than crash the run with an uncaught GateTimeout.
+                    funcs = [p[0] for p in half]
+                    self.log(f"     ⏳ gate timed out in bisect -> DEFER "
+                             f"{len(funcs)} (re-attemptable next run)")
+                    self._revert_pending(symbols)
+                    self.report.deferred.extend(funcs)
+                    continue
+                if green:
+                    self.log(f"     half of {len(half)} OK -> commit")
+                    self._commit_or_abort(symbols)
+                    continue
+            self._bisect(half, symbols, kind=kind)
 
     # ---- main loop ----
     def run(self, limit: int | None = None) -> Report:
