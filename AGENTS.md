@@ -653,34 +653,35 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 468** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 LOWER-half ARM `.s` drain w4 — continue ABOVE the 0xcc wall (b466
-  shipped 77; 621 carvable funcs remain ≈ 4 waves).** ⚠️ **b466 found a
-  verify-fail wall at the 0xbc–0xcc size band** (52%→2% clean), recovering to
-  100% at 0xcc+ — size-driven (not overlay-swap; spans both 0x021b/0x022
-  addrs), likely byte-pack/mwcc threshold. **SKIP the 0xbc–0xcc band** (set
-  `--min-size 0xcc` or carve above it); the parked ~73 are a permuter/RE
-  cohort for later — don't re-grind them. Same chunked `--limit 50` recipe.
-  ⚠️ **WINE-COEXIST:** the decomper runs USA `batch_carve` concurrently — gate
-  with `--gate-timeout 180`; on a GateTimeout wait for decomper-idle, revert
-  the trailing-newline artifact (`git checkout config/eur/arm9/overlays/ov002/
-  delinks.txt`), retry. **LAST actions: final `ninja sha1` green → push →
-  `gh pr create` → PR URL** (clean worktree). Branch: `scaffolder/ov002-lower-w4`.
-- **Brief 469** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **SCALE the USA/JPN `.s` mechanical drain — pilot CONFIRMED (b467: 135 USA
-  main `.s`, 90-98% clean, USA sha1 green every gate; this is now the primary
-  USA/JPN growth lever).** Runway is huge: USA main ~2,947 remain, USA overlays
-  (non-ov002) ~1,164, JPN ~equal — **~8,500 decomper-owned funcs total.** Drive
-  it: continue **USA main** to depletion, then **JPN main** (`--version jpn
-  --srcdir src/jpn/main`), then USA/JPN overlays (NOT ov002 = scaffolder's).
-  Recipe (b467, now in `batch_carve`): `--version <r> --srcdir src/<r>/<mod>
-  --min-addr 0x02000000` (main) — **the `--min-addr` default 0x02234000
-  enumerates 0 main candidates, always override.** Chunked `--limit 50`,
-  commit-on-pass. ⚠️ **WINE-COEXIST** with the scaffolder's EUR lane:
-  `--gate-timeout 180`; if `0 progress + 0% CPU` >5 min, YOU kill your own
-  `asm_escape` job (resumable side) + retry (b454). **LAST actions: final
-  per-region `ninja sha1` green → push → `gh pr create` → PR URL.** Report the
-  shipped count + remaining runway. Branch: `decomper/usajpn-sdrain-w2`.
+- **Brief 470** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
+  **ov002 LOWER-half ARM `.s` drain w5 — continue ABOVE the 0xcc wall (619
+  carvable funcs remain). DUAL-LANE RETRY with the now-shared contention fix.**
+  ⚠️ **CRITICAL: branch FRESH from `main`** so you get the merged contention-
+  robust `batch_carve` — last round (b468) you ran OLD code WITHOUT the gate-
+  lock and got starved to +2. The merged tool has a **cross-worktree shared
+  gate-lock (`/tmp/spirit-caller-gate.lock`, `fcntl.flock`) + `_wait_wine_quiet`
+  before linking**, so your gates now SERIALIZE with the decomper's USA/JPN
+  lane instead of timing out. Use `--gate-timeout 600` (a lane WAITING for the
+  shared lock must not false-timeout). Small chunked `--limit 50`, commit-on-
+  pass — **if a batch's lock-wait gets killed by the ~8–10 min harness cap,
+  just re-run; committed batches are durable.** Expect ~half solo speed (gates
+  alternate with the decomper) but steady progress, no starvation. Skip the
+  0xbc–0xcc band (`--min-size 0xcc`). **LAST actions: final `ninja sha1` green
+  → push → `gh pr create` → PR URL.** Branch: `scaffolder/ov002-lower-w5`.
+- **Brief 471** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **USA/JPN `.s` mechanical drain w3 — the growth frontier (b469: +526, USA fn
+  +3.9pp / JPN +1.4pp). DUAL-LANE with the shared gate-lock.** Continue: finish
+  **USA main**, then **JPN main** (`--version jpn --srcdir src/jpn/main
+  --min-addr 0x02000000`), then USA/JPN overlays (NOT ov002 = scaffolder's).
+  ~8,000 funcs runway. Recipe: `--version <r> --srcdir src/<r>/<mod>
+  --min-addr 0x02000000` (main; default 0x02234000 → 0 candidates). Chunked
+  `--limit 50`, commit-on-pass. ⚠️ **DUAL-LANE COEXIST (now both honor it):**
+  the scaffolder also runs `batch_carve` (EUR ov002) — the shared
+  `/tmp/spirit-caller-gate.lock` serializes your gates with theirs (your Fix 3
+  from b469). Use `--gate-timeout 600`. You are still the resumable side if a
+  true deadlock recurs (kill your own `asm_escape`, retry). **LAST actions:
+  final per-region `ninja sha1` green → push → `gh pr create` → PR URL.**
+  Report shipped + remaining runway per module. Branch: `decomper/usajpn-sdrain-w3`.
 
 ### Closed briefs (reference)
 
