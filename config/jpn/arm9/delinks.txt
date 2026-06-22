@@ -3474,7 +3474,6 @@ src/jpn/main/func_0208c758.s:
 src/jpn/main/func_0208c7c8.s:
     complete
     .text start:0x0208c7c8 end:0x0208c7e4
-
 src/jpn/main/func_0208cb20.c:
     complete
     .text start:0x0208cb20 end:0x0208cb30
@@ -3587,6 +3586,9 @@ libs/nitro/func_0208e2f4.legacy.c:
     complete
     .text start:0x0208e20c end:0x0208e230
 
+src/jpn/main/func_0208e230.s:
+    complete
+    .text start:0x0208e230 end:0x0208e24c
 libs/nitro/func_0208e334.legacy.c:
     complete
     .text start:0x0208e24c end:0x0208e300
@@ -3607,6 +3609,9 @@ libs/nitro/func_0208e43c.legacy.c:
     complete
     .text start:0x0208e354 end:0x0208e3e8
 
+src/jpn/main/func_0208e3e8.s:
+    complete
+    .text start:0x0208e3e8 end:0x0208e404
 src/jpn/main/func_0208e534.legacy.c:
 
     complete
@@ -3647,6 +3652,12 @@ src/jpn/main/func_02090810.s:
 src/jpn/main/func_02090828.s:
     complete
     .text start:0x02090828 end:0x02090840
+src/jpn/main/func_02090840.s:
+    complete
+    .text start:0x02090840 end:0x0209085c
+src/jpn/main/func_0209085c.s:
+    complete
+    .text start:0x0209085c end:0x02090878
 src/jpn/main/func_02090878.s:
     complete
     .text start:0x02090878 end:0x02090890
@@ -3746,6 +3757,10 @@ libs/nitro/func_02092644.legacy.c:
 libs/nitro/func_02092668.legacy.c:
     complete
     .text start:0x02092580 end:0x020925a4
+
+src/jpn/main/func_0209275c.s:
+    complete
+    .text start:0x0209275c end:0x02092778
 
 libs/nitro/func_02092860.legacy.c:
     complete
