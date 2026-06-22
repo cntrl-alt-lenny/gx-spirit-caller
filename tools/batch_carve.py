@@ -207,6 +207,23 @@ class Ops:
             subprocess.run(["pkill", "-f", exe], capture_output=True)
         subprocess.run(["pkill", "-f", "ninja sha1"], capture_output=True)
 
+    def _wait_wine_quiet(self, deadline: float) -> None:
+        """Block until no foreign `mwldarm.exe` link is in flight, so we never
+        start our own link concurrently with a co-lane's. The GPTK wineserver
+        deadlocks when two mwldarm.exe write `arm9.o` at once ("Can't write
+        application arm9.o"). This is ONE-SIDED on purpose: it protects our
+        lane even when the co-lane's batch_carve predates the flock gate-lock
+        (an old-code scaffolder won't take the lock, but we can still see its
+        mwldarm in the process table and wait it out). When we hold this window
+        AND our flock, our link runs alone. Raises TimeoutExpired if no quiet
+        window opens before `deadline` (-> batch deferred, retried next round —
+        never killing the co-lane's in-flight link, unlike _kill_orphans)."""
+        while subprocess.run(["pgrep", "-f", "mwldarm.exe"],
+                             capture_output=True).returncode == 0:
+            if time.monotonic() > deadline:
+                raise subprocess.TimeoutExpired("wine-quiet", 0)
+            time.sleep(2)
+
     def classify(self, func: str) -> str:
         """'clean' | 'refuse' | 'deferred'."""
         try:
@@ -275,6 +292,9 @@ class Ops:
                                 )
                             time.sleep(1)
                     self._run(["python3.13", "tools/configure.py", self.version], timeout=to)
+                    # Wait for a quiet wine window (no co-lane mwldarm) before
+                    # our own link, so the two never collide on the wineserver.
+                    self._wait_wine_quiet(lock_deadline)
                     r = self._run(["ninja", "sha1"], timeout=to)
             except subprocess.TimeoutExpired:
                 self._kill_orphans()
