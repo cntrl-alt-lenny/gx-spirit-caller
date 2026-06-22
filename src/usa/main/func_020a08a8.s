@@ -1,0 +1,16 @@
+; func_020a08a8 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .global func_020a08a8
+        .arm
+func_020a08a8:
+    cmp r0, #0x1
+    bcc .L_14
+    cmp r0, #0xf
+    movls r0, #0x1
+    bxls lr
+.L_14:
+    mov r0, #0x0
+    bx lr
