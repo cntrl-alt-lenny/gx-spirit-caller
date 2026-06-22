@@ -4060,7 +4060,6 @@ src/usa/main/func_0209a718.s:
 src/usa/main/func_0209a730.s:
     complete
     .text start:0x0209a730 end:0x0209a748
-
 src/usa/main/func_0209a748.c:
     complete
     .text start:0x0209a748 end:0x0209a760
@@ -4091,6 +4090,9 @@ src/usa/main/func_0209b3f0.legacy.c:
     complete
     .text start:0x0209b3f0 end:0x0209b440
 
+src/usa/main/func_0209b440.s:
+    complete
+    .text start:0x0209b440 end:0x0209b458
 src/usa/main/func_0209b458.c:
     complete
     .text start:0x0209b458 end:0x0209b468
@@ -4272,6 +4274,10 @@ src/usa/main/func_020a39c0.c:
 src/usa/main/func_020a5560.c:
     complete
     .text start:0x020a5560 end:0x020a5574
+
+src/usa/main/func_020a5758.s:
+    complete
+    .text start:0x020a5758 end:0x020a5770
 
 src/usa/main/func_020a5770.c:
     complete
