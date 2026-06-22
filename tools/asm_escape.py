@@ -453,7 +453,8 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     return "\n".join(head + body + suffix) + "\n"
 
 
-def diff_words(mine: list[dict], orig: list[dict]) -> list[str]:
+def diff_words(mine: list[dict], orig: list[dict],
+               self_func: str | None = None) -> list[str]:
     """PURE byte-compare of two parsed word streams (mine vs delinked orig),
     reloc words modulo. Returns human-readable diffs; empty list = match.
 
@@ -464,6 +465,11 @@ def diff_words(mine: list[dict], orig: list[dict]) -> list[str]:
         freshly-assembled .o carries the same reloc, so the resolved bytes
         differ BY CONSTRUCTION. Compare by SYMBOL NAME, not bytes. A reloc on
         one side only is a parse artifact of the same word and is tolerated.
+        mwasm canonicalises a pointer to the function currently being assembled
+        from `R_ARM_ABS32 <func>` to `R_ARM_ABS32 .text`: emit_asm places the
+        function at offset zero in its standalone `.text` section, so these two
+        spellings resolve to the same address. `self_func` enables that narrow
+        equivalence without weakening checks for any other symbol.
 
       * raw constant (an inline `.word N` island — the intermediate-pool case,
         brief 418) — NEITHER side has a reloc, so the BYTES are the invariant
@@ -480,6 +486,12 @@ def diff_words(mine: list[dict], orig: list[dict]) -> list[str]:
     for i, (x, y) in enumerate(zip(mine, orig, strict=False)):
         if x["reloc"] or y["reloc"]:
             if x["reloc"] and y["reloc"] and x["reloc"] != y["reloc"]:
+                self_reloc = (
+                    self_func is not None
+                    and {x["reloc"], y["reloc"]} == {".text", self_func}
+                )
+                if self_reloc:
+                    continue
                 diffs.append(f"[{i}] reloc {x['reloc']} vs {y['reloc']}")
             continue
         if x["bytes"] != y["bytes"]:
@@ -718,7 +730,8 @@ def bytes_match(a_obj: str, orig_obj: str, func: str) -> tuple[bool, list[str]]:
     """Byte-compare `func` in two objects, reloc words (bl/pool) modulo.
     The word-by-word comparison is the pure `diff_words` (brief 418)."""
     diffs = diff_words(parse_objdump(disasm(a_obj), func),
-                       parse_objdump(disasm(orig_obj), func))
+                       parse_objdump(disasm(orig_obj), func),
+                       self_func=func)
     return (not diffs), diffs
 
 
