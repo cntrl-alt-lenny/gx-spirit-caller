@@ -3494,7 +3494,6 @@ src/jpn/main/func_0208afbc.legacy_sp3.c:
 src/jpn/main/func_0208afe8.s:
     complete
     .text start:0x0208afe8 end:0x0208b008
-
 libs/nitro/func_0208b16c.legacy.c:
     complete
     .text start:0x0208b084 end:0x0208b0a8
@@ -3641,6 +3640,21 @@ src/jpn/main/func_0208ce70.c:
     complete
     .text start:0x0208ce70 end:0x0208ce84
 
+src/jpn/main/func_0208d0fc.s:
+    complete
+    .text start:0x0208d0fc end:0x0208d11c
+src/jpn/main/func_0208de04.s:
+    complete
+    .text start:0x0208de04 end:0x0208de24
+src/jpn/main/func_0208de58.s:
+    complete
+    .text start:0x0208de58 end:0x0208de78
+src/jpn/main/func_0208e0c4.s:
+    complete
+    .text start:0x0208e0c4 end:0x0208e0e4
+src/jpn/main/func_0208e118.s:
+    complete
+    .text start:0x0208e118 end:0x0208e138
 libs/nitro/func_0208e254.legacy.c:
     complete
     .text start:0x0208e16c end:0x0208e1b4
@@ -3731,6 +3745,12 @@ src/jpn/main/func_02090878.s:
 src/jpn/main/func_02090890.s:
     complete
     .text start:0x02090890 end:0x020908a8
+src/jpn/main/func_020908a8.s:
+    complete
+    .text start:0x020908a8 end:0x020908c8
+src/jpn/main/func_020908c8.s:
+    complete
+    .text start:0x020908c8 end:0x020908e8
 src/jpn/main/func_02090968.c:
     complete
     .text start:0x02090968 end:0x02090978
@@ -3773,6 +3793,9 @@ src/jpn/main/func_0209162c.legacy.c:
     complete
     .text start:0x0209162c end:0x02091660
 
+src/jpn/main/func_02091660.s:
+    complete
+    .text start:0x02091660 end:0x02091680
 src/jpn/main/func_0209172c.s:
     complete
     .text start:0x0209172c end:0x02091734
@@ -4139,6 +4162,9 @@ src/jpn/main/func_02095c40.legacy.c:
 src/jpn/main/func_02095d6c.s:
     complete
     .text start:0x02095d6c end:0x02095d74
+src/jpn/main/func_02095f4c.s:
+    complete
+    .text start:0x02095f4c end:0x02095f6c
 src/jpn/main/func_02096134.c:
     complete
     .text start:0x02096134 end:0x02096140
@@ -4150,6 +4176,10 @@ src/jpn/main/func_02096340.legacy.c:
 src/jpn/main/func_02096698.s:
     complete
     .text start:0x02096698 end:0x020966a0
+src/jpn/main/func_02097144.s:
+    complete
+    .text start:0x02097144 end:0x02097164
+
 src/jpn/main/func_0209771c.legacy.c:
     complete
     .text start:0x0209771c end:0x02097754
