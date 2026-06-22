@@ -23,7 +23,7 @@ placeholder symbol.
 ## Hands-off paths
 
 - `tools/`, `libs/`, `include/` — scaffolder's territory
-- `AGENTS.md`, `AGENTS.md`, `docs/state.md` — brain's territory
+- `AGENTS.md`, `CLAUDE.md`, `docs/state.md` — brain's territory
 - `.github/workflows/`, `.githooks/` — scaffolder's territory
 
 If a task needs a change in someone else's lane (e.g. a tool bug is
@@ -128,5 +128,5 @@ Live check: `python tools/next_targets.py --version eur --no-outputs`.
 - `docs/state.md` — in-flight work + open briefs
 - `docs/research/thumb-align-wall.md` — the `.s` / Thumb-align
   saga (brief 013 background)
-- `AGENTS.md` — mwcc version, toolchain invariants"""
+- `CLAUDE.md` — mwcc version, toolchain invariants"""
 name = "decomper"

@@ -13,7 +13,7 @@ merging them.
 
 ## Scope you own
 
-- `AGENTS.md`, `AGENTS.md`
+- `AGENTS.md`, `CLAUDE.md`
 - `docs/state.md`
 - `docs/briefs/` (you author task briefs for other agents)
 
@@ -119,7 +119,7 @@ gh pr merge <N> --squash --delete-branch
 ## See also
 
 - `AGENTS.md` — canonical role/scope/workflow reference
-- `AGENTS.md` — project technical spec
+- `CLAUDE.md` — project technical spec
 - `docs/state.md` — current in-flight work
 - `docs/decomp-workflow.md` — plain-English workflow walkthrough"""
 name = "brain"

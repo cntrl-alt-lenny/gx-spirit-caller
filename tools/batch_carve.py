@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.13
+#!/usr/bin/env python3
 """batch_carve.py — automate the DETERMINISTIC mechanical carve lanes (brief 456).
 
 The ov002 `.s` reg-alloc lane and the region-port lane are deterministic: a
@@ -8,7 +8,7 @@ verification, stages the carve, and — crucially — **commits on a green
 `ninja sha1` and reverts on a red one**, so a wave can never end with work
 sitting uncommitted (the recurring ship-step miss).
 
-    python3.13 tools/batch_carve.py --version eur --overlay ov002 \
+    python tools/batch_carve.py --version eur --overlay ov002 \
         --min-size 0xc1 --max-size 0x100 --batch 20 --limit 60
 
 Design — PURE vs IMPURE
@@ -36,23 +36,33 @@ Safety
 - On a real red batch, the driver BISECTS (delta-debug) to isolate the
   culprit(s), parks them, and commits the good remainder — no good carve is
   lost to one bad sibling.
+- POSIX hosts serialise Wine-backed link gates with `fcntl.flock`. Windows
+  runs mwcc/mwld natively, so Wine process polling and the Wine gate lock are
+  intentional no-ops there.
 """
 from __future__ import annotations
 
 import argparse
-import fcntl
 import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
+
+if sys.platform != "win32":
+    import fcntl
+else:
+    fcntl = None
 
 ROOT = Path(__file__).resolve().parent.parent
 # Shared lock file so concurrent EUR + USA/JPN batch_carve processes serialise
 # their wine/mwldarm link step (only one region links at a time).
-_GATE_LOCK = "/tmp/spirit-caller-gate.lock"
+_GATE_LOCK = Path(tempfile.gettempdir()) / "spirit-caller-gate.lock"
 
 # --------------------------------------------------------------------------- #
 # PURE helpers (unit-tested, no build, no git)                                 #
@@ -192,16 +202,25 @@ class Ops:
     worktree build on the shared wineserver, then defers the candidate."""
 
     def __init__(self, version: str, call_timeout: float = 0.0, gate_retries: int = 1,
-                 gate_timeout: float = 0.0):
+                 gate_timeout: float = 0.0, platform: str | None = None):
         self.version = version
         self.call_timeout = call_timeout
         self.gate_retries = gate_retries
         self.gate_timeout = gate_timeout
+        self.platform = platform or sys.platform
+
+    @property
+    def is_windows(self) -> bool:
+        return self.platform == "win32"
 
     def _run(self, cmd: list[str], timeout: float | None = None) -> subprocess.CompletedProcess:
         return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
 
     def _kill_orphans(self) -> None:
+        # Windows runs the toolchain natively. Never use POSIX process tools or
+        # globally task-kill mwcc/mwld there: another worktree may own them.
+        if self.is_windows:
+            return
         # kill every Win32 toolchain proc that can hang on a wedged wineserver
         for exe in ("mwasmarm.exe", "mwldarm.exe", "mwccarm.exe"):
             subprocess.run(["pkill", "-f", exe], capture_output=True)
@@ -222,7 +241,12 @@ class Ops:
         eats the link's time). On expiry it simply RETURNS and lets the link
         proceed — the link's own timeout+retry is the backstop. It never
         raises and never kills the co-lane's in-flight link (unlike
-        _kill_orphans), so the two lanes cooperate instead of thrashing."""
+        _kill_orphans), so the two lanes cooperate instead of thrashing.
+
+        Native Windows has no wineserver, so this is a documented no-op and
+        never probes the process table with `pgrep`."""
+        if self.is_windows:
+            return
         deadline = time.monotonic() + max_wait
         while subprocess.run(["pgrep", "-f", "mwldarm.exe"],
                              capture_output=True).returncode == 0:
@@ -233,7 +257,7 @@ class Ops:
     def classify(self, func: str) -> str:
         """'clean' | 'refuse' | 'deferred'."""
         try:
-            r = self._run(["python3.13", "tools/asm_escape.py", "--classify-data",
+            r = self._run([sys.executable, "tools/asm_escape.py", "--classify-data",
                            "--version", self.version, func],
                           timeout=self.call_timeout or None)
         except subprocess.TimeoutExpired:
@@ -249,7 +273,7 @@ class Ops:
     def whole_function(self, func: str, out_path: str) -> str:
         """'pass' | 'verify-fail' | 'deferred'. Writes out_path on pass."""
         try:
-            r = self._run(["python3.13", "tools/asm_escape.py", "--whole-function",
+            r = self._run([sys.executable, "tools/asm_escape.py", "--whole-function",
                            "--version", self.version, func, "--out", out_path],
                           timeout=self.call_timeout or None)
         except subprocess.TimeoutExpired:
@@ -264,6 +288,26 @@ class Ops:
         Path(out_path).unlink(missing_ok=True)
         return "verify-fail"
 
+    @contextmanager
+    def _gate_lock(self, timeout: float) -> Iterator[None]:
+        """Serialise Wine-backed POSIX gates; native Windows needs no lock."""
+        if self.is_windows:
+            yield
+            return
+
+        assert fcntl is not None
+        lock_deadline = time.monotonic() + timeout
+        with _GATE_LOCK.open("w", encoding="utf-8") as lock_file:
+            while True:
+                try:
+                    fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError as err:
+                    if time.monotonic() > lock_deadline:
+                        raise subprocess.TimeoutExpired("flock", timeout) from err
+                    time.sleep(1)
+            yield
+
     def gate(self) -> bool:
         """`ninja sha1` with one retry (large-tree transient, item 11b).
 
@@ -274,30 +318,15 @@ class Ops:
           * EVERY attempt killed by `gate_timeout` (a wineserver deadlock with a
             co-lane) -> raise GateTimeout -> the batch is DEFERRED, not parked.
 
-        Uses a cross-process file lock (_GATE_LOCK) so concurrent EUR + USA/JPN
-        batch_carve lanes serialise their mwldarm link step — only one region
-        links at a time, eliminating wineserver deadlocks between co-lanes."""
+        On POSIX, uses a cross-process file lock (_GATE_LOCK) so concurrent EUR
+        + USA/JPN batch_carve lanes serialise their Wine-backed mwldarm link
+        step. Windows runs mwldarm natively and skips this Wine coordination."""
         to = self.gate_timeout or None
         completed_any = False
         for _ in range(self.gate_retries + 1):
             try:
-                # Acquire exclusive cross-process lock before calling wine.
-                # Spin-wait (1 s polls) up to gate_timeout seconds; if we can't
-                # get the lock in time, treat it like a TimeoutExpired so the
-                # batch is deferred (not parked) and we retry next round.
-                lock_deadline = time.monotonic() + (to or 600.0)
-                with open(_GATE_LOCK, "w") as _lf:
-                    while True:
-                        try:
-                            fcntl.flock(_lf, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                            break
-                        except BlockingIOError:
-                            if time.monotonic() > lock_deadline:
-                                raise subprocess.TimeoutExpired(
-                                    "flock", to or 600.0
-                                )
-                            time.sleep(1)
-                    self._run(["python3.13", "tools/configure.py", self.version], timeout=to)
+                with self._gate_lock(to or 600.0):
+                    self._run([sys.executable, "tools/configure.py", self.version], timeout=to)
                     # Wait for a quiet wine window (no co-lane mwldarm) before
                     # our own link, so the two never collide on the wineserver.
                     # Patient, on its own budget; returns best-effort on expiry.
@@ -346,7 +375,7 @@ class Ops:
             Path(ROOT / p).unlink(missing_ok=True)
 
     def sort_delinks(self, delinks_path: str) -> None:
-        r = self._run(["python3.13", "tools/sort_delinks.py", delinks_path])
+        r = self._run([sys.executable, "tools/sort_delinks.py", delinks_path])
         if r.returncode != 0:
             raise RuntimeError(f"sort_delinks failed on {delinks_path}: {r.stderr.strip()}")
 
@@ -467,7 +496,7 @@ class BatchCarver:
         self.ops.rm_files(s_paths)
 
     def _reapply(self, carves: list[tuple[str, int, int, str, str]], symbols: dict[str, int]) -> None:
-        for func, addr, size, s_rel, content in carves:
+        for _, _, _, s_rel, content in carves:
             (ROOT / s_rel).write_text(content, encoding="utf-8")
         self.pending = list(carves)
         self._write_delinks(symbols)
@@ -638,8 +667,8 @@ def main(argv: list[str] | None = None) -> int:
                          "so the driver coexists with a concurrent worktree build")
     ap.add_argument("--gate-timeout", type=float, default=0.0,
                     help="ninja sha1 gate timeout in s (0=off); on a wineserver "
-                         "deadlock the gate is killed + treated as red (routes to "
-                         "bisect/revert) instead of hanging forever")
+                         "deadlock the gate is killed + deferred instead of "
+                         "being parked as a real red")
     ap.add_argument("--gate-retries", type=int, default=1,
                     help="gate re-runs on a non-OK result before giving up "
                          "(absorbs the large-tree transient + a contention "
