@@ -44,6 +44,7 @@ windows dried up; pivoting to JPN main (a fresh band) caught a long scaffolder
 pause and netted +98 quickly.
 
 ### Operational notes banked this round
+
 - **`--batch 25` is worse than `--batch 10` in culprit-bearing bands.** I tried
   batch-25 on JPN to reduce flock-acquisition frequency under contention, but the
   `0x10–0x18` band has scattered link-culprits → a RED triggers a *25-way* bisect
@@ -58,6 +59,7 @@ pause and netted +98 quickly.
   by simply re-running the same command.
 
 ## Runway remaining
+
 - USA main: ~2,330 funcs (was ~2,450; drained 120). Plus ~2–3 deferred batches to
   re-attempt.
 - JPN main: ~2,825 funcs (was ~2,925; drained 98).
@@ -65,6 +67,7 @@ pause and netted +98 quickly.
   ov000 86, ov008 72, ov010 64 USA candidates; JPN ≈ equal).
 
 ## Recommendation for the brain
+
 The shared gate-lock makes concurrent lanes **safe** but not **fast** — total
 throughput is bottlenecked on the single machine-wide wineserver (one link at a
 time). For maximum *project* throughput, **b468's conclusion still holds: prefer
