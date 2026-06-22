@@ -100,6 +100,10 @@ src/usa/main/func_020057c0.c:
 
     .text start:0x020057c0 end:0x020057e4
 
+src/usa/main/func_020057e4.s:
+    complete
+    .text start:0x020057e4 end:0x02005820
+
 src/usa/main/func_02005898.c:
     complete
     .text start:0x02005898 end:0x020058d4
