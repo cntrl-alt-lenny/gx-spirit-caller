@@ -653,8 +653,29 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-_None queued from this (Mac) brain — pending the two-brain coordination decision
-(see [[feedback-three-agent-workflow]] / the round notes below)._
+**Driver: Mac brain (2026-06-22, single-lane — wineserver forces it).** The user is
+on Mac today (→ PC tonight). On Mac the shared GPTK wineserver means only ONE heavy
+`batch_carve` lane at a time (b468 verdict); dual-lane is a PC-only thing (Windows
+runs `mwccarm.exe` natively, no shared wineserver — that's how the PC ran b470–474
+dual). So today = single lane on the USA/JPN frontier; **the scaffolder RESTS on
+Mac** (EUR ov002 lower, ≈343 left, resumes in a PC dual-lane round — EUR is ~done so
+it's low priority).
+
+- **Brief 475** — `decomper` (recommended model: **Sonnet 4.6 Max**).
+  **USA/JPN `.s` mechanical drain — SOLO on Mac (the single heavy lane today; no
+  scaffolder lane → no wineserver contention → run FULL speed).** The frontier:
+  USA 31.8% fn / JPN 27.7% fn, ~thousands of funcs runway. Because you're solo,
+  use **big `--limit 150` batches** (no need to throttle for a co-lane). Continue:
+  finish **USA main**, then **JPN main** (`--version jpn --srcdir src/jpn/main
+  --min-addr 0x02000000`), then USA/JPN overlays (NOT ov002 = scaffolder's PC
+  lane). Recipe: `--version <r> --srcdir src/<r>/<mod> --min-addr 0x02000000`
+  (main; default 0x02234000 → 0 candidates). Commit-on-pass; the b474 codex
+  `asm_escape` self-reloc fix is on `main` (7 more self-pointer carves now pass).
+  **LAST actions: final per-region `ninja sha1` green → push → `gh pr create` →
+  PR URL.** Report shipped + remaining runway per module. Branch:
+  `decomper/usajpn-sdrain-w5`.
+- _Scaffolder: **rest on Mac today.** Resume EUR ov002 lower (`--min-size 0xcc`,
+  ≈343 funcs) in the next PC dual-lane round._
 
 ⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
 Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
