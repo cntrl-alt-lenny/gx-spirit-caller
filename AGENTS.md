@@ -672,9 +672,29 @@ On Mac today the single lane = USA/JPN frontier (decomper); scaffolder rests.
   kind:data REFUSEs (as you did). NOT ov002 (scaffolder's PC lane). **LAST actions:
   final per-region `ninja sha1` green → push → `gh pr create` → PR URL.** Report
   shipped + remaining runway per module. Branch: `decomper/usajpn-sdrain-w6`.
-- _Scaffolder: **rest on Mac.** Resume EUR ov002 lower (`--min-size 0xcc`, ≈343
-  funcs) in the next PC dual-lane round. (If this round is on the PC, run it
-  alongside the decomper — branch `scaffolder/ov002-lower-w6` from main.)_
+- **Brief 477** — `scaffolder` (codex GPT-5.5-High or Sonnet 4.6).
+  **WINE-FREE high-leverage tooling: park-class autopsy + the next `asm_escape`
+  recovery fix.** On Mac the scaffolder can't run a 2nd wine lane (contention),
+  but this task touches NO wine — no `batch_carve`, no gates — so it runs fully
+  parallel to the decomper's drain. **Why it's high-leverage:** b474's codex
+  self-reloc comparator fix recovered 7 parked funcs across all 3 regions from ONE
+  change; parked funcs are accumulating (EUR ov002 0xbc–0xcc wall ≈73; JPN-main
+  gate-fails `func_020a60a8`/`func_020943b0`; assorted verify-fails), and each
+  recovered CLASS multiplies across EUR+USA+JPN + every future wave. TASK (all
+  wine-free): (1) **census + classify the park population** across all
+  regions/modules — gather the build-local/known park records + re-derive
+  uncarved gate-fail/verify-fail funcs, classify each by failure SIGNATURE using
+  `arm-none-eabi-objdump` (native, NOT wine) + the `asm_escape` comparator verdict;
+  find the DOMINANT recoverable class. (2) **Prototype an `asm_escape` fix** for
+  that class + **pure-Python comparator unit tests** in `tests/test_asm_escape.py`
+  (like b474's positive/negative tests — NO wine). (3) Optional: make the known-fail
+  park lists **persistent/committed** per region/module so future decomper waves
+  stop re-testing known fails (the b475 JPN re-bisect waste). ⚠️ **Do NOT run
+  `batch_carve` or `ninja sha1` yourself** — stay wine-free (zero contention). The
+  real-func byte recovery happens downstream (the decomper's next drain re-attempts
+  the class with the fixed tool, or a PC round verifies). Deliverable: PR with the
+  candidate fix + unit tests + `docs/research/brief-477-park-autopsy.md`. Branch:
+  `scaffolder/park-autopsy-w1`.
 
 ⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
 Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
