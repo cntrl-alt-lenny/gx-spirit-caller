@@ -653,38 +653,40 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-- **Brief 470** — `scaffolder` (recommended model: **Sonnet 4.6 Max**).
-  **ov002 LOWER-half ARM `.s` drain w5 — continue ABOVE the 0xcc wall (619
-  carvable funcs remain). DUAL-LANE RETRY with the now-shared contention fix.**
-  ⚠️ **CRITICAL: branch FRESH from `main`** so you get the merged contention-
-  robust `batch_carve` — last round (b468) you ran OLD code WITHOUT the gate-
-  lock and got starved to +2. The merged tool has a **cross-worktree shared
-  gate-lock (`/tmp/spirit-caller-gate.lock`, `fcntl.flock`) + `_wait_wine_quiet`
-  before linking**, so your gates now SERIALIZE with the decomper's USA/JPN
-  lane instead of timing out. Use `--gate-timeout 600` (a lane WAITING for the
-  shared lock must not false-timeout). Small chunked `--limit 50`, commit-on-
-  pass — **if a batch's lock-wait gets killed by the ~8–10 min harness cap,
-  just re-run; committed batches are durable.** Expect ~half solo speed (gates
-  alternate with the decomper) but steady progress, no starvation. Skip the
-  0xbc–0xcc band (`--min-size 0xcc`). **LAST actions: final `ninja sha1` green
-  → push → `gh pr create` → PR URL.** Branch: `scaffolder/ov002-lower-w5`.
-- **Brief 471** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **USA/JPN `.s` mechanical drain w3 — the growth frontier (b469: +526, USA fn
-  +3.9pp / JPN +1.4pp). DUAL-LANE with the shared gate-lock.** Continue: finish
-  **USA main**, then **JPN main** (`--version jpn --srcdir src/jpn/main
-  --min-addr 0x02000000`), then USA/JPN overlays (NOT ov002 = scaffolder's).
-  ~8,000 funcs runway. Recipe: `--version <r> --srcdir src/<r>/<mod>
-  --min-addr 0x02000000` (main; default 0x02234000 → 0 candidates). Chunked
-  `--limit 50`, commit-on-pass. ⚠️ **DUAL-LANE COEXIST (now both honor it):**
-  the scaffolder also runs `batch_carve` (EUR ov002) — the shared
-  `/tmp/spirit-caller-gate.lock` serializes your gates with theirs (your Fix 3
-  from b469). Use `--gate-timeout 600`. You are still the resumable side if a
-  true deadlock recurs (kill your own `asm_escape`, retry). **LAST actions:
-  final per-region `ninja sha1` green → push → `gh pr create` → PR URL.**
-  Report shipped + remaining runway per module. Branch: `decomper/usajpn-sdrain-w3`.
+_None queued from this (Mac) brain — pending the two-brain coordination decision
+(see [[feedback-three-agent-workflow]] / the round notes below)._
+
+⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
+Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
+model) while this Mac brain was idle. They merged as **PRs #1006–#1013**. The PC
+brain tracked them via per-brief docs (`docs/research/brief-47x-*.md`) + PR
+descriptions + git history — it did **not** update this AGENTS.md open/closed
+sections or `state.md`, and it used a **different numbering convention** (one
+brief number per ROUND shared by both lanes → two "471"s, two "473"s) vs this
+brain's per-agent numbering. **Canonical state = git history + `docs/research/`
++ merged PRs, NOT this section.** The next round's numbering + lane assignment is
+pending the user's call on who drives (Mac vs PC) so the two brains stop
+colliding. Current lanes in flight: scaffolder = EUR ov002 LOWER `.s` (≈343 left,
+b473/#1013), decomper/codex = USA/JPN main `.s` drain. ov002 UPPER exhausted
+(b474). EUR ≈ 96.6% units / 95% fn / 87% code; USA 31.8% fn; JPN 27.7% fn.
 
 ### Closed briefs (reference)
 
+- **Briefs 470–474** — driven from the **PC brain** (+ a `[codex]` 3rd-model agent),
+  Mac brain idle; merged as **PRs #1006–#1013**, all 3-region green. Numbering is
+  PC-convention (one number per round shared by both lanes). Canonical per-brief
+  detail: `docs/research/brief-470…474-*.md`. Summary from git + PRs:
+  • **#1009** (b470) scaffolder 150 ov002 lower `.s`; **#1010** (b471) +100 ov002
+  lower; **#1011** (b472) EUR frontier batch-drain 15 `.s` + lane census;
+  **#1013** (b473) +100 ov002 lower (size 0x124–0x154, 100% clean, ≈343 left).
+  • **#1006** (b471) decomper USA/JPN `.s` w3 (+120 USA + 98 JPN main); **#1008**
+  (b473, codex) USA/JPN main `.s` w4; **#1012** (b474, codex) `asm_escape`
+  self-reloc fix (`R_ARM_ABS32 .text` self-pointer canonicalization → 7 historical
+  self-reloc carves now byte-pass; ov002 UPPER confirmed exhausted, 2 kind:data).
+  • **#1007** batch_carve Windows-compatibility. Net metrics after this gap: EUR
+  96.57% units / 95.21% fn / 87.48% code; USA 67.68% / 31.80% / 6.66%; JPN 65.99%
+  / 27.71% / 5.77%. Mac brain verified+merged the final #1012/#1013 on its 3-region
+  gate and reconciled this bookkeeping.
 - **Brief 468** — `scaffolder`, shipped in PR #1005. ⚠️ **Only +2 ov002 lower `.s`
   — CONTENTION-LIMITED, not a clean-rate problem (0 verify-fail above 0xcc).**
   KEY FINDING: **two `batch_carve` lanes CANNOT share the machine-wide wineserver**

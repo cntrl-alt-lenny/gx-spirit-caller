@@ -8,8 +8,25 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-22 (Mac, brain on Opus 4.8), **post briefs 468+469
-merge** (final 3-region sha1 PASS — EUR verified for real, not "by construction").
+**Last updated:** 2026-06-22 (Mac, brain on Opus 4.8), **post briefs 470–474 merge**
+(reconciled — these ran on the PC brain + a codex agent while Mac was idle; Mac
+brain verified/merged the final #1012/#1013 on a clean 3-region gate and
+reconciled bookkeeping). **Canonical per-round detail = `docs/research/brief-47x`
++ PRs #1006–#1013 + git history (the PC brain didn't update AGENTS.md/state.md).**
+
+**Metrics (post b474):** EUR units **96.57%** / matched_fn **95.21%** / code
+**87.48%** — nearly complete. USA units **67.68%** / matched_fn **31.80%** / code
+**6.66%**. JPN units **65.99%** / matched_fn **27.71%** / code **5.77%**. Drivers:
+ov002 lower `.s` waves (EUR fn 91→95%, code 82→87%) + USA/JPN main `.s` drain
+(USA fn +2pp, JPN +2pp). ov002 UPPER exhausted; ov002 lower ≈343 left; USA/JPN
+main `.s` = the open frontier.
+
+⚠️ **TWO-BRAIN COORDINATION is the live process issue** (not a code issue): Mac +
+PC brains drift on AGENTS.md/state.md + brief numbering. Pending user decision on
+who drives + a single bookkeeping source of truth. See AGENTS.md § Open briefs.
+
+---
+**Prior round (briefs 468+469):**
 **This round = USA/JPN `.s` drain at scale + the dual-lane wineserver-contention
 verdict (this is why the round dragged + needed manual pause/resume):**
 - **#1004** decomper (b469) — **+386 USA main + 140 JPN main `.s` (526)**, ~96-99%
