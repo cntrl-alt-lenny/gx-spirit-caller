@@ -8,7 +8,22 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-22 (Mac, brain on Opus 4.8), **post briefs 470–474 merge**
+**Last updated:** 2026-06-23 (Mac, brain on Opus 4.8; agents = codex GPT-5.5-High),
+**post brief 475 merge** (decomper solo-Mac USA/JPN `.s` drain: **596 ships**, PR
+#1014, 3-region green). First wave on the GPT-5.5-High codex agents — clean +
+disciplined (correct bisect/park, locked-main worktree handled); validates the
+gate-makes-model-safe principle on a 4th model. Lane count follows the machine
+(Mac single / PC dual).
+
+**Metrics (post b475):** EUR units **96.57%** / fn **95.21%** / code **87.48%**
+(untouched this round). **USA units 67.68→69.23% / fn 31.80→34.85% (+3pp) / code
+6.66→7.68%.** **JPN units 65.99→67.53% / fn 27.71→30.74% (+3pp) / code 5.77→6.61%.**
+596 `.s` in one solo-Mac wave moved both regions +3pp fn — the USA/JPN mechanical
+lane is the project's engine now. Runway: USA main 2,288 + JPN main 2,694 + non-ov002
+overlays ~1,030/region ≈ 7,000+ funcs left (many waves).
+
+---
+**Prior (briefs 470–474 merge):**
 (reconciled — these ran on the PC brain + a codex agent while Mac was idle; Mac
 brain verified/merged the final #1012/#1013 on a clean 3-region gate and
 reconciled bookkeeping). **Canonical per-round detail = `docs/research/brief-47x`

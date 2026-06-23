@@ -653,29 +653,28 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-**Driver: Mac brain (2026-06-22, single-lane — wineserver forces it).** The user is
-on Mac today (→ PC tonight). On Mac the shared GPTK wineserver means only ONE heavy
-`batch_carve` lane at a time (b468 verdict); dual-lane is a PC-only thing (Windows
-runs `mwccarm.exe` natively, no shared wineserver — that's how the PC ran b470–474
-dual). So today = single lane on the USA/JPN frontier; **the scaffolder RESTS on
-Mac** (EUR ov002 lower, ≈343 left, resumes in a PC dual-lane round — EUR is ~done so
-it's low priority).
+**Driver: Mac brain (Opus 4.8). Agents: codex GPT-5.5-High-Effort (validated b475:
+596 clean ships, correct park/bisect discipline).** LANE COUNT FOLLOWS THE MACHINE:
+**Mac** = shared GPTK wineserver → ONE heavy `batch_carve` lane (rest the other
+agent); **PC** = native `mwccarm.exe`, no shared wineserver → dual-lane is fine.
+On Mac today the single lane = USA/JPN frontier (decomper); scaffolder rests.
 
-- **Brief 475** — `decomper` (recommended model: **Sonnet 4.6 Max**).
-  **USA/JPN `.s` mechanical drain — SOLO on Mac (the single heavy lane today; no
-  scaffolder lane → no wineserver contention → run FULL speed).** The frontier:
-  USA 31.8% fn / JPN 27.7% fn, ~thousands of funcs runway. Because you're solo,
-  use **big `--limit 150` batches** (no need to throttle for a co-lane). Continue:
-  finish **USA main**, then **JPN main** (`--version jpn --srcdir src/jpn/main
-  --min-addr 0x02000000`), then USA/JPN overlays (NOT ov002 = scaffolder's PC
-  lane). Recipe: `--version <r> --srcdir src/<r>/<mod> --min-addr 0x02000000`
-  (main; default 0x02234000 → 0 candidates). Commit-on-pass; the b474 codex
-  `asm_escape` self-reloc fix is on `main` (7 more self-pointer carves now pass).
-  **LAST actions: final per-region `ninja sha1` green → push → `gh pr create` →
-  PR URL.** Report shipped + remaining runway per module. Branch:
-  `decomper/usajpn-sdrain-w5`.
-- _Scaffolder: **rest on Mac today.** Resume EUR ov002 lower (`--min-size 0xcc`,
-  ≈343 funcs) in the next PC dual-lane round._
+- **Brief 476** — `decomper` (codex GPT-5.5-High or Sonnet 4.6).
+  **Continue the USA/JPN `.s` mechanical drain — b475 shipped 596 (USA/JPN main +
+  ov006), all gate-clean.** Solo on Mac → full speed (`--limit 150`). This wave,
+  work the richest OVERLAY veins (main has thousands but the overlays close out
+  faster): **finish USA+JPN `ov006`** (≈100 each left, next size 0xf0), then
+  **`ov004`** (≈166 each, next richest), then **`ov011`** (≈103 each); dip back to
+  USA/JPN `main` if budget remains. Recipe (you used it in b475): overlays =
+  `--version <r> --overlay ov<NNN> --srcdir src/<r>/overlay<NNN> --min-addr
+  0x02000000`; main = `--version <r> --srcdir src/<r>/main --min-addr 0x02000000`.
+  Chunked `--batch 20`, commit-on-pass; bisect-and-park genuine gate-fails +
+  kind:data REFUSEs (as you did). NOT ov002 (scaffolder's PC lane). **LAST actions:
+  final per-region `ninja sha1` green → push → `gh pr create` → PR URL.** Report
+  shipped + remaining runway per module. Branch: `decomper/usajpn-sdrain-w6`.
+- _Scaffolder: **rest on Mac.** Resume EUR ov002 lower (`--min-size 0xcc`, ≈343
+  funcs) in the next PC dual-lane round. (If this round is on the PC, run it
+  alongside the decomper — branch `scaffolder/ov002-lower-w6` from main.)_
 
 ⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
 Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
@@ -693,6 +692,15 @@ b473/#1013), decomper/codex = USA/JPN main `.s` drain. ov002 UPPER exhausted
 
 ### Closed briefs (reference)
 
+- **Brief 475** — `decomper` (codex GPT-5.5-High), shipped in PR #1014. ✅ **596
+  USA/JPN `.s` (solo Mac, 4× `--limit 150` batches): USA main 150/150, JPN main
+  148/150, USA ov006 149/150, JPN ov006 149/150.** 34 commit-on-pass commits;
+  parks = 2 genuine JPN main gate-fails (`func_020a60a8`, `func_020943b0`, bisected
+  + neighbors salvaged) + 1 kind:data REFUSE per region (`func_ov006_021c9b48`).
+  0 verify-fail. First wave with **GPT-5.5-High codex agents** — clean, disciplined
+  (correct bisect/park, handled the locked-main worktree). Runway after: USA main
+  2,288, JPN main 2,694, ov006 100/region, all non-ov002 overlays 1,030/region
+  (next richest ov004 166, ov011 103). 3-region gate reproduced (EUR untouched).
 - **Briefs 470–474** — driven from the **PC brain** (+ a `[codex]` 3rd-model agent),
   Mac brain idle; merged as **PRs #1006–#1013**, all 3-region green. Numbering is
   PC-convention (one number per round shared by both lanes). Canonical per-brief
