@@ -42,6 +42,10 @@ src/jpn/overlay004/func_ov004_021ca048.s:
 src/jpn/overlay004/func_ov004_021ca0b8.s:
     complete
     .text start:0x021ca0b8 end:0x021ca418
+src/jpn/overlay004/func_ov004_021ca418.s:
+    complete
+    .text start:0x021ca418 end:0x021caa64
+
 src/jpn/overlay004/func_ov004_021caa64.s:
     complete
     .text start:0x021caa64 end:0x021cadfc
