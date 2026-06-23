@@ -657,44 +657,43 @@ plus the recurring ship-step miss):
 596 clean ships, correct park/bisect discipline).** LANE COUNT FOLLOWS THE MACHINE:
 **Mac** = shared GPTK wineserver → ONE heavy `batch_carve` lane (rest the other
 agent); **PC** = native `mwccarm.exe`, no shared wineserver → dual-lane is fine.
-On Mac today the single lane = USA/JPN frontier (decomper); scaffolder rests.
+On Mac the single heavy lane = USA/JPN frontier (decomper); the scaffolder takes a
+WINE-FREE lane (tooling/analysis, no contention).
 
-- **Brief 476** — `decomper` (codex GPT-5.5-High or Sonnet 4.6).
-  **Continue the USA/JPN `.s` mechanical drain — b475 shipped 596 (USA/JPN main +
-  ov006), all gate-clean.** Solo on Mac → full speed (`--limit 150`). This wave,
-  work the richest OVERLAY veins (main has thousands but the overlays close out
-  faster): **finish USA+JPN `ov006`** (≈100 each left, next size 0xf0), then
-  **`ov004`** (≈166 each, next richest), then **`ov011`** (≈103 each); dip back to
-  USA/JPN `main` if budget remains. Recipe (you used it in b475): overlays =
-  `--version <r> --overlay ov<NNN> --srcdir src/<r>/overlay<NNN> --min-addr
-  0x02000000`; main = `--version <r> --srcdir src/<r>/main --min-addr 0x02000000`.
-  Chunked `--batch 20`, commit-on-pass; bisect-and-park genuine gate-fails +
-  kind:data REFUSEs (as you did). NOT ov002 (scaffolder's PC lane). **LAST actions:
-  final per-region `ninja sha1` green → push → `gh pr create` → PR URL.** Report
-  shipped + remaining runway per module. Branch: `decomper/usajpn-sdrain-w6`.
-- **Brief 477** — `scaffolder` (codex GPT-5.5-High or Sonnet 4.6).
-  **WINE-FREE high-leverage tooling: park-class autopsy + the next `asm_escape`
-  recovery fix.** On Mac the scaffolder can't run a 2nd wine lane (contention),
-  but this task touches NO wine — no `batch_carve`, no gates — so it runs fully
-  parallel to the decomper's drain. **Why it's high-leverage:** b474's codex
-  self-reloc comparator fix recovered 7 parked funcs across all 3 regions from ONE
-  change; parked funcs are accumulating (EUR ov002 0xbc–0xcc wall ≈73; JPN-main
-  gate-fails `func_020a60a8`/`func_020943b0`; assorted verify-fails), and each
-  recovered CLASS multiplies across EUR+USA+JPN + every future wave. TASK (all
-  wine-free): (1) **census + classify the park population** across all
-  regions/modules — gather the build-local/known park records + re-derive
-  uncarved gate-fail/verify-fail funcs, classify each by failure SIGNATURE using
-  `arm-none-eabi-objdump` (native, NOT wine) + the `asm_escape` comparator verdict;
-  find the DOMINANT recoverable class. (2) **Prototype an `asm_escape` fix** for
-  that class + **pure-Python comparator unit tests** in `tests/test_asm_escape.py`
-  (like b474's positive/negative tests — NO wine). (3) Optional: make the known-fail
-  park lists **persistent/committed** per region/module so future decomper waves
-  stop re-testing known fails (the b475 JPN re-bisect waste). ⚠️ **Do NOT run
-  `batch_carve` or `ninja sha1` yourself** — stay wine-free (zero contention). The
-  real-func byte recovery happens downstream (the decomper's next drain re-attempts
-  the class with the fixed tool, or a PC round verifies). Deliverable: PR with the
-  candidate fix + unit tests + `docs/research/brief-477-park-autopsy.md`. Branch:
-  `scaffolder/park-autopsy-w1`.
+⚠️ **CAP EVERY WAVE AT ONE MODULE / ~150–300 SHIPS (b476 lesson).** Brief 476 told the
+decomper to chain THREE overlays (ov006→ov004→ov011) in one wave → it ran ~5 HOURS
+(710 ships, all clean, but a marathon that needed pause/resume). Going forward a
+decomper brief names ONE target (one module, or USA+JPN of one module) and STOPS —
+opens its PR after ~150–300 ships. Commit-on-pass means partial progress is always
+safe; a tight wave just lands a clean checkpoint every ~1–2h instead of every ~5h.
+
+- **Brief 478** — `decomper` (codex GPT-5.5-High or Sonnet 4.6).
+  **USA/JPN MAIN `.s` drain — ONE capped wave (b476 drained ov004/006/011 both
+  regions = 710; the overlay tier is thinning, main is the big vein: USA main
+  ~2,288, JPN main ~2,694).** Do **USA main + JPN main, ONE `--limit 150` batch
+  each (~300 ships), then STOP and open the PR** — do NOT chain further (that's
+  what made b476 a 5h marathon). ⚠️ **The b477 `asm_escape` size-overrun fix is now
+  on `main`** (branch fresh to get it) — so **re-attempt the previously-parked JPN
+  main gate-fails `func_020943b0` + `func_020a60a8`** and the size-overrun class;
+  they should now carve clean (the tool now bounds disassembly to the symbols.txt
+  function size). Recipe: `--version <r> --srcdir src/<r>/main --min-addr
+  0x02000000` (default 0x02234000 → 0 main candidates). `--batch 20`,
+  commit-on-pass. **LAST actions: final per-region `ninja sha1` green → push →
+  `gh pr create` → PR URL.** Report shipped + remaining runway. Branch:
+  `decomper/usajpn-sdrain-w7`.
+- **Brief 479** — `scaffolder` (codex GPT-5.5-High or Sonnet 4.6). **WINE-FREE
+  park-autopsy w2 — finish the recoverable classes + prune stale lists.** b477
+  fixed the dominant class (disassembly size-overrun, 8 + the JPN main gate-fails)
+  + censused 20 live non-REFUSE parks. Remaining recoverable classes: **6
+  svc/single-register stack encoding, 4 EUR embedded-table, 2 symbol-name/address
+  mismatch.** Pick the next-dominant fixable class (the 6 svc/single-register),
+  prototype the `asm_escape` fix + **pure-Python comparator unit tests** (no wine).
+  ALSO: **prune the stale verify-fail lists** (b477 found `known_verifyfail_ov002.txt`
+  = 134/134 already-carved) so they stop misleading. **Report whether the autopsy
+  lane is now TAPPED** (if only genuine kind:data REFUSEs remain, the scaffolder
+  pivots next round). ⚠️ Stay wine-free — NO `batch_carve`/`ninja sha1` (zero
+  contention with the decomper). Deliverable: PR with fix + tests + pruned lists +
+  `docs/research/brief-479-park-autopsy-w2.md`. Branch: `scaffolder/park-autopsy-w2`.
 
 ⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
 Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
@@ -712,6 +711,24 @@ b473/#1013), decomper/codex = USA/JPN main `.s` drain. ov002 UPPER exhausted
 
 ### Closed briefs (reference)
 
+- **Brief 476** — `decomper` (codex GPT-5.5-High), shipped in PR #1016. ✅ **710
+  USA/JPN overlay `.s`** — ov006 (88+88), ov004 (164+164), ov011 (103+103); all
+  three overlays' clean candidates DRAINED both regions, 0 verify-fail/0 gate-fail.
+  Parks: 13 kind:data ov006/region + 2 kind:data ov004/region. ⚠️ **WAVE TOO BIG:
+  3 overlays chained → ~5h run** (survived a pause/resume mid-ov004) → **b478+ cap
+  waves at one module** (lesson above). 3-region gate reproduced (EUR untouched).
+- **Brief 477** — `scaffolder` (codex GPT-5.5-High), shipped in PR #1015. ✅
+  **WINE-FREE park-autopsy → fixed the DOMINANT park class** (`asm_escape`
+  disassembly size-overrun). Root cause: `parse_objdump` stopped only at a
+  following `func_*` symbol, so funcs followed by NAMED SDK/data syms (BuildInfo,
+  GetSystemWork, OS_DisableIrq, Fill32/Copy32) swallowed adjacent ranges → oversized
+  `.text` that passed standalone but failed the full-ROM gate (= the JPN main
+  gate-fails `func_020943b0` 18→7 words, `func_020a60a8`). Fix bounds original
+  disassembly to symbols.txt size + rejects word-count mismatch; 47 tests pass.
+  Recovers 8 size-overrun instances + the gate-fails across regions (b478 decomper
+  re-attempts them). Also flagged `known_verifyfail_ov002.txt` = 134/134 STALE.
+  Ran fully parallel to the decomper on Mac — ZERO contention (no wine). Remaining
+  recoverable classes for b479: 6 svc/single-reg, 4 EUR embedded-table, 2 sym-name.
 - **Brief 475** — `decomper` (codex GPT-5.5-High), shipped in PR #1014. ✅ **596
   USA/JPN `.s` (solo Mac, 4× `--limit 150` batches): USA main 150/150, JPN main
   148/150, USA ov006 149/150, JPN ov006 149/150.** 34 commit-on-pass commits;

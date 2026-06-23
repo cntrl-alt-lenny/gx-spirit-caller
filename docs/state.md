@@ -9,6 +9,23 @@ minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
 **Last updated:** 2026-06-23 (Mac, brain on Opus 4.8; agents = codex GPT-5.5-High),
+**post briefs 476+477 merge.** **#1016 decomper = 710 USA/JPN overlay `.s`** (ov006
+88+88, ov004 164+164, ov011 103+103 — all 3 overlays drained both regions, 3-region
+green, EUR untouched). **#1015 scaffolder (WINE-FREE, ran parallel, zero contention)
+= fixed the dominant `asm_escape` park class** (disassembly size-overrun: parse_objdump
+swallowed adjacent named SDK/data syms → oversized .text failing only at ROM gate =
+the JPN main gate-fails func_020943b0/func_020a60a8). Recovers 8 + the gate-fails;
+flagged known_verifyfail_ov002.txt 134/134 stale; 47 tests. ⚠️ **#1016 ran ~5h
+(chained 3 overlays) → NEW RULE: cap waves at one module / ~150–300 ships** (b478+).
+**Metrics (post b476):** EUR 96.57% / 95.21% / 87.48% (untouched). **USA units
+69.23→72.80% / fn 34.85→38.45% (+3.6pp) / code 7.68→14.34% (≈DOUBLED).** **JPN units
+67.53→71.56% / fn 30.74→34.33% (+3.6pp) / code 6.61→13.27% (≈DOUBLED).** The overlay
+drain carried big funcs → USA/JPN code-bytes jumped ~2×. Runway: USA main ~2,288 +
+JPN main ~2,694 (the big remaining vein) + thinning overlays. b477 size-overrun fix
+unlocks the JPN main gate-fails for b478.
+
+---
+**Prior (brief 475 merge):**
 **post brief 475 merge** (decomper solo-Mac USA/JPN `.s` drain: **596 ships**, PR
 #1014, 3-region green). First wave on the GPT-5.5-High codex agents — clean +
 disciplined (correct bisect/park, locked-main worktree handled); validates the
