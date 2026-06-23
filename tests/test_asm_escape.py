@@ -50,6 +50,21 @@ _LOOP = """\
   1c:\te8bd8010 \tpop\t{r4, pc}
 """
 
+# A four-byte function followed by a named data symbol and another named
+# routine. Neither successor uses the `func_` prefix, so the pre-477 parser
+# swallowed both into `func_edge` instead of honoring its configured size.
+_NAMED_BOUNDARY = """\
+00000000 <func_edge>:
+   0:\te12fff1e \tbx\tlr
+
+00000004 <BuildInfo>:
+   4:\t00000000 \t.word\t0x00000000
+\t\t\t4: R_ARM_ABS32\tdata_build
+
+00000008 <main>:
+   8:\te12fff1e \tbx\tlr
+"""
+
 # addr 0x28 / 0x2c are the targets of the two `ldr [pc, #N]` loads below.
 _DIS = """\
 00000000 <func_t>:
@@ -91,6 +106,15 @@ class TestParse(unittest.TestCase):
 
     def test_pool_addrs_from_pc_relative_loads(self):
         self.assertEqual(pool_addrs(parse_objdump(ORIG, "func_t")), {0x28, 0x2C})
+
+    def test_configured_size_stops_at_named_boundary(self):
+        words = parse_objdump(_NAMED_BOUNDARY, "func_edge", size=4)
+        self.assertEqual([(w["addr"], w["mnem"]) for w in words],
+                         [(0, "bx lr")])
+        emitted = emit_asm("func_edge", words, whole=True)
+        self.assertNotIn("BuildInfo", emitted)
+        self.assertNotIn("data_build", emitted)
+        self.assertEqual(diff_words(words, words), [])
 
 
 class TestSyntaxConversion(unittest.TestCase):
@@ -490,6 +514,14 @@ class TestDiffWordsPoolGuard(unittest.TestCase):
     def test_code_byte_mismatch_flagged(self):
         self.assertTrue(diff_words([self._w("e3a00001", "mov r0, #1")],
                                    [self._w("e3a00000", "mov r0, #0")]))
+
+    def test_extra_word_is_flagged_red(self):
+        # zip(..., strict=False) used to compare only the shared prefix, so a
+        # truncated or overlong object could verify green.
+        orig = [self._w("e12fff1e", "bx lr")]
+        mine = orig + [self._w("00000000", ".word 0")]
+        self.assertEqual(diff_words(mine, orig),
+                         ["word count differs: mine=2 orig=1"])
 
 
 if __name__ == "__main__":
