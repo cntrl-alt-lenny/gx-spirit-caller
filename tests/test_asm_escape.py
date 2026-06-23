@@ -474,6 +474,19 @@ class TestDiffWordsPoolGuard(unittest.TestCase):
         orig = [self._w("00000000", "....", "data_ov002_x")]
         self.assertTrue(diff_words(mine, orig))
 
+    def test_self_pointer_section_reloc_matches(self):
+        # mwasm canonicalises `.word func_self` to a relocation against the
+        # standalone TU's offset-zero `.text` section. It resolves to the same
+        # address as the original function-symbol relocation.
+        mine = [self._w("00000000", ".word func_self", ".text")]
+        orig = [self._w("00000000", "....", "func_self")]
+        self.assertEqual(diff_words(mine, orig, self_func="func_self"), [])
+
+    def test_text_reloc_does_not_mask_another_symbol(self):
+        mine = [self._w("00000000", ".word func_other", ".text")]
+        orig = [self._w("00000000", "....", "func_other")]
+        self.assertTrue(diff_words(mine, orig, self_func="func_self"))
+
     def test_code_byte_mismatch_flagged(self):
         self.assertTrue(diff_words([self._w("e3a00001", "mov r0, #1")],
                                    [self._w("e3a00000", "mov r0, #0")]))
