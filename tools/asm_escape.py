@@ -95,21 +95,32 @@ _OBJDUMP = _binutil("arm-none-eabi-objdump")
 
 # ----------------------------------------------------------------------- pure
 
-def parse_objdump(text: str, func: str) -> list[dict]:
+def parse_objdump(text: str, func: str, size: int | None = None) -> list[dict]:
     """Parse `objdump -d -r` output for one function into a list of words.
 
     Each entry: {addr, bytes (8 hex), mnem (normalised), reloc (symbol|None)}.
     Captures both instructions and literal-pool words; a reloc on the
-    following line is attached to the word it relocates.
+    following line is attached to the word it relocates. When `size` is
+    provided, the configured function range is authoritative: stop before
+    adjacent named SDK routines or data symbols whose names do not begin with
+    `func_`. Without that bound, objdump's `BuildInfo`, `Fill32`, and similar
+    headers were swallowed into the preceding function (brief 477).
     """
     out: list[dict] = []
     cur = False
+    end_addr: int | None = None
     for line in text.splitlines():
-        if re.match(rf"^[0-9a-f]+ <{re.escape(func)}>:", line):
+        header = re.match(r"^([0-9a-f]+) <([^>]+)>:", line)
+        if header and header.group(2) == func:
             cur = True
+            end_addr = int(header.group(1), 16) + size if size is not None else None
             continue
-        if cur and re.match(r"^[0-9a-f]+ <func_", line):  # next function only
-            break
+        if cur and header:
+            header_addr = int(header.group(1), 16)
+            if end_addr is not None and header_addr >= end_addr:
+                break
+            if size is None and header.group(2).startswith("func_"):
+                break
         if not cur:
             continue
         # ARM: one 8-hex word. Thumb: a 4-hex halfword, or a `xxxx yyyy`
@@ -118,6 +129,8 @@ def parse_objdump(text: str, func: str) -> list[dict]:
         mi = re.match(r"^\s+([0-9a-f]+):\t([0-9a-f]{8}|[0-9a-f]{4} [0-9a-f]{4}"
                       r"|[0-9a-f]{4})(?:\s+(.*))?$", line)
         if mi:
+            if end_addr is not None and int(mi.group(1), 16) >= end_addr:
+                break
             mn = mi.group(3) or ""
             mn = re.sub(r"\s*[@;].*$", "", mn)      # drop objdump comments
             mn = re.sub(r"\s*<[^>]*>", "", mn)      # drop <symbol+0x..> annot
@@ -483,6 +496,8 @@ def diff_words(mine: list[dict], orig: list[dict],
     closes. Verify-gate item 7 demands a corrupted pool word go RED — proven in
     tests/test_asm_escape.py (TestDiffWordsPoolGuard, shown red before green)."""
     diffs: list[str] = []
+    if len(mine) != len(orig):
+        diffs.append(f"word count differs: mine={len(mine)} orig={len(orig)}")
     for i, (x, y) in enumerate(zip(mine, orig, strict=False)):
         if x["reloc"] or y["reloc"]:
             if x["reloc"] and y["reloc"] and x["reloc"] != y["reloc"]:
@@ -533,6 +548,19 @@ def _module_config(version: str, func: str) -> Path:
     if m:
         return ROOT / f"config/{version}/arm9/overlays/ov{m.group(1)}"
     return ROOT / f"config/{version}/arm9"
+
+
+def configured_function_size(version: str, func: str) -> int | None:
+    """Return the authoritative symbols.txt byte size for `func`."""
+    try:
+        text = (_module_config(version, func) / "symbols.txt").read_text(
+            encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    m = re.search(
+        rf"^{re.escape(func)} kind:function\(\w+,size=0x([0-9a-f]+)\)",
+        text, re.MULTILINE)
+    return int(m.group(1), 16) if m else None
 
 
 def classify_data_refs(symbols_text: str, relocs_text: str, delinks_text: str,
@@ -726,11 +754,15 @@ def assemble(s_file: str, out: str) -> bool:
     return os.path.exists(out)
 
 
-def bytes_match(a_obj: str, orig_obj: str, func: str) -> tuple[bool, list[str]]:
+def bytes_match(a_obj: str, orig_obj: str, func: str,
+                size: int | None = None) -> tuple[bool, list[str]]:
     """Byte-compare `func` in two objects, reloc words (bl/pool) modulo.
-    The word-by-word comparison is the pure `diff_words` (brief 418)."""
+    The standalone emitted object is intentionally parsed without a size bound:
+    any accidental trailing payload must trip `diff_words`' count check. Only
+    the original gap object needs the configured bound to stop at the true
+    function end (brief 477)."""
     diffs = diff_words(parse_objdump(disasm(a_obj), func),
-                       parse_objdump(disasm(orig_obj), func),
+                       parse_objdump(disasm(orig_obj), func, size),
                        self_func=func)
     return (not diffs), diffs
 
@@ -751,8 +783,9 @@ def generate(func: str, c_file: str, version: str, out: str | None) -> int:
     if preflight_data_refs(func, version):
         return 1
 
-    mine = parse_objdump(disasm(my_o), func)
-    orig = parse_objdump(disasm(orig_obj), func)
+    size = configured_function_size(version, func)
+    mine = parse_objdump(disasm(my_o), func, size)
+    orig = parse_objdump(disasm(orig_obj), func, size)
     fixes, refusals = classify_fixes(mine, orig)
     if refusals:
         print(f"REFUSE {func}: not a pure canonicalisation hatch — fix in C:")
@@ -770,7 +803,7 @@ def generate(func: str, c_file: str, version: str, out: str | None) -> int:
     if not assemble(out_path, asm_o):
         print(f"error: emitted {out_path} did not assemble", file=sys.stderr)
         return 2
-    ok, diffs = bytes_match(asm_o, orig_obj, func)
+    ok, diffs = bytes_match(asm_o, orig_obj, func, size)
     if ok:
         print(f"{func}: ✅ .s byte-identical vs delinked .o "
               f"({len(fixes)} fix) -> {out_path}")
@@ -796,7 +829,11 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
         return 2
     if preflight_data_refs(func, version):
         return 1
-    orig = parse_objdump(disasm(orig_obj), func)
+    size = configured_function_size(version, func)
+    if size is None:
+        print(f"error: {func} has no configured function size", file=sys.stderr)
+        return 2
+    orig = parse_objdump(disasm(orig_obj), func, size)
     if not orig:
         print(f"error: {func} has no disassembly in {orig_obj}", file=sys.stderr)
         return 2
@@ -814,7 +851,7 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
     if not assemble(out_path, asm_o):
         print(f"error: emitted {out_path} did not assemble", file=sys.stderr)
         return 2
-    ok, diffs = bytes_match(asm_o, orig_obj, func)
+    ok, diffs = bytes_match(asm_o, orig_obj, func, size)
     if ok:
         print(f"{func}: ✅ whole-function .s byte-identical vs delinked .o "
               f"({len(orig)} words) -> {out_path}")
