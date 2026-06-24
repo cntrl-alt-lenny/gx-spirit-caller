@@ -5350,6 +5350,10 @@ src/jpn/main/func_020a5d74.legacy.c:
 src/jpn/main/func_020a5e1c.s:
     complete
     .text start:0x020a5e1c end:0x020a5e50
+src/jpn/main/func_020a60a8.s:
+    complete
+    .text start:0x020a5fb4 end:0x020a5fcc
+
 libs/nitro/func_020a60c0.legacy.c:
     complete
     .text start:0x020a5fcc end:0x020a6008
