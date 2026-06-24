@@ -1420,6 +1420,10 @@ src/usa/main/func_0202223c.c:
     complete
     .text start:0x0202223c end:0x0202224c
 
+src/usa/main/func_0202246c.s:
+    complete
+    .text start:0x0202246c end:0x020224b8
+
 src/usa/main/func_020224b8.c:
     complete
     .text start:0x020224b8 end:0x020224ec
@@ -5352,7 +5356,6 @@ src/usa/main/func_02093534.c:
 src/usa/main/func_020936a8.s:
     complete
     .text start:0x020936a8 end:0x020936bc
-
 src/usa/main/func_020936e8.s:
     complete
     .text start:0x020936e8 end:0x020936fc
@@ -5405,6 +5408,9 @@ src/usa/main/func_02094048.s:
 src/usa/main/func_02094398.s:
     complete
     .text start:0x02094398 end:0x020943b0
+src/usa/main/func_020943b0.s:
+    complete
+    .text start:0x020943b0 end:0x020943cc
 src/usa/main/func_020943f8.s:
     complete
     .text start:0x020943f8 end:0x02094410
