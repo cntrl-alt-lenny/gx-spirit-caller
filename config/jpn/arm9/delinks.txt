@@ -294,6 +294,9 @@ src/jpn/main/func_02005e04.s:
 src/jpn/main/func_02005ec4.s:
     complete
     .text start:0x02005ec4 end:0x02005f10
+src/jpn/main/func_02005f10.s:
+    complete
+    .text start:0x02005f10 end:0x020060f4
 src/jpn/main/func_020060f4.c:
     complete
     .text start:0x020060f4 end:0x02006110
@@ -1090,6 +1093,9 @@ src/jpn/main/func_02014280.s:
 src/jpn/main/func_02014444.s:
     complete
     .text start:0x02014444 end:0x020145fc
+src/jpn/main/func_020145fc.s:
+    complete
+    .text start:0x020145fc end:0x020147e0
 src/jpn/main/func_020147e0.s:
     complete
     .text start:0x020147e0 end:0x020148ec
@@ -2288,6 +2294,9 @@ src/jpn/main/func_02022a2c.s:
 src/jpn/main/func_02022aa0.s:
     complete
     .text start:0x02022aa0 end:0x02022b20
+src/jpn/main/func_02022b20.s:
+    complete
+    .text start:0x02022b20 end:0x02022d00
 src/jpn/main/func_02022d00.s:
     complete
     .text start:0x02022d00 end:0x02022e90
@@ -4569,6 +4578,10 @@ src/jpn/main/func_02044e08.s:
 src/jpn/main/func_02044e58.s:
     complete
     .text start:0x02044e58 end:0x02044e9c
+src/jpn/main/func_02044e9c.s:
+    complete
+    .text start:0x02044e9c end:0x02045080
+
 src/jpn/main/func_02045080.s:
     complete
     .text start:0x02045080 end:0x0204520c
@@ -4809,6 +4822,9 @@ src/jpn/main/func_02047790.c:
 src/jpn/main/func_020477bc.s:
     complete
     .text start:0x020477bc end:0x02047978
+src/jpn/main/func_02047b94.s:
+    complete
+    .text start:0x02047b94 end:0x02047d74
 src/jpn/main/func_02047d74.s:
     complete
     .text start:0x02047d74 end:0x02047e14
@@ -9451,7 +9467,6 @@ src/jpn/main/func_0208c374.s:
 src/jpn/main/func_0208c3a8.s:
     complete
     .text start:0x0208c3a8 end:0x0208c584
-
 src/jpn/main/func_0208c584.s:
     complete
     .text start:0x0208c584 end:0x0208c758
@@ -12165,6 +12180,9 @@ src/jpn/main/func_020b3074.s:
 src/jpn/main/func_020b30a8.s:
     complete
     .text start:0x020b30a8 end:0x020b30f0
+src/jpn/main/func_020b30f0.s:
+    complete
+    .text start:0x020b30f0 end:0x020b32d0
 src/jpn/main/func_020b3554.s:
     complete
     .text start:0x020b3554 end:0x020b3564
