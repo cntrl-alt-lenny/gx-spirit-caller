@@ -28,6 +28,7 @@ import batch_carve as bc  # noqa: E402
 from batch_carve import (  # noqa: E402
     BatchCarver, Scope, audit, bisect_plan, carved_addrs, delink_block,
     filter_candidates, func_addr, newline_guard, parse_skiplist, parse_symbols,
+    parse_symbol_addrs,
 )
 
 
@@ -79,6 +80,21 @@ class TestPureHelpers(unittest.TestCase):
         self.assertEqual(
             b, "src/overlay002/func_ov002_022a0100.s:\n    complete\n"
                "    .text start:0x022a0100 end:0x022a01c4\n")
+
+    def test_parse_symbol_addrs_drift_band(self):
+        # A func NAMED for its nominal (EUR) address but living 0xF4 lower — the
+        # USA/JPN main drift band (brief 483). The delink MUST use the real addr
+        # (0x020a5fb4), not the name-derived one (0x020a60a8), or dsd places the
+        # .s at the wrong location and the ROM sha1 gate fails.
+        syms = ("func_020a60a8 kind:function(arm,size=0x18) addr:0x020a5fb4\n"  # name != addr
+                "func_020943b0 kind:function(arm,size=0x1c) addr:0x020943b0\n")  # name == addr
+        addrs = parse_symbol_addrs(syms)
+        self.assertEqual(addrs["func_020a60a8"], 0x020a5fb4)   # real, not 0x020a60a8
+        self.assertNotEqual(addrs["func_020a60a8"], func_addr("func_020a60a8"))
+        self.assertEqual(addrs["func_020943b0"], func_addr("func_020943b0"))  # unchanged
+        b = delink_block("func_020a60a8", addrs["func_020a60a8"], 0x18, "src/jpn/main")
+        self.assertIn(".text start:0x020a5fb4 end:0x020a5fcc", b)
+        self.assertNotIn("0x020a60a8", b)   # the buggy name-derived placement is gone
 
     def test_newline_guard(self):
         self.assertEqual(newline_guard("a\n    .text end:0x1"), "a\n    .text end:0x1\n")
