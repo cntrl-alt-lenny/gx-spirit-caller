@@ -1491,7 +1491,6 @@ src/usa/main/func_02020224.c:
 src/usa/main/func_02020344.s:
     complete
     .text start:0x02020344 end:0x020203b0
-
 src/usa/main/func_020203b0.c:
     complete
     .text start:0x020203b0 end:0x020203d8
@@ -2147,6 +2146,10 @@ src/usa/main/func_0203176c.s:
 src/usa/main/func_0203178c.s:
     complete
     .text start:0x0203178c end:0x020317e4
+src/usa/main/func_020317e4.s:
+    complete
+    .text start:0x020317e4 end:0x02031850
+
 src/usa/main/func_02031850.s:
     complete
     .text start:0x02031850 end:0x02031864
