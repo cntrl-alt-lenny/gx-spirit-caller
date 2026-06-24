@@ -27,7 +27,7 @@ unlocks the JPN main gate-fails for b478.
 ---
 **Prior (brief 475 merge):**
 **post brief 475 merge** (decomper solo-Mac USA/JPN `.s` drain: **596 ships**, PR
-#1014, 3-region green). First wave on the GPT-5.5-High codex agents — clean +
+1014, 3-region green). First wave on the GPT-5.5-High codex agents — clean +
 disciplined (correct bisect/park, locked-main worktree handled); validates the
 gate-makes-model-safe principle on a 4th model. Lane count follows the machine
 (Mac single / PC dual).
