@@ -3,9 +3,9 @@
 """Combined per-region progress-bar SVG (one card, three nested bars).
 
 Shows TWO honest metrics per region on a shared 0-100% axis:
-  * decompiled-to-C   (green)  — code recovered as real C source
-  * byte-matched      (teal)   — code that rebuilds byte-identical from our
-                                 source tree, INCLUDING `.s` assembly ships
+  - decompiled-to-C   (green)  — code recovered as real C source
+  - byte-matched      (teal)   — code that rebuilds byte-identical from our
+    source tree, INCLUDING `.s` assembly ships
 The C slice is drawn on top of (leading) the byte-matched fill, so it reads
 "C is the leading slice of total coverage" at a glance — making the gap
 between real decompilation and assembly-placeholder coverage explicit.

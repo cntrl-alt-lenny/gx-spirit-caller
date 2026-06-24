@@ -513,7 +513,7 @@ cluster B + D-3 cross-region application (brief 170).
 
 **Combined per-region progress-bar SVG (one card, three nested bars).**
 
-Shows TWO honest metrics per region on a shared 0-100% axis: * decompiled-to-C   (green)  — code recovered as real C source * byte-matched      (teal)   — code that rebuilds byte-identical from our source tree, INCLUDING `.s` assembly sh…
+Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — code recovered as real C source - byte-matched      (teal)   — code that rebuilds byte-identical from our source tree, INCLUDING `.s` assembly sh…
 
 ### `tools/m2c_bootstrap.py`
 
