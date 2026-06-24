@@ -1458,7 +1458,6 @@ src/jpn/main/func_0201fc18.s:
 src/jpn/main/func_0201fed8.s:
     complete
     .text start:0x0201fed8 end:0x0201ff44
-
 src/jpn/main/func_02020084.s:
     complete
     .text start:0x02020084 end:0x020200dc
@@ -1486,6 +1485,10 @@ src/jpn/main/func_020201f4.c:
 src/jpn/main/func_02020224.c:
     complete
     .text start:0x02020224 end:0x02020258
+
+src/jpn/main/func_02020344.s:
+    complete
+    .text start:0x02020344 end:0x020203b0
 
 src/jpn/main/func_020203b0.c:
     complete
