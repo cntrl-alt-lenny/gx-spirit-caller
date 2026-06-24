@@ -10,6 +10,9 @@ src/usa/main/func_0200093c.s:
 src/usa/main/func_02000b60.s:
     complete
     .text start:0x02000b60 end:0x02000b64
+src/usa/main/func_02000b64.s:
+    complete
+    .text start:0x02000b64 end:0x02000b68
 src/usa/main/func_02000c44.c:
     complete
     .text start:0x02000c44 end:0x02000c4c
@@ -660,6 +663,9 @@ src/usa/main/func_02018a30.c:
 src/usa/main/func_02018a50.s:
     complete
     .text start:0x02018a50 end:0x02018a88
+src/usa/main/func_02018ae0.s:
+    complete
+    .text start:0x02018ae0 end:0x02018af4
 src/usa/main/func_02018b00.c:
     complete
     .text start:0x02018b00 end:0x02018b14
@@ -5342,6 +5348,10 @@ src/usa/main/func_02093524.s:
 src/usa/main/func_02093534.c:
     complete
     .text start:0x02093534 end:0x02093544
+
+src/usa/main/func_020936a8.s:
+    complete
+    .text start:0x020936a8 end:0x020936bc
 
 src/usa/main/func_020936e8.s:
     complete
