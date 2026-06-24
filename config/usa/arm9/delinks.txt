@@ -144,7 +144,9 @@ src/usa/main/func_02001ed4.s:
 src/usa/main/func_020033e0.s:
     complete
     .text start:0x020033e0 end:0x020035c8
-
+src/usa/main/func_020035c8.s:
+    complete
+    .text start:0x020035c8 end:0x020037b0
 src/usa/main/func_020037b0.s:
     complete
     .text start:0x020037b0 end:0x020038a0
@@ -729,6 +731,10 @@ src/usa/main/func_0200b340.s:
 src/usa/main/func_0200b580.s:
     complete
     .text start:0x0200b580 end:0x0200b5f8
+src/usa/main/func_0200b5f8.s:
+    complete
+    .text start:0x0200b5f8 end:0x0200b7e0
+
 src/usa/main/func_0200b9e4.s:
     complete
     .text start:0x0200b9e4 end:0x0200bb40
