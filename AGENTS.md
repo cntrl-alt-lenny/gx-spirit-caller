@@ -660,6 +660,13 @@ agent); **PC** = native `mwccarm.exe`, no shared wineserver → dual-lane is fin
 On Mac the single heavy lane = USA/JPN frontier (decomper); the scaffolder takes a
 WINE-FREE lane (tooling/analysis, no contention).
 
+📌 **PARKED INITIATIVE — decomp.dev onboarding (issue #1022, draft PR #1020).**
+Researched + fully prepped (Dockerfile + CI workflow + `docs/decomp-dev-setup.md`),
+paused by owner choice. Needs only the owner's manual steps to go live (build/push a
+PRIVATE build-image, merge #1020, register at decomp.dev/manage/new). If the owner
+says "pick up decomp.dev," start from issue #1022. Do NOT merge #1020 until the
+private image exists (else CI runs red).
+
 ⚠️ **CAP EVERY WAVE AT ONE MODULE / ~150–300 SHIPS (b476 lesson).** Brief 476 told the
 decomper to chain THREE overlays (ov006→ov004→ov011) in one wave → it ran ~5 HOURS
 (710 ships, all clean, but a marathon that needed pause/resume). Going forward a

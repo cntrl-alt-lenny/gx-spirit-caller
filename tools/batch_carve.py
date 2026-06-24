@@ -69,6 +69,8 @@ _GATE_LOCK = Path(tempfile.gettempdir()) / "spirit-caller-gate.lock"
 # --------------------------------------------------------------------------- #
 
 _SYM_RE = re.compile(r"(func_\w+)\s+kind:function\(arm,size=(0x[0-9a-f]+)\)")
+_SYM_ADDR_RE = re.compile(
+    r"(func_\w+)\s+kind:function\(arm,size=0x[0-9a-f]+\)\s+addr:(0x[0-9a-f]+)")
 _START_RE = re.compile(r"start:(0x[0-9a-f]+)")
 _TEXT_RE = re.compile(r"\.text start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)\s*$")
 _SRC_HDR_RE = re.compile(r"(\S+/(func_\w+)\.s):$")
@@ -84,8 +86,29 @@ def parse_symbols(text: str) -> dict[str, int]:
     return out
 
 
+def parse_symbol_addrs(text: str) -> dict[str, int]:
+    """func name -> its REAL ROM addr (the `addr:` field), ARM functions only.
+
+    Most funcs are named after their address (func_021abcde @ 0x021abcde), but
+    some are NOT: the -0xF4 USA/JPN main drift band names a func for its nominal
+    (EUR) address while dsd places it 0xF4 lower — e.g. func_020a60a8 lives at
+    0x020a5fb4.  The delinks block MUST use this real addr; the name-derived
+    address (func_addr) writes the .s delink at the wrong location, so dsd links
+    the bytes into the wrong place and the ROM sha1 gate fails (brief 483 autopsy).
+    asm_escape already resolves the symbol to its real addr, so the .s itself is
+    byte-correct — only the delink position was wrong.
+    """
+    out: dict[str, int] = {}
+    for line in text.splitlines():
+        m = _SYM_ADDR_RE.match(line.strip())
+        if m:
+            out[m.group(1)] = int(m.group(2), 16)
+    return out
+
+
 def func_addr(func: str) -> int:
-    """func_ovNNN_021abcde / func_021abcde -> 0x021abcde."""
+    """func_ovNNN_021abcde / func_021abcde -> 0x021abcde (NAME-derived; a fallback
+    only — prefer parse_symbol_addrs for the real ROM addr, see its note)."""
     return int(func.rsplit("_", 1)[-1], 16)
 
 
@@ -581,7 +604,9 @@ class BatchCarver:
 
     # ---- main loop ----
     def run(self, limit: int | None = None) -> Report:
-        symbols = parse_symbols((self.scope.cfg_dir / "symbols.txt").read_text(encoding="utf-8"))
+        sym_text = (self.scope.cfg_dir / "symbols.txt").read_text(encoding="utf-8")
+        symbols = parse_symbols(sym_text)
+        sym_addrs = parse_symbol_addrs(sym_text)   # real ROM addr per func (drift band)
         self._baseline = (ROOT / self.scope.delinks_path).read_text(encoding="utf-8")
         # REFUSE to start if the SHARED delinks file already has uncommitted
         # edits — a co-lane (decomper) may have in-flight carves there, and our
@@ -612,7 +637,7 @@ class BatchCarver:
                  f"{len(candidates)} candidates (batch={self.batch}, dry_run={self.dry_run})")
 
         for size, func in candidates:
-            addr = func_addr(func)
+            addr = sym_addrs.get(func, func_addr(func))   # real ROM addr (drift band); name only as fallback
             # live dedup re-check: another lane (or an earlier batch) may have
             # carved this addr / created this .s since the start-of-run snapshot.
             if addr in carved:
