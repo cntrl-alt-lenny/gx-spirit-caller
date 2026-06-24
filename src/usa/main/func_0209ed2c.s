@@ -1,0 +1,40 @@
+; func_0209ed2c — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern func_0209da94
+        .extern func_0209dbb4
+        .extern func_0209dc3c
+        .extern func_0209dd68
+        .global func_0209ed2c
+        .arm
+func_0209ed2c:
+    stmdb sp!, {r4, r5, lr}
+    sub sp, sp, #0x4
+    mov r5, r0
+    mov r4, r1
+    mov r0, #0x1
+    mov r1, #0x2
+    bl func_0209da94
+    cmp r0, #0x0
+    addne sp, sp, #0x4
+    ldmneia sp!, {r4, r5, lr}
+    bxne lr
+    bl func_0209dbb4
+    add r1, r0, #0x100
+    mov r2, #0x0
+    strh r2, [r1, #0x50]
+    str r2, [r0, #0x14c]
+    mov r1, r5
+    mov r0, #0x8
+    bl func_0209dd68
+    mov r2, r4
+    mov r0, #0x8
+    mov r1, #0x1
+    bl func_0209dc3c
+    cmp r0, #0x0
+    moveq r0, #0x2
+    add sp, sp, #0x4
+    ldmia sp!, {r4, r5, lr}
+    bx lr
