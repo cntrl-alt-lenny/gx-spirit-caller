@@ -4796,7 +4796,6 @@ src/usa/main/func_02063954.s:
 src/usa/main/func_020639d8.s:
     complete
     .text start:0x020639d8 end:0x02063a6c
-
 src/usa/main/func_02063c1c.c:
     complete
     .text start:0x02063c1c end:0x02063c30
@@ -4810,6 +4809,9 @@ src/usa/main/func_02063d98.s:
 src/usa/main/func_02063e04.s:
     complete
     .text start:0x02063e04 end:0x02063e5c
+src/usa/main/func_02064194.s:
+    complete
+    .text start:0x02064194 end:0x02064228
 src/usa/main/func_02064338.c:
     complete
     .text start:0x02064338 end:0x02064364
@@ -4818,6 +4820,9 @@ src/usa/main/func_02064364.c:
     complete
     .text start:0x02064364 end:0x02064378
 
+src/usa/main/func_02064378.s:
+    complete
+    .text start:0x02064378 end:0x0206440c
 src/usa/main/func_0206440c.s:
     complete
     .text start:0x0206440c end:0x0206441c
@@ -5370,6 +5375,9 @@ src/usa/main/func_0206ce9c.s:
 src/usa/main/func_0206d728.s:
     complete
     .text start:0x0206d728 end:0x0206d74c
+src/usa/main/func_0206d74c.s:
+    complete
+    .text start:0x0206d74c end:0x0206d7e0
 src/usa/main/func_0206da24.s:
     complete
     .text start:0x0206da24 end:0x0206da64
@@ -5520,6 +5528,9 @@ src/usa/main/func_0206fbb8.legacy.c:
 src/usa/main/func_02070264.s:
     complete
     .text start:0x02070264 end:0x020702b4
+src/usa/main/func_020702b4.s:
+    complete
+    .text start:0x020702b4 end:0x02070348
 src/usa/main/func_02070708.s:
     complete
     .text start:0x02070708 end:0x02070764
@@ -5535,6 +5546,9 @@ src/usa/main/func_020709d8.s:
 src/usa/main/func_02070a64.s:
     complete
     .text start:0x02070a64 end:0x02070ac4
+src/usa/main/func_02070ac4.s:
+    complete
+    .text start:0x02070ac4 end:0x02070b58
 src/usa/main/func_02070b58.s:
     complete
     .text start:0x02070b58 end:0x02070b9c
@@ -5865,6 +5879,10 @@ src/usa/main/func_02079d64.s:
 src/usa/main/func_02079d88.s:
     complete
     .text start:0x02079d88 end:0x02079d90
+src/usa/main/func_0207a6ec.s:
+    complete
+    .text start:0x0207a6ec end:0x0207a780
+
 src/usa/main/func_0207ae40.s:
     complete
     .text start:0x0207ae40 end:0x0207aeb8
