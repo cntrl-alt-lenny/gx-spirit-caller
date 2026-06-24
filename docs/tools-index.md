@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**85 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**86 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (17)
+- [Uncategorised](#uncategorised) (18)
 
 ## Analysis / worklist
 
@@ -508,6 +508,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/generate_progress_bars.py`
+
+**Combined per-region progress-bar SVG (one card, three nested bars).**
+
+Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — code recovered as real C source - byte-matched      (teal)   — code that rebuilds byte-identical from our source tree, INCLUDING `.s` assembly sh…
 
 ### `tools/m2c_bootstrap.py`
 

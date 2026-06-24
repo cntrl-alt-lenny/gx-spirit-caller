@@ -1,4 +1,4 @@
-name: Update progress badge
+name: Update progress visuals
 
 on:
   push:
@@ -6,9 +6,8 @@ on:
     paths:
       # Symbol graph changes (renames, new symbols).
       - 'config/**/symbols.txt'
-      # TU-carving changes — `complete` markers here are the primary
-      # signal the delinks.txt tier of progress.py reads when CI
-      # can't run ninja.
+      # TU-carving changes — `complete` markers drive the delinks-tier
+      # numbers both visuals read when CI can't run a baserom build.
       - 'config/**/delinks.txt'
       # New matched source files — the actual progress.
       - 'src/**/*.c'
@@ -16,10 +15,8 @@ on:
       - 'src/**/*.s'
       # Progress tooling itself.
       - 'tools/progress.py'
-      - 'tools/update_progress_badge.py'
+      - 'tools/generate_progress_bars.py'
       - 'tools/generate_heatmap.py'
-      # README so a manual badge edit doesn't get stuck stale.
-      - 'README.md'
   schedule:
     # Weekly backstop in case something slips past the path filter.
     - cron: '0 3 * * 1'
@@ -30,10 +27,8 @@ permissions:
 
 concurrency:
   # Serialise so two pushes in quick succession don't race.
-  # cancel-in-progress is false because the second run is idempotent
-  # — letting it complete is fine, and avoids "ran but nothing
-  # happened" gaps in the action log.
-  group: progress-badge
+  # cancel-in-progress is false because the second run is idempotent.
+  group: progress-visuals
   cancel-in-progress: false
 
 jobs:
@@ -42,9 +37,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Fetch with full history so the push doesn't reject as
-          # non-fast-forward when a sibling commit lands between
-          # checkout and push.
+          # Full history so the push doesn't reject as non-fast-forward
+          # when a sibling commit lands between checkout and push.
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,52 +46,41 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Update README badge + progress heatmaps
-        id: update
+      # All visuals regenerate from the committed delinks.txt (the
+      # no-baserom synthesis path), so CI can keep them current without a
+      # build. The README badge row is now static (sha1/modules/license);
+      # the live per-region numbers live in the combined bar SVG.
+      - name: Regenerate progress visuals
+        id: gen
         run: |
-          # Multi-region: no --version flag → tool iterates over
-          # all 3 regions (EUR/USA/JPN). Per PR #411's refactor.
-          python tools/update_progress_badge.py
-          # Heatmaps regenerate from the committed delinks.txt (the
-          # no-baserom synthesis path in generate_heatmap.py), so CI
-          # CAN keep them live here — unlike the report.json path,
-          # which needs the baserom CI never has. Keeps the chart as
-          # current as the badge instead of drifting for weeks.
+          python tools/generate_progress_bars.py
           for v in eur usa jpn; do
             python tools/generate_heatmap.py --version "$v"
           done
-          if git diff --quiet README.md assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg; then
+          tracked='assets/progress-combined.svg assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg'
+          if git diff --quiet $tracked; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Push badge update directly to main
-        if: steps.update.outputs.changed == 'true'
+      - name: Commit regenerated visuals to main
+        if: steps.gen.outputs.changed == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # `[skip ci]` keeps the workflow from re-triggering itself on
-          # the README path filter — defensive belt-and-braces; GitHub's
-          # default workflow-token-push-doesn't-trigger-workflows rule
-          # already covers this, but the marker makes the intent explicit
-          # in the commit log.
-          MSG="chore: update progress badge + heatmaps [skip ci]"
+          MSG="chore: update progress visuals [skip ci]"
 
-          # Recompute badge + all three heatmaps. Heatmaps use the
-          # no-baserom delinks-synthesis path, so this is safe in CI.
           regen() {
-            python tools/update_progress_badge.py
+            python tools/generate_progress_bars.py
             for v in eur usa jpn; do
               python tools/generate_heatmap.py --version "$v"
             done
           }
-          tracked='README.md assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg'
+          tracked='assets/progress-combined.svg assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg'
 
-          # Rebase-on-failure retry: if main moves between checkout
-          # and push, reset to the new tip, recompute, and retry.
-          # Bounded to 3 attempts so a fully-broken state can still
-          # fail the workflow rather than spin forever.
+          # Rebase-on-failure retry (bounded to 3): if main moves between
+          # checkout and push, reset to its tip, recompute, and retry.
           for attempt in 1 2 3; do
             git add $tracked
             git commit -m "$MSG"
@@ -105,10 +88,6 @@ jobs:
               echo "pushed on attempt $attempt"
               exit 0
             fi
-            # Push rejected — main moved. Reset to its new tip and
-            # recompute. If badge + heatmaps are already correct on the
-            # new tip, the next iteration's `git diff --quiet` will be
-            # clean and we exit 0 with no push needed.
             git fetch origin main
             git reset --hard origin/main
             regen
