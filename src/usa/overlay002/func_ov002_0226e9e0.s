@@ -1,0 +1,46 @@
+; func_ov002_0226e9e0 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .extern func_ov002_021bc1a8
+        .extern func_ov002_021bc5e4
+        .extern func_ov002_021bc64c
+        .extern func_ov002_021bc7e8
+        .global func_ov002_0226e9e0
+        .arm
+func_ov002_0226e9e0:
+    stmdb sp!, {r4, r5, r6, lr}
+    mov r6, r0
+    mov r5, r1
+    bl func_ov002_021bc5e4
+    cmp r0, #0x0
+    movge r0, #0x1
+    ldmgeia sp!, {r4, r5, r6, pc}
+    mov r4, #0x0
+.L_20:
+    cmp r5, #0x0
+    mov r0, r6
+    mov r1, r6
+    ble .L_3c
+    mov r2, r4
+    bl func_ov002_021bc7e8
+    b .L_44
+.L_3c:
+    mov r2, r4
+    bl func_ov002_021bc64c
+.L_44:
+    cmp r0, #0x0
+    beq .L_64
+    mov r0, r6
+    mov r1, r4
+    bl func_ov002_021bc1a8
+    cmp r0, #0x0
+    movne r0, #0x1
+    ldmneia sp!, {r4, r5, r6, pc}
+.L_64:
+    add r4, r4, #0x1
+    cmp r4, #0x4
+    ble .L_20
+    mov r0, #0x0
+    ldmia sp!, {r4, r5, r6, pc}
