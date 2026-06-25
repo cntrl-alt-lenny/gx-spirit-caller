@@ -4,7 +4,7 @@
 
         .text
         .extern data_02197434
-        .extern func_02006e1c
+        .extern Task_Invoke
         .global func_02022b74
         .arm
 func_02022b74:
@@ -84,7 +84,7 @@ func_02022b74:
     ldr r0, [r5, #0x38]
     cmp r0, #0x0
     beq .L_754
-    bl func_02006e1c
+    bl Task_Invoke
 .L_754:
     ldmia r4!, {r0, r1, r2, r3}
     stmia r5!, {r0, r1, r2, r3}

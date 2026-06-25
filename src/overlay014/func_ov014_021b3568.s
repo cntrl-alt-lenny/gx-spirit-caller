@@ -7,7 +7,7 @@
         .extern data_ov014_021b4d48
         .extern data_ov014_0223515c
         .extern func_02037208
-        .extern func_ov014_021b34f0
+        .extern Ov014_HitTestSecondary
         .extern func_ov014_021b379c
         .extern func_ov014_021b4810
         .extern func_ov014_021b484c
@@ -135,7 +135,7 @@ func_ov014_021b3568:
 .L_1a0:
     mov r0, r4
     mov r1, r6
-    bl func_ov014_021b34f0
+    bl Ov014_HitTestSecondary
     cmp r0, #0x0
     beq .L_1c0
     mov r0, r4

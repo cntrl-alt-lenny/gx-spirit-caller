@@ -3,7 +3,7 @@
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .extern func_ov015_021b2b80
+        .extern Ov015_SelectVramBankSub
         .global func_ov015_021b30f0
         .arm
 func_ov015_021b30f0:
@@ -11,7 +11,7 @@ func_ov015_021b30f0:
     mov r6, r1
     mov r5, r2
     mov r4, r3
-    bl func_ov015_021b2b80
+    bl Ov015_SelectVramBankSub
     ldrsh lr, [r6, #0x6]
     ldrsh r2, [r6]
     ldrsh r1, [r6, #0x2]

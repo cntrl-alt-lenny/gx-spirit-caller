@@ -7,8 +7,8 @@
         .extern data_ov015_021b5e28
         .extern data_ov015_021b5e44
         .extern data_ov015_021b6828
-        .extern func_0208df40
-        .extern func_ov015_021b238c
+        .extern Vram_GetBankBaseCD
+        .extern Ov015_UpdateScrollTarget
         .extern func_ov015_021b24f4
         .extern func_ov015_021b2630
         .global func_ov015_021b4444
@@ -39,13 +39,13 @@ func_ov015_021b4444:
     add fp, fp, r0
     ldrsh r4, [r1, #0x30]
     ldr r0, [r6, #0x848]
-    bl func_ov015_021b238c
+    bl Ov015_UpdateScrollTarget
     cmp r4, r0
     beq .L_88
     ldr r0, [r6, #0x848]
     add r1, r6, #0xa00
     strh r4, [r1, #0x32]
-    bl func_ov015_021b238c
+    bl Ov015_UpdateScrollTarget
     add r1, r6, #0xa00
     strh r0, [r1, #0x30]
 .L_88:
@@ -68,7 +68,7 @@ func_ov015_021b4444:
     cmp sl, r0
     beq .L_108
     ldr r8, [r6, #0xa38]
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     ldrh r2, [r4, #0xec]
     mov r1, r9
     mul r1, r2, r1

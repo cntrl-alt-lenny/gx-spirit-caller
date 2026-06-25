@@ -1,7 +1,7 @@
-/* func_ov011_021cc948: push the view origin (238/23C >> 12, 9-bit each) to the
+/* Bg_SetScroll: push the view origin (238/23C >> 12, 9-bit each) to the
  * BG scroll regs 0x04000010 (only in view-mode 1) and 0x04000014. */
 #include "ov011_core.h"
-void func_ov011_021cc948(void) {
+void Bg_SetScroll(void) {
     int x = *(int *)(data_ov011_021d4000 + 0x238);
     int y = *(int *)(data_ov011_021d4000 + 0x23C) >> 12;
     if (*(int *)(data_ov011_021d4000 + 0x2A0) == 1)

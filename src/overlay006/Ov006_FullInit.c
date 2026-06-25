@@ -1,4 +1,4 @@
-/* func_ov006_021b4ad8: per-state "full init" — bind the four VRAM banks, reset
+/* Ov006_FullInit: per-state "full init" — bind the four VRAM banks, reset
  * the engines, then configure the 2D engines one of two ways per the arg, blank
  * the main display mode, switch the sub engine into its display mode, prime the
  * two render flags, and arm the frame/HBlank IRQs; finally stash the arg in the
@@ -31,7 +31,7 @@ extern int  data_02103da0[];
 extern int  data_020c3e48[];
 extern int  data_ov006_0224f2e8[];
 
-int func_ov006_021b4ad8(int a) {
+int Ov006_FullInit(int a) {
     func_02094504(0xc0, 0x7000000, 0x400);
     func_02094504(0xc0, 0x7000400, 0x400);
     func_02094504(0, 0x5000000, 0x400);

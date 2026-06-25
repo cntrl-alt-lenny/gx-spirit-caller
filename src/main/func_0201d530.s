@@ -7,9 +7,9 @@
         .extern func_0208ddec
         .extern func_0208de4c
         .extern func_0208de94
-        .extern func_0208deec
+        .extern Vram_GetBankBaseE
         .extern func_0208df0c
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_0208df60
         .global func_0201d530
         .arm
@@ -44,10 +44,10 @@ func_0201d530:
     mov r0, #0x6400000
     ldmia sp!, {r3, pc}
 .L_168:
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     ldmia sp!, {r3, pc}
 .L_170:
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     ldmia sp!, {r3, pc}
 .L_178:
     bl func_0208de4c

@@ -7,7 +7,7 @@
         .extern data_ov010_021b91b4
         .extern data_ov010_021b9260
         .extern data_ov010_021b93d0
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_ov010_021b238c
         .extern func_ov010_021b24f4
         .extern func_ov010_021b2630
@@ -61,7 +61,7 @@ func_ov010_021b4d58:
     cmp sl, r0
     beq .L_6d8
     ldr r8, [r5]
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     ldrh r2, [r5, #0x4]
     mov r3, r9
     mov r1, r0

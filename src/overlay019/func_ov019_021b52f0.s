@@ -13,11 +13,11 @@
         .extern func_020054a4
         .extern func_02005ee0
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0202c0c0
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_0208e1ac
         .extern func_0208e200
         .extern func_02091554
@@ -50,7 +50,7 @@ func_ov019_021b52f0:
     str r1, [r0]
     mov r1, #0x1
     str r1, [r0, #0x8]
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r4, r0
     mov r0, #0x0
     add r1, r4, #0x1b80
@@ -102,7 +102,7 @@ func_ov019_021b52f0:
     strh r1, [sp, #0x64]
     bl func_0201e5b8
     ldr r0, [sp, #0x50]
-    bl func_02006e1c
+    bl Task_Invoke
     add r0, sp, #0x50
     bl func_0201d47c
     add r0, sp, #0x10
@@ -124,7 +124,7 @@ func_ov019_021b52f0:
     add r0, sp, #0x50
     bl func_0201e5b8
     ldr r0, [sp, #0x50]
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r0, _LIT4
     ldr r1, _LIT5
     mov r2, #0x20

@@ -4,7 +4,7 @@
 
         .text
         .extern Task_InvokeLocked
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_02022580
         .global func_020298f8
         .arm
@@ -33,7 +33,7 @@ func_020298f8:
     ldr r0, [r0, #0x68]
     cmp r0, #0x0
     beq .L_28c
-    bl func_02006e1c
+    bl Task_Invoke
     add r0, r4, r7, lsl #0x2
     str r6, [r0, #0x68]
 .L_28c:

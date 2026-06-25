@@ -5,7 +5,7 @@ extern void func_02091554(void *out, void *a, int b);
 extern int  func_02006c0c(void *p, int b, int c);
 extern void func_0201d47c(void *cmd);
 extern void func_0201e5b8(void *cmd);
-extern void func_02006e1c(int h);
+extern void Task_Invoke(int h);
 extern char *func_0208dd9c(void);
 extern int  func_02094504(int a, void *b, int c);
 extern int  data_ov006_021cb5f4[];
@@ -24,7 +24,7 @@ int func_ov006_021c148c(void *q, int arg1, int slot) {
         *(int *)(cmd + 12) = ((slot << 2) + 845) << 5;
         *(short *)(cmd + 16) = (slot + 9) << 5;
         func_0201e5b8(cmd);
-        func_02006e1c(h);
+        Task_Invoke(h);
     } else {
         func_02094504(0, func_0208dd9c() + (((slot << 2) + 845) << 5), 128);
     }

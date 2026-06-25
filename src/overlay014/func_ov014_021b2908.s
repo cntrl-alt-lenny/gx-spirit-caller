@@ -16,7 +16,7 @@
         .extern func_020061ac
         .extern func_0201e964
         .extern func_020944a4
-        .extern func_ov014_021b3440
+        .extern Ov014_HitTestPrimary
         .extern func_ov014_021b3a84
         .global func_ov014_021b2908
         .arm
@@ -57,7 +57,7 @@ func_ov014_021b2908:
     bne .L_021b29a4
     mov r0, r4
     mov r1, r6
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r5, r5, #0x1
 .L_021b29a4:
@@ -92,7 +92,7 @@ func_ov014_021b2908:
     bne .L_021b2a2c
     mov r0, r4
     mov r1, r5
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r6, r6, #0x1
 .L_021b2a2c:
@@ -128,7 +128,7 @@ func_ov014_021b2908:
     bne .L_021b2ab8
     mov r0, r4
     mov r1, r5
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r6, r6, #0x1
 .L_021b2ab8:
@@ -163,7 +163,7 @@ func_ov014_021b2908:
     bne .L_021b2b40
     mov r0, r4
     mov r1, r5
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r6, r6, #0x1
 .L_021b2b40:
@@ -199,7 +199,7 @@ func_ov014_021b2908:
     bne .L_021b2bcc
     mov r0, r4
     mov r1, r5
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r6, r6, #0x1
 .L_021b2bcc:
@@ -238,7 +238,7 @@ func_ov014_021b2908:
     bne .L_021b2c64
     mov r0, r4
     mov r1, r5
-    bl func_ov014_021b3440
+    bl Ov014_HitTestPrimary
     cmp r0, #0x0
     addne r6, r6, #0x1
 .L_021b2c64:

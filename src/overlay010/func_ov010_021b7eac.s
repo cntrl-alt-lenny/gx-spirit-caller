@@ -30,7 +30,7 @@
         .extern func_0207ed94
         .extern func_0207f05c
         .extern func_0207fd28
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_ov005_021ab260
         .extern func_ov005_021ab3a0
         .extern func_ov005_021ab3b4
@@ -111,7 +111,7 @@ func_ov010_021b7eac:
     add r0, r7, r0
     add r0, r4, r0, lsl #0x2
     ldr r8, [r0, #0x210]
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r7, r0
     add r0, r9, r8
     mov r1, #0xe
@@ -191,7 +191,7 @@ func_ov010_021b7eac:
     bl func_020055b4
     cmp r0, #0x1
     bne .L_1624
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r7, r0
     ldr r0, _LIT5
     mov r1, #0x1a

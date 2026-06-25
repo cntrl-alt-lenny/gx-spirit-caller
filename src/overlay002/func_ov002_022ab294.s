@@ -9,7 +9,7 @@
         .extern func_02001d0c
         .extern func_02005188
         .extern func_0202b7cc
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_0208e200
         .extern func_02094504
         .extern func_ov002_021b00e8
@@ -53,7 +53,7 @@ func_ov002_022ab294:
     addeq sp, sp, #0x8
     ldmeqia sp!, {r3, r4, r5, r6, r7, pc}
     str r1, [r6]
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r7, r0
     ldr r0, _LIT2
     mov r1, #0x3e

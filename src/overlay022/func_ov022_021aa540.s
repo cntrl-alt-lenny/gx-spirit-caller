@@ -5,7 +5,7 @@
         .text
         .extern data_ov022_021ab9a0
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201d6d4
         .extern func_0201d760
@@ -96,7 +96,7 @@ func_ov022_021aa540:
     bl func_020944a4
 .L_1cc:
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     add sp, sp, #0x28
     ldmia sp!, {r3, r4, r5, r6, r7, pc}
 _LIT0: .word data_ov022_021ab9a0

@@ -1,4 +1,4 @@
-/* func_ov021_021aa908: run the scene for one logical frame — step both sub-state
+/* Scene_Update: run the scene for one logical frame — step both sub-state
  * machines (021aaa40 / 021ab090) once per queued tick (+0x30 count), advancing
  * the global frame stamp on the catch-up ticks; then commit both subobjects. If
  * any tick reported completion, latch the state word to 3. Returns that flag.
@@ -15,7 +15,7 @@ extern char data_021040ac[];
 extern char data_ov021_0222ced4[];
 extern char data_ov021_0222cf44[];
 extern int  data_ov021_021ace80[];
-int func_ov021_021aa908(void) {
+int Scene_Update(void) {
     int done = 0;
     int i = 0;
     char *g = data_021040ac;

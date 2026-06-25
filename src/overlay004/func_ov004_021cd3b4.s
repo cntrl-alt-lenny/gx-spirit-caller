@@ -11,7 +11,7 @@
         .extern func_02001d68
         .extern func_02005dac
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0202c0c0
@@ -87,7 +87,7 @@ func_ov004_021cd3b4:
     strh r1, [sp, #0x24]
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r0, _LIT5
     ldr r0, [r0, #0x4]
     mov r0, r0, lsl #0x1d

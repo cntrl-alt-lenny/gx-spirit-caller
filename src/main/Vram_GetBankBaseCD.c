@@ -1,4 +1,4 @@
-/* func_0208df40 — VRAM page address derived from VRAMCNT_C/D OFS field.
+/* Vram_GetBankBaseCD — VRAM page address derived from VRAMCNT_C/D OFS field.
  * Brief 234 Part B — mechanical cleanup using brief 233 C-40 recipe.
  *
  *     ldr   r0, .L_pool                ; load MMIO addr 0x04001008
@@ -12,12 +12,12 @@
  *
  * Brief 233 recipe (`docs/research/mmio-bit-extract.md`): macro-wrap
  * the MMIO cast + single-expression nested shifts + cast to void *.
- * Sibling of `func_0208deec.c` (VRAMCNT_E, 0x0400100a) with the
+ * Sibling of `Vram_GetBankBaseE.c` (VRAMCNT_E, 0x0400100a) with the
  * pool addr swapped.
  */
 
 #define VRAMCNT_CD (*(volatile unsigned short *)0x04001008)
 
-void *func_0208df40(void) {
+void *Vram_GetBankBaseCD(void) {
     return (void *)((((VRAMCNT_CD & 0x3c) >> 2) << 0xe) + 0x6200000);
 }

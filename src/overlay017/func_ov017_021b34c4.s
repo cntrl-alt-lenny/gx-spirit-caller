@@ -15,13 +15,13 @@
         .extern func_02001d0c
         .extern func_02005088
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_020117ac
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0202b100
         .extern func_0202c0c0
-        .extern func_0208deec
+        .extern Vram_GetBankBaseE
         .extern func_0208e1ac
         .extern func_0208e318
         .extern func_02091554
@@ -106,7 +106,7 @@ func_ov017_021b34c4:
     str r1, [sp, #0x60]
     bl func_0201e5b8
     ldr r0, [sp, #0x48]
-    bl func_02006e1c
+    bl Task_Invoke
     mov r1, #0x4
     ldr r0, _LIT7
     mov r2, #0x8
@@ -116,7 +116,7 @@ func_ov017_021b34c4:
     bl func_0208e1ac
     add r4, r0, #0x46
     mov r5, #0xb0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0x1600
     mov r0, #0x0
     mov r2, #0x8c0
@@ -146,7 +146,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT9
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     mov r2, r0
     mov r3, #0x2
     mov r1, r4
@@ -159,7 +159,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT10
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r2, r0, #0x1600
     mov r0, #0x1a
     str r0, [sp]
@@ -173,7 +173,7 @@ func_ov017_021b34c4:
     add r0, r0, #0x6
     add r4, r0, #0x200
     mov r6, #0xf6
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0x1ec0
     mov r0, #0x0
     mov r2, #0x1200
@@ -203,7 +203,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT11
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     mov r2, r0
     mov r3, #0x2
     mov r1, r4
@@ -216,7 +216,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT12
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r2, r0, #0x1ec0
     mov r0, #0x12
     str r0, [sp]
@@ -229,7 +229,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT13
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r2, r0, #0x1ec0
     mov r0, #0x2a
     str r0, [sp]
@@ -242,7 +242,7 @@ func_ov017_021b34c4:
     ldr r0, _LIT12
     bl func_0202c0c0
     mov r4, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r2, r0, #0x1ec0
     mov r0, #0x3a
     str r0, [sp]
@@ -255,7 +255,7 @@ func_ov017_021b34c4:
     bl func_0208e1ac
     add r4, r0, #0x5a
     ldr r6, _LIT14
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0x30c0
     mov r0, #0x0
     mov r2, #0xee0
@@ -348,7 +348,7 @@ func_ov017_021b34c4:
     bl func_0202b100
     mov r4, r0
 .L_4b4:
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     mov r3, r0
     mov r2, #0x1a
     mov r1, r4
@@ -366,7 +366,7 @@ func_ov017_021b34c4:
     ldr r2, [r2, #0xa60]
     add r0, sp, #0x28
     bl func_02091554
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     mov r3, #0x2
     add r2, r0, #0x30c0
     str r3, [sp]
@@ -376,7 +376,7 @@ func_ov017_021b34c4:
     add r1, sp, #0x28
     bl func_02005088
     ldr r5, _LIT20
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r0, r0, #0xfa0
     add r1, r0, #0x3000
     mov r0, #0x0
@@ -414,7 +414,7 @@ func_ov017_021b34c4:
     ldrh r2, [r2, #0x52]
     add r0, sp, #0x28
     bl func_02091554
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r0, r0, #0xfa0
     mov r3, #0x2
     add r2, r0, #0x3000
@@ -440,7 +440,7 @@ func_ov017_021b34c4:
     add r0, sp, #0x28
     mov r2, r4
     bl func_02091554
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0xfa0
     mov r0, #0x12
     str r0, [sp]
@@ -458,7 +458,7 @@ func_ov017_021b34c4:
     ldrh r2, [r2, #0x58]
     add r0, sp, #0x28
     bl func_02091554
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r0, r0, #0xfa0
     add r2, r0, #0x3000
     mov r0, #0x2a
@@ -485,7 +485,7 @@ func_ov017_021b34c4:
     add r0, sp, #0x28
     mov r2, r4
     bl func_02091554
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0xfa0
     mov r0, #0x3a
     str r0, [sp]

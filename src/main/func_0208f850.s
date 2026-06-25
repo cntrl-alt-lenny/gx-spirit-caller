@@ -5,7 +5,7 @@
         .text
         .extern Copy32
         .extern data_0210249c
-        .extern func_0208deec
+        .extern Vram_GetBankBaseE
         .extern func_02094030
         .global func_0208f850
         .arm
@@ -14,7 +14,7 @@ func_0208f850:
     mov r6, r0
     mov r5, r1
     mov r4, r2
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     ldr r1, _LIT0
     mov ip, r0
     ldr r0, [r1]

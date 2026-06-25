@@ -4,7 +4,7 @@
 
         .text
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0209448c
         .global func_02011b9c
         .arm
@@ -64,6 +64,6 @@ func_02011b9c:
     bcc .L_a4
 .L_c0:
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     mov r0, #0x1
     ldmia sp!, {r3, r4, r5, pc}

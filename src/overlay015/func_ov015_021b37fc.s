@@ -23,7 +23,7 @@
         .extern func_0200a2f4
         .extern func_02019528
         .extern func_0202adf8
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_020945f4
         .extern func_ov005_021ab3b4
         .extern func_ov015_021b23f4
@@ -49,7 +49,7 @@ func_ov015_021b37fc:
     ldr r0, [r1, #0x890]
     mov r1, r6
     bl func_ov005_021ab3b4
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r1, #0x0
     mov fp, r0
     mov r0, r6

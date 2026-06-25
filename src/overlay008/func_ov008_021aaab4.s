@@ -16,7 +16,7 @@
         .extern func_0208e120
         .extern func_0208e1cc
         .extern func_02094504
-        .extern func_ov008_021aa50c
+        .extern Ov008_Rand
         .extern func_ov008_021aa900
         .extern func_ov008_021ab508
         .extern func_ov008_021abcdc
@@ -40,7 +40,7 @@ func_ov008_021aaab4:
     stmdb sp!, {r3, r4, r5, r6, r7, lr}
     mov r4, #0x0
     mov r5, r4
-    bl func_ov008_021aa50c
+    bl Ov008_Rand
     ldr r0, _LIT0
     ldrh r1, [r0]
     cmp r1, #0xa

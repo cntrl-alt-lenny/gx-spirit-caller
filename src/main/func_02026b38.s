@@ -5,7 +5,7 @@
         .text
         .extern data_020c68ec
         .extern data_020c68f0
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0200adbc
         .extern func_0200af08
         .extern func_0200afc8
@@ -35,7 +35,7 @@ func_02026b38:
     ldr r0, [r0, #0x4]
     cmp r0, #0x0
     beq .L_b98
-    bl func_02006e1c
+    bl Task_Invoke
     add r0, r4, r7, lsl #0x2
     mov r1, #0x0
     str r1, [r0, #0x4]

@@ -1,4 +1,4 @@
-/* func_ov015_021b2b80: VRAM-bank selector (sub engine) — dispatch the 8 bank-
+/* Ov015_SelectVramBankSub: VRAM-bank selector (sub engine) — dispatch the 8 bank-
  * setup helpers by selector, returning the chosen helper's result (0 for out-of-
  * range). Sibling of 021b2b08 (ov015_core.h). */
 extern int func_0208e220(void);
@@ -9,7 +9,7 @@ extern int func_0208e200(void);
 extern int func_0208e1ac(void);
 extern int func_0208e0a0(void);
 extern int func_0208df94(void);
-int func_ov015_021b2b80(int sel) {
+int Ov015_SelectVramBankSub(int sel) {
     switch (sel) {
     case 0:
         return func_0208e220();

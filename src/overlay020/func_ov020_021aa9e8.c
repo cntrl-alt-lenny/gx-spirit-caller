@@ -8,7 +8,7 @@ extern char data_ov020_021ae948[];
 extern int func_02006c0c(int arc, int mode, int z);
 extern void func_0201d47c(void *cfg);
 extern void func_0201e5b8(void *cfg);
-extern void func_02006e1c(int h);
+extern void Task_Invoke(int h);
 extern void func_020944a4(void *dst, void *src, int size);
 
 typedef struct {
@@ -34,6 +34,6 @@ void func_ov020_021aa9e8(void) {
     cfg.f10 = 0x180;
     cfg.f14 = cfg.f14 & ~0x10;
     func_0201e5b8(&cfg);
-    func_02006e1c(h);
+    Task_Invoke(h);
     func_020944a4((void *)0x5000180, data_ov020_021ae948, 0x20);
 }

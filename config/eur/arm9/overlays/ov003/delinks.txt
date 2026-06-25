@@ -60,7 +60,7 @@ src/overlay003/func_ov003_021cc8b8.s:
 src/overlay003/func_ov003_021cca88.s:
     complete
     .text start:0x021cca88 end:0x021ccd20
-src/overlay003/func_ov003_021ccd20.c:
+src/overlay003/Bg_FillTileRect.c:
     complete
     .text start:0x021ccd20 end:0x021ccd80
 

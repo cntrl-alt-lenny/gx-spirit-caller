@@ -1,4 +1,4 @@
-/* func_0208deec — VRAM bank base address derived from a VRAMCNT_x
+/* Vram_GetBankBaseE — VRAM bank base address derived from a VRAMCNT_x
  * MMIO register's OFS field. Returns the VRAM page address for the
  * configured slot.
  *
@@ -44,7 +44,7 @@
  * int is implementation-defined-as-arithmetic on mwccarm.
  *
  * Sibling picks shipping the same recipe (decomper followup):
- *   - func_0208df40: same shape, pool 0x04001008 (VRAMCNT_C/D)
+ *   - Vram_GetBankBaseCD: same shape, pool 0x04001008 (VRAMCNT_C/D)
  *   - func_0208e1ac: mask 0x1f00, asr #8, lsl #0xb, pool 0x0400100a
  *   - func_0208e200: same as e1ac with pool 0x04001008
  *
@@ -55,6 +55,6 @@
 
 #define VRAMCNT_E (*(volatile unsigned short *)0x0400100a)
 
-void *func_0208deec(void) {
+void *Vram_GetBankBaseE(void) {
     return (void *)((((VRAMCNT_E & 0x3c) >> 2) << 0xe) + 0x6200000);
 }

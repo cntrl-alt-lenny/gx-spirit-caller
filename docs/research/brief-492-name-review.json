@@ -1,0 +1,1232 @@
+{
+ "applied_high": {
+  "func_02006368": "Task_InvokeLockedIrq",
+  "func_02006e1c": "Task_Invoke",
+  "func_0200faf8": "List_Unlink",
+  "func_02018ba4": "SysWork_ClearField0x810",
+  "func_02018f2c": "SysWork_GetPointDistance",
+  "func_0202250c": "Rand_Next",
+  "func_0208deec": "Vram_GetBankBaseE",
+  "func_0208df40": "Vram_GetBankBaseCD",
+  "func_ov003_021ccd20": "Bg_FillTileRect",
+  "func_ov006_021b4ad8": "Ov006_FullInit",
+  "func_ov011_021cc948": "Bg_SetScroll",
+  "func_ov008_021aa50c": "Ov008_Rand",
+  "func_ov012_021cbf74": "Ov012_BeginIntroTransition",
+  "func_ov013_021ca294": "Ov013_GetPageCount",
+  "func_ov013_021ca5d4": "Ov013_SetBlendAlpha",
+  "func_ov013_021ca618": "Ov013_SlotToCell",
+  "func_ov013_021ca68c": "Ov013_SetPage",
+  "func_ov013_021cb644": "Ov013_InitGraphics",
+  "func_ov014_021b25b0": "Ov014_UpdatePanes",
+  "func_ov014_021b3440": "Ov014_HitTestPrimary",
+  "func_ov014_021b34f0": "Ov014_HitTestSecondary",
+  "func_ov015_021b238c": "Ov015_UpdateScrollTarget",
+  "func_ov015_021b2b08": "Ov015_SelectVramBank",
+  "func_ov015_021b2b80": "Ov015_SelectVramBankSub",
+  "func_ov015_021b2bf8": "Ov015_RegisterCallbacks",
+  "func_ov015_021b3028": "Ov015_DrawStatusFields",
+  "func_ov015_021b3170": "Ov015_InitScroller",
+  "func_ov021_021aa514": "Audio_Init",
+  "func_ov021_021aa908": "Scene_Update"
+ },
+ "review_med": [
+  {
+   "func": "func_020058b4",
+   "proposed_name": "Os_ClearVBlankFlag",
+   "reason": "IRQ-bracketed VBlank IE clear of flag"
+  },
+  {
+   "func": "func_02005bfc",
+   "proposed_name": "Task_PostByFlags",
+   "reason": "posts tasks per flag bits, stores handles"
+  },
+  {
+   "func": "func_02005c60",
+   "proposed_name": "Task_InvokeByKind",
+   "reason": "selects handle, tail-calls Task_InvokeLocked"
+  },
+  {
+   "func": "func_02006314",
+   "proposed_name": "Os_DisableIme",
+   "reason": "Clears REG_IME then tail-calls OS_DisableIrq"
+  },
+  {
+   "func": "func_02006334",
+   "proposed_name": "Task_PostLockedIrq",
+   "reason": "IRQ-bracketed Task_PostLocked wrapper, fixed args"
+  },
+  {
+   "func": "func_0200ad90",
+   "proposed_name": "Task_InvokeSlotAndClear",
+   "reason": "invokes task slot then clears it"
+  },
+  {
+   "func": "func_0200af08",
+   "proposed_name": "Task_TryInvoke",
+   "reason": "null-guarded Task_InvokeLocked wrapper returning success"
+  },
+  {
+   "func": "func_0200b06c",
+   "proposed_name": "Task_InvokeList",
+   "reason": "invokes each task in list then list/self"
+  },
+  {
+   "func": "func_0200bca8",
+   "proposed_name": "Task_AllocZeroed",
+   "reason": "alloc n*0x38 via Task_PostLocked, zero via Fill32"
+  },
+  {
+   "func": "func_0200bce4",
+   "proposed_name": "Task_AllocZeroed",
+   "reason": "alloc n*0x18 via Task_PostLocked, zero via Fill32"
+  },
+  {
+   "func": "func_0200bd20",
+   "proposed_name": "Task_AllocZeroed",
+   "reason": "alloc n*8 via Task_PostLocked, zero via Fill32"
+  },
+  {
+   "func": "func_0200bd58",
+   "proposed_name": "Task_AllocZeroed",
+   "reason": "alloc n*8 via Task_PostLocked, zero via Fill32"
+  },
+  {
+   "func": "func_0200c558",
+   "proposed_name": "Task_Cancel",
+   "reason": "invokes+clears task callback, clears active flag bit"
+  },
+  {
+   "func": "func_0200c824",
+   "proposed_name": "Task_SetSlotValue",
+   "reason": "lazy-alloc table via Task_PostLocked, store at index"
+  },
+  {
+   "func": "func_020115e0",
+   "proposed_name": "Mtx_InitTranslate",
+   "reason": "inits 3x3 fixed-point matrix with translation row"
+  },
+  {
+   "func": "func_02018a38",
+   "proposed_name": "SysWork_SetField0x8e8Bits11",
+   "reason": "bitfield insert into SysWork; exact field meaning unknown"
+  },
+  {
+   "func": "func_02018a64",
+   "proposed_name": "SysWork_ClearField0x8e8Bits11",
+   "reason": "bit-clear of same field; meaning of field unknown"
+  },
+  {
+   "func": "func_02018b34",
+   "proposed_name": "SysWork_SetHardTier",
+   "reason": "writes SysWork field 0x814, comment calls it hard-tier"
+  },
+  {
+   "func": "func_02018b48",
+   "proposed_name": "SysWork_GetHardTier",
+   "reason": "reads SysWork field 0x814, hard-tier getter"
+  },
+  {
+   "func": "func_02018b58",
+   "proposed_name": "SysWork_GetFlag0x8f8Bit16",
+   "reason": "extracts single flag bit from SysWork field"
+  },
+  {
+   "func": "func_02018b70",
+   "proposed_name": "SysWork_SetFlag0x8f8Bit15",
+   "reason": "inserts flag bit into SysWork field"
+  },
+  {
+   "func": "func_02018b94",
+   "proposed_name": "SysWork_GetField0x810Ptr",
+   "reason": "returns pointer to SysWork sub-struct at 0x810"
+  },
+  {
+   "func": "func_02018bc0",
+   "proposed_name": "SysWork_GetEntry",
+   "reason": "returns stride-0x18 indexed entry in SysWork block"
+  },
+  {
+   "func": "func_02018d98",
+   "proposed_name": "SysWork_GetEntryFlagBit1",
+   "reason": "reads bit1 of stride-24 SysWork entry field"
+  },
+  {
+   "func": "func_02018dcc",
+   "proposed_name": "SysWork_GetEntryFlagBit0",
+   "reason": "reads bit0 of stride-24 SysWork entry field"
+  },
+  {
+   "func": "func_02018f80",
+   "proposed_name": "SysWork_GetField0x91c",
+   "reason": "getter for SysWork field 0x91c"
+  },
+  {
+   "func": "func_02018f90",
+   "proposed_name": "SysWork_GetField0x920",
+   "reason": "getter for SysWork field 0x920"
+  },
+  {
+   "func": "func_02018fa0",
+   "proposed_name": "SysWork_AddField0x91c",
+   "reason": "read-modify-write add into SysWork field 0x91c"
+  },
+  {
+   "func": "func_02019034",
+   "proposed_name": "SysWork_GetField0x8d4Low16",
+   "reason": "extracts low u16 from SysWork field 0x8d4"
+  },
+  {
+   "func": "func_0201abb0",
+   "proposed_name": "SysWork_SetFlag",
+   "reason": "sets 1-indexed bit in flag word 0x8fc"
+  },
+  {
+   "func": "func_0201abd4",
+   "proposed_name": "SysWork_ClearFlag",
+   "reason": "clears 1-indexed bit in flag word 0x8fc"
+  },
+  {
+   "func": "func_0201abfc",
+   "proposed_name": "SysWork_TestFlag",
+   "reason": "tests 1-indexed bit in flag word 0x8fc"
+  },
+  {
+   "func": "func_0201b730",
+   "proposed_name": "SystemWork_ClearFlags",
+   "reason": "clears flag bits in system-work +0x8f4; field opaque"
+  },
+  {
+   "func": "func_0201b75c",
+   "proposed_name": "SystemWork_GetFlagWord",
+   "reason": "returns &systemwork[0x8f4]; same field as ClearFlags"
+  },
+  {
+   "func": "func_0201b7fc",
+   "proposed_name": "SystemWork_ResetFlags",
+   "reason": "multi-field reset/clear of system-work struct"
+  },
+  {
+   "func": "func_0201ef3c",
+   "proposed_name": "Task_InvokeAll",
+   "reason": "loops invoking Task_InvokeLocked over two task arrays"
+  },
+  {
+   "func": "func_0202b0b4",
+   "proposed_name": "Card_GetTableEntry",
+   "reason": "card-ID to u16 table lookup with reserved-range sentinel"
+  },
+  {
+   "func": "func_0202b31c",
+   "proposed_name": "Card_GetEntry",
+   "reason": "returns pointer to card entry via id lookup"
+  },
+  {
+   "func": "func_0202b33c",
+   "proposed_name": "Card_GetTableCValue",
+   "reason": "returns table_c[lookup(id)]; module Card inferred from card_ctx"
+  },
+  {
+   "func": "func_0202b6b4",
+   "proposed_name": "Card_GetAttrF",
+   "reason": "returns card entry bitfield attr_f"
+  },
+  {
+   "func": "func_0202b6cc",
+   "proposed_name": "Card_GetAttrG",
+   "reason": "returns card entry bitfield attr_g"
+  },
+  {
+   "func": "func_0202b7cc",
+   "proposed_name": "Card_GetStringOffset",
+   "reason": "base+table[idx] into card string blob"
+  },
+  {
+   "func": "func_0202b878",
+   "proposed_name": "Card_GetAttrE",
+   "reason": "returns card entry bitfield attr_e"
+  },
+  {
+   "func": "func_0202b890",
+   "proposed_name": "Card_GetAttrB",
+   "reason": "returns card entry bitfield attr_b"
+  },
+  {
+   "func": "func_0202b8a8",
+   "proposed_name": "Card_GetAttrC",
+   "reason": "returns card entry bitfield attr_c"
+  },
+  {
+   "func": "func_0202b8c0",
+   "proposed_name": "Card_GetAttrD",
+   "reason": "returns card entry bitfield attr_d"
+  },
+  {
+   "func": "func_0202b8d8",
+   "proposed_name": "Card_GetAttrA",
+   "reason": "returns card entry bitfield attr_a"
+  },
+  {
+   "func": "func_0202c1ac",
+   "proposed_name": "Task_InvokePending",
+   "reason": "Invokes+clears two pending Task callback slots"
+  },
+  {
+   "func": "func_0202c44c",
+   "proposed_name": "Card_GetTableEntry",
+   "reason": "indexed table read on card ctx; Card from comment, verb Get"
+  },
+  {
+   "func": "func_0202c4b4",
+   "proposed_name": "Task_InvokeAndClearSlot",
+   "reason": "invokes locked task handle then clears slot; Task module"
+  },
+  {
+   "func": "func_020318a4",
+   "proposed_name": "List_InitHead",
+   "reason": "Inits circular list head (prev=next=self)"
+  },
+  {
+   "func": "func_02031a70",
+   "proposed_name": "List_ForEach",
+   "reason": "Walks list calling func on each node"
+  },
+  {
+   "func": "func_02031b74",
+   "proposed_name": "List_PushFront",
+   "reason": "Pushes node onto head of global list"
+  },
+  {
+   "func": "func_020324c0",
+   "proposed_name": "Ring_Advance",
+   "reason": "IRQ-bracketed circular buffer head advance"
+  },
+  {
+   "func": "func_02034194",
+   "proposed_name": "Task_Post",
+   "reason": "thunk forwarding to Task_PostLocked"
+  },
+  {
+   "func": "func_020341a4",
+   "proposed_name": "Task_Invoke",
+   "reason": "pass-through thunk to Task_InvokeLocked"
+  },
+  {
+   "func": "func_0203459c",
+   "proposed_name": "Task_Post",
+   "reason": "thunk forwarding to Task_PostLocked"
+  },
+  {
+   "func": "func_020345ac",
+   "proposed_name": "Task_InvokeSafe",
+   "reason": "null-checked wrapper around Task_InvokeLocked"
+  },
+  {
+   "func": "func_02034a38",
+   "proposed_name": "Task_Post",
+   "reason": "thunk forwarding to Task_PostLocked"
+  },
+  {
+   "func": "func_02037c54",
+   "proposed_name": "Anim_SetTargetByIndex",
+   "reason": "sets linear-anim target/frames/step in table; module guessed"
+  },
+  {
+   "func": "func_020386f4",
+   "proposed_name": "Anim_StartRamp",
+   "reason": "computes signed linear-anim ramp step; module guessed"
+  },
+  {
+   "func": "func_0203874c",
+   "proposed_name": "Anim_StartRampShort",
+   "reason": "short-struct variant of anim ramp start"
+  },
+  {
+   "func": "func_0203c5a4",
+   "proposed_name": "Anim_SetLinearRamp",
+   "reason": "sets interp target/frames/step; module a guess"
+  },
+  {
+   "func": "func_0203c5e4",
+   "proposed_name": "Anim_SetLinearRamp",
+   "reason": "linear interp ramp setup via Div; module guessed"
+  },
+  {
+   "func": "func_02068424",
+   "proposed_name": "List_PushFront",
+   "reason": "singly-linked-list head push with count; module unknown"
+  },
+  {
+   "func": "func_0206844c",
+   "proposed_name": "List_Append",
+   "reason": "tail-list append with count; module unknown"
+  },
+  {
+   "func": "func_0206e580",
+   "proposed_name": "List_InsertHead",
+   "reason": "clear list insert-at-head; module is a guess"
+  },
+  {
+   "func": "func_0208c428",
+   "proposed_name": "Vec3i_Sub",
+   "reason": "3-component integer vector subtract; module name guessed"
+  },
+  {
+   "func": "func_0208c45c",
+   "proposed_name": "Vec3i_Add",
+   "reason": "3-component integer vector add; module name guessed"
+  },
+  {
+   "func": "func_02090844",
+   "proposed_name": "OS_ResetIrqCheckBuf",
+   "reason": "Clears two fields of OSi_IrqCheckBuf"
+  },
+  {
+   "func": "func_020a6d48",
+   "proposed_name": "Math_Abs",
+   "reason": "integer absolute value; module guessed"
+  },
+  {
+   "func": "func_020a991c",
+   "proposed_name": "Rand_Next",
+   "reason": "glibc LCG PRNG; module name guessed"
+  },
+  {
+   "func": "func_020aaddc",
+   "proposed_name": "Str_Len",
+   "reason": "byte strlen; module name guessed"
+  },
+  {
+   "func": "func_020aee3c",
+   "proposed_name": "Str_LenWide",
+   "reason": "u16 wide strlen; module guessed"
+  },
+  {
+   "func": "func_ov000_021aca28",
+   "proposed_name": "Ov000_DispatchReadyTask",
+   "reason": "builds records, Task_InvokeLocked, clears task+ready bit"
+  },
+  {
+   "func": "func_ov000_021acaac",
+   "proposed_name": "Ov000_FlushDeferredHandle",
+   "reason": "flushes live handle, clears handle+aux slots"
+  },
+  {
+   "func": "func_ov000_021ad3e8",
+   "proposed_name": "Ov000_RefreshSubDisplay",
+   "reason": "runs callback or rebuilds VRAM, marks ready"
+  },
+  {
+   "func": "func_ov000_021adb9c",
+   "proposed_name": "Ov000_ClearVramRegionA",
+   "reason": "clears 1152-byte VRAM region by mode flag"
+  },
+  {
+   "func": "func_ov000_021adbdc",
+   "proposed_name": "Ov000_ClearVramRegionB",
+   "reason": "clears 6144-byte VRAM region by mode flag"
+  },
+  {
+   "func": "func_ov000_021aecf8",
+   "proposed_name": "Ov000_IsIdle",
+   "reason": "returns 1 if subsystem query reports idle"
+  },
+  {
+   "func": "func_02099298",
+   "proposed_name": "MD5_InitState",
+   "reason": "writes canonical MD5 init constants into context"
+  },
+  {
+   "func": "func_021d2ca8",
+   "proposed_name": "Task_SetState",
+   "reason": "task-state setter invoking Task_InvokeLocked; module clear, verb reasonable"
+  },
+  {
+   "func": "func_ov002_021b009c",
+   "proposed_name": "Ov002_Rand",
+   "reason": "clear MSVC LCG rand; module name guessed"
+  },
+  {
+   "func": "func_ov002_021b00d0",
+   "proposed_name": "Ov002_RandScale",
+   "reason": "x*rand()>>15 fixed-point scale; module guessed"
+  },
+  {
+   "func": "func_ov002_02248f60",
+   "proposed_name": "Ov002_PostMatchingTypeCandidate",
+   "reason": "posts kind-11 candidate if card type matches arg"
+  },
+  {
+   "func": "func_ov002_0224915c",
+   "proposed_name": "Ov002_PostType1Candidate",
+   "reason": "posts kind-11 candidate for type-1 cards"
+  },
+  {
+   "func": "func_ov002_0224bae8",
+   "proposed_name": "Ov002_PostType2Candidate",
+   "reason": "posts kind-11 candidate for type-2 cards"
+  },
+  {
+   "func": "func_ov002_0224cd9c",
+   "proposed_name": "Ov002_PostType18Candidate",
+   "reason": "posts kind-11 candidate for type-18 cards"
+  },
+  {
+   "func": "func_ov002_0224d718",
+   "proposed_name": "Ov002_PostType9Candidate",
+   "reason": "posts kind-11 candidate for type-9 cards"
+  },
+  {
+   "func": "func_ov002_0228dda8",
+   "proposed_name": "Ov002_GetSlotId",
+   "reason": "Reads Ov002Slot.id for player slot, dispatches"
+  },
+  {
+   "func": "func_ov003_021ca0c8",
+   "proposed_name": "Scene_Teardown",
+   "reason": "Comment: scene teardown, disable channel pairs"
+  },
+  {
+   "func": "func_ov003_021ca10c",
+   "proposed_name": "Scene_TeardownFull",
+   "reason": "Comment: full scene teardown, blank engines, reset regs"
+  },
+  {
+   "func": "func_ov003_021ca1fc",
+   "proposed_name": "Scene_DispatchStep",
+   "reason": "State-indexed callback dispatch advancing state"
+  },
+  {
+   "func": "func_ov003_021ca254",
+   "proposed_name": "Gx_PushCellStreams",
+   "reason": "Pushes four cell streams to GX FIFO"
+  },
+  {
+   "func": "func_ov003_021ccd80",
+   "proposed_name": "Layout_GetCell",
+   "reason": "Looks up active layout cell record by selector"
+  },
+  {
+   "func": "func_ov003_021ccdb8",
+   "proposed_name": "Layout_GetCell2",
+   "reason": "Sibling layout cell lookup, different tables"
+  },
+  {
+   "func": "func_ov003_021ccdf0",
+   "proposed_name": "Cursor_LoadGlyph",
+   "reason": "Comment: load cursor glyph for slot"
+  },
+  {
+   "func": "func_ov003_021cce58",
+   "proposed_name": "Ov003_IsTransitionReady",
+   "reason": "Gates transition on step counter; module guessed from overlay"
+  },
+  {
+   "func": "func_ov003_021ceeb4",
+   "proposed_name": "Ov003_PollTouchGesture",
+   "reason": "Polls touch UI, decodes gesture, applies to scene"
+  },
+  {
+   "func": "func_ov003_021cef78",
+   "proposed_name": "Ov003_PostButtonEvent",
+   "reason": "Queues press/release button packet to input subsystem"
+  },
+  {
+   "func": "func_ov003_021cefec",
+   "proposed_name": "Ov003_HitTestRect",
+   "reason": "Hit-tests touch point against widget rect"
+  },
+  {
+   "func": "func_ov003_021cf064",
+   "proposed_name": "Ov003_HitTestRect2",
+   "reason": "Second hit-test variant, different input source"
+  },
+  {
+   "func": "func_ov004_021c9d60",
+   "proposed_name": "Ov004_PlayVoice",
+   "reason": "Plays voice/se by index, base id 1601"
+  },
+  {
+   "func": "func_ov004_021c9f94",
+   "proposed_name": "Ov004_FreeHandles",
+   "reason": "Releases and clears two pending handles"
+  },
+  {
+   "func": "func_ov004_021cbf38",
+   "proposed_name": "Ov004_SetCurrentId",
+   "reason": "Latches new current-id, fires change handler"
+  },
+  {
+   "func": "func_ov004_021cbf84",
+   "proposed_name": "Ov004_DrawPanel",
+   "reason": "Lays out panel, frame, caption"
+  },
+  {
+   "func": "func_ov004_021cc74c",
+   "proposed_name": "Ov004_SnapshotRecord",
+   "reason": "Copies active record payload, returns liveness"
+  },
+  {
+   "func": "func_ov004_021ce9e4",
+   "proposed_name": "Ov004_SetCursor",
+   "reason": "Sets active cursor, broadcasts status packet"
+  },
+  {
+   "func": "func_ov004_021cea48",
+   "proposed_name": "Ov004_ConfirmCursor",
+   "reason": "Confirms/cancels active cursor with broadcast"
+  },
+  {
+   "func": "func_ov004_021ceb24",
+   "proposed_name": "Ov004_CancelCursor",
+   "reason": "Clears flag, broadcasts cursor status packet"
+  },
+  {
+   "func": "func_ov005_021aee84",
+   "proposed_name": "Ov005_HitTestRect",
+   "reason": "cursor/touch point-in-rect hit test"
+  },
+  {
+   "func": "func_ov005_021aeefc",
+   "proposed_name": "Ov005_HitTestRectSub",
+   "reason": "second-engine variant of point-in-rect hit test"
+  },
+  {
+   "func": "func_ov006_021b2280",
+   "proposed_name": "Ov006_DispatchState",
+   "reason": "indexes callback table by state, invokes handler"
+  },
+  {
+   "func": "func_ov006_021b22c8",
+   "proposed_name": "Ov006_DispatchStateStep",
+   "reason": "per-state dispatch with no-handler deferred tail"
+  },
+  {
+   "func": "func_ov006_021b26e0",
+   "proposed_name": "Ov006_EnterState4",
+   "reason": "init sequence then sets state word to 4"
+  },
+  {
+   "func": "func_ov006_021b2804",
+   "proposed_name": "Ov006_EnterState3",
+   "reason": "probes subsystems, setup, marks state ready 3"
+  },
+  {
+   "func": "func_ov006_021b287c",
+   "proposed_name": "Ov006_EnterState7",
+   "reason": "init sequence then sets state word to 7"
+  },
+  {
+   "func": "func_ov006_021b2970",
+   "proposed_name": "Ov006_EnterState6",
+   "reason": "guarded setup then sets state to 6"
+  },
+  {
+   "func": "func_ov006_021b2cbc",
+   "proposed_name": "Ov006_EnterState16",
+   "reason": "setup sequence then sets state word to 16"
+  },
+  {
+   "func": "func_ov006_021b2d5c",
+   "proposed_name": "Ov006_TeardownState5",
+   "reason": "teardown sequence then sets state to 5"
+  },
+  {
+   "func": "func_ov006_021b2de0",
+   "proposed_name": "Ov006_EnterStateF",
+   "reason": "probes subsystems, setup, marks state ready 0xf"
+  },
+  {
+   "func": "func_ov006_021b3d60",
+   "proposed_name": "Ov006_BlankDisplayAndUpdate",
+   "reason": "clears DISPCNT mode bits, runs frame update, optional teardown"
+  },
+  {
+   "func": "func_ov006_021b3e20",
+   "proposed_name": "Ov006_StateEnter",
+   "reason": "per-state enter: full-init then subobject setup, advances state"
+  },
+  {
+   "func": "func_ov006_021b3ea0",
+   "proposed_name": "Ov006_StateStep",
+   "reason": "per-state step: subobject updates then advance state"
+  },
+  {
+   "func": "func_ov006_021b3f10",
+   "proposed_name": "Ov006_StateEnterProbe",
+   "reason": "enter probing two subsystems, marks ready on success"
+  },
+  {
+   "func": "func_ov006_021b3f88",
+   "proposed_name": "Ov006_DispatchStateCallback",
+   "reason": "resets word then dispatches per-state callback table"
+  },
+  {
+   "func": "func_ov006_021b3fd8",
+   "proposed_name": "Ov006_DispatchStateCallback",
+   "reason": "callback dispatch variant, publishes state and posts event"
+  },
+  {
+   "func": "func_ov006_021b4048",
+   "proposed_name": "Ov006_DispatchStateCallback",
+   "reason": "callback dispatch variant kicking step-2 transition"
+  },
+  {
+   "func": "func_ov006_021b45f8",
+   "proposed_name": "Ov006_BlankDisplayAndUpdate",
+   "reason": "clears DISPCNT mode bits, frame update, optional teardown"
+  },
+  {
+   "func": "func_ov006_021b46b8",
+   "proposed_name": "Ov006_StateEnter",
+   "reason": "per-state enter: full-init, subsystem handoff, advance state"
+  },
+  {
+   "func": "func_ov006_021b4818",
+   "proposed_name": "Ov006_StateInit",
+   "reason": "init sequence: full-init, register nodes, seed state"
+  },
+  {
+   "func": "func_ov006_021b48b8",
+   "proposed_name": "Ov006_StateInit",
+   "reason": "9-step subsystem init sequence seeding shared state"
+  },
+  {
+   "func": "func_ov006_021b493c",
+   "proposed_name": "Ov006_StateEnterProbe",
+   "reason": "enter probing two subsystems, marks ready on success"
+  },
+  {
+   "func": "func_ov006_021b49b4",
+   "proposed_name": "Ov006_DispatchStateCallback",
+   "reason": "dispatches per-state callback table, clears flag"
+  },
+  {
+   "func": "func_ov006_021b4db8",
+   "proposed_name": "Ov006_StateEnter",
+   "reason": "per-state enter: full-init then subobject setup, advances state"
+  },
+  {
+   "func": "func_ov006_021b4e38",
+   "proposed_name": "Ov006_StateStep",
+   "reason": "per-state step: subobject updates then blank, advances state"
+  },
+  {
+   "func": "func_ov006_021b4ea8",
+   "proposed_name": "Ov006_StateEnterProbe",
+   "reason": "enter: probes two subsystems, sets status if both ok"
+  },
+  {
+   "func": "func_ov006_021b5074",
+   "proposed_name": "Ov006_InitSequence",
+   "reason": "runs fixed 6-step init sequence, sets state word"
+  },
+  {
+   "func": "func_ov006_021b50b0",
+   "proposed_name": "Ov006_FullInit",
+   "reason": "full-init family member; same as 021b4ad8 different struct"
+  },
+  {
+   "func": "func_ov006_021b52d0",
+   "proposed_name": "Ov006_BlankDisplay",
+   "reason": "blank-display family member, different per-state struct"
+  },
+  {
+   "func": "func_ov006_021b5390",
+   "proposed_name": "Ov006_StateEnter",
+   "reason": "per-state enter: full-init plus subsystem setup, advances state"
+  },
+  {
+   "func": "func_ov006_021b5490",
+   "proposed_name": "Ov006_StateEnter",
+   "reason": "enter: full-init, register node, 7-step init, seeds state"
+  },
+  {
+   "func": "func_ov006_021b5524",
+   "proposed_name": "Ov006_InitSequence",
+   "reason": "fixed 8-step subsystem init, seeds state words"
+  },
+  {
+   "func": "func_ov006_021b559c",
+   "proposed_name": "Ov006_StateEnterProbe",
+   "reason": "enter: probes two subsystems, sets ready status if both ok"
+  },
+  {
+   "func": "func_ov006_021b565c",
+   "proposed_name": "Ov006_NotifyMode",
+   "reason": "notifies four subsystems of current 3-bit mode, seeds state"
+  },
+  {
+   "func": "func_ov006_021b56d8",
+   "proposed_name": "Ov006_InitSequence",
+   "reason": "runs four void sub-inits, sets state word"
+  },
+  {
+   "func": "func_ov006_021b5924",
+   "proposed_name": "Ov006_BlankDisplay",
+   "reason": "blank-display family member, different per-state struct"
+  },
+  {
+   "func": "func_ov006_021bd864",
+   "proposed_name": "Ov006_ClampObjField19",
+   "reason": "Clamps obj[19] to range, returns whether clamped; module guessed"
+  },
+  {
+   "func": "func_ov006_021bee68",
+   "proposed_name": "Ov006_ToggleSubDispMode",
+   "reason": "Toggles sub-engine DISPCNT mode bit; one of family"
+  },
+  {
+   "func": "func_ov006_021bf454",
+   "proposed_name": "Ov006_DrawText",
+   "reason": "Text-layout family: clears buffer, emits glyph at x"
+  },
+  {
+   "func": "func_ov006_021c12fc",
+   "proposed_name": "Ov006_SubmitCommandRecord",
+   "reason": "Builds+submits command record or clears region"
+  },
+  {
+   "func": "func_ov006_021c155c",
+   "proposed_name": "Ov006_InitState",
+   "reason": "Fill32-zeroes then inits struct fields, returns 1"
+  },
+  {
+   "func": "func_ov006_021c1680",
+   "proposed_name": "Ov006_CreateResource",
+   "reason": "Creates resource, advances state, posts mode, configures"
+  },
+  {
+   "func": "func_ov006_021c16d8",
+   "proposed_name": "Ov006_ConfigureDisplay",
+   "reason": "Configures display reg, submits command record, releases handle"
+  },
+  {
+   "func": "func_ov006_021c1770",
+   "proposed_name": "Ov006_ToggleMainDispMode",
+   "reason": "Toggles main-engine DISPCNT mode bit; family member"
+  },
+  {
+   "func": "func_ov006_021c5084",
+   "proposed_name": "Ov006_Reset",
+   "reason": "Clears buffer, resets slots, stores handle, hands to builder"
+  },
+  {
+   "func": "func_ov009_021ab848",
+   "proposed_name": "Scene_Init",
+   "reason": "Comment: construct/reset scene controller"
+  },
+  {
+   "func": "func_ov009_021ad6bc",
+   "proposed_name": "Scene_Step",
+   "reason": "Per-frame step of scene sub-objects"
+  },
+  {
+   "func": "func_ov009_021ad73c",
+   "proposed_name": "Scene_Exit",
+   "reason": "Comment: scene-exit teardown"
+  },
+  {
+   "func": "func_ov010_021b2df8",
+   "proposed_name": "Task_Invoke",
+   "reason": "Builds and invokes task via Task_InvokeLocked"
+  },
+  {
+   "func": "func_ov010_021b36e4",
+   "proposed_name": "ScrollWindow_SetGeometry",
+   "reason": "loads window x/y/w/h and row count per comment"
+  },
+  {
+   "func": "func_ov010_021b3734",
+   "proposed_name": "ScrollWindow_ClampPosition",
+   "reason": "clamps scroll position values into struct per comment"
+  },
+  {
+   "func": "func_ov010_021b39c0",
+   "proposed_name": "ScrollWindow_ScrollDown",
+   "reason": "if not at last row, mark dirty, return 1"
+  },
+  {
+   "func": "func_ov010_021b3c58",
+   "proposed_name": "MessageWindow_Open",
+   "reason": "comment: (re)open message window per-mode opener"
+  },
+  {
+   "func": "func_ov010_021b3ce4",
+   "proposed_name": "MessageWindow_UpdateFade",
+   "reason": "steps message window fade toward zero per comment"
+  },
+  {
+   "func": "func_ov011_021ca324",
+   "proposed_name": "View_CreateMainTask",
+   "reason": "tears down and respawns view main task, caches handle"
+  },
+  {
+   "func": "func_ov011_021cbb64",
+   "proposed_name": "Cell_Configure",
+   "reason": "configures cell handle, optional retag, reset+release"
+  },
+  {
+   "func": "func_ov011_021cc250",
+   "proposed_name": "View_FreeHandles",
+   "reason": "frees two state-struct handles via release call"
+  },
+  {
+   "func": "func_ov011_021cc344",
+   "proposed_name": "View_FreeHandle",
+   "reason": "guarded free of single handle"
+  },
+  {
+   "func": "func_ov011_021cc374",
+   "proposed_name": "Actor_FindActive",
+   "reason": "scans actor table, returns first matching entry"
+  },
+  {
+   "func": "func_ov011_021cc3d4",
+   "proposed_name": "Actor_ResetAll",
+   "reason": "resets all actor-table entries then clears flag"
+  },
+  {
+   "func": "func_ov011_021cc424",
+   "proposed_name": "Cell_Configure",
+   "reason": "reconfigures cell handle, retag, reset+release"
+  },
+  {
+   "func": "func_ov011_021cc5c4",
+   "proposed_name": "Cell_Configure",
+   "reason": "sibling cell config over other handle table"
+  },
+  {
+   "func": "func_ov011_021cc8bc",
+   "proposed_name": "Cell_RebuildStatus",
+   "reason": "rebuilds current player status cell, reset+config+release"
+  },
+  {
+   "func": "func_ov011_021cc9b4",
+   "proposed_name": "View_CopyCoordBlock",
+   "reason": "mode-selected copy of 3-word coord block"
+  },
+  {
+   "func": "func_ov006_021b2e58",
+   "proposed_name": "Ov006_DispatchState",
+   "reason": "per-state callback dispatch; module ov006 only, generic name"
+  },
+  {
+   "func": "func_ov006_021b2eac",
+   "proposed_name": "Ov006_AudioInit",
+   "reason": "opens sound bank, programs channel, marks ready; verb clear"
+  },
+  {
+   "func": "func_ov006_021b2f70",
+   "proposed_name": "Ov006_Finalize",
+   "reason": "teardown handle plus four shutdown calls, parks done state"
+  },
+  {
+   "func": "func_ov006_021b2fb0",
+   "proposed_name": "Ov006_FullInit",
+   "reason": "binds VRAM banks, resets engines, arms IRQs"
+  },
+  {
+   "func": "func_ov006_021b31d0",
+   "proposed_name": "Ov006_BlankDisplay",
+   "reason": "clears DISPCNT mode bits, frame update, optional teardown"
+  },
+  {
+   "func": "func_ov006_021b3290",
+   "proposed_name": "Ov006_EnterState",
+   "reason": "full-init then six subobject inits, seeds state"
+  },
+  {
+   "func": "func_ov006_021b33c4",
+   "proposed_name": "Ov006_EnterState",
+   "reason": "probe two subsystems, setup pass, mark ready=3"
+  },
+  {
+   "func": "func_ov006_021b343c",
+   "proposed_name": "Ov006_DispatchState",
+   "reason": "per-state callback dispatch with no-handler tail"
+  },
+  {
+   "func": "func_ov006_021b3498",
+   "proposed_name": "Ov006_AudioInit",
+   "reason": "channel-gated audio init, sibling of 021b2eac"
+  },
+  {
+   "func": "func_ov006_021b355c",
+   "proposed_name": "Ov006_Finalize",
+   "reason": "finalize family, teardown plus four shutdown calls"
+  },
+  {
+   "func": "func_ov006_021b359c",
+   "proposed_name": "Ov006_FullInit",
+   "reason": "full-init family, VRAM banks and IRQ setup"
+  },
+  {
+   "func": "func_ov006_021b37bc",
+   "proposed_name": "Ov006_BlankDisplay",
+   "reason": "blank both engines, frame update, optional teardown"
+  },
+  {
+   "func": "func_ov006_021b387c",
+   "proposed_name": "Ov006_EnterState",
+   "reason": "full-init then seven subobject setups, advance state"
+  },
+  {
+   "func": "func_ov006_021b39a4",
+   "proposed_name": "Ov006_EnterState",
+   "reason": "probe two subsystems, setup pass, ready=3"
+  },
+  {
+   "func": "func_ov006_021b3a1c",
+   "proposed_name": "Ov006_DispatchState",
+   "reason": "per-state callback dispatch, clears flag"
+  },
+  {
+   "func": "func_ov006_021b3a64",
+   "proposed_name": "Ov006_AudioInit",
+   "reason": "audio init, opens bank, programs channel, ready=2"
+  },
+  {
+   "func": "func_ov006_021b3b08",
+   "proposed_name": "Ov006_Finalize",
+   "reason": "teardown plus four shutdown calls, state=5"
+  },
+  {
+   "func": "func_ov006_021b3b40",
+   "proposed_name": "Ov006_FullInit",
+   "reason": "full-init family, VRAM banks and IRQ setup"
+  },
+  {
+   "func": "func_ov007_021b24a4",
+   "proposed_name": "Ov007_Teardown",
+   "reason": "releases blocks, stops sound, shuts down subsystem"
+  },
+  {
+   "func": "func_ov007_021b24e0",
+   "proposed_name": "Ov007_Close",
+   "reason": "closes both panes, tears down, reports success"
+  },
+  {
+   "func": "func_ov007_021b2920",
+   "proposed_name": "Ov007_SetupBoardBg",
+   "reason": "programs sub-screen BG3 BGCNT, loads font/palette"
+  },
+  {
+   "func": "func_ov007_021b2b74",
+   "proposed_name": "Ov007_LoadCell",
+   "reason": "loads cell descriptor into OBJ/OAM cell"
+  },
+  {
+   "func": "func_ov007_021b2c58",
+   "proposed_name": "Ov007_OpenCell",
+   "reason": "opens cell slot with colour and tag"
+  },
+  {
+   "func": "func_ov007_021b2d0c",
+   "proposed_name": "Ov007_InitControlBlock",
+   "reason": "opens data file, primes subsystem, resets cursor"
+  },
+  {
+   "func": "func_ov008_021aeeac",
+   "proposed_name": "Ov008_InitPanel",
+   "reason": "opens data file, primes subsystem, sets cursors"
+  },
+  {
+   "func": "func_ov011_021d2f50",
+   "proposed_name": "Task_Invoke",
+   "reason": "invokes Task_InvokeLocked and clears handle; Task module clear"
+  },
+  {
+   "func": "func_ov012_021ca2a0",
+   "proposed_name": "Task_Respawn",
+   "reason": "tears down and respawns overlay main task"
+  },
+  {
+   "func": "func_ov012_021ca3fc",
+   "proposed_name": "Panel_SetVisible",
+   "reason": "open/close panel transition by show flag"
+  },
+  {
+   "func": "func_ov012_021cbeb4",
+   "proposed_name": "Gfx_Init",
+   "reason": "brings overlay graphics up; VRAM/engine init"
+  },
+  {
+   "func": "func_ov015_021b235c",
+   "proposed_name": "Ov015_Reset",
+   "reason": "Fill32 clears state, forwards, zeroes self"
+  },
+  {
+   "func": "func_ov015_021b2450",
+   "proposed_name": "Ov015_SetScrollRange",
+   "reason": "stores bounds then updates scroll target"
+  },
+  {
+   "func": "func_ov015_021b2db8",
+   "proposed_name": "Ov015_ClearBankRegion",
+   "reason": "Fill32 zeroes a VRAM bank sub-region"
+  },
+  {
+   "func": "func_ov015_021b3528",
+   "proposed_name": "Text_ConfigurePrinter",
+   "reason": "configures text printer palette and glyph, module guessed"
+  },
+  {
+   "func": "func_ov015_021b3578",
+   "proposed_name": "Text_OpenPrinters",
+   "reason": "builds two printer handles, verb clear module guess"
+  },
+  {
+   "func": "func_ov015_021b3614",
+   "proposed_name": "Glyph_Draw",
+   "reason": "draws cell glyph returns advance, module guessed"
+  },
+  {
+   "func": "func_ov015_021b36c4",
+   "proposed_name": "Text_GetRunWidth",
+   "reason": "computes pixel width of run, module guessed"
+  },
+  {
+   "func": "func_ov015_021b46c8",
+   "proposed_name": "Fade_TickIn",
+   "reason": "ticks fade-in master brightness, returns done"
+  },
+  {
+   "func": "func_ov015_021b4740",
+   "proposed_name": "Fade_TickOut",
+   "reason": "ticks fade-out master brightness, returns done"
+  },
+  {
+   "func": "func_ov015_021b59a4",
+   "proposed_name": "Text_Teardown",
+   "reason": "tears down text job, frees handles/buffers"
+  },
+  {
+   "func": "func_ov016_021b3498",
+   "proposed_name": "Sprite_DrawCell",
+   "reason": "binds and builds sprite cell object, module guessed"
+  },
+  {
+   "func": "func_ov016_021b5a28",
+   "proposed_name": "Disp_DisableSubBg01",
+   "reason": "Disables sub-engine BG0/BG1 via DISPCNT, resets scroll"
+  },
+  {
+   "func": "func_ov017_021b2ce4",
+   "proposed_name": "Touch_HitTestRect",
+   "reason": "Returns pen-down inside rect hit-test"
+  },
+  {
+   "func": "func_ov017_021b63ec",
+   "proposed_name": "Menu_HitTestRows",
+   "reason": "Hit-tests touch point against menu rows; module guess."
+  },
+  {
+   "func": "func_ov017_021b7330",
+   "proposed_name": "Scene_DispatchInput",
+   "reason": "Dispatches pending input events to guarded handlers; module guess."
+  },
+  {
+   "func": "func_ov019_021b2728",
+   "proposed_name": "Touch_IsPointInRect",
+   "reason": "pen-down point-in-rect hit-test; module guessed"
+  },
+  {
+   "func": "func_ov019_021b27a0",
+   "proposed_name": "Touch_IsPointInRectAlt",
+   "reason": "secondary-pointer point-in-rect hit-test; module guessed"
+  },
+  {
+   "func": "func_ov020_021aa7ac",
+   "proposed_name": "Touch_IsPointInRect",
+   "reason": "touch point-in-rect test; module guessed"
+  },
+  {
+   "func": "func_ov020_021aac78",
+   "proposed_name": "Bg_LoadAndCommit",
+   "reason": "Loads archive entry, sets BG control, commits, frees"
+  },
+  {
+   "func": "func_ov021_021aa7d8",
+   "proposed_name": "Scene_BlankDisplay",
+   "reason": "Clears DISPCNT display bits both engines, per-frame update"
+  },
+  {
+   "func": "func_ov021_021aa898",
+   "proposed_name": "State_EnterFullInit",
+   "reason": "Per-state enter; inits subobjects, advances state to 4"
+  },
+  {
+   "func": "func_ov021_021aa8d4",
+   "proposed_name": "State_Enter",
+   "reason": "Per-state enter; inits subobjects, advances state to 1"
+  },
+  {
+   "func": "func_ov021_021aaadc",
+   "proposed_name": "Layout_Build",
+   "reason": "Builds layout object, opens render stream, seeds geometry"
+  },
+  {
+   "func": "func_ov021_021aad5c",
+   "proposed_name": "Layout_SetBg3Visible",
+   "reason": "Sets/clears sub-engine BG3 display bit per flag"
+  },
+  {
+   "func": "func_ov021_021abb40",
+   "proposed_name": "Rand_Next",
+   "reason": "MSVC LCG advancing seed at s[21], returns 15-bit"
+  }
+ ],
+ "review_collisions": [
+  {
+   "func": "func_ov006_021b2324",
+   "proposed_name": "Ov006_InitAudio",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b2400",
+   "proposed_name": "Ov006_InitDisplay",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b2620",
+   "proposed_name": "Ov006_BlankDisplay",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b43d8",
+   "proposed_name": "Ov006_InitDisplay",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b49fc",
+   "proposed_name": "Ov006_InitAudio",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b4cf8",
+   "proposed_name": "Ov006_BlankDisplay",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b4f20",
+   "proposed_name": "Ov006_DispatchCallback",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov006_021b5614",
+   "proposed_name": "Ov006_DispatchCallback",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov008_021aa4a0",
+   "proposed_name": "Bit_PopCount",
+   "note": "clone-family collision (proposed for >1 func)"
+  },
+  {
+   "func": "func_ov017_021b2280",
+   "proposed_name": "Bit_PopCount",
+   "note": "clone-family collision (proposed for >1 func)"
+  }
+ ]
+}

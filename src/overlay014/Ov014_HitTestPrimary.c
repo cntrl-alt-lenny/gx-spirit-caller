@@ -1,4 +1,4 @@
-/* func_ov014_021b3440: hit-test the primary pointer against the rect at r and,
+/* Ov014_HitTestPrimary: hit-test the primary pointer against the rect at r and,
  * on a hit, latch the rect's payload byte-pair (rect+0xa) into a0->0x30/0x34 and
  * report 1. Bails (0) if a0 is already locked (+0x4) or the pointer is up or
  * outside [x, x+w) x [y, y+h).
@@ -16,7 +16,7 @@ typedef struct {
 extern void func_02006110(int *px, int *py);
 extern int func_020061ac(void);
 
-int func_ov014_021b3440(int *a0, HitRect *r) {
+int Ov014_HitTestPrimary(int *a0, HitRect *r) {
     int px;
     int py;
     func_02006110(&px, &py);
