@@ -304,6 +304,19 @@ def pool_addrs(instrs: list[dict], thumb: bool = False) -> set[int]:
 _BRANCH_RE = re.compile(
     r"^b(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)?(\.[wn])?\s+([0-9a-f]+)$")
 
+# objdump renders an embedded DATA table (a const pool / jump table inside a
+# `kind:function`) as bogus coprocessor / svc / unprivileged-transfer
+# "instructions" — ldc/stc/cdp(+2)(+l)(+cond), svc(+cond), ldrt/strt(+cond), and
+# CONDITIONAL mcr/mrc (`mrcls`) — which mwasmarm's legacy assembler can't parse
+# from objdump syntax (bare coproc id `15` not `p15`, `crN` not `cN`, `{N}` Op2).
+# These are byte-exact as a raw `.word` and are always data-as-code in this ARM9
+# game (no genuine FPU/SVC), so emit the original encoding directly. Genuine
+# NON-conditional CP15 `mcr`/`mrc` (cache/MMU) is still translated by to_mwasm.
+_DATA_AS_CODE_RE = re.compile(
+    r"^(?:ldc|stc|cdp|svc)[a-z0-9]*\s"
+    r"|^(?:ldr|str)t[a-z]*\s"
+    r"|^(?:mcr|mrc)(?:eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)[a-z0-9]*\s")
+
 
 def branch_targets(instrs: list[dict], thumb: bool = False) -> set[int]:
     """Addresses targeted by INTERNAL branches (no reloc, target within the
@@ -437,6 +450,12 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
         if w["addr"] in labels:
             body.append(f"{labels[w['addr']]}:")
         mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
+        # embedded data table disassembled as un-assemblable coprocessor/svc/
+        # unprivileged-transfer ops -> emit the raw encoding (byte-exact).
+        if not thumb and _DATA_AS_CODE_RE.match(w["mnem"]):
+            val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
+            body.append(f"    .word {val}")
+            continue
         pm = re.search(r"\[pc(?:, #(-?\d+))?\]", mn)
         if pm:
             offset = int(pm.group(1)) if pm.group(1) else 0
