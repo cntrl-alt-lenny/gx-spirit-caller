@@ -1,0 +1,3365 @@
+{
+"count": 336,
+"candidates": [
+{
+"addr": "02000e34",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "INIT/CLEAR store-order globals + tail call passing func ptr",
+"risk": "Pool-word order/scheduling of the 3 literal loads may reorder vs orig.",
+"confidence": "med",
+"file": "02000e34.c"
+},
+{
+"addr": "02001e5c",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "ACCESSOR (signed-byte) + double-negation bool (!(p&&*p))",
+"risk": "movne/moveq order for the !(...) may flip; field offset 0x28 assumed pointer.",
+"confidence": "med",
+"file": "02001e5c.c"
+},
+{
+"addr": "02005800",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "MMIO IE bit0 RMW bracket around setter store (offset 0x4)",
+"risk": "func_0209065c signature assumed (u32 in,r0); base-reload pattern for 0x4000210 may bind.",
+"confidence": "med",
+"file": "02005800.c"
+},
+{
+"addr": "0200583c",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "clone of 5800; MMIO IE bit0 RMW around store (offset 0x8)",
+"risk": "func_0209065c signature assumed; 0x4000210 reload-vs-bind may differ.",
+"confidence": "med",
+"file": "0200583c.c"
+},
+{
+"addr": "02005878",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "clone of 5800; MMIO IE bit0 RMW around store (offset 0xc)",
+"risk": "func_0209065c signature assumed; 0x4000210 reload-vs-bind may differ.",
+"confidence": "med",
+"file": "02005878.c"
+},
+{
+"addr": "020058f0",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "clone of 5800; MMIO IE bit0 RMW around store (offset 0x10)",
+"risk": "func_0209065c signature assumed; 0x4000210 reload-vs-bind may differ.",
+"confidence": "med",
+"file": "020058f0.c"
+},
+{
+"addr": "0200592c",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "straight call sequence + MMIO zero-store block (two bases)",
+"risk": "Scheduling of zero-stores vs +0x1000 bridge may reorder; reg for #0 const.",
+"confidence": "med",
+"file": "0200592c.c"
+},
+{
+"addr": "020062cc",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "straight-line init calls + volatile u16 read-discard then store (IME)",
+"risk": "Dead volatile ldrh at 0x4000208 may not emit unless typed volatile; arg order.",
+"confidence": "med",
+"file": "020062cc.c"
+},
+{
+"addr": "02006524",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "BIND struct base (data_02103da4) + guarded blx tail calls; RMW MMIO",
+"risk": "Three indirect calls reload data_02103da4 each time in orig; binding base would diverge; field offsets guessed.",
+"confidence": "low",
+"file": "02006524.c"
+},
+{
+"addr": "020070dc",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "strlen counted loop with signed char (ldrsb)",
+"risk": "do-while vs while first-iteration peeling may differ; ldrsb requires signed char.",
+"confidence": "high",
+"file": "020070dc.c"
+},
+{
+"addr": "020071c4",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "bitfield-test guard (lsl#1e;lsr#1f = bit1) + branch-tail clear; bind base after guard",
+"risk": "Orig uses TWO pool words for same addr (patcher trim bypass); clean C dedupes to one \u2014 likely 1-word diff.",
+"confidence": "low",
+"file": "020071c4.c"
+},
+{
+"addr": "02007240",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "stack buffer (0x400) init via CRC32-poly call + tail call returning r0",
+"risk": "buf alignment/sub-sp size fixed; func_020a66e8 return type assumed int; arg caching r4/r5.",
+"confidence": "med",
+"file": "02007240.c"
+},
+{
+"addr": "02007f38",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "large constant synthesis (mov+orr chain) single field store",
+"risk": "mwcc may decompose 0x52008421 in a different orr order than orig (0x21,0x8400,0x52000000).",
+"confidence": "med",
+"file": "02007f38.c"
+},
+{
+"addr": "02007f58",
+"module": "main",
+"cls": "A",
+"size": 156,
+"recipe": "straight-line init: calls + halfword/word field stores + masked-field-first orr",
+"risk": "Many bases/offsets guessed; scheduling of interleaved literal loads; strh sharing r2=1 across two stores.",
+"confidence": "med",
+"file": "02007f58.c"
+},
+{
+"addr": "020091f4",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "GUARD/DISPATCH switch + TAIL CALL (case0 returns callee)",
+"risk": "case1 third-arg may emit mov r2,#1 vs orig's mov r2,r0; func arg types guessed",
+"confidence": "high",
+"file": "020091f4.c"
+},
+{
+"addr": "02009278",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "GUARD/DISPATCH switch + TAIL CALL (case0 returns callee)",
+"risk": "callee-saved reg slot for saved args may differ; func arg types guessed",
+"confidence": "high",
+"file": "02009278.c"
+},
+{
+"addr": "0200a380",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "BITFIELD :8 (lsl;lsr) + BIND-once base + counted loop",
+"risk": "struct layout/stride guessed; bitfield storage-unit must stay u16 to keep ldrh + 32-bit shift pair",
+"confidence": "med",
+"file": "0200a380.c"
+},
+{
+"addr": "0200a40c",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "BITFIELD :8 and :1 (shift pairs) + BIND-once base + early-return loop",
+"risk": "bit-1 :1 field placement guessed; r0=0 hoist vs trailing mov may flip; layout guessed",
+"confidence": "med",
+"file": "0200a40c.c"
+},
+{
+"addr": "0200a454",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "counted copy loop, indexed load + computed-base store",
+"risk": "the 0x1aa8 immediate split (+0x1000 then str #0xaa8) is mwcc addressing; may emit single add",
+"confidence": "med",
+"file": "0200a454.c"
+},
+{
+"addr": "0200a994",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "GUARD + 5-arg call (1 stack arg) + function-pointer arg",
+"risk": "func_020351d4 arg count/types guessed; one-stack-arg frame {r3,lr}+str[sp] assumed",
+"confidence": "med",
+"file": "0200a994.c"
+},
+{
+"addr": "0200aa60",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "flag tst-guard + two call paths (6-arg, 2 stack) + Fill32",
+"risk": "func_02004f58 arg count/types guessed; 2-stack-arg ordering and data_021040ac field type assumed",
+"confidence": "med",
+"file": "0200aa60.c"
+},
+{
+"addr": "0200ad0c",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "mul-index init + BIND task ptr / RELOAD f_c + STORE-ORDER tail",
+"risk": "struct offsets guessed; two arg0*0x284 muls must not CSE (relies on f_c reload); store order assumed",
+"confidence": "med",
+"file": "0200ad0c.c"
+},
+{
+"addr": "0200ade8",
+"module": "main",
+"cls": "A",
+"size": 136,
+"recipe": "null-guard early-return + guarded-invoke + unrolled ldr/bl chain",
+"risk": "struct padding offsets guessed (only the listed offsets are load-bearing); field types void*",
+"confidence": "high",
+"file": "0200ade8.c"
+},
+{
+"addr": "0200ae70",
+"module": "main",
+"cls": "A",
+"size": 152,
+"recipe": "null-guard early-return + 8x unrolled guarded-invoke (explicit fields, not a loop)",
+"risk": "low \u2014 offsets 0x0..0x1c are contiguous and certain; must stay unrolled (no for-loop)",
+"confidence": "high",
+"file": "0200ae70.c"
+},
+{
+"addr": "0200b0c8",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "null-guard + counted loop (RELOAD arr base each iter) + tail invokes",
+"risk": "count read once before loop vs re-read; relies on p->arr[i] reloading f4 each iteration",
+"confidence": "med",
+"file": "0200b0c8.c"
+},
+{
+"addr": "0200b1bc",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "setup call + COMMUTATIVE add (accumulator-operand-first) counted loop",
+"risk": "stride-8 element modeled as {int;int}; count*8 must lower to lsl#3; unsigned bcc/bls guard",
+"confidence": "med",
+"file": "0200b1bc.c"
+},
+{
+"addr": "0200b59c",
+"module": "main",
+"cls": "A",
+"size": 120,
+"recipe": "alloc + null-guard + STORE-ORDER field stores (base+off vs plain)",
+"risk": "src/dst offsets guessed; store order assumed to match source order; alloc-null guard via movs result",
+"confidence": "med",
+"file": "0200b59c.c"
+},
+{
+"addr": "0200bff4",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "find-slot scan (break on <0 or ==key) + struct-assign (ldm/stm) + field overwrite",
+"risk": "scan induction may start at base+0xbc(off 0x20) not base(off 0xdc); slot layout 0x24/key@0x20 guessed",
+"confidence": "med",
+"file": "0200bff4.c"
+},
+{
+"addr": "0200c23c",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "indexed find-slot loop + if-guards; pointer-arith addressing",
+"risk": "ip-counter reg choice or the lsl#4 base-add vs struct-index addressing may differ; full=8 sentinel must stay int",
+"confidence": "med",
+"file": "0200c23c.c"
+},
+{
+"addr": "0200eea8",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "alloc(func_0200ed48)+Fill32+Copy32+tail func_0200edb8; null-guards",
+"risk": "Copy32/Fill32 arg order assumed (dest,src,n)/(val,dest,n) from peer corpus; ed48 return treated as void*; sizes 0x284/0x34 fixed",
+"confidence": "high",
+"file": "0200eea8.c"
+},
+{
+"addr": "0200eef0",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "alloc/copy + flag-guard + conditional field stores + tail-return",
+"risk": "Copy32(o,p) direction per asm; &&-store keeps r0 as edb8 return (no extra mov); field offsets 0x98/0x9c guessed",
+"confidence": "high",
+"file": "0200eef0.c"
+},
+{
+"addr": "0200ef60",
+"module": "main",
+"cls": "A",
+"size": 128,
+"recipe": "alloc/copy + two null-guard Task_InvokeLocked + setter + tail",
+"risk": "load-test-invoke-clear ordering on 0x18/0x1c; r5 store@0x27c before edb8; Copy32 direction; offsets guessed",
+"confidence": "high",
+"file": "0200ef60.c"
+},
+{
+"addr": "0200efe0",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "wrapper call(func_0200ef60) + flag-guard + conditional stores + setter tail",
+"risk": "a1/a2 pass-through to ef60; r0 from ef60 then re-fetched via edb8; &&-store; offsets 0x98/0x9c guessed",
+"confidence": "high",
+"file": "0200efe0.c"
+},
+{
+"addr": "0200fbd4",
+"module": "main",
+"cls": "A",
+"size": 164,
+"recipe": "two linked-list searches (single bucket vs bucket-array) by key@8",
+"risk": "data_0218cbc8+0x1000 base; offsets 0x90c/0x914/0x900 from that base; node next@0,key@8; loop-counter/ldrsb shape may differ",
+"confidence": "med",
+"file": "0200fbd4.c"
+},
+{
+"addr": "0200fd84",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "single linked-list search; head@+0x910; next@0,key@8; leaf",
+"risk": "node key@8 vs arg key@0; 0x910 within ldr-imm so no add; data symbol name only",
+"confidence": "high",
+"file": "0200fd84.c"
+},
+{
+"addr": "0200fdc0",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "single list search; compare arg[8]==(node->fc>>12u); leaf",
+"risk": "unsigned lsr#0xc -> must stay unsigned shift; node field @0xc, next@0; head@+0x910",
+"confidence": "high",
+"file": "0200fdc0.c"
+},
+{
+"addr": "020110c4",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "store-order constant init; 0x1000 at f0/f10/f20, 0 elsewhere",
+"risk": "mwcc may reorder the zero stores or reuse the 0x1000 reg differently; struct vs array indexing",
+"confidence": "high",
+"file": "020110c4.c"
+},
+{
+"addr": "02011100",
+"module": "main",
+"cls": "A",
+"size": 120,
+"recipe": "guard (n<=0 return) + 9 unrolled in-place left-shifts",
+"risk": "mwcc could roll the 9 shifts into a loop instead of unrolling; bxle vs bxlt on the guard",
+"confidence": "high",
+"file": "02011100.c"
+},
+{
+"addr": "02011178",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "struct value-copy (*dst=*src) -> auto self-assign guard + 12-word unroll",
+"risk": "mwcc might emit ldmia/stmia block instead of the per-word ldr/str unroll; arg order src=r0,dst=r1",
+"confidence": "high",
+"file": "02011178.c"
+},
+{
+"addr": "02012418",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "0x108 struct copy to stack via by-value local, then tail func_020121b4(&t)",
+"risk": "stack-copy lowered as ldmia/stmia x16 + tail-2 loop; mwcc may pick a plain memcpy loop or different frame size",
+"confidence": "med",
+"file": "02012418.c"
+},
+{
+"addr": "02013a64",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "GetSystemWork guard-chain + conditional orr-store (set bit 0x100)",
+"risk": "field@0x91c unsigned >2 (ldmhi); call results 0x6a/4 are equality gates; read-modify-write of 0x8f8",
+"confidence": "high",
+"file": "02013a64.c"
+},
+{
+"addr": "02014bf4",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "GetSystemWork guard-chain (:1 bitfield test) + setter + tail call",
+"risk": "bit0 test must emit lsl#31;lsrs#31 -> rely on :1 bitfield, not &1; 0x920==1 and 969c()==3 gates; const 0xc0100",
+"confidence": "med",
+"file": "02014bf4.c"
+},
+{
+"addr": "02016b60",
+"module": "main",
+"cls": "A",
+"size": 376,
+"recipe": "GetSystemWork bitfield-guard + nested jump-table dispatch, tail stores",
+"risk": "0x8d8&1 guard compiles to `and #1` not `lsl;lsr` (020186b0 wall); jump-tables + cond loads likely diverge",
+"confidence": "low",
+"file": "02016b60.c"
+},
+{
+"addr": "02017888",
+"module": "main",
+"cls": "A",
+"size": 528,
+"recipe": "GetSystemWork bitfield-guard + cmp/beq chain + jump-table substate",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; substate jump-table + repeated-call CSE + cond loads likely diverge",
+"confidence": "low",
+"file": "02017888.c"
+},
+{
+"addr": "02017a98",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "GetSystemWork bitfield-guard + linear guard-chain, conditional tail store",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; `ldrcs r0,_LIT; strcs` conditional load may emit full materialize; r4/r5 order",
+"confidence": "low",
+"file": "02017a98.c"
+},
+{
+"addr": "02017afc",
+"module": "main",
+"cls": "A",
+"size": 228,
+"recipe": "GetSystemWork bitfield-guard + jump-table dispatch, RMW bit ops, cond stores",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; jump-table layout + `bic;orr` idempotent set + dual cond loads likely diverge",
+"confidence": "low",
+"file": "02017afc.c"
+},
+{
+"addr": "02017be0",
+"module": "main",
+"cls": "A",
+"size": 312,
+"recipe": "GetSystemWork bitfield-guard + jump-table + nested bit2 tests, cond substate dec",
+"risk": "0x8d8&1 / 0x8e0 bit-tests \u2192 `and` wall; jump-table + `subeq` conditional substate decrement likely diverge",
+"confidence": "low",
+"file": "02017be0.c"
+},
+{
+"addr": "02017d18",
+"module": "main",
+"cls": "A",
+"size": 216,
+"recipe": "GetSystemWork bitfield-guard + cmp/beq state chain (1,2,3), RMW + tail stores",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; cond loads `ldr r1,_LIT;str` and call ordering may diverge",
+"confidence": "low",
+"file": "02017d18.c"
+},
+{
+"addr": "02017df0",
+"module": "main",
+"cls": "A",
+"size": 184,
+"recipe": "GetSystemWork bitfield-guard + cmp/beq state chain (1,2), guard-chains + RMW",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; literal-pool message loads and call ordering may diverge",
+"confidence": "low",
+"file": "02017df0.c"
+},
+{
+"addr": "0201816c",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "GetSystemWork bitfield-guard + linear guard-chain (+3 bound), cond tail store",
+"risk": "0x8d8&1 guard \u2192 `and #1` wall; `ldmcc` early-return on unsigned compare + `streq` cond store may diverge; r4/r5 order",
+"confidence": "low",
+"file": "0201816c.c"
+},
+{
+"addr": "020186b0",
+"module": "main",
+"cls": "A",
+"size": 24,
+"recipe": "GetSystemWork leaf bit0-extract accessor (the documented `and #1` wall)",
+"risk": "GUARANTEED mismatch: `(v<<31)>>31` lowers to `and r0,#1` (1 insn), baserom is `lsl#31; movs lsr#31` (2 insn) \u2014 in-tree .s for this exact reason",
+"confidence": "low",
+"file": "020186b0.c"
+},
+{
+"addr": "02018b14",
+"module": "main",
+"cls": "A",
+"size": 20,
+"recipe": "tiny leaf returning a boolean condition (short-circuit ||) consumed in flags",
+"risk": "asm returns 1 with a DEAD trailing `cmp r1,#7` (no cond-move consumes it) \u2014 needs a flag/condition-return form mwcc won't emit from a plain int return",
+"confidence": "low",
+"file": "02018b14.c"
+},
+{
+"addr": "0201942c",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "dense range switch -> addls jump-table, case0 returns 0 else 1",
+"risk": "case0-and-default both return 0 may collapse to a range compare instead of the 18-arm jump table; table arm layout must match exactly",
+"confidence": "med",
+"file": "0201942c.c"
+},
+{
+"addr": "02019604",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "GetSystemWork + mla-stride base, three byte-field adds (accumulator order)",
+"risk": "mla base `(idx-1)*0x18+base` may fuse/split differently; 3 ldrb adds must accumulate f15+f14 then +f16 in this exact order",
+"confidence": "med",
+"file": "02019604.c"
+},
+{
+"addr": "02019820",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "GetSystemWork (discarded) + guard `>=5` then `>0 ? 1 : 0` flag return",
+"risk": "GetSystemWork return is computed but unused (must stay sequenced); `movgt r0,#1` + fallthrough `mov r0,#0` flag-clamp may emit differently",
+"confidence": "med",
+"file": "02019820.c"
+},
+{
+"addr": "020198ec",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "GetSystemWork (discarded) + signed-byte table[idx*7+5], clamp-if-assign, asr#1, double call",
+"risk": "func_02019604 called TWICE (no CSE) \u2014 must stay two call sites; `rsb idx*7` index, `asr#1` halving, and movgt clamp-as-if may reorder",
+"confidence": "low",
+"file": "020198ec.c"
+},
+{
+"addr": "0201a0e0",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "Accessor (ldrsb signed-byte field) + commutative add operand order",
+"risk": "7-byte struct stride/+2 offset guessed; >>1 must stay arithmetic (signed v) to emit asr.",
+"confidence": "med",
+"file": "0201a0e0.c"
+},
+{
+"addr": "0201a824",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "Accessor + byte-extract eq/ne to bool (== 0)",
+"risk": "field-at-+8 offset and func_02018bc0 ptr-return assumed; bool codegen should match movs/moveq.",
+"confidence": "high",
+"file": "0201a824.c"
+},
+{
+"addr": "0201ac1c",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "Guard early-return + linear-search loop, movne index return",
+"risk": "Loop-vs-tail register placement of i (r4) may flip; bge-to-shared-exit scheduling could reorder.",
+"confidence": "high",
+"file": "0201ac1c.c"
+},
+{
+"addr": "0201b5d0",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "Two counted loops, helper call with (i + const) arg",
+"risk": "mwcc may strength-reduce to count the passed value directly instead of i+const; low risk.",
+"confidence": "high",
+"file": "0201b5d0.c"
+},
+{
+"addr": "0201b648",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "Clear loop (split-bic via ~0x1ff) + single-field clear + tail call",
+"risk": "mwcc must split ~0x1ff as bic 0xff then 0x100 in that order; struct stride 0x18 guessed.",
+"confidence": "med",
+"file": "0201b648.c"
+},
+{
+"addr": "0201be64",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "Guard (==2) + bit-extract-to-bool via shift pair (lsl#7;lsrs#0x1f)",
+"risk": "func_020139b4 arg passing incidental (r0=leftover ptr); +0x900 offset and bit-24 test guessed.",
+"confidence": "med",
+"file": "0201be64.c"
+},
+{
+"addr": "0201bf04",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "Copy32 marshalling + flag set/clear (orr/bic #2) around call, field return",
+"risk": "Copy32 arg order (dest,src,len) and offsets 0x810/0x8e0/+8 assumed; reload of w->0x8e0 kept by saved r4.",
+"confidence": "med",
+"file": "0201bf04.c"
+},
+{
+"addr": "0201c560",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "Guard return + counted loop with (==a||==b) skip + early-return + tail call",
+"risk": "cmp;cmpne fusion for (i==0x16||i==0x17) and r4=1 hoist depend on mwcc; otherwise structurally tight.",
+"confidence": "med",
+"file": "0201c560.c"
+},
+{
+"addr": "0201c64c",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "Three accessor calls, commutative sum (x0+x1 then +x2) + conditional tail call",
+"risk": "Sum operand order add(x0,x1) then add(x2,..) must match; call-order x2,x0,x1 preserved by temps.",
+"confidence": "med",
+"file": "0201c64c.c"
+},
+{
+"addr": "0201cfa0",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "Guard chain + compare-to-bool (>=1 via movge/movlt)",
+"risk": "The >=1 must lower to cmp#1/movge/movlt not a branch; structurally clean otherwise.",
+"confidence": "high",
+"file": "0201cfa0.c"
+},
+{
+"addr": "0201d07c",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "Single field store (#3 at +0x14) + counted zero-fill (str [base,i,lsl#2])",
+"risk": "data_0218febc treated as int[] so +0x14 is index 5; if it's a struct the offset still resolves to 0x14.",
+"confidence": "high",
+"file": "0201d07c.c"
+},
+{
+"addr": "0201d0e8",
+"module": "main",
+"cls": "A",
+"size": 44,
+"recipe": "Counted loop with conditional increment (cmp;addne)",
+"risk": "Register pairing (count r0, i r3, base r2 hoisted) should match; very low risk.",
+"confidence": "high",
+"file": "0201d0e8.c"
+},
+{
+"addr": "0201d398",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "Global set + reuse-address-as-arg + linear call sequence (fn-ptr args)",
+"risk": "func_02020814 taking &data_020c5db0 (r0 reuse) is inferred; if it takes the value, emits an ldr instead.",
+"confidence": "med",
+"file": "0201d398.c"
+},
+{
+"addr": "0201d428",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "Linear init calls + guard returns + do/while wait loop (==3)",
+"risk": "data_0218febc[+0x14] store and do/while shape are clean; func_0200583c(0) int-vs-ptr arg harmless.",
+"confidence": "high",
+"file": "0201d428.c"
+},
+{
+"addr": "0201d4b4",
+"module": "main",
+"cls": "A",
+"size": 124,
+"recipe": "DISPATCH switch -> jump-table; tail-call cases returning result",
+"risk": "case4 & default share the mov r0,#0/return slot; mwcc may not fold both into one label as orig",
+"confidence": "high",
+"file": "0201d4b4.c"
+},
+{
+"addr": "0201d530",
+"module": "main",
+"cls": "A",
+"size": 144,
+"recipe": "DISPATCH switch -> jump-table; mix of tail-calls and const returns",
+"risk": "constant cases must inline as mov #imm; default placement vs orig .L_190 may reorder table",
+"confidence": "high",
+"file": "0201d530.c"
+},
+{
+"addr": "0201d5c0",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "SETTER sparse switch -> if/else-if predicated stores",
+"risk": "mwcc may emit a jump table or flip beq/streq predication vs the orig branch+predicate mix",
+"confidence": "med",
+"file": "0201d5c0.c"
+},
+{
+"addr": "0201d5e8",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "DISPATCH getter switch returning two global loads + default 0",
+"risk": "mwcc could lower 2 sparse cases as jump table instead of cmp;beq;cmp;beq chain",
+"confidence": "med",
+"file": "0201d5e8.c"
+},
+{
+"addr": "0201d910",
+"module": "main",
+"cls": "A",
+"size": 268,
+"recipe": "GUARD tail-call + jump-table forwarding args; case4=fall-through",
+"risk": "the 0xfff00000 mask must come from rsb of #0x100000; arg-shuffle reg order (r4-r7) may differ",
+"confidence": "high",
+"file": "0201d910.c"
+},
+{
+"addr": "0201e5b8",
+"module": "main",
+"cls": "A",
+"size": 180,
+"recipe": "GUARD/scan loop; FourCC literals reloaded into held regs; if-else-if order",
+"risk": "loop reg-alloc: orig pins 3 FourCC consts + base in callee regs; literal-pool order/holding may flip",
+"confidence": "low",
+"file": "0201e5b8.c"
+},
+{
+"addr": "0201ed08",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "MUL by const + TAIL CALL via bx (leaf)",
+"risk": "mwcc may emit mul r0,r0,#0x54 form or reorder mov #4/#0; tail bx requires leaf TCO to fire",
+"confidence": "high",
+"file": "0201ed08.c"
+},
+{
+"addr": "0201ee1c",
+"module": "main",
+"cls": "A",
+"size": 244,
+"recipe": "DISPATCH switch (cmp-chain) + struct copy + TAIL CALL",
+"risk": "3 contiguous cases may lower to a jump table not the cmp #0/#1/#2 chain; field offsets guessed",
+"confidence": "med",
+"file": "0201ee1c.c"
+},
+{
+"addr": "0201f090",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "counted loop; (u16)i zero-extend; reload arr[i]; const arg hoist",
+"risk": "the constant 1 may emit inline mov #1 instead of being hoisted to a callee reg as orig",
+"confidence": "med",
+"file": "0201f090.c"
+},
+{
+"addr": "0201f11c",
+"module": "main",
+"cls": "A",
+"size": 28,
+"recipe": "BOUNDED table lookup, unsigned compare + hs fallback",
+"risk": "low; sibling func_0201f0f4 confirms idiom. fallback ldr must stay predicated (ldrhs), not a branch",
+"confidence": "high",
+"file": "0201f11c.c"
+},
+{
+"addr": "0201f1b8",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "linear call seq + one cmp/early-return (==2 -> 1)",
+"risk": "low-med; func_0209eee0 arg types cosmetic; func_0201f138 return-type vs void must not add a mov",
+"confidence": "high",
+"file": "0201f1b8.c"
+},
+{
+"addr": "0201f1f8",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "GUARD chain; predicated early-returns; tail f138(9) returns its value",
+"risk": "the implicit 'return f138(9)' tails must omit mov #0; f_24/f_2 offsets guessed; branch ordering",
+"confidence": "med",
+"file": "0201f1f8.c"
+},
+{
+"addr": "0201f2bc",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "GUARD chain (2-arm); predicated early-return; tail f138(9)",
+"risk": "tails must not emit mov #0 (return f138 value); f_2 offset guessed",
+"confidence": "med",
+"file": "0201f2bc.c"
+},
+{
+"addr": "0201f2f4",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "range-test early return + (!=2) guard + strh global writes",
+"risk": "func_0209ee10 1-arg proto vs real 4-arg; f_4/f_a/f_30 offsets & strh widths guessed",
+"confidence": "med",
+"file": "0201f2f4.c"
+},
+{
+"addr": "0201f68c",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "guard/branch-tail, cmp;moveq early-return, void tail call",
+"risk": "data_021922e0 may need &data[0] vs data; literal pool ordering for the one .word should match",
+"confidence": "high",
+"file": "0201f68c.c"
+},
+{
+"addr": "0201f6c0",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "guard chain, struct callback blx, branch tails",
+"risk": "cb is loaded into r0 base then reloaded as arg via _LIT2; the ldr r1,[r0,#0x38] then ldr r0,_LIT2 ordering may differ; field offset 0x38 assumed",
+"confidence": "med",
+"file": "0201f6c0.c"
+},
+{
+"addr": "0201f7f0",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "store-order field init, guard, branch tail",
+"risk": "arg order (r0=a,r1=b,r2=c) and movs vs mov on the f30!=1 path; many struct offsets guessed; store scheduling must stay in asm order",
+"confidence": "med",
+"file": "0201f7f0.c"
+},
+{
+"addr": "0201fbe0",
+"module": "main",
+"cls": "A",
+"size": 140,
+"recipe": "guard chain, nested guards, struct callback blx",
+"risk": "first ldrh is from r0 arg (p->f2) not the global; rest reload data_02191f40; offsets 0x18/0x38 guessed; callback reloads base into r0 for arg",
+"confidence": "med",
+"file": "0201fbe0.c"
+},
+{
+"addr": "020200d8",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "cmp-chain guard reusing loaded field, branch tails",
+"risk": "f30 must stay in r0 across both cmps (moveq/movne reuse r0); offset 0x30 guessed; load reused not reloaded",
+"confidence": "high",
+"file": "020200d8.c"
+},
+{
+"addr": "02020130",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "guard, call, moveq/movne boolean tail",
+"risk": "final moveq r0,#0/movne r0,#1 expects !=0 boolean from func_02020188; offset 0x30 guessed",
+"confidence": "high",
+"file": "02020130.c"
+},
+{
+"addr": "020201b8",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "simple guard, two-call tail, cmp;moveq early-return",
+"risk": "void return type (no explicit r0 set on the p->f2 path); ldrh from arg r0 at 0x2",
+"confidence": "high",
+"file": "020201b8.c"
+},
+{
+"addr": "020201ec",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "linear calls, cmp #2;moveq early-return, void tail calls",
+"risk": "_LIT0 holds func_02020224 address passed as r0 pointer; cmp #0x2 specific; literal pool layout",
+"confidence": "high",
+"file": "020201ec.c"
+},
+{
+"addr": "02020398",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "guard, switch-on-field, struct callback blx with reordered args",
+"risk": "callback at 0x1c held in r3 across; arg marshalling r0=m12,r1=mc,r2=m10 ordering vs source; offsets 0xc/0x10/0x12 guessed",
+"confidence": "low",
+"file": "02020398.c"
+},
+{
+"addr": "020206d8",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "guard, store halfword, struct callback blx, reload field",
+"risk": "struct lacks f30 member referenced; base reloaded each ldr r0,_LIT0 (RELOAD recipe); callback arg order r0=data,r1=fc; offsets guessed",
+"confidence": "low",
+"file": "020206d8.c"
+},
+{
+"addr": "02020814",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "store-order field clears, moveq/movne boolean tail",
+"risk": "stores must emit in exact asm order (f10,f3c,f1c,f4,fa=1,f2c,fa0,fa4,f20); the shared r2=0 const reuse; offsets guessed",
+"confidence": "med",
+"file": "02020814.c"
+},
+{
+"addr": "02020880",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "linear calls, cmp #2;moveq early-return",
+"risk": "_LIT0=data ptr (r0), _LIT1=func_020208c4 addr (r1); cmp #0x2; literal pool order of the two .words",
+"confidence": "high",
+"file": "02020880.c"
+},
+{
+"addr": "020208c4",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "guard chain, call dispatch, duplicated teardown tails",
+"risk": "_LIT0=func_02020860 address passed as r0 ptr; the two identical teardown blocks must not be CSE-merged; ldrh from arg at 0x2",
+"confidence": "med",
+"file": "020208c4.c"
+},
+{
+"addr": "02020b24",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "store arg to field, guard call, struct callback blx",
+"risk": "r2(base)/r1(_LIT1) loaded before the str; arg order to func_0209e7f0 is r0=0xe,r1=func,r2=0; the str r0,[r2,#0x1c] places arg store first; offsets guessed",
+"confidence": "med",
+"file": "02020b24.c"
+},
+{
+"addr": "02029c80",
+"module": "main",
+"cls": "A",
+"size": 192,
+"recipe": "bitfield :1 (lsl;lsr), if/else dispatch, tail-call groups",
+"risk": "struct offsets/padding guessed; bit2 position and the 2x2 branch nesting order may flip on objdiff",
+"confidence": "med",
+"file": "02029c80.c"
+},
+{
+"addr": "0202a240",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "guard+Task_InvokeLocked+clear, dual-pool alias, tail call",
+"risk": "if mwcc dedupes the two pool words the second .word collapses; volatile may add an extra reload",
+"confidence": "high",
+"file": "0202a240.c"
+},
+{
+"addr": "0202a27c",
+"module": "main",
+"cls": "A",
+"size": 124,
+"recipe": "scan-for-empty loop + Fill32 + stride-mul alloc, dual-pool",
+"risk": "loop induction (ptr vs idx*0xec) and r0=#0 fall-through into Fill32 value-arg may shift; pool dedupe risk",
+"confidence": "low",
+"file": "0202a27c.c"
+},
+{
+"addr": "0202ab04",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "counted loop, signed-guard call+clear, bit-clear tail",
+"risk": "the separate +0xa7 induction pointer (asm keeps r5) may instead recompute base+i*0x10; strh/-1 ok",
+"confidence": "med",
+"file": "0202ab04.c"
+},
+{
+"addr": "0202ab64",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "field stores (word+u16 RMW) + two calls, store order preserved",
+"risk": "struct offsets guessed; f_d8 width (str=word) ok; f_de/f_e0/f_ea must be u16 (strh)",
+"confidence": "high",
+"file": "0202ab64.c"
+},
+{
+"addr": "0202aba0",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "field stores (word=0 + u16 bic) + two calls, store order",
+"risk": "struct offsets guessed; same widths as 0202ab64; bic vs orr is the only delta",
+"confidence": "high",
+"file": "0202aba0.c"
+},
+{
+"addr": "0202af40",
+"module": "main",
+"cls": "A",
+"size": 372,
+"recipe": "repeated guard+Task_InvokeLocked+clear, reload-per-use, ptr model",
+"risk": "currently ships as .s (reg-alloc-walled); reload-each-use must reproduce; matched analog func_0202c1ac suggests it will",
+"confidence": "med",
+"file": "0202af40.c"
+},
+{
+"addr": "0202b6e4",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "counted scan/insert loop, early-return guards, single call",
+"risk": "loop reg-alloc (id in r4, idx in r5) may shift; cmp operand order target-first preserved",
+"confidence": "med",
+"file": "0202b6e4.c"
+},
+{
+"addr": "0202bb88",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "counted byte-clear loop, guard, no calls",
+"risk": "loop may index [base+0xf6c, i] vs the asm's pointer-walk (add r3,#1); ldr [r0] needs int-typed count",
+"confidence": "med",
+"file": "0202bb88.c"
+},
+{
+"addr": "0202c028",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "alloc + indexed u16 load before null-guard + invoke",
+"risk": "ldrh may emit [r4,idx,lsl#1] vs asm's separate lsl+ldrh; load-before-branch ordering must hold",
+"confidence": "med",
+"file": "0202c028.c"
+},
+{
+"addr": "0202c070",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "leaf init: two helper calls, store results, reload global",
+"risk": "global reload after each call must reproduce; arg constants 4/0 and store offsets 0x18/0x1c",
+"confidence": "high",
+"file": "0202c070.c"
+},
+{
+"addr": "0202c3c8",
+"module": "main",
+"cls": "A",
+"size": 132,
+"recipe": "3x guard+Task_InvokeLocked+clear via .p1, reload-per-use",
+"risk": "global reload each use (ldr;ldr[#4];ldr) must reproduce; matched sibling func_0202c1ac validates the shape",
+"confidence": "high",
+"file": "0202c3c8.c"
+},
+{
+"addr": "0202c46c",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "pointer-chase via .p1, stride-8 indexed read + base add",
+"risk": "two-ldr (no ldmia) needs the +4 gap; add operand order base8-first must hold",
+"confidence": "high",
+"file": "0202c46c.c"
+},
+{
+"addr": "0202c948",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "field stores + conditional-move select (movne/moveq) then store",
+"risk": "if/else may branch instead of movne/moveq; base reload-after-call and store order 0x4/0x18/0x14 must hold",
+"confidence": "med",
+"file": "0202c948.c"
+},
+{
+"addr": "0202ce24",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "bind-once guard chain + two tail calls",
+"risk": "func_02037208 arg1=-1 may materialize via mov/mvn not sub-from-0x35; reload-vs-bind of global may differ",
+"confidence": "med",
+"file": "0202ce24.c"
+},
+{
+"addr": "0202d194",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "linear: ptr-chase, clear-call, two ordered stores",
+"risk": "the +0x24e0 may split into adds at 0x2000/0x4e0 in a different order; r1[0x6c] field type guessed",
+"confidence": "med",
+"file": "0202d194.c"
+},
+{
+"addr": "0202d9a0",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "bind-once counter increment + wrap if-assign",
+"risk": "movge/strge wrap may emit as ternary store; field offsets guessed; +0x60 limit add may CSE differently",
+"confidence": "med",
+"file": "0202d9a0.c"
+},
+{
+"addr": "0202ef08",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "chained-eq membership (|| of ==), base-CSE",
+"risk": "mwcc may load comparands as separate literals instead of add-from-base; otherwise byte-exact",
+"confidence": "high",
+"file": "0202ef08.c"
+},
+{
+"addr": "0202f410",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "single-constant eq test (branch-form bool)",
+"risk": "compare result may emit moveq/movne instead of the bne/mov branch form; value is exact",
+"confidence": "high",
+"file": "0202f410.c"
+},
+{
+"addr": "0202f59c",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "chained-eq membership (|| of ==), base-CSE",
+"risk": "consecutive constants may instead emit a range/sub-compare; add-from-base offsets are 1 and 2",
+"confidence": "high",
+"file": "0202f59c.c"
+},
+{
+"addr": "0203058c",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "call + dispatch (|| eq) + min/max if-assign tail",
+"risk": "case 2||3 may fold to a sub/range check; tail movgt/movle ordering may flip; r4 save assumed",
+"confidence": "med",
+"file": "0203058c.c"
+},
+{
+"addr": "02031764",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "chained-eq membership (|| of ==), base-CSE",
+"risk": "mwcc may emit comparands as separate literals; add-from-base offsets 0xB8 and 0x180",
+"confidence": "high",
+"file": "02031764.c"
+},
+{
+"addr": "02031794",
+"module": "main",
+"cls": "A",
+"size": 44,
+"recipe": "two-constant eq membership (separate literals)",
+"risk": "mwcc may instead add-from-base (gap 0x1AB is encodable); both-literal form is what asm shows",
+"confidence": "med",
+"file": "02031794.c"
+},
+{
+"addr": "020317c0",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "single-constant eq test (branch-form bool)",
+"risk": "may emit moveq/movne instead of branch form; value 0x1A9F is exact",
+"confidence": "high",
+"file": "020317c0.c"
+},
+{
+"addr": "020318b8",
+"module": "main",
+"cls": "A",
+"size": 116,
+"recipe": "counted table-init loop + fixed pre/post calls",
+"risk": "duplicate data_0219adb8 literal-pool entry (one raw word) likely won't reproduce; field/arg counts guessed",
+"confidence": "low",
+"file": "020318b8.c"
+},
+{
+"addr": "02031f40",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "linked-list walk calling one func per node",
+"risk": "loop reg-alloc (r4=next, r5=head) may differ; the cmp on saved next vs reload may flip",
+"confidence": "med",
+"file": "02031f40.c"
+},
+{
+"addr": "02032028",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "retry-call wrapper (guarded second attempt + cleanup)",
+"risk": "movs r4 flag reuse and the goto-merge may restructure; arg passing of saved r5/r6 to retry assumed",
+"confidence": "med",
+"file": "02032028.c"
+},
+{
+"addr": "02032644",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "switch-dispatch on call result, void tail",
+"risk": "switch may emit cmp-chain vs jump table (here cmp-chain expected); branch order to default assumed",
+"confidence": "high",
+"file": "02032644.c"
+},
+{
+"addr": "02032724",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "nested-struct base bind + guard + free + clear",
+"risk": "func_02032e6c may be 1-arg (r1 leftover); arg2 may reload instead of reusing cmp reg",
+"confidence": "med",
+"file": "02032724.c"
+},
+{
+"addr": "0203309c",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "guard/branch-tail; save args to callee-saved; constant returns",
+"risk": "func_02053114 arg may be unused (r0=entry leftover); otherwise structurally exact",
+"confidence": "high",
+"file": "0203309c.c"
+},
+{
+"addr": "020331b0",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "null guard (movs+ldmeqia) + linear call sequence",
+"risk": "func_02032e6c(p,p) 2nd arg assumed = p; trailing calls assumed take 0",
+"confidence": "high",
+"file": "020331b0.c"
+},
+{
+"addr": "0203361c",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "tst flag guard + guarded call + tail-return call",
+"risk": "func_0203361c return type assumed int (tail r0); func_0204717c assumed no-arg",
+"confidence": "med",
+"file": "0203361c.c"
+},
+{
+"addr": "02033654",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "counted loop; reload field bound+base each iter; addne accumulator",
+"risk": "strength-reduction of i*0xc to r6 accumulator and per-iter base reload must hold",
+"confidence": "med",
+"file": "02033654.c"
+},
+{
+"addr": "02033808",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "ternary->orrne/biceq branchless toggle + external tail-call (bx ip)",
+"risk": "mwcc must pick ternary->predicated form and tail-optimize the external call to bx ip",
+"confidence": "med",
+"file": "02033808.c"
+},
+{
+"addr": "020338b8",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "guarded call (>1) + multi-bit clear (chained bic via single mask)",
+"risk": "bic decomposition order (0x2000,0x1000,0x4000,0x10000,0x40000) must match; func_02046ae0 arg may be unused",
+"confidence": "med",
+"file": "020338b8.c"
+},
+{
+"addr": "02033a48",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "guard (ldmneia) + long long r0:r1 split-store + nested-base bind",
+"risk": "func_020930b0 paired return modeled as long long; field/sub offsets guessed; sub-base bind ordering before call uncertain",
+"confidence": "low",
+"file": "02033a48.c"
+},
+{
+"addr": "02033d3c",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "init store-order (f0,b4,b5 then call then b15,f18); save arg3 across call",
+"risk": "func_020a6a94 arg2 assumed = preserved entry r1; store/setup scheduling around the call may differ",
+"confidence": "med",
+"file": "02033d3c.c"
+},
+{
+"addr": "02034094",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "range guard (blt->0) + (v<=K)->movle/mov bool; K from pool",
+"risk": "first param assumed unused so value lands in r1; minor: movle/mov vs movle/movgt ordering",
+"confidence": "high",
+"file": "02034094.c"
+},
+{
+"addr": "02034238",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "guard (ldmeqia) + nested guarded calls + global store 0",
+"risk": "func_02046ae0 modeled no-arg here (vs 020338b8 1-arg); data_0219b2dc assumed int global",
+"confidence": "high",
+"file": "02034238.c"
+},
+{
+"addr": "020345c0",
+"module": "main",
+"cls": "A",
+"size": 188,
+"recipe": "init zero-store order (30,34,3c,38) + return-value-chained setup calls; fn-ptr pool order",
+"risk": "first arg of each setup call assumed = prior call's return (chaining); literal-pool order depends on first-use sequence",
+"confidence": "med",
+"file": "020345c0.c"
+},
+{
+"addr": "020347b8",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "switch dispatch (cmp#1/cmp#2 sequential) + global guard + (>=2 movge)",
+"risk": "case 1 returns func_0201cfa0() value (may be void); data_0219b2dc assumed int",
+"confidence": "high",
+"file": "020347b8.c"
+},
+{
+"addr": "02034810",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "switch dispatch (cmp#1/cmp#2) + tail-return calls + default 0",
+"risk": "callee returns treated as int (tail bl;ldmia) \u2014 exact unless they are void with different r0 handling",
+"confidence": "high",
+"file": "02034810.c"
+},
+{
+"addr": "020385d8",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "store-order + forced s16 reload (truncation)",
+"risk": "mwcc could keep v<<8 in-reg instead of ldrsh reload; unlikely (s16 truncation forces re-read)",
+"confidence": "high",
+"file": "020385d8.c"
+},
+{
+"addr": "020387c0",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "mul-index array base; zero 2 halfwords; counted loop-call setter",
+"risk": "two zero stores may both use [base] form instead of orig's [r1,r0]/[r2,#2] split; idx*0x84 mul should match",
+"confidence": "med",
+"file": "020387c0.c"
+},
+{
+"addr": "02038d2c",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "u8 field -> *2 index, mla 0xc stride, 2-iter scan for f4==0",
+"risk": "index (field*2) may materialize as mov;add,lsl vs mov,lsl - the odd mov#0;add,lsl#1 form is the residual risk",
+"confidence": "med",
+"file": "02038d2c.c"
+},
+{
+"addr": "02038d70",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "null->base else advance; bounded linked scan, stride 0x5c, return ptr",
+"risk": "struct size 0x5c and f4 offset guessed; pointer-compare bound should emit bcs as orig",
+"confidence": "high",
+"file": "02038d70.c"
+},
+{
+"addr": "02038dac",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "backward table scan, stride 0x5c, 32 entries, match f4==key",
+"risk": "struct size 0x5c / f4 offset guessed; bpl loop (i>=0) should match the subs;bpl",
+"confidence": "high",
+"file": "02038dac.c"
+},
+{
+"addr": "0203a150",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "null guard; ordered stores; short-circuit ||; stmib pair",
+"risk": "two trailing word stores may emit as 2x str instead of stmib; struct offsets guessed",
+"confidence": "med",
+"file": "0203a150.c"
+},
+{
+"addr": "0203a520",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "lock-flag set; call helper around inner; reload flag to clear; 2-arg",
+"risk": "scheduling of the two literal-pool loads vs the flag store before the bl may differ slightly",
+"confidence": "high",
+"file": "0203a520.c"
+},
+{
+"addr": "0203a578",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "lock/call/unlock wrapper, 3-arg passthrough",
+"risk": "literal-load vs flag-store scheduling before the bl may reorder; otherwise textbook",
+"confidence": "high",
+"file": "0203a578.c"
+},
+{
+"addr": "0203a694",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "guard chain: null checks + deref + tail call (return F(...))",
+"risk": "func_020892c4 return assumed int* (deref'd); tail call should match the final bl;ldmia",
+"confidence": "high",
+"file": "0203a694.c"
+},
+{
+"addr": "0203a6e8",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "guard chain + u16 field arg + bool-normalize (!=0)",
+"risk": "node f0/f4 offsets guessed; movs r4,r0 early-return and movne/moveq normalize should match",
+"confidence": "high",
+"file": "0203a6e8.c"
+},
+{
+"addr": "0203a744",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "call + null guard + deref + bool-normalize; unused arg0",
+"risk": "arg0 unused (overwritten by mov r0,r1) - declared but dead; f0 offset guessed",
+"confidence": "high",
+"file": "0203a744.c"
+},
+{
+"addr": "0203a84c",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "flag-test fast path; bound list base; iterator while-loop",
+"risk": "iterator var (passed as arg2 + reloaded from return) may land in callee-saved reg vs orig's r1",
+"confidence": "med",
+"file": "0203a84c.c"
+},
+{
+"addr": "0203a898",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "lock/call/unlock wrapper, 1-arg, void (inner result discarded)",
+"risk": "inner result genuinely discarded (no mov r4,r0) - void return must hold; otherwise textbook",
+"confidence": "high",
+"file": "0203a898.c"
+},
+{
+"addr": "0203ab9c",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "lock/call/unlock wrapper, identical shape, different inner",
+"risk": "inner result discarded -> void; same scheduling caveat as func_0203a898",
+"confidence": "high",
+"file": "0203ab9c.c"
+},
+{
+"addr": "0203aeec",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "Guard table-search loop, pointer-walk + counter, store-order out",
+"risk": "Struct offsets/field widths guessed; ip-vs-lr split could reg-alloc differently",
+"confidence": "med",
+"file": "0203aeec.c"
+},
+{
+"addr": "0203bbac",
+"module": "main",
+"cls": "A",
+"size": 124,
+"recipe": "Repeated free-if-nonnull then NULL store, store-order; tail null-guard",
+"risk": "func_02038c98 2nd arg=0 assumed; last block uses ldmeqia early-return form",
+"confidence": "high",
+"file": "0203bbac.c"
+},
+{
+"addr": "0203c698",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "Null-guard chain with moveq early-returns; bool ==1 result",
+"risk": "Field offsets 0xac/0x1d and call return types guessed; movne/moveq bool ordering",
+"confidence": "high",
+"file": "0203c698.c"
+},
+{
+"addr": "0203c70c",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "Tiny flag-test bx lr; if-guard returning 0/1 (not ternary)",
+"risk": "Field offset 0xb0 guessed; the (null||bit-set)->1 vs bit-clear->0 branch shape",
+"confidence": "high",
+"file": "0203c70c.c"
+},
+{
+"addr": "0203cb40",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "Linear state dispatch; sub sp #4 byte temp on stack; tail calls",
+"risk": "Stack byte-slot (strb/ldrb [sp]) needs char local addr-taken; func_0203dc10 takes &temp",
+"confidence": "med",
+"file": "0203cb40.c"
+},
+{
+"addr": "0203cb90",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "Range-clamp accessor; predicated ldr chain; default-255 if-guard",
+"risk": "bcc/ls => unsigned 10..16 range; ldrlsb signed byte at +0x17; global double-deref",
+"confidence": "med",
+"file": "0203cb90.c"
+},
+{
+"addr": "0203d0e0",
+"module": "main",
+"cls": "A",
+"size": 224,
+"recipe": "Unrolled 6-byte memcmp table scan, stride 0xc0; not-found tail call + saturating inc",
+"risk": "Stride 0xc0 / offsets 0x474,0xd12 guessed; manual byte compares vs memcmp inlining; mvn==-1 sentinel",
+"confidence": "med",
+"file": "0203d0e0.c"
+},
+{
+"addr": "0203d1c0",
+"module": "main",
+"cls": "A",
+"size": 152,
+"recipe": "Guarded lookup loop; halfword-key match + helper call; indexed byte result",
+"risk": "Offsets 0x47c,0xd12,0x445,0x7a/0xa and stride 0xc0 guessed; r2==0x20 special-case + early ret",
+"confidence": "low",
+"file": "0203d1c0.c"
+},
+{
+"addr": "0203d258",
+"module": "main",
+"cls": "A",
+"size": 144,
+"recipe": "Guarded lookup loop, stride 0x24; byte-key match + helper; indexed byte result",
+"risk": "Stride 0x24, offsets 0x3,0x1,0x4,0xa,0xd12 guessed; r2==0x20 early-exit; ldreqb signed result",
+"confidence": "low",
+"file": "0203d258.c"
+},
+{
+"addr": "0203dae0",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "Two-helper-preamble then switch(==7/==8) dispatch; result in callee-saved",
+"risk": "func_0203c888 return cached in r4 then overwritten only in cases; default returns the c900 setup value",
+"confidence": "high",
+"file": "0203dae0.c"
+},
+{
+"addr": "0203de2c",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "GE-ladder dispatch to tail calls; cached arg in callee-saved r4",
+"risk": "func_0203c848 return drives <4 / <5 / ==5 ladder; r4=func_0203c900 result passed to two tails",
+"confidence": "high",
+"file": "0203de2c.c"
+},
+{
+"addr": "0203deac",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "Tiny scan loop, bit7 test via (b<<24)>>31, leaf bx lr",
+"risk": "Offset 0x447 + stride 4 guessed; u8 loop counter wrap (and #0xff) and bls/bcc unsigned compares",
+"confidence": "med",
+"file": "0203deac.c"
+},
+{
+"addr": "0203ee94",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "Two-call guard chain returning constants; sub sp #4 stub frame",
+"risk": "mvn r1,#0x26 => compare against -0x27; constants 0xb/0x9 mapping; conditional-return epilogues",
+"confidence": "high",
+"file": "0203ee94.c"
+},
+{
+"addr": "0203ef68",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "Two-call guard returning constants; void setup call on success path",
+"risk": "func_020433d0==0 -> 0xe; else func_0203c85c(3) then return 0x11; sub sp #4 stub frame",
+"confidence": "high",
+"file": "0203ef68.c"
+},
+{
+"addr": "0203f030",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "linear call seq; guard-then-tail; store-order for global",
+"risk": "data_0219ecdc decl type (u32 vs int*) may flip the str reloc class; callee signatures guessed",
+"confidence": "high",
+"file": "0203f030.c"
+},
+{
+"addr": "0203f544",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "linear stack-buffer call seq; address-of locals in asm order",
+"risk": "stack frame is 0x6c; my struct split (0x14/0x58) may shift sp offsets if mwcc lays locals differently",
+"confidence": "med",
+"file": "0203f544.c"
+},
+{
+"addr": "0203f6cc",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "stack-buffer; compare guard early-return; tail copy",
+"risk": "the 0x18 frame and buf[0]/buf[8] split may not match mwcc's stack layout exactly; arg0 pass-through",
+"confidence": "med",
+"file": "0203f6cc.c"
+},
+{
+"addr": "0203f718",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "trivial two-call wrapper; stack buffer; arg pass-through",
+"risk": "frame size 0x18 fixed; if mwcc rounds the single 0x18 buf differently the sub-sp imm shifts",
+"confidence": "high",
+"file": "0203f718.c"
+},
+{
+"addr": "0203f740",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "stack-buffer; compare returning bool 1/0 (moveq/movne)",
+"risk": "frame 0x1c vs 0x18 in siblings \u2014 buf size guessed; eq->1/ne->0 order must match (==0 form chosen)",
+"confidence": "high",
+"file": "0203f740.c"
+},
+{
+"addr": "0204033c",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "bind global once (single ldr reused); +0x1000 guard; tail call",
+"risk": "data_0219d9d4 must be a held base (one ldr, reused) \u2014 bound; field 0x384 type/sign; 0x1318 pool word should survive as literal",
+"confidence": "med",
+"file": "0204033c.c"
+},
+{
+"addr": "02040c98",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "trivial stack-buffer two-call wrapper; arg0 held in r4",
+"risk": "frame 0x18 fixed; arg0 saved to callee-saved before first call \u2014 natural; buf size guessed",
+"confidence": "high",
+"file": "02040c98.c"
+},
+{
+"addr": "02040d54",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "guard chain (movs/moveq, cmp/movge) + tail call returning bool",
+"risk": "arg3 must be signed for the movge (>= signed); h held in r4 across calls; movs-on-call-result idiom",
+"confidence": "high",
+"file": "02040d54.c"
+},
+{
+"addr": "02040de8",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "counted loop over 0x20 stride-8 table; +0x1000 field; recompute base each iter",
+"risk": "i<<3 must lower to add r0,base,r4,lsl#3 (not strength-reduced to a pointer bump) \u2014 risk it bumps; signed blt",
+"confidence": "med",
+"file": "02040de8.c"
+},
+{
+"addr": "020414b0",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "blx through ctx+0x1000 fn-ptr; movs-arg guard; store-order field set then add",
+"risk": "field offsets/types of Out guessed; the [r4] reload before the add and store-order (0x4,0xc,8) must match; ctor sig",
+"confidence": "med",
+"file": "020414b0.c"
+},
+{
+"addr": "02041520",
+"module": "main",
+"cls": "A",
+"size": 12,
+"recipe": "ands/bicne mask-clear idiom (if-test then in-place clear)",
+"risk": "mwcc may emit tst;bicne or fold to a plain bic instead of ands;bicne \u2014 the if-guard form is the steer",
+"confidence": "med",
+"file": "02041520.c"
+},
+{
+"addr": "02041dbc",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "memset call; bind base+0x1000 once (held in r1); store-order fields; reload 0x1134 twice",
+"risk": "0xb68/0x5ea ride pool words (LIT1/LIT2) \u2014 must stay literal; base+0x1134 reloaded not bound; store order exact",
+"confidence": "high",
+"file": "02041dbc.c"
+},
+{
+"addr": "02041ea0",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "ldrb guard ==0xff; +0x1000 fields recomputed off param; guard + tail call",
+"risk": "base param held in r4 with +0x1000/+offsets recomputed each use (not bound) \u2014 matches asm; 0x1bf4/0x1b34 pool words",
+"confidence": "high",
+"file": "02041ea0.c"
+},
+{
+"addr": "02042190",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "reload-per-use global (3 separate ldr); store arg0 at +0x1000; two calls",
+"risk": "data_0219d9f0 must RELOAD each ref (do NOT bind) \u2014 written as 3 refs; 0x11dc is a reused pool word; arg0 store width",
+"confidence": "high",
+"file": "02042190.c"
+},
+{
+"addr": "0204320c",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "BIND-vs-RELOAD (reload global after call) + tail-ish call seq",
+"risk": "0x11dc/base reload scheduling may reuse a reg instead of reloading; struct offsets assume byte ptr",
+"confidence": "med",
+"file": "0204320c.c"
+},
+{
+"addr": "02043b38",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "masked SETTER + cond store + RELOAD global on final read",
+"risk": "final read may reuse cached address reg instead of the fresh ldr the asm shows",
+"confidence": "med",
+"file": "02043b38.c"
+},
+{
+"addr": "020442f8",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "COMMUTATIVE eor operand-order + parallel induction-var loop",
+"risk": "strength reduction: mwcc may emit i<<3 instead of the separate sh accumulator the asm keeps",
+"confidence": "med",
+"file": "020442f8.c"
+},
+{
+"addr": "02044328",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "nested counted loop + bit-test-and-count idiom (ands;addne)",
+"risk": "inner shift base/counter reg-alloc may flip; loop may not keep the zero-held outer shift origin",
+"confidence": "med",
+"file": "02044328.c"
+},
+{
+"addr": "020444e4",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "GUARD/early-return + shift-sub SETTER; shared-immediate call",
+"risk": "the two 0x20 args may reload separately instead of mov r1,r0; arg0 ptr type guessed",
+"confidence": "med",
+"file": "020444e4.c"
+},
+{
+"addr": "02044724",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "memset/fill wrapper + recomputed-base byte SETTER (lsl #8)",
+"risk": "post-call address may be cached differently; func_0209448c arg order (val,ptr,len) assumed from regs",
+"confidence": "high",
+"file": "02044724.c"
+},
+{
+"addr": "02045678",
+"module": "main",
+"cls": "A",
+"size": 204,
+"recipe": "GUARD/branch-tail chain + RELOAD singleton per field (no callee-saved)",
+"risk": "reload-vs-bind of the singleton after the call and between the two f4/f6 stores; return-constant reuse may emit moveq; known reg-alloc wall",
+"confidence": "low",
+"file": "02045678.c"
+},
+{
+"addr": "02045744",
+"module": "main",
+"cls": "A",
+"size": 148,
+"recipe": "GUARD chain, void; s->f4 CSE'd; RELOAD singleton post-call/between stores",
+"risk": "second s->f4 may reload instead of CSE; final two stores' reload scheduling may differ; cluster is reg-alloc-walled",
+"confidence": "low",
+"file": "02045744.c"
+},
+{
+"addr": "020457d8",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "double null GUARD + SETTER + post-store call, return const",
+"risk": "minimal; struct field offsets (f0 word, f4 halfword) assume the inferred layout",
+"confidence": "high",
+"file": "020457d8.c"
+},
+{
+"addr": "020458d8",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "DISPATCH switch -> cmp/beq chain of pointer-arg tail calls",
+"risk": "low; mwcc could pick a jump table, but 3 dense cases normally stay a cmp chain",
+"confidence": "high",
+"file": "020458d8.c"
+},
+{
+"addr": "020459c4",
+"module": "main",
+"cls": "A",
+"size": 44,
+"recipe": "counted scan loop (loop-rotation guard + do-while), index<<1",
+"risk": "loop rotation may keep a pre-test form; index/return reg sharing normally holds",
+"confidence": "med",
+"file": "020459c4.c"
+},
+{
+"addr": "02045c34",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "arg-caching across calls + sequential call/shuffle",
+"risk": "exact callee-saved register numbers (r4..r7) assigned to a0..a3 may permute vs the asm",
+"confidence": "high",
+"file": "02045c34.c"
+},
+{
+"addr": "02045c7c",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "stack-arg spill (5th-7th) + cached-arg sequential calls",
+"risk": "7-arg shape inferred from spills; mwcc arg-evaluation/spill order for the stack args may reorder; a3 passed twice",
+"confidence": "med",
+"file": "02045c7c.c"
+},
+{
+"addr": "02045cb8",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "sequential calls + global stores + pooled-immediate arg",
+"risk": "low; preload order of the 0xfffe8515 pool word vs the daf0 store is scheduling-only",
+"confidence": "high",
+"file": "02045cb8.c"
+},
+{
+"addr": "020461fc",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "guard-chain early-returns + void tail call; sp3 tier",
+"risk": "r1=second-arg assumption; if a/p arg roles swap, reg mismatch. Three reloads of field_4 must match.",
+"confidence": "high",
+"file": "020461fc.c"
+},
+{
+"addr": "02046694",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "counted byte-scan loop + tail-call(index); sp3 tier",
+"risk": "loop induction (p++ vs base[i]) may schedule ldrb/add differently; ble-vs-blt guard ordering could flip.",
+"confidence": "med",
+"file": "02046694.c"
+},
+{
+"addr": "02046718",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "indexed table scan + call, return flag; sp3 tier",
+"risk": "table typed void*[]; if dsd extracts data_0219daf4 as char[], stride/index addressing could differ. Loop-bound 0x20 fixed.",
+"confidence": "high",
+"file": "02046718.c"
+},
+{
+"addr": "0204682c",
+"module": "main",
+"cls": "A",
+"size": 44,
+"recipe": "leaf table-scan returning index / -1; sp3 tier (no frame)",
+"risk": "leaf has no push/sub-sp; if mwcc emits a frame it diverges. data_0219daf4 element type must be 4-byte for lsl#2.",
+"confidence": "high",
+"file": "0204682c.c"
+},
+{
+"addr": "02046888",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "null-guard + table scan returning entry; sp3 tier",
+"risk": "match arm must RELOAD data_0219daf4 base (ldreq twice) \u2014 writing data_0219daf4[i] not e should force it; could instead reuse e and mismatch.",
+"confidence": "med",
+"file": "02046888.c"
+},
+{
+"addr": "02046a1c",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "null-guard + stack out-param + tail call; sp3 tier",
+"risk": "out-param type void** assumed; if func_02046a5c writes a non-pointer, [sp] reload arg type harmless but signature guessed.",
+"confidence": "high",
+"file": "02046a1c.c"
+},
+{
+"addr": "02046a5c",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "guard + ptr-arith out-param + byte dispatch + tail calls; sp3",
+"risk": "b369 double-read needs separate || operands (not a cached temp); 0x624 materialized as pool word \u2014 magnitude may inline as imm.",
+"confidence": "med",
+"file": "02046a5c.c"
+},
+{
+"addr": "02046ae0",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "null-guard + byte dispatch + (call+1) tails; sp3 tier",
+"risk": "b369 must be re-loaded per compare (two ldrb) \u2014 caching in a local would emit one ldrb and diverge.",
+"confidence": "high",
+"file": "02046ae0.c"
+},
+{
+"addr": "02046b3c",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "multi-guard chain + lookup + call, tri-valued return; sp3",
+"risk": "f_24 reloaded after the call (second daec ref) \u2014 split refs should match; ==5/==6 may merge into a range compare.",
+"confidence": "med",
+"file": "02046b3c.c"
+},
+{
+"addr": "02046ba8",
+"module": "main",
+"cls": "A",
+"size": 184,
+"recipe": "guard chain + byte branch + field stores + calls; sp3 tier",
+"risk": "struct holds *daec base across guard into branch (r2); C may reload. b_2d reload pattern + first-field double-deref must match.",
+"confidence": "low",
+"file": "02046ba8.c"
+},
+{
+"addr": "02048050",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "leaf guard + teardown calls + store-order + null global; sp3",
+"risk": "arg ordering of func_0204548c (r0=0,r1=f_24,r2=0) guessed; final `data_0219dc78=0` nulls the pointer global itself, type must be ptr.",
+"confidence": "med",
+"file": "02048050.c"
+},
+{
+"addr": "0204823c",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "fn-pointer-arg call + global-reload field stores; sp3 tier",
+"risk": "func_02047c08 first arg is the func ADDRESS (decays from name) \u2014 must not be called. Reload between the two stores must match (two ldr [p]).",
+"confidence": "high",
+"file": "0204823c.c"
+},
+{
+"addr": "02048c28",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "indirect call via struct fn-ptr + constant store; sp3 tier",
+"risk": "arg load order b_1d/f_30 then f_2c last must hold; *p cached (r3) across the three reads then reloaded for the store \u2014 over/under-binding could flip.",
+"confidence": "med",
+"file": "02048c28.c"
+},
+{
+"addr": "020490dc",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "null-guard + clear + 64-bit tick split into two stores; sp3",
+"risk": "func_020930b0 must return r0:r1 as u64; the >>32 split could emit shifts instead of plain hi/lo. f_8=0 before call, reload after.",
+"confidence": "med",
+"file": "020490dc.c"
+},
+{
+"addr": "02049120",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "GUARD + find-loop + bound-global reload + accessor f14",
+"risk": "g->f14 reload placement / r5-vs-r6 reg-alloc on i,arg may flip",
+"confidence": "med",
+"file": "02049120.c"
+},
+{
+"addr": "020492d0",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "GUARD g->f18 + stack-arg pack + single call",
+"risk": "stack-slot order [sp]/[sp+4] may reorder; func ptr passed as data",
+"confidence": "med",
+"file": "020492d0.c"
+},
+{
+"addr": "0204965c",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "GUARD + dual SETTER (f44,f48) + bound-global reload, return 0/1",
+"risk": "field offsets guessed; arg-store order f44 then f48 must match",
+"confidence": "high",
+"file": "0204965c.c"
+},
+{
+"addr": "0204b034",
+"module": "main",
+"cls": "A",
+"size": 116,
+"recipe": "GUARD(ptr+byte) + INIT clears + u64-split stores + arg guard",
+"risk": "dc84 struct offsets guessed; r4!=0 guard placement vs second u64 store",
+"confidence": "med",
+"file": "0204b034.c"
+},
+{
+"addr": "0204b1a4",
+"module": "main",
+"cls": "A",
+"size": 220,
+"recipe": "GUARD-chain of call+cmp(-1) early-returns + nested re-call + tail",
+"risk": "the nested data_ff9ac re-call branch structure; -1 vs 0 sentinels",
+"confidence": "high",
+"file": "0204b1a4.c"
+},
+{
+"addr": "0204b370",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "table-stride loop (entry->f4 guard + call) + Fill32 tail",
+"risk": "stride struct size 0xc / f4 offset; loop bound 0x9a; spurious sub sp,#4",
+"confidence": "med",
+"file": "0204b370.c"
+},
+{
+"addr": "0204b3d0",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "leaf scan loop, mul stride, masked early return",
+"risk": "i*0xc stride may strength-reduce to pointer-bump; (i+0x64)&0xff masking",
+"confidence": "med",
+"file": "0204b3d0.c"
+},
+{
+"addr": "0204bd8c",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "accessor flag-set(2) + double-deref call + flag-clear(0)",
+"risk": "f1a8/f4 offsets; the **(int**) double-deref of f4 may need cast tweak",
+"confidence": "med",
+"file": "0204bd8c.c"
+},
+{
+"addr": "0204bdc4",
+"module": "main",
+"cls": "A",
+"size": 124,
+"recipe": "SETTER f20c + call(byte fd+1) + branch: flag-bracketed call vs else call",
+"risk": "fd/f20c/f1a8 offsets; movs r4 zero-test selects branch; arg fd reload",
+"confidence": "med",
+"file": "0204bdc4.c"
+},
+{
+"addr": "0204bf00",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "two byte-cmp early-returns (f15==2/==3) + two void tail calls",
+"risk": "f15 offset; func_0204bf44(1) is a plain call (not return) before epilogue",
+"confidence": "high",
+"file": "0204bf00.c"
+},
+{
+"addr": "0204ce3c",
+"module": "main",
+"cls": "A",
+"size": 84,
+"recipe": "two accessor results (a/b) + halfword read + stack-arg call + clear f204",
+"risk": "f24/fa4(u16)/f204 offsets; a held in r4 across second acc(); ret returned",
+"confidence": "med",
+"file": "0204ce3c.c"
+},
+{
+"addr": "0204d468",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "Copy32 wrapper + unsigned guard (n>2) + two field stores",
+"risk": "Copy32 arg order (dst,src,n); n+2 unsigned compare; f348/f34c/0x350 offsets",
+"confidence": "med",
+"file": "0204d468.c"
+},
+{
+"addr": "0204f040",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "stack-arg pack (10 words) + single call, r0 passthrough",
+"risk": "many stack slots \u2014 any reorder fails; data_ symbols passed by address",
+"confidence": "med",
+"file": "0204f040.c"
+},
+{
+"addr": "0204f310",
+"module": "main",
+"cls": "A",
+"size": 176,
+"recipe": "init call + setter sequence (store-order) + 5 registration calls",
+"risk": "many offsets (f15/f16/f464/f468/f17d/f2d0); acc reloaded per store",
+"confidence": "med",
+"file": "0204f310.c"
+},
+{
+"addr": "0204f798",
+"module": "main",
+"cls": "A",
+"size": 136,
+"recipe": "two guard+free blocks (RELOAD global) + byte clears, store-order",
+"risk": "struct field offsets for the 3 globals guessed; func_0204548c arg shape (4,?,0) assumed; sp3 routing",
+"confidence": "med",
+"file": "0204f798.c"
+},
+{
+"addr": "0204f9cc",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "32-bit bit-scan count loop (RELOAD global accessor), leaf",
+"risk": "func_020498f0 reloaded every iter (matches asm); field 0x2f0 int, 0xe byte; ands+addne order",
+"confidence": "med",
+"file": "0204f9cc.c"
+},
+{
+"addr": "0204fc38",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "linear search loop, early return, tail call (RELOAD global)",
+"risk": "field 0xf4 is word array; func_0204fa7c(i,count) arg order; ble/blt loop shape",
+"confidence": "med",
+"file": "0204fc38.c"
+},
+{
+"addr": "0205000c",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "cmp early-return (byte guard) + 2 byte clears + tail call, RELOAD",
+"risk": "fields 0x15/0x14/0x16 u8, 0x10 word(ptr); func_020673dc takes that word; sp3 routing",
+"confidence": "med",
+"file": "0205000c.c"
+},
+{
+"addr": "020517a0",
+"module": "main",
+"cls": "A",
+"size": 364,
+"recipe": "linear init: repeated RELOAD + zero-stores in store-order; Fill helper; stacked args",
+"risk": "ASM IS TRUNCATED in batch (76 lines, ends mid-body) \u2014 tail stores+epilogue/routing UNKNOWN; offsets/Fill32 sig guessed",
+"confidence": "low",
+"file": "020517a0.c"
+},
+{
+"addr": "02051ab0",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "guard chain + tail returns, RELOAD global; reuse saved args",
+"risk": "field 0xe4 word(ptr); func_02068cc8(p,r6)/func_02068a20(_,r5,r4) arg slots; default-arg passthrough r4",
+"confidence": "med",
+"file": "02051ab0.c"
+},
+{
+"addr": "02051e38",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "guard chain returning bool, RELOAD global; sp3 routing",
+"risk": "field 0x1a9 u8; func_020469b4()==5 guard; sp3 (push{lr}+sub sp,#4+pop pc); return-block order",
+"confidence": "med",
+"file": "02051e38.c"
+},
+{
+"addr": "02051ec0",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "guard chain with deref + call, RELOAD; bool-invert movs; sp3 routing",
+"risk": "field 0x200 word(ptr); func_02051618 result inverted to bool (eq->1); sp3 routing; guard order",
+"confidence": "med",
+"file": "02051ec0.c"
+},
+{
+"addr": "02051f48",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "byte field copy + switch-on-halfword tail call; reuse r1 sw value; sp3",
+"risk": "fields 0x1d/0x1e u8, 0x22 u16; func_0204fe54(a, p->f22, b) middle arg = leftover r1; sp3 routing",
+"confidence": "low",
+"file": "02051f48.c"
+},
+{
+"addr": "020525dc",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "double-deref global (RELOAD) + null-guard + blx callback dispatch",
+"risk": "global is ptr-to-struct, +0x60c is fn-ptr; callback(arg1, func_02046870()); r0(arg0) ignored at entry",
+"confidence": "med",
+"file": "020525dc.c"
+},
+{
+"addr": "0205261c",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "null guards (global RELOAD via ip) then 2-way tail dispatch; sp3",
+"risk": "global ptr non-null guard via ip; func_02052218 vs func_02052160 picked by (r3!=0); sp3 routing",
+"confidence": "med",
+"file": "0205261c.c"
+},
+{
+"addr": "02052674",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "store-global + Fill call + offset halfword store (constant); sp3",
+"risk": "data_0219e3ec is ptr (str r0 then later ldr+deref); func_020945f4(_,0,0x614); +0x600+0x10 strh 0x5b9; sp3",
+"confidence": "med",
+"file": "02052674.c"
+},
+{
+"addr": "02052704",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "cmp chain returning constant (DISPATCH); leaf bx lr",
+"risk": "pure leaf; (r0 in {2,3,4})->0xc else 0x8; compare-order matches source 2,3,4",
+"confidence": "high",
+"file": "02052704.c"
+},
+{
+"addr": "02052818",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "early-return guard + linear field stores in store-order; sp3",
+"risk": "fields 0x4/0x8 word, 0x1d u8=1, 0x10/0x18 word=0; func_02052334(a0)==2 guard; sp3 routing; r4=p",
+"confidence": "med",
+"file": "02052818.c"
+},
+{
+"addr": "02052ddc",
+"module": "main",
+"cls": "A",
+"size": 24,
+"recipe": "TAIL-CALL thunk via word ptr; field load + arg swap",
+"risk": "f_24 offset/sign guessed; pure-tail bx-via-ip should match; return type may be void",
+"confidence": "high",
+"file": "02052ddc.c"
+},
+{
+"addr": "02052ecc",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "GUARD/early-return null check + conditional call result",
+"risk": "offsets 0x1c/0x24 guessed; r2/r1 zero-init order may flip the two mov #0; bl-not-tail forces frame",
+"confidence": "med",
+"file": "02052ecc.c"
+},
+{
+"addr": "02053114",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "clean compute + cmp-returning-bool (moveq/movne)",
+"risk": "f_3c offset guessed; 0x400 buffer must stay one array (not split); poly literal pool placement",
+"confidence": "high",
+"file": "02053114.c"
+},
+{
+"addr": "020531c0",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "two-arm cmpeq-flag; branch-tail duplication; long-long callee",
+"risk": "struct offsets guessed; cmp/cmpeq operand order (hi-then-lo) may swap; moveq/movne block-order coin-flip",
+"confidence": "med",
+"file": "020531c0.c"
+},
+{
+"addr": "020532f4",
+"module": "main",
+"cls": "A",
+"size": 136,
+"recipe": "INIT/CLEAR memset + STORE-ORDER field writes; CRC; OR-flag",
+"risk": "offsets/struct shape guessed; func_02053230 call interleaved between f_1c and f_24 stores must keep that order; r5=self hoist",
+"confidence": "med",
+"file": "020532f4.c"
+},
+{
+"addr": "020534b4",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "cond ? value : 0 via and-with-mask select",
+"risk": "mwcc may emit a plain movne x/moveq 0 instead of the mvnne/andne mask trio; reg-alloc-walled per .s header",
+"confidence": "low",
+"file": "020534b4.c"
+},
+{
+"addr": "02053560",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "stack-record + hash + mask; long-long (ptr,hash) return",
+"risk": "work buffer size 0x100 vs rec at sp[0] layout must match; reg-alloc-walled per .s header; ptr->u32 cast may add a mov",
+"confidence": "low",
+"file": "02053560.c"
+},
+{
+"addr": "02053650",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "GUARD early-return + AND-mask bit-test bool",
+"risk": "(x&4)==4 may compile via tst/movne differently than cmp #4; otherwise clean leaf \u2014 low risk",
+"confidence": "high",
+"file": "02053650.c"
+},
+{
+"addr": "020536bc",
+"module": "main",
+"cls": "A",
+"size": 12,
+"recipe": "SETTER two-store, preserve arg order + store order",
+"risk": "offsets 0x4/0x8 guessed; trivial leaf \u2014 should byte-match (confirmed by sibling func_02052e90.c caller)",
+"confidence": "high",
+"file": "020536bc.c"
+},
+{
+"addr": "020536d0",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "arg-shuffle + call + single SETTER store",
+"risk": "reg-alloc-walled per .s header: r4/r5 save-reg choice for a1/self may flip; 0x7ff pool placement; offset guessed",
+"confidence": "low",
+"file": "020536d0.c"
+},
+{
+"addr": "02053728",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "two-field masked load -> long-long; volatile orr-#0 marker",
+"risk": "f_0/f_4 offsets guessed; load ordering of the two ldr may reorder vs orig; 0x7ff pool literal",
+"confidence": "high",
+"file": "02053728.c"
+},
+{
+"addr": "02053a64",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "stacked-arg call + result-store-to-global; reload global",
+"risk": "data_0219e474 offsets 0x0/0x4c/0x50 guessed; the two global reloads (LIT1 used twice) must each reload, not bind",
+"confidence": "med",
+"file": "02053a64.c"
+},
+{
+"addr": "02053bfc",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "decrementing for-loop calling helper; signed >=0 exit",
+"risk": "reg-alloc-walled per .s header: r4/r5 counter-vs-self assignment may rotate; loop epilogue dup may differ",
+"confidence": "low",
+"file": "02053bfc.c"
+},
+{
+"addr": "02053ddc",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "TAIL-CALL thunk; three field loads + arg passthrough",
+"risk": "offsets 0x0/0x8/0x14 guessed; pure tail bx-via-ip should match; return type may be void",
+"confidence": "high",
+"file": "02053ddc.c"
+},
+{
+"addr": "02054148",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "null-assert guard + count-reload loop + tail frees",
+"risk": "loop-count signedness (blt) and assert pool-literal order; res14 load type assumed pointer",
+"confidence": "high",
+"file": "02054148.c"
+},
+{
+"addr": "02054314",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "guard on field callback + bind-vs-reload (reload cb)",
+"risk": "callback arg/return type guessed (void*); if cb bound to local the reload ldr disappears",
+"confidence": "high",
+"file": "02054314.c"
+},
+{
+"addr": "02054338",
+"module": "main",
+"cls": "A",
+"size": 128,
+"recipe": "null-assert + indexed-array loop + early-return nonzero",
+"risk": "loop-count signedness; assert pool-literal order; struct field types assumed word",
+"confidence": "high",
+"file": "02054338.c"
+},
+{
+"addr": "020543b8",
+"module": "main",
+"cls": "A",
+"size": 116,
+"recipe": "null-assert + indexed-array loop (void body, count pre-guard)",
+"risk": "void vs int return (trailing r0 leftover); loop-count signedness; assert pool order",
+"confidence": "high",
+"file": "020543b8.c"
+},
+{
+"addr": "02054614",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "double null-test (assert then return-0) + accumulate loop",
+"risk": "scheduling: total=0 must hoist above assert to feed mov r2,r4; else r2,#0 emitted instead",
+"confidence": "med",
+"file": "02054614.c"
+},
+{
+"addr": "02054684",
+"module": "main",
+"cls": "A",
+"size": 124,
+"recipe": "double null-test + free-each loop + two tail frees",
+"risk": "loop-count signedness; assert pool order; items load type assumed pointer",
+"confidence": "high",
+"file": "02054684.c"
+},
+{
+"addr": "02054840",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "tail-forward with inserted constant arg (stack-arg shuffle)",
+"risk": "arg widths assumed int; outgoing-stack slot ordering should match mwcc default",
+"confidence": "high",
+"file": "02054840.c"
+},
+{
+"addr": "02054868",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "stack-buffer pipeline (declare buffers, sequential calls)",
+"risk": "mwcc may order buf0/buf1 differently or size frame !=0x68; buffer sizes guessed",
+"confidence": "med",
+"file": "02054868.c"
+},
+{
+"addr": "020548b4",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "dual separate-index loop + bind base across iters",
+"risk": "loop bound emits blt vs the original bcc (unsigned) -> may need unsigned i",
+"confidence": "med",
+"file": "020548b4.c"
+},
+{
+"addr": "02054b00",
+"module": "main",
+"cls": "A",
+"size": 28,
+"recipe": "predicated conditional store (if/else same global, bic mask)",
+"risk": "unused a1 must not perturb regs; & 0x7fffffff must encode as bic not and",
+"confidence": "high",
+"file": "02054b00.c"
+},
+{
+"addr": "02054c0c",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "out-param call + conditional select on result (mvneq/ldrne)",
+"risk": "minimal; out local must stay at sp+0 (single 4-byte frame)",
+"confidence": "high",
+"file": "02054c0c.c"
+},
+{
+"addr": "02054c30",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "byte marshal around call + reload + tail call",
+"risk": "func_02054ea8/func_0206eb4c return types assumed int; *a2 store width (str) vs strb",
+"confidence": "high",
+"file": "02054c30.c"
+},
+{
+"addr": "02054c78",
+"module": "main",
+"cls": "A",
+"size": 48,
+"recipe": "drop dead leading args + helper call + tail call constants",
+"risk": "func_02054ea8 return assumed int; *a4 deref is word; dead args must emit no code",
+"confidence": "high",
+"file": "02054c78.c"
+},
+{
+"addr": "02054ca8",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "unrolled byte copy + buf[0] override + forward + tail call",
+"risk": "unroller may not emit 4x2; DSE could drop buf[0] copy; frame/buf placement (sp+4) may differ",
+"confidence": "low",
+"file": "02054ca8.c"
+},
+{
+"addr": "02054d14",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "arg-forward wrapper + stacked-arg + tail call",
+"risk": "reg-alloc of forwarded r0-r3 / stack-slot ordering of p5 store may differ; arg5/arg6 split a guess",
+"confidence": "low",
+"file": "02054d14.c"
+},
+{
+"addr": "02054d68",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "wrapper, mov-to-callee-save args, byte copy, tail call",
+"risk": "r4/r5 assignment to p3/p2 and the sub sp,#4 scratch frame may not reproduce; clone-of-02054c30 shape",
+"confidence": "low",
+"file": "02054d68.c"
+},
+{
+"addr": "02054db8",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "unrolled byte-copy loop + buffer + tail call",
+"risk": "mwcc may not 2x-unroll the loop identically (lr counter, post-inc ldrb/strb pairs); buffer size/scheduling may differ",
+"confidence": "low",
+"file": "02054db8.c"
+},
+{
+"addr": "02054dfc",
+"module": "main",
+"cls": "A",
+"size": 88,
+"recipe": "u16 early-return guard + unrolled byte copy + tail call",
+"risk": "the ldrh-guard fold (addeq sp/moveq r0/ldmeq) and loop unroll shape may not match; src struct layout guessed",
+"confidence": "low",
+"file": "02054dfc.c"
+},
+{
+"addr": "02055128",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "stack marshalling, literal args, !=-1 guard, return out",
+"risk": "the unconditional ldrne/mov r0 (out left uninitialised on -1 path) and &len passed both stacked+r3 are hard to force; low",
+"confidence": "low",
+"file": "02055128.c"
+},
+{
+"addr": "02055170",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "stack marshalling, literal args, !=-1 guard, return out",
+"risk": "same as 02055128: out-on-failure-path uninitialised + dual &len passing; clone, so matches iff 02055128 does",
+"confidence": "low",
+"file": "02055170.c"
+},
+{
+"addr": "02055298",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "signed-char guarded table-remap loop, pre-increment, return arg",
+"risk": "c<0x80 on signed char is always true; compiler may drop the bge guard \u2014 confirm both cmp #0 and cmp #0x80 survive",
+"confidence": "med",
+"file": "02055298.c"
+},
+{
+"addr": "020552dc",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "null-guard + alloc(size+1) + cond init call + return ptr",
+"risk": "movs r5/r4 callee-save assignment and the movs-based null tests may flip reg-alloc; otherwise clean",
+"confidence": "med",
+"file": "020552dc.c"
+},
+{
+"addr": "020558fc",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "double null-guard return-2, branchless cond out-store",
+"risk": "struct field offsets guessed (0x108/0x430); mwcc may not fuse both stores branchless via movne/moveq predication",
+"confidence": "low",
+"file": "020558fc.c"
+},
+{
+"addr": "02055c04",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "guard chain returning 2/0 + ==4 dispatch + two tail calls",
+"risk": "func_0205ffc0 first arg is ctr (ip) vs p \u2014 ambiguous; offsets 0x108/0x1d8 guessed; predicated early-outs may not match (brief 302 ships .s)",
+"confidence": "low",
+"file": "02055c04.c"
+},
+{
+"addr": "02055e28",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "triple null/flag guard + lock call + tail call",
+"risk": "ldmeq/ldmne predicated returns instead of branches may not reproduce; f108 offset guessed; brief 302 shipped this as .s",
+"confidence": "low",
+"file": "02055e28.c"
+},
+{
+"addr": "02055fec",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "double null-guard return-2 + flag return-0 + tail call",
+"risk": "addne/movne predicated return-0 vs branch may differ; f108 offset guessed; brief 302 shipped this as .s",
+"confidence": "low",
+"file": "02055fec.c"
+},
+{
+"addr": "02056068",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "global==1 gate + arg null gate (return 2) + tail call",
+"risk": "predicated addne/moveq returns vs branches may differ; global reloaded (not bound) matches asm; otherwise clean",
+"confidence": "med",
+"file": "02056068.c"
+},
+{
+"addr": "020566f4",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "teardown: lock, free+null field, free field, free ctx, null handle",
+"risk": "ctx held in r4 across all calls (bind) matches; store-order of f460=0 vs f428 free may reorder; offsets guessed; shipped .s",
+"confidence": "med",
+"file": "020566f4.c"
+},
+{
+"addr": "02056a34",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "guard + MIN-style conditional store (subgt/strgt as if)",
+"risk": "r0 (arg0) unused but must occupy the slot; subgt/strgt fuse depends on -O4 keeping value in r0",
+"confidence": "high",
+"file": "02056a34.c"
+},
+{
+"addr": "02058038",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "stack-buffer format then tail call (wrapper)",
+"risk": "stack frame must size to 0x14; buffer-passed-as-&buf[0] must yield add r0,sp,#0; reg cache of r0/r1 order may differ",
+"confidence": "med",
+"file": "02058038.c"
+},
+{
+"addr": "02059d90",
+"module": "main",
+"cls": "A",
+"size": 204,
+"recipe": "INIT/CLEAR teardown; reload p->m each use (no bind)",
+"risk": "mwcc may cache p->member (r4->+0xc) in a callee-saved reg instead of reloading every use; if so the ldr-per-store pattern flips",
+"confidence": "med",
+"file": "02059d90.c"
+},
+{
+"addr": "0205bc24",
+"module": "main",
+"cls": "A",
+"size": 168,
+"recipe": "DISPATCH switch on field, result store-if-nonzero, default assert",
+"risk": "jump-table layout/case3-into-default ordering; the default error block's two-call sequence + sub sp,#4 may schedule differently",
+"confidence": "med",
+"file": "0205bc24.c"
+},
+{
+"addr": "0205bccc",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "list-walk predicate (guard chain inside loop, tail return)",
+"risk": "the inner && short-circuit order (f8 then f0) must compile to beq-skip then movne/bxne; rare reg flip on node temp",
+"confidence": "high",
+"file": "0205bccc.c"
+},
+{
+"addr": "0205bd0c",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "list-search by field; conditional *out store; tail return",
+"risk": "strne r3,[r1] (store node to out) vs movne/strne 0 on the miss path must both gate on out!=0; node-reg flip possible",
+"confidence": "high",
+"file": "0205bd0c.c"
+},
+{
+"addr": "0205bdb8",
+"module": "main",
+"cls": "A",
+"size": 168,
+"recipe": "guard (state==3) then teardown; decrement+reload+assert; tail frees",
+"risk": "g->+0x210 reloaded after store for the bge check; m->+0x4 reloaded per call; assert block scheduling; bge=signed",
+"confidence": "med",
+"file": "0205bdb8.c"
+},
+{
+"addr": "0205c340",
+"module": "main",
+"cls": "A",
+"size": 128,
+"recipe": "hoisted struct loads + null assert; stack-arg marshal then tail call",
+"risk": "r4/r5/r6 loaded from arg3 BEFORE the null check (must not sink past assert); 0x4c frame size; stacked args r6,r4 order",
+"confidence": "low",
+"file": "0205c340.c"
+},
+{
+"addr": "0205c6e4",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "stack-zeroed call w/ out-param, early-return, conditional error store",
+"risk": "7-arg call: three stacked zeros (str 0 x3) + &out at sp+0xc; frame 0x14; moveq r0,#0x65/streq/moveq sequence ordering",
+"confidence": "low",
+"file": "0205c6e4.c"
+},
+{
+"addr": "0205c748",
+"module": "main",
+"cls": "A",
+"size": 144,
+"recipe": "alloc + memset + ordered field init; bind old head (single load); publish",
+"risk": "interleave of stores around the two calls may reschedule; old-head bind (one ldr, two uses) and store-order f0,f4,f8,fc,f10,f3c,f38",
+"confidence": "med",
+"file": "0205c748.c"
+},
+{
+"addr": "0205c7f4",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "list-search predicate; compound && match; return node (tail)",
+"risk": "&& order (fc==key then f0==0x69) must keep the bxeq-returns-node form; node temp reg-alloc could flip",
+"confidence": "high",
+"file": "0205c7f4.c"
+},
+{
+"addr": "0205c928",
+"module": "main",
+"cls": "A",
+"size": 120,
+"recipe": "straight-line repeated MMIO-toggle calls (fixed masks)",
+"risk": "low; only risk is mwcc reordering the independent calls, but data deps via r4 keep order; mask immediates are MOV-encodable",
+"confidence": "high",
+"file": "0205c928.c"
+},
+{
+"addr": "0205cab4",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "sequential teardown calls + null-clear stores; guarded free",
+"risk": "p->+8 reloaded before each of the first two calls (no bind); if mwcc binds it the ldr-per-call flips",
+"confidence": "high",
+"file": "0205cab4.c"
+},
+{
+"addr": "0205d4c0",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "leaf predicate; left-to-right && guard chain, conditional return",
+"risk": "&& evaluation order must be fc,f8,f18,f10; final moveq/bxeq form depends on last load landing in r0",
+"confidence": "high",
+"file": "0205d4c0.c"
+},
+{
+"addr": "02062164",
+"module": "main",
+"cls": "A",
+"size": 120,
+"recipe": "counted loop, unsigned-threshold guard, tail-call bool short-circuit",
+"risk": "reg-alloc on i/n (r4/r5) or list-reload at [r7,#0x60] each iter may flip; element field offset 0xc guessed",
+"confidence": "med",
+"file": "02062164.c"
+},
+{
+"addr": "02062498",
+"module": "main",
+"cls": "A",
+"size": 52,
+"recipe": "null-assert guard (movs+bne) then field accessor return",
+"risk": "assert helper arg order/signature; field 0x40 type assumed int; assert literal-pool layout",
+"confidence": "high",
+"file": "02062498.c"
+},
+{
+"addr": "020624cc",
+"module": "main",
+"cls": "A",
+"size": 60,
+"recipe": "null-assert guard then field setter (str at 0x40)",
+"risk": "assert helper signature; arg order (p,v) preserved; line 0x19c via immediate not pool",
+"confidence": "high",
+"file": "020624cc.c"
+},
+{
+"addr": "0206256c",
+"module": "main",
+"cls": "A",
+"size": 148,
+"recipe": "equality guard early-return, address-of-locals out-params, two-branch dispatch",
+"risk": "param-home/local stack-slot reuse (the {r0-r3} home + locals aliasing) may not reproduce; offsets 0xc/0x98 guessed",
+"confidence": "low",
+"file": "0206256c.c"
+},
+{
+"addr": "0206280c",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "if/else selector with two tail-call dispatch returns",
+"risk": "frame epilogue (stmfd{lr}+sub#4, bl-not-b tail) may want legacy_sp3 compiler; helpers take 3 args",
+"confidence": "med",
+"file": "0206280c.c"
+},
+{
+"addr": "02062aec",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "out-param probe, two-stage bool short-circuit, bool-normalize tail",
+"risk": "equal-constant args (7,7) reused as `mov r2,r1` may instead emit `mov r2,#7`; out frame size",
+"confidence": "med",
+"file": "02062aec.c"
+},
+{
+"addr": "02062b48",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "out-param probe with distinct const args, bool short-circuit tail",
+"risk": "out-local frame (sub#8) and r4 reg-alloc; helper signatures assumed",
+"confidence": "high",
+"file": "02062b48.c"
+},
+{
+"addr": "02062ba4",
+"module": "main",
+"cls": "A",
+"size": 116,
+"recipe": "out-param probe (b+7 arg), middle helper on p+0x50, bool tail",
+"risk": "`(char*)p+0x50` add-base vs struct member; reg-alloc of a,b (r5/r4); arg b+7 fold",
+"confidence": "med",
+"file": "02062ba4.c"
+},
+{
+"addr": "02062c18",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "out-param probe with distinct const args, bool short-circuit tail",
+"risk": "out-local frame (sub#8) and r4 reg-alloc; helper signatures assumed",
+"confidence": "high",
+"file": "02062c18.c"
+},
+{
+"addr": "02062d88",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "out-param probe, middle helper on p+0x50 with const args, bool tail",
+"risk": "`(char*)p+0x50` base-add; sub#4 frame (3 saved regs odd); arg order a then 0x20",
+"confidence": "med",
+"file": "02062d88.c"
+},
+{
+"addr": "02062df8",
+"module": "main",
+"cls": "A",
+"size": 116,
+"recipe": "out-param probe (b+7 arg, const 0), helper on p+0x50, bool tail",
+"risk": "`(char*)p+0x50` base-add; a,b reg-alloc (r5/r4); b+7 fold; clone of 02062ba4",
+"confidence": "med",
+"file": "02062df8.c"
+},
+{
+"addr": "02063548",
+"module": "main",
+"cls": "A",
+"size": 216,
+"recipe": "sparse switch (cmp-chain) on opcode, per-case bool-return dispatch",
+"risk": "hoisted a=x+3/b=y-3 before switch; per-case `if(f)return 1;return 0` vs ternary; default=1 placement; sp3 frame",
+"confidence": "low",
+"file": "02063548.c"
+},
+{
+"addr": "02063620",
+"module": "main",
+"cls": "A",
+"size": 68,
+"recipe": "field-compare early-return, !=-as-0/1 arg, bool-normalize tail",
+"risk": "`t != 6` -> moveq/movne 0/1 may instead subtract; field 0xc type; const args 2/(t!=6)",
+"confidence": "med",
+"file": "02063620.c"
+},
+{
+"addr": "02063808",
+"module": "main",
+"cls": "A",
+"size": 76,
+"recipe": "selector branch, nested-call arg threading, bool-normalize tail",
+"risk": "non-eq path passes raw (p,b,c) intact; func_020644a4 2nd arg 0; reg-alloc r4=p",
+"confidence": "med",
+"file": "02063808.c"
+},
+{
+"addr": "02067354",
+"module": "main",
+"cls": "A",
+"size": 136,
+"recipe": "null-default-to-global; guard-chain calls; sentinel-compare tail call",
+"risk": "field_c4 reloaded twice (asm does); && short-circuit block order or the bl/ldmia tail-call merge may flip",
+"confidence": "med",
+"file": "02067354.c"
+},
+{
+"addr": "020673dc",
+"module": "main",
+"cls": "A",
+"size": 92,
+"recipe": "null-default; guard; unsigned-compare(cmp/movcc) conditional store; tail call",
+"risk": "unsigned compare must stay cc not lt; reg holding (r0-field_ac) result may flip; field_b4 store-vs-return order",
+"confidence": "med",
+"file": "020673dc.c"
+},
+{
+"addr": "0206763c",
+"module": "main",
+"cls": "A",
+"size": 24,
+"recipe": "null-default-to-global + single setter",
+"risk": "field offset 0xa8 from struct; trivial otherwise",
+"confidence": "high",
+"file": "0206763c.c"
+},
+{
+"addr": "02067654",
+"module": "main",
+"cls": "A",
+"size": 24,
+"recipe": "null-default-to-global + single setter",
+"risk": "field offset 0xa4 guessed; trivial otherwise",
+"confidence": "high",
+"file": "02067654.c"
+},
+{
+"addr": "0206766c",
+"module": "main",
+"cls": "A",
+"size": 24,
+"recipe": "null-default-to-global + single setter",
+"risk": "field offset 0xa0 guessed; trivial otherwise",
+"confidence": "high",
+"file": "0206766c.c"
+},
+{
+"addr": "02067850",
+"module": "main",
+"cls": "A",
+"size": 32,
+"recipe": "two if-guards (bxlt/bxgt) + indexed word-array store",
+"risk": "table element type assumed int (lsl#2); if signed/index semantics differ, codegen unaffected; very low",
+"confidence": "high",
+"file": "02067850.c"
+},
+{
+"addr": "02067870",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "pre-guarded counted loop; ldrb/call/strb; cache args",
+"risk": "which callee-saved reg holds ctx/buf/n may rotate vs r7/r6/r5; ldrb may be u8 vs s8 (assumed u8 from ldrb)",
+"confidence": "med",
+"file": "02067870.c"
+},
+{
+"addr": "02067a4c",
+"module": "main",
+"cls": "A",
+"size": 72,
+"recipe": "store-order field init + count-up index / count-down value loop",
+"risk": "loop may strength-reduce or fuse the v-- into 0xff-i; descending-value temp could move to a different reg",
+"confidence": "med",
+"file": "02067a4c.c"
+},
+{
+"addr": "02067b54",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "guarded call early-return (addne/ldmne) + tail call",
+"risk": "first call's r1 source ambiguous (arg1 reused live); the 'return 1' actually returns the call's r0 \u2014 early-return value/codegen may differ",
+"confidence": "low",
+"file": "02067b54.c"
+},
+{
+"addr": "02067b8c",
+"module": "main",
+"cls": "A",
+"size": 28,
+"recipe": "bounded-counter if-guard + post-increment + indexed byte store",
+"risk": "store offset folds via addlt r0,r0,r3 then strb #0x2c; struct layout (items at 0x2c, count at 0x40) guessed; predication vs branch could differ",
+"confidence": "med",
+"file": "02067b8c.c"
+},
+{
+"addr": "02067ba8",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "guard early-returns + sequenced calls + indirect blx tail",
+"risk": "the dead ldr r3,[+0x48] before blx not reproduced; fnptr arity (3 vs 4 args) and first call's r0 source unclear; blx scheduling is the known wall",
+"confidence": "low",
+"file": "02067ba8.c"
+},
+{
+"addr": "02067c08",
+"module": "main",
+"cls": "A",
+"size": 80,
+"recipe": "while-with-precheck; bind sub-object base (p+0x14) to a local",
+"risk": "the two-part && condition order/block layout, and whether sub stays in r4 vs reload; field offsets guessed; this is reg-alloc-walled (was shipped .s)",
+"confidence": "low",
+"file": "02067c08.c"
+},
+{
+"addr": "02068380",
+"module": "main",
+"cls": "A",
+"size": 108,
+"recipe": "linked-list unlink: prev/cur walk + predicated splice + count--",
+"risk": "shipped-.s reg-alloc wall; the head reload (ldr r1,[r0] after prev splice) and predicated str ordering likely differ; r1 reuse for next-ptr",
+"confidence": "low",
+"file": "02068380.c"
+},
+{
+"addr": "020683ec",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "linked-list pop-head + conditional tail-clear + count--",
+"risk": "shipped-.s wall; head reload after store (ldr r1,[r0]) and moveq/streq predication ordering may diverge from mwcc emit",
+"confidence": "low",
+"file": "020683ec.c"
+},
+{
+"addr": "02074c74",
+"module": "main",
+"cls": "A",
+"size": 104,
+"recipe": "guard+branch-tail, store-order, tail call",
+"risk": "struct field offsets guessed; r4=obj hoisted before guard may reorder; tail-call return type",
+"confidence": "med",
+"file": "02074c74.c"
+},
+{
+"addr": "02074e4c",
+"module": "main",
+"cls": "A",
+"size": 12,
+"recipe": "bare epilogue stub (not standalone-C)",
+"risk": "not a real C function; epilogue-only fragment of a split routine \u2014 cannot byte-match in isolation",
+"confidence": "low",
+"file": "02074e4c.c"
+},
+{
+"addr": "02074e58",
+"module": "main",
+"cls": "A",
+"size": 156,
+"recipe": "guard early-returns, branch-tail, call sequence",
+"risk": "two func_02075394 tails may be cross-jumped by mwcc; field_c reload vs bind; block order of else-branch",
+"confidence": "med",
+"file": "02074e58.c"
+},
+{
+"addr": "02074ef4",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "two state==const guards returning bool",
+"risk": "second check emits movne#1/moveq#0 pair; mwcc may fold differently if written as ==",
+"confidence": "high",
+"file": "02074ef4.c"
+},
+{
+"addr": "02075394",
+"module": "main",
+"cls": "A",
+"size": 352,
+"recipe": "blx-guard + store-order init (TRUNCATED asm)",
+"risk": "asm truncated \u2014 tail unverifiable; allocator is indirect blx not a named call; alloc helper name unknown",
+"confidence": "low",
+"file": "02075394.c"
+},
+{
+"addr": "02075d74",
+"module": "main",
+"cls": "A",
+"size": 128,
+"recipe": "counted chunk loop, min via if-assign, mvn -1",
+"risk": "avail kept on stack ([sp]) via address-escape to func_02070ac0; if mwcc keeps it in a reg the reloads diverge",
+"confidence": "med",
+"file": "02075d74.c"
+},
+{
+"addr": "02076260",
+"module": "main",
+"cls": "A",
+"size": 36,
+"recipe": "pre-decrement carry-propagate increment loop",
+"risk": "ands;strb;bxne ordering \u2014 mwcc may emit cmp instead of reusing ands flags; pre-dec [r0,#-1]! form",
+"confidence": "med",
+"file": "02076260.c"
+},
+{
+"addr": "0207651c",
+"module": "main",
+"cls": "A",
+"size": 64,
+"recipe": "linear call sequence then status store",
+"risk": "func_02076870 takes field_81c as 3rd arg (r2) while r1 unset \u2014 arg signature guessed; r2=[r4,#0x81c] loaded before call",
+"confidence": "med",
+"file": "0207651c.c"
+},
+{
+"addr": "02076c5c",
+"module": "main",
+"cls": "A",
+"size": 100,
+"recipe": "small table-search loop, halfword reload on hit",
+"risk": "table reloaded via second ldr _LIT0 on hit (RELOAD not bind) \u2014 must keep data ref inside both uses; return promoted u16",
+"confidence": "med",
+"file": "02076c5c.c"
+},
+{
+"addr": "0207708c",
+"module": "main",
+"cls": "A",
+"size": 8,
+"recipe": "bare epilogue stub (not standalone-C)",
+"risk": "not a real C function; epilogue-only fragment \u2014 cannot byte-match in isolation",
+"confidence": "low",
+"file": "0207708c.c"
+},
+{
+"addr": "02077094",
+"module": "main",
+"cls": "A",
+"size": 40,
+"recipe": "strchr-style scan loop (ldrsb signed char), b-into-test",
+"risk": "loop entered via mid-test (b .L_c) \u2014 mwcc may emit pre-test header differently; order of '.' vs NUL compares",
+"confidence": "med",
+"file": "02077094.c"
+},
+{
+"addr": "02077a28",
+"module": "main",
+"cls": "A",
+"size": 96,
+"recipe": "counted search loop, single back-edge, ptr reload on hit",
+"risk": "list[i] reloaded on hit (ldreq [r5,r6,lsl#2]); *(list[i]) double-deref signature; count loaded before list",
+"confidence": "med",
+"file": "02077a28.c"
+},
+{
+"addr": "02077ab4",
+"module": "main",
+"cls": "A",
+"size": 56,
+"recipe": "unsigned bound check (cmp;cs) then single tail call",
+"risk": "on idx>=0x20 path r0 is left = idx (no mov) \u2014 return type/value of guard path; field_4 load from global table base",
+"confidence": "med",
+"file": "02077ab4.c"
+},
+{
+"addr": "02077b98",
+"module": "main",
+"cls": "A",
+"size": 112,
+"recipe": "IRQ-guarded counted scan, helper call, early break",
+"risk": "r4 reused as both arg-save and const 0x20; slot stride 0x5c via pointer-bump vs base+index; break vs fallthrough block order",
+"confidence": "med",
+"file": "02077b98.c"
+}
+]
+}
