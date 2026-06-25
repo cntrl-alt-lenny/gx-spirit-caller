@@ -1,0 +1,43 @@
+/* CAMPAIGN-PREP candidate for func_02060ad4 (main, class C, MED tier) — brief 496.
+ * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
+ * The campaign drops this into src/, runs ninja + objdiff, and applies the
+ * risk note below (these usually need 1+ reshape or a permuter/.s fallback).
+ *   recipe:     decl-order v0/v1/third/h; sign->1/0 via movgt/movle; store +0x8 before commit; bind table
+ *   risk:       the 3rd func_02060c9c has NO func_020ace00 after it yet its result feeds b84 as r1 (=r4=2nd resolve). My 'third' modeling of r1/r4 is wrong: r1=v1-resolve, r4=3rd-c9c-return. reshape-able (fix b84 arg from func_02060c9c return, drop ace00).
+ *   confidence: low
+ */
+/* CAMPAIGN-PREP candidate for func_02060ad4 (main, class C) — brief 496.
+ * UNVERIFIED build-free draft. MED tier: byte-match not expected first build.
+ *   recipe: decl-order r5/r4; two resolve-pairs + one bare read; -1 early-return; gt->1/0 flag
+ */
+/* func_02060ad4: read+resolve two config ints (func_02060c9c/func_020ace00),
+ * stage a third key (func_02060c9c only), open a record with mode 0
+ * (func_02060b84), bail on -1, look the handle up in the table at
+ * data_0219e518 (func_020540d0), store the first value at +0x8, then commit
+ * (func_02060604) with a 0/1 flag derived from sign of the first value. */
+
+extern int data_021013b8, data_021013e4, data_021013ec;
+extern void *data_0219e518;
+
+extern void  func_02060c9c(void *p, int key);
+extern int   func_020ace00(void);
+extern int   func_02060b84(int mode, int a, int b, int c);
+extern void *func_020540d0(void *table, int index);
+extern int   func_02060604(int handle, int flag, int z, int third, int extra);
+
+typedef struct Rec { char _pad_00[0x8]; int field_8; } Rec;
+
+int func_02060ad4(void *p) {
+    int v0, v1, third, h;
+    int flag;
+    Rec *r;
+    func_02060c9c(p, data_021013e4); v0 = func_020ace00();
+    func_02060c9c(p, data_021013b8); v1 = func_020ace00();
+    func_02060c9c(p, data_021013ec); third = 0; /* bare read, value unused as ace00 */
+    h = func_02060b84(0, 0, v1, third);
+    if (h == -1) return -1;
+    r = (Rec *)func_020540d0(data_0219e518, h);
+    if (v0 > 0) flag = 1; else flag = 0;
+    r->field_8 = v0;
+    return func_02060604(h, flag, 0, third, 0);
+}

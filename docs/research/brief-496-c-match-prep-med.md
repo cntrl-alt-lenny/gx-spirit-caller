@@ -2,7 +2,7 @@
 
 # Brief 496 — C-match campaign-prep, MED tier (class C/D)
 
-Extends the brief-494 prep bundle (1,291 HIGH candidates) with **112 MED-tier candidates** — class C (reg-alloc / decl-order) + class D (bitfield / divmod / store-order). Same build-free shape: each was reasoned from the function's target `.s` + the class recipe into a ready-to-build `docs/research/c-match-prep/<addr>.c`. `INDEX.json` now covers both tiers (1403 total: 1291 high + 112 med).
+Extends the brief-494 prep bundle (1,291 HIGH candidates) with **1232 MED-tier candidates** — class C (reg-alloc / decl-order) + class D (bitfield / divmod / store-order). Same build-free shape: each was reasoned from the function's target `.s` + the class recipe into a ready-to-build `docs/research/c-match-prep/<addr>.c`. `INDEX.json` now covers both tiers (2523 total: 1291 high + 1232 med).
 
 ## The MED tier needs iteration — read the risk flag
 
@@ -10,20 +10,20 @@ Unlike the HIGH tier, these rarely byte-match on the first build. Every candidat
 
 | risk class | meaning | campaign move | funcs |
 |---|---|---|---:|
-| reshape-able | a C rewrite should close it (decl-order, bind/reload, operand-order…) | iterate the C | 49 |
-| permuter-class | register rotation / scheduling coin-flip | run permuter or escape to .s | 37 |
-| struct-guessed | offsets/sizes inferred | confirm the struct, then rebuild | 26 |
+| reshape-able | a C rewrite should close it (decl-order, bind/reload, operand-order…) | iterate the C | 489 |
+| permuter-class | register rotation / scheduling coin-flip | run permuter or escape to .s | 451 |
+| struct-guessed | offsets/sizes inferred | confirm the struct, then rebuild | 292 |
 | other | see the note | read the risk line | 0 |
 
 ## Confidence + class
 
 | | funcs |
 |---|---:|
-| class C (reg-alloc/decl-order) | 112 |
-| class D (bitfield/divmod/store-order) | 0 |
-| confidence high | 4 |
-| confidence med | 68 |
-| confidence low | 40 |
+| class C (reg-alloc/decl-order) | 1204 |
+| class D (bitfield/divmod/store-order) | 28 |
+| confidence high | 31 |
+| confidence med | 744 |
+| confidence low | 457 |
 
 ## How the campaign uses it
 

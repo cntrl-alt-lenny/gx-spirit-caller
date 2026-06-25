@@ -1,0 +1,87 @@
+/* CAMPAIGN-PREP candidate for func_0203953c (main, class C, MED tier) — brief 496.
+ * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
+ * The campaign drops this into src/, runs ninja + objdiff, and applies the
+ * risk note below (these usually need 1+ reshape or a permuter/.s fallback).
+ *   recipe:     flag-bit setup r7/r6 via nested if; struct-base bind node(r5); ordered byte/word stores 14,8,1c,18,1f,1e,c,1d
+ *   risk:       struct-guessed and TRUNCATED asm (body ends mid-store at .L_9c0). func_02038c84 2nd arg is r4+0x20 (sub-obj base) — placeholder wrong; offsets and tail-call unknown. confirm against real struct + full asm
+ *   confidence: low
+ */
+#include <stdio.h>
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef int s32;
+
+struct Node_953c {
+    u8 _pad0[0x8];
+    u32 field_8;       /* +0x8 = 0 */
+    u8 _padc[0xc - 0xc];
+    u32 field_c;       /* +0xc <- r4 (sub-obj) */
+    u8 _pad10[0x14 - 0x10];
+    void *field_14;    /* +0x14 <- sl */
+    u32 field_18;      /* +0x18 = 0 */
+    u8 _pad1c0;        /* +0x1c */
+    u8 field_1d;       /* +0x1d */
+    u8 field_1e;       /* +0x1e <- r9 */
+    u8 field_1f;       /* +0x1f <- r7 */
+    u8 sub20[0x20];    /* +0x20 */
+};
+
+struct Cfg_9c480 { u8 _pad0[4]; u16 field_4; };
+extern struct Cfg_9c480 data_0219c480;
+extern u32 data_0219b330;
+extern u32 data_0219c494;
+
+extern int func_02089024(int a0);
+extern struct Node_953c *func_0203a84c(int a0);
+extern int func_020890e4(int a0);
+extern struct Node_953c *func_02038c84(u32 g, void *sub, int sz);
+extern int func_02038e58(int z0, int a0, void *sub, int r4);
+
+int func_0203953c(int sl, int r9, int r8) {
+    int r7, r6;
+    struct Node_953c *node;
+    int sub;
+
+    if (data_0219c480.field_4 != 0) {
+        return func_02089024(sl);
+    }
+
+    if (r8 & 0x400) {
+        r7 = 2;
+        r6 = -1;
+        if (r8 & 0x200) r7 = 1;
+    } else {
+        r7 = 0;
+        r6 = 1;
+    }
+
+    node = func_0203a84c(sl);
+    if (node != 0) {
+        ((u8 *)node)[0x1c]++;
+        return 1;
+    }
+
+    sub = func_020890e4(sl);
+    if (sub == 0) return 0;
+
+    node = func_02038c84(data_0219b330, (u8 *)0 + 0 + ((char *)0 - (char *)0), r6 << 5);
+    /* func_02038c84(global, sub+0x20-ish, r6<<5) */
+    if (node == 0) return 0;
+
+    node->field_14 = (void *)(long)sl;
+    node->field_8 = 0;
+    ((u8 *)node)[0x1c] = 1;
+    node->field_18 = 0;
+    node->field_1f = (u8)r7;
+    node->field_1e = (u8)r9;
+    node->field_c = (u32)sub;
+    node->field_1d = 2;
+
+    if (r8 & 0x8000) {
+        if (sub != func_02038e58(0, sl, &node->sub20, sub)) return 0;
+        node->field_1d = 1;
+    }
+    return 0;
+}
