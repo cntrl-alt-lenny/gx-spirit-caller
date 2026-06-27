@@ -1,0 +1,67 @@
+/* CAMPAIGN-PREP candidate for func_021b274c (ov014, class D, MED tier) — brief 496.
+ * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
+ * The campaign drops this into src/, runs ninja + objdiff, and applies the
+ * risk note below (these usually need 1+ reshape or a permuter/.s fallback).
+ *   recipe:     CLASS D: 3-bit fields as :3; memset(val,dst,len); store 0x2c/8/0/4 in source order
+ *   risk:       struct-guessed + reshape-able: a3c&7 vs :3 field on f4 may differ (orig masks BOTH with lsl#29;lsr#29 -> both want :3 fields). Confirm g_104f4c layout; store-order of f2c/f8/f0/f4 must stay as written.
+ *   confidence: low
+ */
+/* CAMPAIGN-PREP candidate for func_ov014_021b274c (ov014, class D, MED tier).
+ * UNVERIFIED + ITERATION-EXPECTED: MED tier rarely first-build-matches.
+ * Drop into src/, ninja + objdiff, then apply the risk note.
+ *   recipe: CLASS D: 3-bit fields as :3 -> lsl#29;lsr#29; memset arg-order (val,dst,len); store [0x2c],[8],[0],[4] in that exact order.
+ */
+/* func_ov014_021b274c: object init. If not already inited (f2c==0) memset a
+ * 0x4c blob, then compare two 3-bit fields of g_104f4c; equal -> strcpy a
+ * label into obj+0xc, else zero obj+0xc[0x20]. Clear f2c/f8/f0/f4, then by
+ * g_1b5040.f44 either arm a sub-state (f2c=1) or run the fallback init. */
+
+extern void  func_02094504(int val, void *dst, int len);      /* memset(dst,val,len) */
+extern char *func_020aadf8(char *dst, const char *src);       /* strcpy */
+extern void  func_ov005_021ad018(void *p, int a, int b);
+extern void  func_ov014_021b2fb8(void *self);
+
+extern char data_02105989[];                 /* _LIT2 strcpy source */
+extern void *data_ov014_02235094;            /* _LIT0 memset dst */
+
+typedef struct {
+    unsigned int f4   : 3;   /* +0x4 low 3 bits */
+    unsigned int      : 29;
+    /* ... */
+    unsigned char a3c;       /* +0xa3c (only low 3 bits used) */
+} G104f4c;
+extern G104f4c data_02104f4c;                /* _LIT1 */
+
+typedef struct { int f44; } G1b5040;
+extern G1b5040 data_ov014_021b5040;          /* _LIT3 */
+
+typedef struct {
+    int  f0;        /* 0x0 */
+    int  f4;        /* 0x4 */
+    int  f8;        /* 0x8 */
+    char pad_c[0x20]; /* 0xc.. label/sub-object */
+    char pad2[0x2c - 0xc - 0x20];
+    int  f2c;       /* 0x2c gate */
+} Obj14_274c;
+
+int func_ov014_021b274c(Obj14_274c *self)
+{
+    if (self->f2c == 0) {
+        func_02094504(0, &data_ov014_02235094, 0x4c);
+        if (data_02104f4c.f4 == (data_02104f4c.a3c & 7))
+            func_020aadf8((char *)self + 0xc, data_02105989);
+        else
+            func_02094504(0, (char *)self + 0xc, 0x20);
+    }
+    self->f2c = 0;
+    self->f8  = 0;
+    self->f0  = 0;
+    self->f4  = 0;
+    if (data_ov014_021b5040.f44 != 0) {
+        self->f2c = 1;
+        func_ov005_021ad018((char *)self + 0xc, 3, 1);
+    } else {
+        func_ov014_021b2fb8(self);
+    }
+    return 1;
+}

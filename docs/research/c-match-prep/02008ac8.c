@@ -1,0 +1,75 @@
+/* CAMPAIGN-PREP candidate for func_02008ac8 (main, class C, MED tier) — brief 496.
+ * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
+ * The campaign drops this into src/, runs ninja + objdiff, and applies the
+ * risk note below (these usually need 1+ reshape or a permuter/.s fallback).
+ *   recipe:     loop body hoists consts to callee regs (r5..r9); rc==0 OR into status; i<8 counter
+ *   risk:       struct-guessed + permuter-class: the func_0209c7dc descriptor/stack-arg block layout (sp[0..0x14] + sp+0x18 desc) is inferred; the desc field values per-iter are guessed. The orig hoists loop invariants (0x20000,0x4000,7,0xa,2) into callee-saved r5-r9 BEFORE the loop — mwcc will likely re-materialize them inside the body, diverging the whole loop. Strong reg-alloc/scheduling wall.
+ *   confidence: low
+ */
+/* func_02008ac8: gated init then a counted loop (8 iterations) posting
+ * fixed task descriptors via func_0209c7dc, OR-ing a status bit into
+ * data_02104f3c+4 each time. Tail-call to func_02007230 / longjmp label.
+ *
+ *   if (!func_0209c0cc()) goto end;
+ *   h = func_02090868(); if (h == -3) goto end;   ; mvn#2 = -3
+ *   id = (u16)h;
+ *   zero 16 bytes at sp+0x18 (desc); func_0209bfe4(id)
+ *   build descriptor at sp[0..0x14]; func_0209c7dc(...)
+ *   data_02104f3c[4] |= (rc==0)
+ *   for (i=0; i<8; i++) {
+ *     build per-iter desc; func_0209c7dc(sl, base+i*0x4000, 0x10, 0)
+ *     data_02104f3c[4] |= (rc==0)
+ *   }
+ *   func_0209bfd4(id); func_020908c0(id)
+ * end:
+ *   if (func_02007230()) longjmp .L_02021008
+ */
+
+extern int  func_0209c0cc(void);
+extern int  func_02090868(void);
+extern void func_0209bfe4(int id);
+extern int  func_0209c7dc(void *desc, int a1, int a2, int a3);
+extern void func_0209bfd4(int id);
+extern void func_020908c0(int id);
+extern int  func_02007230(void);
+extern void func_02021008(void);   /* .L_02021008 longjmp/dispatch target */
+extern int  data_02104f3c;         /* status word at +0x4 */
+
+struct desc { int w[6]; };
+
+void func_02008ac8(void) {
+    struct desc d0;          /* sp+0x18 region, zeroed then filled */
+    int args0[6];            /* sp+0x0..0x14 stack-arg block */
+    int rc;
+    int i;
+    int base;
+    int id;
+    int h;
+
+    if (func_0209c0cc() == 0) goto end;
+    h = func_02090868();
+    if (h == -3) goto end;
+    id = (unsigned short)h;
+
+    d0.w[0] = 0; d0.w[1] = 0; d0.w[2] = 0; d0.w[3] = 0;
+    func_0209bfe4(id);
+
+    args0[0] = 0; args0[1] = 0; args0[2] = 6; args0[3] = 1; args0[4] = 0;
+    rc = func_0209c7dc(&d0, 0, 4, 0);
+    (&data_02104f3c)[1] |= (rc == 0);
+
+    base = 0x20000;
+    for (i = 0; i < 8; i++) {
+        args0[0] = 0; args0[1] = 0; args0[2] = 7; args0[3] = 0xa; args0[4] = 2;
+        rc = func_0209c7dc(&d0, base, 0x10, 0);
+        (&data_02104f3c)[1] |= (rc == 0);
+        base += 0x4000;
+    }
+
+    func_0209bfd4(id);
+    func_020908c0(id);
+end:
+    if (func_02007230()) {
+        func_02021008();
+    }
+}
