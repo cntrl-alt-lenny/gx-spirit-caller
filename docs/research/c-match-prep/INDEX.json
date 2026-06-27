@@ -1,5 +1,5 @@
 {
-"count": 3867,
+"count": 3990,
 "candidates": [
 {
 "addr": "02000c4c",
@@ -34949,6 +34949,17 @@
 "file": "02262738.c"
 },
 {
+"addr": "02262804",
+"module": "ov002",
+"cls": "D",
+"size": 224,
+"tier": "med",
+"recipe": "CLASS D: arg-pack u16 truncation + (v?0x8000:0) ne-first; if-chain dispatch; unsigned>=9 cmp",
+"risk": "reshape-able: arg-pack operand-order/u16 width to 021d479c; if mwcc binds cd3f4 base once (orig reloads it twice) one `ldr` of the base diverges.",
+"confidence": "med",
+"file": "02262804.c"
+},
+{
 "addr": "022628e4",
 "module": "ov002",
 "cls": "A",
@@ -34982,6 +34993,17 @@
 "file": "022636cc.c"
 },
 {
+"addr": "02263dec",
+"module": "ov002",
+"cls": "D",
+"size": 240,
+"tier": "med",
+"recipe": "CLASS D: unsigned umull /5 + %5 as separate exprs; Ov002Slot.id 13-bit; two-mla addr inlined",
+"risk": "permuter-class: orig has DOUBLE umull for i/5 (one fused into eor `lsr#2`); mwcc may CSE to a single divide, diverging the divmod block / reg-alloc.",
+"confidence": "med",
+"file": "02263dec.c"
+},
+{
 "addr": "02264b24",
 "module": "ov002",
 "cls": "A",
@@ -35013,6 +35035,17 @@
 "confidence": "med",
 "file": "02264da0.c",
 "tier": "high"
+},
+{
+"addr": "022650c0",
+"module": "ov002",
+"cls": "D",
+"size": 112,
+"tier": "med",
+"recipe": "CLASS D: signed /5 via plain `/` (smull magic+asr); per-player index (arg0&1)*0x868 +0 field",
+"risk": "reshape-able: divisor is /5 (0x66666667,asr#2) not /4 per note. Struct-guessed: cf16c row field at +0; if real offset differs the ldr base is wrong.",
+"confidence": "med",
+"file": "022650c0.c"
 },
 {
 "addr": "02265130",
@@ -35059,6 +35092,17 @@
 "file": "02266358.c"
 },
 {
+"addr": "02267df4",
+"module": "ov002",
+"cls": "D",
+"size": 332,
+"tier": "med",
+"recipe": "CLASS D: switch returning constants -> mwcc cmp-tree + addpl jump-table (matches branch-table)",
+"risk": "struct-guessed + TRUNCATED: literal pool _LIT0..3 absent so case IDs/default are unknown; asm cut at .L_10c. Cannot byte-match until full disasm supplies the constants.",
+"confidence": "low",
+"file": "02267df4.c"
+},
+{
 "addr": "02267f40",
 "module": "ov002",
 "cls": "A",
@@ -35079,6 +35123,50 @@
 "confidence": "low",
 "file": "02267f90.c",
 "tier": "high"
+},
+{
+"addr": "02269758",
+"module": "ov002",
+"cls": "D",
+"size": 284,
+"tier": "med",
+"recipe": "CLASS D: halfword bitfield insert (hi8/b15) via :N struct; switch w/ case0->case1 fallthrough; store-order",
+"risk": "struct-guessed/permuter-class: bitfield RMW (`bic;orr lsl#8`) + interleaved store scheduling rarely match first build; orig's DEAD prev=(idx>0?cur-0x18:0) computation is unmodeled (likely DCE'd).",
+"confidence": "low",
+"file": "02269758.c"
+},
+{
+"addr": "02269874",
+"module": "ov002",
+"cls": "D",
+"size": 304,
+"tier": "med",
+"recipe": "CLASS D: low-byte/bit0 bitfield insert via :N struct; prev null-guard; case0->case1 fallthrough; store-order",
+"risk": "struct-guessed/permuter-class: prev computed+null-checked then UNUSED (dead) here \u2014 mwcc will DCE unless it's really live (sibling 9a4 uses it in state2); plus the bitfield-RMW store scheduling.",
+"confidence": "low",
+"file": "02269874.c"
+},
+{
+"addr": "022699a4",
+"module": "ov002",
+"cls": "D",
+"size": 276,
+"tier": "med",
+"recipe": "CLASS D: high-byte bitfield insert via :N struct; prev live in state2 (movne/moveq select); store-order",
+"risk": "struct-guessed/permuter-class: halfword bitfield-RMW insert (`bic;orr lsl#8`) + the +0x5a8/5ac/5b0 store ordering and the prev?:cur / 0x30:0x18 select are codegen-sensitive; first build unlikely to match exactly.",
+"confidence": "low",
+"file": "022699a4.c"
+},
+{
+"addr": "02269ab8",
+"module": "ov002",
+"cls": "D",
+"size": 216,
+"tier": "med",
+"recipe": "D: bind flags word in one local; explicit (f<<k)>>31 per bit; reload+bic on write",
+"risk": "reshape-able: mwcc may fold (f<<19)>>31 into an AND/tst, or reload the word per-test instead of holding f. Fix: switch to 1-bit bitfield member, or force the bind.",
+"confidence": "med",
+"file": "02269ab8.c"
 },
 {
 "addr": "0226a284",
@@ -39360,6 +39448,28 @@
 "file": "022bdd54.c"
 },
 {
+"addr": "022bddf0",
+"module": "ov002",
+"cls": "D",
+"size": 144,
+"tier": "med",
+"recipe": "D: Fill32 zero-init record at sp+4; (u16) key; mla *0x18 entry; unsigned range cc",
+"risk": "struct-guessed: stack record size (int rec[7]->frame 0x1c, &rec[1] is the 24B zeroed slot, rec[0]=comparator at sp) and func_020059b0 arg order inferred from .s; confirm both.",
+"confidence": "med",
+"file": "022bddf0.c"
+},
+{
+"addr": "022bde90",
+"module": "ov002",
+"cls": "D",
+"size": 144,
+"tier": "med",
+"recipe": "D: Fill32 zero-init 36B record at sp+4; (u16) key; mla *0x24 entry; unsigned range cc",
+"risk": "struct-guessed: record size (int rec[10]->frame 0x28, &rec[1] the 36B zeroed slot) and func_020059b0 arg order inferred from .s; r3 savelist is mwcc alignment padding. Confirm layout.",
+"confidence": "med",
+"file": "022bde90.c"
+},
+{
 "addr": "022bdf30",
 "module": "ov002",
 "cls": "A",
@@ -39459,6 +39569,28 @@
 "file": "021c9fcc.c"
 },
 {
+"addr": "021ca0a4",
+"module": "ov004",
+"cls": "D",
+"size": 132,
+"tier": "med",
+"recipe": "<<12/<<16/<<9 scales, stack-slot store-order preserved, block-by-ptr arg",
+"risk": "permuter-class + struct-guessed: exact 8-slot stack frame ordering and which incoming stack args map to s_38/s_3c is inferred from sp offsets; mwcc's outgoing-arg store scheduling rarely matches first build. The <<16>>16 must stay zero-ext (lsr) not sign.",
+"confidence": "low",
+"file": "021ca0a4.c"
+},
+{
+"addr": "021ca128",
+"module": "ov004",
+"cls": "D",
+"size": 112,
+"tier": "med",
+"recipe": "store-order: pair[1] then pair[0]; 12-arg call; a0[0]<<9, a4+8 stack args",
+"risk": "permuter-class: 8 outgoing stack stores are hand-ordered (0x24,0x20 first); mwcc reschedules the str sequence for a 12-arg call though values match. a0/a4 offsets struct-guessed",
+"confidence": "low",
+"file": "021ca128.c"
+},
+{
 "addr": "021cb518",
 "module": "ov004",
 "cls": "A",
@@ -39490,6 +39622,39 @@
 "risk": "struct-guessed+permuter-class: the `rsb;mov lsl#24;ror#24` pos reconstruction is a signed-byte/modulo I can't pin (cmp #0xd0 contradicts pure s8); the three /8 fills' src/dst/len reg-alloc will diverge.",
 "confidence": "low",
 "file": "021cb834.c"
+},
+{
+"addr": "021cb940",
+"module": "ov004",
+"cls": "D",
+"size": 164,
+"tier": "med",
+"recipe": "pos=(signed char)(a0*0x30); plain signed /8 divides; func_0208e0a0 base; 2-way split fill",
+"risk": "struct-guessed: cmp pos,#0xd0 signed-bgt contradicts pure s8 (max 0x7f); (signed char) is closest C for rsb;lsl#24;ror#24 but modulo width unproven. Else reshape-able",
+"confidence": "low",
+"file": "021cb940.c"
+},
+{
+"addr": "021cc014",
+"module": "ov004",
+"cls": "D",
+"size": 204,
+"tier": "med",
+"recipe": "CLASS D: nibble :3 bitfield + store-order frame + msg(58,-1,0,1) sub-not-fold",
+"risk": "permuter-class: outgoing-arg stack-store scheduling + r0 carried from the .L_98 join (b500+0x54 store then func_02037208 args) \u2014 frame field order/decl reshuffle unlikely to recover; already ships as .s.",
+"confidence": "low",
+"file": "021cc014.c"
+},
+{
+"addr": "021cc0e0",
+"module": "ov004",
+"cls": "D",
+"size": 316,
+"tier": "med",
+"recipe": "CLASS D: nibble :3 bitfield both arms + exact store-order record build",
+"risk": "struct-guessed: pool/_LIT mapping + 0x54-record field offsets inferred from sp stores (listing truncated, no _LIT block); also permuter-class strh/strb store scheduling. Confirm struct + the data_0210xxxx base each ldr targets.",
+"confidence": "low",
+"file": "021cc0e0.c"
 },
 {
 "addr": "021cc21c",
@@ -39525,6 +39690,28 @@
 "file": "021cc63c.c"
 },
 {
+"addr": "021cc97c",
+"module": "ov004",
+"cls": "D",
+"size": 180,
+"tier": "med",
+"recipe": "CLASS D: movne/moveq bool-select stores, cached b500 base, msg(66,-1,0,1)",
+"risk": "permuter-class: the `data_022915e8` gate is materialized (movne#1;moveq#0;cmp) by orig but mwcc tends to branch direct (the 'materialized-bool-global' wall in ov004_core.h); the second 0202046c select shares its result reg into either store. Ships as .s.",
+"confidence": "low",
+"file": "021cc97c.c"
+},
+{
+"addr": "021cd6c4",
+"module": "ov004",
+"cls": "D",
+"size": 608,
+"tier": "med",
+"recipe": "Class D: signed divmod as plain /C (smull magic), *0x30 index, masked-field store; preserve store order.",
+"risk": "struct-guessed: literal pool is TRUNCATED so the divide magics give unknown divisors (C1/C2/n2 are guesses) and the function tail past [base+0x204] is missing -- recover full asm before building.",
+"confidence": "low",
+"file": "021cd6c4.c"
+},
+{
 "addr": "021cde38",
 "module": "ov004",
 "cls": "C",
@@ -39534,6 +39721,17 @@
 "risk": "permuter-class: nested in-loop signed divides (acc/2 then `asr#6;add lsr#25;asr#7` = /0x40 then /0x80) reconstruct as add-shift triples mwcc pairs unpredictably \u2014 already brief-302 .s wall.",
 "confidence": "low",
 "file": "021cde38.c"
+},
+{
+"addr": "021ced78",
+"module": "ov004",
+"cls": "D",
+"size": 128,
+"tier": "med",
+"recipe": "switch->addls jump-table; per-case reload of s->val; struct-base bound",
+"risk": "reshape-able: mwcc may emit a cmp tree instead of addls pc table for a 5-case switch returning bools; force with dense 0..4 cases (done). struct-guessed offsets.",
+"confidence": "med",
+"file": "021ced78.c"
 },
 {
 "addr": "021cfbec",
@@ -39569,6 +39767,17 @@
 "file": "021d0530.c"
 },
 {
+"addr": "021d05f4",
+"module": "ov004",
+"cls": "D",
+"size": 184,
+"tier": "med",
+"recipe": "absolute volatile MMIO ptrs; exact store-order; bic/orr RMW per field",
+"risk": "struct-guessed: trailing func_0208e2f4 arg list (6,-8) and the dead 'sub r2,#0xe' are inferred; wrong signature -> arg-setup diverges. Also volatile RMW ordering of the 0x1ff/0x4c pair vs the gate ldr.",
+"confidence": "low",
+"file": "021d05f4.c"
+},
+{
 "addr": "021d1308",
 "module": "ov004",
 "cls": "C",
@@ -39580,6 +39789,17 @@
 "file": "021d1308.c"
 },
 {
+"addr": "021d3bc0",
+"module": "ov004",
+"cls": "D",
+"size": 200,
+"tier": "med",
+"recipe": "switch (cmp/addls jump-table), nested call ctx, store-order tail",
+"risk": "cases 11/12 have identical bodies; orig keeps .L_44/.L_60 as 2 separate table targets but mwcc may merge them into one (permuter-class, not C-steerable).",
+"confidence": "med",
+"file": "021d3bc0.c"
+},
+{
 "addr": "021d3c8c",
 "module": "ov004",
 "cls": "A",
@@ -39589,6 +39809,17 @@
 "confidence": "med",
 "file": "021d3c8c.c",
 "tier": "high"
+},
+{
+"addr": "021d3de4",
+"module": "ov004",
+"cls": "D",
+"size": 184,
+"tier": "med",
+"recipe": "plain %1000 for smull-magic; if-assign abs x2; &&-materialized over-bool",
+"risk": "orig recomputes |d| twice (subs/movpl/rsbmi, then cmp/rsblt); if mwcc CSEs my two `if(d<0)d=-d` into one abs the tail diverges. reshape-able (keep distinct temps / reorder).",
+"confidence": "med",
+"file": "021d3de4.c"
 },
 {
 "addr": "021d3f44",
@@ -39688,6 +39919,28 @@
 "confidence": "low",
 "file": "021d44cc.c",
 "tier": "high"
+},
+{
+"addr": "021d4584",
+"module": "ov004",
+"cls": "D",
+"size": 288,
+"tier": "med",
+"recipe": "unsigned :3 bitfield -> lsl#1d;lsr#1d; changed-edge bool; first error returns",
+"risk": "the changed-bool (orig reuses the dead unk38 reg r0 for `changed`; mwcc picks a fresh reg) = the documented ov004 changed-bool wall \u2014 1 reg off on the gate. permuter-class.",
+"confidence": "med",
+"file": "021d4584.c"
+},
+{
+"addr": "021d46a4",
+"module": "ov004",
+"cls": "D",
+"size": 280,
+"tier": "med",
+"recipe": "sibling of 4584; first error block FALLS THROUGH (no return); :3 bitfield",
+"risk": "same changed-bool reg-reuse wall as 021d4584 (orig recycles dead unk38 reg for the gate; mwcc allocates fresh) \u2014 1 reg off. permuter-class.",
+"confidence": "med",
+"file": "021d46a4.c"
 },
 {
 "addr": "021d4804",
@@ -39943,6 +40196,39 @@
 "tier": "high"
 },
 {
+"addr": "021d7c84",
+"module": "ov004",
+"cls": "D",
+"size": 680,
+"tier": "med",
+"recipe": "plain v/52 & v%52 for smull-magic; out-param decl-order x@sp0/y@sp4; -1 fold",
+"risk": "SOURCE .s IS TRUNCATED at .L_120 (680B fn, ~half shown): .L_198 path + literal pool absent, so /52 divisor and _LIT1 global are inferred and the tail is a stub \u2014 struct-guessed, cannot byte-match as-is.",
+"confidence": "low",
+"file": "021d7c84.c"
+},
+{
+"addr": "021d8648",
+"module": "ov004",
+"cls": "D",
+"size": 336,
+"tier": "med",
+"recipe": "store-order: emit reg RMW + struct fields in exact asm order; volatile u16 MMIO",
+"risk": "literal pool cut: which data_ sym is _LIT0(reg base)/_LIT2/4(ids)/_LIT5/6 and the (LIT1-0x200) OR constant are guessed; descriptor field offsets inferred. struct-guessed.",
+"confidence": "low",
+"file": "021d8648.c"
+},
+{
+"addr": "021d8d1c",
+"module": "ov004",
+"cls": "D",
+"size": 60,
+"tier": "med",
+"recipe": "explicit two-read bitfield RMW (separate f local) + volatile dbl-load; store-order",
+"risk": "documented WALL: orig keeps (field>>8) in scratch `ip`, mwcc reuses r2 across the bic/orr insert \u2014 whole-word value identical, 1 register NUMBER off. permuter-class (escape to .s if it persists).",
+"confidence": "low",
+"file": "021d8d1c.c"
+},
+{
 "addr": "021d9810",
 "module": "ov004",
 "cls": "C",
@@ -39952,6 +40238,28 @@
 "risk": "struct-guessed/reshape-able: the epilogue returns r5 (the z/found latch, value 1 on the success path, 0 otherwise) NOT a separate r \u2014 the return var must be the SAME local set to 1 inside both hit-branches; b/y/z range constants and the b500.64 latch are confirmed but the return-var aliasing is the key reshape.",
 "confidence": "low",
 "file": "021d9810.c"
+},
+{
+"addr": "021da1bc",
+"module": "ov004",
+"cls": "D",
+"size": 268,
+"tier": "med",
+"recipe": "nested for-loops; plain %256 (signed) + plain /8 for the magic; inline i*stride",
+"risk": "loop strength-reduction wall (orig keeps strided base via add lr,#0x20 / r8=base+lr*2; mwcc emits a separate i*0x40 counter) plus 3 magic /8 sites that must each codegen identically. permuter-class.",
+"confidence": "low",
+"file": "021da1bc.c"
+},
+{
+"addr": "021dab1c",
+"module": "ov004",
+"cls": "D",
+"size": 164,
+"tier": "med",
+"recipe": "CLASS D: :3 bitfield (lsl;lsr not mask); bind base g; stride*0x20 ptr-arith; store-order kept",
+"risk": "reshape-able: data_02104f4c offsets struct-guessed (0xa3c/0xa64); if mwcc emits `and #7` not `lsl#29;lsr#29` the :3 field is wrong-typed (widen container/use signedness).",
+"confidence": "med",
+"file": "021dab1c.c"
 },
 {
 "addr": "021dabcc",
@@ -40053,6 +40361,17 @@
 "file": "021ab274.c"
 },
 {
+"addr": "021abb00",
+"module": "ov005",
+"cls": "D",
+"size": 252,
+"tier": "med",
+"recipe": "bitfield: u16 :2 member => lsl#30;lsr#30 (not &3); switch->jump-table (cmp#3;addls pc); shifted-and fold (diff<<16)&0x01ff0000; ldrsh signed f0e",
+"risk": "Per-arm op order: orig loads f30 into r3 before computing diff, masks &0xff after the sub; mwcc may hoist b's mask, shifting one and/ldr per arm (permuter-class scheduling). Struct offsets guessed (struct-guessed).",
+"confidence": "med",
+"file": "021abb00.c"
+},
+{
 "addr": "021acadc",
 "module": "ov005",
 "cls": "C",
@@ -40073,6 +40392,17 @@
 "confidence": "low",
 "file": "021acb50.c",
 "tier": "high"
+},
+{
+"addr": "021ad284",
+"module": "ov005",
+"cls": "D",
+"size": 216,
+"tier": "med",
+"recipe": "decl-order: ret(r4)/state first; if/else-if chain matches cmp;beq (NOT switch jump-table); reload counter each block (orig re-ldr's [r5,#0xc]); reset via the 0-reg",
+"risk": "Orig reloads o->counter after each func_0208c884 (separate ldr) rather than caching; if mwcc keeps counter in a callee-saved reg across the calls, ldr count diverges (reshape-able: re-read o->counter each use, already written that way). counter offset guessed (struct-guessed).",
+"confidence": "med",
+"file": "021ad284.c"
 },
 {
 "addr": "021af704",
@@ -40119,6 +40449,17 @@
 "tier": "high"
 },
 {
+"addr": "021b28c0",
+"module": "ov006",
+"cls": "D",
+"size": 176,
+"tier": "med",
+"recipe": "CLASS D: switch 0..3 jump-table; hi=v>>16 lo=v&0xffff; store f10,f14,f0 in order",
+"risk": "reshape-able: case2 stores f14 BEFORE f0 and case3 stores f10,f14,f0 in that exact order - if mwcc reorders, swap statement order. The addls-pc table needs default to also cover sel==0 (cmp #3 range); confirm.",
+"confidence": "med",
+"file": "021b28c0.c"
+},
+{
 "addr": "021b29b0",
 "module": "ov006",
 "cls": "C",
@@ -40130,6 +40471,17 @@
 "file": "021b29b0.c"
 },
 {
+"addr": "021b2a58",
+"module": "ov006",
+"cls": "D",
+"size": 176,
+"tier": "med",
+"recipe": "CLASS D: g_104f4c.f4 as :3; reload field for both strb/call uses; state=5 last",
+"risk": "struct-guessed + reshape-able: 021b6be0 return used as h+1 in 3 places & h[0] store -> orig holds it in r4 (bind to one local, as written). The :3 field is read twice (strb then 02001d68 arg) - keep two reads. Confirm cf158 (memset-handle) arg shape.",
+"confidence": "low",
+"file": "021b2a58.c"
+},
+{
 "addr": "021b2b28",
 "module": "ov006",
 "cls": "C",
@@ -40139,6 +40491,17 @@
 "risk": "VERIFIED off-by-2: mwcc emits `tst r0,#7` + `cmp r2,r0`; orig wants `lsl#29;lsr#29` (struct-guessed: real :3 bitfield at data_02104f4c+4) and `teq` (permuter-class idiom). Rest byte-identical.",
 "confidence": "med",
 "file": "021b2b28.c"
+},
+{
+"addr": "021b2bd4",
+"module": "ov006",
+"cls": "D",
+"size": 200,
+"tier": "med",
+"recipe": "CLASS D: :3 field; pass cf140.f14 to 021b6be0 r2; reload f14; state=5 last",
+"risk": "struct-guessed + reshape-able: arg order for 021b6be0 (r1=0,r2=f14) and 020091f4 (r1=f14,r2=0,r3=h) inferred from reg setup; f14 is reloaded (ldr twice) so keep two reads. Bind h to r4 across 4 uses (as written). Confirm cf140 layout.",
+"confidence": "low",
+"file": "021b2bd4.c"
 },
 {
 "addr": "021b3318",
@@ -40163,6 +40526,28 @@
 "tier": "high"
 },
 {
+"addr": "021b46fc",
+"module": "ov006",
+"cls": "D",
+"size": 220,
+"tier": "med",
+"recipe": "switch jump-table; halfword unpack v>>16 / v&0xffff; store-order kept",
+"risk": "reshape-able: orig table covers 0..6 with cmp #5 (case6 unreachable) and bundles 0-3 with default \u2014 if mwcc emits a denser table or peels case6, reorder cases or drop case6. v loaded before calls; if mwcc reloads after, ldr count diverges.",
+"confidence": "med",
+"file": "021b46fc.c"
+},
+{
+"addr": "021b4f68",
+"module": "ov006",
+"cls": "D",
+"size": 268,
+"tier": "med",
+"recipe": ":3 bitfield arg reload x4; ordered zero stores; :1 flag pack |=1",
+"risk": "reshape-able: the (data[1]&0x7) is a :3 bitfield (lsl;lsr) \u2014 model data_02104f4c[1] as a struct :3 member or the four reads become 'and' not lsl;lsr. The 0x1b>6 const-fold to 1 and g2[4] :1 RMW order must hold. struct-guessed bases.",
+"confidence": "med",
+"file": "021b4f68.c"
+},
+{
 "addr": "021b53d4",
 "module": "ov006",
 "cls": "A",
@@ -40183,6 +40568,28 @@
 "confidence": "med",
 "file": "021b59e4.c",
 "tier": "high"
+},
+{
+"addr": "021b5a54",
+"module": "ov006",
+"cls": "D",
+"size": 284,
+"tier": "med",
+"recipe": "switch(B[19]-0x18) jump-table; case0/4 and case2/3 share arms; if-assign flag; store-order",
+"risk": "reshape-able: orig normalizes B[0] to bool (movne#1/moveq#0) before the branch; if plain `if(B[0])` omits it, write `int x=(B[0]!=0); if(x)` to force the normalize.",
+"confidence": "med",
+"file": "021b5a54.c"
+},
+{
+"addr": "021b5b70",
+"module": "ov006",
+"cls": "D",
+"size": 180,
+"tier": "med",
+"recipe": "Copy32(src,dst,8) into stack buf; store-order zero C[3]/C[4]; switch on buf[0]; bind B",
+"risk": "struct-guessed: Copy32 arg order (assumed src,dst,n) and func_021ca264's 3rd arg in case1 (orig leaves r2=0 from the earlier zero-store, so passes 0) are inferred; confirm Copy32 signature.",
+"confidence": "med",
+"file": "021b5b70.c"
 },
 {
 "addr": "021b5c2c",
@@ -40249,6 +40656,17 @@
 "risk": "reshape-able/permuter-class: first loop reuses r5/r4 across the i!=0 guard; risk is whether mwcc reuses one counter+0 for both i and j-const like orig (mov r4,r5). Second 5x7 loop matches pattern; mirror-loop tail scheduling is the same permuter residual.",
 "confidence": "med",
 "file": "021b6508.c"
+},
+{
+"addr": "021b6ad8",
+"module": "ov006",
+"cls": "D",
+"size": 212,
+"tier": "med",
+"recipe": "signed /32,%32 bit-index (sign-corrected); flag!=0 branch first; mirrored arms; bit-test",
+"risk": "permuter-class: the two arms have asymmetric epilogue shapes in the orig (arm0 bne->mov#0 vs arm1 moveq#0/popeq); a single mirrored C body won't reproduce both branch layouts \u2014 likely permuter/escape.",
+"confidence": "low",
+"file": "021b6ad8.c"
 },
 {
 "addr": "021b6d00",
@@ -40405,6 +40823,39 @@
 "tier": "high"
 },
 {
+"addr": "021b8fa8",
+"module": "ov006",
+"cls": "D",
+"size": 88,
+"tier": "med",
+"recipe": "ldrsh via short[] index; (1<<v); chained != compare (cmp;cmpne); global reload per RMW block; store-order",
+"risk": "reshape-able: the `if(v!=7 && v!=1)` must compile to cmp #7;cmpne #1 (not two branches); if mwcc splits the && into two tests, the predicated orrne block diverges -- a global (not local) REG yields the reload.",
+"confidence": "med",
+"file": "021b8fa8.c"
+},
+{
+"addr": "021b9c98",
+"module": "ov006",
+"cls": "D",
+"size": 132,
+"tier": "med",
+"recipe": "unsigned <0x100 early-return ldrsb; (hi)|(lo<<8) byteswap; store key(strh) before fnptr(str); pass &key",
+"risk": "struct-guessed: the {cmp,key} stack block + passing &s.key as r0 (with fnptr at key[-1]) is an inferred layout; mwcc's frame/strh-before-str order and the 8-byte sub sp are the likely first diverge.",
+"confidence": "low",
+"file": "021b9c98.c"
+},
+{
+"addr": "021b9d1c",
+"module": "ov006",
+"cls": "D",
+"size": 60,
+"tier": "med",
+"recipe": "read b before a (decl-order); shifted-or lo|(hi<<8) operand-first; (u16) cast = lsl16;lsr16 zero-extend",
+"risk": "reshape-able: read order b-then-a is the lever (orig ldrh [r1] precedes [r0]); if mwcc reads a first the two ldrh swap. (u16) subtract must not become ldrsh -- read via unsigned short*.",
+"confidence": "med",
+"file": "021b9d1c.c"
+},
+{
 "addr": "021b9d58",
 "module": "ov006",
 "cls": "A",
@@ -40414,6 +40865,28 @@
 "confidence": "med",
 "file": "021b9d58.c",
 "tier": "high"
+},
+{
+"addr": "021b9d98",
+"module": "ov006",
+"cls": "D",
+"size": 84,
+"tier": "med",
+"recipe": "load full int, (short) cast = lsl16;asr16 sign-extend; two cmp form (gt early-return, then lt negate); not ldrsh",
+"risk": "reshape-able: must load *a/*b as int and cast (short) so codegen uses lsl;lsr;asr shift-chains, not ldrsh; the `return -(x<y)` reproduces movlt#1/movge#0/rsb#0 better than a ternary.",
+"confidence": "med",
+"file": "021b9d98.c"
+},
+{
+"addr": "021b9e08",
+"module": "ov006",
+"cls": "D",
+"size": 232,
+"tier": "med",
+"recipe": "D: signed /10 & %10 magic via plain / and %; abs via if; LSB-first store then reversed glyph read",
+"risk": "permuter-class: orig recomputes v/10 with TWO smulls (one for %, one for /) per iter and holds the 0x66666667 const in r7 across the loop; mwcc may CSE the divide to one smull or reload the const, diverging the loop body.",
+"confidence": "low",
+"file": "021b9e08.c"
 },
 {
 "addr": "021b9ef8",
@@ -40460,6 +40933,28 @@
 "file": "021bbdc0.c"
 },
 {
+"addr": "021bd6bc",
+"module": "ov006",
+"cls": "D",
+"size": 68,
+"tier": "med",
+"recipe": "D: f20 bit0 as unsigned :1 (lsl#31;lsr#31); ldmib f4,f8 order via (f8+f4); mvnge clamp via if-assign",
+"risk": "reshape-able: the ldmib loads {f4,f8} so the sum operand-order is (f8+f4) to pick the dest reg; if mwcc writes f4+f8 the add source regs swap. struct-guessed offsets/stride 0x24.",
+"confidence": "med",
+"file": "021bd6bc.c"
+},
+{
+"addr": "021bd700",
+"module": "ov006",
+"cls": "D",
+"size": 204,
+"tier": "med",
+"recipe": "D: :1 bitfield branch; value%10/value/10 magic via plain %,/ (f0=rem,f4=quot order); store f0,f4,f8 in asm order",
+"risk": "permuter-class: orig issues TWO smull r2,#10 (one feeding %, one feeding /) and the !flag path uses stmeqia to store {0,value} together; mwcc likely fuses the divide and splits the stores, diverging. struct-guessed.",
+"confidence": "low",
+"file": "021bd700.c"
+},
+{
 "addr": "021bd7cc",
 "module": "ov006",
 "cls": "C",
@@ -40469,6 +40964,28 @@
 "risk": "permuter-class: orig emits each loop guard TWICE (cmp;bge then cmp;mov#1;bge) \u2014 a redundant double-compare from ret-flag placement; mwcc's single-guard do-while likely differs. May need .s.",
 "confidence": "low",
 "file": "021bd7cc.c"
+},
+{
+"addr": "021bdcdc",
+"module": "ov006",
+"cls": "D",
+"size": 248,
+"tier": "med",
+"recipe": "D: :1 bitfield toggle s->flag=!s->flag (bic/orr base-first); movs r0 then submi for (r<0)?fc-1:r; fixed call chain",
+"risk": "permuter-class: many obj->f50 reloads + r6/r4 held across 4 bls; the movs/submi predicated (r<0)?fc-1:r and the bit-toggle RMW are reshape-able, but the call-spanning reg lifetimes likely rotate. struct-guessed (helper sigs guessed too).",
+"confidence": "low",
+"file": "021bdcdc.c"
+},
+{
+"addr": "021beec4",
+"module": "ov006",
+"cls": "D",
+"size": 168,
+"tier": "med",
+"recipe": "D: two strh RMW in asm order on 0x0400100e; 0x30000 bound to a local materialised before the RMWs; literal call chain",
+"risk": "reshape-able: orig does mov r1,#0x30000 BEFORE the two RMW stores and keeps it in r1 until str [reg+0xe]; if mwcc materialises the const late the instruction order (and a reg) shifts. Otherwise high-confidence linear.",
+"confidence": "med",
+"file": "021beec4.c"
 },
 {
 "addr": "021bef6c",
@@ -40482,6 +40999,39 @@
 "file": "021bef6c.c"
 },
 {
+"addr": "021bf4fc",
+"module": "ov006",
+"cls": "D",
+"size": 232,
+"tier": "med",
+"recipe": "D: mode via data_02104f4c.chan :3 (lsl#29;lsr#29); width/2 signed /2; 0xa5-w/2 rsb; two stack args 0xc; family shape",
+"risk": "reshape-able: closely matches the proven centred-text-layout family; main divergence is the signed /2 (add x,x,lsr#31;asr#1) and the stack-arg store of the two 0xc consts \u2014 both family-proven. struct-guessed data_02255448 +0x240.",
+"confidence": "med",
+"file": "021bf4fc.c"
+},
+{
+"addr": "021c11c8",
+"module": "ov006",
+"cls": "D",
+"size": 308,
+"tier": "med",
+"recipe": "D: command-record family; +20 field RE-READ as unsigned short (ldrh); emit field stores per-block in the asm's exact (h,+20,+8,+12,+16) order",
+"risk": "permuter-class: ov006_core.h explicitly lists 021c11c8 as a store-SCHEDULING wall shipped as .s. The 3 blocks' field-store order differs (block1 stores h before +8; blocks 2/3 store +8 first) and mwcc will not reproduce the per-block schedule.",
+"confidence": "low",
+"file": "021c11c8.c"
+},
+{
+"addr": "021c17c8",
+"module": "ov006",
+"cls": "D",
+"size": 400,
+"tier": "med",
+"recipe": "D: cond-ldr ternaries (obj->f18 ? recA : recB) -> ldrne/ldreq; flag word built with |=; (unsigned)(t-7)<=1 for t in {7,8}; rec0 signed short",
+"risk": "permuter-class: the flags block REUSES the f1c cmp-Z flag for orrne #0x400 ACROSS an intervening str f1c=0 (movne/strne don't touch flags); mwcc will recompute the test, re-ordering the bic/orr/str. Long body, multiple cond-ldr coin-flips. struct-guessed offsets.",
+"confidence": "low",
+"file": "021c17c8.c"
+},
+{
 "addr": "021c1958",
 "module": "ov006",
 "cls": "A",
@@ -40493,6 +41043,17 @@
 "tier": "high"
 },
 {
+"addr": "021c215c",
+"module": "ov006",
+"cls": "D",
+"size": 292,
+"tier": "med",
+"recipe": "switch->branch-table, default-first, selector single-expr not re-derived",
+"risk": "reshape-able-ish but second arg: orig emits `sub r1,r0,#0x3b` (K-(K+1)) for -1 not mvn; if mwcc folds -1 to mvn this diverges; permuter-class codegen detail.",
+"confidence": "med",
+"file": "021c215c.c"
+},
+{
 "addr": "021c31d0",
 "module": "ov006",
 "cls": "C",
@@ -40502,6 +41063,17 @@
 "risk": "reshape-able: ldrsh reads data_021cde2c at byte-offset f58<<2 => signed short[] index (f58*2); h held in r0 across select. If mwcc emits ldrh or reloads h, fix array signedness / bind h. Offsets guessed.",
 "confidence": "med",
 "file": "021c31d0.c"
+},
+{
+"addr": "021c32ac",
+"module": "ov006",
+"cls": "D",
+"size": 216,
+"tier": "med",
+"recipe": "bind mla base to one local, call-order=source, signed s16 field reads",
+"risk": "struct-guessed (data_021cdf88 stride 0x1c + field offsets inferred); also the (*pG!=0)?0xc9:0xe9 flag uses double-cmp/movne-moveq normalize \u2014 if mwcc skips the bool temp the cmp pair diverges. permuter-class for that.",
+"confidence": "med",
+"file": "021c32ac.c"
 },
 {
 "addr": "021c34c0",
@@ -40526,6 +41098,17 @@
 "tier": "high"
 },
 {
+"addr": "021c426c",
+"module": "ov006",
+"cls": "D",
+"size": 220,
+"tier": "med",
+"recipe": "explicit pairwise copy loop, store-order kept, stride-8 s16 records, tail field copies",
+"risk": "permuter-class: two reinterpreting copy loops (u16-pair then s16-quad over same 40B buf) \u2014 mwcc's reg-alloc/scheduling of the load/store interleave (ldrsh r1/r0 order, lr counter reuse) is a coin-flip; also struct-guessed offsets.",
+"confidence": "low",
+"file": "021c426c.c"
+},
+{
 "addr": "021c4348",
 "module": "ov006",
 "cls": "A",
@@ -40535,6 +41118,39 @@
 "confidence": "low",
 "file": "021c4348.c",
 "tier": "high"
+},
+{
+"addr": "021c43bc",
+"module": "ov006",
+"cls": "D",
+"size": 348,
+"tier": "med",
+"recipe": "store-order stmia {type,payload}, chained && bound compares, per-entry loop",
+"risk": "TRUNCATED asm (tail past .L_1f90 cut) so final-box logic is a guess; also struct-guessed bound layouts. permuter-class on the cmp/ldrgesh/cmpge fused-compare chains (mwcc may not emit conditional ldrsh).",
+"confidence": "low",
+"file": "021c43bc.c"
+},
+{
+"addr": "021c4574",
+"module": "ov006",
+"cls": "D",
+"size": 332,
+"tier": "med",
+"recipe": "MMIO RMW two strh in order, capture-then-pass each call's helper result",
+"risk": "TRUNCATED asm (tail past 3rd func_0208ff84 cut) + struct-guessed reg layout (the +0xe store width and LIT3 target unconfirmed). reshape-able body but tail/return unverifiable from given asm.",
+"confidence": "low",
+"file": "021c4574.c"
+},
+{
+"addr": "021c480c",
+"module": "ov006",
+"cls": "D",
+"size": 212,
+"tier": "med",
+"recipe": "lsl;lsr -> :3 bitfield, constant /2 signed -> plain /2, selector single-expr",
+"risk": "struct-guessed (G104f4c word offset, data_021cdddc element type, func_02004f58 6-arg signature). reshape-able core; main risk is helper signatures wrong -> arg-marshalling diverges.",
+"confidence": "med",
+"file": "021c480c.c"
 },
 {
 "addr": "021c52b8",
@@ -41450,6 +42066,39 @@
 "file": "021b7128.c"
 },
 {
+"addr": "021b718c",
+"module": "ov010",
+"cls": "D",
+"size": 140,
+"tier": "med",
+"recipe": "subs-flag reuse for if(t<0) cond store; signed /2; *0x97 literal mul; bind MMIO ptr; store-order",
+"risk": "reshape-able: orig reuses the `subs` flags (movmi/strmi) for the negative clamp; if mwcc emits a separate cmp, keep `t=A[6]-delta; A[6]=t; if(t<0)` adjacent (already done) so the sub sets the condition.",
+"confidence": "med",
+"file": "021b718c.c"
+},
+{
+"addr": "021b7218",
+"module": "ov010",
+"cls": "D",
+"size": 168,
+"tier": "med",
+"recipe": "explicit divmod helper (var divisor); /2 signed plain; bind f8; (hi<<8)|lo pack; subs-mi if-clamp",
+"risk": "reshape-able: f8 must bind into both subtract and divisor (orig single ldr r1); if mwcc reloads B+8 a 2nd ldr diverges -- keep the f8 local.",
+"confidence": "med",
+"file": "021b7218.c"
+},
+{
+"addr": "021ca03c",
+"module": "ov011",
+"cls": "D",
+"size": 88,
+"tier": "med",
+"recipe": "lsl#21;lsr#30 -> :2 bitfield at bit9; RMW reloads via second GetSystemWork",
+"risk": "struct-guessed bitfield position; BIGGER risk: the two `.word bl` cross-overlay targets have no real symbols \u2014 extern names are placeholders, campaign must supply correct linked symbols or the bl encodings won't match. reshape-able once symbols resolved.",
+"confidence": "med",
+"file": "021ca03c.c"
+},
+{
 "addr": "021ca0ac",
 "module": "ov011",
 "cls": "A",
@@ -41461,6 +42110,83 @@
 "tier": "high"
 },
 {
+"addr": "021ca538",
+"module": "ov011",
+"cls": "D",
+"size": 200,
+"tier": "med",
+"recipe": "Q12 smull square via long long; 5x2 byte-copy loop; (s8) field; ordered stack args",
+"risk": "permuter-class: byte-copy + 64-bit square + two call setups are hand-interleaved (D[0x238/23c]>>12 stack stores between ldrb index loads); mwcc reschedules the long-long lowering",
+"confidence": "low",
+"file": "021ca538.c"
+},
+{
+"addr": "021ca630",
+"module": "ov011",
+"cls": "D",
+"size": 52,
+"tier": "med",
+"recipe": "unsigned (x<<15)>>28 guard => lsl;lsr;movs; bic/orr constant RMW for 4-bit field",
+"risk": "reshape-able: if guard compiles to and+lsr not lsl#15;lsr#28, make it an unsigned :4 bitfield at bit13. Offsets 0x2a4/0x280 struct-guessed",
+"confidence": "med",
+"file": "021ca630.c"
+},
+{
+"addr": "021ca6c4",
+"module": "ov011",
+"cls": "D",
+"size": 804,
+"tier": "med",
+"recipe": "unsigned bitfield guards; s16 low-half RMW +0x2a clamp; smull-magic divide to short table; 3 call setups",
+"risk": "struct-guessed+permuter-class: smull divisor (_LIT2 magic) UNKNOWN (0x100 is placeholder); s16 low-half RMW reg-alloc and clamp branch scheduling also diverge",
+"confidence": "low",
+"file": "021ca6c4.c"
+},
+{
+"addr": "021cbf28",
+"module": "ov011",
+"cls": "D",
+"size": 536,
+"tier": "med",
+"recipe": "dx/dy deltas; 3-bit field; {&pair,0} frame; abs via movge/rsblt; smull-magic /K; sign-branch +/-0x4000",
+"risk": "permuter-class: dual sign-branch abs() feeding twin smull-magic blocks + per-branch +/-0x4000 coin-flip; lr/ip/r5 rotation won't match. Tail TRUNCATED + magic divisor unknown (struct-guessed)",
+"confidence": "low",
+"file": "021cbf28.c"
+},
+{
+"addr": "021cc194",
+"module": "ov011",
+"cls": "D",
+"size": 188,
+"tier": "med",
+"recipe": "CLASS C/D: handle-table lookup, halfword (p<<16)>>16, guard-flip tails",
+"risk": "permuter-class: the 4-reg `stmib sp,{r0,r5,r6,ip}` arg grouping vs the p7&0xFFFF halfword split \u2014 scheduling decides where the 3rd store lands; C arg-order won't steer it. Documented wall, ships .s.",
+"confidence": "low",
+"file": "021cc194.c"
+},
+{
+"addr": "021cc27c",
+"module": "ov011",
+"cls": "D",
+"size": 200,
+"tier": "med",
+"recipe": "CLASS C/D: 4174 lookup, halfword extract, two literal stack args, idx==0 guard",
+"risk": "permuter-class: same eaa0 stmib-grouping coin-flip as 021cc194 (3-reg group here); the 0xdd80/0x160 literals load order is scheduling-bound. Documented wall sibling, ships .s.",
+"confidence": "low",
+"file": "021cc27c.c"
+},
+{
+"addr": "021cc4c8",
+"module": "ov011",
+"cls": "D",
+"size": 252,
+"tier": "med",
+"recipe": "CLASS D: 9-bit/4-bit lsl;lsr bitfields, signed asr#24 byte, eq-select arg",
+"risk": "struct-guessed + permuter-class: the 4-bit field bit-position (w0<<25>>28) and the cc424 arg mapping (idx vs a3 vs the +1) are reconstructed from shifts; the w0 reload-per-use vs bind also flips reg-alloc. Confirm desc layout + cc424 6-arg roles.",
+"confidence": "low",
+"file": "021cc4c8.c"
+},
+{
 "addr": "021cc664",
 "module": "ov011",
 "cls": "C",
@@ -41470,6 +42196,17 @@
 "risk": "permuter-class: nine callee-saved regs hold loop invariants (r5 left, r6 count, r8 base, r9 cursor, fp=6); mwcc's induction-var (i*8 vs running r9+=8) and which constants live in regs is a scheduling/reg-rotation coin-flip.",
 "confidence": "low",
 "file": "021cc664.c"
+},
+{
+"addr": "021cc814",
+"module": "ov011",
+"cls": "D",
+"size": 168,
+"tier": "med",
+"recipe": "CLASS D: constant /4096 idiom + two-nibble bitfield eq gate, switch dispatch",
+"risk": "permuter-class (documented 1-reg wall): the case-0 `[g+0x268]` load lands r2 vs orig r0 (load-dest reg-numbering); /4096 idiom itself matches. C reshape won't move the load dest. Banked wall in ov011_core.h.",
+"confidence": "med",
+"file": "021cc814.c"
 },
 {
 "addr": "021ccf3c",
@@ -41505,6 +42242,28 @@
 "tier": "high"
 },
 {
+"addr": "021cd0dc",
+"module": "ov011",
+"cls": "D",
+"size": 180,
+"tier": "med",
+"recipe": "CLASS C/D: 4154 lookup, halfword extract, 0x6800/0xe0 literals, single retag guard",
+"risk": "permuter-class: identical eaa0 `stmib sp,{r0,r5,r6}` 3-reg grouping vs the p7 halfword split as 021cc194/27c; scheduling of the 0x6800/0xe0 literal stores. Documented wall sibling, ships .s.",
+"confidence": "low",
+"file": "021cd0dc.c"
+},
+{
+"addr": "021cd190",
+"module": "ov011",
+"cls": "D",
+"size": 108,
+"tier": "med",
+"recipe": "Class D: variable mask 0xffffffff>>(32-w) for mvn;lsr; bitfield insert by mask+orr.",
+"risk": "reshape-able: (id-1)*0x72 mul-then-ldrb ordering vs id-1 reuse for second ldrb; mwcc may recompute id-1 instead of holding ip across both indexes.",
+"confidence": "med",
+"file": "021cd190.c"
+},
+{
 "addr": "021cd1fc",
 "module": "ov011",
 "cls": "A",
@@ -41527,6 +42286,28 @@
 "tier": "high"
 },
 {
+"addr": "021cd2d4",
+"module": "ov011",
+"cls": "D",
+"size": 136,
+"tier": "med",
+"recipe": "Class D: bitfield extract as (x<<23)>>28; mla index base+k*4; halfword loads <<12; preserve store order.",
+"risk": "reshape-able/struct-guessed: row extract is read from a global word, not a struct, so (state<<23)>>28 may fold to lsr;and not lsl;lsr -- confirm vs real bitfield struct at 0x2a4.",
+"confidence": "med",
+"file": "021cd2d4.c"
+},
+{
+"addr": "021cd574",
+"module": "ov011",
+"cls": "D",
+"size": 196,
+"tier": "med",
+"recipe": "Class D: rsb for const-minus-load; bitfield guard (x<<23)>>28; stacked struct by &; preserve store order x then y.",
+"risk": "permuter-class: orig materialises arg1=-1 as sub r1,r0,#8 / sub r1,r0,#7 (reuse of live first-arg reg); mwcc will likely emit mvn r1,#0 instead -> 2 diverging instrs no reshape fixes.",
+"confidence": "med",
+"file": "021cd574.c"
+},
+{
 "addr": "021cd6e0",
 "module": "ov011",
 "cls": "D",
@@ -41536,6 +42317,17 @@
 "confidence": "high",
 "file": "021cd6e0.c",
 "tier": "high"
+},
+{
+"addr": "021cd700",
+"module": "ov011",
+"cls": "D",
+"size": 84,
+"tier": "med",
+"recipe": "Class D: two nibble bitfields as (x<<19)>>28 / (x<<23)>>28 shift pairs; flag dispatch.",
+"risk": "reshape-able: orig computes both shift-lefts (r1,r2) before both lsr#28; arg-eval order may swap which nibble lands in r0 vs r1 -- swap the two call-arg expressions if so.",
+"confidence": "med",
+"file": "021cd700.c"
 },
 {
 "addr": "021cdbd8",
@@ -41549,6 +42341,39 @@
 "file": "021cdbd8.c"
 },
 {
+"addr": "021ce190",
+"module": "ov011",
+"cls": "D",
+"size": 404,
+"tier": "med",
+"recipe": "Class D: bic mask-clears with store-order; RELOAD g268 per use (two reads); bitfield (x<<23)>>28; conditional store.",
+"risk": "struct-guessed: source asm TRUNCATED -- case 0 (.L_610) body and _LIT1 (af358 arg) are missing; case-1 chain is faithful but cannot byte-match without the cut tail/literal.",
+"confidence": "low",
+"file": "021ce190.c"
+},
+{
+"addr": "021ce344",
+"module": "ov011",
+"cls": "D",
+"size": 96,
+"tier": "med",
+"recipe": "Class D: masked-field RMW store FIRST; two bitfield extracts (v<<23)>>28/(v<<19)>>28; reuse shared mask literal.",
+"risk": "reshape-able: the cmp uses two nibble extracts of the same v -- if mwcc folds one to lsr;and the cmp's shifted-operand form (cmp r2,r1,lsr#28) diverges; keep both as (v<<k)>>28.",
+"confidence": "med",
+"file": "021ce344.c"
+},
+{
+"addr": "021ce3a4",
+"module": "ov011",
+"cls": "D",
+"size": 304,
+"tier": "med",
+"recipe": "Class D: guard chains with (x<<k)>>k bitfield extracts; cmpeq short-circuit; masked-field RMW stores; preserve order.",
+"risk": "struct-guessed: asm TRUNCATED at shared exit .L_17c (reconstructed as return 0) and _LIT2 mask assumed 0xffe01fff; also several guard cmps use shifted-operand byte extracts that may fold to and;cmp.",
+"confidence": "low",
+"file": "021ce3a4.c"
+},
+{
 "addr": "021ce4d4",
 "module": "ov011",
 "cls": "A",
@@ -41558,6 +42383,17 @@
 "confidence": "med",
 "file": "021ce4d4.c",
 "tier": "high"
+},
+{
+"addr": "021ceebc",
+"module": "ov011",
+"cls": "D",
+"size": 124,
+"tier": "med",
+"recipe": "bind base403c; conditional-lsl + shared-lsr (not bitfield); exact store-order",
+"risk": "permuter-class: orig shares ONE ldr+lsr#28 with a conditional lsl(23/19); mwcc likely splits into two per-branch loads/shifts. Also tbl/x/y reg rotation across 6 stores.",
+"confidence": "low",
+"file": "021ceebc.c"
 },
 {
 "addr": "021cef38",
@@ -41580,6 +42416,17 @@
 "confidence": "med",
 "file": "021cefb4.c",
 "tier": "high"
+},
+{
+"addr": "021ceffc",
+"module": "ov011",
+"cls": "D",
+"size": 76,
+"tier": "med",
+"recipe": "bitfield :2 set + bitfield-to-bitfield copy (f9=f5); gate early-return",
+"risk": "reshape-able: f9=f5 must yield read(lsl23;lsr28)+write(bic1e00;orr v>>19). If mwcc reads the word twice or reorders f18-store vs gate, swap statements. struct-guessed bit layout.",
+"confidence": "med",
+"file": "021ceffc.c"
 },
 {
 "addr": "021cf2fc",
@@ -41637,6 +42484,39 @@
 "file": "021d0bb0.c"
 },
 {
+"addr": "021d0f38",
+"module": "ov011",
+"cls": "D",
+"size": 52,
+"tier": "med",
+"recipe": "0x28-stride struct mla; :8 bitfield read(lsl24;lsr24)+write(bic;and;orr)",
+"risk": "reshape-able: if mwcc reads e->b with plain 'and #0xff' instead of lsl24;lsr24 the read diverges -- keep it a :8 bitfield (done). struct-guessed stride 0x28 / field@0xc.",
+"confidence": "med",
+"file": "021d0f38.c"
+},
+{
+"addr": "021d1080",
+"module": "ov011",
+"cls": "D",
+"size": 144,
+"tier": "med",
+"recipe": "bind both bases pre-call (callee-saved); bitfield idx; mla 0x72 + <<2",
+"risk": "permuter-class: callee-saved assignment for the two pre-bound bases (r7/r8) and out ptrs (r4/r5) across the call is a scheduling/alloc coin-flip mwcc may permute. mla-0x72 vs separate <<2 fuse also at risk. struct-guessed offsets.",
+"confidence": "low",
+"file": "021d1080.c"
+},
+{
+"addr": "021d1110",
+"module": "ov011",
+"cls": "D",
+"size": 144,
+"tier": "med",
+"recipe": "clone of 1080; only ldrh offsets +0x52/+0x54 differ; same bind/bitfield",
+"risk": "permuter-class: same as 021d1080 -- callee-saved alloc + scheduling across the func_021d0ffc call may permute; only +0x52/+0x54 differ. struct-guessed; if 1080 lands, this lands with the offset bump.",
+"confidence": "low",
+"file": "021d1110.c"
+},
+{
 "addr": "021d1434",
 "module": "ov011",
 "cls": "C",
@@ -41648,6 +42528,17 @@
 "file": "021d1434.c"
 },
 {
+"addr": "021d18b4",
+"module": "ov011",
+"cls": "D",
+"size": 104,
+"tier": "med",
+"recipe": "signed-char ldrsb table; shared row*0x72 mul + col*4; dual u16<<12 stores",
+"risk": "permuter-class: orig keeps row*0x72 (lr) and col*4 (ip) in separate regs, adds each base then indexes by ip; mwcc may fold base+off differently, reordering the two ldrh/mul. signed-char load is the key correctness lever.",
+"confidence": "med",
+"file": "021d18b4.c"
+},
+{
 "addr": "021d1b70",
 "module": "ov011",
 "cls": "D",
@@ -41657,6 +42548,94 @@
 "risk": "permuter-class + struct-guessed: each branch does ONE ldr/2-inserts/ONE str; if mwcc does NOT coalesce the two consecutive bitfield writes (separate casts) it emits 2 RMW per branch. +0x284/+0x268/+0x264 offsets and field widths inferred from shifts, confirm vs real struct.",
 "confidence": "low",
 "file": "021d1b70.c"
+},
+{
+"addr": "021d1c80",
+"module": "ov011",
+"cls": "D",
+"size": 104,
+"tier": "med",
+"recipe": "class D bitfield: lsl;lsr shift-pairs (not masks); reuse new-word local vs reload",
+"risk": "permuter-class: f268 re-extracts the f284 WORD held in r0 (no ldr); if mwcc reloads f284 from memory, 1 extra ldr diverges. Chained <<20>>28<<28>>23 fusion order also fragile.",
+"confidence": "low",
+"file": "021d1c80.c"
+},
+{
+"addr": "021d2008",
+"module": "ov011",
+"cls": "D",
+"size": 224,
+"tier": "med",
+"recipe": "class D: dup if-blocks; uninit first-Fill32 val; (x&0xffff0000)|(v&0xffff) tail idiom",
+"risk": "reshape-able: first Fill32 val=uninitialised local must compile to r0-leftover (no `mov r0`); if mwcc zeroes it, +1 instr. struct-guessed offsets f4/f8/fc/f10 vs real layout.",
+"confidence": "med",
+"file": "021d2008.c"
+},
+{
+"addr": "021d20e8",
+"module": "ov011",
+"cls": "D",
+"size": 48,
+"tier": "med",
+"recipe": "class D extract: (fc<<16)>>16 + (word<<28)>>28 shift-pairs; mla idx via i*S+r",
+"risk": "reshape-able: needs the lsl;lsr pairs to survive (a literal mask -> `and`, breaks). mla fusion of (fc>>16)*c+r is reliable. struct-guessed: base@0, fc@0xc offsets inferred from asm.",
+"confidence": "med",
+"file": "021d20e8.c"
+},
+{
+"addr": "021d2158",
+"module": "ov011",
+"cls": "D",
+"size": 288,
+"tier": "med",
+"recipe": "class D: stream nibble RMW via &~0xf|(v&0xf); halfword (f10<<16)>>16; realloc loop",
+"risk": "permuter-class: 10-callee-saved-reg loop with re-derived loop bound + spilled `slot` (sp,#4); reg-alloc/schedule will diverge. struct-guessed offsets; `slot` first-iter uninit matches asm but fragile.",
+"confidence": "low",
+"file": "021d2158.c"
+},
+{
+"addr": "021d2290",
+"module": "ov011",
+"cls": "D",
+"size": 68,
+"tier": "med",
+"recipe": "class D store-order: emit out[0] then out[1]; (x>>16) Q16->halfword via asr",
+"risk": "permuter-class: orig homes ALL args to stack (stmdb {r0-r3}+extra push) and round-trips via stack halfwords (strh;ldrh); direct C keeps them in regs -> arg-homing prologue + 4 stack ops diverge.",
+"confidence": "low",
+"file": "021d2290.c"
+},
+{
+"addr": "021d22d4",
+"module": "ov011",
+"cls": "D",
+"size": 92,
+"tier": "med",
+"recipe": "class D divmod: FX_Mul = (s64)a*b+0x800>>12 (smull;adds;adc;lsr#c;orr lsl#14); FX_Sqrt call",
+"risk": "permuter-class (DOCUMENTED, brief 457): orig homes all 4 fx32 args to stack (stmdb {r0-r3}) then reads back; direct C keeps them in regs -> arg-homing prologue diverges. The FX_Mul bodies themselves match.",
+"confidence": "med",
+"file": "021d22d4.c"
+},
+{
+"addr": "021d2330",
+"module": "ov011",
+"cls": "D",
+"size": 96,
+"tier": "med",
+"recipe": "class D store-order: ldrsh args, each <<12 to Q12, forward to distance fn",
+"risk": "permuter-class: orig homes the 4 s16 args to stack then re-packs into 2 ldmia-loaded pairs in a fixed strh/str order (sp+8,sp+c,sp+4,sp+0); direct C arg-passing won't reproduce the stack-pack shuffle.",
+"confidence": "low",
+"file": "021d2330.c"
+},
+{
+"addr": "021d2390",
+"module": "ov011",
+"cls": "D",
+"size": 152,
+"tier": "med",
+"recipe": "class D store-order: pack two s16 coord pairs <<12 once; 3 distance calls reuse stack slots",
+"risk": "permuter-class + struct-guessed: 3 calls re-load OVERLAPPING stack-packed pairs (sp+0/8/28) in an order the direct C can't fix; exact coord routing per call (which pair each call gets) inferred from ldmia bases \u2014 verify against the stack layout.",
+"confidence": "low",
+"file": "021d2390.c"
 },
 {
 "addr": "021d2c64",
@@ -41725,6 +42704,17 @@
 "file": "021caea8.c"
 },
 {
+"addr": "021caf80",
+"module": "ov012",
+"cls": "D",
+"size": 264,
+"tier": "med",
+"recipe": "word0 bitfield struct (:3,:4,:9,:9,:7) gives the 3 lsl;lsr pairs; u8/s8 word1; A<<12,B<<12; 3-way branch",
+"risk": "struct-guessed: A:9@7,B:9@16,C:4@3 inferred from shift amounts; if real struct differs the loads change. Else reshape-able via bitfield",
+"confidence": "med",
+"file": "021caf80.c"
+},
+{
 "addr": "021cb400",
 "module": "ov012",
 "cls": "C",
@@ -41747,6 +42737,28 @@
 "tier": "high"
 },
 {
+"addr": "021cb674",
+"module": "ov013",
+"cls": "D",
+"size": 140,
+"tier": "med",
+"recipe": "setter; func_02018b48()==4 branch; unsigned (x<<11)>>29 +1 3-bit field; bind data_021040ac",
+"risk": "HARD BLOCKER (unresolvable-call): first call is hand-encoded .word bl to 0x021b2198, reloc module:none/no symbol; mwcc's bl can't relocate -> likely stays .s unless func_021b2198 is defined",
+"confidence": "low",
+"file": "021cb674.c"
+},
+{
+"addr": "021b2644",
+"module": "ov014",
+"cls": "D",
+"size": 168,
+"tier": "med",
+"recipe": "store-order: clear ~0x1f00 on both MMIO regs in sequence (bind r1=0x4000000, r2=r1+0x1000); guard if-chains; calls in asm order; return 1",
+"risk": "Orig derives regB as r1+0x1000 (add) from the shared 0x4000000 base in r1, not a fresh literal; if mwcc loads 0x4001000 as its own constant the add becomes an ldr (reshape-able: regB = (char*)regA + 0x1000). f44/f2c offsets guessed (struct-guessed).",
+"confidence": "med",
+"file": "021b2644.c"
+},
+{
 "addr": "021b26ec",
 "module": "ov014",
 "cls": "B",
@@ -41756,6 +42768,39 @@
 "confidence": "med",
 "file": "021b26ec.c",
 "tier": "high"
+},
+{
+"addr": "021b274c",
+"module": "ov014",
+"cls": "D",
+"size": 192,
+"tier": "med",
+"recipe": "CLASS D: 3-bit fields as :3; memset(val,dst,len); store 0x2c/8/0/4 in source order",
+"risk": "struct-guessed + reshape-able: a3c&7 vs :3 field on f4 may differ (orig masks BOTH with lsl#29;lsr#29 -> both want :3 fields). Confirm g_104f4c layout; store-order of f2c/f8/f0/f4 must stay as written.",
+"confidence": "low",
+"file": "021b274c.c"
+},
+{
+"addr": "021b280c",
+"module": "ov014",
+"cls": "D",
+"size": 252,
+"tier": "med",
+"recipe": "CLASS D: DISPCNT &=~0x1f00 both engines; a3c 3-bit RMW; a68 |= 0x10001",
+"risk": "struct-guessed + reshape-able: g_104f4c offsets (0xa3c/0xa64/0xa68/0xa78) inferred; a3c RMW (bic#7|field) needs :3 source field. The 0x10001 set splits to two orr -> write as |0x10000|0x1 if one orr diverges. Confirm layout.",
+"confidence": "low",
+"file": "021b280c.c"
+},
+{
+"addr": "021b2eec",
+"module": "ov014",
+"cls": "D",
+"size": 204,
+"tier": "med",
+"recipe": "CLASS D: 3-way switch; reload o->f8 for 2nd call each state; ret=0 first; movge",
+"risk": "reshape-able: state0/2 RELOAD o->f8 for the second 0208c884 (orig re-ldr) - keep separate reads not a bound temp. State0 zeroes f8 via `mov r0,r4`(the ret=0 reg) so f8=ret as written. Risk: chained if/else vs switch jump form.",
+"confidence": "med",
+"file": "021b2eec.c"
 },
 {
 "addr": "021b3b9c",
@@ -41789,6 +42834,39 @@
 "confidence": "low",
 "file": "021b4040.c",
 "tier": "high"
+},
+{
+"addr": "021b41b8",
+"module": "ov014",
+"cls": "D",
+"size": 144,
+"tier": "med",
+"recipe": "volatile :5 bitfield RMW @bit8; reload f58 each tst; if-flow",
+"risk": "struct-guessed: DISPCNT modeled as :5 bitfield. Orig double-loads reg (ldr r2;ldr r1) for read/preserve \u2014 if mwcc collapses to one ldr or picks &0x1f00 mask (->and not lsl;lsr), diverges. permuter-class fallback.",
+"confidence": "med",
+"file": "021b41b8.c"
+},
+{
+"addr": "021b4248",
+"module": "ov014",
+"cls": "D",
+"size": 76,
+"tier": "med",
+"recipe": "four :5 byte masks shifted 0/5/10/15, accumulator-first or-chain",
+"risk": "reshape-able: the stray 'orr r3,r3,#0x0' suggests b0 is a :5 bitfield member (gives lsl;lsr) not plain &0x1f (gives and); if so switch b0 to a struct :5 bitfield. struct-guessed offsets.",
+"confidence": "med",
+"file": "021b4248.c"
+},
+{
+"addr": "021b4810",
+"module": "ov014",
+"cls": "D",
+"size": 60,
+"tier": "med",
+"recipe": "volatile :5 bitfield field &= ~3; two ordered zero stores",
+"risk": "struct-guessed: same DISPCNT :5 model as 021b41b8. Risk the &= ~3 lowers to plain mask (and) instead of the orig lsl;lsr extract sequence, and that mwcc may share r0=0 const differently across the two stores. reshape-able via bitfield width tweak.",
+"confidence": "med",
+"file": "021b4810.c"
 },
 {
 "addr": "021b23f4",
@@ -41868,6 +42946,17 @@
 "file": "021b30f0.c"
 },
 {
+"addr": "021b3718",
+"module": "ov015",
+"cls": "D",
+"size": 228,
+"tier": "med",
+"recipe": "CLASS D: signed-char scan; hoist both bases; if(d)*d++=c cond store; 2-byte token path",
+"risk": "reshape-able/permuter-class: the two identical else-arms (`cmp r6,#0; strneb r1,[r6],#1`) come from `if(d)*d++=c` - mwcc may merge/duplicate them differently. g_104f4c held in r7, g_105989 in r8 across the loop; if mwcc reloads, ldr count diverges. f4 :3 read each iter.",
+"confidence": "low",
+"file": "021b3718.c"
+},
+{
 "addr": "021b3ecc",
 "module": "ov015",
 "cls": "C",
@@ -41888,6 +42977,17 @@
 "risk": "permuter-class: three mid-body early-return tails (ldmneia/ldmltia) reuse r6/r7; mwcc's epilogue-merge and the r1-live-across-ble choice are a scheduling coin-flip a C reshape may not fix.",
 "confidence": "low",
 "file": "021b3f98.c"
+},
+{
+"addr": "021b429c",
+"module": "ov015",
+"cls": "D",
+"size": 268,
+"tier": "med",
+"recipe": "MMIO key flag dispatch; nested if/return chain; reload G fields",
+"risk": "permuter-class: heavy conditional-ldm tail (ldmeqia/ldmneia) \u2014 mwcc must fold each early return into a predicated pop; return-value r0 left unset on several paths (orig returns stale r0). Branch ordering may reschedule. struct-guessed offsets.",
+"confidence": "med",
+"file": "021b429c.c"
 },
 {
 "addr": "021b22d8",
@@ -41967,6 +43067,17 @@
 "tier": "high"
 },
 {
+"addr": "021b5284",
+"module": "ov016",
+"cls": "D",
+"size": 268,
+"tier": "med",
+"recipe": "divmod: %3 then /3 as separate exprs (no CSE); mla via inline (i+1)*0xa; switch jump-table",
+"risk": "reshape-able: mwcc may strength-reduce the loop addr to an induction var (add 0xa) instead of recomputing mla each iter; keep (i+1)*0xa inside the call to force mla.",
+"confidence": "med",
+"file": "021b5284.c"
+},
+{
 "addr": "021b5390",
 "module": "ov016",
 "cls": "A",
@@ -41976,6 +43087,17 @@
 "confidence": "med",
 "file": "021b5390.c",
 "tier": "high"
+},
+{
+"addr": "021b6074",
+"module": "ov016",
+"cls": "D",
+"size": 88,
+"tier": "med",
+"recipe": "shifted-or operand-order (accumulator-first); unsigned (x<<23)>>7 for lsl;lsr; store-order pack",
+"risk": "reshape-able: the folded `mov tmp,ip lsl#23; orr w,acc,tmp lsr#7` needs the unsigned-shift form; if mwcc materializes (x<<16)&mask instead, rewrite as ((unsigned)(arg0-0xd)<<23)>>7 exactly (already done) or split.",
+"confidence": "med",
+"file": "021b6074.c"
 },
 {
 "addr": "021b75c8",
@@ -42033,6 +43155,17 @@
 "file": "021b82e4.c"
 },
 {
+"addr": "021b8774",
+"module": "ov016",
+"cls": "D",
+"size": 472,
+"tier": "med",
+"recipe": "class-D bitfield struct (:5x5,:6) so each field reloads + and;lsr; 5-slot task loop; store-order fields; (asm truncated)",
+"risk": "struct-guessed + TRUNCATED: task-array symbol name and the entire else-branch/literal pool are unknown; bitfield extraction order is solid but field reload depends on bitfield (not cached int) -- confirm task-array symbol.",
+"confidence": "low",
+"file": "021b8774.c"
+},
+{
 "addr": "021b2c8c",
 "module": "ov017",
 "cls": "B",
@@ -42064,6 +43197,28 @@
 "risk": "struct-guessed: only the _LIT0/2/3 -> data_02104f4c/_021b8894 symbol identities are inferred; codegen matched in disasm, so any diff is a relocation/literal-pool name fix.",
 "confidence": "high",
 "file": "021b3e6c.c"
+},
+{
+"addr": "021b40d8",
+"module": "ov017",
+"cls": "D",
+"size": 292,
+"tier": "med",
+"recipe": "CLASS D: smull 0x66666667 -> signed /10 & %10; two loop bodies; tile (d+0x27c)|0x1400",
+"risk": "permuter-class: the two near-identical bodies allocate r6/r7/fp(=0/2/sp) in SWAPPED registers between modes - whole-function register rotation across r6..fp will likely diverge even with matching C. Also `add fp,sp,#0` vs `add r0,sp,#0` for the 020944a4 buf arg differs per mode. /10 div recipe itself should match.",
+"confidence": "low",
+"file": "021b40d8.c"
+},
+{
+"addr": "021b41fc",
+"module": "ov017",
+"cls": "D",
+"size": 312,
+"tier": "med",
+"recipe": "divmod: t=v/3600, min=t%60, hr=v/216000; clamp; two blit blocks",
+"risk": "permuter-class: mwcc's chosen magic for /216000 (orig uses rounding form 0x36b06e71 sep from t/60) and /3600 likely differ; r6=a1/r5=a2 bind order + sp-arg packing also coin-flip. Lowest-confidence of batch.",
+"confidence": "low",
+"file": "021b41fc.c"
 },
 {
 "addr": "021b44d4",
@@ -42154,6 +43309,17 @@
 "file": "021b6774.c"
 },
 {
+"addr": "021b6f40",
+"module": "ov017",
+"cls": "D",
+"size": 208,
+"tier": "med",
+"recipe": "bitfield pack 6x5+1x6 (unsigned-char reads); store-order clears; stride-0x5c & 3-entry loops",
+"risk": "struct-guessed: the orig's redundant `orr ip,ip,#0` plus the (x<<27)>>k shift form strongly imply a :5/:6 bitfield STRUCT write, not the plain OR-chain; emit the struct to match the lsl/lsr-into-orr exactly.",
+"confidence": "low",
+"file": "021b6f40.c"
+},
+{
 "addr": "021b768c",
 "module": "ov017",
 "cls": "C",
@@ -42163,6 +43329,28 @@
 "risk": "reshape-able: ONE folded instr \u2014 target has `addlt r0,r4,r0; sublt r4,r0,#2` but mwcc const-props y==0 to one `sublt`. Defeat the y==0 prop (derive y from an opaque value, or write y=(v>=0x14)?0x14:v-2 and compare).",
 "confidence": "med",
 "file": "021b768c.c"
+},
+{
+"addr": "021b7ba0",
+"module": "ov017",
+"cls": "D",
+"size": 524,
+"tier": "med",
+"recipe": "class-D /2 and /8 signed via plain '/' (constant divisor); state switch; store-order MMIO (best-effort, asm truncated)",
+"risk": "TRUNCATED asm: cases 2/default and tails of 1/.L_f8 + literal pool (_LIT1 mask/_LIT2 MMIO addr) are MISSING -- struct-guessed offsets and unknown MMIO consts; needs full .s to match.",
+"confidence": "low",
+"file": "021b7ba0.c"
+},
+{
+"addr": "021b7dac",
+"module": "ov017",
+"cls": "D",
+"size": 208,
+"tier": "med",
+"recipe": "/2 signed plain '/'; if-assign flag clamp (cmp/cond chain); store word-then-halfword on stack in asm order",
+"risk": "permuter-class: the func_02005dac call discards its result region/args ambiguously and the stack frame layout (frame[4] alias) is struct-guessed; clamp branch order + sp slot offsets likely diverge first.",
+"confidence": "low",
+"file": "021b7dac.c"
 },
 {
 "addr": "021aa5fc",
@@ -42176,6 +43364,17 @@
 "file": "021aa5fc.c"
 },
 {
+"addr": "021aa9b8",
+"module": "ov018",
+"cls": "D",
+"size": 4,
+"tier": "med",
+"recipe": "constant-divisor smull-magic as plain /60 and /30; %60 via total-(total/60)*60; v*255 = (v<<8)-v",
+"risk": "reshape-able: `sec*255` must lower to `rsb x,sec,sec lsl#8` and `v/30` reuse the 0x88888889 magic (asr#4). If mwcc emits `mul`/_s32_div_f instead, write `(sec<<8)-sec`. min(total/60) is computed-then-discarded \u2014 keep the expression so the /60 magic emits. ctx(r0) saved across \u2014 bind ok.",
+"confidence": "med",
+"file": "021aa9b8.c"
+},
+{
 "addr": "021aaa3c",
 "module": "ov018",
 "cls": "A",
@@ -42185,6 +43384,17 @@
 "confidence": "med",
 "file": "021aaa3c.c",
 "tier": "high"
+},
+{
+"addr": "021ab4f4",
+"module": "ov018",
+"cls": "D",
+"size": 416,
+"tier": "med",
+"recipe": "store-order: emit each ldrh/bic/orr/strh halfword pair in asm sequence; bind both MMIO bank bases; mvn for -1 compare",
+"risk": "_LIT1 base (g) held in r4 across whole fn then reused at .L_100; if mwcc reloads it the tail ldr diverges (reshape-able: bind to one local). Struct offsets 0x50/0x54/0xc guessed (struct-guessed).",
+"confidence": "med",
+"file": "021ab4f4.c"
 },
 {
 "addr": "021ace68",
@@ -42341,6 +43551,17 @@
 "tier": "high"
 },
 {
+"addr": "021b4f1c",
+"module": "ov019",
+"cls": "D",
+"size": 192,
+"tier": "med",
+"recipe": "switch returns input n or const; unsigned>= (movcs); n>7 ==45 special",
+"risk": "reshape-able: default/cases 0,1,2,5 must return n unchanged (orig 'bx lr' passthrough) \u2014 if mwcc zero-inits a result var instead, diverges; case6/7 split (>C then ==C&&y>=C2) may fold to one cmp. Use unsigned ops to hold movcs/movhi.",
+"confidence": "med",
+"file": "021b4f1c.c"
+},
+{
 "addr": "021b4fdc",
 "module": "ov019",
 "cls": "C",
@@ -42350,6 +43571,17 @@
 "risk": "struct-guessed: asm is TRUNCATED past .L_198 \u2014 default arm tail, .L_1d8 join, post-format code, frame size (0x12c) and literal->label mapping are reconstructed; the whole back half is unverified and almost certainly incomplete.",
 "confidence": "low",
 "file": "021b4fdc.c"
+},
+{
+"addr": "021b5948",
+"module": "ov019",
+"cls": "D",
+"size": 208,
+"tier": "med",
+"recipe": "signed /2 (sign>>31+asr); nested bounds && for lazy ldrge; store-order cmd pack; bind base",
+"risk": "permuter-class: the lazy ldrge/cond-exec bounds chain (nested-&& vs flat 4-term &&) drives branch shape and may not match; stack-slot order for a/b also struct-guessed.",
+"confidence": "low",
+"file": "021b5948.c"
 },
 {
 "addr": "021aa700",
@@ -42374,6 +43606,17 @@
 "file": "021aa80c.c"
 },
 {
+"addr": "021aa8f0",
+"module": "ov020",
+"cls": "D",
+"size": 248,
+"tier": "med",
+"recipe": "plain &mask/asr extract (cmp uses asr, not bitfield); store-order: loop2 split clear-then-set; loop1 single bic|orr",
+"risk": "reshape-able store-order: loop2 must emit two strh (bic;strh then re-read;orr;strh) while loop1 fuses one bic|orr|strh. Achieved by writing loop2 as `&= ~m;` then `|= v;` (two stmts) vs loop1 single insert. arg-count (6, stack args 4/5) struct-guessed.",
+"confidence": "med",
+"file": "021aa8f0.c"
+},
+{
 "addr": "021aaa80",
 "module": "ov020",
 "cls": "C",
@@ -42383,6 +43626,39 @@
 "risk": "func_020b3870 returns in r0 but orig consumes its result via add r5/lsl chains; if mwcc schedules the post-bl mov differently the rotation diverges. permuter-class.",
 "confidence": "low",
 "file": "021aaa80.c"
+},
+{
+"addr": "021ab364",
+"module": "ov020",
+"cls": "D",
+"size": 100,
+"tier": "med",
+"recipe": "mla index r4*100+1; inner counter copied from shared j(=0) to steer reg; orr tile|0xf000; post-inc strh",
+"risk": "reshape-able: orig copies the inner start from an outer var (mov r1,ip; mov r4,r1) \u2014 the `int j=0; int k=j;` reproduces it; collapsing to `int k=0` may drop a mov. (row*5+4)*32+5 pointer math and the +7 (0xe byte) row gap are exact. Loop body well-bounded.",
+"confidence": "med",
+"file": "021ab364.c"
+},
+{
+"addr": "021ab43c",
+"module": "ov020",
+"cls": "D",
+"size": 100,
+"tier": "med",
+"recipe": "identical clone recipe to 021ab364, palette nibble 0xe000; mla index; inner counter from shared j",
+"risk": "reshape-able: same as 021ab364 \u2014 `int j=0; int k=j;` reproduces the orig's `mov r1,ip; mov r4,r1` inner-init; only divergence risk is that inner-start mov if collapsed to `int k=0`. Pointer math and row gap exact; high confidence given the clone.",
+"confidence": "med",
+"file": "021ab43c.c"
+},
+{
+"addr": "021ab4a0",
+"module": "ov020",
+"cls": "D",
+"size": 292,
+"tier": "med",
+"recipe": "D divmod: sel%5 and sel/5 via smull magic -> plain / and %",
+"risk": "struct-guessed: the smull on (r5*2)/4 path computing r4 (a second quotient) and exact Fill32/func_020a978c/func_02004fe8 arg layout via [sp] block are inferred; the row uses sel/5 but a parallel (2*sel)/4 term suggests my divisor mapping is incomplete. struct-guessed.",
+"confidence": "low",
+"file": "021ab4a0.c"
 },
 {
 "addr": "021ab8f8",
@@ -42451,6 +43727,39 @@
 "tier": "high"
 },
 {
+"addr": "021adb8c",
+"module": "ov020",
+"cls": "D",
+"size": 408,
+"tier": "med",
+"recipe": "divmod: plain / and % by 360/255/60 emit smull magics; switch->jump-table; identical clone of 021ab5c8 \u2014 crack-once-propagate the matched .c to both",
+"risk": "Same as 021ab5c8: 8-smull scheduling interleave is a coin-flip (permuter-class) and the .L_260 pack tail is truncated/inferred (struct-guessed). Once 021ab5c8 matches, this byte-clones it.",
+"confidence": "low",
+"file": "021adb8c.c"
+},
+{
+"addr": "021add24",
+"module": "ov020",
+"cls": "D",
+"size": 156,
+"tier": "med",
+"recipe": "divmod: % 360 emits the 0xb60b60b7 smull+sub; bind reciprocal magic by hoisting (orig loads _LIT0/0x168 before loop); post-inc src; signed count via lsl16;lsr16",
+"risk": "Orig hoists the /360 magic (_LIT0) and 0x168 into callee-saved regs BEFORE the loop (ldr once); mwcc may re-materialize the constant inside the loop body, adding a per-iter ldr (reshape-able borderline / permuter-class if mwcc won't hoist). H/S/V slot reuse + post-inc ordering also fragile.",
+"confidence": "low",
+"file": "021add24.c"
+},
+{
+"addr": "021aab7c",
+"module": "ov021",
+"cls": "D",
+"size": 480,
+"tier": "med",
+"recipe": "decl-order self-first; counter cascade as nested if; -[0x50]<<16 mask into window reg; both arms set r0/r1, r2 differs",
+"risk": "permuter-class + truncated: asm cut off mid-divmod (after second smull on _LIT3) so the /K tail and its r6/lr placement are reconstructed, not derived. data_02104bac AND-mask store-order and the window-reg target (_LIT1) are struct-guessed. Confirm full .s before building.",
+"confidence": "low",
+"file": "021aab7c.c"
+},
+{
 "addr": "021aaf5c",
 "module": "ov021",
 "cls": "C",
@@ -42473,6 +43782,17 @@
 "tier": "high"
 },
 {
+"addr": "021aa540",
+"module": "ov022",
+"cls": "D",
+"size": 320,
+"tier": "med",
+"recipe": "store-order cmd[0x14]/[0x18]; bic|orr mask-insert; switch case-pairs; if-not ternary fields",
+"risk": "reshape-able: orig zero-extends state (lsl#16;lsr#16) before `and #0xf` at cmd[0x14] insert; declare `state` as `unsigned short` param to emit the pair. Tail (enable arm) struct-guessed: 02006e1c/020944a4 order inferred from .extern set.",
+"confidence": "low",
+"file": "021aa540.c"
+},
+{
 "addr": "021aa6e0",
 "module": "ov022",
 "cls": "C",
@@ -42482,6 +43802,17 @@
 "risk": "struct-guessed: incoming args at [sp+0x28]/[sp+0x2c] are the 6th/7th stack params (a5/a6) and the func_0207f934 arg order (blk@sp, coords@sp+4/+8, flag) is inferred from the str offsets; signature/arg-order likely wrong. struct-guessed.",
 "confidence": "low",
 "file": "021aa6e0.c"
+},
+{
+"addr": "021aabe8",
+"module": "ov022",
+"cls": "D",
+"size": 520,
+"tier": "med",
+"recipe": "MMIO bic/orr store-order verbatim; halfword strh ordering 0x8..0xe then data_02104f4c[0..3]; movmi guard",
+"risk": "struct-guessed + truncated: the literal-pool base->global mapping (_LIT0..5 to which data_* base) and field offsets (0x54/0xc/0x8) are inferred from usage; asm cut off after the bne .L_668 second-0208c884 block. MMIO strh order is reshape-able if it slips. Confirm pools.",
+"confidence": "low",
+"file": "021aabe8.c"
 },
 {
 "addr": "021ab330",
@@ -42504,6 +43835,28 @@
 "confidence": "med",
 "file": "021ab3f0.c",
 "tier": "high"
+},
+{
+"addr": "021ab5c8",
+"module": "ov022",
+"cls": "D",
+"size": 408,
+"tier": "med",
+"recipe": "divmod: plain / and % by 360/255/60 emit the smull magics; switch returning per-channel regs -> jump-table; r0/r1/r3 outputs",
+"risk": "8 chained smull divisions: mwcc's instruction-scheduling interleave across them is a coin-flip (permuter-class). Also .L_260 pack tail is truncated in target so PackRGB555 shape is inferred (struct-guessed).",
+"confidence": "low",
+"file": "021ab5c8.c"
+},
+{
+"addr": "021ab760",
+"module": "ov022",
+"cls": "D",
+"size": 164,
+"tier": "med",
+"recipe": "store-order: keep S on the stack, write after +bias, after <=0, after >255 (3 stores); if-assign clamps not ternary; unsigned count via &0xffff",
+"risk": "Orig re-reads/re-stores the S stack slot 3x and interleaves the ldr sp[8] (H) mid-clamp; mwcc may keep S in a reg and emit one store, dropping 2 str (reshape-able: take &S / force stack via the address-of in the out-param call already does this).",
+"confidence": "med",
+"file": "021ab760.c"
 },
 {
 "addr": "021b2280",
