@@ -425,7 +425,7 @@ src/jpn/overlay006/func_ov006_021b5ee4.s:
 src/jpn/overlay006/func_ov006_021b5fa4.s:
     complete
     .text start:0x021b5fa4 end:0x021b6150
-src/jpn/overlay006/func_ov006_021b6150.s:
+src/jpn/overlay006/func_ov006_021b6150.c:
     complete
     .text start:0x021b6150 end:0x021b6264
 src/jpn/overlay006/func_ov006_021b6264.s:
