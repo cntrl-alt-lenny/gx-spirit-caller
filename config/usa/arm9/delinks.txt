@@ -103,7 +103,7 @@ src/usa/main/func_02001c78.c:
 
     .text start:0x02001c78 end:0x02001cb0
 
-src/usa/main/func_02001cb0.s:
+src/usa/main/func_02001cb0.c:
     complete
     .text start:0x02001cb0 end:0x02001cec
 src/usa/main/func_02001cec.c:
@@ -141,7 +141,7 @@ src/usa/main/func_02001e64.s:
 src/usa/main/func_02001e74.s:
     complete
     .text start:0x02001e74 end:0x02001ed4
-src/usa/main/func_02001ed4.s:
+src/usa/main/func_02001ed4.c:
     complete
     .text start:0x02001ed4 end:0x02001ef8
 src/usa/main/func_02001ef8.s:
@@ -218,7 +218,7 @@ src/usa/main/func_02004f6c.legacy_sp3.c:
     complete
     .text start:0x02004f6c end:0x02004f9c
 
-src/usa/main/func_02004f9c.s:
+src/usa/main/func_02004f9c.c:
     complete
     .text start:0x02004f9c end:0x02004fcc
 src/usa/main/func_02004fcc.s:
@@ -363,7 +363,7 @@ src/usa/main/func_02006190.c:
 src/usa/main/func_020061a0.s:
     complete
     .text start:0x020061a0 end:0x0200620c
-src/usa/main/func_0200620c.s:
+src/usa/main/func_0200620c.c:
     complete
     .text start:0x0200620c end:0x02006248
 src/usa/main/func_02006248.s:
@@ -580,7 +580,7 @@ src/usa/main/func_02009730.c:
 src/usa/main/func_0200973c.s:
     complete
     .text start:0x0200973c end:0x02009788
-src/usa/main/func_02009788.s:
+src/usa/main/func_02009788.c:
     complete
     .text start:0x02009788 end:0x020097b8
 src/usa/main/func_020097b8.c:
@@ -638,7 +638,7 @@ src/usa/main/func_0200a438.s:
 src/usa/main/func_0200a46c.s:
     complete
     .text start:0x0200a46c end:0x0200a670
-src/usa/main/func_0200a670.s:
+src/usa/main/func_0200a670.c:
     complete
     .text start:0x0200a670 end:0x0200a6e8
 src/usa/main/func_0200a6e8.s:
@@ -647,7 +647,7 @@ src/usa/main/func_0200a6e8.s:
 src/usa/main/func_0200a788.s:
     complete
     .text start:0x0200a788 end:0x0200a894
-src/usa/main/func_0200a894.s:
+src/usa/main/func_0200a894.c:
     complete
     .text start:0x0200a894 end:0x0200a90c
 src/usa/main/func_0200a90c.s:
@@ -886,7 +886,7 @@ src/usa/main/func_0200c690.s:
 src/usa/main/func_0200c6e0.s:
     complete
     .text start:0x0200c6e0 end:0x0200c730
-src/usa/main/func_0200c730.s:
+src/usa/main/func_0200c730.c:
     complete
     .text start:0x0200c730 end:0x0200c780
 src/usa/main/func_0200c780.s:
@@ -1402,14 +1402,14 @@ src/usa/main/func_02018b8c.c:
 src/usa/main/func_02018bb4.s:
     complete
     .text start:0x02018bb4 end:0x02018ca8
-src/usa/main/func_02018ca8.s:
+src/usa/main/func_02018ca8.c:
     complete
     .text start:0x02018ca8 end:0x02018ce8
 src/usa/main/func_02018ce8.c:
     complete
     .text start:0x02018ce8 end:0x02018d24
 
-src/usa/main/func_02018d24.s:
+src/usa/main/func_02018d24.c:
     complete
     .text start:0x02018d24 end:0x02018d64
 src/usa/main/func_02018d64.c:
@@ -1420,10 +1420,10 @@ src/usa/main/func_02018d98.c:
     complete
     .text start:0x02018d98 end:0x02018dcc
 
-src/usa/main/func_02018dcc.s:
+src/usa/main/func_02018dcc.c:
     complete
     .text start:0x02018dcc end:0x02018e0c
-src/usa/main/func_02018e0c.s:
+src/usa/main/func_02018e0c.c:
     complete
     .text start:0x02018e0c end:0x02018e54
 src/usa/main/func_02018e54.s:
@@ -1654,10 +1654,10 @@ src/usa/main/func_0201a420.c:
 src/usa/main/func_0201a464.s:
     complete
     .text start:0x0201a464 end:0x0201a4a8
-src/usa/main/func_0201a4a8.s:
+src/usa/main/func_0201a4a8.c:
     complete
     .text start:0x0201a4a8 end:0x0201a4fc
-src/usa/main/func_0201a4fc.s:
+src/usa/main/func_0201a4fc.c:
     complete
     .text start:0x0201a4fc end:0x0201a560
 src/usa/main/func_0201a560.c:
@@ -1816,7 +1816,7 @@ src/usa/main/func_0201b7ec.s:
 src/usa/main/func_0201bb64.s:
     complete
     .text start:0x0201bb64 end:0x0201bb88
-src/usa/main/func_0201bb88.s:
+src/usa/main/func_0201bb88.c:
     complete
     .text start:0x0201bb88 end:0x0201bbfc
 src/usa/main/func_0201bbfc.s:
@@ -1835,7 +1835,7 @@ src/usa/main/func_0201be58.c:
     complete
     .text start:0x0201be58 end:0x0201be68
 
-src/usa/main/func_0201be68.s:
+src/usa/main/func_0201be68.c:
     complete
     .text start:0x0201be68 end:0x0201bec4
 src/usa/main/func_0201bec4.s:
@@ -2082,7 +2082,7 @@ src/usa/main/func_0201e7b8.s:
 src/usa/main/func_0201e7c4.s:
     complete
     .text start:0x0201e7c4 end:0x0201e870
-src/usa/main/func_0201e870.s:
+src/usa/main/func_0201e870.c:
     complete
     .text start:0x0201e870 end:0x0201e8d4
 src/usa/main/func_0201e8d4.s:
@@ -2690,7 +2690,7 @@ src/usa/main/func_020276e4.s:
 src/usa/main/func_02027888.s:
     complete
     .text start:0x02027888 end:0x02027d88
-src/usa/main/func_02027d88.s:
+src/usa/main/func_02027d88.c:
     complete
     .text start:0x02027d88 end:0x02027df0
 src/usa/main/func_02027df0.s:
@@ -2853,7 +2853,7 @@ src/usa/main/func_0202b2e8.c:
     complete
     .text start:0x0202b2e8 end:0x0202b30c
 
-src/usa/main/func_0202b30c.s:
+src/usa/main/func_0202b30c.c:
     complete
     .text start:0x0202b30c end:0x0202b380
 src/usa/main/func_0202b380.s:
@@ -3182,7 +3182,7 @@ src/usa/main/func_0202d94c.s:
 src/usa/main/func_0202d9a4.s:
     complete
     .text start:0x0202d9a4 end:0x0202de48
-src/usa/main/func_0202de48.s:
+src/usa/main/func_0202de48.c:
     complete
     .text start:0x0202de48 end:0x0202df24
 src/usa/main/func_0202df24.s:
@@ -3382,7 +3382,7 @@ src/usa/main/func_0203176c.s:
 src/usa/main/func_0203178c.c:
     complete
     .text start:0x0203178c end:0x020317e4
-src/usa/main/func_020317e4.s:
+src/usa/main/func_020317e4.c:
     complete
     .text start:0x020317e4 end:0x02031850
 src/usa/main/func_02031850.s:
@@ -3412,7 +3412,7 @@ src/usa/main/func_02031a5c.s:
 src/usa/main/func_02031aa8.s:
     complete
     .text start:0x02031aa8 end:0x02031ae4
-src/usa/main/func_02031ae4.s:
+src/usa/main/func_02031ae4.c:
     complete
     .text start:0x02031ae4 end:0x02031b20
 src/usa/main/func_02031b20.c:
@@ -3484,7 +3484,7 @@ src/usa/main/func_020320a4.s:
 src/usa/main/func_0203215c.s:
     complete
     .text start:0x0203215c end:0x02032294
-src/usa/main/func_02032294.s:
+src/usa/main/func_02032294.c:
     complete
     .text start:0x02032294 end:0x020322f0
 src/usa/main/func_020322f0.s:
@@ -4047,7 +4047,7 @@ src/usa/main/func_02036534.c:
 src/usa/main/func_02036540.s:
     complete
     .text start:0x02036540 end:0x02036660
-src/usa/main/func_02036660.s:
+src/usa/main/func_02036660.c:
     complete
     .text start:0x02036660 end:0x020366cc
 src/usa/main/func_020366cc.s:
@@ -4159,7 +4159,7 @@ src/usa/main/func_0203820c.c:
     complete
     .text start:0x0203820c end:0x02038220
 
-src/usa/main/func_02038220.s:
+src/usa/main/func_02038220.c:
     complete
     .text start:0x02038220 end:0x02038288
 src/usa/main/func_02038288.s:
@@ -4426,7 +4426,7 @@ src/usa/main/func_0203c5e8.c:
     complete
     .text start:0x0203c5e8 end:0x0203c600
 
-src/usa/main/func_0203c600.s:
+src/usa/main/func_0203c600.c:
     complete
     .text start:0x0203c600 end:0x0203c648
 src/usa/main/func_0203c648.s:
@@ -5262,7 +5262,7 @@ src/usa/main/func_020480b0.s:
 src/usa/main/func_020481c8.s:
     complete
     .text start:0x020481c8 end:0x02048208
-src/usa/main/func_02048208.s:
+src/usa/main/func_02048208.c:
     complete
     .text start:0x02048208 end:0x0204828c
 src/usa/main/func_0204828c.c:
@@ -5849,7 +5849,7 @@ src/usa/main/func_02052f14.c:
     complete
     .text start:0x02052f14 end:0x02052f3c
 
-src/usa/main/func_02052f3c.s:
+src/usa/main/func_02052f3c.c:
     complete
     .text start:0x02052f3c end:0x02052f80
 src/usa/main/func_02052f80.c:
@@ -5863,7 +5863,7 @@ src/usa/main/func_02052fa4.c:
     complete
     .text start:0x02052fa4 end:0x02052fb0
 
-src/usa/main/func_02052fb0.s:
+src/usa/main/func_02052fb0.c:
     complete
     .text start:0x02052fb0 end:0x02053008
 src/usa/main/func_02053008.s:
@@ -6021,7 +6021,7 @@ src/usa/main/func_02053c9c.s:
 src/usa/main/func_02053d68.s:
     complete
     .text start:0x02053d68 end:0x02053d88
-src/usa/main/func_02053d88.s:
+src/usa/main/func_02053d88.c:
     complete
     .text start:0x02053d88 end:0x02053de4
 src/usa/main/func_02053de4.s:
@@ -7338,7 +7338,7 @@ src/usa/main/func_020688e8.s:
 src/usa/main/func_020688f0.s:
     complete
     .text start:0x020688f0 end:0x020688f8
-src/usa/main/func_020688f8.s:
+src/usa/main/func_020688f8.c:
     complete
     .text start:0x020688f8 end:0x0206891c
 src/usa/main/func_0206891c.s:
@@ -8835,7 +8835,7 @@ src/usa/main/func_0207d100.s:
 src/usa/main/func_0207d18c.s:
     complete
     .text start:0x0207d18c end:0x0207d1b4
-src/usa/main/func_0207d1b4.s:
+src/usa/main/func_0207d1b4.c:
     complete
     .text start:0x0207d1b4 end:0x0207d21c
 src/usa/main/func_0207d21c.s:
@@ -8930,7 +8930,7 @@ src/usa/main/func_0207db10.s:
 src/usa/main/func_0207db74.s:
     complete
     .text start:0x0207db74 end:0x0207dbc0
-src/usa/main/func_0207dbc0.s:
+src/usa/main/func_0207dbc0.c:
     complete
     .text start:0x0207dbc0 end:0x0207dc10
 src/usa/main/func_0207dc10.c:
@@ -9206,7 +9206,7 @@ src/usa/main/func_020806d0.s:
 src/usa/main/func_02080714.s:
     complete
     .text start:0x02080714 end:0x020807d0
-src/usa/main/func_020807d0.s:
+src/usa/main/func_020807d0.c:
     complete
     .text start:0x020807d0 end:0x02080808
 src/usa/main/func_02080808.s:
@@ -9756,7 +9756,7 @@ src/usa/main/func_02087ef8.c:
     complete
     .text start:0x02087ef8 end:0x02087f18
 
-src/usa/main/func_02087f18.s:
+src/usa/main/func_02087f18.c:
     complete
     .text start:0x02087f18 end:0x02087f88
 src/usa/main/func_02087f88.s:
@@ -10797,7 +10797,7 @@ src/usa/main/func_0209172c.s:
 src/usa/main/func_02091734.s:
     complete
     .text start:0x02091734 end:0x020917e8
-src/usa/main/func_020917e8.s:
+src/usa/main/func_020917e8.legacy.c:
     complete
     .text start:0x020917e8 end:0x020918a4
 src/usa/main/func_020918a4.legacy.c:
@@ -10811,7 +10811,7 @@ src/usa/main/func_020918f0.legacy.c:
     complete
     .text start:0x020918f0 end:0x02091924
 
-src/usa/main/func_02091924.s:
+src/usa/main/func_02091924.legacy.c:
     complete
     .text start:0x02091924 end:0x020919a4
 src/usa/main/func_020919a4.s:
@@ -10856,14 +10856,14 @@ src/usa/main/func_02091ea0.s:
 src/usa/main/func_02091f8c.s:
     complete
     .text start:0x02091f8c end:0x02091fd4
-src/usa/main/func_02091fd4.s:
+src/usa/main/func_02091fd4.legacy.c:
     complete
     .text start:0x02091fd4 end:0x0209203c
 libs/nitro/func_02092124.legacy.c:
     complete
     .text start:0x0209203c end:0x0209206c
 
-src/usa/main/func_0209206c.s:
+src/usa/main/func_0209206c.legacy.c:
     complete
     .text start:0x0209206c end:0x020920c0
 src/usa/main/func_020920c0.s:
@@ -10892,7 +10892,7 @@ src/usa/main/func_02092280.s:
 src/usa/main/func_02092298.s:
     complete
     .text start:0x02092298 end:0x020922a0
-src/usa/main/func_020922a0.s:
+src/usa/main/func_020922a0.legacy.c:
     complete
     .text start:0x020922a0 end:0x02092324
 src/usa/main/func_02092324.s:
@@ -10915,7 +10915,7 @@ libs/nitro/func_02092668.legacy.c:
     complete
     .text start:0x02092580 end:0x020925a4
 
-src/usa/main/func_020925a4.s:
+src/usa/main/func_020925a4.legacy.c:
     complete
     .text start:0x020925a4 end:0x02092618
 src/usa/main/func_02092618.s:
