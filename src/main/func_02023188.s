@@ -5,7 +5,7 @@
         .text
         .extern data_02197434
         .extern data_0219a834
-        .extern func_02006e1c
+        .extern Task_Invoke
         .global func_02023188
         .arm
 func_02023188:
@@ -29,7 +29,7 @@ func_02023188:
     ldr r0, [sl, #0x38]
     cmp r0, #0x0
     beq .L_c9c
-    bl func_02006e1c
+    bl Task_Invoke
     str r5, [sl, #0x38]
 .L_c9c:
     ldrsh r0, [r4]

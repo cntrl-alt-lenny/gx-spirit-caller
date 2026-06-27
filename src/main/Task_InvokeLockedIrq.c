@@ -1,4 +1,4 @@
-/* func_02006368: IRQ-bracketed Task_InvokeLocked(p) with null-skip —
+/* Task_InvokeLockedIrq: IRQ-bracketed Task_InvokeLocked(p) with null-skip —
  * same semantics as the plain wrapper but the IRQ lock is explicit
  * at this level (Task_InvokeLocked already locks internally, so
  * nesting is defense-in-depth or a legacy shape).
@@ -21,7 +21,7 @@ extern int  OS_DisableIrq(void);
 extern void OS_RestoreIrq(int mask);
 extern void Task_InvokeLocked(void *p);
 
-void func_02006368(void *p) {
+void Task_InvokeLockedIrq(void *p) {
     int saved = OS_DisableIrq();
     if (p != 0) Task_InvokeLocked(p);
     OS_RestoreIrq(saved);

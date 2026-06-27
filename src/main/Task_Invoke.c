@@ -1,4 +1,4 @@
-/* func_02006e1c: minimal pass-through thunk to Task_InvokeLocked.
+/* Task_Invoke: minimal pass-through thunk to Task_InvokeLocked.
  *
  * Cascade target #18 (12 transitive callees, depth 3) — one of the
  * most-called thunks in main. Worth rewriting as C specifically
@@ -8,6 +8,6 @@
 
 extern void Task_InvokeLocked(void *p);
 
-void func_02006e1c(void *p) {
+void Task_Invoke(void *p) {
     Task_InvokeLocked(p);
 }

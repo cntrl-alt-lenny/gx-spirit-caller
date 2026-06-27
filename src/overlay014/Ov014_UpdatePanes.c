@@ -1,4 +1,4 @@
-/* func_ov014_021b25b0: per-frame update for the two paired panes. Bail early
+/* Ov014_UpdatePanes: per-frame update for the two paired panes. Bail early
  * (reporting busy) if the transition lock at data_b5040+0x44 is held. Otherwise
  * advance each pane (func_ov014_021b2eec / func_ov014_021b41b8, keeping their
  * "done" flags), run their post-pass, latch the lock when BOTH are done, flush
@@ -15,7 +15,7 @@ extern char data_ov014_021b5040[];
 extern char data_ov014_02235094[];
 extern char data_ov014_022350f4[];
 
-int func_ov014_021b25b0(void) {
+int Ov014_UpdatePanes(void) {
     int a;
     int b;
     int done;

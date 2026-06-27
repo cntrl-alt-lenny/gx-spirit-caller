@@ -7,7 +7,7 @@
         .extern func_02022234
         .extern func_02022260
         .extern func_020224c0
-        .extern func_0202250c
+        .extern Rand_Next
         .extern func_020b3870
         .global func_020222a0
         .arm
@@ -64,7 +64,7 @@ func_020222a0:
     eor r4, r0, r4
     b .L_158
 .L_ac:
-    bl func_0202250c
+    bl Rand_Next
     mov r1, r4
     bl func_020b3870
     mov r4, r1

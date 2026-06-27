@@ -18,7 +18,7 @@
         .extern func_02001bc8
         .extern func_02001d68
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201d760
         .extern func_0201e5b8
@@ -111,7 +111,7 @@ func_ov004_021cb9e4:
     str r1, [sp, #0xd8]
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r7, _LIT6
     mov sl, #0x1
     add r8, sp, #0xac
@@ -143,7 +143,7 @@ func_ov004_021cb9e4:
     str r4, [sp, #0xd4]
     bl func_0201e5b8
     mov r0, r6
-    bl func_02006e1c
+    bl Task_Invoke
     add sl, sl, #0x1
     cmp sl, #0x4
     blt .L_608
@@ -169,7 +169,7 @@ func_ov004_021cb9e4:
     strh r1, [sp, #0xdc]
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r2, _LIT9
     mov r0, #0x0
     ldrh r1, [r2]
@@ -211,7 +211,7 @@ func_ov004_021cb9e4:
     add r0, sp, #0x84
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r0, _LIT11
     mov r1, #0x4
     mov r2, #0x0
@@ -234,7 +234,7 @@ func_ov004_021cb9e4:
     strh r1, [sp, #0x6c]
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r1, _LIT12
     ldr r2, _LIT13
     add r0, sp, #0x3c
@@ -292,7 +292,7 @@ func_ov004_021cb9e4:
     mov r2, #0x20
     bl func_02094550
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     mov r0, #0x1
     str r0, [sp]
     add r0, r9, #0xf90

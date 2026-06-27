@@ -8,7 +8,7 @@
         .extern data_ov008_021b26c4
         .extern data_ov008_021b2790
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_02091554
@@ -63,7 +63,7 @@ func_ov008_021aefd4:
     str r1, [sp, #0x38]
     bl func_0201e5b8
     ldr r0, [sp, #0x20]
-    bl func_02006e1c
+    bl Task_Invoke
     add sp, sp, #0x48
     ldmia sp!, {r4, pc}
 _LIT0: .word data_021040ac

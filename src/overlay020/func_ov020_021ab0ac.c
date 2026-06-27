@@ -1,7 +1,7 @@
 /* func_ov020_021ab0ac: clear the 0xaa0-offset region of the work buffer,
  * sized by the current page count * 0x360.
  *
- *     bl    func_0208df40
+ *     bl    Vram_GetBankBaseCD
  *     ldr   r2, =data_ov020_021ae060
  *     mov   r1, #0x360
  *     ldr   r3, [r2, #0x8d8]
@@ -11,11 +11,11 @@
  *     bl    func_0209448c
  */
 
-extern void *func_0208df40(void);
+extern void *Vram_GetBankBaseCD(void);
 extern char data_ov020_021ae060[];
 extern void func_0209448c(int val, void *dest, unsigned int size);
 
 void func_ov020_021ab0ac(void) {
-    char *buf = (char *)func_0208df40();
+    char *buf = (char *)Vram_GetBankBaseCD();
     func_0209448c(0, buf + 0xaa0, *(int *)(data_ov020_021ae060 + 0x8d8) * 0x360);
 }

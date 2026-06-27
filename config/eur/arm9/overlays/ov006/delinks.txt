@@ -292,7 +292,7 @@ src/overlay006/func_ov006_021b4aa0.c:
     complete
     .text start:0x021b4aa0 end:0x021b4ad8
 
-src/overlay006/func_ov006_021b4ad8.c:
+src/overlay006/Ov006_FullInit.c:
     complete
     .text start:0x021b4ad8 end:0x021b4cf8
 

@@ -38,9 +38,9 @@
         .extern func_ov015_021b28f0
         .extern func_ov015_021b2c18
         .extern func_ov015_021b2df8
-        .extern func_ov015_021b3028
+        .extern Ov015_DrawStatusFields
         .extern func_ov015_021b30b0
-        .extern func_ov015_021b3170
+        .extern Ov015_InitScroller
         .extern func_ov015_021b31f0
         .extern func_ov015_021b36c4
         .extern func_ov015_021b3d2c
@@ -54,7 +54,7 @@ func_ov015_021b4ba0:
     mov r2, r1
     mov r0, #0x2
     ldr r9, _LIT0
-    bl func_ov015_021b3028
+    bl Ov015_DrawStatusFields
     ldr r0, _LIT1
     ldr r1, _LIT2
     ldr r2, _LIT3
@@ -219,7 +219,7 @@ func_ov015_021b4ba0:
     add r0, r9, #0x880
     strh r4, [sp, #0x14]
     strh r3, [sp, #0x16]
-    bl func_ov015_021b3170
+    bl Ov015_InitScroller
     add r1, sp, #0x10
     add r0, r9, #0x880
     bl func_ov015_021b31f0

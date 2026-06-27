@@ -5,7 +5,7 @@
  *     mov   r4, r0
  *     str   r1, [r4, #0x60]
  *     str   r2, [r4, #0x5c]
- *     bl    func_ov015_021b238c
+ *     bl    Ov015_UpdateScrollTarget
  *     mov   r1, r0
  *     mov   r0, r4
  *     bl    func_ov015_021b23f4
@@ -15,13 +15,13 @@
  *     pop   {r4, pc}
  */
 
-extern int func_ov015_021b238c(void *self);
+extern int Ov015_UpdateScrollTarget(void *self);
 extern void func_ov015_021b23f4(void *self, int v);
 extern void func_ov015_021b2490(void *self, int v);
 
 void func_ov015_021b2450(int *self, int a1, int a2) {
     self[0x18] = a1;
     self[0x17] = a2;
-    func_ov015_021b23f4(self, func_ov015_021b238c(self));
+    func_ov015_021b23f4(self, Ov015_UpdateScrollTarget(self));
     func_ov015_021b2490(self, self[0x19]);
 }

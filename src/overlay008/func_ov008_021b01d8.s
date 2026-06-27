@@ -12,7 +12,7 @@
         .extern data_ov008_021b2de4
         .extern Task_PostLocked
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0208e2f4
@@ -88,7 +88,7 @@ func_ov008_021b01d8:
     strh r1, [sp, #0x10]
     bl func_0201e5b8
     ldr r0, [sp, #0x0]
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r0, .L_021b03a4
     ldr r2, .L_021b03a8
     ldr r0, [r0, #0x18]

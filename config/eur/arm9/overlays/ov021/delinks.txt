@@ -8,7 +8,7 @@ src/overlay021/func_ov021_021aa4a0.s:
     complete
     .text start:0x021aa4a0 end:0x021aa514
 
-src/overlay021/func_ov021_021aa514.c:
+src/overlay021/Audio_Init.c:
     complete
     .text start:0x021aa514 end:0x021aa5a0
 
@@ -39,7 +39,7 @@ src/overlay021/func_ov021_021aa8d4.c:
     complete
     .text start:0x021aa8d4 end:0x021aa908
 
-src/overlay021/func_ov021_021aa908.c:
+src/overlay021/Scene_Update.c:
     complete
     .text start:0x021aa908 end:0x021aa9b4
 

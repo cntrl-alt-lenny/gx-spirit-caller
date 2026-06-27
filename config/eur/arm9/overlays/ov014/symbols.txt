@@ -1,5 +1,5 @@
 func_ov014_021b2280 kind:function(arm,size=0x330) addr:0x021b2280
-func_ov014_021b25b0 kind:function(arm,size=0x94) addr:0x021b25b0
+Ov014_UpdatePanes kind:function(arm,size=0x94) addr:0x021b25b0
 func_ov014_021b2644 kind:function(arm,size=0xa8) addr:0x021b2644
 func_ov014_021b26ec kind:function(arm,size=0x58) addr:0x021b26ec
 func_ov014_021b2744 kind:function(arm,size=0x4) addr:0x021b2744
@@ -9,8 +9,8 @@ func_ov014_021b280c kind:function(arm,size=0xfc) addr:0x021b280c
 func_ov014_021b2908 kind:function(arm,size=0x5e4) addr:0x021b2908
 func_ov014_021b2eec kind:function(arm,size=0xcc) addr:0x021b2eec
 func_ov014_021b2fb8 kind:function(arm,size=0x488) addr:0x021b2fb8
-func_ov014_021b3440 kind:function(arm,size=0xb0) addr:0x021b3440
-func_ov014_021b34f0 kind:function(arm,size=0x78) addr:0x021b34f0
+Ov014_HitTestPrimary kind:function(arm,size=0xb0) addr:0x021b3440
+Ov014_HitTestSecondary kind:function(arm,size=0x78) addr:0x021b34f0
 func_ov014_021b3568 kind:function(arm,size=0x234) addr:0x021b3568
 func_ov014_021b379c kind:function(arm,size=0x19c) addr:0x021b379c
 func_ov014_021b3938 kind:function(arm,size=0x14c) addr:0x021b3938

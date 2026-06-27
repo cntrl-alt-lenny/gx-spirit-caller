@@ -5,11 +5,11 @@
         .text
         .extern data_ov011_021d4000
         .extern data_ov011_021d403c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0208c8cc
-        .extern func_ov011_021cc948
+        .extern Bg_SetScroll
         .global func_ov011_021cb25c
         .arm
 func_ov011_021cb25c:
@@ -86,7 +86,7 @@ func_ov011_021cb25c:
     add r0, sp, #0x0
     bl func_0201e5b8
     ldr r0, [sp]
-    bl func_02006e1c
+    bl Task_Invoke
     ldr r0, [r4, #0x264]
     mov r1, #0x0
     cmp r0, #0x1
@@ -96,7 +96,7 @@ func_ov011_021cb25c:
     mov r2, #0x0
     bl func_0208c8cc
 .L_144:
-    bl func_ov011_021cc948
+    bl Bg_SetScroll
     add sp, sp, #0x28
     ldmia sp!, {r3, r4, r5, pc}
 _LIT0: .word data_ov011_021d4000

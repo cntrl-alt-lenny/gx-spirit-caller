@@ -1,5 +1,5 @@
 func_ov008_021aa4a0 kind:function(arm,size=0x6c) addr:0x021aa4a0
-func_ov008_021aa50c kind:function(arm,size=0x34) addr:0x021aa50c
+Ov008_Rand kind:function(arm,size=0x34) addr:0x021aa50c
 func_ov008_021aa540 kind:function(arm,size=0x38) addr:0x021aa540
 func_ov008_021aa578 kind:function(arm,size=0x60) addr:0x021aa578
 func_ov008_021aa5d8 kind:function(arm,size=0x18) addr:0x021aa5d8

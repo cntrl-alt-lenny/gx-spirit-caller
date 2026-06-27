@@ -11,7 +11,7 @@
         .extern func_02004f58
         .extern func_020054a4
         .extern func_0202c0c0
-        .extern func_0208deec
+        .extern Vram_GetBankBaseE
         .extern func_0208e1ac
         .extern func_02094504
         .global func_ov004_021d0530
@@ -29,7 +29,7 @@ func_ov004_021d0530:
     mov r0, r0, lsl #0x1d
     mov r0, r0, lsr #0x1d
     bl func_02001d68
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     add r1, r0, #0xda0
     mov r0, #0x0
     mov r2, #0x800
@@ -40,7 +40,7 @@ func_ov004_021d0530:
     mov r0, r4
     bl func_0202c0c0
     mov r5, r0
-    bl func_0208deec
+    bl Vram_GetBankBaseE
     mov r4, r0
     mov r0, r5
     mov r1, #0xc

@@ -1,4 +1,4 @@
-/* func_0200faf8: doubly-linked-list node unlink.
+/* List_Unlink: doubly-linked-list node unlink.
  *
  *     ldr   r1, [r0, #0x4]        ; r1 = next
  *     ldr   r0, [r0, #0x0]        ; r0 = prev
@@ -15,7 +15,7 @@ typedef struct list_node {
     struct list_node *next;
 } list_node_t;
 
-int func_0200faf8(list_node_t *node) {
+int List_Unlink(list_node_t *node) {
     list_node_t *next = node->next;
     list_node_t *prev = node->prev;
     if (next) next->prev = prev;

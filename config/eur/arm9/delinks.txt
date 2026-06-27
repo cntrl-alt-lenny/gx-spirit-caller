@@ -908,7 +908,7 @@ src/main/func_02006334.c:
 
 
 
-src/main/func_02006368.c:
+src/main/Task_InvokeLockedIrq.c:
     complete
     .text start:0x02006368 end:0x02006394
 
@@ -1003,7 +1003,7 @@ src/main/func_02006c0c.s:
     complete
     .text start:0x02006c0c end:0x02006e1c
 
-src/main/func_02006e1c.c:
+src/main/Task_Invoke.c:
     complete
     .text start:0x02006e1c end:0x02006e28
 
@@ -1749,7 +1749,7 @@ src/main/func_0200fa90.s:
     complete
     .text start:0x0200fa90 end:0x0200faf8
 
-src/main/func_0200faf8.c:
+src/main/List_Unlink.c:
     complete
     .text start:0x0200faf8 end:0x0200fb18
 
@@ -2483,7 +2483,7 @@ src/main/func_02018b94.c:
 
 
 
-src/main/func_02018ba4.c:
+src/main/SysWork_ClearField0x810.c:
     complete
     .text start:0x02018ba4 end:0x02018bc0
 
@@ -2552,7 +2552,7 @@ src/main/func_02018ecc.s:
     complete
     .text start:0x02018ecc end:0x02018f2c
 
-src/main/func_02018f2c.c:
+src/main/SysWork_GetPointDistance.c:
     complete
     .text start:0x02018f2c end:0x02018f80
 
@@ -4485,7 +4485,7 @@ src/main/func_020224c0.s:
     complete
     .text start:0x020224c0 end:0x0202250c
 
-src/main/func_0202250c.c:
+src/main/Rand_Next.c:
     complete
     .text start:0x0202250c end:0x02022540
 
@@ -15933,7 +15933,7 @@ src/main/func_0208de94.s:
     complete
     .text start:0x0208de94 end:0x0208deec
 
-src/main/func_0208deec.c:
+src/main/Vram_GetBankBaseE.c:
     complete
     .text start:0x0208deec end:0x0208df0c
 
@@ -15941,7 +15941,7 @@ src/main/func_0208df0c.s:
     complete
     .text start:0x0208df0c end:0x0208df40
 
-src/main/func_0208df40.c:
+src/main/Vram_GetBankBaseCD.c:
     complete
     .text start:0x0208df40 end:0x0208df60
 

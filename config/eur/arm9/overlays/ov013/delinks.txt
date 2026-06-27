@@ -23,7 +23,7 @@ src/overlay013/func_ov013_021ca15c.s:
     complete
     .text start:0x021ca15c end:0x021ca294
 
-src/overlay013/func_ov013_021ca294.c:
+src/overlay013/Ov013_GetPageCount.c:
     complete
     .text start:0x021ca294 end:0x021ca2b8
 
@@ -33,15 +33,15 @@ src/overlay013/func_ov013_021ca2b8.s:
 src/overlay013/func_ov013_021ca42c.s:
     complete
     .text start:0x021ca42c end:0x021ca5d4
-src/overlay013/func_ov013_021ca5d4.c:
+src/overlay013/Ov013_SetBlendAlpha.c:
     complete
     .text start:0x021ca5d4 end:0x021ca618
 
-src/overlay013/func_ov013_021ca618.c:
+src/overlay013/Ov013_SlotToCell.c:
     complete
     .text start:0x021ca618 end:0x021ca68c
 
-src/overlay013/func_ov013_021ca68c.c:
+src/overlay013/Ov013_SetPage.c:
     complete
     .text start:0x021ca68c end:0x021ca70c
 
@@ -53,7 +53,7 @@ src/overlay013/func_ov013_021ca7cc.s:
     complete
     .text start:0x021ca7cc end:0x021cb644
 
-src/overlay013/func_ov013_021cb644.c:
+src/overlay013/Ov013_InitGraphics.c:
     complete
     .text start:0x021cb644 end:0x021cb674
 

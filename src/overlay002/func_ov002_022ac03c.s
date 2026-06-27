@@ -5,7 +5,7 @@
         .text
         .extern data_ov002_022cc658
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .global func_ov002_022ac03c
@@ -38,7 +38,7 @@ func_ov002_022ac03c:
     strh r9, [sp, #0x10]
     bl func_0201e5b8
     ldr r0, [sp]
-    bl func_02006e1c
+    bl Task_Invoke
     add r8, r8, #0x1
     cmp r8, #0xe
     bcc .L_20

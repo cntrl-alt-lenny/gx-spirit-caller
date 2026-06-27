@@ -3,7 +3,7 @@
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0200af08
         .extern func_0200afc8
         .extern func_0202162c
@@ -67,7 +67,7 @@ func_02026d50:
     ldr r0, [r0, #0x4]
     cmp r0, #0x0
     beq .L_e4c
-    bl func_02006e1c
+    bl Task_Invoke
     add r0, r4, r6, lsl #0x2
     mov r1, #0x0
     str r1, [r0, #0x4]

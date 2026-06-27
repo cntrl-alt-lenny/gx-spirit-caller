@@ -15,7 +15,7 @@
         .extern func_02005ee0
         .extern func_020062cc
         .extern func_02006334
-        .extern func_02006368
+        .extern Task_InvokeLockedIrq
         .extern func_02006950
         .extern func_02007ff4
         .extern func_020085b4
@@ -143,7 +143,7 @@ _LIT3: .word data_021a63d0
 _LIT4: .word data_02103da4
 _LIT5: .word data_02186afc
 _LIT6: .word func_02006334
-_LIT7: .word func_02006368
+_LIT7: .word Task_InvokeLockedIrq
 _LIT8: .word func_02001540
 _LIT9: .word 0xfffffdf1
 _LIT10: .word 0x0000020e

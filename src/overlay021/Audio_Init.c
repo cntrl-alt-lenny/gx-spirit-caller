@@ -1,4 +1,4 @@
-/* func_ov021_021aa514: audio init — bind the wave archive, route the active
+/* Audio_Init: audio init — bind the wave archive, route the active
  * channel (low 3 bits of the global mode word) through the three mixer stages,
  * clear the capture flag, and mark the state word ready (=2). Returns 1.
  * (ov021_core.h; ov005 audio-init recipe.) */
@@ -12,7 +12,7 @@ extern char data_ov021_021ace8c[];
 extern char data_021040ac[];
 extern int  data_ov021_021ace80[];
 extern struct { int w0; unsigned chan : 3; } data_02104f4c;
-int func_ov021_021aa514(void) {
+int Audio_Init(void) {
     func_0200197c(4, data_ov021_021acec8, 0x80000);
     func_02001d68(data_02104f4c.chan);
     func_0202adf8(data_ov021_021ace8c);

@@ -5,7 +5,7 @@
         .text
         .extern Fill32
         .extern data_0218cbc8
-        .extern func_0200faf8
+        .extern List_Unlink
         .extern func_02010eb4
         .global func_02010040
         .arm
@@ -106,7 +106,7 @@ func_02010040:
     ldreq r1, [r4]
     streq r1, [r0]
     mov r0, r4
-    bl func_0200faf8
+    bl List_Unlink
     mov r1, r4
     mov r0, #0x0
     mov r2, #0x14

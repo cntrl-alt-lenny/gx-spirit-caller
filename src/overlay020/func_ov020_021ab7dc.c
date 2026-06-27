@@ -1,5 +1,5 @@
 /* func_ov020_021ab7dc: family ae6bf115 sibling of ov010_021b35a4.
- * Identical shape — free-and-null two pointer slots via func_02006e1c.
+ * Identical shape — free-and-null two pointer slots via Task_Invoke.
  *
  *     push  {r3, r4, r5, lr}
  *     mov   r5, r0
@@ -7,28 +7,28 @@
  *     mov   r4, r1
  *     cmp   r0, #0x0
  *     beq   .L_a
- *     bl    func_02006e1c
+ *     bl    Task_Invoke
  *     mov   r0, #0x0
  *     str   r0, [r5, #0x0]
  *  .L_a:
  *     ldr   r0, [r4, #0x0]
  *     cmp   r0, #0x0
  *     popeq {r3, r4, r5, pc}
- *     bl    func_02006e1c
+ *     bl    Task_Invoke
  *     mov   r0, #0x0
  *     str   r0, [r4, #0x0]
  *     pop   {r3, r4, r5, pc}
  */
 
-extern void func_02006e1c(void *p);
+extern void Task_Invoke(void *p);
 
 void func_ov020_021ab7dc(void **a, void **b) {
     if (*a != 0) {
-        func_02006e1c(*a);
+        Task_Invoke(*a);
         *a = 0;
     }
     if (*b != 0) {
-        func_02006e1c(*b);
+        Task_Invoke(*b);
         *b = 0;
     }
 }

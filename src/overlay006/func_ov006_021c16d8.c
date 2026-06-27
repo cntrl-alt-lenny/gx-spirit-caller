@@ -4,7 +4,7 @@
 extern int  func_02006c0c(void *p, int b, int c);
 extern void func_0201d47c(void *cmd);
 extern void func_0201e5b8(void *cmd);
-extern void func_02006e1c(int h);
+extern void Task_Invoke(int h);
 extern char data_ov006_021cddc0[];
 int func_ov006_021c16d8(void) {
     volatile unsigned short *reg = (volatile unsigned short *)0x0400000a;
@@ -20,6 +20,6 @@ int func_ov006_021c16d8(void) {
     *(int *)(cmd + 12) = 0x66e0;
     *(short *)(cmd + 16) = 480;
     func_0201e5b8(cmd);
-    func_02006e1c(h);
+    Task_Invoke(h);
     return 1;
 }

@@ -328,7 +328,7 @@ src/overlay011/func_ov011_021cc8bc.c:
     complete
     .text start:0x021cc8bc end:0x021cc948
 
-src/overlay011/func_ov011_021cc948.c:
+src/overlay011/Bg_SetScroll.c:
     complete
     .text start:0x021cc948 end:0x021cc9b4
 

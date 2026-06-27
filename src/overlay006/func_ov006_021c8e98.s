@@ -11,7 +11,7 @@
         .extern data_ov006_021cebc8
         .extern data_ov006_021cebe0
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201d6f8
         .extern func_0201e5b8
@@ -79,7 +79,7 @@ func_ov006_021c8e98:
     mov r2, #0x480
     bl func_020944a4
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     mov r0, #0x1
     add sp, sp, #0x28
     ldmia sp!, {r3, r4, r5, pc}

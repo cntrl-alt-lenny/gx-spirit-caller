@@ -18,7 +18,7 @@
  *
  * Task_PostLocked already locks internally — the outer OS_DisableIrq
  * / OS_RestoreIrq bracket is defense-in-depth or a legacy shape
- * (same pattern as func_02006368 in #198).
+ * (same pattern as Task_InvokeLockedIrq in #198).
  */
 
 extern int  OS_DisableIrq(void);

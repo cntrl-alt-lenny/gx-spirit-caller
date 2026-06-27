@@ -8,7 +8,7 @@
         .extern data_ov004_0220b500
         .extern data_ov004_022109d8
         .extern func_02006c0c
-        .extern func_02006e1c
+        .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0208dd9c
@@ -62,7 +62,7 @@ func_ov004_021d3390:
     strh r2, [sp, #0x3c]
     bl func_0201e5b8
     ldr r0, [sp, #0x28]
-    bl func_02006e1c
+    bl Task_Invoke
     bl func_0208e014
     mov r1, r0
     mov r0, r4
@@ -109,7 +109,7 @@ func_ov004_021d3390:
     strh r1, [sp, #0x10]
     bl func_0201e5b8
     mov r0, r4
-    bl func_02006e1c
+    bl Task_Invoke
     mov r2, #0x4000000
     ldr r1, [r2]
     ldr r0, [r2]

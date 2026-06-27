@@ -1,4 +1,4 @@
-/* func_02018ba4: zero-fill a 32-byte region in the state singleton
+/* SysWork_ClearField0x810: zero-fill a 32-byte region in the state singleton
  * at offset 0x810 (the same region whose contents are read by
  * func_02018b94's pointer-returner).
  *
@@ -22,6 +22,6 @@
 extern char *GetSystemWork(void);
 extern void Fill32(int value, void *dest, int count);
 
-void func_02018ba4(void) {
+void SysWork_ClearField0x810(void) {
     Fill32(0, GetSystemWork() + 0x810, 0x20);
 }

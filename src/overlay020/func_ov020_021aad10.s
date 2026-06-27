@@ -14,7 +14,7 @@
         .extern func_02005088
         .extern func_020054a4
         .extern func_0202c0c0
-        .extern func_0208df40
+        .extern Vram_GetBankBaseCD
         .extern func_020a6afc
         .extern func_020a978c
         .global func_ov020_021aad10
@@ -23,7 +23,7 @@ func_ov020_021aad10:
     stmdb sp!, {r3, r4, r5, lr}
     sub sp, sp, #0x48
     ldr r5, _LIT0
-    bl func_0208df40
+    bl Vram_GetBankBaseCD
     mov r4, r0
     add r1, sp, #0x8
     mov r0, #0x0
