@@ -4071,11 +4071,11 @@ src/main/func_02020188.c:
     complete
     .text start:0x02020188 end:0x020201b8
 
-src/main/func_020201b8.s:
+src/main/func_020201b8.c:
     complete
     .text start:0x020201b8 end:0x020201ec
 
-src/main/func_020201ec.s:
+src/main/func_020201ec.c:
     complete
     .text start:0x020201ec end:0x02020224
 
@@ -4190,7 +4190,7 @@ src/main/func_02020860.c:
     complete
     .text start:0x02020860 end:0x02020880
 
-src/main/func_02020880.s:
+src/main/func_02020880.c:
     complete
     .text start:0x02020880 end:0x020208c4
 
@@ -4227,7 +4227,7 @@ src/main/func_02020ba0.s:
     complete
     .text start:0x02020ba0 end:0x02020c94
 
-src/main/func_02020c94.s:
+src/main/func_02020c94.c:
     complete
     .text start:0x02020c94 end:0x02020ce0
 
