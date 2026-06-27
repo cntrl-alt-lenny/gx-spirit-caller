@@ -23,6 +23,7 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from asm_escape import (  # noqa: E402
+    _DATA_AS_CODE_RE,
     branch_targets,
     classify_fixes,
     diff_words,
@@ -160,6 +161,43 @@ class TestSyntaxConversion(unittest.TestCase):
         # explicit modes already carry a suffix -> passed through unchanged
         self.assertEqual(to_mwasm("stmdb sp!, {r4, lr}"), "stmdb sp!, {r4, lr}")
         self.assertEqual(to_mwasm("ldmia sp!, {r4, pc}"), "ldmia sp!, {r4, pc}")
+
+
+# brief 488: objdump renders an embedded data table as bogus coprocessor / svc /
+# unprivileged-transfer "instructions". A `bx lr` then three data words.
+_DATAASCODE = """\
+00000000 <func_data>:
+   0:\te12fff1e \tbx\tlr
+   4:\teaebeced \tsvclt\t0x00bfc0c0
+   8:\tee1f8f10 \tldc2l\t15, cr15, [lr, #0x3fc]!
+   c:\teef0f0f0 \tcdple\t15, 13, cr13, cr15, cr0, {7}
+"""
+
+
+class TestDataAsCode(unittest.TestCase):  # brief 488
+    def test_regex_matches_data_as_code(self):
+        for mn in ("ldc2l 15, cr15, [lr]", "stclgt 14, cr12, [lr]",
+                   "ldclt 14, cr11, [sp]", "cdple 15, 13, cr13, cr15, cr0, {7}",
+                   "svclt 0x00bfc0c0", "strtge sl, [r6], r7", "ldrtlt fp, [r5]",
+                   "mrcls 14, 4, r9, cr14, cr15, {4}"):
+            self.assertTrue(_DATA_AS_CODE_RE.match(mn), mn)
+
+    def test_regex_skips_normal_and_genuine_cp15(self):
+        # normal ops + genuine NON-conditional CP15 mcr/mrc (translated by
+        # to_mwasm) + plain ldr/str must NOT be diverted to a raw .word
+        for mn in ("add r3, r3, r4", "ldr r0, [r1]", "str r0, [r1]",
+                   "strh r0, [r1]", "bl func_x", "stmdb sp!, {r4, lr}",
+                   "mcr 15, 0, r0, cr7, cr10, {4}", "mrc 15, 0, r0, cr7, cr10, {4}"):
+            self.assertFalse(_DATA_AS_CODE_RE.match(mn), mn)
+
+    def test_emit_words_data_as_code(self):
+        s = emit_asm("func_data", parse_objdump(_DATAASCODE, "func_data"), whole=True)
+        self.assertIn("bx lr", s)                 # real instruction kept
+        self.assertIn(".word 0xeaebeced", s)      # svc data word -> raw .word
+        self.assertIn(".word 0xee1f8f10", s)      # ldc2l data word
+        self.assertIn(".word 0xeef0f0f0", s)      # cdp data word
+        for bogus in ("svclt", "ldc2l", "cdple"):  # un-assemblable mnemonics gone
+            self.assertNotIn(bogus, s)
 
 
 class TestCommutativeSwap(unittest.TestCase):

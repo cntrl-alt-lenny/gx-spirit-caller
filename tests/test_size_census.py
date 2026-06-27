@@ -198,8 +198,10 @@ class TestIntegrationRealConfig(unittest.TestCase):
         names = {n for n, _, _ in pm["ov002"]}
         # brief 277 shipped func_ov002_021ae400 → claimed in delinks → MATCHED
         self.assertNotIn("func_ov002_021ae400", names)
-        # a known still-unmatched pick (brief 276)
-        self.assertIn("func_ov002_021d91e0", names)
+        # a known still-unmatched pick: 021d91e0 (brief 276) has since been
+        # carved, so use the persistent 022b867c data-blob residue (brief 488 —
+        # an embedded data table that needs a whole-function-as-data carve)
+        self.assertIn("func_ov002_022b867c", names)
 
 
 if __name__ == "__main__":
