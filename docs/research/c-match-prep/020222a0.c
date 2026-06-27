@@ -1,0 +1,44 @@
+/* CAMPAIGN-PREP candidate for func_020222a0 (main, class D, MED tier) — brief 496.
+ * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
+ * The campaign drops this into src/, runs ninja + objdiff, and applies the
+ * risk note below (these usually need 1+ reshape or a permuter/.s fallback).
+ *   recipe:     D: opcode switch->jump table; DIVMOD func_020b3870 (quot r0 / rem (s64)>>32 r1); inline /10 digit loop
+ *   risk:       reshape-able on case-body order (explicit case 0 first lays jump table ascending). permuter-class: acc held in r0 across all cases; the .L_150/L_158 dual fallthrough tails (op 11/12 vs <0xc default) may cross-jump differently than the switch emits. struct-guessed: func_020224c0/0202250c arity.
+ *   confidence: med
+ */
+/* CAMPAIGN-PREP candidate for func_020222a0 (main, class D, MED tier).
+ * UNVERIFIED + ITERATION-EXPECTED.
+ *   recipe: D: opcode switch(op<=12) -> jump table (addls pc); DIVMOD via func_020b3870 (quotient=r0, rem=(s64)>>32=r1); inline /10 digit-count loop.
+ * acc = func_020224c0(arg0,1); rhs = arg3 updated in place per opcode.
+ */
+extern long long func_020b3870(int num, int den);   /* fx divmod: r0=quot, r1=rem */
+extern int func_020224c0(int a, int b);
+extern int func_0202250c(void);
+
+int func_020222a0(int arg0, int op, int arg2, int rhs) {
+    int acc = func_020224c0(arg0, 1);              /* r0 accumulator, r1=1 */
+    switch (op) {                                  /* cmp #0xc; addls pc,pc,op<<2 */
+    case 0:  rhs = acc + rhs;                       break;   /* add r0,r4 */
+    case 1:  rhs = acc - rhs;                       break;   /* sub r0,r4 */
+    case 2:  rhs = acc * rhs;                       break;   /* mul r0,r4 */
+    case 3:  rhs = (int)func_020b3870(acc, rhs);    break;   /* quotient r0 */
+    case 4:  rhs = (int)((long long)func_020b3870(acc, rhs) >> 32); break; /* rem r1 */
+    case 5:  rhs = acc & rhs;                       break;
+    case 6:  rhs = acc | rhs;                       break;
+    case 7:  rhs = acc ^ rhs;                       break;
+    case 8:  rhs = (int)((long long)func_020b3870(func_0202250c(), rhs) >> 32); break;
+    case 9:  if (rhs < 0) rhs = -rhs;               break;   /* cmp #0; rsblt */
+    case 10: {                                              /* decimal digit count */
+        int n = rhs;
+        int count = 1;
+        if (n < 0) n = -n;                          /* abs */
+        if (n >= 10) {
+            do { n = n / 10; count++; } while (n >= 10);  /* inline smull /10 */
+        }
+        rhs = count;
+        break;
+    }
+    default: return 1;                              /* op 11,12 -> .L_150/L_158 tails */
+    }
+    return rhs;
+}
