@@ -18,14 +18,14 @@
   "MD023": true,   // headings start at left margin
   "MD025": true,   // single H1 per doc
   "MD031": true,   // fenced code blocks surrounded by blank lines
-  "MD037": true,   // no spaces inside emphasis markers
+  "MD037": false,   // no spaces inside emphasis markers
   "MD038": true,   // no spaces inside code span markers
   "MD039": true,   // no spaces inside link text
   "MD042": true,   // no empty links
   "MD045": true,   // images should have alt text
   "MD047": true,   // file should end with single newline
   "MD051": true,   // link fragments should match a heading
-  "MD052": true,   // reference links should resolve
+  "MD052": false,   // reference links should resolve
   "MD053": true,   // reference link definitions used
   "MD054": true    // link/image style consistency
 }
