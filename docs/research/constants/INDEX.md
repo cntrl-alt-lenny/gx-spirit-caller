@@ -5,7 +5,7 @@
 Recurring magic numbers, bit-flag masks, and enum-like integer sets inferred
 from matched C source files and assembly, across all overlays and main arm9.
 
-> Branch: `kb/types-round2`
+> Branch: `kb/types-round3`
 > Do NOT regenerate — the brain handles the index at merge.
 
 ---
