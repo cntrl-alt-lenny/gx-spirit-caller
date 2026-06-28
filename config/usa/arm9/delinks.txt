@@ -5002,7 +5002,7 @@ src/usa/main/func_02045398.c:
     complete
     .text start:0x02045398 end:0x020453ac
 
-src/usa/main/func_020453ac.s:
+src/usa/main/func_020453ac.c:
     complete
     .text start:0x020453ac end:0x02045420
 src/usa/main/func_02045420.legacy_sp3.c:

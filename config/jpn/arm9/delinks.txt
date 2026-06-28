@@ -5004,7 +5004,7 @@ src/jpn/main/func_02045398.c:
     complete
     .text start:0x02045398 end:0x020453ac
 
-src/jpn/main/func_020453ac.s:
+src/jpn/main/func_020453ac.c:
     complete
     .text start:0x020453ac end:0x02045420
 src/jpn/main/func_02045420.legacy_sp3.c:
