@@ -5699,7 +5699,7 @@ src/main/func_0202ef38.s:
     complete
     .text start:0x0202ef38 end:0x0202effc
 
-src/main/func_0202effc.s:
+src/main/func_0202effc.c:
     complete
     .text start:0x0202effc end:0x0202f050
 
@@ -5731,15 +5731,15 @@ src/main/func_0202f410.c:
     complete
     .text start:0x0202f410 end:0x0202f430
 
-src/main/func_0202f430.s:
+src/main/func_0202f430.c:
     complete
     .text start:0x0202f430 end:0x0202f46c
 
-src/main/func_0202f46c.s:
+src/main/func_0202f46c.c:
     complete
     .text start:0x0202f46c end:0x0202f4cc
 
-src/main/func_0202f4cc.s:
+src/main/func_0202f4cc.c:
     complete
     .text start:0x0202f4cc end:0x0202f500
 
