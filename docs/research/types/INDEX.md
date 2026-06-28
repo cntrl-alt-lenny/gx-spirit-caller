@@ -46,9 +46,12 @@ Confidence ratings: **HIGH** = multiple independent sources agree;
 | Struct | File | Confidence | sizeof | Purpose |
 |--------|------|------------|--------|---------|
 | `EntityStruct0x284` | [EntityStruct0x284.md](EntityStruct0x284.md) | **MED-HIGH** | 0x284 | Player/enemy entity; array-iterable with stride 0x284; sub-array of 0x58-byte sub-objects at +0x000 |
-| `GameSingleton` | [GameSingleton.md](GameSingleton.md) | **MED-HIGH** | ≥ 0x484 | Main game/duel manager; returned by `func_020498f0()`; 50+ confirmed offsets; likely = Ov002 `self` |
+| `GameSingleton` | [GameSingleton.md](GameSingleton.md) | **MED-HIGH** | ≥ 0x484 | Main arm9 singleton returned by `func_020498f0()`; distinct from ov002 battle-state globals |
+| `DuelStateSingleton` | [DuelStateSingleton.md](DuelStateSingleton.md) | **MED-HIGH** | ≥ 0xD98 | `data_ov002_022d016c`: ov002 duel-phase state (phase 0–3, guard flags, fn-ptr slot at +0xd18) |
+| `PerPlayerRowTable` | [PerPlayerRowTable.md](PerPlayerRowTable.md) | **HIGH** | 2 × 0x868 | `data_ov002_022cf16c`: per-player zone data (zone_count + 5-slot Ov002Slot array at +0x030) |
+| `DuelQueueState` | [DuelQueueState.md](DuelQueueState.md) | **MED-HIGH** | ≥ 0x688 | `data_ov002_022ce288`: queue/event state with re-entrancy lock at +0x5C0 and tick counter cluster |
 | `BytecodeVMState` | [BytecodeVMState.md](BytecodeVMState.md) | **MED** | ≥ 0x19C | Embedded scripting VM state; register file at +0xAC (stride 0x2C); sub-region at +0x100 |
-| `Ov002SelfContext` | [Ov002SelfContext.md](Ov002SelfContext.md) | **MED** | unknown (≥0x484) | The `self` arg in 1,206 ov002 source files = battle/duel state; field layout fragmentary |
+| `Ov002SelfContext` | [Ov002SelfContext.md](Ov002SelfContext.md) | **HIGH** | 4 B | **CORRECTED:** `self` in ov002 = small 4-byte card handle `{ u16 f0; u16 b0 : 1; }`. NOT the large battle-state object. |
 
 ## Global singleton structs
 
@@ -70,19 +73,34 @@ Confidence ratings: **HIGH** = multiple independent sources agree;
 
 ## Priority for C-matching wave yield
 
-Highest-leverage structs for unblocking MED-class candidates:
+Highest-leverage structs for unblocking MED-class candidates (round-2 updated):
 
-1. **`Ov002SelfContext` / `GameSingleton`** — used in 1,206 files; recovering
-   the `count` field offset alone likely unlocks a large cluster
-2. **`EntityStruct0x284`** — iteration-heavy struct; fixing sub-object layout
+1. **`DuelStateSingleton`** (`data_ov002_022d016c`) — holds duel phase at +0xCF8
+   (values 0–3) and the state-machine dispatch fn ptr at +0xD18; recovering the
+   full +0x000–+0xCE4 layout unblocks the large cluster of MED candidates that
+   access the card-list region
+2. **`PerPlayerRowTable`** (`data_ov002_022cf16c`) — the per-player zone count
+   at +0x000 and the 5-slot sub-array at +0x030 are the two most-needed fields;
+   the `Ov002Slot.id_lo13 : 13` bitfield shape (NOT `& 0x1FFF`) is the
+   match-critical detail
+3. **`DuelQueueState`** (`data_ov002_022ce288`) — re-entrancy lock at +0x5C0
+   and tick-counter cluster (+0x5CC–+0x688) block a cluster of event-dispatch
+   MED candidates
+4. **`EntityStruct0x284`** — iteration-heavy struct; fixing sub-object layout
    at +0x000 (stride 0x58) unblocks loop-body matches
-3. **`BytecodeVMState`** — register file at +0xAC (stride 0x2C); each
+5. **`BytecodeVMState`** — register file at +0xAC (stride 0x2C); each
    register entry has 5 typed fields; fixing these unblocks all VM-dispatch
    candidates
-4. **`GlobalAudioState`** — 4 matched files provide good coverage; recovering
+6. **`GlobalAudioState`** — 4 matched files provide good coverage; recovering
    field names at 0xB84–0xC48 removes ad-hoc padding in audio functions
-5. **`BgCfg`** — two layout variants (standard / extended); unifying them
+7. **`BgCfg`** — two layout variants (standard / extended); unifying them
    into one typedef with conditional fields removes copy-paste pad blocks
+
+**CORRECTED:** `Ov002SelfContext.self` is a 4-byte card handle, NOT the large
+battle-state object. The `count` field that appeared to block 1,840 lines is
+a local loop variable, not a struct field. The `ov002_core.h` typedef is
+already byte-verified — include it and the `b0 : 1` bitfield syntax handles
+the instruction shape.
 
 ---
 
