@@ -2,77 +2,100 @@
 
 # Ov002SelfContext (the "self" struct)
 
-The dominant struct in the entire decomp. The pointer variable `self` appears
-in **1,206 source files** (1,840 access lines) — nearly every function in
-overlay002 takes it as its first argument. This is the battle/duel state
-manager for Yu-Gi-Oh! GX Spirit Caller.
+**ROUND-2 CORRECTION:** `self` in ov002 is a **small 4-byte card/entity handle**,
+not a large game-state singleton. The large battle-state object is the separate
+global `data_ov002_022d016c` (see `DuelStateSingleton.md`).
 
-**Current status: SHAPE KNOWN, field names NOT YET RECOVERED.**
-Each matched C function defines its own windowed typedef for `self` with only
-the fields it accesses. Field names use bitfield notation (`b0`, `b18_19`,
-`b1_5`, `b4_7`, `b6_11`, `b6_14`, `bit0`, `bit14`, `bit2`, `count`, ...).
+The pointer variable `self` appears in **1,206 source files** — nearly every
+function in overlay002 takes it as its first argument. It identifies which card
+or slot the function is operating on.
 
-## Confidence: MEDIUM (size/purpose KNOWN; layout fragmentary)
+## Confidence: HIGH (corrected in round-2; definition verified from matched C)
 
-The GameSingleton accessed via `func_020498f0()` (see `GameSingleton.md`) is
-a strong candidate for being this struct or a sub-object of it. Offsets from
-the two assembly functions accessing the getter reach 0x480+. Given that
-ov017's functions use `(self + 0x100)` as a sub-object, the full game state
-may be even larger (1000+ bytes).
+## C Definition (byte-verified)
 
-## What is known
-
-- `self` is always the first argument, passed by pointer
-- Every ov002 function defines its own small-window typedef: `typedef struct { char pad[N]; <field_type> fieldN; } Self_local_t;`
-- Field accesses include densely-packed bitfields (names like `b1_5` = bits 1-5 of a byte at some offset)
-- Sub-object at `self + 0x100` observed in ov017 (type: SceneFlags / SubState — a 0xD0+ byte embedded struct)
-
-## Ov017 sub-struct at self+0x100
+Confirmed from `src/overlay002/ov002_core.h` (matched by 5+ EUR functions):
 
 ```c
-/* sub-region of self, beginning at byte offset 0x100 */
-typedef struct SelfSubContext {
-    char           pad[0xD0];    /* +0x100  = self+0x100+0x000 */
-    unsigned short fd0;          /* +0x1D0  = self+0x100+0x0D0 */
-    unsigned short fd8;          /* +0x1D8  = self+0x100+0x0D8 */
-    unsigned short fda;          /* +0x1DA  = self+0x100+0x0DA */
-} SelfSubContext;
+struct Ov002Self {
+    u16 f0;        /* +0x00  card id / entity id (u16) */
+    u16 b0 : 1;    /* +0x02  player-side bit (bit 0 only; lsl#31 >> #31) */
+};
+/* sizeof = 4 bytes */
 ```
 
-Source: `func_ov017_021b7478` accesses `((SubState *)(self + 0x100))->fd0`
-and `func_ov017_021b7230` accesses `((SceneFlags *)(self + 0x100))->fd8` +
-`->fda`. Both casts treat `self+0x100` as the base of this sub-struct.
+The `b0` field uses **1-bit bitfield extraction** — the matched code emits
+`lsl #31` then `lsr #31`, NOT `& 1`. Any C rewrite must use `: 1` bitfield
+syntax, not masking, or the compiler will pick a different instruction.
 
-## Ov015 dirty flag at self+0x70
+## What `self->f0` holds
+
+`f0` is the card identifier. It is read as a u16 in virtually every accessor:
+```c
+u16 id = self->f0;
+u32 player = self->b0;   /* 0 or 1 — which player's side */
+```
+
+## The "count" misconception (corrected)
+
+Round-1 analysis listed `count` as a struct field accessed 1,840 times.
+**This was wrong.** The VARNAME statistics counted local variable names, not
+struct field accesses. In practice, ov002 counting functions use:
 
 ```c
-/* accessed in func_ov015_021b228c */
-typedef struct { unsigned dirty : 1; } Ov015DirtyFlag;
-/* cast: ((Ov015DirtyFlag *)((char *)o + 0x70))->dirty */
+int count = 0;
+/* ... loop body ... */
+count++;
+return count;
 ```
+
+There is no `count` field on `struct Ov002Self`. The "count" is a loop
+accumulator tallying cards in a zone.
+
+## The per-player card count (what the "count" actually is)
+
+The real card-in-zone counter accessed by counting loops is offset 0 of the
+per-player region in `data_ov002_022cf16c`:
+
+```c
+/* in func_ov002_021c9be8 */
+int zone_count = *(int *)((char *)data_ov002_022cf16c + (player & 1) * 0x868);
+```
+
+See `PerPlayerRowTable.md` for the full layout of that global.
+
+## The true large duel-state objects (NOT `self`)
+
+The large game-state singletons in ov002 are standalone globals, not `self`:
+
+| Global | Size | Purpose |
+|--------|------|---------|
+| `data_ov002_022d016c` | ≥ 0xD98 B | Duel-phase state (phase 0–3, guard flags, tick counters) |
+| `data_ov002_022ce288` | ≥ 0x688 B | Queue/event management with re-entrancy lock |
+| `data_ov002_022cf16c` | 2 × 0x868 B | Per-player row table (card counts, slot array) |
+
+See `DuelStateSingleton.md`, `DuelQueueState.md`, `PerPlayerRowTable.md`.
+
+## Ov017 sub-struct note (offset relative to DIFFERENT base)
+
+The `func_ov017_021b7478` / `func_ov017_021b7230` access pattern uses
+`(self + 0x100)` — but in ov017 context, `self` is the ov017 module's own
+state pointer, **not** `Ov002Self`. The sub-struct at +0x100 belongs to ov017's
+local state object, not to the card handle.
+
+## Recommendations for C-matching waves
+
+To match ov002 MED candidates that take `self`:
+
+1. Include `src/overlay002/ov002_core.h` — it has the byte-verified `Ov002Self`
+   definition. **All 125 EUR ov002 .c files already include it.**
+2. The match-blocking issue is the **bitfield instruction shape**: `b0 : 1`
+   must use the `: 1` syntax so mwcc emits `lsl #31; lsr #31`, not `& 1`.
+3. The `char _pad[N]` offsets for windowed typedefs of the large global
+   objects (`d016c`, `ce288`, `cf16c`) are the remaining blockers — see their
+   dedicated files.
 
 ## Using functions
 
 Virtually every function in `src/jpn/overlay002/` and `src/overlay002/` —
 ~1,206 files covering the complete battle system.
-
-## Recommendations for C-matching waves
-
-The bitfield-heavy windowed typedefs mean that MED-class candidates need:
-1. The correct `char pad[N]` size for the fields they access
-2. Correct bit positions and signedness for each bitfield
-3. The `count` field (accessed 1840 times) is likely a major bottleneck —
-   its offset should be found by cross-referencing the functions that most
-   frequently access it
-
-**Priority:** discover the offset and type of the `count` field (likely a
-match-count, turn counter, or action queue counter accessed in nearly every
-function). This single field probably blocks the largest cluster of MED
-candidates.
-
-## Next steps
-
-- Search `c-match-prep/` drafts for functions that use ONLY `self->count`
-  to find the offset by elimination
-- Cross-reference `func_020498f0()` return value with ov002 `self` pointer —
-  if the same, GameSingleton.md captures the full layout
