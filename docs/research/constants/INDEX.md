@@ -30,6 +30,8 @@ from matched C source files and assembly, across all overlays and main arm9.
 | [BitFlagMasks.md](BitFlagMasks.md) | RNG/LFSR (0x7FFF); NDS hardware register masks (0x1F00, 0x43, 0x8000, etc.); game-state flag masks (0x2F07, 0x8); utility masks (0x1, 0xFF, 0x7F) |
 | [DuelStateEnums.md](DuelStateEnums.md) | Duel phase (0–3); per-overlay 4-state sub-machine; gauge kind (12/14/15); VRAM bank selector (0–9); slot-to-cell LUT; timer thresholds (0x3E8, 0x4B0, 0xBB8); state-pair handshake (0x7F/0x80) |
 | [CardIdRanges.md](CardIdRanges.md) | Named card ID sub-ranges (0x1A70–0x1A75, 0x1A90–0x1A95, etc.); spirit card IDs (0x0FA7–0x0FCD); card ID triplets; bijective remap (+0x12) |
+| [OverlayConstants.md](OverlayConstants.md) | ov006: sub-machine 9-state enum + audio init (0xa0/0xa2/0x80000) + VRAM (0x6800000/0x7000000); ov004: voice SE base 1601, phase enum (0/2/4/15/16), touch-region bounds; ov011: actor table (count 5, stride 0x14), coord stride (0x28), cell flags (0x2000/0x1C000); ov013: BLDALPHA layout, engine power codes; ov000: facing enum (0–4, 0xFFFF sentinel), display-engine selector |
+| [MainConstants.md](MainConstants.md) | ARM9 BIOS SWI codes (7 entries); FX32_SHIFT=12; SystemWork singleton (base 0x02104F58, size 0x92C, field offsets); LCG RNG (mult 0x343FD, inc 0x269EC3); VRAM bank base 0x6200000; Fill32 arg-order; task-creation priority=4 |
 
 ---
 
