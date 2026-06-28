@@ -45,7 +45,7 @@ src/jpn/main/func_02000d4c.s:
 src/jpn/main/func_02000d9c.s:
     complete
     .text start:0x02000d9c end:0x02000e34
-src/jpn/main/func_02000e34.s:
+src/jpn/main/func_02000e34.c:
     complete
     .text start:0x02000e34 end:0x02000e70
 src/jpn/main/func_02000e70.s:
