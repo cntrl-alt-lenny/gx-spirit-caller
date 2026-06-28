@@ -4649,7 +4649,7 @@ src/usa/main/func_0203ebcc.s:
 src/usa/main/func_0203ec54.s:
     complete
     .text start:0x0203ec54 end:0x0203ecdc
-src/usa/main/func_0203ecdc.s:
+src/usa/main/func_0203ecdc.c:
     complete
     .text start:0x0203ecdc end:0x0203ed30
 src/usa/main/func_0203ed30.s:
@@ -4888,7 +4888,7 @@ src/usa/main/func_02043ae8.s:
 src/usa/main/func_02043b20.s:
     complete
     .text start:0x02043b20 end:0x02043b8c
-src/usa/main/func_02043b8c.s:
+src/usa/main/func_02043b8c.c:
     complete
     .text start:0x02043b8c end:0x02043bd8
 src/usa/main/func_02043bd8.s:
