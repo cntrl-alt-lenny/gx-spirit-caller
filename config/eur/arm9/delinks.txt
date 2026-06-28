@@ -800,7 +800,7 @@ src/main/func_02005a60.s:
     complete
     .text start:0x02005a60 end:0x02005b38
 
-src/main/func_02005b38.s:
+src/main/func_02005b38.c:
     complete
     .text start:0x02005b38 end:0x02005b74
 
@@ -889,7 +889,7 @@ src/main/func_02006264.s:
     complete
     .text start:0x02006264 end:0x020062cc
 
-src/main/func_020062cc.s:
+src/main/func_020062cc.c:
     complete
     .text start:0x020062cc end:0x02006314
 
