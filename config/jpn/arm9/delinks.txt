@@ -297,7 +297,7 @@ src/jpn/main/func_02005994.s:
 src/jpn/main/func_02005a44.s:
     complete
     .text start:0x02005a44 end:0x02005b1c
-src/jpn/main/func_02005b1c.s:
+src/jpn/main/func_02005b1c.c:
     complete
     .text start:0x02005b1c end:0x02005b58
 src/jpn/main/func_02005b58.s:
@@ -370,7 +370,7 @@ src/jpn/main/func_0200620c.c:
 src/jpn/main/func_02006248.s:
     complete
     .text start:0x02006248 end:0x020062b0
-src/jpn/main/func_020062b0.s:
+src/jpn/main/func_020062b0.c:
     complete
     .text start:0x020062b0 end:0x020062f8
 src/jpn/main/func_020062f8.c:
