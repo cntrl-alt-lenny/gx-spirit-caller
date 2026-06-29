@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**86 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**87 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (18)
+- [Uncategorised](#uncategorised) (19)
 
 ## Analysis / worklist
 
@@ -508,6 +508,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/fastmatch.py`
+
+**per-TU match check without a full ROM rebuild.**
+
+Compiles one (or more) .c source files with the correct mwcc tier, then word-compares the resulting object against the delinked gap object for the requested region. No ninja, no link, no sha1.
 
 ### `tools/generate_progress_bars.py`
 
