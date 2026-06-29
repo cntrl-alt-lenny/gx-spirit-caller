@@ -52,7 +52,8 @@ typedef struct GameSingleton {
     unsigned char  f1a4;        /* +0x1A4  (load/store) */
     unsigned char  f1a6;        /* +0x1A6 */
     unsigned char  f1a7;        /* +0x1A7  (load/store) */
-    /* +0x1A8..+0x1A9  gap */
+    unsigned char  f1a8;        /* +0x1A8  flag (strb 0/1; set before call, cleared after — func_0204ca70) */
+    /* +0x1A9  gap */
     unsigned char  f1aa;        /* +0x1AA  (load/store) */
     /* +0x1AB..+0x1AC  gap */
     unsigned char  f1ad;        /* +0x1AD  (load/store) */
@@ -78,7 +79,9 @@ typedef struct GameSingleton {
     int            f20c;        /* +0x20C  (store) */
     /* +0x210..+0x2CF  gap */
     unsigned char  f2d0;        /* +0x2D0  (store) */
-    /* +0x2D1..+0x3CB  gap */
+    /* +0x2D1..+0x347  gap */
+    int            f348;        /* +0x348  counter (ldr/str; incremented by 1 in loop; address also passed as arg — func_0204ca70) */
+    /* +0x34C..+0x3CB  gap */
     unsigned char  f3cc;        /* +0x3CC */
     unsigned char  f3cd;        /* +0x3CD  (load/store) */
     unsigned short f3ce;        /* +0x3CE  (load — sub-obj at +0x300?) */
@@ -88,7 +91,8 @@ typedef struct GameSingleton {
     int            f458;        /* +0x458 */
     int            f45c;        /* +0x45C */
     int            f460;        /* +0x460 */
-    /* +0x464..+0x46B  gap */
+    void          (*f464)(void); /* +0x464  fn ptr (blx via ldr ip, [r5, #0x464] — func_0204bf44) */
+    int            f468;        /* +0x468  int arg passed alongside f464 call (func_0204bf44) */
     int            f46c;        /* +0x46C */
     int            f470;        /* +0x470 */
     /* +0x474..+0x47B  gap */
@@ -109,10 +113,14 @@ typedef struct GameSingleton {
 | 0x0A4 | u16 | r/w | func_020507b4 |
 | 0x0E4–0x0F8 | s32×6 | load | func_0204d97c, func_020507b4 |
 | 0x184–0x1FC | mixed | r/w | func_0204d97c, func_020507b4 |
+| 0x1A8 | u8 | r/w | func_0204ca70 — set to 1 before call, cleared to 0 after |
 | 0x200–0x20C | s32×4 | r/w | func_020507b4 |
 | 0x2D0 | u8  | store | func_020507b4 |
+| 0x348 | s32 | r/w | func_0204ca70 — counter incremented in loop; address passed as arg |
 | 0x3CC–0x3D0 | u8+u16+s32 | r/w | func_0204d97c |
 | 0x454–0x480 | s32×8 | load | func_0204d97c |
+| 0x464 | fn_ptr | read | func_0204bf44 — `blx ip` via `ldr ip, [r5, #0x464]` |
+| 0x468 | s32 | read | func_0204bf44 — passed as arg alongside f464 call |
 
 ## Getter function
 
