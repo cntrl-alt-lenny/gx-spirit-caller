@@ -6,7 +6,7 @@ This directory provides the index that makes KB docs actionable for C-matching.
 For each known struct or global, which functions touch it; and for each unmatched
 MED candidate, which KB docs to consult.
 
-> Branch: `kb/types-round3`
+> Branch: `kb/retriage`
 > Do NOT regenerate — the brain handles the index at merge.
 
 ---
@@ -17,6 +17,8 @@ MED candidate, which KB docs to consult.
 |------|---------|
 | [StructToFunction.md](StructToFunction.md) | For each recovered struct/global: the functions (matched .c/.s files) that access it. Use this to deepen a struct's field list. |
 | [MedCandidateNeeds.md](MedCandidateNeeds.md) | For each MED candidate cluster (by module): what structs/data/constants KB docs to consult. Use this when picking up a candidate. |
+| [DataToFunction.md](DataToFunction.md) | For each major data table: the matched .s (and .c) files that reference it. Shows access pattern (binary search, indexed dispatch, linear scan). |
+| [ConstantToFunction.md](ConstantToFunction.md) | For each catalogued constant/mask: the matched .c files that test or assign it. Shows file count, top callers, and C-matching recipe implication. |
 
 ---
 
@@ -30,6 +32,11 @@ MED candidate, which KB docs to consult.
 | Know what types a new ov006 MED candidate likely needs | [MedCandidateNeeds.md](MedCandidateNeeds.md) § ov006 |
 | Find all functions that touch the PerPlayerRowTable | [StructToFunction.md](StructToFunction.md) § PerPlayerRowTable |
 | Find all functions that touch GlobalAudioState | [StructToFunction.md](StructToFunction.md) § GlobalAudioState |
+| Know which .s functions load the card-effect descriptor tables | [DataToFunction.md](DataToFunction.md) § ov002 Data Tables |
+| Know which .c files use the 0x23 wildcard tag | [ConstantToFunction.md](ConstantToFunction.md) § 0x23 |
+| Know which .c files use the 0x868 PerPlayerRowTable stride | [ConstantToFunction.md](ConstantToFunction.md) § 0x868 |
+| Know which .c files use the LCG RNG constants | [ConstantToFunction.md](ConstantToFunction.md) § 0x343FD |
+| Know which .c files use the 0x2F07 flag mask | [ConstantToFunction.md](ConstantToFunction.md) § 0x2F07 |
 
 ---
 
