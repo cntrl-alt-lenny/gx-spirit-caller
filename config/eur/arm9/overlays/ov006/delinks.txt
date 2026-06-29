@@ -1516,7 +1516,7 @@ src/overlay006/ov006_021c6990.c:
 
 
 
-src/overlay006/func_ov006_021c6998.s:
+src/overlay006/func_ov006_021c6998.c:
     complete
     .text start:0x021c6998 end:0x021c6a3c
 
@@ -1524,7 +1524,7 @@ src/overlay006/func_ov006_021c6a3c.c:
     complete
     .text start:0x021c6a3c end:0x021c6a58
 
-src/overlay006/func_ov006_021c6a58.s:
+src/overlay006/func_ov006_021c6a58.c:
     complete
     .text start:0x021c6a58 end:0x021c6b2c
 

@@ -1036,14 +1036,14 @@ src/usa/overlay006/ov006_021c6858.c:
 src/usa/overlay006/func_ov006_021c6884.s:
     complete
     .text start:0x021c6884 end:0x021c688c
-src/usa/overlay006/func_ov006_021c688c.s:
+src/usa/overlay006/func_ov006_021c688c.c:
     complete
     .text start:0x021c688c end:0x021c6930
 src/usa/overlay006/func_ov006_021c6930.c:
     complete
     .text start:0x021c6930 end:0x021c694c
 
-src/usa/overlay006/func_ov006_021c694c.s:
+src/usa/overlay006/func_ov006_021c694c.c:
     complete
     .text start:0x021c694c end:0x021c6a20
 src/usa/overlay006/func_ov006_021c6a20.s:
