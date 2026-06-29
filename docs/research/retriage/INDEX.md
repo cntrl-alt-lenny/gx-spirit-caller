@@ -16,9 +16,9 @@ were re-examined to find newly plausible matches.
 
 | File | Module(s) | Newly tractable | KB gaps found |
 |------|-----------|-----------------|--------------|
-| [Ov002EFRetriage.md](Ov002EFRetriage.md) | ov002 (980 E/F) | ~18 definite + ~60 conditional | DSS+0xD2C/D30, data_022cb96c |
-| [MainEFRetriage.md](MainEFRetriage.md) | main (755 E/F) | 8 definite + 2 conditional | data_02102c7c beyond 0x03B, data_02102958 |
-| [OverlayEFRetriage.md](OverlayEFRetriage.md) | all other overlays (453 E/F) | 23 definite | ov006 stride constants, ov011 actor struct |
+| [Ov002EFRetriage.md](Ov002EFRetriage.md) | ov002 (980 E/F, 413 examined) | **297** (72% of examined) | `id_lo13` bitfield=158, PPT=120, DQS=59, DSS=58 |
+| [MainEFRetriage.md](MainEFRetriage.md) | main (755 E/F) | 8 definite + 2 conditional | data_02102c7c beyond 0x03B, GameSingleton +0x348/+0x464 |
+| [OverlayEFRetriage.md](OverlayEFRetriage.md) | all other overlays (453 E/F) | **23** definite | ov006 stride constants, ov011 actor struct |
 
 ---
 
@@ -26,9 +26,10 @@ were re-examined to find newly plausible matches.
 
 | Tier | Count |
 |------|-------|
-| **Definite new tractable** (KB sufficient today) | **~49** |
-| **Conditional** (requires filling 1–2 KB gaps) | **~62** |
-| **Total new candidate pool** | **~111** |
+| **ov002** (definite, from 413 examined < 400 B) | **297** |
+| **main** (definite + conditional) | **10** |
+| **Overlays** (definite) | **23** |
+| **Total new candidate pool** | **~330** |
 
 These 111 funcs join the existing MED pool as additional campaign targets.
 The "conditional" bucket unblocks as soon as `DuelStateSingleton.md` is
