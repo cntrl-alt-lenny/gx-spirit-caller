@@ -180,7 +180,58 @@ initialization:
 
 ---
 
-## 8. State-machine dispatch fn ptr (per-overlay, in global singletons)
+## 8. data_ov002_022ca998 — Dispatch-system-2 handler array (BSS, ov002)
+
+```
+Symbol:  data_ov002_022ca998
+Address: 0x022CA998
+Section: .bss (ov002)
+Size:    unknown (at least 10 × 4 bytes inferred from index range)
+Source:  BSS — zero-initialized, filled at runtime
+```
+
+Fn-ptr array indexed by `DuelStateSingleton.f_d1c`. Each entry is a `fn_t`
+(returns int, no args in the observed callers). The driver is
+`func_ov002_021b08a8`:
+
+```c
+fn_t handler = data_ov002_022ca998[dss->f_d1c];
+if (handler && handler()) { dss->f_d20 = 0; dss->f_d1c++; }
+```
+
+After each successful handler (`returns != 0`), the driver resets the sub-state
+counter `f_d20` to 0 and advances the index. `func_ov002_021aec04` populates the
+table entries based on event-type dispatch code. See
+[DuelStateSingleton.md — Dispatch subsystem 2](../types/DuelStateSingleton.md).
+
+---
+
+## 9. data_ov002_022cb96c — Dispatch-system-3 handler array (BSS, ov002)
+
+```
+Symbol:  data_ov002_022cb96c
+Address: 0x022CB96C
+Section: .bss (ov002)
+Size:    40 bytes minimum (10 × 4-byte fn_ptr entries, indices 0–9)
+Source:  BSS — zero-initialized, filled at runtime
+```
+
+Fn-ptr array indexed by `DuelStateSingleton.f_d2c`. The driver is
+`func_ov002_022627ac`:
+
+```c
+fn_t handler = data_ov002_022cb96c[dss->f_d2c];
+if (!handler) return 1;           /* null entry → sequence done */
+if (handler()) { dss->f_d30 = 0; dss->f_d2c++; }
+```
+
+Phase initialization (`func_ov002_02262804`) sets `f_d2c = 6` and `f_d30 = 1`.
+Completion check is `f_d2c >= 9`, meaning the active dispatch range is slots
+6–9 within a 10-entry table. Slots 0–5 are available for other sub-sequences.
+
+---
+
+## 10. State-machine dispatch fn ptr (per-overlay, in global singletons)
 
 Every overlay has a global singleton with a function-pointer slot used for
 state-machine dispatching. The pattern is uniform across all overlays:
