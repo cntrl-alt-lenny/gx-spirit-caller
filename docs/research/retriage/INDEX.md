@@ -7,7 +7,7 @@ classified as "intractable" — before the struct/data/constants KB existed.
 Now that the KB explains struct offsets and data table layouts, many of these
 were re-examined to find newly plausible matches.
 
-> Branch: `kb/retriage`
+> Branch: `kb/retriage-round5`
 > Do NOT regenerate — the brain handles the index at merge.
 
 ---
@@ -16,25 +16,28 @@ were re-examined to find newly plausible matches.
 
 | File | Module(s) | Newly tractable | KB gaps found |
 |------|-----------|-----------------|--------------|
-| [Ov002EFRetriage.md](Ov002EFRetriage.md) | ov002 (980 E/F, 413 examined) | **297** (72% of examined) | `id_lo13` bitfield=158, PPT=120, DQS=59, DSS=58 |
+| [Ov002EFRetriage.md](Ov002EFRetriage.md) | ov002 (980 E/F, 413 examined < 400 B) | **297** (72% of examined) | `id_lo13` bitfield=158, PPT=120, DQS=59, DSS=58 |
 | [MainEFRetriage.md](MainEFRetriage.md) | main (755 E/F) | 8 definite + 2 conditional | data_02102c7c beyond 0x03B, GameSingleton +0x348/+0x464 |
 | [OverlayEFRetriage.md](OverlayEFRetriage.md) | all other overlays (453 E/F) | **23** definite | ov006 stride constants, ov011 actor struct |
+| [R5SupplementaryRetriage.md](R5SupplementaryRetriage.md) | main (2) + ov002 dispatch (3) | **5** (conditional → confirmed tractable) | — (gaps now closed) |
+| [Ov002EFRetriagedLarge.md](Ov002EFRetriagedLarge.md) | ov002 (400–1200 B tier, 25 examined) | **TBD** (R5 agent result) | TBD |
 
 ---
 
 ## Grand Total: Newly Tractable Funcs
 
-| Tier | Count |
-|------|-------|
-| **ov002** (definite, from 413 examined < 400 B) | **297** |
-| **main** (definite + conditional) | **10** |
-| **Overlays** (definite) | **23** |
-| **Total new candidate pool** | **~330** |
+| Tier | Count | Notes |
+|------|-------|-------|
+| **ov002** (< 400 B, from R4) | **297** | 413 examined, 72% |
+| **main** (R4 definite) | **8** | |
+| **main** (R4 conditional → R5 confirmed) | **+2** | GS+0x348/464 gaps now filled |
+| **Overlays** (R4 definite) | **23** | |
+| **ov002 dispatch** (R5 conditional → confirmed) | **+3** | DSS D1C/D2C gaps now filled |
+| **ov002** (400–1200 B, R5 large-tier) | **TBD** | agent result pending |
+| **Running total (ex large-tier)** | **~335** | |
 
-These 111 funcs join the existing MED pool as additional campaign targets.
-The "conditional" bucket unblocks as soon as `DuelStateSingleton.md` is
-updated with the `+0xD2C` / `+0xD30` offsets and `data_ov002_022cb96c` is
-catalogued.
+> **R4 total was ~330; R5 gap-fills confirmed 5 of the conditional pool.**
+> Update this table after `Ov002EFRetriagedLarge.md` is reviewed.
 
 ---
 
@@ -78,32 +81,33 @@ catalogued.
 
 ---
 
-## KB Gaps Discovered (action items)
+## KB Gaps: Status After R5
 
-These gaps, if filled, unlock the ~62 "conditional" funcs:
-
-| Gap | Found in | Funcs unblocked |
-|-----|---------|----------------|
-| `DuelStateSingleton+0xD2C` (int index) | `func_ov002_022627ac` | ~10 DSS dispatch funcs |
-| `DuelStateSingleton+0xD30` (int flag) | `func_ov002_022627ac` | same group |
-| `DuelStateSingleton+0xD1C`, `+0xD28` | various ov002 E/F | ~20 more dispatch funcs |
-| `data_ov002_022cb96c` (fn-ptr array, size unknown) | `func_ov002_022627ac` | ~5–10 |
-| `data_ov002_022cdc78+0xC` (int counter) | `func_ov002_0225368c/e8` | already counted |
-| `GlobalData02102c7c` beyond offset `+0x03B` | main E/F funcs at `+0x088–+0x0A8` | ~5 |
-| `GameSingleton+0x348`, `+0x1A8`, `+0x464`, `+0x468` | main E/F | 2 |
+| Gap | Status | Doc updated | Funcs unblocked |
+|-----|--------|-------------|-----------------|
+| `DuelStateSingleton+0xD1C/D20/D24/D28` | ✅ **FILLED (R5)** | DuelStateSingleton.md | ~20 dispatch funcs |
+| `DuelStateSingleton+0xD2C/D30/D34` | ✅ **FILLED (R5)** | DuelStateSingleton.md | ~10 dispatch funcs |
+| `DuelStateSingleton+0xD44/D54/D9C` | ✅ **FILLED (R5)** | DuelStateSingleton.md | supporting fields |
+| `data_ov002_022cb96c` (fn-ptr table) | ✅ **DOCUMENTED (R5)** | FunctionPointerTables.md §9 | dispatch callers |
+| `data_ov002_022ca998` (fn-ptr table) | ✅ **DOCUMENTED (R5)** | FunctionPointerTables.md §8 | dispatch callers |
+| `GameSingleton+0x348`, `+0x1A8`, `+0x464`, `+0x468` | ✅ **FILLED (R5)** | GameSingleton.md | 2 main E/F funcs |
+| `data_ov002_022cdc78+0xC` (int counter) | already counted | — | CardHandlerTable callers |
+| `GlobalData02102c7c` beyond `+0x03B` | ⚠️ open | — | ~5 main E/F funcs |
 
 ---
 
 ## What This Means for the Campaign
 
-The ~111 newly-tractable funcs come from the E/F tier that was previously
-written off as a "scheduling wall." They are NOT easy:
-- Many still require reg-reuse / decl-order levers (class C/D difficulty).
-- The "conditional" group needs KB gap-filling first.
+R4 + R5 together have moved **~335 E/F funcs** from "intractable" to "candidate
+pool" — plus whatever the R5 large-tier agent finds.
 
-But they are **genuinely matchable in principle**, unlike the remaining ~2,000
-E/F funcs (large bodies, recursive, float-CPSR, or multiple-blx) which stay `.s`.
+Key message:
+- The conditional/gap bucket is now largely drained — most blocked funcs have
+  their KB dependencies filled.
+- The remaining E/F intractable tier is **genuinely hard**: multiple-blx
+  callbacks, float CPSR, large loop bodies with real scheduling entropy.
+- New tractable funcs are class C/D difficulty — they need reg-reuse and
+  decl-order levers, but they **can** be matched in principle.
 
-**Recommended action:** Add DSS `+0xD2C`/`+0xD30` fields to
-`DuelStateSingleton.md` and document `data_ov002_022cb96c` — this alone
-unblocks ~60 conditional funcs.
+**Remaining open KB gap:** `GlobalData02102c7c` beyond +0x03B — fills ~5 more
+main E/F funcs. Low priority vs the 335+ already identified.
