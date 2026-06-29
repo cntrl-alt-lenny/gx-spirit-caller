@@ -8442,7 +8442,7 @@ src/main/func_020459b4.c:
 
 
 
-src/main/func_020459c4.s:
+src/main/func_020459c4.c:
     complete
     .text start:0x020459c4 end:0x020459f0
 
@@ -8488,7 +8488,7 @@ src/main/func_02046088.c:
 
 
 
-src/main/func_020461fc.s:
+src/main/func_020461fc.legacy_sp3.c:
     complete
     .text start:0x020461fc end:0x02046254
 
@@ -8529,7 +8529,7 @@ src/main/func_020466f4.c:
 libs/nitro/func_02046714.legacy.c:
     complete
     .text start:0x02046714 end:0x02046718
-src/main/func_02046718.s:
+src/main/func_02046718.legacy_sp3.c:
     complete
     .text start:0x02046718 end:0x02046760
 
@@ -8559,7 +8559,7 @@ src/main/func_020467f4.legacy_sp3.c:
     complete
     .text start:0x020467f4 end:0x0204682c
 
-src/main/func_0204682c.s:
+src/main/func_0204682c.legacy_sp3.c:
     complete
     .text start:0x0204682c end:0x02046858
 
@@ -8571,7 +8571,7 @@ src/main/func_02046870.legacy_sp3.c:
     complete
     .text start:0x02046870 end:0x02046888
 
-src/main/func_02046888.s:
+src/main/func_02046888.legacy_sp3.c:
     complete
     .text start:0x02046888 end:0x020468ec
 
