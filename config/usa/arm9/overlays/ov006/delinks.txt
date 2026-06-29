@@ -1013,7 +1013,7 @@ src/usa/overlay006/func_ov006_021c6424.s:
 src/usa/overlay006/func_ov006_021c6534.s:
     complete
     .text start:0x021c6534 end:0x021c6590
-src/usa/overlay006/func_ov006_021c6590.s:
+src/usa/overlay006/func_ov006_021c6590.c:
     complete
     .text start:0x021c6590 end:0x021c668c
 src/usa/overlay006/func_ov006_021c668c.c:
