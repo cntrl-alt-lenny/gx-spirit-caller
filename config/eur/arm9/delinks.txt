@@ -13768,7 +13768,7 @@ src/main/func_0207d1e8.s:
     complete
     .text start:0x0207d1e8 end:0x0207d274
 
-src/main/func_0207d274.s:
+src/main/func_0207d274.c:
     complete
     .text start:0x0207d274 end:0x0207d29c
 
