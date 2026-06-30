@@ -237,3 +237,25 @@ int func_ov004_021caedc(void) {
 3. Case 2 ternary: `moveq/streq + movne/strne` requires both stores to target the same address. Write `b500->field_54 = cond ? 9 : 4;` as a single assignment — do not use separate `if/else` stores.
 4. Else-path: `func_0201d060()` result is `cmp r0, #0x0 / beq .L_14c` — write `if (func_0201d060() != 0)` for the non-zero path (three-field clear + `func_0201d050`) and `else` for the zero-path (field_48=0, field_54=1).
 5. Park as .s if the case 3 loop body produces different register assignments for the inner-loop increment that cannot be resolved by pointer-type choice.
+
+## GROUND TRUTH (from .s)
+
+**Pool words (literal pool, in order):**
+
+| label | value | type |
+|-------|-------|------|
+| `_LIT0` | `data_ov004_0220b500` | raw |
+| `_LIT1` | `data_02104cf8` | data symbol |
+| `_LIT2` | `data_021040ac` | data symbol |
+
+**BL/BLX callees (in call order, unique):**
+
+| instr | target | notes |
+|-------|--------|-------|
+| `bl` | `func_0201cfa0` | main TU call |
+| `bl` | `func_0201d040` | main TU call |
+| `bl` | `func_0201d060` | main TU call |
+| `bl` | `func_0201d050` | main TU call |
+
+> **Mode-C reminder:** never emit `static const` arrays or struct literals — they generate a `.rodata` section that breaks the link silently. Use `extern data_XXXX` references instead.
+

@@ -199,3 +199,28 @@ void func_ov011_021cabbc(int facing, int dir) {
 3. Fallback frame selection: the assembly `cmp r6, #0x32 / bne .L_100` means if `frame_id != 0x32`, skip all sub-guards and go directly to the final dispatch. Write as `if (frame_id == 0x32) { ... }` with the sub-guard chain inside.
 4. `func_0201a3ec() != 0 || func_0201b6e4(0x73) != 0` for the `0x41` path: the assembly `bne .L_d8` on `func_0201a3ec` result and `beq .L_e0` on `func_0201b6e4` result — first call nonzero → 0x41; first zero → check second; second zero → 0x39 path.
 5. Park as .s if the fallback frame-selection chain emits a different branch topology (e.g., if mwcc merges the two `0201a3ec / 0201b6e4` calls into a single conditional expression).
+
+## GROUND TRUTH (from .s)
+
+**Pool words (literal pool, in order):**
+
+| label | value | type |
+|-------|-------|------|
+| `_LIT0` | `data_ov011_021d403c` | raw |
+| `_LIT1` | `data_ov011_021d3060` | raw |
+| `_LIT2` | `data_ov011_021d3177` | raw |
+
+**BL/BLX callees (in call order, unique):**
+
+| instr | target | notes |
+|-------|--------|-------|
+| `bl` | `func_020139b4` | main TU call |
+| `bl` | `func_ov011_021cd1fc` | overlay call (ov011) |
+| `bl` | `func_ov000_021af560` | overlay call (ov000) |
+| `bl` | `func_ov000_021af4d8` | overlay call (ov000) |
+| `bl` | `func_0201a3ec` | main TU call |
+| `bl` | `func_0201b6e4` | main TU call |
+| `bl` | `func_0201a498` | main TU call |
+
+> **Mode-C reminder:** never emit `static const` arrays or struct literals — they generate a `.rodata` section that breaks the link silently. Use `extern data_XXXX` references instead.
+
