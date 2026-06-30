@@ -3,26 +3,38 @@
 fastmatch.py — per-TU match check without a full ROM rebuild.
 
 Compiles a single .c source file by running `ninja <that_unit.o>` — exactly
-one compilation target, no ROM build, no link, no sha1 — then word-compares
-the resulting .o against its delinked gap object, reporting function match %.
+one compilation target, no ROM build, no link, no sha1 — then runs the
+RESOLVED comparison against its delinked gap object and reports the function
+match %.
 
-This delegates compilation to ninja's existing build.ninja, so it uses the
-EXACT same flags/includes/defines as the real build. There is no flag
-reconstruction; drift is structurally impossible.
+RESOLVED vs RAW comparison
+--------------------------
 
-Designed as the **inner-loop gate** during match attempts: run fastmatch on
-every iteration; only run `ninja sha1` to confirm an accepted 100% match.
-The sha1 gate is unchanged — fastmatch speeds up the FAIL case, not the
-PASS case.
+Raw objdiff (and the old verify.py) wildcard every relocatable word: pool
+entries carry R_ARM_ABS32 on the gap side and R_ARM_PC24 carries BL targets
+on both sides. Those wildcards hide two critical failure modes documented in
+docs/research/objdiff-sha1-gap/gap-taxonomy.md:
 
-The word-comparison logic mirrors `tools/verify.py` (including .L_-sublabel
-spanning and reloc wildcarding) and adds:
+  Mode A — wrong pool value   : objdiff says 100%, sha1 fails
+  Mode B — wrong callee       : objdiff says 100%, sha1 fails
 
-  - percentage output (matched_words / total_words × 100)
-  - multi-region support (eur / usa / jpn)
-  - JSON output for scripted waves
-  - multi-file batch mode
-  - gap auto-discovery via objdiff.json (preferred) or glob fallback
+This tool runs `tools/objdiff_resolve_relocs.py`'s `resolve_elf_relocs()`
+on BOTH the candidate `.o` and the gap `.o` before comparing. Resolution
+applies every R_ARM_ABS32 / R_ARM_PC24 reloc to a fictional virtual base
+(same address-from-symbol-name scheme as the real resolver), strips the
+reloc tables, writes `.resolved.o` sidecars in a temp dir, then runs the
+word comparison on those sidecars. After this:
+
+  - Pool words carry the actual resolved address on both sides.
+    Wrong global → different bytes → DIFF (Mode A caught).
+  - BL displacements are computed from the callee symbol's resolved
+    address. Wrong callee → different displacement → DIFF (Mode B caught).
+
+The comparison is otherwise identical to the old path (`.L_`-sublabel
+spanning, const-pool tail stripping, percentage output).
+
+Use `--unresolved` to fall back to the raw wildcarded comparison (faster,
+but blind to Modes A and B).
 
 Prerequisites:
   - build.ninja configured for the target region:
@@ -37,21 +49,22 @@ Usage:
     python tools/fastmatch.py eur src/main/f1.c src/main/f2.c
     python tools/fastmatch.py eur src/main/func_02000e34.c --func func_02000e34
     python tools/fastmatch.py eur src/main/func_02000e34.c --json
-
-    # --gap supplies the delinked target .o path directly (skips discovery)
     python tools/fastmatch.py eur src/main/func_abc.c --gap build/eur/delinks/…
+    python tools/fastmatch.py eur src/main/func_abc.c --unresolved
 
 Exit codes:
     0  All queried functions matched 100%
     1  At least one function has a non-100% match
     2  Compile / build-graph error, or gap object not found
 
-Validation procedure (run in a baserom worktree with build/ populated):
-    # 5 known-matched funcs (listed in delinks.txt as `complete`):
-    python tools/fastmatch.py eur src/main/<matched_1>.c  # expect 100%
-    # 5 in-progress funcs with a stub .c:
-    python tools/fastmatch.py eur src/main/func_0204bf44.c  # expect <100%
-    # Timing comparison:
+Validation procedure (baserom worktree with build/ populated):
+    # 5 known-matched funcs — expect 100% (resolved):
+    python tools/fastmatch.py eur src/main/<matched>.c
+    # 5 Mode-A/B false-positive candidates — expect <100% (resolved),
+    #   but 100% with --unresolved (proving the gap was closed):
+    python tools/fastmatch.py eur src/main/<false_pos>.c
+    python tools/fastmatch.py eur src/main/<false_pos>.c --unresolved
+    # Timing:
     time python tools/fastmatch.py eur src/main/func_02000e34.c
     time ninja sha1
 """
@@ -63,11 +76,53 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
 _KNOWN_REGIONS = ("eur", "usa", "jpn")
+
+# ---------------------------------------------------------------------------
+# Import resolver from sibling tool (soft dependency — falls back gracefully)
+# ---------------------------------------------------------------------------
+
+# When run as `python tools/fastmatch.py`, Python adds tools/ to sys.path.
+# Guard the import so fastmatch still works (in unresolved mode) if the
+# sibling module is missing.
+try:
+    from objdiff_resolve_relocs import (  # type: ignore[import-not-found]
+        resolve_elf_relocs as _rr_resolve_elf,
+        ResolveRelocsError as _rr_Error,
+    )
+    _HAS_RESOLVER = True
+except ImportError:
+    _HAS_RESOLVER = False
+
+
+def _resolve_obj_bytes(path: Path) -> bytes | None:
+    """Read an ELF .o, apply R_ARM_ABS32/PC24 relocs to fictional bases,
+    return modified bytes with reloc tables stripped.
+
+    Returns None on failure (caller falls back to raw/unresolved path).
+    Errors go to stderr; never raises.
+    """
+    if not _HAS_RESOLVER:
+        print(
+            "  WARNING: objdiff_resolve_relocs not importable; "
+            "falling back to --unresolved comparison",
+            file=sys.stderr,
+        )
+        return None
+    try:
+        return _rr_resolve_elf(path.read_bytes())
+    except Exception as exc:
+        print(
+            f"  WARNING: reloc resolve failed for {path.name}: {exc}; "
+            "falling back to --unresolved comparison for this file",
+            file=sys.stderr,
+        )
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -145,21 +200,19 @@ def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
     stdout = result.stdout.strip()
     combined = "\n".join(filter(None, [stderr, stdout]))
 
-    # Detect "no rule to make target" — means file isn't in build.ninja yet
     lowered = combined.lower()
     if (
         "no rule to make target" in lowered
         or "unknown build file" in lowered
-        or "build.ninja" not in (ROOT / "build.ninja").name  # no build.ninja at all
         or not (ROOT / "build.ninja").is_file()
     ):
+        region_guess = out_o.parts[1] if len(out_o.parts) > 1 else "?"
         return False, (
             f"Target '{target}' not in build.ninja.\n"
-            f"  Run `python tools/configure.py {out_o.parts[1] if len(out_o.parts) > 1 else '?'}` first.\n"
+            f"  Run `python tools/configure.py {region_guess}` first.\n"
             f"  (configure.py must be re-run whenever a new .c file is added to src/)"
         )
 
-    # Generic compile failure — show ninja's error
     lines = combined.splitlines()
     return False, "\n".join(lines[:15]) if lines else "ninja returned non-zero"
 
@@ -171,13 +224,8 @@ def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
 def find_gap_from_objdiff(out_o: Path) -> Path | None:
     """Look up the delinked target .o for this compiled .o via objdiff.json.
 
-    objdiff.json is generated by `dsd objdiff` (via `ninja objdiff`) and maps
-    each source unit's base_path (compiled .o) to its target_path (gap .o).
-    This is the most reliable lookup when the file exists; fall back to glob
-    when it doesn't.
-
-    Handles the .resolved.o sidecars written by objdiff_resolve_relocs.py by
-    stripping them back to the underlying .o path.
+    Handles .resolved.o sidecars written by objdiff_resolve_relocs.py by
+    stripping them back to the underlying .o path before comparing.
     """
     objdiff_json = ROOT / "objdiff.json"
     if not objdiff_json.is_file():
@@ -187,12 +235,10 @@ def find_gap_from_objdiff(out_o: Path) -> Path | None:
     except Exception:
         return None
 
-    # Normalise separators so the comparison is platform-independent.
     out_rel = str(out_o.relative_to(ROOT)).replace("\\", "/")
 
     for unit in data.get("units", []):
         base_rel = unit.get("base_path", "").replace("\\", "/")
-        # Strip .resolved sidecar suffix if present
         if base_rel.endswith(".resolved.o"):
             base_rel = base_rel[: -len(".resolved.o")] + ".o"
         if base_rel != out_rel:
@@ -202,7 +248,11 @@ def find_gap_from_objdiff(out_o: Path) -> Path | None:
             continue
         if target_rel.endswith(".resolved.o"):
             target_rel = target_rel[: -len(".resolved.o")] + ".o"
-        target_path = ROOT / target_rel.replace("/", "\\") if "\\" in target_rel else ROOT / target_rel
+        target_path = (
+            ROOT / target_rel.replace("/", "\\")
+            if "\\" in target_rel
+            else ROOT / target_rel
+        )
         if target_path.is_file():
             return target_path
     return None
@@ -215,7 +265,6 @@ def find_gap_by_glob(func: str, module: str, region: str) -> Path | None:
     pattern = str(ROOT / f"build/{region}/delinks" / "**" / f"_dsd_gap@{module}_*.o")
     candidates = sorted(glob.glob(pattern, recursive=True))
     if not candidates:
-        # Widen search — try all gap objects for this region
         pattern_any = str(ROOT / f"build/{region}/delinks" / "**" / "_dsd_gap@*.o")
         candidates = sorted(glob.glob(pattern_any, recursive=True))
 
@@ -232,7 +281,7 @@ def find_gap_by_glob(func: str, module: str, region: str) -> Path | None:
 
 
 # ---------------------------------------------------------------------------
-# Word comparison (same algorithm as tools/verify.py)
+# Word comparison
 # ---------------------------------------------------------------------------
 
 _HDR   = re.compile(r"^[0-9a-f]+ <(\S+)>:")
@@ -253,6 +302,10 @@ def _parse_words(text: str, func: str) -> list[tuple[str, bool]]:
     dsd delink splits each function at internal labels (.L_xxxxxxxx for
     default-blocks, switch tails, const pools). Spanning these continuations
     ensures whole-function matches read as 100% instead of a false near-miss.
+
+    After resolve_elf_relocs(), is_reloc is False for every word (reloc
+    sections are stripped), so match_percent() never wildcards — the
+    resolved values are compared exactly.
     """
     words: list[list] = []
     relocs: set[int] = set()
@@ -283,7 +336,15 @@ def _parse_words(text: str, func: str) -> list[tuple[str, bool]]:
 
 
 def _strip_pool(words: list[tuple[str, bool]]) -> list[tuple[str, bool]]:
-    """Drop trailing const-pool words (reloc'd or zero) before comparing."""
+    """Drop trailing const-pool words (reloc'd or zero) before comparing.
+
+    In unresolved mode: pool words on the gap side are zero + reloc'd →
+    stripped; this prevents spurious length-mismatch diffs.
+
+    In resolved mode: pool words have been patched to actual addresses
+    (non-zero, non-reloc'd) → NOT stripped, so they participate in the
+    comparison and catch Mode-A mismatches.
+    """
     out = list(words)
     while out and (out[-1][1] or out[-1][0] == "00000000"):
         out.pop()
@@ -294,7 +355,12 @@ def match_percent(
     mine: list[tuple[str, bool]],
     orig: list[tuple[str, bool]],
 ) -> tuple[float, list[tuple[int, str, str]]]:
-    """Return (match_pct, diffs). Reloc'd words on either side are wildcards."""
+    """Return (match_pct, diffs). Reloc'd words on either side are wildcards.
+
+    In resolved mode, is_reloc is always False, so the wildcard branch
+    never triggers — every word (including pool entries and BL targets)
+    is compared exactly. This is the key to catching Modes A and B.
+    """
     m2, o2 = _strip_pool(mine), _strip_pool(orig)
     total = max(len(m2), len(o2))
     if total == 0:
@@ -304,7 +370,7 @@ def match_percent(
         mw = m2[i] if i < len(m2) else None
         ow = o2[i] if i < len(o2) else None
         if mw and ow and (mw[1] or ow[1]):
-            continue    # reloc'd — wildcard
+            continue    # reloc'd — wildcard (only active in --unresolved mode)
         a = mw[0] if mw else "MISSING"
         b = ow[0] if ow else "MISSING"
         if a != b:
@@ -341,17 +407,25 @@ def match_one(
     *,
     func: str | None = None,
     gap_override: Path | None = None,
+    unresolved: bool = False,
 ) -> dict:
-    """Compile c_path via ninja and compare against its gap object."""
+    """Compile c_path via ninja and compare against its gap object.
+
+    By default (unresolved=False), applies reloc resolution to both the
+    compiled .o and the gap .o before comparing — this catches Mode-A
+    (wrong pool value) and Mode-B (wrong callee) failures that raw
+    objdiff misses. Pass unresolved=True for the old wildcarded path.
+    """
     result: dict = {
         "file": str(c_path),
         "region": region,
         "tier": _tier_for(c_path),
         "functions": [],
         "status": "ok",
+        "resolved": False,  # updated below once resolution is attempted
     }
 
-    # --- Step 1: compile via ninja (exact same flags as the real build) ---
+    # --- Step 1: compile via ninja ---
     out_o = ninja_target_path(c_path, region)
     ok, err = ninja_compile_one(out_o)
     if not ok:
@@ -359,7 +433,7 @@ def match_one(
         result["error"] = err
         return result
 
-    # --- Step 2: list functions in the compiled .o ---
+    # --- Step 2: list functions ---
     funcs_in_obj = list_funcs_in_obj(out_o)
     if not funcs_in_obj:
         result["status"] = "no_functions"
@@ -367,45 +441,72 @@ def match_one(
 
     targets = [func] if func else funcs_in_obj
     module = _module_for(c_path)
-    my_dump = _objdump_text(out_o)
 
-    # --- Step 3: for each function, find its gap .o and compare ---
-    for fn in targets:
-        mine = _parse_words(my_dump, fn)
+    # --- Step 3: resolve, then compare ---
+    # Use a temp dir so resolved sidecars don't pollute build/.
+    with tempfile.TemporaryDirectory(prefix="fastmatch_") as _tmpdir:
+        tmp = Path(_tmpdir)
 
-        if gap_override:
-            gap = gap_override
-        else:
-            # Prefer objdiff.json lookup (accurate when dsd objdiff has run)
-            gap = find_gap_from_objdiff(out_o)
-            if gap is None:
-                gap = find_gap_by_glob(fn, module, region)
+        # Resolve compiled .o (once; shared across all functions in the TU).
+        resolved_out_o = out_o
+        use_resolved = not unresolved
+        if use_resolved:
+            mine_bytes = _resolve_obj_bytes(out_o)
+            if mine_bytes is not None:
+                resolved_out_o = tmp / "mine.resolved.o"
+                resolved_out_o.write_bytes(mine_bytes)
+            else:
+                use_resolved = False
 
-        if gap is None:
+        result["resolved"] = use_resolved
+        my_dump = _objdump_text(resolved_out_o)
+
+        for fn_idx, fn in enumerate(targets):
+            mine = _parse_words(my_dump, fn)
+
+            # Find gap .o for this function.
+            if gap_override:
+                current_gap: Path | None = gap_override
+            else:
+                current_gap = find_gap_from_objdiff(out_o)
+                if current_gap is None:
+                    current_gap = find_gap_by_glob(fn, module, region)
+
+            if current_gap is None:
+                result["functions"].append({
+                    "name": fn,
+                    "status": "not_in_gap",
+                    "match_percent": None,
+                    "note": "already matched or gap object not found",
+                })
+                continue
+
+            # Resolve gap .o (per-function, different gap files).
+            resolved_gap = current_gap
+            if use_resolved:
+                gap_bytes = _resolve_obj_bytes(current_gap)
+                if gap_bytes is not None:
+                    resolved_gap = tmp / f"gap_{fn_idx}.resolved.o"
+                    resolved_gap.write_bytes(gap_bytes)
+                # If gap resolve fails, compare resolved mine vs unresolved gap:
+                # still better than fully unresolved, but note the asymmetry.
+
+            orig_dump = _objdump_text(resolved_gap)
+            orig = _parse_words(orig_dump, fn)
+            pct, diffs = match_percent(mine, orig)
+            m2, o2 = _strip_pool(mine), _strip_pool(orig)
+
             result["functions"].append({
                 "name": fn,
-                "status": "not_in_gap",
-                "match_percent": None,
-                "note": "already matched or gap object not found",
+                "status": "ok",
+                "match_percent": round(pct, 2),
+                "mine_words": len(m2),
+                "orig_words": len(o2),
+                "diff_count": len(diffs),
+                "gap_obj": str(current_gap.relative_to(ROOT)),
+                "compiled_obj": str(out_o.relative_to(ROOT)),
+                "diffs_sample": [(i, a, b) for i, a, b in diffs[:8]],
             })
-            continue
-
-        orig_dump = _objdump_text(gap)
-        orig = _parse_words(orig_dump, fn)
-        pct, diffs = match_percent(mine, orig)
-        m2, o2 = _strip_pool(mine), _strip_pool(orig)
-
-        result["functions"].append({
-            "name": fn,
-            "status": "ok",
-            "match_percent": round(pct, 2),
-            "mine_words": len(m2),
-            "orig_words": len(o2),
-            "diff_count": len(diffs),
-            "gap_obj": str(gap.relative_to(ROOT)),
-            "compiled_obj": str(out_o.relative_to(ROOT)),
-            "diffs_sample": [(i, a, b) for i, a, b in diffs[:8]],
-        })
 
     return result
 
@@ -417,8 +518,9 @@ def match_one(
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=(
-            "Per-TU fast match check — `ninja <unit.o>` + word-diff vs "
-            "delinked gap object, no ROM rebuild."
+            "Per-TU fast match check — `ninja <unit.o>` + RESOLVED word-diff "
+            "vs delinked gap object. Catches wrong pool values (Mode A) and "
+            "wrong callees (Mode B) that raw objdiff wildcards."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Exit codes: 0=all 100%, 1=non-100% match, 2=compile/gap error",
@@ -445,6 +547,14 @@ def main(argv: list[str] | None = None) -> int:
         help="Explicit gap object path (skips auto-discovery)",
     )
     ap.add_argument(
+        "--unresolved",
+        action="store_true",
+        help=(
+            "Use raw/wildcarded comparison (old behaviour, faster but blind "
+            "to wrong pool values and wrong callees)"
+        ),
+    )
+    ap.add_argument(
         "--json",
         action="store_true",
         help="Print machine-readable JSON instead of plain text",
@@ -456,7 +566,6 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = ap.parse_args(argv)
 
-    # Sanity check: build.ninja must exist
     if not (ROOT / "build.ninja").is_file():
         print(
             f"ERROR: build.ninja not found in {ROOT}\n"
@@ -479,6 +588,7 @@ def main(argv: list[str] | None = None) -> int:
                 "file": cfile_str,
                 "status": "file_not_found",
                 "functions": [],
+                "resolved": False,
             })
             continue
 
@@ -487,6 +597,7 @@ def main(argv: list[str] | None = None) -> int:
             args.region,
             func=args.func,
             gap_override=args.gap,
+            unresolved=args.unresolved,
         )
         all_results.append(r)
 
@@ -507,6 +618,7 @@ def main(argv: list[str] | None = None) -> int:
     for r in all_results:
         label = Path(r["file"]).name
         tag = f"[{r['region']}]"
+        mode = "resolved" if r.get("resolved") else "unresolved"
 
         if r["status"] == "file_not_found":
             print(f"{tag} {label}: FILE NOT FOUND")
@@ -523,7 +635,6 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         tier_used = r.get("tier", "?")
-        compiled = r.get("functions", [{}])[0].get("compiled_obj", "")
         for fn_r in r["functions"]:
             fn = fn_r["name"]
             if fn_r["status"] == "not_in_gap":
@@ -538,7 +649,7 @@ def main(argv: list[str] | None = None) -> int:
             if pct == 100.0:
                 print(
                     f"{tag} {fn} ({label}, cc={tier_used}): "
-                    f"100.0%  OK  ({mine_w} words, gap={gap_rel})"
+                    f"100.0%  OK  ({mode}, {mine_w} words, gap={gap_rel})"
                 )
             else:
                 size_note = (
@@ -549,7 +660,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(
                     f"{tag} {fn} ({label}, cc={tier_used}): "
                     f"{pct:.1f}%  DIFF  "
-                    f"({ndiff} diff{'s' if ndiff != 1 else ''}, {size_note}, "
+                    f"({mode}, {ndiff} diff{'s' if ndiff != 1 else ''}, {size_note}, "
                     f"gap={gap_rel})"
                 )
                 if args.verbose:

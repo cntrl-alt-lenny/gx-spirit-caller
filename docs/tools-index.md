@@ -513,7 +513,7 @@ cluster B + D-3 cross-region application (brief 170).
 
 **per-TU match check without a full ROM rebuild.**
 
-Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then word-compares the resulting .o against its delinked gap object, reporting function match %.
+Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then runs the RESOLVED comparison against its delinked gap object and reports the function match %.
 
 ### `tools/generate_progress_bars.py`
 
