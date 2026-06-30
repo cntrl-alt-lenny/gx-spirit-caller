@@ -67,3 +67,21 @@ This is the sibling of `021ac06c` (the `func_ov008_021ac06c` callee that impleme
 1. The `(hw<<24)>>24` peephole wall is the same as `021acfa0` and `021acdd0` (ov008_core.h §brief-403). Try replacing the `unsigned int f4 : 8` bitfield read with `(unsigned int)(*(unsigned short *)(data_ov008_021b2dc8 + 4) << 24) >> 24` inline, using variable-shift form `int s = 24; (hw << s) >> s;` to prevent copy-propagation.
 2. In objdiff check the `f8` store: `(o->f4 < t) ? 4 : 0xfffc` should produce `movlt r?,#4 / ldrge r?,pool(0xfffc)` — if mwcc emits a branch instead of the conditional moves, try separating into `if (o->f4 < t) o->f8 = 4; else o->f8 = 0xfffc;`.
 3. The `o->f4` re-read after the `func_ov008_021ac06c` call (in the `if (t == o->f4)` and `o->f8 = (o->f4 < t)`) must be fresh loads from the struct (not cached). If mwcc caches `f4` in a register, add a volatile cast or restructure to force reloads. Escalate to permuter if the `movlt/ldrge` scheduling doesn't close.
+
+## GROUND TRUTH (from .s)
+
+**Pool words (literal pool, in order):**
+
+| label | value | type |
+|-------|-------|------|
+| `_LIT0` | `data_ov008_021b2dc8` | raw |
+| `_LIT1` | `0x0000fffc` | MMIO/const |
+
+**BL/BLX callees (in call order, unique):**
+
+| instr | target | notes |
+|-------|--------|-------|
+| `bl` | `func_ov008_021ac06c` | overlay call (ov008) |
+
+> **Mode-C reminder:** never emit `static const` arrays or struct literals — they generate a `.rodata` section that breaks the link silently. Use `extern data_XXXX` references instead.
+
