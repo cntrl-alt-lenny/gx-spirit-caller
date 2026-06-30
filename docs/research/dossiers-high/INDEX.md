@@ -1,9 +1,7 @@
 # HIGH-tier dossiers index
 
-Generated from docs/research/dossiers-high/
-
-| addr | header summary |
-|------|---------------|
+| addr | header |
+|------|--------|
 | 02001e5c | func_02001e5c (main, HIGH class A, unknown B) |
 | 0200592c | func_0200592c (main, HIGH class A, unknown B) |
 | 02006524 | func_02006524 (main, HIGH class A, unknown B) |
