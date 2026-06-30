@@ -1273,7 +1273,7 @@ src/overlay006/func_ov006_021c3384.s:
     complete
     .text start:0x021c3384 end:0x021c34c0
 
-src/overlay006/func_ov006_021c34c0.s:
+src/overlay006/func_ov006_021c34c0.c:
     complete
     .text start:0x021c34c0 end:0x021c358c
 
@@ -1317,7 +1317,7 @@ src/overlay006/func_ov006_021c4518.c:
     complete
     .text start:0x021c4518 end:0x021c4574
 
-src/overlay006/func_ov006_021c4574.s:
+src/overlay006/func_ov006_021c4574.c:
     complete
     .text start:0x021c4574 end:0x021c46c0
 
@@ -1406,7 +1406,7 @@ src/overlay006/ov006_021c52b0.c:
 
 
 
-src/overlay006/func_ov006_021c52b8.s:
+src/overlay006/func_ov006_021c52b8.c:
     complete
     .text start:0x021c52b8 end:0x021c53bc
 
@@ -1414,7 +1414,7 @@ src/overlay006/func_ov006_021c53bc.s:
     complete
     .text start:0x021c53bc end:0x021c5a5c
 
-src/overlay006/func_ov006_021c5a5c.s:
+src/overlay006/func_ov006_021c5a5c.c:
     complete
     .text start:0x021c5a5c end:0x021c5b00
 
@@ -1462,7 +1462,7 @@ src/overlay006/func_ov006_021c6640.c:
     complete
     .text start:0x021c6640 end:0x021c669c
 
-src/overlay006/func_ov006_021c669c.s:
+src/overlay006/func_ov006_021c669c.c:
     complete
     .text start:0x021c669c end:0x021c6798
 
@@ -1516,7 +1516,7 @@ src/overlay006/ov006_021c6990.c:
 
 
 
-src/overlay006/func_ov006_021c6998.s:
+src/overlay006/func_ov006_021c6998.c:
     complete
     .text start:0x021c6998 end:0x021c6a3c
 
@@ -1524,7 +1524,7 @@ src/overlay006/func_ov006_021c6a3c.c:
     complete
     .text start:0x021c6a3c end:0x021c6a58
 
-src/overlay006/func_ov006_021c6a58.s:
+src/overlay006/func_ov006_021c6a58.c:
     complete
     .text start:0x021c6a58 end:0x021c6b2c
 
@@ -1665,7 +1665,7 @@ src/overlay006/func_ov006_021c6c78.s:
     complete
     .text start:0x021c6c78 end:0x021c6d8c
 
-src/overlay006/func_ov006_021c6d8c.s:
+src/overlay006/func_ov006_021c6d8c.c:
     complete
     .text start:0x021c6d8c end:0x021c6e40
 
@@ -1730,11 +1730,11 @@ src/overlay006/func_ov006_021c6fa0.c:
     complete
     .text start:0x021c6fa0 end:0x021c6ff8
 
-src/overlay006/func_ov006_021c6ff8.s:
+src/overlay006/func_ov006_021c6ff8.c:
     complete
     .text start:0x021c6ff8 end:0x021c7110
 
-src/overlay006/func_ov006_021c7110.s:
+src/overlay006/func_ov006_021c7110.c:
     complete
     .text start:0x021c7110 end:0x021c71e0
 
