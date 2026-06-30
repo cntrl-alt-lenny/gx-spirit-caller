@@ -16131,19 +16131,19 @@ src/main/func_0208f5ac.s:
     complete
     .text start:0x0208f5ac end:0x0208f6b0
 
-src/main/func_0208f6b0.s:
+src/main/func_0208f6b0.legacy.c:
     complete
     .text start:0x0208f6b0 end:0x0208f718
 
-src/main/func_0208f718.s:
+src/main/func_0208f718.legacy.c:
     complete
     .text start:0x0208f718 end:0x0208f780
 
-src/main/func_0208f780.s:
+src/main/func_0208f780.legacy.c:
     complete
     .text start:0x0208f780 end:0x0208f7e8
 
-src/main/func_0208f7e8.s:
+src/main/func_0208f7e8.legacy.c:
     complete
     .text start:0x0208f7e8 end:0x0208f850
 

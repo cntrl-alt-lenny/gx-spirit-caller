@@ -10554,16 +10554,16 @@ src/usa/main/func_0208f444.s:
 src/usa/main/func_0208f4c4.s:
     complete
     .text start:0x0208f4c4 end:0x0208f5c8
-src/usa/main/func_0208f5c8.s:
+src/usa/main/func_0208f5c8.legacy.c:
     complete
     .text start:0x0208f5c8 end:0x0208f630
-src/usa/main/func_0208f630.s:
+src/usa/main/func_0208f630.legacy.c:
     complete
     .text start:0x0208f630 end:0x0208f698
-src/usa/main/func_0208f698.s:
+src/usa/main/func_0208f698.legacy.c:
     complete
     .text start:0x0208f698 end:0x0208f700
-src/usa/main/func_0208f700.s:
+src/usa/main/func_0208f700.legacy.c:
     complete
     .text start:0x0208f700 end:0x0208f768
 src/usa/main/func_0208f768.s:
