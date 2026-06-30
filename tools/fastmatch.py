@@ -100,6 +100,33 @@ except ImportError:
     _HAS_RESOLVER = False
 
 
+# ---------------------------------------------------------------------------
+# objdump wrapper — clean error if binary is missing
+# ---------------------------------------------------------------------------
+
+_OBJDUMP = "arm-none-eabi-objdump"
+
+
+def _run_objdump(extra_args: list[str], obj: Path) -> str:
+    """Run arm-none-eabi-objdump and return stdout.
+
+    Exits with code 2 and a clean message if the binary is not on PATH, so
+    the user sees an actionable hint instead of a raw FileNotFoundError
+    traceback.
+    """
+    cmd = [_OBJDUMP] + extra_args + [str(obj)]
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT).stdout
+    except FileNotFoundError:
+        print(
+            f"ERROR: '{_OBJDUMP}' not found on PATH.\n"
+            "  Run `ninja` once to download toolchain binaries, or:\n"
+            "  python tools/download_tool.py",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+
 def _resolve_obj_bytes(path: Path) -> bytes | None:
     """Read an ELF .o, apply R_ARM_ABS32/PC24 relocs to fictional bases,
     return modified bytes with reloc tables stripped.
@@ -269,10 +296,7 @@ def find_gap_by_glob(func: str, module: str, region: str) -> Path | None:
         candidates = sorted(glob.glob(pattern_any, recursive=True))
 
     for obj in candidates:
-        out = subprocess.run(
-            ["arm-none-eabi-objdump", "-t", obj],
-            capture_output=True, text=True, cwd=ROOT,
-        ).stdout
+        out = _run_objdump(["-t"], Path(obj))
         if re.search(
             rf"\bF\b.+\.text\s+[0-9a-f]+\s+{re.escape(func)}$", out, re.M
         ):
@@ -290,10 +314,7 @@ _RELOC = re.compile(r"^\s+([0-9a-f]+):\s+R_ARM")
 
 
 def _objdump_text(obj: Path) -> str:
-    return subprocess.run(
-        ["arm-none-eabi-objdump", "-d", "-r", "--architecture=armv5te", str(obj)],
-        capture_output=True, text=True, cwd=ROOT,
-    ).stdout
+    return _run_objdump(["-d", "-r", "--architecture=armv5te"], obj)
 
 
 def _parse_words(text: str, func: str) -> list[tuple[str, bool]]:
@@ -385,10 +406,7 @@ def match_percent(
 
 def list_funcs_in_obj(obj: Path) -> list[str]:
     """Return the list of function names in obj's .text section."""
-    out = subprocess.run(
-        ["arm-none-eabi-objdump", "-t", str(obj)],
-        capture_output=True, text=True, cwd=ROOT,
-    ).stdout
+    out = _run_objdump(["-t"], obj)
     result: list[str] = []
     for line in out.splitlines():
         m = re.search(r"\bF\b.+\.text\s+[0-9a-f]+\s+(\S+)$", line)
