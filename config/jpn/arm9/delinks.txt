@@ -2659,10 +2659,10 @@ src/jpn/main/func_02026cfc.s:
 src/jpn/main/func_02026de4.s:
     complete
     .text start:0x02026de4 end:0x02026e84
-src/jpn/main/func_02026e84.s:
+src/jpn/main/func_02026e84.c:
     complete
     .text start:0x02026e84 end:0x02026ed4
-src/jpn/main/func_02026ed4.s:
+src/jpn/main/func_02026ed4.c:
     complete
     .text start:0x02026ed4 end:0x02026f24
 src/jpn/main/func_02026f24.s:

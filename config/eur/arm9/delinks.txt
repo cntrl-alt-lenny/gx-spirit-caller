@@ -4715,11 +4715,11 @@ src/main/func_02026e38.s:
     complete
     .text start:0x02026e38 end:0x02026ed8
 
-src/main/func_02026ed8.s:
+src/main/func_02026ed8.c:
     complete
     .text start:0x02026ed8 end:0x02026f28
 
-src/main/func_02026f28.s:
+src/main/func_02026f28.c:
     complete
     .text start:0x02026f28 end:0x02026f78
 
