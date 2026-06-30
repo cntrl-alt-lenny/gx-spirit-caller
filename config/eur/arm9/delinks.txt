@@ -1439,11 +1439,11 @@ src/main/func_0200af08.c:
 
 
 
-src/main/func_0200af24.s:
+src/main/func_0200af24.c:
     complete
     .text start:0x0200af24 end:0x0200afc8
 
-src/main/func_0200afc8.s:
+src/main/func_0200afc8.c:
     complete
     .text start:0x0200afc8 end:0x0200b06c
 
@@ -1633,15 +1633,15 @@ src/main/func_0200c594.s:
     complete
     .text start:0x0200c594 end:0x0200c65c
 
-src/main/func_0200c65c.s:
+src/main/func_0200c65c.c:
     complete
     .text start:0x0200c65c end:0x0200c6ac
 
-src/main/func_0200c6ac.s:
+src/main/func_0200c6ac.c:
     complete
     .text start:0x0200c6ac end:0x0200c6fc
 
-src/main/func_0200c6fc.s:
+src/main/func_0200c6fc.c:
     complete
     .text start:0x0200c6fc end:0x0200c74c
 
