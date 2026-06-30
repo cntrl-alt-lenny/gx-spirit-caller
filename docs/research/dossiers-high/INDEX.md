@@ -1,206 +1,34 @@
 # HIGH-tier dossiers index
 
-| addr | module | size | cls | primary mode |
-|------|--------|------|-----|-------------|
-| 02001e5c | main | ? | A | Mode E |
-| 0200592c | main | ? | A | Mode E |
-| 02006524 | main | ? | A | Mode A |
-| 020071c4 | main | ? | A | Mode D |
-| 02007f38 | main | ? | A | Mode E |
-| 02007f58 | main | ? | A | Mode A |
-| 020091f4 | main | ? | A | Mode E |
-| 02009278 | main | ? | A | Mode E |
-| 0200a40c | main | 72B | A | Mode E |
-| 0200a454 | main | 52B | A | Mode E |
-| 0200b0c8 | main | ? | A | Mode E |
-| 0200b1bc | main | ? | A | Mode E |
-| 0200bff4 | main | ? | A | Mode E |
-| 0200c23c | main | ? | A | Mode E |
-| 0200efe0 | main | ? | A | Mode B |
-| 0200f01c | main | ? | B | Mode E |
-| 0200fbd4 | main | ? | A | Mode A |
-| 0200fdc0 | main | ? | A | Mode A |
-| 02011178 | main | ? | A | Mode E |
-| 02016b60 | main | ? | A | Mode E |
-| 02017888 | main | 328B | A | Mode E |
-| 02017a98 | main | 88B | A | Mode E |
-| 02017afc | main | 164B | A | Mode E |
-| 02017be0 | main | 204B | A | Mode E |
-| 02017d18 | main | 156B | A | Mode E |
-| 02017df0 | main | 132B | A | Mode E |
-| 0201816c | main | 72B | A | Mode E |
-| 020186b0 | main | 24B | A | Mode E |
-| 02018b14 | main | 20B | A | Mode E |
-| 0201942c | main | 96B | A | Mode E |
-| 02019820 | main | ? | A | Mode E |
-| 020198ec | main | ? | A | Mode A |
-| 0201a0e0 | main | ? | A | Mode A |
-| 0201a3ec | main | ? | B | Mode E |
-| 0201a498 | main | ? | B | Mode E |
-| 0201a824 | main | ? | A | Mode E |
-| 0201b648 | main | ? | A | Mode E |
-| 0201be64 | main | ? | A | Mode E |
-| 0201cfa0 | main | ? | A | Mode E |
-| 0201d5c0 | main | ? | A | Mode A |
-| 0201e5b8 | main | 44B | A | Mode E |
-| 0201ee1c | main | 72B | A | Mode E |
-| 0201f6c0 | main | 33B | A | Mode A |
-| 0201f7f0 | main | 46B | A | Mode E |
-| 0201fbe0 | main | 46B | A | Mode A |
-| 02020130 | main | 27B | A | Mode E |
-| 02020398 | main | 44B | A | Mode A |
-| 020206d8 | main | 33B | A | Mode A |
-| 02020814 | main | 43B | A | Mode E |
-| 0202111c | main | 60B | B | Mode A |
-| 02021158 | main | 56B | B | Mode A |
-| 02021660 | main | 80B | A | Mode E |
-| 02021bac | main | 96B | A | Mode A |
-| 020224c0 | main | 76B | A | Mode E |
-| 02023fec | main | 56B | A | Mode A |
-| 02025840 | main | 64B | B | Mode E |
-| 02027048 | main | 136B | A | Mode D |
-| 02029204 | main | 136B | A | Mode E |
-| 02029458 | main | 104B | A | Mode E |
-| 02029c80 | main | 192B | A | Mode E |
-| 0202a240 | main | 60B | A | Mode D |
-| 0202a27c | main | 124B | A | Mode D |
-| 0202ab04 | main | 96B | A | Mode E |
-| 0202b6e4 | main | 104B | A | Mode E |
-| 0202bb88 | main | 64B | A | Mode A |
-| 0202c948 | main | 88B | A | Mode E |
-| 0202ce24 | main | 84B | A | Mode A |
-| 0202d194 | main | 68B | A | Mode E |
-| 0202d9a0 | main | 88B | A | Mode A |
-| 0203058c | main | 48B | A | Mode E |
-| 02031794 | main | 44B | A | Mode E |
-| 020318b8 | main | 116B | A | Mode E |
-| 02032028 | main | 76B | A | Mode E |
-| 02032644 | main | 56B | A | Mode E |
-| 02032724 | main | 36B | A | Mode E |
-| 0203361c | main | 56B | A | Mode E |
-| 020338b8 | main | 64B | A | Mode E |
-| 02033a48 | main | 56B | A | Mode A |
-| 02034094 | main | 36B | A | Mode E |
-| 0203671c | main | 192B | A | Mode E |
-| 02037328 | main | 80B | A | Mode A |
-| 020379c4 | main | 40B | A | Mode E |
-| 02037b04 | main | 48B | A | Mode E |
-| 02037b58 | main | 140B | A | Mode A |
-| 020387c0 | main | 80B | A | Mode E |
-| 02038d2c | main | 68B | A | Mode E |
-| 02038d70 | main | 60B | A | Mode A |
-| 02038dac | main | 48B | A | Mode A |
-| 0203aeec | main | 88B | A | Mode E |
-| 0203c70c | main | 36B | A | Mode A |
-| 0203c7d0 | main | 68B | B | Mode E |
-| 0203c900 | main | 104B | B | Mode E |
-| 0203cb0c | main | 52B | B | Mode E |
-| 0203cb40 | main | 80B | A | Mode E |
-| 0203cb90 | main | 48B | A | Mode E |
-| 0203cbc0 | main | 152B | B | Mode E |
-| 0203d0e0 | main | 224B | A | Mode E |
-| 0203d1c0 | main | 152B | A | Mode E |
-| 0203d258 | main | 144B | A | Mode E |
-| 0203dae0 | main | 68B | A | Mode B |
-| 0203db24 | main | 76B | B | Mode E |
-| 0203db70 | main | 160B | B | Mode E |
-| 0203de2c | main | 84B | A | Mode B |
-| 0203deac | main | 68B | A | Mode A |
-| 0203e254 | main | 156B | B | Mode E |
-| 0203eb14 | main | 52B | B | Mode E |
-| 0203ee94 | main | 76B | A | Mode E |
-| 0203ef68 | main | 56B | A | Mode B |
-| 0203f030 | main | 100B | A | Mode A |
-| 0203f544 | main | 76B | A | Mode E |
-| 0203f6cc | main | ? | A | Mode A |
-| 0203f718 | main | ? | A | Mode E |
-| 0203f740 | main | ? | A | Mode A |
-| 0204033c | main | ? | A | Mode A |
-| 02040c98 | main | ? | A | Mode E |
-| 02040d54 | main | ? | A | Mode E |
-| 02040de8 | main | ? | A | Mode E |
-| 020414b0 | main | ? | A | Mode A |
-| 02041520 | main | ? | A | Mode E |
-| 02041dbc | main | ? | A | Mode E |
-| 02041ea0 | main | 100B | A | Mode E |
-| 02042190 | main | 72B | A | Mode A |
-| 0204320c | main | 68B | A | Mode A |
-| 020442f8 | main | 48B | A | Mode E |
-| 02044328 | main | 68B | A | Mode E |
-| 02044724 | main | 52B | A | Mode B |
-| 02045678 | main | 204B | A | Mode A |
-| 02045744 | main | 148B | A | Mode A |
-| 020457d8 | main | 80B | A | Mode A |
-| 020458d8 | main | 100B | A | Mode A |
-| 02045c34 | main | 72B | A | Mode E |
-| 02045c7c | main | 60B | A | Mode A |
-| 02045cb8 | main | 72B | A | Mode A |
-| 02046694 | main | 96B | A | Mode E |
-| 020469d0 | main | 76B | B | Mode A |
-| 02046a5c | main | 104B | A | Mode A |
-| 02046ae0 | main | 92B | A | Mode A |
-| 02046b3c | main | 108B | A | Mode A |
-| 02046ba8 | main | 184B | A | Mode A |
-| 02048050 | main | 100B | A | Mode A |
-| 020490dc | main | 68B | A | Mode A |
-| 02049120 | main | 108B | A | Mode A |
-| 020492d0 | main | 76B | A | Mode A |
-| 0204965c | main | 40B | A | Mode A |
-| 0204b034 | main | 116B | A | Mode A |
-| 0204b370 | main | 96B | A | Mode A |
-| 0204b3d0 | main | 64B | A | Mode A |
-| 0204bd8c | main | 56B | A | Mode B |
-| 0204bdc4 | main | 124B | A | Mode B |
-| 0204bf00 | main | 68B | A | Mode B |
-| 0204ce3c | main | 84B | A | Mode B |
-| 0204d468 | main | 76B | A | Mode B |
-| 0204f040 | main | 104B | A | Mode A |
-| 0204f310 | main | 176B | A | Mode A |
-| 0204f9cc | main | 88B | A | Mode E |
-| 0204fc38 | main | 100B | A | Mode E |
-| 0205000c | main | 72B | A | Mode E |
-| 020517a0 | main | 364B | A | Mode E |
-| 02051ab0 | main | 96B | A | Mode B |
-| 02051e38 | main | 92B | A | Mode E |
-| 02051ec0 | main | 92B | A | Mode E |
-| 02051f48 | main | 80B | A | Mode E |
-| 020525dc | main | 64B | A | Mode A |
-| 02052674 | main | 68B | A | Mode A |
-| 02052704 | main | 40B | A | Mode E |
-| 0205272c | main | 60B | B | Mode A |
-| 02052bd4 | main | 100B | B | Mode E |
-| 02052c58 | main | 132B | B | Mode B |
-| 02052ddc | main | 24B | A | Mode B |
-| 02052ecc | main | 56B | A | Mode B |
-| 02052f04 | main | 132B | B | Mode B |
-| 02053114 | main | 68B | A | Mode E |
-| 020531c0 | main | 112B | A | Mode E |
-| 020532f4 | main | 136B | A | Mode E |
-| 020534b4 | main | 32B | A | Mode E |
-| 02053600 | main | 44B | B | Mode E |
-| 02053650 | main | 56B | A | Mode E |
-| 020536bc | main | 12B | A | Mode E |
-| 020536d0 | main | 52B | A | Mode E |
-| 02053a64 | main | 80B | A | Mode A |
-| 02053bfc | main | 56B | A | Mode E |
-| 0205407c | main | 84B | B | Mode A |
-| 02054148 | main | 112B | A | Mode A |
-| 02054338 | main | 128B | A | Mode A |
-| 020543b8 | main | 116B | A | Mode A |
-| 02054684 | main | 124B | A | Mode A |
-| 02054840 | main | 40B | A | Mode E |
-| 020548b4 | main | 64B | A | Mode A |
-| 02054ad0 | main | 48B | B | Mode B |
-| 02054b00 | main | 28B | A | Mode A |
-| 02054c0c | main | 36B | A | Mode E |
-| 02054c30 | main | 52B | A | Mode E |
-| 02054c78 | main | 48B | A | Mode E |
-| 02054ca8 | main | 80B | A | Mode E |
-| 02054d14 | main | 56B | A | Mode E |
-| 02054d68 | main | 52B | A | Mode E |
-| 02054db8 | main | 68B | A | Mode E |
-| 02054dfc | main | 88B | A | Mode E |
-| 02055128 | main | 72B | A | Mode E |
-| 02055170 | main | 72B | A | Mode E |
+247 dossiers (HIGH class A/B, not yet on main as .c). Each dossier includes:
+- recipe + risk (from c-match-prep)
+- SHA1 pitfall mode (A/B/D/E)
+- **GROUND TRUTH** section: pool-word VALUES and BL/BLX callee targets extracted directly from the .s ship
+- Mode-C reminder: never use `static const` arrays
 
-Total: 200 dossiers
+The GROUND TRUTH section pre-empts Mode A (wrong pool value) and Mode B (wrong callee) failures — the campaign agent uses the correct values from the first attempt.
+
+## Address range
+
+| from | to | count |
+|------|----|-------|
+| `02001e5c` | `02064158` | 247 |
+
+## Files
+
+| addr | recipe (brief) |
+|------|----------------|
+| 02001e5c | ACCESSOR (signed-byte) + double-negation bool |
+| 0200592c | Sequential init calls + MMIO pool words (0x04000010, 0x04001014) |
+| 02006524 | Ternary-chain conditional + bitfield extraction |
+| 020071c4 | Mode D — duplicate pool words (data_02104f1c × 2); .s-only |
+| 02007f38 | Counted copy loop + two data symbol pool words |
+| 02007f58 | BITFIELD insert + shifted-immediate base |
+| 020091f4 | switch dispatch + BL callees |
+| 02009278 | ACCESSOR + ptr-chain |
+| 0200a40c | BITFIELD :8 and :1 + BIND-once base + early-return loop |
+| 0200a454 | counted copy loop, indexed load + computed-base store |
+
+_(full list: 247 entries — addr-sorted .md files in this directory)_
+
+Total: 247 dossiers
