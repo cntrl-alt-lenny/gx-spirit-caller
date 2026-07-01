@@ -138,7 +138,7 @@ src/usa/main/func_02001e3c.s:
 src/usa/main/func_02001e64.s:
     complete
     .text start:0x02001e64 end:0x02001e74
-src/usa/main/func_02001e74.s:
+src/usa/main/func_02001e74.c:
     complete
     .text start:0x02001e74 end:0x02001ed4
 src/usa/main/func_02001ed4.c:
