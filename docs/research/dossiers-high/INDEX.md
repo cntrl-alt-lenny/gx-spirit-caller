@@ -1,6 +1,6 @@
 # HIGH-tier dossiers index
 
-531 dossiers (HIGH class A/B, not yet on main as .c). Each dossier includes:
+1067 dossiers (HIGH class A/B, not yet on main as .c). Each dossier includes:
 - recipe + risk (from c-match-prep)
 - SHA1 pitfall mode (A/B/D/E)
 - **GROUND TRUTH** section: pool-word VALUES and BL/BLX callee targets extracted directly from the .s ship
@@ -12,7 +12,7 @@ The GROUND TRUTH section pre-empts Mode A (wrong pool value) and Mode B (wrong c
 
 | from | to | count |
 |------|----|-------|
-| `02001e5c` | `020937d0` | 531 |
+| `02001e5c` | `022bdf30` | 1067 |
 
 ## Files
 
@@ -29,6 +29,6 @@ The GROUND TRUTH section pre-empts Mode A (wrong pool value) and Mode B (wrong c
 | 0200a40c | BITFIELD :8 and :1 + BIND-once base + early-return loop |
 | 0200a454 | counted copy loop, indexed load + computed-base store |
 
-_(full list: 531 entries — addr-sorted .md files in this directory)_
+_(full list: 1067 entries — addr-sorted .md files in this directory)_
 
-Total: 531 dossiers
+Total: 1067 dossiers

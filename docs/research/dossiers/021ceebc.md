@@ -89,3 +89,19 @@ data_ov011_021d300c and data_ov011_021d3034 are short[] lookup tables (4-byte en
 1. Build as-is. The prep draft captures the right store sequence and the conditional-shift pattern. The key risk is that `idx = (v << 0x17) >> 0x1c` in the if-branch and `idx = (v << 0x13) >> 0x1c` in the else-branch — mwcc may reload `v` per branch rather than keeping a single load. If the asm shows two `ldr r?, [base, #0x268]` instructions (one per branch), move `v = *(unsigned int *)(b + 0x268);` into each branch body instead of hoisting it.
 2. In objdiff, check that `idx * 2` compiles to `lsl #1` (not a mul). If the branch where `v` is loaded and the branch where `tbl` and `idx` are set do not share the same register, try declaring `idx` before the if and assigning `v` inside each branch separately.
 3. ov011_core.h wave-4 explicitly names this as a WALL (predication-vs-branch). If predication coercion fails after 3 attempts, park as .s — do not spend permuter budget on it.
+
+## GROUND TRUTH (from .s)
+
+**Pool words (literal pool, in order):**
+
+| label | value | type |
+|-------|-------|------|
+| `_LIT0` | `data_ov011_021d4000` | raw |
+| `_LIT1` | `data_ov011_021d403c` | raw |
+| `_LIT2` | `data_ov011_021d300c` | raw |
+| `_LIT3` | `data_ov011_021d3034` | raw |
+
+**BL/BLX callees:** none (leaf function).
+
+> **Mode-C reminder:** never emit `static const` arrays or struct literals — they generate a `.rodata` section that breaks the link silently. Use `extern data_XXXX` references instead.
+

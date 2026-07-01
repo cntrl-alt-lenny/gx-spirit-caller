@@ -71,3 +71,22 @@ The address arithmetic: `row_ptr + (x + y) * 10` positions at the correct row (1
 1. Try `int v = ((unsigned short *)(row))[sel - 1]` as an alternative to the pointer arithmetic form `*(unsigned short *)(row + sel*2 - 2)` — the array-index form may produce the cleaner `add ip,r1,r3,lsl#1` / `ldrh [ip,#-2]` sequence. If the current form already produces `ldrh[#-2]`, keep it.
 2. If the `(x+y)*5*2` multiply folds to `(x+y)*10` in one `mul` vs `lsl+add`, try writing `* 10` directly instead of `* 5 * 2`. Check objdiff for whether the multiply instruction changes.
 3. If the `func_ov008_021b2268` call's register assignment diverges (v must be in r4 across the `021b22e4(1)` call), try binding: `int v = ...;` before `func_ov008_021b22e4(1);` so v gets a callee-saved register. If still not matching, escalate to permuter.
+
+## GROUND TRUTH (from .s)
+
+**Pool words (literal pool, in order):**
+
+| label | value | type |
+|-------|-------|------|
+| `_LIT0` | `data_ov008_021b2de4` | raw |
+
+**BL/BLX callees (in call order, unique):**
+
+| instr | target | notes |
+|-------|--------|-------|
+| `bl` | `func_ov008_021b22e4` | overlay call (ov008) |
+| `bl` | `func_ov008_021b2268` | overlay call (ov008) |
+| `bl` | `func_ov008_021b2200` | overlay call (ov008) |
+
+> **Mode-C reminder:** never emit `static const` arrays or struct literals — they generate a `.rodata` section that breaks the link silently. Use `extern data_XXXX` references instead.
+
