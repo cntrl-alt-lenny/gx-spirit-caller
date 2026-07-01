@@ -3656,7 +3656,7 @@ src/main/func_0201d07c.c:
     complete
     .text start:0x0201d07c end:0x0201d0b0
 
-src/main/func_0201d0b0.s:
+src/main/func_0201d0b0.c:
     complete
     .text start:0x0201d0b0 end:0x0201d0e8
 
