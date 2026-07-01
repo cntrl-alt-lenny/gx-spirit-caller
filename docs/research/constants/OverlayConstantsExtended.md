@@ -1,9 +1,9 @@
 [//]: # (markdownlint-disable MD013 MD041)
 
-# Overlay Magic Constants — ov008, ov010, ov016
+# Overlay Magic Constants — ov008, ov010, ov016, ov018, ov021, ov022
 
 Compiler-generated magic constants (smull reciprocals) and notable scalar
-limits found in ov008, ov010, and ov016 GLOBAL_ASM `.s` files.
+limits found in overlay GLOBAL_ASM `.s` files.
 Constants already documented in `MagicDivisionConstants.md` are listed here
 only where overlays add new usage sites or context.
 
@@ -54,6 +54,52 @@ asr r2, r2, #0x1        ; r2 = r3 / 3
 
 Standard mwcc signed divide-by-3 recipe. Context in ov016 is likely the
 tri-color channel split (R, G, B = 3 components) or a 3-item table index.
+
+---
+
+### 0xb60b60b7 — smull reciprocal for ÷360
+
+**Source:** `func_ov018_021acf80.s`
+**Occurrences:** 1 (ov018 only)
+
+Corroborated by the literal `0x168` (=360) appearing at the paired
+remainder-computation site in the same function (retriage R7,
+`SmallOverlaysRetriageR7.md`).
+
+---
+
+### 0x2aaaaaab — smull reciprocal for ÷48 (post-shift `asr #0x3`)
+
+**Source:** `func_ov021_021ab3fc.s`
+**Occurrences:** 1 (ov021 only)
+
+Converts touch-Y+40 into a row index for the ov021 5×2 card grid
+(48px cell height). Retriage R7, `SmallOverlaysRetriageR7.md`.
+
+---
+
+### 0x38e38e39 — smull reciprocal for ÷72 (post-shift `asr #0x4`)
+
+**Source:** `func_ov021_021ab3fc.s`
+**Occurrences:** 1 (ov021 only)
+
+Converts touch-X+48 into a column index (72px cell width); corroborated by
+the `mov r1,#0x48` stride constant repeated in sibling
+`func_ov021_021ab150.s`. Retriage R7, `SmallOverlaysRetriageR7.md`.
+
+---
+
+### 0x88888889 — smull reciprocal, postshift-dependent (÷15, ÷30, or ÷60)
+
+**Sources:** `func_ov001_021ca144.s` (÷60 @ `asr #0x5`),
+`func_ov018_021acf80.s` (÷9-family reading in its own shift context),
+`func_ov022_021aadf0.s` / `func_ov022_021ab5c8.s` (÷15 @ `asr #0x3`,
+cross-confirmed between the two ov022 sites).
+
+The raw hex constant is identical across all sites, but the effective
+divisor differs by each function's own post-shift amount — record the
+post-shift alongside the constant, not just the hex value, when matching
+against this reciprocal. Retriage R7, `SmallOverlaysRetriageR7.md`.
 
 ---
 

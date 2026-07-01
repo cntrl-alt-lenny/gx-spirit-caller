@@ -72,10 +72,19 @@ char *GetSystemWork(void) { return data_02104f58; }
 /* SysWork_ClearField0x810: Fill32(0, base+0x810, 0x20) */
 #define SYSWORK_CLEAR_OFF   0x810
 #define SYSWORK_CLEAR_SIZE  0x20    /* 32 bytes zeroed */
+#define SYSWORK_ANIM_FRAME_COUNT 0x91c  /* primary progress/frame counter */
+#define SYSWORK_ANIM_SUBFRAME    0x920  /* secondary tie-break counter */
 ```
 
 Confirmed: `GetSystemWork.c`, `SysWork_GetPointDistance.c`,
 `SysWork_ClearField0x810.c`.
+
+`SYSWORK_ANIM_FRAME_COUNT`/`SYSWORK_ANIM_SUBFRAME` (retriage R7,
+`Ov017Ov019Retriage.md`): the aliased base `data_02104f4c` used by several
+ov017/ov019/ov003 functions is `data_02104f58 - 0xC` (verified by address
+arithmetic), so its `+0x928`/`+0x92c` offsets land inside this same block at
+`+0x91C`/`+0x920`. `+0x91C` is compared against thresholds (8, 0x17, 0x18,
+0x24, 0x29, 0x2b) across functions; `+0x920` against 3/4.
 
 ---
 
