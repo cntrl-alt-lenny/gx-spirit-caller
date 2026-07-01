@@ -1230,7 +1230,7 @@ src/usa/main/func_02014444.s:
 src/usa/main/func_020145fc.s:
     complete
     .text start:0x020145fc end:0x020147e0
-src/usa/main/func_020147e0.s:
+src/usa/main/func_020147e0.c:
     complete
     .text start:0x020147e0 end:0x020148ec
 src/usa/main/func_020148ec.s:
