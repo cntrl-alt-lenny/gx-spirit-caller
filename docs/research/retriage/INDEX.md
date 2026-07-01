@@ -7,7 +7,7 @@ classified as "intractable" — before the struct/data/constants KB existed.
 Now that the KB explains struct offsets and data table layouts, many of these
 were re-examined to find newly plausible matches.
 
-> Branch: `kb/retriage-extend` (R6 extension — 16 new overlays, 53 newly tractable)
+> Branch: `kb/retriage-r7` (R7 extension — 10 more overlays, 51 newly tractable)
 > Do NOT regenerate — the brain handles the index at merge.
 
 ---
@@ -25,6 +25,10 @@ were re-examined to find newly plausible matches.
 | [SmallOverlaysRetriage.md](SmallOverlaysRetriage.md) | ov003/005/009/012/014 (112 total .s, all examined) | **10** | dispatch-table-advance pattern; sub-display MMIO clear pattern |
 | [Ov016Ov020Ov015Retriage.md](Ov016Ov020Ov015Retriage.md) | ov016 (44), ov020 (33), ov015 (32) — 56 examined | **13** | new data globals in OverlayDataGlobs.md |
 | [Ov004Ov006Deep.md](Ov004Ov006Deep.md) | ov004 (20 new files), ov006 (24 new files) | **15** | 3 new ov006 globals; smull ÷10 pattern |
+| [Ov017Ov019Retriage.md](Ov017Ov019Retriage.md) | ov017 (14 E/F), ov019 (10 E/F) — never examined before R7 | **24** (100% of examined) | SystemWork+0x91C/0x920 (→ MainConstants.md); GlobalAudioState/DSS extensions |
+| [SmallOverlaysRetriageR7.md](SmallOverlaysRetriageR7.md) | ov001/007/013/018/021/022 (28 funcs) | **20** | 4 new smull reciprocals (→ OverlayConstantsExtended.md); ~15 new data globals |
+| [Ov000Deep.md](Ov000Deep.md) | ov000 (26 residual, only 8/32 examined before R7) | **2** | 8 gaps flagged (VRAM descriptors, unnamed bitfield struct); mostly reconfirms genuine wall |
+| [Ov011Deep.md](Ov011Deep.md) | ov011 (19 residual, only 8/27 examined before R7) | **5** | actor-struct field table extension (+0x21c..+0x288); 7 new data globals |
 
 ---
 
@@ -44,10 +48,22 @@ were re-examined to find newly plausible matches.
 | **R6: ov016 + ov020 + ov015** | **+13** | Ov016Ov020Ov015Retriage.md |
 | **R6: ov004 deep + ov006 deep** | **+15** | Ov004Ov006Deep.md |
 | **R6: main E/F unblocked by GlobalData02102c7c extension** | **+6** | GlobalData02102c7c.md (+0x03B→+0x0B4) |
-| **Grand total** | **~415** | R4 ~330 + R5 +32 + R6 +53 |
+| **R7: ov017 + ov019** | **+24** | Ov017Ov019Retriage.md (100% of examined) |
+| **R7: ov001/007/013/018/021/022 (small)** | **+20** | SmallOverlaysRetriageR7.md |
+| **R7: ov000 deep (residual)** | **+2** | Ov000Deep.md |
+| **R7: ov011 deep (residual)** | **+5** | Ov011Deep.md |
+| **Grand total** | **~466** | R4 ~330 + R5 +32 + R6 +53 + R7 +51 |
+
+> **R7 count: +51 newly tractable across 10 overlays.** ov017/ov019 (never
+> examined before) ran 24/24 = 100% tractable — the highest hit rate of any
+> retriage round to date. ov000 and ov011 got the deep second pass their R4
+> 8-of-N shallow sample never got; most of their backlog reconfirmed as
+> genuine wall (consistent with `ov000_core.h`'s existing thinning verdict),
+> but both still yielded a handful of clean recipes plus rich struct-field
+> extensions for a future pass.
+> Running total: **~466** confirmed tractable funcs across R4 + R5 + R6 + R7.
 
 > **R6 count: +53 newly tractable (47 from retriage docs + 6 main unblocked by KB extension).**
-> Running total: **~415** confirmed tractable funcs across R4 + R5 + R6.
 > 16 overlays examined for the first time in R6; ov004/ov006 got a deep second pass.
 
 > **Final R5 count: 362 funcs confirmed tractable across R4 + R5.**
@@ -83,6 +99,16 @@ were re-examined to find newly plausible matches.
   offset and audio array stride.
 - **4 conditionals → tractable (R5)**: `func_0204bf44`, `func_0204ca70` (R5 supplementary doc),
   `func_0204c120`, `func_02050054` (same GS+0x464/0x468 gap, now filled).
+
+### R7 Overlays (see retriage docs above)
+
+- **ov017 wins (14, 100%):** every remaining hard-tier func tractable, including two large (2-3KB) state machines/inits previously tagged "permuter terr" — larger bodies again proved easier to classify, not harder.
+- **ov019 wins (10, 100%):** same pattern — jump-table dispatchers, MMIO setup sequences, and layout-marshalling bodies all resolved once `SystemWork`, `GlobalAudioState`, and DSS-adjacent fields were cross-referenced.
+- **Small overlays (20 of 28):** ov001 (3/3), ov007 (1/1), ov013 (4/5 + partial case-level recipe on the 5th), ov018 (5/6), ov022 (7/7); ov021 confirmed fully wall (matches its existing `ov021_core.h` verdict exactly, 0/6).
+- **Address-reuse finding:** `0x021aa4a0` recurring across ov018/ov021/ov022 (and already-matched ov000/ov008) is confirmed COINCIDENTAL — different, unrelated functions placed at the same overlay-relative offset, not shared code. Do not assume same-address-across-overlays implies same-function.
+- **Genuine cross-overlay clone found:** `func_ov022_021ab4b0` is byte-identical to `func_ov020_021ada74` — one recipe covers both.
+- **ov000 deep pass (2 of 26):** the bulk of ov000's backlog reconfirms as genuine wall — consistent with `ov000_core.h`'s standing verdict — but surfaced 2 clean recipes plus a twin-pair (`021abe64`/`021abec8`, `021ad660`/`021ad8dc`) worth a dedicated struct doc once bit-widths are pinned down.
+- **ov011 deep pass (5 of 19):** actor-struct fields at `+0x274`/`+0x284` resolved but did NOT unlock the 3 dispatch funcs that touch them (walled by jump-table topology, not missing facts) — a reminder that KB gaps and scheduling-entropy walls are independent failure modes.
 
 ### R6 Overlays (see retriage docs above)
 
@@ -126,6 +152,10 @@ were re-examined to find newly plausible matches.
 | `data_ov010_021b9260` (card-list singleton, 12 fields) | ✅ **DOCUMENTED (R6)** | OverlayDataGlobs.md | ov010 VRAM-bank dispatch pair |
 | `data_ov016_021b8f80` (fn-ptr dispatch table, 32 slots) | ✅ **DOCUMENTED (R6)** | OverlayDataGlobs.md | ov016 state dispatcher |
 | smull reciprocals 0x1b4e81b5 (÷150), 0x55555556 (÷3) | ✅ **DOCUMENTED (R6)** | OverlayConstantsExtended.md | ov008, ov016 magic-divide funcs |
+| `SystemWork+0x91C/+0x920` (aliased via `data_02104f4c`) | ✅ **FILLED (R7)** | MainConstants.md (`SYSWORK_ANIM_FRAME_COUNT`/`SYSWORK_ANIM_SUBFRAME`) | ov017/ov019/ov003 funcs |
+| smull reciprocals 0xb60b60b7 (÷360), 0x2aaaaaab (÷48), 0x38e38e39 (÷72), 0x88888889 (postshift-dependent ÷15/30/60) | ✅ **DOCUMENTED (R7)** | OverlayConstantsExtended.md | ov001, ov018, ov021, ov022 magic-divide funcs |
+| ov011 actor-struct fields `+0x21c..+0x288` (extended) | documented, not yet unblocking | Ov011Deep.md (inline; not folded into a types/ doc) | resolved fields didn't unlock the 3 dispatch funcs — walled by topology, not facts |
+| ov000 `021abe64`/`021abec8` packed-field struct, `data_ov000_021b56b4` wide row | documented, not yet unblocking | Ov000Deep.md (inline; not folded into a types/ doc) | needs dedicated struct doc + full-row survey before it unlocks anything |
 
 ---
 
