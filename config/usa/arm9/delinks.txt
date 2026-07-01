@@ -526,7 +526,7 @@ src/usa/main/func_02008aac.s:
 src/usa/main/func_02008bf4.s:
     complete
     .text start:0x02008bf4 end:0x02008bf8
-src/usa/main/func_02008bf8.s:
+src/usa/main/func_02008bf8.c:
     complete
     .text start:0x02008bf8 end:0x02008c68
 src/usa/main/func_02008c68.c:

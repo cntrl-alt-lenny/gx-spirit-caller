@@ -1128,7 +1128,7 @@ src/main/func_02008ac8.s:
 libs/nitro/func_02008c10.legacy.c:
     complete
     .text start:0x02008c10 end:0x02008c14
-src/main/func_02008c14.s:
+src/main/func_02008c14.c:
     complete
     .text start:0x02008c14 end:0x02008c84
 
