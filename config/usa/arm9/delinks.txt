@@ -1206,7 +1206,7 @@ src/usa/main/func_02013a1c.c:
 src/usa/main/func_02013a30.c:
     complete
     .text start:0x02013a30 end:0x02013a6c
-src/usa/main/func_02013a6c.s:
+src/usa/main/func_02013a6c.c:
     complete
     .text start:0x02013a6c end:0x02013b18
 src/usa/main/func_02013b18.s:

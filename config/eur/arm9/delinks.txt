@@ -2122,7 +2122,7 @@ src/main/func_02013a64.c:
     complete
     .text start:0x02013a64 end:0x02013aa0
 
-src/main/func_02013aa0.s:
+src/main/func_02013aa0.c:
     complete
     .text start:0x02013aa0 end:0x02013b4c
 
