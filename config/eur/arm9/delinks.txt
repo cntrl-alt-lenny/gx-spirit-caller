@@ -8343,7 +8343,7 @@ src/main/func_02045280.c:
 src/main/func_0204529c.legacy.c:
     complete
     .text start:0x0204529c end:0x020452c4
-src/main/func_020452c4.s:
+src/main/func_020452c4.c:
     complete
     .text start:0x020452c4 end:0x020453b4
 

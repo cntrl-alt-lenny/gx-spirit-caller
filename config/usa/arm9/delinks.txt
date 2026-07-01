@@ -4987,7 +4987,7 @@ src/usa/main/func_0204524c.legacy.c:
     complete
     .text start:0x0204524c end:0x02045274
 
-src/usa/main/func_02045274.s:
+src/usa/main/func_02045274.c:
     complete
     .text start:0x02045274 end:0x02045364
 src/usa/main/func_02045364.c:
