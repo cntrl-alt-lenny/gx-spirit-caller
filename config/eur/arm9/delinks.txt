@@ -4874,7 +4874,7 @@ src/main/func_02029f74.s:
     complete
     .text start:0x02029f74 end:0x0202a1cc
 
-src/main/func_0202a1cc.s:
+src/main/func_0202a1cc.c:
     complete
     .text start:0x0202a1cc end:0x0202a240
 

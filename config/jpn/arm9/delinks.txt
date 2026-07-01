@@ -2776,7 +2776,7 @@ src/jpn/main/func_02029cec.s:
 src/jpn/main/func_02029f20.s:
     complete
     .text start:0x02029f20 end:0x0202a178
-src/jpn/main/func_0202a178.s:
+src/jpn/main/func_0202a178.c:
     complete
     .text start:0x0202a178 end:0x0202a1ec
 src/jpn/main/func_0202a228.s:
