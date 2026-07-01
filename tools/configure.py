@@ -18,6 +18,7 @@ Usage:
 import argparse
 import hashlib
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -1162,6 +1163,47 @@ def add_mwcc_builds(
         n.newline()
 
 
+# Matches a TU declaration header in delinks.txt — same shape as
+# patch_section_align.py's own `_DELINKS_TU_HEADER_RE` (kept as an
+# independent copy rather than an import: this is configure.py's own
+# ninja-graph concern — which files ninja should watch — not the
+# patcher's concern of what to read once invoked; the two tools stay
+# decoupled at the module level). Example matching shape:
+#
+#     src/main/func_02023478.s:
+#         complete
+#         .text start:0x02023478 end:0x020234f8
+_DELINKS_TU_HEADER_RE = re.compile(
+    r"^(?P<path>[^\s:#][^\s:]*\.[csS](?:pp)?):\s*$", re.MULTILINE,
+)
+
+
+def _index_delinks_by_source(delinks_files: list[str]) -> dict[str, str]:
+    """Map every TU source path declared across `delinks_files` to the
+    ONE delinks.txt that declares it.
+
+    Used to scope each `.s` build edge's implicit deps down to just
+    its own module's delinks.txt instead of the whole-project list
+    (see `add_mwasm_builds`). Safe to rely on: `patch_section_align.py`
+    already documents the invariant this needs — each `.s` file is
+    referenced exactly once in exactly one delinks.txt project-wide
+    (see its `_lookup_delinks_slot_size` docstring) — so the other
+    delinks.txt files' content cannot affect any given TU's build.
+
+    Pure function; does its own I/O reading `delinks_files` once.
+    """
+    index: dict[str, str] = {}
+    for delinks_path in delinks_files:
+        try:
+            with open(delinks_path, encoding="utf-8") as f:
+                text = f.read()
+        except OSError:
+            continue
+        for m in _DELINKS_TU_HEADER_RE.finditer(text):
+            index[m.group("path").replace("\\", "/")] = delinks_path
+    return index
+
+
 def add_mwasm_builds(
     n: ninja_syntax.Writer, project: Project, mwasm_implicit: list,
 ):
@@ -1170,13 +1212,41 @@ def add_mwasm_builds(
     No m2ctx / scratch-context sibling here (unlike the C path) —
     decomp.me's asm scratches are fed the extracted disassembly
     directly, not a preprocessed source file, so there's nothing
-    useful to preprocess from a hand-written .s file."""
-    for source_file in get_asm_files(
-            [src_path, libs_path], region=project.game_version):
+    useful to preprocess from a hand-written .s file.
+
+    Each file's implicit deps are scoped to just the ONE delinks.txt
+    that documents it (`_index_delinks_by_source`), instead of ALL of
+    `project.delinks_files` (every delinks.txt in the region — one per
+    module, ~27 for EUR). Before this change, editing a single
+    module's delinks.txt (e.g. flipping one C-match candidate .s ->
+    .c) marked every remaining `.s` build edge in the ENTIRE project
+    stale, not just that module's own files — see
+    docs/research/speed/buildcost-analysis.md for the full trace and
+    docs/research/speed/optimization1-implementation.md for this fix.
+    `mwasm_implicit` (ASM + patch_align + the FULL delinks list, as
+    built by the caller) is kept and used only as a per-file fallback
+    for any `.s` this index can't place — correctness never regresses
+    even if a real-world tree hits an edge case the index misses; only
+    that one file's speed win is forfeited.
+    """
+    full_delinks = list(project.delinks_files)
+    base_implicit = mwasm_implicit[:len(mwasm_implicit) - len(full_delinks)]
+    delinks_index = _index_delinks_by_source(full_delinks)
+
+    source_files = list(get_asm_files(
+        [src_path, libs_path], region=project.game_version))
+    scoped_count = 0
+    for source_file in source_files:
         src_obj_path = project.game_build / source_file
+        scoped_delinks = delinks_index.get(str(source_file).replace("\\", "/"))
+        if scoped_delinks is not None:
+            implicit = base_implicit + [scoped_delinks]
+            scoped_count += 1
+        else:
+            implicit = mwasm_implicit
         n.build(
             inputs=str(source_file),
-            implicit=mwasm_implicit,
+            implicit=implicit,
             rule="mwasm",
             outputs=str(src_obj_path.with_suffix(".o")),
             variables={
@@ -1187,6 +1257,16 @@ def add_mwasm_builds(
             },
         )
         n.newline()
+
+    if source_files:
+        print(
+            f"mwasm dependency scoping ({project.game_version}): "
+            f"{scoped_count}/{len(source_files)} .s files scoped to a "
+            f"single delinks.txt "
+            f"({len(source_files) - scoped_count} fell back to the "
+            f"full {len(full_delinks)}-file list)",
+            file=sys.stderr,
+        )
 
 
 # Known regions for per-region source-tree filtering. A path
