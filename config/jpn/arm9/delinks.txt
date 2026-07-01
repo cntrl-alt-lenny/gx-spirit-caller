@@ -4039,7 +4039,7 @@ src/jpn/main/func_02036260.s:
 src/jpn/main/func_02036424.c:
     complete
     .text start:0x02036424 end:0x02036474
-src/jpn/main/func_02036474.s:
+src/jpn/main/func_02036474.c:
     complete
     .text start:0x02036474 end:0x02036534
 src/jpn/main/func_02036534.c:

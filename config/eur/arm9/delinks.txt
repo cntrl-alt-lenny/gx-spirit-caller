@@ -7019,7 +7019,7 @@ src/main/func_02036474.c:
     complete
     .text start:0x02036474 end:0x020364c4
 
-src/main/func_020364c4.s:
+src/main/func_020364c4.c:
     complete
     .text start:0x020364c4 end:0x02036584
 
