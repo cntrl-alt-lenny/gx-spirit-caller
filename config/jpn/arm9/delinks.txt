@@ -530,7 +530,7 @@ src/jpn/main/func_02008bf4.s:
 src/jpn/main/func_02008bf8.s:
     complete
     .text start:0x02008bf8 end:0x02008c68
-src/jpn/main/func_02008c68.s:
+src/jpn/main/func_02008c68.c:
     complete
     .text start:0x02008c68 end:0x02008cb8
 src/jpn/main/func_02008cb8.c:
