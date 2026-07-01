@@ -2502,7 +2502,7 @@ src/usa/main/func_0202252c.s:
 src/usa/main/func_02022560.s:
     complete
     .text start:0x02022560 end:0x020225b4
-src/usa/main/func_020225b4.s:
+src/usa/main/func_020225b4.c:
     complete
     .text start:0x020225b4 end:0x020225f0
 src/usa/main/func_020225f0.s:
