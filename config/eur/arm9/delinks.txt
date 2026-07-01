@@ -721,7 +721,7 @@ src/main/func_02005240.s:
     complete
     .text start:0x02005240 end:0x02005298
 
-src/main/func_02005298.s:
+src/main/func_02005298.c:
     complete
     .text start:0x02005298 end:0x02005374
 
