@@ -3196,7 +3196,7 @@ src/usa/main/func_0202e204.c:
     complete
     .text start:0x0202e204 end:0x0202e21c
 
-src/usa/main/func_0202e21c.s:
+src/usa/main/func_0202e21c.c:
     complete
     .text start:0x0202e21c end:0x0202e274
 src/usa/main/func_0202e274.c:

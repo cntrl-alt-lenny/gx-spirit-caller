@@ -5590,7 +5590,7 @@ src/main/func_0202e258.c:
 
 
 
-src/main/func_0202e270.s:
+src/main/func_0202e270.c:
     complete
     .text start:0x0202e270 end:0x0202e2c8
 
