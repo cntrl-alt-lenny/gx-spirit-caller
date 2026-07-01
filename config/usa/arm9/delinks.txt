@@ -1236,7 +1236,7 @@ src/usa/main/func_020147e0.c:
 src/usa/main/func_020148ec.s:
     complete
     .text start:0x020148ec end:0x02014af4
-src/usa/main/func_02014af4.s:
+src/usa/main/func_02014af4.c:
     complete
     .text start:0x02014af4 end:0x02014bc0
 src/usa/main/func_02014bc0.c:
