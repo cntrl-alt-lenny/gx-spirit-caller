@@ -4016,7 +4016,7 @@ src/jpn/main/func_0203587c.s:
 src/jpn/main/func_02035904.s:
     complete
     .text start:0x02035904 end:0x02035fa4
-src/jpn/main/func_02035fa4.s:
+src/jpn/main/func_02035fa4.c:
     complete
     .text start:0x02035fa4 end:0x02036010
 src/jpn/main/func_02036010.c:

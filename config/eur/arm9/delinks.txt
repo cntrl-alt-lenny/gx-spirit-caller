@@ -6991,7 +6991,7 @@ src/main/func_02035954.s:
     complete
     .text start:0x02035954 end:0x02035ff4
 
-src/main/func_02035ff4.s:
+src/main/func_02035ff4.c:
     complete
     .text start:0x02035ff4 end:0x02036060
 
