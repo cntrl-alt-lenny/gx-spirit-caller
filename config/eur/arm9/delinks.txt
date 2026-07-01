@@ -549,7 +549,7 @@ src/main/func_02001dc4.c:
     complete
     .text start:0x02001dc4 end:0x02001ddc
 
-src/main/func_02001ddc.s:
+src/main/func_02001ddc.c:
     complete
     .text start:0x02001ddc end:0x02001e40
 

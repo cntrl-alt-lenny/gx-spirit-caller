@@ -123,7 +123,7 @@ src/usa/main/func_02001d78.s:
 src/usa/main/func_02001da4.s:
     complete
     .text start:0x02001da4 end:0x02001dbc
-src/usa/main/func_02001dbc.s:
+src/usa/main/func_02001dbc.c:
     complete
     .text start:0x02001dbc end:0x02001e20
 src/usa/main/func_02001e20.s:
