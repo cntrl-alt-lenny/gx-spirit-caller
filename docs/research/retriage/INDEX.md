@@ -7,9 +7,69 @@ classified as "intractable" — before the struct/data/constants KB existed.
 Now that the KB explains struct offsets and data table layouts, many of these
 were re-examined to find newly plausible matches.
 
-> Branch: `kb/retriage-r9-containment` (R9 extension — 5 waves, ~195 newly
-> tractable; also folds in R8's ~152, never previously indexed)
+> Branch: `kb/retriage-r10` (R10 extension — +8 newly tractable, but the
+> round's real headline is methodological: discovered the E/F worklist
+> overlaps heavily with a SEPARATE, already-closed GLOBAL_ASM-shipped
+> cohort — see "R10: the campaign's residual pool was mostly already
+> closed" below before assigning R11 batches)
 > Do NOT regenerate — the brain handles the index at merge.
+
+---
+
+## R10: the campaign's residual pool was mostly already closed (read this first)
+
+R10 discovered that **1,350 of the 1,361 E/F functions this index's own
+methodology computed as "residual" after R9 (99.2%) already carry a
+project-level header marking them as deliberately, permanently shipped
+as byte-exact assembly** — the output of `tools/asm_escape.py
+--whole-function` (brief 302), the mechanical endgame for brief 294's
+rigorous reg-alloc-wall scouting effort. This is a **separate campaign
+lane that this retriage index never cross-referenced**: brief 294 (a
+proper survey of the wider CodeWarrior/mwcc decomp scene, concluding no
+reg-alloc-aware C lever exists anywhere) and brief 302 (the tooling that
+mechanically ships that cohort as `.s`) both predate several R7-R9
+retriage rounds, but nobody had diffed the retriage worklist against the
+GLOBAL_ASM-shipped file set until R10's `main` batch stumbled onto it
+mid-examination.
+
+**Practical effect:** of `main`'s 50 assigned + ov002's 50 assigned +
+ov004/ov006/ov008's 50 assigned addresses this round (150 total), **145
+(97%)** already carried the marker. Excluding everything already
+GLOBAL_ASM-shipped, the campaign's **TRUE remaining never-examined E/F
+pool, across the entire game, is only ~11 addresses** (not the
+thousands implied by the raw worklist minus retriage-doc-mentions
+calculation this index has used through R9) — 7 in ov002, 3 in ov008,
+1 in `main`. R10 examined all 11 directly (folded into the per-module
+docs below).
+
+**A second, distinct marker family was also found and must not be
+conflated with the first**: several functions (including all of this
+round's genuine upgrades) instead carry an EARLIER `"brief 207/202/204
+C-34 candidate"` header — a purely mechanical build-tooling
+classification (a literal-pool trim-protect bug workaround in
+`patch_section_align.py`, see `docs/research/brief-207-c34-c35-rescan-
+drain.md`), **not** a reg-alloc-wall claim. C-34-marked functions are
+genuinely untested for C-expressibility, unlike GLOBAL_ASM-marked ones.
+Always check which marker (if either) a target carries before rendering
+a verdict — `grep -l "GLOBAL_ASM\|whole-function ship-as-.s"` vs
+`grep -l "C-34 candidate"` on the `.s` file is a one-line, build-free
+check that should happen BEFORE KB cross-referencing, not after.
+
+**What this means for R11 and beyond:** the E/F retriage lane as
+originally scoped (find undocumented-KB-blocked functions in the
+worklist) is now close to exhausted for `main`/ov002/ov004/ov006/ov008 —
+future rounds assigning these modules should expect near-100% marker
+coverage and should pivot to one of: (a) a proper back-edge/register-
+pressure audit of the ~40 marker-carrying "candidate" write-ups R10
+already produced (structural facts are resolved, just needs the
+tractability check the ov002/main sub-agents applied but the ov004/ov008
+ones skipped), (b) the still-fully-unexamined ov006 (20 functions, R10's
+sub-agent hit a rate limit before starting), or (c) other overlays not
+yet checked against the GLOBAL_ASM cohort at all. See
+`docs/research/retriage/Ov002EFRetriageR10.md`,
+`MainEFRetriageR10.md`, and `Ov004Ov006Ov008CloseoutR10.md` for full
+detail, and the `[[kb-retriage-rounds]]` memory for the durable version
+of this lesson.
 
 ---
 
@@ -39,6 +99,9 @@ were re-examined to find newly plausible matches.
 | [Ov004Ov006DeepR9.md](Ov004Ov006DeepR9.md) | ov004 (19), ov006 (20) — 4th pass | **38** (97.4%: 29 clean + 10 risk-noted), 1 wall-adjacent | — |
 | [Ov011Ov016Ov010Ov005RetriageR9.md](Ov011Ov016Ov010Ov005RetriageR9.md) | ov005 (15), ov010 (12), ov011 (14), ov016 (17) | **44** (76%), 14 wall | — |
 | [SmallOverlaysRetriageR9.md](SmallOverlaysRetriageR9.md) | 10 small overlays, 52 residual (drained to zero) | **41** (39 clean + 2 nuanced dispatchers), 11 wall | several (inline) |
+| [Ov002EFRetriageR10.md](Ov002EFRetriageR10.md) | ov002 (50 assigned, 40 examined + 5 true-frontier giants) | **3** (2 confirmed + 1 risk-noted), 38 wall, 4 untested (see R10 methodology note above) | ~35 (5 cross-corroborated) |
+| [MainEFRetriageR10.md](MainEFRetriageR10.md) | main (50 residual) | **2** (4%), 48 wall (33 back-edge + 13 call-heavy + 2 branch-tree) | 4 new gaps |
+| [Ov004Ov006Ov008CloseoutR10.md](Ov004Ov006Ov008CloseoutR10.md) | ov004 (14), ov006 (0/20, not reached), ov008 (16) | **3** (ov008 only), 27 candidates pending re-audit (14 ov004 + 13 ov008, all GLOBAL_ASM-marked) | many (inline) |
 
 ---
 
@@ -71,7 +134,35 @@ were re-examined to find newly plausible matches.
 | **R9: ov004 + ov006 (4th pass)** | **+38** | Ov004Ov006DeepR9.md (97.4%) |
 | **R9: ov005 + ov010 + ov011 + ov016** | **+44** | Ov011Ov016Ov010Ov005RetriageR9.md (ov011 outlier: 1/14) |
 | **R9: 10 small overlays (residual drained to zero)** | **+41** | SmallOverlaysRetriageR9.md (39 clean + 2 nuanced dispatchers) |
-| **Grand total** | **~813** | R4 ~330 + R5 +32 + R6 +53 + R7 +51 + R8 +152 + R9 +195 |
+| **R10: ov002 (2 confirmed + 1 risk-noted true-frontier)** | **+3** | Ov002EFRetriageR10.md — 95% of examined already GLOBAL_ASM-shipped |
+| **R10: main (residual)** | **+2** | MainEFRetriageR10.md (4% — 94% already GLOBAL_ASM-shipped) |
+| **R10: ov008 (marker-free subset only)** | **+3** | Ov004Ov006Ov008CloseoutR10.md — 13 more candidates pending re-audit, not counted |
+| **Grand total** | **~821** | R4 ~330 + R5 +32 + R6 +53 + R7 +51 + R8 +152 + R9 +195 + R10 +8 |
+
+> **R10 count: +8 newly tractable — small by design, not by failure.** The
+> real finding is methodological (see the "R10: the campaign's residual
+> pool was mostly already closed" section at the top of this doc): 145 of
+> this round's 150 assigned addresses (97%) already carried a
+> project-level "shipped as verified byte-exact assembly, no C match"
+> marker from a separate, earlier campaign lane (briefs 294/302) that
+> this retriage index never cross-referenced before now. Excluding that
+> cohort, the campaign's true never-examined E/F pool was only ~11
+> addresses across the whole game — R10 examined all of them. A SECOND,
+> different marker family (`"brief 207 C-34 candidate"`, a build-tooling
+> classification unrelated to C-expressibility) was also discovered and
+> must not be conflated with the first. 27 additional ov004/ov008
+> function write-ups (fully KB-resolved, real C sketches) are NOT counted
+> toward this total because their sub-agents didn't check for the
+> GLOBAL_ASM marker before rendering a verdict — they carry over to R11
+> as candidates pending the same back-edge/register-pressure audit the
+> ov002/main sub-agents applied. ov006 (20 functions) was not reached at
+> all. `tools/containment_check.py` was hardened per Task 2 (clean errors
+> confirmed already-correct; added `--addr`/`--module` auto-range-
+> derivation, catching and fixing a genuine ambiguity bug — a bare
+> address can fall inside up to 9 different overlays' reused RAM windows
+> simultaneously).
+> Running total: **~821** confirmed tractable funcs across R4–R10 (not
+> counting the 27 R10 candidates awaiting re-audit).
 
 > **R9 count: +195 newly tractable across 5 waves (ov002, main, ov004+ov006,
 > and two mop-up groups spanning 9 overlays).** Hit rates dropped sharply
@@ -143,6 +234,62 @@ were re-examined to find newly plausible matches.
   offset and audio array stride.
 - **4 conditionals → tractable (R5)**: `func_0204bf44`, `func_0204ca70` (R5 supplementary doc),
   `func_0204c120`, `func_02050054` (same GS+0x464/0x468 gap, now filled).
+
+### R10 (see retriage docs above, and the methodology note at the top of this file)
+
+- **The headline is the GLOBAL_ASM/residual-pool overlap discovery**,
+  detailed at the top of this document — not repeated here.
+- **ov002 (2 confirmed + 1 risk-noted upgrade, 38 wall, 4 untested):**
+  both confirmed upgrades (`0x021ae70c` — a 24-byte veneer wildly smaller
+  than its 1776B heuristic claim; `0x021b43a4` — a clean 3-way dispatch)
+  were marker-free functions the brief-302 bulk sweep never touched. A
+  third address (`0x02247b6c`, one of the 5 true-frontier giants) is a
+  genuine state-enum dispatcher, not a card-ID ladder — risk-noted
+  tractable. The other 4 giants are explicitly downgraded from an
+  earlier draft's "qualified wall" to **UNTESTED**: they carry the
+  unrelated C-34 build-tooling marker, and struct-family overlap with
+  the confirmed-wall cohort is not the same as a tested verdict — 2 of
+  the 4 are functions brief 207 itself explicitly never shipped.
+- **main (2/50, 4%):** the sub-agent independently rediscovered the
+  GLOBAL_ASM overlap and, rather than trust the marker blindly, ran a
+  scripted back-edge check plus a full manual read on all 50 files —
+  33 genuine loop back-edges, 13 no-back-edge-but-call-heavy, 2
+  no-back-edge-pure-branch-tree, and exactly 2 zero-back-edge functions
+  independently named by `GlobalData02102c7c.md`'s own pointer-table
+  dispatch pattern. This is the calibration baseline the rest of R10
+  measures against: ~95% of marker-carrying functions hold up as
+  genuine walls when actually checked.
+- **ov004 (0/14 counted) + ov008 (3/16 counted):** both sub-agents
+  produced thorough, KB-grounded analysis but neither checked the
+  marker before rendering a verdict — ov004 is 100% GLOBAL_ASM-marked
+  (0 counted, all 14 carried over as candidates), ov008 is 81% marked
+  (only its 3 marker-free functions counted; the other 13, including a
+  claimed overturn of an original `tract=never` tag on a 2868B/71-call
+  function, carry over as high-value but unverified candidates — a
+  large call-dense body is the LEAST likely marker false-positive
+  category per main's own calibration, not the most, so that specific
+  claim deserves particular scrutiny in R11).
+- **ov006: not reached** — rate-limited before any content was produced;
+  a context-gathering pass (skimming R6/R8's existing recipes) completed
+  and is preserved for whichever round picks the module back up.
+- **New tooling:** `tools/containment_check.py` hardened — (a) clean
+  missing-file errors and (c) AVALANCHE escaping-run-offset printing were
+  already correct from R9 and needed no change; (b) `--addr`/`--module`
+  auto-range-derivation was genuinely added, and validating it surfaced
+  a real ambiguity bug (a bare address can fall inside multiple
+  overlays' delinked ranges simultaneously — quantified at up to 9
+  overlays for one specific address — now resolved with a clean
+  disambiguation error rather than a silent wrong guess).
+- **Operational note:** three independently-spawned sub-agents this
+  round initially violated an explicit "do not delegate further, work
+  directly" instruction and spawned their own nested children anyway —
+  see [[nested-agent-notification-routing]]. Unlike the prior round, the
+  nested children's work was NOT wasted (their findings, including the
+  GLOBAL_ASM discovery itself, arrived as root-routed notifications and
+  were harvested directly), but two of the three top-level agents needed
+  an explicit corrective message before they stopped waiting and either
+  wrote their own file directly (`main`) or the orchestrator synthesized
+  the result itself (`ov002`, this closeout doc).
 
 ### R9 Overlays (see retriage docs above)
 
@@ -254,6 +401,9 @@ were re-examined to find newly plausible matches.
 | ov011 actor-struct fields `+0x21c..+0x288` (extended) | documented, not yet unblocking | Ov011Deep.md (inline; not folded into a types/ doc) | resolved fields didn't unlock the 3 dispatch funcs — walled by topology, not facts |
 | ov000 `021abe64`/`021abec8` packed-field struct, `data_ov000_021b56b4` wide row | documented, not yet unblocking | Ov000Deep.md (inline; not folded into a types/ doc) | needs dedicated struct doc + full-row survey before it unlocks anything |
 | R8/R9 new fields (~40+, across ov009/ov012/ov002/main/ov004/ov006/ov005/ov010/ov016/etc.) | documented, not yet folded | inline in each round's own retriage doc only | mixed confidence — a handful corroborated 2-3× across independent function sites within R8+R9 (e.g. `data_02104bac+0x52` flagged in both `SmallOverlaysRetriageR8.md` and this round's ov009 doc; `data_ov012_021cc6a0[0x19c]` and `data_02104bac[0x54]` each corroborated 2× across independent ov012 functions within `SmallOverlaysRetriageR9.md`), most single-site; needs a dedicated fold-in pass into `types/`/`data/`/`constants/` docs before promotion, same as R7's ov000/ov011 residue above |
+| `GlobalData02102c7c+0x000` (mode-selector flag) | corroborated 2× (R10) | inline in `MainEFRetriageR10.md` | 2 independent sites (`0x02003b18`, `0x02003c68`), both reading it identically; doesn't block either upgrade, would extend the canonical doc's own evidence table |
+| `data_ov002_022cd73c+0x4` | corroborated **4×** (R10) | inline in `Ov002EFRetriageR10.md` | strongest single promotion candidate this round — always read identically across `021cb584`/`021cbb74`/`021cc258`/`021ccd78` |
+| R10 new fields (~35 ov002 + ~30 ov004/ov008, most single-site) | documented, not yet folded | inline in each round's own retriage doc only | same precedent as R8/R9 above; unusually high volume this round because the closeout sub-agents' analysis (though not counted toward the tractable total, see the R10 methodology note) still surfaced genuine new struct facts independent of the marker-verdict question |
 
 ---
 
