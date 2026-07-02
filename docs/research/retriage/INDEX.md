@@ -7,7 +7,8 @@ classified as "intractable" — before the struct/data/constants KB existed.
 Now that the KB explains struct offsets and data table layouts, many of these
 were re-examined to find newly plausible matches.
 
-> Branch: `kb/retriage-r7` (R7 extension — 10 more overlays, 51 newly tractable)
+> Branch: `kb/retriage-r9-containment` (R9 extension — 5 waves, ~195 newly
+> tractable; also folds in R8's ~152, never previously indexed)
 > Do NOT regenerate — the brain handles the index at merge.
 
 ---
@@ -29,6 +30,15 @@ were re-examined to find newly plausible matches.
 | [SmallOverlaysRetriageR7.md](SmallOverlaysRetriageR7.md) | ov001/007/013/018/021/022 (28 funcs) | **20** | 4 new smull reciprocals (→ OverlayConstantsExtended.md); ~15 new data globals |
 | [Ov000Deep.md](Ov000Deep.md) | ov000 (26 residual, only 8/32 examined before R7) | **2** | 8 gaps flagged (VRAM descriptors, unnamed bitfield struct); mostly reconfirms genuine wall |
 | [Ov011Deep.md](Ov011Deep.md) | ov011 (19 residual, only 8/27 examined before R7) | **5** | actor-struct field table extension (+0x21c..+0x288); 7 new data globals |
+| [MainEFRetriageR8.md](MainEFRetriageR8.md) | main (35 residual, never examined before R8) | **35** (100%) | none — fully KB-resolved |
+| [Ov002EFRetriageR8.md](Ov002EFRetriageR8.md) | ov002 (35 residual, never examined before R8) | **35** (100%; 31 clean + 4 conditional-with-caveats) | — |
+| [Ov004Ov006DeepR8.md](Ov004Ov006DeepR8.md) | ov004 (15), ov006 (15) — 3rd pass | **30** (100%) | 7 new gaps (inline) |
+| [SmallOverlaysRetriageR8.md](SmallOverlaysRetriageR8.md) | 10 small overlays, 60 residual | **52** (87%), 8 confirmed wall | several (inline) |
+| [Ov002EFRetriageR9.md](Ov002EFRetriageR9.md) | ov002 (50 residual) | **38** (76%), 12 wall | 6 new gaps (inline) |
+| [MainEFRetriageR9.md](MainEFRetriageR9.md) | main (50 residual) | **34** (68%), 16 wall (7 R4-reconfirmed + 9 new) | 20 new gaps (inline) |
+| [Ov004Ov006DeepR9.md](Ov004Ov006DeepR9.md) | ov004 (19), ov006 (20) — 4th pass | **38** (97.4%: 29 clean + 10 risk-noted), 1 wall-adjacent | — |
+| [Ov011Ov016Ov010Ov005RetriageR9.md](Ov011Ov016Ov010Ov005RetriageR9.md) | ov005 (15), ov010 (12), ov011 (14), ov016 (17) | **44** (76%), 14 wall | — |
+| [SmallOverlaysRetriageR9.md](SmallOverlaysRetriageR9.md) | 10 small overlays, 52 residual (drained to zero) | **41** (39 clean + 2 nuanced dispatchers), 11 wall | several (inline) |
 
 ---
 
@@ -52,7 +62,41 @@ were re-examined to find newly plausible matches.
 | **R7: ov001/007/013/018/021/022 (small)** | **+20** | SmallOverlaysRetriageR7.md |
 | **R7: ov000 deep (residual)** | **+2** | Ov000Deep.md |
 | **R7: ov011 deep (residual)** | **+5** | Ov011Deep.md |
-| **Grand total** | **~466** | R4 ~330 + R5 +32 + R6 +53 + R7 +51 |
+| **R8: main (residual)** | **+35** | MainEFRetriageR8.md (100% of examined) |
+| **R8: ov002 (residual)** | **+35** | Ov002EFRetriageR8.md (100%; 4 conditional-with-caveats) |
+| **R8: ov004 + ov006 (3rd pass)** | **+30** | Ov004Ov006DeepR8.md (100%) |
+| **R8: 10 small overlays** | **+52** | SmallOverlaysRetriageR8.md (87% of 60 examined) |
+| **R9: ov002 (residual)** | **+38** | Ov002EFRetriageR9.md (76% — genuine hard tier reached) |
+| **R9: main (residual)** | **+34** | MainEFRetriageR9.md (68% — genuine hard tier reached) |
+| **R9: ov004 + ov006 (4th pass)** | **+38** | Ov004Ov006DeepR9.md (97.4%) |
+| **R9: ov005 + ov010 + ov011 + ov016** | **+44** | Ov011Ov016Ov010Ov005RetriageR9.md (ov011 outlier: 1/14) |
+| **R9: 10 small overlays (residual drained to zero)** | **+41** | SmallOverlaysRetriageR9.md (39 clean + 2 nuanced dispatchers) |
+| **Grand total** | **~813** | R4 ~330 + R5 +32 + R6 +53 + R7 +51 + R8 +152 + R9 +195 |
+
+> **R9 count: +195 newly tractable across 5 waves (ov002, main, ov004+ov006,
+> and two mop-up groups spanning 9 overlays).** Hit rates dropped sharply
+> for ov002 (76%) and main (68%) — the first sub-R7-level rates since R4 —
+> confirming the campaign is now reaching genuinely hard residue rather than
+> merely-undocumented KB gaps (main's doc explicitly re-confirms 7 of its 16
+> walls against R4 precedent). ov004/ov006's 4th pass still ran 97.4% — KB
+> maturity for a well-covered module keeps paying off long after the
+> "obvious" funcs are gone. The ov005/ov010/ov011/ov016 wave surfaced a
+> stark within-wave contrast: ov011 (1/14) had already absorbed a full R7
+> deep pass, while its three neighbors were genuinely fresh territory and
+> hit near-100%. The 10-small-overlay mop-up drained its residual to zero,
+> closing ov021/ov018/ov000 as fully-confirmed wall (byte-for-byte
+> re-verification of prior rounds' own claims) alongside two large
+> dispatcher functions (ov012 `021cb49c`, ov013 `021ca7cc`) resolved with a
+> per-case verdict instead of one flat call.
+> Running total: **~813** confirmed tractable funcs across R4 + R5 + R6 +
+> R7 + R8 + R9.
+
+> **R8 count: +152 newly tractable (35 main + 35 ov002 + 30 ov004/ov006 +
+> 52 of 10 small overlays).** main/ov002/ov004+ov006 all ran at or near
+> 100% — R7's KB-maturity trend continued unbroken. The 10-small-overlay
+> batch was the first sub-100% "small overlays" round (87%, 8 confirmed
+> wall) — an early signal, later confirmed by R9's follow-up mop-up, that
+> the small-overlay tier was approaching its genuine floor.
 
 > **R7 count: +51 newly tractable across 10 overlays.** ov017/ov019 (never
 > examined before) ran 24/24 = 100% tractable — the highest hit rate of any
@@ -99,6 +143,59 @@ were re-examined to find newly plausible matches.
   offset and audio array stride.
 - **4 conditionals → tractable (R5)**: `func_0204bf44`, `func_0204ca70` (R5 supplementary doc),
   `func_0204c120`, `func_02050054` (same GS+0x464/0x468 gap, now filled).
+
+### R9 Overlays (see retriage docs above)
+
+- **ov002 + main residual (76% / 68%):** the first sub-R7-level hit rates
+  since R4 — both docs explicitly re-confirm several walls against R4
+  precedent (main: 7 of 16) instead of discovering new KB gaps, meaning
+  these batches are the campaign's first genuinely-representative sample of
+  the *remaining* hard tier rather than a backlog of merely-undocumented KB
+  gaps. One contested verdict (`0x020970a8`) was initially claimed
+  tractable by an internal sub-batch, then reverted to wall after
+  cross-referencing brief 271's "6/23 are clean shells" caveat plus a
+  direct `.s` re-read. Conversely `0x022640F4` (ov002) was found listed as
+  BOTH an intractable-prose entry AND a tractable-summary-table entry
+  within R4 itself — resolved tractable on fresh read.
+- **ov004 + ov006 (4th pass, 97.4%):** still finding clean recipes this
+  deep into an already-well-covered module — KB maturity compounds.
+- **ov005 / ov010 / ov011 / ov016 mop-up:** ov005 (15/15), ov010 (11/12),
+  ov016 (17/17) were genuinely fresh residual and hit near-100%; **ov011
+  (1/14) is the outlier** — it already absorbed a full deep pass in R7
+  (`Ov011Deep.md`), so this batch is its *second* hard layer, not its
+  first.
+- **10-small-overlay mop-up (residual drained to zero):** ov009/ov003/ov014
+  100%; ov021 (0/5), ov018 (0/1), ov000 (0/2) all independently
+  byte-for-byte re-confirmed as genuine wall, matching prior rounds' own
+  verdicts exactly; ov012's `021cb49c` (2584 B, 11-way dispatcher) and
+  ov013's `021ca7cc` (18-case dispatcher) each got a **per-case verdict**
+  instead of one flat call — several cases ship-clean today, others are
+  gap-flagged (unresolved raw `.word` `bl` callee symbols, not scheduling
+  walls), and exactly one sub-block in each is a confirmed wall
+  cross-referenced to an existing dossier.
+- **New tooling:** [`tools/containment_check.py`](../../../tools/containment_check.py)
+  (Task 2, this round) diffs `build/<ver>/build/arm9.bin` against
+  `extract/<ver>/arm9/arm9.bin` inside a candidate's delinked address range
+  to classify a sha1 failure as CONTAINED (byte diff stays inside the
+  range — normal C-shaping miss, keep iterating) vs AVALANCHE (diff spills
+  outside — link/layout perturbation, park immediately). Build-free to
+  write; validated against brief-514's own ground-truth dataset.
+- **KB gaps:** ~40 new fields/tables flagged across this round's docs (raw
+  `.word` `bl` callee-symbol gaps cluster in ov002's `0x021b12xx`–
+  `0x021b1dxx` range and need a decomper with `dsd`/objdump access to
+  resolve). Documented inline per-file only this round, consistent with
+  R7's precedent for high-volume/variable-confidence gap sets — see
+  "KB Gaps: Status" below.
+
+### R8 Overlays (see retriage docs above)
+
+- **main + ov002 + ov004/ov006 (all ~100%):** continued R7's KB-maturity
+  trend without interruption — every residual func in these 3 docs (100
+  combined) resolved to a deterministic struct/literal/callee shape.
+- **10-small-overlay batch (87%, 8 wall):** the first "small overlays"
+  round to land under 100% — an early signal (later confirmed by R9's
+  follow-up mop-up) that the small-overlay tier was approaching its
+  genuine floor rather than still being gated by KB gaps.
 
 ### R7 Overlays (see retriage docs above)
 
@@ -156,6 +253,7 @@ were re-examined to find newly plausible matches.
 | smull reciprocals 0xb60b60b7 (÷360), 0x2aaaaaab (÷48), 0x38e38e39 (÷72), 0x88888889 (postshift-dependent ÷15/30/60) | ✅ **DOCUMENTED (R7)** | OverlayConstantsExtended.md | ov001, ov018, ov021, ov022 magic-divide funcs |
 | ov011 actor-struct fields `+0x21c..+0x288` (extended) | documented, not yet unblocking | Ov011Deep.md (inline; not folded into a types/ doc) | resolved fields didn't unlock the 3 dispatch funcs — walled by topology, not facts |
 | ov000 `021abe64`/`021abec8` packed-field struct, `data_ov000_021b56b4` wide row | documented, not yet unblocking | Ov000Deep.md (inline; not folded into a types/ doc) | needs dedicated struct doc + full-row survey before it unlocks anything |
+| R8/R9 new fields (~40+, across ov009/ov012/ov002/main/ov004/ov006/ov005/ov010/ov016/etc.) | documented, not yet folded | inline in each round's own retriage doc only | mixed confidence — a handful corroborated 2-3× across independent function sites within R8+R9 (e.g. `data_02104bac+0x52` flagged in both `SmallOverlaysRetriageR8.md` and this round's ov009 doc; `data_ov012_021cc6a0[0x19c]` and `data_02104bac[0x54]` each corroborated 2× across independent ov012 functions within `SmallOverlaysRetriageR9.md`), most single-site; needs a dedicated fold-in pass into `types/`/`data/`/`constants/` docs before promotion, same as R7's ov000/ov011 residue above |
 
 ---
 
