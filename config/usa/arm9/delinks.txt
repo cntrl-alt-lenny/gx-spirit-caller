@@ -1257,7 +1257,7 @@ src/usa/main/func_020152b8.s:
 src/usa/main/func_02015460.s:
     complete
     .text start:0x02015460 end:0x02015604
-src/usa/main/func_02015604.s:
+src/usa/main/func_02015604.c:
     complete
     .text start:0x02015604 end:0x020157a0
 src/usa/main/func_020157a0.s:

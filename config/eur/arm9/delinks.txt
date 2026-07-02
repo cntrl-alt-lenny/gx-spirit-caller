@@ -2190,7 +2190,7 @@ src/main/func_02015494.s:
     complete
     .text start:0x02015494 end:0x02015638
 
-src/main/func_02015638.s:
+src/main/func_02015638.c:
     complete
     .text start:0x02015638 end:0x020157d4
 
