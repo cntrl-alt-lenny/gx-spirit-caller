@@ -1261,7 +1261,7 @@ src/jpn/main/func_02015460.s:
 src/jpn/main/func_02015604.c:
     complete
     .text start:0x02015604 end:0x020157a0
-src/jpn/main/func_020157a0.s:
+src/jpn/main/func_020157a0.c:
     complete
     .text start:0x020157a0 end:0x02015940
 src/jpn/main/func_02015940.s:
