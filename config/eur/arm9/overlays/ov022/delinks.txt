@@ -8,7 +8,7 @@ src/overlay022/func_ov022_021aa4a0.s:
     complete
     .text start:0x021aa4a0 end:0x021aa540
 
-src/overlay022/func_ov022_021aa540.s:
+src/overlay022/func_ov022_021aa540.c:
     complete
     .text start:0x021aa540 end:0x021aa680
 
