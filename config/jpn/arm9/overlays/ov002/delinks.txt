@@ -6013,7 +6013,7 @@ src/jpn/overlay002/func_ov002_0227d73c.c:
     complete
     .text start:0x0227d73c end:0x0227d760
 
-src/jpn/overlay002/func_ov002_0227d760.s:
+src/jpn/overlay002/func_ov002_0227d760.c:
     complete
     .text start:0x0227d760 end:0x0227d7d4
 src/jpn/overlay002/func_ov002_0227d918.s:
