@@ -7,3 +7,7 @@
 src/jpn/overlay022/bss/data_ov022_bss.s:
     complete
     .bss start:0x021ab9c0 end:0x021acb60
+
+src/jpn/overlay022/func_ov022_021aa460.c:
+    complete
+    .text start:0x021aa460 end:0x021aa5a0
