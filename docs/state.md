@@ -35,7 +35,18 @@ sha1-proven `.c` from `bd74e172^` (+ reconfigure) → JPN green. **LESSON
 can mask missing-source breaks; the brain's clean-tree 3-region gate is the
 only reliable arbiter. Also: a port wave's commit should never delete files
 outside its stated scope — watch for neighbor-sweep in `git add -A` commits.**
-_(Metrics below.)_
+**Metrics (post b515-518, FRESH — first accurate USA/JPN numbers since June):**
+EUR units **99.11%** / fn **98.72%** / code **97.50%** — endgame. **USA units
+89.08% / fn 76.21% / code 49.17%; JPN units 88.63% / fn 74.83% / code 48.10%**
+(vs stale June 72/38/14 — the PC arc's completed `.s` drain + port waves are now
+measured). ⚠️ USA/JPN reports were BLOCKED by a NEW objdiff-cli panic variant
+(arm.rs:130 `len 1/idx -1`): a gap TU with data-FIRST `.text` (`BuildInfo` OBJECT
+at 0x0 before `main` FUNC, no mapping symbols — USA `_dsd_gap@main_202.o`).
+Brain shipped **objdiff_filter_panic_units v3** (drop data-first `.text` units;
++ regression test; 16/16 pass) — the brief-187 filter's third variant. JPN's
+pipeline also dropped 759 case-B (planned-uncompiled routing-tier) units this
+run vs USA's 1, so cross-region unit TOTALS differ slightly this round;
+restabilizes on the next standard end-to-end report.
 
 ---
 **Prior (briefs 476+477 merge, 2026-06-23):** **#1016 decomper = 710 USA/JPN overlay `.s`** (ov006

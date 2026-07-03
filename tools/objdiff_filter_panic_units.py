@@ -239,11 +239,34 @@ def has_addressable_text_code(elf_path: Path) -> bool:
     # unit as having addressable code.
     if symtab_size % SYMBOL_ENTRY_SIZE != 0:
         return False
+    # v3 (2026-07-03): track BOTH whether any sized FUNC exists in
+    # `.text` (the v2 rule) AND what type the lowest-offset sized
+    # `.text` symbol is. A second upstream-crash variant surfaced
+    # once the first was filtered:
+    #
+    #     thread '<unnamed>' panicked at objdiff-core/src/arch/arm.rs:130:29:
+    #     index out of bounds: the len is 1 but the index is 18446744073709551615
+    #
+    # ("len is 1" this time, not 0.) Trigger: a gap TU whose `.text`
+    # STARTS with a sized STT_OBJECT data blob (offset 0) followed by
+    # a real FUNC — e.g. USA `_dsd_gap@main_202.o` = `BuildInfo`
+    # (OBJECT, 0x0..0xcc) + `main` (FUNC, 0xcc..0xdc) — with NO ARM
+    # mapping symbols ($a/$d) anywhere. The v2 rule kept it (a sized
+    # FUNC exists), but objdiff's ARM processor, lacking any mapping
+    # symbol for the leading data region, underflows searching for
+    # the preceding code marker. Data-FIRST `.text` with no mapping
+    # symbols is the crash predictor, so such units are dropped.
+    has_sized_func = False
+    lowest_value: int | None = None
+    lowest_type: int | None = None
     for s_off in range(
         symtab_off, symtab_off + symtab_size, SYMBOL_ENTRY_SIZE,
     ):
         if s_off + SYMBOL_ENTRY_SIZE > len(buf):
             return False
+        st_value = struct.unpack_from(
+            "<I", buf, s_off + ST_VALUE_OFFSET,
+        )[0]
         st_size = struct.unpack_from(
             "<I", buf, s_off + ST_SIZE_OFFSET,
         )[0]
@@ -252,13 +275,18 @@ def has_addressable_text_code(elf_path: Path) -> bool:
         st_shndx = struct.unpack_from(
             "<H", buf, s_off + ST_SHNDX_OFFSET,
         )[0]
-        if (
-            st_shndx == text_section_idx
-            and st_size > 0
-            and st_type == STT_FUNC
-        ):
-            return True
-    return False
+        if st_shndx != text_section_idx or st_size == 0:
+            continue
+        if st_type == STT_FUNC:
+            has_sized_func = True
+        if lowest_value is None or st_value < lowest_value:
+            lowest_value = st_value
+            lowest_type = st_type
+    if not has_sized_func:
+        return False          # v2 rule: no addressable code at all
+    if lowest_type == STT_OBJECT:
+        return False          # v3 rule: data-first .text (arm.rs len-1 crash)
+    return True
 
 
 # Backwards-compat alias — the original brief 187 v1 filter used a

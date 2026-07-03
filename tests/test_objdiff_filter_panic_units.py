@@ -41,7 +41,8 @@ from objdiff_filter_panic_units import (  # noqa: E402
 # Built by hand to avoid pulling in pyelftools — same shape the
 # real filter would accept as "addressable .text code". 0x100 is
 # more than enough room.
-def _make_minimal_arm_elf(*, with_func_symbol: bool) -> bytes:
+def _make_minimal_arm_elf(*, with_func_symbol: bool,
+                          data_first: bool = False) -> bytes:
     # Layout: header (0x34) + section header table (0x80) +
     # .shstrtab + .symtab + .strtab + .text bytes.
     # Section order in shdr table (idx): 0 NULL, 1 .text, 2 .shstrtab,
@@ -50,19 +51,23 @@ def _make_minimal_arm_elf(*, with_func_symbol: bool) -> bytes:
     shstrtab_off = 0x34 + 5 * 0x28  # after header + 5 shdrs
     shstrtab_size = len(shstrtab_names)
 
-    strtab_names = b"\x00func_test\x00"
+    strtab_names = b"\x00func_test\x00data_test\x00"
     strtab_off = shstrtab_off + shstrtab_size
     strtab_size = len(strtab_names)
 
     # symtab: 1 NULL entry + (optionally) 1 STT_FUNC at sh #1 (.text)
+    # + (if data_first) 1 STT_OBJECT preceding the func in .text.
     # ELF32 symbol entry = 16 bytes
-    sym_count = 2 if with_func_symbol else 1
+    sym_count = 1 + (1 if with_func_symbol else 0) + (1 if data_first else 0)
     symtab_off = strtab_off + strtab_size
     symtab_size = sym_count * 16
 
     text_off = symtab_off + symtab_size
-    text_size = 4
-    text_bytes = b"\x00\xf0\x20\xe3"  # ARM `nop`
+    # data_first layout mirrors _dsd_gap@main_202.o: a sized OBJECT
+    # blob at .text:0 followed by the FUNC — no ARM mapping symbols.
+    text_size = 8 if data_first else 4
+    text_bytes = (b"\xde\xad\xbe\xef" + b"\x00\xf0\x20\xe3") if data_first \
+        else b"\x00\xf0\x20\xe3"  # ARM `nop` (+ leading data blob)
 
     total_size = text_off + text_size
     buf = bytearray(total_size)
@@ -124,15 +129,26 @@ def _make_minimal_arm_elf(*, with_func_symbol: bool) -> bytes:
 
     # Symbol table
     # idx 0 — NULL symbol (16 zero bytes — already zeroed)
+    next_sym = symtab_off + 16
+    func_value = 4 if data_first else 0
+    if data_first:
+        # STT_OBJECT data blob at .text:0, size 4 — the v3 crash
+        # variant's leading symbol (BuildInfo analogue).
+        struct.pack_into("<I", buf, next_sym + 0x0, 11)  # st_name → "data_test"
+        struct.pack_into("<I", buf, next_sym + 0x4, 0)   # st_value
+        struct.pack_into("<I", buf, next_sym + 0x8, 4)   # st_size
+        buf[next_sym + 0xC] = 0x11  # st_info: STB_GLOBAL | STT_OBJECT
+        buf[next_sym + 0xD] = 0
+        struct.pack_into("<H", buf, next_sym + 0xE, 1)   # st_shndx → .text
+        next_sym += 16
     if with_func_symbol:
-        # idx 1 — STT_FUNC at .text:0, size 4, bound to section 1
-        sym_base = symtab_off + 16
-        struct.pack_into("<I", buf, sym_base + 0x0, 1)  # st_name → "func_test"
-        struct.pack_into("<I", buf, sym_base + 0x4, 0)  # st_value
-        struct.pack_into("<I", buf, sym_base + 0x8, 4)  # st_size
-        buf[sym_base + 0xC] = 0x12  # st_info: STB_GLOBAL | STT_FUNC
-        buf[sym_base + 0xD] = 0  # st_other
-        struct.pack_into("<H", buf, sym_base + 0xE, 1)  # st_shndx → .text
+        # STT_FUNC in .text, size 4, bound to section 1
+        struct.pack_into("<I", buf, next_sym + 0x0, 1)  # st_name → "func_test"
+        struct.pack_into("<I", buf, next_sym + 0x4, func_value)  # st_value
+        struct.pack_into("<I", buf, next_sym + 0x8, 4)  # st_size
+        buf[next_sym + 0xC] = 0x12  # st_info: STB_GLOBAL | STT_FUNC
+        buf[next_sym + 0xD] = 0  # st_other
+        struct.pack_into("<H", buf, next_sym + 0xE, 1)  # st_shndx → .text
 
     # .text bytes
     buf[text_off:text_off + text_size] = text_bytes
@@ -208,10 +224,12 @@ class TestFilterObjdiffJson(unittest.TestCase):
     def tearDown(self) -> None:
         self.tmpdir.cleanup()
 
-    def _write_unit_o(self, rel_path: str, with_func_symbol: bool = True) -> None:
+    def _write_unit_o(self, rel_path: str, with_func_symbol: bool = True,
+                      data_first: bool = False) -> None:
         p = self.root / rel_path
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_bytes(_make_minimal_arm_elf(with_func_symbol=with_func_symbol))
+        p.write_bytes(_make_minimal_arm_elf(
+            with_func_symbol=with_func_symbol, data_first=data_first))
 
     def _write_objdiff_json(self, units: list[dict]) -> Path:
         p = self.root / "objdiff.json"
@@ -245,6 +263,28 @@ class TestFilterObjdiffJson(unittest.TestCase):
                 "target_path": "build/code_less.o",
                 "base_path": "build/code_less.o",
                 "metadata": {"source_path": "src/code_less.c"},
+            },
+        ])
+        kept, dropped, reasons = filter_objdiff_json(p, project_root=self.root)
+        self.assertEqual(kept, 0)
+        self.assertEqual(dropped, 1)
+        self.assertIn("ARM crash trigger", reasons[0][1])
+
+    def test_drops_unit_with_data_first_text(self) -> None:
+        """Case A, v3 variant (2026-07-03) — `.text` HAS a sized
+        STT_FUNC, but a sized STT_OBJECT sits at the LOWEST offset
+        (data-first `.text`, no mapping symbols). Real example:
+        USA `_dsd_gap@main_202.o` = BuildInfo (OBJECT, 0x0..0xcc) +
+        `main` (FUNC, 0xcc..0xdc) → objdiff-core arm.rs:130 panics
+        with `len is 1, index usize::MAX`. Must drop."""
+        self._write_unit_o("build/data_first.o", with_func_symbol=True,
+                           data_first=True)
+        p = self._write_objdiff_json([
+            {
+                "name": "data_first_unit",
+                "target_path": "build/data_first.o",
+                "base_path": "build/data_first.o",
+                "metadata": {"source_path": "src/data_first.c"},
             },
         ])
         kept, dropped, reasons = filter_objdiff_json(p, project_root=self.root)
