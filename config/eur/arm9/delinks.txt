@@ -5896,7 +5896,7 @@ src/main/func_02031ab0.s:
     complete
     .text start:0x02031ab0 end:0x02031afc
 
-src/main/func_02031afc.s:
+src/main/func_02031afc.c:
     complete
     .text start:0x02031afc end:0x02031b38
 

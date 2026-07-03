@@ -3411,7 +3411,7 @@ src/jpn/main/func_02031a1c.c:
 src/jpn/main/func_02031a5c.s:
     complete
     .text start:0x02031a5c end:0x02031aa8
-src/jpn/main/func_02031aa8.s:
+src/jpn/main/func_02031aa8.c:
     complete
     .text start:0x02031aa8 end:0x02031ae4
 src/jpn/main/func_02031ae4.c:
