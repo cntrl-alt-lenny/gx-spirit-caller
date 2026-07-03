@@ -8,8 +8,37 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-06-23 (Mac, brain on Opus 4.8; agents = codex GPT-5.5-High),
-**post briefs 476+477 merge.** **#1016 decomper = 710 USA/JPN overlay `.s`** (ov006
+**Last updated:** 2026-07-03 (Mac, brain on Fable 5; reconciling after the PC-brain
+arc), **post briefs 515–518 round merge (PRs #1080/#1083/#1084/#1085).** Briefs
+478–518 ran from the PC brain: the `.s` mechanical drain COMPLETED and the campaign
+pivoted to **C-MATCH waves** (shipped `.s` → matching C; HIGH/MED tiers,
+containment-gated, safe-queue work orders — state lives in
+`docs/research/campaign-analytics/` + `retriage/INDEX.md` + per-wave briefs).
+This round: **#1080** decomper 3 retriage `.s`→C + USA/JPN ports (ov000/007/022;
+brain fixed 2 delink inversions); **#1085** scaffolder 3 HIGH `.s`→C + ports
+(75% contained-yield); **#1084** R10 retriage — MAJOR: 1,350/1,361 "unexamined"
+were already GLOBAL_ASM-shipped (true unexamined ≈ 11; retriage frontier ~closed)
++ containment_check.py overlay-disambiguation hardening (brain-reviewed: SAFE,
+fixes a real silent-wrong-overlay bug); **#1083** reshape-recipe catalog (6
+recipes) + safe-queue-v3 (150 never-attempted candidates; fixed a tiebreak
+scoring bug). Next: b519 HIGH w11 (first true v3-queue wave) + b520 MED w7 +
+R10 follow-ups.
+
+⚠️ **LATENT JPN BREAK caught + fixed at this gate (not from these PRs):** `main`
+had been broken for FRESH JPN builds since 2026-06-28 — commit `bd74e172`
+("wave 3 batch 7 ports") accidentally swept 3 address-adjacent JPN `.c` files
+into its deletion (`func_02005be0/0200620c/020062f8`) without reverting their
+delink entries → `mwldarm: Specified file not found` on any clean tree. Every
+"JPN sha1 OK" since rode on STALE incremental `.o`s. Brain restored the 3
+sha1-proven `.c` from `bd74e172^` (+ reconfigure) → JPN green. **LESSON
+(recurring class, cf. b459 stale-.o claim): agent gates on incremental trees
+can mask missing-source breaks; the brain's clean-tree 3-region gate is the
+only reliable arbiter. Also: a port wave's commit should never delete files
+outside its stated scope — watch for neighbor-sweep in `git add -A` commits.**
+_(Metrics below.)_
+
+---
+**Prior (briefs 476+477 merge, 2026-06-23):** **#1016 decomper = 710 USA/JPN overlay `.s`** (ov006
 88+88, ov004 164+164, ov011 103+103 — all 3 overlays drained both regions, 3-region
 green, EUR untouched). **#1015 scaffolder (WINE-FREE, ran parallel, zero contention)
 = fixed the dominant `asm_escape` park class** (disassembly size-overrun: parse_objdump

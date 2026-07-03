@@ -653,12 +653,13 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-**Driver: Mac brain (Opus 4.8). Agents: codex GPT-5.5-High-Effort (validated b475:
-596 clean ships, correct park/bisect discipline).** LANE COUNT FOLLOWS THE MACHINE:
-**Mac** = shared GPTK wineserver → ONE heavy `batch_carve` lane (rest the other
-agent); **PC** = native `mwccarm.exe`, no shared wineserver → dual-lane is fine.
-On Mac the single heavy lane = USA/JPN frontier (decomper); the scaffolder takes a
-WINE-FREE lane (tooling/analysis, no contention).
+**Era: C-MATCH campaign (briefs ~500+).** The mechanical `.s` drain is COMPLETE;
+current lanes convert shipped `.s` → matching C (HIGH/MED tiers, containment-gated,
+safe-queue work orders). Brain alternates Mac/PC; agents = codex GPT-5.5-High or
+Sonnet. LANE-COUNT rule (still true for any HEAVY wine lane like batch_carve):
+**Mac** = one at a time (shared GPTK wineserver); **PC** = dual fine (native
+mwccarm). C-match waves are LIGHT on wine — dual-lane OK on either machine if
+gates are staggered.
 
 📌 **PARKED INITIATIVE — decomp.dev onboarding (issue #1022, draft PR #1020).**
 Researched + fully prepped (Dockerfile + CI workflow + `docs/decomp-dev-setup.md`),
@@ -674,33 +675,41 @@ decomper brief names ONE target (one module, or USA+JPN of one module) and STOPS
 opens its PR after ~150–300 ships. Commit-on-pass means partial progress is always
 safe; a tight wave just lands a clean checkpoint every ~1–2h instead of every ~5h.
 
-- **Brief 478** — `decomper` (codex GPT-5.5-High or Sonnet 4.6).
-  **USA/JPN MAIN `.s` drain — ONE capped wave (b476 drained ov004/006/011 both
-  regions = 710; the overlay tier is thinning, main is the big vein: USA main
-  ~2,288, JPN main ~2,694).** Do **USA main + JPN main, ONE `--limit 150` batch
-  each (~300 ships), then STOP and open the PR** — do NOT chain further (that's
-  what made b476 a 5h marathon). ⚠️ **The b477 `asm_escape` size-overrun fix is now
-  on `main`** (branch fresh to get it) — so **re-attempt the previously-parked JPN
-  main gate-fails `func_020943b0` + `func_020a60a8`** and the size-overrun class;
-  they should now carve clean (the tool now bounds disassembly to the symbols.txt
-  function size). Recipe: `--version <r> --srcdir src/<r>/main --min-addr
-  0x02000000` (default 0x02234000 → 0 main candidates). `--batch 20`,
-  commit-on-pass. **LAST actions: final per-region `ninja sha1` green → push →
-  `gh pr create` → PR URL.** Report shipped + remaining runway. Branch:
-  `decomper/usajpn-sdrain-w7`.
-- **Brief 479** — `scaffolder` (codex GPT-5.5-High or Sonnet 4.6). **WINE-FREE
-  park-autopsy w2 — finish the recoverable classes + prune stale lists.** b477
-  fixed the dominant class (disassembly size-overrun, 8 + the JPN main gate-fails)
-  + censused 20 live non-REFUSE parks. Remaining recoverable classes: **6
-  svc/single-register stack encoding, 4 EUR embedded-table, 2 symbol-name/address
-  mismatch.** Pick the next-dominant fixable class (the 6 svc/single-register),
-  prototype the `asm_escape` fix + **pure-Python comparator unit tests** (no wine).
-  ALSO: **prune the stale verify-fail lists** (b477 found `known_verifyfail_ov002.txt`
-  = 134/134 already-carved) so they stop misleading. **Report whether the autopsy
-  lane is now TAPPED** (if only genuine kind:data REFUSEs remain, the scaffolder
-  pivots next round). ⚠️ Stay wine-free — NO `batch_carve`/`ninja sha1` (zero
-  contention with the decomper). Deliverable: PR with fix + tests + pruned lists +
-  `docs/research/brief-479-park-autopsy-w2.md`. Branch: `scaffolder/park-autopsy-w2`.
+⚠️ **RECONCILED 2026-07-03 (Mac brain, post b515-518 merge).** Briefs **478–518
+ran from the PC brain** (c-match campaign era). Stale Mac-era 478/479 entries
+removed — 478/479 as written were OVERTAKEN (the USA/JPN `.s` mechanical drain
+completed; the campaign pivoted to **C-MATCH waves**: converting shipped `.s` to
+matching C, HIGH/MED tiers, containment-gated). **Campaign state lives in
+`docs/research/campaign-analytics/safe-queue-v3.md` (the 150-candidate work
+order; v2/v3 rows never yet attempted) + `docs/research/retriage/INDEX.md`
+(R10: retriage frontier ~closed — 1,350/1,361 "unexamined" were already
+GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
+`docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
+fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
+
+- **Brief 519** — `scaffolder`. **HIGH c-match wave 11 — the FIRST wave drawn
+  from safe-queue-v3's never-attempted queue.** Take the top HIGH-tier rows
+  from `campaign-analytics/safe-queue-v3.md` (~5-6 attempts), confirm
+  containment per candidate (`tools/containment_check.py`, now with the R10
+  hardening — use the overlay fallback for overlay candidates), reshape via the
+  `contained-reshape-catalog.md` recipes, match EUR then port USA/JPN
+  (`port_to_region.py`; gate = per-region ROM `ninja sha1`, park divergents).
+  Park avalanches/reshape-walls with one-line reasons. Wave doc
+  `brief-519-cmatch-high-w11.md` + regen research README. **LAST actions:
+  3-region sha1 green → push → PR.** Branch: `scaffolder/c-match-high-519`.
+- **Brief 520** — `decomper`. **MED/retriage c-match wave 7 + the R10
+  follow-ups.** (1) Take the top MED/RETRIAGE rows from safe-queue-v3 (b515
+  yield was 3/19 — pick the best-scored, drop fast on reg-alloc walls).
+  (2) From R10: re-audit the **27 pending marker-carrying candidates** (14
+  ov004 + 13 ov008) — verify the GLOBAL_ASM marker's wall claim before
+  attempting (R10 calibration: ~95% hold up; only attempt the ~5% that don't)
+  — and/or the **unexamined ov006 pocket (20 funcs)**. Same gates as 519.
+  Wave doc + regen README. **LAST actions: 3-region sha1 green → push → PR.**
+  Branch: `decomper/c-match-med-520`.
+- ⚠️ Machine note: these c-match waves are LIGHT on wine (a handful of gates
+  per wave, not a batch_carve drain) — dual-lane is fine on either machine;
+  on Mac just avoid running two gates simultaneously (stagger, or
+  `--gate-timeout 600`).
 
 ⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
 Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
