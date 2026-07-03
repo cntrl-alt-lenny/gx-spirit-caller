@@ -42,6 +42,18 @@ Usage:
     # whichever extension delinks.txt currently shows for this TU):
     python tools/containment_check.py eur --candidate src/main/func_02001e5c.c
 
+    # Auto-resolve the range from just a bare address (e.g. straight out of
+    # a worklist row or a retriage doc header) -- no filename needed:
+    python tools/containment_check.py eur --addr 0x02001e5c
+
+    # Overlay addresses are frequently AMBIGUOUS (this game's overlay RAM
+    # windows are reused by overlays that never coexist in memory), so
+    # --addr alone may report multiple candidates and ask for --module:
+    python tools/containment_check.py eur --addr 0x021aa558
+    #   -> ERROR: address 0x021aa558 is AMBIGUOUS -- 9 different TUs ...
+    #        --module ov002 -> [0x021aa558, 0x021ab864) ...
+    python tools/containment_check.py eur --addr 0x021aa558 --module ov002
+
 Options:
     --json          Machine-readable JSON output
     --built PATH    Override the built ARM9 binary path (default:
@@ -52,6 +64,10 @@ Options:
                      "owner" TU for (default 5; owner lookup scans all
                      delinks.txt files, so it's capped to stay cheap on a
                      massive avalanche with 100k+ runs)
+    --module MODULE Only meaningful with --addr. Scopes the delinks.txt
+                     scan to one module ("main", "ov002"/"overlay002"/"2"
+                     all accepted) to disambiguate a bare address that
+                     falls inside multiple overlays' reused RAM windows.
 
 Exit codes:
     0   CONTAINED — every differing byte run is inside the candidate range
@@ -125,6 +141,47 @@ not synthetic data):
     build/arm9.bin` vs `extract/<region>/arm9/arm9.bin` diff on a real
     built candidate — that's exactly what the three commands above are
     for.
+
+R10 hardening — three asks: (a) clean errors on missing build/extract
+binaries, (b) auto-derive a candidate's range from a bare address, (c) on
+AVALANCHE print the escaping diff-run offsets. (a) and (c) were already
+correctly implemented as of R9's original version (see the `built_path.
+is_file()`/`extract_path.is_file()` checks and the `out_of_range_runs`
+printing below) — re-read and confirmed still correct, no change needed.
+(b) was genuinely missing and is the substance of this round's change:
+`--addr`/`_lookup_ranges_by_addr`/`--module`/`_normalize_module`/
+`_iter_delinks_files(module=...)`. Verified build-free, this session,
+against the REAL repo:
+  - `_lookup_ranges_by_addr(0x02001e5c, 'eur')` (a `main` address) returns
+    exactly one hit, `(0x02001e5c, 0x02001e84, 'src/main/func_02001e5c.s')`
+    — matches `_lookup_candidate_range`'s independently-verified result
+    for the same TU verbatim, and resolves correctly from a MID-body
+    address too (`0x02001e60`, not just the TU's own start address).
+  - `_lookup_ranges_by_addr(0x0200a460, 'eur')` (brief 514's CONTAINED
+    case, given as a mid-range address) returns exactly
+    `(0x0200a454, 0x0200a488, 'src/main/func_0200a454.c')` — matches
+    brief 514's documented range for this candidate verbatim.
+  - **Found and fixed a real ambiguity bug while validating**: a naive
+    first-match version of this lookup (no `--module` support) silently
+    returned WHICHEVER overlay's range happened to sort first for an
+    address inside a reused overlay RAM window — e.g. `0x021aa558`
+    resolved to an unrelated `src/overlay000/...` range instead of the
+    intended `src/overlay002/...` one. Quantified: this specific address
+    falls inside **9 different overlays'** delinked ranges simultaneously
+    (ov000/002/005/008/009/018/020/021/022) in EUR — confirmed by scanning
+    the real `config/eur/arm9/overlays/*/delinks.txt` tree. `--module` now
+    resolves this deterministically and an unscoped ambiguous `--addr`
+    reports a clean, actionable error listing every candidate with its
+    `--module` hint rather than silently guessing.
+  - Full CLI exercised end-to-end for: an unambiguous `main` address (no
+    `--module` needed, exit 0), an ambiguous overlay address with no
+    `--module` (clean AMBIGUOUS error, exit 2, all 9 candidates listed),
+    the same address disambiguated via `--module ov002` and via the
+    `--module overlay002` alternate spelling (both resolve identically),
+    a wrong-but-plausible `--module main` for an overlay-only address
+    (clean NOT FOUND error, exit 2), an unrecognized `--module` name
+    (clean error, exit 2), and a bogus address in no delinks.txt at all
+    (clean NOT FOUND error, exit 2).
 """
 from __future__ import annotations
 
@@ -163,11 +220,46 @@ _DELINKS_TEXT_RANGE_RE = re.compile(
 # delinks.txt lookups
 # ---------------------------------------------------------------------------
 
-def _iter_delinks_files(region: str):
+def _normalize_module(module: str) -> str | None:
+    """"ov002" / "overlay002" / "002" / "2" -> "ov002"; "main"/"arm9" ->
+    "main". Returns None if it doesn't look like either shape (caller
+    should then treat the module as unrecognized rather than silently
+    matching nothing)."""
+    m = module.strip().lower()
+    if m in ("main", "arm9"):
+        return "main"
+    m = re.sub(r"^(overlay|ov)", "", m)
+    if m.isdigit():
+        return f"ov{int(m):03d}"
+    return None
+
+
+def _iter_delinks_files(region: str, module: str | None = None):
+    """Yield delinks.txt paths for a region. If `module` is given (e.g.
+    "main", "ov002", "overlay002"), scope to just that module's own
+    delinks.txt instead of every module in the region — needed because
+    this game's overlay RAM windows are reused across overlays that never
+    coexist in memory (see CLAUDE.md's `dsd init` note and
+    docs/research/retriage/kb-retriage-rounds' "same address across
+    overlays is usually coincidental" gotcha), so an unscoped scan can
+    return several unrelated TUs for the same address.
+    """
     config_arm9 = ROOT / "config" / region / "arm9"
     if not config_arm9.is_dir():
         return
-    yield from sorted(config_arm9.rglob("delinks.txt"))
+    if module is None:
+        yield from sorted(config_arm9.rglob("delinks.txt"))
+        return
+    norm = _normalize_module(module)
+    if norm == "main":
+        main_delinks = config_arm9 / "delinks.txt"
+        if main_delinks.is_file():
+            yield main_delinks
+        return
+    if norm is not None:
+        ov_dir = config_arm9 / "overlays" / norm
+        if ov_dir.is_dir():
+            yield from sorted(ov_dir.rglob("delinks.txt"))
 
 
 def _lookup_candidate_range(candidate: str, region: str) -> tuple[int, int] | None:
@@ -211,12 +303,43 @@ def _lookup_candidate_range(candidate: str, region: str) -> tuple[int, int] | No
     return None
 
 
-def _build_range_index(region: str) -> list[tuple[int, int, str]]:
-    """All (start_va, end_va, source_path) TU ranges across every
-    delinks.txt in the region, for best-effort "owner of this VA" lookups
-    on out-of-range diff runs. Built once per run."""
+def _lookup_ranges_by_addr(
+    addr: int, region: str, module: str | None = None,
+) -> list[tuple[int, int, str]]:
+    """Resolve the delinked [start, end) TU range(s) that CONTAIN a bare
+    address, by scanning delinks.txt range(s) in the region.
+
+    Unlike `_lookup_candidate_range` (which matches a TU by file *path*,
+    so the caller must already know or guess the exact filename), this
+    matches by address containment — for the common case where an agent
+    has only an address (e.g. from a worklist row or a retriage doc
+    header) and no reason to know whether delinks.txt currently shows the
+    `.c` or `.s` extension for that TU, or its exact source subdirectory.
+
+    Returns a list because, without a `module` hint, a bare address can
+    genuinely be AMBIGUOUS: this game's overlay RAM windows are reused by
+    overlays that never coexist in memory, so the same VA can fall inside
+    several different overlays' own delinked ranges simultaneously (e.g.
+    0x021aa558 lands inside NINE different overlays' TUs in EUR — verified
+    against the real repo while building this). Callers MUST check
+    `len(result)`: 0 = not found, 1 = unambiguous, >1 = ambiguous (caller
+    should ask for `module` to disambiguate, not guess).
+    """
+    return [
+        (start, end, path)
+        for start, end, path in _build_range_index(region, module=module)
+        if start <= addr < end
+    ]
+
+
+def _build_range_index(
+    region: str, module: str | None = None,
+) -> list[tuple[int, int, str]]:
+    """All (start_va, end_va, source_path) TU ranges across delinks.txt in
+    the region (optionally scoped to one `module`), for best-effort "owner
+    of this VA" lookups on out-of-range diff runs. Built once per run."""
     index: list[tuple[int, int, str]] = []
-    for delinks_path in _iter_delinks_files(region):
+    for delinks_path in _iter_delinks_files(region, module=module):
         try:
             text = delinks_path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -311,6 +434,22 @@ def main(argv: list[str] | None = None) -> int:
         "--candidate", metavar="PATH",
         help="Candidate .c or .s path; range is resolved from delinks.txt",
     )
+    range_group.add_argument(
+        "--addr", metavar="ADDR",
+        help="Bare candidate address, e.g. --addr 0x02001e5c; range is "
+             "auto-derived by scanning delinks.txt for the TU whose "
+             "[start, end) contains this address — no filename needed",
+    )
+    ap.add_argument(
+        "--module", metavar="MODULE", default=None,
+        help="Only meaningful with --addr. Scope the delinks.txt scan to "
+             "one module (\"main\", \"ov002\", \"overlay002\" all work). "
+             "This game's overlay RAM windows are reused by overlays that "
+             "never coexist in memory, so a bare --addr is often "
+             "genuinely AMBIGUOUS across several overlays at once — pass "
+             "--module to disambiguate (the tool errors out and lists the "
+             "candidates if you omit it and it's ambiguous).",
+    )
     ap.add_argument("--built", type=Path, default=None,
                      help="Override built ARM9 binary path")
     ap.add_argument("--extract", type=Path, default=None,
@@ -329,7 +468,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: --range values must be hex addresses, got {args.range}", file=sys.stderr)
             return 2
         range_source = "explicit"
-    else:
+    elif args.candidate:
         resolved = _lookup_candidate_range(args.candidate, args.region)
         if resolved is None:
             print(
@@ -342,6 +481,59 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         cand_start, cand_end = resolved
         range_source = f"resolved from delinks.txt ({args.candidate})"
+    else:
+        try:
+            addr = int(args.addr, 16)
+        except ValueError:
+            print(f"ERROR: --addr must be a hex address, got {args.addr!r}", file=sys.stderr)
+            return 2
+        if args.module and _normalize_module(args.module) is None:
+            print(
+                f"ERROR: --module {args.module!r} not recognized. Use "
+                f"\"main\", or an overlay like \"ov002\"/\"overlay002\"/\"2\".",
+                file=sys.stderr,
+            )
+            return 2
+        addr_hits = _lookup_ranges_by_addr(addr, args.region, module=args.module)
+        if not addr_hits:
+            scope = f"module '{args.module}'" if args.module else f"region '{args.region}'"
+            print(
+                f"ERROR: address 0x{addr:08x} is not contained in any "
+                f"delinks.txt TU range for {scope}.\n"
+                f"  Checked config/{args.region}/arm9/"
+                f"{'delinks.txt' if _normalize_module(args.module or '') == 'main' else '**/delinks.txt'}"
+                f". This usually means the address is wrong, belongs to a "
+                f"different region, or falls in a gap delinks.txt doesn't "
+                f"cover (e.g. padding/alignment bytes between TUs) — use "
+                f"--range to supply the span explicitly if you already "
+                f"know it from another source (a dossier, a worklist "
+                f"entry's own size field, etc).",
+                file=sys.stderr,
+            )
+            return 2
+        if len(addr_hits) > 1:
+            print(
+                f"ERROR: address 0x{addr:08x} is AMBIGUOUS — it falls "
+                f"inside {len(addr_hits)} different TUs' delinked ranges "
+                f"simultaneously (this game's overlay RAM windows are "
+                f"reused by overlays that never coexist in memory, so "
+                f"this is common, not a bug). Re-run with --module to "
+                f"pick one:",
+                file=sys.stderr,
+            )
+            for start, end, path in addr_hits:
+                # best-effort module guess from the path for the hint
+                mod_guess = "main"
+                mparts = path.replace("\\", "/").split("/")
+                if len(mparts) > 1 and mparts[0] == "src" and mparts[1].startswith("overlay"):
+                    mod_guess = "ov" + mparts[1][len("overlay"):]
+                print(
+                    f"    --module {mod_guess:<10s} -> [0x{start:08x}, 0x{end:08x})  {path}",
+                    file=sys.stderr,
+                )
+            return 2
+        cand_start, cand_end, owning_path = addr_hits[0]
+        range_source = f"resolved from delinks.txt (addr 0x{addr:08x} -> {owning_path})"
 
     if cand_end <= cand_start:
         print(f"ERROR: candidate range end (0x{cand_end:x}) must be > start (0x{cand_start:x})", file=sys.stderr)
