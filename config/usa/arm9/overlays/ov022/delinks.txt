@@ -4,10 +4,10 @@
     .data       start:0x021ab8c0 end:0x021ab9c0 kind:data align:32
     .bss        start:0x021ab9c0 end:0x021acb60 kind:bss align:32
 
-src/usa/overlay022/bss/data_ov022_bss.s:
-    complete
-    .bss start:0x021ab9c0 end:0x021acb60
-
 src/usa/overlay022/func_ov022_021aa460.c:
     complete
     .text start:0x021aa460 end:0x021aa5a0
+
+src/usa/overlay022/bss/data_ov022_bss.s:
+    complete
+    .bss start:0x021ab9c0 end:0x021acb60
