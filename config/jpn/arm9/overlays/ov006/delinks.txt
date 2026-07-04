@@ -503,7 +503,7 @@ src/jpn/overlay006/func_ov006_021b7140.s:
 src/jpn/overlay006/func_ov006_021b74f0.s:
     complete
     .text start:0x021b74f0 end:0x021b78ac
-src/jpn/overlay006/func_ov006_021b78ac.s:
+src/jpn/overlay006/func_ov006_021b78ac.c:
     complete
     .text start:0x021b78ac end:0x021b7920
 src/jpn/overlay006/func_ov006_021b7920.s:
