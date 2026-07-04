@@ -62,7 +62,7 @@ src/usa/overlay004/func_ov004_021cb198.c:
 src/usa/overlay004/func_ov004_021cb1b0.s:
     complete
     .text start:0x021cb1b0 end:0x021cb438
-src/usa/overlay004/func_ov004_021cb438.s:
+src/usa/overlay004/func_ov004_021cb438.c:
     complete
     .text start:0x021cb438 end:0x021cb488
 src/usa/overlay004/func_ov004_021cb488.s:
