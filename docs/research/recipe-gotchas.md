@@ -92,6 +92,14 @@ Detailed write-ups follow below.
 | Const-compare `a0==K\|\|a0==K+n`: mine predicates (`moveq#1/movne#0`), orig branches (`bne` to shared `return 0`) | (switch) | `switch(a0){case K: case K+n: return 1;} return 0;` (defeats predication; brief 266) |
 | Bit/byte field-insert: orig `lsl#K; orr rN, lsr#M`, mine optimal `orr rN, lsl#pos` | 16 + shift-form | u8/u16-cast the value + write the insert as `((x<<K)>>M)`, not value-level `<<pos` |
 | Orig `lsl #K; lsr #K`, mine `and #mask` (byte/halfword zero-extend) | (P-1) | permanent — no shift form defeats it; skip-and-document |
+| Orig shows explicit `mul`+indexed-load for a non-power-of-2-stride array loop; mine strength-reduces to a shorter post-increment `ldr [base],#SIZE` | 27 | bracket the function with `#pragma opt_strength_reduction off` / `reset` |
+| Single-global R-M-W: orig's pool-base and loaded-value registers are swapped vs mine (same instr count/opcodes) | 28 | swap cast-deref (`*(T*)&g`) for array-index (`g_arr[0]`) notation, or vice versa |
+| Two adjacent struct fields: orig batches `ldr;ldr;str;str`, mine interleaves `ldr;str;ldr;str` (or vice versa) | 29 | whole-struct assignment (`*dst=*src`) for batched; per-field scalar assigns for interleaved |
+| Shift-extract emits wrong `asr`/`lsr` | 30 | match pointer signedness to the shift opcode (`lsr`→unsigned, `asr`→signed) |
+| Orig has ONE conditional mov + one unconditional (no `moveq`); mine (ternary) has two conditional movs | 31 | `int x=A; if(!cond) x=B;` (override form), not `cond?A:B` |
+| Extra `mov` shuffles rearranging call-argument temps into position | 32 | reorder temps' **declarations** to match the register pattern implied by orig's shuffle, not the call's parameter order |
+| Orig re-reads a `volatile` value inside a branch arm that already tested it; mine reuses the branch-test's loaded register | 33 | keep the field `volatile` — expect a second, predicated load in the arm body (extends gotcha 17) |
+| Nested switches: orig has ONE shared fallback call, mine has it duplicated once per switch level | 34 | `break`/`goto` to one shared tail label, not an early `return helper(...)` at each switch level |
 
 Steps 1-4 of the 6-step diagnostic order (at the bottom of the
 file) also serve as a fallback when the table doesn't match.
@@ -1251,6 +1259,249 @@ the permuter** (1484 iterations, floor = base score) reaches it. Outcome:
 **`.s` asm escape hatch** (one-line operand flip; precedent
 `func_ov002_021ff3bc.s`) or documented permanent C-wall — see
 `brief-288-wave7-addorder-residue.md`.
+
+---
+
+## Gotcha 27 — `#pragma opt_strength_reduction off` blocks pointer-increment lowering
+
+**Symptom.** A loop indexing an array of a **non-power-of-2-size**
+element (a struct whose size isn't 1/2/4/8/16 bytes) matches orig's
+index-with-multiply form (`mov r,#SIZE; mul rI,i,r; ldr [base,rI]`),
+but the natural C loop mwcc emits **strength-reduces** to a
+post-increment pointer walk (`ldr r,[base],#SIZE`) instead — one
+instruction shorter, and it will not byte-match an orig that computes
+the index explicitly.
+
+**Cause.** mwcc 2.0/sp1p5's `-O4,p` strength-reduction pass converts
+index-times-constant-stride addressing into a walking pointer whenever
+the stride isn't already free via the ARM barrel shifter (a
+power-of-2 stride folds into `lsl #N` inside the load itself, so
+mwcc doesn't bother — this only fires for non-power-of-2 strides,
+confirmed 12-byte struct in the synthetic test below). Confirmed **live** on
+our compiler — NOT a 1.2-only quirk, and NOT the same finding as "no
+*source* form blocks it" (that finding, from prior sessions, tested only
+source-level rewrites; a `#pragma` is a different lever category and
+was never ruled out).
+
+**Fix.** Bracket the affected function with the pragma pair — it is
+correctly SCOPED to just the enclosed function(s), verified: a function
+compiled after `#pragma opt_strength_reduction reset` returns to the
+default (reduced) behavior with zero leakage.
+
+```c
+#pragma opt_strength_reduction off
+int sum_over_structs(struct Elem *arr, int n) {   /* struct Elem is e.g. 12 bytes */
+    int i, total = 0;
+    for (i = 0; i < n; i++) {
+        total += arr[i].a;
+    }
+    return total;
+}
+#pragma opt_strength_reduction reset
+```
+
+**Falsification.** An unrecognized pragma name (e.g. `#pragma
+this_pragma_does_not_exist off`) compiles clean with **zero** effect —
+byte-identical to the un-pragma'd default. "Compiles without error" is
+never evidence a pragma did anything; only an instruction-shape diff
+counts. Confirmed via a synthetic A/B/control triple
+(`sum_baseline`/`sum_pragma`/`sum_bogus`) on a 12-byte-struct loop:
+baseline strength-reduces to `ldr r2,[r0],#12` (3-instruction loop
+body); the pragma'd version reverts to `mov r2,#12; mul r3,ip,r2; ldr
+r3,[r0,r3]` (genuine multiply + indexed load, structurally different
+register allocation too — `push {r3,lr}` framed vs baseline's
+frameless); the bogus-pragma control is byte-identical to baseline.
+**Does NOT trigger** on power-of-2-stride loops (e.g. a plain `int[]`)
+— mwcc doesn't strength-reduce those in the first place (the barrel
+shifter already makes `arr[i]` addressing free), so there's nothing
+for the pragma to block; check the orig disasm shows an explicit
+`mul`/multi-instruction stride computation before reaching for this
+gotcha.
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§6f, their own `func_ov034_02112020`), re-verified on our mwcc
+2.0/sp1p5 brief 524 (contradicted a prior session's narrower "not
+blockable from C" finding — that finding was source-forms-only and
+didn't test pragmas). No real matched-corpus anchor identified yet on
+our side; promote a worked example here once a non-power-of-2-stride
+near-miss surfaces. Full verification:
+[`brief-524-lever-verification.md`](brief-524-lever-verification.md).
+
+---
+
+## Gotcha 28 — deref vs array-index notation for a single global swaps registers
+
+**Symptom.** A read-modify-write of one pool-loaded global
+(`*(unsigned*)&g |= mask` vs `g_arr[0] |= mask`, where `g_arr` is a
+1-element array alias of the same global) matches every instruction
+*except* which register holds the pool base vs the loaded value —
+same instruction count, same opcodes, registers swapped.
+
+**Cause.** The cast-and-dereference notation and the array-index
+notation are semantically identical C for a single global, but mwcc's
+register allocator treats the two *access expressions* differently:
+confirmed on our compiler, cast+deref puts the pool base in the
+*second*-claimed register and the loaded value in the *first*; the
+subscript form swaps them.
+
+**Fix.** If orig's `ldr`/`orr`/`str` sequence has the pool-base
+register and the value register in an unexpected order relative to a
+natural array-index read, try the pointer-cast-deref form instead (or
+vice versa) before reaching for gotcha 19's operand-order lever (this
+is a different axis — single-global *access notation*, not
+two-operand ordering).
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§2), verified on our mwcc 2.0/sp1p5 brief 524 — synthetic test
+`test_a`(deref)/`test_b`(index) on a bit-set produced register-swapped
+but otherwise identical 5-word sequences. No real matched-corpus
+anchor identified yet.
+
+---
+
+## Gotcha 29 — adjacent struct-copy fields batch as load-load-store-store; scalar fields interleave
+
+**Symptom.** Two adjacent struct fields copied field-by-field
+(`dst->a=src->a; dst->b=src->b;`) interleaves as `ldr;str;ldr;str`;
+the same copy written as a whole-struct assignment (`*dst=*src;`)
+batches as `ldr;ldr;str;str`. Picking the wrong C form for what orig's
+`.s` shows produces an extra-instruction or wrong-order near-miss.
+
+**Fix.** Match the shape you see: interleaved loads/stores → write
+per-field scalar assignments; batched (both loads before both stores,
+or an `ldm`/`stm` pair) → write a single struct assignment. This is
+**not** the same as Recipe 6 in `contained-reshape-catalog.md` (store
+order follows *source statement order* for **unrelated** fields) — this
+is specifically about what happens when the two fields are an
+*adjacent, copyable* pair.
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§3), verified on our mwcc 2.0/sp1p5 brief 524 — `copy_scalar` /
+`copy_struct` synthetic pair reproduced both shapes exactly as
+predicted. No real matched-corpus anchor identified yet.
+
+---
+
+## Gotcha 30 — signed vs unsigned pointer type picks `asr` vs `lsr` for shift-extraction
+
+**Symptom.** `(*p >> sh) & mask` emits `asr` (arithmetic, sign-extending)
+through a signed pointer type; the identical expression through an
+**unsigned** pointer type emits `lsr` (logical). An orig with `lsr`
+will not match a signed-typed extraction, and vice versa.
+
+**Fix.** Match the shift opcode in the orig disasm to the pointer's
+signedness — `lsr` needs `unsigned */unsigned int *`, `asr` needs a
+plain/signed pointer. Standard C signed-right-shift semantics (ARM/mwcc
+consistently choose arithmetic for signed), so likely portable across
+mwcc versions — a mismatch here is more surprising than a match; double
+check flags/types if it fails.
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§3), verified on our mwcc 2.0/sp1p5 brief 524 exactly as predicted (high
+prior confidence, confirmed). No real matched-corpus anchor identified
+yet.
+
+---
+
+## Gotcha 31 — assign-then-override is a genuinely different shape from a ternary, not just reordered
+
+**Symptom.** `int x = A; if (!cond) x = B;` (assign-then-conditionally-
+override) and `cond ? A : B` (full ternary) are semantically identical
+but are **not** interchangeable source forms: the override form
+compiles to ONE unconditional `mov` + ONE conditional `mov` (`mov
+r,#A; movne r,#B`-shape, no `moveq`); the ternary compiles to TWO
+conditional `mov`s (`movne`/`moveq` pair, per gotcha 3). Using the
+wrong form for what orig shows produces an extra- or missing-instruction
+near-miss, not just an operand-order swap.
+
+**Fix.** Count the conditional-move instructions in orig's tail: one
+conditional mov + one unconditional → override form; two conditional
+movs → ternary (gotcha 3 territory for polarity).
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§6c), verified on our mwcc 2.0/sp1p5 brief 524 — `select_ternary`
+(2 conditional movs) vs `select_override` (1 unconditional + 1
+conditional) reproduced exactly as predicted. No real matched-corpus
+anchor identified yet.
+
+---
+
+## Gotcha 32 — local declaration/evaluation order (not call-argument position) colors call-site temps
+
+**Symptom.** Several named temps built up before a multi-arg call land
+in unexpected registers relative to the call's parameter order — extra
+`mov` shuffling appears at the call site to get values from their
+"natural" register into the position the callee expects.
+
+**Cause.** Confirmed on our compiler: the register a call-argument
+builder temp lives in is fixed by **evaluation order** (which, for
+inline initializers, is the same as **declaration order**), not by the
+temp's eventual position in the call's argument list. The
+first-computed value always lands in the same "early" register
+(observed: r5 in a 3-temp/3-call test) regardless of whether it's the
+call's 1st, 2nd, or 3rd argument; the last-computed value stays
+passthrough in r0 with no save needed. When declaration order doesn't
+match call order, this forces extra `mov`s to rearrange into position —
+this is the call-argument-temp analogue of gotcha 11 (which covers
+long-lived locals, not call-builder temps specifically).
+
+**Fix.** If orig's call-argument setup has fewer (or more, or
+differently-placed) `mov` shuffles than your natural build, try
+reordering the temps' **declarations** to match the register pattern
+implied by the orig's shuffle sequence, not just the call's parameter
+order.
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§6c), verified on our mwcc 2.0/sp1p5 brief 524 — a synthetic
+declared-in-reverse-of-call-order test and a declared-in-call-order
+control both showed the "first-computed → fixed register" mechanism,
+with reverse-declared order requiring the extra shuffle. No real
+matched-corpus anchor identified yet.
+
+---
+
+## Gotcha 33 — `volatile` in a branch condition forces a genuine second read in each arm
+
+**Symptom.** A `volatile`-qualified value read directly in an `if`
+condition, then read again inside the arm body (`if (g) return g+1;`),
+matches orig's TWO separate loads (branch-test load + a second,
+conditionally-executed load for the body's use) — a build that reuses
+the branch-test's already-loaded register value is one load short.
+
+**Fix.** This is gotcha 17's mechanism (`volatile` prevents dead-store
+elision / load-after-store CSE) extended to a **different**
+optimization: CSE across a branch condition and its arm body, not a
+field re-read. Mark the field/global `volatile` and expect a second,
+predicated load in the arm that uses the value again.
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§6g), verified on our mwcc 2.0/sp1p5 brief 524 — `test_cse` reproduced
+exactly the predicted two-load shape (`ldr r1,[r0]` for the test,
+predicated `ldrne r0,[r0]` for the `+1` use). No real matched-corpus
+anchor identified yet.
+
+---
+
+## Gotcha 34 — nested-switch break-to-shared-tail vs early-return duplicates a shared call/epilogue
+
+**Symptom.** Two nested `switch` statements that both need to reach a
+shared fallback (e.g. a common helper call) diff by an extra,
+duplicated copy of that fallback call/epilogue — one copy per switch
+level instead of one shared copy.
+
+**Fix.** Write the fallback paths as `break`/`goto` to ONE shared tail
+label reached from both switch levels' default cases, not as an
+inline/early `return helper(...)` repeated at each switch level. The
+break-to-shared-tail form emits the call/epilogue **once**; writing an
+early return at each switch level's default case duplicates it (one
+copy per level that needs it).
+
+**Where surfaced:** imported from sm64ds-decomp (`mwccarm-codegen.md`
+§6e, Fable), verified on our mwcc 2.0/sp1p5 brief 524 — `nested_break`
+(break-to-shared, 1 `bl helper`) vs `nested_early_return` (return-inline,
+2 `bl helper` copies, +2 words) reproduced exactly as predicted. Extends
+the gotcha 23/24 switch family. No real matched-corpus anchor identified
+yet.
 
 ---
 
