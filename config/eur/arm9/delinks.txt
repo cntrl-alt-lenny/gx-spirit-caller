@@ -5687,7 +5687,7 @@ src/main/func_0202ed90.c:
     complete
     .text start:0x0202ed90 end:0x0202ee40
 
-src/main/func_0202ee40.s:
+src/main/func_0202ee40.c:
     complete
     .text start:0x0202ee40 end:0x0202ef08
 
@@ -5695,7 +5695,7 @@ src/main/func_0202ef08.c:
     complete
     .text start:0x0202ef08 end:0x0202ef38
 
-src/main/func_0202ef38.s:
+src/main/func_0202ef38.c:
     complete
     .text start:0x0202ef38 end:0x0202effc
 
