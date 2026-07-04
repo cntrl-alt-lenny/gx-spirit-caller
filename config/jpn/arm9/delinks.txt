@@ -853,7 +853,7 @@ src/jpn/main/func_0200bfb0.c:
 src/jpn/main/func_0200bfd8.s:
     complete
     .text start:0x0200bfd8 end:0x0200c05c
-src/jpn/main/func_0200c05c.s:
+src/jpn/main/func_0200c05c.c:
     complete
     .text start:0x0200c05c end:0x0200c0c8
 src/jpn/main/func_0200c0c8.s:
@@ -862,7 +862,7 @@ src/jpn/main/func_0200c0c8.s:
 src/jpn/main/func_0200c220.s:
     complete
     .text start:0x0200c220 end:0x0200c268
-src/jpn/main/func_0200c268.s:
+src/jpn/main/func_0200c268.c:
     complete
     .text start:0x0200c268 end:0x0200c2dc
 src/jpn/main/func_0200c2dc.s:
@@ -3113,7 +3113,7 @@ src/jpn/main/func_0202c658.s:
 src/jpn/main/func_0202c6dc.s:
     complete
     .text start:0x0202c6dc end:0x0202c71c
-src/jpn/main/func_0202c71c.s:
+src/jpn/main/func_0202c71c.c:
     complete
     .text start:0x0202c71c end:0x0202c794
 src/jpn/main/func_0202c794.s:
@@ -3234,13 +3234,13 @@ src/jpn/main/func_0202e558.s:
 src/jpn/main/func_0202e5b8.s:
     complete
     .text start:0x0202e5b8 end:0x0202e6a0
-src/jpn/main/func_0202e6a0.s:
+src/jpn/main/func_0202e6a0.c:
     complete
     .text start:0x0202e6a0 end:0x0202e748
 src/jpn/main/func_0202e748.s:
     complete
     .text start:0x0202e748 end:0x0202e810
-src/jpn/main/func_0202e810.s:
+src/jpn/main/func_0202e810.c:
     complete
     .text start:0x0202e810 end:0x0202e898
 src/jpn/main/func_0202e898.s:
@@ -3253,19 +3253,19 @@ src/jpn/main/func_0202ea5c.c:
 src/jpn/main/func_0202ea74.s:
     complete
     .text start:0x0202ea74 end:0x0202ecb0
-src/jpn/main/func_0202ecb0.s:
+src/jpn/main/func_0202ecb0.c:
     complete
     .text start:0x0202ecb0 end:0x0202ed3c
-src/jpn/main/func_0202ed3c.s:
+src/jpn/main/func_0202ed3c.c:
     complete
     .text start:0x0202ed3c end:0x0202edec
-src/jpn/main/func_0202edec.s:
+src/jpn/main/func_0202edec.c:
     complete
     .text start:0x0202edec end:0x0202eeb4
 src/jpn/main/func_0202eeb4.c:
     complete
     .text start:0x0202eeb4 end:0x0202eee4
-src/jpn/main/func_0202eee4.s:
+src/jpn/main/func_0202eee4.c:
     complete
     .text start:0x0202eee4 end:0x0202efa8
 src/jpn/main/func_0202efa8.c:
@@ -3280,7 +3280,7 @@ src/jpn/main/func_0202f110.s:
 src/jpn/main/func_0202f184.s:
     complete
     .text start:0x0202f184 end:0x0202f1c4
-src/jpn/main/func_0202f1c4.s:
+src/jpn/main/func_0202f1c4.c:
     complete
     .text start:0x0202f1c4 end:0x0202f290
 src/jpn/main/func_0202f290.s:
