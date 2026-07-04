@@ -20,11 +20,13 @@ sys.path.insert(0, str(_TOOLS))
 
 from port_to_region import (  # noqa: E402
     FILENAME_RE,
+    KIND_DATA_RE,
     SYMBOL_RE,
     SymbolRef,
     Resolution,
     _fmt_shift,
     apply_substitutions,
+    collect_new_symbols_txt_lines,
     compute_neighbor_shift_consensus,
     compute_output_path,
     derive_data_shift_consensus,
@@ -32,9 +34,12 @@ from port_to_region import (  # noqa: E402
     function_symbol_for,
     infer_module_from_path,
     module_to_src_dir,
+    normalize_module_name,
     parse_filename_stem,
     parse_symbols_in_source,
     resolve_symbol,
+    symbols_txt_path_for,
+    synthesize_data_symbol_name,
     target_stem_for_prefix,
 )
 
@@ -391,6 +396,132 @@ class TestFunctionSymbolFor(unittest.TestCase):
             function_symbol_for("ov12", 0x021b41e8),
             "func_ov012_021b41e8",
         )
+
+
+class TestSynthesizeDataSymbolName(unittest.TestCase):
+    """Brief 526 — the `data_*` analogue of function_symbol_for(): the
+    RAW address-encoded name dsd assigns a data/bss symbol before
+    semantic retriage."""
+
+    def test_main_module(self):
+        self.assertEqual(
+            synthesize_data_symbol_name("main", 0x021040ac),
+            "data_021040ac",
+        )
+
+    def test_overlay_module(self):
+        self.assertEqual(
+            synthesize_data_symbol_name("ov022", 0x021ab9bc),
+            "data_ov022_021ab9bc",
+        )
+
+    def test_high_overlay_pads_to_three_digits(self):
+        self.assertEqual(
+            synthesize_data_symbol_name("ov6", 0x0224f3e0),
+            "data_ov006_0224f3e0",
+        )
+
+    def test_matches_real_b523_eur_symbol_names(self):
+        # The two b523-blocked functions' EUR data symbols are
+        # THEMSELVES already RETRIAGE-tier raw-address names (that's
+        # what "no semantic name yet" means) — confirm the synthesis
+        # convention round-trips them exactly, addr-for-addr.
+        self.assertEqual(
+            synthesize_data_symbol_name("ov006", 0x0224f3e0),
+            "data_ov006_0224f3e0",
+        )
+        self.assertEqual(
+            synthesize_data_symbol_name("main", 0x021040ac),
+            "data_021040ac",
+        )
+        self.assertEqual(
+            synthesize_data_symbol_name("ov022", 0x021ab9bc),
+            "data_ov022_021ab9bc",
+        )
+
+
+class TestNormalizeModuleName(unittest.TestCase):
+    """Brief 526 — relocs.txt's `module:` field uses dsd's own
+    `overlay(N)` / `overlays(N,M,...)` syntax, NOT the `ovNNN` form every
+    other module key in this tool uses. This was silently defeating the
+    parallel-reloc data-symbol map for every OVERLAY-targeted reference
+    (the actual root cause behind b523's 2 "blocked" ports — the
+    address was always computable, the lookup key just never matched).
+    """
+
+    def test_main_passes_through(self):
+        self.assertEqual(normalize_module_name("main"), "main")
+
+    def test_already_normalized_passes_through(self):
+        self.assertEqual(normalize_module_name("ov006"), "ov006")
+
+    def test_singular_overlay_form(self):
+        self.assertEqual(normalize_module_name("overlay(6)"), "ov006")
+        self.assertEqual(normalize_module_name("overlay(22)"), "ov022")
+
+    def test_singular_overlay_pads_to_three_digits(self):
+        self.assertEqual(normalize_module_name("overlay(2)"), "ov002")
+
+    def test_plural_overlay_swap_form_uses_first_listed(self):
+        # Matches _port_overlay.py's prior _norm_mod fix (brief 459) for
+        # the identical convention — an overlay-swap zone referenced
+        # from either sibling lists all swap members; the first is used.
+        self.assertEqual(normalize_module_name("overlays(5,9)"), "ov005")
+        self.assertEqual(normalize_module_name("overlays(0,2)"), "ov000")
+
+    def test_unrecognized_string_passes_through_unchanged(self):
+        # Defensive: an unexpected format is returned verbatim rather
+        # than silently mangled.
+        self.assertEqual(normalize_module_name("something_else"), "something_else")
+
+
+class TestSymbolsTxtPathFor(unittest.TestCase):
+    """Brief 526 — the config/ path a synthesized data symbol's new
+    line needs to be appended to."""
+
+    def test_main_module(self):
+        self.assertEqual(
+            symbols_txt_path_for("usa", "main"),
+            "config/usa/arm9/symbols.txt",
+        )
+
+    def test_overlay_module(self):
+        self.assertEqual(
+            symbols_txt_path_for("jpn", "ov022"),
+            "config/jpn/arm9/overlays/ov022/symbols.txt",
+        )
+
+
+class TestKindDataRE(unittest.TestCase):
+    """Brief 526 — the kind-capturing companion to DATA_RE, used by
+    load_region_data_symbol_kinds() to preserve kind:data / kind:bss /
+    kind:data(any) when proposing a new symbols.txt line."""
+
+    def test_plain_bss(self):
+        m = KIND_DATA_RE.match(
+            "data_021040ac kind:bss addr:0x021040ac")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("kind"), "bss")
+        self.assertEqual(m.group("addr"), "021040ac")
+
+    def test_plain_data(self):
+        m = KIND_DATA_RE.match(
+            "data_ov006_0224f3e0 kind:data addr:0x0224f3e0")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("kind"), "data")
+
+    def test_data_with_qualifier(self):
+        # The `(any)` qualifier must be captured VERBATIM so the
+        # synthesized symbols.txt line reproduces it exactly.
+        m = KIND_DATA_RE.match(
+            "data_ov022_021ab9bc kind:data(any) addr:0x021ab9bc")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("kind"), "data(any)")
+
+    def test_function_kind_does_not_match(self):
+        m = KIND_DATA_RE.match(
+            "func_02006164 kind:function(arm,size=0x20) addr:0x02006164")
+        self.assertIsNone(m)
 
 
 class TestTargetStemForPrefix(unittest.TestCase):
@@ -890,6 +1021,80 @@ class TestResolveSymbolAutoPromote(unittest.TestCase):
         self.assertEqual(res.confidence, "HIGH")
         self.assertNotIn("auto-promote", res.notes)
 
+    def test_data_parallel_reloc_map_hit_with_named_target(self):
+        # Sanity/regression: the ORIGINAL tier-1 success path (map hit +
+        # target already named) is unaffected by brief 526 — still
+        # EXACT_ADDR, not SYNTHESIZED.
+        data_addr_map = {("ov006", 0x0224f3e0): ("ov006", 0x0224f3e0)}
+        target_data = {"ov006": {0x0224f3e0: "g_cardSortBitmask"}}
+        ref = SymbolRef(text="data_ov006_0224f3e0", kind="data",
+                        module="ov006", addr=0x0224f3e0)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "EXACT_ADDR")
+        self.assertEqual(res.target_name, "g_cardSortBitmask")
+        self.assertIsNone(res.new_symbols_txt_line)
+
+    def test_data_parallel_reloc_map_hit_synthesizes_when_unnamed(self):
+        # Brief 526 — the exact b523 scenario: `find_siblings` fingerprint-
+        # matches the (still-.s) target function, so derive_data_address_
+        # mapping's parallel-reloc pairing DOES determine the correct
+        # target address for a data ref inside it — but the target
+        # region's symbols.txt has never named anything there (RETRIAGE-
+        # tier: nothing else in that region references this address yet).
+        # Previously fell through silently to the next tier and
+        # eventually NONE; now synthesizes immediately at this tier.
+        data_addr_map = {("ov022", 0x021ab9bc): ("ov022", 0x021ab9bc)}
+        target_data = {"ov022": {
+            0x021ab998: "data_ov022_021ab998",
+            0x021ab9c0: "data_ov022_021ab9c0",
+            # nothing named at 0x021ab9bc itself
+        }}
+        ref = SymbolRef(text="data_ov022_021ab9bc", kind="data",
+                        module="ov022", addr=0x021ab9bc)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+            eur_data_kinds={"ov022": {0x021ab9bc: "data(any)"}},
+        )
+        self.assertEqual(res.confidence, "SYNTHESIZED")
+        self.assertEqual(res.target_name, "data_ov022_021ab9bc")
+        self.assertEqual(
+            res.new_symbols_txt_line,
+            "data_ov022_021ab9bc kind:data(any) addr:0x021ab9bc",
+        )
+        self.assertEqual(
+            res.new_symbols_txt_path,
+            "config/usa/arm9/overlays/ov022/symbols.txt",
+        )
+        self.assertIn("parallel-reloc map", res.notes)
+        self.assertIn("NOT YET NAMED", res.notes)
+
+    def test_data_parallel_reloc_map_synthesis_uses_mapped_module(self):
+        # The synthesized name/path must use the MAPPED module (from
+        # data_addr_map's value), not the ref's own module — matters for
+        # cross-module data refs (main code referencing overlay data or
+        # vice versa).
+        data_addr_map = {("main", 0x02100000): ("ov004", 0x021c0000)}
+        target_data = {"ov004": {}}
+        ref = SymbolRef(text="data_02100000", kind="data",
+                        module="main", addr=0x02100000)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "SYNTHESIZED")
+        self.assertEqual(res.target_name, "data_ov004_021c0000")
+        self.assertEqual(
+            res.new_symbols_txt_path,
+            "config/usa/arm9/overlays/ov004/symbols.txt",
+        )
+
     def test_data_d3_shift_consensus_resolves_unmapped_symbol(self):
         # Brief 095 D3 — when a data symbol misses the
         # parallel-reloc map AND misses exact-addr match, derive
@@ -942,9 +1147,12 @@ class TestResolveSymbolAutoPromote(unittest.TestCase):
         self.assertEqual(res.confidence, "NONE")
         self.assertIn("parallel-reloc map didn't cover", res.notes)
 
-    def test_data_d3_keeps_none_when_shifted_addr_missing(self):
-        # Consensus shift exists, but target region has no data
-        # symbol at the shifted address → still NONE.
+    def test_data_d3_synthesizes_when_shifted_addr_unnamed(self):
+        # Brief 526 — consensus shift exists (ground-truth address is
+        # KNOWN), but target region has never named a symbol at the
+        # shifted address (RETRIAGE-tier gap). Previously fell through
+        # to NONE, blocking the whole port; now SYNTHESIZED with the
+        # raw address-encoded name + a companion symbols.txt-line note.
         data_addr_map = {
             ("main", 0x021a18b8): ("main", 0x021a17d8),
             ("main", 0x021a19e8): ("main", 0x021a1908),
@@ -960,8 +1168,37 @@ class TestResolveSymbolAutoPromote(unittest.TestCase):
             ref, "usa", {}, {}, target_data,
             find_siblings_fn=None,
             data_addr_map=data_addr_map,
+            eur_data_kinds={"main": {0x021a1a18: "bss"}},
         )
-        self.assertEqual(res.confidence, "NONE")
+        self.assertEqual(res.confidence, "SYNTHESIZED")
+        self.assertEqual(res.target_name, "data_021a1938")
+        self.assertEqual(res.new_symbols_txt_line,
+                         "data_021a1938 kind:bss addr:0x021a1938")
+        self.assertEqual(res.new_symbols_txt_path,
+                         "config/usa/arm9/symbols.txt")
+        self.assertIn("D3 data-shift consensus", res.notes)
+        self.assertIn("NOT YET NAMED", res.notes)
+
+    def test_data_d3_synthesis_defaults_kind_to_data_when_kinds_omitted(self):
+        # eur_data_kinds is optional — omitting it defaults to "data"
+        # rather than crashing.
+        data_addr_map = {
+            ("main", 0x021a18b8): ("main", 0x021a17d8),
+            ("main", 0x021a19e8): ("main", 0x021a1908),
+        }
+        target_data = {"main": {
+            0x021a17d8: "data_021a17d8",
+            0x021a1908: "data_021a1908",
+        }}
+        ref = SymbolRef(text="data_021a1a18", kind="data",
+                        module="main", addr=0x021a1a18)
+        res = resolve_symbol(
+            ref, "usa", {}, {}, target_data,
+            find_siblings_fn=None,
+            data_addr_map=data_addr_map,
+        )
+        self.assertEqual(res.confidence, "SYNTHESIZED")
+        self.assertIn("kind:data ", res.new_symbols_txt_line)
 
     def test_derive_data_shift_consensus_skips_cross_module(self):
         # Cross-module entries (main → ov002) MUST NOT contribute to
@@ -1047,6 +1284,97 @@ class TestResolveSymbolAutoPromote(unittest.TestCase):
         # Second call must NOT re-walk the neighbors — only the
         # candidate's own find_siblings call counts.
         self.assertEqual(call_count[0], first_call_count + 1)
+
+
+class TestCollectNewSymbolsTxtLines(unittest.TestCase):
+    """Brief 526 — groups every SYNTHESIZED resolution's companion
+    symbols.txt line by target path, so landing a synthesized port is
+    copy-paste mechanical."""
+
+    def _synth(self, module, addr, line, path):
+        return Resolution(
+            eur_ref=SymbolRef(text=f"data_{addr:08x}", kind="data",
+                              module=module, addr=addr),
+            target_name=f"data_{addr:08x}",
+            confidence="SYNTHESIZED",
+            notes="test",
+            new_symbols_txt_line=line,
+            new_symbols_txt_path=path,
+        )
+
+    def test_empty_when_no_synthesized(self):
+        resolutions = [
+            Resolution(eur_ref=SymbolRef(text="func_x", kind="func",
+                                         module="main", addr=1),
+                      target_name="func_y", confidence="HIGH", notes=""),
+        ]
+        self.assertEqual(collect_new_symbols_txt_lines(resolutions), {})
+
+    def test_single_synthesized_resolution(self):
+        resolutions = [
+            self._synth("ov022", 0x021ab9bc,
+                       "data_ov022_021ab9bc kind:data(any) addr:0x021ab9bc",
+                       "config/usa/arm9/overlays/ov022/symbols.txt"),
+        ]
+        out = collect_new_symbols_txt_lines(resolutions)
+        self.assertEqual(out, {
+            "config/usa/arm9/overlays/ov022/symbols.txt": [
+                "data_ov022_021ab9bc kind:data(any) addr:0x021ab9bc",
+            ],
+        })
+
+    def test_groups_by_path_and_sorts(self):
+        # Two synthesized symbols in the SAME module (func_ov022_021ab460
+        # references both an ov022 AND a main data symbol) group under
+        # their respective paths, each internally sorted.
+        resolutions = [
+            self._synth("ov022", 0x021ab9bc,
+                       "data_ov022_021ab9bc kind:data(any) addr:0x021ab9bc",
+                       "config/usa/arm9/overlays/ov022/symbols.txt"),
+            self._synth("main", 0x021040ac,
+                       "data_021040ac kind:bss addr:0x021040ac",
+                       "config/usa/arm9/symbols.txt"),
+        ]
+        out = collect_new_symbols_txt_lines(resolutions)
+        self.assertEqual(list(out.keys()), [
+            "config/usa/arm9/overlays/ov022/symbols.txt",
+            "config/usa/arm9/symbols.txt",
+        ])
+        self.assertEqual(
+            out["config/usa/arm9/symbols.txt"],
+            ["data_021040ac kind:bss addr:0x021040ac"],
+        )
+
+    def test_deduplicates_identical_lines(self):
+        # The same data symbol referenced twice in one source (e.g. once
+        # for read, once for write) must not produce a duplicate line.
+        resolutions = [
+            self._synth("ov006", 0x0224f3e0,
+                       "data_ov006_0224f3e0 kind:bss addr:0x0224f3e0",
+                       "config/usa/arm9/overlays/ov006/symbols.txt"),
+            self._synth("ov006", 0x0224f3e0,
+                       "data_ov006_0224f3e0 kind:bss addr:0x0224f3e0",
+                       "config/usa/arm9/overlays/ov006/symbols.txt"),
+        ]
+        out = collect_new_symbols_txt_lines(resolutions)
+        self.assertEqual(
+            out["config/usa/arm9/overlays/ov006/symbols.txt"],
+            ["data_ov006_0224f3e0 kind:bss addr:0x0224f3e0"],
+        )
+
+    def test_ignores_exact_addr_and_none(self):
+        # Only SYNTHESIZED resolutions contribute; EXACT_ADDR (already
+        # named) and NONE (unresolved) must not leak a phantom line.
+        resolutions = [
+            Resolution(eur_ref=SymbolRef(text="data_x", kind="data",
+                                         module="main", addr=1),
+                      target_name="data_y", confidence="EXACT_ADDR",
+                      notes=""),
+            Resolution(eur_ref=SymbolRef(text="data_z", kind="data",
+                                         module="main", addr=2),
+                      target_name=None, confidence="NONE", notes=""),
+        ]
+        self.assertEqual(collect_new_symbols_txt_lines(resolutions), {})
 
 
 if __name__ == "__main__":

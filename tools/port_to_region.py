@@ -141,8 +141,14 @@ class Resolution:
     """A symbol's cross-region resolution."""
     eur_ref: SymbolRef
     target_name: str | None  # target region's symbol name; None if unresolved
-    confidence: str          # 'HIGH', 'MEDIUM', 'LOW', 'NONE', or 'EXACT_ADDR' for data
+    confidence: str          # 'HIGH', 'MEDIUM', 'LOW', 'NONE', 'EXACT_ADDR' or
+                             # 'SYNTHESIZED' (brief 526) for data
     notes: str               # human-readable rationale
+    # Brief 526 — set only when confidence == "SYNTHESIZED": the exact new
+    # symbols.txt line the target region needs (structured, not re-parsed
+    # from `notes`) plus the relative config/ path it belongs in.
+    new_symbols_txt_line: str | None = None
+    new_symbols_txt_path: str | None = None
 
 
 # --------------------------------------------------------------------------- #
@@ -241,6 +247,41 @@ def function_symbol_for(module: str, addr: int) -> str:
     if module.startswith("ov") and module[2:].isdigit():
         return f"func_ov{module[2:].zfill(3)}_{addr:08x}"
     return f"func_{addr:08x}"
+
+
+def synthesize_data_symbol_name(module: str, addr: int) -> str:
+    """Build the RAW address-encoded data-symbol name — the default dsd
+    naming convention for a data/bss symbol before semantic retriage
+    (the `data_*` analogue of `function_symbol_for()`).
+
+    main → `data_<addr>`
+    ov<NNN> → `data_ov<NNN>_<addr>`
+
+    Brief 526 — used when a symbol's target-region ADDRESS is known
+    (via the parallel-reloc map or the D3 shift-consensus) but the
+    target region's `symbols.txt` has no entry there yet. dsd only
+    names a data/bss address once SOME already-analyzed reference in
+    THAT region touches it; a symbol reachable only from a
+    not-yet-ported function is invisible to the target's symbols.txt
+    even though the address itself is perfectly well-defined
+    (RETRIAGE-tier EUR symbols already carry this exact raw-address
+    name — see the two b523 entries this fixes, both plain `data_*`).
+    Modeled on the b459/461 porter fix for `_unk`-suffixed placeholder
+    symbols: an address-encoded name needs no target-side lookup to be
+    valid, only a correct re-address.
+    """
+    if module.startswith("ov") and module[2:].isdigit():
+        return f"data_ov{module[2:].zfill(3)}_{addr:08x}"
+    return f"data_{addr:08x}"
+
+
+def symbols_txt_path_for(region: str, module: str) -> str:
+    """The `config/` path (relative, for human-readable messages) whose
+    `symbols.txt` a synthesized data symbol needs a new line appended to
+    before the port can link."""
+    if module == "main":
+        return f"config/{region}/arm9/symbols.txt"
+    return f"config/{region}/arm9/overlays/{module}/symbols.txt"
 
 
 def target_stem_for_prefix(prefix: str, target_func_name: str) -> str:
@@ -436,6 +477,38 @@ def compute_neighbor_shift_consensus(
     return None, shifts
 
 
+def _synthesize_data_resolution(
+    ref: SymbolRef,
+    target_region: str,
+    target_module: str,
+    target_addr: int,
+    eur_data_kinds: dict[str, dict[int, str]] | None,
+    *,
+    origin: str,
+) -> Resolution:
+    """Brief 526 — build the `SYNTHESIZED` Resolution for a data symbol
+    whose target-region address is known but unnamed. Shared by
+    `resolve_symbol()`'s two address-derivation tiers (parallel-reloc
+    map and D3 shift-consensus) so both attach the identical companion
+    symbols.txt-line message."""
+    synth = synthesize_data_symbol_name(target_module, target_addr)
+    kind = "data"
+    if eur_data_kinds is not None:
+        kind = eur_data_kinds.get(ref.module, {}).get(ref.addr, "data")
+    new_line = f"{synth} kind:{kind} addr:0x{target_addr:08x}"
+    new_path = symbols_txt_path_for(target_region, target_module)
+    return Resolution(
+        eur_ref=ref,
+        target_name=synth,
+        confidence="SYNTHESIZED",
+        notes=f"{origin} — NOT YET NAMED in {target_region}; synthesized "
+              f"`{synth}`. Needs a new symbols.txt line before this port "
+              f"links: `{new_line}` in {new_path}",
+        new_symbols_txt_line=new_line,
+        new_symbols_txt_path=new_path,
+    )
+
+
 def resolve_symbol(
     ref: SymbolRef,
     target_region: str,
@@ -447,6 +520,7 @@ def resolve_symbol(
     *,
     auto_promote_low: bool = True,
     consensus_cache: dict[tuple[str, str], tuple[int | None, list[int]]] | None = None,
+    eur_data_kinds: dict[str, dict[int, str]] | None = None,
 ) -> Resolution:
     """Resolve one EUR symbol reference to its target-region name.
 
@@ -462,6 +536,26 @@ def resolve_symbol(
     LOW → MEDIUM. `consensus_cache` is a caller-supplied dict that
     caches results across calls within one port_to_region invocation
     (keyed by (module, target_region)).
+
+    Brief 526 — the RETRIAGE-tier data-symbol gap: `data_addr_map`
+    (ground-truth, reloc-pairing derived) or the D3 shift-consensus can
+    determine the CORRECT target address for a data symbol even when
+    the target region's `symbols.txt` has never named anything there
+    (dsd only names a data/bss address once some already-analyzed
+    reference in THAT region touches it — a symbol reachable only from
+    a not-yet-ported function is invisible to the target's table
+    despite the address being perfectly well-defined). Previously this
+    fell through to `NONE`, blocking the whole port. Now: when the
+    address is known but unnamed, synthesize the raw address-encoded
+    name (`synthesize_data_symbol_name`, same convention as the EUR
+    symbol's own RETRIAGE-tier name) and return it at `SYNTHESIZED`
+    confidence (HIGH-equivalent — the address itself is exactly as
+    reliable as the `EXACT_ADDR` tiers; only the *name* is new) with a
+    note describing the exact new `symbols.txt` line the target region
+    needs before the port can link. `eur_data_kinds` (from
+    `load_region_data_symbol_kinds("eur")`) supplies the `kind:` field
+    for that proposed line; omit it only for callers that don't need
+    the message (defaults to `data`).
     """
     if ref.kind == "data":
         # Try the parallel-reloc-derived mapping first (most
@@ -481,6 +575,14 @@ def resolve_symbol(
                         notes=f"parallel-reloc map → "
                               f"{mapped_module}/0x{mapped_addr:08x}",
                     )
+                # Brief 526 — address known, but not yet named in the
+                # target region. Synthesize rather than give up.
+                return _synthesize_data_resolution(
+                    ref, target_region, mapped_module, mapped_addr,
+                    eur_data_kinds,
+                    origin=f"parallel-reloc map → "
+                           f"{mapped_module}/0x{mapped_addr:08x}",
+                )
 
         # Fallback: exact-address match in target's symbols.txt
         # (works when EUR and target share the data layout for
@@ -519,6 +621,17 @@ def resolve_symbol(
                               f"{target_region}/{ref.module}/"
                               f"0x{shifted_addr:08x}",
                     )
+                # Brief 526 — same synthesis fallback: the D3-derived
+                # address is known (≥2 agreeing same-module mappings)
+                # but unnamed in the target.
+                return _synthesize_data_resolution(
+                    ref, target_region, ref.module, shifted_addr,
+                    eur_data_kinds,
+                    origin=f"D3 data-shift consensus "
+                           f"{_fmt_shift(data_shift)} → "
+                           f"{target_region}/{ref.module}/"
+                           f"0x{shifted_addr:08x}",
+                )
 
         return Resolution(
             eur_ref=ref,
@@ -774,6 +887,49 @@ def load_region_data_symbols(region: str) -> dict[str, dict[int, str]]:
     return out
 
 
+KIND_DATA_RE = re.compile(
+    r"^\S+\s+kind:(?P<kind>(?:data|bss)(?:\([^)]*\))?)\s+addr:0x(?P<addr>[0-9a-fA-F]+)"
+)
+
+
+def load_region_data_symbol_kinds(region: str) -> dict[str, dict[int, str]]:
+    """Return dict[module] → {addr: kind_string} for one region — the
+    kind-preserving companion to `load_region_data_symbols()`.
+
+    Brief 526: when synthesizing a NEW data-symbol name for an address
+    the target region hasn't registered yet, the proposed `symbols.txt`
+    line needs the correct `kind:data` / `kind:bss` / `kind:data(any)`
+    field. That's a property of the EUR side's own entry (bss-ness is
+    a source-level fact — initialized vs zero-initialized — that
+    transfers across regions for the same underlying game logic), so
+    this loader is called on `eur`, not the target.
+    """
+    out: dict[str, dict[int, str]] = {}
+    config_arm9 = ROOT / "config" / region / "arm9"
+    if not config_arm9.is_dir():
+        return out
+
+    def _parse(path: Path) -> dict[int, str]:
+        result: dict[int, str] = {}
+        if not path.is_file():
+            return result
+        for line in path.read_text(encoding="utf-8",
+                                   errors="replace").splitlines():
+            m = KIND_DATA_RE.match(line)
+            if m:
+                result[int(m.group("addr"), 16)] = m.group("kind")
+        return result
+
+    out["main"] = _parse(config_arm9 / "symbols.txt")
+    overlays_dir = config_arm9 / "overlays"
+    if overlays_dir.is_dir():
+        for ov_dir in sorted(overlays_dir.iterdir()):
+            if not (ov_dir / "symbols.txt").is_file():
+                continue
+            out[ov_dir.name] = _parse(ov_dir / "symbols.txt")
+    return out
+
+
 # Parallel-reloc helper for data-symbol mapping.
 #
 # When find_region_siblings pairs EUR func_X with USA func_Y, the
@@ -792,10 +948,44 @@ RELOC_FULL_RE = re.compile(
     r"to:0x(?P<to_addr>[0-9a-fA-F]+)\s+module:(?P<to_mod>\S+)"
 )
 
+_OVERLAY_SINGULAR_RE = re.compile(r"^overlay\((\d+)\)$")
+_OVERLAY_PLURAL_RE = re.compile(r"^overlays\(([\d,]+)\)$")
+
+
+def normalize_module_name(m: str) -> str:
+    """`relocs.txt`'s `module:` field uses dsd's OWN overlay-reference
+    syntax — `overlay(6)`, or `overlays(5,9)` for an overlay-swap zone
+    referenced from either sibling — NOT the `ov006` convention every
+    other module key in this tool uses (`symbols.txt`-derived tables,
+    `SymbolRef.module`, `target_data_symbols` keys, …).
+
+    Brief 526: this format mismatch silently broke the parallel-reloc
+    data-symbol mapping for every OVERLAY data reference (main-format
+    keys collide fine since `"main"` needs no translation) — a
+    `data_addr_map` entry keyed `("overlay(6)", addr)` never matches a
+    lookup for `("ov006", addr)`, so the map "misses" even when it
+    actually computed the right address. Normalizing at the parse
+    boundary (`load_full_relocs`) means every downstream consumer sees
+    consistent `ovNNN` keys.
+
+    `overlay(2)` → `ov002`; `overlays(5,9)` → `ov005` (the swap zone's
+    first-listed overlay number, matching `_port_overlay.py`'s prior
+    `_norm_mod` fix for the same convention — brief 459); anything else
+    (`main`, an already-normalized `ovNNN`) passes through unchanged.
+    """
+    m1 = _OVERLAY_SINGULAR_RE.match(m)
+    if m1:
+        return f"ov{int(m1.group(1)):03d}"
+    m2 = _OVERLAY_PLURAL_RE.match(m)
+    if m2:
+        return f"ov{int(m2.group(1).split(',')[0]):03d}"
+    return m
+
 
 def load_full_relocs(region: str) -> dict[str, dict[int, list[tuple[str, int, str]]]]:
     """Return dict[source_module] -> dict[from_addr] -> list of
-    (kind, to_addr, to_module) tuples for the region.
+    (kind, to_addr, to_module) tuples for the region. `to_module` is
+    normalized to `ovNNN` form (see `normalize_module_name`).
     """
     out: dict[str, dict[int, list[tuple[str, int, str]]]] = {}
     config_arm9 = ROOT / "config" / region / "arm9"
@@ -814,7 +1004,7 @@ def load_full_relocs(region: str) -> dict[str, dict[int, list[tuple[str, int, st
                 result[int(m.group("from_addr"), 16)].append((
                     m.group("kind"),
                     int(m.group("to_addr"), 16),
-                    m.group("to_mod"),
+                    normalize_module_name(m.group("to_mod")),
                 ))
         return dict(result)
 
@@ -933,6 +1123,9 @@ def main() -> int:
     target_data = load_region_data_symbols(args.target)
     eur_full_relocs = load_full_relocs("eur")
     target_full_relocs = load_full_relocs(args.target)
+    # Brief 526 — EUR's own kind:data/kind:bss field, needed to propose a
+    # correctly-kinded new symbols.txt line for any synthesized data symbol.
+    eur_data_kinds = load_region_data_symbol_kinds("eur")
 
     if not eur:
         print("error: config/eur/ not found", file=sys.stderr)
@@ -1034,16 +1227,20 @@ def main() -> int:
                 data_addr_map=data_addr_map,
                 auto_promote_low=not args.no_auto_promote,
                 consensus_cache=consensus_cache,
+                eur_data_kinds=eur_data_kinds,
             ))
 
     # Check confidence floor.
     floor_rank = {"HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0,
-                  "EXACT_ADDR": 3}
+                  "EXACT_ADDR": 3, "SYNTHESIZED": 3}
     floor = floor_rank[args.confidence_floor]
     failed = [r for r in resolutions
               if floor_rank.get(r.confidence, 0) < floor]
-    # Data symbols: EXACT_ADDR is considered HIGH-equivalent.
-    failed = [r for r in failed if r.confidence != "EXACT_ADDR"]
+    # Data symbols: EXACT_ADDR / SYNTHESIZED are HIGH-equivalent — the
+    # address is derived identically reliably in both; SYNTHESIZED just
+    # additionally needs the new symbols.txt line surfaced below.
+    failed = [r for r in failed
+              if r.confidence not in ("EXACT_ADDR", "SYNTHESIZED")]
 
     if failed and not args.dry_run:
         # Refuse to write; surface the failures.
@@ -1142,6 +1339,8 @@ def main() -> int:
         delinks_entry = (f"# (delinks entry unavailable — target func "
                          f"{main_func_resolution.target_name} not found)\n")
 
+    new_symbols_txt = collect_new_symbols_txt_lines(resolutions)
+
     if args.json:
         print(json.dumps({
             "status": "ok",
@@ -1153,6 +1352,7 @@ def main() -> int:
             "delinks_entry": delinks_entry,
             "rewritten": rewritten,
             "resolutions": [_resolution_to_dict(r) for r in resolutions],
+            "new_symbols_txt_lines": new_symbols_txt,
         }, indent=2))
     elif args.dry_run:
         print(f"# Would write: {out_path}")
@@ -1164,6 +1364,15 @@ def main() -> int:
         print("# delinks.txt entry:")
         for line in delinks_entry.splitlines():
             print(f"#   {line}")
+        if new_symbols_txt:
+            print("#")
+            print("# ⚠ NEW symbols.txt lines needed before this port links")
+            print("# (brief 526 — RETRIAGE-tier data symbol(s), not yet")
+            print("# named in the target region; append these first):")
+            for path, lines in new_symbols_txt.items():
+                print(f"#   {path}:")
+                for line in lines:
+                    print(f"#     {line}")
         print()
         print("# === Rewritten source ===")
         print(rewritten, end="")
@@ -1175,9 +1384,18 @@ def main() -> int:
         print(delinks_entry, end="")
         # Resolution summary
         n_high = sum(1 for r in resolutions
-                     if r.confidence in ("HIGH", "EXACT_ADDR"))
+                     if r.confidence in ("HIGH", "EXACT_ADDR", "SYNTHESIZED"))
         n_total = len(resolutions)
-        print(f"# {n_high}/{n_total} symbols resolved at HIGH/EXACT")
+        print(f"# {n_high}/{n_total} symbols resolved at HIGH/EXACT/SYNTHESIZED")
+        if new_symbols_txt:
+            print("#")
+            print("# ⚠ NEW symbols.txt lines needed before this port links")
+            print("# (brief 526 — RETRIAGE-tier data symbol(s), not yet")
+            print("# named in the target region; append these first):")
+            for path, lines in new_symbols_txt.items():
+                print(f"#   {path}:")
+                for line in lines:
+                    print(f"#     {line}")
 
     return 0
 
@@ -1191,7 +1409,29 @@ def _resolution_to_dict(r: Resolution) -> dict:
         "target_name": r.target_name,
         "confidence": r.confidence,
         "notes": r.notes,
+        "new_symbols_txt_line": r.new_symbols_txt_line,
+        "new_symbols_txt_path": r.new_symbols_txt_path,
     }
+
+
+def collect_new_symbols_txt_lines(
+    resolutions: list[Resolution],
+) -> dict[str, list[str]]:
+    """Brief 526 — group every `SYNTHESIZED` resolution's companion
+    symbols.txt line by target path, deduplicated, sorted.
+
+    Returns dict[symbols_txt_path] -> [new_line, ...]. Empty dict if no
+    resolution needed synthesis. This is what lets landing a synthesized
+    port be copy-paste mechanical: append each listed line to the named
+    file before the port's `ninja sha1` gate.
+    """
+    out: dict[str, set[str]] = {}
+    for r in resolutions:
+        if r.confidence != "SYNTHESIZED" or not r.new_symbols_txt_path:
+            continue
+        out.setdefault(r.new_symbols_txt_path, set()).add(
+            r.new_symbols_txt_line or "")
+    return {path: sorted(lines) for path, lines in sorted(out.items())}
 
 
 if __name__ == "__main__":
