@@ -697,7 +697,7 @@ fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
   match EUR → port USA/JPN (`port_to_region.py`; gate = per-region ROM `ninja sha1`;
   park divergents/avalanches with one-line reasons). ⚠️ a commit must NEVER delete
   files outside its module (the bd74e172 neighbor-sweep latently broke JPN for 5 days
-  — `git status` before commit). LAST actions: 3-region sha1 green → push → PR.
+  — `git status` before commit). LAST actions: 3-region sha1 green → push → PR. ⚠️ **ONE WORKTREE PER LANE (b523 finding): >3 concurrent lanes need a dedicated `git worktree add ../<lane> <branch>` — the 3 role-named worktrees (brain/scaffolder/decomper) are NOT enough for 4 agents; a peer lane's whole-tree `git checkout` silently wiped b523's uncommitted matches in a shared dir.**
 - **Brief 521** — Codex `scaffolder` → **`main` c-match** (owns config/*/arm9/delinks.txt).
   98 main candidates in v3 (rows 13-26+ = tiny 52-96B leaf funcs, all predicted-
   contained — the cleanest mechanical pool). ⚠️ SKIP the main-HIGH avalanche zone
@@ -706,24 +706,40 @@ fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 - **Brief 522** — Codex `decomper` → **`ov002` c-match** (owns ov002 delinks). 21
   v3 candidates incl. the 3 HIGH clone-cluster tinies (rows 1-3: `021e2e18`/`021e358c`/
   `0229cd70`, 24-32B) + ov002 MED. Branch `codex/cmatch-ov002-522`.
-- **Brief 523** — Claude `scaffolder` → **overlay-tail c-match** (owns ov000/005/006/
-  011/013/016/019/022 delinks — NOT ov002, that's 522). 26 v3 candidates (rows 4/9/10/
-  11/12: ov016 `021b28f4`, ov006 `021ca518`/`021cab6c`, ov019 `021b4f1c`, ov011
-  `021ceebc`, + tail). Branch `claude/cmatch-overlays-523`.
-- **Brief 524** — Claude `decomper` (strongest model — Opus/Fable) → **lever
-  verification + wall re-test (NO delinks — build-capable research).** Verify the b1089
-  sm64ds imported levers (`reshape-recipes/imported-sm64ds.md`: 25 NEW + 2 CONTRADICTS,
-  all UNVERIFIED-ON-2.0) using each lever's 5-min protocol on our mwccarm 2.0/sp1p5.
-  PRIORITIZE the 2 CONTRADICTS: (1) **SM-2 u64-mask address-laundering — may LIFT the
-  P-14 wall** (`codegen-walls.md`; if it forces the in-range base split on 2.0, that
-  unlocks a locked-permanent wall class for ALL lanes); (2) the `#pragma
-  opt_strength_reduction off` claim vs our "strength-reduction not blockable from C".
-  Promote VERIFIED levers into `contained-reshape-catalog.md` / `codegen-walls.md`;
-  mark refuted ones. May land a few real matches if a lever cracks a wall (pick funcs
-  in an UNOWNED module or coordinate). Branch `claude/lever-verify-524`.
-
+- **Brief 525** — Claude `scaffolder` → **overlay-tail c-match, wave 2** (owns
+  ov000/005/006/011/013/016/019/022 delinks — NOT ov002/main = Codex 521/522).
+  Continue safe-queue-v3 §4 rows for these overlays (b523 shipped 2 EUR + parked 2
+  reg-alloc near-misses `021b79ac`/`021ac91c`). **NEW: you now have the b524-verified
+  levers** — `recipe-gotchas.md` gotchas 27-34, esp. **gotcha 27 = `#pragma
+  opt_strength_reduction off`** (real lever) and SM-1 access-expression reg-order —
+  RETRY the 2 parked near-misses with these + attack new reg-alloc walls. Ship 3-region
+  where portable; EUR-only (keep the region `.s`) where a func references an unmapped
+  RETRIAGE global (b526 is fixing that porter gap). Own worktree. Branch
+  `claude/cmatch-overlays-525`.
+- **Brief 526** — Claude `decomper` (strongest model) → **fix the port_to_region
+  data-symbol gap (TOOLING, no delinks — won't collide).** b523's 2 EUR matches
+  couldn't port because they reference RETRIAGE-tier EUR data symbols (`data_*`) with
+  NO named USA/JPN region-sibling → `port_to_region.py` can't map them. Extend the
+  porter to auto-resolve/name the region data-symbol counterpart (model on the b459/
+  b461 porter fixes that did this for `func_*`/`_unk`/overlay-swap syms): find the
+  USA/JPN symbol at the address-corresponding location, name it, rewrite the ported
+  `.c`'s reference. + pure-Python tests + doc. This UNBLOCKS USA/JPN ports for every
+  overlay c-match lane (currently forcing EUR-only ships). Validate on b523's
+  `021b8d9c` (ov006) + `021ab460` (ov022) in a DRY-RUN (report the rewrite; don't land
+  the ports — that's 525's module). Own worktree. Branch `claude/porter-datasym-526`.
 
 ### Closed briefs (reference)
+
+- **Briefs 523/524 (Claude pair, 4-lane round).** **#1091** (b523, overlay-tail
+  c-match): 2 EUR matches (ov006 `021b8d9c`, ov022 `021ab460`), byte-identical, but
+  USA/JPN port-BLOCKED by the port_to_region data-symbol gap (→ b526 fixes) → EUR-only,
+  no regression. 2 reg-alloc near-misses parked (→ b525 retries with b524 levers). Found
+  (a) the 4-lane worktree collision + (b) the bd74e172 USA-side collateral (3 USA main
+  .c missing — same as JPN; brain restored them, symmetric to a7c8f253). **#1090** (b524,
+  lever verification): verified all 27 sm64ds levers on 2.0/sp1p5 — **9 VERIFIED**
+  (→ recipe-gotchas.md gotchas 27-34, incl. gotcha 27 = `#pragma opt_strength_reduction
+  off`, a real lever), **7 REFUTED** (SM-2 does NOT lift P-14 — wall stays locked-
+  permanent; tested real func, WALL on all 3 tiers), 2 untested. Docs-only, no gate.
 
 - **Briefs 519/520 + tooling/research (2026-07-03/04, PC brain + this round).** 519
   (decomper, c-match overlay wave) + 520 (scaffolder, HIGH c-match) merged. **#1088**
