@@ -5679,11 +5679,11 @@ src/main/func_0202eac8.s:
     complete
     .text start:0x0202eac8 end:0x0202ed04
 
-src/main/func_0202ed04.s:
+src/main/func_0202ed04.c:
     complete
     .text start:0x0202ed04 end:0x0202ed90
 
-src/main/func_0202ed90.s:
+src/main/func_0202ed90.c:
     complete
     .text start:0x0202ed90 end:0x0202ee40
 
