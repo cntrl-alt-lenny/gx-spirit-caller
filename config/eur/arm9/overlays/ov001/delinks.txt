@@ -20,7 +20,7 @@ src/overlay001/func_ov001_021ca2d8.s:
     complete
     .text start:0x021ca2d8 end:0x021ca2f8
 
-src/overlay001/func_ov001_021ca2f8.s:
+src/overlay001/func_ov001_021ca2f8.c:
     complete
     .text start:0x021ca2f8 end:0x021ca348
 

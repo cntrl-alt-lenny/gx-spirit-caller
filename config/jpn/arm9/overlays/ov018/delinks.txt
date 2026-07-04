@@ -68,6 +68,10 @@ src/jpn/overlay018/func_ov018_021accc8.c:
     complete
     .text start:0x021accc8 end:0x021acd3c
 
+src/jpn/overlay018/func_ov018_021acd3c.c:
+    complete
+    .text start:0x021acd3c end:0x021acd90
+
 src/jpn/overlay018/func_ov018_021ad040.c:
     complete
     .text start:0x021ad040 end:0x021ad11c
