@@ -687,25 +687,20 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **FOUR-LANE ROUND (briefs 521-524, 2026-07-04).** Two agent pairs running
-  concurrently (Codex GPT-5.5-High + Claude Code). Lanes are partitioned by MODULE
-  so no two agents touch the same delinks.txt — collision-free on files. (Wine:
-  c-match is light, but 4 co-located gates serialize; stagger / `--gate-timeout
-  600`.) All c-match lanes: draw candidates from `campaign-analytics/safe-queue-v3.md`
-  §4 queue FILTERED TO YOUR MODULE, confirm containment (`tools/containment_check.py`,
-  `--module` for overlays), reshape via `reshape-recipes/contained-reshape-catalog.md`,
-  match EUR → port USA/JPN (`port_to_region.py`; gate = per-region ROM `ninja sha1`;
-  park divergents/avalanches with one-line reasons). ⚠️ a commit must NEVER delete
-  files outside its module (the bd74e172 neighbor-sweep latently broke JPN for 5 days
-  — `git status` before commit). LAST actions: 3-region sha1 green → push → PR. ⚠️ **ONE WORKTREE PER LANE (b523 finding): >3 concurrent lanes need a dedicated `git worktree add ../<lane> <branch>` — the 3 role-named worktrees (brain/scaffolder/decomper) are NOT enough for 4 agents; a peer lane's whole-tree `git checkout` silently wiped b523's uncommitted matches in a shared dir.**
-- **Brief 521** — Codex `scaffolder` → **`main` c-match** (owns config/*/arm9/delinks.txt).
-  98 main candidates in v3 (rows 13-26+ = tiny 52-96B leaf funcs, all predicted-
-  contained — the cleanest mechanical pool). ⚠️ SKIP the main-HIGH avalanche zone
-  (row 27 `02078ebc` etc., brief-512/514 flagged) — MED leaf funcs only. Target
-  ~one wave. Branch `codex/cmatch-main-521`.
-- **Brief 522** — Codex `decomper` → **`ov002` c-match** (owns ov002 delinks). 21
-  v3 candidates incl. the 3 HIGH clone-cluster tinies (rows 1-3: `021e2e18`/`021e358c`/
-  `0229cd70`, 24-32B) + ov002 MED. Branch `codex/cmatch-ov002-522`.
+- **LANE STATE (2026-07-04, updated): CODEX DROPPED (user hit message limits) → Claude
+  Code ONLY now** (scaffolder + decomper; user will say when Codex is back). Codex's
+  main + ov002 lanes (b521/522, both 0-ship — avalanche-parked / already-matched) are
+  now FREE. Current: **b525 scaffolder = overlay-tail (RUNNING)**; **b527 decomper =
+  main (queued below)**. c-match loop (all lanes): safe-queue-v3 §4 rows FILTERED TO
+  YOUR MODULE → `containment_check.py` (`--module` for overlays) → reshape via
+  `contained-reshape-catalog.md` + `recipe-gotchas.md` (now incl. b524 gotchas 27-34,
+  esp. #27 `#pragma opt_strength_reduction off`) → EUR match → port USA/JPN
+  (`port_to_region.py`, now fixed for overlay data-syms by b526) → per-region ROM
+  `ninja sha1`; park with reasons. ⚠️ **ONE WORKTREE PER LANE** (`git worktree add
+  ../<lane> -b <branch> origin/main`) — never share a dir (b523: a peer's `git checkout`
+  wiped uncommitted work). ⚠️ a commit must NEVER delete files outside its module
+  (bd74e172 neighbor-sweep broke USA+JPN — `git status` before commit). LAST actions:
+  3-region sha1 green → push → PR.
 - **Brief 525** — Claude `scaffolder` → **overlay-tail c-match, wave 2** (owns
   ov000/005/006/011/013/016/019/022 delinks — NOT ov002/main = Codex 521/522).
   Continue safe-queue-v3 §4 rows for these overlays (b523 shipped 2 EUR + parked 2
@@ -716,19 +711,29 @@ fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
   where portable; EUR-only (keep the region `.s`) where a func references an unmapped
   RETRIAGE global (b526 is fixing that porter gap). Own worktree. Branch
   `claude/cmatch-overlays-525`.
-- **Brief 526** — Claude `decomper` (strongest model) → **fix the port_to_region
-  data-symbol gap (TOOLING, no delinks — won't collide).** b523's 2 EUR matches
-  couldn't port because they reference RETRIAGE-tier EUR data symbols (`data_*`) with
-  NO named USA/JPN region-sibling → `port_to_region.py` can't map them. Extend the
-  porter to auto-resolve/name the region data-symbol counterpart (model on the b459/
-  b461 porter fixes that did this for `func_*`/`_unk`/overlay-swap syms): find the
-  USA/JPN symbol at the address-corresponding location, name it, rewrite the ported
-  `.c`'s reference. + pure-Python tests + doc. This UNBLOCKS USA/JPN ports for every
-  overlay c-match lane (currently forcing EUR-only ships). Validate on b523's
-  `021b8d9c` (ov006) + `021ab460` (ov022) in a DRY-RUN (report the rewrite; don't land
-  the ports — that's 525's module). Own worktree. Branch `claude/porter-datasym-526`.
+- **Brief 527** — Claude `decomper` (strongest model) → **`main` c-match** (owns
+  config/{eur,usa,jpn}/arm9/delinks.txt — NOT overlays = b525 scaffolder). Codex's
+  main lane is free now. From safe-queue-v3 §4, take the **main MED leaf rows** (rows
+  13-26+: tiny 52-96B leaf funcs, all "predicted-contained YES" — the safe pool).
+  ⚠️ SKIP the avalanche zone: main-HIGH rows + Codex b521's parked `02085460` (163k-byte
+  avalanche). Use the b524 levers (gotcha 27 pragma etc.) on reg-alloc walls; the b526
+  porter fix means main matches should now port to USA/JPN (EUR-only + note only if a
+  ref is genuinely unmapped). Own worktree (`git worktree add ../claude-527 -b
+  claude/cmatch-main-527 origin/main`). LAST actions: 3-region sha1 green → push → PR.
+  Doc brief-527-cmatch-main.md + regen README.
+
 
 ### Closed briefs (reference)
+
+- **Briefs 521/522/526 (2026-07-04).** **#1093** (Codex b521, main c-match): 0 matches —
+  parked first fresh candidate `02085460` (163k-byte avalanche); docs + a duplicate of
+  the USA `bd74e172` restore the brain already landed. **#1094** (Codex b522, ov002):
+  0 ships — 3 candidates already-C on main, 3 parked; docs-only; 15 ov002 rows unattempted.
+  **#1092** (Claude b526): FIXED the porter data-symbol gap — real root cause was a
+  `overlay(N)` vs `ovNNN` module-name mismatch in `port_to_region.py` (the b459 fix had
+  only ever hit the ephemeral `build/_port_overlay.py`, never the canonical tool). New
+  `normalize_module_name()`; both b523 EUR-only funcs now resolve in dry-run; 349 porter
+  tests pass. Overlay c-match ports UNBLOCKED going forward. All 3 = 0 ROM change, no gate.
 
 - **Briefs 523/524 (Claude pair, 4-lane round).** **#1091** (b523, overlay-tail
   c-match): 2 EUR matches (ov006 `021b8d9c`, ov022 `021ab460`), byte-identical, but
