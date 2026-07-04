@@ -121,6 +121,10 @@ src/jpn/overlay015/func_ov015_021b588c.c:
     complete
     .text start:0x021b588c end:0x021b58fc
 
+src/jpn/overlay015/func_ov015_021b58fc.c:
+    complete
+    .text start:0x021b58fc end:0x021b594c
+
 src/jpn/overlay015/func_ov015_021b5954.c:
     complete
     .text start:0x021b5954 end:0x021b5974
