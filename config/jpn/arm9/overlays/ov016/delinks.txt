@@ -17,6 +17,10 @@ src/jpn/overlay016/func_ov016_021b26cc.c:
     complete
     .text start:0x021b26cc end:0x021b2724
 
+src/jpn/overlay016/func_ov016_021b2724.c:
+    complete
+    .text start:0x021b2724 end:0x021b277c
+
 src/jpn/overlay016/func_ov016_021b2bf4.c:
     complete
     .text start:0x021b2bf4 end:0x021b2c4c

@@ -9,6 +9,10 @@ src/usa/overlay014/func_ov014_021b24b0.c:
     complete
     .text start:0x021b24b0 end:0x021b2544
 
+src/usa/overlay014/func_ov014_021b25ec.c:
+    complete
+    .text start:0x021b25ec end:0x021b2644
+
 src/usa/overlay014/func_ov014_021b3340.c:
     complete
     .text start:0x021b3340 end:0x021b33f0

@@ -3,6 +3,10 @@
     .data       start:0x021b2280 end:0x021b22a0 kind:data align:32
     .bss        start:0x021b22a0 end:0x021b2300 kind:bss align:32
 
+src/usa/overlay023/func_ov023_021b2214.c:
+    complete
+    .text start:0x021b2214 end:0x021b226c
+
 src/usa/overlay023/bss/data_ov023_bss.s:
     complete
     .bss start:0x021b22a0 end:0x021b2300

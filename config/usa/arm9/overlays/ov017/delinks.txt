@@ -13,6 +13,10 @@ src/usa/overlay017/func_ov017_021b2b48.c:
     complete
     .text start:0x021b2b48 end:0x021b2b8c
 
+src/usa/overlay017/func_ov017_021b2b8c.c:
+    complete
+    .text start:0x021b2b8c end:0x021b2be4
+
 src/usa/overlay017/func_ov017_021b2be4.c:
     complete
     .text start:0x021b2be4 end:0x021b2c5c
