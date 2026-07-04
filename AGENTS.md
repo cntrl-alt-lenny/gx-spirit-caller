@@ -687,45 +687,52 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **Brief 519** — `scaffolder`. **HIGH c-match wave 11 — the FIRST wave drawn
-  from safe-queue-v3's never-attempted queue.** Take the top HIGH-tier rows
-  from `campaign-analytics/safe-queue-v3.md` (~5-6 attempts), confirm
-  containment per candidate (`tools/containment_check.py`, now with the R10
-  hardening — use the overlay fallback for overlay candidates), reshape via the
-  `contained-reshape-catalog.md` recipes, match EUR then port USA/JPN
-  (`port_to_region.py`; gate = per-region ROM `ninja sha1`, park divergents).
-  Park avalanches/reshape-walls with one-line reasons. Wave doc
-  `brief-519-cmatch-high-w11.md` + regen research README. **LAST actions:
-  3-region sha1 green → push → PR.** Branch: `scaffolder/c-match-high-519`.
-- **Brief 520** — `decomper`. **MED/retriage c-match wave 7 + the R10
-  follow-ups.** (1) Take the top MED/RETRIAGE rows from safe-queue-v3 (b515
-  yield was 3/19 — pick the best-scored, drop fast on reg-alloc walls).
-  (2) From R10: re-audit the **27 pending marker-carrying candidates** (14
-  ov004 + 13 ov008) — verify the GLOBAL_ASM marker's wall claim before
-  attempting (R10 calibration: ~95% hold up; only attempt the ~5% that don't)
-  — and/or the **unexamined ov006 pocket (20 funcs)**. Same gates as 519.
-  Wave doc + regen README. **LAST actions: 3-region sha1 green → push → PR.**
-  Branch: `decomper/c-match-med-520`.
-- ⚠️ Machine note: these c-match waves are LIGHT on wine (a handful of gates
-  per wave, not a batch_carve drain) — dual-lane is fine on either machine;
-  on Mac just avoid running two gates simultaneously (stagger, or
-  `--gate-timeout 600`).
+- **FOUR-LANE ROUND (briefs 521-524, 2026-07-04).** Two agent pairs running
+  concurrently (Codex GPT-5.5-High + Claude Code). Lanes are partitioned by MODULE
+  so no two agents touch the same delinks.txt — collision-free on files. (Wine:
+  c-match is light, but 4 co-located gates serialize; stagger / `--gate-timeout
+  600`.) All c-match lanes: draw candidates from `campaign-analytics/safe-queue-v3.md`
+  §4 queue FILTERED TO YOUR MODULE, confirm containment (`tools/containment_check.py`,
+  `--module` for overlays), reshape via `reshape-recipes/contained-reshape-catalog.md`,
+  match EUR → port USA/JPN (`port_to_region.py`; gate = per-region ROM `ninja sha1`;
+  park divergents/avalanches with one-line reasons). ⚠️ a commit must NEVER delete
+  files outside its module (the bd74e172 neighbor-sweep latently broke JPN for 5 days
+  — `git status` before commit). LAST actions: 3-region sha1 green → push → PR.
+- **Brief 521** — Codex `scaffolder` → **`main` c-match** (owns config/*/arm9/delinks.txt).
+  98 main candidates in v3 (rows 13-26+ = tiny 52-96B leaf funcs, all predicted-
+  contained — the cleanest mechanical pool). ⚠️ SKIP the main-HIGH avalanche zone
+  (row 27 `02078ebc` etc., brief-512/514 flagged) — MED leaf funcs only. Target
+  ~one wave. Branch `codex/cmatch-main-521`.
+- **Brief 522** — Codex `decomper` → **`ov002` c-match** (owns ov002 delinks). 21
+  v3 candidates incl. the 3 HIGH clone-cluster tinies (rows 1-3: `021e2e18`/`021e358c`/
+  `0229cd70`, 24-32B) + ov002 MED. Branch `codex/cmatch-ov002-522`.
+- **Brief 523** — Claude `scaffolder` → **overlay-tail c-match** (owns ov000/005/006/
+  011/013/016/019/022 delinks — NOT ov002, that's 522). 26 v3 candidates (rows 4/9/10/
+  11/12: ov016 `021b28f4`, ov006 `021ca518`/`021cab6c`, ov019 `021b4f1c`, ov011
+  `021ceebc`, + tail). Branch `claude/cmatch-overlays-523`.
+- **Brief 524** — Claude `decomper` (strongest model — Opus/Fable) → **lever
+  verification + wall re-test (NO delinks — build-capable research).** Verify the b1089
+  sm64ds imported levers (`reshape-recipes/imported-sm64ds.md`: 25 NEW + 2 CONTRADICTS,
+  all UNVERIFIED-ON-2.0) using each lever's 5-min protocol on our mwccarm 2.0/sp1p5.
+  PRIORITIZE the 2 CONTRADICTS: (1) **SM-2 u64-mask address-laundering — may LIFT the
+  P-14 wall** (`codegen-walls.md`; if it forces the in-range base split on 2.0, that
+  unlocks a locked-permanent wall class for ALL lanes); (2) the `#pragma
+  opt_strength_reduction off` claim vs our "strength-reduction not blockable from C".
+  Promote VERIFIED levers into `contained-reshape-catalog.md` / `codegen-walls.md`;
+  mark refuted ones. May land a few real matches if a lever cracks a wall (pick funcs
+  in an UNOWNED module or coordinate). Branch `claude/lever-verify-524`.
 
-⚠️ **TWO-BRAIN BOOKKEEPING DRIFT (reconciled 2026-06-22, post b474 merge).**
-Briefs **470–474 were driven from the PC brain** (with a `[codex]` agent as a 3rd
-model) while this Mac brain was idle. They merged as **PRs #1006–#1013**. The PC
-brain tracked them via per-brief docs (`docs/research/brief-47x-*.md`) + PR
-descriptions + git history — it did **not** update this AGENTS.md open/closed
-sections or `state.md`, and it used a **different numbering convention** (one
-brief number per ROUND shared by both lanes → two "471"s, two "473"s) vs this
-brain's per-agent numbering. **Canonical state = git history + `docs/research/`
-+ merged PRs, NOT this section.** The next round's numbering + lane assignment is
-pending the user's call on who drives (Mac vs PC) so the two brains stop
-colliding. Current lanes in flight: scaffolder = EUR ov002 LOWER `.s` (≈343 left,
-b473/#1013), decomper/codex = USA/JPN main `.s` drain. ov002 UPPER exhausted
-(b474). EUR ≈ 96.6% units / 95% fn / 87% code; USA 31.8% fn; JPN 27.7% fn.
 
 ### Closed briefs (reference)
+
+- **Briefs 519/520 + tooling/research (2026-07-03/04, PC brain + this round).** 519
+  (decomper, c-match overlay wave) + 520 (scaffolder, HIGH c-match) merged. **#1088**
+  (Codex) objdiff #352 cherry-pick (doc-only, unbuilt — fixes the ORIGINAL arm.rs crash
+  variant, NOT the v3 data-first one, so `objdiff_filter_panic_units.py` v3 stays
+  necessary) + `tools/xmap_normalize.py`. **#1089** (Codex) sm64ds-decomp codegen
+  catalog ingest → `reshape-recipes/imported-sm64ds.md`: 44 levers (17 known, 25 NEW,
+  2 CONTRADICTS-ours), ALL tagged UNVERIFIED-ON-2.0 → b524 verifies. Both build-free,
+  merged without gate (0 src/config).
 
 - **Brief 476** — `decomper` (codex GPT-5.5-High), shipped in PR #1016. ✅ **710
   USA/JPN overlay `.s`** — ov006 (88+88), ov004 (164+164), ov011 (103+103); all
