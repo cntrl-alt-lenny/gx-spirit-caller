@@ -1,8 +1,10 @@
 [//]: # (markdownlint-disable MD013 MD041)
 
-# Imported sm64ds-decomp levers — UNVERIFIED-ON-2.0
+# Imported sm64ds-decomp levers — VERIFIED-ON-2.0 (brief 524)
 
-**Status:** build-free research, 2026-07-03. Mined from
+**Status:** VERIFIED on mwcc 2.0/sp1p5, 2026-07-04 (brief 524). Every entry
+below now carries a **Verdict (brief 524)** line/block — see the Counts table
+for the resolution tally. Originally mined build-free, 2026-07-03, from
 [`bmanus2-dotcom/sm64ds-decomp`](https://github.com/bmanus2-dotcom/sm64ds-decomp)
 (active project, **68.8% matched** / 66.9%→70%-goal per its own runbook at fetch
 time, 4,400+ byte-exact pairs), specifically `notes/mwccarm-codegen.md` (493
@@ -37,13 +39,17 @@ the headline version gap:
   -msgstyle gcc`. Theirs (per `mwccarm-codegen.md` §1): `-O4,p -enum int -lang
   c99 -char signed -interworking -proc arm946e -gccext,on -msgstyle gcc`.
 
-**Every lever in this document is tagged `UNVERIFIED-ON-2.0`.** None of it may
-be cited as fact, used to justify a match, or copied into
-[`contained-reshape-catalog.md`](contained-reshape-catalog.md) or
-[`../recipe-gotchas.md`](../recipe-gotchas.md) until a build-capable agent runs
-its verification protocol on our actual toolchain and the predicted asm shape
-is confirmed. This document does not touch `src/`, `config/`, or `tools/` —
-it is a work queue for a *future* build-capable session.
+**Brief 524 ran the verification protocol on every entry** (mwcc 2.0/sp1p5,
+direct-compile + objdump harness, `tools/verify.py` for real-function
+comparisons). Each entry now carries a `**Verdict (brief 524):**` note.
+VERIFIED entries are promoted into [`recipe-gotchas.md`](../recipe-gotchas.md)
+(gotchas 27-34) with a cross-reference back here; REFUTED/MOOT/UNTESTED
+entries are annotated in place per the graduation protocol below (not
+deleted — the negative result prunes the search space too). This document
+still does not touch `src/`/`config/` — brief 524 was build-capable
+*research*, no delinks/matches landed from it directly (see
+[`brief-524-lever-verification.md`](../brief-524-lever-verification.md) for
+the full session account and whether any match landed).
 
 ### How to graduate a lever out of this file
 
@@ -73,11 +79,32 @@ it is a work queue for a *future* build-capable session.
 | CONTRADICTS-ours (conflicts with a documented finding; needs urgent verification) | 2 |
 | **Total sm64ds findings triaged** | **44** |
 
+### Brief 524 verification resolution (25 NEW + 2 CONTRADICTS = 27 tested)
+
+| Verdict | Count | Entries |
+|---|---:|---|
+| **VERIFIED** (promoted to `recipe-gotchas.md` gotchas 27-34) | 9 | SM-1, SM-3, SM-7, SM-9, SM-10 (nuance), SM-12, SM-13, SM-15, SM-22 |
+| **VERIFIED/EXPECTED** (confirmed correct C semantics, not a new quirk) | 1 | SM-19 |
+| **REFUTED** (does not reproduce on 2.0/sp1p5) | 7 | SM-2 (P-14 stays locked), SM-4, SM-6, SM-8, SM-20, SM-21, SM-26 |
+| **MOOT** (idiom already naturally present in our codebase/SDK) | 2 | SM-16, SM-17 |
+| **UNTESTED** (precondition not reproduced / mis-targeted test — not refuted) | 2 | SM-5, SM-18 |
+| **NOT TESTED** (lower priority per the source's own ranking, deferred) | 6 | SM-11, SM-14, SM-23, SM-24, SM-25 (N/A), SM-27 |
+| **Total** | **27** | |
+
+Full session account, including the P-14 re-test detail and whether any
+match landed: [`brief-524-lever-verification.md`](../brief-524-lever-verification.md).
+
 ---
 
 ## Tier 1 — highest value, verify these first
 
-### SM-1. Access-EXPRESSION (deref vs index) changes r0/r1 register ordering — **NEW**
+### SM-1. Access-EXPRESSION (deref vs index) changes r0/r1 register ordering — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed exactly as predicted on mwcc
+> 2.0/sp1p5 — `test_a`/`test_b` synthetic reproduced a register swap
+> (base/value in opposite registers) with identical instruction count.
+> Promoted to [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 28. No
+> real matched-corpus anchor identified yet.
 
 **Their claim** (`mwccarm-codegen.md` §2, the chapter's own "KEY LEVER"):
 `*(T*)G |= mask` (cast-and-dereference) and `G[0] |= mask` (array-index) are
@@ -126,7 +153,21 @@ exactly a deref/index swap.
 
 ---
 
-### SM-2. u64-mask laundering for base-address materialization — **CONTRADICTS our P-14 wall**
+### SM-2. u64-mask laundering for base-address materialization — **REFUTED for P-14 (brief 524)**
+
+> **Verdict (brief 524):** re-tested against the exact `func_02032724`
+> P-14 target on mwcc 2.0/sp1p5 (all 3 tiers, `verify.py --cc all`).
+> **P-14 remains locked-permanent.** The laundering idiom DOES force
+> some split/materialization (a bare-store synthetic went 3→4 words) —
+> so the fold isn't universally unconditional, a genuinely new,
+> real observation — but the split point is **compiler-chosen** by
+> DP-immediate-encodability (`0x27c`/`0xc00` every time), never the
+> source-implied `0x1fc`/`0xc80` sub-struct boundary, and repeated
+> occurrences of the identical masked expression aren't even handled
+> consistently (load vs store diverged). Against the real function with
+> matching control flow: 10 words vs orig's 9, no tier matched. Full
+> writeup + all variants tested: `codegen-walls.md` P-14 addendum,
+> [`brief-524-lever-verification.md`](../brief-524-lever-verification.md).
 
 **Their claim** (`mwccarm-codegen.md` §6g, "RETIREMENT LIFTED"): the idiom
 
@@ -193,7 +234,26 @@ real matches, not just a documentation update.
 
 ---
 
-### SM-3. `#pragma opt_strength_reduction off` — **CONTRADICTS our memory's strength-reduction finding**
+### SM-3. `#pragma opt_strength_reduction off` — **VERIFIED (brief 524) — real lever, prior finding refined not overturned**
+
+> **Verdict (brief 524):** CONFIRMED live on mwcc 2.0/sp1p5. A
+> non-power-of-2-struct-stride loop strength-reduces to a
+> post-increment pointer walk by default (`ldr r2,[r0],#12`); the
+> pragma reverts it to explicit `mul`+indexed addressing, a genuinely
+> different, longer sequence with different register allocation. A
+> bogus-pragma control confirmed byte-identical to the default (ruling
+> out "any pragma perturbs codegen"), and the `reset` pragma correctly
+> scopes the effect to just the enclosed function (a function compiled
+> after `reset` returns to default behavior). **Does not trigger on
+> power-of-2-stride loops** — the ARM barrel shifter already makes
+> those addressing modes free, so mwcc doesn't strength-reduce them in
+> the first place regardless of the pragma (tested; both un-reduced by
+> default). This refines rather than overturns the prior memory finding:
+> that finding tested only SOURCE-LEVEL forms, which genuinely don't
+> block it; a `#pragma` is a different, effective lever category.
+> Promoted to [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 27. No
+> real matched-corpus anchor identified yet — apply on the next
+> non-power-of-2-stride near-miss.
 
 **Their claim** (`mwccarm-codegen.md` §6f + §6e, `crack-loop-runbook.md`):
 across a 20-pragma × 96-near-miss sweep (1,920 compiles), all but two pragmas
@@ -259,7 +319,21 @@ permanent.
 
 ---
 
-### SM-4. Real C++ virtual dispatch reproduces pre-indexed writeback — **NEW, "the single biggest unlock" per source**
+### SM-4. Real C++ virtual dispatch reproduces pre-indexed writeback — **REFUTED (brief 524)**
+
+> **Verdict (brief 524):** does not reproduce on mwcc 2.0/sp1p5. Two
+> test configurations (a minimal single-arg dispatch, and a thickened
+> version with 3 locals computed before the call to give the scheduler
+> genuine freedom) both produced **byte-identical** output for the real
+> `.cpp`/`extern "C"` virtual call and the plain-C vtable-slot
+> emulation — no distinguishable hoisting, no pre-indexed writeback
+> form (`ldr rV,[r0,#OFF]!`) in EITHER variant. The `.cpp`+`extern "C"`
+> *infrastructure* itself is confirmed live (compiles clean under
+> `-lang=c++`, matching our existing per-file opt-in), so the mechanism
+> is available if a different C++-specific shape needs it (see SM-10
+> below, tested the same session) — but this specific distinguishing
+> claim is refuted for our compiler. SM-11 (bundled with this,
+> lower-priority) not tested as a result.
 
 **Their claim** (`mwccarm-codegen.md` §5): a source file starting with the
 literal comment `//cpp` compiles under `-lang c++` while keeping `extern "C"`
@@ -328,7 +402,19 @@ testing in the same session since it's the same file/flag setup.
 
 ---
 
-### SM-5. `#pragma optimize_for_size on` cracks early-exit epilogue duplication — **NEW**
+### SM-5. `#pragma optimize_for_size on` cracks early-exit epilogue duplication — **UNTESTED (brief 524) — precondition not reproduced**
+
+> **Verdict (brief 524):** untested, not refuted. Two synthetic
+> attempts (a minimal `if`/return-two-helpers shape, then a thickened
+> version with 3 callee-saved locals live across the branch) both
+> compiled with **no epilogue duplication in the baseline** — each
+> return path just emits its own single `pop`, nothing to observe the
+> pragma blocking. The specific `-O4,p` duplication heuristic the
+> source describes needs a more particular precondition than generic
+> "thickening" reproduces; per the doc's own guidance, distinguishing
+> untested from refuted matters here — this is a search pattern to keep
+> in mind (a build a few bytes longer than orig at an early-return
+> point) rather than a confirmed-inert pragma.
 
 **Their claim** (`mwccarm-codegen.md` §6d/§6f): `-O4,p` duplicates a short
 conditional epilogue at an early-exit point where the ROM has a plain `beq`
@@ -389,7 +475,17 @@ tail) rather than a specific address.
 
 ## Tier 2 — solid candidates, concise protocols
 
-### SM-6. Pool-loaded literal/address hoisted above first use under `-O4,p` — **NEW**
+### SM-6. Pool-loaded literal/address hoisted above first use under `-O4,p` — **REFUTED (brief 524)**
+
+> **Verdict (brief 524):** does NOT reproduce on mwcc 2.0/sp1p5 — the
+> opposite happens. `test_hoist`'s pool-address load for `g_rare`
+> (used only inside a rarely-taken `if`) is scheduled **lazily**,
+> emitted as a **predicated** `ldreq`/`ldreq` pair right at the point
+> of use, not hoisted to the top of the function before the branch
+> condition. This is consistent with (extends, doesn't contradict) our
+> existing Recipe 6 lazy-scheduling finding — mwcc's "schedule right
+> before use" behavior applies broadly to pool-loaded globals inside
+> conditionals, not just stack-passed arguments.
 
 **Claim** (`mwccarm-codegen.md` §1): pool loads (constants, addresses) are
 hoisted to appear *before* their first use in the instruction stream, even
@@ -420,7 +516,13 @@ int test_hoist(int cond, int a, int b) {
 
 ---
 
-### SM-7. Adjacent-word struct copy batches as load-load-store-store — **NEW**
+### SM-7. Adjacent-word struct copy batches as load-load-store-store — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed exactly as predicted —
+> `copy_scalar`/`copy_struct` synthetic reproduced interleaved
+> (`ldr;str;ldr;str`) vs batched (`ldr;ldr;str;str`) precisely.
+> Promoted to [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 29. No
+> real matched-corpus anchor identified yet.
 
 **Claim** (`mwccarm-codegen.md` §3): two adjacent words copied field-by-field
 should be written as a single struct assignment (`*(P2*)dst = *(P2*)src;`),
@@ -447,7 +549,17 @@ regardless).
 
 ---
 
-### SM-8. `volatile`-qualified array survives scalar replacement — **NEW extension of gotcha 17**
+### SM-8. `volatile`-qualified array survives scalar replacement — **REFUTED (brief 524)**
+
+> **Verdict (brief 524):** does not reproduce on mwcc 2.0/sp1p5 —
+> tested twice (once with a runtime-variable loop index, once redone
+> with pure compile-time-constant indices per the doc's own precondition).
+> **Both** `test_plain` and `test_volatile` allocate a real stack slot
+> and issue genuine indexed loads in both tests — mwcc 2.0 never
+> scalar-replaces (SROAs) a local array in the first place on this
+> toolchain, regardless of `volatile`. Matches the doc's own predicted
+> "doesn't reproduce" case exactly: the qualifier is moot for this
+> specific optimization on our compiler.
 
 **Claim** (`mwccarm-codegen.md` §6e, Fable-discovered): a plain local array
 can be scalar-replaced (SROA'd into individual register/stack values,
@@ -481,7 +593,12 @@ qualifier moot for this specific shape.
 
 ---
 
-### SM-9. Bitfield-shift extraction needs an `unsigned` pointer type for `lsr` — **NEW (high confidence, low risk)**
+### SM-9. Bitfield-shift extraction needs an `unsigned` pointer type for `lsr` — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed exactly as predicted (high prior
+> confidence borne out) — `extract_signed` emits `asr`, `extract_unsigned`
+> emits `lsr`. Promoted to [`recipe-gotchas.md`](../recipe-gotchas.md)
+> gotcha 30. No real matched-corpus anchor identified yet.
 
 **Claim** (`mwccarm-codegen.md` §3): `*(unsigned *)p >> sh & mask` emits
 `lsr` (logical shift); the same expression through a **signed** pointer
@@ -506,7 +623,21 @@ if it fails.
 
 ---
 
-### SM-10. PMF (pointer-to-member-function) ABI shape + argument-liveness coloring — **NEW**
+### SM-10. PMF (pointer-to-member-function) ABI shape + argument-liveness coloring — **VERIFIED WITH NUANCE (brief 524)**
+
+> **Verdict (brief 524):** the tagged 2-word PMF ABI is confirmed real
+> on mwcc 2.0/sp1p5 — a parameter-passed PMF dispatch produced the
+> expected mechanism (this-pointer adjustment via `asr #1` discarding a
+> tag bit, a `tst`+branch choosing between a direct-pointer path and a
+> vtable-indexed path). The **exact instruction sequence differs** from
+> the doc's literal prediction (`ldr r3,[r0,#OFF]; ldr r1,[r3,#4]; …`)
+> because that describes a PMF read from a **struct field**
+> (`c->pp[+N/8]`); the test here passes the PMF as a **parameter**
+> instead (no field-read prefix needed), so the opening differs while
+> the core adjustor+dispatch mechanism matches. Useful confirmation of
+> the ABI shape either way, per the doc's own framing. No real
+> matched-corpus PMF candidate identified on our side yet — the "ov006
+> state machine" lead is unconfirmed as PMF-shaped.
 
 **Claim** (`mwccarm-codegen.md` §5, §6e): `PMF* p = c->pp[+N/8]; (c->**p)();`
 with `typedef void (C::*PMF)();` produces a fixed prologue: `ldr r3,[r0,#OFF];
@@ -545,7 +676,12 @@ produces either way, since it's useful even if it diverges from 1.2's.
 
 ---
 
-### SM-11. Deleting-destructor / `new T()` shape — **NEW (bundle with SM-4/SM-10, lower individual priority)**
+### SM-11. Deleting-destructor / `new T()` shape — **NOT TESTED (brief 524)**
+
+> **Verdict (brief 524):** not tested this round — bundled with SM-4,
+> which refuted, so per the doc's own priority ranking this dropped
+> further in priority. Still open if a real C++-object-allocation
+> candidate surfaces.
 
 **Claim** (`mwccarm-codegen.md` §5): compiler-generated deleting destructors
 install the vtable with the pool-load **hoisted above** `mov r4, r0` (don't
@@ -558,7 +694,14 @@ C++ path is worth investing in further.
 
 ---
 
-### SM-12. Predicated-select "override" form vs ternary — **NEW third code shape**
+### SM-12. Predicated-select "override" form vs ternary — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed — `select_ternary` (two
+> conditional movs, `movne`+`moveq`) and `select_override` (one
+> unconditional `mov`+one conditional `movne`) are genuinely different
+> shapes, not just operand-swapped. Promoted to
+> [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 31. No real
+> matched-corpus anchor identified yet.
 
 **Claim** (`mwccarm-codegen.md` §6c): `int x = A; if (!cond) x = B;`
 (assign-then-conditionally-override) produces a single predicated `mov`
@@ -584,7 +727,17 @@ same output — the override form isn't a distinct lever on our compiler.
 
 ---
 
-### SM-13. Arg-builder temp declaration order sets CALL-argument registers — **NEW extension of gotcha 11**
+### SM-13. Arg-builder temp declaration order sets CALL-argument registers — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed — a declared-in-reverse-of-call-order
+> test and a declared-in-call-order control both showed the same
+> mechanism: the register a call-argument temp lives in is fixed by
+> **evaluation/declaration order**, not call position (first-computed
+> value always lands in the same "early" register, e.g. r5, regardless
+> of which call argument it becomes). Mismatched order forces extra
+> `mov` shuffling at the call site. Promoted to
+> [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 32. No real
+> matched-corpus anchor identified yet.
 
 **Claim** (`mwccarm-codegen.md` §6c): our gotcha 11 already establishes that
 declaration order picks *callee-saved* (r4/r5/r6) register assignment for
@@ -617,7 +770,13 @@ effect, and the extra `mov`s don't appear.
 
 ---
 
-### SM-14. `register`-qualified locals (including arrays) bias allocation — **NEW**
+### SM-14. `register`-qualified locals (including arrays) bias allocation — **NOT TESTED (brief 524)**
+
+> **Verdict (brief 524):** not tested this round — the doc's own note
+> that this needs a real register-pressure near-miss as the test
+> subject (not a clean synthetic) held; no such candidate was hunted
+> down this session given the volume of other levers to clear. Still
+> open.
 
 **Claim** (`pret-idioms.md` #5): `register u32 chunk_starts[3];` biases mwcc
 toward keeping a value resident in a register across a region it would
@@ -634,7 +793,13 @@ protocol itself requires hunting a real candidate first (10 minutes, not 5).
 
 ---
 
-### SM-15. `volatile` in a condition defeats CSE per branch arm — **NEW extension of gotcha 17**
+### SM-15. `volatile` in a condition defeats CSE per branch arm — **VERIFIED (brief 524)**
+
+> **Verdict (brief 524):** confirmed exactly as predicted — `test_cse`
+> reproduced two separate loads of `g_status` (branch-test load +
+> a second, predicated `ldrne` for the `+1` use). Promoted to
+> [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 33. No real
+> matched-corpus anchor identified yet.
 
 **Claim** (`mwccarm-codegen.md` §6g): a `volatile` read used directly inside
 a branch condition prevents mwcc from CSE-ing that read across the two arms
@@ -663,24 +828,25 @@ single load's register value for both, even with `volatile` — meaning
 
 ## Tier 3 — narrower / deeper levers (compact protocols)
 
-All still `UNVERIFIED-ON-2.0`. These are lower-priority (narrow applicability,
-or SDK/game-content-derived rather than pure-compiler, or from the Fable
-"floor mop-up" tier where the win rate was already low even on 1.2).
+Lower-priority (narrow applicability, or SDK/game-content-derived rather than
+pure-compiler, or from the Fable "floor mop-up" tier where the win rate was
+already low even on 1.2). **Verdict column added brief 524** — see notes below
+the table for tested entries.
 
-| # | Lever | Source | One-line test | Expected signal |
-|---|---|---|---|---|
-| SM-16 | Fix12 fixed-point multiply idiom: `(int)(((long long)a*b+0x800)>>12)` | `mwccarm-codegen.md` §6 | Compile the idiom, check for a `smull`/shift-right-12 sequence | SDK-derived, likely portable — low risk, medium value if our game uses Fix12 math (check `src/` for existing fixed-point helpers first) |
-| SM-17 | Angle→sin/cos table index: `(unsigned short)(short)(angle+0x8000)>>4` indexing `tbl[i*2]`/`tbl[i*2+1]` | `mwccarm-codegen.md` §6 | Grep our own `src/`/`libs/` for an existing trig-table accessor before testing — may already be present under a different name | NitroSDK-standard; if we already have this idiom in matched code, this entry is moot (check first, verify second) |
-| SM-18 | `__sinit_*` static initializers matchable via source-order integer constants (encodable immediates inline, non-encodable take pool word) | `mwccarm-codegen.md` §6 | Compile two static-init structs, one with all-encodable immediates and one with a mixed set, compare pool usage | Order of pool words should track source order if the lever holds |
-| SM-19 | Boolean-materialization suffix sensitivity: `t!=false` vs `t==true` change which `cmp`/branch form emits (both should still beat the fully-materialized 6-instr form) | `mwccarm-codegen.md` §6c | Compile `if(t!=0)`, `if(t!=false)`, `if(t==true)` variants of the same guard | All three should fold to the same ~4-instr `cmp/bne`; if one doesn't, that's the new information |
-| SM-20 | Fake data-dependency forces load/store batching order: `int a=p.a,b=p.b; dst_a=b?a:a; dst_b=b;` | `mwccarm-codegen.md` §6e (Fable) | Compare a plain two-field copy vs the same-value-ternary form | Ternary form should force both loads before both stores; plain form may interleave |
-| SM-21 | Reassign-before-call blocks copy-propagation: `dh=(s16)(h-dh); f(&x,dh,...)` | `mwccarm-codegen.md` §6e (Fable) | Compare `f(&x, h-dh, ...)` (inline expr) vs the reassign form | Reassign form should force a materialized temp instead of folding the subtraction into the call-arg setup |
-| SM-22 | Break out of **both** nested switches to reach a shared `else` epilogue | `mwccarm-codegen.md` §6e (Fable) | Nested `switch`/`switch` with a `break`-to-shared-tail vs early-return from the inner switch | Break form should produce one shared epilogue block; early-return duplicates it (extends our gotcha 23/24 switch family) |
-| SM-23 | `enum` vs plain `u32`/`int` LOCAL type affects regalloc | `pret-idioms.md` #4 | Declare the same intermediate as `enum Foo` vs `unsigned int`, same logic otherwise | Low-confidence per source ("purposefully left as u32... causes fuckery" — no mechanism given); treat any observed difference as worth a closer look, not proof of a general rule |
-| SM-24 | `void *` pointer arithmetic for materialization: `return (u32)((void *)f(x) + value);` | `pret-idioms.md` #10 | Test **after** SM-2 (u64 laundering) — this is adjacent to our already-*falsified* `(char*)self + K` cast idiom from the P-14 6-idiom matrix, so low expected yield | If it reproduces where the `char*` cast form didn't, the `void*` vs `char*` distinction itself becomes the interesting finding |
-| SM-25 | mwcc inline `asm { }` function-body escape hatch, with syntax gotchas (`swi` not `svc`; `stmltia` not `stmlt`; bare label + trailing colon on own line; `strneh` not `strhne`; `ldr pc,[sp],#4` not `ldmia sp!,{pc}`) | `mwccarm-codegen.md` §8 | N/A — this is a syntax reference, not a behavior to falsify; relevant only if a candidate is a genuine hand-written-asm SDK primitive | Compare against our existing GLOBAL_ASM `.s`-file mechanism (see `permuter-lane-windows-blocked.md` memory) before using — we may already have an equivalent path; this is opportunistic, not urgent |
-| SM-26 | Mutable-variable subtraction beats `rsb` const-fold: `int v=K; v-=x;` forces `mov+sub`, not `rsb rD,x,#K` | `mwccarm-codegen.md` §6g | Compile `return K - x;` vs `int v=K; v-=x; return v;` | `rsb` form vs `mov+sub` form should differ if the lever holds |
-| SM-27 | Explicit constant call-arg colors a compare chain; volatile reads on different call args order relative to each other across a call boundary | `mwccarm-codegen.md` §6g | Narrow/deep — construct two `volatile` reads passed as args to the same call in different declared orders | Lowest priority in this table; only worth chasing if a real near-miss matches this exact shape |
+| # | Lever | Source | One-line test | Expected signal | Verdict (brief 524) |
+|---|---|---|---|---|---|
+| SM-16 | Fix12 fixed-point multiply idiom: `(int)(((long long)a*b+0x800)>>12)` | `mwccarm-codegen.md` §6 | Compile the idiom, check for a `smull`/shift-right-12 sequence | SDK-derived, likely portable — low risk, medium value if our game uses Fix12 math (check `src/` for existing fixed-point helpers first) | **MOOT** — `>>12` fixed-point idiom already naturally present in matched-adjacent overlay code (ordinary C, nothing exotic to verify) |
+| SM-17 | Angle→sin/cos table index: `(unsigned short)(short)(angle+0x8000)>>4` indexing `tbl[i*2]`/`tbl[i*2+1]` | `mwccarm-codegen.md` §6 | Grep our own `src/`/`libs/` for an existing trig-table accessor before testing — may already be present under a different name | NitroSDK-standard; if we already have this idiom in matched code, this entry is moot (check first, verify second) | **MOOT** — `libs/nitro/include/nitro/fx.h` already declares `FX_SinIdx`/`FX_CosIdx` (LUT-based angle indexing); no fresh verification needed |
+| SM-18 | `__sinit_*` static initializers matchable via source-order integer constants (encodable immediates inline, non-encodable take pool word) | `mwccarm-codegen.md` §6 | Compile two static-init structs, one with all-encodable immediates and one with a mixed set, compare pool usage | Order of pool words should track source order if the lever holds | **UNTESTED** — my test mis-targeted the claim: plain static-const-struct initializers land directly in `.data` (raw bytes, no code-section pool word involved at all), not through the mechanism the claim describes (runtime `__sinit_*` constructor-list generation for non-trivial initializers). Needs a genuine non-trivial-initializer test, deferred |
+| SM-19 | Boolean-materialization suffix sensitivity: `t!=false` vs `t==true` change which `cmp`/branch form emits (both should still beat the fully-materialized 6-instr form) | `mwccarm-codegen.md` §6c | Compile `if(t!=0)`, `if(t!=false)`, `if(t==true)` variants of the same guard | All three should fold to the same ~4-instr `cmp/bne`; if one doesn't, that's the new information | **VERIFIED/EXPECTED** — `!=0`/`!=false` byte-identical (correct, `false`==0 in C); `==true` compares against `#1` instead of `#0`, but that's correct C semantics (`==true` really is `==1`, a different condition than `!=0` for any value >1), not a new mwcc quirk. All three fold to the same ~4-6-instr shape |
+| SM-20 | Fake data-dependency forces load/store batching order: `int a=p.a,b=p.b; dst_a=b?a:a; dst_b=b;` | `mwccarm-codegen.md` §6e (Fable) | Compare a plain two-field copy vs the same-value-ternary form | Ternary form should force both loads before both stores; plain form may interleave | **REFUTED** — byte-identical (`ldr;ldr;stm`) for both forms; mwcc already batches independent struct-field reads/writes via alias analysis, the fake trivially-true ternary is optimized away entirely |
+| SM-21 | Reassign-before-call blocks copy-propagation: `dh=(s16)(h-dh); f(&x,dh,...)` | `mwccarm-codegen.md` §6e (Fable) | Compare `f(&x, h-dh, ...)` (inline expr) vs the reassign form | Reassign form should force a materialized temp instead of folding the subtraction into the call-arg setup | **REFUTED** — byte-identical; mwcc's copy-propagation sees through the reassignment regardless of whether the subtraction is inlined at the call site or bound to a reassigned local first |
+| SM-22 | Break out of **both** nested switches to reach a shared `else` epilogue | `mwccarm-codegen.md` §6e (Fable) | Nested `switch`/`switch` with a `break`-to-shared-tail vs early-return from the inner switch | Break form should produce one shared epilogue block; early-return duplicates it (extends our gotcha 23/24 switch family) | **VERIFIED** — confirmed exactly as predicted (break-form: 1 shared `bl helper`; early-return form: 2 duplicated `bl helper` copies, +2 words). Promoted to [`recipe-gotchas.md`](../recipe-gotchas.md) gotcha 34 |
+| SM-23 | `enum` vs plain `u32`/`int` LOCAL type affects regalloc | `pret-idioms.md` #4 | Declare the same intermediate as `enum Foo` vs `unsigned int`, same logic otherwise | Low-confidence per source ("purposefully left as u32... causes fuckery" — no mechanism given); treat any observed difference as worth a closer look, not proof of a general rule | **NOT TESTED** — lowest priority per source's own low-confidence flag |
+| SM-24 | `void *` pointer arithmetic for materialization: `return (u32)((void *)f(x) + value);` | `pret-idioms.md` #10 | Test **after** SM-2 (u64 laundering) — this is adjacent to our already-*falsified* `(char*)self + K` cast idiom from the P-14 6-idiom matrix, so low expected yield | If it reproduces where the `char*` cast form didn't, the `void*` vs `char*` distinction itself becomes the interesting finding | **NOT TESTED** — SM-2 refuted for P-14, and the source itself flags "low expected yield"; deprioritized accordingly |
+| SM-25 | mwcc inline `asm { }` function-body escape hatch, with syntax gotchas (`swi` not `svc`; `stmltia` not `stmlt`; bare label + trailing colon on own line; `strneh` not `strhne`; `ldr pc,[sp],#4` not `ldmia sp!,{pc}`) | `mwccarm-codegen.md` §8 | N/A — this is a syntax reference, not a behavior to falsify; relevant only if a candidate is a genuine hand-written-asm SDK primitive | Compare against our existing GLOBAL_ASM `.s`-file mechanism (see `permuter-lane-windows-blocked.md` memory) before using — we may already have an equivalent path; this is opportunistic, not urgent | **N/A** — syntax reference only, not a behavior to test; not applicable this round |
+| SM-26 | Mutable-variable subtraction beats `rsb` const-fold: `int v=K; v-=x;` forces `mov+sub`, not `rsb rD,x,#K` | `mwccarm-codegen.md` §6g | Compile `return K - x;` vs `int v=K; v-=x; return v;` | `rsb` form vs `mov+sub` form should differ if the lever holds | **REFUTED** — byte-identical (`rsb r0,r0,#100`) for both; mwcc optimizes through the mutable local back to the same `rsb` regardless of source form |
+| SM-27 | Explicit constant call-arg colors a compare chain; volatile reads on different call args order relative to each other across a call boundary | `mwccarm-codegen.md` §6g | Narrow/deep — construct two `volatile` reads passed as args to the same call in different declared orders | Lowest priority in this table; only worth chasing if a real near-miss matches this exact shape | **NOT TESTED** — lowest priority per the source's own explicit ranking; no matching near-miss surfaced this round |
 
 ---
 

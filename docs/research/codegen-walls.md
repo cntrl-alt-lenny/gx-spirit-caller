@@ -7050,6 +7050,31 @@ Family-5/N3 investigation, added the immediate-range probe, and locked
 P-14. Full diagnosis at
 [`brief-250-c42-escape-classify-family5-n3-family7.md`](brief-250-c42-escape-classify-family5-n3-family7.md).
 
+**7th idiom re-tested, still locked (brief 524).** `imported-sm64ds.md`
+SM-2 proposed a 7th idiom the original 6-idiom matrix hadn't tried:
+routing the computed address through a 64-bit bitwise-AND identity op
+(`*(int*)(((int)base+OFF) & 0xFFFFFFFFFFFFFFFFULL) = …`), reported to
+force the split on sm64ds's mwcc **1.2/sp2p3**. Re-tested against
+`func_02032724` on **our** mwcc 2.0/sp1p5 (all 3 tiers via `verify.py
+--cc all`): the idiom **does** force some materialization/split — a
+bare-store synthetic went from 3 words (folded `[r0,#0xe7c]`) to 4
+words (`add r0,r0,#0x27c; …,[r0,#0xc00]`) — so the fold is not
+*universally* unconditional, contradicting a stronger reading of "no
+idiom works." But the mechanism is **not steerable to the wall's
+specific boundary**: mwcc always split at its own DP-immediate-encodable
+point (`0x27c`/`0xc00`), never at the source-implied `0x1fc`/`0xc80`
+sub-struct boundary, regardless of which of the combined address's two
+occurrences it applied to (load vs store handled inconsistently — one
+became a fully-materialized-then-zero-offset store, the other stayed
+an offset-load). Against the real function (with its `if`/`bl` control
+flow, matching orig's semantics exactly) the laundered form produced
+**10 words vs orig's 9**, no tier matched. **P-14 remains
+locked-permanent** — the 7th idiom is refuted as a general P-14 lift,
+though the underlying "u64-mask forces materialization when the
+combined offset isn't itself DP-immediate-encodable" observation is
+banked as real (just uncontrollable). Full retest:
+[`brief-524-lever-verification.md`](brief-524-lever-verification.md).
+
 ### P-15. Legacy-tier (1.2/sp2p3) reg-alloc + const-CSE plateau
 
 > **Wall family note — the legacy-tier sibling of P-11.** P-11 is the
