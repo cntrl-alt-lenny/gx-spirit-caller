@@ -24,6 +24,10 @@ src/usa/overlay008/func_ov008_021aa820.c:
     complete
     .text start:0x021aa820 end:0x021aa86c
 
+src/usa/overlay008/func_ov008_021aaec4.c:
+    complete
+    .text start:0x021aaec4 end:0x021aaf28
+
 src/usa/overlay008/func_ov008_021ab040.c:
     complete
     .text start:0x021ab040 end:0x021ab084

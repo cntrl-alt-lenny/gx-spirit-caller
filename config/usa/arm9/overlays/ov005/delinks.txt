@@ -61,6 +61,10 @@ src/usa/overlay005/func_ov005_021ace70.c:
     complete
     .text start:0x021ace70 end:0x021acea8
 
+src/usa/overlay005/func_ov005_021acea8.c:
+    complete
+    .text start:0x021acea8 end:0x021acf10
+
 src/usa/overlay005/ov005_021acf10.c:
     complete
     .text start:0x021acf10 end:0x021acf28
