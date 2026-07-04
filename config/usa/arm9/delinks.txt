@@ -852,7 +852,7 @@ src/usa/main/func_0200bfb0.c:
 src/usa/main/func_0200bfd8.s:
     complete
     .text start:0x0200bfd8 end:0x0200c05c
-src/usa/main/func_0200c05c.s:
+src/usa/main/func_0200c05c.c:
     complete
     .text start:0x0200c05c end:0x0200c0c8
 src/usa/main/func_0200c0c8.s:
@@ -861,7 +861,7 @@ src/usa/main/func_0200c0c8.s:
 src/usa/main/func_0200c220.s:
     complete
     .text start:0x0200c220 end:0x0200c268
-src/usa/main/func_0200c268.s:
+src/usa/main/func_0200c268.c:
     complete
     .text start:0x0200c268 end:0x0200c2dc
 src/usa/main/func_0200c2dc.s:
@@ -3114,7 +3114,7 @@ src/usa/main/func_0202c658.s:
 src/usa/main/func_0202c6dc.s:
     complete
     .text start:0x0202c6dc end:0x0202c71c
-src/usa/main/func_0202c71c.s:
+src/usa/main/func_0202c71c.c:
     complete
     .text start:0x0202c71c end:0x0202c794
 src/usa/main/func_0202c794.s:
@@ -3235,13 +3235,13 @@ src/usa/main/func_0202e558.s:
 src/usa/main/func_0202e5b8.s:
     complete
     .text start:0x0202e5b8 end:0x0202e6a0
-src/usa/main/func_0202e6a0.s:
+src/usa/main/func_0202e6a0.c:
     complete
     .text start:0x0202e6a0 end:0x0202e748
 src/usa/main/func_0202e748.s:
     complete
     .text start:0x0202e748 end:0x0202e810
-src/usa/main/func_0202e810.s:
+src/usa/main/func_0202e810.c:
     complete
     .text start:0x0202e810 end:0x0202e898
 src/usa/main/func_0202e898.s:
@@ -3254,19 +3254,19 @@ src/usa/main/func_0202ea5c.c:
 src/usa/main/func_0202ea74.s:
     complete
     .text start:0x0202ea74 end:0x0202ecb0
-src/usa/main/func_0202ecb0.s:
+src/usa/main/func_0202ecb0.c:
     complete
     .text start:0x0202ecb0 end:0x0202ed3c
-src/usa/main/func_0202ed3c.s:
+src/usa/main/func_0202ed3c.c:
     complete
     .text start:0x0202ed3c end:0x0202edec
-src/usa/main/func_0202edec.s:
+src/usa/main/func_0202edec.c:
     complete
     .text start:0x0202edec end:0x0202eeb4
 src/usa/main/func_0202eeb4.c:
     complete
     .text start:0x0202eeb4 end:0x0202eee4
-src/usa/main/func_0202eee4.s:
+src/usa/main/func_0202eee4.c:
     complete
     .text start:0x0202eee4 end:0x0202efa8
 src/usa/main/func_0202efa8.c:
@@ -3281,7 +3281,7 @@ src/usa/main/func_0202f110.s:
 src/usa/main/func_0202f184.s:
     complete
     .text start:0x0202f184 end:0x0202f1c4
-src/usa/main/func_0202f1c4.s:
+src/usa/main/func_0202f1c4.c:
     complete
     .text start:0x0202f1c4 end:0x0202f290
 src/usa/main/func_0202f290.s:
