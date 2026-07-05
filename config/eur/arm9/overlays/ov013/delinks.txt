@@ -60,7 +60,7 @@ src/overlay013/Ov013_InitGraphics.c:
 src/overlay013/func_ov013_021cb674.s:
     complete
     .text start:0x021cb674 end:0x021cb700
-src/overlay013/func_ov013_021cb700.s:
+src/overlay013/func_ov013_021cb700.c:
     complete
     .text start:0x021cb700 end:0x021cb750
 

@@ -441,10 +441,10 @@ src/jpn/overlay011/ov011_021d0858.c:
 src/jpn/overlay011/func_ov011_021d0874.s:
     complete
     .text start:0x021d0874 end:0x021d0a38
-src/jpn/overlay011/func_ov011_021d0a38.s:
+src/jpn/overlay011/func_ov011_021d0a38.c:
     complete
     .text start:0x021d0a38 end:0x021d0a88
-src/jpn/overlay011/func_ov011_021d0a88.s:
+src/jpn/overlay011/func_ov011_021d0a88.c:
     complete
     .text start:0x021d0a88 end:0x021d0aec
 src/jpn/overlay011/func_ov011_021d0aec.s:

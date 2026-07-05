@@ -180,7 +180,7 @@ src/overlay020/func_ov020_021ad910.s:
     complete
     .text start:0x021ad910 end:0x021ada1c
 
-src/overlay020/func_ov020_021ada1c.s:
+src/overlay020/func_ov020_021ada1c.c:
     complete
     .text start:0x021ada1c end:0x021ada6c
 

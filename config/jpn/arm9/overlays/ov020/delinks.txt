@@ -64,6 +64,10 @@ src/jpn/overlay020/func_ov020_021ab6fc.c:
     complete
     .text start:0x021ab6fc end:0x021ab73c
 
+src/jpn/overlay020/func_ov020_021ad93c.c:
+    complete
+    .text start:0x021ad93c end:0x021ad98c
+
 src/jpn/overlay020/data/data_ov020_021adf5c.c:
     complete
     .data start:0x021adf5c end:0x021adf60

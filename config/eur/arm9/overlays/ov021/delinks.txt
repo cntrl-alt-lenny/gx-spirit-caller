@@ -4,7 +4,7 @@
     .data       start:0x021abea0 end:0x021ace80 kind:data align:32
     .bss        start:0x021ace80 end:0x0222d0e0 kind:bss align:32
 
-src/overlay021/func_ov021_021aa4a0.s:
+src/overlay021/func_ov021_021aa4a0.c:
     complete
     .text start:0x021aa4a0 end:0x021aa514
 

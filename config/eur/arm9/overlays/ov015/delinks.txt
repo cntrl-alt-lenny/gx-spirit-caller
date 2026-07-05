@@ -416,7 +416,7 @@ src/overlay015/func_ov015_021b59a4.c:
     complete
     .text start:0x021b59a4 end:0x021b5a14
 
-src/overlay015/func_ov015_021b5a14.s:
+src/overlay015/func_ov015_021b5a14.c:
     complete
     .text start:0x021b5a14 end:0x021b5a64
 

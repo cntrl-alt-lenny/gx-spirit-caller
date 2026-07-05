@@ -94,7 +94,7 @@ src/overlay012/Ov012_BeginIntroTransition.c:
     complete
     .text start:0x021cbf74 end:0x021cc01c
 
-src/overlay012/func_ov012_021cc01c.s:
+src/overlay012/func_ov012_021cc01c.c:
     complete
     .text start:0x021cc01c end:0x021cc06c
 
