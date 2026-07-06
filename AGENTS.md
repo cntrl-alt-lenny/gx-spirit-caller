@@ -687,43 +687,50 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-04, updated): CODEX DROPPED (user hit message limits) → Claude
-  Code ONLY now** (scaffolder + decomper; user will say when Codex is back). Codex's
-  main + ov002 lanes (b521/522, both 0-ship — avalanche-parked / already-matched) are
-  now FREE. Current: **b525 scaffolder = overlay-tail (RUNNING)**; **b527 decomper =
-  main (queued below)**. c-match loop (all lanes): safe-queue-v3 §4 rows FILTERED TO
-  YOUR MODULE → `containment_check.py` (`--module` for overlays) → reshape via
-  `contained-reshape-catalog.md` + `recipe-gotchas.md` (now incl. b524 gotchas 27-34,
-  esp. #27 `#pragma opt_strength_reduction off`) → EUR match → port USA/JPN
-  (`port_to_region.py`, now fixed for overlay data-syms by b526) → per-region ROM
-  `ninja sha1`; park with reasons. ⚠️ **ONE WORKTREE PER LANE** (`git worktree add
-  ../<lane> -b <branch> origin/main`) — never share a dir (b523: a peer's `git checkout`
-  wiped uncommitted work). ⚠️ a commit must NEVER delete files outside its module
-  (bd74e172 neighbor-sweep broke USA+JPN — `git status` before commit). LAST actions:
-  3-region sha1 green → push → PR.
-- **Brief 525** — Claude `scaffolder` → **overlay-tail c-match, wave 2** (owns
-  ov000/005/006/011/013/016/019/022 delinks — NOT ov002/main = Codex 521/522).
-  Continue safe-queue-v3 §4 rows for these overlays (b523 shipped 2 EUR + parked 2
-  reg-alloc near-misses `021b79ac`/`021ac91c`). **NEW: you now have the b524-verified
-  levers** — `recipe-gotchas.md` gotchas 27-34, esp. **gotcha 27 = `#pragma
-  opt_strength_reduction off`** (real lever) and SM-1 access-expression reg-order —
-  RETRY the 2 parked near-misses with these + attack new reg-alloc walls. Ship 3-region
-  where portable; EUR-only (keep the region `.s`) where a func references an unmapped
-  RETRIAGE global (b526 is fixing that porter gap). Own worktree. Branch
-  `claude/cmatch-overlays-525`.
-- **Brief 527** — Claude `decomper` (strongest model) → **`main` c-match** (owns
-  config/{eur,usa,jpn}/arm9/delinks.txt — NOT overlays = b525 scaffolder). Codex's
-  main lane is free now. From safe-queue-v3 §4, take the **main MED leaf rows** (rows
-  13-26+: tiny 52-96B leaf funcs, all "predicted-contained YES" — the safe pool).
-  ⚠️ SKIP the avalanche zone: main-HIGH rows + Codex b521's parked `02085460` (163k-byte
-  avalanche). Use the b524 levers (gotcha 27 pragma etc.) on reg-alloc walls; the b526
-  porter fix means main matches should now port to USA/JPN (EUR-only + note only if a
-  ref is genuinely unmapped). Own worktree (`git worktree add ../claude-527 -b
-  claude/cmatch-main-527 origin/main`). LAST actions: 3-region sha1 green → push → PR.
-  Doc brief-527-cmatch-main.md + regen README.
+- **LANE STATE (2026-07-05, Mac, Claude-only — Codex still out).** Briefs 528-533 ran
+  from the PC brain (brief 530 = last productive wave, 6 main matches + ports; 531 sweep;
+  **532 + 533 = ZERO-match negative results**). ⚠️ **The easy c-match is DRAINED — the
+  sibling-sweep + safe-queue grind is hitting walls** (532: safe-queue ranks ~93-104 all
+  avalanched; 533: Pattern-B exemplars are large bespoke funcs, no free-sibling property).
+  Root causes: (a) the safe-queue's "predicted-contained" flags are UNRELIABLE — the
+  `containment_check.py` blind spot (truncates its diff to the shorter file → false-
+  CONTAINED, 3/4 in b525; trust `objdump -h` size + full `cmp -l` instead); (b) the true
+  tractable pool is thinning; what's left = permuter-class reg-alloc swaps + large RE.
+  → THIS ROUND IS A REGROUP (fix the pipeline + hit the best hard targets), not more blind
+  grinding. If b534's reliable re-verify confirms the pool is dry, next round = strategy
+  call (push the permuter-class residue vs call EUR≈99%/USA-JPN≈49%-code a stopping point).
+  ⚠️ ONE WORKTREE PER LANE (`git worktree add ../<lane> -b <branch> origin/main`); never
+  delete files outside your scope (`git status` before commit); LAST actions: gate → push → PR.
+- **Brief 534** — Claude `scaffolder` → **FIX the `containment_check.py` blind spot +
+  re-verify the safe-queue (TOOLING/analysis, no delinks — collision-free).** The tool
+  truncates its diff to the SHORTER file's length → silently misses size GROWTH (the
+  avalanche signal) and can't catch same-size wrong-content → false-CONTAINED (3/4 in
+  b525). FIX it: compare FULL lengths + flag any size mismatch as AVALANCHE (model the
+  reliable check on `objdump -h` section-size + full `cmp -l` on the rebuilt overlay-bin);
+  + pure-Python tests. THEN re-run the fixed tool across the 107 "carried" safe-queue-v3
+  rows → produce `safe-queue-v4.md`: the GENUINELY-contained shortlist (prunes the false-
+  contained walls) so the next grind waves stop wasting time on avalanches. Report the
+  real tractable count (if ~0, say so plainly — that's the campaign's natural tail).
+  NO matching this wave (keep it collision-free). Own worktree. Branch `claude/containment-fix-534`.
+- **Brief 535** — Claude `decomper` (strongest model) → **targeted hard-RE on the flagged
+  high-value residue** (owns main + ov006 + ov010/ov015 for THESE funcs only). Two targets:
+  (1) **B4 = `func_ov010_021b2924` / `func_ov015_021b2924`** (byte-identical 484B pair,
+  b533's #1 target) — it avalanched on a 32-byte compiled-`.text` shortfall = an incomplete
+  derivation; do the SECOND derivation pass to recover the missing 32 bytes, then match →
+  +2 if it cracks. (2) The permuter-class near-miss cohort (correct logic, reg-alloc swap):
+  `0200dd58` (main, b533 B2), `021ac91c` (ov015, b525), `021b79ac` (ov006, b525) — try the
+  b524 levers (esp. gotcha 27 pragma) first; if a 1-2 reg swap still resists, park it
+  permuter-class (don't marathon). Ship what cracks. Own worktree. Branch `claude/hard-re-535`.
 
 
 ### Closed briefs (reference)
+
+- **Briefs 528-533 (PC brain, 2026-07-04/05).** 530 = last productive wave (6 main EUR
+  matches + 6/6 USA/JPN ports, dispatch-table-advance sibling family). 531 dispatch-table
+  sweep. **532** (#1102, main A1/B6 sibling-sweep) + **533** (#1101, Pattern-B struct-
+  callback) = ZERO-match, fully-diagnosed negative results (docs-only). 533 flagged B4
+  (`021b2924` ov010/ov015 pair) as #1 hard target + the permuter-class near-miss cohort.
+  → the easy c-match is drained; b534/535 regroup (fix containment_check + hard-RE).
 
 - **Briefs 521/522/526 (2026-07-04).** **#1093** (Codex b521, main c-match): 0 matches —
   parked first fresh candidate `02085460` (163k-byte avalanche); docs + a duplicate of
