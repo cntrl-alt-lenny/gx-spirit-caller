@@ -687,43 +687,51 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-05, Mac, Claude-only — Codex still out).** Briefs 528-533 ran
-  from the PC brain (brief 530 = last productive wave, 6 main matches + ports; 531 sweep;
-  **532 + 533 = ZERO-match negative results**). ⚠️ **The easy c-match is DRAINED — the
-  sibling-sweep + safe-queue grind is hitting walls** (532: safe-queue ranks ~93-104 all
-  avalanched; 533: Pattern-B exemplars are large bespoke funcs, no free-sibling property).
-  Root causes: (a) the safe-queue's "predicted-contained" flags are UNRELIABLE — the
-  `containment_check.py` blind spot (truncates its diff to the shorter file → false-
-  CONTAINED, 3/4 in b525; trust `objdump -h` size + full `cmp -l` instead); (b) the true
-  tractable pool is thinning; what's left = permuter-class reg-alloc swaps + large RE.
-  → THIS ROUND IS A REGROUP (fix the pipeline + hit the best hard targets), not more blind
-  grinding. If b534's reliable re-verify confirms the pool is dry, next round = strategy
-  call (push the permuter-class residue vs call EUR≈99%/USA-JPN≈49%-code a stopping point).
-  ⚠️ ONE WORKTREE PER LANE (`git worktree add ../<lane> -b <branch> origin/main`); never
-  delete files outside your scope (`git status` before commit); LAST actions: gate → push → PR.
-- **Brief 534** — Claude `scaffolder` → **FIX the `containment_check.py` blind spot +
-  re-verify the safe-queue (TOOLING/analysis, no delinks — collision-free).** The tool
-  truncates its diff to the SHORTER file's length → silently misses size GROWTH (the
-  avalanche signal) and can't catch same-size wrong-content → false-CONTAINED (3/4 in
-  b525). FIX it: compare FULL lengths + flag any size mismatch as AVALANCHE (model the
-  reliable check on `objdump -h` section-size + full `cmp -l` on the rebuilt overlay-bin);
-  + pure-Python tests. THEN re-run the fixed tool across the 107 "carried" safe-queue-v3
-  rows → produce `safe-queue-v4.md`: the GENUINELY-contained shortlist (prunes the false-
-  contained walls) so the next grind waves stop wasting time on avalanches. Report the
-  real tractable count (if ~0, say so plainly — that's the campaign's natural tail).
-  NO matching this wave (keep it collision-free). Own worktree. Branch `claude/containment-fix-534`.
-- **Brief 535** — Claude `decomper` (strongest model) → **targeted hard-RE on the flagged
-  high-value residue** (owns main + ov006 + ov010/ov015 for THESE funcs only). Two targets:
-  (1) **B4 = `func_ov010_021b2924` / `func_ov015_021b2924`** (byte-identical 484B pair,
-  b533's #1 target) — it avalanched on a 32-byte compiled-`.text` shortfall = an incomplete
-  derivation; do the SECOND derivation pass to recover the missing 32 bytes, then match →
-  +2 if it cracks. (2) The permuter-class near-miss cohort (correct logic, reg-alloc swap):
-  `0200dd58` (main, b533 B2), `021ac91c` (ov015, b525), `021b79ac` (ov006, b525) — try the
-  b524 levers (esp. gotcha 27 pragma) first; if a 1-2 reg swap still resists, park it
-  permuter-class (don't marathon). Ship what cracks. Own worktree. Branch `claude/hard-re-535`.
+- **LANE STATE (2026-07-06, Mac, Claude-only). C-MATCH QUEUE NEARLY DRAINED — strategic
+  inflection.** b534's fixed-tool re-audit: of v3's 107 "carried" rows, only **8 are
+  genuinely untried** (all now CONTAINED with the module-aware tool); 99 were already
+  resolved. b535 cracked B4 (`021b2924` pair). So the c-match campaign has ~1 productive
+  wave left (the 8), then the true tail = permuter-class reg-alloc + large RE.
+  ⚠️ **BIGGER PICTURE: c-match is a QUALITY lane (EUR `.s`→C; the `.s` already gate
+  byte-identical, so it doesn't move coverage %). The COVERAGE frontier is USA/JPN ≈49%
+  code — ~51% is still dsd auto-gap (uncarved). If that's still mechanically `.s`-drainable
+  (the b467-469 drain that hit 49% may have PAUSED for the c-match pivot, not exhausted),
+  it's a far bigger lane than the c-match tail.** b537 censuses exactly that. Worktree
+  hygiene: one per lane (`git worktree add ../<lane> -b <branch> origin/main`); never
+  delete files outside scope; LAST actions gate→push→PR.
+- **Brief 536** — Claude `scaffolder` → **the LAST easy c-match wave: the 8 genuinely-
+  untried v4 candidates.** From `campaign-analytics/safe-queue-v4.md` §"The 8 genuinely
+  open rows": `0228791c`/`0225368c`/`021b0a30` (ov002), `020384e8` (main), `021ae218`/
+  `021ae2cc` (ov000), `021ca70c` (ov013), `021cca04` (ov011) — 92-220B, all CONTAINED
+  per the FIXED module-aware `containment_check.py` (pass `--module` / it now auto-resolves).
+  Match EUR → port USA/JPN (per-region ROM `ninja sha1`, park divergents). Use the b524
+  levers. Small byproduct cleanup (you own main): b534 flagged 6 EUR `main` delinks.txt
+  lines still naming a DELETED `.s` whose `.c` exists+is tracked — fix those stale lines.
+  Own worktree. Branch `claude/cmatch-final8-536`.
+- **Brief 537** — Claude `decomper` (strongest model) → **USA/JPN mechanical `.s`-drain
+  runway CENSUS (READ-ONLY — no ships, no delink writes → collision-free).** THE strategy-
+  deciding scout. USA/JPN are ≈49% code; ~51% is auto-gap. Question: how much of that
+  uncarved USA/JPN code is still TRACTABLE `batch_carve`/`asm_escape --whole-function`
+  runway vs genuine walls (kind:data C-absorbed / permuter / RE)? Method: enumerate
+  uncarved USA + JPN funcs per module (main + all overlays) — use `batch_carve --dry-run`
+  / `asm_escape --classify-data` (objdump-only, wine-free) across the FULL address range
+  (⚠️ `--min-addr` default 0x02234000 misses ranges — set per module). Report per-module:
+  #uncarved, #tractable (clean preflight), #REFUSE (kind:data), rough size tiers. VERDICT:
+  is there a big resumable USA/JPN drain lane, and how big (≈ funcs / code-% it would add)?
+  Do NOT carve/ship — census only. Own worktree. Branch `claude/usajpn-census-537`. Doc
+  `brief-537-usajpn-runway-census.md`.
 
 
 ### Closed briefs (reference)
+
+- **Briefs 534/535 (2026-07-06, Mac).** **#1103** (b534): fixed `containment_check.py`'s
+  MODULE-AWARENESS blind spot (overlay candidates silently diffed vs main's always-clean
+  binary → rubber-stamp CONTAINED; = the 3/4 b525 false-positives + b518's 805k-diff case)
+  + full-length size check; 29 tests. Re-audited v3's 107 "carried" → only **8 genuinely
+  untried** (99 already resolved). safe-queue-v4.md. **#1104** (b535): CRACKED B4
+  (`func_ov010/ov015_021b2924`, 484B pair) via a 2nd derivation pass (+2 EUR + 4 ports,
+  new 0x021b2824 region delink range); confirmed `0200dd58`/`021ac91c` genuine permuter-
+  class (gotcha 27 no effect — different class), `021b79ac` already matched b525. 3-region green.
 
 - **Briefs 528-533 (PC brain, 2026-07-04/05).** 530 = last productive wave (6 main EUR
   matches + 6/6 USA/JPN ports, dispatch-table-advance sibling family). 531 dispatch-table
