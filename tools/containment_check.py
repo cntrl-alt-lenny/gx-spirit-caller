@@ -18,33 +18,53 @@ that fails `ninja sha1`:
      problem, and not worth further per-instruction tuning until the size/
      layout issue itself is understood. Park it.
 
-This tool automates brief 514's manual recipe: diff `build/<region>/build/
-arm9.bin` (freshly built, uncompressed) against `extract/<region>/arm9/
-arm9.bin` (the original, uncompressed baseline), map every differing byte
-run to a virtual address via `VA = 0x02000000 + offset` (the ARM9 load
-address baked into this game's linker script — see brief 514), and check
+This tool automates brief 514's manual recipe: diff a built binary against
+its baseline, map every differing byte run to a virtual address, and check
 whether every run's VA range is fully contained in the candidate's own
-delinked range.
+delinked range — PLUS an unconditional full-length size check that alone
+forces AVALANCHE on any mismatch (see "brief 534 fix" below).
+
+MODULE-AWARE (brief 534 fix — read this if you're touching overlay code):
+this tool used to hardcode "main"'s binaries (`build/<region>/build/
+arm9.bin` / `extract/<region>/arm9/arm9.bin`) and VA base (`0x02000000`)
+as the ONLY default, regardless of which module a candidate actually
+belonged to. For an overlay candidate, that default pair is a DIFFERENT,
+always-clean binary the overlay's own compiled bytes never touch — a
+caller who forgot to manually pass `--built`/`--extract` overlay overrides
+got a rubber-stamp CONTAINED that said nothing about the real overlay
+state. Confirmed as the actual mechanism behind 3 false-CONTAINED
+verdicts in brief 525. Now the module is resolved (from `--candidate`'s
+path, `--addr`'s matched delinks.txt entry, or `--range` via the same
+address-containment lookup) BEFORE picking defaults, so `--built`/
+`--extract` auto-select the right binary pair and VA base for whichever
+module the candidate is actually in. Explicit `--built`/`--extract` still
+override the default, same as before.
 
 Prerequisites:
   - `python tools/configure.py <region>` has been run
   - The candidate is currently applied (its delinks.txt entry is the `.c`
-    under test) and `ninja rom` (or at least the arm9-link chain) has been
-    rebuilt, so `build/<region>/build/arm9.bin` reflects the candidate
-  - `extract/<region>/arm9/arm9.bin` exists (produced by `dsd rom extract`,
-    which `ninja` runs once per region as part of the normal build graph)
+    under test) and `ninja rom` has been rebuilt, so the module's built
+    binary (`build/<region>/build/arm9.bin` for main, `arm9_ovNNN.bin` for
+    an overlay, `itcm.bin`/`dtcm.bin` for those) reflects the candidate
+  - The module's baseline binary exists under `extract/<region>/...`
+    (produced by `dsd rom extract`, which `ninja` runs once per region)
 
 Usage:
-    # Explicit range (already known, e.g. from delinks.txt or a dossier):
+    # Explicit range (already known, e.g. from delinks.txt or a dossier) —
+    # module is auto-detected from the range's own start address:
     python tools/containment_check.py eur --range 0x02001e5c 0x02001e84
 
-    # Auto-resolve the range from delinks.txt by candidate path (.c or .s,
-    # whichever extension delinks.txt currently shows for this TU):
+    # Auto-resolve the range (and module) from delinks.txt by candidate
+    # path (.c or .s, whichever extension delinks.txt currently shows):
     python tools/containment_check.py eur --candidate src/main/func_02001e5c.c
 
-    # Auto-resolve the range from just a bare address (e.g. straight out of
-    # a worklist row or a retriage doc header) -- no filename needed:
+    # Auto-resolve the range (and module) from just a bare address:
     python tools/containment_check.py eur --addr 0x02001e5c
+
+    # An OVERLAY candidate — module auto-detected as ov005, so the default
+    # --built/--extract now correctly point at ov005's own binaries, not
+    # main's (the brief 525 bug this round fixed):
+    python tools/containment_check.py eur --addr 0x021abcc4 --module ov005
 
     # Overlay addresses are frequently AMBIGUOUS (this game's overlay RAM
     # windows are reused by overlays that never coexist in memory), so
@@ -56,132 +76,33 @@ Usage:
 
 Options:
     --json          Machine-readable JSON output
-    --built PATH    Override the built ARM9 binary path (default:
-                     build/<region>/build/arm9.bin)
-    --extract PATH  Override the baseline ARM9 binary path (default:
-                     extract/<region>/arm9/arm9.bin)
+    --built PATH    Override the built binary path (default: module-aware,
+                     see above)
+    --extract PATH  Override the baseline binary path (default: module-aware,
+                     see above)
     --max-owner-lookups N   How many out-of-range runs to resolve an
                      "owner" TU for (default 5; owner lookup scans all
                      delinks.txt files, so it's capped to stay cheap on a
                      massive avalanche with 100k+ runs)
-    --module MODULE Only meaningful with --addr. Scopes the delinks.txt
-                     scan to one module ("main", "ov002"/"overlay002"/"2"
-                     all accepted) to disambiguate a bare address that
-                     falls inside multiple overlays' reused RAM windows.
+    --module MODULE Declares/disambiguates which module ("main",
+                     "ov002"/"overlay002"/"2" all accepted) the candidate
+                     belongs to. Required when --addr or --range is
+                     ambiguous or not found in any delinks.txt yet.
 
 Exit codes:
     0   CONTAINED — every differing byte run is inside the candidate range
-    1   AVALANCHE — a run spilled outside the range, or the ARM9 image
-        changed size
+        AND the full built/baseline lengths match exactly
+    1   AVALANCHE — a run spilled outside the range, or the built/baseline
+        lengths differ at all (checked on the FULL, untruncated lengths —
+        brief 534)
     2   Infrastructure error (region unknown, files missing, bad range,
         candidate not found in any delinks.txt, etc.)
 
-Validation for the brain (build-free from this session — no `build/` or
-`extract/` directories exist in this worktree, so none of this has actually
-been run; the logic below WAS validated build-free wherever real on-disk
-data made that possible — see "What's already verified"):
-
-Brief 514's own dataset (docs/research/brief-514-forensics.md) gives one
-clean CONTAINED case and one clean AVALANCHE case to sanity-check this tool
-against, once a region is configured and built:
-
-    python tools/configure.py eur
-    ninja rom          # or at minimum the arm9 link chain; produces
-                        # build/eur/build/arm9.bin
-
-    # CONTAINED case: 0200a454 — brief 514 measured a 5-byte ARM9 diff,
-    # entirely inside [0x0200a454, 0x0200a488). Apply that candidate's .c
-    # (or reuse whatever the brief 512/514 worktree already had applied),
-    # then:
-    python tools/containment_check.py eur --range 0x0200a454 0x0200a488
-    # Expected: verdict CONTAINED, exit 0, diff_byte_count small (~5),
-    # out_of_range_run_count 0.
-
-    # AVALANCHE case: 02001e5c — brief 514 measured a 604,225-byte ARM9
-    # diff starting at offset 0x8f8 (owner src/main/Entry.c), far outside
-    # the candidate's own [0x02001e5c, 0x02001e84) range:
-    python tools/containment_check.py eur --range 0x02001e5c 0x02001e84
-    # Expected: verdict AVALANCHE, exit 1, out_of_range_run_count > 0,
-    # first_out_of_range_runs[0].owner == "src/main/Entry.c" (this repo's
-    # delinks.txt already names Entry.c at that exact VA — confirmed
-    # build-free by _owner_of(0x020008f8, ...) during this tool's
-    # development, see below).
-
-    # Also worth one AVALANCHE + SIZE GROWTH case (a third failure shape
-    # brief 514 documents): 02006524, 0200c23c, or 0200fbd4 all grew the
-    # linked ARM9 image by 0x20 bytes on brief 514's retry:
-    python tools/containment_check.py eur --range 0x02006524 0x020065a8
-    # Expected: verdict AVALANCHE, exit 1, size_delta == 32 (if the
-    # worktree's current C draft still reproduces brief 514's retry
-    # exactly — the size delta is what forces the verdict regardless of
-    # where the byte runs land, per this tool's design).
-
-What's already verified (build-free, this session, against the REAL repo —
-not synthetic data):
-  - `_lookup_candidate_range('src/main/func_02001e5c.c', 'eur')` returns
-    exactly `(0x02001e5c, 0x02001e84)` — matches brief 514's documented
-    range for this candidate verbatim. Also verified the `.c`/`.s`
-    extension-fallback resolves the identical range.
-  - `_owner_of(0x020008f8, _build_range_index('eur'))` returns exactly
-    `'src/main/Entry.c'` — matches brief 514's documented "owner
-    src/main/Entry.c" finding for this exact VA verbatim.
-  - `_find_diff_runs` unit-tested against synthetic byte buffers: no-diff,
-    single run, a run deliberately straddling a block boundary (validates
-    the chunked-comparison fast path doesn't create false boundaries), and
-    multiple disjoint runs — all exact-matched expected output.
-  - Full CLI exercised end-to-end (via `--built`/`--extract` overrides
-    pointed at synthetic files standing in for a built/baseline ARM9
-    image) against all three brief-514 failure shapes — contained,
-    avalanche-by-spill, avalanche-by-size-growth — each produced the
-    correct verdict and exit code. Also verified `--json` output shape,
-    `--candidate` auto-resolve (chained through the real delinks.txt
-    lookup above), and error handling for a missing built/extract file, an
-    unresolvable candidate, and an inverted range.
-  - What COULDN'T be verified build-free: the actual `build/<region>/
-    build/arm9.bin` vs `extract/<region>/arm9/arm9.bin` diff on a real
-    built candidate — that's exactly what the three commands above are
-    for.
-
-R10 hardening — three asks: (a) clean errors on missing build/extract
-binaries, (b) auto-derive a candidate's range from a bare address, (c) on
-AVALANCHE print the escaping diff-run offsets. (a) and (c) were already
-correctly implemented as of R9's original version (see the `built_path.
-is_file()`/`extract_path.is_file()` checks and the `out_of_range_runs`
-printing below) — re-read and confirmed still correct, no change needed.
-(b) was genuinely missing and is the substance of this round's change:
-`--addr`/`_lookup_ranges_by_addr`/`--module`/`_normalize_module`/
-`_iter_delinks_files(module=...)`. Verified build-free, this session,
-against the REAL repo:
-  - `_lookup_ranges_by_addr(0x02001e5c, 'eur')` (a `main` address) returns
-    exactly one hit, `(0x02001e5c, 0x02001e84, 'src/main/func_02001e5c.s')`
-    — matches `_lookup_candidate_range`'s independently-verified result
-    for the same TU verbatim, and resolves correctly from a MID-body
-    address too (`0x02001e60`, not just the TU's own start address).
-  - `_lookup_ranges_by_addr(0x0200a460, 'eur')` (brief 514's CONTAINED
-    case, given as a mid-range address) returns exactly
-    `(0x0200a454, 0x0200a488, 'src/main/func_0200a454.c')` — matches
-    brief 514's documented range for this candidate verbatim.
-  - **Found and fixed a real ambiguity bug while validating**: a naive
-    first-match version of this lookup (no `--module` support) silently
-    returned WHICHEVER overlay's range happened to sort first for an
-    address inside a reused overlay RAM window — e.g. `0x021aa558`
-    resolved to an unrelated `src/overlay000/...` range instead of the
-    intended `src/overlay002/...` one. Quantified: this specific address
-    falls inside **9 different overlays'** delinked ranges simultaneously
-    (ov000/002/005/008/009/018/020/021/022) in EUR — confirmed by scanning
-    the real `config/eur/arm9/overlays/*/delinks.txt` tree. `--module` now
-    resolves this deterministically and an unscoped ambiguous `--addr`
-    reports a clean, actionable error listing every candidate with its
-    `--module` hint rather than silently guessing.
-  - Full CLI exercised end-to-end for: an unambiguous `main` address (no
-    `--module` needed, exit 0), an ambiguous overlay address with no
-    `--module` (clean AMBIGUOUS error, exit 2, all 9 candidates listed),
-    the same address disambiguated via `--module ov002` and via the
-    `--module overlay002` alternate spelling (both resolve identically),
-    a wrong-but-plausible `--module main` for an overlay-only address
-    (clean NOT FOUND error, exit 2), an unrecognized `--module` name
-    (clean error, exit 2), and a bogus address in no delinks.txt at all
-    (clean NOT FOUND error, exit 2).
+See `tests/test_containment_check.py` for the regression suite, including
+the brief-534 case this fix targets: an overlay candidate whose module-
+default main-binary pair is IDENTICAL (would falsely read CONTAINED under
+the old hardcoded-to-main defaults) while its real, module-correct overlay
+binary pair has a genuine diff.
 """
 from __future__ import annotations
 
@@ -262,8 +183,106 @@ def _iter_delinks_files(region: str, module: str | None = None):
             yield from sorted(ov_dir.rglob("delinks.txt"))
 
 
-def _lookup_candidate_range(candidate: str, region: str) -> tuple[int, int] | None:
-    """Resolve a candidate's [start, end) VA range from delinks.txt.
+def _module_from_delinks_path(delinks_path: Path, region: str) -> str | None:
+    """Derive a module name ('main', 'itcm', 'dtcm', 'ovNNN') from a
+    delinks.txt file's own location, e.g.
+    `config/eur/arm9/overlays/ov005/delinks.txt` -> `'ov005'`,
+    `config/eur/arm9/itcm/delinks.txt` -> `'itcm'`,
+    `config/eur/arm9/delinks.txt` -> `'main'`.
+
+    This is the module-awareness this tool was missing (brief 534):
+    every downstream binary-path / VA-base decision keys off this, not
+    a single hardcoded "main" assumption.
+    """
+    try:
+        rel = delinks_path.resolve().relative_to(
+            (ROOT / "config" / region / "arm9").resolve()
+        )
+    except ValueError:
+        return None
+    parts = rel.parts
+    if len(parts) == 1:
+        return "main"
+    if parts[0] == "overlays" and len(parts) >= 2:
+        return parts[1]
+    if parts[0] in ("itcm", "dtcm"):
+        return parts[0]
+    return None
+
+
+def _module_delinks_path(region: str, module: str) -> Path | None:
+    """Inverse of `_module_from_delinks_path`: a module name -> its own
+    delinks.txt path."""
+    if module == "main":
+        return ROOT / "config" / region / "arm9" / "delinks.txt"
+    if module in ("itcm", "dtcm"):
+        return ROOT / "config" / region / "arm9" / module / "delinks.txt"
+    if module.startswith("ov"):
+        return ROOT / "config" / region / "arm9" / "overlays" / module / "delinks.txt"
+    return None
+
+
+def _module_va_base(region: str, module: str) -> int | None:
+    """A module's `.text` load VA, read from its own delinks.txt's first
+    `.text start:` line. Mirrors `tools/predict_walls.py`'s
+    `_module_text_base` — same idea, same source of truth, kept as an
+    independent copy per this codebase's "tools stay decoupled" norm.
+
+    This REPLACES the old hardcoded `ARM9_BASE_VA = 0x02000000` for
+    anything that isn't `main`: an overlay's own RAM window starts at
+    whatever address its own delinks.txt says, not at the ARM9 base —
+    treating an overlay candidate's file offsets as if they were
+    `0x02000000`-based (the pre-fix behavior) computes VAs that can
+    never land inside the candidate's real (overlay-space) range,
+    which is a *different* bug shape than the one brief 534 named but
+    the same root cause: this tool never actually looked at which
+    module a candidate belonged to.
+    """
+    path = _module_delinks_path(region, module)
+    if path is None or not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    m = re.search(r"\.text[ \t]+start:0x([0-9a-fA-F]+)", text)
+    return int(m.group(1), 16) if m else None
+
+
+def _module_default_paths(region: str, module: str) -> tuple[Path, Path]:
+    """(built_path, extract_path) defaults for a module.
+
+    This is THE fix for brief 525's false-CONTAINED verdicts: the old
+    code always defaulted to `build/<region>/build/arm9.bin` /
+    `extract/<region>/arm9/arm9.bin` (main's binaries) regardless of
+    which module the candidate actually belonged to. An overlay
+    candidate's compiled bytes never land in the main ARM9 image at
+    all (overlays are separate loadable binaries) — so a caller
+    checking an overlay candidate who forgot to manually pass
+    `--built`/`--extract` was silently diffing main's (untouched,
+    always-clean) binaries and getting a rubber-stamp CONTAINED that
+    said nothing about the actual overlay candidate. Verified against
+    the real repo tree (brief 534): overlay baselines live at
+    `extract/<region>/arm9_overlays/<module>.bin` (no `arm9_` prefix
+    on the filename — the prefix is only on the *built* side,
+    `build/<region>/build/arm9_<module>.bin`); itcm/dtcm keep the same
+    bare name on both sides, alongside arm9.bin's own directory on the
+    extract side.
+    """
+    if module == "main":
+        built = ROOT / "build" / region / "build" / "arm9.bin"
+        extract = ROOT / "extract" / region / "arm9" / "arm9.bin"
+    elif module in ("itcm", "dtcm"):
+        built = ROOT / "build" / region / "build" / f"{module}.bin"
+        extract = ROOT / "extract" / region / "arm9" / f"{module}.bin"
+    else:
+        built = ROOT / "build" / region / "build" / f"arm9_{module}.bin"
+        extract = ROOT / "extract" / region / "arm9_overlays" / f"{module}.bin"
+    return built, extract
+
+
+def _lookup_candidate_range(
+    candidate: str, region: str,
+) -> tuple[int, int, str | None] | None:
+    """Resolve a candidate's [start, end) VA range (and owning module)
+    from delinks.txt.
 
     Tries the given path as-is, then (if it looks like a .c file) its .s
     sibling and vice versa — delinks.txt may show either extension
@@ -299,13 +318,14 @@ def _lookup_candidate_range(candidate: str, region: str) -> tuple[int, int] | No
                     break
                 rm = _DELINKS_TEXT_RANGE_RE.match(lines[j])
                 if rm:
-                    return int(rm.group("start"), 16), int(rm.group("end"), 16)
+                    module = _module_from_delinks_path(delinks_path, region)
+                    return int(rm.group("start"), 16), int(rm.group("end"), 16), module
     return None
 
 
 def _lookup_ranges_by_addr(
     addr: int, region: str, module: str | None = None,
-) -> list[tuple[int, int, str]]:
+) -> list[tuple[int, int, str, str | None]]:
     """Resolve the delinked [start, end) TU range(s) that CONTAIN a bare
     address, by scanning delinks.txt range(s) in the region.
 
@@ -326,20 +346,22 @@ def _lookup_ranges_by_addr(
     should ask for `module` to disambiguate, not guess).
     """
     return [
-        (start, end, path)
-        for start, end, path in _build_range_index(region, module=module)
+        (start, end, path, owning_module)
+        for start, end, path, owning_module in _build_range_index(region, module=module)
         if start <= addr < end
     ]
 
 
 def _build_range_index(
     region: str, module: str | None = None,
-) -> list[tuple[int, int, str]]:
-    """All (start_va, end_va, source_path) TU ranges across delinks.txt in
-    the region (optionally scoped to one `module`), for best-effort "owner
-    of this VA" lookups on out-of-range diff runs. Built once per run."""
-    index: list[tuple[int, int, str]] = []
+) -> list[tuple[int, int, str, str | None]]:
+    """All (start_va, end_va, source_path, module) TU ranges across
+    delinks.txt in the region (optionally scoped to one `module`), for
+    best-effort "owner of this VA" lookups on out-of-range diff runs.
+    Built once per run."""
+    index: list[tuple[int, int, str, str | None]] = []
     for delinks_path in _iter_delinks_files(region, module=module):
+        owning_module = _module_from_delinks_path(delinks_path, region)
         try:
             text = delinks_path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -357,13 +379,14 @@ def _build_range_index(
                     int(rm.group("start"), 16),
                     int(rm.group("end"), 16),
                     pending_path,
+                    owning_module,
                 ))
                 pending_path = None
     return index
 
 
-def _owner_of(va: int, range_index: list[tuple[int, int, str]]) -> str | None:
-    for start, end, path in range_index:
+def _owner_of(va: int, range_index: list[tuple[int, int, str, str | None]]) -> str | None:
+    for start, end, path, _module in range_index:
         if start <= va < end:
             return path
     return None
@@ -372,6 +395,18 @@ def _owner_of(va: int, range_index: list[tuple[int, int, str]]) -> str | None:
 # ---------------------------------------------------------------------------
 # Byte diff
 # ---------------------------------------------------------------------------
+
+def _size_mismatch(built: bytes, orig: bytes) -> int:
+    """`len(built) - len(orig)`, as its own testable unit.
+
+    Brief 534: this is the FULL-length check that must run independently
+    of `_find_diff_runs`'s truncated byte walk — a candidate that grows or
+    shrinks the linked artifact is an AVALANCHE regardless of whether the
+    byte-level walk below (which only ever compares the common prefix)
+    happens to find anything in range.
+    """
+    return len(built) - len(orig)
+
 
 def _find_diff_runs(a: bytes, b: bytes, block_size: int = 4096) -> list[tuple[int, int]]:
     """Contiguous runs of differing bytes between a and b, over their
@@ -442,24 +477,40 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument(
         "--module", metavar="MODULE", default=None,
-        help="Only meaningful with --addr. Scope the delinks.txt scan to "
-             "one module (\"main\", \"ov002\", \"overlay002\" all work). "
-             "This game's overlay RAM windows are reused by overlays that "
-             "never coexist in memory, so a bare --addr is often "
-             "genuinely AMBIGUOUS across several overlays at once — pass "
-             "--module to disambiguate (the tool errors out and lists the "
-             "candidates if you omit it and it's ambiguous).",
+        help="Scope/declare which module (\"main\", \"ov002\", "
+             "\"overlay002\" all work) the candidate belongs to. Required "
+             "to disambiguate a bare --addr when it falls inside more than "
+             "one overlay's reused RAM window (the tool errors out and "
+             "lists the candidates if you omit it and it's ambiguous). "
+             "Also accepted with --range, where it skips auto-detection — "
+             "useful if the range doesn't (yet) appear in any delinks.txt. "
+             "Whichever way the module is known, it picks the default "
+             "--built/--extract binaries and VA base (main's ARM9 image vs "
+             "the right overlay's own binary) — see brief 534.",
     )
     ap.add_argument("--built", type=Path, default=None,
-                     help="Override built ARM9 binary path")
+                     help="Override built binary path (default: auto-selected "
+                          "from the candidate's module — main's arm9.bin, or "
+                          "the owning overlay's own arm9_<ovNNN>.bin, etc.)")
     ap.add_argument("--extract", type=Path, default=None,
-                     help="Override baseline ARM9 binary path")
+                     help="Override baseline binary path (default: auto-selected "
+                          "the same way as --built)")
     ap.add_argument("--max-owner-lookups", type=int, default=5,
                      help="Cap on out-of-range runs to resolve an owner TU for (default 5)")
     ap.add_argument("--json", action="store_true", help="Machine-readable JSON output")
     args = ap.parse_args(argv)
 
-    # --- Resolve the candidate range ---
+    # --- Resolve the candidate range (and, critically, its MODULE — brief
+    # 534: every default binary path and VA base below keys off this) ---
+    if args.module is not None and _normalize_module(args.module) is None:
+        print(
+            f"ERROR: --module {args.module!r} not recognized. Use "
+            f"\"main\", or an overlay like \"ov002\"/\"overlay002\"/\"2\".",
+            file=sys.stderr,
+        )
+        return 2
+    module = _normalize_module(args.module) if args.module else None
+
     if args.range:
         try:
             cand_start = int(args.range[0], 16)
@@ -467,7 +518,43 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError:
             print(f"ERROR: --range values must be hex addresses, got {args.range}", file=sys.stderr)
             return 2
-        range_source = "explicit"
+        if module is not None:
+            range_source = f"explicit (--module {module})"
+        else:
+            # Auto-detect the module the same way --addr does, rather than
+            # silently assuming "main" — an explicit range for an overlay
+            # candidate used to fall through to main's binaries below.
+            addr_hits = _lookup_ranges_by_addr(cand_start, args.region)
+            if len(addr_hits) == 1:
+                module = addr_hits[0][3]
+                range_source = f"explicit (module auto-detected: {module or 'unknown'})"
+            elif len(addr_hits) > 1:
+                print(
+                    f"ERROR: --range start 0x{cand_start:08x} is AMBIGUOUS — "
+                    f"it falls inside {len(addr_hits)} different TUs' "
+                    f"delinked ranges simultaneously (reused overlay RAM "
+                    f"windows). Re-run with --module to pick one:",
+                    file=sys.stderr,
+                )
+                for start, end, path, mod_guess in addr_hits:
+                    print(
+                        f"    --module {mod_guess or 'main':<10s} -> [0x{start:08x}, 0x{end:08x})  {path}",
+                        file=sys.stderr,
+                    )
+                return 2
+            else:
+                print(
+                    f"WARNING: could not auto-detect a module for --range "
+                    f"0x{cand_start:08x}; this range isn't (yet) any TU's "
+                    f"exact delinked span in delinks.txt. Defaulting to "
+                    f"'main' binaries — pass --module explicitly if this "
+                    f"range actually belongs to an overlay, or the built-"
+                    f"vs-baseline comparison below will be checking the "
+                    f"WRONG binary pair.",
+                    file=sys.stderr,
+                )
+                module = "main"
+                range_source = "explicit (module defaulted to main — unresolved)"
     elif args.candidate:
         resolved = _lookup_candidate_range(args.candidate, args.region)
         if resolved is None:
@@ -479,7 +566,7 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return 2
-        cand_start, cand_end = resolved
+        cand_start, cand_end, module = resolved
         range_source = f"resolved from delinks.txt ({args.candidate})"
     else:
         try:
@@ -487,21 +574,14 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError:
             print(f"ERROR: --addr must be a hex address, got {args.addr!r}", file=sys.stderr)
             return 2
-        if args.module and _normalize_module(args.module) is None:
-            print(
-                f"ERROR: --module {args.module!r} not recognized. Use "
-                f"\"main\", or an overlay like \"ov002\"/\"overlay002\"/\"2\".",
-                file=sys.stderr,
-            )
-            return 2
-        addr_hits = _lookup_ranges_by_addr(addr, args.region, module=args.module)
+        addr_hits = _lookup_ranges_by_addr(addr, args.region, module=module)
         if not addr_hits:
-            scope = f"module '{args.module}'" if args.module else f"region '{args.region}'"
+            scope = f"module '{module}'" if module else f"region '{args.region}'"
             print(
                 f"ERROR: address 0x{addr:08x} is not contained in any "
                 f"delinks.txt TU range for {scope}.\n"
                 f"  Checked config/{args.region}/arm9/"
-                f"{'delinks.txt' if _normalize_module(args.module or '') == 'main' else '**/delinks.txt'}"
+                f"{'delinks.txt' if module == 'main' else '**/delinks.txt'}"
                 f". This usually means the address is wrong, belongs to a "
                 f"different region, or falls in a gap delinks.txt doesn't "
                 f"cover (e.g. padding/alignment bytes between TUs) — use "
@@ -521,27 +601,34 @@ def main(argv: list[str] | None = None) -> int:
                 f"pick one:",
                 file=sys.stderr,
             )
-            for start, end, path in addr_hits:
-                # best-effort module guess from the path for the hint
-                mod_guess = "main"
-                mparts = path.replace("\\", "/").split("/")
-                if len(mparts) > 1 and mparts[0] == "src" and mparts[1].startswith("overlay"):
-                    mod_guess = "ov" + mparts[1][len("overlay"):]
+            for start, end, path, mod_guess in addr_hits:
                 print(
-                    f"    --module {mod_guess:<10s} -> [0x{start:08x}, 0x{end:08x})  {path}",
+                    f"    --module {mod_guess or 'main':<10s} -> [0x{start:08x}, 0x{end:08x})  {path}",
                     file=sys.stderr,
                 )
             return 2
-        cand_start, cand_end, owning_path = addr_hits[0]
+        cand_start, cand_end, owning_path, module = addr_hits[0]
         range_source = f"resolved from delinks.txt (addr 0x{addr:08x} -> {owning_path})"
 
     if cand_end <= cand_start:
         print(f"ERROR: candidate range end (0x{cand_end:x}) must be > start (0x{cand_start:x})", file=sys.stderr)
         return 2
 
-    # --- Resolve binary paths ---
-    built_path = args.built or (ROOT / "build" / args.region / "build" / "arm9.bin")
-    extract_path = args.extract or (ROOT / "extract" / args.region / "arm9" / "arm9.bin")
+    if module is None:
+        print(
+            "WARNING: could not determine which module this candidate "
+            "belongs to; defaulting to 'main' binaries. If this is an "
+            "overlay candidate, pass --module explicitly — otherwise the "
+            "comparison below silently checks the WRONG (main) binary "
+            "pair, which is exactly brief 525's false-CONTAINED bug.",
+            file=sys.stderr,
+        )
+        module = "main"
+
+    # --- Resolve binary paths (module-aware — brief 534) ---
+    default_built, default_extract = _module_default_paths(args.region, module)
+    built_path = args.built or default_built
+    extract_path = args.extract or default_extract
 
     if not built_path.is_file():
         print(
@@ -564,15 +651,37 @@ def main(argv: list[str] | None = None) -> int:
     built = built_path.read_bytes()
     orig = extract_path.read_bytes()
 
-    size_delta = len(built) - len(orig)
+    # --- Size check FIRST, on the FULL lengths (brief 534) ---
+    # This is the headline fix: `_find_diff_runs` below only ever walks the
+    # common prefix (min of the two lengths) for performance, so it is
+    # incapable of noticing bytes that exist only in the longer file. Any
+    # size mismatch is decided right here, off the untruncated `len()` of
+    # both files, before that truncated walk even runs — so a truncation
+    # bug in the byte-level walk can never again hide a size regression
+    # from the verdict.
+    size_delta = _size_mismatch(built, orig)
     runs = _find_diff_runs(built, orig)
+    common_len = min(len(built), len(orig))
+    unpaired_tail_bytes = max(len(built), len(orig)) - common_len
 
     total_diff_bytes = sum(end - start for start, end in runs)
 
+    va_base = _module_va_base(args.region, module)
+    if va_base is None:
+        print(
+            f"WARNING: could not read a VA base for module '{module}' from "
+            f"its own delinks.txt; falling back to the main ARM9 base "
+            f"(0x{ARM9_BASE_VA:08x}). Out-of-range diagnostics below may be "
+            f"wrong for an overlay candidate — this should only happen "
+            f"against a synthetic/incomplete config tree.",
+            file=sys.stderr,
+        )
+        va_base = ARM9_BASE_VA
+
     out_of_range_runs = []
     for start, end in runs:
-        va_start = ARM9_BASE_VA + start
-        va_end = ARM9_BASE_VA + end
+        va_start = va_base + start
+        va_end = va_base + end
         if not (cand_start <= va_start and va_end <= cand_end):
             out_of_range_runs.append((va_start, va_end))
 
@@ -592,16 +701,19 @@ def main(argv: list[str] | None = None) -> int:
 
     report = {
         "region": args.region,
+        "module": module,
         "candidate_range": {
             "start": f"0x{cand_start:08x}",
             "end": f"0x{cand_end:08x}",
             "source": range_source,
         },
+        "va_base": f"0x{va_base:08x}",
         "built_path": str(built_path.relative_to(ROOT)) if built_path.is_relative_to(ROOT) else str(built_path),
         "extract_path": str(extract_path.relative_to(ROOT)) if extract_path.is_relative_to(ROOT) else str(extract_path),
         "built_size": len(built),
         "extract_size": len(orig),
         "size_delta": size_delta,
+        "unpaired_tail_bytes": unpaired_tail_bytes,
         "diff_run_count": len(runs),
         "diff_byte_count": total_diff_bytes,
         "out_of_range_run_count": len(out_of_range_runs),
@@ -612,12 +724,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(report, indent=2))
     else:
-        print(f"containment_check: {args.region}  candidate=[0x{cand_start:08x}, 0x{cand_end:08x})  ({range_source})")
+        print(f"containment_check: {args.region}  module={module}  candidate=[0x{cand_start:08x}, 0x{cand_end:08x})  ({range_source})")
         print(f"  built:   {report['built_path']}  ({len(built)} bytes)")
         print(f"  extract: {report['extract_path']}  ({len(orig)} bytes)")
         if size_delta:
-            print(f"  SIZE DELTA: {size_delta:+d} bytes — linked layout changed, this alone forces AVALANCHE")
-        print(f"  diff: {total_diff_bytes} byte(s) across {len(runs)} run(s)")
+            print(f"  SIZE MISMATCH: {size_delta:+d} bytes (full-length compare, not truncated) — this alone forces AVALANCHE")
+            print(f"    {unpaired_tail_bytes} byte(s) exist only in the longer file and were NOT walked below —")
+            print(f"    a size mismatch means everything past the common prefix is structurally shifted,")
+            print(f"    not meaningfully comparable byte-for-byte; the diff below covers only the common prefix.")
+        print(f"  diff: {total_diff_bytes} byte(s) across {len(runs)} run(s) (over the {common_len}-byte common prefix)")
         if out_of_range_runs:
             print(f"  {len(out_of_range_runs)} run(s) OUTSIDE the candidate range:")
             for o in owners:
