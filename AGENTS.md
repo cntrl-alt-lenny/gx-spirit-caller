@@ -687,39 +687,46 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-06, Mac, Claude-only). NEW CHAPTER: RESUME the USA/JPN mechanical
-  `.s` drain (b537 census verdict).** The c-match easy tier is DONE (b536: 1/8 shipped,
-  rest permuter-class). The COVERAGE frontier reopened: **4,349 of 4,439 uncarved USA/JPN
-  funcs (98%) are tractable `batch_carve` runway → USA/JPN ≈49% → ~99% code.** The drain
-  was PAUSED for the c-match detour, not exhausted. **ov002 = ~77% (1,443 tractable/region,
-  898K bytes) — the whale.** Small tractable overlay pools after (ov000 85, ov008 71, ov005
-  63, ov010 62, ov016 56, ov017/015 39, …); main nearly done (49). SKIP the confirmed walls:
-  ov004/ov006/ov011 (100% wall). ⚠️ **MAC = ONE heavy wine lane** (user chose smooth): the
-  DRAIN is the single batch_carve lane (scaffolder); the decomper takes a WINE-FREE lane so
-  they don't contend. When back on PC (native mwccarm), both can drain. Recipe (from the
-  USA/JPN drain era): `batch_carve --version <r> --overlay ovNNN --srcdir src/<r>/overlayNNN
-  --min-addr <module-base>` (⚠️ default 0x02234000 misses ranges) `--batch 20 --limit 150`,
-  commit-on-pass; per-region ROM `ninja sha1`. Worktree per lane; never delete outside scope.
-- **Brief 538** — Claude `scaffolder` → **RESUME the drain: USA + JPN `ov002` mechanical
-  `.s` drain (the whale, ~1,443 tractable/region).** ONE smooth wine lane (no co-lane).
-  `batch_carve` USA ov002, then JPN ov002 (or interleave), full `--min-addr` range for ov002
-  (NOT the 0x02234000 default — enumerate the whole overlay), chunked `--limit 50-150`,
-  commit-on-pass. b406 preflight parks kind:data; per-pick gate isolates the overlay-swap
-  zone. This is the first of ~several ov002 waves. Report shipped + remaining ov002 runway.
-  Own worktree. Branch `claude/usajpn-ov002-drain-538`.
-- **Brief 539** — Claude `decomper` (strongest model) → **WINE-FREE: turnkey drain roadmap +
-  pitfall audit** (no batch_carve/gates → zero contention with the scaffolder's drain). Turn
-  b537's census into an executable multi-wave WORK ORDER for the whole USA/JPN 49%→99% drain:
-  for EACH tractable module (ov002 first, then the small overlays, then main's 49), give the
-  EXACT `batch_carve` invocation — `--version`, `--overlay`/`--srcdir`, the TRUE `--min-addr`
-  (each module's real base, since the 0x02234000 default silently skips ranges), tractable
-  count, size tiers — plus flag SKIP-walls (ov004/006/011) and any per-module gotcha
-  (overlay-swap zones, region delink quirks, the b459 extern-decl class). Deliverable: a
-  `docs/research/campaign-analytics/usajpn-drain-workorder.md` the scaffolder executes wave
-  after wave without re-deriving. Own worktree. Branch `claude/drain-workorder-539`.
+- **LANE STATE (2026-07-06, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS.**
+  b538 wave 1 shipped 296 ov002 `.s` (148/region, all first-attempt) → **~1,295 USA +
+  1,431 JPN ov002 tractable remain** (≈9 more ov002 waves), then the small overlays +
+  main (full plan: `campaign-analytics/usajpn-drain-workorder.md`, b539). ⚠️ **MAC = ONE
+  smooth wine lane = the DRAIN (scaffolder); decomper is wine-free.** When on PC (native
+  mwccarm), run BOTH agents on the drain (dual-lane, fast — that's how to blitz ov002).
+  ⚠️ **NEW WORKTREE GOTCHA (b538): `git worktree add` does NOT carry the git-ignored tool
+  binaries — `tools/mwccarm/`, `objdiff-cli`, `dsd` — so a fresh worktree verify-fails
+  EVERY candidate until you copy them from an existing worktree** (`cp -R
+  ../brain/tools/mwccarm tools/ ; cp ../brain/objdiff-cli ../brain/dsd .`). Do this right
+  after `git worktree add` in any drain/gate lane. Recipe: `batch_carve --version <r>
+  --overlay ov002 --srcdir src/<r>/overlay002 --min-addr 0x021aa3c0` (the REAL ov002 base;
+  NOT the 0x02234000 default) `--batch 20 --limit 150`, commit-on-pass, per-region sha1.
+- **Brief 540** — Claude `scaffolder` → **ov002 drain wave 2** (continue b538; ~1,295 USA +
+  1,431 JPN remain). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ after `git worktree add`,
+  COPY the tool binaries (see gotcha above) or every candidate verify-fails. One solid wave
+  (a few hundred) then PR — don't marathon. Report shipped + remaining. Own worktree.
+  Branch `claude/usajpn-ov002-drain-540`.
+- **Brief 541** — Claude `decomper` → **WINE-FREE wall-autopsy: are ov004/ov006/ov011's
+  "100% wall" residues genuinely dead, or is there a class-unlock?** (No batch_carve/gates
+  → no contention with the drain.) The b537 census flagged ov004 (2), ov006 (13), ov011 (0)
+  as 100% kind:data C-absorbed walls. Confirm (via `asm_escape --classify-data` + objdump,
+  wine-free) that each is genuinely the C-absorbed class (mid-bundle addr, no named def —
+  the one truly-unrecoverable kind per b406), OR find an `asm_escape` fix that recovers a
+  chunk (the b474/477 class-unlock pattern). Deliver a verdict doc + any tool fix + tests.
+  If genuinely dead, that's a clean permanent-skip. LOW priority — the decomper may instead
+  REST on Mac; the real acceleration is dual-lane drain on PC. Own worktree. Branch
+  `claude/wall-autopsy-541`.
 
 
 ### Closed briefs (reference)
+
+- **Briefs 538/539 (2026-07-06, Mac — drain chapter opens).** **#1108** (b538, drain w1):
+  296 ov002 `.s` (148 USA + 148 JPN), 16 auto-commits, ALL first-attempt gate passes;
+  `--min-addr 0x021aa3c0` (real base). Runway after: ~1,295 USA + 1,431 JPN ov002. Gotchas:
+  fresh-worktree missing tool binaries (→ banked above), + a mid-gate interruption recovered
+  by hand. **#1107** (b539): the turnkey `usajpn-drain-workorder.md` — per-module batch_carve
+  invocations + true --min-addr + SKIP-walls (ov004/006/011); confirmed the overlay-swap
+  groups (9/9/6 @ 0x021aa3c0/0x021b2180/0x021c9c80) + that b459/b461/name-drift fixes are all
+  already in the tracked tools (no action). 3-region green.
 
 - **Briefs 536/537 (2026-07-06, Mac).** **#1106** (b536, last easy c-match): shipped 1
   (`func_ov002_0225368c` 92B, 3-region) of the 8; 4 parked (2-4B reg-alloc tie-breaks =
