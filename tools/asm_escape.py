@@ -364,7 +364,8 @@ def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], lis
 
 
 def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
-             whole: bool = False, thumb: bool = False) -> str:
+             whole: bool = False, thumb: bool = False,
+             absorbed_subs: dict[str, str] | None = None) -> str:
     """Emit a byte-exact mwasmarm `.s` from the ORIGINAL instruction stream.
 
     Two modes share this emitter:
@@ -441,6 +442,8 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     for w in orig:
         if w["addr"] in lit:
             val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
+            if absorbed_subs and val in absorbed_subs:
+                val = absorbed_subs[val]   # C-absorbed unlock (brief 541 prototype)
             if thumb and not in_pool:
                 body.append("    .align 2")   # halfword stream realigns before a pool
             in_pool = True
@@ -650,6 +653,7 @@ def classify_data_refs(symbols_text: str, relocs_text: str, delinks_text: str,
                 base = syms[bisect.bisect_right(saddrs, cs) - 1][1]
                 if cs < saddr:
                     v = {"verdict": "C-absorbed", "tu": tu,
+                         "base": base, "base_addr": cs, "offset": t - cs,
                          "note": f"absorbed into bundle TU (base {base}); "
                                  f"data_… has NO linkable definition -> mwldarm "
                                  f"Undefined (brief 361 class)"}
@@ -668,6 +672,42 @@ def classify_data_refs(symbols_text: str, relocs_text: str, delinks_text: str,
                              f"0x{t:08x}: unexpected geometry"}
         out.append({"sym": sname, "target": t, **v})
     return out
+
+
+def resolve_absorbed_substitutions(verdicts: list[dict]) -> dict[str, str] | None:
+    """PURE (brief 541): turn C-absorbed verdicts into `.word`-safe
+    `base+0xN` expressions, IF that is the only unlinkable class present.
+
+    Every C-absorbed ref has a base symbol with a real linkable definition
+    (that's what "absorbed into bundle TU (base X)" means) — its address
+    is just missing its OWN symbol table entry. A relocation against
+    `base+offset` is ordinary symbol-plus-addend arithmetic (the same
+    thing an R_ARM_ABS32 reloc already encodes), so mwasmarm accepting
+    `.word base+0xN` syntax would let emit_asm reproduce the original
+    `.word <absorbed_sym>` bytes without any delinks/data-carve change.
+
+    Returns:
+      - `{absorbed_sym: "base+0xN"}` for every C-absorbed ref, if EVERY
+        non-ok verdict in `verdicts` is C-absorbed (A-aligned/B-gap refs
+        need no substitution and are simply absent from the returned dict).
+      - `None` if any verdict is OFFSET / MISADDRESSED / an unresolved
+        B-gap, or anything else this substitution doesn't address — the
+        caller must still refuse in that case.
+
+    NOT wired into any default code path (brief 541 prototype — see
+    `generate_whole`'s `allow_absorbed_offset` opt-in). mwasmarm's
+    acceptance of `symbol+constant` in a `.word` directive is UNVERIFIED
+    in this wine-free session; a follow-up must assemble one real
+    candidate before this is trusted for a ship.
+    """
+    subs: dict[str, str] = {}
+    for v in verdicts:
+        if v["verdict"] in ("A-aligned", "B-gap"):
+            continue
+        if v["verdict"] != "C-absorbed":
+            return None
+        subs[v["sym"]] = f"{v['base']}+0x{v['offset']:x}"
+    return subs
 
 
 def _gap_defines_data(version: str, sym: str) -> bool:
@@ -833,10 +873,17 @@ def generate(func: str, c_file: str, version: str, out: str | None) -> int:
     return 1
 
 
-def generate_whole(func: str, version: str, out: str | None) -> int:
+def generate_whole(func: str, version: str, out: str | None,
+                   allow_absorbed_offset: bool = False) -> int:
     """Whole-function GLOBAL_ASM ship (brief 302): emit the original
     disassembly verbatim as a byte-exact mwasm `.s` — no C, no near-match.
-    The endgame for reg-alloc-walled functions (brief 294)."""
+    The endgame for reg-alloc-walled functions (brief 294).
+
+    `allow_absorbed_offset` (brief 541 prototype, default OFF): if the
+    preflight's only REFUSE reason is C-absorbed data refs, substitute
+    each with a `base+0xN` expression (see resolve_absorbed_substitutions)
+    instead of refusing. UNVERIFIED against the real mwasmarm assembler —
+    see that function's docstring before trusting a ship through this path."""
     tmp = ROOT / "build" / "_asm_escape"
     tmp.mkdir(parents=True, exist_ok=True)
     asm_o = str(tmp / f"{func}.asm.o")
@@ -846,8 +893,27 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
         print(f"error: {func} not found in build/{version}/delinks "
               f"(already matched, or run `ninja` first?)", file=sys.stderr)
         return 2
+    absorbed_subs: dict[str, str] | None = None
     if preflight_data_refs(func, version):
-        return 1
+        if not allow_absorbed_offset:
+            return 1
+        cfg = _module_config(version, func)
+        try:
+            verdicts = classify_data_refs(
+                (cfg / "symbols.txt").read_text(encoding="utf-8"),
+                (cfg / "relocs.txt").read_text(encoding="utf-8"),
+                (cfg / "delinks.txt").read_text(encoding="utf-8"), func)
+        except FileNotFoundError:
+            return 1
+        absorbed_subs = resolve_absorbed_substitutions(verdicts)
+        if absorbed_subs is None:
+            print(f"{func}: ❌ REFUSE reason isn't purely C-absorbed — "
+                  f"--allow-absorbed-offset can't recover this one.",
+                  file=sys.stderr)
+            return 1
+        print(f"{func}: ⚠ proceeding with {len(absorbed_subs)} C-absorbed "
+              f"base+offset substitution(s) — UNVERIFIED assembler syntax "
+              f"(brief 541 prototype)")
     size = configured_function_size(version, func)
     if size is None:
         print(f"error: {func} has no configured function size", file=sys.stderr)
@@ -863,7 +929,8 @@ def generate_whole(func: str, version: str, out: str | None) -> int:
     except FileNotFoundError:
         sym_text = ""
     _resolve_tail_calls(func, orig, sym_text)
-    s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func))
+    s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func),
+                absorbed_subs=absorbed_subs)
     out_path = out or str(tmp / f"{func}.s")
     Path(out_path).write_text(s, encoding="utf-8")
 
@@ -895,6 +962,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="kind:data link preflight only (brief 406): print per-ref "
                          "A-aligned/B-gap/C-absorbed/OFFSET/MISADDRESSED verdicts, "
                          "no .s emitted; exit 1 on any unlinkable ref")
+    ap.add_argument("--allow-absorbed-offset", action="store_true",
+                    help="(brief 541 prototype, --whole-function only) if the ONLY "
+                         "REFUSE reason is C-absorbed data refs, emit `base+0xN` "
+                         "instead of refusing. UNVERIFIED against mwasmarm in the "
+                         "wine-free session that added this flag — assemble + gate "
+                         "one candidate before trusting a ship through this path.")
     ap.add_argument("--version", default="eur")
     ap.add_argument("--out", default=None, help="output .s path (default: build/_asm_escape/)")
     args = ap.parse_args(argv)
@@ -904,7 +977,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{args.function}: ✅ kind:data preflight clean — carve will link")
         return rc
     if args.whole_function:
-        return generate_whole(args.function, args.version, args.out)
+        return generate_whole(args.function, args.version, args.out,
+                              allow_absorbed_offset=args.allow_absorbed_offset)
     if not args.c:
         ap.error("provide either --c <byte-near.c> (canonicalisation fix) or --whole-function")
     return generate(args.function, args.c, args.version, args.out)
