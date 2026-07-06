@@ -37,6 +37,10 @@ src/jpn/overlay015/func_ov015_021b27f0.c:
     complete
     .text start:0x021b27f0 end:0x021b2824
 
+src/jpn/overlay015/func_ov015_021b2824.c:
+    complete
+    .text start:0x021b2824 end:0x021b2a08
+
 src/jpn/overlay015/func_ov015_021b2a08.c:
     complete
     .text start:0x021b2a08 end:0x021b2a80
