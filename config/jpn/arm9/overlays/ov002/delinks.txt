@@ -5005,7 +5005,7 @@ src/jpn/overlay002/func_ov002_0225321c.s:
 src/jpn/overlay002/func_ov002_02253550.s:
     complete
     .text start:0x02253550 end:0x022535a4
-src/jpn/overlay002/func_ov002_022535a4.s:
+src/jpn/overlay002/func_ov002_022535a4.c:
     complete
     .text start:0x022535a4 end:0x02253600
 src/jpn/overlay002/func_ov002_02253600.s:
