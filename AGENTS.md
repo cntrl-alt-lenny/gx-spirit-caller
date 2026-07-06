@@ -687,42 +687,47 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-06, Mac, Claude-only). C-MATCH QUEUE NEARLY DRAINED — strategic
-  inflection.** b534's fixed-tool re-audit: of v3's 107 "carried" rows, only **8 are
-  genuinely untried** (all now CONTAINED with the module-aware tool); 99 were already
-  resolved. b535 cracked B4 (`021b2924` pair). So the c-match campaign has ~1 productive
-  wave left (the 8), then the true tail = permuter-class reg-alloc + large RE.
-  ⚠️ **BIGGER PICTURE: c-match is a QUALITY lane (EUR `.s`→C; the `.s` already gate
-  byte-identical, so it doesn't move coverage %). The COVERAGE frontier is USA/JPN ≈49%
-  code — ~51% is still dsd auto-gap (uncarved). If that's still mechanically `.s`-drainable
-  (the b467-469 drain that hit 49% may have PAUSED for the c-match pivot, not exhausted),
-  it's a far bigger lane than the c-match tail.** b537 censuses exactly that. Worktree
-  hygiene: one per lane (`git worktree add ../<lane> -b <branch> origin/main`); never
-  delete files outside scope; LAST actions gate→push→PR.
-- **Brief 536** — Claude `scaffolder` → **the LAST easy c-match wave: the 8 genuinely-
-  untried v4 candidates.** From `campaign-analytics/safe-queue-v4.md` §"The 8 genuinely
-  open rows": `0228791c`/`0225368c`/`021b0a30` (ov002), `020384e8` (main), `021ae218`/
-  `021ae2cc` (ov000), `021ca70c` (ov013), `021cca04` (ov011) — 92-220B, all CONTAINED
-  per the FIXED module-aware `containment_check.py` (pass `--module` / it now auto-resolves).
-  Match EUR → port USA/JPN (per-region ROM `ninja sha1`, park divergents). Use the b524
-  levers. Small byproduct cleanup (you own main): b534 flagged 6 EUR `main` delinks.txt
-  lines still naming a DELETED `.s` whose `.c` exists+is tracked — fix those stale lines.
-  Own worktree. Branch `claude/cmatch-final8-536`.
-- **Brief 537** — Claude `decomper` (strongest model) → **USA/JPN mechanical `.s`-drain
-  runway CENSUS (READ-ONLY — no ships, no delink writes → collision-free).** THE strategy-
-  deciding scout. USA/JPN are ≈49% code; ~51% is auto-gap. Question: how much of that
-  uncarved USA/JPN code is still TRACTABLE `batch_carve`/`asm_escape --whole-function`
-  runway vs genuine walls (kind:data C-absorbed / permuter / RE)? Method: enumerate
-  uncarved USA + JPN funcs per module (main + all overlays) — use `batch_carve --dry-run`
-  / `asm_escape --classify-data` (objdump-only, wine-free) across the FULL address range
-  (⚠️ `--min-addr` default 0x02234000 misses ranges — set per module). Report per-module:
-  #uncarved, #tractable (clean preflight), #REFUSE (kind:data), rough size tiers. VERDICT:
-  is there a big resumable USA/JPN drain lane, and how big (≈ funcs / code-% it would add)?
-  Do NOT carve/ship — census only. Own worktree. Branch `claude/usajpn-census-537`. Doc
-  `brief-537-usajpn-runway-census.md`.
+- **LANE STATE (2026-07-06, Mac, Claude-only). NEW CHAPTER: RESUME the USA/JPN mechanical
+  `.s` drain (b537 census verdict).** The c-match easy tier is DONE (b536: 1/8 shipped,
+  rest permuter-class). The COVERAGE frontier reopened: **4,349 of 4,439 uncarved USA/JPN
+  funcs (98%) are tractable `batch_carve` runway → USA/JPN ≈49% → ~99% code.** The drain
+  was PAUSED for the c-match detour, not exhausted. **ov002 = ~77% (1,443 tractable/region,
+  898K bytes) — the whale.** Small tractable overlay pools after (ov000 85, ov008 71, ov005
+  63, ov010 62, ov016 56, ov017/015 39, …); main nearly done (49). SKIP the confirmed walls:
+  ov004/ov006/ov011 (100% wall). ⚠️ **MAC = ONE heavy wine lane** (user chose smooth): the
+  DRAIN is the single batch_carve lane (scaffolder); the decomper takes a WINE-FREE lane so
+  they don't contend. When back on PC (native mwccarm), both can drain. Recipe (from the
+  USA/JPN drain era): `batch_carve --version <r> --overlay ovNNN --srcdir src/<r>/overlayNNN
+  --min-addr <module-base>` (⚠️ default 0x02234000 misses ranges) `--batch 20 --limit 150`,
+  commit-on-pass; per-region ROM `ninja sha1`. Worktree per lane; never delete outside scope.
+- **Brief 538** — Claude `scaffolder` → **RESUME the drain: USA + JPN `ov002` mechanical
+  `.s` drain (the whale, ~1,443 tractable/region).** ONE smooth wine lane (no co-lane).
+  `batch_carve` USA ov002, then JPN ov002 (or interleave), full `--min-addr` range for ov002
+  (NOT the 0x02234000 default — enumerate the whole overlay), chunked `--limit 50-150`,
+  commit-on-pass. b406 preflight parks kind:data; per-pick gate isolates the overlay-swap
+  zone. This is the first of ~several ov002 waves. Report shipped + remaining ov002 runway.
+  Own worktree. Branch `claude/usajpn-ov002-drain-538`.
+- **Brief 539** — Claude `decomper` (strongest model) → **WINE-FREE: turnkey drain roadmap +
+  pitfall audit** (no batch_carve/gates → zero contention with the scaffolder's drain). Turn
+  b537's census into an executable multi-wave WORK ORDER for the whole USA/JPN 49%→99% drain:
+  for EACH tractable module (ov002 first, then the small overlays, then main's 49), give the
+  EXACT `batch_carve` invocation — `--version`, `--overlay`/`--srcdir`, the TRUE `--min-addr`
+  (each module's real base, since the 0x02234000 default silently skips ranges), tractable
+  count, size tiers — plus flag SKIP-walls (ov004/006/011) and any per-module gotcha
+  (overlay-swap zones, region delink quirks, the b459 extern-decl class). Deliverable: a
+  `docs/research/campaign-analytics/usajpn-drain-workorder.md` the scaffolder executes wave
+  after wave without re-deriving. Own worktree. Branch `claude/drain-workorder-539`.
 
 
 ### Closed briefs (reference)
+
+- **Briefs 536/537 (2026-07-06, Mac).** **#1106** (b536, last easy c-match): shipped 1
+  (`func_ov002_0225368c` 92B, 3-region) of the 8; 4 parked (2-4B reg-alloc tie-breaks =
+  permuter-class), 3 deferred (complex) → c-match easy tier CONFIRMED done. Also fixed the
+  6 stale EUR main delink lines (b534 byproduct). **#1105** (b537, census): **VERDICT RESUME**
+  — 4,349/4,439 uncarved USA/JPN funcs tractable (98%), USA/JPN ~49%→~99% projected; ov002 =
+  77% (1,443/region); ov004/006/011 = 100% wall (skip). Wine-free method, 5 CLI-validated.
+  → b538 resumes the ov002 drain; b539 builds the full drain work-order.
 
 - **Briefs 534/535 (2026-07-06, Mac).** **#1103** (b534): fixed `containment_check.py`'s
   MODULE-AWARENESS blind spot (overlay candidates silently diffed vs main's always-clean
