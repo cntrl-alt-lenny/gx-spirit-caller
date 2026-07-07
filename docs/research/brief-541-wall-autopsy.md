@@ -9,6 +9,15 @@ as "100% kind:data C-absorbed walls." This brief autopsies every one of
 those ~15 residual USA/JPN functions individually to confirm the class
 is genuinely unrecoverable, or find an unlock.
 
+**Update (brief 543, 2026-07-07): SHIPPED.** The `--allow-absorbed-offset`
+unlock prototyped below was validated against the real `mwasmarm`
+assembler and gated byte-identical via `ninja sha1` on all 15 functions,
+both USA and JPN — see
+[`brief-543-absorbed-unlock.md`](brief-543-absorbed-unlock.md) for the
+full verdict, the real `.extern`-list bug found and fixed along the way,
+and the batch_carve drain-default recommendation. `ov004`/`ov006` are no
+longer a skip class; the paragraphs below are kept as-written for history.
+
 ## Verdict
 
 **Confirmed: all 15 residual functions are genuinely `C-absorbed` under

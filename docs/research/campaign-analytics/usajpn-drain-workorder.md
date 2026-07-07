@@ -72,17 +72,26 @@ python tools/batch_carve.py \
 
 ## SKIP — confirmed walls, do not attempt
 
+**Update (brief 543): `ov004`/`ov006` are no longer a skip class.** Both
+shipped — see
+[`brief-543-absorbed-unlock.md`](../brief-543-absorbed-unlock.md). The
+`C-absorbed` REFUSE class turned out to be recoverable via
+`asm_escape.py --allow-absorbed-offset` (`.word base+0xN` emission,
+validated against the real assembler and gated byte-identical both
+regions). `ov011` remains listed below for completeness (nothing to do,
+not a wall).
+
 | Module | Uncarved | REFUSE | Why |
 |---|---:|---:|---|
-| `ov004` | 2 | 2 (100%) | Both `C-absorbed`. Confirmed wall, both regions. |
-| `ov006` | 13 | 13 (100%) | All `C-absorbed`. Confirmed wall, both regions. |
+| `ov004` | 0 | — | **Shipped brief 543** (was 2, both `C-absorbed`). |
+| `ov006` | 0 | — | **Shipped brief 543** (was 13, all `C-absorbed`). |
 | `ov011` | 0 | — | Already fully drained (0 uncarved) — nothing to do. |
 
-Running `batch_carve.py` against these will only re-confirm the same
-REFUSEs at the cost of a wasted invocation — skip them entirely for
-this campaign. They are candidates for a *different* technique (the
-kind:data-absorption class needs a source-side fix — see brief 537 §
-Caveats — not a carve retry).
+If a *new* `C-absorbed` REFUSE turns up elsewhere (e.g. in the ongoing
+`ov002` drain), it is no longer an automatic skip either — try
+`asm_escape.py --whole-function --allow-absorbed-offset` first; only
+fall back to a bundle split or permanent-skip if that flag itself
+refuses (mixed verdict, not purely `C-absorbed`) or fails to assemble.
 
 ## Gotchas to pre-empt
 
@@ -259,10 +268,12 @@ costs nothing; it's still far below the harmful `0x02234000` default.)
 | USA | 49.7% | +1,160,352 B | **~98.7%** |
 | JPN | 48.6% | +1,185,984 B | **~98.7%** |
 
-Residual after full execution: the 45 confirmed `C-absorbed` REFUSEs
-per region (mostly `ov002`'s 4 + `main`'s 26 + `ov004`/`ov006`'s 15) —
-a small, well-characterized tail for a separate technique, not more
-mechanical carving.
+Residual after full execution: the 30 confirmed `C-absorbed` REFUSEs
+per region (`ov002`'s 4 + `main`'s 26 — `ov004`/`ov006`'s 15 shipped
+brief 543, see above) — a small, well-characterized tail. Per brief
+543, this residual is no longer assumed unrecoverable by default:
+retry each with `asm_escape.py --allow-absorbed-offset` before treating
+it as a permanent skip.
 
 ## Final state
 
