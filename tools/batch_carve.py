@@ -74,6 +74,30 @@ _SYM_ADDR_RE = re.compile(
 _START_RE = re.compile(r"start:(0x[0-9a-f]+)")
 _TEXT_RE = re.compile(r"\.text start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)\s*$")
 _SRC_HDR_RE = re.compile(r"(\S+/(func_\w+)\.s):$")
+_REFUSE_VERDICT_RE = re.compile(r"data-ref \S+ @0x[0-9a-f]+: (\S+) \(REFUSE\)")
+
+
+def classify_refuse_kind(output: str) -> str:
+    """PURE (brief 545): given `asm_escape.py --classify-data`'s combined
+    stdout+stderr, decide whether a REFUSE is the `C-absorbed`
+    `base+small_offset` sub-case brief 543 proved recoverable via
+    `--allow-absorbed-offset`, or a genuine wall.
+
+    Parses the `data-ref SYM @0xADDR: VERDICT (REFUSE)` lines the preflight
+    prints per brief 406's 5-verdict classifier (`asm_escape.classify_data_refs`)
+    — mirrors that module's own `resolve_absorbed_substitutions`: recoverable
+    ONLY if every refused ref is specifically `C-absorbed`. A REFUSE mixed
+    with (or consisting of) `OFFSET`, `MISADDRESSED`, or an under-defined
+    `B-gap` is a real wall — `--allow-absorbed-offset` cannot fix those, so
+    don't waste a retry (or worse, blur the REFUSE/verify-fail park
+    bucketing) on one.
+
+    Returns 'absorbed' or 'wall'. No REFUSE lines found at all (unexpected
+    output shape) conservatively returns 'wall' — same as today's behaviour."""
+    verdicts = _REFUSE_VERDICT_RE.findall(output)
+    if verdicts and all(v == "C-absorbed" for v in verdicts):
+        return "absorbed"
+    return "wall"
 
 
 def parse_symbols(text: str) -> dict[str, int]:
@@ -278,7 +302,14 @@ class Ops:
             time.sleep(2)
 
     def classify(self, func: str) -> str:
-        """'clean' | 'refuse' | 'deferred'."""
+        """'clean' | 'refuse' | 'refuse-absorbed' | 'deferred'.
+
+        'refuse-absorbed' (brief 545): the REFUSE is purely the `C-absorbed`
+        sub-case brief 543 proved recoverable — `run()` retries these via
+        `whole_function()` (which now always carries
+        `--allow-absorbed-offset`) instead of parking immediately. A genuine
+        wall (OFFSET/MISADDRESSED/other) still returns plain 'refuse' and is
+        parked exactly as before."""
         try:
             r = self._run([sys.executable, "tools/asm_escape.py", "--classify-data",
                            "--version", self.version, func],
@@ -288,15 +319,21 @@ class Ops:
             return "deferred"
         out = r.stdout + r.stderr
         if "REFUSE" in out:
-            return "refuse"
+            return "refuse-absorbed" if classify_refuse_kind(out) == "absorbed" else "refuse"
         if "clean" in out or "✅" in out:
             return "clean"
         return "refuse"   # unknown output -> conservative park
 
     def whole_function(self, func: str, out_path: str) -> str:
-        """'pass' | 'verify-fail' | 'deferred'. Writes out_path on pass."""
+        """'pass' | 'verify-fail' | 'deferred'. Writes out_path on pass.
+
+        Always passes `--allow-absorbed-offset` (brief 545): a proven no-op
+        when the preflight is clean or the REFUSE isn't purely `C-absorbed`
+        (asm_escape refuses identically either way — see brief 543), and the
+        only way a 'refuse-absorbed' classify() retry can actually recover."""
         try:
             r = self._run([sys.executable, "tools/asm_escape.py", "--whole-function",
+                           "--allow-absorbed-offset",
                            "--version", self.version, func, "--out", out_path],
                           timeout=self.call_timeout or None)
         except subprocess.TimeoutExpired:
@@ -436,15 +473,22 @@ class Scope:
 class Report:
     passed: list[str] = field(default_factory=list)
     refused: list[str] = field(default_factory=list)
+    absorbed: list[str] = field(default_factory=list)
     verify_fail: list[str] = field(default_factory=list)
     gate_fail: list[str] = field(default_factory=list)
     deferred: list[str] = field(default_factory=list)
     committed_batches: int = 0
 
     def summary(self) -> str:
+        """`absorbed` is a SUBSET count, not a new bucket: every func in it
+        also lands in `passed`/`verify_fail`/`deferred` (its real outcome) —
+        it just tags "REFUSE routed through --allow-absorbed-offset instead
+        of parked" (brief 545). In `--dry-run` it's an unattempted estimate
+        (classify() only), same caveat `passed` already carries there."""
         total = len(self.passed) + len(self.refused) + len(self.verify_fail) + len(self.gate_fail)
         rate = (100 * len(self.passed) // total) if total else 0
         return (f"SHIPPED {len(self.passed)} | REFUSE {len(self.refused)} | "
+                f"absorbed-routed {len(self.absorbed)} | "
                 f"verify-fail {len(self.verify_fail)} | gate-fail {len(self.gate_fail)} | "
                 f"deferred {len(self.deferred)} | clean-rate {rate}% | "
                 f"commits {self.committed_batches}")
@@ -648,6 +692,11 @@ class BatchCarver:
             if cd == "refuse":
                 self.report.refused.append(func); self._park(func, "kind:data-REFUSE", self.skip_path)
                 self.log(f"  ⊘ {func} REFUSE (parked)"); continue
+            if cd == "refuse-absorbed":
+                # brief 545: purely C-absorbed -- don't park, fall through and
+                # let whole_function() (always --allow-absorbed-offset) try it.
+                self.report.absorbed.append(func)
+                self.log(f"  ◆ {func} REFUSE (C-absorbed, base+offset-recoverable — attempting)")
             if self.dry_run:
                 self.report.passed.append(func); continue
             s_rel = f"{self.srcdir}/{func}.s"

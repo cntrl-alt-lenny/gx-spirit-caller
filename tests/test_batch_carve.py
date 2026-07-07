@@ -26,9 +26,9 @@ sys.path.insert(0, str(_TOOLS))
 
 import batch_carve as bc  # noqa: E402
 from batch_carve import (  # noqa: E402
-    BatchCarver, Scope, audit, bisect_plan, carved_addrs, delink_block,
-    filter_candidates, func_addr, newline_guard, parse_skiplist, parse_symbols,
-    parse_symbol_addrs,
+    BatchCarver, Scope, audit, bisect_plan, carved_addrs, classify_refuse_kind,
+    delink_block, filter_candidates, func_addr, newline_guard, parse_skiplist,
+    parse_symbols, parse_symbol_addrs,
 )
 
 
@@ -130,6 +130,92 @@ class TestPureHelpers(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# classify_refuse_kind (brief 545: routes purely-C-absorbed REFUSEs through   #
+# --allow-absorbed-offset instead of the classify()-time park; genuine walls  #
+# — OFFSET/MISADDRESSED/under-defined B-gap — must stay parked immediately)   #
+# --------------------------------------------------------------------------- #
+
+class TestClassifyRefuseKind(unittest.TestCase):
+    # Real asm_escape --classify-data shapes (brief 406's 5-verdict printer),
+    # not synthetic strings -- these are the exact per-ref two-line blocks
+    # `preflight_data_refs` emits.
+    _OK_ALIGNED = (
+        "  data-ref data_ov006_021ce530 @0x021ce530: A-aligned (ok) "
+        "[src/usa/overlay006/data/data_ov006_021ce530.s]\n"
+        "      symbol-aligned carved TU defines the global; .extern links\n")
+    _ABSORBED = (
+        "  data-ref data_ov006_021ce788 @0x021ce788: C-absorbed (REFUSE) "
+        "[src/usa/overlay006/data/data_ov006_021ce530.s]\n"
+        "      absorbed into bundle TU (base data_ov006_021ce530); data_… has "
+        "NO linkable definition -> mwldarm Undefined (brief 361 class)\n")
+    _ABSORBED_2 = (
+        "  data-ref data_ov006_021ce9f0 @0x021ce9f0: C-absorbed (REFUSE) "
+        "[src/usa/overlay006/data/data_ov006_021ce9e4.s]\n"
+        "      absorbed into bundle TU (base data_ov006_021ce9e4); data_… has "
+        "NO linkable definition -> mwldarm Undefined (brief 361 class)\n")
+    _OFFSET = (
+        "  data-ref data_ov002_02211fb0 @0x02211fb4: OFFSET (REFUSE) "
+        "[src/overlay002/data/data_ov002_02211fac.s]\n"
+        "      pool word targets data_ov002_02211fb0+0x4; emit_asm drops the "
+        "addend -> silent corruption caught only at sha1. Unsupported\n")
+    _MISADDRESSED = (
+        "  data-ref data_ov002_02220000 @0x02220000: MISADDRESSED (REFUSE) "
+        "[src/overlay002/data/data_ov002_02220000.s]\n"
+        "      carve range 0x02220000..0x02220010 starts at no data symbol "
+        "— mis-sized/mis-addressed data carve\n")
+    _BGAP_UNDEFINED = (
+        "  data-ref data_ov002_02230000 @0x02230000: B-gap (REFUSE) "
+        "[]\n"
+        "      classified B-gap but NO gap object defines the symbol — "
+        "unlinkable (absorbed without a symbols.txt carve?)\n")
+    _TRAILER_REFUSED = ("func_x: ❌ kind:data preflight REFUSED — the carve "
+                        "would not link (or would mislink). Do not ship; "
+                        "see verdicts above.\n")
+
+    def test_pure_c_absorbed_single_ref(self):
+        out = self._OK_ALIGNED + self._ABSORBED + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "absorbed")
+
+    def test_pure_c_absorbed_multi_ref(self):
+        # func_ov006_021c81a0 shape (brief 541): two C-absorbed refs, no
+        # other REFUSE-tagged line -- still fully recoverable.
+        out = self._OK_ALIGNED + self._ABSORBED + self._ABSORBED_2 + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "absorbed")
+
+    def test_mixed_c_absorbed_and_offset_is_a_wall(self):
+        out = self._ABSORBED + self._OFFSET + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "wall")
+
+    def test_pure_offset_is_a_wall(self):
+        out = self._OFFSET + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "wall")
+
+    def test_pure_misaddressed_is_a_wall(self):
+        out = self._MISADDRESSED + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "wall")
+
+    def test_undefined_b_gap_is_a_wall_not_absorbed(self):
+        # B-gap CAN be REFUSE-tagged (the gap object doesn't actually define
+        # the symbol) -- a different unlinkable shape than C-absorbed, and
+        # --allow-absorbed-offset has no mechanism for it.
+        out = self._BGAP_UNDEFINED + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "wall")
+
+    def test_ok_lines_do_not_affect_the_verdict(self):
+        # Multiple ok A-aligned/B-gap refs alongside the one C-absorbed
+        # REFUSE -- only the REFUSE-tagged lines should matter.
+        out = self._OK_ALIGNED * 3 + self._ABSORBED + self._TRAILER_REFUSED
+        self.assertEqual(classify_refuse_kind(out), "absorbed")
+
+    def test_no_refuse_lines_conservatively_a_wall(self):
+        # Garbled/unexpected output (e.g. a traceback) -- same safe default
+        # as today's "unknown output -> conservative park".
+        self.assertEqual(classify_refuse_kind(""), "wall")
+        self.assertEqual(classify_refuse_kind("Traceback (most recent call last):\n...\n"),
+                         "wall")
+
+
+# --------------------------------------------------------------------------- #
 # Platform-specific Ops paths                                                  #
 # --------------------------------------------------------------------------- #
 
@@ -179,6 +265,33 @@ class TestOpsPlatformPaths(unittest.TestCase):
                 (sys.executable, "tools/configure.py"),
             ],
         )
+        # brief 545: the --whole-function call always carries the flag now
+        # (a proven no-op unless the ONLY REFUSE reason is C-absorbed).
+        whole_function_call = next(c for c in calls if "--whole-function" in c)
+        self.assertIn("--allow-absorbed-offset", whole_function_call)
+
+    def test_classify_distinguishes_absorbed_from_genuine_wall(self):
+        """brief 545: real Ops.classify() (not the pure helper directly) must
+        route a purely-C-absorbed REFUSE to 'refuse-absorbed' and a mixed/
+        OFFSET/MISADDRESSED REFUSE to plain 'refuse' -- the actual seam
+        BatchCarver.run() reads."""
+        ops = bc.Ops("usa")
+        absorbed_output = (
+            "  data-ref data_ov006_021ce788 @0x021ce788: C-absorbed (REFUSE) "
+            "[src/usa/overlay006/data/data_ov006_021ce530.s]\n"
+            "      absorbed into bundle TU (base data_ov006_021ce530); ...\n"
+            "func_x: ❌ kind:data preflight REFUSED — ...\n")
+        wall_output = (
+            "  data-ref data_ov002_02211fb0 @0x02211fb4: OFFSET (REFUSE) "
+            "[src/overlay002/data/data_ov002_02211fac.s]\n"
+            "      pool word targets ...\n"
+            "func_x: ❌ kind:data preflight REFUSED — ...\n")
+        with mock.patch.object(ops, "_run",
+                              return_value=mock.Mock(returncode=1, stdout=absorbed_output, stderr="")):
+            self.assertEqual(ops.classify("func_x"), "refuse-absorbed")
+        with mock.patch.object(ops, "_run",
+                              return_value=mock.Mock(returncode=1, stdout=wall_output, stderr="")):
+            self.assertEqual(ops.classify("func_x"), "refuse")
 
     @unittest.skipIf(sys.platform == "win32", "POSIX-only flock behaviour")
     def test_posix_gate_lock_is_exclusive(self):
@@ -207,14 +320,20 @@ class TestOpsPlatformPaths(unittest.TestCase):
 class FakeOps:
     """Models classify/whole-function/gate/git against the temp tree.
 
-    refuse:     funcs whose classify returns REFUSE
+    refuse:     funcs whose classify returns REFUSE (genuine wall — parked
+                immediately, whole_function() never called; brief 545)
+    absorbed:   funcs whose classify returns 'refuse-absorbed' (purely
+                C-absorbed — run() retries via whole_function() instead of
+                parking; brief 545). Combine with `corrupt` to model an
+                absorbed candidate whose retry still fails.
     corrupt:    funcs whose whole-function does NOT byte-verify
     bad_link:   funcs that byte-verify but make `gate()` (ninja sha1) fail
                 when their delink block is present in the tree
     """
-    def __init__(self, refuse=(), corrupt=(), bad_link=(), commit_fails=False,
-                 dirty=False, gate_times_out=False):
+    def __init__(self, refuse=(), absorbed=(), corrupt=(), bad_link=(),
+                 commit_fails=False, dirty=False, gate_times_out=False):
         self.refuse = set(refuse)
+        self.absorbed = set(absorbed)
         self.corrupt = set(corrupt)
         self.bad_link = set(bad_link)
         self.commit_fails = commit_fails
@@ -238,7 +357,11 @@ class FakeOps:
         pass
 
     def classify(self, func):
-        return "refuse" if func in self.refuse else "clean"
+        if func in self.refuse:
+            return "refuse"
+        if func in self.absorbed:
+            return "refuse-absorbed"
+        return "clean"
 
     def whole_function(self, func, out_path):
         if func in self.corrupt:
@@ -334,6 +457,60 @@ class TestDriverNegativeParks(unittest.TestCase):
         self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
         self.assertNotIn("func_ov002_022a0000.s", (self.tmp / scope.delinks_path).read_text())
         self.assertIn("func_ov002_022a0000", (self.tmp / c.skip_path).read_text())
+
+    def test_refuse_absorbed_recovers_via_whole_function(self):
+        """brief 545: a C-absorbed-only REFUSE must NOT be parked at
+        classify() time -- run() falls through to whole_function() (which
+        FakeOps models as succeeding, standing in for the real
+        --allow-absorbed-offset retry), and the func ships exactly like a
+        clean candidate: carved, committed, absent from the skip-list."""
+        funcs = [("func_ov002_022a0000", 0x80), ("func_ov002_022a0100", 0xc4)]
+        ops = FakeOps(absorbed=["func_ov002_022a0000"])
+        c, scope = self._carver(funcs, ops)
+        rep = c.run()
+        self.assertEqual(rep.refused, [])                          # not a park
+        self.assertEqual(rep.absorbed, ["func_ov002_022a0000"])    # tagged
+        self.assertEqual(set(rep.passed),
+                         {"func_ov002_022a0000", "func_ov002_022a0100"})
+        self.assertTrue((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
+        self.assertIn("func_ov002_022a0000.s", (self.tmp / scope.delinks_path).read_text())
+        self.assertNotIn("func_ov002_022a0000", (self.tmp / c.skip_path).read_text())
+
+    def test_refuse_absorbed_that_still_fails_parks_as_verify_fail_not_refuse(self):
+        """A candidate classify() flags as the recoverable C-absorbed
+        sub-case, but whose whole_function() retry still doesn't byte-verify
+        (a real assemble/verify failure, not a link-preflight wall), must
+        land in verify_fail/verifyfail_path -- NOT refused/skip_path. The
+        REFUSE bucket is reserved for genuine, immediately-known walls;
+        this one was ATTEMPTED and failed at a different stage."""
+        funcs = [("func_ov002_022a0000", 0x80), ("func_ov002_022a0100", 0xc4)]
+        ops = FakeOps(absorbed=["func_ov002_022a0000"], corrupt=["func_ov002_022a0000"])
+        c, scope = self._carver(funcs, ops)
+        rep = c.run()
+        self.assertEqual(rep.refused, [])
+        self.assertEqual(rep.absorbed, ["func_ov002_022a0000"])
+        self.assertEqual(rep.verify_fail, ["func_ov002_022a0000"])
+        self.assertEqual(rep.passed, ["func_ov002_022a0100"])
+        self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
+        self.assertIn("func_ov002_022a0000", (self.tmp / c.verifyfail_path).read_text())
+        self.assertNotIn("func_ov002_022a0000", (self.tmp / c.skip_path).read_text())
+
+    def test_refuse_absorbed_dry_run_estimates_without_attempting(self):
+        """--dry-run must count a recoverable REFUSE (for census/quantification,
+        brief 545) without ever calling whole_function() -- classify() alone
+        is wine-free; the actual assemble+verify is not attempted."""
+        funcs = [("func_ov002_022a0000", 0x80), ("func_ov002_022a0100", 0xc4)]
+        ops = FakeOps(absorbed=["func_ov002_022a0000"])
+        scope = _mk_repo(self.tmp, funcs)
+        ops.bind(self.tmp / scope.delinks_path)
+        c = BatchCarver(scope, ops, batch=10, dry_run=True, log=lambda *a: None)
+        rep = c.run()
+        self.assertEqual(rep.absorbed, ["func_ov002_022a0000"])
+        self.assertEqual(set(rep.passed),
+                         {"func_ov002_022a0000", "func_ov002_022a0100"})
+        # never attempted -- no .s materialised, nothing committed
+        self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
+        self.assertEqual(ops.committed, [])
 
     def test_corrupt_carve_is_parked_RED(self):
         """THE negative test: a deliberately non-byte-identical carve is parked,
