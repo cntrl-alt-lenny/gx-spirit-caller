@@ -688,34 +688,41 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
 - **LANE STATE (2026-07-07, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
-  (2 waves = 592 ov002 `.s`; USA code ~50.6%, JPN ~49.4%).** ~1,147 USA + 1,283 JPN ov002
-  tractable remain (~8 more waves), then small overlays + main (`usajpn-drain-workorder.md`).
-  ⚠️ **MAC = ONE smooth wine lane = the DRAIN (scaffolder); decomper wine-light/rest. On PC:
-  BOTH on the drain (dual-lane, fast).** ⚠️ **fresh `git worktree add` lacks the git-ignored
-  tool binaries → copy `tools/mwccarm/` + `objdiff-cli` + `dsd` right after** (else every
-  candidate verify-fails). Drain recipe: `batch_carve --version <r> --overlay ov002 --srcdir
-  src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20 --limit 150`, commit-on-pass.
-  🔓 **b541 prototyped an `asm_escape --allow-absorbed-offset` unlock (opt-in, default off,
-  UNVERIFIED vs mwasmarm) for the `base+small_offset` C-absorbed class — b543 validates it;
-  if real it recovers the ov004/006 walls AND likely cuts the drain's own kind:data REFUSEs.**
-- **Brief 542** — Claude `scaffolder` → **ov002 drain wave 3** (continue; ~1,147 USA + 1,283
+  (3 waves = 888 ov002 `.s`; USA past halfway).** ~999 USA + 1,135 JPN ov002 tractable remain
+  (~7 more waves), then small overlays + main (`usajpn-drain-workorder.md`). ⚠️ **MAC = ONE
+  smooth wine lane = DRAIN (scaffolder); decomper wine-light. On PC: BOTH on the drain.**
+  ⚠️ **fresh `git worktree add` → copy `tools/mwccarm/` + `objdiff-cli` + `dsd` (else verify-
+  fails).** Recipe: `batch_carve --version <r> --overlay ov002 --srcdir src/<r>/overlay002
+  --min-addr 0x021aa3c0 --batch 20 --limit 150`. 🔓 **b543 VALIDATED `asm_escape
+  --allow-absorbed-offset` (real mwasmarm) + shipped 15 ov004/006 C-absorbed walls — the
+  `base+offset` C-absorbed class is NO LONGER a permanent wall. b545 wires it into
+  batch_carve so the ongoing drain recovers its kind:data REFUSEs (more ships/wave).**
+- **Brief 544** — Claude `scaffolder` → **ov002 drain wave 4** (continue; ~999 USA + 1,135
   JPN remain). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries after `git
-  worktree add`. One solid wave then PR — don't marathon. Report shipped + remaining. Own
-  worktree. Branch `claude/usajpn-ov002-drain-542`.
-- **Brief 543** — Claude `decomper` (strongest model) → **VALIDATE + apply the b541
-  C-absorbed-offset unlock** (small wine — a handful of gates, light interleave with the
-  drain; if the user wants zero contention, run after the scaffolder's wave or on PC).
-  (1) Test-assemble the simplest case `func_ov006_021c9b48` with `asm_escape
-  --allow-absorbed-offset` (command in `docs/research/brief-541-wall-autopsy.md`) → confirm
-  byte-identical vs orig via `ninja sha1`. (2) If it holds, apply to all 15 ov004/006
-  C-absorbed walls (USA+JPN) + ship. (3) **Report whether it should become a drain default**
-  (it would cut kind:data REFUSEs in the ongoing ov002 drain = more ships/wave — high
-  leverage). If it FAILS vs mwasmarm, mark the flag experimental + document why. Owns
-  ov004/ov006 (NOT ov002 = scaffolder). Own worktree + copy tool binaries. Branch
-  `claude/absorbed-unlock-543`.
+  worktree add`. One solid wave then PR. Report shipped + remaining. Own worktree. Branch
+  `claude/usajpn-ov002-drain-544`.
+- **Brief 545** — Claude `decomper` (strongest model) → **WIRE `--allow-absorbed-offset`
+  into `batch_carve` as a drain default (WINE-FREE tooling + unit tests → no drain
+  contention).** b543 validated the unlock (real assembler) + shipped 15 walls; now make the
+  DRAIN benefit: per `docs/research/brief-543-absorbed-unlock.md` § Step 4, `batch_carve`'s
+  `classify()` currently PARKS any `C-absorbed` REFUSE before `--whole-function` is ever
+  tried — change it to route the `base+small_offset` C-absorbed sub-case through
+  `--allow-absorbed-offset` instead of parking (keep the genuine OFFSET/MISADDRESSED parks).
+  Pure-Python + unit tests (mirror b543's regression test). Report the expected REFUSE→ship
+  recovery (b538/540/542 each had ~4 REFUSE/wave — quantify what this reclaims). Live proof
+  happens on the scaffolder's NEXT wave (which picks up the wired tool). Own worktree +
+  copy tool binaries. Branch `claude/wire-absorbed-545`.
 
 
 ### Closed briefs (reference)
+
+- **Briefs 542/543 (2026-07-07, Mac).** **#1112** (b542, drain w3): 296 ov002 `.s`, all
+  first-attempt, no interruptions; USA past halfway (~999 remain, JPN ~1,135). **#1111**
+  (b543, unlock validation): VALIDATED `asm_escape --allow-absorbed-offset` against real
+  mwasmarm (fixed a `.extern`-list-before-substitution bug that hit 3/14) + **shipped all 15
+  ov004/006 C-absorbed walls** (USA+JPN) — the `base+offset` C-absorbed class is now
+  recoverable, not a permanent wall. Recommends wiring it as a batch_carve default (→ b545).
+  59 asm_escape tests, 2453 suite. 3-region green.
 
 - **Briefs 540/541 (2026-07-07, Mac).** **#1110** (b540, drain w2): 296 ov002 `.s` (148/
   region), 4 REFUSE, 0 verify-fail, all first-attempt; USA code ~50.6% / JPN ~49.4%; ~1,147
