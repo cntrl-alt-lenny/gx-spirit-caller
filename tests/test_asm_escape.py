@@ -32,6 +32,7 @@ from asm_escape import (  # noqa: E402
     is_commutative_swap,
     parse_objdump,
     pool_addrs,
+    resolve_absorbed_substitutions,
     to_mwasm,
 )
 
@@ -264,6 +265,27 @@ class TestEmit(unittest.TestCase):
         self.assertIn("ldr r4, _LIT0", s)                 # pc-rel load -> label
         self.assertIn("fix [4]", s)                       # documented
 
+    def test_absorbed_subs_rewrites_pool_word(self):
+        # brief 541: a C-absorbed pool word gets substituted with its
+        # base+offset expression instead of the bare (unlinkable) symbol.
+        orig = parse_objdump(ORIG, "func_t")
+        s = emit_asm("func_t", orig, [(4, "add r3, r4, r3", "add r3, r3, r4")],
+                     absorbed_subs={"data_ov002_022cf16c": "data_ov002_022cf000+0x16c"})
+        self.assertIn(".word data_ov002_022cf000+0x16c", s)
+        self.assertNotIn(".word data_ov002_022cf16c\n", s)
+        # unrelated externs/relocs untouched
+        self.assertIn("bl func_ov002_021c1ef0", s)
+
+    def test_absorbed_subs_noop_when_no_match(self):
+        # a substitution map that doesn't mention this function's symbols
+        # must change nothing (safety: never silently rewrite the wrong ref).
+        orig = parse_objdump(ORIG, "func_t")
+        s_plain = emit_asm("func_t", orig, [(4, "add r3, r4, r3", "add r3, r3, r4")])
+        s_with_unrelated_map = emit_asm(
+            "func_t", orig, [(4, "add r3, r4, r3", "add r3, r3, r4")],
+            absorbed_subs={"data_unrelated_sym": "data_other+0x4"})
+        self.assertEqual(s_plain, s_with_unrelated_map)
+
 
 class TestWholeFunction(unittest.TestCase):
     """The GLOBAL_ASM whole-function mode (brief 302)."""
@@ -372,6 +394,12 @@ class TestClassifyDataRefs(unittest.TestCase):
             "    .data start:0x02100000 end:0x02100020\n")
         self.assertEqual([x["verdict"] for x in v], ["C-absorbed"])
         self.assertIn("data_a", v[0]["note"])
+        # brief 541: base/base_addr/offset exposed as explicit fields (not
+        # just embedded in the note string) so a caller can compute a
+        # base+offset substitution without re-parsing the note.
+        self.assertEqual(v[0]["base"], "data_a")
+        self.assertEqual(v[0]["base_addr"], 0x02100000)
+        self.assertEqual(v[0]["offset"], 0x10)
 
     def test_offset_interior_word_refused(self):
         # pool word at data_b+4: emit_asm drops the addend -> refuse.
@@ -399,6 +427,74 @@ class TestClassifyDataRefs(unittest.TestCase):
             "src/x/data_c.c:\n    complete\n"
             "    .rodata start:0x02100020 end:0x02100024\n")
         self.assertEqual([x["verdict"] for x in v], ["A-aligned"])
+
+
+class TestResolveAbsorbedSubstitutions(unittest.TestCase):
+    """brief 541: turn C-absorbed verdicts into base+offset substitutions,
+    IFF that is the only unlinkable class present in this function's refs.
+    Confirmed against the real ov004/ov006 wall autopsy this brief (10
+    distinct C-absorbed instances across 15 residual USA/JPN functions,
+    every one a clean base+small-offset relationship — see
+    docs/research/brief-541-wall-autopsy.md)."""
+
+    def test_pure_c_absorbed_returns_substitution(self):
+        verdicts = [{"sym": "data_b", "verdict": "C-absorbed",
+                    "base": "data_a", "base_addr": 0x02100000, "offset": 0x10}]
+        self.assertEqual(resolve_absorbed_substitutions(verdicts),
+                         {"data_b": "data_a+0x10"})
+
+    def test_mixed_a_aligned_and_c_absorbed_still_substitutes(self):
+        # matches func_ov006_021bc350's real shape: several A-aligned refs
+        # alongside one C-absorbed ref -- only the absorbed one needs a sub.
+        verdicts = [
+            {"sym": "data_x", "verdict": "A-aligned"},
+            {"sym": "data_b", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x10},
+            {"sym": "data_y", "verdict": "B-gap"},
+        ]
+        self.assertEqual(resolve_absorbed_substitutions(verdicts),
+                         {"data_b": "data_a+0x10"})
+
+    def test_no_c_absorbed_returns_empty_dict_not_none(self):
+        # nothing to substitute, but nothing blocking either -- distinct
+        # from the None-means-give-up case.
+        verdicts = [{"sym": "data_x", "verdict": "A-aligned"}]
+        self.assertEqual(resolve_absorbed_substitutions(verdicts), {})
+
+    def test_offset_verdict_blocks_substitution(self):
+        # a genuinely different unlinkable class (interior pool-word addend)
+        # -- this fix does not address it, caller must still refuse.
+        verdicts = [
+            {"sym": "data_b", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x10},
+            {"sym": "data_c", "verdict": "OFFSET"},
+        ]
+        self.assertIsNone(resolve_absorbed_substitutions(verdicts))
+
+    def test_misaddressed_verdict_blocks_substitution(self):
+        verdicts = [
+            {"sym": "data_b", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x10},
+            {"sym": "data_bad", "verdict": "MISADDRESSED"},
+        ]
+        self.assertIsNone(resolve_absorbed_substitutions(verdicts))
+
+    def test_multiple_c_absorbed_all_substituted(self):
+        # matches func_ov006_021ca5e8's real shape: 3 C-absorbed refs into
+        # the SAME base at different offsets.
+        verdicts = [
+            {"sym": "data_b", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x2},
+            {"sym": "data_c", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x6},
+            {"sym": "data_d", "verdict": "C-absorbed",
+             "base": "data_a", "base_addr": 0x02100000, "offset": 0x24a},
+        ]
+        self.assertEqual(resolve_absorbed_substitutions(verdicts), {
+            "data_b": "data_a+0x2",
+            "data_c": "data_a+0x6",
+            "data_d": "data_a+0x24a",
+        })
 
 
 class TestThumbMode(unittest.TestCase):
