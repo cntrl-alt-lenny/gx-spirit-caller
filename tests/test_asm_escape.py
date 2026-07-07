@@ -276,6 +276,20 @@ class TestEmit(unittest.TestCase):
         # unrelated externs/relocs untouched
         self.assertIn("bl func_ov002_021c1ef0", s)
 
+    def test_absorbed_subs_externs_the_base_not_the_absorbed_symbol(self):
+        # brief 543: ORIG's only data ref IS the substituted one (no other
+        # reloc independently names the base) -- the exact shape that let
+        # the base go un-externed and fail to assemble (mwasmarm: undeclared
+        # external) until emit_asm's extern list was routed through
+        # absorbed_subs. A function that ALSO references its base directly
+        # elsewhere (as the first real candidate happened to) would mask
+        # this: the base got externed anyway, for an unrelated reason.
+        orig = parse_objdump(ORIG, "func_t")
+        s = emit_asm("func_t", orig, [(4, "add r3, r4, r3", "add r3, r3, r4")],
+                     absorbed_subs={"data_ov002_022cf16c": "data_ov002_022cf000+0x16c"})
+        self.assertIn("        .extern data_ov002_022cf000", s)
+        self.assertNotIn("data_ov002_022cf16c", s)
+
     def test_absorbed_subs_noop_when_no_match(self):
         # a substitution map that doesn't mention this function's symbols
         # must change nothing (safety: never silently rewrite the wrong ref).

@@ -399,7 +399,19 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
     labels = {a: f".L_{a:x}" for a in branch_targets(orig, thumb)}
-    externs = sorted({w["reloc"] for w in orig if w["reloc"]})
+
+    def _extern_name(sym: str) -> str:
+        # brief 543: a substituted C-absorbed ref (`base+0xN`) no longer names
+        # the absorbed symbol anywhere in the emitted text -- extern the BASE
+        # instead, or mwasmarm sees an undeclared external and refuses to
+        # assemble (caught assembling func_ov004_021d3d04/021d4d2c and
+        # func_ov006_021bbfc0, none of which happen to reference their base
+        # symbol directly elsewhere the way the first proven candidate did).
+        if absorbed_subs and sym in absorbed_subs:
+            return absorbed_subs[sym].split("+")[0]
+        return sym
+
+    externs = sorted({_extern_name(w["reloc"]) for w in orig if w["reloc"]})
 
     if whole:
         head = [f"; {func} — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):",
