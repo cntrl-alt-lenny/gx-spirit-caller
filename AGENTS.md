@@ -688,39 +688,49 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
 - **LANE STATE (2026-07-08, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
-  (5 waves = 1,500 ov002 `.s`; both regions past 50% code).** ~707 USA + 823 JPN ov002
-  tractable remain (~5-6 more waves); then small overlays (ov000 85/region, ov008 71, ov005
+  (6 waves = 1,800 ov002 `.s`; both regions past 50% code).** ~555 USA + 671 JPN ov002
+  tractable remain (~4-5 more waves); then small overlays (ov000 85/region, ov008 71, ov005
   63, … ~601/region total) + main (~34/region). **b547 census: full runway = 3,176 candidates
-  ≈ ~10-12 paired waves to ~99%.** ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder);
+  ≈ ~8-10 more paired waves to ~99%.** ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder);
   decomper wine-free. On PC: BOTH on the drain.** ⚠️ **fresh `git worktree add` → copy
   `tools/mwccarm/` + `objdiff-cli` + `dsd` (else verify-fails).** Recipe: `batch_carve
   --version <r> --overlay ov002 --srcdir src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20
-  --limit 150`. 🔓 **`--allow-absorbed-offset` is WIRED into batch_carve (b545) — but b546's
-  live run showed the routing ATTEMPTS the C-absorbed REFUSEs (vs parking) yet they still
-  VERIFY-FAIL (4/4 ov002 REFUSE→verify-fail, 0 shipped): classify-`recoverable` ≠ ships. Net
-  ships unaffected; the census's "0 walls" is an upper bound (b549 autopsies why).**
-- **Brief 548** — Claude `scaffolder` → **ov002 drain wave 6** (continue; ~707 USA + 823 JPN
+  --limit 150`. ✅ **C-absorbed class now GENUINELY recovers: b546's "0/4 verify-fail" was a
+  comparator bug (`diff_words` matched pool relocs by symbol NAME, false-mismatching every
+  base+offset substitution) — b549 FIXED it + brain PROVED it (carved `func_ov002_022626c4`,
+  the exact b546 "wall", ships via real `usa ninja sha1`). The b547 census's "60/60
+  recoverable, 0 walls" is VINDICATED. Drop the verifyfail seed; the fixed tool ships them.**
+- **Brief 550** — Claude `scaffolder` → **ov002 drain wave 7** (continue; ~555 USA + 671 JPN
   remain). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries after `git worktree
-  add`. One solid wave then PR. Seed a `--verifyfail-list` with the 2 known ov002 verify-fail
-  addrs (`func_ov002_022626c4`, `func_ov002_022b9434`) so the wave doesn't re-route+re-fail
-  them each time (b546). Report shipped + remaining. Own worktree. Branch
-  `claude/usajpn-ov002-drain-548`.
-- **Brief 549** — Claude `decomper` → **WINE-FREE autopsy of the absorbed verify-fail class**
-  (no drain contention; static inspection only, NO `ninja sha1`). b546 proved the b545 wiring
-  ATTEMPTS the C-absorbed REFUSEs but they VERIFY-FAIL (4/4 ov002: `func_ov002_022626c4` +
-  `func_ov002_022b9434` × 2 regions, 0 shipped) — so b547's "60/60 recoverable, 0 walls" is
-  optimistic. Statically diagnose WHY: objdump the orig delink `.o` (`build/<ver>/delinks/*.o`,
-  wine-free), run `asm_escape --whole-function --allow-absorbed-offset` to see the generated
-  `.word base+0xN` substitution, and compare — is the residual a FIXABLE asm_escape gap (like
-  b543's `.extern` bug) or genuinely permuter-tier? Sample a few of `main`'s 26/region
-  C-absorbed REFUSEs too. Deliver `docs/research/brief-549-absorbed-verifyfail-autopsy.md`: a
-  realistic ship-vs-verify-fail split for the 60 REFUSEs + a proposed fix if a pattern emerges
-  (final ship-proof needs a wine attempt — the scaffolder validates any fix on a later wave).
-  Own worktree + copy tool binaries. Branch `claude/absorbed-autopsy-549`.
+  add`. **DROP the `--verifyfail-list` seed** — b549 fixed the comparator bug, so the C-absorbed
+  funcs the seed skipped now SHIP (proven). Expect a few `◆ … REFUSE (C-absorbed … attempting)`
+  lines that now land in SHIPPED (not verify-fail); report how many absorbed-routed actually
+  shipped. Report shipped + remaining. Own worktree. Branch `claude/usajpn-ov002-drain-550`.
+- **Brief 551** — Claude `decomper` → **WINE-FREE post-ov002 drain work order** (no drain
+  contention; `--dry-run` + config reads only, NO `ninja sha1`). ov002 taps in ~4-5 waves;
+  produce the turnkey plan for everything after it so the scaffolder sweeps the rest to ~99%
+  with zero setup guesswork. For each remaining module (the 20 small overlays ov000/ov008/
+  ov005/… then main), give: the exact `batch_carve` invocation (base `--min-addr`, `--srcdir`,
+  `mkdir -p` if the dir doesn't exist), the `--dry-run` candidate count (clean vs C-absorbed-
+  now-recoverable, on the b549-fixed tool), and a recommended wave order/sizing. Update
+  `docs/research/campaign-analytics/usajpn-drain-workorder.md` (or a new
+  `post-ov002-drain-workorder.md`). Own worktree + copy tool binaries. Branch
+  `claude/post-ov002-workorder-551`.
 
 
 ### Closed briefs (reference)
 
+- **Briefs 548/549 (2026-07-08, Mac).** **#1118** (b548, drain w6): 300 ov002 `.s` (150/150),
+  first 150/150 clean sweep (seeded out the 2 known verify-fails); ~555 USA + 671 JPN ov002
+  remain. **#1117** (b549, autopsy → FIX): root-caused b546's "0/4 verify-fail" as a COMPARATOR
+  BUG — `asm_escape.diff_words()` compared pool relocs by symbol NAME, false-mismatching every
+  `--allow-absorbed-offset` `base+offset` substitution (`whole_function` could never see
+  "byte-identical"). Fixed: `parse_objdump` preserves the reloc addend; `diff_words` accepts a
+  substitution only when `base+addend` == the recorded map (wrong base/offset still flags). +6
+  unit tests (65 asm_escape / 2471 full suite green). **Brain-PROVED via real `ninja sha1`:
+  `func_ov002_022626c4` (the exact b546 "wall") now ships byte-identical.** So b547's "60/60
+  recoverable, 0 walls" is VINDICATED and b546's "walls" reading is WITHDRAWN. Both merged on a
+  clean 3-region `ninja sha1` PASS (jpn/usa/eur).
 - **Briefs 546/547 (2026-07-08, Mac).** **#1116** (b546, drain w5): 296 ov002 `.s` (148/148),
   all pure additions/gated green; ~707 USA + 823 JPN ov002 remain. FIRST live run on the
   b545-wired batch_carve — the 4 ov002 C-absorbed REFUSEs (2/region: `func_ov002_022626c4`,
