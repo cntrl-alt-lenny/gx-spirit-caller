@@ -672,5 +672,94 @@ class TestDiffWordsPoolGuard(unittest.TestCase):
                          ["word count differs: mine=2 orig=1"])
 
 
+class TestDiffWordsAbsorbedSubstitution(unittest.TestCase):
+    """brief 549: the C-absorbed `base+0xN` substitution (brief 541/543) is a
+    KNOWN false mismatch in diff_words — `mine`'s reloc names the base symbol
+    (+ a `reloc_addend` suffix), `orig`'s reloc names the absorbed symbol the
+    expression was substituted for; different strings, same resolved address
+    (brief 543 proved this against the real assembler+linker for 15 shipped
+    ov004/ov006 functions, and brief 549's autopsy found batch_carve's b545
+    wiring had been reporting this exact false mismatch as a genuine
+    verify-fail for every real ov002/main attempt since). `absorbed_subs`
+    (the same map `emit_asm` used to build the substituted `.word` line)
+    resolves it -- but ONLY when the base symbol AND the exact offset match
+    what was actually substituted; a wrong base or a wrong offset must still
+    flag, or this would silently accept a real corruption."""
+
+    @staticmethod
+    def _w(b, mnem, reloc=None, reloc_addend=None):
+        return {"addr": 0, "bytes": b, "mnem": mnem, "reloc": reloc,
+               "reloc_addend": reloc_addend}
+
+    def test_correct_substitution_matches(self):
+        mine = [self._w("00000000", ".word data_base+0xc34",
+                        "data_base", "+0xc34")]
+        orig = [self._w("00000000", "....", "data_absorbed")]
+        self.assertEqual(
+            diff_words(mine, orig,
+                      absorbed_subs={"data_absorbed": "data_base+0xc34"}),
+            [])
+
+    def test_wrong_offset_still_flagged(self):
+        # a hypothetical emit_asm/resolve_absorbed_substitutions regression
+        # that computed the wrong offset must NOT be silently accepted.
+        mine = [self._w("00000000", ".word data_base+0xc30",
+                        "data_base", "+0xc30")]
+        orig = [self._w("00000000", "....", "data_absorbed")]
+        self.assertEqual(
+            diff_words(mine, orig,
+                      absorbed_subs={"data_absorbed": "data_base+0xc34"}),
+            ["[0] reloc data_base vs data_absorbed"])
+
+    def test_wrong_base_still_flagged(self):
+        mine = [self._w("00000000", ".word data_wrong_base+0xc34",
+                        "data_wrong_base", "+0xc34")]
+        orig = [self._w("00000000", "....", "data_absorbed")]
+        self.assertEqual(
+            diff_words(mine, orig,
+                      absorbed_subs={"data_absorbed": "data_base+0xc34"}),
+            ["[0] reloc data_wrong_base vs data_absorbed"])
+
+    def test_orig_symbol_not_in_absorbed_subs_still_flagged(self):
+        # absorbed_subs doesn't even mention this symbol -- an unrelated
+        # mismatch must be flagged exactly as before this fix.
+        mine = [self._w("00000000", ".word data_base+0xc34",
+                        "data_base", "+0xc34")]
+        orig = [self._w("00000000", "....", "data_unrelated")]
+        self.assertEqual(
+            diff_words(mine, orig,
+                      absorbed_subs={"data_absorbed": "data_base+0xc34"}),
+            ["[0] reloc data_base vs data_unrelated"])
+
+    def test_no_absorbed_subs_preserves_pre_549_behaviour(self):
+        # absorbed_subs=None (the default, every pre-549 call site) is
+        # byte-for-byte the old behaviour -- no equivalence is ever granted.
+        mine = [self._w("00000000", ".word data_base+0xc34",
+                        "data_base", "+0xc34")]
+        orig = [self._w("00000000", "....", "data_absorbed")]
+        self.assertEqual(diff_words(mine, orig),
+                         ["[0] reloc data_base vs data_absorbed"])
+
+    def test_multiple_substitutions_in_one_function_all_resolve(self):
+        # func_0207de38 shape (brief 549 autopsy): 3 distinct C-absorbed refs
+        # to the same base at different offsets, plus one DIRECT (unsubstituted)
+        # reference to the base itself -- all four words must resolve cleanly.
+        subs = {"data_a": "data_base+0x4c", "data_b": "data_base+0x34",
+               "data_c": "data_base+0x8"}
+        mine = [
+            self._w("00000000", ".word data_base+0x4c", "data_base", "+0x4c"),
+            self._w("00000000", ".word data_base+0x34", "data_base", "+0x34"),
+            self._w("00000000", ".word data_base", "data_base"),  # direct ref
+            self._w("00000000", ".word data_base+0x8", "data_base", "+0x8"),
+        ]
+        orig = [
+            self._w("00000000", "....", "data_a"),
+            self._w("00000000", "....", "data_b"),
+            self._w("00000000", "....", "data_base"),
+            self._w("00000000", "....", "data_c"),
+        ]
+        self.assertEqual(diff_words(mine, orig, absorbed_subs=subs), [])
+
+
 if __name__ == "__main__":
     unittest.main()
