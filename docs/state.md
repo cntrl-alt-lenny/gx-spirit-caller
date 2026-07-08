@@ -8,17 +8,19 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-07 (Mac, Claude-only: brain=Opus, scaffolder+decomper=Claude
-Code), **post briefs 544/545 round merge (PRs #1114/#1113), clean 3-region `ninja sha1`.**
-CHAPTER: the USA/JPN mechanical `.s` drain (the coverage frontier), reopened by the b537
-census. ov002 is the whale: **4 waves = 1,204 ov002 `.s` shipped** (b538/540/542 = 296 each,
-b544 = 316); both regions now past 50% code (USA 54.3% / JPN 52.7% as of w3). ~851 USA +
-967 JPN ov002 tractable remain (~6 waves), then small overlays + main
-(`docs/research/campaign-analytics/usajpn-drain-workorder.md`). b545 WIRED `asm_escape
---allow-absorbed-offset` into `batch_carve` (C-absorbed `base+offset` REFUSEs now
-auto-recovered instead of parked; first live proof on b546). Mac = ONE wine drain lane
-(scaffolder) + wine-free decomper. Next queued: b546 drain w5, b547 wine-free full-runway
-census.
+**Last updated:** 2026-07-08 (Mac, Claude-only: brain=Opus, scaffolder+decomper=Claude
+Code), **post briefs 546/547 round merge (PRs #1116/#1115), clean 3-region `ninja sha1`.**
+CHAPTER: the USA/JPN mechanical `.s` drain. ov002: **5 waves = 1,500 ov002 `.s` shipped**;
+~707 USA + 823 JPN ov002 remain (~5-6 waves), then small overlays (ov000 next, 85/region) +
+main (~34/region). **b547 census: full runway = 3,176 candidates ≈ ~10-12 paired waves to
+~99%** (`docs/research/brief-547-runway-census.md`). ⚠️ b546 finding: the b545
+`--allow-absorbed-offset` wiring ATTEMPTS the C-absorbed REFUSEs instead of parking, but they
+still VERIFY-FAIL (4/4 ov002, 0 shipped) — classify-`recoverable` ≠ ships, so the census's "0
+walls" is an upper bound (b549 autopsies why). Mac = ONE wine drain lane (scaffolder) +
+wine-free decomper. Next queued: b548 drain w6, b549 wine-free absorbed-verify-fail autopsy.
+
+**Previously (2026-07-07):** briefs 544/545 (PRs #1114/#1113) — drain w4 (316) + wired
+`--allow-absorbed-offset` into batch_carve.
 
 **Previously (2026-07-03, Fable 5):** post briefs 515–518 round merge (PRs #1080/#1083/#1084/#1085). Briefs
 478–518 ran from the PC brain: the `.s` mechanical drain COMPLETED and the campaign

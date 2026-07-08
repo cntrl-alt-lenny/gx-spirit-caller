@@ -687,36 +687,50 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-07, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
-  (4 waves = 1,204 ov002 `.s`; both regions past 50% — USA 54.3% / JPN 52.7% code as of w3,
-  w4's +316 not yet re-measured).** ~851 USA + 967 JPN ov002 tractable remain (~6 more waves),
-  then small overlays + main (`usajpn-drain-workorder.md`). ⚠️ **MAC = ONE smooth wine lane =
-  DRAIN (scaffolder); decomper wine-free. On PC: BOTH on the drain.** ⚠️ **fresh `git worktree
-  add` → copy `tools/mwccarm/` + `objdiff-cli` + `dsd` (else verify-fails).** Recipe:
-  `batch_carve --version <r> --overlay ov002 --srcdir src/<r>/overlay002 --min-addr
-  0x021aa3c0 --batch 20 --limit 150`. 🔓 **`asm_escape --allow-absorbed-offset` (C-absorbed
-  `base+offset` unlock) is now WIRED INTO batch_carve as a drain default (b545, MERGED) — the
-  drain auto-routes its kind:data C-absorbed REFUSEs through it instead of parking, so wave 5+
-  reclaim the ~4 REFUSE/wave that earlier waves parked.**
-- **Brief 546** — Claude `scaffolder` → **ov002 drain wave 5** (continue; ~851 USA + 967 JPN
+- **LANE STATE (2026-07-08, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
+  (5 waves = 1,500 ov002 `.s`; both regions past 50% code).** ~707 USA + 823 JPN ov002
+  tractable remain (~5-6 more waves); then small overlays (ov000 85/region, ov008 71, ov005
+  63, … ~601/region total) + main (~34/region). **b547 census: full runway = 3,176 candidates
+  ≈ ~10-12 paired waves to ~99%.** ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder);
+  decomper wine-free. On PC: BOTH on the drain.** ⚠️ **fresh `git worktree add` → copy
+  `tools/mwccarm/` + `objdiff-cli` + `dsd` (else verify-fails).** Recipe: `batch_carve
+  --version <r> --overlay ov002 --srcdir src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20
+  --limit 150`. 🔓 **`--allow-absorbed-offset` is WIRED into batch_carve (b545) — but b546's
+  live run showed the routing ATTEMPTS the C-absorbed REFUSEs (vs parking) yet they still
+  VERIFY-FAIL (4/4 ov002 REFUSE→verify-fail, 0 shipped): classify-`recoverable` ≠ ships. Net
+  ships unaffected; the census's "0 walls" is an upper bound (b549 autopsies why).**
+- **Brief 548** — Claude `scaffolder` → **ov002 drain wave 6** (continue; ~707 USA + 823 JPN
   remain). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries after `git worktree
-  add`. One solid wave then PR — now on the b545-wired `batch_carve`, so watch for the
-  `◆ … REFUSE (C-absorbed … attempting)` line and report how many absorbed-routed funcs
-  actually shipped (first live proof of the wiring). Report shipped + remaining. Own worktree.
-  Branch `claude/usajpn-ov002-drain-546`.
-- **Brief 547** — Claude `decomper` → **WINE-FREE full-runway census** (no drain contention;
-  `--dry-run` classify-only). Run `batch_carve --dry-run` across ALL remaining uncarved
-  USA/JPN `.s` (ov002 + the other overlays + main — see `usajpn-drain-workorder.md` for the
-  module list), on the b545-wired tool, and produce a per-module table: `clean` /
-  `refuse-absorbed` (now auto-recovered) / genuine-`refuse` (wall) counts per region. Goal: a
-  definitive map of (a) exactly how many waves ov002 has left, (b) the next-biggest drain
-  module after ov002, (c) how many global walls the absorbed wiring now reclaims. Write
-  `docs/research/brief-547-runway-census.md`. Own worktree + copy tool binaries (dry-run still
-  imports asm_escape). Branch `claude/runway-census-547`.
+  add`. One solid wave then PR. Seed a `--verifyfail-list` with the 2 known ov002 verify-fail
+  addrs (`func_ov002_022626c4`, `func_ov002_022b9434`) so the wave doesn't re-route+re-fail
+  them each time (b546). Report shipped + remaining. Own worktree. Branch
+  `claude/usajpn-ov002-drain-548`.
+- **Brief 549** — Claude `decomper` → **WINE-FREE autopsy of the absorbed verify-fail class**
+  (no drain contention; static inspection only, NO `ninja sha1`). b546 proved the b545 wiring
+  ATTEMPTS the C-absorbed REFUSEs but they VERIFY-FAIL (4/4 ov002: `func_ov002_022626c4` +
+  `func_ov002_022b9434` × 2 regions, 0 shipped) — so b547's "60/60 recoverable, 0 walls" is
+  optimistic. Statically diagnose WHY: objdump the orig delink `.o` (`build/<ver>/delinks/*.o`,
+  wine-free), run `asm_escape --whole-function --allow-absorbed-offset` to see the generated
+  `.word base+0xN` substitution, and compare — is the residual a FIXABLE asm_escape gap (like
+  b543's `.extern` bug) or genuinely permuter-tier? Sample a few of `main`'s 26/region
+  C-absorbed REFUSEs too. Deliver `docs/research/brief-549-absorbed-verifyfail-autopsy.md`: a
+  realistic ship-vs-verify-fail split for the 60 REFUSEs + a proposed fix if a pattern emerges
+  (final ship-proof needs a wine attempt — the scaffolder validates any fix on a later wave).
+  Own worktree + copy tool binaries. Branch `claude/absorbed-autopsy-549`.
 
 
 ### Closed briefs (reference)
 
+- **Briefs 546/547 (2026-07-08, Mac).** **#1116** (b546, drain w5): 296 ov002 `.s` (148/148),
+  all pure additions/gated green; ~707 USA + 823 JPN ov002 remain. FIRST live run on the
+  b545-wired batch_carve — the 4 ov002 C-absorbed REFUSEs (2/region: `func_ov002_022626c4`,
+  `func_ov002_022b9434`) were routed+attempted (not parked) but all 4 VERIFY-FAILED
+  (REFUSE→verify-fail, 0 shipped): the wiring works, but classify-`recoverable` ≠ ships.
+  **#1115** (b547, census): wine-free `--dry-run` over all 22 modules × 2 regions = 3,176
+  candidates; ov002 855/971 (pre-w5), next module ov000 (85/region), then ov008 (71)/ov005
+  (63); ~10-12 paired waves total to ~99%. Its "60/60 recoverable, 0 walls" is classify-time
+  optimism (b546 refutes it for the ov002 4) — b549 autopsies. Both merged on a clean 3-region
+  `ninja sha1` PASS (jpn/usa/eur).
 - **Briefs 544/545 (2026-07-07, Mac).** **#1114** (b544, drain w4): 316 ov002 `.s` (148 USA +
   168 JPN), all pure additions/first-attempt, no re-carves; both regions now past 50%
   (~851 USA + 967 JPN ov002 remain). **#1113** (b545, wire absorbed): routed the pure
