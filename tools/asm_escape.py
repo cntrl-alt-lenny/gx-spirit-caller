@@ -141,7 +141,10 @@ def parse_objdump(text: str, func: str, size: int | None = None) -> list[dict]:
             continue
         rl = re.search(r"R_ARM_\S+\s+(\S+)", line)
         if rl and out:
-            out[-1]["reloc"] = re.sub(r"[+-]0x[0-9a-f]+$", "", rl.group(1))
+            full = rl.group(1)
+            out[-1]["reloc"] = re.sub(r"[+-]0x[0-9a-f]+$", "", full)
+            addend_m = re.search(r"([+-]0x[0-9a-f]+)$", full)
+            out[-1]["reloc_addend"] = addend_m.group(1) if addend_m else None
     return out
 
 
@@ -501,7 +504,8 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
 
 
 def diff_words(mine: list[dict], orig: list[dict],
-               self_func: str | None = None) -> list[str]:
+               self_func: str | None = None,
+               absorbed_subs: dict[str, str] | None = None) -> list[str]:
     """PURE byte-compare of two parsed word streams (mine vs delinked orig),
     reloc words modulo. Returns human-readable diffs; empty list = match.
 
@@ -517,6 +521,18 @@ def diff_words(mine: list[dict], orig: list[dict],
         function at offset zero in its standalone `.text` section, so these two
         spellings resolve to the same address. `self_func` enables that narrow
         equivalence without weakening checks for any other symbol.
+
+      * a C-absorbed `base+0xN` substitution (brief 541/543) — `mine`'s reloc
+        NAMES THE BASE symbol (plus `reloc_addend`, e.g. `+0xc34`) while
+        `orig`'s reloc names the absorbed symbol the base+offset expression
+        was substituted FOR. These are different symbol strings but, when
+        `absorbed_subs` confirms `orig`'s symbol maps to exactly this
+        base+addend, they resolve to the IDENTICAL final address (proven
+        against the real assembler+linker, brief 543) — a false mismatch,
+        not a real one. `absorbed_subs` (the same `{absorbed_sym: "base+0xN"}`
+        map `emit_asm` used to build the substituted `.word` line, brief 545
+        autopsy) enables this narrow equivalence, keyed and value-exact per
+        substitution — a wrong base OR a wrong offset still correctly diffs.
 
       * raw constant (an inline `.word N` island — the intermediate-pool case,
         brief 418) — NEITHER side has a reloc, so the BYTES are the invariant
@@ -540,6 +556,14 @@ def diff_words(mine: list[dict], orig: list[dict],
                     and {x["reloc"], y["reloc"]} == {".text", self_func}
                 )
                 if self_reloc:
+                    continue
+                mine_full = x["reloc"] + (x.get("reloc_addend") or "")
+                absorbed_ok = (
+                    absorbed_subs is not None
+                    and y["reloc"] in absorbed_subs
+                    and mine_full == absorbed_subs[y["reloc"]]
+                )
+                if absorbed_ok:
                     continue
                 diffs.append(f"[{i}] reloc {x['reloc']} vs {y['reloc']}")
             continue
@@ -826,15 +850,18 @@ def assemble(s_file: str, out: str) -> bool:
 
 
 def bytes_match(a_obj: str, orig_obj: str, func: str,
-                size: int | None = None) -> tuple[bool, list[str]]:
+                size: int | None = None,
+                absorbed_subs: dict[str, str] | None = None) -> tuple[bool, list[str]]:
     """Byte-compare `func` in two objects, reloc words (bl/pool) modulo.
     The standalone emitted object is intentionally parsed without a size bound:
     any accidental trailing payload must trip `diff_words`' count check. Only
     the original gap object needs the configured bound to stop at the true
-    function end (brief 477)."""
+    function end (brief 477). `absorbed_subs`, when given, resolves the brief
+    541/543 C-absorbed `base+0xN` substitution's known false mismatch (see
+    `diff_words`) instead of leaving it perpetually unverifiable (brief 549)."""
     diffs = diff_words(parse_objdump(disasm(a_obj), func),
                        parse_objdump(disasm(orig_obj), func, size),
-                       self_func=func)
+                       self_func=func, absorbed_subs=absorbed_subs)
     return (not diffs), diffs
 
 
@@ -949,7 +976,7 @@ def generate_whole(func: str, version: str, out: str | None,
     if not assemble(out_path, asm_o):
         print(f"error: emitted {out_path} did not assemble", file=sys.stderr)
         return 2
-    ok, diffs = bytes_match(asm_o, orig_obj, func, size)
+    ok, diffs = bytes_match(asm_o, orig_obj, func, size, absorbed_subs=absorbed_subs)
     if ok:
         print(f"{func}: ✅ whole-function .s byte-identical vs delinked .o "
               f"({len(orig)} words) -> {out_path}")
