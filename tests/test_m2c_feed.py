@@ -1,11 +1,16 @@
 """Tests for tools/m2c_feed.py — the m2c cold-RE feeder (brief 274).
 
-Two halves:
+Three parts:
   - `render()` is the pure objdump→GAS parser; unit-tested on fixtures
     (no objdump binary needed), incl. the failure modes the brief
     requires (empty input fails LOUDLY, not silently).
   - `resolve_symbol()` runs against the committed `config/eur` so the
     name / ambiguous-address / unknown paths are covered end-to-end.
+  - `find_core_header()` / `build_context()` / `run_m2c()` (brief 555,
+    `--context`) — header lookup is pure and always tested; the m2ctx.py
+    (gcc) and vendored-m2c integration tests are real (not mocked) but
+    guarded to skip where their external dependency is unavailable, so
+    the suite stays green on a host without `tools/m2c_bootstrap.py` run.
 """
 
 from __future__ import annotations
@@ -13,15 +18,21 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from m2c_feed import (  # noqa: E402
     FeedError,
+    FeedResult,
+    M2CMissing,
+    build_context,
+    find_core_header,
     main,
     render,
     resolve_symbol,
+    run_m2c,
 )
 
 # A realistic `objdump -d -r` slice (tabs matter — match objdump's layout).
@@ -137,6 +148,95 @@ class TestResolveSymbol(unittest.TestCase):
             resolve_symbol("eur", "notahexnoraname")
 
 
+class TestFindCoreHeader(unittest.TestCase):
+    """Against the committed src/ tree (brief 555)."""
+
+    def test_eur_is_unprefixed(self):
+        h = find_core_header("eur", "ov002")
+        self.assertIsNotNone(h)
+        self.assertTrue(h.is_file())
+        self.assertEqual(h.name, "ov002_core.h")
+        self.assertNotIn("/usa/", str(h))
+        self.assertNotIn("/jpn/", str(h))
+
+    def test_usa_and_jpn_are_region_prefixed(self):
+        for region in ("usa", "jpn"):
+            h = find_core_header(region, "ov002")
+            self.assertIsNotNone(h)
+            self.assertTrue(h.is_file())
+            self.assertIn(f"/{region}/", str(h))
+
+    def test_main_has_no_core_header(self):
+        # arm9 has no consolidated header — too heterogeneous (brief 555
+        # scope note); callers must proceed context-less, not crash.
+        self.assertIsNone(find_core_header("eur", "main"))
+
+    def test_nonexistent_overlay_returns_none(self):
+        self.assertIsNone(find_core_header("eur", "ov999"))
+
+
+class TestBuildContext(unittest.TestCase):
+    """Real m2ctx.py + gcc integration against the committed ov002_core.h."""
+
+    def test_main_module_short_circuits_without_gcc(self):
+        # No header for `main` -> None immediately, no m2ctx/gcc subprocess.
+        self.assertIsNone(build_context("eur", "main"))
+
+    def test_ov002_context_carries_struct_and_extern_decls(self):
+        ctx_path = build_context("eur", "ov002")
+        self.assertIsNotNone(ctx_path)
+        self.assertTrue(ctx_path.is_file())
+        text = ctx_path.read_text()
+        # A representative type + a [shipped]-tagged extern from
+        # ov002_core.h — proves the header's OWN content made it through
+        # m2ctx's include-only-extraction trick, not just its includes.
+        self.assertIn("struct Ov002Self", text)
+        self.assertIn("data_ov002_022cd744", text)
+        self.assertIn("func_ov002_0229ade0", text)
+
+
+class TestRunM2C(unittest.TestCase):
+    def test_missing_vendor_raises_m2cmissing(self):
+        with mock.patch("m2c_feed.M2C_VENDOR", Path("/no/such/m2c.py")):
+            with self.assertRaises(M2CMissing):
+                run_m2c("func_x", ".text\n", None)
+
+    @unittest.skipUnless(
+        (Path(__file__).resolve().parent.parent / "tools/_vendor/m2c/m2c.py").is_file(),
+        "m2c not vendored — run tools/m2c_bootstrap.py first",
+    )
+    def test_context_yields_named_field_not_raw_cast(self):
+        # The brief-555 demo function: func_ov002_021ae400 reads
+        # data_ov002_022cd744[a] and calls func_ov002_0229ade0, both
+        # declared in ov002_core.h.
+        s_text = render([
+            "00000000 <func_ov002_021ae400>:",
+            "   0:\te92d4008 \tpush\t{r3, lr}",
+            "   4:\te59f3018 \tldr\tr3, [pc, #24]\t@ 20 <.L_data>",
+            "   8:\te1a02001 \tmov\tr2, r1",
+            "   c:\te7930100 \tldr\tr0, [r3, r0, lsl #2]",
+            "  10:\te3500000 \tcmp\tr0, #0",
+            "  14:\t18bd8008 \tpopne\t{r3, pc}",
+            "  18:\te3a01000 \tmov\tr1, #0",
+            "  1c:\te1a03001 \tmov\tr3, r1",
+            "  20:\te3a00031 \tmov\tr0, #49",
+            "  24:\teb000000 \tbl\t0 <func_ov002_0229ade0>",
+            "\t\t\t24: R_ARM_PC24\tfunc_ov002_0229ade0-0x8",
+            "  28:\te8bd8008 \tpop\t{r3, pc}",
+            "0000002c <.L_data>:",
+            "  2c:\t00000000                                ....",
+            "\t\t\t2c: R_ARM_ABS32\tdata_ov002_022cd744",
+        ], "func_ov002_021ae400", thumb=False)
+
+        without = run_m2c("func_ov002_021ae400", s_text, None)
+        self.assertIn("?", without)  # unknown types, no context
+
+        ctx_path = build_context("eur", "ov002")
+        with_ctx = run_m2c("func_ov002_021ae400", s_text, ctx_path)
+        self.assertIn("data_ov002_022cd744[a]", with_ctx)  # named field, not *(&sym + …)
+        self.assertNotIn("?", with_ctx)
+
+
 class TestCliExitCodes(unittest.TestCase):
     def test_unknown_func_exit_1(self):
         rc = main(["--version", "eur", "func_ov002_deadbeef"])
@@ -150,6 +250,25 @@ class TestCliExitCodes(unittest.TestCase):
     def test_bad_target_exit_1(self):
         rc = main(["--version", "eur", "notahexnoraname"])
         self.assertEqual(rc, 1)
+
+    def test_m2c_missing_vendor_exit_2(self):
+        # feed() itself needs a real build/ delink tree (baserom-gated, not
+        # committed) to resolve a target — mock it so this exercises just
+        # main()'s --m2c wiring: M2CMissing -> exit 2, independent of build/.
+        canned = FeedResult(".text\n\tbx lr\n", "func_ov002_deadbeef", "ov002")
+        with mock.patch("m2c_feed.feed", return_value=canned), \
+                mock.patch("m2c_feed.M2C_VENDOR", Path("/no/such/m2c.py")):
+            rc = main(["--version", "eur", "--m2c", "func_ov002_deadbeef"])
+        self.assertEqual(rc, 2)
+
+    def test_context_warns_not_fails_when_module_has_no_header(self):
+        # main has no *_core.h -> --context should warn and still succeed,
+        # not crash the whole invocation.
+        canned = FeedResult(".text\n\tbx lr\n", "func_02012345", "main")
+        with mock.patch("m2c_feed.feed", return_value=canned), \
+                mock.patch("m2c_feed.run_m2c", return_value="void func_02012345(void) {}\n"):
+            rc = main(["--version", "eur", "--m2c", "--context", "func_02012345"])
+        self.assertEqual(rc, 0)
 
 
 if __name__ == "__main__":
