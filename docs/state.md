@@ -20,6 +20,15 @@ remain (~3 waves), then the b551 turnkey **10-wave POST-ov002 sweep**
 b553 wine-free post-ov002 runbook + post-w7 census refresh. ⚠️ AGENTS.md closed-brief history
 now lives in `docs/briefs/CLOSED-LOG.md` (Windows-brain trim). No open PRs pending review.
 
+**Also this session (brain, autonomous — from the improvement swarm,
+`docs/research/improvement-swarm-2026-07-09.md`):** new **`tools/gate3.py`** = the one-command
+clean-tree 3-region `ninja sha1` gate (use it every merge; `--scope tests` is wine-free,
+`--clean` for delete/move changes) + new **`tools/check_delink_dupes.py`** (wired as a gate3
+preflight: catches the "re-carve doubles a delink → `dsd lcf` overlaps at merge" footgun in
+ms). Fixed the stale obsolete-gate text in `.claude/agents/brain.md` + AGENTS.md item 7 (both
+described the dead `ninja rom`/24-of-27 gate). Deferred (low-value): the `docs/state.md` split,
+`m2c --context` wiring, and 3 standing `func_02086800_dummy` invariant errors (harmless to sha1).
+
 **Previously (2026-07-08):** briefs 548/549 (PRs #1118/#1117) — drain w6 (300) + the
 `asm_escape.diff_words` comparator fix that vindicated the census's "0 walls" (brain-proved via
 real `usa ninja sha1`).

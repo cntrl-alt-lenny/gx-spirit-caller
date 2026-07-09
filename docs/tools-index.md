@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**92 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**93 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (1)
+- [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (24)
@@ -288,6 +288,12 @@ Brief 066 deliverable: a reproducible way to vendor the three target upstream de
 ## Hygiene / invariants
 
 _Pre-flight sanity checks. Run locally before pushing and in CI on every PR._
+
+### `tools/check_delink_dupes.py`
+
+**catch the duplicate-delink footgun before it burns a gate.**
+
+Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an address some *other* file on `main` already delinks. After the merge the region's `delinks.txt` lists that `.text start:ADDR` under two different source fil…
 
 ### `tools/check_match_invariants.py`
 

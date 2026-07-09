@@ -146,6 +146,16 @@ def main() -> int:
               f"(expected all|eur|usa|jpn|tests)", file=sys.stderr)
         return 2
 
+    # Preflight (only when we're about to build): a duplicate delink makes
+    # `dsd lcf` abort "overlaps with previous file" mid-build — catch it in
+    # milliseconds and skip the wasted wine lane.
+    if regions and (ROOT / "tools" / "check_delink_dupes.py").exists():
+        print(f"\n{'=' * 20} preflight: delink dupes {'=' * 20}", flush=True)
+        if run([PY, "tools/check_delink_dupes.py"]) != 0:
+            print("\n==================== GATE FAIL ====================", flush=True)
+            print("  duplicate delink (see above) - fix before gating", flush=True)
+            return 1
+
     failed = [ver for ver in regions if not gate_region(ver, args.clean)]
 
     tests_ok = True
