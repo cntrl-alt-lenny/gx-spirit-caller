@@ -692,32 +692,32 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
 - **LANE STATE (2026-07-09, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
-  (7 waves = 2,100 ov002 `.s`; USA 60.6% / JPN 58.7% code as of w6).** ~405 USA + 521 JPN ov002
-  tractable remain (~3 more waves), then the POST-ov002 sweep — **b551 turnkey 10-wave runbook
-  is READY** (`docs/research/campaign-analytics/post-ov002-drain-workorder.md`: 21 modules,
-  1,350 candidates / 675 per region; the 20 small overlays are 100% clean; 52 REFUSE all in
-  `main`, all b549-recoverable; 0 walls). **Full remaining runway ≈ ~13 paired waves to ~99%.**
-  ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder); decomper wine-free. On PC: BOTH on the
-  drain.** ⚠️ **fresh `git worktree add` → copy `tools/mwccarm/` + `objdiff-cli` + `dsd` (else
-  verify-fails).** Recipe: `batch_carve --version <r> --overlay ov002 --srcdir
+  (8 waves = 2,400 ov002 `.s`).** ~257 USA + 373 JPN ov002 tractable remain (USA ~2 waves,
+  JPN ~2-3), then the POST-ov002 sweep — **b551/b553 turnkey runbook is READY**
+  (`docs/research/campaign-analytics/post-ov002-runbook.md` = copy-paste command blocks for the
+  10-wave plan; 21 modules, 675/region, 0 walls). **Full remaining runway ≈ ~12 paired waves to
+  ~99%.** ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder); decomper wine-free. On PC: BOTH
+  on the drain.** ⚠️ **fresh `git worktree add` → copy `tools/mwccarm/` + `objdiff-cli` + `dsd`
+  (else verify-fails).** Recipe: `batch_carve --version <r> --overlay ov002 --srcdir
   src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20 --limit 150`. ✅ **C-absorbed class
-  GENUINELY recovers (b549 `diff_words` fix) — CONFIRMED LIVE in w7 (b550): the previously-
-  "walled" C-absorbed funcs shipped. Drop the verifyfail seed.**
-- **Brief 552** — Claude `scaffolder` → **ov002 drain wave 8** (continue; ~405 USA + 521 JPN
-  remain, ~3 ov002 waves left). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries
-  after `git worktree add`. NO verifyfail seed (b549 fix ships the C-absorbed funcs — confirmed
-  live in w7). One solid wave then PR; report shipped + remaining. When ov002 taps out, the
-  next waves follow `post-ov002-drain-workorder.md` (ov000 first). Own worktree. Branch
-  `claude/usajpn-ov002-drain-552`.
-- **Brief 553** — Claude `decomper` → **WINE-FREE post-ov002 runbook + post-w7 census refresh**
-  (no drain contention; `--dry-run` + config reads only, NO `ninja sha1`). Two deliverables:
-  (1) re-run the `--dry-run` census on the b549-fixed tool for ov002 + all 21 post-ov002 modules
-  to confirm `post-ov002-drain-workorder.md`'s counts haven't drifted after 7 waves (flag any
-  delta); (2) turn the work order's 10-wave plan into a PUSH-BUTTON runbook — for each wave, the
-  exact copy-paste `batch_carve` command block (usa-then-jpn per module, `mkdir -p src/<ver>/
-  overlayNN` for untouched dirs), so the scaffolder's remaining ~13 waves are zero-friction.
-  Deliver `docs/research/campaign-analytics/post-ov002-runbook.md`. Own worktree + copy tool
-  binaries. Branch `claude/post-ov002-runbook-553`.
+  GENUINELY recovers (b549 fix) — reconfirmed live every wave since (w8 shipped
+  `func_ov002_022b856c`). Drop the verifyfail seed.** 🔧 **BRAIN GATE = `python3.13
+  tools/gate3.py`** (one command: delink-dupe preflight + clean-tree 3-region `ninja sha1` +
+  pytest; `--scope tests` is wine-free for docs/tools-only PRs).
+- **Brief 554** — Claude `scaffolder` → **ov002 drain wave 9** (continue; ~257 USA + 373 JPN
+  remain — USA ~2 waves, JPN ~2-3). Same recipe (`--min-addr 0x021aa3c0`), NO verifyfail seed.
+  ⚠️ copy tool binaries after `git worktree add`. One solid wave then PR; report shipped +
+  remaining. **When a region drops below ~150 left, that region pivots to the post-ov002 sweep
+  — follow `docs/research/campaign-analytics/post-ov002-runbook.md` (ov000 first, copy-paste
+  blocks).** Own worktree. Branch `claude/usajpn-ov002-drain-554`.
+- **Brief 555** — Claude `decomper` → **WINE-FREE: wire `m2c --context` into `m2c_feed.py`**
+  (quality-lane prep for the eventual `.s`→C chapter; the one concrete quick-win from the
+  improvement swarm, `docs/research/improvement-swarm-2026-07-09.md`). Today m2c drafts emit raw
+  `*(int*)(base+0xNN)`; feed it `tools/m2ctx.py` + the per-overlay `*_core.h` so drafts emit
+  named struct fields instead. WINE-FREE (m2c + context assembly are pure Python; NO `ninja
+  sha1`, no drain contention). **Measure the draft-quality delta on ONE known-matched EUR
+  function first** (show before/after). `tools/` is scaffolder territory — propose via PR, brain
+  merges. Own worktree + copy tool binaries. Branch `claude/m2c-context-555`.
 
 
 ### Closed briefs (reference)

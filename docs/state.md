@@ -29,12 +29,12 @@ ms). Fixed the stale obsolete-gate text in `.claude/agents/brain.md` + AGENTS.md
 described the dead `ninja rom`/24-of-27 gate). Deferred (low-value): the `docs/state.md` split,
 `m2c --context` wiring, and 3 standing `func_02086800_dummy` invariant errors (harmless to sha1).
 
-**Round in flight:** **b553 MERGED** (PR #1123, docs-only, gate3 `--scope tests` PASS) — post-ov002
-runbook ready + census refresh: ov002 now **USA 407 / JPN 523** (0 drift on the 21 post-ov002
-modules; b549 fix re-confirmed live — absorbed-routed 4→2, a stuck C-absorbed func shipped by a
-real wave). **b552 (PR #1124, drain w8) is still a DRAFT — scaffolder is mid-wave** (USA 150
-carved; actively carving JPN, unpushed). Do NOT touch claude-552; review + gate + merge it when
-it flips ready.
+**Round 552/553 DONE:** both merged. **b553** (PR #1123, docs-only) = post-ov002 runbook +
+census. **b552** (PR #1124, drain w8) = 300 ov002 `.s` (150/150), merged on the **first real
+`tools/gate3.py` 3-region run — GATE PASS** (delink preflight OK, eur/usa/jpn all byte-identical,
+pytest green). ov002: **8 waves = 2,400 `.s`; ~257 USA + 373 JPN remain** (USA ~2 waves, JPN
+~2-3), then the post-ov002 sweep (runbook ready). Next queued: **b554** scaffolder drain w9,
+**b555** decomper wine-free `m2c --context` wiring (quality-lane quick-win from the swarm).
 
 **Previously (2026-07-08):** briefs 548/549 (PRs #1118/#1117) — drain w6 (300) + the
 `asm_escape.diff_words` comparator fix that vindicated the census's "0 walls" (brain-proved via
