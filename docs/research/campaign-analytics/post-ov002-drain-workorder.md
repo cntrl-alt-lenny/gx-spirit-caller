@@ -28,6 +28,43 @@ every wave on `ov002` alone, exactly per the established wave order.
 **Recommended: ~10 waves to fully exhaust this list** (see § Wave
 plan) — comfortably inside the brief's own ~8-10 estimate.
 
+## Census refresh (brief 553, 2026-07-08)
+
+Re-ran the identical wine-free `--dry-run` census (no `--limit`
+truncation, both regions) after 2 more `ov002` waves landed since this
+doc's original brief-551 snapshot. Result: **zero drift on any of the
+21 post-`ov002` modules** — every single row in the table below is
+byte-for-byte identical to the original measurement (confirmed by
+re-running, not assumed), meaning the scaffolder has stayed on `ov002`
+exclusively in the interim, exactly as the wave order intends.
+
+`ov002` itself has shrunk substantially:
+
+| | brief 549 | brief 553 | Δ |
+|---|---:|---:|---:|
+| USA candidates | 855 | **407** | −448 |
+| USA `absorbed-routed` | 4 | **2** | −2 |
+| JPN candidates | 971 | **523** | −448 |
+| JPN `absorbed-routed` | 4 | **2** | −2 |
+
+**The `absorbed-routed` count dropping from 4 to 2 in both regions is
+live, in-production confirmation of the brief-549 `diff_words()` fix**
+— one of the two previously-stuck `C-absorbed` functions
+(`func_ov002_022626c4` / `func_ov002_022b9434`, same addresses both
+regions) has already been carved and shipped by a real wave since that
+fix landed. This is stronger evidence than brief 549's own sampled
+re-verification (which confirmed the mechanism works in isolation, not
+that a live wave would actually reach and ship one) — the drain itself
+is now recovering candidates that were dead ends before brief 549.
+
+At `--limit 150`, `ov002`'s remaining runway is **407 / 150 ≈ 3 more
+USA waves, 523 / 150 ≈ 4 more JPN waves** — down from brief 551's ~7
+estimate, i.e. real, substantial progress, not just projection. Once
+`ov002` clears, this doc's own 21-module, 10-wave plan (unchanged,
+still accurate per the zero-drift confirmation above) is the entire
+remaining runway — see `post-ov002-runbook.md` for the copy-paste
+command blocks.
+
 ## Method
 
 Per module, per region: `python3.13 -u tools/batch_carve.py --version
