@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**91 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**92 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (1)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (23)
+- [Uncategorised](#uncategorised) (24)
 
 ## Analysis / worklist
 
@@ -526,6 +526,12 @@ cluster B + D-3 cross-region application (brief 170).
 **per-TU match check without a full ROM rebuild.**
 
 Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then runs the RESOLVED comparison against its delinked gap object and reports the function match %.
+
+### `tools/gate3.py`
+
+**the brain's one-command 3-region clean-tree gate.**
+
+The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-repeated, highest-stakes brain action, yet it's entirely manual: `configure.py` is single-region, so a real gate means reconfiguring + rebuilding for all thre…
 
 ### `tools/generate_progress_bars.py`
 

@@ -98,9 +98,13 @@ is backing the session.
      `brew uninstall --cask wine-stable` first to satisfy the
      cask's conflicts-with check. Rationale + tested baseline:
      [`docs/research/wine-migration.md`](docs/research/wine-migration.md).
-7. **Confirm the baseline.** Run the current module-check command from
-   [`docs/state.md`](docs/state.md). Today's baseline is 24/27 OK (main /
-   DTCM / overlay 4 still fail — expected, placeholder-symbol artifacts).
+7. **Confirm the baseline.** Run the full 3-region gate:
+   `python3.13 tools/gate3.py` (reconfigures + clean-tree `ninja sha1` for
+   eur/usa/jpn, then the pytest suite). All three regions rebuild
+   byte-identical and **all 27 modules × 3 regions check green** — a diverging
+   region or a `dsd check` regression is a REAL break, not an expected
+   artifact. (The old "24/27, main/DTCM/ov004 expected to fail" baseline is
+   obsolete — those closed in briefs 138–140.)
 8. **Read [`docs/state.md`](docs/state.md)** and tackle whatever the
    *Next-brain TODO* section lists.
 
