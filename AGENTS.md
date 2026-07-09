@@ -687,35 +687,33 @@ GLOBAL_ASM-shipped `.s`; true unexamined ≈ 11, now examined) +
 `docs/research/reshape-recipes/contained-reshape-catalog.md` (the 6-recipe
 fast path once containment is confirmed) + per-wave `brief-5xx` docs.**
 
-- **LANE STATE (2026-07-08, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
-  (6 waves = 1,800 ov002 `.s`; both regions past 50% code).** ~555 USA + 671 JPN ov002
-  tractable remain (~4-5 more waves); then small overlays (ov000 85/region, ov008 71, ov005
-  63, … ~601/region total) + main (~34/region). **b547 census: full runway = 3,176 candidates
-  ≈ ~8-10 more paired waves to ~99%.** ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder);
-  decomper wine-free. On PC: BOTH on the drain.** ⚠️ **fresh `git worktree add` → copy
-  `tools/mwccarm/` + `objdiff-cli` + `dsd` (else verify-fails).** Recipe: `batch_carve
-  --version <r> --overlay ov002 --srcdir src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20
-  --limit 150`. ✅ **C-absorbed class now GENUINELY recovers: b546's "0/4 verify-fail" was a
-  comparator bug (`diff_words` matched pool relocs by symbol NAME, false-mismatching every
-  base+offset substitution) — b549 FIXED it + brain PROVED it (carved `func_ov002_022626c4`,
-  the exact b546 "wall", ships via real `usa ninja sha1`). The b547 census's "60/60
-  recoverable, 0 walls" is VINDICATED. Drop the verifyfail seed; the fixed tool ships them.**
-- **Brief 550** — Claude `scaffolder` → **ov002 drain wave 7** (continue; ~555 USA + 671 JPN
-  remain). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries after `git worktree
-  add`. **DROP the `--verifyfail-list` seed** — b549 fixed the comparator bug, so the C-absorbed
-  funcs the seed skipped now SHIP (proven). Expect a few `◆ … REFUSE (C-absorbed … attempting)`
-  lines that now land in SHIPPED (not verify-fail); report how many absorbed-routed actually
-  shipped. Report shipped + remaining. Own worktree. Branch `claude/usajpn-ov002-drain-550`.
-- **Brief 551** — Claude `decomper` → **WINE-FREE post-ov002 drain work order** (no drain
-  contention; `--dry-run` + config reads only, NO `ninja sha1`). ov002 taps in ~4-5 waves;
-  produce the turnkey plan for everything after it so the scaffolder sweeps the rest to ~99%
-  with zero setup guesswork. For each remaining module (the 20 small overlays ov000/ov008/
-  ov005/… then main), give: the exact `batch_carve` invocation (base `--min-addr`, `--srcdir`,
-  `mkdir -p` if the dir doesn't exist), the `--dry-run` candidate count (clean vs C-absorbed-
-  now-recoverable, on the b549-fixed tool), and a recommended wave order/sizing. Update
-  `docs/research/campaign-analytics/usajpn-drain-workorder.md` (or a new
-  `post-ov002-drain-workorder.md`). Own worktree + copy tool binaries. Branch
-  `claude/post-ov002-workorder-551`.
+- **LANE STATE (2026-07-09, Mac, Claude-only). CHAPTER: USA/JPN `.s` drain IN PROGRESS
+  (7 waves = 2,100 ov002 `.s`; USA 60.6% / JPN 58.7% code as of w6).** ~405 USA + 521 JPN ov002
+  tractable remain (~3 more waves), then the POST-ov002 sweep — **b551 turnkey 10-wave runbook
+  is READY** (`docs/research/campaign-analytics/post-ov002-drain-workorder.md`: 21 modules,
+  1,350 candidates / 675 per region; the 20 small overlays are 100% clean; 52 REFUSE all in
+  `main`, all b549-recoverable; 0 walls). **Full remaining runway ≈ ~13 paired waves to ~99%.**
+  ⚠️ **MAC = ONE smooth wine lane = DRAIN (scaffolder); decomper wine-free. On PC: BOTH on the
+  drain.** ⚠️ **fresh `git worktree add` → copy `tools/mwccarm/` + `objdiff-cli` + `dsd` (else
+  verify-fails).** Recipe: `batch_carve --version <r> --overlay ov002 --srcdir
+  src/<r>/overlay002 --min-addr 0x021aa3c0 --batch 20 --limit 150`. ✅ **C-absorbed class
+  GENUINELY recovers (b549 `diff_words` fix) — CONFIRMED LIVE in w7 (b550): the previously-
+  "walled" C-absorbed funcs shipped. Drop the verifyfail seed.**
+- **Brief 552** — Claude `scaffolder` → **ov002 drain wave 8** (continue; ~405 USA + 521 JPN
+  remain, ~3 ov002 waves left). Same recipe (`--min-addr 0x021aa3c0`). ⚠️ copy tool binaries
+  after `git worktree add`. NO verifyfail seed (b549 fix ships the C-absorbed funcs — confirmed
+  live in w7). One solid wave then PR; report shipped + remaining. When ov002 taps out, the
+  next waves follow `post-ov002-drain-workorder.md` (ov000 first). Own worktree. Branch
+  `claude/usajpn-ov002-drain-552`.
+- **Brief 553** — Claude `decomper` → **WINE-FREE post-ov002 runbook + post-w7 census refresh**
+  (no drain contention; `--dry-run` + config reads only, NO `ninja sha1`). Two deliverables:
+  (1) re-run the `--dry-run` census on the b549-fixed tool for ov002 + all 21 post-ov002 modules
+  to confirm `post-ov002-drain-workorder.md`'s counts haven't drifted after 7 waves (flag any
+  delta); (2) turn the work order's 10-wave plan into a PUSH-BUTTON runbook — for each wave, the
+  exact copy-paste `batch_carve` command block (usa-then-jpn per module, `mkdir -p src/<ver>/
+  overlayNN` for untouched dirs), so the scaffolder's remaining ~13 waves are zero-friction.
+  Deliver `docs/research/campaign-analytics/post-ov002-runbook.md`. Own worktree + copy tool
+  binaries. Branch `claude/post-ov002-runbook-553`.
 
 
 ### Closed briefs (reference)

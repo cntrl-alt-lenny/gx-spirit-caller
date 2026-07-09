@@ -8,19 +8,21 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-08 (Mac, Claude-only: brain=Opus, scaffolder+decomper=Claude
-Code), **post briefs 548/549 round merge (PRs #1118/#1117), clean 3-region `ninja sha1`.**
-CHAPTER: the USA/JPN mechanical `.s` drain. ov002: **6 waves = 1,800 ov002 `.s` shipped**;
-~555 USA + 671 JPN ov002 remain (~4-5 waves), then small overlays (ov000 next, 85/region) +
-main (~34/region). **b547 census: full runway = 3,176 candidates ≈ ~8-10 more paired waves to
-~99%** (`docs/research/brief-547-runway-census.md`). ✅ **RESOLVED (reverses last round): b546's
-"C-absorbed 0/4 verify-fail" was NOT walls — it was a comparator bug in `asm_escape.diff_words`
-(pool relocs matched by symbol NAME, false-mismatching every `base+offset` substitution). b549
-FIXED it (preserve reloc addend; accept sub only when `base+addend` == recorded map); brain
-PROVED it via real `usa ninja sha1` (`func_ov002_022626c4`, the exact b546 "wall", now ships).
-So b547's "0 walls" is VINDICATED — the C-absorbed class genuinely recovers.** Mac = ONE wine
-drain lane (scaffolder) + wine-free decomper. Next queued: b550 drain w7 (drop the verifyfail
-seed), b551 wine-free post-ov002 drain work order.
+**Last updated:** 2026-07-09 (Mac, Claude-only: brain=Opus, both agents=Claude Code),
+**re-synced after a Windows-brain stint — origin/main (`86c660a5`) canonical, local main
+ff'd to it.** The Windows brain merged **b550** (drain w7: 300 shipped, first LIVE confirmation
+of the b549 fix — the previously-"walled" C-absorbed funcs shipped) + **b551** (post-ov002 work
+order). CHAPTER: USA/JPN `.s` drain. ov002: **7 waves = 2,100 ov002 `.s`**; ~405 USA + 521 JPN
+remain (~3 waves), then the b551 turnkey **10-wave POST-ov002 sweep**
+(`docs/research/campaign-analytics/post-ov002-drain-workorder.md`: 21 modules, 1,350 candidates,
+20 overlays 100% clean, 52 `main` REFUSE all b549-recoverable, 0 walls). **~13 paired waves to
+~99%.** Mac = ONE wine drain lane (scaffolder) + wine-free decomper. Next queued: b552 drain w8,
+b553 wine-free post-ov002 runbook + post-w7 census refresh. ⚠️ AGENTS.md closed-brief history
+now lives in `docs/briefs/CLOSED-LOG.md` (Windows-brain trim). No open PRs pending review.
+
+**Previously (2026-07-08):** briefs 548/549 (PRs #1118/#1117) — drain w6 (300) + the
+`asm_escape.diff_words` comparator fix that vindicated the census's "0 walls" (brain-proved via
+real `usa ninja sha1`).
 
 **Previously (2026-07-08):** briefs 546/547 (PRs #1116/#1115) — drain w5 (296) + full-runway
 census (the census whose "0 walls" b549 then vindicated).
