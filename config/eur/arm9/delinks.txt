@@ -15291,31 +15291,31 @@ src/main/func_0208910c.c:
     complete
     .text start:0x0208910c end:0x02089134
 
-src/main/func_02089134.s:
+src/main/func_02089134.c:
     complete
     .text start:0x02089134 end:0x02089198
 
-src/main/func_02089198.s:
+src/main/func_02089198.c:
     complete
     .text start:0x02089198 end:0x020891fc
 
-src/main/func_020891fc.s:
+src/main/func_020891fc.c:
     complete
     .text start:0x020891fc end:0x02089260
 
-src/main/func_02089260.s:
+src/main/func_02089260.c:
     complete
     .text start:0x02089260 end:0x020892c4
 
-src/main/func_020892c4.s:
+src/main/func_020892c4.c:
     complete
     .text start:0x020892c4 end:0x02089328
 
-src/main/func_02089328.s:
+src/main/func_02089328.c:
     complete
     .text start:0x02089328 end:0x0208938c
 
-src/main/func_0208938c.s:
+src/main/func_0208938c.c:
     complete
     .text start:0x0208938c end:0x020893f0
 
