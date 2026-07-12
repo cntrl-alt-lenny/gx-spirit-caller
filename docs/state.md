@@ -29,6 +29,27 @@ ms). Fixed the stale obsolete-gate text in `.claude/agents/brain.md` + AGENTS.md
 described the dead `ninja rom`/24-of-27 gate). Deferred (low-value): the `docs/state.md` split,
 `m2c --context` wiring, and 3 standing `func_02086800_dummy` invariant errors (harmless to sha1).
 
+**Brief 561 (foundation fixes, from the r3 improvement-swarm re-run,
+`docs/research/improvement-swarm-2026-07-09-r3.md`):** ⚠️ **NEW 4th metric —
+`units` / `fn` / `code` count a `.s` ship identically to a real C match, so
+none of them track "readable C." `python tools/progress.py --version <ver>`
+now prints a 4th line, `C-decompiled`, computed straight from committed
+`delinks.txt` (no build needed). Going-forward convention: report
+**units/fn/code/C** (4 numbers), not 3. Current 4-metric snapshot (delinks
+tier, 2026-07-09): **EUR code 97.41% / C 7.92%; USA code 73.82% / C 7.01%;
+JPN code 68.59% / C 7.01%.** Readable-C is early-stage (~7-8%) and is a
+SEPARATE goal from the `.s` drain (which is close to done on the
+byte-matched-coverage metric) — don't conflate the two, and don't sell a
+`.s`→C port chapter on the headline % (EUR→USA/JPN porting is metric-neutral
+post-drain, since the region already ships the function as `.s`). Also
+landed this brief: `batch_carve.py` branch guard (refuses on `main`/detached-
+at-origin-main unless `--force-branch`) + `check_delink_dupes.py` wired as
+its own preflight; `scaffolder.md`/`decomper.md` agent configs rewritten
+(were ~7 weeks stale, claiming no local toolchain); `post-ov002-runbook.md`
+made cross-platform (was Mac-only: hardcoded paths + `python3.13`) + Wave 11
+added (ov002 mop-up for the ~180 candidates the pivot logic orphans, USA
+~107 + JPN ~73).
+
 **Round 552/553 DONE:** both merged. **b553** (PR #1123, docs-only) = post-ov002 runbook +
 census. **b552** (PR #1124, drain w8) = 300 ov002 `.s` (150/150), merged on the **first real
 `tools/gate3.py` 3-region run — GATE PASS** (delink preflight OK, eur/usa/jpn all byte-identical,
@@ -75,7 +96,18 @@ outside its stated scope — watch for neighbor-sweep in `git add -A` commits.**
 EUR units **99.11%** / fn **98.72%** / code **97.50%** — endgame. **USA units
 89.08% / fn 76.21% / code 49.17%; JPN units 88.63% / fn 74.83% / code 48.10%**
 (vs stale June 72/38/14 — the PC arc's completed `.s` drain + port waves are now
-measured). ⚠️ USA/JPN reports were BLOCKED by a NEW objdiff-cli panic variant
+measured). ⚠️ **CORRECTED 2026-07-09 (brief 561, improvement-swarm r3 finding
+#2): the `code 49.17% / 48.10%` figures above were ~25pp STALE** — they came
+from a gitignored machine-local `build/<ver>/report.json` that hadn't been
+regenerated since before several drain waves landed. The COMMITTED
+`config/<ver>/**/delinks.txt` tier (always current, no build required —
+`python tools/progress.py --version <ver>`) says **USA code 73.82%, JPN code
+68.59%** as of this correction. Going forward, treat any `report.json`-sourced
+number older than the current session with suspicion; the delinks tier is the
+trustworthy no-build fallback. ⚠️ **Also new as of brief 561: `units` / `fn` /
+`code` all count a `.s` ship identically to a real C match, so none of them
+track "readable C" as a goal — see the next paragraph for the 4th metric that
+does.** ⚠️ USA/JPN reports were BLOCKED by a NEW objdiff-cli panic variant
 (arm.rs:130 `len 1/idx -1`): a gap TU with data-FIRST `.text` (`BuildInfo` OBJECT
 at 0x0 before `main` FUNC, no mapping symbols — USA `_dsd_gap@main_202.o`).
 Brain shipped **objdiff_filter_panic_units v3** (drop data-first `.text` units;

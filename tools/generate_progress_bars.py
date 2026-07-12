@@ -22,7 +22,6 @@ Data source: committed `config/<ver>/**/delinks.txt` (no baserom / no build).
 """
 
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -32,6 +31,11 @@ from generate_heatmap import (  # noqa: E402
     as_int,
     synthesize_report_from_delinks,
 )
+# c_code_bytes is the canonical "true C-decompiled bytes" scan (brief 561,
+# improvement-swarm r3 REFRAME) — lives in progress.py (the root of this
+# import chain: progress <- generate_heatmap <- generate_progress_bars) so
+# progress.py's own text/JSON reporter can carry the same honest 4th metric.
+from progress import c_code_bytes  # noqa: E402
 
 # (config dir name, display label, game code)
 REGIONS = [("eur", "EUR", "AYXP"), ("usa", "USA", "AYXE"), ("jpn", "JPN", "AYXJ")]
@@ -50,32 +54,12 @@ TRACK = "#3a4048"
 C_COLOR = "#3fb950"        # decompiled to C (green)
 MATCHED_COLOR = "#2b6cb0"  # byte-matched incl. .s (blue)
 
-_SRC = re.compile(r"^\s*(?:src|libs)/\S+\.(c|cpp|s):\s*$")
-_TEXT = re.compile(r"\.text\s+start:0x([0-9a-fA-F]+)\s+end:0x([0-9a-fA-F]+)")
-
-
-def c_code_bytes(version: str) -> int:
-    """Sum of .text bytes for blocks sourced from a .c/.cpp file."""
-    total = 0
-    cfg = ROOT / "config" / version
-    for delinks in cfg.rglob("delinks.txt"):
-        ext = None
-        for line in delinks.read_text(encoding="utf-8", errors="ignore").splitlines():
-            m = _SRC.match(line)
-            if m:
-                ext = m.group(1)
-                continue
-            t = _TEXT.search(line)
-            if t and ext in ("c", "cpp"):
-                total += int(t.group(2), 16) - int(t.group(1), 16)
-    return total
-
 
 def region_metrics(version: str) -> dict:
     report = synthesize_report_from_delinks(ROOT / "config" / version)
     m = report["measures"] if report else {}
     matched, total = as_int(m.get("matched_code")), as_int(m.get("total_code"))
-    c = c_code_bytes(version)
+    c = c_code_bytes(ROOT / "config" / version)
     return {
         "matched_pct": matched / total if total else 0.0,
         "c_pct": c / total if total else 0.0,
