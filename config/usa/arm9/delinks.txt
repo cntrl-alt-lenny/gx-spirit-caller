@@ -10566,40 +10566,40 @@ src/usa/main/func_0208f698.legacy.c:
 src/usa/main/func_0208f700.legacy.c:
     complete
     .text start:0x0208f700 end:0x0208f768
-src/usa/main/func_0208f768.s:
+src/usa/main/func_0208f768.legacy.c:
     complete
     .text start:0x0208f768 end:0x0208f7d0
-src/usa/main/func_0208f7d0.s:
+src/usa/main/func_0208f7d0.legacy.c:
     complete
     .text start:0x0208f7d0 end:0x0208f838
-src/usa/main/func_0208f838.s:
+src/usa/main/func_0208f838.legacy.c:
     complete
     .text start:0x0208f838 end:0x0208f8a0
-src/usa/main/func_0208f8a0.s:
+src/usa/main/func_0208f8a0.legacy.c:
     complete
     .text start:0x0208f8a0 end:0x0208f908
-src/usa/main/func_0208f908.s:
+src/usa/main/func_0208f908.legacy.c:
     complete
     .text start:0x0208f908 end:0x0208f970
-src/usa/main/func_0208f970.s:
+src/usa/main/func_0208f970.legacy.c:
     complete
     .text start:0x0208f970 end:0x0208f9d8
-src/usa/main/func_0208f9d8.s:
+src/usa/main/func_0208f9d8.legacy.c:
     complete
     .text start:0x0208f9d8 end:0x0208fa40
-src/usa/main/func_0208fa40.s:
+src/usa/main/func_0208fa40.legacy.c:
     complete
     .text start:0x0208fa40 end:0x0208faa8
-src/usa/main/func_0208faa8.s:
+src/usa/main/func_0208faa8.legacy.c:
     complete
     .text start:0x0208faa8 end:0x0208fb10
-src/usa/main/func_0208fb10.s:
+src/usa/main/func_0208fb10.legacy.c:
     complete
     .text start:0x0208fb10 end:0x0208fb78
-src/usa/main/func_0208fb78.s:
+src/usa/main/func_0208fb78.legacy.c:
     complete
     .text start:0x0208fb78 end:0x0208fbe0
-src/usa/main/func_0208fbe0.s:
+src/usa/main/func_0208fbe0.legacy.c:
     complete
     .text start:0x0208fbe0 end:0x0208fc48
 src/usa/main/func_0208fc48.s:
@@ -10608,19 +10608,19 @@ src/usa/main/func_0208fc48.s:
 src/usa/main/func_0208fca8.s:
     complete
     .text start:0x0208fca8 end:0x0208fd08
-src/usa/main/func_0208fd08.s:
+src/usa/main/func_0208fd08.legacy.c:
     complete
     .text start:0x0208fd08 end:0x0208fd70
 src/usa/main/func_0208fd70.s:
     complete
     .text start:0x0208fd70 end:0x0208fdcc
-src/usa/main/func_0208fdcc.s:
+src/usa/main/func_0208fdcc.legacy.c:
     complete
     .text start:0x0208fdcc end:0x0208fe34
-src/usa/main/func_0208fe34.s:
+src/usa/main/func_0208fe34.legacy.c:
     complete
     .text start:0x0208fe34 end:0x0208fe9c
-src/usa/main/func_0208fe9c.s:
+src/usa/main/func_0208fe9c.legacy.c:
     complete
     .text start:0x0208fe9c end:0x0208ff04
 src/usa/main/func_0208ff04.s:
