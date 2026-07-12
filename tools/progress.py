@@ -30,6 +30,7 @@ need to know which source was used.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -161,6 +162,41 @@ def parse_delinks_file(delinks_file: Path) -> tuple[list[tuple[str, int, int]], 
     return module_sections, tus
 
 
+_C_SRC_HDR = re.compile(r"^\s*(?:src|libs)/\S+\.(c|cpp|s):\s*$")
+_C_TEXT_RANGE = re.compile(r"\.text\s+start:0x([0-9a-fA-F]+)\s+end:0x([0-9a-fA-F]+)")
+
+
+def c_code_bytes(config_dir: Path) -> int:
+    """Sum of `.text` bytes for TUs sourced from a `.c`/`.cpp` file (never
+    `.s`) across every `config_dir/**/delinks.txt`.
+
+    This is the metric `matched_code` (above) and `complete_units` CANNOT
+    give you: both of those count a `.s` ship (a byte-identical assembly
+    escape hatch, never hand-decompiled) identically to a real C match —
+    see the improvement-swarm r3 report's REFRAME finding. `c_code_bytes`
+    is the true "readable C" numerator; call it against the same
+    `total_code` denominator `summarize_delinks` returns for the % line.
+
+    No build required — same delinks.txt-only data source as
+    `summarize_delinks`. Originally lived in `generate_progress_bars.py`
+    (which now imports it from here) — moved to `progress.py` so the
+    headline text/JSON reporter can carry the same honest number, not
+    just the SVG badge.
+    """
+    total = 0
+    for delinks in config_dir.rglob("delinks.txt"):
+        ext = None
+        for line in delinks.read_text(encoding="utf-8", errors="ignore").splitlines():
+            m = _C_SRC_HDR.match(line)
+            if m:
+                ext = m.group(1)
+                continue
+            t = _C_TEXT_RANGE.search(line)
+            if t and ext in ("c", "cpp"):
+                total += int(t.group(2), 16) - int(t.group(1), 16)
+    return total
+
+
 def summarize_delinks(config_dir: Path) -> dict | None:
     """Walk every config/<ver>/**/delinks.txt and aggregate byte totals
     into a report.json-shaped dict. Returns None if no delinks.txt
@@ -235,7 +271,7 @@ def print_stub(version: str, total: int) -> None:
     print("  Run `ninja report` after compiling any source to produce a real report.")
 
 
-def print_report(version: str, report: dict) -> None:
+def print_report(version: str, report: dict, config_dir: Path | None = None) -> None:
     print(f"Yu-Gi-Oh! GX Spirit Caller ({version}) — decomp progress")
     print()
     measures = report.get("measures", {})
@@ -257,6 +293,15 @@ def print_report(version: str, report: dict) -> None:
     print(f"  code:   {code_matched:>10} / {code_total:<10} bytes  ({pct(code_matched, code_total):5.2f}%)")
     print(f"  data:   {data_matched:>10} / {data_total:<10} bytes  ({pct(data_matched, data_total):5.2f}%)")
     print(f"  units:  {units_done:>10} / {units_total:<10}        ({pct(units_done, units_total):5.2f}%)")
+    # 4th line (improvement-swarm r3 REFRAME): code/data/units above all
+    # count a `.s` ship identically to a real C match, so none of them
+    # can see the "readable C" goal. c_code_bytes is the true numerator —
+    # same total_code denominator, but only .c/.cpp-sourced bytes counted.
+    if config_dir is not None:
+        c_matched = c_code_bytes(config_dir)
+        print(f"  C-decompiled: {c_matched:>10} / {code_total:<10} bytes  "
+              f"({pct(c_matched, code_total):5.2f}%)  <- true readable-C metric, "
+              f"distinct from 'code' above (which also counts .s ships)")
     print()
 
     if report.get("categories"):
@@ -283,10 +328,12 @@ def main() -> int:
         with report_path.open() as f:
             report = json.load(f)
         if args.json:
-            json.dump(report, sys.stdout, indent=2)
+            payload = dict(report)
+            payload["c_code_bytes"] = c_code_bytes(config_dir)
+            json.dump(payload, sys.stdout, indent=2)
             print()
         else:
-            print_report(args.version, report)
+            print_report(args.version, report, config_dir)
         return 0
 
     # Tier 2 — delinks.txt-derived summary. Works in CI (no toolchain
@@ -298,11 +345,12 @@ def main() -> int:
             # Merge a `state: delinks` tag so downstream tools can see
             # the provenance without changing their measures-reading code.
             payload = {"version": args.version, "state": "delinks",
+                       "c_code_bytes": c_code_bytes(config_dir),
                        **delinks_summary}
             json.dump(payload, sys.stdout, indent=2)
             print()
         else:
-            print_report(args.version, delinks_summary)
+            print_report(args.version, delinks_summary, config_dir)
             print("  source: delinks.txt (approximate — run `ninja report` locally "
                   "for objdiff-verified numbers)")
         return 0

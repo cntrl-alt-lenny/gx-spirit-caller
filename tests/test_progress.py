@@ -21,6 +21,7 @@ sys.path.insert(0, str(_TOOLS))
 from progress import (  # noqa: E402
     CODE_SECTIONS,
     DATA_SECTIONS,
+    c_code_bytes,
     count_functions_in_symbols,
     count_total_functions,
     parse_delinks_file,
@@ -330,6 +331,110 @@ class TestSummarizeDelinks(unittest.TestCase):
 # --------------------------------------------------------------------------- #
 # Round-trip: report shape is JSON-compatible
 # --------------------------------------------------------------------------- #
+
+class TestCCodeBytes(unittest.TestCase):
+    """The true "readable C" metric (brief 561, improvement-swarm r3
+    REFRAME): unlike matched_code/complete_units above, this must NOT
+    count a `.s` ship — only bytes from a `.c`/`.cpp`-sourced TU."""
+
+    def _make_config(self, delinks_content: str) -> Path:
+        tmp = tempfile.mkdtemp()
+        arm9 = Path(tmp) / "arm9"
+        arm9.mkdir()
+        (arm9 / "delinks.txt").write_text(delinks_content)
+        return Path(tmp)
+
+    def test_no_delinks_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(c_code_bytes(Path(tmp)), 0)
+
+    def test_c_tu_counted(self):
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40)
+
+    def test_cpp_tu_counted(self):
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.cpp:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40)
+
+    def test_s_tu_not_counted(self):
+        # The exact case the metric exists to fix: a byte-identical .s
+        # ship is real progress toward `matched_code`, but NOT toward
+        # "readable C" — it must contribute 0 here even though it's
+        # `complete` and would count fully in summarize_delinks().
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.s:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0)
+
+    def test_mixed_c_and_s_only_c_summed(self):
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+            "\n"
+            "src/bar.s:\n"
+            "    complete\n"
+            "    .text start:0x40 end:0x100\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40)   # only foo.c's range
+
+    def test_libs_prefix_counted(self):
+        # c_code_bytes matches both src/... and libs/... TU headers (SDK
+        # code lives under libs/), same as the module-map scan elsewhere.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "libs/nitro/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x20\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x20)
+
+    def test_incomplete_c_tu_still_counted(self):
+        # c_code_bytes is a pure "which file was this TU carved from"
+        # source-scan -- it does NOT gate on `complete` status the way
+        # summarize_delinks's matched_code does. An incomplete .c draft
+        # is still real C on disk (arguably readable, just not yet
+        # byte-verified) -- counting it is the documented behaviour
+        # inherited unchanged from generate_progress_bars.c_code_bytes.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40)
+
+    def test_walks_subtree(self):
+        tmp = tempfile.mkdtemp()
+        for sub, content in (
+            ("arm9", "src/foo.c:\n    complete\n    .text start:0x0 end:0x10\n"),
+            ("arm9/overlays/ov002",
+             "src/overlay002/bar.c:\n    complete\n    .text start:0x0 end:0x20\n"),
+        ):
+            d = Path(tmp) / sub
+            d.mkdir(parents=True)
+            (d / "delinks.txt").write_text(content)
+        self.assertEqual(c_code_bytes(Path(tmp)), 0x10 + 0x20)
+
 
 class TestReportJsonRoundtrip(unittest.TestCase):
     def test_summarize_delinks_output_is_json_serialisable(self):
