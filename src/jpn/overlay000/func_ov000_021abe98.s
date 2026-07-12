@@ -1,0 +1,25 @@
+; func_ov000_021abe98 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; the original disassembly emitted verbatim as a byte-exact mwasm TU.
+; For reg-alloc-walled functions with no C match (brief 294 endgame).
+
+        .text
+        .global func_ov000_021abe98
+        .arm
+func_ov000_021abe98:
+    ldr r1, [r0, #0xc]
+    ldr r3, [r0, #0x8]
+    mov r1, r1, lsl #0x18
+    mov r1, r1, lsr #0x18
+    mov r2, r3, lsl #0x10
+    rsb r1, r1, r3, lsr #0x10
+    cmp r1, r2, lsr #0x10
+    mov r2, r2, lsr #0x10
+    bxls lr
+    mov r1, #0x10000
+    rsb r1, r1, #0x0
+    add r2, r2, #0x1
+    and r3, r3, r1
+    mov r1, r2, lsl #0x10
+    orr r1, r3, r1, lsr #0x10
+    str r1, [r0, #0x8]
+    bx lr
