@@ -232,6 +232,31 @@ def bisect_plan(items: list) -> list[list]:
     return [items[:mid], items[mid:]]
 
 
+def branch_guard_message(branch: str, detached_at_origin_main: bool, force: bool) -> str | None:
+    """PURE (improvement-swarm r3 safety flag): decide whether batch_carve should
+    refuse to run given the current branch state. Returns an error message if it
+    should refuse, or None if it's safe to proceed.
+
+    Real risk: batch_carve auto-commits every green batch (see module docstring).
+    An unattended launch in the wrong worktree — HEAD still on `main`, or a
+    detached HEAD that happens to point at origin/main — would push carve waves
+    straight past review. `force=True` (--force-branch) is an explicit escape
+    hatch for the rare intentional case."""
+    if force:
+        return None
+    if branch == "main":
+        return ("refusing to carve on branch 'main' — batch_carve auto-commits "
+                 "each green-gated batch, and an unattended run on main would "
+                 "ship carve waves with no review. Create a work branch first "
+                 "(git switch -C claude/<brief>-NNN origin/main), or pass "
+                 "--force-branch if this is intentional.")
+    if detached_at_origin_main:
+        return ("refusing to carve on a detached HEAD pointing at origin/main — "
+                 "same risk as branch 'main' (see above). Create a work branch "
+                 "first, or pass --force-branch if this is intentional.")
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # IMPURE seam — Ops (real subprocess/git; the tests inject a fake)             #
 # --------------------------------------------------------------------------- #
@@ -408,6 +433,31 @@ class Ops:
 
     def head_rev(self) -> str:
         return self._run(["git", "rev-parse", "HEAD"]).stdout.strip()
+
+    def current_branch(self) -> str:
+        """The checked-out branch name, or 'HEAD' if detached (git's own
+        convention for `--abbrev-ref` on a detached HEAD)."""
+        return self._run(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+
+    def is_detached_at_origin_main(self) -> bool:
+        """True only when HEAD is detached AND its commit == origin/main's tip —
+        the risky case the branch guard exists for (see branch_guard_message).
+        A detached HEAD elsewhere (e.g. mid-rebase, a pinned older commit) is not
+        guarded against; only an accidental "still on main's tip" launch is."""
+        if self.current_branch() != "HEAD":
+            return False
+        r = self._run(["git", "rev-parse", "origin/main"])
+        if r.returncode != 0:
+            return False   # no origin/main to compare against -> nothing to guard
+        return self.head_rev() == r.stdout.strip()
+
+    def check_delink_dupes(self) -> tuple[bool, str]:
+        """Preflight (improvement-swarm r3 safety flag): scan every
+        config/**/delinks.txt for a `.text` address two different files both
+        claim, BEFORE this run stages any more entries on top of a possibly
+        already-broken tree. Returns (ok, combined stdout+stderr)."""
+        r = self._run([sys.executable, "tools/check_delink_dupes.py"])
+        return r.returncode == 0, (r.stdout + r.stderr)
 
     def is_dirty(self, path: str) -> bool:
         """True if `path` has uncommitted changes (staged or unstaged). Used to
@@ -755,12 +805,39 @@ def main(argv: list[str] | None = None) -> int:
                     help="override .s output directory (default: scope.srcdir = "
                          "src/main or src/overlayNNN). Use src/usa/main for USA carves "
                          "so they stay region-specific and don't pollute the EUR baseline.")
+    ap.add_argument("--force-branch", action="store_true",
+                    help="bypass the branch-safety guard (refuses to carve on "
+                         "'main' or a detached HEAD at origin/main — batch_carve "
+                         "auto-commits every green batch). Only for an "
+                         "intentional main-targeted run.")
+    ap.add_argument("--skip-dupe-check", action="store_true",
+                    help="skip the check_delink_dupes.py preflight (default: run "
+                         "it before carving and abort on any duplicate .text "
+                         "address, since `dsd lcf` would fail at merge anyway)")
     args = ap.parse_args(argv)
+
+    ops = Ops(version=args.version, call_timeout=args.call_timeout,
+              gate_timeout=args.gate_timeout, gate_retries=args.gate_retries)
+
+    branch = ops.current_branch()
+    guard_msg = branch_guard_message(branch, ops.is_detached_at_origin_main(),
+                                     args.force_branch)
+    if guard_msg:
+        print(f"batch_carve: REFUSING (branch={branch!r}) — {guard_msg}", file=sys.stderr)
+        return 2
+
+    if not args.skip_dupe_check:
+        dupes_ok, dupes_out = ops.check_delink_dupes()
+        if not dupes_ok:
+            print(dupes_out, file=sys.stderr)
+            print("batch_carve: ABORT — check_delink_dupes preflight found a "
+                  "pre-existing duplicate .text address (see above); fix it "
+                  "before carving on top of it, or pass --skip-dupe-check if "
+                  "this is a known false positive.", file=sys.stderr)
+            return 2
 
     scope = Scope(version=args.version, overlay=args.overlay, min_addr=args.min_addr,
                   min_size=args.min_size, max_size=args.max_size)
-    ops = Ops(version=args.version, call_timeout=args.call_timeout,
-              gate_timeout=args.gate_timeout, gate_retries=args.gate_retries)
     carver = BatchCarver(scope, ops, batch=args.batch, srcdir=args.srcdir,
                          skip_path=args.skip_list, verifyfail_path=args.verifyfail_list,
                          dry_run=args.dry_run)

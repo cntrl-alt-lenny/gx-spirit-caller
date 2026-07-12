@@ -130,6 +130,36 @@ class TestPureHelpers(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# branch_guard_message (brief 561 safety flag: batch_carve auto-commits, so   #
+# an unattended launch on main/detached-at-main must refuse, not carve)       #
+# --------------------------------------------------------------------------- #
+
+class TestBranchGuard(unittest.TestCase):
+    def test_refuses_on_main(self):
+        msg = bc.branch_guard_message("main", False, force=False)
+        self.assertIsNotNone(msg)
+        self.assertIn("main", msg)
+
+    def test_refuses_on_detached_at_origin_main(self):
+        msg = bc.branch_guard_message("HEAD", True, force=False)
+        self.assertIsNotNone(msg)
+        self.assertIn("detached", msg)
+
+    def test_allows_work_branch(self):
+        self.assertIsNone(bc.branch_guard_message("claude/foundation-561", False, force=False))
+
+    def test_allows_detached_elsewhere(self):
+        # detached, but NOT at origin/main's tip (e.g. mid-rebase, pinned commit)
+        self.assertIsNone(bc.branch_guard_message("HEAD", False, force=False))
+
+    def test_force_bypasses_main(self):
+        self.assertIsNone(bc.branch_guard_message("main", False, force=True))
+
+    def test_force_bypasses_detached_at_origin_main(self):
+        self.assertIsNone(bc.branch_guard_message("HEAD", True, force=True))
+
+
+# --------------------------------------------------------------------------- #
 # classify_refuse_kind (brief 545: routes purely-C-absorbed REFUSEs through   #
 # --allow-absorbed-offset instead of the classify()-time park; genuine walls  #
 # — OFFSET/MISADDRESSED/under-defined B-gap — must stay parked immediately)   #
