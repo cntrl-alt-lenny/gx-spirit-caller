@@ -23,6 +23,8 @@ campaign's compass is miscalibrated:
 2. **The reported USA/JPN `code 49.17% / 48.10%` is ~25pp STALE.** Those come from a
    gitignored machine-local `report.json`; the committed delinks tier is actually
    **USA 73.82% / JPN 68.59%**. The drain is far more advanced than state.md admits.
+   **Superseded by Brief 565:** these percentages remain only as the historical
+   finding; use the current committed-tier snapshot in `docs/state.md`.
 3. **EUR→USA/JPN C-porting is metric-neutral post-drain** — once a function ships as
    region `.s`, porting its `.c` moves the headline numbers by ~0. A "port chapter"
    is busywork for the metrics (still has readability value, but don't sell it on %).

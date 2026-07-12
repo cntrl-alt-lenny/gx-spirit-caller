@@ -146,6 +146,10 @@ USA / 7.0% JPN, and no committed metric tracked it (S-tier finding).
   the 4-metric convention going forward and recorded today's full
   snapshot for all three regions.
 
+  **Superseded by Brief 565:** the historical 73.82% / 68.59% correction above
+  is retained only to explain the prior finding; the current committed-tier
+  snapshot is in `docs/state.md` and `docs/research/brief-565-metrics-truthup.md`.
+
 ## Gate
 
 `python -m pytest -q tests` run after every fix. Baseline established
