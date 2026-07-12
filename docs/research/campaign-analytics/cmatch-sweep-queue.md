@@ -44,3 +44,17 @@ family.
 
 No build, baserom, compiler, or generated index step is required for this
 doc-only census.
+
+## Deferred families worth revisiting (brain note, 2026-07-12)
+
+The census rule marks any address appearing in *any* brief as ATTEMPTED. Two of
+the swarm report's highest-value families are excluded on that basis — but they
+only appear in **brief-498 as DEFERRED-as-stubborn, never actually cracked**, so
+they remain prime C-match targets:
+
+- **7-clone relative-offset table-walker** (`02089134` → 21 funcs total,
+  exact-canonical): already assigned to the Claude Code C-match lane (brief 560)
+  — crack the exemplar, then propagate to the 6 siblings + region ports.
+- **MMIO-extract quad** (`0208df0c`, `0208df60`, `0208e1cc`, `0208e220`):
+  currently UNASSIGNED — queue for a future C-match wave (start from brief-498's
+  register-order note + the mwcc-register-reuse recipe).
