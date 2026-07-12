@@ -31,19 +31,32 @@ src/jpn/overlay008/func_ov008_021aaec4.c:
     complete
     .text start:0x021aaec4 end:0x021aaf28
 
+src/jpn/overlay008/func_ov008_021aaf28.s:
+    complete
+    .text start:0x021aaf28 end:0x021ab040
+
 src/jpn/overlay008/func_ov008_021ab040.c:
     complete
     .text start:0x021ab040 end:0x021ab084
 
+src/jpn/overlay008/func_ov008_021ab2cc.s:
+    complete
+    .text start:0x021ab2cc end:0x021ab3a4
 src/jpn/overlay008/func_ov008_021ab3a4.s:
     complete
     .text start:0x021ab3a4 end:0x021ab428
+src/jpn/overlay008/func_ov008_021ab95c.s:
+    complete
+    .text start:0x021ab95c end:0x021aba28
 src/jpn/overlay008/func_ov008_021aba28.s:
     complete
     .text start:0x021aba28 end:0x021abac0
 src/jpn/overlay008/func_ov008_021abac0.s:
     complete
     .text start:0x021abac0 end:0x021abb10
+src/jpn/overlay008/func_ov008_021abb10.s:
+    complete
+    .text start:0x021abb10 end:0x021abbfc
 src/jpn/overlay008/func_ov008_021abf8c.s:
     complete
     .text start:0x021abf8c end:0x021abfd8
@@ -53,13 +66,15 @@ src/jpn/overlay008/func_ov008_021ac128.s:
 src/jpn/overlay008/func_ov008_021ac1cc.s:
     complete
     .text start:0x021ac1cc end:0x021ac27c
+src/jpn/overlay008/func_ov008_021ac27c.s:
+    complete
+    .text start:0x021ac27c end:0x021ac350
 src/jpn/overlay008/func_ov008_021ac350.s:
     complete
     .text start:0x021ac350 end:0x021ac3f0
 src/jpn/overlay008/func_ov008_021ac3f0.s:
     complete
     .text start:0x021ac3f0 end:0x021ac4b0
-
 src/jpn/overlay008/func_ov008_021ac4b0.c:
     complete
     .text start:0x021ac4b0 end:0x021ac4f0
@@ -67,6 +82,21 @@ src/jpn/overlay008/func_ov008_021ac4b0.c:
 src/jpn/overlay008/func_ov008_021ac4f0.s:
     complete
     .text start:0x021ac4f0 end:0x021ac578
+src/jpn/overlay008/func_ov008_021ac578.s:
+    complete
+    .text start:0x021ac578 end:0x021ac638
+src/jpn/overlay008/func_ov008_021ac638.s:
+    complete
+    .text start:0x021ac638 end:0x021ac710
+src/jpn/overlay008/func_ov008_021acc24.s:
+    complete
+    .text start:0x021acc24 end:0x021accf0
+src/jpn/overlay008/func_ov008_021accf0.s:
+    complete
+    .text start:0x021accf0 end:0x021acdcc
+src/jpn/overlay008/func_ov008_021acdcc.s:
+    complete
+    .text start:0x021acdcc end:0x021ace98
 src/jpn/overlay008/func_ov008_021ace98.s:
     complete
     .text start:0x021ace98 end:0x021acef4
@@ -77,6 +107,9 @@ src/jpn/overlay008/func_ov008_021ad96c.c:
     complete
     .text start:0x021ad96c end:0x021ad984
 
+src/jpn/overlay008/func_ov008_021ad984.s:
+    complete
+    .text start:0x021ad984 end:0x021ada98
 src/jpn/overlay008/func_ov008_021ada98.s:
     complete
     .text start:0x021ada98 end:0x021adb20
@@ -98,19 +131,40 @@ src/jpn/overlay008/func_ov008_021aed88.c:
 src/jpn/overlay008/func_ov008_021aedf4.s:
     complete
     .text start:0x021aedf4 end:0x021aeeb0
+src/jpn/overlay008/func_ov008_021aeeb0.s:
+    complete
+    .text start:0x021aeeb0 end:0x021aef84
 src/jpn/overlay008/func_ov008_021aef84.s:
     complete
     .text start:0x021aef84 end:0x021af030
+src/jpn/overlay008/func_ov008_021af3a0.s:
+    complete
+    .text start:0x021af3a0 end:0x021af464
 src/jpn/overlay008/func_ov008_021afa88.s:
     complete
     .text start:0x021afa88 end:0x021afb08
 src/jpn/overlay008/func_ov008_021afb08.s:
     complete
     .text start:0x021afb08 end:0x021afb80
+src/jpn/overlay008/func_ov008_021b0294.s:
+    complete
+    .text start:0x021b0294 end:0x021b039c
+src/jpn/overlay008/func_ov008_021b1780.s:
+    complete
+    .text start:0x021b1780 end:0x021b1874
+src/jpn/overlay008/func_ov008_021b1af0.s:
+    complete
+    .text start:0x021b1af0 end:0x021b1be4
+src/jpn/overlay008/func_ov008_021b1be4.s:
+    complete
+    .text start:0x021b1be4 end:0x021b1ce8
 src/jpn/overlay008/ov008_021b1ce8.c:
     complete
     .text start:0x021b1ce8 end:0x021b1cfc
 
+src/jpn/overlay008/func_ov008_021b1cfc.s:
+    complete
+    .text start:0x021b1cfc end:0x021b1dbc
 src/jpn/overlay008/func_ov008_021b1dbc.c:
     complete
     .text start:0x021b1dbc end:0x021b1dd0
@@ -119,6 +173,9 @@ src/jpn/overlay008/func_ov008_021b1dd0.c:
     complete
     .text start:0x021b1dd0 end:0x021b1e04
 
+src/jpn/overlay008/func_ov008_021b1e04.s:
+    complete
+    .text start:0x021b1e04 end:0x021b1f04
 src/jpn/overlay008/func_ov008_021b1f04.c:
     complete
     .text start:0x021b1f04 end:0x021b1f40
@@ -137,6 +194,9 @@ src/jpn/overlay008/func_ov008_021b2120.c:
 src/jpn/overlay008/func_ov008_021b2144.s:
     complete
     .text start:0x021b2144 end:0x021b21c0
+src/jpn/overlay008/func_ov008_021b21c0.s:
+    complete
+    .text start:0x021b21c0 end:0x021b2288
 src/jpn/overlay008/func_ov008_021b2288.c:
     complete
     .text start:0x021b2288 end:0x021b2294
