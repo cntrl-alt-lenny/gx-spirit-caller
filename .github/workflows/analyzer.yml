@@ -33,6 +33,10 @@ jobs:
   pr-tier-delta:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [eur, usa, jpn]
+    continue-on-error: ${{ matrix.version != 'eur' }}
     permissions:
       contents: read
       pull-requests: write
@@ -58,23 +62,23 @@ jobs:
           git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
           git worktree add /tmp/main-tree origin/${{ github.event.pull_request.base.ref }}
           (cd /tmp/main-tree && python tools/analyze_symbols.py \
-              --version eur --no-outputs >/dev/null 2>&1 || true)
-          if [ -f /tmp/main-tree/build/eur/analysis/snapshot.json ]; then
-            cp /tmp/main-tree/build/eur/analysis/snapshot.json /tmp/main-snapshot.json
+              --version ${{ matrix.version }} --no-outputs >/dev/null 2>&1 || true)
+          if [ -f /tmp/main-tree/build/${{ matrix.version }}/analysis/snapshot.json ]; then
+            cp /tmp/main-tree/build/${{ matrix.version }}/analysis/snapshot.json /tmp/main-snapshot-${{ matrix.version }}.json
           else
-            echo '{}' > /tmp/main-snapshot.json
+            echo '{}' > /tmp/main-snapshot-${{ matrix.version }}.json
           fi
 
       - name: Analyze PR + compute diff
         run: |
           python tools/analyze_symbols.py \
-              --version eur \
+              --version ${{ matrix.version }} \
               --no-outputs \
-              --against /tmp/main-snapshot.json \
-              --diff-json /tmp/diff.json
+              --against /tmp/main-snapshot-${{ matrix.version }}.json \
+              --diff-json /tmp/diff-${{ matrix.version }}.json
 
       - name: Format diff as Markdown
-        run: python tools/ci_format_diff.py /tmp/diff.json -o /tmp/comment.md
+        run: python tools/ci_format_diff.py /tmp/diff-${{ matrix.version }}.json -o /tmp/comment-${{ matrix.version }}.md
 
       - name: Upsert PR comment
         env:
@@ -85,12 +89,16 @@ jobs:
         # See .github/scripts/upsert-pr-comment.sh for the rationale.
         run: |
           .github/scripts/upsert-pr-comment.sh \
-            '<sub>🤖 Posted by `.github/workflows/analyzer.yml`' \
-            /tmp/comment.md
+            '<sub>🤖 Posted by `.github/workflows/analyzer.yml` (${{ matrix.version }})' \
+            /tmp/comment-${{ matrix.version }}.md
 
   main-baseline:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [eur, usa, jpn]
+    continue-on-error: ${{ matrix.version != 'eur' }}
     permissions:
       contents: read
     steps:
@@ -106,4 +114,4 @@ jobs:
         run: pip install -r tools/requirements.txt
 
       - name: Run analyzer (validates config/ integrity)
-        run: python tools/analyze_symbols.py --version eur --no-outputs
+        run: python tools/analyze_symbols.py --version ${{ matrix.version }} --no-outputs

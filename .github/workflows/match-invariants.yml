@@ -39,6 +39,10 @@ jobs:
   pr-invariants:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [eur, usa, jpn]
+    continue-on-error: ${{ matrix.version != 'eur' }}
     permissions:
       contents: read
       pull-requests: write
@@ -61,18 +65,18 @@ jobs:
         run: |
           set +e
           python tools/check_match_invariants.py \
-              --version eur --json > /tmp/invariants.json
+              --version ${{ matrix.version }} --json > /tmp/invariants-${{ matrix.version }}.json
           check_exit=$?
           echo "check_exit=${check_exit}" >> "$GITHUB_OUTPUT"
           # errors count lives in the JSON — parse it so we know
           # whether to hard-fail the job later.
-          errors=$(python -c "import json; print(json.load(open('/tmp/invariants.json'))['errors'])")
+          errors=$(python -c "import json; print(json.load(open('/tmp/invariants-${{ matrix.version }}.json'))['errors'])")
           echo "errors=${errors}" >> "$GITHUB_OUTPUT"
 
       - name: Format report as Markdown
         run: |
           python tools/ci_format_invariants.py \
-              /tmp/invariants.json -o /tmp/comment.md
+              /tmp/invariants-${{ matrix.version }}.json -o /tmp/comment-${{ matrix.version }}.md
 
       - name: Upsert PR comment
         env:
@@ -81,8 +85,8 @@ jobs:
         # Shared upsert script — see .github/scripts/upsert-pr-comment.sh.
         run: |
           .github/scripts/upsert-pr-comment.sh \
-            '<sub>🤖 Posted by `.github/workflows/match-invariants.yml`' \
-            /tmp/comment.md
+            '<sub>🤖 Posted by `.github/workflows/match-invariants.yml` (${{ matrix.version }})' \
+            /tmp/comment-${{ matrix.version }}.md
 
       - name: Block merge on error-severity issues only
         # Warnings are informational (brief 003 intentional-placeholder
@@ -101,6 +105,10 @@ jobs:
   main-baseline:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [eur, usa, jpn]
+    continue-on-error: ${{ matrix.version != 'eur' }}
     permissions:
       contents: read
     steps:
@@ -121,10 +129,10 @@ jobs:
         # sneaking through with a missing_tu_source.
         run: |
           set +e
-          python tools/check_match_invariants.py --version eur --json > /tmp/invariants.json
-          errors=$(python -c "import json; print(json.load(open('/tmp/invariants.json'))['errors'])")
+          python tools/check_match_invariants.py --version ${{ matrix.version }} --json > /tmp/invariants-${{ matrix.version }}.json
+          errors=$(python -c "import json; print(json.load(open('/tmp/invariants-${{ matrix.version }}.json'))['errors'])")
           if [ "${errors}" -gt 0 ]; then
             echo "::error::Found ${errors} error-severity invariant issue(s) on main."
-            python tools/check_match_invariants.py --version eur
+            python tools/check_match_invariants.py --version ${{ matrix.version }}
             exit 1
           fi
