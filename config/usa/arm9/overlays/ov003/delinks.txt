@@ -27,6 +27,10 @@ src/usa/overlay003/func_ov003_021ca1d4.s:
 src/usa/overlay003/func_ov003_021ca1d8.s:
     complete
     .text start:0x021ca1d8 end:0x021ca1dc
+src/usa/overlay003/func_ov003_021ca1dc.s:
+    complete
+    .text start:0x021ca1dc end:0x021cba28
+
 src/usa/overlay003/func_ov003_021cba28.s:
     complete
     .text start:0x021cba28 end:0x021cbca4
@@ -85,7 +89,6 @@ src/usa/overlay003/func_ov003_021cd4ec.s:
 src/usa/overlay003/func_ov003_021cd6a0.s:
     complete
     .text start:0x021cd6a0 end:0x021ce3a8
-
 src/usa/overlay003/func_ov003_021ce3a8.s:
     complete
     .text start:0x021ce3a8 end:0x021cea48
