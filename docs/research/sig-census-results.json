@@ -1,0 +1,1575 @@
+{
+  "sample_size": 60,
+  "min_size": 32,
+  "seed": 1,
+  "regions": [
+    "usa",
+    "jpn"
+  ],
+  "cross_validate": true,
+  "elapsed_seconds": 182.2,
+  "results": [
+    {
+      "name": "func_ov002_0226b054",
+      "addr": 36089940,
+      "size": 64,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0226b054.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226af64",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226af64",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226af64",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226af64",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226af64",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226af64",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_02096434",
+      "addr": 34169908,
+      "size": 108,
+      "module": "main",
+      "source": "src/main/func_02096434.legacy.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02096340",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02096340",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02096340",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02096340",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02096340",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02096340",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021d79d0",
+      "addr": 35486160,
+      "size": 76,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021d79d0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021d78e0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021d78e0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021d78e0",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021d78e0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021d78e0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021d78e0",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov010_021b3998",
+      "addr": 35338648,
+      "size": 40,
+      "module": "ov010",
+      "source": "src/overlay010/func_ov010_021b3998.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "Task_PostLocked",
+      "addr": 33581052,
+      "size": 116,
+      "module": "main",
+      "source": "src/main/Task_PostLocked.c",
+      "sig_new_ok": false
+    },
+    {
+      "name": "func_02005d54",
+      "addr": 33578324,
+      "size": 88,
+      "module": "main",
+      "source": "src/main/func_02005d54.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02005d38",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02005d38",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02005d38",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02005d38",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02005d38",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02005d38",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021c9dac",
+      "addr": 35429804,
+      "size": 68,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021c9dac.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c9ccc",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021c9ccc",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c9ccc",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c9ccc",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021c9ccc",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c9ccc",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02252438",
+      "addr": 35988536,
+      "size": 108,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02252438.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "func_ov000_021ad3e8",
+      "addr": 35312616,
+      "size": 124,
+      "module": "ov000",
+      "source": "src/overlay000/func_ov000_021ad3e8.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ad308",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021ad308",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ad308",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ad308",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021ad308",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ad308",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov006_021c34c0",
+      "addr": 35402944,
+      "size": 204,
+      "module": "ov006",
+      "source": "src/overlay006/func_ov006_021c34c0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c33b4",
+          "twin_module": "overlay 6",
+          "port_to_region_target_name": "func_ov006_021c33b4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c33b4",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c33b4",
+          "twin_module": "overlay 6",
+          "port_to_region_target_name": "func_ov006_021c33b4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c33b4",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0220b0f8",
+      "addr": 35696888,
+      "size": 40,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0220b0f8.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220b008",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220b008",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220b008",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220b008",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220b008",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220b008",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov015_021b34a4",
+      "addr": 35337380,
+      "size": 40,
+      "module": "ov015",
+      "source": "src/overlay015/func_ov015_021b34a4.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "func_ov005_021aaea8",
+      "addr": 35303080,
+      "size": 88,
+      "module": "ov005",
+      "source": "src/overlay005/func_ov005_021aaea8.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aadc8",
+          "twin_module": "overlay 5",
+          "port_to_region_target_name": "func_ov005_021aadc8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aadc8",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aadc8",
+          "twin_module": "overlay 5",
+          "port_to_region_target_name": "func_ov005_021aadc8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aadc8",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_0206ccbc",
+      "addr": 34000060,
+      "size": 64,
+      "module": "main",
+      "source": "src/main/func_0206ccbc.legacy.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0206cc48",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0206cc48",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0206cc48",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0206cc48",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0206cc48",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0206cc48",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021d5be0",
+      "addr": 35478496,
+      "size": 112,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021d5be0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021d5af0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021d5af0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021d5af0",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021d5af0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021d5af0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021d5af0",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0226af58",
+      "addr": 36089688,
+      "size": 32,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0226af58.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226ae68",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226ae68",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226ae68",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226ae68",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226ae68",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226ae68",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0220444c",
+      "addr": 35669068,
+      "size": 64,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0220444c.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220435c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220435c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220435c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220435c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220435c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220435c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_0203c85c",
+      "addr": 33802332,
+      "size": 44,
+      "module": "main",
+      "source": "src/main/func_0203c85c.legacy_sp3.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0203c80c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0203c80c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0203c80c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0203c80c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0203c80c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0203c80c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0226db7c",
+      "addr": 36100988,
+      "size": 52,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0226db7c.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226da8c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226da8c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226da8c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0226da8c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0226da8c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0226da8c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "Ov015_RegisterCallbacks",
+      "addr": 35335160,
+      "size": 32,
+      "module": "ov015",
+      "source": "src/overlay015/Ov015_RegisterCallbacks.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "func_02031838",
+      "addr": 33757240,
+      "size": 108,
+      "module": "main",
+      "source": "src/main/func_02031838.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x020317e4",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_020317e4",
+          "port_to_region_confidence": "MEDIUM",
+          "port_to_region_predicted_addr": "0x020317e4",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x020317e4",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_020317e4",
+          "port_to_region_confidence": "MEDIUM",
+          "port_to_region_predicted_addr": "0x020317e4",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021c9f94",
+      "addr": 35430292,
+      "size": 56,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021c9f94.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c9eb4",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021c9eb4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c9eb4",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021c9eb4",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021c9eb4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021c9eb4",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov020_021aae0c",
+      "addr": 35302924,
+      "size": 60,
+      "module": "ov020",
+      "source": "src/overlay020/func_ov020_021aae0c.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aad2c",
+          "twin_module": "overlay 20",
+          "port_to_region_target_name": "func_ov020_021aad2c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aad2c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aad2c",
+          "twin_module": "overlay 20",
+          "port_to_region_target_name": "func_ov020_021aad2c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aad2c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021dc19c",
+      "addr": 35504540,
+      "size": 48,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dc19c.thumb.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbf88",
+          "twin_module": "overlay 4"
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbf88",
+          "twin_module": "overlay 4"
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021dd350",
+      "addr": 35509072,
+      "size": 34,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dd350.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dd13c",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021dd13c",
+          "port_to_region_confidence": "MEDIUM",
+          "port_to_region_predicted_addr": "0x021dd13c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dd13c",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021dd13c",
+          "port_to_region_confidence": "MEDIUM",
+          "port_to_region_predicted_addr": "0x021dd13c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_0208cd18",
+      "addr": 34131224,
+      "size": 36,
+      "module": "main",
+      "source": "src/main/func_0208cd18.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "func_ov021_021aa4a0",
+      "addr": 35300512,
+      "size": 116,
+      "module": "ov021",
+      "source": "src/overlay021/func_ov021_021aa4a0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aa3c0",
+          "twin_module": "overlay 21",
+          "port_to_region_target_name": "func_ov021_021aa3c0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aa3c0",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aa3c0",
+          "twin_module": "overlay 21",
+          "port_to_region_target_name": "func_ov021_021aa3c0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aa3c0",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021b0c04",
+      "addr": 35326980,
+      "size": 36,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021b0c04.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b0b24",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021b0b24",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b0b24",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b0b24",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021b0b24",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b0b24",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov011_021cc424",
+      "addr": 35439652,
+      "size": 164,
+      "module": "ov011",
+      "source": "src/overlay011/func_ov011_021cc424.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021cc360",
+          "twin_module": "overlay 11",
+          "port_to_region_target_name": "func_ov011_021cc360",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021cc360",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021cc360",
+          "twin_module": "overlay 11",
+          "port_to_region_target_name": "func_ov011_021cc360",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021cc360",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_022382ec",
+      "addr": 35881708,
+      "size": 64,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_022382ec.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x022381fc",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_022381fc",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x022381fc",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x022381fc",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_022381fc",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x022381fc",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_02006228",
+      "addr": 33579560,
+      "size": 60,
+      "module": "main",
+      "source": "src/main/func_02006228.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0200620c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0200620c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0200620c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0200620c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0200620c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0200620c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_0206bab0",
+      "addr": 33995440,
+      "size": 36,
+      "module": "main",
+      "source": "src/main/func_0206bab0.legacy.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0206ba3c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0206ba3c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0206ba3c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0206ba3c",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0206ba3c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0206ba3c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "ov002_0220c8b0",
+      "addr": 35702960,
+      "size": 32,
+      "module": "ov002",
+      "source": "src/overlay002/ov002_0220c8b0.c",
+      "sig_new_ok": false
+    },
+    {
+      "name": "func_ov004_021dc238",
+      "addr": 35504696,
+      "size": 148,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dc238.thumb.c",
+      "sig_new_ok": true,
+      "internal_census": "not_found",
+      "region_twins": {
+        "usa": {
+          "kind": "not_found"
+        },
+        "jpn": {
+          "kind": "not_found"
+        }
+      }
+    },
+    {
+      "name": "func_0203c824",
+      "addr": 33802276,
+      "size": 36,
+      "module": "main",
+      "source": "src/main/func_0203c824.legacy_sp3.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0203c7d4",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0203c7d4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0203c7d4",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0203c7d4",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_0203c7d4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0203c7d4",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021ce9b8",
+      "addr": 35449272,
+      "size": 44,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021ce9b8.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ce8d8",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021ce8d8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ce8d8",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ce8d8",
+          "twin_module": "overlay 4",
+          "port_to_region_target_name": "func_ov004_021ce8d8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ce8d8",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021b30f4",
+      "addr": 35336436,
+      "size": 88,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021b30f4.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b3014",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021b3014",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b3014",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b3014",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021b3014",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b3014",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021dbfa8",
+      "addr": 35504040,
+      "size": 42,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dbfa8.thumb.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbd94",
+          "twin_module": "overlay 4"
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbd94",
+          "twin_module": "overlay 4"
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02204ef0",
+      "addr": 35671792,
+      "size": 56,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02204ef0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02204e00",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02204e00",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02204e00",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02204e00",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02204e00",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02204e00",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0220052c",
+      "addr": 35652908,
+      "size": 128,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0220052c.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220043c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220043c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220043c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0220043c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0220043c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0220043c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021aea58",
+      "addr": 35318360,
+      "size": 36,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021aea58.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ae978",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021ae978",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ae978",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ae978",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021ae978",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ae978",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0223fd54",
+      "addr": 35913044,
+      "size": 32,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0223fd54.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0223fc6c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0223fc6c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0223fc6c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x0223fc6c",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_0223fc6c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x0223fc6c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_02095108",
+      "addr": 34165000,
+      "size": 40,
+      "module": "main",
+      "source": "src/main/func_02095108.legacy.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02095014",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02095014",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02095014",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02095014",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02095014",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02095014",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021dbe78",
+      "addr": 35503736,
+      "size": 38,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dbe78.thumb.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbc64",
+          "twin_module": "overlay 4"
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021dbc64",
+          "twin_module": "overlay 4"
+        }
+      }
+    },
+    {
+      "name": "Rand_Next",
+      "addr": 33694988,
+      "size": 52,
+      "module": "main",
+      "source": "src/main/Rand_Next.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x020224b8",
+          "twin_module": "ARM9 main"
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x020224b8",
+          "twin_module": "ARM9 main"
+        }
+      }
+    },
+    {
+      "name": "func_ov002_021ae680",
+      "addr": 35317376,
+      "size": 36,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_021ae680.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ae5a0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021ae5a0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ae5a0",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ae5a0",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_021ae5a0",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ae5a0",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02209004",
+      "addr": 35688452,
+      "size": 68,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02209004.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02208f14",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02208f14",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02208f14",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02208f14",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02208f14",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02208f14",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_022943c4",
+      "addr": 36258756,
+      "size": 44,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_022943c4.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x022942b4",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_022942b4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x022942b4",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x022942b4",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_022942b4",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x022942b4",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_02087fe0",
+      "addr": 34111456,
+      "size": 32,
+      "module": "main",
+      "source": "src/main/func_02087fe0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02087ef8",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02087ef8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02087ef8",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02087ef8",
+          "twin_module": "ARM9 main",
+          "port_to_region_target_name": "func_02087ef8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02087ef8",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_02095158",
+      "addr": 34165080,
+      "size": 40,
+      "module": "main",
+      "source": "libs/nitro/func_02095158.legacy.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_noop"
+        },
+        "jpn": {
+          "kind": "applied_noop"
+        }
+      }
+    },
+    {
+      "name": "func_ov000_021ac85c",
+      "addr": 35309660,
+      "size": 52,
+      "module": "ov000",
+      "source": "src/overlay000/func_ov000_021ac85c.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ac77c",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021ac77c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ac77c",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021ac77c",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021ac77c",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021ac77c",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov000_021af3f0",
+      "addr": 35320816,
+      "size": 48,
+      "module": "ov000",
+      "source": "src/overlay000/func_ov000_021af3f0.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021af304",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021af304",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021af304",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021af304",
+          "twin_module": "overlay 0",
+          "port_to_region_target_name": "func_ov000_021af304",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021af304",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02201a40",
+      "addr": 35658304,
+      "size": 44,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02201a40.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02201950",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02201950",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02201950",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02201950",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02201950",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02201950",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "Ov008_Rand",
+      "addr": 35300620,
+      "size": 52,
+      "module": "ov008",
+      "source": "src/overlay008/Ov008_Rand.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aa42c",
+          "twin_module": "overlay 8"
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aa42c",
+          "twin_module": "overlay 8"
+        }
+      }
+    },
+    {
+      "name": "func_ov002_0229126c",
+      "addr": 36246124,
+      "size": 56,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_0229126c.c",
+      "sig_new_ok": true,
+      "internal_census": "multiple",
+      "internal_clone_catalogued_in": [],
+      "internal_clone_is_new": true,
+      "region_twins": {
+        "usa": {
+          "kind": "multiple"
+        },
+        "jpn": {
+          "kind": "multiple"
+        }
+      }
+    },
+    {
+      "name": "func_ov004_021dc350",
+      "addr": 35504976,
+      "size": 104,
+      "module": "ov004",
+      "source": "src/overlay004/func_ov004_021dc350.thumb.c",
+      "sig_new_ok": true,
+      "internal_census": "not_found",
+      "region_twins": {
+        "usa": {
+          "kind": "not_found"
+        },
+        "jpn": {
+          "kind": "not_found"
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02285984",
+      "addr": 36198788,
+      "size": 48,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02285984.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02285874",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02285874",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02285874",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02285874",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02285874",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02285874",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov006_021b22c8",
+      "addr": 35332808,
+      "size": 92,
+      "module": "ov006",
+      "source": "src/overlay006/func_ov006_021b22c8.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b21c8",
+          "twin_module": "overlay 6",
+          "port_to_region_target_name": "func_ov006_021b21c8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b21c8",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021b21c8",
+          "twin_module": "overlay 6",
+          "port_to_region_target_name": "func_ov006_021b21c8",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021b21c8",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov018_021aad64",
+      "addr": 35302756,
+      "size": 44,
+      "module": "ov018",
+      "source": "src/overlay018/func_ov018_021aad64.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aac84",
+          "twin_module": "overlay 18",
+          "port_to_region_target_name": "func_ov018_021aac84",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aac84",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x021aac84",
+          "twin_module": "overlay 18",
+          "port_to_region_target_name": "func_ov018_021aac84",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x021aac84",
+          "port_to_region_agrees": true
+        }
+      }
+    },
+    {
+      "name": "func_ov002_02248f60",
+      "addr": 35950432,
+      "size": 124,
+      "module": "ov002",
+      "source": "src/overlay002/func_ov002_02248f60.c",
+      "sig_new_ok": true,
+      "internal_census": "applied_noop",
+      "region_twins": {
+        "usa": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02248e78",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02248e78",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02248e78",
+          "port_to_region_agrees": true
+        },
+        "jpn": {
+          "kind": "applied_rename",
+          "twin_addr": "0x02248e78",
+          "twin_module": "overlay 2",
+          "port_to_region_target_name": "func_ov002_02248e78",
+          "port_to_region_confidence": "HIGH",
+          "port_to_region_predicted_addr": "0x02248e78",
+          "port_to_region_agrees": true
+        }
+      }
+    }
+  ]
+}
