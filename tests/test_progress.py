@@ -22,6 +22,7 @@ from progress import (  # noqa: E402
     CODE_SECTIONS,
     DATA_SECTIONS,
     c_code_bytes,
+    c_code_total_bytes,
     count_functions_in_symbols,
     count_total_functions,
     parse_delinks_file,
@@ -409,12 +410,15 @@ class TestCCodeBytes(unittest.TestCase):
         self.assertEqual(c_code_bytes(root), 0x20)
 
     def test_incomplete_c_tu_still_counted(self):
-        # c_code_bytes is a pure "which file was this TU carved from"
-        # source-scan -- it does NOT gate on `complete` status the way
-        # summarize_delinks's matched_code does. An incomplete .c draft
-        # is still real C on disk (arguably readable, just not yet
-        # byte-verified) -- counting it is the documented behaviour
-        # inherited unchanged from generate_progress_bars.c_code_bytes.
+        # c_code_bytes's DEFAULT is a pure "which file was this TU
+        # carved from" source-scan -- it does NOT gate on `complete`
+        # status the way summarize_delinks's matched_code does. An
+        # incomplete .c draft is still real C on disk (arguably
+        # readable, just not yet byte-verified) -- counting it is the
+        # documented behaviour inherited unchanged from
+        # generate_progress_bars.c_code_bytes. Pass
+        # require_complete=True for the stricter view (see
+        # test_require_complete_excludes_incomplete below).
         root = self._make_config(
             "    .text       start:0x0 end:0x100 kind:code\n"
             "\n"
@@ -422,6 +426,31 @@ class TestCCodeBytes(unittest.TestCase):
             "    .text start:0x0 end:0x40\n"
         )
         self.assertEqual(c_code_bytes(root), 0x40)
+
+    def test_require_complete_excludes_incomplete(self):
+        # brief 566 / improvement-swarm r4 A3: the "no complete gate"
+        # variant -- require_complete=True gates out .c/.cpp TUs
+        # without status=='complete', the same status
+        # summarize_delinks's matched_code requires. An incomplete TU
+        # contributes 0 under this stricter view even though it still
+        # counts under the default (see test above).
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root, require_complete=True), 0)
+
+    def test_require_complete_still_counts_complete(self):
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_bytes(root, require_complete=True), 0x40)
 
     def test_walks_subtree(self):
         tmp = tempfile.mkdtemp()
@@ -434,6 +463,110 @@ class TestCCodeBytes(unittest.TestCase):
             d.mkdir(parents=True)
             (d / "delinks.txt").write_text(content)
         self.assertEqual(c_code_bytes(Path(tmp)), 0x10 + 0x20)
+
+    def test_gap_tu_after_c_tu_not_leaked(self):
+        # brief 566 / improvement-swarm r4 A3: regression test for the
+        # "ext-leak across _dsd_gap" bug in the old regex-based scan.
+        # The old implementation tracked "current TU's source
+        # extension" as a variable that persisted across TU
+        # boundaries; a `_dsd_gap@...` header never matched the
+        # src/libs regex, so it never reset that variable -- a gap
+        # TU's .text bytes immediately following a .c/.cpp TU got
+        # silently misattributed to C. parse_delinks_file scopes
+        # `source` per-TU, eliminating this by construction: only
+        # foo.c's own 0x40 bytes should count, never the gap's 0xc0.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+            "\n"
+            "_dsd_gap@mod_1:\n"
+            "    .text start:0x40 end:0x100\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40)
+
+    def test_gap_tu_between_two_c_tus_not_leaked(self):
+        # Same bug, sandwiched: a gap TU between two real .c TUs must
+        # not pick up either neighbour's extension.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x180 kind:code\n"
+            "\n"
+            "src/a.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+            "\n"
+            "_dsd_gap@mod_1:\n"
+            "    .text start:0x40 end:0x100\n"
+            "\n"
+            "src/b.c:\n"
+            "    complete\n"
+            "    .text start:0x100 end:0x180\n"
+        )
+        self.assertEqual(c_code_bytes(root), 0x40 + 0x80)  # a.c + b.c only
+
+
+class TestCCodeTotalBytes(unittest.TestCase):
+    """c_code_bytes()'s correct denominator (brief 566 / improvement-
+    swarm r4 A3): `.text`-only from the module-level section map,
+    NOT `.text` + `.init` like summarize_delinks's total_code. Pairing
+    the .text-only numerator against a .text+.init denominator
+    structurally caps the ratio below 100% even at full decomp --
+    these tests pin the .init-exclusion specifically."""
+
+    def _make_config(self, delinks_content: str) -> Path:
+        tmp = tempfile.mkdtemp()
+        arm9 = Path(tmp) / "arm9"
+        arm9.mkdir()
+        (arm9 / "delinks.txt").write_text(delinks_content)
+        return Path(tmp)
+
+    def test_no_delinks_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(c_code_total_bytes(Path(tmp)), 0)
+
+    def test_text_only_counted(self):
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "    .rodata     start:0x100 end:0x180 kind:rodata\n"
+        )
+        self.assertEqual(c_code_total_bytes(root), 0x100)
+
+    def test_init_excluded(self):
+        # The acute bug this function fixes: total_code (summarize_delinks)
+        # sums .text + .init (CODE_SECTIONS), but c_code_bytes' numerator
+        # never counts .init even when it's owned by a .c TU -- so this
+        # denominator must be .text ONLY, dropping .init entirely.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "    .init       start:0x100 end:0x140 kind:code\n"
+        )
+        self.assertEqual(c_code_total_bytes(root), 0x100)  # .init's 0x40 dropped
+
+    def test_ignores_tu_level_sections(self):
+        # Only the MODULE-level section map counts (matching total_code's
+        # own source) -- TU-level .text ranges (per-function, a subset
+        # of the module total) must not be double-counted on top.
+        root = self._make_config(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/foo.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        self.assertEqual(c_code_total_bytes(root), 0x100)
+
+    def test_walks_subtree(self):
+        tmp = tempfile.mkdtemp()
+        for sub, content in (
+            ("arm9", "    .text start:0x0 end:0x100 kind:code\n"),
+            ("arm9/overlays/ov002", "    .text start:0x0 end:0x80 kind:code\n"),
+        ):
+            d = Path(tmp) / sub
+            d.mkdir(parents=True)
+            (d / "delinks.txt").write_text(content)
+        self.assertEqual(c_code_total_bytes(Path(tmp)), 0x100 + 0x80)
 
 
 class TestReportJsonRoundtrip(unittest.TestCase):

@@ -35,7 +35,11 @@ from generate_heatmap import (  # noqa: E402
 # improvement-swarm r3 REFRAME) — lives in progress.py (the root of this
 # import chain: progress <- generate_heatmap <- generate_progress_bars) so
 # progress.py's own text/JSON reporter can carry the same honest 4th metric.
-from progress import c_code_bytes  # noqa: E402
+# c_code_total_bytes is its paired `.text`-only denominator (brief 566,
+# improvement-swarm r4 A3) — c_code_bytes' numerator never counts `.init`
+# even for a .c-sourced TU that owns some, so dividing by the `.text`+
+# `.init` total_code below would structurally cap this ratio under 100%.
+from progress import c_code_bytes, c_code_total_bytes  # noqa: E402
 
 # (config dir name, display label, game code)
 REGIONS = [("eur", "EUR", "AYXP"), ("usa", "USA", "AYXE"), ("jpn", "JPN", "AYXJ")]
@@ -59,10 +63,12 @@ def region_metrics(version: str) -> dict:
     report = synthesize_report_from_delinks(ROOT / "config" / version)
     m = report["measures"] if report else {}
     matched, total = as_int(m.get("matched_code")), as_int(m.get("total_code"))
-    c = c_code_bytes(ROOT / "config" / version)
+    config_dir = ROOT / "config" / version
+    c = c_code_bytes(config_dir)
+    c_total = c_code_total_bytes(config_dir)
     return {
         "matched_pct": matched / total if total else 0.0,
-        "c_pct": c / total if total else 0.0,
+        "c_pct": c / c_total if c_total else 0.0,
         "matched": matched,
         "c": c,
         "total": total,
