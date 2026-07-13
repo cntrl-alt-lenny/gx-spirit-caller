@@ -7159,7 +7159,6 @@ src/jpn/main/func_02066708.s:
 src/jpn/main/func_02066774.s:
     complete
     .text start:0x02066774 end:0x02066950
-
 src/jpn/main/func_02066950.s:
     complete
     .text start:0x02066950 end:0x02066a14
@@ -9414,6 +9413,10 @@ src/jpn/main/func_02082704.s:
 src/jpn/main/func_02082774.s:
     complete
     .text start:0x02082774 end:0x020827cc
+src/jpn/main/func_020827cc.s:
+    complete
+    .text start:0x020827cc end:0x02082b5c
+
 src/jpn/main/func_02082b5c.s:
     complete
     .text start:0x02082b5c end:0x02082e7c
