@@ -35,9 +35,10 @@ described the dead `ninja rom`/24-of-27 gate). Deferred (low-value): the `docs/s
 none of them track "readable C." `python tools/progress.py --version <ver>`
 now prints a 4th line, `C-decompiled`, computed straight from committed
 `delinks.txt` (no build needed). Going-forward convention: report
-**units/fn/code/C** (4 numbers), not 3. Current 4-metric snapshot (delinks
-tier, 2026-07-09): **EUR code 97.41% / C 7.92%; USA code 73.82% / C 7.01%;
-JPN code 68.59% / C 7.01%.** Readable-C is early-stage (~7-8%) and is a
+**units/fn/code/C** (4 numbers), not 3. The prior 2026-07-09 snapshot is
+superseded. Current snapshot (committed delinks tier, build-free, 2026-07-12):
+**EUR code 97.41% / C 7.99%; USA code 89.83% / C 7.08%; JPN code 89.83% /
+C 7.08%.** Readable-C is early-stage (~7-8%) and is a
 SEPARATE goal from the `.s` drain (which is close to done on the
 byte-matched-coverage metric) — don't conflate the two, and don't sell a
 `.s`→C port chapter on the headline % (EUR→USA/JPN porting is metric-neutral
@@ -92,22 +93,17 @@ sha1-proven `.c` from `bd74e172^` (+ reconfigure) → JPN green. **LESSON
 can mask missing-source breaks; the brain's clean-tree 3-region gate is the
 only reliable arbiter. Also: a port wave's commit should never delete files
 outside its stated scope — watch for neighbor-sweep in `git add -A` commits.**
-**Metrics (post b515-518, FRESH — first accurate USA/JPN numbers since June):**
-EUR units **99.11%** / fn **98.72%** / code **97.50%** — endgame. **USA units
-89.08% / fn 76.21% / code 49.17%; JPN units 88.63% / fn 74.83% / code 48.10%**
-(vs stale June 72/38/14 — the PC arc's completed `.s` drain + port waves are now
-measured). ⚠️ **CORRECTED 2026-07-09 (brief 561, improvement-swarm r3 finding
-#2): the `code 49.17% / 48.10%` figures above were ~25pp STALE** — they came
-from a gitignored machine-local `build/<ver>/report.json` that hadn't been
-regenerated since before several drain waves landed. The COMMITTED
-`config/<ver>/**/delinks.txt` tier (always current, no build required —
-`python tools/progress.py --version <ver>`) says **USA code 73.82%, JPN code
-68.59%** as of this correction. Going forward, treat any `report.json`-sourced
-number older than the current session with suspicion; the delinks tier is the
-trustworthy no-build fallback. ⚠️ **Also new as of brief 561: `units` / `fn` /
-`code` all count a `.s` ship identically to a real C match, so none of them
-track "readable C" as a goal — see the next paragraph for the 4th metric that
-does.** ⚠️ USA/JPN reports were BLOCKED by a NEW objdiff-cli panic variant
+**Metrics (committed delinks tier, build-free, 2026-07-12; Brief 565):** EUR
+units **100.00%** / fn **not emitted by build-free progress.py** / code
+**97.41%** / C-decompiled **7.99%**. **USA units 100.00% / fn not emitted by
+build-free progress.py / code 89.83% / C-decompiled 7.08%; JPN units 100.00%
+/ fn not emitted by build-free progress.py / code 89.83% / C-decompiled 7.08%**.
+The committed `config/<ver>/**/delinks.txt` tier is the no-build source of
+truth; do not substitute function percentages from a machine-local
+`report.json`. ⚠️ **Also new as of brief 561: `units` / `fn` / `code` all count
+a `.s` ship identically to a real C match, so none of them track "readable C"
+as a goal — the C-decompiled metric above does.** ⚠️ USA/JPN reports were
+BLOCKED by a NEW objdiff-cli panic variant
 (arm.rs:130 `len 1/idx -1`): a gap TU with data-FIRST `.text` (`BuildInfo` OBJECT
 at 0x0 before `main` FUNC, no mapping symbols — USA `_dsd_gap@main_202.o`).
 Brain shipped **objdiff_filter_panic_units v3** (drop data-first `.text` units;
