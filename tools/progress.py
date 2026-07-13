@@ -30,7 +30,6 @@ need to know which source was used.
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -162,11 +161,7 @@ def parse_delinks_file(delinks_file: Path) -> tuple[list[tuple[str, int, int]], 
     return module_sections, tus
 
 
-_C_SRC_HDR = re.compile(r"^\s*(?:src|libs)/\S+\.(c|cpp|s):\s*$")
-_C_TEXT_RANGE = re.compile(r"\.text\s+start:0x([0-9a-fA-F]+)\s+end:0x([0-9a-fA-F]+)")
-
-
-def c_code_bytes(config_dir: Path) -> int:
+def c_code_bytes(config_dir: Path, *, require_complete: bool = False) -> int:
     """Sum of `.text` bytes for TUs sourced from a `.c`/`.cpp` file (never
     `.s`) across every `config_dir/**/delinks.txt`.
 
@@ -174,26 +169,72 @@ def c_code_bytes(config_dir: Path) -> int:
     give you: both of those count a `.s` ship (a byte-identical assembly
     escape hatch, never hand-decompiled) identically to a real C match —
     see the improvement-swarm r3 report's REFRAME finding. `c_code_bytes`
-    is the true "readable C" numerator; call it against the same
-    `total_code` denominator `summarize_delinks` returns for the % line.
+    is the true "readable C" numerator; pair it against
+    `c_code_total_bytes`'s `.text`-only denominator for the % line (NOT
+    `summarize_delinks`'s `total_code`, which also includes `.init` —
+    see `c_code_total_bytes`'s docstring for why that mismatch matters).
+
+    Pass `require_complete=True` for the stricter "verified byte-
+    matching only" view (gates on `status == "complete"`, the same
+    status `summarize_delinks` requires for `matched_code`). The
+    default (`False`) counts any `.c`/`.cpp`-sourced TU regardless of
+    match state — an in-progress draft is still real C on disk,
+    arguably readable, just not yet byte-verified.
 
     No build required — same delinks.txt-only data source as
     `summarize_delinks`. Originally lived in `generate_progress_bars.py`
     (which now imports it from here) — moved to `progress.py` so the
     headline text/JSON reporter can carry the same honest number, not
     just the SVG badge.
+
+    Uses the canonical `parse_delinks_file` (brief 566 / improvement-
+    swarm r4 A3) rather than a bespoke regex scan — the earlier regex
+    tracked "current TU's source extension" as a variable that
+    persisted across TU boundaries, so a `_dsd_gap@...` TU immediately
+    following a `.c`/`.cpp` TU had its `.text` bytes silently
+    misattributed to C (gap TU headers never match the src/libs regex,
+    so the leaked `ext` value was never reset). Iterating `tus` gives
+    each TU its own correctly-scoped `source` field, eliminating that
+    leak by construction.
     """
     total = 0
     for delinks in config_dir.rglob("delinks.txt"):
-        ext = None
-        for line in delinks.read_text(encoding="utf-8", errors="ignore").splitlines():
-            m = _C_SRC_HDR.match(line)
-            if m:
-                ext = m.group(1)
+        _module_sections, tus = parse_delinks_file(delinks)
+        for tu in tus:
+            source = tu.get("source", "")
+            if not (source.endswith(".c") or source.endswith(".cpp")):
                 continue
-            t = _C_TEXT_RANGE.search(line)
-            if t and ext in ("c", "cpp"):
-                total += int(t.group(2), 16) - int(t.group(1), 16)
+            if require_complete and tu.get("status") != "complete":
+                continue
+            for name, start, end in tu.get("sections", []):
+                if name == ".text":
+                    total += max(0, end - start)
+    return total
+
+
+def c_code_total_bytes(config_dir: Path) -> int:
+    """Sum of `.text`-only bytes from the MODULE-LEVEL section map
+    across every `config_dir/**/delinks.txt` — the correct denominator
+    for `c_code_bytes()`'s ratio (brief 566 / improvement-swarm r4 A3).
+
+    `summarize_delinks`'s `total_code` sums `.text` + `.init`
+    (`CODE_SECTIONS`), which is right for the "byte-matched" line
+    (`.init` genuinely is code, and a `.s` or `.c` TU can occupy
+    either section). But `c_code_bytes()`'s numerator only ever scans
+    `.text` ranges — even for a `.c`/`.cpp` TU that also owns `.init`
+    bytes (e.g. `sinit_*.c` static-initializer glue) — so pairing that
+    numerator against a `.text`+`.init` denominator means the ratio
+    can never reach 100% even at full decomp: it's structurally capped
+    at `1 - init_bytes/total_code` (~99.907% for EUR at the time of
+    writing). This function gives the `.text`-only total so both sides
+    of the ratio count exactly the same section set.
+    """
+    total = 0
+    for delinks in config_dir.rglob("delinks.txt"):
+        module_sections, _tus = parse_delinks_file(delinks)
+        for name, start, end in module_sections:
+            if name == ".text":
+                total += max(0, end - start)
     return total
 
 
@@ -295,12 +336,16 @@ def print_report(version: str, report: dict, config_dir: Path | None = None) -> 
     print(f"  units:  {units_done:>10} / {units_total:<10}        ({pct(units_done, units_total):5.2f}%)")
     # 4th line (improvement-swarm r3 REFRAME): code/data/units above all
     # count a `.s` ship identically to a real C match, so none of them
-    # can see the "readable C" goal. c_code_bytes is the true numerator —
-    # same total_code denominator, but only .c/.cpp-sourced bytes counted.
+    # can see the "readable C" goal. c_code_bytes is the true numerator.
+    # Denominator is c_code_total_bytes (`.text`-only), NOT code_total
+    # (`.text`+`.init`) — pairing the .text-only numerator against a
+    # .text+.init denominator structurally caps the ratio below 100%
+    # even at full decomp (brief 566 / improvement-swarm r4 A3).
     if config_dir is not None:
         c_matched = c_code_bytes(config_dir)
-        print(f"  C-decompiled: {c_matched:>10} / {code_total:<10} bytes  "
-              f"({pct(c_matched, code_total):5.2f}%)  <- true readable-C metric, "
+        c_total = c_code_total_bytes(config_dir)
+        print(f"  C-decompiled: {c_matched:>10} / {c_total:<10} bytes  "
+              f"({pct(c_matched, c_total):5.2f}%)  <- true readable-C metric, "
               f"distinct from 'code' above (which also counts .s ships)")
     print()
 
@@ -330,6 +375,7 @@ def main() -> int:
         if args.json:
             payload = dict(report)
             payload["c_code_bytes"] = c_code_bytes(config_dir)
+            payload["c_code_total_bytes"] = c_code_total_bytes(config_dir)
             json.dump(payload, sys.stdout, indent=2)
             print()
         else:
@@ -346,6 +392,7 @@ def main() -> int:
             # the provenance without changing their measures-reading code.
             payload = {"version": args.version, "state": "delinks",
                        "c_code_bytes": c_code_bytes(config_dir),
+                       "c_code_total_bytes": c_code_total_bytes(config_dir),
                        **delinks_summary}
             json.dump(payload, sys.stdout, indent=2)
             print()
