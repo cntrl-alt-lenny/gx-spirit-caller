@@ -36,7 +36,7 @@ src/jpn/overlay022/func_ov022_021ab310.s:
 src/jpn/overlay022/func_ov022_021ab380.s:
     complete
     .text start:0x021ab380 end:0x021ab3d0
-src/jpn/overlay022/func_ov022_021ab3d0.s:
+src/jpn/overlay022/func_ov022_021ab3d0.c:
     complete
     .text start:0x021ab3d0 end:0x021ab4e8
 src/jpn/overlay022/func_ov022_021ab4e8.s:
