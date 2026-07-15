@@ -198,10 +198,16 @@ class TestIntegrationRealConfig(unittest.TestCase):
         names = {n for n, _, _ in pm["ov002"]}
         # brief 277 shipped func_ov002_021ae400 → claimed in delinks → MATCHED
         self.assertNotIn("func_ov002_021ae400", names)
-        # a known still-unmatched pick: 021d91e0 (brief 276) has since been
-        # carved, so use the persistent 022b867c data-blob residue (brief 488 —
-        # an embedded data table that needs a whole-function-as-data carve)
-        self.assertIn("func_ov002_022b867c", names)
+        # a known still-unmatched pick: 021d91e0 (brief 276) was carved, then
+        # the fallback fixture 022b867c (brief 488's data-blob residue) was
+        # ALSO shipped by brief 572's EUR closeout — as of that brief, EUR
+        # ov002 has NO function residue at all. Assert that stronger fact:
+        # whatever remains uncarved is only __sinit_* static-initializer stubs.
+        self.assertTrue(names, "census should still see the __sinit residue")
+        non_sinit = {n for n in names if not n.startswith("__sinit_ov002_")}
+        self.assertEqual(non_sinit, set(),
+                         "EUR ov002 grew NEW non-__sinit residue (regression "
+                         "vs the brief-572 fully-carved state)")
 
 
 if __name__ == "__main__":
