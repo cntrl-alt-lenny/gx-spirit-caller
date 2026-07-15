@@ -1,10 +1,14 @@
-# Superseded c-match-prep scaffolds (Brief 567)
+# Superseded c-match-prep scaffolds (Brief 581)
 
-The following prep scaffolds have the same address as a real decompiled C
-source file matching `src/**/func_<addr>*.c`. They are listed for review only;
-no scaffold files were deleted.
+This is the complete build-free address census from the 3,990 files under `docs/research/c-match-prep/`. A scaffold is superseded when its eight-digit
+address appears in any tracked real C filename under `src/**/*.c`, including
+`func_<addr>.c`, `.legacy.c`, `.thumb.c`, `.legacy_sp3.c`, overlay names,
+and USA/JPN variants.
 
-**Count: 360 superseded scaffolds.**
+**Count: 473 superseded scaffolds.** Brief 567 reported 45; this
+full address-based diff adds **428** (473/45 total).
+The remaining prep files are kept as reference because their addresses still
+have no real `.c` filename match.
 
 ## Addresses
 
@@ -53,16 +57,30 @@ no scaffold files were deleted.
 0208f2f4 0208f3e4 0208f52c 0208f6b0 0208f718 0208f780 0208f7e8 0208f850
 0208f8b8 0208f920 0208f988 0208f9f0 0208fa58 0208fac0 0208fb28 0208fb90
 0208fbf8 0208fc60 0208fcc8 0208fdf0 0208feb4 0208ff1c 0208ff84 020918d0
-02091a0c 020920bc 02092154 02092388 0209268c 0209d664 020a5d74 021d2ca8
+02091a0c 020920bc 02092154 02092388 0209268c 0209d664 020a5d74 021aa540
+021aa700 021aa840 021aab7c 021aafa4 021ab3ac 021add24 021ae674 021b0b54
+021b2280 021b2314 021b23f4 021b26d0 021b26ec 021b2824 021b287c 021b299c
+021b2b08 021b2b80 021b2c8c 021b30f0 021b3240 021b359c 021b35e4 021b36bc
+021b3ca8 021b3d7c 021b3dd0 021b3ea0 021b3ecc 021b3f5c 021b3fd8 021b4040
+021b5390 021b6250 021b8bf4 021b9000 021c34c0 021c4574 021c52b8 021c5a5c
+021c669c 021c6998 021c6a58 021c6d8c 021c6ff8 021c7110 021c9d60 021c9d8c
+021c9da0 021ca3f0 021cb518 021cb778 021cd574 021ced78 021d0ed0 021d0f38
+021d1158 021d1ce8 021d2ca8 021d2d18 021d4834 021d5a90 021d9778 021dbf14
+021dec2c 021e28fc 021e2b1c 021e358c 021f5090 021f6304 021f6704 021f7f08
+022005ac 022029e0 02203580 0220aad0 0220dba4 022123fc 0226af38 0226af58
+0226af78 0226af94 0226afb4 0226afd0 0226aff0 0226b034 0226b094 0226b0b0
+0226b0d0 0226b13c 0226b158 0226b174 0226b194 0226b258 0226b298 0227d684
+0227d850 022806a4 02281920 02285d68 02285df0 022862cc 02286fb8 02287474
+022875c4 02287774 022952dc 022963c4 02296428 022965c0 02296690 02296ac0
+0229cd70
 ```
 
 ## Mechanical check
 
-- Prep input: the 3,990 address-named `.c` files in
-  `docs/research/c-match-prep/`.
-- Match input: recursive `src/**` C filenames beginning with
-  `func_<addr>`.
-- The repo-root `.ignore` entry keeps the prep library tracked while making
-  default `rg`/Grep searches skip it.
-- This is an inventory only. No prep or source files were deleted or edited,
-  and no build or baserom was used.
+- Prep input: 3,990 unique address-named `.c` files.
+- Match input: tracked `src/**/*.c` filenames, matched by address rather than
+  exact filename. This includes thumb, legacy, legacy_sp3, overlay, USA, and
+  JPN naming variants.
+- `build.ninja` contains no `c-match-prep` reference.
+- This ledger is the pre-prune inventory; Brief 581 prunes exactly these
+  superseded scaffolds and leaves the unmatched reference files.
