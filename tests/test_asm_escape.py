@@ -30,6 +30,7 @@ from asm_escape import (  # noqa: E402
     emit_asm,
     hex_imm,
     is_commutative_swap,
+    is_single_reg_push_pop,
     parse_objdump,
     pool_addrs,
     resolve_absorbed_substitutions,
@@ -174,6 +175,28 @@ _DATAASCODE = """\
    c:\teef0f0f0 \tcdple\t15, 13, cr13, cr15, cr0, {7}
 """
 
+# brief 577 autopsy: an embedded data table whose words objdump can't decode
+# as ANY instruction at all -- the `@ <UNDEFINED> instruction: 0x...>`
+# comment IS the entire "mnemonic" text, which parse_objdump's `@`-comment
+# strip (correctly, for every OTHER word) reduces to an empty mnem.
+_UNDEFDATA = """\
+00000000 <func_undef>:
+   0:\te12fff1e \tbx\tlr
+   4:\tf9fafbfc \t\t\t@ <UNDEFINED> instruction: 0xf9fafbfc
+   8:\te3a00000 \tmov\tr0, #0
+"""
+
+# brief 577 autopsy: a single-register push/pop using the dedicated
+# STR/LDR pre/post-indexed encoding (0xE52D0004 / 0xE49D0004) -- objdump
+# ALIAS-PRINTS this identically to a STMDB/LDMIA-based push/pop, but
+# `to_mwasm`'s push/pop handling always assembles to the STMDB/LDMIA form.
+_SINGLEREGPUSHPOP = """\
+00000000 <func_pushpop1>:
+   0:\te52de004 \tpush\t{lr}
+   4:\te3a00000 \tmov\tr0, #0
+   8:\te49df004 \tpop\t{pc}
+"""
+
 
 class TestDataAsCode(unittest.TestCase):  # brief 488
     def test_regex_matches_data_as_code(self):
@@ -199,6 +222,62 @@ class TestDataAsCode(unittest.TestCase):  # brief 488
         self.assertIn(".word 0xeef0f0f0", s)      # cdp data word
         for bogus in ("svclt", "ldc2l", "cdple"):  # un-assemblable mnemonics gone
             self.assertNotIn(bogus, s)
+
+
+class TestUndefinedAsCode(unittest.TestCase):  # brief 577 autopsy
+    """A word objdump can't decode at all reduces to an empty `mnem` after
+    parse_objdump strips its `@ <UNDEFINED> instruction: ...>` comment — the
+    pre-fix behaviour silently emitted a blank line (the word vanished from
+    the reassembled output entirely); post-fix it's a raw `.word`, same as
+    the other data-as-code shapes."""
+
+    def test_parse_objdump_undefined_word_has_empty_mnem(self):
+        words = parse_objdump(_UNDEFDATA, "func_undef")
+        undef = next(w for w in words if w["addr"] == 0x4)
+        self.assertEqual(undef["mnem"], "")
+
+    def test_emit_undefined_word_as_raw_word_not_blank(self):
+        s = emit_asm("func_undef", parse_objdump(_UNDEFDATA, "func_undef"), whole=True)
+        self.assertIn("bx lr", s)
+        self.assertIn(".word 0xf9fafbfc", s)
+        self.assertIn("mov r0, #0x0", s)
+        # no blank body line where the undefined word's mnem used to vanish to
+        body_lines = s.splitlines()[s.splitlines().index("func_undef:") + 1:]
+        self.assertTrue(all(ln.strip() for ln in body_lines), body_lines)
+
+
+class TestSingleRegPushPop(unittest.TestCase):  # brief 577 autopsy
+    def test_detects_single_reg_push(self):
+        self.assertTrue(is_single_reg_push_pop("e52de004"))  # str lr, [sp, #-4]!
+        self.assertTrue(is_single_reg_push_pop("e52d0004"))  # str r0, [sp, #-4]! (Rd=0)
+
+    def test_detects_single_reg_pop(self):
+        self.assertTrue(is_single_reg_push_pop("e49df004"))  # ldr pc, [sp], #4
+        self.assertTrue(is_single_reg_push_pop("e49d0004"))  # ldr r0, [sp], #4 (Rd=0)
+
+    def test_skips_multi_register_block_transfer(self):
+        # the ordinary stmdb/ldmia-based push {r4, lr} / pop {r4, pc} the
+        # _LOOP fixture already exercises must NOT be caught by this check
+        self.assertFalse(is_single_reg_push_pop("e92d4010"))  # push {r4, lr}
+        self.assertFalse(is_single_reg_push_pop("e8bd8010"))  # pop {r4, pc}
+
+    def test_skips_unrelated_encoding(self):
+        self.assertFalse(is_single_reg_push_pop("e3a00000"))  # mov r0, #0
+
+    def test_emit_single_reg_push_pop_as_raw_word(self):
+        s = emit_asm("func_pushpop1", parse_objdump(_SINGLEREGPUSHPOP, "func_pushpop1"),
+                    whole=True)
+        self.assertIn(".word 0xe52de004", s)
+        self.assertIn(".word 0xe49df004", s)
+        self.assertIn("mov r0, #0x0", s)
+        self.assertNotIn("stmdb", s)
+        self.assertNotIn("ldmia", s)
+
+    def test_emit_multi_reg_push_pop_unaffected(self):
+        # _LOOP's push {r4, lr} must still translate normally (regression
+        # guard: this fix must not touch the common multi-register case)
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True)
+        self.assertIn("stmdb sp!, {r4, lr}", s)
 
 
 class TestCommutativeSwap(unittest.TestCase):
@@ -332,6 +411,27 @@ class TestWholeFunction(unittest.TestCase):
         self.assertIn("escape hatch (brief 290)", s)
         self.assertNotIn("GLOBAL_ASM", s)
         self.assertNotIn(".L_", s)
+
+    def test_base_addr_none_reproduces_prior_output_exactly(self):
+        # omitted base_addr (every caller before brief 577) must be byte-for-
+        # byte identical to today's output -- no absolute labels appear
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True)
+        self.assertNotIn(".L_1000", s)
+
+    def test_base_addr_adds_absolute_labels_alongside_relative_ones(self):
+        # brief 577 autopsy: an already-existing external file can branch
+        # directly into a mid-function entry point of a compiler-tail-merged
+        # function, via dsd's `.L_<absolute-hex-addr>` convention -- only a
+        # whole-function carve of the MERGED function can define that label,
+        # since the entry point isn't its own symbol.
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True,
+                    base_addr=0x1000)
+        self.assertIn(".L_8:", s)         # relative internal-branch label kept
+        self.assertIn(".L_1c:", s)
+        self.assertIn(".L_1008:", s)      # NEW: absolute label at the same word
+        self.assertIn(".L_101c:", s)
+        self.assertIn("b .L_8", s)        # internal branches still use the
+        self.assertIn("bge .L_1c", s)     # relative label, unaffected
 
 
 class TestDisasmZeroFlag(unittest.TestCase):
