@@ -8,9 +8,22 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-09 (Mac, Claude-only: brain=Opus, both agents=Claude Code),
-**re-synced after a Windows-brain stint — origin/main (`86c660a5`) canonical, local main
-ff'd to it.** The Windows brain merged **b550** (drain w7: 300 shipped, first LIVE confirmation
+**Last updated:** 2026-07-15 (Mac, brain=Opus; **4-agent roster: 2× Codex GPT-5.6 Luna on
+mechanical recipe lanes + 2× Claude Sonnet on judgment lanes** — Luna is the GPT-5.6 nano
+tier, so per the model-notes invariant it gets gate-protected grind only). **Re-synced after
+an away stint (PC brain ran briefs 556-574).** This round: reviewed + merged the 4 waiting
+PRs on one integration branch, gated by `tools/gate3.py` — **#1134** (b563, post-ov002 sweep
+waves 3-10, 1,024 shipped, every wave self-gated; genuine `main` floor = 7 funcs/region
+parked), **#1143** (b572, EUR floor closeout 77/77 — EUR done except 2 data blobs
+`020b2d2c`/`020b3c78`), **#1142** (b574 coverage tracker), **#1141** (b573 Defender guide).
+**AGENTS.md put on the Codex 32KB instruction-cap diet** (43.9KB → 31.9KB: model notes /
+brain onboarding / worktree mechanism B / wine-macos moved verbatim to `docs/agents/*`;
+integrity-controls section untouched) — the trigger fired because Codex is back in the
+roster. Queue: **b575** Luna wave-11 ov002 mop-up (the ONE wine lane), **b576** Luna
+endgame ledger (wine-free census), **b577** Sonnet `main`-floor autopsy (wine-free, b549
+pattern), **b578** Sonnet EUR data-blob emitter (wine-free tool+tests).
+
+**Previously (2026-07-09):** The Windows brain merged **b550** (drain w7: 300 shipped, first LIVE confirmation
 of the b549 fix — the previously-"walled" C-absorbed funcs shipped) + **b551** (post-ov002 work
 order). CHAPTER: USA/JPN `.s` drain. ov002: **7 waves = 2,100 ov002 `.s`**; ~405 USA + 521 JPN
 remain (~3 waves), then the b551 turnkey **10-wave POST-ov002 sweep**
