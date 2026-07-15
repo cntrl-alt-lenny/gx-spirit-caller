@@ -416,22 +416,53 @@ class TestWholeFunction(unittest.TestCase):
         # omitted base_addr (every caller before brief 577) must be byte-for-
         # byte identical to today's output -- no absolute labels appear
         s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True)
-        self.assertNotIn(".L_1000", s)
+        self.assertNotIn(".L_02021000", s)
 
     def test_base_addr_adds_absolute_labels_alongside_relative_ones(self):
         # brief 577 autopsy: an already-existing external file can branch
         # directly into a mid-function entry point of a compiler-tail-merged
         # function, via dsd's `.L_<absolute-hex-addr>` convention -- only a
         # whole-function carve of the MERGED function can define that label,
-        # since the entry point isn't its own symbol.
+        # since the entry point isn't its own symbol. Real ROM address (the
+        # exact one this autopsy hit) so the zero-padding regression below
+        # is against a realistic, not a round, value.
         s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True,
-                    base_addr=0x1000)
-        self.assertIn(".L_8:", s)         # relative internal-branch label kept
+                    base_addr=0x02020fa4)
+        self.assertIn(".L_8:", s)             # relative internal-branch label kept
         self.assertIn(".L_1c:", s)
-        self.assertIn(".L_1008:", s)      # NEW: absolute label at the same word
-        self.assertIn(".L_101c:", s)
-        self.assertIn("b .L_8", s)        # internal branches still use the
-        self.assertIn("bge .L_1c", s)     # relative label, unaffected
+        self.assertIn(".L_02020fac:", s)      # NEW: absolute label at the same word
+        self.assertIn(".L_02020fc0:", s)
+        self.assertIn("b .L_8", s)            # internal branches still use the
+        self.assertIn("bge .L_1c", s)         # relative label, unaffected
+
+    def test_base_addr_labels_are_zero_padded_to_8_hex_digits(self):
+        # regression guard: a real mwldarm link failed against the FIRST cut
+        # of this fix (Python's unpadded `:x` produced `.L_2020fac`) because
+        # dsd's own placeholder-symbol convention for these is the full
+        # zero-padded 32-bit address (`.L_02020fac`) -- a different string,
+        # so the unpadded form left the external reference just as undefined
+        # as no label at all. Confirmed against the real assembler+linker
+        # before this test was written (see the brief-577 report).
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True,
+                    base_addr=0x02020fa4)
+        self.assertNotIn(".L_2020fac", s)     # unpadded form must not appear
+        self.assertNotIn(".L_2020fc0", s)
+
+    def test_base_addr_labels_are_declared_global(self):
+        # a label is LOCAL by default -- mwasmarm only exports one that's
+        # also declared `.global` (confirmed empirically against the real
+        # assembler: an un-globaled `.L_<addr>` assembles fine but stays out
+        # of the object's symbol table, so an external cross-file reference
+        # to it still comes back Undefined at link time).
+        s = emit_asm("func_loop", parse_objdump(_LOOP, "func_loop"), whole=True,
+                    base_addr=0x02020fa4)
+        self.assertIn("        .global .L_02020fac", s)
+        self.assertIn("        .global .L_02020fc0", s)
+        # every non-pool instruction address gets one, not just detected
+        # internal branch targets -- an external reference could target ANY
+        # instruction in the merged function, not only ones this function's
+        # own control flow happens to jump to.
+        self.assertIn("        .global .L_02020fa4", s)  # the function's own first word
 
 
 class TestDisasmZeroFlag(unittest.TestCase):

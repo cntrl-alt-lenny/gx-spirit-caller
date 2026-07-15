@@ -436,6 +436,19 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
     labels = {a: f".L_{a:x}" for a in branch_targets(orig, thumb)}
+    # cross-function tail-merge targets (brief 577 autopsy): every non-pool
+    # instruction's absolute-address label, in ROM-address order (matches
+    # the ordering pattern already used for pool labels above). Zero-padded
+    # to 8 hex digits: dsd's own placeholder-symbol convention for these
+    # (confirmed against a real mwldarm "Undefined" error) is the full
+    # 32-bit address, e.g. `.L_02020fb4`, NOT Python's unpadded `:x` default
+    # (`.L_2020fb4`) -- those are different symbol names, so the unpadded
+    # form left the reference just as undefined as no label at all. A label
+    # is also LOCAL by default -- mwasmarm only exports one that's also
+    # `.global`, confirmed empirically (an un-globaled `.L_<addr>` assembles
+    # fine but stays out of the object's symbol table).
+    abs_labels = ([f".L_{base_addr + w['addr']:08x}" for w in orig if w["addr"] not in lit]
+                  if base_addr is not None else [])
 
     def _extern_name(sym: str) -> str:
         # brief 543: a substituted C-absorbed ref (`base+0xN`) no longer names
@@ -463,8 +476,9 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
     head += ["", "        .text"]
     head += [f"        .extern {e}" for e in externs]
-    head += [f"        .global {func}", "        .thumb" if thumb else "        .arm",
-             f"{func}:"]
+    head += [f"        .global {func}"]
+    head += [f"        .global {lbl}" for lbl in abs_labels]
+    head += ["        .thumb" if thumb else "        .arm", f"{func}:"]
 
     body: list[str] = []
     in_pool = False   # track pool RUNS so each Thumb pool island realigns once
@@ -505,8 +519,9 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             # cross-function tail-merge target (brief 577 autopsy): an
             # absolute-address label alongside any relative one above, so an
             # already-existing external `.L_<abs-addr>` reference into this
-            # merged function's body can resolve at link time.
-            body.append(f".L_{base_addr + w['addr']:x}:")
+            # merged function's body can resolve at link time. Zero-padded
+            # to match abs_labels above -- must be the exact same string.
+            body.append(f".L_{base_addr + w['addr']:08x}:")
         mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
         # embedded data table disassembled as un-assemblable coprocessor/svc/
         # unprivileged-transfer ops, or a word objdump couldn't decode at all
