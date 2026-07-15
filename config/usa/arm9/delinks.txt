@@ -13150,6 +13150,10 @@ src/usa/main/func_020b2b74.s:
 src/usa/main/func_020b2bd0.s:
     complete
     .text start:0x020b2bd0 end:0x020b2c2c
+src/usa/main/func_020b2c38.s:
+    complete
+    .text start:0x020b2c38 end:0x020b2ff0
+
 src/usa/main/func_020b2ff0.s:
     complete
     .text start:0x020b2ff0 end:0x020b3074
