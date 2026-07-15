@@ -2358,6 +2358,9 @@ src/usa/main/func_02020cac.s:
 src/usa/main/func_02020d30.s:
     complete
     .text start:0x02020d30 end:0x02020fa4
+src/usa/main/func_02020fa4.s:
+    complete
+    .text start:0x02020fa4 end:0x02021010
 src/usa/main/func_02021010.c:
     complete
     .text start:0x02021010 end:0x02021064
@@ -13188,6 +13191,10 @@ src/usa/main/func_020b375c.s:
 src/usa/main/func_020b377c.s:
     complete
     .text start:0x020b377c end:0x020b3988
+src/usa/main/func_020b3988.s:
+    complete
+    .text start:0x020b3988 end:0x020b3b6c
+
 src/usa/main/func_020b3b84.s:
     complete
     .text start:0x020b3b84 end:0x020b40c8
