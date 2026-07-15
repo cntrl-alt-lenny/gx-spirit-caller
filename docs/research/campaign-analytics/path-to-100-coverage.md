@@ -1,5 +1,8 @@
 # Path to ~100% byte coverage
 
+> Superseded by [endgame-ledger.md](endgame-ledger.md), the definitive
+> post-drain residual ledger (Brief 576).
+
 Snapshot: 2026-07-13. Build-free, from `origin/main` at commit `6a3ec942`.
 The USA/JPN drain and the EUR closeout are active work, so these counts are a
 moving target and should be refreshed after those branches land.
