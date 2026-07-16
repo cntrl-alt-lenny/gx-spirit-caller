@@ -75,10 +75,6 @@ cp ~/Dev/spirit-caller/brain/orig/baserom_*.nds \
    ~/Dev/spirit-caller/scaffolder/orig/
 ```
 
-> Historical note: this layout replaced the prior flat-sibling
-> `~/Dev/gx-spirit-caller{,-decomper,-scaffolder}` in May 2026 — same
-> three-worktree isolation, just rehomed under one parent for tidiness.
-
 Each worktree gets its own `orig/baserom_*.nds` (gitignored) and
 its own `build/` directory. The `.git` is shared via worktree
 mechanics, so commits/branches are visible across all three — but
@@ -418,6 +414,13 @@ itself:
 **Success:** how we'll know it's done (tests pass / PR merges cleanly / etc).
 **Branch:** suggested branch name following the convention above.
 ```
+
+**Agent-session names (cntrl_alt_lenny's convention — address kickoffs to
+EXACTLY these).** The four worker sessions are called **Claude Code
+Decomper**, **Claude Code Scaffolder**, **Codex Decomper**, **Codex
+Scaffolder** (provider + role slug). Never "session 1/2", "agent A", or
+model names — the brain labels every kickoff with one of these four names
+so cntrl_alt_lenny knows exactly which window gets which paste.
 
 **Kickoff conventions.** Since brief 180, briefs are inline-spec in the
 kickoff message the brain hands cntrl_alt_lenny to paste — not separate
