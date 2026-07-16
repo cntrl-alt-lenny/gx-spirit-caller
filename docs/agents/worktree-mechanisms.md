@@ -2,7 +2,12 @@
 
 # Worktree mechanism B (Claude Code sandbox worktrees) + which mechanism to use
 
-independent of brain's main working state. No manual
+Claude Code on Windows (or anywhere) automatically creates a
+per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`
+each time an agent session is launched. These provide identical
+isolation to the manual sibling worktrees (Mechanism A in AGENTS.md) —
+decomper and scaffolder each get their own checkout of their working
+branch, independent of brain's main working state. No manual
 `git worktree add` needed.
 
 Example layout that appears automatically when both agents are running:

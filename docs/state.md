@@ -8,9 +8,21 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-15 (Mac, brain=Opus; **4-agent roster: 2× Codex GPT-5.6 Luna on
-mechanical recipe lanes + 2× Claude Sonnet on judgment lanes** — Luna is the GPT-5.6 nano
-tier, so per the model-notes invariant it gets gate-protected grind only). **Re-synced after
+**Last updated:** 2026-07-16 (M1 Mac, brain=Opus; roster: 2× Codex **GPT-5.6 Luna Medium** +
+2× Claude **Sonnet 5 Max**). **CHAPTER: READABLE-C.** This round merged **#1147** (b577
+main-floor autopsy — 12/14 "floor" funcs were 3 asm_escape bugs, now fixed+shipped; ~1 genuine
+wall/region), **#1150** (b579 C-match sibling families), **#1149** (b580 unified readable-C
+queue), **#1148** (b581 prep-scaffold prune, 473 removed). Committed-tier truth (progress.py):
+units EUR 99.11 / USA 93.41 / JPN 92.79; **C-dec EUR 8.11 / USA+JPN 7.19** (the `code:` line
+reads a possibly-stale local report.json — b583 fixes instrumentation). ⚠️ **Luna validation
+verdict (b575/b576):** mechanical gate-protected lane = clean; hand-transcription ledger =
+materially WRONG (r5 finding) → Luna gets ONLY tool-derived/checkable-output tasks now.
+Queue: **b582** Sonnet-5 544B ceiling probe (WINE lane, r5 rank-1), **b583** Sonnet-5
+instrumentation truth (batch_carve returncode + size_census + byte-derived ledger), **b584**
+Luna green-main sweep, **b585** Luna CLOSED-LOG backfill + cold-start fixes. An **r6 R&D
+swarm** (8 lanes, dual-verify) is running; report lands as a research doc next round.
+
+**Previously (2026-07-15):** (superseded numbers — see r5's stale-metrics finding) **Re-synced after
 an away stint (PC brain ran briefs 556-574).** This round: reviewed + merged the 4 waiting
 PRs on one integration branch, gated by `tools/gate3.py` — **#1134** (b563, post-ov002 sweep
 waves 3-10, 1,024 shipped, every wave self-gated; genuine `main` floor = 7 funcs/region

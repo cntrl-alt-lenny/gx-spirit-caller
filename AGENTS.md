@@ -88,13 +88,7 @@ checkout) is isolated.
 When starting a new decomper or scaffolder session, point it at the
 corresponding sibling directory instead of the main clone.
 
-#### Mechanism B — Claude Code automatic sandbox worktrees (Windows convention)
-
-Claude Code on Windows (or anywhere) automatically creates a
-per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`
-each time an agent session is launched. These provide identical
-isolation to the manual sibling worktrees above — decomper and
-scaffolder each get their own checkout of their working branch,
+#### Mechanism B — Claude Code automatic sandbox worktrees
 
 Mechanism B (Claude Code automatic sandbox worktrees, the Windows
 convention) + which-mechanism guidance: moved to
@@ -482,44 +476,46 @@ plus the recurring ship-step miss):
 
 ### Open briefs
 
-The C-MATCH-era campaign context (safe-queue / retriage / reshape docs) lives in
-`docs/research/campaign-analytics/` — see `path-to-100-coverage.md` for the live
-coverage tracker and `docs/briefs/CLOSED-LOG.md` for finished-brief history.
+Campaign context: `docs/research/campaign-analytics/` (readable-C queue = brief 580's
+unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief history =
+`docs/briefs/CLOSED-LOG.md`; swarm findings = `docs/research/improvement-swarm-2026-07-15-r5.md`
+(+ the r6 R&D swarm report when it lands).
 
-- **LANE STATE (2026-07-15, Mac, 4 agents: 2× Codex GPT-5.6 Luna = mechanical
-  recipe lanes, 2× Claude Sonnet = judgment lanes; brain = Opus).** CHAPTER:
-  **coverage endgame + C-match quality chapter.** Coverage: USA/JPN post-ov002
-  sweep waves 1-10 DONE (b563 merged 1,024; EUR floor closed b572, 77/77 —
-  only 2 EUR data blobs left: `020b2d2c`/`020b3c78`). Remaining coverage work:
-  **Wave 11 ov002 mop-up** (~180: USA ~107 + JPN ~73, runbook § Wave 11) + the
-  **`main` floor** (7 funcs/region parked: 5 verify-fail + 2 gate-fail, ledger
-  in `docs/research/brief-563-drain-w3plus.md`). Quality: C-match waves 1-2
-  done (~8% C), overlay sweep queue in `docs/research/campaign-analytics/`.
-  ⚠️ **MAC = ONE wine lane** (the drain); everything else wine-free. ⚠️ fresh
-  worktree → copy `tools/mwccarm/` + `objdiff-cli` + `dsd`. Brain gate =
-  `python3.13 tools/gate3.py`.
-- **Brief 575** — Codex Luna `scaffolder` → **Wave 11 ov002 mop-up (WINE
-  lane)** per `docs/research/campaign-analytics/post-ov002-runbook.md` § Wave
-  11 (copy-paste blocks; ~107 USA + ~73 JPN). Report shipped + remaining.
-  Branch `codex/ov002-mopup-575`.
-- **Brief 576** — Codex Luna `decomper` → **WINE-FREE endgame ledger**: dry-run
-  census (`batch_carve --dry-run`) across ALL USA/JPN modules on the current
-  tree + reconcile with the b563 floor ledger + b570 EUR census → ONE
-  definitive remaining-work table (per module × region: carveable / parked
-  verify-fail / parked gate-fail / data-blob) in
-  `docs/research/campaign-analytics/endgame-ledger.md`. Branch
-  `codex/endgame-ledger-576`.
-- **Brief 577** — Claude Sonnet `decomper` → **WINE-FREE `main`-floor autopsy**
-  (b549 pattern: static objdump + asm_escape inspection, NO ninja sha1) of the
-  7/region parked funcs (5 verify-fail + 2 gate-fail; addresses in
-  `docs/research/brief-563-drain-w3plus.md`) — root-cause each: fixable tool
-  gap vs genuine wall; propose fixes. Branch `claude/main-floor-autopsy-577`.
-- **Brief 578** — Claude Sonnet `scaffolder` → **WINE-FREE whole-function-as-
-  data emitter** for the 2 EUR data blobs (`020b2d2c`/`020b3c78`, see
-  `docs/research/brief-572-eur-closeout.md`): extend `asm_escape.py` to emit a
-  data-carve `.s` for a function-shaped pure-data region + unit tests (b545/549
-  pattern: tool + tests wine-free now; a later wine lane live-proves). Branch
-  `claude/data-emitter-578`.
+- **LANE STATE (2026-07-16, M1 Mac, 4 agents: 2× Codex GPT-5.6 Luna Medium = mechanical
+  tool-derived lanes ONLY (b576 ledger lesson: no transcription/synthesis without a checkable
+  invariant), 2× Claude Sonnet 5 Max = judgment lanes; brain = Opus).** CHAPTER: **READABLE-C
+  is the campaign** (byte-coverage done: EUR units 99.11%, USA 93.41%, JPN 92.79% committed-
+  tier; residual byte-gap ≈61,404 B per r5, pending b583 re-derivation; main floor root-caused
+  b577 — 12/14 shipped via 3 asm_escape bug fixes, ~1 genuine wall/region). C-dec: EUR 8.11%,
+  USA/JPN 7.19%. **The strategic question: the 544 B C-match ceiling (51% of residue above it,
+  essentially untested — b582 probes it).** ⚠️ MAC = ONE wine lane (b582 owns it this round);
+  everything else wine-free. ⚠️ fresh worktree → copy `tools/mwccarm/` + `objdiff-cli` + `dsd`.
+  Brain gate = `python3.13 tools/gate3.py`.
+- **Brief 582** — Claude Sonnet 5 `decomper` → **THE 544 B CEILING PROBE (WINE lane, ~2-4h,
+  timeboxed).** r5 rank-1: 3 singleton functions above 544 B (2× ov002 + 1× arm9, never
+  main-only), m2c-scaffolded (`m2c_feed` + `--context`), per-file `.o` compile + objdiff loop,
+  binary verdict per function. Success = the VERDICT (shipped or documented-why-not), not the
+  ship count. Branch `claude/c-ceiling-probe-582`.
+- **Brief 583** — Claude Sonnet 5 `scaffolder` → **WINE-FREE endgame-instrumentation truth**
+  (r5 ranks 2+3): fix `batch_carve.py` returncode conflation (`whole_function()`/`classify()`
+  never read exit-2 → infra errors masquerade as verify-fail; add a `tool-error` verdict,
+  never parked/floored, unit-tested via the `_run` mock seam) + extend `tools/size_census.py`
+  (fix `.text`-only scan, `.init` false positives, ITCM blindness) + regenerate
+  `endgame-ledger.md` FROM BYTES (must explain the full gap incl. ov004's ~20 KB; strike the
+  wrong §6). Branch `claude/instrumentation-truth-583`.
+- **Brief 584** — Codex Luna `scaffolder` → **WINE-FREE green-main sweep** (r5 rank 4 minus
+  rulesets): run the auto-fixers (ruff --fix; markdownlint-cli2 --fix over the 3 generated
+  dirs), regenerate both indices, fix `lint.yml` docs/** paths exclusion, add
+  `tests/test_docs_links.py` (unittest-style, stdlib; exempt build/+extract/) + apply the
+  `../../` link fixes (CLOSED-LOG + safe-queue docs). Acceptance = ALL CI checks green on the
+  PR. Do NOT touch branch-protection/rulesets (user-only). Branch `codex/green-main-584`.
+- **Brief 585** — Codex Luna `decomper` → **WINE-FREE ledger backfill + cold-start fixes**:
+  append briefs 550-585 to `docs/briefs/CLOSED-LOG.md` (source = merged PR bodies via `gh pr
+  view`, checkable count ≈35 entries, newest-last, established format) + `configure.py`
+  region-correct baserom errors (GAME_CODE dict; fix `orig/README.md`) + widen
+  `check_delink_dupes.py` to `libs/` blocks + add `default rom sha1` to the generated
+  build.ninja (configure.py writer) — each with unit tests. Branch
+  `codex/backfill-coldstart-585`.
 
 ### Closed briefs (reference)
 
