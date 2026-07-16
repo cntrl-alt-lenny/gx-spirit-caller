@@ -730,8 +730,8 @@ def main(argv: list[str] | None = None) -> int:
         if size_delta:
             print(f"  SIZE MISMATCH: {size_delta:+d} bytes (full-length compare, not truncated) — this alone forces AVALANCHE")
             print(f"    {unpaired_tail_bytes} byte(s) exist only in the longer file and were NOT walked below —")
-            print(f"    a size mismatch means everything past the common prefix is structurally shifted,")
-            print(f"    not meaningfully comparable byte-for-byte; the diff below covers only the common prefix.")
+            print("    a size mismatch means everything past the common prefix is structurally shifted,")
+            print("    not meaningfully comparable byte-for-byte; the diff below covers only the common prefix.")
         print(f"  diff: {total_diff_bytes} byte(s) across {len(runs)} run(s) (over the {common_len}-byte common prefix)")
         if out_of_range_runs:
             print(f"  {len(out_of_range_runs)} run(s) OUTSIDE the candidate range:")
