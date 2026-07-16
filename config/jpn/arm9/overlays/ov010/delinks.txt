@@ -116,7 +116,7 @@ src/jpn/overlay010/func_ov010_021b2d44.s:
 src/jpn/overlay010/func_ov010_021b3068.s:
     complete
     .text start:0x021b3068 end:0x021b31ac
-src/jpn/overlay010/func_ov010_021b31ac.s:
+src/jpn/overlay010/func_ov010_021b31ac.c:
     complete
     .text start:0x021b31ac end:0x021b33dc
 src/jpn/overlay010/func_ov010_021b33dc.s:
