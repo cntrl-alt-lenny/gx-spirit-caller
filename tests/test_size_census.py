@@ -73,6 +73,25 @@ class TestParse(unittest.TestCase):
         self.assertIn((0x021AB000, 0x021AB040), iv)
         self.assertEqual(len(iv), 2)  # the .rodata line is excluded
 
+    def test_parse_claimed_text_includes_init_not_module_header(self):
+        """r5: CODE_SECTIONS (progress.py) = {.text, .init} — a per-TU
+        `.init` claim must count as claimed (verified independently: 71%
+        of EUR's .text-only "unmatched" count was actually .init-claimed).
+        The module-level section-map header (multiple spaces + a
+        `kind:`/`align:` suffix) must NOT be mistaken for a per-TU claim —
+        it describes the whole module's nominal span, not what's carved."""
+        delinks = "\n".join([
+            "    .text       start:0x021c9d60 end:0x021cf0dc kind:code align:32",
+            "    .init       start:0x021cf114 end:0x021cf140 kind:code align:4",
+            "",
+            "src/overlay003/func_021cf114.c:",
+            "    complete",
+            "    .init start:0x021cf114 end:0x021cf140",
+        ])
+        iv = parse_claimed_text(delinks)
+        self.assertIn((0x021CF114, 0x021CF140), iv)  # the per-TU .init claim
+        self.assertEqual(len(iv), 1)  # neither header line matched
+
     def test_is_claimed(self):
         iv = parse_claimed_text(self.DELINKS)
         self.assertTrue(is_claimed(0x021AA4A0, iv))
@@ -198,16 +217,39 @@ class TestIntegrationRealConfig(unittest.TestCase):
         names = {n for n, _, _ in pm["ov002"]}
         # brief 277 shipped func_ov002_021ae400 → claimed in delinks → MATCHED
         self.assertNotIn("func_ov002_021ae400", names)
-        # a known still-unmatched pick: 021d91e0 (brief 276) was carved, then
-        # the fallback fixture 022b867c (brief 488's data-blob residue) was
-        # ALSO shipped by brief 572's EUR closeout — as of that brief, EUR
-        # ov002 has NO function residue at all. Assert that stronger fact:
-        # whatever remains uncarved is only __sinit_* static-initializer stubs.
-        self.assertTrue(names, "census should still see the __sinit residue")
-        non_sinit = {n for n in names if not n.startswith("__sinit_ov002_")}
-        self.assertEqual(non_sinit, set(),
-                         "EUR ov002 grew NEW non-__sinit residue (regression "
-                         "vs the brief-572 fully-carved state)")
+        # Pre-brief-583, this asserted the __sinit_* static-initializer
+        # stubs still showed as unmatched residue — but that was itself a
+        # symptom of the .text-only scan bug: those stubs live in `.init`
+        # TUs that were always `complete`, just invisible to
+        # parse_claimed_text() before it also scanned CODE_SECTIONS'
+        # `.init` member (r5; verified by reverting the fix and observing
+        # this same census re-surface all 5 as "unmatched"). Now that
+        # `.init` is scanned, EUR ov002 correctly shows zero residue of
+        # any kind — assert that stronger, corrected fact.
+        self.assertEqual(names, set(),
+                         "EUR ov002 shows residue post-.init-fix — either "
+                         "a real regression, or a new false positive")
+
+    def test_itcm_is_censused_and_matches_independently_verified_counts(self):
+        """r5: `_module_paths` never yielded `itcm`, so its 14 functions/
+        region were invisible to every census. Independently re-derived
+        (parse_functions + parse_claimed_text against the real committed
+        config, brief 583): EUR has carved 3 of 14 (11 unmatched), USA/JPN
+        have carved none yet (14 unmatched each) — 39 total, matching the
+        corrected split in the byte-derived ledger."""
+        for version, want_unmatched in (("eur", 11), ("usa", 14), ("jpn", 14)):
+            pm = collect(version, "itcm")
+            self.assertIn("itcm", pm)
+            self.assertEqual(len(pm["itcm"]), want_unmatched,
+                             f"{version} itcm unmatched count drifted")
+
+    def test_dtcm_is_censused_and_is_empty(self):
+        """DTCM carries no kind:function entries in any region (data-only)
+        — censusing it should be a harmless no-op, not an error."""
+        for version in ("eur", "usa", "jpn"):
+            pm = collect(version, "dtcm")
+            self.assertIn("dtcm", pm)
+            self.assertEqual(pm["dtcm"], [])
 
 
 if __name__ == "__main__":

@@ -327,14 +327,25 @@ class Ops:
             time.sleep(2)
 
     def classify(self, func: str) -> str:
-        """'clean' | 'refuse' | 'refuse-absorbed' | 'deferred'.
+        """'clean' | 'refuse' | 'refuse-absorbed' | 'tool-error' | 'deferred'.
 
         'refuse-absorbed' (brief 545): the REFUSE is purely the `C-absorbed`
         sub-case brief 543 proved recoverable — `run()` retries these via
         `whole_function()` (which now always carries
         `--allow-absorbed-offset`) instead of parking immediately. A genuine
         wall (OFFSET/MISADDRESSED/other) still returns plain 'refuse' and is
-        parked exactly as before."""
+        parked exactly as before.
+
+        'tool-error' (brief 583, r5 finding): asm_escape's `--classify-data`
+        returns exit 1 for BOTH a genuine data-ref REFUSE and an infra
+        failure reading module config (a `FileNotFoundError`, printed as
+        "error: preflight could not read module config: ..." — no "REFUSE"
+        text). The old code's `return "refuse"` fallback for any output
+        containing neither "REFUSE" nor "clean"/"✅" silently parked infra
+        failures into the SAME skip-list bucket as a real wall (r.returncode
+        was never even read). `tool-error` is deliberately NEVER parked (see
+        BatchCarver.run()) and NEVER counted in the clean-rate denominator
+        (see Report.summary()) — it means "no real verdict", not "wall"."""
         try:
             r = self._run([sys.executable, "tools/asm_escape.py", "--classify-data",
                            "--version", self.version, func],
@@ -343,19 +354,39 @@ class Ops:
             self._kill_orphans()
             return "deferred"
         out = r.stdout + r.stderr
+        if r.returncode not in (0, 1):
+            return "tool-error"   # crashed / killed / unexpected exit
         if "REFUSE" in out:
             return "refuse-absorbed" if classify_refuse_kind(out) == "absorbed" else "refuse"
-        if "clean" in out or "✅" in out:
+        if r.returncode == 0 and ("clean" in out or "✅" in out):
             return "clean"
-        return "refuse"   # unknown output -> conservative park
+        return "tool-error"   # unknown output (e.g. infra error) -> do NOT park as a wall
 
     def whole_function(self, func: str, out_path: str) -> str:
-        """'pass' | 'verify-fail' | 'deferred'. Writes out_path on pass.
+        """'pass' | 'verify-fail' | 'tool-error' | 'deferred'. Writes out_path
+        on pass.
 
         Always passes `--allow-absorbed-offset` (brief 545): a proven no-op
         when the preflight is clean or the REFUSE isn't purely `C-absorbed`
         (asm_escape refuses identically either way — see brief 543), and the
-        only way a 'refuse-absorbed' classify() retry can actually recover."""
+        only way a 'refuse-absorbed' classify() retry can actually recover.
+
+        'tool-error' (brief 583, r5 finding): asm_escape's `generate_whole()`
+        returns exit 2 at 7 distinct infra-failure sites ("not found in
+        build/{version}/delinks ... run `ninja` first?", "no configured
+        function size", "did not assemble", ...) and exit 1 for BOTH a
+        genuine byte-mismatch (the "did NOT verify" case, the one that
+        belongs in verify-fail/the floor) and a couple of REFUSE-shaped
+        early-outs that should never reach this method in practice (classify()
+        already filtered to clean/refuse-absorbed candidates). The old code
+        read neither `r.returncode` NOR the message text — ANY non-pass
+        output landed in `verify-fail`, the exact bucket every endgame-ledger
+        residual row is built from (b577 already shipped real `ninja sha1`
+        fixes for two functions the ledger had recorded as permanent floor).
+        Now `verify-fail` requires BOTH returncode==1 AND asm_escape's own
+        explicit "did NOT verify" marker; everything else — exit 2, or exit 1
+        without that marker — is `tool-error` (never parked, never counted
+        as floor; see Report.summary() and BatchCarver.run())."""
         try:
             r = self._run([sys.executable, "tools/asm_escape.py", "--whole-function",
                            "--allow-absorbed-offset",
@@ -368,10 +399,12 @@ class Ops:
             Path(out_path).unlink(missing_ok=True)
             return "deferred"
         out = r.stdout + r.stderr
-        if "byte-identical" in out or "✅" in out:
+        if r.returncode == 0 and ("byte-identical" in out or "✅" in out):
             return "pass"
         Path(out_path).unlink(missing_ok=True)
-        return "verify-fail"
+        if r.returncode == 1 and "did NOT verify" in out:
+            return "verify-fail"
+        return "tool-error"
 
     @contextmanager
     def _gate_lock(self, timeout: float) -> Iterator[None]:
@@ -527,6 +560,7 @@ class Report:
     verify_fail: list[str] = field(default_factory=list)
     gate_fail: list[str] = field(default_factory=list)
     deferred: list[str] = field(default_factory=list)
+    tool_error: list[str] = field(default_factory=list)
     committed_batches: int = 0
 
     def summary(self) -> str:
@@ -534,14 +568,20 @@ class Report:
         also lands in `passed`/`verify_fail`/`deferred` (its real outcome) —
         it just tags "REFUSE routed through --allow-absorbed-offset instead
         of parked" (brief 545). In `--dry-run` it's an unattempted estimate
-        (classify() only), same caveat `passed` already carries there."""
+        (classify() only), same caveat `passed` already carries there.
+
+        `tool_error` (brief 583) is excluded from the clean-rate denominator
+        for the same reason `deferred` already is: it means "no real verdict
+        this run" (a returncode/output classify() or whole_function() didn't
+        recognize), not a real pass or a real park — counting it either way
+        would misrepresent the actual wall rate."""
         total = len(self.passed) + len(self.refused) + len(self.verify_fail) + len(self.gate_fail)
         rate = (100 * len(self.passed) // total) if total else 0
         return (f"SHIPPED {len(self.passed)} | REFUSE {len(self.refused)} | "
                 f"absorbed-routed {len(self.absorbed)} | "
                 f"verify-fail {len(self.verify_fail)} | gate-fail {len(self.gate_fail)} | "
-                f"deferred {len(self.deferred)} | clean-rate {rate}% | "
-                f"commits {self.committed_batches}")
+                f"deferred {len(self.deferred)} | tool-error {len(self.tool_error)} | "
+                f"clean-rate {rate}% | commits {self.committed_batches}")
 
 
 class GateTimeout(RuntimeError):
@@ -739,6 +779,12 @@ class BatchCarver:
             cd = self.ops.classify(func)
             if cd == "deferred":
                 self.report.deferred.append(func); self.log(f"  ~ {func} deferred (classify)"); continue
+            if cd == "tool-error":
+                # brief 583: no real verdict (infra failure, not a genuine
+                # wall) -- must NOT be parked, must NOT count as REFUSE. The
+                # candidate simply reappears as uncarved next run.
+                self.report.tool_error.append(func)
+                self.log(f"  ⚠ {func} tool-error (classify) — not parked, retry next run"); continue
             if cd == "refuse":
                 self.report.refused.append(func); self._park(func, "kind:data-REFUSE", self.skip_path)
                 self.log(f"  ⊘ {func} REFUSE (parked)"); continue
@@ -755,6 +801,13 @@ class BatchCarver:
             wf = self.ops.whole_function(func, str(ROOT / s_rel))
             if wf == "deferred":
                 self.report.deferred.append(func); self.log(f"  ~ {func} deferred (verify)"); continue
+            if wf == "tool-error":
+                # brief 583: exit-2 infra failure (or exit-1 without asm_escape's
+                # explicit "did NOT verify" marker) -- NOT a genuine byte
+                # mismatch, must NOT be parked into verifyfail_path (that
+                # bucket is the floor/ledger's source; this isn't a wall).
+                self.report.tool_error.append(func)
+                self.log(f"  ⚠ {func} tool-error (verify) — not parked, retry next run"); continue
             if wf == "verify-fail":
                 self.report.verify_fail.append(func); self._park(func, "verify-fail", self.verifyfail_path)
                 self.log(f"  ✗ {func} verify-fail (parked)"); continue

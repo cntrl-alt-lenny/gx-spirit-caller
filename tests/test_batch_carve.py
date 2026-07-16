@@ -323,6 +323,111 @@ class TestOpsPlatformPaths(unittest.TestCase):
                               return_value=mock.Mock(returncode=1, stdout=wall_output, stderr="")):
             self.assertEqual(ops.classify("func_x"), "refuse")
 
+    def test_classify_infra_error_is_tool_error_not_refuse(self):
+        """brief 583 (r5 finding): asm_escape's --classify-data returns exit 1
+        for BOTH a genuine data-ref REFUSE and an infra failure reading
+        module config (FileNotFoundError) -- the infra case prints no
+        "REFUSE" text at all, so the OLD code's unconditional fallback
+        (`return "refuse"`) silently parked it into the same skip-list
+        bucket as a real wall. Must now come back 'tool-error' and (per
+        BatchCarver.run()) never be parked."""
+        ops = bc.Ops("usa")
+        infra_output = (
+            "error: preflight could not read module config: "
+            "[Errno 2] No such file or directory: 'config/usa/arm9/overlays/"
+            "ov002/symbols.txt'\n")
+        with mock.patch.object(ops, "_run",
+                              return_value=mock.Mock(returncode=1, stdout="", stderr=infra_output)):
+            self.assertEqual(ops.classify("func_x"), "tool-error")
+
+    def test_classify_unexpected_returncode_is_tool_error(self):
+        """A crash / kill / interpreter-startup failure (returncode outside
+        {0, 1}) is never a valid --classify-data verdict -- must not fall
+        through to 'refuse' just because the output happens to lack
+        "REFUSE"/"clean" text."""
+        ops = bc.Ops("usa")
+        with mock.patch.object(ops, "_run",
+                              return_value=mock.Mock(returncode=127, stdout="", stderr="command not found")):
+            self.assertEqual(ops.classify("func_x"), "tool-error")
+
+    def test_whole_function_genuine_mismatch_is_verify_fail(self):
+        """The real byte-mismatch case: asm_escape's generate_whole() exits 1
+        with its explicit "did NOT verify" marker -- the ONE case that
+        belongs in verify-fail (the floor/ledger's source bucket)."""
+        ops = bc.Ops("usa")
+        mismatch_output = (
+            "func_x: ❌ emitted whole-function .s did NOT verify:\n"
+            "    word 12: mine=0xe1a00000 orig=0xe1a00001\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            out_path = str(Path(tmp) / "func_x.s")
+            Path(out_path).write_text("; partial\n")   # asm_escape writes before verifying
+            with mock.patch.object(
+                ops, "_run",
+                return_value=mock.Mock(returncode=1, stdout=mismatch_output, stderr=""),
+            ):
+                self.assertEqual(ops.whole_function("func_x", out_path), "verify-fail")
+            self.assertFalse(Path(out_path).exists())  # unverified .s must be removed
+
+    def test_whole_function_exit_2_infra_error_is_tool_error(self):
+        """brief 583 (r5 finding, the headline one): asm_escape reserves exit
+        2 for infrastructure failure at 7 sites ("not found in build/.../
+        delinks ... run `ninja` first?", "no configured function size",
+        "did not assemble", ...). The OLD code read neither returncode nor
+        message text -- ANY non-pass output landed in verify-fail, the exact
+        bucket every endgame-ledger residual row is built from. Must now come
+        back 'tool-error' and (per BatchCarver.run()) never be parked into
+        verifyfail_path."""
+        ops = bc.Ops("usa")
+        infra_output = (
+            "error: func_x not found in build/usa/delinks (already matched, "
+            "or run `ninja` first?)\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            out_path = str(Path(tmp) / "func_x.s")
+            with mock.patch.object(
+                ops, "_run",
+                return_value=mock.Mock(returncode=2, stdout="", stderr=infra_output),
+            ):
+                self.assertEqual(ops.whole_function("func_x", out_path), "tool-error")
+            self.assertFalse(Path(out_path).exists())
+
+    def test_whole_function_pass(self):
+        """The clean case: real Ops.whole_function() must still return
+        'pass' on asm_escape's byte-identical marker (returncode 0) --
+        regression guard alongside the two failure-path tests above."""
+        ops = bc.Ops("usa")
+        pass_output = (
+            "func_x: ✅ whole-function .s byte-identical vs delinked .o "
+            "(42 words) -> build/_asm_escape/func_x.s\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            out_path = str(Path(tmp) / "func_x.s")
+            Path(out_path).write_text("; func_x\n.global func_x\nfunc_x:\n bx lr\n")
+            with mock.patch.object(
+                ops, "_run",
+                return_value=mock.Mock(returncode=0, stdout=pass_output, stderr=""),
+            ):
+                self.assertEqual(ops.whole_function("func_x", out_path), "pass")
+            self.assertTrue(Path(out_path).exists())  # a real pass keeps the .s
+
+    def test_whole_function_returncode_1_without_marker_is_tool_error(self):
+        """generate_whole() also returns 1 for a couple of REFUSE-shaped
+        early-outs that classify() should already have filtered out before
+        whole_function() is ever called (e.g. "REFUSE reason isn't purely
+        C-absorbed"). If classify() and generate_whole()'s own independent
+        preflight analysis ever disagree, that is a tool-consistency bug,
+        not proof of a genuine wall -- require the exact "did NOT verify"
+        marker, not just returncode==1, before trusting verify-fail."""
+        ops = bc.Ops("usa")
+        disagreement_output = (
+            "func_x: ❌ REFUSE reason isn't purely C-absorbed — "
+            "--allow-absorbed-offset can't recover this one.\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            out_path = str(Path(tmp) / "func_x.s")
+            with mock.patch.object(
+                ops, "_run",
+                return_value=mock.Mock(returncode=1, stdout="", stderr=disagreement_output),
+            ):
+                self.assertEqual(ops.whole_function("func_x", out_path), "tool-error")
+
     @unittest.skipIf(sys.platform == "win32", "POSIX-only flock behaviour")
     def test_posix_gate_lock_is_exclusive(self):
         import fcntl
@@ -359,13 +464,22 @@ class FakeOps:
     corrupt:    funcs whose whole-function does NOT byte-verify
     bad_link:   funcs that byte-verify but make `gate()` (ninja sha1) fail
                 when their delink block is present in the tree
+    classify_tool_error: funcs whose classify() returns 'tool-error' (brief
+                583: an infra failure, not a genuine wall — must never be
+                parked)
+    verify_tool_error: funcs whose whole_function() returns 'tool-error'
+                (brief 583: e.g. an asm_escape exit-2 infra failure — must
+                never be parked into verifyfail_path)
     """
     def __init__(self, refuse=(), absorbed=(), corrupt=(), bad_link=(),
+                 classify_tool_error=(), verify_tool_error=(),
                  commit_fails=False, dirty=False, gate_times_out=False):
         self.refuse = set(refuse)
         self.absorbed = set(absorbed)
         self.corrupt = set(corrupt)
         self.bad_link = set(bad_link)
+        self.classify_tool_error = set(classify_tool_error)
+        self.verify_tool_error = set(verify_tool_error)
         self.commit_fails = commit_fails
         self.dirty = dirty
         self.gate_times_out = gate_times_out
@@ -387,6 +501,8 @@ class FakeOps:
         pass
 
     def classify(self, func):
+        if func in self.classify_tool_error:
+            return "tool-error"
         if func in self.refuse:
             return "refuse"
         if func in self.absorbed:
@@ -394,6 +510,9 @@ class FakeOps:
         return "clean"
 
     def whole_function(self, func, out_path):
+        if func in self.verify_tool_error:
+            Path(out_path).unlink(missing_ok=True)
+            return "tool-error"
         if func in self.corrupt:
             Path(out_path).unlink(missing_ok=True)
             return "verify-fail"
@@ -541,6 +660,40 @@ class TestDriverNegativeParks(unittest.TestCase):
         # never attempted -- no .s materialised, nothing committed
         self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
         self.assertEqual(ops.committed, [])
+
+    def test_classify_tool_error_is_not_parked(self):
+        """brief 583: a classify()-time 'tool-error' (infra failure, not a
+        genuine wall) must NOT land in refused/skip_path -- it goes to the
+        new tool_error bucket and the candidate is simply left uncarved for
+        a future run to retry, exactly like a real wall would NOT be."""
+        funcs = [("func_ov002_022a0000", 0x80), ("func_ov002_022a0100", 0xc4)]
+        ops = FakeOps(classify_tool_error=["func_ov002_022a0000"])
+        c, scope = self._carver(funcs, ops)
+        rep = c.run()
+        self.assertEqual(rep.refused, [])
+        self.assertEqual(rep.tool_error, ["func_ov002_022a0000"])
+        self.assertEqual(rep.passed, ["func_ov002_022a0100"])
+        self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
+        self.assertNotIn("func_ov002_022a0000.s", (self.tmp / scope.delinks_path).read_text())
+        # NOT parked to skip_path -- that bucket is genuine-wall-only
+        self.assertNotIn("func_ov002_022a0000", (self.tmp / c.skip_path).read_text())
+
+    def test_whole_function_tool_error_is_not_parked_as_verify_fail(self):
+        """brief 583 (the headline r5 finding): a whole_function()-time
+        'tool-error' (e.g. asm_escape's exit-2 infra failure) must NOT land
+        in verify_fail/verifyfail_path -- that bucket is the floor/ledger's
+        source, and an infra hiccup is not proof of a genuine byte
+        mismatch."""
+        funcs = [("func_ov002_022a0000", 0x80), ("func_ov002_022a0100", 0xc4)]
+        ops = FakeOps(verify_tool_error=["func_ov002_022a0000"])
+        c, scope = self._carver(funcs, ops)
+        rep = c.run()
+        self.assertEqual(rep.verify_fail, [])
+        self.assertEqual(rep.tool_error, ["func_ov002_022a0000"])
+        self.assertEqual(rep.passed, ["func_ov002_022a0100"])
+        self.assertFalse((self.tmp / "src/overlay002/func_ov002_022a0000.s").exists())
+        # NOT parked to verifyfail_path -- that bucket is genuine-mismatch-only
+        self.assertNotIn("func_ov002_022a0000", (self.tmp / c.verifyfail_path).read_text())
 
     def test_corrupt_carve_is_parked_RED(self):
         """THE negative test: a deliberately non-byte-identical carve is parked,
