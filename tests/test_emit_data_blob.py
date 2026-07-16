@@ -273,6 +273,24 @@ class TestEmitEndToEnd(unittest.TestCase):
                 with self.assertRaises(BlobError):
                     edb.emit("eur", 0x02000000, 0x80)  # already a TU in fixture delinks.txt
 
+    def test_emit_srcdir_override_writes_region_specific_path(self):
+        """brief 577: a region-specific candidate (e.g. USA/JPN main) must
+        NOT land in the region-neutral EUR-baseline `src/main` tree."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root, blob_bytes = self._make_tree(tmp)
+            (root / "src" / "usa" / "main").mkdir(parents=True)
+            with mock.patch.object(edb, "ROOT", root):
+                result = edb.emit("eur", 0x02000080, 0x40, srcdir="src/usa/main")
+
+            s_path = root / "src" / "usa" / "main" / "func_02000080.s"
+            self.assertEqual(Path(result["s_path"]), s_path.relative_to(root))
+            self.assertTrue(s_path.is_file())
+            self.assertEqual(_decode_byte_rows(s_path.read_text()), blob_bytes)
+            self.assertFalse((root / "src" / "main" / "func_02000080.s").exists())
+
+            delinks_text = (root / "config" / "eur" / "arm9" / "delinks.txt").read_text()
+            self.assertIn("src/usa/main/func_02000080.s:", delinks_text)
+
 
 if __name__ == "__main__":
     unittest.main()

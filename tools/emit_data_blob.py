@@ -303,11 +303,17 @@ def insert_delinks_entry(
 
 def emit(
     version: str, addr: int, size: int, *, overlay: str | None = None,
-    name: str | None = None, dry_run: bool = False,
+    name: str | None = None, dry_run: bool = False, srcdir: str | None = None,
 ) -> dict:
     """Do the whole thing for one blob. Returns a result dict (also used
     directly by tests). Raises BlobError with a precise reason on any
-    guardrail trip — callers should catch it and park, not force."""
+    guardrail trip — callers should catch it and park, not force.
+
+    `srcdir` (brief 577 autopsy) overrides `srcdir_for(overlay)`'s default
+    EUR-baseline path (`src/main` / `src/overlayNNN`) — pass e.g.
+    `src/usa/main` for a USA-region candidate, matching `batch_carve.py`'s
+    own `--srcdir` convention, so a region-specific blob doesn't land in
+    the region-neutral EUR tree and get pulled into every region's build."""
     delinks_path = delinks_txt_path(version, overlay)
     resolved_name, declared_size = resolve_name_and_declared_size(version, overlay, addr, name)
     if declared_size is not None and declared_size != size:
@@ -317,7 +323,7 @@ def emit(
         )
     check_not_already_claimed(delinks_path, addr)
     data = read_ground_truth_bytes(version, overlay, addr, size)
-    srcdir = srcdir_for(overlay)
+    srcdir = srcdir or srcdir_for(overlay)
     s_text = render_data_blob_s(resolved_name, addr, data)
     s_path = ROOT / srcdir / f"{resolved_name}.s"
 
@@ -353,6 +359,11 @@ def main() -> int:
     size_group.add_argument("--size", type=_parse_hex)
     size_group.add_argument("--end", type=_parse_hex)
     ap.add_argument("--name", default=None, help="override for an address with no existing symbol")
+    ap.add_argument("--srcdir", default=None,
+                    help="override .s output directory (default: src/main or "
+                         "src/overlayNNN — the EUR baseline). Use src/usa/main or "
+                         "src/jpn/main for a region-specific blob so it doesn't "
+                         "land in the region-neutral EUR tree.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -362,7 +373,8 @@ def main() -> int:
         return 1
 
     try:
-        result = emit(args.version, args.addr, size, overlay=args.overlay, name=args.name, dry_run=args.dry_run)
+        result = emit(args.version, args.addr, size, overlay=args.overlay, name=args.name,
+                      dry_run=args.dry_run, srcdir=args.srcdir)
     except BlobError as e:
         print(f"REFUSE: {e}", file=sys.stderr)
         return 1

@@ -321,6 +321,23 @@ _DATA_AS_CODE_RE = re.compile(
     r"|^(?:mcr|mrc)(?:eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al|hs|lo)[a-z0-9]*\s")
 
 
+def is_single_reg_push_pop(word_bytes: str) -> bool:
+    """True if `word_bytes` (8 hex chars, big-endian instruction word) is the
+    dedicated single-register STR/LDR pre/post-indexed push/pop encoding —
+    `str rD, [sp, #-4]!` (0xE52D_0004, Rd in bits 15:12) / `ldr rD, [sp], #4`
+    (0xE49D_0004) — unconditional only, the only shape the original compiler
+    emits for a straight-line prologue/epilogue (brief 577 autopsy).
+
+    objdump ALIAS-PRINTS this identically to a multi- (or even single-)
+    register STMDB/LDMIA block-transfer push/pop (`push {lr}` / `pop {pc}`
+    either way), but the two are DIFFERENT encodings — mwasmarm's `push`/
+    `pop` pseudo-ops (via `to_mwasm`'s push/pop handling) always assemble to
+    the STMDB/LDMIA form, which is byte-WRONG for this one. The mnemonic
+    text can't distinguish them; the raw encoding can."""
+    w = int(word_bytes, 16)
+    return (w & 0xFFFF0FFF) in (0xE52D0004, 0xE49D0004)
+
+
 def branch_targets(instrs: list[dict], thumb: bool = False) -> set[int]:
     """Addresses targeted by INTERNAL branches (no reloc, target within the
     function). The whole-function `.s` mode emits a `.L_<addr>` label at each
@@ -368,7 +385,8 @@ def classify_fixes(mine: list[dict], orig: list[dict]) -> tuple[list[tuple], lis
 
 def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
              whole: bool = False, thumb: bool = False,
-             absorbed_subs: dict[str, str] | None = None) -> str:
+             absorbed_subs: dict[str, str] | None = None,
+             base_addr: int | None = None) -> str:
     """Emit a byte-exact mwasmarm `.s` from the ORIGINAL instruction stream.
 
     Two modes share this emitter:
@@ -378,6 +396,22 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
         original disassembly verbatim, for reg-alloc-walled functions with no
         C match (brief 294). This needs INTERNAL-branch local labels, which
         the straight-line hatch never had.
+
+    `base_addr` (brief 577 autopsy), when given, is the function's own
+    absolute ROM address — every non-pool instruction ALSO gets an
+    absolute-address `.L_<abs-hex>:` label, alongside whatever
+    relative-addressed internal-branch label it may already carry. dsd's
+    delink output for OTHER, already-existing files that branch directly
+    into a mid-function entry point of a compiler-tail-merged function
+    (several small functions sharing a common trailing sequence, folded
+    into ONE symbol) names that entry point `.L_<absolute-hex-addr>` and
+    expects whichever TU eventually defines that address to export a
+    matching label — a whole-function carve of the MERGED function is
+    the only TU that can, since the entry point isn't its own symbol.
+    Omitted (the canonicalisation-hatch default) reproduces prior output
+    byte-for-byte; it only ever mattered for whole-function candidates
+    that happen to be a tail-merge target, an unlikely shape outside that
+    mode.
 
     Pool words become `.word` slots referenced by `_LITn`; internal branch
     targets get `.L_<addr>` labels; external calls (bl/b/blx + reloc) use the
@@ -402,6 +436,19 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
     for i, a in enumerate(sorted(lit)):
         lit[a] = f"_LIT{i}"
     labels = {a: f".L_{a:x}" for a in branch_targets(orig, thumb)}
+    # cross-function tail-merge targets (brief 577 autopsy): every non-pool
+    # instruction's absolute-address label, in ROM-address order (matches
+    # the ordering pattern already used for pool labels above). Zero-padded
+    # to 8 hex digits: dsd's own placeholder-symbol convention for these
+    # (confirmed against a real mwldarm "Undefined" error) is the full
+    # 32-bit address, e.g. `.L_02020fb4`, NOT Python's unpadded `:x` default
+    # (`.L_2020fb4`) -- those are different symbol names, so the unpadded
+    # form left the reference just as undefined as no label at all. A label
+    # is also LOCAL by default -- mwasmarm only exports one that's also
+    # `.global`, confirmed empirically (an un-globaled `.L_<addr>` assembles
+    # fine but stays out of the object's symbol table).
+    abs_labels = ([f".L_{base_addr + w['addr']:08x}" for w in orig if w["addr"] not in lit]
+                  if base_addr is not None else [])
 
     def _extern_name(sym: str) -> str:
         # brief 543: a substituted C-absorbed ref (`base+0xN`) no longer names
@@ -429,8 +476,9 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
             head.append(f";   fix [{idx}]: C emits `{my_mn}`; original is `{orig_mn}`.")
     head += ["", "        .text"]
     head += [f"        .extern {e}" for e in externs]
-    head += [f"        .global {func}", "        .thumb" if thumb else "        .arm",
-             f"{func}:"]
+    head += [f"        .global {func}"]
+    head += [f"        .global {lbl}" for lbl in abs_labels]
+    head += ["        .thumb" if thumb else "        .arm", f"{func}:"]
 
     body: list[str] = []
     in_pool = False   # track pool RUNS so each Thumb pool island realigns once
@@ -467,12 +515,27 @@ def emit_asm(func: str, orig: list[dict], fixes: list[tuple] | None = None,
         in_pool = False
         if w["addr"] in labels:
             body.append(f"{labels[w['addr']]}:")
+        if base_addr is not None:
+            # cross-function tail-merge target (brief 577 autopsy): an
+            # absolute-address label alongside any relative one above, so an
+            # already-existing external `.L_<abs-addr>` reference into this
+            # merged function's body can resolve at link time. Zero-padded
+            # to match abs_labels above -- must be the exact same string.
+            body.append(f".L_{base_addr + w['addr']:08x}:")
         mn = to_mwasm_thumb(w["mnem"]) if thumb else to_mwasm(w["mnem"])
         # embedded data table disassembled as un-assemblable coprocessor/svc/
-        # unprivileged-transfer ops -> emit the raw encoding (byte-exact).
-        if not thumb and _DATA_AS_CODE_RE.match(w["mnem"]):
+        # unprivileged-transfer ops, or a word objdump couldn't decode at all
+        # (parse_objdump strips its `@ <UNDEFINED> instruction: ...>` comment
+        # down to an empty mnem) -> emit the raw encoding (byte-exact).
+        if not thumb and (not w["mnem"] or _DATA_AS_CODE_RE.match(w["mnem"])):
             val = w["reloc"] if w["reloc"] else f"0x{int(w['bytes'], 16):08x}"
             body.append(f"    .word {val}")
+            continue
+        # single-register push/pop aliasing the STR/LDR pre/post-indexed
+        # encoding, not the STMDB/LDMIA block-transfer form `to_mwasm` always
+        # produces for push/pop text -> preserve the exact original encoding.
+        if not thumb and not w["reloc"] and is_single_reg_push_pop(w["bytes"]):
+            body.append(f"    .word 0x{int(w['bytes'], 16):08x}")
             continue
         pm = re.search(r"\[pc(?:, #(-?\d+))?\]", mn)
         if pm:
@@ -969,7 +1032,8 @@ def generate_whole(func: str, version: str, out: str | None,
         sym_text = ""
     _resolve_tail_calls(func, orig, sym_text)
     s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func),
-                absorbed_subs=absorbed_subs)
+                absorbed_subs=absorbed_subs,
+                base_addr=int(func.rsplit("_", 1)[-1], 16))
     out_path = out or str(tmp / f"{func}.s")
     Path(out_path).write_text(s, encoding="utf-8")
 
