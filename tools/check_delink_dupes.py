@@ -17,7 +17,7 @@ address, so the address still appears exactly ONCE in the final file. Two entrie
 at one address only happens when two *different* files both claim it — which is
 exactly the bug. No git-delta simulation needed.
 
-Only `.text start:` lines that sit inside a `src/...:` source block are counted;
+Only `.text start:` lines that sit inside a `src/...:` or `libs/...:` source block are counted;
 the module's top-of-file section headers (`.text/.rodata/...`) are ignored.
 
 Usage:
@@ -36,7 +36,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-_FILE_RE = re.compile(r"^(src/\S+):\s*$")
+_FILE_RE = re.compile(r"^((?:src|libs)/\S+):\s*$")
 _TEXT_RE = re.compile(r"\.text\s+start:(0x[0-9a-fA-F]+)\s+end:")
 
 

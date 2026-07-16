@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**94 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**95 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (25)
+- [Uncategorised](#uncategorised) (26)
 
 ## Analysis / worklist
 
@@ -526,6 +526,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/emit_data_blob.py`
+
+**whole-function-as-data emitter (brief 578).**
+
+WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--whole-function` strategy (`asm_escape.py --whole-function`) disassembles the original bytes into ARM/Thumb instructions and re-emits them as a `.s` TU, then g…
 
 ### `tools/fastmatch.py`
 

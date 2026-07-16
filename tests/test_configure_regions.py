@@ -26,6 +26,8 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
+from io import StringIO
 from pathlib import Path
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
@@ -116,6 +118,22 @@ class TestIsRegionSourceExcluded(unittest.TestCase):
             Path("src/eur/main/func_X.c"), "eur"))
         self.assertTrue(configure._is_region_source_excluded(
             Path("src/eur/main/func_X.c"), "usa"))
+
+    def test_missing_baserom_message_uses_region_code_and_expected_sha1(self):
+        old_orig_path = configure.orig_path
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                configure.orig_path = Path(td)
+                err = StringIO()
+                with redirect_stderr(err):
+                    with self.assertRaises(SystemExit):
+                        configure.verify_baserom("eur")
+                message = err.getvalue()
+        finally:
+            configure.orig_path = old_orig_path
+        self.assertIn("AYXP", message)
+        self.assertNotIn("AYXE", message)
+        self.assertIn(configure.BASEROM_SHA1["eur"], message)
 
 
 class TestGetCCppFilesRegion(unittest.TestCase):

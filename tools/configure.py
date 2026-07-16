@@ -117,6 +117,12 @@ BASEROM_SHA1: dict[str, str | None] = {
     "jpn": "761fbfc62f4fe74f867e973a5eda91b8e86424f6",  # AYXJ
 }
 
+GAME_CODE = {
+    "eur": "AYXP",
+    "usa": "AYXE",
+    "jpn": "AYXJ",
+}
+
 CC_FLAGS = " ".join([
     "-O4,p",                # Optimize maximally (adjust if objdiff disagrees)
     "-enum int",            # Use int-sized enums
@@ -282,14 +288,16 @@ def verify_baserom(version: str) -> Path:
     """Hash orig/baserom_<version>.nds and compare to BASEROM_SHA1[version].
     Fails loudly with a clear error if the file is missing or wrong."""
     baserom = orig_path / f"baserom_{version}.nds"
+    game_code = GAME_CODE[version]
     if not baserom.is_file():
         print(
             f"\nERROR: baserom not found at {baserom}\n"
             f"\n"
-            f"  Drop a clean US-region Yu-Gi-Oh! GX Spirit Caller ROM at:\n"
+            f"  Drop a clean {version.upper()}-region Yu-Gi-Oh! GX Spirit Caller ROM at:\n"
             f"      {baserom}\n"
             f"\n"
-            f"  (Game code: AYXE. Use your own dump — we do not ship ROMs.)\n",
+            f"  (Game code: {game_code}; expected SHA-1: "
+            f"{BASEROM_SHA1.get(version)}. Use your own dump — we do not ship ROMs.)\n",
             file=sys.stderr,
         )
         exit(1)
@@ -315,7 +323,7 @@ def verify_baserom(version: str) -> Path:
             f"  actual:   {actual}\n"
             f"\n"
             f"  Your dump does not match the known-good hash. Common causes:\n"
-            f"    - wrong region (we require AYXE / US)\n"
+            f"    - wrong region (we require {game_code} / {version.upper()})\n"
             f"    - trimmed / headered / patched ROM\n"
             f"    - corrupt dump — try re-dumping from cartridge\n",
             file=sys.stderr,
@@ -1085,6 +1093,8 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
         variables={"sha1_file": sha1_file},
         outputs="sha1",
     )
+    n.newline()
+    n.default(["rom", "sha1"])
     n.newline()
 
 
