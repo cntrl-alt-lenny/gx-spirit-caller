@@ -110,6 +110,7 @@ If the prep draft uses a switch lookup table modeled as `static const` instead o
 Risk annotation: "Orig uses TWO pool words for same addr (patcher trim bypass); clean C dedupes to one — likely 1-word diff."
 
 The `.s` ship has:
+
 ```asm
 .L_02007210:
     .word   data_02104f1c      ; pool[0] — symbol reloc

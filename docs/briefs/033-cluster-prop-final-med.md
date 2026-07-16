@@ -22,7 +22,7 @@ matched ≥10):
 - Other top-8 entries fail the matched ≥10 floor.
 
 **Codegen-walls reference is now live** at
-[`docs/research/codegen-walls.md`](docs/research/codegen-walls.md)
+[`docs/research/codegen-walls.md`](../../docs/research/codegen-walls.md)
 — grep there first when you hit a partial-match drop. Brief 032's
 key finding: ~20% of historic drops were *coercible-but-missed*
 under the right C variation. This brief is the first decomper

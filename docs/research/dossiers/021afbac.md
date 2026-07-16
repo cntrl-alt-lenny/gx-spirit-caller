@@ -1,10 +1,12 @@
 # 021afbac — func_ov008_021afbac (ov008, class C, 128B)
 
 ## Recipe + Risk
+
 **Recipe:** guard branch; row=base+(x+y)*10, read row[sel-1] as ldrh[-2]
-**Risk:** orig forms the pointer with separate adds (+row, +ip*2, ldrh[#-2]); mwcc may fold sel*2-2 into one scaled addr or pick a different base reg. reshape-able (index expr / (row)[sel-1] form)
+**Risk:** orig forms the pointer with separate adds (+row, +ip*2, ldrh[#-2]); mwcc may fold sel*2-2 into one scaled addr or pick a different base reg. reshape-able (index expr / [row](sel-1) form)
 
 ## Prep draft
+
 ```c
 /* CAMPAIGN-PREP candidate for func_021afbac (ov008, class C, MED tier) — brief 496.
  * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
@@ -49,6 +51,7 @@ void func_ov008_021afbac(void) {
 ```
 
 ## Struct context
+
 `data_ov008_021b2de4` is the ov008 main state block:
 
 | field | offset | type | purpose |
@@ -63,11 +66,13 @@ void func_ov008_021afbac(void) {
 The address arithmetic: `row_ptr + (x + y) * 10` positions at the correct row (10 = 5 u16s per row). Then `row[sel-1]` = `*(u16*)(row + (sel-1)*2)` = `*(u16*)(row + sel*2 - 2)` which the asm emits as `ldrh [r1, #-2]` after computing `row + sel*2`. Keep the `sel*2-2` form in the draft.
 
 ## Closest matched example
+
 **Path:** src/overlay008/func_ov008_021af0a8.c (this batch)
 **Why similar:** identical access to `data_ov008_021b2de4` at +0x00, +0x02, +0xc0; same `*(char**)(data+0xc0)` double-deref row-base pattern; same 10-byte (5*2) stride.
 **Key lesson from that file:** the `+0xc0` field is a pointer stored in the state block; it must be double-dereferenced as `*(char**)(data+0xc0)`, not cast as an array. The `x+y` sum uses two separate `ldrh` loads (not a u32 load) — keep the two `*(unsigned short *)` accesses separate in the expression.
 
 ## Try this
+
 1. Try `int v = ((unsigned short *)(row))[sel - 1]` as an alternative to the pointer arithmetic form `*(unsigned short *)(row + sel*2 - 2)` — the array-index form may produce the cleaner `add ip,r1,r3,lsl#1` / `ldrh [ip,#-2]` sequence. If the current form already produces `ldrh[#-2]`, keep it.
 2. If the `(x+y)*5*2` multiply folds to `(x+y)*10` in one `mul` vs `lsl+add`, try writing `* 10` directly instead of `* 5 * 2`. Check objdiff for whether the multiply instruction changes.
 3. If the `func_ov008_021b2268` call's register assignment diverges (v must be in r4 across the `021b22e4(1)` call), try binding: `int v = ...;` before `func_ov008_021b22e4(1);` so v gets a callee-saved register. If still not matching, escalate to permuter.

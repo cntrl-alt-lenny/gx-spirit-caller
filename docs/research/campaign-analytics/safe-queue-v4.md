@@ -5,7 +5,7 @@
 **Status:** brief 534 (2026-07-06). Re-verifies
 [`safe-queue-v3.md`](safe-queue-v3.md)'s 107 `carried` (never-attempted-as-
 of-v3) rows against the CURRENT repo state, using the now-fixed
-`tools/containment_check.py` (see [Part 1](#part-1-the-tool-fix) below).
+`tools/containment_check.py` (see [Part 1](#part-1--the-tool-fix) below).
 This is **not** a new ranking — v3's scoring methodology is untouched — it
 is a bookkeeping re-audit that answers one question: *of the 107 rows v3
 called "still to attempt," how many actually still are?*

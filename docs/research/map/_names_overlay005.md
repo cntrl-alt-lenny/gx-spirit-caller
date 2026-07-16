@@ -45,7 +45,7 @@
 | 0x021ac91c | CardList_WriteTileRow | HIGH | Fills 0x20-row tile strip from packed 16-bit tile value; strh into p->p_20 buffer |
 | 0x021ac984 | CardList_GetVisibleColCount | HIGH | min(CardList_BuildSlotList(chan), (h_span)/16) — clamp visible column count |
 | 0x021ac9c8 | CardList_GetTileStride | MED | Returns constant 0x10 (tile row stride); role as getter |
-| 0x021ac9d0 | CardList_GetTableEntry | HIGH | Returns *(int**)(obj+0x2c)[idx] — indexed table lookup |
+| 0x021ac9d0 | CardList_GetTableEntry | HIGH | Returns *(int**)[obj+0x2c](idx) — indexed table lookup |
 | 0x021ac9dc | CardList_FindEntryByKey | HIGH | Linear search of +0x60 array by key at e[1]; returns index or -1 |
 | 0x021aca30 | CardList_BeginHighlight | HIGH | Guard (busy or count<16); latch target in 4 fields, set busy=1 |
 | 0x021aca64 | CardList_BeginScroll | HIGH | Guard busy; compute slack cols; if offset fits latch target+snapshot, set state=2 |

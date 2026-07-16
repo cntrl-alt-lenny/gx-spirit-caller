@@ -25,7 +25,7 @@ the local-branch cleanup can fail with *"branch X used by worktree at
 still succeeds. The Claude Code worktree releases the branch when its
 session ends.
 
-#### Which mechanism to use
+## Which mechanism to use
 
 Both achieve the same isolation goal. Pick by host convention:
 
@@ -38,4 +38,3 @@ Brain does not strictly need either mechanism for review/merge work
 on its own — both mechanisms only matter when decomper and scaffolder
 run in parallel. A brain that's only verifying PRs and merging can
 work from the main checkout alone.
-

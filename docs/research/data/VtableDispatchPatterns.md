@@ -94,6 +94,7 @@ extern EventSink data_02191e60;
 ```
 
 Pattern in `func_0201f2f8.s` and related:
+
 ```s
 ldr r2, [r0, #0x38]        ; r2 = data_02191e60.f_38
 cmp r2, #0x0
@@ -180,6 +181,7 @@ typedef struct Ov005Obj {
 
 2. **Null-checked slots** (pattern: `cmp rN, #0; beq skip; blx rN`) require
    the C source to null-check before calling:
+
    ```c
    if (obj->callback) obj->callback(arg);
    ```

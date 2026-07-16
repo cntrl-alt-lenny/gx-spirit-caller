@@ -276,6 +276,7 @@ available.
 ## ov000 (0/2 — confirmed wall, both inherited unchanged from Ov000Deep.md)
 
 ### `021ABEC8` (96B) — WALL
+
 Leaf function tail-calling the confirmed divmod helper `func_020b3a7c`.
 Four-field extract-and-combine sequence interleaves live registers
 `r1/r2/r3/r4/ip/lr` across ~18 instructions with no loop and no natural
@@ -288,6 +289,7 @@ the already-walled caller `021ac144` (calls this + its twin `021abe64`
 four times combined) — stays `.s` regardless of independent tractability.
 
 ### `021AD8DC` (636B) — WALL
+
 Sibling of the HIGH-confidence `Ov000_SetupMainVram` (`021ad660`). ~30
 interleaved stack writes threaded between 14 `bl` calls, where fields are
 written, partially overwritten, then consumed by a call several

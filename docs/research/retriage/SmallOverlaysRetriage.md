@@ -33,6 +33,7 @@ No pool words, no globals, no calls.  Trivially C-matchable.
 **Pool words:** none
 
 **Recipe sketch:**
+
 ```c
 void func_ov003_021ca2b4(void) {
     return;
@@ -53,6 +54,7 @@ No pool words, no globals, no calls.  Trivially C-matchable.
 **Pool words:** none
 
 **Recipe sketch:**
+
 ```c
 void func_ov003_021ca2b8(void) {
     return;
@@ -92,6 +94,7 @@ base, `[r0, #0x30]` scroll offset), combines them with a mask constant
 (0x04001010 / 0x04001014 / 0x04001018 / 0x0400101c).  No calls, no blx.
 
 **Pool words:**
+
 ```
 .word 0x01ff0000   ; mask applied to upper halfword
 .word 0x04001010   ; BG0HOFS
@@ -104,6 +107,7 @@ base, `[r0, #0x30]` scroll offset), combines them with a mask constant
 `[r0, #0x34]` (current), `[r0, #0x5c]` (mode selector, bits 0–1).
 
 **Recipe sketch:**
+
 ```c
 void func_ov005_021abb00(BgState *p) {
     int mode = p->field_5c & 3;
@@ -135,12 +139,14 @@ the index.  On null entry (table exhausted): clears `[r0]`, `[r0+0x8]`,
 `[r0+0xc]`, returns 1.
 
 **Pool words:**
+
 ```
 .word data_ov005_021b1e4c   ; state index / counter
 .word data_ov005_021b17e8   ; function-pointer table
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov005_021acfb0(State *p) {
     int idx = data_ov005_021b1e4c;
@@ -197,11 +203,13 @@ remaining bits, writes back; also zeros `[r3, #0x10]` and `[r3, #0x14]`
 `func_ov014_021b4810`.
 
 **Pool words:**
+
 ```
 .word 0x04001000   ; DISPCNT_SUB (sub-display control register)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov009_021aa59c(void) {
     vu32 *disp = (vu32*)0x04001000;
@@ -236,6 +244,7 @@ argument: `[r4]` = x_left, `[r4+4]` = x_right, `[r4+2]` = y_top,
 `[+6]` y_hi (all u16 / s16 halfwords).
 
 **Recipe sketch:**
+
 ```c
 int func_ov009_021ac458(HitRect *r) {
     int x = func_02006110();
@@ -262,12 +271,14 @@ and clears a secondary field.  Returns 0 if the slot ran, 1 if the table was
 exhausted (null entry).
 
 **Pool words:**
+
 ```
 .word data_ov009_021adc94   ; state index / counter global
 .word data_ov009_021adb9c   ; function-pointer table base
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov009_021ad7d4(State *p) {
     int idx = data_ov009_021adc94;
@@ -318,12 +329,14 @@ three paths.  Each path reads `data_ov012_021cc6dc[0x17c]` (a tilemap pointer)
 and returns it or a derived value.
 
 **Pool words:**
+
 ```
 .word data_ov012_021cc6a0   ; overlay state struct (flag at +0x198)
 .word data_ov012_021cc6dc   ; tilemap descriptor struct (ptr at +0x17c)
 ```
 
 **Recipe sketch:**
+
 ```c
 void *func_ov012_021ca36c(void) {
     int mode = ((u8*)data_ov012_021cc6a0)[0x198];
@@ -384,6 +397,7 @@ is deterministic.
 `ldrh r0, [r0, #0x56]`.
 
 **Recipe sketch:**
+
 ```c
 u32 func_ov014_021b4248(Rec *p) {
     u16 lo = p->field_54;
@@ -409,11 +423,13 @@ then zeros two adjacent registers at `[r3, #0x10]` and `[r3, #0x14]`
 (BG scroll sub-registers), returns 1.
 
 **Pool words:**
+
 ```
 .word 0x04001000   ; DISPCNT_SUB
 ```
 
 **Assembly (load-bearing):**
+
 ```asm
 func_ov014_021b4810:
     ldr r3, _LIT0          ; 0x04001000
@@ -434,6 +450,7 @@ _LIT0: .word 0x04001000
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov014_021b4810(void) {
     vu32 *disp = (vu32*)0x04001000;

@@ -44,6 +44,7 @@ the known idiom from OverlayConstants.md.  The audio sub-system init calls
 - `data_ov016_021bab44` — audio config table
 
 **Ground-truth pool words:**
+
 ```
 0x000000c0   ; VRAM_PALETTE_MODE (copy from source)
 0x07000000   ; VRAM_PALETTE_A dest
@@ -73,6 +74,7 @@ data_ov016_021bab44
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov016_021b23f0(void) {
     func_020092e0(data_ov016_021b9784); // slot init
@@ -129,12 +131,14 @@ no unnamed constants.
 - `data_ov016_021b8f80` — function-pointer table, word-indexed by state
 
 **Ground-truth pool words:**
+
 ```
 data_ov016_021b9740   ; state block base
 data_ov016_021b8f80   ; fn-ptr table base
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b2824(void) {
     int idx = data_ov016_021b9740[0];
@@ -172,6 +176,7 @@ No pool words; no unnamed constants; no blx.
 register-passed touch coords)
 
 **Recipe sketch:**
+
 ```c
 // Touch source A: func_02006110 + func_020061ac
 int func_ov016_021b287c(TouchRect *rect) {
@@ -205,6 +210,7 @@ same branching logic, same return convention.
 **Ground-truth pool words:** (none)
 
 **Recipe sketch:**
+
 ```c
 // Touch source B: func_02006148 + func_0200617c
 int func_ov016_021b28f4(TouchRect *rect) {
@@ -244,6 +250,7 @@ zero-fill with mode=0 is the documented VRAM clear.  The constants `0x9c`
 - `data_ov016_021b9040` — second task template / OBJ config block
 
 **Ground-truth pool words:**
+
 ```
 data_ov016_021bab44   ; audio config
 data_ov016_021b9020   ; task template A
@@ -255,6 +262,7 @@ data_ov016_021b9040   ; task template B / OBJ config
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov016_021b2b2c(void *arg) {
     // VRAM clear for OBJ palette area
@@ -300,6 +308,7 @@ known `(palette=0xf) << 12` bitmask.
 **Ground-truth pool words:** (none — all magic from `orr r0, r3, #0xf000` literal)
 
 **Recipe sketch:**
+
 ```c
 // Writes 3 rows × 0x1c tiles starting at OBJ VRAM + 0x44*2,
 // palette index 0xf (bits 15:12), tiles 1..0x54
@@ -337,6 +346,7 @@ halfwords (+0x1c bytes - 0x19*2 = 0xe*2).  Identical structure to
 **Ground-truth pool words:** (none — computed via MLA with literal 0x64)
 
 **Recipe sketch:**
+
 ```c
 // r0 = base ptr arg (passed to func_0208e1cc), r1 = slot index
 void func_ov020_021ab364(void *base, int slot) {
@@ -373,6 +383,7 @@ constant changed.
 **Ground-truth pool words:** (none — `orr r0, r3, #0xe000` literal)
 
 **Recipe sketch:**
+
 ```c
 // Identical to 021ab364 but palette = 0xe
 void func_ov020_021ab43c(void *base, int slot) {
@@ -415,6 +426,7 @@ ID.  `data_02102c90` is the known `data_02102c90` display config block.
 - `data_02104f4c` — SystemWork (language source)
 
 **Ground-truth pool words:**
+
 ```
 data_ov020_021ae0a8   ; secondary config block
 data_ov020_021ae060   ; main state block (count at +0x910)
@@ -425,6 +437,7 @@ data_02104f4c         ; SystemWork
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov020_021aad10(void) {
     void *vram_base = Vram_GetBankBaseCD();
@@ -477,6 +490,7 @@ This is a 3-instruction-per-path getter; the only question is the struct type.
 **Ground-truth pool words:** (none)
 
 **Recipe sketch:**
+
 ```c
 int func_ov015_021b28a8(Ov015Obj *obj) {
     switch (obj->direction) {   // +0x8
@@ -519,6 +533,7 @@ consistent with a 0x18 × 0x14 tile zone.
 operands)
 
 **Recipe sketch:**
+
 ```c
 void func_ov015_021b2514(Ov015Layout *self, int mode, s16 x, s16 y) {
     if (mode == 0) {
@@ -569,6 +584,7 @@ r4, lsl #0xc` instruction.
 **Ground-truth pool words:** (none — all from struct fields and register args)
 
 **Recipe sketch:**
+
 ```c
 // r0 = bg_id, r1 = &Rect{x,y,w,h}, r2 = tile_start, r3 = palette
 void func_ov015_021b30f0(int bg_id, TileRect *rect, int tile, int pal) {
@@ -613,11 +629,13 @@ cases 0..7) sets DISPCNT/BG mode fields — `0x5000040` (sub palette base),
   case 0..5)
 
 **Ground-truth pool words:**
+
 ```
 data_ov015_021b5bb0   ; task template pointer table (6 entries)
 ```
 
 **Recipe sketch:**
+
 ```c
 // r0 = dest handle storage, r1 = task arg, r2 = template index (0-5),
 // r6 = BG mode index (0-7)

@@ -94,6 +94,7 @@ ov004 entry below).
   fully matched at `021d8648`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record (r4 base)
 data_02104dac         ; halfword-echo dest for early-return path
@@ -107,6 +108,7 @@ data_ov004_022915e8   ; lock-gate object (arg to func_ov004_021d8798)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021cc74c
 func_0202b9ec              (x2, both branches probe empty-slot count)
@@ -119,6 +121,7 @@ func_02037208               (tail toast, id=0x3a-0x3b)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov004_LayoutCardList(int card_idx) {
     Ov004_CopyActiveRecord();               /* func_ov004_021cc74c */
@@ -196,6 +199,7 @@ string/label pointers (adjacent to the `Category 5` string-array family in
   `Ov004Ov006DataTables.md` as brief-141 string arrays.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x66666667            ; smull reciprocal, ÷10 (row index = slot / 10 % 5)
 data_ov004_0220b5b8   ; slot-array sibling of b500
@@ -209,6 +213,7 @@ data_02104f4c         ; system-clock cluster (+0x4 language 3-bit field)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020a7440
 func_02001d68            (x5: x4 one per card-kind case, x1 language field)
@@ -229,6 +234,7 @@ func_ov004_021cb940       (tail, empty-frame VRAM clear)
 
 **Recipe sketch (top-level shape; the 4-case category dispatch and the final
 11-item copy loop are fully bounded and follow directly from the `.s`):**
+
 ```c
 void Ov004_DrawCardSlotsFull(int slot_idx) {
     int row = /* (slot_idx*0x66666667 double-smull) % 5 */;
@@ -301,6 +307,7 @@ is bounded.
   `021cced8`'s 5-string set).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_021040ac         ; global state record (+0xba8 bitfield read)
@@ -312,6 +319,7 @@ data_02104f4c         ; system-clock cluster (+0x4 language field)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208e0a0
 func_02094550
@@ -333,6 +341,7 @@ func_02094504
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov004_UpdateCardSlots(void) {
     if (data_ov004_0220b500.f8c > 0x100) return;
@@ -394,6 +403,7 @@ already seen in `021cc7bc` above.
 - `data_ov004_022915e8` — lock-gate object.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_021040ac         ; global state record (+0xba4/ba8/bcc/bcd)
@@ -403,6 +413,7 @@ data_ov004_022915e8   ; lock-gate object
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201cbd8
 func_02094688              (x2, one per case-0 sub-branch)
@@ -412,6 +423,7 @@ func_ov004_021d8cd0
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov004_DrawSlotHighlight(void) {
     char buf[0x200];
@@ -482,6 +494,7 @@ R7's `Ov017_MainSceneUpdate` (`021b5130`).
 - `data_ov004_022915e8` — lock-gate object.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_ov004_022915e8   ; lock-gate object
@@ -490,6 +503,7 @@ data_ov004_022915e8   ; lock-gate object
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201ca88
 func_ov004_021cd924        (Ov004_DrawSlotHighlight, tail-consistency check)
@@ -515,6 +529,7 @@ func_ov004_021c9dd4         (Ov004_RGBBlend, tail)
 
 **Recipe sketch (top-level dispatch shape; each state's internal computed
 branch follows the identical shape shown for state 0 below):**
+
 ```c
 void Ov004_HandleSlotDrop(void) {
     if (data_ov004_0220b500.f54 == 0) Ov004_TouchOverlayInit();  /* 0201ca88 */
@@ -594,11 +609,13 @@ cluster member, same global used throughout ov004's text-render calls per
 `021b34c4`/`021cf070` etc.) — no new globals.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90   ; GlobalData02102c7c cluster (text-render context)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Task_PostLocked
 func_02094504
@@ -611,6 +628,7 @@ Task_InvokeLocked
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov004_DrawTradeControls(int row_base, char *text) {
     void *task = Task_PostLocked(0x400, 4, 0);
@@ -662,6 +680,7 @@ already-catalogued pattern from `021cc7bc` (dual-byte selector).
   string labels (same `Category 5` family as `021cced8`'s set).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00007fff             ; DMA size mask
 0x00001ce7             ; layout literal (fixed display config)
@@ -682,6 +701,7 @@ data_ov004_02209d68    ; string label ("category 3 / default")
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02001bc8
 func_02094550
@@ -702,6 +722,7 @@ Task_Invoke
 ```
 
 **Recipe sketch (top-level shape):**
+
 ```c
 void Ov004_RunTradeLoop(int slot) {
     static int inited = 0;
@@ -775,6 +796,7 @@ methodology expects, not entropy.
 (two independent timer-bar counters, already-referenced pattern).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 0xc0002022             ; BLDALPHA-family packed literal A
@@ -783,6 +805,7 @@ data_ov004_0220b500   ; b500 main state record
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021ca0a4     (Ov004_LayoutCell, x2 — one per bar half)
 func_02005dac              (x2)
@@ -790,6 +813,7 @@ func_ov004_021cde38      (x4 — 2 per bar half)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov004_DrawTimerBar(void) {
     if (data_ov004_0220b500.f68) {
@@ -841,12 +865,14 @@ chained with early-exit fallthrough.
   key)) — new global, not previously catalogued (see New KB gaps).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_ov004_0220f228   ; stride-0x54 60-entry timer/panel table
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02052cdc    (x1 per loop-1 iteration, up to 60x)
 func_02094688    (on match, loop 1)
@@ -856,6 +882,7 @@ func_02094688    (on match, loop 3 fallback)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov004_DrawTimerPanel(Ov004Panel *panel) {
     Ov004TimerEntry *table = &data_ov004_0220f228;
@@ -922,6 +949,7 @@ idiom used throughout ov017 (`Ov017_DrawCardCount`-style).
   labels (see New KB gaps).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_ov004_0220e500   ; secondary ov004 BSS block (already-flagged gap)
@@ -943,6 +971,7 @@ data_02104f4c         ; system-clock cluster (+0xa68 achievement/mode bit)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021ce364     (Ov004_DrawTimerPanel, matched above)
 func_0208e2f4
@@ -996,6 +1025,7 @@ func_0208c884
 **Recipe sketch (top-level shape only; the 4-iteration render loop and BLDCNT
 pack sequences follow the identical shape already fully specified in
 `Ov017Ov019Retriage.md`'s `021b22ec`):**
+
 ```c
 void Ov004_RenderTradeSession(void) {
     data_ov004_0220b500.f6c = 0;
@@ -1072,6 +1102,7 @@ already-documented "achievement/mode cluster" (R7).
   gaps).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_ov004_022915e8   ; lock-gate object
@@ -1081,6 +1112,7 @@ data_02104f4c         ; system-clock cluster (+0xa6c/a70, +0xc74 bit table)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020349ec
 func_ov004_021cded0      (Ov004_UpdateCardSlots, matched above)
@@ -1094,6 +1126,7 @@ func_02034888                     (x6, once per non-loop case)
 
 **Recipe sketch (jump-table shape; the 0x40-iteration bitmask-scan case
 `.L_588` is a bounded loop shown in full):**
+
 ```c
 int Ov004_ProcessExchangeInput(void) {
     ExchangeMsg msg;
@@ -1168,12 +1201,14 @@ the same "layout cell fan-out" idiom repeated with a different box grid.
   `021ce4a8`/`021cf070`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500   ; b500 main state record
 data_02102c90          ; GlobalData02102c7c cluster (text-render context)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021ceb6c
 func_ov004_021ca0a4     (x5: 4-loop + one extra)
@@ -1187,6 +1222,7 @@ func_02004f58
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov004_ProcessTradeInput(void) {
     int base = Ov004_GetLayoutBase();            /* func_ov004_021ceb6c */
@@ -1264,6 +1300,7 @@ tractable across the whole R7/R8 batch.
   here used as a message-argument source rather than a stride-table seed).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220e500   ; secondary ov004 BSS block (already-flagged gap)
 data_ov004_0220b500   ; b500 main state record
@@ -1275,6 +1312,7 @@ data_021040ac          ; global state record
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020347b8
 func_0202046c
@@ -1307,6 +1345,7 @@ func_ov004_021ce1ec           (Ov004_DrawTimerBar, matched above)
 
 **Recipe sketch (top-level shape; the ~24-case message dispatcher follows
 the identical bounded-branch idiom already shown in full for `021cda8c`):**
+
 ```c
 int Ov004_DrawDetailPanel(void) {
     data_ov004_0220e500.fbd8 = -1;
@@ -1384,11 +1423,13 @@ same call sequence, same argument shapes, only the constants differ.
 member as `021cdd38`) — no new globals.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90   ; GlobalData02102c7c cluster (text-render context)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Task_PostLocked
 func_02094504
@@ -1401,6 +1442,7 @@ Task_InvokeLocked
 ```
 
 **Recipe sketch (differences from `021cdd38` highlighted):**
+
 ```c
 void Ov004_DrawInfoText(int row_base, char *text) {
     void *task = Task_PostLocked(0x600, 4, 0);       /* 0x600 not 0x400 */
@@ -1459,6 +1501,7 @@ documented across R6/R7 applied to ov004's trade sub-engine bring-up.
 - `data_ov004_02209de0` — string label (same family as `021cced8`'s set).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x04000060             ; MMIO BLDALPHA-family register
 0xffffcffd             ; bit-clear mask
@@ -1487,6 +1530,7 @@ data_ov004_02211548    ; config block D (new)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208cf58
 func_0208cf44
@@ -1531,6 +1575,7 @@ func_ov004_021d0168
 **Recipe sketch (top-level shape — a linear sequence of fixed-arg NitroSDK
 calls with no branches; shown as a representative excerpt since the full
 55-call body is a straight enumeration):**
+
 ```c
 void Ov004_UpdateTradePhase(void) {
     func_0208cf58(); func_0208cf44(); func_0208cf20();
@@ -1619,6 +1664,7 @@ slot-weight helper (per `overlay006.md`'s premap).
   singletons (used elsewhere in the ov006 audio-init family per R6).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f2ac   ; audio-config singleton (arg to func_0202adf8)
 data_02104f4c          ; system-clock cluster (+0x4 language field)
@@ -1629,6 +1675,7 @@ data_ov006_0225cb98    ; 12-entry stride-0x10 sibling array
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202adf8
 func_0202ae1c
@@ -1643,6 +1690,7 @@ func_020373cc
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov006_State4_AudioInitFull(void) {
     func_0202adf8(data_ov006_0224f2ac);
@@ -1691,11 +1739,13 @@ already catalogued for the achievement-scan idiom) depending on a mode flag
 scan stride-0x18 table / loop-bound global) — no new globals.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020b4768   ; achievement-scan loop-bound global (documented, R7)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021b843c    (x5, fixed slot-clear loop)
 func_0202b0e0             (per-item, bounded by data_020b4768[0])
@@ -1704,6 +1754,7 @@ func_0202b6cc                (mode!=0 comparator)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Slot_AnimateTransition(SomeBase *p, int filter_key) {
     for (int slot = 0; slot < 5; slot++) {
@@ -1756,12 +1807,14 @@ branch target is a named, already-classified sibling function.
   end).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020f8c60   ; construction-arg global (arg to func_020211c8)
 data_021040ac    ; global state record (+0x1c "ov006 active" flag)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020211c8
 func_0202147c
@@ -1788,6 +1841,7 @@ func_ov006_021c11c8
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_DuelObj_Step(Ov006Battle *self) {
     self->f0 = func_020211c8(data_020f8c60);
@@ -1855,6 +1909,7 @@ it is a wide but fully enumerable state table.
 - `data_021040ac` — `+0x1c` (same "ov006 active" flag as `021ba1f8`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 data_ov006_0225de70   ; mode-toggle singleton A
@@ -1864,6 +1919,7 @@ data_021040ac          ; global state record (+0x1c)
 
 **Ground-truth BL targets (verbatim, in call order — representative, many
 repeat with different literal args per case):**
+
 ```
 func_02037208    (x13, one per toast-firing case)
 func_ov006_021bbdc0    (x2: early state, final commit)
@@ -1889,6 +1945,7 @@ func_ov006_021bf844
 
 **Recipe sketch (top-level shape; every case is a distinguishable,
 fully-literal block already enumerated verbatim from the `.s`):**
+
 ```c
 int Ov006_Battle_MainDispatch(Ov006Battle *self) {
     Ov006SlotRec *rec = &self->f100 + self->f54 * 0x24;
@@ -1966,6 +2023,7 @@ The second half repeats the identical shape with a second bank lookup
   struct pointer).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0225df3c   ; mode-toggle singleton A
 data_ov006_0225e068    ; audio/engine struct pointer (documented, R4)
@@ -1976,12 +2034,14 @@ data_ov006_021cc0f4    ; stride-0xc lookup table (self.f40==default)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02021660    (x2, one per half)
 func_020216b0      (x12: 6 per half)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_EnterPhase(Ov006Battle *self) {
     Ov006SlotRec *rec = &self->f100 + self->f50 * 0x24;
@@ -2044,6 +2104,7 @@ arithmetic is index/stride math on `sp`-local counters (`+0x20`
   arg to `func_02091554`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 data_ov006_021cdd14    ; glyph/label render source
@@ -2051,6 +2112,7 @@ data_ov006_021cdd14    ; glyph/label render source
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021be5b8     (matched, this doc)
 func_02021660
@@ -2068,6 +2130,7 @@ func_020216b0
 
 **Recipe sketch (outer/inner loop shape; the identical `020216b0` 6-field
 sequence from `021bbe7c` is reused per iteration):**
+
 ```c
 int Ov006_Battle_ExecPhase(Ov006Battle *self) {
     Ov006SlotRec *rec = &self->f100 + self->f50 * 0x24;
@@ -2158,6 +2221,7 @@ and literal dispatch.
   `_6be8` usage).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_021cce08   ; Type-B animation table (self.f40==1/4)
 data_ov006_0224f448    ; card-slot object base
@@ -2173,6 +2237,7 @@ data_ov000_021b1d4c              ; shared cross-overlay controller struct
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021c6bdc
 func_02021660      (obj alloc, per outer iteration)
@@ -2186,6 +2251,7 @@ func_020216b0                  (x8, final field-set sequence)
 **Recipe sketch (top-level shape; the 7-way jump-table dispatch into
 `Ov006_Slot_FillOrCopy` is the same recipe already fully specified for R6's
 `func_ov006_021b843c`/`021b831c` — see `Ov004Ov006Deep.md`):**
+
 ```c
 int Ov006_Battle_AnimCard(Ov006Battle *self, int r1, int r2, int r3) {
     for (int idx = 0; idx < 0xe; idx++) {
@@ -2262,6 +2328,7 @@ range-gated skip check, each iteration building an OBJ record via the same
   already-documented offset used across the whole batch).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 0x88888889              ; smull reciprocal, postshift-dependent (documented, R7)
@@ -2273,6 +2340,7 @@ data_02104f4c                  ; system-clock cluster (+0x4 language field)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021be8c4    (matched sibling, per map doc's overlay006.md neighbors)
 func_02021660      (x7, one per loop iteration)
@@ -2280,6 +2348,7 @@ func_020216b0        (x56: 8 per iteration x 7 iterations)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_ProcessEffect(Ov006Battle *self, int arg1, int arg2) {
     if (self->f40 != 1) return 0;
@@ -2350,6 +2419,7 @@ arms.
 - `data_ov006_0225df3c` — mode-toggle singleton (same as `021bbe7c`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 data_ov006_021cc6cc    ; Type-A animation table
@@ -2365,6 +2435,7 @@ data_ov006_0225df3c               ; mode-toggle singleton
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021bd6bc     (matched, R6 — Ov006_Battle_GetDamage)
 func_ov006_021b6d1c        (matched, R4/R6 family)
@@ -2381,6 +2452,7 @@ func_020216b0           (x8, final field-set sequence)
 skeleton, differing only in literal mode id 2-8 and which `data_ov006_021cc4fc`-
 style field the fallback pulls — matches the recipe already established for
 `021b60a4`'s 4-way seed dispatch in R4/R6):**
+
 ```c
 int Ov006_Battle_UpdateBoard(Ov006Battle *self, int mode, int arg2) {
     if (mode == 0) return 1;
@@ -2469,6 +2541,7 @@ sibling calls into the same `_c7964`/`_8174` family.
 - `data_ov006_0225df3c` — mode-toggle singleton (already-referenced).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_021cc588   ; stride-0xc table (self.f40==0/2/3, primary)
 data_ov006_021cc478    ; stride-0xc table (self.f40==0/2/3, secondary)
@@ -2482,6 +2555,7 @@ data_ov006_0225df3c              ; mode-toggle singleton
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021b7cac    (matched, this doc — Ov006_CardPool_GetPoolPtr, x2: early gate + tail)
 func_ov006_021bd6bc      (matched, R6 — Ov006_Battle_GetDamage)
@@ -2502,6 +2576,7 @@ func_ov006_021c7edc        (conditional, follows the 021c7f5c call)
 
 **Recipe sketch (top-level shape; the 10-way jump table is a straight
 literal-code lookup, not a scheduling wall):**
+
 ```c
 int Ov006_Battle_Resolve(Ov006Battle *self) {
     Ov006SlotRec *zone = &self->f100 + self->f50 * 0x24;
@@ -2582,6 +2657,7 @@ dispatcher in `Ov004Ov006Deep.md`).
   global used in `func_ov006_021b59e4`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 data_ov006_0225e068    ; audio/engine struct pointer (documented, R4)
@@ -2589,6 +2665,7 @@ data_ov006_0225e068    ; audio/engine struct pointer (documented, R4)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Copy32
 func_ov006_021be0b0     (matched, this doc — case 2)
@@ -2612,6 +2689,7 @@ func_ov006_021ca264       (case default)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_HandleInput2(Ov006Battle *self, int msg_type, int arg) {
     int cur[3];
@@ -2712,12 +2790,14 @@ inlined logic).
   in this same doc.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 0x66666667              ; smull reciprocal, ÷10 (documented, R6/R8)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021bd6bc    (matched, R6 — Ov006_Battle_GetDamage, x2 guard checks)
 func_ov006_021b6d1c      (matched, R4/R6 family)
@@ -2729,6 +2809,7 @@ func_ov006_021bd6bc      (matched, R6 — 2nd use, slot-base resolve)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_UpdateSlot(Ov006Battle *self, int slot_idx, int arg2) {
     Ov006SlotRec *zone = &self->f100 + self->f50 * 0x24;
@@ -2792,11 +2873,13 @@ matched, R4/R6). This is a short, fully deterministic leaf.
 (same struct as every other function in this doc).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021b6d00     (matched, R4 — trivial count accessor leaf)
 func_020b3870
@@ -2807,6 +2890,7 @@ func_ov006_021b8f7c              (matched, R6, x up to 4)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_EvalCard(Ov006Battle *self) {
     Ov006SlotRec *zone = &self->f100 + self->f50 * 0x24;
@@ -2860,6 +2944,7 @@ literally the KB-friendly signal, not a wall.
   pair source tables (rank-lookup constants).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov000_021b1d4c   ; shared cross-overlay controller struct
 data_ov006_021cb634    ; rank-lookup table A (10 halfword pairs)
@@ -2867,11 +2952,13 @@ data_ov006_021cb65c     ; rank-lookup table B (10 halfword pairs)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov005_021aa4b0   (cross-overlay duel-rule callback, per module description)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov006_Battle_RankCard(Ov006Battle *self) {
     Ov006SlotRec *zone = &self->f100 + self->f50 * 0x24;
@@ -2934,6 +3021,7 @@ already-catalogued table field — no unresolved indirection.
 - `data_ov006_0225de70` — mode-toggle singleton (already-referenced).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448   ; card-slot object base
 data_ov006_021cc03c    ; row-pointer table A
@@ -2953,6 +3041,7 @@ data_ov006_0225de70                   ; mode-toggle singleton
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021bd6bc     (matched, R6 — Ov006_Battle_GetDamage, guard check)
 func_ov006_021b6d1c       (matched, R4/R6 family)
@@ -2963,6 +3052,7 @@ func_ov006_021c6bdc          (matched sibling, same as 021bb954/021bc45c)
 **Recipe sketch (top-level shape; the exact bounding-box/table-index logic
 is a deterministic scan over already-catalogued tables, matching the shape
 already proven for `021bc45c`'s jump-table dispatch above):**
+
 ```c
 int Ov006_Battle_BuildChoice(Ov006Battle *self, s16 x, s16 y, Ov006Choice *out) {
     Ov006SlotRec *zone = &self->f100 + self->f50 * 0x24;

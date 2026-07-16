@@ -972,7 +972,7 @@ multi-call sequences (re-read explicitly). Each needs 20-40 min
 per pick — above brief 224's 10-15 min cap. Brief 226 takes 2 of
 these (sign-check + helper-return reuse) as sub-classification
 pilots. Research note:
-[`brief-224-c39-wave1.md`](docs/research/brief-224-c39-wave1.md).
+[`brief-224-c39-wave1.md`](../docs/research/brief-224-c39-wave1.md).
 
 Brief 225 (scaffolder) ran the C-39 sub-patterns + brief 216
 deferred investigation. **1 ship + 4 documented near-misses**
@@ -989,7 +989,7 @@ all 5 tiers + volatile + inline-asm), u64 pack/value-in-regs (B3
 — likely hand-`.s` or RealView convention). Brief 227+ decomper
 candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
 to find more C-38 chained-cast picks. Research note:
-[`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
+[`brief-225-c39-subpatterns-and-c38-deferred.md`](../docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 
 **Current metrics (post-#709 + #710 merge, EUR):**
 `matched_functions 2166 / 9801 (22.10 %)` — **+32 functions**
@@ -1087,7 +1087,7 @@ verifies). **Switch to `complete_units` as the headline metric.**
 The post-pivot arc (briefs 188 → 203) shipped +44 complete_units
 vs the +11 matched_functions previously reported. Real code-
 decomp progress is ~4× the prior headline. Full diagnosis:
-[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
+[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](../docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
 **Two open lanes after this merge.** **Brief 230 (decomper)** —
 C-39 drain wave 4 (cohort hunting). Apply brief 228's recipe-
@@ -1397,7 +1397,7 @@ verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
   `complete_code_percent=100` but `matched_functions=None` —
   brief 206 will recover all of them (predicted: 1630 → 1677).
   Concrete canary list at
-  [`docs/research/brief-206-prevalidation.md`](docs/research/brief-206-prevalidation.md).
+  [`docs/research/brief-206-prevalidation.md`](../docs/research/brief-206-prevalidation.md).
   (2) `.codex/` cleanup: renamed `cloud.toml` → `scaffolder.toml`,
   updated content (cloud → scaffolder throughout 3 files),
   removed bogus Codex.ai URL convention, fixed `hooks.json`'s
@@ -1883,7 +1883,7 @@ unrelocated-`.o` byte-identity, while our ship paths have
 different reloc records than dsd's delink (post-link bytes match
 — SHA1 PASS verifies). `complete_units` IS the SHA1-aligned
 indicator. Full diagnosis:
-[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md).
+[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](../docs/research/objdiff-fuzzy-vs-complete-metric.md).
 
 **Current (post #671 + #672 merge):**
 
@@ -1896,12 +1896,12 @@ indicator. Full diagnosis:
 | complete_code_percent | (per-unit) | for individual ships, 100 % means byte-identical at the linker level |
 | **easy-tier matched ratio** | **92.9 %** | up from 88.7 %. 79 unmatched easy-tier picks remain, of which 39 are Wall-2-blocked (leaf-no-pool reg-alloc divergence). |
 
-**Resumption queue:** [docs/research/code-decomp-resumption-queue.md](docs/research/code-decomp-resumption-queue.md)
+**Resumption queue:** [docs/research/code-decomp-resumption-queue.md](../docs/research/code-decomp-resumption-queue.md)
 — 52 picks across trivial (12) / easy (25) / medium-easy (15).
 Brief 188 is grinding the trivial bucket; brief 190+ picks up
 easy + medium-easy once brief 189's wall pre-emption lands.
 
-**Resumption playbook:** [docs/decomp-workflow.md](docs/decomp-workflow.md)
+**Resumption playbook:** [docs/decomp-workflow.md](../docs/decomp-workflow.md)
 § "Code-decomp resumption — the post-scaffold playbook" (NEW in
 brief 187). Routing decision tree, scratch flow, permuter staging,
 3-region SHA1 PASS as headline gate.

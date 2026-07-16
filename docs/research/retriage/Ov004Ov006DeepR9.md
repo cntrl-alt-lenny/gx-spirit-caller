@@ -101,11 +101,13 @@ access at all. All state is local (one stack arg, registers).
 **Ground-truth pool words:** none (no literal pool).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02005dac   (x1, inside the bounded loop)
 ```
 
 **C sketch:**
+
 ```c
 /* args: r0=base_id, r1=color(low byte used), r2=row_mul, r3=extra;
    stack[0x30] = raw_value used for loop-bound + phase calc */
@@ -204,6 +206,7 @@ a deterministic `abs()` on the count argument.
   string/pointer-array family; this function is a confirmed live consumer).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00002710             ; 10000 decimal — magnitude threshold
 data_ov004_02209f74
@@ -212,6 +215,7 @@ data_ov004_02209f80
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021c9d60
 func_0202c0c0        (conditional, only when the id-arg is zero entering the voice-ok branch)
@@ -219,6 +223,7 @@ func_0209150c         (one of two call sites, mutually exclusive per branch)
 ```
 
 **C sketch:**
+
 ```c
 /* args: r0=buf, r1=len, r2=count, r3=fmt_flag;
    stack[0x18]=extra_a, stack[0x1c]=str_id_or_zero */
@@ -278,12 +283,14 @@ already fully catalogued in R8's `021cdd38`/`021cfc64`/`021ce4a8` entries.
 - `data_02102c90` — text-render context cluster (documented, R8).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c
 data_02102c90
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02001d68
 func_02001d0c
@@ -297,6 +304,7 @@ func_02001e94
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d0e98(int sl_arg) {
     int lang = (data_02104f4c.f4 << 0x1d) >> 0x1d;
@@ -364,6 +372,7 @@ ever seeing R6's WALL flag. Map doc corroborates: `Ov004_BlendPixels`.
 **Ground-truth BL targets:** none — zero calls.
 
 **C sketch:**
+
 ```c
 /* r0=dst(u16*), r1=src(u16*), r2=count */
 void func_ov004_021c9dd4(u16 *dst, const u16 *src, int count) {
@@ -427,6 +436,7 @@ sampled" placeholder for that exact address.
   not-yet-sampled placeholder for this address.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_02200f18
 0x00002c10
@@ -435,6 +445,7 @@ data_ov004_02200f18
 **Ground-truth BL targets:** none — zero calls.
 
 **C sketch:**
+
 ```c
 int func_ov004_021db874(const char *src, u16 *dst) {
     int out_i = 0, in_i = 0;
@@ -503,12 +514,14 @@ resolves to already-named siblings: `func_0202c0c0` and
   (see New KB gaps).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500
 data_021040ac
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202c0c0        (x5, inside setup loop — one per i in 0..4)
 func_ov004_021d6f20   (x5, inside setup loop, paired 1:1 with above)
@@ -523,6 +536,7 @@ func_ov004_021d6f20                   (gate 4)
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d7440(int kind) {
     if (kind < 0) {
@@ -591,12 +605,14 @@ is a documented NitroSDK/text-render primitive.
   cache (see New KB gaps).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90
 data_ov004_0220f1a4
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Task_PostLocked
 func_02094504
@@ -609,6 +625,7 @@ Task_InvokeLocked
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021cb63c(int slot_id, char *text, int size_arg) {
     int half_scaled = (size_arg << 4);
@@ -733,6 +750,7 @@ base pointer returned by `func_0208e890` (a stable extern) and 5 pool
 literals which are plain hex constants, not symbolic globals.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x04000444
 0x4210ffff
@@ -742,6 +760,7 @@ literals which are plain hex constants, not symbolic globals.
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202d9f8
 func_0208e890
@@ -749,6 +768,7 @@ func_0208ecd8
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d03ec(int card_idx) {
     if (func_0202d9f8() == 0) return;
@@ -823,6 +843,7 @@ into `data_ov004_0220b500`.
 **Ground-truth pool words:** `data_ov004_0220b500`.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202bae4                          (conditional)
 func_0202ba94                             (conditional, same branch)
@@ -836,6 +857,7 @@ func_ov004_021d0530                                              (always, tail)
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d1118(int arg0) {
     if (arg0 != 0) {
@@ -918,6 +940,7 @@ field writes and already-named callees. `data_ov004_0220e500+0xbd8` write of
 `data_ov004_022915e8`.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020347b8
 func_ov004_021c9d8c     (conditional)
@@ -933,6 +956,7 @@ func_ov004_021d9b98                                       (always, tail)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov004_021d9d58(void) {
     data_ov004_0220e500.fbd8 = -1;
@@ -1013,6 +1037,7 @@ flagged is one deterministic address computation, not a loop.
   `OV004_STRUCT_FIELD12=35`/`OV004_STRUCT_FIELD14=1` — direct confirmation).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_0219b2dc
 data_021040ac
@@ -1028,6 +1053,7 @@ data_ov004_0220b500
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02046ac4         (x2: init-gate test, then again after the init block)
 func_020aadf8
@@ -1037,6 +1063,7 @@ func_ov004_021d3a58     (conditional, tail — only if b500.f78 != 0)
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d53c0(SomeSelf *self) {
     int gate = 0;
@@ -1126,6 +1153,7 @@ classification ambiguity.
 **Ground-truth pool words:** `data_ov004_0220b500`.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020945f4
 func_02033c2c
@@ -1135,6 +1163,7 @@ func_02033d28    (conditional tail, only when no branch already set the "handled
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d512c(RecordSelf *self) {
     int was_active = (self->f38 != 0);
@@ -1204,6 +1233,7 @@ compile-time-enumerable case, not a computed/indirect call.
 `0x0400006c`, `0x0400106c`.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov004_021d83b0       (case f4c==1)
 func_ov004_021db780          (case f4c==0)
@@ -1225,6 +1255,7 @@ func_ov004_021d9418                  (3rd dispatch, case new_f4c==2)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov004_021d6a10(void) {
     int gate = (data_ov004_0220b500.f48 != data_ov004_0220b500.f4c);
@@ -1296,6 +1327,7 @@ structure already confirmed tractable in `021d1118`.
 - `data_ov004_022915e8` — lock-gate object.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov004_0220b500
 0x66666667
@@ -1305,6 +1337,7 @@ data_ov004_022915e8
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202c028
 func_0202ba94
@@ -1319,6 +1352,7 @@ func_ov004_021cfbec                  (per inner-loop iteration, x2 outer)
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d0f98(int arg0) {
     if (arg0 != 0) {
@@ -1396,6 +1430,7 @@ animation-request record via already-named helpers.
   family, extends the known set).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c
 data_02102c90
@@ -1404,6 +1439,7 @@ data_ov004_02209dfc
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202c93c
 func_0202c9c0
@@ -1426,6 +1462,7 @@ func_0202cca4                                (always, final)
 ```
 
 **C sketch:**
+
 ```c
 void func_ov004_021d0168(int arg0) {
     int flag = (arg0 != 0);
@@ -1508,6 +1545,7 @@ siblings.
 **Ground-truth pool words:** `data_ov004_0220b500`.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201cbd8
 func_ov004_021cfbec    (per inner-loop iteration in the "count" case, bounded by the stack-buffer count)
@@ -1521,6 +1559,7 @@ func_ov004_021d1118                              (always, arg=1)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov004_021d2aac(void) {
     char buf[0x200];
@@ -1634,6 +1673,7 @@ record-validity idiom byte-for-byte.
 ## ov006 — Tractable functions (17 clean + 3 risk-noted)
 
 ### 0x021B6E3C (220 B, class E, overlay=ov006) — re-examined, was stale
+
 BORDERLINE in R6
 
 **Original verdict:** E — "switch plus counted scan with live ip across
@@ -1666,6 +1706,7 @@ via `add` chains).
 **Ground-truth BL targets:** none (leaf function).
 
 **C sketch:**
+
 ```c
 int func_ov006_021b6e3c(char *base, int slot, int card_key, int mode) {
     char *ip;
@@ -1724,6 +1765,7 @@ stride-0x10 field (see New KB gaps).
 **Ground-truth pool words:** `data_ov006_0224f448` (the only pool word).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208dd9c                          (x1, before loop)
 func_02094504                          (x1, before loop)
@@ -1736,6 +1778,7 @@ func_02004f58                          (x up to 6, conditional)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c4bd4(char *pool_base) {
     char *vram = func_0208dd9c();
@@ -1797,12 +1840,14 @@ known body: `func_0200617c`/`func_02006194` (bit-0/bit-2 accessors),
   compute).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000001ff   ; bit-pack mask
 0x04001018   ; MMIO register (BG2PA-family, engine B)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0200617c        (guard: bit-2 test)
 func_02037208         (conditional toast, id=0x84-0x85)
@@ -1813,6 +1858,7 @@ func_ov006_021caea8             (conditional: Ov006_SubObj_F_HandleInput)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021cac38(SubObjF *self) {
     if (self->f8 == 0) return 1;
@@ -1867,6 +1913,7 @@ edge-detection idiom, zero runtime-unknown branching.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208e1ac    (x1, before loop)
 func_02094504      (x1, before loop)
@@ -1874,6 +1921,7 @@ func_0208e1ac        (x N, re-fetched every INNER-loop iteration, not hoisted)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021ca570(SubObjE *self) {
     void *vram_tilemap_base = func_0208e1ac();
@@ -1928,12 +1976,14 @@ field-setter call uses a literal field ID.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02021660    (x2)
 func_020216b0      (x12: 6 per iteration x 2 iterations)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021caa64(SomeBase *self) {
     int neg_boundary = 1 - self->f60;
@@ -1992,17 +2042,20 @@ purely as a guard. `data_ov006_0225deb4` is already documented as the
   (count), scanned against a fixed 6-entry literal hit-box ladder.
 
 **Ground-truth pool words:**
+
 ```
 data_ov006_021ce084   ; 3-entry stride-0xc hit-region table
 data_ov006_0225deb4    ; Ov006_SubObj_B_Init state object (already named)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021c6f24    (x3, once per loop-1 iteration, up to 3x)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c6530(SubObjE *self, int x, int y, HitResult *out) {
     out->hit = out->tag = out->extra = 0;
@@ -2057,12 +2110,14 @@ this batch. Loop bound is a hard 6-iteration constant with a data-dependent
 - `data_02104f4c+0x4` — language 3-bit field.
 
 **Ground-truth pool words:**
+
 ```
 data_02104f4c
 0x000001cd   ; 461 dec — string-ID literal / geometry base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208dd9c
 func_02094504
@@ -2076,6 +2131,7 @@ func_02004f58                      (x up to 6)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c6840(SomeBase *self) {
     void *vram = func_0208dd9c();
@@ -2139,6 +2195,7 @@ types). `data_ov006_021cddec` is the sibling parallel table.
   0xe.
 
 **Ground-truth pool words:**
+
 ```
 data_ov006_021cdf88   ; Row32ac struct (already documented)
 data_ov006_021cddec    ; parallel s16 array
@@ -2146,12 +2203,14 @@ data_ov006_021cddec    ; parallel s16 array
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02021660     (x8)
 func_020216b0        (x72: 9 per iteration x 8 iterations)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c3384(Ov006Battle *self) {
     Row32ac *row = &data_ov006_021cdf88[0];
@@ -2187,6 +2246,7 @@ int func_ov006_021c3384(Ov006Battle *self) {
 ---
 
 ### 0x021B81DC (320 B, class F, overlay=ov006) — re-examined, was stale
+
 WALL in R6
 
 **Original verdict:** F — "large switch plus loop, heavy reg-alloc" (R6's
@@ -2220,11 +2280,13 @@ The 5-way slot-base resolver is the identical add-chain idiom seen in
 **Ground-truth pool words:** `data_ov006_0224f400`, `data_ov006_0224f3e0`.
 
 **Ground-truth BL targets:**
+
 ```
 func_ov006_021b9a00   (per source-list entry, bounded by the row's count field)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021b81dc(char *self, int slot) {
     char *dst, *src;
@@ -2262,6 +2324,7 @@ int func_ov006_021b81dc(char *self, int slot) {
 ---
 
 ### 0x021B70FC (324 B, class F, overlay=ov006) — re-examined, was stale
+
 WALL in R6
 
 **Original verdict:** F — "324B switch-in-loop, nested calls" (R6's
@@ -2293,6 +2356,7 @@ entry.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0200974c                          (x1, at entry)
 func_ov006_021b7010     (x3 per source-list entry: mode=3, mode=1, mode=2)
@@ -2300,6 +2364,7 @@ func_0202b9b0              (x1 per source-list entry)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021b70fc(char *self) {
     int active_ctx = func_0200974c(self);
@@ -2372,12 +2437,14 @@ data dependency being small already-referenced fields.
 family literal as `021c3384`).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02021660    (x2)
 func_020216b0      (x16: 8 per iteration x 2 iterations)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c5df0(SomeBase *self) {
     StrideRow *row = (StrideRow *)((char *)self + 0x6c + self->f4c * 0x10);
@@ -2440,6 +2507,7 @@ well-established elsewhere in this codebase.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov006_021b6ad8    (x50, guard)
 func_02008f24             (x up to 50, guard-true, loop 1)
@@ -2450,6 +2518,7 @@ func_02012418                       (x up to 32, guard-true, loop 2)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021b8a88(char *self) {
     int count1 = 0;
@@ -2514,6 +2583,7 @@ arithmetic is deterministic clamp/bounds math against already-known fields.
   (s16, tri-state discriminant).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c
 data_ov006_021ce650   ; E9c54 row table, channel 0
@@ -2525,6 +2595,7 @@ data_ov006_021ce8a8    ; E9c54 row table, channel else
 **Ground-truth BL targets:** none (leaf function).
 
 **C sketch:**
+
 ```c
 int func_ov006_021c7d60(SomeBase *self, int arg_r1, int arg_r2) {
     int idx = self->f74;
@@ -2591,12 +2662,14 @@ byte-field inner count, copying a halfword into a destination array.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32              (x1, at entry)
 func_02094688         (x1, at entry)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021b805c(char *self) {
     Fill32(self + 0x124, 0, 0x124);
@@ -2660,12 +2733,14 @@ called by `021c0c14` below, confirming its central-hub role.
 **Ground-truth pool words:** none.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201d710      (x1, at entry)
 func_02094688         (x up to 64: once per inner 8x8-block iteration, nonzero-nibble only)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021cb158(char *self, int tileset_sel, int tile_idx, int base_mul, int coord) {
     int row_stride_mul = ((coord >> 2) + ((unsigned)coord >> 0x1d) >> 3) * self->f14;
@@ -2726,18 +2801,21 @@ exact "zero-check idiom" pattern already documented in R8's `021bbe7c`.
   R4).
 
 **Ground-truth pool words:**
+
 ```
 0x000001c9              ; OBJ-attribute base flags literal (this function's family)
 data_ov006_0225e068     ; audio/engine struct pointer (already documented, R4)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02021660    (x2)
 func_020216b0      (x16: 8 per iteration x 2 iterations)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c358c(SomeBase *self) {
     StrideRow *row = (StrideRow *)((char *)self + 0x9c + self->f64 * 0x10);
@@ -2806,6 +2884,7 @@ primitive used pervasively across R6/R7/R8.
   `func_ov006_021b9dec`/`_9e08`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0224f448
 data_ov006_02257548     ; +0x6c field confirmed; full shape a gap
@@ -2816,6 +2895,7 @@ data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208dd9c
 func_02094504
@@ -2837,6 +2917,7 @@ func_02001d98
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021bf2a4(char *self) {
     void *vram = func_0208dd9c();
@@ -2908,6 +2989,7 @@ The "switch" is an 8-target bounded computed branch, fully enumerable (7 of
 family variant).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020b3870      (x2 per loop iteration: col then row, loop bound 0x23=35)
 func_ov006_021c9c54    (x1 per loop iteration)
@@ -2916,6 +2998,7 @@ func_020216b0               (x8 per loop iteration)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c9030(char *self) {
     for (int i = 0; i < 0x23; i++) {
@@ -2976,6 +3059,7 @@ in call order) to close the exact byte match.
 ---
 
 ### 0x021C0C14 (436 B, class F, overlay=ov006) — genuinely new finding,
+
 cross-referenced but never independently examined by R8
 
 **Original verdict:** F — "436B render/fill, multiple loops, divmod,
@@ -3022,6 +3106,7 @@ description predicts).
   4-iteration digit-style decomposition.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_0225e138    ; Ov006_SubObj_G target object (already documented)
 data_ov006_021cc118     ; 9-entry stride-4 halfword-pair table (NEW)
@@ -3031,6 +3116,7 @@ data_ov006_0224f448       ; card-slot object base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208dd9c
 func_02094504
@@ -3042,6 +3128,7 @@ func_ov006_021cb158              (x1 per outer iteration where self->f40 == 5, t
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c0c14(char *self) {
     void *vram = func_0208dd9c();
@@ -3112,6 +3199,7 @@ exclusive branches, one with an internal fixed 2-iteration loop.
 - `data_02104f4c+0x4` — language field, read 3x.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov006_021cde2c
 data_02104f4c
@@ -3119,6 +3207,7 @@ data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208dd9c
 func_02094504
@@ -3139,6 +3228,7 @@ func_02001d98                                      (mode!=2 branch, post-render)
 ```
 
 **C sketch:**
+
 ```c
 int func_ov006_021c4ec4(SomeBase *self) {
     void *vram = func_0208dd9c();

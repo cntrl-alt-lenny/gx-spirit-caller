@@ -1311,6 +1311,7 @@ These 8 were triaged from scratch against the KB docs (no
 ---
 
 #### 0x0226DAEC (144 B, class E) — genuinely virgin, not in any prior
+
 retriage doc
 
 **Original verdict:** E — "nested loops with field-pack and call inside;

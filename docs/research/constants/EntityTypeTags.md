@@ -74,6 +74,7 @@ duel-phase functions:
 | 0x4D (77) | ov002 only (negated in f4) |
 
 The `S2b07` struct stores the checkpoint negated:
+
 ```c
 struct S2b07 {
     char _pad[4];   /* +0x00 */

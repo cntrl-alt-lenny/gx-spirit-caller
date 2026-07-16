@@ -446,7 +446,7 @@ caveat "no local toolchain" is over-broad.
 >   bytes match orig delinks, which is sufficient for the
 >   ship decision but doesn't validate the full link).
 
-Brain may want to also update [`AGENTS.md`](../AGENTS.md)
+Brain may want to also update [`AGENTS.md`](../../AGENTS.md)
 § scaffolder if the same caveat appears there.
 
 ### 2. `configure.py` `arm9.o.xMAP` rule gap

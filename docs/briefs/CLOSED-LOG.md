@@ -1593,7 +1593,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   The `mf > cu` delta is a natural multi-fn-per-TU artifact, not
   a missing-marker indicator. Brain should not treat this delta
   as actionable bookkeeping. Research note:
-  [`brief-239-c39e-sub-c42-audit-gotchas.md`](docs/research/brief-239-c39e-sub-c42-audit-gotchas.md).
+  [`brief-239-c39e-sub-c42-audit-gotchas.md`](../../docs/research/brief-239-c39e-sub-c42-audit-gotchas.md).
 - **Brief 238** — `decomper`, shipped in PR #710. 🎯 **30 .c
   ships in the C-42 first mechanical drain. Hard-tier 8.16 % →
   8.52 % (+0.36 pp).** Strategic drain hit: 14 main + 16 ov002
@@ -1610,7 +1610,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   mid-scope declarations); early-return vs `return r` form
   depends on whether orig has the redundant `moveq r0, #0`
   (read orig disasm first). Research note:
-  [`brief-238-c42-drain-wave1.md`](docs/research/brief-238-c42-drain-wave1.md).
+  [`brief-238-c42-drain-wave1.md`](../../docs/research/brief-238-c42-drain-wave1.md).
 
 - **Brief 237** — `scaffolder`, shipped in PR #705. 🎯 **C-42
   multi-call thunk NEW WALL classified — biggest single-round
@@ -1627,7 +1627,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   expected mechanical drain via brief 238+. Detector + 3 unit
   tests added. 2 recipe gotchas surfaced (return-r-vs-return-0,
   array-vs-scalar extern). Research note:
-  [`brief-237-hard-tier-landscape-survey.md`](docs/research/brief-237-hard-tier-landscape-survey.md).
+  [`brief-237-hard-tier-landscape-survey.md`](../../docs/research/brief-237-hard-tier-landscape-survey.md).
 - **Brief 236** — `decomper`, shipped in PR #704. 🎯 **31 .c
   ships across C-39 wave 7 + C-39e cohort. Hard-tier 7.79 % →
   8.16 %.** (A) C-39e cohort: 3 of 5 listed candidates shipped
@@ -1660,7 +1660,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (resolved in rebase by keeping brief 234's bytes — identical).
   C-39e detector + C-41 detector + 4 unit tests added. Research
   note:
-  [`brief-235-c39e-c40-broader-and-232-deferred.md`](docs/research/brief-235-c39e-c40-broader-and-232-deferred.md).
+  [`brief-235-c39e-c40-broader-and-232-deferred.md`](../../docs/research/brief-235-c39e-c40-broader-and-232-deferred.md).
 - **Brief 234** — `decomper`, shipped in PR #702. 🎯 **31 .c
   ships in the C-39 wave 6 + C-40 mechanical cleanup. Hard-tier
   ~7.42 % → ~7.79 %.** (A) Drained 28 C-39b-solo picks using brief
@@ -1697,7 +1697,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   recurring source-shape templates from shipped `.legacy.c` picks
   (template clustering similar to brief 159's pattern_library)
   but that's not blocking. Research note:
-  [`mmio-bit-extract.md`](docs/research/mmio-bit-extract.md).
+  [`mmio-bit-extract.md`](../../docs/research/mmio-bit-extract.md).
 - **Brief 232** — `decomper`, shipped in PR #699. 🎯 **35 .c
   ships in the C-39b-solo cohort, hard-tier 7.21 % → 7.42 %.**
   Slightly under the 7.5-7.8 % target (+0.21 pp vs +0.3-0.6 pp)
@@ -1718,7 +1718,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   improvement: brief 215's C-39b regex `mov rD, r0` matched
   shifts (`mov rD, r0, lsl/lsr`) as false positives; tightened
   to `mov rD, r0$` — 116 → 76 candidates. Research note:
-  [`brief-232-c39-drain-wave-5.md`](docs/research/brief-232-c39-drain-wave-5.md).
+  [`brief-232-c39-drain-wave-5.md`](../../docs/research/brief-232-c39-drain-wave-5.md).
 - **Brief 231** — `scaffolder`, shipped in PR #695. 🎯 **2
   permanent walls locked (P-12 + P-13) with full falsification
   matrices — 0 ships, high-value negative result.** **P-13 (C-39c
@@ -1737,7 +1737,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   version variants for C-39c, not to iterate on non-leaf chained-
   cast picks for byte-match, frees brief 232+ from re-trying
   these directions. Research note:
-  [`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](docs/research/brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
+  [`brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md`](../../docs/research/brief-231-c39c-cross-tier-and-c38-nonleaf-p12.md).
 - **Brief 230** — `decomper`, shipped in PR #696. 🎯 **31 .c ships
   (31/32, one revert), hard-tier 6.8 % → 7.2 %.** Drained the
   C-39d-solo cohort (432 candidates pre-brief). 4 recipe sub-
@@ -1756,7 +1756,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   brief 232+ candidate). Metric deltas: `matched_functions` 1994
   → 2025 (+31), `complete_units` ~1957 → ~1988 (+31). 3-region
   SHA1 PASS. Research note:
-  [`brief-230-c39-wave4-cohort-hunt.md`](docs/research/brief-230-c39-wave4-cohort-hunt.md).
+  [`brief-230-c39-wave4-cohort-hunt.md`](../../docs/research/brief-230-c39-wave4-cohort-hunt.md).
 - **Brief 229** — `scaffolder`, shipped in PR #693. 🎯 **C-39d
   locked (3/3, natural re-read recipe)** + C-39c near-miss +
   C-38 non-leaf P-12 candidate. **Key insight: C-39d's recipe
@@ -1773,7 +1773,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   candidate. Drain estimate per scaffolder: ~100-150 C-39d picks
   + brief 226's ~250-300 a/b = **~400-500 total C-39 sub-shape
   drain picks** for brief 230+. Research note:
-  [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](docs/research/brief-229-c39c-d-pilots-and-c38-nonleaf.md).
+  [`brief-229-c39c-d-pilots-and-c38-nonleaf.md`](../../docs/research/brief-229-c39c-d-pilots-and-c38-nonleaf.md).
   Pre-merge gotcha caught: ternary polarity (`m < 1 ? 0 : 2` vs
   `m >= 1 ? 2 : 0`) emits different `movge`/`movlt` order — SHA1
   caught it; fixed by flipping polarity.
@@ -1790,7 +1790,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   returned 0; deferred to brief 230+. Metric deltas:
   `matched_functions` 1963 → 1994 (+31), `complete_units` 1926
   → 1957 (+31). 3-region SHA1 PASS. Research note:
-  [`brief-228-c39-wave3-sub-shapes.md`](docs/research/brief-228-c39-wave3-sub-shapes.md).
+  [`brief-228-c39-wave3-sub-shapes.md`](../../docs/research/brief-228-c39-wave3-sub-shapes.md).
 - **Brief 227** — `decomper`, shipped in PR #690. 🎯 **19/19 .c
   ships, hard-tier 6.0 % → 6.2 %.** Methodology breakthrough:
   scan disasm FIRST, filter by exact sub-shape, batch-write C.
@@ -1804,7 +1804,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   scaffolder lane). Metric deltas: `matched_functions` 1940 →
   1959 (+19), `complete_units` 1903 → 1922 (+19). 3-region SHA1
   PASS preserved. Research note:
-  [`brief-227-c38-chained-cast-c39-wave2.md`](docs/research/brief-227-c38-chained-cast-c39-wave2.md).
+  [`brief-227-c38-chained-cast-c39-wave2.md`](../../docs/research/brief-227-c38-chained-cast-c39-wave2.md).
 - **Brief 226** — `scaffolder`, shipped in PR #689. 🎯 **C-39a +
   C-39b sub-classifications locked (3/3 ships per sub-shape).**
   **C-39a (sign-check)** recipe: dead-arg helper-reuse —
@@ -1818,7 +1818,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   signatures + 5 new unit tests. Drain estimate per scaffolder:
   ~250-300 additional C-39 picks unlocked for brief 228+. Research
   note:
-  [`brief-226-c39-subclass-sign-check-helper-reuse.md`](docs/research/brief-226-c39-subclass-sign-check-helper-reuse.md).
+  [`brief-226-c39-subclass-sign-check-helper-reuse.md`](../../docs/research/brief-226-c39-subclass-sign-check-helper-reuse.md).
 - **Brief 225** — `scaffolder`, shipped in PR #686. 🎯 **1 ship +
   4 documented near-misses with full falsification matrices.**
   Two parallel investigations. Shipped: `func_0207d304.legacy.c`
@@ -1837,7 +1837,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Brief 226+ scaffolder followup: deeper investigation of
   DCE-defeat idioms (A1/B2 family) and u64-pack/value-in-regs
   family (B3) if more candidates surface. Research note:
-  [`brief-225-c39-subpatterns-and-c38-deferred.md`](docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
+  [`brief-225-c39-subpatterns-and-c38-deferred.md`](../../docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
 - **Brief 224** — `decomper`, shipped in PR #687. 🎯 **25 ships,
   hard-tier 5.6 % → 6.0 %.** First C-39 drain wave (24 `.s` + 1
   `.c` upgrade `func_ov002_021f4a00.c`). Below 10-18 `.c` target
@@ -1851,7 +1851,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   of these as sub-classification pilots. Metric deltas:
   `matched_functions` 1915 → 1940 (+25), `complete_units` 1878 →
   1903 (+25). 3-region SHA1 PASS preserved. Research note:
-  [`brief-224-c39-wave1.md`](docs/research/brief-224-c39-wave1.md).
+  [`brief-224-c39-wave1.md`](../../docs/research/brief-224-c39-wave1.md).
 - **Brief 223** — `decomper`, shipped in PR #683. 🎯 **29 hard-tier
   ships (5.3 % → 5.6 %).** First hard-tier wave per brief 220's
   survey. 28 `.s` + 1 `.legacy.c` (`func_020115a8` — 12-field
@@ -1884,7 +1884,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (`func_ov010_021b238c`, near-miss at 85 % fuzzy) and switch-
   table dispatch sub-shape (`func_ov002_0222bc1c`, 396 B). Both
   feed brief 225 scaffolder follow-on. Research note:
-  [`brief-222-c39-non-leaf-bitfield.md`](docs/research/brief-222-c39-non-leaf-bitfield.md).
+  [`brief-222-c39-non-leaf-bitfield.md`](../../docs/research/brief-222-c39-non-leaf-bitfield.md).
 - **Brief 221** — `decomper`, shipped in PR #680. 🎯 **Medium-tier
   100 % matched (161 / 161).** 18 ships drained the unmatched
   medium cohort. After easy-tier closed in brief 219, medium is
@@ -1912,7 +1912,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   216 recipes (222), C-22 solo (33). Brief 222 (C-39 pilot) and
   brief 223 (C-23 + StyleA drain) directly seeded by this survey.
   Research note:
-  [`hard-tier-wall-survey.md`](docs/research/hard-tier-wall-survey.md).
+  [`hard-tier-wall-survey.md`](../../docs/research/hard-tier-wall-survey.md).
 - **Brief 219** — `decomper`, shipped in PR #677. 🎯 **Easy-tier
   100 % matched (1110 / 1110).** 40 ships drained the remaining
   easy-tier cohort: 2 worked C examples (Recipe C
@@ -1950,7 +1950,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   plain `.c`. Brief 214's "32-byte shape" claim was likely a
   mis-measurement (function size including internal pool word).
   Research note:
-  [`brief-218-wall-1-broader-and-shape-b.md`](docs/research/brief-218-wall-1-broader-and-shape-b.md).
+  [`brief-218-wall-1-broader-and-shape-b.md`](../../docs/research/brief-218-wall-1-broader-and-shape-b.md).
   Brain housekeeping caught + fixed missed `delinks.txt` update
   during merge prep (3-region SHA1 PASS confirmed on the fixed
   state).
@@ -2142,7 +2142,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (direct subscript constant-folds). Brief 199's recipe is now
   more general. +3 complete_units; matched_functions ticks under-
   reported due to reloc-record divergence (see
-  [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](docs/research/objdiff-fuzzy-vs-complete-metric.md)).
+  [`docs/research/objdiff-fuzzy-vs-complete-metric.md`](../../docs/research/objdiff-fuzzy-vs-complete-metric.md)).
 - **Brief 202** — `scaffolder`, shipped in PR #653. 🎯 **C-34
   address-CSE wall closed with `.s` recipe + worked example.**
   NOT classified as P-12 — recipe found. Two-layer CSE bypass
@@ -2385,7 +2385,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   at `docs/research/cluster-b-bundle-cap-raise.md`.
 - **Brief 184** — `scaffolder`, shipped in PR #629. 🎯
   **Cluster C / D-1 / D-2 cross-region subcommands.** Direct
-  continuation of [PR #626's research note](docs/research/chunk-extent-generalisation.md):
+  continuation of [PR #626's research note](../../docs/research/chunk-extent-generalisation.md):
   brief 177's `adjust_chunk_extent` is already cluster-agnostic;
   this brief wires three new subcommands into
   `tools/cross_region_cluster_apply.py` (`c-strings`,
@@ -2452,7 +2452,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   ov007 + 1 ov021. 3-region SHA1 PASS + 27/27 modules
   preserved. Brain pushed drift-check regen fix on rebase.
 
-- [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
+- [`docs/briefs/176-cross-region-cluster-b-residue-with-generator.md`](../../docs/briefs/176-cross-region-cluster-b-residue-with-generator.md)
   `decomper`, shipped in PR #617. ✅ **Brief 174
   generator validated at scale.** 32 cross-region
   cluster B residue claims (16 USA + 16 JPN). **ov006
@@ -2462,7 +2462,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   extend gates met (53% yield + 500+ B). Residue 16
   (size-1/2 + odd-aligned) deferred to brief 180+.
   3-region SHA1 PASS + 27/27 OK preserved.
-- [`docs/briefs/177-unified-chunk-extent-generator.md`](docs/briefs/177-unified-chunk-extent-generator.md)
+- [`docs/briefs/177-unified-chunk-extent-generator.md`](../../docs/briefs/177-unified-chunk-extent-generator.md)
   `scaffolder`, shipped in PR #618. 🎉 New
   `tools/cross_region_chunk_extent.py` 3-phase
   algorithm generalises brief 174 to multi-symbol
@@ -2474,7 +2474,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   conflict resolution (both PRs touched same files;
   additive merge).
 
-- [`docs/briefs/175-cross-region-cluster-d3-apply.md`](docs/briefs/175-cross-region-cluster-d3-apply.md)
+- [`docs/briefs/175-cross-region-cluster-d3-apply.md`](../../docs/briefs/175-cross-region-cluster-d3-apply.md)
   `decomper`, shipped in PR #614. 🔬 **Same failure
   class as brief 172.** Attempted mechanical cross-
   region apply of 59 EUR D-3 Pattern 3 chunks; **0
@@ -2484,7 +2484,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   generalises brief 174's heuristic into region-aware
   chunk extent generator. No source kept; baseline
   preserved. Brain pushed drift-check regen fix.
-- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](docs/briefs/174-bundle-extent-heuristic-generator.md)
+- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](../../docs/briefs/174-bundle-extent-heuristic-generator.md)
   `scaffolder`, shipped in PR #615. 🎉 **Heuristic locked +
   generator shipped.** `tools/cluster_b_bundle_gen.py`
   automates the brief 152/155 hand-tuned heuristic
@@ -2494,7 +2494,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   worked examples shipped + SHA1 PASS. 15 new tests;
   suite 1874 → 1889. Brain pushed F401 ruff fixes.
 
-- [`docs/briefs/172-cross-region-cluster-b-residue.md`](docs/briefs/172-cross-region-cluster-b-residue.md)
+- [`docs/briefs/172-cross-region-cluster-b-residue.md`](../../docs/briefs/172-cross-region-cluster-b-residue.md)
   `decomper`, shipped in PR #611. 🔬 **Hypothesis
   falsified.** 4 bundle-apply iterations attempted, all
   FAIL on USA + JPN cluster B residue. Root cause:
@@ -2504,7 +2504,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   174 hand-off: scaffolder builds an extent-selection-
   heuristic generator. Brain pushed drift-check regen
   fix.
-- [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](docs/briefs/173-odd-aligned-slot-recipe-research.md)
+- [`docs/briefs/173-odd-aligned-slot-recipe-research.md`](../../docs/briefs/173-odd-aligned-slot-recipe-research.md)
   `scaffolder`, shipped in PR #612. 🔬 **All 4 variants FAIL**
   on `data_ov004_021ded69`. Root cause: mwldarm enforces
   minimum 4-byte alignment on `.rodata` regardless of
@@ -2516,7 +2516,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   pool shifts at low n (brief 177+ candidate). Research
   note + brief 174+ hand-off shipped.
 
-- [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
+- [`docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md`](../../docs/briefs/171-ov004-rodata-path-2-scale-up-wave-2.md)
   `decomper`, shipped in PR #608. 🔑 **First sub-3
   ov004 `.rodata` state shipped.** 5 band-1 4-aligned
   claims kept; multi-band-1 cascade demonstrated n=9→
@@ -2525,7 +2525,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   brief 160 finding #4 still applies). New signed-net
   form at n=2 (`net -8`); byte-detection authoritative.
   3-region SHA1 PASS + 27/27 preserved.
-- [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
+- [`docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md`](../../docs/briefs/170-cross-region-cluster-bd3-apply-tooling.md)
   `scaffolder`, shipped in PR #609. 🎉 **Cross-region
   tooling shipped.** New
   `tools/cross_region_cluster_apply.py` generalises
@@ -2537,7 +2537,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   application. 28 new tests; suite 1874 → 1902. Brain
   pushed F401 + F841 + B007 ruff fixes.
 
-- [`docs/briefs/169-cross-region-cluster-a-apply.md`](docs/briefs/169-cross-region-cluster-a-apply.md)
+- [`docs/briefs/169-cross-region-cluster-a-apply.md`](../../docs/briefs/169-cross-region-cluster-a-apply.md)
   `decomper`, shipped in PR #605. 🎉 **Largest single-
   brief cross-region unlock.** 3,164 cluster A bss
   claims across USA + JPN (1,582 per region = 100%
@@ -2548,7 +2548,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   files. 50 TUs total (25 per region). 3-region SHA1
   PASS + 27/27 preserved; EUR bit-identical
   regression verified.
-- [`docs/briefs/168-patcher-n3-residual-fix.md`](docs/briefs/168-patcher-n3-residual-fix.md)
+- [`docs/briefs/168-patcher-n3-residual-fix.md`](../../docs/briefs/168-patcher-n3-residual-fix.md)
   `scaffolder`, shipped in PR #606. 🔑 **n=3 SHA1 residual
   CLOSED via deeper-than-expected fix.** Diagnosis
   showed the root cause was NOT a new cluster shape
@@ -2566,7 +2566,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   regions. W7 chain: 134 → 142 → 146 → 150 → 162 →
   164 → **168**.
 
-- [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](docs/briefs/167-ov004-rodata-path-2-scale-up.md)
+- [`docs/briefs/167-ov004-rodata-path-2-scale-up.md`](../../docs/briefs/167-ov004-rodata-path-2-scale-up.md)
   `decomper`, shipped in PR #602. 🔑 **First production
   wave of brief 164's walk-forward detector.** 6 path-2
   claims kept at n=5; 4,464 bytes; 3-region SHA1 PASS.
@@ -2577,7 +2577,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   target enumeration captured. Band-1 confirmed as only
   sub-5 path. Both self-extend gates met (86% yield +
   4,464 B); further sub-5 work gated on brief 168.
-- [`docs/briefs/166-pattern3-generator-local-label-fix.md`](docs/briefs/166-pattern3-generator-local-label-fix.md)
+- [`docs/briefs/166-pattern3-generator-local-label-fix.md`](../../docs/briefs/166-pattern3-generator-local-label-fix.md)
   `scaffolder`, shipped in PR #601. Pattern 3 generator emits
   raw hex literals for `kind:label(*)` refs; no `.extern`.
   `_word_directive_for_target` helper centralises the
@@ -2587,7 +2587,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   manual patch (cosmetic whitespace only); kept hand-
   patched file. 2 new tests; suite 1838/1838.
 
-- [`docs/briefs/165-main-30kb-mega-array.md`](docs/briefs/165-main-30kb-mega-array.md)
+- [`docs/briefs/165-main-30kb-mega-array.md`](../../docs/briefs/165-main-30kb-mega-array.md)
   `decomper`, shipped in PR #598. 🎉 **Biggest single
   deferred Pattern 1 candidate shipped.** `data_020b6ec4`
   — 30,720 B (30.0 KB exact, 0x7800) in main `.rodata`,
@@ -2597,7 +2597,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   not exercised). Tooling stack proved fully turnkey on
   biggest single mega. 3-region SHA1 PASS + 27/27 OK
   preserved. Deferred-mega residue 2 → 1.
-- [`docs/briefs/164-patcher-n5-residual-fix.md`](docs/briefs/164-patcher-n5-residual-fix.md)
+- [`docs/briefs/164-patcher-n5-residual-fix.md`](../../docs/briefs/164-patcher-n5-residual-fix.md)
   `scaffolder`, shipped in PR #599. 🔑 **n=5 SHA1 residual
   CLOSED — path-2 unblocked.** Diagnosis: mwldarm at n=5
   emits 28-byte cluster (`WITH_TERMINATOR_LONG` shape) vs
@@ -2610,7 +2610,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   tests; suite 1832 → 1836. W7 chain: 134 → 142 → 146 →
   150 → 162 → 164.
 
-- [`docs/briefs/163-cluster-d3-wave-3.md`](docs/briefs/163-cluster-d3-wave-3.md)
+- [`docs/briefs/163-cluster-d3-wave-3.md`](../../docs/briefs/163-cluster-d3-wave-3.md)
   `decomper`, shipped in PR #595. **🎉 Cluster D-3
   EFFECTIVELY CLOSED.** 9 chunks / 12,528 B (7 ov006 0x280
   + 1 ov002 mid + 1 main mega data_020c7b44 4,924 B).
@@ -2623,7 +2623,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   verified). New generator gap surfaced (local-label
   `.word .L_*`); decomper manually fixed; brief 166+
   candidate.
-- [`docs/briefs/162-patcher-low-n-extended-coverage.md`](docs/briefs/162-patcher-low-n-extended-coverage.md)
+- [`docs/briefs/162-patcher-low-n-extended-coverage.md`](../../docs/briefs/162-patcher-low-n-extended-coverage.md)
   `scaffolder`, shipped in PR #596. Path A (per-n empirical
   override dict). Empirical sampling captured n=5
   `ctor_pad_net = 8` vs formula 12 → +4 disagreement
@@ -2636,7 +2636,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   SHA1 residual (brief 164 closes). W7 patcher chain:
   134 → 142 → 146 → 150 → 162.
 
-- [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
+- [`docs/briefs/160-ov004-rodata-veneer-trigger-claims.md`](../../docs/briefs/160-ov004-rodata-veneer-trigger-claims.md)
   `decomper`, shipped in PR #592. **🔬 Path-2 hypothesis
   FALSIFIED but mechanism CONFIRMED.** 3 per-slot
   experiments, 0 PASS (all reverted), research-note-only
@@ -2650,7 +2650,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   shift the veneer pool by 2 B** → patcher contiguity
   fails. Separate recipe needed. 3-region SHA1 PASS
   preserved.
-- [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](docs/briefs/161-pattern3-subsumed-ref-resolution.md)
+- [`docs/briefs/161-pattern3-subsumed-ref-resolution.md`](../../docs/briefs/161-pattern3-subsumed-ref-resolution.md)
   `scaffolder`, shipped in PR #593. Sketch 2 chosen (cleanest,
   no generator/patcher change). Investigation: GNU
   `__attribute__((alias))` only does address-equal aliases
@@ -2663,7 +2663,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   to-end (brief 158's deferred). Suite 1808 → 1824. 3-
   region SHA1 PASS bit-for-bit preserved.
 
-- [`docs/briefs/158-cluster-d3-wave-2.md`](docs/briefs/158-cluster-d3-wave-2.md)
+- [`docs/briefs/158-cluster-d3-wave-2.md`](../../docs/briefs/158-cluster-d3-wave-2.md)
   `decomper`, shipped in PR #589. **12 chunks across 5
   modules** (main + ov002 + ov006 + ov007 + ov021) / 5,852
   bytes. First wave with overlay reach (wave 1 main-only).
@@ -2675,7 +2675,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `arm9_ovNNN.bin` symlinks for ov002/6/7/21 (generator's
   expected path mismatch — also brief 161 cleanup candidate).
   3-region SHA1 PASS + 27/27 OK preserved.
-- [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
+- [`docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md`](../../docs/briefs/159-pattern3-section-flag-plus-reverse-lookup-tool.md)
   `scaffolder`, shipped in PR #590. **Part 1**: `--section
   {auto,rodata,data}` flag (closes brief 157 generator
   gap). Auto-detect via delinks.txt section table. 5 new
@@ -2690,7 +2690,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   **Path-2 infrastructure shipped.** Brain pushed F541 +
   MD022 lint fixes.
 
-- [`docs/briefs/157-cluster-d3-wave-1.md`](docs/briefs/157-cluster-d3-wave-1.md)
+- [`docs/briefs/157-cluster-d3-wave-1.md`](../../docs/briefs/157-cluster-d3-wave-1.md)
   `decomper`, shipped in PR #586. **🎉 Last unopened
   data-tier sub-cluster opened.** 9 D-3 chunks, 6,664
   bytes (80% over ≥5 target). All chunks natively clean
@@ -2699,7 +2699,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   shipped mechanically. Yield gate FAIL (9/33=27%,
   deliberately conservative); wave 1 closes. Generator
   gap surfaced for scaffolder brief 159 Part 1.
-- [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
+- [`docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md`](../../docs/briefs/156-cluster-b-recipe-addendum-medium-spot-disassembly.md)
   `scaffolder`, shipped in PR #587. **Part 1**: recipe addendum
   capturing bundle generalisation to value=0 size=4 (per
   brief 155). **Part 2**: 8-candidate spot-disasm. **Hit
@@ -2712,7 +2712,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   trip gate. Bonus: non-STMFD controls caught coherent
   THUNK patterns. Brain pushed MD018 lint fix.
 
-- [`docs/briefs/155-cluster-b-main-w6-rejected-drain.md`](docs/briefs/155-cluster-b-main-w6-rejected-drain.md)
+- [`docs/briefs/155-cluster-b-size-1-2-main-wave.md`](../../docs/briefs/155-cluster-b-size-1-2-main-wave.md)
   `decomper`, shipped in PR #584. **Cluster B
   effectively closed.** Pool pivot: main size-1/2 was
   empty (brief 152 claimed only one); pivoted to cluster
@@ -2723,7 +2723,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   applies, broader application** — bundle forces non-zero
   content into `.data`, preventing mwcc emission to `.bss`.
   **3-region SHA1 PASS + 27/27 OK preserved.**
-- [`docs/briefs/154-ov004-rodata-symbol-reclassification-research.md`](docs/briefs/154-ov004-rodata-symbol-reclassification-research.md)
+- [`docs/briefs/154-ov004-rodata-symbol-reclassification-research.md`](../../docs/briefs/154-ov004-rodata-symbol-reclassification-research.md)
   `scaffolder`, shipped in PR #581 (survey-only after recovery).
   Initial submission included HIGH-confidence
   reclassification of `0x021e2efc` that **brain verify-
@@ -2738,7 +2738,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   gate before any promotes to HIGH. **3-region SHA1
   PASS preserved.** Survey is high-value catalog (622
   candidates bucketed by structural heuristics).
-- [`docs/briefs/153-cluster-b-size-1-2-overlay-wave.md`](docs/briefs/153-cluster-b-size-1-2-overlay-wave.md)
+- [`docs/briefs/153-cluster-b-size-1-2-wave.md`](../../docs/briefs/153-cluster-b-size-1-2-wave.md)
   `decomper`, shipped in PR #582. **6 multi-symbol `.s`
   bundles** covering **1560 bytes** across ov002 (2) +
   ov006 (4), absorbing 34 placeholder neighbours.
@@ -2748,7 +2748,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   3-style multi-symbol `.s` chunks where each absorbed
   placeholder gets its own `.global` label. **3-region
   SHA1 PASS preserved.**
-- [`docs/briefs/151-ov004-rodata-cluster-wave-2.md`](docs/briefs/151-ov004-rodata-cluster-wave-2.md)
+- [`docs/briefs/151-ov004-rodata-cluster-wave-2.md`](../../docs/briefs/151-ov004-rodata-cluster-wave-2.md)
   `decomper`, shipped in PR #578. **28 source-level
   claims** (40% over ≥20 target). 25 Pattern 1 .c
   (brief 141 orphan recovery) + 2 D-1 + 1 Pattern 3
@@ -2757,7 +2757,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   met: couldn't drop `n` below 9 — remaining
   candidates are ARM-code-as-data misclassifications,
   handed off to brief 154.
-- [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](docs/briefs/152-cluster-b-size-1-2-workarounds.md)
+- [`docs/briefs/152-cluster-b-size-1-2-workarounds.md`](../../docs/briefs/152-cluster-b-size-1-2-workarounds.md)
   `scaffolder`, shipped in PR #579. **Workaround #3 PASSES;
   #2 FALSIFIED with root-cause diagnosis.** `arm9.lcf`'s
   `ALIGNALL(2)` (not mwcc) is the alignment-cascade
@@ -2766,7 +2766,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   bundle, 64 bytes). Recipe locked at
   `docs/research/cluster-b-size-1-2-recipe.md`.
 
-- [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
+- [`docs/briefs/149-cluster-b-wave-3-pointer-apply.md`](../../docs/briefs/149-cluster-b-wave-3-pointer-apply.md)
   `decomper`, shipped in PR #575. **Cluster B pointer
   pool fully drained**: 20 of 20 candidates via scaffolder's
   locked recipe. 12 singletons + two 4-element + one
@@ -2781,7 +2781,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Self-extend gate: yield 100% PASS, bytes-matched
   FAIL (80 B vs ≥250 B); wave 1 closes. **3-region SHA1
   PASS + 27/27 OK preserved.**
-- [`docs/briefs/150-patcher-low-n-with-terminator.md`](docs/briefs/150-patcher-low-n-with-terminator.md)
+- [`docs/briefs/150-patcher-low-n-with-terminator.md`](../../docs/briefs/150-patcher-low-n-with-terminator.md)
   `scaffolder`, shipped in PR #576. Option A shipped:
   byte-detection authoritative in `_fix_ctor_and_pad`;
   n-inference is now a hint via stderr note, not
@@ -2798,7 +2798,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   at historical n=86.** Brief 134 → 142 → 146 → 150
   patcher chain complete.
 
-- [`docs/briefs/147-ov004-rodata-cluster-wave-retry.md`](docs/briefs/147-ov004-rodata-cluster-wave-retry.md)
+- [`docs/briefs/147-ov004-rodata-cluster-wave-retry.md`](../../docs/briefs/147-ov004-rodata-cluster-wave-retry.md)
   `decomper`, shipped in PR #572. **14 ov004 `.rodata`
   syms across all 3 shapes proven** (Pattern 1 .c /
   Pattern 1 .s / Pattern 3 chunk). Brief 146 patcher
@@ -2812,7 +2812,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   without forcing the additional 6 candidates that
   would have broken SHA1. Brief 150 closes the
   boundary.
-- [`docs/briefs/148-cluster-b-pointer-typedef-research.md`](docs/briefs/148-cluster-b-pointer-typedef-research.md)
+- [`docs/briefs/148-cluster-b-pointer-typedef-research.md`](../../docs/briefs/148-cluster-b-pointer-typedef-research.md)
   `scaffolder`, shipped in PR #573. Research brief, three
   deliverables. (1) Pointer pool survey at
   `docs/research/cluster-b-pointer-pool.md` (23
@@ -2830,7 +2830,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   default 4-byte section alignment ≠ orig byte-tight;
   1308 byte diff). 3 size-1 workaround sketches filed
   for brief 149 stretch falsification.
-- [`docs/briefs/146-patcher-ctor-terminator-detection.md`](docs/briefs/146-patcher-ctor-terminator-detection.md)
+- [`docs/briefs/146-patcher-ctor-terminator-detection.md`](../../docs/briefs/146-patcher-ctor-terminator-detection.md)
   `scaffolder`, shipped in PR #570. Two-path
   `_fix_ctor_and_pad`: WITH_TERMINATOR (n=86,
   preserves SHA1 PASS bit-for-bit) and NO_TERMINATOR
@@ -2840,17 +2840,17 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   where `.LZN` marker differs from zero pad. Pinned
   with dedicated test. Unblocks ov004 `.rodata`
   source-level work (brief 147).
-- [`docs/briefs/144-pattern3-extern-emission-fix.md`](docs/briefs/144-pattern3-extern-emission-fix.md)
+- [`docs/briefs/144-pattern3-extern-emission-fix.md`](../../docs/briefs/144-pattern3-extern-emission-fix.md)
   `scaffolder`, shipped in PR #565. Pattern 3 generator
   now auto-emits `.extern` declarations for `.word
   <name>` references. Eliminates 14 chunks' worth of
   manual fixups. 1770/1770 tests post-merge.
-- [`docs/briefs/145-ov004-rodata-cluster-wave.md`](docs/briefs/145-ov004-rodata-cluster-wave.md)
+- [`docs/briefs/145-ov004-rodata-cluster-wave.md`](../../docs/briefs/145-ov004-rodata-cluster-wave.md)
   `decomper`, shipped in PR #566. **BLOCKED writeup**
   — no source changes; characterised the patcher bug
   brief 146 then fixed. Clean discipline: 3
   reproducer shapes documented; SHA1 not regressed.
-- [`docs/briefs/142-patch-veneers-variable-count.md`](docs/briefs/142-patch-veneers-variable-count.md)
+- [`docs/briefs/142-patch-veneers-variable-count.md`](../../docs/briefs/142-patch-veneers-variable-count.md)
   `scaffolder`, shipped in PR #562. Generalised
   `tools/patch_ov004_veneers.py` to accept any veneer
   count `n ∈ [0, HISTORICAL_MAX_VENEER_COUNT=86]`.
@@ -2862,7 +2862,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   worktree — no parallel-session interference. Unlocks
   brief 145 ov004
   `.rodata` cluster work.
-- [`docs/briefs/143-cluster-b-wave-1.md`](docs/briefs/143-cluster-b-wave-1.md)
+- [`docs/briefs/143-cluster-b-wave-1.md`](../../docs/briefs/143-cluster-b-wave-1.md)
   `decomper`, shipped in PR #561. **First post-SHA1
   decomp wave.** Opened cluster B — last unopened
   data-tier cluster. **60 true scalars** (target ≥30;
@@ -2877,7 +2877,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   SHA1 PASS preserved.** Strict-aligned-nonzero sub-
   pool drained 60/60. Brief 146+ candidates: 5 size-2
   + 2 size-1 + 6 zero-value + 1 non-aligned residue.
-- [`docs/briefs/140-sha1-final-gate.md`](docs/briefs/140-sha1-final-gate.md)
+- [`docs/briefs/140-sha1-final-gate.md`](../../docs/briefs/140-sha1-final-gate.md)
   `scaffolder`, shipped in PR #558. **🎉🎉🎉 `ninja sha1`
   PASSES FOR EUR + USA + JPN.** First byte-identical
   ROM rebuild in project history. Two parts, single
@@ -2896,7 +2896,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   area is byte-identical to orig). 15 new tests
   (3 patcher + 12 CRC); total 1742. Brain pushed F401
   unused-import fix.
-- [`docs/briefs/141-ov004-cluster-sweep.md`](docs/briefs/141-ov004-cluster-sweep.md)
+- [`docs/briefs/141-ov004-cluster-sweep.md`](../../docs/briefs/141-ov004-cluster-sweep.md)
   `decomper`, shipped in PR #557. **31 symbols across
   cluster C + D-1 + D-2.** First production ov004
   cluster work post-W7 unlock. **New empirical W7
@@ -2907,7 +2907,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   D-1 + D-2 pools exhausted; cluster C `.data`
   partial (25/92 strict-aligned drained). Brief 142
   generalises the patcher to unlock .rodata work.
-- [`docs/briefs/138-clean-macos-junk-filter.md`](docs/briefs/138-clean-macos-junk-filter.md)
+- [`docs/briefs/138-clean-macos-junk-filter.md`](../../docs/briefs/138-clean-macos-junk-filter.md)
   `scaffolder`, shipped in PR #555. **🔑 99.995% SHA1-gap
   closure shipped.** `tools/clean_macos_junk.py`
   removes `.DS_Store` / `._*` / `Thumbs.db` /
@@ -2918,7 +2918,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   drops to exactly 5 bytes** (verified locally on
   combined main: EUR + USA + JPN identical shape).
   Brain pushed F401 unused-`os`-import fix.
-- [`docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md`](docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md)
+- [`docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md`](../../docs/briefs/139-cluster-a-wave-4-pattern3-wave-2.md)
   `decomper`, shipped in PR #554. **305 effective
   candidates** (target was ≥ 105; self-extend
   exercised). Part 1: 298 .bss symbols across 17
@@ -2928,7 +2928,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   gap exercised (`.word <name>` manual `.extern`).
   Pre-existing Pattern 1 TUs removed where chunks
   now cover them. 3-region 27/27 preserved.
-- [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](docs/briefs/136-usa-jpn-main-2byte-fix.md)
+- [`docs/briefs/136-usa-jpn-main-2byte-fix.md`](../../docs/briefs/136-usa-jpn-main-2byte-fix.md)
   `decomper`, shipped in PR #551. **🎉🎉 3-REGION
   27/27 MODULE BASELINE.** Root cause was duplicate
   symbol `func_02094d18` across two real functions
@@ -2938,7 +2938,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   address breaks the duplicate. 4 symbols.txt edits
   + 2 source extern renames. EUR preserved 27/27;
   USA + JPN flipped 26/27 → 27/27.
-- [`docs/briefs/137-sha1-gap-scoping.md`](docs/briefs/137-sha1-gap-scoping.md)
+- [`docs/briefs/137-sha1-gap-scoping.md`](../../docs/briefs/137-sha1-gap-scoping.md)
   `scaffolder`, shipped in PR #552. **🔑 99.995% of SHA1
   gap is `.DS_Store` macOS metadata leakage.** EUR
   diff 100,805 → 5 bytes after filter. Bisection
@@ -2950,7 +2950,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   + brief 140 (CRC16) = SHA1 PASS. Zero new toolchain
   walls (W8+ candidates absent).
 
-- [`docs/briefs/134-ov004-binary-patch-phase3.md`](docs/briefs/134-ov004-binary-patch-phase3.md)
+- [`docs/briefs/134-ov004-binary-patch-phase3.md`](../../docs/briefs/134-ov004-binary-patch-phase3.md)
   `scaffolder`, shipped in PR #549. **🎉 26/27 BASELINE
   UNLOCKED: EUR 27/27 + USA 26/27 + JPN 26/27.**
   First multi-region module-baseline milestone of the
@@ -2965,7 +2965,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (bytes outside dsd module coverage — brief 137
   scoping). USA/JPN main 2-byte residue (BL offset
   0xf4 displacement) is brief 136 candidate.
-- [`docs/briefs/135-cluster-d2-pattern3-wave-1.md`](docs/briefs/135-cluster-d2-pattern3-wave-1.md)
+- [`docs/briefs/135-cluster-d2-pattern3-wave-1.md`](../../docs/briefs/135-cluster-d2-pattern3-wave-1.md)
   `decomper`, shipped in PR #548. **26 effective
   candidates** (19 D-2 + 7 Pattern 3 chunks). Self-
   extend on both axes. D-2 sub-pool ~60-75% drained
@@ -2974,7 +2974,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   gap: `.word <name>` needs manual `.extern`
   declarations (brief 137+ generator fix candidate).
 
-- [`docs/briefs/132-ov004-symbol-scoping-phase2.md`](docs/briefs/132-ov004-symbol-scoping-phase2.md)
+- [`docs/briefs/132-ov004-symbol-scoping-phase2.md`](../../docs/briefs/132-ov004-symbol-scoping-phase2.md)
   `scaffolder`, shipped in PR #546. **NO BASELINE FLIP;
   3 approaches falsified empirically.** B v1
   (STT_FUNC→STT_NOTYPE on 783 syms) no change; B v2
@@ -2988,7 +2988,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   diagnostic, not wired into build) + extended W7
   mitigation tiers. Brief 134 = Phase 3 = post-link
   binary patching. Brain pushed `5ee1d29` F401 fix.
-- [`docs/briefs/133-cluster-d1-wave-3-mega2.md`](docs/briefs/133-cluster-d1-wave-3-mega2.md)
+- [`docs/briefs/133-cluster-d1-wave-3-mega2.md`](../../docs/briefs/133-cluster-d1-wave-3-mega2.md)
   `decomper`, shipped in PR #545. **14 candidates
   byte-identical** (13 D-1 dispatch tables + 1
   mega-array). 2nd mega `data_ov002_022bf3c4` 5376
@@ -2997,7 +2997,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   pointer + ov004-blocked). 2/3 mega-arrays done;
   1 30 KB main mega remains.
 
-- [`docs/briefs/130-cluster-c-wave-4-d1-wave-2.md`](docs/briefs/130-cluster-c-wave-4-d1-wave-2.md)
+- [`docs/briefs/130-cluster-c-wave-4-d1-wave-2.md`](../../docs/briefs/130-cluster-c-wave-4-d1-wave-2.md)
   `decomper`, shipped in PR #542. **42 candidates
   byte-identical** (26 cluster C + 1 mega-array +
   15 D-1). **First production mega-array shipped**:
@@ -3005,7 +3005,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Pattern 1 ~95% drained; D-1 ~50% drained.**
   Cumulative cluster C/D arc: **176 symbols** across
   6 briefs.
-- [`docs/briefs/131-ov004-thunk-section-fix.md`](docs/briefs/131-ov004-thunk-section-fix.md)
+- [`docs/briefs/131-ov004-thunk-section-fix.md`](../../docs/briefs/131-ov004-thunk-section-fix.md)
   `scaffolder`, shipped in PR #543. **🔑 Phase 1 ALIGNALL
   partial unlock: 95% ov004 + 52% main byte-diff
   reduction.** No baseline flips yet. 4 sub-options
@@ -3018,14 +3018,14 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   root cause for Phase 2 identified. Brief 132
   unlocks the rest.
 
-- [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](docs/briefs/128-main-cat1-cluster-c-wave-3.md)
+- [`docs/briefs/128-main-cat1-cluster-c-wave-3.md`](../../docs/briefs/128-main-cat1-cluster-c-wave-3.md)
   `decomper`, shipped in PR #539. **42 candidates
   byte-identical** (3 Cat 1 main fixes + 39 cluster C
   Pattern 1 wave 3). Cat 1 = 3 one-line edits per
   brief 127's plan; main 21→16 bytes (still FAILED,
   pending OV004 cascade). 3 mega-arrays deferred
   (30 KB / 5 KB / 4.6 KB).
-- [`docs/briefs/129-ov004-checksum-scoping.md`](docs/briefs/129-ov004-checksum-scoping.md)
+- [`docs/briefs/129-ov004-checksum-scoping.md`](../../docs/briefs/129-ov004-checksum-scoping.md)
   `scaffolder`, shipped in PR #540. **🔑 ROOT CAUSE: 86
   spurious mwldarm thumb→arm veneers in `.rodata`.**
   Brief 113's Cat 4 hypothesis confirmed empirically.
@@ -3037,7 +3037,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Option 3 (LCF `.thunk` section) recommended. W7
   candidate workflow wall.
 
-- [`docs/briefs/126-cluster-cd-wave-2.md`](docs/briefs/126-cluster-cd-wave-2.md)
+- [`docs/briefs/126-cluster-cd-wave-2.md`](../../docs/briefs/126-cluster-cd-wave-2.md)
   `decomper`, shipped in PR #537. **36 symbols / 41
   KB** (29 cluster C Pattern 1 + 7 D-2 scalar arrays).
   **W6 cascade detected + bisected → recipe
@@ -3047,7 +3047,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   candidates. Largest cluster C symbol shipped:
   `data_ov002_022c357c` 19,488 bytes. Cumulative
   cluster C/D arc: 95 symbols / 47K bytes.
-- [`docs/briefs/127-arm9-main-checksum-scoping.md`](docs/briefs/127-arm9-main-checksum-scoping.md)
+- [`docs/briefs/127-arm9-main-checksum-scoping.md`](../../docs/briefs/127-arm9-main-checksum-scoping.md)
   `scaffolder`, shipped in PR #536. **🔑 ARM9 main gap is
   only 21 bytes / 6 symbols** (brief 113 hypothesis
   falsified). 3 categories: Cat 1 = 5 bytes / 3
@@ -3060,7 +3060,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   recovery → main auto-flips. **No new toolchain
   investment needed.**
 
-- [`docs/briefs/124-cluster-d-wave-1-d1.md`](docs/briefs/124-cluster-d-wave-1-d1.md)
+- [`docs/briefs/124-cluster-d-wave-1-d1.md`](../../docs/briefs/124-cluster-d-wave-1-d1.md)
   `decomper`, shipped in PR #533. **20 dispatch
   tables / 1652 bytes / 200% of floor.** First
   production application of brief 121's D-1 recipe
@@ -3068,7 +3068,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   cleanly via existing symbols.txt names. Per-table
   size variance wide (16-byte → 320-byte). ~28% of
   ~71 D-1 pool drained; 4-6 waves close it.
-- [`docs/briefs/125-cluster-c-pattern3-generator.md`](docs/briefs/125-cluster-c-pattern3-generator.md)
+- [`docs/briefs/125-cluster-c-pattern3-generator.md`](../../docs/briefs/125-cluster-c-pattern3-generator.md)
   `scaffolder`, shipped in PR #534. **343-line generator
   at `tools/cluster_c_pattern3_gen.py` + 34 new
   tests.** Closes brief 119's FAILED Pattern 2 case
@@ -3079,7 +3079,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   identical. Brain pushed `a366a86` to clear 4 ruff
   classes (F401/B007/B905/F541).
 
-- [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](docs/briefs/122-cluster-c-wave-1-pattern1.md)
+- [`docs/briefs/122-cluster-c-wave-1-pattern1.md`](../../docs/briefs/122-cluster-c-wave-1-pattern1.md)
   `decomper`, shipped in PR #530. **37 cluster C
   Pattern 1 symbols / 4672 bytes / 185% of floor.**
   First production W6 mitigation at scale across 9
@@ -3087,7 +3087,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (size % 4 == 0 AND addr % 4 == 0) held — no W6
   cascade. Pool drain: 110-150 Pattern 1 candidates
   remain.
-- [`docs/briefs/123-data-worklist-v3.md`](docs/briefs/123-data-worklist-v3.md)
+- [`docs/briefs/123-data-worklist-v3.md`](../../docs/briefs/123-data-worklist-v3.md)
   `scaffolder`, shipped in PR #531. **data_worklist v3
   ships with 3 new size-4 sub-shapes:** string-ascii4
   (≥1 printable + nulls), pointer-code (LE u32 →
@@ -3098,7 +3098,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   ~1755 effective (folds 115 ASCII4); D adds pointer
   sub-shapes. 25 new tests; 1656/1656 total.
 
-- [`docs/briefs/120-cluster-a-wave-3-overlays.md`](docs/briefs/120-cluster-a-wave-3-overlays.md)
+- [`docs/briefs/120-cluster-a-wave-3-overlays.md`](../../docs/briefs/120-cluster-a-wave-3-overlays.md)
   `decomper`, shipped in PR #527. **175 cluster A
   `.bss` symbols** across ov009 (66) + ov021 (69) +
   ov014 (40). Self-extended to 3 overlays per cap.
@@ -3106,7 +3106,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   smaller than ov004 was. All 3 preserved OK baseline.
   **Cluster A coverage cumulative: 1145 / 1586 = ~72%
   drained** across briefs 116 + 118 + 120.
-- [`docs/briefs/121-cluster-d-pattern2-research.md`](docs/briefs/121-cluster-d-pattern2-research.md)
+- [`docs/briefs/121-cluster-d-pattern2-research.md`](../../docs/briefs/121-cluster-d-pattern2-research.md)
   `scaffolder`, shipped in PR #528. **Cluster D split into
   3 sub-clusters:** D-1 dispatch tables (~71, `.c`
   extern + `void*[]`, naturally 4-aligned) / D-2
@@ -3118,7 +3118,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   was over-broad. 3 worked examples (`data_0210210c`
   D-1, `data_02101f34` D-2, `data_020b52d4` Pattern 2).
 
-- [`docs/briefs/118-cluster-a-wave-2-overlay.md`](docs/briefs/118-cluster-a-wave-2-overlay.md)
+- [`docs/briefs/118-cluster-a-wave-2-overlay.md`](../../docs/briefs/118-cluster-a-wave-2-overlay.md)
   `decomper`, shipped in PR #524. **307 cluster A
   `.bss` symbols across ov004 (231) + ov006 (76).**
   Recipe scales cleanly from main to overlays. ov006
@@ -3126,7 +3126,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `.data` residue (predicted — same shape as ARM9
   main). Cluster A coverage cumulative: **970 / 1586
   = ~61% drained.**
-- [`docs/briefs/119-cluster-c-strings-research.md`](docs/briefs/119-cluster-c-strings-research.md)
+- [`docs/briefs/119-cluster-c-strings-research.md`](../../docs/briefs/119-cluster-c-strings-research.md)
   `scaffolder`, shipped in PR #525. **NEW WALL W6
   DISCOVERED:** mwldarm rounds `.rodata` section size
   to 4-byte alignment + dsd LCF `.ctor` `ALIGN(32)`
@@ -3138,7 +3138,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   verification (brief 121 part 2). Pattern 3 (chunk-
   section, ~10-20%) is generator-tool candidate.
 
-- [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
+- [`docs/briefs/116-cluster-a-wave-1-dtcm-parity.md`](../../docs/briefs/116-cluster-a-wave-1-dtcm-parity.md)
   `decomper`, shipped in PR #522. **🎉 ALL 3 REGIONS
   AT 25/27 OK** — first multi-region milestone of the
   session. **647 cluster A `.bss` symbols claimed in
@@ -3149,7 +3149,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   3 regions' delinks.txt claims. ARM9 main checksum
   still FAILED (cross-module relocs in `.text`/`.data`
   remain — separate scope).
-- [`docs/briefs/117-cluster-b-scalars-research.md`](docs/briefs/117-cluster-b-scalars-research.md)
+- [`docs/briefs/117-cluster-b-scalars-research.md`](../../docs/briefs/117-cluster-b-scalars-research.md)
   `scaffolder`, shipped in PR #521. **W4 resolved + multi-
   global wall surfaced + 47% sub-classification.** mwcc
   2.0/sp1p5 places `int x = N;` in `.data`
@@ -3161,7 +3161,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   pointers + 14 unclassified. Brief 121 candidate:
   data_worklist v3 byte-pattern refinement.
 
-- [`docs/briefs/115-dtcm-pilot-cluster-e.md`](docs/briefs/115-dtcm-pilot-cluster-e.md)
+- [`docs/briefs/115-dtcm-pilot-cluster-e.md`](../../docs/briefs/115-dtcm-pilot-cluster-e.md)
   `decomper`, shipped in PR #519. **First production
   data-tier wave. EUR 25/27 OK** (DTCM module flipped
   FAILED → OK — first multi-module-baseline improvement
@@ -3172,7 +3172,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   the recipe is `.s` files + dsd's LCF auto-routing
   based on delinks.txt address claims). USA + JPN remain
   at 24/27 pending brief 116 part 2 cross-region parity.
-- [`docs/briefs/114-data-worklist-v2.md`](docs/briefs/114-data-worklist-v2.md)
+- [`docs/briefs/114-data-worklist-v2.md`](../../docs/briefs/114-data-worklist-v2.md)
   `scaffolder`, shipped in PR #518. **data_worklist.py v2
   ships with all 5 cluster filters** + sanity-check
   passes (cluster A = 85.34% of pool, matches brief
@@ -3183,7 +3183,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   tools. 1631/1631 tests (+48 new). Brain pushed
   `ac1aedd` to clear 4 F401 unused imports.
 
-- [`docs/briefs/112-c29-c30-application-wave.md`](docs/briefs/112-c29-c30-application-wave.md)
+- [`docs/briefs/112-c29-c30-application-wave.md`](../../docs/briefs/112-c29-c30-application-wave.md)
   `decomper`, shipped in PR #516. **1 port / 72 bytes
   — chain closes (all 3 gates missed).** 2nd
   consecutive application-wave hand-back (after brief
@@ -3193,7 +3193,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   offset-split CSE, arg-spill convention, secondary
   range-check, callee-save reload-over-spill). 7th
   NEGATIVE-finding confirmation.
-- [`docs/briefs/113-data-tier-scoping.md`](docs/briefs/113-data-tier-scoping.md)
+- [`docs/briefs/113-data-tier-scoping.md`](../../docs/briefs/113-data-tier-scoping.md)
   `scaffolder`, shipped in PR #515. **STRATEGIC PIVOT.**
   Data tier is 2.0× larger than code (4.78 MB at 0%
   matched). 85% is `.bss` (zero-fill, structurally
@@ -3203,7 +3203,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   DTCM pilot (brief 115) flips DTCM module FAILED →
   OK = first 25/27 baseline since session start.**
 
-- [`docs/briefs/110-cross-region-apply-wave-3.md`](docs/briefs/110-cross-region-apply-wave-3.md)
+- [`docs/briefs/110-cross-region-apply-wave-3.md`](../../docs/briefs/110-cross-region-apply-wave-3.md)
   `decomper`, shipped in PR #512. **71 region-landings /
   5052 bytes / 77% USA + 74% JPN conversion.** Cleanest
   cross-region apply wave ever — brief 095's D2 v2 + D3
@@ -3211,7 +3211,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   confidence; zero manual `--confidence-floor LOW`
   overrides; zero refusals). First multi-region badge
   advance since brief 094 wave 2.
-- [`docs/briefs/111-p10-permuter-callee-save.md`](docs/briefs/111-p10-permuter-callee-save.md)
+- [`docs/briefs/111-p10-permuter-callee-save.md`](../../docs/briefs/111-p10-permuter-callee-save.md)
   `scaffolder`, shipped in PR #513. **2 byte-identical
   recoveries: C-29 + C-30.** C-29: P-10 → C-29
   promotion via permuter at 1200s × 4 threads (4×
@@ -3225,7 +3225,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   follow-up. **Operational rule: 1200s+ permuter
   budget for IR-lowering walls.**
 
-- [`docs/briefs/108-c27-application-wave-1.md`](docs/briefs/108-c27-application-wave-1.md)
+- [`docs/briefs/108-c27-application-wave-1.md`](../../docs/briefs/108-c27-application-wave-1.md)
   `decomper`, shipped in PR #509. **3 ports / 232
   bytes — all 3 gates missed, chain closes.** Honest
   calibration: C-27 recipe is narrower than brief 107's
@@ -3238,7 +3238,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `cmp+cmpne` range-check wall flagged (below
   escalation threshold). Cumulative C-class chain
   101+102+104+106+108: **46 ports / 3208 bytes**.
-- [`docs/briefs/109-brief-106-residue-research.md`](docs/briefs/109-brief-106-residue-research.md)
+- [`docs/briefs/109-brief-106-residue-research.md`](../../docs/briefs/109-brief-106-residue-research.md)
   `scaffolder`, shipped in PR #510. **C-28 RECOVERY + P-10
   PERMANENT + 3 partial classifications.** C-28
   (predicated-cascade collapse, explicit-intermediate
@@ -3251,7 +3251,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   than brief 105). Brain pushed `538d467` to clear
   MD037.
 
-- [`docs/briefs/106-c26-w2-p9-early-return.md`](docs/briefs/106-c26-w2-p9-early-return.md)
+- [`docs/briefs/106-c26-w2-p9-early-return.md`](../../docs/briefs/106-c26-w2-p9-early-return.md)
   `decomper`, shipped in PR #507. **10 ports / 952
   bytes / 67% combined yield** (effective 9 after
   `func_02033488` dedup vs brief 105). C-26 wave 2: 5
@@ -3262,7 +3262,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   101+102+104+106: 43 ports / 2976 bytes.** Coordination
   miss flagged: future brief specs need explicit
   already-shipped exclusion lists for sub-pool overlap.
-- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](docs/briefs/107-poolword-crossmodule-bl-research.md)
+- [`docs/briefs/107-poolword-crossmodule-bl-research.md`](../../docs/briefs/107-poolword-crossmodule-bl-research.md)
   `scaffolder`, shipped in PR #506. **Brief 097 residue
   classification COMPLETE.** **C-27** = pool-word
   DUPLICATION wall, supersedes P-7. Dual-extern +
@@ -3276,7 +3276,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Brief 097 hand-back's 31 candidates → 5 wall families
   classified end-to-end.
 
-- [`docs/briefs/104-c24-w3-c26-application.md`](docs/briefs/104-c24-w3-c26-application.md)
+- [`docs/briefs/104-c24-w3-c26-application.md`](../../docs/briefs/104-c24-w3-c26-application.md)
   `decomper`, shipped in PR #503. **8 ports / 560 bytes**
   total. C-24 wave 3 final: 4 ports (3 default `.c` + 1
   `.legacy.c`) — chain capped. C-26 strict-sig wave 1: 4
@@ -3288,7 +3288,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `func_02033488`; same CI workflow-trigger quirk as PR
   #500 (workflows fired only after merge-conflict
   resolution push).
-- [`docs/briefs/105-permuter-vs-p9.md`](docs/briefs/105-permuter-vs-p9.md)
+- [`docs/briefs/105-permuter-vs-p9.md`](../../docs/briefs/105-permuter-vs-p9.md)
   `scaffolder`, shipped in PR #504. **1 base recovery
   (`func_02033488`) + P-9 scope refinement.** Wall
   applies to MASK form (`cond ? -1 : 0`), NOT EARLY-
@@ -3301,7 +3301,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   brief 098's 33% (1/3) — permuter more useful for
   reg-alloc walls than IR-lowering walls.
 
-- [`docs/briefs/102-c24-recipe-wave-2.md`](docs/briefs/102-c24-recipe-wave-2.md)
+- [`docs/briefs/102-c24-recipe-wave-2.md`](../../docs/briefs/102-c24-recipe-wave-2.md)
   `decomper`, shipped in PR #500. **13 ports / 648
   bytes / 68% yield.** C-24 application expanded beyond
   `.legacy_sp3.c` to **two adjacent routing tiers** (4
@@ -3314,7 +3314,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   ports / 1464 bytes**. Brain pushed empty commit
   `0032550` to retrigger CI that didn't initially fire +
   close/reopen the PR for the same reason.
-- [`docs/briefs/103-predicated-cascade-research.md`](docs/briefs/103-predicated-cascade-research.md)
+- [`docs/briefs/103-predicated-cascade-research.md`](../../docs/briefs/103-predicated-cascade-research.md)
   `scaffolder`, shipped in PR #501. **New P-9 entry: mvnNE-
   write peephole gap.** 90 compiles (6 variants × 15
   SPs) all miss — mwcc 2.0 lowers `cond ? -1 : 0` as
@@ -3326,7 +3326,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (housekeeping). Future-attempt paths: `asm void` +
   `nofralloc` recipe OR permuter sweep (brief 105).
 
-- [`docs/briefs/101-c24-recipe-wave-1.md`](docs/briefs/101-c24-recipe-wave-1.md)
+- [`docs/briefs/101-c24-recipe-wave-1.md`](../../docs/briefs/101-c24-recipe-wave-1.md)
   `decomper`, shipped in PR #498. **12 ports / 816 bytes
   / 71% yield** — both self-extend gates pass with
   significant margin. First production application of
@@ -3337,7 +3337,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Funnel: 17 attempts → 12 byte-identical + 5 reg-alloc-
   blocked. 12 distinct sub-patterns under the C-24
   umbrella covered.
-- [`docs/briefs/100-wn-codify-critical-section.md`](docs/briefs/100-wn-codify-critical-section.md)
+- [`docs/briefs/100-wn-codify-critical-section.md`](../../docs/briefs/100-wn-codify-critical-section.md)
   `scaffolder`, shipped in PR #497. **2 new entries: C-25 +
   C-26.** C-25 (W-N store-reload, default `2.0/*` SPs)
   is the **first W-class → C-class promotion** via
@@ -3350,7 +3350,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   first non-prologue instruction → declare as no-arg.
   Brain pushed `bea7b26` to clear MD037 + MD018.
 
-- [`docs/briefs/098-permuter-sweep-byte-diff.md`](docs/briefs/098-permuter-sweep-byte-diff.md)
+- [`docs/briefs/098-permuter-sweep-byte-diff.md`](../../docs/briefs/098-permuter-sweep-byte-diff.md)
   `decomper`, shipped in PR #494. **1 of 8 recovered —
   production-readiness threshold met.** The recovery
   (`func_ov000_021ac85c`) cracked the **W-N temp-register
@@ -3362,7 +3362,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   lacked source baselines (couldn't attempt) — queued
   as backlog. Throughput: ~200-230 iter / 60s / thread.
   Brain queued brief 100 to codify the W-N recipe.
-- [`docs/briefs/099-medium-tier-walls-research.md`](docs/briefs/099-medium-tier-walls-research.md)
+- [`docs/briefs/099-medium-tier-walls-research.md`](../../docs/briefs/099-medium-tier-walls-research.md)
   `scaffolder`, shipped in PR #495. **NEW C-24 entry: indirect-
   call dispatch + pool-dedup wall.** First wall in catalog
   using `.legacy_sp3.c` (mwcc 1.2/sp3) recipe — completes
@@ -3374,7 +3374,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   two-global at score 1). Cross-corpus survey: 49
   candidates match the signature; 3 strict-signature
   matches. Brief 101 queued to apply at scale.
-- [`docs/briefs/096-permuter-wrapper.md`](docs/briefs/096-permuter-wrapper.md)
+- [`docs/briefs/096-permuter-wrapper.md`](../../docs/briefs/096-permuter-wrapper.md)
   `scaffolder`, shipped in PR #492. Project-side shim (over
   upstreaming patches). 4 vendor patches stored as Python
   string-replacements with guard substring for
@@ -3385,7 +3385,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   thread-iterations in 30s, no manual hand-edits. 20 new
   tests, suite 1583/1583. Brain pushed `87ef1c6` to clear
   F841 in new test.
-- [`docs/briefs/097-medium-tier-follow-on-wave.md`](docs/briefs/097-medium-tier-follow-on-wave.md)
+- [`docs/briefs/097-medium-tier-follow-on-wave.md`](../../docs/briefs/097-medium-tier-follow-on-wave.md)
   `decomper`, **HANDED BACK at 0 matches**. 20 medium-
   tier candidates surveyed, 5 attempted, **0 byte-
   identical**. Walls: indirect-call (`blx rN`), critical-
@@ -3399,7 +3399,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   waves are productive. 1 new W-N datapoint
   (`func_ov000_021ac85c`) — now coercible via brief 098.
 
-- [`docs/briefs/094-cross-region-apply-wave-2.md`](docs/briefs/094-cross-region-apply-wave-2.md)
+- [`docs/briefs/094-cross-region-apply-wave-2.md`](../../docs/briefs/094-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #490. **311 EUR ports × 2
   regions = 622 byte-identical landings, 83% conversion
   from 375-port pool — largest single-PR badge climb of
@@ -3411,7 +3411,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   the percentage doesn't reflect the match count
   proportionally). 64 unrecovered: 4 collisions + 34
   undefined-callee + 3 byte-diff + 23 other-refused.
-- [`docs/briefs/095-port-to-region-d2-v2.md`](docs/briefs/095-port-to-region-d2-v2.md)
+- [`docs/briefs/095-port-to-region-d2-v2.md`](../../docs/briefs/095-port-to-region-d2-v2.md)
   `scaffolder`, shipped in PR #489. **D2 v2 + D3 both shipped.**
   D2 v2: LOW→MEDIUM auto-promote (N=5 / min-agreement=3
   consensus shift) eliminates the manual `--confidence-
@@ -3421,7 +3421,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   correctly; anti-match safeguard verified (wrong-shift
   candidates stay LOW with explicit rationale). 21 new
   tests, suite 1563/1563.
-- [`docs/briefs/092-single-region-cap-raise-0x80.md`](docs/briefs/092-single-region-cap-raise-0x80.md)
+- [`docs/briefs/092-single-region-cap-raise-0x80.md`](../../docs/briefs/092-single-region-cap-raise-0x80.md)
   `decomper`, shipped in PR #486. Wave 1 CLOSED at floor: **1
   match / 100 bytes / 20% yield**. Cap-raise yield trajectory
   67.7% (081) → 63% (086) → 20% (092) is textbook
@@ -3431,7 +3431,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   W-stack-split / popcount-mask-order shapes with no current
   source-form recipe. 2 new wall candidates surfaced
   (W-stack-split 2dp, W-popcount-mask-order 1dp).
-- [`docs/briefs/093-permuter-vs-p4-validation.md`](docs/briefs/093-permuter-vs-p4-validation.md)
+- [`docs/briefs/093-permuter-vs-p4-validation.md`](../../docs/briefs/093-permuter-vs-p4-validation.md)
   `scaffolder`, shipped in PR #487. **P-4 family confirmed
   permanent.** Permuter ran ~900 thread-iterations against
   `func_02000cc4`'s entry_ptr variant; best score 80
@@ -3442,7 +3442,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (homebrew_gcc_cpp / lowercase -i / DEFAULT_AS_CMDLINE /
   prelude.inc / compile.sh) — closed by brief 096.
 
-- [`docs/briefs/090-cross-region-apply-single-region-matches.md`](docs/briefs/090-cross-region-apply-single-region-matches.md)
+- [`docs/briefs/090-cross-region-apply-single-region-matches.md`](../../docs/briefs/090-cross-region-apply-single-region-matches.md)
   `decomper`, shipped in PR #483. **33 of 39 EUR matches × 2
   regions = 66 byte-identical landings** (78% conversion, dead
   centre of the 30-50 projection). USA + JPN badges 0.26% →
@@ -3453,7 +3453,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   HIGH neighbors. Caught + fixed a brief 075 OS_DisableIrq
   rename bug. 2 legacy_sp3 refusals (data-symbol resolution
   gap, candidate for D3).
-- [`docs/briefs/091-c22-v2-expansion.md`](docs/briefs/091-c22-v2-expansion.md)
+- [`docs/briefs/091-c22-v2-expansion.md`](../../docs/briefs/091-c22-v2-expansion.md)
   `scaffolder`, shipped in PR #484. **6-walls-not-1 finding** —
   extends brief 084's 3-walls methodology. Brief 081 + 086
   C-22 cluster (6 candidates by symptom) had 6 distinct root
@@ -3463,7 +3463,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `func_02000cc4` → P-4 family (reg-alloc, permuter is next).
   C-22 bitfield-via-union recipe unchanged. Brain pushed
   MD018 line-wrap fix `54c6569`.
-- [`docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md`](docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md)
+- [`docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md`](../../docs/briefs/086-single-region-hard-tier-cap-raise-0x60.md)
   `decomper`, full 3-wave chain shipped via PRs #474 (W1) +
   #478 (W2) + #480 (W3). **21 matches / 1440 bytes / ~63%
   combined yield.** Cap-raise to ≤0x60 paid off — **1.6×
@@ -3472,7 +3472,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   upper edge of the band). Surfaced C-22 first production hit
   (`func_02001c98`) + 2 more C-22 datapoints (brief 091 v2
   expansion) + S-2a loop-counter signedness extension to S-2.
-- [`docs/briefs/088-mmio-base-folding-wall-sweep.md`](docs/briefs/088-mmio-base-folding-wall-sweep.md)
+- [`docs/briefs/088-mmio-base-folding-wall-sweep.md`](../../docs/briefs/088-mmio-base-folding-wall-sweep.md)
   `scaffolder`, shipped in PR #481. **C-23 classification: NEW
   ENTRY** (per brief 084's "3-walls-not-1" methodology). 75-
   compile sweep (5 variants × 15 SPs) confirmed C-23 carries
@@ -3481,27 +3481,27 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Recipe `.legacy.c` (mwcc 1.2/sp2p3) byte-identical for all
   4 confirmed instances; `.legacy_sp3.c` is 4 bytes shorter
   (epilogue change, NOT byte-identical).
-- [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](docs/briefs/084-c22-struct-pointer-corruption-wall.md)
+- [`docs/briefs/084-c22-struct-pointer-corruption-wall.md`](../../docs/briefs/084-c22-struct-pointer-corruption-wall.md)
   `scaffolder`, shipped in PR #471. Codified C-22 adjacent-bitfield
   wall from brief 081 chain's 3 datapoints. Bitfield-via-
   union recipe validated in production (brief 086 wave 3
   `func_02001c98`). Brief 091 (v2 expansion) refines for
   remaining 4 non-bitfield shapes from 5-datapoint cumulative
   pool.
-- [`docs/briefs/082-pokeheartgold-bulk-port-wave-1.md`](docs/briefs/082-pokeheartgold-bulk-port-wave-1.md)
+- [`docs/briefs/082-pokeheartgold-bulk-port-wave-1.md`](../../docs/briefs/082-pokeheartgold-bulk-port-wave-1.md)
   `decomper`, shipped in PR #470. Below target (1 match) —
   pool calibration data for the 2.0/sp2p2 cross-project
   pool. Cumulative cross-project: 100 ports (99 pokediamond
   + 1 pokeheartgold).
-- [`docs/briefs/063-permuter-auto-runner.md`](docs/briefs/063-permuter-auto-runner.md)
+- [`docs/briefs/063-permuter-auto-runner.md`](../../docs/briefs/063-permuter-auto-runner.md)
   `scaffolder`, shipped in PR #473. `--run` mode for
   `tools/permute.py`. Active for hard-tier candidates that
   hit close-but-not-byte-identical states.
-- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
+- [`docs/briefs/066-cross-project-source-research.md`](../../docs/briefs/066-cross-project-source-research.md)
   `scaffolder`, originally shipped via PR #429; correction
   applied via brief 080 (PR #465). Folded into the
   cross-project pipeline.
-- [`docs/briefs/081-single-region-hard-tier-resumption.md`](docs/briefs/081-single-region-hard-tier-resumption.md)
+- [`docs/briefs/081-single-region-hard-tier-resumption.md`](../../docs/briefs/081-single-region-hard-tier-resumption.md)
   `decomper`, full 3-wave chain shipped via PRs #464 / #467
   / #468. **21 matches / 876 bytes / 67.7% combined yield.**
   Slope-change validation post-tools-investment. Wave 1
@@ -3511,12 +3511,12 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   codifies) + suggest_coercion calibration: 6.5%
   cumulative invocation rate, rule engine is long-tail
   accelerator at ≤0x40 band (not first-pass tool).
-- [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](docs/briefs/079-cross-apply-tool-v2-fixes.md)
+- [`docs/briefs/079-cross-apply-tool-v2-fixes.md`](../../docs/briefs/079-cross-apply-tool-v2-fixes.md)
   `scaffolder`, shipped in PR #463. D1 v2 overlay-prefix rename
   + D2 v2 reloc-mask offset fix (closes Thumb-2 BL
   half-mask trap). ~30 cross-region ports unlocked for
   brief 085 (future).
-- [`docs/briefs/080-pokeheartgold-extension-research.md`](docs/briefs/080-pokeheartgold-extension-research.md)
+- [`docs/briefs/080-pokeheartgold-extension-research.md`](../../docs/briefs/080-pokeheartgold-extension-research.md)
   `scaffolder`, shipped in PR #465. VERDICT: GO-WITH-CAVEATS.
   Brief 066 correction: nitrocrypto is `.s` not `.c`. Real
   unlock is 39 portable `.c` files across NitroSDK +
@@ -3524,7 +3524,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Estimated ~50-80 ports/region after disambiguation.
   Plus scaffolder-research-archaeology lessons writeup
   shipped via PR #466.
-- [`docs/briefs/078-cross-region-apply-wave-2.md`](docs/briefs/078-cross-region-apply-wave-2.md)
+- [`docs/briefs/078-cross-region-apply-wave-2.md`](../../docs/briefs/078-cross-region-apply-wave-2.md)
   `decomper`, shipped in PR #461. 11 of 40 target — below
   target. **Cross-region pipeline at natural drain**:
   39/99 libs/nitro ports applied (39% coverage). Remaining
@@ -3532,12 +3532,12 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   applicable), ~25 overlay ports (blocked on D1 v2 in
   brief 079), ~5 substantive byte-collision (D2 v2 in
   brief 079). Pipeline cap with current tools ~70 ports.
-- [`docs/briefs/077-strip-static-keyword.md`](docs/briefs/077-strip-static-keyword.md)
+- [`docs/briefs/077-strip-static-keyword.md`](../../docs/briefs/077-strip-static-keyword.md)
   `scaffolder`, shipped in PR #459. 2-line static-strip regex
   + 5 tests. Followed by PR #460 (brief 077.b — `static
   inline` extension after family survey ruled out other
   family members).
-- [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](docs/briefs/074-cross-project-bulk-port-wave-3.md)
+- [`docs/briefs/074-cross-project-bulk-port-wave-3.md`](../../docs/briefs/074-cross-project-bulk-port-wave-3.md)
   `decomper`, shipped in PR #457 at 12/50 below floor. **Brief
   074 chain CLOSES at cumulative 99 cross-project ports**
   (10 b069w1 + 64 b071w1 + 13 b071w2 + 12 b074w3). Three sub-
@@ -3547,14 +3547,14 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   drain. Surfaced two follow-ups: static-keyword silent-
   corruption (brief 077), pool depth bias future waves toward
   substantive ports only.
-- [`docs/briefs/076-cross-apply-libs-port-improvements.md`](docs/briefs/076-cross-apply-libs-port-improvements.md)
+- [`docs/briefs/076-cross-apply-libs-port-improvements.md`](../../docs/briefs/076-cross-apply-libs-port-improvements.md)
   `scaffolder`, shipped in PR #456. D1 overlay-port regex + D2
   raw-bytes + reloc-parity fallback. Sweep shows **17 size-
   16+ unlocks on existing libs/nitro sample** plus 29 overlay
   ports unlocked. D2's strictly-conservative-fallback design
   (never overrides primary HIGH) catches the BL-offset
   divergence trap from brief 075 wave 1.
-- [`docs/briefs/075-cross-region-apply-existing-ports.md`](docs/briefs/075-cross-region-apply-existing-ports.md)
+- [`docs/briefs/075-cross-region-apply-existing-ports.md`](../../docs/briefs/075-cross-region-apply-existing-ports.md)
   `decomper`, shipped in PR #454. 27 of 87 ports cross-applied
   (below 70 target). Headline output: byte-uniqueness diagnostic
   — 62% of the 87-port set is size-4 stubs (`bx lr` etc.),
@@ -3564,7 +3564,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   USA + JPN climbed 0.19% → 0.23% (smaller than projected
   0.6-0.7% because refused pool was trivial bytes). Three
   follow-up vectors surfaced; D1 + D2 become brief 076.
-- [`docs/briefs/073-per-region-cross-application.md`](docs/briefs/073-per-region-cross-application.md)
+- [`docs/briefs/073-per-region-cross-application.md`](../../docs/briefs/073-per-region-cross-application.md)
   `scaffolder`, shipped in PR #451. **Approach A extended** (function
   + data-ref rename via parallel-reloc bridge). 1-port worked
   example (`func_02007218.legacy.c`) verifies 3-region 24/27
@@ -3572,14 +3572,14 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   20 new tests. Approach B (upstream NitroSDK naming) deferred to
   brief 076 if Approach A's semantic noise bites decomper
   iteration. Followed by brief 075 (full 87-port batch).
-- [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](docs/briefs/072-port-driver-d5-struct-vendoring.md)
+- [`docs/briefs/072-port-driver-d5-struct-vendoring.md`](../../docs/briefs/072-port-driver-d5-struct-vendoring.md)
   `scaffolder`, shipped in PR #449. Full struct defs for
   `_OSThread`, `_OSThreadQueue`, `OSMutex` + transitive deps
   (OSContext, CPContext). 300-sample sweep: struct-access
   drops 118 → 80 (-38). 3 of 5 OS_thread.c / OS_mutex.c
   functions unblock (was 0/5 pre-D5). New headers:
   libs/nitro/include/nitro/os_thread.h + os_printf.h.
-- [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
+- [`docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md`](../../docs/briefs/071-cross-project-bulk-port-wave-1-rerun.md)
   `decomper`, full chain shipped across PRs #442 (wave 1, 64
   ports / 0.88) + #445 (wave 2, 13 ports / 0.68 — below
   floor). **Cumulative 87 cross-project ports** at the
@@ -3590,7 +3590,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (TU-collision pre-filter + ish-mismatch) and #446
   (STT_NOTYPE r-value classification) in parallel — both
   silent-corruption fixes the next cross-project wave needs.
-- [`docs/briefs/070-port-external-source-driver.md`](docs/briefs/070-port-external-source-driver.md)
+- [`docs/briefs/070-port-external-source-driver.md`](../../docs/briefs/070-port-external-source-driver.md)
   `scaffolder`, **fully closed** across PRs #438 (D1 callee remap),
   #440 (D4 data-ref remap), #441 (D2+D3 vendored framework).
   D1+D4+D2+D3 combined: 171 compile-ready candidates against
@@ -3599,7 +3599,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   parallel-reloc bridge paid off as designed. D2+D3 framework
   compounds incrementally as decomper vendors more headers
   into `libs/nitro/include/`.
-- [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](docs/briefs/069-cross-project-bulk-port-wave-1.md)
+- [`docs/briefs/069-cross-project-bulk-port-wave-1.md`](../../docs/briefs/069-cross-project-bulk-port-wave-1.md)
   `decomper`, shipped in PR #436 at the floor (10 ports vs 50
   floor). **Brain scoping miss** — brief 069 listed
   `port_external_source.py` as a brief 068 deliverable but
@@ -3609,7 +3609,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   diagnostic: 2887 HIGH rows → 455 dedup → 14 driver-OK →
   10 byte-match. Followed by brief 070 (ship the proper
   driver) → brief 071 (decomper rerun).
-- [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](docs/briefs/065-multi-region-bulk-port-wave-1.md)
+- [`docs/briefs/065-multi-region-bulk-port-wave-1.md`](../../docs/briefs/065-multi-region-bulk-port-wave-1.md)
   `decomper`, full 3-wave chain shipped via PRs #423 / #428 /
   #431. **400 byte-identical cross-region matches (200 USA +
   200 JPN) / 92.6% cumulative precision.** Brief 057+060
@@ -3617,7 +3617,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   065 shipped 400 cross-region in 3. Order-of-magnitude lift
   the multi-region investment was scoped for. Followed by
   brief 069 (cross-project bulk-port, now ACTIVE).
-- [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](docs/briefs/068-cross-project-byte-fingerprint-pass.md)
+- [`docs/briefs/068-cross-project-byte-fingerprint-pass.md`](../../docs/briefs/068-cross-project-byte-fingerprint-pass.md)
   `scaffolder`, shipped in PR #432. `tools/external_obj.py` +
   `find_external_source.py --byte-scan` mode. **5/5 perfect
   1.000 byte-sim matches** on pokediamond's `OS_tick.c` with
@@ -3626,7 +3626,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   subtrees (103 of 105 files) use mwcc 1.2/sp2p3 = exact match
   to our `.legacy.c` SP. Hit rate jumps from 80-95% to 100%
   sample-validated. CSV contract shipped for brief 069.
-- [`docs/briefs/066-cross-project-source-research.md`](docs/briefs/066-cross-project-source-research.md)
+- [`docs/briefs/066-cross-project-source-research.md`](../../docs/briefs/066-cross-project-source-research.md)
   `scaffolder`, shipped in PR #429. **VERDICT: GO** with refined
   estimates. SP-distance matrix is the dominant risk model:
   pokediamond (one SP rev → 80-95%), pokeheartgold (50-70%),
@@ -3638,7 +3638,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   EUR ports from pokediamond alone (×3 regions via brief 064/065
   → 900-1800 cross-region matches). Followed by brief 068 (impl)
   + brief 069 (bulk-port wave).
-- [`docs/briefs/062-diff-to-coercion-suggester.md`](docs/briefs/062-diff-to-coercion-suggester.md)
+- [`docs/briefs/062-diff-to-coercion-suggester.md`](../../docs/briefs/062-diff-to-coercion-suggester.md)
   `scaffolder`, shipped in PR #422. `tools/suggest_coercion.py` v0
   rule engine over objdiff JSON + codegen-walls.md catalog.
   Two-mode CLI (auto-locate + JSON-in). 5 walls in v0 (C-15,
@@ -3646,7 +3646,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   no recipe restating). 28 unit tests; full suite 1274/1274.
   Hit-rate measurement deferred to decomper's next iterative
   wave per the brief's spec.
-- [`docs/briefs/064-multi-region-implementation.md`](docs/briefs/064-multi-region-implementation.md)
+- [`docs/briefs/064-multi-region-implementation.md`](../../docs/briefs/064-multi-region-implementation.md)
   `scaffolder`, full chain shipped across PRs #418 (part 1, byte-
   disambiguation) + #419 (part 2, `tools/port_to_region.py`) +
   #420 (part 3, parallel-region builds). **All 3 deliverables
@@ -3657,7 +3657,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   hit 24/27 baseline at the same placeholder modules. Brief
   065 unblocked; **wave 1 closed at 88 matches / 100%
   precision** (PR #423).
-- [`docs/briefs/061-multi-region-porting-research.md`](docs/briefs/061-multi-region-porting-research.md)
+- [`docs/briefs/061-multi-region-porting-research.md`](../../docs/briefs/061-multi-region-porting-research.md)
   `scaffolder`, shipped in PR #414. **VERDICT: GO.** 74.8%
   HIGH-confidence pairings across 500-sample stratified survey
   (peaking 90.6% in ≤0x40 band, 100% in medium). USA + JPN are
@@ -3667,7 +3667,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   Followed by PR #415 (brain bootstrap of `config/usa/` +
   `config/jpn/`) then brief 064 (implementation pipeline) +
   brief 065 (first bulk-port wave).
-- [`docs/briefs/060-hard-tier-c20-medium-pool.md`](docs/briefs/060-hard-tier-c20-medium-pool.md)
+- [`docs/briefs/060-hard-tier-c20-medium-pool.md`](../../docs/briefs/060-hard-tier-c20-medium-pool.md)
   `decomper`, full chain shipped across PRs #405 / #408 / #412
   (waves 24/25/26). **29 matches / 1072 bytes / ~75% combined
   yield.** Strongest brief outcome since brief 057's first two
@@ -3676,7 +3676,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   shipped (wave 25 bitfields + wave 26 helper-thunks). ~32% of
   the PR #397 90-pool drained; ~61 candidates remain. Surfaced
   cascade variants (b)/(c)/(d) (PRs #407/#410/#413).
-- [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](docs/briefs/057-hard-tier-cap-raise-0x60.md)
+- [`docs/briefs/057-hard-tier-cap-raise-0x60.md`](../../docs/briefs/057-hard-tier-cap-raise-0x60.md)
   `decomper`, full chain shipped across PRs #390 / #392 / #402
   (waves 21/22/23). **16 matches / 1016 bytes / ~57% combined
   yield.** Cap-raise paid off for 2 waves (70% each at 0x60) then
@@ -3684,71 +3684,71 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (folded in PR #391) + S-1 padding off-by-one (folded in PR #398)
   + the candidate C-21 "next-ahead walk loop" pattern. Followed
   by brief 060 (fall back to ≤ 0x40, mine the PR #397 MEDIUM pool).
-- [`docs/briefs/055-hard-tier-byte-volume-continued.md`](docs/briefs/055-hard-tier-byte-volume-continued.md)
+- [`docs/briefs/055-hard-tier-byte-volume-continued.md`](../../docs/briefs/055-hard-tier-byte-volume-continued.md)
   `decomper`, full chain shipped across PRs #383 / #385 / #387
   (waves 18/19/20). **22 matches / 948 bytes / 69% combined
   yield.** Beat brief 053's 884-byte chain. 4 C-16 W-H wins via
   natural C; multi-module twin pattern strong. Triggered scaffolder
   C-17 / C-18 / C-19 autonomous fold-ins.
-- [`docs/briefs/053-hard-tier-byte-volume.md`](docs/briefs/053-hard-tier-byte-volume.md)
+- [`docs/briefs/053-hard-tier-byte-volume.md`](../../docs/briefs/053-hard-tier-byte-volume.md)
   `decomper`, full chain shipped across PRs #374 / #378 / #380
   (waves 15/16/17). **19 matches / 884 bytes combined at 66%
   yield.** Strategic byte-volume pivot validated. Brief 055
   continues the pattern. Wave 16 surfaced C-1r over-predication
   (scaffolder confirmed permanent in PR #379).
-- [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
+- [`docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md`](../../docs/briefs/054-c15-vs-p1-taxonomy-fold-plus-ldr-ip-wall.md)
   `scaffolder`, shipped in PR #375. Two deliverables: (1) C-15 vs P-1
   wall family note (cross-links + discriminator table); (2)
   **C-16 / W-H** ldr-r1-vs-ip flipped coercible.
-- [`docs/briefs/051-mixed-wave-13.md`](docs/briefs/051-mixed-wave-13.md)
+- [`docs/briefs/051-mixed-wave-13.md`](../../docs/briefs/051-mixed-wave-13.md)
   `decomper`, shipped in PR #368. **14 byte-identical at 88%**
   from the `func_ov010_021b4750` tail-call cluster (PR #363
   separate-scope, 22 siblings). All 14 reclassify to easy
   (82.7% → 84.0%).
-- [`docs/briefs/052-wave-12-wall-investigations.md`](docs/briefs/052-wave-12-wall-investigations.md)
+- [`docs/briefs/052-wave-12-wall-investigations.md`](../../docs/briefs/052-wave-12-wall-investigations.md)
   `scaffolder`, shipped in PR #369. Three deliverables: C-2a
   struct-copy refinement (cracks brief 022's historic
   `func_0208904c` miss); **C-15 / W-G** mvn-vs-sub peephole
   classified as routing-tractable; ov004 BSS investigation
   documented.
-- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
+- [`docs/briefs/049-hard-tier-wave-10.md`](../../docs/briefs/049-hard-tier-wave-10.md)
   `decomper`, full chain shipped across PRs #359 + #362 + #366
   (waves 10/11/12). **34 matches at ~87% combined yield.** Wave
   10 validated cap-raise to 0x28; wave 11 took both C-14 W-F
   unblocks first try; wave 12 took 11/15 from scaffolder's PR #363
   rescan list and reclassified them all to easy tier — empirically
   validating the "easy-tier reopened" finding.
-- [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
+- [`docs/briefs/050-codegen-walls-c13-plus-r2-research.md`](../../docs/briefs/050-codegen-walls-c13-plus-r2-research.md)
   `scaffolder`, shipped in PR #360. Two deliverables: (1) **C-13**
   folded (predicated if-X order, from wave 9). (2) **W-F →
   C-14 coercible** (r2-vs-r1 reg-alloc; specific C variation
   flips). Two unblocks for decomper queued.
-- [`docs/briefs/049-hard-tier-wave-10.md`](docs/briefs/049-hard-tier-wave-10.md)
+- [`docs/briefs/049-hard-tier-wave-10.md`](../../docs/briefs/049-hard-tier-wave-10.md)
   `decomper`, shipped in PR #359. **15/15 = 100% yield** at
   raised ≤ 0x28 cap. Hard tier 1.6% → 1.8%. Cap-raise hypothesis
   validated. Strong repeated-twin signal observed (compounding
   via find_shape_templates).
-- [`docs/briefs/048-push-r0-wall-research.md`](docs/briefs/048-push-r0-wall-research.md)
+- [`docs/briefs/048-push-r0-wall-research.md`](../../docs/briefs/048-push-r0-wall-research.md)
   `scaffolder`, shipped in PR #351. **C-12 push-r0 thunk via asm void**
   — mwcc inline asm coerces; verified across all 15 SPs in
   toolchain (none emit push-r0 from C source). Two immediate
   unblocks: `func_02093294`, `func_02092f04`. Decomper picks
   these up under brief 047's self-extend.
-- [`docs/briefs/047-hard-tier-pilot.md`](docs/briefs/047-hard-tier-pilot.md)
+- [`docs/briefs/047-hard-tier-pilot.md`](../../docs/briefs/047-hard-tier-pilot.md)
   `decomper`, shipped in PR #350. **15 byte-identical matches at
   100% per-attempt yield** on first hard-tier wave. 9 sp1p5 + 6
   sp3 + 0 sp2p3 across main/ov002/ov011. Hard tier 1.1% → 1.3%.
   Qualitative read: hard tier ≤ 0x20 = medium-tier thunks
   rebadged. Self-extend yield criterion exceeded; 2 follow-ups
   available.
-- [`docs/briefs/046-medium-tier-wave-5.md`](docs/briefs/046-medium-tier-wave-5.md)
+- [`docs/briefs/046-medium-tier-wave-5.md`](../../docs/briefs/046-medium-tier-wave-5.md)
   `decomper`, shipped in PR #342. **6 byte-identical matches
   across all 3 compiler tiers** (4 sp3, 1 sp2p3, 1 sp1p5). 3/5
   brief-044 sp3-unique candidates landed; W-B unblocked. Brief
   044's discriminator predicted reliably. New observation: brief
   041's declare-order r4↔r5 trick doesn't transfer to sp3.
   Self-extend allowance preserved (2 follow-ups remaining).
-- [`docs/briefs/045-sp3-routing-implementation.md`](docs/briefs/045-sp3-routing-implementation.md)
+- [`docs/briefs/045-sp3-routing-implementation.md`](../../docs/briefs/045-sp3-routing-implementation.md)
   `scaffolder`, shipped in PR #340. Third compiler routing tier
   (`*.legacy_sp3.c` → mwcc 1.2/sp3) implemented next to existing
   tiers. Brain ran the dual-tier smoke test before merging
@@ -3756,77 +3756,77 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `.legacy_sp3.o`). Brain pushed a follow-up commit on scaffolder's
   branch to regenerate `docs/tools-index.md` after CI caught the
   drift; small miss, no rework needed.
-- [`docs/briefs/044-sp3-routing-research.md`](docs/briefs/044-sp3-routing-research.md)
+- [`docs/briefs/044-sp3-routing-research.md`](../../docs/briefs/044-sp3-routing-research.md)
   `scaffolder`, shipped in PR #337. Sp3 sweep verdict: **ship the
   third tier**. 7 sp3-unique medium+easy candidates (borderline
   range), but scaffolder's cross-cutting argument about the 416
   hard-tier candidates as future leverage convinced brain to
   override the conservative default. Brief 045 implements.
-- [`docs/briefs/043-medium-tier-wave-4.md`](docs/briefs/043-medium-tier-wave-4.md)
+- [`docs/briefs/043-medium-tier-wave-4.md`](../../docs/briefs/043-medium-tier-wave-4.md)
   `decomper`, shipped in PR #338. **9 byte-identical matches at
   100% per-attempt yield.** W-A unblock confirmed first-try via
   C-9. Medium tier 69.9% → 75.6%. Decomper is on a streak.
-- [`docs/briefs/042-codegen-walls-w-abcd.md`](docs/briefs/042-codegen-walls-w-abcd.md)
+- [`docs/briefs/042-codegen-walls-w-abcd.md`](../../docs/briefs/042-codegen-walls-w-abcd.md)
   `scaffolder`, shipped in PR #334. 310-line update to codegen-walls.md
   documenting W-A..W-D + coercion attempts. **W-A flipped to C-9
   coercible** (uninitialised temp trick); **W-B verified
   byte-identical via mwcc 1.2/sp3** (T-3 tooling-tractable —
   triggered brief 044). W-C T-3+P-7 hybrid. W-D true permanent
   (P-8).
-- [`docs/briefs/041-medium-tier-wave-3.md`](docs/briefs/041-medium-tier-wave-3.md)
+- [`docs/briefs/041-medium-tier-wave-3.md`](../../docs/briefs/041-medium-tier-wave-3.md)
   `decomper`, shipped in PR #335. **8 byte-identical matches
   across 4 modules** (main + ov005 + ov006 + ov011). Medium
   tier 64.7% → 69.9%. New source-shape lesson: declaration
   order controls callee-save register allocation. Provisional
   new wall flagged on `func_0201904c` (clamped 16-bit add); brief
   044 picks it up as part of the sp3 sweep.
-- [`docs/briefs/040-medium-tier-wave-2-retry.md`](docs/briefs/040-medium-tier-wave-2-retry.md)
+- [`docs/briefs/040-medium-tier-wave-2-retry.md`](../../docs/briefs/040-medium-tier-wave-2-retry.md)
   `decomper`, shipped in PR #332. **7 byte-identical matches
   (64% yield)** via the now-working `.legacy.c` pipeline. First
   validation of the Style A unblock chain end-to-end. Source-
   shape lessons captured: twin functions can want opposite C
   shapes; `unsigned short` return type controls halfword extend
   emission. 4 walls (W-A..W-D) documented for brief 042.
-- [`docs/briefs/039-objects-txt-legacy-patch.md`](docs/briefs/039-objects-txt-legacy-patch.md)
+- [`docs/briefs/039-objects-txt-legacy-patch.md`](../../docs/briefs/039-objects-txt-legacy-patch.md)
   `scaffolder`, shipped in PR #330. `tools/patch_objects_legacy.py`
   post-process script + 20 unit tests. Chained into the lcf
   ninja rule. **Brain ran brief 038's exact reproducer end-to-
   end before merging this time** — link step succeeded; arm9.lcf
   and objects.txt now agree on `.legacy.o`. Style A unblock
   chain end-to-end working.
-- [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
+- [`docs/briefs/038-medium-tier-wave-2-dual-compiler.md`](../../docs/briefs/038-medium-tier-wave-2-dual-compiler.md)
   `decomper`, **escalation closed in PR #328**. 0 byte-identical
   matches; blocked on the `dsd lcf` filename inconsistency.
   Empty commit; bug analysis is the deliverable. Triggered
   brief 039.
-- [`docs/briefs/037-dual-compiler-routing.md`](docs/briefs/037-dual-compiler-routing.md)
+- [`docs/briefs/037-dual-compiler-routing.md`](../../docs/briefs/037-dual-compiler-routing.md)
   `scaffolder`, shipped in PR #327. Per-TU dual-compiler routing via
   `*.legacy.c` filename convention. **Brain merged this without
   running the brief's required end-to-end smoke test** — the
   test would have caught the `dsd lcf` inconsistency that
   blocked brief 038. Brief 039 is the post-process workaround;
   the routing core itself is sound.
-- [`docs/briefs/036-style-a-epilogue-research.md`](docs/briefs/036-style-a-epilogue-research.md)
+- [`docs/briefs/036-style-a-epilogue-research.md`](../../docs/briefs/036-style-a-epilogue-research.md)
   `scaffolder`, shipped in PR #325. **Style A wall fully diagnosed** —
   mwcc 1.2/sp2p3 emits Style A; mwcc 2.0 (all SPs) and
   1.2/sp3+ emit Style B. Verified byte-identical against 2 of
   brief 034's targets. Matches pokediamond's dual-compiler
   pattern. Brief 037 (scaffolder) operationalises; brief 038
   (decomper) consumes.
-- [`docs/briefs/035-codegen-walls-c1-refinement.md`](docs/briefs/035-codegen-walls-c1-refinement.md)
+- [`docs/briefs/035-codegen-walls-c1-refinement.md`](../../docs/briefs/035-codegen-walls-c1-refinement.md)
   `scaffolder`, shipped in PR #322. Refined codegen-walls.md C-1
   with the ≤3-op if-body predication threshold + new P-6
   permanent entry. Quantification updated: permanent 29 → 32
   drops (62% → 68%), coercible-but-missed 9 → 6 drops (19% →
   13%).
-- [`docs/briefs/034-medium-tier-wave.md`](docs/briefs/034-medium-tier-wave.md)
+- [`docs/briefs/034-medium-tier-wave.md`](../../docs/briefs/034-medium-tier-wave.md)
   `decomper`, shipped in PR #323. **0 byte-identical matches**
   but discovered the **Style A vs Style B epilogue wall** —
   blocks every IRQ-bracket / Task-Locked / Fill32-pattern
   medium-tier candidate attempted. Empty commit; the analysis
   IS the deliverable. Triggered brief 036 (scaffolder research)
   immediately.
-- [`docs/briefs/033-cluster-prop-final-med.md`](docs/briefs/033-cluster-prop-final-med.md)
+- [`docs/briefs/033-cluster-prop-final-med.md`](../../docs/briefs/033-cluster-prop-final-med.md)
   `decomper`, shipped in PR #320. **3 byte-identical matches at
   18% yield** — second below-floor pilot, BUT the PR delivered a
   research-grade post-mortem: cluster turned out to be brief 028
@@ -3834,14 +3834,14 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   (cross-reference-before-iterate saved hours); concrete C-1
   refinement proposal (predicated-exec ≤3-op limit) handed to
   brief 035; explicit pivot-to-medium-tier recommendation.
-- [`docs/briefs/032-consolidate-codegen-walls.md`](docs/briefs/032-consolidate-codegen-walls.md)
+- [`docs/briefs/032-consolidate-codegen-walls.md`](../../docs/briefs/032-consolidate-codegen-walls.md)
   `scaffolder`, shipped in PR #317. 641-line research note at
   `docs/research/codegen-walls.md`; 15 codegen walls classified
   into coercible-with-knowledge (8, accounting for 19% of past
   drops), permanent (5, 62%), and edge cases (3, 17%). Plus 2
   tooling-tractable proposals for follow-up. Brain auto-fixed
   MD031 lint in the file post-merge.
-- [`docs/briefs/030-cluster-prop-next-med-2.md`](docs/briefs/030-cluster-prop-next-med-2.md)
+- [`docs/briefs/030-cluster-prop-next-med-2.md`](../../docs/briefs/030-cluster-prop-next-med-2.md)
   `decomper`, shipped across PR #313 (10 matches @ 71% on
   `func_02001e84`), PR #315 (2 matches @ 22% — below floor on
   HIGH rank-#8 escalation), and PR #318 (24 matches @ 77% on
@@ -3849,27 +3849,27 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   pattern fully tested across 3 PRs; produced both wins and the
   first below-floor escalation. Pattern stays per-brief for now,
   not graduated to AGENTS.md yet.
-- [`docs/briefs/029-cluster-prop-next-med.md`](docs/briefs/029-cluster-prop-next-med.md)
+- [`docs/briefs/029-cluster-prop-next-med.md`](../../docs/briefs/029-cluster-prop-next-med.md)
   `decomper`, shipped in PR #311. **21 byte-identical matches at
   70% yield** on rank-#2 `func_02001d84` (default suggestion;
   doubled the predicted MED 37%). 16 distinct shape templates;
   selection-rule trace in PR body validates the brief's
   filtering.
-- [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](docs/briefs/028-cluster-prop-ov006-021c81a4.md)
+- [`docs/briefs/028-cluster-prop-ov006-021c81a4.md`](../../docs/briefs/028-cluster-prop-ov006-021c81a4.md)
   `decomper`, shipped in PR #309. **27 byte-identical matches at
   61% yield** on ov006 cluster #1 — 3x the predicted 20% LOW,
   comfortably above brief 023's 40-60% calibration. 18 distinct
   shape templates across two passes; honest stop at 27 because
   remaining 17 had clear codegen-quirk reasons. Per-target time
   1.8x brief 027 (within stop-guidance).
-- [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
+- [`docs/briefs/027-cluster-prop-ov006-021b7ce0.md`](../../docs/briefs/027-cluster-prop-ov006-021b7ce0.md)
   `decomper`, shipped in PR #306. **32 byte-identical matches at
   94% yield** on ov006 cluster #2 — way past brief 023's 40-60%
   calibrated band. First real-world validation of
   `find_shape_templates.py`. Honest workflow note: tool useful
   for cluster orientation, asm-read still the bottleneck on the
   C-write step.
-- [`docs/briefs/026-wine-migration-prep.md`](docs/briefs/026-wine-migration-prep.md)
+- [`docs/briefs/026-wine-migration-prep.md`](../../docs/briefs/026-wine-migration-prep.md)
   `scaffolder`, shipped in PR #307. Migrated macOS brain onboarding
   off `wine-stable` (disabled 2026-09-01) onto **Gcenx's Game
   Porting Toolkit cask**. Brain locally verified end-to-end
@@ -3877,51 +3877,51 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   tests including 4 new `TestResolveMacosWine` cases pass).
   AGENTS.md *Brain onboarding* step 6 + *Wine on macOS* section
   updated by scaffolder as part of the PR.
-- [`docs/briefs/025-ov006-tooling-followup.md`](docs/briefs/025-ov006-tooling-followup.md)
+- [`docs/briefs/025-ov006-tooling-followup.md`](../../docs/briefs/025-ov006-tooling-followup.md)
   `scaffolder`, shipped in PR #304. `tools/find_shape_templates.py` —
   679-line tool + 532 lines of tests. Opcode-sequence Levenshtein
   scoring across the matched corpus with stat-based dsd-dis caching.
   Sample output on brief-020 anchor returns expected siblings at
   similarity 1.0. Sibling to `pattern_library.py`.
-- [`docs/briefs/024-cluster-prop-next-high.md`](docs/briefs/024-cluster-prop-next-high.md)
+- [`docs/briefs/024-cluster-prop-next-high.md`](../../docs/briefs/024-cluster-prop-next-high.md)
   `decomper`, shipped in PR #303. **18 byte-identical matches at
   100% yield** on rank-#8 `func_0202b43c`. Single-shape cluster of
   4-insn pre-call-arg-rsb tail-call thunks. First test of the
   anchor-selection rule — selection trace in PR body shows the
   filter working as intended.
-- [`docs/briefs/022-cluster-prop-0202b0e0.md`](docs/briefs/022-cluster-prop-0202b0e0.md)
+- [`docs/briefs/022-cluster-prop-0202b0e0.md`](../../docs/briefs/022-cluster-prop-0202b0e0.md)
   `decomper`, shipped in PR #301. **24 byte-identical matches at
   77% yield** (target ≥15, predicted 74%). 14 distinct shape
   templates under the lifted 15-cap; excellent reg-alloc notes
   carry over for future heterogeneous-cluster pilots.
-- [`docs/briefs/023-ov006-cluster-investigation.md`](docs/briefs/023-ov006-cluster-investigation.md)
+- [`docs/briefs/023-ov006-cluster-investigation.md`](../../docs/briefs/023-ov006-cluster-investigation.md)
   `scaffolder`, shipped in PR #299. 348-line research note diagnosing
   the two persistently-stuck top-of-pool ov006 clusters as
   heterogeneous bags (≥15 / ≥8 distinct shapes hiding behind
   identical fingerprints). Predicted yields are correct, not bugged.
   Recommendation: build `find_shape_templates.py` (now scoped as
   brief 025).
-- [`docs/briefs/021-markdownlint-cleanup.md`](docs/briefs/021-markdownlint-cleanup.md)
+- [`docs/briefs/021-markdownlint-cleanup.md`](../../docs/briefs/021-markdownlint-cleanup.md)
   `scaffolder`, shipped in PR #296. Cleared 7 pre-existing markdown-lint
   errors and patched `tools/generate_tool_index.py` to compute
   GFM-style heading slugs going forward (root-cause fix, not just
   symptoms).
-- [`docs/briefs/020-cluster-prop-02006164.md`](docs/briefs/020-cluster-prop-02006164.md)
+- [`docs/briefs/020-cluster-prop-02006164.md`](../../docs/briefs/020-cluster-prop-02006164.md)
   `decomper`, shipped in PR #297. **20 byte-identical matches
   (87% yield)** — beat predicted 74%. Heterogeneous cluster
   unlocked via per-shape templating (12 distinct shapes) instead
   of the brief's per-bit-position hand-patches. Updated the
   brief-template guidance in brief 022.
-- [`docs/briefs/019-configure-mwasmarm-output.md`](docs/briefs/019-configure-mwasmarm-output.md)
+- [`docs/briefs/019-configure-mwasmarm-output.md`](../../docs/briefs/019-configure-mwasmarm-output.md)
   `scaffolder`, shipped in PR #292. Fresh-clone bootstrap fix —
   `outputs=[CC, LD, ASM]` in the `download_tool` rule. Verified by
   brain via the documented `rm -rf tools/mwccarm` smoke test.
-- [`docs/briefs/018-cluster-tooling-upgrade.md`](docs/briefs/018-cluster-tooling-upgrade.md)
+- [`docs/briefs/018-cluster-tooling-upgrade.md`](../../docs/briefs/018-cluster-tooling-upgrade.md)
   `scaffolder`. **First half** shipped in PR #243 (cluster fingerprint
   subdivision). **Second half** (`propagate_template --substitute-imm`)
   *superseded* by the post-#255 hard-tier clustering pivot — see
   `docs/state.md` for the narrative.
-- [`docs/briefs/017-cluster-prop-020085d4.md`](docs/briefs/017-cluster-prop-020085d4.md)
+- [`docs/briefs/017-cluster-prop-020085d4.md`](../../docs/briefs/017-cluster-prop-020085d4.md)
   `decomper`, shipped in PR #247. 13 offset-substitution matches on
   the `func_020085d4` cluster.
 
@@ -3930,34 +3930,33 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
   `docs/briefs/010-*.md` through `docs/briefs/014-*.md` plus the
   per-brief PRs (#94, #98, #102, #105, #146 and the wave PRs that
   drained each brief's targets). The auto-generated
-  [`docs/briefs/README.md`](docs/briefs/README.md) index lists every
+  [`docs/briefs/README.md`](../../docs/briefs/README.md) index lists every
   brief with its working branch.
 
-- [`docs/briefs/009-sinit-ov002-outlier.md`](docs/briefs/009-sinit-ov002-outlier.md)
+- [`docs/briefs/009-sinit-ov002-outlier.md`](../../docs/briefs/009-sinit-ov002-outlier.md)
   `decomper`, shipped in PR #92. Matched `__sinit_ov002_022ca7e8`
   (24 bytes, asm-void escape hatch for mwcc's RHS-first ordering).
-- [`docs/briefs/008-ov011-tail-call-wrappers.md`](docs/briefs/008-ov011-tail-call-wrappers.md)
+- [`docs/briefs/008-ov011-tail-call-wrappers.md`](../../docs/briefs/008-ov011-tail-call-wrappers.md)
   `decomper`, shipped in PR #89. Matched `func_ov011_021ce324` /
   `021ce334` — both 0x10 ARM tail-call wrappers, 100% objdiff.
-- [`docs/briefs/001-ov005-finish-trivials.md`](docs/briefs/001-ov005-finish-trivials.md)
+- [`docs/briefs/001-ov005-finish-trivials.md`](../../docs/briefs/001-ov005-finish-trivials.md)
   `claude-pc`, shipped in PR #8 + PR #11. Net: 13 ov005 functions
   matched (8 trivial + 5 easy-tier leaves).
-- [`docs/briefs/002-analyzer-bulk-groups.md`](docs/briefs/002-analyzer-bulk-groups.md)
+- [`docs/briefs/002-analyzer-bulk-groups.md`](../../docs/briefs/002-analyzer-bulk-groups.md)
   `scaffolder`, shipped in PR #10. Output: `build/eur/analysis/{targets.md,bulk.json}`
   with 382 bulk groups covering 8009 functions.
-- [`docs/briefs/003-sinit-bulk-match.md`](docs/briefs/003-sinit-bulk-match.md)
+- [`docs/briefs/003-sinit-bulk-match.md`](../../docs/briefs/003-sinit-bulk-match.md)
   `claude-pc`, shipped across the sinit wave PRs. Matched the
   same-sized `__sinit_*` group; deferred the documented outliers.
-- [`docs/briefs/004-trivial-stubs-wave.md`](docs/briefs/004-trivial-stubs-wave.md)
+- [`docs/briefs/004-trivial-stubs-wave.md`](../../docs/briefs/004-trivial-stubs-wave.md)
   `claude-pc`, shipped in PR #63, PR #65, and PR #66. Matched 56
   trivial `bx lr` stubs across passing overlays.
-- [`docs/briefs/005-easy-tier-wave.md`](docs/briefs/005-easy-tier-wave.md)
+- [`docs/briefs/005-easy-tier-wave.md`](../../docs/briefs/005-easy-tier-wave.md)
   `claude-pc`, shipped in PR #70, PR #71, and PR #72. Matched 24
   easy-tier leaves across ov005/ov006/ov007/ov009.
-- [`docs/briefs/006-easy-tier-heavies.md`](docs/briefs/006-easy-tier-heavies.md)
+- [`docs/briefs/006-easy-tier-heavies.md`](../../docs/briefs/006-easy-tier-heavies.md)
   `claude-pc`, shipped in PR #79, PR #80, PR #81, and PR #82.
   Matched 29 easy-tier leaves across ov015/ov010/ov011/ov000.
-- [`docs/briefs/007-ov000-bit-getter.md`](docs/briefs/007-ov000-bit-getter.md)
+- [`docs/briefs/007-ov000-bit-getter.md`](../../docs/briefs/007-ov000-bit-getter.md)
   `claude-pc`, shipped in PR #85. Matched one ov000 0x10 bit getter
   as the low-risk Brief 007 opener.
-

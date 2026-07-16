@@ -31,6 +31,7 @@ syntax, not masking, or the compiler will pick a different instruction.
 ## What `self->f0` holds
 
 `f0` is the card identifier. It is read as a u16 in virtually every accessor:
+
 ```c
 u16 id = self->f0;
 u32 player = self->b0;   /* 0 or 1 — which player's side */

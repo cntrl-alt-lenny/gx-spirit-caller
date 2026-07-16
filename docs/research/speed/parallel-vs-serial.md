@@ -108,9 +108,11 @@ settles.
 4. Run for a **fixed wall-clock window of 90 minutes** (not a fixed
    candidate count — see §5 on why).
 5. At T+0, T+30, T+60, T+90 minutes, sample CPU utilization:
+
    ```powershell
    Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 2 -MaxSamples 5
    ```
+
    (or Task Manager → Performance tab, eyeballed) — this is the brief-486
    tell: if CPU sits under ~30% while both lanes are actively working,
    that's the I/O-bound signature recurring.

@@ -86,6 +86,7 @@ per `ov000_core.h`).
 - `bl func_02037208` — toast/notify, args `(0x9b-0x9c, 0, 1)` = `(-1, 0, 1)`.
 
 **Complete C sketch:**
+
 ```c
 extern short data_02104bac[];              /* joypad/input state; +0x54 bit0 */
 extern char  data_ov000_021c75c4[];         /* config struct */
@@ -117,6 +118,7 @@ ready_check:
     }
 }
 ```
+
 Note: exact bit numbering for `+0x270` should be re-verified against the
 literal `.word` masks (`0x100000`/`0x400000`/`0x200000`/`0x200`/`0x800`) at
 build time — the masks above are read directly off the `.s` immediates, not
@@ -168,6 +170,7 @@ config words — new, see gaps).
   mode-nibble set at bits [13:12], independent little RMW.
 
 **Complete C sketch:**
+
 ```c
 extern char data_ov000_021c758c[];
 extern short data_ov000_021b56b4[];  /* stride 0x28 shorts, row = idx*0x28/2 */
@@ -197,6 +200,7 @@ void func_ov000_021ae2cc(int idx) {
         (data_ov000_021c763c[0x20/4] & ~0x3000) | 0x1000;
 }
 ```
+
 This is a best-effort structural sketch (the exact `tbl` addressing needs the
 `data_ov000_021c7660` base confirmed at build time — see gaps below); it is
 listed as tractable because every callee and every constant is now
@@ -386,6 +390,7 @@ Each entry: address + the *specific* scheduling ambiguity, with ground-truth
 pool words and callees so a future pass doesn't have to re-derive them.
 
 ### 0x021AA4C4 (244B, class F) — `Ov000_InitObj`
+
 Zeroes a 4-word block via `Fill32`, writes 8 literal fields (`0x1000`,
 `0x200000`, `-0xbf000`, `0xff000`, `0xa000` ×2) plus two `ldrsh` samples from
 `data_020bf280+0x5c/0x5e` (a large uncarved rodata table — offsets `+0x5c`
@@ -407,6 +412,7 @@ call-order transcription can't even be verified against a complete sibling.**
 `func_ov000_021aa840`, `func_ov000_021aaac8`, `func_ov000_021aa5b8`.
 
 ### 0x021AAAC8 (876B, class F) — `Ov000_DispatchObjMove`
+
 Already NAMED HIGH confidence in the map ("large SHIP; tests facing field
 1-4, dispatches move directions, calls RefreshObjTransform"). Reads the
 active-object struct at fields `+0x100..+0x144` (facing/status region, byte-
@@ -425,6 +431,7 @@ near-miss.** `.word` pool (verbatim): `data_ov000_021c73e0`, `data_020bef80`.
 `bl` targets (verbatim): `func_ov000_021aa840` (once, mid-function).
 
 ### 0x021AAEE4 (312B, class F) — `Ov000_InitTaskNode`
+
 Already NAMED in the map (MED, "likely allocates/inits a task node") and
 independently flagged by name in `ov000_core.h`'s wave-3 wall list under
 "Fixed-point (smull/mla) class: 021ae510, 021ab01c, **021aaee4**, 021aa8d4,
@@ -453,6 +460,7 @@ project's canon defers to permuter.** `.word` pool (verbatim): `0x80808081`.
 `cmp r5,#0x0 / beq`).
 
 ### 0x021AB258 (540B, class F) — `Ov000_SetBgTileParams`
+
 Already NAMED HIGH in the map ("indexes stride-0x2c table
 `data_ov000_021c7540` by engine×channel, writes BG scroll/tile regs" — this
 IS the confirmed struct, `data_ov000_021c7540`, stride `0x2c` (`mov ip,#0x2c
@@ -471,6 +479,7 @@ wall, more instances.** `.word` pool (verbatim): `data_ov000_021c7540`,
 (leaf function, pure MMIO writes).
 
 ### 0x021ABD50 (260B, class F) — `Ov000_SetupBgLayers`
+
 Named MED in the map ("configures BG layer registers"; `ov000_core.h`
 wave-3 lists it explicitly among "command-record builders… dedicated RE").
 Zeroes a 0x14-byte block via `Fill32`, then packs SEVEN incoming arguments
@@ -489,6 +498,7 @@ non-uniform field widths.** `.word` pool (verbatim): `0xffff803f`,
 entry).
 
 ### 0x021AC144 (820B, class F) — `Ov000_ProcessScrollEntry`
+
 Already NAMED HIGH in the map ("large; dispatches per scroll-entry type;
 calls ComputeScrollOffset, AdvanceScrollLo/SubScrollLo" — every callee here
 IS already matched/named: `func_ov000_021abe64`/`021abec8` (the twin pair
@@ -516,6 +526,7 @@ call sites), `func_02006194`, `func_0200617c`, `func_02006110`,
 `func_ov000_021abec8`.
 
 ### 0x021AC578 (436B, class F) — `Ov000_UpdateScrollAnimEntry`
+
 Already NAMED HIGH in the map ("iterates scroll animation; calls font
 rendering helpers func_0200617x") and explicitly named in `ov000_core.h`'s
 wave-3 fixed-point wall list alongside `021aaee4`/`021ae510` ("021ac578
@@ -538,6 +549,7 @@ targets (verbatim, in order): `func_02006110`, `func_02006194`,
 `func_0200617c` (×2), `func_02006164` (×2).
 
 ### 0x021ACAF8 (352B, class E) — `Ov000_ProcessAnimFrame`
+
 Already NAMED MED in the map ("processes animation frame; calls
 DispatchDeferredTask/FlushDeferredHandle" — actually the call targets are
 `func_0201e7e4`/`func_0201e800`/`func_0201e7ec`/`func_0207fd28`, all now
@@ -568,6 +580,7 @@ multi-FX_Mul, cf. VEC_DotProduct's near-miss).** `.word` pool (verbatim):
 `func_020b3870`.
 
 ### 0x021ACC58 (360B, class E) — `Ov000_LoadNextAnimFrame`
+
 Already NAMED MED in the map ("sibling to ProcessAnimFrame; loads next
 animation frame"; explicitly listed in `ov000_core.h`'s fixed-point wall
 list alongside `021ac578`/`021aaee4`). Range-checks two VRAM-offset fields
@@ -601,6 +614,7 @@ scale — actually this is inline `smull`, no call), `func_0201e964` (×1..3,
 loop-bounded).
 
 ### 0x021ACEF8 (396B, class F) — `Ov000_SetupBgControl`
+
 Already NAMED HIGH in the map ("sets BG control regs (BGCNT via 0xNNN half-
 word writes), calls func_0201d47c and func_0201e5b8" — both sinks confirmed,
 see the `021ad660` writeup above for their bodies). **Wall: a 3-way switch
@@ -617,6 +631,7 @@ sets applies rather than which of N struct rows.** `.word` pool (verbatim):
 (conditional), `func_0201e5b8`.
 
 ### 0x021AD084 (868B, class F) — `Ov000_SetupSubVram`
+
 Already NAMED HIGH in the map ("large; sets BGCNT/DISPCNT for sub display,
 calls func_02094504 to DMA-fill VRAM"). This is the direct sibling of the
 `021AD660`/`021AD8DC` twin pair above (installed at `data_ov000_021c758c+
@@ -649,6 +664,7 @@ call sites, not a loop) has the same schedule-fragility as the twin pair.**
 `func_ov000_021ad464` (conditional), `func_ov000_021ab4ec`.
 
 ### 0x021ADC50 (212B, class F) — `Ov000_SetupScrollTable`
+
 Explicitly named "orchestrator tier" in `ov000_core.h`'s wall list
 ("021ae218 / 021adc50: complex orchestrators (nested goto-tail control flow
 / many-stack-arg pass-through calls) — dedicated RE"), and named MED in the
@@ -676,6 +692,7 @@ no loop structure is schedule-determined, matching the class of wall
 `func_02001e94`.
 
 ### 0x021ADD44 (468B, class F) — `Ov000_RenderText`
+
 Already NAMED HIGH in the map ("calls Strlen+ComputeTextOffset; renders text
 into BG tile buffer" — both `func_ov000_021ac7dc`/`Ov000_Strlen` and
 `func_ov000_021add24`/`Ov000_ComputeTextOffset` are confirmed MATCHED). This
@@ -708,6 +725,7 @@ variants), `func_02001ddc`, `func_0201d4b4`, `func_02001e94`,
 `func_ov000_021add24` (alt branch).
 
 ### 0x021ADF18 (172B, class E) — `Ov000_ScanTextNewline`
+
 Already NAMED MED in the map ("scans string for newlines up to a line
 count; text layout helper"). **Re-examined fully and this one is genuinely
 simple** — two independent scan loops (first: count lines up to `arg1`,
@@ -734,6 +752,7 @@ of the double-comparison by hand (not swept) may crack it.** `.word` pool:
 none. `bl` targets: none (leaf, pure pointer/byte loop).
 
 ### 0x021ADFC4 (596B, class F) — `Ov000_LayoutText`
+
 Already NAMED HIGH in the map ("large; calls ComputeTextOffset +
 ScanTextNewline; handles multi-line layout into VRAM" — confirms
 `021adf18` above IS called from production code, not just `021ae2cc`).
@@ -762,6 +781,7 @@ reproduces which accumulator mwcc recomputes vs. carries).** `.word` pool
 (loop-bounded), `func_ov000_021ab4bc`.
 
 ### 0x021AE510 (324B, class F) — `Ov000_LoadCardLayout`
+
 Already NAMED HIGH in the map ("reads data_021b56b4 table, calls
 BuildWindowA; sets up card-display layout"), explicitly named in
 `ov000_core.h`'s fixed-point wall list ("021ae510, 021ab01c, 021aaee4,
@@ -790,6 +810,7 @@ constant, different use), `0x80808081`, `data_020bef80`. `bl` targets
 (verbatim): `func_ov000_021ad49c` (tail call, once).
 
 ### 0x021AE69C (704B, class F) — `Ov000_UpdateTextDisplay`
+
 Already NAMED HIGH in the map ("large; reads data_021b56b4 table, calls font
 helpers (func_0200617x), updates scroll anim"). Every callee confirmed:
 `func_02006110`/`02006164`/`0200617c` (button/idle-poll family, per
@@ -818,6 +839,7 @@ both ways is a real experiment this pass didn't have scope to run.**
 `func_ov000_021ae4d8` (×2 more, post-loop), `func_ov000_021ae654` (×2).
 
 ### 0x021AE95C (892B, class F) — `Ov000_RunStateUpdate`
+
 Already NAMED HIGH in the map ("large state-machine; dispatches on top-byte
 of [0x2a8]; calls LoadCardLayout, UpdateTextDisplay" — both callees are the
 confirmed-intractable `021ae510`/`021ae69c` above, so this inherits their
@@ -851,6 +873,7 @@ of 1), `func_ov000_021ac72c` (×2), `func_ov000_021ae510`,
 `func_ov000_021ac834` (arm 7 guard).
 
 ### 0x021AED8C (1452B, class F) — `Ov000_MainUpdate`
+
 Already NAMED HIGH in the map as "largest function; 7-state jump table on
 [0x2a4] sub-byte; the main per-frame entry point" — this is the single
 biggest function in the entire overlay (0x5AC bytes). Calls the just-examined
@@ -886,6 +909,7 @@ first.** `.word` pool (verbatim): `data_ov000_021c758c`, `data_ov000_021c75c4`,
 `func_0207fd28`, `func_0201eaa0`.
 
 ### 0x021AF5E0 (320B, class F) — `Ov000_SetupAltEntry`
+
 Already NAMED MED in the map ("larger init sequence for alt entry/slot") and
 explicitly named in `ov000_core.h`'s wave-3 wall list ("command-record
 builders: 021ad660/021ad8dc… 021abd50, **021af5e0** — dedicated RE"). Copies

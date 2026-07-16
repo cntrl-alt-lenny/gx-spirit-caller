@@ -106,8 +106,8 @@ delinked object: **every one of the 22 words matches byte-for-byte**
 except the substituted pool word. Base `data_ov002_022cac38`, absorbed
 `data_ov002_022cb86c`, offset `0xc34` — `0x022cac38 + 0xc34 =
 0x022cb86c` exactly. The absorbed symbol is the base of an indexed
-function-pointer table (`ldr r2, [pc,#…]` then `ldr r1, [r2, r1, lsl
-#2]` then `blx r1`) — array-base semantics, not a scalar load; the
+function-pointer table (`ldr r2, [pc,#…]` then `ldr r1, [r2, r1, lsl #2]`
+then `blx r1`) — array-base semantics, not a scalar load; the
 substitution is correct regardless. Pre-fix: `[21] reloc
 data_ov002_022cac38 vs data_ov002_022cb86c`. Post-fix: `✅
 whole-function .s byte-identical vs delinked .o (22 words)`.

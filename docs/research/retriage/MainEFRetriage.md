@@ -29,6 +29,7 @@ is now fully named — it is the first field of whichever object `data_02102958[
 **Struct/data needed:** `data_02102958` (already matched; `void *data_02102958[3]`)
 
 **Assembly:**
+
 ```asm
 func_020a71e4:
     stmdb sp!, {r3, lr}
@@ -41,6 +42,7 @@ func_020a71e4:
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_020a71e4(void) {
     void (*fn)(void) = *(void (**)(void))data_02102958[2];
@@ -63,6 +65,7 @@ of slot 0. `data_02102958` now documented.
 **Struct/data needed:** `data_02102958` (already matched)
 
 **Assembly:**
+
 ```asm
 func_020a724c:
     stmdb sp!, {r3, lr}
@@ -75,6 +78,7 @@ func_020a724c:
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_020a724c(void) {
     /* typeof(*data_02102958[2]) has at least two fn-ptr fields */
@@ -100,6 +104,7 @@ emits this exact instruction sequence for the standard SDK normalization inline.
 **Struct/data needed:** None — pure arithmetic, no external references.
 
 **Assembly:**
+
 ```asm
 func_020b1e4c:
     cmp r0, #0x0
@@ -122,6 +127,7 @@ func_020b1e4c:
 ```
 
 **Recipe sketch:**
+
 ```c
 /* FX_FX32 float-pack: uint → two-word packed representation */
 /* Standard SDK pattern; no coin-flip. Write the C and compiler produces this. */
@@ -148,6 +154,7 @@ before the clz+shift, then ORs the sign back into the result high word. Fully de
 **Struct/data needed:** None.
 
 **Assembly excerpt (sign-handling head):**
+
 ```asm
 func_020b1e0c:
     ands r2, r0, #-2147483648 ; r2 = sign bit isolated
@@ -162,6 +169,7 @@ func_020b1e0c:
 ```
 
 **Recipe sketch:**
+
 ```c
 FX32 func_020b1e0c(int x) {
     return FX32_FromS32(x);   /* SDK signed normalization */
@@ -186,6 +194,7 @@ deterministic mwcc output.
 **Struct/data needed:** None.
 
 **Assembly tail (rounding):**
+
 ```asm
     orr r0, r0, r3, lsl #0x17  ; pack sign+exp+mantissa
     bxeq lr                     ; if mantissa was 0, return early
@@ -198,6 +207,7 @@ deterministic mwcc output.
 ```
 
 **Recipe sketch:**
+
 ```c
 float func_020b319c(int x) {
     return (float)x;    /* mwcc generates this exact round-to-nearest sequence */
@@ -233,6 +243,7 @@ straightforward once the array entry layout is understood.
   relative to that base. Treat as a flat BSS array of 26 structs.)
 
 **Assembly key:**
+
 ```asm
     ldr r0, _LIT0              ; data_021040ac (GlobalAudioState)
     ldr r0, [r0, #0x38]       ; GlobalAudioState.f3c
@@ -246,6 +257,7 @@ _LIT0: .word data_021040ac
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02009dec(void) {
     GlobalAudioState *gas = &data_021040ac;
@@ -282,6 +294,7 @@ a signed delta, storing into `entry[0x56d]`. The `func_020a991c` call is the sam
 **Struct/data needed:** Same as `02009dec`.
 
 **Assembly key:**
+
 ```asm
     ldr r0, [r0, #0x38]       ; GlobalAudioState.f3c
     bl func_020a9950
@@ -292,6 +305,7 @@ a signed delta, storing into `entry[0x56d]`. The `func_020a991c` call is the sam
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02009f50(void) {
     func_020a9950(data_021040ac.f3c);
@@ -334,6 +348,7 @@ and builds an index-lookup from `data_020c3e84`.
   pointer array (8-byte entries, `void *` or struct ptr)
 
 **Assembly excerpt:**
+
 ```asm
     ldr r0, .L_02006b04        ; r0 = data_02104f1c
     ldr r4, .L_02006b08        ; r4 = same (literal copy for patcher)
@@ -346,6 +361,7 @@ and builds an index-lookup from `data_020c3e84`.
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02006a38(int a, int b, int c, ...) {
     GlobalData02104f1c *d = &data_02104f1c;

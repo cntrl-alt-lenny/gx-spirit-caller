@@ -1,6 +1,7 @@
 # 021ceebc — func_ov011_021ceebc (ov011, class C, 232B)
 
 ## Recipe + Risk
+
 **Recipe:** CLASS C: multi-field loop; stride computed per iter; reload bound
 **Risk:** per-iter stride: compute stride each iteration. reload: bound not cached.
 
@@ -11,6 +12,7 @@
 > cannot be coerced.
 
 ## Prep draft
+
 ```c
 /* CAMPAIGN-PREP candidate for func_021ceebc (ov011, class D, MED tier) — brief 496.
  * UNVERIFIED + ITERATION-EXPECTED: the MED tier rarely first-build-matches.
@@ -63,6 +65,7 @@ void func_ov011_021ceebc(void) {
 ```
 
 ## Struct context
+
 Touches two ov011 state globals from ov011_core.h:
 
 | field | offset | type | purpose |
@@ -81,11 +84,13 @@ Touches two ov011 state globals from ov011_core.h:
 data_ov011_021d300c and data_ov011_021d3034 are short[] lookup tables (4-byte entries, x and y shorts).
 
 ## Closest matched example
+
 **Path:** src/overlay011/func_ov011_021cc9b4.c
 **Why similar:** 2-arm if/switch on `data_ov011_021d4000 + 0x2a0 == 1`, bound base403c, then cross-struct field stores in prescribed order.
 **Key lesson from that file:** The 2-arm switch on mode-0x2a0 compiles to a cmp chain (NOT a jump table); no default case is needed. The base pointer `s = data_ov011_021d403c` must be declared before the switch and bound into a callee-saved register. Store order of the 3-word block is preserved exactly as written in C.
 
 ## Try this
+
 1. Build as-is. The prep draft captures the right store sequence and the conditional-shift pattern. The key risk is that `idx = (v << 0x17) >> 0x1c` in the if-branch and `idx = (v << 0x13) >> 0x1c` in the else-branch — mwcc may reload `v` per branch rather than keeping a single load. If the asm shows two `ldr r?, [base, #0x268]` instructions (one per branch), move `v = *(unsigned int *)(b + 0x268);` into each branch body instead of hoisting it.
 2. In objdiff, check that `idx * 2` compiles to `lsl #1` (not a mul). If the branch where `v` is loaded and the branch where `tbl` and `idx` are set do not share the same register, try declaring `idx` before the if and assigning `v` inside each branch separately.
 3. ov011_core.h wave-4 explicitly names this as a WALL (predication-vs-branch). If predication coercion fails after 3 attempts, park as .s — do not spend permuter budget on it.

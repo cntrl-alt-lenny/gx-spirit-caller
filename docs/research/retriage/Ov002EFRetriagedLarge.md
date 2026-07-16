@@ -57,6 +57,7 @@ well-documented offset +0xD48. Compares to 1 — a simple clearable-flag check. 
 calls, no loops, no scheduling.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_022ae718(CardObj *card) {
     if (*(u16 *)card == 0) return 0;
@@ -65,6 +66,7 @@ int func_ov002_022ae718(CardObj *card) {
     return 0;
 }
 ```
+
 **Levers:** none expected.
 
 ---
@@ -79,6 +81,7 @@ against `r0` (the player-parity arg). If mismatch → 0; if `r1 == 0xb` → retu
 0x800 (special sentinel). Pure known-struct read with a const compare.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_02216530(int player, int arg1) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -89,6 +92,7 @@ int func_ov002_02216530(int player, int arg1) {
     return 0;
 }
 ```
+
 **Levers:** player-bit lsl#1f/lsr#1f is a standard pattern (no extra lever needed).
 
 ---
@@ -103,6 +107,7 @@ returns 0. Then reads `dss->f_cf8` (`+0xCF8`), returns 1 if `== 3`, else 0.
 Both fields fully documented.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0220cff8(CardObj *card) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -111,6 +116,7 @@ int func_ov002_0220cff8(CardObj *card) {
     return (dss->f_cf8 == 3) ? 1 : 0;               /* +0xCF8 */
 }
 ```
+
 **Levers:** cmp ordering (== 3 moveq/movne) is standard.
 
 ---
@@ -128,6 +134,7 @@ deterministic (no calls, no loops, no scheduling). Confidence: **medium** (offse
 in KB but pattern is unambiguous).
 
 **m2c sketch:**
+
 ```c
 void func_ov002_021c9af0(int bit_idx, int set_flag) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -138,6 +145,7 @@ void func_ov002_021c9af0(int bit_idx, int set_flag) {
     }
 }
 ```
+
 **Levers:** orr-shifted-operand-first for the set branch; standard and-mvn for clear.
 
 ---
@@ -152,6 +160,7 @@ returns its boolean result. Two-branch function — the scheduling is entirely
 determined by the counter threshold and the named callee.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0220ddf4(void) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -160,6 +169,7 @@ int func_ov002_0220ddf4(void) {
     return func_ov002_0220dd34() != 0;
 }
 ```
+
 **Levers:** `movlt r0, #0` + `ldmltia` early-exit pattern; `movne/moveq` for boolean.
 
 ---
@@ -176,6 +186,7 @@ to `+0xD84/+0xD54/+0xD50/+0xD58`, loads `data_022cd73c[+0x4]` and stores to
 function just zeroes them (init function).
 
 **m2c sketch:**
+
 ```c
 void func_ov002_022592b8(int mode_code) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -187,6 +198,7 @@ void func_ov002_022592b8(int mode_code) {
     dss->f_d58 = 0;            /* +0xD58 gap field */
 }
 ```
+
 **Levers:** store ordering is fixed by the instruction stream (no scheduling).
 
 ---
@@ -202,6 +214,7 @@ to documented +0xD9C); `data_ov002_022d0e6c+0xA0/+0xA2` (two u16 strh stores)
 to a named function — fully deterministic.
 
 **m2c sketch:**
+
 ```c
 void func_ov002_0226acf8(int arg0, int arg1, u16 arg2, u16 arg3) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -213,6 +226,7 @@ void func_ov002_0226acf8(int arg0, int arg1, u16 arg2, u16 arg3) {
     func_ov002_0226ac94();
 }
 ```
+
 **Levers:** none expected (push/pop pair already emitted correctly by mwcc with r3
 as padding).
 
@@ -231,6 +245,7 @@ returns 1. Falls through → 0. The bitfield extraction and loop count are
 deterministic. No fn-ptr calls.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_021fbf30(int target_field) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -245,6 +260,7 @@ int func_ov002_021fbf30(int target_field) {
     return 0;
 }
 ```
+
 **Levers:** loop counter in r2 vs `ip` (count), `bcc` loop back — standard.
 
 ---
@@ -258,6 +274,7 @@ literal stored to `dss->f_d48` is `0x9` (hard-coded constant) rather than the
 argument `r0`. The two functions are a matched pair of duel-phase initializers.
 
 **m2c sketch:**
+
 ```c
 void func_ov002_02259324(int arg0) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -269,6 +286,7 @@ void func_ov002_02259324(int arg0) {
     dss->f_d58 = 0;
 }
 ```
+
 **Levers:** none beyond the sibling `022592B8` levers.
 
 ---
@@ -283,6 +301,7 @@ masks to bit0, `mla` with stride 0x868. Adds `+0x30` for the slots sub-array. Lo
 counts non-zero slots. No calls, no scheduling.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_021bbf50(int player) {
     Ov002FieldZone *row = &data_ov002_022cf16c[player & 1];  /* stride 0x868 mla */
@@ -294,6 +313,7 @@ int func_ov002_021bbf50(int player) {
     return count;
 }
 ```
+
 **Levers:** mwcc 2.0 signed bitfield extraction (lsl#19/lsr#19 is standard); `movs`
 to check nonzero.
 
@@ -311,6 +331,7 @@ extraction (`lsl#19/lsr#19`), compares to `0x175e`. Pure comparison — no calls
 loops.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_022968bc(CardObj *card) {
     int player = ((card->f2 << 31) >> 31) & 1;
@@ -319,6 +340,7 @@ int func_ov002_022968bc(CardObj *card) {
     return (id == 0x175e) ? 1 : 0;
 }
 ```
+
 **Levers:** `and #1` after `lsr#1f` emitted by mwcc when masking the bit explicitly.
 
 ---
@@ -336,6 +358,7 @@ computes `data_022cf16c + r0*8 + 0x1400` — this is a stride-8 table that start
 single call is to a named function (not a fn-ptr), so scheduling is fixed.
 
 **m2c sketch:**
+
 ```c
 void func_ov002_021b2094(CardObj *card) {
     u16 idx = card->f_a;         /* [+0xA] u16 — first node in chain */
@@ -350,6 +373,7 @@ void func_ov002_021b2094(CardObj *card) {
     }
 }
 ```
+
 **Levers:** `add r1, r4, r0, lsl #3` + `add r1, r1, #0x1400` — the shift-then-add
 sequence is canonical for a stride-8 pointer with large base offset.
 
@@ -364,6 +388,7 @@ bit0 `lsl#1f/lsr#1f`, compares to `dss->f_cec`. Mismatch → 0. Then checks `dss
 Mismatch → 0. Passes both → calls `func_ov002_021ff354` and returns its result.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0220599c(CardObj *card) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -373,6 +398,7 @@ int func_ov002_0220599c(CardObj *card) {
     return func_ov002_021ff354(card);
 }
 ```
+
 **Levers:** `movne + ldmneia` short-circuit — standard mwcc conditional-return.
 
 ---
@@ -389,6 +415,7 @@ base. Checks `zone_count_p0 + 0x1f4 > zone_count_p1`. Returns 1 if true, 0 if no
 A simple cross-player threshold comparison — no calls.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_022913cc(CardObj *card) {
     int p = ((card->f2 << 31) >> 31) & 1;
@@ -398,6 +425,7 @@ int func_ov002_022913cc(CardObj *card) {
     return (cnt_q < cnt_p + 0x1f4) ? 1 : 0;
 }
 ```
+
 **Levers:** `rsb r2, r1, #0x1` + `and #1` pattern for inverse-player computation;
 `movlt/movge` arm-swap order.
 
@@ -414,6 +442,7 @@ constant. The mla emits `mul ip, r3, r0` then `mul r0, r1, r0` (compiler reuses 
 as stride) — a known mwcc alias pattern.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_02206e64(CardObj *card) {
     int p = ((card->f2 << 31) >> 31) & 1;
@@ -423,6 +452,7 @@ int func_ov002_02206e64(CardObj *card) {
     return (cnt_p + 0x7d0 <= cnt_q) ? 1 : 0;
 }
 ```
+
 **Levers:** `movle/movgt` (note reversed comparison vs 022913CC — `<=` not `<`).
 
 ---
@@ -438,6 +468,7 @@ to `target`. Match → calls `func_ov002_021b9e00` and returns 0x800 on nonzero,
 otherwise. No-match or out-of-range → 0. Both DSS fields are documented.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_02267f90(int target, int r1, int r2) {
     if (r1 + r2 > 0xa) return 0;
@@ -448,6 +479,7 @@ int func_ov002_02267f90(int target, int r1, int r2) {
     return 0;
 }
 ```
+
 **Levers:** `bgt .L_skip` before DSS load; `movne r0, #0x800` return.
 
 ---
@@ -465,6 +497,7 @@ Then calls `func_ov002_021c38c4(result)`, checks if result < 7, conditionally ca
 `func_ov002_02253458(player, 11, slot_idx)`. Two named calls — scheduling is fixed.
 
 **m2c sketch:**
+
 ```c
 void func_ov002_0224ea54(int player, int arg1, int slot_idx) {
     Ov002FieldZone *row = &data_ov002_022cf16c[player & 1];
@@ -477,6 +510,7 @@ void func_ov002_0224ea54(int player, int arg1, int slot_idx) {
     }
 }
 ```
+
 **Levers:** bitfield reconstruct: `lsl#2/lsr#24` → 8 bits; `lsl#1` doubling; note
 exact shift constants need careful tracing.
 
@@ -494,6 +528,7 @@ exact shift constants need careful tracing.
 carry flag (`movcs/movcc`). Pure card-vs-zone comparison, no calls.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_022869d0(CardObj *card) {
     int p_inv = ((1 - ((card->f2 << 31) >> 31)) & 1);  /* opponent player */
@@ -503,6 +538,7 @@ int func_ov002_022869d0(CardObj *card) {
     return ((u16)card->f_14 >= f16) ? 1 : 0;  /* carry/unsigned cmp */
 }
 ```
+
 **Levers:** `movge r0, #1; bxge lr` early-exit pattern; `movcs/movcc` for unsigned.
 
 ---
@@ -518,6 +554,7 @@ a count value. Computes `count * 0x1F4` (500). Gets player-parity base from
 `zone_count > count * 0x1f4`. Named callee (not fn-ptr).
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0227c630(int player) {
     int base_count = func_ov002_021bb068(0x132c);
@@ -526,6 +563,7 @@ int func_ov002_0227c630(int player) {
     return (zone_cnt > threshold) ? 1 : 0;
 }
 ```
+
 **Levers:** `movgt/movle` flag ordering.
 
 ---
@@ -543,6 +581,7 @@ ov002 BSS). Reads `[+0xA2]` u16 from that entry. Calls
 fn-ptrs.
 
 **m2c sketch:**
+
 ```c
 void func_ov002_02249e84(int player) {
     int opponent = 1 - player;
@@ -553,6 +592,7 @@ void func_ov002_02249e84(int player) {
     }
 }
 ```
+
 **Levers:** `add r0, r4, r6, lsl #1` + `add r0, r0, #0x1D00` — shift-then-add with
 large offset; loop uses `blt`.
 
@@ -570,6 +610,7 @@ mul-by-stride operations via `mul r2, r1, r0` (player's mul) and `mul r0, r1, r0
 (opponent's mul) reusing r0 as stride — standard mwcc alias.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_02207e18(CardObj *card) {
     int p = ((card->f2 << 31) >> 31) & 1;
@@ -579,6 +620,7 @@ int func_ov002_02207e18(CardObj *card) {
     return (cnt_p + 0x1b58 <= cnt_q) ? 1 : 0;
 }
 ```
+
 **Levers:** two-`mul` alias (both use same stride variable reuse); `add r0, r2, #0x358;
 add r0, r0, #0x1800` for constant `0x1B58` split across two immediates.
 
@@ -595,6 +637,7 @@ Else: extracts two bits from `card[+0x2]`: bit17 via `lsl#17/lsr#1f` and bit0 vi
 mismatch, 0 if match. All field accesses from documented KB structs.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_021e2e38(CardObj *card) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -605,6 +648,7 @@ int func_ov002_021e2e38(CardObj *card) {
     return (data_ov002_022cd73c.f_4 != xor_key) ? 1 : 0;
 }
 ```
+
 **Levers:** `eor r0, r1, r2, lsr #0x1f` — XOR with shifted operand is direct.
 
 ---
@@ -621,6 +665,7 @@ field and sign bit), sums, calls `func_ov002_021c38c4`. Single named call, no
 second branch.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0228deac(int player, int slot_idx) {
     Ov002FieldZone *row = &data_ov002_022cf16c[player & 1];
@@ -629,6 +674,7 @@ int func_ov002_0228deac(int player, int slot_idx) {
     return func_ov002_021c38c4(field_a);
 }
 ```
+
 **Levers:** same as `0224EA54`; note `lsr#18` vs sibling's `lsr#18` — same width.
 
 ---
@@ -647,6 +693,7 @@ multiple .s files as a 32-bit bitmask word in the DSS gap region — determinist
 once the field is named.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0228bb58(CardObj *card_a, CardObj *card_b) {
     if (card_b == NULL) return 0;
@@ -659,6 +706,7 @@ int func_ov002_0228bb58(CardObj *card_a, CardObj *card_b) {
     return dss->f_d0 & 1;                 /* +0xD0 bitmask bit0 */
 }
 ```
+
 **Levers:** `ldrls` conditional load — mwcc emits a predicated LDR when the branch
 and load are in a paired condition.
 
@@ -676,6 +724,7 @@ All DQS field accesses — the `+0x5DC` byte is in the documented gap (between
 +0x5D8 guard and +0x688 companion). Deterministic branch sequence.
 
 **m2c sketch:**
+
 ```c
 int func_ov002_0228ac74(CardObj *card) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -686,6 +735,7 @@ int func_ov002_0228ac74(CardObj *card) {
     return func_ov002_0228a9a4(card);
 }
 ```
+
 **Levers:** `movls r0, #0; ldmlsia sp!, {r3, pc}` — predicated return via stmdb
 push/pop; `cmpne r2, #0x13` chained condition.
 

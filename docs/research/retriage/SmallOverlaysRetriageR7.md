@@ -89,6 +89,7 @@ the heuristic's own count.
   entry.
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov001_021ca348
 _LIT1: .word data_021040ac
@@ -99,6 +100,7 @@ _LIT2: .word data_ov001_021ca404
 `func_02006c0c` (×2), `func_0201e5b8` (×2), `Task_Invoke` (×2).
 
 **Complete C sketch:**
+
 ```c
 extern unsigned char data_ov001_021ca348[48];   /* matched rodata table */
 extern GlobalAudioState data_021040ac;           /* +0x34 = NEW field */
@@ -167,6 +169,7 @@ the outbound-scroll branch.
   the tree using the same constant at the same shift level).
 
 **Ground-truth pool words:**
+
 ```
 .L_021ca2cc: .word data_ov001_021ca420
 .L_021ca2d0: .word data_ov001_021ca420   (pooled twice, same symbol)
@@ -180,6 +183,7 @@ the outbound-scroll branch.
 `func_ov000_021ab8f8` (×1).
 
 **Complete C sketch:**
+
 ```c
 extern unsigned int data_ov001_021ca420[1];
 extern void func_ov000_021ab520(int engine, int val);
@@ -270,6 +274,7 @@ round).
   cross-referenced from the existing Pattern A1 `ov001` row.
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_021040ac
 _LIT1: .word data_ov001_021ca384
@@ -279,6 +284,7 @@ _LIT1: .word data_ov001_021ca384
 `data_ov001_021ca384[data_021040ac.fb6c]`).
 
 **Complete C sketch:**
+
 ```c
 typedef int (*Ov001StepFn)(void);
 extern GlobalAudioState data_021040ac;
@@ -338,6 +344,7 @@ matched `.c` files with known exact signatures.
   entry.
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_02104bac
 _LIT1: .word data_ov007_0223352c
@@ -349,6 +356,7 @@ _LIT2: .word data_020c9694
 `func_ov007_021b2c44`, `func_ov007_021b299c`, `func_ov007_021b2b74`.
 
 **Complete C sketch:**
+
 ```c
 typedef struct Ov007WorkACtx {
     char _pad[0x3c];
@@ -470,6 +478,7 @@ offsets — flagged so the bracket-offset syntax isn't misread as a
 struct access), `0x04000304`/`0x04000000`/`0x04001000` (DISPCNT family).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov013_021cbc3c      _LIT7: .word 0x04000580
 _LIT1: .word 0x00000598                _LIT8: .word data_02104f1c
@@ -492,6 +501,7 @@ no-arg then `(9,2)`), `func_ov000_021af4bc`, `func_0202adf8`,
 `func_0208232c`, `GetSystemWork`, `func_ov000_021ab6ec` (conditional).
 
 **Complete C sketch:**
+
 ```c
 void func_ov013_021c9d74(void) {
     Fill32(0, data_ov013_021cbc3c, 0x598);
@@ -570,6 +580,7 @@ flag), `data_ov013_021cbc3c+0x20c` (task handle, 3-file confirmed),
 sprite" path).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov013_021cbc00
 _LIT1: .word data_ov013_021cbc3c
@@ -579,6 +590,7 @@ _LIT1: .word data_ov013_021cbc3c
 `func_ov000_021ab4bc`, `func_0208c8cc`.
 
 **Complete C sketch:**
+
 ```c
 int func_ov013_021ca024(void) {
     if (data_ov013_021cbc00->f248 == 0) return 0;
@@ -637,6 +649,7 @@ arg `4` matches the documented `OV006_TASK_PRIORITY`/OV011 lazy-init
 factory constant family (cross-overlay reuse of this pattern).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov013_021cb750
 ```
@@ -645,6 +658,7 @@ _LIT0: .word data_ov013_021cb750
 (×2), `func_02006c0c` (×2), `func_0201e5b8` (×2), `Task_Invoke` (×2).
 
 **Complete C sketch:**
+
 ```c
 void func_ov013_021ca15c(void) {
     func_020139b4();
@@ -710,6 +724,7 @@ nibble, same field independently confirmed in `Ov013_SetPage.c` and
 bits[10:9].
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word 0x0400000a          _LIT4: .word 0x00000709
 _LIT1: .word data_ov013_021cbc3c  _LIT5: .word func_ov013_021c9d60
@@ -726,15 +741,18 @@ _LIT3: .word data_021040ac
 `func_ov000_021add44`], `func_020018d4`, `func_ov002_021b1200`
 (cross-overlay call into ov002), `func_02005800`, `func_0208c940`.
 Veneers (`target = pc+8 + sign_extend(imm24)*4`):
+
 ```
 .word 0xebffa0ae  →  0x021b282c
 .word 0xebff9bad  →  0x021b142c
 .word 0xebffa0a8  →  0x021b284c   (only reached on GetSystemWork bit-test == 0)
 ```
+
 Then tail `func_0201c198`. `0x021b282c`/`0x021b284c` are only 0x20 apart
 — likely two entry points into the same small subsystem.
 
 **Complete C sketch:**
+
 ```c
 void func_ov013_021ca42c(void) {
     *(vu16*)0x0400000a = (*(vu16*)0x0400000a & 0x43) | 0xe90 | 0x3000;
@@ -887,6 +905,7 @@ source field-pairs), `data_ov018_021ae160+0xfc` (gate bit),
 work struct, per `ov018_core.h`'s field map).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov018_021ad860       _LIT3: .word 0x04001014
 _LIT1: .word 0x000001ff                _LIT4: .word data_ov018_021ae160
@@ -896,6 +915,7 @@ _LIT2: .word 0x04000010                _LIT5: .word data_ov018_021ad8a8
 **BL targets:** `func_0201e5b8`, `Task_Invoke`.
 
 **Complete C sketch:**
+
 ```c
 void func_ov018_021aa4a0(void) {
     unsigned short *src = (unsigned short *)((char *)data_ov018_021ad860 + 0x96c);
@@ -939,6 +959,7 @@ undocumented globals**: per-page halfword lookup tables feeding one edge
 of a touch-hit bounding box each.
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov018_021ad8a8    _LIT3: .word data_ov018_021ad2fc
 _LIT1: .word data_02104f4c          _LIT4: .word data_ov018_021ad2f0
@@ -949,6 +970,7 @@ _LIT2: .word data_ov018_021ad308    _LIT5: .word data_ov018_021ad2e4
 call sites, args `(0x97,-1,0,1)` confirm and `(0x38,-1,0,1)` change).
 
 **Complete C sketch:**
+
 ```c
 int func_ov018_021aaddc(void) {
     OamWork *w = data_ov018_021ad8a8;
@@ -1018,6 +1040,7 @@ into a callback registration via `func_02005800`, cross-linking these
 two functions.
 
 **Ground-truth pool words (all 23 slots incl. dupes):**
+
 ```
 data_ov018_021ad8a8, 0x9b8, data_02104f1c, data_ov018_021ad860, 0x1ff,
 data_ov018_021ae0f0, data_ov018_021ae190, data_02104f4c,
@@ -1036,6 +1059,7 @@ func_ov018_021aa4a0
 `func_02005800`.
 
 **Complete C sketch:**
+
 ```c
 int func_ov018_021ab1c4(void) {
     *(vu32*)0x04000000 &= ~0x1f00;
@@ -1113,6 +1137,7 @@ undocumented global**: fn-ptr table, length unbounded from this function
 alone (no upper-bound test on the index here).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_021040ac
 _LIT1: .word data_ov018_021ad71c
@@ -1122,6 +1147,7 @@ _LIT1: .word data_ov018_021ad71c
 (indirect, table-indexed).
 
 **Complete C sketch:**
+
 ```c
 int func_ov018_021ace14(void) {
     func_020a991c();
@@ -1153,6 +1179,7 @@ operates on a compile-time-constant divisor (6, 360, 9-or-15-family,
 all smull magic constants, no globals).
 
 **Ground-truth pool words and magic-constant derivation:**
+
 ```
 _LIT0: .word 0xb60b60b7   -- NEW constant: mwcc signed ÷360 reciprocal.
                              Corroborated by the literal 0x168 (=360 decimal)
@@ -1174,6 +1201,7 @@ _LIT2: .word 0x88888889   -- SAME raw constant seen in ov001/ov021/ov022 targets
 **BL targets:** none (leaf).
 
 **Complete C sketch:**
+
 ```c
 unsigned short func_ov018_021acf80(int h, int s, int v)
 {
@@ -1296,6 +1324,7 @@ initializing two sub-screen band objects at stride `0x41c`. **No `mla`,
 no linked-list walk** — see cross-overlay identity section.
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_ov022_021acaa0
 _LIT1: .word data_ov022_021abae8
@@ -1306,6 +1335,7 @@ _LIT1: .word data_ov022_021abae8
 `func_0208f2a8`, `func_0207ed94` (×2, loop), `func_0207ec68` (×2, loop).
 
 **Complete C sketch:**
+
 ```c
 void Ov022_InitSubScreenBands(void) {
     if (data_ov022_021acaa0->f198 & 1) {
@@ -1347,6 +1377,7 @@ row), `data_ov022_021abae8+0x1000+slot*4+0xb8`/`+0xec` (per-slot OBJ
 fields).
 
 **Ground-truth pool words (all 20):**
+
 ```
 data_ov022_021abae8, 0x00001154, data_02104f1c, data_ov022_021abaa0,
 0x000001ff, data_ov022_021ac330, data_ov022_021abac4, data_ov022_021abab0,
@@ -1363,6 +1394,7 @@ data_02104f4c, data_ov022_021ab8fe, data_ov022_021ab8e4
 `func_0208d138`, `func_0208d030`, `func_02005800`, `func_020b3870`.
 
 **Complete C sketch:**
+
 ```c
 void Ov022_InitDisplay(void) {
     *(vu32*)0x04000000 &= ~0x1f00;
@@ -1435,6 +1467,7 @@ tail (2× MASTER_BRIGHT ramp seed + play one SE).
 fields).
 
 **Ground-truth pool words (all 13):**
+
 ```
 data_ov022_021ac36c, data_ov022_021abae8, data_ov022_021ac56c,
 data_ov022_021ab9a0, data_ov022_021abac4, data_ov022_021abab0,
@@ -1450,6 +1483,7 @@ data_ov022_021ac368, data_ov022_021ab8e4, data_02104f4c, 0x0400006c,
 `func_020373cc`.
 
 **Complete C sketch:**
+
 ```c
 int Ov022_BuildScrollBands(void) {
     Ov022_CreateScrollTask(0, 0, 1, &data_ov022_021ac36c);
@@ -1527,6 +1561,7 @@ conditional).
 
 **Complete C sketch** (abbreviated for readability — every branch below
 is deterministic, no coin-flip):
+
 ```c
 int Ov022_UpdateCardSlots(void) {
     int progress = data_ov022_021abaa0.f54 + 0x1000;
@@ -1642,6 +1677,7 @@ undocumented global**: fn-ptr phase table, likely `.data`/rodata (not
 in `bss/data_ov022_bss.s`).
 
 **Ground-truth pool words:**
+
 ```
 _LIT0: .word data_021040ac
 _LIT1: .word data_ov022_021ab9bc
@@ -1650,6 +1686,7 @@ _LIT1: .word data_ov022_021ab9bc
 **BL/BLX targets:** zero `bl`; one `blx r0`.
 
 **Complete C sketch:**
+
 ```c
 int Ov022_DispatchPhase(void) {
     int phase = data_021040ac.field_b6c;
@@ -1685,6 +1722,7 @@ arithmetic, only extern is `func_020b3870` (IntDiv).
 **BL targets:** `func_020b3870` (×2, both conditional).
 
 **Complete C sketch:**
+
 ```c
 void Ov022_RGB5ToHSV(u16 rgb555, int *out_value, int *out_saturation, int *out_hue) {
     int r = rgb555 & 0x1f;
@@ -1743,6 +1781,7 @@ overlay).
 (Ov022_HSVToRGB5) — both looped, up to `count` dynamic invocations each.
 
 **Complete C sketch:**
+
 ```c
 void Ov022_PaletteBlendHue(u16 *src, u16 *dst, int packed_arg) {
     int count = (u16)(packed_arg >> 16);
