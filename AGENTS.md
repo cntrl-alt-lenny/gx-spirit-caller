@@ -495,7 +495,11 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 593** — Claude Code Decomper (Sonnet 5) → ceiling round 3 (WINE lane) — IN FLIGHT.
+- **Brief 597** — Claude Code Decomper (Sonnet 5) → **THE <0x100 ENDGAME SWEEP (WINE lane)**:
+  hand-match the small-tier residue from b592's tables (EUR 20 funcs/0xb12 + ITCM 11-14/region
+  + the USA/JPN small tail incl. main's 56) — the cold-RE knee says 5-15 min each. C-first
+  (readable-C ships coverage AND quality). Use b593's C-44 + the wall taxonomy from move 1.
+  Branch `claude/small-tier-sweep-597`.
 - **Brief 594** — Codex Scaffolder (Luna) → **MASTER CANDIDATE LEDGER campaign** (wine-free,
   multi-phase): script-driven JSONL cross-referencing every size_census-unmatched function ×
   sig-census twins × c-match-prep dossiers × attempt provenance + per-module rollups. Feeds
