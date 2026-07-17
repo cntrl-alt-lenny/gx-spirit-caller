@@ -76,8 +76,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from get_platform import get_platform  # noqa: E402
 from progress import parse_delinks_file  # noqa: E402
-
-_ROUTING_SUFFIXES = (".legacy_sp3", ".legacy", ".thumb")
+# brief 587: this tuple was the "seed" tools/routing_suffixes.py was
+# promoted from (it predates the Thumb tier's other 3 consumers going
+# stale) — now imports back from the shared module instead of keeping
+# its own copy, so there is exactly one definition repo-wide.
+from routing_suffixes import ROUTING_SUFFIXES as _ROUTING_SUFFIXES  # noqa: E402
 
 _RENAME_FN_RE = re.compile(
     r"Renamed function at (0x[0-9a-fA-F]+) in (.+?) to '([^']+)'"

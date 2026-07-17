@@ -369,6 +369,54 @@ class TestParseFilenameStem(unittest.TestCase):
         self.assertIsNone(parse_filename_stem("Task_DrawHand"))
 
 
+class TestThumbSourceProducesPortPlanInsteadOfSkip(unittest.TestCase):
+    """brief 587 (improvement-swarm r5 item 7 / brief-569 family): the
+    CLI gate in `main()` used to strip only `.legacy_sp3`/`.legacy` from
+    `args.source.stem` before calling `parse_filename_stem()` — a
+    `.thumb.c` source's stem still carried the `.thumb` infix,
+    `parse_filename_stem` doesn't recognise it (its own contract requires
+    routing suffixes pre-stripped), so `parsed` came back None and
+    `main()` printed "filename doesn't match any accepted pattern" and
+    exited 1. No Thumb function could region-port at all.
+
+    Static test only, no compile: this exercises exactly the two-step
+    sequence `main()` now runs (`split_routing_suffix` then
+    `parse_filename_stem`) without invoking the CLI's EUR/target config
+    loading, so it proves the gate itself is fixed without needing a
+    real region checkout."""
+
+    def test_thumb_c_stem_now_parses(self):
+        from routing_suffixes import split_routing_suffix
+
+        source = Path("src/overlay004/func_ov004_021dd374.thumb.c")
+        file_stem = split_routing_suffix(source.stem)[0]
+        parsed = parse_filename_stem(file_stem)
+        self.assertIsNotNone(
+            parsed, "a .thumb.c source must produce a port plan, not be skipped")
+        self.assertEqual(parsed, ("func_ov004", "ov004", 0x021dd374))
+
+    def test_legacy_and_legacy_sp3_c_stems_still_parse(self):
+        """Regression guard: the fix must not disturb the two suffixes
+        that already worked."""
+        from routing_suffixes import split_routing_suffix
+
+        for suffix, expected in (
+            (".legacy", ("func", "main", 0x0208f850)),
+            (".legacy_sp3", ("func", "main", 0x0208f850)),
+        ):
+            source = Path(f"src/main/func_0208f850{suffix}.c")
+            file_stem = split_routing_suffix(source.stem)[0]
+            self.assertEqual(parse_filename_stem(file_stem), expected)
+
+    def test_plain_c_stem_still_parses(self):
+        from routing_suffixes import split_routing_suffix
+
+        source = Path("src/main/func_0208f850.c")
+        file_stem = split_routing_suffix(source.stem)[0]
+        self.assertEqual(
+            parse_filename_stem(file_stem), ("func", "main", 0x0208f850))
+
+
 class TestFunctionSymbolFor(unittest.TestCase):
     """The function-symbol *inside* the source is always
     `func_<addr>` / `func_ov<NNN>_<addr>` regardless of filename
@@ -604,6 +652,21 @@ class TestComputeOutputPathWithModulePrefix(unittest.TestCase):
         )
         self.assertEqual(
             out, ROOT / "src/usa/main/main_020488f0.legacy.c",
+        )
+
+    def test_ov_addr_input_with_thumb_suffix_preserves_both(self):
+        # Brief 587 regression guard: this path already worked before
+        # the fix (this function's own suffix handling always included
+        # .thumb) — pins it against the refactor onto routing_suffixes.
+        ROOT = _TOOLS.parent
+        prefix, module, _addr = parse_filename_stem("ov004_021dd374")
+        target_stem = target_stem_for_prefix(prefix, "func_ov004_021dd200")
+        out = compute_output_path(
+            ROOT / "src/overlay004/ov004_021dd374.thumb.c",
+            "usa", target_stem, module,
+        )
+        self.assertEqual(
+            out, ROOT / "src/usa/overlay004/ov004_021dd200.thumb.c",
         )
 
 

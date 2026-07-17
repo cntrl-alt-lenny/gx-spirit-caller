@@ -90,6 +90,9 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from routing_suffixes import ROUTING_SUFFIXES, split_routing_suffix  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "src"
@@ -806,23 +809,15 @@ def compute_output_path(
         src/overlay002/ov002_<eur>.c + target=jpn, stem=ov002_<jpn>
             → src/jpn/overlay002/ov002_<jpn>.c
 
-    `.legacy.c` and `.legacy_sp3.c` suffixes are preserved.
+    `.legacy.c`, `.legacy_sp3.c`, and `.thumb.c` suffixes are preserved
+    (brief 587: routed through the shared `routing_suffixes` module
+    rather than a locally hand-rolled if/elif chain).
     """
-    name_stem = source_path.stem
     suffix = source_path.suffix
-    # Detect compound suffix (.legacy.c / .legacy_sp3.c) — these
-    # show up in `name_stem` because source_path.stem only strips
-    # the final ".c".
-    routing_suffix = ""
-    if name_stem.endswith(".legacy_sp3"):
-        routing_suffix = ".legacy_sp3"
-        name_stem = name_stem[:-len(".legacy_sp3")]
-    elif name_stem.endswith(".legacy"):
-        routing_suffix = ".legacy"
-        name_stem = name_stem[:-len(".legacy")]
-    elif name_stem.endswith(".thumb"):
-        routing_suffix = ".thumb"
-        name_stem = name_stem[:-len(".thumb")]
+    # Detect compound suffix (.legacy.c / .legacy_sp3.c / .thumb.c) —
+    # these show up in `source_path.stem` because Path.stem only
+    # strips the final ".c".
+    name_stem, routing_suffix = split_routing_suffix(source_path.stem)
 
     new_filename = f"{target_stem}{routing_suffix}{suffix}"
     src_subdir = module_to_src_dir(module)
@@ -1147,12 +1142,11 @@ def main() -> int:
     # Find the "function being defined" — the one whose name matches
     # the file basename. We look it up in EUR and resolve its target
     # twin first, since the output filename depends on it.
-    file_stem = args.source.stem
-    # Strip routing-suffix from stem before parsing
-    if file_stem.endswith(".legacy_sp3"):
-        file_stem = file_stem[:-len(".legacy_sp3")]
-    elif file_stem.endswith(".legacy"):
-        file_stem = file_stem[:-len(".legacy")]
+    # Strip routing-suffix from stem before parsing (brief 587: this
+    # gate used to hand-roll only .legacy_sp3/.legacy, so any
+    # .thumb.c source failed here with "filename doesn't match any
+    # accepted pattern" — no Thumb function could region-port at all).
+    file_stem = split_routing_suffix(args.source.stem)[0]
     parsed = parse_filename_stem(file_stem)
     if parsed is None:
         print(f"error: filename doesn't match any accepted pattern "

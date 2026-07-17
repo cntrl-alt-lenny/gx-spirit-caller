@@ -57,13 +57,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 _TOOLS = ROOT / "tools"
+sys.path.insert(0, str(_TOOLS))
+
+from routing_suffixes import ROUTING_SUFFIXES  # noqa: E402
 
 # The region marker appears in every per-TU build rule's variables
 # block (`game_version = eur`); build.ninja is single-region at a
 # time (each `configure.py <ver>` run overwrites the root
 # build.ninja), so the first match tells us which region is active.
 _REGION_RE = re.compile(r"game_version = (eur|usa|jpn)\b")
-_LEGACY_SUFFIXES = (".legacy_sp3", ".legacy")
 _GAME_SRC_SUFFIXES = (".c", ".cpp", ".s")
 
 # Hard caps so a stuck compiler/objdiff invocation can't block the
@@ -163,18 +165,20 @@ def _unit_and_symbol(rel: Path) -> tuple[str, str]:
     `src/**/*.{c,cpp,s}` path.
 
     unit: the path with only the file extension stripped (keeps a
-      `.legacy`/`.legacy_sp3` infix) in forward-slash form, matching
-      delinks.txt's TU-header convention — e.g.
+      `.legacy`/`.legacy_sp3`/`.thumb` infix) in forward-slash form,
+      matching delinks.txt's TU-header convention — e.g.
       'src/main/func_0208f850.legacy' for 'src/main/func_0208f850.legacy.c'.
     symbol: the function name — the filename stem with BOTH the file
-      extension and any `.legacy`/`.legacy_sp3` infix stripped. Valid
-      for both address-named (`func_X`) and already-renamed
+      extension and any routing-tier infix stripped (brief 587: was
+      `.legacy`/`.legacy_sp3`-only, silently leaving a stray `.thumb` on
+      the symbol for every Thumb-tier edit — see routing_suffixes.py).
+      Valid for both address-named (`func_X`) and already-renamed
       (`ModuleName_Verb`) files, since decomper convention keeps the
       filename in sync with the symbol name in both cases.
     """
     unit = rel.as_posix().rsplit(".", 1)[0]
     stem = rel.stem
-    for suf in _LEGACY_SUFFIXES:
+    for suf in ROUTING_SUFFIXES:
         if stem.endswith(suf):
             stem = stem[: -len(suf)]
             break

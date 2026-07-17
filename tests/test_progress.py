@@ -21,11 +21,13 @@ sys.path.insert(0, str(_TOOLS))
 from progress import (  # noqa: E402
     CODE_SECTIONS,
     DATA_SECTIONS,
+    _discover_module_delinks,
     c_code_bytes,
     c_code_total_bytes,
     count_functions_in_symbols,
     count_total_functions,
     parse_delinks_file,
+    summarize_by_module,
     summarize_delinks,
 )
 
@@ -567,6 +569,196 @@ class TestCCodeTotalBytes(unittest.TestCase):
             d.mkdir(parents=True)
             (d / "delinks.txt").write_text(content)
         self.assertEqual(c_code_total_bytes(Path(tmp)), 0x100 + 0x80)
+
+
+class TestDiscoverModuleDelinks(unittest.TestCase):
+    """[(module_name, delinks_path)] in main/itcm/dtcm/ovNNN order."""
+
+    def test_empty_config_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(_discover_module_delinks(Path(tmp)), [])
+
+    def test_main_only(self):
+        tmp = tempfile.mkdtemp()
+        arm9 = Path(tmp) / "arm9"
+        arm9.mkdir()
+        (arm9 / "delinks.txt").write_text("    .text start:0x0 end:0x10 kind:code\n")
+        found = _discover_module_delinks(Path(tmp))
+        self.assertEqual([name for name, _ in found], ["main"])
+
+    def test_itcm_dtcm_and_overlays_discovered_in_order(self):
+        tmp = tempfile.mkdtemp()
+        for sub in ("arm9", "arm9/itcm", "arm9/dtcm",
+                    "arm9/overlays/ov002", "arm9/overlays/ov000"):
+            d = Path(tmp) / sub
+            d.mkdir(parents=True)
+            (d / "delinks.txt").write_text("    .text start:0x0 end:0x10 kind:code\n")
+        found = _discover_module_delinks(Path(tmp))
+        self.assertEqual(
+            [name for name, _ in found],
+            ["main", "itcm", "dtcm", "ov000", "ov002"],  # overlays sorted
+        )
+
+    def test_missing_delinks_txt_skipped(self):
+        # A module directory that exists but has no delinks.txt yet
+        # (e.g. dtcm with only symbols.txt) must not be reported.
+        tmp = tempfile.mkdtemp()
+        arm9 = Path(tmp) / "arm9"
+        (arm9 / "dtcm").mkdir(parents=True)
+        (arm9 / "dtcm" / "symbols.txt").write_text("")   # no delinks.txt
+        self.assertEqual(_discover_module_delinks(Path(tmp)), [])
+
+    def test_non_ov_prefixed_overlay_dirs_ignored(self):
+        tmp = tempfile.mkdtemp()
+        junk = Path(tmp) / "arm9" / "overlays" / "not_an_overlay"
+        junk.mkdir(parents=True)
+        (junk / "delinks.txt").write_text("    .text start:0x0 end:0x10 kind:code\n")
+        self.assertEqual(_discover_module_delinks(Path(tmp)), [])
+
+
+class TestSummarizeByModule(unittest.TestCase):
+    """Per-module code%/C% breakdown (brief 587 / improvement-swarm r5:
+    no tool previously reported C% per module at all)."""
+
+    def _make_multi_module_config(self) -> Path:
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9").mkdir()
+        (root / "arm9" / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "src/main/func_a.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+            "\n"
+            "src/main/func_b.s:\n"
+            "    complete\n"
+            "    .text start:0x40 end:0x80\n"
+        )
+        ov002 = root / "arm9" / "overlays" / "ov002"
+        ov002.mkdir(parents=True)
+        (ov002 / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x80 kind:code\n"
+            "\n"
+            "src/overlay002/func_c.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x20\n"
+        )
+        return root
+
+    def test_empty_config_dir_returns_empty_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(summarize_by_module(Path(tmp)), [])
+
+    def test_per_module_rows_in_discovery_order(self):
+        root = self._make_multi_module_config()
+        rows = summarize_by_module(root)
+        self.assertEqual([r["module"] for r in rows], ["main", "ov002"])
+
+    def test_main_module_code_and_c_bytes(self):
+        # main: matched_code = func_a (.c, 0x40) + func_b (.s, 0x40) = 0x80
+        # (code% counts BOTH .c and .s ships identically -- the whole
+        # point of the separate C% column). c_bytes counts ONLY the .c
+        # TU: 0x40.
+        root = self._make_multi_module_config()
+        rows = {r["module"]: r for r in summarize_by_module(root)}
+        main = rows["main"]
+        self.assertEqual(main["total_code"], 0x100)
+        self.assertEqual(main["matched_code"], 0x80)
+        self.assertEqual(main["c_total"], 0x100)
+        self.assertEqual(main["c_bytes"], 0x40)   # only func_a.c, not func_b.s
+
+    def test_ov002_module_code_and_c_bytes(self):
+        root = self._make_multi_module_config()
+        rows = {r["module"]: r for r in summarize_by_module(root)}
+        ov002 = rows["ov002"]
+        self.assertEqual(ov002["total_code"], 0x80)
+        self.assertEqual(ov002["matched_code"], 0x20)
+        self.assertEqual(ov002["c_total"], 0x80)
+        self.assertEqual(ov002["c_bytes"], 0x20)
+
+    def test_gap_tu_never_counts_as_matched_or_c(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9").mkdir()
+        (root / "arm9" / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x100 kind:code\n"
+            "\n"
+            "_dsd_gap@main_0:\n"
+            "    complete\n"   # still a gap even if stamped complete
+            "    .text start:0x0 end:0x100\n"
+        )
+        rows = summarize_by_module(root)
+        self.assertEqual(rows[0]["matched_code"], 0)
+        self.assertEqual(rows[0]["c_bytes"], 0)
+
+    def test_cpp_source_counts_toward_c_bytes(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9").mkdir()
+        (root / "arm9" / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x40 kind:code\n"
+            "\n"
+            "src/main/func_a.cpp:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x40\n"
+        )
+        rows = summarize_by_module(root)
+        self.assertEqual(rows[0]["c_bytes"], 0x40)
+
+    def test_init_counts_toward_code_but_not_c(self):
+        # CODE_SECTIONS (.text + .init) feeds matched_code/total_code;
+        # C%'s .text-only convention (brief 566 / r4 A3) must exclude
+        # .init even when a .c TU owns it.
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9").mkdir()
+        (root / "arm9" / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x40 kind:code\n"
+            "    .init       start:0x40 end:0x60 kind:code\n"
+            "\n"
+            "src/main/func_a.c:\n"
+            "    complete\n"
+            "    .init start:0x40 end:0x60\n"
+        )
+        rows = summarize_by_module(root)
+        self.assertEqual(rows[0]["total_code"], 0x60)   # .text + .init
+        self.assertEqual(rows[0]["matched_code"], 0x20)  # the .init TU
+        self.assertEqual(rows[0]["c_total"], 0x40)       # .text ONLY
+        self.assertEqual(rows[0]["c_bytes"], 0)          # .init excluded from C%
+
+    def test_incomplete_tu_not_counted(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9").mkdir()
+        (root / "arm9" / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x40 kind:code\n"
+            "\n"
+            "src/main/func_a.c:\n"
+            "    .text start:0x0 end:0x40\n"   # no `complete` stamp
+        )
+        rows = summarize_by_module(root)
+        self.assertEqual(rows[0]["matched_code"], 0)
+        self.assertEqual(rows[0]["c_bytes"], 0)
+
+    def test_sum_across_modules_matches_summarize_delinks_region_total(self):
+        """Self-consistency: summing this function's per-module rows
+        must equal summarize_delinks()'s region-wide totals exactly --
+        both read the same underlying parse_delinks_file data, just
+        grouped differently."""
+        root = self._make_multi_module_config()
+        rows = summarize_by_module(root)
+        sum_matched = sum(r["matched_code"] for r in rows)
+        sum_total = sum(r["total_code"] for r in rows)
+
+        region = summarize_delinks(root)
+        self.assertEqual(sum_matched, int(region["measures"]["matched_code"]))
+        self.assertEqual(sum_total, int(region["measures"]["total_code"]))
+
+        sum_c = sum(r["c_bytes"] for r in rows)
+        sum_ctotal = sum(r["c_total"] for r in rows)
+        self.assertEqual(sum_c, c_code_bytes(root))
+        self.assertEqual(sum_ctotal, c_code_total_bytes(root))
 
 
 class TestReportJsonRoundtrip(unittest.TestCase):

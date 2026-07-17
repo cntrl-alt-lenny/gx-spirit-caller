@@ -85,6 +85,9 @@ import struct
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from routing_suffixes import ROUTING_SUFFIXES, object_suffix_for_source  # noqa: E402
+
 
 # ELF32 little-endian header / section header constants we need.
 ELF_MAGIC = b"\x7fELF"
@@ -298,27 +301,31 @@ has_nonempty_text_section = has_addressable_text_code
 
 
 def _legacy_suffix_from_source(source_path: str) -> str | None:
-    """Infer the `.legacy.o` / `.legacy_sp3.o` filename suffix
-    that mwcc + dsd will produce for this unit, based on the
+    """Infer the `.legacy.o` / `.legacy_sp3.o` / `.thumb.o` filename
+    suffix that mwcc + dsd will produce for this unit, based on the
     source file's filename routing convention.
 
     Background: dsd emits objdiff.json entries with `target_path` /
-    `base_path` stripped of the `.legacy` / `.legacy_sp3` filename
-    infix — both point at a bare `<name>.o`. But mwcc compiles
-    `<name>.legacy.c` to `<name>.legacy.o` (and `<name>.legacy_sp3.c`
-    to `<name>.legacy_sp3.o`) — so the actual artifact lives at a
-    different filename than dsd advertises. Pre-brief-199 the
-    filter dropped these units as "target_path missing" — pick #5
+    `base_path` stripped of the routing-tier filename infix — both
+    point at a bare `<name>.o`. But mwcc compiles `<name>.legacy.c`
+    to `<name>.legacy.o` (and likewise for `.legacy_sp3.c` /
+    `.thumb.c`) — so the actual artifact lives at a different
+    filename than dsd advertises. Pre-brief-199 the filter dropped
+    these units as "target_path missing" — pick #5
     (`func_02096434.legacy.c`, brief 199 worked example) shipped
     cleanly to the build but never registered in
     `matched_functions`. This helper recovers the correct suffix
     from the `source_path` field, which dsd preserves as-is.
+
+    Brief 587: `.thumb.c` was missing from this mapping entirely
+    (added 2026-06-09, after this helper was written) — every one of
+    EUR's 36 `.thumb.c` overlay004 units silently dropped from every
+    report as "unmatched routing-tier unit" despite being matched and
+    shipping. Delegates to `routing_suffixes.object_suffix_for_source`
+    (the shared source of truth across all 4 sites in this bug family)
+    rather than re-deriving the mapping locally.
     """
-    if source_path.endswith(".legacy.c"):
-        return ".legacy.o"
-    if source_path.endswith(".legacy_sp3.c"):
-        return ".legacy_sp3.o"
-    return None
+    return object_suffix_for_source(source_path)
 
 
 def _rewrite_path_for_legacy(rel_path: str, suffix: str) -> str:

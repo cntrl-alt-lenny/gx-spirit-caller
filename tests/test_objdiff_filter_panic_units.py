@@ -171,6 +171,16 @@ class TestLegacySuffixFromSource(unittest.TestCase):
             ".legacy_sp3.o",
         )
 
+    def test_thumb_c(self) -> None:
+        # brief 587: was missing entirely (added to the routing tier
+        # 2026-06-09, after this helper was written) — every one of
+        # EUR's 36 .thumb.c overlay004 units silently dropped from
+        # every report despite being matched and shipping.
+        self.assertEqual(
+            _legacy_suffix_from_source("src/overlay004/func_ov004_021dd374.thumb.c"),
+            ".thumb.o",
+        )
+
     def test_plain_c(self) -> None:
         self.assertIsNone(_legacy_suffix_from_source("src/main/func_abc.c"))
 
@@ -360,6 +370,40 @@ class TestFilterObjdiffJson(unittest.TestCase):
         self.assertEqual(
             written["units"][0]["target_path"],
             "build/delinks/func_xyz.legacy_sp3.o",
+        )
+
+    def test_rewrites_thumb_paths_and_keeps_the_unit(self) -> None:
+        """brief 587 (improvement-swarm r5 item 7): a `.thumb.c`-sourced
+        unit must be KEPT, not dropped as "unmatched routing-tier unit".
+        Before the fix, `_legacy_suffix_from_source` returned None for
+        `.thumb.c` (added to the routing tier 2026-06-09, after this
+        helper was written), so every one of EUR's 36 `.thumb.c`
+        overlay004 units silently vanished from every report despite
+        being matched and shipping — this is the regression test for
+        that: a fixture unit named `*.thumb.c` must survive the filter."""
+        self._write_unit_o("build/delinks/func_ov004_021dd374.thumb.o", with_func_symbol=True)
+        self._write_unit_o("build/src/func_ov004_021dd374.thumb.o", with_func_symbol=True)
+        p = self._write_objdiff_json([
+            {
+                "name": "thumb_unit",
+                "target_path": "build/delinks/func_ov004_021dd374.o",
+                "base_path": "build/src/func_ov004_021dd374.o",
+                "metadata": {"source_path": "src/overlay004/func_ov004_021dd374.thumb.c"},
+            },
+        ])
+        kept, dropped, reasons = filter_objdiff_json(p, project_root=self.root)
+        self.assertEqual(kept, 1, msg=f"expected kept; got reasons={reasons}")
+        self.assertEqual(dropped, 0)
+
+        with p.open() as f:
+            written = json.load(f)
+        self.assertEqual(
+            written["units"][0]["target_path"],
+            "build/delinks/func_ov004_021dd374.thumb.o",
+        )
+        self.assertEqual(
+            written["units"][0]["base_path"],
+            "build/src/func_ov004_021dd374.thumb.o",
         )
 
     def test_drops_legacy_unit_when_neither_variant_exists(self) -> None:
