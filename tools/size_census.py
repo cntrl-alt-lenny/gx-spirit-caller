@@ -17,6 +17,16 @@ falls inside a claimed `.text` range in the sibling `delinks.txt`
 (every claimed range belongs to a `src/…` unit); UNMATCHED otherwise.
 This equals the set of functions dsd delinks into `_dsd_gap@*` objects.
 
+Scope note (brief 596): this is a *function*-level census, driven
+entirely by named `kind:function` entries in `symbols.txt`. It is a
+lower bound on the true byte-level gap, not the gap itself — bytes with
+no symbols.txt entry at all (inter-function alignment padding, or
+larger never-disassembled blocks) are real uncovered ROM content but
+invisible here. See "Reconciliation against size_census.py" in
+`docs/research/campaign-analytics/endgame-ledger.md` for the measured
+size of that blind spot (currently 34 B in ov004, 2,270 B in `main`,
+0 B everywhere else, as of that ledger's snapshot).
+
 Buckets (brief 277's knee): `<0x100` (hand-matchable now),
 `0x100-0x200` (marginal), `>0x200` (needs a reg-alloc tool).
 

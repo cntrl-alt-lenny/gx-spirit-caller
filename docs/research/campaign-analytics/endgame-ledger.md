@@ -98,6 +98,64 @@ Every module with a nonzero gap in at least one region (`dtcm` carries no
 7,104 USA + 7,104 JPN = 20,110 B) — it had no row anywhere in the prose
 ledger.
 
+## Reconciliation against size_census.py (brief 596)
+
+PR #1160 (brief 592) planned to render a per-module comparison between
+this ledger's byte-derived gap and `tools/size_census.py`'s per-module
+unmatched-*function*-byte totals, as a cross-check. That comparison never
+actually happened: its `## Comparison` section is a literal, never-
+substituted `${rows}` template placeholder, both in the PR body and in
+the committed `docs/research/brief-592-census-bundle.md` (lines 130/132).
+No prose anywhere in that doc or PR describes specific mismatches either
+— the promised comparison was silent, not merely unread.
+
+Brief 596 ran it for the first time: `size_census.collect()`'s per-module
+unmatched-function byte total vs. this ledger's `module_gap()` byte total,
+for all 57 module/region combinations with a nonzero ledger gap. **55 of
+57 match exactly (0 B delta).** The other two — **fully root-caused, zero
+unexplained residual** — are both instances of the same underlying cause
+(bytes with no `kind:function` entry in `symbols.txt` at all), at two
+different scales:
+
+- **ov004, all 3 regions (34 B delta, e.g. EUR 5,902 ledger vs. 5,868
+  census):** 17 discrete 2-byte "orphan" gaps, each sitting between two
+  named, already-enumerated functions (e.g. EUR `0x021dbc8a-0x021dbc8c`,
+  immediately before `func_ov004_021dbc8c`). These are inter-function
+  alignment padding — real unclaimed bytes the ledger correctly counts,
+  but with no symbol of their own for `size_census.py` (a function-level
+  tool by design) to see.
+- **`main`, all 3 regions (2,270 B delta, identical byte count in EUR/
+  USA/JPN despite very different ledger totals — EUR 2,270 vs. USA 4,660
+  vs. JPN 4,544):** dominated by a ~2,048 B block at the very start of
+  ARM9 main (`0x02000000` through `~0x02000800`, 19 fragments of ~80-160
+  B each, interleaved with a couple of tiny already-matched functions
+  such as `VBlankIntrWait` at `0x02000086`) that has **no `symbols.txt`
+  entry whatsoever** — not `kind:function`, not `kind:data`, nothing.
+  `Entry` (the real ARM9 entry point, `0x02000800`, `0x13c` B) is
+  already matched and sits just past this block. The remaining ~222 B is
+  the same small-orphan pattern as ov004, scattered through the rest of
+  `main`. EUR's `main` shows 0 unmatched *functions* in size_census
+  (every named function is carved) — its entire remaining ledger gap
+  *is* this unsymbolized block. USA/JPN carry the identical 2,270 B
+  block *plus* their own separate, ordinarily-visible unmatched
+  functions (the `02099834`-area residue described below), which is why
+  their ledger totals differ from EUR's while the orphan component does
+  not.
+
+**Neither artifact is wrong.** `size_census.py`'s own docstring scopes it
+to named functions in `symbols.txt` ("bucket every UNMATCHED function");
+this ledger measures raw uncovered bytes regardless of whether a symbol
+exists there. They answer different questions by design, and now
+provably agree everywhere except these two fully-explained cases. The
+practical takeaway: `size_census.py`'s totals are a *lower bound* on the
+true byte gap, not the gap itself — the difference is exactly the bytes
+no tool currently has a name for. The `main` startup-code block in
+particular is invisible to `size_census.py` *and* to `batch_carve.py`
+alike (both are `symbols.txt`-driven) — it isn't a queued, carvable
+candidate anywhere right now; naming it would need dsd re-analysis or
+manual symbol authoring, not a carve wave. Flagged here as a fresh lead,
+not fixed in this brief.
+
 ## What changed from the prose ledger
 
 ### USA/JPN main floor — not permanent; 12 of 14 named addresses now matched

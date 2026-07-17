@@ -1252,14 +1252,48 @@ candidates.**
 > C-15's mwcc-2.0-only-peephole logic to apply. **All 7
 > collapsed to `and #0xffff` even on mwcc 1.2/sp2p3** — because
 > P-1 is shape-collapse, not peephole, and fires on every SP.
-> The 7 candidates correctly belong in the P-1 cross-reference
-> rows (permanent), not C-15.
+> At the time, the 7 candidates were filed in the P-1
+> cross-reference rows as permanent.
+>
+> **Update (brief 596): that "permanent" verdict was itself the
+> trap — for this specific sub-shape.** All 7 addresses are
+> `complete` (matched) in the current tree — they shipped in a
+> later C-match wave via the natural recipe (`(u16)x` cast or
+> `x & 0xffffu` mask, forwarding the truncated value as a
+> *different* function's call argument), not via C-15 legacy
+> routing. Brief 596 re-derived the mechanism on
+> `func_ov002_0226af78` with a direct-mwcc dual-tier probe
+> (2.0/sp1p5 **and** 1.2/sp2p3): compiling `(u16)arg1` or
+> `arg1 & 0xffffu` as a tail-call argument produces the identical
+> 28 B `.text` (sha1 `2164ac87…`) on **both** tiers, matching the
+> committed/matched object exactly; compiling the shift-pair
+> *literally* (`(unsigned)(arg1 << 16) >> 16`) produces a
+> *different*, non-matching, 36 B `.text` (sha1 `6e1fa595…`) on
+> both tiers — worse than either working idiom, not a fix. See
+> the P-1 entry's own "Argument-marshalling exception" note below
+> for the mechanism. **The C-15-vs-P-1 discriminator table above
+> still holds** — P-1 remains permanent for Family 7's
+> return-value/same-register case, re-confirmed independently by
+> brief 250's own 5-idiom matrix. What was wrong was filing *every*
+> `lsl K; lsr K`-bodied function under one verdict regardless of
+> whether the truncated value stays in its source register (return)
+> or must move to a different one (argument setup) — those are
+> mechanistically different mwcc lowerings, and only the former is
+> actually a wall.
 >
 > **Quick discriminator at the asm level:**
 >
 > - Target has **2 insns** that mwcc collapses to **1 insn**
->   on a halfword/byte zero-extend (`lsl K; lsr K` or
->   `(x << K) >> K` C source) → **P-1**, no fix.
+>   on a halfword/byte zero-extend **and the truncated value is
+>   consumed from the same register it started in** (typically a
+>   return value) → **P-1**, no fix — confirmed permanent on both
+>   mwcc tiers (brief 250).
+> - Target has the same **2-insn** shift-pair but the truncated
+>   value is being moved into a **different register** to become
+>   another call's argument → **not a wall**: `(u16)x` or
+>   `x & 0xffffu` both reproduce it byte-for-byte on both mwcc
+>   tiers (brief 596). Do **not** route these through `*.legacy.c`
+>   — the plain default-tier `.c` file already matches on every SP.
 > - Target has **1 insn** that mwcc emits as a different
 >   **1 insn** (typical: `mvn` vs `sub` on `-1` from a
 >   set-zero-then-derive context) → **C-15**, route through
@@ -6068,15 +6102,50 @@ uses mask) is the same wall in the other direction.
 **Affected drops:** brief 022 `ov000_021ab6cc`/`021af5c0`, brief
 028 `func_0203d6c4`/`func_0209aa48`/`func_0209d788`, brief 029
 `func_0207d304`, brief 031 `func_ov002_022912c8`; brief 049
-self-extend (wave 14, PR #372) added 7 ov002 misapplications
-that decomper initially routed through `*.legacy.c` expecting
+self-extend (wave 14, PR #372) originally added 7 ov002
+addresses here after routing them through `*.legacy.c` expecting
 C-15-style fix to apply: `func_ov002_0226af78`,
 `_0226afb4`, `_0226aff0`, `_0226b094`, `_0226b13c`, `_0226b158`,
-`_0226b258` — all `lsl 16; lsr 16` halfword zero-extends that
-collapse to `and #0xffff` even on mwcc 1.2/sp2p3. **17 of 69
-drops (25%)** — by far the largest single wall in this set,
-and the most-frequently-misapplied wall (see *Wall family
-note* in C-15 entry above).
+`_0226b258` — all `lsl 16; lsr 16` halfword zero-extends whose
+*legacy-routed* attempt collapsed to `and #0xffff` even on mwcc
+1.2/sp2p3, at the time. **Update (brief 596): all 7 are now
+`complete` (matched) in the current tree** — see the
+*Argument-marshalling exception* below. They no longer belong in
+this affected-drops list; **the real remaining P-1 count is 10 of
+69 (14.5%)**, not 17/69. Still the largest single wall in this
+set and the most-frequently-misapplied one (see *Wall family
+note* in C-15 entry above) — just smaller than previously
+recorded.
+
+### Argument-marshalling exception (brief 596) — not actually P-1
+
+The 7 addresses above are shape-identical to genuine P-1 (same
+`lsl K; lsr K` target body) but sit in a **different mwcc lowering
+context**: the truncated value is being moved into a *different*
+register to become another function's call argument (a tail-call
+shim, e.g. `func_ov002_0226acf8(arg0, sel, 0, (u16)arg1)`), not
+returned from the *same* register it started in (Family 7, below).
+In that cross-register-move context, mwcc does **not** collapse to
+`and` — it naturally lowers the truncation as the shift pair,
+byte-identical to target, regardless of whether the C source spells
+it as a cast or a mask.
+
+Direct-mwcc dual-tier probe on `func_ov002_0226af78` (both
+`mwccarm 2.0/sp1p5` and `1.2/sp2p3`, `.text`-only sha1):
+
+| C idiom | mwcc emits | sha1 (both tiers identical) | Matches orig? |
+|---|---|---|---|
+| `(u16)arg1` (cast) | `lsl r1,r1,#16; lsr r3,r1,#16` | `2164ac87…` (28 B) | **yes** — matches the committed/matched object exactly |
+| `arg1 & 0xffffu` (mask) | `lsl r1,r1,#16; lsr r3,r1,#16` | `2164ac87…` (28 B) | **yes** — byte-identical to the cast form |
+| `(unsigned)(arg1<<16)>>16` (literal shift-pair) | `lsl;lsr;lsl;lsr` (4 insns — computes the C expression, then truncates *again* for the u16 argument) | `6e1fa595…` (36 B) | **no** — larger AND wrong; the one idiom that looks most like "writing the target shape directly" is the one that fails |
+
+So the "write the shift form literally" instinct — the thing that
+*doesn't* work for Family 7 either — is doubly wrong here: it
+neither reproduces target nor is it a peephole-neutral no-op: it
+emits the truncation twice. The working recipe is the boring one
+(cast or mask, whichever reads better at the call site); brief 596
+confirms it holds on both mwcc SP tiers, so no `*.legacy.c` routing
+is needed or wanted.
 
 Brief 250 added the C-42 wave-6 **Family 7** (3 main picks, the
 only main functions with the P-1 zero-extend getter tail `ldr …;
