@@ -484,41 +484,39 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
 `docs/briefs/CLOSED-LOG.md`; swarm findings = `docs/research/improvement-swarm-2026-07-15-r5.md`
 (+ the r6 R&D swarm report when it lands).
 
-- **LANE STATE (2026-07-16, M1 Mac, 4 agents: 2× Codex GPT-5.6 Luna Medium = mechanical
-  tool-derived lanes ONLY (b576 ledger lesson: no transcription/synthesis without a checkable
-  invariant), 2× Claude Sonnet 5 Max = judgment lanes; brain = Opus).** CHAPTER: **READABLE-C
-  is the campaign** (byte-coverage done: EUR units 99.11%, USA 93.41%, JPN 92.79% committed-
-  tier; residual byte-gap ≈61,404 B per r5, pending b583 re-derivation; main floor root-caused
-  b577 — 12/14 shipped via 3 asm_escape bug fixes, ~1 genuine wall/region). C-dec: EUR 8.11%,
-  USA/JPN 7.19%. **The strategic question: the 544 B C-match ceiling (51% of residue above it,
-  essentially untested — b582 probes it).** ⚠️ MAC = ONE wine lane (b582 owns it this round);
-  everything else wine-free. ⚠️ fresh worktree → copy `tools/mwccarm/` + `objdiff-cli` + `dsd`.
-  Brain gate = `python3.13 tools/gate3.py`.
-- **Brief 582** — Claude Sonnet 5 `decomper` → **THE 544 B CEILING PROBE (WINE lane, ~2-4h,
-  timeboxed).** r5 rank-1: 3 singleton functions above 544 B (2× ov002 + 1× arm9, never
-  main-only), m2c-scaffolded (`m2c_feed` + `--context`), per-file `.o` compile + objdiff loop,
-  binary verdict per function. Success = the VERDICT (shipped or documented-why-not), not the
-  ship count. Branch `claude/c-ceiling-probe-582`.
-- **Brief 583** — Claude Sonnet 5 `scaffolder` → **WINE-FREE endgame-instrumentation truth**
-  (r5 ranks 2+3): fix `batch_carve.py` returncode conflation (`whole_function()`/`classify()`
-  never read exit-2 → infra errors masquerade as verify-fail; add a `tool-error` verdict,
-  never parked/floored, unit-tested via the `_run` mock seam) + extend `tools/size_census.py`
-  (fix `.text`-only scan, `.init` false positives, ITCM blindness) + regenerate
-  `endgame-ledger.md` FROM BYTES (must explain the full gap incl. ov004's ~20 KB; strike the
-  wrong §6). Branch `claude/instrumentation-truth-583`.
-- **Brief 584** — Codex Luna `scaffolder` → **WINE-FREE green-main sweep** (r5 rank 4 minus
-  rulesets): run the auto-fixers (ruff --fix; markdownlint-cli2 --fix over the 3 generated
-  dirs), regenerate both indices, fix `lint.yml` docs/** paths exclusion, add
-  `tests/test_docs_links.py` (unittest-style, stdlib; exempt build/+extract/) + apply the
-  `../../` link fixes (CLOSED-LOG + safe-queue docs). Acceptance = ALL CI checks green on the
-  PR. Do NOT touch branch-protection/rulesets (user-only). Branch `codex/green-main-584`.
-- **Brief 585** — Codex Luna `decomper` → **WINE-FREE ledger backfill + cold-start fixes**:
-  append briefs 550-585 to `docs/briefs/CLOSED-LOG.md` (source = merged PR bodies via `gh pr
-  view`, checkable count ≈35 entries, newest-last, established format) + `configure.py`
-  region-correct baserom errors (GAME_CODE dict; fix `orig/README.md`) + widen
-  `check_delink_dupes.py` to `libs/` blocks + add `default rom sha1` to the generated
-  build.ninja (configure.py writer) — each with unit tests. Branch
-  `codex/backfill-coldstart-585`.
+- **LANE STATE (2026-07-18, M1 Mac, 4 agents: Codex Decomper + Codex Scaffolder =
+  GPT-5.6 Luna Medium (tool-derived/checkable outputs ONLY), Claude Code Decomper +
+  Claude Code Scaffolder = Sonnet 5 Max (judgment); brain = Opus).** CHAPTER: READABLE-C.
+  🎉 **THE 544 B CEILING IS BROKEN** (b582: `func_02037dc0`, 552 B arm9, shipped via real
+  `ninja sha1`; + a NEW wall class discovered: repeated-address rematerialization after a
+  call; + a 908 B half-crack documented). Byte-truth ledger rebuilt from bytes (b583):
+  3-region gap = 55,540 B, ov004 = 36.2% of it; batch_carve now distinguishes tool-error
+  from verify-fail. Green-main sweep + CLOSED-LOG backfill + cold-start fixes landed
+  (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
+  everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
+  at 21/~130 agents (quota) — resume when Claude agents idle.
+- **Brief 586** — Claude Code Decomper (Sonnet 5) → **CEILING ROUND 2 (WINE lane, ~4h):**
+  (a) finish `func_ov002_022b809c` (908 B — the structural mistake is documented in
+  brief-582's doc §Target 3); (b) 3 fresh singletons 600-1200 B, escalating; (c) formalize
+  the b582-discovered wall into `docs/research/codegen-walls.md` with its repro. Branch
+  `claude/c-ceiling-r2-586`.
+- **Brief 587** — Claude Code Scaffolder (Sonnet 5) → **WINE-FREE Thumb-tier recovery:**
+  (a) fix `objdiff_filter_panic_units.py` dropping `.thumb.c` units (36 EUR units, r5 #7
+  audit-confirmed); (b) `tools/routing_suffixes.py` shared constant + conformance test,
+  migrating the 4 suffix-strip sites incl. `port_to_region.py:1152` (currently NO Thumb
+  function can port); (c) `progress.py --by-module` with per-module C% (feeds the
+  ov002/arm9 re-queue decision). Branch `claude/thumb-tier-587`.
+- **Brief 588** — Codex Scaffolder (Luna) → **WINE-FREE mechanical bundle:** (a) CLOSED-LOG:
+  replace the 6 "no PR found" placeholders (577=#1147, 579=#1150, 580=#1149, 581=#1148;
+  556/557 = "ran without a dedicated PR, PC-brain stint"); (b) pin `ruff-action` in
+  lint.yml; (c) decomp.me `mwcc_30_131` scratch HARVEST → JSONL corpus + counts (API
+  pagination, zero analysis). Branch `codex/mech-bundle-588`.
+- **Brief 589** — Codex Decomper (Luna) → **WINE-FREE census bundle:** (a) full dry-run
+  census on the b583-fixed batch_carve (all modules × usa/jpn; tool-error now distinct) +
+  reconcile sums vs the byte ledger; (b) rerun `tools/sig_census.py` to refresh the
+  clone/region-twin map post-b579/582 ships; (c) per-function ITCM table (the ledger's
+  newly-visible 11-14/region) appended to the ledger appendix. Branch
+  `codex/census-bundle-589`.
 
 ### Closed briefs (reference)
 

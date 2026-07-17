@@ -8,8 +8,21 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-16 (M1 Mac, brain=Opus; roster: 2× Codex **GPT-5.6 Luna Medium** +
-2× Claude **Sonnet 5 Max**). **CHAPTER: READABLE-C.** This round merged **#1147** (b577
+**Last updated:** 2026-07-18 (M1 Mac, brain=Opus; roster: Codex Decomper + Codex Scaffolder =
+GPT-5.6 Luna Medium, Claude Code Decomper + Claude Code Scaffolder = Sonnet 5 Max). **CHAPTER:
+READABLE-C — and the 544 B CEILING IS BROKEN.** This round merged **#1154** (b582 probe:
+`func_02037dc0` 552 B arm9 SHIPPED via real sha1, 1/3; + NEW wall class "repeated-address
+rematerialization after a call" with repro; + 908 B half-crack documented), **#1153** (b583:
+batch_carve tool-error verdict — infra≠verify-fail; size_census .init/ITCM fixes; **byte-true
+ledger: 3-region gap 55,540 B, ov004 = 36.2%**), **#1152** (b584 green-main: ruff+markdownlint
+autofixes, link test, indices), **#1151** (b585: CLOSED-LOG 32 entries, region-correct
+configure errors, libs-wide delink-dupe check, `ninja` defaults to rom+sha1). Cross-PR
+interaction caught in integration: b581's prune deleted a scaffold two safe-queue docs still
+linked — de-linked with prune notes. Queue: **b586** ceiling round 2 (WINE), **b587**
+Thumb-tier recovery, **b588** Codex mechanical bundle, **b589** Codex census bundle. r6 swarm
+still paused at 21 cached agents — resume when Claude agents go idle.
+
+**Previously (2026-07-16):** (superseded) This round merged **#1147** (b577
 main-floor autopsy — 12/14 "floor" funcs were 3 asm_escape bugs, now fixed+shipped; ~1 genuine
 wall/region), **#1150** (b579 C-match sibling families), **#1149** (b580 unified readable-C
 queue), **#1148** (b581 prep-scaffold prune, 473 removed). Committed-tier truth (progress.py):
