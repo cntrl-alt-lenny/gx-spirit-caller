@@ -1,0 +1,18 @@
+/* func_01ff8664: ITCM DMA channel programmer — set SAD/DAD/CNT, then
+ * if channel 0, force it back to a disabled/reset state (0/0/0x81400001)
+ * and return channel 0's current SAD register either way. Sibling of
+ * func_01ff8770 / func_01ff86c4 (same address-view-split idiom). */
+
+int func_01ff8664(int ch, int sad, int dad, int ctrl) {
+    volatile int *dma_base = (volatile int *)0x040000b0;
+    volatile int *p = (volatile int *)((char *)dma_base + ch * 12);
+    *(volatile int *)(0x04000000 + ch * 12 + 0xb0) = sad;
+    p[1] = dad;
+    p[2] = ctrl;
+    if (ch == 0) {
+        p[0] = 0;
+        p[1] = 0;
+        p[2] = 0x81400001;
+    }
+    return *dma_base;
+}

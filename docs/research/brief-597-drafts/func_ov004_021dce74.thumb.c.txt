@@ -1,0 +1,46 @@
+/* func_ov004_021dce74: mode-2 gated handshake step; on any early-exit
+ * condition bumps *counter and returns mode unchanged. */
+#pragma thumb on
+#include "ov004_core.h"
+
+extern int func_ov004_021dbd1c(unsigned short);
+extern int func_ov004_021dbd34(int);
+extern int func_ov004_021dccc8(int, int);
+extern void func_ov004_021dd590(int);
+
+int func_ov004_021dce74(int mode, char *arg1, int *counter, int arg3) {
+    char *p;
+    int result;
+
+    if (mode != 2) {
+        *counter += 1;
+        return mode;
+    }
+    p = arg1 + 0x24;
+    if (func_ov004_021dccc8(arg3 + 0x10, (int)(arg1 + 0xC + 0x10)) < 0) {
+        *counter += 1;
+        return mode;
+    }
+    if (*(int *)(arg1 + 0x24) != 7) {
+        *counter += 1;
+        return mode;
+    }
+    if (func_ov004_021dbd1c(*(unsigned short *)(p + 2)) == 0) {
+        *counter += 1;
+        return mode;
+    }
+    result = func_ov004_021dbd34(*(int *)(p + 4));
+    if (result == 0) {
+        return 0x64;
+    }
+    if (result == -2) {
+        func_ov004_021dd590(0x14);
+        return -1;
+    }
+    if (result == -3) {
+        func_ov004_021dd590(0x15);
+        return -1;
+    }
+    func_ov004_021dd590(0x18);
+    return -1;
+}

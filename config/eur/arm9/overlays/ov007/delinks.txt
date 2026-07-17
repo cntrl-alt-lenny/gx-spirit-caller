@@ -4,6 +4,10 @@
     .data       start:0x021b2fa0 end:0x021b3480 kind:data align:32
     .bss        start:0x021b3480 end:0x02233580 kind:bss align:32
 
+src/overlay007/func_ov007_021b2280.c:
+    complete
+    .text start:0x021b2280 end:0x021b22d8
+
 src/overlay007/func_ov007_021b22d8.s:
     complete
     .text start:0x021b22d8 end:0x021b24a4

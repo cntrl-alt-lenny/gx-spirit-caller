@@ -1,0 +1,12 @@
+/* func_ov004_021dcbcc: read a little-endian N-byte integer from ptr
+ * (walks backward from ptr[count-1] to ptr[0], accumulating). */
+#pragma thumb on
+#include "ov004_core.h"
+unsigned int func_ov004_021dcbcc(unsigned char *ptr, int count) {
+    unsigned int result = 0;
+    int i;
+    for (i = 0; i < count; i++) {
+        result = (result << 8) + ptr[count - 1 - i];
+    }
+    return result;
+}

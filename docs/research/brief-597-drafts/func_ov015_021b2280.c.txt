@@ -1,0 +1,41 @@
+/* func_ov015_021b2280: compute a Q12 position delta and consume it —
+ * pick a (dx,dy) source (per-slot at index<5, else a shared/running
+ * slot) into a small local struct (unused downstream in this
+ * function but its address escapes, so mwcc can't dead-store-eliminate
+ * it), gate an extra +1 on a per-slot mode flag, then walk arg3/arg4
+ * (position, remaining) by func_0207f934's step result. */
+
+extern int func_0207f934(int, unsigned short, int);
+
+void func_ov015_021b2280(void *arg0, int index, int extra, int *arg3, int *arg4) {
+    char *base = (char *)arg0;
+    int spC, sp10;
+    struct {
+        int *p;
+        int a;
+        int b;
+    } tmp;
+    int mode;
+    int result;
+
+    if (index < 5) {
+        spC = (int)(*(short *)(base + index * 8 + 0x34)) << 12;
+        sp10 = (int)(*(short *)(base + index * 8 + 0x36)) << 12;
+    } else {
+        spC = (int)(*(short *)(base + 0x34)) << 12;
+        sp10 = ((int)(*(short *)(base + 0x36)) + *(int *)(base + 4)) << 12;
+    }
+
+    mode = *(int *)(base + index * 4 + 0x8c);
+    tmp.p = &spC;
+    tmp.a = 0;
+    tmp.b = 0;
+    if (mode == 1) {
+        extra += 1;
+    }
+    result = func_0207f934(*arg3, (unsigned short)*arg4, *(int *)(base + extra * 4 + 0x74));
+    *arg3 += result * 8;
+    *arg4 -= result;
+    (void)sp10;
+    (void)tmp;
+}
