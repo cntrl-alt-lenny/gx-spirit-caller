@@ -26,9 +26,10 @@ sys.path.insert(0, str(_TOOLS))
 
 import batch_carve as bc  # noqa: E402
 from batch_carve import (  # noqa: E402
-    BatchCarver, Scope, audit, bisect_plan, carved_addrs, classify_refuse_kind,
-    delink_block, filter_candidates, func_addr, newline_guard, parse_skiplist,
-    parse_symbols, parse_symbol_addrs,
+    BatchCarver, CensusBreakdown, Scope, audit, bisect_plan, carved_addrs,
+    census_breakdown, classify_refuse_kind, delink_block, filter_candidates,
+    func_addr, newline_guard, parse_all_symbols, parse_skiplist,
+    parse_symbols, parse_symbol_addrs, real_addr,
 )
 
 
@@ -64,16 +65,44 @@ class TestPureHelpers(unittest.TestCase):
 
     def test_filter_excludes_carved_skip_addr_size(self):
         syms = parse_symbols(self.SYMS)
-        cands = filter_candidates(syms, carved={0x022a0000}, skips=set(),
+        addrs = parse_symbol_addrs(self.SYMS)
+        cands = filter_candidates(syms, addrs, carved={0x022a0000}, skips=set(),
                                   min_addr=0x02234000, min_size=0x81, max_size=0x100)
         # 022a0000 carved; 021a0000 below addr; 022a0200 thumb; only 022a0100 (0xc4) left
         self.assertEqual(cands, [(0xc4, "func_ov002_022a0100")])
 
     def test_filter_skips_skiplisted(self):
         syms = parse_symbols(self.SYMS)
-        cands = filter_candidates(syms, carved=set(), skips={"func_ov002_022a0100"},
+        addrs = parse_symbol_addrs(self.SYMS)
+        cands = filter_candidates(syms, addrs, carved=set(), skips={"func_ov002_022a0100"},
                                   min_addr=0x02234000, min_size=0x0, max_size=0x100)
         self.assertEqual([f for _, f in cands], ["func_ov002_022a0000"])
+
+    def test_filter_resolves_renamed_symbol_via_sym_addrs(self):
+        """brief 596: a renamed symbol (no address encoded in its name at
+        all) must still be filtered correctly via sym_addrs, not crash or
+        be silently invisible."""
+        syms_text = (
+            "OS_DisableIrq kind:function(arm,size=0x14) addr:0x02003308\n"
+            "func_ov002_022a0000 kind:function(arm,size=0x80) addr:0x022a0000\n"
+        )
+        syms = parse_symbols(syms_text)
+        addrs = parse_symbol_addrs(syms_text)
+        self.assertIn("OS_DisableIrq", syms)   # brief 596: no longer invisible
+        cands = filter_candidates(syms, addrs, carved=set(), skips=set(),
+                                  min_addr=0x0, min_size=0x0, max_size=0x10000)
+        self.assertEqual(
+            {f for _, f in cands}, {"OS_DisableIrq", "func_ov002_022a0000"})
+
+    def test_filter_excludes_renamed_symbol_already_carved(self):
+        """A renamed symbol's REAL address (not a name-derived one, which
+        doesn't exist) must correctly match an entry in `carved`."""
+        syms_text = "OS_DisableIrq kind:function(arm,size=0x14) addr:0x02003308\n"
+        syms = parse_symbols(syms_text)
+        addrs = parse_symbol_addrs(syms_text)
+        cands = filter_candidates(syms, addrs, carved={0x02003308}, skips=set(),
+                                  min_addr=0x0, min_size=0x0, max_size=0x10000)
+        self.assertEqual(cands, [])
 
     def test_delink_block(self):
         b = delink_block("func_ov002_022a0100", 0x022a0100, 0xc4, "src/overlay002")
@@ -127,6 +156,206 @@ class TestPureHelpers(unittest.TestCase):
         self.assertEqual(bisect_plan([1, 2, 3, 4]), [[1, 2], [3, 4]])
         self.assertEqual(bisect_plan([1]), [])
         self.assertEqual(bisect_plan([]), [])
+
+
+# --------------------------------------------------------------------------- #
+# brief 596: carve-census autopsy — the two regex bugs that made            #
+# batch_carve --dry-run report 0 candidates in modules size_census.py       #
+# correctly showed had real residue, plus the self-describing breakdown.    #
+# --------------------------------------------------------------------------- #
+
+class TestCarvedAddrsModuleHeaderExclusion(unittest.TestCase):
+    """The bug: `carved_addrs()` used to collect ANY `start:0x...`
+    substring in the whole delinks.txt text, including the module-level
+    section-map header ("    .text       start:0x... end:0x... kind:code
+    align:32" — multiple spaces + a kind:/align: suffix). That header's
+    start: address is always the module's first byte, which is ALSO the
+    real address of whichever function happens to sit there — so that one
+    function, in every module, was silently marked "carved" even when
+    genuinely still uncarved."""
+
+    def test_module_header_alone_does_not_carve_the_addr(self):
+        # No per-TU claim at all -- just the header. Before the fix this
+        # returned {0x021aa3c0}; a fully-uncarved module must return empty.
+        d = "    .text       start:0x021aa3c0 end:0x022bdeb4 kind:code align:32\n"
+        self.assertEqual(carved_addrs(d), set())
+
+    def test_first_function_at_module_base_stays_uncarved_when_unclaimed(self):
+        # The exact live shape that surfaced this (func_ov002_021aa3c0):
+        # a module header PLUS one genuinely-carved TU elsewhere. The
+        # header's start: must not leak into the carved set.
+        d = ("    .text       start:0x021aa3c0 end:0x022bdeb4 kind:code align:32\n"
+             "    .rodata     start:0x022bdeb4 end:0x022be000 kind:rodata align:4\n"
+             "\n"
+             + delink_block("func_ov002_021ac000", 0x021ac000, 0x40, "src/overlay002"))
+        carved = carved_addrs(d)
+        self.assertNotIn(0x021aa3c0, carved)   # the module base -- must NOT be "carved"
+        self.assertIn(0x021ac000, carved)      # the real per-TU claim -- must be
+
+    def test_per_tu_text_line_still_carves_correctly(self):
+        # Regression guard: the fix must not lose real per-TU claims.
+        d = delink_block("func_ov002_022a0000", 0x022a0000, 0x80, "src/overlay002")
+        self.assertEqual(carved_addrs(d), {0x022a0000})
+
+    def test_init_section_also_carves(self):
+        # CODE_SECTIONS parity with progress.py/size_census.py: a carved
+        # TU in .init must count exactly like one in .text. (Name matches
+        # its own real address so the _DELINK_HDR_RE name-derived fallback
+        # agrees with the primary per-TU-range match, not a stray value.)
+        d = "src/main/func_02003300.c:\n    complete\n    .init start:0x02003300 end:0x02003340\n"
+        self.assertEqual(carved_addrs(d), {0x02003300})
+
+    def test_data_section_header_does_not_carve(self):
+        # A .rodata/.data/.bss module header must not leak either -- only
+        # CODE_SECTIONS (.text/.init) per-TU lines are function addresses.
+        d = "    .rodata     start:0x02003300 end:0x02003340 kind:rodata align:4\n"
+        self.assertEqual(carved_addrs(d), set())
+
+
+class TestRenamedSymbolVisibility(unittest.TestCase):
+    """The other bug: `parse_symbols`/`parse_symbol_addrs` required a
+    literal `func_` prefix, so a symbol RENAMED to a semantic name
+    (`OS_DisableIrq`, `Copy32`, `main`, ...) was invisible even when
+    genuinely still uncarved -- naming (signature-matching) and carving
+    are independent steps, so an identified-but-uncarved renamed symbol
+    is a real, common case. size_census.py's parser never had this
+    restriction, which is why the two tools disagreed on candidate
+    counts for every module with any renamed residue."""
+
+    SYMS = (
+        "OS_DisableIrq kind:function(arm,size=0x14) addr:0x02003308\n"
+        "Copy32 kind:function(arm,size=0x24) addr:0x02003400\n"
+        "func_ov002_022a0000 kind:function(arm,size=0x80) addr:0x022a0000\n"
+    )
+
+    def test_parse_symbols_sees_renamed_entries(self):
+        s = parse_symbols(self.SYMS)
+        self.assertIn("OS_DisableIrq", s)
+        self.assertEqual(s["OS_DisableIrq"], 0x14)
+        self.assertIn("Copy32", s)
+        self.assertIn("func_ov002_022a0000", s)   # unchanged: still sees func_ names
+
+    def test_parse_symbol_addrs_sees_renamed_entries(self):
+        a = parse_symbol_addrs(self.SYMS)
+        self.assertEqual(a["OS_DisableIrq"], 0x02003308)
+        self.assertEqual(a["Copy32"], 0x02003400)
+
+    def test_real_addr_resolves_renamed_symbol(self):
+        addrs = parse_symbol_addrs(self.SYMS)
+        self.assertEqual(real_addr("OS_DisableIrq", addrs), 0x02003308)
+
+    def test_real_addr_falls_back_to_name_derived(self):
+        # A func_-named symbol absent from sym_addrs (shouldn't happen in
+        # practice, but must not crash) falls back to name-derived.
+        self.assertEqual(real_addr("func_ov002_022a0000", {}), 0x022a0000)
+
+    def test_real_addr_returns_none_for_unresolvable_name(self):
+        # A renamed symbol with no addr: entry at all -- no name-derived
+        # fallback exists either. Must return None, never raise.
+        self.assertIsNone(real_addr("OS_DisableIrq", {}))
+
+
+class TestParseAllSymbols(unittest.TestCase):
+    SYMS = (
+        "func_ov002_022a0000 kind:function(arm,size=0x80) addr:0x022a0000\n"
+        "func_ov002_022a0200 kind:function(thumb,size=0x20) addr:0x022a0200\n"
+        "OS_DisableIrq kind:function(arm,size=0x14) addr:0x02003308\n"
+        "data_ov002_022cf16c kind:data(word) addr:0x022cf16c\n"   # not a function
+    )
+
+    def test_sees_both_arm_and_thumb(self):
+        all_syms = parse_all_symbols(self.SYMS)
+        self.assertEqual(all_syms["func_ov002_022a0000"], ("arm", 0x80, 0x022a0000))
+        self.assertEqual(all_syms["func_ov002_022a0200"], ("thumb", 0x20, 0x022a0200))
+
+    def test_sees_renamed_symbols(self):
+        all_syms = parse_all_symbols(self.SYMS)
+        self.assertEqual(all_syms["OS_DisableIrq"], ("arm", 0x14, 0x02003308))
+
+    def test_data_symbols_excluded(self):
+        all_syms = parse_all_symbols(self.SYMS)
+        self.assertNotIn("data_ov002_022cf16c", all_syms)
+
+
+class TestCensusBreakdown(unittest.TestCase):
+    """The self-describing empty-census machinery (brief 596): every
+    kind:function entry lands in exactly one bucket, so a 0-candidate
+    census explains itself instead of printing a bare, ambiguous zero
+    ("the placeholder scope line fooled the brain twice")."""
+
+    SYMS = (
+        "func_a kind:function(arm,size=0x40) addr:0x02200000\n"    # -> candidate
+        "func_b kind:function(thumb,size=0x20) addr:0x02200100\n"  # -> thumb_excluded
+        "func_c kind:function(arm,size=0x40) addr:0x02100000\n"    # -> below_min_addr
+        "func_d kind:function(arm,size=0x8) addr:0x02200200\n"     # -> size_out_of_range (too small)
+        "func_e kind:function(arm,size=0x40) addr:0x02200300\n"    # -> already_carved
+        "func_f kind:function(arm,size=0x40) addr:0x02200400\n"    # -> skiplisted
+        "func_g kind:function(arm,size=0x40) addr:0x02200500\n"    # -> on_disk_dedup
+    )
+
+    def _breakdown(self, **overrides) -> CensusBreakdown:
+        kwargs = dict(
+            carved={0x02200300}, skips={"func_f"},
+            existing=frozenset({"func_g.s"}),
+            min_addr=0x02200000, min_size=0x10, max_size=0x1000,
+        )
+        kwargs.update(overrides)
+        return census_breakdown(self.SYMS, kwargs.pop("carved"), kwargs.pop("skips"),
+                                kwargs.pop("existing"), **kwargs)
+
+    def test_total_counts_every_kind_function_entry(self):
+        b = self._breakdown()
+        self.assertEqual(b.total_functions, 7)
+
+    def test_each_bucket_gets_exactly_one(self):
+        b = self._breakdown()
+        self.assertEqual(b.thumb_excluded, 1)
+        self.assertEqual(b.below_min_addr, 1)
+        self.assertEqual(b.size_out_of_range, 1)
+        self.assertEqual(b.already_carved, 1)
+        self.assertEqual(b.skiplisted, 1)
+        self.assertEqual(b.on_disk_dedup, 1)
+        self.assertEqual(b.candidates, [(0x40, "func_a")])
+
+    def test_summary_lists_every_nonzero_reason_when_empty(self):
+        # Same fixture minus func_a (make it thumb too, so candidates is empty).
+        syms = self.SYMS.replace(
+            "func_a kind:function(arm,size=0x40) addr:0x02200000",
+            "func_a kind:function(thumb,size=0x40) addr:0x02200000")
+        b = census_breakdown(syms, {0x02200300}, {"func_f"}, frozenset({"func_g.s"}),
+                             min_addr=0x02200000, min_size=0x10, max_size=0x1000)
+        self.assertEqual(b.candidates, [])
+        s = b.summary()
+        self.assertIn("2 thumb excluded by mode filter", s)   # func_a now also thumb
+        self.assertIn("1 already carved", s)
+        self.assertIn("1 already have a .s/.c on disk", s)
+        self.assertIn("1 outside size range", s)
+        self.assertIn("1 below min-addr", s)
+        self.assertIn("1 skip-listed", s)
+
+    def test_summary_nonempty_is_just_the_count(self):
+        b = self._breakdown()
+        self.assertEqual(b.summary(), "1 candidates")
+
+    def test_summary_truly_empty_module(self):
+        b = census_breakdown("", set(), set(), frozenset(),
+                             min_addr=0x0, min_size=0x0, max_size=0x10000)
+        self.assertEqual(b.summary(), "0 candidates (module has no kind:function entries in scope)")
+
+    def test_matches_filter_candidates_on_the_same_scope(self):
+        """The two must never silently drift apart: same inputs, same
+        candidate list, same order."""
+        symbols = parse_symbols(self.SYMS)
+        sym_addrs = parse_symbol_addrs(self.SYMS)
+        carved = {0x02200300}
+        skips = {"func_f"}
+        via_filter = filter_candidates(symbols, sym_addrs, carved, skips,
+                                       min_addr=0x02200000, min_size=0x10, max_size=0x1000)
+        # filter_candidates has no on-disk-dedup concept -- match census_breakdown
+        # against it with an empty `existing` for a fair comparison.
+        b = census_breakdown(self.SYMS, carved, skips, frozenset(),
+                             min_addr=0x02200000, min_size=0x10, max_size=0x1000)
+        self.assertEqual(b.candidates, via_filter)
 
 
 # --------------------------------------------------------------------------- #

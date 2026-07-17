@@ -112,13 +112,17 @@ class TestResolveNameAndDeclaredSizeFromText(unittest.TestCase):
         with self.assertRaises(BlobError):
             resolve_name_and_declared_size_from_text(self.SYMS, 0x02222222, None)
 
-    def test_friendly_named_symbol_not_addr_indexed_by_this_helper(self):
-        # parse_symbol_addrs (batch_carve.py) only indexes func_-prefixed
-        # names by design (matches its own scope) — a renamed/friendly
-        # symbol at the same address is invisible to it, same as an
-        # unclaimed address, unless --name is supplied.
-        with self.assertRaises(BlobError):
-            resolve_name_and_declared_size_from_text(self.SYMS, 0x02000086, None)
+    def test_friendly_named_symbol_now_resolves(self):
+        # brief 596: parse_symbol_addrs (batch_carve.py) used to only index
+        # func_-prefixed names, so a renamed/friendly symbol at a real
+        # address was invisible here — indistinguishable from a genuinely
+        # un-symbolled one. That was a bug, not this function's design:
+        # its own docstring says "Prefers the real symbol at addr", with
+        # no func_-prefix caveat. Now that the underlying parser sees any
+        # name, this correctly resolves instead of raising.
+        name, size = resolve_name_and_declared_size_from_text(self.SYMS, 0x02000086, None)
+        self.assertEqual(name, "VBlankIntrWait")
+        self.assertEqual(size, 0x6)
 
 
 class TestCheckNotAlreadyClaimedInText(unittest.TestCase):

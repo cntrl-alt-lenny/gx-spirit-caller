@@ -68,10 +68,18 @@ _GATE_LOCK = Path(tempfile.gettempdir()) / "spirit-caller-gate.lock"
 # PURE helpers (unit-tested, no build, no git)                                 #
 # --------------------------------------------------------------------------- #
 
-_SYM_RE = re.compile(r"(func_\w+)\s+kind:function\(arm,size=(0x[0-9a-f]+)\)")
+_SYM_RE = re.compile(r"(\S+)\s+kind:function\(arm,size=(0x[0-9a-f]+)\)")
 _SYM_ADDR_RE = re.compile(
-    r"(func_\w+)\s+kind:function\(arm,size=0x[0-9a-f]+\)\s+addr:(0x[0-9a-f]+)")
-_START_RE = re.compile(r"start:(0x[0-9a-f]+)")
+    r"(\S+)\s+kind:function\(arm,size=0x[0-9a-f]+\)\s+addr:(0x[0-9a-f]+)")
+_ALL_SYM_RE = re.compile(
+    r"(\S+)\s+kind:function\((arm|thumb),size=(0x[0-9a-f]+)\)\s+addr:(0x[0-9a-f]+)")
+# Per-TU section lines are a single space before "start:" and end right
+# after end:0x...; the module-level section-map header at the top of every
+# delinks.txt uses multiple spaces plus a kind:/align: suffix ("    .text
+# start:0x... end:0x... kind:code align:32") and is deliberately NOT
+# matched here -- brief 596, the same false-positive shape size_census.py
+# was fixed for in brief 583 (see parse_claimed_text there).
+_CARVED_RANGE_RE = re.compile(r"\.(?:text|init) start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)\s*$")
 _TEXT_RE = re.compile(r"\.text start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)\s*$")
 _SRC_HDR_RE = re.compile(r"(\S+/(func_\w+)\.s):$")
 _REFUSE_VERDICT_RE = re.compile(r"data-ref \S+ @0x[0-9a-f]+: (\S+) \(REFUSE\)")
@@ -101,12 +109,37 @@ def classify_refuse_kind(output: str) -> str:
 
 
 def parse_symbols(text: str) -> dict[str, int]:
-    """func name -> size (bytes), ARM functions only."""
+    """func name -> size (bytes), ARM functions only.
+
+    brief 596: the name capture used to require a literal `func_` prefix,
+    so a symbol RENAMED to a semantic name (`OS_DisableIrq`, `Copy32`,
+    `main`, ...) was invisible here even when genuinely still uncarved --
+    naming (via signature-matching) and carving are independent steps, so
+    an identified-but-uncarved renamed symbol is a real, common case, not
+    an edge case. size_census.py's `_FUNC_RE` never had this restriction
+    (`(\\S+)`), which is why size_census and batch_carve disagreed on
+    candidate counts for every module with any renamed residue."""
     out: dict[str, int] = {}
     for line in text.splitlines():
         m = _SYM_RE.match(line.strip())
         if m:
             out[m.group(1)] = int(m.group(2), 16)
+    return out
+
+
+def parse_all_symbols(text: str) -> dict[str, tuple[str, int, int]]:
+    """func name -> (kind, size, addr) for EVERY kind:function entry —
+    ARM *and* THUMB (brief 596). Used only for the census breakdown
+    (`census_breakdown`), so an empty batch_carve census can explain
+    itself ("N thumb excluded by mode filter") instead of reporting an
+    ambiguous bare zero. `parse_symbols`/`parse_symbol_addrs` remain the
+    ARM-only, carve-eligible view the real carve loop uses — this
+    function is reporting-only and never feeds a carve decision."""
+    out: dict[str, tuple[str, int, int]] = {}
+    for line in text.splitlines():
+        m = _ALL_SYM_RE.match(line.strip())
+        if m:
+            out[m.group(1)] = (m.group(2), int(m.group(3), 16), int(m.group(4), 16))
     return out
 
 
@@ -121,6 +154,13 @@ def parse_symbol_addrs(text: str) -> dict[str, int]:
     the bytes into the wrong place and the ROM sha1 gate fails (brief 483 autopsy).
     asm_escape already resolves the symbol to its real addr, so the .s itself is
     byte-correct — only the delink position was wrong.
+
+    brief 596: like `parse_symbols`, the name capture used to require a
+    literal `func_` prefix — a RENAMED symbol has no address encoded in
+    its name at all (not just a drifted one), so it needs this dict even
+    more than an address-named func does; `filter_candidates` now resolves
+    every candidate's address through here first, `func_addr()` only as a
+    last-resort fallback.
     """
     out: dict[str, int] = {}
     for line in text.splitlines():
@@ -139,10 +179,31 @@ def func_addr(func: str) -> int:
 _DELINK_HDR_RE = re.compile(r"(?:\S+/)?(func_\w+)\.\S+:$")
 
 def carved_addrs(delinks_text: str) -> set[int]:
+    """Every address a delinks.txt entry has already claimed.
+
+    brief 596: used to collect ANY `start:0x...` occurrence in the whole
+    text via a bare, unanchored regex — including the module-level
+    section-map header at the top of every delinks.txt ("    .text
+    start:0x... end:0x... kind:code align:32", multiple spaces + a
+    kind:/align: suffix). That header's start: address is always the
+    module's very first byte, which is ALSO the real address of whichever
+    function happens to sit there — so the first function of every
+    module was silently marked "carved" even when genuinely still
+    uncarved (confirmed live: func_ov002_021aa3c0 and 20+ siblings, one
+    per overlay, all at each module's own base address). Scoped now to
+    per-TU CODE_SECTIONS (.text + .init) lines only, via the same
+    single-space/no-suffix discipline size_census.py's
+    `parse_claimed_text` was fixed to use in brief 583 — a module header
+    never satisfies it, a real per-TU claim always does.
+    """
     # Include both start: addresses AND name-derived addresses from headers.
     # Some symbols have a name that doesn't match their ROM addr (thunks/trampolines),
     # so checking both prevents re-queuing already-delinked symbols.
-    addrs = {int(m.group(1), 16) for m in _START_RE.finditer(delinks_text)}
+    addrs: set[int] = set()
+    for raw in delinks_text.splitlines():
+        m = _CARVED_RANGE_RE.search(raw.rstrip())
+        if m:
+            addrs.add(int(m.group(1), 16))
     for line in delinks_text.splitlines():
         m = _DELINK_HDR_RE.match(line.strip())
         if m:
@@ -164,19 +225,129 @@ def parse_skiplist(text: str) -> set[str]:
     return out
 
 
-def filter_candidates(symbols: dict[str, int], carved: set[int], skips: set[str],
+def real_addr(func: str, sym_addrs: dict[str, int]) -> int | None:
+    """The function's real ROM address: `sym_addrs` (the authoritative
+    `addr:` field) first, name-derived `func_addr()` as a last-resort
+    fallback for a name absent from `sym_addrs`. Returns None (never
+    raises) if neither resolves — e.g. a renamed symbol somehow missing
+    its own `addr:` entry, which should not occur in well-formed
+    symbols.txt but must not crash a census over one bad line."""
+    a = sym_addrs.get(func)
+    if a is not None:
+        return a
+    try:
+        return func_addr(func)
+    except ValueError:
+        return None
+
+
+def filter_candidates(symbols: dict[str, int], sym_addrs: dict[str, int],
+                      carved: set[int], skips: set[str],
                       *, min_addr: int, min_size: int, max_size: int) -> list[tuple[int, str]]:
-    """(size, func) sorted by size then addr — the carve order (smallest first)."""
+    """(size, func) sorted by size then addr — the carve order (smallest first).
+
+    brief 596: resolves each candidate's address via `sym_addrs` (real ROM
+    addr) rather than name-derived `func_addr()` throughout — a renamed
+    function (`OS_DisableIrq`) has no address encoded in its name at all,
+    and even an address-named one can drift from its own name in the
+    USA/JPN main -0xF4 band (see `parse_symbol_addrs`'s docstring); the
+    real address is correct in both cases. Previously this used
+    `func_addr(func)` directly, which would raise on any renamed symbol —
+    moot before brief 596 since `parse_symbols` never surfaced renamed
+    symbols to begin with, but load-bearing now that it does.
+    """
     out: list[tuple[int, str]] = []
     for func, size in symbols.items():
-        a = func_addr(func)
+        a = real_addr(func, sym_addrs)
+        if a is None:
+            continue
         if a < min_addr or not (min_size <= size <= max_size):
             continue
         if a in carved or func in skips:
             continue
         out.append((size, func))
-    out.sort(key=lambda t: (t[0], func_addr(t[1])))
+    out.sort(key=lambda t: (t[0], real_addr(t[1], sym_addrs) or 0))
     return out
+
+
+@dataclass
+class CensusBreakdown:
+    """Explains a candidate census, especially an empty one (brief 596: a
+    bare "0 candidates" line fooled the brain twice into concluding a
+    module had no residue, when the real cause was a mode filter or a
+    parsing gap — not an actually-drained module). Every kind:function
+    entry in the module's symbols.txt lands in exactly one bucket."""
+    total_functions: int = 0       # every kind:function(arm|thumb) entry
+    thumb_excluded: int = 0        # kind=thumb -- invisible to the arm-only carve mode
+    below_min_addr: int = 0        # arm, real addr < min_addr
+    size_out_of_range: int = 0     # arm, in addr range, size outside [min_size, max_size]
+    already_carved: int = 0        # arm, in range, but addr already claimed
+    skiplisted: int = 0            # arm, uncarved, but func is in a skip/verifyfail list
+    on_disk_dedup: int = 0         # arm, would-be candidate, but a .s/.c already exists
+    candidates: list[tuple[int, str]] = field(default_factory=list)
+
+    def summary(self) -> str:
+        if self.candidates:
+            return f"{len(self.candidates)} candidates"
+        reasons = []
+        if self.thumb_excluded:
+            reasons.append(f"{self.thumb_excluded} thumb excluded by mode filter")
+        if self.already_carved:
+            reasons.append(f"{self.already_carved} already carved")
+        if self.on_disk_dedup:
+            reasons.append(f"{self.on_disk_dedup} already have a .s/.c on disk")
+        if self.size_out_of_range:
+            reasons.append(f"{self.size_out_of_range} outside size range")
+        if self.below_min_addr:
+            reasons.append(f"{self.below_min_addr} below min-addr")
+        if self.skiplisted:
+            reasons.append(f"{self.skiplisted} skip-listed")
+        if not reasons:
+            return "0 candidates (module has no kind:function entries in scope)"
+        return "0 candidates (" + ", ".join(reasons) + ")"
+
+
+def census_breakdown(sym_text: str, carved: set[int], skips: set[str],
+                     existing: frozenset[str] = frozenset(), *,
+                     min_addr: int, min_size: int, max_size: int) -> CensusBreakdown:
+    """PURE (brief 596): classify EVERY `kind:function` entry — ARM *and*
+    THUMB — in a module's symbols.txt into exactly one bucket, so a
+    0-candidate census can explain itself instead of printing a bare,
+    uninformative zero.
+
+    This is a reporting-only parallel to `filter_candidates` (parses via
+    `parse_all_symbols`, independent of `parse_symbols`/`parse_symbol_addrs`),
+    not a rewrite of it — the real carve loop still goes through
+    `filter_candidates`/`carved_addrs` unchanged. `test_census_breakdown_
+    matches_filter_candidates` pins the two candidate lists against each
+    other on real fixtures so they cannot silently drift apart.
+    """
+    all_symbols = parse_all_symbols(sym_text)
+    b = CensusBreakdown(total_functions=len(all_symbols))
+    staged: list[tuple[int, int, str]] = []  # (size, addr, func) pre-sort
+    for func, (kind, size, addr) in all_symbols.items():
+        if kind == "thumb":
+            b.thumb_excluded += 1
+            continue
+        if addr < min_addr:
+            b.below_min_addr += 1
+            continue
+        if not (min_size <= size <= max_size):
+            b.size_out_of_range += 1
+            continue
+        if addr in carved:
+            b.already_carved += 1
+            continue
+        if func in skips:
+            b.skiplisted += 1
+            continue
+        if any(f"{func}{ext}" in existing for ext in (".s", ".c")):
+            b.on_disk_dedup += 1
+            continue
+        staged.append((size, addr, func))
+    staged.sort()
+    b.candidates = [(size, func) for size, _addr, func in staged]
+    return b
 
 
 def delink_block(func: str, addr: int, size: int, srcdir: str) -> str:
@@ -757,21 +928,34 @@ class BatchCarver:
                 skips |= parse_skiplist((ROOT / p).read_text(encoding="utf-8"))
         existing = set(os.listdir(ROOT / self.srcdir)) if (ROOT / self.srcdir).exists() else set()
 
-        candidates = filter_candidates(symbols, carved, skips,
+        candidates = filter_candidates(symbols, sym_addrs, carved, skips,
                                         min_addr=self.scope.min_addr,
                                         min_size=self.scope.min_size,
                                         max_size=self.scope.max_size)
         # file-level dedup (item 10): drop any candidate already present as .s/.c
         candidates = [(s, f) for s, f in candidates
                       if not any(f"{f}{ext}" in existing for ext in (".s", ".c"))]
+        # brief 596: self-describing census — WHY, not just how many. Cheap
+        # (pure, no I/O beyond the sym_text already in hand) so it's always
+        # computed, not just on the zero-candidate path; its own candidate
+        # count matches `candidates` above exactly (pinned by
+        # test_census_breakdown_matches_filter_candidates), so the "N
+        # candidates" case is unchanged and the "0 candidates" case gains
+        # an explanation instead of a placeholder scope line the brain has
+        # already been fooled by twice.
+        breakdown = census_breakdown(sym_text, carved, skips, frozenset(existing),
+                                     min_addr=self.scope.min_addr,
+                                     min_size=self.scope.min_size,
+                                     max_size=self.scope.max_size)
         if limit:
             candidates = candidates[:limit]
         self.log(f"scope {self.scope.overlay or 'main'} "
                  f"0x{self.scope.min_size:x}-0x{self.scope.max_size:x}: "
-                 f"{len(candidates)} candidates (batch={self.batch}, dry_run={self.dry_run})")
+                 f"{breakdown.summary()} (of {breakdown.total_functions} total; "
+                 f"batch={self.batch}, dry_run={self.dry_run})")
 
         for size, func in candidates:
-            addr = sym_addrs.get(func, func_addr(func))   # real ROM addr (drift band); name only as fallback
+            addr = real_addr(func, sym_addrs)   # real ROM addr (drift band / renamed); never name-derived-only
             # live dedup re-check: another lane (or an earlier batch) may have
             # carved this addr / created this .s since the start-of-run snapshot.
             if addr in carved:
