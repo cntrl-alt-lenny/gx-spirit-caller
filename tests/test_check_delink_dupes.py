@@ -54,6 +54,13 @@ class TestFindDupes(unittest.TestCase):
              + _block("src/main/func_B.s", "0x0208df40", "0x0208df60")
         self.assertIn("0x0208df40", find_dupes(body))
 
+    def test_libs_duplicate_two_files_one_address(self):
+        body = HEADER + _block("libs/nitro/func_a.c", "0x02001000", "0x02001010") \
+                      + _block("libs/runtime/func_b.s", "0x02001000", "0x02001010")
+        dupes = find_dupes(body)
+        self.assertIn("0x02001000", dupes)
+        self.assertEqual(len(set(dupes["0x02001000"])), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

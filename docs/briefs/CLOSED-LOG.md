@@ -7,6 +7,42 @@ Codex is one of the two providers filling brain/decomper/scaffolder roles per
 AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
+- **Brief 578** — **#1146**, “Brief 578: EUR data-blob emitter — close last 2 non-function gaps”: **Both blobs shipped** (`func_020b2d2c` and `func_020b3c78`); EUR delinks reports `units: 10333/10333 (100.00%)`; the only unclosed bytes are the permanent 42-file ISA floor.
+- **Brief 577** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 576** — **#1144**, “Brief 576: definitive endgame ledger”: added the post-drain endgame ledger covering USA/JPN main-floor parks, ov002 Wave-11 populations, EUR data blobs and non-floor parks, the ISA floor, parked C-match families, and the ITCM count-level residual.
+- **Brief 575** — **#1145**, “Brief 575: ov002 mop-up”: USA **SHIPPED 0**, JPN **SHIPPED 0**; both dry-runs and full runs found zero remaining candidates.
+- **Brief 574** — **#1142**, “Brief 574: add path to 100% coverage tracker”: added a dated, build-free USA/JPN post-ov002 Waves 9-10 tracker, the EUR 77-function closeout floor, and git ls-files inventory counts.
+- **Brief 573** — **#1141**, “Brief 573: add Windows Defender build speed guide”: added a user-run Windows Defender build-tree exclusion guide.
+- **Brief 572** — **#1143**, “Brief 572: EUR residual floor closeout (batch_carve)”: **77/77 closeable functions shipped**; `ov002` 2/2, `ov006` 4/4, `ov004` 9/9, and `main` 62/62; 0 REFUSE and 0 gate-fail.
+- **Brief 571** — **#1138**, “Brief 571: extend metadata gates to USA/JPN”: extended the analyzer and match-invariants metadata gates from EUR-only to the committed region matrix `[eur, usa, jpn]`.
+- **Brief 570** — **#1139**, “Brief 570: census EUR residual floor closeout”: identified 68 C-absorbed recoverables, 9 clean PASS candidates, and 2 data-blob blockers; **Closeable EUR funcs: 77**.
+- **Brief 569** — **#1140**, “Brief 569: dsd sig clone-census prototype (read-only measurement)”: internal EUR clone census **6/60 sampled functions (10%)**; region-twin map **49/60** exact USA+JPN addresses.
+- **Brief 568** — **#1136**, “Brief 568: catalog parked C-match and permanent ISA floor”: cataloged parked C-match families and the permanent ISA floor; the command returned **94 files**.
+- **Brief 567** — **#1135**, “Brief 567: hide and inventory superseded prep scaffolds”: listed **360 prep addresses** that also have real source C files and preserved all scaffold files.
+- **Brief 566** — **#1137**, “tools: fix C-feedback loop gap + C% metric ceiling (brief 566)”: fixed the C-feedback loop and changed EUR C% from **8.0210% → 8.0285%**.
+- **Brief 565** — **#1132**, “Brief 565: refresh committed progress metrics”: refreshed EUR/USA/JPN committed-tier metrics; EUR C-decompiled **7.99%**, USA **7.08%**, JPN **7.08%**.
+- **Brief 564** — **#1131**, “Brief 564: add overlay C-match sweep queue”: queued **22 functions across 4 family rows**.
+- **Brief 563** — **#1134**, “Brief 563: USA/JPN drain waves 3-10 (1024 shipped)”: **1024 shipped** across Waves 3-10; Wave 7 main retained a 14-function floor.
+- **Brief 562** — **#1133**, “main: C-match sweep week 2 - 7 matched (table-walker family), 3 families near-miss”: **7/7 matched** in Family 4, **21 ships total**, and Families 1-3 were **0/13** near-misses.
+- **Brief 561** — **#1128**, “Foundation fixes: safety guard, stale docs, runbook portability, C% metric (brief 561)”: landed four foundation fixes, including the branch safety guard, portable runbook, and true C-decompiled metric.
+- **Brief 560** — **#1129**, “main: match VRAM 16-member threshold-dispatch family (brief 560)”: **16/16 EUR matches**, ported to USA+JPN for **48 ships total**.
+- **Brief 559** — **#1127**, “Brief 559: add C-match sweep queue”: queued **22 functions across 4 family rows**.
+- **Brief 558** — **#1130**, “Brief 558: finish USA/JPN ov002 drain and open post-ov002 sweep”: USA ov002 **107 shipped**, JPN ov002 **223 shipped**; post-ov002 Wave 1 **85/85** and Wave 2 **71/71**.
+- **Brief 557** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 556** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 555** — **#1125**, “Brief 555: wire m2c --context into m2c_feed”: wired `m2c --context` into `m2c_feed`; the PR body reports **2497 passed, 7 skipped** for the full repo suite.
+- **Brief 554** — **#1126**, “Brief 554: USA/JPN ov002 drain — wave 9 (300 shipped)”: USA **150/150 shipped**, JPN **150/150 shipped**, **300 shipped** total.
+- **Brief 553** — **#1123**, “Brief 553: post-ov002 runbook + census refresh”: refreshed the wine-free census at **zero drift on any of the 21 post-ov002 modules** and added the post-ov002 runbook.
+- **Brief 552** — **#1124**, “Brief 552: USA/JPN ov002 drain — wave 8 (300 shipped)”: **300 `.s` functions shipped** via batch_carve, 150 USA + 150 JPN; 0 REFUSE, 0 verify-fail, 0 gate-fail.
+- **Brief 551** — **#1119**, “Brief 551: post-ov002 drain work order”: wine-free census found **1,350 total candidates (675/region)**, **52 REFUSE (26/region)**, all recoverable, and 0 genuine walls.
+- **Brief 550** — **#1122**, “Brief 550: USA/JPN ov002 drain — wave 7 (300 shipped)”: **300 `.s` functions shipped** via batch_carve, 150 USA + 150 JPN; 0 REFUSE, 0 verify-fail, 0 gate-fail.
+
+### No merged PR found (briefs 579-581)
+
+- **Brief 581** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 580** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 579** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+
 - **Briefs 548/549 (2026-07-08, Mac).** **#1118** (b548, drain w6): 300 ov002 `.s` (150/150),
   first 150/150 clean sweep (seeded out the 2 known verify-fails); ~555 USA + 671 JPN ov002
   remain. **#1117** (b549, autopsy → FIX): root-caused b546's "0/4 verify-fail" as a COMPARATOR
@@ -3960,4 +3996,3 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
 - [`docs/briefs/007-ov000-bit-getter.md`](docs/briefs/007-ov000-bit-getter.md)
   `claude-pc`, shipped in PR #85. Matched one ov000 0x10 bit getter
   as the low-risk Brief 007 opener.
-
