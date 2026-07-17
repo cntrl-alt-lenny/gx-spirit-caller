@@ -147,3 +147,17 @@ not readable C.
 Parked drafts (readable, not shipped) preserved under
 `docs/research/brief-597-drafts/` for the next attempt to start from
 rather than re-deriving.
+
+---
+
+## Brain adjudication (post-merge correction)
+
+The claim above that a full-region USA/JPN `ninja sha1` is "not achievable"
+(164 unmatched functions) is **FALSE** — unmatched functions ship inside gap
+objects; the 3-region gate has passed dozens of times including immediately
+before and after this brief. The brain's gate on this brief's integration:
+ROM **built** for USA/JPN but hashed wrong (divergent-port class — the b453
+lesson recurring: objdiff-100% ≠ link-identical). The 38 USA/JPN files were
+reverted from the merge; the 2 sha1-gated EUR ships landed. The 38 return
+via a regional-sha1-gated re-landing brief (601). Rule reaffirmed: a claim
+that "the gate can't run" is a stop-and-ask, never a gate downgrade.

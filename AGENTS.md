@@ -495,26 +495,22 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 597** — Claude Code Decomper (Sonnet 5) → **THE <0x100 ENDGAME SWEEP (WINE lane)**:
-  hand-match the small-tier residue from b592's tables (EUR 20 funcs/0xb12 + ITCM 11-14/region
-  + the USA/JPN small tail incl. main's 56) — the cold-RE knee says 5-15 min each. C-first
-  (readable-C ships coverage AND quality). Use b593's C-44 + the wall taxonomy from move 1.
-  Branch `claude/small-tier-sweep-597`.
-- **Brief 594** — Codex Scaffolder (Luna) → **MASTER CANDIDATE LEDGER campaign** (wine-free,
-  multi-phase): script-driven JSONL cross-referencing every size_census-unmatched function ×
-  sig-census twins × c-match-prep dossiers × attempt provenance + per-module rollups. Feeds
-  the singleton re-queue (r6-verified top-1). Branch `codex/master-ledger-594`.
-- **Brief 595** — Codex Decomper (Luna) → **NAMING + CORPUS campaign** (wine-free,
-  multi-phase): naming-coverage census (named vs func_ per module × region), matched-C
-  pair-corpus export (c + delink disasm; tool-presence preflight), decomp.me harvest retry
-  (STOP if still blocked). Branch `codex/naming-corpus-595`.
-- **Brief 596** — Claude Code Scaffolder (Sonnet 5) → **WINE-LIGHT: batch_carve enumeration
-  autopsy + P-1 probe**: (a) diagnose why batch_carve censuses 0 while size_census sees 150+
-  unclaimed ARM funcs (gap-object carved_addrs hypothesis; make empty census output
-  SELF-DESCRIBING); (b) reconcile the 592 size_census-vs-ledger mismatches (ov004 rows); (c)
-  the r6-verified P-1 probe: `(s32)(u16)` cast-chain via direct-mwcc variant matrix (single-TU
-  compiles; yield the wineserver instantly if 593's lane contends). Branch
-  `claude/carve-census-autopsy-596`.
+- **Brief 601** — Claude Code Decomper (Sonnet 5) → **RE-LAND the 38 USA/JPN ships (WINE
+  lane, priority)**: b597's 38 objdiff-only files byte-diverged the USA/JPN ROMs (reverted at
+  integration). Re-land with per-region `ninja sha1` gating per batch of ~5, self-bisecting
+  reds; diagnose the divergence class in the doc. Branch `claude/reland-usajpn-601`.
+- **Brief 602** — Codex Decomper (Luna High) → **PERMUTER CAMPAIGN (wine, compute-bound,
+  hours)** on b593's two 70%-verified reg-alloc-plateau drafts; expectation set LOW (historic
+  ~0 permuter recovery on reg-alloc) — success = completed runs + best-score reports. Defers
+  to 601's wine priority (batch tools self-wait). Branch `codex/permuter-602`.
+- **Brief 603** — Codex Scaffolder (Luna Medium) → **wine-free hygiene**: ledger/pick-list
+  regen, CLOSED-LOG 596-600, union-index retrieval rerun, indices, pytest. Branch
+  `codex/hygiene-603`.
+- **Brief 604** — Claude Code Scaffolder (Sonnet 5) → **retriever GO/NO-GO**: run the
+  union-index twin eval, interpret, and either wire top-k few-shot retrieval into `m2c_feed`
+  (GO) or write the NO-GO with evidence. Branch `claude/retriever-604`.
+- (Deferred one round: the RE-CARVE wave over the b596-reopened candidates — needs 601's
+  re-land merged first so the pools don't collide; next Codex wine campaign.)
 
 ### Closed briefs (reference)
 
