@@ -533,7 +533,7 @@ cluster B + D-3 cross-region application (brief 170).
 
 ### `tools/emit_data_blob.py`
 
-**whole-function-as-data emitter (brief 578).**
+**raw-byte data emitter (briefs 578 and 607).**
 
 WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--whole-function` strategy (`asm_escape.py --whole-function`) disassembles the original bytes into ARM/Thumb instructions and re-emits them as a `.s` TU, then g…
 

@@ -4,6 +4,11 @@
     .data       start:0x020c3bc0 end:0x02102c60 kind:data align:32
     .bss        start:0x02102c60 end:0x021aa4a0 kind:bss align:32
 
+src/main/SecureAreaData_02000000.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000000 end:0x02000086
+
 src/main/VBlankIntrWait.s:
     complete
     .text start:0x02000086 end:0x0200008c
@@ -21,6 +26,11 @@ src/main/VBlankIntrWait.s:
 
 
 
+
+src/main/SecureAreaData_0200008c.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200008c end:0x020000f2
 
 src/main/LZ77UnCompReadByCallbackWrite16bit.s:
     complete
@@ -40,6 +50,11 @@ src/main/LZ77UnCompReadByCallbackWrite16bit.s:
 
 
 
+src/main/SecureAreaData_020000f6.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020000f6 end:0x0200017a
+
 src/main/RLUnCompReadByCallbackWrite16bit.s:
     complete
     .text start:0x0200017a end:0x0200017e
@@ -57,6 +72,11 @@ src/main/RLUnCompReadByCallbackWrite16bit.s:
 
 
 
+
+src/main/SecureAreaData_0200017e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200017e end:0x020001f2
 
 src/main/Div.s:
     complete
@@ -76,6 +96,11 @@ src/main/Div.s:
 
 
 
+src/main/SecureAreaData_020001f6.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020001f6 end:0x02000254
+
 src/main/CpuSet.c:
     complete
     .text start:0x02000254 end:0x02000258
@@ -93,6 +118,11 @@ src/main/CpuSet.c:
 
 
 
+
+src/main/SecureAreaData_02000258.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000258 end:0x020002ae
 
 src/main/BitUnPack.s:
     complete
@@ -112,6 +142,11 @@ src/main/BitUnPack.s:
 
 
 
+src/main/SecureAreaData_020002b2.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020002b2 end:0x02000324
+
 src/main/Mod.s:
     complete
     .text start:0x02000324 end:0x0200032a
@@ -129,6 +164,11 @@ src/main/Mod.s:
 
 
 
+
+src/main/SecureAreaData_0200032a.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200032a end:0x02000394
 
 src/main/HuffUnCompReadByCallback.c:
     complete
@@ -148,6 +188,11 @@ src/main/HuffUnCompReadByCallback.c:
 
 
 
+src/main/SecureAreaData_02000398.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000398 end:0x02000400
+
 src/main/WaitByLoop.c:
     complete
     .text start:0x02000400 end:0x02000404
@@ -165,6 +210,11 @@ src/main/WaitByLoop.c:
 
 
 
+
+src/main/SecureAreaData_02000404.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000404 end:0x0200045a
 
 src/main/IsDebugger.s:
     complete
@@ -184,6 +234,11 @@ src/main/IsDebugger.s:
 
 
 
+src/main/SecureAreaData_0200045e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200045e end:0x020004b0
+
 src/main/LZ77UnCompReadNormalWrite8bit.c:
     complete
     .text start:0x020004b0 end:0x020004b4
@@ -201,6 +256,11 @@ src/main/LZ77UnCompReadNormalWrite8bit.c:
 
 
 
+
+src/main/SecureAreaData_020004b4.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020004b4 end:0x02000524
 
 src/main/CpuFastSet.c:
     complete
@@ -220,6 +280,11 @@ src/main/CpuFastSet.c:
 
 
 
+src/main/SecureAreaData_02000528.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000528 end:0x02000584
+
 src/main/Halt.c:
     complete
     .text start:0x02000584 end:0x02000588
@@ -237,6 +302,11 @@ src/main/Halt.c:
 
 
 
+
+src/main/SecureAreaData_02000588.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000588 end:0x020005f6
 
 src/main/GetCRC16.s:
     complete
@@ -256,6 +326,11 @@ src/main/GetCRC16.s:
 
 
 
+src/main/SecureAreaData_020005fa.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020005fa end:0x02000652
+
 src/main/RLUnCompReadNormalWrite8bit.s:
     complete
     .text start:0x02000652 end:0x02000656
@@ -273,6 +348,11 @@ src/main/RLUnCompReadNormalWrite8bit.s:
 
 
 
+
+src/main/SecureAreaData_02000656.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x02000656 end:0x020006b0
 
 src/main/IntrWait.c:
     complete
@@ -292,6 +372,11 @@ src/main/IntrWait.c:
 
 
 
+src/main/SecureAreaData_020006b4.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x020006b4 end:0x02000728
+
 src/main/Sqrt.c:
     complete
     .text start:0x02000728 end:0x0200072c
@@ -310,6 +395,11 @@ src/main/Sqrt.c:
 
 
 
+src/main/SecureAreaData_0200072c.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200072c end:0x0200078a
+
 src/main/SoftReset.s:
     complete
     .text start:0x0200078a end:0x0200078e
@@ -327,6 +417,11 @@ src/main/SoftReset.s:
 
 
 
+
+src/main/SecureAreaData_0200078e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_eur.nds; not decompiled source
+    .text start:0x0200078e end:0x02000800
 
 src/main/Entry.c:
     complete

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""emit_data_blob.py — whole-function-as-data emitter (brief 578).
+"""emit_data_blob.py — raw-byte data emitter (briefs 578 and 607).
 
 WHY THIS EXISTS
 ---------------
@@ -71,6 +71,8 @@ call `python tools/configure.py <version> && ninja sha1` after, same as
 any other source change.
 
 Usage:
+    python tools/emit_data_blob.py --version eur --addr 0x02000000 \
+        --size 0x86 --name SecureAreaData_02000000 --from-orig --verify
     python tools/emit_data_blob.py --version eur --addr 0x020b2d2c --size 0x3b8
     python tools/emit_data_blob.py --version eur --addr 0x020b2d2c --end 0x020b30e4
     python tools/emit_data_blob.py --version eur --addr 0x020b2d2c --size 0x3b8 --dry-run
@@ -89,6 +91,9 @@ from batch_carve import audit, carved_addrs, delink_block, newline_guard, parse_
 from sort_delinks import sort_delinks  # noqa: E402
 
 _BYTES_PER_ROW = 16
+_ARM9_BASE = 0x02000000
+_SECURE_AREA_RAM_END = 0x02000800
+_SECURE_AREA_ROM_OFFSET = 0x4000
 
 
 class BlobError(RuntimeError):
@@ -175,6 +180,21 @@ def read_ground_truth_bytes(version: str, overlay: str | None, addr: int, size: 
     return data[offset:offset + size]
 
 
+def read_secure_area_bytes(version: str, addr: int, size: int) -> bytes:
+    """Read secure-area bytes directly from the original ROM."""
+    rom_path = ROOT / "orig" / f"baserom_{version}.nds"
+    if not rom_path.is_file():
+        raise BlobError(f"missing original ROM {rom_path}")
+    offset = _SECURE_AREA_ROM_OFFSET + (addr - _ARM9_BASE)
+    data = rom_path.read_bytes()
+    if (addr < _ARM9_BASE or addr + size > _SECURE_AREA_RAM_END
+            or offset < 0 or offset + size > len(data)):
+        raise BlobError(
+            f"0x{addr:08x}+0x{size:x} is outside secure area in {rom_path}"
+        )
+    return data[offset:offset + size]
+
+
 # --------------------------------------------------------------------------- #
 # Symbol + delinks resolution
 # --------------------------------------------------------------------------- #
@@ -252,29 +272,47 @@ def check_not_already_claimed(delinks_path: Path, addr: int) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def render_data_blob_s(name: str, addr: int, data: bytes) -> str:
+def render_data_blob_s(
+    name: str, addr: int, data: bytes, *, description: str | None = None
+) -> str:
     end = addr + len(data)
-    lines = [
-        f"; {name} — whole-function-as-data emission (brief 578,",
-        "; tools/emit_data_blob.py).",
-        ";",
-        f"; Range: 0x{addr:08x}..0x{end:08x} ({len(data)} bytes)",
-        "; The ground-truth bytes at this address disassemble as plausible",
-        "; ARM code but do not round-trip byte-identically through the normal",
-        "; disassemble/reassemble .s path (batch_carve verify-fail, brief",
-        "; 572) — emitted as raw .byte data instead of instructions so there",
-        "; is no disassembler/assembler translation step left to mismatch.",
-        "",
-        "        .text",
-        f"        .global {name}",
-        f"{name}:",
-    ]
+    title = description or "whole-function-as-data emission (brief 578"
+    lines = [f"; {name} — {title},", "; tools/emit_data_blob.py).", "",
+             f"; Range: 0x{addr:08x}..0x{end:08x} ({len(data)} bytes)"]
+    if description:
+        lines.extend([
+            "; Verbatim bytes copied from the original ROM secure area.",
+            "; This is opaque encrypted data, not reverse-engineered source.",
+        ])
+    else:
+        lines.extend([
+            "; The ground-truth bytes at this address disassemble as plausible",
+            "; ARM code but do not round-trip byte-identically through the normal",
+            "; disassemble/reassemble .s path (batch_carve verify-fail, brief",
+            "; 572) — emitted as raw .byte data instead of instructions so there",
+            "; is no disassembler/assembler translation step left to mismatch.",
+        ])
+    lines.extend(["", "        .text", f"        .global {name}", f"{name}:"])
     for i in range(0, len(data), _BYTES_PER_ROW):
         row = data[i:i + _BYTES_PER_ROW]
         hexbytes = ", ".join(f"0x{b:02x}" for b in row)
         lines.append(f"        .byte {hexbytes}")
     lines.append("")
     return "\n".join(lines)
+
+
+def decode_data_blob_s(s_text: str) -> bytes:
+    """Decode the .byte directives emitted by render_data_blob_s."""
+    out = bytearray()
+    for line in s_text.splitlines():
+        match = re.match(r"^\s*\.byte\s+(.+)$", line)
+        if not match:
+            continue
+        for token in match.group(1).split(","):
+            token = token.strip()
+            if token:
+                out.append(int(token, 0))
+    return bytes(out)
 
 
 # --------------------------------------------------------------------------- #
@@ -284,13 +322,16 @@ def render_data_blob_s(name: str, addr: int, data: bytes) -> str:
 
 def insert_delinks_entry(
     delinks_path: Path, name: str, addr: int, size: int, srcdir: str,
-    symbol_sizes: dict[str, int],
+    symbol_sizes: dict[str, int], comment: str | None = None,
 ) -> list[str]:
     """Append the new TU block, sort, and audit. Returns audit() problems
     (empty == clean). Does not write if dry-run is handled by the caller —
     this function always writes (callers gate on --dry-run themselves)."""
     text = newline_guard(delinks_path.read_text(encoding="utf-8") if delinks_path.is_file() else "")
-    text += delink_block(name, addr, size, srcdir)
+    block = delink_block(name, addr, size, srcdir)
+    if comment:
+        block = block.replace("    .text start:", f"    # {comment}\n    .text start:")
+    text += block
     delinks_path.write_text(text, encoding="utf-8")
     sort_delinks(str(delinks_path))
     return audit(delinks_path.read_text(encoding="utf-8"), symbol_sizes)
@@ -304,6 +345,7 @@ def insert_delinks_entry(
 def emit(
     version: str, addr: int, size: int, *, overlay: str | None = None,
     name: str | None = None, dry_run: bool = False, srcdir: str | None = None,
+    from_orig: bool = False, verify: bool = False,
 ) -> dict:
     """Do the whole thing for one blob. Returns a result dict (also used
     directly by tests). Raises BlobError with a precise reason on any
@@ -322,9 +364,15 @@ def emit(
             f"but 0x{size:x} was requested — refusing to carve a mismatched range"
         )
     check_not_already_claimed(delinks_path, addr)
-    data = read_ground_truth_bytes(version, overlay, addr, size)
+    if from_orig and overlay is not None:
+        raise BlobError("--from-orig is only valid for ARM9 main")
+    data = (read_secure_area_bytes(version, addr, size)
+            if from_orig else read_ground_truth_bytes(version, overlay, addr, size))
     srcdir = srcdir or srcdir_for(overlay)
-    s_text = render_data_blob_s(resolved_name, addr, data)
+    description = "secure-area raw-byte copy from orig (brief 607)" if from_orig else None
+    s_text = render_data_blob_s(resolved_name, addr, data, description=description)
+    if verify and decode_data_blob_s(s_text) != data:
+        raise BlobError(f"{resolved_name}: emitted .byte data failed static round-trip")
     s_path = ROOT / srcdir / f"{resolved_name}.s"
 
     result = {
@@ -341,8 +389,18 @@ def emit(
 
     sym_path = symbols_txt_path(version, overlay)
     sym_text = sym_path.read_text(encoding="utf-8") if sym_path.is_file() else ""
-    problems = insert_delinks_entry(delinks_path, resolved_name, addr, size, srcdir, parse_symbols(sym_text))
+    comment = None
+    if from_orig:
+        comment = f"verbatim bytes copied from orig/baserom_{version}.nds; not decompiled source"
+    problems = insert_delinks_entry(
+        delinks_path, resolved_name, addr, size, srcdir, parse_symbols(sym_text), comment
+    )
     result["audit_problems"] = problems
+    if verify:
+        emitted = s_path.read_text(encoding="utf-8")
+        if decode_data_blob_s(emitted) != data:
+            raise BlobError(f"{resolved_name}: written .s failed static round-trip")
+        result["round_trip_verified"] = True
     return result
 
 
@@ -364,6 +422,10 @@ def main() -> int:
                          "src/overlayNNN — the EUR baseline). Use src/usa/main or "
                          "src/jpn/main for a region-specific blob so it doesn't "
                          "land in the region-neutral EUR tree.")
+    ap.add_argument("--from-orig", action="store_true",
+                    help="read bytes from orig/baserom_<version>.nds (brief 607)")
+    ap.add_argument("--verify", action="store_true",
+                    help="decode emitted .byte directives and require exact byte round-trip")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -374,7 +436,8 @@ def main() -> int:
 
     try:
         result = emit(args.version, args.addr, size, overlay=args.overlay, name=args.name,
-                      dry_run=args.dry_run, srcdir=args.srcdir)
+                      dry_run=args.dry_run, srcdir=args.srcdir,
+                      from_orig=args.from_orig, verify=args.verify)
     except BlobError as e:
         print(f"REFUSE: {e}", file=sys.stderr)
         return 1
@@ -384,6 +447,8 @@ def main() -> int:
         return 0
 
     print(f"wrote {result['s_path']} ({result['size']} bytes) + delinks entry in {result['delinks_path']}")
+    if result.get("round_trip_verified"):
+        print(f"round-trip verified: {result['name']} byte-identical ({result['size']} bytes)")
     if result["audit_problems"]:
         print("AUDIT PROBLEMS:", file=sys.stderr)
         for p in result["audit_problems"]:

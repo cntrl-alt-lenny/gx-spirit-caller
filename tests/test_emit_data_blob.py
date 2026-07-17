@@ -29,7 +29,9 @@ import emit_data_blob as edb  # noqa: E402
 from emit_data_blob import (  # noqa: E402
     BlobError,
     check_not_already_claimed_in_text,
+    decode_data_blob_s,
     module_binary_and_base,
+    read_secure_area_bytes,
     read_ground_truth_bytes,
     render_data_blob_s,
     resolve_name_and_declared_size_from_text,
@@ -84,6 +86,10 @@ class TestRenderDataBlobS(unittest.TestCase):
         text = render_data_blob_s("func_x", 0x02000000, b"")
         self.assertEqual(_decode_byte_rows(text), b"")
         self.assertIn("func_x:", text)
+
+    def test_decode_ignores_comments_and_round_trips(self):
+        text = "; .byte in a comment\n        .byte 0xff, 0x00, 0x7f\n"
+        self.assertEqual(decode_data_blob_s(text), b"\xff\x00\x7f")
 
 
 class TestResolveNameAndDeclaredSizeFromText(unittest.TestCase):
@@ -186,6 +192,16 @@ class TestModuleBinaryAndBaseAndBytes(unittest.TestCase):
             with mock.patch.object(edb, "ROOT", root):
                 with self.assertRaises(BlobError):
                     read_ground_truth_bytes("eur", None, 0x02000000 + 2000, 8)
+
+    def test_read_secure_area_bytes_uses_rom_offset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "orig").mkdir()
+            rom = bytearray(0x4008)
+            rom[0x4000:0x4008] = b"secure!!"
+            (root / "orig" / "baserom_eur.nds").write_bytes(rom)
+            with mock.patch.object(edb, "ROOT", root):
+                self.assertEqual(read_secure_area_bytes("eur", 0x02000000, 8), b"secure!!")
 
 
 class TestEmitEndToEnd(unittest.TestCase):

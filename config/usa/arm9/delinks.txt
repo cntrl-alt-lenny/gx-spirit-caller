@@ -4,6 +4,101 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/usa/main/SecureAreaData_02000000.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000000 end:0x0200009e
+
+src/usa/main/SecureAreaData_020000a4.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020000a4 end:0x0200010e
+
+src/usa/main/SecureAreaData_02000112.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000112 end:0x0200019c
+
+src/usa/main/SecureAreaData_020001a0.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020001a0 end:0x020001ea
+
+src/usa/main/SecureAreaData_020001ee.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020001ee end:0x02000256
+
+src/usa/main/SecureAreaData_0200025a.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x0200025a end:0x020002d2
+
+src/usa/main/SecureAreaData_020002d6.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020002d6 end:0x02000320
+
+src/usa/main/SecureAreaData_02000324.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000324 end:0x02000378
+
+src/usa/main/SecureAreaData_0200037c.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x0200037c end:0x020003d0
+
+src/usa/main/SecureAreaData_020003d4.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020003d4 end:0x02000442
+
+src/usa/main/SecureAreaData_02000446.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000446 end:0x020004a4
+
+src/usa/main/SecureAreaData_020004a8.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020004a8 end:0x02000502
+
+src/usa/main/SecureAreaData_02000508.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000508 end:0x0200057e
+
+src/usa/main/SecureAreaData_02000582.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000582 end:0x020005ec
+
+src/usa/main/SecureAreaData_020005f0.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020005f0 end:0x02000662
+
+src/usa/main/SecureAreaData_02000666.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000666 end:0x020006b6
+
+src/usa/main/SecureAreaData_020006ba.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x020006ba end:0x0200072c
+
+src/usa/main/SecureAreaData_02000730.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x02000730 end:0x0200078a
+
+src/usa/main/SecureAreaData_0200078e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_usa.nds; not decompiled source
+    .text start:0x0200078e end:0x02000800
+
 src/usa/main/func_0200093c.s:
     complete
     .text start:0x0200093c end:0x02000950

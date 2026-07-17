@@ -4,6 +4,101 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/jpn/main/SecureAreaData_02000000.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000000 end:0x0200007e
+
+src/jpn/main/SecureAreaData_02000082.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000082 end:0x020000ee
+
+src/jpn/main/SecureAreaData_020000f2.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020000f2 end:0x02000162
+
+src/jpn/main/SecureAreaData_02000166.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000166 end:0x020001ca
+
+src/jpn/main/SecureAreaData_020001ce.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020001ce end:0x02000236
+
+src/jpn/main/SecureAreaData_0200023a.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x0200023a end:0x020002b0
+
+src/jpn/main/SecureAreaData_020002b4.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020002b4 end:0x02000322
+
+src/jpn/main/SecureAreaData_02000328.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000328 end:0x0200039a
+
+src/jpn/main/SecureAreaData_0200039e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x0200039e end:0x02000404
+
+src/jpn/main/SecureAreaData_02000408.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000408 end:0x0200047c
+
+src/jpn/main/SecureAreaData_02000480.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000480 end:0x020004cc
+
+src/jpn/main/SecureAreaData_020004d2.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020004d2 end:0x02000538
+
+src/jpn/main/SecureAreaData_0200053c.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x0200053c end:0x02000594
+
+src/jpn/main/SecureAreaData_02000598.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000598 end:0x020005e4
+
+src/jpn/main/SecureAreaData_020005e8.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020005e8 end:0x02000644
+
+src/jpn/main/SecureAreaData_02000648.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x02000648 end:0x020006b8
+
+src/jpn/main/SecureAreaData_020006bc.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x020006bc end:0x0200071a
+
+src/jpn/main/SecureAreaData_0200071e.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x0200071e end:0x02000786
+
+src/jpn/main/SecureAreaData_0200078a.s:
+    complete
+    # verbatim bytes copied from orig/baserom_jpn.nds; not decompiled source
+    .text start:0x0200078a end:0x02000800
+
 src/jpn/main/func_0200093c.s:
     complete
     .text start:0x0200093c end:0x02000950
