@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**97 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**98 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (28)
+- [Uncategorised](#uncategorised) (29)
 
 ## Analysis / worklist
 
@@ -473,10 +473,6 @@ The ov002 `.s` reg-alloc lane and the region-port lane are deterministic: a cand
 
 Given a region and a list of accepted candidate .c files (already passing fastmatch-resolved), this tool:
 
-### `tools/build_master_ledger.py`
-
-**Build the committed, unmatched-function master candidate ledger.**
-
 ### `tools/c42_family_hunter.py`
 
 **cluster the unmatched C-42 cohort into exact**
@@ -537,6 +533,10 @@ cluster B + D-3 cross-region application (brief 170).
 
 WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--whole-function` strategy (`asm_escape.py --whole-function`) disassembles the original bytes into ARM/Thumb instructions and re-emits them as a `.s` TU, then g…
 
+### `tools/export_matched_pairs.py`
+
+**Export compact EUR matched-C function rows for retriever seeding.**
+
 ### `tools/fastmatch.py`
 
 **per-TU match check without a full ROM rebuild.**
@@ -560,6 +560,10 @@ Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C  
 **vendor m2c (the asm->C decompiler) at a pinned commit,**
 
 mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
+
+### `tools/naming_census.py`
+
+**Count placeholder and real function names in committed symbol tables.**
 
 ### `tools/objdiff_filter_panic_units.py`
 
