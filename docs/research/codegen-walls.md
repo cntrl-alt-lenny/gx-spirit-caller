@@ -7164,6 +7164,133 @@ allocation, demote; it resists direct source iteration. Full diagnosis
 at
 [`brief-268-overfire-stylea-tail-subfamilies.md`](brief-268-overfire-stylea-tail-subfamilies.md).
 
+### P-16. Repeated-address rematerialization after a call
+
+> **Wall family note — same pool-materialization axis as P-7/C-24/C-27,
+> but a distinct sub-case.** Those three are all about whether mwcc
+> deduplicates two loads of the *same bare symbol* into one pool word
+> or keeps two. P-16 is about a symbol accessed at a **constant offset**
+> (`symbol+K`, not the bare symbol) at 3+ program points separated by
+> `bl` calls: mwcc sometimes folds the combined `symbol+K` address into
+> its *own* pool word and addresses through it with a zero-offset load
+> (`ldr r2,[pc,#N]` → `ldr/str [r2,#0]`), where orig reloads the *bare*
+> symbol (reusing the single pool word every other access in the
+> function already uses) and applies `K` via the load/store
+> instruction's own immediate-offset field (`ldr/str [r1,#K]`). Net
+> effect: one extra 4-byte pool word plus a register-allocation ripple
+> at every affected site.
+
+**Discovered:** brief 582, `func_ov002_02269534` (ov002, 548 B duel-
+progress state-machine tick). Confirmed via `docs/research/brief-582-c-
+ceiling-probe.md` Target 1 and re-verified against the same `.o` this
+brief (586).
+
+**The wall.** The step counter at `data_ov002_022d016c+0xd20` is
+incremented via a "reload base, indexed read, add 1, indexed store"
+sequence at three independent, non-dominating return points in the
+function (an early return inside one dispatch case, a fallthrough
+midpoint, and the final tail) — each separated from the others by at
+least one intervening `bl`. Orig reloads the bare `data_ov002_022d016c`
+literal at all three sites (the exact same pool word the function's
+very first access, the switch-dispatch read, already established) and
+indexes `+0xd20` via the instruction's own addressing mode:
+
+```text
+
+; orig, at each of the 3 sites (case-0 tail shown):
+    bl    func_ov002_021d479c
+    ldr   r1, .L_pool0          ; bare data_ov002_022d016c (SAME pool word as the fn's 1st access)
+    add   sp, sp, #0x4
+    ldr   r2, [r1, #0xd20]      ; indexed read
+    mov   r0, #0x0
+    add   r2, r2, #0x1
+    str   r2, [r1, #0xd20]      ; indexed write
+    ldmia sp!, {r3, r4, r5, r6, r7, r8, r9, sl, pc}
+
+```
+
+**mwcc emits when miscoded (natural C, either `x = x + 1` or `x += 1`
+— both reproduce identically):**
+
+```c
+extern char data_ov002_022d016c[];
+/* ... inside the function, at the same 3 program points ... */
+*(int *)(data_ov002_022d016c + 0xd20) += 1;
+```
+
+```text
+
+    bl    func_ov002_021d479c
+    ldr   r2, [pc, #0x1b0]      ; FOLDED data_ov002_022d016c+0xd20 — its OWN pool word
+    add   sp, sp, #0x4
+    ldr   r1, [r2, #0x0]        ; zero-offset read
+    add   r1, r1, #0x1
+    str   r1, [r2, #0x0]        ; zero-offset write
+    ldmia sp!, {r3, r4, r5, r6, r7, r8, r9, sl, pc}
+
+```
+
+Result: 137 insns both sides (same instruction *count*), but the extra
+pool word makes the compiled `.text` 552 B against a 548 B target, and
+the register choice at each site (`r7`/`r5` in the miscoded build vs.
+`r8`/`r6` in orig for two loop-locals, an unrelated knock-on) ripples
+through the rest of the function. Final state: **65.2% match, 12
+divergent instructions — 3 folded-vs-indexed pairs (4 instructions each:
+the pool load + the read + the add + the write) plus their downstream
+register echoes.** All 12 are directly attributable to this one pattern;
+nothing else in the function diverges.
+
+**Tried, no effect on the fold:**
+- `x = x + 1` vs `x += 1` (longhand vs compound assignment) — identical
+  output either way; ruled out CSE-on-the-lvalue-expression as the
+  trigger.
+- Fixing an unrelated real bug in the same function (a mis-sized helper
+  struct causing a loop-stride error) — improved match% elsewhere but
+  left this pattern completely unchanged, confirming it's independent
+  of the rest of the function's shape.
+
+**Not yet tried (candidates for a future brief to test):** forcing the
+compiler to keep the *bare* base pointer live across the call via an
+extra dummy read of a different offset right before the `bl` (denying
+the optimizer a "only one offset used near this call" shortcut);
+restructuring the three sites to route through one shared `goto` target
+so there's only one static occurrence of the increment in the source
+(the mode-1→2 fallthrough in brief 582's Target 2, `func_02037dc0`, hit
+a *different but adjacent* mwcc choice — whether to hoist a sub-table
+pointer above or keep it inside a loop body — and relocating the
+computation to match orig's placement fixed both the extra instruction
+and a register-allocation ripple in one move; worth testing whether the
+same "match orig's exact placement, don't consolidate" principle
+transfers here). Two more independently-observed instances (not just
+this one function) would confirm the pattern is systemic rather than
+this-function-specific and make a targeted coercion search worth a
+dedicated timebox.
+
+**Counter-lever status (brief 586):** not found yet. `func_ov002_022b809c`
+(908 B, the brief-582 Target 3 this brief finished) has a superficially
+similar-looking repeated access — a parameter-relative field
+(`self+0xc00+0x6a`) read 5+ times across multiple `bl` calls — but that
+case does **not** exercise this wall at all: `self` arrives in a
+register at function entry (no literal-pool load involved for the base
+in the first place), so there's no pool-materialization decision for
+mwcc to make. That function's repeated-read pattern (deliberately
+written as a fresh `*(...)`cast each time, matching orig's own re-reads,
+per the C-1-adjacent lesson that hoisting into a shared local can change
+codegen even when the value doesn't change) compiled correctly, but it
+isn't evidence about P-16 specifically — P-16 requires a **global
+symbol** (needing its own pool entry) at a **constant offset**, not a
+parameter/register-relative access. A real counter-lever test needs a
+fresh target that repeats a `global_symbol+K` lvalue 3+ times across
+calls; none of this brief's picks happened to have that exact shape
+(see the per-target notes in `brief-586-ceiling-r2.md` for what shapes
+they did have).
+
+**Affected picks:** `func_ov002_02269534` (parked, not shipped —
+this is the sole reason it doesn't reach 100%). **Status: PERMANENT
+until a counter-lever is found or confirmed absent by exhaustive C-shape
+sweep** — filed as P- (permanent-for-now), not C- (confirmed coercible),
+pending that future investigation.
+
 ## Codegen-inherent edge cases (3 patterns)
 
 Drops that the C language genuinely can't express. Future pilots:
