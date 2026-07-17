@@ -17,6 +17,10 @@ src/usa/main/func_02000950.s:
 src/usa/main/func_020009fc.s:
     complete
     .text start:0x020009fc end:0x02000a74
+src/usa/main/AutoloadCallback.c:
+    complete
+    .text start:0x02000a74 end:0x02000a78
+
 src/usa/main/func_02000a78.s:
     complete
     .text start:0x02000a78 end:0x02000b60
@@ -26,6 +30,10 @@ src/usa/main/func_02000b60.s:
 src/usa/main/func_02000b64.s:
     complete
     .text start:0x02000b64 end:0x02000b68
+src/usa/main/main.c:
+    complete
+    .text start:0x02000c34 end:0x02000c44
+
 src/usa/main/func_02000c44.c:
     complete
     .text start:0x02000c44 end:0x02000c4c
@@ -1376,6 +1384,10 @@ src/usa/main/func_02018a88.s:
 src/usa/main/func_02018ae0.s:
     complete
     .text start:0x02018ae0 end:0x02018af4
+src/usa/main/GetSystemWork.c:
+    complete
+    .text start:0x02018af4 end:0x02018b00
+
 src/usa/main/func_02018b00.c:
     complete
     .text start:0x02018b00 end:0x02018b14
@@ -10718,6 +10730,38 @@ libs/nitro/func_020903b0.legacy.c:
 src/usa/main/func_020902ec.s:
     complete
     .text start:0x020902ec end:0x0209036c
+src/usa/main/OSi_IrqHandlerTimer3.c:
+    complete
+    .text start:0x0209036c end:0x0209037c
+
+src/usa/main/OSi_IrqHandlerTimer2.c:
+    complete
+    .text start:0x0209037c end:0x0209038c
+
+src/usa/main/OSi_IrqHandlerTimer1.c:
+    complete
+    .text start:0x0209038c end:0x0209039c
+
+src/usa/main/OSi_IrqHandlerTimer0.c:
+    complete
+    .text start:0x0209039c end:0x020903ac
+
+src/usa/main/OSi_IrqHandlerDma3.c:
+    complete
+    .text start:0x020903ac end:0x020903bc
+
+src/usa/main/OSi_IrqHandlerDma2.c:
+    complete
+    .text start:0x020903bc end:0x020903cc
+
+src/usa/main/OSi_IrqHandlerDma1.c:
+    complete
+    .text start:0x020903cc end:0x020903dc
+
+src/usa/main/OSi_IrqHandlerDma0.c:
+    complete
+    .text start:0x020903dc end:0x020903ec
+
 src/usa/main/func_020903ec.s:
     complete
     .text start:0x020903ec end:0x02090488
