@@ -8,7 +8,7 @@ AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
 - **Brief 578** — **#1146**, “Brief 578: EUR data-blob emitter — close last 2 non-function gaps”: **Both blobs shipped** (`func_020b2d2c` and `func_020b3c78`); EUR delinks reports `units: 10333/10333 (100.00%)`; the only unclosed bytes are the permanent 42-file ISA floor.
-- **Brief 577** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 577** — **#1147**, “Brief 577: main floor autopsy — 12/14 shipped via 3 root-caused tool bugs”: **12 of 14 parked functions (6/region) shipped**, root-caused to 3 distinct tool bugs in `asm_escape.py`'s whole-function emitter.
 - **Brief 576** — **#1144**, “Brief 576: definitive endgame ledger”: added the post-drain endgame ledger covering USA/JPN main-floor parks, ov002 Wave-11 populations, EUR data blobs and non-floor parks, the ISA floor, parked C-match families, and the ITCM count-level residual.
 - **Brief 575** — **#1145**, “Brief 575: ov002 mop-up”: USA **SHIPPED 0**, JPN **SHIPPED 0**; both dry-runs and full runs found zero remaining candidates.
 - **Brief 574** — **#1142**, “Brief 574: add path to 100% coverage tracker”: added a dated, build-free USA/JPN post-ov002 Waves 9-10 tracker, the EUR 77-function closeout floor, and git ls-files inventory counts.
@@ -28,8 +28,8 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
 - **Brief 560** — **#1129**, “main: match VRAM 16-member threshold-dispatch family (brief 560)”: **16/16 EUR matches**, ported to USA+JPN for **48 ships total**.
 - **Brief 559** — **#1127**, “Brief 559: add C-match sweep queue”: queued **22 functions across 4 family rows**.
 - **Brief 558** — **#1130**, “Brief 558: finish USA/JPN ov002 drain and open post-ov002 sweep”: USA ov002 **107 shipped**, JPN ov002 **223 shipped**; post-ov002 Wave 1 **85/85** and Wave 2 **71/71**.
-- **Brief 557** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
-- **Brief 556** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 557** — ran without a dedicated PR (PC-brain stint — see docs/state.md history).
+- **Brief 556** — ran without a dedicated PR (PC-brain stint — see docs/state.md history).
 - **Brief 555** — **#1125**, “Brief 555: wire m2c --context into m2c_feed”: wired `m2c --context` into `m2c_feed`; the PR body reports **2497 passed, 7 skipped** for the full repo suite.
 - **Brief 554** — **#1126**, “Brief 554: USA/JPN ov002 drain — wave 9 (300 shipped)”: USA **150/150 shipped**, JPN **150/150 shipped**, **300 shipped** total.
 - **Brief 553** — **#1123**, “Brief 553: post-ov002 runbook + census refresh”: refreshed the wine-free census at **zero drift on any of the 21 post-ov002 modules** and added the post-ov002 runbook.
@@ -39,9 +39,9 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
 
 ### No merged PR found (briefs 579-581)
 
-- **Brief 581** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
-- **Brief 580** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
-- **Brief 579** — no merged PR found in `gh pr list --state merged --limit 60 --json number,title,body`.
+- **Brief 581** — **#1148**, “Brief 581: prune superseded c-match prep scaffolds”: **Final scope: 473 scaffold deletions plus 2 documentation edits.**
+- **Brief 580** — **#1149**, “Brief 580: add unified readable-C C-match queue”: **Documentation-only change.**
+- **Brief 579** — **#1150**, “Brief 579: C-match overlay sibling families (readable-C frontier)”: **7/7 attempted exemplar+sibling matches at EUR objdiff 100%, all ported USA+JPN, 3-region `gate3.py` green.**
 
 - **Briefs 548/549 (2026-07-08, Mac).** **#1118** (b548, drain w6): 300 ov002 `.s` (150/150),
   first 150/150 clean sweep (seeded out the 2 known verify-fails); ~555 USA + 671 JPN ov002
