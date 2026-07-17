@@ -1,0 +1,1815 @@
+# State log
+
+Historical dated round log moved verbatim from `docs/state.md` by Brief 599.
+Entries remain newest-first; standing references stay in `docs/state.md`.
+
+**Previously (2026-07-09):** The Windows brain merged **b550** (drain w7: 300 shipped, first LIVE confirmation
+of the b549 fix — the previously-"walled" C-absorbed funcs shipped) + **b551** (post-ov002 work
+order). CHAPTER: USA/JPN `.s` drain. ov002: **7 waves = 2,100 ov002 `.s`**; ~405 USA + 521 JPN
+remain (~3 waves), then the b551 turnkey **10-wave POST-ov002 sweep**
+(`docs/research/campaign-analytics/post-ov002-drain-workorder.md`: 21 modules, 1,350 candidates,
+20 overlays 100% clean, 52 `main` REFUSE all b549-recoverable, 0 walls). **~13 paired waves to
+~99%.** Mac = ONE wine drain lane (scaffolder) + wine-free decomper. Next queued: b552 drain w8,
+b553 wine-free post-ov002 runbook + post-w7 census refresh. ⚠️ AGENTS.md closed-brief history
+now lives in `docs/briefs/CLOSED-LOG.md` (Windows-brain trim). No open PRs pending review.
+
+**Also this session (brain, autonomous — from the improvement swarm,
+`docs/research/improvement-swarm-2026-07-09.md`):** new **`tools/gate3.py`** = the one-command
+clean-tree 3-region `ninja sha1` gate (use it every merge; `--scope tests` is wine-free,
+`--clean` for delete/move changes) + new **`tools/check_delink_dupes.py`** (wired as a gate3
+preflight: catches the "re-carve doubles a delink → `dsd lcf` overlaps at merge" footgun in
+ms). Fixed the stale obsolete-gate text in `.claude/agents/brain.md` + AGENTS.md item 7 (both
+described the dead `ninja rom`/24-of-27 gate). Deferred (low-value): the `docs/state.md` split,
+`m2c --context` wiring, and 3 standing `func_02086800_dummy` invariant errors (harmless to sha1).
+
+**Brief 561 (foundation fixes, from the r3 improvement-swarm re-run,
+`docs/research/improvement-swarm-2026-07-09-r3.md`):** ⚠️ **NEW 4th metric —
+`units` / `fn` / `code` count a `.s` ship identically to a real C match, so
+none of them track "readable C." `python tools/progress.py --version <ver>`
+now prints a 4th line, `C-decompiled`, computed straight from committed
+`delinks.txt` (no build needed). Going-forward convention: report
+**units/fn/code/C** (4 numbers), not 3. The prior 2026-07-09 snapshot is
+superseded. Current snapshot (committed delinks tier, build-free, 2026-07-12):
+**EUR code 97.41% / C 7.99%; USA code 89.83% / C 7.08%; JPN code 89.83% /
+C 7.08%.** Readable-C is early-stage (~7-8%) and is a
+SEPARATE goal from the `.s` drain (which is close to done on the
+byte-matched-coverage metric) — don't conflate the two, and don't sell a
+`.s`→C port chapter on the headline % (EUR→USA/JPN porting is metric-neutral
+post-drain, since the region already ships the function as `.s`). Also
+landed this brief: `batch_carve.py` branch guard (refuses on `main`/detached-
+at-origin-main unless `--force-branch`) + `check_delink_dupes.py` wired as
+its own preflight; `scaffolder.md`/`decomper.md` agent configs rewritten
+(were ~7 weeks stale, claiming no local toolchain); `post-ov002-runbook.md`
+made cross-platform (was Mac-only: hardcoded paths + `python3.13`) + Wave 11
+added (ov002 mop-up for the ~180 candidates the pivot logic orphans, USA
+~107 + JPN ~73).
+
+**Round 552/553 DONE:** both merged. **b553** (PR #1123, docs-only) = post-ov002 runbook +
+census. **b552** (PR #1124, drain w8) = 300 ov002 `.s` (150/150), merged on the **first real
+`tools/gate3.py` 3-region run — GATE PASS** (delink preflight OK, eur/usa/jpn all byte-identical,
+pytest green). ov002: **8 waves = 2,400 `.s`; ~257 USA + 373 JPN remain** (USA ~2 waves, JPN
+~2-3), then the post-ov002 sweep (runbook ready). Next queued: **b554** scaffolder drain w9,
+**b555** decomper wine-free `m2c --context` wiring (quality-lane quick-win from the swarm).
+
+**Previously (2026-07-08):** briefs 548/549 (PRs #1118/#1117) — drain w6 (300) + the
+`asm_escape.diff_words` comparator fix that vindicated the census's "0 walls" (brain-proved via
+real `usa ninja sha1`).
+
+**Previously (2026-07-08):** briefs 546/547 (PRs #1116/#1115) — drain w5 (296) + full-runway
+census (the census whose "0 walls" b549 then vindicated).
+**Previously (2026-07-07):** briefs 544/545 (PRs #1114/#1113) — drain w4 (316) + wired
+`--allow-absorbed-offset` into batch_carve.
+
+**Previously (2026-07-03, Fable 5):** post briefs 515–518 round merge (PRs #1080/#1083/#1084/#1085). Briefs
+478–518 ran from the PC brain: the `.s` mechanical drain COMPLETED and the campaign
+pivoted to **C-MATCH waves** (shipped `.s` → matching C; HIGH/MED tiers,
+containment-gated, safe-queue work orders — state lives in
+`docs/research/campaign-analytics/` + `retriage/INDEX.md` + per-wave briefs).
+This round: **#1080** decomper 3 retriage `.s`→C + USA/JPN ports (ov000/007/022;
+brain fixed 2 delink inversions); **#1085** scaffolder 3 HIGH `.s`→C + ports
+(75% contained-yield); **#1084** R10 retriage — MAJOR: 1,350/1,361 "unexamined"
+were already GLOBAL_ASM-shipped (true unexamined ≈ 11; retriage frontier ~closed)
++ containment_check.py overlay-disambiguation hardening (brain-reviewed: SAFE,
+fixes a real silent-wrong-overlay bug); **#1083** reshape-recipe catalog (6
+recipes) + safe-queue-v3 (150 never-attempted candidates; fixed a tiebreak
+scoring bug). Next: b519 HIGH w11 (first true v3-queue wave) + b520 MED w7 +
+R10 follow-ups.
+
+⚠️ **LATENT JPN BREAK caught + fixed at this gate (not from these PRs):** `main`
+had been broken for FRESH JPN builds since 2026-06-28 — commit `bd74e172`
+("wave 3 batch 7 ports") accidentally swept 3 address-adjacent JPN `.c` files
+into its deletion (`func_02005be0/0200620c/020062f8`) without reverting their
+delink entries → `mwldarm: Specified file not found` on any clean tree. Every
+"JPN sha1 OK" since rode on STALE incremental `.o`s. Brain restored the 3
+sha1-proven `.c` from `bd74e172^` (+ reconfigure) → JPN green. **LESSON
+(recurring class, cf. b459 stale-.o claim): agent gates on incremental trees
+can mask missing-source breaks; the brain's clean-tree 3-region gate is the
+only reliable arbiter. Also: a port wave's commit should never delete files
+outside its stated scope — watch for neighbor-sweep in `git add -A` commits.**
+**Metrics (committed delinks tier, build-free, 2026-07-12; Brief 565):** EUR
+units **100.00%** / fn **not emitted by build-free progress.py** / code
+**97.41%** / C-decompiled **7.99%**. **USA units 100.00% / fn not emitted by
+build-free progress.py / code 89.83% / C-decompiled 7.08%; JPN units 100.00%
+/ fn not emitted by build-free progress.py / code 89.83% / C-decompiled 7.08%**.
+The committed `config/<ver>/**/delinks.txt` tier is the no-build source of
+truth; do not substitute function percentages from a machine-local
+`report.json`. ⚠️ **Also new as of brief 561: `units` / `fn` / `code` all count
+a `.s` ship identically to a real C match, so none of them track "readable C"
+as a goal — the C-decompiled metric above does.** ⚠️ USA/JPN reports were
+BLOCKED by a NEW objdiff-cli panic variant
+(arm.rs:130 `len 1/idx -1`): a gap TU with data-FIRST `.text` (`BuildInfo` OBJECT
+at 0x0 before `main` FUNC, no mapping symbols — USA `_dsd_gap@main_202.o`).
+Brain shipped **objdiff_filter_panic_units v3** (drop data-first `.text` units;
++ regression test; 16/16 pass) — the brief-187 filter's third variant. JPN's
+pipeline also dropped 759 case-B (planned-uncompiled routing-tier) units this
+run vs USA's 1, so cross-region unit TOTALS differ slightly this round;
+restabilizes on the next standard end-to-end report.
+
+---
+**Prior (briefs 476+477 merge, 2026-06-23):** **#1016 decomper = 710 USA/JPN overlay `.s`** (ov006
+88+88, ov004 164+164, ov011 103+103 — all 3 overlays drained both regions, 3-region
+green, EUR untouched). **#1015 scaffolder (WINE-FREE, ran parallel, zero contention)
+= fixed the dominant `asm_escape` park class** (disassembly size-overrun: parse_objdump
+swallowed adjacent named SDK/data syms → oversized .text failing only at ROM gate =
+the JPN main gate-fails func_020943b0/func_020a60a8). Recovers 8 + the gate-fails;
+flagged known_verifyfail_ov002.txt 134/134 stale; 47 tests. ⚠️ **#1016 ran ~5h
+(chained 3 overlays) → NEW RULE: cap waves at one module / ~150–300 ships** (b478+).
+**Metrics (post b476):** EUR 96.57% / 95.21% / 87.48% (untouched). **USA units
+69.23→72.80% / fn 34.85→38.45% (+3.6pp) / code 7.68→14.34% (≈DOUBLED).** **JPN units
+67.53→71.56% / fn 30.74→34.33% (+3.6pp) / code 6.61→13.27% (≈DOUBLED).** The overlay
+drain carried big funcs → USA/JPN code-bytes jumped ~2×. Runway: USA main ~2,288 +
+JPN main ~2,694 (the big remaining vein) + thinning overlays. b477 size-overrun fix
+unlocks the JPN main gate-fails for b478.
+
+---
+**Prior (brief 475 merge):**
+**post brief 475 merge** (decomper solo-Mac USA/JPN `.s` drain: **596 ships**, PR #1014,
+3-region green). First wave on the GPT-5.5-High codex agents — clean +
+disciplined (correct bisect/park, locked-main worktree handled); validates the
+gate-makes-model-safe principle on a 4th model. Lane count follows the machine
+(Mac single / PC dual).
+
+**Metrics (post b475):** EUR units **96.57%** / fn **95.21%** / code **87.48%**
+(untouched this round). **USA units 67.68→69.23% / fn 31.80→34.85% (+3pp) / code
+6.66→7.68%.** **JPN units 65.99→67.53% / fn 27.71→30.74% (+3pp) / code 5.77→6.61%.**
+596 `.s` in one solo-Mac wave moved both regions +3pp fn — the USA/JPN mechanical
+lane is the project's engine now. Runway: USA main 2,288 + JPN main 2,694 + non-ov002
+overlays ~1,030/region ≈ 7,000+ funcs left (many waves).
+
+---
+**Prior (briefs 470–474 merge):**
+(reconciled — these ran on the PC brain + a codex agent while Mac was idle; Mac
+brain verified/merged the final #1012/#1013 on a clean 3-region gate and
+reconciled bookkeeping). **Canonical per-round detail = `docs/research/brief-47x`
++ PRs #1006–#1013 + git history (the PC brain didn't update AGENTS.md/state.md).**
+
+**Metrics (post b474):** EUR units **96.57%** / matched_fn **95.21%** / code
+**87.48%** — nearly complete. USA units **67.68%** / matched_fn **31.80%** / code
+**6.66%**. JPN units **65.99%** / matched_fn **27.71%** / code **5.77%**. Drivers:
+ov002 lower `.s` waves (EUR fn 91→95%, code 82→87%) + USA/JPN main `.s` drain
+(USA fn +2pp, JPN +2pp). ov002 UPPER exhausted; ov002 lower ≈343 left; USA/JPN
+main `.s` = the open frontier.
+
+⚠️ **TWO-BRAIN COORDINATION is the live process issue** (not a code issue): Mac +
+PC brains drift on AGENTS.md/state.md + brief numbering. Pending user decision on
+who drives + a single bookkeeping source of truth. See AGENTS.md § Open briefs.
+
+---
+**Prior round (briefs 468+469):**
+**This round = USA/JPN `.s` drain at scale + the dual-lane wineserver-contention
+verdict (this is why the round dragged + needed manual pause/resume):**
+- **#1004** decomper (b469) — **+386 USA main + 140 JPN main `.s` (526)**, ~96-99%
+  clean, 3-region green. + 3 `tools/` fixes: asm_escape bare `[pc]` pool miss;
+  batch_carve `carved_addrs()` name-derived addrs; wine-contention robustness
+  (`_wait_wine_quiet()` before link + `GateTimeout` caught in `_bisect`). JPN main
+  opened. The USA/JPN megalever is the growth frontier.
+- **#1005** scaffolder (b468) — only **+2 ov002 lower `.s`, CONTENTION-LIMITED**
+  (0 verify-fail above 0xcc; the low count is the wineserver, not clean-rate).
+  ⚠️ **VERDICT: two `batch_carve` lanes CANNOT share the machine-wide wineserver**
+  — continuous decomper building starved every EUR gate (all timed out). → don't
+  run both batch_carve drivers concurrently; single heavy lane / serialize. 619
+  ov002 funcs remain above 0xcc.
+- ⚠️ **OPEN DECISION (next round): lane strategy.** USA/JPN `.s` (decomper) is the
+  megalever + frontier; EUR ov002 (scaffolder) is nearly done + lower-value. Brain
+  to pick single-lane vs retry-dual-with-fixed-tool (#1004's flock-lock +
+  `_wait_wine_quiet` now on main for BOTH lanes) — pending user input.
+
+**Metrics:** EUR units **94.95%** / matched_fn **91.47%** / code **82.14%** (+2).
+**USA jumped: units 65.24→66.68%, matched_fn 25.72→29.66% (+3.9pp), code
+5.56→6.13%** (+386 main `.s`). **JPN moved too: units 64.93→65.25%, matched_fn
+24.34→25.77% (+1.4pp), code 5.51→5.56%** (+140 main `.s`). The USA/JPN `.s`
+megalever moves BOTH regions — the project's growth engine.
+
+---
+**Prior round (briefs 466+467):** **This round = the USA/JPN `.s`
+megalever OPENED — both agents now run mechanical batch_carve (dual lane):**
+- **#1003** scaffolder (b466) — 77 ov002 lower-half ARM `.s`. **Found a verify-fail
+  WALL at the 0xbc–0xcc size band** (52%→2% clean), recovering to 100% at 0xcc+ —
+  size-driven (not overlay-swap), likely byte-pack/mwcc threshold; 73 parked
+  (permuter/RE). **621 carvable funcs remain above 0xcc.** → b468 continues above
+  the wall.
+- **#1002** decomper (b467) — **USA/JPN `.s` drain pilot CONFIRMED: 135 USA main
+  `.s`, 90-98% clean, USA sha1 green every gate** + `batch_carve --srcdir` flag.
+  **The new primary USA/JPN growth lever** (region-port clean lane tapped).
+  Census: **~8,500 decomper-owned uncarved funcs** (USA main 3,082 + USA overlays
+  1,164 + JPN ≈equal). `--min-addr 0x02000000` mandatory for main. → b469 scales.
+- DUAL-LANE wine-coexist works (`--gate-timeout 180`; 2 managed GateTimeouts on
+  the scaffolder side). Both PRs merged clean; 22 batch_carve tests pass.
+
+**Metrics:** EUR units **94.95%** / matched_fn **91.45%** / code **82.12%**
+(+77 ov002 `.s`). **USA moved on the pilot: units 64.93→65.24%, matched_fn
+24.34→25.72%, code 5.51→5.56%** (+135 USA main `.s`). JPN flat (64.93%/24.34%/
+5.51% — pilot was USA-only; b469 brings JPN). The USA/JPN `.s` lever is live.
+
+---
+**Prior round (briefs 464+465):**
+**This round = ov002-lower lane scaling + region-port clean lane CONFIRMED tapped:**
+- **#1001** scaffolder (b464) — **150 ov002 lower-half ARM `.s`** (3× `--limit 50`
+  batches, 100% clean). Pinned the root cause of #997's bad census: **`batch_carve
+  --min-addr` defaults to 0x02234000** → prior censuses only saw the upper half.
+  **772 carvable ov002 lower funcs remain** (~5 waves). Ship-step fixed (chunked
+  batches under the background cap; clean worktree).
+- **#1000** decomper (b465) — **main no-sibling VERDICT: exhausted** (0/256
+  recoverable; 239 divergent, 17 size-mismatch, 1 byte-identical ported). Region-
+  port clean lane fully tapped → b467 pivots decomper to the **USA/JPN `.s`
+  mechanical drain** (USA/JPN code is only 5.51% — the biggest untapped lever).
+- ⚠️ **#1000 mislabeled a cosmetic ov010 extern reorg as a "b459 bug fix (stale
+  `.o`)" — INACCURATE:** the decls were present on main since b459 (`193a8afd`);
+  the clean `rm -rf build/*` 3-region gate passed, debunking the stale-`.o` claim.
+  The merge left DUPLICATE externs in usa/jpn ov010_core.h (legal C); **brain
+  deduped** (byte-neutral, re-gated usa/jpn OK). b459 stands as a correct fix.
+- Both PRs merged clean; clean-rebuild 3-region gate green.
+
+**Metrics:** EUR units **94.75%** / matched_fn **90.66%** (crossed 90%) / code
+**81.45%** (+150 ov002 lower `.s`). USA & JPN units **64.93%** / matched_fn
+**24.34%** / code **5.51%**. EUR ~complete; USA/JPN code (5.51%) = the megalever
+b467 pilots (`.s` mechanical drain, the region-port clean lane being tapped).
+
+---
+**Prior round (briefs 462+463):** **This round = ov002 lower-half
+ARM lane confirmed + region-port clean lane found winding down:**
+- **#999** scaffolder (b462) — **100 ov002 LOWER-half ARM `.s`** (2 batch_carve
+  batches), EUR sha1 OK. **Confirms the lane #997 wrongly called empty** (the
+  b461 scout was right). ⚠️ **ship-step miss:** session ended after carving
+  batch 2 but before its commit-on-pass gate — brain re-gated (all 100 clean,
+  dup-clean), committed batch 2, pushed, opened the PR. ~942 ARM funcs remain.
+- **#998** decomper (b463) — **20 main `.c` ports + `port_main()` support**
+  (main = 0x02000000 base + arm9.bin). **KEY FINDING: the clean region-port lane
+  is winding down** — 0 new clean ports across all 22 overlays; main residue =
+  256 no-sibling + 26 divergent. This reconciles the b461 scout's "812 remaining"
+  (most of it is non-portable, not clean runway). → b465 redirected to
+  investigate/unlock the 256 main no-sibling = the real remaining USA/JPN lever.
+- Both PRs merged clean (no conflicts); both gates green.
+
+**Metrics:** EUR units **94.58%** / matched_fn **89.12%** / code **80.42%**
+(crossed 80% code; +100 ov002 lower `.s`). USA & JPN units **64.94%** /
+matched_fn **24.33%** / code **5.51%** (+20 main ports). EUR ~complete; USA/JPN
+growth now gated on the b465 no-sibling investigation + b464 ov002-lower `.s`.
+
+---
+**Prior round (briefs 460+461):** **This round = Thumb
+region-port lane opened + a census correction caught by a brain scout:**
+- **#997** scaffolder — 48 real ov002 gap ships (0xec–0x100, 48/48 clean). ⚠️
+  **but its "EUR ARM lane fully exhausted" census was REFUTED** by a brain
+  runway-scout Workflow (4 read-only scouts) + authoritative spot-check: ov002
+  has **~1,042 genuinely-uncarved ARM funcs** (3,777 symbols − 2,735 carved),
+  almost all LOWER-half (`func_ov002_021ab874` size=0x1ec etc.). #997 ASSUMED
+  the decomper drained the lower half; it didn't. → **brief 462 redirected to
+  drain the ov002 lower-half ARM lane (~1,000 funcs, the biggest open vein),
+  not a thin Thumb pilot.** LESSON: an "exhausted" census must enumerate the
+  FULL range authoritatively, not assume another agent's prior work.
+- **#996** decomper — **first Thumb region-port wave: 66 `.thumb.c` (ov004,
+  33 USA + 33 JPN) + 3 porter fixes** (`.thumb` routing/stem-strip + a
+  Thumb-aware halfword reloc comparator: Thumb BL/BLX reloc lands on the 2nd
+  halfword → the 4-byte ARM window mis-rejected 7 funcs). ov004 Thumb drained.
+- **Runway scout (Workflow, 5 agents, ~276k tok):** ARM census REFUTED (above);
+  Thumb CONFIRMED concentrated in ov004 (thin ~1 wave); region-port runway
+  corrected to **~812 remaining**, top = main(385)/ov006(116)/ov002(79);
+  integration audit = no blockers (comparator sound, no stale files).
+- Both agents ran their ship step; both PRs merged clean (no conflicts).
+
+**Metrics:** EUR units **94.53%** / matched_fn **88.10%** / code **79.85%**
+(48 gap ships). USA & JPN units **64.86%** / matched_fn **24.23%** / code
+**5.49%** (66 ov004 Thumb ports added). EUR essentially complete; USA/JPN
+runway = the ~812-port region lane (b463) + b462's ov002-lower EUR `.s`.
+
+---
+**Prior round (briefs 458+459):** **This round = batch_carve
+at full scale + region porter fixed:**
+- **#995** scaffolder **507 ov002 UPPER `.s`** via `batch_carve.py` (the swarm
+  P2 tool) — the **ov002 UPPER-half ARM lane is FULLY DRAINED** (99.6% clean,
+  2 kind:data parked). Finding: byte-pack drops DON'T climb with size (clean to
+  ~2700-byte funcs). ⚠️ ran as a detached `bash &` (invisible to the app UI) →
+  b460 asks for a UI-trackable launch.
+- **#994** decomper region-port w12 — 20 `.c` ports + **2 real porter bug fixes**
+  (`overlays(N,M)` plural + `_unk` symbols).
+- ⚠️ **DEFECT caught at the brain gate:** #994 hand-authored 2 ov010 funcs
+  (×USA/JPN) using `data_ov010_021b9160/9790` but omitted the `extern` decls →
+  USA/JPN "undefined identifier" (EUR passed, no EUR consumer → #994's own gate
+  missed it). Brain fix `193a8afd` added the decls; all 20 ports kept. **New
+  gotcha (brief 461 + below): a region-only `.c` needs its extern decls in the
+  region `ovNNN_core.h`; an EUR-only gate won't catch a USA/JPN compile fail.**
+
+**Metrics:** EUR units **94.04%** / matched_fn **87.61%** / code **79.35%**
+(+507 large ov002 .s → code +12pp, units 91→94%). USA & JPN units 65.10% /
+matched_fn 24.15% / code 5.48%.
+
+**Lanes next:** scaffolder → **460** (batch_carve on ov002 LOWER + remaining EUR
+ARM veins; UI-trackable launch); decomper → **461** (region-port w13 at scale,
+porter fixed; mind the extern-decl gotcha).
+
+---
+**Prior round (briefs 456+457):** **This round = the swarm
+findings PAID OFF:**
+- **#992** scaffolder built **`tools/batch_carve.py`** (swarm P2): deterministic-
+  lane driver, commit-on-pass / red→bisect-park, 22 tests, a 6-agent adversarial
+  safety review before touching real git; **shipped 50 ov002 `.s` THROUGH it,
+  auto-committed**. The ship-step problem is now structurally solved.
+- **#993** decomper (swarm P3) **cracked the FX_Mul fixed-point wall**:
+  `func_02018f2c` `.s`→`.c` 3-region OK (NitroSDK Q12 dist; `FX_Mul` verbatim
+  from RushRE's bit-identical `fx.h`). Banked SDK identities (FX_Sqrt/FX_Div) +
+  an idiom crib. Honest negative: hard reg-alloc tier still doesn't crack on
+  idioms (corroborates the swarm/b405 verdict).
+- **BOTH agents ran their ship step** (the AGENTS.md enforcement held).
+
+**Metrics:** EUR units **91.20%** / matched_fn **82.42%** / code **67.46%**
+(+50 ov002 .s + FX .c). USA & JPN ~unchanged (24.05% fn / 5.44% code — only the
+1 FX `main` func touched all 3; the region lever moves on the port waves).
+
+**Lanes next:** scaffolder → **458** (ov002 `.s` at SCALE via `batch_carve.py` —
+0x101+ tiers, big auto-committed wave); decomper → **459** (region-port wave 12,
+keep the USA/JPN lever going + apply the FX/SDK crib to overlay SDK-math callers).
+
+---
+**Prior round (briefs 454+455):**
+- **#990** scaffolder ov002 UPPER `.s` wave 13 — **40 ships** (0xc1–0x100 tier).
+- **#991** decomper region-port wave 11 — **1,164 `.c` ports across 20 overlays
+  (582 USA + 582 JPN)**; clean on the first gate (decomper parked its own
+  divergent funcs per the b453 lesson — no brain salvage).
+- **Both agents skipped the ship step (3rd round running)** → brain verified +
+  committed + PR'd both. Ship-step enforcement now in AGENTS.md kickoff
+  conventions; the P2 batch-driver (brief 456) auto-commits to fix it structurally.
+
+**Metrics (objdiff-verified, merged main):** EUR units **91.07%** / matched_fn
+81.90% / code **66.99%**. USA & JPN (identical) units **64.98%** / matched_fn
+**24.05%** / code **5.44%**. 🎯 The overlay-port lane keeps compounding: USA
+matched_fn 9% → 18% → **24%** and code 1.2% → 3.3% → **5.4%** over three port waves.
+
+🛰️ **TOOL-SCOUT SWARM (2026-06-19, 225 agents, ~7.1M tok):** verdict = our
+toolchain is scene-standard / at-frontier; 77/100 candidates rejected. Findings
+APPLIED: (a) process-polish + ship-step enforcement → AGENTS.md; (b) **P2
+batch-driver = brief 456 (scaffolder)**, **P3 peer-corpus idiom mining = brief
+457 (decomper)**. P1 (embedding retriever) + decomp.dev dashboard deferred.
+Full report: `docs/research/tool-scout-swarm-2026-06-19.md`. LLM byte-exact
+matching = partial win for ≤~0x100 tier, NOT the hard-residue unlock.
+
+**Lanes next:** scaffolder → **456** (build batch-carve driver, pilot on an
+ov002 wave); decomper → **457** (peer-corpus idiom mining, crack wall residue).
+
+---
+**Prior round (briefs 452+453):**
+- **#988** scaffolder ov002 UPPER `.s` wave 12 — **58 ships** (whole ≤0xc0 tier;
+  the 23 ≤0x80 "skip residue" were MISSED not dropped, 23/23 clean).
+- **#989** decomper region-port wave 10 — **1,624 ov002 `.c` ports (812 USA +
+  812 JPN)**, the overlay-port lane at scale. **⚠️ LANDED BY THE BRAIN** — the
+  decomper session ended before its ship step (1,624 files sat untracked, no
+  commit/push/PR/doc). Brain verified, found the gate failed on ONE divergent
+  func/region (`func_ov002_02296a18`, struct-offset immediate — objdiff-complete
+  but ROM-sha1-FAIL), parked it (uncompressed-bin `cmp` localise → dsd auto-gap),
+  re-gated USA+JPN OK, then committed/pushed/PR'd the clean ~1,620 + wrote the doc.
+  **KEY LESSON (in brief 455): objdiff per-unit is NOT sufficient for region
+  ports — gate the per-region ROM sha1.**
+
+**Metrics (objdiff-verified, merged main):**
+- **EUR: units 7928/8715 (90.97%), matched_fn 81.50%, code 66.63%.**
+- **USA & JPN (identical): units 63.44%, matched_fn 18.10%, code 3.26%.**
+  🎯 The overlay-port lane WORKED: USA matched_fn **9.3%→18.1% (doubled)**, code
+  **1.4%→3.3% (>2×)** from the 812 ov002 ports. The lever is confirmed; ~487
+  more ov002/region + other overlays (ov004/ov011/ov000…) remain.
+
+**Lanes next:** scaffolder → **454** (ov002 UPPER `.s` wave 13, the 0xc1–0x100
+tier); decomper → **455** (region-port wave 11 — finish ov002 + next overlays;
+MANDATORY per-region ROM sha1 per batch + park divergent + RUN THE SHIP STEP).
+
+---
+**Prior round (briefs 450+451):**
+
+**↓ Below: CATCH-UP after the WINDOWS ARC (briefs 420–449, PRs #952–#985; the
+Windows brain didn't refresh this log, so git log + PR bodies are the record).**
+
+**Windows arc summary — two lanes:**
+- **(A) ov002 `.s` drain, split by half** — scaffolder UPPER (≥0x02234000,
+  ~28/wave, briefs 430/…/448), decomper LOWER (40–50/wave, briefs 441/…/449,
+  size filter now ≤0xc0). Both have MANY waves left (lower half: 288+ ≤0xc0
+  candidates; upper: ~64 in 0x81–0xc0 + more above). ov002 `.s` totals: lower
+  276 (waves 1–9), upper ~10×28.
+- **(B) USA/JPN region-port lane** — decomper, briefs 431–439: ported EUR
+  `main` `.c` to both regions = **660 ports (USA 330 + JPN 330)**. main `.c`
+  clean-port lane DRAINED at b439 → decomper moved to ov002 lower. Region
+  residue/region: 47 SDK-name-blocked (alias 2 syms → unblock 94), 14
+  marginal, 283 divergent (real RE). **Next easy vein: OVERLAY region-port**
+  (ov002 1299/1375 etc. port-clean — hundreds of clean ports) → brief 451.
+
+**Metrics (objdiff-verified this session, post-arc):**
+- **EUR: `complete_units 7842/8629 (90.88%)`, matched_fn 80.61%, code-bytes
+  66.11%** (was 90.52%/73.94%/58.29% at b419 — the ov002 drains pushed code
+  +8pp). EUR `ninja sha1` PASS (re-gated this session after the 30 merges).
+- **USA: `units 916/1472 (62.23%)`, matched_fn 9.29%, code-bytes 1.24%**;
+  **JPN: identical** (916/1472, 9.29%, 1.24%). Both `ninja sha1` PASS
+  (byte-identical ROMs — round-trip DONE). Source-match is EARLY: the 660
+  `main` `.c` ports moved code ~0.70% → 1.24% (main bytes are huge; ports
+  were a fraction). **The overlay-port lane (b451) is the lever** — overlays
+  port-clean and are a big share, so USA/JPN code should climb fast there.
+
+**Lanes now:** scaffolder → **brief 450** (ov002 UPPER `.s`, continue);
+decomper → **brief 451** (PIVOT to USA/JPN region-port: SDK-alias quick win +
+the overlay-port lane — the user-requested frontier). ov002 LOWER idles 1 round.
+
+Op-note (re-derived on Windows): large-tree transient `dsd delink`/`mwasmarm`
+crashes under heavy parallelism — re-run a flaked baseline step before calling
+it broken main (= Verify item 11b).
+
+---
+
+**Prior landmark (briefs 418+419, Mac):** **2,612 ships, crossed 90% units.**
+- **#950** scaffolder (brief 418): asm_escape **intermediate-literal-pool
+  support** (the ~0x1040 edge) + comparator-hole fix (diff_words by reloc) +
+  **12 above-edge ov002 ships**. Negative test shown red-before-green.
+- **#951** decomper (brief 419): **2,600 arm9 `main` `.s` ships** — essentially
+  the entire main vein in one wave. + 6 asm_escape instruction fixes (MCR/MRC,
+  rrx, cond LDM/STM, ALU S+cond, tail-call `.L_FUNCEND`, cross-fn branch) +
+  a size-overrun false-pass fix (`parse_objdump` + `zip(strict=False)`).
+  Main residue parked: 53 kind:data + 6 intermediate-pool (→418 tool) + 15 asm-fail.
+
+**Metrics (objdiff-verified, EUR, post-merge):** **`complete_units 7190/7943
+(90.52%)`** (+2612 = exactly the ships), `matched_functions 7220/9765
+(73.94%)`, **code-bytes 1387438/2380434 (58.29%)** (was ~11% two rounds ago;
+main is the biggest code module so it moved the byte metric enormously — the
+"29%" was a mid-build delinks-approximate read). 3-region `ninja sha1` PASS
+(EUR/USA/JPN) verified on the integration tree + main == that tree (content
+diff empty). **NB:** these are byte-identical `.s` carves (assembly), not C
+decomp — the ROM round-trips from source; readable-C is a separate later pass.
+
+⚠️ **TWO operational hazards hit this round (both recovered, banked):**
+1. **`tools/asm_escape.py` COLLISION** — brief 418 (tooling) and brief 419
+   (needed 6 fixes to carve main) both edited it → merge conflict. Brain
+   reconciled (inline-pool emission + tail-call detection + diff_words +
+   the 6 main fixes; 43 tests pass). LESSON: don't queue two briefs that both
+   edit the shared tool in one round, or expect+plan the reconcile.
+2. **WINESERVER DEADLOCK at build step 0** — the first EUR gate hung 38 min at
+   0% CPU / 0 objects (stale wineserver lock; even `-j1` didn't help). Fix:
+   `pkill wineserver` + relaunch with FULL parallelism (the `-j1` caution is
+   only for concurrent *cross-worktree* wine; single-worktree wants `-j`).
+   Relaunch built 17k+ objects fast. **Brain gate recipe: if a build shows 0
+   `.o` + 0% CPU after a few min, kill wineserver and relaunch parallel.**
+
+**Prior round (briefs 416+417, 2 PRs, both agents ran on CODEX):**
+- **#949** scaffolder ov002 `.s` wave 23 (brief 416): **67 ships** via a
+  size ladder 0x74→~0x1040. **CAPABILITY EDGE FOUND ~0x1040–0x109c**:
+  intermediate literal pools (`....` mwasmarm can't assemble) → brief 418
+  tooling. `.s` total ≈275.
+- **#948** decomper overlay-residue drain (brief 417): **355 `.s` ships
+  across 11 overlays** — drains the non-ov002/main overlay vein. Residue
+  now ~100: ~75 reg-alloc walls + 10 kind:data + **15 Thumb-tooling-
+  blocked**. Flagged+recovered a wine-concurrency artifact (cap ≤4).
+
+**Total: 422 ships this round.** complete_units **4578/5906 (77.51%)**.
+3-region `ninja sha1` PASS verified on the integration tree + on fixed main.
+
+⚠️ **DEFECT caught at the integration gate (the gate earned its keep):**
+PR #948's sweep re-derived `ov010/021b27d8` + `ov017/021b2c8c` (already on
+main from earlier rounds) → squash-merge **doubled** their delink blocks →
+`dsd lcf` "overlaps with previous file", main briefly broke. The agent's
+on-branch sha1 was green (its branch had 1 entry); the doubling is a 3-way
+add-add that only appears on merge. Brain hotfix `4d0122fd` removed the dup
+blocks, 3-region re-verified. **New verify-gate item 10: pre-merge dup-scan
+of touched delinks** + tell sweep agents to dedup vs *current main*.
+
+🤖 **MODEL-MIX DECISION (2026-06-14, grounded — see AGENTS.md § Model
+notes → Per-role recommendation).** This round ran entirely on **Sonnet
+4.6 Max** (brain + both agents) → 310 clean ships, gate green, agents
+found+fixed 2 real bugs. With the deterministic gate, a weaker model
+ships *fewer* answers, never *wrong* ones. Cost: Opus 4.8 = ~1.67×
+Sonnet 4.6 (not ~5×) → low-stakes, pick by capability-fit. **Decision:
+scaffolder→Sonnet (permanent); decomper→Sonnet for sweeps / Opus 4.8 for
+RE rounds; brain→Opus 4.8 (cheap insurance on the judgment seat);
+Fable 5→skip on RE lanes (classifier fallback negates it).**
+
+📊 **Uncarved-function census (post-b418/419).** **main** = essentially DONE
+(2600 carved); residue **74** (53 kind:data + 6 intermediate-pool[now have the
+418 tool] + 15 asm-fail). **ov002** ~2400 uncarved BUT the large-func tier is
+now UNBLOCKED (brief 418 intermediate-pool tool) → scaffolder can drain it all.
+**other overlays** ~100 (~75 reg-alloc walls + 10 kind:data + 15 ov004
+Thumb-tooling-blocked → pending Thumb-emitter brief). At 90.52% units, the
+remaining ~750 incomplete units = ov002 large tier + the ~74 main residue +
+the overlay walls + Thumb. **NEW FRONTIER (user-requested): USA/JPN source
+port** — all 3 ROMs already round-trip, but USA/JPN source-match is ~0.7%
+(they relink delinked objects); most funcs are region-identical so EUR `.s`/`.c`
+should port via `tools/port_to_region.py`. Scout queued (b421).
+
+**Prior round (briefs 405–411, 7 PRs, 68 ships):**
+- #937** decomper RE-giant swarm pilot (brief 405): **1 ship** (ov004
+  `021dd374` Thumb, first-compile byte-exact); P-405 `021dc664` = 143/143
+  structural near-miss; **METHOD VERDICT: fan-out = comprehension tool, not
+  volume lane** (leaner protocol recommended: lead draft + 1 adversarial
+  agent).
+- **#938** scaffolder kind:data harness (brief 406): **BINDING CONSTRAINT
+  DISSOLVED** — A-aligned + B-gap link today; `asm_escape` classify-data
+  5-verdict preflight wired in; **12 parked ov002 funcs shipped**; Thumb
+  gap-object parser fix; m2ctx.py clang fix.
+- **#941** decomper kind:data + Thumb unpark wave (brief 407): **11 ships**
+  (5 kind:data parks + 2 dispatcher twins + 3 Thumb `.s` + 1 P-405 stretch),
+  all-3-region sha1 OK in PR.
+- **#939** scaffolder ov002 `.s` wave 18 (brief 408): **8 ships** (0x5c–0x60).
+- **#943** decomper thin-overlay sweep (brief 409): **16 ships** across
+  ov018/020/021/022/023; 3 optional extras seeded to brief 413.
+- **#940** scaffolder ov002 `.s` wave 19 (brief 410): **8 ships** (0x60).
+- **#942** scaffolder ov002 `.s` lower-pool wave 20 (brief 411): **12 ships**
+  (sizes 0x2c–0x6c, lower address band — confirms lower pool is productive).
+
+**(Prior round total: 68 ships.)**
+
+**Current metrics (EUR — objdiff-verified on merged main, 3-region sha1 PASS):**
+**`complete_units 7190 / 7943 (90.52 %)`** (+2612 = exactly the ships),
+`matched_functions 7220 / 9765 (73.94 %)`, **code-bytes 1387438 / 2380434
+(58.29 %)** (was ~11 % two rounds ago — the main carves moved it enormously).
+3-region `ninja sha1` PASS (eur / usa / jpn) on the integration tree; final
+main content-identical to it.
+Note: `.s` ships are byte-identical assembly, not C (round-trips, readable-C is
+a later pass); Thumb `.s` under-counts in `complete_units` (metric-canon).
+
+Previously: *tree breakage from `m2ctx.py -fworking-directory`* — **FIXED in
+brief 406 / PR #938.** `ninja sha1` / `objdiff` / `report` all run clean.
+
+**Overlay census (brief-401-corrected — count carves by ADDRESS):** ov002
+~2556 uncarved (scaffolder), main 2677 (legacy/region-complex, parked).
+Per-overlay residue is now **reg-alloc-finicky near-misses + detailed
+builders + jump-table/switch-tree walls everywhere** — no fresh easy
+clean-C tier anywhere (the brief-401 verdict that sets the 403 routing
+direction).
+
+**Prior (Windows session 2, briefs 366–392): ~24 PRs (#892–#915), THE
+PIVOT = the `.s` ENDGAME** (permuter proved niche; clean-C tapped) — both
+agents `.s`-converting reg-alloc walls at scale; Mac reconciled (#916/#917).
+
+🔻 **Permuter: SETTLED (brief 403, the final word).** 0/2 on
+freshly-diagnosed overlay targets (plateaus ~8k/7k iters); combined
+fresh-target record 3/10 (363+403), all 3 on main. **Overlay endgame =
+`.s` + hand-levers; the permuter is a last-resort probe, not a lane.**
+The productive replacement is LEVER-TESTING on the fresh diff — both 403
+`.c` ships were one-recompile cracks (the new COMMUTATIVE-POOL-LOAD
+lever: first-evaluated operand's constant takes the pool slot, partner
+derived via barrel-shifter operand-2; + `volatile` ptr pins store
+order). **m2c stays vendored** (clean-C accelerator).
+
+🧰 **kind:data constraint DISSOLVED (brief 406).** The binding wall was
+5% real: A-aligned + B-gap both link today; only C-absorbed (no named def)
+Undefined-fails. `asm_escape` now preflights every carve (5 verdicts). All
+~19 previously-parked funcs classified A or B → shipped in briefs 406–407.
+The dispatcher twins and ov004 Thumb reg-walls also unparked (B-gap +
+Thumb-gap parser fix). **No new kind:data backlog.** Park rule going forward:
+park on REFUSE, not on kind:data presence.
+
+🤖 **Model mix (Fable 5 / Opus 4.8) — posture in AGENTS.md § Model notes:**
+4.8 = calibration floor; Fable 5 gains = stretch upside; classifier fallback
+= expected behavior (note, never evade). Swarm fan-out verdict (brief 405):
+use for comprehension-bound giants + a leaner protocol (lead draft + 1
+adversarial agent), not as a volume lane.
+
+🪓 **The `.s` endgame (the volume lane).** Project at **77.51% units**.
+Project at **90.52% units / 58.29% code**. main is essentially carved (2600);
+the intermediate-pool tool (b418) unblocked ov002's large tier. Remaining EUR
+work: ov002 large tier (scaffolder, now unblocked), ~74 main residue, overlay
+walls, Thumb. Then the USA/JPN port frontier opens.
+
+🔁 **Where we are (lanes — collision-free by module).**
+**scaffolder → brief 420** = ov002 full drain WITH the new intermediate-pool
+tool (the large ≥0x109c tier is now shippable — drain it + continue the
+mechanical tiers; big vein). **decomper → brief 421** = (1) finish main
+residue (6 intermediate-pool via the 418 tool + classify the 53 kind:data A/B
+vs C + 15 asm-fail), then (2) **USA/JPN port SCOUT** — quantify how much of
+EUR's matched `.s`/`.c` ports clean via `tools/port_to_region.py`, pilot a
+sample, size the divergent residue (mostly in main). Both Sonnet/Codex-class.
+**Pending: Thumb-emitter tooling** (15 ov004). Collision-free: scaffolder
+tools/+ov002; decomper main+region configs.
+
+🗂️ **Settled / reference:** walls P-11, P-15, switch-case-body-layout
+(brief 305). ov004 `dsd check symbols` noise = benign label-drift, leave it
+(#818 diagnosis, `docs/research/ov004-check-symbols-diagnosis.md`); the
+project gate is `ninja sha1` + `dsd check modules`. ntrtwl branch parked
+(land/drop on request).
+
+🛰️ **Ecosystem scout (brain swarm) + two spawned follow-up sessions.**
+Verified wins for when cold-RE starts: (1) **m2c arm-mwcc-c** — a real
+ARM decompiler that knows mwcc, the genuine Track-2 accelerator (pilot
+free via decomp.me Decompile button); (2) **dsd-ghidra** (Ghidra primed
+with our symbols) + **dsd `sig`** (auto-ID lib funcs) — both unused;
+(3) **TWEWY** (CC0, our exact 2.0/sp1p5) = the one net-new SDK port pool.
+We're the most tooling-advanced project in the ecosystem (codegen-walls.md
+leads). ⚠️ **Two spawned Claude Code sessions** (origin 1dfcadb5…) acted
+on the ntrtwl finding and left it uncommitted on main; brain preserved +
+verified it on branch `brain/ntrtwl-vendor-pool-review` (49 tests pass,
+ruff clean). Finding: the ntrtwl wireless pool is ~99 % already-complete
+(33 net-new, 5 exclusive) — NOT a goldmine; see `reference_ntrtwl_pool`
+memory + `ntrtwl-nitrosdk-feasibility.md`. Branch awaits a land/hold call.
+
+🤖 **Workflow hardening (Opus 4.8 review, PRs #728 + #730 + #731).** The
+verify gate is now paste-the-output: paste-or-FAIL SHA1 tails, captured
+state block, metric provenance, authorization-source for destructive
+ops, end-of-round checklist; + falsification-for-permanence claims,
+test-must-red-on-bad-input, Success = artifact, neutral what-didn't-land,
+untrusted-content rule. Posture: 4.8's diligence gains are short-context;
+the brain runs in the long regime the evals don't cover → integrity =
+captured artifacts, not narrative. Both agents already show these
+unprompted (brief 253's evidence-backed non-shippers). See AGENTS.md
+§ Verify gate and round discipline.
+
+🧭 **Next round queued (254 + 255):** above. Brief 256's direction
+depends on 254(A)'s Track-2 ship-or-over-fire verdict.
+
+🎯 **Brief 246 — both brief 245 escapes resolved via existing
+gotcha 7.** No new gotcha needed. Key methodology lesson surfaced:
+**count the orig's desired temp register FIRST, then gotcha 7
+mechanically picks the right arg count**. Important correction:
+brief 245 misdiagnosed `02087528` as an objdiff scoring quirk —
+it was actually real reg-alloc divergence (bytes really didn't
+match). objdiff was correct. The new diagnostic discipline
+prevents this misdiagnosis going forward. Cluster scout repeated:
+no new >100-pick clusters after C-42 drain. Top-5 unchanged from
+brief 241 (55/45/40/26/20 picks). C-42 itself dropped from 851 to
+539 unmatched picks across waves 1-4 — the drain is coming out of
+C-42's own population, not adjacent clusters. Brief 246 also
+proposed an additive symptom→gotcha lookup table for
+recipe-gotchas.md (deferred to brain decision, not landed).
+
+⚠️ **Brief 247 — 19 .c at 73% C-yield, surfaced 4 NEW escape
+patterns.** Halted at first repeat escape per brief discipline.
+**Important new lesson surfaced: yield correlates with sub-shape
+homogeneity, not recipe-library maturity.** Wave 4's 94% yield
+came from sibling families (tag6+sp3 same-recipe 25 times). Wave
+5's 73% yield came from main-heavy thunks where each pick had a
+unique shape. The yield drop isn't a recipe-library regression —
+it's that the remaining cohort is shape-diverse. **For brief 249+:
+hunt sibling families and exhaust them, not random picks from the
+cohort.** 4 new escape patterns filed for brief 248:
+- **N1** sub-shape 2 with trailing void helper (gotcha 8 doesn't
+  apply when there's a `bl` after the field write)
+- **N2** predication collapse (`if (X) return 0` collapses to
+  `moveq+popeq` even with braces — overrides gotcha 5)
+- **N3** nested struct ptr-alias (mwcc inlines `&self->inner` to
+  a single offset; orig pre-computes the alias in a callee-save reg)
+- **N4** 2-helper if-else r3 vs r1 reg-alloc (orig picks r3 for
+  pool temp; ours picks r1; no obvious source-side lever)
+
+**C-42 cohort drain progress** (now 5 waves):
+brief 238 (30) + brief 240 (8) + brief 241 deferred (8) + brief
+243 (22) + brief 245 (33) + brief 247 (19) = **127 picks** of
+~860 original C-42 cohort. Remaining ~535-540 picks. With brief
+247's lesson now folded in, brief 249+ should pursue
+sibling-family hunting for sustained 85-94% yield rather than the
+73% baseline.
+
+**The "scaffolder unblocks, decomper surfaces" cadence is now
+fully validated across 4 iterations.** Brief 246 resolved 2/2
+escapes (100% lock rate sustained: 9 of 9 patterns across briefs
+242/244/246). Methodology + catalog converge fast on any new
+escape — the catalog is mature enough that escapes increasingly
+turn out to be misapplications of existing gotchas rather than
+genuinely new patterns.
+
+🎯 **Brief 244 — 5/5 reg-alloc patterns LOCKED, no P-14
+again.** Brief 243's 5 new sub-patterns (6-10) all yielded to
+brief 242's methodology. Pattern 6 (pointer-double-store) → gotcha
+8 family (return helper_ret keeps r0 live). Pattern 7 (switch-on-
+ldrh) + Pattern 10 (indexed-ldr) → gotcha 7 direct (2-arg / 3-arg
+pass-through). Pattern 8 (stmia fusion miss) → gotcha 10
+(`.legacy_sp3.c` — was a tier misclassification, not reg-alloc).
+Pattern 9 (loop counter / index) → **NEW gotcha 11**
+(declaration order — declare loop var FIRST). 7 worked examples
+shipped. recipe-gotchas.md now 11 gotchas + 6-step diagnostic
+order. **The "reg-alloc divergence" framing is now a settled
+solved class — methodology + catalog converge fast on any new
+escape pattern in this family.**
+
+🎯 **Brief 245 — 33 .c at 94% C-yield, the highest yield of any
+C-42 wave so far.** Decomper drained 33 of 35 attempted (12 main
++ 21 ov002), shattering brief 243's empirical 70-75% expectation.
+The expanded recipe library (gotchas 1-11 + 4-step diagnostic) is
+now mature enough that high-yield mechanical drain dominates over
+escape-pattern discovery. Sub-shape coverage: tag6 bitfield
+single-helper (10), tag6 bitfield if-else 2-helper (7), pool +
+global check (3), pool-deref 2-fields + helper (3), sp3-routing
+ptr-null + helper (4), sp3-routing other (6). Only **2 escapes**
+filed for brief 246: `02087528` (objdiff fuzzy 66% despite
+matching bytes — relocation scoring issue), `02259f74` (`movhi`
+unsigned-compare variant of sub-shape 2 — gotcha 7 doesn't
+generalise to this variant).
+
+**C-42 cohort drain progress.** Total drained across waves 1-4:
+brief 238 (30) + brief 240 (8) + brief 241 deferred (8) + brief
+243 (22) + brief 245 (33) = **101 picks** of ~860 original C-42
+cohort. Remaining ~445 picks (more after brief 244 expanded
+detector coverage, but approximate scale stable). At 94 % yield
+this wave, cohort exhaustion expected around wave 7-8 if
+trajectory holds — possibly faster as the gotcha library matures.
+
+**Methodology pattern fully validated — "scaffolder unblocks,
+decomper surfaces."** Briefs 240→241→242→243→244→245 are 3
+complete iterations of this cadence. Average per iteration: +30
+ships, +1-3 new gotchas, +5 sub-shapes documented. Each
+scaffolder round has locked 100 % of the escape patterns
+surfaced by the prior decomper round (no P-14 needed in either
+242 or 244). **Confidence is high that this cadence will fully
+drain C-42 in 3-5 more iterations.**
+
+🎯 **Brief 242 — 4/4 reg-alloc sub-shapes LOCKED, no P-14.**
+Brief 240's halt-trigger was an incomplete diagnosis — all 4
+documented sub-shapes ship under natural recipes with the right
+gotcha combination. Sub-shape 1 (tag6 bitfield, 5+ picks) reaches
+via gotcha 7 (arg-count) direct. Sub-shape 2 (pool + 2 global
+writes) reaches via **NEW gotcha 8** (return LIT reuses last
+`mov r0, #LIT`, forcing pool to r1). Sub-shape 3 (ptr-copy +
+helper + LIT-write) reaches via **NEW gotcha 9** (helper takes
+both args + int return → r2 temp + r1 LIT). Sub-shape 4 (stmfd +
+sub sp #4, 6+ picks) is NOT reg-alloc at all — it's a routing
+tier mismatch, fixed by **NEW gotcha 10** (use `*.legacy_sp3.c`).
+8 worked examples shipped (2 main `.legacy_sp3.c`, 6 ov002 `.c`).
+recipe-gotchas.md extended by 3 gotchas + 3 checklist items +
+4-step diagnostic order. **~500 C-42 picks across these
+sub-shapes now unblocked for mechanical drain.**
+
+⚠️ **Brief 243 — 22 ships at 71% C-yield, halted on 5 NEW
+reg-alloc sub-patterns.** Decomper drained 22 of 31 attempted
+C-42 picks (5 main + 17 ov002), expanding the recipe library by
+5 more documented sub-shapes (17-20 + single-helper conditional
+thunks). Hard-tier 8.62% → 8.88%. C-yield 71% (below 85%
+target) — halted per brief stop-rule after 9 escapes surfaced 5
+**new** reg-alloc sub-patterns beyond brief 240's set: (6)
+pointer-double-store reg choice (2 picks), (7) switch-on-ldrh
+reg choice (1), (8) stmia fusion miss (1), (9) loop counter/index
+reg-alloc (4), (10) indexed-ldr reg choice (1). 3 source-side
+controls tried (explicit local var decls, struct vs ptr types,
+declaration-order swaps) — none deterministically shift mwcc's
+allocator. Filed for brief 244 scaffolder.
+
+**Empirical cohort sizing finding (brief 243).** Brief 240's
+"safe profile" (2+ args + no bitfield) is smaller than estimated:
+~250 main+ov002 metric-safe candidates → only 22 ship first-
+attempt (71% yield). Remaining ~150 hit one of the 5 new
+sub-patterns. **Wave 4+ should expect 70-75% yield without
+source-side controls** — until brief 244 cracks more reg-alloc
+patterns, the natural yield is bounded around 70-75%.
+
+**Methodology pattern emerging — "scaffolder unblocks, decomper
+surfaces."** Briefs 240/241/242/243 are the second iteration of
+a clear pattern: decomper drains until repeat reg-alloc escapes
+trigger a halt, scaffolder runs a focused variant matrix against
+the documented escape shapes and locks recipes, decomper drains
+the unblocked picks and surfaces the next batch of escapes. Each
+iteration nets +20-30 ships and +1-4 new gotchas. Likely the
+dominant cadence for the next 5-10 rounds while the C-42 cluster
+drains.
+
+**Two open lanes after this merge.** **Brief 248 (scaffolder)**
+— investigate brief 247's 4 NEW escape patterns N1-N4 (sub-shape
+2 with trailing void helper, predication collapse, nested
+struct ptr-alias, 2-helper r3 vs r1). Apply the now-proven
+catalog-+-variant-matrix methodology (4th iteration). Plus
+decision on brief 246's proposed symptom→gotcha lookup table.
+Plus opportunity to extend the recipe-gotchas catalogue
+narrative with brief 247's "sub-shape homogeneity drives yield"
+lesson — this is a strategic methodology insight that future
+briefs will reference. **Brief 249 (decomper)** — C-42 drain
+wave 6, sibling-family-first strategy. Apply brief 247's
+empirical lesson: hunt sibling families and exhaust each before
+moving on. Sub-shape families to enumerate first (per brief
+247's high-yield wave 4 pattern): tag6 bitfield siblings,
+sp3-routing thunks (`.legacy_sp3.c`), pool + global check
+clusters, pool-deref 2-fields + helper. Use brief 239's
+sub-shape histogram to enumerate cohort sizes per family.
+Target 25-40 ships at 85-94% C-yield (sustained brief 245
+trajectory). Avoid brief 247's 4 escape patterns until brief
+248 lands their recipes. Both kickoffs sent.
+
+**Brain methodology insight (this round, NOT yet in
+docs/research/) — "sub-shape homogeneity drives yield".** Brief
+247 surfaced an empirical pattern: a 33-ship wave with 25 from
+same-recipe siblings yields 94%; a 26-ship wave with each pick
+shape-diverse yields 73%. The recipe library isn't the
+bottleneck at wave 5+ — the **selection strategy** is. Future
+decomper briefs should explicitly favour sibling-family drains
+over random picks from the cohort. Worth documenting in
+codegen-walls.md or recipe-gotchas.md as a brief-249 deliverable
+or brief-248 (C) write-up.
+
+---
+
+## Previous round — briefs 240 + 241 (post-#712 + #713)
+
+---
+
+## Previous round — briefs 240 + 241 (post-#712 + #713)
+
+⚠️ **Brief 240 partial — reg-alloc divergence escape surfaced.**
+Decomper hit a recurring escape: mwcc 2.0/sp1p5 picks `r1` for
+free-scratch where orig used `r2` (or vice versa). Same
+instructions, control flow, opcodes — only register choice
+differs. 4 source-form variations tried (extra unused arg,
+struct layouts, extern forms, return type) did not shift mwcc's
+choice. Affects ~5 sub-shapes across the ~500 remaining C-42
+picks: (1) tag6 bitfield extract (5+ picks), (2) pool-data +
+global field write, (3) helper-returns-ptr + field write,
+(4) `stmfd; sub sp, #4` prologue thunks (6+ picks), (5)
+`*p = *q; helper(p); *p = LIT`. Decomper halted at 8/15 (53%
+C-yield) per brief guidance — exactly the right move. 8 ships
+landed in `src/main`, all sharing the empirical
+ships-without-walls profile: 2+ explicit args, no bitfield
+extract.
+
+🎯 **Brief 241 (A) locked brief 238's 7 deferred picks.** All
+ship byte-identical under natural recipes — NOT a new wall class.
+Folded as 5 new C-42 sub-shapes (struct-large-offset, clamp,
+sp3-dup-helper, helper3-u64-return, cmp-dispatch-switch). C-42
+family taxonomy now 16 sub-shapes documented (brief 237's 5 +
+brief 238's 6 + brief 241's 5). **New recipe gotcha 7
+(arg-count tunes the temp register)** added to recipe-gotchas.md
+— directly applicable to brief 240's escape pattern, queued for
+brief 242 systematic investigation.
+
+🎯 **Brief 241 (C) calcrom canon corrected.** Brief 239 (D)
+empirically falsified brain's interpretation: the
+`matched_functions > complete_units` delta is a natural multi-fn-
+per-TU counting artifact, NOT a missing-marker indicator.
+Calcrom output now annotates this inline; `reference_metric_canon.md`
+updated. Brain methodology lesson reconfirmed: don't ship plans
+based on metric-artifact misreads.
+
+🎯 **Brief 241 (B) next-cluster scout.** Post-C-42-drain
+unclassified residue is 1204 picks. Top 5 clusters histogrammed
+with sample picks — no cluster crosses the 100-pick pilot
+threshold, meaning the next wall isn't a single big cohort.
+Deferred to brief 244+ if needed.
+
+**Brain methodology re-confirmed (brief 240 round):** when a
+sub-shape produces repeat escapes within a single decomper
+session, halt and surface to scaffolder rather than grind. Brief
+240's halt at 53% C-yield cost ~32 missed ships but unlocked the
+path to ~500 in subsequent rounds — and brief 242 then locked all
+4 escape sub-shapes the next round, validating the bet.
+
+---
+
+## Previous round — briefs 238 + 239 (post-#709 + #710)
+
+**Brief 238 (C-42 first drain wave, decomper) and brief 239
+(C-39e generalises + C-42 audit + recipe gotchas + calcrom
+verdict, scaffolder) both shipped.**
+
+🎯 **C-42 drain underway — 30 ships first wave, taxonomy
+expanding.** Brief 238 cashed in brief 237's C-42 classification:
+30 .c shipped, hard-tier 8.16% → 8.52%. **Strategic drain hit:
+14 main + 16 ov002** per calcrom debt-reduction guidance.
+C-yield was 81% (not 95% target) — 7 escapes were struct-layout
+/ pool-deref edge cases (mwcc's `add r4, r0, #N; ldr [r4, #M]`
+split for large field offsets). **6 NEW C-42 sub-shapes
+surfaced** beyond brief 237's 5 (sub-shapes 6-11): chain
+`helper2(self, helper1_ret)`, 2-helper preserving (self, arg1),
+arg-insert thunk with literal, store + cond-skip + helper,
+save/clear/helper/restore, pool-deref + helper. C-42 family
+taxonomy now 11 sub-shapes documented.
+
+🎯 **Brief 239 quad-deliverable, mixed but all valuable.**
+(A) Brief 236's 2 deferred C-39e picks both LOCK under natural
+recipes — C-39e recipe generalises to complex bodies (NOT a new
+sub-shape). New gotcha surfaced: `&&` short-circuit merges
+duplicate-call paths. (B) C-42 detector audit: 97.3% TP rate
+(2.7% FP, below threshold). Tightened to exclude
+`sub sp, sp, #N>16` large-stack-frame buffer-pass thunks. 9-way sub-shape
+histogram added for decomper pre-tagging (A3 single-bl-plain
+189 picks dominant, B5 two-bl-plain 92, C three-or-more-bl 91).
+(C) Recipe-gotchas reference doc shipped at
+`docs/research/recipe-gotchas.md` — 6 patterns catalogued
+(return-r-vs-return-0, array-vs-scalar extern, ternary polarity,
+XOR operand ordering, if-then vs early-return for bmi, mask <
+0xff triggers C-1 predication) + pre-flight checklist.
+**(D) NEGATIVE RESULT — brain's calcrom interpretation corrected.**
+The "matched_functions > complete_units" delta is NOT a "missing
+complete markers" indicator — it's the natural state for
+multi-fn-per-TU TUs. All 9 "affected" overlays already have 100%
+complete delinks. Mf − cu delta = avg fns-per-TU × num multi-fn
+TUs. **Brain methodology lesson:** do not treat the mf > cu
+delta as actionable bookkeeping; it's a counting artifact.
+
+🎯 **C-42 NEW WALL CLASSIFIED — multi-call thunk hint.** Brief 237
+piloted 5 picks from the dominant unclassified hard-tier cluster
+(861 picks, 50% of unclassified). **5/5 shipped byte-identical on
+first attempt** under natural source — these picks aren't a wall,
+they're shape-unrecognised. C-42 is therefore a hint (mechanical
+drain unlock), not a recipe. **~600-800 picks accessible from the
+C-42 cluster expected to ship first-attempt** in subsequent
+mechanical drains — roughly 100-130 hours of decomper work
+available. This is the biggest single-round unlock since C-39
+family was classified.
+
+🎯 **Hard-tier landscape resurveyed (brief 237).** Unclassified
+slice dropped 27.9% → 22.4% (-484 picks) thanks to retroactive
+C-39 family classification. New histogram: C-39 base 1279, C-39d
+562, C-39b 304, C-39a 40, C-39e 25 — total ~2210 picks now
+correctly tagged. Unclassified residue 1725 (22.4%) — multi-call
+thunk shape dominates, plus heterogeneous one-offs.
+
+Brief 236 shipped 31 .c (28 C-39b mixed cohort + 3 C-39e cohort
+drain). Hard-tier ~7.79% → ~8.16%. 2 picks deferred
+(`021e27c0`, `02206608` — C-39e prologue but divergent body,
+flagged for brief 239 sub-pattern review). Methodology lesson
+reconfirmed: multi-bitfield interleaved scheduling ships under
+natural source (brief 224's old hypothesis was wrong); 5-arg
+helpers with stack-spill ship via natural C signature.
+
+🎯 **C-41 NEW WALL LOCKED — MMIO bit-clear + tail-call.** Brief
+235's broader-0x04001xxx pilot found 4 sibling picks
+(`func_0208cc18` / `_0208cc40` / `_0208ce48` / `_0208ce70`)
+sharing the same 7-instruction shape: read DISPCNT, `bic` one
+bit, write back, tail-call helper(data). All 4 ship from a
+single natural recipe — `MMIO &= ~MASK; return helper(data);` —
+under default mwcc 2.0/sp1p5. C-41 detector + 2 unit tests
+added. The remaining ~455 broader-0x04001xxx picks are
+heterogeneous one-off shapes; no further bulk-recipe scaffolder
+work expected there — per-pick decomper territory.
+
+🎯 **C-39e LOCKED — null+helper-at-top sub-shape.** Brief 232's
+2 known picks (`0228b810`, `0228b850`) + 1 simpler variant
+(`0228b894`) all ship 3/3 from a natural recipe:
+`if (arg1 == 0) return 0; if (helper1(...) == 0) return 0;
+return helper2(self, arg1);` mwcc emits `movs r4, r1` as a
+peephole-fused mov+cmp when arg1 is both spilled to callee-saved
+AND tested for null at function top. Detector + 2 unit tests
+added. Brief 235 scan found 6 additional candidates in ov002 —
+cohort estimated 10-20 picks total, feeds brief 236 drain.
+
+**Brief 232's 2 deferred picks both recovered** in brief 235
+with natural recipes (`func_ov002_02295284` double-call
+disjunction + `func_ov002_0220673c` cross-call compare with
+dead-store) — confirms brief 232's "bookkeeping noise from
+per-pick effort cap, not recipe failure" framing.
+
+**Brief 234 shipped 31 .c files** (C-39 wave 6 + 3-pick C-40
+mechanical cleanup using brief 233's locked recipe). Brief 235
+also shipped the 3 C-40 picks as bonus during its broader-corpus
+pilot, which produced add/add rebase conflicts (resolved in
+favour of brief 234's already-merged bytes — both versions byte-
+identical, just attribution).
+
+Brief 224 (decomper) ran C-39 drain wave 1. **25 ships, hard-tier
+5.6 % → 6.0 %.** Routing: 24 `.s` + 1 `.c` upgrade
+(`func_ov002_021f4a00.c`). The 1-of-25 `.c` rate is below the
+brief's 10-18 target but consistent with brief 223's hard-tier
+reality. **Identified 4 second-order C-39 shape variations** that
+block volume `.c` upgrades at hard tier: (1) sign-check vs
+comparison (`movs; bmi` vs `cmp; blt`), (2) bitfield packing into
+helper args, (3) helper-return reuse (callee-saved storage), (4)
+multi-call sequences (re-read explicitly). Each needs 20-40 min
+per pick — above brief 224's 10-15 min cap. Brief 226 takes 2 of
+these (sign-check + helper-return reuse) as sub-classification
+pilots. Research note:
+[`brief-224-c39-wave1.md`](../docs/research/brief-224-c39-wave1.md).
+
+Brief 225 (scaffolder) ran the C-39 sub-patterns + brief 216
+deferred investigation. **1 ship + 4 documented near-misses**
+(with full 5-tier × 5-10 idiom falsification matrices).
+**Shipped:** `func_0207d304.legacy.c` (20 B) — orig has a chained
+`(u16)(u8)*p` cast where the trailing `lsl/lsr #16` after the
+`and #0xff` is semantically redundant. mwcc 2.0 peepholes the
+pair away; mwcc 1.2/sp2p3 (legacy tier) preserves both casts
+literally. Extends **C-38 family** with new "redundant-cast"
+sub-shape — route-tier wall, not source-form wall. **4
+near-misses documented:** scheduling-divergent DCE (A1), 396 B
+switch-table (A2 — beyond pilot scope), DCE of unused load (B2 —
+all 5 tiers + volatile + inline-asm), u64 pack/value-in-regs (B3
+— likely hand-`.s` or RealView convention). Brief 227+ decomper
+candidate: corpus-scan for `and #0xff; lsl #16; lsr #16` tail
+to find more C-38 chained-cast picks. Research note:
+[`brief-225-c39-subpatterns-and-c38-deferred.md`](../docs/research/brief-225-c39-subpatterns-and-c38-deferred.md).
+
+**Current metrics (post-#709 + #710 merge, EUR):**
+`matched_functions 2166 / 9801 (22.10 %)` — **+32 functions**
+(30 brief 238 + 2 brief 239 — exact reconcile),
+`matched_code_percent 5.8882 %`, `complete_code_percent 6.5918 %`,
+`complete_units 2129 / 3263 (65.25 %)` — **+32 units**. 3-region
+SHA1 PASS preserved.
+
+**Tier breakdown (post-#709/#710):** trivial 100 %, easy 100 %,
+sinit 100 %, named 100 %, medium 100 %, **hard 8.52 %** (brief
+238's reported delta; +0.36 pp).
+
+**Wall taxonomy after this merge.** Active C-class: C-1 through
+C-42 (42 named recipes). **C-42 family expanded to 11 sub-shapes**
+(brief 237's 5 + brief 238's 6 new). C-39 family unchanged:
+base + a + b + d + e (5 active) + c → P-13. Permanent walls:
+P-1 through P-13. **Detector tightened in brief 239:** C-42 now
+excludes `sub sp, sp, #N>16` (97.3 % TP rate, 2.7 % FP).
+
+**Two open lanes after this merge.** **Brief 240 (decomper)** —
+C-42 second drain wave with the audit-refined detector + brief
+239's 9-way sub-shape histogram. Target: 40-60 ships, hard-tier
+8.52 % → 9.0-9.4 %. **Brief 241 (scaffolder)** — (A) investigate
+brief 238's 7 deferred picks (struct-layout / pool-deref edge
+cases — `add rN, r0, #N; ldr [rN, #M]` split pattern for large
+field offsets); (B) survey what comes after C-42 drain in the
+unclassified hard-tier residue (1725 picks − ~554 C-42 unmatched
+left after wave 2 ≈ 1170 residue picks for next-cluster scout);
+(C) reconcile calcrom.py interpretation in tooling docs +
+README — the mf > cu finding from brief 239 (D) updates the
+metric canon understanding.
+
+**Brain-PR investigations last round:** 3 ecosystem-survey
+research agents + 2 follow-up agents (calcrom.py port shipped in
+PR #707; objdiff v3.7.1 upgrade trial captured as defer-verdict
+research note in PR #708). Research adoption arc closed — next
+candidate from the punch list is Mizuchi mwccarm fork (Tier A #5,
+2-3 days dedicated brief) when prioritised.
+
+**Brain methodology update (this round):** "metric interpretation
+must be empirically validated before issuing as a directive."
+Brain's brief 239 (D) directive — "flip delinks.txt markers in
+overlays where mf > cu" — was based on misinterpreting calcrom
+output. Scaffolder's audit found the gap is a natural artifact
+of multi-fn-per-TU counting, not a missing-marker indicator. No
+ships needed for (D). Brain should treat new metrics as
+hypotheses needing validation runs, not as commands.
+
+**Strategic direction (set 2026-05-25 by cntrl_alt_lenny):** the
+project pursues TWO goals in parallel, not either-or:
+1. **Track 1 — byte-identical ROM from controlled source.**
+   `complete_units` is the gauge. Currently 1666/2553 (65.3%).
+   Recipe pipeline mature; `.s` ships handle hard walls. Estimated
+   30-50 more rounds at current pace to complete (~4-7 weeks).
+2. **Track 2 — human-readable C source for every function.**
+   `matched_functions` minus `.s`-via-recovery is the gauge.
+   Currently ~280 actual C-source matches across 9,801 functions.
+   Multi-year arc at current pace, but cntrl_alt_lenny is
+   explicitly bullish on AI-tool improvement (6-18 months) cutting
+   this much shorter. The project will continue regardless.
+
+**Brain-PR investigations this round:** Verification + housekeeping
+only. No code changes this round; both PRs landed cleanly (brief
+220 research-only, brief 221 mechanical .s drain with one
+StyleA .legacy.c the PR body undercounted). **Two standout
+artifacts this round:** (1) brief 220's hard-tier survey is the
+strategic groundwork for the next 5-10 rounds — the histogram +
+unclassified-pattern breakdown gives brain crystal-clear drain
+priorities. The C-39 candidate (454 non-leaf bitfield picks) is
+particularly exciting because it extends brief 218's recipe to a
+huge slice of the hard tier. (2) brief 221 closing medium-tier
+at 100 % means trivial+easy+sinit+named+medium are all DONE; the
+remaining unmatched pool is entirely hard-tier (7,911 picks).
+
+**Methodology observation (brief 221):** the brief was scoped as
+"apply existing recipes per classifier output." Decomper
+interpreted this conservatively — all 18 picks shipped as `.s`
+(except 1 StyleA `.legacy.c`). The mature recipes (StyleA, C-23,
+C-33, C-36, C-15) MIGHT have reached on the other 10 picks with
+per-pick variant-matrix work. Brief 223 explicitly flags this as
+a lesson: "when the recipe is mature, try .c first."
+
+**Wall 1 status:** classified as **P-4 extended** per brief 218.
+"Tiny-thunk reg-allocator divergence" now covers 3 sub-shapes
+(swap-tail, pool-load tail, fnptr-cache). Permanent under current
+toolchain — informative near-misses captured for future research
+if mwcc options ever change.
+
+**Headline metric shift this round.** Investigation found that
+`matched_functions` is systematically under-counting `.legacy.c`
++ `.s` ships because objdiff requires unrelocated-`.o` byte-
+identity while our shipped units have different reloc records
+than dsd's delink (post-link bytes match — that's what SHA1
+verifies). **Switch to `complete_units` as the headline metric.**
+The post-pivot arc (briefs 188 → 203) shipped +44 complete_units
+vs the +11 matched_functions previously reported. Real code-
+decomp progress is ~4× the prior headline. Full diagnosis:
+[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](../docs/research/objdiff-fuzzy-vs-complete-metric.md).
+
+**Two open lanes after this merge.** **Brief 230 (decomper)** —
+C-39 drain wave 4 (cohort hunting). Apply brief 228's recipe-
+variant taxonomy + brief 229's C-39d detector to hunt the
+next-largest uniform cohort. Target: 25-40 ships. **Brief 231
+(scaffolder)** — C-39c tier-mismatch workaround (cross-tier
+pilots) + C-38 non-leaf P-12 verdict. Both kickoffs sent.
+
+**Brain methodology update (PR #664):** "empirical hypothesis
+testing — non-negotiable for pre-validation." Brain
+pre-validations must run the falsification test before claiming
+a root cause; brief 209's `.word`-to-mnemonic test correctly
+identified the real mechanism after brain's PR #662 hypothesis
+turned out wrong.
+
+**Brain methodology update (this PR):** "reconfigure after rebase
+that changes source TU paths." Brief 218 rebased onto post-#677
+main, which had brief 219's `.s` → `.legacy.c` swap for
+`func_0207db74`. The old `build/eur/build.ninja` still referenced
+the deleted `.s`; `ninja sha1` failed until `configure.py` re-ran.
+Sibling of the existing "always reconfigure before quoting metrics"
+lesson.
+
+**Brain methodology update (this PR):** "recipe falsification ≠
+permanent wall." Brief 217 falsified brief 214's Shape B
+shift-pair-cast recipe (empirically didn't reach orig on the actual
+picks). Brief 218 found a NEW recipe (bitfield struct read) that
+DOES reach. The methodology lesson: when a recipe is empirically
+falsified, the wall isn't automatically permanent — try other
+recipe classes (bitfield, union, intrinsic, address-arithmetic,
+volatile, etc.) before classifying as P-N.
+
+**Brain methodology update (last PR):** "rebase open PRs onto
+post-merge main BEFORE merging the second one." Brief 217's PR had
+markdownlint failing on lines fixed by brief 216 — rebasing onto
+post-216 main cleared the CI failure without any new edits. Cheap
+when remembered; otherwise burns a force-push + CI cycle on the
+agent's branch chasing a stale conflict. (Applied again this round
+on brief 218 — same playbook works.)
+
+**Brain methodology update (this PR):** "always reconfigure +
+`ninja report` after a merge wave before quoting metrics."
+Decomper's brief 213 had to recompute the matched_functions
+baseline because state.md's quoted 1698 was stale (real was
+1701 post-#666/#667 once a fresh build ran).
+
+## The current headline — 10-brief pivot validation arc (briefs 188 → 197)
+
+The pivot from scaffold to code decomp landed cleanly. 10 briefs
+shipped against the post-SHA1 resumption queue + wall taxonomy:
+
+| Brief | Agent | Result | Headline |
+|---|---|---|---|
+| 188 | decomper | 5/12 trivial ships | First code-decomp brief in 39 briefs |
+| 189 | scaffolder | Wall classifier shipped | `predict_walls.py` foundation |
+| 190 | decomper | 10/25 easy ships | +0.0093 % matched_code; 4 wall clusters surfaced |
+| 191 | scaffolder | C-31 wall closed | Recipe + classifier + 100% detection |
+| 192 | scaffolder | C-32 wall closed | Recipe + classifier + 16-pick ov011 scan |
+| 193 | decomper | 0/15 medium-easy | Surfaced Cluster E + F mechanisms |
+| 194 | scaffolder | C-33 wall closed | Per-section modal-deviation patcher cap |
+| 195 | decomper | **8/8 recipe drain** | 100% recipe-locked throughput |
+| 196 | scaffolder | Permuter wrapper shipped | 9-pick worklist + outcome schema |
+| 197 | decomper | **13/13 ov011 C-32 drain** | Above target + Track B documented |
+
+**Three named walls (C-31/C-32/C-33)** now have locked recipes +
+classifier detection in `tools/predict_walls.py`. The post-pivot
+methodology has a steady cadence: decomper either drains recipe-
+locked picks (briefs 195/197 averaged 95% throughput) or surfaces
+wall mechanisms when something new fires (briefs 188/190/193); the
+scaffolder converts wall mechanisms into recipes (briefs 191/192/194)
+or builds pipeline infrastructure (briefs 187/189/196).
+
+**The unsolved problem:** `matched_functions` has NOT moved since
+brief 190. Briefs 195 + 197 shipped 21 `.s` files (which tick
+`complete_units` but not `matched_functions`); the C-source matches
+brief 188 + 190 produced were small and the well of "trivially
+matchable" picks ran dry. Brief 198 is the strategic bet that
+permuter can crack the Cluster E / B picks where mwcc-shape
+iteration is the bottleneck. Outcome answer due next round.
+
+## The previous headline — pivot from scaffold to code decomp (briefs 182 → 187)
+
+Three pivot-enabler briefs closed the W7 patcher chain at n=0 + revived
+`ninja report` (objdiff-verified metrics) + published the 52-pick
+curated queue. See PR #634 for the brain-PR that captured the pivot.
+
+## The previous headline — SHA1 PASS achieved (briefs 137 → 140, 2026-05-13)
+
+Mac brain's last full arc closed the SHA1 gap:
+
+1. **Brief 137** — scoped the gap (99.995% was `.DS_Store` noise across
+   the extract; 3-brief unlock plan).
+2. **Brief 138** — `.DS_Store` filter shipped (100K → 5 bytes / 3 regions).
+3. **Brief 139** — cluster A wave 4 + Pattern 3 wave 2 (305 effective
+   candidates).
+4. **Brief 140 — 🎉🎉🎉 `ninja sha1` PASSES** for EUR + USA + JPN. First
+   byte-identical ROM rebuild across all 3 regions. **This is the
+   `CLAUDE.md` final-gate criterion.**
+
+Subsequent briefs (141 → 148) ran the post-SHA1 polish wave: ov004
+cluster sweep (brief 141), 3-region 27/27 module baseline canonicalised
+(brief 136 → 141), patcher generalisation for variable veneer counts
+(brief 142 — `n ∈ [0, 86]`), first post-SHA1 decomp wave (brief 143 —
+cluster B opened with 60 + 114 true scalars across two waves), Pattern
+3 generator extern emission fix (brief 144), ov004 `.rodata` cluster
+wave BLOCKED (brief 145) → patcher ctor-terminator detection (brief
+146) → ov004 `.rodata` retry shipped 14 syms across 3 shapes (brief
+147), cluster B pointer pool survey + recipe (brief 148).
+
+## SHA1 PASS is now the floor
+
+Every PR going forward must preserve 3-region `ninja sha1` PASS:
+
+```
+ninja sha1  # EUR — must say "OK"
+python tools/configure.py usa && ninja sha1  # USA — must say "OK"
+python tools/configure.py jpn && ninja sha1  # JPN — must say "OK"
+```
+
+This supersedes the old "24/27 module check" gate. If a PR drops any
+region from PASS → FAIL, it does not merge. Cloud and decomper both
+verify 3-region SHA1 PASS pre-PR; brain re-verifies pre-merge.
+
+## Today's merges (just-landed)
+
+- **PR #671 — decomper / brief 215 trivial-bucket wave 2.** 🎯
+  **46 ships** (12 + 8 + 26 across three waves), well above the
+  20-40 target. Easy-tier matched ratio 88.7 % → 92.9 %; unmatched
+  easy-tier 125 → 79 picks. Recipe routing: 6 C + 40 `.s` (the
+  brief 210 `$d → $a` patcher chain handles all `.s` ships as
+  `matched_functions: 1/1`). **Two new walls flagged for scaffolder
+  follow-on:** Wall 1 — swap-tail-call register temp (mwcc 2.0
+  picks r2; orig wants r3; 3 picks affected; tried 4 source forms,
+  none reach r3). Wall 2 — leaf-no-pool reg-alloc divergence (39
+  of 79 remaining easy-tier picks share this shape — major drain
+  blocker; mwcc 2.0's register choices + instruction scheduling
+  diverge from orig in ways that don't track to source-form
+  differences). Picks deferred: 1 `func_020b3648` (branches OUT of
+  its own range) + 17 Thumb picks (untouched this round; brief 191
+  C-31 recipe applies to interwork shims; others need their own
+  recipe — suggest a dedicated Thumb sweep). 3-region SHA1 PASS +
+  27/27 OK + 0 invariant errors.
+- **PR #672 — scaffolder / brief 214 C-37 bit-test/byte-zero 0/1
+  idiom — recipe + worked example + detector.** 🎯 **C-37 recipe
+  unlocked.** Source idiom
+  `unsigned t = (unsigned)(x << 31) >> 31; if (t != 0u) return 1;
+  return 0;` produces orig bytes byte-identically under mwcc
+  1.2/sp2p3 (legacy tier). mwcc 2.0 has a `tst r0, #1` peephole
+  that defeats it; mwcc 1.2 doesn't, and keeps the lsl/lsr shape.
+  Three jointly-required source elements pinned: (1) shift-extract
+  via unsigned cast (NOT mask); (2) stored in a named temp;
+  (3) explicit `if (t != 0u) return 1; return 0;`. Shipped 1
+  worked example (`src/main/func_020a584c.legacy.c`), deleted the
+  `.s`. New C-37 detector in `tools/predict_walls.py` covering
+  4 polarity × shift-width combos. 2 byte-low C-37 variants remain
+  as `.s` — recipe documented for decomper follow-up. Drive-by:
+  brief 212's `TestStragglerSmoke` tests updated to accept post-fix
+  idempotent state (the design-issue I flagged in last round's
+  brain-PR — scaffolder fixed it). Bonus finding: scaffolder
+  worktree has mwccarm.exe downloaded locally — direct compiler
+  invocation worked for the 23×8 variant matrix, bypassing the
+  ninja/dsd/objdiff orchestration constraint. EUR SHA1 PASS
+  preserved (tools + 1 worked-example swap).
+- **Brain-PR (this one) — close briefs 214 + 215, log Wall 1 + 2
+  for scaffolder follow-on.** 🔬 Verification + housekeeping. Both
+  PRs verified standalone in decomper + combined-merge for #672 on
+  top of #671. EUR SHA1 PASS preserved through both. AGENTS.md
+  Open briefs already empty from last round; added 214 + 215 to
+  Closed briefs. Next-brain TODO updated with Wall 2 classifier as
+  top scaffolder candidate (39 of 79 remaining easy-tier picks
+  blocked by single mechanism) + 2-byte-low C-37 + Thumb sweep as
+  decomper continuation options.
+- **PR #669 — decomper / brief 213 trivial-bucket revalidated sweep
+  + Entry match.** 🎯 **31 ships** (4 + 8 + 18 across three waves).
+  Wave 3 was an `ov002:0x0226acf8` dispatcher cluster — 18 thin
+  trampolines all shipped as `.s` since the shape is mechanical.
+  Plus `Entry` lifted 98.73% → 100% via a 3-region `relocs.txt`
+  addition (`from:0x02000928 kind:load to:0x02000b68 module:main`)
+  — same `$d`-family root cause as brief 209, config-side
+  remediation. Re-validated the survey-staleness rule from brief
+  211: fresh `next_targets.py` showed 156 unmatched easy-tier (not
+  the 2026-05-25 survey's "231 trivial" size-only bucket), now
+  125 post-drain. New wall candidate surfaced: bit-test → 0/1
+  idiom (`lsl r0,r0,#31; movs r0,r0,lsr #31; movne/moveq`) — 4
+  picks shipped as `.s` because mwcc 2.0 collapses plain
+  `(x & 1) ? 1 : 0` to `tst r0,#1`. Queued as brief 214 candidate.
+  Side find: state.md baseline `matched_functions=1698` was stale;
+  fresh build at brief 213 start showed 1701 (brain hadn't rebuilt
+  objdiff post-#666/#667). Metric deltas: `complete_units` 1672 →
+  1703 (+31), `matched_functions` 1701 → 1733 (+32). 3-region SHA1
+  PASS + 27/27 OK + 0 invariant errors.
+- **PR #668 — scaffolder / brief 212 `$d`/`$a` rewriter audit +
+  pass-2 trailing collapse.** 🎯 **Both unflipped brief-209
+  stragglers landed at `matched=1/1, fuzzy=100`.**
+  `func_ov011_021cb574` and `func_ov011_021d02a4`. Root cause:
+  asymmetric `$d` emission (mwasmarm: one `$d` per `.word` *run*;
+  dsd-delink: one `$d` per pool *entry*); when a `cond==0xF` data
+  word is followed by ARM-like words, pass 1's per-symbol promotion
+  produces divergent shapes between the two sides. Pass 2 zeros
+  trailing `$a` markers after the last data marker so both sides
+  converge on implicit-`$d` to end-of-text. Audit dry-run predicted
+  +11 flips; actual incremental over brief 213 was +7 (predictions
+  shifted shape on some candidates once brief 213's new src
+  landed). New `--sweep` mode for post-fix idempotency checking.
+  9 new tests, 25/25 pass; ruff clean. EUR SHA1 PASS preserved
+  (tools-only PR, no source touches).
+- **Brain-PR (this one) — close briefs 212 + 213 + Windows
+  worktree-repair + xMAP infra gap noted.** 🔬 Verification +
+  housekeeping. Repaired the `decomper/` and `scaffolder/` worktree
+  pointer files (stale paths from a parent-dir rename
+  `gx-spirit-caller-NEW` → `gx-spirit-caller`) via
+  `git worktree repair` before the agents could git-fetch. Brain
+  re-verified post-merge metrics from decomper worktree (brain has
+  no build state on this Windows install). Surfaced a long-standing
+  `configure.py` gap: `arm9.o.xMAP` (mwldarm linker map side-output)
+  is referenced as an input in `build.ninja` but no rule produces
+  it — bites fresh worktrees that haven't built before (scaffolder
+  worktree triggered this). Queued as scaffolder brief 216 candidate.
+- **PR #661 — decomper / brief 209 straggler root-cause diagnosed.**
+  🔬 Investigation-only PR. All 23 stragglers (units at
+  complete_code=100 + low fuzzy_match) traced to a single mechanism:
+  mwasmarm tags `.word 0xHEX` directives with `$d` (data) mapping
+  symbols; objdiff reads these as data not code. Empirical
+  falsification test: promoted one `.word` to its mnemonic, fuzzy
+  went DOWN (13% → 3%) — mixed `$a`/`$d` is worse than pure `$d`.
+  Recipes are correct; metric is wrong. Three remediation paths
+  proposed; brain queued path #1 (post-process rewrite) as brief
+  210. Phase 1 (literal-tail drain) deferred to brief 211 since
+  brief 208 hadn't merged at brief 209 start.
+  **This invalidated brain's pre-validation hypothesis from PR
+  #662** — see "Brain methodology update" in the headline.
+- **PR #663 — scaffolder / brief 208 C-36 literal-tail trim trap.**
+  🎯 Two-guard patcher fix shipped. Brief 204's reloc-protection
+  handled cascade-fill; brief 208 adds delinks-aware slot-size
+  guard for literal-tail (no-reloc) case. mwasm padding always
+  rounds UP, so when sh_size matches the declared slot size, the
+  trailing zeros are content (don't trim). Worked example:
+  `func_02023478.s` ships clean. Classifier validates all 5
+  brief-207-deferred picks; 6th was a brief-207 mis-listing
+  (symbol-ref tail, covered by brief 204 already). +18 tests
+  (2150 → 2168).
+- **Brain-PR (this one) — brief 208/209 housekeeping + methodology
+  lesson.** 🔬 Captured the "empirically falsify hypotheses
+  before claiming root cause" lesson in
+  [user memory feedback-session-patterns.md](file:///Users/leo/.claude/projects/-Users-leo-Dev-spirit-caller/memory/feedback_session_patterns.md).
+  Also doubled down on "always reconfigure before reading metrics
+  post-branch-switch" — that pattern burned brain 3+ times this
+  arc with false matched_functions-dropped alarms. Reconfirmed the
+  actual metric (post-fresh-build) is matched_functions = 1687,
+  not 1673 the stale-build reading showed. AGENTS.md +
+  state.md rotated for 208/209 closure + 210/211 queueing.
+
+- **PR #660 — decomper / brief 207 C-34/C-35 rescan drain 32/33.**
+  🎯 **Biggest single drain to date.** 5 main + 27 overlay picks
+  via the now-locked brief 202 C-34 `.s` recipe. Full-corpus EUR
+  rescan via brief 204's C-35 composite classifier; overlay picks
+  were out-of-scope in brief 205. 1 deferred (`func_02023478`) —
+  surfaced a NEW failure mode beyond brief 204's reloc-only trim
+  protection: literal-tail (no relocation) trim. ~5 sibling picks
+  affected. Queued as brief 208. +32 complete_units (1636 → 1666).
+- **PR #659 — scaffolder / brief 206 objdiff resolve-relocs harness
+  shipped.** 🎯 **matched_functions accounting permanently fixed.**
+  `tools/objdiff_resolve_relocs.py` applies `R_ARM_ABS32` +
+  `R_ARM_PC24` to a fictional fixed base before objdiff compares.
+  All 21 high-confidence canaries from brain-PR #658 flipped to
+  `matched_functions: 1/1`. Recovery: matched_functions 1430 →
+  1654 (+224 cumulative across the arc; +24 against the immediate
+  prior measurement). Brain pushed research-index regen on
+  review-fix. 2117 → 2146 tests.
+- **Brain-PR (this one) — brief 209 stragger pre-validation +
+  unmatched function pool survey + two-track strategic capture.**
+  🔬 Three research artifacts + housekeeping. (1) Brief 209
+  pre-validation: empirically diagnosed brief 206's 23 stragglers,
+  showing the bottom-tier 13 ov011 picks have a structural
+  unrelocated-byte gap (not a recipe bug); 7 close picks remain
+  for brief 209 Phase 2. (2) Strategic survey: 8,149 unmatched
+  functions categorised by size/module; identifies BIOS-thunk
+  family as highest-leverage easy pick (~30 named SWI thunks
+  shippable in one brief). (3) state.md captures the two-track
+  strategic direction (byte-identical + human-readable C, both
+  pursued in parallel) per cntrl_alt_lenny's 2026-05-25 framing.
+
+- **PR #657 — decomper / brief 205 C-34 full-scan drain 20/21.**
+  🎯 Phase 1 (E-08) + Phase 2 (full EUR scan harvest). 20 of 21
+  picks shipped via brief 202's C-34 `.s` recipe — biggest drain
+  since brief 197's 13/13. Surfaced + worked around a patcher
+  trim trap (later properly fixed by brief 204): duplicate-slot-
+  as-literal + last-pool-entry-as-literal defeat the 4-byte
+  `\x00\x00` trim trigger. 1 pick deferred (`func_02023478`) —
+  last pool entry too small to promote; now shippable post-204.
+  +20 complete_units (1617 → 1636).
+- **PR #656 — scaffolder / brief 204 C-35 routing trilemma +
+  patcher trim-protect.** 🎯 Multi-track win. (1) Swept all 15
+  mwccarm variants on `func_02021b38` — confirmed no native tier
+  produces orig's compact-push + dup-pool + non-strength-reduced-
+  loop combo (trilemma is real). (2) Applied brief 202's `.s`
+  recipe; shipped `func_02021b38.s` as worked example. (3)
+  Surfaced + fixed a patcher trim false-positive in
+  `tools/patch_section_align.py::trim_text_section_padding` —
+  added reloc-protection that prevents trimming when `.rel.text`
+  has an `r_offset` in the last 4 bytes. PR #115's Thumb-thunk
+  fix surface preserved. (4) New C-35 composite detector
+  (C-23 + C-34) flags routing-trilemma picks. 2110 → 2117 tests.
+- **Brain-PR (this one) — brief 206 pre-validation + .codex
+  cleanup + 204/205 housekeeping.** 🔬 Diagnostic + janitorial.
+  (1) Profile of the 47 units currently sitting at
+  `complete_code_percent=100` but `matched_functions=None` —
+  brief 206 will recover all of them (predicted: 1630 → 1677).
+  Concrete canary list at
+  [`docs/research/brief-206-prevalidation.md`](../docs/research/brief-206-prevalidation.md).
+  (2) `.codex/` cleanup: renamed `cloud.toml` → `scaffolder.toml`,
+  updated content (cloud → scaffolder throughout 3 files),
+  removed bogus Codex.ai URL convention, fixed `hooks.json`'s
+  hardcoded `/Users/leo/Dev/gx-spirit-caller/` paths (relative
+  now) + `python` → `python3` (same fix as `.claude/settings.json`
+  in PR #634). (3) AGENTS.md / state.md rotated for 204/205
+  closure + 206/207 queuing.
+
+- **PR #654 — decomper / brief 203 C-23 drain 2/3 + recipe
+  extensions.** 🎯 `OSi_PostIrqEvent` (0x9c) + `func_02093dc8`
+  (0x70) shipped as `.legacy.c`. `func_02021b38` (0x74) left
+  un-wired (routing trilemma — brief 204 scope). Two new recipe
+  extensions to brief 199's C-23 framework: (1) inline-expression
+  form `int mask = 1 << data[idx]` anchors callee-saved reg from
+  first use; (2) `&base[expr]` forces pool load for variable
+  index (direct subscript constant-folds at imm). +3 complete_units;
+  matched_functions ticks under-reported (see new research note).
+- **PR #653 — scaffolder / brief 202 C-34 wall closed (NOT
+  permanent — recipe found).** 🎯 mwcc 2.0's address-CSE pass
+  collapses two pool entries for the SAME data symbol into one
+  slot. Brief 202 found the bypass: `.s` with explicit `.word`
+  data directives at distinct labels — defeats BOTH layers (mwcc
+  IR-CSE + mwasmarm pool dedup). E-07 (`func_02023f7c`, 0x70)
+  shipped as worked example. New `detect_address_cse` consults
+  relocs.txt for 2+ `kind:load to:<same addr>` entries. 8 new
+  tests (2080 → 2110). Brief 199 + 200 cohorts correctly DON'T
+  fire on C-34.
+- **Brain-PR (this one) — rename-tracking investigation +
+  housekeeping.** 🔬 Diagnostic-only. Investigation discovered
+  that `matched_functions` systematically under-counts `.legacy.c`
+  / `.s` ships due to reloc-record divergence between mwcc's
+  output and dsd's delink (post-link bytes match — verified by
+  SHA1 — but unrelocated `.o` bytes don't, so objdiff classifies
+  as fuzzy_match < 100). Recommendation: `complete_units` is the
+  SHA1-aligned headline. New research note documents the finding
+  + proposes upstream / local fix paths for brief 206+.
+
+- **PR #651 — decomper / brief 201 first C-source via decomp.me
+  workflow.** 🎯 **B-08 `func_0205da2c` matched as `.legacy_sp3.c`.**
+  Three-routing-tier verification table documented (`.c` wrong reg
+  alloc; `.legacy.c` wrong epilogue style; `.legacy_sp3.c` ✓ — explicit
+  sub-sp + Style B `pop {pc}`). Permuter couldn't find this because
+  the wall was a ROUTING decision, not a source-shape one. E-07 + E-08
+  hit a new wall (1-insn diff each — mwcc 2.0 address-CSE collapses
+  two pool entries to one slot); handed off to scaffolder brief 202.
+  Bonus finding: brief 199's "two pool loads" comment is imprecise
+  (both target SAME pool slot — mwcc had already CSE'd). 3-region
+  SHA1 PASS. matched_code_percent 1.7190 → 1.7201, matched_functions
+  1628 → 1629.
+- **PR #649 — scaffolder / brief 200 P-11 reg-allocator plateau.** 🎯
+  Brief 198's 5 plateau picks (E-12/13/14, B-22, B-24) classified as
+  ONE shared wall — mwcc 2.0 reg-allocator + liveness divergence at
+  0x5c-0x74 sizes with helper-call-in-body. Three sub-shapes
+  documented: find-empty-slot template, array destructor with
+  in-loop bl, useless-spill stack-scratch. All recipe attempts failed
+  (volatile / `.legacy.c` / structural simplification) — P-11
+  classified as permanent under current tools, may promote to C-N if
+  a coercion is found (precedent: C-29 supersedes P-10, C-27
+  supersedes P-7). Two-path detector in `predict_walls.py` fires on
+  all 5 picks; brief 199's pick #5 correctly does NOT fire (C-23,
+  not P-11). 2073 → 2080 tests. Brain pushed lint fix (broken link
+  fragment + line wrapping that started with `#4`).
+
+- **Brain-PR (previous) — matched_functions fix + macOS permuter
+  workarounds + housekeeping.** 🎉 **+198 matched_functions recovered.**
+  Three-part PR. (1) `objdiff_filter_panic_units.py` was silently
+  dropping every `.legacy.c` unit because dsd emits objdiff.json
+  entries with bare `.o` paths while mwcc produces `.legacy.o` —
+  filter's "missing file" branch swallowed them. New
+  `_legacy_suffix_from_source` + `_rewrite_path_for_legacy` helpers
+  reconcile the two using `source_path` as the authoritative routing
+  signal. `matched_code_percent 1.4102 → 1.7190` (+0.3084), function
+  count 1430 → 1628. (2) `tools/permute.py` macOS workarounds folded
+  in: `expected_disasm_path` scans the tree-mirroring layout when the
+  flat path is absent (was symlink-required); `install_permuter_deps`
+  detects PEP 668 externally-managed-environment refusal and auto-
+  creates `.venv_permuter/` then patches `sys.path` so the venv's
+  deps import in-process (no re-exec). (3) AGENTS.md + state.md
+  closing brief 198 + 199, queueing brief 200 + 201. 2073 → 2088
+  tests (+15 new objdiff filter tests; +5 permute fixes covering
+  flat/mirror/PEP668 cases).
+- **PR #648 — decomper / brief 198 permuter wave 0/9 converged.**
+  🔬 Strategic finding: permuter isn't the right tool for Cluster
+  B + E walls. Phase 1 wrote 9 `.c` stubs (gitignored from delinks
+  — artifacts only). Phase 2 ran `permute_batch.py` with
+  120s/1800s/4-thread budget — all picks hit budget; best scores
+  220 → 590. **5 picks plateaued at 480–500** (E-12/13/14 +
+  B-22/B-24 — shared codegen mechanism, brief 200 scope). 3 picks
+  at 220-315 (E-07/E-08/B-08 — manual-iteration reach, brief 201
+  scope). 1 pick at 590 with 53 variants (B-18 — hardware-register-
+  fold per brief 190, deferred). Real-world macOS workarounds
+  documented (`.venv_permuter` + disasm path symlinks) — folded
+  into this brain-PR as proper fixes.
+- **PR #647 — scaffolder / brief 199 C-23 wall closed.** 🎯 Pick #5
+  (`func_02096434`, 0x6c) shipped clean as `.legacy.c`. **Key
+  insight: C-23 + StyleA "stacked walls" from brief 193 is ONE wall
+  with ONE recipe** (sub-sp + Style A epilogue is the natural mwcc
+  1.2/sp2p3 shape for this call layout). Classifier expanded with
+  4 new C-23 signals beyond brief 086's MMIO range: DTCM kernel,
+  duplicate refs, clustered pool, contiguous-pool false-positive
+  doc. Surfaced 4 more C-23 candidates for brief 200+ drain
+  (`OSi_PostIrqEvent`, `func_02021b38`, `func_02093dc8` + pick #5
+  shipped). Constant-folding trap documented: naive `*(int *)
+  (base + offset)` folds even at `.legacy.c` tier — keep base +
+  offset separate in source. 2068 → 2073 tests.
+
+### Earlier this round (#635 → #646 from previous brain-PR)
+
+- **PR #645 — decomper / brief 197 Track A 13/13 + Track B documented.**
+  🎉 **13 of 13 ov011 C-32 picks ship via brief 192's locked recipe**
+  (above ≥ 10 target). 5.6 KB `.text` across 13 functions, 30 hand-
+  encoded cross-overlay BLs. `/tmp/c32_emit.py` helper automated `.s`
+  generation from orig bytes — sidesteps transcription error across
+  thousands of instructions. Track B 0/2 lands on brief 193 pick #2
+  re-attempt: `.legacy.c` builds cleanly (brief 194's Cluster F fix
+  empirically confirmed) but is structurally different from orig;
+  `.c` (mwcc 2.0) closest variant is do-while form with 14 residual
+  diffs (reg-allocator preference — escalates to brief 198+ permuter).
+  Surfaces C-15 prediction caveat: `mvn #0` in orig doesn't always
+  mean mwcc 1.2. `complete_units` 1415 → 1428. 3-region SHA1 PASS +
+  27/27 OK.
+- **PR #644 — scaffolder / brief 196 permuter batch wrapper.** 🎯
+  `tools/permute_batch.py` wraps brief 098's single-shot permuter
+  for worklist-driven batch use with budgets + threads + structured
+  results JSON (match / no_match / timeout / stub_missing /
+  import_failed / budget_exhausted). 9-pick worklist for Cluster B +
+  E published. Dry-run finding: 9/9 picks `stub_missing` — the actual
+  gap is between "skip during decomp wave" and "drive permuter
+  against the result," NOT permuter viability. **Brief 198 (decomper)
+  closes the gap by writing the stubs.** 2032 → 2068 tests (+36).
+- **PR #643 — scaffolder / brief 194 C-33 wall + patcher cap revision.**
+  🎯 Brilliant diagnostic move: brief 193's "+64 byte cascade" turned
+  out to be a *virtual LCF accounting artifact*, not a physical shift.
+  120 TU sections all shifted by the same +64-to-+68 magnitude (modal
+  100% consensus on `.text` and `.data`). New `_section_modal_shifts()`
+  measures deviation from PER-SECTION modal; absolute cap fires only
+  when a TU moves INDEPENDENTLY from its section's bulk. Unblocks ALL
+  `.legacy.c` > 0x50 routing — substantial mid-tier work. Honest
+  worked-example caveat: fix unblocks the BUILD pipeline but byte-
+  matching brief 193's affected picks is Cluster E permuter territory.
+  +1150/-15, 2032/2032 tests (+20).
+- **PR #642 — decomper / brief 195 recipe drain 8/8 ships.** 🎉
+  **100% recipe-locked throughput.** Drained all C-31 + C-32 locked
+  picks from briefs 191/192: 4 cluster-A cross-overlay BL picks +
+  4 mwldarm interwork picks. `.s` files per recipes. One mwasmarm-
+  dialect snag fixed inline (`lsl`/`lsr` aren't standalone mnemonics
+  in ARM mode). `complete_units` 1407 → 1415.
+- **PR #640 — decomper / brief 193 medium-easy 0/15.** 🔬 Pivot's
+  first wash brief but high diagnostic yield. Two new wall clusters
+  documented: **Cluster E (mwcc reg-alloc + scheduling drift)** —
+  5 picks affected, permuter territory; **Cluster F (`.legacy.c`
+  cascade)** — 3 picks affected, forward-progress blocker for ALL
+  `.legacy.c` > 0x50 (closed by brief 194). Pick #19 correctly flagged
+  as mis-tagged in brief 190's queue.
+- **PR #639 — scaffolder / brief 192 C-32 cross-overlay BL wall.**
+  🎯 Recipe + classifier + worked example. ov011/ov012/ov013
+  functions with `bl <hardcoded VA>` to shared-base-range addresses;
+  dsd emits orig bytes with NO `R_ARM_PC24` reloc. Recipe: `.s` with
+  hand-encoded BL `.word`. Worked example: `func_ov011_021d2c64.s`
+  (40 B). Three shared-base ranges documented. Full ov011 scan found
+  12 additional C-32 hits (brief 197 drained them). +763 LOC, 2012
+  tests.
+- **PR #638 — scaffolder / brief 191 C-31 mwldarm interwork wall.**
+  🎯 Recipe + classifier + worked example. `ldr rN, [pc, …]; bx rN;
+  .word target` pattern causes multi-KB cascade when source-claimed
+  (mwldarm re-emits veneers when its native slots are user-claimed).
+  Empirical repro: 158,713 B (59.2%) divergence with 19,693 runs.
+  Recipe: `.s` with `.thumb` directive (NOT `.thumb_func`). Three
+  shape signatures classified. 100% detection on all 5 brief-188
+  affected picks. +588 LOC, 2005 tests.
+- **PR #637 — decomper / brief 190 easy-bucket 10/25 ships.** ✅
+  `matched_code_percent` +0.0093% (5.5× brief 188's delta). +6
+  matched_functions. Four new wall clusters surfaced from skipped
+  picks (3 became named walls in briefs 191/192/194; 1 became
+  Cluster E for permuter).
+- **PR #636 — decomper / brief 188 first code-decomp wave.** 🎉
+  **First code-decomp brief in 39 briefs.** 5/12 trivial picks
+  ship; matched_code +0.0017%, matched_functions +4 — **first
+  positive metric movement since SHA1 PASS at brief 140.** Per-pick
+  wall classification surfaced C-31 mwldarm interwork (5 of 7
+  skipped) + 2 epilogue orphans.
+- **PR #635 — scaffolder / brief 189 wall pre-emption classifier.**
+  🎯 `tools/predict_walls.py` (480 LOC) — disasm-based wall
+  classifier. Project-wide tally: C-1 3,980 / StyleA 2,074 / C-15 869
+  / C-22 286 / P-9 225 / C-24 212 (out of 9,849 scanned). Top-3 wall
+  research notes shipped. `next_targets.py:reason` now emits
+  `[walls: ...]`. Foundation that briefs 191/192/194 extended.
+- **PR #634 — brain / housekeeping for 182-187 pivot capture.**
+  AGENTS.md + state.md captured the W7 closure + post-SHA1 scaffold
+  done declaration. Fixed `python` → `python3` in Stop hook (silent
+  failure on Mac since macOS ships no plain `python`).
+
+### Earlier (PR #629 → #633 from the previous brain-PR — see PR #634 body)
+
+- **PR #633 — scaffolder / brief 187 code-decomp resumption prep.**
+  🎉 **Pivot enabler shipped.** Three-part single PR. (1) Diagnosed
+  `ninja report` panicking with `index out of bounds` at
+  `objdiff-core/src/arch/arm.rs:130:29`; root cause: `.text` sections
+  with no `STT_FUNC` symbol coverage OR target `.o` missing (`.legacy`/
+  `.legacy_sp3` routing tiers with no C source yet).
+  `tools/objdiff_filter_panic_units.py` drops 1,096 / 3,330 affected
+  units via direct ELF parsing (no `pyelftools` dep); ninja report
+  succeeds in ~0.2 s. **First post-filter metrics:**
+  `matched_code_percent = 1.40 %`, `matched_functions = 1,420 / 9,608
+  (14.78 %)`, `complete_units = 1,381 / 2,234`. Upstream
+  [objdiff#352](https://github.com/encounter/objdiff/issues/352)
+  filed with backtrace + 1020-byte base64 ELF reproducer + suggested
+  fix direction. (2) `docs/research/code-decomp-resumption-queue.md`
+  — 52-pick curated queue (12 trivial + 25 easy + 15 medium-easy),
+  ranked easiest-first. (3) `docs/decomp-workflow.md` refreshed with
+  the "Code-decomp resumption — the post-scaffold playbook" section:
+  routing decision tree, scratch flow, permuter staging, 3-region
+  SHA1 PASS as headline gate. Brain pushed MD012 fix (commit 38ec1e2,
+  3 spots — triple-blank before bucket tables in the queue doc).
+  1973/1973 tests, 3-region SHA1 PASS preserved.
+- **PR #632 — decomper / brief 182 W7 chain CLOSED for EUR.**
+  🎉 **Both odd-aligned EUR ov004 `.rodata` claims ship via
+  brief 173 Variant A.** `data_ov004_021ded69` (8,780 B `.rodata`
+  `[0x021ded69..0x021e0fb5)`) + `data_ov004_021e191c` (1,173 B
+  `[0x021e191c..0x021e1db1)`), both `__attribute__((aligned(1)))
+  const unsigned char[N]`. Total: 9,953 new EUR bytes. n=2 → n=0.
+  **W7 chain: 134 → 142 → 146 → 150 → 162 → 164 → 168 → 180 → 183
+  → 186 → 182 CLOSED for EUR.** USA + JPN cross-region attempted +
+  reverted: extending the USA/JPN claim to absorb the inner
+  `data_ov004_021e1b9d` placeholder produces a +36 B `.rodata`
+  cascade well over brief 180's `MAX_SHIFT_BYTES = 4` cap, not
+  absorbed by the 20-byte `.ctor` pad. Deferred indefinitely per
+  pivot discipline. Self-extend survey: 35 odd-aligned ov004 data
+  symbols total, 1 shipped, 34 remain. 3-region SHA1 PASS (EUR at
+  n=0, USA + JPN baseline preserved) + 27/27 modules + 0
+  match-invariants errors.
+- **PR #631 — scaffolder / brief 186 patcher gap closure.**
+  🎯 **Two parser gaps closed in `tools/patch_ov004_veneers.py`
+  from the decomper's brief 182 diagnosis.** Gap A — TU trailing
+  range lost when last symbol has size=0: new
+  `_MAP_SECTION_BOUNDARY_RE` parses `OV<NN>_<SECTION>_START/END`
+  markers; per-TU `built_end_va` extends to next TU's start (or
+  section END for trailing TU); defensive `max()` semantic — never
+  shrinks. Gap B — `.ctor` shift defaulted to 0 instead of
+  inheriting from `.init`: fallback uses most recent `.init` TU's
+  shift when own `shift_candidate` is None AND no prior `.ctor`
+  TU exists. Real-data confirmed on EUR map: `.ctor` shift now +24
+  (was 0), `_dsd_gap@ov004_24.o (.text) built_end_va` now extends
+  to next TU start. +256/-0, 4 new tests (1969 → 1973), 3-region
+  SHA1 PASS at n=2 baseline.
+- **PR #630 — scaffolder / brief 185 cluster B cap raise.**
+  🎯 **`max_bundle_bytes` raised 1024 → 4096 + `data_ov006_021ceae4`
+  worked example.** Diagnosis: bundle MUST end at a 4-aligned named
+  symbol; no intermediate one exists between `0x021ceae4` and
+  `0x021cef74` (1168 B away). Tightening predicate (option a)
+  structurally infeasible — chose option b: raise cap + new
+  `max_inner_symbols = 16` per-cluster guardrail. New
+  `render_bundle_s_bytewise` emitter for byte-granular .s with
+  `.global` labels at non-4-aligned offsets. Worked example:
+  `data_ov006_021ceae4.s` (USA + JPN ov006, byte-identical
+  cross-region). 1956 → 1969 tests. Research note at
+  `docs/research/cluster-b-bundle-cap-raise.md`. 3-region SHA1
+  PASS preserved.
+- **PR #629 — scaffolder / brief 184 C / D-1 / D-2 cross-region
+  subcommands.** 🎯 **`adjust_chunk_extent` is already cluster-
+  agnostic; this brief wires three new subcommands.**
+  `cmd_c_strings` (Pattern 3 `.s` via `cluster_c_pattern3_gen.
+  generate_chunk`), `cmd_d1_tables` (bespoke `extern char <p>;` +
+  `void *<a>[N] = { &p, ... }`), `cmd_d2_tables` (Pattern 3 `.s`
+  with `--section data`). Each follows existing `cmd_b_*` shape
+  (load region context → enumerate → adjust extent → emit). EUR
+  dry-run smoke totals: 1855 emit / 741 skip across the three
+  subcommands. 1937 → 1956 tests (+19). Pure tools work — no source
+  ships; decomper's brief 188+ owns the apply at scale (deferred
+  per pivot — brief 188 is code decomp, not data apply). 3-region
+  SHA1 PASS preserved.
+
+### Earlier this round (PRs #622 → #624 from the previous brain-PR)
+
+- **PR #622 — brain / cloud→scaffolder rename + extended
+  cleanup.** Two-commit PR: initial in-repo rename (agent
+  files, AGENTS.md table, CI labeler, tools docstrings)
+  + extended cleanup commit that drops all forward-facing
+  `cloud` references in `AGENTS.md`, `docs/state.md`,
+  `docs/decomp-workflow.md`, `.claude/agents/scaffolder.md`
+  (History section removed), and `tests/test_generate_research_index.py`
+  fixtures. Preserved (intentional): 5 factual branch-name
+  references to `cloud/patcher-variant-e-2byte-pool-shift`
+  (real git artifact), generic `cloud LLM session` in
+  brain-runs-locally rationale, `iCloud-share` in
+  onboarding. Suite 1904/1904 + EUR SHA1 PASS.
+- **PR #621 — scaffolder / brief 179 Variant E
+  FALSIFIED.** 🔬 1–3 byte veneer-pool shift model
+  disproven via empirical reproduction on EUR
+  `data_ov004_021ded69` Variant A. Actual root cause:
+  multi-segment `.rodata` layout cascade (+0/+1/+2/+4
+  across 4 TU boundaries, absorbed by 16-vs-20 `.ctor`-pad
+  delta). Pure pool-shift detection — even with
+  `MAX_SHIFT_BYTES = 3` — cannot close SHA1. Ships ONLY
+  the research note (`docs/research/ov004-odd-aligned-
+  layout-cascade.md`) + brief 180 reformulation spec; no
+  patcher / source / delinks changes. 3-region SHA1 PASS
+  preserved at n=2.
+- **PR #620 — decomper / brief 178 cross-region D-3 at
+  scale.** 🎉 **74 cross-region D-3 chunks** shipped (37
+  USA + 37 JPN, 247% over ≥30 target). 80,152 bytes of
+  new region-specific data (40,076 per region). Per-
+  region per-module: 18 main + 6 ov002 + 11 ov006 + 1
+  ov007 + 1 ov021. Method: brief 177's
+  `cross_region_chunk_extent.py` for extent adjustment +
+  **recursive split-around-pre-existing-TUs pass** to
+  maximize coverage (13 → 37 per region). 3-region SHA1
+  PASS + 27/27 modules preserved. Brain pushed drift-
+  check regen fix on rebase.
+- **PR #623 — scaffolder / brief 180 patcher Variant E
+  proper.** 🎉 **W7 chain extends to brief 180.** Four
+  pieces: (1) dropped `veneer_count > 0` gate on load-
+  rewrite + ARM-BL re-encode passes; (2) `--map` CLI arg
+  plumbed through `rom_config` rule; (3) map-driven per-
+  TU layout reconstruction (~558 LOC) with
+  `parse_link_map_ov004` + `_layout_reconstruct` (per-TU
+  bounds, not per-symbol — sidesteps the ~21 KB gap-
+  marker stranding); (4) `MAX_SHIFT_BYTES = 4` cap.
+  **Brain caught a routing-order bug** on first verify
+  pass: parser raised on shift > 4 BEFORE the
+  `_is_orig_shape` idempotence guard ran, breaking n=2
+  production. Scaffolder picked Option A (move cap out
+  of parser into `_layout_reconstruct`) and shipped the
+  fix in commit adc44f6 + 4 new regression tests. Suite
+  1930 → 1934. 3-region SHA1 PASS preserved at n=2.
+  Brief 182 (decomper path-2 final wave dropping n=2 →
+  n=0) now unblocked.
+- **PR #624 — decomper / brief 181 cluster B residue +
+  cluster D-3 small-residue cleanup.** Bridge wave while
+  brief 180 was in flight. Three sub-targets in one PR:
+  (1) cluster B size-1/2 + odd-aligned cross-region —
+  3 bundles per region × USA + JPN = 6 ships + ov002
+  bonus; (2) 3 cluster B value=0 EUR deferred (W6-
+  rejected wave-2 rewrite) — 2 main rewrites absorbing
+  3 placeholders + bonus cross-region absorbing 6 more
+  across USA + JPN; (3) cluster D-3 `data_020e0e70`
+  (366 B → 544 B Pattern 3 chunk absorbing
+  `data_020e0fde`). Bytes: EUR 556, USA 148, JPN 148.
+  3-region SHA1 PASS + 27/27 modules preserved.
+  Skipped: `data_ov006_021ceae4` (>1024 B safety cap),
+  `data_ov002_022ccc2e` (odd-aligned, needs brief 180
+  recipe — now unblocked), `data_020c9694` 14.8 KB
+  D-3 mega (separate brief).
+
+- **PR #617 — decomper / brief 176 cluster B residue at
+  scale.** ✅ **Brief 174 generator validated at scale.**
+  32 cluster B residue claims shipped across USA + JPN
+  (16 each); 14 main + 1 ov004 + 1 ov006 per region.
+  **🎉 Brief 170 ov006 sub-pool RESOLVED** — brief 170
+  reported a 32-byte `.data` ordering shift; brief 172
+  didn't resolve; brief 174's more conservative bundle
+  extents now ship cleanly (`data_ov006_021ce9e0` lands
+  in this wave). Apply funnel: 30 worklist → skip 14
+  (size=2/1 + odd-aligned + worked + overlap) → apply
+  16. Self-extend both gates met (53% yield, 500+ B per
+  region). Residue 16 (size-1/2 + odd-aligned) deferred
+  to brief 180+. **3-region SHA1 PASS + 27/27 OK
+  preserved.**
+- **PR #618 — scaffolder / brief 177 unified chunk-extent
+  generator.** 🎉 New `tools/cross_region_chunk_extent.py`
+  generalises brief 174's bundle heuristic to multi-symbol
+  Pattern 3 chunks. **3-phase algorithm**: Phase A lowers
+  start LEFT to absorb predecessor; Phase B raises end
+  RIGHT iteratively for inner extents; Phase C validates
+  4-aligned + named-symbol + non-zero. **Brief 175's
+  headline failure REPRODUCES + ships**: target
+  `[0x021cca88, 0x021ccd08)` → adjusted
+  `[0x021cca68, 0x021ccf68)` (1280 B). 2 worked examples
+  shipped — USA + JPN ov006 (1280 B each) + USA main
+  (816 B). 15 new tests; suite 1889 → 1904. Brain pushed
+  F401 ruff fix + manual delinks.txt merge conflict
+  resolution (both PRs touched same files; additive
+  merge).
+
+- **PR #578 — decomper / brief 151 ov004 .rodata wave 2.** ✅
+  **28 source-level claims** (40% over ≥ 20 target). Per-shape:
+  25 Pattern 1 .c (`.data` strings, brief 141 orphan recovery —
+  the .c files were already in the working tree but were never
+  wired into delinks.txt), 2 D-1 dispatch tables, and 1 Pattern 3
+  mega chunk at `0x02200f18..0x02206738` covering a 22.5 KB
+  block with 2 symbols. Total: 23,432 bytes. 3-region SHA1 PASS +
+  27/27 OK preserved. **BONUS NOT MET**: couldn't drop ov004's
+  veneer count `n` below 9 — investigation showed remaining
+  candidates are ARM-code symbols misclassified as `data` in
+  `symbols.txt`. Brief 154 (scaffolder, queued) takes the
+  reclassification research as the next step.
+- **PR #579 — scaffolder / brief 152 cluster B size-1/2 workarounds.**
+  ✅ **Workaround #3 PASSES; workaround #2 FALSIFIED with root-
+  cause diagnosis.** Empirical finding: `arm9.lcf`'s
+  `ALIGNALL(2)` directive (not mwcc) is the alignment-cascade
+  culprit — the `.o` reports `Algn 2**0` correctly, but mwldarm
+  re-aligns every section to 4 bytes at link time, padding 3
+  bytes after a 1-byte section. Workaround #3 (bundle the size-
+  1/2 slot + zero-pad neighbours into `unsigned int[N]` covering
+  the deduced range to the next named symbol) sidesteps the
+  cascade. Worked example shipped: `data_021020b4` (16-int
+  bundle, 64 bytes). 3-region SHA1 PASS + 1784/1784 tests.
+  Research note at `docs/research/cluster-b-size-1-2-recipe.md`.
+  Recipe ready for brief 153 (decomper) to drain.
+- **PR #575 — decomper / brief 149 cluster B wave 3.** ✅
+  **Cluster B pointer pool fully drained**: 20 of 20 remaining
+  candidates shipped via brief 148's locked recipe. 8 data-pointer
+  singletons + 4 code-pointer singletons + two 4-element + one
+  3-element fn-ptr "table" + one ov004 (bss pointee). **3-region
+  SHA1 PASS + 27/27 OK preserved.** Notable empirical correction:
+  **REJECTED brief 148's bundling-into-array hand-off** — checked
+  `relocs.txt`, found each table slot is referenced by name from
+  other code, so bundling would break per-slot symbol identity.
+  All 20 shipped as singletons. **Size-1 workaround #1 (.s with
+  explicit `.byte`) FALSIFIED** — same 1308 byte / 32-byte
+  cascade as brief 148's naive .c attempt; mwasmarm respects the
+  same LCF section-alignment cascade as mwcc. Workarounds #2 +
+  #3 deferred to brief 152. Self-extend gate: yield 100% PASS,
+  bytes-matched FAIL (80 B vs ≥250 B — pointers are 4 B). Brief
+  closes after wave 1.
+- **PR #576 — scaffolder / brief 150 low-n WITH_TERMINATOR.** Option
+  A shipped (recommended): `_fix_ctor_and_pad`'s byte-detection
+  is now the authoritative truth source; n-inference is an
+  informational hint via stderr note on disagreement, not a
+  fatal error. **Patcher accepts any `n ∈ [0, 86]` cleanly.**
+  `expected_output_size_for` gains optional `ctor_pad_net`
+  parameter that takes precedence over n-inference; `main()`
+  passes the byte-detected truth into the YAML `code_size`
+  rewrite. 8 new tests (`TestLowNWithTerminator` +
+  `TestExpectedOutputSizeForCtorPadNet`) pin brief 147's n=2 +
+  n=7 failing cases under brief 150 + assert stderr note
+  semantics. **Test suite 1784/1784.** **3-region `ninja sha1`
+  PASS preserved bit-for-bit at the historical n=86 case.**
+  Cloud honestly documented test-scope limits: end-to-end smoke
+  via an arbitrary source claim couldn't drop `n` below 9
+  because suppression depends on the slot being an ov002
+  cross-overlay pointer target — reverse-lookup tool is brief
+  151+ territory. **Brief 134 → 142 → 146 → 150 patcher chain
+  complete** — W7 mitigation now fully general.
+

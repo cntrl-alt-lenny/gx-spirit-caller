@@ -40,6 +40,7 @@ class BuildMasterLedgerTest(unittest.TestCase):
             "region": "eur", "module": "main", "name": "func_main_a",
             "addr": "0x02000010", "size": 0x40, "bucket": "<0x100",
             "mode": "arm", "has_dossier": False, "twin": None,
+            "attempted": False, "park_reason": None,
         })
         self.assertEqual(rows[1]["mode"], "thumb")
         self.assertEqual(rows[1]["has_dossier"], True)

@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
+import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -103,21 +105,95 @@ def build_region_rows(
                 "mode": modes[(name, addr)],
                 "has_dossier": (module, addr) in dossiers,
                 "twin": twins.get((region, module, addr)),
+                "attempted": False,
+                "park_reason": None,
             })
     return sorted(rows, key=lambda row: (row["module"], parse_addr(row["addr"]), row["name"]))
 
 
-def write_ledger(regions: list[str], output: Path) -> dict[str, list[dict]]:
+def _evidence_tags(line: str, heading: str, source: str) -> list[str]:
+    if source.endswith("endgame-ledger.md"):
+        if any(word in heading.lower() for word in ("park", "floor")):
+            return ["endgame-floor"]
+        return []
+    if not source.endswith("codegen-walls.md"):
+        return []
+    tags = re.findall(r"\b(?:C|P|T)-\d+[a-z]?\b|\bW-[A-Z]\b", line)
+    if tags:
+        return [tags[0]]
+    heading_tags = re.findall(r"\b(?:C|P|T)-\d+[a-z]?\b|\bW-[A-Z]\b", heading)
+    if heading_tags:
+        return [heading_tags[0]]
+    return ["codegen-walls"]
+
+
+def load_research_evidence(names: set[str], research_root: Path = ROOT / "docs/research") -> tuple[set[str], dict[str, str], float]:
+    """Use one ripgrep pattern-file sweep, then classify matching evidence."""
+    started = time.perf_counter()
+    if not names:
+        return set(), {}, 0.0
+    pattern_file = research_root.parent / ".master-ledger-name-patterns.tmp"
+    pattern_file.write_text("\n".join(sorted(names)) + "\n")
+    try:
+        result = subprocess.run(
+            [
+                "rg", "-l", "-F", "-f", str(pattern_file),
+                "--glob", "!campaign-analytics/master-ledger-summary.md",
+                "--glob", "!campaign-analytics/pick-lists.md",
+                str(research_root),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        pattern_file.unlink(missing_ok=True)
+    attempted = set()
+    reasons: dict[str, set[str]] = defaultdict(set)
+    for raw_path in result.stdout.splitlines():
+        path = Path(raw_path)
+        text = path.read_text(encoding="utf-8")
+        present = {name for name in names if name in text}
+        attempted.update(present)
+        heading = ""
+        for line in text.splitlines():
+            if line.startswith("#"):
+                heading = line
+            for name in present:
+                if name in line:
+                    reasons[name].update(_evidence_tags(line, heading, path.name))
+    elapsed = time.perf_counter() - started
+    def primary(tags: set[str]) -> str:
+        if "endgame-floor" in tags:
+            return "endgame-floor"
+        if "codegen-walls" in tags:
+            return "codegen-walls"
+        return sorted(tags)[0]
+
+    return attempted, {name: primary(tags) for name, tags in reasons.items() if tags}, elapsed
+
+
+def apply_provenance(rows: list[dict]) -> float:
+    names = {row["name"] for row in rows}
+    attempted, reasons, elapsed = load_research_evidence(names)
+    for row in rows:
+        row["attempted"] = row["name"] in attempted
+        row["park_reason"] = reasons.get(row["name"])
+    return elapsed
+
+
+def write_ledger(regions: list[str], output: Path) -> tuple[dict[str, list[dict]], float]:
     dossiers = load_dossiers()
     twins = load_twins()
     rows_by_region = {region: build_region_rows(region, dossiers=dossiers, twins=twins)
                       for region in regions}
+    elapsed = apply_provenance([row for rows in rows_by_region.values() for row in rows])
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w") as handle:
         for region in regions:
             for row in rows_by_region[region]:
                 handle.write(json.dumps(row, sort_keys=True) + "\n")
-    return rows_by_region
+    return rows_by_region, elapsed
 
 
 def read_ledger(path: Path) -> list[dict]:
@@ -147,7 +223,7 @@ def render_summary(rows: list[dict]) -> str:
     groups = defaultdict(list)
     for row in rows:
         groups[(row["region"], row["module"])].append(row)
-    lines = ["# Master candidate ledger summary", "", "Unmatched functions from committed symbols and delinks; byte deltas compare candidate bytes with the endgame ledger's code-gap bytes.", "", "| Region | Module | Count | Bytes | ARM | Thumb | Dossier | Twin | Endgame gap (B) | Delta (B) |", "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = ["# Master candidate ledger summary", "", "Unmatched functions from committed symbols and delinks; provenance columns are derived from one repository-wide ripgrep sweep.", "", "| Region | Module | Count | Bytes | ARM | Thumb | Dossier | Twin | Attempted | Parked | Endgame gap (B) | Delta (B) |", "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     totals = defaultdict(lambda: [0, 0, 0, 0, 0, 0])
     for (region, module), items in sorted(groups.items()):
         count = len(items)
@@ -156,24 +232,46 @@ def render_summary(rows: list[dict]) -> str:
         thumb = count - arm
         dossier = sum(item["has_dossier"] for item in items)
         twin = sum(item["twin"] is not None for item in items)
+        attempted = sum(item["attempted"] for item in items)
+        parked = sum(item["park_reason"] is not None for item in items)
         gap = ENDGAME_BYTES.get(region, {}).get(module, 0)
-        lines.append(f"| {region.upper()} | {module} | {count} | {byte_count} | {arm} | {thumb} | {dossier}/{count} ({dossier / count:.1%}) | {twin}/{count} ({twin / count:.1%}) | {gap} | {byte_count - gap:+d} |")
+        lines.append(f"| {region.upper()} | {module} | {count} | {byte_count} | {arm} | {thumb} | {dossier}/{count} ({dossier / count:.1%}) | {twin}/{count} ({twin / count:.1%}) | {attempted}/{count} | {parked}/{count} | {gap} | {byte_count - gap:+d} |")
         t = totals[region]
         for i, value in enumerate((count, byte_count, arm, thumb, dossier, twin)):
             t[i] += value
-    lines += ["", "| **Region total** | | **Count** | **Bytes** | **ARM** | **Thumb** | **Dossier** | **Twin** | **Endgame gap (B)** | **Delta (B)** |", "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines += ["", "| **Region total** | | **Count** | **Bytes** | **ARM** | **Thumb** | **Dossier** | **Twin** | **Attempted** | **Parked** | **Endgame gap (B)** | **Delta (B)** |", "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for region in VALID_REGIONS:
         count, byte_count, arm, thumb, dossier, twin = totals[region]
+        attempted = sum(item["attempted"] for item in rows if item["region"] == region)
+        parked = sum(item["park_reason"] is not None for item in rows if item["region"] == region)
         gap = sum(ENDGAME_BYTES.get(region, {}).values())
-        lines.append(f"| **{region.upper()}** | | {count} | {byte_count} | {arm} | {thumb} | {dossier}/{count} ({dossier / count:.1%}) | {twin}/{count} ({twin / count:.1%}) | {gap} | {byte_count - gap:+d} |")
+        lines.append(f"| **{region.upper()}** | | {count} | {byte_count} | {arm} | {thumb} | {dossier}/{count} ({dossier / count:.1%}) | {twin}/{count} ({twin / count:.1%}) | {attempted}/{count} | {parked}/{count} | {gap} | {byte_count - gap:+d} |")
     count = sum(v[0] for v in totals.values())
     byte_count = sum(v[1] for v in totals.values())
     gap = sum(sum(values.values()) for values in ENDGAME_BYTES.values())
-    lines.append(f"| **ALL REGIONS** | | **{count}** | **{byte_count}** | **{sum(v[2] for v in totals.values())}** | **{sum(v[3] for v in totals.values())}** | | | **{gap}** | **{byte_count - gap:+d}** |")
+    attempted = sum(row["attempted"] for row in rows)
+    parked = sum(row["park_reason"] is not None for row in rows)
+    lines.append(f"| **ALL REGIONS** | | **{count}** | **{byte_count}** | **{sum(v[2] for v in totals.values())}** | **{sum(v[3] for v in totals.values())}** | | | **{attempted}** | **{parked}** | **{gap}** | **{byte_count - gap:+d}** |")
     lines += ["", "The totals reconcile to the endgame ledger's 55,540-byte gap only as an explicit comparison: this ledger counts unmatched function spans, while the endgame ledger measures module code gaps. The delta is therefore reported, not adjusted.", "", "## ARM singleton pick-list", "", "| Name | Region | Module | Size | Dossier? |", "|---|---|---|---:|---|"]
     singletons = [row for row in rows if row["mode"] == "arm" and row["twin"] is None]
     for row in sorted(singletons, key=lambda r: (r["size"], r["region"], r["module"], r["name"]))[:100]:
         lines.append(f"| `{row['name']}` | {row['region'].upper()} | {row['module']} | {row['size']} | {'yes' if row['has_dossier'] else 'no'} |")
+    return "\n".join(lines) + "\n"
+
+
+def render_pick_lists(rows: list[dict]) -> str:
+    lines = ["# Never-attempted ARM singleton pick-lists", "", "Full lists by module; singleton means `twin == null`. Rows are sorted by size, then region and address.", ""]
+    groups = defaultdict(list)
+    for row in rows:
+        if row["mode"] == "arm" and row["twin"] is None and not row["attempted"]:
+            groups[row["module"]].append(row)
+    for module in sorted(groups):
+        items = sorted(groups[module], key=lambda r: (r["size"], r["region"], parse_addr(r["addr"]), r["name"]))
+        lines += [f"## {module} ({len(items)} rows)", "", "| Name | Region | Size | Dossier? |", "|---|---|---:|---|"]
+        for row in items:
+            lines.append(f"| `{row['name']}` | {row['region'].upper()} | {row['size']} | {'yes' if row['has_dossier'] else 'no'} |")
+        lines.append("")
+    lines.append(f"Total never-attempted ARM singletons: {sum(len(items) for items in groups.values())}.")
     return "\n".join(lines) + "\n"
 
 
@@ -182,12 +280,18 @@ def main() -> int:
     parser.add_argument("--version", nargs="+", choices=VALID_REGIONS, default=list(VALID_REGIONS))
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--summary", type=Path, help="also write a Markdown summary")
+    parser.add_argument("--pick-lists", type=Path, help="also write never-attempted ARM singleton lists")
     args = parser.parse_args()
-    rows = write_ledger(args.version, args.output)
+    rows, elapsed = write_ledger(args.version, args.output)
     print(" ".join(f"{region}={len(rows[region])}" for region in args.version))
     if args.summary:
-        args.summary.write_text(render_summary(read_ledger(args.output)))
+        ledger_rows = read_ledger(args.output)
+        args.summary.write_text(render_summary(ledger_rows))
         print(f"summary={args.summary}")
+        if args.pick_lists:
+            args.pick_lists.write_text(render_pick_lists(ledger_rows))
+            print(f"pick_lists={args.pick_lists}")
+    print(f"research_sweep_seconds={elapsed:.6f}")
     return 0
 
 
