@@ -4,6 +4,15 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/jpn/main/LZ77UnCompReadNormalWrite8bit.s:
+    complete
+    .text start:0x0200007e end:0x02000082
+src/jpn/main/WaitByLoop.s:
+    complete
+    .text start:0x02000162 end:0x02000166
+src/jpn/main/CpuSet.s:
+    complete
+    .text start:0x02000236 end:0x0200023a
 src/jpn/main/IntrWait.c:
     complete
     .text start:0x020002b0 end:0x020002b4
@@ -13,6 +22,13 @@ src/jpn/main/Sqrt.c:
 src/jpn/main/CpuFastSet.c:
     complete
     .text start:0x02000538 end:0x0200053c
+src/jpn/main/HuffUnCompReadByCallback.s:
+    complete
+    .text start:0x0200071a end:0x0200071e
+src/jpn/main/Halt.s:
+    complete
+    .text start:0x02000786 end:0x0200078a
+
 src/jpn/main/func_0200093c.s:
     complete
     .text start:0x0200093c end:0x02000950
