@@ -4,6 +4,38 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/jpn/main/LZ77UnCompReadNormalWrite8bit.c:
+    complete
+    .text start:0x0200007e end:0x02000082
+
+src/jpn/main/WaitByLoop.c:
+    complete
+    .text start:0x02000162 end:0x02000166
+
+src/jpn/main/CpuSet.c:
+    complete
+    .text start:0x02000236 end:0x0200023a
+
+src/jpn/main/IntrWait.c:
+    complete
+    .text start:0x020002b0 end:0x020002b4
+
+src/jpn/main/Sqrt.c:
+    complete
+    .text start:0x02000404 end:0x02000408
+
+src/jpn/main/CpuFastSet.c:
+    complete
+    .text start:0x02000538 end:0x0200053c
+
+src/jpn/main/HuffUnCompReadByCallback.c:
+    complete
+    .text start:0x0200071a end:0x0200071e
+
+src/jpn/main/Halt.c:
+    complete
+    .text start:0x02000786 end:0x0200078a
+
 src/jpn/main/func_0200093c.s:
     complete
     .text start:0x0200093c end:0x02000950
@@ -13,6 +45,10 @@ src/jpn/main/func_02000950.s:
 src/jpn/main/func_020009fc.s:
     complete
     .text start:0x020009fc end:0x02000a74
+src/jpn/main/AutoloadCallback.c:
+    complete
+    .text start:0x02000a74 end:0x02000a78
+
 src/jpn/main/func_02000a78.s:
     complete
     .text start:0x02000a78 end:0x02000b60
@@ -22,6 +58,10 @@ src/jpn/main/func_02000b60.s:
 src/jpn/main/func_02000b64.s:
     complete
     .text start:0x02000b64 end:0x02000b68
+src/jpn/main/main.c:
+    complete
+    .text start:0x02000c34 end:0x02000c44
+
 src/jpn/main/func_02000c44.c:
     complete
     .text start:0x02000c44 end:0x02000c4c
@@ -1373,6 +1413,10 @@ src/jpn/main/func_02018a88.s:
 src/jpn/main/func_02018ae0.s:
     complete
     .text start:0x02018ae0 end:0x02018af4
+src/jpn/main/GetSystemWork.c:
+    complete
+    .text start:0x02018af4 end:0x02018b00
+
 src/jpn/main/func_02018b00.c:
     complete
     .text start:0x02018b00 end:0x02018b14
@@ -10715,6 +10759,38 @@ libs/nitro/func_020903b0.legacy.c:
 src/jpn/main/func_020902ec.s:
     complete
     .text start:0x020902ec end:0x0209036c
+src/jpn/main/OSi_IrqHandlerTimer3.c:
+    complete
+    .text start:0x0209036c end:0x0209037c
+
+src/jpn/main/OSi_IrqHandlerTimer2.c:
+    complete
+    .text start:0x0209037c end:0x0209038c
+
+src/jpn/main/OSi_IrqHandlerTimer1.c:
+    complete
+    .text start:0x0209038c end:0x0209039c
+
+src/jpn/main/OSi_IrqHandlerTimer0.c:
+    complete
+    .text start:0x0209039c end:0x020903ac
+
+src/jpn/main/OSi_IrqHandlerDma3.c:
+    complete
+    .text start:0x020903ac end:0x020903bc
+
+src/jpn/main/OSi_IrqHandlerDma2.c:
+    complete
+    .text start:0x020903bc end:0x020903cc
+
+src/jpn/main/OSi_IrqHandlerDma1.c:
+    complete
+    .text start:0x020903cc end:0x020903dc
+
+src/jpn/main/OSi_IrqHandlerDma0.c:
+    complete
+    .text start:0x020903dc end:0x020903ec
+
 src/jpn/main/func_020903ec.s:
     complete
     .text start:0x020903ec end:0x02090488

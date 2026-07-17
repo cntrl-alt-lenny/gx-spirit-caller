@@ -1,0 +1,21 @@
+/* func_ov004_021dc0ac: CRC-32 (IEEE 802.3, reversed 0xedb88320) table
+ * generator — classic 256-entry, 8-shifts-per-entry table build. */
+#pragma thumb on
+#include "ov004_core.h"
+
+void func_ov004_021dc0ac(unsigned int *table) {
+    unsigned int *p;
+    unsigned int c, i, j;
+    p = table;
+    for (i = 0; i < 256; i++) {
+        c = i;
+        for (j = 0; j < 8; j++) {
+            if (c & 1) {
+                c = (c >> 1) ^ 0xedb88320;
+            } else {
+                c = c >> 1;
+            }
+        }
+        *p++ = c;
+    }
+}

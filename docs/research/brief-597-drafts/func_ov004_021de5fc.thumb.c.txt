@@ -1,0 +1,25 @@
+/* func_ov004_021de5fc: if the (unmatched-elsewhere) gate check passes,
+ * poll once for a status of 14 and use it as the -1/0 result. */
+#pragma thumb on
+#include "ov004_core.h"
+
+extern int func_ov004_021deb01_unk(void);
+extern int func_020924c0(char *, int *, int);
+extern char data_ov004_022923f0[];
+
+int func_ov004_021de5fc(void) {
+    int result = -1;
+    int flag;
+    int val;
+
+    if (func_ov004_021deb01_unk() != 0) {
+        flag = 0;
+        do {
+            func_020924c0(data_ov004_022923f0, &val, 1);
+            if (val == 14) {
+                result = flag;
+            }
+        } while (flag != 0);
+    }
+    return result;
+}

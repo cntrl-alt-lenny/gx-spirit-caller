@@ -5,10 +5,14 @@ src/main/itcm/func_01ff8400.s:
     complete
     .text start:0x01ff8400 end:0x01ff8414
 
-src/main/itcm/func_01ff8770.legacy.c:
+src/main/itcm/func_01ff86c4.legacy.c:
     complete
-    .text start:0x01ff8770 end:0x01ff87c0
+    .text start:0x01ff86c4 end:0x01ff86fc
 
 src/main/itcm/func_01ff86fc.s:
     complete
     .text start:0x01ff86fc end:0x01ff8770
+
+src/main/itcm/func_01ff8770.legacy.c:
+    complete
+    .text start:0x01ff8770 end:0x01ff87c0
