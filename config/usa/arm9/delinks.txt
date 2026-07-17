@@ -4,6 +4,10 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/usa/main/Sqrt.c:
+    complete
+    .text start:0x0200019c end:0x020001a0
+
 src/usa/main/func_0200093c.s:
     complete
     .text start:0x0200093c end:0x02000950
