@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**95 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**96 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (26)
+- [Uncategorised](#uncategorised) (27)
 
 ## Analysis / worklist
 
@@ -580,6 +580,12 @@ code-decomp resumption wave (brief 189).
 **cap the number of ephemeral claude-NNN task worktrees.**
 
 The multi-agent convention (AGENTS.md § Worktree convention) spins up a new numbered sibling worktree per task session (`claude-525`, `claude-526`, ...). Nothing retires them automatically, so the count only ever grows — 27+ were observe…
+
+### `tools/routing_suffixes.py`
+
+**the ONE shared source of truth for the mwcc**
+
+routing-tier filename suffixes (brief 587, closing the brief-569 / improvement-swarm-r5-item-7 "suffix-strip" bug family).
 
 ### `tools/sig_census.py`
 

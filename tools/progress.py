@@ -298,6 +298,125 @@ def summarize_delinks(config_dir: Path) -> dict | None:
     }
 
 
+# --------------------------------------------------------------------------- #
+# Per-module breakdown (brief 587 / improvement-swarm r5)
+# --------------------------------------------------------------------------- #
+
+def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
+    """[(module_name, delinks_path)] in main/itcm/dtcm/ovNNN order.
+
+    Deliberately a small local walk rather than importing calcrom.py's
+    own `discover_module_paths` (which additionally requires a sibling
+    relocs.txt this function doesn't need): progress.py is the
+    dependency root other tools import FROM (see `c_code_bytes`'s
+    docstring and improvement-swarm r4 A3), not the reverse — pulling
+    from calcrom here would invert that and risk a circular import if
+    calcrom ever imports something from progress (it already sources
+    its own `measures` from `summarize_delinks`, per r4's structural-fix
+    note).
+    """
+    arm9 = config_dir / "arm9"
+    out: list[tuple[str, Path]] = []
+    if not arm9.is_dir():
+        return out
+    main_delinks = arm9 / "delinks.txt"
+    if main_delinks.is_file():
+        out.append(("main", main_delinks))
+    for name in ("itcm", "dtcm"):
+        d = arm9 / name / "delinks.txt"
+        if d.is_file():
+            out.append((name, d))
+    ov_root = arm9 / "overlays"
+    if ov_root.is_dir():
+        for sub in sorted(ov_root.iterdir()):
+            if sub.is_dir() and sub.name.startswith("ov"):
+                d = sub / "delinks.txt"
+                if d.is_file():
+                    out.append((sub.name, d))
+    return out
+
+
+def summarize_by_module(config_dir: Path) -> list[dict]:
+    """Per-module code% (`matched_code`/`total_code`, `CODE_SECTIONS`)
+    AND C% (`.text`-only, `.c`/`.cpp`-sourced `complete` TUs over
+    `.text`-only total — the same ratio `c_code_bytes`/
+    `c_code_total_bytes` already report region-wide, brief 566 /
+    improvement-swarm r4 A3) — broken out per module instead of summed
+    across the whole region. Reuses `parse_delinks_file`; build-free
+    (no report.json needed).
+
+    No tool previously reported C% per module at all (improvement-swarm
+    r5): 78.3% of EUR's denominator is 2 modules (arm9 + ov002) sitting
+    at 6.58% combined C, capping the *headline* number at 26.89% even if
+    every OTHER module hit 100% C — invisible without this breakdown.
+
+    Returns one dict per module, in discovery order (main, itcm, dtcm,
+    ov000..ovNNN):
+        {"module": str, "matched_code": int, "total_code": int,
+         "c_bytes": int, "c_total": int}
+    Raw byte counts, not percentages — callers compute the ratio (JSON
+    payloads should carry the same values report.json's `measures` do,
+    not a lossy pre-divided float).
+    """
+    rows: list[dict] = []
+    for module, delinks in _discover_module_delinks(config_dir):
+        module_sections, tus = parse_delinks_file(delinks)
+
+        total_code = matched_code = 0
+        c_total = 0
+        for name, start, end in module_sections:
+            size = max(0, end - start)
+            if name in CODE_SECTIONS:
+                total_code += size
+            if name == ".text":
+                c_total += size
+
+        c_bytes = 0
+        for tu in tus:
+            source = tu.get("source", "")
+            is_gap = source.startswith("_dsd_gap")
+            complete = tu.get("status") == "complete"
+            for name, start, end in tu.get("sections", []):
+                size = max(0, end - start)
+                if not is_gap and complete and name in CODE_SECTIONS:
+                    matched_code += size
+                if complete and name == ".text" and (
+                    source.endswith(".c") or source.endswith(".cpp")):
+                    c_bytes += size
+
+        rows.append({
+            "module": module,
+            "matched_code": matched_code, "total_code": total_code,
+            "c_bytes": c_bytes, "c_total": c_total,
+        })
+    return rows
+
+
+def print_by_module(version: str, rows: list[dict]) -> None:
+    def pct(num: int, den: int) -> float:
+        return (num / den * 100.0) if den else 0.0
+
+    print(f"Yu-Gi-Oh! GX Spirit Caller ({version}) — per-module code% / C%")
+    print()
+    hdr = (f"  {'module':<8} {'code %':>7}  {'matched/total code (B)':>24}  "
+           f"{'C %':>7}  {'C / .text-total (B)':>22}")
+    print(hdr)
+    print("  " + "-" * (len(hdr) - 2))
+    tot_matched = tot_total = tot_c = tot_ctotal = 0
+    for row in rows:
+        code_frac = f"{row['matched_code']}/{row['total_code']}"
+        c_frac = f"{row['c_bytes']}/{row['c_total']}"
+        print(f"  {row['module']:<8} {pct(row['matched_code'], row['total_code']):6.2f}%  "
+              f"{code_frac:>24}  {pct(row['c_bytes'], row['c_total']):6.2f}%  {c_frac:>22}")
+        tot_matched += row["matched_code"]; tot_total += row["total_code"]
+        tot_c += row["c_bytes"]; tot_ctotal += row["c_total"]
+    print("  " + "-" * (len(hdr) - 2))
+    tot_code_frac = f"{tot_matched}/{tot_total}"
+    tot_c_frac = f"{tot_c}/{tot_ctotal}"
+    print(f"  {'TOTAL':<8} {pct(tot_matched, tot_total):6.2f}%  "
+          f"{tot_code_frac:>24}  {pct(tot_c, tot_ctotal):6.2f}%  {tot_c_frac:>22}")
+
+
 def print_stub(version: str, total: int) -> None:
     if total == 0:
         print(f"{version}: no symbols.txt files found yet.")
@@ -362,10 +481,26 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Report decomp progress")
     ap.add_argument("--version", default="usa", help='Game version (default: "usa")')
     ap.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+    ap.add_argument("--by-module", action="store_true",
+                    help="Per-module code%% AND C%% table (build-free, "
+                         "delinks.txt tier only — brief 587)")
     args = ap.parse_args()
 
     report_path = ROOT / "build" / args.version / "report.json"
     config_dir  = ROOT / "config" / args.version
+
+    if args.by_module:
+        rows = summarize_by_module(config_dir)
+        if not rows:
+            print(f"error: no config under config/{args.version} (wrong region?)",
+                  file=sys.stderr)
+            return 1
+        if args.json:
+            json.dump({"version": args.version, "modules": rows}, sys.stdout, indent=2)
+            print()
+        else:
+            print_by_module(args.version, rows)
+        return 0
 
     # Tier 1 — objdiff-generated report.json. Highest fidelity; requires
     # a post-`ninja report` local build.
