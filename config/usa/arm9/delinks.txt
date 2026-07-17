@@ -4,9 +4,33 @@
     .data       start:0x020c3ae0 end:0x02102b80 kind:data align:32
     .bss        start:0x02102b80 end:0x021aa3c0 kind:bss align:32
 
+src/usa/main/HuffUnCompReadByCallback.s:
+    complete
+    .text start:0x020001ea end:0x020001ee
+
+src/usa/main/LZ77UnCompReadNormalWrite8bit.s:
+    complete
+    .text start:0x020002d2 end:0x020002d6
+
 src/usa/main/CpuSet.c:
     complete
     .text start:0x02000320 end:0x02000324
+
+src/usa/main/WaitByLoop.s:
+    complete
+    .text start:0x02000442 end:0x02000446
+
+src/usa/main/CpuFastSet.s:
+    complete
+    .text start:0x0200057e end:0x02000582
+
+src/usa/main/IntrWait.s:
+    complete
+    .text start:0x02000662 end:0x02000666
+
+src/usa/main/Halt.s:
+    complete
+    .text start:0x0200078a end:0x0200078e
 
 src/usa/main/func_0200093c.s:
     complete
