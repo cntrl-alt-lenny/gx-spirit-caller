@@ -15,7 +15,9 @@ Three parts:
 
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -26,12 +28,15 @@ sys.path.insert(0, str(_TOOLS))
 from m2c_feed import (  # noqa: E402
     FeedError,
     FeedResult,
+    FewshotExample,
     M2CMissing,
     build_context,
     find_core_header,
+    format_fewshot_block,
     main,
     render,
     resolve_symbol,
+    retrieve_fewshot,
     run_m2c,
 )
 
@@ -269,6 +274,176 @@ class TestCliExitCodes(unittest.TestCase):
                 mock.patch("m2c_feed.run_m2c", return_value="void func_02012345(void) {}\n"):
             rc = main(["--version", "eur", "--m2c", "--context", "func_02012345"])
         self.assertEqual(rc, 0)
+
+
+class TestFormatFewshotBlock(unittest.TestCase):
+    """brief 604 --fewshot: pure formatter, no subprocess/filesystem."""
+
+    def test_empty_examples_yields_empty_string(self):
+        self.assertEqual(format_fewshot_block([]), "")
+
+    def test_every_line_is_comment_prefixed(self):
+        ex = FewshotExample("func_ov002_deadbeef", "ov002", 0xdeadbeef,
+                            "int func_ov002_deadbeef(void) {\n    return 1;\n}\n")
+        block = format_fewshot_block([ex])
+        for line in block.rstrip("\n").split("\n"):
+            self.assertTrue(line.startswith("//"), f"non-comment line: {line!r}")
+
+    def test_survives_source_with_its_own_block_comment(self):
+        # brief 604 gotcha: a wrapping `/* ... */` block breaks the moment
+        # the retrieved source has its own `/* header */` comment (C/GAS
+        # comments don't nest) -- the source's own `*/` would close the
+        # wrapper early and the rest becomes live, mis-parsed code. Confirm
+        # the shipped formatter (per-line `//`) has no such delimiter to
+        # break, by asserting every line survives as a comment even when
+        # the source is stuffed with `/* */` pairs and a stray bare `*/`.
+        ex = FewshotExample("func_x", "ov000", 0x1000,
+                            "/* header */\nint func_x(void) {\n"
+                            "    /* nested-looking */ return 1; /* trailing */\n"
+                            "}\n*/\n")
+        block = format_fewshot_block([ex])
+        lines = block.rstrip("\n").split("\n")
+        self.assertTrue(all(line.startswith("//") for line in lines))
+        self.assertIn("// */", lines)
+
+    def test_numbers_multiple_examples_in_order(self):
+        examples = [
+            FewshotExample("func_a", "ov001", 0x1000, "void func_a(void) {}\n"),
+            FewshotExample("func_b", "ov001", 0x2000, "void func_b(void) {}\n"),
+        ]
+        block = format_fewshot_block(examples)
+        self.assertIn("[1/2] func_a", block)
+        self.assertIn("[2/2] func_b", block)
+        self.assertLess(block.index("func_a"), block.index("func_b"))
+
+    def test_blank_source_lines_become_bare_comment_marker(self):
+        ex = FewshotExample("func_x", "main", 0x02000000, "int x;\n\nint y;\n")
+        block = format_fewshot_block([ex])
+        self.assertIn("\n//\n", block)
+
+
+class TestRetrieveFewshot(unittest.TestCase):
+    """brief 604 --fewshot: corpus lookup + BM25 query, subprocess mocked."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.corpus_path = self.root / "corpus.jsonl"
+        self.c_dir = self.root / "src"
+        self.c_dir.mkdir()
+
+    def _write_corpus(self, rows):
+        with self.corpus_path.open("w") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def _write_c(self, relpath, content):
+        p = self.root / relpath
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content)
+        return relpath
+
+    def test_top_k_ranked_by_similarity_and_reads_c_source(self):
+        near = self._write_c("src/near.c", "int near(void) { return 1; }\n")
+        far = self._write_c("src/far.c", "int far(void) { return 2; }\n")
+        self._write_corpus([
+            {"name": "func_near", "module": "ov001", "addr": 0x1000,
+             "c_path": near, "mnemonics": "push mov bl ldr ldr ldr pop"},
+            # shares only "pop" with the query -- a real (if weak) BM25
+            # candidate, not a zero-overlap doc BM25's postings-union
+            # candidate generation would drop before ranking even starts.
+            {"name": "func_far", "module": "ov001", "addr": 0x2000,
+             "c_path": far, "mnemonics": "swi mrs mcr pop"},
+        ])
+        # target disassembles to the SAME shape as func_near
+        disasm_stub = (
+            "00000000 <func_target>:\n"
+            "   0:\te92d4008 \tpush\t{r3, lr}\n"
+            "   4:\te1a00000 \tmov\tr0, r0\n"
+            "   8:\teb000000 \tbl\t0 <helper>\n"
+            "   c:\te5900000 \tldr\tr0, [r0]\n"
+            "  10:\te5900000 \tldr\tr0, [r0]\n"
+            "  14:\te5900000 \tldr\tr0, [r0]\n"
+            "  18:\te8bd8008 \tpop\t{r3, pc}\n"
+        )
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout=disasm_stub)
+            with mock.patch("m2c_feed.ROOT", self.root):
+                results = retrieve_fewshot("eur", "some.o", "func_target", k=2,
+                                           corpus_path=self.corpus_path)
+        self.assertEqual([r.name for r in results], ["func_near", "func_far"])
+        self.assertIn("return 1", results[0].c_source)
+
+    def test_excludes_self_by_name(self):
+        own = self._write_c("src/own.c", "int func_target(void) { return 0; }\n")
+        self._write_corpus([
+            {"name": "func_target", "module": "ov001", "addr": 0x1000,
+             "c_path": own, "mnemonics": "push pop"},
+        ])
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(
+                stdout="00000000 <func_target>:\n   0:\te92d4008 \tpush\t{r3, lr}\n")
+            with mock.patch("m2c_feed.ROOT", self.root):
+                results = retrieve_fewshot("eur", "some.o", "func_target", k=5,
+                                           corpus_path=self.corpus_path)
+        self.assertEqual(results, [])
+
+    def test_missing_corpus_raises_feed_error(self):
+        with self.assertRaises(FeedError):
+            retrieve_fewshot("eur", "some.o", "func_target", k=3,
+                             corpus_path=self.root / "does-not-exist.jsonl")
+
+    def test_missing_c_source_file_is_skipped_not_fatal(self):
+        self._write_corpus([
+            {"name": "func_ghost", "module": "ov001", "addr": 0x1000,
+             "c_path": "src/does-not-exist.c", "mnemonics": "push pop"},
+        ])
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(
+                stdout="00000000 <func_target>:\n   0:\te92d4008 \tpush\t{r3, lr}\n")
+            with mock.patch("m2c_feed.ROOT", self.root):
+                results = retrieve_fewshot("eur", "some.o", "func_target", k=3,
+                                           corpus_path=self.corpus_path)
+        self.assertEqual(results, [])
+
+    def test_empty_disassembly_raises_feed_error(self):
+        self._write_corpus([{"name": "func_a", "module": "ov001", "addr": 0x1000,
+                             "c_path": "src/a.c", "mnemonics": "push pop"}])
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout="")
+            with self.assertRaises(FeedError):
+                retrieve_fewshot("eur", "some.o", "func_target", k=3,
+                                 corpus_path=self.corpus_path)
+
+
+class TestCliFewshotWiring(unittest.TestCase):
+    def test_fewshot_prepends_block_to_output(self):
+        canned = FeedResult(".text\n\tbx lr\n", "func_02012345", "main", "some.o")
+        example = FewshotExample("func_sibling", "main", 0x02000100,
+                                 "void func_sibling(void) {}\n")
+        with mock.patch("m2c_feed.feed", return_value=canned), \
+                mock.patch("m2c_feed.retrieve_fewshot", return_value=[example]) as rf, \
+                tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "out.s"
+            rc = main(["--version", "eur", "func_02012345",
+                      "--fewshot", "3", "-o", str(out)])
+            self.assertEqual(rc, 0)
+            rf.assert_called_once()
+            self.assertEqual(rf.call_args.args[3], 3)  # k positional
+            text = out.read_text()
+        self.assertIn("func_sibling", text)
+        self.assertIn("bx lr", text)
+        self.assertLess(text.index("func_sibling"), text.index("bx lr"),
+                        "few-shot context must be prepended, not appended")
+
+    def test_fewshot_zero_is_a_noop(self):
+        canned = FeedResult(".text\n\tbx lr\n", "func_02012345", "main", "some.o")
+        with mock.patch("m2c_feed.feed", return_value=canned), \
+                mock.patch("m2c_feed.retrieve_fewshot") as rf:
+            rc = main(["--version", "eur", "func_02012345"])
+        self.assertEqual(rc, 0)
+        rf.assert_not_called()
 
 
 if __name__ == "__main__":
