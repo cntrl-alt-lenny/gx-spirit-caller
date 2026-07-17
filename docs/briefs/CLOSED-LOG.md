@@ -8,6 +8,13 @@ AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
 - **Brief 585** — **#1151**, “Brief 585: CLOSED-LOG backfill + cold-start fixes”: **Added 32 entries: 26 merged PR entries plus six explicit `no merged PR found` entries (556, 557, 577, 579, 580, 581).**
+- **Brief 595** — **#1163**, “Brief 595: naming + corpus campaign”: **The 48 real-named functions satisfy the canary.**
+- **Brief 594** — **#1164**, “Brief 594: master candidate ledger (397 rows)”: **Ledger rows: EUR 32, USA 183, JPN 182; total 397.**
+- **Brief 593** — **#1162**, “Brief 593: ceiling round 3 (0 shipped, C-44 lever found)”: **Attempted 2 fresh 900-1500B jump-table-dispatcher targets in ov002 (`func_ov002_022461d8`, `func_ov002_021b4684`). Neither reached 100% objdiff match — 0 ships this round.**
+- **Brief 592** — **#1160**, “Brief 592: census bundle redo (canary-verified)”: **All measurements are read-only. No ninja sha1, ninja rom, Wine, or real carve was run.**
+- **Brief 591** — **#1159**, “Brief 591: post-merge hygiene (CLOSED-LOG + indices + links)”: **Appended verified CLOSED-LOG entries for Briefs 582-585.**
+- **Brief 590** — **#1161**, “Brief 590: r6 findings verified (22 confirmed / 7 plausible / 0 refuted)”: **Result: 22 CONFIRMED / 7 PLAUSIBLE / 0 REFUTED.**
+- **Brief 586** — **#1158**, “Brief 586: ceiling round 2 (1 shipped)”: **1 more function shipped above the old 544 B line (552 B → now also 952 B, both `arm9/main`), one previously-parked wall formalized with a working counter-lever discovered along the way, and two honest parks with precise, evidence-backed diagnoses.**
 - **Brief 584** — **#1152**, “Brief 584: green main (lint + links + index regen)”: **2573 passed, 12 skipped, 9 subtests passed in 14.17s**.
 - **Brief 583** — **#1153**, “Brief 583: instrumentation truth — returncode fix + byte-derived ledger”: **3-region gap: 55,540 B** (EUR 13,432 / USA 21,112 / JPN 20,996).
 - **Brief 582** — **#1154**, “Brief 582: 544B C-ceiling probe (1/3 shipped)”: **1/3 shipped clean via real `ninja sha1`, 2/3 parked with full diagnosis, 0/3 stuck on comprehension.**
