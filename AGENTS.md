@@ -487,19 +487,14 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
 - **LANE STATE (2026-07-18, M1 Mac, 4 agents: Codex Decomper + Codex Scaffolder =
   GPT-5.6 Luna Medium (tool-derived/checkable outputs ONLY), Claude Code Decomper +
   Claude Code Scaffolder = Sonnet 5 Max (judgment); brain = Opus).** CHAPTER: READABLE-C.
-  🎉 **THE 544 B CEILING IS BROKEN** (b582: `func_02037dc0`, 552 B arm9, shipped via real
-  `ninja sha1`; + a NEW wall class discovered: repeated-address rematerialization after a
+  🎉 **THE CEILING KEEPS MOVING: 952 B is the new record** (b586 `func_0204f3c0`.legacy_sp3 via
+  the C-24 routing fix; b582 broke 544 with 552 B; + a NEW wall class discovered: repeated-address rematerialization after a
   call; + a 908 B half-crack documented). Byte-truth ledger rebuilt from bytes (b583):
   3-region gap = 55,540 B, ov004 = 36.2% of it; batch_carve now distinguishes tool-error
   from verify-fail. Green-main sweep + CLOSED-LOG backfill + cold-start fixes landed
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 586** — Claude Code Decomper (Sonnet 5) → **CEILING ROUND 2 (WINE lane, ~4h):**
-  (a) finish `func_ov002_022b809c` (908 B — the structural mistake is documented in
-  brief-582's doc §Target 3); (b) 3 fresh singletons 600-1200 B, escalating; (c) formalize
-  the b582-discovered wall into `docs/research/codegen-walls.md` with its repro. Branch
-  `claude/c-ceiling-r2-586`.
 - **Brief 590** — Claude Code Scaffolder (Sonnet 5) → **WINE-FREE r6-findings
   verification** (replaces the retired swarm resume): adversarially verify all 29 findings in
   `docs/research/rnd-swarm-r6-partial.md` refute-by-default; deliver `rnd-swarm-r6-verified.md`
