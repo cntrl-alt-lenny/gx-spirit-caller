@@ -7,6 +7,11 @@ Codex is one of the two providers filling brain/decomper/scaffolder roles per
 AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
+- **Brief 585** — **#1151**, “Brief 585: CLOSED-LOG backfill + cold-start fixes”: **Added 32 entries: 26 merged PR entries plus six explicit `no merged PR found` entries (556, 557, 577, 579, 580, 581).**
+- **Brief 584** — **#1152**, “Brief 584: green main (lint + links + index regen)”: **2573 passed, 12 skipped, 9 subtests passed in 14.17s**.
+- **Brief 583** — **#1153**, “Brief 583: instrumentation truth — returncode fix + byte-derived ledger”: **3-region gap: 55,540 B** (EUR 13,432 / USA 21,112 / JPN 20,996).
+- **Brief 582** — **#1154**, “Brief 582: 544B C-ceiling probe (1/3 shipped)”: **1/3 shipped clean via real `ninja sha1`, 2/3 parked with full diagnosis, 0/3 stuck on comprehension.**
+
 - **Brief 578** — **#1146**, “Brief 578: EUR data-blob emitter — close last 2 non-function gaps”: **Both blobs shipped** (`func_020b2d2c` and `func_020b3c78`); EUR delinks reports `units: 10333/10333 (100.00%)`; the only unclosed bytes are the permanent 42-file ISA floor.
 - **Brief 577** — **#1147**, “Brief 577: main floor autopsy — 12/14 shipped via 3 root-caused tool bugs”: **12 of 14 parked functions (6/region) shipped**, root-caused to 3 distinct tool bugs in `asm_escape.py`'s whole-function emitter.
 - **Brief 576** — **#1144**, “Brief 576: definitive endgame ledger”: added the post-drain endgame ledger covering USA/JPN main-floor parks, ov002 Wave-11 populations, EUR data blobs and non-floor parks, the ISA floor, parked C-match families, and the ITCM count-level residual.
@@ -37,7 +42,7 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
 - **Brief 551** — **#1119**, “Brief 551: post-ov002 drain work order”: wine-free census found **1,350 total candidates (675/region)**, **52 REFUSE (26/region)**, all recoverable, and 0 genuine walls.
 - **Brief 550** — **#1122**, “Brief 550: USA/JPN ov002 drain — wave 7 (300 shipped)”: **300 `.s` functions shipped** via batch_carve, 150 USA + 150 JPN; 0 REFUSE, 0 verify-fail, 0 gate-fail.
 
-### No merged PR found (briefs 579-581)
+## No merged PR found (briefs 579-581)
 
 - **Brief 581** — **#1148**, “Brief 581: prune superseded c-match prep scaffolds”: **Final scope: 473 scaffold deletions plus 2 documentation edits.**
 - **Brief 580** — **#1149**, “Brief 580: add unified readable-C C-match queue”: **Documentation-only change.**
