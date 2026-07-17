@@ -2,7 +2,13 @@
 
 # R&D swarm r6 — PARTIAL salvage (2026-07-16)
 
-⚠️ **STATUS: UNVERIFIED.** The r6 swarm (8 lanes × dual refute-by-default verifiers) hit the
+> ⚠️ **SUPERSEDED by [rnd-swarm-r6-verified.md](rnd-swarm-r6-verified.md) (brief 590, 2026-07-17).**
+> All 29 findings below have now been adversarially verified: 22 CONFIRMED / 7 PLAUSIBLE / 0
+> REFUTED. Four are already fixed and merged (PRs #1153, #1157). One (`-ipa file`, codegen-levers)
+> directly contradicts a prior CLOSED verdict from r4 and must not be actioned as written. Read the
+> verified doc, not this one, for anything beyond historical interest.
+
+⚠️ **STATUS: UNVERIFIED (historical).** The r6 swarm (8 lanes × dual refute-by-default verifiers) hit the
 Claude session limit mid-run: 5 of 8 scout lanes completed (29 findings below), **zero
 verifier passes ran**, no critic, no synthesis. Three lanes never scouted (retriever-fewshot,
 endgame-roadmap, agent-workflow-rnd). The codegen-levers scout additionally ran without its
