@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**98 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**99 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (29)
+- [Uncategorised](#uncategorised) (30)
 
 ## Analysis / worklist
 
@@ -472,6 +472,10 @@ The ov002 `.s` reg-alloc lane and the region-port lane are deterministic: a cand
 **amortized sha1 confirmation for a batch of C-match candidates.**
 
 Given a region and a list of accepted candidate .c files (already passing fastmatch-resolved), this tool:
+
+### `tools/build_master_ledger.py`
+
+**Build the committed, unmatched-function master candidate ledger.**
 
 ### `tools/c42_family_hunter.py`
 
