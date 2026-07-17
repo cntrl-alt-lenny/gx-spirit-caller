@@ -156,6 +156,8 @@ def aggregate(per_module: dict[str, list[tuple[str, int, int]]]) -> dict:
 def _module_paths(version: str):
     base = ROOT / f"config/{version}"
     yield "main", base / "arm9/symbols.txt", base / "arm9/delinks.txt"
+    for special in ("itcm", "dtcm"):
+        yield special, (base / "arm9" / special / "symbols.txt"), (base / "arm9" / special / "delinks.txt")
     for d in sorted((base / "arm9/overlays").glob("ov*")):
         yield d.name, d / "symbols.txt", d / "delinks.txt"
 

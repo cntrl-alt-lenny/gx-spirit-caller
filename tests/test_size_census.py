@@ -29,6 +29,7 @@ from size_census import (  # noqa: E402
     shape_features,
     unmatched,
 )
+import size_census  # noqa: E402
 
 
 class TestBucket(unittest.TestCase):
@@ -208,6 +209,13 @@ class TestIntegrationRealConfig(unittest.TestCase):
         self.assertEqual(non_sinit, set(),
                          "EUR ov002 grew NEW non-__sinit residue (regression "
                          "vs the brief-572 fully-carved state)")
+
+    def test_itcm_module_is_discoverable(self):
+        modules = {name: (symbols, delinks)
+                   for name, symbols, delinks in size_census._module_paths("eur")}
+        self.assertIn("itcm", modules)
+        self.assertTrue(modules["itcm"][0].is_file())
+        self.assertEqual(collect("eur", "itcm").keys(), {"itcm"})
 
 
 if __name__ == "__main__":
