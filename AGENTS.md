@@ -495,22 +495,25 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 601** — Claude Code Decomper (Sonnet 5) → **RE-LAND the 38 USA/JPN ships (WINE
-  lane, priority)**: b597's 38 objdiff-only files byte-diverged the USA/JPN ROMs (reverted at
-  integration). Re-land with per-region `ninja sha1` gating per batch of ~5, self-bisecting
-  reds; diagnose the divergence class in the doc. Branch `claude/reland-usajpn-601`.
-- **Brief 602** — Codex Decomper (Luna High) → **PERMUTER CAMPAIGN (wine, compute-bound,
-  hours)** on b593's two 70%-verified reg-alloc-plateau drafts; expectation set LOW (historic
-  ~0 permuter recovery on reg-alloc) — success = completed runs + best-score reports. Defers
-  to 601's wine priority (batch tools self-wait). Branch `codex/permuter-602`.
-- **Brief 603** — Codex Scaffolder (Luna Medium) → **wine-free hygiene**: ledger/pick-list
-  regen, CLOSED-LOG 596-600, union-index retrieval rerun, indices, pytest. Branch
-  `codex/hygiene-603`.
-- **Brief 604** — Claude Code Scaffolder (Sonnet 5) → **retriever GO/NO-GO**: run the
-  union-index twin eval, interpret, and either wire top-k few-shot retrieval into `m2c_feed`
-  (GO) or write the NO-GO with evidence. Branch `claude/retriever-604`.
-- (Deferred one round: the RE-CARVE wave over the b596-reopened candidates — needs 601's
-  re-land merged first so the pools don't collide; next Codex wine campaign.)
+- **Brief 601** — Claude Code Decomper (Sonnet 5) → RE-LAND the 38 USA/JPN ships (WINE lane) — IN FLIGHT.
+- **Brief 605** — Claude Code Scaffolder (Sonnet 5) → **SINGLETON RE-QUEUE design** (wine-free,
+  the r6-verified #1 strategic move): using pick-lists.md (151 singletons) + the now-WORKING
+  `--fewshot` retriever (b604: family-hit@5 95.8%) + naming census, produce
+  `docs/research/campaign-analytics/singleton-cmatch-queue.md` — ranked candidates, each with
+  its retriever-suggested sibling seeds + size + module, batched for the wine lane to drain.
+  Branch `claude/singleton-queue-605`.
+- **Brief 606** — Codex Scaffolder (Luna Medium) → **pre-draft the top-40 singletons** (wine-
+  free, compute): for the 40 smallest never-attempted ARM singletons from pick-lists.md, run
+  `m2c_feed --fewshot 5` and commit each candidate draft under `docs/research/cmatch-drafts/`
+  + an index. Turnkeys the wine drain. CANARY: draft count must equal 40; each draft nonempty.
+  Branch `codex/predraft-606`.
+- **Brief 607** — Codex Decomper (Luna High) → **execute b600's secure-area carve plan (GEN
+  half, wine-free)**: run `tools/emit_data_blob.py` for the 57 `SecureAreaData_*` fragments
+  (per brief-600-startup-block.md's acceptance criteria) to GENERATE the raw-byte `.s` +
+  delink flips; do NOT gate (the brain runs the 3-region sha1). CANARY: emitter must round-trip
+  one fragment byte-identical before doing all 57. Branch `codex/securearea-gen-607`.
+- (Next Codex Decomper wine round, after 601 merges: the RE-CARVE wave over b596's 289
+  reopened candidates — deferred so pools don't collide with 601.)
 
 ### Closed briefs (reference)
 
