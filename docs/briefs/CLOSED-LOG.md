@@ -7,6 +7,13 @@ Codex is one of the two providers filling brain/decomper/scaffolder roles per
 AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
+- **Brief 581** — **#1148**, “Brief 581: prune superseded c-match prep scaffolds”: **Final scope: 473 scaffold deletions plus 2 documentation edits.**
+- **Brief 580** — **#1149**, “Brief 580: add unified readable-C C-match queue”: **Documentation-only change.**
+- **Brief 579** — **#1150**, “Brief 579: C-match overlay sibling families (readable-C frontier)”: **7/7 attempted exemplar+sibling matches at EUR objdiff 100%, all ported USA+JPN, 3-region `gate3.py` green.**
+- **Brief 577** — **#1147**, “Brief 577: main floor autopsy — 12/14 shipped via 3 root-caused tool bugs”: **12 of 14 parked functions (6/region) shipped**, root-caused to 3 distinct tool bugs in `asm_escape.py`'s whole-function emitter.
+- **Brief 557** — ran without a dedicated PR (PC-brain stint — see docs/state.md history).
+- **Brief 556** — ran without a dedicated PR (PC-brain stint — see docs/state.md history).
+
 - **Briefs 548/549 (2026-07-08, Mac).** **#1118** (b548, drain w6): 300 ov002 `.s` (150/150),
   first 150/150 clean sweep (seeded out the 2 known verify-fails); ~555 USA + 671 JPN ov002
   remain. **#1117** (b549, autopsy → FIX): root-caused b546's "0/4 verify-fail" as a COMPARATOR
@@ -3960,4 +3967,3 @@ relocated — see AGENTS.md § Closed briefs (reference) for the pointer back he
 - [`docs/briefs/007-ov000-bit-getter.md`](docs/briefs/007-ov000-bit-getter.md)
   `claude-pc`, shipped in PR #85. Matched one ov000 0x10 bit getter
   as the low-risk Brief 007 opener.
-
