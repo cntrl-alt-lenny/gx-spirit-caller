@@ -1,0 +1,124 @@
+/* func_ov002_021b4684: card-id membership predicate. Returns 1 if
+ * func_0202b8c0(id) (card attr_d, a 3-bit category field) equals 1, or
+ * if id is one of a fixed set of 10 "universal" card IDs, or if id is
+ * one of a fixed per-kind set of card IDs gated on the kind argument
+ * (only kind values 0xd, 0xe, 0xf, 0x10, 0x14, 0x16 have a non-empty
+ * set; all other kinds fall through to just the universal check).
+ * Every constant below was extracted by mechanically interpreting the
+ * original's binary-search comparison tree (brief 593), not hand-read.
+ *
+ * kind-case order mirrors the original's body layout order (by
+ * address: 0x14, 0x16, 0xd, 0xe, 0xf, 0x10), not ascending kind value —
+ * same source-order-drives-jump-table-target lesson as func_ov002_022461d8
+ * in this same brief.
+ */
+
+extern unsigned int func_0202b8c0(int id);
+
+int func_ov002_021b4684(int id, int kind) {
+    if (func_0202b8c0(id) == 1) {
+        return 1;
+    }
+
+    switch (id) {
+    case 0x148c:
+    case 0x15fc:
+    case 0x168f:
+    case 0x17c2:
+    case 0x17c6:
+    case 0x17d4:
+    case 0x183a:
+    case 0x1936:
+    case 0x1a24:
+    case 0x1a25:
+        return 1;
+    }
+
+    switch (kind) {
+    case 0x14:
+        switch (id) {
+        case 0x1231:
+        case 0x1238:
+        case 0x1243:
+        case 0x12cf:
+        case 0x12d0:
+        case 0x12f1:
+        case 0x12f2:
+        case 0x1329:
+        case 0x132a:
+        case 0x1330:
+        case 0x1381:
+        case 0x138e:
+        case 0x13ee:
+        case 0x1409:
+        case 0x1492:
+        case 0x14be:
+        case 0x14eb:
+        case 0x1514:
+        case 0x153d:
+        case 0x15a6:
+        case 0x167b:
+        case 0x16e3:
+        case 0x1763:
+        case 0x184b:
+        case 0x1853:
+        case 0x1882:
+        case 0x192d:
+        case 0x19b4:
+        case 0x1a60:
+        case 0x1a69:
+            return 1;
+        }
+        return 0;
+    case 0x16:
+        switch (id) {
+        case 0x12ba:
+        case 0x134b:
+        case 0x14a7:
+        case 0x18d4:
+        case 0x195e:
+        case 0x1990:
+        case 0x19e0:
+        case 0x1a17:
+            return 1;
+        }
+        return 0;
+    case 0xd:
+        switch (id) {
+        case 0x1119:
+        case 0x111a:
+        case 0x111b:
+        case 0x13a7:
+        case 0x1493:
+        case 0x1853:
+        case 0x1883:
+            return 1;
+        }
+        return 0;
+    case 0xe:
+        switch (id) {
+        case 0xfe0:
+        case 0x151b:
+            return 1;
+        }
+        return 0;
+    case 0xf:
+        switch (id) {
+        case 0x1352:
+        case 0x135a:
+        case 0x138f:
+        case 0x17ca:
+        case 0x19b6:
+            return 1;
+        }
+        return 0;
+    case 0x10:
+        switch (id) {
+        case 0x1352:
+        case 0x135a:
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}

@@ -233,7 +233,7 @@ known) or *didn't* (with a one-line reason), and a *use when*
 hint. The bucket header indicates how to budget the pattern in a
 yield prediction.
 
-## Coercible-with-knowledge (43 patterns, 4 sub-classifications)
+## Coercible-with-knowledge (44 patterns, 4 sub-classifications)
 
 Specific C source variation matches; the right shape is known.
 Grep these first when a partial-match drop shape looks familiar.
@@ -5921,6 +5921,103 @@ only by the helper symbol each calls). One recipe drains all 4.
 69% fuzzy with explicit gap fields and deferred Family 5; brief 250
 (this entry) ran the variant matrix, found the arg-width coercion,
 shipped the classifier + gotcha 13.
+
+### C-44. Switch/dispatcher body order must mirror source (address) order
+
+> **Wall family note — orthogonal to C-24/P-16.** Those are about
+> *which* pool word or addressing mode mwcc picks. C-44 is about
+> *where in `.text` mwcc places each case body* for a multi-case
+> `switch` lowered to a jump table (`addls pc, pc, rN, lsl #2`). It
+> hits any dispatcher-shaped function with 3+ non-trivial case
+> bodies, regardless of what the bodies themselves do — a pure
+> control-flow-layout issue, not a data/addressing one.
+
+**Discovered:** brief 593, both fresh targets
+(`func_ov002_022461d8`, 1020 B, 34-way event-notify dispatcher;
+`func_ov002_021b4684`, 1248 B, kind-gated card-id membership
+predicate) hit this independently and identically.
+
+**The wall.** mwcc lays out a jump-table switch's case **bodies** in
+**source (case-label) order** — not ascending case-value order, and
+not any other automatic sort. The jump **table** itself is always
+correctly indexed by case value (that part is automatic and never
+wrong), but every `b` entry in it points at wherever the
+corresponding body actually landed in `.text`, so if the bodies are
+ordered differently than the original, every jump-table target
+offset past the first body comes out wrong — even though the logic
+inside each body is byte-identical. Because one switch's case order
+is wrong, this cascades: register allocation and even the function's
+own prologue (which callee-saved registers get pushed) can shift
+too, since the compiler's whole-function analysis sees a differently
+laid-out control-flow graph.
+
+**Symptom:** writing case labels in the natural/obvious order (case
+value ascending, e.g. `case 1: ... case 2: ... case 3:`) when the
+original's *disassembly* lays the bodies out in some other order
+(reconstructible from each body's label **address**, e.g.
+`.L_c4` @ 0xc4, `.L_d0` @ 0xd0, `.L_e8` @ 0xe8 — read the address,
+not the case value it handles) produces a diff where:
+
+- The **prologue** may already differ (`DIFF_REPLACE` on `stmdb`) —
+  a register-pressure symptom of the wrong body order, not its own
+  separate wall; don't chase routing tier (`.legacy.c` /
+  `.legacy_sp3.c`) on this diff alone, see below.
+- Every `b`/branch target inside the jump table shows
+  `DIFF_ARG_MISMATCH` (same mnemonic, wrong offset) from roughly the
+  second case body onward.
+- Match percentage lands in the 10-25% range even though the C is
+  semantically 100% correct — this is a pure layout bug, not a
+  comprehension bug, and no amount of lever-hunting on individual
+  case bodies fixes it.
+
+**The fix.** Walk the `.s` file's body labels (`.L_XXXX:`) in the
+order their **addresses** increase, note which case value each one
+handles (from the outer jump table's `b .L_XXXX` list — remember the
+`addls pc, pc, rN, lsl #2` pipeline offset: the entry for value 0 is
+the **second** `b` after the `addls`, not the first; the first `b`
+is the out-of-range/`hi` fallback), then write the C `switch`'s case
+labels in **that** order instead of ascending case value. Nested
+nested/nested switches (a sub-dispatch reached via `default:` or a
+grouped case list) need the same treatment recursively — their own
+inner case order must match their own body's address order too.
+
+**Effect (this brief, before -> after, same C logic, only case order
+changed):**
+
+| Target | Before (ascending case value) | After (body-address order) |
+|---|---|---|
+| `func_ov002_022461d8` (34-way) | 14.9% | 58.4% (default tier) / 69.0% (`.legacy.c`) |
+| `func_ov002_021b4684` (6-way kind dispatch) | 24.1% | 74.7% (default tier) |
+
+Routing tier (`.legacy.c` / `.legacy_sp3.c`) is a **secondary** lever
+to try only *after* body order is fixed, not before — trying it on
+the wrong-order diff produced noise (a few points either way) that
+looked like signal but wasn't; the real jump was always the
+reordering. On `func_ov002_022461d8` `.legacy.c` gave a further
++10.6 points on top of the reordering fix; on `func_ov002_021b4684`
+`.legacy.c` made things dramatically *worse* (74.7% -> 23.0%),
+confirming tier choice is genuinely per-function and must be
+re-checked after every structural fix, not assumed to transfer.
+
+**Not fully resolved by this lever alone:** neither target reached
+100% in brief 593 — both plateaued with correct structure (body
+order, control flow, all case values, all literal constants
+verified) but a residual register-allocation-level gap (same
+instruction, different register; a handful of literal-pool ordering
+differences). `suggest_coercion.py`'s C-1 (predicated-execution)
+rule fired on `func_ov002_021b4684` at LOW confidence; applying it
+(replacing scattered `return` statements with a single flag +
+one final `return`) made the match **worse** (74.7% -> 44.6%), not
+better — reverted. Whether the remaining gap is a genuine wall or a
+still-undiscovered lever is open; see
+[`brief-593-ceiling-r3.md`](brief-593-ceiling-r3.md) for the full
+diff evidence on both targets.
+
+**Provenance:** brief 593 (this entry). Both targets independently
+selected from a 69-candidate jump-table-shaped census in the 900-1500
+B band (`main` + `ov002`); see the brief doc for the full candidate
+list — the census itself is reusable for future waves once this
+lever is applied from the start.
 
 ## Permanent (15 patterns)
 
