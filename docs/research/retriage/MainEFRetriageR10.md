@@ -185,6 +185,7 @@ single shared `bl func_02002200` (`.L_dc`) with no `func_020038c0`
 call. There is no indirect (`blx`) call anywhere in this function.
 
 **C sketch:**
+
 ```c
 typedef struct { char _pad0[0x88]; void *f88; char _g8c[4];
                   void *f90; char _g94[4]; void *f98; char _g9c[4];
@@ -276,6 +277,7 @@ site per invocation: either `bl func_020038c0` → `bl func_02002538`
 single shared `bl func_02002538` (`.L_20c`). No `blx` anywhere.
 
 **C sketch:**
+
 ```c
 extern GlobalData02102c7c data_02102c7c; /* same type as 0x02003b18's sketch */
 extern int func_020038c0(int width, int stackArg1);

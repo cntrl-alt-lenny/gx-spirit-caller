@@ -58,6 +58,7 @@ of the full-init recipe.
 display mode arg, +0xc/+0x10 = cleared flags).
 
 **Recipe sketch:**
+
 ```c
 // Full-init dispatcher — arg r0 selects display mode (0=2D, nonzero=3D)
 void func_ov006_021b5704(int arg) {
@@ -110,6 +111,7 @@ times (inner, `cmp r6, #0x7`) — matching `OV006_STRIDE_SLOT_COUNT 5` and
 array), `data_ov006_0224f400` (stride table B, same shape).
 
 **Recipe sketch:**
+
 ```c
 // Copy stride tables into per-slot struct fields
 int func_ov006_021b5f60(void *p) {
@@ -149,6 +151,7 @@ which returns a card sort key in r0 that becomes the array offset (`lsl #3`).
 accessed via `[r0*8 + bit_index*4]`).
 
 **Recipe sketch:**
+
 ```c
 // Extract one bit from stride bitmask table
 int func_ov006_021b8d9c(void *p, int slot) {
@@ -181,6 +184,7 @@ SETs the bit with `orr`.  Also calls `Fill32` to zero a 0x124-byte region and
 addresses correspond to the "slot active subarray" layout.
 
 **Recipe sketch:**
+
 ```c
 int func_ov006_021b79ac(void *p, int slot) {
     Fill32(0, (u8*)p + 0x248 + slot * 0x124, 0x124);
@@ -212,6 +216,7 @@ initial `Copy32(p + 0x248 + slot*0x124, p + 0x124, 0x124)` instead of Fill32.
 **Struct/data needed:** Same stride bitmask table, `Copy32`.
 
 **Recipe sketch:**
+
 ```c
 int func_ov006_021b7a20(void *p, int slot) {
     func_ov006_021b805c(p);
@@ -270,6 +275,7 @@ stride-slot families 021b7c94, 021b7cc0, 021b7bb0 (all already matched or
 similar).
 
 **Recipe sketch:**
+
 ```c
 int func_ov006_021b6364(void *p) {
     Fill32(0, data_ov006_0224f448, 0xca98);
@@ -314,6 +320,7 @@ preliminary loop `cmp r5, #0x5 / blt .L_50` that skips index 0 (the
 same stride families.
 
 **Recipe sketch:**
+
 ```c
 int func_ov006_021b6508(void *p) {
     Fill32(0, data_ov006_0224f448, 0xca98);
@@ -362,6 +369,7 @@ substrings), `data_02104f4c` (global flag byte), `data_ov006_0224f448` (fill
 buffer).
 
 **Recipe sketch:**
+
 ```c
 int func_ov006_021b66c4(void *p) {
     Fill32(0, data_ov006_0224f448, 0xca98);
@@ -411,6 +419,7 @@ setup documented in Ov004Ov006DataTables.md §Category 3.
 **Struct/data needed:** None (stateless VRAM DMA helper).
 
 **Recipe sketch:**
+
 ```c
 void func_ov004_021da2c8(int x) {
     int v = (x * 0x30 + 0x80) >> 8;   // mul + asr-round / 256
@@ -454,6 +463,7 @@ short-circuit logic.  This is the ov004 phase-gate pattern (OverlayConstants.md
 Category 5 array), `r4` pointing to a b500 struct (ov004 main state record).
 
 **Recipe sketch:**
+
 ```c
 int func_ov004_021d5b14(void *r4) {
     int state = ((MyStruct*)r4)->field_30;
@@ -500,6 +510,7 @@ precisely matches `mov r0, #0x3 / mov r2, #0x56 / bl func_02034888`.
 sources — all main-binary data tables).
 
 **Recipe sketch:**
+
 ```c
 int func_ov004_021d62b8(u16 slot) {
     u8 buf[0xac];
@@ -537,6 +548,7 @@ The inner loop at `.L_74` indexes `data_02104cf8` with stride `+0x108` and
 b500), `data_02104cf8` (lookup table used for the case-3 path).
 
 **Recipe sketch:**
+
 ```c
 int func_ov004_021caedc(void) {
     if (!func_0201cfa0()) {
@@ -592,6 +604,7 @@ target LUTs), `data_ov011_021d4000` (global state), `data_ov011_021d403c`
 (actor table).
 
 **Recipe sketch:**
+
 ```c
 void func_ov011_021cca04(void) {
     int view = data_ov011_021d4000[0x2a0 / 4];
@@ -640,6 +653,7 @@ Field `data_ov011_021d403c[0x29c]` is the tile-stride (extracted 3-bit
 **Struct/data needed:** `data_ov011_021d4000`, `data_ov011_021d403c`.
 
 **Recipe sketch:**
+
 ```c
 int func_ov011_021ca400(int x, int y) {
     int view = data_ov011_021d4000[0x2a0 / 4];
@@ -682,6 +696,7 @@ animation dispatch calls.
 (anim row table), `data_ov011_021d3177` (anim frame table).
 
 **Recipe sketch:**
+
 ```c
 void func_ov011_021cabbc(int facing, int dir) {
     int handle = func_020139b4();
@@ -725,6 +740,7 @@ factory args).  The bitfield packs into a 0x28-byte stack struct consumed by
 `data_ov011_021d38a8` (default template), scroll LUTs 021d2fc8/021d2fc9.
 
 **Recipe sketch:**
+
 ```c
 void func_ov011_021cb3b4(int mode) {
     TaskConfig cfg;
@@ -767,6 +783,7 @@ dispatch family from OverlayConstants.md.
 ?, fn:u32 }` (0x10 = offset 4 words).
 
 **Recipe sketch:**
+
 ```c
 void func_ov000_021ac72c(OvTask *t) {
     if (t->flags & (1 << 1)) {
@@ -797,6 +814,7 @@ results at `p+0x12c` and `p+0x12e`.
 position struct), fields at offsets 0x24/0x2c/0x30/0x34/0x38.
 
 **Recipe sketch:**
+
 ```c
 void func_ov000_021aa8d4(void) {
     ActorPos *p = *data_ov000_021c73e0;
@@ -835,6 +853,7 @@ mwcc α/255 normalization idiom.  Calls `func_ov000_021ab520` and
 fields at +0x0 = alpha byte, 2-bit mode at bits 16-17/18-19).
 
 **Recipe sketch:**
+
 ```c
 void func_ov000_021ab798(void) {
     AlphaRec *p = *data_ov000_021c7588;
@@ -876,6 +895,7 @@ documented ov000 task-dispatch struct layout.
 deferred-task layout at +0x70/0x74/0x78/0x7c/0x98.
 
 **Recipe sketch:**
+
 ```c
 void func_ov000_021ac920(void *p, int *srcbuf, int mode) {
     if (p->field_68 != 0) func_ov000_021acaac(p);
@@ -920,6 +940,7 @@ matched ov004 touch-region funcs (OverlayConstants.md §Touch-region boundaries)
 record).
 
 **Recipe sketch:**
+
 ```c
 int func_ov000_021ac098(HitRect *r, int x, int y) {
     int center = func_ov000_021abe64(r);
@@ -961,6 +982,7 @@ selects which anim group to play.
 `data_ov013_021cbc3c` (scroll state struct), animation table globals.
 
 **Recipe sketch:**
+
 ```c
 int func_ov013_021ca70c(void) {
     int sub_mode = (data_ov013_021cbc00[0x1a4/4] >> 18) & 7;  // 3-bit
@@ -998,8 +1020,8 @@ sym name in the link.
 **Original verdict:** low — "bit-scan loop with shifting selector and calls"
 
 **Upgrade reason:** Opens with `func_0201ab2c()` (get bit-pattern), then shifts
-right 1 bit per iteration (`mov r6, r6, asr #1`) and checks bit 0 (`tst r6,
-#1`).  The loop accumulates set-bit positions (0..4) using `r7 += 1`.  For
+right 1 bit per iteration (`mov r6, r6, asr #1`) and checks bit 0 (`tst r6, #1`).
+The loop accumulates set-bit positions (0..4) using `r7 += 1`.  For
 each set bit, it calls `func_0202c0c0()` (SE play) with computed ID `(r8*3 +
 0x30c + 0x400 + r9)` or `0x70b` (based on bit 3 special-case), then
 `func_020a69d0` twice with `data_ov013_021cbb1c` (a count constant value 10).
@@ -1010,6 +1032,7 @@ The final section calls `func_0202c0c0(0x70a)` and a veneer pair.  SE ID `0x70b`
 display), `data_ov013_021cbc3c`, `data_ov013_021cbb1c` (count=10 constant).
 
 **Recipe sketch:**
+
 ```c
 void func_ov013_021ca2b8(int bits) {
     int kana_idx = func_0201ab2c();
@@ -1059,6 +1082,7 @@ array), `data_ov021_021ace80` (state counter), ov021 sparse table at
 `data_ov021_021acb20`.
 
 **Recipe sketch:**
+
 ```c
 int func_ov021_021aba18(Ov021State *p) {
     int out[5];
@@ -1083,52 +1107,64 @@ int func_ov021_021aba18(Ov021State *p) {
 ## Confirmed Intractable (representative sample, 10–15 funcs)
 
 ### 0x021B9A00 (648B, class F, overlay=ov006)
+
 `tst-flag comparator dispatch` — 249-insn tst chains over 32 flag bits,
 all using `ldrh [data_ov006_0224f3e0]` as the bitmask.  The logic is correct
 but requires 10+ different flag-name constants not yet in the KB.  The
 reg-alloc in the multi-flag case is permuter-class.  **Status: still low.**
 
 ### 0x021BA364 (5616B, class F, never, overlay=ov006)
+
 979-insn, 97 calls huge state machine.  `tract=never` confirmed.
 
 ### 0x021C53BC (1696B, class F, never, overlay=ov006)
+
 420-insn large controller.  `tract=never` confirmed.
 
 ### 0x021D6ED0 (80B, class E, never, overlay=ov004)
+
 `post-blx return-value rotation, indirect call` — indirect call, return value
 routed through a register-rotation pattern.  `tract=never` confirmed.
 
 ### 0x021D0AFC (80B, class E, never, overlay=ov011)
+
 `blx callback dispatch, post-blx return coin-flip` — post-blx rotation coin
 flip.  `tract=never` confirmed.
 
 ### 0x021D0B4C (100B, class E, never, overlay=ov011)
+
 `blx callback dispatch with flag-set, post-blx rotation` — as above.
 `tract=never` confirmed.
 
 ### 0x021D2DE4 (364B, class E, never, overlay=ov011)
+
 `umull/mla 64-bit arithmetic, heavy reg liveness` — 64-bit math with mla
 chains.  `tract=never` confirmed.
 
 ### 0x021AB01C (404B, class F, never, overlay=ov000)
+
 `huge fixed-point smull interp, scheduling coin-flip` — `tract=never` confirmed.
 
 ### 0x021ABA18 (already triaged above as tractable)
 
 ### 0x021CB700 (80B, class E, never, overlay=ov013)
+
 `post-blx register rotation coin-flip` — `tract=never` confirmed.
 
 ### 0x021B9D98 (80B, class F per .s file, overlay=ov006)
+
 Not in E/F list — already shipped as .s brief-302.  Two-value comparison with
 `mov r1, r3, lsr #0x10 / mov r2` style — pure sort comparator.  No struct
 access, scheduling-only.
 
 ### 0x021B9D1C (76B, overlay=ov006)
+
 Not in E/F list.  Swap-bytes comparator.  No struct access, scheduling-only.
 
 ### 0x021BA0F0 (208B, class not E/F — already matched sibling)
 
 ### 0x021CF0C8 (304B, class F, overlay=ov011)
+
 `data-as-code loop with mul/long-mul` — references data-as-code `.word` body.
 Dispatches through multiply-and-add chains.  No known struct signals; body is
 genuinely opaque.  **Status: still low.**

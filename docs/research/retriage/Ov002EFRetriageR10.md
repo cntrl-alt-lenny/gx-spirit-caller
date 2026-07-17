@@ -89,6 +89,7 @@ code `0x31` and sub-code `0xa`. Zero struct/global touches.
 command-sink signature from `ov002_core.h`).
 
 **C sketch:**
+
 ```c
 int func_ov002_021ae70c(int r0, int r1, int r2, int r3, int stack_arg) {
     unsigned int lo = (r2 & 0xf) | ((stack_arg & 0xf) << 4);
@@ -99,6 +100,7 @@ int func_ov002_021ae70c(int r0, int r1, int r2, int r3, int stack_arg) {
     return func_ov002_0229ade0(49 /* 0x31 */, 10 /* 0xa */, r0, arg2);
 }
 ```
+
 Note: `0x021ae70c` also happens to share its relative address with an
 unrelated ov008 function this same round (see the closeout doc) —
 confirmed coincidental overlay-RAM-window reuse, not shared code, per the
@@ -129,6 +131,7 @@ resolver).
 **Ground-truth BL/BLX targets:** `func_ov002_021b9ecc`.
 
 **C sketch:**
+
 ```c
 int func_ov002_021b43a4(struct Ov002Self *self, int arg1, int arg2) {
     u16 raw = self->f0;
@@ -150,6 +153,7 @@ int func_ov002_021b43a4(struct Ov002Self *self, int arg1, int arg2) {
     return 0;
 }
 ```
+
 **Lever:** the ~20-way compare-tree threshold→branch-target mapping under
 the `type∈[7,0xa]` arm is mechanical range-compare codegen off
 `func_ov002_021b9ecc`'s return value — pin the exact `.L` mapping from

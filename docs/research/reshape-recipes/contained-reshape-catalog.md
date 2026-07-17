@@ -155,8 +155,8 @@ in the *source* nudges it toward the asymmetric allocation the original had. Whe
 pool bases are present and only one ends up "sticky" across the loop in the `.s`, mirror
 that asymmetry — don't bind both just because both look like they need it.
 
-**Diagnostic:** check which base's register gets an extra arithmetic op (`add rN, rN,
-#0x1000`-style offset bump, or gets reused inside the loop body for computed
+**Diagnostic:** check which base's register gets an extra arithmetic op (`add rN, rN, #0x1000`
+style offset bump, or gets reused inside the loop body for computed
 addressing) mid-sequence in the `.s` — that's the one to bind. The other, referenced
 via a single fresh `ldr [rBase, index]` each iteration with no persistent adjustment,
 should stay a direct array reference.

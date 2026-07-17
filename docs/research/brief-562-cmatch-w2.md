@@ -55,6 +55,7 @@ mutually-exclusive conditional instructions mwcc emits first:
    into its own statement *before* an explicit if/else, so only the
    reload is unconditional and the add/zero stays inside the
    conditional branches:
+
    ```c
    char *h_reload = (char *)g->h;
    if (v == 0) { result = 0; } else { result = h_reload + v; }
@@ -207,7 +208,7 @@ Best diff: `0208df0c` under `.legacy.c` + value-temp, 4 bytes
    high-value** — add to the recipe catalogue. When a predicated
    pair (`moveq`/`addne` or similar) comes out in the wrong relative
    order from a ternary, rewrite as `if (falsy) { false-case } else
-   { true-case } ` before assuming it's unreachable.
+   { true-case }` before assuming it's unreachable.
 2. **Campaign-prep dossier headers can contain the right diagnosis
    in prose while the draft C gets it wrong** — Family 2's dossier
    literally said "goto end" but its own code used `return`. Read

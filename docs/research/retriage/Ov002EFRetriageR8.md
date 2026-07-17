@@ -105,6 +105,7 @@ fn-ptr; this is a size-class dispatcher, not a scheduling coin-flip.
   `id >= 6` dispatch tree (not just the `6/0x4a` arm).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cdc78   ; CtrlState save area (ctx/id/cleared-int)
 data_ov002_022cdc88   ; buffer address, arg to 0229cd5c
@@ -113,6 +114,7 @@ data_ov002_022cd744   ; flag table, indexed by [ctx], compared == 1
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0229cd5c   (data_022cdc78, 0x200) — 1st call
 func_ov002_0229cd5c   (data_022ce088, 0x100) — 2nd call, different buffer
@@ -126,6 +128,7 @@ func_ov002_0229ade0   (0x32, ctx, id, 0) — fallback, id < 6 OR cd744 gate fail
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_021af9d0(void *ctx, int id, int arg2, int arg3) {
     data_ov002_022cdc78[0] = (int)ctx;
@@ -184,11 +187,13 @@ literal codes `0x3b`/`0x3c`/`0x3d`.
   documented).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cd73c   ; CtrlState-family struct (+0x4 player)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc   (x5, one per slot iteration)
 func_ov002_021c8470   (per-slot hit, when resolver returns nonzero)
@@ -200,6 +205,7 @@ func_ov002_021b0b54    (x3: codes 0x3b, 0x3c, 0x3d — conditional log/sink call
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021b0df8(void) {
     int player = data_ov002_022cd73c[1];   /* +0x4 */
@@ -252,6 +258,7 @@ against the caller-supplied target — a clean bounded scan.
 `self.f6` (+0x6, u8 loop-count field, per-TU local — established recipe).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000016ab   ; range constant A
 0x0000147e   ; range constant B
@@ -259,11 +266,13 @@ against the caller-supplied target — a clean bounded scan.
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_ov002_0223def4   (loop, up to self->f6 times)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021b86f4(struct Ov002Self *self, int target) {
     u16 id = self->f0;
@@ -296,6 +305,7 @@ int func_ov002_021b86f4(struct Ov002Self *self, int target) {
     return 0;
 }
 ```
+
 *(the exact branch nesting must be re-derived carefully against the `.s`
 control flow at match time — the constant-heavy decision tree above sketches
 the shape and confirms determinism; every arm is a literal compare.)*
@@ -324,6 +334,7 @@ the resolver's original result — exactly the documented stride pattern.
   section ("node lookup u16 table — same 0x868 stride").
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000fee   ; id sentinel A
 0x000014ac   ; id sentinel B
@@ -334,6 +345,7 @@ data_ov002_022cf1a8   ; PerPlayerRowTable companion (node u16 table)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc   (player, slot) — resolve card id, 1st call
 func_02030ea4          (no args) — gate check
@@ -348,6 +360,7 @@ func_0202e234           (id) — fallthrough tail predicate
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021b9bd4(int player, int slot) {
     int id = func_ov002_021b9ecc(player, slot);
@@ -379,6 +392,7 @@ int func_ov002_021b9bd4(int player, int slot) {
     return node;
 }
 ```
+
 *(this function has a dense control-flow tail; the recipe captures the
 struct/callee shape faithfully, exact arm ordering should be re-verified
 line-by-line against `.L_d0`–`.L_140` at match time.)*
@@ -415,6 +429,7 @@ each dispatching to `func_ov002_021ba0b0`/`func_ov002_021badb0`.
   companion small globals, `+0x38`-stride record lookup.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cf16c   ; PerPlayerRowTable base
 0x00000868             ; PerPlayerRowTable stride
@@ -426,6 +441,7 @@ data_ov002_022cd4cc   ; companion global C
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc   (x5, per-slot loop)
 func_ov002_021ba0b0    (x2, once per data_022cd3f4 field check)
@@ -433,6 +449,7 @@ func_ov002_021badb0    (x2, once per data_022cd3f4 field check)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021bb444(int player, int target_id) {
     char *row = (char *)data_ov002_022cf16c + (player & 1) * 0x868;
@@ -499,6 +516,7 @@ signature `(player, tag, _unused, d)` confirmed via `func_ov002_021bbd04.c`).
 - `func_ov002_021bbd04(a, b, _unused, d)` — already-matched thunk.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf1ac   ; occupancy mask field A
@@ -507,6 +525,7 @@ data_ov002_022cf1a4   ; occupancy mask field B
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc   (resolve card id)
 func_02031764           (gate)
@@ -514,6 +533,7 @@ func_ov002_021bbd04    (x2: tag=3 both arms, player and 1-player)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021c1954(int player, int slot) {
     char *row_a = (char *)data_ov002_022cf1ac + (player & 1) * 0x868;
@@ -559,12 +579,14 @@ record's `+0x40` bitfield-derived flags, then always tail-calls
 - `func_ov002_021d479c(packed, a, b, c)` — documented arg-pack sink.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cd3f4   ; record base (player-conditional +0x0/+0x4/+0x1c/+0x20)
 data_ov002_022cd4b8   ; companion (stride 0x14)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021ba0b0    (resolve companion record)
 func_ov002_021c1e44    (self, player, idx) — byte-verified ov002_core.h sig
@@ -574,6 +596,7 @@ func_ov002_021dcc48    (tail, always called)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021df4d8(struct Ov002Self *self, int player) {
     int player_a, player_b;
@@ -603,6 +626,7 @@ int func_ov002_021df4d8(struct Ov002Self *self, int player) {
     return 1;
 }
 ```
+
 *(the `L_718` branch's exact bit-packing arithmetic is dense; struct shape
 and call order are confirmed, exact `orr`/`rsb` immediate reconstruction
 should be re-checked against the `.s` at match time.)*
@@ -641,11 +665,13 @@ conditional `func_ov002_022562f0` call, ending with a second
 - `func_ov002_021d479c` arg-pack family — documented.
 
 **Ground-truth pool words (verbatim) — 021DF818:**
+
 ```
 0x000015ab   ; f18 range base
 ```
 
 **Ground-truth BL targets (verbatim, in call order) — 021DF818:**
+
 ```
 func_ov002_021df818   (self-recursive tail call, x2 arms)
 func_ov002_0226ad5c    (terminal arm, id-compare predicate)
@@ -653,6 +679,7 @@ func_ov002_021df938    (fallthrough terminal, all other arms)
 ```
 
 **Ground-truth pool words (verbatim) — 021DF938:**
+
 ```
 0x00001805   ; tag A for func_ov002_021b3ecc
 0x00001850   ; tag B for func_ov002_021b3ecc
@@ -663,6 +690,7 @@ func_ov002_021df938    (fallthrough terminal, all other arms)
 ```
 
 **Ground-truth BL targets (verbatim, in call order) — 021DF938:**
+
 ```
 func_ov002_021b3ecc   (x3: tags 0x1805, 0x1850, 0x1a06)
 func_ov002_021bae7c    (tag 0x18c4)
@@ -672,6 +700,7 @@ func_ov002_02244fe4    (final arg-pack dispatch, kind=0x10)
 ```
 
 **Recipe sketch:**
+
 ```c
 /* 021df818 */
 int func_ov002_021df818(struct Ext021df818Self *self, int player) {
@@ -737,6 +766,7 @@ literal is a plain constant; both callees at the tail (`021df680`,
 `021d479c` arg-pack sink shape.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00001256   ; tag for func_ov002_021bae7c / func_ov002_021df680
 0x0000ffff   ; clamp sentinel
@@ -744,6 +774,7 @@ literal is a plain constant; both callees at the tail (`021df680`,
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021bae7c    (tag 0x1256)
 func_ov002_021df680    (tag 0x1256, on success)
@@ -754,6 +785,7 @@ func_ov002_022538bc    (tag 0x144d)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_021e05fc(int player, int arg1) {
     int inv = 1 - player;
@@ -793,6 +825,7 @@ range dispatch on `self->f0` (`Ov002Self` core field) against `0x12c5`,
 - `Ov002Self.f0` — byte-verified core field.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf1a4   ; companion field
@@ -801,6 +834,7 @@ data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021bc8c8    (tag6 gate)
 func_ov002_021bc618    (bit0) — byte-verified, single call site
@@ -811,6 +845,7 @@ func_0202e864            (id-range C follow-up)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021ebc2c(struct Ov002Self *self, int player, int slot) {
     u16 f2 = self->f2raw;   /* extended-self halfword at +0x2 */
@@ -861,6 +896,7 @@ range on `self->f6` (halfword, 3-way switch on values 0/1/2).
 - `func_ov002_021c23ac(player, slot)` — already-known.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000018a3   ; self->f0 range base A
 0x0000146f   ; self->f0 range literal B
@@ -868,6 +904,7 @@ range on `self->f6` (halfword, 3-way switch on values 0/1/2).
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021c23ac    (player, slot)
 func_ov002_021ba104     (x5, one per range/switch arm)
@@ -876,6 +913,7 @@ func_0202f46c             (terminal arm follow-up)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021ed4c0(struct Ov002Self *self, int player, int slot) {
     if (self->b0 != player) return 0;
@@ -927,12 +965,14 @@ every step is a documented struct field or already-known helper.
 `PerPlayerRowTable`, `func_ov002_021bc618`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc    (resolve card id)
 func_0202eab0
@@ -943,6 +983,7 @@ func_ov002_021bc288    (fallback arm)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021f0848(struct Ov002Self *self, int player, int slot) {
     int id = func_ov002_021b9ecc(player, slot);
@@ -990,12 +1031,14 @@ documented for `PerPlayerRowTable` slot-scan loops elsewhere in the corpus.
 - `PerPlayerRowTable` companion `data_ov002_022cf1a4`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021bc8c8    (tag6/bit0 gate)
 func_ov002_0223b468     (loop bound from self->f8)
@@ -1004,6 +1047,7 @@ func_ov002_0223b430     (x-N, per clear bit)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021f126c(struct Ov002Self *self, int player, int slot) {
     u16 f2 = self->f2raw;
@@ -1051,12 +1095,14 @@ in `ov002_core.h`**: `(self, player, idx)`) and finally
   byte-verified in `ov002_core.h`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b9ecc    (resolve card id)
 func_ov002_021b7bb8     (already-known helper)
@@ -1067,6 +1113,7 @@ func_ov002_021c2084     (self, player, idx, 1) — byte-verified
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021f19e8(struct Ov002Self *self, int player, int slot) {
     int id = func_ov002_021b9ecc(player, slot);
@@ -1116,6 +1163,7 @@ literal-pool words (all constants are small immediates encoded directly in
 instructions: `0x16`, `0x2`, `0x5`).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b8ecc     (self2)
 func_0202b878             (self2->f0, compared to 0x16)
@@ -1124,6 +1172,7 @@ func_ov002_022018cc     (self2, p, s), conditional on 021c1ef0 result
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0220196c(struct Ov002Self *self1, struct Ov002Self *self2) {
     if (self1 == 0) return 0;
@@ -1174,11 +1223,13 @@ above), and finally a `DuelStateSingleton+0xCEC`-adjacent
 - `data_ov002_022cd3f4` — already-known.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cd3f4   ; already-known ov002 global (compared at +0x0, +0x4, +0x8)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b8ecc     (self2, gate)
 func_0202e234             (self2->f0, predicate)
@@ -1189,6 +1240,7 @@ func_ov002_022018cc     (x-up-to-5, per successful slot)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02202d5c(struct Ov002Self *self1, struct Ov002Self *self2) {
     if (self1 == 0) return 0;
@@ -1244,6 +1296,7 @@ with two different bitmask tests (`&1` vs `&2`).
 - `func_ov002_021b6600` — already-known ov002 helper.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000015ab             ; self1->f0 sentinel
 0x00000868             ; PerPlayerRowTable stride
@@ -1251,6 +1304,7 @@ data_ov002_022cf178   ; documented companion (event count table)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202e234             (self2->f0, predicate)
 func_0202b8c0             (self2->f0, compared to 4)
@@ -1258,6 +1312,7 @@ func_ov002_021b6600     (x2, bitmask &1 or &2 arm)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_022058b4(struct Ov002Self *self1, struct Ov002Self *self2) {
     if (self2 == 0) return 0;
@@ -1311,6 +1366,7 @@ func_ov002_021bc618(b)`), and a final `func_ov002_021bc288` fallback.
 - `func_ov002_021ff2b8(a,b)` — byte-verified thunk.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf17c   ; documented companion (0x260 list)
@@ -1318,6 +1374,7 @@ data_ov002_022cf17c   ; documented companion (0x260 list)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021ca2b8    (xorbit, 0, 0, 0) — byte-verified thunk
 func_ov002_0223f6c4     (self) — companion-record-zero fallback
@@ -1329,6 +1386,7 @@ func_ov002_021bc288      (bit0, hi) — fallback arm, taken only when xorbit==bi
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02205e08(struct Ov002Self *self) {
     u16 f2 = self->f2raw;
@@ -1378,6 +1436,7 @@ recognisably the same skeleton, minus the `PerPlayerRowTable`/
 immediates in instructions (no literal pool in this function).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021ca2b8    (xorbit, 0, 0, 0) — byte-verified thunk
 func_ov002_021b9e00     (bits)
@@ -1388,6 +1447,7 @@ func_ov002_021bc288      (fallback arm)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02206380(struct Ov002Self *self) {
     u16 f2 = self->f2raw;
@@ -1427,6 +1487,7 @@ literal-driven lookup-table dispatch, fully deterministic.
 **Struct/data needed:** `Ov002Self.f0`/`b0` — byte-verified.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0000172f   ; self->f0 range base A
 0x00001472   ; self->f0 range base B
@@ -1434,6 +1495,7 @@ literal-driven lookup-table dispatch, fully deterministic.
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021bc6e8    (bit0)
 func_ov002_021ca2b8     (bit0, 0, 0, 0) — byte-verified thunk
@@ -1442,6 +1504,7 @@ func_ov002_021ca2d0     (bit0, chosen_b)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02206780(struct Ov002Self *self) {
     int bit0 = self->b0;
@@ -1486,6 +1549,7 @@ a clean literal-driven guard chain.
 - `Ov002Self.f2raw` tag6 (per-TU local).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000fb7   ; id sentinel 1
 0x00000fb8   ; id sentinel 2
@@ -1496,6 +1560,7 @@ a clean literal-driven guard chain.
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021ff3bc    (self) — byte-verified bool query
 func_ov002_021c2f24     (x5, one per id sentinel, self->f2 tag6 != 0x23 path)
@@ -1503,6 +1568,7 @@ func_ov002_021c3ae4     (tag6 == 0x23 path)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02206994(struct Ov002Self *self) {
     if (func_ov002_021ff3bc(self) == 0) return 0;
@@ -1545,6 +1611,7 @@ from the documented `PerPlayerRowTable` record.
 - `func_ov002_022536e8` — dossier-documented.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf178   ; documented companion (event count table)
@@ -1552,6 +1619,7 @@ data_ov002_022cf16c   ; PerPlayerRowTable base (record +0xc = loop bound)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021bc8c8    (bit-shape gate)
 func_ov002_021ff2b8     (self, bit0) — byte-verified thunk
@@ -1561,6 +1629,7 @@ func_ov002_022536e8     (x-N: self->f0, i) — dossier-documented, loop
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0220a328(struct Ov002Self *self) {
     u16 f2 = self->f2raw;
@@ -1601,6 +1670,7 @@ success and the specific guard callee names.
 **Struct/data needed:** same as `0220a328`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000013f2             ; func_ov002_021bb068 tag literal
 0x00000868             ; PerPlayerRowTable stride
@@ -1609,6 +1679,7 @@ data_ov002_022cf16c   ; PerPlayerRowTable base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_02257ab8    (self, 1-bit0) — self implicit in r0, untouched since entry
 func_ov002_02257ab8    (self, bit0) — same callee, flipped 2nd arg
@@ -1618,6 +1689,7 @@ func_ov002_022536e8     (x-N: self->f0, i) — dossier-documented, loop
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0220ad78(struct Ov002Self *self) {
     u16 f2 = self->f2raw;
@@ -1661,6 +1733,7 @@ result against `self1`'s own `f2`/`f4` bit-pack.
 literals encoded directly (no literal pool in this function).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02031794             (self2->f0, predicate)
 func_ov002_021ff320     (self1, self2)
@@ -1672,6 +1745,7 @@ func_ov002_0223de94     (self2, i) — byte-verified, loop over self2->f6
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0220b488(struct Ov002Self *self1, struct Ov002Self *self2) {
     if (self2 == 0) return 0;
@@ -1707,6 +1781,7 @@ int func_ov002_0220b488(struct Ov002Self *self1, struct Ov002Self *self2) {
     return 0;
 }
 ```
+
 *(the `self1`-side pack at `.L_100` combines `f2`/`f4` bits in a way that
 needs a careful re-derivation from the `.s` byte-shift sequence at match
 time; call order and struct/callee shapes above are all confirmed.)*
@@ -1732,6 +1807,7 @@ guard chain up front is longer).
 reuse the same companion-check idiom, not an identical body).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0000ffff             ; func_ov002_021b3618 sentinel
 0x00000868             ; PerPlayerRowTable stride
@@ -1739,6 +1815,7 @@ data_ov002_022cf17c   ; documented companion (0x260 list)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021b3618    (self)
 func_ov002_021b3ecc     (bit0, hi, self->f0) — byte-verified 3-arg thunk
@@ -1751,6 +1828,7 @@ func_ov002_022536e8     (self->f0, bit0, companion) — dossier-documented
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0220c6b8(struct Ov002Self *self) {
     u16 f2 = self->f2raw;
@@ -1813,6 +1891,7 @@ skeleton, ov002 flavor.
 immediates (no literal pool in this function).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0223df38     (self, i, &stack) — loop, up to self->f6 times
 func_ov002_0225764c     (self, lo, hi) — conditional, on 0223df38 success
@@ -1821,6 +1900,7 @@ func_ov002_021de408     (self, bitmask) — tail, always called
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_0220e594(struct Ov002Self *self) {
     u8 count = (u8)self->f6raw;
@@ -1863,6 +1943,7 @@ with a packed argument.
 - `func_ov002_0225764c(self, lo, hi)` — already-known.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf16c   ; PerPlayerRowTable base
@@ -1871,6 +1952,7 @@ data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0223df38     (self, 0, &stack)
 func_ov002_0225764c     (self, lo, hi) — conditional
@@ -1878,6 +1960,7 @@ func_ov002_021d59cc     (packed, hi) — tail dispatch
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02213f9c(struct Ov002Self *self) {
     int parity = (self->f2raw >> 15) & 1;
@@ -1927,12 +2010,14 @@ batch) — OR a single `func_ov002_021e2d94` call when `tag6 != 2`.
 - `func_ov002_021df818` — documented above in this batch.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022cf16c   ; PerPlayerRowTable base
 0x00000868             ; PerPlayerRowTable stride
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021c8470     (parity, slot) — x-up-to-5, per-slot on nonzero bitfield
 func_ov002_021de408     (self, bitmask) — tag6==2 path
@@ -1941,6 +2026,7 @@ func_ov002_021e2d94     (bit0, hi, 5, 1) — tag6!=2 path
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0221429c(struct Ov002Self *self) {
     if (self->f4raw & 0x8000) return 0;
@@ -1996,6 +2082,7 @@ u16 of arg2").
 `func_ov002_021d90c0` — documented arg-pack-family member.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000868             ; PerPlayerRowTable stride
 data_ov002_022cf16c   ; PerPlayerRowTable base
@@ -2004,6 +2091,7 @@ data_ov002_022cf1a4   ; companion field
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0223df38     (self, 0, &stack)
 func_ov002_021c4c9c     (self, &stack2) — 2nd unpack, conditional
@@ -2011,6 +2099,7 @@ func_ov002_021d90c0     (clamped_a, clamped_b) — documented arg-pack family
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_02214e58(struct Ov002Self *self) {
     int parity = (self->f2raw >> 15) & 1;
@@ -2050,6 +2139,7 @@ void func_ov002_02214e58(struct Ov002Self *self) {
     func_ov002_021d90c0(bit0, (a << 16) | (b & 0xffff));
 }
 ```
+
 *(the exact stack-slot layout / packing of the second unpack should be
 re-verified against `.s` at match time; the two-level `PerPlayerRowTable`
 lookup and the arg-pack tail are confirmed deterministic.)*
@@ -2076,12 +2166,14 @@ the `0x7e`/`0x7f` arms, or `func_ov002_021bc618`(byte-verified) +
   tickers.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000014f8             ; func_ov002_021ca3f0 tag
 data_ov002_022ce288   ; DuelQueueState base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021ca2b8    (bit0, 0, 0, 0) — byte-verified thunk
 func_ov002_021ca3f0     (bit0, 0x14f8)
@@ -2092,6 +2184,7 @@ func_ov002_021e2c5c      (queue_state == 0x7e arm) — already-known ticker
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02215080(struct Ov002Self *self) {
     if (self->f4raw & 0x8000) return 0;
@@ -2145,6 +2238,7 @@ line-by-line against the `.s` — no genuine ambiguity remains.
 - `PerPlayerRowTable` companion `data_ov002_022cf16c+0xC`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov002_022ce288   ; DuelQueueState base
 data_ov002_022cf16c   ; PerPlayerRowTable base
@@ -2153,6 +2247,7 @@ data_ov002_022d016c   ; DuelStateSingleton base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_021d7970    (x-up-to-N, per-slot in the 0x80-arm double loop)
 func_ov002_021e104c     (0x7f arm)
@@ -2162,6 +2257,7 @@ func_ov002_021e2c5c     (0x7e arm, ticker) — already-known
 ```
 
 **Recipe sketch:**
+
 ```c
 /* self viewed as a u16 array from byte offset +0x8: field[xorp] means
  * *(u16 *)((char *)self + xorp*2 + 8). */
@@ -2220,6 +2316,7 @@ lookup-table shape than `02206780` above.
 `func_ov002_0225764c` (already-known).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0000195e   ; self->f0 range base A
 0x00001254   ; self->f0 range base B
@@ -2227,6 +2324,7 @@ lookup-table shape than `02206780` above.
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0225764c    (x-up-to-10: 2 players × 5 slots, per-iteration guard)
 func_ov002_021c8470     (most range arms)
@@ -2234,6 +2332,7 @@ func_ov002_021c84a8     (the 0x1711 range arm)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02216004(int id, u16 *out) {
     int best = -1;
@@ -2265,6 +2364,7 @@ int func_ov002_02216004(int id, u16 *out) {
     return best;
 }
 ```
+
 *(the precise branch/range structure over the 6 literal cases is
 consolidated here for clarity; each arm and its target are individually
 confirmed against the `.s`, exact nesting should be re-verified against the
@@ -2291,6 +2391,7 @@ skeleton as `0220e594` above.
 immediates (no literal pool).
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0223df38     (self, i, &stack) — loop, up to self->f6 times
 func_ov002_0225764c     (self, lo, hi) — conditional, accumulate bitmask
@@ -2299,6 +2400,7 @@ func_ov002_021de408     (self, bitmask) — conditional on 021b4618 == 3
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_02216334(struct Ov002Self *self) {
     u8 tag = (u8)((self->f6raw << 8) >> 24);
@@ -2345,6 +2447,7 @@ recipe); `func_ov002_021e2b3c`/`021e2c5c` — already-known tickers.
 function.
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov002_0223def4    (self, i) — pass 1, per iteration
 func_ov002_021b947c     (no args) — pass 1, per iteration
@@ -2358,6 +2461,7 @@ func_ov002_021e2c5c     (no args) — already-known ticker, tail
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_02216424(struct Ov002Self *self) {
     u8 count = (u8)((self->f6raw >> 8) & 0xff);

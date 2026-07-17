@@ -94,6 +94,7 @@ per `docs/research/map/overlay017.md`.
   same shape as ov016's `data_ov016_021bab44`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x07000400   ; VRAM_PALETTE_A + block (OV006_VRAM_BLOCK_SIZE offset)
 0x05000400   ; BG palette dest + block
@@ -119,6 +120,7 @@ data_ov017_021b8570   ; main controller (arg to Ov017_MainSceneSetupBg)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504 (x4: palette-A, palette-B, tile-base, tile-base-B)
 func_0200592c
@@ -158,6 +160,7 @@ func_ov017_021b2ddc  (Ov017_MainSceneSetupBg — tail call)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r0, #0xa64] [r0, #0xa68] [r0, #0xa6c] [r0, #0xa70] [r0, #0xa74] [r0, #0xa7c]  (data_02104f4c cluster)
 [r0, #0x52] [r0, #0x58]  (data_0210594c)
@@ -165,6 +168,7 @@ func_ov017_021b2ddc  (Ov017_MainSceneSetupBg — tail call)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov017_MainSceneInit(void) {
     *(vu16*)0x04000000 &= ~0x1f00;
@@ -293,6 +297,7 @@ also tractable).
 - `data_ov017_021b8134` — fourth OBJ template pointer (post-loop TaskConfig).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov017_021b80d4
 data_ov017_021b80f0
@@ -307,6 +312,7 @@ data_ov017_021b8134
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201d47c, func_02006c0c, func_0201e5b8, Task_Invoke   (x3, TaskConfig blocks)
 func_0201e7e0
@@ -323,6 +329,7 @@ func_ov017_021b34c4   (Ov017_CardPanelInit — tail call)
 `func_ov016_021b2b2c`).
 
 **Recipe sketch:**
+
 ```c
 void Ov017_MainSceneSetupBg(Ov017MainCtrl *self) {
     TaskConfig cfg;
@@ -411,6 +418,7 @@ the same "achievement/mode cluster" field seen in 021b22ec above.
   BSS-catalogued via `data_ov017_bss.s`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov017_021b8a9c   ; controller (touch-cursor gate at +0x8)
 data_ov017_021b80c8   ; Rect #1
@@ -424,6 +432,7 @@ data_ov017_021b8610   ; sub-scene controller (arg to Ov017_DrawMainCardPanel)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov017_021b7dac   (Ov017_TouchCheckCursor)
 func_ov017_021b2ce4   (Ov017_TouchHitTest, x4 — one per Rect)
@@ -433,6 +442,7 @@ func_ov017_021b41fc   (Ov017_DrawCardList, tail)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r5, #0x8]   (data_ov017_021b8a9c — cursor-move gate)
 [r6, #0xc]   (self — last-hit-row cache)
@@ -442,6 +452,7 @@ func_ov017_021b41fc   (Ov017_DrawCardList, tail)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov017_MainCtrlUpdate(Ov017MainCtrl *self) {
     if (data_ov017_021b8a9c.f8) Ov017_TouchCheckCursor();
@@ -518,12 +529,14 @@ internal `blt`/threshold check — zero real scheduling ambiguity.
 `r0` (fields `[0]`=state, `[8]`=fade counter).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0400006c   ; MASTER_BRIGHT main
 0x0400106c   ; MASTER_BRIGHT sub
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_0208c884  (x4 — MASTER_BRIGHT writes, 2 per fade-state)
 func_ov017_021b3ca8   (Ov017_MainCtrlPhaseAdvance)
@@ -534,6 +547,7 @@ func_02037208          (toast/SE call, state-1 success path)
 counter, read/write in states 0 and 2).
 
 **Recipe sketch:**
+
 ```c
 int Ov017_MainCtrlStateMachine(Ov017MainCtrl *self) {
     int result = 0;
@@ -591,6 +605,7 @@ this doc) at the tail.
 **Ground-truth pool words (verbatim, partial — full list requires the
 remaining 400+ lines not reproduced here, but the pattern is 100% consistent
 with the sampled prefix):**
+
 ```
 data_020b4728
 data_02102c90
@@ -604,6 +619,7 @@ data_ov017_021b8a9c
 
 **Ground-truth BL targets (verbatim, sampled — full function is ~400 lines
 of the same idiom repeated):**
+
 ```
 func_02001bc8, func_02001d0c, func_02005088, func_02006c0c, Task_Invoke,
 func_020117ac, func_0201d47c, func_0201e5b8, func_0202b100, func_0202c0c0,
@@ -617,6 +633,7 @@ same family as 021b22ec/021b312c's +0xa64/+0xa74).
 **Recipe sketch (top-level shape only — full body is the OV006-init +
 TaskConfig-build idiom repeated ~6x with different literal offsets, matching
 the already-established recipe from 021b22ec/021b2ddc above):**
+
 ```c
 void Ov017_CardPanelInit(void) {
     if (data_02104f4c.fa78) {
@@ -660,11 +677,13 @@ both overlays).
 cluster) — no new globals.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_02094504
 func_02001d0c
@@ -679,6 +698,7 @@ func_02094550   (x2, tile-fill loop)
 to `func_02005088`/`func_02001d0c`).
 
 **Recipe sketch:**
+
 ```c
 void Ov017_DrawCardCount(int panelIdx, void *dst, int mode, int count, int y) {
     int cols = (count / 4);  /* mwcc asr/lsr divide-by-4 idiom */
@@ -752,6 +772,7 @@ descriptions.
   (u16 fields written back in mode-2's success path).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c
 data_ov017_021b8180
@@ -769,6 +790,7 @@ data_ov017_021b8994
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504
 func_ov017_021b2280   (popcount, x4 across the 4 mode branches)
@@ -784,6 +806,7 @@ Task_Invoke
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r9, #0x4]  [r9, #0x60] [r9, #0x14] [r9, #0xc] [r9, #0x10] [r9, #0x1c] [r9, #0x20+idx]
 [data_ov017_021b8894, #0xa68] [+0xa6c] [+0xa70] [+0xa74]  (bitmask source per mode)
@@ -793,6 +816,7 @@ Task_Invoke
 **Recipe sketch (mode-1 branch shown in full; modes 0/2/3 follow the
 identical popcount-scan/select shape with different bit-table sources and
 scan widths (0x40/0xc/0x8/0x10 bits respectively)):**
+
 ```c
 void Ov017_SubSceneInit(Ov017SubCtrl *self, int mode) {
     func_02094504(0, data_ov017_021b8610, 0x6c);
@@ -856,6 +880,7 @@ ambiguous.
 reference), field `+0x18` (0-3 mode selector).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov000_021b1d4c
 data_ov017_021b8570
@@ -866,6 +891,7 @@ data_ov017_021b8176
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov017_021b405c   (Ov017_DrawCardObjPacked, x3)
 func_ov005_021aaea8
@@ -878,12 +904,14 @@ func_ov017_021b4090   (Ov017_DrawCardObjOffset, x2)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r9, #0x14] [r9, #0x64] [r9, #0x10] [r9, #0xc] [r9, #0x4] [r9, #0x68]
 [data_ov000_021b1d4c, #0x18]
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov017_DrawMainCardPanel(Ov017MainCtrl *self) {
     if (self->cardTotal > 5) {
@@ -922,8 +950,8 @@ big-body"
 **Upgrade reason:** `Ov017_MainSceneUpdate` — the single largest function
 in the whole retriage batch, and it is fully deterministic despite its
 size. Top-level dispatch is a 3-way switch on `[r4]` (states 0/1/2), each
-with an internal computed-branch sub-state switch (`addls pc,pc,r1,lsl
-#0x2`, bounded 0-3) — a textbook 2-level state machine, not scheduling
+with an internal computed-branch sub-state switch (`addls pc,pc,r1,lsl #0x2`,
+bounded 0-3) — a textbook 2-level state machine, not scheduling
 entropy. The repeated blocks (`.L_878`/`.L_98c`/`.L_ac0`/`.L_bd0`/`.L_d00`)
 are near-identical siblings of the same "render N cards starting at cursor
 position" loop (5 or 7 iterations, differing only in loop bound and a small
@@ -951,6 +979,7 @@ hit-test using the already-matched `func_ov017_021b2d5c` sibling
   targets for the tail dual-source touch check.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov000_021b1d4c
 data_ov017_021b8894
@@ -966,6 +995,7 @@ data_ov017_021b8176
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_ov017_021b5f24   (Ov017_SubSceneSetupBg, state-0/sub-2 path)
 func_ov017_021b5de8   (Ov017_SubStateNavigate)
@@ -984,6 +1014,7 @@ func_ov017_021b2d5c   (Ov017_ButtonHitTest, x2 — dual input source)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r4, #0x0] [r4, #0x4] [r4, #0x8] [r4, #0xc] [r4, #0x10] [r4, #0x14] [r4, #0x18] [r4, #0x64] [r4, #0x68]
 [data_ov017_021b8894, #0x1e4] [+0x1f4]
@@ -993,6 +1024,7 @@ func_ov017_021b2d5c   (Ov017_ButtonHitTest, x2 — dual input source)
 
 **Recipe sketch (top-level shape; sub-state bodies follow the render-loop
 pattern already fully specified in 021b4df8/021b7010 above):**
+
 ```c
 int Ov017_MainSceneUpdate(Ov017MainCtrl *self) {
     switch (self->state) {
@@ -1060,11 +1092,13 @@ ambiguity.
 (first TaskConfig block).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov017_021b820c
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_0201d47c, func_02006c0c, func_0201e5b8 (x2), Task_Invoke
 func_0208e120
@@ -1076,6 +1110,7 @@ func_ov017_021b61dc   (Ov017_LoadCardNameBg, tail)
 shape as prior functions).
 
 **Recipe sketch:**
+
 ```c
 void Ov017_SubSceneSetupBg(Ov017SubCtrl *self) {
     TaskConfig cfg;
@@ -1133,6 +1168,7 @@ space-stripping copy loop, `ldrsb`/`strneb`/pointer increment). The
 - `data_ov017_021b867c` — 0x100-byte string buffer (already BSS-catalogued).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov017_021b7ef8
 0x0000079f   ; sentinel SE ID
@@ -1142,6 +1178,7 @@ data_ov017_021b867c
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_0202c0c0   (case 0, case 1, case 3 — literal SE IDs; case 2 conditional)
 func_0202b100   (case 2, card-lookup)
@@ -1152,6 +1189,7 @@ func_020aadf8   (case 2, string-format — x2, one per branch)
 (card-index byte, indexed by caller arg `r6`).
 
 **Recipe sketch:**
+
 ```c
 void *Ov017_GetCardTileAddr(Ov017MainCtrl *self, int slot) {
     switch (self->mode) {
@@ -1232,6 +1270,7 @@ every call target is named.
   `func_02005088`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90, 0x6c3, 0x7fff, 0x5000040, data_ov017_021b8238, 0x1af, 0x10f,
 data_020b4728, 0x5000060, 0x3ff, 0x5000020, data_02104f4c, data_02105989,
@@ -1242,6 +1281,7 @@ data_ov017_021b8330, data_ov017_021b8350, func_ov017_021b6774
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02001d0c, func_0202c0c0, func_02005088, func_0208e220,
 func_02001bc8, func_02094550, func_0201d47c, func_02006c0c, func_0201e5b8,
@@ -1253,6 +1293,7 @@ func_ov017_021b7490 (Ov017_RenderTextWindowB), func_ov017_021b7578
 ```
 
 **Struct offsets accessed:**
+
 ```
 [data_02104f4c, #0xa3c] (byte)  [+0xb00] (byte)
 [r4, #0x1cc] [+0x1cd] [+0x1ce] [+0x1cf] [+0x1d4] [+0x100+0xd0] [+0x100+0xda]
@@ -1263,6 +1304,7 @@ func_ov017_021b7490 (Ov017_RenderTextWindowB), func_ov017_021b7578
 **Recipe sketch (top-level shape — this is the "sub-scene per-frame
 update" that rebuilds text windows and packs a card-attribute word each
 frame):**
+
 ```c
 void Ov017_SubSceneUpdate(Ov017SubCtrl *self) {
     func_02001d0c(data_02102c90, 8, 2);
@@ -1326,6 +1368,7 @@ gaps). `data_ov017_021b7f3c` is a 16-byte literal block copied via
   cell-config template, same shape as `data_ov017_021b7e7c`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x66666667   ; smull reciprocal, ÷10 (documented in OverlayConstantsExtended.md)
 data_021040ac
@@ -1333,11 +1376,13 @@ data_ov017_021b7f3c
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_0201e964   (x5 — 4 cell-reconfigure calls + implicit in scroll-loop tail)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r4, #0x1dc] [+0x1e0] [+0x1e4] [+0x1e8]   (scroll-A interpolation state)
 [r4, #0x1ec] [+0x1f0] [+0x1f4] [+0x1f8]   (scroll-B interpolation state)
@@ -1347,6 +1392,7 @@ func_0201e964   (x5 — 4 cell-reconfigure calls + implicit in scroll-loop tail)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov017_SubScrollUpdate(Ov017SubCtrl *self) {
     int deltaA;
@@ -1406,6 +1452,7 @@ above), `data_ov017_021b84d0`/`_84f0` — two 0x20-byte config blocks passed
 to `func_02091554` (font-glyph render).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov017_021b8a9c, data_02102c90, 0x00005680, 0x00013200, data_020b4728,
 0x050004a0, 0x000002be, 0x000002bb, 0x01ff0000, 0x04001010,
@@ -1413,6 +1460,7 @@ data_ov017_021b84d0, data_ov017_021b84f0
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504 (x3), func_0208e200, func_0208e1ac, Vram_GetBankBaseCD,
 func_02001d0c, func_02005088, func_02091554 (x2), func_0201d47c,
@@ -1439,9 +1487,9 @@ selected by `(row==0)`/`(row==last)`/else × `(col==0)`/`(col==last)`/else).
 **Original verdict:** E — "divide-by-shift arithmetic chains, loop, heavy
 reg juggling"
 
-**Upgrade reason:** `Ov019_FillTileRows` per the map doc — the "divide-by-
-shift" is the standard mwcc signed-divide idiom (`asr#0x2`/`add...,lsr
-#0x1d`/`asr#0x3`, then `asr#0x2`/`lsr#0x1d`/`asr#0x3` again — a double
+**Upgrade reason:** `Ov019_FillTileRows` per the map doc — the "divide-by-shift"
+is the standard mwcc signed-divide idiom (`asr#0x2`/`add...,lsr #0x1d`/`asr#0x3`,
+then `asr#0x2`/`lsr#0x1d`/`asr#0x3` again — a double
 divide-by-8 applied to a byte-count arg) feeding `func_02094504` (documented
 VRAM DMA convention) and `func_02001d0c` (documented display-config call).
 The loop is a clean bounded 2-call-per-iteration tile-fill using
@@ -1457,6 +1505,7 @@ invariant hoisting, not indeterminate scheduling).
 at all; only `func_02004f58` is a plain `bl`).
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_02094504 (x2)
 func_02001d0c
@@ -1468,6 +1517,7 @@ func_02094550 (x2, inside loop)
 supplied args).
 
 **Recipe sketch:**
+
 ```c
 void Ov019_FillTileRows(int slot, int arg1, int y, int height) {
     int h8 = height / 8;   /* double divide-by-8 idiom, asr#2/lsr#1d/asr#3 twice */
@@ -1499,9 +1549,9 @@ stores"
 `func_02006c0c(template,4,0)` + `bic`/`orr` TaskConfig-pack idiom seen
 throughout ov017 (4 blocks here), plus a bounded `for` loop building 6+1
 card-count sprites via the already-matched sibling `func_ov019_021b40d4`
-(`Ov019_SceneA_RenderCount`), a `func_ov019_021b4258` (`Ov019_SceneA_
-LayoutSlots`) tail call, and a DISPCNT-family pack (`0x4000000`, `bic
-#0x1f00`/`orr #0xc00`). All literals are fixed, all callees named.
+(`Ov019_SceneA_RenderCount`), a `func_ov019_021b4258` (`Ov019_SceneA_LayoutSlots`)
+tail call, and a DISPCNT-family pack (`0x4000000`, `bic #0x1f00`/`orr #0xc00`).
+All literals are fixed, all callees named.
 
 **Struct/data needed:** `data_ov019_021b5bd0`/`_5bf0`/`_5c0c`/`_5c2c`/
 `_5c4c` — five task templates. `data_ov019_021b5a18` — 16-byte literal
@@ -1509,6 +1559,7 @@ block copied via `ldmia`/`stmia` (same idiom as ov017's `data_ov017_
 021b7e7c`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov019_021b5e70, 0x000004c4, 0x0400006c, 0x0400106c, data_ov019_021b5bd0,
 data_ov019_021b5bf0, data_ov019_021b5c0c, 0x00006640, data_ov019_021b5c2c,
@@ -1517,6 +1568,7 @@ data_ov019_021b5c4c, data_ov019_021b5a18, 0x000076f4, 0x05000600,
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504, func_0208c884 (x2, MASTER_BRIGHT), func_ov019_021b3f7c
 (Ov019_SceneA_MapAnimState), func_0201d47c, func_02006c0c, func_0201e5b8
@@ -1527,11 +1579,13 @@ func_0202c0c0, func_ov019_021b52f0 (Ov019_SceneC_Build, conditional tail)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r6, #0x8] [+0xc] [+0x10] [+0x14] [+0x44] [+0x48] [+0x64] [+0xbc] [+0xc0] [+0xc4]
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov019_SceneA_Build(Ov019SceneA *self) {
     func_02094504(0, &data_ov019_021b5e70, 0x4c4);
@@ -1595,12 +1649,14 @@ mwcc idiom, not entropy — every index feeds a bounded, named-callee call.
 globals (hit-test targets, first-touch and scroll-touch).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov019_021b6920, data_ov019_021b5ba0, data_ov019_021b5baa,
 data_ov000_021b1d4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov019_021b5948 (Ov019_SceneA_TouchScrollBar, conditional),
 func_ov019_021b2728 (Ov019_TouchHitTestPrimary, x2), func_ov019_021b3f34
@@ -1611,6 +1667,7 @@ x4), func_ov005_021aaea8
 ```
 
 **Struct offsets accessed:**
+
 ```
 [sl, #0x8] [+0xc] [+0x10] [+0x18] [+0x1c] [+0x434]
 [data_ov000_021b1d4c, #0x18]
@@ -1618,6 +1675,7 @@ x4), func_ov005_021aaea8
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov019_SceneA_UpdateInput(Ov019SceneA *self) {
     if (data_ov019_021b6920.f8) Ov019_SceneA_TouchScrollBar();
@@ -1691,6 +1749,7 @@ sibling.
 
 **Ground-truth pool words (verbatim, partial — full function is ~500
 lines):**
+
 ```
 data_02104bac
 data_ov000_021b1d4c
@@ -1701,6 +1760,7 @@ data_ov019_021b5baa
 **Ground-truth BL targets (verbatim, sampled — repeated `func_02037208`
 calls with id-1 literal arithmetic `0x42-0x43`/`0x38-0x39`, matching the
 established ov017/ov019 toast convention):**
+
 ```
 func_ov019_021b3cf0 (Ov019_SceneA_HandleDone, x3+)
 func_02037208 (toast/SE, x6+ across branches)
@@ -1713,6 +1773,7 @@ func_ov019_021b4324 (Ov019_SceneA_HitTestSlots)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r4, #0x434]   (self — phase/countdown field, matches 021b3068's usage)
 [data_02104bac, #0x52] [+0x54] [+0x56]
@@ -1722,6 +1783,7 @@ func_ov019_021b4324 (Ov019_SceneA_HitTestSlots)
 **Recipe sketch (top-level shape, sampled from the confirmed prefix — see
 `func_ov017_021b33dc`'s recipe above for the identical `func_02037208
 (id-1,0,1)` idiom this function reuses extensively):**
+
 ```c
 int Ov019_SceneA_RenderFrame(Ov019SceneA *self) {
     *(vu16*)0x04000000 = (*(vu16*)0x04000000 & ~0x1f00) |
@@ -1777,11 +1839,13 @@ reference but not yet in a formal `types/*.md` doc — see New KB gaps),
 `+0x92c` (int, secondary/delta companion field).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_020195b8 (x3, per-state-entry probe)
 func_ov019_021b43a8 (Ov019_MapCardCategory)
@@ -1790,6 +1854,7 @@ func_0201b690 (conditional, on match)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r4, #0x928] [+0x92c]   (data_02104f4c cluster, "global step-counter")
 [r9, #0x0] [+0x4] [+0x8]  (self — output ring entry, stride 0xc)
@@ -1797,6 +1862,7 @@ func_0201b690 (conditional, on match)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov019_SceneA_MapAnimState(Ov019SceneA *self) {
     int outCount = 0;
@@ -1856,12 +1922,14 @@ siblings and a DISPCNT pack (`orr #0x13`<<8). Zero indirection anywhere.
 `data_02102c90`, `data_02104f4c`) already documented.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020b4728, 0x000003ff, 0x05000020, 0x00007fff, 0x05000040, data_02102c90,
 0x000006cf, 0x000006cc, 0x000006cd, data_02104f4c, func_ov019_021b4560
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094550 (x2), func_02001bc8 (x2), func_0208e220, func_02001d0c (x5),
 func_0208df60 (x2), func_02094504 (x5), func_0202c0c0 (x3), func_020054a4
@@ -1910,12 +1978,14 @@ s32 triangle-wave table `{0,1,2,1,0,-1,-2,-1}` (`ldmia`/`stmia` copy of two
 literal template to stack" pattern).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov019_021b5a68
 data_021040ac
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_0201e964 (x4)
 func_ov019_021b4f1c (Ov019_MapAnimFrame, x2)
@@ -1923,12 +1993,14 @@ func_ov019_021b4ed0 (Ov019_AnimGatePredicate)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r5, #0xbc] [+0xc0] [+0xc4] [+0x8] [+0xc] [+0x10] [+0x64]
 [data_021040ac, #0x38]
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov019_SceneB_UpdateAnim(Ov019SceneB *self) {
     if (self->f_bc == 0 && self->f_c0 > 0) {
@@ -1972,6 +2044,7 @@ indirection.
 after `data_ov019_021b5a18`/`_5a68`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90
 data_02104f4c
@@ -1979,6 +2052,7 @@ data_ov019_021b5a50
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208df0c (x4), func_02094504 (x2), func_0202c0c0 (x2), func_02001d0c
 (x2), func_020054a4 (x3), func_02005088 (x3), func_02019210, func_02018abc,
@@ -1987,12 +2061,14 @@ func_020117e4, func_02011a14, func_02011a7c, func_02018d1c, func_02001d68
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r7, #0xc0] [+0xb8] [+0xbc]
 [data_02104f4c, #0x928] [+0x92c]
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov019_SceneB_RenderCard(Ov019SceneB *self) {
     void *card = self->f_c0;
@@ -2053,12 +2129,14 @@ config blocks (args to `func_02091554`). `data_020b4728` — already
 documented (shared with ov017).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov019_021b6920, data_02102c90, data_ov019_021b5dd4, data_ov019_021b5df4,
 data_020b4728, 0x05000400, 0x01ff0000, 0x04001010
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504 (x3), func_0208e200, func_0208e1ac, Vram_GetBankBaseCD,
 func_02001d0c, func_02005088 (x2), func_02091554 (x2), func_0201d47c (x2),
@@ -2067,6 +2145,7 @@ func_0202c0c0 (x2), func_020054a4, func_02005ee0
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r0, #0x0] [+0x8] [+0x14] [+0x18]   (self — struct at sp+0x8)
 ```
@@ -2100,6 +2179,7 @@ convention.
 documented.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104bac
 0x01ff0000
@@ -2107,6 +2187,7 @@ data_02104bac
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 func_02037208 (x2, toast/SE with id-1 idiom: 0x3a-0x3b)
 func_02006148 (secondary touch position)
@@ -2114,11 +2195,13 @@ func_0200617c (secondary touch pressed)
 ```
 
 **Struct offsets accessed:**
+
 ```
 [r4, #0x0] [+0x4] [+0x14] [+0x18] [+0x1c]
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov019_SceneA_AnimScroll(Ov019SceneA *self) {
     int mid = (0xc0 - self->f14 + ((0xc0-self->f14)>>31)) >> 1;

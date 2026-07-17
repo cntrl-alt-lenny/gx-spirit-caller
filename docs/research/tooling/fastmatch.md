@@ -220,9 +220,11 @@ edit src/foo.c  →  fastmatch.py (seconds)  →  100%?  →  ninja sha1 (final)
 
 - `arm-none-eabi-objdump` on PATH.
 - `build.ninja` configured for the target region:
+
   ```bash
   python tools/configure.py eur   # (or usa / jpn)
   ```
+
   Re-run `configure.py` when a new `.c` file is added to `src/`.
 - `build/<region>/delinks/` populated (`ninja delink` or full `ninja`).
 - `tools/objdiff_resolve_relocs.py` present (ships in repo; the resolved

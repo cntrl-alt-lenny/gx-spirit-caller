@@ -32,6 +32,7 @@ Grouped by first 4 hex digits of address.
 - Mixed-module groups: `addr  module` one per line.
 
 ### 0x0201... (main, 65 dossiers)
+
 020125ac  020138b8  020139fc  02013aa0
 02013b4c  020142b4  02014814  02014b28
 02015190  020152ec  02015494  02015638
@@ -51,6 +52,7 @@ Grouped by first 4 hex digits of address.
 0201ff98
 
 ### 0x0202... (main, 95 dossiers)
+
 020202ac  02020490  02020550  020205ec
 02020914  02020a24  02020ba0  02020d00
 020211c8  020212cc  020214ac  02021a3c
@@ -77,6 +79,7 @@ Grouped by first 4 hex digits of address.
 0202f050  0202f218  0202f2e4
 
 ### 0x0203... (main, 100 dossiers)
+
 02030b84  020310d8  02031208  020312a0
 02031358  02031470  02031684  02031838
 0203194c  02031afc  02031b38  02031ba0
@@ -104,6 +107,7 @@ Grouped by first 4 hex digits of address.
 0203eefc  0203efa0  0203f094  0203f30c
 
 ### 0x0204... (main, 40 dossiers)
+
 02040258  0204037c  02040478  0204052c
 02040cc0  02040d94  020413b0  0204152c
 020417e8  020418ac  02041f04  020433d0
@@ -116,6 +120,7 @@ Grouped by first 4 hex digits of address.
 0204706c  02047de8  02047fb8  020480b4
 
 ### 0x021a... (mixed, 48 dossiers)
+
 021aa540  ov022
 021aa5b0  ov009
 021aa5b8  ov000
@@ -166,6 +171,7 @@ Grouped by first 4 hex digits of address.
 021afc2c  ov008
 
 ### 0x021b... (mixed, 77 dossiers)
+
 021b03b8  ov008
 021b18a4  ov008
 021b1ad8  ov008
@@ -245,6 +251,7 @@ Grouped by first 4 hex digits of address.
 021b7c04  ov002
 
 ### 0x021c... (mixed, 56 dossiers)
+
 021c215c  ov006
 021c31d0  ov006
 021c32ac  ov006
@@ -303,6 +310,7 @@ Grouped by first 4 hex digits of address.
 021cfe68  ov002
 
 ### 0x021d... (mixed, 17 dossiers)
+
 021d0060  ov002
 021d0214  ov002
 021d03cc  ov002

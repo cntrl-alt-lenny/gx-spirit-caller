@@ -93,7 +93,6 @@ _KNOWN_REGIONS = ("eur", "usa", "jpn")
 try:
     from objdiff_resolve_relocs import (  # type: ignore[import-not-found]
         resolve_elf_relocs as _rr_resolve_elf,
-        ResolveRelocsError as _rr_Error,
     )
     _HAS_RESOLVER = True
 except ImportError:

@@ -99,6 +99,7 @@ is required to write correct C, only to name the arrays.
   (parallel to `data_02102d04`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020c3cd0   ; 2-entry color/palette-select array (fp base)
 data_02102d04   ; stride-8 array, indexed by outer-loop r7
@@ -106,12 +107,14 @@ data_020b46e0   ; stride-8 array, indexed by outer-loop r7 (parallel)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02091554
 func_02006ef0
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardSlot_ScanHandlers2(int mask, int a1, int a2) {
     char buf[4 + 0x20]; /* stack local render dest, sp+0x4 */
@@ -164,6 +167,7 @@ value worth noting but not blocking).
   `[r5, r9, lsl#3]`, i.e. the 8-byte-stride second word).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102d04   ; task-handle array, flat int[9] view (write target)
 data_020c3cd8   ; 2-entry color/palette-select array
@@ -171,6 +175,7 @@ data_020b46e0   ; stride-8 array (second word read per entry)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02001ba4
 func_02091554
@@ -178,6 +183,7 @@ func_02006c0c
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardSlot_FreeTask(int mask) {
     func_02001ba4();
@@ -220,17 +226,20 @@ compaction shift.
 external call `func_02094688` is already a named function.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 blx r2   (parameter callback, arg 4 — NOT a global/struct vtable slot)
 func_02094688
 ```
 
 **Recipe sketch:**
+
 ```c
 int Gfx_SetupLayer2(void *base, int count, int stride, int (*cmp)(void*, void*, int)) {
     int kept = 0;
@@ -291,17 +300,20 @@ mislabel genuinely tractable functions.
 **Struct/data needed:** None — pure two-string comparison.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020070dc
 func_020070dc   (x2 — called once per input string)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Str_FindSubstring(const signed char *haystack, const signed char *needle) {
     int needleLen = func_020070dc(needle);
@@ -354,11 +366,13 @@ differing only in 3 literal fields — deterministic, not scheduling-bound.
   New KB gaps.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f3c   ; single-field flag word, offset +0x4 read/orr/store
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0209c0cc
 func_02090868
@@ -372,6 +386,7 @@ func_02007230
 ```
 
 **Recipe sketch:**
+
 ```c
 int Net_PollRecv(void) {
     int ok = func_0209c0cc();
@@ -433,6 +448,7 @@ already named.
 - `data_021064d1` — u8 tertiary byte, same stride-0x1c array.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_021064b8   ; mode/state byte, stride-0x1c array
 data_021064b9   ; secondary byte, same array
@@ -441,6 +457,7 @@ data_021064d1   ; tertiary byte, same array
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02019034
 func_02019124
@@ -449,6 +466,7 @@ func_02009ab0
 ```
 
 **Recipe sketch:**
+
 ```c
 void Overlay_UpdateState(int slot) {
     int idx = func_02019034();
@@ -522,12 +540,14 @@ throughout the codebase).
   8-entry `int[8]` array filled by `func_0200a488`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f3c   ; flag word, field +0x14 read
 data_02104f4c   ; system-clock/state-array cluster, +0x1868 window (i*4 stride)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0202ae1c
 func_0200a488
@@ -537,6 +557,7 @@ func_0202af40
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_0200a704(void) {
     int lang = (data_02104f3c.f14 << 3) >> 3;  /* 3-bit language-ID extract */
@@ -589,6 +610,7 @@ both documented in `MainConstants.md`.
 - `data_0210593c` — single halfword field at `+0x62` (threshold/count).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020c3f48   ; documented scalar 0x3B9ACA00 (Copy32 source)
 data_02104f4c   ; array cluster, +0x18a8 window (bitfield test)
@@ -597,6 +619,7 @@ data_0210593c   ; single halfword field, offset +0x62
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02006c0c
 Copy32
@@ -604,6 +627,7 @@ Task_Invoke
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_0200a7a4(int *flags) {
     TaskCfg *task = func_02006c0c(&data_020c3f48 /* really [r1+4] deref */, 4, 0);
@@ -663,11 +687,13 @@ recoverable from the instructions alone. All 4 callees (`func_02092904`,
   (record array base pointer).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02186ae8   ; header: +0xc loop bound, +0x14 record array base
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02092904
 func_02090114
@@ -676,6 +702,7 @@ func_02090048
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_0200c594(void) {
     Record *recArray = *(Record **)((char *)&data_02186ae8 + 0x14);
@@ -736,12 +763,14 @@ textbook packed-record write with all inputs already resolved.
 `+0x0` [s8]) — fully self-contained.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x040004a8   ; packed dest word A (raw MMIO-style address, no lookup needed)
 0x04000488   ; packed dest word B (raw MMIO-style address, no lookup needed)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0200bfcc
 func_0200bfa4
@@ -750,6 +779,7 @@ func_0200bef4
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_0200ce5c(void *a0, RecB *a1, int mode, int extra) {
     if (a0 == NULL) return;
@@ -810,11 +840,13 @@ counts).
 `+0x270` (per-loop bitmask guards).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0200fbd4
 func_02010040
@@ -823,6 +855,7 @@ func_02010040
 ```
 
 **Recipe sketch:**
+
 ```c
 int Duel_EvalCardAlt(DuelCtx *self) {
     if (self == NULL) return 0;
@@ -895,12 +928,14 @@ overclaimed).
   shape needs to be known.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_020b5e20   ; slot-table base (added to func_02019210 result * 0x3c)
 data_02102c64   ; documented 64-bit LCG state, u32[6] (dossiers 02019a58/0201a9d0)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 GetSystemWork
 func_02019210
@@ -909,6 +944,7 @@ func_02019210
 ```
 
 **Recipe sketch:**
+
 ```c
 short SysWork_InitSlotTable(void *ctx, int mode) {
     GetSystemWork();
@@ -976,17 +1012,20 @@ word on `func_02018bc0`'s return value, used only as `(flags >> 0x1e) &
 mask` at the two return sites.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 GetSystemWork
 func_02018bc0
 ```
 
 **Recipe sketch:**
+
 ```c
 int SysWork_RebuildSlotGroup(int id) {
     GetSystemWork();
@@ -1064,11 +1103,13 @@ KB's existing characterization of that mask family.
 - `0xffe01fff` — documented `BitFlagMasks.md` blend-alpha clear mask.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0xffe01fff   ; documented BLDALPHA clear mask (BitFlagMasks.md)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 GetSystemWork
 func_02019210
@@ -1077,6 +1118,7 @@ func_0201942c
 ```
 
 **Recipe sketch:**
+
 ```c
 void SysWork_SetupSlotArray(int id) {
     char *sw = (char *)GetSystemWork();
@@ -1147,6 +1189,7 @@ a ring-index advance (mod-32) and a call to `func_02092748`.
   handle/context).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_0218fedc   ; running total accumulator
 data_0218febc   ; ring index/count struct (+0x0 index, +0x1c count)
@@ -1155,6 +1198,7 @@ data_0218ff0c   ; halfword ring array, mod-32 indexed
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020927b8
 func_020944a4
@@ -1164,6 +1208,7 @@ func_02092748
 ```
 
 **Recipe sketch:**
+
 ```c
 void Match_WriteRecord(void *dst, int len, int flag) {
     int threshold = func_020927b8();
@@ -1234,6 +1279,7 @@ seeded callback) or a second slot's callback (the tail `blx r2`).
   passed as the arg to the tail callback.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02191f40   ; phase-dispatch struct (+0x30 phase, +0x38 fn-ptr slot)
 data_020c6390   ; arg to the +0x38 callback on entry (pre-store path)
@@ -1242,12 +1288,14 @@ data_020c6490   ; documented scalar 0xA7325 — arg to the tail callback
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 blx r3   (data_02191f40.f38 callback, pre-store, arg=data_020c6390[phase])
 blx r2   (data_02191f40.f38 callback, post-store, arg=data_020c6488[mode])
 ```
 
 **Recipe sketch:**
+
 ```c
 void DB_SetActiveCard(int mode) {
     void (*cb)(void *, int) = (void (*)(void *, int))data_02191f40.f38;
@@ -1295,6 +1343,7 @@ targets in the `DB_*` family per the map doc.
   `ldr r1, _LIT2`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02191f40   ; phase-dispatch struct, +0x24 fn-ptr slot (sibling of +0x38)
 data_02191fa0   ; arg 1 to the +0x24 callback
@@ -1303,6 +1352,7 @@ func_0201f2bc   ; passed by address to func_020a08f4 (callback registration)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201f138   (mode=3)
 blx r2   (data_02191f40.f24 callback, args = data_02191fa0, data_02191fe0)
@@ -1312,6 +1362,7 @@ func_0201f138   (mode=9, conditional)
 ```
 
 **Recipe sketch:**
+
 ```c
 int DB_CardStateUpdate(void) {
     func_0201f138(3);
@@ -1359,6 +1410,7 @@ scheduling entropy. All 4 non-blx callees (`func_0201f138`, `func_0201f19c`,
   literal fields (`0xd`, `0x3`, `0x10`, stack `1`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02191f40   ; phase-dispatch struct (+0x38/+0x30/+0x40 read here)
 data_020c6550   ; arg to the +0x38-family callback (branch A)
@@ -1367,6 +1419,7 @@ data_020c6530   ; arg to the tail-path callback (final blx)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201f19c
 func_0201f138   (mode=9, conditional early-out)
@@ -1382,6 +1435,7 @@ blx r2          (data_02191f40 callback #2, final path)
 ```
 
 **Recipe sketch:**
+
 ```c
 int DB_CardPhasePlay(short *self) {
     if (self->f2 != 0) {
@@ -1462,17 +1516,20 @@ scheduling ambiguity.
   counter, read-modify-write with multiply-add).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02191f40   ; phase-dispatch struct, +0x34 LCG-style counter (rand seed)
 0x00010dcd      ; multiplier constant (self-contained arithmetic, no lookup needed)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 none (leaf function)
 ```
 
 **Recipe sketch:**
+
 ```c
 short Rand_PickBits(unsigned int bits) {
     int count = 0, i = 0;
@@ -1533,11 +1590,13 @@ ambiguity.
 `+0x4/+0x14/+0x18+j*0xc`=per-record sub-fields).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00000618   ; per-entry stride for self+0x34 array (self-contained, caller's own struct)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208e890
 func_0202455c
@@ -1552,6 +1611,7 @@ func_02021c28
 ```
 
 **Recipe sketch:**
+
 ```c
 int BattleObj_ProcessPhase2(Self *self) {
     func_0208e890();
@@ -1614,11 +1674,13 @@ into a coordinate delta), `+0x74` (fallback bit-0 flag), `+0xd4` (s16 mode
 selector, range 0-7).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02092904
 func_0208f5ac    (mode-branch A, cases 0-3, sub-branch flag=1)
@@ -1632,6 +1694,7 @@ func_0208ff84    (mode-branch B, cases 4-7, sub-branch flag=0)
 ```
 
 **Recipe sketch:**
+
 ```c
 int SpiritObj_LoadGfx(Self *self, int y, int x, int extra) {
     int flag;
@@ -1696,11 +1759,13 @@ sub-fields), `+0x70`/`+0xa0` (halfword pair at stride-2 offset within the
 same array window).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0207fd28
 func_0201e7e4
@@ -1711,6 +1776,7 @@ func_0201e800   (2nd call, path B)
 ```
 
 **Recipe sketch:**
+
 ```c
 int CardCtx_RenderAlt(Self *self) {
     char *base = (char *)self + 0x98;
@@ -1766,16 +1832,19 @@ external struct doc required.
 fields).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201eaa0
 ```
 
 **Recipe sketch:**
+
 ```c
 int CardCtx_AnimStep(Self *self) {
     int px = (self->f16c >> 4) << 12;
@@ -1829,6 +1898,7 @@ the "unsigned range trick"). Leaf function, zero calls, zero ambiguity.
 the parameter.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x00001452   ; card-ID range anchor (falls in documented 0x0F00-0x1B00 space)
 0x0000111c   ; card-ID range anchor
@@ -1838,11 +1908,13 @@ the parameter.
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 none (leaf function)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Card_UpdateDeckSlot(int id) {
     if (id > 0x1452) {
@@ -1889,17 +1961,20 @@ in `0x0F00`-`0x1B00`). Leaf function, zero calls, zero ambiguity.
 **Struct/data needed:** None — pure integer literal comparisons.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000014ab   ; card-ID range anchor
 0x0000160d   ; card-ID range anchor
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 none (leaf function)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Card_SetDeckEntry(int id) {
     if (id > 0x14ab) {
@@ -1946,11 +2021,13 @@ pointer) and the per-node layout `{+0x0 key, +0x4 fn, +0x8 extra}`, stride
 `0xc`, derivable purely from this function's own instructions.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 blx ip   (per-node callback, key-matched dispatch — not a global vtable)
 func_02031d0c   (fallback path A)
@@ -1958,6 +2035,7 @@ func_02031a70   (fallback path B)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_020319a0(Self *self, int key, int a2, int a3) {
     ListNode *n = self->f24;
@@ -2022,6 +2100,7 @@ family.
   value.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_0219adcc   ; 12-entry array, stride 0x64 (outer walk)
 data_0219adb8   ; 12-entry parallel array, stride 0x64 (inner list walk)
@@ -2029,6 +2108,7 @@ data_0219b27c   ; spin-loop sentinel/target value
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02031ab0   (per-node, inner circular-list walk)
 func_020318a4   (per-outer-slot, called after inner walk)
@@ -2037,6 +2117,7 @@ func_02031ba0   (tail spin-loop, polled against data_0219b27c)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02031d98(void) {
     Slot *outer = &data_0219adcc;
@@ -2104,11 +2185,13 @@ a 4-byte record write with a 1-byte tag + 1-byte flag + 2-byte payload).
 fields (`+0x0/+0x4/+0x8/+0xc`), fully self-contained.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 OS_DisableIrq
 func_02094688
@@ -2116,6 +2199,7 @@ OS_RestoreIrq
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_0203251c(Ring *self, unsigned char tag, int len, int payload) {
     if (self == NULL) return -1;
@@ -2199,11 +2283,13 @@ bitfield clear+set on `+0xeb4` (`bic 0x2000; bic 0x1000; bic 0x4000; bic
   fn-ptr slot, 4-arg callback).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020334cc
 func_02033864   (conditional)
@@ -2218,6 +2304,7 @@ blx ip          (r4+0xecc callback, null-checked, tail)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_02032888(void *a0, int a1, int a2, void *rec, int a4) {
     if (func_020334cc(rec)) return 0;
@@ -2282,6 +2369,7 @@ part of this batch). The tail `blx r1` dispatches through the struct's
   int arg).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 func_02032864   ; function address, passed to func_0204965c
 func_02032c14   ; function address, passed to func_02049634 (arg 1)
@@ -2289,6 +2377,7 @@ func_02032a18   ; function address, passed to func_02049634 (arg 2)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020334cc
 func_020459b4
@@ -2300,6 +2389,7 @@ blx r1          (r5+0xee4 callback, null-checked, tail; arg = r6)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02032a34(void *self, void *arg, Rec *rec) {
     if (func_020334cc(rec)) return;
@@ -2352,11 +2442,13 @@ in-body).
   `+0xc0c` (params passed to `func_020339d4`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000082ea   ; multiplier constant for the timestamp-delta scale (self-contained)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02046ae0
 func_020930b0   (returns 64-bit tick pair r0:r1)
@@ -2367,6 +2459,7 @@ func_020930b0   (2nd call, re-stamp)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02032d70(Rec *rec) {
     if (!(rec->feb4 & 0x2000)) return;
@@ -2424,6 +2517,7 @@ the same shared struct family as `02032888`/`02032a34`/`02032d70`/
   the 6 named function addresses).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 func_02032888   ; handler-array slot (this batch's sibling function)
 func_02032cc8   ; handler-array slot
@@ -2434,6 +2528,7 @@ func_02032a34   ; handler-array slot (this batch's sibling function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0204757c
 func_02046c60
@@ -2446,6 +2541,7 @@ func_0204706c
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02033390(Rec *self) {
     struct { int a,b,c,d,e,f; } stackArgs;
@@ -2497,17 +2593,20 @@ struct.
   `func_020452c4`), `+0xec4` (null-checked fn-ptr slot, 2-arg callback).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020452c4
 blx r3   (r5+0xec4 callback, null-checked, tail; args = the two stack results)
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_020334cc(Rec *self) {
     if (self->fe80 != 0) return self->fe80;
@@ -2553,16 +2652,19 @@ decrement), `+0x1`/`+0x2` (signed byte pair, loop bound + counter),
 `+0x8` (extra field, passthrough call arg).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none (no literal pool in this function)
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02033b60   (loop, bounded by self->f2, signed byte)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02033c74(Self *self, int a1, int a2, int a3) {
     if (self->f0 == 0) return;
@@ -2631,6 +2733,7 @@ provenance. `data_020fe480` is a single halfword sentinel write
 - `data_020fe480` — single halfword sentinel, set to -1.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_0219b2e0   ; header struct (+0x8/+0x48/+0x4/+0x6/+0x54 fields)
 data_0219b344   ; 4-entry int[4], zero-init loop
@@ -2645,6 +2748,7 @@ data_020fe480   ; single halfword sentinel, set to -1
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020385bc   (loop, 4 iterations)
 func_02087ec8   (loop, 0x1c=28 iterations)
@@ -2654,6 +2758,7 @@ func_020388f0
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_02034c34(void) {
     Header *h = &data_0219b2e0;

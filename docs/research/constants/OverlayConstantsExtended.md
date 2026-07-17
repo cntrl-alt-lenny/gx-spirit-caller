@@ -20,6 +20,7 @@ only where overlays add new usage sites or context.
 2^36 / 0x1b4e81b5 ≈ 150.0 → post-shift `asr #0x4` → divisor = 150 = 0x96.
 
 **Code context:**
+
 ```asm
 ; r0 = input x-coordinate in range [0x34, 0xca] (52 to 202)
 sub r3, r0, #0x34       ; r3 = r0 - 52 → range [0, 150]
@@ -45,6 +46,7 @@ data range width (`0xca - 0x34 = 0x96`).
 2^33 / 0x55555556 ≈ 3.0 → post-shift `asr #0x1` → divisor = 3.
 
 **Code context:**
+
 ```asm
 ldr r1, _LIT_55555556   ; 0x55555556
 smull r0, r2, r1, r3    ; r2:r0 = r3 * 0x55555556

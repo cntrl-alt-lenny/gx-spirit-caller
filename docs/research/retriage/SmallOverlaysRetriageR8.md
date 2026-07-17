@@ -50,11 +50,13 @@ not missing-KB walls. Every other overlay in this batch hit 100%.
 **Struct/data needed:** `data_02102c90` (documented `GlobalData02102c7c` cluster member, passed opaque to `func_02001d0c`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90   ; _LIT0 — GlobalData02102c7c cluster member
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504
 func_02001d0c
@@ -65,6 +67,7 @@ func_02094550   (x2, two-row tile-fill loop)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov016_021b296c(int panelIdx, void *cellDst, int val, int count) {
     int mid = count / 4;
@@ -89,6 +92,7 @@ void func_ov016_021b296c(int panelIdx, void *cellDst, int val, int count) {
 **Struct/data needed:** `data_ov016_021b9000`/`_900a`/`_9014` (10-byte HitRect records, extending known `+0xc`/`+0x16` u16 fields), `data_ov016_021bac38` (state-gate, `+0x8`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov016_021bac38   ; state-gate struct (+0x8 tested)
 data_ov016_021b9000   ; 10-byte record #1
@@ -99,6 +103,7 @@ data_ov016_021bac64   ; arg to func_ov016_021b6350
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov016_021b5dd0   func_ov016_021b287c   func_ov016_021b3498
 func_ov016_021b287c   func_ov016_021b39e4   func_ov016_021b3498
@@ -109,6 +114,7 @@ func_ov016_021b6350
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b2d4c(CardListCtrl *self) {
     if (data_ov016_021bac38.f8 != 0) func_ov016_021b5dd0();
@@ -132,12 +138,14 @@ int func_ov016_021b2d4c(CardListCtrl *self) {
 **Struct/data needed:** `data_ov016_021b9740` (step-counter, extends `+0x8`/`+0x10`), caller controller `+0x98`/`+0x8` (fade counter, matches `Ov017_MainCtrlStateMachine` shape).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov016_021b9740   data_02104f4c   data_ov016_021bac64
 0x0400006c   0x0400106c   0x000006b3
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov016_021b5a6c   func_ov016_021b5a28   func_ov016_021b700c
 func_02009494   func_02037208   func_0208c884   func_0208c884
@@ -146,6 +154,7 @@ func_0208c884   func_0208c884
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b2f6c(CardListCtrl *self) {
     if (data_ov016_021b9740.f8 != 0) { /* scroll-poll branch, MASTER_BRIGHT fade */ }
@@ -169,12 +178,14 @@ int func_ov016_021b2f6c(CardListCtrl *self) {
 **Struct/data needed:** `data_02104bac` (extends `+0x54` flags with sibling `+0x52` gate field).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104bac         data_ov016_021b9000   data_ov016_021b900a
 data_ov016_021b9014   data_ov016_021babec   data_ov016_021bac64
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov016_021b39e4   func_02037208   func_ov016_021b32f0 (x2)
 func_ov016_021b28f4   func_ov016_021b32f0 (x2)   func_ov016_021b28f4
@@ -184,6 +195,7 @@ func_ov016_021b6324   func_ov016_021b35dc   func_ov016_021b3650
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b3174(CardListCtrl *self) {
     switch (self->f_4) {
@@ -211,12 +223,14 @@ int func_ov016_021b3174(CardListCtrl *self) {
 **Struct/data needed:** `data_ov016_021b9740+0x8c` (new gate field, case-2 branch).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x04001000   data_ov016_021babec   data_ov016_021b9740
 data_ov016_021bac64   0x000006b5   data_ov016_021bac38
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02037208   func_02037208   func_ov016_021b35dc   func_ov016_021b3b14
 func_ov016_021b61dc   func_ov016_021b35dc   func_ov016_021b61dc
@@ -224,6 +238,7 @@ func_02037208   func_0202c0c0   func_ov016_021b5544   func_02037208
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b32f0(CardListCtrl *self, int mode) {
     switch (mode) {
@@ -246,17 +261,20 @@ int func_ov016_021b32f0(CardListCtrl *self, int mode) {
 **Struct/data needed:** none — pure register-level arithmetic loop.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none
 ```
 
 **Ground-truth BL targets (verbatim, x12 loop iterations each):**
+
 ```
 func_020b3814   (x12)
 func_020b3808   (x12)
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov016_021b3a78(u16 *out, u32 lo, u32 hi) {
     for (int i = 0; i < 0xc; i++) {
@@ -279,6 +297,7 @@ void func_ov016_021b3a78(u16 *out, u32 lo, u32 hi) {
 **Struct/data needed:** `data_02104bac+0x52` (reused bitmask field, cross-confirms `021b3174`), `data_ov016_021b8df8` (5-halfword coord struct), `data_ov016_021b9184` cluster (HitRect family), `data_ov016_021bab44` (audio/sprite config table).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_ov016_021bac38   data_02104bac   0x80000083   data_ov016_021b8df8
 data_ov016_021b9184   data_ov016_021bab44   data_ov016_021b918e
@@ -288,6 +307,7 @@ data_ov016_021b91ac   0x000042b8   0x000042ba   0x000042bb
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov016_021b5154 (x4)   func_ov016_021b5188 (x2)   func_02005dac
 func_020944a4   func_ov016_021b287c   func_ov016_021b3498  (x5 paired iterations)
@@ -296,6 +316,7 @@ func_02005dac (x6)   func_020944a4 (x6)   func_ov016_021b5424
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b423c(CardDetailCtrl *self) {
     if (self->f_0 != 1) return 0;
@@ -319,6 +340,7 @@ int func_ov016_021b423c(CardDetailCtrl *self) {
 **Struct/data needed:** `data_ov014_021b8e04` (16-byte literal block), `data_02105b70` (main-module class-B struct arg), self `+0x14`/`+0x18`/`+0x1c`/`+0x20` (saturating counters).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_ov016_021b8e04   data_ov016_021bab44   0x04001000
 data_02105b70   0x00000678   data_ov016_021bac38
@@ -326,6 +348,7 @@ data_02105b70   0x00000678   data_ov016_021bac38
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov016_021b398c   func_02052ecc   func_0202c0c0   func_ov016_021b5544
 func_0205307c   func_0202c0c0   func_ov016_021b5544   func_02037208
@@ -335,6 +358,7 @@ func_ov016_021b5244   func_ov016_021b5390   func_ov016_021b5414
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov016_021b47c8(CardDetailCtrl *self) {
     switch (self->f_0) {
@@ -359,18 +383,21 @@ int func_ov016_021b47c8(CardDetailCtrl *self) {
 **Struct/data needed:** `data_02102c90` (display-config), `data_02104f4c` (`+4` language extract), caller struct `+4`/`+6` (row/dim s16).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0000028b   ; sound-effect ID (default/mode-0/mode-3 arms)
 data_02102c90   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov010_021b2b08   func_0202c0c0   func_020054a4   func_02001d0c
 func_02001d68   func_02001c98   func_02005088   func_ov010_021b35e4
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_FillTilemapStrip(int mode, void *arg1, StripDims *dims, int bankIdx) {
     void *vramBase = Ov010_GetVramBankBase(bankIdx);
@@ -390,6 +417,7 @@ int Ov010_FillTilemapStrip(int mode, void *arg1, StripDims *dims, int bankIdx) {
 **Struct/data needed:** `data_ov010_021b8d44` (Fill32 dest), `data_02104f1c` (`+0x1c` source), `data_ov010_021b8d08` (mode/language/singleton fields).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_ov010_021b8d44   data_02104f1c   data_ov010_021b8d08   0x1ff
 0x4000304   0x4000008   0x238c   0xffcfffef   0xffbfff9f
@@ -398,6 +426,7 @@ data_02104f4c   data_ov010_021b8d08
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32   func_0207deb0   func_0200592c   func_0208d1e4   func_02094504 (x3)
 func_0208cc90   func_0208da2c   func_0208d1e4 (x2)   func_0208d8c0
@@ -408,6 +437,7 @@ func_ov010_021b2bf8
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_Init(int mode) {
     Fill32(0, data_ov010_021b8d44, 0x70);
@@ -429,12 +459,14 @@ int Ov010_Init(int mode) {
 **Struct/data needed:** `data_ov010_021b91b4` (`+0x128`), `data_ov010_021b9260` (row/col dims `+0x4`/`+0x6`, extends known `+0x8`/`+0xc`), `data_ov010_021b93d0` (halfword-pair table).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov010_021b91b4   data_ov010_021b9260   data_ov010_021b93d0
 data_02102c90   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov005_021ab3b4   Vram_GetBankBaseCD   func_ov010_021b476c
 func_ov010_021b4194   Task_PostLocked   func_ov010_021b421c
@@ -446,6 +478,7 @@ func_ov010_021b2450 (x2)   func_ov010_021b23f4
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov010_InitManagerBPanel(void *self, int *outHandle) {
     int idx = func_ov005_021ab3b4(data_ov010_021b91b4.f128, self);
@@ -465,11 +498,13 @@ void Ov010_InitManagerBPanel(void *self, int *outHandle) {
 **Struct/data needed:** `data_ov010_021b91b4` (`+0x12c`/`+0xd8`/`+0x18`/`+0x220`/`+0x2c`/`+0x80` nested handle struct).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov010_021b91b4   data_ov010_021b9260   data_ov010_021b9270
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov005_021abb00   func_ov010_021b2630   func_ov010_021b238c
 func_ov005_021ac9c8   func_020b3870   func_ov010_021b23f4 (x2)
@@ -480,6 +515,7 @@ func_ov005_021ab108   func_ov010_021b3734   func_ov010_021b3774
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_RenderManagerBList(void *panel) {
     int idx = CardList_WriteScrollMMIO(data_ov010_021b91b4.f12c);
@@ -499,11 +535,13 @@ int Ov010_RenderManagerBList(void *panel) {
 **Struct/data needed:** `data_ov010_021b91b4` (`+0x198`/`+0xb0`/`+0xe0`/`+0x220` etc.), `data_02104bac` (extends `+0x56`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov010_021b91b4   data_ov010_021b9260   data_02104bac
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov005_021ac9d0   func_ov010_021b3998   func_ov005_021ab108
 func_ov010_021b39c0   func_ov005_021ab260   func_ov005_021ab384
@@ -515,6 +553,7 @@ func_ov010_021b23f4   func_ov010_021b3a14   func_02037208
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_HandleInputManagerB(void) {
     if (data_ov010_021b91b4.f198 == 1 && ...) return data_ov010_021b91b4.fb0;
@@ -535,18 +574,21 @@ int Ov010_HandleInputManagerB(void) {
 **Struct/data needed:** `data_ov010_021b93d0` (`+0x48`/`+0x4a` scroll-pos cache), `data_ov010_021b91b4` (20-slot row-cache array).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov010_021b93d0   0x01ff0000   0x04001010
 data_ov010_021b91b4   data_ov010_021b9260
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov010_021b24f4   func_ov010_021b2630   func_ov010_021b238c (x2)
 Vram_GetBankBaseCD   Copy32
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_UpdateScrollWindowB(void *panel) {
     short pos = data_ov010_021b93d0.f48 - 0x24;
@@ -568,17 +610,20 @@ int Ov010_UpdateScrollWindowB(void *panel) {
 **Struct/data needed:** `data_ov010_021b91b4` (`+0x8`/`+0xc` clamp fields), `data_ov010_021b9260` (`+0xb4` running total).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov010_021b91b4   data_ov010_021b9260   0x04001008   0x0400000a
 data_ov010_021b8d44   0x0400104c   0x0400004d
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020b3870 (x2)   func_0208e318 (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov010_AnimScrollBarBB(int arg0) {
     int cur = data_ov010_021b9260.fb4 - arg0;
@@ -601,6 +646,7 @@ int Ov010_AnimScrollBarBB(int arg0) {
 **Struct/data needed:** `data_ov010_021b8c2c` (4-halfword bitfield pack, extends 0xa4-byte zeroed block), `data_ov010_021b88c0` (16-entry table), `data_ov010_021b91c0` (40-entry int array), `data_ov000_021b1ddc`/`_1db4` (cross-overlay shared config).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 0x04001000   data_ov010_021b9260   0x07000400   0x05000400   0x04001008
 0x05000420   0x000003ff   0x050005c0   0x00007c1f   data_ov010_021b88c0
@@ -610,6 +656,7 @@ data_ov010_021b91c0   func_ov010_021b476c   func_ov010_021b46a8   func_ov010_021
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32   func_02094504 (x2)   func_0208d138   func_0208d0bc   func_0208d030
 func_02001bc8 (x2)   func_0208f368   func_0208f2a8   func_02005bfc
@@ -623,6 +670,7 @@ func_ov005_021acacc   func_ov005_021acad4
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov010_InitMode1Display(void *self, void **outHandle) {
     /* OV006-family init, bitfield pack, 16-entry copy, dual 40-iter glyph
@@ -664,16 +712,19 @@ All 8 addresses already carry HIGH-confidence proposed names in `docs/research/m
 **Struct/data needed:** base struct three "single alloc" families (`+0xc4`/`+0xe4`/`+0x11c` live-flags) + stride-`0x6c`/`0x40`/`0x1b8` nested arrays.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201ef3c (x9 — one per guarded free site)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov003_FreeCardSlots(Ov003Scene *sl) {
     if (sl->slotA_c4) func_0201ef3c(sl->slotA_b8, &sl->tmpA0, &sl->tmpA1);
@@ -694,6 +745,7 @@ void Ov003_FreeCardSlots(Ov003Scene *sl) {
 **Struct/data needed:** `data_ov003_021cf6c0` (scene-context singleton, `+0x44`/`+0x48`/`+0x4c`/`+0x50`/`+0x54`), `data_02104c40` (new selector array), `data_021040ac` (`GlobalAudioState`, `+0xc3c`/`+0xc48`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x000001ff   0x04000014   0x04001018   data_021040ac
 data_ov003_021cf370   data_02104c40   0x55555556
@@ -701,6 +753,7 @@ data_ov003_021cf370   data_02104c40   0x55555556
 ```
 
 **Ground-truth BL targets (verbatim, across 16 case blocks):**
+
 ```
 func_0201d47c   func_02006c0c   func_0201e5b8 (x2)   Task_Invoke
 func_ov003_021cc8b8   func_02037208   func_02034784 (x4)   func_02034888 (x2)
@@ -709,6 +762,7 @@ func_ov003_021cef78   func_0208c884 (x4)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov003_DuelPhaseStep(Ov003Scene *r5) {
     switch (r5->phase) {
@@ -734,12 +788,14 @@ int Ov003_DuelPhaseStep(Ov003Scene *r5) {
 **Struct/data needed:** `data_02104bac` (extended), `data_021040ac` (`+0xc3c`), `data_02104cec` (new selector-index array), `data_ov003_021cf1b8` (hit-test rect array, stride 6).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_021040ac   data_02104cec   data_ov003_021cf6c0   data_02104bac
 data_ov003_021cf1b8
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02034844   func_02034784   func_020061ac
 func_ov003_021cefec (loop, ≤3 iters)   func_ov003_021cf064 (loop, ≤3 iters)
@@ -747,6 +803,7 @@ func_02037208 (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov003_PollCardSelection(Ov003Player *r5) {
     if (data_02104cec[data_021040ac[0xc3c]] == 1) { /* active check, write result */ return 1; }
@@ -767,12 +824,14 @@ int Ov003_PollCardSelection(Ov003Player *r5) {
 **Struct/data needed:** Same as `021cc8b8`, plus `data_ov003_021cf6c0+0x50`/`+0x58`/`+0x4c` (new fields).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov003_021cf6c0   data_02104cec   data_021040ac   data_02104bac
 data_ov003_021cf1b8
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_020a991c   func_ov003_021cef78 (x3)   func_02037208 (x5)
 func_02034784   func_020061ac
@@ -780,6 +839,7 @@ func_ov003_021cefec (loop, ≤2 iters)   func_ov003_021cf064 (loop, ≤2 iters)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov003_PollConfirmButton(Ov003Player *r6) {
     int sel = data_02104cec[data_021040ac[0xc3c] ^ flag];
@@ -801,6 +861,7 @@ int Ov003_PollConfirmButton(Ov003Player *r6) {
 **Struct/data needed:** `data_02104c68` (packed 5-field selector table, new), `data_021040ac` (`+0xc3c`/`+0xba8`), `data_02104f4c` (`+0xa64`), 27 stream-descriptor globals.
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_021040ac   data_ov003_021cf388   data_ov003_021cf3a8   data_ov003_021cf3c8
 data_ov003_021cf3e8   data_ov003_021cf408   data_ov003_021cf428   data_ov003_021cf448
@@ -813,12 +874,14 @@ data_ov003_021cf678   data_ov003_021cf690   data_02104c68
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201e7e0   func_02091554 (x4, x5 groups = x20)   func_ov003_021cd358 (x5)
 func_ov003_021cce58
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov003_PushColourStreams(Ov003Player *r6, int arg1) {
     int idx = data_021040ac[0xc3c] ^ arg1;
@@ -839,16 +902,19 @@ void Ov003_PushColourStreams(Ov003Player *r6, int arg1) {
 **Struct/data needed:** `data_02104c68` (cross-confirms `021ccea4`'s selector table), `data_021040ac`, `data_02104f4c`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_021040ac   data_02104c68   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov003_021cd628 (x6, varying literal args)   func_ov003_021cce58
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov003_DrawCardFace(Ov003Player *r6, int arg1) {
     int sel = data_02104c68[data_021040ac[0xc3c] ^ arg1];
@@ -874,16 +940,19 @@ void Ov003_DrawCardFace(Ov003Player *r6, int arg1) {
 **Struct/data needed:** `data_02104c68` (3rd confirmation site), `data_02104f4c+0x928` (confirmed SystemWork-alias, threshold `0x17`), `data_ov003_021cf0f4` (16-byte literal block), `data_021040ac+0x38` (new offset).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104c68   data_02104f4c   data_ov003_021cf0f4   data_021040ac
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201942c (conditional)   func_0201e964 (unconditional tail)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov003_DrawSlotLayer(Ov003Player *r6, int arg1, int arg2, int arg3) {
     int lr = data_02104c68[arg1];
@@ -904,11 +973,13 @@ void Ov003_DrawSlotLayer(Ov003Player *r6, int arg1, int arg2, int arg3) {
 **Struct/data needed:** `data_ov003_021cf6c0` (`+0x44`/`+0x48`/`+0x50`/`+0x54`, cross-confirmed against `021cc8b8`/`021cca88`), battle-line state (`+0x4` phase, `+0x8`/`+0xc`/`+0x10`/`+0x14`/`+0xf4`/`+0xc0`).
 
 **Ground-truth pool words (verbatim, IN ORDER — `_LITn` reused across all 10 cases):**
+
 ```
 data_021040ac   0x88888889   0x55555556   data_ov003_021cf6c0
 ```
 
 **Ground-truth BL targets (verbatim, full enumeration across all 10 cases):**
+
 ```
 func_ov003_021cedf8 (x6, case 0)   func_020a991c   func_ov003_021cedf8 (x8, case 1)
 func_02034784   func_020a991c   func_ov003_021cedf8 (x8, case 2)
@@ -921,6 +992,7 @@ func_ov003_021cedf8 (x1, case 8)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov003_AnimateBattleLine(Ov003BattleLine *r4) {
     switch (r4->phase) {
@@ -948,6 +1020,7 @@ All 8 addresses genuinely virgin to R4-R7, but already examined at the naming/ma
 **Struct/data needed:** new ov014-local `HudIconRect` struct at `data_ov014_021b4d48` (+5 siblings, stride TBD), `data_ov014_021b4bf8` (4×u16 color-blend source), `data_02104f4c` (new field, distinct bit offset from the documented `+0xa64` cluster), `[r4,#0x40]→+0x2c` (stride-8 pointer array).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov014_021b4bf8   0x600100   0x5000618   data_ov014_021b4d48
 data_02104f4c   data_ov014_021b4d54   data_ov014_021b4d60
@@ -955,12 +1028,14 @@ data_ov014_021b4d6c   data_ov014_021b4d78   data_ov014_021b4d84
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov014_021b3a84   Ov014_HitTestPrimary (x5)   func_0201e964 (x6)
 func_020061ac   func_02005dac (x3)   func_020944a4 (x3)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov014_DrawPaneAHUD(PaneA *r4) {
     /* Ov014_BlendPixels backdrop, then 6x { HitTestPrimary?, func_0201e964 submit } */
@@ -980,6 +1055,7 @@ int Ov014_DrawPaneAHUD(PaneA *r4) {
 **Struct/data needed:** 6 OBJ/BG template pointers, `data_02102c90` (font/glyph), `data_020b4728` (palette source), `data_ov014_021b4c08` (16-byte literal block).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov014_021b4d90   data_02102c90   0x000006a5   data_ov014_021b4da4
 data_ov014_021b4dc0   data_020b4728   0x05000460   data_ov014_021b4de0
@@ -987,6 +1063,7 @@ data_ov014_021b4dfc   data_ov014_021b4e18   data_ov014_021b4c08
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0201d47c   func_02006c0c   func_0201e5b8   Task_Invoke
 func_0208e0a0   func_0208de4c   func_02094504   func_02001d0c
@@ -998,6 +1075,7 @@ func_02094550   func_0201e7e0   func_0201ef90
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov014_BuildPaneATiles(PaneA *r5) {
     Task_Invoke(build_task(&cfg, data_ov014_021b4d90, 0xf, 0x8, ...));
@@ -1022,17 +1100,20 @@ void Ov014_BuildPaneATiles(PaneA *r5) {
 **Struct/data needed:** `data_02104bac` (`+0x52`/`+0x54` d-pad decode), `data_ov014_021b4d48` (shared with `021b2908`), `data_ov014_0223515c` (third resource-group object).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104bac   data_ov014_021b4d48   data_ov014_0223515c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov014_021b379c   func_02037208 (x4)   Ov014_HitTestSecondary (loop, ≤6 iters)
 func_ov014_021b379c   func_ov014_021b484c   func_ov014_021b4ac4   func_ov014_021b4810
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov014_UpdateCursorMenu(PaneCtrl *r4) {
     switch (r4->field_4) {
@@ -1055,17 +1136,20 @@ int Ov014_UpdateCursorMenu(PaneCtrl *r4) {
 **Struct/data needed:** `data_ov014_022350f4` (pane-B controller, `+0x54` byte-pair, `+0x58` mode flag), `data_ov014_0223515c`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov014_022350f4   data_ov014_0223515c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov005_021ad018   func_02037208   func_ov014_021b3938   func_02037208
 func_ov014_021b3938   func_02037208   func_ov014_021b44e8 (conditional)   func_02037208
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov014_ConfirmCursorSel(PaneCtrl *r4) {
     switch (r4->field_34) {
@@ -1089,17 +1173,20 @@ int Ov014_ConfirmCursorSel(PaneCtrl *r4) {
 **Struct/data needed:** `data_ov014_021b4bf8` (shared literal blob, `+0x0..+0x7` string prefix), `data_ov014_022350f4` (`+0x54`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov014_021b4bf8   data_ov014_022350f4   0x000006a7   0x000006a6   data_02102c90
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208de4c   func_02094504   func_02001d0c   func_0202c0c0
 func_02004f58   func_02091554   func_020054a4   func_02004f58
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov014_RenderPaneBName(PaneCtrl *r5, int side) {
     char fmt[8]; memcpy(fmt, data_ov014_021b4bf8, 8);
@@ -1121,16 +1208,19 @@ void Ov014_RenderPaneBName(PaneCtrl *r5, int side) {
 **Struct/data needed:** `data_021040ac+0x38` (fade/blend-factor byte — genuine new KB gap, no other fields of this base documented anywhere).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_021040ac
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 none
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov014_BlendPixels(u16 *dst, u16 *src, int count, FadeState *r0) {
     int factor = r0->field_38 & 0x3f;
@@ -1140,6 +1230,7 @@ void Ov014_BlendPixels(u16 *dst, u16 *src, int count, FadeState *r0) {
     }
 }
 ```
+
 **Levers:** the `mul`→`asr#0x4`→`add,lsr#0x1b` 3-instruction rounding idiom must reproduce identically for R/G/B; channel extraction order and clamp-after-shift ordering are load-bearing for register numbering.
 
 ---
@@ -1153,6 +1244,7 @@ void Ov014_BlendPixels(u16 *dst, u16 *src, int count, FadeState *r0) {
 **Struct/data needed:** `data_ov014_022350e0` (render-task-pair guard), `data_ov014_022350f4` (`+0x54`/`+0x56` selector bytes), 16 palette-table globals (4 quadruples of 4).
 
 **Ground-truth pool words (verbatim, 19 total):**
+
 ```
 data_ov014_022350e0   data_ov014_022350f4   data_ov014_021b4e34   data_ov014_021b4e54
 data_ov014_021b4e74   data_ov014_021b4e94   data_ov014_021b4eb4   data_ov014_021b4ed4
@@ -1162,6 +1254,7 @@ data_ov014_021b4ff4   data_ov014_021b5014   func_ov014_021b3b9c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504   func_02091554 (x4, block1, selector low-byte)   func_0201e7e0   func_0201ef90
 func_02091554 (x4, block2, selector high-byte)   func_0201e7e0   func_0201ef90
@@ -1171,6 +1264,7 @@ func_02005800 (data arg, not called)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov014_BuildPaneBTiles(PaneB *r4) {
     /* zero guard, one-time bic/orr prologue on field_54/field_56 */
@@ -1191,18 +1285,21 @@ void Ov014_BuildPaneBTiles(PaneB *r4) {
 **Struct/data needed:** same palette quadruple as `021b3c20` block 1, `data_ov014_022350e0[0]` (task-handle write).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov014_021b4e34   data_ov014_021b4e54   data_ov014_021b4e74
 data_ov014_021b4e94   data_ov014_022350e0
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02091554 (x4)   func_0201ef3c (conditional)   func_0201e7e0
 func_0201ef90   func_0201ede4
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov014_RenderDeckSlotA(PaneB *r4) {
     void *pal[4] = { load_pal(...), load_pal(...), load_pal(...), load_pal(...) };
@@ -1228,17 +1325,20 @@ All 6 already carry HIGH-confidence proposed names in `docs/research/map/_names_
 **Struct/data needed:** `Ov015Scroller` (self=r9): `+0x54..+0x74` window/scroll/mode/countdown fields.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x66666667   ; smull ÷10 reciprocal
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0207ec28   func_02006194   func_02006110   func_020b3870
 func_ov015_021b3520   func_02037208   func_0207fd28   func_0207f934
 ```
 
 **Recipe sketch (conditionally tractable — interpolation arithmetic + final font-cell stack-arg block need 1-2 objdiff iterations):**
+
 ```c
 int func_ov015_021b3280(Ov015Scroller *self, int a1, void *a2, void **out) {
     if (self->f70 > 0) { /* mode-2/3 smull interpolation, clamp */ }
@@ -1260,16 +1360,19 @@ int func_ov015_021b3280(Ov015Scroller *self, int a1, void *a2, void **out) {
 **Struct/data needed:** `data_ov015_021b5e44` (`+0` task handle, `+0xa84` flags word).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x04001008   data_ov015_021b5e44
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Task_InvokeLocked   func_ov005_021ab6ac
 ```
 
 **Recipe sketch:**
+
 ```c
 void func_ov015_021b3e14(void *self) {
     if (*(int *)self != 0) { Task_InvokeLocked(); *(int *)self = 0; }
@@ -1291,17 +1394,20 @@ void func_ov015_021b3e14(void *self) {
 **Struct/data needed:** `data_ov015_021b6828` (`+0x4c` scroll value), `data_ov015_021b5e44` (`+0x900..` row-cache table, `+0xa00`/`+0xa38`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov015_021b6828   0x01ff0000   0x04001010   data_ov015_021b5e28   data_ov015_021b5e44
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov015_021b24f4   func_ov015_021b2630   Ov015_UpdateScrollTarget (x2)
 Vram_GetBankBaseCD   Copy32
 ```
 
 **Recipe sketch:**
+
 ```c
 int func_ov015_021b4444(void *arg0, void *arg1) {
     /* masked scroll-value write, ScrollRangeNonEmpty gate + HitTestAndScroll,
@@ -1320,16 +1426,19 @@ int func_ov015_021b4444(void *arg0, void *arg1) {
 **Struct/data needed:** `data_ov015_021b5e28+0x864`, `data_ov015_021b5e44+0xa00` (window: current/step/repeat), `data_02104bac+0x52/+0x54`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov015_021b5e28   data_ov015_021b5e44   data_02104bac
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_ov015_021b2480   func_ov015_021b2488   func_ov015_021b23f4
 ```
 
 **Recipe sketch (conditionally tractable — one field binding needs objdiff confirmation):**
+
 ```c
 int func_ov015_021b4574(void) {
     int lo = func_ov015_021b2480(...); int hi = func_ov015_021b2488(...);
@@ -1351,6 +1460,7 @@ int func_ov015_021b4574(void) {
 **Struct/data needed:** `data_ov015_021b5e44`/`_5e34`/`_5e28` (central state), `data_ov015_021b5a8c` (resource-config, flagged R6 naming gap, second confirmed user), `data_0210694c+0xa4` (count/threshold).
 
 **Ground-truth pool words (verbatim, 27 total, in order):**
+
 ```
 data_ov015_021b5e44   0x00000a88   data_02104f1c   data_ov015_021b5e34
 0x000001ff   data_ov015_021b6794   0x04000304   0x0400000e   0xffcfffef
@@ -1361,6 +1471,7 @@ data_0210694c   data_ov015_021b5a8c   func_ov015_021b3ecc   func_ov015_021b3f98 
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32   func_0207deb0   func_0200592c   func_0208d1e4   func_02094504 (x4)
 func_0208cc90   func_0207e8b8   func_02001a34   Ov015_RegisterCallbacks
@@ -1372,6 +1483,7 @@ func_ov005_021ab32c (x2)   func_ov005_021ab3e8   func_ov005_021acacc   func_ov00
 ```
 
 **Recipe sketch (conditionally tractable — largest/highest register-pressure function in the batch, but zero unresolved symbols):**
+
 ```c
 int func_ov015_021b47cc(void) {
     Fill32(0, G, 0xa88);
@@ -1393,11 +1505,13 @@ int func_ov015_021b47cc(void) {
 **Struct/data needed:** `data_02102c90`, `data_02104f4c+4`, caller rect struct.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x0000028b   data_02102c90   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Ov015_SelectVramBank   func_0202c0c0   func_020054a4 (per-iteration)
 func_02001d0c   func_02001d68   func_02001c98   func_02005088
@@ -1405,6 +1519,7 @@ func_ov015_021b30f0
 ```
 
 **Recipe sketch (conditionally tractable — jump-table body case→value mapping needs one more careful re-check):**
+
 ```c
 int func_ov015_021b2c18(int mode, int a1, s16Rect *rect, int a3) {
     void *vbank = Ov015_SelectVramBank(a1);
@@ -1430,11 +1545,13 @@ All 5 have HIGH-confidence proposed names in `docs/research/map/overlay020.md`/`
 **Struct/data needed:** `data_ov020_021ae0a8` (plain pointer, VRAM base offset), `data_02102c90`, `data_02104f4c`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov020_021ae0a8   data_02102c90   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Vram_GetBankBaseCD   func_ov020_021aa700 (x2)   Task_PostLocked (x2)   Fill32 (x2)
 func_ov020_021aa4a0 (x2)   func_02001d0c (x2)   func_02001d68 (x2)
@@ -1443,6 +1560,7 @@ Task_InvokeLocked (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov020_InitPanel(int cardId) {
     void *vramCD = Vram_GetBankBaseCD();
@@ -1462,11 +1580,13 @@ void Ov020_InitPanel(int cardId) {
 **Struct/data needed:** `data_02104f4c`, `data_02102c90`.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02104f4c   data_02102c90
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208df0c   func_ov020_021aa700 (x2)   Task_PostLocked (x2)   Fill32 (x2)
 func_ov020_021aa4a0   func_02001d68 (x2)   func_020054a4   func_02001d0c
@@ -1475,6 +1595,7 @@ Task_InvokeLocked (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov020_InitCardPanel(int slot, int cardId, int mode) {
     void *slotBase = func_0208df0c() + 0x20 + slot * 0xc80;
@@ -1493,6 +1614,7 @@ void Ov020_InitCardPanel(int slot, int cardId, int mode) {
 **Struct/data needed:** `data_ov020_021ae060` (`+0xa64` bitfield, `+0xab8`/`+0xae0` per-card ownership bitmask), `data_0210594c` (`+0xb8`).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_ov020_021ae0a8   0xa54   data_02104f1c   data_ov020_021ae060
 data_ov020_021ae084   data_ov020_021ae070   0x1ff   data_ov020_021ae988
@@ -1504,6 +1626,7 @@ data_ov020_021ae0e8   data_ov020_021ae504   data_0210594c   0x66666667
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32   func_0207deb0   func_0207f884   func_0207f85c   func_0200592c
 func_0208d1e4   func_02094504 (x5)   func_0208cc90   func_0207e8b8
@@ -1516,6 +1639,7 @@ Task_InvokeLocked
 ```
 
 **Recipe sketch:**
+
 ```c
 void Ov020_Init(void) {
     /* DISPCNT pack, Fill32, OV006-family VRAM/DISPCNT init */
@@ -1536,12 +1660,14 @@ void Ov020_Init(void) {
 **Struct/data needed:** `data_ov020_021ae0a8` (`+0x40`/`+0x5c`/`+0x78`/`+0x87c`/`+0x878` fade-timer cluster).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov020_021ae0a8   data_ov020_021ae0e8   0x04001008   0x04001000
 0x0400006c   0x0400106c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0207ed94 (x2)   func_0207ec68 (x2)   func_ov020_021ab81c
 func_0207f05c (x2)   func_0208c940   func_020b3870
@@ -1549,6 +1675,7 @@ func_0208c884 (x2)   func_0208c884 (x2, completion path)   func_020373cc
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov020_TransitionIn(void) {
     /* reset 2 BG-layer scroll blocks, measure widths, apply, DISPCNT priority ladder */
@@ -1570,6 +1697,7 @@ int Ov020_TransitionIn(void) {
 **Struct/data needed:** `data_ov020_021ae060` (`+0xa50` UI-mode-flags bitfield, `+0` state index, `+0x894`/`+0x898`/`+0x89c` cursor fields, `+0x87c..+0x8cc` timer cluster shared with `021ac4fc`, `+0xab8`/`+0xae0` ownership bitmask shared with `021abbe8`), `data_02104bac` (extends `+0x54` with new bits `0x1`/`0x800`).
 
 **Ground-truth pool words (verbatim, 9 total):**
+
 ```
 data_ov020_021ae0a8   data_ov020_021ae0e8   data_02104bac   0x0000ffff
 data_02104f4c   data_ov020_021addd0   data_ov020_021ae060   data_0210594c
@@ -1577,6 +1705,7 @@ data_02104f4c   data_ov020_021addd0   data_ov020_021ae060   data_0210594c
 ```
 
 **Ground-truth BL targets (verbatim, 68 call sites — full enumeration, grep-verified):**
+
 ```
 func_0207ed94   func_0207ec68   func_02006164   func_ov020_021aa7ac
 func_020061ac   func_ov020_021aa7ac   func_0200617c   func_02006164
@@ -1599,6 +1728,7 @@ func_02036590 (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 int Ov020_Update(void) {
     /* reset 2 BG-layer scroll blocks; primary/secondary touch hit-test dispatch */
@@ -1630,11 +1760,13 @@ All 8 independently HIGH-confidence-named in `docs/research/map/overlay005.md`/`
 **Struct/data needed:** self struct (`+0xc..+0x6c` box/mode/task fields), `data_02102c90`, `data_02104f4c` (`+4` language).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov005_021b1ddc   data_02102c90   data_02104f4c   0x00007fff
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Fill32   Vram_GetBankBaseCD/func_0208e200   Vram_GetBankBaseE/func_0208e1ac
 func_0208de4c/func_0208e0a0   func_0208dd9c/func_0208df94   Task_PostLocked (x2)
@@ -1644,6 +1776,7 @@ func_02001bc8   func_02001c98
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardList_InitVram(CardListChannel *self, void *cmdBuf, Rect16 *box, int glyphIdx, int stackArg1c) {
     Fill32(self, 0, 0x70);
@@ -1664,11 +1797,13 @@ void CardList_InitVram(CardListChannel *self, void *cmdBuf, Rect16 *box, int gly
 **Struct/data needed:** self (`+0x0`/`+0x5c`/`+0x60`/`+0x6c`), 16-byte-stride callback contract struct.
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 Task_PostLocked (x2)   func_ov005_021ab274   func_ov005_021ab384 (x2 per iter)
 blx r3 (caller callback via [r8,#0x6c])   func_ov005_021ab260   func_ov005_021ab274
@@ -1676,6 +1811,7 @@ func_ov005_021ab2e0 (x1-2)   func_ov005_021abc88   Task_InvokeLocked (x2)
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardList_BuildDisplayList(CardListChannel *self) {
     /* do/while: build node -> validate -> populate via caller callback ->
@@ -1696,11 +1832,13 @@ void CardList_BuildDisplayList(CardListChannel *self) {
 **Struct/data needed:** self (`+0x28`/`+0x34`/`+0x38`/`+0x3c`/`+0x4c`/`+0x50`/`+0x54`/`+0x58`/`+0x5c`/`+0x64`/`+0x68`), hit-scan entry struct (0xc-stride), glyph entry struct (0x60-stride).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 0x04000304   0x00003fff
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0207ec28   func_020b3870   blx [sl,#0x68] (conditional)
 func_02006164   func_02006110   blx [sl,#0x64] (conditional, in scan loop)
@@ -1708,6 +1846,7 @@ func_0207f934 (in render loop)
 ```
 
 **Recipe sketch:**
+
 ```c
 int CardList_ScrollUpdate(CardListChannel *self, int elapsed, int touchX, void *arg3) {
     /* scroll-remaining countdown + interpolate, on-complete callback */
@@ -1728,16 +1867,19 @@ int CardList_ScrollUpdate(CardListChannel *self, int elapsed, int touchX, void *
 **Struct/data needed:** self (`+0x14` row count), indexed pointer table (`self+idx*4 → +0x18`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 Fill32 (x1-3, loop-invoked)
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardList_FillColumnSlice(CardListChannel *self, int idx, int colOffset, int fillVal) {
     /* 3-phase Fill32: leftover-column partial, full-8-column blocks, final leftover-row */
@@ -1755,16 +1897,19 @@ void CardList_FillColumnSlice(CardListChannel *self, int idx, int colOffset, int
 **Struct/data needed:** self (`+0xc`/`+0x14`/`+0x20`/`+0x24`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 none
 ```
 
 **Ground-truth BL targets (verbatim):**
+
 ```
 none
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardList_WriteTileRow(CardListEntry *self) {
     u16 *dst = (u16*)self->p_20 + (self->f_c >> 3);
@@ -1785,17 +1930,20 @@ void CardList_WriteTileRow(CardListEntry *self) {
 **Struct/data needed:** `data_ov005_021b1e6c`, `data_02104f4c` (`+4`), self (`+0x8`/`+0x20`/`+0x28`/`+0x44`/`+0x48`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_ov005_021b1e6c   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_02094504   func_020aadf8   func_ov005_021af2dc   func_020aaddc (x1-2)
 func_020054a4 (loop)   func_ov005_021adf3c   func_ov005_021afac8 (conditional)
 ```
 
 **Recipe sketch:**
+
 ```c
 int CardList_ResetAndRebuild(CardListChannel *self) {
     /* save/clear/restore Fill32, language-ID branch, threshold clamp cascade */
@@ -1816,6 +1964,7 @@ int CardList_ResetAndRebuild(CardListChannel *self) {
 **Struct/data needed:** `data_ov005_021b1568`/`_1a44`/`_1ab2`/`_1a76`/`_1d4c` (new KB gaps, simple scalar/small-array pool literals), `data_02104f4c` (`+4`), `data_021040ac` (new `+0x38` offset), self (`+0x4..+0x3cc`, 12+ fields).
 
 **Ground-truth pool words (verbatim, in order):**
+
 ```
 data_ov005_021b1568   0x40f02000   0x00600100   0x050006b8   0x00005402
 data_ov005_021b1a44   0x00005406   0xc0004000   0x0000ee80   0x00000439
@@ -1825,6 +1974,7 @@ data_ov005_021b1d4c   data_ov005_021b1a76
 ```
 
 **Ground-truth BL targets (verbatim, in call order — 16 `func_0201e964` sites total):**
+
 ```
 func_02034784   func_02034810 (conditional)   func_02005dac   func_020944a4 (x5 loop)
 func_ov005_021aee84 (hit-test gate, multiple sites)   func_0201e964 (x16 total, slot-populate)
@@ -1832,6 +1982,7 @@ func_ov005_021af704 (measure width)   func_02005dac   func_020944a4 (decorations
 ```
 
 **Recipe sketch:**
+
 ```c
 int CardList_RebuildStaticUI(CardListChannel *self) {
     /* header box submit, blend-pixel-row decoration */
@@ -1853,16 +2004,19 @@ int CardList_RebuildStaticUI(CardListChannel *self) {
 **Struct/data needed:** `data_02102c90`, `data_02104f4c`, self (`+0x8`/`+0x48+idx`).
 
 **Ground-truth pool words (verbatim):**
+
 ```
 data_02102c90   data_02104f4c
 ```
 
 **Ground-truth BL targets (verbatim, in call order):**
+
 ```
 func_0208de4c   func_02094504   func_02001d0c   func_02004f58
 ```
 
 **Recipe sketch:**
+
 ```c
 void CardList_SetupTileMap(CardListChannel *self) {
     void *base = func_0208de4c();
@@ -1886,12 +2040,14 @@ void CardList_SetupTileMap(CardListChannel *self) {
 **Struct/data needed:** `data_02104bac` (extends documented struct with `+0x52`), `data_ov009_021adc00`/`_dbcc`/`_dac0`/`_da90`/`_da9c`/`_dacc` (self-contained ov009-local structs, all already targeted by other matched/ship siblings).
 
 **Ground-truth pool words (verbatim, all 7):**
+
 ```
 data_02104bac   data_ov009_021adac0   data_ov009_021ada90   data_ov009_021ada9c
 data_ov009_021adbcc   data_ov009_021adc00   data_ov009_021adacc
 ```
 
 **Ground-truth BL targets (verbatim, 55 calls / 12 unique targets, all direct `bl`, no `blx`):**
+
 ```
 func_02037208 (x24)   func_ov009_021acf1c (x6)   func_ov009_021acff8 (x3)
 func_ov009_021ac458 (x4)   func_ov009_021aa4a8 (x2)   func_ov009_021aa5d8 (x2)
@@ -1902,6 +2058,7 @@ func_ov009_021aa59c
 ```
 
 **Recipe sketch (conditionally tractable — no unresolved callees, ordinary reg-alloc/jump-table-ordering risk only):**
+
 ```c
 int Ov009_Scene_Update(Ov009ScoreCtrl *self) {
     switch (self->state) {

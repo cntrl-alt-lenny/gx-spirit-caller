@@ -42,6 +42,7 @@ fully explained by the KB.
 **Struct/data needed:** DuelStateSingleton+0xD0C (gate_flag), DuelStateSingleton+0xD18 (state_dispatch_fnptr)
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_021b0a30(void) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -66,6 +67,7 @@ int func_ov002_021b0a30(void) {
     return 0;
 }
 ```
+
 **Levers needed:** decl-order for the handler branch; orr-shift on parity multiply
 
 ---
@@ -82,6 +84,7 @@ scheduling coin-flip.
 **Struct/data needed:** DuelStateSingleton+0xCEC (card_list_slot_idx)
 
 **Recipe sketch:**
+
 ```c
 void func_ov002_02256a50(CardObj *card, int arg1, int arg2) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -94,6 +97,7 @@ void func_ov002_02256a50(CardObj *card, int arg1, int arg2) {
     }
 }
 ```
+
 **Levers needed:** none expected beyond standard mwcc 2.0/sp1p5
 
 ---
@@ -109,6 +113,7 @@ from `data_ov002_022cd524`. The post-call "rotation" stores back into that struc
 **Struct/data needed:** DuelStateSingleton+0xCEC, DuelStateSingleton+0xCF8
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_02299c9c(void) {
     DuelStateSingleton *dss = &data_ov002_022d016c;
@@ -128,6 +133,7 @@ int func_ov002_02299c9c(void) {
     return 0;
 }
 ```
+
 **Levers needed:** standard; watch for duel_phase cmp ordering (4 before 7)
 
 ---
@@ -143,6 +149,7 @@ of matched slots — completely deterministic once the struct layout is known.
 **Struct/data needed:** PerPlayerRowTable base 0x022CF16C, stride 0x868, Ov002Slot id_lo13 bitfield
 
 **Recipe sketch:**
+
 ```c
 /* Searches both players' slots for target_id; returns {player,slot} packed or ~0 */
 u32 func_ov002_021b9830(int target_id) {
@@ -163,6 +170,7 @@ u32 func_ov002_021b9830(int target_id) {
     return (u32)-1;
 }
 ```
+
 **Levers needed:** mwcc 2.0 signed bitfield extraction (lsl#19/lsr#19 is standard)
 
 ---
@@ -179,6 +187,7 @@ is a function parameter — the scheduling is fixed.
 **Struct/data needed:** PerPlayerRowTable+0x40 per-slot check field, stride 0x868
 
 **Recipe sketch:**
+
 ```c
 u32 func_ov002_02257750(void *ctx, fn_t callback) {
     PlayerRow *tbl = &data_ov002_022cf16c;
@@ -194,6 +203,7 @@ u32 func_ov002_02257750(void *ctx, fn_t callback) {
     return result;
 }
 ```
+
 **Levers needed:** lsl-by-reg for bitmask OR; orr-shift emit pattern
 
 ---
@@ -209,6 +219,7 @@ state guard from `data_ov002_022cdc78+0xC` — not register coin-flip.
 **Struct/data needed:** CardHandlerTable 0x022CAD38, stride 0x8 ({u32 id; fn_ptr handler})
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0225368c(int ctx, u16 card_id, int arg2) {
     int idx = func_ov002_02253638(card_id);  /* binary search -> index */
@@ -221,6 +232,7 @@ int func_ov002_0225368c(int ctx, u16 card_id, int arg2) {
     return cs->f_c;
 }
 ```
+
 **Levers needed:** movs sign-check for idx < 0 branch
 
 ---
@@ -237,6 +249,7 @@ an hp factor from `data_ov002_022d0e6c[+0xB0]`.
 **Struct/data needed:** DuelQueueState+0x5A8 (queue_state 0x7f=done, 0x80=active)
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_022157e4(CardObj *card) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -257,6 +270,7 @@ int func_ov002_022157e4(CardObj *card) {
     return 0;
 }
 ```
+
 **Levers needed:** dqs->queue_state cmp ordering (0x7f vs 0x80 arm order)
 
 ---
@@ -273,6 +287,7 @@ documented `cleared_on_edge` field.
 **Struct/data needed:** DuelQueueState+0x5D4 (cleared_on_edge = loop bound), data_ov002_022ce884
 
 **Recipe sketch:**
+
 ```c
 int func_ov002_0228791c(CardObj *card) {
     DuelQueueState *dqs = &data_ov002_022ce288;
@@ -288,6 +303,7 @@ int func_ov002_0228791c(CardObj *card) {
     return 1;
 }
 ```
+
 **Levers needed:** switch-range dispatch ladder ordering (bgt/bge sequence)
 
 ---

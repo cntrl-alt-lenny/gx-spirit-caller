@@ -121,6 +121,7 @@ flags, bit 0x8 tested).
 `data_021a84c0.field_40`, documented fn-ptr slot per sibling precedent)
 
 **C sketch:**
+
 ```c
 typedef struct {
     char _pad_00[0x40];
@@ -176,6 +177,7 @@ per 5x sibling precedent — no new gap, reuses established sibling struct).
 `bl func_02091768` (arg=10)
 
 **C sketch:**
+
 ```c
 typedef struct {
     int            f0;
@@ -226,6 +228,7 @@ stride 0x4c, `+0x4` word with bits [7:5] gating a conditional call.
 `bl` per iteration, NOT indirect)
 
 **C sketch:**
+
 ```c
 typedef struct {
     char _pad0[0x4];
@@ -279,6 +282,7 @@ the siblings take parameters — a simpler variant of the same shape.
 loop), `bl WaitByLoop` (0x40000, in loop) — zero indirect calls
 
 **C sketch:**
+
 ```c
 int func_02043b70(void) {
     while (func_0209640c(4, 1) == 0) ;
@@ -320,6 +324,7 @@ slot, named global), `data_0219b30c` (NEW GAP: arg to that callback),
 `data_0219b300`, null-checked, arg=`data_0219b30c`), `bl func_02091a8c`
 
 **C sketch:**
+
 ```c
 typedef struct { unsigned short h0; unsigned short h2; } Flags;
 extern void *data_0219b30c;
@@ -366,6 +371,7 @@ returns. All four callees are named `.extern`s.
 `bl func_0207391c` (loop tail, every iteration)
 
 **C sketch:**
+
 ```c
 void func_0207113c(void) {
     int frame;
@@ -405,6 +411,7 @@ tractable.
 `bl func_01ff86fc` (payload, post-wait)
 
 **C sketch:**
+
 ```c
 void func_02093fb8(int self, void *dst, int count, int mode) {
     if (mode == 0) return;
@@ -440,6 +447,7 @@ condition and mask shift differ.
 `bl func_01ff86fc`
 
 **C sketch:**
+
 ```c
 void func_02094030(int self, void *dst, int mode, int count) {
     func_02093c20(self, dst, mode, count);
@@ -475,6 +483,7 @@ indexed by a computed rotate-result (history/lookup table).
 **Ground-truth BL/BLX targets (verbatim):** none (leaf)
 
 **C sketch:**
+
 ```c
 extern unsigned char data_021a08bc;
 extern unsigned char data_021a08c0[];
@@ -521,6 +530,7 @@ caller-supplied first parameter, self-contained.
 `bl func_020955e8` (cond/uncond)
 
 **C sketch:**
+
 ```c
 struct S87444 { int bit_idx; int flag8; int flagc; int val10; };
 
@@ -566,6 +576,7 @@ caller-supplied 3rd-param callback), `bl func_020937e4`/`bl
 OS_RestoreIrq` (matching branch)
 
 **C sketch:**
+
 ```c
 int func_020909d0(int a0, void *a1, void (*cb)(void), int locked) {
     int state = locked ? func_020937d0() : OS_DisableIrq();
@@ -604,6 +615,7 @@ symbols with matching access shapes (u32 flags word, u16[9] array).
 `bl func_02093a3c` (loop, repeated), `bl OS_RestoreIrq`
 
 **C sketch:**
+
 ```c
 extern unsigned int data_021a66f8;
 extern unsigned short data_021a66fc[9];
@@ -651,6 +663,7 @@ draft; NEW GAP: `+0x1c`, `+0x24`, `+0x4` bit 13, `+0x40` (fn ptr), `+0x48`.
 `blx ip` (uncond, self-struct vtable slot), `bl func_020a6d94` (tail)
 
 **C sketch:**
+
 ```c
 struct S6dc4 {
     char _pad0[0x4];
@@ -702,6 +715,7 @@ retry-loop body), `bl func_02043bdc` (inner retry-loop condition),
 `bl func_02043b70` (tail check)
 
 **C sketch:**
+
 ```c
 int func_02044424(void *base, void **ptrs, void *flags) {
     unsigned char *p = (unsigned char *)base;
@@ -742,6 +756,7 @@ arithmetic.
 `bl func_01ff8770` (payload)
 
 **C sketch:**
+
 ```c
 void func_02094864(int self, void *dst, void *param, int count) {
     func_02093c90(self, -1);
@@ -779,6 +794,7 @@ extern.
 calls at all
 
 **C sketch:**
+
 ```c
 #define DMA_BASE ((volatile unsigned int *)0x040000b0)
 
@@ -821,6 +837,7 @@ null-checked), `blx ip` (1st, `[r4,#0x4]`, unconditional), `blx ip` (2nd,
 `[r4,#0x10]`, null-checked), `bl func_02092904` x2
 
 **C sketch:**
+
 ```c
 typedef struct {
     void *unused0;
@@ -863,6 +880,7 @@ deterministic from the two raw pointer parameters.
 anywhere)
 
 **C sketch:**
+
 ```c
 void func_020947d0(unsigned char *src, unsigned char *dst) {
     unsigned int header = *(unsigned int *)src;
@@ -916,6 +934,7 @@ data_021014e4, 0, 0x1b`), `blx r1` (`[r4,#0x24]`, null-checked, self
 passed as sole arg), `bl func_02064aa0` (teardown path)
 
 **C sketch:**
+
 ```c
 typedef struct {
     char _pad[0x14];
@@ -965,6 +984,7 @@ vectors), one output pointer.
 **Ground-truth BL/BLX targets (verbatim):** none
 
 **C sketch:**
+
 ```c
 void func_0208c348(int *a, int *b, int *out) {
     long long p0 = (long long)a[1] * b[2] - (long long)a[2] * b[1];
@@ -1007,6 +1027,7 @@ fully bounded double loop with ordinary early-return.
 `bl func_02087fc8`, `bl func_02087f34` (per inner iter) — all plain `bl`
 
 **C sketch:**
+
 ```c
 typedef struct {
     unsigned char  count;
@@ -1057,6 +1078,7 @@ idiom.
 call)
 
 **C sketch:**
+
 ```c
 unsigned short func_0209e3ac(void) {
     unsigned char buf[6];
@@ -1103,6 +1125,7 @@ data symbols accessed only via `[base, idx*4]`.
 — no indirect calls
 
 **C sketch:**
+
 ```c
 extern int  *data_020c3cc8;
 extern char *data_02102d04;
@@ -1159,6 +1182,7 @@ convention), `bl func_020945f4` (memset, `MainConstants.md`-adjacent
 convention)
 
 **C sketch:**
+
 ```c
 extern unsigned char data_0219dc94[];
 
@@ -1221,6 +1245,7 @@ call — deterministic per-node callback), `bl OS_DisableIrq`,
 `bl func_0206bf60`, `bl func_02091690`, `bl OS_RestoreIrq`
 
 **C sketch:**
+
 ```c
 typedef struct QNode {
     void (*cb)(void *arg);
@@ -1276,6 +1301,7 @@ first), then `blx r4` (callback, param-passed) OR `bl func_02093dc8` +
 (`bl func_020906dc` cond) + `bl func_01ff8770`
 
 **C sketch:**
+
 ```c
 void func_02093e38(void *dst, void *src, unsigned int size, unsigned int flag,
                     void (*cb)(void *arg)) {
@@ -1316,6 +1342,7 @@ flag is a reg-alloc-risk warning, not an unresolved KB fact.
 
 **C sketch:** (approximate — see Levers; the true C shape needs
 conditional-select verification against the `.s`)
+
 ```c
 int func_02061290(unsigned char *arr) {
     unsigned char a0 = arr[0];
@@ -1368,6 +1395,7 @@ pre-loop), `bl func_020b3870` (in loop), `bl func_02067984` (once,
 post-loop)
 
 **C sketch:**
+
 ```c
 void func_0206a984(void *self, signed char *b, int count) {
     char *base54 = (char *)self + 0x54;
@@ -1412,6 +1440,7 @@ normalized lengths of both operands), `bl func_020945f4` (cond, tail
 zero-fill)
 
 **C sketch:**
+
 ```c
 unsigned short *func_02079d30(unsigned short *dst, unsigned short *a,
                                unsigned short *b, int len) {
@@ -1461,6 +1490,7 @@ in the SAME function — self-contained, single-hop, terminal.
 every iteration), `bl func_02081c84` (loop, cond)
 
 **C sketch:**
+
 ```c
 int func_02081bd8(unsigned char *self, unsigned char *other) {
     unsigned int hdrofs = *(unsigned int *)(self + 0x8);
@@ -1525,6 +1555,7 @@ an unresolved indirect call), `bl func_02091a8c` (loop, cond),
 `bl OS_RestoreIrq`
 
 **C sketch:**
+
 ```c
 extern void **data_021a63c8;
 
@@ -1577,6 +1608,7 @@ shipped sibling `.legacy.c` files, not a fresh gap.
 helper), `bl func_02091a0c`, `bl OS_RestoreIrq`
 
 **C sketch:**
+
 ```c
 typedef struct Container {
     char _pad00[0x10];
@@ -1637,6 +1669,7 @@ executes per invocation, target=`[r4,#0x630]`, self-derived struct field
 slots)
 
 **C sketch:**
+
 ```c
 typedef struct Ctx {
     char pad600[0x600];
@@ -1697,6 +1730,7 @@ loop re-fetch), `bl func_02091690`, `bl func_0209198c`,
 `bl OS_RestoreIrq` — 10 unique callees, zero `blx`
 
 **C sketch:**
+
 ```c
 typedef struct QRec { char pad08[0x8]; void *f8; } QRec;
 

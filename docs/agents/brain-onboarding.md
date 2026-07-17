@@ -35,7 +35,7 @@ is backing the session.
      migrating from `wine-stable` should
      `brew uninstall --cask wine-stable` first to satisfy the
      cask's conflicts-with check. Rationale + tested baseline:
-     [`docs/research/wine-migration.md`](docs/research/wine-migration.md).
+     [`docs/research/wine-migration.md`](../../docs/research/wine-migration.md).
 7. **Confirm the baseline.** Run the full 3-region gate:
    `python3.13 tools/gate3.py` (reconfigures + clean-tree `ninja sha1` for
    eur/usa/jpn, then the pytest suite). All three regions rebuild
@@ -43,7 +43,7 @@ is backing the session.
    region or a `dsd check` regression is a REAL break, not an expected
    artifact. (The old "24/27, main/DTCM/ov004 expected to fail" baseline is
    obsolete — those closed in briefs 138–140.)
-8. **Read [`docs/state.md`](docs/state.md)** and tackle whatever the
+8. **Read [`docs/state.md`](../../docs/state.md)** and tackle whatever the
    *Next-brain TODO* section lists.
 
 Afterwards, your loop is: fetch, read `docs/state.md`, review any open

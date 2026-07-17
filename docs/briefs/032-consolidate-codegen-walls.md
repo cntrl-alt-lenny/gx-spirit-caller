@@ -55,7 +55,7 @@ absent or coercible at lower density.
   "dropped" or "carryover" or in the brief's reg-alloc notes
   section.
 - Land the consolidated note as
-  [`docs/research/codegen-walls.md`](docs/research/codegen-walls.md).
+  [`docs/research/codegen-walls.md`](../../docs/research/codegen-walls.md).
   Same format as `docs/research/ov006-cluster-stuck.md` /
   `hard-tier-clustering.md` / `medium-tier-plateau.md`:
   - Quick exec summary (1 paragraph).

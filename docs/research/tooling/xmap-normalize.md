@@ -134,7 +134,7 @@ this validation:
   unbounded scan, which — on USA/JPN, where that header doesn't exist
   at all — consumed the entire file before the segment-parsing scan
   ever got a chance to run, producing empty output. Fixed by bounding
-  the search to stop at the first `# Link map of ` line (which always
+  the search to stop at the first `# Link map of` line (which always
   precedes the memory map, and — when present — always follows the
   unreferenced-symbols header too).
 

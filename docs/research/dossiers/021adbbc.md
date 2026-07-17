@@ -1,6 +1,7 @@
 # 021adbbc — func_ov008_021adbbc (ov008, class D, 136B)
 
 ## Recipe + Risk
+
 **Recipe:** D: u8 read as :8 bitfield (lsl#24;lsr#24); &t out-ptr; bind base
 **Risk:** permuter-class: mwcc peepholes (hw<<24)>>24 to `and #0xff` (orig keeps lsl;lsr) and may reorder the f8 movlt/ldrge clamp vs the cmp — documented byte-combine peephole-split wall (ov008_core.h).
 

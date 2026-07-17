@@ -47,6 +47,7 @@ BSS block), `data_ov008_021b2440` (dispatch function-pointer table).
 - Sub-field clear offsets: `[r1+2]`, `[r1+4]`
 
 **Recipe sketch:**
+
 ```c
 // Dispatch driver — index at data_021040ac[0xb6c] selects handler from table.
 // Returns 1 if handler was NULL (nothing to do), 0 if handler ran and advanced.
@@ -100,6 +101,7 @@ no scheduling entropy.
 - `_LIT9`: `data_020b4728` (palette source table)
 
 **Recipe sketch:**
+
 ```c
 void func_ov008_021ab164(void) {
     func_02094504(0xc0, (void *)0x7000000,   0x400);  /* VRAM palette A */
@@ -165,6 +167,7 @@ single expression tree with no reuse ambiguity.
 - Coordinate adjust: `sub r1, r1, #2` / `sub r3, r0, #2`
 
 **Recipe sketch:**
+
 ```c
 void func_ov008_021abba0(int x, int y) {
     unsigned int attr;
@@ -211,6 +214,7 @@ block — first 8 bytes zeroed on entry).
   `0x1f` (BGCNT priority), `0x8000` (BLDCNT alpha enable)
 
 **Recipe sketch:**
+
 ```c
 void func_ov008_021ac2ac(void) {
     func_02094504(0, data_ov008_021b2dc0, 8);
@@ -274,6 +278,7 @@ chain.  No scheduling ambiguity.
   `0x34 = 52`; the mul is `slot * 0x34` via `add / lsl`)
 
 **Recipe sketch:**
+
 ```c
 void func_ov008_021acfa0(void) {
     ((int *)data_ov008_021b2dc8)[3] = 0;  /* +0xc */
@@ -316,6 +321,7 @@ register.
 **Pool-word values:** None.
 
 **Recipe sketch:**
+
 ```c
 int func_ov010_021b28a8(SomeStruct *p) {
     switch (p->field_8) {
@@ -357,6 +363,7 @@ Offsets used: `+0x3c`, `+0x3e`, `+0x40`, `+0x42`, `+0x44`, `+0x46`,
 **Pool-word values:** None.
 
 **Recipe sketch:**
+
 ```c
 void func_ov010_021b2514(RectStruct *p, int mode, int x, int y) {
     switch (mode) {
@@ -412,6 +419,7 @@ straight-line BL + return with no argument setup or post-call computation.
 **Pool-word values:** None.
 
 **Recipe sketch:**
+
 ```c
 void *func_ov010_021b2b08(int idx) {
     switch (idx) {
@@ -449,6 +457,7 @@ no scheduling entropy.
 **Pool-word values:** None.
 
 **Recipe sketch:**
+
 ```c
 void *func_ov010_021b2b80(int idx) {
     switch (idx) {
@@ -474,53 +483,63 @@ the `.extern` list in the source .s.
 ## Confirmed Intractable (representative sample)
 
 ### 0x021AA5F0 (180B, class E, overlay=ov008)
+
 Loop over `data_ov008_021b2780` entries calling `func_0202b6e4` +
 `func_020b3870`.  Multiple callee-saved regs updated per iteration, live across
 the loop body.  Reg-alloc wall.  **Status: still low.**
 
 ### 0x021AA6A4 (680B, class F, overlay=ov008)
+
 26-slot init: reads card tables, bitfield test `tst r0, #0x8000`, smull
 `0x51eb851f` (divide-by-100), counter increment at `[r0, #0x5c]`.  Dense
 loop with inter-iteration register dependencies.  **Status: still low.**
 
 ### 0x021AAAB4 (760B, class F, overlay=ov008)
+
 11-way jump table + `blx r5` where `r5` is a function pointer loaded from a
 pool constant (non-table indirect call).  Multiple scheduling paths.
 `tract=never` confirmed.
 
 ### 0x021AB008 (104B, class E, overlay=ov008)
+
 RGB15 pixel-blend loop: extracts R/G/B 5-bit channels with `asr #5`,
 `asr #0xa` chains, then weighted average using `mul / asr #4 / lsr #0x1b /
 asr #0x5` chain.  Scheduling-sensitive multi-channel interleave.  **Status:
 still low.**
 
 ### 0x021AB508 (300B+, class F, overlay=ov008)
+
 Spawns 13 task/cell objects via `func_02006c0c(template, 4, 0)` + bitfield
 pack + `func_0201e5b8` + `Task_Invoke`.  Very long; many register-dependent
 bitfield stores per iteration.  **Status: still low.**
 
 ### 0x021ABCDC (450B, class F, overlay=ov008)
+
 Large display update: calls pixel-blend subfunc 021ab008, 8 bitfield tests
 on `data_ov008_021b2780[0x634]`, sprite placement via func_ov008_021ab484,
 cell object management.  Too large, too many bitfield tests.  **Status: still
 low.**
 
 ### 0x021ADA0C (120B, class E, overlay=ov008)
+
 Accumulates weighted total over 26 slots via `mla r5, r0+r0', r6, r5` where
 r6 comes from table-indexed highlight values.  Scheduling-heavy.  **Status:
 still low.**
 
 ### 0x021ADC44 (530B, class F, overlay=ov008)
+
 C-34 candidate.  Very large second-screen touch handler with many live-reg
 branches.  `tract=never` confirmed (too large, too many live deps).
 
 ### 0x021B2E44 (230B, class F, overlay=ov010)
+
 Nested 32×32 tilemap iteration with RGB15 colour blending (mode 2/3 alpha
 blend, mod arithmetic with asr+add×5 chains) and MMIO BGCNT finalization.
 Dense loop with 5 callee-saved temps and `add/lsl/ldr/str` interleave.
 `tract=never` confirmed.
 
 ### 0x021B3168 (120B, class F, overlay=ov010)
+
 2×2 sprite OAM setup loop (`cmp r4, #0x2 / blt`, `cmp r5, #0x2 / blt`),
 packs OAM attribute with `lsl #0x17 / lsr #0x7` chain, MMIO BGCNT + BLDCNT
 finalization with literal pool constants `0x60fb` / `0x18ae`.  Short but
@@ -528,6 +547,7 @@ scheduling-sensitive OAM attr packing in the inner loop.  **Status: still
 low.**
 
 ### 0x021B32AC (190B, class F, overlay=ov010)
+
 Task spawn: 6-way jump table on r2 selects template from `data_ov010_021b8a70`,
 then 8-way jump on r6 packs 9 different bitfield patterns into the task config
 struct.  Each case uses `bic/orr` on sp+0x14 and sp+0x18 with different masks.
@@ -535,6 +555,7 @@ Scheduling-sensitive (bitfield stores share a live word across both word fields)
 **Status: still low.**
 
 ### 0x021B2924 (380B, class E, overlay=ov010)
+
 Touch hit-test + nested switch on `[r7+8]` (0/1/other) × `[r7+0xc]` (0/1/2/3),
 then `blx r1` where r1 = `[r7+0x14]` (stored function pointer).  Intractable
 due to `blx` through closure pointer.  `tract=never` confirmed.
