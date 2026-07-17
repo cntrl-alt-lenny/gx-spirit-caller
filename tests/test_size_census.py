@@ -234,10 +234,11 @@ class TestIntegrationRealConfig(unittest.TestCase):
         """r5: `_module_paths` never yielded `itcm`, so its 14 functions/
         region were invisible to every census. Independently re-derived
         (parse_functions + parse_claimed_text against the real committed
-        config, brief 583): EUR has carved 3 of 14 (11 unmatched), USA/JPN
-        have carved none yet (14 unmatched each) — 39 total, matching the
-        corrected split in the byte-derived ledger."""
-        for version, want_unmatched in (("eur", 11), ("usa", 14), ("jpn", 14)):
+        config, brief 583): EUR had carved 3 of 14 (11 unmatched), USA/JPN
+        none (14 each). Brief 597 then hand-matched EUR's func_01ff86c4
+        (ITCM DMA programmer, .legacy.c tier) → EUR 10. Update these pins
+        alongside any future ITCM ship."""
+        for version, want_unmatched in (("eur", 10), ("usa", 14), ("jpn", 14)):
             pm = collect(version, "itcm")
             self.assertIn("itcm", pm)
             self.assertEqual(len(pm["itcm"]), want_unmatched,
