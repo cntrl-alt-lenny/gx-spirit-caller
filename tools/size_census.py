@@ -48,7 +48,16 @@ BUCKETS = (
 _FUNC_RE = re.compile(
     r"^(\S+) kind:function\((?:arm|thumb),size=0x([0-9a-f]+)\) addr:0x([0-9a-f]+)"
 )
-_TEXT_RANGE_RE = re.compile(r"^\s+\.text start:0x([0-9a-f]+) end:0x([0-9a-f]+)")
+# Per-TU section lines are a single space between name and `start:` (e.g.
+# "    .text start:0x...  end:0x..."); the module-level section-map header
+# at the top of a delinks.txt uses multiple spaces + a `kind:`/`align:`
+# suffix ("    .text       start:0x... end:0x... kind:code align:32") and is
+# deliberately NOT matched here — only per-TU claims count as "matched".
+# CODE_SECTIONS (progress.py) = {.text, .init}: a carved TU can occupy
+# either, so both must count as "claimed" or .init-resident functions are
+# reported as false-positive unmatched (verified independently: 71% of
+# EUR's .text-only "unmatched" count was actually .init-claimed).
+_CODE_RANGE_RE = re.compile(r"^\s+\.(?:text|init) start:0x([0-9a-f]+) end:0x([0-9a-f]+)")
 
 
 def bucket_of(size: int) -> str:
@@ -69,10 +78,14 @@ def parse_functions(symbols_text: str) -> list[tuple[str, int, int]]:
 
 
 def parse_claimed_text(delinks_text: str) -> list[tuple[int, int]]:
-    """Claimed `.text start:end` intervals from a delinks.txt."""
+    """Claimed code (`.text` + `.init`) intervals from a delinks.txt.
+
+    Name kept as `parse_claimed_text` for the existing import surface
+    (tests/test_size_census.py) even though it now scans both
+    CODE_SECTIONS members, not `.text` alone."""
     out = []
     for line in delinks_text.splitlines():
-        m = _TEXT_RANGE_RE.match(line)
+        m = _CODE_RANGE_RE.match(line)
         if m:
             out.append((int(m.group(1), 16), int(m.group(2), 16)))
     return out
@@ -156,6 +169,14 @@ def aggregate(per_module: dict[str, list[tuple[str, int, int]]]) -> dict:
 def _module_paths(version: str):
     base = ROOT / f"config/{version}"
     yield "main", base / "arm9/symbols.txt", base / "arm9/delinks.txt"
+    # ITCM/DTCM are separate delink-tier modules (their own symbols.txt +
+    # delinks.txt under arm9/), previously never yielded here: DTCM carries
+    # no kind:function entries in any region (data-only, harmless to
+    # include), but ITCM does (14/region) and was silently excluded from
+    # every census — verified independently: 11 EUR / 14 USA / 14 JPN of
+    # those are still unmatched.
+    yield "itcm", base / "arm9/itcm/symbols.txt", base / "arm9/itcm/delinks.txt"
+    yield "dtcm", base / "arm9/dtcm/symbols.txt", base / "arm9/dtcm/delinks.txt"
     for d in sorted((base / "arm9/overlays").glob("ov*")):
         yield d.name, d / "symbols.txt", d / "delinks.txt"
 

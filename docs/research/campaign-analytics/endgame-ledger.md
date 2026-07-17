@@ -1,152 +1,194 @@
-# Endgame ledger: remaining uncovered items
+[//]: # (markdownlint-disable MD013 MD041)
 
-Snapshot: 2026-07-15. Build-free transcription of the committed reports.
+# Endgame ledger: remaining uncovered code, by bytes
 
-> This supersedes [path-to-100-coverage.md](path-to-100-coverage.md), which
-> was a stale mid-drain snapshot.
+Snapshot: 2026-07-16, commit `a9c4772d`. **Byte-derived**, not hand-transcribed
+— every number below is computed directly from the committed
+`config/<region>/**/delinks.txt` tier (brief 583), the same source
+`tools/progress.py` already treats as the project's no-build ground truth.
 
-## Totals and distance to true 100%
+> The previous version of this document (a hand transcription of brief
+> prose) explained 11.6% of the real gap, had every EUR row wrong, and had
+> no row at all for the single largest gap (ov004, 33% of the total). See
+> [§ What changed](#what-changed-from-the-prose-ledger) below for the
+> specifics. This version supersedes it entirely.
 
-| Region | Named residual entries / populations | ISA-permanent files | Distance to true 100% |
-|---|---:|---:|---|
-| USA | 7 main-floor parks + ~107 ov002 Wave-11 population | 26 | 7 targeted parks plus Wave 11; 26 files are ISA-permanent |
-| JPN | 7 main-floor parks + ~73 ov002 Wave-11 population | 26 | 7 targeted parks plus Wave 11; 26 files are ISA-permanent |
-| EUR | 2 data blobs + 11 non-floor ov006 parks + 39 ITCM funcs | 42 | 52 named/countable contingent items; 42 files are ISA-permanent |
+## Method (reproducible from any commit)
 
-The totals deliberately keep populations and permanent ISA files separate:
-the source reports do not provide individual addresses for the Wave-11 or
-ITCM populations, and the near-miss catalogue is a cross-cutting research
-ledger rather than a new ship count. “True 100%” therefore means resolving
-the contingent rows below; the ISA rows require inline-assembly wrappers and
-are not C-match targets.
+`tools/progress.py::parse_delinks_file` + `CODE_SECTIONS` (`{.text,
+.init}`) is the canonical delinks-tier parser — this ledger adds no new
+parsing logic, it just calls that parser once per `delinks.txt` (main,
+`itcm`, `dtcm`, every `overlays/ov*`) instead of once per region, so the
+per-module breakdown survives instead of being collapsed into one number.
+A module's **gap** is `total_code - matched_code`: `total_code` sums
+`CODE_SECTIONS` bytes from the module-level section map (the file's
+authoritative byte range), `matched_code` sums the same sections from TUs
+whose status is `complete` (excluding `_dsd_gap@...` synthetic entries,
+which never appear in committed `delinks.txt` — dsd only ever synthesizes
+those at build time for whatever a `delinks.txt` does *not* claim).
 
-## 1. USA/JPN main floor
+```python
+import sys; sys.path.insert(0, "tools")
+import progress as pg
+from pathlib import Path
 
-Brief 563 reports the same seven parked functions in each region: five
-verify-fails and two gate-fails. Identical addresses failed identically in
-USA and JPN.
+def module_gap(delinks_path):
+    module_sections, tus = pg.parse_delinks_file(delinks_path)
+    total = sum(max(0, e - s) for n, s, e in module_sections if n in pg.CODE_SECTIONS)
+    matched = sum(
+        max(0, e - s)
+        for tu in tus
+        if not tu["source"].startswith("_dsd_gap") and tu["status"] == "complete"
+        for n, s, e in tu["sections"] if n in pg.CODE_SECTIONS
+    )
+    return matched, total, total - matched
 
-| Address | Region | Source report | Status |
+# Walk config/<region>/arm9/{delinks.txt, itcm/delinks.txt, dtcm/delinks.txt,
+# overlays/ov*/delinks.txt} per region and sum module_gap()'s third element.
+```
+
+No build, no wine, no ninja — this whole ledger is derived read-only from
+files already committed to `main`.
+
+## Totals
+
+| Region | Matched (B) | Total code (B) | **Gap (B)** |
+|---|---:|---:|---:|
+| EUR | 2,374,740 | 2,388,172 | **13,432** |
+| USA | 2,366,076 | 2,387,188 | **21,112** |
+| JPN | 2,366,192 | 2,387,188 | **20,996** |
+| **3-region total** | | | **55,540** |
+
+## Per-module gap, all 3 regions
+
+Every module with a nonzero gap in at least one region (`dtcm` carries no
+`kind:function` entries in any region — 0 everywhere, omitted). Sorted by
+3-region total, descending. **Rows sum exactly to the measured total**
+(55,540 B) — verified by direct recomputation, not by construction alone.
+
+| Module | EUR gap (B) | USA gap (B) | JPN gap (B) | 3-region total (B) | % of 55,540 |
+|---|---:|---:|---:|---:|---:|
+| **ov004** | 5,902 | 7,104 | 7,104 | **20,110** | 36.2% |
+| main | 2,270 | 4,660 | 4,544 | **11,474** | 20.7% |
+| itcm | 1,940 | 2,156 | 2,156 | **6,252** | 11.3% |
+| ov019 | 912 | 1,044 | 1,044 | **3,000** | 5.4% |
+| ov014 | 816 | 948 | 948 | **2,712** | 4.9% |
+| ov003 | 872 | 916 | 916 | **2,704** | 4.9% |
+| ov001 | 452 | 452 | 452 | **1,356** | 2.4% |
+| ov006 | 0 | 484 | 484 | **968** | 1.7% |
+| ov020 | 0 | 476 | 476 | **952** | 1.7% |
+| ov015 | 180 | 284 | 284 | **748** | 1.3% |
+| ov010 | 0 | 368 | 368 | **736** | 1.3% |
+| ov018 | 0 | 348 | 348 | **696** | 1.3% |
+| ov002 | 0 | 304 | 304 | **608** | 1.1% |
+| ov017 | 0 | 284 | 284 | **568** | 1.0% |
+| ov005 | 0 | 224 | 224 | **448** | 0.8% |
+| ov016 | 0 | 220 | 220 | **440** | 0.8% |
+| ov007 | 88 | 176 | 176 | **440** | 0.8% |
+| ov022 | 0 | 160 | 160 | **320** | 0.6% |
+| ov009 | 0 | 136 | 136 | **272** | 0.5% |
+| ov008 | 0 | 108 | 108 | **216** | 0.4% |
+| ov023 | 0 | 100 | 100 | **200** | 0.4% |
+| ov021 | 0 | 88 | 88 | **176** | 0.3% |
+| ov011 | 0 | 52 | 52 | **104** | 0.2% |
+| ov013 | 0 | 20 | 20 | **40** | 0.1% |
+| **TOTAL** | **13,432** | **21,112** | **20,996** | **55,540** | **100.0%** |
+
+**ov004 is the largest single gap at 36.2% of the total** (5,902 EUR +
+7,104 USA + 7,104 JPN = 20,110 B) — it had no row anywhere in the prose
+ledger.
+
+## What changed from the prose ledger
+
+### USA/JPN main floor — not permanent; 12 of 14 named addresses now matched
+
+The old §1 listed 7 addresses per region (14 total) as a **permanent**
+verify-fail/gate-fail floor, cross-region reproducibility cited as proof
+of structural walls. Re-checked individually against the current tree:
+
+| Address | EUR | USA | JPN |
 |---|---|---|---|
-| `020b40cc` | USA | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b40e0` | USA | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `02099834` | USA | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b2c38` | USA | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b3b84` | USA | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `02020fa4` | USA | `brief-563-drain-w3plus.md` | Parked — gate-fail |
-| `020b3988` | USA | `brief-563-drain-w3plus.md` | Parked — gate-fail |
-| `020b40cc` | JPN | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b40e0` | JPN | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `02099834` | JPN | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b2c38` | JPN | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `020b3b84` | JPN | `brief-563-drain-w3plus.md` | Parked — verify-fail |
-| `02020fa4` | JPN | `brief-563-drain-w3plus.md` | Parked — gate-fail |
-| `020b3988` | JPN | `brief-563-drain-w3plus.md` | Parked — gate-fail |
+| `020b40cc` | matched | **matched** | **matched** |
+| `020b40e0` | matched | **matched** | **matched** |
+| `020b2c38` | matched | **matched** | **matched** |
+| `020b3b84` | matched | **matched** | **matched** |
+| `02020fa4` | matched | **matched** | **matched** |
+| `020b3988` | matched | **matched** | **matched** |
+| `02099834` | matched (as `func_02099718`, drift band) | still a gap | still a gap |
 
-## 2. EUR data blobs
+Only **one** of the seven named addresses (`02099834`) remains open in
+USA/JPN — the other six shipped once brief 583's own returncode fix
+(`tools/batch_carve.py`) and the "main floor autopsy" emitter fix
+(`tools/asm_escape.py`, cross-function tail-merge labels + single-register
+push/pop byte-exactness) landed. This is the concrete, measured version of
+r5's point: deterministic *tool* bugs reproducing identically across
+regions looked like a structural floor, and weren't one. `02099834` is the
+one address dsd's delink flags specially ("Function at 0x02099834 was
+adjusted to include pre-code constant pool at 0x02099820") — worth a
+dedicated look, not a default assumption of permanence. The remaining USA
+(4,660 B) / JPN (4,544 B) `main` gap in the table above includes this
+address plus whatever else in `main` isn't yet a named/tracked park.
 
-Brief 572 shipped all 77 closeable EUR floor functions. These two known
-data blobs remain and are being fixed by Brief 578.
+### EUR data blobs — closed
 
-| Address | Region | Source report | Status |
-|---|---|---|---|
-| `020b2d2c` | EUR | `brief-572-eur-closeout.md` | Verify-fail data blob; pending Brief 578 |
-| `020b3c78` | EUR | `brief-572-eur-closeout.md` | Verify-fail data blob; pending Brief 578 |
+The old §2 listed `020b2d2c` and `020b3c78` as pending (Brief 578). Both
+are now matched: `src/main/func_020b2d2c.s`, `src/main/func_020b3c78.s`.
+Closed; no longer a residual.
 
-## 3. ov002 Wave-11 residue
+### EUR non-floor ov006 parks — phantom, struck
 
-The post-ov002 runbook records the orphaned Wave-11 population after the
-pivot logic moved on. Brief 563 explicitly deferred this wave. Brief 575 is
-the active follow-up; the runbook does not enumerate individual addresses, so
-the population rows below are the complete address information available in
-the source report.
+**The old §6 (11 EUR ov006 "verify-fail, non-floor" parks) is struck.**
+Measured directly: `config/eur/arm9/overlays/ov006/delinks.txt` has
+`matched_code == total_code == 102,972` — **zero gap**. Whatever those 11
+addresses represented at the time §6 was written, ov006 in the current
+tree is 100% matched. This is exactly r5's finding (independently
+reproduced): every one of those park addresses sits inside a `complete` C
+TU, not a real residual.
 
-| Address | Region | Source report | Status |
-|---|---|---|---|
-| `ov002 residual population (~107 candidates; addresses not enumerated)` | USA | `post-ov002-runbook.md` § Wave 11; `brief-563-drain-w3plus.md` | Pending Brief 575 |
-| `ov002 residual population (~73 candidates; addresses not enumerated)` | JPN | `post-ov002-runbook.md` § Wave 11; `brief-563-drain-w3plus.md` | Pending Brief 575 |
+### ITCM — corrected split (11 EUR + 14 USA + 14 JPN, not "39 EUR")
 
-## 4. Permanent ISA floor
+The old §7 recorded "39 uncarved ITCM functions" as an undifferentiated
+EUR-only count, sourced from an r4 discussion that never enumerated
+addresses. Directly censused (both at the function level via
+`tools/size_census.py` post-fix, and at the byte level via
+`parse_delinks_file` — the two independently agree):
 
-These `.s` files contain `mcr`, `mrc`, `swi`, `msr`, or `mrs`. The source
-catalogue marks them ISA-permanent: inline-asm-wrapper only; do not spend
-lever/permuter effort. The catalogue contains 42 canonical EUR files and 26
-each for USA and JPN.
+| Region | ITCM functions | Unmatched functions | Gap (B) |
+|---|---:|---:|---:|
+| EUR | 14 | 11 | 1,940 |
+| USA | 14 | 14 | 2,156 |
+| JPN | 14 | 14 | 2,156 |
 
-| Address / file | Region | Source report | Status |
-|---|---|---|---|
-| `BitUnPack.s`, `Div.s`, `GetCRC16.s`, `IsDebugger.s`, `LZ77UnCompReadByCallbackWrite16bit.s`, `Mod.s`, `OS_DisableIrq.s`, `OS_RestoreIrq.s`, `RLUnCompReadByCallbackWrite16bit.s`, `RLUnCompReadNormalWrite8bit.s`, `SoftReset.s`, `VBlankIntrWait.s` | EUR | `cmatch-parked-and-floor.md` | ISA-permanent; inline-asm-wrapper only |
-| `func_02000950.s`, `func_020009fc.s`, `func_02000a78.s`, `func_020922d8.s`, `func_02092324.s`, `func_0209286c.s`, `func_02092898.s`, `func_020928cc.s`, `func_020928e8.s`, `func_02092904.s`, `func_02092940.s`, `func_02092e38.s`, `func_02092e90.s`, `func_02092f18.s`, `func_02092fa8.s`, `func_02093790.s`, `func_020937d0.s`, `func_020937e4.s`, `func_020937fc.s`, `func_02093808.s`, `func_020b2978.s`, `func_020b2a10.s`, `func_020b2ab4.s`, `func_020b2b50.s`, `func_020b2bdc.s`, `func_020b2c68.s`, `func_020b2cc4.s`, `func_020b41c0.s`, `func_020b41d4.s`, `func_020b41e8.s` | EUR | `cmatch-parked-and-floor.md` | ISA-permanent; inline-asm-wrapper only |
-| `func_02000950.s`, `func_020009fc.s`, `func_02000a78.s`, `func_020921f0.s`, `func_0209223c.s`, `func_02092784.s`, `func_020927b0.s`, `func_020927e4.s`, `func_02092800.s`, `func_0209281c.s`, `func_02092858.s`, `func_02092d50.s`, `func_02092da8.s`, `func_02092e30.s`, `func_02092ec0.s`, `func_020936a8.s`, `func_020936e8.s`, `func_020936fc.s`, `func_02093714.s`, `func_020b2884.s`, `func_020b291c.s`, `func_020b29c0.s`, `func_020b2a5c.s`, `func_020b2ae8.s`, `func_020b2b74.s`, `func_020b2bd0.s` | JPN | `cmatch-parked-and-floor.md` | ISA-permanent; inline-asm-wrapper only |
-| `func_02000950.s`, `func_020009fc.s`, `func_02000a78.s`, `func_020921f0.s`, `func_0209223c.s`, `func_02092784.s`, `func_020927b0.s`, `func_020927e4.s`, `func_02092800.s`, `func_0209281c.s`, `func_02092858.s`, `func_02092d50.s`, `func_02092da8.s`, `func_02092e30.s`, `func_02092ec0.s`, `func_020936a8.s`, `func_020936e8.s`, `func_020936fc.s`, `func_02093714.s`, `func_020b2884.s`, `func_020b291c.s`, `func_020b29c0.s`, `func_020b2a5c.s`, `func_020b2ae8.s`, `func_020b2b74.s`, `func_020b2bd0.s` | USA | `cmatch-parked-and-floor.md` | ISA-permanent; inline-asm-wrapper only |
+39 total unmatched functions, split 11/14/14 — not 39 in EUR alone. EUR
+has already carved 3 of its 14; USA/JPN haven't started. `itcm` was
+previously invisible to every census tool (`size_census.py`'s
+`_module_paths()` never yielded it) — see brief 583's `tools/size_census.py`
+fix in the same PR as this ledger.
 
-## 5. Parked near-miss C-match families
+### Carried forward, not re-verified this pass
 
-These are the parked families transcribed from the Brief 568 catalogue. The
-source does not assign a region to every family, so the region field is
-recorded as `source unspecified` rather than inferred.
-
-| Address(es) | Region | Source report | Status / exact diff-type |
-|---|---|---|---|
-| `02047fb8`, `02048880`, `0204ab88` | source unspecified | `cmatch-parked-and-floor.md` (Brief 562) | Parked near-miss — register allocation / constant rematerialization; 24-byte distance |
-| `02089df8`, `02089e70`, `02089ee8` | source unspecified | `cmatch-parked-and-floor.md` (Brief 562) | Parked near-miss — stack layout, push/pop-folded slot vs `sub/add sp`; 12-byte distance |
-| `0208df0c`, `0208df60`, `0208e1cc`, `0208e220` | source unspecified | `cmatch-parked-and-floor.md` (Brief 562) | Parked near-miss — MMIO register numbering; 4-byte distance |
-| `0207103c` | source unspecified | `cmatch-parked-and-floor.md` (Briefs 520, 527) | Parked near-miss — 64-bit scheduling/permuter wall; 69 diff bytes / 6 runs |
-| `02078ebc` | source unspecified | `cmatch-parked-and-floor.md` (Brief 520) | Parked near-miss — volatile-load destination; 1 diff byte / 1 run |
-| `0202e5ac` | source unspecified | `cmatch-parked-and-floor.md` (Brief 527) | Parked permuter-class — immediate decomposition; distance not stated |
-| `02054b44` | source unspecified | `cmatch-parked-and-floor.md` (Brief 527) | Parked compiler-fixed idiom — mask lowering; distance not stated |
-| `0208ddec` | source unspecified | `cmatch-parked-and-floor.md` (Brief 527) | Parked permuter-class — scheduling; distance not stated |
-| `02010a98` | source unspecified | `cmatch-parked-and-floor.md` (Brief 528) | Parked near-miss — register substitution; 20-byte distance |
-| `0201934c` | source unspecified | `cmatch-parked-and-floor.md` (Brief 528) | Parked near-miss — jump-table construction; 17-byte distance |
-| `0201d620` | source unspecified | `cmatch-parked-and-floor.md` (Brief 528) | Parked permuter-class — scheduling/register allocation; distance not stated |
-| `021b79ac`, `021ac91c` | source unspecified | `cmatch-parked-and-floor.md` (Brief 523) | Parked near-miss — overlay register-role swap; distance not stated |
-| `021b5f60` | source unspecified | `cmatch-parked-and-floor.md` (Brief 525) | Parked near-miss — register choice; 60 → 28 byte diff during investigation |
-| `021ac91c`, `021b7a20` | source unspecified | `cmatch-parked-and-floor.md` (Brief 529) | Parked near-miss — contained register allocation; 38 bytes / 8 runs each |
-| `0200dd58` | source unspecified | `cmatch-parked-and-floor.md` (Briefs 533, 535) | Parked permuter-class — register-role swap; 20 bytes / 11 runs |
-| `02072444` | source unspecified | `cmatch-parked-and-floor.md` (Brief 530) | Parked near-miss — register pressure; 35-byte distance |
-| `0205340c` | source unspecified | `cmatch-parked-and-floor.md` (Brief 530) | Parked near-miss — prologue register footprint; 90-byte contained miss |
-| `021ae218` | source unspecified | `cmatch-parked-and-floor.md` (Brief 536) | Parked near-miss — overlay tail register swap; 6-byte distance |
-| `020384e8` | source unspecified | `cmatch-parked-and-floor.md` (Brief 536) | Parked near-miss — loop register role; distance not stated |
-| `021b0a30` | source unspecified | `cmatch-parked-and-floor.md` (Brief 536) | Parked near-miss — parity-tail form; alternate 208B/224B around 220B target |
-| `0228791c` | source unspecified | `cmatch-parked-and-floor.md` (Brief 536) | Parked near-miss — fused bit-XOR sequence; final 4 bytes |
-
-## 6. EUR non-floor parks from Brief 572
-
-These are outside the 79-function closeout floor. They are included so the
-ledger does not mistake the successful 77/77 closeout for a clean EUR tree.
-
-| Address | Region | Source report | Status |
-|---|---|---|---|
-| `021b5c28` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021b9ef4` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c1558` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c19a4` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c5080` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c6960` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c6bfc` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c7558` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021c9ed0` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021cac0c` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-| `021cb02c` | EUR / ov006 | `brief-572-eur-closeout.md` | Parked — verify-fail, non-floor |
-
-## 7. ITCM unreachable population
-
-The r4 swarm report records **39 uncarved ITCM functions** in its B-tier
-discussion as a lane no current tool reaches. It does not publish the 39
-addresses. The ledger therefore records the source's count without inventing
-addresses; these rows are a count-level residual, not an address census.
-
-| Address | Region | Source report | Status |
-|---|---|---|---|
-| `ITCM residual set: 39 addresses not enumerated in source report` | EUR | `improvement-swarm-2026-07-12-r4.md` (B-tier) | Uncarved; no current tool reaches |
+The old §4 (permanent ISA floor: `mcr`/`mrc`/`swi`/`msr`/`mrs`-carrying
+`.s` files, 42 EUR / 26 USA / 26 JPN) and §5 (parked near-miss C-match
+families) are function-level research catalogues, not byte-gap accounting
+— out of scope for this brief's byte re-derivation. They are **not**
+struck, but also not independently re-verified here; treat them as
+carried forward from the prior ledger pending their own audit.
 
 ## Source accounting notes
 
-- Brief 563's USA/JPN main floor is 14 entries total, seven per region.
-- Brief 572 reports 77/77 closeable EUR functions shipped, with the two data
-  blobs and 11 non-floor ov006 verify-fails left behind.
-- The permanent ISA catalogue is 94 files total: 42 EUR, 26 USA, 26 JPN.
-- The near-miss families are intentionally not added to the regional totals:
-  their source report does not provide a complete region assignment and they
-  overlap the permanent/contingent research ledger rather than representing a
-  fresh mechanical-carve queue.
+- This ledger's numbers are exact for commit `a9c4772d` and will drift as
+  soon as the next carve/match lands — that's expected of any point-in-time
+  derivation. Re-run the method above against a fresh checkout rather than
+  trusting this snapshot once meaningful time has passed.
+- `dtcm` is walked by the method above (for completeness/symmetry with
+  `itcm`) but carries no `kind:function` entries in any region, so it
+  never contributes a nonzero row.
+- The 3-region total dropped from 61,404 B (r5's snapshot, commit
+  `97e0ef5a`) to 55,540 B by the time this ledger was written, purely from
+  real work landing in between (main-floor-autopsy-577, cmatch-ov-579,
+  cmatch-queue-580) — a live demonstration of why this document needs to
+  be regenerated from bytes on demand, not maintained as hand-written
+  prose that answers a question about a tree that no longer exists by the
+  time someone reads it.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
