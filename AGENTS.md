@@ -500,23 +500,20 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   brief-582's doc §Target 3); (b) 3 fresh singletons 600-1200 B, escalating; (c) formalize
   the b582-discovered wall into `docs/research/codegen-walls.md` with its repro. Branch
   `claude/c-ceiling-r2-586`.
-- **Brief 587** — Claude Code Scaffolder (Sonnet 5) → **WINE-FREE Thumb-tier recovery:**
-  (a) fix `objdiff_filter_panic_units.py` dropping `.thumb.c` units (36 EUR units, r5 #7
-  audit-confirmed); (b) `tools/routing_suffixes.py` shared constant + conformance test,
-  migrating the 4 suffix-strip sites incl. `port_to_region.py:1152` (currently NO Thumb
-  function can port); (c) `progress.py --by-module` with per-module C% (feeds the
-  ov002/arm9 re-queue decision). Branch `claude/thumb-tier-587`.
-- **Brief 588** — Codex Scaffolder (Luna) → **WINE-FREE mechanical bundle:** (a) CLOSED-LOG:
-  replace the 6 "no PR found" placeholders (577=#1147, 579=#1150, 580=#1149, 581=#1148;
-  556/557 = "ran without a dedicated PR, PC-brain stint"); (b) pin `ruff-action` in
-  lint.yml; (c) decomp.me `mwcc_30_131` scratch HARVEST → JSONL corpus + counts (API
-  pagination, zero analysis). Branch `codex/mech-bundle-588`.
-- **Brief 589** — Codex Decomper (Luna) → **WINE-FREE census bundle:** (a) full dry-run
-  census on the b583-fixed batch_carve (all modules × usa/jpn; tool-error now distinct) +
-  reconcile sums vs the byte ledger; (b) rerun `tools/sig_census.py` to refresh the
-  clone/region-twin map post-b579/582 ships; (c) per-function ITCM table (the ledger's
-  newly-visible 11-14/region) appended to the ledger appendix. Branch
-  `codex/census-bundle-589`.
+- **Brief 590** — Claude Code Scaffolder (Sonnet 5) → **WINE-FREE r6-findings
+  verification** (replaces the retired swarm resume): adversarially verify all 29 findings in
+  `docs/research/rnd-swarm-r6-partial.md` refute-by-default; deliver `rnd-swarm-r6-verified.md`
+  (verdict table + ranked top-8 + synthesis). Extra scrutiny on the codegen-levers lane; NO
+  live compiler-flag flips. Branch `claude/r6-verify-590`.
+- **Brief 591** — Codex Scaffolder (Luna) → **WINE-FREE post-merge hygiene** (preflight-gated
+  on the 582-585 merge): CLOSED-LOG entries for 582-585 (PRs #1154/#1153/#1152/#1151), regen
+  both indices, full pytest incl. links (fix only the mechanical ../../ class), markdownlint
+  the new docs. Branch `codex/hygiene-591`.
+- **Brief 592** — Codex Decomper (Luna) → **WINE-FREE census bundle REDO** (preflight: grep
+  tool-error in batch_carve; CANARY: ov004 census must show nonzero candidates before the full
+  sweep — b589/#1156 was closed void on wrong base + wrong --min-addr): full dry-run census
+  (per-module --min-addr from the workorder table, scope lines pasted verbatim) + sig_census
+  refresh + ITCM appendix. Branch `codex/census-redo-592`.
 
 ### Closed briefs (reference)
 

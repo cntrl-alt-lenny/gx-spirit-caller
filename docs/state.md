@@ -18,9 +18,16 @@ ledger: 3-region gap 55,540 B, ov004 = 36.2%**), **#1152** (b584 green-main: ruf
 autofixes, link test, indices), **#1151** (b585: CLOSED-LOG 32 entries, region-correct
 configure errors, libs-wide delink-dupe check, `ninja` defaults to rom+sha1). Cross-PR
 interaction caught in integration: b581's prune deleted a scaffold two safe-queue docs still
-linked — de-linked with prune notes. Queue: **b586** ceiling round 2 (WINE), **b587**
-Thumb-tier recovery, **b588** Codex mechanical bundle, **b589** Codex census bundle. r6 swarm
-still paused at 21 cached agents — resume when Claude agents go idle.
+linked — de-linked with prune notes. **Round update (same day, second pass):** merged **#1157** (b587 Thumb-tier: 36 EUR Thumb
+units restored to reports, `routing_suffixes.py` conformance, Thumb porting unblocked,
+`progress.py --by-module`) + **#1155** (b588: CLOSED-LOG placeholders fixed, ruff-action
+pinned; decomp.me harvest Cloudflare-blocked — honestly STOPped) on a tests-scope gate.
+**#1156 (b589) closed VOID** — forked pre-merge + wrong `--min-addr` gave 0-candidate
+censuses it never questioned; kickoffs now carry BASE PREFLIGHT + CANARY rules (banked in
+memory). **r6 swarm resume RETIRED** — verification reassigned to b590 (agent seat, no quota
+collision). Open: **b586** ceiling r2 (CC Decomper, wine, in flight). Queue: **b590** CC
+Scaffolder r6-verify, **b591** Codex Scaffolder hygiene (preflight-gated), **b592** Codex
+Decomper census redo (preflight + ov004 canary).
 
 **Previously (2026-07-16):** (superseded) This round merged **#1147** (b577
 main-floor autopsy — 12/14 "floor" funcs were 3 asm_escape bugs, now fixed+shipped; ~1 genuine
