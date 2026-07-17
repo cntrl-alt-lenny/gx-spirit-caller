@@ -37,6 +37,13 @@ an m2c `--context` file via `m2ctx.py`, so drafts show named fields
 (`data_ov002_022cd744[a]`) and known signatures instead of raw
 pointer casts (`*(&data_ov002_022cd744 + (arg0 * 4))`) and `?` types.
 
+`--fewshot K` (brief 604) prepends the top-K already-matched functions
+whose mnemonic stream is closest (BM25, `tools/retrieval_eval.py`) to
+the target's, as a `//`-commented block ahead of the `.s` or `--m2c`
+draft — same-family functions (row-group-rebuild, popcount twins,
+etc.) hit top-5 23/24 in brief 604's probe. Needs
+`tools/corpus/matched-pairs-<version>.jsonl` (`export_matched_pairs.py`).
+
 Usage:
     python tools/m2c_feed.py --version eur func_ov002_0225ee48 > f.s
     python tools/m2c_feed.py --version eur 0x0225ee48 > f.s
@@ -53,6 +60,7 @@ empty function (1).
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
@@ -60,6 +68,9 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import NamedTuple
+
+from export_matched_pairs import mnemonics_from_objdump
+from retrieval_eval import BM25, load_jsonl
 
 ROOT = Path(__file__).resolve().parent.parent
 VALID_REGIONS = ("eur", "usa", "jpn")
@@ -96,6 +107,8 @@ class FeedResult(NamedTuple):
     text: str      # the rendered .s
     name: str      # resolved function symbol name
     module: str    # resolved module, e.g. "ov002" or "main"
+    obj: str = ""  # resolved gap .o path (brief 604, --fewshot); "" if
+                   # unresolved (e.g. an --obj-only call on a typo'd name)
 
 
 def _symbols_files(region: str) -> list[Path]:
@@ -209,6 +222,97 @@ def build_context(region: str, module: str) -> Path | None:
             f"{result.stderr.strip()}"
         )
     return out_path
+
+
+def default_corpus_path(region: str) -> Path:
+    return ROOT / f"tools/corpus/matched-pairs-{region}.jsonl"
+
+
+class FewshotExample(NamedTuple):
+    name: str
+    module: str
+    addr: int
+    c_source: str
+
+
+def retrieve_fewshot(region: str, obj: str, func: str, k: int,
+                      corpus_path: Path | None = None,
+                      objdump: str = "arm-none-eabi-objdump") -> list[FewshotExample]:
+    """Top-k already-matched functions whose disassembly mnemonic stream is
+    closest (BM25) to `func`'s, per brief 604's family-hit@5 finding
+    (23/24 same-family hit rate once `retrieval_eval.py`'s scoring bug —
+    the fix landed in the same brief — was corrected).
+
+    Tokenizes `func`'s own disassembly with the exact same
+    `mnemonics_from_objdump` used to build the corpus (brief 595/598's
+    `export_matched_pairs.py`), via a plain `objdump -d` — not
+    `m2c_feed.py`'s own `--architecture=armv5te`-qualified invocation —
+    so the query is tokenized identically to what's indexed; any
+    disassembly quirk in the corpus (e.g. a `bx`/`msr` ambiguity from the
+    missing arch flag) needs to be reproduced here too, or matching
+    functions would score against a systematically different vocabulary.
+    """
+    corpus_path = corpus_path or default_corpus_path(region)
+    if not corpus_path.is_file():
+        # corpus_path may be a --corpus override outside ROOT (or, in
+        # tests, a tempdir) -- don't assume relative_to(ROOT) succeeds.
+        shown = corpus_path.relative_to(ROOT) if ROOT in corpus_path.parents else corpus_path
+        raise FeedError(
+            f"{shown} not found — run "
+            f"tools/export_matched_pairs.py --version {region} first"
+        )
+    disasm = subprocess.run([objdump, "-d", obj], capture_output=True, text=True).stdout
+    query = mnemonics_from_objdump(disasm, func).split()
+    if not query:
+        raise FeedError(f"{func} disassembled to zero instructions for --fewshot query")
+
+    corpus = load_jsonl(corpus_path)
+    index = BM25(corpus)
+    # exclude func's own corpus row, if the target happens to already be a
+    # matched function (e.g. run for inspection, not drafting) -- by name,
+    # not address: retrieve_fewshot always indexes a single region's own
+    # corpus, where func_ names are unique (unlike raw addresses, which
+    # collide across overlay-swap siblings -- see brief 604's own probe).
+    self_index = next((i for i, row in enumerate(corpus) if row["name"] == func), None)
+    ranking = index.rank(query, exclude=self_index)[:k]
+
+    out = []
+    for i in ranking:
+        row = corpus[i]
+        c_path = ROOT / row["c_path"]
+        if not c_path.is_file():
+            continue
+        out.append(FewshotExample(row["name"], row["module"], row["addr"],
+                                   c_path.read_text()))
+    return out
+
+
+def format_fewshot_block(examples: list[FewshotExample]) -> str:
+    """Pure formatter: retrieved matched sources -> a `//`-commented block.
+
+    Per-LINE `//` comments, not a wrapping `/* */` block: several matched
+    sources carry their own `/* ... */` header comments (see e.g.
+    src/main/data_02102be8.s's convention), and C/GAS block comments don't
+    nest -- the source's own `*/` would close a wrapping block comment
+    early and leave the rest of it as live (mis-parsed) code. `//` is a
+    valid GNU-as comment (in addition to `@`) and valid C99+, so it's safe
+    whether this prepends raw `.s` or an `--m2c` C draft."""
+    if not examples:
+        return ""
+    parts = [
+        f"// --- brief 604 few-shot context: top-{len(examples)} retrieved "
+        "matched functions (BM25 over mnemonic streams) ---"
+    ]
+    for n, ex in enumerate(examples, 1):
+        parts.append(
+            f"// [{n}/{len(examples)}] {ex.name} ({ex.module}, "
+            f"0x{ex.addr:08x}) -- already matched; shown for shape/idiom "
+            "reference only, NOT part of the target function"
+        )
+        parts.extend(f"// {line}" if line else "//"
+                      for line in ex.c_source.rstrip("\n").split("\n"))
+    parts.append("// --- end few-shot context ---\n")
+    return "\n".join(parts) + "\n"
 
 
 def run_m2c(func: str, s_text: str, context: Path | None) -> str:
@@ -394,7 +498,7 @@ def feed(region: str, target: str, objdump: str, obj: str | None = None,
         isa = "thumb" if det else "arm"
     module = module or _module_of(name)
     text = convert(objdump, obj, name, thumb=(isa == "thumb"))
-    return FeedResult(text, name, module)
+    return FeedResult(text, name, module, obj)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -422,6 +526,14 @@ def main(argv: list[str] | None = None) -> int:
                          "(brief 555)")
     ap.add_argument("-o", "--out", default=None,
                     help="output file — the .s, or with --m2c the C draft (default stdout)")
+    ap.add_argument("--fewshot", type=int, default=0, metavar="K",
+                    help="prepend the top-K retrieved already-matched functions "
+                         "(BM25 over mnemonic streams, tools/retrieval_eval.py) as "
+                         "//-commented context; needs tools/corpus/matched-pairs-"
+                         "<version>.jsonl (brief 604)")
+    ap.add_argument("--corpus", type=Path, default=None,
+                    help="override the --fewshot corpus path (default: "
+                         "tools/corpus/matched-pairs-<version>.jsonl)")
     args = ap.parse_args(argv)
 
     isa_override = "arm" if args.arm else ("thumb" if args.thumb else None)
@@ -455,6 +567,23 @@ def main(argv: list[str] | None = None) -> int:
         except FeedError as e:
             print(f"error: {e}", file=sys.stderr)
             return 1
+
+    if args.fewshot > 0:
+        # Queries with the target's OWN raw disassembly (result.obj), not
+        # the (possibly m2c-transformed) `text` above -- retrieval must
+        # never feed the few-shot examples into m2c's own parse, only into
+        # the final human/LLM-facing output.
+        try:
+            examples = retrieve_fewshot(args.version, result.obj, result.name,
+                                        args.fewshot, corpus_path=args.corpus,
+                                        objdump=args.objdump)
+        except FeedError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+        if not examples:
+            print("warning: --fewshot found no retrievable matched functions "
+                  "(empty corpus?)", file=sys.stderr)
+        text = format_fewshot_block(examples) + text
 
     if args.out:
         Path(args.out).write_text(text)

@@ -38,12 +38,19 @@ class BM25:
                 self.postings.setdefault(term, set()).add(index)
 
     def score(self, query: list[str], index: int) -> float:
+        # brief 604: was scoring `frequency` from Counter(query) -- the
+        # QUERY's own term counts, never the target DOCUMENT's. `frequencies`
+        # (the document's real term_frequency row) was computed and then
+        # never read. That makes every candidate containing >=1 query term
+        # score identically regardless of how well it actually matches --
+        # BM25 was content-blind since brief 598. Score each distinct query
+        # term using the DOCUMENT's frequency for that term instead.
         frequencies = self.term_frequency[index]
         length = self.lengths[index]
         norm = 1 - self.b + self.b * length / self.average_length
-        return sum(self.idf.get(term, 0) * frequency * (self.k1 + 1) /
-                   (frequency + self.k1 * norm)
-                   for term, frequency in Counter(query).items())
+        return sum(self.idf.get(term, 0) * frequencies.get(term, 0) * (self.k1 + 1) /
+                   (frequencies.get(term, 0) + self.k1 * norm)
+                   for term in set(query))
 
     def rank(self, query: list[str], exclude: int | None = None) -> list[int]:
         candidates = set().union(*(self.postings.get(term, set()) for term in set(query)))
