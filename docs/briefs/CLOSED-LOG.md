@@ -8,6 +8,11 @@ AGENTS.md § Slugs are roles, not LLM providers. Nothing below was edited, only
 relocated — see AGENTS.md § Closed briefs (reference) for the pointer back here.
 
 - **Brief 585** — **#1151**, “Brief 585: CLOSED-LOG backfill + cold-start fixes”: **Added 32 entries: 26 merged PR entries plus six explicit `no merged PR found` entries (556, 557, 577, 579, 580, 581).**
+- **Brief 600** — **#1168**, “Brief 600: the unclaimed startup block”: **Identifies and names brief 596's ~2,048 B ARM9-startup residue (`0x02000000`-`0x02000800` — no `symbols.txt` entry at all, invisible to every census/carve/ledger tool). Delivers, but does not execute, a carve plan.**
+- **Brief 599** — **#1165**, “Playlist 599: ledger provenance + STATE-LOG split + log catch-up”: **Extended `build_master_ledger.py` with `attempted` and `park_reason`, re-emitted the ledger and summary, and added `pick-lists.md`.**
+- **Brief 598** — **#1166**, “Playlist 598: corpus fix + retrieval eval + harvest”: **SELF-RETRIEVAL: 3521/3521 (100.00%)**
+- **Brief 597** — **#1169**, “Brief 597: <0x100 endgame sweep (21 shipped)”: **21 shipped: 2 EUR (real `ninja sha1`-gated) + 19 functions × USA/JPN (38 files, 100% `objdiff-cli`-matched against delinked ground truth).** Adjudication: **2 EUR shipped, 38 USA/JPN reverted at gate.**
+- **Brief 596** — **#1167**, “Brief 596: census autopsy + P-1 probe”: **Three independent objectives, all landed with concrete, verified results.**
 - **Brief 595** — **#1163**, “Brief 595: naming + corpus campaign”: **The 48 real-named functions satisfy the canary.**
 - **Brief 594** — **#1164**, “Brief 594: master candidate ledger (397 rows)”: **Ledger rows: EUR 32, USA 183, JPN 182; total 397.**
 - **Brief 593** — **#1162**, “Brief 593: ceiling round 3 (0 shipped, C-44 lever found)”: **Attempted 2 fresh 900-1500B jump-table-dispatcher targets in ov002 (`func_ov002_022461d8`, `func_ov002_021b4684`). Neither reached 100% objdiff match — 0 ships this round.**
