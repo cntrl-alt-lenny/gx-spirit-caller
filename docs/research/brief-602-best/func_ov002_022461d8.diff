@@ -1,0 +1,434 @@
+--- docs/research/brief-593-drafts/func_ov002_022461d8.legacy.c.txt	2026-07-17 13:54:34
++++ docs/research/brief-602-best/func_ov002_022461d8.best.c	2026-07-17 17:11:12
+@@ -1,204 +1,253 @@
+-/* func_ov002_022461d8: event-notify dispatcher. Clears self->0 (u16),
+- * then if the shared manager (data_ov002_022ce288) has an active
+- * request (+0x5d4 != 0), dispatches its mode byte (+0x5dc, range
+- * [0,0x21]) through a 34-way jump table that mostly posts a single
+- * event code via func_ov002_0229cd88(self, code) — a handful of modes
+- * (5, 15, 16, 18, 23, 25, 27, 29) gate the code (or a +0/+1 adjustment
+- * to it) on an equality/bit check against data_ov002_022d016c+0xcec,
+- * data_ov002_022cd73c+4, data_ov002_022cd3f4, or bits of the manager's
+- * stashed +0x5fc word. Modes 6-10/31/32/33 share one sub-dispatch (its
+- * own inner switch on the same mode value), then a bit-check gate on
+- * bit16(stashed) ^ bit9(stashed) shared by ALL eight of those modes.
+- * Falls through to a shared tail that fires a second notify
+- * (func_ov002_0229cdb8) only if self->0 became non-zero, then always
+- * fires a final unconditional notify.
+- *
+- * Case order below mirrors the original's body layout order (by
+- * address), not case-value order — mwcc lays out switch bodies in
+- * source order, so matching that order matches the jump-table target
+- * offsets byte-for-byte.
+- */
+
+ extern void func_ov002_0229cd88(void *self, unsigned int arg1);
+ extern void func_ov002_0229cdb8(void *self, unsigned int arg1);
+-
+ extern char data_ov002_022ce288[];
+ extern char data_ov002_022d016c[];
+ extern char data_ov002_022cd73c[];
+ extern char data_ov002_022cd3f4[];
+ extern char data_ov002_022cacbc[];
++void func_ov002_022461d8(void *selfArg)
++{
++  char *self = (char *) selfArg;
++  char *mgr = data_ov002_022ce288;
++  *((unsigned short *) self) = 0;
++  if ((*((int *) (data_ov002_022ce288 + 0x5d4))) != 0)
++  {
++    volatile int mode = *((unsigned char *) (data_ov002_022ce288 + 0x5dc));
++    unsigned int stashed = *((unsigned int *) (data_ov002_022ce288 + 0x5fc));
++    if (mode <= 0x21)
++    {
++      switch (mode)
++      {
++        case 1:
++          func_ov002_0229cd88(self, 0x3e);
++          break;
+
+-void func_ov002_022461d8(void *selfArg) {
+-    char *self = (char *)selfArg;
+-    char *mgr = data_ov002_022ce288;
++        case 2:
++          func_ov002_0229cd88(self, 0x3f);
++          break;
+
+-    *(unsigned short *)self = 0;
++        case 3:
+
+-    if (*(int *)(mgr + 0x5d4) != 0) {
+-        unsigned int mode = *(unsigned char *)(mgr + 0x5dc);
+-        unsigned int stashed = *(unsigned int *)(mgr + 0x5fc);
++        case 4:
++          func_ov002_0229cd88(self, 0x40);
++          break;
+
+-        if (mode <= 0x21) {
+-            switch (mode) {
+-            case 1:
+-                func_ov002_0229cd88(self, 0x3e);
+-                break;
+-            case 2:
+-                func_ov002_0229cd88(self, 0x3f);
+-                break;
+-            case 3:
+-            case 4:
+-                func_ov002_0229cd88(self, 0x40);
+-                break;
+-            case 23:
+-                if (*(int *)(data_ov002_022d016c + 0xcec) != *(int *)(data_ov002_022cd73c + 4)) {
+-                    func_ov002_0229cd88(self, 0x110);
+-                }
+-                break;
+-            case 5:
+-                if (*(int *)(data_ov002_022d016c + 0xcec) == *(int *)(data_ov002_022cd73c + 4)) {
+-                    func_ov002_0229cd88(self, 0x43);
+-                } else {
+-                    func_ov002_0229cd88(self, 0xfb);
+-                }
+-                break;
++        case 23:
++          if ((*((int *) (data_ov002_022d016c + 0xcec))) != (*((int *) (data_ov002_022cd73c + 4))))
++        {
++          func_ov002_0229cd88(self, 0x110);
++        }
++          break;
++
++        case 5:
++          if ((*((int *) (data_ov002_022d016c + 0xcec))) == (*((int *) (data_ov002_022cd73c + 4))))
++        {
++          func_ov002_0229cd88(self, 0x43);
++        }
++        else
++        {
++          func_ov002_0229cd88(self, 0xfb);
++        }
++          break;
++
++        case 6:
++
++        case 7:
++
++        case 8:
++
++        case 9:
++
++        case 10:
++
++        case 31:
++
++        case 32:
++
++        case 33:
++        {
++          unsigned int code;
++          unsigned int bitA;
++          unsigned int bitB;
++          int match;
++          switch (mode)
++          {
+             case 6:
++              code = 0xfc;
++              break;
++
+             case 7:
++              code = 0xfe;
++              break;
++
+             case 8:
++              code = 0x100;
++              break;
++
+             case 9:
++              code = 0xaf;
++              break;
++
+             case 10:
++              code = 0x9f;
++              break;
++
+             case 31:
++              code = 0xa9;
++              break;
++
+             case 32:
+-            case 33: {
+-                unsigned int code;
+-                unsigned int bitA, bitB;
+-                int match;
++              code = 0xab;
++              break;
+
+-                switch (mode) {
+-                case 6:
+-                    code = 0xfc;
+-                    break;
+-                case 7:
+-                    code = 0xfe;
+-                    break;
+-                case 8:
+-                    code = 0x100;
+-                    break;
+-                case 9:
+-                    code = 0xaf;
+-                    break;
+-                case 10:
+-                    code = 0x9f;
+-                    break;
+-                case 31:
+-                    code = 0xa9;
+-                    break;
+-                case 32:
+-                    code = 0xab;
+-                    break;
+-                default: /* 33 */
+-                    code = 0xad;
+-                    break;
+-                }
+-
+-                bitA = (unsigned int)(stashed << 0xf) >> 0x1f;
+-                bitB = (unsigned int)(stashed << 0x16) >> 0x1f;
+-                match = 0;
+-                if ((*(int *)(data_ov002_022cd73c + 4) ^ 1) == (int)(bitA ^ bitB))
+-                    match = 1;
+-                func_ov002_0229cd88(self, code + match);
+-                break;
+-            }
+-            case 18:
+-                if (stashed != 0) {
+-                    int match = 0;
+-                    if (*(int *)data_ov002_022cd3f4 == (*(int *)(data_ov002_022cd73c + 4) ^ 1))
+-                        match = 1;
+-                    func_ov002_0229cd88(self, 0xb6 + match);
+-                } else {
+-                    func_ov002_0229cd88(self, 0x9a);
+-                }
+-                break;
+-            case 19:
+-                func_ov002_0229cd88(self, 0xb5);
+-                break;
+-            case 20:
+-                func_ov002_0229cd88(self, 0xb1);
+-                break;
+-            case 13:
+-                func_ov002_0229cd88(self, 0x10a);
+-                break;
+-            case 14:
+-                func_ov002_0229cd88(self, 0x105);
+-                break;
+-            case 15: {
+-                int match = 0;
+-                if ((*(int *)(data_ov002_022cd73c + 4) ^ 1) == (int)((unsigned int)(stashed << 0xa) >> 0x1f))
+-                    match = 1;
+-                func_ov002_0229cd88(self, 0xb9 + match);
+-                break;
+-            }
+-            case 22:
+-                func_ov002_0229cd88(self, 0xb8);
+-                break;
+-            case 11:
+-                func_ov002_0229cd88(self, 0xb2);
+-                break;
+-            case 12:
+-                func_ov002_0229cd88(self, 0xb3);
+-                break;
+-            case 16: {
+-                int match = 0;
+-                if ((*(int *)(data_ov002_022cd73c + 4) ^ 1) == (int)((unsigned int)(stashed << 0xf) >> 0x1f))
+-                    match = 1;
+-                func_ov002_0229cd88(self, 0xbd + match);
+-                break;
+-            }
+-            case 24:
+-                func_ov002_0229cd88(self, 0xc4);
+-                break;
+-            case 25: {
+-                int match = 0;
+-                if ((*(int *)(data_ov002_022cd73c + 4) ^ 1) == (int)((unsigned int)(stashed << 0x16) >> 0x1f))
+-                    match = 1;
+-                func_ov002_0229cd88(self, 0xc5 + match);
+-                break;
+-            }
+-            case 27:
+-                if ((int)((unsigned int)(stashed << 0x10) >> 0x1f) != 0) {
+-                    func_ov002_0229cd88(self, 0x10b);
+-                } else {
+-                    unsigned int field = (unsigned int)(stashed << 9) >> 0x1c;
+-                    if (field == 0xb) {
+-                        func_ov002_0229cd88(self, 0xc7);
+-                    } else if (field == 0xe) {
+-                        func_ov002_0229cd88(self, 0x10c);
+-                    }
+-                }
+-                break;
+-            case 28:
+-                func_ov002_0229cd88(self, 0xc8);
+-                break;
+-            case 29: {
+-                int match = 0;
+-                if ((*(int *)(data_ov002_022cd73c + 4) ^ 1) == (int)((unsigned int)(stashed << 0x16) >> 0x1f))
+-                    match = 1;
+-                func_ov002_0229cd88(self, 0xc9 + match);
+-                break;
+-            }
+-            case 30:
+-                func_ov002_0229cd88(self, 0xcb);
+-                break;
+             default:
+-                /* modes 0, 17, 21, 26 -> no-op */
+-                break;
+-            }
++              code = 0xad;
++              break;
++
++          }
++
++          bitA = ((unsigned int) (stashed << 0xf)) >> 0x1f;
++          bitB = ((unsigned int) (stashed << 0x16)) >> 0x1f;
++          match = 0;
++          if (((*((int *) (data_ov002_022cd73c + 4))) ^ 1) == ((int) (bitA ^ bitB)))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, code + match);
++          break;
+         }
+
+-        if (*(unsigned short *)self != 0) {
+-            func_ov002_0229cdb8(self, (unsigned int)data_ov002_022cacbc);
++        case 18:
++          if (stashed != 0)
++        {
++          int match = 0;
++          if ((*((int *) data_ov002_022cd3f4)) == ((*((int *) (data_ov002_022cd73c + 4))) ^ 1))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, 0xb6 + match);
+         }
+-    }
++        else
++        {
++          func_ov002_0229cd88(self, 0x9a);
++        }
++          break;
+
+-    func_ov002_0229cdb8(self, 0x10d);
++        case 19:
++          func_ov002_0229cd88(self, 0xb5);
++          break;
++
++        case 20:
++          func_ov002_0229cd88(self, 0xb1);
++          break;
++
++        case 13:
++          func_ov002_0229cd88(self, 0x10a);
++          break;
++
++        case 14:
++          func_ov002_0229cd88(self, 0x105);
++          break;
++
++        case 15:
++        {
++          int match = 0;
++          if (((*((int *) (data_ov002_022cd73c + 4))) ^ 1) == ((int) (((unsigned int) (stashed << 0xa)) >> 0x1f)))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, 0xb9 + match);
++          break;
++        }
++
++        case 22:
++          func_ov002_0229cd88(self, 0xb8);
++          break;
++
++        case 11:
++          func_ov002_0229cd88(self, 0xb2);
++          break;
++
++        case 12:
++          func_ov002_0229cd88(self, 0xb3);
++          break;
++
++        case 16:
++        {
++          int match = 0;
++          if (((*((int *) (data_ov002_022cd73c + 4))) ^ 1) == ((int) (((unsigned int) (stashed << 0xf)) >> 0x1f)))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, 0xbd + match);
++          break;
++        }
++
++        case 24:
++          func_ov002_0229cd88(self, 0xc4);
++          break;
++
++        case 25:
++        {
++          int match = 0;
++          if (((*((int *) (data_ov002_022cd73c + 4))) ^ 1) == ((int) (((unsigned int) (stashed << 0x16)) >> 0x1f)))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, 0xc5 + match);
++          break;
++        }
++
++        case 27:
++          if (((int) (((unsigned int) (stashed << 0x10)) >> 0x1f)) != 0)
++        {
++          func_ov002_0229cd88(self, 0x10b);
++        }
++        else
++        {
++          unsigned int field = ((unsigned int) (stashed << 9)) >> 0x1c;
++          if (field == 0xb)
++          {
++            func_ov002_0229cd88(self, 0xc7);
++          }
++          else
++            if (field == 0xe)
++          {
++            func_ov002_0229cd88(self, 0x10c);
++          }
++        }
++          break;
++
++        case 28:
++          func_ov002_0229cd88(self, 0xc8);
++          break;
++
++        case 29:
++        {
++          int match = 0;
++          if (((*((int *) (data_ov002_022cd73c + 4))) ^ 1) == ((int) (((unsigned int) (stashed << 0x16)) >> 0x1f)))
++          {
++            match = 1;
++          }
++          func_ov002_0229cd88(self, 0xc9 + match);
++          break;
++        }
++
++        case 30:
++          func_ov002_0229cd88(self, 0xcb);
++          break;
++
++        default:
++          break;
++
++      }
++
++    }
++    if ((*((unsigned short *) self)) != 0)
++    {
++      func_ov002_0229cdb8(self, (unsigned int) data_ov002_022cacbc);
++    }
++  }
++  func_ov002_0229cdb8(self, 0x10d);
+ }
