@@ -495,20 +495,22 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 590** — Claude Code Scaffolder (Sonnet 5) → **WINE-FREE r6-findings
-  verification** (replaces the retired swarm resume): adversarially verify all 29 findings in
-  `docs/research/rnd-swarm-r6-partial.md` refute-by-default; deliver `rnd-swarm-r6-verified.md`
-  (verdict table + ranked top-8 + synthesis). Extra scrutiny on the codegen-levers lane; NO
-  live compiler-flag flips. Branch `claude/r6-verify-590`.
-- **Brief 591** — Codex Scaffolder (Luna) → **WINE-FREE post-merge hygiene** (preflight-gated
-  on the 582-585 merge): CLOSED-LOG entries for 582-585 (PRs #1154/#1153/#1152/#1151), regen
-  both indices, full pytest incl. links (fix only the mechanical ../../ class), markdownlint
-  the new docs. Branch `codex/hygiene-591`.
-- **Brief 592** — Codex Decomper (Luna) → **WINE-FREE census bundle REDO** (preflight: grep
-  tool-error in batch_carve; CANARY: ov004 census must show nonzero candidates before the full
-  sweep — b589/#1156 was closed void on wrong base + wrong --min-addr): full dry-run census
-  (per-module --min-addr from the workorder table, scope lines pasted verbatim) + sig_census
-  refresh + ITCM appendix. Branch `codex/census-redo-592`.
+- **Brief 593** — Claude Code Decomper (Sonnet 5) → ceiling round 3 (WINE lane) — IN FLIGHT.
+- **Brief 594** — Codex Scaffolder (Luna) → **MASTER CANDIDATE LEDGER campaign** (wine-free,
+  multi-phase): script-driven JSONL cross-referencing every size_census-unmatched function ×
+  sig-census twins × c-match-prep dossiers × attempt provenance + per-module rollups. Feeds
+  the singleton re-queue (r6-verified top-1). Branch `codex/master-ledger-594`.
+- **Brief 595** — Codex Decomper (Luna) → **NAMING + CORPUS campaign** (wine-free,
+  multi-phase): naming-coverage census (named vs func_ per module × region), matched-C
+  pair-corpus export (c + delink disasm; tool-presence preflight), decomp.me harvest retry
+  (STOP if still blocked). Branch `codex/naming-corpus-595`.
+- **Brief 596** — Claude Code Scaffolder (Sonnet 5) → **WINE-LIGHT: batch_carve enumeration
+  autopsy + P-1 probe**: (a) diagnose why batch_carve censuses 0 while size_census sees 150+
+  unclaimed ARM funcs (gap-object carved_addrs hypothesis; make empty census output
+  SELF-DESCRIBING); (b) reconcile the 592 size_census-vs-ledger mismatches (ov004 rows); (c)
+  the r6-verified P-1 probe: `(s32)(u16)` cast-chain via direct-mwcc variant matrix (single-TU
+  compiles; yield the wineserver instantly if 593's lane contends). Branch
+  `claude/carve-census-autopsy-596`.
 
 ### Closed briefs (reference)
 
