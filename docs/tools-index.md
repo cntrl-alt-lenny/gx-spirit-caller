@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**100 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**101 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (31)
+- [Uncategorised](#uncategorised) (32)
 
 ## Analysis / worklist
 
@@ -540,6 +540,10 @@ WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--w
 ### `tools/export_matched_pairs.py`
 
 **Export compact matched-C function rows for retriever seeding.**
+
+### `tools/family_hit_harness.py`
+
+**Reproducible leave-one-out family retrieval evaluation.**
 
 ### `tools/fastmatch.py`
 

@@ -104,11 +104,40 @@ def evaluate(eur: list[dict], usa: list[dict], jpn: list[dict], sig: dict) -> di
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--fewshot-mode",
+        choices=("mnemonic", "symbol", "union", "shape"),
+        help="Run the family-hit harness using this representation.",
+    )
+    parser.add_argument(
+        "--family-fixture",
+        type=Path,
+        default=ROOT / "tests/fixtures/family_hit_queries.jsonl",
+        help="Fixture consumed by --fewshot-mode.",
+    )
     parser.add_argument("--eur", type=Path, default=ROOT / "tools/corpus/matched-pairs-eur.jsonl")
     parser.add_argument("--usa", type=Path, default=ROOT / "tools/corpus/matched-pairs-usa.jsonl")
     parser.add_argument("--jpn", type=Path, default=ROOT / "tools/corpus/matched-pairs-jpn.jsonl")
     parser.add_argument("--sig", type=Path, default=ROOT / "docs/research/sig-census-results.json")
     args = parser.parse_args()
+    if args.fewshot_mode:
+        try:
+            from .family_hit_harness import evaluate as evaluate_family
+            from .family_hit_harness import load_corpus, load_jsonl
+        except ImportError:
+            from family_hit_harness import evaluate as evaluate_family
+            from family_hit_harness import load_corpus, load_jsonl
+
+        corpus = load_corpus({"eur": args.eur, "usa": args.usa, "jpn": args.jpn})
+        metrics = evaluate_family(corpus, load_jsonl(args.family_fixture), args.fewshot_mode)
+        print("FEWSHOT-MODE: " + metrics["mode"])
+        print("QUERIES: " + str(metrics["queries"]))
+        print("SELF-RETRIEVAL: " + metrics["self_retrieval"])
+        for k, value in metrics["family_hit"].items():
+            print(f"FAMILY-HIT@{k}: {value}")
+        if not metrics["self_retrieval"].startswith(f"{metrics['queries']}/{metrics['queries']}"):
+            return 1
+        return 0
     metrics = evaluate(load_jsonl(args.eur), load_jsonl(args.usa),
                        load_jsonl(args.jpn), json.loads(args.sig.read_text()))
     print("SELF-RETRIEVAL: " + metrics["self_retrieval"])

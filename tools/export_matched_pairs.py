@@ -16,7 +16,9 @@ _SYMBOL_RE = re.compile(
     r"^(\S+) kind:function\((arm|thumb),size=0x([0-9a-f]+)\) addr:0x([0-9a-f]+)"
 )
 _FUNC_RE = re.compile(r"^\s*[0-9a-f]+ <([^>]+)>:")
+_FUNC_ADDR_RE = re.compile(r"^\s*([0-9a-f]+) <([^>]+)>:")
 _INSN_RE = re.compile(r"^\s*[0-9a-f]+:\s+.*?\t(.+)$")
+_RELOC_RE = re.compile(r"^\s*([0-9a-f]+)\s+R_ARM_\S+\s+(data_[A-Za-z0-9_]+)")
 
 
 def parse_symbols(text: str) -> list[tuple[str, str, int, int]]:
@@ -47,6 +49,69 @@ def mnemonics_from_objdump(text: str, function: str) -> str:
         if match:
             words.append(match.group(1).split()[0])
     return " ".join(words)
+
+
+def data_relocation_symbols(text: str) -> list[str]:
+    """Extract data_* targets from arm-none-eabi-objdump -r output."""
+    return sorted({match.group(2) for line in text.splitlines()
+                   if (match := _RELOC_RE.match(line))})
+
+
+def relocation_symbols_by_function(relocations: str, disassembly: str) -> dict[str, list[str]]:
+    """Associate .text relocations with the nearest preceding function."""
+    functions = sorted(
+        (int(match.group(1), 16), match.group(2))
+        for line in disassembly.splitlines()
+        if (match := _FUNC_ADDR_RE.match(line))
+        and not match.group(2).startswith(".")
+    )
+    out = {name: set() for _addr, name in functions}
+    for line in relocations.splitlines():
+        match = _RELOC_RE.match(line)
+        if not match:
+            continue
+        offset = int(match.group(1), 16)
+        owners = [(addr, name) for addr, name in functions if addr <= offset]
+        if owners:
+            out[owners[-1][1]].add(match.group(2))
+    return {name: sorted(symbols) for name, symbols in out.items()}
+
+
+def shape_tokens_from_objdump(text: str, function: str) -> list[str]:
+    """Emit operand-shape abstractions without retaining literal operands."""
+    active = False
+    tokens = []
+    for line in text.splitlines():
+        fn = _FUNC_RE.match(line)
+        if fn:
+            name = fn.group(1)
+            if active and not name.startswith("."):
+                break
+            active = name == function
+            continue
+        if not active:
+            continue
+        match = _INSN_RE.match(line)
+        if not match:
+            continue
+        instruction = match.group(1)
+        mnemonic, _, operands = instruction.partition("\t")
+        if "\t" not in instruction:
+            parts = instruction.split(None, 1)
+            mnemonic, operands = parts[0], parts[1] if len(parts) == 2 else ""
+        shapes = [f"op:{mnemonic.split()[0]}"]
+        if "[" in operands and "]" in operands:
+            shapes.append("mem:bracket")
+        if "{" in operands and "}" in operands:
+            shapes.append("reglist")
+        if re.search(r"\br(?:1[0-5]|[0-9])\b", operands):
+            shapes.append("reg:gpr")
+        if re.search(r"\b(?:sp|lr|pc)\b", operands):
+            shapes.append("reg:special")
+        if re.search(r"#(?:-?0x[0-9a-f]+|-?\d+)", operands, re.IGNORECASE):
+            shapes.append("imm")
+        tokens.extend(shapes)
+    return tokens
 
 
 def object_for(source: str, delinks_root: Path) -> Path | None:
@@ -82,12 +147,18 @@ def collect(region: str = "eur", root: Path = ROOT,
             disassembly = subprocess.run([objdump, "-d", str(obj)],
                                          capture_output=True, text=True,
                                          check=True).stdout
+            relocations = subprocess.run([objdump, "-r", str(obj)],
+                                         capture_output=True, text=True,
+                                         check=True).stdout
+            symbols_by_function = relocation_symbols_by_function(relocations, disassembly)
             for name, kind, addr, size in symbols:
                 if any(start <= addr < end for start, end in ranges):
                     rows.append({"name": name, "module": module, "addr": addr,
                                  "size": size, "c_path": source,
                                  "_kind": kind,
-                                 "mnemonics": mnemonics_from_objdump(disassembly, name)})
+                                 "mnemonics": mnemonics_from_objdump(disassembly, name),
+                                 "symbols": symbols_by_function.get(name, []),
+                                 "shape_tokens": shape_tokens_from_objdump(disassembly, name)})
     return sorted(rows, key=lambda row: row["addr"])
 
 
