@@ -495,25 +495,22 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
   (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
   everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
   at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 601** — Claude Code Decomper (Sonnet 5) → RE-LAND the 38 USA/JPN ships (WINE lane) — IN FLIGHT.
-- **Brief 605** — Claude Code Scaffolder (Sonnet 5) → **SINGLETON RE-QUEUE design** (wine-free,
-  the r6-verified #1 strategic move): using pick-lists.md (151 singletons) + the now-WORKING
-  `--fewshot` retriever (b604: family-hit@5 95.8%) + naming census, produce
-  `docs/research/campaign-analytics/singleton-cmatch-queue.md` — ranked candidates, each with
-  its retriever-suggested sibling seeds + size + module, batched for the wine lane to drain.
-  Branch `claude/singleton-queue-605`.
-- **Brief 606** — Codex Scaffolder (Luna Medium) → **pre-draft the top-40 singletons** (wine-
-  free, compute): for the 40 smallest never-attempted ARM singletons from pick-lists.md, run
-  `m2c_feed --fewshot 5` and commit each candidate draft under `docs/research/cmatch-drafts/`
-  + an index. Turnkeys the wine drain. CANARY: draft count must equal 40; each draft nonempty.
-  Branch `codex/predraft-606`.
-- **Brief 607** — Codex Decomper (Luna High) → **execute b600's secure-area carve plan (GEN
-  half, wine-free)**: run `tools/emit_data_blob.py` for the 57 `SecureAreaData_*` fragments
-  (per brief-600-startup-block.md's acceptance criteria) to GENERATE the raw-byte `.s` +
-  delink flips; do NOT gate (the brain runs the 3-region sha1). CANARY: emitter must round-trip
-  one fragment byte-identical before doing all 57. Branch `codex/securearea-gen-607`.
-- (Next Codex Decomper wine round, after 601 merges: the RE-CARVE wave over b596's 289
-  reopened candidates — deferred so pools don't collide with 601.)
+- **Brief 608** — Claude Code Decomper (Sonnet 5) → **THE WINEPREFIX PARALLEL-LANE SPIKE
+  (wine, r7 #1 bet)**: prove/kill whether per-worktree WINEPREFIX turns the one wine lane into
+  N (plumbing confirmed transform_dep.py:6-8). Baseline vs 2/3/4-lane concurrent compiles/min;
+  deadlock verdict; keep flock on the 81s mwld link only. GO/NO-GO + proposed change (do not
+  wire yet). Branch `claude/wineprefix-spike-608`.
+- **Brief 609** — Claude Code Scaffolder (Sonnet 5) → **STRUCT/TYPE BANK prototype (wine-free,
+  r7 #1b)**: promote the ~64 comment field-maps in *_core.h to typed structs (quick slice),
+  then tools/build_struct_bank.py mining width/signedness/bitfield from delink objdump on
+  data_ov002_022d016c; prove m2c --context renders named fields. Branch `claude/struct-bank-609`.
+- (Codex idle by design — no genuinely-hours mechanical work exists this round. Genuine Codex
+  campaigns unlock when: 609's miner is built -> full-tree struct mining; OR 608 is GO -> the
+  opt-level variant matrix on the reg-alloc plateau class.)
+- **b607 CLOSED (not merged):** secure-area .s carve broke `dsd delink` in all 3 regions (57
+  fragments byte-correct, but the encrypted secure area ships as-is via the header/CRC pipeline
+  and is not delink-carveable). TODO: annotate it as a known non-carveable encrypted region in
+  endgame-ledger.md (small docs task) rather than carving. r7 secure-area lead is dead.
 
 ### Closed briefs (reference)
 
