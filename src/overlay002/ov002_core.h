@@ -28,9 +28,26 @@ extern int  data_ov002_022cf17c[];   /* per-player count table (0x260 list) [mem
 extern char data_ov002_022cf178[];   /* per-player event count table */
 extern int  data_ov002_022cf184[];   /* per-player count table (0x3a0 list) [shipped 021ba1e8] */
 extern char data_ov002_022ce950[];   /* per-player field table (+0x80c scalar) [member1] */
+/* M2C_CONTEXT_BUILD (brief 609): m2c's --context type inference keys off
+ * a symbol's DECLARED type, not any macro that aliases it -- the D016C /
+ * CE288 cast-pointer macros below are pure preprocessor text and m2c's
+ * parser never sees them. Typing the extern as the mined struct VALUE
+ * (not char[]) in this branch only -- never defined during a real build,
+ * see tools/m2c_feed.py's build_context() -- is what actually makes m2c
+ * render named fields instead of auto `unkNNN` offsets. Verified: with
+ * this branch active, func_ov002_021cb174's m2c --context draft renders
+ * `data_ov002_022d016c.f_d2c = 6;` instead of `->unkD2C`. */
+#ifdef M2C_CONTEXT_BUILD
+extern struct Ov002D016c data_ov002_022d016c;
+#else
 extern char data_ov002_022d016c[];   /* per-player field table (+0xcec scalar) [member1*] */
+#endif
 extern char data_ov002_022cf1a4[];   /* per-player field table */
+#ifdef M2C_CONTEXT_BUILD
+extern struct Ov002Ce288 data_ov002_022ce288;
+#else
 extern char data_ov002_022ce288[];   /* per-player field table */
+#endif
 extern char data_ov002_022cd3f4[];   /* per-player field table */
 
 /* 20-byte (0x14) sub-row array starts at (row + 0x30); slot.id is a 13-bit
@@ -81,10 +98,165 @@ extern void func_ov002_021b91c4(int *dst, const int *src);       /* [shipped] *d
 extern int  data_ov002_022cd744[];   /* flag table, indexed by a small id [shipped 021ae400] */
 extern u16  data_ov002_022ce720[];   /* node fallback ring (mod 128) [shipped 0223de94] */
 
-/* d016c / ce288 are per-player FIELD tables (declared char[] above); the
- * band reads scalar state at fixed offsets — type a local struct per TU,
- * e.g. d016c.f3300 (+0xce4), .f3308 (+0xcec), .f3340 (+0xd0c), .f_d50,
- * .f_d64; ce288.f1484/.f1488/.f1492/.f1496/.f1672. [shipped 021e2b3c/2c5c] */
+/* d016c / ce288 are per-player FIELD tables (declared char[] above).
+ * Brief 609 mined the full field layout below from every access site
+ * across the delinked build (tools/build_struct_bank.py), not just the
+ * handful this comment used to name by hand (f3300/f3308/f3340/f_d50/
+ * f_d64; ce288.f1484/.f1488/.f1492/.f1496/.f1672 — all still present
+ * below, now with real offsets/widths for every OTHER field too).
+ *
+ * The `char[]` externs above are UNTOUCHED — 20 already-matched TUs
+ * here `#include "ov002_core.h"` and cast-offset into `data_ov002_022d016c`
+ * / `data_ov002_022ce288` directly; re-typing either extern to a struct
+ * would conflict with that char[] declaration the moment BOTH are in
+ * scope in the same TU (verified: a same-symbol, different-type
+ * redeclaration is a hard C constraint violation, not shadowing — a
+ * standard-C syntax check on exactly this pattern confirms it errors).
+ * The ~5 existing files that already want struct-style access instead
+ * don't include core.h at all today, for the same reason.
+ *
+ * So the structs below are reached through a cast-pointer macro, not a
+ * redeclared extern — semantically identical to what every existing
+ * `*(TYPE *)(data_ov002_022d016c + N)` site already does by hand, just
+ * through one shared, comprehensively-mined layout instead of
+ * re-deriving a partial view (or a from-scratch `struct g016c { ... }`)
+ * per file:
+ *     D016C->rand_state             // was *(int*)(data_ov002_022d016c+0xce4)
+ *     CE288->f_5a8                  // was *(int*)(data_ov002_022ce288+0x5a8)
+ * Two offsets in each struct (marked below) had a MINORITY of access
+ * sites narrow the field with a lsl/lsr shift pair while the majority
+ * read it as a plain word; the emitted type follows the majority
+ * (matches every already-shipped reference checked), but the minority
+ * sites are worth a second look — see docs/research/brief-609-struct-bank.md. */
+
+/* Mined by tools/build_struct_bank.py from 55 observed offsets across
+ * 2077 access sites (brief 609). +0xce4 is func_ov002_021b009c's proven
+ * MSVC LCG rand_state (u32); +0xce8/+0xd44 are the majority-vote-vs-
+ * minority-narrowed disagreements above (1/5 and 1/142 sites narrow to
+ * a 16-bit read respectively — both kept `int` to match the ~60
+ * shipped references, which are all unnarrowed). */
+struct Ov002D016c {
+    char _pad0[2];
+    u16 f_2;
+    char _pad1[24];
+    int f_1c;
+    int f_20;
+    char _pad2[172];
+    int f_d0;
+    int f_d4;
+    int f_d8;
+    int f_dc;
+    int f_e0;
+    char _pad3[3072];
+    int rand_state;   /* +0xce4: func_ov002_021b009c's proven MSVC LCG state */
+    int f_ce8;         /* +0xce8: 4/5 sites unnarrowed, 1/5 narrows to u16 -- see brief-609 doc */
+    int f_cec;
+    int f_cf0;
+    int f_cf4;
+    int f_cf8;
+    int f_cfc;
+    int f_d00;
+    int f_d04;
+    int f_d08;
+    int f_d0c;
+    void *f_d10;
+    int f_d14;
+    int f_d18;
+    int f_d1c;
+    int f_d20;
+    int f_d24;
+    int f_d28;
+    int f_d2c;
+    int f_d30;
+    int f_d34;
+    int f_d38;
+    int f_d3c;
+    int f_d40;
+    int f_d44;         /* +0xd44: 141/142 sites unnarrowed, 1/142 narrows to u16 -- see brief-609 doc */
+    int f_d48;
+    int f_d4c;
+    int f_d50;
+    int f_d54;
+    int f_d58;
+    int f_d5c;
+    int f_d60;
+    int f_d64;
+    int f_d68;
+    int f_d6c;
+    int f_d70;
+    int f_d74;
+    int f_d78;
+    int f_d7c;
+    int f_d80;
+    int f_d84;
+    int f_d88;
+    int f_d8c;
+    int f_d90;
+    int f_d94;
+    int f_d98;
+    int f_d9c;
+};
+#define D016C ((struct Ov002D016c *)data_ov002_022d016c)
+
+/* Mined the same way, 45 observed offsets across 1945 access sites.
+ * +0x69c has the same majority-vote-vs-minority-narrowed shape as
+ * d016c's two flagged offsets above (23/24 unnarrowed, 1/24 narrows to
+ * u16) -- kept `int`, see docs/research/brief-609-struct-bank.md. */
+struct Ov002Ce288 {
+    char _pad0[2];
+    u16 f_2;
+    u16 f_4;
+    u16 f_6;
+    char _pad1[2];
+    u16 f_a;
+    u16 f_c;
+    char _pad2[1138];
+    int f_480;
+    int f_484;
+    int f_488;
+    int f_48c;
+    int f_490;
+    int f_494;
+    char _pad3[256];
+    int f_598;
+    int f_59c;
+    int f_5a0;
+    int f_5a4;
+    int f_5a8;
+    int f_5ac;
+    int f_5b0;
+    int f_5b4;
+    int f_5b8;
+    int f_5bc;
+    int f_5c0;
+    int f_5c4;
+    int f_5c8;
+    int f_5cc;
+    int f_5d0;
+    int f_5d4;
+    int f_5d8;
+    u8 f_5dc;
+    char _pad4[31];
+    int f_5fc;
+    char _pad5[124];
+    int f_67c;
+    int f_680;
+    int f_684;
+    int f_688;
+    int f_68c;
+    char _pad6[4];
+    int f_694;
+    int f_698;
+    int f_69c;         /* +0x69c: 23/24 sites unnarrowed, 1/24 narrows to u16 -- see brief-609 doc */
+    int f_6a0;
+    int f_6a4;
+    int f_6a8;
+    int f_6ac;
+    int f_6b0;
+    int f_6b4;
+    int f_6b8;
+};
+#define CE288 ((struct Ov002Ce288 *)data_ov002_022ce288)
 
 /* hub: gate on a flag table, then post a command (84 band callers). */
 extern void func_ov002_021ae400(int a, int b);                   /* [shipped] cd744[a]?ret:0229ade0(0x31,0,b,0) */

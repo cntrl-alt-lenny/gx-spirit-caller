@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**100 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**101 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (31)
+- [Uncategorised](#uncategorised) (32)
 
 ## Analysis / worklist
 
@@ -476,6 +476,12 @@ Given a region and a list of accepted candidate .c files (already passing fastma
 ### `tools/build_master_ledger.py`
 
 **Build the committed, unmatched-function master candidate ledger.**
+
+### `tools/build_struct_bank.py`
+
+**mine field width/signedness/bitfield shape for one**
+
+`data_*` symbol from the delinked disassembly, and emit a canonical typed struct (brief 609 / r7-1 prototype).
 
 ### `tools/c42_family_hunter.py`
 

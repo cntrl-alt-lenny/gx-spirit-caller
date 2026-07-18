@@ -206,16 +206,35 @@ def build_context(region: str, module: str) -> Path | None:
     # the header's own content must be reached BY an include, not passed
     # directly. An absolute path sidesteps m2ctx's fixed -I list
     # (include/, libs/*/include/), which doesn't cover src/.
-    with tempfile.NamedTemporaryFile("w", suffix=".c", delete=False) as wrapper:
-        wrapper.write(f'#include "{header.resolve()}"\n')
-        wrapper_path = wrapper.name
+    #
+    # Two-level indirection (brief 609): m2ctx.py's own include-extraction
+    # regex only recognizes `#include` lines in the file it's handed — a
+    # `#define` on its own line would be silently dropped, never reaching
+    # gcc -E. So `wrapper` (the file passed to m2ctx.py) has ONLY an
+    # #include of `shim`; `shim` is a real on-disk file gcc -E expands
+    # normally (m2ctx.py's regex never looks inside it) and is where
+    # M2C_CONTEXT_BUILD actually gets defined before the header loads.
+    # ov002_core.h uses that macro to type data_ov002_022d016c /
+    # data_ov002_022ce288 as their mined struct instead of char[] — m2c's
+    # field-naming keys off the symbol's declared type, and is blind to
+    # the D016C/CE288 cast-pointer macros (pure preprocessor text, not a
+    # type). Harmless no-op for every module without such a branch.
+    with tempfile.NamedTemporaryFile("w", suffix=".h", delete=False) as shim:
+        shim.write(f'#define M2C_CONTEXT_BUILD 1\n#include "{header.resolve()}"\n')
+        shim_path = shim.name
     try:
-        result = subprocess.run(
-            [sys.executable, str(M2CTX_SCRIPT), "-f", str(out_path), wrapper_path],
-            capture_output=True, text=True, cwd=ROOT,
-        )
+        with tempfile.NamedTemporaryFile("w", suffix=".c", delete=False) as wrapper:
+            wrapper.write(f'#include "{shim_path}"\n')
+            wrapper_path = wrapper.name
+        try:
+            result = subprocess.run(
+                [sys.executable, str(M2CTX_SCRIPT), "-f", str(out_path), wrapper_path],
+                capture_output=True, text=True, cwd=ROOT,
+            )
+        finally:
+            Path(wrapper_path).unlink(missing_ok=True)
     finally:
-        Path(wrapper_path).unlink(missing_ok=True)
+        Path(shim_path).unlink(missing_ok=True)
     if result.returncode != 0:
         raise FeedError(
             f"m2ctx.py failed to preprocess {header.relative_to(ROOT)}: "
