@@ -16,8 +16,10 @@ pc-relative-target pool detection rather than a fragile string match.
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -26,6 +28,7 @@ from asm_escape import (  # noqa: E402
     _DATA_AS_CODE_RE,
     branch_targets,
     classify_fixes,
+    configured_function_addr,
     diff_words,
     emit_asm,
     hex_imm,
@@ -463,6 +466,48 @@ class TestWholeFunction(unittest.TestCase):
         # instruction in the merged function, not only ones this function's
         # own control flow happens to jump to.
         self.assertIn("        .global .L_02020fa4", s)  # the function's own first word
+
+
+class TestConfiguredFunctionAddr(unittest.TestCase):
+    """brief 618: generate_whole() used to derive base_addr by parsing the
+    LAST `_`-separated token of the function name as hex -- silently wrong
+    for any already-named function (OS_DisableIrq, Fill32, ...), which is
+    exactly what main's residual gap candidates increasingly are now that
+    most of the module is decompiled and named. configured_function_addr()
+    reads the real address out of symbols.txt instead, regardless of what
+    the function is called."""
+
+    def _with_symbols(self, text: str):
+        tmp = tempfile.TemporaryDirectory()
+        (Path(tmp.name) / "symbols.txt").write_text(text, encoding="utf-8")
+        self.addCleanup(tmp.cleanup)
+        return mock.patch("asm_escape._module_config", return_value=Path(tmp.name))
+
+    def test_hex_named_function(self):
+        with self._with_symbols(
+            "func_02048950 kind:function(arm,size=0x34) addr:0x02048950\n"
+        ):
+            self.assertEqual(
+                configured_function_addr("usa", "func_02048950"), 0x02048950)
+
+    def test_human_named_function(self):
+        # The exact shape that broke the old name-parsing: no hex suffix.
+        with self._with_symbols(
+            "OS_DisableIrq kind:function(arm,size=0x14) addr:0x020936bc\n"
+        ):
+            self.assertEqual(
+                configured_function_addr("usa", "OS_DisableIrq"), 0x020936bc)
+
+    def test_missing_function_returns_none(self):
+        with self._with_symbols(
+            "func_02048950 kind:function(arm,size=0x34) addr:0x02048950\n"
+        ):
+            self.assertIsNone(configured_function_addr("usa", "func_nowhere"))
+
+    def test_missing_symbols_file_returns_none(self):
+        with mock.patch("asm_escape._module_config",
+                        return_value=Path(tempfile.mkdtemp())):
+            self.assertIsNone(configured_function_addr("usa", "func_02048950"))
 
 
 class TestDisasmZeroFlag(unittest.TestCase):
