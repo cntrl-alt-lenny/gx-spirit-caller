@@ -10776,6 +10776,9 @@ src/jpn/main/OSi_IrqHandlerDma0.c:
 src/jpn/main/func_020903ec.s:
     complete
     .text start:0x020903ec end:0x02090488
+src/jpn/main/OS_DefaultIrqHandler.s:
+    complete
+    .text start:0x02090488 end:0x0209048c
 src/jpn/main/func_0209048c.s:
     complete
     .text start:0x0209048c end:0x020904c0
@@ -11205,6 +11208,12 @@ src/jpn/main/func_02093638.s:
 src/jpn/main/func_020936a8.s:
     complete
     .text start:0x020936a8 end:0x020936bc
+src/jpn/main/OS_DisableIrq.s:
+    complete
+    .text start:0x020936bc end:0x020936d0
+src/jpn/main/OS_RestoreIrq.s:
+    complete
+    .text start:0x020936d0 end:0x020936e8
 src/jpn/main/func_020936e8.s:
     complete
     .text start:0x020936e8 end:0x020936fc
@@ -11311,6 +11320,12 @@ src/jpn/main/func_02094398.s:
 src/jpn/main/func_020943b0.s:
     complete
     .text start:0x020943b0 end:0x020943cc
+src/jpn/main/Fill32.s:
+    complete
+    .text start:0x020943cc end:0x020943e0
+src/jpn/main/Copy32.s:
+    complete
+    .text start:0x020943e0 end:0x020943f8
 src/jpn/main/func_020943f8.s:
     complete
     .text start:0x020943f8 end:0x02094410
@@ -11370,6 +11385,10 @@ src/jpn/main/func_02094ba0.s:
 src/jpn/main/func_02094bf8.legacy.c:
     complete
     .text start:0x02094bf8 end:0x02094c24
+
+src/jpn/main/SNDi_SetTrackParam.s:
+    complete
+    .text start:0x02094c24 end:0x02094c58
 
 src/jpn/main/func_02094c58.legacy.c:
     complete
