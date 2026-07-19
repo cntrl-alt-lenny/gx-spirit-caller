@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**102 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**103 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (33)
+- [Uncategorised](#uncategorised) (34)
 
 ## Analysis / worklist
 
@@ -568,6 +568,12 @@ The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-r
 **Combined per-region progress-bar SVG (one card, three nested bars).**
 
 Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — code recovered as real C source - byte-matched      (teal)   — code that rebuilds byte-identical from our source tree, INCLUDING `.s` assembly sh…
+
+### `tools/kickoff_lint.py`
+
+**a pre-send gate on agent kickoff text (R&D r8, §4).**
+
+The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter of correctness. But it fires only after an agent has already spent its hour. The recurring void-work incidents (b576 transcription-without-invariant, b589 wrong…
 
 ### `tools/m2c_bootstrap.py`
 
