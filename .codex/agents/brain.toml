@@ -33,10 +33,12 @@ production fire, see below).
 1. `git fetch origin && git pull --ff-only`
 2. Read `docs/state.md` and `gh pr list --state open` to catch up.
 3. For each open PR:
-   a. Pull the branch, run the appropriate subset of `ninja rom`,
-      `./dsd check modules -c config/eur/arm9/config.yaml` (or
-      `./dsd.exe` on Windows), `ninja objdiff`, `ninja report`,
-      `python tools/progress.py --version eur`.
+   a. Build an integration tree and gate it: `python3.13 tools/gate3.py
+      --scope all` — the 3-region byte-identical `ninja sha1` (eur+usa+jpn),
+      all 27 modules, plus pytest. That is the merge arbiter. For a
+      scope/rename-safety companion run `tools/scope_gate.py`. (Ignore any
+      older `ninja rom` / `dsd check modules` / "24/27 baseline" workflow —
+      obsolete.)
    b. Write a plain-English summary for cntrl_alt_lenny: what changed,
       why it's safe, what's next.
    c. Offer to merge. On OK, `gh pr merge <N> --squash --delete-branch`.
@@ -46,9 +48,9 @@ production fire, see below).
 
 ## Production-fire authority
 
-When `dsd check modules` regresses from the 24/27 baseline and blocks
-every downstream decomp PR, self-merge the fix without waiting.
-Precedent: PRs #116 and #118 (align-regression fire). Flag the PR body
+When `gate3.py --scope all` goes red on `main` (a merge broke the
+byte-identical build) and blocks every downstream PR, self-merge the fix
+without waiting. Precedent: PRs #116 and #118 (align-regression fire). Flag the PR body
 with "self-merged per AGENTS.md § spot authority" and explain the
 urgency. Scope: production fires only, never feature work.
 
@@ -74,15 +76,11 @@ Regenerate `docs/briefs/README.md` via
 
 Before merging a decomp match PR:
 
-- [ ] `ninja rom` completes cleanly.
-- [ ] `dsd check modules` holds its baseline (24/27 OK today; the
-      three failing modules — main / DTCM / ov004 — are documented
-      placeholder-symbol artifacts, not regressions).
-- [ ] `tools/check_match_invariants.py --version eur` reports 0
-      errors (warnings OK — ~317 pre-existing `complete_tu_rename`
-      backlog).
-- [ ] Target functions report 100% in `ninja report`.
-- [ ] `tools/progress.py` shows movement or at least no regression.
+- [ ] `python3.13 tools/gate3.py --scope all` PASS — 3-region
+      byte-identical `ninja sha1` (the only real merge gate) + pytest.
+- [ ] `tools/scope_gate.py --kind naming|carve` PASS if the PR renames
+      or carves (gate3 is scope-BLIND — it can't see a thin/half-applied PR).
+- [ ] `tools/progress.py --by-module` shows movement or no regression.
 
 Before merging a tools/docs PR:
 
@@ -96,21 +94,14 @@ Before merging a tools/docs PR:
 # Open PR list + triage starting point
 gh pr list --state open
 
-# Pull and verify a PR locally
+# Verify a PR: build an integration tree, then the 3-region gate
 gh pr checkout <N>
-python tools/configure.py eur
-ninja rom
-./dsd check modules -c config/eur/arm9/config.yaml
-python tools/check_match_invariants.py --version eur
-python tools/next_targets.py --version eur --no-outputs
+python3.13 tools/gate3.py --scope all      # eur+usa+jpn ninja sha1 + pytest
+python3.13 tools/scope_gate.py --kind naming --base origin/main   # if it renames
+python3.13 tools/progress.py --version usa --by-module            # coverage/C% movement
 
-# Match-depth regression check (Path A workflow, PR #124)
-git checkout main && ninja report
-cp build/eur/report.json /tmp/before.json
-gh pr checkout <N>
-ninja && ninja report
-cp build/eur/report.json /tmp/after.json
-python tools/ci_format_diff_reasons.py /tmp/before.json /tmp/after.json
+# Sanity: a clobbered dsd masquerades as a divergence (gate3 preflights this)
+./dsd --version | grep 0.11
 
 # Merge after cntrl_alt_lenny's OK
 gh pr merge <N> --squash --delete-branch

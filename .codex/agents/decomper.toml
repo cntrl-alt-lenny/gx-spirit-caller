@@ -48,22 +48,28 @@ Step-by-step:
    siblings inlined as drafting templates + NitroSDK header hints.
 3. **Draft C**. Write `src/<module-dir>/<name>.c` with best guess.
    Use `libs/nitro/include/nitro/*.h` for SDK types.
-4. **Build**. `ninja`
-5. **Diff**. `ninja objdiff && ninja report`, check the objdiff-cli
-   TUI for instruction-level differences.
-6. **Iterate**. Common tweaks:
+4. **Build + diff**. `ninja` then `ninja objdiff` (per-function
+   instruction diff via objdiff-cli). Or let `tools/cmatch_loop.py`
+   draft+compile+score a batch for you (the readable-C production loop).
+5. **Iterate**. Common tweaks:
    - `int` ↔ `short` ↔ `unsigned`
    - Reorder local declarations (mwcc is RHS-first; placement
      matters for literal-pool layout)
    - Split one expression into two (forces a temp register)
    - `volatile` when the baserom loads the same addr twice
    - For tricky cases: `asm void` inline or a `.s` escape hatch
-     (see PR #105, PR #135)
-7. **Mark complete**. Edit `config/<ver>/<module>/delinks.txt` and
-   add `complete` under the TU header once objdiff is 100%.
-8. **Rename**. `python tools/rename_symbol.py <module> <addr> <Name>`
-   handles the cross-reference updates in all symbols.txt files.
-9. **Commit + PR** on branch `decomper/<kebab-scope>`.
+6. **Mark complete**. Add `complete` under the TU header in
+   `config/<ver>/<module>/delinks.txt` once objdiff is 100%.
+7. **Rename** (cascade-safe — MANDATORY flag): `python3.13
+   tools/rename_symbol.py --cascade <old_name> <new_name>`. The
+   `--cascade` (b623) renames symbols.txt AND the region source that
+   defines the old name — WITHOUT it you get a half-applied rename that
+   passes `dsd check` but breaks USA/JPN `ninja sha1` (b612). Verify with
+   `tools/scope_gate.py --kind naming --base origin/main`.
+8. **Gate**. The real gate is `python3.13 tools/gate3.py --scope all`
+   (3-region byte-identical `ninja sha1`) — run it before your PR; a green
+   per-function objdiff is NOT sufficient (objdiff ≠ link; b453/b597 trap).
+9. **Commit + PR** on branch `codex/<kebab-scope>` (or `decomper/<scope>`).
 
 ## Useful tools (scaffolder-built, consume freely)
 
@@ -112,9 +118,9 @@ into the build via `dsd delink`).
 - One concern per PR (one match, or a coherent wave of siblings)
 - PR body must include:
   - Shape of each match (size, instructions, NitroSDK name if renamed)
-  - Byte-compare result against `extract/eur/<module>*.bin`
-  - Tier movement: before/after for the affected tiers
-  - `dsd check modules` status (should stay at baseline)
+  - The pasted `gate3.py --scope all` sha1 PASS (the real byte-identical
+    proof, all 3 regions) — plus `scope_gate.py` PASS if you renamed/carved
+  - Tier / coverage movement via `progress.py --by-module`
 - Don't push to `main` directly. Don't self-merge — that's brain's job.
 
 ## Current tier state (from docs/state.md)
