@@ -684,6 +684,28 @@ def configured_function_size(version: str, func: str) -> int | None:
     return int(m.group(1), 16) if m else None
 
 
+def configured_function_addr(version: str, func: str) -> int | None:
+    """Return the authoritative symbols.txt address for `func`.
+
+    Brief 618: `generate_whole()` used to derive this by parsing the LAST
+    `_`-separated token of `func` as hex (`func_02048950` -> 0x02048950) --
+    silently wrong for any already-named function (`OS_DisableIrq`,
+    `Fill32`, ...), which main's residual gap candidates increasingly are
+    now that most of the module is decompiled and named. symbols.txt
+    already records the real address regardless of what the function is
+    called; read it from there instead."""
+    try:
+        text = (_module_config(version, func) / "symbols.txt").read_text(
+            encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    m = re.search(
+        rf"^{re.escape(func)} kind:function\(\w+,size=0x[0-9a-f]+\)"
+        r" addr:0x([0-9a-f]+)",
+        text, re.MULTILINE)
+    return int(m.group(1), 16) if m else None
+
+
 def classify_data_refs(symbols_text: str, relocs_text: str, delinks_text: str,
                        func: str) -> list[dict]:
     """PURE: classify every kind:data load-target of `func` for linkability.
@@ -1020,6 +1042,10 @@ def generate_whole(func: str, version: str, out: str | None,
     if size is None:
         print(f"error: {func} has no configured function size", file=sys.stderr)
         return 2
+    base_addr = configured_function_addr(version, func)
+    if base_addr is None:
+        print(f"error: {func} has no configured function address", file=sys.stderr)
+        return 2
     orig = parse_objdump(disasm(orig_obj), func, size)
     if not orig:
         print(f"error: {func} has no disassembly in {orig_obj}", file=sys.stderr)
@@ -1033,7 +1059,7 @@ def generate_whole(func: str, version: str, out: str | None,
     _resolve_tail_calls(func, orig, sym_text)
     s = emit_asm(func, orig, whole=True, thumb=is_thumb(version, func),
                 absorbed_subs=absorbed_subs,
-                base_addr=int(func.rsplit("_", 1)[-1], 16))
+                base_addr=base_addr)
     out_path = out or str(tmp / f"{func}.s")
     Path(out_path).write_text(s, encoding="utf-8")
 
