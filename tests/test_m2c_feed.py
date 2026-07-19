@@ -241,6 +241,38 @@ class TestRunM2C(unittest.TestCase):
         self.assertIn("data_ov002_022cd744[a]", with_ctx)  # named field, not *(&sym + …)
         self.assertNotIn("?", with_ctx)
 
+    @unittest.skipUnless(
+        (Path(__file__).resolve().parent.parent / "tools/_vendor/m2c/m2c.py").is_file(),
+        "m2c not vendored — run tools/m2c_bootstrap.py first",
+    )
+    def test_struct_bank_context_yields_named_field_not_unk_offset(self):
+        # brief 609: data_ov002_022d016c stays `extern char […]` for real
+        # compilation (20 shipped .c files cast-offset into it; retyping
+        # the extern would conflict — see ov002_core.h's M2C_CONTEXT_BUILD
+        # comment), so the D016C cast-pointer macro is pure preprocessor
+        # text m2c's parser never sees. Without build_context()'s
+        # M2C_CONTEXT_BUILD shim swapping in a struct-typed extern for
+        # JUST the context build, m2c falls back to its own generic
+        # offset-struct inference and renders `data_ov002_022d016c->
+        # unkD2C` instead of the mined field name — this pins that the
+        # shim actually flips the branch, not just that the struct text
+        # is present somewhere in the context (TestBuildContext covers
+        # that separately).
+        s_text = render([
+            "00000000 <func_test_d016c>:",
+            "   0:\te59f1004 \tldr\tr1, [pc, #4]\t@ c <.L_data>",
+            "   4:\te3a02006 \tmov\tr2, #6",
+            "   8:\te5812d2c \tstr\tr2, [r1, #3372]\t@ 0xd2c",
+            "0000000c <.L_data>:",
+            "   c:\t00000000                                ....",
+            "\t\t\tc: R_ARM_ABS32\tdata_ov002_022d016c",
+        ], "func_test_d016c", thumb=False)
+
+        ctx_path = build_context("eur", "ov002")
+        with_ctx = run_m2c("func_test_d016c", s_text, ctx_path)
+        self.assertIn("data_ov002_022d016c.f_d2c = 6", with_ctx)
+        self.assertNotIn("unkD2C", with_ctx)
+
 
 class TestCliExitCodes(unittest.TestCase):
     def test_unknown_func_exit_1(self):
