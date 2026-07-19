@@ -154,7 +154,7 @@ func_02006248 kind:function(arm,size=0x68) addr:0x02006248
 func_020062b0 kind:function(arm,size=0x48) addr:0x020062b0
 func_020062f8 kind:function(arm,size=0x20) addr:0x020062f8
 func_02006318 kind:function(arm,size=0x34) addr:0x02006318
-func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c
+Task_InvokeLockedIrq kind:function(arm,size=0x2c) addr:0x0200634c
 func_02006378 kind:function(arm,size=0x190) addr:0x02006378
 func_02006508 kind:function(arm,size=0x84) addr:0x02006508
 func_0200658c kind:function(arm,size=0x250) addr:0x0200658c
@@ -4156,7 +4156,7 @@ func_020b4154 kind:function(arm,size=0x34) addr:0x020b4154
 func_020b4188 kind:function(arm,size=0x8) addr:0x020b4188
 func_020b4190 kind:function(arm,size=0x2c) addr:0x020b4190
 func_020b41bc kind:function(arm,size=0x44) addr:0x020b41bc
-func_020b4200 kind:function(arm,size=0x20) addr:0x020b4200
+__register_global_object kind:function(arm,size=0x20) addr:0x020b4200
 func_020b4220 kind:function(arm,size=0xc) addr:0x020b4220
 data_020b422c kind:data(any) addr:0x020b422c
 data_020b4234 kind:data(any) addr:0x020b4234
