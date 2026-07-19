@@ -96,6 +96,46 @@ class TestCascade(unittest.TestCase):
         self.assertTrue(ok)
 
 
+class TestCarve(unittest.TestCase):
+    def test_thin_carve_fails_target(self):
+        base = {("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "a.s")}
+        head = base | {
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "b.s"),
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "c.s"),
+        }
+        sg.complete_tus = lambda ref, regions: base if ref else head
+        ok, detail, _ = sg.check_carve_scope("BASE", ["eur"], target=20)
+        self.assertFalse(ok)
+        self.assertIn("delta = 2", detail)
+        self.assertIn("target 20", detail)
+
+    def test_matching_carve_reconciles(self):
+        base = set()
+        head = {
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "a.s"),
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "b.s"),
+        }
+        sg.complete_tus = lambda ref, regions: base if ref else head
+        sg.new_source_files = lambda base, regions: {"src/overlay008/a.s", "src/overlay008/b.s"}
+        ok, detail, _ = sg.check_carve_reconciliation("BASE", ["eur"])
+        self.assertTrue(ok)
+        self.assertIn("new complete TUs = 2", detail)
+        self.assertIn("new src files = 2", detail)
+
+    def test_padded_delinks_fails_reconciliation(self):
+        base = set()
+        head = {
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "a.s"),
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "b.s"),
+        }
+        sg.complete_tus = lambda ref, regions: base if ref else head
+        sg.new_source_files = lambda base, regions: {"src/overlay008/a.s"}
+        ok, detail, _ = sg.check_carve_reconciliation("BASE", ["eur"])
+        self.assertFalse(ok)
+        self.assertIn("new complete TUs = 2", detail)
+        self.assertIn("new src files = 1", detail)
+
+
 class TestIntegrationRealMain(unittest.TestCase):
     """Clean committed HEAD must pass all checks at target 0 (no build)."""
 
