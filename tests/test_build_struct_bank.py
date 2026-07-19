@@ -12,6 +12,7 @@ during development -- see brief-609 doc).
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -20,8 +21,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 from build_struct_bank import (  # noqa: E402
     Access,
     aggregate,
+    mine_object_text,
     parse_symbol_accesses,
+    render_context_block,
     render_struct,
+    update_header,
 )
 
 SYM = "data_test_sym"
@@ -51,6 +55,14 @@ class TestPoolLoadAndBasicWidths(unittest.TestCase):
         self.assertEqual({a.mnemonic for a in accesses}, {"ldr", "str"})
         self.assertFalse(accesses[0].is_store)
         self.assertTrue(accesses[1].is_store)
+
+    def test_implicit_zero_offset_is_recognized(self):
+        text = fn("f", 0, (
+            "   0:\te59f0008 \tldr\tr0, [pc, #8]\t@ c <.L_pool>\n"
+            "   4:\te5901000 \tldr\tr1, [r0]\t@ 0\n"
+        ), 0xc)
+        accesses = parse_symbol_accesses(text, SYM)
+        self.assertEqual(accesses[0].offset, 0)
 
     def test_predicated_store_is_recognized(self):
         """streq must be attributed as a `str` access, not silently
@@ -272,6 +284,53 @@ class TestAggregateDisagreement(unittest.TestCase):
         self.assertIsNotNone(f.disagreement)
         self.assertIsNone(f.bitfield_width)
         self.assertEqual(f.c_type(), "int")
+
+
+class TestBatchAndContextEmission(unittest.TestCase):
+    def test_one_objdump_result_can_feed_multiple_symbols(self):
+        text = fn("f", 0, (
+            "   0:\te59f0008 \tldr\tr0, [pc, #8]\t@ c <.L_pool>\n"
+            "   4:\te5901010 \tldr\tr1, [r0, #16]\t@ 0x10\n"
+        ), 0xc)
+        result = mine_object_text(text, Path("sample.o"), [SYM, "data_other"])
+        self.assertEqual(result[SYM][0].offset, 16)
+        self.assertEqual(result["data_other"], [])
+
+    def test_context_block_preserves_real_build_declaration(self):
+        fields = aggregate([Access(offset=4, mnemonic="ldr", is_store=False)])
+        block = render_context_block(fields, "Demo", SYM, f"extern char {SYM}[];")
+        self.assertIn("#ifdef M2C_CONTEXT_BUILD", block)
+        self.assertIn(f"extern struct Demo {SYM};", block)
+        self.assertIn(f"#else\nextern char {SYM}[];\n#endif", block)
+
+    def test_render_omits_ambiguous_overlapping_field(self):
+        fields = aggregate([
+            Access(offset=0, mnemonic="ldr", is_store=False),
+            Access(offset=2, mnemonic="ldrh", is_store=False),
+        ])
+        block = render_struct(fields, "Demo", SYM)
+        self.assertIn("omitted overlapping field at +0x0", block)
+        self.assertIn("u16 f_2", block)
+        self.assertNotIn("int f_0;", block)
+
+    def test_header_update_wraps_only_plain_declarations(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            header = Path(tmp) / "core.h"
+            header.write_text(
+                "extern char data_ov002_022d0000[]; /* keep */\n"
+                "#ifdef M2C_CONTEXT_BUILD\n"
+                "extern struct Existing data_ov002_022d0004;\n"
+                "#else\n"
+                "extern char data_ov002_022d0004[];\n"
+                "#endif\n"
+            )
+            fields = aggregate([Access(offset=4, mnemonic="ldr", is_store=False)])
+            added = update_header(header, {"data_ov002_022d0000": fields,
+                                           "data_ov002_022d0004": fields})
+            text = header.read_text()
+            self.assertEqual(added, 1)
+            self.assertEqual(text.count("extern struct"), 2)
+            self.assertIn("#else\nextern char data_ov002_022d0000[]; /* keep */\n#endif", text)
 
     def test_bitfield_plus_store_is_not_a_disagreement(self):
         """A store at the same offset never carries bitfield info (there's
