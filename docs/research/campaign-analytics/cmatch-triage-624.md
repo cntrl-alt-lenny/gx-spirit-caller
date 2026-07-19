@@ -21,7 +21,7 @@ The documented cmatch-loop canary reproduced two current complete C matches at
 | ov012 | 16 | 0 | 16 | 0 | none |
 | ov009 | 17 | 0 | 17 | 0 | none |
 | ov007 | 10 | 0 | 10 | 0 | none |
-| ov019 | 25 | pending | pending | pending | pending |
+| ov019 | 25 | 0 | 25 | 0 | none |
 | ov003 | 18 | pending | pending | pending | pending |
 
 ## Method
