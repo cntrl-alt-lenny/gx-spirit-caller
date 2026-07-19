@@ -19,9 +19,16 @@ sys.path.insert(0, str(_TOOLS))
 import rename_symbol  # noqa: E402
 from rename_symbol import (  # noqa: E402
     IDENT_RE,
+    cascade_rename,
     find_symbol,
     rewrite_first_token,
 )
+
+
+def _write_symbols(path: Path, lines: list[str]) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n")
+    return path
 
 
 class TestIdentValidation(unittest.TestCase):
@@ -155,6 +162,92 @@ class TestFindSymbol(unittest.TestCase):
                 self.assertEqual(path.name, "symbols.txt")
             finally:
                 self._restore()
+
+
+class TestCascadeRename(unittest.TestCase):
+    def _make_tree(self, tmp: Path, files: dict[str, str]) -> Path:
+        root = tmp / "config-fake"
+        for rel, content in files.items():
+            path = root / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        return root
+
+    def _patch_config_root(self, fake_root: Path):
+        self._orig = rename_symbol.CONFIG
+        rename_symbol.CONFIG = fake_root
+
+    def _setup(self, root: Path) -> None:
+        self._old_root = rename_symbol.ROOT
+        self._old_config = rename_symbol.CONFIG
+        rename_symbol.ROOT = root
+        rename_symbol.CONFIG = root / "config"
+        self.addCleanup(self._restore)
+
+    def _restore(self) -> None:
+        if hasattr(self, "_old_root"):
+            rename_symbol.ROOT = self._old_root
+            rename_symbol.CONFIG = self._old_config
+        else:
+            rename_symbol.CONFIG = self._orig
+
+    def test_all_regions_update_symbols_content_and_filenames(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._setup(root)
+            for region, source_dir in (
+                ("eur", root / "src" / "main"),
+                ("usa", root / "src" / "usa" / "main"),
+                ("jpn", root / "src" / "jpn" / "main"),
+            ):
+                _write_symbols(
+                    root / "config" / region / "arm9" / "symbols.txt",
+                    ["func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c"],
+                )
+                source_dir.mkdir(parents=True, exist_ok=True)
+                (source_dir / "func_0200634c.c").write_text(
+                    "void func_0200634c(void) { func_0200634c(); }\n",
+                )
+                if region == "usa":
+                    (source_dir / "func_0200634c.s").write_text(".word 0\n")
+
+            messages = cascade_rename(
+                "func_0200634c", "Task_InvokeLockedIrq",
+            )
+
+            self.assertIn("3 symbol table(s)", messages[0])
+            for region, source_dir in (
+                ("eur", root / "src" / "main"),
+                ("usa", root / "src" / "usa" / "main"),
+                ("jpn", root / "src" / "jpn" / "main"),
+            ):
+                symbols = (root / "config" / region / "arm9" / "symbols.txt").read_text()
+                self.assertIn("Task_InvokeLockedIrq kind:function", symbols)
+                renamed = source_dir / "Task_InvokeLockedIrq.c"
+                self.assertTrue(renamed.exists())
+                self.assertNotIn("func_0200634c", renamed.read_text())
+            self.assertTrue((root / "src" / "usa" / "main" / "Task_InvokeLockedIrq.s").exists())
+
+    def test_cascade_is_atomic_on_region_collision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._setup(root)
+            _write_symbols(
+                root / "config" / "eur" / "arm9" / "symbols.txt",
+                ["func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c"],
+            )
+            _write_symbols(
+                root / "config" / "usa" / "arm9" / "symbols.txt",
+                ["func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c",
+                 "Taken kind:function(arm,size=0x4) addr:0x02001000"],
+            )
+            _write_symbols(
+                root / "config" / "jpn" / "arm9" / "symbols.txt",
+                ["func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c"],
+            )
+            with self.assertRaises(ValueError):
+                cascade_rename("func_0200634c", "Taken")
+            self.assertIn("func_0200634c", (root / "config" / "eur" / "arm9" / "symbols.txt").read_text())
 
     def test_not_found(self):
         with tempfile.TemporaryDirectory() as tmp:
