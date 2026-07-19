@@ -667,13 +667,13 @@ WINE REGISTRY Version 2
 "OpenWithIcon"="2905_wscript.0"
 "ProgID"="VBSFile"
 
-[Software\\Wine\\Fonts] 1784460342
-#time=1dd17715544becc
+[Software\\Wine\\Fonts] 1784483340
+#time=1dd17a6e15a0216
 "Codepages"="1252,437"
 "LogPixels"=dword:00000060
 
-[Software\\Wine\\Fonts\\External Fonts] 1784460342
-#time=1dd177155461a06
+[Software\\Wine\\Fonts\\External Fonts] 1784483340
+#time=1dd17a6e15b5ab2
 "@Apple SD Gothic Neo Regular (TrueType)"="Z:\\System\\Library\\Fonts\\AppleSDGothicNeo.ttc"
 "@Arial Unicode MS (TrueType)"="Z:\\System\\Library\\Fonts\\Supplemental\\Arial Unicode.ttf"
 "@Brush Script MT Italic (TrueType)"="Z:\\System\\Library\\Fonts\\Supplemental\\Brush Script.ttf"
