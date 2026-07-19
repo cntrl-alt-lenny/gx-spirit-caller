@@ -14,16 +14,21 @@ Usage:
     python tools/rename_symbol.py <old_name> <new_name>
     python tools/rename_symbol.py <old_name> <new_name> --version eur
     python tools/rename_symbol.py <old_name> <new_name> --dry
+    python tools/rename_symbol.py <old_name> <new_name> --cascade
 
 Safety checks:
-  - <old_name> must exist in exactly ONE symbols.txt under config/.
-    If it's not found or ambiguous, the tool refuses to edit anything.
+  - Without --cascade, <old_name> must exist in exactly ONE symbols.txt
+    under config/. If it's not found or ambiguous, the tool refuses to
+    edit anything.
+  - --cascade plans the rename independently for each selected region,
+    then updates matching source content and filenames atomically. With
+    no --version it covers EUR, USA, and JPN.
   - <new_name> must not already be used by any other symbol anywhere
     in config/ (collisions would break the linker / objdiff).
   - <new_name> must be a valid C identifier
     (`[A-Za-z_][A-Za-z0-9_]*`).
 
-What this tool does NOT touch:
+What this tool does NOT touch without --cascade:
   - relocs.txt / delinks.txt — they reference addresses, not names;
     no rewrite needed.
   - src/*.c — if you wrote a function definition using the old name,
@@ -91,9 +96,133 @@ def rewrite_first_token(path: Path, line_no: int, old: str, new: str) -> None:
     path.write_text("".join(lines))
 
 
+REGIONS = ("eur", "usa", "jpn")
+SOURCE_SUFFIXES = {".c", ".s", ".h"}
+
+
+def _source_files(region: str) -> list[Path]:
+    """Return source files visible to one region's compilation."""
+    paths: list[Path] = []
+    src_root = ROOT / "src"
+    if src_root.is_dir():
+        for path in src_root.rglob("*"):
+            if not path.is_file() or path.suffix not in SOURCE_SUFFIXES:
+                continue
+            relative = path.relative_to(src_root)
+            first = relative.parts[0] if relative.parts else ""
+            if first in ("usa", "jpn") and first != region:
+                continue
+            paths.append(path)
+    for shared_root in (ROOT / "libs", ROOT / "include"):
+        if shared_root.is_dir():
+            paths.extend(
+                path for path in shared_root.rglob("*")
+                if path.is_file() and path.suffix in SOURCE_SUFFIXES
+            )
+    return sorted(set(paths))
+
+
+def _replace_symbol(path: Path, old: str, new: str) -> bool:
+    """Replace identifier references in a source file, preserving bytes otherwise."""
+    pattern = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(old)}(?![A-Za-z0-9_])")
+    content = path.read_text()
+    replaced = pattern.sub(new, content)
+    if replaced == content:
+        return False
+    path.write_text(replaced)
+    return True
+
+
+def _cascade_plan(
+    old: str, new: str, version_filter: str | None,
+) -> tuple[list[tuple[Path, int]], list[tuple[Path, Path]], list[Path]]:
+    """Validate and return symbol edits, source renames, and source edits."""
+    regions = (version_filter,) if version_filter else REGIONS
+    symbol_edits: list[tuple[Path, int]] = []
+    source_renames: list[tuple[Path, Path]] = []
+    source_edits: list[Path] = []
+    found_old = False
+
+    for region in regions:
+        old_hits = find_symbol(old, region)
+        new_hits = find_symbol(new, region)
+        if len(old_hits) > 1:
+            locations = ", ".join(f"{p.relative_to(ROOT)}:{line}" for p, line in old_hits)
+            raise ValueError(f"symbol '{old}' is ambiguous in {region}: {locations}")
+        if old_hits:
+            found_old = True
+            if new_hits:
+                locations = ", ".join(f"{p.relative_to(ROOT)}:{line}" for p, line in new_hits)
+                raise ValueError(
+                    f"target name '{new}' already in use in {region}: {locations}"
+                )
+            symbol_edits.append(old_hits[0])
+
+        for path in _source_files(region):
+            has_content = old in path.read_text()
+            has_filename = path.name.startswith(old + ".")
+            if not has_content and not has_filename:
+                continue
+            if has_content:
+                source_edits.append(path)
+            if has_filename:
+                destination = path.with_name(new + path.name[len(old):])
+                if destination.exists() and destination != path:
+                    raise ValueError(
+                        f"cascade filename collision: {destination.relative_to(ROOT)}"
+                    )
+                source_renames.append((path, destination))
+
+    if not found_old:
+        raise ValueError(f"symbol '{old}' not found in selected region(s)")
+
+    # A source file can be visible to multiple selected regions; edit it once.
+    source_edits = list(dict.fromkeys(source_edits))
+    source_renames = list(dict.fromkeys(source_renames))
+    return symbol_edits, source_renames, source_edits
+
+
+def cascade_rename(
+    old: str, new: str, version_filter: str | None = None, dry: bool = False,
+) -> list[str]:
+    """Apply a validated symbol + source cascade, or return its dry plan."""
+    symbol_edits, source_renames, source_edits = _cascade_plan(
+        old, new, version_filter,
+    )
+    if dry:
+        return [
+            f"[dry] symbols={len(symbol_edits)} source_files={len(source_edits)} "
+            f"filenames={len(source_renames)}"
+        ]
+
+    for path, line_no in symbol_edits:
+        rewrite_first_token(path, line_no, old, new)
+    for path in source_edits:
+        _replace_symbol(path, old, new)
+    for source, destination in source_renames:
+        source.rename(destination)
+    return [
+        f"Renamed '{old}' -> '{new}' with cascade: "
+        f"{len(symbol_edits)} symbol table(s), {len(source_edits)} source file(s), "
+        f"{len(source_renames)} filename(s)"
+    ]
+
+
+def cascade_main(
+    old: str, new: str, version_filter: str | None, dry: bool,
+) -> int:
+    try:
+        for message in cascade_rename(old, new, version_filter, dry):
+            print(message)
+        return 0
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Rename one symbol in dsd's config/**/symbols.txt"
+        description="Rename one symbol in dsd config and optionally its source cascade"
     )
     ap.add_argument("old_name", help="Current symbol name, e.g. func_020abcde")
     ap.add_argument("new_name", help="Target symbol name, e.g. Duel_DrawCard")
@@ -105,6 +234,11 @@ def main() -> int:
         "--dry",
         action="store_true",
         help="Show the planned edit without writing",
+    )
+    ap.add_argument(
+        "--cascade",
+        action="store_true",
+        help="Also rename matching source content and func_ADDR filenames",
     )
     args = ap.parse_args()
 
@@ -119,6 +253,9 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+
+    if args.cascade:
+        return cascade_main(args.old_name, args.new_name, args.version, args.dry)
 
     old_hits = find_symbol(args.old_name, args.version)
     if len(old_hits) == 0:
