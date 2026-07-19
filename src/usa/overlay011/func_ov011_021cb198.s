@@ -9,7 +9,7 @@
         .extern func_0201d428
         .extern func_0201e564
         .extern func_0208c7e4
-        .extern func_ov011_021cc884
+        .extern Bg_SetScroll
         .global func_ov011_021cb198
         .arm
 func_ov011_021cb198:
@@ -96,7 +96,7 @@ func_ov011_021cb198:
     mov r2, #0x0
     bl func_0208c7e4
 .L_144:
-    bl func_ov011_021cc884
+    bl Bg_SetScroll
     add sp, sp, #0x28
     ldmia sp!, {r3, r4, r5, pc}
 _LIT0: .word data_ov011_021d3f20

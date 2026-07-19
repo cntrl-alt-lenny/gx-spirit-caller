@@ -77,7 +77,7 @@ src/usa/overlay012/func_ov012_021cbdd4.c:
     complete
     .text start:0x021cbdd4 end:0x021cbe94
 
-src/usa/overlay012/func_ov012_021cbe94.c:
+src/usa/overlay012/Ov012_BeginIntroTransition.c:
     complete
     .text start:0x021cbe94 end:0x021cbf3c
 

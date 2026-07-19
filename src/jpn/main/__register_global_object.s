@@ -1,12 +1,12 @@
-; func_020b4200 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; __register_global_object — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
         .extern data_021aa3a0
-        .global func_020b4200
+        .global __register_global_object
         .arm
-func_020b4200:
+__register_global_object:
     ldr r3, _LIT0
     ldr ip, [r3]
     str ip, [r2]

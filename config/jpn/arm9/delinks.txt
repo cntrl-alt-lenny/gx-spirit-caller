@@ -414,7 +414,7 @@ src/jpn/main/func_02006318.c:
     complete
     .text start:0x02006318 end:0x0200634c
 
-src/jpn/main/func_0200634c.c:
+src/jpn/main/Task_InvokeLockedIrq.c:
     complete
     .text start:0x0200634c end:0x02006378
 
@@ -1004,7 +1004,7 @@ src/jpn/main/func_0200f838.s:
 src/jpn/main/func_0200fa74.s:
     complete
     .text start:0x0200fa74 end:0x0200fadc
-src/jpn/main/func_0200fadc.c:
+src/jpn/main/List_Unlink.c:
 
     complete
 
@@ -1470,7 +1470,7 @@ src/jpn/main/func_02018e54.s:
 src/jpn/main/func_02018e98.s:
     complete
     .text start:0x02018e98 end:0x02018ef8
-src/jpn/main/func_02018ef8.c:
+src/jpn/main/SysWork_GetPointDistance.c:
     complete
     .text start:0x02018ef8 end:0x02018f4c
 
@@ -2528,7 +2528,7 @@ src/jpn/main/func_020223dc.s:
 src/jpn/main/func_0202246c.s:
     complete
     .text start:0x0202246c end:0x020224b8
-src/jpn/main/func_020224b8.c:
+src/jpn/main/Rand_Next.c:
     complete
     .text start:0x020224b8 end:0x020224ec
 
@@ -10773,7 +10773,7 @@ src/jpn/main/OSi_IrqHandlerDma1.c:
 src/jpn/main/OSi_IrqHandlerDma0.c:
     complete
     .text start:0x020903dc end:0x020903ec
-src/jpn/main/func_020903ec.s:
+src/jpn/main/OSi_PostIrqEvent.s:
     complete
     .text start:0x020903ec end:0x02090488
 src/jpn/main/OS_DefaultIrqHandler.s:
@@ -13296,7 +13296,7 @@ src/jpn/main/func_020b4188.s:
 src/jpn/main/func_020b4190.s:
     complete
     .text start:0x020b4190 end:0x020b41bc
-src/jpn/main/func_020b4200.s:
+src/jpn/main/__register_global_object.s:
     complete
     .text start:0x020b4200 end:0x020b4220
 src/jpn/main/func_020b4220.c:

@@ -1,4 +1,4 @@
-/* func_ov012_021cbe94: choose the opening transition for the overlay and rebuild
+/* Ov012_BeginIntroTransition: choose the opening transition for the overlay and rebuild
  * its graphics. Clears the pending mode/param (data_02103fcc[0x3c]/[0x40]); if a
  * forced-intro is queued (func_ov000_021ac680) uses mode 5/param 2, else — unless
  * a load is still busy (func_02018b14) — derives the param from the saved slot's
@@ -15,7 +15,7 @@ extern char data_ov012_021cc5fc[];
 struct ov012_nib4 {
     unsigned f : 4;
 };
-int func_ov012_021cbe94(void) {
+int Ov012_BeginIntroTransition(void) {
     char *d = data_ov012_021cc5fc;
     *(int *)(data_02103fcc + 0x3c) = 0;
     *(int *)(data_02103fcc + 0x40) = 0;

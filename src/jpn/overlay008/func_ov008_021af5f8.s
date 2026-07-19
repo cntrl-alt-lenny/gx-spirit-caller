@@ -8,7 +8,7 @@
         .extern func_020221e0
         .extern func_0202bacc
         .extern func_020b377c
-        .extern func_ov008_021aa42c
+        .extern Ov008_Rand
         .extern func_ov008_021aecd8
         .extern func_ov008_021af3a0
         .extern func_ov008_021af464
@@ -109,7 +109,7 @@ func_ov008_021af5f8:
 .L_160:
     cmp r4, #0x0
     beq .L_188
-    bl func_ov008_021aa42c
+    bl Ov008_Rand
     mov r1, sl
     bl func_020b377c
     add r2, sp, #0x1c
@@ -118,7 +118,7 @@ func_ov008_021af5f8:
     strh r1, [r9, r0]
     b .L_2f0
 .L_188:
-    bl func_ov008_021aa42c
+    bl Ov008_Rand
     mov r1, r7
     bl func_020b377c
     add r2, sp, #0x10c
@@ -174,7 +174,7 @@ func_ov008_021af5f8:
 .L_24c:
     cmp r4, #0x0
     beq .L_274
-    bl func_ov008_021aa42c
+    bl Ov008_Rand
     mov r1, sl
     bl func_020b377c
     add r2, sp, #0x1c
@@ -186,7 +186,7 @@ func_ov008_021af5f8:
     mov r4, r8, lsl #0x1
     add fp, sp, #0x10c
 .L_27c:
-    bl func_ov008_021aa42c
+    bl Ov008_Rand
     mov r1, r7
     bl func_020b377c
     ldr r0, [fp, r1, lsl #0x2]

@@ -20,7 +20,7 @@ func_ov012_021cb240 kind:function(arm,size=0xe0) addr:0x021cb240
 func_ov012_021cb320 kind:function(arm,size=0x9c) addr:0x021cb320
 func_ov012_021cb3bc kind:function(arm,size=0xa18) addr:0x021cb3bc
 func_ov012_021cbdd4 kind:function(arm,size=0xc0) addr:0x021cbdd4
-func_ov012_021cbe94 kind:function(arm,size=0xa8) addr:0x021cbe94
+Ov012_BeginIntroTransition kind:function(arm,size=0xa8) addr:0x021cbe94
 func_ov012_021cbf3c kind:function(arm,size=0x50) addr:0x021cbf3c
 data_ov012_021cbf8c kind:data(any) addr:0x021cbf8c
 data_ov012_021cbf98 kind:data(any) addr:0x021cbf98

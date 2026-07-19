@@ -1,4 +1,4 @@
-; func_020903ec — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; OSi_PostIrqEvent — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
@@ -9,9 +9,9 @@
         .extern data_021a627c
         .extern data_027e0000
         .extern func_020904f4
-        .global func_020903ec
+        .global OSi_PostIrqEvent
         .arm
-func_020903ec:
+OSi_PostIrqEvent:
     stmdb sp!, {r4, r5, lr}
     sub sp, sp, #0x4
     mov r1, #0xc

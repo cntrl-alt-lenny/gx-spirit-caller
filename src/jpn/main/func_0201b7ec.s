@@ -9,7 +9,7 @@
         .extern func_020189f8
         .extern func_02018d64
         .extern func_02018d98
-        .extern func_02018ef8
+        .extern SysWork_GetPointDistance
         .extern func_02018f4c
         .extern func_02018f5c
         .extern func_02019150
@@ -53,7 +53,7 @@ func_0201b7ec:
 .L_58:
     mov r0, #0x0
     bl func_02019150
-    bl func_02018ef8
+    bl SysWork_GetPointDistance
     b .L_368
 .L_68:
     cmp r6, #0x2f
