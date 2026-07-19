@@ -336,6 +336,98 @@ def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
     return out
 
 
+# --------------------------------------------------------------------------- #
+# Honest metric: tractable-C ceiling, attainment, done-class (brief 615 /
+# r7-14, r7-15, r7-16)
+# --------------------------------------------------------------------------- #
+#
+# Headline byte-% has always been sold as the progress number, but the
+# ceiling for READABLE C was never 100% of bytes — a `.s` ship byte-matches
+# without ever becoming C, and two modules carry known, named reasons their
+# remaining bytes will likely never convert. This section makes that
+# ceiling a first-class, per-module estimate instead of an unstated
+# assumption, so `attainment = C / ceiling` (not `C / total_bytes`) can be
+# the honest rate-of-progress number (r7-13's "north-star").
+#
+# TIER 1 -- ASYMPTOTIC. Hard-coded set, not derived: {main, ov002}. This
+# is a direct, repeated, "confirmed" (not merely "plausible") finding of
+# the r7 swarm (rnd-swarm-r7-verified.md r7-14/r7-15) -- verified here by
+# recomputing the denominator share independently rather than trusting the
+# prose: as of this brief, main + ov002's `.text`-only totals are 738,080
+# + 1,129,252 = 1,867,332 B of EUR's 2,385,948 B region-wide `.text`
+# total -- 78.3%, matching r7-14's cited "78% of the denominator" exactly.
+# Two DIFFERENT reasons collapse into one tier: main's residual is
+# reg-alloc-wall-bound code (`docs/research/codegen-walls.md`'s C-/P-/W-
+# classes, none of which have a known source-form fix); ov002's is a
+# project-level PRIORITY decision, not a technical wall -- it is already
+# byte-complete (100% code%, see the delinks.txt tier), and the ongoing
+# c-match campaign deliberately converts it .s-to-C selectively
+# (HIGH/MED tiers, containment-gated) rather than exhaustively, because
+# at 1.1 MB it is by far the largest single module. Both reasons argue
+# for the SAME operational answer: assume most, not all, of the
+# remaining non-C bytes stay non-C.
+#
+# TIER 2 -- FINISHABLE. Every other module. r7-15 further narrows this to
+# a curated "14 finishable modules (~92 kB .s)" subset via its own deeper
+# per-module wall census (that census's raw data -- workflow journal
+# `wf_05209332-366` -- isn't available to this brief, and isn't
+# reproducible from committed data alone). This implementation uses the
+# broader, simpler "every non-asymptotic module" definition instead --
+# documented here as a KNOWN divergence, not a silent one: it is a
+# coarser, more optimistic approximation than r7-15's curated subset (see
+# docs/research/brief-615-honest-metric.md for the measured aggregate
+# ceiling this produces and how it compares to r7-14's stated 14-24%
+# band).
+#
+# Ceiling formula (both tiers, same shape): current C stays current;
+# the REMAINING non-C bytes (c_total - c_bytes) convert at a fixed,
+# named, per-tier headroom fraction. This -- not a flat percentage of
+# c_total -- guarantees ceiling >= c_bytes always, so attainment can
+# never read above 100% by construction, including for modules already
+# well into their remaining headroom.
+ASYMPTOTIC_MODULES = frozenset({"main", "ov002"})
+
+# 10%: a deliberately small but nonzero fraction. Zero would make
+# attainment tautologically 100% for these two modules forever (ceiling
+# == current by definition) -- unfalsifiable and uninformative. 10%
+# reflects that SOME further conversion keeps landing even here (e.g.
+# brief 609's ov002 struct-bank work), just far slower than elsewhere.
+ASYMPTOTIC_HEADROOM_FRACTION = 0.10
+
+# 75%: most of a finishable module's remaining non-C bytes are assumed
+# reachable, netting out ~25% for the permanent ISA-instruction floor
+# named in docs/research/campaign-analytics/endgame-ledger.md (mcr/mrc/
+# swi/msr/mrs-carrying .s, ~42 EUR / 26 USA / 26 JPN files project-wide
+# -- genuinely inexpressible in C) plus per-module walls this simpler
+# model doesn't individually census.
+FINISHABLE_HEADROOM_FRACTION = 0.75
+
+
+def done_class(module: str) -> str:
+    """'asymptotic' (ASYMPTOTIC_MODULES) or 'finishable' (everything
+    else) -- r7-15's module-tier "meaningfully done" classification."""
+    return "asymptotic" if module in ASYMPTOTIC_MODULES else "finishable"
+
+
+def tractable_ceiling_bytes(module: str, c_bytes: int, c_total: int) -> int:
+    """Estimated realistic ceiling for readable-C bytes in `module`, given
+    its current `c_bytes` / `.text`-only `c_total` (brief 615). Not a
+    measurement -- see the module docstring above for the tier
+    assumptions this rests on.
+
+    `c_bytes <= ceiling <= c_total` always (headroom fractions are
+    clamped to [0, 1] and applied to the non-negative remainder), so a
+    caller computing `c_bytes / ceiling` can never see attainment > 100%.
+    """
+    if c_total <= 0:
+        return 0
+    frac = (ASYMPTOTIC_HEADROOM_FRACTION if module in ASYMPTOTIC_MODULES
+            else FINISHABLE_HEADROOM_FRACTION)
+    frac = max(0.0, min(1.0, frac))
+    remaining = max(0, c_total - c_bytes)
+    return c_bytes + round(frac * remaining)
+
+
 def summarize_by_module(config_dir: Path) -> list[dict]:
     """Per-module code% (`matched_code`/`total_code`, `CODE_SECTIONS`)
     AND C% (`.text`-only, `.c`/`.cpp`-sourced `complete` TUs over
@@ -350,13 +442,23 @@ def summarize_by_module(config_dir: Path) -> list[dict]:
     at 6.58% combined C, capping the *headline* number at 26.89% even if
     every OTHER module hit 100% C — invisible without this breakdown.
 
+    Brief 615 (r7-16) adds three honest-metric columns on top of the
+    same byte data: `tractable_ceiling` (a tiered, wall-enriched
+    estimate — see `tractable_ceiling_bytes()`), `attainment` (`c_bytes`
+    / `tractable_ceiling`, `None` if the ceiling is 0 — undefined, not
+    zero, matching e.g. `dtcm`'s 0/0), and `done_class` ("asymptotic" /
+    "finishable", `done_class()`).
+
     Returns one dict per module, in discovery order (main, itcm, dtcm,
     ov000..ovNNN):
         {"module": str, "matched_code": int, "total_code": int,
-         "c_bytes": int, "c_total": int}
+         "c_bytes": int, "c_total": int, "tractable_ceiling": int,
+         "attainment": float | None, "done_class": str}
     Raw byte counts, not percentages — callers compute the ratio (JSON
     payloads should carry the same values report.json's `measures` do,
-    not a lossy pre-divided float).
+    not a lossy pre-divided float). `attainment` is the one exception
+    (already a ratio, not a byte count) since it is undefined rather
+    than a lossy re-derivable fraction when `tractable_ceiling` is 0.
     """
     rows: list[dict] = []
     for module, delinks in _discover_module_delinks(config_dir):
@@ -384,10 +486,14 @@ def summarize_by_module(config_dir: Path) -> list[dict]:
                     source.endswith(".c") or source.endswith(".cpp")):
                     c_bytes += size
 
+        ceiling = tractable_ceiling_bytes(module, c_bytes, c_total)
         rows.append({
             "module": module,
             "matched_code": matched_code, "total_code": total_code,
             "c_bytes": c_bytes, "c_total": c_total,
+            "tractable_ceiling": ceiling,
+            "attainment": (c_bytes / ceiling) if ceiling else None,
+            "done_class": done_class(module),
         })
     return rows
 
@@ -396,25 +502,109 @@ def print_by_module(version: str, rows: list[dict]) -> None:
     def pct(num: int, den: int) -> float:
         return (num / den * 100.0) if den else 0.0
 
-    print(f"Yu-Gi-Oh! GX Spirit Caller ({version}) — per-module code% / C%")
+    def attainment_str(row: dict) -> str:
+        return f"{row['attainment'] * 100.0:6.2f}%" if row["attainment"] is not None else "    n/a"
+
+    print(f"Yu-Gi-Oh! GX Spirit Caller ({version}) — per-module code% / C% "
+          "/ honest metric (brief 615)")
     print()
     hdr = (f"  {'module':<8} {'code %':>7}  {'matched/total code (B)':>24}  "
-           f"{'C %':>7}  {'C / .text-total (B)':>22}")
+           f"{'C %':>7}  {'C / .text-total (B)':>22}  "
+           f"{'ceiling %':>9}  {'attainment':>10}  {'class':<11}")
     print(hdr)
     print("  " + "-" * (len(hdr) - 2))
-    tot_matched = tot_total = tot_c = tot_ctotal = 0
+    tot_matched = tot_total = tot_c = tot_ctotal = tot_ceiling = 0
     for row in rows:
         code_frac = f"{row['matched_code']}/{row['total_code']}"
         c_frac = f"{row['c_bytes']}/{row['c_total']}"
         print(f"  {row['module']:<8} {pct(row['matched_code'], row['total_code']):6.2f}%  "
-              f"{code_frac:>24}  {pct(row['c_bytes'], row['c_total']):6.2f}%  {c_frac:>22}")
+              f"{code_frac:>24}  {pct(row['c_bytes'], row['c_total']):6.2f}%  {c_frac:>22}  "
+              f"{pct(row['tractable_ceiling'], row['c_total']):8.2f}%  "
+              f"{attainment_str(row):>10}  {row['done_class']:<11}")
         tot_matched += row["matched_code"]; tot_total += row["total_code"]
         tot_c += row["c_bytes"]; tot_ctotal += row["c_total"]
+        tot_ceiling += row["tractable_ceiling"]
     print("  " + "-" * (len(hdr) - 2))
     tot_code_frac = f"{tot_matched}/{tot_total}"
     tot_c_frac = f"{tot_c}/{tot_ctotal}"
+    tot_attainment = f"{tot_c / tot_ceiling * 100.0:6.2f}%" if tot_ceiling else "    n/a"
     print(f"  {'TOTAL':<8} {pct(tot_matched, tot_total):6.2f}%  "
-          f"{tot_code_frac:>24}  {pct(tot_c, tot_ctotal):6.2f}%  {tot_c_frac:>22}")
+          f"{tot_code_frac:>24}  {pct(tot_c, tot_ctotal):6.2f}%  {tot_c_frac:>22}  "
+          f"{pct(tot_ceiling, tot_ctotal):8.2f}%  {tot_attainment:>10}  {'':<11}")
+    print()
+    print(f"  tractable-C ceiling: {tot_ceiling} / {tot_ctotal} bytes "
+          f"({pct(tot_ceiling, tot_ctotal):.2f}% of .text-total) -- an ESTIMATE, "
+          "not a measurement (see tractable_ceiling_bytes() for the tier "
+          "assumptions); c.f. r7-14's independently-derived 14-24% band.")
+
+
+# --------------------------------------------------------------------------- #
+# CANARY: reconcile the by-module gap against the endgame ledger (brief 615)
+# --------------------------------------------------------------------------- #
+#
+# docs/research/campaign-analytics/endgame-ledger.md (brief 583) is an
+# independently-derived byte ledger: ov004's 3-region gap is 36.2% of the
+# 3-region total (20,110 / 55,540 B at its 2026-07-16 snapshot, commit
+# a9c4772d). It uses the SAME parse_delinks_file + CODE_SECTIONS method
+# this module already implements (summarize_by_module's matched_code /
+# total_code), so the two should reconcile near-exactly -- if they don't,
+# either this file's byte accounting or the ledger's has drifted from
+# reality, and the new honest-metric columns (built on this same data)
+# would be silently wrong too. This function is the mandatory check for
+# that, not merely a nice-to-have cross-reference.
+
+
+def three_region_module_gaps(root: Path, regions: tuple[str, ...] = ("eur", "usa", "jpn")) -> dict[str, int]:
+    """{module: 3-region-summed (total_code - matched_code)}, via the same
+    `summarize_by_module` this file already uses for its per-region
+    dashboard -- i.e. the SAME method (`parse_delinks_file` +
+    `CODE_SECTIONS`) `docs/research/campaign-analytics/endgame-ledger.md`
+    (brief 583) independently used, just called once per region and
+    summed here instead of walked directly. Build-free."""
+    gaps: dict[str, int] = {}
+    for region in regions:
+        for row in summarize_by_module(root / "config" / region):
+            gaps[row["module"]] = gaps.get(row["module"], 0) + (row["total_code"] - row["matched_code"])
+    return gaps
+
+
+def canary_reconciliation(gaps: dict[str, int], module: str = "ov004",
+                           expected_pct: float = 36.2, tolerance_pct: float = 1.0) -> dict:
+    """Pure comparison: does `module`'s share of `gaps` fall within
+    `tolerance_pct` percentage points of `expected_pct`? `gaps` is
+    whatever `three_region_module_gaps()` (live) or a test fixture
+    (pinned) produces -- kept separate from that I/O so the tolerance
+    check itself is unit-testable without a real config/ tree.
+
+    Returns {"module", "module_gap", "total_gap", "actual_pct",
+    "expected_pct", "tolerance_pct", "delta_pct", "ok"}. `ok` is False
+    (not an exception) on mismatch -- callers decide whether that's a
+    hard stop (the CLI does) or just a warning to log.
+    """
+    total_gap = sum(gaps.values())
+    module_gap = gaps.get(module, 0)
+    actual_pct = (module_gap / total_gap * 100.0) if total_gap else 0.0
+    delta = actual_pct - expected_pct
+    return {
+        "module": module, "module_gap": module_gap, "total_gap": total_gap,
+        "actual_pct": actual_pct, "expected_pct": expected_pct,
+        "tolerance_pct": tolerance_pct, "delta_pct": delta,
+        "ok": abs(delta) <= tolerance_pct,
+    }
+
+
+def print_canary(result: dict) -> None:
+    status = "OK" if result["ok"] else "MISMATCH"
+    print(f"CANARY [{status}]: {result['module']} = {result['module_gap']} / "
+          f"{result['total_gap']} B = {result['actual_pct']:.2f}% of the "
+          f"3-region gap (ledger: {result['expected_pct']:.1f}%, "
+          f"tolerance +/-{result['tolerance_pct']:.1f}pp, "
+          f"delta {result['delta_pct']:+.2f}pp)")
+    if not result["ok"]:
+        print("  STOP: denominator does not reconcile with the endgame "
+              "ledger (brief 583) within tolerance -- the honest-metric "
+              "columns below rest on this same data and should not be "
+              "trusted until this is root-caused.", file=sys.stderr)
 
 
 def print_stub(version: str, total: int) -> None:
@@ -483,11 +673,28 @@ def main() -> int:
     ap.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
     ap.add_argument("--by-module", action="store_true",
                     help="Per-module code%% AND C%% table (build-free, "
-                         "delinks.txt tier only — brief 587)")
+                         "delinks.txt tier only — brief 587), plus the "
+                         "tractable-ceiling/attainment/done-class honest-"
+                         "metric columns (brief 615)")
+    ap.add_argument("--canary", action="store_true",
+                    help="Reconcile the 3-region per-module gap against "
+                         "the endgame ledger's ov004=36.2%% anchor "
+                         "(brief 583/615); ignores --version, exits 1 "
+                         "on mismatch")
     args = ap.parse_args()
 
     report_path = ROOT / "build" / args.version / "report.json"
     config_dir  = ROOT / "config" / args.version
+
+    if args.canary:
+        gaps = three_region_module_gaps(ROOT)
+        result = canary_reconciliation(gaps)
+        if args.json:
+            json.dump(result, sys.stdout, indent=2)
+            print()
+        else:
+            print_canary(result)
+        return 0 if result["ok"] else 1
 
     if args.by_module:
         rows = summarize_by_module(config_dir)
