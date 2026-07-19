@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**104 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**105 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (35)
+- [Uncategorised](#uncategorised) (36)
 
 ## Analysis / worklist
 
@@ -618,6 +618,12 @@ The multi-agent convention (AGENTS.md § Worktree convention) spins up a new num
 **the ONE shared source of truth for the mwcc**
 
 routing-tier filename suffixes (brief 587, closing the brief-569 / improvement-swarm-r5-item-7 "suffix-strip" bug family).
+
+### `tools/scope_gate.py`
+
+**a pre-merge COMPLETENESS + rename-safety gate (R&D r9, §4).**
+
+`gate3.py` (3-region sha1) is the correctness arbiter, but it is **scope-blind**: a thin PR that renames 40 of 150 targets, or does EUR and skips USA/JPN, passes byte-identically. And a *rename* can be byte-neutral in one region yet brea…
 
 ### `tools/sig_census.py`
 
