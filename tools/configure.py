@@ -19,6 +19,7 @@ import argparse
 import hashlib
 import os
 import re
+import shlex
 import sys
 from pathlib import Path
 
@@ -222,10 +223,22 @@ EXE = platform.exe
 # for either `wine` (wine-stable cask) or `wine64` (game-porting-toolkit cask).
 if platform.system == "windows":
     WINE = ""
+    WINE_ENV = ""
 elif platform.system == "macos":
     WINE = args.wine if args.wine is not None else _resolve_macos_wine()
+    # Brief 608 (docs/research/brief-608-wineprefix-spike.md): every lane
+    # sharing the default `~/.wine` serialises on ONE wineserver, even
+    # across worktrees -- transform_dep.py already reads WINEPREFIX from
+    # the environment (falling back to ~/.wine), set by nobody. Defaulting
+    # it per-worktree instead gives each lane its own wineserver ->
+    # concurrent compiles (measured ~3.66x aggregate at 4 lanes, 0
+    # deadlocks). An explicit WINEPREFIX in the environment still wins,
+    # matching transform_dep.py's own resolution order.
+    WINEPREFIX = os.environ.get("WINEPREFIX") or str((root_path / ".wine-lane").resolve())
+    WINE_ENV = f'WINEPREFIX="{WINEPREFIX}" '
 else:
     WINE = args.wine if args.wine is not None else DEFAULT_WIBO_PATH
+    WINE_ENV = ""  # wibo has no wineserver/prefix concept
 DSD = str(args.dsd or os.path.join('.', str(root_path / f"dsd{EXE}")))
 OBJDIFF = os.path.join('.', str(root_path / f"objdiff-cli{EXE}"))
 CC = os.path.join('.', str(mwcc_path / "mwccarm.exe"))
@@ -473,11 +486,15 @@ def main():
         )
         n.newline()
 
-        mwcc_cmd = f'{WINE} "{CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_cmd = f'{WINE_ENV}{WINE} "{CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_implicit = [CC]
         if platform.system != "windows":
             transform_dep = "tools/transform_dep.py"
-            mwcc_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            # WINE_ENV also prefixes this call: `VAR=val cmd1 && cmd2` only
+            # scopes VAR to cmd1 in POSIX shell, but transform_dep.py reads
+            # WINEPREFIX itself to translate the .d file mwcc just wrote --
+            # it must resolve to the SAME prefix the compile just used.
+            mwcc_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
             mwcc_implicit.append(transform_dep)
         n.rule(
             name="mwcc",
@@ -492,10 +509,10 @@ def main():
         # `*.legacy.c` suffix (`is_legacy_c()`) compile through this
         # rule. See docs/research/style-a-epilogue.md for the
         # mwcc-version sweep that motivated the routing.
-        mwcc_legacy_cmd = f'{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_cmd = f'{WINE_ENV}{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_legacy_implicit = [LEGACY_CC]
         if platform.system != "windows":
-            mwcc_legacy_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_legacy_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
             mwcc_legacy_implicit.append(transform_dep)
         n.rule(
             name="mwcc_legacy",
@@ -513,10 +530,10 @@ def main():
         # docs/research/sp3-routing-decision.md (brief 044) for the
         # 3-tier discriminator and the candidate count that
         # justified shipping this third tier.
-        mwcc_legacy_sp3_cmd = f'{WINE} "{LEGACY_SP3_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_sp3_cmd = f'{WINE_ENV}{WINE} "{LEGACY_SP3_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_legacy_sp3_implicit = [LEGACY_SP3_CC]
         if platform.system != "windows":
-            mwcc_legacy_sp3_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_legacy_sp3_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
             mwcc_legacy_sp3_implicit.append(transform_dep)
         n.rule(
             name="mwcc_legacy_sp3",
@@ -536,10 +553,10 @@ def main():
         # and the same `transform_dep` tail as the other tiers; only
         # the binary path differs. Source files carry `#pragma thumb
         # on`. See THUMB_C_SUFFIX above + docs/research/brief-393-*.md.
-        mwcc_thumb_cmd = f'{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_thumb_cmd = f'{WINE_ENV}{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_thumb_implicit = [LEGACY_CC]
         if platform.system != "windows":
-            mwcc_thumb_cmd += f" && {PYTHON} {transform_dep} $basefile.d $basefile.d"
+            mwcc_thumb_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
             mwcc_thumb_implicit.append(transform_dep)
         n.rule(
             name="mwcc_thumb",
@@ -582,7 +599,7 @@ def main():
             f"--delinks {d}" for d in project.delinks_files
         )
         mwasm_cmd = _wrap_chain_for_windows(
-            f'{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
+            f'{WINE_ENV}{WINE} "{ASM}" {ASM_FLAGS} $asm_flags -o $out $in'
             f' && {PYTHON} {patch_align} --trim-padding $out'
             f' {delinks_args} --source-path $in'
         )
@@ -676,21 +693,38 @@ def main():
         # claim (`docs/research/ov004-odd-aligned-layout-cascade.md`).
         # Falls back to the brief 134/142/146/164/168 splice path
         # when the map shows no cascade.
+        mwld_chain = (
+            f'{WINE_ENV}{WINE} "{LD}" {LD_FLAGS} @$objects_file '
+            f'$lcf_file -o $out'
+            f' && {PYTHON} {patch_ov004}'
+            f' --binary $ov004_bin'
+            f' --relocs $ov004_relocs'
+            f' --delinks $ov004_delinks'
+            f' --map $arm9_map'
+            f' && {PYTHON} {patch_literals}'
+            f' --binary $main_bin'
+            f' --relocs $main_relocs'
+            f' --base-va 0x02000000'
+        )
+        # Brief 608/614: per-worktree WINEPREFIX lets compiles run fully
+        # concurrent (no shared wineserver to fight over), but the link
+        # itself stays serialised machine-wide -- brief 608 only measured
+        # 2-way link concurrency with no compile load alongside it, so the
+        # untested cases (3-4 way, link-during-compile) default to caution
+        # rather than an untested guess. `wine_link_lock.py` takes a
+        # cross-process flock (same lock file batch_carve.py's old
+        # gate-lock used, for compatibility with any not-yet-updated
+        # worktree still running the previous locking scheme) around ONLY
+        # this rule -- compiles above are never gated by it. No-op on
+        # Windows: mwldarm runs natively there, no wineserver/Rosetta
+        # contention to serialise against.
+        if platform.system != "windows":
+            mwld_chain = (
+                f"{PYTHON} tools/wine_link_lock.py sh -c {shlex.quote(mwld_chain)}"
+            )
         n.rule(
             name="mwld",
-            command=_wrap_chain_for_windows(
-                f'{WINE} "{LD}" {LD_FLAGS} @$objects_file '
-                f'$lcf_file -o $out'
-                f' && {PYTHON} {patch_ov004}'
-                f' --binary $ov004_bin'
-                f' --relocs $ov004_relocs'
-                f' --delinks $ov004_delinks'
-                f' --map $arm9_map'
-                f' && {PYTHON} {patch_literals}'
-                f' --binary $main_bin'
-                f' --relocs $main_relocs'
-                f' --base-va 0x02000000'
-            ),
+            command=_wrap_chain_for_windows(mwld_chain),
         )
         n.newline()
 
@@ -969,6 +1003,7 @@ def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
             LD,
             "tools/patch_ov004_veneers.py",
             "tools/patch_module_literals.py",
+            "tools/wine_link_lock.py",
             ov004_relocs,
             ov004_delinks,
             main_relocs,

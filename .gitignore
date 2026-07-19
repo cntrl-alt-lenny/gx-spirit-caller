@@ -13,6 +13,11 @@ build.ninja
 /wibo
 /ninja.exe
 /tools/mwccarm/
+
+# Brief 614: per-worktree WINEPREFIX default (tools/configure.py) —
+# each worktree's own wine prefix (registry + drive_c), auto-created on
+# first compile. Never commit; can be multiple GB.
+/.wine-lane/
 # arm-none-eabi binutils (objdump/as) for the .s + permuter lanes (brief 369).
 # Downloaded on demand via `download_tool.py arm-binutils`; never committed.
 /tools/arm-none-eabi/
