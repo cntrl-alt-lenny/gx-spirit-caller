@@ -54,6 +54,33 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable  # the python3.13 running this script
 REGIONS = ["eur", "usa", "jpn"]
+DSD_MARKER = "0.11"  # the pinned dsd tag (configure.DSD_VERSION = v0.11.0)
+
+
+def check_dsd_binary() -> bool:
+    """Fail loud if ./dsd isn't the real dsd. Incident 2026-07-19: ./dsd got
+    clobbered byte-for-byte with objdiff-cli, so `dsd rom extract` errored
+    ("Unrecognized argument: rom") and the whole 3-region gate FAILED on a
+    build error that looked exactly like a content divergence — a full gate
+    cycle wasted before the wrong binary was spotted. This catches it in ms."""
+    dsd = ROOT / "dsd"
+    if not dsd.exists():
+        print(f"gate3: ./dsd missing — run `python3.13 tools/download_tool.py "
+              f"dsd v0.11.0 --path ./dsd`", file=sys.stderr)
+        return False
+    try:
+        out = subprocess.run([str(dsd), "--version"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=15).stdout
+    except (subprocess.SubprocessError, OSError) as e:
+        print(f"gate3: ./dsd --version failed ({e})", file=sys.stderr)
+        return False
+    if DSD_MARKER not in out:
+        print(f"gate3: ./dsd is the WRONG binary (version {out.strip()!r}, "
+              f"expected dsd {DSD_MARKER}.x — likely clobbered with objdiff-cli). "
+              f"Restore: `python3.13 tools/download_tool.py dsd v0.11.0 --path ./dsd`",
+              file=sys.stderr)
+        return False
+    return True
 
 
 def run(cmd: list[str]) -> int:
@@ -149,6 +176,13 @@ def main() -> int:
     # Preflight (only when we're about to build): a duplicate delink makes
     # `dsd lcf` abort "overlaps with previous file" mid-build — catch it in
     # milliseconds and skip the wasted wine lane.
+    if regions:
+        print(f"\n{'=' * 20} preflight: dsd binary {'=' * 20}", flush=True)
+        if not check_dsd_binary():
+            print("\n==================== GATE FAIL ====================", flush=True)
+            print("  ./dsd is missing or the wrong binary (see above) — not a "
+                  "content divergence; restore dsd and re-run", flush=True)
+            return 2
     if regions and (ROOT / "tools" / "check_delink_dupes.py").exists():
         print(f"\n{'=' * 20} preflight: delink dupes {'=' * 20}", flush=True)
         if run([PY, "tools/check_delink_dupes.py"]) != 0:
