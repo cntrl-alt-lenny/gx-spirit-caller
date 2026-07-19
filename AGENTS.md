@@ -484,33 +484,32 @@ unified queue; coverage tracker = `path-to-100-coverage.md`); finished-brief his
 `docs/briefs/CLOSED-LOG.md`; swarm findings = `docs/research/improvement-swarm-2026-07-15-r5.md`
 (+ the r6 R&D swarm report when it lands).
 
-- **LANE STATE (2026-07-18, M1 Mac, 4 agents: Codex Decomper + Codex Scaffolder =
-  GPT-5.6 Luna Medium (tool-derived/checkable outputs ONLY), Claude Code Decomper +
-  Claude Code Scaffolder = Sonnet 5 Max (judgment); brain = Opus).** CHAPTER: READABLE-C.
-  🎉 **THE CEILING KEEPS MOVING: 952 B is the new record** (b586 `func_0204f3c0`.legacy_sp3 via
-  the C-24 routing fix; b582 broke 544 with 552 B; + a NEW wall class discovered: repeated-address rematerialization after a
-  call; + a 908 B half-crack documented). Byte-truth ledger rebuilt from bytes (b583):
-  3-region gap = 55,540 B, ov004 = 36.2% of it; batch_carve now distinguishes tool-error
-  from verify-fail. Green-main sweep + CLOSED-LOG backfill + cold-start fixes landed
-  (b584/b585). C-dec: EUR ~8.2%, USA/JPN ~7.2%. ⚠️ MAC = ONE wine lane (b586 owns it);
-  everything else wine-free. Brain gate = `python3.13 tools/gate3.py`. r6 R&D swarm paused
-  at 21/~130 agents (quota) — resume when Claude agents idle.
-- **Brief 608** — Claude Code Decomper (Sonnet 5) → **THE WINEPREFIX PARALLEL-LANE SPIKE
-  (wine, r7 #1 bet)**: prove/kill whether per-worktree WINEPREFIX turns the one wine lane into
-  N (plumbing confirmed transform_dep.py:6-8). Baseline vs 2/3/4-lane concurrent compiles/min;
-  deadlock verdict; keep flock on the 81s mwld link only. GO/NO-GO + proposed change (do not
-  wire yet). Branch `claude/wineprefix-spike-608`.
-- **Brief 609** — Claude Code Scaffolder (Sonnet 5) → **STRUCT/TYPE BANK prototype (wine-free,
-  r7 #1b)**: promote the ~64 comment field-maps in *_core.h to typed structs (quick slice),
-  then tools/build_struct_bank.py mining width/signedness/bitfield from delink objdump on
-  data_ov002_022d016c; prove m2c --context renders named fields. Branch `claude/struct-bank-609`.
-- (Codex idle by design — no genuinely-hours mechanical work exists this round. Genuine Codex
-  campaigns unlock when: 609's miner is built -> full-tree struct mining; OR 608 is GO -> the
-  opt-level variant matrix on the reg-alloc plateau class.)
-- **b607 CLOSED (not merged):** secure-area .s carve broke `dsd delink` in all 3 regions (57
-  fragments byte-correct, but the encrypted secure area ships as-is via the header/CRC pipeline
-  and is not delink-carveable). TODO: annotate it as a known non-carveable encrypted region in
-  endgame-ledger.md (small docs task) rather than carving. r7 secure-area lead is dead.
+- **LANE STATE (2026-07-19, M1 Mac, 4 agents: Codex Decomper + Codex Scaffolder =
+  GPT-5.6 Luna, Claude Code Decomper + Claude Code Scaffolder = Sonnet 5 Max; brain = Opus).**
+  CHAPTER: READABLE-C. Effort is routed **per-brief, not per-agent** (r8/r9): Luna Medium on
+  mechanical/gate-protected, High only on genuinely-agentic build-test-iterate; ultracode = brain only.
+  🎉 **MAC IS NO LONGER ONE WINE LANE** — b608 proved (3.66x @ 4 lanes, 0 deadlock) and **b614
+  WIRED** per-worktree `WINEPREFIX` as the default; the `mwld` link stays serialized
+  (`tools/wine_link_lock.py`). Concurrent worktrees now compile in parallel.
+- **Landed this session:** 608 (GO) + 614 (wired parallel lanes) · 609 + 613 (struct/type bank
+  mined tree-wide, `#ifdef M2C_CONTEXT_BUILD`-gated in `*_core.h`) · 611 (retriever validation —
+  **real family-hit@5 = 53.5%**, not the 24-query 95.8%) · 615 (honest-metric dashboard:
+  `progress.py --by-module` tractable-ceiling/attainment/done-class) · R&D **r8** (routing) +
+  **r9** (Luna profile + fast-finish crack). New brain tools: `kickoff_lint.py` (pre-send gate),
+  `scope_gate.py` (pre-merge scope + rename-safety — catches the b610/b612 classes).
+- **GATES:** correctness = `gate3.py --scope all` (3-region sha1, the merge arbiter);
+  completeness/rename-safety = `scope_gate.py` (it's scope-BLIND on its own — a thin/half-applied
+  PR passes sha1); pre-send = `kickoff_lint.py`.
+- **⚠️ NAMING LANE PARKED** — b610 (dup-symbol) and b612 (half-applied rename) BOTH broke USA/JPN
+  sha1 while EUR passed. Resume ONLY with `scope_gate.py --kind naming` gating every rename +
+  cascade to region-specific `src/<region>/main/*.c`. `dsd check` does NOT catch either class.
+- **Throughput direction (r9):** fast Codex runs are by-design — decouple throughput from dispatch
+  via **B-lite batches** (3-5 gate-checked queue items per kickoff → self-chaining), persistence in
+  the HARNESS (batch_carve) not the prompt, and **drop "give a plan first / narrate progress"** from
+  Codex kickoffs (it causes early stops). See [[feedback_codex_throughput_fix]].
+- **NEXT:** decomp-carve waves using the now-live parallel lanes; the easy c-match tier is drained
+  (safe-queue-v4) so the frontier is the ov002/coverage drain + harder c-match. cmatch_loop.py (r7-2)
+  still unbuilt.
 
 ### Closed briefs (reference)
 
