@@ -24,6 +24,11 @@ The documented cmatch-loop canary reproduced two current complete C matches at
 | ov019 | 25 | 0 | 25 | 0 | none |
 | ov003 | 18 | 0 | 18 | 0 | none |
 
+**Batch total:** 135 candidates, 0 accepts, 135 iterates, 0 parks. The
+accept-list is empty. The iterate classifications were compile failures from
+the generated temporary C drafts; no candidate reached the three-attempt park
+cap in this single classification pass.
+
 ## Method
 
 Candidate files are derived from EUR `config/eur/arm9/overlays/*/delinks.txt`
