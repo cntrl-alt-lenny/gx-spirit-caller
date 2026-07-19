@@ -19,16 +19,23 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from progress import (  # noqa: E402
+    ASYMPTOTIC_HEADROOM_FRACTION,
+    ASYMPTOTIC_MODULES,
     CODE_SECTIONS,
     DATA_SECTIONS,
+    FINISHABLE_HEADROOM_FRACTION,
     _discover_module_delinks,
     c_code_bytes,
     c_code_total_bytes,
+    canary_reconciliation,
     count_functions_in_symbols,
     count_total_functions,
+    done_class,
     parse_delinks_file,
     summarize_by_module,
     summarize_delinks,
+    three_region_module_gaps,
+    tractable_ceiling_bytes,
 )
 
 
@@ -775,6 +782,248 @@ class TestReportJsonRoundtrip(unittest.TestCase):
             # json.dumps will raise if anything's non-serialisable.
             s = json.dumps(report)
             self.assertIn("source", json.loads(s))
+
+
+class TestDoneClass(unittest.TestCase):
+    """r7-15's module-tier classification (brief 615)."""
+
+    def test_asymptotic_modules(self):
+        self.assertEqual(done_class("main"), "asymptotic")
+        self.assertEqual(done_class("ov002"), "asymptotic")
+
+    def test_other_modules_are_finishable(self):
+        for module in ("ov000", "ov004", "itcm", "dtcm", "ov023"):
+            self.assertEqual(done_class(module), "finishable")
+
+    def test_asymptotic_modules_set_is_exactly_main_and_ov002(self):
+        # Pins the hard-coded set itself, not just done_class()'s
+        # membership test -- a future edit that widens/narrows the set
+        # without updating this test (and its brief-615 doc citation)
+        # should fail loudly.
+        self.assertEqual(ASYMPTOTIC_MODULES, frozenset({"main", "ov002"}))
+
+
+class TestTractableCeilingBytes(unittest.TestCase):
+    """The tiered, wall-enriched ceiling estimate (brief 615 / r7-14)."""
+
+    def test_zero_c_total_returns_zero(self):
+        # dtcm-shaped: no .text bytes at all in any region.
+        self.assertEqual(tractable_ceiling_bytes("dtcm", 0, 0), 0)
+
+    def test_asymptotic_module_uses_asymptotic_headroom(self):
+        # main: c_bytes=100, c_total=1000 -> remaining=900,
+        # ceiling = 100 + round(0.10 * 900) = 100 + 90 = 190.
+        ceiling = tractable_ceiling_bytes("main", 100, 1000)
+        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTION * 900))
+        self.assertEqual(ceiling, 190)
+
+    def test_ov002_module_uses_asymptotic_headroom(self):
+        # ASYMPTOTIC_MODULES membership, not a name-prefix check --
+        # confirms ov002 specifically routes through the same branch
+        # as main, not e.g. any module starting with "ov".
+        ceiling = tractable_ceiling_bytes("ov002", 100, 1000)
+        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTION * 900))
+
+    def test_finishable_module_uses_finishable_headroom(self):
+        # ov004: c_bytes=100, c_total=1000 -> remaining=900,
+        # ceiling = 100 + round(0.75 * 900) = 100 + 675 = 775.
+        ceiling = tractable_ceiling_bytes("ov004", 100, 1000)
+        self.assertEqual(ceiling, 100 + round(FINISHABLE_HEADROOM_FRACTION * 900))
+        self.assertEqual(ceiling, 775)
+
+    def test_ceiling_never_below_c_bytes(self):
+        # Invariant: attainment = c_bytes / ceiling can never read above
+        # 100%, for either tier, at any c_bytes/c_total split.
+        for module in ("main", "ov002", "ov004", "itcm"):
+            for c_bytes, c_total in ((0, 1000), (500, 1000), (1000, 1000), (999, 1000)):
+                with self.subTest(module=module, c_bytes=c_bytes, c_total=c_total):
+                    self.assertGreaterEqual(
+                        tractable_ceiling_bytes(module, c_bytes, c_total), c_bytes)
+
+    def test_ceiling_never_exceeds_c_total(self):
+        for module in ("main", "ov002", "ov004", "itcm"):
+            for c_bytes, c_total in ((0, 1000), (500, 1000), (1000, 1000)):
+                with self.subTest(module=module, c_bytes=c_bytes, c_total=c_total):
+                    self.assertLessEqual(
+                        tractable_ceiling_bytes(module, c_bytes, c_total), c_total)
+
+    def test_fully_converted_module_ceiling_equals_c_total(self):
+        # c_bytes == c_total (already 100% C) -> zero remaining headroom
+        # regardless of tier -> ceiling == c_total exactly.
+        self.assertEqual(tractable_ceiling_bytes("main", 1000, 1000), 1000)
+        self.assertEqual(tractable_ceiling_bytes("ov004", 1000, 1000), 1000)
+
+    def test_finishable_ceiling_strictly_above_asymptotic_for_same_input(self):
+        # The whole point of the two-tier split: identical current/total
+        # bytes must NOT produce the same ceiling in both tiers.
+        asymptotic = tractable_ceiling_bytes("main", 100, 1000)
+        finishable = tractable_ceiling_bytes("ov004", 100, 1000)
+        self.assertLess(asymptotic, finishable)
+
+
+class TestSummarizeByModuleHonestMetricColumns(unittest.TestCase):
+    """summarize_by_module()'s three brief-615 additions, on top of the
+    same fixture shape TestSummarizeByModule already exercises."""
+
+    def _make_config(self, c_bytes: int, c_total: int, module_dir: str = "arm9") -> Path:
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / module_dir).mkdir(parents=True)
+        lines = [f"    .text       start:0x0 end:0x{c_total:x} kind:code\n", "\n"]
+        if c_bytes:
+            lines += [
+                "src/main/func_a.c:\n",
+                "    complete\n",
+                f"    .text start:0x0 end:0x{c_bytes:x}\n",
+            ]
+        (root / module_dir / "delinks.txt").write_text("".join(lines))
+        return root
+
+    def test_new_fields_present(self):
+        root = self._make_config(c_bytes=0x40, c_total=0x100)
+        row = summarize_by_module(root)[0]
+        self.assertIn("tractable_ceiling", row)
+        self.assertIn("attainment", row)
+        self.assertIn("done_class", row)
+
+    def test_main_module_is_asymptotic_with_matching_ceiling(self):
+        root = self._make_config(c_bytes=0x40, c_total=0x100)  # 64/256
+        row = summarize_by_module(root)[0]
+        self.assertEqual(row["module"], "main")
+        self.assertEqual(row["done_class"], "asymptotic")
+        expected_ceiling = tractable_ceiling_bytes("main", 0x40, 0x100)
+        self.assertEqual(row["tractable_ceiling"], expected_ceiling)
+        self.assertAlmostEqual(row["attainment"], 0x40 / expected_ceiling)
+
+    def test_attainment_is_none_when_c_total_zero(self):
+        # dtcm-shaped: a module dir with a delinks.txt carrying no
+        # .text section at all (module_sections stays empty -> c_total
+        # 0) must not raise ZeroDivisionError.
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        (root / "arm9" / "dtcm").mkdir(parents=True)
+        (root / "arm9" / "dtcm" / "delinks.txt").write_text("")
+        rows = summarize_by_module(root)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["tractable_ceiling"], 0)
+        self.assertIsNone(rows[0]["attainment"])
+
+    def test_ov002_overlay_is_asymptotic(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        ov002 = root / "arm9" / "overlays" / "ov002"
+        ov002.mkdir(parents=True)
+        (ov002 / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x80 kind:code\n"
+            "\n"
+            "src/overlay002/func_c.c:\n"
+            "    complete\n"
+            "    .text start:0x0 end:0x20\n"
+        )
+        row = summarize_by_module(root)[0]
+        self.assertEqual(row["module"], "ov002")
+        self.assertEqual(row["done_class"], "asymptotic")
+
+    def test_ov004_overlay_is_finishable(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        ov004 = root / "arm9" / "overlays" / "ov004"
+        ov004.mkdir(parents=True)
+        (ov004 / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x80 kind:code\n"
+        )
+        row = summarize_by_module(root)[0]
+        self.assertEqual(row["module"], "ov004")
+        self.assertEqual(row["done_class"], "finishable")
+
+
+class TestCanaryReconciliation(unittest.TestCase):
+    """The mandatory ov004=36.2%-of-3-region-gap reconciliation (brief
+    615/583). canary_reconciliation() is pure -- these pin the
+    tolerance-check MATH on fixture gap dicts, independent of the live
+    (and constantly drifting) repo tree; the live check itself is
+    exercised separately (not pinned, since it's expected to drift) via
+    `python tools/progress.py --canary`."""
+
+    def test_exact_ledger_snapshot_reconciles(self):
+        # The endgame-ledger.md 2026-07-16 snapshot's own numbers,
+        # verbatim (ov004 20,110 of 55,540 total = 36.2...%).
+        gaps = {"ov004": 20110, "main": 11474, "itcm": 6252, "ov019": 3000,
+                "ov014": 2712, "ov003": 2704, "ov001": 1356, "ov006": 968,
+                "ov020": 952, "ov015": 748, "ov010": 736, "ov018": 696,
+                "ov002": 608, "ov017": 568, "ov005": 448, "ov016": 440,
+                "ov007": 440, "ov022": 320, "ov009": 272, "ov008": 216,
+                "ov023": 200, "ov021": 176, "ov011": 104, "ov013": 40}
+        self.assertEqual(sum(gaps.values()), 55540)
+        result = canary_reconciliation(gaps)
+        self.assertTrue(result["ok"])
+        self.assertAlmostEqual(result["actual_pct"], 36.2, places=1)
+
+    def test_mismatch_outside_tolerance_flagged_not_silently_passed(self):
+        # ov004 at half its ledger share -- a real regression shape
+        # (e.g. a section-set or gap-tu-exclusion bug half-counting it).
+        gaps = {"ov004": 10000, "everything_else": 45540}
+        result = canary_reconciliation(gaps)
+        self.assertFalse(result["ok"])
+        self.assertLess(result["actual_pct"], 36.2 - result["tolerance_pct"])
+
+    def test_missing_module_is_zero_gap_not_a_crash(self):
+        gaps = {"main": 100, "ov004": 0}
+        result = canary_reconciliation(gaps, module="nonexistent_module")
+        self.assertEqual(result["module_gap"], 0)
+        self.assertFalse(result["ok"])
+
+    def test_empty_gaps_no_zero_division(self):
+        result = canary_reconciliation({})
+        self.assertEqual(result["actual_pct"], 0.0)
+        self.assertFalse(result["ok"])
+
+    def test_tolerance_is_a_hard_boundary(self):
+        # 36.2% target, default 1.0pp tolerance -> 37.2% must pass,
+        # 37.21% must not (delta computed on the RAW float, not rounded
+        # display text).
+        total = 1000000
+        just_inside = round(total * 0.372)
+        just_outside = round(total * 0.3721)
+        ok_result = canary_reconciliation({"ov004": just_inside, "rest": total - just_inside})
+        bad_result = canary_reconciliation({"ov004": just_outside, "rest": total - just_outside})
+        self.assertTrue(ok_result["ok"])
+        self.assertFalse(bad_result["ok"])
+
+
+class TestThreeRegionModuleGaps(unittest.TestCase):
+    """three_region_module_gaps() sums summarize_by_module()'s per-module
+    gap across eur/usa/jpn config dirs -- the live-data half of the
+    CANARY check (canary_reconciliation covers the pure-math half)."""
+
+    def _write_region(self, root: Path, region: str, main_gap: int) -> None:
+        arm9 = root / "config" / region / "arm9"
+        arm9.mkdir(parents=True)
+        matched_end = 0x1000 - main_gap
+        (arm9 / "delinks.txt").write_text(
+            "    .text       start:0x0 end:0x1000 kind:code\n"
+            "\n"
+            "src/main/func_a.c:\n"
+            "    complete\n"
+            f"    .text start:0x0 end:0x{matched_end:x}\n"
+        )
+
+    def test_sums_gap_across_all_three_regions(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        self._write_region(root, "eur", main_gap=0x10)
+        self._write_region(root, "usa", main_gap=0x20)
+        self._write_region(root, "jpn", main_gap=0x30)
+        gaps = three_region_module_gaps(root)
+        self.assertEqual(gaps["main"], 0x10 + 0x20 + 0x30)
+
+    def test_missing_region_dir_contributes_nothing(self):
+        tmp = tempfile.mkdtemp()
+        root = Path(tmp)
+        self._write_region(root, "eur", main_gap=0x10)
+        # usa/jpn config dirs simply don't exist.
+        gaps = three_region_module_gaps(root)
+        self.assertEqual(gaps["main"], 0x10)
 
 
 if __name__ == "__main__":
