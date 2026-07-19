@@ -36,9 +36,13 @@ Safety
 - On a real red batch, the driver BISECTS (delta-debug) to isolate the
   culprit(s), parks them, and commits the good remainder — no good carve is
   lost to one bad sibling.
-- POSIX hosts serialise Wine-backed link gates with `fcntl.flock`. Windows
-  runs mwcc/mwld natively, so Wine process polling and the Wine gate lock are
-  intentional no-ops there.
+- Brief 614: `gate()` no longer takes a Python-level lock. Each worktree
+  gets its own WINEPREFIX (tools/configure.py) so concurrent `ninja sha1`
+  calls no longer share a wineserver for the compile portion; only the
+  `mwld` link step stays serialised, via a flock `tools/configure.py`
+  embeds directly in the `mwld` ninja rule (tools/wine_link_lock.py) — a
+  POSIX-only no-op on native Windows, which has no wineserver to
+  serialise against. See docs/research/brief-608-wineprefix-spike.md.
 """
 from __future__ import annotations
 
@@ -47,22 +51,10 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
-import time
-from collections.abc import Iterator
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
-if sys.platform != "win32":
-    import fcntl
-else:
-    fcntl = None
-
 ROOT = Path(__file__).resolve().parent.parent
-# Shared lock file so concurrent EUR + USA/JPN batch_carve processes serialise
-# their wine/mwldarm link step (only one region links at a time).
-_GATE_LOCK = Path(tempfile.gettempdir()) / "spirit-caller-gate.lock"
 
 # --------------------------------------------------------------------------- #
 # PURE helpers (unit-tested, no build, no git)                                 #
@@ -469,34 +461,6 @@ class Ops:
             subprocess.run(["pkill", "-f", exe], capture_output=True)
         subprocess.run(["pkill", "-f", "ninja sha1"], capture_output=True)
 
-    def _wait_wine_quiet(self, max_wait: float = 900.0) -> None:
-        """Block until no foreign `mwldarm.exe` link is in flight, so we never
-        start our own link concurrently with a co-lane's. The GPTK wineserver
-        deadlocks when two mwldarm.exe write `arm9.o` at once ("Can't write
-        application arm9.o"). This is ONE-SIDED on purpose: it protects our
-        lane even when the co-lane's batch_carve predates the flock gate-lock
-        (an old-code scaffolder won't take the lock, but we can still see its
-        mwldarm in the process table and wait it out). When we hold this window
-        AND our flock, our link runs alone.
-
-        Patient and best-effort: polls up to `max_wait` seconds on its OWN
-        budget (decoupled from the link `gate_timeout`, so a busy co-lane never
-        eats the link's time). On expiry it simply RETURNS and lets the link
-        proceed — the link's own timeout+retry is the backstop. It never
-        raises and never kills the co-lane's in-flight link (unlike
-        _kill_orphans), so the two lanes cooperate instead of thrashing.
-
-        Native Windows has no wineserver, so this is a documented no-op and
-        never probes the process table with `pgrep`."""
-        if self.is_windows:
-            return
-        deadline = time.monotonic() + max_wait
-        while subprocess.run(["pgrep", "-f", "mwldarm.exe"],
-                             capture_output=True).returncode == 0:
-            if time.monotonic() > deadline:
-                return
-            time.sleep(2)
-
     def classify(self, func: str) -> str:
         """'clean' | 'refuse' | 'refuse-absorbed' | 'tool-error' | 'deferred'.
 
@@ -577,26 +541,6 @@ class Ops:
             return "verify-fail"
         return "tool-error"
 
-    @contextmanager
-    def _gate_lock(self, timeout: float) -> Iterator[None]:
-        """Serialise Wine-backed POSIX gates; native Windows needs no lock."""
-        if self.is_windows:
-            yield
-            return
-
-        assert fcntl is not None
-        lock_deadline = time.monotonic() + timeout
-        with _GATE_LOCK.open("w", encoding="utf-8") as lock_file:
-            while True:
-                try:
-                    fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except BlockingIOError as err:
-                    if time.monotonic() > lock_deadline:
-                        raise subprocess.TimeoutExpired("flock", timeout) from err
-                    time.sleep(1)
-            yield
-
     def gate(self) -> bool:
         """`ninja sha1` with one retry (large-tree transient, item 11b).
 
@@ -604,23 +548,22 @@ class Ops:
         from a not-fully-rebuilt tree is not trusted). Distinguishes two failure
         modes so a concurrent-build deadlock never false-parks a clean carve:
           * a completed run that is not OK  -> return False (real RED -> bisect);
-          * EVERY attempt killed by `gate_timeout` (a wineserver deadlock with a
-            co-lane) -> raise GateTimeout -> the batch is DEFERRED, not parked.
+          * EVERY attempt killed by `gate_timeout` (a hung build) -> raise
+            GateTimeout -> the batch is DEFERRED, not parked.
 
-        On POSIX, uses a cross-process file lock (_GATE_LOCK) so concurrent EUR
-        + USA/JPN batch_carve lanes serialise their Wine-backed mwldarm link
-        step. Windows runs mwldarm natively and skips this Wine coordination."""
+        Brief 614: no longer takes a Python-level lock around this call. Each
+        worktree gets its own WINEPREFIX (tools/configure.py), so concurrent
+        `ninja sha1` calls no longer share a wineserver for the compile
+        portion; the `mwld` link step alone stays serialised, via a flock
+        `tools/configure.py` embeds directly in the `mwld` ninja rule
+        (tools/wine_link_lock.py) — invisible from here, since it's inside
+        the `ninja sha1` subprocess call below, not wrapped around it."""
         to = self.gate_timeout or None
         completed_any = False
         for _ in range(self.gate_retries + 1):
             try:
-                with self._gate_lock(to or 600.0):
-                    self._run([sys.executable, "tools/configure.py", self.version], timeout=to)
-                    # Wait for a quiet wine window (no co-lane mwldarm) before
-                    # our own link, so the two never collide on the wineserver.
-                    # Patient, on its own budget; returns best-effort on expiry.
-                    self._wait_wine_quiet()
-                    r = self._run(["ninja", "sha1"], timeout=to)
+                self._run([sys.executable, "tools/configure.py", self.version], timeout=to)
+                r = self._run(["ninja", "sha1"], timeout=to)
             except subprocess.TimeoutExpired:
                 self._kill_orphans()
                 continue

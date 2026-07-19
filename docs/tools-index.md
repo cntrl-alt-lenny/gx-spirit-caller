@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**103 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**104 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (34)
+- [Uncategorised](#uncategorised) (35)
 
 ## Analysis / worklist
 
@@ -648,6 +648,12 @@ pick from its disassembly (brief 264, stretch goal).
 **byte-compare a compiled function against its dsd-delinked gap**
 
 object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain reproduces the 3-region SHA1 on merge.
+
+### `tools/wine_link_lock.py`
+
+**serialise the Wine-backed mwld link step machine-wide.**
+
+Brief 608 (docs/research/brief-608-wineprefix-spike.md) measured near-linear compile scaling once each worktree gets its own WINEPREFIX (no shared wineserver left to fight over), but only 2-way concurrency for the link itself, with no co…
 
 ### `tools/xmap_normalize.py`
 

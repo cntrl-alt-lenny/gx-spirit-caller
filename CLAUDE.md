@@ -194,7 +194,13 @@ deliverable 2 (PR #419) for the porting convention.
   deprecated; see
   [`docs/research/wine-migration.md`](docs/research/wine-migration.md).
   `dsd-macos-arm64` and `objdiff-cli-macos-arm64` are downloaded
-  natively.
+  natively. `configure.py` defaults `WINEPREFIX` to `<worktree>/.wine-lane`
+  (auto-created on first compile, gitignored) instead of the shared
+  `~/.wine` — each worktree gets its own wineserver, so concurrent
+  worktrees' compiles no longer serialize on each other (brief 608/614;
+  see [`docs/research/brief-608-wineprefix-spike.md`](docs/research/brief-608-wineprefix-spike.md)).
+  Set `WINEPREFIX` explicitly to override. The `mwld` link step stays
+  serialized machine-wide regardless (`tools/wine_link_lock.py`).
 - **Linux:** `wibo` is auto-downloaded and runs the Win32 compiler.
 - **Windows:** `mwccarm.exe` / `mwldarm.exe` run natively; no runner.
 - `get_platform.py` was patched 2026-04-20 to return `Darwin → macos` and

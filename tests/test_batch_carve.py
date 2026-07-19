@@ -483,7 +483,6 @@ class TestOpsPlatformPaths(unittest.TestCase):
         ops = bc.Ops("eur", platform="win32")
         with mock.patch.object(bc.subprocess, "run") as run:
             ops._kill_orphans()
-            ops._wait_wine_quiet(max_wait=0)
         run.assert_not_called()
 
     def test_windows_python_subprocesses_use_current_interpreter(self):
@@ -656,25 +655,6 @@ class TestOpsPlatformPaths(unittest.TestCase):
                 return_value=mock.Mock(returncode=1, stdout="", stderr=disagreement_output),
             ):
                 self.assertEqual(ops.whole_function("func_x", out_path), "tool-error")
-
-    @unittest.skipIf(sys.platform == "win32", "POSIX-only flock behaviour")
-    def test_posix_gate_lock_is_exclusive(self):
-        import fcntl
-
-        ops = bc.Ops("eur", platform=sys.platform)
-        with tempfile.TemporaryDirectory() as tmp:
-            old_lock = bc._GATE_LOCK
-            bc._GATE_LOCK = Path(tmp) / "gate.lock"
-            try:
-                with ops._gate_lock(1):
-                    with bc._GATE_LOCK.open("w", encoding="utf-8") as competitor:
-                        with self.assertRaises(BlockingIOError):
-                            fcntl.flock(
-                                competitor,
-                                fcntl.LOCK_EX | fcntl.LOCK_NB,
-                            )
-            finally:
-                bc._GATE_LOCK = old_lock
 
 
 # --------------------------------------------------------------------------- #
