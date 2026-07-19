@@ -71,7 +71,9 @@ _RELOC_RE = re.compile(r"^\s*([0-9a-f]+):\s+R_ARM_ABS32\s+(\S+)\s*$")
 _LABEL_RE = re.compile(r"^([0-9a-f]+) <(\.L_\w+)>:")
 _INSN_RE = re.compile(r"^\s*([0-9a-f]+):\t[0-9a-f]{8}(?: \t| )(\S+)\s*(.*)$")
 _POOL_LOAD_RE = re.compile(r"^ldr\s+(r\d+|ip|lr|sp|pc|fp),\s*\[pc,\s*#-?\d+\]\s*@ ([0-9a-f]+) <(\.L_\w+)>")
-_OFFSET_LOAD_RE = re.compile(r"^(\w+)\s+(r\d+|ip|lr),\s*\[(r\d+|ip|lr),\s*#(-?\d+)\]")
+_OFFSET_LOAD_RE = re.compile(
+    r"^(\w+)\s+(r\d+|ip|lr),\s*\[(r\d+|ip|lr)(?:,\s*#(-?\d+))?\]"
+)
 _REG_DEST_RE = re.compile(r"^\w+\s+(r\d+|ip|lr),")
 _SHIFT_RE = re.compile(r"^(lsl|lsr|asr)\s+(r\d+|ip|lr),\s*\1?\2?,?\s*#?(\d+)")
 _MOV_SHIFT_RE = re.compile(r"^mov\w*\s+(r\d+|ip|lr),\s*(r\d+|ip|lr),\s*(lsl|lsr|asr)\s+#(\d+)")
@@ -205,7 +207,7 @@ def parse_symbol_accesses(objdump_text: str, symbol: str) -> list[Access]:
             insns.append((addr, rest, operands))
 
     accesses: list[Access] = []
-    for i, (addr, mnemonic, operands) in enumerate(insns):
+    for i, (_addr, mnemonic, operands) in enumerate(insns):
         pm = _POOL_LOAD_RE.match(f"{mnemonic} {operands}")
         if not pm or pm.group(3) not in pool_labels:
             continue
@@ -223,7 +225,7 @@ def parse_symbol_accesses(objdump_text: str, symbol: str) -> list[Access]:
                 if not is_store:
                     bf_width, bf_shift = _detect_bitfield(insns, j + 1, dest_reg, width)
                 accesses.append(Access(
-                    offset=int(om.group(4)), mnemonic=base_mn2, is_store=is_store,
+                    offset=int(om.group(4) or 0), mnemonic=base_mn2, is_store=is_store,
                     bitfield_width=bf_width, bitfield_shift=bf_shift,
                     site=f"0x{a2:x}",  # the access instruction's own address, not the pool load's
                 ))
@@ -345,28 +347,60 @@ def mine_object(obj: Path, symbol: str, objdump: str) -> list[Access]:
     ]
 
 
+def mine_object_text(text: str, obj: Path, symbols: list[str]) -> dict[str, list[Access]]:
+    """Parse one objdump result for every requested symbol."""
+    return {
+        symbol: [
+            Access(a.offset, a.mnemonic, a.is_store, a.bitfield_width,
+                   a.bitfield_shift, site=f"{obj.name}:{a.site}")
+            for a in parse_symbol_accesses(text, symbol)
+        ]
+        for symbol in symbols
+    }
+
+
 def mine_all(version: str, symbol: str, objdump: str, root: Path = ROOT) -> list[Access]:
+    return mine_all_symbols(version, [symbol], objdump, root)[symbol]
+
+
+def mine_all_symbols(version: str, symbols: list[str], objdump: str,
+                     root: Path = ROOT) -> dict[str, list[Access]]:
+    """Mine many symbols while running objdump only once per object."""
     delinks = root / f"build/{version}/delinks"
     if not delinks.is_dir():
         raise SystemExit(f"{delinks} missing -- run configure.py + `ninja delink` first")
-    accesses: list[Access] = []
+    accesses = {symbol: [] for symbol in symbols}
     for obj in sorted(delinks.rglob("*.o")):
-        accesses.extend(mine_object(obj, symbol, objdump))
+        text = subprocess.run(
+            [objdump, "-d", "-r", "--architecture=armv5te", str(obj)],
+            capture_output=True, text=True,
+        ).stdout
+        for symbol, object_accesses in mine_object_text(text, obj, symbols).items():
+            accesses[symbol].extend(object_accesses)
     return accesses
 
 
 def render_struct(fields: dict[int, FieldInference], struct_name: str, symbol: str) -> str:
     ordered = sorted(fields.values(), key=lambda f: f.offset)
     lines = [f"/* Mined by tools/build_struct_bank.py from {len(ordered)} observed "
-             f"offsets across {sum(f.n_sites for f in ordered)} access sites (brief 609). */",
+             f"offsets across {sum(f.n_sites for f in ordered)} access sites (brief 613). */",
              f"struct {struct_name} {{"]
     cursor = 0
     pad_n = 0
-    for f in ordered:
+    for index, f in enumerate(ordered):
+        overlaps_later = any(
+            later.offset < f.offset + f.width for later in ordered[index + 1:]
+        )
+        if overlaps_later:
+            lines.append(f"    /* omitted overlapping field at +0x{f.offset:x} */")
+            continue
         if f.offset > cursor:
             lines.append(f"    char _pad{pad_n}[{f.offset - cursor}];")
             pad_n += 1
             cursor = f.offset
+        if f.offset < cursor:
+            lines.append(f"    /* omitted overlapping field at +0x{f.offset:x} */")
+            continue
         note = f"  /* +0x{f.offset:x}, {f.n_sites} site(s)" + \
                (f" -- {f.disagreement}" if f.disagreement else "") + " */"
         lines.append(f"    {f.declaration(f'f_{f.offset:x}')};{note}")
@@ -376,30 +410,94 @@ def render_struct(fields: dict[int, FieldInference], struct_name: str, symbol: s
     return "\n".join(lines) + "\n"
 
 
+def render_context_block(fields: dict[int, FieldInference], struct_name: str,
+                        symbol: str, original_decl: str) -> str:
+    """Render a context-only struct while preserving the real-build line."""
+    struct = render_struct(fields, struct_name, symbol)
+    return ("#ifdef M2C_CONTEXT_BUILD\n" + struct +
+            "#else\n" + original_decl + "\n#endif")
+
+
+def header_data_symbols(header: Path) -> list[str]:
+    """Return data_ov002 symbols declared by an ov002 core header."""
+    return sorted(set(re.findall(r"\b(data_ov002_[0-9a-f]+)\b", header.read_text())))
+
+
+def update_header(header: Path, mined: dict[str, dict[int, FieldInference]]) -> int:
+    """Add guarded mined blocks around plain data declarations.
+
+    Existing context blocks are left untouched. The declaration copied into
+    each new `#else` branch is the exact source line found in the header.
+    """
+    text = header.read_text()
+    changed = 0
+    for symbol, fields in mined.items():
+        if not fields:
+            continue
+        context_blocks = list(re.finditer(
+            r"(?ms)^#ifdef M2C_CONTEXT_BUILD\n.*?^#endif\s*$", text))
+        existing = next((block for block in context_blocks if symbol in block.group(0)), None)
+        if existing:
+            if "Mined by tools/build_struct_bank.py" not in existing.group(0):
+                continue
+            else_decl = re.search(r"(?m)^#else\n([^\n]+)\n#endif", existing.group(0))
+            if not else_decl:
+                continue
+            original = else_decl.group(1)
+            struct_name = "".join(p.capitalize() for p in symbol.removeprefix("data_").split("_"))
+            block = render_context_block(fields, struct_name, symbol, original)
+            text = text[:existing.start()] + block + text[existing.end():]
+            changed += 1
+            continue
+        match = re.search(rf"(?m)^(?P<decl>[^\n]*\b{re.escape(symbol)}\b[^\n]*;[^\n]*)$", text)
+        if not match:
+            continue
+        original = match.group("decl").rstrip()
+        struct_name = "".join(p.capitalize() for p in symbol.removeprefix("data_").split("_"))
+        block = render_context_block(fields, struct_name, symbol, original)
+        text = text[:match.start()] + block + text[match.end():]
+        changed += 1
+    if changed:
+        header.write_text(text)
+    return changed
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[1] if __doc__ else "")
-    ap.add_argument("symbol", help="e.g. data_ov002_022d016c")
+    ap.add_argument("symbol", nargs="?", help="e.g. data_ov002_022d016c")
+    ap.add_argument("--symbols", nargs="+", help="mine several symbols in one object-dump pass")
     ap.add_argument("--version", default="eur", choices=("eur", "usa", "jpn"))
     ap.add_argument("--struct-name", default=None, help="default: derived from the symbol name")
     ap.add_argument("--objdump", default="arm-none-eabi-objdump")
+    ap.add_argument("--header", type=Path, help="update this header with guarded blocks")
     args = ap.parse_args(argv)
 
-    struct_name = args.struct_name or "".join(
-        p.capitalize() for p in args.symbol.removeprefix("data_").split("_")
-    )
-    accesses = mine_all(args.version, args.symbol, args.objdump)
-    if not accesses:
-        print(f"error: no accesses to {args.symbol} found under "
-              f"build/{args.version}/delinks/", file=sys.stderr)
+    symbols = args.symbols or ([args.symbol] if args.symbol else None)
+    if not symbols:
+        ap.error("provide SYMBOL or --symbols")
+    all_accesses = mine_all_symbols(args.version, symbols, args.objdump)
+    mined = {}
+    for symbol in symbols:
+        accesses = all_accesses[symbol]
+        if not accesses:
+            print(f"error: no accesses to {symbol} found under "
+                  f"build/{args.version}/delinks/", file=sys.stderr)
+            continue
+        fields = aggregate(accesses)
+        mined[symbol] = fields
+        struct_name = args.struct_name if len(symbols) == 1 and args.struct_name else "".join(
+            p.capitalize() for p in symbol.removeprefix("data_").split("_"))
+        if not args.header:
+            print(render_struct(fields, struct_name, symbol))
+        disagreements = [f for f in fields.values() if f.disagreement]
+        print(f"# {symbol}: {len(accesses)} total access sites, {len(fields)} distinct offsets, "
+              f"{len(disagreements)} disagreement(s)", file=sys.stderr)
+        for f in disagreements:
+            print(f"#   +0x{f.offset:x}: {f.disagreement} ({f.sites})", file=sys.stderr)
+    if args.header:
+        print(f"# changed {update_header(args.header, mined)} context block(s)")
+    if not mined:
         return 1
-    fields = aggregate(accesses)
-    print(render_struct(fields, struct_name, args.symbol))
-
-    disagreements = [f for f in fields.values() if f.disagreement]
-    print(f"# {len(accesses)} total access sites, {len(fields)} distinct offsets, "
-          f"{len(disagreements)} disagreement(s)", file=sys.stderr)
-    for f in disagreements:
-        print(f"#   +0x{f.offset:x}: {f.disagreement} ({f.sites})", file=sys.stderr)
     return 0
 
 
