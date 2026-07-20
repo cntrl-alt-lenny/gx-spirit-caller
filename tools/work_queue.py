@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 """
-queue.py — the autonomous self-chaining work queue (2026-07-20).
+work_queue.py — the autonomous self-chaining work queue (2026-07-20).
 
-The recurring pain: Codex/Luna agents finish fast because the work is genuinely
-bounded, so the human has to re-dispatch every ~20 min. The fix is NOT longer
-tasks (padding) — it's decoupling throughput from dispatch: a committed backlog
-per lane, and an agent that pulls the next item, does it, and pulls the next,
-until the queue is empty or it's blocked. The human sends ONE message; the agent
-stays busy across many briefs for as long as there's tractable work.
+Named `work_queue.py`, not `queue.py`: running any `python3.13 tools/X.py`
+script puts `tools/` first on `sys.path`, so a file literally named
+`queue.py` there shadows the stdlib `queue` module for every script in
+this directory -- including transitively, for anything that imports
+`requests` (which needs `queue.LifoQueue` via `urllib3`). Confirmed
+live: `tools/download_tool.py` crashed with `AttributeError: module
+'queue' has no attribute 'LifoQueue'` on a completely fresh worktree
+the moment this file existed as `queue.py`, blocking `ninja`'s own
+tool-download step for every lane, not just this one. Renamed before
+this was in wide use; if you're tempted to rename it back, don't.
+
+The recurring pain this tool solves: Codex/Luna agents finish fast because
+the work is genuinely bounded, so the human has to re-dispatch every
+~20 min. The fix is NOT longer tasks (padding) — it's decoupling
+throughput from dispatch: a committed backlog per lane, and an agent
+that pulls the next item, does it, and pulls the next, until the queue
+is empty or it's blocked. The human sends ONE message; the agent stays
+busy across many briefs for as long as there's tractable work.
 
 Each lane has a markdown file `docs/queue/<lane>.md` whose items are sections:
 
@@ -22,11 +34,11 @@ never double-claims. Committing the queue file after each transition makes the
 whole thing crash-resumable — the agent's own progress log IS the state.
 
 Usage:
-    python3.13 tools/queue.py next   <lane>                 # claim + print next TODO
-    python3.13 tools/queue.py done   <lane> <id>            # mark DONE
-    python3.13 tools/queue.py park   <lane> <id> "<reason>" # mark PARKED (+ reason)
-    python3.13 tools/queue.py status <lane>                 # counts by status
-    python3.13 tools/queue.py list   <lane>                 # ids + status + titles
+    python3.13 tools/work_queue.py next   <lane>                 # claim + print next TODO
+    python3.13 tools/work_queue.py done   <lane> <id>            # mark DONE
+    python3.13 tools/work_queue.py park   <lane> <id> "<reason>" # mark PARKED (+ reason)
+    python3.13 tools/work_queue.py status <lane>                 # counts by status
+    python3.13 tools/work_queue.py list   <lane>                 # ids + status + titles
 
 Exit codes: 0 ok · 3 queue EMPTY (no TODO) on `next` · 2 usage/IO error.
 Lanes are free-form (e.g. codex-decomper, codex-scaffolder). File must exist.
@@ -123,7 +135,11 @@ def cmd_list(lane: str) -> int:
 def main(argv: list[str]) -> int:
     args = argv[1:]
     if len(args) < 2:
-        print(__doc__.strip().split("\n\n")[3], file=sys.stderr)  # usage block
+        # Find the "Usage:" paragraph by content, not position -- a
+        # hardcoded index here silently breaks (prints the wrong
+        # paragraph, not an error) the next time this docstring grows.
+        usage = next(p for p in __doc__.strip().split("\n\n") if p.startswith("Usage:"))
+        print(usage, file=sys.stderr)
         return 2
     cmd, lane, *rest = args
     try:

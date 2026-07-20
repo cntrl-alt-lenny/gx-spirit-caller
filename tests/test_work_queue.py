@@ -1,4 +1,4 @@
-"""Tests for tools/queue.py — the autonomous self-chaining work queue."""
+"""Tests for tools/work_queue.py — the autonomous self-chaining work queue."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
-import queue as q  # noqa: E402
+import work_queue as q  # noqa: E402
 
 SEED = """# lane
 

@@ -3,7 +3,7 @@
 # Claude Code Decomper — autonomous C-match queue
 
 **Protocol (the standing kickoff drives this):**
-1. `python3.13 tools/queue.py next claude-decomper` → prints the next module, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping brain.
+1. `python3.13 tools/work_queue.py next claude-decomper` → prints the next module, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping brain.
 2. Hand C-match a batch of that module's matched-but-still-`.s` functions to readable C, each byte-verified. `cmatch_loop.py` drafts a starting point; the C-writing judgment is yours. Skip documented reg-alloc walls.
 3. Gate with `python3.13 tools/gate3.py --scope all` (paste the real sha1 PASS). Open ONE PR. Then `queue.py done claude-decomper <id>`, commit the queue file, back to step 1.
 4. A function that won't byte-match after honest iteration → park it (note it in the PR), move on. Don't grind a single wall.

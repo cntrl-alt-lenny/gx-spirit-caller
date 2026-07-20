@@ -615,12 +615,6 @@ code-decomp resumption wave (brief 189).
 
 The multi-agent convention (AGENTS.md § Worktree convention) spins up a new numbered sibling worktree per task session (`claude-525`, `claude-526`, ...). Nothing retires them automatically, so the count only ever grows — 27+ were observe…
 
-### `tools/queue.py`
-
-**the autonomous self-chaining work queue (2026-07-20).**
-
-The recurring pain: Codex/Luna agents finish fast because the work is genuinely bounded, so the human has to re-dispatch every ~20 min. The fix is NOT longer tasks (padding) — it's decoupling throughput from dispatch: a committed backlog…
-
 ### `tools/retrieval_eval.py`
 
 **Small pure-Python BM25 evaluation for the matched-pair corpora.**
@@ -672,6 +666,12 @@ object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain
 **serialise the Wine-backed mwld link step machine-wide.**
 
 Brief 608 (docs/research/brief-608-wineprefix-spike.md) measured near-linear compile scaling once each worktree gets its own WINEPREFIX (no shared wineserver left to fight over), but only 2-way concurrency for the link itself, with no co…
+
+### `tools/work_queue.py`
+
+**the autonomous self-chaining work queue (2026-07-20).**
+
+Named `work_queue.py`, not `queue.py`: running any `python3.13 tools/X.py` script puts `tools/` first on `sys.path`, so a file literally named `queue.py` there shadows the stdlib `queue` module for every script in this directory -- inclu…
 
 ### `tools/xmap_normalize.py`
 
