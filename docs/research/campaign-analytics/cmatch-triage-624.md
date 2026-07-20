@@ -54,3 +54,8 @@ shipped and no gate was run.
 | ov018 | 10 | 0 | 10 | 0 | none |
 | ov020 | 27 | 0 | 27 | 0 | none |
 | ov021 | 9 | 0 | 9 | 0 | none |
+
+**Rest-of-queue total:** 6,011 candidates, 2 accepts, 6,009 iterates, and 0
+parks. The two classify-only accepts were `func_ov004_021c9ef0` and
+`func_ov010_021b34dc`; the sweep restored their original `.s`/delinks state
+and did not ship either candidate.
