@@ -25,6 +25,6 @@ b624 classified 10 modules (ov001/003/007/009/012/013/014/019/022/023). Classify
 ~1850 `.wine-lane/` wine-prefix files are tracked in git (they churn `system.reg`/`user.reg` into unrelated diffs — real noise). `git rm -r --cached .wine-lane` across the tree, ensure `.wine-lane/` (and `.wine-lane*`) is in `.gitignore`, confirm no build input references it. Mechanical but valuable hygiene.
 **Gate:** `git ls-files '.wine-lane/*' | wc -l` == 0, `git check-ignore .wine-lane/x` matches, and `python3.13 tools/gate3.py --scope eur` still PASS (proves the untrack didn't touch a build input).
 
-### q-scopegate-cover — harden scope_gate test coverage [TODO]
+### q-scopegate-cover — harden scope_gate test coverage [DONE]
 `scope_gate.py` gained `--kind carve` (b622). Add tests for edge cases not yet covered (empty diff, multi-region carve, a carve that adds .c but no delink entry, the deliverable-tool mutation check). Wine-free.
 **Gate:** `python3.13 -m pytest tests/test_scope_gate.py -q` green with the new cases.
