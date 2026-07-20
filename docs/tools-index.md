@@ -521,9 +521,7 @@ Brief 119 identified 3 patterns for cluster C `.rodata` symbol carving:
 
 ### `tools/cmatch_loop.py`
 
-**the production c-match loop (brief 619, r7-2).**
-
-Composes four already-built pieces that nothing currently chains:
+**(no docstring)**
 
 ### `tools/containment_check.py`
 
@@ -559,9 +557,7 @@ WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--w
 
 ### `tools/fastmatch.py`
 
-**per-TU match check without a full ROM rebuild.**
-
-Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then runs the RESOLVED comparison against its delinked gap object and reports the function match %.
+**(no docstring)**
 
 ### `tools/gate3.py`
 
