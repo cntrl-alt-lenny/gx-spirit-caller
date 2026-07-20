@@ -21,7 +21,8 @@ main: 7.88% C, the biggest module. b621 converted 10; hundreds remain, especiall
 ov005: 5.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov009 — hand C-match ov009 [CLAIMED]
+### cm-ov009 — hand C-match ov009 [PARKED]
+> PARKED: no honest batch of 8-15 available: read all 17 remaining .s functions directly. 3 already carry brief 343's own detailed deferred-reason analysis (register-allocation coin-flips: discriminant-register choice, scratch-register parking). Of the other 14: 2 use magic-constant-division idioms (smull with 0x78787879/0xb60b60b7/0x51eb851f-style constants -- notoriously exact-codegen-dependent, high iteration cost for uncertain payoff), 1 is a 10-saved-register per-pixel color-blend loop (021ad214, dense interacting register scheduling across ~50 instructions), several are large multi-hundred-to-thousand-byte subsystem functions (0x390-0x990 bytes) unlikely to match on a first natural-C attempt, and 2 borderline jump-table-dispatch candidates (021acf1c, 021aa4a8) would need careful, slow hand-verification of ARM conditional-jump-table semantics before attempting -- not the ~8-15 quick, tractable batch this item asks for. Verified directly, not assumed from ov009_core.h alone (which itself only documented 4 deferred, not exhaustive).
 ov009: 7.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
