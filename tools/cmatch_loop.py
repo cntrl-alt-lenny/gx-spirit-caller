@@ -106,77 +106,6 @@ DEFAULT_STATE_PATH = ROOT / "build" / "cmatch_loop" / "state.json"
 ATTEMPT_CAP = 3  # r7-10
 
 
-# m2c deliberately leaves uncertain types as `?` and uses `void *` for
-# pointer-shaped values.  That is useful for a human draft, but MWCC rejects
-# the placeholders before it can produce an object for fastmatch.  The
-# compile probe gets a conservative, named-field scaffold: it is explicitly
-# a drafting aid, not a claim that these inferred types are byte-correct.
-_UNKNOWN_FIELD_RE = re.compile(r"(?:->|\.)\s*(unk[0-9A-Fa-f]+)\b")
-_FIELD_BASE_RE = re.compile(
-    r"\b([A-Za-z_]\w*)\s*(?:->|\.)\s*unk[0-9A-Fa-f]+\b"
-)
-_STANDALONE_UNKNOWN_RE = re.compile(r"(?<![A-Za-z0-9_])\?(?![A-Za-z0-9_])")
-_RAW_ADDRESS_FIELD_RE = re.compile(
-    r"\((?:void|u8|u16|u32|s8|s16|s32)\s+\*\)"
-    r"(0x[0-9A-Fa-f]+)->(unk[0-9A-Fa-f]+)"
-)
-_ADDRESS_DEREF_RE = re.compile(
-    r"\*\(&([A-Za-z_]\w*)\s+\+\s+([^;]+?)\)"
-)
-
-
-def prepare_compile_source(source: str) -> str:
-    """Make an m2c draft syntactically compilable for the first probe.
-
-    m2c's `?` and `unkNNN` markers are honest uncertainty markers, not C
-    syntax.  Give them a small MWCC-compatible scaffold so cmatch_loop can
-    distinguish "draft compiled, now iterate on bytes" from "the tool could
-    not even create an object".  The transformation intentionally preserves
-    the function body and does not promise a match.
-    """
-    field_names = set(_UNKNOWN_FIELD_RE.findall(source))
-    field_bases = set(_FIELD_BASE_RE.findall(source))
-
-    lines = [
-        "typedef unsigned char u8;",
-        "typedef unsigned short u16;",
-        "typedef unsigned int u32;",
-        "typedef signed char s8;",
-        "typedef signed short s16;",
-        "typedef signed int s32;",
-        "struct M2CUnknown {",
-    ]
-    for field in sorted(field_names, key=lambda item: int(item[3:], 16)):
-        lines.append(f"    int {field};")
-    lines.extend(["};", ""])
-
-    # Pointer-shaped unknown parameters are more useful as the scaffold type
-    # than as int pointers, while scalar unknowns remain int-sized MWCC args.
-    text = source.replace("? *", "struct M2CUnknown *")
-    text = _STANDALONE_UNKNOWN_RE.sub("int", text)
-
-    for name in sorted(field_bases, key=len, reverse=True):
-        text = re.sub(rf"\bvoid \*{re.escape(name)}\b",
-                      f"struct M2CUnknown *{name}", text)
-        text = re.sub(rf"\bint {re.escape(name)}\b",
-                      f"struct M2CUnknown {name}", text)
-        text = re.sub(rf"\bextern int {re.escape(name)}\b",
-                      f"extern struct M2CUnknown {name}", text)
-
-    # m2c emits `(type *)ADDR->unkN` for unknown MMIO bases.  Make the
-    # intended pointer/member operation explicit so MWCC accepts it.
-    text = _RAW_ADDRESS_FIELD_RE.sub(
-        r"((struct M2CUnknown *)\1)->\2", text
-    )
-
-    # A few pool/stack expressions dereference an unknown aggregate address.
-    # Read those words through a byte-addressed int pointer in the scaffold.
-    text = _ADDRESS_DEREF_RE.sub(
-        r"*(int *)((char *)&\1 + \2)", text
-    )
-    return "\n".join(lines) + text
-
-
 # --------------------------------------------------------------------------- #
 # Path derivation (mirrors m2c_feed.find_core_header / fastmatch.ninja_target_path)
 # --------------------------------------------------------------------------- #
@@ -379,7 +308,8 @@ def _disasm_to_s(region: str, func: str, obj_path: str, objdump: str) -> str:
         capture_output=True, text=True, cwd=ROOT, check=True,
     )
     lines = result.stdout.splitlines()
-    # Thumb detection is derived from the disassembly, not the symbol name.
+    thumb = "func_t" in func or False  # cheap default; render() re-derives
+    # detection from content, not this hint, for anything that matters.
     return m2c_feed.render(lines, func, thumb=_looks_thumb(result.stdout))
 
 
@@ -655,7 +585,6 @@ def process_candidate(func: str, region: str, state: dict, *,
     # already has a real gap object and needs none of this.
     s_rel = s_routed_complete_tu(region, module, func)
 
-<<<<<<< HEAD
     def _acquire_and_test() -> tuple[Dossier, dict, Path | None, bool, str | None]:
         dossier = build_dossier(region, func, module, k=fewshot_k, objdump=objdump)
         source_text = source_override if source_override is not None else dossier.m2c_skeleton
@@ -664,16 +593,6 @@ def process_candidate(func: str, region: str, state: dict, *,
                               "detail": f"no source to compile: {dossier.m2c_error}"}, None, False, None
         c_path, created, previous_content = stage_source(
             region, module, func, source_text, reuse_existing=reuse_existing)
-=======
-    # Keep the dossier's raw m2c text available for the human, but compile a
-    # mechanically scaffolded copy so placeholder types do not abort the
-    # first fastmatch probe before it can produce useful feedback.
-    if source_override is None:
-        source_text = prepare_compile_source(source_text)
-    c_path, created, previous_content = stage_source(
-        region, module, func, source_text, reuse_existing=reuse_existing)
-    try:
->>>>>>> origin/codex/cmatch-drafter-626
         outcome = compile_and_fastmatch(c_path, region, func)
         return dossier, outcome, c_path, created, previous_content
 
@@ -890,7 +809,6 @@ class TemporaryGap:
         self.headers_by_path = headers_by_path
         self._backups: dict[Path, str] = {}
 
-<<<<<<< HEAD
     def __enter__(self) -> "TemporaryGap":
         # SAFETY (brief 620): Python never calls __exit__ if __enter__
         # itself raises -- an early version let a failing `ninja delink`
@@ -915,17 +833,6 @@ class TemporaryGap:
             for path, backup in self._backups.items():
                 path.write_text(backup)
             raise
-=======
-    def __enter__(self) -> TemporaryGap:
-        for path, headers in self.headers_by_path.items():
-            backup = path.read_text()
-            self._backups[path] = backup
-            text = backup
-            for header in headers:
-                text = _strip_tu_block(text, header)
-            path.write_text(text)
-        _run_ninja_delink()
->>>>>>> origin/codex/cmatch-drafter-626
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
