@@ -21,6 +21,6 @@ b630's sig-naming engine (dsd sig DB from named functions → `dsd sig apply` �
 Any function real-named in EUR whose USA/JPN twin is still `func_*` is a free name (3× multiplier, byte-neutral). Sweep for EUR-only names, propagate each to its USA/JPN twin via `rename_symbol.py --cascade`, gated by `scope_gate.py --kind naming`. This is pure, safe yield.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + count of twins propagated.
 
-### q-sig-lower-thresh — probe a lower sig-match threshold (measure precision) [TODO]
+### q-sig-lower-thresh — probe a lower sig-match threshold (measure precision) [CLAIMED]
 b630 applied only unambiguous sig matches. Investigate whether a lower `dsd sig apply` confidence threshold surfaces MORE correct names WITHOUT wrong ones — but the round-trip canary must stay 100% and scope_gate must pass every batch. If a lower threshold starts producing wrong names (round-trip fails / name at wrong address), STOP and record the precision ceiling — that's the valuable result. Do NOT mass-apply guesses.
 **Gate:** `scope_gate.py --kind naming` PASS + a short precision report (threshold vs correct/wrong on the round-trip set).
