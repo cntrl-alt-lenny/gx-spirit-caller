@@ -21,7 +21,7 @@ main: 7.88% C, the biggest module. b621 converted 10; hundreds remain, especiall
 ov005: 5.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov009 — hand C-match ov009 [TODO]
+### cm-ov009 — hand C-match ov009 [CLAIMED]
 ov009: 7.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
