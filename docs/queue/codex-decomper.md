@@ -17,7 +17,7 @@ You have the full toolchain in your worktree (`.codex/agents/decomper.toml`). Se
 b630's sig-naming engine (dsd sig DB from named functions → `dsd sig apply` → `rename_symbol.py --cascade`) shipped 29 names. As the CC agents convert more functions to readable-C and name them, the sig corpus grows → more matches. Re-build the sig DB from ALL currently-named functions (EUR uniques + any newly named this session), re-apply across EUR/USA/JPN, report the delta vs 29. Canary: round-trip (un-name a known SDK function, sig-apply, recover the exact name) before any mass apply.
 **Gate:** `dsd check` green 3 regions + `python3.13 tools/scope_gate.py --kind naming --base origin/main` PASS + names-applied delta vs b630's 29.
 
-### q-name-crossprop — cross-region twin propagation sweep [CLAIMED]
+### q-name-crossprop — cross-region twin propagation sweep [DONE]
 Any function real-named in EUR whose USA/JPN twin is still `func_*` is a free name (3× multiplier, byte-neutral). Sweep for EUR-only names, propagate each to its USA/JPN twin via `rename_symbol.py --cascade`, gated by `scope_gate.py --kind naming`. This is pure, safe yield.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + count of twins propagated.
 
