@@ -239,8 +239,10 @@ def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
             f"  (configure.py must be re-run whenever a new .c file is added to src/)"
         )
 
-    lines = combined.splitlines()
-    return False, "\n".join(lines[:15]) if lines else "ninja returned non-zero"
+    # Keep the compiler's diagnostics intact.  cmatch_loop uses this text to
+    # classify draft failures; truncating at the first 15 lines hid the actual
+    # MWCC category behind MoltenVK startup noise.
+    return False, combined or "ninja returned non-zero"
 
 
 # ---------------------------------------------------------------------------
