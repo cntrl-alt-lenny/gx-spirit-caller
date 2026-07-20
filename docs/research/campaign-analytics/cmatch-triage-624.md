@@ -47,3 +47,4 @@ shipped and no gate was run.
 | ov005 | 33 | 0 | 33 | 0 | none |
 | ov006 | 161 | 0 | 161 | 0 | none |
 | ov010 | 49 | 1 | 48 | 0 | `func_ov010_021b34dc` |
+| ov011 | 88 | 0 | 88 | 0 | none |
