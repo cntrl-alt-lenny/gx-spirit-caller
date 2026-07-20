@@ -1,0 +1,5 @@
+name: BitUnPack
+signatures:
+  - bitmask: /////w==
+    pattern: EN9wRw==
+    relocations: []

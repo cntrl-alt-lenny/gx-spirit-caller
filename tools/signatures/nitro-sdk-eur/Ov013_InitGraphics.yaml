@@ -1,0 +1,26 @@
+name: Ov013_InitGraphics
+signatures:
+  - bitmask: /////wAAAP8AAAD/AAAA//////8AAAD/AAAA//////8AAAD//////wAAAP//////
+    pattern: CEAt6QAAAOsAAADrAAAA6wAAoOMAAADrAAAA6wEAoOMAAADrAgCg4wAAAOsIgL3o
+    relocations:
+      - offset: 4
+        name: func_020058b4
+        kind: ArmCall
+      - offset: 8
+        name: func_ov000_021aae70
+        kind: ArmCall
+      - offset: 12
+        name: func_ov013_021c9ff8
+        kind: ArmCall
+      - offset: 20
+        name: func_ov000_021ace2c
+        kind: ArmCall
+      - offset: 24
+        name: func_0202c1ac
+        kind: ArmCall
+      - offset: 32
+        name: func_02005c60
+        kind: ArmCall
+      - offset: 40
+        name: func_02005c60
+        kind: ArmCall

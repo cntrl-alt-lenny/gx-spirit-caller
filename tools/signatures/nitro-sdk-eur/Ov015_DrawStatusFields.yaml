@@ -1,0 +1,34 @@
+name: Ov015_DrawStatusFields
+signatures:
+  - bitmask: >-
+      //////////////////////////////////////////8AAAD///////////////////////////8AAAD//////wAAAP////////////////8AAAD///////////////////////////8AAAD//////wAAAP///////////wAAAAAAAAAAAAAAAA==
+    pattern: >-
+      +EAt6QjQTeJsMJ/lAWCg4QAQk+UAcKDhBACN4gJQoOEAAADrAECg4QQAneVMMJ/lBhCg4QcgoOEAAADrBACg4QAAAOswEJ/lAACN4gQQkeUAAADrAECg4QAAneUgMJ/lBRCg4QcgoOEAAADrBACg4QAAAOsI0I3i+IC96AAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 32
+        name: func_0201edac
+        kind: ArmCall
+      - offset: 56
+        name: func_0207f610
+        kind: ArmCall
+      - offset: 64
+        name: Task_Invoke
+        kind: ArmCall
+      - offset: 80
+        name: func_0201ede4
+        kind: ArmCall
+      - offset: 104
+        name: func_0207f510
+        kind: ArmCall
+      - offset: 112
+        name: Task_Invoke
+        kind: ArmCall
+      - offset: 124
+        name: data_ov015_021b5ba0
+        kind: Load
+      - offset: 128
+        name: data_ov015_021b5e04
+        kind: Load
+      - offset: 132
+        name: data_ov015_021b5df0
+        kind: Load

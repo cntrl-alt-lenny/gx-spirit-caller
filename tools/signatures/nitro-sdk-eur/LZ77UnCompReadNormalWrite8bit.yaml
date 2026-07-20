@@ -1,0 +1,5 @@
+name: LZ77UnCompReadNormalWrite8bit
+signatures:
+  - bitmask: /////w==
+    pattern: Ed9wRw==
+    relocations: []

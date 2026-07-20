@@ -1,0 +1,10 @@
+name: Bg_SetScroll
+signatures:
+  - bitmask: >-
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAA
+    pattern: >-
+      CEAt6VAAn+U8IpDloBKQ5ULmoOEBAFHjOMKQ5QYAABo4AJ/lOCCf5QAYoOFMNgDgDggB4AAAg+EAAILlHACf5SAgn+UAGKDhTDYA4A4IAeAAAIPhAACC5QiAvegAAAAAAAAAAAAAAAAAAAAA
+    relocations:
+      - offset: 92
+        name: data_ov011_021d4000
+        kind: Load

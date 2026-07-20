@@ -1,0 +1,5 @@
+name: GetCRC16
+signatures:
+  - bitmask: /////w==
+    pattern: Dt9wRw==
+    relocations: []

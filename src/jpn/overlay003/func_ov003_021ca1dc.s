@@ -49,7 +49,7 @@
         .extern func_0209445c
         .extern func_020aace8
         .extern func_ov003_021ca174
-        .extern func_ov003_021ccbe4
+        .extern Bg_FillTileRect
         .extern func_ov003_021ccc44
         .extern func_ov003_021ccc7c
         .extern func_ov003_021cccb4
@@ -229,7 +229,7 @@ func_ov003_021ca1dc:
     add r1, r6, #0xde
     mov r2, #0xd4
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     bl func_0208e0e4
     add r4, r0, #0x1e
     ldr r0, _LIT9
@@ -257,7 +257,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x200
     mov r2, #0xe0
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT7
     ldr r0, [r0, r9, lsl #0x2]
     cmp r0, #0x0
@@ -289,7 +289,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x300
     mov r2, #0xec
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     b .L_434
 .L_3a0:
     bl func_0208e0e4
@@ -328,7 +328,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x35c
     mov r2, #0xf8
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
 .L_434:
     mov sl, #0x0
     bl func_0208e0e4
@@ -435,7 +435,7 @@ func_ov003_021ca1dc:
     add r2, r2, #0x108
     mov r3, #0x14
     str r4, [sp, #0x4]
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     bl func_0208e0e4
     add r6, r0, #0x9a
     ldr r0, [sp, #0x18]
@@ -473,7 +473,7 @@ func_ov003_021ca1dc:
     add r1, r6, #0x200
     add r2, r2, #0x130
     mov r3, #0x14
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT7
     mov r1, #0x1
     ldr r0, [r0, r9, lsl #0x2]
@@ -516,7 +516,7 @@ func_ov003_021ca1dc:
     add r2, r2, #0x158
     mov r3, #0x14
     str r5, [sp, #0x4]
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     b .L_7cc
 .L_70c:
     ldr r0, [sp, #0x18]
@@ -561,7 +561,7 @@ func_ov003_021ca1dc:
     ldr r2, _LIT14
     add r1, r4, #0x300
     mov r3, #0xa
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT13
     ldr r0, [r0, #0x4]
     mov r0, r0, lsl #0x1d
@@ -768,7 +768,7 @@ func_ov003_021ca1dc:
     add r1, r5, #0xde
     mov r2, #0xd4
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     bl func_0208e0c4
     add r4, r0, #0x1e
     ldr r0, _LIT9
@@ -796,7 +796,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x200
     mov r2, #0xe0
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT7
     ldr r0, [r0, r8, lsl #0x2]
     cmp r0, #0x0
@@ -828,7 +828,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x300
     mov r2, #0xec
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     b .L_c6c
 .L_bd8:
     bl func_0208e0c4
@@ -867,7 +867,7 @@ func_ov003_021ca1dc:
     add r1, r4, #0x35c
     mov r2, #0xf8
     mov r3, #0x6
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
 .L_c6c:
     bl func_0208e0c4
     add r0, r0, #0x5a
@@ -973,7 +973,7 @@ func_ov003_021ca1dc:
     add r2, r2, #0x108
     mov r3, #0x14
     str r4, [sp, #0x4]
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     bl func_0208e0c4
     add r6, r0, #0x9a
     ldr r0, [sp, #0x18]
@@ -1011,7 +1011,7 @@ func_ov003_021ca1dc:
     add r1, r6, #0x200
     add r2, r2, #0x130
     mov r3, #0x14
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT7
     ldr r0, [r0, r8, lsl #0x2]
     cmp r0, #0x0
@@ -1054,7 +1054,7 @@ func_ov003_021ca1dc:
     add r2, r2, #0x158
     mov r3, #0x14
     str r5, [sp, #0x4]
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     b .L_1048
 _LIT0: .word data_ov003_021cefa0
 _LIT1: .word data_020b4634
@@ -1117,7 +1117,7 @@ _LIT21: .word data_ov003_021cf158
     ldr r2, _LIT14
     add r1, r4, #0x300
     mov r3, #0xa
-    bl func_ov003_021ccbe4
+    bl Bg_FillTileRect
     ldr r0, _LIT13
     ldr r0, [r0, #0x4]
     mov r0, r0, lsl #0x1d

@@ -1,0 +1,11 @@
+name: Ov013_GetPageCount
+signatures:
+  - bitmask: /////wAAAP8AAAD///////////////////////////8AAAAA
+    pattern: CEAt6QAAAOsAAADrDCCf5QIwgOKSE8Dgow+A4AiAvegAAAAA
+    relocations:
+      - offset: 4
+        name: func_0201ab2c
+        kind: ArmCall
+      - offset: 8
+        name: func_ov000_021ab1b0
+        kind: ArmCall

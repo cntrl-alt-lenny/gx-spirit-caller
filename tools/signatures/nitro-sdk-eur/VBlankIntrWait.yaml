@@ -1,0 +1,5 @@
+name: VBlankIntrWait
+signatures:
+  - bitmask: ////////
+    pattern: ACIF33BH
+    relocations: []

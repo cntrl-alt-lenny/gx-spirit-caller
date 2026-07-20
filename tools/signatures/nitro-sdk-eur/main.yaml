@@ -1,0 +1,11 @@
+name: main
+signatures:
+  - bitmask: /////wAAAP8AAAD//////w==
+    pattern: CEAt6QAAAOsAAADrCIC96A==
+    relocations:
+      - offset: 4
+        name: func_02006394
+        kind: ArmCall
+      - offset: 8
+        name: func_020065a8
+        kind: ArmCall

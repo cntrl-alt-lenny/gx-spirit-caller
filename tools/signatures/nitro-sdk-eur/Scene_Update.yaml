@@ -1,0 +1,43 @@
+name: Scene_Update
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////AAAA/wAAAP//////////////////////AAAA/////////////////wAAAP8AAAD///////////////////////////8AAAD//////wAAAP8AAAD/////////////////////////////////AAAAAAAAAAAAAAAAAAAAAA==
+    pattern: >-
+      +EMt6ZBgn+UAQKDjMACW5QRQoOEAAFDjFAAAunyQn+V8cJ/lAYCg4wAAVeMEAADaAAAA6wAAAOs4AJblAQCA4jgAhuUJAKDhAAAA6wAAUOMHAKDhCECgEQAAAOsAAADrMACW5QFQheIAAFXh7f//2igAn+UAAADrJACf5QAAAOsAAADrAABU4xgAnxUDEKATABCAFQQAoOH4g73oAAAAAAAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 48
+        name: func_020056a4
+        kind: ArmCall
+      - offset: 52
+        name: func_02005f2c
+        kind: ArmCall
+      - offset: 72
+        name: func_ov021_021aaa40
+        kind: ArmCall
+      - offset: 88
+        name: func_ov021_021ab090
+        kind: ArmCall
+      - offset: 92
+        name: func_ov021_021aa820
+        kind: ArmCall
+      - offset: 116
+        name: func_ov021_021aaad4
+        kind: ArmCall
+      - offset: 124
+        name: func_ov021_021ab148
+        kind: ArmCall
+      - offset: 128
+        name: func_ov021_021aa848
+        kind: ArmCall
+      - offset: 156
+        name: data_021040ac
+        kind: Load
+      - offset: 160
+        name: data_ov021_0222ced4
+        kind: Load
+      - offset: 164
+        name: data_ov021_0222cf44
+        kind: Load
+      - offset: 168
+        name: data_ov021_021ace80
+        kind: Load

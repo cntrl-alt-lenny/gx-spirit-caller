@@ -1,0 +1,31 @@
+name: Ov015_SelectVramBank
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD/////////////////
+    pattern: >-
+      CEAt6QcAUOMA8Y+QFwAA6gYAAOoHAADqCAAA6gkAAOoKAADqCwAA6gwAAOoNAADqAAAA6wiAvegAAADrCIC96AAAAOsIgL3oAAAA6wiAvegAAADrCIC96AAAAOsIgL3oAAAA6wiAvegAAADrCIC96AAAoOMIgL3o
+    relocations:
+      - offset: 48
+        name: func_0208df60
+        kind: ArmCall
+      - offset: 56
+        name: func_0208df0c
+        kind: ArmCall
+      - offset: 64
+        name: func_0208de94
+        kind: ArmCall
+      - offset: 72
+        name: func_0208ddec
+        kind: ArmCall
+      - offset: 80
+        name: Vram_GetBankBaseCD
+        kind: ArmCall
+      - offset: 88
+        name: Vram_GetBankBaseE
+        kind: ArmCall
+      - offset: 96
+        name: func_0208de4c
+        kind: ArmCall
+      - offset: 104
+        name: func_0208dd9c
+        kind: ArmCall

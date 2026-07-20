@@ -1,0 +1,5 @@
+name: Vram_GetBankBaseE
+signatures:
+  - bitmask: /////////////////////////////////////wAAAAA=
+    pattern: FACf5bAA0OE8AADiQAGg4QAHoOFiBoDiHv8v4QAAAAA=
+    relocations: []

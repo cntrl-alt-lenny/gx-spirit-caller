@@ -1,0 +1,8 @@
+name: Rand_Next
+signatures:
+  - bitmask: ////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAA==
+    pattern: HDCf5RwAn+UEwJPlGBCf5Rggn+WcECDgBACD5SAIAuAe/y/hAAAAAAAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 36
+        name: data_02197434
+        kind: Load

@@ -1,0 +1,40 @@
+name: Ov014_UpdatePanes
+signatures:
+  - bitmask: >-
+      /////////////////////////////////////wAAAP///////////wAAAP///////////wAAAP//////AAAA/////////////////////////////////////////////////wAAAP//////AAAA//////8AAAD//////wAAAP///////////wAAAAAAAAAAAAAAAA==
+    pattern: >-
+      OEAt6XwAn+VEAJDlAABQ4wEAoBM4gL0YbACf5QAAAOsAUKDhZACf5QAAAOsAQKDhVACf5QAAAOtQAJ/lAAAA6wAAVeMAAFQTAUCgEwBAoAMAAFTjLACfFQEQoBMAEIAVAQCg4wAAAOsCAKDjAAAA6wEAoOMAAADrAgCg4wAAAOsEAKDhOIC96AAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 28
+        name: func_ov014_021b2eec
+        kind: ArmCall
+      - offset: 40
+        name: func_ov014_021b41b8
+        kind: ArmCall
+      - offset: 52
+        name: func_ov014_021b2908
+        kind: ArmCall
+      - offset: 60
+        name: func_ov014_021b4040
+        kind: ArmCall
+      - offset: 100
+        name: func_02005e20
+        kind: ArmCall
+      - offset: 108
+        name: func_02005e20
+        kind: ArmCall
+      - offset: 116
+        name: func_02005ca0
+        kind: ArmCall
+      - offset: 124
+        name: func_02005ca0
+        kind: ArmCall
+      - offset: 136
+        name: data_ov014_021b5040
+        kind: Load
+      - offset: 140
+        name: data_ov014_02235094
+        kind: Load
+      - offset: 144
+        name: data_ov014_022350f4
+        kind: Load

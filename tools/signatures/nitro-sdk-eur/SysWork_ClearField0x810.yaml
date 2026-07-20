@@ -1,0 +1,11 @@
+name: SysWork_ClearField0x810
+signatures:
+  - bitmask: /////wAAAP////////////////8AAAD//////w==
+    pattern: CEAt6QAAAOuBHoDiAACg4yAgoOMAAADrCIC96A==
+    relocations:
+      - offset: 4
+        name: GetSystemWork
+        kind: ArmCall
+      - offset: 20
+        name: Fill32
+        kind: ArmCall

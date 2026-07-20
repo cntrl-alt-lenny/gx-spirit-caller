@@ -1,0 +1,5 @@
+name: Sqrt
+signatures:
+  - bitmask: /////w==
+    pattern: Dd9wRw==
+    relocations: []

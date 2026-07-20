@@ -1,0 +1,7 @@
+name: Bg_FillTileRect
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pattern: >-
+      +EAt6RhwneUAUKDjAABX4/iAvdgcQJ3lBeCg4Q5goOEAAFPjCAAA2gEAguKGwKDhBCaC4QAIoOEBYIbivCCB4QMAVuEgKKDh9v//ugFQheIHAFXhQBCB4u///7r4gL3o
+    relocations: []
