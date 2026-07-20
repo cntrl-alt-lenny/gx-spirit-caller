@@ -20,7 +20,7 @@ ov008 is the lowest-C% overlay (3.52%). b620 triaged 70 candidates: 12 are known
 ov001: 5.29% C, lots of headroom. Convert a batch (~8-15) of matched-.s functions.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov014 — hand C-match ov014 [TODO]
+### cm-ov014 — hand C-match ov014 [CLAIMED]
 ov014: 5.01% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
