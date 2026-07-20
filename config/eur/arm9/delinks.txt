@@ -346,7 +346,7 @@ src/main/Entry.c:
 
 
 
-src/main/func_0200093c.s:
+src/main/func_0200093c.c:
     complete
     .text start:0x0200093c end:0x02000950
 
@@ -8161,7 +8161,7 @@ src/main/func_020414b0.s:
     complete
     .text start:0x020414b0 end:0x02041520
 
-src/main/func_02041520.s:
+src/main/func_02041520.c:
     complete
     .text start:0x02041520 end:0x0204152c
 
@@ -9724,7 +9724,7 @@ src/main/func_020536b4.c:
 
 
 
-src/main/func_020536bc.s:
+src/main/func_020536bc.c:
     complete
     .text start:0x020536bc end:0x020536c8
 
@@ -16828,7 +16828,7 @@ src/main/func_02092324.s:
     complete
     .text start:0x02092324 end:0x02092368
 
-src/main/func_02092368.s:
+src/main/func_02092368.c:
     complete
     .text start:0x02092368 end:0x02092380
 
@@ -16971,7 +16971,7 @@ src/main/func_02092d20.s:
     complete
     .text start:0x02092d20 end:0x02092e38
 
-src/main/func_02092e38.s:
+src/main/func_02092e38.c:
     complete
     .text start:0x02092e38 end:0x02092e4c
 
@@ -17139,7 +17139,7 @@ src/main/func_020937fc.s:
 
 
 
-src/main/func_02093808.s:
+src/main/func_02093808.c:
     complete
     .text start:0x02093808 end:0x02093814
 
@@ -17314,7 +17314,7 @@ src/main/Copy32.s:
 
 
 
-src/main/func_020944ec.s:
+src/main/func_020944ec.c:
     complete
     .text start:0x020944ec end:0x02094504
 
@@ -18092,7 +18092,7 @@ src/main/func_02099c24.c:
     complete
     .text start:0x02099c24 end:0x02099c38
 
-src/main/func_02099c38.s:
+src/main/func_02099c38.c:
     complete
     .text start:0x02099c38 end:0x02099c50
 
@@ -18312,7 +18312,7 @@ src/main/func_0209b4e4.legacy.c:
     complete
     .text start:0x0209b4e4 end:0x0209b534
 
-src/main/func_0209b534.s:
+src/main/func_0209b534.c:
     complete
     .text start:0x0209b534 end:0x0209b54c
 
@@ -19957,15 +19957,15 @@ src/main/func_020b3c78.s:
 libs/nitro/func_020b41bc.legacy.c:
     complete
     .text start:0x020b41bc end:0x020b41c0
-src/main/func_020b41c0.s:
+src/main/func_020b41c0.c:
     complete
     .text start:0x020b41c0 end:0x020b41d4
 
-src/main/func_020b41d4.s:
+src/main/func_020b41d4.c:
     complete
     .text start:0x020b41d4 end:0x020b41e8
 
-src/main/func_020b41e8.s:
+src/main/func_020b41e8.c:
     complete
     .text start:0x020b41e8 end:0x020b41f8
 
