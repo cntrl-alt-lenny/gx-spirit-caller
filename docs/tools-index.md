@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**106 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**107 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (37)
+- [Uncategorised](#uncategorised) (38)
 
 ## Analysis / worklist
 
@@ -614,6 +614,12 @@ code-decomp resumption wave (brief 189).
 **cap the number of ephemeral claude-NNN task worktrees.**
 
 The multi-agent convention (AGENTS.md § Worktree convention) spins up a new numbered sibling worktree per task session (`claude-525`, `claude-526`, ...). Nothing retires them automatically, so the count only ever grows — 27+ were observe…
+
+### `tools/queue.py`
+
+**the autonomous self-chaining work queue (2026-07-20).**
+
+The recurring pain: Codex/Luna agents finish fast because the work is genuinely bounded, so the human has to re-dispatch every ~20 min. The fix is NOT longer tasks (padding) — it's decoupling throughput from dispatch: a committed backlog…
 
 ### `tools/retrieval_eval.py`
 
