@@ -473,5 +473,288 @@ class TestBuildDossierRegression(unittest.TestCase):
         self.assertIsNotNone(dossier.m2c_skeleton)
 
 
+# --------------------------------------------------------------------------- #
+# Brief 620 — scale-validation fixes. Pure logic first.
+# --------------------------------------------------------------------------- #
+
+class TestPatchUnresolvedTypes(unittest.TestCase):
+    """m2c's `?` unresolved-type placeholder is not valid C -- confirmed
+    against a real mwcc run (declaration/expression syntax error, not a
+    diff), not a hypothetical. patch_unresolved_types() is the targeted,
+    narrow fix: only `?` in a declaration/call return-type position."""
+
+    def test_patches_return_type_position(self):
+        text = "? func_x(s32);\n"
+        patched, count = cl.patch_unresolved_types(text)
+        self.assertEqual(count, 1)
+        self.assertEqual(patched, "int func_x(s32);\n")
+
+    def test_patches_multiple_occurrences(self):
+        text = "? func_a();\n? func_b(int);\nint func_c();\n"
+        patched, count = cl.patch_unresolved_types(text)
+        self.assertEqual(count, 2)
+        self.assertNotIn("?", patched)
+
+    def test_leaves_already_typed_declarations_alone(self):
+        text = "s32 func_x();\nint func_y(void);\n"
+        patched, count = cl.patch_unresolved_types(text)
+        self.assertEqual(count, 0)
+        self.assertEqual(patched, text)
+
+    def test_does_not_touch_a_bare_question_mark_elsewhere(self):
+        # A `?` not immediately followed by `ident(` (e.g. inside a
+        # comment or a ternary m2c happened to emit) must survive --
+        # the fix is deliberately narrow, not a blanket find-replace.
+        text = "/* really? */\nint x = a ? b : c;\n"
+        patched, count = cl.patch_unresolved_types(text)
+        self.assertEqual(count, 0)
+        self.assertEqual(patched, text)
+
+    def test_real_captured_draft_all_three_patched(self):
+        # Verbatim (minus body) from a real func_ov008_021b2200 m2c
+        # draft captured while building this fix.
+        text = (
+            "? func_0202cca4(s32);                               /* extern */\n"
+            "s32 func_0202cdf8();                                /* extern */\n"
+            "? func_0202ce24();                                  /* extern */\n"
+            "? func_0202d9a0();                                  /* extern */\n"
+        )
+        patched, count = cl.patch_unresolved_types(text)
+        self.assertEqual(count, 3)
+        self.assertEqual(patched.count("int func_"), 3)
+        self.assertEqual(patched.count("s32 func_"), 1)
+
+
+class TestSRoutedCompleteTu(unittest.TestCase):
+    """Detects the c-match scenario (already-matched-but-.s) vs. a
+    genuinely-unmatched candidate -- the distinction process_candidate
+    uses to decide whether it needs a TemporaryGap window at all."""
+
+    def _write_delinks(self, root: Path, entries: str) -> Path:
+        arm9 = root / "arm9"
+        arm9.mkdir(parents=True, exist_ok=True)
+        p = arm9 / "delinks.txt"
+        p.write_text(entries)
+        return p
+
+    def test_complete_s_routed_tu_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_delinks(root, (
+                "    .text       start:0x0 end:0x40 kind:code\n"
+                "\n"
+                "src/main/func_x.s:\n"
+                "    complete\n"
+                "    .text start:0x0 end:0x40\n"
+            ))
+            orig_delinks_path_for_module = cl.delinks_path_for_module
+            cl.delinks_path_for_module = lambda region, module: root / "arm9" / "delinks.txt"
+            try:
+                result = cl.s_routed_complete_tu("eur", "main", "func_x")
+            finally:
+                cl.delinks_path_for_module = orig_delinks_path_for_module
+            self.assertEqual(result, "src/main/func_x.s")
+
+    def test_incomplete_s_tu_not_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_delinks(root, (
+                "    .text       start:0x0 end:0x40 kind:code\n"
+                "\n"
+                "src/main/func_x.s:\n"
+                "    .text start:0x0 end:0x40\n"
+            ))
+            orig = cl.delinks_path_for_module
+            cl.delinks_path_for_module = lambda region, module: root / "arm9" / "delinks.txt"
+            try:
+                result = cl.s_routed_complete_tu("eur", "main", "func_x")
+            finally:
+                cl.delinks_path_for_module = orig
+            self.assertIsNone(result)
+
+    def test_c_routed_tu_not_detected_as_s_routed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_delinks(root, (
+                "    .text       start:0x0 end:0x40 kind:code\n"
+                "\n"
+                "src/main/func_x.c:\n"
+                "    complete\n"
+                "    .text start:0x0 end:0x40\n"
+            ))
+            orig = cl.delinks_path_for_module
+            cl.delinks_path_for_module = lambda region, module: root / "arm9" / "delinks.txt"
+            try:
+                result = cl.s_routed_complete_tu("eur", "main", "func_x")
+            finally:
+                cl.delinks_path_for_module = orig
+            self.assertIsNone(result)
+
+    def test_missing_delinks_file_returns_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            orig = cl.delinks_path_for_module
+            cl.delinks_path_for_module = lambda region, module: root / "nope" / "delinks.txt"
+            try:
+                result = cl.s_routed_complete_tu("eur", "main", "func_x")
+            finally:
+                cl.delinks_path_for_module = orig
+            self.assertIsNone(result)
+
+
+class TestDisplaceSiblingS(unittest.TestCase):
+    """The .s-sibling displacement that unblocks a real ninja conflict:
+    writing a draft .c next to a still-present, still-.s-routed matched
+    function produces `ninja: error: ... multiple rules generate` the
+    SAME output .o -- confirmed on the very first real ov008 attempt,
+    all 3 smoke-test candidates, not a hypothetical."""
+
+    def test_displaces_and_restores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            s_path = Path(tmp) / "func_x.s"
+            s_path.write_text("@ original .s content\n")
+            backup = cl.displace_sibling_s(s_path)
+            self.assertFalse(s_path.is_file())
+            self.assertEqual(backup, "@ original .s content\n")
+            cl.restore_sibling_s(s_path, backup)
+            self.assertTrue(s_path.is_file())
+            self.assertEqual(s_path.read_text(), "@ original .s content\n")
+
+    def test_missing_s_file_returns_none_and_restore_is_a_noop(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            s_path = Path(tmp) / "func_x.s"
+            backup = cl.displace_sibling_s(s_path)
+            self.assertIsNone(backup)
+            cl.restore_sibling_s(s_path, backup)
+            self.assertFalse(s_path.is_file())
+
+
+class TestTemporaryGapEnterExceptionSafety(unittest.TestCase):
+    """Regression test for a real bug: Python never calls __exit__ if
+    __enter__ itself raises. An earlier TemporaryGap left every already-
+    stripped delinks.txt permanently modified (no restore) when the
+    `ninja delink` call inside __enter__ failed -- caught directly: a
+    crashed real run left two real delinks.txt files (main's and
+    ov002's) stripped and uncommitted until manually `git checkout`-
+    restored. __enter__ must roll back what it already wrote before
+    re-raising, exactly like __exit__ does on a later failure."""
+
+    def test_failing_ninja_delink_restores_already_written_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p1 = Path(tmp) / "a.txt"
+            p2 = Path(tmp) / "b.txt"
+            p1.write_text("src/main/func_a.c:\n    complete\n    .text start:0x0 end:0x10\n")
+            p2.write_text("src/main/func_b.c:\n    complete\n    .text start:0x0 end:0x10\n")
+            gap = cl.TemporaryGap({p1: ["src/main/func_a.c"], p2: ["src/main/func_b.c"]})
+
+            def _boom():
+                raise RuntimeError("simulated ninja delink failure")
+
+            orig_run = cl._run_ninja_delink
+            cl._run_ninja_delink = _boom
+            try:
+                with self.assertRaises(RuntimeError):
+                    gap.__enter__()
+            finally:
+                cl._run_ninja_delink = orig_run
+
+            # Both files must be back to their ORIGINAL content, not left
+            # stripped -- this is the exact state a crashed real run left
+            # config/eur/arm9/delinks.txt and .../ov002/delinks.txt in
+            # before this fix.
+            self.assertIn("func_a.c", p1.read_text())
+            self.assertIn("complete", p1.read_text())
+            self.assertIn("func_b.c", p2.read_text())
+            self.assertIn("complete", p2.read_text())
+
+    def test_successful_enter_still_works_normally(self):
+        # Non-regression: the happy path (real ninja delink succeeds)
+        # must still strip-then-not-restore on __enter__ (restoration
+        # only happens on __exit__ for a successful entry).
+        with tempfile.TemporaryDirectory() as tmp:
+            p1 = Path(tmp) / "a.txt"
+            p1.write_text("src/main/func_a.c:\n    complete\n    .text start:0x0 end:0x10\n")
+            gap = cl.TemporaryGap({p1: ["src/main/func_a.c"]})
+
+            orig_run = cl._run_ninja_delink
+            cl._run_ninja_delink = lambda: None
+            try:
+                gap.__enter__()
+                self.assertNotIn("func_a.c", p1.read_text())
+                gap.__exit__(None, None, None)
+                self.assertIn("func_a.c", p1.read_text())
+            finally:
+                cl._run_ninja_delink = orig_run
+
+
+@unittest.skipUnless(_HAS_TOOLCHAIN, _SKIP_REASON)
+class TestCMatchScenarioIntegration(unittest.TestCase):
+    """End-to-end: an already-.s-matched, real ov008 candidate (the
+    scenario brief 620 exists to drain) must get a REAL attempt from
+    process_candidate, not the "dossier produced no compilable source" /
+    ninja "multiple rules" errors this scenario hit on first real use.
+    Confirms the .s-displacement + include-prepending + unresolved-type-
+    patching fixes compose correctly against the real toolchain, and
+    that the tree is left exactly as found.
+
+    021acfa0 is deliberately a documented HARD candidate (ov008_core.h:
+    a permuter-probed byte-combine-builder wall, brief 403), not a soft
+    one picked to make this test look good -- its raw m2c draft, even
+    patched, genuinely fails to compile ("not a struct/union/class",
+    confirmed against real mwcc: m2c mis-models one of its fields as a
+    struct member). That is a REAL attempt (the compiler ran against
+    this function's own code and gave a real diagnostic) exactly as
+    much as a numeric sub-100% score would be -- both are "iterate",
+    both leave match_percent readable-or-None correctly; only the two
+    INFRA-error strings below (this scenario's actual failure mode
+    before the brief-620 fixes) would mean the plumbing itself is
+    broken again."""
+
+    def test_ov008_candidate_gets_a_real_score_and_tree_is_restored(self):
+        func, region, module = "func_ov008_021acfa0", "eur", "ov008"
+        s_path = cl.src_path(region, module, func, suffix=".s")
+        c_path = cl.src_path(region, module, func)
+        delinks_path = cl.delinks_path_for_module(region, module)
+        original_s = s_path.read_text()
+        original_delinks = delinks_path.read_text()
+        self.assertTrue(s_path.is_file())
+        self.assertFalse(c_path.is_file())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            state = cl.load_state(state_path)
+            result = cl.process_candidate(func, region, state)
+
+        # The scenario-detection + .s-displacement + include/type fixes
+        # must together produce a REAL attempt, not an infra error --
+        # "iterate" (or even "accept", if m2c's draft happens to land
+        # it) is a real outcome; "no compilable source" / a ninja
+        # subprocess error string is not.
+        self.assertIn(result["classification"], ("accept", "iterate", "park"))
+        detail = result.get("detail") or ""
+        self.assertNotIn("multiple rules", detail)
+        self.assertNotIn("no compilable source", detail)
+        # match_percent is None exactly when compilation itself failed
+        # (compile_and_fastmatch's documented contract, cmatch_loop.py's
+        # own classify() docstring: "covers a genuine low/partial match,
+        # a compile error, ... alike") -- a real compiler diagnostic
+        # against 021acfa0's own code, not a missing score. Either way
+        # there must be a non-empty reason on record.
+        if result["match_percent"] is None:
+            self.assertTrue(detail.strip(),
+                             "no match_percent AND no detail explaining why")
+        else:
+            self.assertGreaterEqual(result["match_percent"], 0.0)
+
+        # Tree must be back exactly as found: unaccepted (this is a
+        # fresh state, ATTEMPT_CAP not hit) means iterate, so the .s
+        # sibling and delinks.txt must both be restored.
+        if result["classification"] != "accept":
+            self.assertTrue(s_path.is_file())
+            self.assertEqual(s_path.read_text(), original_s)
+            self.assertEqual(delinks_path.read_text(), original_delinks)
+            self.assertFalse(c_path.is_file())
+
+
 if __name__ == "__main__":
     unittest.main()

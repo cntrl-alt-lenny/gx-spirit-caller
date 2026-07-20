@@ -53,6 +53,25 @@ ATTEMPT_CAP = 3 (r7-10: "attempt-cap = 3, not the peer's 28 — one lane
 makes long-tail attempt economics infeasible"). A candidate that hasn't
 reached 100% after 3 attempts auto-parks rather than looping forever.
 
+THE C-MATCH SCENARIO (brief 620): an already-.s-matched candidate --
+the readable-C conversion target this whole tool exists to drain -- has
+NO gap object (dsd only emits one for byte ranges no TU claims, and an
+already-matched TU claims its own). `s_routed_complete_tu()` detects
+this and `process_candidate` wraps dossier-build + compile + fastmatch
+in a per-candidate TemporaryGap, additionally displacing the still-
+present `.s` sibling for the compile window (writing a draft `.c` next
+to it otherwise produces a real ninja "multiple rules generate the same
+output" error -- confirmed on the first real attempt against this
+scenario, not a hypothetical). Both are restored unless the candidate
+is accepted, in which case the `.s` stays removed (matching the
+project's own convention: no already-.c-converted function anywhere in
+this tree keeps a sibling `.s`) and the winning draft is left on disk
+for batch_sha1.py to find-and-flip. `--source-overrides-dir DIR` feeds
+a hand-improved `<func>.c` back through this same path -- the CLI-level
+version of "iterate the iterate-class ones with judgment"; the plain
+positional-args/`--candidates-file` path alone had no way to do this
+short of the Python API's `source_overrides` parameter.
+
 Usage:
     python tools/cmatch_loop.py eur func_02000e34 func_02001e5c \\
         --state build/cmatch_loop/state.json
@@ -80,6 +99,7 @@ if str(_TOOLS) not in sys.path:
 
 import fastmatch  # noqa: E402
 import m2c_feed  # noqa: E402
+import progress  # noqa: E402
 import suggest_coercion  # noqa: E402
 
 DEFAULT_STATE_PATH = ROOT / "build" / "cmatch_loop" / "state.json"
@@ -124,6 +144,7 @@ class Dossier:
     m2c_error: str | None = None
     coercion_hits: list[dict] | None = None
     coercion_error: str | None = None
+    unresolved_types_patched: int = 0
 
     def render_markdown(self) -> str:
         parts = [f"# Dossier: {self.func} ({self.region}/{self.module})", ""]
@@ -146,6 +167,11 @@ class Dossier:
         parts.append("")
         parts.append("## m2c draft skeleton")
         if self.m2c_skeleton:
+            if self.unresolved_types_patched:
+                parts.append(f"_({self.unresolved_types_patched} unresolved-type `?` "
+                              "placeholder(s) patched to `int` so this compiles at all "
+                              "-- likely WRONG types worth checking by hand, not a real "
+                              "fix; see suggest_coercion hints below once compiled.)_")
             parts.append("```c")
             parts.append(self.m2c_skeleton.rstrip("\n"))
             parts.append("```")
@@ -163,6 +189,33 @@ class Dossier:
             parts.append("- (not yet run — needs a compiled .o; populated after "
                           "the first compile attempt, see enrich_with_coercion)")
         return "\n".join(parts) + "\n"
+
+
+_UNRESOLVED_TYPE_RE = re.compile(r"(?<![\w?])\?(?=\s+\w+\s*\()")
+
+
+def patch_unresolved_types(text: str) -> tuple[str, int]:
+    """Replace m2c's `?` unresolved-type placeholder with `int` wherever
+    it stands in for a function's return type (`? func_X(...)`), and
+    report how many replacements were made.
+
+    `?` is not valid C -- m2c prints it when it cannot infer a type
+    (r7-6's documented limitation: "mis-resolves pool literals ->
+    ?/void*"), and a raw `?`-carrying draft is a hard compile error, not
+    a partial match (confirmed against real mwcc: `declaration syntax
+    error` / `expression syntax error`, not a diff). This does not fix
+    the underlying unresolved-type problem -- the substituted `int` may
+    well be the wrong type (a pointer, a different width) -- it only
+    gets the draft to a state fastmatch can score at all, converting a
+    guaranteed 0%/compile_error into a real, if likely imperfect,
+    percentage a human can iterate from. Only matches `?` immediately
+    followed by whitespace-then-identifier-then-`(` (a declaration/call
+    return-type position) to avoid mangling a `?` that might legitimately
+    appear elsewhere (e.g. inside a string or comment m2c happened to
+    emit) -- deliberately narrow rather than a blanket find-replace.
+    """
+    patched, count = _UNRESOLVED_TYPE_RE.subn("int", text)
+    return patched, count
 
 
 def build_dossier(region: str, func: str, module: str, *, k: int = 3,
@@ -218,7 +271,26 @@ def build_dossier(region: str, func: str, module: str, *, k: int = 3,
     try:
         s_text = _disasm_to_s(region, func, obj_path, objdump)
         context = m2c_feed.build_context(region, module)
-        dossier.m2c_skeleton = m2c_feed.run_m2c(func, s_text, context)
+        raw_skeleton = m2c_feed.run_m2c(func, s_text, context)
+        raw_skeleton, n_patched = patch_unresolved_types(raw_skeleton)
+        dossier.unresolved_types_patched = n_patched
+        # brief 620: run_m2c's OWN output is never standalone-compilable
+        # -- confirmed against a real mwcc run (not just eyeballing the
+        # text, which is all brief 609 did): it freely emits m2c's `s32`/
+        # `u32`-family type names with NO #include for them anywhere in
+        # its own output. `--context` only feeds those names to m2c's
+        # decompilation/type-inference step; it does not also add the
+        # matching #include to what m2c PRINTS. `s32` itself isn't even
+        # defined by any module's own *_core.h (checked: ov002_core.h
+        # and ov008_core.h each define u8/u16/u32 only) -- the project's
+        # own convention for it is `#include <nitro/types.h>` (36 real
+        # matched files do exactly this). Prepending both makes the
+        # skeleton what run_m2c's docstring already implies it should
+        # be: a drop-in draft, not just decompiler-accurate prose.
+        includes = ["#include <nitro/types.h>"]
+        if dossier.struct_header_path:
+            includes.append(f'#include "{Path(dossier.struct_header_path).name}"')
+        dossier.m2c_skeleton = "\n".join(includes) + "\n\n" + raw_skeleton
     except Exception as exc:  # noqa: BLE001 — m2c has many failure modes; the
         # dossier records the failure and proceeds context-less rather than
         # aborting the whole candidate (r7-6: the dossier is a comprehension
@@ -295,6 +367,37 @@ def _reconfigure(region: str) -> None:
         [sys.executable, "tools/configure.py", region],
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
+
+
+def displace_sibling_s(s_path: Path) -> str | None:
+    """Move an already-shipped .s file's content out of the way and
+    return it (None if no .s file existed).
+
+    brief 620: configure.py adds an unconditional ninja build rule for
+    EVERY .c and EVERY .s file it finds under src/ — not just whichever
+    one delinks.txt currently routes to. Writing a draft .c next to a
+    still-present, still-matched .s for the same function produces a
+    real `ninja: error: ... multiple rules generate build/.../X.o`, not
+    a hypothetical edge case (hit on the very first real ov008 c-match
+    attempt, all 3 smoke-test candidates). Every already-.c-converted
+    function in this tree has zero sibling .s file (verified directly:
+    `ls src/overlay008/*.c` vs. checking for a matching .s finds none)
+    — so removing it is not a workaround, it's the established
+    convention this tool needs to reproduce to compile-test a draft at
+    all, not just to ship one.
+    """
+    if not s_path.is_file():
+        return None
+    content = s_path.read_text()
+    s_path.unlink()
+    return content
+
+
+def restore_sibling_s(s_path: Path, content: str | None) -> None:
+    """Undo displace_sibling_s: put the .s file back verbatim if it was
+    ever displaced (content is None otherwise — nothing to do)."""
+    if content is not None:
+        s_path.write_text(content)
 
 
 def stage_source(region: str, module: str, func: str, source_text: str, *,
@@ -406,6 +509,37 @@ def save_state(path: Path, state: dict) -> None:
     path.write_text(json.dumps(state, indent=2) + "\n")
 
 
+def s_routed_complete_tu(region: str, module: str, func: str) -> str | None:
+    """If `func` is an already-matched-but-still-.s candidate (the c-match
+    scenario brief 620 exists to drain: byte-identical, complete, just not
+    yet readable C), return its TU's relative header path (e.g.
+    'src/overlay008/func_ov008_X.s'). Returns None for a genuinely
+    unmatched function — dsd's own gap object already covers those,
+    brief 619's original design.
+
+    This distinction matters because dsd only ever emits a `_dsd_gap@...`
+    object for byte ranges NO TU header claims (confirmed in brief 619) —
+    an already-.s-matched TU claims its range, so `m2c_feed.find_object`/
+    `retrieve_fewshot` fail outright for every such candidate (confirmed
+    in brief 620: EVERY one of ov008's 70 .s-matched candidates hit
+    "dossier produced no compilable source" on a naive first pass, not a
+    partial-match iterate — a much more fundamental gap than the brief
+    619 canary's read-only TemporaryGap use suggested). `process_candidate`
+    uses this to decide whether it needs a per-candidate TemporaryGap
+    window around dossier-build + compile + fastmatch.
+    """
+    delinks_path = delinks_path_for_module(region, module)
+    if not delinks_path.is_file():
+        return None
+    s_path = src_path(region, module, func, suffix=".s")
+    rel = str(s_path.relative_to(ROOT))
+    _sections, tus = progress.parse_delinks_file(delinks_path)
+    for tu in tus:
+        if tu.get("source") == rel and tu.get("status") == "complete":
+            return rel
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # The loop itself
 # --------------------------------------------------------------------------- #
@@ -442,41 +576,127 @@ def process_candidate(func: str, region: str, state: dict, *,
                 "match_percent": None, "detail": f"resolve_symbol failed: {exc}",
                 "skipped": False, "dossier": None}
 
-    dossier = build_dossier(region, func, module, k=fewshot_k, objdump=objdump)
-    source_text = source_override if source_override is not None else dossier.m2c_skeleton
-    if source_text is None:
-        rec["attempts"] += 1
-        rec["status"] = "iterate" if rec["attempts"] < ATTEMPT_CAP else "parked"
-        rec["last_match_percent"] = None
-        rec["history"].append({"attempt": rec["attempts"],
-                                "error": f"no source to compile: {dossier.m2c_error}"})
-        return {"func": func, "region": region, "classification": rec["status"],
-                "match_percent": None, "detail": "dossier produced no compilable source",
-                "skipped": False, "dossier": dossier}
+    # brief 620: an already-.s-matched candidate (the c-match/readable-C
+    # scenario this brief exists to drain) has NO gap object -- its TU
+    # already claims the range, so dossier-building needs the same
+    # TemporaryGap trick brief 619's canary used, just for real
+    # dossier+compile+fastmatch work, not a read-only reproduction check.
+    # A genuinely still-unmatched candidate (brief 619's original design)
+    # already has a real gap object and needs none of this.
+    s_rel = s_routed_complete_tu(region, module, func)
 
-    c_path, created, previous_content = stage_source(
-        region, module, func, source_text, reuse_existing=reuse_existing)
-    try:
+    def _acquire_and_test() -> tuple[Dossier, dict, Path | None, bool, str | None]:
+        dossier = build_dossier(region, func, module, k=fewshot_k, objdump=objdump)
+        source_text = source_override if source_override is not None else dossier.m2c_skeleton
+        if source_text is None:
+            return dossier, {"status": "no_source", "match_percent": None,
+                              "detail": f"no source to compile: {dossier.m2c_error}"}, None, False, None
+        c_path, created, previous_content = stage_source(
+            region, module, func, source_text, reuse_existing=reuse_existing)
         outcome = compile_and_fastmatch(c_path, region, func)
-    finally:
-        if not keep_drafts:
+        return dossier, outcome, c_path, created, previous_content
+
+    def _finish(dossier: Dossier, outcome: dict) -> dict | None:
+        """Shared classify + state-update logic. Returns the early-return
+        dict for a no-source outcome, or None if the caller should keep
+        going (compute the normal accept/iterate/park result itself,
+        since only the caller knows whether it's still inside a
+        TemporaryGap window and can safely call enrich_with_coercion)."""
+        if outcome["status"] == "no_source":
+            rec["attempts"] += 1
+            rec["status"] = "iterate" if rec["attempts"] < ATTEMPT_CAP else "parked"
+            rec["last_match_percent"] = None
+            rec["history"].append({"attempt": rec["attempts"], "error": outcome["detail"]})
+            return {"func": func, "region": region, "classification": rec["status"],
+                    "match_percent": None, "detail": "dossier produced no compilable source",
+                    "skipped": False, "dossier": dossier}
+        return None
+
+    if s_rel is not None:
+        delinks_path = delinks_path_for_module(region, module)
+        s_path = ROOT / s_rel
+        with TemporaryGap({delinks_path: [s_rel]}):
+            s_backup = displace_sibling_s(s_path)
+            try:
+                dossier, outcome, c_path, created, previous_content = _acquire_and_test()
+            except Exception:
+                restore_sibling_s(s_path, s_backup)
+                _reconfigure(region)
+                raise
+            early = _finish(dossier, outcome)
+            if early is not None:
+                restore_sibling_s(s_path, s_backup)
+                _reconfigure(region)
+                return early
+
+            rec["attempts"] += 1
+            classification = classify(outcome["match_percent"], outcome["status"], rec["attempts"])
+            rec["status"] = "accepted" if classification == "accept" else (
+                "parked" if classification == "park" else "iterate")
+            rec["last_match_percent"] = outcome["match_percent"]
+            rec["history"].append({
+                "attempt": rec["attempts"], "fastmatch_status": outcome["status"],
+                "match_percent": outcome["match_percent"], "classification": classification,
+                "detail": outcome["detail"],
+            })
+
+            # Coercion hints need the gap object, which is only real
+            # INSIDE this `with` block -- must run before it exits, unlike
+            # the non-c-match branch below where the gap object (a real,
+            # already-shipped one) persists regardless.
+            if classification != "accept" and keep_drafts:
+                dossier = enrich_with_coercion(dossier, c_path, region, func)
+
+            keep_this_one = classification == "accept"
+            if not keep_this_one:
+                if not keep_drafts and c_path is not None:
+                    unstage_source(c_path, created, previous_content, region)
+                # Always restore the .s sibling for anything short of a
+                # real accept -- an "iterate" draft kept on disk (--keep-
+                # drafts) must NOT leave the function sourceless: the .s
+                # goes back so the tree stays buildable/matching exactly
+                # as it was found, with the (non-matching) draft .c
+                # sitting alongside it purely for inspection. Only an
+                # ACCEPTED candidate gets to leave the .s permanently
+                # removed, matching the project's own established
+                # convention (verified: zero already-.c-converted
+                # functions anywhere in this tree keep a sibling .s).
+                restore_sibling_s(s_path, s_backup)
+                _reconfigure(region)
+            # else (accepted): leave the .s removed and the winning draft
+            # ON DISK -- delinks.txt is about to go back to .s-ROUTED TEXT
+            # inside this `with` block's __exit__ (the file is gone, the
+            # TU header string is not), which is exactly the state
+            # batch_sha1.py needs: it finds the still-.s-routed header,
+            # flips the TEXT to .c, and only THEN runs a real `ninja
+            # sha1` -- by which point the routing and the on-disk files
+            # agree again. process_candidate's caller (run_loop) reaches
+            # invoke_batch_sha1() immediately after the whole sweep, so
+            # this "routing says .s, file doesn't exist" window is
+            # process-local and short-lived, not a persisted state; any
+            # unrelated `ninja` invocation during that narrow window
+            # would fail loudly (missing input), never silently.
+    else:
+        dossier, outcome, c_path, created, previous_content = _acquire_and_test()
+        early = _finish(dossier, outcome)
+        if early is not None:
+            return early
+
+        rec["attempts"] += 1
+        classification = classify(outcome["match_percent"], outcome["status"], rec["attempts"])
+        rec["status"] = "accepted" if classification == "accept" else (
+            "parked" if classification == "park" else "iterate")
+        rec["last_match_percent"] = outcome["match_percent"]
+        rec["history"].append({
+            "attempt": rec["attempts"], "fastmatch_status": outcome["status"],
+            "match_percent": outcome["match_percent"], "classification": classification,
+            "detail": outcome["detail"],
+        })
+
+        if classification != "accept" and keep_drafts:
+            dossier = enrich_with_coercion(dossier, c_path, region, func)
+        if not keep_drafts and c_path is not None:
             unstage_source(c_path, created, previous_content, region)
-
-    rec["attempts"] += 1
-    classification = classify(outcome["match_percent"], outcome["status"], rec["attempts"])
-    rec["status"] = "accepted" if classification == "accept" else (
-        "parked" if classification == "park" else "iterate")
-    rec["last_match_percent"] = outcome["match_percent"]
-    rec["history"].append({
-        "attempt": rec["attempts"], "fastmatch_status": outcome["status"],
-        "match_percent": outcome["match_percent"], "classification": classification,
-        "detail": outcome["detail"],
-    })
-
-    if classification != "accept" and keep_drafts:
-        # Only worth the extra compile if the draft is still on disk to
-        # diff against (unstage already ran above when keep_drafts=False).
-        dossier = enrich_with_coercion(dossier, c_path, region, func)
 
     return {"func": func, "region": region, "classification": classification,
             "match_percent": outcome["match_percent"], "detail": outcome["detail"],
@@ -590,14 +810,29 @@ class TemporaryGap:
         self._backups: dict[Path, str] = {}
 
     def __enter__(self) -> "TemporaryGap":
-        for path, headers in self.headers_by_path.items():
-            backup = path.read_text()
-            self._backups[path] = backup
-            text = backup
-            for header in headers:
-                text = _strip_tu_block(text, header)
-            path.write_text(text)
-        _run_ninja_delink()
+        # SAFETY (brief 620): Python never calls __exit__ if __enter__
+        # itself raises -- an early version let a failing `ninja delink`
+        # here (e.g. a stale build.ninja conflict from an unrelated
+        # leftover file) leave every already-written delinks.txt
+        # permanently stripped, uncommitted, with no automatic recovery.
+        # Caught directly: a crashed run left two real delinks.txt files
+        # (main's and ov002's) missing their canary functions' TU blocks
+        # until manually `git checkout`-restored. Wrapped in try/except
+        # so __enter__ restores everything it already wrote before
+        # re-raising, exactly like __exit__ does on a later failure.
+        try:
+            for path, headers in self.headers_by_path.items():
+                backup = path.read_text()
+                self._backups[path] = backup
+                text = backup
+                for header in headers:
+                    text = _strip_tu_block(text, header)
+                path.write_text(text)
+            _run_ninja_delink()
+        except Exception:
+            for path, backup in self._backups.items():
+                path.write_text(backup)
+            raise
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -697,6 +932,15 @@ def main(argv: list[str] | None = None) -> int:
                           "runs a full ninja sha1). Without this, --gate uses --dry-run.")
     ap.add_argument("--keep-drafts", action="store_true",
                      help="Leave staged candidate .c files on disk instead of removing them")
+    ap.add_argument("--source-overrides-dir", type=Path,
+                     help="Directory of hand-authored <func>.c files (brief 620: "
+                          "'iterate the iterate-class ones with judgment' needs a way "
+                          "to feed an improved draft back through the same compile+"
+                          "fastmatch+classify path, not just the raw, deterministic "
+                          "m2c skeleton every plain re-run would regenerate "
+                          "identically). A file present here for a queued candidate "
+                          "wins over its dossier's m2c skeleton; candidates with no "
+                          "matching file fall back to the m2c skeleton as usual.")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
@@ -708,12 +952,21 @@ def main(argv: list[str] | None = None) -> int:
         print("error: no candidate function names given", file=sys.stderr)
         return 2
 
+    source_overrides = None
+    if args.source_overrides_dir:
+        source_overrides = {}
+        for func in funcs:
+            p = args.source_overrides_dir / f"{func}.c"
+            if p.is_file():
+                source_overrides[func] = p.read_text()
+
     if args.canary:
         report = run_canary(funcs, args.region, state_path=args.state)
     else:
         report = run_loop(funcs, args.region, state_path=args.state,
                            keep_drafts=args.keep_drafts, gate=args.gate,
-                           gate_dry_run=not args.gate_real)
+                           gate_dry_run=not args.gate_real,
+                           source_overrides=source_overrides)
 
     if args.json:
         print(json.dumps(report, default=lambda o: dataclasses.asdict(o) if dataclasses.is_dataclass(o) else str(o), indent=2))

@@ -207,6 +207,53 @@ def ninja_target_path(c_path: Path, region: str) -> Path:
     return ROOT / "build" / region / src_rel.with_suffix(".o")
 
 
+_NOISE_LINE_RE = re.compile(
+    r"^\s*(?:"
+    r"\[mvk-info\]|"                                    # MoltenVK banners
+    r"VK_[A-Za-z0-9_]+\s+v\d|"                            # Vulkan extension names
+    r"The following \d+ Vulkan extensions|"
+    r"(?:model|type|vendorID|deviceID|pipelineCacheUUID|"
+    r"GPU memory (?:available|used))\s*:|"
+    r"Metal Shading Language\b|"                          # no trailing ':' -- "... 3.2"
+    r"supports the following GPU Features:|"
+    r"GPU Family |Read-Write Texture Tier|"
+    r"[0-9a-f]{4}:fixme:"                                 # wine fixme warnings
+    r")"
+)
+
+
+def summarize_compile_error(combined: str, n: int = 15) -> str:
+    """A human-meaningful tail of a failed compile's combined stdout+
+    stderr -- pulled out of ninja_compile_one so this is independently
+    testable without a real subprocess.
+
+    brief 620: the original behavior (`lines[:n]`, first n lines)
+    reliably returned nothing but wine/MoltenVK GPU-capability startup
+    noise on macOS -- confirmed directly, every one of 70 real ov008
+    compile failures in one scale-validation sweep. Switching to
+    `lines[-n:]` (last n) was a first fix but still insufficient on its
+    own: wine/MoltenVK prints not one but TWO banners per invocation --
+    a ~150-line "supported extensions" capability dump at startup, AND
+    a second, shorter "Created VkInstance ... N extensions enabled"
+    banner right before the app's own output -- so a fixed-size tail
+    can still land entirely inside noise for some candidates while
+    working for others, observed directly across the same 70-candidate
+    sweep. This filters out every KNOWN noise line by pattern
+    (`_NOISE_LINE_RE`: mvk-info banners, VK_* extension names, GPU
+    capability fields, wine `fixme:` warnings) first, then takes the
+    tail of whatever real content remains -- robust to however many
+    banners wine happens to print, rather than to a specific count of
+    lines. Falls back to the raw tail if filtering removes everything
+    (should not happen for a genuine compile error, but must never
+    surface a blank message when unfiltered output existed).
+    """
+    lines = combined.splitlines()
+    if not lines:
+        return "ninja returned non-zero"
+    signal = [ln for ln in lines if not _NOISE_LINE_RE.match(ln)]
+    return "\n".join(signal[-n:]) if signal else "\n".join(lines[-n:])
+
+
 def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
     """Run `ninja <out_o>` to compile exactly one translation unit.
 
@@ -239,8 +286,7 @@ def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
             f"  (configure.py must be re-run whenever a new .c file is added to src/)"
         )
 
-    lines = combined.splitlines()
-    return False, "\n".join(lines[:15]) if lines else "ninja returned non-zero"
+    return False, summarize_compile_error(combined)
 
 
 # ---------------------------------------------------------------------------
