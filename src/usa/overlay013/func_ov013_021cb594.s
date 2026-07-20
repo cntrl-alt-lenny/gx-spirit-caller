@@ -10,7 +10,7 @@
         .extern func_0201912c
         .extern func_ov000_021ae3a0
         .extern func_ov002_021b20ac
-        .extern func_ov013_021cb564
+        .extern Ov013_InitGraphics
         .global func_ov013_021cb594
         .arm
 func_ov013_021cb594:
@@ -46,7 +46,7 @@ func_ov013_021cb594:
     ldr r1, _LIT1
     str r0, [r1, #0x40]
 .L_78:
-    bl func_ov013_021cb564
+    bl Ov013_InitGraphics
     mov r0, #0x1
     ldmia sp!, {r4, pc}
 _LIT0: .word data_ov013_021cbb5c

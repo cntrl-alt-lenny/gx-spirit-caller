@@ -1,0 +1,17 @@
+name: Ov015_RegisterCallbacks
+signatures:
+  - bitmask: //////////8AAAD//////wAAAP//////AAAAAAAAAAA=
+    pattern: CEAt6QwAn+UAAADrCACf5QAAAOsIgL3oAAAAAAAAAAA=
+    relocations:
+      - offset: 8
+        name: func_0207f884
+        kind: ArmCall
+      - offset: 16
+        name: func_0207f85c
+        kind: ArmCall
+      - offset: 24
+        name: data_ov015_021b5e04
+        kind: Load
+      - offset: 28
+        name: data_ov015_021b5df0
+        kind: Load

@@ -47,10 +47,10 @@
         .extern func_ov000_021af304
         .extern func_ov000_021af334
         .extern func_ov002_021b20ac
-        .extern func_ov013_021ca1b4
+        .extern Ov013_GetPageCount
         .extern func_ov013_021ca1d8
-        .extern func_ov013_021ca4f4
-        .extern func_ov013_021ca5ac
+        .extern Ov013_SetBlendAlpha
+        .extern Ov013_SetPage
         .extern func_ov013_021ca62c
         .global func_ov013_021ca6ec
         .arm
@@ -63,7 +63,7 @@ func_ov013_021ca6ec:
     mov r7, #0x0
     orr r1, r1, #0x40
     str r1, [r0, #0x140]
-    bl func_ov013_021ca4f4
+    bl Ov013_SetBlendAlpha
     ldr r0, _LIT2
     ldr r1, [r0, #0x178]
     sub r1, r1, #0x800
@@ -109,7 +109,7 @@ func_ov013_021ca6ec:
     mov r1, #0x1
     ldr r0, [r0, #0x3c]
     sub r0, r0, #0x1
-    bl func_ov013_021ca5ac
+    bl Ov013_SetPage
     ldr r0, [r6, #0x15c]
     ldr r1, [r6, #0x170]
     bic r0, r0, #0xff0000
@@ -154,7 +154,7 @@ func_ov013_021ca6ec:
     mov r0, r0, lsl #0xe
     mov r0, r0, lsr #0x1e
     add r4, r0, #0x1
-    bl func_ov013_021ca1b4
+    bl Ov013_GetPageCount
     cmp r4, r0
     ldrcs r0, [r6, #0x168]
     biccs r0, r0, #0x30000
@@ -172,7 +172,7 @@ func_ov013_021ca6ec:
     b .L_eb8
 .L_274:
     mov r1, r7
-    bl func_ov013_021ca5ac
+    bl Ov013_SetPage
     bl func_ov000_021af334
     ldr r1, [r6, #0x15c]
     mov r0, r1, lsl #0x8

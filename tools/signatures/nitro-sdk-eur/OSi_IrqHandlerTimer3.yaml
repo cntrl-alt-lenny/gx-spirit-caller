@@ -1,0 +1,8 @@
+name: OSi_IrqHandlerTimer3
+signatures:
+  - bitmask: ////////////////AAAAAA==
+    pattern: BMCf5QcAoOMc/y/hAAAAAA==
+    relocations:
+      - offset: 12
+        name: OSi_PostIrqEvent
+        kind: Load

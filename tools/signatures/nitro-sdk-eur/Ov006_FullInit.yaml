@@ -1,0 +1,124 @@
+name: Ov006_FullInit
+signatures:
+  - bitmask: >-
+      ////////////////////////////////AAAA/////////////////wAAAP////////////////8AAAD/////////////////AAAA/wAAAP//////AAAA/////////////////wAAAP8AAAD/////////////////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD//////wAAAP//////AAAA/////////////////wAAAP//////AAAA////////////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD/////////////////AAAA//////8AAAD///////////////////////////////////////////8AAAD//////////////////////////////////////////////////////////////////////wAAAP///////////wAAAP//////////////////////AAAA////////////AAAA////////////AAAA/////////////////wAAAP////////////////////////////////8AAAD///////////8AAAD///////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+    pattern: >-
+      GEAt6QTQTeIAQKDhwACg4wcUoOMBK6DjAAAA69wRn+XAAKDjASug4wAAAOsAAKDjBRSg4wEroOMAAADrwBGf5QAAoOMBK6DjAAAA6wAAAOuwAZ/lAAAA6wAAoOMaFaDjKSmg4wAAAOsAAADrAABU4xQAAApgAKDjAAAA6wMAoOMAAADrEACg4wAAAOsEAKDjAAAA6wgAoOMAAADrgACg4wAAAOsBDKDjAAAA6wEAoOMAEKDjACCg4QAAAOsAAKDjAAAA6xUAAOoBAKDjAAAA6wIAoOMAAADrIACg4wAAAOtAAKDjAAAA6wQAoOMAAADrCACg4wAAAOuAAKDjAAAA6wEMoOMAAADrAQCg4wAQoOMBIKDhAAAA6wAAoOMAAADr5CCf5QEToOOwANLhAgmA47AAwuEAAJHlHwzA4wAAgeUAAADrxMCf5cQQn+UAIJzlwACf5R8swuMAIIzlACCc5QEwoOMBKILjACCM5QAgoOMAMIHlACCA5QAAAOsAAKDjARCg4wAAAOsAAFTjARCgAwAQoBMBAKDjAAAA6wMAoOMIEKDjAAAA6wUAoOOoEKDjAAAA6wAAVOMIAAAKCACg4wAAAOsDyqDjAwCg4xAQoOMGKaDjADCg4wDAjeUAAADrFACg4wEQoOMAAADrKBCf5QEAoOMIQIHlBNCN4hiAvegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 24
+        name: func_02094504
+        kind: ArmCall
+      - offset: 40
+        name: func_02094504
+        kind: ArmCall
+      - offset: 56
+        name: func_02094504
+        kind: ArmCall
+      - offset: 72
+        name: func_02094504
+        kind: ArmCall
+      - offset: 76
+        name: func_0200592c
+        kind: ArmCall
+      - offset: 84
+        name: func_0208d1e4
+        kind: ArmCall
+      - offset: 100
+        name: func_02094504
+        kind: ArmCall
+      - offset: 104
+        name: func_0208cc90
+        kind: ArmCall
+      - offset: 120
+        name: func_0208da2c
+        kind: ArmCall
+      - offset: 128
+        name: func_0208d4f0
+        kind: ArmCall
+      - offset: 136
+        name: func_0208d3fc
+        kind: ArmCall
+      - offset: 144
+        name: func_0208d138
+        kind: ArmCall
+      - offset: 152
+        name: func_0208d0bc
+        kind: ArmCall
+      - offset: 160
+        name: func_0208d030
+        kind: ArmCall
+      - offset: 168
+        name: func_0208cfa4
+        kind: ArmCall
+      - offset: 184
+        name: func_0208c8cc
+        kind: ArmCall
+      - offset: 192
+        name: func_0208c8b0
+        kind: ArmCall
+      - offset: 204
+        name: func_0208da2c
+        kind: ArmCall
+      - offset: 212
+        name: func_0208d8c0
+        kind: ArmCall
+      - offset: 220
+        name: func_0208d7ac
+        kind: ArmCall
+      - offset: 228
+        name: func_0208d6f4
+        kind: ArmCall
+      - offset: 236
+        name: func_0208d138
+        kind: ArmCall
+      - offset: 244
+        name: func_0208d0bc
+        kind: ArmCall
+      - offset: 252
+        name: func_0208d030
+        kind: ArmCall
+      - offset: 260
+        name: func_0208cfa4
+        kind: ArmCall
+      - offset: 276
+        name: func_0208c8cc
+        kind: ArmCall
+      - offset: 284
+        name: func_0208c8b0
+        kind: ArmCall
+      - offset: 320
+        name: func_0208c940
+        kind: ArmCall
+      - offset: 376
+        name: func_02021064
+        kind: ArmCall
+      - offset: 388
+        name: func_02021190
+        kind: ArmCall
+      - offset: 408
+        name: func_02021190
+        kind: ArmCall
+      - offset: 420
+        name: func_020211b4
+        kind: ArmCall
+      - offset: 432
+        name: func_020211b4
+        kind: ArmCall
+      - offset: 448
+        name: func_0200ad0c
+        kind: ArmCall
+      - offset: 476
+        name: func_0200f854
+        kind: ArmCall
+      - offset: 488
+        name: func_020057c8
+        kind: ArmCall
+      - offset: 532
+        name: data_02103da0
+        kind: Load
+      - offset: 536
+        name: data_020c3e48
+        kind: Load
+      - offset: 540
+        name: data_ov006_0224f2e8
+        kind: Load

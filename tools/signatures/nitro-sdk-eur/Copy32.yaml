@@ -1,0 +1,5 @@
+name: Copy32
+signatures:
+  - bitmask: ////////////////////////////////
+    pattern: AsCB4AwAUeEEALC4BAChuPv//7oe/y/h
+    relocations: []

@@ -1,0 +1,19 @@
+name: Ov015_InitScroller
+signatures:
+  - bitmask: >-
+      //////////////////////////8AAAD/////////////////AAAA////////////AAAA/////////////////////////////////////////////////////////////////////////////////wAAAP////////////////8=
+    pattern: >-
+      OEAt6QBQoOEBAKDhAkCg4QAQoOMAAADrABCg4QUAoOEEIKDhAAAA6wUAoOEBGqDjAAAA6wEgoOMIIIXlABCg41wQheUQAKDjvAbF4WggheW0FcXhthXF4QEMoOO4BcXhwACg47oFxeFgEIXl/BbV4QAAAOsBAEDiZACF5TiAveg=
+    relocations:
+      - offset: 20
+        name: func_0207e3bc
+        kind: ArmCall
+      - offset: 36
+        name: func_0207fd60
+        kind: ArmCall
+      - offset: 48
+        name: func_0207fce0
+        kind: ArmCall
+      - offset: 112
+        name: func_020b3870
+        kind: ArmCall

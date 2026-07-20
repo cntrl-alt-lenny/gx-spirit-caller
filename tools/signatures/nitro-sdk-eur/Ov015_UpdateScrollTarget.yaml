@@ -1,0 +1,10 @@
+name: Ov015_UpdateScrollTarget
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////////////////////////////////////AAAA//////////////////////////////////////8=
+    pattern: >-
+      OEAt6QBAoOFwAJTl9iXU4f4U1OGAD6DhoA+g4QEAUOMBEELgBCCU5QwAABpcAJTlYFCU5QAAVeFoUIQFBAAACgUAQOCSAADgAAAA6wAAheBoAITlcACU5QEAwONwAITlaACU5TiAveg=
+    relocations:
+      - offset: 72
+        name: func_020b3870
+        kind: ArmCall

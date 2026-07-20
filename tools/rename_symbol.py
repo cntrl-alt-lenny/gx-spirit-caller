@@ -110,7 +110,14 @@ def _source_files(region: str) -> list[Path]:
                 continue
             relative = path.relative_to(src_root)
             first = relative.parts[0] if relative.parts else ""
-            if first in ("usa", "jpn") and first != region:
+            # EUR compiles the shared src/main + src/overlay* tree;
+            # USA/JPN compile their complete region-specific mirror.
+            # Do not mix the trees: the same placeholder token can name
+            # different functions at the same address in each region.
+            if region == "eur":
+                if first in ("usa", "jpn"):
+                    continue
+            elif first != region:
                 continue
             paths.append(path)
     for shared_root in (ROOT / "libs", ROOT / "include"):

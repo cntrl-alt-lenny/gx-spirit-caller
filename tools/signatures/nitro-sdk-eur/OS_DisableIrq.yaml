@@ -1,0 +1,5 @@
+name: OS_DisableIrq
+signatures:
+  - bitmask: //////////////////////////8=
+    pattern: AAAP4YAQgOMB8CHhgAAA4h7/L+E=
+    relocations: []

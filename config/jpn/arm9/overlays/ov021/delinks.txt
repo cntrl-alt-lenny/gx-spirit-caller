@@ -8,7 +8,7 @@ src/jpn/overlay021/func_ov021_021aa3c0.c:
     complete
     .text start:0x021aa3c0 end:0x021aa434
 
-src/jpn/overlay021/func_ov021_021aa434.c:
+src/jpn/overlay021/Audio_Init.c:
     complete
     .text start:0x021aa434 end:0x021aa4c0
 
@@ -39,7 +39,7 @@ src/jpn/overlay021/func_ov021_021aa7f4.c:
     complete
     .text start:0x021aa7f4 end:0x021aa828
 
-src/jpn/overlay021/func_ov021_021aa828.c:
+src/jpn/overlay021/Scene_Update.c:
     complete
     .text start:0x021aa828 end:0x021aa8d4
 

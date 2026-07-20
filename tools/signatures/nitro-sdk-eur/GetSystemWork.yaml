@@ -1,0 +1,8 @@
+name: GetSystemWork
+signatures:
+  - bitmask: //////////8AAAAA
+    pattern: AACf5R7/L+EAAAAA
+    relocations:
+      - offset: 8
+        name: data_02104f58
+        kind: Load

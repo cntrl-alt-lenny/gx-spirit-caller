@@ -1,0 +1,37 @@
+name: Audio_Init
+signatures:
+  - bitmask: >-
+      /////////////////////wAAAP//////////////////////AAAA//////8AAAD//////////////////////wAAAP//////////////////////AAAA////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    pattern: >-
+      CEAt6WwQn+UEAKDjAieg4wAAAOtgAJ/lBACQ5YAOoOGgDqDhAAAA61AAn+UAAADrRACf5QQAkOWADqDhoA6g4QAAAOswAJ/lBACQ5YAOoOGgDqDhAAAA6yQQn+UAMKDjIACf5QIgoOMwMIHlACCA5QEAoOMIgL3oAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    relocations:
+      - offset: 16
+        name: func_0200197c
+        kind: ArmCall
+      - offset: 36
+        name: func_02001d68
+        kind: ArmCall
+      - offset: 44
+        name: func_0202adf8
+        kind: ArmCall
+      - offset: 64
+        name: func_0202ae1c
+        kind: ArmCall
+      - offset: 84
+        name: func_0202c070
+        kind: ArmCall
+      - offset: 120
+        name: data_ov021_021acec8
+        kind: Load
+      - offset: 124
+        name: data_02104f4c
+        kind: Load
+      - offset: 128
+        name: data_ov021_021ace8c
+        kind: Load
+      - offset: 132
+        name: data_021040ac
+        kind: Load
+      - offset: 136
+        name: data_ov021_021ace80
+        kind: Load

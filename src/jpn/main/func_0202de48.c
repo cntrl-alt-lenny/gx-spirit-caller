@@ -8,7 +8,7 @@
  */
 /* func_0202de48: 16-case (0..15) dense switch on func_0202b884(), returning a
  * small constant per case (default 0). Compiles to cmp #0xf + addls pc,pc jump
- * table. Proven recipe: func_ov013_021ca538 (switch returning constants). */
+ * table. Proven recipe: Ov013_SlotToCell (switch returning constants). */
 extern int func_0202b884(void);
 
 int func_0202de48(void) {

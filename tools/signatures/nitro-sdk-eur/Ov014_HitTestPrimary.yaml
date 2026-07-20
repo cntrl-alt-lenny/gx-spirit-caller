@@ -1,0 +1,13 @@
+name: Ov014_HitTestPrimary
+signatures:
+  - bitmask: >-
+      ////////////////////////////////AAAA////////////////////////////AAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=
+    pattern: >-
+      OEAt6QjQTeIAUKDhAUCg4QQAjeIAEI3iAAAA6wQAleUAAFDjCNCNEgAAoBM4gL0YAAAA6wAAUOMZAAAKsBDU4QQgneUCAFHhFQAAygQA1OUAAIHgAgBQ4REAANqyENThACCd5QIAUeENAADKBQDU5QAAgeACAFDhCQAA2roQ1OEI0I3iAQCg4/8QAeIwEIXluhDU4UEUoOH/EAHiNBCF5TiAvegAAKDjCNCN4jiAveg=
+    relocations:
+      - offset: 24
+        name: func_02006110
+        kind: ArmCall
+      - offset: 48
+        name: func_020061ac
+        kind: ArmCall

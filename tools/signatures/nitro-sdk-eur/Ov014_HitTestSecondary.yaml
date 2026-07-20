@@ -1,0 +1,13 @@
+name: Ov014_HitTestSecondary
+signatures:
+  - bitmask: >-
+      //////////////////////////8AAAD/AAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pattern: >-
+      EEAt6QjQTeIBQKDhBACN4gAQjeIAAADrAAAA6wAAUOMRAAAKsBDU4QQgneUCAFHhDQAAygQA1OUAAIHgAgBQ4QkAANqyENThACCd5QIAUeEFAADKBQDU5QAAgeACAFDhCNCNwgEAoMMQgL3IAACg4wjQjeIQgL3o
+    relocations:
+      - offset: 20
+        name: func_02006148
+        kind: ArmCall
+      - offset: 24
+        name: func_0200617c
+        kind: ArmCall

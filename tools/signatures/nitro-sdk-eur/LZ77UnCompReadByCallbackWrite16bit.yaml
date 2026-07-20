@@ -1,0 +1,5 @@
+name: LZ77UnCompReadByCallbackWrite16bit
+signatures:
+  - bitmask: /////w==
+    pattern: Et9wRw==
+    relocations: []

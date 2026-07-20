@@ -1,0 +1,8 @@
+name: Ov008_Rand
+signatures:
+  - bitmask: ////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAA==
+    pattern: HDCf5RwAn+UIwJPlGBCf5Rggn+WcECDgCACD5SAIAuAe/y/hAAAAAAAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 36
+        name: data_ov008_021b2780
+        kind: Load

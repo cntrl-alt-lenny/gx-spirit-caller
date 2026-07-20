@@ -1,0 +1,13 @@
+name: SysWork_GetPointDistance
+signatures:
+  - bitmask: >-
+      /////wAAAP///////////////////////////////////////////////////////////////////////////////////////////wAAAP//////
+    pattern: >-
+      CEAt6QAAAOsUOZDlDCmQ5RAZkOUICZDlAsBD4AAQQeCRAcLgAjuQ4pwcwOAAIKLiAhuR4iM2oOEAAKDiIRag4QI6g+EAGoHhAQCD4AAAAOsIgL3o
+    relocations:
+      - offset: 4
+        name: GetSystemWork
+        kind: ArmCall
+      - offset: 76
+        name: func_0208bf3c
+        kind: ArmCall

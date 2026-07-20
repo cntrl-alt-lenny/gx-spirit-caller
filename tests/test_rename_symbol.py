@@ -255,6 +255,55 @@ class TestCascadeRename(unittest.TestCase):
                 cascade_rename("func_0200634c", "Taken")
             self.assertIn("func_0200634c", (root / "config" / "eur" / "arm9" / "symbols.txt").read_text())
 
+    def test_region_cascade_does_not_touch_shared_source_tree(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._setup(root)
+            for region in ("eur", "usa", "jpn"):
+                _write_symbols(
+                    root / "config" / region / "arm9" / "symbols.txt",
+                    ["func_02018b70 kind:function(arm,size=0x20) addr:0x02018b70"],
+                )
+            _write_symbols(
+                root / "config" / "eur" / "arm9" / "delinks.txt",
+                ["src/main/func_02018b70.c:"],
+            )
+            _write_symbols(
+                root / "config" / "usa" / "arm9" / "delinks.txt",
+                ["src/usa/main/func_02018b70.c:"],
+            )
+            _write_symbols(
+                root / "config" / "jpn" / "arm9" / "delinks.txt",
+                ["src/jpn/main/func_02018b70.c:"],
+            )
+            for region, directory in (
+                ("eur", root / "src" / "main"),
+                ("usa", root / "src" / "usa" / "main"),
+                ("jpn", root / "src" / "jpn" / "main"),
+            ):
+                directory.mkdir(parents=True, exist_ok=True)
+                (directory / "func_02018b70.c").write_text(
+                    "void func_02018b70(void) { func_02018b70(); }\n",
+                )
+            (root / "src" / "main" / "SysWork_ClearField0x810.c").write_text(
+                "void SysWork_ClearField0x810(void) {}\n",
+            )
+
+            cascade_rename(
+                "func_02018b70", "SysWork_ClearField0x810", "usa",
+            )
+
+            self.assertTrue(
+                (root / "src" / "usa" / "main" / "SysWork_ClearField0x810.c").exists()
+            )
+            self.assertTrue(
+                (root / "src" / "main" / "func_02018b70.c").exists()
+            )
+            self.assertIn(
+                "func_02018b70",
+                (root / "src" / "main" / "func_02018b70.c").read_text(),
+            )
+
     def test_not_found(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._make_tree(Path(tmp), {

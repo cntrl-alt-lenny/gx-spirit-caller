@@ -1,0 +1,10 @@
+name: Ov013_SetBlendAlpha
+signatures:
+  - bitmask: >-
+      //////////////////////////////////////////////////////////////////////////8AAAAAAAAAAAAAAAA=
+    pattern: >-
+      MBCf5TAAn+V8IZHleMGR5UI2oOEAGKDhICCf5UzGAOADCAHgABCM4QAQguUBCoLiABCA5R7/L+EAAAAAAAAAAAAAAAA=
+    relocations:
+      - offset: 56
+        name: data_ov013_021cbc00
+        kind: Load
