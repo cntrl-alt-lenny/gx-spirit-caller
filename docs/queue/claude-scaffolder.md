@@ -16,7 +16,7 @@ Set effort MAX. Readable-C output is the frontier — ship real matches.
 main: 7.88% C, the biggest module. b621 converted 10; hundreds remain, especially newly-named SDK-style functions (Copy32/Fill32/OS_*/SNDi_* from b618, plus b627/b630 sig names). Take functions b621 didn't. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov005 — hand C-match ov005 [TODO]
+### cm-ov005 — hand C-match ov005 [CLAIMED]
 ov005: 5.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
