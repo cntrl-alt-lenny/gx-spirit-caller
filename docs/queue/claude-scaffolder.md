@@ -26,6 +26,7 @@ ov005: 5.31% C. Convert a batch (~8-15).
 ov009: 7.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov022 — hand C-match ov022 [CLAIMED]
+### cm-ov022 — hand C-match ov022 [PARKED]
+> PARKED: no honest batch of 8-15 available: all 12 remaining .s functions carry the same GLOBAL_ASM-endgame marker (briefs 294/302, systematic prior no-C-match pass) seen in cm-ov005 and cm-ov009 -- this project-wide pass evidently covered ov022 too, despite no dedicated ov022 brief/core.h existing. Read all 12 directly: uniformly complex, register-heavy (8-9 saved regs), multi-dependency (10+ .extern per TU is common), several with magic-constant smull multiplies and packed-argument unpacking (a single register split into two 16-bit halves via lsl/lsr pairs) -- same difficulty class as cm-ov009's parked residue, not the short/simple pattern that made cm-main's batch tractable. Two near-identical siblings (021ab760/021ab804, packed-arg unpack + smull scaling) looked like the best candidates but deriving+verifying the exact packed-argument signed/unsigned semantics would need real iteration time with uncertain payoff at this point in a long session. Verified directly against the module's own symbols.txt + delinks.txt, not assumed.
 ov022: 11.70% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
