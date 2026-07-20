@@ -43,3 +43,4 @@ shipped and no gate was run.
 | Module | Candidates | Accept | Iterate | Park | Accept list |
 | --- | ---: | ---: | ---: | ---: | --- |
 | ov000 | 59 | 0 | 59 | 0 | none |
+| ov004 | 172 | 1 | 171 | 0 | `func_ov004_021c9ef0` |
