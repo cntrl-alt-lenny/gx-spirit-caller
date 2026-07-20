@@ -5,7 +5,7 @@
         .text
         .extern data_02186a08
         .extern func_0200fa74
-        .extern func_0200fadc
+        .extern List_Unlink
         .extern func_0200fc5c
         .extern func_02090074
         .extern func_020900e4
@@ -87,7 +87,7 @@ func_0200c0c8:
     bne .L_100
 .L_110:
     mov r0, r6
-    bl func_0200fadc
+    bl List_Unlink
     mov r0, r6
     mov r1, r4
     bl func_0200fa74

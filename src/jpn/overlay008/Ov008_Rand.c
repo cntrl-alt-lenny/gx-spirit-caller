@@ -1,6 +1,6 @@
-/* func_ov008_021aa42c: C23-noMMIO MSVC LCG rand -> state=state*0x343fd+0x269ec3; (state>>16)&0x7fff. */
+/* Ov008_Rand: C23-noMMIO MSVC LCG rand -> state=state*0x343fd+0x269ec3; (state>>16)&0x7fff. */
 extern char data_ov008_021b2660[];
-int func_ov008_021aa42c(void) {
+int Ov008_Rand(void) {
     unsigned int s = *(unsigned int *)(data_ov008_021b2660 + 8);
     s = s * 0x343fd + 0x269ec3;
     *(unsigned int *)(data_ov008_021b2660 + 8) = s;

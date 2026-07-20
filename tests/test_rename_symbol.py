@@ -204,6 +204,9 @@ class TestCascadeRename(unittest.TestCase):
                     root / "config" / region / "arm9" / "symbols.txt",
                     ["func_0200634c kind:function(arm,size=0x2c) addr:0x0200634c"],
                 )
+                delink_path = root / "config" / region / "arm9" / "delinks.txt"
+                source_name = "src/main/func_0200634c.c" if region == "eur" else f"src/{region}/main/func_0200634c.c"
+                _write_symbols(delink_path, [source_name + ":"])
                 source_dir.mkdir(parents=True, exist_ok=True)
                 (source_dir / "func_0200634c.c").write_text(
                     "void func_0200634c(void) { func_0200634c(); }\n",
@@ -226,6 +229,9 @@ class TestCascadeRename(unittest.TestCase):
                 renamed = source_dir / "Task_InvokeLockedIrq.c"
                 self.assertTrue(renamed.exists())
                 self.assertNotIn("func_0200634c", renamed.read_text())
+                delinks = (root / "config" / region / "arm9" / "delinks.txt").read_text()
+                self.assertIn("Task_InvokeLockedIrq.c:", delinks)
+                self.assertNotIn("func_0200634c.c:", delinks)
             self.assertTrue((root / "src" / "usa" / "main" / "Task_InvokeLockedIrq.s").exists())
 
     def test_cascade_is_atomic_on_region_collision(self):

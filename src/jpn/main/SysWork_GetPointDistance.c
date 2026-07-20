@@ -1,4 +1,4 @@
-/* func_02018ef8: 2D distance between two points in the system-work block —
+/* SysWork_GetPointDistance: 2D distance between two points in the system-work block —
  * FX_Sqrt(dx*dx + dy*dy) in NitroSDK Q12 fixed point.
  *
  * Cracked from .s (brief 457, peer-corpus idiom mining): the inline
@@ -19,7 +19,7 @@ typedef s32 fx32;
 extern char *GetSystemWork(void);
 extern fx32 func_0208be54(fx32 x);   /* FX_Sqrt */
 
-fx32 func_02018ef8(void) {
+fx32 SysWork_GetPointDistance(void) {
     char *p = GetSystemWork();
     fx32 dy = *(fx32 *)(p + 0x914) - *(fx32 *)(p + 0x90c);
     fx32 dx = *(fx32 *)(p + 0x910) - *(fx32 *)(p + 0x908);

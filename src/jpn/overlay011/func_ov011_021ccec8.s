@@ -4,7 +4,7 @@
 
         .text
         .extern data_ov011_021d3f20
-        .extern func_ov011_021cc884
+        .extern Bg_SetScroll
         .extern func_ov011_021cc940
         .global func_ov011_021ccec8
         .arm
@@ -18,7 +18,7 @@ func_ov011_021ccec8:
     sub r1, r1, #0x60000
     str r1, [r0, #0x23c]
     bl func_ov011_021cc940
-    bl func_ov011_021cc884
+    bl Bg_SetScroll
     ldr r0, _LIT0
     ldr r1, [r0, #0x2ac]
     bic r1, r1, #0xff00000

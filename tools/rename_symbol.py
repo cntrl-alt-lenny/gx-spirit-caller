@@ -135,12 +135,15 @@ def _replace_symbol(path: Path, old: str, new: str) -> bool:
 
 def _cascade_plan(
     old: str, new: str, version_filter: str | None,
-) -> tuple[list[tuple[Path, int]], list[tuple[Path, Path]], list[Path]]:
-    """Validate and return symbol edits, source renames, and source edits."""
+) -> tuple[
+    list[tuple[Path, int]], list[tuple[Path, Path]], list[Path], list[Path]
+]:
+    """Validate and return symbol, source, and delink edits."""
     regions = (version_filter,) if version_filter else REGIONS
     symbol_edits: list[tuple[Path, int]] = []
     source_renames: list[tuple[Path, Path]] = []
     source_edits: list[Path] = []
+    delink_edits: list[Path] = []
     found_old = False
 
     for region in regions:
@@ -173,26 +176,32 @@ def _cascade_plan(
                     )
                 source_renames.append((path, destination))
 
+                old_filename = path.name
+                for delinks in (CONFIG / region / "arm9").rglob("delinks.txt"):
+                    if old_filename in delinks.read_text():
+                        delink_edits.append(delinks)
+
     if not found_old:
         raise ValueError(f"symbol '{old}' not found in selected region(s)")
 
     # A source file can be visible to multiple selected regions; edit it once.
     source_edits = list(dict.fromkeys(source_edits))
     source_renames = list(dict.fromkeys(source_renames))
-    return symbol_edits, source_renames, source_edits
+    delink_edits = list(dict.fromkeys(delink_edits))
+    return symbol_edits, source_renames, source_edits, delink_edits
 
 
 def cascade_rename(
     old: str, new: str, version_filter: str | None = None, dry: bool = False,
 ) -> list[str]:
     """Apply a validated symbol + source cascade, or return its dry plan."""
-    symbol_edits, source_renames, source_edits = _cascade_plan(
+    symbol_edits, source_renames, source_edits, delink_edits = _cascade_plan(
         old, new, version_filter,
     )
     if dry:
         return [
             f"[dry] symbols={len(symbol_edits)} source_files={len(source_edits)} "
-            f"filenames={len(source_renames)}"
+            f"filenames={len(source_renames)} delinks={len(delink_edits)}"
         ]
 
     for path, line_no in symbol_edits:
@@ -201,10 +210,14 @@ def cascade_rename(
         _replace_symbol(path, old, new)
     for source, destination in source_renames:
         source.rename(destination)
+    for delinks in delink_edits:
+        _replace_symbol(delinks, old + ".c", new + ".c")
+        for source, destination in source_renames:
+            _replace_symbol(delinks, source.name, destination.name)
     return [
         f"Renamed '{old}' -> '{new}' with cascade: "
         f"{len(symbol_edits)} symbol table(s), {len(source_edits)} source file(s), "
-        f"{len(source_renames)} filename(s)"
+        f"{len(source_renames)} filename(s), {len(delink_edits)} delink file(s)"
     ]
 
 
