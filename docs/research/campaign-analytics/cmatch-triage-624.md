@@ -34,3 +34,12 @@ cap in this single classification pass.
 Candidate files are derived from EUR `config/eur/arm9/overlays/*/delinks.txt`
 entries whose complete TU source is a `func_*.s` file. Each module is run with
 `--candidates-file`, a module-specific state file, and no `--gate-real`.
+
+## Rest-of-queue classification (Brief 632)
+
+The same classify-only path was applied to the next module. No candidate was
+shipped and no gate was run.
+
+| Module | Candidates | Accept | Iterate | Park | Accept list |
+| --- | ---: | ---: | ---: | ---: | --- |
+| ov000 | 59 | 0 | 59 | 0 | none |

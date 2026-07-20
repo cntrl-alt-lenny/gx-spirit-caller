@@ -17,7 +17,7 @@ You have the full toolchain in your worktree (`.codex/agents/scaffolder.toml`). 
 b626 lifted cmatch_loop's draft COMPILE rate 0%→40% (a compile-only scaffold normalizing the m2c draft before the mwcc probe, in m2c_feed/cmatch_loop, + a fastmatch.py change to stop truncating the compiler error). It was REVERTED because it conflicted with b620's cmatch_loop refactor. Re-apply it ON TOP OF current main (reconcile with b620, don't revert b620). Read the reverted diff on branch `origin/codex/cmatch-drafter-626` / closed PR #1199 for the approach, but re-apply against CURRENT cmatch_loop.py. Then: score the compilable drafts' match% (b631 measured ~10.66% avg — try to beat it honestly; a measured ceiling is a valid result). Canary: `cmatch_loop --canary` still 100%, and the compile-rate baseline on current main measures ~0 before your fix.
 **Gate:** `python3.13 -m pytest tests -q` + paste before/after compile-rate and avg-match% on a 30-candidate set.
 
-### q-cmatch-triage-rest — finish the cmatch classification map (remaining ~12 modules) [TODO]
+### q-cmatch-triage-rest — finish the cmatch classification map (remaining ~12 modules) [CLAIMED]
 b624 classified 10 modules (ov001/003/007/009/012/013/014/019/022/023). Classify the REST — main, ov000, ov002, ov004, ov005, ov006, ov010, ov011, ov015, ov016, ov017, ov018, ov020, ov021 — the same way (cmatch_loop, no --gate-real, classify only), appending to `docs/research/campaign-analytics/cmatch-triage-624.md`. Compiles every candidate, so it's a genuinely long run. Purely additive (no ship).
 **Gate:** `python3.13 -m pytest tests -q` + paste the per-module accept/iterate/park table for the newly-classified modules.
 
