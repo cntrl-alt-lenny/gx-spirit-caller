@@ -26,6 +26,6 @@ ov005: 5.31% C. Convert a batch (~8-15).
 ov009: 7.31% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov022 — hand C-match ov022 [TODO]
+### cm-ov022 — hand C-match ov022 [CLAIMED]
 ov022: 11.70% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
