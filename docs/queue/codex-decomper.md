@@ -13,7 +13,7 @@ You have the full toolchain in your worktree (`.codex/agents/decomper.toml`). Se
 
 ---
 
-### q-sig-refresh — re-run the sig-naming engine after new names land [TODO]
+### q-sig-refresh — re-run the sig-naming engine after new names land [CLAIMED]
 b630's sig-naming engine (dsd sig DB from named functions → `dsd sig apply` → `rename_symbol.py --cascade`) shipped 29 names. As the CC agents convert more functions to readable-C and name them, the sig corpus grows → more matches. Re-build the sig DB from ALL currently-named functions (EUR uniques + any newly named this session), re-apply across EUR/USA/JPN, report the delta vs 29. Canary: round-trip (un-name a known SDK function, sig-apply, recover the exact name) before any mass apply.
 **Gate:** `dsd check` green 3 regions + `python3.13 tools/scope_gate.py --kind naming --base origin/main` PASS + names-applied delta vs b630's 29.
 
