@@ -1,0 +1,8 @@
+name: FS_StopOverlay
+signatures:
+  - bitmask: //////////8AAAD//////////////////////w==
+    pattern: AEAt6QTQTeIAAADrAQCg4wTQjeIAQL3oHv8v4Q==
+    relocations:
+      - offset: 8
+        name: func_020987a4
+        kind: ArmCall

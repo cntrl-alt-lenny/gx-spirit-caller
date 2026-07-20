@@ -1,0 +1,7 @@
+name: Ov013_SlotToCell
+signatures:
+  - bitmask: >-
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=
+    pattern: >-
+      BwBQ4wDxj5AXAADqBgAA6gcAAOoIAADqCQAA6goAAOoLAADqDAAA6g0AAOoIAKDjHv8v4QQAoOMe/y/hAwCg4x7/L+EFAKDjHv8v4QYAoOMe/y/hRgCg4x7/L+EJAKDjHv8v4QoAoOMe/y/hAACg4x7/L+E=
+    relocations: []

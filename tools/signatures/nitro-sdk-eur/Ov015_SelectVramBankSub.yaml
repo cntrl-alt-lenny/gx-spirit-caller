@@ -1,0 +1,31 @@
+name: Ov015_SelectVramBankSub
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD//////wAAAP//////AAAA//////8AAAD/////////////////
+    pattern: >-
+      CEAt6QcAUOMA8Y+QFwAA6gYAAOoHAADqCAAA6gkAAOoKAADqCwAA6gwAAOoNAADqAAAA6wiAvegAAADrCIC96AAAAOsIgL3oAAAA6wiAvegAAADrCIC96AAAAOsIgL3oAAAA6wiAvegAAADrCIC96AAAoOMIgL3o
+    relocations:
+      - offset: 48
+        name: func_0208e220
+        kind: ArmCall
+      - offset: 56
+        name: func_0208e1cc
+        kind: ArmCall
+      - offset: 64
+        name: func_0208e120
+        kind: ArmCall
+      - offset: 72
+        name: func_0208e014
+        kind: ArmCall
+      - offset: 80
+        name: func_0208e200
+        kind: ArmCall
+      - offset: 88
+        name: func_0208e1ac
+        kind: ArmCall
+      - offset: 96
+        name: func_0208e0a0
+        kind: ArmCall
+      - offset: 104
+        name: func_0208df94
+        kind: ArmCall

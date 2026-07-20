@@ -1,0 +1,28 @@
+name: Ov012_BeginIntroTransition
+signatures:
+  - bitmask: >-
+      /////////////////////////////////////wAAAP///////////////////////////////////////////wAAAP///////////////////////////////////////////////////////////wAAAP//////////////////////////////////////AAAA////////////AAAAAAAAAAAAAAAA
+    pattern: >-
+      EEAt6ZAQn+UAIKDjPCCB5YgAn+VAIIHlhECf5QAAAOsAAFDjBQAACmwAn+UFEKDjPBCA5QIQoONAEIDlEwAA6gAAAOsAAFDjEAAAGmABlOUADqDhIA6g4QMAUOMDAAAaNACf5QAQoONAEIDlAgAA6gAAAOsgEJ/lQACB5WARlOUUAJ/lAR6g4SEeoOE8EIDlAAAA6wEAoOMQgL3oAAAAAAAAAAAAAAAA
+    relocations:
+      - offset: 28
+        name: func_ov000_021ac760
+        kind: ArmCall
+      - offset: 64
+        name: func_02018b48
+        kind: ArmCall
+      - offset: 112
+        name: func_ov000_021ae4ac
+        kind: ArmCall
+      - offset: 144
+        name: func_ov012_021cbeb4
+        kind: ArmCall
+      - offset: 156
+        name: data_021040ac
+        kind: Load
+      - offset: 160
+        name: data_ov012_021cc80c
+        kind: Load
+      - offset: 164
+        name: data_ov012_021cc6dc
+        kind: Load

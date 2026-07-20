@@ -1,5 +1,5 @@
 func_ov021_021aa3c0 kind:function(arm,size=0x74) addr:0x021aa3c0
-func_ov021_021aa434 kind:function(arm,size=0x8c) addr:0x021aa434
+Audio_Init kind:function(arm,size=0x8c) addr:0x021aa434
 func_ov021_021aa4c0 kind:function(arm,size=0x2c) addr:0x021aa4c0
 func_ov021_021aa4ec kind:function(arm,size=0x20c) addr:0x021aa4ec
 func_ov021_021aa6f8 kind:function(arm,size=0x48) addr:0x021aa6f8
@@ -7,7 +7,7 @@ func_ov021_021aa740 kind:function(arm,size=0x28) addr:0x021aa740
 func_ov021_021aa768 kind:function(arm,size=0x50) addr:0x021aa768
 func_ov021_021aa7b8 kind:function(arm,size=0x3c) addr:0x021aa7b8
 func_ov021_021aa7f4 kind:function(arm,size=0x34) addr:0x021aa7f4
-func_ov021_021aa828 kind:function(arm,size=0xac) addr:0x021aa828
+Scene_Update kind:function(arm,size=0xac) addr:0x021aa828
 func_ov021_021aa8d4 kind:function(arm,size=0x4) addr:0x021aa8d4
 func_ov021_021aa8d8 kind:function(arm,size=0x4) addr:0x021aa8d8
 func_ov021_021aa8dc kind:function(arm,size=0x40) addr:0x021aa8dc

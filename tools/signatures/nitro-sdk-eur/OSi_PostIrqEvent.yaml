@@ -1,0 +1,25 @@
+name: OSi_PostIrqEvent
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAA/////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAA
+    pattern: >-
+      MEAt6QTQTeIMEKDjkAEE4HAgn+VwMJ/lgACg4QQQkuewMJPhAVCg4wAAoOMEAILnAABR4xVToOECAAAKTACf5QQAkOcx/y/hRACf5UQQn+UDCoDi+C+Q5QUgguH4L4DlBACR5wAAUOME0I0SMEC9GB7/LxEFAKDhAAAA6wTQjeIwQL3oHv8v4QAAAAAAAAAAAAAAAAAAAAAAAAAA
+    relocations:
+      - offset: 120
+        name: func_020905dc
+        kind: ArmCall
+      - offset: 136
+        name: data_021a6354
+        kind: Load
+      - offset: 140
+        name: data_021024a0
+        kind: Load
+      - offset: 144
+        name: data_021a635c
+        kind: Load
+      - offset: 148
+        name: data_027e0000
+        kind: Load
+      - offset: 152
+        name: data_021a6358
+        kind: Load

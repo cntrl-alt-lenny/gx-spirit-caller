@@ -1,0 +1,8 @@
+name: OSi_IrqHandlerDma1
+signatures:
+  - bitmask: ////////////////AAAAAA==
+    pattern: BMCf5QEAoOMc/y/hAAAAAA==
+    relocations:
+      - offset: 12
+        name: OSi_PostIrqEvent
+        kind: Load

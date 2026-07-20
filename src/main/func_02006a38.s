@@ -10,7 +10,7 @@
         .extern func_020067f8
         .extern func_020069f4
         .extern func_0209286c
-        .extern func_02098734
+        .extern FS_UnloadOverlay
         .global func_02006a38
         .arm
 func_02006a38:
@@ -25,13 +25,13 @@ func_02006a38:
     ldmia r0, {r5, r6}
     beq .L_02006a8c
     mov r0, #0x0
-    bl func_02098734
+    bl FS_UnloadOverlay
     mvn r0, #0x0
     cmp r7, r0
     beq .L_02006a80
     mov r1, r7
     mov r0, #0x0
-    bl func_02098734
+    bl FS_UnloadOverlay
 .L_02006a80:
     ldr r0, [r4, #0x10]
     bic r0, r0, #0x1

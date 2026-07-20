@@ -1,0 +1,5 @@
+name: CpuFastSet
+signatures:
+  - bitmask: /////w==
+    pattern: DN9wRw==
+    relocations: []

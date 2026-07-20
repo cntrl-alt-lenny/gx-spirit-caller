@@ -1,0 +1,14 @@
+name: Task_InvokeLockedIrq
+signatures:
+  - bitmask: //////////8AAAD//////////////////////wAAAP//////AAAA//////8=
+    pattern: OEAt6QBQoOEAAADrAECg4QAAVeMBAAAKBQCg4QAAAOsEAKDhAAAA6ziAveg=
+    relocations:
+      - offset: 8
+        name: OS_DisableIrq
+        kind: ArmCall
+      - offset: 28
+        name: Task_InvokeLocked
+        kind: ArmCall
+      - offset: 36
+        name: OS_RestoreIrq
+        kind: ArmCall

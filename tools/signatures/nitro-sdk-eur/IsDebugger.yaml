@@ -1,0 +1,5 @@
+name: IsDebugger
+signatures:
+  - bitmask: /////w==
+    pattern: D99wRw==
+    relocations: []

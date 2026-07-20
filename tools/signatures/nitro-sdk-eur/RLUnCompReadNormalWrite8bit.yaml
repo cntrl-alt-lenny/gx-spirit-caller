@@ -1,0 +1,5 @@
+name: RLUnCompReadNormalWrite8bit
+signatures:
+  - bitmask: /////w==
+    pattern: FN9wRw==
+    relocations: []

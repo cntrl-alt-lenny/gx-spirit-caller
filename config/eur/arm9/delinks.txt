@@ -17994,11 +17994,11 @@ src/main/func_020986c0.s:
 src/main/func_0209870c.legacy.c:
     complete
     .text start:0x0209870c end:0x02098734
-src/main/func_02098734.s:
+src/main/FS_UnloadOverlay.s:
     complete
     .text start:0x02098734 end:0x02098788
 
-src/main/func_02098788.legacy.c:
+src/main/FS_StopOverlay.legacy.c:
     complete
     .text start:0x02098788 end:0x020987a4
 
@@ -18021,7 +18021,7 @@ src/main/func_020989a8.s:
     complete
     .text start:0x020989a8 end:0x02098a4c
 
-src/main/func_02098a4c.s:
+src/main/FS_LoadOverlayInfo.s:
     complete
     .text start:0x02098a4c end:0x02098b60
 

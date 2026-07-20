@@ -55,7 +55,7 @@ src/usa/overlay003/func_ov003_021cc768.s:
 src/usa/overlay003/func_ov003_021cc94c.s:
     complete
     .text start:0x021cc94c end:0x021ccbe4
-src/usa/overlay003/func_ov003_021ccbe4.s:
+src/usa/overlay003/Bg_FillTileRect.s:
     complete
     .text start:0x021ccbe4 end:0x021ccc44
 src/usa/overlay003/func_ov003_021ccc44.c:

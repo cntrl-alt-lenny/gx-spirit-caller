@@ -1,0 +1,8 @@
+name: SNDi_SetTrackParam
+signatures:
+  - bitmask: ////////////////////////////////////////////////AAAA/////////////////w==
+    pattern: AEAt6QTQTeIIwJ3lAuCg4QAwjeUBIKDhDByA4Q4woOEHAKDjAAAA6wTQjeIAQL3oHv8v4Q==
+    relocations:
+      - offset: 36
+        name: func_02094c94
+        kind: ArmCall

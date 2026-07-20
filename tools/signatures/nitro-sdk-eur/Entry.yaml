@@ -1,0 +1,46 @@
+name: Entry
+signatures:
+  - bitmask: >-
+      //////////////////////////8AAAD/////////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAA/////////////////wAAAP////////////////8AAAD///////////8AAAD/AAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AAAD/AAAA/wAAAP///////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+    pattern: >-
+      AcOg4wjCjOW2ANzhAABQ4/z//xoAAADrEwCg4wDwIeHwAJ/l/w2A4gDQoOESAKDjAPAh4dwAn+X/DYDiQABA4gTQQOIEAB3jBNBNAsgQn+UBEEDgHwCg4wDwL+EE0EHiAACg46wQn+UBKaDjAAAA6wAAoOOkEJ/lASug4wAAAOsCDKDjmBCf5QEroOMAAADrkBCf5RQAkeUAAADrAAAA64AAn+UMEJDlECCQ5QEwoOEAAKDjAgBR4QQAgTT8//86HxDD45oPB+41HwfuPh8H7iAQgeICAFHh+f//ukgQn+UAAIHlLBCf5f8dgeI8EIHiOACf5QAAgeUAAADrAAAA6wAAAOsoEJ/lKOCf5QQAHeME0E0SEf8v4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+    relocations:
+      - offset: 20
+        name: func_02000a78
+        kind: ArmCall
+      - offset: 108
+        name: func_0200093c
+        kind: ArmCall
+      - offset: 124
+        name: func_0200093c
+        kind: ArmCall
+      - offset: 140
+        name: func_0200093c
+        kind: ArmCall
+      - offset: 152
+        name: func_02000950
+        kind: ArmCall
+      - offset: 156
+        name: func_020009fc
+        kind: ArmCall
+      - offset: 248
+        name: func_020b41bc
+        kind: ArmCall
+      - offset: 252
+        name: func_02000b64
+        kind: ArmCall
+      - offset: 256
+        name: func_020b4284
+        kind: ArmCall
+      - offset: 280
+        name: data_027e0000
+        kind: Load
+      - offset: 296
+        name: BuildInfo
+        kind: Load
+      - offset: 304
+        name: func_01ff8180
+        kind: Load
+      - offset: 308
+        name: main
+        kind: Load

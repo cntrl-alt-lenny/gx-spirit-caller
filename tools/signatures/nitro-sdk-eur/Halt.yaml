@@ -1,0 +1,5 @@
+name: Halt
+signatures:
+  - bitmask: /////w==
+    pattern: Bt9wRw==
+    relocations: []

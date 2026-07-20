@@ -1,0 +1,31 @@
+name: Ov013_SetPage
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////AAAA//////8AAAD/AAAA/////////////////wAAAP//////AAAA/////////////////wAAAP///////////wAAAP//////AAAAAAAAAAA=
+    pattern: >-
+      EEAt6Wwgn+WADqDhpDGS5QAAUeMHF8PjoAWB4aQBguUBAKDjUECf5QAQoOEBAAAKAAAA6wAAAOoAAADrAAAA62gBlOWABaDhoA6g4QAAAOsAQKDhAAAA6wAgoOEEEKDhAACg4wAAAOsBAKDjAhCg4wAAAOsQgL3oAAAAAAAAAAA=
+    relocations:
+      - offset: 48
+        name: func_ov000_021ab4bc
+        kind: ArmCall
+      - offset: 56
+        name: func_ov000_021ab4ec
+        kind: ArmCall
+      - offset: 76
+        name: Ov013_SlotToCell
+        kind: ArmCall
+      - offset: 84
+        name: func_020139b4
+        kind: ArmCall
+      - offset: 100
+        name: func_ov000_021af560
+        kind: ArmCall
+      - offset: 112
+        name: func_ov000_021ab4bc
+        kind: ArmCall
+      - offset: 120
+        name: data_ov013_021cbc00
+        kind: Load
+      - offset: 124
+        name: data_ov013_021cbc3c
+        kind: Load

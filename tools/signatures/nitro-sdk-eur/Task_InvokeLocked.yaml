@@ -1,0 +1,19 @@
+name: Task_InvokeLocked
+signatures:
+  - bitmask: >-
+      /////////////////////////////////////wAAAP//////////////////////AAAA//////8AAAD//////wAAAAA=
+    pattern: >-
+      OEAt6QBQsOE4gL0ILACf5RgQkOUBEEHiGBCA5QAAAOsYEJ/lAECg4RwAkeUFEKDhAAAA6wQAoOEAAADrOIC96AAAAAA=
+    relocations:
+      - offset: 28
+        name: OS_DisableIrq
+        kind: ArmCall
+      - offset: 48
+        name: func_0207d458
+        kind: ArmCall
+      - offset: 56
+        name: OS_RestoreIrq
+        kind: ArmCall
+      - offset: 64
+        name: data_02104f1c
+        kind: Load

@@ -1,0 +1,25 @@
+name: Task_PostLocked
+signatures:
+  - bitmask: >-
+      /////////////////////wAAAP///////////////////////////wAAAP//////////////////////AAAA////////////AAAA/////////////////////////////////wAAAP///////////wAAAAA=
+    pattern: >-
+      cEAt6QBgoOEBUKDhAkCg4QAAAOsEGKDhUCCf5QBAoOEcAJLlIRig4QAAAOs8AJ/lBhCg4RwAkOUFIKDhAAAA6wBQoOEEAKDhAAAA6xwAn+UAAFXjGBCQ5QEQgeIYEIDlAAAAGgAAAOsFAKDhcIC96AAAAAA=
+    relocations:
+      - offset: 16
+        name: OS_DisableIrq
+        kind: ArmCall
+      - offset: 40
+        name: func_0207d36c
+        kind: ArmCall
+      - offset: 60
+        name: func_0207d494
+        kind: ArmCall
+      - offset: 72
+        name: OS_RestoreIrq
+        kind: ArmCall
+      - offset: 100
+        name: func_020067f8
+        kind: ArmCall
+      - offset: 112
+        name: data_02104f1c
+        kind: Load

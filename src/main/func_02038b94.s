@@ -8,7 +8,7 @@
         .extern func_02098088
         .extern func_02098388
         .extern func_020988a8
-        .extern func_02098a4c
+        .extern FS_LoadOverlayInfo
         .extern func_02098c70
         .extern func_02098c98
         .global func_02038b94
@@ -20,7 +20,7 @@ func_02038b94:
     mov r2, r0
     mov r0, r5
     mov r1, #0x0
-    bl func_02098a4c
+    bl FS_LoadOverlayInfo
     cmp r0, #0x0
     addeq sp, sp, #0x7c
     moveq r0, #0x0
