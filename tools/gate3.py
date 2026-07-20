@@ -194,6 +194,19 @@ def main() -> int:
 
     tests_ok = True
     if not args.no_tests and scope in ("all", "tests"):
+        # The pytest step is documented as running against a known-good
+        # tree, but the region loop above leaves `configure.py`'s state
+        # pointing at whichever region ran LAST (usa/jpn for --scope all)
+        # -- several toolchain-dependent tests hardcode region="eur" (the
+        # project's own baseline region, CLAUDE.md) and silently produce
+        # wrong-but-plausible results against a mismatched tree (iterate
+        # instead of accept, a None match_percent) rather than a loud
+        # config error, indistinguishable from a real regression until
+        # traced back here (brief 620). Restore eur before tests, but
+        # only when the loop actually left it in some other state.
+        if regions and regions[-1] != "eur":
+            print(f"\n{'=' * 20} restoring eur config for tests {'=' * 20}", flush=True)
+            run([PY, "tools/configure.py", "eur"])
         tests_ok = run_tests(args.invariants)
 
     passed = not failed and tests_ok
