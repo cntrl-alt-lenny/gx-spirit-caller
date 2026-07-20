@@ -3,7 +3,7 @@
 # Claude Code Scaffolder — autonomous C-match queue
 
 **Protocol (the standing kickoff drives this):**
-1. `python3.13 tools/queue.py next claude-scaffolder` → prints the next module, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping brain.
+1. `python3.13 tools/work_queue.py next claude-scaffolder` → prints the next module, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping brain.
 2. Hand C-match a batch of that module's matched-`.s` functions to readable C, byte-verified. `cmatch_loop.py` assists; judgment is yours. Different modules from the Claude Code Decomper lane, so no collision.
 3. Gate with `python3.13 tools/gate3.py --scope all` (paste the real sha1 PASS). Open ONE PR. Then `queue.py done claude-scaffolder <id>`, commit, back to step 1.
 4. Park un-matchable walls (note in PR), move on.

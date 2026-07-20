@@ -3,10 +3,10 @@
 # Codex Decomper — autonomous work queue
 
 **Protocol (the standing kickoff drives this — you don't need a new message per item):**
-1. `python3.13 tools/queue.py next codex-decomper` → prints the next item, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping the brain.
+1. `python3.13 tools/work_queue.py next codex-decomper` → prints the next item, marks it CLAIMED. `QUEUE-EMPTY` → stop, ping the brain.
 2. Do the item. Every symbol rename goes through `rename_symbol.py --cascade` and is gated with `scope_gate.py --kind naming` (the b610/b612 safety). Paste the real gate output — never self-report.
-3. Open ONE PR. Then `python3.13 tools/queue.py done codex-decomper <id>`, commit the queue file, back to step 1.
-4. ~3 failed attempts → `python3.13 tools/queue.py park codex-decomper <id> "<reason>"`, commit, continue.
+3. Open ONE PR. Then `python3.13 tools/work_queue.py done codex-decomper <id>`, commit the queue file, back to step 1.
+4. ~3 failed attempts → `python3.13 tools/work_queue.py park codex-decomper <id> "<reason>"`, commit, continue.
 5. Stop only on QUEUE-EMPTY, an ungreenable gate, or a real blocker. A short run because the queue drained is a SUCCESS.
 
 You have the full toolchain in your worktree (`.codex/agents/decomper.toml`). Set effort HIGH. Naming is candidate-scarce right now — honest low counts per item are expected; process every item regardless.
