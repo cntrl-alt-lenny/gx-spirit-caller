@@ -48,6 +48,9 @@ data_ov008_021b2d74:
         .space 0x4c
         .global data_ov008_021b2dc0
 data_ov008_021b2dc0:
+        .space 0x0
+        .global data_ov008_021b2dc0_alias
+data_ov008_021b2dc0_alias:
         .space 0x8
         .global data_ov008_021b2dc8
 data_ov008_021b2dc8:
