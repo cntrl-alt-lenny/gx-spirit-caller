@@ -17090,11 +17090,11 @@ src/main/func_02093720.s:
     complete
     .text start:0x02093720 end:0x02093790
 
-src/main/func_02093790.s:
+src/main/func_02093790.c:
     complete
     .text start:0x02093790 end:0x020937a4
 
-src/main/OS_DisableIrq.s:
+src/main/OS_DisableIrq.c:
     complete
     .text start:0x020937a4 end:0x020937b8
 
@@ -17109,7 +17109,7 @@ src/main/OS_DisableIrq.s:
 
 
 
-src/main/OS_RestoreIrq.s:
+src/main/OS_RestoreIrq.c:
     complete
     .text start:0x020937b8 end:0x020937d0
 
@@ -17124,15 +17124,15 @@ src/main/OS_RestoreIrq.s:
 
 
 
-src/main/func_020937d0.s:
+src/main/func_020937d0.c:
     complete
     .text start:0x020937d0 end:0x020937e4
 
-src/main/func_020937e4.s:
+src/main/func_020937e4.c:
     complete
     .text start:0x020937e4 end:0x020937fc
 
-src/main/func_020937fc.s:
+src/main/func_020937fc.c:
     complete
     .text start:0x020937fc end:0x02093808
 
@@ -17278,15 +17278,15 @@ src/main/func_02094378.s:
     complete
     .text start:0x02094378 end:0x0209448c
 
-src/main/func_0209448c.s:
+src/main/func_0209448c.c:
     complete
     .text start:0x0209448c end:0x020944a4
 
-src/main/func_020944a4.s:
+src/main/func_020944a4.c:
     complete
     .text start:0x020944a4 end:0x020944c0
 
-src/main/Fill32.s:
+src/main/Fill32.c:
     complete
     .text start:0x020944c0 end:0x020944d4
 
@@ -17301,7 +17301,7 @@ src/main/Fill32.s:
 
 
 
-src/main/Copy32.s:
+src/main/Copy32.c:
     complete
     .text start:0x020944d4 end:0x020944ec
 
