@@ -13,7 +13,7 @@ You have the full toolchain in your worktree (`.codex/agents/scaffolder.toml`). 
 
 ---
 
-### q-632-drafter — re-land the b626 drafter compile-fix on current main + push toward match [TODO]
+### q-632-drafter — re-land the b626 drafter compile-fix on current main + push toward match [DONE]
 b626 lifted cmatch_loop's draft COMPILE rate 0%→40% (a compile-only scaffold normalizing the m2c draft before the mwcc probe, in m2c_feed/cmatch_loop, + a fastmatch.py change to stop truncating the compiler error). It was REVERTED because it conflicted with b620's cmatch_loop refactor. Re-apply it ON TOP OF current main (reconcile with b620, don't revert b620). Read the reverted diff on branch `origin/codex/cmatch-drafter-626` / closed PR #1199 for the approach, but re-apply against CURRENT cmatch_loop.py. Then: score the compilable drafts' match% (b631 measured ~10.66% avg — try to beat it honestly; a measured ceiling is a valid result). Canary: `cmatch_loop --canary` still 100%, and the compile-rate baseline on current main measures ~0 before your fix.
 **Gate:** `python3.13 -m pytest tests -q` + paste before/after compile-rate and avg-match% on a 30-candidate set.
 

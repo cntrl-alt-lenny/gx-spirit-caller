@@ -525,6 +525,24 @@ class TestPatchUnresolvedTypes(unittest.TestCase):
         self.assertEqual(patched.count("s32 func_"), 1)
 
 
+class TestCompileDraftScaffold(unittest.TestCase):
+    def test_m2c_placeholders_get_a_compileable_scaffold(self):
+        draft = """? helper(? *arg0);\nextern ? data_x;\n
+void func_x(void *arg0) {\n    ? local;\n    local.unk10 = arg0->unk14;\n    *(&local + (arg0 * 4)) = helper(&local);\n}\n"""
+        prepared = cl.prepare_compile_source(draft)
+        self.assertIn("struct M2CUnknown", prepared)
+        self.assertNotIn("? helper", prepared)
+        self.assertIn("struct M2CUnknown *arg0", prepared)
+        self.assertIn("local.unk10", prepared)
+        self.assertIn("*(int *)((char *)&local + (arg0 * 4))", prepared)
+
+    def test_unknown_fields_are_deduplicated(self):
+        prepared = cl.prepare_compile_source(
+            "extern ? data_x;\nint f(void) { return data_x.unk0 + data_x.unk0; }\n"
+        )
+        self.assertEqual(prepared.count("int unk0;"), 1)
+
+
 class TestSRoutedCompleteTu(unittest.TestCase):
     """Detects the c-match scenario (already-matched-but-.s) vs. a
     genuinely-unmatched candidate -- the distinction process_candidate

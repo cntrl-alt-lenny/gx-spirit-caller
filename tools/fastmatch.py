@@ -222,7 +222,7 @@ _NOISE_LINE_RE = re.compile(
 )
 
 
-def summarize_compile_error(combined: str, n: int = 15) -> str:
+def summarize_compile_error(combined: str, n: int | None = None) -> str:
     """A human-meaningful tail of a failed compile's combined stdout+
     stderr -- pulled out of ninja_compile_one so this is independently
     testable without a real subprocess.
@@ -251,7 +251,9 @@ def summarize_compile_error(combined: str, n: int = 15) -> str:
     if not lines:
         return "ninja returned non-zero"
     signal = [ln for ln in lines if not _NOISE_LINE_RE.match(ln)]
-    return "\n".join(signal[-n:]) if signal else "\n".join(lines[-n:])
+    if not signal:
+        return "\n".join(lines[-n:]) if n is not None else "\n".join(lines)
+    return "\n".join(signal[-n:]) if n is not None else "\n".join(signal)
 
 
 def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
