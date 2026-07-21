@@ -16,7 +16,8 @@ ov019: 8.5% C, ~1208/14212 bytes matched — lots of headroom. Convert a batch (
 ov013: 404/6640 bytes C — big headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov022 — hand C-match ov022 [TODO]
+### cm-ov022 — hand C-match ov022 [PARKED]
+> PARKED: 0 fresh candidates: all 12 remaining .s functions in src/overlay022/ carry brief 294/302 GLOBAL_ASM-endgame headers (documented reg-alloc walls, no C match). Same pattern as cm-ov019/cm-ov013/cm-ov014 this run and last.
 ov022: 600/5128 bytes C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
