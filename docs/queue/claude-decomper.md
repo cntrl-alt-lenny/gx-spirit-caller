@@ -11,7 +11,7 @@
 ov019: 8.5% C, ~1208/14212 bytes matched — lots of headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (new .c / removed .s).
 
-### cm-ov013 — hand C-match ov013 [TODO]
+### cm-ov013 — hand C-match ov013 [CLAIMED]
 ov013: 404/6640 bytes C — big headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
