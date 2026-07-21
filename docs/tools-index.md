@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**107 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**108 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (38)
+- [Uncategorised](#uncategorised) (39)
 
 ## Analysis / worklist
 
@@ -660,6 +660,12 @@ pick from its disassembly (brief 264, stretch goal).
 **byte-compare a compiled function against its dsd-delinked gap**
 
 object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain reproduces the 3-region SHA1 on merge.
+
+### `tools/wall_aware_headroom.py`
+
+**TRUE readable-C headroom (walls subtracted).**
+
+The raw C% metric (progress.py) counts every not-yet-`.c` byte as "headroom", including functions that are DOCUMENTED PERMANENT WALLS (the brief-294/302 GLOBAL_ASM-endgame reg-alloc class, C-32 cross-overlay-BL link walls, etc.). That mi…
 
 ### `tools/wine_link_lock.py`
 
