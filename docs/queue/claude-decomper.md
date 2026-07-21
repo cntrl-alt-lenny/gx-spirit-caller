@@ -21,7 +21,8 @@ ov013: 404/6640 bytes C — big headroom. Convert a batch (~8-15).
 ov022: 600/5128 bytes C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov012 — hand C-match ov012 [TODO]
+### cm-ov012 — hand C-match ov012 [PARKED]
+> PARKED: 0 fresh candidates. 16 .s functions total: 15 carry brief 294/302 GLOBAL_ASM-endgame headers, the 16th (func_ov012_021c9d8c) is a documented C-32 cross-overlay-BL wall -- explicitly labeled in its own header as 'Sibling of func_ov013_021c9d60 (same shape, different host addr)'. Same hard mwldarm link-level constraint as cm-ov013's C-32 case, no C-level defeat.
 ov012: 832/8972 bytes C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
