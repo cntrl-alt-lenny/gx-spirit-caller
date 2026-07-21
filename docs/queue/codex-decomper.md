@@ -6,7 +6,7 @@
 
 ---
 
-### q-sig-refresh-2 — rebuild the sig DB after the CC agents named more functions [CLAIMED]
+### q-sig-refresh-2 — rebuild the sig DB after the CC agents named more functions [DONE]
 The CC C-match rounds add real names as they convert functions. Rebuild b630's sig DB from ALL currently-named functions (it grows as C-match progresses), re-apply across EUR/USA/JPN, report the delta vs b630's 29. Round-trip canary first.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming --base origin/main` PASS + names-applied delta.
 
