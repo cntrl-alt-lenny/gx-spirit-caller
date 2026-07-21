@@ -12,7 +12,7 @@ NOTE: only ~245 convertible functions remain project-wide, mostly in the hard as
 main has ~115 convertible (non-wall) functions — the biggest remaining pool. Get the list via `wall_aware_headroom.py --json` (main.convertible_files), C-match a batch (~8-15), prefer the SDK-named ones.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov004 — C-match ov004 convertibles [TODO]
+### cm-ov004 — C-match ov004 convertibles [CLAIMED]
 ov004 has ~35 convertible functions. Get the list, C-match a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
