@@ -22,5 +22,5 @@ Cross-checked every reported candidate against `delinks.txt` routing before atte
 Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (per module).
 
-### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [DONE — no-op]
-Fresh `wall_aware_headroom.py --json` scan: `overlay002: {total: 2773, wall: 2773, convertible: 0}`. Batch 1 already shipped/cleared the module's entire 27-function convertible pool (16 real ships + 11 dead orphans deleted) — nothing left for batch 2 to do. No functions converted, no gate run needed (no source changes).
+### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [DONE]
+No-op: fresh `wall_aware_headroom.py --json` scan shows `overlay002: {total: 2773, wall: 2773, convertible: 0}`. Batch 1 already shipped/cleared the module's entire 27-function convertible pool (16 real ships + 11 dead orphans deleted) — nothing left for batch 2 to do. No functions converted, no gate run needed (no source changes).
