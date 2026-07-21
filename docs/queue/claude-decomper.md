@@ -1,27 +1,21 @@
 [//]: # (markdownlint-disable MD013 MD041)
 
-# Claude Code Decomper — autonomous C-match queue
+# Claude Code Decomper — autonomous C-match queue (WALL-AWARE)
 
-**Protocol:** loop until QUEUE-EMPTY. `python3.13 tools/work_queue.py next claude-decomper` → hand C-match a batch (~8-15) of that module's matched-`.s` functions to readable C, byte-verified; `cmatch_loop.py` drafts a start, judgment is yours; skip documented walls. Gate `python3.13 tools/gate3.py --scope all` (paste the sha1 PASS), open ONE PR, `work_queue.py done claude-decomper <id>`, commit, next. Park un-matchable walls, move on. Effort MAX. This moves the readable-C % — ship real matches.
+**Protocol:** loop until QUEUE-EMPTY. `python3.13 tools/work_queue.py next claude-decomper`. For each item, the candidate list is the module's CONVERTIBLE (non-wall) functions — get them with `python3.13 tools/wall_aware_headroom.py --json` (that module's `convertible_files`). Do NOT re-attempt documented walls (GLOBAL_ASM-endgame / C-32). Hand C-match a batch, byte-verify, gate `gate3.py --scope all`, ONE PR, `work_queue.py done`, commit, next. Park anything that turns out to be an unmarked wall (add the marker). Effort MAX.
+
+NOTE: only ~245 convertible functions remain project-wide, mostly in the hard asymptotic modules below — batches may be small and some "convertible" ones are still difficult. That's the real frontier; honest low counts are fine.
 
 ---
 
-### cm-ov019 — hand C-match ov019 [TODO]
-ov019: 8.5% C, ~1208/14212 bytes matched — lots of headroom. Convert a batch (~8-15).
-**Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (new .c / removed .s).
-
-### cm-ov013 — hand C-match ov013 [TODO]
-ov013: 404/6640 bytes C — big headroom. Convert a batch (~8-15).
+### cm-main-batch1 — C-match main convertibles (batch 1) [TODO]
+main has ~115 convertible (non-wall) functions — the biggest remaining pool. Get the list via `wall_aware_headroom.py --json` (main.convertible_files), C-match a batch (~8-15), prefer the SDK-named ones.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov022 — hand C-match ov022 [TODO]
-ov022: 600/5128 bytes C. Convert a batch (~8-15).
+### cm-ov004 — C-match ov004 convertibles [TODO]
+ov004 has ~35 convertible functions. Get the list, C-match a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov012 — hand C-match ov012 [TODO]
-ov012: 832/8972 bytes C. Convert a batch (~8-15).
-**Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
-
-### cm-ov007 — hand C-match ov007 [TODO]
-ov007: 1108/3256 bytes C (already ~34% — the tractable ones may be nearly done; take what's open, park walls). Convert a batch.
+### cm-main-batch2 — C-match main convertibles (batch 2) [TODO]
+Continue main's convertible pool — different functions than batch 1.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
