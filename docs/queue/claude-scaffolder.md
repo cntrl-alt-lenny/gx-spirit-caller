@@ -22,6 +22,6 @@ Cross-checked every reported candidate against `delinks.txt` routing before atte
 Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (per module).
 
-### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [TODO]
+### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [CLAIMED]
 Continue ov002's convertible pool — different functions than batch 1.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
