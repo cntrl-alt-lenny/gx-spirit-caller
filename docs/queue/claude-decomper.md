@@ -11,7 +11,8 @@
 ov019: 8.5% C, ~1208/14212 bytes matched — lots of headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (new .c / removed .s).
 
-### cm-ov013 — hand C-match ov013 [CLAIMED]
+### cm-ov013 — hand C-match ov013 [PARKED]
+> PARKED: 0 fresh candidates. 9 .s functions total: 8 carry brief 294/302 GLOBAL_ASM-endgame headers (documented reg-alloc walls), the 9th (func_ov013_021c9d60) is a documented C-32 cross-overlay-BL wall (brief 192 recipe) -- a hard mwldarm link-level constraint (module:none reloc, target address ambiguous across a shared-base overlay group), not a codegen/style issue, so there is no C-level defeat. See docs/research/codegen-walls.md C-32 entry.
 ov013: 404/6640 bytes C — big headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
