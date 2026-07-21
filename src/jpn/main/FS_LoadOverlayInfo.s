@@ -1,4 +1,4 @@
-; func_02098958 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; FS_LoadOverlayInfo — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
@@ -12,9 +12,9 @@
         .extern func_02098294
         .extern func_02098a6c
         .extern func_02098b7c
-        .global func_02098958
+        .global FS_LoadOverlayInfo
         .arm
-func_02098958:
+FS_LoadOverlayInfo:
     stmdb sp!, {r4, r5, lr}
     sub sp, sp, #0x64
     movs r4, r1

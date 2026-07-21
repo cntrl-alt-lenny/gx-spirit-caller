@@ -11831,10 +11831,10 @@ src/jpn/main/func_02098618.legacy.c:
     complete
     .text start:0x02098618 end:0x02098640
 
-src/jpn/main/func_02098640.s:
+src/jpn/main/FS_UnloadOverlay.s:
     complete
     .text start:0x02098640 end:0x02098694
-src/jpn/main/func_02098694.legacy.c:
+src/jpn/main/FS_StopOverlay.legacy.c:
     complete
     .text start:0x02098694 end:0x020986b0
 
@@ -11847,7 +11847,7 @@ src/jpn/main/func_020987b4.s:
 src/jpn/main/func_020988b4.s:
     complete
     .text start:0x020988b4 end:0x02098958
-src/jpn/main/func_02098958.s:
+src/jpn/main/FS_LoadOverlayInfo.s:
     complete
     .text start:0x02098958 end:0x02098a6c
 src/jpn/main/func_02098a6c.s:

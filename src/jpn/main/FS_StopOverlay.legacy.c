@@ -1,4 +1,4 @@
-/* func_02098694: side-effect call returning constant 1. Style A.
+/* FS_StopOverlay: side-effect call returning constant 1. Style A.
  *
  *     stmdb sp!, {lr}
  *     sub   sp, sp, #0x4
@@ -11,7 +11,7 @@
 
 extern int func_020986b0(int x);
 
-int func_02098694(int x) {
+int FS_StopOverlay(int x) {
     func_020986b0(x);
     return 1;
 }

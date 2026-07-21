@@ -1,24 +1,24 @@
-; func_02098734 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; FS_UnloadOverlay — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .extern func_02098788
-        .extern func_02098a4c
-        .global func_02098734
+        .extern FS_StopOverlay
+        .extern FS_LoadOverlayInfo
+        .global FS_UnloadOverlay
         .arm
-func_02098734:
+FS_UnloadOverlay:
     stmfd sp!, {lr}
     sub sp, sp, #0x2c
     mov r3, r0
     mov r2, r1
     add r0, sp, #0x0
     mov r1, r3
-    bl func_02098a4c
+    bl FS_LoadOverlayInfo
     cmp r0, #0x0
     beq .L_34
     add r0, sp, #0x0
-    bl func_02098788
+    bl FS_StopOverlay
     cmp r0, #0x0
     bne .L_44
 .L_34:

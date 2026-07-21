@@ -11847,10 +11847,10 @@ src/usa/main/func_02098618.legacy.c:
     complete
     .text start:0x02098618 end:0x02098640
 
-src/usa/main/func_02098640.s:
+src/usa/main/FS_UnloadOverlay.s:
     complete
     .text start:0x02098640 end:0x02098694
-src/usa/main/func_02098694.legacy.c:
+src/usa/main/FS_StopOverlay.legacy.c:
     complete
     .text start:0x02098694 end:0x020986b0
 
@@ -11863,7 +11863,7 @@ src/usa/main/func_020987b4.s:
 src/usa/main/func_020988b4.s:
     complete
     .text start:0x020988b4 end:0x02098958
-src/usa/main/func_02098958.s:
+src/usa/main/FS_LoadOverlayInfo.s:
     complete
     .text start:0x02098958 end:0x02098a6c
 src/usa/main/func_02098a6c.s:
