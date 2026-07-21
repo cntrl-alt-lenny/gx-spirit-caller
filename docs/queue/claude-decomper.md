@@ -6,7 +6,8 @@
 
 ---
 
-### cm-ov019 — hand C-match ov019 [TODO]
+### cm-ov019 — hand C-match ov019 [PARKED]
+> PARKED: RE-CONFIRMED (2nd pass, fresh origin/main a44f8894): still 0 fresh candidates. All 25 remaining .s functions in src/overlay019/ carry brief 294/302 GLOBAL_ASM-endgame headers (documented reg-alloc walls, no C match) -- identical result to the prior park on claude/decomper-queue-run. The 8.5%/1208-of-14212-bytes headroom this queue item cites is a pure not-yet-.c byte count that doesn't cross-reference wall documentation -- every one of those remaining bytes belongs to an already-walled function. Escalating: this module will keep re-appearing on every refill unless the refill heuristic excludes GLOBAL_ASM-endgame-marked functions from headroom scoring, or ov019 is retired from the candidate pool entirely. Recommend brain fix the refill query rather than re-queuing this a 3rd time.
 ov019: 8.5% C, ~1208/14212 bytes matched — lots of headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (new .c / removed .s).
 
