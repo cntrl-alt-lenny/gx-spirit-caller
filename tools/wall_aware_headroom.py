@@ -32,8 +32,12 @@ ROOT = Path(__file__).resolve().parent.parent
 # EUR baseline module dirs only (region ports live under src/usa, src/jpn).
 _MODULE_RE = re.compile(r"^src/(main|overlay\d+)/[^/]+\.s$")
 _WALL_RE = re.compile(
+    # A `.s` header citing ANY taxonomy entry number (C-34, C-8, P-16...) is
+    # self-classifying as a documented wall even without the word "wall" (CC
+    # Decomper, 2026-07-21). No ARM reg/opcode reads as `[CP]-<digits>`, so this
+    # is conservative: a stray cite only under-counts headroom, never mis-sends.
     r"GLOBAL_ASM|brief[ _]?29[04]|brief[ _]?302|reg-?alloc wall|no C match|"
-    r"\bC-32\b|ship-as-\.s|whole-function ship|permanent wall|endgame",
+    r"ship-as-\.s|whole-function ship|permanent wall|endgame|\b[CP]-\d+\b",
     re.I,
 )
 

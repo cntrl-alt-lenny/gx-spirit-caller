@@ -7,7 +7,7 @@
 ---
 
 ### cm-ov002-batch1 — C-match ov002 convertibles (batch 1) [TODO]
-ov002 has ~60 convertible (non-wall) functions. Get the list via `wall_aware_headroom.py --json` (overlay002.convertible_files), C-match a batch (~8-15). (ov002 is asymptotic-hard, but these carry no documented wall — attempt them.)
+ov002 has ~27 convertible (non-wall) functions. Get the list via `wall_aware_headroom.py --json` (overlay002.convertible_files), C-match a batch (~8-15). (ov002 is asymptotic-hard, but these carry no documented wall — attempt them.)
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
 ### cm-smalls — C-match the small-overlay convertibles [TODO]
