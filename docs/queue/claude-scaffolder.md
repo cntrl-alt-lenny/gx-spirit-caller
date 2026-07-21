@@ -6,7 +6,7 @@
 
 ---
 
-### cm-ov005 — hand C-match ov005 [TODO]
+### cm-ov005 — hand C-match ov005 [CLAIMED]
 ov005: 1532/28832 bytes C — huge module, lots of headroom. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
