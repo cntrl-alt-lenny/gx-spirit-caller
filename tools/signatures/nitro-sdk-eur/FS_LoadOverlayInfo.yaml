@@ -1,0 +1,34 @@
+name: FS_LoadOverlayInfo
+signatures:
+  - bitmask: >-
+      /////////////////////////////////////////////////////////////////////////////////////////////////////wAAAP///////////wAAAP///////////wAAAP////////////////8AAAD/////////////////////////////////////////////////////////////////AAAA////////////////////////////////////////////////////////////////////////////////////////////AAAA/////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAA
+    pattern: >-
+      MEAt6WTQTeIBQLDhAFCg4egAnwXoAJ8VADCQ5QAAU+MlAAAKBACQ5YIioOEAAFLhZNCNIgAAoCMwQL0oHv8vIQIAg+AFEKDhICCg4wAAAOsYAI3iIECF5QAAAOsQAI3iBRCg4QAAAOsQEI3iGACN4gYAkegAAADrAABQ42TQjQIAAKADMEC9CB7/LwE8EJ3lGACN4iQQheVAIJ3lPBCd5QEQQuAoEIXlAAAA62TQjeIBAKDjMEC96B7/L+FEEJ/lRMCf5QAAkeVAMJ/lAACN5QQQkeUFAKDhBBCN5QBQnOUEEKDhCFCN5QRAnOUMQI3lAAAA62TQjeIwQL3oHv8v4QAAAAAAAAAAAAAAAAAAAAAAAAAA
+    relocations:
+      - offset: 76
+        name: func_02094688
+        kind: ArmCall
+      - offset: 88
+        name: func_02098388
+        kind: ArmCall
+      - offset: 100
+        name: func_02098c70
+        kind: ArmCall
+      - offset: 116
+        name: func_02098088
+        kind: ArmCall
+      - offset: 168
+        name: func_02097ff0
+        kind: ArmCall
+      - offset: 240
+        name: func_02098b60
+        kind: ArmCall
+      - offset: 256
+        name: data_021a8324
+        kind: Load
+      - offset: 260
+        name: data_021a832c
+        kind: Load
+      - offset: 272
+        name: data_021a8334
+        kind: Load

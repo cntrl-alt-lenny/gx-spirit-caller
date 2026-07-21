@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
@@ -97,6 +98,44 @@ class TestCascade(unittest.TestCase):
 
 
 class TestCarve(unittest.TestCase):
+    def test_empty_diff_is_zero_delta_and_fails_positive_target(self):
+        empty = set()
+        sg.complete_tus = lambda ref, regions: empty
+        sg.new_source_files = lambda base, regions: set()
+
+        ok_scope, detail, _ = sg.check_carve_scope("BASE", ["eur"], target=1)
+        ok_reconcile, reconcile_detail, _ = sg.check_carve_reconciliation("BASE", ["eur"])
+
+        self.assertFalse(ok_scope)
+        self.assertIn("delta = 0", detail)
+        self.assertTrue(ok_reconcile)
+        self.assertIn("new complete TUs = 0", reconcile_detail)
+
+    def test_multi_region_carve_counts_each_selected_region(self):
+        base = set()
+        head = {
+            ("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "eur.s"),
+            ("usa", "config/usa/arm9/overlays/ov008/delinks.txt", "usa.c"),
+            ("jpn", "config/jpn/arm9/overlays/ov008/delinks.txt", "jpn.s"),
+        }
+
+        def complete(ref, regions):
+            return base if ref else {tu for tu in head if tu[0] in regions}
+
+        sg.complete_tus = complete
+        sg.new_source_files = lambda base, regions: {
+            "src/overlay008/eur.s",
+            "src/usa/overlay008/usa.c",
+        }
+
+        ok_scope, detail, _ = sg.check_carve_scope("BASE", ["eur", "usa"], target=2)
+        ok_reconcile, reconcile_detail, _ = sg.check_carve_reconciliation("BASE", ["eur", "usa"])
+
+        self.assertTrue(ok_scope)
+        self.assertIn("delta = 2", detail)
+        self.assertTrue(ok_reconcile)
+        self.assertIn("new src files = 2", reconcile_detail)
+
     def test_thin_carve_fails_target(self):
         base = {("eur", "config/eur/arm9/overlays/ov008/delinks.txt", "a.s")}
         head = base | {
@@ -134,6 +173,26 @@ class TestCarve(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("new complete TUs = 2", detail)
         self.assertIn("new src files = 1", detail)
+
+    def test_source_added_without_delink_complete_unit_fails(self):
+        sg.complete_tus = lambda ref, regions: set()
+        sg.new_source_files = lambda base, regions: {"src/overlay008/func_a.c"}
+
+        ok, detail, _ = sg.check_carve_reconciliation("BASE", ["eur"])
+
+        self.assertFalse(ok)
+        self.assertIn("new complete TUs = 0", detail)
+        self.assertIn("new src files = 1", detail)
+
+    def test_tool_mutation_is_not_a_carve_deliverable(self):
+        result = mock.Mock(stdout=(
+            "A\ttools/scope_gate.py\n"
+            "A\tsrc/overlay008/func_a.c\n"
+        ))
+        with mock.patch.object(sg.subprocess, "run", return_value=result):
+            files = sg.new_source_files("BASE", ["eur"])
+
+        self.assertEqual(files, {"src/overlay008/func_a.c"})
 
 
 class TestIntegrationRealMain(unittest.TestCase):

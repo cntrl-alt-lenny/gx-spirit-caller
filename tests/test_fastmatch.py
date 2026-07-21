@@ -98,6 +98,11 @@ class TestSummarizeCompileError(unittest.TestCase):
         result = fastmatch.summarize_compile_error(text, n=3)
         self.assertEqual(result, "line7\nline8\nline9")
 
+    def test_default_preserves_all_signal_lines(self):
+        text = "\n".join(f"compiler line {i}" for i in range(20))
+        result = fastmatch.summarize_compile_error(text)
+        self.assertEqual(result, text)
+
     def test_all_noise_falls_back_to_raw_tail_not_blank(self):
         # If literally everything matches the noise filter (shouldn't
         # happen for a genuine compile error, but must never surface an
