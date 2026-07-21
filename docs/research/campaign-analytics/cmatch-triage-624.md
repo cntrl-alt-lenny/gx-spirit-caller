@@ -34,3 +34,28 @@ cap in this single classification pass.
 Candidate files are derived from EUR `config/eur/arm9/overlays/*/delinks.txt`
 entries whose complete TU source is a `func_*.s` file. Each module is run with
 `--candidates-file`, a module-specific state file, and no `--gate-real`.
+
+## Rest-of-queue classification (Brief 632)
+
+The same classify-only path was applied to the next module. No candidate was
+shipped and no gate was run.
+
+| Module | Candidates | Accept | Iterate | Park | Accept list |
+| --- | ---: | ---: | ---: | ---: | --- |
+| ov000 | 59 | 0 | 59 | 0 | none |
+| ov004 | 172 | 1 | 171 | 0 | `func_ov004_021c9ef0` |
+| ov005 | 33 | 0 | 33 | 0 | none |
+| ov006 | 161 | 0 | 161 | 0 | none |
+| ov010 | 49 | 1 | 48 | 0 | `func_ov010_021b34dc` |
+| ov011 | 88 | 0 | 88 | 0 | none |
+| ov015 | 26 | 0 | 26 | 0 | none |
+| ov016 | 43 | 0 | 43 | 0 | none |
+| ov017 | 30 | 0 | 30 | 0 | none |
+| ov018 | 10 | 0 | 10 | 0 | none |
+| ov020 | 27 | 0 | 27 | 0 | none |
+| ov021 | 9 | 0 | 9 | 0 | none |
+
+**Rest-of-queue total:** 6,011 candidates, 2 accepts, 6,009 iterates, and 0
+parks. The two classify-only accepts were `func_ov004_021c9ef0` and
+`func_ov010_021b34dc`; the sweep restored their original `.s`/delinks state
+and did not ship either candidate.
