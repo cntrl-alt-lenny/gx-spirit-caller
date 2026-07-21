@@ -6,7 +6,7 @@
 
 ---
 
-### q-drafter-ceiling-doc — write up the readable-C automation ceiling [TODO]
+### q-drafter-ceiling-doc — write up the readable-C automation ceiling [DONE]
 Consolidate b624 (0/135 accept), b626 (0→40% compile), b631/b632 (~10.66% avg match, struct-bank injection rejected) into ONE decision doc: docs/research/readable-c-automation-ceiling.md — the honest conclusion is that m2c-drafted readable-C caps at ~compile-but-not-match, so readable-C needs human judgment (CC), and cmatch_loop's value is draft-ASSIST not auto-ship. This stops future rounds re-attempting a dead end.
 **Gate:** `python3.13 -m pytest tests -q` green + the committed doc.
 
