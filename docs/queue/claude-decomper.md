@@ -12,15 +12,15 @@ Set effort MAX. This is the work that moves the readable-C % — ship real match
 
 ---
 
-### cm-ov008 — hand C-match ov008 [TODO]
+### cm-ov008 — hand C-match ov008 [DONE]
 ov008 is the lowest-C% overlay (3.52%). b620 triaged 70 candidates: 12 are known codegen walls (see ov008_core.h / briefs 323/325/403), ~46 genuinely open. Convert a batch (~8-15) of the open ones.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (new .c / removed .s).
 
-### cm-ov001 — hand C-match ov001 [TODO]
+### cm-ov001 — hand C-match ov001 [DONE]
 ov001: 5.29% C, lots of headroom. Convert a batch (~8-15) of matched-.s functions.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov014 — hand C-match ov014 [TODO]
+### cm-ov014 — hand C-match ov014 [CLAIMED]
 ov014: 5.01% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
