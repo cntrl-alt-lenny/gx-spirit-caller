@@ -26,6 +26,7 @@ ov022: 600/5128 bytes C. Convert a batch (~8-15).
 ov012: 832/8972 bytes C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov007 — hand C-match ov007 [TODO]
+### cm-ov007 — hand C-match ov007 [PARKED]
+> PARKED: 0 fresh candidates: all 10 remaining .s functions in src/overlay007/ carry brief 294/302 GLOBAL_ASM-endgame headers (documented reg-alloc walls, no C match). The queue item's own note ('already ~34% -- tractable ones may be nearly done') is correct in spirit: the module IS effectively done, just not convertible to C -- the 34% ceiling is real, not a sign of unclaimed work.
 ov007: 1108/3256 bytes C (already ~34% — the tractable ones may be nearly done; take what's open, park walls). Convert a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
