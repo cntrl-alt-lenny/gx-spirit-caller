@@ -24,6 +24,7 @@ ov001: 5.29% C, lots of headroom. Convert a batch (~8-15) of matched-.s function
 ov014: 5.01% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov019 — hand C-match ov019 [CLAIMED]
+### cm-ov019 — hand C-match ov019 [PARKED]
+> PARKED: 0 fresh candidates: all 25 remaining .s functions in src/overlay019/ carry brief 294/302 GLOBAL_ASM-endgame headers (documented reg-alloc walls, no C match, already shipped as permanent .s by a past sweep). Verified against origin/main tip (0 commits behind, 0 diff on overlay019 paths). Cross-checked delinks.txt (26 .s: entries = 25 functions + 1 bss data section, all 25 functions confirmed walled, none missing a marker). No code changes to gate or PR. See PR #1216 (cm-ov014) for the sibling case.
 ov019: 8.5% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
