@@ -59,12 +59,33 @@ def is_wall(path: Path) -> bool:
         return False
 
 
+_SRC_REF_RE = re.compile(r"^(src/\S+\.(?:c|s)):")
+
+
+def _live_sources() -> set[str]:
+    """Every src path actually referenced by a committed delinks.txt — the real
+    build inputs. Files on disk NOT in this set are orphans (CC Decomper,
+    2026-07-21: brief-071's bulk-port relocated functions to libs/nitro and
+    repointed delinks, but left dead `.s` copies under src/ — 29 project-wide).
+    Counting those inflates headroom, so we skip them."""
+    refs: set[str] = set()
+    for d in (ROOT / "config").rglob("delinks.txt"):
+        for line in d.read_text(encoding="utf-8", errors="ignore").splitlines():
+            m = _SRC_REF_RE.match(line.strip())
+            if m:
+                refs.add(m.group(1))
+    return refs
+
+
 def scan() -> dict[str, dict]:
     per: dict[str, dict] = {}
+    live = _live_sources()
     for p in (ROOT / "src").rglob("*.s"):
         rel = p.relative_to(ROOT).as_posix()
         m = _MODULE_RE.match(rel)
         if not m:
+            continue
+        if rel not in live:  # orphaned dead file, not a build input — skip
             continue
         mod = m.group(1)
         d = per.setdefault(mod, {"total": 0, "wall": 0, "convertible": 0,
