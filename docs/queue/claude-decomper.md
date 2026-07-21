@@ -24,6 +24,6 @@ ov001: 5.29% C, lots of headroom. Convert a batch (~8-15) of matched-.s function
 ov014: 5.01% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov019 — hand C-match ov019 [TODO]
+### cm-ov019 — hand C-match ov019 [CLAIMED]
 ov019: 8.5% C. Convert a batch (~8-15).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
