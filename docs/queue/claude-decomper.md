@@ -16,6 +16,6 @@ main has ~115 convertible (non-wall) functions — the biggest remaining pool. G
 ov004 has ~35 convertible functions. Get the list, C-match a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-main-batch2 — C-match main convertibles (batch 2) [TODO]
+### cm-main-batch2 — C-match main convertibles (batch 2) [CLAIMED]
 Continue main's convertible pool — different functions than batch 1.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
