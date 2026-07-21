@@ -10,6 +10,6 @@
 The CC C-match rounds add real names as they convert functions. Rebuild b630's sig DB from ALL currently-named functions (it grows as C-match progresses), re-apply across EUR/USA/JPN, report the delta vs b630's 29. Round-trip canary first.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming --base origin/main` PASS + names-applied delta.
 
-### q-name-crossprop-2 — cross-region twin propagation [CLAIMED]
+### q-name-crossprop-2 — cross-region twin propagation [DONE]
 Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade` (byte-neutral, 3× multiplier). Sweep all modules.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins propagated.
