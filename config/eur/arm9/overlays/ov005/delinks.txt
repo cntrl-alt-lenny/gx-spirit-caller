@@ -298,7 +298,7 @@ src/overlay005/ov005_021acacc.c:
 
 
 
-src/overlay005/func_ov005_021acadc.s:
+src/overlay005/func_ov005_021acadc.c:
     complete
     .text start:0x021acadc end:0x021acb50
 
