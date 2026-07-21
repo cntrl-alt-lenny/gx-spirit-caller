@@ -6,6 +6,8 @@
 
 NOTE: only ~245 convertible functions remain project-wide, mostly in the hard asymptotic modules below — batches may be small and some "convertible" ones are still difficult. That's the real frontier; honest low counts are fine.
 
+**CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
+
 ---
 
 ### cm-main-batch1 — C-match main convertibles (batch 1) [TODO]

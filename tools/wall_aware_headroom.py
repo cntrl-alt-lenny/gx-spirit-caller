@@ -10,6 +10,16 @@ the CC Decomper burned a whole run re-confirming ov019/013/022/012/007 as 100%
 walls (2026-07-21). This tool fixes the refill signal: it counts, per EUR module,
 the `.s` functions that are NOT wall-marked — the genuinely convertible ones.
 
+IMPORTANT — this count is an UPPER BOUND, not a work-list. A THIRD wall class
+(CC Decomper, 2026-07-21) is free-form prose with NO taxonomy number ("mwcc
+reg-alloc doesn't match", hand-encoded `.word` cross-jumps, privileged `mcr`
+ops, shared-epilogue pads) — deliberately NOT regex-matched, because a net wide
+enough to catch varied prose also swallows the genuinely-easy stubs (which are
+also commented). So an agent MUST header-read each candidate before compiling;
+the tool narrows the field, human judgment makes the final call. In one medium
+batch ~6 of 8 "convertible" were prose walls — treat the real number as well
+below the printed one.
+
 A `.s` file is a wall if its body carries any endgame/wall marker (GLOBAL_ASM
 endgame, "brief 294"/"brief 302", "reg-alloc wall", "no C match", "C-32", "ship-
 as-.s"). EUR baseline only (`src/main/`, `src/overlayNNN/` — no `src/usa|jpn/`

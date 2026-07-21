@@ -4,6 +4,8 @@
 
 **Protocol:** loop until QUEUE-EMPTY. `python3.13 tools/work_queue.py next claude-scaffolder`. Candidate list = the module's CONVERTIBLE (non-wall) functions via `python3.13 tools/wall_aware_headroom.py --json`. Skip documented walls. Different modules from the Decomper lane — no collision. Hand C-match a batch, byte-verify, gate `gate3.py --scope all`, ONE PR, `work_queue.py done`, commit, next. Effort MAX. Only ~245 convertible remain project-wide; honest small batches are fine.
 
+**CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
+
 ---
 
 ### cm-ov002-batch1 — C-match ov002 convertibles (batch 1) [TODO]
