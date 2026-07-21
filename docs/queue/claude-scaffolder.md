@@ -16,8 +16,10 @@ Shipped all 16 genuinely-live remaining functions as byte-verified `asm void` C 
 Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-smalls — C-match the small-overlay convertibles [CLAIMED]
-The overlays with a few convertible each: ov008 (~6), ov011 (~5), ov010 (~5), ov015 (~4), ov003 (~2), ov016 (~2). Get each module's convertible_files, C-match what you can across them.
+### cm-smalls — C-match the small-overlay convertibles [DONE]
+Cross-checked every reported candidate against `delinks.txt` routing before attempting conversion (per the cm-ov002-batch1 dead-orphan lesson): most of ov008/ov011/ov010/ov016's reported counts were dead orphans or already resolved by the ff8e3426 taxonomy tightening. Real, live candidates found: 3 trivial no-op stubs (`func_ov015_021b285c`, `func_ov015_021b2860`, `func_ov003_021ca2b8` — empty C body, compiles to a bare `bx lr`) shipped as natural C, plus 1 attempted-and-parked case.
+**Parked:** `func_ov011_021d2c64` (brief 192's cross-overlay hardcoded-BL worked example — a `bl` to an address dsd can't attribute to one overlay, so the original `.s` hand-encodes the branch as a raw `.word`). Confirmed this is **not** portable to `asm void` either: bare `.word` raw-instruction-encoding directives are rejected by mwcc's inline assembler (`unknown assembler instruction mnemonic`), unlike the labeled-pool-literal case from cm-ov002-batch1 which had a `ldr rX, =symbol` workaround — there's no equivalent substitute for an unresolvable raw branch encoding. Reverted cleanly to its original `.s`; stays a genuine wall until dsd itself can attribute the call (out of scope here, same as brief 192 concluded).
+Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (per module).
 
 ### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [TODO]
