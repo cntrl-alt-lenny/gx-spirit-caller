@@ -3,10 +3,10 @@
 # Codex Scaffolder — autonomous work queue
 
 **Protocol (the standing kickoff drives this — you don't need a new message per item):**
-1. `python3.13 tools/queue.py next codex-scaffolder` → it prints the next item and marks it CLAIMED. If it prints `QUEUE-EMPTY`, stop and ping the brain.
+1. `python3.13 tools/work_queue.py next codex-scaffolder` → it prints the next item and marks it CLAIMED. If it prints `QUEUE-EMPTY`, stop and ping the brain.
 2. Do the item. Gate it with the item's stated **Gate** command (pytest / `gate3.py --scope all` if it touched build inputs / `scope_gate.py`). Never self-report — paste the real gate output.
-3. Open ONE PR for the item. Then `python3.13 tools/queue.py done codex-scaffolder <id>`, commit the queue file, and go back to step 1.
-4. If an item fails ~3 honest attempts, `python3.13 tools/queue.py park codex-scaffolder <id> "<reason>"`, commit, and continue — don't grind.
+3. Open ONE PR for the item. Then `python3.13 tools/work_queue.py done codex-scaffolder <id>`, commit the queue file, and go back to step 1.
+4. If an item fails ~3 honest attempts, `python3.13 tools/work_queue.py park codex-scaffolder <id> "<reason>"`, commit, and continue — don't grind.
 5. Stop only on: QUEUE-EMPTY, a gate you can't get green, or a genuine blocker. A short run because the queue drained is a SUCCESS, not a failure.
 
 You have the full toolchain in your worktree (`.codex/agents/scaffolder.toml`). Set effort HIGH.
