@@ -9972,7 +9972,7 @@ src/main/func_02054ad0.s:
     complete
     .text start:0x02054ad0 end:0x02054b00
 
-src/main/func_02054b00.s:
+src/main/func_02054b00.c:
     complete
     .text start:0x02054b00 end:0x02054b1c
 
@@ -16030,7 +16030,7 @@ src/main/func_0208d138.s:
     complete
     .text start:0x0208d138 end:0x0208d1e4
 
-src/main/func_0208d1e4.s:
+src/main/func_0208d1e4.c:
     complete
     .text start:0x0208d1e4 end:0x0208d204
 
@@ -16568,11 +16568,11 @@ src/main/func_02090910.c:
     complete
     .text start:0x02090910 end:0x02090928
 
-src/main/func_02090928.s:
+src/main/func_02090928.c:
     complete
     .text start:0x02090928 end:0x02090944
 
-src/main/func_02090944.s:
+src/main/func_02090944.c:
     complete
     .text start:0x02090944 end:0x02090960
 
@@ -16584,11 +16584,11 @@ src/main/func_02090978.c:
     complete
     .text start:0x02090978 end:0x02090990
 
-src/main/func_02090990.s:
+src/main/func_02090990.c:
     complete
     .text start:0x02090990 end:0x020909b0
 
-src/main/func_020909b0.s:
+src/main/func_020909b0.c:
     complete
     .text start:0x020909b0 end:0x020909d0
 
@@ -16688,7 +16688,7 @@ src/main/func_02091714.legacy.c:
     complete
     .text start:0x02091714 end:0x02091748
 
-src/main/func_02091748.s:
+src/main/func_02091748.c:
     complete
     .text start:0x02091748 end:0x02091768
 
@@ -17911,7 +17911,7 @@ libs/nitro/func_020983b8.legacy.c:
     complete
     .text start:0x020983b8 end:0x020983f4
 
-src/main/func_020983f4.s:
+src/main/func_020983f4.c:
     complete
     .text start:0x020983f4 end:0x02098414
 
@@ -18215,7 +18215,7 @@ src/main/func_0209aa48.s:
     complete
     .text start:0x0209aa48 end:0x0209aa64
 
-src/main/func_0209aa64.s:
+src/main/func_0209aa64.c:
     complete
     .text start:0x0209aa64 end:0x0209aa84
 

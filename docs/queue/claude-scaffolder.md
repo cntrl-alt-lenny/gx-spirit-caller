@@ -8,14 +8,21 @@
 
 ---
 
-### cm-ov002-batch1 — C-match ov002 convertibles (batch 1) [TODO]
-ov002 has ~27 convertible (non-wall) functions. Get the list via `wall_aware_headroom.py --json` (overlay002.convertible_files), C-match a batch (~8-15). (ov002 is asymptotic-hard, but these carry no documented wall — attempt them.)
+### cm-ov005 — hand C-match ov005 [DONE]
+Shipped 1 function (`func_ov005_021acadc`, bitfield-insert + Task_PostLocked size calc), byte-verified via `gate3.py --scope all` (3-region sha1 PASS). `wall_aware_headroom.py` now reports 0 convertible remaining in ov005 — pool exhausted (rest of the module's remaining `.s` carries the brief 294/302 GLOBAL_ASM-endgame wall marker).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-smalls — C-match the small-overlay convertibles [TODO]
-The overlays with a few convertible each: ov008 (~6), ov011 (~5), ov010 (~5), ov015 (~4), ov003 (~2), ov016 (~2). Get each module's convertible_files, C-match what you can across them.
+### cm-ov002-batch1 — C-match ov002 convertibles (batch 1) [DONE]
+Of the 27 `wall_aware_headroom.py`-reported convertibles, 11 (the no-`func_`-prefix `ov002_XXXXXXXX.s` files) turned out to be **dead orphans** — already shipped as C under `libs/nitro/*.legacy.c` or a shifted `src/overlay002/*.c` path, with a stale unused `.s` sitting on disk (the tool globs `.s` files on disk, it doesn't check `delinks.txt` routing — same false-positive class as one file found in ov003). Deleted all 11, plus 1 equivalent orphan found in ov003 (`ov003_021ca2b4.s`) — 12 total dead files removed as hygiene.
+Shipped all 16 genuinely-live remaining functions as byte-verified `asm void` C (reg-alloc-sensitive guard chains and table-lookup/tail-call families — not safely reachable from natural C on this asymptotic-hard module). **Toolchain finding:** the original `.s` files' local-label pool literals (`.Lxxx: .word symbol`) don't parse inside mwcc's inline `asm void {}` blocks (`illegal operand` / `unknown assembler instruction mnemonic`) — fixed by rewriting as the `ldr rX, =symbol` pseudo-op instead (proven precedent: `sinit_ov002_022ca7e8.c`). Confirmed via canary before scaling.
+Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
+**Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
+
+### cm-smalls — C-match the small-overlay convertibles [DONE]
+Cross-checked every reported candidate against `delinks.txt` routing before attempting conversion (per the cm-ov002-batch1 dead-orphan lesson): most of ov008/ov011/ov010/ov016's reported counts were dead orphans or already resolved by the ff8e3426 taxonomy tightening. Real, live candidates found: 3 trivial no-op stubs (`func_ov015_021b285c`, `func_ov015_021b2860`, `func_ov003_021ca2b8` — empty C body, compiles to a bare `bx lr`) shipped as natural C, plus 1 attempted-and-parked case.
+**Parked:** `func_ov011_021d2c64` (brief 192's cross-overlay hardcoded-BL worked example — a `bl` to an address dsd can't attribute to one overlay, so the original `.s` hand-encodes the branch as a raw `.word`). Confirmed this is **not** portable to `asm void` either: bare `.word` raw-instruction-encoding directives are rejected by mwcc's inline assembler (`unknown assembler instruction mnemonic`), unlike the labeled-pool-literal case from cm-ov002-batch1 which had a `ldr rX, =symbol` workaround — there's no equivalent substitute for an unresolvable raw branch encoding. Reverted cleanly to its original `.s`; stays a genuine wall until dsd itself can attribute the call (out of scope here, same as brief 192 concluded).
+Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (per module).
 
-### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [TODO]
-Continue ov002's convertible pool — different functions than batch 1.
-**Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
+### cm-ov002-batch2 — C-match ov002 convertibles (batch 2) [DONE]
+No-op: fresh `wall_aware_headroom.py --json` scan shows `overlay002: {total: 2773, wall: 2773, convertible: 0}`. Batch 1 already shipped/cleared the module's entire 27-function convertible pool (16 real ships + 11 dead orphans deleted) — nothing left for batch 2 to do. No functions converted, no gate run needed (no source changes).
