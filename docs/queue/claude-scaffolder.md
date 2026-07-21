@@ -16,7 +16,7 @@ Shipped all 16 genuinely-live remaining functions as byte-verified `asm void` C 
 Byte-verified via `gate3.py --scope all` (3-region sha1 PASS + full pytest green).
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-smalls — C-match the small-overlay convertibles [TODO]
+### cm-smalls — C-match the small-overlay convertibles [CLAIMED]
 The overlays with a few convertible each: ov008 (~6), ov011 (~5), ov010 (~5), ov015 (~4), ov003 (~2), ov016 (~2). Get each module's convertible_files, C-match what you can across them.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted (per module).
 
