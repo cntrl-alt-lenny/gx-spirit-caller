@@ -9972,7 +9972,7 @@ src/main/func_02054ad0.s:
     complete
     .text start:0x02054ad0 end:0x02054b00
 
-src/main/func_02054b00.s:
+src/main/func_02054b00.c:
     complete
     .text start:0x02054b00 end:0x02054b1c
 
