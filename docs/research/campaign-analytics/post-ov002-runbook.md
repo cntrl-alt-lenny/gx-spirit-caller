@@ -11,7 +11,7 @@ command blocks — one per wave, each self-contained. Every module's
 setup guesswork. Census-refreshed same session (see that doc's own §
 Census refresh) — zero drift on any of the 21 modules below, so this plan
 is current as of brief 553. All command blocks use plain `python` (not
-`python3.13`) and repo-relative paths, so they run unmodified on both
+`python`) and repo-relative paths, so they run unmodified on both
 Mac/Linux and Windows.
 
 **Do not touch `ov002` in Waves 1-10** — during those waves it's the

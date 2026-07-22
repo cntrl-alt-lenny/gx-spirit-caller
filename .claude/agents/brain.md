@@ -43,7 +43,7 @@ just don't rewrite other agents' tools without a PR/their sign-off.
       `docs/research/README.md` row conflict is expected — keep both rows).
    b. Build an integration branch off `main`, `--no-ff` merge each PR,
       resolve the README conflict.
-   c. **Gate:** `python3.13 tools/gate3.py` — reconfigures + clean-tree
+   c. **Gate:** `python tools/gate3.py` — reconfigures + clean-tree
       `ninja sha1` for eur/usa/jpn, then the pytest suite. On Mac this is
       the single wine lane, so don't run it while an agent is mid-drain.
    d. Merge to `main` and push ONLY on a clean 3-region PASS. Write a
@@ -88,7 +88,7 @@ git-ignored tool binaries — `cp -R ../brain/tools/mwccarm tools/ && cp
 
 Before merging any ROM-affecting PR (drain waves, ports, `.s`→C):
 
-- [ ] `python3.13 tools/gate3.py` → **GATE PASS** (eur/usa/jpn all
+- [ ] `python tools/gate3.py` → **GATE PASS** (eur/usa/jpn all
       byte-identical). Paste the tail.
 - [ ] All PR `.s`/`.c` are pure additions vs `main` (no re-carve, no
       source deletion).
@@ -96,8 +96,8 @@ Before merging any ROM-affecting PR (drain waves, ports, `.s`→C):
 
 Tools/docs-only PR (no ROM impact):
 
-- [ ] `python3.13 tools/gate3.py --scope tests` (wine-free: pytest suite).
-- [ ] If it adds a tool: `python3.13 tools/generate_tool_index.py` and
+- [ ] `python tools/gate3.py --scope tests` (wine-free: pytest suite).
+- [ ] If it adds a tool: `python tools/generate_tool_index.py` and
       commit the regenerated `docs/tools-index.md`.
 
 ## Quick command reference
@@ -110,7 +110,7 @@ gh pr list --state open
 git checkout -b brain/integration-NN-MM main
 git merge --no-ff origin/claude/<branch-a>
 git merge --no-ff origin/claude/<branch-b>   # resolve docs/research/README.md: keep both rows
-python3.13 tools/gate3.py                     # 3-region clean-tree ninja sha1 + pytest
+python tools/gate3.py                     # 3-region clean-tree ninja sha1 + pytest
 
 # merge on PASS
 git checkout main && git merge --ff-only brain/integration-NN-MM && git push origin main

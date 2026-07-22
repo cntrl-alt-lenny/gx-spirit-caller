@@ -37,7 +37,7 @@ is backing the session.
      cask's conflicts-with check. Rationale + tested baseline:
      [`docs/research/wine-migration.md`](../../docs/research/wine-migration.md).
 7. **Confirm the baseline.** Run the full 3-region gate:
-   `python3.13 tools/gate3.py` (reconfigures + clean-tree `ninja sha1` for
+   `python tools/gate3.py` (reconfigures + clean-tree `ninja sha1` for
    eur/usa/jpn, then the pytest suite). All three regions rebuild
    byte-identical and **all 27 modules × 3 regions check green** — a diverging
    region or a `dsd check` regression is a REAL break, not an expected
@@ -51,4 +51,3 @@ PRs (`gh pr list --state open`), verify them locally (configure +
 ninja rom + `./dsd.exe check modules -c config/eur/arm9/config.yaml`),
 merge or comment, update `docs/state.md`, write briefs for cntrl_alt_lenny to
 paste to other agents, repeat.
-

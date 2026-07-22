@@ -67,7 +67,7 @@ command blocks.
 
 ## Method
 
-Per module, per region: `python3.13 -u tools/batch_carve.py --version
+Per module, per region: `python -u tools/batch_carve.py --version
 <usa|jpn> [--overlay ov<NNN>] --srcdir src/<ver>/<overlay<NNN>|main>
 --min-addr <base> --dry-run --limit 100000` (no `--limit` truncation —
 every count below is the module's true total, not a sample). Base
@@ -128,7 +128,7 @@ flag or manual step needed, same command as every clean module.
 ## Universal command template
 
 ```bash
-python3.13 tools/batch_carve.py \
+python tools/batch_carve.py \
     --version <usa|jpn> \
     --overlay ov<NNN>              # omit entirely for main
     --srcdir src/<usa|jpn>/overlay<NNN>   # src/<ver>/main for main

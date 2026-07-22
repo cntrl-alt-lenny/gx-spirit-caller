@@ -43,7 +43,7 @@ stateless: read this file + `docs/state.md` and you're the active holder.
 
 Moved to [`docs/agents/brain-onboarding.md`](docs/agents/brain-onboarding.md)
 (one-time per-machine setup: clone, baserom, deps, configure, first build,
-baseline = 3-region `python3.13 tools/gate3.py` GATE PASS).
+baseline = 3-region `python tools/gate3.py` GATE PASS).
 
 ### Worktree convention (multi-agent on the same machine)
 
@@ -175,7 +175,7 @@ No-one else touches it without coordination.
 3. PR description says: **what** changed, **why** (link the task brief
    or a sentence of context), anything the reviewer should know.
 4. **Brain reviews locally** — checks out the branch and runs the
-   merge gate: `python3.13 tools/configure.py <region>` then
+   merge gate: `python tools/configure.py <region>` then
    `ninja sha1` for EUR + USA + JPN (3-region SHA1 PASS is the floor),
    plus `tools/check_match_invariants.py` and the test suite. For
    tools-only / docs-only PRs that don't touch the build path, EUR
@@ -524,3 +524,14 @@ providers, above). Nothing was deleted, only relocated.
 ## In-flight branches
 
 See the open-PR list (`gh pr list`) — it is always current; this file does not track branches.
+
+
+## Python and worktree portability
+
+Agent-facing commands use plain `python`, which is the Windows interpreter in these worktrees. On Mac, use the installed Python 3.13 interpreter for the same commands.
+
+Worktree capabilities:
+
+- `kb-map` is **build-FREE**: no baserom and no `dsd` required.
+- `kb-types` has **EUR baserom only**.
+- `scaffolder` and `decomper` have **all three baseroms** (EUR/USA/JPN).
