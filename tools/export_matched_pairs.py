@@ -9,7 +9,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from progress import parse_delinks_file
+from parsers import parse_delinks_file
 
 ROOT = Path(__file__).resolve().parent.parent
 _SYMBOL_RE = re.compile(

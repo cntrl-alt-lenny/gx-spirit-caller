@@ -41,7 +41,10 @@ import sys
 import tempfile
 from pathlib import Path
 
-from progress import parse_delinks_file
+try:
+    from tools.parsers import parse_delinks_file
+except ModuleNotFoundError:  # direct ``python tools/scope_gate.py`` entry
+    from parsers import parse_delinks_file
 
 ROOT = Path(__file__).resolve().parent.parent
 _FUNC_RE = re.compile(r"^(\S+)\s+kind:function\([^)]*\)\s+addr:(0x[0-9a-fA-F]+)", re.M)

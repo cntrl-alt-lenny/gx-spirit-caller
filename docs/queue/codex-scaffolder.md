@@ -35,18 +35,16 @@ Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we 
 ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 14 USA + 14 JPN per brief 643's census) that **no census, wave, or tool currently reaches**. Investigate the mechanism — is it a `dsd` config gap, a delinks/section modelling issue, or an addressing thing? Produce a diagnosis + a concrete proposal for making them reachable. Read-only investigation; do not attempt to carve them in this item.
 **Gate:** the report, with the exact evidence (config/section/tool output) that explains the invisibility.
 
-### q-c34-corpus — assemble the C-34 corpus (116 of 138 coercible) [TODO]
-
+### q-c34-corpus — assemble the C-34 corpus (116 of 138 coercible) [DONE]
 One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the single biggest lever-shaped opportunity in the pool. Mechanically gather every C-34-cited file into one reference: address, module, size, the exact `.s` shape that triggered the citation, and any ALREADY-MATCHED example of the same shape (search matched `.c` for siblings). You are assembling evidence, NOT deriving the recipe — a CC agent cracks it; your job is to hand them the corpus so they don't spend hours collecting it.
 **Gate:** the corpus doc + counts; doc-only, no build.
 
-### q-tools-package — kill the tools/ boilerplate and parser duplication [TODO]
-
+### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+> PARKED: Parser facade and direct-call-site batch complete; exact configure gate unavailable because orig\\baserom_eur.nds is absent. pytest ran with 2843 passed, 25 skipped, 55 subtests and 11 pre-existing Windows/path/build failures; no new failures.
 ~93 flat `tools/*.py` with no package boundary: ~30 hand-roll delinks/symbols parsing while canonical `parse_delinks_file`/`parse_symbols_file` exist, and ~40 carry identical `sys.path.insert` + `# noqa: E402` boilerplate. Promote the canonical parsers into a shared module, make `tools/` importable, migrate the hand-rolled readers. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that (absolute imports or `-m`), and migrate in small batches, most-duplicated first. This is the root cause behind the C%-metric bug b566 had to fix.
 **Gate:** `python -m pytest -q tests` green (do NOT add to the ~12 known Windows path-sep failures) + `python tools/configure.py eur` still succeeds + list which tools you migrated.
 
-### q-dead-tools — audit the tool inventory for dead weight [TODO]
-
+### q-dead-tools — audit the tool inventory for dead weight [DONE]
 Of the ~93 `tools/*.py`, some are superseded or unreferenced (e.g. tools whose lane closed). For each: is it referenced by `build.ninja`, any workflow, any test, any doc, or another tool? Produce a table: KEEP / SUPERSEDED-BY-X / UNREFERENCED. ⚠️ **List only — delete nothing in this item.** A follow-up will action it after review.
 **Gate:** the audit table; doc-only, no build.
 

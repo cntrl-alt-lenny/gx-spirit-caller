@@ -58,7 +58,7 @@ from pathlib import Path
 # Use the existing delinks parser from progress.py — same source-of-
 # truth as collect_matched_ranges() / parse_delinks_file callers.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from progress import parse_delinks_file  # noqa: E402
+from parsers import parse_delinks_file  # noqa: E402
 
 
 LEGACY_C_SUFFIX = ".legacy.c"

@@ -75,7 +75,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from get_platform import get_platform  # noqa: E402
-from progress import parse_delinks_file  # noqa: E402
+from parsers import parse_delinks_file  # noqa: E402
 # brief 587: this tuple was the "seed" tools/routing_suffixes.py was
 # promoted from (it predates the Thumb tier's other 3 consumers going
 # stale) — now imports back from the shared module instead of keeping
