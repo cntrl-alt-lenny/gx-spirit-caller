@@ -12,7 +12,7 @@
         .extern func_020a7fec
         .extern func_020a85ec
         .extern func_020aaddc
-        .extern func_020ab088
+        .extern Strchr
         .global func_020a8d50
         .arm
 func_020a8d50:
@@ -31,7 +31,7 @@ func_020a8d50:
 .L_30:
     mov r0, fp
     mov r1, #0x25
-    bl func_020ab088
+    bl Strchr
     str r0, [sp, #0xc]
     cmp r0, #0x0
     bne .L_84

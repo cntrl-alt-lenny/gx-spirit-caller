@@ -1,4 +1,4 @@
-char *func_020ab088(char *s, int c) {
+char *Strchr(char *s, int c) {
     char ch = (char)c;
     char cur = *s++;
     while (cur != 0) {

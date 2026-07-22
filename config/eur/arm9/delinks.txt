@@ -5874,7 +5874,7 @@ src/main/func_02031764.c:
     complete
     .text start:0x02031764 end:0x02031794
 
-src/main/func_02031794.c:
+src/main/IsValue12D3Or147E.c:
     complete
     .text start:0x02031794 end:0x020317c0
 
@@ -14716,7 +14716,7 @@ src/main/func_02082198.s:
     complete
     .text start:0x02082198 end:0x020821e4
 
-src/main/func_020821e4.c:
+src/main/SetPackedField9C.c:
     complete
     .text start:0x020821e4 end:0x02082210
 
@@ -19589,7 +19589,7 @@ src/main/func_020ab054.s:
     complete
     .text start:0x020ab054 end:0x020ab088
 
-src/main/func_020ab088.c:
+src/main/Strchr.c:
     complete
     .text start:0x020ab088 end:0x020ab0c4
 

@@ -89,8 +89,7 @@ Brief 662 found the 91-family census unusable as a worklist: its own audit retur
 Rebuild it with that fixed: impose a **minimum exemplar size** (start at ≥64 B and state your threshold), require a distinctive signature (non-empty relocation set — the `sig=0` rows were exactly the ambiguous ones), and require the anchor to be a genuinely matched `.c`. Report how many families survive the stricter criteria — a much smaller, trustworthy list beats 91 unusable rows.
 **Gate:** doc-only; the rebuilt census + the criteria you applied + survival counts vs the original 91.
 
-### q-name-batch-2 — name the newly converted functions [TODO]
-
+### q-name-batch-2 — name the newly converted functions [DONE]
 The CC lanes are shipping steadily (24 last round, more landing). Name any newly-converted function still called `func_*` whose purpose is legible from its C body, then propagate twins to USA/JPN. ⚠️ Never invent a name you can't justify from the code — an honest small batch beats a speculative large one.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied.
 

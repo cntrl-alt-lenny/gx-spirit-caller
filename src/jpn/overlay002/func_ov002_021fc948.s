@@ -13,7 +13,7 @@
         .extern func_0202b86c
         .extern func_0202e1e0
         .extern func_0202f994
-        .extern func_02031740
+        .extern IsValue12D3Or147E
         .extern func_ov002_021b2fcc
         .extern func_ov002_021b3dec
         .extern func_ov002_021b3e2c
@@ -87,7 +87,7 @@ func_ov002_021fc948:
     bne .L_788
 .L_c8:
     ldrh r0, [r9]
-    bl func_02031740
+    bl IsValue12D3Or147E
     cmp r0, #0x0
     movne r0, #0x0
     ldmneia sp!, {r4, r5, r6, r7, r8, r9, sl, pc}

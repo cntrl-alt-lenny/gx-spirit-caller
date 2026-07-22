@@ -5,7 +5,7 @@
         .text
         .extern func_02045c7c
         .extern func_020aaddc
-        .extern func_020ab088
+        .extern Strchr
         .global func_02045c34
         .arm
 func_02045c34:
@@ -17,7 +17,7 @@ func_02045c34:
     mov r4, r3
     mov r0, r5
     mov r1, #0x0
-    bl func_020ab088
+    bl Strchr
     mov r2, r0
     mov r0, r7
     mov r1, r6

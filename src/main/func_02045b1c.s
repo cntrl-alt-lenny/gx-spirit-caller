@@ -6,7 +6,7 @@
         .extern func_020aaddc
         .extern func_020aaec0
         .extern func_020ab054
-        .extern func_020ab088
+        .extern Strchr
         .global func_02045b1c
         .arm
 func_02045b1c:
@@ -20,7 +20,7 @@ func_02045b1c:
     ldmeqia sp!, {r4, r5, r6, r7, pc}
     mov r0, r2
     mov r1, r6
-    bl func_020ab088
+    bl Strchr
     movs r5, r0
     addeq sp, sp, #0x4
     mvneq r0, #0x0
@@ -43,14 +43,14 @@ func_02045b1c:
 .L_1cc:
     mov r1, r6
     add r0, r5, #0x1
-    bl func_020ab088
+    bl Strchr
     cmp r0, #0x0
     addeq sp, sp, #0x4
     mvneq r0, #0x0
     ldmeqia sp!, {r4, r5, r6, r7, pc}
     mov r1, r6
     add r0, r0, #0x1
-    bl func_020ab088
+    bl Strchr
     movs r5, r0
     bne .L_194
     add sp, sp, #0x4
@@ -59,14 +59,14 @@ func_02045b1c:
 .L_208:
     mov r1, r6
     add r0, r5, #0x1
-    bl func_020ab088
+    bl Strchr
     movs r5, r0
     addeq sp, sp, #0x4
     mvneq r0, #0x0
     ldmeqia sp!, {r4, r5, r6, r7, pc}
     mov r1, r6
     add r0, r5, #0x1
-    bl func_020ab088
+    bl Strchr
     cmp r0, #0x0
     addne r1, r5, #0x1
     subne r6, r0, r1

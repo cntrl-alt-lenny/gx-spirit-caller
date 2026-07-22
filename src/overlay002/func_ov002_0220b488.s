@@ -5,7 +5,7 @@
         .text
         .extern func_0202de9c
         .extern func_0202e234
-        .extern func_02031794
+        .extern IsValue12D3Or147E
         .extern func_ov002_021ff020
         .extern func_ov002_021ff320
         .extern func_ov002_0223de94
@@ -18,7 +18,7 @@ func_ov002_0220b488:
     moveq r0, #0x0
     ldmeqia sp!, {r4, r5, r6, pc}
     ldrh r0, [r5]
-    bl func_02031794
+    bl IsValue12D3Or147E
     cmp r0, #0x0
     movne r0, #0x0
     ldmneia sp!, {r4, r5, r6, pc}

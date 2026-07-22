@@ -6,7 +6,7 @@
         .extern func_0202b824
         .extern func_0202b86c
         .extern func_0202e1e0
-        .extern func_02031740
+        .extern IsValue12D3Or147E
         .extern func_ov002_021fdcac
         .global func_ov002_021fe8d4
         .arm
@@ -18,7 +18,7 @@ func_ov002_021fe8d4:
     mov r4, r1
     bl func_ov002_021fdcac
     mov r0, r4
-    bl func_02031740
+    bl IsValue12D3Or147E
     cmp r0, #0x0
     addne sp, sp, #0x30
     movne r0, #0x0

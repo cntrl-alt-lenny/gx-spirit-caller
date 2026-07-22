@@ -8,7 +8,7 @@
         .extern func_0202b8c0
         .extern func_0202e270
         .extern func_0202f9e8
-        .extern func_02031794
+        .extern IsValue12D3Or147E
         .extern func_ov002_021b3014
         .extern func_ov002_021b30ac
         .extern func_ov002_021b3434
@@ -87,7 +87,7 @@ func_ov002_021fe3d4:
     tst r0, #0x1
     bne .L_ba8
     mov r0, fp
-    bl func_02031794
+    bl IsValue12D3Or147E
     cmp r0, #0x0
     bne .L_ba8
     cmp r5, #0x4

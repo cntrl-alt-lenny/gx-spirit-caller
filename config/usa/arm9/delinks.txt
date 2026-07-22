@@ -3422,7 +3422,7 @@ src/usa/main/func_02031630.c:
 src/usa/main/func_02031710.c:
     complete
     .text start:0x02031710 end:0x02031740
-src/usa/main/func_02031740.c:
+src/usa/main/IsValue12D3Or147E.c:
     complete
     .text start:0x02031740 end:0x0203176c
 src/usa/main/func_0203176c.c:
@@ -9411,7 +9411,7 @@ src/usa/main/func_02082050.s:
 src/usa/main/func_020820b0.s:
     complete
     .text start:0x020820b0 end:0x020820fc
-src/usa/main/func_020820fc.c:
+src/usa/main/SetPackedField9C.c:
     complete
     .text start:0x020820fc end:0x02082128
 src/usa/main/func_02082128.c:

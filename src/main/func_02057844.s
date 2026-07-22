@@ -8,7 +8,7 @@
         .extern data_021000b0
         .extern func_020602c4
         .extern func_020ab054
-        .extern func_020ab088
+        .extern Strchr
         .extern func_020ace00
         .global func_02057844
         .arm
@@ -26,7 +26,7 @@ func_02057844:
     ldmltia sp!, {r4, r5, r6, r7, pc}
     ldr r0, [r6]
     mov r1, #0xa
-    bl func_020ab088
+    bl Strchr
     movs r4, r0
     beq .L_f10
     ldr r1, _LIT0

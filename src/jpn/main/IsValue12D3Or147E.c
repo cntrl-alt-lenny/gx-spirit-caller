@@ -1,4 +1,4 @@
-int func_02031740(int a0) {
+int IsValue12D3Or147E(int a0) {
     switch (a0) {
     case 0x12d3:
     case 0x147e:

@@ -5,7 +5,7 @@
         .text
         .extern data_ov002_022ce1a8
         .extern data_ov002_022ce4a8
-        .extern func_02031740
+        .extern IsValue12D3Or147E
         .extern func_ov002_021d8814
         .extern func_ov002_021de4a8
         .extern func_ov002_0226b04c
@@ -23,7 +23,7 @@ func_ov002_0223a978:
     mla r5, r4, r0, r1
 .L_140:
     ldrh r0, [r5]
-    bl func_02031740
+    bl IsValue12D3Or147E
     cmp r0, #0x0
     bne .L_1d4
     ldrh r0, [r5, #0x4]

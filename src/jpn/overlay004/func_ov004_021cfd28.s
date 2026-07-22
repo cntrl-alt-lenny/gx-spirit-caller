@@ -20,7 +20,7 @@
         .extern func_0207e03c
         .extern func_0207e288
         .extern func_02081f74
-        .extern func_020820fc
+        .extern SetPackedField9C
         .extern func_02082128
         .extern func_0208214c
         .extern func_02082170
@@ -170,7 +170,7 @@ func_ov004_021cfd28:
     mov r0, #0x7
     mov r2, r5
     mov r3, r1
-    bl func_020820fc
+    bl SetPackedField9C
     bl func_02082208
     bl func_02084ef8
     ldr r2, _LIT13
