@@ -18,7 +18,7 @@
         .extern func_02004fe8
         .extern func_020054a4
         .extern func_020945f4
-        .extern func_020a6a00
+        .extern Strlen
         .extern func_020a6afc
         .extern func_ov005_021abdb8
         .extern func_ov005_021abe04
@@ -252,7 +252,7 @@ func_ov005_021abe5c:
     ldr r0, [fp]
     mov r1, #0x0
     str r1, [sp, #0xc]
-    bl func_020a6a00
+    bl Strlen
     mov r5, r0
     add r0, r5, #0x4
     mov r1, #0x4

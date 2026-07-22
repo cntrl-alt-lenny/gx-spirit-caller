@@ -1,4 +1,4 @@
-int func_020a6a00(char *s) {
+int Strlen(char *s) {
     int i = 0;
     if (s[0] != 0) {
         do {

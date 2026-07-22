@@ -30,7 +30,7 @@
         .extern func_0208f368
         .extern func_02092904
         .extern func_02094504
-        .extern func_020a6a00
+        .extern Strlen
         .extern func_020a6afc
         .extern func_ov005_021aaf08
         .extern func_ov005_021aaf6c
@@ -273,7 +273,7 @@ func_ov010_021b534c:
     add r0, r0, #0x200
     str r5, [r4, r6, lsl #0x2]
     bl func_0202c0c0
-    bl func_020a6a00
+    bl Strlen
     add r0, r5, r0
     add r0, r0, #0x4
     add r6, r6, #0x1

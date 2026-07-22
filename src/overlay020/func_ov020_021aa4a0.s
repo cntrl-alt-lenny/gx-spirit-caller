@@ -7,7 +7,7 @@
         .extern func_0202b100
         .extern func_0202c208
         .extern func_0202c228
-        .extern func_020a6a00
+        .extern Strlen
         .extern func_020a6afc
         .global func_ov020_021aa4a0
         .arm
@@ -65,7 +65,7 @@ func_ov020_021aa4a0:
     sub r9, r3, #0x30
     add r0, r9, r8
     bl func_0202b100
-    bl func_020a6a00
+    bl Strlen
     mov sl, r0
     cmp r6, #0x0
     beq .L_ec
@@ -88,7 +88,7 @@ func_ov020_021aa4a0:
     sub r9, r2, #0x2f
     add r0, r9, r8
     bl func_0202c228
-    bl func_020a6a00
+    bl Strlen
     mov sl, r0
     cmp r6, #0x0
     beq .L_140
@@ -111,7 +111,7 @@ func_ov020_021aa4a0:
     sub r9, r2, #0x2f
     add r0, r9, r8
     bl func_0202c208
-    bl func_020a6a00
+    bl Strlen
     mov sl, r0
     cmp r6, #0x0
     beq .L_194

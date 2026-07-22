@@ -8,7 +8,7 @@
         .extern func_020a7268
         .extern func_020a73e8
         .extern func_020aaddc
-        .extern func_020ace98
+        .extern FindU16InArray
         .extern func_020acec0
         .extern func_020ad438
         .extern func_020ad688
@@ -402,7 +402,7 @@ func_020ae474:
     mov r0, r6
     mov r2, r7
     mov r1, #0x0
-    bl func_020ace98
+    bl FindU16InArray
     cmp r0, #0x0
     beq .L_788
     sub r0, r0, r6
