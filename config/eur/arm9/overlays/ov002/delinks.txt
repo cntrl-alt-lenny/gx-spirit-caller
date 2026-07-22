@@ -3982,7 +3982,7 @@ src/overlay002/func_ov002_022005ac.s:
     complete
     .text start:0x022005ac end:0x02200630
 
-src/overlay002/func_ov002_02200630.s:
+src/overlay002/func_ov002_02200630.c:
     complete
     .text start:0x02200630 end:0x02200650
 
