@@ -3154,7 +3154,7 @@ src/main/func_0201aabc.s:
 
 
 
-src/main/func_0201aaf4.s:
+src/main/func_0201aaf4.c:
     complete
     .text start:0x0201aaf4 end:0x0201ab2c
 
@@ -7813,7 +7813,7 @@ src/main/func_0203d6a8.c:
     complete
     .text start:0x0203d6a8 end:0x0203d6c4
 
-src/main/func_0203d6c4.s:
+src/main/func_0203d6c4.c:
     complete
     .text start:0x0203d6c4 end:0x0203d6e0
 
@@ -15720,7 +15720,7 @@ libs/nitro/func_0208b16c.legacy.c:
     complete
     .text start:0x0208b16c end:0x0208b190
 
-src/main/func_0208b190.s:
+src/main/func_0208b190.c:
     complete
     .text start:0x0208b190 end:0x0208b1ac
 
