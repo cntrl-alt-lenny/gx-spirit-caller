@@ -1432,7 +1432,7 @@ src/usa/main/func_02018b60.c:
     complete
     .text start:0x02018b60 end:0x02018b70
 
-src/usa/main/func_02018b70.c:
+src/usa/main/SysWork_ClearField0x810.c:
     complete
     .text start:0x02018b70 end:0x02018b8c
 
