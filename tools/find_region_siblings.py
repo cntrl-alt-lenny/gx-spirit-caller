@@ -71,6 +71,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+from parsers import parse_symbols_file
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config"
@@ -292,10 +293,6 @@ class Function:
 # Loading
 # --------------------------------------------------------------------------- #
 
-SYMBOL_RE = re.compile(
-    r"^(?P<name>\S+)\s+kind:function\((?P<ish>arm|thumb),"
-    r"size=0x(?P<size>[0-9a-fA-F]+)\)\s+addr:0x(?P<addr>[0-9a-fA-F]+)"
-)
 RELOC_RE = re.compile(
     r"^from:0x(?P<from_addr>[0-9a-fA-F]+)\s+kind:(?P<kind>\S+)\s+"
     r"to:0x(?P<to_addr>[0-9a-fA-F]+)\s+module:(?P<to_mod>\S+)"
@@ -304,20 +301,13 @@ RELOC_RE = re.compile(
 
 def parse_symbols(path: Path, module: str) -> list[tuple[int, int, str, str]]:
     """Return list of (addr, size, name, ish) for each function in
-    `path`. Skips non-function entries."""
-    if not path.is_file():
-        return []
-    out: list[tuple[int, int, str, str]] = []
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        m = SYMBOL_RE.match(line)
-        if m:
-            out.append((
-                int(m.group("addr"), 16),
-                int(m.group("size"), 16),
-                m.group("name"),
-                m.group("ish"),
-            ))
-    return out
+    `path`. Skips non-function entries. The canonical parser owns the
+    symbols.txt grammar; this adapter preserves this tool's tuple API."""
+    return [
+        (symbol.addr, symbol.size, symbol.name, symbol.mode)
+        for symbol in parse_symbols_file(path, module)
+        if symbol.is_function
+    ]
 
 
 def parse_relocs(path: Path) -> dict[int, list[tuple[int, str, str]]]:

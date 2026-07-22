@@ -9,26 +9,13 @@ import re
 import subprocess
 from pathlib import Path
 
-from parsers import parse_delinks_file
+from parsers import parse_delinks_file, parse_symbols_file
 
 ROOT = Path(__file__).resolve().parent.parent
-_SYMBOL_RE = re.compile(
-    r"^(\S+) kind:function\((arm|thumb),size=0x([0-9a-f]+)\) addr:0x([0-9a-f]+)"
-)
 _FUNC_RE = re.compile(r"^\s*[0-9a-f]+ <([^>]+)>:")
 _FUNC_ADDR_RE = re.compile(r"^\s*([0-9a-f]+) <([^>]+)>:")
 _INSN_RE = re.compile(r"^\s*[0-9a-f]+:\s+.*?\t(.+)$")
 _RELOC_RE = re.compile(r"^\s*([0-9a-f]+)\s+R_ARM_\S+\s+(data_[A-Za-z0-9_]+)")
-
-
-def parse_symbols(text: str) -> list[tuple[str, str, int, int]]:
-    out = []
-    for line in text.splitlines():
-        match = _SYMBOL_RE.match(line)
-        if match:
-            out.append((match.group(1), match.group(2), int(match.group(4), 16),
-                        int(match.group(3), 16)))
-    return out
 
 
 def mnemonics_from_objdump(text: str, function: str) -> str:
@@ -132,10 +119,14 @@ def collect(region: str = "eur", root: Path = ROOT,
         symbols_path = delinks.parent / "symbols.txt"
         if not symbols_path.is_file():
             continue
-        symbols = parse_symbols(symbols_path.read_text())
         module = "main"
         if "overlays" in delinks.parts:
             module = delinks.parts[delinks.parts.index("overlays") + 1]
+        symbols = [
+            (symbol.name, symbol.mode, symbol.addr, symbol.size)
+            for symbol in parse_symbols_file(symbols_path, module)
+            if symbol.is_function
+        ]
         for tu in tus:
             source = tu.get("source", "")
             if tu.get("status") != "complete" or not source.endswith(".c"):
