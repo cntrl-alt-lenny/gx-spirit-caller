@@ -74,8 +74,8 @@ Brief 655 found that **30 of `main`'s 62 "coercible" files cite C-34 with zero s
 Brief 654 drained ov002's coercible pool (23 shipped total) and **independently re-tested the remaining ~2,750 files' 288/290/294 reg-alloc-walled headers with fresh evidence** rather than trusting the blanket stamp. That verification is currently buried in a brief report. Promote it into a durable record (address ranges, the re-test method, what evidence was found) so no future round re-sweeps ov002 believing it's unexplored. This is the *negative* result that protects weeks of effort — write it to be found.
 **Gate:** doc-only; cross-link it from `endgame-ledger.md` and the wall taxonomy.
 
-### q-dead-tools-action — action the dead-tool audit [CLAIMED]
-
+### q-dead-tools-action — action the dead-tool audit [PARKED]
+> PARKED: No UNREFERENCED tools were found; requested configure gate is unavailable because kb-map has no EUR baserom. PR #1256 records the no-op and known baseline test failures.
 Your own `q-dead-tools` audit produced a KEEP / SUPERSEDED / UNREFERENCED table. Now action it: delete only the rows you classified UNREFERENCED, one small batch at a time. ⚠️ Re-verify each is still unreferenced at deletion time (`build.ninja`, workflows, tests, docs, other tools) — the tree has changed since the audit.
 **Gate:** `python -m pytest -q tests` (no NEW failures beyond the known 12 Windows path-sep ones) + `python tools/configure.py eur` succeeds + list what you removed.
 
