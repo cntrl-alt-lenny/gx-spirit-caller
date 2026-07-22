@@ -16,59 +16,130 @@ Anchor-backed families rank first because a matched C sibling is the highest-lev
 
 The prior sweep queues contributed 64 address tokens to the exclusion set. Any candidate-only shape group containing one of those addresses was omitted, so the tables below do not re-list the families already catalogued in `cmatch-sweep-queue.md` or `cmatch-sweep-queue-overlays.md`.
 
-## Anchor verification audit (queue item `q-family-verify`)
+## Anchor verification audit (queue items `q-family-verify` and `q-family-verify-2`)
 
-The census's “C anchor” label was checked against the current EUR tree on
-2026-07-22. The method was deliberately build-free:
+This is the completed, build-free audit of all 91 `A-*` rows as of 2026-07-22.
+The source-of-truth check is the committed EUR tree: retain only `complete`
+delinks whose source path is C/C++ (including `.legacy.c`, `.thumb.c`, and
+`.legacy_sp3.c`), then look up each exemplar address. A complete `.s` TU is not
+a C anchor. The relocation signature is the census fingerprint from the
+committed EUR relocs data.
 
-1. Read every EUR `delinks.txt` and retain only `complete` TUs whose source
-   path ends in `.c`/`.cpp` (including `.legacy.c`, `.thumb.c`, and
-   `.legacy_sp3.c`). A complete `.s` TU is **not** a C anchor.
-2. For the first 20 anchor rows (`A-01`–`A-20`), look up the exemplar address
-   in the EUR symbols and test whether a retained C TU actually covers that
-   address.
-3. Recompute each exemplar's `(size, relocation-offset/kind signature)` from
-   the committed EUR `relocs.txt`, then count current non-C functions with the
-   same fingerprint. This checks the claimed member shape without compiling.
-4. Mark `sig=0` rows **AMBIGUOUS** even when the size and empty signature
-   repeat: an empty relocation signature is not enough to distinguish leaf
-   functions. Mark a non-empty-signature row **VERIFIED** only when the C
-   anchor exists and at least one same-shape candidate remains; otherwise it
-   is **SUSPECT**.
+Status is intentionally mechanical and fully resolved, including the former
+ambiguous rows:
 
-| Family | Claimed exemplar | C anchor now? | Current same-shape non-C members | Verification |
-|---|---|---|---:|---|
-| `A-01` | `0207708c` | no | 5 | AMBIGUOUS (`sig=0`) |
-| `A-02` | `0209085c` | no | 2 | SUSPECT |
-| `A-03` | `020b3648` | no | 1 | AMBIGUOUS (`sig=0`) |
-| `A-04` | `0208b1c8` | no | 1 | AMBIGUOUS (`sig=0`) |
-| `A-05` | `0206be1c` | no | 6 | AMBIGUOUS (`sig=0`) |
-| `A-06` | `02067b8c` | no | 13 | AMBIGUOUS (`sig=0`) |
-| `A-07` | `0207e214` | no | 4 | SUSPECT |
-| `A-08` | `02031794` | no | 16 | AMBIGUOUS (`sig=0`) |
-| `A-09` | `02007f38` | no | 3 | SUSPECT |
-| `A-10` | `02001e5c` | no | 12 | AMBIGUOUS (`sig=0`) |
-| `A-11` | `02034094` | no | 10 | AMBIGUOUS (`sig=0`) |
-| `A-12` | `020644a4` | no | 15 | AMBIGUOUS (`sig=0`) |
-| `A-13` | `020442f8` | no | 10 | AMBIGUOUS (`sig=0`) |
-| `A-14` | `0203ab98` | no | 51 | AMBIGUOUS (`sig=0`) |
-| `A-15` | `020a978c` | no | 2 | SUSPECT |
-| `A-16` | `02054840` | no | 1 | SUSPECT |
-| `A-17` | `0205bccc` | no | 11 | AMBIGUOUS (`sig=0`) |
-| `A-18` | `02021660` | no | 11 | AMBIGUOUS (`sig=0`) |
-| `A-19` | `0203aeec` | no | 9 | AMBIGUOUS (`sig=0`) |
-| `A-20` | `02038dac` | no | 8 | SUSPECT |
+- **VERIFIED** — the exemplar is a current complete C TU and its non-empty
+  relocation signature is real. `A-26` is the one such row; brief 655 shipped
+  `020a32e4` 100% across the three regions, so it has no open member left.
+- **SUSPECT** — the exemplar has a non-empty relocation signature, but no
+  current complete C TU at that address. The family shape may still be useful;
+  it is not an anchor-backed propagation family.
+- **AMBIGUOUS** — the relocation signature is empty (`sig=0`). Equal size plus
+  no relocations cannot distinguish unrelated leaf functions, even if the
+  fingerprint repeats. This is a resolved classification, not an unchecked
+  row: do not treat these as verified anchors.
 
-**Sample result: 0 VERIFIED, 6 SUSPECT, 14 AMBIGUOUS.** Applying the same
-address/source/signature test mechanically to all 91 `A-*` rows gives **0
-VERIFIED, 54 SUSPECT, and 37 AMBIGUOUS**. The full index below remains the
-original census snapshot; use the status column above for the sampled rows
-and treat every un-audited row as unverified until it passes the same check.
+No separate checked-in brief-662 report exists in this repository snapshot;
+the post-census C evidence visible here is the current source/delinks tree and
+brief 655's shipped record. No build or tool input was changed.
 
-This is a stale-anchor finding, not a claim that the candidate members are
-identical in machine code. The non-empty-signature SUSPECT rows still have
-same-shaped candidates worth independent review; the `sig=0` rows should not
-be scheduled as near-zero-shot propagation families.
+| Family | Exemplar | Reloc sig | C TU now? | Status | Mechanical note |
+|---|---|---:|---|---|---|
+| A-01 | `0207708c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-02 | `0209085c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-03 | `020b3648` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-04 | `0208b1c8` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-05 | `0206be1c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-06 | `02067b8c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-07 | `0207e214` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-08 | `02031794` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-09 | `02007f38` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-10 | `02001e5c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-11 | `02034094` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-12 | `020644a4` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-13 | `020442f8` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-14 | `0203ab98` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-15 | `020a978c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-16 | `02054840` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-17 | `0205bccc` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-18 | `02021660` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-19 | `0203aeec` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-20 | `02038dac` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-21 | `020821e4` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-22 | `02064d88` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-23 | `0201d5c0` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-24 | `0203deac` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-25 | `020534b4` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-26 | `020a32e4` | 1 | yes — `src/main/func_020a32e4.c` | **VERIFIED** | brief 655 shipped 100%; no open member |
+| A-27 | `0200fdc0` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-28 | `0203ed80` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-29 | `0200c23c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-30 | `02025880` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-31 | `020683ec` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-32 | `020061bc` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-33 | `020670f4` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-34 | `02033fb0` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-35 | `02032724` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-36 | `020a3afc` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-37 | `0208b070` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-38 | `0204320c` | 3 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-39 | `0202f500` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-40 | `02022540` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-41 | `0202e5ac` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-42 | `020938c8` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-43 | `02038d2c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-44 | `0202d9a0` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-45 | `0200fa90` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-46 | `02038674` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-47 | `0201d620` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-48 | `02054c0c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-49 | `0201aabc` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-50 | `02067b54` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-51 | `0206eb08` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-52 | `02067870` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-53 | `0206afec` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-54 | `0200c79c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-55 | `0206a724` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-56 | `02087e54` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-57 | `0203f718` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-58 | `02022580` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-59 | `0203eb14` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-60 | `0206da98` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-61 | `0200fd1c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-62 | `0206904c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-63 | `0202e79c` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-64 | `020678b8` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-65 | `020b0afc` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-66 | `0203cb90` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-67 | `02054c78` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-68 | `0201a5c0` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-69 | `02065d18` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-70 | `0208226c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-71 | `0209e0f0` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-72 | `0207be90` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-73 | `0201904c` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-74 | `0202b3d4` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-75 | `02038d70` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-76 | `0206b7d8` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-77 | `0207d458` | 3 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-78 | `02087918` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-79 | `02009a68` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-80 | `0206bf94` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-81 | `02084dc0` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-82 | `020a3144` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-83 | `0207034c` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-84 | `0207092c` | 3 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-85 | `02044c60` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-86 | `02068890` | 1 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-87 | `020125ac` | 2 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-88 | `020900a0` | 4 | no | **SUSPECT** | non-empty signature; no C TU |
+| A-89 | `0203def0` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-90 | `0208b1e0` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+| A-91 | `0200f044` | 0 | no | **AMBIGUOUS** | empty relocation signature |
+
+**Completed result: 1 VERIFIED, 53 SUSPECT, 37 AMBIGUOUS (91 total).**
+The previous sample/full audit was 0/54/37; the delta is the one live C
+anchor created by brief 655 (`A-26`).
 
 ## Ranked anchor-backed families — top 10
 
