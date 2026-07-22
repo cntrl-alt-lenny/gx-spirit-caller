@@ -57,8 +57,7 @@ We have no historical view of the readable-C rate — only spot readings. Recons
 Brief 659 studied peer projects as a *source of SDK code*; this is different — mine them for **techniques we lack**. Look at pret/pokeheartgold, pret/pokediamond, pmd-sky, sm64ds decomps, zeldaret/ph: how do they crack reg-alloc mismatches, what compiler-flag or pragma levers do they use per-TU, what tooling do they have that we don't, how do they organise a large C-matching push? ⚠️ Skip anything already in our ledger as dead: the m2c drafter (~10.66%, dead end), `-ipa` (would break our matches), `#pragma thumb` (already used), the illpragmas opt_* toggles (measured inert). Report only genuinely NEW techniques, each with a URL and an assessment of whether it applies to mwccarm 2.0/sp1p5.
 **Gate:** doc-only; the technique list with URLs + applicability verdicts.
 
-### q-family-verify-2 — finish verifying the family census [TODO]
-
+### q-family-verify-2 — finish verifying the family census [DONE]
 `q-family-verify` sampled ~20 of brief 658's 91 anchor-backed families. Finish the job: verify the remainder, and resolve every row still marked ambiguous. The CC Decomper is now sweeping these families for real (brief 662) — a false anchor costs it a wasted session, so accuracy here directly protects that lane.
 **Gate:** doc-only; the completed VERIFIED/SUSPECT/AMBIGUOUS column across all 91 + counts.
 
