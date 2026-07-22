@@ -84,8 +84,7 @@ Brief 661 established `main`'s **0–256 byte tier (1,645 of 2,370 files, 69% of
 For every main candidate ≤256 B: address, size, shape class (trivial stub / tail-call forwarder / guard chain / small dispatcher / loop / other — derive mechanically from the `.s`), header provenance, and whether a matched sibling of similar shape exists. Rank by the shapes 661 found tractable (stubs and forwarders first). Split the output by address range so it maps onto the two CC lanes: **0x02000000–0x0203ffff** (Scaffolder) and **0x02040000+** (Decomper).
 **Gate:** doc-only, no build; the ranked worklist with per-range counts.
 
-### q-family-census-2 — rebuild the family census with LARGER exemplars [TODO]
-
+### q-family-census-2 — rebuild the family census with LARGER exemplars [DONE]
 Brief 662 found the 91-family census unusable as a worklist: its own audit returns **0 VERIFIED / 54 SUSPECT / 37 AMBIGUOUS**, root-caused to **families clustered around tiny 8–28 byte exemplars — a tiny shape matches many unrelated bodies, so they are false anchors for propagation**.
 Rebuild it with that fixed: impose a **minimum exemplar size** (start at ≥64 B and state your threshold), require a distinctive signature (non-empty relocation set — the `sig=0` rows were exactly the ambiguous ones), and require the anchor to be a genuinely matched `.c`. Report how many families survive the stricter criteria — a much smaller, trustworthy list beats 91 unusable rows.
 **Gate:** doc-only; the rebuilt census + the criteria you applied + survival counts vs the original 91.
