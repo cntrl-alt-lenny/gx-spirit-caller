@@ -6350,28 +6350,43 @@ on the C source — it's already correct.
 **Affected drops:** zero (it's idiom-not-wall) but appears in 3+
 matched shapes across briefs 027–029.
 
-### P-6. Predication threshold (≥4-op if-body)
+### P-6. Predication threshold (≥4-op if-body) — RETIRED, was a routing-tier gap
 
-The boundary at the bottom of C-1: when an `if (cond) { ... }`
+**Correction (brief 665, cm-main-small-c):** this was never a real
+compiler-heuristic wall — the 4-op predication cutoff is specific to
+the **default `2.0/sp1p5` tier**. All 3 originally-affected drops now
+ship 100% byte-identical once routed through `.legacy.c` (mwcc
+`1.2/sp2p3`), which does NOT apply the same predicate-vs-branch
+cost heuristic at 4 ops. `func_02087d10` was already recovered this
+way by brief 216 (see `wall-2-leaf-no-pool-reg-alloc.md`) but the
+other two siblings — `func_02067b8c` and `func_0207f8f8` — were
+never re-tested under the same tier until brief 665, despite sharing
+the identical citation and the fix living in the same document.
+**Lesson: a `P-NN` citation naming 2+ sibling functions is not proof
+all siblings were re-tested after ANY one of them gets a later fix —
+check every named sibling, not just the one the fix-brief mentions.**
+
+The original (now-superseded) framing is kept below for history.
+
+~~The boundary at the bottom of C-1: when an `if (cond) { ... }`
 body expands to **4 or more ARM instructions** in mwcc's output,
 the optimiser switches off the predicated-execution pass and
 emits an early-`bxXX lr` branch instead. The split is binary —
 3-op bodies predicate, 4-op bodies don't — and no source-shape
-coercion tried so far has crossed the line. See C-1's *ARM-op
-limit* subsection above for the matched-vs-dropped table and the
-brief-033 iteration log.
+coercion tried so far has crossed the line.~~ ← wrong: no *source-shape*
+coercion crosses the line under the default tier, but a *routing-tier*
+change does.
 
-**Why permanent:** mwcc's predication pass scores predicate-cost
-against branch-cost using a fixed heuristic that's not exposed
-via flags or pragmas. The threshold is set in the codegen
-pipeline; the C source can only steer the *shape* of the
-if-body, not the instruction count.
+**Why NOT permanent:** mwcc's predication pass scores predicate-cost
+against branch-cost using a fixed heuristic that differs PER COMPILER
+REVISION. `1.2/sp2p3` (the `.legacy.c` tier) predicates 4-op bodies
+that `2.0/sp1p5` refuses.
 
-**Affected drops:** brief 028 `func_02067b8c`, `func_0207f8f8`,
-`func_02087d10` (originally tagged C-1-coercible; brief 033
-reattempted them in the residue cluster and confirmed they hit
-this threshold). **3 of 47 drops (6%)** — third-largest single
-wall in the set.
+**Affected drops (now recovered):** brief 028 `func_02067b8c`,
+`func_0207f8f8`, `func_02087d10` (originally tagged C-1-coercible;
+brief 033 reattempted them in the residue cluster and mis-declared
+them permanent under the default-tier-only test). **3 of 47 drops
+(6%)** — third-largest single wall in the set, now 0.
 
 ### P-7. Pool literal not deduplicated across uses
 
