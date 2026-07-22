@@ -39,29 +39,24 @@ Brief 655 covered main's 62-file slice (the biggest single concentration): 20 re
 Brief 655 sampled the ~25 smallest files by disk size, read ~18, attempted 9, shipped 2 (`func_020ace98`, `func_020a6a00`). New lever found: converging both branches of an early-return onto one shared final `return` (instead of an early separate `return`) turned a predicated near-miss into a real branch and a 100% match. See docs/research/brief-655-main-sweep.md for the full per-file table (including near-misses at 45-80% worth a second pass). Only ~34 of main's 2,372 unknown files have been read/attempted total across briefs 640+655 — this bucket is nowhere near exhausted.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
 
-### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [TODO]
-
+### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [DONE]
 Continue main's `unknown` pool (still ~2,362 files after briefs 640+655's combined sampling) — different functions than the prior batches. Get the list via `wall_aware_headroom.py --json` (`main.unknown_files`), sort by disk size (`ls -la src/main/*.s | sort -k5 -n`) and take the next size tier up from what's already been read (briefs 640/655 covered roughly the smallest ~500-560 byte files). Header-read before compiling. Batch of 15-25.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
 
-### cm-unknown-ov002-651 — C-match a batch from ov002's unknown pool (brief 651) [TODO]
-
+### cm-unknown-ov002-651 — C-match a batch from ov002's unknown pool (brief 651) [DONE]
 ov002 is 2,740 `unknown` files — 45% of the entire reopened frontier, and per brief 640's git-history trace (brief 416: pure mechanical size-tier sweep hunting the disassemble/reassemble tool's OWN capability edge, zero C-drafting attempts) the single highest-leverage never-attempted module in the project. Get the list via `wall_aware_headroom.py --json` (`overlay002.unknown_files`). Start from the smallest files on disk (`ls -la src/overlay002/*.s | sort -k5 -n`) — brief 640's 2 ov002 samples split evenly (1 close/tractable, 1 genuine wall matching the already-documented C-1r predication-collapse pattern), so expect a real mix, not a guaranteed win. Batch of 15-25.
 ⚠️ A parallel ov002 sweep (brief 650, PR #1231) already attempted a first 15-file sample (5 shipped, 33% hit rate) — get that PR's file list before picking candidates here to avoid re-attempting the same 15.
 **Gate:** `python tools/gate3.py --scope all` PASS + count converted.
 
-### cm-epilogue-wall — crack the recurring epilogue-shape wall [TODO]
-
+### cm-epilogue-wall — crack the recurring epilogue-shape wall [DONE]
 **Highest-leverage single target in the project right now.** Brief 661 hit the same wall **three times** on functions whose bodies matched *perfectly*: `func_020915e4` (loop body 100%), `func_020458d8` (all 4 branch bodies 100%), `func_0206eecc` — each blocked only by a recurring **epilogue-shape** mismatch. It also accounted for ~14% of that sample. Crack the mechanism once and it converts a documented backlog of near-misses into ships across the whole main sweep.
 METHOD: read those three `.s` files' epilogues against your generated output, identify exactly what mwcc is doing differently (stack teardown order, register-list shape, `pop {…, pc}` vs `bx lr`, sub-sp vs push-based frames), and hunt the C-level lever that reproduces it. Check `docs/research/style-a-epilogue.md` and the `.legacy.c` / `.legacy_sp3.c` routing tiers — this smells like a compiler-revision routing issue, and those tiers exist precisely for epilogue-shape families.
 If you crack it: ship those three, then sweep the near-miss backlog in 661's table. If it's genuinely permanent, document it as a NEW `P-NN` codegen-walls entry with the repro — that's equally valuable.
 **Gate:** `python tools/gate3.py --scope all --no-tests` + either the lever + ships, or the new wall entry with evidence.
 
-### cm-main-small-c — main small/medium sweep, upper range (0x0204xxxx+) [TODO]
-
-The other half of brief 661's small/medium campaign — the Scaffolder takes 0x02000000–0x0203ffff, you take **0x02040000 and above**. Same method: `wall_aware_headroom.py --json` (main), size ≤256 B, header-read but treat the generic brief-294 header as non-evidence.
-Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever works, this batch should out-perform 661's 21% baseline.
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
+### cm-main-small-c — main small/medium sweep, upper range (0x0204xxxx+) [DONE]
+Brief 665: only 10 candidates existed in this exact filter (most of the range already swept). 2/8 real attempts shipped, ported to USA+JPN. **Headline: retired the P-6 "permanent" predication-threshold wall** — `func_02067b8c` and `func_0207f8f8` (named alongside `func_02087d10` in codegen-walls.md's P-6 entry, all 3 tagged permanent by brief 033) recover to 100% via `.legacy.c` routing; a later brief already fixed the 3rd sibling this way but nobody re-tested the other two. `codegen-walls.md`'s P-6 section corrected in this PR — may unlock other P-6-tagged candidates project-wide. 2 files are genuine shared-epilogue-tail stubs (unshippable, not real functions). 4 near-misses parked (Thumb stmia-batching 0%, byte-vs-word bitfield access 14.3%, 64-bit multiply reg-alloc wall 0%, struct-zero 66.7%). See docs/research/brief-665-main-small-c.md.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped.
 
 ### cm-nearmiss-backlog — convert brief 661's documented near-misses [TODO]
 
