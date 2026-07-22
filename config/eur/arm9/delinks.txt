@@ -3757,7 +3757,7 @@ src/main/func_0201d530.c:
     complete
     .text start:0x0201d530 end:0x0201d5c0
 
-src/main/func_0201d5c0.s:
+src/main/func_0201d5c0.c:
     complete
     .text start:0x0201d5c0 end:0x0201d5e8
 
