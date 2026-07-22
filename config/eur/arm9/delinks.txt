@@ -7497,7 +7497,7 @@ src/main/func_0203aae8.s:
     complete
     .text start:0x0203aae8 end:0x0203ab98
 
-src/main/func_0203ab98.s:
+src/main/func_0203ab98.c:
     complete
     .text start:0x0203ab98 end:0x0203ab9c
 
