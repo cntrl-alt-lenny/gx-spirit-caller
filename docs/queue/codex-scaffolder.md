@@ -60,6 +60,7 @@ Of the ~93 `tools/*.py`, some are superseded or unreferenced (e.g. tools whose l
 **Gate:** the audit table; doc-only, no build.
 
 ### q-green-main — finish greening CI, then propose protection [DONE]
+
 Lint has been red for weeks and **red is the baseline**, which means a real regression is invisible. Finish the cleanup (ruff autofixes, markdownlint over the generated dirs, regenerate both indices — that flips drift-check and unittest together), then **propose** (do not apply — it needs owner rights) a branch-protection ruleset requiring: `Python (ruff)`, `Markdown (markdownlint-cli2)`, `unittest`, `drift-check`, `pr-invariants (eur)`. ⚠️ Exclude the usa/jpn matrix legs — `continue-on-error` does NOT produce a green check-run, so requiring them would hard-block every PR.
 **Gate:** the CI checks green on your own PR + the proposed ruleset written up for the owner to apply.
 
@@ -68,8 +69,7 @@ Lint has been red for weeks and **red is the baseline**, which means a real regr
 Brief 655 found that **30 of `main`'s 62 "coercible" files cite C-34 with zero supporting evidence** — the identical boilerplate paragraph pasted verbatim across unrelated bodies. Examples: `func_020061bc` is a SWAR population-count routine (pool constants `0xaaaaaaaa/0xcccccccc/0xf0f0f0f0/0xff00ff00`, no address anywhere); `func_02007f38` builds one MMIO-shadow constant via 3 `orr`s; `func_0200b2f4`/`func_0201a32c`/`func_0203244c`/`func_0206d79c` have **no `.word` pool entries at all**. None involve loading the same address twice — the citation's actual mechanism. Correct those headers (remove/replace the unsupported citation with an honest "never assessed" note) so `wall_aware_headroom.py` stops reporting them as lever-shaped. Get the full list from brief 655's report, and re-verify each yourself before editing.
 **Gate:** `python tools/wall_aware_headroom.py` before/after counts + `python tools/gate3.py --scope eur --no-tests` (header comments must be byte-neutral — prove it).
 
-### q-ov002-wall-record — document ov002's verified wall cohort [TODO]
-
+### q-ov002-wall-record — document ov002's verified wall cohort [DONE]
 Brief 654 drained ov002's coercible pool (23 shipped total) and **independently re-tested the remaining ~2,750 files' 288/290/294 reg-alloc-walled headers with fresh evidence** rather than trusting the blanket stamp. That verification is currently buried in a brief report. Promote it into a durable record (address ranges, the re-test method, what evidence was found) so no future round re-sweeps ov002 believing it's unexplored. This is the *negative* result that protects weeks of effort — write it to be found.
 **Gate:** doc-only; cross-link it from `endgame-ledger.md` and the wall taxonomy.
 

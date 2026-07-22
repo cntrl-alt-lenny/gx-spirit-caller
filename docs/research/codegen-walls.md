@@ -7457,6 +7457,30 @@ until a counter-lever is found or confirmed absent by exhaustive C-shape
 sweep** — filed as P- (permanent-for-now), not C- (confirmed coercible),
 pending that future investigation.
 
+### P-17. Briefs 288/290 commutative-add CSE/reg-alloc wall
+
+> **Wall family note — distinct from C-34 and P-16.** The Brief 288/290
+> cohort carries a specific `.s` escape-hatch diagnosis: C is byte-identical
+> except for a commutative add-operand order, but changing that source order
+> can cause mwcc to re-derive a wider register-allocation mismatch. It is not
+> the duplicate same-symbol pool-slot wall of C-34, nor P-16's repeated
+> `symbol+K` rematerialization after calls.
+
+**Evidence.** Brief 654 counted 17 ov002 function headers naming the
+brief-288/290 diagnosis. A fresh accumulated-lever re-test of
+`func_ov002_021ebf40` reproduced the `DIFF_ARG_MISMATCH` register divergence,
+so the cohort remains parked pending a dedicated counter-lever study.
+
+**Affected cohort:** `021e8b34`, `021e97bc`, `021eb128`, `021eb300`,
+`021eb630`, `021ebf40`, `021ebfd0`, `021ee23c`, `021ef5a0`, `021efe44`,
+`021f0028`, `021f020c`, `021f1458`, `021f1504`, `021f208c`, `021f2138`,
+`021f2ac8` (all ov002). The complete cohort census and method are in the
+[verified ov002 wall cohort](campaign-analytics/ov002-wall-cohort.md).
+
+**Status:** permanent-for-now / not a C-match queue target. Re-open only
+with a fresh source-form hypothesis and byte evidence; do not infer that the
+17 headers represent 17 independent untested opportunities.
+
 ## Codegen-inherent edge cases (3 patterns)
 
 Drops that the C language genuinely can't express. Future pilots:
