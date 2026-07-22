@@ -2,7 +2,7 @@
 
 # Codex Decomper — autonomous naming queue
 
-**Protocol:** loop until QUEUE-EMPTY. `python3.13 tools/work_queue.py next codex-decomper`. Every rename via `rename_symbol.py --cascade`, each batch gated `scope_gate.py --kind naming` (b610/b612 safety). Paste real `dsd check` + `scope_gate` output. Open ONE PR, `work_queue.py done codex-decomper <id>`, commit, next. Effort HIGH. Naming is candidate-scarce — honest low counts / QUEUE-EMPTY quickly is a SUCCESS, not a failure; do NOT invent names.
+**Protocol:** loop until QUEUE-EMPTY. `python tools/work_queue.py next codex-decomper`. Every rename via `rename_symbol.py --cascade`, each batch gated `scope_gate.py --kind naming` (b610/b612 safety). Paste real `dsd check` + `scope_gate` output. Open ONE PR, `work_queue.py done codex-decomper <id>`, commit, next. Effort HIGH. Naming is candidate-scarce — honest low counts / QUEUE-EMPTY quickly is a SUCCESS, not a failure; do NOT invent names.
 
 ---
 
