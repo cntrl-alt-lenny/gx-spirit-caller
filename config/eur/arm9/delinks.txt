@@ -7813,7 +7813,7 @@ src/main/func_0203d6a8.c:
     complete
     .text start:0x0203d6a8 end:0x0203d6c4
 
-src/main/func_0203d6c4.s:
+src/main/func_0203d6c4.c:
     complete
     .text start:0x0203d6c4 end:0x0203d6e0
 
