@@ -1,7 +1,5 @@
-; func_020aee58 — brief 207 / Phase 2: C-34 candidate. Vanilla
-; brief 202 `.s` recipe — explicit `.word` per pool slot.
-; Brief 204's patcher trim-protect handles relocation-tail
-; cases.
+; func_020aee58 — brief 655 review: no duplicate-address evidence.
+; Taxonomy citation removed; never assessed as a C-match target.
 
         .text
         .global func_020aee58
