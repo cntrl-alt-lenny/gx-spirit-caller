@@ -59,7 +59,7 @@ This is now the campaign's central unknown. Brief 654 showed ov002's "unknown" t
 The CC lanes have converted ~24 more functions this round (18 ov002 + 6 main) and more are landing. Any newly-converted function still called `func_*` whose purpose is now legible from its C body is a naming candidate. Name them via `rename_symbol.py --cascade`, then propagate twins to USA/JPN. ⚠️ Never invent a name you can't justify from the code — an honest small batch beats a speculative large one.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied.
 
-### q-progress-history-2 — extend the series and add per-module [CLAIMED]
+### q-progress-history-2 — extend the series and add per-module [DONE]
 Your `q-progress-history` series gave us the first real view of the readable-C rate. Extend it: add the latest merges, and break it down per-module (which modules are actually moving vs flat). Also state the derived rate honestly — pp/week — and, if the trend supports it, a projection with explicit assumptions. This is the number we steer by; it should be uncomfortable if the truth is uncomfortable.
 **Gate:** doc-only; updated series + per-module + the stated rate.
 
