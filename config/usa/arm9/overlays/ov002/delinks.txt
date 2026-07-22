@@ -3660,7 +3660,7 @@ src/usa/overlay002/func_ov002_022029e0.c:
 src/usa/overlay002/func_ov002_022029f4.s:
     complete
     .text start:0x022029f4 end:0x02202a3c
-src/usa/overlay002/func_ov002_02202a3c.s:
+src/usa/overlay002/func_ov002_02202a3c.c:
     complete
     .text start:0x02202a3c end:0x02202a68
 src/usa/overlay002/func_ov002_02202a68.c:
@@ -4897,7 +4897,7 @@ src/usa/overlay002/func_ov002_0220cde8.c:
     complete
     .text start:0x0220cde8 end:0x0220ce1c
 
-src/usa/overlay002/func_ov002_0220ce1c.s:
+src/usa/overlay002/func_ov002_0220ce1c.c:
     complete
     .text start:0x0220ce1c end:0x0220ce50
 src/usa/overlay002/func_ov002_0220ce50.s:
@@ -5367,7 +5367,7 @@ src/usa/overlay002/func_ov002_02216304.c:
 src/usa/overlay002/func_ov002_02216334.s:
     complete
     .text start:0x02216334 end:0x02216440
-src/usa/overlay002/func_ov002_02216440.s:
+src/usa/overlay002/func_ov002_02216440.c:
     complete
     .text start:0x02216440 end:0x02216470
 src/usa/overlay002/func_ov002_02216470.s:
@@ -6994,7 +6994,7 @@ src/usa/overlay002/func_ov002_0223b138.s:
 src/usa/overlay002/func_ov002_0223b1fc.s:
     complete
     .text start:0x0223b1fc end:0x0223b2dc
-src/usa/overlay002/func_ov002_0223b2dc.s:
+src/usa/overlay002/func_ov002_0223b2dc.c:
     complete
     .text start:0x0223b2dc end:0x0223b310
 src/usa/overlay002/func_ov002_0223b310.c:
@@ -11852,7 +11852,7 @@ src/usa/overlay002/func_ov002_022ae2f4.s:
 src/usa/overlay002/func_ov002_022ae44c.s:
     complete
     .text start:0x022ae44c end:0x022ae5dc
-src/usa/overlay002/func_ov002_022ae5dc.s:
+src/usa/overlay002/func_ov002_022ae5dc.c:
     complete
     .text start:0x022ae5dc end:0x022ae608
 src/usa/overlay002/func_ov002_022ae608.s:
@@ -12178,7 +12178,7 @@ src/usa/overlay002/func_ov002_022bda00.s:
 src/usa/overlay002/func_ov002_022bda04.s:
     complete
     .text start:0x022bda04 end:0x022bda08
-src/usa/overlay002/func_ov002_022bda08.s:
+src/usa/overlay002/func_ov002_022bda08.c:
     complete
     .text start:0x022bda08 end:0x022bda34
 src/usa/overlay002/func_ov002_022bda34.s:
