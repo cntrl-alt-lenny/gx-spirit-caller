@@ -150,7 +150,7 @@ Several matched sources already carry their own `/* header */`
 comments (a project convention seen throughout `src/`) — C and GAS
 comments don't nest, so the source's own `*/` would close the wrapper
 early and leave the remainder as live, mis-parsed code. Switched to
-per-line `// ` prefixing, immune to the same failure by construction
+per-line `//` prefixing, immune to the same failure by construction
 (no multi-line delimiter to prematurely close); added
 `test_survives_source_with_its_own_block_comment` as the regression
 guard.

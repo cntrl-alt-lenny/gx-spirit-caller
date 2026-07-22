@@ -84,7 +84,6 @@ def _section(text: str, m: re.Match) -> str:
 
 
 def _set_status(text: str, m: re.Match, new: str) -> str:
-    old_header = m.group(0)
     new_header = f"### {m.group('id')} — {m.group('title')} [{new}]"
     return text[:m.start()] + new_header + text[m.end():]
 

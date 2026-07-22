@@ -276,7 +276,7 @@ class TestCascadeRename(unittest.TestCase):
                 root / "config" / "jpn" / "arm9" / "delinks.txt",
                 ["src/jpn/main/func_02018b70.c:"],
             )
-            for region, directory in (
+            for _region, directory in (
                 ("eur", root / "src" / "main"),
                 ("usa", root / "src" / "usa" / "main"),
                 ("jpn", root / "src" / "jpn" / "main"),
