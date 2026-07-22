@@ -8125,7 +8125,7 @@ src/main/func_02040cc0.s:
     complete
     .text start:0x02040cc0 end:0x02040d54
 
-src/main/func_02040d54.s:
+src/main/func_02040d54.c:
     complete
     .text start:0x02040d54 end:0x02040d94
 
