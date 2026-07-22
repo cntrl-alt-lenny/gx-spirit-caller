@@ -14,6 +14,6 @@ Consolidate b624 (0/135 accept), b626 (0→40% compile), b631/b632 (~10.66% avg 
 Run `scope_gate.py --kind carve` against the last ~10 merged C-match PRs' ranges to confirm none under-shipped (a completeness retro). Report any that would have flagged.
 **Gate:** `python3.13 -m pytest tests/test_scope_gate.py -q` green + the audit summary.
 
-### q-orphan-cleanup — delete the 29 orphaned dead .s files [TODO]
+### q-orphan-cleanup — delete the 29 orphaned dead .s files [DONE]
 CC Decomper (2026-07-21) found 29 `.s` files under src/ that are NOT referenced by any delinks.txt — leftovers from brief-071's bulk-port that relocated the functions to libs/nitro/*.legacy.c and repointed delinks, but left the old src/ copies. Get the exact list: `python3.13 -c "import tools.wall_aware_headroom as w"` won't list them, so grep: for each src/**/*.s, check it appears in a delinks.txt; delete the ones that don't (mostly ov002/ov004/ov010/ov015/ov011/ov003). They are dead weight, not build inputs.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS (proves the deleted files were NOT build inputs — the 3-region ROM is unchanged) + count deleted.
