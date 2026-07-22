@@ -209,6 +209,7 @@ synthetic examples). Generated through the actual CLI
 pre-brief version (BEFORE) and the current mined version (AFTER):
 
 **`func_ov002_021cb174`** — before:
+
 ```c
 void func_ov002_021cb174(void) {
     s32 var_r2;
@@ -224,7 +225,9 @@ void func_ov002_021cb174(void) {
     data_ov002_022ce950->unk80C = 0;
 }
 ```
+
 after:
+
 ```c
 void func_ov002_021cb174(void) {
     s32 var_r2;
@@ -245,6 +248,7 @@ void func_ov002_021cb174(void) {
 table this brief never mined, correctly left alone.
 
 **`func_ov002_021c9af0`** — before:
+
 ```c
 void func_ov002_021c9af0(s32 arg0, s32 arg1) {
     if (arg1 != 0) {
@@ -254,7 +258,9 @@ void func_ov002_021c9af0(s32 arg0, s32 arg1) {
     data_ov002_022d016c->unkD0 = (s32) (data_ov002_022d016c->unkD0 & ~(1 << arg0));
 }
 ```
+
 after:
+
 ```c
 void func_ov002_021c9af0(s32 arg0, s32 arg1) {
     if (arg1 != 0) {
@@ -266,6 +272,7 @@ void func_ov002_021c9af0(s32 arg0, s32 arg1) {
 ```
 
 **`func_ov002_021b01f4`** — before:
+
 ```c
 if (data_ov002_022d016c->unkE0 != 0) { return; }
 ...
@@ -273,7 +280,9 @@ data_ov002_022d016c->unkE0 = 1;
 ...
 data_ov002_022d016c->unkD00 = var_r3;
 ```
+
 after:
+
 ```c
 if (data_ov002_022d016c.f_e0 != 0) { return; }
 ...

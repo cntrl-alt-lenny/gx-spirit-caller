@@ -86,7 +86,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from routing_suffixes import ROUTING_SUFFIXES, object_suffix_for_source  # noqa: E402
+from routing_suffixes import ROUTING_SUFFIXES, object_suffix_for_source  # noqa: E402, F401
 
 
 # ELF32 little-endian header / section header constants we need.

@@ -10,31 +10,40 @@
 
 ---
 
+## Items
+
 ### cm-main-batch1 — C-match main convertibles (batch 1) [DONE]
+
 main has ~115 convertible (non-wall) functions — the biggest remaining pool. Get the list via `wall_aware_headroom.py --json` (main.convertible_files), C-match a batch (~8-15), prefer the SDK-named ones.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
 ### cm-ov004 — C-match ov004 convertibles [DONE]
+
 ov004 has ~35 convertible functions. Get the list, C-match a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
 ### cm-main-batch2 — C-match main convertibles (batch 2) [DONE]
+
 Continue main's convertible pool — different functions than batch 1.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
 ### cm-coercible-651 — C-match the project-wide coercible pool (brief 651) [DONE]
+
 Brief 655 covered main's 62-file slice (the biggest single concentration): 20 real attempts, 4 shipped (`func_0200b2f4`, `func_020a32e4`, `func_0208b0d0`, `func_02097238`), 16 parked with match% + residual documented in docs/research/brief-655-main-sweep.md. Found that 30 of the 62 citations (all sharing one specific boilerplate header, "brief 207 / Phase 2: Vanilla brief 202 `.s` recipe") don't actually exhibit the cited C-34 pattern at all — read the pool-word structure yourself, don't trust the citation. ~12 main "Vanilla" mistags + 2 branched jump-table dispatchers (`func_020037d0`, `func_02003d98`) remain unattempted (time-boxed, not walled) — a real follow-up target. overlay004/6/8/11's slice is the scaffolder's separate `cm-coercible-overlays-651` item; ov002's 33 coercible files are tracked by the parallel ov002 sweep campaign (brief 650, PR #1231), not this queue.
 **Gate:** `python3.13 tools/gate3.py --scope all --no-tests` PASS (3-region sha1) — verified via a forced-clean rebuild of the 6 changed objects, not just incremental `ninja` (see brief-655's process note on why that matters after activate/revert script cycling).
 
 ### cm-unknown-main-651 — C-match a batch from main's unknown pool (brief 651) [DONE]
+
 Brief 655 sampled the ~25 smallest files by disk size, read ~18, attempted 9, shipped 2 (`func_020ace98`, `func_020a6a00`). New lever found: converging both branches of an early-return onto one shared final `return` (instead of an early separate `return`) turned a predicated near-miss into a real branch and a 100% match. See docs/research/brief-655-main-sweep.md for the full per-file table (including near-misses at 45-80% worth a second pass). Only ~34 of main's 2,372 unknown files have been read/attempted total across briefs 640+655 — this bucket is nowhere near exhausted.
 **Gate:** `python3.13 tools/gate3.py --scope all --no-tests` PASS + count converted.
 
 ### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [TODO]
+
 Continue main's `unknown` pool (still ~2,362 files after briefs 640+655's combined sampling) — different functions than the prior batches. Get the list via `wall_aware_headroom.py --json` (`main.unknown_files`), sort by disk size (`ls -la src/main/*.s | sort -k5 -n`) and take the next size tier up from what's already been read (briefs 640/655 covered roughly the smallest ~500-560 byte files). Header-read before compiling. Batch of 15-25.
 **Gate:** `python3.13 tools/gate3.py --scope all --no-tests` PASS + count converted.
 
 ### cm-unknown-ov002-651 — C-match a batch from ov002's unknown pool (brief 651) [TODO]
+
 ov002 is 2,740 `unknown` files — 45% of the entire reopened frontier, and per brief 640's git-history trace (brief 416: pure mechanical size-tier sweep hunting the disassemble/reassemble tool's OWN capability edge, zero C-drafting attempts) the single highest-leverage never-attempted module in the project. Get the list via `wall_aware_headroom.py --json` (`overlay002.unknown_files`). Start from the smallest files on disk (`ls -la src/overlay002/*.s | sort -k5 -n`) — brief 640's 2 ov002 samples split evenly (1 close/tractable, 1 genuine wall matching the already-documented C-1r predication-collapse pattern), so expect a real mix, not a guaranteed win. Batch of 15-25.
 ⚠️ A parallel ov002 sweep (brief 650, PR #1231) already attempted a first 15-file sample (5 shipped, 33% hit rate) — get that PR's file list before picking candidates here to avoid re-attempting the same 15.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.

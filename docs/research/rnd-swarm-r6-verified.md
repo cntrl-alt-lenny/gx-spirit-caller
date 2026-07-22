@@ -12,7 +12,7 @@ external quotes reproduced almost exactly across nearly every finding). What ver
 found was a different failure mode: **currency, not accuracy**. Four findings (three in
 `r5-claims-audit`, one in `ov002-arm9-strategy`) describe bugs/gaps that a live agent — this one, in
 prior sessions — had *already fixed and merged* by the time this swarm ran or was verified (PRs
-#1153, #1157). Several more had their premise partly overtaken by *other* work that landed in the
+1153, 1157). Several more had their premise partly overtaken by *other* work that landed in the
 interim (briefs 582, 584, 585, 586). One finding (`codegen-levers` #2, `-ipa file`) turned out to
 directly contradict an explicit prior **CLOSED** verdict from `improvement-swarm-2026-07-12-r4.md`
 that the scout never checked against — flagged below, excluded from the top-8, not safe to act on

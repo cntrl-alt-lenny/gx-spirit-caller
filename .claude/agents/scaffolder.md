@@ -159,7 +159,7 @@ Same rule brain has: when `dsd check modules` (or the 3-region gate)
 goes red and blocks every decomp PR, self-merge the fix without
 waiting. Scope: tools/ fixes that restore the baseline. Flag in PR
 body as "self-merged per AGENTS.md § spot authority". Precedent: PRs
-#116 (align-regression fix) and #118 (regression-fix-v2) — both
+116 (align-regression fix) and 118 (regression-fix-v2) — both
 scaffolder self-merges during the Thumb-align fire.
 
 Normal tool/docs/drain PRs go through brain's review, never self-merged.

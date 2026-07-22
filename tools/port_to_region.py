@@ -91,7 +91,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from routing_suffixes import ROUTING_SUFFIXES, split_routing_suffix  # noqa: E402
+from routing_suffixes import ROUTING_SUFFIXES, split_routing_suffix  # noqa: E402, F401
 
 
 ROOT = Path(__file__).resolve().parent.parent
