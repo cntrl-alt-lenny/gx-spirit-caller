@@ -79,7 +79,7 @@ Your `q-progress-history` series gave us the first real view of the readable-C r
 `endgame-ledger.md` was written before the wall-classification correction and improvement-swarm r5 found it explained only 11.6% of the real byte gap (its EUR row wrong on all three terms, ov004's large gap absent entirely). Rebuild it from current committed data: real per-region byte gap, the corrected candidate buckets, the verified ov002 wall cohort, ITCM, and the 32 confirmed-permanent files. Supersede the old content in place with a dated note.
 **Gate:** doc-only; the rebuilt ledger reconciling to `wall_aware_headroom.py` + `progress.py` totals — show the arithmetic.
 
-### q-small-tier-worklist — prioritize the 1,645-file small/medium tier [CLAIMED]
+### q-small-tier-worklist — prioritize the 1,645-file small/medium tier [DONE]
 Brief 661 established `main`'s **0–256 byte tier (1,645 of 2,370 files, 69% of the tranche)** as real runway at an estimated 35–55% floor, and both CC lanes are now sweeping it (`cm-main-small-a/b/c`). Give them a prioritized worklist so they don't pick blind.
 For every main candidate ≤256 B: address, size, shape class (trivial stub / tail-call forwarder / guard chain / small dispatcher / loop / other — derive mechanically from the `.s`), header provenance, and whether a matched sibling of similar shape exists. Rank by the shapes 661 found tractable (stubs and forwarders first). Split the output by address range so it maps onto the two CC lanes: **0x02000000–0x0203ffff** (Scaffolder) and **0x02040000+** (Decomper).
 **Gate:** doc-only, no build; the ranked worklist with per-range counts.
