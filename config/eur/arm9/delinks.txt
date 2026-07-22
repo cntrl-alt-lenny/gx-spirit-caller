@@ -8040,7 +8040,7 @@ src/main/func_0203f6cc.s:
     complete
     .text start:0x0203f6cc end:0x0203f718
 
-src/main/func_0203f718.s:
+src/main/func_0203f718.c:
     complete
     .text start:0x0203f718 end:0x0203f740
 
