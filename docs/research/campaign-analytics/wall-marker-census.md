@@ -441,6 +441,61 @@ src/usa/overlay023/bss/data_ov023_bss.s
 ```
 </details>
 
+### Current surviving no-marker census
+
+The 294-path list above is the Brief 643 snapshot. A current `git
+ls-files src` reconciliation finds **274 of those paths still tracked**; **20
+paths are stale** after the orphaned-source cleanup (`be172f4e`) and are not
+replaced with guessed names. The surviving files divide into **55 function
+`.s` files, 145 data `.s` files, and 74 BSS `.s` files** across the three
+regions.
+
+For functions, size buckets are `<=0x10`, `0x11–0x7f`, `0x80–0xff`, and
+`>=0x100`. Shape is a mechanical header/body classification: `stub` for
+functions up to 8 bytes, `large` for functions at least 0x100 bytes,
+`dispatcher` for four or more branch instructions, `leaf` for no calls or
+branches, and `branching/loop` for the remaining function bodies. Data and
+BSS are kept separate rather than pretending they have a function shape.
+“C siblings” means at least one current completed C TU in the same module has
+the same `(size, relocation-offset/kind signature)`; it is a prioritisation
+signal, not a match decision.
+
+| Region/module group | Files | Functions | Data | BSS | Size `<=0x10` | `0x11–0x7f` | `0x80–0xff` | `>=0x100` | Function shapes (stub / leaf / branch-loop / dispatcher) | Functions with C sibling |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
+| EUR `main` | 70 | 38 | 30 | 2 | 37 | 19 | 1 | 13 | 15 / 3 / 19 / 1 | 32 |
+| EUR `itcm` | 2 | 2 | 0 | 0 | 0 | 2 | 0 | 0 | 0 / 0 / 2 / 0 | 0 |
+| EUR `overlay002` | 7 | 0 | 7 | 0 | 0 | 2 | 0 | 5 | — | 0 |
+| EUR `overlay006` | 18 | 0 | 17 | 1 | 0 | 3 | 0 | 15 | — | 0 |
+| EUR other overlays | 31 | 4 | 6 | 21 | 6 | 4 | 0 | 21 | 1 / 0 / 3 / 0 | 1 |
+| USA `main` | 26 | 6 | 19 | 1 | 7 | 2 | 5 | 12 | 6 / 0 / 0 / 0 | 6 |
+| USA `overlay002` | 8 | 0 | 7 | 1 | 1 | 2 | 0 | 5 | — | 0 |
+| USA `overlay006` | 16 | 0 | 15 | 1 | 0 | 4 | 0 | 12 | — | 0 |
+| USA other overlays | 24 | 0 | 2 | 22 | 0 | 2 | 0 | 22 | — | 0 |
+| JPN `main` | 24 | 5 | 18 | 1 | 5 | 2 | 5 | 12 | 5 / 0 / 0 / 0 | 5 |
+| JPN `overlay002` | 8 | 0 | 7 | 1 | 1 | 2 | 0 | 5 | — | 0 |
+| JPN `overlay006` | 16 | 0 | 15 | 1 | 0 | 4 | 0 | 12 | — | 0 |
+| JPN other overlays | 24 | 0 | 2 | 22 | 0 | 2 | 0 | 22 | — | 0 |
+| **Total surviving** | **274** | **55** | **145** | **74** | **57** | **50** | **11** | **156** | **27 / 3 / 24 / 1** | **44** |
+
+### Mechanical tractability read
+
+The cleanest untouched function-shaped pocket is the **27 short stubs**;
+the 44 C-sibling hits are dominated by these small bodies and by repeated
+EUR/main relocation families. The strongest repeated signals are:
+
+- EUR/main BIOS/helper stubs such as `BitUnPack`, `Div`, `GetCRC16`,
+  `IsDebugger`, the LZ/RL thunks, and their `func_`-named siblings;
+- EUR/main repeated 0x1c/0x20 families such as
+  `func_02067b8c`, `func_0206be1c`, `func_0207e214`, and
+  `func_0208b1c8`; and
+- the USA/JPN main BIOS-thunk ports, where all 11 surviving function files
+  have same-signature C siblings in their own region.
+
+This is a census signal only. The 145 data and 74 BSS files are not function
+targets, and a same-signature sibling does not prove that a C propagation will
+pass the normal byte gate. The 20 stale paths are recorded as removed from
+the current target pool rather than silently counted as candidates.
+
 ### Blanket cohort only
 
 **19728 files** carry only the blanket GLOBAL_ASM / Brief
