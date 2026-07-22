@@ -665,7 +665,7 @@ object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain
 
 **TRUE readable-C headroom (walls subtracted).**
 
-The raw C% metric (progress.py) counts every not-yet-`.c` byte as "headroom", including functions that are DOCUMENTED PERMANENT WALLS (the brief-294/302 GLOBAL_ASM-endgame reg-alloc class, C-32 cross-overlay-BL link walls, etc.). That mi…
+The raw C% metric (progress.py) counts every not-yet-`.c` byte as "headroom", including functions that are documented permanent walls. Brief 640's audit (docs/research/brief-640-wall-audit.md) found the PREVIOUS version of this tool badl…
 
 ### `tools/wine_link_lock.py`
 
