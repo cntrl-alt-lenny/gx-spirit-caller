@@ -6,18 +6,16 @@
 
 NOTE: only ~245 convertible functions remain project-wide, mostly in the hard asymptotic modules below — batches may be small and some "convertible" ones are still difficult. That's the real frontier; honest low counts are fine.
 
-**CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
-
 ---
 
-### cm-main-batch1 — C-match main convertibles (batch 1) [TODO]
-main has ~52 convertible (non-wall) functions — the biggest remaining pool. Get the list via `wall_aware_headroom.py --json` (main.convertible_files), C-match a batch (~8-15), prefer the SDK-named ones.
+### cm-main-batch1 — C-match main convertibles (batch 1) [DONE]
+main has ~115 convertible (non-wall) functions — the biggest remaining pool. Get the list via `wall_aware_headroom.py --json` (main.convertible_files), C-match a batch (~8-15), prefer the SDK-named ones.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-ov004 — C-match ov004 convertibles [TODO]
-ov004 has ~27 convertible functions. Get the list, C-match a batch.
+### cm-ov004 — C-match ov004 convertibles [DONE]
+ov004 has ~35 convertible functions. Get the list, C-match a batch.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
 
-### cm-main-batch2 — C-match main convertibles (batch 2) [TODO]
+### cm-main-batch2 — C-match main convertibles (batch 2) [DONE]
 Continue main's convertible pool — different functions than batch 1.
 **Gate:** `python3.13 tools/gate3.py --scope all` PASS + count converted.
