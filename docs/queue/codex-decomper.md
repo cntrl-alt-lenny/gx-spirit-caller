@@ -34,8 +34,7 @@ Brief 640 found **0 of 5 sampled wall citations actually matched the criteria of
 The CC C-match lanes add real names as they convert (briefs 650/654/655 are running now). Rebuild the signature DB from ALL currently-named functions, re-apply across EUR/USA/JPN, and report the delta vs the last refresh. Round-trip canary first (confirm a known-good signature still resolves before trusting a bulk apply).
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming --base origin/main` PASS + names-applied delta.
 
-### q-name-crossprop-3 — cross-region twin propagation sweep [TODO]
-
+### q-name-crossprop-3 — cross-region twin propagation sweep [DONE]
 Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade`. Byte-neutral, 3× multiplier on every name the CC lanes create. Sweep all modules. Brief 569's sig region-twin map (49/60 exact twins, 0/44 false positives) is the validated fallback when the name alone is ambiguous.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins propagated count.
 
