@@ -642,7 +642,7 @@ src/main/func_02003a4c.s:
     complete
     .text start:0x02003a4c end:0x02003ac0
 
-src/main/func_02003ac0.s:
+src/main/func_02003ac0.c:
     complete
     .text start:0x02003ac0 end:0x02003b14
 
@@ -665,7 +665,7 @@ src/main/func_02003e98.s:
     complete
     .text start:0x02003e98 end:0x02003f1c
 
-src/main/func_02003f1c.s:
+src/main/func_02003f1c.c:
     complete
     .text start:0x02003f1c end:0x02003f70
 
@@ -1164,7 +1164,7 @@ src/main/func_0200924c.c:
     complete
     .text start:0x0200924c end:0x02009278
 
-src/main/func_02009278.s:
+src/main/func_02009278.c:
     complete
     .text start:0x02009278 end:0x020092c8
 
