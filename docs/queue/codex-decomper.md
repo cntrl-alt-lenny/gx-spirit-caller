@@ -38,8 +38,7 @@ The CC C-match lanes add real names as they convert (briefs 650/654/655 are runn
 Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade`. Byte-neutral, 3× multiplier on every name the CC lanes create. Sweep all modules. Brief 569's sig region-twin map (49/60 exact twins, 0/44 false positives) is the validated fallback when the name alone is ambiguous.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins propagated count.
 
-### q-progress-history — build the C%-over-time series [TODO]
-
+### q-progress-history — build the C%-over-time series [DONE]
 We have no historical view of the readable-C rate — only spot readings. Reconstruct it from git history: walk merge commits on `main` over the last ~6 weeks, and at each point compute readable-C bytes per region (the committed-delinks tier is build-free, so this is a pure history walk — see `tools/progress.py`'s C-decompiled path). Output a table + the derived rate (pp/week), plus per-module where cheap. This tells us honestly whether the campaign is accelerating or flat, which nothing currently answers.
 **Gate:** doc-only, no build; the series + your stated method (say plainly if some points are un-computable).
 
