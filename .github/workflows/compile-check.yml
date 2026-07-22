@@ -1,0 +1,75 @@
+name: Compile changed C
+
+# This is deliberately a compile-only gate. It proves that changed game C
+# reaches a valid ARM relocatable; byte identity still belongs to the local
+# baserom-backed gates and is never attempted here.
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/configure.py'
+      - 'tools/transform_dep.py'
+      - '.github/workflows/compile-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile changed C (${{ matrix.region }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [eur, usa, jpn]
+
+    steps:
+      - name: Check out PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate baserom-free build graph
+        shell: pwsh
+        env:
+          REGION: ${{ matrix.region }}
+        run: python tools/configure.py $env:REGION --skip-sha1
+
+      - name: Find changed C targets
+        id: targets
+        shell: pwsh
+        env:
+          REGION: ${{ matrix.region }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          $files = @(git diff --name-only --diff-filter=ACMR $env:BASE_SHA $env:HEAD_SHA -- 'src/**/*.c')
+          $files = @($files | ForEach-Object { $_ -replace '\\', '/' } | Where-Object {
+            $_ -match '^src/.*\.c$' -and
+            (($_ -notmatch '^src/(usa|jpn)/') -or ($_ -match "^src/$env:REGION/"))
+          })
+
+          # A workflow-only PR has no changed C file. Compile one stable
+          # sentinel so a newly added workflow exercises its own toolchain
+          # path; normal source PRs remain strictly diff-scoped.
+          if ($files.Count -eq 0) {
+            $files = @('src/main/Copy32.c')
+            Write-Host "No changed C files for $env:REGION; using compile sentinel $($files[0])."
+          }
+
+          $targets = @($files | ForEach-Object {
+            $object = [IO.Path]::ChangeExtension($_, '.o')
+            "build/$env:REGION/$object"
+          })
+          $joined = $targets -join ' '
+          "targets=$joined" >> $env:GITHUB_OUTPUT
+          Write-Host "Compile targets ($env:REGION): $joined"
+
+      - name: Compile changed C targets
+        shell: pwsh
+        run: ninja ${{ steps.targets.outputs.targets }}
