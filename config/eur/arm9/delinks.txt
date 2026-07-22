@@ -9448,7 +9448,7 @@ src/main/func_02052674.s:
     complete
     .text start:0x02052674 end:0x020526b8
 
-src/main/func_020526b8.s:
+src/main/func_020526b8.c:
     complete
     .text start:0x020526b8 end:0x02052704
 
