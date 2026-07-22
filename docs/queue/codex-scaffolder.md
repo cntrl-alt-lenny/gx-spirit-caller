@@ -44,8 +44,7 @@ One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the 
 ~93 flat `tools/*.py` with no package boundary: ~30 hand-roll delinks/symbols parsing while canonical `parse_delinks_file`/`parse_symbols_file` exist, and ~40 carry identical `sys.path.insert` + `# noqa: E402` boilerplate. Promote the canonical parsers into a shared module, make `tools/` importable, migrate the hand-rolled readers. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that (absolute imports or `-m`), and migrate in small batches, most-duplicated first. This is the root cause behind the C%-metric bug b566 had to fix.
 **Gate:** `python -m pytest -q tests` green (do NOT add to the ~12 known Windows path-sep failures) + `python tools/configure.py eur` still succeeds + list which tools you migrated.
 
-### q-dead-tools — audit the tool inventory for dead weight [TODO]
-
+### q-dead-tools — audit the tool inventory for dead weight [DONE]
 Of the ~93 `tools/*.py`, some are superseded or unreferenced (e.g. tools whose lane closed). For each: is it referenced by `build.ninja`, any workflow, any test, any doc, or another tool? Produce a table: KEEP / SUPERSEDED-BY-X / UNREFERENCED. ⚠️ **List only — delete nothing in this item.** A follow-up will action it after review.
 **Gate:** the audit table; doc-only, no build.
 
