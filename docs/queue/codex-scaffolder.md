@@ -59,8 +59,7 @@ One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the 
 Of the ~93 `tools/*.py`, some are superseded or unreferenced (e.g. tools whose lane closed). For each: is it referenced by `build.ninja`, any workflow, any test, any doc, or another tool? Produce a table: KEEP / SUPERSEDED-BY-X / UNREFERENCED. ⚠️ **List only — delete nothing in this item.** A follow-up will action it after review.
 **Gate:** the audit table; doc-only, no build.
 
-### q-green-main — finish greening CI, then propose protection [CLAIMED]
-
+### q-green-main — finish greening CI, then propose protection [DONE]
 Lint has been red for weeks and **red is the baseline**, which means a real regression is invisible. Finish the cleanup (ruff autofixes, markdownlint over the generated dirs, regenerate both indices — that flips drift-check and unittest together), then **propose** (do not apply — it needs owner rights) a branch-protection ruleset requiring: `Python (ruff)`, `Markdown (markdownlint-cli2)`, `unittest`, `drift-check`, `pr-invariants (eur)`. ⚠️ Exclude the usa/jpn matrix legs — `continue-on-error` does NOT produce a green check-run, so requiring them would hard-block every PR.
 **Gate:** the CI checks green on your own PR + the proposed ruleset written up for the owner to apply.
 
