@@ -82,11 +82,13 @@ Your own `q-dead-tools` audit produced a KEEP / SUPERSEDED / UNREFERENCED table.
 **Gate:** `python -m pytest -q tests` (no NEW failures beyond the known 12 Windows path-sep ones) + `python tools/configure.py eur` succeeds + list what you removed.
 
 ### q-tools-package-2 — continue the parser migration [PARKED]
+
 > PARKED: Migrated 2 readers, but configure.py eur is blocked by the missing EUR baserom in kb-map; PR #1257 records the migration and known baseline test failures.
+
 `q-tools-package` landed a shared parser facade. Continue: migrate the remaining hand-rolled delinks/symbols readers onto it, most-duplicated first, in small reviewable batches. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that. Stop and report if any migration would need a build-graph change.
 **Gate:** `python -m pytest -q tests` (no new failures) + `python tools/configure.py eur` succeeds + count migrated.
 
-### q-objdiff-v3-action — execute the objdiff bump if your study said go [TODO]
+### q-objdiff-v3-action — execute the objdiff bump if your study said go [CLAIMED]
 
 Your `q-objdiff-v3` feasibility report reached a verdict. If it was GO: perform the bump in the migration order you proposed, updating the report.json consumers you identified, and retire panic-filter case (a) — keep case (b). If it was NO-GO or conditional: do NOT bump; instead write the specific blocking condition and what would have to change. Either path is a valid completion of this item.
 **Gate:** if bumping — `python tools/gate3.py --scope all --no-tests` PASS + all report.json consumers still work; if not bumping — the blocking-condition writeup.
