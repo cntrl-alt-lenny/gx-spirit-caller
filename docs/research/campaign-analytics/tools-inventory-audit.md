@@ -147,3 +147,20 @@ path-separator/tool-environment failures, with no deletion-related changes.
 `python tools/configure.py eur` could not start because this build-free
 worktree has no `orig\baserom_eur.nds`. The item is parked pending a
 baserom-capable worktree; no build was forced.
+
+## EUR-capable rerun (2026-07-22)
+
+The action was re-run from `kb-types`, which has the EUR baserom. The
+re-audit still found **0 UNREFERENCED executable tools** and **0 explicitly
+superseded tools**, so the safe deletion count remains zero. The named build
+check completed with `python tools/configure.py eur` followed by `ninja sha1`:
+
+```text
+gx-spirit-caller_eur.nds: OK
+Verifying SHA-1 of orig\baserom_eur.nds...
+  OK  (1da50df7c210fae96dc69b3825554b9ce13b4f75)
+```
+
+The required pytest rerun remains at 11 pre-existing Windows/path/tool-
+environment failures, 2,848 passed, 20 skipped, and 55 subtests; no deletion
+was made and no deletion-related failure exists.
