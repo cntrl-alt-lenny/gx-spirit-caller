@@ -35,4 +35,3 @@ Recommended repository rules:
 ## Owner application sketch
 
 In GitHub, open Settings → Rules → Rulesets, create an active branch ruleset targeting `main`, enable pull-request and required-status-check rules, and add exactly the five contexts listed above. Review the preview and save only after confirming that the USA/JPN matrix legs are not selected as required checks. This is an application guide, not an instruction for an agent to change repository settings.
-
