@@ -132,3 +132,18 @@ The generated `docs/tools-index.md` is excluded from the documentation signal be
 - No executable tool is unreferenced under this scan. `tools/naming_census.py` has a test reference and historical research coverage, so it remains KEEP; the package boundary row is the only deliberately non-referenced file.
 - No `SUPERSEDED-BY-X` row is asserted. Similar wording such as “use X instead” inside a tool’s domain-specific help was not treated as a deletion proof.
 - The next action is human review of deliberately one-shot research utilities and any future explicit supersession claim. This item intentionally performs no deletion.
+
+## Action follow-up (q-dead-tools-action)
+
+Rechecking the current tree before deletion found the same result: **0
+UNREFERENCED executable tools and 0 explicitly superseded tools**. The
+package boundary `tools/__init__.py` remains intentional. Therefore this
+follow-up removes **no files**; deleting a KEEP row would violate the audit's
+mechanical rule.
+
+The requested gate was attempted. `python -m pytest -q tests` reported
+`11 failed, 2843 passed, 25 skipped, 55 subtests passed` — the known Windows
+path-separator/tool-environment failures, with no deletion-related changes.
+`python tools/configure.py eur` could not start because this build-free
+worktree has no `orig\baserom_eur.nds`. The item is parked pending a
+baserom-capable worktree; no build was forced.
