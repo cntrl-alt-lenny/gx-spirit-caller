@@ -75,11 +75,14 @@ Brief 654 drained ov002's coercible pool (23 shipped total) and **independently 
 **Gate:** doc-only; cross-link it from `endgame-ledger.md` and the wall taxonomy.
 
 ### q-dead-tools-action — action the dead-tool audit [PARKED]
+
 > PARKED: No UNREFERENCED tools were found; requested configure gate is unavailable because kb-map has no EUR baserom. PR #1256 records the no-op and known baseline test failures.
+
 Your own `q-dead-tools` audit produced a KEEP / SUPERSEDED / UNREFERENCED table. Now action it: delete only the rows you classified UNREFERENCED, one small batch at a time. ⚠️ Re-verify each is still unreferenced at deletion time (`build.ninja`, workflows, tests, docs, other tools) — the tree has changed since the audit.
 **Gate:** `python -m pytest -q tests` (no NEW failures beyond the known 12 Windows path-sep ones) + `python tools/configure.py eur` succeeds + list what you removed.
 
 ### q-tools-package-2 — continue the parser migration [CLAIMED]
+
 `q-tools-package` landed a shared parser facade. Continue: migrate the remaining hand-rolled delinks/symbols readers onto it, most-duplicated first, in small reviewable batches. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that. Stop and report if any migration would need a build-graph change.
 **Gate:** `python -m pytest -q tests` (no new failures) + `python tools/configure.py eur` succeeds + count migrated.
 
