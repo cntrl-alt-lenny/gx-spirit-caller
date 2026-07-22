@@ -3118,7 +3118,7 @@ src/main/func_0201a5f4.s:
 src/main/func_0201a778.s:
     complete
     .text start:0x0201a778 end:0x0201a824
-src/main/func_0201a824.s:
+src/main/func_0201a824.c:
     complete
     .text start:0x0201a824 end:0x0201a84c
 
