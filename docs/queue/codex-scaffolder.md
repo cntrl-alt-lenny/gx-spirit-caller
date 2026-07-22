@@ -89,5 +89,6 @@ Your own `q-dead-tools` audit produced a KEEP / SUPERSEDED / UNREFERENCED table.
 **Gate:** `python -m pytest -q tests` (no new failures) + `python tools/configure.py eur` succeeds + count migrated.
 
 ### q-objdiff-v3-action — execute the objdiff bump if your study said go [DONE]
+
 Your `q-objdiff-v3` feasibility report reached a verdict. If it was GO: perform the bump in the migration order you proposed, updating the report.json consumers you identified, and retire panic-filter case (a) — keep case (b). If it was NO-GO or conditional: do NOT bump; instead write the specific blocking condition and what would have to change. Either path is a valid completion of this item.
 **Gate:** if bumping — `python tools/gate3.py --scope all --no-tests` PASS + all report.json consumers still work; if not bumping — the blocking-condition writeup.
