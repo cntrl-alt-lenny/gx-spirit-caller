@@ -2912,7 +2912,7 @@ src/main/func_020197ac.s:
     complete
     .text start:0x020197ac end:0x02019820
 
-src/main/func_02019820.s:
+src/main/func_02019820.c:
     complete
     .text start:0x02019820 end:0x02019858
 
