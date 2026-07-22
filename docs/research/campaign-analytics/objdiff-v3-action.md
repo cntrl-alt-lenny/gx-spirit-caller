@@ -33,3 +33,14 @@ should open a separate pin-bump PR.
 See the [full v3.7.3 feasibility report](../objdiff-v373-feasibility.md) for
 the consumer inventory, migration order, and the observed v3.7.1 metric
 warning.
+
+## EUR-capable rerun (2026-07-22)
+
+The rerun from `kb-types` successfully configured EUR and completed the named
+`ninja sha1` target with `gx-spirit-caller_eur.nds: OK`. The prior missing
+baserom blocker is therefore cleared. The item remains conditional/no-go for
+the pin bump: `python -m pytest -q tests` still has the same 11 Windows/path/
+tool-environment failures (2,848 passed, 20 skipped, 55 subtests), and the
+report-generation plus direct-diff A/B probes have not been run. Keep v2.7.1,
+keep panic-filter cases (a) and (b), and schedule the A/B probe as a separate
+migration trial.
