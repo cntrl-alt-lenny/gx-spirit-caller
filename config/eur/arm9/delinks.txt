@@ -19353,7 +19353,7 @@ src/main/func_020a6924.s:
 src/main/func_020a69d0.legacy.c:
     complete
     .text start:0x020a69d0 end:0x020a6a00
-src/main/func_020a6a00.c:
+src/main/Strlen.c:
     complete
     .text start:0x020a6a00 end:0x020a6a28
 
@@ -19639,7 +19639,7 @@ src/main/func_020ace88.c:
     complete
     .text start:0x020ace88 end:0x020ace98
 
-src/main/func_020ace98.c:
+src/main/FindU16InArray.c:
     complete
     .text start:0x020ace98 end:0x020acec0
 

@@ -55,8 +55,7 @@ Brief 659 studied peer projects as a *source of SDK code*; this is different —
 This is now the campaign's central unknown. Brief 654 showed ov002's "unknown" tranche was really the 288/290/294 reg-alloc-walled cohort in disguise — genuinely walled, verified. Is `main`'s 2,370-file unknown tranche the same, or actually unexplored? Profile it MECHANICALLY (no matching): for each file, what header text does it carry, what cohort/brief does that text trace to, size distribution, and shape (leaf/stub/dispatcher/large). Group by provenance — "which sweep put this text here" is the key question. You are NOT judging matchability; you're establishing what evidence exists.
 **Gate:** doc-only; the profile table grouped by header provenance + your read on how much is cohort-stamp vs genuinely unassessed.
 
-### q-name-batch — name what the C-match lanes converted [TODO]
-
+### q-name-batch — name what the C-match lanes converted [DONE]
 The CC lanes have converted ~24 more functions this round (18 ov002 + 6 main) and more are landing. Any newly-converted function still called `func_*` whose purpose is now legible from its C body is a naming candidate. Name them via `rename_symbol.py --cascade`, then propagate twins to USA/JPN. ⚠️ Never invent a name you can't justify from the code — an honest small batch beats a speculative large one.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied.
 
