@@ -78,7 +78,7 @@ from next_targets import (  # noqa: E402
     collect_matched_ranges,
     is_addr_matched,
 )
-from progress import parse_delinks_file  # noqa: E402
+from parsers import parse_delinks_file  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #

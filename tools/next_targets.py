@@ -56,7 +56,7 @@ from analyze_symbols import (  # noqa: E402
     load_all,
     rank_targets,
 )
-from progress import (  # noqa: E402
+from parsers import (  # noqa: E402
     parse_delinks_file,
 )
 

@@ -54,7 +54,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_symbols import ROOT, ModuleData, load_all  # noqa: E402
-from progress import parse_delinks_file  # noqa: E402
+from parsers import parse_delinks_file  # noqa: E402
 
 
 PLACEHOLDER_PREFIXES = ("func_", "data_", "_dsd_gap")
