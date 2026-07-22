@@ -16,6 +16,60 @@ Anchor-backed families rank first because a matched C sibling is the highest-lev
 
 The prior sweep queues contributed 64 address tokens to the exclusion set. Any candidate-only shape group containing one of those addresses was omitted, so the tables below do not re-list the families already catalogued in `cmatch-sweep-queue.md` or `cmatch-sweep-queue-overlays.md`.
 
+## Anchor verification audit (queue item `q-family-verify`)
+
+The census's “C anchor” label was checked against the current EUR tree on
+2026-07-22. The method was deliberately build-free:
+
+1. Read every EUR `delinks.txt` and retain only `complete` TUs whose source
+   path ends in `.c`/`.cpp` (including `.legacy.c`, `.thumb.c`, and
+   `.legacy_sp3.c`). A complete `.s` TU is **not** a C anchor.
+2. For the first 20 anchor rows (`A-01`–`A-20`), look up the exemplar address
+   in the EUR symbols and test whether a retained C TU actually covers that
+   address.
+3. Recompute each exemplar's `(size, relocation-offset/kind signature)` from
+   the committed EUR `relocs.txt`, then count current non-C functions with the
+   same fingerprint. This checks the claimed member shape without compiling.
+4. Mark `sig=0` rows **AMBIGUOUS** even when the size and empty signature
+   repeat: an empty relocation signature is not enough to distinguish leaf
+   functions. Mark a non-empty-signature row **VERIFIED** only when the C
+   anchor exists and at least one same-shape candidate remains; otherwise it
+   is **SUSPECT**.
+
+| Family | Claimed exemplar | C anchor now? | Current same-shape non-C members | Verification |
+|---|---|---|---:|---|
+| `A-01` | `0207708c` | no | 5 | AMBIGUOUS (`sig=0`) |
+| `A-02` | `0209085c` | no | 2 | SUSPECT |
+| `A-03` | `020b3648` | no | 1 | AMBIGUOUS (`sig=0`) |
+| `A-04` | `0208b1c8` | no | 1 | AMBIGUOUS (`sig=0`) |
+| `A-05` | `0206be1c` | no | 6 | AMBIGUOUS (`sig=0`) |
+| `A-06` | `02067b8c` | no | 13 | AMBIGUOUS (`sig=0`) |
+| `A-07` | `0207e214` | no | 4 | SUSPECT |
+| `A-08` | `02031794` | no | 16 | AMBIGUOUS (`sig=0`) |
+| `A-09` | `02007f38` | no | 3 | SUSPECT |
+| `A-10` | `02001e5c` | no | 12 | AMBIGUOUS (`sig=0`) |
+| `A-11` | `02034094` | no | 10 | AMBIGUOUS (`sig=0`) |
+| `A-12` | `020644a4` | no | 15 | AMBIGUOUS (`sig=0`) |
+| `A-13` | `020442f8` | no | 10 | AMBIGUOUS (`sig=0`) |
+| `A-14` | `0203ab98` | no | 51 | AMBIGUOUS (`sig=0`) |
+| `A-15` | `020a978c` | no | 2 | SUSPECT |
+| `A-16` | `02054840` | no | 1 | SUSPECT |
+| `A-17` | `0205bccc` | no | 11 | AMBIGUOUS (`sig=0`) |
+| `A-18` | `02021660` | no | 11 | AMBIGUOUS (`sig=0`) |
+| `A-19` | `0203aeec` | no | 9 | AMBIGUOUS (`sig=0`) |
+| `A-20` | `02038dac` | no | 8 | SUSPECT |
+
+**Sample result: 0 VERIFIED, 6 SUSPECT, 14 AMBIGUOUS.** Applying the same
+address/source/signature test mechanically to all 91 `A-*` rows gives **0
+VERIFIED, 54 SUSPECT, and 37 AMBIGUOUS**. The full index below remains the
+original census snapshot; use the status column above for the sampled rows
+and treat every un-audited row as unverified until it passes the same check.
+
+This is a stale-anchor finding, not a claim that the candidate members are
+identical in machine code. The non-empty-signature SUSPECT rows still have
+same-shaped candidates worth independent review; the `sig=0` rows should not
+be scheduled as near-zero-shot propagation families.
+
 ## Ranked anchor-backed families — top 10
 
 These are ranked mechanically by `(new candidate members + matched anchors) × matched anchors`, then candidate count, then size. `sig=0` means the exact relocation signature is empty; those rows are intentionally labeled **ambiguous** because equal size plus no relocations can describe unrelated leaf functions.
