@@ -65,8 +65,8 @@ def check_dsd_binary() -> bool:
     cycle wasted before the wrong binary was spotted. This catches it in ms."""
     dsd = ROOT / "dsd"
     if not dsd.exists():
-        print(f"gate3: ./dsd missing — run `python3.13 tools/download_tool.py "
-              f"dsd v0.11.0 --path ./dsd`", file=sys.stderr)
+        print("gate3: ./dsd missing — run `python3.13 tools/download_tool.py "
+              "dsd v0.11.0 --path ./dsd`", file=sys.stderr)
         return False
     try:
         out = subprocess.run([str(dsd), "--version"], cwd=ROOT,
