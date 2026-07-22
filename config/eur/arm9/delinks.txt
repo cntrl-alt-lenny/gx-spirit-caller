@@ -2989,7 +2989,7 @@ src/main/func_0201a0b8.c:
     complete
     .text start:0x0201a0b8 end:0x0201a0e0
 
-src/main/func_0201a0e0.s:
+src/main/func_0201a0e0.c:
     complete
     .text start:0x0201a0e0 end:0x0201a110
 
