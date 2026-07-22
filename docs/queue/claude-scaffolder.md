@@ -2,7 +2,11 @@
 
 # Claude Code Scaffolder — autonomous C-match queue (WALL-AWARE)
 
-**Protocol:** loop until QUEUE-EMPTY. `python3.13 tools/work_queue.py next claude-scaffolder`. Candidate list = the module's CONVERTIBLE (non-wall) functions via `python3.13 tools/wall_aware_headroom.py --json`. Skip documented walls. Different modules from the Decomper lane — no collision. Hand C-match a batch, byte-verify, gate `gate3.py --scope all`, ONE PR, `work_queue.py done`, commit, next. Effort MAX. Only ~245 convertible remain project-wide; honest small batches are fine.
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next claude-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Candidate list via `python tools/wall_aware_headroom.py --json`. Hand C-match a batch, byte-verify, gate `python tools/gate3.py --scope all --no-tests`, ONE PR **per item**, `work_queue.py done`, commit, then immediately take the next item. Effort MAX.
+
+**Pool status (2026-07-23 — supersedes the old "~245 convertible" line, which came from the broken pre-b651 classifier):** the honest pool is **6,093 candidates** (116 coercible + 5,945 never-assessed + 32 no-marker); only **32 files project-wide are confirmed-permanent**. Brief 661 established that `main`'s never-assessed tranche is **real runway, not disguised walls** — the generic "reg-alloc-walled, no C match (brief 294 endgame)" header is NOT evidence and was wrong more often than right on a true random sample.
+
+⚠️ **Gate with `--no-tests`** — the pytest step has 12 known pre-existing Windows path-sep failures unrelated to your work. ⚠️ **NEVER bare `ninja`.** ⚠️ **Park the reg-alloc/scratch-register wall on sight** (identical instructions, one register swapped throughout) — 100% lever-insensitive per brief 641; do not iterate on it.
 
 **CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
 
@@ -51,3 +55,20 @@ Worked the full 32-file coercible pool (files citing a taxonomy code) plus 1 dir
 ### main-unknown-probe-661 — is main's 2,370-file unknown tranche real runway or disguised walls? (brief 661) [DONE]
 Unlike ov002 (brief 654: 98.9% of its "unknown" pool traced to specific, credible per-function negative-result headers), main's generic "reg-alloc-walled, no C match (brief 294 endgame)" header is **not reliable evidence** — present on all 35 files of a true seeded-random sample spanning the full size range, but of 14 real compile attempts in the 0-256B range (69% of the tranche by file count, 1,645/2,370 files), only 5 (36%) showed a confirmed genuine-wall signature; 3 shipped outright (21%, all mistagged) and 2 more reached a **perfect logical body match** blocked only by one recurring epilogue-shape quirk (14%). **3/35 shipped.** For the 257B+ tier (31% of the tranche), every sample inspected (8 read in full/substantial part) was genuinely complex real code (DMA/texture transfers, heap allocators, weighted-average computations) with no wall signature, just too large to byte-verify in this sweep's budget. **NEW wall class (not yet catalogued): epilogue-shape wall** — mwcc's original prefers `sub sp,#4` + single-register push/pop; my compiles consistently prefer a dummy-register push + fused pop-and-return; confirmed 3 times, unresponsive to a `volatile` local (unlike the different epilogue variant from brief 654's candidate 1). 3 new levers: don't over-assume a callee's signature from a "preserved register" pattern (check for a wider/narrower return type first), `cur = *s++;` must be a standalone statement not check-then-increment for post-increment addressing, and don't cache a repeatedly-accessed global pointer in a local if the original re-reads it fresh each time. **Recommend: schedule a dedicated sweep on the 0-256B tier (real, sizeable runway); do NOT quick-sweep the 257B+ tier (real but expensive per-candidate, needs brief-650-style dedicated investment); retire the brief-294 header as evidence for main specifically.**
 **Gate:** `python3.13 tools/gate3.py --scope all --no-tests` PASS (3-region sha1).
+
+### cm-main-small-a — main small/medium sweep, batch A (0x0200xxxx–0x0203xxxx) [TODO]
+
+Brief 661 proved `main`'s never-assessed tranche is real runway: in the **0–256 byte tier (69% of it — 1,645 of 2,370 files)** a true random sample gave **21% shipped outright + 43% open near-misses**, with an estimated **35–55% floor** for a dedicated sweep. This is that campaign. Work the 0–256 B candidates whose addresses fall in **0x02000000–0x0203ffff** (the Decomper takes the upper half — no collision).
+Get candidates: `python tools/wall_aware_headroom.py --json` (main), filter to size ≤256 B and your address range. Header-read first, but treat the generic brief-294 header as **non-evidence** — 661 showed it was wrong more often than right.
+Prefer the shapes 661 found tractable: trivial stubs, tail-call forwarders, small guard/dispatch bodies. Levers ranked by evidence: `docs/research/reshape-recipes/lever-payoff.md` (read its ANTI-PATTERNS section first).
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted counts.
+
+### cm-main-small-b — main small/medium sweep, batch B (continue batch A's range) [TODO]
+
+Continue `cm-main-small-a` in the same address range with a fresh batch. Report the running shipped/attempted rate so we can see whether 661's 35–55% floor estimate holds at volume — that number decides how much of the 1,645-file tier is worth committing to.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate vs 661's estimate.
+
+### cm-main-large-probe — probe the 257 B+ tier [TODO]
+
+Brief 661 read 8 files from the **257 B+ tier (31% of the tranche)** — DMA/texture transfers, heap allocators, weighted-average routines — and found **real complex game code with NO wall signature**, just too large to verify inside a sweep budget. Take 3–4 of them and give each the slow, per-candidate treatment (the shape of brief 650's 1036 B dispatcher effort, which succeeded). Expect low counts; the deliverable is whether large-function matching is economically viable, not a ship count.
+**Gate:** `python tools/gate3.py --scope all --no-tests` + an honest verdict on viability per hour spent.
