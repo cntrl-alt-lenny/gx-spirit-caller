@@ -49,7 +49,8 @@ ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 1
 One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the single biggest lever-shaped opportunity in the pool. Mechanically gather every C-34-cited file into one reference: address, module, size, the exact `.s` shape that triggered the citation, and any ALREADY-MATCHED example of the same shape (search matched `.c` for siblings). You are assembling evidence, NOT deriving the recipe — a CC agent cracks it; your job is to hand them the corpus so they don't spend hours collecting it.
 **Gate:** the corpus doc + counts; doc-only, no build.
 
-### q-tools-package — kill the tools/ boilerplate and parser duplication [TODO]
+### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+> PARKED: kb-types EUR configure and ninja sha1 passed; required pytest remains red on 11 pre-existing Windows/path/tool-environment failures (2848 passed, 20 skipped, 55 subtests), so keep parked until the stated green pytest gate.
 >
 > PARKED: Parser facade and direct-call-site batch complete; exact configure gate unavailable because orig\\baserom_eur.nds is absent. pytest ran with 2843 passed, 25 skipped, 55 subtests and 11 pre-existing Windows/path/build failures; no new failures.
 ~93 flat `tools/*.py` with no package boundary: ~30 hand-roll delinks/symbols parsing while canonical `parse_delinks_file`/`parse_symbols_file` exist, and ~40 carry identical `sys.path.insert` + `# noqa: E402` boilerplate. Promote the canonical parsers into a shared module, make `tools/` importable, migrate the hand-rolled readers. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that (absolute imports or `-m`), and migrate in small batches, most-duplicated first. This is the root cause behind the C%-metric bug b566 had to fix.
