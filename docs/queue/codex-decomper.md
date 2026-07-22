@@ -18,13 +18,11 @@ The CC C-match rounds add real names as they convert functions. Rebuild b630's s
 Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade` (byte-neutral, 3× multiplier). Sweep all modules.
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins propagated.
 
-### q-family-verify — verify brief 658's anchor-backed families [TODO]
-
+### q-family-verify — verify brief 658's anchor-backed families [DONE]
 Brief 658 found **91 new C-anchored relocation families** (`docs/research/campaign-analytics/family-census-2026-07.md`). Anchor-backed families are the highest-value C-match targets we have (a matched sibling means near-zero-shot propagation — VRAM 16/16, table-walker 7/7). But the census is mechanical, so some "anchors" may be false. Verify a sample (~20 families): does the claimed anchor really exist as matched `.c`, and do the members really share its shape? Also resolve the rows 658 flagged **ambiguous** (`sig=0` — empty relocation signature can describe unrelated leaf functions). Output: a VERIFIED / SUSPECT / AMBIGUOUS column added to the census, so the CC agents only sweep real families.
 **Gate:** doc-only, no build; paste your verification method + counts.
 
 ### q-nomarker-census — classify the 294 no-marker files [TODO]
-
 Brief 643's census found **294 `.s` files with no wall marker at all** — neither a taxonomy code nor the blanket cohort stamp. They're pure never-assessed candidates and nobody knows what they are. Census them: module, size distribution, shape (leaf/stub/dispatcher/large), and whether any have matched siblings. These are potentially the cleanest untouched pool in the project.
 **Gate:** doc-only, no build; the census table + your read on which look most tractable.
 
