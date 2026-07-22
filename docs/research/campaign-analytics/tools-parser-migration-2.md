@@ -33,3 +33,22 @@ The specialized readers in `batch_carve.py`, `calcrom.py`, and
 include carve-specific or relocation-specific semantics rather than the
 canonical symbol/delinks record. They are not silently rewritten in this
 small batch.
+
+## Continuation rerun (2026-07-22)
+
+The remaining delinks readers were migrated through compatibility adapters:
+
+| Tool | Former local reader | Compatibility preserved |
+|---|---|---|
+| `tools/calcrom.py` | local `delinks.txt` parser with `ranges` keys | yes; the adapter maps canonical `sections` to the legacy `ranges` view |
+| `tools/cross_region_cluster_apply.py` | local section/TU scanner | yes; the adapter rebuilds the existing `DelinksMap` (`sections`, `claims`, and `tu_paths`) |
+
+Both tools remain directly executable and no `build.ninja` entry point changed.
+The canonical parser now handles all four migrated reader surfaces in this
+facade work (the two symbol readers above plus these two delinks readers).
+
+From `kb-types`, `python tools/configure.py eur` followed by the explicitly
+scoped `ninja sha1` completed with `gx-spirit-caller_eur.nds: OK` and the
+original EUR SHA-1 verified. The full pytest rerun remains at 11 pre-existing
+Windows/path/tool-environment failures, 2,848 passed, 20 skipped, and 55
+subtests; no parser-migration failure was observed.

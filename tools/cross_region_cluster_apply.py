@@ -120,6 +120,7 @@ from analyze_symbols import (  # noqa: E402
     parse_relocs_file,
     parse_symbols_file,
 )
+from parsers import parse_delinks_file  # noqa: E402
 
 # Brief 184: brief 177's extent adjuster + brief 125's Pattern 3
 # emitter are the building blocks for the cluster C / D-1 / D-2
@@ -216,15 +217,6 @@ class RegionPaths:
 # --------------------------------------------------------------------------- #
 
 
-_SECTION_LINE_RE = re.compile(
-    r"\.(\w+)\s+start:0x([0-9a-f]+)\s+end:0x([0-9a-f]+)",
-)
-_TU_HEADER_RE = re.compile(r"^(\S+):\s*$")
-_TU_RANGE_RE = re.compile(
-    r"\.(\w+)\s+start:0x([0-9a-f]+)\s+end:0x([0-9a-f]+)",
-)
-
-
 @dataclass
 class ClaimedRange:
     """One (section, start_va, end_va) range that's already
@@ -246,61 +238,16 @@ class DelinksMap:
 
 
 def parse_delinks(path: Path) -> DelinksMap:
-    out = DelinksMap()
-    if not path.is_file():
-        return out
-    text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
-
-    # Phase 1: section-map stanza (consecutive indented lines at
-    # the file's head, before any TU header).
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        stripped = line.strip()
-        if not stripped:
-            i += 1
-            continue
-        if not line.startswith(" ") and not line.startswith("\t"):
-            break  # first un-indented line ends the section stanza
-        m = _SECTION_LINE_RE.match(stripped)
-        if m is not None:
-            out.sections["." + m.group(1)] = (
-                int(m.group(2), 16),
-                int(m.group(3), 16),
-            )
-        i += 1
-
-    # Phase 2: per-TU stanzas. Format:
-    #   src/path/to/file.c:
-    #       complete
-    #       .data start:0xADDR end:0xADDR
-    #       ...
-    current_tu: str | None = None
-    for j in range(i, len(lines)):
-        line = lines[j]
-        stripped = line.strip()
-        if not stripped:
-            current_tu = None
-            continue
-        if not line.startswith(" ") and not line.startswith("\t"):
-            m = _TU_HEADER_RE.match(line)
-            if m is not None:
-                current_tu = m.group(1)
-                out.tu_paths.add(current_tu)
-            continue
-        # Indented line under a TU header — either `complete` or a
-        # range line.
-        if current_tu is None:
-            continue
-        rm = _TU_RANGE_RE.match(stripped)
-        if rm is None:
-            continue
-        out.claims.append(ClaimedRange(
-            section="." + rm.group(1),
-            start=int(rm.group(2), 16),
-            end=int(rm.group(3), 16),
-        ))
+    sections, tus = parse_delinks_file(path)
+    out = DelinksMap(
+        sections={name: (start, end) for name, start, end in sections},
+        tu_paths={tu["source"] for tu in tus},
+        claims=[
+            ClaimedRange(section, start, end)
+            for tu in tus
+            for section, start, end in tu.get("sections", [])
+        ],
+    )
     return out
 
 

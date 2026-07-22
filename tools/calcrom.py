@@ -47,6 +47,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+try:  # package import when invoked from the repository root
+    from tools.parsers import parse_delinks_file
+except ImportError:  # direct ``python tools/calcrom.py`` invocation
+    from parsers import parse_delinks_file
+
 CODE_SECTIONS = {".text", ".init", ".itcm"}
 DATA_SECTIONS = {".rodata", ".ctor", ".dtor", ".data"}
 
@@ -89,66 +94,21 @@ def parse_relocs(path: Path) -> list[tuple[int, str, int]]:
 
 
 def parse_delinks(path: Path):
-    """Parse a dsd delinks.txt file.
+    """Return the legacy calcrom view from the canonical parser.
 
-    Returns (module_sections, tus):
-
-      module_sections: list of (name, start, end) tuples for the
-        module-level section map at the top of the file.
-
-      tus: list of dicts:
-        {"source": "src/...c" or "_dsd_gap@..." (rare here),
-         "status": "complete" | "incomplete" | None,
-         "ranges": [(section_name, start, end), ...]}
+    ``calcrom`` historically called TU ranges ``ranges`` while the shared
+    parser calls them ``sections``. Keep that small compatibility adapter so
+    its callers and output remain unchanged.
     """
-    module_sections: list[tuple[str, int, int]] = []
-    tus: list[dict] = []
-    current: dict | None = None
-    in_tu = False  # False while we're still in the module map
-
-    if not path.is_file():
-        return module_sections, tus
-
-    with path.open() as f:
-        for raw in f:
-            stripped = raw.strip()
-            if not stripped or stripped.startswith("#"):
-                continue
-
-            if stripped.endswith(":") and not stripped.startswith("."):
-                if current is not None:
-                    tus.append(current)
-                current = {
-                    "source": stripped.rstrip(":"),
-                    "status": None,
-                    "ranges": [],
-                }
-                in_tu = True
-                continue
-
-            if in_tu and current is not None and stripped in ("complete", "incomplete"):
-                current["status"] = stripped
-                continue
-
-            if stripped.startswith("."):
-                parts = stripped.split()
-                section_name = parts[0]
-                start = end = None
-                for p in parts[1:]:
-                    if p.startswith("start:0x"):
-                        start = int(p[len("start:0x"):], 16)
-                    elif p.startswith("end:0x"):
-                        end = int(p[len("end:0x"):], 16)
-                if start is None or end is None:
-                    continue
-                if in_tu and current is not None:
-                    current["ranges"].append((section_name, start, end))
-                else:
-                    module_sections.append((section_name, start, end))
-                continue
-        if current is not None:
-            tus.append(current)
-
+    module_sections, parsed_tus = parse_delinks_file(path)
+    tus = [
+        {
+            "source": tu["source"],
+            "status": tu.get("status"),
+            "ranges": tu.get("sections", []),
+        }
+        for tu in parsed_tus
+    ]
     return module_sections, tus
 
 
