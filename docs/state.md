@@ -8,7 +8,27 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-18 (M1 Mac, brain=Opus; roster: Codex Decomper + Codex Scaffolder =
+**Last updated:** 2026-07-23 (Windows PC, brain=Opus; roster: 2× Codex GPT-5.6 Luna High +
+2× Claude Code Sonnet 5 Max, all four on autonomous standing queues `docs/queue/*.md` —
+loop-until-QUEUE-EMPTY, one PR per item). **CHAPTER: READABLE-C, post-wall-correction.**
+EUR C-decompiled **8.48%** (+0.460 pp/week measured over 32 days; USA/JPN 7.20% at +0.342).
+⚠️ 108 of 10,519 matched `.c` TUs contain inline asm and currently count as C — the
+Natural-C vs asm-C metric split is queued (`q-natural-c-metric`). Landmark rounds this stint:
+b650/654 (ov002: coercible pool drained 23 ships, remaining ~2,750 verified genuine walls),
+b651 (wall classifier fixed: honest pool 6,093 candidates / 32 confirmed-permanent),
+b661 (**main's 2,370-file unknown tranche = real runway, size-gated**: 0-256B tier ~35-55%
+floor, 1,645 files — both CC lanes now sweeping it split by address range; recurring
+epilogue-shape wall ×3 = highest-leverage single target, `cm-epilogue-wall`),
+b662 (91-family census untrustworthy: tiny 8-28B exemplars are false anchors — rebuild queued).
+External review (GPT-5.6 Sol) applied 2026-07-23: tooling budget + asm-void≠readable-C policy
+in all queue headers; green-pytest / natural-C-split / strict tool re-audit / scorecard /
+doc-archive queued. **Branch protection LIVE** (ruleset `main-protection`: required checks
+Python ruff + Markdown + drift-check — the only 3 that run on EVERY PR (pr-invariants and
+compile-check are paths-filtered, requiring them would hang docs-only PRs); force-push +
+deletion blocked; repo-admin bypass keeps the brain's gated integ→main push flow working.
+The brain's 3-region `ninja sha1` gate remains the real merge gate, always run locally.
+
+**Previously (2026-07-18):** (M1 Mac, brain=Opus; roster: Codex Decomper + Codex Scaffolder =
 GPT-5.6 Luna Medium, Claude Code Decomper + Claude Code Scaffolder = Sonnet 5 Max). **CHAPTER:
 READABLE-C — and the 544 B CEILING IS BROKEN.** This round merged **#1154** (b582 probe:
 `func_02037dc0` 552 B arm9 SHIPPED via real sha1, 1/3; + NEW wall class "repeated-address
