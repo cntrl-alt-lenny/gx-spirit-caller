@@ -418,7 +418,7 @@ src/overlay011/ov011_021cd6d0.c:
 
 
 
-src/overlay011/func_ov011_021cd6e0.s:
+src/overlay011/func_ov011_021cd6e0.c:
     complete
     .text start:0x021cd6e0 end:0x021cd700
 
