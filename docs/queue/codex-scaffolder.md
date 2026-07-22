@@ -31,8 +31,7 @@ Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles
 Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we own this patch forever" belief is dead, and v3.7.3 ships prebuilts for all three hosts. But this is NOT a blind bump: v3.0.0 self-describes as a rewrite (251 commits / 186 files), **10 `report.json` consumers ride this schema**, and the genuinely untested risk is dsd v0.11.0's `objdiff.json` ↔ v3 config schema. Produce a feasibility report: what breaks, which consumers need changes, whether our panic-filter case (a) can retire (case (b) stays), and a go/no-go with a migration order. Do a read-only trial if you can (fetch v3.7.3, run it against one unit) without changing the pinned version.
 **Gate:** `python -m pytest -q tests` green + the report; do NOT change the pin in this item.
 
-### q-itcm-reach — why ITCM's functions are unreachable [TODO]
-
+### q-itcm-reach — why ITCM's functions are unreachable [DONE]
 ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 14 USA + 14 JPN per brief 643's census) that **no census, wave, or tool currently reaches**. Investigate the mechanism — is it a `dsd` config gap, a delinks/section modelling issue, or an addressing thing? Produce a diagnosis + a concrete proposal for making them reachable. Read-only investigation; do not attempt to carve them in this item.
 **Gate:** the report, with the exact evidence (config/section/tool output) that explains the invisibility.
 
