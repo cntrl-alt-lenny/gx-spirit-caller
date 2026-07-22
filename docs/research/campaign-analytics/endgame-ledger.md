@@ -98,6 +98,15 @@ Every module with a nonzero gap in at least one region (`dtcm` carries no
 7,104 USA + 7,104 JPN = 20,110 B) — it had no row anywhere in the prose
 ledger.
 
+### ov002 wall record
+
+The EUR ov002 function residue has now been mechanically reconciled into
+the Brief-294 reg-alloc cohort, the Brief-288/290 P-17 cohort, and the C-34
+duplicate-pool-slot residue. See the [verified ov002 wall cohort](ov002-wall-cohort.md)
+for the address envelopes, exact non-P-16 members, and re-test evidence.
+This source-header census is orthogonal to the byte-derived table above: it
+does not change the measured EUR/USA/JPN gap values.
+
 ## Reconciliation against size_census.py (brief 596)
 
 PR #1160 (brief 592) planned to render a per-module comparison between
