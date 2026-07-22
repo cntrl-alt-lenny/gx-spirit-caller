@@ -26,8 +26,8 @@ CC Decomper (2026-07-21) found 29 `.s` files under src/ that are NOT referenced 
 Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles to a valid ARM relocatable using only committed `include/` + `libs/` + `mwccarm.exe`; **0 mwcc edges reference `extract/`**, and `configure.py <ver> --skip-sha1` already runs baserom-free. Today **none of the 11 workflows compiles a single line of game C** — the existing comments conflate "can't verify byte-identity" with "can't build at all". Add `.github/workflows/compile-check.yml`: PR-triggered, paths filter `src/**`, fetch mwccarm, `configure.py <region> --skip-sha1`, map changed `.c` via `git diff` → `build/<region>/<path>.o`, `ninja` just those targets. Changed-file scoping keeps it seconds. **windows-latest needs no wibo** — prefer it. Do NOT attempt to put baseroms in CI.
 **Gate:** the workflow file + a green run on your own PR (it will exercise itself), or if it can't self-trigger, paste the exact local equivalent commands and their output.
 
-### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [TODO]
-
+### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+> PARKED: Report delivered; pytest gate ran but remains red on 11 pre-existing Windows/path/build-environment failures (2843 passed, 25 skipped, 55 subtests). Re-run on a POSIX/build-capable worktree before pin migration.
 Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we own this patch forever" belief is dead, and v3.7.3 ships prebuilts for all three hosts. But this is NOT a blind bump: v3.0.0 self-describes as a rewrite (251 commits / 186 files), **10 `report.json` consumers ride this schema**, and the genuinely untested risk is dsd v0.11.0's `objdiff.json` ↔ v3 config schema. Produce a feasibility report: what breaks, which consumers need changes, whether our panic-filter case (a) can retire (case (b) stays), and a go/no-go with a migration order. Do a read-only trial if you can (fetch v3.7.3, run it against one unit) without changing the pinned version.
 **Gate:** `python -m pytest -q tests` green + the report; do NOT change the pin in this item.
 
