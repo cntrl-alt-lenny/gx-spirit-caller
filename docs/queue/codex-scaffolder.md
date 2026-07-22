@@ -35,8 +35,7 @@ Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we 
 ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 14 USA + 14 JPN per brief 643's census) that **no census, wave, or tool currently reaches**. Investigate the mechanism — is it a `dsd` config gap, a delinks/section modelling issue, or an addressing thing? Produce a diagnosis + a concrete proposal for making them reachable. Read-only investigation; do not attempt to carve them in this item.
 **Gate:** the report, with the exact evidence (config/section/tool output) that explains the invisibility.
 
-### q-c34-corpus — assemble the C-34 corpus (116 of 138 coercible) [TODO]
-
+### q-c34-corpus — assemble the C-34 corpus (116 of 138 coercible) [DONE]
 One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the single biggest lever-shaped opportunity in the pool. Mechanically gather every C-34-cited file into one reference: address, module, size, the exact `.s` shape that triggered the citation, and any ALREADY-MATCHED example of the same shape (search matched `.c` for siblings). You are assembling evidence, NOT deriving the recipe — a CC agent cracks it; your job is to hand them the corpus so they don't spend hours collecting it.
 **Gate:** the corpus doc + counts; doc-only, no build.
 
