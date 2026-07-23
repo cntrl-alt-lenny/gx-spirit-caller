@@ -95,11 +95,17 @@ Candidates: `python tools/wall_aware_headroom.py --json` (main), size <=256 B, y
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + running rate.
 
-### cm-main-small-e — main small/medium sweep, batch E [TODO]
+### cm-main-small-e — main small/medium sweep, batch E [DONE]
 
 Same as batch D, next tranche. Report the cumulative rate across A/B/D/E so we can see whether the epilogue-routing lift holds at volume.
 
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate.
+**Result: 2/11 shipped (18%)** — the weakest batch so far, cumulative A+B+D+E = **29/52 shipped (56%)**, still comfortably above 661's 35–55% floor. This batch's candidates skewed toward two specific obstacle classes that resisted every lever tried:
+- **Redundant double-pool-load of the same symbol** (now 4 confirmed instances total: `func_02021158`/`func_02023fec` from batch D, `func_0202111c`/`func_0202a240` here) — recognized **on sight** this time from the shape match and parked without re-attempting already-failed if/switch/volatile restructurings. Worth a lever-payoff.md anti-pattern entry if this keeps recurring.
+- **Instruction-scheduling-only near-misses** — `func_02000d0c` and `func_02019858` both reached >90%/75% with every *instruction* correct, differing only in operand order or store/load interleaving that didn't respond to source-level reordering (temp-variable insertion, operand-position swaps). Same class as batch D's `func_0201aabc`.
+- **New finding**: `func_0202b9b0`'s near-miss traced to a genuine **relocation-target identity mismatch**, not a codegen difference — `symbols.txt` defines `data_020be822` as its own distinct symbol 2 bytes into `data_020be820`, and the target's `.s` relocates directly to it, while addend-based access (`data_020be820[i].value`, or explicit `+2` arithmetic) relocates to `data_020be820+2` instead. objdiff-cli's pre-link comparison treats these as different even though they resolve to the same final address; **did not get time to confirm whether this is a true post-link no-op** (worth a follow-up: `ninja sha1` on a build using the addend form, before assuming a project-wide "reference the split symbol directly" rule).
+Ships: `func_02018a84` (3-bit bitfield extraction, lever #3, first try), `func_0202b3d4` (natural signed-division-by-32 bitmap lookup, first try).
+**9 parked**: `func_0202111c`/`func_0202a240` (double-pool-load, recognized on sight), `func_0202b9b0` (relocation-identity near-miss, see above), `func_02038d70` (loop-form near-miss — plain `while`, `goto`, and `for(;;)` all produced the identical wrong shape; a `while` variant was closest at 75%), `func_02000d0c`/`func_02019858` (scheduling-only near-misses, 62.5–93.75%), `func_02022540`/`func_0202bb88`/`func_020338b8` (larger deviations, one attempt each, not pursued further under this batch's time budget).
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/11 shipped (18%), cumulative 29/52 (56%).
 
 ### cm-ov002-unknown-2 — ov002 unknown pool, batch 2 [TODO]
 
