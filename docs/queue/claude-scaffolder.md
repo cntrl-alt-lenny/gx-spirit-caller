@@ -2,11 +2,11 @@
 
 # Claude Code Scaffolder — autonomous C-match queue (WALL-AWARE)
 
-**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next claude-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Candidate list via `python tools/wall_aware_headroom.py --json`. Hand C-match a batch, byte-verify, gate `python tools/gate3.py --scope all --no-tests`, ONE PR **per item**, `work_queue.py done`, commit, then immediately take the next item. Effort MAX.
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next claude-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Candidate list via `python tools/wall_aware_headroom.py --json`. Hand C-match a batch, byte-verify, gate `python tools/gate3.py --scope all` (including pytest), ONE PR **per item**, `work_queue.py done`, commit, then immediately take the next item. Effort MAX.
 
 **Pool status (2026-07-23 — supersedes the old "~245 convertible" line, which came from the broken pre-b651 classifier):** the honest pool is **6,093 candidates** (116 coercible + 5,945 never-assessed + 32 no-marker); only **32 files project-wide are confirmed-permanent**. Brief 661 established that `main`'s never-assessed tranche is **real runway, not disguised walls** — the generic "reg-alloc-walled, no C match (brief 294 endgame)" header is NOT evidence and was wrong more often than right on a true random sample.
 
-⚠️ **Gate with `--no-tests`** — the pytest step has 12 known pre-existing Windows path-sep failures unrelated to your work. ⚠️ **NEVER bare `ninja`.** ⚠️ **Park the reg-alloc/scratch-register wall on sight** (identical instructions, one register swapped throughout) — 100% lever-insensitive per brief 641; do not iterate on it.
+⚠️ **The full gate is required by default;** the Windows path-separator baseline has been fixed or explicitly prerequisite-gated. ⚠️ **NEVER bare `ninja`.** ⚠️ **Park the reg-alloc/scratch-register wall on sight** (identical instructions, one register swapped throughout) — 100% lever-insensitive per brief 641; do not iterate on it.
 
 **CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
 

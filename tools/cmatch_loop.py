@@ -604,7 +604,10 @@ def s_routed_complete_tu(region: str, module: str, func: str) -> str | None:
     if not delinks_path.is_file():
         return None
     s_path = src_path(region, module, func, suffix=".s")
-    rel = str(s_path.relative_to(ROOT))
+    # delinks.txt uses repository-relative POSIX paths on every host;
+    # normalize the Path before comparing so the routed-TU check is
+    # cross-platform.
+    rel = s_path.relative_to(ROOT).as_posix()
     _sections, tus = progress.parse_delinks_file(delinks_path)
     for tu in tus:
         if tu.get("source") == rel and tu.get("status") == "complete":

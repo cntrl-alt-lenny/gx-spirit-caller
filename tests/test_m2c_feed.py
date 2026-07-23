@@ -16,11 +16,14 @@ Three parts:
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
+
+import pytest
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -161,15 +164,16 @@ class TestFindCoreHeader(unittest.TestCase):
         self.assertIsNotNone(h)
         self.assertTrue(h.is_file())
         self.assertEqual(h.name, "ov002_core.h")
-        self.assertNotIn("/usa/", str(h))
-        self.assertNotIn("/jpn/", str(h))
+        path = h.as_posix()
+        self.assertNotIn("/usa/", path)
+        self.assertNotIn("/jpn/", path)
 
     def test_usa_and_jpn_are_region_prefixed(self):
         for region in ("usa", "jpn"):
             h = find_core_header(region, "ov002")
             self.assertIsNotNone(h)
             self.assertTrue(h.is_file())
-            self.assertIn(f"/{region}/", str(h))
+            self.assertIn(f"/{region}/", h.as_posix())
 
     def test_main_has_no_core_header(self):
         # arm9 has no consolidated header — too heterogeneous (brief 555
@@ -187,6 +191,10 @@ class TestBuildContext(unittest.TestCase):
         # No header for `main` -> None immediately, no m2ctx/gcc subprocess.
         self.assertIsNone(build_context("eur", "main"))
 
+    @pytest.mark.skipif(
+        shutil.which("gcc") is None,
+        reason="m2ctx integration requires the gcc executable",
+    )
     def test_ov002_context_carries_struct_and_extern_decls(self):
         ctx_path = build_context("eur", "ov002")
         self.assertIsNotNone(ctx_path)

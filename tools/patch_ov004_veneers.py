@@ -1762,7 +1762,7 @@ def main() -> int:
         try:
             map_text = args.map.read_text(encoding="utf-8")
         except OSError as e:
-            print(f"error: read {args.map}: {e}", file=sys.stderr)
+            print(f"error: read {args.map.as_posix()}: {e}", file=sys.stderr)
             return 1
 
     # Brief 194 diagnostic — print per-TU shifts and exit. Used
@@ -1779,7 +1779,7 @@ def main() -> int:
         try:
             tu_sections = parse_link_map_ov004(map_text)
         except PatchError as e:
-            print(f"error: parse {args.map}: {e}", file=sys.stderr)
+            print(f"error: parse {args.map.as_posix()}: {e}", file=sys.stderr)
             return 1
         dump_tu_shifts(tu_sections)
         return 0

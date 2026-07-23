@@ -252,15 +252,15 @@ class TestRenderByteDirective(unittest.TestCase):
 class TestExtractBinPath(unittest.TestCase):
     def test_main_path(self):
         path = _extract_bin_path("eur", "main")
-        self.assertTrue(str(path).endswith("extract/eur/arm9/arm9.bin"))
+        self.assertTrue(path.as_posix().endswith("extract/eur/arm9/arm9.bin"))
 
     def test_overlay_path(self):
         path = _extract_bin_path("eur", "ov005")
-        self.assertTrue(str(path).endswith("extract/eur/arm9/arm9_ov005.bin"))
+        self.assertTrue(path.as_posix().endswith("extract/eur/arm9/arm9_ov005.bin"))
 
     def test_tcm_path(self):
-        self.assertTrue(str(_extract_bin_path("eur", "dtcm")).endswith("dtcm.bin"))
-        self.assertTrue(str(_extract_bin_path("eur", "itcm")).endswith("itcm.bin"))
+        self.assertTrue(_extract_bin_path("eur", "dtcm").as_posix().endswith("dtcm.bin"))
+        self.assertTrue(_extract_bin_path("eur", "itcm").as_posix().endswith("itcm.bin"))
 
 
 class TestGenerateChunkSmoke(unittest.TestCase):

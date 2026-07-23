@@ -134,7 +134,9 @@ def resolve_symbol(region: str, target: str, module_hint: str | None = None) -> 
             ) from exc
     hits = []
     for sf in _symbols_files(region):
-        mod_m = re.search(r"/(ov\d+|arm9)/symbols\.txt$", str(sf))
+        # Windows paths use backslashes, while the same repository layout
+        # is conventionally written with forward slashes in diagnostics.
+        mod_m = re.search(r"[\\/](ov\d+|arm9)[\\/]symbols\.txt$", str(sf))
         module = "main" if (mod_m and mod_m.group(1) == "arm9") else (
             mod_m.group(1) if mod_m else "?")
         if module_hint and module != module_hint:

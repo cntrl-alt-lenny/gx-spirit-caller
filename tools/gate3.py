@@ -29,15 +29,15 @@ Per-region sequence (the canonical CLAUDE.md re-verify command):
     [--clean: ninja -t clean]
     ninja sha1
 
-Then once, unless --no-tests: `pytest -q tests` (a hard gate). `--invariants`
+Then once: `pytest -q tests` (a hard gate). `--invariants`
 additionally runs tools/check_match_invariants.py as an ADVISORY report (it
 never gates — see run_tests).
 
 Usage:
-    python3.13 tools/gate3.py                # full 3-region gate + invariants + tests
-    python3.13 tools/gate3.py --scope eur     # one region (fast smoke)
-    python3.13 tools/gate3.py --scope tests    # invariants + pytest only (wine-free)
-    python3.13 tools/gate3.py --clean          # force a full rebuild each region
+    python tools/gate3.py                # full 3-region gate + invariants + tests
+    python tools/gate3.py --scope eur     # one region (fast smoke)
+    python tools/gate3.py --scope tests    # invariants + pytest only (wine-free)
+    python tools/gate3.py --clean          # force a full rebuild each region
 
 Exit codes:
     0   every requested region byte-identical (+ invariants/tests green)

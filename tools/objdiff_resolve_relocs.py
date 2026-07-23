@@ -719,15 +719,17 @@ def process_objdiff_json(
         except ResolveRelocsError as e:
             failures.append((unit.get("name", "?"), str(e)))
             continue
-        unit["target_path"] = str(
-            resolved_target.relative_to(project_root)
-        ) if resolved_target.is_relative_to(project_root) else str(
-            resolved_target
+        # objdiff.json is a portable artifact: keep repository-relative
+        # paths POSIX-shaped even when generated on Windows.
+        unit["target_path"] = resolved_target.relative_to(
+            project_root
+        ).as_posix() if resolved_target.is_relative_to(project_root) else (
+            resolved_target.as_posix()
         )
-        unit["base_path"] = str(
-            resolved_base.relative_to(project_root)
-        ) if resolved_base.is_relative_to(project_root) else str(
-            resolved_base
+        unit["base_path"] = resolved_base.relative_to(
+            project_root
+        ).as_posix() if resolved_base.is_relative_to(project_root) else (
+            resolved_base.as_posix()
         )
         processed += 1
     data["units"] = units

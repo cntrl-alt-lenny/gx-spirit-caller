@@ -2,7 +2,7 @@
 
 # Codex Scaffolder — autonomous tooling queue
 
-**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output). Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
 
 **Worktree capability (match your gate to it — briefing bug b642):** `kb-map` = build-FREE (no baserom, no `dsd`) · `kb-types` = EUR baserom only · `scaffolder`/`decomper` = all 3 baseroms. If an item's gate needs a build you cannot run, say so and skip rather than forcing.
 
@@ -121,8 +121,7 @@ Brief 661 hit one recurring **epilogue-shape** mismatch **three times** on funct
 Mechanically gather every candidate whose `.s` shows the same epilogue shape as those three: search `src/**/*.s` for the epilogue pattern they share, and for each hit record address, module, size, and the exact epilogue instruction sequence. Also list which routing tier each file currently uses (plain `.c` / `.legacy.c` / `.legacy_sp3.c` / `.thumb.c`) — the tiers exist for epilogue-shape families, so tier-vs-shape correlation is the key signal.
 **Gate:** doc-only, no build; the corpus + the tier correlation table.
 
-### q-green-pytest — make the suite GENUINELY green, no known-failure baseline [TODO]
-
+### q-green-pytest — make the suite GENUINELY green, no known-failure baseline [DONE]
 External review (Sol) + swarm r5 agree: normalising 11-12 "known" failures makes real regressions invisible. Work from `kb-types` (has EUR baserom + dsd, so you can tell "missing prerequisite" from "real bug"). For EACH failing test classify and act:
 - REAL cross-platform bug (e.g. path-separator assertions) → fix the TEST or the TOOL, whichever is actually wrong;
 - MISSING-PREREQUISITE integration test (needs dsd / baserom / `cpp` binary) → `pytest.mark.skipif` with an explicit reason string checking for the prerequisite;
