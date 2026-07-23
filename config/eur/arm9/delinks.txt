@@ -1722,7 +1722,7 @@ src/main/func_0200ef60.c:
     complete
     .text start:0x0200ef60 end:0x0200efe0
 
-src/main/func_0200efe0.s:
+src/main/func_0200efe0.c:
     complete
     .text start:0x0200efe0 end:0x0200f01c
 
@@ -1782,7 +1782,7 @@ src/main/func_0200fd84.c:
     complete
     .text start:0x0200fd84 end:0x0200fdc0
 
-src/main/func_0200fdc0.s:
+src/main/func_0200fdc0.c:
     complete
     .text start:0x0200fdc0 end:0x0200fdfc
 
