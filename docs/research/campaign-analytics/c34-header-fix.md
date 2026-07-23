@@ -30,3 +30,18 @@ wall handling; this pass only removes unsupported Vanilla citations.
   build-free worktree**; preflight stopped at missing `./dsd`. No source
   bytes changed: all 28 edits are assembler comments.
 
+## EUR-capable rerun (2026-07-22)
+
+The corrected tree was rechecked from `kb-types`. `python tools/wall_aware_headroom.py`
+reports the corrected totals (`total_candidate=6088`, `coercible=88`,
+`main C-34=28`), and `python tools/gate3.py --scope eur --no-tests` passed:
+
+```text
+[eur] SHA1 PASS
+==================== GATE PASS ====================
+Verifying SHA-1 of orig\baserom_eur.nds...
+  OK  (1da50df7c210fae96dc69b3825554b9ce13b4f75)
+```
+
+This rerun changed no source files; the header correction remains byte-neutral.
+

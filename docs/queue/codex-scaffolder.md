@@ -74,6 +74,7 @@ Lint has been red for weeks and **red is the baseline**, which means a real regr
 
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [TODO]
 
+### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
 > PARKED: Corrected the live mistagged headers and recorded 58->28 main C-34 count; gate3 is blocked because kb-map lacks ./dsd. PR #1260 records the byte-neutral pass.
 Brief 655 found that **30 of `main`'s 62 "coercible" files cite C-34 with zero supporting evidence** — the identical boilerplate paragraph pasted verbatim across unrelated bodies. Examples: `func_020061bc` is a SWAR population-count routine (pool constants `0xaaaaaaaa/0xcccccccc/0xf0f0f0f0/0xff00ff00`, no address anywhere); `func_02007f38` builds one MMIO-shadow constant via 3 `orr`s; `func_0200b2f4`/`func_0201a32c`/`func_0203244c`/`func_0206d79c` have **no `.word` pool entries at all**. None involve loading the same address twice — the citation's actual mechanism. Correct those headers (remove/replace the unsupported citation with an honest "never assessed" note) so `wall_aware_headroom.py` stops reporting them as lever-shaped. Get the full list from brief 655's report, and re-verify each yourself before editing.
 **Gate:** `python tools/wall_aware_headroom.py` before/after counts + `python tools/gate3.py --scope eur --no-tests` (header comments must be byte-neutral — prove it).
