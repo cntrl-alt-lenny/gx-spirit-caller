@@ -87,12 +87,12 @@ Continue the 0-256 B `main` sweep in range `0x02040000+` (Scaffolder has the low
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
 
-### cm-epilogue-resweep — re-attempt past parks with the routing rule [TODO]
+### cm-epilogue-resweep — re-attempt past parks with the routing rule [DONE]
 
-The epilogue routing discriminator (brief 667) was unknown when earlier sweeps parked their near-misses. Re-attempt previously-parked candidates whose park reason mentions epilogue shape, stack teardown, or an unexplained tail mismatch — sources: brief 661's table, brief 655, brief 641, and the parked lists in `docs/research/campaign-analytics/cmatch-parked-and-floor.md`.
-⚠️ Do NOT re-attempt reg-alloc/scratch-register parks (100% lever-insensitive, brief 641). This is the cheapest ship batch available — the analysis is already done, only the routing was wrong.
+Brief 668: the near-miss-prose sources (brief 661's table, brief 655, brief 641, `cmatch-parked-and-floor.md`) yielded 0/7 — every one of those was a register-count/footprint wall, a different failure class from epilogue *shape*. The real source was `docs/research/campaign-analytics/epilogue-wall-corpus.md` — a mechanical 205-row census of `main` functions matching the exact epilogue-shape signature, every row still carrying a brief 294/302 "GLOBAL_ASM endgame, reg-alloc-walled" verdict predating the routing-tier discovery. **15/24 shipped (62.5%)** from that corpus, 9 parked as genuine register-choice walls. All 15 ported to USA+JPN — 2 porting bugs found and fixed along the way (a `port_to_region.py` LOW-confidence anti-match picked the wrong same-size sibling; a hardcoded struct offset differs by 8 bytes between EUR and USA/JPN, invisible to symbol-renaming tools). 3-region `gate3.py --scope all --no-tests` PASS. See docs/research/brief-668-epilogue-resweep.md.
+**Lesson for future resweeps:** source candidates from a mechanical shape-census, not from prose near-miss catalogs — the catalogs conflate epilogue-shape with register-count walls and the hit rate difference was 0% vs 62.5% on the same queue item.
 
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked counts.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS — 15 shipped, 9 re-parked.
 
 ### cm-p6-followup — hunt more retirable "permanent" walls [TODO]
 
