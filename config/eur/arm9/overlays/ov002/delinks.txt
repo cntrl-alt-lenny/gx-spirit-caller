@@ -4191,7 +4191,7 @@ src/overlay002/func_ov002_02202ae4.s:
     complete
     .text start:0x02202ae4 end:0x02202b2c
 
-src/overlay002/func_ov002_02202b2c.s:
+src/overlay002/func_ov002_02202b2c.c:
     complete
     .text start:0x02202b2c end:0x02202b58
 
@@ -5512,7 +5512,7 @@ src/overlay002/func_ov002_0220ced8.c:
     complete
     .text start:0x0220ced8 end:0x0220cf0c
 
-src/overlay002/func_ov002_0220cf0c.s:
+src/overlay002/func_ov002_0220cf0c.c:
     complete
     .text start:0x0220cf0c end:0x0220cf40
 
@@ -6064,7 +6064,7 @@ src/overlay002/func_ov002_022163f4.c:
 src/overlay002/func_ov002_02216424.s:
     complete
     .text start:0x02216424 end:0x02216530
-src/overlay002/func_ov002_02216530.s:
+src/overlay002/func_ov002_02216530.c:
     complete
     .text start:0x02216530 end:0x02216560
 
@@ -7796,7 +7796,7 @@ src/overlay002/func_ov002_0223b228.s:
 src/overlay002/func_ov002_0223b2ec.s:
     complete
     .text start:0x0223b2ec end:0x0223b3cc
-src/overlay002/func_ov002_0223b3cc.s:
+src/overlay002/func_ov002_0223b3cc.c:
     complete
     .text start:0x0223b3cc end:0x0223b400
 
@@ -13558,7 +13558,7 @@ src/overlay002/func_ov002_022ae430.s:
 src/overlay002/func_ov002_022ae588.s:
     complete
     .text start:0x022ae588 end:0x022ae718
-src/overlay002/func_ov002_022ae718.s:
+src/overlay002/func_ov002_022ae718.c:
     complete
     .text start:0x022ae718 end:0x022ae744
 
@@ -13911,7 +13911,7 @@ libs/nitro/func_ov002_022bdb14.legacy.c:
     .text start:0x022bdb14 end:0x022bdb18
 
 
-src/overlay002/func_ov002_022bdb18.s:
+src/overlay002/func_ov002_022bdb18.c:
     complete
     .text start:0x022bdb18 end:0x022bdb44
 
