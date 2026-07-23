@@ -39,7 +39,7 @@ from generate_heatmap import (  # noqa: E402
 # improvement-swarm r4 A3) — c_code_bytes' numerator never counts `.init`
 # even for a .c-sourced TU that owns some, so dividing by the `.text`+
 # `.init` total_code below would structurally cap this ratio under 100%.
-from progress import c_code_bytes, c_code_total_bytes  # noqa: E402
+from progress import c_code_bytes_by_class, c_code_total_bytes  # noqa: E402
 
 # (config dir name, display label, game code)
 REGIONS = [("eur", "EUR", "AYXP"), ("usa", "USA", "AYXE"), ("jpn", "JPN", "AYXJ")]
@@ -64,13 +64,17 @@ def region_metrics(version: str) -> dict:
     m = report["measures"] if report else {}
     matched, total = as_int(m.get("matched_code")), as_int(m.get("total_code"))
     config_dir = ROOT / "config" / version
-    c = c_code_bytes(config_dir)
+    c_split = c_code_bytes_by_class(config_dir)
+    c = sum(c_split.values())
     c_total = c_code_total_bytes(config_dir)
     return {
         "matched_pct": matched / total if total else 0.0,
         "c_pct": c / c_total if c_total else 0.0,
         "matched": matched,
         "c": c,
+        "c_total": c_total,
+        "natural_c": c_split["natural-c"],
+        "asm_c": c_split["asm-c"],
         "total": total,
     }
 
@@ -145,7 +149,9 @@ def main() -> None:
     for ver, label, _code in REGIONS:
         mm = region_metrics(ver)
         print(
-            f"  {label}: C {mm['c_pct'] * 100:.1f}%  |  byte-matched "
+            f"  {label}: Natural-C {mm['natural_c']}/{mm['c_total']} B, "
+            f"asm-C {mm['asm_c']}/{mm['c_total']} B, "
+            f"C {mm['c_pct'] * 100:.1f}%  |  byte-matched "
             f"{mm['matched_pct'] * 100:.1f}%  ({mm['c']}/{mm['matched']}/{mm['total']})"
         )
 

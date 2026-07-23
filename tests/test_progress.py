@@ -25,7 +25,9 @@ from progress import (  # noqa: E402
     DATA_SECTIONS,
     FINISHABLE_HEADROOM_FRACTION,
     _discover_module_delinks,
+    classify_c_source,
     c_code_bytes,
+    c_code_bytes_by_class,
     c_code_total_bytes,
     canary_reconciliation,
     count_functions_in_symbols,
@@ -347,6 +349,19 @@ class TestCCodeBytes(unittest.TestCase):
     REFRAME): unlike matched_code/complete_units above, this must NOT
     count a `.s` ship — only bytes from a `.c`/`.cpp`-sourced TU."""
 
+    def test_classifies_natural_c(self):
+        self.assertEqual(classify_c_source("void f(void) { return; }"), "natural-c")
+
+    def test_classifies_asm_c(self):
+        self.assertEqual(classify_c_source("asm void f(void) { nop; }"), "asm-c")
+        self.assertEqual(classify_c_source("void f(void) { asm { nop; } }"), "asm-c")
+
+    def test_comment_mention_does_not_classify_as_asm(self):
+        self.assertEqual(
+            classify_c_source("/* asm void fake(void) */ void f(void) { return; }"),
+            "natural-c",
+        )
+
     def _make_config(self, delinks_content: str) -> Path:
         tmp = tempfile.mkdtemp()
         arm9 = Path(tmp) / "arm9"
@@ -367,6 +382,7 @@ class TestCCodeBytes(unittest.TestCase):
             "    .text start:0x0 end:0x40\n"
         )
         self.assertEqual(c_code_bytes(root), 0x40)
+        self.assertEqual(sum(c_code_bytes_by_class(root).values()), 0x40)
 
     def test_cpp_tu_counted(self):
         root = self._make_config(

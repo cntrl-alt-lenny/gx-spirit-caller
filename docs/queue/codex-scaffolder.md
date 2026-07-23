@@ -129,8 +129,7 @@ External review (Sol) + swarm r5 agree: normalising 11-12 "known" failures makes
 END STATE: `python -m pytest -q tests` fully green on Windows AND unchanged-green on POSIX (don't weaken what a test verifies where it CAN run). Then update the queue headers + gate3 guidance to drop the `--no-tests` advice — the full gate becomes usable everywhere.
 **Gate:** full pytest output pasted green + `python tools/configure.py eur && ninja sha1` OK (byte-neutrality).
 
-### q-natural-c-metric — split natural-C vs asm-in-C in the readable-C metric [TODO]
-
+### q-natural-c-metric — split natural-C vs asm-in-C in the readable-C metric [DONE]
 **108 of 10,519 matched `.c` TUs contain inline asm** (`asm void` / `asm {` — e.g. the cm-ov002-batch1 ships, plus legit BIOS wrappers like CpuFastSet.c) and ALL currently count toward "C-decompiled" — inflating the headline readable-C number. Fix the metric:
 1. Grep-classify first and enumerate the exact in-tree patterns (`asm void`, statement `asm {`, anything else) — list what you find in the PR.
 2. In the C-decompiled computation (tools/progress.py + the c_code_bytes path in generate_progress_bars.py): a TU whose source matches the patterns = ASM-C; else NATURAL-C. Emit two lines: `Natural-C` and `asm-C`; their SUM must equal the old C-decompiled number — prove sum-preservation in the PR with before/after.

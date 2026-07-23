@@ -30,6 +30,7 @@ need to know which source was used.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -161,6 +162,117 @@ def parse_delinks_file(delinks_file: Path) -> tuple[list[tuple[str, int, int]], 
     return module_sections, tus
 
 
+def _strip_c_comments_and_literals(source: str) -> str:
+    """Blank comments and string/char literals without joining tokens.
+
+    The readable-C classifier must not turn a documentation example such as
+    ``/* asm void fake() */`` into ASM-C. Blanking rather than deleting keeps
+    token boundaries and line structure stable for the small lexical scan.
+    """
+    out: list[str] = []
+    i = 0
+    state = "code"
+    while i < len(source):
+        ch = source[i]
+        nxt = source[i + 1] if i + 1 < len(source) else ""
+        if state == "code":
+            if ch == "/" and nxt == "/":
+                out.extend("  ")
+                i += 2
+                state = "line-comment"
+            elif ch == "/" and nxt == "*":
+                out.extend("  ")
+                i += 2
+                state = "block-comment"
+            elif ch in ('"', "'"):
+                out.append(" ")
+                i += 1
+                state = "string" if ch == '"' else "char"
+            else:
+                out.append(ch)
+                i += 1
+        elif state == "line-comment":
+            if ch == "\n":
+                out.append("\n")
+                state = "code"
+            else:
+                out.append(" ")
+            i += 1
+        elif state == "block-comment":
+            if ch == "*" and nxt == "/":
+                out.extend("  ")
+                i += 2
+                state = "code"
+            else:
+                out.append("\n" if ch == "\n" else " ")
+                i += 1
+        else:  # string or character literal
+            if ch == "\\" and i + 1 < len(source):
+                out.extend("  ")
+                i += 2
+            elif (state == "string" and ch == '"') or (
+                state == "char" and ch == "'"
+            ):
+                out.append(" ")
+                i += 1
+                state = "code"
+            else:
+                out.append("\n" if ch == "\n" else " ")
+                i += 1
+    return "".join(out)
+
+
+def classify_c_source(source: str) -> str:
+    """Return ``natural-c`` or ``asm-c`` for a C/C++ source body.
+
+    The project uses Metrowerks' declaration-style ``asm`` escape hatch;
+    retain a generic ``asm`` token fallback for non-void return types and
+    statement-style/extension spellings. Comments and literals are blanked
+    first so prose mentioning asm remains Natural-C.
+    """
+    clean = _strip_c_comments_and_literals(source)
+    if re.search(r"\b(?:__asm|asm)\b", clean, flags=re.IGNORECASE):
+        return "asm-c"
+    return "natural-c"
+
+
+def c_code_bytes_by_class(
+    config_dir: Path, *, require_complete: bool = False,
+) -> dict[str, int]:
+    """Return readable-C `.text` bytes split into natural-C and ASM-C.
+
+    This is deliberately the same delinks walk as :func:`c_code_bytes`;
+    keeping the aggregate as the sum of these two buckets makes the metric
+    split backward-compatible and mechanically sum-preserving.
+    """
+    totals = {"natural-c": 0, "asm-c": 0}
+    source_classes: dict[str, str] = {}
+    for delinks in config_dir.rglob("delinks.txt"):
+        _module_sections, tus = parse_delinks_file(delinks)
+        for tu in tus:
+            source = tu.get("source", "")
+            if not (source.endswith(".c") or source.endswith(".cpp")):
+                continue
+            if require_complete and tu.get("status") != "complete":
+                continue
+            category = source_classes.get(source)
+            if category is None:
+                source_path = ROOT / Path(source)
+                try:
+                    text = source_path.read_text(encoding="utf-8")
+                except OSError:
+                    # Preserve the old metric's behavior for synthetic or
+                    # incomplete fixtures whose source body is unavailable.
+                    category = "natural-c"
+                else:
+                    category = classify_c_source(text)
+                source_classes[source] = category
+            for name, start, end in tu.get("sections", []):
+                if name == ".text":
+                    totals[category] += max(0, end - start)
+    return totals
+
+
 def c_code_bytes(config_dir: Path, *, require_complete: bool = False) -> int:
     """Sum of `.text` bytes for TUs sourced from a `.c`/`.cpp` file (never
     `.s`) across every `config_dir/**/delinks.txt`.
@@ -197,19 +309,9 @@ def c_code_bytes(config_dir: Path, *, require_complete: bool = False) -> int:
     each TU its own correctly-scoped `source` field, eliminating that
     leak by construction.
     """
-    total = 0
-    for delinks in config_dir.rglob("delinks.txt"):
-        _module_sections, tus = parse_delinks_file(delinks)
-        for tu in tus:
-            source = tu.get("source", "")
-            if not (source.endswith(".c") or source.endswith(".cpp")):
-                continue
-            if require_complete and tu.get("status") != "complete":
-                continue
-            for name, start, end in tu.get("sections", []):
-                if name == ".text":
-                    total += max(0, end - start)
-    return total
+    return sum(c_code_bytes_by_class(
+        config_dir, require_complete=require_complete,
+    ).values())
 
 
 def c_code_total_bytes(config_dir: Path) -> int:
@@ -651,11 +753,15 @@ def print_report(version: str, report: dict, config_dir: Path | None = None) -> 
     # .text+.init denominator structurally caps the ratio below 100%
     # even at full decomp (brief 566 / improvement-swarm r4 A3).
     if config_dir is not None:
-        c_matched = c_code_bytes(config_dir)
+        c_split = c_code_bytes_by_class(config_dir)
         c_total = c_code_total_bytes(config_dir)
+        c_matched = sum(c_split.values())
+        print(f"  Natural-C:    {c_split['natural-c']:>10} / {c_total:<10} bytes  "
+              f"({pct(c_split['natural-c'], c_total):5.2f}%)")
+        print(f"  asm-C:        {c_split['asm-c']:>10} / {c_total:<10} bytes  "
+              f"({pct(c_split['asm-c'], c_total):5.2f}%)")
         print(f"  C-decompiled: {c_matched:>10} / {c_total:<10} bytes  "
-              f"({pct(c_matched, c_total):5.2f}%)  <- true readable-C metric, "
-              f"distinct from 'code' above (which also counts .s ships)")
+              f"({pct(c_matched, c_total):5.2f}%)  <- sum of Natural-C + asm-C")
     print()
 
     if report.get("categories"):
@@ -716,7 +822,10 @@ def main() -> int:
             report = json.load(f)
         if args.json:
             payload = dict(report)
-            payload["c_code_bytes"] = c_code_bytes(config_dir)
+            c_split = c_code_bytes_by_class(config_dir)
+            payload["c_code_bytes"] = sum(c_split.values())
+            payload["c_code_natural_bytes"] = c_split["natural-c"]
+            payload["c_code_asm_bytes"] = c_split["asm-c"]
             payload["c_code_total_bytes"] = c_code_total_bytes(config_dir)
             json.dump(payload, sys.stdout, indent=2)
             print()
@@ -732,8 +841,11 @@ def main() -> int:
         if args.json:
             # Merge a `state: delinks` tag so downstream tools can see
             # the provenance without changing their measures-reading code.
+            c_split = c_code_bytes_by_class(config_dir)
             payload = {"version": args.version, "state": "delinks",
-                       "c_code_bytes": c_code_bytes(config_dir),
+                       "c_code_bytes": sum(c_split.values()),
+                       "c_code_natural_bytes": c_split["natural-c"],
+                       "c_code_asm_bytes": c_split["asm-c"],
                        "c_code_total_bytes": c_code_total_bytes(config_dir),
                        **delinks_summary}
             json.dump(payload, sys.stdout, indent=2)
