@@ -101,8 +101,12 @@ Same as batch D, next tranche. Report the cumulative rate across A/B/D/E so we c
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate.
 
-### cm-ov002-unknown-2 — ov002 unknown pool, batch 2 [TODO]
-
+### cm-ov002-unknown-2 — ov002 unknown pool, batch 2 [DONE]
 Brief 664 shipped **6/11** from ov002's unknown pool — note this is the *unknown/never-assessed* tranche, NOT the coercible pool (drained) and NOT the ~2,750 files brief 654 verified as genuine reg-alloc walls. Continue with a fresh batch, same discipline: header-read, route by epilogue, park verified walls immediately.
 
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
+**Result: 2/6 shipped (33%) EUR, ported to USA+JPN (6 objects, 3-region gate PASS).**
+
+**Correction to brief 664's own methodology note:** its report states "everything below 505B has already been swept by earlier size-tier passes" as the reason it started sampling at 505B+. That's **not accurate** — a direct `wall_aware_headroom.py` scan of ov002's unknown pool (excluding all 26 addresses brief 650+664 already touched) found **2,298 of 2,730 unknown-pool files are still under 500B**, many as small as 40–60B. This is the same "documented already-swept claim doesn't hold up empirically" pattern already seen in brief 655 (30/40 mistagged C-34 citations) and brief 661 (main's tranche). Pivoted to this newly-confirmed small-tier runway instead of the 500B+ tier brief 664 sampled — those 500B+ candidates read as genuinely complex multi-branch state machines (150+ lines, 8+ callees each) in the 4 spot-checked, consistent with the large-tier probe's earlier finding that size correlates with real difficulty in this codebase.
+Ships: `func_ov002_0226acf8` (4-field struct-write dispatcher, first try), `func_ov002_0227aa50` (4-byte-bitfield full-word clear + separate halfword set, lever #3, first try).
+**4 parked after 1–2 attempts each, all under this item's remaining time budget**: `func_ov002_02273500`/`func_ov002_021d81d4` (tail-call-via-`bx` argument-prep near-misses, register-letter/instruction-order residue), `func_ov002_0220c2c0` (branch-vs-predicate guard — unlike 5/5 prior instances this session, `goto`-to-separate-tail had **zero effect** here, confirming this lever is situational, not universal), `func_ov002_0220ddf4` (pure register-letter swap, matches the reg-alloc anti-pattern). None reached the "genuine wall" confirmation bar (2–3 attempts) that batches D/E used — flagged as unresolved-not-confirmed-wall given the time constraint, worth a fresh attempt in a future batch rather than treating as settled.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/6 shipped (33%), ported to USA+JPN via `port_to_region.py`.
