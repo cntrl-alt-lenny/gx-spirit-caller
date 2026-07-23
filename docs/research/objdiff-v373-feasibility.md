@@ -125,6 +125,19 @@ v3 report/diff probes are explicitly deferred to a build-capable checkout.
 
 ## Sources in this checkout
 
+## EUR-capable rerun (2026-07-22)
+
+This item was re-run from the EUR-capable `kb-types` checkout. The build
+pipeline can configure and reproduce the EUR ROM: `python tools/configure.py
+eur` followed by the explicitly scoped `ninja sha1` completed with
+`gx-spirit-caller_eur.nds: OK`. That removes the prior missing-baserom
+blocker, but it does not change the feasibility verdict: the requested
+`python -m pytest -q tests` gate remains red on the existing Windows/path/tool
+environment assumptions (11 failed, 2,848 passed, 20 skipped, 55 subtests).
+No pin or production source was changed. The v3 report-generation and direct
+diff A/B probes remain a separate migration trial, so the pin stays at
+v2.7.1 and panic-filter case (a) stays enabled.
+
 - [`tools/configure.py`](../../tools/configure.py) — current `OBJDIFF_VERSION`
   pin and report pipeline.
 - [`tools/objdiff_filter_panic_units.py`](../../tools/objdiff_filter_panic_units.py)

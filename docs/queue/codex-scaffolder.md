@@ -36,6 +36,8 @@ Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles
 
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [TODO]
 
+### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+> PARKED: kb-types EUR rerun configured and ninja sha1 passed, but required pytest remains red (11 pre-existing Windows/path/tool-environment failures); v3 A/B probes still require a separate migration trial.
 >
 > PARKED: Report delivered; pytest gate ran but remains red on 11 pre-existing Windows/path/build-environment failures (2843 passed, 25 skipped, 55 subtests). Re-run on a POSIX/build-capable worktree before pin migration.
 Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we own this patch forever" belief is dead, and v3.7.3 ships prebuilts for all three hosts. But this is NOT a blind bump: v3.0.0 self-describes as a rewrite (251 commits / 186 files), **10 `report.json` consumers ride this schema**, and the genuinely untested risk is dsd v0.11.0's `objdiff.json` ↔ v3 config schema. Produce a feasibility report: what breaks, which consumers need changes, whether our panic-filter case (a) can retire (case (b) stays), and a go/no-go with a migration order. Do a read-only trial if you can (fetch v3.7.3, run it against one unit) without changing the pinned version.
