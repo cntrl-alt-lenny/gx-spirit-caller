@@ -127,8 +127,12 @@ R&D swarm r6 (docs/research/rnd-swarm-2026-07-23-r6.md, bet 1) found the brief-6
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped count + the retired-rule doc edits.
 
-### cm-main-small-g — continue the small/medium main sweep (batch G) [TODO]
+### cm-main-small-g — continue the small/medium main sweep (batch G) [DONE]
 
 Continue the 0-256B `main` sweep, range 0x02000000-0x0203ffff. Route by epilogue BEFORE drafting (header at top of this file). Recent batches ran 54-87%. Once Codex ships q-headroom-textsize, use `--max-size 256`; until then header-read + size-check per candidate.
 
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + running rate.
+**Result: 2/4 shipped (50%)**, cumulative A+B+D+E+G = 31/56 shipped (55%). `q-headroom-textsize` hadn't landed yet (`wall_aware_headroom.py --help` still shows no size flag), so candidates were sourced the same way as batches D/E: `--json` + a symbols.txt size join. A short batch — this item ran directly after `cm-regalloc-ship`, which had already consumed a large share of the available session time on genuine per-function investigation (3/7 reproduced there).
+Skipped `func_02000cc4` on sight without attempting: it's the exact function cited in codegen-walls.md's P-4 permuter rule-out (900 iterations, confirmed-permanent r4↔r5 swap) — recognized by address, not re-tried.
+Ships: `func_02018e88` (dual-mode struct-field-vs-array-element writer; needed the "always compute the array-element pointer, even on the branch that doesn't use it" lever — matches lever-payoff.md #12's short-body-pure-predication family: an early-return-shaped if/else tempted the compiler into a real branch instead of the target's straight-line predicated form), `func_0201a3ec` (bitfield lever #3, single-bit `sysWork` flag check-and-set).
+**2 parked, both pure register-letter residue after 1-2 attempts** (branch-vs-predicate `goto` fix and struct-field reordering respectively, neither changed the outcome): `func_02025840` (bit0/bit1 guard chain — goto fixed the *branch* shape but left a size/residue mismatch elsewhere), `func_02000f84` (4-field zero-out + counter increment — same register-letter-swap signature as several `cm-regalloc-ship` residuals from this session, worth revisiting together). Also skipped 2 further candidates unattempted as too complex for remaining budget: `func_02005188`/`func_020051cc` (near-identical multi-arg forwarding thunks that inject a literal function-pointer constant as a 7th call argument via 3 stack-passed words — genuinely uncertain arity, not attempted rather than risk a wrong model).
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/4 shipped (50%), cumulative 31/56 (55%).
