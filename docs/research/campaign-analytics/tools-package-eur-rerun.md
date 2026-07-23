@@ -29,3 +29,12 @@ The required `python -m pytest -q tests` gate remains red on the pre-existing
 Windows/path/tool-environment baseline: 11 failed, 2,848 passed, 20 skipped,
 55 subtests. No migration-related failure was observed, so the item remains
 parked until the stated green pytest gate is available.
+
+## Reopened queue rerun (2026-07-23)
+
+The reopened item was rechecked after the research index gained additional
+reports: pytest now reports **12 failed, 2,847 passed, 20 skipped, 55
+subtests**, with the extra failure being the generated research-index
+freshness check. `python tools/configure.py eur` followed by `ninja sha1`
+still completes and verifies the original EUR SHA-1. No parser migration
+failure was found; the item remains parked pending `q-green-pytest`.

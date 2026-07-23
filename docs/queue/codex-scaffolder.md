@@ -54,8 +54,8 @@ ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 1
 One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the single biggest lever-shaped opportunity in the pool. Mechanically gather every C-34-cited file into one reference: address, module, size, the exact `.s` shape that triggered the citation, and any ALREADY-MATCHED example of the same shape (search matched `.c` for siblings). You are assembling evidence, NOT deriving the recipe — a CC agent cracks it; your job is to hand them the corpus so they don't spend hours collecting it.
 **Gate:** the corpus doc + counts; doc-only, no build.
 
-### q-tools-package — kill the tools/ boilerplate and parser duplication [TODO]
-
+### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+> PARKED: kb-types EUR configure+ninja sha1 passed; pytest remains red with 12 failures including the stale generated research-index check, so defer until q-green-pytest.
 ### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
 
 > PARKED: kb-types EUR configure and ninja sha1 passed; required pytest remains red on 11 pre-existing Windows/path/tool-environment failures (2848 passed, 20 skipped, 55 subtests), so keep parked until the stated green pytest gate.
