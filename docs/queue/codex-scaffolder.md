@@ -111,8 +111,7 @@ needed a build and `kb-map` has no baserom. That was a briefing error, not your 
 `python tools/configure.py eur && ninja sha1` (⚠️ never bare `ninja`). If an item still
 cannot be gated even there, re-park it with the specific reason — that remains the right call.
 
-### q-epilogue-corpus — assemble the epilogue-shape wall corpus [TODO]
-
+### q-epilogue-corpus — assemble the epilogue-shape wall corpus [DONE]
 Brief 661 hit one recurring **epilogue-shape** mismatch **three times** on functions whose bodies matched 100% (`func_020915e4` loop body 100%, `func_020458d8` all four branch bodies 100%, `func_0206eecc`) — roughly 14% of its sample. The CC Decomper is trying to crack the lever (`cm-epilogue-wall`); your job is to hand it the full corpus so it isn't hunting.
 Mechanically gather every candidate whose `.s` shows the same epilogue shape as those three: search `src/**/*.s` for the epilogue pattern they share, and for each hit record address, module, size, and the exact epilogue instruction sequence. Also list which routing tier each file currently uses (plain `.c` / `.legacy.c` / `.legacy_sp3.c` / `.thumb.c`) — the tiers exist for epilogue-shape families, so tier-vs-shape correlation is the key signal.
 **Gate:** doc-only, no build; the corpus + the tier correlation table.
