@@ -39,10 +39,9 @@ Brief 655 covered main's 62-file slice (the biggest single concentration): 20 re
 Brief 655 sampled the ~25 smallest files by disk size, read ~18, attempted 9, shipped 2 (`func_020ace98`, `func_020a6a00`). New lever found: converging both branches of an early-return onto one shared final `return` (instead of an early separate `return`) turned a predicated near-miss into a real branch and a 100% match. See docs/research/brief-655-main-sweep.md for the full per-file table (including near-misses at 45-80% worth a second pass). Only ~34 of main's 2,372 unknown files have been read/attempted total across briefs 640+655 — this bucket is nowhere near exhausted.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
 
-### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [TODO]
-
-Continue main's `unknown` pool (still ~2,362 files after briefs 640+655's combined sampling) — different functions than the prior batches. Get the list via `wall_aware_headroom.py --json` (`main.unknown_files`), sort by disk size (`ls -la src/main/*.s | sort -k5 -n`) and take the next size tier up from what's already been read (briefs 640/655 covered roughly the smallest ~500-560 byte files). Header-read before compiling. Batch of 15-25.
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
+### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [DONE]
+Brief 663: 14/17 shipped (82%) from the 650-780 byte tier, ported to USA+JPN (28 objects), 3-region gate PASS. New levers: `.legacy.c`/`.legacy_sp3.c` routing also fixes default-tier literal-pool over-folding for nearby MMIO constants (not just epilogue shape); variadic-forwarding thunks reproduce byte-exact via manual `(addr & ~(align-1)) + size` pointer arithmetic (no `stdarg.h` in this toolchain); mwcc spills all 4 arg registers whenever ANY parameter's address is taken, regardless of real arity. 3 near-misses parked (func_0209a8d0 73.68%, func_0209a884 0%, func_0206df54 40%) — all a "want branch, got predication" pattern with no working lever found yet, opposite direction from brief 655's converge-to-return fix. See docs/research/brief-663-main-unknown-batch2.md, including a tooling gotcha: a delinks.txt patch must replace the OLD entry's full body (header + complete + .text line), not just the header line, or `dsd delink` crashes on a full clean rebuild with a corrupted duplicate block.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 14 converted.
 
 ### cm-unknown-ov002-651 — C-match a batch from ov002's unknown pool (brief 651) [TODO]
 
