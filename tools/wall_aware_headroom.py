@@ -68,6 +68,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from parsers import parse_delinks_file, parse_symbols_file
+
 ROOT = Path(__file__).resolve().parent.parent
 # EUR baseline module dirs only (region ports live under src/usa, src/jpn).
 _MODULE_RE = re.compile(r"^src/(main|overlay\d+)/[^/]+\.s$")
@@ -144,24 +146,94 @@ def _live_sources() -> set[str]:
     return refs
 
 
+def _source_module(rel: str) -> str:
+    """Map an EUR source path to dsd's symbol-module name."""
+    m = _MODULE_RE.match(rel)
+    if not m:
+        return ""
+    return "main" if m.group(1) == "main" else f"ov{m.group(1)[7:]}"
+
+
+def _delink_text_sizes() -> dict[str, int]:
+    """Return each live source TU's committed `.text` span in bytes."""
+    sizes: dict[str, int] = {}
+    for delinks in (ROOT / "config").rglob("delinks.txt"):
+        _module_sections, tus = parse_delinks_file(delinks)
+        for tu in tus:
+            source = tu.get("source", "")
+            if not source.startswith("src/") or not source.endswith(".s"):
+                continue
+            size = sum(
+                max(0, end - start)
+                for name, start, end in tu.get("sections", [])
+                if name == ".text"
+            )
+            # Region-specific source paths are distinct, while the EUR
+            # baseline paths used by this selector are unique. Keep the
+            # largest observed span if a generated config repeats a path.
+            sizes[source] = max(size, sizes.get(source, 0))
+    return sizes
+
+
+def _symbol_addresses() -> dict[tuple[str, str], str]:
+    """Index EUR function symbols as stable human-readable hex addresses."""
+    addresses: dict[tuple[str, str], str] = {}
+    eur_arm9 = ROOT / "config" / "eur" / "arm9"
+    symbol_files = [eur_arm9 / "symbols.txt"] + sorted(
+        (eur_arm9 / "overlays").glob("ov*/symbols.txt")
+    )
+    for symbols_file in symbol_files:
+        if symbols_file.parent.name == "arm9":
+            module = "main"
+        else:
+            module = symbols_file.parent.name
+        for symbol in parse_symbols_file(symbols_file, module):
+            if symbol.is_function:
+                addresses[(module, symbol.name)] = f"0x{symbol.addr:08x}"
+    return addresses
+
+
+_ADDR_SUFFIX_RE = re.compile(r"(?:^|_)([0-9a-fA-F]{8})$")
+
+
+def _file_metadata(
+    rel: str, text_sizes: dict[str, int], addresses: dict[tuple[str, str], str],
+) -> dict:
+    stem = Path(rel).stem
+    module = _source_module(rel)
+    addr_match = _ADDR_SUFFIX_RE.search(stem)
+    addr = f"0x{addr_match.group(1).lower()}" if addr_match else None
+    addr = addr or addresses.get((module, stem))
+    return {"path": rel, "addr": addr, "text_size": text_sizes.get(rel)}
+
+
 def _new_module_entry() -> dict:
     return {
         "total": 0, "permanent": 0, "coercible": 0, "unknown": 0, "no_marker": 0,
         "candidate": 0,
-        "coercible_files": [],  # list of {"path": ..., "codes": [...]}
-        "unknown_files": [], "no_marker_files": [],
+        "coercible_files": [],  # list of {path, addr, text_size, codes}
+        "unknown_files": [],  # list of {path, addr, text_size}
+        "no_marker_files": [],  # list of {path, addr, text_size}
     }
 
 
-def scan() -> dict[str, dict]:
+def scan(min_size: int | None = None, max_size: int | None = None) -> dict[str, dict]:
     per: dict[str, dict] = {}
     live = _live_sources()
+    text_sizes = _delink_text_sizes()
+    addresses = _symbol_addresses()
     for p in (ROOT / "src").rglob("*.s"):
         rel = p.relative_to(ROOT).as_posix()
         m = _MODULE_RE.match(rel)
         if not m:
             continue
         if rel not in live:  # orphaned dead file, not a build input — skip
+            continue
+        metadata = _file_metadata(rel, text_sizes, addresses)
+        text_size = metadata["text_size"]
+        if min_size is not None and (text_size is None or text_size < min_size):
+            continue
+        if max_size is not None and (text_size is None or text_size > max_size):
             continue
         mod = m.group(1)
         d = per.setdefault(mod, _new_module_entry())
@@ -170,24 +242,24 @@ def scan() -> dict[str, dict]:
         d[c.kind] += 1
         if c.kind == "coercible":
             d["candidate"] += 1
-            d["coercible_files"].append({"path": rel, "codes": c.codes})
+            d["coercible_files"].append({**metadata, "codes": c.codes})
         elif c.kind == "unknown":
             d["candidate"] += 1
-            d["unknown_files"].append(rel)
+            d["unknown_files"].append(metadata)
         elif c.kind == "no_marker":
             d["candidate"] += 1
-            d["no_marker_files"].append(rel)
+            d["no_marker_files"].append(metadata)
     return per
 
 
 def _json_module(d: dict) -> dict:
-    # backward-compat key: `convertible`/`convertible_files` = the old
-    # binary-split name for the new `candidate` total (coercible + unknown +
-    # no_marker) so existing queue-doc protocols keep working unmodified.
+    # `convertible`/`convertible_files` retain the old aggregate names, but
+    # each file is now structured so selectors can use the committed address
+    # and `.text` span without falling back to on-disk `.s` byte counts.
     out = {k: v for k, v in d.items()}
     out["convertible"] = d["candidate"]
     out["convertible_files"] = (
-        [f["path"] for f in d["coercible_files"]] + d["unknown_files"] + d["no_marker_files"]
+        d["coercible_files"] + d["unknown_files"] + d["no_marker_files"]
     )
     return out
 
@@ -199,8 +271,18 @@ def main(argv: list[str]) -> int:
                     help="only show modules with >= this many candidates")
     ap.add_argument("--coercible", action="store_true",
                     help="list every coercible file with its taxonomy code(s)")
+    ap.add_argument("--min-size", type=int, default=None,
+                    help="only include files with `.text` span >= N bytes")
+    ap.add_argument("--max-size", type=int, default=None,
+                    help="only include files with `.text` span <= N bytes")
     args = ap.parse_args(argv[1:])
-    per = scan()
+    if (args.min_size is not None and args.min_size < 0) or (
+        args.max_size is not None and args.max_size < 0
+    ):
+        ap.error("size filters must be non-negative")
+    if args.min_size is not None and args.max_size is not None and args.min_size > args.max_size:
+        ap.error("--min-size cannot exceed --max-size")
+    per = scan(args.min_size, args.max_size)
     ranked = sorted(per.items(), key=lambda kv: kv[1]["candidate"], reverse=True)
     total_candidate = sum(d["candidate"] for _, d in ranked)
     total_permanent = sum(d["permanent"] for _, d in ranked)
@@ -220,11 +302,12 @@ def main(argv: list[str]) -> int:
         return 0
 
     if args.coercible:
-        print(f"{'module':12} {'addr/path':45} codes")
-        print("-" * 70)
+        print(f"{'module':12} {'addr':12} {'text_size':>9} {'path':45} codes")
+        print("-" * 90)
         for mod, d in ranked:
             for f in d["coercible_files"]:
-                print(f"{mod:12} {f['path']:45} {', '.join(f['codes'])}")
+                print(f"{mod:12} {str(f['addr']):12} {str(f['text_size']):>9} "
+                      f"{f['path']:45} {', '.join(f['codes'])}")
         return 0
 
     print(f"{'module':12} {'total.s':>8} {'perm':>6} {'coerc':>6} "

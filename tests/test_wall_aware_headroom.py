@@ -128,19 +128,62 @@ class ScanCandidateAccounting(unittest.TestCase):
         self.assertEqual(d["unknown"], 1)
         self.assertEqual(d["no_marker"], 1)
         self.assertEqual(d["candidate"], 3)  # everything except permanent
-        self.assertEqual(d["coercible_files"], [{"path": "src/main/coercible.s", "codes": ["C-34"]}])
-        self.assertEqual(d["unknown_files"], ["src/main/unknown.s"])
-        self.assertEqual(d["no_marker_files"], ["src/main/plain.s"])
+        self.assertEqual(d["coercible_files"], [{
+            "path": "src/main/coercible.s",
+            "addr": None,
+            "text_size": 0,
+            "codes": ["C-34"],
+        }])
+        self.assertEqual(d["unknown_files"], [{
+            "path": "src/main/unknown.s",
+            "addr": None,
+            "text_size": 0,
+        }])
+        self.assertEqual(d["no_marker_files"], [{
+            "path": "src/main/plain.s",
+            "addr": None,
+            "text_size": 0,
+        }])
 
     def test_json_module_backward_compat_keys(self):
         d = w._new_module_entry()
         d["total"] = 1
         d["no_marker"] = 1
         d["candidate"] = 1
-        d["no_marker_files"] = ["src/main/x.s"]
+        d["no_marker_files"] = [{"path": "src/main/x.s", "addr": None, "text_size": None}]
         out = w._json_module(d)
         self.assertEqual(out["convertible"], 1)
-        self.assertEqual(out["convertible_files"], ["src/main/x.s"])
+        self.assertEqual(out["convertible_files"], d["no_marker_files"])
+
+    def test_scan_adds_address_and_text_size_and_filters(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "src" / "main").mkdir(parents=True)
+            small = root / "src/main/func_02000010.s"
+            large = root / "src/main/func_02000020.s"
+            small.write_text("; C-34\n.text\n", encoding="utf-8")
+            large.write_text("; C-34\n.text\n", encoding="utf-8")
+            (root / "config" / "delinks.txt").write_text(
+                "src/main/func_02000010.s:\n"
+                "    .text start:0x10 end:0x30\n\n"
+                "src/main/func_02000020.s:\n"
+                "    .text start:0x20 end:0x140\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan(max_size=0x20)
+
+        self.assertEqual(per["main"]["candidate"], 1)
+        self.assertEqual(per["main"]["coercible_files"], [{
+            "path": "src/main/func_02000010.s",
+            "addr": "0x02000010",
+            "text_size": 0x20,
+            "codes": ["C-34"],
+        }])
 
 
 if __name__ == "__main__":

@@ -7,8 +7,16 @@
 The other half of brief 661's small/medium campaign (0x02040000+, ≤256B).
 `wall_aware_headroom.py --json` for main's candidate/unknown/coercible
 pools filtered to this exact address+size range yielded only **10
-files** — most of this range has already been swept by earlier
-sessions/campaigns. Header-read all 10 before compiling.
+files** using the old on-disk `.s` byte-length proxy. That is not a
+validated ≤256 B `.text` selection, so the conclusion that most of the
+range had already been swept is void. Header-read all 10 before compiling.
+
+### Measurement correction
+
+The authoritative rerun is `wall_aware_headroom.py --json --max-size 256`,
+whose `text_size` values come from committed EUR `delinks.txt` `.text`
+ranges. Do not use the historical count of 10 to close out this address
+range.
 
 ## Headline finding: P-6 "permanent" wall was a routing-tier gap, not a real wall
 
