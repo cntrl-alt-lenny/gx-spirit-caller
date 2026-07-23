@@ -51,12 +51,14 @@ verified 100% via objdiff before the final gate.
    toolchain has no real `stdarg.h` (only a pycparser stub used by an
    unrelated tool). The `va_start`-equivalent pointer is reproduced
    exactly with plain arithmetic:
+
    ```c
    void thunk(int a0, ..., int aN, ...) {
        unsigned int addr = ((unsigned int)&aN & ~3) + sizeof(aN);
        calleee(a0, ..., aN, (void *)addr);
    }
    ```
+
    Keeping the real `...` in the declaration is what makes the
    compiler emit the standard `stmdb sp!,{r0-r3}` / `stmdb sp!,{r3,lr}`
    argument-spill prologue; the align-down-then-add algebraic *order*
