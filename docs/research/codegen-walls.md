@@ -6388,7 +6388,16 @@ brief 033 reattempted them in the residue cluster and mis-declared
 them permanent under the default-tier-only test). **3 of 47 drops
 (6%)** — third-largest single wall in the set, now 0.
 
-### P-7. Pool literal not deduplicated across uses
+### P-7. Pool literal not deduplicated across uses — RETIRED, superseded by C-27
+
+**Correction (brief 668, cm-p6-followup):** this entry's own body already
+noted the fix ("SUPERSEDED BY C-27", brief 107) but kept the original
+"why permanent" framing above it, unlike P-6's corrected framing. To be
+unambiguous: this pattern is **not permanent**. Brief 107's dual-extern +
+`symbols.txt` alias entry + `void * volatile *` pointer-dance recipe
+recovers byte-identical output at the project's default mwcc 2.0/sp1p5.
+See C-27 for the codified recipe and its 157-occurrence cross-corpus
+survey. The original framing is kept below for history.
 
 **Target asm (W-C, brief 040 — `func_02023fec`):** the function
 references the same global twice (once as a value, once as a
@@ -6450,7 +6459,14 @@ dance) recovers byte-identical at the project's default mwcc
 C-27 for the codified recipe + cross-corpus survey (157
 duplicate-pool-pair occurrences, ~80 candidate functions).
 
-### P-8. Bit-chain reg-alloc: r0-only vs r0→r1→r0
+### P-8. Bit-chain reg-alloc: r0-only vs r0→r1→r0 — RETIRED, superseded by C-25
+
+**Correction (brief 668, cm-p6-followup):** same framing gap as P-7 —
+the body already says "SUPERSEDED BY C-25" (brief 100) but the "why
+permanent" section above kept the stale claim. Not permanent: splitting
+the bitfield-chain expression into two statements (brief 98's permuter
+discovery, codified as C-25) recovers byte-identical output. The
+original framing is kept below for history.
 
 **Target asm (W-D, brief 040 — `func_ov000_021ac85c`):** a
 `Fill32` call followed by a 4-step bit-mask chain on a struct
@@ -6671,7 +6687,16 @@ the diagnostic `mvn` instruction. ~12 of the 36-candidate pool
 are estimated early-return form (recoverable with natural
 source), ~24 are mask form (true P-9 permanent).
 
-### P-10. Over-predication of short tail vs early-return
+### P-10. Over-predication of short tail vs early-return — RETIRED, superseded by C-29
+
+**Correction (brief 668, cm-p6-followup):** same framing gap as P-7/P-8
+— the body already says "SUPERSEDED BY C-29" (brief 111) but the "why
+permanent" section above kept the stale claim. Not permanent: writing
+the null-guard as `if (!p) return -1;` (unary NOT) instead of `if (p ==
+0) return -1;` (equality-with-0) — both semantically identical —
+compiles to a different control-flow shape that matches orig. Brief
+111's permuter run found this at iteration ~50. The original framing is
+kept below for history.
 
 **Target asm (`func_02037b34` — brief 109 worked example):**
 
@@ -7495,6 +7520,31 @@ so the cohort remains parked pending a dedicated counter-lever study.
 **Status:** permanent-for-now / not a C-match queue target. Re-open only
 with a fresh source-form hypothesis and byte evidence; do not infer that the
 17 headers represent 17 independent untested opportunities.
+
+**Re-test (brief 668, cm-p6-followup).** Fresh independent reconstructions of
+2 more cohort members (`021e8b34`, `021eb128`), applying this session's full
+lever set (shift-pair-preserving idioms for the sibling bit-extract checks,
+explicit statement sequencing, expression regrouping):
+
+- `021e8b34`: reached 72.2% — every instruction matches except the exact one
+  the header names (`add lr, r12, lr` vs orig's `add lr, lr, r12`), cleanly
+  isolating the wall to a single instruction with no other divergence. 3
+  variants tried (combined expression, explicit `(A+B)` regrouping, 2-statement
+  sequencing) — regrouping and sequencing both made things *worse* (they
+  perturbed the surrounding register allocation, exactly as this entry's own
+  wall-family note predicts), confirming the combined single-expression form
+  is already the closest reachable point.
+- `021eb128`: additionally exposed a **second, independent** register-choice
+  wall (callee-saved `r3` vs orig's `r4`, present throughout the whole
+  function) stacked on top of the same commutative-add issue — this cohort
+  member is harder to isolate cleanly, but the same core add-operand pattern
+  is present.
+
+**Verdict: P-17 remains permanent.** 3 of 17 cohort members now confirmed
+independently (`021ebf40` from brief 654, plus these 2) — 14 remain
+genuinely untested, but the pattern is consistent across all 3 confirmed
+so far. No lever from this session's catalogue (route-before-draft,
+shift-pair preservation, branch polarity, statement sequencing) touches it.
 
 ## Codegen-inherent edge cases (3 patterns)
 
