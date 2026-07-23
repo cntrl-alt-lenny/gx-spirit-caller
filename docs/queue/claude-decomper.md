@@ -102,11 +102,13 @@ Brief 669: read all 17 P-NN entries in full. **Finding 1:** P-7, P-8, and P-10 w
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` — no source changes this brief (docs/research/codegen-walls.md only); EUR `ninja sha1` re-confirmed unaffected. Per-entry verdict: P-7/P-8/P-10 retired (framing corrected), P-17 confirmed-permanent (fresh evidence), P-16 deferred.
 
-### cm-wall-retire — systematically re-test the P-NN 'permanent' walls (r6 bet, wall-retirement lens) [TODO]
+### cm-wall-retire — systematically re-test the P-NN 'permanent' walls (r6 bet, wall-retirement lens) [DONE]
 
 Brief 665 retired P-6; r6's reg-alloc finding effectively retires part of P-4. Only 32 files are confirmed-permanent, and the P-NN entries in docs/research/codegen-walls.md have never been re-tested against current knowledge (routing tiers, lever-payoff.md, asm-void last resort). For each P-NN: does its criteria still hold? Re-test the cheapest 2-3 candidates per entry. A retirement reopens a whole class — worth far more than one ship. ⚠️ P-7/P-8/P-10 are flagged by r6 as likely-superseded — start there.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` + per-entry verdict (retired / confirmed-permanent with fresh evidence).
+
+**Result:** P-7/P-8/P-10's stale framing was already corrected in brief 669 (re-verified live on main, no new action). r6's own R&D report (`docs/research/rnd-swarm-2026-07-23-r6.md`) claiming "6 of 8 + P-4's own `func_02084ac4`" falsified was independently re-tested function-by-function: **2/7 shipped** (`func_020a71e4`, `func_020a724c` — both from the broader brief-641 catalog, genuinely fixed via a "grep actual call sites for true arity" lever, not a new allocator lever), **1 false-positive correction** (`func_02084ac4`, P-4's own cited example, re-confirmed PERMANENT across 3 variants — r6 was wrong about this one), **4 partial-progress parks** (`func_0207e214` 42.9%, `func_02096040` 66.7%, two `.thumb.c` candidates at 69-71%). Critical tooling finding: `.thumb.c` files need an explicit `#pragma thumb on` or they silently miscompile in ARM mode. Both ships ported to USA+JPN, individually objdiff-verified 100%. 3-region gate PASS. Full writeup: [`docs/research/brief-671-wall-retire.md`](../research/brief-671-wall-retire.md).
 
 ### cm-epilogue-resweep-2 — re-attempt more parked candidates with the routing discriminator [TODO]
 
