@@ -19422,7 +19422,7 @@ src/main/func_020a70fc.s:
     complete
     .text start:0x020a70fc end:0x020a71e4
 
-src/main/func_020a71e4.s:
+src/main/func_020a71e4.c:
     complete
     .text start:0x020a71e4 end:0x020a7200
 
@@ -19434,7 +19434,7 @@ src/main/func_020a7238.c:
     complete
     .text start:0x020a7238 end:0x020a724c
 
-src/main/func_020a724c.s:
+src/main/func_020a724c.c:
     complete
     .text start:0x020a724c end:0x020a7268
 
