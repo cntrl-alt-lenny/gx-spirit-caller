@@ -1157,7 +1157,7 @@ src/overlay004/func_ov004_021de250.thumb.c:
     complete
     .text start:0x021de250 end:0x021de264
 
-src/overlay004/func_ov004_021de264.s:
+src/overlay004/func_ov004_021de264.thumb.c:
     complete
     .text start:0x021de264 end:0x021de280
 
