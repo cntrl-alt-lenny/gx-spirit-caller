@@ -545,22 +545,22 @@ class TestRegionPaths(unittest.TestCase):
         p = RegionPaths.make("usa", "main")
         self.assertEqual(p.region, "usa")
         self.assertIsNone(p.overlay_num)
-        self.assertTrue(str(p.config_dir).endswith("config/usa/arm9"))
-        self.assertTrue(str(p.binary_bin).endswith(
+        self.assertTrue(p.config_dir.as_posix().endswith("config/usa/arm9"))
+        self.assertTrue(p.binary_bin.as_posix().endswith(
             "extract/usa/arm9/arm9.bin",
         ))
-        self.assertTrue(str(p.src_data_dir).endswith("src/usa/main/data"))
+        self.assertTrue(p.src_data_dir.as_posix().endswith("src/usa/main/data"))
 
     def test_overlay_paths(self) -> None:
         p = RegionPaths.make("jpn", "ov007")
         self.assertEqual(p.overlay_num, 7)
-        self.assertTrue(str(p.config_dir).endswith(
+        self.assertTrue(p.config_dir.as_posix().endswith(
             "config/jpn/arm9/overlays/ov007",
         ))
-        self.assertTrue(str(p.binary_bin).endswith(
+        self.assertTrue(p.binary_bin.as_posix().endswith(
             "extract/jpn/arm9_overlays/ov007.bin",
         ))
-        self.assertTrue(str(p.src_data_dir).endswith(
+        self.assertTrue(p.src_data_dir.as_posix().endswith(
             "src/jpn/overlay007/data",
         ))
 
