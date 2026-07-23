@@ -102,14 +102,18 @@ The CC lanes are shipping steadily (24 last round, more landing). Name any newly
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied.
 
 ### q-tool-reaudit — stricter tool classification (fix the circular audit) [DONE]
+
 The earlier dead-tool audit kept nearly everything because docs/tests reference it — circular (the test exists because the tool exists). Reclassify ALL 110 `tools/*.py` into: **CORE** (referenced by build.ninja, gate3/merge flow, or a CI workflow), **ACTIVE-CAMPAIGN** (invoked by a current queue lane or appearing in the last 30 days of brief reports), **OCCASIONAL**, **HISTORICAL** (one-off, kept only for reproducibility), **REPLACE/DELETE** (superseded or duplicated — name the successor). Evidence per tool: build.ninja/workflow/queue grep + last-meaningful-change date + last-30-days brief mentions. PROPOSE (don't execute) moving HISTORICAL out of the primary tools/ surface (e.g. tools/archive/) with a migration checklist.
 **Gate:** doc-only; the classification table with per-class counts + evidence columns.
 
 ### q-health-scorecard — ONE generated weekly scorecard [DONE]
+
 Extend the existing progress-history method (do NOT build a new subsystem — tooling budget applies) into docs/research/campaign-analytics/scorecard.md: per-region natural-C% and asm-C% (after q-natural-c-metric; until then note "split pending"), ships/week from the history series, names recovered, active tool count (CORE+ACTIVE from q-tool-reaudit), open PRs + median age (gh), CI check health. ONE regenerable doc. The point (per the external review): track OUTPUT (readable-C bytes, ships/week), not activity (PR counts, queue completions).
 **Gate:** doc-only; the scorecard + the method note.
 
 ### q-doc-archive — archive superseded STATUS docs (not brief reports) [TODO]
+
 ### q-doc-archive — archive superseded STATUS docs (not brief reports) [DONE]
+
 3,195 tracked .md; the live operational surface should be compact: state.md + 4 queues + generated indices. Move clearly-SUPERSEDED status/planning docs — e.g. path-to-100-coverage.md (superseded by endgame-ledger), safe-queue-v2/v3, pre-b651 candidate lists — into docs/research/archive/ leaving a 2-line stub pointer at each old path. Verify each is genuinely superseded (its own header says so, or a successor doc exists) before moving; if unsure, leave it. ⚠️ Do NOT touch brief-*.md reports (the historical record stays put). Regenerate the research index; the link test must stay green.
 **Gate:** doc-only; list of moves + index regenerated + link test green.

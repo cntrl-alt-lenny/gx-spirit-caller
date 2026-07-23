@@ -37,6 +37,7 @@ Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [TODO]
 
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+
 > PARKED: kb-types EUR rerun configured and ninja sha1 passed, but required pytest remains red (11 pre-existing Windows/path/tool-environment failures); v3 A/B probes still require a separate migration trial.
 >
 > PARKED: Report delivered; pytest gate ran but remains red on 11 pre-existing Windows/path/build-environment failures (2843 passed, 25 skipped, 55 subtests). Re-run on a POSIX/build-capable worktree before pin migration.
@@ -56,6 +57,7 @@ One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the 
 ### q-tools-package — kill the tools/ boilerplate and parser duplication [TODO]
 
 ### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+
 > PARKED: kb-types EUR configure and ninja sha1 passed; required pytest remains red on 11 pre-existing Windows/path/tool-environment failures (2848 passed, 20 skipped, 55 subtests), so keep parked until the stated green pytest gate.
 >
 > PARKED: Parser facade and direct-call-site batch complete; exact configure gate unavailable because orig\\baserom_eur.nds is absent. pytest ran with 2843 passed, 25 skipped, 55 subtests and 11 pre-existing Windows/path/build failures; no new failures.
@@ -75,6 +77,7 @@ Lint has been red for weeks and **red is the baseline**, which means a real regr
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [TODO]
 
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
+
 > PARKED: Corrected the live mistagged headers and recorded 58->28 main C-34 count; gate3 is blocked because kb-map lacks ./dsd. PR #1260 records the byte-neutral pass.
 Brief 655 found that **30 of `main`'s 62 "coercible" files cite C-34 with zero supporting evidence** — the identical boilerplate paragraph pasted verbatim across unrelated bodies. Examples: `func_020061bc` is a SWAR population-count routine (pool constants `0xaaaaaaaa/0xcccccccc/0xf0f0f0f0/0xff00ff00`, no address anywhere); `func_02007f38` builds one MMIO-shadow constant via 3 `orr`s; `func_0200b2f4`/`func_0201a32c`/`func_0203244c`/`func_0206d79c` have **no `.word` pool entries at all**. None involve loading the same address twice — the citation's actual mechanism. Correct those headers (remove/replace the unsupported citation with an honest "never assessed" note) so `wall_aware_headroom.py` stops reporting them as lever-shaped. Get the full list from brief 655's report, and re-verify each yourself before editing.
 **Gate:** `python tools/wall_aware_headroom.py` before/after counts + `python tools/gate3.py --scope eur --no-tests` (header comments must be byte-neutral — prove it).
@@ -85,12 +88,14 @@ Brief 654 drained ov002's coercible pool (23 shipped total) and **independently 
 **Gate:** doc-only; cross-link it from `endgame-ledger.md` and the wall taxonomy.
 
 ### q-dead-tools-action — action the dead-tool audit [DONE]
+
 > PARKED: No UNREFERENCED tools were found; requested configure gate is unavailable because kb-map has no EUR baserom. PR #1256 records the no-op and known baseline test failures.
 
 Your own `q-dead-tools` audit produced a KEEP / SUPERSEDED / UNREFERENCED table. Now action it: delete only the rows you classified UNREFERENCED, one small batch at a time. ⚠️ Re-verify each is still unreferenced at deletion time (`build.ninja`, workflows, tests, docs, other tools) — the tree has changed since the audit.
 **Gate:** `python -m pytest -q tests` (no NEW failures beyond the known 12 Windows path-sep ones) + `python tools/configure.py eur` succeeds + list what you removed.
 
 ### q-tools-package-2 — continue the parser migration [DONE]
+
 > PARKED: Migrated 2 readers, but configure.py eur is blocked by the missing EUR baserom in kb-map; PR #1257 records the migration and known baseline test failures.
 
 `q-tools-package` landed a shared parser facade. Continue: migrate the remaining hand-rolled delinks/symbols readers onto it, most-duplicated first, in small reviewable batches. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that. Stop and report if any migration would need a build-graph change.
@@ -112,6 +117,7 @@ needed a build and `kb-map` has no baserom. That was a briefing error, not your 
 cannot be gated even there, re-park it with the specific reason — that remains the right call.
 
 ### q-epilogue-corpus — assemble the epilogue-shape wall corpus [DONE]
+
 Brief 661 hit one recurring **epilogue-shape** mismatch **three times** on functions whose bodies matched 100% (`func_020915e4` loop body 100%, `func_020458d8` all four branch bodies 100%, `func_0206eecc`) — roughly 14% of its sample. The CC Decomper is trying to crack the lever (`cm-epilogue-wall`); your job is to hand it the full corpus so it isn't hunting.
 Mechanically gather every candidate whose `.s` shows the same epilogue shape as those three: search `src/**/*.s` for the epilogue pattern they share, and for each hit record address, module, size, and the exact epilogue instruction sequence. Also list which routing tier each file currently uses (plain `.c` / `.legacy.c` / `.legacy_sp3.c` / `.thumb.c`) — the tiers exist for epilogue-shape families, so tier-vs-shape correlation is the key signal.
 **Gate:** doc-only, no build; the corpus + the tier correlation table.

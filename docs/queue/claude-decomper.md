@@ -40,12 +40,14 @@ Brief 655 sampled the ~25 smallest files by disk size, read ~18, attempted 9, sh
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
 
 ### cm-unknown-main-655-batch2 — C-match another batch from main's unknown pool [DONE]
+
 Brief 663: 14/17 shipped (82%) from the 650-780 byte tier, ported to USA+JPN (28 objects), 3-region gate PASS. New levers: `.legacy.c`/`.legacy_sp3.c` routing also fixes default-tier literal-pool over-folding for nearby MMIO constants (not just epilogue shape); variadic-forwarding thunks reproduce byte-exact via manual `(addr & ~(align-1)) + size` pointer arithmetic (no `stdarg.h` in this toolchain); mwcc spills all 4 arg registers whenever ANY parameter's address is taken, regardless of real arity. 3 near-misses parked (func_0209a8d0 73.68%, func_0209a884 0%, func_0206df54 40%) — all a "want branch, got predication" pattern with no working lever found yet, opposite direction from brief 655's converge-to-return fix. See docs/research/brief-663-main-unknown-batch2.md, including a tooling gotcha: a delinks.txt patch must replace the OLD entry's full body (header + complete + .text line), not just the header line, or `dsd delink` crashes on a full clean rebuild with a corrupted duplicate block.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 14 converted.
 Continue main's `unknown` pool (still ~2,362 files after briefs 640+655's combined sampling) — different functions than the prior batches. Get the list via `wall_aware_headroom.py --json` (`main.unknown_files`), sort by disk size (`ls -la src/main/*.s | sort -k5 -n`) and take the next size tier up from what's already been read (briefs 640/655 covered roughly the smallest ~500-560 byte files). Header-read before compiling. Batch of 15-25.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + count converted.
 
 ### cm-unknown-ov002-651 — C-match a batch from ov002's unknown pool (brief 651) [DONE]
+
 Brief 664: 6/11 shipped (55%) from the 505B+ tier (excluding brief 650's 15 already-attempted addresses, per its report's own per-candidate table). Ported to USA+JPN (18 objects), 3-region sha1 PASS. New lever: inverted nested-if (outer guard negated + nested, no `else`, inner single-statement early return) reproduces an asymmetric branch-then-predicate shape that neither plain early-return nor brief-655's converged if/else could hit. 5 near-misses parked, including a strong 81.8% pure-register-residue case (`func_ov002_022576d8`) and a confirmed instruction-selection wall for AND-vs-shift-pair byte insertion (`func_ov002_021aff4c`). See docs/research/brief-664-ov002-unknown-batch1.md. pytest: 12 pre-existing Windows path-separator failures (documented baseline, none touching this batch's files) — sha1 is the authoritative gate per CLAUDE.md.
 **Gate:** `python tools/gate3.py --scope all` — 3-region sha1 PASS + 6 converted.
 
@@ -58,12 +60,14 @@ ov002 is 2,740 `unknown` files — 45% of the entire reopened frontier, and per 
 **Gate:** `python tools/gate3.py --scope all` PASS + count converted.
 
 ### cm-epilogue-wall — crack the recurring epilogue-shape wall [DONE]
+
 **Highest-leverage single target in the project right now.** Brief 661 hit the same wall **three times** on functions whose bodies matched *perfectly*: `func_020915e4` (loop body 100%), `func_020458d8` (all 4 branch bodies 100%), `func_0206eecc` — each blocked only by a recurring **epilogue-shape** mismatch. It also accounted for ~14% of that sample. Crack the mechanism once and it converts a documented backlog of near-misses into ships across the whole main sweep.
 METHOD: read those three `.s` files' epilogues against your generated output, identify exactly what mwcc is doing differently (stack teardown order, register-list shape, `pop {…, pc}` vs `bx lr`, sub-sp vs push-based frames), and hunt the C-level lever that reproduces it. Check `docs/research/style-a-epilogue.md` and the `.legacy.c` / `.legacy_sp3.c` routing tiers — this smells like a compiler-revision routing issue, and those tiers exist precisely for epilogue-shape families.
 If you crack it: ship those three, then sweep the near-miss backlog in 661's table. If it's genuinely permanent, document it as a NEW `P-NN` codegen-walls entry with the repro — that's equally valuable.
 **Gate:** `python tools/gate3.py --scope all --no-tests` + either the lever + ships, or the new wall entry with evidence.
 
 ### cm-main-small-c — main small/medium sweep, upper range (0x0204xxxx+) [DONE]
+
 Brief 665: only 10 candidates existed in this exact filter (most of the range already swept). 2/8 real attempts shipped, ported to USA+JPN. **Headline: retired the P-6 "permanent" predication-threshold wall** — `func_02067b8c` and `func_0207f8f8` (named alongside `func_02087d10` in codegen-walls.md's P-6 entry, all 3 tagged permanent by brief 033) recover to 100% via `.legacy.c` routing; a later brief already fixed the 3rd sibling this way but nobody re-tested the other two. `codegen-walls.md`'s P-6 section corrected in this PR — may unlock other P-6-tagged candidates project-wide. 2 files are genuine shared-epilogue-tail stubs (unshippable, not real functions). 4 near-misses parked (Thumb stmia-batching 0%, byte-vs-word bitfield access 14.3%, 64-bit multiply reg-alloc wall 0%, struct-zero 66.7%). See docs/research/brief-665-main-small-c.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped.
 The other half of brief 661's small/medium campaign — the Scaffolder takes 0x02000000–0x0203ffff, you take **0x02040000 and above**. Same method: `wall_aware_headroom.py --json` (main), size ≤256 B, header-read but treat the generic brief-294 header as non-evidence.
@@ -71,5 +75,6 @@ Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever wor
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
 
 ### cm-nearmiss-backlog — convert brief 661's documented near-misses [DONE]
+
 Brief 666: 2/5 shipped (func_0206eecc already resolved via a separate unmerged epilogue-wall PR, not re-attempted). `func_020967bc` (ring-buffer dequeue, 74.3%→100%: unsigned bounds check + return-raw-value lever) and `func_020403d4` (multi-call global setup, 26.8%→100% first try: don't-cache-global lever + `.legacy_sp3.c` routing). 2 more show major measurable progress without fully closing: `func_0209a000` (18-19%→70.7%: branch-polarity fix + `.legacy.c` routing recovered one whole branch to 100%, residual is a reg-alloc register-reuse choice in the other branch) and `func_02073fc8` (22.9%→35.4%: the Internet-checksum odd/even-alignment split is now fully modeled, residual is shift/mask instruction selection). `func_020685c8` unchanged at 54.2% (2 more variants tried, both worse; confirmed `lr`-preferring reg-alloc residue). All ships ported to USA+JPN. See docs/research/brief-666-nearmiss-backlog.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped, 2 improved.
