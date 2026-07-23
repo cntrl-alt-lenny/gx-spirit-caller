@@ -8088,7 +8088,7 @@ src/main/func_0204037c.s:
     complete
     .text start:0x0204037c end:0x020403d4
 
-src/main/func_020403d4.s:
+src/main/func_020403d4.legacy_sp3.c:
     complete
     .text start:0x020403d4 end:0x02040478
 
@@ -17730,7 +17730,7 @@ src/main/func_02096794.c:
     complete
     .text start:0x02096794 end:0x020967bc
 
-src/main/func_020967bc.s:
+src/main/func_020967bc.legacy.c:
     complete
     .text start:0x020967bc end:0x02096848
 
