@@ -12,6 +12,8 @@
 
 **Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split incoming, q-natural-c-metric); prefer natural C, use asm-void only where a documented wall justifies it.
 
+**⚠️ ROUTE BEFORE YOU DRAFT (brief 667, 3/3 + generalised):** the recurring epilogue-shape wall is NOT a wall — it is the existing per-TU compiler routing tier. **Read the TARGET `.s`'s own epilogue first:** `sub sp,#4` + separate `pop {lr}` / `bx lr` → name the file `*.legacy.c`; fused `pop {..., pc}` → `*.legacy_sp3.c`; otherwise plain `.c`. Choosing the tier BEFORE writing the body removes an epilogue mismatch that accounted for ~14% of brief 661's sample. See `docs/research/style-a-epilogue.md` + lever-payoff #28/#29.
+
 ---
 
 ## Items
@@ -85,3 +87,22 @@ Brief 661 read 8 files from the **257 B+ tier (31% of the tranche)** — DMA/tex
 
 **New finding for the lever docs (not yet written up there):** large-tier obstacles are qualitatively different from small-tier ones. The small tier's dominant obstacle (branch-vs-predicate polarity, this queue's batch B) is reliably fixable with `goto`-to-shared-tail or nested-if. The large tier's dominant obstacle here — mwcc's internal switch-statement value-clustering/pivot-anchor selection and case-body layout ordering — showed **no responsive C-level lever** across 5 combined attempts on 2 candidates; it looks close (right instruction mix, right general control shape) without a way to close the last 20–30%. **Recommend:** do not schedule a routine large-tier sweep at the small-tier's per-candidate pace (~15–20 min); brief 650's dispatcher win took dedicated multi-hour investment per function, and even that scale of effort is not guaranteed against this specific obstacle class.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) — no source changes (all 4 attempts reverted cleanly); doc-only update.
+
+### cm-main-small-d — main small/medium sweep, batch D [TODO]
+
+Continue the 0-256 B `main` sweep in range `0x02000000-0x0203ffff`. Batches A/B ran **54%** and **87%** — far above brief 661's 35-55% estimate, largely because the epilogue routing rule (above) removes a whole failure class. Keep going; the tier is 1,645 files and barely dented.
+Candidates: `python tools/wall_aware_headroom.py --json` (main), size <=256 B, your range. Route by epilogue BEFORE drafting. Park reg-alloc/scratch-register on sight.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + running rate.
+
+### cm-main-small-e — main small/medium sweep, batch E [TODO]
+
+Same as batch D, next tranche. Report the cumulative rate across A/B/D/E so we can see whether the epilogue-routing lift holds at volume.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate.
+
+### cm-ov002-unknown-2 — ov002 unknown pool, batch 2 [TODO]
+
+Brief 664 shipped **6/11** from ov002's unknown pool — note this is the *unknown/never-assessed* tranche, NOT the coercible pool (drained) and NOT the ~2,750 files brief 654 verified as genuine reg-alloc walls. Continue with a fresh batch, same discipline: header-read, route by epilogue, park verified walls immediately.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.

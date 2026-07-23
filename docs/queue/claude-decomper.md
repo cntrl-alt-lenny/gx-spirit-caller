@@ -10,6 +10,8 @@
 
 **Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split incoming, q-natural-c-metric); prefer natural C, use asm-void only where a documented wall justifies it.
 
+**⚠️ ROUTE BEFORE YOU DRAFT (brief 667, 3/3 + generalised):** the recurring epilogue-shape wall is NOT a wall — it is the existing per-TU compiler routing tier. **Read the TARGET `.s`'s own epilogue first:** `sub sp,#4` + separate `pop {lr}` / `bx lr` → name the file `*.legacy.c`; fused `pop {..., pc}` → `*.legacy_sp3.c`; otherwise plain `.c`. Choosing the tier BEFORE writing the body removes an epilogue mismatch that accounted for ~14% of brief 661's sample. See `docs/research/style-a-epilogue.md` + lever-payoff #28/#29.
+
 ---
 
 ## Items
@@ -78,3 +80,23 @@ Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever wor
 
 Brief 666: 2/5 shipped (func_0206eecc already resolved via a separate unmerged epilogue-wall PR, not re-attempted). `func_020967bc` (ring-buffer dequeue, 74.3%→100%: unsigned bounds check + return-raw-value lever) and `func_020403d4` (multi-call global setup, 26.8%→100% first try: don't-cache-global lever + `.legacy_sp3.c` routing). 2 more show major measurable progress without fully closing: `func_0209a000` (18-19%→70.7%: branch-polarity fix + `.legacy.c` routing recovered one whole branch to 100%, residual is a reg-alloc register-reuse choice in the other branch) and `func_02073fc8` (22.9%→35.4%: the Internet-checksum odd/even-alignment split is now fully modeled, residual is shift/mask instruction selection). `func_020685c8` unchanged at 54.2% (2 more variants tried, both worse; confirmed `lr`-preferring reg-alloc residue). All ships ported to USA+JPN. See docs/research/brief-666-nearmiss-backlog.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped, 2 improved.
+
+### cm-main-small-f — main small/medium sweep, upper range batch F [TODO]
+
+Continue the 0-256 B `main` sweep in range `0x02040000+` (Scaffolder has the lower range — no collision). Batch C's sibling batches ran 82-87% with epilogue routing applied. Route by epilogue BEFORE drafting.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
+
+### cm-epilogue-resweep — re-attempt past parks with the routing rule [TODO]
+
+The epilogue routing discriminator (brief 667) was unknown when earlier sweeps parked their near-misses. Re-attempt previously-parked candidates whose park reason mentions epilogue shape, stack teardown, or an unexplained tail mismatch — sources: brief 661's table, brief 655, brief 641, and the parked lists in `docs/research/campaign-analytics/cmatch-parked-and-floor.md`.
+⚠️ Do NOT re-attempt reg-alloc/scratch-register parks (100% lever-insensitive, brief 641). This is the cheapest ship batch available — the analysis is already done, only the routing was wrong.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked counts.
+
+### cm-p6-followup — hunt more retirable "permanent" walls [TODO]
+
+Brief 665 **retired the P-6 permanent wall** — a taxonomy entry believed permanent turned out not to be. Only 32 files project-wide are now confirmed-permanent, and the P-NN entries have never been systematically re-tested against current knowledge (epilogue routing, the lever-payoff catalogue, asm-void as a last resort).
+Take the remaining P-NN entries in `docs/research/codegen-walls.md`, and for each: does its stated criteria still hold, or was it — like P-6 — a lever we now have? Re-test the cheapest 2-3 candidates per entry. A retirement is worth far more than a single ship: it reopens a whole class.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` + per-entry verdict (retired / confirmed-permanent with fresh evidence).
