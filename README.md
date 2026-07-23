@@ -22,7 +22,7 @@
 ## Progress
 
 <p align="center">
-  <img src="assets/progress-combined.svg" alt="Decompilation progress by region" width="660">
+  <img src="https://raw.githubusercontent.com/cntrl-alt-lenny/gx-spirit-caller/progress-visuals/assets/progress-combined.svg" alt="Decompilation progress by region" width="660">
 </p>
 
 Two metrics, because they differ a lot:
@@ -33,9 +33,9 @@ Two metrics, because they differ a lot:
 <details>
 <summary>Per-region structural heatmaps (one cell per translation unit — sized by bytes, coloured by match)</summary>
 <br>
-<p align="center"><strong>EUR</strong><br><img src="assets/progress-heatmap-eur.svg" alt="EUR heatmap" width="100%"></p>
-<p align="center"><strong>USA</strong><br><img src="assets/progress-heatmap-usa.svg" alt="USA heatmap" width="100%"></p>
-<p align="center"><strong>JPN</strong><br><img src="assets/progress-heatmap-jpn.svg" alt="JPN heatmap" width="100%"></p>
+<p align="center"><strong>EUR</strong><br><img src="https://raw.githubusercontent.com/cntrl-alt-lenny/gx-spirit-caller/progress-visuals/assets/progress-heatmap-eur.svg" alt="EUR heatmap" width="100%"></p>
+<p align="center"><strong>USA</strong><br><img src="https://raw.githubusercontent.com/cntrl-alt-lenny/gx-spirit-caller/progress-visuals/assets/progress-heatmap-usa.svg" alt="USA heatmap" width="100%"></p>
+<p align="center"><strong>JPN</strong><br><img src="https://raw.githubusercontent.com/cntrl-alt-lenny/gx-spirit-caller/progress-visuals/assets/progress-heatmap-jpn.svg" alt="JPN heatmap" width="100%"></p>
 </details>
 
 Visuals regenerate from committed `delinks.txt` on every merge — no baserom needed.

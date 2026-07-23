@@ -79,23 +79,10 @@ jobs:
           }
           tracked='assets/progress-combined.svg assets/progress-heatmap-eur.svg assets/progress-heatmap-usa.svg assets/progress-heatmap-jpn.svg'
 
-          # Rebase-on-failure retry (bounded to 3): if main moves between
-          # checkout and push, reset to its tip, recompute, and retry.
-          for attempt in 1 2 3; do
-            git add $tracked
-            git commit -m "$MSG"
-            if git push origin HEAD:main; then
-              echo "pushed on attempt $attempt"
-              exit 0
-            fi
-            git fetch origin main
-            git reset --hard origin/main
-            regen
-            if git diff --quiet $tracked; then
-              echo "main already current after rebase; nothing to do"
-              exit 0
-            fi
-          done
-
-          echo "failed to push after 3 attempts"
-          exit 1
+          # main is protected (ruleset main-protection) and github-actions[bot]
+          # cannot bypass on a personal repo, so publish regenerated SVGs to an
+          # unprotected `progress-visuals` branch. README references its raw URLs.
+          git add $tracked
+          git commit -m "$MSG"
+          git push --force origin HEAD:refs/heads/progress-visuals
+          echo "published regenerated visuals to progress-visuals"
