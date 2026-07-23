@@ -42,7 +42,8 @@ Usage:
 Exit codes:
     0   every requested region byte-identical (+ invariants/tests green)
     1   a region diverged, or invariants/tests failed (message names which)
-    2   infrastructure error (wrong cwd, missing configure.py, ...)
+    2   infrastructure error or vacuous invocation (wrong cwd, missing
+        configure.py, `--scope tests --no-tests`, ...)
 """
 from __future__ import annotations
 
@@ -135,7 +136,20 @@ def run_tests(invariants: bool) -> bool:
     return tests_ok
 
 
-def main() -> int:
+def verdict(*, failed: list[str], checks_run: int, tests_ok: bool) -> tuple[str, int]:
+    """Return the gate label and exit code from observable checks.
+
+    A zero-check invocation is not a successful gate: it is a caller error
+    that must be surfaced distinctly from a real build or test failure.
+    """
+    if checks_run == 0:
+        return "VACUOUS", 2
+    if failed or not tests_ok:
+        return "FAIL", 1
+    return "PASS", 0
+
+
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="Brain 3-region clean-tree `ninja sha1` gate driver."
     )
@@ -154,7 +168,12 @@ def main() -> int:
     ap.add_argument("--invariants", action="store_true",
                     help="also run tools/check_match_invariants.py (ADVISORY only: "
                          "noisy, carries standing pre-existing drift, never gates)")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
+
+    if args.scope.lower() == "tests" and args.no_tests:
+        ap.error(
+            "GATE VACUOUS: --scope tests --no-tests would execute zero checks"
+        )
 
     if not (ROOT / "tools" / "configure.py").exists():
         print("gate3: tools/configure.py not found - run from the repo root.",
@@ -193,6 +212,7 @@ def main() -> int:
     failed = [ver for ver in regions if not gate_region(ver, args.clean)]
 
     tests_ok = True
+    tests_ran = False
     if not args.no_tests and scope in ("all", "tests"):
         # The pytest step is documented as running against a known-good
         # tree, but the region loop above leaves `configure.py`'s state
@@ -207,15 +227,20 @@ def main() -> int:
         if regions and regions[-1] != "eur":
             print(f"\n{'=' * 20} restoring eur config for tests {'=' * 20}", flush=True)
             run([PY, "tools/configure.py", "eur"])
+        tests_ran = True
         tests_ok = run_tests(args.invariants)
 
-    passed = not failed and tests_ok
-    print(f"\n{'=' * 20} GATE {'PASS' if passed else 'FAIL'} {'=' * 20}", flush=True)
+    label, exit_code = verdict(
+        failed=failed,
+        checks_run=len(regions) + int(tests_ran),
+        tests_ok=tests_ok,
+    )
+    print(f"\n{'=' * 20} GATE {label} {'=' * 20}", flush=True)
     if failed:
         print(f"  diverging region(s): {', '.join(failed)}", flush=True)
     if not tests_ok:
         print("  invariants/tests failed", flush=True)
-    return 0 if passed else 1
+    return exit_code
 
 
 if __name__ == "__main__":
