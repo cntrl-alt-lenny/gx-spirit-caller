@@ -4806,7 +4806,7 @@ src/jpn/main/func_0204063c.s:
 src/jpn/main/func_02040988.s:
     complete
     .text start:0x02040988 end:0x02040c48
-src/jpn/main/func_02040c48.s:
+src/jpn/main/func_02040c48.c:
     complete
     .text start:0x02040c48 end:0x02040c70
 src/jpn/main/func_02040c70.s:
@@ -5402,7 +5402,7 @@ src/jpn/main/func_020495c0.legacy.c:
     complete
     .text start:0x020495c0 end:0x020495e8
 
-src/jpn/main/func_020495e8.s:
+src/jpn/main/func_020495e8.legacy.c:
     complete
     .text start:0x020495e8 end:0x02049610
 src/jpn/main/func_02049610.s:
@@ -7270,7 +7270,7 @@ src/jpn/main/func_020675f8.c:
 src/jpn/main/func_02067610.s:
     complete
     .text start:0x02067610 end:0x020677dc
-src/jpn/main/func_020677dc.s:
+src/jpn/main/func_020677dc.c:
     complete
     .text start:0x020677dc end:0x020677fc
 src/jpn/main/func_020677fc.s:
@@ -9148,7 +9148,7 @@ src/jpn/main/func_0207e844.s:
 src/jpn/main/func_0207e9f0.s:
     complete
     .text start:0x0207e9f0 end:0x0207e9fc
-src/jpn/main/func_0207e9fc.s:
+src/jpn/main/func_0207e9fc.legacy.c:
     complete
     .text start:0x0207e9fc end:0x0207ea20
 src/jpn/main/func_0207ea20.s:
@@ -9211,13 +9211,13 @@ src/jpn/main/func_0207f7e0.c:
     complete
     .text start:0x0207f7e0 end:0x0207f7f0
 
-src/jpn/main/func_0207f7f0.s:
+src/jpn/main/func_0207f7f0.legacy.c:
     complete
     .text start:0x0207f7f0 end:0x0207f810
 src/jpn/main/func_0207f810.legacy.c:
     complete
     .text start:0x0207f810 end:0x0207f82c
-src/jpn/main/func_0207f82c.s:
+src/jpn/main/func_0207f82c.legacy.c:
     complete
     .text start:0x0207f82c end:0x0207f84c
 src/jpn/main/func_0207f84c.s:
@@ -12639,7 +12639,7 @@ src/jpn/main/func_020a39c0.c:
 src/jpn/main/func_020a39cc.s:
     complete
     .text start:0x020a39cc end:0x020a3a08
-src/jpn/main/func_020a3a08.s:
+src/jpn/main/func_020a3a08.c:
     complete
     .text start:0x020a3a08 end:0x020a3a2c
 src/jpn/main/func_020a3a2c.s:
@@ -12902,7 +12902,7 @@ src/jpn/main/func_020a7174.s:
 src/jpn/main/func_020a71fc.s:
     complete
     .text start:0x020a71fc end:0x020a7274
-src/jpn/main/func_020a7274.s:
+src/jpn/main/func_020a7274.c:
     complete
     .text start:0x020a7274 end:0x020a7294
 src/jpn/main/func_020a7294.s:

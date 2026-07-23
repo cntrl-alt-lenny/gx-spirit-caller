@@ -81,11 +81,10 @@ Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever wor
 Brief 666: 2/5 shipped (func_0206eecc already resolved via a separate unmerged epilogue-wall PR, not re-attempted). `func_020967bc` (ring-buffer dequeue, 74.3%→100%: unsigned bounds check + return-raw-value lever) and `func_020403d4` (multi-call global setup, 26.8%→100% first try: don't-cache-global lever + `.legacy_sp3.c` routing). 2 more show major measurable progress without fully closing: `func_0209a000` (18-19%→70.7%: branch-polarity fix + `.legacy.c` routing recovered one whole branch to 100%, residual is a reg-alloc register-reuse choice in the other branch) and `func_02073fc8` (22.9%→35.4%: the Internet-checksum odd/even-alignment split is now fully modeled, residual is shift/mask instruction selection). `func_020685c8` unchanged at 54.2% (2 more variants tried, both worse; confirmed `lr`-preferring reg-alloc residue). All ships ported to USA+JPN. See docs/research/brief-666-nearmiss-backlog.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped, 2 improved.
 
-### cm-main-small-f — main small/medium sweep, upper range batch F [TODO]
+### cm-main-small-f — main small/medium sweep, upper range batch F [DONE]
+Brief 670: 8/19 shipped (42%), 11 parked, 6 deferred (epilogue-only shared-tail stubs / hand-encoded inter-function jumps, plus one `clz`-based popcount deferred pending toolchain-intrinsic confirmation). 3 of the 8 ships needed `.legacy.c` routing purely to cross a predication-threshold (same underlying mechanism as brief 665's retired P-6, but confirmed here to fire independent of epilogue/frame shape — one ship is a pure leaf with no stack frame at all). Two reusable levers found: `return`-the-original-pointer forces a separate register for a loop's walking pointer when the function also needs to hand back the untouched incoming value; an unused dummy parameter does NOT reserve a register on its own — it must be forwarded to a real use (e.g. a tail call) to survive dead-code elimination. All 8 ported to USA+JPN, individually verified 100% (24/24 across all 3 regions, no porting bugs this time). See docs/research/brief-670-main-small-f.md.
 
-Continue the 0-256 B `main` sweep in range `0x02040000+` (Scaffolder has the lower range — no collision). Batch C's sibling batches ran 82-87% with epilogue routing applied. Route by epilogue BEFORE drafting.
-
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS — 8 shipped, 11 re-parked.
 
 ### cm-epilogue-resweep — re-attempt past parks with the routing rule [TODO]
 
