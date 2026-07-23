@@ -11,9 +11,10 @@ log --oneline -20` and the open-PR list fill in whatever this misses.
 **Last updated:** 2026-07-23 (Windows PC, brain=Opus; roster: 2× Codex GPT-5.6 Luna High +
 2× Claude Code Sonnet 5 Max, all four on autonomous standing queues `docs/queue/*.md` —
 loop-until-QUEUE-EMPTY, one PR per item). **CHAPTER: READABLE-C, post-wall-correction.**
-EUR C-decompiled **8.48%** (+0.460 pp/week measured over 32 days; USA/JPN 7.20% at +0.342).
-⚠️ 108 of 10,519 matched `.c` TUs contain inline asm and currently count as C — the
-Natural-C vs asm-C metric split is queued (`q-natural-c-metric`). Landmark rounds this stint:
+EUR readable-C **8.591%** = **Natural-C 201,522 B (8.446%)** + **asm-C 3,456 B
+(0.145%)** over the `.text` denominator of 2,385,948 B; USA is **7.269%**
+(172,520 natural / 832 asm B) and JPN is **7.269%** (172,520 natural / 840 asm B).
+The aggregate remains the sum of the two buckets. Landmark rounds this stint:
 b650/654 (ov002: coercible pool drained 23 ships, remaining ~2,750 verified genuine walls),
 b651 (wall classifier fixed: honest pool 6,093 candidates / 32 confirmed-permanent),
 b661 (**main's 2,370-file unknown tranche = real runway, size-gated**: 0-256B tier ~35-55%
