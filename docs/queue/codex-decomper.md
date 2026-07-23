@@ -110,5 +110,6 @@ Extend the existing progress-history method (do NOT build a new subsystem — to
 **Gate:** doc-only; the scorecard + the method note.
 
 ### q-doc-archive — archive superseded STATUS docs (not brief reports) [TODO]
+### q-doc-archive — archive superseded STATUS docs (not brief reports) [DONE]
 3,195 tracked .md; the live operational surface should be compact: state.md + 4 queues + generated indices. Move clearly-SUPERSEDED status/planning docs — e.g. path-to-100-coverage.md (superseded by endgame-ledger), safe-queue-v2/v3, pre-b651 candidate lists — into docs/research/archive/ leaving a 2-line stub pointer at each old path. Verify each is genuinely superseded (its own header says so, or a successor doc exists) before moving; if unsure, leave it. ⚠️ Do NOT touch brief-*.md reports (the historical record stays put). Regenerate the research index; the link test must stay green.
 **Gate:** doc-only; list of moves + index regenerated + link test green.
