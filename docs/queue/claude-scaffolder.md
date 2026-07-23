@@ -89,6 +89,7 @@ Brief 661 read 8 files from the **257 B+ tier (31% of the tranche)** — DMA/tex
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) — no source changes (all 4 attempts reverted cleanly); doc-only update.
 
 ### cm-main-small-d — main small/medium sweep, batch D [DONE]
+
 Continue the 0-256 B `main` sweep in range `0x02000000-0x0203ffff`. Batches A/B ran **54%** and **87%** — far above brief 661's 35-55% estimate, largely because the epilogue routing rule (above) removes a whole failure class. Keep going; the tier is 1,645 files and barely dented.
 Candidates: `python tools/wall_aware_headroom.py --json` (main), size <=256 B, your range. Route by epilogue BEFORE drafting. Park reg-alloc/scratch-register on sight.
 
@@ -110,6 +111,7 @@ Ships: `func_02018a84` (3-bit bitfield extraction, lever #3, first try), `func_0
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/11 shipped (18%), cumulative 29/52 (56%).
 
 ### cm-ov002-unknown-2 — ov002 unknown pool, batch 2 [DONE]
+
 Brief 664 shipped **6/11** from ov002's unknown pool — note this is the *unknown/never-assessed* tranche, NOT the coercible pool (drained) and NOT the ~2,750 files brief 654 verified as genuine reg-alloc walls. Continue with a fresh batch, same discipline: header-read, route by epilogue, park verified walls immediately.
 
 **Result: 2/6 shipped (33%) EUR, ported to USA+JPN (6 objects, 3-region gate PASS).**
@@ -118,3 +120,15 @@ Brief 664 shipped **6/11** from ov002's unknown pool — note this is the *unkno
 Ships: `func_ov002_0226acf8` (4-field struct-write dispatcher, first try), `func_ov002_0227aa50` (4-byte-bitfield full-word clear + separate halfword set, lever #3, first try).
 **4 parked after 1–2 attempts each, all under this item's remaining time budget**: `func_ov002_02273500`/`func_ov002_021d81d4` (tail-call-via-`bx` argument-prep near-misses, register-letter/instruction-order residue), `func_ov002_0220c2c0` (branch-vs-predicate guard — unlike 5/5 prior instances this session, `goto`-to-separate-tail had **zero effect** here, confirming this lever is situational, not universal), `func_ov002_0220ddf4` (pure register-letter swap, matches the reg-alloc anti-pattern). None reached the "genuine wall" confirmation bar (2–3 attempts) that batches D/E used — flagged as unresolved-not-confirmed-wall given the time constraint, worth a fresh attempt in a future batch rather than treating as settled.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/6 shipped (33%), ported to USA+JPN via `port_to_region.py`.
+
+### cm-regalloc-ship — reproduce + ship the r6 reg-alloc functions (retire park-on-sight) [TODO]
+
+R&D swarm r6 (docs/research/rnd-swarm-2026-07-23-r6.md, bet 1) found the brief-641 reg-alloc/scratch-register 'park-on-sight' class is byte-FALSIFIED for 6 of 8 named instances + P-4's func_02084ac4: all reach byte-identical .text from ordinary C once routed to the correct tier (plain .c / .legacy.c / .thumb.c — routing is load-bearing, read the target epilogue first). The swarm's scratchpad proof is GONE (ephemeral), so REPRODUCE from the report's evidence, then ship. Also record func_020b3850 and func_0208b1ac as GENUINELY SURVIVING (do not chase). Scope doc edits to codegen-walls.md P-4 and lever-payoff.md L21 only. This RETIRES our largest park-on-sight rule.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped count + the retired-rule doc edits.
+
+### cm-main-small-g — continue the small/medium main sweep (batch G) [TODO]
+
+Continue the 0-256B `main` sweep, range 0x02000000-0x0203ffff. Route by epilogue BEFORE drafting (header at top of this file). Recent batches ran 54-87%. Once Codex ships q-headroom-textsize, use `--max-size 256`; until then header-read + size-check per candidate.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + running rate.

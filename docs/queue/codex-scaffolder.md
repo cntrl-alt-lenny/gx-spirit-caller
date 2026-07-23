@@ -35,7 +35,9 @@ Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles
 **Gate:** the workflow file + a green run on your own PR (it will exercise itself), or if it can't self-trigger, paste the exact local equivalent commands and their output.
 
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+
 > PARKED: kb-types EUR build gate passed, but pytest remains red with 12 failures (11 Windows/path/tool baseline plus stale generated research-index check); defer until q-green-pytest.
+
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
 
 > PARKED: kb-types EUR rerun configured and ninja sha1 passed, but required pytest remains red (11 pre-existing Windows/path/tool-environment failures); v3 A/B probes still require a separate migration trial.
@@ -55,7 +57,9 @@ One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the 
 **Gate:** the corpus doc + counts; doc-only, no build.
 
 ### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+
 > PARKED: kb-types EUR configure+ninja sha1 passed; pytest remains red with 12 failures including the stale generated research-index check, so defer until q-green-pytest.
+
 ### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
 
 > PARKED: kb-types EUR configure and ninja sha1 passed; required pytest remains red on 11 pre-existing Windows/path/tool-environment failures (2848 passed, 20 skipped, 55 subtests), so keep parked until the stated green pytest gate.
@@ -75,6 +79,7 @@ Lint has been red for weeks and **red is the baseline**, which means a real regr
 **Gate:** the CI checks green on your own PR + the proposed ruleset written up for the owner to apply.
 
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
+
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
 
 > PARKED: Corrected the live mistagged headers and recorded 58->28 main C-34 count; gate3 is blocked because kb-map lacks ./dsd. PR #1260 records the byte-neutral pass.
@@ -122,6 +127,7 @@ Mechanically gather every candidate whose `.s` shows the same epilogue shape as 
 **Gate:** doc-only, no build; the corpus + the tier correlation table.
 
 ### q-green-pytest — make the suite GENUINELY green, no known-failure baseline [DONE]
+
 External review (Sol) + swarm r5 agree: normalising 11-12 "known" failures makes real regressions invisible. Work from `kb-types` (has EUR baserom + dsd, so you can tell "missing prerequisite" from "real bug"). For EACH failing test classify and act:
 - REAL cross-platform bug (e.g. path-separator assertions) → fix the TEST or the TOOL, whichever is actually wrong;
 - MISSING-PREREQUISITE integration test (needs dsd / baserom / `cpp` binary) → `pytest.mark.skipif` with an explicit reason string checking for the prerequisite;
@@ -130,9 +136,22 @@ END STATE: `python -m pytest -q tests` fully green on Windows AND unchanged-gree
 **Gate:** full pytest output pasted green + `python tools/configure.py eur && ninja sha1` OK (byte-neutrality).
 
 ### q-natural-c-metric — split natural-C vs asm-in-C in the readable-C metric [DONE]
+
 **108 of 10,519 matched `.c` TUs contain inline asm** (`asm void` / `asm {` — e.g. the cm-ov002-batch1 ships, plus legit BIOS wrappers like CpuFastSet.c) and ALL currently count toward "C-decompiled" — inflating the headline readable-C number. Fix the metric:
 1. Grep-classify first and enumerate the exact in-tree patterns (`asm void`, statement `asm {`, anything else) — list what you find in the PR.
 2. In the C-decompiled computation (tools/progress.py + the c_code_bytes path in generate_progress_bars.py): a TU whose source matches the patterns = ASM-C; else NATURAL-C. Emit two lines: `Natural-C` and `asm-C`; their SUM must equal the old C-decompiled number — prove sum-preservation in the PR with before/after.
 3. Tests for the classifier (both classes + an edge: a comment containing the word "asm" must NOT trip it).
 4. Update state.md's metric block to show the split.
 **Gate:** pytest no-new-failures (green if q-green-pytest landed first) + before/after totals pasted + sum-preservation shown.
+
+### q-headroom-textsize — add a text_size field to wall_aware_headroom.py (r6 bet 2 — unblocks the small-tier re-sweep) [TODO]
+
+⚠️ HIGH-VALUE: the selector emits only bare path strings, so briefs 663/664 sized candidates by `.s` FILE bytes (~10x the real .text span) and brief 665 wrongly declared a 1,224-candidate small-.text range 'already swept'. Emit `{path,addr,text_size}` (a join on delinks the tool already parses) and add `--min-size/--max-size`. Then correct briefs 663/664/665's mis-measurement note. Work from kb-types (EUR baserom).
+
+**Gate:** `python -m pytest -q tests` no-new-failures + before/after: the tool now reports text_size for a sample + `--max-size 256` filters correctly.
+
+### q-gate3-vacuous — make gate3 fail-loud when it runs nothing (r6 bet 3) [TODO]
+
+gate3.py can print `GATE PASS` having executed ZERO checks (e.g. `--scope tests --no-tests`). Extract a `verdict()`, return exit-2 `GATE VACUOUS` when nothing ran, reject `--scope tests --no-tests` at argparse, add tests/test_gate3.py. The real merge oracle is the brain's 3-region sha1, but a vacuous PASS is dangerous.
+
+**Gate:** `python -m pytest -q tests/test_gate3.py` green + demonstrate `GATE VACUOUS` exit-2 on the empty combination.
