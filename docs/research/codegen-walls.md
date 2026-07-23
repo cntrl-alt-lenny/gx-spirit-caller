@@ -6216,6 +6216,33 @@ other patterns in partial-match drops.
 
 ### P-4. Tiny-thunk reg-allocator divergence (formerly "swap-shape")
 
+> **UPDATE (queue item cm-regalloc-ship, following R&D swarm r6 bet 1):**
+> this class is **not a blanket wall**. R&D swarm r6 independently verified
+> 6 of the 8 named instances below plus `func_02084ac4` (7 total) reach
+> byte-identical `.text` from ordinary C once routed to the correct
+> compiler tier (plain `.c` / `.legacy.c` / `.thumb.c` — the b665/b667
+> routing-tier pattern, not a new allocator lever). The swarm's own
+> scratch source was not preserved; this session reproduced **3 of the 7**
+> from the report's evidence alone — `func_02084ac4` (plain `.c`,
+> first-try natural C), `func_02096040` (`.legacy.c`, needed a `volatile`
+> local to stop `-O4` dead-code-eliminating an otherwise-unread struct
+> write that the target genuinely emits), `func_ov004_021de264`
+> (`.thumb.c` — **the Thumb routing is load-bearing**; a `#pragma thumb
+> on` at the top of the `.c` file is required, the suffix alone routes
+> the compiler binary but does not by itself flip codegen mode). The
+> other 4 named instances below (including the two swap-shape and
+> fnptr-cache examples the "why permanent" section discusses) still show
+> pure register-letter residue after tier-routing and `volatile` attempts
+> in this session — genuinely unresolved *by this session*, not
+> re-confirmed as permanent. **`func_020b3850` and `func_0208b1ac` are
+> confirmed genuine survivors** (all-tier DIFF; do not re-attempt).
+> **Action for future work:** do not park a reg-alloc-shaped candidate on
+> sight — read its epilogue, route to the tier it implies, try a
+> `volatile` local if a value looks dead-code-eliminated, and only treat
+> a residue that survives both as confirmed-permanent. See
+> `lever-payoff.md`'s reg-alloc/scratch-register row for the up-to-date
+> W/F count.
+
 For a tiny thunk where mwcc must pick a scratch register for
 a swap temp or pool-load pointer (`return target(b, a)` or
 `return target(arr[idx*N])`), mwcc reliably picks the
