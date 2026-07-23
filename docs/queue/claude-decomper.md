@@ -81,7 +81,7 @@ Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever wor
 Brief 666: 2/5 shipped (func_0206eecc already resolved via a separate unmerged epilogue-wall PR, not re-attempted). `func_020967bc` (ring-buffer dequeue, 74.3%→100%: unsigned bounds check + return-raw-value lever) and `func_020403d4` (multi-call global setup, 26.8%→100% first try: don't-cache-global lever + `.legacy_sp3.c` routing). 2 more show major measurable progress without fully closing: `func_0209a000` (18-19%→70.7%: branch-polarity fix + `.legacy.c` routing recovered one whole branch to 100%, residual is a reg-alloc register-reuse choice in the other branch) and `func_02073fc8` (22.9%→35.4%: the Internet-checksum odd/even-alignment split is now fully modeled, residual is shift/mask instruction selection). `func_020685c8` unchanged at 54.2% (2 more variants tried, both worse; confirmed `lr`-preferring reg-alloc residue). All ships ported to USA+JPN. See docs/research/brief-666-nearmiss-backlog.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped, 2 improved.
 
-### cm-main-small-f — main small/medium sweep, upper range batch F [TODO]
+### cm-main-small-f — main small/medium sweep, upper range batch F [CLAIMED]
 
 Continue the 0-256 B `main` sweep in range `0x02040000+` (Scaffolder has the lower range — no collision). Batch C's sibling batches ran 82-87% with epilogue routing applied. Route by epilogue BEFORE drafting.
 

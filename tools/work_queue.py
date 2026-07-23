@@ -52,7 +52,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 QDIR = ROOT / "docs" / "queue"
 STATUSES = ("TODO", "CLAIMED", "DONE", "PARKED")
-_HDR = re.compile(r"^###\s+(?P<id>\S+)\s+—\s+(?P<title>.*?)\s+\[(?P<status>\w+)\]\s*$",
+# The trailing lookahead anchors to end-of-line WITHOUT consuming the line
+# terminator or the following blank line — a bare `\s*$` used to eat the CRLF +
+# the blank line after the heading on every status transition, manufacturing an
+# MD022 markdownlint failure (a required check). Lookahead => byte-perfect tail.
+_HDR = re.compile(r"^###\s+(?P<id>\S+)\s+—\s+(?P<title>.*?)\s+\[(?P<status>\w+)\](?=[ \t]*(?:\r?\n|$))",
                   re.M)
 
 
