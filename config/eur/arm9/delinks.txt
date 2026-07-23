@@ -2553,7 +2553,7 @@ src/main/func_02018e40.c:
     complete
     .text start:0x02018e40 end:0x02018e88
 
-src/main/func_02018e88.s:
+src/main/func_02018e88.c:
     complete
     .text start:0x02018e88 end:0x02018ecc
 
@@ -3056,7 +3056,7 @@ src/main/func_0201a3b8.c:
 
 
 
-src/main/func_0201a3ec.s:
+src/main/func_0201a3ec.c:
     complete
     .text start:0x0201a3ec end:0x0201a430
 
