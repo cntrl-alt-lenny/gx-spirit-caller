@@ -2376,7 +2376,7 @@ src/main/func_02018a64.c:
 
 
 
-src/main/func_02018a84.s:
+src/main/func_02018a84.c:
     complete
     .text start:0x02018a84 end:0x02018abc
 
@@ -5030,7 +5030,7 @@ src/main/func_0202b360.c:
     complete
     .text start:0x0202b360 end:0x0202b3d4
 
-src/main/func_0202b3d4.s:
+src/main/func_0202b3d4.c:
     complete
     .text start:0x0202b3d4 end:0x0202b410
 
