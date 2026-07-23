@@ -34,8 +34,8 @@ CC Decomper (2026-07-21) found 29 `.s` files under src/ that are NOT referenced 
 Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles to a valid ARM relocatable using only committed `include/` + `libs/` + `mwccarm.exe`; **0 mwcc edges reference `extract/`**, and `configure.py <ver> --skip-sha1` already runs baserom-free. Today **none of the 11 workflows compiles a single line of game C** — the existing comments conflate "can't verify byte-identity" with "can't build at all". Add `.github/workflows/compile-check.yml`: PR-triggered, paths filter `src/**`, fetch mwccarm, `configure.py <region> --skip-sha1`, map changed `.c` via `git diff` → `build/<region>/<path>.o`, `ninja` just those targets. Changed-file scoping keeps it seconds. **windows-latest needs no wibo** — prefer it. Do NOT attempt to put baseroms in CI.
 **Gate:** the workflow file + a green run on your own PR (it will exercise itself), or if it can't self-trigger, paste the exact local equivalent commands and their output.
 
-### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [TODO]
-
+### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+> PARKED: kb-types EUR build gate passed, but pytest remains red with 12 failures (11 Windows/path/tool baseline plus stale generated research-index check); defer until q-green-pytest.
 ### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
 
 > PARKED: kb-types EUR rerun configured and ninja sha1 passed, but required pytest remains red (11 pre-existing Windows/path/tool-environment failures); v3 A/B probes still require a separate migration trial.
