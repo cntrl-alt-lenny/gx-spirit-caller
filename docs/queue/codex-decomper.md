@@ -116,7 +116,7 @@ Extend the existing progress-history method (do NOT build a new subsystem — to
 3,195 tracked .md; the live operational surface should be compact: state.md + 4 queues + generated indices. Move clearly-SUPERSEDED status/planning docs — e.g. path-to-100-coverage.md (superseded by endgame-ledger), safe-queue-v2/v3, pre-b651 candidate lists — into docs/research/archive/ leaving a 2-line stub pointer at each old path. Verify each is genuinely superseded (its own header says so, or a successor doc exists) before moving; if unsure, leave it. ⚠️ Do NOT touch brief-*.md reports (the historical record stays put). Regenerate the research index; the link test must stay green.
 **Gate:** doc-only; list of moves + index regenerated + link test green.
 
-### q-sm64ds-reingest — re-ingest the sm64ds lever catalogue delta (r6 bet 4) [TODO]
+### q-sm64ds-reingest — re-ingest the sm64ds lever catalogue delta (r6 bet 4) [DONE]
 
 The sm64ds catalogue moved repos and grew ~970 lines / 21 dated sections of same-compiler (1.2/sp2p3) evidence since our snapshot; §7a directly reports the uniform 'register allocation' near-miss label was a CATEGORIZER failure and 6/8 then matched — corroborating our own reg-alloc finding. Re-ingest to docs/research/reshape-recipes/imported-sm64ds-r2.md; flag §6k/6q/6u/6y/6z/7a/7b for on-2.0/sp2p3 verification (a later CC item will test); fix the stale 'different SP revisions' line. Cite the source URLs.
 
