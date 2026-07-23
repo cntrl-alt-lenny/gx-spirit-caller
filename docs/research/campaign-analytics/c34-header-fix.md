@@ -45,3 +45,12 @@ Verifying SHA-1 of orig\baserom_eur.nds...
 
 This rerun changed no source files; the header correction remains byte-neutral.
 
+## Reopened verification (2026-07-23)
+
+The queue item was reopened after the readable-C pool changed. The live
+classifier now reports `main C-34=30` and `total_candidate=6041`; the original
+28 comment-only corrections remain present, with no new source edit required.
+`python tools/gate3.py --scope eur --no-tests` passed with `[eur] SHA1 PASS`
+and verified the original EUR SHA-1. The current count is a census snapshot,
+not a reversal of the header correction.
+

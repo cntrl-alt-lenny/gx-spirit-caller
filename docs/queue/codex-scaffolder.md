@@ -74,8 +74,7 @@ Of the ~93 `tools/*.py`, some are superseded or unreferenced (e.g. tools whose l
 Lint has been red for weeks and **red is the baseline**, which means a real regression is invisible. Finish the cleanup (ruff autofixes, markdownlint over the generated dirs, regenerate both indices — that flips drift-check and unittest together), then **propose** (do not apply — it needs owner rights) a branch-protection ruleset requiring: `Python (ruff)`, `Markdown (markdownlint-cli2)`, `unittest`, `drift-check`, `pr-invariants (eur)`. ⚠️ Exclude the usa/jpn matrix legs — `continue-on-error` does NOT produce a green check-run, so requiring them would hard-block every PR.
 **Gate:** the CI checks green on your own PR + the proposed ruleset written up for the owner to apply.
 
-### q-c34-header-fix — correct the 30 mistagged C-34 citations [TODO]
-
+### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
 
 > PARKED: Corrected the live mistagged headers and recorded 58->28 main C-34 count; gate3 is blocked because kb-map lacks ./dsd. PR #1260 records the byte-neutral pass.
