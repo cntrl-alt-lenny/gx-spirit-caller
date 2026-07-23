@@ -7991,7 +7991,7 @@ src/main/func_0203eefc.s:
     complete
     .text start:0x0203eefc end:0x0203ef68
 
-src/main/func_0203ef68.s:
+src/main/func_0203ef68.legacy_sp3.c:
     complete
     .text start:0x0203ef68 end:0x0203efa0
 
@@ -8044,7 +8044,7 @@ src/main/func_0203f718.c:
     complete
     .text start:0x0203f718 end:0x0203f740
 
-src/main/func_0203f740.s:
+src/main/func_0203f740.legacy_sp3.c:
     complete
     .text start:0x0203f740 end:0x0203f778
 
