@@ -54,6 +54,7 @@ if (!guard) {
 }
 return 0;
 ```
+
 Confirmed on 2 functions (`func_ov002_022ae718`, `func_ov002_02216530`
 — the second one zero-shot once the pattern was known). Distinct from
 brief-655's "converge to one return" lever, which defeats *unwanted*
