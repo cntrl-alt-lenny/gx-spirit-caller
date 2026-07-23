@@ -6053,12 +6053,36 @@ B band (`main` + `ov002`); see the brief doc for the full candidate
 list — the census itself is reusable for future waves once this
 lever is applied from the start.
 
-## Permanent (15 patterns)
+## Permanent P-wall index (13 live; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
 walls in yield predictions. Future pilots: skip-and-document
 rather than iterating.
+
+| P-wall | Status | Current routing note |
+|---|---|---|
+| P-1 | LIVE | Shift-pair vs mask collapse; source-form pipeline wall. |
+| P-2 | LIVE | `ldmia`/`ldmib`/`stmia` fusion mismatch. |
+| P-3 | LIVE | Constant materialisation: pool load vs add/orr chain. |
+| P-4 | LIVE | Tiny-thunk register-allocation divergence. |
+| P-5 | LIVE | Halfword offset above the immediate range. |
+| P-6 | RETIRED | Routing-tier gap; superseded by legacy-tier routing. |
+| P-7 | RETIRED | **SUPERSEDED BY C-27:** dual externs plus symbol alias and pointer dance. |
+| P-8 | RETIRED | **SUPERSEDED BY C-25:** split the bit-chain into two statements. |
+| P-9 | LIVE | Conditional `mvn` mask form; keep distinct from recoverable early returns. |
+| P-10 | RETIRED | **SUPERSEDED BY C-29:** `if (!p) return ...` early-return polarity. |
+| P-11 | LIVE | mwcc 2.0 mid-size helper-call register-allocation plateau. |
+| P-12 | LIVE | Non-leaf chained-cast register-allocation divergence. |
+| P-13 | LIVE | C-39c bitfield-packing cross-tier irreducible. |
+| P-14 | LIVE | In-range sub-struct base-offset fold. |
+| P-15 | LIVE | Legacy-tier register-allocation and constant-CSE plateau. |
+| P-16 | LIVE | Repeated-address rematerialisation after a call. |
+| P-17 | LIVE | Briefs 288/290 commutative-add CSE/register-allocation wall. |
+
+**Current count:** 13 genuinely live P-entries; four retired entries
+(P-6, P-7, P-8, P-10). The three newly corrected headings below are
+P-7, P-8, and P-10; their historical bodies remain intact.
 
 ### P-1. Shift-pair vs mask collapse
 
@@ -6388,7 +6412,10 @@ brief 033 reattempted them in the residue cluster and mis-declared
 them permanent under the default-tier-only test). **3 of 47 drops
 (6%)** — third-largest single wall in the set, now 0.
 
-### P-7. Pool literal not deduplicated across uses — RETIRED, superseded by C-27
+### P-7. Pool literal not deduplicated across uses — SUPERSEDED BY C-27 (dual-extern alias/pointer-dance recipe)
+
+**Status:** RETIRED. Route this shape to C-27; do not treat the historical
+pool-deduplication text below as a live P-wall.
 
 **Correction (brief 668, cm-p6-followup):** this entry's own body already
 noted the fix ("SUPERSEDED BY C-27", brief 107) but kept the original
@@ -6459,7 +6486,10 @@ dance) recovers byte-identical at the project's default mwcc
 C-27 for the codified recipe + cross-corpus survey (157
 duplicate-pool-pair occurrences, ~80 candidate functions).
 
-### P-8. Bit-chain reg-alloc: r0-only vs r0→r1→r0 — RETIRED, superseded by C-25
+### P-8. Bit-chain reg-alloc: r0-only vs r0→r1→r0 — SUPERSEDED BY C-25 (split-chain source form)
+
+**Status:** RETIRED. Route this shape to C-25; do not treat the historical
+single-register chain text below as a live P-wall.
 
 **Correction (brief 668, cm-p6-followup):** same framing gap as P-7 —
 the body already says "SUPERSEDED BY C-25" (brief 100) but the "why
@@ -6687,7 +6717,10 @@ the diagnostic `mvn` instruction. ~12 of the 36-candidate pool
 are estimated early-return form (recoverable with natural
 source), ~24 are mask form (true P-9 permanent).
 
-### P-10. Over-predication of short tail vs early-return — RETIRED, superseded by C-29
+### P-10. Over-predication of short tail vs early-return — SUPERSEDED BY C-29 (`if (!p)` early-return polarity)
+
+**Status:** RETIRED. Route this shape to C-29; do not treat the historical
+predication-cost text below as a live P-wall.
 
 **Correction (brief 668, cm-p6-followup):** same framing gap as P-7/P-8
 — the body already says "SUPERSEDED BY C-29" (brief 111) but the "why

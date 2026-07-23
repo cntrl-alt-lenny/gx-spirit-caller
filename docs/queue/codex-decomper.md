@@ -122,7 +122,7 @@ The sm64ds catalogue moved repos and grew ~970 lines / 21 dated sections of same
 
 **Gate:** doc-only; the re-ingested delta + a VERIFY-ON-1.2/sp2p3 checklist + source URLs.
 
-### q-wall-doc-supersede — correct the 3 superseded P-wall headings (r6 bet 10) [TODO]
+### q-wall-doc-supersede — correct the 3 superseded P-wall headings (r6 bet 10) [DONE]
 
 3 of 17 P-walls (P-7/P-8/P-10) still read as live permanent walls in docs/research/codegen-walls.md while cm-wall-retire re-tests them. Append '— SUPERSEDED BY <the actual mechanism/lever>' to those headings per r6's finding, and name the genuinely-live P-entries so future rounds don't waste budget. Do NOT rewrite the taxonomy bodies — annotate headings + add a status line.
 
