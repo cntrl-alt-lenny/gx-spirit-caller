@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**109 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**110 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (40)
+- [Uncategorised](#uncategorised) (41)
 
 ## Analysis / worklist
 
@@ -460,6 +460,12 @@ README.md's per-region shields.io badges to match.
 ## Uncategorised
 
 _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CATEGORIES` to classify._
+
+### `tools/asm_void_counter.py`
+
+**Report inline-assembly C bytes changed by a PR.**
+
+This is visibility only: it never rejects a change.  It finds added or modified ``.c`` files under ``src/`` and ``libs/``, classifies their current source for the project's inline-assembly spellings, and sums their ``.text`` bytes from t…
 
 ### `tools/batch_carve.py`
 

@@ -140,7 +140,7 @@ r6 verified `-lang c99` is `.text`-NEUTRAL (1,106 SAME / 0 DIFF across all tiers
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python -m pytest -q tests` no-new-failures + the flag table.
 
-### q-asm-void-counter — surface a per-PR asm-void byte counter (r6 bet 5 follow-on) [TODO]
+### q-asm-void-counter — surface a per-PR asm-void byte counter (r6 bet 5 follow-on) [DONE]
 
 The natural-C/asm-C split landed, but nothing GATES new asm-in-C content and the escape rate was accelerating (70.8% of new EUR C bytes on one 3-day burst). Retarget `scope_gate.py` (or add a small check) to count added/modified `asm void`/`asm {` `.c` under src/ and libs/ in a PR and surface it in the PR template/summary. Not a hard block — visibility, so asm-void ships are a deliberate choice.
 
