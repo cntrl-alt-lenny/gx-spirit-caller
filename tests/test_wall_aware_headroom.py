@@ -233,6 +233,32 @@ class ScanCandidateAccounting(unittest.TestCase):
         self.assertEqual(per["overlay002"]["candidate"], 0)
         self.assertEqual(per["overlay002"]["excluded_attempted"], 1)
 
+    def test_scan_filters_by_address_range(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "src" / "main").mkdir(parents=True)
+            for addr in (0x02000010, 0x02000020, 0x02000030):
+                rel = f"src/main/func_{addr:08x}.s"
+                (root / rel).write_text("; C-34\n.text\n", encoding="utf-8")
+            (root / "config" / "delinks.txt").write_text(
+                "\n".join(
+                    f"src/main/func_{addr:08x}.s:\n    .text start:0x{addr:x} end:0x{addr + 0x10:x}"
+                    for addr in (0x02000010, 0x02000020, 0x02000030)
+                ),
+                encoding="utf-8",
+            )
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan(min_addr=0x02000020, max_addr=0x02000020)
+
+        self.assertEqual(per["main"]["candidate"], 1)
+        self.assertEqual(
+            per["main"]["coercible_files"][0]["addr"], "0x02000020"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
