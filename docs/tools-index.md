@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**110 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**111 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (41)
+- [Uncategorised](#uncategorised) (42)
 
 ## Analysis / worklist
 
@@ -568,6 +568,12 @@ WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--w
 **per-TU match check without a full ROM rebuild.**
 
 Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then runs the RESOLVED comparison against its delinked gap object and reports the function match %.
+
+### `tools/fix_delink_suffixes.py`
+
+**Check and repair routing suffixes in ``delinks.txt`` TU headers.**
+
+Routing tiers are encoded in source filenames (``.legacy.c``, ``.legacy_sp3.c``, and ``.thumb.c``). A stale plain ``.c`` header can leave a build green while making the invariant checker unable to find the TU source. This preflight repor…
 
 ### `tools/gate3.py`
 
