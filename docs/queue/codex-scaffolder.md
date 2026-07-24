@@ -134,7 +134,7 @@ gate3.py can print `GATE PASS` having executed ZERO checks (e.g. `--scope tests 
 
 **Gate:** `python -m pytest -q tests/test_gate3.py` green + demonstrate `GATE VACUOUS` exit-2 on the empty combination.
 
-### q-c99-flag-hook — add a per-TU flag table to configure.py + adopt -lang c99 (r6 bet 6) [TODO]
+### q-c99-flag-hook — add a per-TU flag table to configure.py + adopt -lang c99 (r6 bet 6) [DONE]
 
 r6 verified `-lang c99` is `.text`-NEUTRAL (1,106 SAME / 0 DIFF across all tiers/regions) and both pret NDS repos ship it; it legalises declaration-at-point-of-use (a real allocator lever). Table-ise the 3 version constants into `{suffix:(binary,flags)}` + a path-glob→flags map, land it as a `ninja sha1`-proven no-op, then flip the default to c99 on the neutrality evidence. Treat the reg-alloc PAYOFF as unproven — adopt on hygiene + to unlock future one-line flag experiments. Work from kb-types.
 
