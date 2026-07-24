@@ -15,10 +15,11 @@ report, 125 lines), `notes/pret-idioms.md` (66 lines, mined from
 
 ## Read this first — every entry below is a hypothesis, not a fact
 
-sm64ds-decomp compiles with **mwccarm 1.2/sp2p3** (plus a `1.2/sp3` legacy tier
-of their own — not to be confused with our `1.2/sp2p3`/`1.2/sp3` legacy tiers,
-which are a *different* pair of SP revisions serving a *different* routing
-purpose; see `CLAUDE.md`'s toolchain table). **We compile with mwccarm
+sm64ds-decomp's main catalogue is compiled with **mwccarm 1.2/sp2p3** (plus a
+`1.2/sp3` legacy tier of its own). Its 1.2/sp2p3 binary is the same compiler
+used by this tree's `1.2/sp2p3` `.legacy.c` and `.thumb.c` routing tiers; the
+additional sp3 tier maps to this tree's separate `.legacy_sp3.c` axis. **We
+compile with mwccarm
 2.0/sp1p5** (decomp.me id `mwcc_30_131`). These are different compiler
 releases with a major version gap. Two concrete, confirmed divergences beyond
 the headline version gap:
