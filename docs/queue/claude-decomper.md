@@ -113,11 +113,12 @@ The epilogue re-sweep shipped 45 then 39 the last two rounds — still the highe
 
 **Result:** Continued the same mechanical `epilogue-wall-corpus.md` sweep as briefs 668/672 through its next 23 smallest still-unattempted rows. **17/23 shipped (73.9%)**, 6 parked — 45/64 (70.3%) cumulative from this corpus across 3 briefs. New confirmed lever: the brief-655 shared-return convergence generalizes to a 3rd shape (threshold-gated dispatch). New wall sub-class identified: an explicit register-copy of a live-in parameter (`mov r1,r0`-style) is allocator-internal and does not respond to a local-variable source hint — 2 independent confirmations this brief. Also fixed a queue-hygiene dedup bug that had silently reverted cm-epilogue-resweep-2's `[DONE]` status back to an empty `[TODO]` stub. All 17 ported to USA+JPN, individually verified 100%. Full writeup: [`docs/research/brief-673-epilogue-resweep-3.md`](../research/brief-673-epilogue-resweep-3.md).
 
-### cm-small-resweep-upper — size-filtered small sweep, upper range 0x02040000+ [TODO]
+### cm-small-resweep-upper — size-filtered small sweep, upper range 0x02040000+ [DONE]
 
 The other half of the re-sweep (Scaffolder takes the lower range). `--max-size 256`, route by epilogue.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
+**Result:** 3 ships, 3-region PASS (EUR/USA/JPN), each individually fastmatch-verified at 100%. Caught and fixed a region-specific struct-offset porting bug (`func_0204c384`'s USA/JPN ports read the same global-state fields at `0x19e`/`0x198` instead of EUR's `0x1a6`/`0x1a0` — `port_to_region.py` renames symbols but not hardcoded struct-literal offsets, same class as brief 673's finding). KEY process note: the initial USA aggregate gate reported "0 confirmed, 3 culprits" for a genuine single-candidate bug, indistinguishable on its face from brief 675's contamination false-negative — individually fastmatch-testing each port (not just trusting the aggregate gate or its bisection) is what isolated the real culprit. New lever: the predication-vs-real-branch sensitivity from brief 675's early-return findings also applies to a plain `if`/`else` — swapping which branch tests first can flip mwcc's choice. 8 more candidates checked and parked (2 byte-swap idioms with correct values but wrong instruction ordering, 1 stack-layout mystery, several complex multi-call sequences not yet converged). ~520 candidates remain in the fresh 129-256B tier alone. Full writeup: [`docs/research/brief-676-small-resweep-upper.md`](../research/brief-676-small-resweep-upper.md).
 
 ### cm-regalloc-discriminator — build a systematic reg-alloc-park discriminator (r8 bets 5/9) [DONE]
 
