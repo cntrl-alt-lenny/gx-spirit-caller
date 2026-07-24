@@ -176,7 +176,7 @@ The brain hand-drives every merge round: ~10-15 serial git merges into brain/int
 
 **Gate:** `python -m pytest -q tests` + a dry-run demo on 2 real branches showing typed resolution + gate result.
 
-### q-include-layer — ship the empty-but-wired include/ shared-header layer (r10 bet 4 [A], substrate — do FIRST) [TODO]
+### q-include-layer — ship the empty-but-wired include/ shared-header layer (r10 bet 4 [A], substrate — do FIRST) [DONE]
 
 `-i include` is already on all 4 mwcc rules (build.ninja) yet include/ holds only .gitkeep — a zero-config drop-in slot sitting empty. 63 headers exist but all ovNNN_core.h (mostly sketch); main-arm9 (~4,047 funcs) has ZERO headers. Create the canonical home: include/game/types.h (game structs + NitroSDK primitive types), include/game/prototypes.h (stub, filled by q-prototypes-h), and per-module include/game/main_core.h etc. Instantly includable, NO configure.py edit needed. This is the substrate the prototypes + type-recovery lanes write into — land it first. Keep it byte-neutral (headers only change what's DECLARED, gate proves no codegen change).
 
