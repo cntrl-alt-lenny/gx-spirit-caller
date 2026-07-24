@@ -359,7 +359,7 @@ src/overlay002/func_ov002_021b1cf0.s:
     complete
     .text start:0x021b1cf0 end:0x021b1d48
 
-src/overlay002/func_ov002_021b1d48.s:
+src/overlay002/func_ov002_021b1d48.c:
     complete
     .text start:0x021b1d48 end:0x021b1d84
 
@@ -1046,7 +1046,7 @@ src/overlay002/func_ov002_021bc6c4.c:
     complete
     .text start:0x021bc6c4 end:0x021bc6e8
 
-src/overlay002/func_ov002_021bc6e8.s:
+src/overlay002/func_ov002_021bc6e8.c:
     complete
     .text start:0x021bc6e8 end:0x021bc72c
 
@@ -3002,7 +3002,7 @@ src/overlay002/func_ov002_021ef664.s:
 src/overlay002/func_ov002_021ef6f4.s:
     complete
     .text start:0x021ef6f4 end:0x021ef7b4
-src/overlay002/func_ov002_021ef7b4.s:
+src/overlay002/func_ov002_021ef7b4.c:
     complete
     .text start:0x021ef7b4 end:0x021ef844
 
@@ -4187,7 +4187,7 @@ src/overlay002/func_ov002_02202ad0.c:
 
 
 
-src/overlay002/func_ov002_02202ae4.s:
+src/overlay002/func_ov002_02202ae4.c:
     complete
     .text start:0x02202ae4 end:0x02202b2c
 
@@ -5519,7 +5519,7 @@ src/overlay002/func_ov002_0220cf0c.c:
 src/overlay002/func_ov002_0220cf40.s:
     complete
     .text start:0x0220cf40 end:0x0220cff8
-src/overlay002/func_ov002_0220cff8.s:
+src/overlay002/func_ov002_0220cff8.c:
     complete
     .text start:0x0220cff8 end:0x0220d02c
 
@@ -7898,7 +7898,7 @@ src/overlay002/func_ov002_0223de94.c:
     complete
     .text start:0x0223de94 end:0x0223def4
 
-src/overlay002/func_ov002_0223def4.s:
+src/overlay002/func_ov002_0223def4.c:
     complete
     .text start:0x0223def4 end:0x0223df38
 
@@ -9544,7 +9544,7 @@ src/overlay002/func_ov002_022592ec.c:
     complete
     .text start:0x022592ec end:0x02259324
 
-src/overlay002/func_ov002_02259324.s:
+src/overlay002/func_ov002_02259324.c:
     complete
     .text start:0x02259324 end:0x0225935c
 
@@ -13417,7 +13417,7 @@ src/overlay002/func_ov002_022a8c90.c:
     complete
     .text start:0x022a8c90 end:0x022a8ca8
 
-src/overlay002/func_ov002_022a8ca8.s:
+src/overlay002/func_ov002_022a8ca8.c:
     complete
     .text start:0x022a8ca8 end:0x022a8cf0
 
