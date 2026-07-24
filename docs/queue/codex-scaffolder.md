@@ -150,7 +150,7 @@ END STATE: `python -m pytest -q tests` fully green on Windows AND unchanged-gree
 
 **Gate:** `python -m pytest -q tests` no-new-failures + before/after: the tool now reports text_size for a sample + `--max-size 256` filters correctly.
 
-### q-gate3-vacuous — make gate3 fail-loud when it runs nothing (r6 bet 3) [TODO]
+### q-gate3-vacuous — make gate3 fail-loud when it runs nothing (r6 bet 3) [DONE]
 
 gate3.py can print `GATE PASS` having executed ZERO checks (e.g. `--scope tests --no-tests`). Extract a `verdict()`, return exit-2 `GATE VACUOUS` when nothing ran, reject `--scope tests --no-tests` at argparse, add tests/test_gate3.py. The real merge oracle is the brain's 3-region sha1, but a vacuous PASS is dangerous.
 
