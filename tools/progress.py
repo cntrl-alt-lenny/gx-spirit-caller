@@ -51,14 +51,43 @@ _DATA_ARRAY_DECL_RE = re.compile(
     r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+"
     r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
 
-# Narrow sub-tier for actual arrays of a named struct.  The broad metric
-# above intentionally retains historical coverage, including opaque
-# ``unsigned char data_*[N]`` carve placeholders.  This expression is the
-# actionable typed-data tier: primitive-element arrays cannot match it.
-_DATA_NAMED_STRUCT_ARRAY_DECL_RE = re.compile(
-    r"(?m)^\s*(?:(?:static|const|volatile)\s+)*"
-    r"struct\s+[A-Za-z_]\w*\s+[A-Za-z_]\w*\s*"
-    r"\[[^\]]*\]\s*(?:=|;)")
+# Same shape as _DATA_ARRAY_DECL_RE but captures the type-clause (every
+# qualifier/type token before the array name) so it can be checked for
+# "is every token a primitive/qualifier keyword" — see
+# _is_primitive_type_clause below.
+_DATA_ARRAY_DECL_TYPE_CAPTURE_RE = re.compile(
+    r"(?m)^\s*((?:(?:static|const|volatile|unsigned|signed|long|short|"
+    r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+)"
+    r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
+
+# Narrow sub-tier for actual arrays of a named (non-primitive) element type.
+# The broad metric above intentionally retains historical coverage,
+# including opaque ``unsigned char data_*[N]`` carve placeholders. This is
+# the actionable typed-data tier: primitive-element arrays cannot count
+# here. Classified by EXCLUSION rather than requiring the literal `struct`
+# keyword, since this repo declares struct types by bare typedef name
+# (`const CharParam data_020b5b80[96]` has no `struct` token at the
+# declaration site) — a keyword requirement misses every such array.
+_PRIMITIVE_TYPE_TOKENS = {
+    "static", "const", "volatile",
+    "void", "char", "short", "int", "long", "float", "double",
+    "signed", "unsigned", "bool", "_Bool",
+    "u8", "u16", "u32", "u64", "s8", "s16", "s32", "s64",
+}
+_PRIMITIVE_WIDTH_RE = re.compile(r"^u?int\d*$")
+
+
+def _is_primitive_type_clause(type_clause: str) -> bool:
+    """True if every token in a declaration's type clause is a qualifier
+    or a built-in/fixed-width primitive keyword — i.e. no struct/union/enum
+    tag or typedef'd name appears. `struct Foo`/`union Foo` are never
+    primitive: `struct`/`union` aren't in the primitive set, so their mere
+    presence already fails the check regardless of the tag that follows.
+    """
+    return all(
+        tok in _PRIMITIVE_TYPE_TOKENS or _PRIMITIVE_WIDTH_RE.match(tok)
+        for tok in type_clause.split()
+    )
 
 
 def count_functions_in_symbols(symbols_file: Path) -> int:
@@ -424,10 +453,15 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
     ``data_*`` placeholders and dsd synthetic names are excluded from the
     denominator. Typed-array bytes are the DATA_SECTIONS bytes owned by a
     ``.c``/``.cpp`` TU whose source contains a file-scope typed-array
-    declaration. ``named_struct_bytes`` is the conservative sub-tier for
-    arrays declared as ``struct Type name[N]``; primitive-element arrays are
-    excluded. Both walks use the same module-level delinks ranges as the
-    existing data% fallback.
+    declaration. ``named_struct_bytes`` is the sub-tier for arrays whose
+    element type is NOT a primitive/qualifier keyword — this repo declares
+    struct types by bare typedef name (``const CharParam data_X[96]``, no
+    ``struct`` token at the declaration site), so the tier is classified by
+    excluding known-primitive type clauses rather than requiring the
+    literal ``struct`` keyword; a literal ``struct Foo name[N]`` still
+    counts too, since ``struct``/``union``/``enum`` were never added to the
+    primitive set. Both walks use the same module-level delinks ranges as
+    the existing data% fallback.
     """
     named_symbols = placeholder_symbols = 0
     for symbols_file in config_dir.rglob("symbols.txt"):
@@ -469,7 +503,8 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
             )
             if _DATA_ARRAY_DECL_RE.search(source_text):
                 typed_array_bytes += data_bytes
-            if _DATA_NAMED_STRUCT_ARRAY_DECL_RE.search(source_text):
+            type_match = _DATA_ARRAY_DECL_TYPE_CAPTURE_RE.search(source_text)
+            if type_match and not _is_primitive_type_clause(type_match.group(1)):
                 named_struct_bytes += data_bytes
 
     total_symbols = named_symbols + placeholder_symbols
