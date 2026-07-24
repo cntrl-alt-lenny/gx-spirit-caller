@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**115 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**116 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (3)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (45)
+- [Uncategorised](#uncategorised) (46)
 
 ## Analysis / worklist
 
@@ -638,6 +638,12 @@ fixed fictional virtual base address, strip the relocation tables, write `*.reso
 **Canonical repository parsers shared by tooling scripts.**
 
 The implementation remains in the two long-standing parser owners for now: ``analyze_symbols`` owns symbols.txt and ``progress`` owns delinks.txt. This small facade gives new and migrated callers one stable import surface without changin…
+
+### `tools/port_census.py`
+
+**READ-ONLY census: EUR .c files whose USA/JPN twin still ships as .s.**
+
+Reproduces the r10 method (find_region_siblings HIGH + byte-sim) against the current checkout. Writes JSON backlog lists to build/ (override with PORT_CENSUS_OUT).
 
 ### `tools/predict_walls.py`
 
