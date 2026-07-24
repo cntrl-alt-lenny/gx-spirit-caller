@@ -651,6 +651,7 @@ def main(argv: list[str] | None = None) -> int:
             exit_code = max(exit_code, 2)
             all_results.append({
                 "file": cfile_str,
+                "region": args.region,
                 "status": "file_not_found",
                 "functions": [],
                 "resolved": False,

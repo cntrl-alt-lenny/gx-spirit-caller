@@ -164,7 +164,7 @@ The post_edit hook already runs objdiff-cli --format json on every .c/.s edit an
 
 **Gate:** `python -m pytest -q tests` no-new-failures + demo: a <100% edit prints the diverging line(s).
 
-### q-fastmatch-keyerror — one-line fastmatch KeyError fix (r9 lever, hours) [TODO]
+### q-fastmatch-keyerror — one-line fastmatch KeyError fix (r9 lever, hours) [DONE]
 
 fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/renamed candidate path crashes with a raw KeyError:'region' instead of a clean FILE NOT FOUND — common during the func_X.c -> Module_Verb.c rename churn. Add 'region': args.region to the file_not_found dict (~lines 652-657), or move the tag computation past the status guards. Also make the batch loop return exit 2 not 1 on a missing file.
 

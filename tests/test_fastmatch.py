@@ -23,6 +23,9 @@ which is exercised indirectly and extensively by tests/test_cmatch_loop
 
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -160,6 +163,28 @@ class TestSummarizeCompileError(unittest.TestCase):
         ]
         result = fastmatch.summarize_compile_error("\n".join(lines))
         self.assertEqual(result, "src/x.c:1: declaration syntax error\nErrors caused tool to abort.")
+
+
+class TestMissingFile(unittest.TestCase):
+    def test_stale_path_reports_cleanly_and_returns_exit_two(self):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            rc = fastmatch.main(["eur", "src/main/func_stale.c"])
+
+        self.assertEqual(rc, 2)
+        self.assertIn("[eur] func_stale.c: FILE NOT FOUND", stdout.getvalue())
+        self.assertIn("ERROR: not found: src/main/func_stale.c", stderr.getvalue())
+
+    def test_missing_file_json_keeps_region_for_status_rendering(self):
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(io.StringIO()):
+            rc = fastmatch.main(["jpn", "src/main/func_stale.c", "--json"])
+
+        self.assertEqual(rc, 2)
+        result = json.loads(stdout.getvalue())[0]
+        self.assertEqual(result["status"], "file_not_found")
+        self.assertEqual(result["region"], "jpn")
 
 
 if __name__ == "__main__":
