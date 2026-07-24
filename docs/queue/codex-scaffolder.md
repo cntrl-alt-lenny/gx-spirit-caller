@@ -170,7 +170,7 @@ TOP RATE FIX — the 3-region gate is the brain's serial critical path. The deli
 
 **Gate:** byte-identical: `python tools/configure.py eur && ninja sha1` OK; then a SECOND no-change `ninja sha1` must be <5s (paste both timings); `python -m pytest -q tests` no-new-failures.
 
-### q-integrate-driver — tools/integrate.py — one-command merge-round driver (r9 lever #3) [TODO]
+### q-integrate-driver — tools/integrate.py — one-command merge-round driver (r9 lever #3) [DONE]
 
 The brain hand-drives every merge round: ~10-15 serial git merges into brain/integ, conflict resolution, index regen, lint fix, gate3, push (86 hand-merge commits + ~40% bookkeeping in last-300). Build tools/integrate.py <branches...> reproducing it deterministically: merge each branch --no-ff; on conflict resolve by TYPE (config/*/delinks.txt = keep-ours + sort_delinks; docs/queue/* = union then dedup-by-id + MD022 blank-guard; docs/research/README.md = regenerate); then run gate3 --scope all --no-tests and report a summary (C added, .s removed, per-region sha1). Do NOT push (brain reviews). Biggest brain-overhead reduction.
 
