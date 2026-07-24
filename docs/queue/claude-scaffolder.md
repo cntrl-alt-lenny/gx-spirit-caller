@@ -140,3 +140,15 @@ Skipped `func_02000cc4` on sight without attempting: it's the exact function cit
 Ships: `func_02018e88` (dual-mode struct-field-vs-array-element writer; needed the "always compute the array-element pointer, even on the branch that doesn't use it" lever — matches lever-payoff.md #12's short-body-pure-predication family: an early-return-shaped if/else tempted the compiler into a real branch instead of the target's straight-line predicated form), `func_0201a3ec` (bitfield lever #3, single-bit `sysWork` flag check-and-set).
 **2 parked, both pure register-letter residue after 1-2 attempts** (branch-vs-predicate `goto` fix and struct-field reordering respectively, neither changed the outcome): `func_02025840` (bit0/bit1 guard chain — goto fixed the *branch* shape but left a size/residue mismatch elsewhere), `func_02000f84` (4-field zero-out + counter increment — same register-letter-swap signature as several `cm-regalloc-ship` residuals from this session, worth revisiting together). Also skipped 2 further candidates unattempted as too complex for remaining budget: `func_02005188`/`func_020051cc` (near-identical multi-arg forwarding thunks that inject a literal function-pointer constant as a 7th call argument via 3 stack-passed words — genuinely uncertain arity, not attempted rather than risk a wrong model).
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS (3-region sha1) + 2/4 shipped (50%), cumulative 31/56 (55%).
+
+### cm-small-resweep — re-sweep the small tier with the FIXED size selector (r6 bet 2 payoff) [TODO]
+
+The r6 swarm found the small tier was never actually swept — a units bug had `wall_aware_headroom.py` sizing by `.s` FILE bytes (~10x real). Codex just shipped the `text_size` field + `--max-size`. Now sweep it PROPERLY: `python tools/wall_aware_headroom.py --json --max-size 256` (main), which is the genuinely-tractable pool (~1,645 files at a measured 35-87% hit rate). Route by epilogue first (header). This is the round's highest-runway lane.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + confirm the --max-size pool size.
+
+### cm-small-resweep-2 — continue the size-filtered small sweep (batch 2) [TODO]
+
+Continue cm-small-resweep with a fresh batch, different address range from the Decomper (you take 0x02000000-0x0203ffff). Report cumulative rate.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate.

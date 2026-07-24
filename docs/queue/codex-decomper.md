@@ -127,3 +127,15 @@ The sm64ds catalogue moved repos and grew ~970 lines / 21 dated sections of same
 3 of 17 P-walls (P-7/P-8/P-10) still read as live permanent walls in docs/research/codegen-walls.md while cm-wall-retire re-tests them. Append '— SUPERSEDED BY <the actual mechanism/lever>' to those headings per r6's finding, and name the genuinely-live P-entries so future rounds don't waste budget. Do NOT rewrite the taxonomy bodies — annotate headings + add a status line.
 
 **Gate:** doc-only; the 3 corrected headings + a live-vs-superseded P-wall summary table.
+
+### q-attempts-ledger — build a machine-readable attempts ledger (r6 bet 9) [TODO]
+
+The failed-candidate exclusion set exists only as prose across ~10 briefs, and brief 661's 8 candidate names were never recorded — permanently lost. Create an append-only `docs/research/campaign-analytics/attempts.tsv` with columns `addr,module,text_size,tier,shape,result,match_pct,park_class,brief` and `merge=union` in `.gitattributes` (prevents the queue-file-style conflicts). Backfill what's recoverable from recent brief reports. Add a `wall_aware_headroom.py --exclude-attempted` flag that reads it.
+
+**Gate:** doc+tool; the tsv with backfilled rows + the --exclude-attempted flag + a test.
+
+### q-sm64ds-verify-prep — prep the sm64ds §7a verification (feeds a CC lane) [TODO]
+
+q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verification harness for §6k/6q/6u/6y/6z/7a/7b: extract each lever's exact before/after C form and the .s it claims to fix, into a checklist a CC agent can run mechanically. §7a (reg-alloc categorizer failure) is the priority — it corroborates our own finding.
+
+**Gate:** doc-only; the per-lever verification checklist with concrete C forms.

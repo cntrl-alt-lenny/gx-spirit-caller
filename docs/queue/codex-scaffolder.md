@@ -34,17 +34,9 @@ CC Decomper (2026-07-21) found 29 `.s` files under src/ that are NOT referenced 
 Improvement-swarm r5's S2. PROVEN feasible but never built: a game `.c` compiles to a valid ARM relocatable using only committed `include/` + `libs/` + `mwccarm.exe`; **0 mwcc edges reference `extract/`**, and `configure.py <ver> --skip-sha1` already runs baserom-free. Today **none of the 11 workflows compiles a single line of game C** — the existing comments conflate "can't verify byte-identity" with "can't build at all". Add `.github/workflows/compile-check.yml`: PR-triggered, paths filter `src/**`, fetch mwccarm, `configure.py <region> --skip-sha1`, map changed `.c` via `git diff` → `build/<region>/<path>.o`, `ninja` just those targets. Changed-file scoping keeps it seconds. **windows-latest needs no wibo** — prefer it. Do NOT attempt to put baseroms in CI.
 **Gate:** the workflow file + a green run on your own PR (it will exercise itself), or if it can't self-trigger, paste the exact local equivalent commands and their output.
 
-### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
+### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [DONE]
 
 > PARKED: kb-types EUR build gate passed, but pytest remains red with 12 failures (11 Windows/path/tool baseline plus stale generated research-index check); defer until q-green-pytest.
-
-### q-objdiff-v3 — objdiff 2.7.1 → 3.7.3 upgrade feasibility [PARKED]
-
-> PARKED: kb-types EUR rerun configured and ninja sha1 passed, but required pytest remains red (11 pre-existing Windows/path/tool-environment failures); v3 A/B probes still require a separate migration trial.
->
-> PARKED: Report delivered; pytest gate ran but remains red on 11 pre-existing Windows/path/build-environment failures (2843 passed, 25 skipped, 55 subtests). Re-run on a POSIX/build-capable worktree before pin migration.
-Our own issue **#352 was CLOSED upstream 2026-07-10** (PR #359 merged); the "we own this patch forever" belief is dead, and v3.7.3 ships prebuilts for all three hosts. But this is NOT a blind bump: v3.0.0 self-describes as a rewrite (251 commits / 186 files), **10 `report.json` consumers ride this schema**, and the genuinely untested risk is dsd v0.11.0's `objdiff.json` ↔ v3 config schema. Produce a feasibility report: what breaks, which consumers need changes, whether our panic-filter case (a) can retire (case (b) stays), and a go/no-go with a migration order. Do a read-only trial if you can (fetch v3.7.3, run it against one unit) without changing the pinned version.
-**Gate:** `python -m pytest -q tests` green + the report; do NOT change the pin in this item.
 
 ### q-itcm-reach — why ITCM's functions are unreachable [DONE]
 
@@ -56,17 +48,9 @@ ITCM is effectively an invisible 27th module: ~39 uncarved functions (11 EUR + 1
 One taxonomy code, **C-34, covers 116 of the 138 coercible candidates** — the single biggest lever-shaped opportunity in the pool. Mechanically gather every C-34-cited file into one reference: address, module, size, the exact `.s` shape that triggered the citation, and any ALREADY-MATCHED example of the same shape (search matched `.c` for siblings). You are assembling evidence, NOT deriving the recipe — a CC agent cracks it; your job is to hand them the corpus so they don't spend hours collecting it.
 **Gate:** the corpus doc + counts; doc-only, no build.
 
-### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
+### q-tools-package — kill the tools/ boilerplate and parser duplication [DONE]
 
 > PARKED: kb-types EUR configure+ninja sha1 passed; pytest remains red with 12 failures including the stale generated research-index check, so defer until q-green-pytest.
-
-### q-tools-package — kill the tools/ boilerplate and parser duplication [PARKED]
-
-> PARKED: kb-types EUR configure and ninja sha1 passed; required pytest remains red on 11 pre-existing Windows/path/tool-environment failures (2848 passed, 20 skipped, 55 subtests), so keep parked until the stated green pytest gate.
->
-> PARKED: Parser facade and direct-call-site batch complete; exact configure gate unavailable because orig\\baserom_eur.nds is absent. pytest ran with 2843 passed, 25 skipped, 55 subtests and 11 pre-existing Windows/path/build failures; no new failures.
-~93 flat `tools/*.py` with no package boundary: ~30 hand-roll delinks/symbols parsing while canonical `parse_delinks_file`/`parse_symbols_file` exist, and ~40 carry identical `sys.path.insert` + `# noqa: E402` boilerplate. Promote the canonical parsers into a shared module, make `tools/` importable, migrate the hand-rolled readers. ⚠️ `build.ninja` invokes tools AS SCRIPTS — preserve that (absolute imports or `-m`), and migrate in small batches, most-duplicated first. This is the root cause behind the C%-metric bug b566 had to fix.
-**Gate:** `python -m pytest -q tests` green (do NOT add to the ~12 known Windows path-sep failures) + `python tools/configure.py eur` still succeeds + list which tools you migrated.
 
 ### q-dead-tools — audit the tool inventory for dead weight [DONE]
 
@@ -79,12 +63,6 @@ Lint has been red for weeks and **red is the baseline**, which means a real regr
 **Gate:** the CI checks green on your own PR + the proposed ruleset written up for the owner to apply.
 
 ### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
-
-### q-c34-header-fix — correct the 30 mistagged C-34 citations [DONE]
-
-> PARKED: Corrected the live mistagged headers and recorded 58->28 main C-34 count; gate3 is blocked because kb-map lacks ./dsd. PR #1260 records the byte-neutral pass.
-Brief 655 found that **30 of `main`'s 62 "coercible" files cite C-34 with zero supporting evidence** — the identical boilerplate paragraph pasted verbatim across unrelated bodies. Examples: `func_020061bc` is a SWAR population-count routine (pool constants `0xaaaaaaaa/0xcccccccc/0xf0f0f0f0/0xff00ff00`, no address anywhere); `func_02007f38` builds one MMIO-shadow constant via 3 `orr`s; `func_0200b2f4`/`func_0201a32c`/`func_0203244c`/`func_0206d79c` have **no `.word` pool entries at all**. None involve loading the same address twice — the citation's actual mechanism. Correct those headers (remove/replace the unsupported citation with an honest "never assessed" note) so `wall_aware_headroom.py` stops reporting them as lever-shaped. Get the full list from brief 655's report, and re-verify each yourself before editing.
-**Gate:** `python tools/wall_aware_headroom.py` before/after counts + `python tools/gate3.py --scope eur --no-tests` (header comments must be byte-neutral — prove it).
 
 ### q-ov002-wall-record — document ov002's verified wall cohort [DONE]
 
@@ -155,3 +133,15 @@ END STATE: `python -m pytest -q tests` fully green on Windows AND unchanged-gree
 gate3.py can print `GATE PASS` having executed ZERO checks (e.g. `--scope tests --no-tests`). Extract a `verdict()`, return exit-2 `GATE VACUOUS` when nothing ran, reject `--scope tests --no-tests` at argparse, add tests/test_gate3.py. The real merge oracle is the brain's 3-region sha1, but a vacuous PASS is dangerous.
 
 **Gate:** `python -m pytest -q tests/test_gate3.py` green + demonstrate `GATE VACUOUS` exit-2 on the empty combination.
+
+### q-c99-flag-hook — add a per-TU flag table to configure.py + adopt -lang c99 (r6 bet 6) [TODO]
+
+r6 verified `-lang c99` is `.text`-NEUTRAL (1,106 SAME / 0 DIFF across all tiers/regions) and both pret NDS repos ship it; it legalises declaration-at-point-of-use (a real allocator lever). Table-ise the 3 version constants into `{suffix:(binary,flags)}` + a path-glob→flags map, land it as a `ninja sha1`-proven no-op, then flip the default to c99 on the neutrality evidence. Treat the reg-alloc PAYOFF as unproven — adopt on hygiene + to unlock future one-line flag experiments. Work from kb-types.
+
+**Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python -m pytest -q tests` no-new-failures + the flag table.
+
+### q-asm-void-counter — surface a per-PR asm-void byte counter (r6 bet 5 follow-on) [TODO]
+
+The natural-C/asm-C split landed, but nothing GATES new asm-in-C content and the escape rate was accelerating (70.8% of new EUR C bytes on one 3-day burst). Retarget `scope_gate.py` (or add a small check) to count added/modified `asm void`/`asm {` `.c` under src/ and libs/ in a PR and surface it in the PR template/summary. Not a hard block — visibility, so asm-void ships are a deliberate choice.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + demo output on a sample diff.

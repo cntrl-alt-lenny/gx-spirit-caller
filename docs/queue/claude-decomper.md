@@ -61,13 +61,6 @@ ov002 is 2,740 `unknown` files — 45% of the entire reopened frontier, and per 
 ⚠️ A parallel ov002 sweep (brief 650, PR #1231) already attempted a first 15-file sample (5 shipped, 33% hit rate) — get that PR's file list before picking candidates here to avoid re-attempting the same 15.
 **Gate:** `python tools/gate3.py --scope all` PASS + count converted.
 
-### cm-epilogue-wall — crack the recurring epilogue-shape wall [DONE]
-
-**Highest-leverage single target in the project right now.** Brief 661 hit the same wall **three times** on functions whose bodies matched *perfectly*: `func_020915e4` (loop body 100%), `func_020458d8` (all 4 branch bodies 100%), `func_0206eecc` — each blocked only by a recurring **epilogue-shape** mismatch. It also accounted for ~14% of that sample. Crack the mechanism once and it converts a documented backlog of near-misses into ships across the whole main sweep.
-METHOD: read those three `.s` files' epilogues against your generated output, identify exactly what mwcc is doing differently (stack teardown order, register-list shape, `pop {…, pc}` vs `bx lr`, sub-sp vs push-based frames), and hunt the C-level lever that reproduces it. Check `docs/research/style-a-epilogue.md` and the `.legacy.c` / `.legacy_sp3.c` routing tiers — this smells like a compiler-revision routing issue, and those tiers exist precisely for epilogue-shape families.
-If you crack it: ship those three, then sweep the near-miss backlog in 661's table. If it's genuinely permanent, document it as a NEW `P-NN` codegen-walls entry with the repro — that's equally valuable.
-**Gate:** `python tools/gate3.py --scope all --no-tests` + either the lever + ships, or the new wall entry with evidence.
-
 ### cm-main-small-c — main small/medium sweep, upper range (0x0204xxxx+) [DONE]
 
 Brief 665: only 10 candidates existed in this exact filter (most of the range already swept). 2/8 real attempts shipped, ported to USA+JPN. **Headline: retired the P-6 "permanent" predication-threshold wall** — `func_02067b8c` and `func_0207f8f8` (named alongside `func_02087d10` in codegen-walls.md's P-6 entry, all 3 tagged permanent by brief 033) recover to 100% via `.legacy.c` routing; a later brief already fixed the 3rd sibling this way but nobody re-tested the other two. `codegen-walls.md`'s P-6 section corrected in this PR — may unlock other P-6-tagged candidates project-wide. 2 files are genuine shared-epilogue-tail stubs (unshippable, not real functions). 4 near-misses parked (Thumb stmia-batching 0%, byte-vs-word bitfield access 14.3%, 64-bit multiply reg-alloc wall 0%, struct-zero 66.7%). See docs/research/brief-665-main-small-c.md.
@@ -81,13 +74,7 @@ Apply anything you learned from `cm-epilogue-wall` — if the epilogue lever wor
 Brief 666: 2/5 shipped (func_0206eecc already resolved via a separate unmerged epilogue-wall PR, not re-attempted). `func_020967bc` (ring-buffer dequeue, 74.3%→100%: unsigned bounds check + return-raw-value lever) and `func_020403d4` (multi-call global setup, 26.8%→100% first try: don't-cache-global lever + `.legacy_sp3.c` routing). 2 more show major measurable progress without fully closing: `func_0209a000` (18-19%→70.7%: branch-polarity fix + `.legacy.c` routing recovered one whole branch to 100%, residual is a reg-alloc register-reuse choice in the other branch) and `func_02073fc8` (22.9%→35.4%: the Internet-checksum odd/even-alignment split is now fully modeled, residual is shift/mask instruction selection). `func_020685c8` unchanged at 54.2% (2 more variants tried, both worse; confirmed `lr`-preferring reg-alloc residue). All ships ported to USA+JPN. See docs/research/brief-666-nearmiss-backlog.md.
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + 2 shipped, 2 improved.
 
-### cm-main-small-f — main small/medium sweep, upper range batch F [CLAIMED]
-
 ### cm-main-small-f — main small/medium sweep, upper range batch F [DONE]
-
-Brief 670: 8/19 shipped (42%), 11 parked, 6 deferred (epilogue-only shared-tail stubs / hand-encoded inter-function jumps, plus one `clz`-based popcount deferred pending toolchain-intrinsic confirmation). 3 of the 8 ships needed `.legacy.c` routing purely to cross a predication-threshold (same underlying mechanism as brief 665's retired P-6, but confirmed here to fire independent of epilogue/frame shape — one ship is a pure leaf with no stack frame at all). Two reusable levers found: `return`-the-original-pointer forces a separate register for a loop's walking pointer when the function also needs to hand back the untouched incoming value; an unused dummy parameter does NOT reserve a register on its own — it must be forwarded to a real use (e.g. a tail call) to survive dead-code elimination. All 8 ported to USA+JPN, individually verified 100% (24/24 across all 3 regions, no porting bugs this time). See docs/research/brief-670-main-small-f.md.
-
-**Gate:** `python tools/gate3.py --scope all --no-tests` PASS — 8 shipped, 11 re-parked.
 
 ### cm-epilogue-resweep — re-attempt past parks with the routing rule [DONE]
 
@@ -111,10 +98,15 @@ Brief 665 retired P-6; r6's reg-alloc finding effectively retires part of P-4. O
 **Result:** P-7/P-8/P-10's stale framing was already corrected in brief 669 (re-verified live on main, no new action). r6's own R&D report (`docs/research/rnd-swarm-2026-07-23-r6.md`) claiming "6 of 8 + P-4's own `func_02084ac4`" falsified was independently re-tested function-by-function: **2/7 shipped** (`func_020a71e4`, `func_020a724c` — both from the broader brief-641 catalog, genuinely fixed via a "grep actual call sites for true arity" lever, not a new allocator lever), **1 false-positive correction** (`func_02084ac4`, P-4's own cited example, re-confirmed PERMANENT across 3 variants — r6 was wrong about this one), **4 partial-progress parks** (`func_0207e214` 42.9%, `func_02096040` 66.7%, two `.thumb.c` candidates at 69-71%). Critical tooling finding: `.thumb.c` files need an explicit `#pragma thumb on` or they silently miscompile in ARM mode. Both ships ported to USA+JPN, individually objdiff-verified 100%. 3-region gate PASS. Full writeup: [`docs/research/brief-671-wall-retire.md`](../research/brief-671-wall-retire.md).
 
 ### cm-epilogue-resweep-2 — re-attempt more parked candidates with the routing discriminator [TODO]
-### cm-epilogue-resweep-2 — re-attempt more parked candidates with the routing discriminator [DONE]
 
-The epilogue-routing re-sweep shipped 45 last round from previously-parked functions. Keep going: re-attempt parked candidates whose park reason mentions epilogue/stack-teardown/tail mismatch — sources: brief 655/661 tables + cmatch-parked-and-floor.md. Route by epilogue first. ⚠️ Skip reg-alloc parks unless cm-wall-retire reopened them.
+### cm-epilogue-resweep-3 — continue re-attempting parks with the routing discriminator [TODO]
+
+The epilogue re-sweep shipped 45 then 39 the last two rounds — still the highest producer. Keep going on the parked backlog (brief 655/661 tables + cmatch-parked-and-floor.md), route by epilogue. Also fold in anything cm-wall-retire reopened.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked.
 
-**Result:** Continued brief 668's mechanical `epilogue-wall-corpus.md` sweep (not the prose sources named above — brief 668 already established the corpus outperforms them 62.5% vs 0%) through its next 17 smallest still-unattempted rows. **13/17 shipped (76.5%)**, 4 parked on pure register-choice residuals. New/confirmed levers: hoist a shared pointer offset out of both if/else branches or the compiler duplicates it; a disassembly's literal flag-variable shape can be load-bearing (don't simplify to `||`); the brief-655 shared-return convergence lever generalizes to a second, unrelated function shape; "re-fetch a global instead of caching it" recurs on 2 more functions. Also fixed a brief-668 tooling bug found via this branch's own CI: 17 EUR delinks.txt headers had the wrong file suffix (plain `.c` instead of the real `.legacy.c`/`.legacy_sp3.c`/`.s`), invisible to the build but flagged by `check_match_invariants.py`. All 13 ported to USA+JPN (4 at MEDIUM confidence, individually verified). Full writeup: [`docs/research/brief-672-epilogue-resweep-2.md`](../research/brief-672-epilogue-resweep-2.md).
+### cm-small-resweep-upper — size-filtered small sweep, upper range 0x02040000+ [TODO]
+
+The other half of the re-sweep (Scaffolder takes the lower range). `--max-size 256`, route by epilogue.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
