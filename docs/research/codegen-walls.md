@@ -6260,25 +6260,48 @@ other patterns in partial-match drops.
 > register issue — `func_020a724c` takes two forwarded `int` args (was
 > wrongly modeled as `void`-no-arg); `func_0207e214` needed the swarm's
 > exact struct field layout/write order. Both matched first-try once
-> corrected. The final 2 (`func_020a71e4`, `func_ov004_021dbe68`) got the
-> *same* signature-class correction applied — a 2-arg vtable call and an
-> int-returning arg-swap tail call respectively, confirmed structurally
-> correct (every immediate offset and relocation matches) — and **still
-> show pure register-letter residue**: mine picks r2, target picks r3,
-> the exact `swap-tail-call`/`fnptr-cache` sub-shapes the table below
-> already documents. Four additional source rewrites each (explicit
-> local, fn-pointer local, deref-call form, memory round-trip) produced
-> byte-identical compiled output every time — `-O4` normalizes them
-> before register allocation ever sees a difference. These 2 now stand as
-> a *confirmed* instance of the sub-shapes below, not merely an
-> unattempted one. **`func_020b3850` and `func_0208b1ac` are confirmed
-> genuine survivors** (all-tier DIFF; do not re-attempt). **Action for
-> future work:** do not park a reg-alloc-shaped candidate on sight — read
-> its epilogue, route to the tier it implies, try a `volatile` local if a
-> value looks dead-code-eliminated, then check for a wrong signature
-> (missing forwarded args, wrong return type) before accepting a
-> register-letter residue as the wall itself. See `lever-payoff.md`'s
-> reg-alloc/scratch-register row for the up-to-date W/F count.
+> corrected. `func_020a71e4` (2-arg vtable call) got the *same*
+> signature-class correction applied — confirmed structurally correct
+> (every immediate offset and relocation matches) — and **still shows
+> pure register-letter residue**: mine picks r2, target picks r3, the
+> exact `swap-tail-call`/`fnptr-cache` sub-shapes the table below already
+> documents. Four additional source rewrites (explicit local, fn-pointer
+> local, deref-call form, memory round-trip) produced byte-identical
+> compiled output every time — `-O4` normalizes them before register
+> allocation ever sees a difference.
+>
+> **UPDATE 2 (r8 bet 3, queue item cm-regalloc-trampoline):** the other
+> "final" case, `func_ov004_021dbe68`, was **not actually a register-letter
+> residue at all** — the diagnosis above was wrong. Its callee,
+> `func_02094688`, is a genuine 3-argument `(dst, src, len)` memmove-style
+> routine (`cmp r2, #0` is its first instruction, and r2 is read/decremented
+> throughout the body) — confirmed by reading the callee's own `.s`, not
+> just the caller's. Modeling the trampoline as forwarding only 2 args left
+> r2 "dead" from the compiler's point of view, free to reuse as the
+> swap-temp scratch register (picking r2); the real signature must forward
+> a 3rd `int n` arg through unchanged, which forces r3 as the swap temp
+> instead (r2 has to stay live to carry `n`). `int func_ov004_021dbe68(int
+> a, int b, int n) { return func_02094688(b, a, n); }` compiles **byte-
+> identical** (`1c03 1c08 1c19 4b01 4718 46c0`) on the first try — this was
+> a wrong-arity bug, indistinguishable from a genuine register-letter wall
+> from the caller's disassembly alone, since forwarding a 3rd arg
+> unchanged produces *zero* additional visible instructions in the
+> caller — the only symptom is which scratch register the swap uses.
+> **Generalized rule: never model a trampoline/thunk's argument count from
+> the caller's instruction count alone — a forwarded-but-untouched
+> argument adds no visible instructions, so undercounting arity is
+> invisible until you check the callee's own first instructions for which
+> argument registers it actually reads.** `func_020b3850` and
+> `func_0208b1ac` remain the only confirmed genuine survivors (all-tier
+> DIFF, arity independently verified in both cases; do not re-attempt).
+> **Action for future work:** do not park a reg-alloc-shaped candidate on
+> sight — read its epilogue, route to the tier it implies, try a
+> `volatile` local if a value looks dead-code-eliminated, check for a
+> wrong signature (missing forwarded args, wrong return type, **or wrong
+> arity confirmed by reading the callee**), then accept a register-letter
+> residue as the wall itself only once all of those are ruled out. See
+> `lever-payoff.md`'s reg-alloc/scratch-register row for the up-to-date
+> W/F count.
 
 For a tiny thunk where mwcc must pick a scratch register for
 a swap temp or pool-load pointer (`return target(b, a)` or
