@@ -158,7 +158,7 @@ Data readability is ~0% and invisible: 10,949 `data_*` placeholders, 2 real name
 
 **Gate:** `python -m pytest -q tests` no-new-failures + the new metric lines + a test.
 
-### q-objdiff-lines — surface objdiff's already-computed line_number in the feedback hook (r9 lever #4 — close localize.py) [TODO]
+### q-objdiff-lines — surface objdiff's already-computed line_number in the feedback hook (r9 lever #4 — close localize.py) [DONE]
 
 The post_edit hook already runs objdiff-cli --format json on every .c/.s edit and the JSON ALREADY carries per-instruction 'formatted' (disasm) + 'line_number' (the .debug_line join objdiff does internally; -sym on is default in CC_FLAGS configure.py:141). The hook extracts ONLY match_percent (post_edit.py:255/293) and discards the rest -> agents then hand-run fastmatch/capstone to localize. FIX: in _objdiff_match_percent also return the instruction rows; in _cmatch_feedback, when pct<100 print the first ~3 diverging rows as 'line 25: mov r5,r0'. ~50 lines. This makes the queued/ledgered localize.py task REDUNDANT — mark it closed (nothing to join; objdiff already did it).
 
