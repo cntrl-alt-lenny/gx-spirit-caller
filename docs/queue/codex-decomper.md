@@ -134,7 +134,7 @@ The failed-candidate exclusion set exists only as prose across ~10 briefs, and b
 
 **Gate:** doc+tool; the tsv with backfilled rows + the --exclude-attempted flag + a test.
 
-### q-sm64ds-verify-prep — prep the sm64ds §7a verification (feeds a CC lane) [TODO]
+### q-sm64ds-verify-prep — prep the sm64ds §7a verification (feeds a CC lane) [DONE]
 
 q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verification harness for §6k/6q/6u/6y/6z/7a/7b: extract each lever's exact before/after C form and the .s it claims to fix, into a checklist a CC agent can run mechanically. §7a (reg-alloc categorizer failure) is the priority — it corroborates our own finding.
 
