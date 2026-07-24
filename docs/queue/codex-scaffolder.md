@@ -182,7 +182,7 @@ The brain hand-drives every merge round: ~10-15 serial git merges into brain/int
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python -m pytest -q tests` no-new-failures + the header skeleton.
 
-### q-data-metric-fix — fix the data metric — it counts opaque placeholders as 'typed' (r10 bet 3 [A]) [TODO]
+### q-data-metric-fix — fix the data metric — it counts opaque placeholders as 'typed' (r10 bet 3 [A]) [DONE]
 
 The Typed-array metric (progress.py:49 _DATA_ARRAY_DECL_RE, :454) matches the opaque carve placeholder `unsigned char data_X[N]=` IDENTICALLY to a real struct array, so summarize_data_readability's 1.69% holds 0 BYTES of genuinely struct-typed data — retyping (cm-data-canary) would move it by ZERO. Add a named-struct sub-tier that EXCLUDES primitive-element arrays (unsigned char/int etc.) and counts only real `StructName foo[N]` typed data. Land it BEFORE the data-retype chapter scales, or the whole lane is invisible + unscorable.
 

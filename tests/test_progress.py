@@ -828,6 +828,37 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["typed_array_bytes"], 0x20)
         self.assertEqual(metric["data_total_bytes"], 0x100)
         self.assertAlmostEqual(metric["typed_array_pct"], 12.5)
+        self.assertEqual(metric["named_struct_bytes"], 0)
+        self.assertEqual(metric["named_struct_pct"], 0.0)
+
+    def test_named_struct_array_subtier_excludes_primitive_arrays(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x30 kind:data\n"
+                "\n"
+                "src/main/data_00000003.c:\n"
+                "    .data start:0x0 end:0x20\n"
+                "\n"
+                "src/main/data_00000004.c:\n"
+                "    .data start:0x20 end:0x30\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_00000003.c").write_text(
+                "struct Canary data_00000003[2] = {{0}, {0}};\n"
+            )
+            (source_dir / "data_00000004.c").write_text(
+                "const unsigned char data_00000004[16] = {0};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["typed_array_bytes"], 0x30)
+        self.assertEqual(metric["named_struct_bytes"], 0x20)
+        self.assertAlmostEqual(metric["named_struct_pct"], 100 * 0x20 / 0x30)
 
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py

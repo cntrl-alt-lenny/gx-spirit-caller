@@ -51,6 +51,15 @@ _DATA_ARRAY_DECL_RE = re.compile(
     r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+"
     r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
 
+# Narrow sub-tier for actual arrays of a named struct.  The broad metric
+# above intentionally retains historical coverage, including opaque
+# ``unsigned char data_*[N]`` carve placeholders.  This expression is the
+# actionable typed-data tier: primitive-element arrays cannot match it.
+_DATA_NAMED_STRUCT_ARRAY_DECL_RE = re.compile(
+    r"(?m)^\s*(?:(?:static|const|volatile)\s+)*"
+    r"struct\s+[A-Za-z_]\w*\s+[A-Za-z_]\w*\s*"
+    r"\[[^\]]*\]\s*(?:=|;)")
+
 
 def count_functions_in_symbols(symbols_file: Path) -> int:
     """Count how many symbols in a dsd symbols.txt file are functions.
@@ -415,7 +424,9 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
     ``data_*`` placeholders and dsd synthetic names are excluded from the
     denominator. Typed-array bytes are the DATA_SECTIONS bytes owned by a
     ``.c``/``.cpp`` TU whose source contains a file-scope typed-array
-    declaration. Both walks use the same module-level delinks ranges as the
+    declaration. ``named_struct_bytes`` is the conservative sub-tier for
+    arrays declared as ``struct Type name[N]``; primitive-element arrays are
+    excluded. Both walks use the same module-level delinks ranges as the
     existing data% fallback.
     """
     named_symbols = placeholder_symbols = 0
@@ -435,7 +446,7 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
             else:
                 named_symbols += 1
 
-    data_total_bytes = typed_array_bytes = 0
+    data_total_bytes = typed_array_bytes = named_struct_bytes = 0
     for delinks in config_dir.rglob("delinks.txt"):
         module_sections, tus = parse_delinks_file(delinks)
         data_total_bytes += sum(
@@ -451,13 +462,15 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
                 source_text = (ROOT / Path(source)).read_text(encoding="utf-8")
             except OSError:
                 continue
-            if not _DATA_ARRAY_DECL_RE.search(source_text):
-                continue
-            typed_array_bytes += sum(
+            data_bytes = sum(
                 max(0, end - start)
                 for name, start, end in tu.get("sections", [])
                 if name in DATA_SECTIONS
             )
+            if _DATA_ARRAY_DECL_RE.search(source_text):
+                typed_array_bytes += data_bytes
+            if _DATA_NAMED_STRUCT_ARRAY_DECL_RE.search(source_text):
+                named_struct_bytes += data_bytes
 
     total_symbols = named_symbols + placeholder_symbols
     return {
@@ -468,6 +481,9 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
         "typed_array_bytes": typed_array_bytes,
         "data_total_bytes": data_total_bytes,
         "typed_array_pct": (typed_array_bytes / data_total_bytes * 100.0)
+        if data_total_bytes else 0.0,
+        "named_struct_bytes": named_struct_bytes,
+        "named_struct_pct": (named_struct_bytes / data_total_bytes * 100.0)
         if data_total_bytes else 0.0,
     }
 
@@ -857,6 +873,9 @@ def print_report(version: str, report: dict, config_dir: Path | None = None) -> 
         print(f"  Typed-array:  {data_metric['typed_array_bytes']:>10} / "
               f"{data_metric['data_total_bytes']:<10} data bytes  "
               f"({data_metric['typed_array_pct']:5.2f}%)")
+        print(f"  Named-struct: {data_metric['named_struct_bytes']:>10} / "
+              f"{data_metric['data_total_bytes']:<10} data bytes  "
+              f"({data_metric['named_struct_pct']:5.2f}%)")
     print()
 
     if report.get("categories"):
