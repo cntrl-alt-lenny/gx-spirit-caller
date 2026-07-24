@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**113 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**115 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,10 +16,10 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (2)
+- [Hygiene / invariants](#hygiene--invariants) (3)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (44)
+- [Uncategorised](#uncategorised) (45)
 
 ## Analysis / worklist
 
@@ -301,6 +301,12 @@ Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an
 
 The metadata scattered across `symbols.txt`, `delinks.txt`, and the C sources in `src/` can drift out of sync in ways that silently break the decomp loop. This tool catches the common footguns:
 
+### `tools/check_prototypes_provenance.py`
+
+**re-verify include/game/prototypes.h**
+
+against the matched C bodies it claims to be derived from.
+
 ## CI formatters
 
 _PR comment renderers. Each consumes a machine-readable analysis result and emits Markdown for the GitHub comment bot._
@@ -580,6 +586,12 @@ Routing tiers are encoded in source filenames (``.legacy.c``, ``.legacy_sp3.c``,
 **the brain's one-command 3-region clean-tree gate.**
 
 The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-repeated, highest-stakes brain action, yet it's entirely manual: `configure.py` is single-region, so a real gate means reconfiguring + rebuilding for all thre…
+
+### `tools/gen_prototypes.py`
+
+**evidence-only canonical prototype bank generator.**
+
+PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled conflicts had a prototype that CONTRADICTED its own matched C body (33 arity mismatches, 26 return-type mismatches), because it derived signatures by majorit…
 
 ### `tools/generate_progress_bars.py`
 
