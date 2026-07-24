@@ -64,10 +64,15 @@ def check_dsd_binary() -> bool:
     ("Unrecognized argument: rom") and the whole 3-region gate FAILED on a
     build error that looked exactly like a content divergence — a full gate
     cycle wasted before the wrong binary was spotted. This catches it in ms."""
-    dsd = ROOT / "dsd"
-    if not dsd.exists():
-        print("gate3: ./dsd missing — run `python3.13 tools/download_tool.py "
-              "dsd v0.11.0 --path ./dsd`", file=sys.stderr)
+    # Windows ships the binary as dsd.exe. Path.exists() on the extensionless
+    # name is False there even though CreateProcess resolves `dsd` -> `dsd.exe`
+    # at exec time, so probing only "dsd" made every Windows worktree fail this
+    # preflight in ~0s with a message that reads like a content divergence,
+    # while the build itself ran dsd perfectly happily.
+    dsd = next((c for c in (ROOT / "dsd", ROOT / "dsd.exe") if c.exists()), None)
+    if dsd is None:
+        print("gate3: ./dsd (or ./dsd.exe) missing — run `python3.13 "
+              "tools/download_tool.py dsd v0.11.0 --path ./dsd`", file=sys.stderr)
         return False
     try:
         out = subprocess.run([str(dsd), "--version"], cwd=ROOT,

@@ -39,5 +39,39 @@ class TestArgumentGuard(unittest.TestCase):
         self.assertEqual(ctx.exception.code, 2)
 
 
+
+class TestDsdBinaryProbe(unittest.TestCase):
+    """Windows ships dsd.exe; probing only the extensionless name made every
+    Windows worktree fail the preflight in ~0s with a message that reads like a
+    content divergence, while the build ran dsd fine (CreateProcess appends
+    .exe). Guard both spellings."""
+
+    def _probe(self, root):
+        # Mirror check_dsd_binary's candidate resolution against a fake root.
+        return next((c for c in (root / "dsd", root / "dsd.exe") if c.exists()), None)
+
+    def test_exe_only_root_is_found(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "dsd.exe").write_bytes(b"x")
+            self.assertIsNotNone(self._probe(root), "dsd.exe must satisfy the probe")
+
+    def test_extensionless_only_root_is_found(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "dsd").write_bytes(b"x")
+            self.assertIsNotNone(self._probe(root), "posix ./dsd must satisfy the probe")
+
+    def test_empty_root_is_missing(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            self.assertIsNone(self._probe(Path(d)), "no binary at all must still fail loud")
+
+    def test_real_repo_root_resolves(self):
+        self.assertIsNotNone(self._probe(Path(gate3.ROOT)),
+                             "this checkout must expose a dsd binary under either spelling")
+
 if __name__ == "__main__":
     unittest.main()
