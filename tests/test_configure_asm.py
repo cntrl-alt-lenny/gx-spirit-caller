@@ -305,6 +305,30 @@ class TestLegacyCompilerConstants(unittest.TestCase):
     def test_legacy_and_default_paths_differ(self):
         self.assertNotEqual(configure.LEGACY_CC, configure.CC)
 
+    def test_compiler_suffix_table_keeps_binary_and_flag_together(self):
+        self.assertEqual(
+            configure.MWCC_BY_SUFFIX[configure.LEGACY_C_SUFFIX],
+            (configure.LEGACY_CC, "-lang=c99"),
+        )
+        self.assertEqual(
+            configure.MWCC_BY_SUFFIX[".c"],
+            (configure.CC, "-lang=c99"),
+        )
+
+    def test_source_glob_table_selects_c99_and_cxx(self):
+        self.assertEqual(
+            configure._source_language_flags("src/main/func_02000000.c"),
+            "-lang=c99",
+        )
+        self.assertEqual(
+            configure._source_language_flags("libs/nitro/helper.cpp"),
+            "-lang=c++",
+        )
+        self.assertEqual(
+            configure._source_language_flags("src/main/func_02000000.s"),
+            "",
+        )
+
 
 class TestLegacySp3CompilerConstants(unittest.TestCase):
     """Pin the third-tier (sp3) version + path constants. Same

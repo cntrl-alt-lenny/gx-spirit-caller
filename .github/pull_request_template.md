@@ -58,3 +58,12 @@ any of these (e.g. wiki, CI, docs), just describe what changed and why.
 ### Notes for reviewers
 
 <!-- Anything non-obvious: workarounds, why a particular cast, related upstream issues, etc. -->
+
+### Inline-assembly visibility
+
+For PRs that change C under `src/` or `libs/`, paste the non-blocking report
+from `python tools/asm_void_counter.py --base origin/main --head HEAD --region eur`:
+
+```
+asm-void counter (eur): <.text bytes> .text bytes in <N> changed asm-C TU(s) (<N> changed C file(s) scanned)
+```

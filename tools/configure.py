@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import fnmatch
 import hashlib
 import os
 import re
@@ -171,7 +172,7 @@ ASM_FLAGS = " ".join([
 DSD_OBJDIFF_ARGS = " ".join([
     "--scratch",
     f"--compiler {DECOMP_ME_COMPILER}",
-    f'--c-flags "{CC_FLAGS} -lang=c"',
+    f'--c-flags "{CC_FLAGS} -lang=c99"',
     "--custom-make ninja",
 ])
 
@@ -258,6 +259,26 @@ LEGACY_SP3_CC = os.path.join('.', str(mwcc_legacy_sp3_path / "mwccarm.exe"))
 # pokeheartgold ship BIOS SWI thunks this way.
 ASM = os.path.join('.', str(mwcc_path / "mwasmarm.exe"))
 PYTHON = sys.executable
+
+# Per-TU compiler routing. Keep the binary and language flag together so
+# adding another compiler tier or experimenting with one flag is a one-line
+# table change rather than another copy of the routing logic below. The
+# `.thumb.c` cohort intentionally shares the legacy compiler binary but keeps
+# its own suffix so the source-level Thumb pragma remains visible.
+MWCC_BY_SUFFIX = {
+    LEGACY_SP3_C_SUFFIX: (LEGACY_SP3_CC, "-lang=c99"),
+    THUMB_C_SUFFIX: (LEGACY_CC, "-lang=c99"),
+    LEGACY_C_SUFFIX: (LEGACY_CC, "-lang=c99"),
+    ".c": (CC, "-lang=c99"),
+}
+
+# Ordered path-glob overrides for source-language flags. The broad `*.c`
+# entry is the new default; a future per-directory experiment can be added
+# ahead of it without changing the compiler-rule generator.
+SOURCE_FLAGS_BY_GLOB = {
+    "*.cpp": "-lang=c++",
+    "*.c": MWCC_BY_SUFFIX[".c"][1],
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -486,7 +507,7 @@ def main():
         )
         n.newline()
 
-        mwcc_cmd = f'{WINE_ENV}{WINE} "{CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_cmd = f'{WINE_ENV}{WINE} "{MWCC_BY_SUFFIX[".c"][0]}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_implicit = [CC]
         if platform.system != "windows":
             transform_dep = "tools/transform_dep.py"
@@ -509,7 +530,7 @@ def main():
         # `*.legacy.c` suffix (`is_legacy_c()`) compile through this
         # rule. See docs/research/style-a-epilogue.md for the
         # mwcc-version sweep that motivated the routing.
-        mwcc_legacy_cmd = f'{WINE_ENV}{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_cmd = f'{WINE_ENV}{WINE} "{MWCC_BY_SUFFIX[LEGACY_C_SUFFIX][0]}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_legacy_implicit = [LEGACY_CC]
         if platform.system != "windows":
             mwcc_legacy_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
@@ -530,7 +551,7 @@ def main():
         # docs/research/sp3-routing-decision.md (brief 044) for the
         # 3-tier discriminator and the candidate count that
         # justified shipping this third tier.
-        mwcc_legacy_sp3_cmd = f'{WINE_ENV}{WINE} "{LEGACY_SP3_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_legacy_sp3_cmd = f'{WINE_ENV}{WINE} "{MWCC_BY_SUFFIX[LEGACY_SP3_C_SUFFIX][0]}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_legacy_sp3_implicit = [LEGACY_SP3_CC]
         if platform.system != "windows":
             mwcc_legacy_sp3_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
@@ -553,7 +574,7 @@ def main():
         # and the same `transform_dep` tail as the other tiers; only
         # the binary path differs. Source files carry `#pragma thumb
         # on`. See THUMB_C_SUFFIX above + docs/research/brief-393-*.md.
-        mwcc_thumb_cmd = f'{WINE_ENV}{WINE} "{LEGACY_CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
+        mwcc_thumb_cmd = f'{WINE_ENV}{WINE} "{MWCC_BY_SUFFIX[THUMB_C_SUFFIX][0]}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_thumb_implicit = [LEGACY_CC]
         if platform.system != "windows":
             mwcc_thumb_cmd += f" && {WINE_ENV}{PYTHON} {transform_dep} $basefile.d $basefile.d"
@@ -1167,11 +1188,7 @@ def add_mwcc_builds(
     for source_file in get_c_cpp_files(
             [src_path, libs_path], region=project.game_version):
         src_obj_path = project.game_build / source_file
-        cc_flags = []
-        if is_cpp(source_file):
-            cc_flags.append("-lang=c++")
-        elif is_c(source_file):
-            cc_flags.append("-lang=c")
+        cc_flags = [_source_language_flags(source_file)]
         if is_legacy_sp3_c(source_file):
             rule = "mwcc_legacy_sp3"
             implicit = mwcc_legacy_sp3_implicit
@@ -1393,6 +1410,15 @@ def get_source_files(dirs: list[Path], region: str | None = None):
     `_is_region_source_excluded` for the rule."""
     yield from get_c_cpp_files(dirs, region=region)
     yield from get_asm_files(dirs, region=region)
+
+
+def _source_language_flags(name):
+    """Return the per-TU language flags selected by the path-glob table."""
+    normalized = str(name).replace("\\", "/")
+    for pattern, flags in SOURCE_FLAGS_BY_GLOB.items():
+        if fnmatch.fnmatch(normalized, pattern):
+            return flags
+    return ""
 
 
 def is_cpp(name):
