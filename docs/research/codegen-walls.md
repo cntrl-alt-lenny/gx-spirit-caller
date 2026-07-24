@@ -6373,6 +6373,54 @@ the broader family (any single-byte register-field
 divergence) could be unlocked by a `propagate_template
 --rename-regs` flag at near-zero per-target cost.
 
+**Re-test (brief 671, cm-wall-retire, prompted by an r6 R&D report
+claiming "6 of 8 + P-4's `func_02084ac4`" are falsified).** Independent
+re-verification, function by function:
+
+- **`func_02084ac4` (P-4's own cited fnptr-cache example) — RE-CONFIRMED
+  PERMANENT, not falsified.** Reached 70% (r0-vs-r1 on the cached
+  function pointer, exactly the documented sub-shape) and *stayed* at
+  70% across 3 independent source variants (direct field access, named
+  local, alternate call syntax `(*p->fn)()`). r6's report is wrong about
+  this specific function — the P-4 fnptr-cache sub-shape entry stands.
+- **`func_020a71e4` / `func_020a724c` — genuinely fixed, 100%, but
+  neither is one of P-4's own named examples** (they're from the
+  broader brief-641 lever-insensitive catalog r6's report also cites —
+  a related but distinct population). The mechanism was **not** a new
+  allocator lever: both had a wrong parameter arity in every prior
+  attempt (this session's own brief 670 included) — the actual call
+  sites (grepped via `bl func_020a71e4` / the reloc table for the
+  Thumb-called sibling) show 3 live argument registers reaching the
+  call, not the 0-1 previously assumed. Once the real arity was
+  modeled and every parameter reaches a genuine use (an unused one
+  gets dead-code-eliminated and doesn't reserve its register — see
+  brief 670's refinement of this lever), both reached 100% on the
+  first correct attempt. **New process lesson: when a thunk's own body
+  doesn't reveal its arity (a pure pass-through call with no visible
+  parameter use), grep its actual call sites before assuming arity from
+  the disassembly alone** — the disassembly of the callee never shows
+  a register is "used" if it's just forwarded untouched to another call.
+- **Thumb-mode instances of the same register-choice pattern, newly
+  confirmed permanent:** `func_ov004_021dbe68` (swap-shape, r2-vs-r3,
+  plateaued at 71.4%) and `func_ov004_021de264` (fnptr-cache-adjacent,
+  r0-vs-r1, plateaued at 69.2%) — both show the identical
+  reshape-insensitivity as the ARM-mode instances above (multiple
+  source variants tried, zero movement on the register choice). P-4's
+  mechanism is confirmed to apply in Thumb mode too, not just ARM.
+- **Unrelated but critical tooling finding surfaced while re-testing the
+  two Thumb candidates above: a `.thumb.c`-suffixed source file that
+  omits an explicit `#pragma thumb on` does NOT reliably compile in
+  Thumb mode** — both functions initially showed catastrophic (0%)
+  mismatches with ARM-style predicated instructions (`addeq`/`moveq`)
+  appearing where Thumb has no such encoding, which looked like a deep
+  semantic modeling error. Adding `#pragma thumb on` (present in every
+  sibling `.thumb.c` file already in the tree, e.g.
+  `func_ov004_021dd20c.thumb.c`, but easy to omit when starting a fresh
+  file from scratch) immediately jumped both from 0% to 69-71%. **Any
+  `.thumb.c` file that shows bizarre/predicated-ARM-looking output
+  instead of a clean near-miss is missing this pragma — check for it
+  before spending time on a "semantic" re-diagnosis.**
+
 **Permuter rule-out (brief 093, PR #?):** the P-4 family was
 a natural permuter target — its discriminator is "wall is in
 the allocator, not source form." Brief 093 ran permuter against
