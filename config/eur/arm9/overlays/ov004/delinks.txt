@@ -983,7 +983,7 @@ src/overlay004/func_ov004_021dbe5c.thumb.c:
     complete
     .text start:0x021dbe5c end:0x021dbe68
 
-src/overlay004/func_ov004_021dbe68.s:
+src/overlay004/func_ov004_021dbe68.thumb.c:
     complete
     .text start:0x021dbe68 end:0x021dbe78
 
