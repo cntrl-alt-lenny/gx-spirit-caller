@@ -157,3 +157,15 @@ q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verif
 Data readability is ~0% and invisible: 10,949 `data_*` placeholders, 2 real names, 0 typed structs. `data%` is byte-MATCH and Natural-C% is `.text`-only by construction (progress.py:747), so naming/typing data moves NO tracked number — the lane's blocker is a missing metric. Add named-data-% and typed-array-byte-% lines mirroring the natural/asm split, reusing the delinks walk. This makes the data frontier measurable so it can be worked.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + the new metric lines + a test.
+
+### q-objdiff-lines — surface objdiff's already-computed line_number in the feedback hook (r9 lever #4 — close localize.py) [TODO]
+
+The post_edit hook already runs objdiff-cli --format json on every .c/.s edit and the JSON ALREADY carries per-instruction 'formatted' (disasm) + 'line_number' (the .debug_line join objdiff does internally; -sym on is default in CC_FLAGS configure.py:141). The hook extracts ONLY match_percent (post_edit.py:255/293) and discards the rest -> agents then hand-run fastmatch/capstone to localize. FIX: in _objdiff_match_percent also return the instruction rows; in _cmatch_feedback, when pct<100 print the first ~3 diverging rows as 'line 25: mov r5,r0'. ~50 lines. This makes the queued/ledgered localize.py task REDUNDANT — mark it closed (nothing to join; objdiff already did it).
+
+**Gate:** `python -m pytest -q tests` no-new-failures + demo: a <100% edit prints the diverging line(s).
+
+### q-fastmatch-keyerror — one-line fastmatch KeyError fix (r9 lever, hours) [TODO]
+
+fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/renamed candidate path crashes with a raw KeyError:'region' instead of a clean FILE NOT FOUND — common during the func_X.c -> Module_Verb.c rename churn. Add 'region': args.region to the file_not_found dict (~lines 652-657), or move the tag computation past the status guards. Also make the batch loop return exit 2 not 1 on a missing file.
+
+**Gate:** `python -m pytest -q tests` + repro: a stale path now reports FILE NOT FOUND cleanly.

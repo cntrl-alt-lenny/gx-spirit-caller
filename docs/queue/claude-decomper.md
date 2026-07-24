@@ -124,3 +124,9 @@ The other half of the re-sweep (Scaffolder takes the lower range). `--max-size 2
 Reg-alloc/predication parks dominate (44 of 74) and ship 0%, BUT r8 shows some are falsifiable (routing tier, trampoline arity — see cm-regalloc-trampoline) and match_pct is ANTI-informative (walls plateau HIGH at 84-88%, mimicking near-misses — do NOT chase high-% parks). Read the .s of the remaining reg-alloc parks and find the discriminator that predicts convertible vs genuinely-stuck (callee-arity, routing signature, decl-order sensitivity). Ship what's tractable; document the r2↔r3 permanent signature so it's park-on-sight-CORRECTLY.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` + the discriminator writeup + any ships.
+
+### cm-main-128-drain — drain the untouched main <=128B high-yield cell (r9 lever #5) [TODO]
+
+r9 drain-aware analysis: ov002 <=128B is ~exhausted (87% but easy wins swept), while main <=128B is the largest UNTOUCHED high-yield block — 873 candidates, only ~10 sampled. Focus here: python tools/wall_aware_headroom.py --json --max-size 128 filtered to main. Route by epilogue first. match_pct is anti-informative for reg-alloc parks (don't chase high-%). This is where the scarce high-EV budget should go.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted on main <=128B.
