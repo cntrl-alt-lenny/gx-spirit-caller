@@ -169,3 +169,9 @@ The post_edit hook already runs objdiff-cli --format json on every .c/.s edit an
 fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/renamed candidate path crashes with a raw KeyError:'region' instead of a clean FILE NOT FOUND — common during the func_X.c -> Module_Verb.c rename churn. Add 'region': args.region to the file_not_found dict (~lines 652-657), or move the tag computation past the status guards. Also make the batch loop return exit 2 not 1 on a missing file.
 
 **Gate:** `python -m pytest -q tests` + repro: a stale path now reports FILE NOT FOUND cleanly.
+
+### q-prototypes-h — consolidate 463 conflicting extern prototypes into a canonical header (r10 bet 5 [S]) [TODO]
+
+4,712 extern decl-sites for 2,040 distinct functions (2,672 pure duplicates); 463 functions are declared with 2+ MUTUALLY-CONTRADICTORY signatures inline across files (func_ov002_021ff320 = 17 sigs across 21 files); after stripping cosmetic param-name diffs, 366 keep genuine type conflicts, 142 are ABI-SIGNIFICANT (contradictory return type / arg count -> changes call-site codegen -> BLOCKS first-try byte-match on callers). Emit ONE canonical prototype per function into include/game/prototypes.h (created by q-include-layer). Prioritize the ~30 functions declared >20 ways (ov002 sinks, DMA/fill helpers), then the 142 ABI-significant. Resolve each conflict by the best evidence (a matched C body that USES the fn is ground truth). This directly raises first-try match rate on every caller.
+
+**Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + count of prototypes emitted + conflicts resolved.

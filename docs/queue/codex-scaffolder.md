@@ -175,3 +175,15 @@ TOP RATE FIX — the 3-region gate is the brain's serial critical path. The deli
 The brain hand-drives every merge round: ~10-15 serial git merges into brain/integ, conflict resolution, index regen, lint fix, gate3, push (86 hand-merge commits + ~40% bookkeeping in last-300). Build tools/integrate.py <branches...> reproducing it deterministically: merge each branch --no-ff; on conflict resolve by TYPE (config/*/delinks.txt = keep-ours + sort_delinks; docs/queue/* = union then dedup-by-id + MD022 blank-guard; docs/research/README.md = regenerate); then run gate3 --scope all --no-tests and report a summary (C added, .s removed, per-region sha1). Do NOT push (brain reviews). Biggest brain-overhead reduction.
 
 **Gate:** `python -m pytest -q tests` + a dry-run demo on 2 real branches showing typed resolution + gate result.
+
+### q-include-layer — ship the empty-but-wired include/ shared-header layer (r10 bet 4 [A], substrate — do FIRST) [TODO]
+
+`-i include` is already on all 4 mwcc rules (build.ninja) yet include/ holds only .gitkeep — a zero-config drop-in slot sitting empty. 63 headers exist but all ovNNN_core.h (mostly sketch); main-arm9 (~4,047 funcs) has ZERO headers. Create the canonical home: include/game/types.h (game structs + NitroSDK primitive types), include/game/prototypes.h (stub, filled by q-prototypes-h), and per-module include/game/main_core.h etc. Instantly includable, NO configure.py edit needed. This is the substrate the prototypes + type-recovery lanes write into — land it first. Keep it byte-neutral (headers only change what's DECLARED, gate proves no codegen change).
+
+**Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python -m pytest -q tests` no-new-failures + the header skeleton.
+
+### q-data-metric-fix — fix the data metric — it counts opaque placeholders as 'typed' (r10 bet 3 [A]) [TODO]
+
+The Typed-array metric (progress.py:49 _DATA_ARRAY_DECL_RE, :454) matches the opaque carve placeholder `unsigned char data_X[N]=` IDENTICALLY to a real struct array, so summarize_data_readability's 1.69% holds 0 BYTES of genuinely struct-typed data — retyping (cm-data-canary) would move it by ZERO. Add a named-struct sub-tier that EXCLUDES primitive-element arrays (unsigned char/int etc.) and counts only real `StructName foo[N]` typed data. Land it BEFORE the data-retype chapter scales, or the whole lane is invisible + unscorable.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + the new tier reports 0 now and >0 after cm-data-canary lands + a test.
