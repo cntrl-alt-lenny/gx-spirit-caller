@@ -7,7 +7,7 @@
         .extern func_0205340c
         .extern func_02053720
         .extern func_02053728
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .global func_0205337c
         .arm
 func_0205337c:
@@ -43,7 +43,7 @@ func_0205337c:
     mov r0, r5
     mov r1, #0x15
     add r3, sp, #0x14
-    bl func_0209150c
+    bl OS_SNPrintf
     add sp, sp, #0x40
     ldmia sp!, {r4, r5, r6, pc}
 _LIT0: .word data_020ffa9c

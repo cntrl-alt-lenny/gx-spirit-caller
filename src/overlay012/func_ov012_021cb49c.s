@@ -28,7 +28,7 @@
         .extern func_0201c6a0
         .extern func_0202c0c0
         .extern func_02037208
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_ov000_021ab6cc
         .extern func_ov000_021ab6ec
         .extern func_ov000_021ab8f8
@@ -597,12 +597,12 @@ func_ov012_021cb49c:
     add r0, sp, #0x0
     add r2, r2, #0x1
     str r6, [r3, #0x4]
-    bl func_02091554
+    bl OS_SPrintf
     b .L_810
 .L_804:
     ldr r1, _LIT14
     add r0, sp, #0x0
-    bl func_02091554
+    bl OS_SPrintf
 .L_810:
     add r0, sp, #0x0
     .word 0xebff95c0

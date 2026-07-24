@@ -26,10 +26,10 @@
         .extern func_020822f0
         .extern func_02084aec
         .extern func_02084fe0
-        .extern func_0208b16c
+        .extern MTX_Identity33_
         .extern func_0208e318
-        .extern func_02091554
-        .extern func_02094588
+        .extern OS_SPrintf
+        .extern MI_Copy36B
         .extern func_ov004_021d0168
         .extern func_ov004_021d02f4
         .extern func_ov004_021d03ec
@@ -101,7 +101,7 @@ func_ov004_021d3578:
     mov r1, r8
     add r0, sp, #0x40
     mov r2, r5
-    bl func_02091554
+    bl OS_SPrintf
     b .L_118
 .L_f4:
     bl func_0202c0c0
@@ -112,7 +112,7 @@ func_ov004_021d3578:
     mov r1, r8
     add r0, sp, #0x40
     mov r3, r5
-    bl func_02091554
+    bl OS_SPrintf
 .L_118:
     ldr r0, _LIT3
     add r1, sp, #0x40
@@ -154,10 +154,10 @@ func_ov004_021d3578:
     ldmia r5, {r0, r1, r2}
     stmia r3, {r0, r1, r2}
     add r0, sp, #0x4
-    bl func_0208b16c
+    bl MTX_Identity33_
     ldr r1, _LIT9
     add r0, sp, #0x4
-    bl func_02094588
+    bl MI_Copy36B
     ldr r1, _LIT10
     add r0, sp, #0x34
     ldr r2, [r1, #0xfc]

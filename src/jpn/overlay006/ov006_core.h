@@ -264,7 +264,7 @@ extern void func_02006e1c(int h);                       /* release handle (main)
  *     local the LOWEST sp offset). Members differ in 2 globals + 2 consts
  *     (field base +829/+845, slot +5/+9).
  * Store-scheduling siblings 021ca678 / 021c11c8 wall (ship-as-.s). */
-extern void func_02091554(void *out, void *a, int b);   /* record descriptor build (main) */
+extern void OS_SPrintf(void *out, void *a, int b);   /* record descriptor build (main) */
 extern int  func_02094504(int a, void *b, int c);        /* region clear (main) */
 
 /* --- guard + switch (jump-table) shape --------------------------------

@@ -4,7 +4,7 @@
 
         .text
         .extern func_0209281c
-        .extern func_02092928
+        .extern DC_WaitWriteBufferEmpty
         .extern func_020a35e8
         .global func_020a2bc8
         .arm
@@ -17,7 +17,7 @@ func_020a2bc8:
     mov r0, r4
     bic r1, r2, #0x1f
     bl func_0209281c
-    bl func_02092928
+    bl DC_WaitWriteBufferEmpty
     mov r0, r4
     mov r1, r6
     mov r2, r5

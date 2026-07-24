@@ -4,7 +4,7 @@
 
         .text
         .extern func_020936a8
-        .extern func_02093bf0
+        .extern OS_Halt
         .global func_02091618
         .arm
 func_02091618:
@@ -12,5 +12,5 @@ func_02091618:
     sub sp, sp, #0x4
     bl func_020936a8
 .L_c:
-    bl func_02093bf0
+    bl OS_Halt
     b .L_c

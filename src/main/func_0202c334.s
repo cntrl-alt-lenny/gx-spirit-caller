@@ -9,7 +9,7 @@
         .extern data_0219a93c
         .extern func_02006c0c
         .extern func_0202c3c8
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_0202c334
         .arm
 func_0202c334:
@@ -25,7 +25,7 @@ func_0202c334:
     ldr r4, [r1, r4, lsl #0x2]
     ldr r1, _LIT1
     mov r2, r4
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x20
     mov r1, #0x4
     mov r2, #0x0
@@ -36,7 +36,7 @@ func_0202c334:
     mov r2, r4
     str r0, [r3]
     add r0, sp, #0x0
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x0
     mov r1, #0x4
     mov r2, #0x0

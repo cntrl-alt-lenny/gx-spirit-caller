@@ -4,7 +4,7 @@
 
         .text
         .extern func_02084fe0
-        .extern func_0208b94c
+        .extern MTX_Copy44To43_
         .extern func_0208e61c
         .extern func_0208e664
         .global func_020852fc
@@ -32,7 +32,7 @@ func_020852fc:
     bne .L_3c
     add r0, sp, #0x0
     mov r1, r6
-    bl func_0208b94c
+    bl MTX_Copy44To43_
 .L_58:
     cmp r5, #0x0
     beq .L_70

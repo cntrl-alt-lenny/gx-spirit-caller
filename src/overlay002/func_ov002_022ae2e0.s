@@ -9,7 +9,7 @@
         .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_ov002_022ae2e0
         .arm
 func_ov002_022ae2e0:
@@ -23,7 +23,7 @@ func_ov002_022ae2e0:
     add r0, sp, #0x28
     ldr r2, [r1, r2, lsl #0x2]
     ldr r1, _LIT1
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x28
     mov r1, #0x4
     mov r2, #0x0

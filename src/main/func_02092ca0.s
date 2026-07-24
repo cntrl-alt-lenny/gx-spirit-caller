@@ -9,8 +9,8 @@
         .extern func_02092a48
         .extern func_02092a5c
         .extern func_02092b48
-        .extern func_02092e80
-        .extern func_02092e88
+        .extern OS_SetProtectionRegion1
+        .extern OS_SetProtectionRegion2
         .global func_02092ca0
         .arm
 func_02092ca0:
@@ -38,9 +38,9 @@ func_02092ca0:
     bxne lr
 .L_58:
     ldr r0, _LIT1
-    bl func_02092e80
+    bl OS_SetProtectionRegion1
     ldr r0, _LIT2
-    bl func_02092e88
+    bl OS_SetProtectionRegion2
     add sp, sp, #0x4
     ldmfd sp!, {lr}
     bx lr

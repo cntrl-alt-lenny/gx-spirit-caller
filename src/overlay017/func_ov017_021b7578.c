@@ -9,7 +9,7 @@ extern char data_ov017_021b8488[];
 extern char data_ov017_021b84a0[];
 extern char data_ov017_021b84b8[];
 extern char data_ov017_021b877c[];
-extern void func_02091554(int str, void *font, int pal);
+extern void OS_SPrintf(int str, void *font, int pal);
 extern void func_0201ef3c(int a, void *b, void *c);
 extern void func_0201e7e0(void);
 extern void func_02093820(void);
@@ -24,10 +24,10 @@ typedef struct {
 void func_ov017_021b7578(char *self, int *tbl) {
     int job;
     if (((SubState *)(self + 0x100))->fd0 == 0) return;
-    func_02091554(tbl[0], data_ov017_021b8470, ((SubState *)(self + 0x100))->fd0 + 0x4b);
-    func_02091554(tbl[1], data_ov017_021b8488, ((SubState *)(self + 0x100))->fd0 + 0x4b);
-    func_02091554(tbl[2], data_ov017_021b84a0, ((SubState *)(self + 0x100))->fd0 + 0x4b);
-    func_02091554(tbl[3], data_ov017_021b84b8, ((SubState *)(self + 0x100))->fd0 + 0x4b);
+    OS_SPrintf(tbl[0], data_ov017_021b8470, ((SubState *)(self + 0x100))->fd0 + 0x4b);
+    OS_SPrintf(tbl[1], data_ov017_021b8488, ((SubState *)(self + 0x100))->fd0 + 0x4b);
+    OS_SPrintf(tbl[2], data_ov017_021b84a0, ((SubState *)(self + 0x100))->fd0 + 0x4b);
+    OS_SPrintf(tbl[3], data_ov017_021b84b8, ((SubState *)(self + 0x100))->fd0 + 0x4b);
     if (*(int *)(self + 0x1c4) != 0) {
         func_0201ef3c(*(int *)(self + 0x170), self + 0x178, self + 0x1c4);
         *(int *)(self + 0x1c8) = 0;

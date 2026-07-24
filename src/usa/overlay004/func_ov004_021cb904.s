@@ -27,7 +27,7 @@
         .extern func_0208dcb4
         .extern func_0208dd64
         .extern func_0208dfb8
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_0209445c
         .extern func_ov000_021abc70
@@ -122,7 +122,7 @@ func_ov004_021cb904:
     mov r0, r8
     mov r1, r7
     add r2, sl, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r8
     mov r1, fp
     mov r2, #0x0

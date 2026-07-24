@@ -5,7 +5,7 @@
         .text
         .extern func_0208be9c
         .extern func_0208bed8
-        .extern func_020945a4
+        .extern MI_Copy48B
         .global func_0208b54c
         .arm
 func_0208b54c:
@@ -233,7 +233,7 @@ func_0208b54c:
     str r1, [r9, #0x2c]
     bne .L_5d0
     ldr r1, [sp]
-    bl func_020945a4
+    bl MI_Copy48B
 .L_5d0:
     mov r0, #0x0
     add sp, sp, #0x5c

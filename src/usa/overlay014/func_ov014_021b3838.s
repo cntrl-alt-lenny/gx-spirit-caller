@@ -11,7 +11,7 @@
         .extern func_02005488
         .extern func_0202c06c
         .extern func_0208dd64
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .global func_ov014_021b3838
         .arm
@@ -81,7 +81,7 @@ func_ov014_021b3838:
     mov r2, r5
     add r0, sp, #0x8
     add r1, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x8
     mov r1, #0xc
     bl func_02005488

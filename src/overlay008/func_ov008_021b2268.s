@@ -7,7 +7,7 @@
         .extern data_ov008_021b275c
         .extern func_02021660
         .extern func_020216b0
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_ov008_021b2268
         .arm
 func_ov008_021b2268:
@@ -38,7 +38,7 @@ func_ov008_021b2268:
     ldr r0, [r0]
     ldr r2, [r0, #0xc]
     add r0, r0, #0x70
-    bl func_02091554
+    bl OS_SPrintf
     ldmia sp!, {r4, pc}
 _LIT0: .word data_ov008_021b270c
 _LIT1: .word data_ov008_021b275c

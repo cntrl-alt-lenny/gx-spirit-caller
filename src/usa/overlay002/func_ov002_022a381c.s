@@ -21,8 +21,8 @@
         .extern func_0208d944
         .extern func_0208df2c
         .extern func_0208e038
-        .extern func_0208e334
-        .extern func_02091554
+        .extern G2x_SetBGyAffine_
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_ov002_022a567c
         .global func_ov002_022a381c
@@ -61,7 +61,7 @@ func_ov002_022a381c:
     ldr r1, _LIT4
     add r0, sp, #0x40
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x40
     mov r1, #0x4
     mov r2, #0x0
@@ -160,7 +160,7 @@ func_ov002_022a381c:
     mov r2, #0x80
     mov r3, #0x14
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     mov r1, #0x0
     str r1, [sp]
     sub r1, r1, #0x60
@@ -169,7 +169,7 @@ func_ov002_022a381c:
     add r1, sp, #0x8
     mov r2, #0x80
     mov r3, #0x14
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     add sp, sp, #0x60
     ldmia sp!, {r3, r4, r5, pc}
 _LIT0: .word data_02103fcc

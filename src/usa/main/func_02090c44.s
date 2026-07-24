@@ -5,7 +5,7 @@
         .text
         .extern func_0209149c
         .extern func_020914fc
-        .extern func_0209164c
+        .extern string_put_char
         .extern func_020b3714
         .global func_02090c44
         .arm
@@ -55,20 +55,20 @@ func_02090c44:
     cmp r0, #0x3c
     bcs .L_d0
     add r0, sp, #0x54
-    bl func_0209164c
+    bl string_put_char
     ldrsb r1, [r9, #0x1]!
     cmp r1, #0x0
     beq .L_870
     add r0, sp, #0x54
     add r9, r9, #0x1
-    bl func_0209164c
+    bl string_put_char
     b .L_870
 .L_d0:
     cmp r1, #0x25
     beq .L_e8
     add r0, sp, #0x54
     add r9, r9, #0x1
-    bl func_0209164c
+    bl string_put_char
     b .L_870
 .L_e8:
     ldr r6, [sp, #0x4]
@@ -245,7 +245,7 @@ func_02090c44:
     mov r0, r4, lsl #0x18
     mov r1, r0, asr #0x18
     add r0, sp, #0x54
-    bl func_0209164c
+    bl string_put_char
     ldr r1, [sp, #0x1c]
     sub r2, sl, #0x1
     add r0, sp, #0x54
@@ -263,7 +263,7 @@ func_02090c44:
     mov r0, r4, lsl #0x18
     mov r1, r0, asr #0x18
     add r0, sp, #0x54
-    bl func_0209164c
+    bl string_put_char
 .L_384:
     add r9, r9, #0x1
     b .L_870
@@ -349,7 +349,7 @@ func_02090c44:
     bne .L_4b4
     add r0, sp, #0x54
     add r9, r9, #0x1
-    bl func_0209164c
+    bl string_put_char
     b .L_870
 .L_4b4:
     add r0, sp, #0x54
@@ -589,7 +589,7 @@ func_02090c44:
     ldrsb r1, [r4, #-1]!
     sub r7, r7, #0x1
     add r0, sp, #0x54
-    bl func_0209164c
+    bl string_put_char
     cmp r7, #0x0
     bgt .L_804
 .L_81c:
@@ -605,7 +605,7 @@ func_02090c44:
     ldrsb r1, [r4, #-1]!
     sub r8, r8, #0x1
     add r0, sp, #0x54
-    bl func_0209164c
+    bl string_put_char
     cmp r8, #0x0
     bgt .L_83c
 .L_854:

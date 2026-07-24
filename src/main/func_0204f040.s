@@ -8,7 +8,7 @@
         .extern data_020ff9ac
         .extern data_020ff9b8
         .extern data_020ff9ec
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .global func_0204f040
         .arm
 func_0204f040:
@@ -30,7 +30,7 @@ func_0204f040:
     ldr r3, _LIT4
     mov r1, #0x100
     str ip, [sp, #0x20]
-    bl func_0209150c
+    bl OS_SNPrintf
     add sp, sp, #0x24
     ldmfd sp!, {pc}
 _LIT0: .word data_020ff980

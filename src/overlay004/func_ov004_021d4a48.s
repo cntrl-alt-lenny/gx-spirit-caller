@@ -6,7 +6,7 @@
         .extern data_ov004_02209fd0
         .extern func_0203268c
         .extern func_02033308
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_ov004_021d3e9c
         .global func_ov004_021d4a48
         .arm
@@ -36,7 +36,7 @@ func_ov004_021d4a48:
     str r1, [sp, #0x4]
     ldr r3, [sp, #0x8]
     mov r1, #0x200
-    bl func_0209150c
+    bl OS_SNPrintf
 .L_fc:
     mov r0, #0x18
     str r0, [r4, #0x30]

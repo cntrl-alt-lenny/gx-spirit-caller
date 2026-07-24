@@ -9,7 +9,7 @@
 extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int);
 extern void func_02091f88(void);
-extern struct Node *func_020921a8(void *);
+extern struct Node *OSi_RemoveLinkFromQueue(void *);
 
 typedef struct Node {
     char _pad00[0x64];
@@ -30,7 +30,7 @@ void func_02091a0c(Container *c)
     int irq = OS_DisableIrq();
     if (c->head != 0) {
         while (c->head != 0) {
-            Node *n = func_020921a8(c);
+            Node *n = OSi_RemoveLinkFromQueue(c);
             n->f64 = 1;
             n->f78 = 0;
             n->f80 = 0;

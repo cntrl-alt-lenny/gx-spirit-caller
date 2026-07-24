@@ -9,7 +9,7 @@
         .extern func_0208b0f0
         .extern func_0208e2f4
         .extern func_0208e318
-        .extern func_0208e334
+        .extern G2x_SetBGyAffine_
         .extern func_ov002_022aacbc
         .global func_ov002_022a4a30
         .arm
@@ -68,7 +68,7 @@ func_ov002_022a4a30:
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     mov r0, #0x0
     add sp, sp, #0x18
     str r0, [r6, #0xc]
@@ -90,7 +90,7 @@ func_ov002_022a4a30:
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     ldr r1, _LIT3
     ldrh r0, [r1]
     bic r0, r0, #0x3

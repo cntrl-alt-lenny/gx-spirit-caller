@@ -15,8 +15,8 @@
         .extern func_0203f6cc
         .extern func_0207cbe0
         .extern func_0207cc50
-        .extern func_0209150c
-        .extern func_02091554
+        .extern OS_SNPrintf
+        .extern OS_SPrintf
         .extern func_020928cc
         .extern func_020939a4
         .extern func_02093a20
@@ -45,7 +45,7 @@ func_020409d8:
     mov r0, r4
     mov r1, #0xe
     str r5, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
     b .L_3b4
 .L_398:
     ldr r3, [r6, #0x8]
@@ -54,13 +54,13 @@ func_020409d8:
     mov r0, r4
     mov r1, #0xe
     str r5, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
 .L_3b4:
     ldrh r3, [r6, #0x10]
     ldr r2, _LIT1
     add r0, r4, #0xe
     mov r1, #0x7
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r0, _LIT2
     ldrb r0, [r0]
     cmp r0, #0x0
@@ -93,7 +93,7 @@ func_020409d8:
     ldrb r2, [r7]
     mov r0, r6
     mov r1, r5
-    bl func_02091554
+    bl OS_SPrintf
     add r8, r8, #0x1
     cmp r8, #0x6
     add r7, r7, #0x1
@@ -109,7 +109,7 @@ func_020409d8:
     strhib r0, [sp, #0x38]
     ldrb r3, [sp, #0x38]
     add r0, r4, #0x2c
-    bl func_0209150c
+    bl OS_SNPrintf
     add r0, sp, #0x3c
     add r1, r4, #0x7e
     mov r2, #0x14
@@ -120,7 +120,7 @@ func_020409d8:
     str r1, [sp]
     ldrb r3, [sp, #0x3a]
     mov r1, #0x5
-    bl func_0209150c
+    bl OS_SNPrintf
     add r0, sp, #0x1c
     bl func_0209bc20
     cmp r0, #0x0
@@ -148,7 +148,7 @@ func_020409d8:
     ldr r3, [sp, #0x34]
     str r3, [sp, #0x10]
     ldr r3, [sp, #0x1c]
-    bl func_0209150c
+    bl OS_SNPrintf
     bl OS_DisableIrq
     mov r9, r0
     bl func_0207cc50
@@ -170,7 +170,7 @@ func_020409d8:
     ldrb r2, [r8, r6]
     mov r0, r7
     mov r1, r5
-    bl func_02091554
+    bl OS_SPrintf
     add r6, r6, #0x1
     cmp r6, #0x6
     add r7, r7, #0x2
@@ -180,7 +180,7 @@ func_020409d8:
     ldr r2, _LIT7
     add r0, r4, #0x6f
     mov r1, #0xe
-    bl func_0209150c
+    bl OS_SNPrintf
     add r0, sp, #0x14
     bl func_0207cbe0
     mov r5, r0

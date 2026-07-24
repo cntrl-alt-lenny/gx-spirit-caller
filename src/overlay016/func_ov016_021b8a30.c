@@ -6,7 +6,7 @@ extern char data_ov016_021b9558[];
 extern char data_ov016_021b9578[];
 extern char data_ov016_021b9598[];
 extern char data_ov016_021b95b8[];
-extern void func_02091554(void *a, void *b, int c);
+extern void OS_SPrintf(void *a, void *b, int c);
 extern void func_0201ef3c(int a, void *b, void *c);
 extern void func_0201e7e0(void);
 extern void func_0201ef90(void *a, void *b, void *c, int d, int e, int f, void *g, int h, int i, void *j);
@@ -14,10 +14,10 @@ extern int func_0201ede4(void *a, void *b);
 void func_ov016_021b8a30(void *arg0, void **arg1) {
     char *p = arg0;
     int tmp;
-    func_02091554(arg1[0], data_ov016_021b9558, *(unsigned char *)(p + 460));
-    func_02091554(arg1[1], data_ov016_021b9578, *(unsigned char *)(p + 460));
-    func_02091554(arg1[2], data_ov016_021b9598, *(unsigned char *)(p + 460));
-    func_02091554(arg1[3], data_ov016_021b95b8, *(unsigned char *)(p + 460));
+    OS_SPrintf(arg1[0], data_ov016_021b9558, *(unsigned char *)(p + 460));
+    OS_SPrintf(arg1[1], data_ov016_021b9578, *(unsigned char *)(p + 460));
+    OS_SPrintf(arg1[2], data_ov016_021b9598, *(unsigned char *)(p + 460));
+    OS_SPrintf(arg1[3], data_ov016_021b95b8, *(unsigned char *)(p + 460));
     if (*(int *)(p + 84) != 0) {
         func_0201ef3c(*(int *)p, p + 8, p + 84);
         *(int *)(p + 88) = 0;

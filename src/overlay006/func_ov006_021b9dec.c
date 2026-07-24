@@ -4,15 +4,15 @@
  *     stmdb sp!, {r3, lr}
  *     mov   r0, r1
  *     ldr   r1, .L_021b9e04            ; data_ov006_021cbf24
- *     bl    func_02091554
+ *     bl    OS_SPrintf
  *     mov   r0, #0x1
  *     ldmia sp!, {r3, pc}
  */
 
-extern int func_02091554(int x, void *y);
+extern int OS_SPrintf(int x, void *y);
 extern void *data_ov006_021cbf24;
 
 int func_ov006_021b9dec(int unused, int x) {
-    func_02091554(x, &data_ov006_021cbf24);
+    OS_SPrintf(x, &data_ov006_021cbf24);
     return 1;
 }

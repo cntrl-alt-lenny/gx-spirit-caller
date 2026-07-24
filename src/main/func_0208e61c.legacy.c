@@ -13,7 +13,7 @@
  *     ldmnefd sp!, {lr}
  *     bxne  lr
  *     ldr   r0, .L_VECMTX
- *     bl    func_02094588          ; MTX_Copy33(src=VECMTX, dst=out)
+ *     bl    MI_Copy36B          ; MTX_Copy33(src=VECMTX, dst=out)
  *     mov   r0, #0
  *     add   sp, sp, #0x4
  *     ldmfd sp!, {lr}
@@ -22,18 +22,18 @@
  * .L_VECMTX: .word 0x04000680
  *
  * Pair with func_0208e664 which does the same for the 4x4 CLIPMTX_RESULT
- * (matrix at 0x04000640, copied via func_020945c8 / MTX_Copy44).
+ * (matrix at 0x04000640, copied via MI_Copy64B / MTX_Copy44).
  *
  * 16 insns + 2 pool words = 0x48 bytes.
  */
 
 #include <nitro/types.h>
 
-extern void func_02094588(const int *src, int *dst);  /* MTX_Copy33 */
+extern void MI_Copy36B(const int *src, int *dst);  /* MTX_Copy33 */
 
 int func_0208e61c(int *out) {
     vu32 *gxstat = (vu32 *)0x04000600;
     if (*gxstat & 0x08000000) return -1;
-    func_02094588((const int *)0x04000680, out);
+    MI_Copy36B((const int *)0x04000680, out);
     return 0;
 }

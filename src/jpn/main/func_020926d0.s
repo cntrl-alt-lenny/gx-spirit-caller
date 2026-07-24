@@ -7,7 +7,7 @@
         .extern OS_RestoreIrq
         .extern data_021a62f0
         .extern func_020919a4
-        .extern func_02092668
+        .extern OSi_EnqueueTail
         .global func_020926d0
         .arm
 func_020926d0:
@@ -29,7 +29,7 @@ func_020926d0:
     add r2, r1, #0x1
     mov r1, r5
     str r2, [r5, #0xc]
-    bl func_02092668
+    bl OSi_EnqueueTail
     b .L_74
 .L_4c:
     cmp r0, r7

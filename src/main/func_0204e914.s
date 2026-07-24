@@ -7,7 +7,7 @@
         .extern data_020ff9dc
         .extern data_020ff9e4
         .extern func_0205538c
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_02094688
         .extern func_020aaddc
         .global func_0204e914
@@ -27,7 +27,7 @@ func_0204e914:
     add r0, sp, #0x8
     mov r1, #0x200
     str ip, [sp, #0x4]
-    bl func_0209150c
+    bl OS_SNPrintf
     add r1, sp, #0x8
     add r2, sp, #0x9
     strb r6, [r1, r0]

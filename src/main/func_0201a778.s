@@ -8,7 +8,7 @@
         .extern data_020c5c7c
         .extern data_020c5c90
         .extern func_0201a4dc
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_0201a778
         .arm
 func_0201a778:
@@ -36,7 +36,7 @@ func_0201a778:
     ldr r2, [r0, r5, lsl #0x2]
     ldr r1, _LIT2
     mov r0, r4
-    bl func_02091554
+    bl OS_SPrintf
     add sp, sp, #0x5c
     ldmia sp!, {r4, r5, r6, r7, pc}
 .L_68:
@@ -50,7 +50,7 @@ func_0201a778:
     ldr r3, [r0, r1, lsl #0x2]
     ldr r1, _LIT3
     mov r0, r4
-    bl func_02091554
+    bl OS_SPrintf
     add sp, sp, #0x5c
     ldmia sp!, {r4, r5, r6, r7, pc}
 _LIT0: .word data_020b59e0

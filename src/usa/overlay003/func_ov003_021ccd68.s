@@ -35,7 +35,7 @@
         .extern data_ov003_021cf538
         .extern data_ov003_021cf550
         .extern func_0201e78c
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_ov003_021ccd1c
         .extern func_ov003_021cd21c
         .global func_ov003_021ccd68
@@ -70,19 +70,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     and r7, r4, #0x1f
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT4
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT5
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT6
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x0
@@ -93,19 +93,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT7
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT8
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT9
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT10
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x1
@@ -116,19 +116,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT11
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT12
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT13
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT14
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     add r3, sp, #0x0
     mov r0, r6
     mov r1, r5
@@ -142,19 +142,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT15
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT16
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT17
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT18
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x3
@@ -168,19 +168,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT19
     add r2, r4, #0x4b
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT20
     add r2, r4, #0x4b
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT21
     add r2, r4, #0x4b
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT22
     add r2, r4, #0x4b
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x4
@@ -199,56 +199,56 @@ func_ov003_021ccd68:
     bne .L_2a8
     ldr r0, [sp]
     ldr r1, _LIT23
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT24
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT25
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT26
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     b .L_330
 .L_2a8:
     ldr r0, [sp]
     ldr r1, _LIT27
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT28
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT29
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT30
     mov r2, #0x37
-    bl func_02091554
+    bl OS_SPrintf
     b .L_330
 .L_2e8:
     ldr r0, [sp]
     ldr r1, _LIT19
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT1
     ldr r0, [sp, #0x4]
     ldr r2, [r1, r4, lsl #0x2]
     ldr r1, _LIT20
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT1
     ldr r0, [sp, #0x8]
     ldr r2, [r1, r4, lsl #0x2]
     ldr r1, _LIT21
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT1
     ldr r0, [sp, #0xc]
     ldr r2, [r1, r4, lsl #0x2]
     ldr r1, _LIT22
-    bl func_02091554
+    bl OS_SPrintf
 .L_330:
     add r3, sp, #0x0
     mov r0, r6
@@ -274,19 +274,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT19
     mov r2, #0x5c
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT20
     mov r2, #0x5c
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT21
     mov r2, #0x5c
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT22
     mov r2, #0x5c
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x4
@@ -298,19 +298,19 @@ func_ov003_021ccd68:
     ldr r0, [sp]
     ldr r1, _LIT19
     mov r2, #0x5d
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x4]
     ldr r1, _LIT20
     mov r2, #0x5d
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0x8]
     ldr r1, _LIT21
     mov r2, #0x5d
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [sp, #0xc]
     ldr r1, _LIT22
     mov r2, #0x5d
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r6
     mov r1, r5
     mov r2, #0x4

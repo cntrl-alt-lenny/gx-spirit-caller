@@ -12,7 +12,7 @@
         .extern data_ov017_021b8794
         .extern func_0202c06c
         .extern func_020371b8
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_020b377c
         .extern func_ov005_021aa3f0
         .extern func_ov017_021b2c5c
@@ -220,7 +220,7 @@ func_ov017_021b5030:
     ldr r2, _LIT7
     ldrh r2, [r2, r3]
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     str r0, [sp]
     mov r0, #0xc
@@ -310,7 +310,7 @@ func_ov017_021b5030:
     ldr r2, _LIT7
     ldrh r2, [r2, r3]
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     str r0, [sp]
     mov r0, #0xc
@@ -439,7 +439,7 @@ func_ov017_021b5030:
     ldr r2, _LIT7
     ldrh r2, [r2, r3]
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     str r0, [sp]
     mov r0, #0xc
@@ -516,7 +516,7 @@ func_ov017_021b5030:
     ldrh r2, [r2, #0x78]
     mov r0, r5
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0xc
     mul r0, r9, r0
     add r0, r0, #0xea
@@ -590,7 +590,7 @@ func_ov017_021b5030:
     ldr r2, _LIT7
     ldrh r2, [r2, r3]
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     str r0, [sp]
     mov r0, #0xc
@@ -666,7 +666,7 @@ func_ov017_021b5030:
     ldrh r2, [r2, #0x78]
     mov r0, r5
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0xc
     mul r0, r9, r0
     add r0, r0, #0xea
@@ -747,7 +747,7 @@ func_ov017_021b5030:
     ldrh r2, [r2, #0x78]
     mov r0, r5
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0xc
     mul r0, r9, r0
     add r0, r0, #0xea

@@ -7,7 +7,7 @@
         .extern OS_RestoreIrq
         .extern func_020936e8
         .extern func_020936fc
-        .extern func_020947c8
+        .extern MI_SwapWord
         .global func_020908e8
         .arm
 func_020908e8:
@@ -27,7 +27,7 @@ func_020908e8:
 .L_30:
     mov r0, r9
     mov r1, r8
-    bl func_020947c8
+    bl MI_SwapWord
     movs r4, r0
     bne .L_54
     cmp r7, #0x0

@@ -23,7 +23,7 @@
         .extern data_020fe64c
         .extern func_02041578
         .extern func_020416a8
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aace8
         .extern func_020aed48
         .global func_0204063c
@@ -40,7 +40,7 @@ func_0204063c:
     mov r1, #0x21
     mov r3, #0x1
     str ip, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
     add r0, sp, #0x4
     bl func_020aace8
     mov r3, r0
@@ -205,7 +205,7 @@ func_0204063c:
     mov r1, #0x21
     mov r3, #0x1
     str ip, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r1, _LIT16
     add r2, sp, #0x4
     mov r0, r6

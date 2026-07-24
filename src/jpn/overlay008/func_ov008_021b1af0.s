@@ -15,7 +15,7 @@
         .extern func_0202c06c
         .extern func_0208ddac
         .extern func_0208e038
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_020aae1c
         .global func_ov008_021b1af0
@@ -36,7 +36,7 @@ func_ov008_021b1af0:
     ldr r2, [r2]
     add r0, sp, #0x8
     ldr r2, [r2, #0x14]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, _LIT0
     ldr r0, [r0]
     ldr r0, [r0, #0x14]

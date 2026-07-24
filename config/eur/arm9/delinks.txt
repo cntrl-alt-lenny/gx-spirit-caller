@@ -13604,7 +13604,7 @@ src/main/func_02079e4c.s:
     complete
     .text start:0x02079e4c end:0x02079e70
 
-libs/nitro/func_02079e70.legacy.c:
+libs/nitro/OsCountZeroBits.legacy.c:
     complete
     .text start:0x02079e70 end:0x02079e78
 
@@ -15716,7 +15716,7 @@ src/main/func_0208b108.legacy.c:
     complete
     .text start:0x0208b108 end:0x0208b16c
 
-libs/nitro/func_0208b16c.legacy.c:
+libs/nitro/MTX_Identity33_.legacy.c:
     complete
     .text start:0x0208b16c end:0x0208b190
 
@@ -15736,11 +15736,11 @@ src/main/func_0208b1e0.s:
     complete
     .text start:0x0208b1e0 end:0x0208b2a4
 
-libs/nitro/func_0208b2a4.legacy.c:
+libs/nitro/MTX_Identity43_.legacy.c:
     complete
     .text start:0x0208b2a4 end:0x0208b2cc
 
-libs/nitro/func_0208b2cc.legacy.c:
+libs/nitro/MTX_Copy43To44_.legacy.c:
     complete
     .text start:0x0208b2cc end:0x0208b300
 
@@ -15756,15 +15756,15 @@ src/main/func_0208b54c.s:
     complete
     .text start:0x0208b54c end:0x0208b8e0
 
-libs/nitro/func_0208b8e0.legacy.c:
+libs/nitro/MTX_ScaleApply43.legacy.c:
     complete
     .text start:0x0208b8e0 end:0x0208b920
 
-libs/nitro/func_0208b920.legacy.c:
+libs/nitro/MTX_Identity44_.legacy.c:
     complete
     .text start:0x0208b920 end:0x0208b94c
 
-libs/nitro/func_0208b94c.legacy.c:
+libs/nitro/MTX_Copy44To43_.legacy.c:
     complete
     .text start:0x0208b94c end:0x0208b980
 
@@ -16150,7 +16150,7 @@ src/main/func_0208e318.c:
     complete
     .text start:0x0208e318 end:0x0208e334
 
-libs/nitro/func_0208e334.legacy.c:
+libs/nitro/G2x_SetBGyAffine_.legacy.c:
     complete
     .text start:0x0208e334 end:0x0208e3e8
 
@@ -16166,7 +16166,7 @@ src/main/func_0208e420.c:
     complete
     .text start:0x0208e420 end:0x0208e43c
 
-libs/nitro/func_0208e43c.legacy.c:
+libs/nitro/GXi_NopClearFifo128_.legacy.c:
     complete
     .text start:0x0208e43c end:0x0208e4d0
 
@@ -16404,7 +16404,7 @@ src/main/func_02090330.s:
     complete
     .text start:0x02090330 end:0x020903b0
 
-libs/nitro/func_020903b0.legacy.c:
+libs/nitro/GX_SendFifo48B.legacy.c:
     complete
     .text start:0x020903b0 end:0x020903d4
 
@@ -16622,7 +16622,7 @@ src/main/func_02090c44.s:
     complete
     .text start:0x02090c44 end:0x0209150c
 
-libs/nitro/func_0209150c.legacy.c:
+libs/nitro/OS_SNPrintf.legacy.c:
     complete
     .text start:0x0209150c end:0x0209153c
 
@@ -16630,7 +16630,7 @@ src/main/func_0209153c.c:
     complete
     .text start:0x0209153c end:0x02091554
 
-libs/nitro/func_02091554.legacy.c:
+libs/nitro/OS_SPrintf.legacy.c:
     complete
     .text start:0x02091554 end:0x02091584
 
@@ -16642,7 +16642,7 @@ src/main/func_020915e4.legacy.c:
     complete
     .text start:0x020915e4 end:0x0209164c
 
-libs/nitro/func_0209164c.legacy.c:
+libs/nitro/string_put_char.legacy.c:
     complete
     .text start:0x0209164c end:0x02091678
 
@@ -16680,7 +16680,7 @@ src/main/func_020916c8.legacy.c:
     complete
     .text start:0x020916c8 end:0x02091700
 
-libs/nitro/func_02091700.legacy.c:
+libs/nitro/OSi_IdleThreadProc.legacy.c:
     complete
     .text start:0x02091700 end:0x02091714
 
@@ -16753,7 +16753,7 @@ src/main/func_02091af4.legacy.c:
     .text start:0x02091af4 end:0x02091b30
 
 
-libs/nitro/func_02091b30.legacy.c:
+libs/nitro/OSi_CancelThreadAlarmForSleep.legacy.c:
     complete
     .text start:0x02091b30 end:0x02091b5c
 
@@ -16796,7 +16796,7 @@ src/main/func_020920bc.legacy.c:
     complete
     .text start:0x020920bc end:0x02092124
 
-libs/nitro/func_02092124.legacy.c:
+libs/nitro/OSi_RemoveMutexLinkFromQueue.legacy.c:
     complete
     .text start:0x02092124 end:0x02092154
 
@@ -16804,11 +16804,11 @@ src/main/func_02092154.legacy.c:
     complete
     .text start:0x02092154 end:0x020921a8
 
-libs/nitro/func_020921a8.legacy.c:
+libs/nitro/OSi_RemoveLinkFromQueue.legacy.c:
     complete
     .text start:0x020921a8 end:0x020921dc
 
-libs/nitro/func_020921dc.legacy.c:
+libs/nitro/OSi_InsertLinkToQueue.legacy.c:
     complete
     .text start:0x020921dc end:0x02092254
 
@@ -16869,11 +16869,11 @@ src/main/func_02092614.c:
     complete
     .text start:0x02092614 end:0x02092644
 
-libs/nitro/func_02092644.legacy.c:
+libs/nitro/OSi_DequeueItem.legacy.c:
     complete
     .text start:0x02092644 end:0x02092668
 
-libs/nitro/func_02092668.legacy.c:
+libs/nitro/OSi_EnqueueTail.legacy.c:
     complete
     .text start:0x02092668 end:0x0209268c
 
@@ -16897,7 +16897,7 @@ src/main/func_02092844.c:
     complete
     .text start:0x02092844 end:0x02092860
 
-libs/nitro/func_02092860.legacy.c:
+libs/nitro/DC_InvalidateAll.legacy.c:
     complete
     .text start:0x02092860 end:0x0209286c
 src/main/func_0209286c.s:
@@ -16920,10 +16920,10 @@ src/main/func_02092904.s:
     complete
     .text start:0x02092904 end:0x02092928
 
-libs/nitro/func_02092928.legacy.c:
+libs/nitro/DC_WaitWriteBufferEmpty.legacy.c:
     complete
     .text start:0x02092928 end:0x02092934
-libs/nitro/func_02092934.legacy.c:
+libs/nitro/IC_InvalidateAll.legacy.c:
     complete
     .text start:0x02092934 end:0x02092940
 src/main/func_02092940.s:
@@ -16975,20 +16975,20 @@ src/main/func_02092e38.c:
     complete
     .text start:0x02092e38 end:0x02092e4c
 
-libs/nitro/func_02092e4c.legacy.c:
+libs/nitro/OS_EnableProtectionUnit.legacy.c:
     complete
     .text start:0x02092e4c end:0x02092e5c
-libs/nitro/func_02092e5c.legacy.c:
+libs/nitro/OS_DisableProtectionUnit.legacy.c:
     complete
     .text start:0x02092e5c end:0x02092e6c
-libs/nitro/func_02092e6c.legacy.c:
+libs/nitro/OS_SetDPermissionsForProtectionRegion.legacy.c:
     complete
     .text start:0x02092e6c end:0x02092e80
-libs/nitro/func_02092e80.legacy.c:
+libs/nitro/OS_SetProtectionRegion1.legacy.c:
     complete
     .text start:0x02092e80 end:0x02092e88
 
-libs/nitro/func_02092e88.legacy.c:
+libs/nitro/OS_SetProtectionRegion2.legacy.c:
     complete
     .text start:0x02092e88 end:0x02092e90
 
@@ -17196,7 +17196,7 @@ src/main/func_02093b00.s:
     complete
     .text start:0x02093b00 end:0x02093bf0
 
-libs/nitro/func_02093bf0.legacy.c:
+libs/nitro/OS_Halt.legacy.c:
     complete
     .text start:0x02093bf0 end:0x02093bfc
 libs/nitro/func_02093bfc.legacy.c:
@@ -17326,15 +17326,15 @@ src/main/func_02094550.s:
     complete
     .text start:0x02094550 end:0x02094588
 
-libs/nitro/func_02094588.legacy.c:
+libs/nitro/MI_Copy36B.legacy.c:
     complete
     .text start:0x02094588 end:0x020945a4
 
-libs/nitro/func_020945a4.legacy.c:
+libs/nitro/MI_Copy48B.legacy.c:
     complete
     .text start:0x020945a4 end:0x020945c8
 
-libs/nitro/func_020945c8.legacy.c:
+libs/nitro/MI_Copy64B.legacy.c:
     complete
     .text start:0x020945c8 end:0x020945f4
 
@@ -17350,7 +17350,7 @@ src/main/func_020947b8.s:
     complete
     .text start:0x020947b8 end:0x020947c6
 
-libs/nitro/func_020947c8.legacy.c:
+libs/nitro/MI_SwapWord.legacy.c:
     complete
     .text start:0x020947c8 end:0x020947d0
 
@@ -17907,7 +17907,7 @@ src/main/func_02098388.s:
     complete
     .text start:0x02098388 end:0x020983b8
 
-libs/nitro/func_020983b8.legacy.c:
+libs/nitro/FS_Init.legacy.c:
     complete
     .text start:0x020983b8 end:0x020983f4
 
@@ -19257,7 +19257,7 @@ src/main/func_020a60a8.c:
     complete
     .text start:0x020a60a8 end:0x020a60c0
 
-libs/nitro/func_020a60c0.legacy.c:
+libs/nitro/CTRDG_IsOptionCartridge.legacy.c:
     complete
     .text start:0x020a60c0 end:0x020a60fc
 

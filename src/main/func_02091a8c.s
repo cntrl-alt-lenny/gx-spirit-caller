@@ -7,7 +7,7 @@
         .extern OS_RestoreIrq
         .extern data_021a63c8
         .extern func_02091f88
-        .extern func_020921dc
+        .extern OSi_InsertLinkToQueue
         .global func_02091a8c
         .arm
 func_02091a8c:
@@ -23,7 +23,7 @@ func_02091a8c:
     mov r0, r6
     mov r1, r4
     str r6, [r4, #0x78]
-    bl func_020921dc
+    bl OSi_InsertLinkToQueue
 .L_b4:
     mov r0, #0x0
     str r0, [r4, #0x64]

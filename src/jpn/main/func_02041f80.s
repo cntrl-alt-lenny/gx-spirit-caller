@@ -9,7 +9,7 @@
         .extern data_020fe8f0
         .extern data_020fe8f4
         .extern func_020416a8
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aace8
         .extern func_020aafd0
         .global func_02041f80
@@ -36,7 +36,7 @@ func_02041f80:
     ldr r2, _LIT3
     add r0, sp, #0x0
     mov r1, #0x7
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r1, _LIT4
     add r2, sp, #0x0
     mov r0, r4

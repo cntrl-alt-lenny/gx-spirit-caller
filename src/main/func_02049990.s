@@ -15,7 +15,7 @@
         .extern func_0204ec90
         .extern func_02062600
         .extern func_02064f84
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020930b0
         .global func_02049990
         .arm
@@ -94,7 +94,7 @@ func_02049990:
     ldr r2, _LIT0
     add r0, sp, #0x10
     mov r1, #0xc
-    bl func_0209150c
+    bl OS_SNPrintf
     bl func_020498f0
     mov r4, r0
     bl func_020498f0

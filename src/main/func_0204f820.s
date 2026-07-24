@@ -11,7 +11,7 @@
         .extern func_02045c7c
         .extern func_02049038
         .extern func_020498f0
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .global func_0204f820
         .arm
 func_0204f820:
@@ -29,7 +29,7 @@ func_0204f820:
     add r0, sp, #0x0
     add r3, r1, #0x1
     mov r1, #0xc
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r0, _LIT1
     add r1, sp, #0x0
     add r2, sp, #0xc
@@ -41,7 +41,7 @@ func_0204f820:
     mov r1, #0xc
     add r3, r2, #0x1
     ldr r2, _LIT0
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r0, _LIT2
     add r1, sp, #0x0
     add r2, sp, #0xc
@@ -51,7 +51,7 @@ func_0204f820:
     add r0, sp, #0x0
     mov r1, #0xc
     mov r3, #0x3
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r0, _LIT3
     add r1, sp, #0x0
     add r2, sp, #0xc

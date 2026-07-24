@@ -54,7 +54,7 @@
         .extern func_0202c0c0
         .extern func_0202c1ac
         .extern func_0208df0c
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094504
         .global func_02012cc8
         .arm
@@ -515,7 +515,7 @@ func_02012cc8:
     str r0, [sp, #0x4]
     mov r0, r4
     mov r2, r6
-    bl func_02091554
+    bl OS_SPrintf
     b .L_e0c
 .L_d94:
     bl func_020117dc
@@ -548,7 +548,7 @@ func_02012cc8:
     mov r3, r8
     mov r0, r4
     mov r2, r6
-    bl func_02091554
+    bl OS_SPrintf
 .L_e0c:
     bl func_0208df0c
     mov r2, r0
@@ -579,17 +579,17 @@ func_02012cc8:
 .L_e74:
     ldr r1, _LIT13
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
     b .L_ea0
 .L_e84:
     ldr r1, _LIT14
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
     b .L_ea0
 .L_e94:
     ldr r1, _LIT15
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
 .L_ea0:
     bl func_0208df0c
     add r1, r7, #0x1
@@ -608,11 +608,11 @@ func_02012cc8:
     cmp r2, #0x2
     bge .L_eec
     ldr r1, _LIT16
-    bl func_02091554
+    bl OS_SPrintf
     b .L_ef4
 .L_eec:
     ldr r1, _LIT17
-    bl func_02091554
+    bl OS_SPrintf
 .L_ef4:
     bl func_0208df0c
     add r1, r7, #0x2
@@ -632,7 +632,7 @@ func_02012cc8:
     ldrne r2, _LIT19
     add r0, sp, #0x1c
     ldreq r2, _LIT20
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r0, r7, #0x3
@@ -648,7 +648,7 @@ func_02012cc8:
     add r0, sp, #0x1c
     ldr r2, [r1, #0xc38]
     ldr r1, _LIT21
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r1, r7, #0x4
@@ -666,7 +666,7 @@ func_02012cc8:
     ldr r1, _LIT23
     ldr r2, [r3, r2, lsl #0x2]
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r1, r7, #0x5
@@ -684,7 +684,7 @@ func_02012cc8:
     ldr r1, _LIT25
     ldr r2, [r3, r2, lsl #0x2]
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r1, r7, #0x6
@@ -702,7 +702,7 @@ func_02012cc8:
     mov r2, r0
     ldr r1, _LIT26
     add r0, sp, #0x1c
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r1, r7, #0x7
@@ -722,7 +722,7 @@ func_02012cc8:
     ldrne r2, _LIT28
     add r0, sp, #0x1c
     ldreq r2, _LIT29
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r0, r7, #0x8
@@ -742,7 +742,7 @@ func_02012cc8:
     ldrne r2, _LIT28
     add r0, sp, #0x1c
     ldreq r2, _LIT29
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0208df0c
     mov r2, r0
     add r0, r7, #0x9

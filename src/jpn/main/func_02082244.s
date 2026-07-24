@@ -7,9 +7,9 @@
         .extern data_021a17e0
         .extern data_021a1824
         .extern data_021a1894
-        .extern func_0208b16c
-        .extern func_0208b2a4
-        .extern func_0208b920
+        .extern MTX_Identity33_
+        .extern MTX_Identity43_
+        .extern MTX_Identity44_
         .global func_02082244
         .arm
 func_02082244:
@@ -31,9 +31,9 @@ func_02082244:
     str r4, [r1, #0x90]
     str r3, [r1, #0xa4]
     str r2, [r1, #0xb8]
-    bl func_0208b2a4
+    bl MTX_Identity43_
     ldr r0, _LIT7
-    bl func_0208b920
+    bl MTX_Identity44_
     mov r2, r7
     ldr r1, _LIT1
     ldr r7, _LIT8
@@ -63,7 +63,7 @@ func_02082244:
     str r2, [r1, #0xe0]
     str r2, [r1, #0xe4]
     str r2, [r1, #0xe8]
-    bl func_0208b16c
+    bl MTX_Identity33_
     mov r3, #0x1000
     ldr r0, _LIT1
     mov r2, #0x0

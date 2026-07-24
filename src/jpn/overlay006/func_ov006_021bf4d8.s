@@ -16,7 +16,7 @@
         .extern func_0202c06c
         .extern func_0202c3f8
         .extern func_0208dcb4
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_ov006_021b6c1c
         .extern func_ov006_021bd5b0
@@ -109,7 +109,7 @@ func_ov006_021bf4d8:
     add r0, sp, #0x8
     mov r2, r4
     mov r3, r6
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0xb1
     str r0, [sp]
     mov ip, #0xc

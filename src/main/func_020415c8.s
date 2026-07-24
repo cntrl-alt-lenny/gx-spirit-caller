@@ -7,7 +7,7 @@
         .extern data_020fe8f0
         .extern func_020413b0
         .extern func_020438b8
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aaddc
         .global func_020415c8
         .arm
@@ -63,7 +63,7 @@ func_020415c8:
 .L_15c:
     mov r2, r6
     mov r3, r9
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r2, [r4, #0x4]
     mov r1, r7
     add r0, r2, r0

@@ -26,7 +26,7 @@
         .extern func_0208e0a0
         .extern func_0208e120
         .extern func_0208e318
-        .extern func_0208e334
+        .extern G2x_SetBGyAffine_
         .extern func_02094504
         .extern func_ov002_022b303c
         .global func_ov002_022a51e0
@@ -201,7 +201,7 @@ func_ov002_022a51e0:
     mov r2, #0x80
     mov r3, r5
     str r6, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     ldr r0, _LIT7
     mov r1, #0x0
     strh r1, [r0]
@@ -213,7 +213,7 @@ func_ov002_022a51e0:
     mov r3, r5
     mov r2, #0x80
     str r6, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     ldr r0, _LIT9
     mov r1, #0x0
     strh r1, [r0]
@@ -282,7 +282,7 @@ func_ov002_022a51e0:
     mov r3, r9
     mov r2, #0x80
     str r6, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     ldr r0, _LIT7
     mov r1, #0x4
     mov r2, #0x3f
@@ -307,7 +307,7 @@ func_ov002_022a51e0:
     mov r3, r9
     mov r2, #0x80
     str r6, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     ldr r0, _LIT9
     mov r3, r5
     mov r1, #0x4

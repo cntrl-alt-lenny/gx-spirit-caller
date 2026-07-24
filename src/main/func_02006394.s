@@ -39,7 +39,7 @@
         .extern func_0209448c
         .extern func_02094504
         .extern func_02096228
-        .extern func_020983b8
+        .extern FS_Init
         .extern func_0209bcdc
         .extern func_0209bfc8
         .global func_02006394
@@ -71,7 +71,7 @@ func_02006394:
     str r1, [r0]
     bl func_020062cc
     mov r0, #0x2
-    bl func_020983b8
+    bl FS_Init
     mov r0, #0x4
     bl func_02092c78
     mov r0, #0x4

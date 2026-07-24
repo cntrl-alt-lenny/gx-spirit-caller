@@ -7,7 +7,7 @@
         .extern data_020c5ca8
         .extern data_020c5cc8
         .extern data_02102c64
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_0201a9d0
         .arm
 func_0201a9d0:
@@ -49,7 +49,7 @@ func_0201a9d0:
     mov r0, r4
     add r3, r3, #0x1
     str ip, [r5, #0x4]
-    bl func_02091554
+    bl OS_SPrintf
     add sp, sp, #0x30
     ldmia sp!, {r4, r5, r6, pc}
 .L_4b4:
@@ -57,7 +57,7 @@ func_0201a9d0:
     ldr r2, [lr, r0, lsl #0x2]
     ldr r1, _LIT3
     mov r0, r4
-    bl func_02091554
+    bl OS_SPrintf
     add sp, sp, #0x30
     ldmia sp!, {r4, r5, r6, pc}
 _LIT0: .word data_020b5ab8

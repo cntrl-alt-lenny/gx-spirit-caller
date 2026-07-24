@@ -9,7 +9,7 @@
         .extern func_020498f0
         .extern func_0204e914
         .extern func_0204e9b8
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020930b0
         .extern func_02094688
         .global func_0204ead0
@@ -57,7 +57,7 @@ func_0204ead0:
     ldr r2, _LIT0
     add r0, sp, #0x20
     mov r1, #0x200
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r8, r0
     cmp r9, #0x1
     mov r7, #0x1
@@ -69,7 +69,7 @@ func_0204ead0:
     ldr r2, _LIT1
     mov r0, r6
     mov r1, r5
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r4, r0
     add r1, sp, #0x20
     mov r0, r6

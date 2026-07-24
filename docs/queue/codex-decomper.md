@@ -140,7 +140,7 @@ q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verif
 
 **Gate:** doc-only; the per-lever verification checklist with concrete C forms.
 
-### q-nitro-names — harvest the 35 byte-verified NitroSDK names from libs/nitro headers (r8 bet 4) [TODO]
+### q-nitro-names — harvest the 35 byte-verified NitroSDK names from libs/nitro headers (r8 bet 4) [DONE]
 
 89 `libs/nitro/func_*.c` carry a `function: <Name>` header (verified). Filter the ~53 FX_Init size-0x4 stubs → ~35 REAL names (FS_Init, OS_SPrintf, MI_Copy48B, OsCountZeroBits, MTX_* …), all still `func_*` in symbols.txt with ZERO overlap vs the 72-entry sig DB. Parse the header field and apply via `rename_symbol.py --cascade` (byte-neutral, 3x across regions). Their bodies name their callees for free — chase those too.
 

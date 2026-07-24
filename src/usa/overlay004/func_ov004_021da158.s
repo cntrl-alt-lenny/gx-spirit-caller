@@ -26,7 +26,7 @@
         .extern func_0208dcb4
         .extern func_0208dd64
         .extern func_0208dfb8
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_0209445c
         .extern func_ov000_021abc70
@@ -100,7 +100,7 @@ func_ov004_021da158:
     ldr r1, _LIT6
     moveq r2, fp
     mov r0, r7
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     mov r1, #0x4
     mov r2, #0x0

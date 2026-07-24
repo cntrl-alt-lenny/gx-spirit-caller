@@ -5,7 +5,7 @@
         .text
         .extern data_021a088c
         .extern func_02079e4c
-        .extern func_02079e70
+        .extern OsCountZeroBits
         .extern func_0207a7d4
         .extern func_0207a868
         .extern func_0207af28
@@ -127,7 +127,7 @@ func_0207a868:
     bl func_0207b0e0
 .L_18c:
     ldrh r0, [r5, #0xa]
-    bl func_02079e70
+    bl OsCountZeroBits
     rsb r0, r0, #0x20
     mov r0, r0, lsl #0x10
     mov r0, r0, lsr #0x10

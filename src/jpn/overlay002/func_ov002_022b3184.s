@@ -15,7 +15,7 @@
         .extern func_02006e00
         .extern func_0201d428
         .extern func_0201e564
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_ov002_022b3184
         .arm
 func_ov002_022b3184:
@@ -49,7 +49,7 @@ func_ov002_022b3184:
     mla r2, r4, r0, ip
     ldr r1, _LIT3
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
     b .L_cc
 .L_80:
     ldr r0, _LIT4
@@ -64,14 +64,14 @@ func_ov002_022b3184:
     mla r2, r4, r0, ip
     ldr r1, _LIT3
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
     b .L_cc
 .L_b8:
     ldr r3, _LIT2
     add r0, sp, #0x28
     ldr r3, [r3, r1, lsl #0x2]
     ldr r1, _LIT5
-    bl func_02091554
+    bl OS_SPrintf
 .L_cc:
     add r0, sp, #0x28
     bl func_02006af4
@@ -79,7 +79,7 @@ func_ov002_022b3184:
     bne .L_e8
     ldr r1, _LIT6
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
 .L_e8:
     add r0, sp, #0x28
     mov r1, #0x4

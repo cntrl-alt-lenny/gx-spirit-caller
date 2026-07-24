@@ -12,7 +12,7 @@
         .extern data_02102c24
         .extern func_02001b84
         .extern func_02006bf0
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_0209445c
         .extern func_02098294
         .global func_02001a14
@@ -38,7 +38,7 @@ func_02001a14:
     ldr r2, [r5, r9, lsl #0x3]
     mov r0, r7
     mov r1, r6
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, r7
     mov r1, fp
     mov r2, #0x2

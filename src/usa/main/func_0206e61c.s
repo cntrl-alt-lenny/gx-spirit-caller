@@ -5,7 +5,7 @@
         .text
         .extern data_02101db4
         .extern func_0206e5fc
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_02094688
         .global func_0206e61c
         .arm
@@ -40,7 +40,7 @@ func_0206e61c:
     ldrb r3, [sp, #0x10]
     str r3, [sp, #0x8]
     ldrb r3, [sp, #0x13]
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r0, r4
     add sp, sp, #0x18
     ldmia sp!, {r4, lr}
