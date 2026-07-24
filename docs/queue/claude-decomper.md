@@ -119,7 +119,7 @@ The other half of the re-sweep (Scaffolder takes the lower range). `--max-size 2
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
 
-### cm-regalloc-discriminator — build a systematic reg-alloc-park discriminator (r8 bets 5/9) [TODO]
+### cm-regalloc-discriminator — build a systematic reg-alloc-park discriminator (r8 bets 5/9) [DONE]
 
 Reg-alloc/predication parks dominate (44 of 74) and ship 0%, BUT r8 shows some are falsifiable (routing tier, trampoline arity — see cm-regalloc-trampoline) and match_pct is ANTI-informative (walls plateau HIGH at 84-88%, mimicking near-misses — do NOT chase high-% parks). Read the .s of the remaining reg-alloc parks and find the discriminator that predicts convertible vs genuinely-stuck (callee-arity, routing signature, decl-order sensitivity). Ship what's tractable; document the r2↔r3 permanent signature so it's park-on-sight-CORRECTLY.
 
@@ -130,3 +130,4 @@ Reg-alloc/predication parks dominate (44 of 74) and ship 0%, BUT r8 shows some a
 r9 drain-aware analysis: ov002 <=128B is ~exhausted (87% but easy wins swept), while main <=128B is the largest UNTOUCHED high-yield block — 873 candidates, only ~10 sampled. Focus here: python tools/wall_aware_headroom.py --json --max-size 128 filtered to main. Route by epilogue first. match_pct is anti-informative for reg-alloc parks (don't chase high-%). This is where the scarce high-EV budget should go.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted on main <=128B.
+**Result:** Verified r8's bet 3 directly: `func_ov004_021dbe68` (parked 3 sessions as an "unbeatable r2/r3 wall") is a mis-classified 2-argument model — its tail-callee reads r2 as a genuine 3rd parameter at instruction 1. Modeling the true 3-arg signature ships 100% first try, correcting a prior (wrong) "confirmed permanent" re-test in `codegen-walls.md`'s P-4 entry. Documented the general discriminator: read the callee before parking a tail-call/thunk — a missing/wrong-arity forwarded argument is falsifiable, a register choice for a value computed purely locally (never crossing a call boundary) is the genuine, reshape-insensitive signature (independently reconfirmed 3× this session already, briefs 672/673, zero movement across every reshape). match_pct correlates with neither case (spot-checked 58-92%). USA/JPN port blocked by a genuine pre-existing un-carved gap in both regions' ov004 delinks.txt — flagged as a separate task. EUR ships alone. Full writeup: [`docs/research/brief-674-regalloc-discriminator.md`](../research/brief-674-regalloc-discriminator.md).

@@ -6303,6 +6303,72 @@ other patterns in partial-match drops.
 > `lever-payoff.md`'s reg-alloc/scratch-register row for the up-to-date
 > W/F count.
 
+> **CORRECTION (queue item cm-regalloc-discriminator, brief 674,
+> following R&D swarm r8 bet 3/9).** The UPDATE above's claim that
+> `func_ov004_021dbe68` is a "confirmed instance" of pure register
+> residue is **wrong** — r8 found, and this brief independently
+> reproduced byte-exact, that its true signature is **3 forwarded
+> args, not 2**: the tail-callee `func_02094688` is a memcpy-shaped
+> routine that reads `r2` as a length parameter at its very first
+> instruction (`cmp r2, #0x0`). The trampoline never touches r2 at
+> all — it only swaps r0↔r1 — so r2 passes through untouched from
+> `func_ov004_021dbe68`'s own (unmodeled) 3rd parameter straight into
+> the callee. Modeling `void func_ov004_021dbe68(void *a0, void *a1,
+> int a2) { func_02094688(a1, a0, a2); }` under `.thumb.c` +
+> `#pragma thumb on` reaches 100% first try. **Removed from the
+> confirmed-permanent list.** Its sibling `func_ov004_021de264`
+> (already fixed and shipped on `main` as of this brief, 1 forwarded
+> `void *` arg instead of 0) is the same error pattern one entry over.
+>
+> **The discriminator this establishes — read the callee before
+> parking a tail-call/thunk as reg-alloc-permanent:**
+> 1. **Forwarded-argument false positive (falsifiable):** the
+>    park is a tail-call/trampoline shape (swap-and-call,
+>    cache-and-call, vtable dispatch) AND the residual is that an
+>    *entire argument* is missing from the model, not just a
+>    register-letter swap on an argument both sides agree exists.
+>    Diagnostic: read the **callee's own raw disassembly** (or its
+>    real callers, if the callee is already C) and check which
+>    registers it reads in its first few instructions — a callee
+>    that reads r2 (or r3) as real input proves the caller must be
+>    forwarding that same register, whether or not the caller's own
+>    body ever appears to "use" it. A pass-through/forwarding thunk's
+>    own disassembly never shows a register being "used" — forwarding
+>    *is* the use, and is invisible if you only read the caller. This
+>    is the same lever brief 671 found for `func_020a71e4`/`func_020a724c`
+>    (grep actual call sites for true arity), generalized to reading
+>    the *callee* directly when it's cheaper than finding call sites.
+> 2. **Genuine r2↔r3 (or r0↔r1) permanent wall (park-on-sight,
+>    correctly):** every argument the caller forwards is already
+>    correctly modeled (confirmed by reading the callee/call-sites as
+>    above), AND the sole residual is a register choice for a value
+>    **computed locally** within the function — a scratch swap-temp,
+>    a pool-load pointer, or an intermediate like `sub rX, r1, r0` for
+>    a range/threshold check — never a value received from the
+>    caller's own parameter list. This session (briefs 672/673)
+>    independently reconfirmed this exact shape 3 times
+>    (`func_0207d4dc`, `func_0207dab4`, `func_0207db00` — all
+>    range/threshold-check dispatch with a local `end-start`-style
+>    intermediate mwcc puts in r2, target in r3) with zero movement
+>    across every reshape tried (named locals, statement/declaration
+>    order, operand order). **These are the r2↔r3 signature this
+>    queue item asks to document: if the diff shows the entire rest
+>    of the function byte-identical and the sole residual is one
+>    register-operand swap on a value that never crosses a call
+>    boundary, stop reshaping — it will not move.** Brief 218's own
+>    12-variant exhaustive sweep (below) already proved this for the
+>    original 4 swap-tail-call examples; treat any NEW instance
+>    matching this exact shape (byte-identical elsewhere, one
+>    never-forwarded register swap) as equally settled without
+>    re-running the same 12 variants again.
+> 3. **match_pct is not a valid signal for either case above.** Per
+>    r8: reg-alloc/predication parks plateau deceptively HIGH (72-91%
+>    observed this session and prior), because only 1-4 instructions
+>    differ out of 20-40 — the rest of a correctly-modeled function
+>    matches immediately regardless of which of the two cases above
+>    applies. A 91% park is not "closer to shippable" than a 40% one;
+>    check the discriminator (callee arity), not the percentage.
+
 For a tiny thunk where mwcc must pick a scratch register for
 a swap temp or pool-load pointer (`return target(b, a)` or
 `return target(arr[idx*N])`), mwcc reliably picks the
