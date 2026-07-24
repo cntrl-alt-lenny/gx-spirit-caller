@@ -451,7 +451,13 @@ def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
 # assumption, so `attainment = C / ceiling` (not `C / total_bytes`) can be
 # the honest rate-of-progress number (r7-13's "north-star").
 #
-# TIER 1 -- ASYMPTOTIC. Hard-coded set, not derived: {main, ov002}. This
+# TIER 1 -- ASYMPTOTIC. The module set remains explicit, but its headroom is
+# now per-module rather than one flat fraction. R8's measured main campaign
+# rate is 75%; ov002 retains its documented conservative policy dial because
+# it is byte-complete and selectively converted rather than technically
+# exhausted.
+#
+# {main, ov002}. This
 # is a direct, repeated, "confirmed" (not merely "plausible") finding of
 # the r7 swarm (rnd-swarm-r7-verified.md r7-14/r7-15) -- verified here by
 # recomputing the denominator share independently rather than trusting the
@@ -489,12 +495,20 @@ def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
 # well into their remaining headroom.
 ASYMPTOTIC_MODULES = frozenset({"main", "ov002"})
 
-# 10%: a deliberately small but nonzero fraction. Zero would make
-# attainment tautologically 100% for these two modules forever (ceiling
-# == current by definition) -- unfalsifiable and uninformative. 10%
-# reflects that SOME further conversion keeps landing even here (e.g.
-# brief 609's ov002 struct-bank work), just far slower than elsewhere.
-ASYMPTOTIC_HEADROOM_FRACTION = 0.10
+# Main's 75% is the measured empirical ship-rate adopted by the R8
+# synthesis: +33,832 C-bytes in the observed campaign window, consuming
+# roughly 49% of the old model-assigned main headroom in one month. The
+# figure is intentionally recorded here as a module-specific input, not
+# silently applied to every asymptotic module.
+#
+# Ov002's 10% is retained as a conservative policy input, not mislabelled as
+# a measured technical wall: the module is byte-complete, but its 1.1 MB
+# readable-C conversion is selective. A future ov002 measurement can replace
+# this entry without changing the formula.
+ASYMPTOTIC_HEADROOM_FRACTIONS = {
+    "main": 0.75,
+    "ov002": 0.10,
+}
 
 # 75%: most of a finishable module's remaining non-C bytes are assumed
 # reachable, netting out ~25% for the permanent ISA-instruction floor
@@ -523,8 +537,10 @@ def tractable_ceiling_bytes(module: str, c_bytes: int, c_total: int) -> int:
     """
     if c_total <= 0:
         return 0
-    frac = (ASYMPTOTIC_HEADROOM_FRACTION if module in ASYMPTOTIC_MODULES
-            else FINISHABLE_HEADROOM_FRACTION)
+    if module in ASYMPTOTIC_MODULES:
+        frac = ASYMPTOTIC_HEADROOM_FRACTIONS[module]
+    else:
+        frac = FINISHABLE_HEADROOM_FRACTION
     frac = max(0.0, min(1.0, frac))
     remaining = max(0, c_total - c_bytes)
     return c_bytes + round(frac * remaining)

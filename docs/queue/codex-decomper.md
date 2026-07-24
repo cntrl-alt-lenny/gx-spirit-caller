@@ -146,7 +146,7 @@ q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verif
 
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied count.
 
-### q-ceiling-measured — replace the hard-coded 0.10 asymptotic headroom with main's MEASURED ship-rate (r8 bet 1) [TODO]
+### q-ceiling-measured — replace the hard-coded 0.10 asymptotic headroom with main's MEASURED ship-rate (r8 bet 1) [DONE]
 
 ⚠️ CAREFUL — this corrects the published north-star. progress.py:490 hard-codes ASYMPTOTIC_MODULES={main,ov002} and :497 ASYMPTOTIC_HEADROOM_FRACTION=0.10, but main is the campaign's #1 mover (+33,832 C-bytes this window, ~8x the next module) — self-refutingly NOT asymptotic. Replace the flat 0.10 with each asymptotic module's MEASURED empirical ship-rate (derive from the attempts ledger / progress history), and publish a per-module ceiling. Reclassifying main alone moves the total ceiling 29.97%→~47.88% (reverify byte-exact). State assumptions; this is a data-driven correction, not an optimistic flip.
 

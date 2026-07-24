@@ -19,7 +19,7 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from progress import (  # noqa: E402
-    ASYMPTOTIC_HEADROOM_FRACTION,
+    ASYMPTOTIC_HEADROOM_FRACTIONS,
     ASYMPTOTIC_MODULES,
     CODE_SECTIONS,
     DATA_SECTIONS,
@@ -828,17 +828,20 @@ class TestTractableCeilingBytes(unittest.TestCase):
 
     def test_asymptotic_module_uses_asymptotic_headroom(self):
         # main: c_bytes=100, c_total=1000 -> remaining=900,
-        # ceiling = 100 + round(0.10 * 900) = 100 + 90 = 190.
+        # ceiling = 100 + round(0.75 * 900) = 100 + 675 = 775.
         ceiling = tractable_ceiling_bytes("main", 100, 1000)
-        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTION * 900))
-        self.assertEqual(ceiling, 190)
+        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTIONS["main"] * 900))
+        self.assertEqual(ceiling, 775)
 
     def test_ov002_module_uses_asymptotic_headroom(self):
         # ASYMPTOTIC_MODULES membership, not a name-prefix check --
         # confirms ov002 specifically routes through the same branch
         # as main, not e.g. any module starting with "ov".
         ceiling = tractable_ceiling_bytes("ov002", 100, 1000)
-        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTION * 900))
+        self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTIONS["ov002"] * 900))
+
+    def test_asymptotic_rates_are_per_module(self):
+        self.assertEqual(ASYMPTOTIC_HEADROOM_FRACTIONS, {"main": 0.75, "ov002": 0.10})
 
     def test_finishable_module_uses_finishable_headroom(self):
         # ov004: c_bytes=100, c_total=1000 -> remaining=900,
@@ -871,8 +874,9 @@ class TestTractableCeilingBytes(unittest.TestCase):
 
     def test_finishable_ceiling_strictly_above_asymptotic_for_same_input(self):
         # The whole point of the two-tier split: identical current/total
-        # bytes must NOT produce the same ceiling in both tiers.
-        asymptotic = tractable_ceiling_bytes("main", 100, 1000)
+        # bytes must NOT produce the same ceiling as the conservative
+        # asymptotic policy dial.
+        asymptotic = tractable_ceiling_bytes("ov002", 100, 1000)
         finishable = tractable_ceiling_bytes("ov004", 100, 1000)
         self.assertLess(asymptotic, finishable)
 
