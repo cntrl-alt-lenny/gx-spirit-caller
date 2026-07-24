@@ -208,6 +208,13 @@ def main(argv: list[str] | None = None) -> int:
             print("\n==================== GATE FAIL ====================", flush=True)
             print("  duplicate delink (see above) - fix before gating", flush=True)
             return 1
+    if regions and (ROOT / "tools" / "fix_delink_suffixes.py").exists():
+        print(f"\n{'=' * 20} preflight: delink suffixes {'=' * 20}", flush=True)
+        if run([PY, "tools/fix_delink_suffixes.py"]) != 0:
+            print("\n==================== GATE FAIL ====================", flush=True)
+            print("  routed delink header mismatch (see above) - run "
+                  "`python tools/fix_delink_suffixes.py --fix`", flush=True)
+            return 1
 
     failed = [ver for ver in regions if not gate_region(ver, args.clean)]
 

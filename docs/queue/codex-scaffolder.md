@@ -152,7 +152,7 @@ The ONLY concurrent-collision prevention today is prose address-splits in queue 
 
 **Gate:** `python -m pytest -q tests` no-new-failures + demo: the flag filters the JSON by address range.
 
-### q-delink-suffix-fix — fix_delink_suffixes.py preflight for routing ships (r8 bet 5) [TODO]
+### q-delink-suffix-fix — fix_delink_suffixes.py preflight for routing ships (r8 bet 5) [DONE]
 
 Routing ships rename `.c`→`.legacy.c`/`.legacy_sp3.c`/`.thumb.c`, and the delinks.txt TU-header must follow — it's missed routinely (brief 668 left all 17 headers plain `.c`; build passed but `check_match_invariants` went red repo-wide with missing_tu_source×17 for DAYS until hand-fixed). 347 routing files in src/main → recurs nearly every ship. Build `tools/fix_delink_suffixes.py` reusing `ROUTING_SUFFIXES`, wire it like `check_delink_dupes` (gate3 preflight).
 
