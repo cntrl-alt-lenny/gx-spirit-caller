@@ -158,7 +158,7 @@ Routing ships rename `.c`→`.legacy.c`/`.legacy_sp3.c`/`.thumb.c`, and the deli
 
 **Gate:** `python -m pytest -q tests` + demo it fixes a deliberately-mismatched header + `python tools/configure.py eur && ninja sha1` OK.
 
-### q-128b-reband — re-band the small-tier worklist at 128B (r8 bet 2) [TODO]
+### q-128b-reband — re-band the small-tier worklist at 128B (r8 bet 2) [DONE]
 
 r8 measured the '≤256B runway' is really TWO populations split at 128B: ≤128B ships ~70% (0-64B 8/11, 65-128B 15/22), 129-256B only 20% (3/15), 257B+ 0/4 — holds within-module, so size is causal. The 1640-row worklist sorts shape-first, interleaving 725 low-yield rows through 915 high-yield. Split the band at 128B (lead with ≤128B), delete the `matched-sibling`/`provenance` columns (both 1640/1640 constant = useless), retier the summary.
 
