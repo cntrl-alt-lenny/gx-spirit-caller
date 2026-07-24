@@ -860,6 +860,50 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["named_struct_bytes"], 0x20)
         self.assertAlmostEqual(metric["named_struct_pct"], 100 * 0x20 / 0x30)
 
+    def test_named_struct_subtier_matches_real_bare_typedef_canary_declarations(self):
+        # Regression test for q-data-metric-fix-v2: v1 (#1326) required the
+        # literal `struct` keyword, so it scored 0 for both of these
+        # already-shipped arrays (cm-data-canary, #1328) since this repo
+        # declares struct types by bare typedef name, never `struct Name`
+        # at the array declaration site. Reads the REAL on-disk files
+        # rather than a synthetic `struct Foo` stand-in, since that literal
+        # spelling is exactly what v1's regex already handled correctly —
+        # only a bare-typedef declaration exercises the actual bug.
+        repo_root = Path(__file__).resolve().parent.parent
+        charparam_src = (repo_root / "src" / "main" / "data_020b5b80.c").read_text(encoding="utf-8")
+        presentcard_src = (repo_root / "src" / "main" / "data_020b5e20.c").read_text(encoding="utf-8")
+        self.assertIn("const CharParam data_020b5b80[96]", charparam_src)
+        self.assertIn("const PresentCardEntry data_020b5e20[71]", presentcard_src)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .rodata start:0x0 end:0x1354 kind:data\n"
+                "\n"
+                "src/main/data_020b5b80.c:\n"
+                "    .rodata start:0x0 end:0x2a0\n"
+                "\n"
+                "src/main/data_020b5e20.c:\n"
+                "    .rodata start:0x2a0 end:0x1344\n"
+                "\n"
+                "src/main/data_0deadbeef.c:\n"
+                "    .rodata start:0x1344 end:0x1354\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_020b5b80.c").write_text(charparam_src, encoding="utf-8")
+            (source_dir / "data_020b5e20.c").write_text(presentcard_src, encoding="utf-8")
+            (source_dir / "data_0deadbeef.c").write_text(
+                "const unsigned char data_0deadbeef[16] = {0};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x1344)  # 672 + 4260, primitive array excluded
+        self.assertEqual(metric["typed_array_bytes"], 0x1354)   # all 3 arrays count for the broad tier
+
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py
         # via json.dumps — the dict must survive the round-trip without
