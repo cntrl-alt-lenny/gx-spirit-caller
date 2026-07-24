@@ -139,3 +139,21 @@ The failed-candidate exclusion set exists only as prose across ~10 briefs, and b
 q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verification harness for §6k/6q/6u/6y/6z/7a/7b: extract each lever's exact before/after C form and the .s it claims to fix, into a checklist a CC agent can run mechanically. §7a (reg-alloc categorizer failure) is the priority — it corroborates our own finding.
 
 **Gate:** doc-only; the per-lever verification checklist with concrete C forms.
+
+### q-nitro-names — harvest the 35 byte-verified NitroSDK names from libs/nitro headers (r8 bet 4) [TODO]
+
+89 `libs/nitro/func_*.c` carry a `function: <Name>` header (verified). Filter the ~53 FX_Init size-0x4 stubs → ~35 REAL names (FS_Init, OS_SPrintf, MI_Copy48B, OsCountZeroBits, MTX_* …), all still `func_*` in symbols.txt with ZERO overlap vs the 72-entry sig DB. Parse the header field and apply via `rename_symbol.py --cascade` (byte-neutral, 3x across regions). Their bodies name their callees for free — chase those too.
+
+**Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + names applied count.
+
+### q-ceiling-measured — replace the hard-coded 0.10 asymptotic headroom with main's MEASURED ship-rate (r8 bet 1) [TODO]
+
+⚠️ CAREFUL — this corrects the published north-star. progress.py:490 hard-codes ASYMPTOTIC_MODULES={main,ov002} and :497 ASYMPTOTIC_HEADROOM_FRACTION=0.10, but main is the campaign's #1 mover (+33,832 C-bytes this window, ~8x the next module) — self-refutingly NOT asymptotic. Replace the flat 0.10 with each asymptotic module's MEASURED empirical ship-rate (derive from the attempts ledger / progress history), and publish a per-module ceiling. Reclassifying main alone moves the total ceiling 29.97%→~47.88% (reverify byte-exact). State assumptions; this is a data-driven correction, not an optimistic flip.
+
+**Gate:** doc+tool; the new per-module ceiling with the derivation shown + before/after headline ceiling.
+
+### q-data-metric — add a data-readability metric to progress.py (r8 bet 10 — opens an unworked frontier) [TODO]
+
+Data readability is ~0% and invisible: 10,949 `data_*` placeholders, 2 real names, 0 typed structs. `data%` is byte-MATCH and Natural-C% is `.text`-only by construction (progress.py:747), so naming/typing data moves NO tracked number — the lane's blocker is a missing metric. Add named-data-% and typed-array-byte-% lines mirroring the natural/asm split, reusing the delinks walk. This makes the data frontier measurable so it can be worked.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + the new metric lines + a test.

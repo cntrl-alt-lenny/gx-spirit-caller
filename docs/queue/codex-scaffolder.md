@@ -145,3 +145,21 @@ r6 verified `-lang c99` is `.text`-NEUTRAL (1,106 SAME / 0 DIFF across all tiers
 The natural-C/asm-C split landed, but nothing GATES new asm-in-C content and the escape rate was accelerating (70.8% of new EUR C bytes on one 3-day burst). Retarget `scope_gate.py` (or add a small check) to count added/modified `asm void`/`asm {` `.c` under src/ and libs/ in a PR and surface it in the PR template/summary. Not a hard block — visibility, so asm-void ships are a deliberate choice.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + demo output on a sample diff.
+
+### q-selector-addr — add --min-addr/--max-addr to wall_aware_headroom.py (r8 bet 6 — kills double-carves) [TODO]
+
+The ONLY concurrent-collision prevention today is prose address-splits in queue items, so agents hand-filter JSON and `check_delink_dupes` only DETECTS an overlap at gate3 AFTER both lanes burned the carve (the brain then hand-resolves it every merge). `metadata['addr']` is already in scope — add `--min-addr/--max-addr` as a 4-line mirror of the existing size filter. Then the sweep lanes get concrete `--max-addr`/`--min-addr` commands instead of prose. Work from kb-types.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + demo: the flag filters the JSON by address range.
+
+### q-delink-suffix-fix — fix_delink_suffixes.py preflight for routing ships (r8 bet 5) [TODO]
+
+Routing ships rename `.c`→`.legacy.c`/`.legacy_sp3.c`/`.thumb.c`, and the delinks.txt TU-header must follow — it's missed routinely (brief 668 left all 17 headers plain `.c`; build passed but `check_match_invariants` went red repo-wide with missing_tu_source×17 for DAYS until hand-fixed). 347 routing files in src/main → recurs nearly every ship. Build `tools/fix_delink_suffixes.py` reusing `ROUTING_SUFFIXES`, wire it like `check_delink_dupes` (gate3 preflight).
+
+**Gate:** `python -m pytest -q tests` + demo it fixes a deliberately-mismatched header + `python tools/configure.py eur && ninja sha1` OK.
+
+### q-128b-reband — re-band the small-tier worklist at 128B (r8 bet 2) [TODO]
+
+r8 measured the '≤256B runway' is really TWO populations split at 128B: ≤128B ships ~70% (0-64B 8/11, 65-128B 15/22), 129-256B only 20% (3/15), 257B+ 0/4 — holds within-module, so size is causal. The 1640-row worklist sorts shape-first, interleaving 725 low-yield rows through 915 high-yield. Split the band at 128B (lead with ≤128B), delete the `matched-sibling`/`provenance` columns (both 1640/1640 constant = useless), retier the summary.
+
+**Gate:** doc-only; the re-banded worklist + the two dead columns removed.

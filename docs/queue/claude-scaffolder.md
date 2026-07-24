@@ -152,3 +152,9 @@ The r6 swarm found the small tier was never actually swept — a units bug had `
 Continue cm-small-resweep with a fresh batch, different address range from the Decomper (you take 0x02000000-0x0203ffff). Report cumulative rate.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + cumulative rate.
+
+### cm-regalloc-trampoline — ship func_ov004_021dbe68 + generalize the trampoline-arity rule (r8 bet 3) [TODO]
+
+Parked 3 sessions (P-4, brief-641/671) as an 'unbeatable r2/r3 reg-alloc wall' — but r8 found it's a byte-exact 3-ARG trampoline: tail-callee func_02094688 reads r2 at instr 1 (hidden 3rd arg forces r3 as the swap temp). The 3-arg `.thumb.c` model compiles to `1c03 1c08 1c19 4b01 4718 46c0`, byte-identical. Ship the `.thumb.c` (sibling 021de264 already routes so; flip delinks.txt). GENERALIZE: never model a trampoline's arity without reading the callee's first instructions — add this to lever-payoff.md.
+
+**Gate:** `python tools/gate3.py --scope all --no-tests` PASS + the generalized rule doc.
