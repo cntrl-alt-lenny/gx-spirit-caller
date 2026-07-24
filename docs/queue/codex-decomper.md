@@ -152,7 +152,7 @@ q-sm64ds-reingest banked the ~970-line delta. Now prepare the on-2.0/sp2p3 verif
 
 **Gate:** doc+tool; the new per-module ceiling with the derivation shown + before/after headline ceiling.
 
-### q-data-metric — add a data-readability metric to progress.py (r8 bet 10 — opens an unworked frontier) [TODO]
+### q-data-metric — add a data-readability metric to progress.py (r8 bet 10 — opens an unworked frontier) [DONE]
 
 Data readability is ~0% and invisible: 10,949 `data_*` placeholders, 2 real names, 0 typed structs. `data%` is byte-MATCH and Natural-C% is `.text`-only by construction (progress.py:747), so naming/typing data moves NO tracked number — the lane's blocker is a missing metric. Add named-data-% and typed-array-byte-% lines mirroring the natural/asm split, reusing the delinks walk. This makes the data frontier measurable so it can be worked.
 

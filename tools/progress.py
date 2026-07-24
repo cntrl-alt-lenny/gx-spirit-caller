@@ -43,6 +43,14 @@ ROOT = Path(__file__).resolve().parent.parent
 CODE_SECTIONS = {".text", ".init"}
 DATA_SECTIONS = {".data", ".rodata", ".ctor", ".dtor", ".bss"}
 
+# A data TU is considered typed-array readable only when its source contains
+# a file-scope array declaration. This deliberately does not infer types from
+# comments or from a `data_*` filename alone.
+_DATA_ARRAY_DECL_RE = re.compile(
+    r"(?m)^\s*(?:(?:static|const|volatile|unsigned|signed|long|short|"
+    r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+"
+    r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
+
 
 def count_functions_in_symbols(symbols_file: Path) -> int:
     """Count how many symbols in a dsd symbols.txt file are functions.
@@ -397,6 +405,70 @@ def summarize_delinks(config_dir: Path) -> dict | None:
             "complete_units":  matched_units,
             "total_units":     total_units,
         },
+    }
+
+
+def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
+    """Return build-free data naming and typed-array readability metrics.
+
+    Named-data is a symbol-count metric: only real names are counted, while
+    ``data_*`` placeholders and dsd synthetic names are excluded from the
+    denominator. Typed-array bytes are the DATA_SECTIONS bytes owned by a
+    ``.c``/``.cpp`` TU whose source contains a file-scope typed-array
+    declaration. Both walks use the same module-level delinks ranges as the
+    existing data% fallback.
+    """
+    named_symbols = placeholder_symbols = 0
+    for symbols_file in config_dir.rglob("symbols.txt"):
+        try:
+            lines = symbols_file.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            if "kind:data" not in line:
+                continue
+            name = line.split(None, 1)[0]
+            if name.startswith("data_"):
+                placeholder_symbols += 1
+            elif name.startswith(".p_") or name.startswith("SecureAreaData_"):
+                continue
+            else:
+                named_symbols += 1
+
+    data_total_bytes = typed_array_bytes = 0
+    for delinks in config_dir.rglob("delinks.txt"):
+        module_sections, tus = parse_delinks_file(delinks)
+        data_total_bytes += sum(
+            max(0, end - start)
+            for name, start, end in module_sections
+            if name in DATA_SECTIONS
+        )
+        for tu in tus:
+            source = tu.get("source", "")
+            if not (source.endswith(".c") or source.endswith(".cpp")):
+                continue
+            try:
+                source_text = (ROOT / Path(source)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if not _DATA_ARRAY_DECL_RE.search(source_text):
+                continue
+            typed_array_bytes += sum(
+                max(0, end - start)
+                for name, start, end in tu.get("sections", [])
+                if name in DATA_SECTIONS
+            )
+
+    total_symbols = named_symbols + placeholder_symbols
+    return {
+        "named_data_symbols": named_symbols,
+        "total_data_symbols": total_symbols,
+        "named_data_pct": (named_symbols / total_symbols * 100.0)
+        if total_symbols else 0.0,
+        "typed_array_bytes": typed_array_bytes,
+        "data_total_bytes": data_total_bytes,
+        "typed_array_pct": (typed_array_bytes / data_total_bytes * 100.0)
+        if data_total_bytes else 0.0,
     }
 
 
@@ -762,6 +834,13 @@ def print_report(version: str, report: dict, config_dir: Path | None = None) -> 
               f"({pct(c_split['asm-c'], c_total):5.2f}%)")
         print(f"  C-decompiled: {c_matched:>10} / {c_total:<10} bytes  "
               f"({pct(c_matched, c_total):5.2f}%)  <- sum of Natural-C + asm-C")
+        data_metric = summarize_data_readability(config_dir)
+        print(f"  Named-data:   {data_metric['named_data_symbols']:>10} / "
+              f"{data_metric['total_data_symbols']:<10} symbols  "
+              f"({data_metric['named_data_pct']:5.2f}%)")
+        print(f"  Typed-array:  {data_metric['typed_array_bytes']:>10} / "
+              f"{data_metric['data_total_bytes']:<10} data bytes  "
+              f"({data_metric['typed_array_pct']:5.2f}%)")
     print()
 
     if report.get("categories"):
@@ -823,10 +902,12 @@ def main() -> int:
         if args.json:
             payload = dict(report)
             c_split = c_code_bytes_by_class(config_dir)
+            data_metric = summarize_data_readability(config_dir)
             payload["c_code_bytes"] = sum(c_split.values())
             payload["c_code_natural_bytes"] = c_split["natural-c"]
             payload["c_code_asm_bytes"] = c_split["asm-c"]
             payload["c_code_total_bytes"] = c_code_total_bytes(config_dir)
+            payload.update(data_metric)
             json.dump(payload, sys.stdout, indent=2)
             print()
         else:
@@ -842,11 +923,13 @@ def main() -> int:
             # Merge a `state: delinks` tag so downstream tools can see
             # the provenance without changing their measures-reading code.
             c_split = c_code_bytes_by_class(config_dir)
+            data_metric = summarize_data_readability(config_dir)
             payload = {"version": args.version, "state": "delinks",
                        "c_code_bytes": sum(c_split.values()),
                        "c_code_natural_bytes": c_split["natural-c"],
                        "c_code_asm_bytes": c_split["asm-c"],
                        "c_code_total_bytes": c_code_total_bytes(config_dir),
+                       **data_metric,
                        **delinks_summary}
             json.dump(payload, sys.stdout, indent=2)
             print()

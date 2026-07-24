@@ -13,11 +13,13 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
+import progress as progress_module  # noqa: E402
 from progress import (  # noqa: E402
     ASYMPTOTIC_HEADROOM_FRACTION,
     ASYMPTOTIC_MODULES,
@@ -35,6 +37,7 @@ from progress import (  # noqa: E402
     done_class,
     parse_delinks_file,
     summarize_by_module,
+    summarize_data_readability,
     summarize_delinks,
     three_region_module_gaps,
     tractable_ceiling_bytes,
@@ -785,6 +788,47 @@ class TestSummarizeByModule(unittest.TestCase):
 
 
 class TestReportJsonRoundtrip(unittest.TestCase):
+    def test_data_readability_metrics(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "symbols.txt").write_text(
+                "data_00000001 kind:data(any) addr:0x0\n"
+                "data_00000002 kind:data(any) addr:0x20\n"
+                "NamedTable kind:data(any) addr:0x40\n"
+                ".p__sinit_0 kind:data(any) addr:0x60\n"
+                "SecureAreaData_0 kind:data(any) addr:0x70\n"
+            )
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x100 kind:data\n"
+                "\n"
+                "src/main/data_00000001.c:\n"
+                "    complete\n"
+                "    .data start:0x0 end:0x20\n"
+                "\n"
+                "src/main/data_00000002.c:\n"
+                "    complete\n"
+                "    .data start:0x20 end:0x40\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_00000001.c").write_text(
+                "const unsigned char data_00000001[32] = {0};\n"
+            )
+            (source_dir / "data_00000002.c").write_text(
+                "int data_00000002 = 0;\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_data_symbols"], 1)
+        self.assertEqual(metric["total_data_symbols"], 3)
+        self.assertAlmostEqual(metric["named_data_pct"], 100 / 3)
+        self.assertEqual(metric["typed_array_bytes"], 0x20)
+        self.assertEqual(metric["data_total_bytes"], 0x100)
+        self.assertAlmostEqual(metric["typed_array_pct"], 12.5)
+
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py
         # via json.dumps — the dict must survive the round-trip without
