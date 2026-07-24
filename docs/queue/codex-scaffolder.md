@@ -144,7 +144,7 @@ END STATE: `python -m pytest -q tests` fully green on Windows AND unchanged-gree
 4. Update state.md's metric block to show the split.
 **Gate:** pytest no-new-failures (green if q-green-pytest landed first) + before/after totals pasted + sum-preservation shown.
 
-### q-headroom-textsize — add a text_size field to wall_aware_headroom.py (r6 bet 2 — unblocks the small-tier re-sweep) [TODO]
+### q-headroom-textsize — add a text_size field to wall_aware_headroom.py (r6 bet 2 — unblocks the small-tier re-sweep) [DONE]
 
 ⚠️ HIGH-VALUE: the selector emits only bare path strings, so briefs 663/664 sized candidates by `.s` FILE bytes (~10x the real .text span) and brief 665 wrongly declared a 1,224-candidate small-.text range 'already swept'. Emit `{path,addr,text_size}` (a join on delinks the tool already parses) and add `--min-size/--max-size`. Then correct briefs 663/664/665's mis-measurement note. Work from kb-types (EUR baserom).
 

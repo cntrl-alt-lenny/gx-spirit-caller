@@ -9,9 +9,18 @@ this batch explicitly excludes all 15 of those addresses (read from
 `docs/research/brief-650-ov002-sweep.md`'s own per-candidate table,
 which lists all 15 including the 10 parked/unshipped ones — the PR
 diff alone only shows the 5 that landed). Sampled the NEXT smallest
-files in ov002's `unknown` pool (505B+ — everything below that has
-already been swept by earlier size-tier passes across the whole
-project). Header-read before compiling.
+files in ov002's `unknown` pool (the report called these 505B+ based on
+on-disk `.s` file length — the selector had no `.text` size field yet).
+That label is not a validated `.text` threshold, and the claim that
+everything below it had already been swept is void. Header-read before
+compiling.
+
+### Measurement correction
+
+Use the selector's committed-delinks `text_size` field for future tiers, not
+filesystem byte length. The historical 6/11 result is still valid for the
+files actually attempted, but it must not be used as evidence that the
+ov002 pool below 505 B of `.text` was exhausted.
 
 ## Ships (6)
 

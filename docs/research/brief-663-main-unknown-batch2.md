@@ -10,6 +10,15 @@ from what briefs 640/655 already covered (roughly 500–650 bytes).
 Header-read every candidate before compiling; skipped genuine walls
 (raw `.word` cross-function branches) without attempting them.
 
+### Measurement correction
+
+The original 650–780 B label used the `.s` file's on-disk byte length because
+the selector emitted paths only. It therefore does **not** establish a
+650–780 B `.text` tier. Re-run any comparison with
+`wall_aware_headroom.py --json` and sort the emitted `text_size` field; the
+historical 14/17 result remains a disk-size-selected sample, not a validated
+`.text`-size experiment.
+
 ## Ships (14)
 
 | Function | Shape | Notes |
