@@ -27,9 +27,11 @@ enough to park future instances correctly on sight.
 
 The trampoline swaps its first two arguments and tail-calls
 `func_02094688`:
+
 ```
 mov r3, r0 / mov r0, r1 / mov r1, r3 / ldr r3, =func_02094688 / bx r3
 ```
+
 Previous attempts (this session's own brief 671 included) modeled this
 as a 2-argument swap-and-forward (`void func(int, int)`), landing at a
 documented, seemingly-permanent 71.4% with an r2-vs-r3 residual on the
@@ -39,13 +41,17 @@ reads `r2` as a genuine input at its very *first* instruction
 parameter. The trampoline never touches r2 — it passes through
 untouched from `func_ov004_021dbe68`'s own (previously unmodeled) 3rd
 parameter. Modeling the true 3-argument signature:
+
 ```c
+
 #pragma thumb on
+
 extern void func_02094688(void *, void *, int);
 void func_ov004_021dbe68(void *a0, void *a1, int a2) {
     func_02094688(a1, a0, a2);
 }
 ```
+
 reaches 100% immediately. Its sibling `func_ov004_021de264` (same
 family, adjacent address) had already been independently fixed and
 shipped to `main` by the time this brief started — same error pattern
