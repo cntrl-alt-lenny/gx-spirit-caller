@@ -30,6 +30,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 _HOOKS_DIR = Path(__file__).resolve().parent.parent / ".claude" / "hooks"
 
@@ -169,6 +170,40 @@ class TestPostEditInternal(unittest.TestCase):
     def test_relative_path_for_relative_passes_through(self):
         p = post_edit._relative_path("tools/x.py")
         self.assertEqual(p, Path("tools/x.py"))
+
+    def test_diverging_rows_prefer_candidate_line_and_format(self):
+        data = {
+            "left": {"sections": [{"symbols": [{"instructions": [
+                {"diff_kind": "DIFF_NONE",
+                 "instruction": {"formatted": "mov r0, r0", "line_number": 24}},
+                {"diff_kind": "DIFF_REPLACE",
+                 "instruction": {"formatted": "mov r1, r1", "line_number": 25}},
+            ]}]}]},
+            "right": {"sections": [{"symbols": [{"instructions": [
+                {"diff_kind": "DIFF_NONE",
+                 "instruction": {"formatted": "mov r0, r0", "line_number": 24}},
+                {"diff_kind": "DIFF_REPLACE",
+                 "instruction": {"formatted": "mov r5, r0", "line_number": 25}},
+            ]}]}]},
+        }
+        self.assertEqual(
+            post_edit._diverging_instruction_rows(data),
+            [{"line_number": 25, "formatted": "mov r5, r0"}],
+        )
+
+    def test_cmatch_feedback_prints_first_three_divergences(self):
+        rows = [
+            {"line_number": 25, "formatted": "mov r5, r0"},
+            {"line_number": 26, "formatted": "str r1, [r2]"},
+        ]
+        with patch.object(post_edit, "_detect_active_region", return_value="eur"), \
+                patch.object(post_edit, "_compile_tu", return_value=(True, "")), \
+                patch.object(post_edit, "_objdiff_match_percent",
+                             return_value=(88.89, rows)):
+            feedback = post_edit._cmatch_feedback(Path("src/main/func_02000000.c"))
+        self.assertIn("match: 88.89%", feedback)
+        self.assertIn("line 25: mov r5, r0", feedback)
+        self.assertIn("line 26: str r1, [r2]", feedback)
 
 
 class TestPreBashGating(unittest.TestCase):

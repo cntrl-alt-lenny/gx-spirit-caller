@@ -217,10 +217,69 @@ def _compile_tu(region: str, unit: str) -> tuple[bool, str]:
     return proc.returncode == 0, out
 
 
-def _objdiff_match_percent(region: str, unit: str, symbol: str) -> float | None:
-    """Run a single-unit objdiff-cli diff and return the match
-    percentage, or None if objdiff-cli is missing / errors / the
-    delinked target object doesn't exist yet.
+def _instruction_diffs(data: dict, side: str) -> list[dict]:
+    """Flatten objdiff's per-symbol instruction rows for one side."""
+    rows: list[dict] = []
+    for section in data.get(side, {}).get("sections", []) or []:
+        for symbol in section.get("symbols", []) or []:
+            rows.extend(symbol.get("instructions", []) or [])
+    return rows
+
+
+def _instruction(row: dict | None) -> dict | None:
+    """Return the parsed instruction nested in an objdiff diff row."""
+    if not isinstance(row, dict):
+        return None
+    instruction = row.get("instruction")
+    return instruction if isinstance(instruction, dict) else None
+
+
+def _is_diverging(row: dict | None) -> bool:
+    """Whether an objdiff instruction row represents a difference."""
+    if not isinstance(row, dict):
+        return False
+    kind = row.get("diff_kind")
+    if isinstance(kind, int):
+        return kind != 0
+    if isinstance(kind, str):
+        normalized = kind.upper()
+        return normalized not in ("0", "NONE", "DIFF_NONE")
+    return bool(kind)
+
+
+def _diverging_instruction_rows(data: dict, limit: int = 3) -> list[dict]:
+    """Return the first differing instructions with source-line data.
+
+    The right side is the candidate object for this hook's ``-1 target,
+    -2 base`` invocation, so prefer it for the source line and formatted
+    disassembly.  Falls back to the target row for delete-only diffs.
+    """
+    left = _instruction_diffs(data, "left")
+    right = _instruction_diffs(data, "right")
+    out: list[dict] = []
+    for index, left_row in enumerate(left):
+        if not _is_diverging(left_row):
+            continue
+        right_row = right[index] if index < len(right) else None
+        instruction = _instruction(right_row) or _instruction(left_row)
+        if not instruction or not instruction.get("formatted"):
+            continue
+        out.append({
+            "line_number": instruction.get("line_number"),
+            "formatted": str(instruction["formatted"]).strip(),
+        })
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _objdiff_match_percent(
+    region: str, unit: str, symbol: str,
+) -> tuple[float, list[dict]] | None:
+    """Run a single-unit objdiff-cli diff and return match data, or None.
+
+    The second tuple member contains the first differing instruction rows
+    from objdiff, including its existing source line and formatted text.
 
     Deliberately uses direct two-file mode (`-1 <target.o> -2
     <base.o>`), NOT `-p .` project mode — project mode requires a
@@ -252,7 +311,8 @@ def _objdiff_match_percent(region: str, unit: str, symbol: str) -> float | None:
         return None
     try:
         data = json.loads(proc.stdout)
-        return data["left"]["sections"][0]["match_percent"]
+        pct = data["left"]["sections"][0]["match_percent"]
+        return pct, _diverging_instruction_rows(data)
     except (json.JSONDecodeError, KeyError, IndexError, TypeError):
         return None
 
@@ -284,13 +344,22 @@ def _cmatch_feedback(rel: Path) -> str | None:
             f"{tail.rstrip()}"
         )
 
-    pct = _objdiff_match_percent(region, unit, symbol)
-    if pct is None:
+    match = _objdiff_match_percent(region, unit, symbol)
+    if match is None:
         return (
             f"[post-edit-hook] {region} compile OK for {rel} "
             f"(match%: unavailable)"
         )
-    return f"[post-edit-hook] {region} compile OK, {symbol} match: {pct:.2f}%"
+    pct, rows = match
+    feedback = f"[post-edit-hook] {region} compile OK, {symbol} match: {pct:.2f}%"
+    if pct < 100.0 and rows:
+        details = []
+        for row in rows:
+            line = row["line_number"]
+            location = f"line {line}" if line is not None else "line ?"
+            details.append(f"{location}: {row['formatted']}")
+        feedback += "\n" + "\n".join(f"  diff: {item}" for item in details)
+    return feedback
 
 
 def main() -> int:
