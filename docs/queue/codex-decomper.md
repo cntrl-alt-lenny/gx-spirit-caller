@@ -128,7 +128,7 @@ The sm64ds catalogue moved repos and grew ~970 lines / 21 dated sections of same
 
 **Gate:** doc-only; the 3 corrected headings + a live-vs-superseded P-wall summary table.
 
-### q-attempts-ledger — build a machine-readable attempts ledger (r6 bet 9) [TODO]
+### q-attempts-ledger — build a machine-readable attempts ledger (r6 bet 9) [DONE]
 
 The failed-candidate exclusion set exists only as prose across ~10 briefs, and brief 661's 8 candidate names were never recorded — permanently lost. Create an append-only `docs/research/campaign-analytics/attempts.tsv` with columns `addr,module,text_size,tier,shape,result,match_pct,park_class,brief` and `merge=union` in `.gitattributes` (prevents the queue-file-style conflicts). Backfill what's recoverable from recent brief reports. Add a `wall_aware_headroom.py --exclude-attempted` flag that reads it.
 

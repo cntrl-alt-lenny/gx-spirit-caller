@@ -62,6 +62,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import sys
@@ -207,21 +208,65 @@ def _file_metadata(
     return {"path": rel, "addr": addr, "text_size": text_sizes.get(rel)}
 
 
+_ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
+_ATTEMPT_ADDR_RE = re.compile(r"(?:^|_)([0-9a-fA-F]{8})$")
+
+
+def _normalise_attempt_addr(value: str | None) -> str | None:
+    """Return the canonical 0xXXXXXXXX address stored by the selector."""
+    if not value:
+        return None
+    value = value.strip()
+    match = _ATTEMPT_ADDR_RE.search(value)
+    if match:
+        return f"0x{match.group(1).lower()}"
+    try:
+        return f"0x{int(value, 0):08x}"
+    except ValueError:
+        return None
+
+
+def _attempted_keys(path: Path | None = None) -> set[tuple[str, str]]:
+    """Read the append-only ledger as (module, address) exclusion keys."""
+    ledger = path or ROOT / _ATTEMPTS_REL
+    if not ledger.is_file():
+        return set()
+    keys: set[tuple[str, str]] = set()
+    with ledger.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(stream, delimiter="\t")
+        required = {"addr", "module"}
+        if not required.issubset(reader.fieldnames or []):
+            raise ValueError(
+                f"{ledger}: expected TSV columns including addr and module"
+            )
+        for row in reader:
+            addr = _normalise_attempt_addr(row.get("addr"))
+            module = (row.get("module") or "").strip().lower()
+            if addr and module:
+                keys.add((module, addr))
+    return keys
+
+
 def _new_module_entry() -> dict:
     return {
         "total": 0, "permanent": 0, "coercible": 0, "unknown": 0, "no_marker": 0,
-        "candidate": 0,
+        "candidate": 0, "excluded_attempted": 0,
         "coercible_files": [],  # list of {path, addr, text_size, codes}
         "unknown_files": [],  # list of {path, addr, text_size}
         "no_marker_files": [],  # list of {path, addr, text_size}
     }
 
 
-def scan(min_size: int | None = None, max_size: int | None = None) -> dict[str, dict]:
+def scan(
+    min_size: int | None = None,
+    max_size: int | None = None,
+    exclude_attempted: bool = False,
+) -> dict[str, dict]:
     per: dict[str, dict] = {}
     live = _live_sources()
     text_sizes = _delink_text_sizes()
     addresses = _symbol_addresses()
+    attempted = _attempted_keys() if exclude_attempted else set()
     for p in (ROOT / "src").rglob("*.s"):
         rel = p.relative_to(ROOT).as_posix()
         m = _MODULE_RE.match(rel)
@@ -230,13 +275,20 @@ def scan(min_size: int | None = None, max_size: int | None = None) -> dict[str, 
         if rel not in live:  # orphaned dead file, not a build input — skip
             continue
         metadata = _file_metadata(rel, text_sizes, addresses)
+        mod = m.group(1)
+        d = per.setdefault(mod, _new_module_entry())
+        source_module = _source_module(rel)
+        if exclude_attempted and (
+            (mod, metadata["addr"]) in attempted
+            or (source_module, metadata["addr"]) in attempted
+        ):
+            d["excluded_attempted"] += 1
+            continue
         text_size = metadata["text_size"]
         if min_size is not None and (text_size is None or text_size < min_size):
             continue
         if max_size is not None and (text_size is None or text_size > max_size):
             continue
-        mod = m.group(1)
-        d = per.setdefault(mod, _new_module_entry())
         d["total"] += 1
         c = classify_path(p)
         d[c.kind] += 1
@@ -271,6 +323,8 @@ def main(argv: list[str]) -> int:
                     help="only show modules with >= this many candidates")
     ap.add_argument("--coercible", action="store_true",
                     help="list every coercible file with its taxonomy code(s)")
+    ap.add_argument("--exclude-attempted", action="store_true",
+                    help="exclude (module, address) rows in attempts.tsv")
     ap.add_argument("--min-size", type=int, default=None,
                     help="only include files with `.text` span >= N bytes")
     ap.add_argument("--max-size", type=int, default=None,
@@ -282,13 +336,14 @@ def main(argv: list[str]) -> int:
         ap.error("size filters must be non-negative")
     if args.min_size is not None and args.max_size is not None and args.min_size > args.max_size:
         ap.error("--min-size cannot exceed --max-size")
-    per = scan(args.min_size, args.max_size)
+    per = scan(args.min_size, args.max_size, args.exclude_attempted)
     ranked = sorted(per.items(), key=lambda kv: kv[1]["candidate"], reverse=True)
     total_candidate = sum(d["candidate"] for _, d in ranked)
     total_permanent = sum(d["permanent"] for _, d in ranked)
     total_coercible = sum(d["coercible"] for _, d in ranked)
     total_unknown = sum(d["unknown"] for _, d in ranked)
     total_no_marker = sum(d["no_marker"] for _, d in ranked)
+    total_excluded = sum(d["excluded_attempted"] for _, d in ranked)
 
     if args.json:
         print(json.dumps({
@@ -297,6 +352,7 @@ def main(argv: list[str]) -> int:
             "total_coercible": total_coercible,
             "total_unknown": total_unknown,
             "total_no_marker": total_no_marker,
+            "total_excluded_attempted": total_excluded,
             "modules": {m: _json_module(d) for m, d in ranked},
         }, indent=1))
         return 0
@@ -323,6 +379,8 @@ def main(argv: list[str]) -> int:
           f"(coercible {total_coercible} + unknown/never-assessed {total_unknown} "
           f"+ no-marker {total_no_marker})")
     print(f"TOTAL confirmed-permanent: {total_permanent}")
+    if args.exclude_attempted:
+        print(f"TOTAL excluded by attempts ledger: {total_excluded}")
     print("(candidate = NOT confirmed-permanent; still an upper bound, "
           "not a work-list — header-read before compiling)")
     return 0

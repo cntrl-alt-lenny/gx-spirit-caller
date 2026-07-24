@@ -185,6 +185,54 @@ class ScanCandidateAccounting(unittest.TestCase):
             "codes": ["C-34"],
         }])
 
+    def test_scan_excludes_attempted_module_address(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "src" / "main").mkdir(parents=True)
+            (root / "src" / "overlay002").mkdir(parents=True)
+            (root / "src/main/func_02000010.s").write_text(
+                "; C-34\n.text\n", encoding="utf-8"
+            )
+            (root / "src/main/func_02000020.s").write_text(
+                "; C-34\n.text\n", encoding="utf-8"
+            )
+            (root / "src/overlay002/func_ov002_02100010.s").write_text(
+                "; C-34\n.text\n", encoding="utf-8"
+            )
+            (root / "config/delinks.txt").write_text(
+                "src/main/func_02000010.s:\n    complete\n\n"
+                "src/main/func_02000020.s:\n    complete\n",
+                encoding="utf-8",
+            )
+            with (root / "config/delinks.txt").open("a", encoding="utf-8") as stream:
+                stream.write("\nsrc/overlay002/func_ov002_02100010.s:\n    complete\n")
+            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger.parent.mkdir(parents=True)
+            ledger.write_text(
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tbrief\n"
+                "0x02000010\tmain\t0\tdefault\tleaf\tparked\t50\tC-34\tbrief-1\n",
+                encoding="utf-8",
+            )
+            ledger.write_text(
+                ledger.read_text(encoding="utf-8")
+                + "0x02100010\tov002\t0\tdefault\tleaf\tparked\t50\tC-34\tbrief-1\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan(exclude_attempted=True)
+
+        self.assertEqual(per["main"]["candidate"], 1)
+        self.assertEqual(per["main"]["excluded_attempted"], 1)
+        self.assertEqual(
+            per["main"]["coercible_files"][0]["addr"], "0x02000020"
+        )
+        self.assertEqual(per["overlay002"]["candidate"], 0)
+        self.assertEqual(per["overlay002"]["excluded_attempted"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
