@@ -11,7 +11,7 @@
         .extern Task_Invoke
         .extern func_0201d47c
         .extern func_0201e5b8
-        .extern func_02091554
+        .extern OS_SPrintf
         .global func_ov008_021aefd4
         .arm
 func_ov008_021aefd4:
@@ -28,13 +28,13 @@ func_ov008_021aefd4:
     ldr r1, _LIT1
     ldrh r2, [r1, r2]
     ldr r1, _LIT2
-    bl func_02091554
+    bl OS_SPrintf
     b .L_108
 .L_f8:
     ldr r1, _LIT1
     ldrh r2, [r1, r2]
     ldr r1, _LIT3
-    bl func_02091554
+    bl OS_SPrintf
 .L_108:
     add r0, sp, #0x20
     bl func_0201d47c

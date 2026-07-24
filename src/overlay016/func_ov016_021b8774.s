@@ -16,7 +16,7 @@
         .extern func_0201ede4
         .extern func_0201ef3c
         .extern func_0201ef90
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_ov016_021b894c
         .extern func_ov016_021b8a30
         .extern func_ov016_021b8b10
@@ -90,19 +90,19 @@ func_ov016_021b8774:
     ldr r0, .L_021b8934
     ldr r1, .L_021b8938
     ldr r0, [r0, #0x0]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b8934
     ldr r1, .L_021b893c
     ldr r0, [r0, #0x4]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b8934
     ldr r1, .L_021b8940
     ldr r0, [r0, #0x8]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b8934
     ldr r1, .L_021b8944
     ldr r0, [r0, #0xc]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, [r5, #0xb0]
     cmp r0, #0x0
     beq .L_021b88c8

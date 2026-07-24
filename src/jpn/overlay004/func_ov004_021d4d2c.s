@@ -25,7 +25,7 @@
         .extern func_020337d8
         .extern func_02033cec
         .extern func_02033d28
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_020aae1c
         .extern func_ov004_021cddf0
         .extern func_ov004_021d3e64
@@ -100,7 +100,7 @@ func_ov004_021d4d2c:
     ldr r1, _LIT11
     add r2, r2, #0x3e8
     ldr r4, _LIT12
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, _LIT4
     ldr r0, [r0, #0xc98]
     cmp r0, #0x0

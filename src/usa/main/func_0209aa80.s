@@ -10,7 +10,7 @@
         .extern func_020904f4
         .extern func_02090574
         .extern func_02093720
-        .extern func_02093bf0
+        .extern OS_Halt
         .extern func_0209a760
         .extern func_0209a954
         .extern func_0209a990
@@ -121,7 +121,7 @@ func_0209aa80:
     bl func_0209b0ec
     cmp r0, #0x0
     bne .L_15c
-    bl func_02093bf0
+    bl OS_Halt
     ldr r0, _LIT6
     bl func_02093720
     ands r0, sl, #0x8

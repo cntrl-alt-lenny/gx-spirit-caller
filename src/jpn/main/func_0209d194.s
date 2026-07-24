@@ -8,7 +8,7 @@
         .extern func_020919a4
         .extern func_020927e4
         .extern func_0209281c
-        .extern func_02092928
+        .extern DC_WaitWriteBufferEmpty
         .extern func_02093720
         .extern func_02096264
         .extern func_02096318
@@ -52,7 +52,7 @@ func_0209d194:
     ldr r0, [r6]
     mov r1, #0x60
     bl func_0209281c
-    bl func_02092928
+    bl DC_WaitWriteBufferEmpty
     mov r9, #0xb
     mov r8, #0x1
     mov r7, #0x0

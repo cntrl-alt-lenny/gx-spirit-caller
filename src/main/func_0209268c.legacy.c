@@ -9,7 +9,7 @@
 extern char data_021a63d0[];
 extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int);
-extern void func_02092668(int, void *);
+extern void OSi_EnqueueTail(int, void *);
 
 typedef struct Obj {
     char _pad00[0x08];
@@ -25,7 +25,7 @@ int func_0209268c(Obj *o)
     if (o->f8 == 0) {
         o->f8 = cur;
         o->fc = o->fc + 1;
-        func_02092668(cur, o);
+        OSi_EnqueueTail(cur, o);
         ret = 1;
     } else if (o->f8 == cur) {
         o->fc = o->fc + 1;

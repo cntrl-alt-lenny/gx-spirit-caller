@@ -7,7 +7,7 @@
         .extern OS_RestoreIrq
         .extern data_021a62f0
         .extern func_02091924
-        .extern func_02092644
+        .extern OSi_DequeueItem
         .global func_02092660
         .arm
 func_02092660:
@@ -28,7 +28,7 @@ func_02092660:
     cmp r1, #0x0
     bne .L_58
     mov r1, r5
-    bl func_02092644
+    bl OSi_DequeueItem
     mov r1, #0x0
     mov r0, r5
     str r1, [r5, #0x8]

@@ -4,7 +4,7 @@
 
         .text
         .extern data_020ff81c
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aace8
         .global func_02045bd4
         .arm
@@ -18,7 +18,7 @@ func_02045bd4:
     ldr r2, _LIT0
     mov r0, r4
     mov r1, #0x1000
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r0, r4
     bl func_020aace8
     add sp, sp, #0x10

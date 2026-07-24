@@ -15,7 +15,7 @@
         .extern func_0208de58
         .extern func_0208e0c4
         .extern func_0208e118
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_ov009_021ab758
         .global func_ov009_021aabe4
@@ -69,14 +69,14 @@ func_ov009_021aabe4:
     mov r1, r0
     ldr r2, [r2]
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     b .L_150
 .L_c0:
     add r0, r0, #0x1b8
     bl func_0202c06c
     mov r1, r0
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     b .L_150
 .L_d8:
     add r0, r0, #0x1b8
@@ -88,7 +88,7 @@ func_ov009_021aabe4:
     mov r2, r0
     add r0, sp, #0x10
     mov r1, r4
-    bl func_02091554
+    bl OS_SPrintf
     b .L_150
 .L_104:
     mov r1, #0x1
@@ -100,7 +100,7 @@ func_ov009_021aabe4:
     mov r1, r0
     ldr r2, [r2]
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     b .L_150
 .L_130:
     mov r1, #0x2
@@ -110,7 +110,7 @@ func_ov009_021aabe4:
     bl func_0202c06c
     mov r1, r0
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
 .L_150:
     bl func_0208de58
     mov r4, r0
@@ -152,7 +152,7 @@ func_ov009_021aabe4:
     bl func_0202c06c
     mov r1, r0
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0x1f
     bl func_0202c06c
     mov r1, #0xc
@@ -187,7 +187,7 @@ func_ov009_021aabe4:
     bl func_0202c06c
     mov r1, r0
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0x1d
     bl func_0202c06c
     mov r1, #0xc
@@ -208,7 +208,7 @@ func_ov009_021aabe4:
     bl func_0202c06c
     mov r1, r0
     add r0, sp, #0x10
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0x1e
     bl func_0202c06c
     mov r1, #0xc

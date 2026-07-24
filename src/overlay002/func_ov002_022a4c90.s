@@ -16,8 +16,8 @@
         .extern func_0208c8b0
         .extern func_0208df94
         .extern func_0208e0a0
-        .extern func_0208e334
-        .extern func_02091554
+        .extern G2x_SetBGyAffine_
+        .extern OS_SPrintf
         .extern func_02094504
         .global func_ov002_022a4c90
         .arm
@@ -58,7 +58,7 @@ func_ov002_022a4c90:
     ldr r1, _LIT2
     ldr r2, [r4, #0x4]
     add r0, sp, #0x40
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x18
     bl func_0201d47c
     add r0, sp, #0x40
@@ -90,7 +90,7 @@ func_ov002_022a4c90:
     add r0, sp, #0x40
     rsb r2, r1, #0x1
     ldr r1, _LIT2
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x18
     bl func_0201d47c
     add r0, sp, #0x40
@@ -143,7 +143,7 @@ func_ov002_022a4c90:
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     mov r1, #0x2000
     add r0, sp, #0x8
     mov r2, r1
@@ -154,7 +154,7 @@ func_ov002_022a4c90:
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     mov r0, #0x89
     sub r1, r0, #0x8a
     mov r2, #0x0

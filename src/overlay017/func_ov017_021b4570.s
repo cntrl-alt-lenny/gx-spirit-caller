@@ -17,7 +17,7 @@
         .extern func_0201d47c
         .extern func_0201e5b8
         .extern func_0202c0c0
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02093820
         .extern func_02094504
         .extern func_ov017_021b2280
@@ -290,7 +290,7 @@ func_ov017_021b4570:
     add r2, r2, #0xa00
     ldrh r2, [r2, #0x78]
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0x0
     str r0, [sp]
     ldr r0, [r9, #0xc]
@@ -390,7 +390,7 @@ func_ov017_021b4570:
     ldrh r2, [r2, #0x78]
     mov r0, r5
     add r2, r2, #0x1
-    bl func_02091554
+    bl OS_SPrintf
     mov r0, #0xc
     mul r0, r8, r0
     add r0, r0, #0xea

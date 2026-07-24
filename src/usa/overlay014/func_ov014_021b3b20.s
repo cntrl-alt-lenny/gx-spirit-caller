@@ -24,7 +24,7 @@
         .extern func_020057e4
         .extern func_0201e78c
         .extern func_0201ef3c
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094410
         .extern func_ov014_021b3a9c
         .global func_ov014_021b3b20
@@ -67,25 +67,25 @@ func_ov014_021b3b20:
     add r0, sp, #0x28
     mov r2, r2, lsl #0x18
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT3
     add r0, sp, #0x68
     mov r2, r2, lsl #0x18
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT4
     add r0, sp, #0xa8
     mov r2, r2, lsl #0x18
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT5
     add r0, sp, #0xe8
     mov r2, r2, lsl #0x18
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     add r2, sp, #0x28
     mov r1, #0x0
     add r0, sp, #0x18
@@ -116,25 +116,25 @@ func_ov014_021b3b20:
     add r0, sp, #0x28
     mov r2, r2, lsl #0x10
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT7
     add r0, sp, #0x68
     mov r2, r2, lsl #0x10
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT8
     add r0, sp, #0xa8
     mov r2, r2, lsl #0x10
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r2, [r4, #0x54]
     ldr r1, _LIT9
     add r0, sp, #0xe8
     mov r2, r2, lsl #0x10
     mov r2, r2, lsr #0x18
-    bl func_02091554
+    bl OS_SPrintf
     mov r1, #0x0
     add r2, sp, #0x28
     add r0, sp, #0x18
@@ -162,16 +162,16 @@ func_ov014_021b3b20:
     bl func_0201ef3c
     ldr r1, _LIT10
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT11
     add r0, sp, #0x68
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT12
     add r0, sp, #0xa8
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT13
     add r0, sp, #0xe8
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r0, [r4, #0x56]
     mov r1, #0x0
     add r2, sp, #0x28
@@ -204,16 +204,16 @@ func_ov014_021b3b20:
     bl func_0201ef3c
     ldr r1, _LIT14
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT15
     add r0, sp, #0x68
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT16
     add r0, sp, #0xa8
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT17
     add r0, sp, #0xe8
-    bl func_02091554
+    bl OS_SPrintf
     ldrh r0, [r4, #0x56]
     mov r1, #0x0
     add r2, sp, #0x28

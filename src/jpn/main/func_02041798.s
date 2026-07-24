@@ -6,7 +6,7 @@
         .extern data_020fe824
         .extern data_020fe878
         .extern func_02041460
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aace8
         .global func_02041798
         .arm
@@ -50,7 +50,7 @@ func_02041798:
     ldr r0, [r5, #0x4]
     ldr r1, [r5, #0xc]
     ldr r3, [r3, #0x128]
-    bl func_0209150c
+    bl OS_SNPrintf
     ldr r1, [r5, #0x4]
     add r0, r1, r0
     str r0, [r5, #0x4]

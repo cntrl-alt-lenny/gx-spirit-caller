@@ -9,7 +9,7 @@
         .extern func_020216b0
         .extern func_02023188
         .extern func_0202b9ec
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_020b3870
         .extern func_ov006_021b60a4
         .extern func_ov006_021b6ad8
@@ -140,7 +140,7 @@ func_ov006_021c3c78:
     ldr r0, [sp, #0x14]
     ldr r1, _LIT1
     mov r2, r6
-    bl func_02091554
+    bl OS_SPrintf
 .L_193c:
     cmp sl, #0x0
     beq .L_1968

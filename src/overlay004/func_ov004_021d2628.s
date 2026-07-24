@@ -22,11 +22,11 @@
         .extern func_020822c8
         .extern func_020822f0
         .extern func_02084aec
-        .extern func_0208b16c
+        .extern MTX_Identity33_
         .extern func_0208e014
         .extern func_0208e1cc
         .extern func_020944a4
-        .extern func_02094588
+        .extern MI_Copy36B
         .extern func_ov004_021ca0a4
         .extern func_ov004_021d03ec
         .extern func_ov004_021d2550
@@ -188,10 +188,10 @@ func_ov004_021d2628:
     ldmia r4, {r0, r1, r2}
     stmia r3, {r0, r1, r2}
     add r0, sp, #0x1c
-    bl func_0208b16c
+    bl MTX_Identity33_
     ldr r1, _LIT9
     add r0, sp, #0x1c
-    bl func_02094588
+    bl MI_Copy36B
     ldr r1, _LIT10
     add r0, sp, #0x4c
     ldr r2, [r1, #0xfc]

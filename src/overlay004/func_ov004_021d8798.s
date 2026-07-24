@@ -17,7 +17,7 @@
         .extern Vram_GetBankBaseCD
         .extern func_0208e1ac
         .extern func_0208e200
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094504
         .global func_ov004_021d8798
         .arm
@@ -74,11 +74,11 @@ func_ov004_021d8798:
     ldr r1, _LIT1
     add r0, sp, #0x50
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     ldr r1, _LIT2
     add r0, sp, #0x30
     mov r2, r7
-    bl func_02091554
+    bl OS_SPrintf
     add r0, sp, #0x8
     bl func_0201d47c
     add r0, sp, #0x50

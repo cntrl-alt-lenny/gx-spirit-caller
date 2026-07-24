@@ -8,7 +8,7 @@
         .extern data_ov002_022d0f04
         .extern func_0208b008
         .extern func_0208e230
-        .extern func_0208e334
+        .extern G2x_SetBGyAffine_
         .global func_ov002_022a4dc8
         .arm
 func_ov002_022a4dc8:
@@ -192,14 +192,14 @@ func_ov002_022a4dc8:
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     str r5, [sp]
     ldr r0, _LIT4
     add r1, sp, #0x8
     mov r2, #0x80
     mov r3, #0x10
     str r4, [sp, #0x4]
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     add sp, sp, #0x28
     ldmia sp!, {r4, r5, r6, r7, r8, pc}
 _LIT0: .word data_02104e6c

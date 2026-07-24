@@ -11,7 +11,7 @@
         .extern func_020918a4
         .extern func_02091924
         .extern func_02091afc
-        .extern func_02091b30
+        .extern OSi_CancelThreadAlarmForSleep
         .extern func_02091f8c
         .extern func_0209206c
         .extern func_02092618
@@ -33,7 +33,7 @@ func_02091a74:
     mov r0, r5
     bl func_02092618
     mov r0, r5
-    bl func_02091b30
+    bl OSi_CancelThreadAlarmForSleep
     ldr r0, [r5, #0x78]
     cmp r0, #0x0
     beq .L_50

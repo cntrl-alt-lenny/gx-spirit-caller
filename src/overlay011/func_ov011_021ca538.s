@@ -6,7 +6,7 @@
         .extern data_ov011_021d2fbe
         .extern data_ov011_021d4000
         .extern func_0201e818
-        .extern func_0208e334
+        .extern G2x_SetBGyAffine_
         .global func_ov011_021ca538
         .arm
 func_ov011_021ca538:
@@ -55,7 +55,7 @@ func_ov011_021ca538:
     ldrb r3, [r1, r4, lsl #0x1]
     ldrb r2, [r2, r4, lsl #0x1]
     add r1, sp, #0x8
-    bl func_0208e334
+    bl G2x_SetBGyAffine_
     add sp, sp, #0x24
     ldmia sp!, {r3, r4, pc}
 _LIT0: .word data_ov011_021d2fbe

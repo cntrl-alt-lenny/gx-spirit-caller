@@ -38,7 +38,7 @@
         .extern func_0208df60
         .extern func_0208e1cc
         .extern func_0208e220
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02093820
         .extern func_02094550
         .extern func_ov017_021b6774
@@ -394,22 +394,22 @@ func_ov017_021b680c:
     ldrb r2, [r4, #0x1cc]
     ldr r0, [r0, #0x0]
     ldr r1, .L_021b6f18
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldrb r2, [r4, #0x1cc]
     ldr r0, [r0, #0x4]
     ldr r1, .L_021b6f1c
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldrb r2, [r4, #0x1cc]
     ldr r0, [r0, #0x8]
     ldr r1, .L_021b6f20
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldr r1, .L_021b6f24
     ldr r0, [r0, #0xc]
     ldrb r2, [r4, #0x1cc]
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0201e7e0
     bl func_02093820
     mov r3, #0x0
@@ -431,22 +431,22 @@ func_ov017_021b680c:
     ldr r1, .L_021b6f2c
     ldr r0, [r0, #0x0]
     ldrb r2, [r4, #0x1cd]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldr r1, .L_021b6f30
     ldr r0, [r0, #0x4]
     ldrb r2, [r4, #0x1cd]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldr r1, .L_021b6f34
     ldr r0, [r0, #0x8]
     ldrb r2, [r4, #0x1cd]
-    bl func_02091554
+    bl OS_SPrintf
     ldr r0, .L_021b6f14
     ldr r1, .L_021b6f38
     ldr r0, [r0, #0xc]
     ldrb r2, [r4, #0x1cd]
-    bl func_02091554
+    bl OS_SPrintf
     bl func_0201e7e0
     bl func_02093820
     mov r3, #0x200

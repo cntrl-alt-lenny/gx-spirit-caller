@@ -5,7 +5,7 @@
         .text
         .extern data_020fe8e8
         .extern func_020413b0
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_020aaddc
         .global func_0204152c
         .arm
@@ -39,7 +39,7 @@ func_0204152c:
 .L_68:
     ldr r2, _LIT1
     mov r3, r6
-    bl func_0209150c
+    bl OS_SNPrintf
     cmp r0, r5
     ldreq r1, [r4, #0x4]
     movne r0, #0x1

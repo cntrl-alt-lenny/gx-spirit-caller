@@ -3,7 +3,7 @@
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .extern func_020945a4
+        .extern MI_Copy48B
         .global func_0208bca4
         .arm
 func_0208bca4:
@@ -15,7 +15,7 @@ func_0208bca4:
     mov r4, r3
     cmp r7, r6
     beq .L_348
-    bl func_020945a4
+    bl MI_Copy48B
 .L_348:
     ldr r0, [r7, #0x10]
     ldr r1, [r7]

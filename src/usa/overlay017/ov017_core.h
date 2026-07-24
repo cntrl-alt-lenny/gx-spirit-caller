@@ -28,7 +28,7 @@ extern char data_ov017_021b867c[];   /* render-job handle array [0/4/8]      */
 /* --- shared sinks (already named in the tree) --------------------------
  *   func_02006110(&x,&y)/func_02006148(&x,&y)   read touch / alt-input point
  *   func_020061ac()/func_0200617c()             pen-down? (paired w/ above)
- *   func_02091554(str, font, pal)               render a text cell
+ *   OS_SPrintf(str, font, pal)               render a text cell
  *   func_0201ef3c(handle, &dst, &flag)          flush a pending VRAM transfer
  *   func_0201ef90(&a,&b,&c, charBase, prio, 1, tbl, 1, -1, &flag)
  *                                               submit a window render job (10-arg)

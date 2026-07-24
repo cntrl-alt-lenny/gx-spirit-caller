@@ -6,8 +6,8 @@
         .extern data_021a6630
         .extern data_021a6634
         .extern data_021a663c
-        .extern func_02092e4c
-        .extern func_02092e5c
+        .extern OS_EnableProtectionUnit
+        .extern OS_DisableProtectionUnit
         .global func_02092fa8
         .arm
 func_02092fa8:
@@ -23,14 +23,14 @@ func_02092fa8:
     ldr r1, _LIT1
     msr CPSR_fsxc, r1
     mov sp, r0
-    bl func_02092e4c
+    bl OS_EnableProtectionUnit
     ldr r1, _LIT2
     ldr r0, _LIT0
     ldr r1, [r1]
     ldr r2, [r0]
     ldr r0, _LIT3
     blx r2
-    bl func_02092e5c
+    bl OS_DisableProtectionUnit
     add sp, sp, #0x4
     ldmfd sp!, {lr}
     bx lr

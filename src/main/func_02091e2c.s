@@ -11,7 +11,7 @@
         .extern data_021a64a0
         .extern data_021a6628
         .extern data_027e0000
-        .extern func_02091700
+        .extern OSi_IdleThreadProc
         .extern func_02091714
         .extern func_02091d24
         .global func_02091e2c
@@ -102,5 +102,5 @@ _LIT9: .word 0xfddb597d
 _LIT10: .word 0x7bf9dd5b
 _LIT11: .word 0x027fffa0
 _LIT12: .word data_021a63e0
-_LIT13: .word func_02091700
+_LIT13: .word OSi_IdleThreadProc
 _LIT14: .word data_021a6628

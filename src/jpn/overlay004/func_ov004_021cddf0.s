@@ -24,7 +24,7 @@
         .extern func_0201e564
         .extern func_0202c06c
         .extern func_020347f4
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_0209445c
         .extern func_020a9698
         .extern func_ov004_021cdc58
@@ -130,7 +130,7 @@ func_ov004_021cddf0:
     sub r3, r2, #0x1
     mla r2, r3, r1, r5
     ldr r1, _LIT13
-    bl func_02091554
+    bl OS_SPrintf
     b .L_210
 .L_180:
     bl func_020347f4
@@ -140,11 +140,11 @@ func_ov004_021cddf0:
     add r0, sp, #0x28
     bne .L_1a4
     ldr r1, _LIT14
-    bl func_02091554
+    bl OS_SPrintf
     b .L_210
 .L_1a4:
     ldr r1, _LIT15
-    bl func_02091554
+    bl OS_SPrintf
     b .L_210
 .L_1b0:
     cmp r6, #0x0
@@ -159,7 +159,7 @@ func_ov004_021cddf0:
     sub r3, r2, #0x1
     mla r2, r3, r1, r5
     ldr r1, _LIT13
-    bl func_02091554
+    bl OS_SPrintf
     b .L_210
 .L_1e8:
     ldr r0, _LIT8
@@ -171,7 +171,7 @@ func_ov004_021cddf0:
     sub r3, r2, #0x1
     mla r2, r3, r1, r5
     ldr r1, _LIT13
-    bl func_02091554
+    bl OS_SPrintf
 .L_210:
     add r0, sp, #0x28
     bl func_02006af4
@@ -179,7 +179,7 @@ func_ov004_021cddf0:
     bne .L_22c
     ldr r1, _LIT16
     add r0, sp, #0x28
-    bl func_02091554
+    bl OS_SPrintf
 .L_22c:
     add r0, sp, #0x28
     mov r1, #0x4

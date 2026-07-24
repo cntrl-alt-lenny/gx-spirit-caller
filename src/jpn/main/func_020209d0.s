@@ -12,7 +12,7 @@
         .extern func_0201fc18
         .extern func_0201fcd0
         .extern func_0209281c
-        .extern func_02092928
+        .extern DC_WaitWriteBufferEmpty
         .extern func_02093b08
         .extern func_02094688
         .global func_020209d0
@@ -62,7 +62,7 @@ func_020209d0:
     ldr r0, _LIT3
     mov r1, #0xc0
     bl func_0209281c
-    bl func_02092928
+    bl DC_WaitWriteBufferEmpty
     ldr r0, _LIT0
     ldr r0, [r0, #0x18]
     cmp r0, #0x0

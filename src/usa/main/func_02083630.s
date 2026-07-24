@@ -15,7 +15,7 @@
         .extern func_020820b0
         .extern func_02084d24
         .extern func_02084ef8
-        .extern func_0208b2cc
+        .extern MTX_Copy43To44_
         .extern func_0208b898
         .extern func_0208c0b8
         .extern func_0208c1f8
@@ -121,7 +121,7 @@ func_02083630:
     beq .L_7e0
     bl func_02082010
     add r1, sp, #0x48
-    bl func_0208b2cc
+    bl MTX_Copy43To44_
     add r0, sp, #0x8
     add r1, sp, #0x48
     mov r2, r0
@@ -132,7 +132,7 @@ func_02083630:
     beq .L_804
     ldr r0, _LIT6
     add r1, sp, #0x88
-    bl func_0208b2cc
+    bl MTX_Copy43To44_
     add r0, sp, #0x8
     add r1, sp, #0x88
     mov r2, r0

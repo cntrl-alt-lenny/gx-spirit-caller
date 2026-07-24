@@ -6,8 +6,8 @@
         .extern OS_DisableIrq
         .extern OS_RestoreIrq
         .extern data_021a9854
-        .extern func_02092e6c
-        .extern func_020a60c0
+        .extern OS_SetDPermissionsForProtectionRegion
+        .extern CTRDG_IsOptionCartridge
         .global func_020a5cbc
         .arm
 func_020a5cbc:
@@ -18,14 +18,14 @@ func_020a5cbc:
     ldr r1, _LIT0
     mov r4, r0
     str r5, [r1]
-    bl func_020a60c0
+    bl CTRDG_IsOptionCartridge
     cmp r0, #0x0
     bne .L_3c
     cmp r5, #0x0
     movne r1, #0x1000
     moveq r1, #0x5000
     mov r0, #0xf000
-    bl func_02092e6c
+    bl OS_SetDPermissionsForProtectionRegion
 .L_3c:
     mov r0, r4
     bl OS_RestoreIrq

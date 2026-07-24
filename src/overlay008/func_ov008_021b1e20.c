@@ -5,7 +5,7 @@ extern void func_ov008_021b1ad8(int);
 extern void func_ov008_021b1c14(void);
 extern int func_02021660(int, int, int);
 extern void func_020216b0(int, int, int);
-extern void func_02091554(void *out, void *a, int b);
+extern void OS_SPrintf(void *out, void *a, int b);
 extern char data_021040ac[];
 extern char data_ov008_021b2718[];
 extern char data_ov008_021b272c[];
@@ -26,9 +26,9 @@ void func_ov008_021b1e20(int p0, int p1) {
 
     if (*(int *)(data_021040ac + 0x34) == 0) {
         int *o = *(int **)data_ov008_021b270c;
-        func_02091554((char *)o + 0x70, data_ov008_021b2718, o[4]);
+        OS_SPrintf((char *)o + 0x70, data_ov008_021b2718, o[4]);
     } else {
         int *o = *(int **)data_ov008_021b270c;
-        func_02091554((char *)o + 0x70, data_ov008_021b272c, o[4]);
+        OS_SPrintf((char *)o + 0x70, data_ov008_021b272c, o[4]);
     }
 }

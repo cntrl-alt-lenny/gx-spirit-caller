@@ -4,7 +4,7 @@
 
         .text
         .extern OS_DisableIrq
-        .extern func_02093bf0
+        .extern OS_Halt
         .global func_02093b08
         .arm
 func_02093b08:
@@ -12,5 +12,5 @@ func_02093b08:
     sub sp, sp, #0x4
 .L_8:
     bl OS_DisableIrq
-    bl func_02093bf0
+    bl OS_Halt
     b .L_8

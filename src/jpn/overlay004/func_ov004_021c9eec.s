@@ -6,7 +6,7 @@
         .extern data_ov004_02200b5c
         .extern data_ov004_02209874
         .extern func_0201ef3c
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_ov004_021c9eb4
         .global func_ov004_021c9eec
         .arm
@@ -31,7 +31,7 @@ func_ov004_021c9eec:
     mov r0, r8
     mov r1, r5
     mov r2, r9
-    bl func_02091554
+    bl OS_SPrintf
     str r8, [r4, r7, lsl #0x2]
     add r7, r7, #0x1
     cmp r7, #0x4

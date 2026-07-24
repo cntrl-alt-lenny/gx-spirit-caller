@@ -16,7 +16,7 @@
         .extern func_02019210
         .extern func_0202c0c0
         .extern func_0208dd9c
-        .extern func_02091554
+        .extern OS_SPrintf
         .extern func_02094504
         .extern func_ov006_021b6ad8
         .extern func_ov006_021b6be0
@@ -112,7 +112,7 @@ func_ov006_021c4cc4:
     add r0, sp, #0x8
     mov r2, r5
     mov r3, r6
-    bl func_02091554
+    bl OS_SPrintf
     mov r3, #0x6
     add r1, sp, #0x8
     str r3, [sp]

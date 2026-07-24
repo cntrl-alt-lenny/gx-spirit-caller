@@ -6,7 +6,7 @@
         .extern data_ov004_02209d14
         .extern data_ov004_02209d20
         .extern func_0202c06c
-        .extern func_0209150c
+        .extern OS_SNPrintf
         .extern func_ov004_021c9c80
         .global func_ov004_021d399c
         .arm
@@ -31,7 +31,7 @@ func_ov004_021d399c:
     mov r0, r4
     sub r1, r7, #0x1
     str r6, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r1, #0x0
     strb r1, [r4, r0]
     ldmia sp!, {r3, r4, r5, r6, r7, pc}
@@ -39,7 +39,7 @@ func_ov004_021d399c:
     ldr r2, _LIT2
     mov r0, r4
     sub r1, r7, #0x1
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r1, #0x0
     strb r1, [r4, r0]
     ldmia sp!, {r3, r4, r5, r6, r7, pc}
@@ -60,7 +60,7 @@ func_ov004_021d399c:
     mov r3, r5
     sub r1, r7, #0x1
     str r6, [sp]
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r1, #0x0
     strb r1, [r4, r0]
     ldmia sp!, {r3, r4, r5, r6, r7, pc}
@@ -69,7 +69,7 @@ func_ov004_021d399c:
     mov r0, r4
     mov r3, r5
     sub r1, r7, #0x1
-    bl func_0209150c
+    bl OS_SNPrintf
     mov r1, #0x0
     strb r1, [r4, r0]
     ldmia sp!, {r3, r4, r5, r6, r7, pc}

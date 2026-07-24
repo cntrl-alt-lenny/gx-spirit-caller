@@ -27,7 +27,7 @@ extern char data_ov016_021b9740[];   /* record array, stride 84 (+140 field)  */
 extern char data_ov016_021bab44[];   /* subsystem A state                     */
 extern char data_ov016_021bb2c4[];   /* subsystem B state                     */
 extern char data_ov016_021bb1a4[];   /* per-row built-object handles (+12 stride) */
-extern char data_ov016_021b939c[];   /* number-format glyph table (func_02091554) */
+extern char data_ov016_021b939c[];   /* number-format glyph table (OS_SPrintf) */
 extern char data_ov016_021b96d8[];   /* row-group-5 cell configs (stride 24) */
 extern char data_ov016_021b96f0[];
 extern char data_ov016_021b9708[];

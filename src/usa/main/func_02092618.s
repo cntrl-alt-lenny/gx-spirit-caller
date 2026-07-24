@@ -4,7 +4,7 @@
 
         .text
         .extern func_02091924
-        .extern func_02092124
+        .extern OSi_RemoveMutexLinkFromQueue
         .global func_02092618
         .arm
 func_02092618:
@@ -18,7 +18,7 @@ func_02092618:
     mov r4, #0x0
 .L_94:
     mov r0, r5
-    bl func_02092124
+    bl OSi_RemoveMutexLinkFromQueue
     str r4, [r0, #0xc]
     str r4, [r0, #0x8]
     bl func_02091924

@@ -1,7 +1,7 @@
 /* func_ov006_021c11f0: build+submit a command record for entry `arg1` (else
  * clear its region); return 1. (0201e5b8 command-record family — conditional,
  * fields scaled from `slot`. n=3 with 021c13c4/021c148c.) */
-extern void func_02091554(void *out, void *a, int b);
+extern void OS_SPrintf(void *out, void *a, int b);
 extern int  func_02006bf0(void *p, int b, int c);
 extern void func_0201d428(void *cmd);
 extern void func_0201e564(void *cmd);
@@ -15,7 +15,7 @@ int func_ov006_021c11f0(void *q, int arg1, int slot) {
     char buf[32];
     if (arg1 != 0) {
         int h;
-        func_02091554(buf, data_ov006_021cdc58, data_ov006_021cb500[arg1]);
+        OS_SPrintf(buf, data_ov006_021cdc58, data_ov006_021cb500[arg1]);
         h = func_02006bf0(buf, 4, 0);
         func_0201d428(cmd);
         *(int *)(cmd + 0) = h;
