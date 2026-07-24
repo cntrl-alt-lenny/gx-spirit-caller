@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**112 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**113 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (43)
+- [Uncategorised](#uncategorised) (44)
 
 ## Analysis / worklist
 
@@ -586,6 +586,12 @@ The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-r
 **Combined per-region progress-bar SVG (one card, three nested bars).**
 
 Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — code recovered as real C source - byte-matched      (teal)   — code that rebuilds byte-identical from our source tree, INCLUDING `.s` assembly sh…
+
+### `tools/integrate.py`
+
+**deterministic merge-round driver for the brain lane.**
+
+Merge a list of reviewed branches into the current integration branch with the repository's three recurring conflict policies, then refresh generated indexes and run the requested gate.  The driver deliberately does not push: the integra…
 
 ### `tools/kickoff_lint.py`
 
