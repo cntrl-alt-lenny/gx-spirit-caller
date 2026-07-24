@@ -175,15 +175,3 @@ TOP RATE FIX — the 3-region gate is the brain's serial critical path. The deli
 The brain hand-drives every merge round: ~10-15 serial git merges into brain/integ, conflict resolution, index regen, lint fix, gate3, push (86 hand-merge commits + ~40% bookkeeping in last-300). Build tools/integrate.py <branches...> reproducing it deterministically: merge each branch --no-ff; on conflict resolve by TYPE (config/*/delinks.txt = keep-ours + sort_delinks; docs/queue/* = union then dedup-by-id + MD022 blank-guard; docs/research/README.md = regenerate); then run gate3 --scope all --no-tests and report a summary (C added, .s removed, per-region sha1). Do NOT push (brain reviews). Biggest brain-overhead reduction.
 
 **Gate:** `python -m pytest -q tests` + a dry-run demo on 2 real branches showing typed resolution + gate result.
-
-### q-delink-stamp-fix — fix the phantom delink.yaml that makes EVERY gate re-delink (r9 lever #2, VERIFIED 87x) [TODO]
-
-TOP RATE FIX — the 3-region gate is the brain's serial critical path. The delink ninja edge declares output build/<ver>/delinks/delink.yaml but dsd delink v0.11.0 NEVER writes it, so `ninja -d explain -n sha1` prints 'output ... delink.yaml doesn't exist / is dirty' and re-runs delink (12.5s) -> relink (56s) -> ROM (7s) on EVERY gate even with zero changes (~74s no-op tax). Creating the file once -> next `ninja sha1` = 853ms (87x). FIX: replace the phantom yaml output with a real .delink.stamp the delink rule touches; repoint the link edge's $in (configure.py ~997) from the yaml to the stamp. See configure.py:425 (arm9_delink_yaml), :483, the delink rule + link edge. The delink rule's REAL inputs (delinks.txt etc.) already re-trigger it, so correctness is preserved. Work from kb-types.
-
-**Gate:** byte-identical: `python tools/configure.py eur && ninja sha1` OK; then a SECOND no-change `ninja sha1` must be <5s (paste both timings); `python -m pytest -q tests` no-new-failures.
-
-### q-integrate-driver — tools/integrate.py — one-command merge-round driver (r9 lever #3) [TODO]
-
-The brain hand-drives every merge round: ~10-15 serial git merges into brain/integ, conflict resolution, index regen, lint fix, gate3, push (86 hand-merge commits + ~40% bookkeeping in last-300). Build tools/integrate.py <branches...> reproducing it deterministically: merge each branch --no-ff; on conflict resolve by TYPE (config/*/delinks.txt = keep-ours + sort_delinks; docs/queue/* = union then dedup-by-id + MD022 blank-guard; docs/research/README.md = regenerate); then run gate3 --scope all --no-tests and report a summary (C added, .s removed, per-region sha1). Do NOT push (brain reviews). Biggest brain-overhead reduction.
-
-**Gate:** `python -m pytest -q tests` + a dry-run demo on 2 real branches showing typed resolution + gate result.
