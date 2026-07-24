@@ -170,7 +170,7 @@ fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/r
 
 **Gate:** `python -m pytest -q tests` + repro: a stale path now reports FILE NOT FOUND cleanly.
 
-### q-prototypes-h — consolidate 463 conflicting extern prototypes into a canonical header (r10 bet 5 [S]) [TODO]
+### q-prototypes-h — consolidate 463 conflicting extern prototypes into a canonical header (r10 bet 5 [S]) [DONE]
 
 4,712 extern decl-sites for 2,040 distinct functions (2,672 pure duplicates); 463 functions are declared with 2+ MUTUALLY-CONTRADICTORY signatures inline across files (func_ov002_021ff320 = 17 sigs across 21 files); after stripping cosmetic param-name diffs, 366 keep genuine type conflicts, 142 are ABI-SIGNIFICANT (contradictory return type / arg count -> changes call-site codegen -> BLOCKS first-try byte-match on callers). Emit ONE canonical prototype per function into include/game/prototypes.h (created by q-include-layer). Prioritize the ~30 functions declared >20 ways (ov002 sinks, DMA/fill helpers), then the 142 ABI-significant. Resolve each conflict by the best evidence (a matched C body that USES the fn is ground truth). This directly raises first-try match rate on every caller.
 
