@@ -422,8 +422,14 @@ class Project:
     def arm9_objects_txt(self) -> Path:
         return self.game_build / "objects.txt"
 
-    def arm9_delink_yaml(self) -> Path:
-        return self.game_build / "delinks" / "delink.yaml"
+    def arm9_delink_stamp(self) -> Path:
+        """Declared completion marker for the dsd delink side-effect tree.
+
+        dsd v0.11.0 writes ``delink.yaml`` as an implementation detail but
+        does not reliably preserve it as a Ninja output. The stamp is the
+        explicit edge output and is touched only after delink succeeds.
+        """
+        return self.game_build / "delinks" / ".delink.stamp"
 
     def arm9_o(self) -> Path:
         return self.game_build / "arm9.o"
@@ -480,10 +486,11 @@ def main():
         # (it would produce correct output on already-exact-size
         # sections but it's wasted work, and the tool's
         # no-op-on-already-clean path would dominate).
-        # $out is delink.yaml; its parent dir is where dsd drops the
-        # gap `.o`s. The --dir mode walks that tree recursively —
+        # dsd's delink.yaml and gap `.o`s are side effects under the
+        # delinks directory. The --dir mode walks that tree recursively —
         # cross-platform (ninja's `find | xargs` breaks on Windows
-        # cmd.exe).
+        # cmd.exe). The declared stamp is touched only after both
+        # side-effect-producing steps succeed, so Ninja can trust it.
         patch_align = "tools/patch_section_align.py"
         # NOTE: brief 132 added `tools/strip_overlay_func_collisions.py`
         # for symbol-collision research, but it is NOT wired into
@@ -503,6 +510,7 @@ def main():
             command=_wrap_chain_for_windows(
                 f"{DSD} delink --config-path $config_path"
                 f" && {PYTHON} {patch_align} --dir $delinks_dir"
+                f" && {PYTHON} tools/touch_stamp.py $delink_stamp"
             ),
         )
         n.newline()
@@ -994,7 +1002,7 @@ def add_extract_build(n: ninja_syntax.Writer, project: Project):
 def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
     lcf_file = str(project.arm9_lcf())
     objects_file = str(project.arm9_objects_txt())
-    delink_file = str(project.arm9_delink_yaml())
+    delink_file = str(project.arm9_delink_stamp())
     elf_file = str(project.arm9_o())
     # Brief 134: pass the ov004 + main .bin / relocs paths to
     # the mwld rule so the post-link patchers (veneer-splice for
@@ -1468,19 +1476,21 @@ def add_delink_and_lcf_builds(n: ninja_syntax.Writer, project: Project):
     n.comment("Delink ELF binaries when any delinks.txt file is modified")
     rom_config = str(project.baserom_config())
     delinks_path = project.arm9_delinks()
+    delink_stamp = str(project.arm9_delink_stamp())
     n.build(
         inputs=project.dsd_configs() + [rom_config],
-        implicit=[DSD, "tools/patch_section_align.py"],
+        implicit=[DSD, "tools/patch_section_align.py", "tools/touch_stamp.py"],
         rule="delink",
-        outputs=str(delinks_path / "delink.yaml"),
+        outputs=delink_stamp,
         variables={
             "config_path": str(project.arm9_config_yaml()),
             "delinks_dir": str(delinks_path),
+            "delink_stamp": delink_stamp,
         },
     )
     n.newline()
 
-    n.build(inputs=str(delinks_path / "delink.yaml"), rule="phony", outputs="delink")
+    n.build(inputs=delink_stamp, rule="phony", outputs="delink")
     n.newline()
 
     lcf_file = project.arm9_lcf()
