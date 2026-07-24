@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**111 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**112 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (2)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (42)
+- [Uncategorised](#uncategorised) (43)
 
 ## Analysis / worklist
 
@@ -672,6 +672,10 @@ mwldarm overlay-swap-blind veneer-generation cascade (brief 132).
 **Emit a candidate `.legacy.c` stub for a StyleA c94 5-arg helper-family**
 
 pick from its disassembly (brief 264, stretch goal).
+
+### `tools/touch_stamp.py`
+
+**Touch a Ninja stamp output after a side-effecting rule succeeds.**
 
 ### `tools/verify.py`
 

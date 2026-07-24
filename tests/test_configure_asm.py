@@ -305,6 +305,11 @@ class TestLegacyCompilerConstants(unittest.TestCase):
     def test_legacy_and_default_paths_differ(self):
         self.assertNotEqual(configure.LEGACY_CC, configure.CC)
 
+    def test_delink_completion_uses_real_stamp_not_phantom_yaml(self):
+        stamp = str(configure.Project("eur").arm9_delink_stamp()).replace("\\", "/")
+        self.assertTrue(stamp.endswith("build/eur/delinks/.delink.stamp"))
+        self.assertNotIn("delink.yaml", stamp)
+
     def test_compiler_suffix_table_keeps_binary_and_flag_together(self):
         self.assertEqual(
             configure.MWCC_BY_SUFFIX[configure.LEGACY_C_SUFFIX],

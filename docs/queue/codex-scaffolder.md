@@ -164,7 +164,7 @@ r8 measured the '≤256B runway' is really TWO populations split at 128B: ≤128
 
 **Gate:** doc-only; the re-banded worklist + the two dead columns removed.
 
-### q-delink-stamp-fix — fix the phantom delink.yaml that makes EVERY gate re-delink (r9 lever #2, VERIFIED 87x) [TODO]
+### q-delink-stamp-fix — fix the phantom delink.yaml that makes EVERY gate re-delink (r9 lever #2, VERIFIED 87x) [DONE]
 
 TOP RATE FIX — the 3-region gate is the brain's serial critical path. The delink ninja edge declares output build/<ver>/delinks/delink.yaml but dsd delink v0.11.0 NEVER writes it, so `ninja -d explain -n sha1` prints 'output ... delink.yaml doesn't exist / is dirty' and re-runs delink (12.5s) -> relink (56s) -> ROM (7s) on EVERY gate even with zero changes (~74s no-op tax). Creating the file once -> next `ninja sha1` = 853ms (87x). FIX: replace the phantom yaml output with a real .delink.stamp the delink rule touches; repoint the link edge's $in (configure.py ~997) from the yaml to the stamp. See configure.py:425 (arm9_delink_yaml), :483, the delink rule + link edge. The delink rule's REAL inputs (delinks.txt etc.) already re-trigger it, so correctness is preserved. Work from kb-types.
 
