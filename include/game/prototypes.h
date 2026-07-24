@@ -1903,6 +1903,7 @@ extern void func_ov000_021ac78c(void *, unsigned int);
 extern int func_ov000_021ac7a8(void *);
 extern void func_ov000_021ac7c4(void *, unsigned);
 extern int func_ov000_021ac7dc(void *);
+extern void func_ov000_021ac810(int);
 extern int func_ov000_021ac834(void);
 extern void func_ov000_021ac85c(void *);
 extern int func_ov000_021ac890(void *);

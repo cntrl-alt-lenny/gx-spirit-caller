@@ -33,11 +33,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gen_prototypes import (  # noqa: E402
     PROTOTYPES_H,
     PROVENANCE_JSON,
-    ROOT,
     collect_evidence_backed_signatures,
-    render_header,
     render_prototype,
-    render_provenance,
 )
 
 

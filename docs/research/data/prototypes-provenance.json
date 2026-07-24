@@ -13084,6 +13084,13 @@
     "return_type": "int",
     "source": "src/overlay000/func_ov000_021ac7dc.c"
   },
+  "func_ov000_021ac810": {
+    "params": [
+      "int"
+    ],
+    "return_type": "void",
+    "source": "src/overlay000/func_ov000_021ac810.c"
+  },
   "func_ov000_021ac834": {
     "params": [],
     "return_type": "int",
