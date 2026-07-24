@@ -105,11 +105,13 @@ The epilogue-routing re-sweep shipped 45 last round from previously-parked funct
 
 **Result:** Continued brief 668's mechanical `epilogue-wall-corpus.md` sweep (not the prose sources named above — brief 668 already established the corpus outperforms them 62.5% vs 0%) through its next 17 smallest still-unattempted rows. **13/17 shipped (76.5%)**, 4 parked on pure register-choice residuals. New/confirmed levers: hoist a shared pointer offset out of both if/else branches or the compiler duplicates it; a disassembly's literal flag-variable shape can be load-bearing (don't simplify to `||`); the brief-655 shared-return convergence lever generalizes to a second, unrelated function shape; "re-fetch a global instead of caching it" recurs on 2 more functions. Also fixed a brief-668 tooling bug found via this branch's own CI: 17 EUR delinks.txt headers had the wrong file suffix (plain `.c` instead of the real `.legacy.c`/`.legacy_sp3.c`/`.s`), invisible to the build but flagged by `check_match_invariants.py`. All 13 ported to USA+JPN (4 at MEDIUM confidence, individually verified). Full writeup: [`docs/research/brief-672-epilogue-resweep-2.md`](../research/brief-672-epilogue-resweep-2.md).
 
-### cm-epilogue-resweep-3 — continue re-attempting parks with the routing discriminator [TODO]
+### cm-epilogue-resweep-3 — continue re-attempting parks with the routing discriminator [DONE]
 
 The epilogue re-sweep shipped 45 then 39 the last two rounds — still the highest producer. Keep going on the parked backlog (brief 655/661 tables + cmatch-parked-and-floor.md), route by epilogue. Also fold in anything cm-wall-retire reopened.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked.
+
+**Result:** Continued the same mechanical `epilogue-wall-corpus.md` sweep as briefs 668/672 through its next 23 smallest still-unattempted rows. **17/23 shipped (73.9%)**, 6 parked — 45/64 (70.3%) cumulative from this corpus across 3 briefs. New confirmed lever: the brief-655 shared-return convergence generalizes to a 3rd shape (threshold-gated dispatch). New wall sub-class identified: an explicit register-copy of a live-in parameter (`mov r1,r0`-style) is allocator-internal and does not respond to a local-variable source hint — 2 independent confirmations this brief. Also fixed a queue-hygiene dedup bug that had silently reverted cm-epilogue-resweep-2's `[DONE]` status back to an empty `[TODO]` stub. All 17 ported to USA+JPN, individually verified 100%. Full writeup: [`docs/research/brief-673-epilogue-resweep-3.md`](../research/brief-673-epilogue-resweep-3.md).
 
 ### cm-small-resweep-upper — size-filtered small sweep, upper range 0x02040000+ [TODO]
 
