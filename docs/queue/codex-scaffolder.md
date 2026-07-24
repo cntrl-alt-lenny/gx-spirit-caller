@@ -146,7 +146,7 @@ The natural-C/asm-C split landed, but nothing GATES new asm-in-C content and the
 
 **Gate:** `python -m pytest -q tests` no-new-failures + demo output on a sample diff.
 
-### q-selector-addr — add --min-addr/--max-addr to wall_aware_headroom.py (r8 bet 6 — kills double-carves) [TODO]
+### q-selector-addr — add --min-addr/--max-addr to wall_aware_headroom.py (r8 bet 6 — kills double-carves) [DONE]
 
 The ONLY concurrent-collision prevention today is prose address-splits in queue items, so agents hand-filter JSON and `check_delink_dupes` only DETECTS an overlap at gate3 AFTER both lanes burned the carve (the brain then hand-resolves it every merge). `metadata['addr']` is already in scope — add `--min-addr/--max-addr` as a 4-line mirror of the existing size filter. Then the sweep lanes get concrete `--max-addr`/`--min-addr` commands instead of prose. Work from kb-types.
 

@@ -261,6 +261,8 @@ def scan(
     min_size: int | None = None,
     max_size: int | None = None,
     exclude_attempted: bool = False,
+    min_addr: int | None = None,
+    max_addr: int | None = None,
 ) -> dict[str, dict]:
     per: dict[str, dict] = {}
     live = _live_sources()
@@ -283,6 +285,12 @@ def scan(
             or (source_module, metadata["addr"]) in attempted
         ):
             d["excluded_attempted"] += 1
+            continue
+        addr = metadata["addr"]
+        addr_int = int(addr, 0) if addr is not None else None
+        if min_addr is not None and (addr_int is None or addr_int < min_addr):
+            continue
+        if max_addr is not None and (addr_int is None or addr_int > max_addr):
             continue
         text_size = metadata["text_size"]
         if min_size is not None and (text_size is None or text_size < min_size):
@@ -316,6 +324,19 @@ def _json_module(d: dict) -> dict:
     return out
 
 
+def _parse_address(value: str) -> int:
+    """Parse a CLI address in the usual ``0x...`` or hexadecimal form."""
+    try:
+        return int(value, 0)
+    except ValueError:
+        try:
+            return int(value, 16)
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(
+                f"invalid address: {value!r}"
+            ) from exc
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description="Wall-aware readable-C headroom.")
     ap.add_argument("--json", action="store_true")
@@ -329,6 +350,10 @@ def main(argv: list[str]) -> int:
                     help="only include files with `.text` span >= N bytes")
     ap.add_argument("--max-size", type=int, default=None,
                     help="only include files with `.text` span <= N bytes")
+    ap.add_argument("--min-addr", type=_parse_address, default=None,
+                    help="only include functions at or above this address")
+    ap.add_argument("--max-addr", type=_parse_address, default=None,
+                    help="only include functions at or below this address")
     args = ap.parse_args(argv[1:])
     if (args.min_size is not None and args.min_size < 0) or (
         args.max_size is not None and args.max_size < 0
@@ -336,7 +361,12 @@ def main(argv: list[str]) -> int:
         ap.error("size filters must be non-negative")
     if args.min_size is not None and args.max_size is not None and args.min_size > args.max_size:
         ap.error("--min-size cannot exceed --max-size")
-    per = scan(args.min_size, args.max_size, args.exclude_attempted)
+    if args.min_addr is not None and args.max_addr is not None and args.min_addr > args.max_addr:
+        ap.error("--min-addr cannot exceed --max-addr")
+    per = scan(
+        args.min_size, args.max_size, args.exclude_attempted,
+        args.min_addr, args.max_addr,
+    )
     ranked = sorted(per.items(), key=lambda kv: kv[1]["candidate"], reverse=True)
     total_candidate = sum(d["candidate"] for _, d in ranked)
     total_permanent = sum(d["permanent"] for _, d in ranked)
