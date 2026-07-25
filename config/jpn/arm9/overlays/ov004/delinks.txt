@@ -375,7 +375,7 @@ src/jpn/overlay004/func_ov004_021d3dbc.s:
 src/jpn/overlay004/func_ov004_021d3e64.s:
     complete
     .text start:0x021d3e64 end:0x021d3f24
-src/jpn/overlay004/func_ov004_021d3f24.s:
+src/jpn/overlay004/func_ov004_021d3f24.c:
     complete
     .text start:0x021d3f24 end:0x021d3f64
 src/jpn/overlay004/func_ov004_021d3f64.s:

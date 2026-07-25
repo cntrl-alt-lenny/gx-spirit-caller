@@ -7,7 +7,7 @@ are counted as real names.
 |---|---|---:|---:|---:|
 | EUR | dtcm | 0 | 0 | 0 |
 | EUR | itcm | 14 | 14 | 0 |
-| EUR | main | 4138 | 4090 | 48 |
+| EUR | main | 4138 | 4047 | 91 |
 | EUR | ov000 | 152 | 152 | 0 |
 | EUR | ov001 | 6 | 6 | 0 |
 | EUR | ov002 | 3777 | 3777 | 0 |
@@ -34,64 +34,55 @@ are counted as real names.
 | EUR | ov023 | 3 | 3 | 0 |
 | USA | dtcm | 0 | 0 | 0 |
 | USA | itcm | 14 | 14 | 0 |
-| USA | main | 4137 | 4099 | 38 |
+| USA | main | 4137 | 4056 | 81 |
 | USA | ov000 | 152 | 152 | 0 |
 | USA | ov001 | 6 | 6 | 0 |
 | USA | ov002 | 3777 | 3777 | 0 |
-| USA | ov003 | 35 | 35 | 0 |
+| USA | ov003 | 35 | 34 | 1 |
 | USA | ov004 | 310 | 310 | 0 |
 | USA | ov005 | 90 | 90 | 0 |
 | USA | ov006 | 406 | 406 | 0 |
 | USA | ov007 | 34 | 34 | 0 |
-| USA | ov008 | 91 | 91 | 0 |
+| USA | ov008 | 91 | 90 | 1 |
 | USA | ov009 | 38 | 38 | 0 |
 | USA | ov010 | 107 | 107 | 0 |
-| USA | ov011 | 194 | 194 | 0 |
-| USA | ov012 | 24 | 24 | 0 |
-| USA | ov013 | 16 | 16 | 0 |
-| USA | ov014 | 36 | 36 | 0 |
+| USA | ov011 | 194 | 193 | 1 |
+| USA | ov012 | 24 | 23 | 1 |
+| USA | ov013 | 16 | 11 | 5 |
+| USA | ov014 | 36 | 34 | 2 |
 | USA | ov015 | 74 | 74 | 0 |
 | USA | ov016 | 83 | 83 | 0 |
 | USA | ov017 | 59 | 59 | 0 |
 | USA | ov018 | 29 | 29 | 0 |
 | USA | ov019 | 47 | 47 | 0 |
 | USA | ov020 | 49 | 49 | 0 |
-| USA | ov021 | 40 | 40 | 0 |
+| USA | ov021 | 40 | 38 | 2 |
 | USA | ov022 | 15 | 15 | 0 |
 | USA | ov023 | 3 | 3 | 0 |
 | JPN | dtcm | 0 | 0 | 0 |
 | JPN | itcm | 14 | 14 | 0 |
-| JPN | main | 4137 | 4099 | 38 |
+| JPN | main | 4137 | 4056 | 81 |
 | JPN | ov000 | 152 | 152 | 0 |
 | JPN | ov001 | 6 | 6 | 0 |
 | JPN | ov002 | 3777 | 3777 | 0 |
-| JPN | ov003 | 35 | 35 | 0 |
+| JPN | ov003 | 35 | 34 | 1 |
 | JPN | ov004 | 310 | 310 | 0 |
 | JPN | ov005 | 90 | 90 | 0 |
 | JPN | ov006 | 406 | 406 | 0 |
 | JPN | ov007 | 34 | 34 | 0 |
-| JPN | ov008 | 91 | 91 | 0 |
+| JPN | ov008 | 91 | 90 | 1 |
 | JPN | ov009 | 38 | 38 | 0 |
 | JPN | ov010 | 107 | 107 | 0 |
-| JPN | ov011 | 194 | 194 | 0 |
-| JPN | ov012 | 24 | 24 | 0 |
-| JPN | ov013 | 16 | 16 | 0 |
-| JPN | ov014 | 36 | 36 | 0 |
+| JPN | ov011 | 194 | 193 | 1 |
+| JPN | ov012 | 24 | 23 | 1 |
+| JPN | ov013 | 16 | 11 | 5 |
+| JPN | ov014 | 36 | 34 | 2 |
 | JPN | ov015 | 74 | 74 | 0 |
 | JPN | ov016 | 83 | 83 | 0 |
 | JPN | ov017 | 59 | 59 | 0 |
 | JPN | ov018 | 29 | 29 | 0 |
 | JPN | ov019 | 47 | 47 | 0 |
 | JPN | ov020 | 49 | 49 | 0 |
-| JPN | ov021 | 40 | 40 | 0 |
+| JPN | ov021 | 40 | 38 | 2 |
 | JPN | ov022 | 15 | 15 | 0 |
 | JPN | ov023 | 3 | 3 | 0 |
-
-## Naming-propagation candidates
-
-Cross-reference of sampled EUR real-named functions against the signature
-census twin map. Candidate count: **0**.
-
-| EUR name | Module | EUR address | USA twin | JPN twin |
-|---|---|---:|---|---|
-| None | | | | |
