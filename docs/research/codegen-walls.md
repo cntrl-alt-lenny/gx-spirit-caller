@@ -6124,7 +6124,7 @@ temporary all lose to the optimiser.
 uses mask) is the same wall in the other direction.
 
 **Affected drops:** brief 022 `ov000_021ab6cc`/`021af5c0`, brief
-028 `func_0203d6c4`/`func_0209aa48`/`func_0209d788`, brief 029
+028 `func_0203d6c4`, brief 029
 `func_0207d304`, brief 031 `func_ov002_022912c8`; brief 049
 self-extend (wave 14, PR #372) originally added 7 ov002
 addresses here after routing them through `*.legacy.c` expecting
@@ -6135,11 +6135,21 @@ C-15-style fix to apply: `func_ov002_0226af78`,
 1.2/sp2p3, at the time. **Update (brief 596): all 7 are now
 `complete` (matched) in the current tree** — see the
 *Argument-marshalling exception* below. They no longer belong in
-this affected-drops list; **the real remaining P-1 count is 10 of
-69 (14.5%)**, not 17/69. Still the largest single wall in this
-set and the most-frequently-misapplied one (see *Wall family
-note* in C-15 entry above) — just smaller than previously
-recorded.
+this affected-drops list. **Update (q-sm64ds-reingest, this PR):**
+brief 028's other two citations here, `func_0209aa48` and
+`func_0209d788`, were never genuine P-1 members either — their disasm
+shows no `lsl K; lsr K` shift-pair at all (`ands+movne+moveq` and
+`ands+bicne+strneh` respectively, a dead-value-write pattern, not a
+shift/mask collapse). Both `.s` files already carried a brief-655
+header comment saying so ("no duplicate-address evidence... never
+assessed as a C-match target") that was never synced to this prose.
+`func_0209aa48` has since shipped (C-23 routing, the dead-value-write
+mechanism its actual shape matches); `func_0209d788` remains a genuine
+near-miss but on a pure register-letter swap, not P-1 or C-23. **The
+real remaining P-1 count is 8 of 69 (11.6%)**, not 17/69 or 10/69.
+Still the largest single wall in this set and the most-frequently-
+misapplied one (see *Wall family note* in C-15 entry above) — just
+smaller than previously recorded, twice now.
 
 ### Argument-marshalling exception (brief 596) — not actually P-1
 
