@@ -329,7 +329,22 @@ The khdays-ported `tools/audit_callsite_arity.py` now runs against our bank and 
 
 **Gate:** `python tools/audit_callsite_arity.py` reports 0 contradictions + `python tools/check_prototypes_provenance.py` 0 mismatches + `python -m pytest -q tests` + `ninja sha1` byte-neutral (nothing includes the bank yet).
 
-### cm-parked-reaudit-2 — batch 2 of the parked re-audit — the lane cleared its own restock bar (44.8%) [TODO]
+### cm-parked-reaudit-2 — batch 2 of the parked re-audit — the lane cleared its own restock bar (44.8%) [DONE]
+
+> Shipped, 8/39 attempted (20.5% — below batch 1's own >25% bar, honestly
+> reported; corpus is thinning). Live census of all 47 still-`.s`
+> C-34 citations built fresh (no static list survived from batch 1);
+> 4 parallel worktree agents. 4 more mistagged citations corrected
+> (2 pre-verified before dispatch, 2 found by batch B), batch 1's own
+> deferred item (`func_ov002_022b595c`) re-investigated (still needs
+> its own from-scratch session — pool refs are 5576B apart, likely
+> reach-forced not discretionary CSE), 2 new C-34 sub-patterns + 2 new
+> levers found and folded into codegen-walls.md, 2 tooling bugs found
+> and flagged (batch_sha1.py false-FAIL race, objdiff_resolve_relocs.py
+> alias-symbol blind spot — spawned as separate follow-up tasks, not
+> fixed here). 3-region gate3.py PASS. Full breakdown:
+> `docs/research/cm-parked-reaudit-2-2026-07-25.md`. PR #1348, not yet
+> merged to main as of this branch.
 
 cm-parked-reaudit-1 shipped **13/29 (44.8%)**, comfortably above the >25% 'restocks itself' threshold it was asked to measure — so continue. Take the NEXT slice of the parked/wall-cited corpus beyond batch 1's 30-candidate sample of the 59-member Bucket-A pool (finish Bucket-A, then extend to the next bucket by the same selection method; the writeup `docs/research/cm-parked-reaudit-1-2026-07-25.md` documents the bucketing). CARRY BATCH 1'S LESSONS: the typed-struct-member lever alone does NOT split a duplicated pool slot — use the FULL toolkit (typed-struct externs, trampoline-arity check, tier routing, branch-order/predication, push-list correction via reusing named locals). Batch 1 also found several candidates were MISFILED as C-34 (single-`ldr` cases with no duplicate pool word at all) — re-check the citation against the actual `.s` before spending effort, and correct the misfiling in the taxonomy as you go. Also pick up batch 1's own deferred item: `func_ov002_022b595c` (size-forced exception).
 

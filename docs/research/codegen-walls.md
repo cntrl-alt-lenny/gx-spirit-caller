@@ -4542,6 +4542,30 @@ raw-`.s` recipe only if that fails or the picked function is too
 large/unanalyzed to safely reshape (see the 5 largest-corpus-entries
 note above).
 
+**UPDATE (cm-parked-reaudit-2, 2026-07-25):** batch 2 of the re-audit
+(8/39 shipped, 20.5% — see `docs/research/cm-parked-reaudit-2-2026-07-25.md`)
+confirmed the distinct-symbol lever generalizes correctly (verified via
+`objdump -r` on 6+ independent candidates: literal-address-cast always
+produces two genuinely distinct pool words). Every non-ship in that
+batch was a SEPARATE, downstream wall the lever itself doesn't touch —
+2 new ones worth trying alongside the pool-fold on future C-34 picks:
+
+- **Persistent-base-pointer caching**: when the original visibly keeps
+  a base pointer live in one register across several calls, caching it
+  into an explicit named local (rather than re-deriving it inline at
+  each use) can fix a register-allocation divergence downstream of a
+  correctly-applied pool-fold.
+- **`goto`-based branch forcing**: when mwcc predicates a small
+  `if`/`else` into branchless code but the original keeps a real
+  branch, restructuring via `goto` (rather than trying to coax the
+  `if`/`else` form into staying unpredicated) can force the branch
+  back.
+
+Also confirmed 2 more mistagged citations (only one real pool word,
+not a duplicate): `func_ov002_022a1870` (zero pool words) and
+`func_ov002_021f2ca8` (one pool word). Headers corrected in both
+`.s` files directly.
+
 **Cross-corpus survey notes:** brief 198's permuter wave
 identified the wall on two clones (E-07 / E-08); both ship via
 the brief 202 `.s` recipe.

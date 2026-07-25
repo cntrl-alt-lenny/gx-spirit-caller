@@ -11351,6 +11351,7 @@ data_0219a914 kind:bss addr:0x0219a914
 data_0219a924 kind:bss addr:0x0219a924
 data_0219a924_alias kind:bss addr:0x0219a924
 data_0219a92c kind:bss addr:0x0219a92c
+data_0219a92c_alias kind:bss addr:0x0219a92c
 data_0219a934 kind:bss addr:0x0219a934
 data_0219a934_alias kind:bss addr:0x0219a934
 data_0219a93c kind:bss addr:0x0219a93c

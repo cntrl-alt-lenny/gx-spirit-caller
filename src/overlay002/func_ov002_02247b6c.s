@@ -1,7 +1,52 @@
-; func_ov002_02247b6c — brief 207 / Phase 2: C-34 candidate. Vanilla
-; brief 202 `.s` recipe — explicit `.word` per pool slot.
-; Brief 204's patcher trim-protect handles relocation-tail
-; cases.
+; func_ov002_02247b6c — genuine C-34, large (cm-parked-reaudit-2 batch
+; B, 2026-07-25): confirmed real duplicate pool slot for
+; data_ov002_022cacc0 (`.L_022482ac` / `.L_022482b0`, both plain symbol
+; refs) -- one dedicated to each of this function's 3 array-search
+; loops' GUARD check, the other to its ITERATING pointer, exactly the
+; split already proven in func_ov002_022476e8.c / func_ov002_02247ad8.c
+; (symbol for the guard, literal-address-cast `(struct Ov002Item
+; *)0x022cacc0` for the loop pointer; both offset-0).
+;
+; A full ~300-line C translation was written and compiled successfully
+; against the real toolchain (a state-machine dispatcher switching on
+; data_ov002_022ce288+0x5a8, matching the func_ov002_0223483c /
+; func_ov002_0222b2e0 "global 3-way switch" idiom at much larger scale --
+; 9 cases: 0x62/0x63/0x64/0x7c/0x7d/0x7e/0x7f/0x80 + default). Verified
+; structurally complete and correct two ways: (1) the compiled branch
+; topology (cmp/bgt/bge chain + every case's label targets) is BYTE-
+; IDENTICAL to orig's, confirmed instruction-by-instruction; (2) both
+; compiled objects contain exactly 24 `bl` (call) instructions, in the
+; same order/context -- every callee is invoked the right number of
+; times from the right place. This confirms both the pool-split lever
+; and the full case-by-case logic derivation are correct, not just the
+; top-level shape.
+;
+; Two non-obvious bit-layout corrections needed along the way (verified
+; against the raw shift amounts directly, not trusted from m2c's first-
+; pass rendering): the "not one of {0x1698,0x1716,0x19d9}" search uses a
+; SECOND, distinct 13-bit bitfield of the same data_ov002_022cacc0
+; record at bits [25:13] (`idHigh`), not the established `id:13` at
+; bits [12:0] the other two searches use; and the case-0x64/0x7c
+; circular-buffer index into data_ov002_022ce288+0x498 masks with
+; `& 0x7f` (128-entry), not `& 0xff` as m2c's own rendering suggested.
+;
+; Residual: NOT byte-exact. mwcc's register allocator picks a
+; systematically different (but same-COUNT: 7 GP regs + lr, 8 total in
+; both) push list than orig -- mine starts at r4 (self in r4, state
+; value in r0), orig starts at r3 (self in r5, state value in r1) --
+; and that one-slot shift cascades through every instruction referencing
+; those values for the whole function. This is the same class of "hard
+; to steer via source form" register-numbering issue documented on the
+; smaller func_020270d0 (this batch), just at a scale (7-8 interacting
+; persistent registers across ~470 words) that didn't converge with the
+; time available this session. Draft archived (not committed, to keep
+; the tree in the documented "either .c or .s, never both" state) --
+; a follow-up session chasing the specific register/scheduling knobs
+; (candidate levers: reordering which local is computed/named first,
+; the explicit-pointer-reassignment trick, forcing the state value into
+; a named local before the self-pointer copy) could plausibly close
+; this from a solid, already-verified-correct logic base rather than
+; from scratch.
 
         .text
         .extern data_ov002_022cacc0
