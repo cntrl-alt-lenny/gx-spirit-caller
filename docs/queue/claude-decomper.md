@@ -239,7 +239,7 @@ The candidate: `func_ov004_021cd3b4` (previously untried) now reconstructs to **
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + either the ship or a documented word-level residual naming the wall class.
 
-### q-invariants-green — get `Match invariants` green on main [CLAIMED]
+### q-invariants-green — get `Match invariants` green on main [DONE]
 
 Red since ~2026-07-22 (small/quick fix, per the brain's own sizing).
 
