@@ -450,7 +450,7 @@ src/jpn/main/func_020068fc.c:
     complete
     .text start:0x020068fc end:0x02006934
 
-src/jpn/main/func_02006934.s:
+src/jpn/main/func_02006934.c:
     complete
     .text start:0x02006934 end:0x020069d8
 src/jpn/main/func_020069d8.c:
