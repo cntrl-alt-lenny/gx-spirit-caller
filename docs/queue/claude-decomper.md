@@ -215,6 +215,7 @@ just flagged. Full per-lever ledger:
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body. ✅
 
 ### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [DONE]
+
 > DONE: PR #1353 (already open on branch claude/sm64ds-lever-apply; this
 > main-based checkout hadn't picked up the merge yet when `next` was called
 > a second time — patched locally per the known work_queue.py staleness gap).
