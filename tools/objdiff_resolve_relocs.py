@@ -250,7 +250,23 @@ def section_base_for(name: str, bases: dict[str, int] | None = None) -> int:
 # optionally the overlay tag (`data_ov006_021ceae4` — observed in the
 # wild). Capture group 1 is the trailing 8 hex; we use that as the
 # address.
-_NAME_ADDR_RE = re.compile(r"_([0-9a-fA-F]{8})$")
+#
+# The registered-alias C-match lever (brief 682) adds a SECOND symbol at
+# the same address, named `<original>_alias` (e.g. a `data_0219a92c`
+# already in symbols.txt gets a sibling `data_0219a92c_alias` entry, both
+# `kind:bss addr:0x0219a92c` — confirmed across every real instance in
+# config/**/symbols.txt, always this exact `_alias` suffix, no numbering).
+# Before this fix the trailing `(?:_alias)?` wasn't here, so an alias name
+# didn't end in 8 hex digits and fell all the way through to the FNV-1a
+# name-hash fallback below — a DIFFERENT fictional address than the
+# original symbol at the literal same real address gets. Two relocations
+# that are supposed to be interchangeable (same byte, different symbol
+# name) then resolved to different bytes, showing up as a false pool-word
+# mismatch for every candidate using the alias lever. The optional
+# non-capturing suffix here means the address group still captures just
+# the 8 hex digits either way, so an alias resolves to the IDENTICAL
+# fictional address as the symbol it aliases.
+_NAME_ADDR_RE = re.compile(r"_([0-9a-fA-F]{8})(?:_alias)?$")
 
 
 def _fnv1a_24(name: str) -> int:
@@ -283,7 +299,9 @@ def resolve_symbol_address(
     Resolution priority:
       1. `SHN_ABS` — `st_value` is the absolute address.
       2. `SHN_UNDEF` (external) — name-based:
-         - 8-hex-digit suffix in the name → use that hex.
+         - 8-hex-digit suffix in the name (optionally followed by
+           `_alias`, e.g. `data_0219a92c_alias`) → use that hex, so an
+           alias symbol resolves identically to the symbol it aliases.
          - Otherwise → `NAME_HASH_BASE | FNV-1a(name)`.
       3. In-section symbol — `section_bases_by_idx[st_shndx] +
          st_value` (where the per-file section index has been

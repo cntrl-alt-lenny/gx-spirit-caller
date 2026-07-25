@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -72,6 +73,11 @@ class Candidate:
     c_rel: str          # relative .c path (forward-slash)
     delinks_path: Path
     applied: bool = dataclasses.field(default=False, init=False)
+    # Set by _displace_stale_sibling when this candidate's .s sibling had to
+    # be moved out of the way to self-heal a ninja config error (see
+    # _ninja_config_error). None means "never displaced" -- _revert_one
+    # only needs to restore it in the displaced case.
+    s_backup: bytes | None = dataclasses.field(default=None, init=False)
 
 
 def _rel_posix(path: Path) -> str:
@@ -226,7 +232,114 @@ def _revert_one(cand: Candidate) -> bool:
     ok = _flip_delinks(cand.delinks_path, cand.c_rel, cand.s_rel)
     if ok:
         cand.applied = False
+        _restore_stale_sibling(cand)
     return ok
+
+
+# ---------------------------------------------------------------------------
+# Stale-sibling self-heal (delinks-flip-before-.s-removal race)
+# ---------------------------------------------------------------------------
+#
+# configure.py adds an unconditional ninja build rule for EVERY .c and
+# EVERY .s file it finds under src/, regardless of what delinks.txt
+# currently routes to (confirmed directly: `tools/cmatch_loop.py`'s
+# `displace_sibling_s` hits the identical mechanism during compile-testing,
+# and the project convention is that zero already-.c-converted functions
+# anywhere in this tree keep a sibling .s). A candidate's .s sibling is
+# REQUIRED to exist on disk by the time batch_sha1 starts (see
+# `_missing_revert_target_error` -- it's the bisection fallback), so every
+# batch begins in exactly the state that produces this collision the
+# moment build.ninja is next regenerated: two build edges both writing
+# `build/<region>/<...>.o`, which ninja refuses to parse at all with
+# `ninja: error: build.ninja:N: multiple rules generate <path>` -- a
+# CONFIGURATION fatal that fires before sha1.py ever runs, not a byte
+# divergence. Reproduced directly against this tree (brief 682 fix,
+# 2026-07-25): writing a throwaway .c beside an untouched, delinks-routed
+# `src/main/VBlankIntrWait.s` and reconfiguring hit this exact error;
+# deleting the .s WITHOUT reconfiguring left the error in place (build.ninja
+# is a static snapshot -- ninja never rescans the filesystem on its own);
+# reconfiguring afterward cleared it. The fix below automates precisely
+# that manual recovery for whichever candidate in THIS batch triggered it.
+
+
+def _reconfigure(region: str) -> tuple[int, str]:
+    """Re-run configure.py for `region`. Returns (returncode, combined
+    stdout+stderr) so callers can surface a failure verbatim."""
+    result = subprocess.run(
+        [sys.executable, "tools/configure.py", region],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    return result.returncode, (result.stdout or "") + (result.stderr or "")
+
+
+def _displace_stale_sibling(cand: Candidate) -> bool:
+    """Move cand's .s sibling out of the way (delete, keep the exact bytes
+    in-memory on the Candidate). Returns True if a file was displaced.
+
+    Mirrors `cmatch_loop.py`'s `displace_sibling_s` -- same mechanism,
+    same reason. Uses read_bytes/write_bytes (not text) so line endings
+    and encoding round-trip byte-for-byte through the backup.
+    """
+    s_path = ROOT / cand.s_rel
+    if not s_path.is_file():
+        return False
+    cand.s_backup = s_path.read_bytes()
+    s_path.unlink()
+    return True
+
+
+def _restore_stale_sibling(cand: Candidate) -> None:
+    """Undo _displace_stale_sibling: put the .s file back verbatim if it
+    was ever displaced (no-op otherwise, including the common case where
+    self-heal never triggered for this candidate)."""
+    if cand.s_backup is not None:
+        (ROOT / cand.s_rel).write_bytes(cand.s_backup)
+        cand.s_backup = None
+
+
+# ninja's own fatal-configuration-error line. Distinct from sha1.py's own
+# failure report (`f"{file_path}: FAILED"`, no "ninja: error:" prefix --
+# see tools/sha1.py) by construction, so this can never misfire on a real
+# byte mismatch: this prefix only appears when ninja refused to even
+# start the build.
+_NINJA_ERROR_RE = re.compile(r"^ninja: error:.*$", re.M)
+_MULTIPLE_RULES_RE = re.compile(r"multiple rules generate (?P<path>\S+)")
+
+
+def _ninja_config_error(output: str) -> str | None:
+    """None if `output` (ninja's combined stdout+stderr) shows no
+    ninja-level fatal; otherwise the matched error line(s), joined."""
+    hits = _NINJA_ERROR_RE.findall(output)
+    return "\n".join(hits) if hits else None
+
+
+def _expected_s_object_rel(s_rel: str, region: str) -> str:
+    """'src/main/func_X.s' -> 'build/eur/src/main/func_X.o' -- the output
+    path a stale, still-on-disk .s sibling's own assemble rule would
+    target. A .s has no routing-tier concept (see `_c_to_s_rel`'s
+    docstring), so this is always the bare stem, matching what a
+    colliding *plain* `.c` (same stem) would ALSO target -- exactly the
+    collision this whole self-heal exists to resolve."""
+    assert s_rel.endswith(".s")
+    return f"build/{region}/{s_rel[:-2]}.o"
+
+
+def _correlate_stale_sibling(
+    config_error: str, candidates: list[Candidate], region: str,
+) -> Candidate | None:
+    """If `config_error` is a 'multiple rules generate <path>' fatal whose
+    path matches one of `candidates`' own .s sibling, return that
+    candidate. None if the conflict doesn't belong to this batch (a
+    stray, unrelated .c/.s pair elsewhere in the tree) -- self-healing
+    something outside the batch is out of scope; report it instead."""
+    m = _MULTIPLE_RULES_RE.search(config_error)
+    if m is None:
+        return None
+    hit_path = m.group("path").replace("\\", "/")
+    for cand in candidates:
+        if _expected_s_object_rel(cand.s_rel, region) == hit_path:
+            return cand
+    return None
 
 
 def _apply_many(candidates: list[Candidate]) -> None:
@@ -264,14 +377,24 @@ def _sort_delinks(delinks_paths: set[Path]) -> None:
 # sha1 runner
 # ---------------------------------------------------------------------------
 
-def _run_sha1(verbose: bool = False) -> int:
-    """Run `ninja sha1` from ROOT. Returns the exit code."""
-    kwargs: dict = {"cwd": ROOT}
-    if not verbose:
-        kwargs["capture_output"] = True
-        kwargs["text"] = True
-    result = subprocess.run(["ninja", "sha1"], **kwargs)
-    return result.returncode
+def _run_sha1(verbose: bool = False) -> tuple[int, str]:
+    """Run `ninja sha1` from ROOT. Returns (exit code, combined
+    stdout+stderr).
+
+    Always captures now (previously only when not verbose) so callers can
+    tell a ninja-level configuration fatal (see `_ninja_config_error`)
+    apart from a real sha1 mismatch -- both look identical as a bare
+    nonzero return code. When verbose, the captured output is echoed
+    after the run instead of streaming live; a minor UX trade for being
+    able to inspect every run's output uniformly.
+    """
+    result = subprocess.run(
+        ["ninja", "sha1"], cwd=ROOT, capture_output=True, text=True,
+    )
+    output = (result.stdout or "") + (result.stderr or "")
+    if verbose:
+        print(output, end="")
+    return result.returncode, output
 
 
 # ---------------------------------------------------------------------------
@@ -306,7 +429,7 @@ def _bisect_culprits(
 
     # --- Test without first half ---
     _revert_many(first)
-    rc = _run_sha1(verbose)
+    rc, _output = _run_sha1(verbose)
     if rc == 0:
         # Removing first half fixed sha1 → all culprits are in first half.
         # Re-apply first, then recurse to isolate specific ones.
@@ -319,7 +442,7 @@ def _bisect_culprits(
     # Restore first, revert second, test.
     _apply_many(first)
     _revert_many(second)
-    rc2 = _run_sha1(verbose)
+    rc2, _output = _run_sha1(verbose)
     if rc2 == 0:
         # Removing second half fixed sha1 → all culprits are in second half.
         _apply_many(second)
@@ -334,7 +457,7 @@ def _bisect_culprits(
     # Now: culprits_first reverted, clean_first applied, second still reverted.
 
     _apply_many(second)
-    rc3 = _run_sha1(verbose)
+    rc3, _output = _run_sha1(verbose)
     if rc3 == 0:
         # Second half turned out clean (sha1 passes once culprits_first are out)
         return culprits_first, clean_first + second
@@ -453,9 +576,77 @@ def main(argv: list[str] | None = None) -> int:
 
     _sort_delinks(modified_delinks)
 
-    # --- Run sha1 ---
+    # --- Run sha1, self-healing a stale-.s-sibling ninja config error once
+    # per candidate before ever treating a failure as a byte mismatch ---
     print(f"\nninja sha1  ({len(candidates)} candidate(s) applied)...")
-    rc = _run_sha1(args.verbose)
+    healed: list[str] = []
+    already_healed: set[str] = set()
+    while True:
+        rc, output = _run_sha1(args.verbose)
+        if rc == 0:
+            break
+        config_error = _ninja_config_error(output)
+        if config_error is None:
+            break  # a real sha1 mismatch -- fall through to bisect below
+
+        culprit = _correlate_stale_sibling(config_error, candidates, args.region)
+        if culprit is None or culprit.c_rel in already_healed:
+            # Not one of this batch's own candidates (a stray .c/.s pair
+            # elsewhere in the tree), or we already tried healing this one
+            # once and it's still broken -- this is an infra problem, not
+            # something bisection can meaningfully attribute to a culprit.
+            for c in candidates:
+                if c.applied:
+                    _revert_one(c)
+            _sort_delinks(modified_delinks)
+            already_str = (
+                f" (already attempted a self-heal for {culprit.c_rel})"
+                if culprit is not None else ""
+            )
+            print(
+                f"ERROR: ninja configuration error, not a byte mismatch"
+                f"{already_str}:\n{config_error}\n"
+                "  build.ninja itself is broken -- commonly a stray .c/.s "
+                "pair for the same translation unit existed when "
+                "configure.py last ran (configure.py adds a build rule "
+                "for every .c AND every .s file it finds under src/, "
+                "regardless of delinks.txt). All candidates in this batch "
+                "have been reverted.\n"
+                "  Fix: locate the stray file pair named above, remove "
+                f"the extra one, then re-run "
+                f"`python tools/configure.py {args.region}` before retrying.",
+                file=sys.stderr,
+            )
+            return 2
+
+        already_healed.add(culprit.c_rel)
+        print(
+            f"  ninja config error: {culprit.c_rel}'s .s sibling "
+            f"({culprit.s_rel}) is still on disk and collides with its "
+            f"own build rule now that delinks.txt routes to the .c. "
+            f"Self-healing: removing {culprit.s_rel}, reconfiguring, "
+            f"retrying...",
+            file=sys.stderr,
+        )
+        _displace_stale_sibling(culprit)
+        reconf_rc, reconf_output = _reconfigure(args.region)
+        if reconf_rc != 0:
+            for c in candidates:
+                if c.applied:
+                    _revert_one(c)
+            _sort_delinks(modified_delinks)
+            print(
+                f"ERROR: configure.py failed during stale-sibling self-heal "
+                f"for {culprit.c_rel}:\n{reconf_output}\n"
+                "  All candidates in this batch have been reverted.",
+                file=sys.stderr,
+            )
+            return 2
+        healed.append(culprit.c_rel)
+        # Loop back and retry `ninja sha1` now that build.ninja is clean.
+
+    if healed:
+        print(f"  self-healed stale .s sibling(s) for: {', '.join(healed)}")
 
     confirmed: list[Candidate]
     culprits: list[Candidate]
@@ -486,6 +677,7 @@ def main(argv: list[str] | None = None) -> int:
         "sha1_passed": rc == 0,
         "confirmed": [_fmt(c.c_path) for c in confirmed],
         "culprits": [_fmt(c.c_path) for c in culprits],
+        "self_healed_stale_siblings": healed,
     }
 
     if args.json:

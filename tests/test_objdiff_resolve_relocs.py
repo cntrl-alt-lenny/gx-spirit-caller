@@ -320,6 +320,39 @@ class TestResolveSymbolAddress(unittest.TestCase):
             0x021ceae4,
         )
 
+    def test_alias_suffixed_extern_resolves_like_its_original(self) -> None:
+        # brief 682's registered-alias lever: a second symbol at the
+        # SAME real address, named `<original>_alias`
+        # (config/**/symbols.txt always emits this exact suffix, no
+        # numbering -- e.g. `data_0219a92c` + `data_0219a92c_alias`,
+        # both `kind:bss addr:0x0219a92c`). Before this fix,
+        # `_alias`-suffixed names fell through to the FNV-1a name-hash
+        # fallback (a DIFFERENT fictional address than the plain name),
+        # so a relocation via the alias and an equivalent one via the
+        # original name compared unequal even though both point at the
+        # literal same byte -- a false pool-word mismatch specifically
+        # for candidates using the alias lever.
+        original = resolve_symbol_address(
+            "data_0219a92c", st_value=0, st_shndx=0, section_bases_by_idx={},
+        )
+        alias = resolve_symbol_address(
+            "data_0219a92c_alias", st_value=0, st_shndx=0, section_bases_by_idx={},
+        )
+        self.assertEqual(original, 0x0219a92c)
+        self.assertEqual(alias, 0x0219a92c)
+        self.assertEqual(original, alias)
+
+    def test_alias_suffixed_extern_with_overlay_tag(self) -> None:
+        # Real instance from config/usa/arm9/overlays/ov001/symbols.txt:
+        # data_ov001_021ca340 / data_ov001_021ca340_alias.
+        self.assertEqual(
+            resolve_symbol_address(
+                "data_ov001_021ca340_alias", st_value=0, st_shndx=0,
+                section_bases_by_idx={},
+            ),
+            0x021ca340,
+        )
+
     def test_named_extern_falls_back_to_hash(self) -> None:
         # `memcpy` has no embedded address. Both files reference it
         # by name, so the hash-based fallback gives the same value.
@@ -507,6 +540,50 @@ class TestResolveElfRelocsRela(unittest.TestCase):
                 "fails, the matched_functions metric won't tick "
                 "for .legacy.c / .legacy_sp3.c / .s ships."
             ),
+        )
+
+    def test_alias_and_original_symbol_converge_on_same_bytes(self) -> None:
+        """The alias-lever analogue of the brief 206 invariant above:
+        one file's R_ARM_ABS32 targets `data_0219a92c` directly, the
+        other's targets the registered-alias sibling
+        `data_0219a92c_alias` at the identical real address. Both must
+        resolve to the SAME `.text` bytes -- otherwise the alias lever
+        (writing through the alias name instead of the original) shows
+        up as a false pool-word mismatch purely from the symbol NAME
+        differing, never a real byte divergence."""
+        text = struct.pack("<II", 0xeb000000, 0x00000000)
+
+        via_original = _build_arm_elf_with_relocs(
+            text_bytes=text,
+            symbols=[
+                ("", 0, 0, 0),
+                ("data_0219a92c", 0, 0, 0),
+            ],
+            relocs=[(0x04, R_ARM_ABS32, 1, 0)],
+            rela=True,
+        )
+        via_alias = _build_arm_elf_with_relocs(
+            text_bytes=text,
+            symbols=[
+                ("", 0, 0, 0),
+                ("data_0219a92c_alias", 0, 0, 0),
+            ],
+            relocs=[(0x04, R_ARM_ABS32, 1, 0)],
+            rela=True,
+        )
+
+        original_out = resolve_elf_relocs(via_original)
+        alias_out = resolve_elf_relocs(via_alias)
+
+        self.assertEqual(
+            _extract_text(original_out), _extract_text(alias_out),
+            msg="alias-suffixed and plain symbol names must resolve to "
+                "identical post-relocation bytes for the same real address",
+        )
+        # Pin the actual resolved value too, not just their equality.
+        self.assertEqual(
+            struct.unpack_from("<I", _extract_text(alias_out), 4)[0],
+            0x0219a92c,
         )
 
     def test_strips_rela_text_size(self) -> None:
