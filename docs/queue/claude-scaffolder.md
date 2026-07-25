@@ -446,7 +446,7 @@ Do NOT just make the job tolerate unknown targets — that would make it vacuous
 Both scratch PRs (#1357, #1358) closed without merging, branches deleted — throwaway verification only.
 Found a real but out-of-scope issue while reading unrelated CI output on #1357: `pr-invariants`'s `cross_file_name_drift` check has 4 pre-existing errors on main (confirmed via `git log` on the offending files — last touched 2026-06-30, long before this branch existed), currently blocking merge on EVERY PR project-wide, not just this lane's. Filed separately below as `q-invariant-drift-fix` per this session's own standing rule against flagging follow-ups in prose only.
 
-### q-pytest-ci-reconcile — the suite is green locally and red in CI, so neither is a gate [CLAIMED]
+### q-pytest-ci-reconcile — the suite is green locally and red in CI, so neither is a gate [DONE]
 
 `Tests` has been failing on main since ~2026-07-24. `q-green-pytest` delivered "genuinely green, no known-failure baseline" — but that was only ever verified on a fully-provisioned dev box. CI shows 2 failures + 2 errors; a bare local run on the brain worktree shows a DIFFERENT set. Two runs that disagree means neither is trustworthy.
 
@@ -458,6 +458,8 @@ Known environment-dependent tests:
 Decide per test whether the dependency is genuinely required (then provision it in the workflow) or incidental (then add a real skip guard with a reason, e.g. `shutil.which('gcc')`). A skip with a stated reason is honest; a test that passes only on one machine is not. Do NOT reintroduce a blanket known-failure baseline — that is what `q-green-pytest` deliberately removed.
 
 **Gate:** `Tests` green in CI on your PR, and `python -m pytest -q tests` green on a worktree with NO gcc and NO dsd (skips allowed, failures not). Report the skip count and the reason for each in the PR body.
+
+**Result:** Shipped as #1360. 3 distinct root causes, not 1 shared cause — (1) `test_m2c_feed.py` bare `import pytest` (not in `tools/requirements.txt`) crashed the whole module at import time before any skip guard mattered, compounded by `@pytest.mark.skipif` being inert under CI's actual runner (`unittest discover`, not `pytest`) — swapped to `@unittest.skipUnless`, dropped the import; (2) `test_fastmatch.TestMissingFile` depended on `build.ninja` existing (fastmatch.py checks it before the per-file check) even though the behavior under test has no real need for a build graph — isolated via a `setUp` that monkeypatches `ROOT` to a scratch dir, no product code touched; (3) `test_gate3.TestDsdBinaryProbe.test_real_repo_root_resolves` checks the real repo root for an actual dsd binary, genuinely external state CI never downloads — added `@unittest.skipUnless` with a reason. Confirmed via the REAL ubuntu-latest CI run (not just local sim): `Ran 3020 tests ... OK (skipped=21)`, 0 failures, 0 errors, every skip has a stated reason (verified by reading the actual job log, not assumed). Also green locally both ways: `python -m unittest discover -s tests` (3025 passed/16 skipped on a configured Windows box) and `python -m pytest -q tests` (3017 passed/16 skipped). No blanket known-failure baseline reintroduced.
 
 ### cm-data-020c3198-carve — carve the true base of the data_020c319c table (mid-record split, mirrors data_020b52d8) [TODO]
 
