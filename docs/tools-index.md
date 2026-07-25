@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**116 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**118 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (3)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (46)
+- [Uncategorised](#uncategorised) (48)
 
 ## Analysis / worklist
 
@@ -473,6 +473,12 @@ _Tools without a category mapping. Add a prefix rule to `generate_tool_index.CAT
 
 This is visibility only: it never rejects a change.  It finds added or modified ``.c`` files under ``src/`` and ``libs/``, classifies their current source for the project's inline-assembly spellings, and sums their ``.text`` bytes from t…
 
+### `tools/audit_callsite_arity.py`
+
+**audit_callsite_arity.py -- cross-check declared arity against real CALL SITES.**
+
+Ported from khdays-decomp's `tools/audit_callsite_arity.py` (https://github.com/Yokimitsuro/khdays-decomp, CC0-1.0 -- see docs/research/data/khdays-callsite-arity-report-2026-07-25.md for the full attribution note this project's q-khdays…
+
 ### `tools/batch_carve.py`
 
 **automate the DETERMINISTIC mechanical carve lanes (brief 456).**
@@ -554,6 +560,12 @@ for Pattern 3 / D-3 / cluster-C cross-region apply (brief 177).
 **per-region claim regenerator for**
 
 cluster B + D-3 cross-region application (brief 170).
+
+### `tools/declperm.py`
+
+**declperm.py -- permute a function's leading local-declaration order and**
+
+measure each permutation against the ground truth.
 
 ### `tools/emit_data_blob.py`
 
