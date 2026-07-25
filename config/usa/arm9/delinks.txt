@@ -2410,7 +2410,7 @@ src/usa/main/func_02021064.c:
 src/usa/main/func_020210c8.c:
     complete
     .text start:0x020210c8 end:0x02021104
-src/usa/main/func_02021104.s:
+src/usa/main/func_02021104.c:
     complete
     .text start:0x02021104 end:0x0202113c
 src/usa/main/func_0202113c.c:
@@ -2431,7 +2431,7 @@ src/usa/main/func_02021174.s:
 src/usa/main/func_02021278.s:
     complete
     .text start:0x02021278 end:0x020213d8
-src/usa/main/func_020213d8.s:
+src/usa/main/func_020213d8.c:
     complete
     .text start:0x020213d8 end:0x02021428
 src/usa/main/func_02021428.c:
