@@ -947,10 +947,10 @@ class TestTractableCeilingBytes(unittest.TestCase):
 
     def test_asymptotic_module_uses_asymptotic_headroom(self):
         # main: c_bytes=100, c_total=1000 -> remaining=900,
-        # ceiling = 100 + round(0.75 * 900) = 100 + 675 = 775.
+        # ceiling = 100 + round(0.10 * 900) = 100 + 90 = 190.
         ceiling = tractable_ceiling_bytes("main", 100, 1000)
         self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTIONS["main"] * 900))
-        self.assertEqual(ceiling, 775)
+        self.assertEqual(ceiling, 190)
 
     def test_ov002_module_uses_asymptotic_headroom(self):
         # ASYMPTOTIC_MODULES membership, not a name-prefix check --
@@ -960,7 +960,7 @@ class TestTractableCeilingBytes(unittest.TestCase):
         self.assertEqual(ceiling, 100 + round(ASYMPTOTIC_HEADROOM_FRACTIONS["ov002"] * 900))
 
     def test_asymptotic_rates_are_per_module(self):
-        self.assertEqual(ASYMPTOTIC_HEADROOM_FRACTIONS, {"main": 0.75, "ov002": 0.10})
+        self.assertEqual(ASYMPTOTIC_HEADROOM_FRACTIONS, {"main": 0.10, "ov002": 0.10})
 
     def test_finishable_module_uses_finishable_headroom(self):
         # ov004: c_bytes=100, c_total=1000 -> remaining=900,

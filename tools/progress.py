@@ -572,13 +572,27 @@ def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
 # remaining bytes will likely never convert. This section makes that
 # ceiling a first-class, per-module estimate instead of an unstated
 # assumption, so `attainment = C / ceiling` (not `C / total_bytes`) can be
-# the honest rate-of-progress number (r7-13's "north-star").
+# a rate-of-progress TREND indicator (r7-13's "north-star").
+#
+# NOT A COMPLETION CRITERION (q-readable-c-done-definition, 2026-07-25).
+# r11 found this whole model self-contradicting: it read 48.03% total
+# ceiling against r7-14's independently-derived "14-24% of headline bytes"
+# band -- 2-3.4x over. Root cause + fix: see the ASYMPTOTIC_HEADROOM_
+# FRACTIONS comment below for main's specific correction, and
+# FINISHABLE_HEADROOM_FRACTION's comment for the larger, still-open
+# residual. Both bands are ROUGH, TIME-VARYING ESTIMATES -- r7-14's own
+# band is framed as "~2-3x the CURRENT matched rate", so it drifts as real
+# progress ships and is not a fixed target either. Treat every number this
+# section prints as a trend indicator to watch move over time, never as a
+# finish line. The actual "done" definition lives in
+# docs/research/q-readable-c-done-definition-2026-07-25.md (pointer in
+# docs/state.md's Next-brain TODO).
 #
 # TIER 1 -- ASYMPTOTIC. The module set remains explicit, but its headroom is
-# now per-module rather than one flat fraction. R8's measured main campaign
-# rate is 75%; ov002 retains its documented conservative policy dial because
-# it is byte-complete and selectively converted rather than technically
-# exhausted.
+# now per-module rather than one flat fraction. ov002 retains its
+# documented conservative policy dial because it is byte-complete and
+# selectively converted rather than technically exhausted. See below for
+# main's fraction.
 #
 # {main, ov002}. This
 # is a direct, repeated, "confirmed" (not merely "plausible") finding of
@@ -618,18 +632,46 @@ def _discover_module_delinks(config_dir: Path) -> list[tuple[str, Path]]:
 # well into their remaining headroom.
 ASYMPTOTIC_MODULES = frozenset({"main", "ov002"})
 
-# Main's 75% is the measured empirical ship-rate adopted by the R8
-# synthesis: +33,832 C-bytes in the observed campaign window, consuming
-# roughly 49% of the old model-assigned main headroom in one month. The
-# figure is intentionally recorded here as a module-specific input, not
-# silently applied to every asymptotic module.
+# Main's fraction (CORRECTED 2026-07-25, q-readable-c-done-definition;
+# was 0.75, commit f8e1dad5, 2026-07-24). The 0.75 figure was a one-month
+# ship-rate extrapolation (+33,832 C-bytes / ~49% of the old headroom) over
+# a window the campaign's own briefs (661, 675) show was NOT representative
+# -- sweeps deliberately worked the easiest size tiers first, so a
+# short-window rate reads far higher than the true remaining difficulty.
+# Two committed, gated data points on main's ACTUAL unknown tranche:
+#   - brief 661: TRUE RANDOM sample, 35 files across every size tier,
+#     3 shipped = 8.57%. Unbiased sampling method, but diluted by 20/35
+#     files in the 257B+ range that were header-read (real code, no wall
+#     signature) but never compile-attempted, so this is a conservative
+#     floor, not a precise rate.
+#   - brief 675: deliberately the single EASIEST cell (main's <=128B
+#     tranche only), 30 candidates, 9 shipped = 30%. A best-case upper
+#     bound by construction (cherry-picked cell), not representative of
+#     the whole remaining pool -- this is exactly the kind of number that
+#     produced the original 0.75 overshoot, so it is cited but not used.
+# 0.10 is adopted: it sits almost exactly at brief 661's unbiased 8.57%
+# floor, rounded to match ov002's existing conservative-round-number
+# precedent below. Arithmetic: main c_bytes=83,256 / c_total=738,080 (EUR,
+# 2026-07-25 snapshot) -> ceiling = 83,256 + round(0.10 * 654,824) =
+# 148,738 (20.15% of main, was 77.82%). Region-wide TOTAL ceiling moves
+# 1,145,890 -> 720,254 bytes (48.03% -> 30.19% of the 2,385,948 B .text
+# total) -- a large step toward r7-14's 14-24% band, but NOT a full
+# reconciliation: even at main=0%, every OTHER module's existing
+# FINISHABLE_HEADROOM_FRACTION (unchanged by this fix, see its comment
+# below) already sums to 23.95% on its own, meaning any nonzero main
+# contribution structurally pushes the region-wide total above 24%. That
+# residual is a separate, larger, already-flagged, NOT-yet-fixed
+# divergence -- not silently absorbed into this number. See
+# docs/research/q-readable-c-done-definition-2026-07-25.md for the full
+# derivation and why this section stops short of forcing the total inside
+# the band.
 #
 # Ov002's 10% is retained as a conservative policy input, not mislabelled as
 # a measured technical wall: the module is byte-complete, but its 1.1 MB
 # readable-C conversion is selective. A future ov002 measurement can replace
 # this entry without changing the formula.
 ASYMPTOTIC_HEADROOM_FRACTIONS = {
-    "main": 0.75,
+    "main": 0.10,
     "ov002": 0.10,
 }
 
@@ -639,6 +681,24 @@ ASYMPTOTIC_HEADROOM_FRACTIONS = {
 # swi/msr/mrs-carrying .s, ~42 EUR / 26 USA / 26 JPN files project-wide
 # -- genuinely inexpressible in C) plus per-module walls this simpler
 # model doesn't individually census.
+#
+# FLAGGED, NOT FIXED (q-readable-c-done-definition, 2026-07-25): applied
+# flat across 24 modules with no per-module wall census, this is the
+# LARGER of the two contributors to the ceiling model's r11-reported
+# self-contradiction (48.03% vs r7-14's 14-24% band) -- bigger than
+# main's now-corrected fraction above. At current EUR bytes, every
+# non-asymptotic module's ceiling under this single fraction already sums
+# to 23.95% of the region-wide .text total on its own (main and ov002
+# excluded), i.e. it alone consumes nearly the whole 14-24% band before
+# main contributes anything. The comment this replaces already named the
+# proper fix: r7-15's curated "14 finishable modules (~92 kB .s)" subset,
+# built from a deeper per-module wall census whose raw data
+# (workflow journal wf_05209332-366) is not reproducible from committed
+# data alone. Redoing that census is out of scope for this item (r11
+# scoped it as separate future work); this fraction is left UNCHANGED
+# rather than hand-waved to a number with no evidence behind it. Treat
+# every ceiling/attainment figure this module prints accordingly -- see
+# the "NOT A COMPLETION CRITERION" note above.
 FINISHABLE_HEADROOM_FRACTION = 0.75
 
 
@@ -774,9 +834,14 @@ def print_by_module(version: str, rows: list[dict]) -> None:
           f"{pct(tot_ceiling, tot_ctotal):8.2f}%  {tot_attainment:>10}  {'':<11}")
     print()
     print(f"  tractable-C ceiling: {tot_ceiling} / {tot_ctotal} bytes "
-          f"({pct(tot_ceiling, tot_ctotal):.2f}% of .text-total) -- an ESTIMATE, "
-          "not a measurement (see tractable_ceiling_bytes() for the tier "
-          "assumptions); c.f. r7-14's independently-derived 14-24% band.")
+          f"({pct(tot_ceiling, tot_ctotal):.2f}% of .text-total) -- a ROUGH, "
+          "TIME-VARYING ESTIMATE, not a measurement and NOT a completion "
+          "criterion (see tractable_ceiling_bytes() for the tier "
+          "assumptions). r7-14's older 14-24% band is a separate estimate "
+          "from an earlier, lower matched-bytes baseline, not a target this "
+          "number should be forced to match. For an actual 'done' "
+          "definition see docs/research/q-readable-c-done-definition-"
+          "2026-07-25.md.")
 
 
 # --------------------------------------------------------------------------- #

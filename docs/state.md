@@ -190,6 +190,23 @@ sufficient.
 
 ## Next-brain TODO
 
+**0. (2026-07-25, q-readable-c-done-definition) Decide the "readable-C
+done" definition; ceiling model corrected, not a completion criterion
+anymore.** r11 found the tractable-C ceiling self-contradicting (48.03%
+vs r7-14's 14-24% band); fixed with shown arithmetic (main's headroom
+fraction 0.75 -> 0.10, region-wide ceiling 48.03% -> 30.19%) but
+explicitly NOT reconciled to the band — see
+[`docs/research/q-readable-c-done-definition-2026-07-25.md`](../docs/research/q-readable-c-done-definition-2026-07-25.md)
+for why forcing an exact match would be false precision, and for the
+larger still-flagged-not-fixed `FINISHABLE_HEADROOM_FRACTION` residual.
+That doc gives 3 candidate "readable-C done" definitions (pret-style
+public ladder / attainment=100%-of-ceiling / internal verdict-complete
+gate) with a recommendation (adopt the ladder + verdict-gate together,
+reject attainment as a completion criterion) — **the brain decides**
+which to formally adopt. If verdict-complete is chosen, note the
+freshness-cutoff nuance in that doc (key it per-lever-family off
+`codegen-walls.md`'s own correction history, not one global date).
+
 1. **Brief 234 (decomper)** — C-39 drain wave 6 + C-40 3-pick
    mechanical cleanup. Kicked off this round. (A) Continue
    C-39b-solo drain (122 picks remain after brief 232's 35).

@@ -10,7 +10,7 @@
 
 **CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
 
-**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split incoming, q-natural-c-metric); prefer natural C, use asm-void only where a documented wall justifies it.
+**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split shipped end-to-end, q-natural-c-metric [DONE]); prefer natural C, use asm-void only where a documented wall justifies it.
 
 **⚠️ ROUTE BEFORE YOU DRAFT (brief 667, 3/3 + generalised):** the recurring epilogue-shape wall is NOT a wall — it is the existing per-TU compiler routing tier. **Read the TARGET `.s`'s own epilogue first:** `sub sp,#4` + separate `pop {lr}` / `bx lr` → name the file `*.legacy.c`; fused `pop {..., pc}` → `*.legacy_sp3.c`; otherwise plain `.c`. Choosing the tier BEFORE writing the body removes an epilogue mismatch that accounted for ~14% of brief 661's sample. See `docs/research/style-a-epilogue.md` + lever-payoff #28/#29.
 
@@ -294,7 +294,18 @@ r11's external lens found khdays-decomp ships a CC0-licensed (public-domain-equi
 
 **Gate:** `python -m pytest -q tests` + both tools running on our tree + the arity-audit report against the current prototypes bank (counts + any contradictions found) + CC0 attribution recorded.
 
-### q-readable-c-done-definition — retire the self-contradicting ceiling model and define 'readable-C done' (r11 [S]) [TODO]
+### q-readable-c-done-definition — retire the self-contradicting ceiling model and define 'readable-C done' (r11 [S]) [DONE]
+
+> Shipped, ceiling fixed with shown arithmetic (main headroom 0.75->0.10,
+> 48.03%->30.19%, residual explicitly flagged not fully reconciled) +
+> 3 candidate done-definitions with a recommendation (adopt pret-style
+> ladder + verdict-complete gate, reject attainment-as-completion) in
+> `docs/research/q-readable-c-done-definition-2026-07-25.md` (pointer
+> added to state.md's Next-brain TODO) + README SVG bar now reports
+> natural-C only + 4 stale "metric split incoming" queue headers fixed
+> — PR #1345, not yet merged to main as of this branch. **QUEUE EMPTY
+> after this item — all 7 items shipped this session (#1337, #1338,
+> #1339, #1341, #1342, #1343, and this one).**
 
 r11 found the project's ceiling model CONTRADICTS ITSELF — it reports 48.03% while the r7-r14 analyses put the realistic band at 14-24% — so it is unfit to anchor any planning, and it currently does. Two deliverables: (1) Retire or re-derive the ceiling: find where 48.03% comes from (`tools/progress.py` ASYMPTOTIC_* constants and any doc quoting it), show the arithmetic, and either fix it or delete it — do NOT leave two contradictory numbers in the tree. (2) Propose a concrete 'readable-C done' definition, since the project currently has none and % alone is a poor target. r11's suggestion: a pret-style PUBLIC ladder (tiered milestones outside) plus a VERDICT-COMPLETE gate inside (every function has an explicit verdict: matched / genuinely-walled-with-evidence / not-yet-attempted — so 'done' means zero un-adjudicated functions, not an arbitrary %). Give 3 candidate definitions with pros/cons and RECOMMEND one; the brain decides. Also close the last asm-inflated surface: the README progress SVG bar still folds asm-C into readable-C even though the natural-C split landed end-to-end everywhere else.
 
