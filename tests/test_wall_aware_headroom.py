@@ -93,6 +93,51 @@ class ClassifyText(unittest.TestCase):
         self.assertEqual(c.codes, ["C-23", "C-34"])
 
 
+class ClassifyModule(unittest.TestCase):
+    """q-itcm-feeder-fix: the previous `_MODULE_RE` was a single regex
+    with a `[^/]+` (exactly one path segment) assumption baked in, which
+    silently rejected every `src/main/itcm/*.s` file -- an extra path
+    segment -- even though the linker/progress tooling already saw
+    those files fine. _classify_module replaces it with real path-part
+    classification."""
+
+    def test_main(self):
+        self.assertEqual(w._classify_module("src/main/func_X.s"), "main")
+
+    def test_overlay(self):
+        self.assertEqual(w._classify_module("src/overlay002/func_ov002_X.s"), "overlay002")
+
+    def test_itcm_real_path_shape(self):
+        # The exact real file this bug hid: q-itcm-reach's diagnosed
+        # root cause, itcm-reachability.md's own cited example.
+        self.assertEqual(w._classify_module("src/main/itcm/func_01ff8400.s"), "itcm")
+
+    def test_dtcm_is_not_classified(self):
+        # DTCM is confirmed data-only in every region (zero kind:function
+        # symbols.txt entries) -- it must never contribute a function
+        # candidate row, so it's deliberately absent from the classifier
+        # entirely (not just filtered out downstream).
+        self.assertIsNone(w._classify_module("src/main/dtcm/func_X.s"))
+
+    def test_region_port_paths_not_classified(self):
+        # src/usa|jpn/ are region ports of the EUR baseline -- this tool
+        # is EUR-only by design (its own module docstring).
+        self.assertIsNone(w._classify_module("src/usa/main/func_X.s"))
+        self.assertIsNone(w._classify_module("src/jpn/overlay002/func_ov002_X.s"))
+
+    def test_non_s_extension_not_classified(self):
+        self.assertIsNone(w._classify_module("src/main/itcm/func_01ff8400.legacy.c"))
+
+    def test_too_many_segments_not_classified(self):
+        # A hypothetical deeper nesting must not be silently misclassified
+        # into "main" or "itcm" -- only the two real shapes match.
+        self.assertIsNone(w._classify_module("src/main/itcm/nested/func_X.s"))
+        self.assertIsNone(w._classify_module("src/overlay002/nested/func_X.s"))
+
+    def test_source_module_matches_classify_module_for_itcm(self):
+        self.assertEqual(w._source_module("src/main/itcm/func_01ff8400.s"), "itcm")
+
+
 class ScanCandidateAccounting(unittest.TestCase):
     """candidate = coercible + unknown + no_marker (everything not permanent)."""
 
@@ -258,6 +303,117 @@ class ScanCandidateAccounting(unittest.TestCase):
         self.assertEqual(
             per["main"]["coercible_files"][0]["addr"], "0x02000020"
         )
+
+
+class ScanItcm(unittest.TestCase):
+    """q-itcm-feeder-fix's own two named regression tests: the real
+    src/main/itcm/func_01ff8400.s shape (layer 1, the module-path fix),
+    and a symbol-only gap with no source file at all (layer 2, the
+    size_census.py union) -- plus the doc's explicit "assert dtcm
+    contributes zero function rows" check."""
+
+    def _make_tree(self, tmp: str):
+        root = Path(tmp)
+        itcm_cfg = root / "config" / "eur" / "arm9" / "itcm"
+        itcm_cfg.mkdir(parents=True)
+        itcm_src = root / "src" / "main" / "itcm"
+        itcm_src.mkdir(parents=True)
+
+        # Real, on-disk .s file -- pins the exact real bug shape from
+        # itcm-reachability.md's own cited example.
+        (itcm_src / "func_01ff8400.s").write_text(
+            "; func_01ff8400 -- brief 219: ITCM word-fill loop.\n"
+            ".text\nfunc_01ff8400:\n bx lr\n",
+            encoding="utf-8",
+        )
+
+        # itcm's own symbols.txt: the claimed function (matches the .s
+        # file above) plus two genuinely UNMATCHED (no delinks claim,
+        # no .s file) symbol-only gaps.
+        (itcm_cfg / "symbols.txt").write_text(
+            "func_01ff8400 kind:function(arm,size=0x14) addr:0x01ff8400\n"
+            "func_01ff8500 kind:function(arm,size=0x40) addr:0x01ff8500\n"
+            "func_01ff8600 kind:function(arm,size=0x20) addr:0x01ff8600\n",
+            encoding="utf-8",
+        )
+        (itcm_cfg / "delinks.txt").write_text(
+            "src/main/itcm/func_01ff8400.s:\n"
+            "    complete\n"
+            "    .text start:0x01ff8400 end:0x01ff8414\n",
+            encoding="utf-8",
+        )
+
+        # DTCM: real symbols.txt present, but data-only (zero
+        # kind:function entries) -- must contribute nothing.
+        dtcm_cfg = root / "config" / "eur" / "arm9" / "dtcm"
+        dtcm_cfg.mkdir(parents=True)
+        (dtcm_cfg / "symbols.txt").write_text(
+            "data_02ff0000 kind:data(any) addr:0x02ff0000\n", encoding="utf-8"
+        )
+        (dtcm_cfg / "delinks.txt").write_text("", encoding="utf-8")
+
+        return root
+
+    def test_real_itcm_file_becomes_a_candidate(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_tree(tmp)
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan()
+
+        self.assertIn("itcm", per)
+        paths = {f["path"] for f in per["itcm"]["no_marker_files"]}
+        self.assertIn("src/main/itcm/func_01ff8400.s", paths)
+
+    def test_symbol_only_gap_becomes_a_scaffold_target_candidate(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_tree(tmp)
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan()
+
+        paths = {f["path"] for f in per["itcm"]["no_marker_files"]}
+        # Neither gap function has a real .s file on disk -- both must
+        # still surface, at the canonical (not-yet-existing) path.
+        self.assertIn("src/main/itcm/func_01ff8500.s", paths)
+        self.assertIn("src/main/itcm/func_01ff8600.s", paths)
+        self.assertFalse((root / "src/main/itcm/func_01ff8500.s").exists())
+
+        gap = next(f for f in per["itcm"]["no_marker_files"]
+                   if f["path"] == "src/main/itcm/func_01ff8500.s")
+        self.assertEqual(gap["addr"], "0x01ff8500")
+        self.assertEqual(gap["text_size"], 0x40)
+
+    def test_itcm_total_is_file_plus_gap_count_no_double_counting(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_tree(tmp)
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan()
+
+        # 1 real file (func_01ff8400) + 2 symbol-only gaps = 3, not 4 --
+        # func_01ff8400 must not ALSO appear via the size_census union
+        # (it has a real delinks claim, so size_census.unmatched()
+        # already excludes it independently of the on-disk check).
+        self.assertEqual(per["itcm"]["total"], 3)
+        self.assertEqual(per["itcm"]["candidate"], 3)
+
+    def test_dtcm_contributes_zero_function_rows(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_tree(tmp)
+            with mock.patch.object(w, "ROOT", root):
+                per = w.scan()
+
+        self.assertNotIn("dtcm", per)
 
 
 if __name__ == "__main__":

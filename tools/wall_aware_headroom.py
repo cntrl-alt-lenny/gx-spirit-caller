@@ -69,11 +69,46 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import size_census
 from parsers import parse_delinks_file, parse_symbols_file
 
 ROOT = Path(__file__).resolve().parent.parent
-# EUR baseline module dirs only (region ports live under src/usa, src/jpn).
-_MODULE_RE = re.compile(r"^src/(main|overlay\d+)/[^/]+\.s$")
+
+_OVERLAY_DIR_RE = re.compile(r"^overlay\d+$")
+
+
+def _classify_module(rel: str) -> str | None:
+    """Path-part module classifier for an EUR-baseline `.s` source path.
+
+    Returns the per-module dict key this tool uses ("main", "overlayNNN",
+    or "itcm"), or None if `rel` isn't a recognized EUR-baseline assembly
+    source at all (region ports under src/usa|jpn/, or anything else).
+
+    Deliberately NOT a single `[^/]+`-shaped regex (the previous
+    `_MODULE_RE`) -- that single-path-segment assumption silently
+    excluded every `src/main/itcm/*.s` file (an extra `itcm/` segment)
+    from every candidate scan, even though the linker/progress tooling
+    could already see those files fine (q-itcm-feeder-fix, root cause
+    diagnosed in docs/research/campaign-analytics/itcm-reachability.md).
+    DTCM is deliberately NOT classified here -- confirmed data-only in
+    every region (no `kind:function` symbols.txt entries at all), so it
+    should never contribute a function-level C-match candidate.
+    """
+    if not rel.endswith(".s"):
+        return None
+    parts = rel.split("/")
+    if len(parts) < 3 or parts[0] != "src":
+        return None
+    top = parts[1]
+    if top == "main":
+        if len(parts) == 3:
+            return "main"
+        if len(parts) == 4 and parts[2] == "itcm":
+            return "itcm"
+        return None
+    if len(parts) == 3 and _OVERLAY_DIR_RE.match(top):
+        return top
+    return None
 
 # Taxonomy citations: e.g. "C-34", "P-11", "C-39a" (lettered sub-variants).
 _P_CITE_RE = re.compile(r"\bP-\d+[a-z]?\b")
@@ -149,10 +184,12 @@ def _live_sources() -> set[str]:
 
 def _source_module(rel: str) -> str:
     """Map an EUR source path to dsd's symbol-module name."""
-    m = _MODULE_RE.match(rel)
-    if not m:
+    mod = _classify_module(rel)
+    if mod is None:
         return ""
-    return "main" if m.group(1) == "main" else f"ov{m.group(1)[7:]}"
+    if mod in ("main", "itcm"):
+        return mod
+    return f"ov{mod[7:]}"
 
 
 def _delink_text_sizes() -> dict[str, int]:
@@ -257,6 +294,41 @@ def _new_module_entry() -> dict:
     }
 
 
+def _itcm_symbol_only_gap_metadata() -> list[dict]:
+    """Symbol-only ITCM candidates: functions size_census.py counts as
+    UNMATCHED (no delinks.txt TU claim at all -- dsd delinks them into
+    an anonymous gap object) that ALSO have no on-disk `.s` file, so the
+    file-level scan above structurally cannot find them (it can only
+    iterate files that already exist). Emits the canonical address-based
+    path a future carve would write to -- it doesn't exist yet, this
+    just names where it WOULD go -- per this item's own "emit the
+    normal address-based scaffold target rather than pretending a
+    source file exists" instruction (q-itcm-feeder-fix).
+
+    EUR baseline only, matching this whole tool's existing scope. Any
+    unmatched function that DOES already have an on-disk `.s` file is
+    explicitly skipped here -- the file-level scan already covers it,
+    and double-counting would inflate the candidate total.
+    """
+    itcm_dir = ROOT / "config" / "eur" / "arm9" / "itcm"
+    symbols_path = itcm_dir / "symbols.txt"
+    if not symbols_path.is_file():
+        return []
+    delinks_path = itcm_dir / "delinks.txt"
+    funcs = size_census.parse_functions(symbols_path.read_text(encoding="utf-8"))
+    intervals = (
+        size_census.parse_claimed_text(delinks_path.read_text(encoding="utf-8"))
+        if delinks_path.is_file() else []
+    )
+    out = []
+    for name, addr, size in size_census.unmatched(funcs, intervals):
+        scaffold_path = f"src/main/itcm/{name}.s"
+        if (ROOT / scaffold_path).is_file():
+            continue
+        out.append({"path": scaffold_path, "addr": f"0x{addr:08x}", "text_size": size})
+    return out
+
+
 def scan(
     min_size: int | None = None,
     max_size: int | None = None,
@@ -269,46 +341,58 @@ def scan(
     text_sizes = _delink_text_sizes()
     addresses = _symbol_addresses()
     attempted = _attempted_keys() if exclude_attempted else set()
-    for p in (ROOT / "src").rglob("*.s"):
-        rel = p.relative_to(ROOT).as_posix()
-        m = _MODULE_RE.match(rel)
-        if not m:
-            continue
-        if rel not in live:  # orphaned dead file, not a build input — skip
-            continue
-        metadata = _file_metadata(rel, text_sizes, addresses)
-        mod = m.group(1)
+
+    def _consider(mod: str, source_module: str, metadata: dict, classification: Classification) -> None:
         d = per.setdefault(mod, _new_module_entry())
-        source_module = _source_module(rel)
         if exclude_attempted and (
             (mod, metadata["addr"]) in attempted
             or (source_module, metadata["addr"]) in attempted
         ):
             d["excluded_attempted"] += 1
-            continue
+            return
         addr = metadata["addr"]
         addr_int = int(addr, 0) if addr is not None else None
         if min_addr is not None and (addr_int is None or addr_int < min_addr):
-            continue
+            return
         if max_addr is not None and (addr_int is None or addr_int > max_addr):
-            continue
+            return
         text_size = metadata["text_size"]
         if min_size is not None and (text_size is None or text_size < min_size):
-            continue
+            return
         if max_size is not None and (text_size is None or text_size > max_size):
-            continue
+            return
         d["total"] += 1
-        c = classify_path(p)
-        d[c.kind] += 1
-        if c.kind == "coercible":
+        d[classification.kind] += 1
+        if classification.kind == "coercible":
             d["candidate"] += 1
-            d["coercible_files"].append({**metadata, "codes": c.codes})
-        elif c.kind == "unknown":
+            d["coercible_files"].append({**metadata, "codes": classification.codes})
+        elif classification.kind == "unknown":
             d["candidate"] += 1
             d["unknown_files"].append(metadata)
-        elif c.kind == "no_marker":
+        elif classification.kind == "no_marker":
             d["candidate"] += 1
             d["no_marker_files"].append(metadata)
+
+    for p in (ROOT / "src").rglob("*.s"):
+        rel = p.relative_to(ROOT).as_posix()
+        mod = _classify_module(rel)
+        if mod is None:
+            continue
+        if rel not in live:  # orphaned dead file, not a build input — skip
+            continue
+        metadata = _file_metadata(rel, text_sizes, addresses)
+        source_module = _source_module(rel)
+        _consider(mod, source_module, metadata, classify_path(p))
+
+    # Layer 2 (q-itcm-feeder-fix): union in ITCM's symbol-only gaps --
+    # real unmatched functions with no source file at all, invisible to
+    # the file-level scan above by construction. No wall marker can
+    # exist for a file that was never written, so these are always
+    # "no_marker" (== presumed convertible, same as an un-annotated
+    # real .s file gets today).
+    for metadata in _itcm_symbol_only_gap_metadata():
+        _consider("itcm", "itcm", metadata, Classification("no_marker"))
+
     return per
 
 
