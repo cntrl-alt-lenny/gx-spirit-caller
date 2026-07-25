@@ -10,7 +10,7 @@ src/usa/overlay001/func_ov001_021c9e44.s:
 src/usa/overlay001/func_ov001_021c9f94.c:
     complete
     .text start:0x021c9f94 end:0x021ca064
-src/usa/overlay001/func_ov001_021ca064.s:
+src/usa/overlay001/func_ov001_021ca064.c:
     complete
     .text start:0x021ca064 end:0x021ca1f8
 

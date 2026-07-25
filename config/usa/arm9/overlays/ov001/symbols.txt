@@ -13,3 +13,4 @@ data_ov001_021ca2ec kind:data(any) addr:0x021ca2ec
 data_ov001_021ca308 kind:data(any) addr:0x021ca308
 data_ov001_021ca324 kind:data(any) addr:0x021ca324
 data_ov001_021ca340 kind:bss addr:0x021ca340
+data_ov001_021ca340_alias kind:bss addr:0x021ca340
