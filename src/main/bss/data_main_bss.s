@@ -514,6 +514,9 @@ data_0219a924_alias:
         .space 0x8
         .global data_0219a92c
 data_0219a92c:
+        .space 0x0
+        .global data_0219a92c_alias
+data_0219a92c_alias:
         .space 0x8
         .global data_0219a934
 data_0219a934:
