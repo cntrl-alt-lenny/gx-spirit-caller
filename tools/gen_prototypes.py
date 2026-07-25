@@ -18,11 +18,17 @@ pointing straight back to the file it was read from. A function with no
 matched body, or whose definition this parser can't confidently parse,
 is silently skipped — never guessed.
 
-Pointer- and struct-typed parameters/returns are normalized to `void *`
-(ABI-identical on ARM32, and avoids needing to resolve every struct's
-full definition across files); scalar types are kept verbatim. Arity
-and return class (void / scalar / pointer) always match the body exactly
-by construction, since they're read directly from it.
+Pointer-typed parameters/returns (including pointer-to-struct) are
+normalized to `void *` (ABI-identical on ARM32 regardless of pointee,
+and avoids needing to resolve every struct's full definition across
+files); scalar types are kept verbatim. A BY-VALUE struct/union param
+or return can't be normalized the same way -- its ABI depends on the
+aggregate's actual size, not just "is it a pointer" -- so a function
+using one is excluded entirely, same as an `asm`-bodied definition
+(whose written parameter list isn't trustworthy arity evidence at all;
+see parse_function_definitions). Arity and return class (void / scalar
+/ pointer) always match the body exactly by construction for every
+prototype that IS emitted, since they're read directly from it.
 
 Usage:
     python tools/gen_prototypes.py --write
@@ -86,20 +92,89 @@ def _find_matching_paren(text: str, open_pos: int) -> int | None:
 # Candidate signature start: column 0 (never indented — every top-level
 # function definition in this codebase starts at column 0; nested control
 # structures never do, so this alone rules them out without a keyword
-# denylist doing the real work).
-_CANDIDATE_RE = re.compile(r"(?m)^(?:asm\s+)?([^\n(){};]+?)\s*\(")
+# denylist doing the real work). The `asm` qualifier is captured in its
+# own group (not discarded) — see the is_asm check below.
+_CANDIDATE_RE = re.compile(r"(?m)^(?P<asm>asm\s+)?(?P<prefix>[^\n(){};]+?)\s*\(")
+
+_AGGREGATE_TOKENS = {"struct", "union"}
 
 
-def parse_function_definitions(source_text: str) -> list[dict]:
+def _is_byvalue_aggregate(type_clause: str) -> bool:
+    """True if `type_clause` (already confirmed non-pointer) names a
+    struct/union passed or returned BY VALUE.
+
+    Unlike a pointer (always 4 bytes on ARM32, safely normalizable to
+    `void *` regardless of what it points to), a by-value struct/union's
+    ABI depends on its actual SIZE — how many registers/stack bytes the
+    calling convention uses. There is no type-erased spelling that stays
+    ABI-correct, the way `void *` does for pointers, so a function using
+    one can't be banked without either duplicating that struct's real
+    (often TU-local) definition into the shared header, or silently
+    getting the calling convention wrong. Exclude rather than guess.
+    """
+    toks = type_clause.split()
+    return bool(toks) and toks[0] in _AGGREGATE_TOKENS
+
+
+# Two shapes of file-local `typedef`: a function-pointer alias (name
+# inside `(*NAME)`) and a plain alias (name is the last identifier
+# before `;`). The `[^;{]*?` middle deliberately excludes `{`, so a
+# `typedef struct {...} Name;` (a real, evidenced anonymous-struct-with-
+# tag pattern used elsewhere in this codebase) does NOT match either --
+# a false negative there is safe (worst case: not detected as local,
+# same as before this check existed), whereas a false positive would
+# wrongly exclude a legitimate global type.
+_TYPEDEF_FUNCPTR_NAME_RE = re.compile(r"typedef\b[^;{]*?\(\s*\*\s*([A-Za-z_]\w*)\s*\)\s*\([^;]*\)\s*;")
+_TYPEDEF_SIMPLE_NAME_RE = re.compile(r"typedef\b[^;{]*?\b([A-Za-z_]\w*)\s*;")
+
+
+def _file_local_typedef_names(text: str) -> set[str]:
+    """Names this FILE's own `typedef`s introduce -- invisible outside
+    the TU that declares them, so a param/return type using one can't
+    be banked into a shared header (see func_02032074's real bug: its
+    matched body spells a callback param `alloc_02032074_t`, a typedef
+    for `void *(*)(int, int)` declared 3 lines above the function --
+    the plain `if "(" in params_raw` function-pointer-parameter check
+    doesn't catch this shape, since by the time it's used as a
+    parameter type the `(` is hidden behind the typedef name).
+    """
+    names = {m.group(1) for m in _TYPEDEF_FUNCPTR_NAME_RE.finditer(text)}
+    names |= {m.group(1) for m in _TYPEDEF_SIMPLE_NAME_RE.finditer(text)}
+    return names
+
+
+def parse_function_definitions(source_text: str, skipped: dict[str, list[str]] | None = None) -> list[dict]:
     """Return [{name, return_type, params: [type,...], is_void_return,
     is_pointer_return}] for every top-level function DEFINITION (not
     declaration) found. Best-effort: anything ambiguous is skipped, never
     guessed — false negatives are safe here, false positives are not.
+
+    Three classes are skipped unconditionally, regardless of how cleanly
+    they'd otherwise parse: `asm`-qualified definitions (their body is
+    raw instructions with no C-visible parameter list, so a `(void)` or
+    `(int)` written there is not trustworthy evidence of the REAL arity
+    — the callee's register usage can reference arguments the written
+    signature never mentions; q-prototypes-golive-fix found these banked
+    with a wrong arity); any function whose return type or ANY parameter
+    is a by-value struct/union (see _is_byvalue_aggregate); and any
+    function whose return type or a non-pointer parameter names a
+    `typedef` this SAME FILE introduces (see _file_local_typedef_names)
+    — invisible outside the TU, so unbankable the same way a by-value
+    TU-local struct is, most commonly a function-pointer alias hiding
+    the exact "too complex, skip safely" shape the raw-`(` check below
+    already handles for an UN-aliased function-pointer parameter.
+
+    `skipped`, if given, gets `"asm"`, `"byvalue_struct"`, and
+    `"local_typedef"` keys appended with the excluded function names,
+    for a caller that wants to report exactly what was excluded and why
+    (not just a count).
     """
     text = _strip_comments(source_text)
+    local_typedefs = _file_local_typedef_names(text)
     out = []
     for m in _CANDIDATE_RE.finditer(text):
-        prefix = m.group(1).strip()
+        is_asm = m.group("asm") is not None
+        prefix = m.group("prefix").strip()
         open_paren = m.end() - 1
         close_paren = _find_matching_paren(text, open_paren)
         if close_paren is None:
@@ -117,6 +192,12 @@ def parse_function_definitions(source_text: str) -> list[dict]:
         name = name_match.group(1)
         if name in _CONTROL_KEYWORDS:
             continue
+
+        if is_asm:
+            if skipped is not None:
+                skipped.setdefault("asm", []).append(name)
+            continue
+
         return_clause = prefix[:name_match.start()].strip()
         if not return_clause:
             continue  # no type at all before the name — not a real definition
@@ -126,6 +207,15 @@ def parse_function_definitions(source_text: str) -> list[dict]:
             continue  # something we don't recognize (macro, attribute, ...) — skip
         is_pointer_return = "*" in return_tokens
         is_void_return = (not is_pointer_return) and return_tokens == ["void"]
+        if not is_pointer_return:
+            if _is_byvalue_aggregate(return_clause):
+                if skipped is not None:
+                    skipped.setdefault("byvalue_struct", []).append(name)
+                continue
+            if local_typedefs.intersection(return_tokens):
+                if skipped is not None:
+                    skipped.setdefault("local_typedef", []).append(name)
+                continue
 
         params_raw = text[open_paren + 1:close_paren].strip()
         if "(" in params_raw:
@@ -133,6 +223,7 @@ def parse_function_definitions(source_text: str) -> list[dict]:
         param_types: list[str] = []
         if params_raw and params_raw != "void":
             ok = True
+            unbankable_reason: str | None = None
             for part in params_raw.split(","):
                 part = part.strip()
                 if not part:
@@ -158,7 +249,17 @@ def parse_function_definitions(source_text: str) -> list[dict]:
                 if not all(_TYPE_TOKEN_RE.match(t) for t in ptoks):
                     ok = False
                     break
+                if _is_byvalue_aggregate(ptype):
+                    unbankable_reason = "byvalue_struct"
+                    break
+                if local_typedefs.intersection(ptoks):
+                    unbankable_reason = "local_typedef"
+                    break
                 param_types.append(ptype)
+            if unbankable_reason is not None:
+                if skipped is not None:
+                    skipped.setdefault(unbankable_reason, []).append(name)
+                continue
             if not ok:
                 continue
 
@@ -177,6 +278,7 @@ def collect_evidence_backed_signatures() -> dict[str, dict]:
     """
     signatures: dict[str, dict] = {}
     skipped_ambiguous = 0
+    skipped: dict[str, list[str]] = {}
     for delinks in sorted(CONFIG_DIR.rglob("delinks.txt")):
         _, tus = parse_delinks_file(delinks)
         for tu in tus:
@@ -192,7 +294,7 @@ def collect_evidence_backed_signatures() -> dict[str, dict]:
                 text = path.read_text(encoding="utf-8")
             except OSError:
                 continue
-            funcs = parse_function_definitions(text)
+            funcs = parse_function_definitions(text, skipped=skipped)
             for fn in funcs:
                 name = fn["name"]
                 if name in signatures and signatures[name]["source"] != src:
@@ -209,6 +311,15 @@ def collect_evidence_backed_signatures() -> dict[str, dict]:
     if skipped_ambiguous:
         print(f"note: skipped {skipped_ambiguous} function name(s) with "
               f"conflicting signatures across TUs", file=sys.stderr)
+    _skip_labels = {
+        "asm": "asm-bodied (untrustworthy arity)",
+        "byvalue_struct": "by-value struct/union param or return",
+        "local_typedef": "param/return names a file-local typedef",
+    }
+    for reason, names in sorted(skipped.items()):
+        label = _skip_labels.get(reason, reason)
+        print(f"note: excluded {len(names)} function(s) [{label}]: "
+              f"{', '.join(sorted(names))}", file=sys.stderr)
     return signatures
 
 
@@ -235,6 +346,17 @@ def render_header(signatures: dict[str, dict]) -> str:
         " *",
         " * Do not hand-edit: rerun the generator instead, so provenance",
         " * stays accurate. Byte-neutral -- nothing #includes this yet.",
+        " *",
+        " * STRUCTURAL CONSTRAINT (verified, not yet hit because nothing",
+        " * includes this header today): every pointer/struct-pointer",
+        " * parameter and return here is normalized to `void *`, which is",
+        " * ABI-safe for a CALLER but WRONG for the function's own",
+        " * DEFINITION -- a TU that defines one of these functions with",
+        " * its real (non-void*) parameter/return types would see this",
+        " * header's `extern void *`-typed declaration first and get a",
+        " * conflicting-types redefinition error. This header is safe to",
+        " * include from caller-only TUs; NEVER from a TU that also",
+        " * defines one of the functions declared below.",
         " */",
         "#ifndef GAME_PROTOTYPES_H_",
         "#define GAME_PROTOTYPES_H_",

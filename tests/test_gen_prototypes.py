@@ -67,7 +67,16 @@ class TestParseFunctionDefinitions(unittest.TestCase):
         )
         self.assertEqual(_names(funcs), {"func_ov005_021b0b28", "func_ov005_021b0b2c"})
 
-    def test_asm_qualifier_stripped_from_return_type(self):
+    def test_asm_qualified_function_is_excluded_not_kept(self):
+        # q-prototypes-golive-fix: an earlier version of this parser just
+        # stripped the `asm` qualifier and kept the function -- but an
+        # asm body's written parameter list (almost always a placeholder
+        # `(void)` in this codebase's own convention, confirmed against
+        # 96 real matched functions including well-known multi-arg SDK
+        # calls like Fill32/CpuSet) is not trustworthy arity evidence at
+        # all, since the real args just land in registers the raw
+        # instructions reference directly, invisible to this parser.
+        # Excluded entirely now, regardless of what its param list says.
         funcs = parse_function_definitions(
             "asm void func_0208b0fc(void) {\n"
             "    nofralloc\n"
@@ -75,9 +84,122 @@ class TestParseFunctionDefinitions(unittest.TestCase):
             "    bx lr\n"
             "}\n"
         )
-        f = _by_name(funcs, "func_0208b0fc")
-        self.assertTrue(f["is_void_return"])
-        self.assertEqual(f["params"], [])
+        self.assertEqual(_names(funcs), set())
+
+    def test_asm_qualified_function_with_written_args_is_still_excluded(self):
+        # Even when the asm body's signature LOOKS like real evidence
+        # (non-void params), it's still untrustworthy -- exclude
+        # unconditionally, don't try to judge case by case.
+        funcs = parse_function_definitions(
+            "asm void Fill32(u32 fillData, void *dest, u32 size) {\n"
+            "    nofralloc\n"
+            "    bx lr\n"
+            "}\n"
+        )
+        self.assertEqual(_names(funcs), set())
+
+    def test_asm_exclusion_reported_in_skipped_dict(self):
+        skipped: dict = {}
+        parse_function_definitions(
+            "asm void func_0208b0fc(void) {\n    bx lr\n}\n",
+            skipped=skipped,
+        )
+        self.assertEqual(skipped.get("asm"), ["func_0208b0fc"])
+
+    def test_byvalue_struct_param_is_excluded(self):
+        # A by-value struct/union's ABI depends on its SIZE, unlike a
+        # pointer (always 4 bytes) -- no void*-style normalization is
+        # ABI-safe, so the whole function must be excluded, not just
+        # that one parameter. Pins the real func_ov000_021aaa20 bug
+        # shape (struct Ov000V3, defined only inside that one TU).
+        skipped: dict = {}
+        funcs = parse_function_definitions(
+            "struct Ov000V3 { int x, y, z; };\n"
+            "void func_ov000_021aaa20(struct Ov000V3 a, struct Ov000V3 b) {\n"
+            "    (void)a; (void)b;\n"
+            "}\n",
+            skipped=skipped,
+        )
+        self.assertEqual(_names(funcs), set())
+        self.assertEqual(skipped.get("byvalue_struct"), ["func_ov000_021aaa20"])
+
+    def test_byvalue_struct_return_is_excluded(self):
+        funcs = parse_function_definitions(
+            "struct Point { int x, y; };\n"
+            "struct Point func_X(void) {\n"
+            "    struct Point p; return p;\n"
+            "}\n"
+        )
+        self.assertEqual(_names(funcs), set())
+
+    def test_pointer_to_local_struct_is_not_excluded(self):
+        # A POINTER to a by-value-unsafe struct type is still ABI-safe
+        # to normalize to void* -- only genuine by-value passing is the
+        # problem. Must not over-exclude.
+        funcs = parse_function_definitions(
+            "struct Ov000V3 { int x, y, z; };\n"
+            "void func_X(struct Ov000V3 *p) {\n"
+            "    (void)p;\n"
+            "}\n"
+        )
+        f = _by_name(funcs, "func_X")
+        self.assertEqual(f["params"], ["void *"])
+
+    def test_local_typedef_funcptr_param_is_excluded(self):
+        # Pins the real func_02032074 bug: a callback parameter typed via
+        # a file-local function-pointer typedef has no literal "(" at
+        # the parameter use site (it's hidden behind the typedef name),
+        # so the existing "function-pointer parameter, too complex"
+        # check (which looks for a literal "(" in the raw param text)
+        # doesn't catch it -- confirmed via a real mwccarm pilot compile
+        # of the generated header, which failed on exactly this shape
+        # before this fix.
+        skipped: dict = {}
+        funcs = parse_function_definitions(
+            "typedef void *(*alloc_02032074_t)(int size, int align);\n"
+            "void func_02032074(void *p, alloc_02032074_t alloc, void *q) {\n"
+            "    (void)p; (void)alloc; (void)q;\n"
+            "}\n",
+            skipped=skipped,
+        )
+        self.assertEqual(_names(funcs), set())
+        self.assertEqual(skipped.get("local_typedef"), ["func_02032074"])
+
+    def test_local_typedef_return_is_excluded(self):
+        funcs = parse_function_definitions(
+            "typedef int local_status_t;\n"
+            "local_status_t func_X(void) {\n"
+            "    return 0;\n"
+            "}\n"
+        )
+        self.assertEqual(_names(funcs), set())
+
+    def test_local_typedef_used_as_pointer_is_not_excluded(self):
+        # Same non-over-exclusion principle as the struct-pointer case:
+        # a POINTER to a locally-typedef'd type is still void*-safe.
+        funcs = parse_function_definitions(
+            "typedef struct { int x; } LocalT;\n"
+            "void func_X(LocalT *p) {\n"
+            "    (void)p;\n"
+            "}\n"
+        )
+        f = _by_name(funcs, "func_X")
+        self.assertEqual(f["params"], ["void *"])
+
+    def test_local_typedef_exclusion_is_per_function_not_whole_file(self):
+        # A file-local typedef existing SOMEWHERE in the TU must only
+        # exclude the specific function(s) that actually use it as a
+        # non-pointer type -- an unrelated function in the same file
+        # must still be banked normally.
+        skipped: dict = {}
+        funcs = parse_function_definitions(
+            "typedef void *(*cb_t)(int);\n"
+            "void func_uses_it(cb_t callback) { (void)callback; }\n"
+            "int func_unrelated(int x) { return x + 1; }\n",
+            skipped=skipped,
+        )
+        self.assertEqual(_names(funcs), {"func_unrelated"})
+        self.assertEqual(skipped.get("local_typedef"), ["func_uses_it"])
 
     def test_pointer_param_normalized_to_void_star(self):
         funcs = parse_function_definitions(
