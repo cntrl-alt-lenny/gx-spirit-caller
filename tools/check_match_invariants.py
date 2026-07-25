@@ -55,6 +55,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_symbols import ROOT, ModuleData, load_all  # noqa: E402
 from parsers import parse_delinks_file  # noqa: E402
+from progress import _strip_c_comments_and_literals  # noqa: E402
 
 
 PLACEHOLDER_PREFIXES = ("func_", "data_", "_dsd_gap")
@@ -455,7 +456,8 @@ def _all_header_decl_names(libs_root: Path) -> set[str]:
                 text = path.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
-            for m in _HEADER_DECL_RE.finditer(text):
+            clean = _strip_c_comments_and_literals(text)
+            for m in _HEADER_DECL_RE.finditer(clean):
                 names.add(m.group("name"))
     return names
 
@@ -496,8 +498,18 @@ def check_cross_file_name_drift(
                 text = path.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
+            # Scan comment-and-literal-blanked text so prose mentioning
+            # "extern" (e.g. a doc comment describing a C-27 alias
+            # recipe) can't be lazily bridged by _EXTERN_FN_RE's
+            # DOTALL `[^;{]*?` into a fake declaration ending at some
+            # unrelated later `word(...);` in the same comment block.
+            # Blanking (not deleting) keeps every match position --
+            # and thus _line_number(text, ...) below, which still
+            # indexes the ORIGINAL text -- identical to the unblanked
+            # source.
+            clean = _strip_c_comments_and_literals(text)
             already_flagged: set[str] = set()
-            for m in _EXTERN_FN_RE.finditer(text):
+            for m in _EXTERN_FN_RE.finditer(clean):
                 name = m.group("name")
                 if name in resolvable or name in already_flagged:
                     continue

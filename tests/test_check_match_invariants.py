@@ -399,6 +399,9 @@ class TestCrossFileNameDrift(unittest.TestCase):
       - Deliberately-ignored operand names (eq, lr, sp, …) → skipped
       - Function definitions (extern int foo(x) { ... }) without the
         terminating ; → NOT matched by the extern regex
+      - A `/* ... */` doc comment whose prose contains the word
+        "extern" (plus a parenthetical aside and a later `;`) → NOT
+        matched; comments/literals are blanked before scanning
     """
 
     def _setup(
@@ -725,6 +728,43 @@ class TestCrossFileNameDrift(unittest.TestCase):
                 [i for i in issues if i.severity == "error"], [],
                 "multi-region union should resolve USA symbol against "
                 "config/usa/ even when --version eur is passed",
+            )
+
+    def test_comment_prose_mentioning_extern_not_flagged(self):
+        # Regression (cm-ov004-021cd3b4-finish follow-up, q-invariants-
+        # green): a doc comment describing a C-27 alias recipe used the
+        # word "extern" in prose, followed eventually by a parenthesized
+        # aside and a period. _EXTERN_FN_RE's DOTALL `[^;{]*?` bridged
+        # from "extern" all the way to an unrelated later `word(...);`
+        # inside the SAME comment block, capturing a single stray letter
+        # as a fake "extern" name and firing a false cross_file_name_drift
+        # error on a file with no real drift at all.
+        with tempfile.TemporaryDirectory() as td:
+            config_dir, src_dir, libs_dir = self._setup(
+                Path(td),
+                symbols={"main": ["func_real"]},
+                src_files={
+                    "main/foo.c": (
+                        "/* foo: uses the existing C-27 alias recipe --\n"
+                        " * a second extern name at the identical address\n"
+                        " * (data_alias, added to symbols.txt/BSS here,\n"
+                        " * mirroring the pre-existing pattern used for\n"
+                        " * this exact shape elsewhere) that neither the\n"
+                        " * compiler nor the assembler can prove aliases\n"
+                        " * the first. b1's dispatch (see docs) sets c;\n"
+                        " */\n"
+                        "extern void func_real(void);\n"
+                        "void foo(void) { func_real(); }\n"
+                    ),
+                },
+            )
+            issues = check_cross_file_name_drift(
+                src_dir, libs_dir, config_dir,
+            )
+            self.assertEqual(
+                issues, [],
+                "prose in a comment must not be parsed as an extern "
+                "declaration",
             )
 
     def test_multi_region_genuinely_missing_still_flags(self):
