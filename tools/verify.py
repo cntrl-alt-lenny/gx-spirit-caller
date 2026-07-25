@@ -35,14 +35,22 @@ import re
 import subprocess
 import sys
 
+from get_platform import exe_launch_prefix, get_platform
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # mwcc tiers — keep in sync with build.ninja rules mwcc / mwcc_legacy /
 # mwcc_legacy_sp3 (they share every flag but the compiler binary).
+# ABSOLUTE paths (brief note, Windows compat): native Windows `CreateProcess`
+# resolves a relative argv[0] against the launching process's own cwd, not
+# the `cwd=` passed to subprocess.run for the CHILD — a relative path here
+# raises `FileNotFoundError: [WinError 2]` even though the file exists under
+# ROOT. Same class of fix as `asm_escape.py`'s `_binutil`/`_MWCC` absolute
+# paths.
 _COMPILERS = {
-    "2.0": "tools/mwccarm/2.0/sp1p5/mwccarm.exe",
-    "legacy": "tools/mwccarm/1.2/sp2p3/mwccarm.exe",
-    "sp3": "tools/mwccarm/1.2/sp3/mwccarm.exe",
+    "2.0": os.path.join(ROOT, "tools/mwccarm/2.0/sp1p5/mwccarm.exe"),
+    "legacy": os.path.join(ROOT, "tools/mwccarm/1.2/sp2p3/mwccarm.exe"),
+    "sp3": os.path.join(ROOT, "tools/mwccarm/1.2/sp3/mwccarm.exe"),
 }
 _CFLAGS = (
     "-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
@@ -123,9 +131,23 @@ def compare_words(
 # ---- CLI (shells out to wine/objdump; not exercised in CI) ----
 
 
+def _binutil(name: str) -> str:
+    """Resolve an arm-none-eabi binutil to the downloaded copy under
+    `tools/arm-none-eabi/bin` (brief 369: `download_tool.py arm-binutils`),
+    mirroring `asm_escape.py`'s `_binutil` helper. Returns an ABSOLUTE path so
+    this works under native Windows `CreateProcess` without requiring the
+    download dir on `PATH`; falls back to the bare name when the download
+    isn't present (system-installed toolchain on Linux/macOS `PATH`).
+    """
+    p = get_platform()
+    exe = p.exe if p is not None else ""
+    cand = os.path.join(ROOT, "tools", "arm-none-eabi", "bin", f"{name}{exe}")
+    return cand if os.path.exists(cand) else name
+
+
 def _objdump(obj: str) -> str:
     return subprocess.run(
-        ["arm-none-eabi-objdump", "-d", "-r", "--architecture=armv5te", obj],
+        [_binutil("arm-none-eabi-objdump"), "-d", "-r", "--architecture=armv5te", obj],
         capture_output=True, text=True, cwd=ROOT,
     ).stdout
 
@@ -135,7 +157,7 @@ def _find_gap(func: str, module: str) -> str | None:
         os.path.join(ROOT, f"build/eur/delinks/_dsd_gap@{module}_*.o")
     )):
         out = subprocess.run(
-            ["arm-none-eabi-objdump", "-t", obj], capture_output=True, text=True
+            [_binutil("arm-none-eabi-objdump"), "-t", obj], capture_output=True, text=True
         ).stdout
         if re.search(rf"\sF\s+\.text\s+[0-9a-f]+\s+{re.escape(func)}$", out, re.M):
             return obj
@@ -145,7 +167,7 @@ def _find_gap(func: str, module: str) -> str | None:
 def _compile(cfile: str, out_o: str, tier: str) -> bool:
     env = {**os.environ, "WINEDEBUG": "-all", "MVK_CONFIG_LOG_LEVEL": "0"}
     subprocess.run(
-        ["wine", _COMPILERS[tier], *_CFLAGS, "-c", cfile, "-o", out_o],
+        [*exe_launch_prefix(), _COMPILERS[tier], *_CFLAGS, "-c", cfile, "-o", out_o],
         capture_output=True, text=True, cwd=ROOT, env=env,
     )
     return os.path.exists(out_o)
