@@ -421,14 +421,16 @@ Full pilot-by-pilot detail, every investigation verdict (including the 8 correct
 
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (EUR/USA/JPN SHA1 + pytest 3017 passed, 0 regressions) + per-blob verdict + hit rate + `Named-struct` before/after from a real `progress.py` run — see writeup doc for full detail.
 
-### q-compile-gate-region-fix — the baserom-free compile gate has never actually worked [S] [CLAIMED]
+### q-compile-gate-region-fix — the baserom-free compile gate has never actually worked [S] [DONE]
 
 `Compile changed C (usa)` and `(jpn)` fail with `ninja: error: unknown target 'build/usa/src/main/data_020bea2c.o'`. Workflow-run history shows it has been red on essentially EVERY PR since the gate was added, green only on crossregion-mop and q-batch-port — i.e. only on cross-region PRs. For the entire EUR-first campaign this gate has been crying wolf, so a genuine compile break would be invisible in the noise. That is the demonstrated failure class this fix closes.
 
 Root cause, verified: the region filter in `.github/workflows/compile-check.yml` (~line 57) is
+
 ```
 (($_ -notmatch '^src/(usa|jpn)/') -or ($_ -match "^src/$env:REGION/"))
 ```
+
 which treats an un-prefixed path as region-shared. It is not: `src/main/` and `src/overlayNNN/` are EUR-only. Confirmed: `config/usa/arm9/delinks.txt` contains 1057 `src/usa/main/` entries and ZERO `src/main/` entries. So for usa/jpn the workflow synthesizes targets that do not exist in that region's build graph.
 
 Fix: make the filter region-exclusive — eur takes paths NOT under `src/usa/` or `src/jpn/`; usa takes only `^src/usa/`; jpn takes only `^src/jpn/`. The existing sentinel fallback already covers "no changed files for this region", so a pure-EUR PR will compile the usa/jpn sentinel and pass honestly rather than failing.
@@ -436,6 +438,13 @@ Fix: make the filter region-exclusive — eur takes paths NOT under `src/usa/` o
 Do NOT just make the job tolerate unknown targets — that would make it vacuous, which is the same defect `q-gate3-vacuous` already fixed once elsewhere. Prove the fix both ways before shipping: (1) a branch touching only `src/main/*.c` must go green on all three regions, and (2) a deliberately broken EUR `.c` must still turn the eur job RED. Assert both in the PR body.
 
 **Gate:** re-run the workflow on your own PR and on a scratch branch containing only an EUR-path `.c` change; both green. A separate deliberately-broken-EUR scratch branch turns the eur job RED.
+
+**Result:** Shipped as #1356. Filter made region-exclusive exactly per spec. Proved both directions with REAL GitHub Actions runs (windows-latest), not just local simulation:
+- #1356 itself (0 changed `.c` files) — `Compile changed C` PASS on all 3 regions via the sentinel path.
+- Scratch PR #1357 (one-line comment added to `src/main/data_020bead0.c`, an EUR-baseline file) — PASS on all 3 regions: eur compiles the real file, usa/jpn correctly fall through to their own sentinels.
+- Scratch PR #1358 (same file, garbage token spliced into the declaration) — eur FAILS with a genuine mwcc error (`undefined identifier 'this'`, `too many initializers`), usa/jpn stay PASS (file correctly excluded, not even attempted). Exact same error text as the local repro, confirming it's a real compile break, not a tooling artifact.
+Both scratch PRs (#1357, #1358) closed without merging, branches deleted — throwaway verification only.
+Found a real but out-of-scope issue while reading unrelated CI output on #1357: `pr-invariants`'s `cross_file_name_drift` check has 4 pre-existing errors on main (confirmed via `git log` on the offending files — last touched 2026-06-30, long before this branch existed), currently blocking merge on EVERY PR project-wide, not just this lane's. Filed separately below as `q-invariant-drift-fix` per this session's own standing rule against flagging follow-ups in prose only.
 
 ### q-pytest-ci-reconcile — the suite is green locally and red in CI, so neither is a gate [TODO]
 
@@ -487,3 +496,14 @@ Two sibling leads found but not yet carved (no dedicated `.c` file exists for ei
 Review of the merged metric v2 found 3 latent gaps, none affecting today's numbers: (1) the type-clause capture does NOT skip `extern` declarations — 801 EUR TUs carry extern array decls (2877 `extern char` + ~30 extern-of-typedef spellings) that will silently miscount as named-struct bytes the moment such a TU owns DATA_SECTIONS bytes; fix = skip any clause containing `extern`. (2) `.search()` is first-match-only — 43 EUR TUs have primitive-first/struct-later declaration ordering; fix = finditer/any. (3) widen primitive coverage: `u?int\d+_t`, `vu8/vu16/vu32`, `fx16/fx32`, `BOOL`. Add tests for each. ALSO record in this commit (docs/research/data/prototypes-provenance notes or the queue): the prototypes.h WIRING constraints found by review — ~15 emitted lines reference types the header chain does not define (BOOL/fx32/s8/s32/one by-value `struct Ov000V3`), so the FIRST future #include of game/prototypes.h will hard-error until those are resolved, and the void*-normalization means the header is includable by CALLER-only TUs, never by a TU that DEFINES one of the banked functions (redefinition conflict). Nothing includes it today; these are constraints on the go-live step, not current bugs.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + new tests for all 3 gaps + the wiring-constraints note committed.
+
+### q-invariant-drift-fix — pr-invariants' cross_file_name_drift check has a comment-spanning regex bug AND 3 real dead externs, currently blocking merge on EVERY open PR [TODO]
+
+Found while reading unrelated CI output on a q-compile-gate-region-fix scratch PR (#1357) — a ONE-LINE comment addition to an already-shipped file made `pr-invariants (eur)` and `(usa)` both fail with "Found 4 error-severity invariant issue(s)". Confirmed this is pre-existing and project-wide, not caused by that PR: same 4 errors reproduce on #1355 (an unrelated, already-in-review PR), and `git log` on each offending file shows its content unchanged since 2026-06-30, long before either branch existed. Right now this blocks merge on every open PR in the repo, same failure class as `q-compile-gate-region-fix` before its fix — the campaign has a second gate crying wolf.
+
+Two distinct root causes, both investigated (not guessed):
+
+1. **A real checker bug, not real drift.** `tools/check_match_invariants.py:334-337`'s `_EXTERN_FN_RE` is `^[^\n]*?\bextern\s+[^;{]*?\b(?P<name>[A-Za-z_]\w*)\s*\([^)]*\)\s*;` with `re.MULTILINE | re.DOTALL` — the negated character classes (`[^;{]`, `[^)]`) already span newlines regardless of DOTALL, and the pattern never excludes `/* ... */` or `//` comment text. One of the 4 flagged "errors" is `src/overlay001/func_ov001_021ca144.c:15`, symbol supposedly named `c` — line 15 is prose inside a block comment ("`* C-27 alias recipe: a second extern name at the identical address`"), not code; grepping the file directly for `extern` shows zero real declarations near that line (the real ones start at line 59). The regex latched onto "extern" inside the comment and then scanned forward across further comment lines and paragraph/parenthesis text hunting for the next `NAME(args);` shape, producing a garbage capture attributed to the wrong line. Fix: strip C comments (`/* */` and `//`) before running `_EXTERN_FN_RE`, the same way a real preprocessor would — do NOT just special-case this one file/symbol.
+2. **3 genuinely dead externs**, unrelated to the regex bug, all the identical vestigial shape: `extern void func_02086800_dummy(void);` in `src/main/func_02086800.c:10`, `src/usa/main/func_02086718.c:10`, `src/jpn/main/func_02086718.c:10`. Confirmed dead (not just unresolved) — grepped each of the 3 files for any call site or further reference to `func_02086800_dummy`, found none; `func_02086800.c` itself defines the real `func_02086800` two lines below its own now-unused forward declaration. `config/eur/arm9/symbols.txt` has `func_02086800` (no `_dummy` suffix) at `0x02086800`, confirming `_dummy` was a placeholder name from before the function matched and the extern was never cleaned up. Fix is deletion, not a `rename_symbol.py` re-point — verify there really is no live use in any of the 3 files before removing (already checked once here; re-verify at fix time in case something changed).
+
+**Gate:** `python -m pytest -q tests` no-new-failures + a regression test for the comment-spanning false positive (e.g. an `extern` mention inside a `/* */` block that must NOT be flagged) + the 3 dead externs removed + `pr-invariants` green on a real PR (not just local `python tools/check_match_invariants.py`) to prove the CI path itself, not just the library function, is fixed.
