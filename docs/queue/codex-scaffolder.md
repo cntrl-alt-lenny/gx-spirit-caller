@@ -8,7 +8,7 @@
 
 **Lane status (2026-07-22 — supersedes the old "this lane is thin" note):** the readable-C frontier REOPENED. Brief 651 corrected `wall_aware_headroom.py`; the honest pool went 47 → **6,117 candidates**, with only 32 files confirmed-permanent project-wide. There is real engineering work again. Still report QUEUE-EMPTY honestly if you genuinely exhaust it.
 
-**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split incoming, q-natural-c-metric); prefer natural C, use asm-void only where a documented wall justifies it.
+**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split shipped end-to-end, q-natural-c-metric [DONE]); prefer natural C, use asm-void only where a documented wall justifies it.
 
 ---
 

@@ -10,7 +10,7 @@
 
 **CRITICAL — header-read each candidate before compiling.** `wall_aware_headroom.py`'s list is an UPPER BOUND: a third wall class is free-form prose with no taxonomy number (mwcc-reg-alloc / hand-`.word` cross-jumps / `mcr` ops / shared-epilogue pads) — the tool can't catch it without also skipping easy stubs. Read each candidate's `.s` header; skip prose walls; the EASY WINS are trivial stubs (no-op `bx lr`, tail-call trampolines/forwarders). ~half of a medium batch may be prose walls — that's expected.
 
-**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split incoming, q-natural-c-metric); prefer natural C, use asm-void only where a documented wall justifies it.
+**Tooling budget (2026-07-23):** a NEW tool must do one of: replace/delete an existing tool, consolidate duplicated infrastructure, measurably cut cycle time, catch a demonstrated failure class, or directly ship functions/bytes — state which in the PR. **asm-void ≠ readable C:** inline-asm-in-C is coverage hygiene, counted separately from natural C (metric split shipped end-to-end, q-natural-c-metric [DONE]); prefer natural C, use asm-void only where a documented wall justifies it.
 
 **⚠️ ROUTE BEFORE YOU DRAFT (brief 667, 3/3 + generalised):** the recurring epilogue-shape wall is NOT a wall — it is the existing per-TU compiler routing tier. **Read the TARGET `.s`'s own epilogue first:** `sub sp,#4` + separate `pop {lr}` / `bx lr` → name the file `*.legacy.c`; fused `pop {..., pc}` → `*.legacy_sp3.c`; otherwise plain `.c`. Choosing the tier BEFORE writing the body removes an epilogue mismatch that accounted for ~14% of brief 661's sample. See `docs/research/style-a-epilogue.md` + lever-payoff #28/#29.
 
@@ -238,13 +238,17 @@ PR #1327's 2047-line bank was REVERTED to an evidence-only stub because adversar
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python -m pytest -q tests` + the self-checker passes (0 prototype-vs-body mismatches) + committed provenance table + count of evidence-backed prototypes emitted (expect far fewer than 2026 — only matched-body functions).
 
-### cm-parked-reaudit-1 — re-audit old parks under the typed-struct convention — batch 1 (the #1334 reversal root cause, scaled) [TODO]
+### cm-parked-reaudit-1 — re-audit old parks under the typed-struct convention — batch 1 (the #1334 reversal root cause, scaled) [DONE]
+
+> Shipped, 13/29 (44.8%) — PR #1337, not yet merged to main as of this branch.
 
 cm-overlay-small-sweep REVERSED six documented wall citations. CAVEAT (review-verified): the typed-struct lever is DEMONSTRATED for only 3 of the 6 — the others fell to a wrong forwarded-arg signature and a plain if/else restructure. So re-attempt each park with the FULL current toolkit (typed-struct externs FIRST, then trampoline-arity check, tier routing, branch-order/predication levers), not the struct lever alone. The original observation: prior investigations used pointer-cast arithmetic (`*(int*)(base+N)`) where a typed struct member (`base->field`) compiles to genuinely different mwcc pool-constant-folding. That makes EVERY wall/park citation predating the typed-struct-extern convention unverified. BATCH 1: collect ~25 parked candidates whose park note cites pool-constant/offset-arithmetic behavior (grep codegen-walls.md, epilogue-wall-corpus.md parked rows, briefs' park lists, and GLOBAL_ASM comments for offset/pool/cast language — NOT the allocator-internal register-copy class, which is genuinely reshape-insensitive per briefs 672/673/675). Re-attempt each with typed-struct-extern members instead of pointer casts. Track hit-rate; if batch 1 ships >25%, this restocks itself — say so in the writeup so the lane continues.
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + the hit-rate verdict (does the lane restock?).
 
-### cm-data-020b52d8-carve — the deferred strongest-evidence data retype: carve + retype the split 12-byte-record table at 020b52d0 [TODO]
+### cm-data-020b52d8-carve — the deferred strongest-evidence data retype: carve + retype the split 12-byte-record table at 020b52d0 [DONE]
+
+> Shipped, all 4 consumers individually re-verified 100% — PR #1338, not yet merged to main as of this branch.
 
 cm-data-inference-probe's #1 finding, deliberately deferred: the 145-record x 12-byte table whose TRUE base is data_020b52d0 — dsd split one physical table into 4 sub-symbols by literal-pool address, so the named symbol data_020b52d8 starts 8 bytes INTO record 0. Evidence is the strongest of the whole probe: 4 already-matched, disassembly-verified C functions each confirm one field (offsets 0/4/6/8); record count 145 confirmed two independent ways (see docs/research/data/inference-probe-main-2026-07-24.md). The work: extract the 4 missing base bytes from arm9.bin, carve a delinks.txt entry for the true base, define the 12B record struct, retype the whole table, and rewrite the 4 matched consumer functions to reference the typed table — each of those 4 MUST individually re-verify 100% (fastmatch) before the aggregate gate, since this touches already-shipped matches (real regression risk — that's why it was deferred). If any consumer refuses to re-match against the typed table, STOP and document rather than force.
 
@@ -256,31 +260,50 @@ Review of the merged metric v2 found 3 latent gaps, none affecting today's numbe
 
 **Gate:** `python -m pytest -q tests` no-new-failures + new tests for all 3 gaps + the wiring-constraints note committed.
 
-### q-toolbugs-evaporated — fix the 3 tool bugs that have been flagged repeatedly and NEVER queued (r11 completeness critic) [TODO]
+### q-toolbugs-evaporated — fix the 3 tool bugs that have been flagged repeatedly and NEVER queued (r11 completeness critic) [DONE]
+
+> Shipped, all 3 bugs fixed with tests, gate3 PASS in 2m56.982s — PR #1339, not yet merged to main as of this branch.
 
 r11's completeness critic found these were flagged (spawn_task / brief prose) across multiple rounds and reached NO queue — they keep costing whole batches. Fix all three, with a test each. (1) ~~gate3 dsd probe~~ **ALREADY FIXED BY THE BRAIN** (main: `check_dsd_binary()` now probes `dsd` AND `dsd.exe`, + 4 regression tests in tests/test_gate3.py). Root cause for the record: Python's `Path('dsd').exists()` is False on Windows while `subprocess` still runs `./dsd` fine (CreateProcess appends `.exe`), so the preflight false-failed in ~0s while the build worked. SKIP this sub-item. (2) `tools/batch_sha1.py` — TWO defects: its `.c`->`.s` suffix-strip doesn't handle the routing tiers (`.thumb.c` / `.legacy.c` / `.legacy_sp3.c`), which ABORTS a whole batch; and its bisection assumes the candidate's `.s` still physically exists as a revert target, so deleting the `.s` before gating yields a FALSE '0 confirmed' across an entire correct batch (brief 675 lost a batch to exactly this; brief 676 nearly mis-diagnosed a real single-candidate bug as the same thing). Handle the tier suffixes; detect a missing revert target and fail LOUD with a distinct message instead of reporting 0-confirmed. (3) `tools/cmatch_loop.py --keep-drafts` leaves a draft `.c` beside the `.s`, recreating the fatal 'multiple rules generate' ninja state. Clean up or namespace the drafts.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a test per bug + a note confirming gate3 now passes on Windows (paste the elapsed time — a real gate takes minutes, not 0s).
 
-### q-prototypes-golive-fix — make the prototypes bank actually includable — 11 uncompilable decls + 12 arity landmines (r11 [S]) [TODO]
+### q-prototypes-golive-fix — make the prototypes bank actually includable — 11 uncompilable decls + 12 arity landmines (r11 [S]) [DONE]
+
+> Shipped, 130 exclusions (96 asm + 1 by-value-struct + 33 local-typedef), pilot compile verified — PR #1341, not yet merged to main as of this branch.
 
 The merged bank (3,891 evidence-backed prototypes, provenance + self-checker, 0 mismatches) is byte-neutral because NOTHING includes it — and r11 found it cannot yet BE included. Two blocking classes: (1) **11 declarations reference types the header chain never defines** (`BOOL`, `fx32`, `s32`, `s8`, and one by-value `struct Ov000V3` defined only inside a single TU) — the first `#include` of game/prototypes.h is a hard compile error. Fix by defining the missing primitive aliases in `include/game/types.h` (matching the project's dominant spellings — mind the u32 clash already noted: nitro says `unsigned long`, the project says `unsigned int`) and by EXCLUDING any prototype that needs a TU-local struct by value. (2) **12 `asm void` functions are banked as 0-arg** because their asm-bodied definition carries no parameter list, while their real callers pass up to 3 args — these are exactly the landmine class that got the previous bank reverted. EXCLUDE asm-bodied definitions from the evidence set (or derive their arity from call sites and mark it separately). Also record the structural constraint r11 verified: the void*-normalization makes the bank includable by CALLER-only TUs and NEVER by a TU that DEFINES a banked function (redefinition conflict) — document this in the header's own comment. Payoff is now quantified: **the wrong-extern rate in matched TUs is 50.2%**, so a correct bank materially raises first-try match rate. Do NOT wire any #include in this item — make it *includable*, prove it with a single throwaway pilot TU compile, then stop.
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + `python tools/check_prototypes_provenance.py` 0 mismatches + evidence that a pilot TU including game/prototypes.h COMPILES (paste the command) + the 12 asm-void exclusions listed.
 
-### q-itcm-feeder-fix — make ITCM visible to the censuses — the last invisible module (r11 [A], root cause VERIFIED by brain) [TODO]
+### q-itcm-feeder-fix — make ITCM visible to the censuses — the last invisible module (r11 [A], root cause VERIFIED by brain) [DONE]
+
+> Shipped, 12 EUR itcm candidates now visible (2 file-level + 10 symbol-only-gap) — PR #1342, not yet merged to main as of this branch.
 
 ITCM is an invisible 27th module: its functions reach NO census, wave, or worklist, so they can never be picked up. The q-itcm-reach investigation diagnosed it on 2026-07-22 (`docs/research/campaign-analytics/itcm-reachability.md`) and specified the fix — but the fix was queued NOWHERE and the investigation's lane (Codex) is now closed, so it has sat unactioned. ROOT CAUSE (brain re-verified at main): `tools/wall_aware_headroom.py:76` has `_MODULE_RE = re.compile(r"^src/(main|overlay\d+)/[^/]+\.s$")` — the `[^/]+` allows exactly ONE path segment after the module dir, so real files like `src/main/itcm/func_01ff8400.s` (an extra `itcm/` segment) are silently rejected. Confirmed those `.s` files exist on disk and are excluded. Implement the report's own proposal: module-aware path classification (don't hard-code a single-segment assumption), union with `size_census.py`'s unmatched itcm rows so both feeders agree, and the two named regression tests (`src/main/itcm/func_01ff8400.s` plus one symbol-only case). Then report how many ITCM candidates become visible (~10 EUR + 14 USA + 14 JPN / ~6.2 KB per the census). Matching them is a SEPARATE follow-up — this item only makes them reachable.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + the 2 named regression tests + a before/after count from `python tools/wall_aware_headroom.py --json` showing ITCM rows now appear.
 
-### q-khdays-toolkit — port khdays-decomp's CC0 declperm.py + audit_callsite_arity.py (r11 [S]) [TODO]
+### q-khdays-toolkit — port khdays-decomp's CC0 declperm.py + audit_callsite_arity.py (r11 [S]) [DONE]
+
+> Shipped, 39 arity contradictions found (6 cross-confirm golive-fix, 33 new) — PR #1343, not yet merged to main as of this branch.
 
 r11's external lens found khdays-decomp ships a CC0-licensed (public-domain-equivalent — license-clean to adopt, unlike the peer SDK sources we ruled out) toolkit with two tools that map DIRECTLY onto our current blockers: (1) **audit_callsite_arity.py** — audits declared arity against actual CALL SITES. This is precisely the check that would have caught BOTH prototype-bank failures: #1327's 33 arity contradictions and the 12 `asm void` 0-arg landmines in the current bank (an asm-bodied definition carries no parameter list, so call sites are the ONLY evidence). Wire it as a companion to `tools/check_prototypes_provenance.py` so arity is verified from two independent directions. (2) **declperm.py** — declaration-permutation search; a mechanical lever for the decl-order/register-allocation residuals we currently hand-permute. Port both to our tree (our paths/parsers, keep attribution + the CC0 note), add tests, and REPORT what audit_callsite_arity finds when run against the current `include/game/prototypes.h` — that output is directly actionable for q-prototypes-golive-fix.
 
 **Gate:** `python -m pytest -q tests` + both tools running on our tree + the arity-audit report against the current prototypes bank (counts + any contradictions found) + CC0 attribution recorded.
 
-### q-readable-c-done-definition — retire the self-contradicting ceiling model and define 'readable-C done' (r11 [S]) [TODO]
+### q-readable-c-done-definition — retire the self-contradicting ceiling model and define 'readable-C done' (r11 [S]) [DONE]
+
+> Shipped, ceiling fixed with shown arithmetic (main headroom 0.75->0.10,
+> 48.03%->30.19%, residual explicitly flagged not fully reconciled) +
+> 3 candidate done-definitions with a recommendation (adopt pret-style
+> ladder + verdict-complete gate, reject attainment-as-completion) in
+> `docs/research/q-readable-c-done-definition-2026-07-25.md` (pointer
+> added to state.md's Next-brain TODO) + README SVG bar now reports
+> natural-C only + 4 stale "metric split incoming" queue headers fixed
+> — PR TBD, not yet merged to main as of this branch. **QUEUE EMPTY
+> after this item — all 7 items shipped this session (#1337, #1338,
+> #1339, #1341, #1342, #1343, and this one).**
 
 r11 found the project's ceiling model CONTRADICTS ITSELF — it reports 48.03% while the r7-r14 analyses put the realistic band at 14-24% — so it is unfit to anchor any planning, and it currently does. Two deliverables: (1) Retire or re-derive the ceiling: find where 48.03% comes from (`tools/progress.py` ASYMPTOTIC_* constants and any doc quoting it), show the arithmetic, and either fix it or delete it — do NOT leave two contradictory numbers in the tree. (2) Propose a concrete 'readable-C done' definition, since the project currently has none and % alone is a poor target. r11's suggestion: a pret-style PUBLIC ladder (tiered milestones outside) plus a VERDICT-COMPLETE gate inside (every function has an explicit verdict: matched / genuinely-walled-with-evidence / not-yet-attempted — so 'done' means zero un-adjudicated functions, not an arbitrary %). Give 3 candidate definitions with pros/cons and RECOMMEND one; the brain decides. Also close the last asm-inflated surface: the README progress SVG bar still folds asm-C into readable-C even though the natural-C split landed end-to-end everywhere else.
 

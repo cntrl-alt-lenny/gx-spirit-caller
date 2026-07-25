@@ -3,12 +3,20 @@
 """Combined per-region progress-bar SVG (one card, three nested bars).
 
 Shows TWO honest metrics per region on a shared 0-100% axis:
-  - decompiled-to-C   (green)  — code recovered as real C source
+  - decompiled-to-C   (green)  — NATURAL C only: readable C recovered by
+    hand, excluding `asm { }`-bodied `.c` files (those are byte-matched
+    placeholders wearing a `.c` extension, not real decompilation — see
+    c_code_bytes_by_class()'s natural-c/asm-c split in progress.py)
   - byte-matched      (teal)   — code that rebuilds byte-identical from our
-    source tree, INCLUDING `.s` assembly ships
+    source tree, INCLUDING `.s` assembly AND asm-C ships
 The C slice is drawn on top of (leading) the byte-matched fill, so it reads
 "C is the leading slice of total coverage" at a glance — making the gap
 between real decompilation and assembly-placeholder coverage explicit.
+CORRECTED 2026-07-25 (q-readable-c-done-definition): this bar used to fold
+asm-C into the green slice (`c = sum(c_split.values())`), the last surface
+where the natural-C/asm-C split hadn't landed even though every other
+metric surface (progress.py's CLI/JSON, state.md) already reports them
+separately — this card now matches.
 
 This is the top-of-README progress visual; it replaces the three full-width
 per-region heatmap SVGs (each ~0.7-1.9 MB) with one ~2 KB card. The per-region
@@ -16,7 +24,7 @@ heatmaps stay available (linked / behind a <details>) for the per-unit view.
 
 Data source: committed `config/<ver>/**/delinks.txt` (no baserom / no build).
   * byte-matched + total: generate_heatmap.synthesize_report_from_delinks
-  * C-only: sum of `.text` bytes for blocks whose source file is .c/.cpp
+  * C-only: natural-C `.text` bytes only (c_code_bytes_by_class()["natural-c"])
 
     python tools/generate_progress_bars.py        # -> assets/progress-combined.svg
 """
@@ -65,7 +73,12 @@ def region_metrics(version: str) -> dict:
     matched, total = as_int(m.get("matched_code")), as_int(m.get("total_code"))
     config_dir = ROOT / "config" / version
     c_split = c_code_bytes_by_class(config_dir)
-    c = sum(c_split.values())
+    # Natural-C ONLY (q-readable-c-done-definition, 2026-07-25): asm-C
+    # (asm{}-bodied .c files) is a byte-matched placeholder, not real
+    # decompilation -- it belongs in the matched/teal bar, not the green
+    # "decompiled to C" one. Was `sum(c_split.values())`, folding both
+    # classes together; the last surface still doing that.
+    c = c_split["natural-c"]
     c_total = c_code_total_bytes(config_dir)
     return {
         "matched_pct": matched / total if total else 0.0,
