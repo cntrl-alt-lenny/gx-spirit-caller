@@ -156,7 +156,7 @@ def _find_gap(func: str, module: str) -> str | None:
         os.path.join(ROOT, f"build/eur/delinks/_dsd_gap@{module}_*.o")
     )):
         out = subprocess.run(
-            ["arm-none-eabi-objdump", "-t", obj], capture_output=True, text=True
+            [_binutil("arm-none-eabi-objdump"), "-t", obj], capture_output=True, text=True
         ).stdout
         if re.search(rf"\sF\s+\.text\s+[0-9a-f]+\s+{re.escape(func)}$", out, re.M):
             return obj
