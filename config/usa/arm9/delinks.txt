@@ -495,7 +495,7 @@ src/usa/main/func_02007188.c:
     complete
     .text start:0x02007188 end:0x020071a8
 
-src/usa/main/func_020071a8.s:
+src/usa/main/func_020071a8.c:
     complete
     .text start:0x020071a8 end:0x020071fc
 libs/nitro/func_02007218.legacy.c:
