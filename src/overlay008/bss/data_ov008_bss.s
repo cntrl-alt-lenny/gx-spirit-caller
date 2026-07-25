@@ -6,6 +6,9 @@
 
         .global data_ov008_021b2780
 data_ov008_021b2780:
+        .space 0x0
+        .global data_ov008_021b2780_alias
+data_ov008_021b2780_alias:
         .space 0x10
         .global data_ov008_021b2790
 data_ov008_021b2790:
@@ -54,6 +57,9 @@ data_ov008_021b2dc0_alias:
         .space 0x8
         .global data_ov008_021b2dc8
 data_ov008_021b2dc8:
+        .space 0x0
+        .global data_ov008_021b2dc8_alias
+data_ov008_021b2dc8_alias:
         .space 0x4
         .global data_ov008_021b2dcc
 data_ov008_021b2dcc:
