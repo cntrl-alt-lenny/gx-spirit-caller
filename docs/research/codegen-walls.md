@@ -4354,7 +4354,7 @@ at [`first-wave-wall-legacy-c-cascade.md`](first-wave-wall-legacy-c-cascade.md).
 > |---|---|---|
 > | **C-23** | Multiple `ldr [pc, ...]` of NEARBY constants (e.g. 4 MMIO regs at `0x04000280/90/98/a0`) — mwcc 2.0 base-folds to 1 base + offsets. | `.legacy.c` routing (mwcc 1.2/sp2p3 lacks the base-fold peephole). |
 > | **C-27** | Two C externs naming the SAME address via `symbols.txt` alias trick — produces 2 pool entries for what mwcc thinks are 2 distinct symbols. | C source declares two `extern T sym_a;` + `extern T sym_b;` and `symbols.txt` aliases one to the other. |
-> | **C-34** (this entry) | Two `ldr [pc, ...]` of the SAME symbol — orig has 2 distinct pool slots; mwcc 2.0 address-CSE collapses to 1 slot + `mov rN, rM` reuse. Routing tier doesn't help (`.legacy.c` produces a totally different shape). C-27's alias trick would work in principle but requires polluting `symbols.txt`. | `.s` with explicit `.word` pool directives — bypasses BOTH mwcc's IR-CSE AND mwasmarm's literal-pool dedup. |
+> | **C-34** (this entry) | Two `ldr [pc, ...]` of the SAME symbol — orig has 2 distinct pool slots; mwcc 2.0 address-CSE collapses to 1 slot + `mov rN, rM` reuse. Routing tier doesn't help (`.legacy.c` produces a totally different shape). **UPDATE (cm-parked-reaudit-1, 2026-07-25): C-27's alias trick is CONFIRMED, not just "in principle"** — see the "Distinct-symbol lever" subsection below. A plain typed-struct-member or bitfield rewrite of the SAME symbol does NOT work (mwasmarm dedupes the literal pool by symbol+addend after codegen, independent of C source form) — only genuinely giving the two access sites distinct symbol identities does. | Try the distinct-symbol lever FIRST (below); fall back to `.s` with explicit `.word` pool directives only if that fails. |
 >
 > **Quick discriminator:** read the orig pool block at the tail
 > of the function. If two adjacent `.word` slots hold the SAME
@@ -4427,6 +4427,67 @@ by 4 bytes (1 fewer pool word).
 | `.legacy.c` routing (mwcc 1.2/sp2p3) | Completely different shape (StyleA epilogue + sub-sp + reg swap) |
 | `.legacy_sp3.c` routing (mwcc 1.2/sp3) | Same divergence as `.legacy.c` |
 | `asm void` + `nofralloc` (brief 202 attempt) | Bypasses mwcc IR-CSE but mwasmarm STILL dedupes literal pool when `ldr rN, =sym` is used. Two `ldr` instructions, but both point to a SINGLE pool slot. |
+| Typed-struct-member access (`base->field`) instead of pointer-cast (`*(int*)(base+N)`) | **Tried and failed, cm-parked-reaudit-1 (2026-07-25).** Fixes a DIFFERENT, related wall (general CSE mismatch from `char[]+cast` styling — see cm-overlay-small-sweep, PR #1334) but does NOT split a genuine duplicate pool slot. Confirmed via a forced-register-reload diagnostic: even when mwcc is forced to emit two separate `ldr rN,[pc,#imm]` instructions (via intervening calls), both still resolve to the SAME pool slot — mwasmarm's dedup operates on symbol+addend identity, not on how many times or where the compiler loads it. |
+
+**Distinct-symbol lever (CONFIRMED, cm-parked-reaudit-1, 2026-07-25 —
+13/29 attempted candidates shipped this way, see brief doc for full
+list).** The `asm`/typed-struct failures above share one root cause:
+every failed attempt still asks mwasmarm to resolve the SAME symbol
+name twice, and mwasmarm dedupes pool words by symbol+addend
+regardless of C source form or instruction count. The fix is to make
+the two access sites reference two DIFFERENT symbols that happen to
+alias the same address — mwasmarm has no reason to dedup those. Two
+concrete techniques, chosen by field offset:
+
+- **Literal-address-cast, when BOTH access sites are at offset 0**
+  (e.g. `((SomeType *)0x022cacc0)->field`, using the symbol's actual
+  runtime address as a raw integer literal — NOT a `volatile`
+  qualifier, an actual numeric-literal cast). mwcc pool-materializes a
+  literal integer differently than a symbol reference, so the two
+  loads land in distinct pool slots with zero linker/`symbols.txt`
+  wiring. **Only works at offset 0** — cast-then-offset lets mwcc fold
+  the offset into the literal itself, losing the effect. Shipped
+  examples: `func_0202111c.c`, `func_02021158.c`, `func_0202142c.c`,
+  `func_02023fec.c`, `func_02006950.c`, `func_ov002_022476e8.c`,
+  `func_ov002_02247ad8.c` (the last two additionally needed real
+  bitfield types instead of plain `&mask` expressions — a hoisted
+  shared mask register otherwise defeats the pool split).
+- **Registered alias, for non-zero or mixed offsets** — the general
+  case, this is C-27's alias trick properly applied to a C-34 target.
+  Add a second symbol name for the same address (e.g.
+  `data_X_alias`) to the module's `symbols.txt` **AND** a matching
+  zero-size split entry in its BSS `.s` file — **`symbols.txt` alone
+  is metadata only and will link-fail**; the BSS split is what
+  actually makes it a second linker-visible symbol. Mirror the
+  pre-existing `data_0219a8e4_alias` / `data_0219a934_alias` pattern
+  in `src/main/bss/data_main_bss.s` + `config/eur/arm9/symbols.txt`.
+  Shipped examples: `func_020071c4.c` (the pre-existing C-30 worked
+  example, done properly), `func_02026fd8.c` (E-08, previously this
+  doc's own canonical "proven-uncrackable-by-C" exemplar — see E-07/
+  E-08 note below), `func_ov001_021ca144.c`, `func_ov008_021aa94c.c`,
+  `func_ov008_021adaa8.c`.
+
+**Not a universal fix**: ~55% of the 2026-07-25 re-audit sample still
+parked even with the correct lever applied, but in every one of those
+cases the pool-duplicate mechanic itself was confirmed fixed — the
+residual was always a separate, orthogonal register-allocation or
+instruction-scheduling divergence in an unusually large/intricate
+function body (one candidate, `func_ov004_021cab44`, reached 98.7% —
+a single 2-word scheduling swap short). Two prior "confirmed reversal"
+citations this lever's discovery was originally motivated by
+(`func_ov002_02273b1c`, `func_ov011_021ca600` from cm-overlay-small-
+sweep) turned out on inspection to have only ONE pool word in their
+originals — they were never true C-34 cases, just misfiled. The 5
+largest C-34 corpus entries (1380–3172 instructions each, e.g.
+`func_ov002_021aba60/021c4c9c/021d9828/021e4ba8/0220eb00`) were
+triaged as out-of-scope full-decompilation projects, not lever
+applications, and weren't attempted. `func_ov002_022b595c`'s two
+references are 6088 bytes apart — beyond ARM's ±4095B `ldr [pc,#imm]`
+range — so its dual pool islands may be size-forced rather than
+discretionary; also not attempted, flagged for a dedicated session.
+
+Full per-candidate breakdown:
+`docs/research/cm-parked-reaudit-1-2026-07-25.md`.
 
 **`.s` that coerces it (verified byte-identical against
 `func_02023f7c`, default `.s` routing):**
@@ -4475,6 +4536,11 @@ holding the SAME data symbol value at distinct addresses, AND
 the function body has multiple `ldr [pc, #...]` instructions
 pointing to those slots separately. The
 `tools/predict_walls.py` `C-34` detector flags affected picks.
+**Try the distinct-symbol lever above FIRST** (literal-address-cast
+if both sites are offset-0, else a registered alias) — reach for this
+raw-`.s` recipe only if that fails or the picked function is too
+large/unanalyzed to safely reshape (see the 5 largest-corpus-entries
+note above).
 
 **Cross-corpus survey notes:** brief 198's permuter wave
 identified the wall on two clones (E-07 / E-08); both ship via
@@ -7702,10 +7768,34 @@ calls; none of this brief's picks happened to have that exact shape
 they did have).
 
 **Affected picks:** `func_ov002_02269534` (parked, not shipped —
-this is the sole reason it doesn't reach 100%). **Status: PERMANENT
-until a counter-lever is found or confirmed absent by exhaustive C-shape
-sweep** — filed as P- (permanent-for-now), not C- (confirmed coercible),
-pending that future investigation.
+this is the sole reason it doesn't reach 100%).
+
+**UPDATE (cm-parked-reaudit-1, 2026-07-25): the pool-fold mechanism
+itself IS a confirmed-fixable counter-lever, softening this entry from
+PERMANENT.** Accessing `data_ov002_022d016c->f_d20` through a real
+typed struct member at all 3 sites (rather than the
+`*(int*)(base+0xd20)` cast form quoted above) reproduces orig's
+indexed `[reg,#0xd20]` addressing with zero extra pool words — the
+fold this entry describes no longer occurs at all under that lever.
+Combined with fixing a wrong push-list (10 registers down to the
+correct 7, via reusing named locals — `own`/`opp`/`opponent` — instead
+of separate `p1`/`p0`/`flag` temporaries), match rose from a 65.2%
+ceiling to 50.36%... **note the two percentages aren't directly
+comparable, they're different failure modes/baselines** — the earlier
+65.2% was measured against the old cast-form wall; the new number is
+against a mostly-different residual after the pool-fold is gone: 5 of
+7 persistent registers now match exactly (player/opponent/counter/row
+all correct), and what remains is 2 small scratch-register-pairing
+swaps at 3 near-identical `+= 1` sites, resistant to compound-vs-
+longhand form, explicit temp pointers, and label reordering — looking
+like a genuine, separate instruction-scheduling wall of the
+"park on sight once diagnosed" class this project already catalogs
+elsewhere (not yet independently confirmed as such via a second
+instance). **Status: reclassify to P- pending-scheduling-lever** (no
+longer "permanent" at the pool-fold level — that part is solved — but
+still parked pending either a scheduling counter-lever or a second
+confirmed instance of the residual to file it as its own wall).
+Full detail: `docs/research/cm-parked-reaudit-1-2026-07-25.md`.
 
 ### P-17. Briefs 288/290 commutative-add CSE/reg-alloc wall
 
