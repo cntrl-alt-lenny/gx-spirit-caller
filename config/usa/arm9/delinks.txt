@@ -1028,7 +1028,7 @@ src/usa/main/func_0200fd00.s:
 src/usa/main/func_0200fd68.c:
     complete
     .text start:0x0200fd68 end:0x0200fda4
-src/usa/main/func_0200fda4.s:
+src/usa/main/func_0200fda4.c:
     complete
     .text start:0x0200fda4 end:0x0200fde0
 src/usa/main/func_0200fde0.s:
