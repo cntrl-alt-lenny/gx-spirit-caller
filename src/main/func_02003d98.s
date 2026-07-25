@@ -1,7 +1,9 @@
-; func_02003d98 — brief 207 / Phase 2: C-34 candidate. Vanilla
-; brief 202 `.s` recipe — explicit `.word` per pool slot.
-; Brief 204's patcher trim-protect handles relocation-tail
-; cases.
+; func_02003d98 — MISTAGGED as C-34 (cm-parked-reaudit-1, confirmed
+; again cm-parked-reaudit-2): only ONE pool word for this address, not
+; a duplicate slot. The real issue is a jump-table dispatch register-
+; allocation mismatch, unrelated to pool duplication -- see
+; docs/research/cm-parked-reaudit-1-2026-07-25.md. Brief 204's patcher
+; trim-protect still handles this file's relocation-tail case.
 
         .text
         .extern data_02102c7c
