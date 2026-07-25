@@ -20230,9 +20230,9 @@ src/main/data/data_020c3188.s:
     complete
     .rodata start:0x020c3188 end:0x020c3198
 
-src/main/data_020c319c.c:
+src/main/data_020c3198.c:
     complete
-    .rodata start:0x020c319c end:0x020c31f8
+    .rodata start:0x020c3198 end:0x020c31f8
 
 src/main/data_020c31f8.c:
     complete
