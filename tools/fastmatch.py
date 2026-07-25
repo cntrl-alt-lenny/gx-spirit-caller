@@ -98,12 +98,33 @@ try:
 except ImportError:
     _HAS_RESOLVER = False
 
+try:
+    from get_platform import get_platform  # type: ignore[import-not-found]
+except ImportError:
+    get_platform = None  # type: ignore[assignment]
+
 
 # ---------------------------------------------------------------------------
 # objdump wrapper — clean error if binary is missing
 # ---------------------------------------------------------------------------
 
-_OBJDUMP = "arm-none-eabi-objdump"
+
+def _resolve_objdump() -> str:
+    """Prefer the project's own downloaded copy under
+    tools/arm-none-eabi/bin (brief 369: download_tool.py arm-binutils),
+    matching verify.py's/asm_escape.py's _binutil() convention -- native
+    Windows CreateProcess needs an absolute path (no PATH lookup for a
+    bare name unless the launching shell already exported one), and
+    every other tool in this project's toolkit already resolves this
+    way. Falls back to the bare name for a system-installed toolchain
+    (Linux/macOS) if the download isn't present."""
+    p = get_platform() if get_platform else None
+    exe = p.exe if p is not None else ""
+    cand = ROOT / "tools" / "arm-none-eabi" / "bin" / f"arm-none-eabi-objdump{exe}"
+    return str(cand) if cand.exists() else "arm-none-eabi-objdump"
+
+
+_OBJDUMP = _resolve_objdump()
 
 
 def _run_objdump(extra_args: list[str], obj: Path) -> str:
