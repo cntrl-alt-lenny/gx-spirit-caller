@@ -117,6 +117,9 @@ data_02104dcc:
         .space 0x70
         .global data_02104e3c
 data_02104e3c:
+        .space 0x0
+        .global data_02104e3c_alias
+data_02104e3c_alias:
         .space 0x20
         .global data_02104e5c
 data_02104e5c:
