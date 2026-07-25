@@ -817,7 +817,7 @@ src/jpn/main/func_0200b20c.c:
 src/jpn/main/func_0200b234.s:
     complete
     .text start:0x0200b234 end:0x0200b2d8
-src/jpn/main/func_0200b2d8.s:
+src/jpn/main/func_0200b2d8.c:
     complete
     .text start:0x0200b2d8 end:0x0200b340
 src/jpn/main/func_0200b340.s:
@@ -977,7 +977,7 @@ src/jpn/main/func_0200eed4.c:
 src/jpn/main/func_0200ef44.c:
     complete
     .text start:0x0200ef44 end:0x0200efc4
-src/jpn/main/func_0200efc4.s:
+src/jpn/main/func_0200efc4.c:
     complete
     .text start:0x0200efc4 end:0x0200f000
 src/jpn/main/func_0200f000.s:
