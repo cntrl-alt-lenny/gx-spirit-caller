@@ -134,8 +134,9 @@ the `codegen-walls.md` C-39-residue update above — but an independent
 useful confirmation this is a stable, real sub-wall rather than a
 one-off near-miss.
 
-## Ships (5, all EUR-only, matching this campaign's phased EUR-first
-convention — USA/JPN porting not attempted this pass)
+## Ships (5, all EUR-only — USA/JPN porting not attempted this pass)
+
+Matches this campaign's established phased EUR-first convention.
 
 | Function | Tier | Insns | Mechanism that actually closed it |
 |---|---|---:|---|
