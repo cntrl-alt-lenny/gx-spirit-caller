@@ -36,7 +36,7 @@ src/overlay008/func_ov008_021aa900.c:
     complete
     .text start:0x021aa900 end:0x021aa94c
 
-src/overlay008/func_ov008_021aa94c.s:
+src/overlay008/func_ov008_021aa94c.c:
     complete
     .text start:0x021aa94c end:0x021aaab4
 
@@ -185,7 +185,7 @@ src/overlay008/func_ov008_021ada90.c:
     complete
     .text start:0x021ada90 end:0x021adaa8
 
-src/overlay008/func_ov008_021adaa8.s:
+src/overlay008/func_ov008_021adaa8.c:
     complete
     .text start:0x021adaa8 end:0x021adbbc
 
