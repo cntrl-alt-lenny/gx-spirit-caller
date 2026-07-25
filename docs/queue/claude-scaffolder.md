@@ -328,3 +328,15 @@ cm-parked-reaudit-1 shipped **13/29 (44.8%)**, comfortably above the >25% 'resto
 cm-data-inference-probe shipped 2/6 by structural inference and cm-data-020b52d8-carve then landed the hardest case (a split mid-record table, 4 matched consumers re-verified 100%). The method is established; scale it. Next slice: (a) the remaining opaque `const unsigned char data_X[N]` blobs in `src/main` beyond the 6 already probed — rank by size x consumer-evidence exactly as the probe did (a matched consumer's computed-stride access is the evidence; no evidence = leave opaque, do NOT force); (b) r11 flagged that OVERLAYS carry more opaque blobs that no probe has touched — census `src/overlay*` the same way and include the best-evidenced ones. Reuse the probe's own tooling path (`emit_data_blob.py`'s ground-truth byte reading; generate initializers by script, never hand-transcribe) and the canary's mwcc bracing rule (a struct whose sole member is itself an array needs the extra brace layer). Report the hit rate again so we know whether this lane keeps paying.
 
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-blob verdict (retyped / left-opaque + why) + the running hit rate + `Named-struct` bytes before/after from `tools/progress.py`.
+
+### q-toolbugs-round2 — the 2 tooling bugs brief 682 flagged but never queued [A]
+
+⚠️ These were found by `cm-parked-reaudit-2` (PR #1348) and described in its PR prose as "flagged as separate follow-up tasks" — but NO queue item was ever created, which is exactly the "flagged follow-ups evaporate" failure r11 identified (a prose mention is not a task). The brain queued them. **When you flag a follow-up, append a real `### id — title [TODO]` block to the right queue file; prose in a result or a spawn_task chip does NOT schedule anything.**
+
+1. **`tools/batch_sha1.py` false-FAIL on a delinks-flip-before-`.s`-removal race.** The tool reports a FAIL when the delinks entry has been flipped to `.c` but the old `.s` has not yet been deleted — a transient state every ship passes through. Since this is the third distinct batch_sha1 defect (after the tier-suffix strip and the missing-revert-target bisect false-negative, both fixed in `q-toolbugs-evaporated`), fix it in the same spirit: detect the transient state explicitly and either tolerate it or fail with a message that names the actual cause, never a generic FAIL that reads like a byte divergence.
+
+2. **`tools/objdiff_resolve_relocs.py` blind spot for `_alias`-suffixed symbols** — the registered-alias lever's own naming convention (see brief 682's new levers) produces symbols the resolver skips, so alias-using candidates get an incomplete relocation comparison. Teach it the `_alias` suffix.
+
+Add a regression test per bug.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + one test per bug + a note confirming each reproduces before the fix.
