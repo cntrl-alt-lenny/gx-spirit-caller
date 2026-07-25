@@ -54,7 +54,7 @@ _CFLAGS = (
     "-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
     "-fp soft -inline noauto -Cpp_exceptions off -RTTI off -interworking "
     "-w off -sym on -gccinc -nolink -msgstyle gcc -i include "
-    "-i libs/runtime/include -i libs/nitro/include -lang=c -d eur"
+    "-i libs/runtime/include -i libs/nitro/include -lang=c99 -d eur"
 ).split()
 
 _HDR = re.compile(r"^[0-9a-f]+ <(\S+)>:")
