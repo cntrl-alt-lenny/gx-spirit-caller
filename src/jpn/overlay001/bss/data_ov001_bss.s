@@ -6,4 +6,7 @@
 
         .global data_ov001_021ca340
 data_ov001_021ca340:
+        .space 0x0
+        .global data_ov001_021ca340_alias
+data_ov001_021ca340_alias:
         .space 0x20
