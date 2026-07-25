@@ -337,7 +337,7 @@ src/usa/overlay000/func_ov000_021adabc.c:
     complete
     .text start:0x021adabc end:0x021adafc
 
-src/usa/overlay000/func_ov000_021adafc.s:
+src/usa/overlay000/func_ov000_021adafc.c:
     complete
     .text start:0x021adafc end:0x021adb3c
 src/usa/overlay000/ov000_021adb3c.c:
