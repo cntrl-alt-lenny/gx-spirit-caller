@@ -523,6 +523,22 @@ def unstage_source(path: Path, created: bool, previous_content: str | None, regi
         _reconfigure(region)
 
 
+def draft_aside_path(c_path: Path) -> Path:
+    """Rename target for a --keep-drafts draft that must coexist with a
+    restored .s sibling of the same base name.
+
+    Must NOT end in .c (or any suffix configure.py's src/ glob treats as
+    a build source) -- displace_sibling_s's own docstring documents why:
+    configure.py adds an unconditional ninja rule for EVERY .c and EVERY
+    .s file it finds under src/, so a draft left at its canonical name
+    alongside the restored .s reproduces the exact `ninja: error: ...
+    multiple rules generate build/.../X.o` fatal that displace_sibling_s
+    exists to prevent during the compile-test window -- just in the
+    aftermath instead. Appending (not replacing) the suffix keeps the
+    draft trivially findable next to where it would normally live."""
+    return c_path.with_name(c_path.name + ".draft")
+
+
 # --------------------------------------------------------------------------- #
 # Compile + fastmatch (step 2) and classification (step 3)
 # --------------------------------------------------------------------------- #
@@ -731,16 +747,24 @@ def process_candidate(func: str, region: str, state: dict, *,
             if not keep_this_one:
                 if not keep_drafts and c_path is not None:
                     unstage_source(c_path, created, previous_content, region)
+                elif keep_drafts and c_path is not None and c_path.is_file():
+                    # A draft kept at its CANONICAL name would collide
+                    # with the .s sibling restored just below (both
+                    # produce build/.../X.o -- see draft_aside_path's
+                    # docstring). Move it aside first so it stays
+                    # inspectable without recreating that fatal state.
+                    c_path.replace(draft_aside_path(c_path))
                 # Always restore the .s sibling for anything short of a
                 # real accept -- an "iterate" draft kept on disk (--keep-
                 # drafts) must NOT leave the function sourceless: the .s
                 # goes back so the tree stays buildable/matching exactly
                 # as it was found, with the (non-matching) draft .c
-                # sitting alongside it purely for inspection. Only an
-                # ACCEPTED candidate gets to leave the .s permanently
-                # removed, matching the project's own established
-                # convention (verified: zero already-.c-converted
-                # functions anywhere in this tree keep a sibling .s).
+                # sitting alongside it (namespaced, see above) purely for
+                # inspection. Only an ACCEPTED candidate gets to leave
+                # the .s permanently removed, matching the project's own
+                # established convention (verified: zero already-.c-
+                # converted functions anywhere in this tree keep a
+                # sibling .s).
                 restore_sibling_s(s_path, s_backup)
                 _reconfigure(region)
             # else (accepted): leave the .s removed and the winning draft

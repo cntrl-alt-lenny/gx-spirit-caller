@@ -76,8 +76,31 @@ def _rel_posix(path: Path) -> str:
     return str(path.relative_to(ROOT)).replace("\\", "/")
 
 
+# Longest-first: each of these also ends with plain ".c", so a routing-
+# tier suffix must be tried before the bare ".c" fallback or it never
+# matches.
+_TIER_SUFFIXES = (".legacy_sp3.c", ".legacy.c", ".thumb.c")
+
+
 def _c_to_s_rel(c_rel: str) -> str:
-    """'src/main/func_X.c' → 'src/main/func_X.s'."""
+    """'src/main/func_X.c' → 'src/main/func_X.s'.
+
+    Also handles the routing-tier filename suffixes (.legacy.c,
+    .legacy_sp3.c, .thumb.c): their .s revert target never carries the
+    tier suffix, because a tier only selects which mwcc invocation
+    compiles a .c -- a .s has no tier concept, it's assembled directly.
+    Confirmed against a real ship: func_ov004_021dcd1c.thumb.c's own
+    delinks history shows the .s it replaced was plain
+    func_ov004_021dcd1c.s, not func_ov004_021dcd1c.thumb.s. Before this
+    fix, the naive c_rel[:-2] suffix strip produced
+    'func_X.legacy_sp3.s' (or '.legacy.s' / '.thumb.s') for these three
+    families -- a revert target that never exists, defeating
+    batch_sha1's bisection the moment a tier-suffixed candidate needed
+    reverting.
+    """
+    for suffix in _TIER_SUFFIXES:
+        if c_rel.endswith(suffix):
+            return c_rel[: -len(suffix)] + ".s"
     if not c_rel.endswith(".c"):
         raise ValueError(f"Expected .c path, got: {c_rel}")
     return c_rel[:-2] + ".s"
@@ -122,6 +145,33 @@ def _is_already_applied(c_rel: str, region: str) -> Path | None:
         if marker_mid in content or content.startswith(marker_sof):
             return delinks
     return None
+
+
+def _missing_revert_target_error(s_rel: str, c_rel: str) -> str | None:
+    """None if s_rel exists on disk as a valid bisection fallback, else a
+    precise, ready-to-print error string explaining why not.
+
+    By the time this is called, delinks.txt still routes to s_rel (a
+    caller-side _find_delinks lookup already succeeded) -- but the file
+    itself can still be gone, e.g. deleted by an earlier batch-prep step
+    that didn't also flip delinks.txt. Left unchecked, that doesn't fail
+    here: it fails LATER, deep inside a bisect run, as a ninja "missing
+    input" build error that _run_sha1 can't distinguish from a real sha1
+    mismatch -- every candidate in the batch gets misreported as a
+    culprit (brief 675's "FALSE 0 confirmed across an entire correct
+    batch"). Checking this as an infra precondition, alongside the other
+    delinks/already-applied checks, turns that into one loud, specific,
+    immediate error instead.
+    """
+    if (ROOT / s_rel).is_file():
+        return None
+    return (
+        f"Revert target missing: {s_rel} is still the active delinks.txt "
+        f"entry for {c_rel}, but the .s file itself doesn't exist on disk.\n"
+        f"  batch_sha1 needs the pre-ship .s as a bisection fallback -- "
+        f"restore it (e.g. `git checkout -- {s_rel}`) before running this batch, "
+        f"or omit {c_rel} from this invocation."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +402,11 @@ def main(argv: list[str] | None = None) -> int:
                     f"No delinks.txt entry found for .s ship: {s_rel}\n"
                     f"  Check config/{args.region}/arm9/**/delinks.txt"
                 )
+            continue
+
+        revert_err = _missing_revert_target_error(s_rel, c_rel)
+        if revert_err is not None:
+            infra_errors.append(revert_err)
             continue
 
         candidates.append(Candidate(c_path=c_path, s_rel=s_rel, c_rel=c_rel,
