@@ -163,6 +163,40 @@ query (0 hits for all 3, see above). Those residuals' own internal leads
 were separately executed in brief 680 (C-23 routing retry, byte-swap
 draft) — nothing new for any of the 3 from this lever set.
 
+## Update 2026-07-25 — the 5 verified levers swept at scale (queue item `cm-sm64ds-lever-apply`)
+
+The 5 VERIFIED-ON-2.0 levers (#2, #3, #6, #9, #12) had each only been
+tried on their single brief-682 test candidate. Swept each across the
+parked corpus instead — see
+[`cm-sm64ds-lever-apply-2026-07-25.md`](../cm-sm64ds-lever-apply-2026-07-25.md)
+for the full per-lever ledger. Headline: **every one of the 5 real
+ships this pass landed via a mechanism OTHER than the lever being
+tested on that candidate** — the same pattern brief 682 itself
+already flagged for levers 13/14. At scale, across 23 total
+candidate checks:
+
+- **Lever 3** (hidden-arg liveness) is the one that most often
+  genuinely applies (2/7 candidates) — both left as confirmed
+  near-misses behind a separate residual, not full ships.
+- **Lever 2** (fake-dependency coloring) is confirmed load-bearing on
+  2/2 ov002 C-39-residue candidates it was tried against — a 2-for-2
+  reproduction, strong evidence this is a real, reusable technique for
+  that specific symptom (see `codegen-walls.md`'s C-39-residue entry),
+  even though neither closed all the way.
+- **Levers 6 and 9** both looked strong in their own single
+  brief-682 worked example but did not close a single ADDITIONAL
+  candidate this pass (0/4 and 0/3) — lever 6 in particular now has 2
+  independent data points (brief-682's own candidate plus this pass's
+  3) suggesting its documented scope should narrow to true
+  load-then-immediate-store copy shapes, not general arithmetic.
+- **Lever 12** had only 2 real shape-matches in the swept corpus, and
+  both had already shipped independently before this pass started.
+
+Net: real, verified evidence that "a lever works once" and "a lever
+is worth sweeping at scale" are different claims — worth checking
+before importing a large batch from any single worked example in a
+future re-ingest.
+
 ## Source URLs
 
 - Current repository: [`tangosdev/sm64ds-decomp`](https://github.com/tangosdev/sm64ds-decomp)
