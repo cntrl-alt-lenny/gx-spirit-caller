@@ -144,8 +144,14 @@ def _find_gap(func: str, module: str) -> str | None:
 
 def _compile(cfile: str, out_o: str, tier: str) -> bool:
     env = {**os.environ, "WINEDEBUG": "-all", "MVK_CONFIG_LOG_LEVEL": "0"}
+    # Windows runs mwccarm.exe natively (no Win32 runner) -- same platform
+    # split as configure.py's WINE="" branch. wine/wibo are Linux/macOS-only.
+    # CreateProcess resolves a relative argv[0] against the CALLING process's
+    # cwd, not the child's (cwd= below) -- must be absolute on win32.
+    cmd = [os.path.join(ROOT, _COMPILERS[tier]), *_CFLAGS, "-c", cfile, "-o", out_o] if sys.platform == "win32" \
+        else ["wine", _COMPILERS[tier], *_CFLAGS, "-c", cfile, "-o", out_o]
     subprocess.run(
-        ["wine", _COMPILERS[tier], *_CFLAGS, "-c", cfile, "-o", out_o],
+        cmd,
         capture_output=True, text=True, cwd=ROOT, env=env,
     )
     return os.path.exists(out_o)
