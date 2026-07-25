@@ -371,7 +371,7 @@ cm-data-inference-probe shipped 2/6 by structural inference and cm-data-020b52d8
 
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-blob verdict (retyped / left-opaque + why) + the running hit rate + `Named-struct` bytes before/after from `tools/progress.py`.
 
-### q-toolbugs-round2 — the 2 tooling bugs brief 682 flagged but never queued [A]
+### q-toolbugs-round2 — the 2 tooling bugs brief 682 flagged but never queued [TODO]
 
 ⚠️ These were found by `cm-parked-reaudit-2` (PR #1348) and described in its PR prose as "flagged as separate follow-up tasks" — but NO queue item was ever created, which is exactly the "flagged follow-ups evaporate" failure r11 identified (a prose mention is not a task). The brain queued them. **When you flag a follow-up, append a real `### id — title [TODO]` block to the right queue file; prose in a result or a spawn_task chip does NOT schedule anything.**
 
