@@ -421,7 +421,7 @@ Full pilot-by-pilot detail, every investigation verdict (including the 8 correct
 
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (EUR/USA/JPN SHA1 + pytest 3017 passed, 0 regressions) + per-blob verdict + hit rate + `Named-struct` before/after from a real `progress.py` run — see writeup doc for full detail.
 
-### q-compile-gate-region-fix — the baserom-free compile gate has never actually worked [S] [TODO]
+### q-compile-gate-region-fix — the baserom-free compile gate has never actually worked [S] [CLAIMED]
 
 `Compile changed C (usa)` and `(jpn)` fail with `ninja: error: unknown target 'build/usa/src/main/data_020bea2c.o'`. Workflow-run history shows it has been red on essentially EVERY PR since the gate was added, green only on crossregion-mop and q-batch-port — i.e. only on cross-region PRs. For the entire EUR-first campaign this gate has been crying wolf, so a genuine compile break would be invisible in the noise. That is the demonstrated failure class this fix closes.
 
