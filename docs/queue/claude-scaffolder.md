@@ -311,19 +311,38 @@ r11 found the project's ceiling model CONTRADICTS ITSELF — it reports 48.03% w
 
 **Gate:** `python -m pytest -q tests` + the ceiling either corrected or removed (with the arithmetic shown) + 3 candidate done-definitions with a recommendation + the README SVG bar reporting natural-C.
 
-### q-prototypes-arity-33 — resolve the 33 CALL-SITE arity contradictions the new audit tool found [S] [TODO]
+### q-prototypes-arity-33 — resolve the 33 CALL-SITE arity contradictions the new audit tool found [S] [DONE]
+
+> Shipped, 0 unresolved — PR #1346, not yet merged to main as of this branch.
 
 The khdays-ported `tools/audit_callsite_arity.py` now runs against our bank and reports: **3,780 declared prototypes audited, 33 with a CALL-SITE arity contradiction** (e.g. `func_ov010_021b2860`: bank declares 0 args, 4 confident call sites pass 1). These are the SAME failure class that got the first prototype bank reverted — a wrong arity silently breaks every caller's byte-match the moment the header is included, and the sha1 gate CANNOT see it. For each of the 33: decide the truth from evidence — the definition body is ground truth where it exists; where the definition is `asm`-bodied (no parameter list, the known blind spot) the CALL SITES are the only evidence, so take the call-site arity. Fix `gen_prototypes.py` so the resolution is GENERATED, not hand-patched (hand edits get wiped by the next `--write`), then regenerate and re-run the audit until it reports 0 contradictions. Wire `audit_callsite_arity.py` into the check path so this can't regress: `check_prototypes_provenance.py` verifies against DEFINITIONS, the arity audit verifies against CALL SITES — two independent directions, which is exactly why the pair catches what either alone misses.
 
 **Gate:** `python tools/audit_callsite_arity.py` reports 0 contradictions + `python tools/check_prototypes_provenance.py` 0 mismatches + `python -m pytest -q tests` + `ninja sha1` byte-neutral (nothing includes the bank yet).
 
-### cm-parked-reaudit-2 — batch 2 of the parked re-audit — the lane cleared its own restock bar (44.8%) [TODO]
+### cm-parked-reaudit-2 — batch 2 of the parked re-audit — the lane cleared its own restock bar (44.8%) [DONE]
+
+> Shipped, 8/39 (20.5%) — PR #1348, not yet merged to main as of this branch.
 
 cm-parked-reaudit-1 shipped **13/29 (44.8%)**, comfortably above the >25% 'restocks itself' threshold it was asked to measure — so continue. Take the NEXT slice of the parked/wall-cited corpus beyond batch 1's 30-candidate sample of the 59-member Bucket-A pool (finish Bucket-A, then extend to the next bucket by the same selection method; the writeup `docs/research/cm-parked-reaudit-1-2026-07-25.md` documents the bucketing). CARRY BATCH 1'S LESSONS: the typed-struct-member lever alone does NOT split a duplicated pool slot — use the FULL toolkit (typed-struct externs, trampoline-arity check, tier routing, branch-order/predication, push-list correction via reusing named locals). Batch 1 also found several candidates were MISFILED as C-34 (single-`ldr` cases with no duplicate pool word at all) — re-check the citation against the actual `.s` before spending effort, and correct the misfiling in the taxonomy as you go. Also pick up batch 1's own deferred item: `func_ov002_022b595c` (size-forced exception).
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + hit rate + any further taxonomy misfilings corrected.
 
-### cm-data-inference-2 — extend the no-oracle data retype — the probe proved 2/6, now widen it [TODO]
+### cm-data-inference-2 — extend the no-oracle data retype — the probe proved 2/6, now widen it [DONE]
+
+> Shipped, 11/16 investigated (69%) — 6 main + 5 overlay002 blobs (an
+> "8-table dispatch family" in ov002, 5/8 members investigated, all 5
+> shipped). Named-struct bytes 8,832 -> 38,652 (+337.6%). 2 blobs
+> correctly identified as misclassified CODE (not data), 1 correctly
+> left already-optimally-typed, 1 correctly left as a scalar string
+> constant, 1 (an AES T-table) deferred — strong evidence but no
+> verifiable in-tree consumer. One consumer-rewrite regression caught
+> and correctly reverted (struct-member vs pointer-cast codegen
+> divergence, same risk class this session's concurrent
+> cm-parked-reaudit-2 independently rediscovered). 3-region
+> `gate3.py --scope all` PASS. Full breakdown:
+> `docs/research/cm-data-inference-2-2026-07-25.md`. PR TBD, not yet
+> merged to main as of this branch. **QUEUE EMPTY after this item —
+> all 3 items shipped this round (#1346, #1348, and this one).**
 
 cm-data-inference-probe shipped 2/6 by structural inference and cm-data-020b52d8-carve then landed the hardest case (a split mid-record table, 4 matched consumers re-verified 100%). The method is established; scale it. Next slice: (a) the remaining opaque `const unsigned char data_X[N]` blobs in `src/main` beyond the 6 already probed — rank by size x consumer-evidence exactly as the probe did (a matched consumer's computed-stride access is the evidence; no evidence = leave opaque, do NOT force); (b) r11 flagged that OVERLAYS carry more opaque blobs that no probe has touched — census `src/overlay*` the same way and include the best-evidenced ones. Reuse the probe's own tooling path (`emit_data_blob.py`'s ground-truth byte reading; generate initializers by script, never hand-transcribe) and the canary's mwcc bracing rule (a struct whose sole member is itself an array needs the extra brace layer). Report the hit rate again so we know whether this lane keeps paying.
 
