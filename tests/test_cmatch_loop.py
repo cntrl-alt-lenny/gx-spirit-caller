@@ -647,6 +647,61 @@ class TestDisplaceSiblingS(unittest.TestCase):
             self.assertFalse(s_path.is_file())
 
 
+class TestDraftAsidePath(unittest.TestCase):
+    def test_appends_draft_suffix(self):
+        p = Path("src/main/func_X.c")
+        self.assertEqual(cl.draft_aside_path(p), Path("src/main/func_X.c.draft"))
+
+    def test_result_never_ends_in_a_build_source_suffix(self):
+        # The whole point: configure.py's src/ glob for buildable .c
+        # sources must never pick this up, or the "multiple rules
+        # generate" bug this fix exists to prevent just moves to a new
+        # filename instead of actually going away.
+        for name in ("func_X.c", "func_X.legacy.c", "func_X.legacy_sp3.c", "func_X.thumb.c"):
+            with self.subTest(name=name):
+                result = cl.draft_aside_path(Path("src/main") / name)
+                self.assertFalse(result.name.endswith(".c"))
+
+    def test_preserves_directory(self):
+        p = Path("src/overlay004/func_ov004_X.c")
+        self.assertEqual(cl.draft_aside_path(p).parent, p.parent)
+
+
+class TestKeepDraftsNoCollisionWithRestoredSibling(unittest.TestCase):
+    """Regression test for q-toolbugs-evaporated bug 3: a --keep-drafts
+    iterate/park draft left at its CANONICAL name while the .s sibling
+    is restored is exactly the 'multiple rules generate build/.../X.o'
+    trigger TestDisplaceSiblingS's own docstring describes -- just in
+    the aftermath of a non-accepted attempt instead of during it.
+    Exercises the real displace_sibling_s/draft_aside_path/
+    restore_sibling_s functions in process_candidate's actual sequence
+    for that branch; no dossier/compile/fastmatch needed since this is
+    about the file-juggling around a classification, not match
+    correctness."""
+
+    def test_draft_and_restored_sibling_never_share_a_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            c_path = Path(tmp) / "func_X.c"
+            s_path = Path(tmp) / "func_X.s"
+            s_path.write_text("@ original matched .s\n")
+
+            # process_candidate's real sequence for a c-match rewrite
+            # attempt: displace the .s, stage a draft .c in its place...
+            s_backup = cl.displace_sibling_s(s_path)
+            c_path.write_text("int func_X(void) { return 1; } /* draft, non-matching */\n")
+
+            # ...classification comes back non-accept with keep_drafts=True:
+            # the fix's branch moves the draft aside BEFORE the .s comes back.
+            c_path.replace(cl.draft_aside_path(c_path))
+            cl.restore_sibling_s(s_path, s_backup)
+
+            self.assertFalse(c_path.is_file(), "draft must not remain at the canonical .c name")
+            self.assertTrue(s_path.is_file(), "the .s sibling must be restored")
+            draft = cl.draft_aside_path(c_path)
+            self.assertTrue(draft.is_file(), "the draft must survive, just renamed")
+            self.assertEqual(draft.read_text(), "int func_X(void) { return 1; } /* draft, non-matching */\n")
+
+
 class TestTemporaryGapEnterExceptionSafety(unittest.TestCase):
     """Regression test for a real bug: Python never calls __exit__ if
     __enter__ itself raises. An earlier TemporaryGap left every already-
