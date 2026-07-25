@@ -4646,7 +4646,7 @@ src/main/func_020242d4.s:
 src/main/func_02024368.s:
     complete
     .text start:0x02024368 end:0x02024430
-src/main/func_02024430.s:
+src/main/func_02024430.c:
     complete
     .text start:0x02024430 end:0x020244e8
 
