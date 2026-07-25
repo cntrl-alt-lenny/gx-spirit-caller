@@ -3432,6 +3432,13 @@
     "return_type": "int",
     "source": "src/main/func_020240a0.c"
   },
+  "func_02024430": {
+    "params": [
+      "int"
+    ],
+    "return_type": "int",
+    "source": "src/main/func_02024430.c"
+  },
   "func_0202455c": {
     "params": [],
     "return_type": "int",
@@ -3497,6 +3504,13 @@
     "return_type": "int",
     "source": "src/main/func_02026fd8.c"
   },
+  "func_020270d0": {
+    "params": [
+      "void *"
+    ],
+    "return_type": "void *",
+    "source": "src/main/func_020270d0.c"
+  },
   "func_02027144": {
     "params": [
       "void *"
@@ -3518,10 +3532,29 @@
     "return_type": "void",
     "source": "src/main/func_02027ed4.c"
   },
+  "func_020285bc": {
+    "params": [
+      "int"
+    ],
+    "return_type": "int",
+    "source": "src/main/func_020285bc.c"
+  },
+  "func_020286a0": {
+    "params": [],
+    "return_type": "int",
+    "source": "src/main/func_020286a0.c"
+  },
   "func_02028754": {
     "params": [],
     "return_type": "int",
     "source": "src/main/func_02028754.c"
+  },
+  "func_02028790": {
+    "params": [
+      "void *"
+    ],
+    "return_type": "void *",
+    "source": "src/main/func_02028790.c"
   },
   "func_02028804": {
     "params": [
@@ -3548,6 +3581,13 @@
     "params": [],
     "return_type": "int",
     "source": "src/main/func_0202a240.c"
+  },
+  "func_0202a27c": {
+    "params": [
+      "void *"
+    ],
+    "return_type": "void *",
+    "source": "src/main/func_0202a27c.c"
   },
   "func_0202a2f8": {
     "params": [
@@ -4287,6 +4327,11 @@
     ],
     "return_type": "void",
     "source": "src/main/func_020318a4.c"
+  },
+  "func_020318b8": {
+    "params": [],
+    "return_type": "void",
+    "source": "src/main/func_020318b8.c"
   },
   "func_0203192c": {
     "params": [
@@ -7645,6 +7690,15 @@
     "return_type": "int",
     "source": "src/main/func_02065f78.c"
   },
+  "func_02066ea0": {
+    "params": [
+      "void *",
+      "unsigned char",
+      "void *"
+    ],
+    "return_type": "void",
+    "source": "src/main/func_02066ea0.legacy_sp3.c"
+  },
   "func_02067140": {
     "params": [
       "void *",
@@ -9540,6 +9594,16 @@
     "return_type": "void *",
     "source": "src/main/func_020854e4.c"
   },
+  "func_02085664": {
+    "params": [
+      "void *",
+      "void *",
+      "void *",
+      "int"
+    ],
+    "return_type": "void",
+    "source": "src/main/func_02085664.legacy.c"
+  },
   "func_02085864": {
     "params": [
       "void *"
@@ -9758,6 +9822,15 @@
     ],
     "return_type": "void",
     "source": "src/main/func_02087e2c.legacy_sp3.c"
+  },
+  "func_02087e54": {
+    "params": [
+      "void *",
+      "int",
+      "int"
+    ],
+    "return_type": "void",
+    "source": "src/main/func_02087e54.legacy_sp3.c"
   },
   "func_02087e90": {
     "params": [
@@ -20751,6 +20824,11 @@
     "return_type": "void",
     "source": "src/overlay002/func_ov002_022a51cc.c"
   },
+  "func_ov002_022a822c": {
+    "params": [],
+    "return_type": "void",
+    "source": "src/overlay002/func_ov002_022a822c.c"
+  },
   "func_ov002_022a82c4": {
     "params": [
       "void *"
@@ -22798,6 +22876,15 @@
     ],
     "return_type": "int",
     "source": "src/overlay006/ov006_021b5f50.c"
+  },
+  "func_ov006_021b60a4": {
+    "params": [
+      "void *",
+      "int",
+      "int"
+    ],
+    "return_type": "int",
+    "source": "src/overlay006/func_ov006_021b60a4.c"
   },
   "func_ov006_021b6250": {
     "params": [
@@ -25951,6 +26038,14 @@
     "params": [],
     "return_type": "void",
     "source": "src/overlay016/ov016_stubs_b77c4.c"
+  },
+  "func_ov016_021b8774": {
+    "params": [
+      "void *",
+      "void *"
+    ],
+    "return_type": "void",
+    "source": "src/overlay016/func_ov016_021b8774.c"
   },
   "func_ov016_021b894c": {
     "params": [
