@@ -42,11 +42,17 @@ side (`compute_port_output_path`).
 Safety (mirrors batch_carve.py; see its module docstring for the shared
 rationale)
 ==========================================================================
-- The `.s` sibling is NEVER deleted until AFTER its batch gates green and
-  commits (brief 675's bug: deleting it any earlier means a bisect revert
-  has no buildable target to flip back to, and the WHOLE batch — not just
-  the real culprit — reports as unconfirmed). Reverting always leaves the
-  original .s exactly where it was.
+- The `.s` sibling's CONTENT is cached in memory before it's ever touched,
+  so a revert can always restore a buildable .s regardless of when it's
+  called (brief 675's bug: a bisect revert with no buildable target to
+  flip back to reports the WHOLE batch — not just the real culprit — as
+  unconfirmed). The .s is physically deleted at stage time, not deferred
+  to commit: dsd's per-TU rule generation keys the object filename off the
+  function stem, so a .s and a .c with the same stem coexisting on disk
+  makes ninja refuse the whole build outright (`multiple rules generate
+  ...`) — discovered live when a first real batch gate-failed on every
+  single candidate identically, which is what a mechanical bug (not 7
+  coincidental real mismatches) looks like.
 - Branch guard: refuses to run on `main` or a detached HEAD at
   origin/main's tip (reuses `batch_carve.branch_guard_message` verbatim).
 - A red batch bisects (reuses `batch_carve.bisect_plan`) to isolate the
@@ -208,6 +214,7 @@ class PendingPort:
     new_c_rel: str
     delinks_rel: str
     source_text: str
+    old_s_content: bytes   # cached at stage time -- see _stage()'s docstring
 
 
 @dataclass
@@ -265,6 +272,20 @@ class BatchPorter:
 
     # ---- stage/revert (flip model, not append -- see module docstring) ----
     def _stage(self, p: PendingPort) -> None:
+        """Write the new .c, flip the delinks.txt header, then delete the
+        .s -- in that order, and the .s comes out only AFTER the flip
+        succeeds. The .s can't just stay on disk alongside the .c: dsd's
+        per-TU rule generation keys the object filename off the function
+        STEM, so a .s and a .c with the same stem both present makes ninja
+        refuse the whole build outright (`multiple rules generate
+        build/.../func_X.o`) -- discovered live the hard way (every
+        candidate in the first real batch gate-failed identically, which
+        pointed at a mechanical bug rather than 7 coincidental real
+        mismatches). `old_s_content` was cached into `p` by the caller
+        BEFORE this runs, so `_revert_one` can always restore a buildable
+        .s regardless of when it's called -- must-have (b), satisfied via
+        an in-memory cache instead of leaving the file physically in
+        place (which is what actually broke the gate)."""
         (ROOT / p.new_c_rel).parent.mkdir(parents=True, exist_ok=True)
         (ROOT / p.new_c_rel).write_text(p.source_text, encoding="utf-8")
         ok = _flip_delinks(ROOT / p.delinks_rel, p.old_s_rel, p.new_c_rel)
@@ -272,12 +293,14 @@ class BatchPorter:
             (ROOT / p.new_c_rel).unlink(missing_ok=True)
             raise RuntimeError(f"delinks flip failed for {p.func} "
                               f"({p.old_s_rel} -> {p.new_c_rel})")
+        (ROOT / p.old_s_rel).unlink(missing_ok=True)
         self._refresh_cache(p.delinks_rel)
         self.pending.append(p)
 
     def _revert_one(self, p: PendingPort) -> None:
         _flip_delinks(ROOT / p.delinks_rel, p.new_c_rel, p.old_s_rel)
-        (ROOT / p.new_c_rel).unlink(missing_ok=True)   # .s untouched -- stays buildable
+        (ROOT / p.new_c_rel).unlink(missing_ok=True)
+        (ROOT / p.old_s_rel).write_bytes(p.old_s_content)   # restore from cache
         self._refresh_cache(p.delinks_rel)
 
     def _revert_pending(self) -> None:
@@ -296,9 +319,9 @@ class BatchPorter:
         funcs = [p.func for p in self.pending]
         msg = (f"batch_port: {self.region} +{len(funcs)} ported "
                f"[auto, {self.region} sha1 OK]")
-        # Only now -- batch proven green -- is deleting the .s siblings safe
-        # (must-have (b): a revert must always have a buildable .s to flip
-        # back to; that's only guaranteed before this point).
+        # _stage() already unlinked every .s in this batch (had to, for
+        # ninja -- see its docstring); this is just belt-and-suspenders in
+        # case anything external re-created one.
         self.ops.rm_files(remove_paths)
         if not self.ops.git_commit_port(add_paths, remove_paths, msg):
             return False
@@ -384,6 +407,7 @@ class BatchPorter:
                      f"on disk -- skip (must-have (b): never stage without a .s to "
                      f"revert to)")
             return None
+        old_s_content = (ROOT / header).read_bytes()
         new_c_rel = compute_port_output_path(header, entry["eur"])
         if (ROOT / new_c_rel).exists():
             self.report.stale.append(entry["tgt"])
@@ -411,7 +435,8 @@ class BatchPorter:
             self.log(f"  ⊘ {entry['tgt']} needs a new symbols.txt line -- manual, skip")
             return None
         return PendingPort(func=entry["tgt"], old_s_rel=header, new_c_rel=new_c_rel,
-                          delinks_rel=delinks_rel, source_text=result["rewritten"])
+                          delinks_rel=delinks_rel, source_text=result["rewritten"],
+                          old_s_content=old_s_content)
 
     # ---- main loop ----
     def run(self, backlog: list[dict], limit: int | None = None) -> Report:
