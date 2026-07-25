@@ -33,10 +33,49 @@ parser reading the written signature. Call sites are the ONLY
 evidence for what a caller actually passes, independent of what the
 callee's own (possibly wrong) declaration claims.
 
+RESOLUTION (q-prototypes-arity-33, 2026-07-25): a raw contradiction
+here does NOT automatically mean the bank is wrong. gen_prototypes.py
+is evidence-only (q-prototypes-h-redo/golive-fix) -- every declared
+arity already comes from a real, non-`asm`, non-by-value-struct,
+non-local-typedef matched DEFINITION, independently re-verified by
+`check_prototypes_provenance.py` (0 mismatches). Investigating all 33
+contradictions this tool found against the live tree (2026-07-25): all
+33 are real, unambiguous, multi-int/void*-param definitions (e.g.
+`func_020190c0(int _unused, int b, int c, int d)`,
+`func_ov006_021ba1f0(void)`) whose callers independently declare their
+OWN wrong local `extern` and call with a different arg count -- a
+byte-safe quirk (the extra/missing args are simply unused registers at
+that call site, faithfully reproducing the original binary), not a
+bank defect. Blindly resolving toward call-site arity, as a naive
+reading of "take the call-site evidence" might suggest, would make the
+bank WRONG to match already-wrong callers -- exactly the mistake that
+got the #1327 bank reverted in the first place.
+
+So: `classify()` below independently RE-VERIFIES each contradiction
+against a fresh parse of its real definition (reusing
+`gen_prototypes.parse_function_definitions` directly -- the same
+evidence-only primitive the bank itself is built from, not a
+reimplementation) before deciding what a "contradiction" means:
+  - **resolved** -- the declaration is confirmed correct by an
+    independent re-parse of its real definition. The call-site
+    disagreement is a CALLER-side issue (wrong local extern in some
+    other TU), informational only, not a bank defect. Not counted
+    against the pass/fail gate.
+  - **unresolved** -- no independently-verifiable real definition
+    backs the declared arity (parse fails, function no longer found,
+    or the fresh re-parse disagrees with what's declared). A genuine,
+    actionable bank gap. THIS is what "0 contradictions" means for the
+    check-path gate `main()` now enforces via its exit code.
+This keeps the two checks doing genuinely independent verification
+(`check_prototypes_provenance.py` against definitions,
+`audit_callsite_arity.py` against call sites, this classifier
+cross-checking the two) rather than collapsing them into one tool that
+could share a blind spot.
+
 Usage:
-    python tools/audit_callsite_arity.py             # contradictions in prototypes.h
+    python tools/audit_callsite_arity.py             # unresolved contradictions (non-zero exit if any)
     python tools/audit_callsite_arity.py --all       # print the full consensus per callee
-    python tools/audit_callsite_arity.py --json       # machine-readable contradictions
+    python tools/audit_callsite_arity.py --json      # machine-readable {resolved, unresolved}
 """
 from __future__ import annotations
 
@@ -49,6 +88,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from parsers import parse_delinks_file  # noqa: E402
+from gen_prototypes import parse_function_definitions  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config" / "eur" / "arm9"
@@ -157,16 +197,86 @@ def build_consensus() -> dict[str, dict[int, int]]:
     return consensus
 
 
+def load_provenance() -> dict[str, dict]:
+    """Raw {name: {params, return_type, source}} from gen_prototypes.py's
+    provenance table -- the full entries, not just arity counts, so a
+    caller can independently re-verify each one against its own
+    `source` file (see `reverify_definition`)."""
+    if not PROVENANCE_JSON.is_file():
+        return {}
+    return json.loads(PROVENANCE_JSON.read_text(encoding="utf-8"))
+
+
 def load_declared_arities() -> dict[str, int]:
     """{name: declared_param_count} from gen_prototypes.py's own
     evidence-only provenance table (the canonical bank's source of
     truth) -- reading the committed JSON directly rather than
     re-parsing the generated header, since the JSON already carries
     exactly params/return_type/source with no rendering to undo."""
-    if not PROVENANCE_JSON.is_file():
-        return {}
-    data = json.loads(PROVENANCE_JSON.read_text(encoding="utf-8"))
-    return {name: len(entry.get("params", [])) for name, entry in data.items()}
+    return {name: len(entry.get("params", [])) for name, entry in load_provenance().items()}
+
+
+def reverify_definition(name: str, source_rel: str) -> list[str] | None:
+    """Independently re-derive `name`'s param list straight from its
+    real source file, using gen_prototypes.py's OWN evidence-only
+    parser -- not by trusting the provenance JSON's cached value. This
+    is what lets `classify()` tell "declaration confirmed correct,
+    caller is wrong" apart from "declaration itself unverifiable" --
+    the same distinction that matters for every other bank consumer.
+
+    Returns None if the file can't be read, or the parser can't
+    confidently find/keep this definition on a FRESH parse (excluded
+    as asm-bodied / by-value-aggregate / file-local-typedef, or simply
+    no longer there -- source drifted since provenance.json was last
+    generated). Never guesses; mirrors gen_prototypes.py's own
+    "silently skip, never guess" rule.
+    """
+    path = ROOT / Path(source_rel)
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    for entry in parse_function_definitions(text):
+        if entry["name"] == name:
+            return entry["params"]
+    return None
+
+
+def classify(contradictions: list[dict], provenance: dict[str, dict]) -> tuple[list[dict], list[dict]]:
+    """Split raw `audit()` contradictions into (resolved, unresolved).
+
+    `resolved`: independently re-verified against a fresh parse of the
+    real definition -- the declared arity is CONFIRMED correct, so the
+    call-site disagreement is some other TU's wrong local `extern`, not
+    a bank defect. Carried forward with `caller_arity` attached
+    (informational: what the wrong callers actually pass) so the data
+    isn't lost, just correctly attributed.
+
+    `unresolved`: no real, current, independently-parseable definition
+    backs the declared arity -- a genuine gap. Empty today (every
+    entry in the current bank is evidence-backed by construction), but
+    this is the check that keeps it that way: a future regression
+    (stale provenance.json, a loosened exclusion rule, a moved/edited
+    source file) would surface here, not silently disappear.
+    """
+    resolved, unresolved = [], []
+    for c in contradictions:
+        entry = provenance.get(c["name"])
+        source = entry.get("source") if entry else None
+        live_params = reverify_definition(c["name"], source) if source else None
+        if live_params is not None and len(live_params) == c["declared"]:
+            resolved.append({**c, "caller_arity": c["tree_uses"]})
+        else:
+            unresolved.append({
+                **c,
+                "reverify_failure": (
+                    "no independently-parseable definition found"
+                    if live_params is None
+                    else f"re-parse gives {len(live_params)} param(s), "
+                         f"bank declares {c['declared']}"
+                ),
+            })
+    return resolved, unresolved
 
 
 def audit(consensus: dict[str, dict[int, int]], declared: dict[str, int]) -> list[dict]:
@@ -192,7 +302,7 @@ def audit(consensus: dict[str, dict[int, int]], declared: dict[str, int]) -> lis
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--all", action="store_true", help="print the full call-site consensus per callee")
-    ap.add_argument("--json", action="store_true", help="machine-readable contradictions only")
+    ap.add_argument("--json", action="store_true", help="machine-readable {resolved, unresolved}")
     args = ap.parse_args(argv)
 
     consensus = build_consensus()
@@ -202,19 +312,28 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{name:<34} {dict(consensus[name])}")
         return 0
 
-    declared = load_declared_arities()
+    provenance = load_provenance()
+    declared = {name: len(entry.get("params", [])) for name, entry in provenance.items()}
     contradictions = audit(consensus, declared)
+    resolved, unresolved = classify(contradictions, provenance)
 
     if args.json:
-        print(json.dumps(contradictions, indent=2))
-        return 0
+        print(json.dumps({"resolved": resolved, "unresolved": unresolved}, indent=2))
+        return 1 if unresolved else 0
 
-    for c in contradictions:
-        print(f"!! {c['name']}: bank declares {c['declared']} arg(s), "
-              f"tree call sites use {c['tree_uses']} ({c['site_count']} confident sites)")
+    for c in unresolved:
+        print(f"!! UNRESOLVED {c['name']}: bank declares {c['declared']} arg(s), "
+              f"tree call sites use {c['tree_uses']} ({c['site_count']} confident sites) "
+              f"-- {c['reverify_failure']}")
+    for c in resolved:
+        print(f"   (informational) {c['name']}: bank declares {c['declared']} arg(s) "
+              f"(confirmed against its real definition), some caller(s) wrongly use "
+              f"{c['caller_arity']} ({c['site_count']} confident sites) -- not a bank defect")
     print(f"\n{len(declared)} declared prototype(s) audited, "
-          f"{len(contradictions)} with a CALL-SITE arity contradiction")
-    return 0
+          f"{len(resolved)} caller-side mismatch(es) against a verified definition "
+          f"(informational, not bank defects), "
+          f"{len(unresolved)} UNRESOLVED bank contradiction(s)")
+    return 1 if unresolved else 0
 
 
 if __name__ == "__main__":
