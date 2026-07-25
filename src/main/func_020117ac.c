@@ -13,10 +13,15 @@
  *     bx    lr
  */
 
-extern unsigned short data_020b4bd4[];
+typedef struct {
+    unsigned short field0;
+    unsigned short field1;
+} Record020b4bd4;
+
+extern const Record020b4bd4 data_020b4bd4[];
 
 unsigned int func_020117ac(int i) {
     if (i == 0) return 0;
     if (i >= 0x63) return 0;
-    return *(unsigned short *)((char *)data_020b4bd4 + (i - 1) * 4);
+    return data_020b4bd4[i - 1].field0;
 }

@@ -350,7 +350,22 @@ cm-parked-reaudit-1 shipped **13/29 (44.8%)**, comfortably above the >25% 'resto
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted + hit rate + any further taxonomy misfilings corrected.
 
-### cm-data-inference-2 — extend the no-oracle data retype — the probe proved 2/6, now widen it [TODO]
+### cm-data-inference-2 — extend the no-oracle data retype — the probe proved 2/6, now widen it [DONE]
+
+> Shipped, 11/16 investigated (69%) — 6 main + 5 overlay002 blobs (an
+> "8-table dispatch family" in ov002, 5/8 members investigated, all 5
+> shipped). Named-struct bytes 8,832 -> 38,652 (+337.6%). 2 blobs
+> correctly identified as misclassified CODE (not data), 1 correctly
+> left already-optimally-typed, 1 correctly left as a scalar string
+> constant, 1 (an AES T-table) deferred — strong evidence but no
+> verifiable in-tree consumer. One consumer-rewrite regression caught
+> and correctly reverted (struct-member vs pointer-cast codegen
+> divergence, same risk class this session's concurrent
+> cm-parked-reaudit-2 independently rediscovered). 3-region
+> `gate3.py --scope all` PASS. Full breakdown:
+> `docs/research/cm-data-inference-2-2026-07-25.md`. PR #1349, not yet
+> merged to main as of this branch. **QUEUE EMPTY after this item —
+> all 3 items shipped this round (#1346, #1348, #1349).**
 
 cm-data-inference-probe shipped 2/6 by structural inference and cm-data-020b52d8-carve then landed the hardest case (a split mid-record table, 4 matched consumers re-verified 100%). The method is established; scale it. Next slice: (a) the remaining opaque `const unsigned char data_X[N]` blobs in `src/main` beyond the 6 already probed — rank by size x consumer-evidence exactly as the probe did (a matched consumer's computed-stride access is the evidence; no evidence = leave opaque, do NOT force); (b) r11 flagged that OVERLAYS carry more opaque blobs that no probe has touched — census `src/overlay*` the same way and include the best-evidenced ones. Reuse the probe's own tooling path (`emit_data_blob.py`'s ground-truth byte reading; generate initializers by script, never hand-transcribe) and the canary's mwcc bracing rule (a struct whose sole member is itself an array needs the extra brace layer). Report the hit rate again so we know whether this lane keeps paying.
 
