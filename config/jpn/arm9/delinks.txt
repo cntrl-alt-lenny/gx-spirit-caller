@@ -2403,7 +2403,7 @@ src/jpn/main/func_02021064.c:
 src/jpn/main/func_020210c8.c:
     complete
     .text start:0x020210c8 end:0x02021104
-src/jpn/main/func_02021104.s:
+src/jpn/main/func_02021104.c:
     complete
     .text start:0x02021104 end:0x0202113c
 src/jpn/main/func_0202113c.c:
