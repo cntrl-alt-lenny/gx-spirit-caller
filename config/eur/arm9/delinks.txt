@@ -5897,7 +5897,7 @@ src/main/func_020318a4.c:
 
 
 
-src/main/func_020318b8.s:
+src/main/func_020318b8.c:
     complete
     .text start:0x020318b8 end:0x0203192c
 
