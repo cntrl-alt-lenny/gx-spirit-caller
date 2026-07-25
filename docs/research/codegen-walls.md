@@ -6533,11 +6533,20 @@ claiming "6 of 8 + P-4's `func_02084ac4`" are falsified).** Independent
 re-verification, function by function:
 
 - **`func_02084ac4` (P-4's own cited fnptr-cache example) — RE-CONFIRMED
-  PERMANENT, not falsified.** Reached 70% (r0-vs-r1 on the cached
-  function pointer, exactly the documented sub-shape) and *stayed* at
-  70% across 3 independent source variants (direct field access, named
-  local, alternate call syntax `(*p->fn)()`). r6's report is wrong about
-  this specific function — the P-4 fnptr-cache sub-shape entry stands.
+  PERMANENT, not falsified, AT THE TIME OF THIS BRIEF.** Reached 70%
+  (r0-vs-r1 on the cached function pointer, exactly the documented
+  sub-shape) and *stayed* at 70% across 3 independent source variants
+  (direct field access, named local, alternate call syntax
+  `(*p->fn)()`). r6's report was wrong about *this brief's* 3 variants —
+  but **SUPERSEDED (brief 677 re-audit): this function has since
+  SHIPPED.** `docs/research/reshape-recipes/lever-payoff.md`'s own
+  reg-alloc entry records the actual fix — a later pass tried the
+  *correct compiler tier* (`.legacy.c`/`.thumb.c` routing per the b665/
+  b667 pattern), not just alternate source phrasing at the default
+  tier, which is what brief 671's 3 variants above missed. Confirmed
+  via `src/main/func_02084ac4.c` existing on disk. The P-4 fnptr-cache
+  sub-shape as a *class* may still apply to other members; this
+  specific named example no longer illustrates it.
 - **`func_020a71e4` / `func_020a724c` — genuinely fixed, 100%, but
   neither is one of P-4's own named examples** (they're from the
   broader brief-641 lever-insensitive catalog r6's report also cites —
@@ -7098,6 +7107,26 @@ for this pattern — see C-29 for the codified recipe.
 
 ### P-11. mwcc 2.0 reg-allocator plateau on mid-size helper-call functions
 
+> **Re-audit (brief 677, cm-wall-reaudit-p11-p16): 10 of the 16 members
+> catalogued below have ALREADY SHIPPED as matched C, via unrelated later
+> work that never looped back to correct this entry** — the entry's own
+> population contradicted its "permanent" verdict. Checked by file
+> presence (`.s` gone = matched), not by re-deriving from scratch:
+> `func_0200b0c8`, `func_02032efc`, `func_02032f38`, `func_02032e8c`,
+> `func_02032ec4`, `func_02054fd0`, `func_02055000`, `func_ov002_02238bc8`,
+> `func_ov002_0226db7c`, `func_ov002_02292020`. **6 genuinely remain
+> unmatched** and were spot-checked against this brief's available lever
+> set (typed-struct externs, trampoline-arity, tier routing, branch-order/
+> predication) — none apply: this entry's own framing above ("resist
+> BOTH permuter AND source-shape iteration," "downstream of source-shape
+> decisions") is a fundamentally different mechanism than the ones those
+> levers address, and the extensive prior falsification history below
+> (5 source variants, `volatile`-qualified reads, 900-iteration permuter
+> run) already demonstrates none of them move the register-allocator's
+> choice. Re-confirmed standing, not re-tested exhaustively from zero:
+> `func_02024574`, `func_020270d0`, `func_02028790`, `func_ov011_021d2ca8`,
+> `func_ov002_02200084`, `func_ov002_022319f4`.
+
 > **Wall family note — see also P-4, P-8, brief 198.** P-11 is
 > the umbrella for mwcc 2.0/sp1p5 register-allocator
 > divergences that **resist both permuter and source-shape
@@ -7648,6 +7677,28 @@ at
 
 ### P-16. Repeated-address rematerialization after a call
 
+> **Re-audit (brief 677, cm-wall-reaudit-p11-p16): the falsification
+> below used a raw pointer-cast (`*(int *)(data_ov002_022d016c + 0xd20)
+> += 1;`) for the step-counter increment — the exact idiom
+> `cm-overlay-small-sweep` (PR #1334) later established compiles
+> differently from a typed struct member and has reversed 6 other
+> "permanent" verdicts for this same reason.** The typed member is
+> already available and unused: `ov002_core.h`'s own `struct
+> Ov002D016c` (accessed via the `D016C` macro) has `int f_d20;` mapped
+> at exactly this offset — so the untested fix is simply `D016C->f_d20
+> += 1;` at all 3 sites instead of the pointer-cast form, no new struct
+> work needed. **Not attempted this brief**: the surrounding function
+> (`func_ov002_02269534`, 548 B / 137 insns, a 3-state duel-progress
+> dispatcher) has no preserved draft to build on — brief 582's own
+> working file was discarded once parked (`.s` restored, tree clean) —
+> so testing this lever means reconstructing the whole function from
+> the ground-truth `.s` first, not just swapping an access idiom in an
+> existing near-miss. Full disassembly, prior traced semantics (state
+> 0/1/2 dispatch, callee signatures, the 5-slot sweep struct), and the
+> exact 12-instruction residual are all in this entry below — a future
+> attempt should reconstruct with `D016C->f_d20` from the start rather
+> than discovering the pointer-cast trap again.
+
 > **Wall family note — same pool-materialization axis as P-7/C-24/C-27,
 > but a distinct sub-case.** Those three are all about whether mwcc
 > deduplicates two loads of the *same bare symbol* into one pool word
@@ -7796,6 +7847,7 @@ longer "permanent" at the pool-fold level — that part is solved — but
 still parked pending either a scheduling counter-lever or a second
 confirmed instance of the residual to file it as its own wall).
 Full detail: `docs/research/cm-parked-reaudit-1-2026-07-25.md`.
+(Brief 677's independent re-audit reached this entry the same round and had flagged it UNVERIFIED on the grounds the typed-struct lever was untried; cm-parked-reaudit-1 then actually ran that lever — the result above supersedes the untried framing.)
 
 ### P-17. Briefs 288/290 commutative-add CSE/reg-alloc wall
 
@@ -8266,16 +8318,20 @@ source-layout pitfall surfaced so far.**
 
 Adjacent finds — *not* S-class, listed here for clarity:
 
-- **`func_ov011_021ca600` drop (PR #385 wave 19)** —
-  "byte-pointer source would need a struct typedef to coerce."
-  This looks like S-class on first read but is a **C-source
-  shape** choice: byte-pointer arithmetic
+- **`func_ov011_021ca600` drop (PR #385 wave 19) — UPDATE: coercion
+  pursued and SHIPPED (`cm-overlay-small-sweep`, PR #1334, 2026-07-24).**
+  Originally: "byte-pointer source would need a struct typedef to
+  coerce." This looked like S-class on first read but was actually a
+  **C-source shape** choice: byte-pointer arithmetic
   (`*(int*)(buf + 0x10)`) and struct-member access
   (`p->field_10`) are both valid C, but they emit different
   asm (`add + ldr` vs single `ldr [base, #imm]`). The struct
-  decl isn't wrong — the access shape is. Adjacent to C-2
-  (local-pointer reuse). Decomper didn't pursue the coercion
-  this wave; no entry-worthy pattern emerged.
+  decl wasn't wrong — the access shape was. Adjacent to C-2
+  (local-pointer reuse). The typed-struct-member coercion was later
+  applied and matched byte-identical — see
+  [`cm-overlay-small-sweep-2026-07-24.md`](cm-overlay-small-sweep-2026-07-24.md)
+  for the general lever (same root cause reversed 6 documented
+  "permanent" verdicts in one sweep).
 - **All ten "iteration win" notes** in waves 13–22 (brief 051
   / 053 / 055 / 057) reduced to C-N coercions (now C-2a, C-9,
   C-11, C-13, C-14, C-15, C-16, C-17, C-18, C-19, C-20, C-21)
