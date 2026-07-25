@@ -214,7 +214,10 @@ just flagged. Full per-lever ledger:
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body. ✅
 
-### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [TODO]
+### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [DONE]
+> DONE: PR #1353 (already open on branch claude/sm64ds-lever-apply; this
+> main-based checkout hadn't picked up the merge yet when `next` was called
+> a second time — patched locally per the known work_queue.py staleness gap).
 
 `cm-sm64ds-lever-verify` tested all 14 imported levers on our own tree: **5 VERIFIED-ON-2.0, 5 FAILED, 3 NO-CANDIDATE, 1 moot**, with 5 ships along the way (3 where the lever was load-bearing, confirmed by controlled A/B against a failing control). Those 5 verified levers have only been used on their single test candidate each — now sweep them across the parked corpus.
 
@@ -224,7 +227,7 @@ For each of the 5 verified levers (see the per-lever ledger in `docs/research/re
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + ships per lever + the three-way count check stated in the PR body.
 
-### cm-ov004-021cd3b4-finish — finish the 93% candidate brief 683 flagged (it was described in prose but never queued) [TODO]
+### cm-ov004-021cd3b4-finish — finish the 93% candidate brief 683 flagged (it was described in prose but never queued) [CLAIMED]
 
 ⚠️ Filed by the brain: `cm-sm64ds-lever-verify` flagged this as a follow-up **in its PR text only**, so no task existed — the third recurrence of the 'flagged follow-ups evaporate' pattern this week. **A prose mention is not a task: append a real `### id — title [TODO]` block to the queue file.**
 
