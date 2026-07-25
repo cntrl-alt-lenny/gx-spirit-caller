@@ -70,3 +70,6 @@ Files to be Reviewed/
 # pycparser tables (decomp-permuter leaves these in CWD)
 /parser.out
 /yacctab.py
+
+# Ephemeral per-agent worktrees created by parallel sweeps (never tracked).
+.claude/worktrees/
