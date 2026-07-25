@@ -301,7 +301,7 @@ r11's external lens found khdays-decomp ships a CC0-licensed (public-domain-equi
 > `docs/research/q-readable-c-done-definition-2026-07-25.md` (pointer
 > added to state.md's Next-brain TODO) + README SVG bar now reports
 > natural-C only + 4 stale "metric split incoming" queue headers fixed
-> — PR TBD, not yet merged to main as of this branch. **QUEUE EMPTY
+> — PR #1345, not yet merged to main as of this branch. **QUEUE EMPTY
 > after this item — all 7 items shipped this session (#1337, #1338,
 > #1339, #1341, #1342, #1343, and this one).**
 
