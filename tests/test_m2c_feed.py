@@ -23,8 +23,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import pytest
-
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
@@ -191,9 +189,9 @@ class TestBuildContext(unittest.TestCase):
         # No header for `main` -> None immediately, no m2ctx/gcc subprocess.
         self.assertIsNone(build_context("eur", "main"))
 
-    @pytest.mark.skipif(
-        shutil.which("gcc") is None,
-        reason="m2ctx integration requires the gcc executable",
+    @unittest.skipUnless(
+        shutil.which("gcc") is not None,
+        "m2ctx integration requires the gcc executable",
     )
     def test_ov002_context_carries_struct_and_extern_decls(self):
         ctx_path = build_context("eur", "ov002")

@@ -27,8 +27,10 @@ import contextlib
 import io
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -166,6 +168,26 @@ class TestSummarizeCompileError(unittest.TestCase):
 
 
 class TestMissingFile(unittest.TestCase):
+    def setUp(self):
+        # main() checks `(ROOT / "build.ninja").is_file()` BEFORE checking
+        # whether the requested .c file exists, and bails with a DIFFERENT
+        # stderr-only message if it's missing -- so on a worktree that
+        # hasn't run configure.py (every CI checkout; this job never does),
+        # these tests previously got empty stdout instead of the expected
+        # FILE NOT FOUND line, while passing silently on any dev box that
+        # happened to have already configured a build. The actual behavior
+        # under test (missing-file reporting) has no real dependency on a
+        # configured build graph, so isolate ROOT to a scratch dir with a
+        # stub build.ninja instead of relying on whatever the ambient
+        # worktree happens to have.
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        (root / "build.ninja").write_text("")
+        patcher = mock.patch("fastmatch.ROOT", root)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_stale_path_reports_cleanly_and_returns_exit_two(self):
         stdout = io.StringIO()
         stderr = io.StringIO()

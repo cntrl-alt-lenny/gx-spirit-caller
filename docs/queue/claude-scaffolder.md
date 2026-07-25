@@ -446,7 +446,7 @@ Do NOT just make the job tolerate unknown targets — that would make it vacuous
 Both scratch PRs (#1357, #1358) closed without merging, branches deleted — throwaway verification only.
 Found a real but out-of-scope issue while reading unrelated CI output on #1357: `pr-invariants`'s `cross_file_name_drift` check has 4 pre-existing errors on main (confirmed via `git log` on the offending files — last touched 2026-06-30, long before this branch existed), currently blocking merge on EVERY PR project-wide, not just this lane's. Filed separately below as `q-invariant-drift-fix` per this session's own standing rule against flagging follow-ups in prose only.
 
-### q-pytest-ci-reconcile — the suite is green locally and red in CI, so neither is a gate [TODO]
+### q-pytest-ci-reconcile — the suite is green locally and red in CI, so neither is a gate [CLAIMED]
 
 `Tests` has been failing on main since ~2026-07-24. `q-green-pytest` delivered "genuinely green, no known-failure baseline" — but that was only ever verified on a fully-provisioned dev box. CI shows 2 failures + 2 errors; a bare local run on the brain worktree shows a DIFFERENT set. Two runs that disagree means neither is trustworthy.
 
