@@ -1025,7 +1025,7 @@ src/jpn/main/func_0200fd00.s:
 src/jpn/main/func_0200fd68.c:
     complete
     .text start:0x0200fd68 end:0x0200fda4
-src/jpn/main/func_0200fda4.s:
+src/jpn/main/func_0200fda4.c:
     complete
     .text start:0x0200fda4 end:0x0200fde0
 src/jpn/main/func_0200fde0.s:
