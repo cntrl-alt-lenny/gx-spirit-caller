@@ -214,7 +214,11 @@ just flagged. Full per-lever ledger:
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body. ✅
 
-### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [TODO]
+### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [DONE]
+
+> DONE: PR #1353 (not yet merged as of this branch — patched locally per
+> the known work_queue.py staleness gap: `next` on a fresh-from-main
+> branch re-surfaces any shipped-but-unmerged item as TODO).
 
 `cm-sm64ds-lever-verify` tested all 14 imported levers on our own tree: **5 VERIFIED-ON-2.0, 5 FAILED, 3 NO-CANDIDATE, 1 moot**, with 5 ships along the way (3 where the lever was load-bearing, confirmed by controlled A/B against a failing control). Those 5 verified levers have only been used on their single test candidate each — now sweep them across the parked corpus.
 
@@ -224,10 +228,37 @@ For each of the 5 verified levers (see the per-lever ledger in `docs/research/re
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + ships per lever + the three-way count check stated in the PR body.
 
-### cm-ov004-021cd3b4-finish — finish the 93% candidate brief 683 flagged (it was described in prose but never queued) [TODO]
+### cm-ov004-021cd3b4-finish — finish the 93% candidate brief 683 flagged (it was described in prose but never queued) [DONE]
+
+> DONE: PR #1354 (not yet merged as of this branch — patched locally,
+> same staleness gap as cm-sm64ds-lever-apply above).
 
 ⚠️ Filed by the brain: `cm-sm64ds-lever-verify` flagged this as a follow-up **in its PR text only**, so no task existed — the third recurrence of the 'flagged follow-ups evaporate' pattern this week. **A prose mention is not a task: append a real `### id — title [TODO]` block to the queue file.**
 
 The candidate: `func_ov004_021cd3b4` (previously untried) now reconstructs to **93% — 176 of 189 instructions** under lever 8, with 2 small residuals remaining. That is close enough to be worth a dedicated attempt with the full current toolkit (tier routing by epilogue, typed-struct externs, trampoline-arity check, branch-order/predication, the newly-verified sm64ds levers). If the 2 residuals turn out to be the known TST-vs-ANDS or argument-spill classes, say so explicitly and park with the word-level diff documented — that is a useful result too.
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + either the ship or a documented word-level residual naming the wall class.
+
+### q-invariants-green — get `Match invariants` green on main [CLAIMED]
+
+Red since ~2026-07-22 (small/quick fix, per the brain's own sizing).
+
+The CI check has 4 error-severity `cross_file_name_drift` issues, all pre-existing on main, none caused by any open PR. Two different root causes, fix separately:
+
+(a) THREE dead placeholder externs, not rebase drift. `extern void func_02086800_dummy(void);` at line 10 of `src/main/func_02086800.c`, `src/usa/main/func_02086718.c`, `src/jpn/main/func_02086718.c`. These are brief-494 campaign-prep unverified swarm drafts. The symbol never existed, and the declaration is never referenced in any of the three bodies — it emits nothing. Delete the 3 lines. Do NOT follow the checker's own suggested fix ("re-apply with rename_symbol.py") — its diagnosis is wrong. All 3 files are the active delinks.txt entries in their regions, so `gate3 --scope all` must still pass afterward — removing an unused extern declaration cannot change codegen, but prove it, don't assume it.
+
+(b) ONE checker bug. `src/overlay001/func_ov001_021ca144.c:15` is reported as `extern ... c`. Line 15 is INSIDE the file's opening `/* */` comment block — it is prose describing the C-27 alias recipe ("a second extern name at the identical address"). `check_match_invariants.py` is not stripping comments before scanning for extern declarations. Same bug class the q-khdays-toolkit port found and fixed upstream (a return statement misparsed as a declaration) — check whether that fix's approach ports here. Add a pytest regression test that feeds the checker a comment block containing the word "extern" and asserts zero findings.
+
+**Gate:** `python tools/check_match_invariants.py` reports 0 errors (warnings are fine and do not block); `python tools/gate3.py --scope all` PASS.
+
+### cm-ov002-unknown-sweep — sweep ov002's unknown pool, the biggest untouched concentration left [TODO]
+
+`wall_aware_headroom.py --exclude-attempted` currently reports ov002 at 2,682 candidates (8 coercible, 2,674 unknown, 0 confirmed-permanent) — the single largest pool in the project, ahead of main's 2,260. Most of it was mechanically `.s`-shipped by size-tier sweeps with zero C-drafting attempts (brief 416), so expect the usual mix, not a wall.
+
+Use the WORKTREE-PARALLEL SWEEP PROTOCOL in the queue header — it shipped 64/118 on cm-overlay-small-sweep and is the proven ~7x-per-merge-slot pattern. Take a size-gated batch (start 0-256B, the tier b661 measured at a 35-55% floor), partition it across ~5 worktrees, write the partition into the PR body, gate ONCE on the consolidated branch.
+
+Two preflights that have bitten this protocol before: seed each worktree with the baserom + a configure run or the batch dies late; and after consolidation, COUNT the `.c` files added vs the delinks.txt activations flipped — they must be equal (the 07-24 sweep added 64 but flipped 63, and no gate catches that, only the count check does).
+
+COORDINATION: the scaffolder's data lane is also in overlay002 but only touches `data_ov002_*.c` blobs. Stay on `func_ov002_*` and you are disjoint; delinks.txt overlap merges cleanly with `--no-ff`.
+
+**Gate:** `python tools/gate3.py --scope all` PASS + shipped/attempted count in the PR body.
