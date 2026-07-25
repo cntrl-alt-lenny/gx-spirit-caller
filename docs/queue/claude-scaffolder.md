@@ -382,3 +382,25 @@ cm-data-inference-probe shipped 2/6 by structural inference and cm-data-020b52d8
 Add a regression test per bug.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + one test per bug + a note confirming each reproduces before the fix.
+
+### q-prototypes-golive-pilot — actually USE the prototype bank — it is clean but included by ZERO TUs [S] [TODO]
+
+The bank is now in good shape (3,892 evidence-only prototypes, `check_prototypes_provenance.py` 0 mismatches, `audit_callsite_arity.py` 0 unresolved, types.h carries s8/s32/fx32/BOOL, asm-bodied definitions excluded) — and **not a single TU includes it**, so its entire payoff is still unrealized. The measured prize: **50.2% of extern declarations inside matched TUs are wrong**, and a wrong extern is a first-try match failure.
+
+PILOT CAREFULLY, this is the go-live step: (1) pick ONE matched caller-only TU that currently carries inline externs the bank also declares; (2) replace its inline externs with `#include "game/prototypes.h"`; (3) rebuild and confirm the TU's `.o` is byte-identical (per-TU objdiff, then `ninja sha1`). If byte-identical, repeat on ~5 more TUs of different shapes (different modules, at least one `.legacy.c` tier file) to prove it generalizes. **STOP and report if any TU changes bytes** — that is the signal that the bank's spelling (void*-normalisation, int widths) is not codegen-neutral, which is exactly what this pilot exists to discover.
+
+⚠️ HARD CONSTRAINT r11 verified: the bank is includable by CALLER-only TUs and NEVER by a TU that DEFINES one of the banked functions (redefinition conflict). Pick pilots accordingly. Do NOT mass-convert — the deliverable is a proven, byte-neutral recipe plus a count of how many TUs are eligible.
+
+**Gate:** `ninja sha1` byte-identical 3-region + per-TU objdiff evidence for each pilot TU + the eligible-TU count + a written go/no-go on mass conversion.
+
+### cm-data-inference-3 — data wave 3 — 213 opaque blobs remain and the lane is running at 69% [TODO]
+
+cm-data-inference-2 shipped **11/16 (69%)** and took `Named-struct` from 8,832 to 38,652 bytes (+337%). The runway is large: **65 opaque blobs remain in `src/main` and 148 across `src/overlay*`**. Continue with the same method and the same discipline that made wave 2 good:
+
+- Evidence first: read how real consumer code indexes the blob; the access pattern IS the struct evidence. No evidence -> leave opaque and say why. Wave 2 correctly declined 5 of 16.
+- Wave 2 found a productive shortcut: several blobs belonged to one **card-ID -> handler-pointer dispatch family** sharing generic lookup helpers. Look for families again — cracking the helper explains many blobs at once.
+- Watch for **misclassified CODE**: 2 of wave 2's non-ships were ARM32 linker veneer stubs, not data at all.
+- ⚠️ Wave 2 hit a real regression: rewriting an already-matched consumer from pointer-cast to struct-member access changed mwcc's codegen and dropped it to 27.3%. It reverted rather than forced — do the same, and re-verify every touched consumer individually before the aggregate gate.
+- Parse byte content from the already-committed literal by script and round-trip verify; never hand-transcribe.
+
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-blob verdict + hit rate + `Named-struct` before/after from a real `progress.py` run.

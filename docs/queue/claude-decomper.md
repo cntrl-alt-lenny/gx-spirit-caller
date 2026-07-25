@@ -213,3 +213,21 @@ just flagged. Full per-lever ledger:
 `docs/research/brief-682-sm64ds-lever-verify.md`.
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body. ✅
+
+### cm-sm64ds-lever-apply — apply the 5 VERIFIED-ON-2.0 sm64ds levers across the parked corpus [TODO]
+
+`cm-sm64ds-lever-verify` tested all 14 imported levers on our own tree: **5 VERIFIED-ON-2.0, 5 FAILED, 3 NO-CANDIDATE, 1 moot**, with 5 ships along the way (3 where the lever was load-bearing, confirmed by controlled A/B against a failing control). Those 5 verified levers have only been used on their single test candidate each — now sweep them across the parked corpus.
+
+For each of the 5 verified levers (see the per-lever ledger in `docs/research/reshape-recipes/imported-sm64ds-r3.md`): find every parked candidate whose documented residual matches that lever's failure shape and re-attempt it. Hidden-arg liveness, volatile-read pinning and field-by-field-copy-plus-guard were the load-bearing three — start there. Report ships per lever so we learn which imports actually earn their keep at scale, not just once.
+
+⚠️ State the `.c-added == delinks-flipped == .s-deleted` counts in the PR body (verify by diff, as brief 683 did — that report was exemplary).
+
+**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + ships per lever + the three-way count check stated in the PR body.
+
+### cm-ov004-021cd3b4-finish — finish the 93% candidate brief 683 flagged (it was described in prose but never queued) [TODO]
+
+⚠️ Filed by the brain: `cm-sm64ds-lever-verify` flagged this as a follow-up **in its PR text only**, so no task existed — the third recurrence of the 'flagged follow-ups evaporate' pattern this week. **A prose mention is not a task: append a real `### id — title [TODO]` block to the queue file.**
+
+The candidate: `func_ov004_021cd3b4` (previously untried) now reconstructs to **93% — 176 of 189 instructions** under lever 8, with 2 small residuals remaining. That is close enough to be worth a dedicated attempt with the full current toolkit (tier routing by epilogue, typed-struct externs, trampoline-arity check, branch-order/predication, the newly-verified sm64ds levers). If the 2 residuals turn out to be the known TST-vs-ANDS or argument-spill classes, say so explicitly and park with the word-level diff documented — that is a useful result too.
+
+**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + either the ship or a documented word-level residual naming the wall class.
