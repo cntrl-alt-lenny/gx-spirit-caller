@@ -20036,7 +20036,11 @@ src/main/data/data_020b4320.s:
 
 src/main/data_020b4680.c:
     complete
-    .rodata start:0x020b4680 end:0x020b46e0
+    .rodata start:0x020b4680 end:0x020b46a0
+
+src/main/data_020b46a0.c:
+    complete
+    .rodata start:0x020b46a0 end:0x020b46e0
 
 src/main/data/data_020b46e0.s:
     complete
