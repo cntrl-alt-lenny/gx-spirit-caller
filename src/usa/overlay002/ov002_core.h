@@ -23,15 +23,132 @@ typedef unsigned int   u32;
 /* --- per-player core: 0x868 bytes/player, indexed (player & 1) ---------
  * The dominant Cluster-A globals. Stride between players is 0x868; index
  * a player's region with (player & 1) * 0x868 as a BYTE offset.            */
+#ifdef M2C_CONTEXT_BUILD
+/* Mined by tools/build_struct_bank.py from 17 observed offsets across 51 access sites (brief 613). */
+struct Ov002022cf16c {
+    /* omitted overlapping field at +0x0 */
+    char _pad0[2];
+    u16 f_2;  /* +0x2, 3 site(s) */
+    int f_4;  /* +0x4, 2 site(s) */
+    int f_8;  /* +0x8, 1 site(s) */
+    int f_c;  /* +0xc, 4 site(s) */
+    int f_10;  /* +0x10, 2 site(s) */
+    int f_14;  /* +0x14, 2 site(s) */
+    char _pad1[4];
+    int f_1c;  /* +0x1c, 1 site(s) */
+    char _pad2[12];
+    int f_2c;  /* +0x2c, 5 site(s) */
+    char _pad3[2104];
+    int f_868;  /* +0x868, 7 site(s) */
+    int f_86c;  /* +0x86c, 2 site(s) */
+    int f_870;  /* +0x870, 1 site(s) */
+    int f_874;  /* +0x874, 4 site(s) */
+    int f_878;  /* +0x878, 1 site(s) */
+    int f_87c;  /* +0x87c, 2 site(s) */
+    char _pad4[4];
+    int f_884;  /* +0x884, 1 site(s) */
+    char _pad5[12];
+    int f_894;  /* +0x894, 5 site(s) */
+};
+extern struct Ov002022cf16c data_ov002_022cf08c;
+#else
 extern char data_ov002_022cf08c[];   /* row table (0x868/player) [member3] */
+#endif
 extern int  data_ov002_022cf09c[];   /* per-player count table (0x260 list) [member2] */
 extern char data_ov002_022cf098[];   /* per-player event count table */
 extern int  data_ov002_022cf0a4[];   /* per-player count table (0x3a0 list) [shipped 021ba1e8] */
+#ifdef M2C_CONTEXT_BUILD
+/* Mined by tools/build_struct_bank.py from 9 observed offsets across 661 access sites (brief 613). */
+struct Ov002022ce950 {
+    u16 f_0;  /* +0x0, 73 site(s) */
+    u16 f_2;  /* +0x2, 74 site(s) */
+    u16 f_4;  /* +0x4, 60 site(s) -- signedness disagreement: [False, True] */
+    u16 f_6;  /* +0x6, 40 site(s) */
+    char _pad0[2048];
+    int f_808;  /* +0x808, 21 site(s) */
+    int f_80c;  /* +0x80c, 83 site(s) */
+    int f_810;  /* +0x810, 272 site(s) */
+    int f_814;  /* +0x814, 10 site(s) */
+    int f_818;  /* +0x818, 28 site(s) -- 21/27 loads read the full word unnarrowed, 6/27 narrow to [(13, 0)] */
+};
+extern struct Ov002022ce950 data_ov002_022ce870;
+#else
 extern char data_ov002_022ce870[];   /* per-player field table (+0x80c scalar) [member1] */
+#endif
+/* M2C_CONTEXT_BUILD (brief 609): m2c's --context type inference keys off
+ * a symbol's DECLARED type, not any macro that aliases it -- the D008C /
+ * CE1A8 cast-pointer macros below are pure preprocessor text and m2c's
+ * parser never sees them. Typing the extern as the mined struct VALUE
+ * (not char[]) in this branch only -- never defined during a real build,
+ * see tools/m2c_feed.py's build_context() -- is what actually makes m2c
+ * render named fields instead of auto `unkNNN` offsets. */
+#ifdef M2C_CONTEXT_BUILD
+extern struct Ov002D016c data_ov002_022d008c;
+#else
 extern char data_ov002_022d008c[];   /* per-player field table (+0xcec scalar) [member1*] */
+#endif
 extern char data_ov002_022cf0c4[];   /* per-player field table */
+#ifdef M2C_CONTEXT_BUILD
+extern struct Ov002Ce288 data_ov002_022ce1a8;
+#else
 extern char data_ov002_022ce1a8[];   /* per-player field table */
+#endif
+#ifdef M2C_CONTEXT_BUILD
+/* Mined by tools/build_struct_bank.py from 39 observed offsets across 888 access sites (brief 613). */
+struct Ov002022cd3f4 {
+    int f_0;  /* +0x0, 128 site(s) */
+    int f_4;  /* +0x4, 91 site(s) */
+    int f_8;  /* +0x8, 78 site(s) */
+    int f_c;  /* +0xc, 4 site(s) */
+    int f_10;  /* +0x10, 4 site(s) */
+    int f_14;  /* +0x14, 9 site(s) */
+    int f_18;  /* +0x18, 16 site(s) */
+    int f_1c;  /* +0x1c, 259 site(s) */
+    int f_20;  /* +0x20, 171 site(s) */
+    int f_24;  /* +0x24, 16 site(s) */
+    int f_28;  /* +0x28, 5 site(s) */
+    int f_2c;  /* +0x2c, 1 site(s) */
+    int f_30;  /* +0x30, 1 site(s) */
+    int f_34;  /* +0x34, 1 site(s) */
+    int f_38;  /* +0x38, 3 site(s) */
+    int f_3c;  /* +0x3c, 2 site(s) */
+    int f_40;  /* +0x40, 1 site(s) */
+    int f_44;  /* +0x44, 1 site(s) */
+    int f_48;  /* +0x48, 1 site(s) */
+    int f_4c;  /* +0x4c, 1 site(s) */
+    char _pad0[8];
+    int f_58;  /* +0x58, 5 site(s) */
+    int f_5c;  /* +0x5c, 1 site(s) */
+    int f_60;  /* +0x60, 1 site(s) */
+    char _pad1[8];
+    int f_6c;  /* +0x6c, 1 site(s) */
+    int f_70;  /* +0x70, 2 site(s) */
+    int f_74;  /* +0x74, 1 site(s) */
+    char _pad2[24];
+    int f_90;  /* +0x90, 4 site(s) */
+    char _pad3[8];
+    int f_9c;  /* +0x9c, 31 site(s) */
+    int f_a0;  /* +0xa0, 5 site(s) */
+    int f_a4;  /* +0xa4, 5 site(s) */
+    int f_a8;  /* +0xa8, 14 site(s) */
+    int f_ac;  /* +0xac, 2 site(s) */
+    int f_b0;  /* +0xb0, 3 site(s) */
+    char _pad4[8];
+    int f_bc;  /* +0xbc, 1 site(s) */
+    char _pad5[4];
+    int f_c4;  /* +0xc4, 6 site(s) */
+    char _pad6[6];
+    u16 f_ce;  /* +0xce, 3 site(s) */
+    char _pad7[8];
+    int f_d8;  /* +0xd8, 6 site(s) */
+    char _pad8[16];
+    int f_ec;  /* +0xec, 2 site(s) */
+    int f_f0;  /* +0xf0, 2 site(s) */
+};
+extern struct Ov002022cd3f4 data_ov002_022cd314;
+#else
 extern char data_ov002_022cd314[];   /* per-player field table */
+#endif
 
 /* 20-byte (0x14) sub-row array starts at (row + 0x30); slot.id is a 13-bit
  * field read lsl#19;lsr#19 — type it as a BITFIELD, never (v<<19)>>19
@@ -81,10 +198,146 @@ extern void func_ov002_021b90e4(int *dst, const int *src);       /* [shipped] *d
 extern int  data_ov002_022cd664[];   /* flag table, indexed by a small id [shipped 021ae400] */
 extern u16  data_ov002_022ce640[];   /* node fallback ring (mod 128) [shipped 0223de94] */
 
-/* d016c / ce288 are per-player FIELD tables (declared char[] above); the
- * band reads scalar state at fixed offsets — type a local struct per TU,
- * e.g. d016c.f3300 (+0xce4), .f3308 (+0xcec), .f3340 (+0xd0c), .f_d50,
- * .f_d64; ce288.f1484/.f1488/.f1492/.f1496/.f1672. [shipped 021e2b3c/2c5c] */
+/* d016c / ce288 are per-player FIELD tables (declared char[] above). Full
+ * field layout mined from every access site across the delinked build
+ * (tools/build_struct_bank.py, brief 613) — propagated from the EUR
+ * header's brief-609 additions (same struct layout, this region's own
+ * data_ov002_022d008c / data_ov002_022ce1a8 addresses). See
+ * src/overlay002/ov002_core.h for the full brief-609 rationale comment
+ * (cast-pointer macro, not a redeclared extern, for the same reason: 20+
+ * already-matched TUs here `#include "ov002_core.h"` and cast-offset into
+ * these symbols directly as char[] today).
+ *     D008C->rand_state             // was *(int*)(data_ov002_022d008c+0xce4)
+ *     CE1A8->f_5a8                  // was *(int*)(data_ov002_022ce1a8+0x5a8) */
+
+/* Mined by tools/build_struct_bank.py from 55 observed offsets across
+ * 2077 access sites (brief 609). +0xce4 is func_ov002_021b009c's proven
+ * MSVC LCG rand_state (u32); +0xce8/+0xd44 are the majority-vote-vs-
+ * minority-narrowed disagreements above (1/5 and 1/142 sites narrow to
+ * a 16-bit read respectively — both kept `int` to match the ~60
+ * shipped references, which are all unnarrowed). */
+struct Ov002D016c {
+    char _pad0[2];
+    u16 f_2;
+    char _pad1[24];
+    int f_1c;
+    int f_20;
+    char _pad2[172];
+    int f_d0;
+    int f_d4;
+    int f_d8;
+    int f_dc;
+    int f_e0;
+    char _pad3[3072];
+    int rand_state;   /* +0xce4: func_ov002_021b009c's proven MSVC LCG state */
+    int f_ce8;         /* +0xce8: 4/5 sites unnarrowed, 1/5 narrows to u16 -- see brief-609 doc */
+    int f_cec;
+    int f_cf0;
+    int f_cf4;
+    int f_cf8;
+    int f_cfc;
+    int f_d00;
+    int f_d04;
+    int f_d08;
+    int f_d0c;
+    void *f_d10;
+    int f_d14;
+    int f_d18;
+    int f_d1c;
+    int f_d20;
+    int f_d24;
+    int f_d28;
+    int f_d2c;
+    int f_d30;
+    int f_d34;
+    int f_d38;
+    int f_d3c;
+    int f_d40;
+    int f_d44;         /* +0xd44: 141/142 sites unnarrowed, 1/142 narrows to u16 -- see brief-609 doc */
+    int f_d48;
+    int f_d4c;
+    int f_d50;
+    int f_d54;
+    int f_d58;
+    int f_d5c;
+    int f_d60;
+    int f_d64;
+    int f_d68;
+    int f_d6c;
+    int f_d70;
+    int f_d74;
+    int f_d78;
+    int f_d7c;
+    int f_d80;
+    int f_d84;
+    int f_d88;
+    int f_d8c;
+    int f_d90;
+    int f_d94;
+    int f_d98;
+    int f_d9c;
+};
+#define D008C ((struct Ov002D016c *)data_ov002_022d008c)
+
+/* Mined the same way, 45 observed offsets across 1945 access sites.
+ * +0x69c has the same majority-vote-vs-minority-narrowed shape as
+ * d016c's two flagged offsets above (23/24 unnarrowed, 1/24 narrows to
+ * u16) -- kept `int`, see docs/research/brief-609-struct-bank.md. */
+struct Ov002Ce288 {
+    char _pad0[2];
+    u16 f_2;
+    u16 f_4;
+    u16 f_6;
+    char _pad1[2];
+    u16 f_a;
+    u16 f_c;
+    char _pad2[1138];
+    int f_480;
+    int f_484;
+    int f_488;
+    int f_48c;
+    int f_490;
+    int f_494;
+    char _pad3[256];
+    int f_598;
+    int f_59c;
+    int f_5a0;
+    int f_5a4;
+    int f_5a8;
+    int f_5ac;
+    int f_5b0;
+    int f_5b4;
+    int f_5b8;
+    int f_5bc;
+    int f_5c0;
+    int f_5c4;
+    int f_5c8;
+    int f_5cc;
+    int f_5d0;
+    int f_5d4;
+    int f_5d8;
+    u8 f_5dc;
+    char _pad4[31];
+    int f_5fc;
+    char _pad5[124];
+    int f_67c;
+    int f_680;
+    int f_684;
+    int f_688;
+    int f_68c;
+    char _pad6[4];
+    int f_694;
+    int f_698;
+    int f_69c;         /* +0x69c: 23/24 sites unnarrowed, 1/24 narrows to u16 -- see brief-609 doc */
+    int f_6a0;
+    int f_6a4;
+    int f_6a8;
+    int f_6ac;
+    int f_6b0;
+    int f_6b4;
+    int f_6b8;
+};
+#define CE1A8 ((struct Ov002Ce288 *)data_ov002_022ce1a8)
 
 /* hub: gate on a flag table, then post a command (84 band callers). */
 extern void func_ov002_021ae400(int a, int b);                   /* [shipped] cd744[a]?ret:0229ade0(0x31,0,b,0) */
