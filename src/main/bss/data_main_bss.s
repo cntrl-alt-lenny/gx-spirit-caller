@@ -508,6 +508,9 @@ data_0219a914:
         .space 0x10
         .global data_0219a924
 data_0219a924:
+        .space 0x0
+        .global data_0219a924_alias
+data_0219a924_alias:
         .space 0x8
         .global data_0219a92c
 data_0219a92c:
