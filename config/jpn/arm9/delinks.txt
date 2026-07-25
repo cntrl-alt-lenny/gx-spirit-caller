@@ -2424,7 +2424,7 @@ src/jpn/main/func_02021174.s:
 src/jpn/main/func_02021278.s:
     complete
     .text start:0x02021278 end:0x020213d8
-src/jpn/main/func_020213d8.s:
+src/jpn/main/func_020213d8.c:
     complete
     .text start:0x020213d8 end:0x02021428
 src/jpn/main/func_02021428.c:
