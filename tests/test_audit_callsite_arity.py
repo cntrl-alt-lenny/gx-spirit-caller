@@ -7,6 +7,14 @@ close to the original and tested directly; `build_consensus`/`audit`
 are this project's own re-targeting (delinks.txt `complete` TUs as the
 matched-tree source, gen_prototypes.py's provenance JSON as the audit
 target) and tested against synthetic fixtures.
+
+`classify()` (q-prototypes-arity-33, 2026-07-25) is tested both against
+synthetic fixtures (resolved/unresolved shapes) AND, in
+`TestRealTreeHasZeroUnresolvedContradictions`, against the actual
+committed tree -- THIS is the "wired into the check path" regression
+guard the item asked for: a plain `pytest -q tests` run now fails if a
+future bank regeneration ever reintroduces a genuine (non-caller-side)
+arity contradiction.
 """
 
 from __future__ import annotations
@@ -153,6 +161,136 @@ class BuildConsensusAndAudit(unittest.TestCase):
     def test_audit_ignores_undeclared_functions(self):
         consensus = {"target": {2: 3}}
         self.assertEqual(aca.audit(consensus, {"other_func": 0}), [])
+
+
+class ReverifyDefinition(unittest.TestCase):
+    def _make_source(self, tmp: str, rel: str, text: str) -> Path:
+        root = Path(tmp)
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        return root
+
+    def test_real_definition_returns_params(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_source(
+                tmp, "src/main/target.c",
+                "int target(int a, int b) { return a + b; }\n",
+            )
+            with mock.patch.object(aca, "ROOT", root):
+                params = aca.reverify_definition("target", "src/main/target.c")
+        self.assertEqual(len(params), 2)
+
+    def test_asm_bodied_definition_returns_none(self):
+        # The exact blind spot this whole tool exists to catch: an
+        # asm-qualified definition's written param list isn't trustworthy
+        # evidence, so gen_prototypes.py's own parser excludes it --
+        # reverify_definition must see the same exclusion, not a stale
+        # "0 params" reading.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_source(
+                tmp, "src/main/target.c",
+                "asm void target(void) { nop; }\n",
+            )
+            with mock.patch.object(aca, "ROOT", root):
+                params = aca.reverify_definition("target", "src/main/target.c")
+        self.assertIsNone(params)
+
+    def test_missing_file_returns_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(aca, "ROOT", Path(tmp)):
+                params = aca.reverify_definition("target", "src/main/nope.c")
+        self.assertIsNone(params)
+
+    def test_function_not_found_in_file_returns_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._make_source(
+                tmp, "src/main/target.c",
+                "int other(int a) { return a; }\n",
+            )
+            with mock.patch.object(aca, "ROOT", root):
+                params = aca.reverify_definition("target", "src/main/target.c")
+        self.assertIsNone(params)
+
+
+class Classify(unittest.TestCase):
+    def _contradiction(self, name="target", declared=0, tree_uses=(1,), site_count=3):
+        return {"name": name, "declared": declared, "tree_uses": list(tree_uses), "site_count": site_count}
+
+    def test_matching_reverify_is_resolved_not_unresolved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src/main").mkdir(parents=True)
+            (root / "src/main/target.c").write_text(
+                "int target(void) { return 1; }\n", encoding="utf-8",
+            )
+            provenance = {"target": {"params": [], "source": "src/main/target.c"}}
+            with mock.patch.object(aca, "ROOT", root):
+                resolved, unresolved = aca.classify([self._contradiction()], provenance)
+        self.assertEqual(unresolved, [])
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["name"], "target")
+        self.assertEqual(resolved[0]["caller_arity"], [1])
+
+    def test_stale_provenance_is_unresolved(self):
+        # The real source now takes 2 params, but provenance still
+        # claims 0 (as if generated before an un-regenerated source
+        # edit) -- classify() must NOT silently trust the cached value.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src/main").mkdir(parents=True)
+            (root / "src/main/target.c").write_text(
+                "int target(int a, int b) { return a + b; }\n", encoding="utf-8",
+            )
+            provenance = {"target": {"params": [], "source": "src/main/target.c"}}
+            with mock.patch.object(aca, "ROOT", root):
+                resolved, unresolved = aca.classify([self._contradiction(declared=0)], provenance)
+        self.assertEqual(resolved, [])
+        self.assertEqual(len(unresolved), 1)
+        self.assertIn("re-parse gives 2 param(s)", unresolved[0]["reverify_failure"])
+
+    def test_missing_source_is_unresolved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            provenance = {"target": {"params": [], "source": "src/main/gone.c"}}
+            with mock.patch.object(aca, "ROOT", Path(tmp)):
+                resolved, unresolved = aca.classify([self._contradiction()], provenance)
+        self.assertEqual(resolved, [])
+        self.assertEqual(len(unresolved), 1)
+        self.assertIn("no independently-parseable definition", unresolved[0]["reverify_failure"])
+
+    def test_missing_provenance_entry_is_unresolved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(aca, "ROOT", Path(tmp)):
+                resolved, unresolved = aca.classify([self._contradiction()], {})
+        self.assertEqual(resolved, [])
+        self.assertEqual(len(unresolved), 1)
+
+
+class TestRealTreeHasZeroUnresolvedContradictions(unittest.TestCase):
+    """The actual check-path regression guard: every call-site
+    contradiction against the COMMITTED bank must independently
+    re-verify against a real definition. A future regeneration that
+    reintroduces a genuine (non-caller-side) gap fails THIS test."""
+
+    def test_committed_bank_has_no_unresolved_contradictions(self):
+        if not aca.PROVENANCE_JSON.is_file():
+            self.skipTest("prototypes-provenance.json not present")
+        consensus = aca.build_consensus()
+        provenance = aca.load_provenance()
+        declared = {name: len(entry.get("params", [])) for name, entry in provenance.items()}
+        contradictions = aca.audit(consensus, declared)
+        resolved, unresolved = aca.classify(contradictions, provenance)
+        self.assertEqual(
+            unresolved, [],
+            "audit_callsite_arity found bank-side (not caller-side) arity "
+            "contradiction(s) -- run `python tools/audit_callsite_arity.py` "
+            "for details, then resolve via gen_prototypes.py (regenerate) "
+            "or fix the underlying source, per q-prototypes-arity-33.",
+        )
+        # Not a hard assertion (the real count may change as the bank
+        # grows) -- just confirms classify() is actually exercising real
+        # data, not silently short-circuiting to empty lists both ways.
+        self.assertGreater(len(resolved) + len(unresolved), 0)
 
 
 if __name__ == "__main__":

@@ -311,7 +311,19 @@ r11 found the project's ceiling model CONTRADICTS ITSELF — it reports 48.03% w
 
 **Gate:** `python -m pytest -q tests` + the ceiling either corrected or removed (with the arithmetic shown) + 3 candidate done-definitions with a recommendation + the README SVG bar reporting natural-C.
 
-### q-prototypes-arity-33 — resolve the 33 CALL-SITE arity contradictions the new audit tool found [S] [TODO]
+### q-prototypes-arity-33 — resolve the 33 CALL-SITE arity contradictions the new audit tool found [S] [DONE]
+
+> Shipped, 0 unresolved (all 33 independently re-verified as real,
+> non-asm, evidence-backed definitions — the bank was already correct;
+> callers wrongly declare their own local externs, byte-safe but
+> unwired). Regenerating the bank confirmed a byte-identical no-op.
+> Fix lives in `tools/audit_callsite_arity.py`'s new `classify()`
+> (reuses `gen_prototypes.parse_function_definitions` to independently
+> re-verify each contradiction against a fresh definition parse) +
+> a nonzero exit code + a real-tree pytest integration test as the
+> check-path regression guard — see
+> `docs/research/q-prototypes-arity-33-2026-07-25.md`. PR #1346, not
+> yet merged to main as of this branch.
 
 The khdays-ported `tools/audit_callsite_arity.py` now runs against our bank and reports: **3,780 declared prototypes audited, 33 with a CALL-SITE arity contradiction** (e.g. `func_ov010_021b2860`: bank declares 0 args, 4 confident call sites pass 1). These are the SAME failure class that got the first prototype bank reverted — a wrong arity silently breaks every caller's byte-match the moment the header is included, and the sha1 gate CANNOT see it. For each of the 33: decide the truth from evidence — the definition body is ground truth where it exists; where the definition is `asm`-bodied (no parameter list, the known blind spot) the CALL SITES are the only evidence, so take the call-site arity. Fix `gen_prototypes.py` so the resolution is GENERATED, not hand-patched (hand edits get wiped by the next `--write`), then regenerate and re-run the audit until it reports 0 contradictions. Wire `audit_callsite_arity.py` into the check path so this can't regress: `check_prototypes_provenance.py` verifies against DEFINITIONS, the arity audit verifies against CALL SITES — two independent directions, which is exactly why the pair catches what either alone misses.
 
