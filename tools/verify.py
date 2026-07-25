@@ -165,8 +165,15 @@ def _find_gap(func: str, module: str) -> str | None:
 
 def _compile(cfile: str, out_o: str, tier: str) -> bool:
     env = {**os.environ, "WINEDEBUG": "-all", "MVK_CONFIG_LOG_LEVEL": "0"}
+    # Absolute path for the compiler binary: on native Windows, subprocess/
+    # CreateProcess resolves a relative executable against the *calling*
+    # process's cwd, not the `cwd=` kwarg given here, so a relative
+    # "tools/mwccarm/..." path raises FileNotFoundError (WinError 2) even
+    # though ROOT is correct. Absolute is unambiguous on every platform,
+    # including under wine (which just receives it as its own argv[1]).
+    compiler = os.path.join(ROOT, _COMPILERS[tier])
     subprocess.run(
-        [*exe_launch_prefix(), _COMPILERS[tier], *_CFLAGS, "-c", cfile, "-o", out_o],
+        [*exe_launch_prefix(), compiler, *_CFLAGS, "-c", cfile, "-o", out_o],
         capture_output=True, text=True, cwd=ROOT, env=env,
     )
     return os.path.exists(out_o)
