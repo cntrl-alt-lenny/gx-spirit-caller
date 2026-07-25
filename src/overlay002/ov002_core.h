@@ -625,6 +625,16 @@ extern int  func_ov002_021c2084(struct Ov002Self *self, int player, int idx, int
  * .s picks: 02267f90 021efd38 0220d7c0 0220599c 021f95f8 0220c2c0 02201e38
  *   02205dc8 0220cf0c 022abf88 0220cff8 02273b1c 022576d8 0223b3cc 021b91d0
  *   021b9ba0 021d5ab4.
+ *
+ * UPDATE (cm-overlay-small-sweep, PR #1334, 2026-07-24): 3 of the ".s picks"
+ * above have SHIPPED and are stale — 02267f90, 0220c2c0, 02273b1c all
+ * matched byte-identical once drafted with a typed struct member instead of
+ * the pointer-cast arithmetic ("reg-mirror"/"predicate-vs-branch"/
+ * "mirror-no-sink") the original investigation used. Same root cause as
+ * every other reversal in that sweep — see
+ * docs/research/cm-overlay-small-sweep-2026-07-24.md. The remaining .s
+ * picks above are unverified against this lever; treat as unconfirmed, not
+ * settled, until individually re-checked.
  * ======================================================================= */
 
 /* =======================================================================

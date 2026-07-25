@@ -51,8 +51,10 @@ extern char data_02104f4c[];         /* system work: +0x928 boot/page counter   
  *             the HSV-buried magic in ov018 021acf80. Banks: clean /N div matches.
  *
  * §DEFERRED (Mac/permuter + big-render tier; catalogued by class):
- *   021b4c30 (70%) caller-saved flag-load r0-vs-r1 (flag has no call-arg use, so
- *     mwcc parks it in r1; not decl-order reachable — like ov017 021b33dc/61dc).
+ *   021b4c30 SHIPPED (cm-overlay-small-sweep, PR #1334, 2026-07-24) — the
+ *     documented 70% caller-saved flag-load r0-vs-r1 verdict used pointer-cast
+ *     arithmetic instead of a typed struct member; the latter matched
+ *     byte-identical on the first attempt.
  *   021b26d0 script-step dispatcher: increment base/zero/index post-blx rotation
  *     (identical to ov017 021b2c8c, ~72%).
  *   021b28dc (73%) OAM-packet bit-pack: caller-saved lr<->r12 swap + orr operand

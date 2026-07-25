@@ -97,7 +97,10 @@ extern char data_ov011_021d4674[];   /* parallel coord array Y', stride 0x28 */
  * WALL additions (defer; GLOBAL_ASM/permuter tail):
  *  - field-address pooling on a POST-CALL single access: a lone RMW/`+=1` after
  *    a call fuses `base+off` into the pool instead of `[base,#off]`; cached-base
- *    does not recover it. (021ccf8c, 021cefb4, 021d0afc, 021d0b4c)
+ *    does not recover it. (021cefb4, 021d0afc, 021d0b4c — 021ccf8c SHIPPED via
+ *    cm-overlay-small-sweep, PR #1334, 2026-07-24: the "3 prior attempts
+ *    reverted" verdict used pointer-cast arithmetic instead of a typed struct
+ *    member; the latter matched byte-identical)
  *  - `(n<<K1)>>K2` nibble-reposition fuses to `& mask` (skips lsr;lsl). (021ceffc)
  *  - load-dest reg-numbering (r0 vs r1) clean 2-reg cascade. (021d20e8, 021d18b4)
  *  - arg-eval-order (right-to-left) reg cascade. (021cd700, 021ce344)
