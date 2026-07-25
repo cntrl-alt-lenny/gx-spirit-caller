@@ -169,8 +169,27 @@ The harvest took the backlog from 244/region to **20/region** (verify with `pyth
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + port_census showing the backlog at/near 0 + the ov002_core.h propagation + a verdict on the bss-alias case.
 
-### cm-sm64ds-lever-verify — verify the newly-ingested sm64ds levers on our 2.0/sp1p5 corpus [TODO]
+### cm-sm64ds-lever-verify — verify the newly-ingested sm64ds levers on our 2.0/sp1p5 corpus [DONE]
 
-brief 680's re-ingest mined the peer's commit stream (147 commits) and its structured `nearmiss/db.jsonl` (683 rows) — a much better source than the frozen notes file. Those levers are marked UNVERIFIED-ON-2.0 by our standing rule (the peer builds on 1.2/sp2p3). The ingest already shipped 5 functions x 3 regions applying some of them, which is a promising signal — now systematically verify the rest. For each newly-imported lever: find a parked candidate in our corpus whose residual matches the lever's stated failure shape, apply it, and record VERIFIED-ON-2.0 / FAILED-ON-2.0 / NO-CANDIDATE in `docs/research/reshape-recipes/imported-sm64ds-r3.md`. PRIORITIZE any lever bearing on our three open residuals (TST-vs-ANDS instruction selection, the 4-register argument-spill ABI puzzle, byte-swap value-correct/order-wrong) — r11 found no external recipe for the first two, so a peer lever that moves either is a significant unlock. Ship whatever matches byte-exact along the way. ⚠️ When you ship, DELETE the replaced `.s` — brief 680 flipped delinks to `.legacy.c` but left 15 stale `.s` files behind (the brain caught it via the .c-added vs delinks-flipped count check and cleaned up). Verify that count yourself before opening the PR.
+**Result (brief 682, this PR):** all 14 levers tried against real local
+candidates: 5 VERIFIED-ON-2.0 (mechanism confirmed real — 3 load-bearing
+and shipped: hidden-arg liveness on `func_02087e54`, volatile-read pinning
+on `func_02066ea0`, field-by-field-copy-plus-guard on `func_02085664`; 2
+confirmed real but not applicable — fake-dependency coloring blocked by an
+unrelated frame-shape wall, u64-laundering confirmed to work in the
+opposite direction this candidate needs), 5 FAILED-ON-2.0 (2 of which
+still shipped their candidate via the OPPOSITE approach from the one
+tested: `func_ov002_022a822c`'s duplicate-beats-hoist, `func_ov006_021b60a4`'s
+correct-reconstruction-beats-offset-split), 3 honest NO-CANDIDATE after a
+real corpus search, 1 moot (lever's precondition never arose — bonus: a
+93% near-miss fell out of testing it, flagged as a follow-up). None of the
+14 touch the 3 open residuals — reconfirmed, nothing new for any of them
+this pass (their own internal leads were separately executed in brief
+680). Along the way, 6 independent agents hit the same real
+`tools/verify.py` bug (hardcoded `wine`, unresolvable on native Windows) —
+fixed for real via the existing `exe_launch_prefix()` helper rather than
+just flagged. Full per-lever ledger:
+`docs/research/reshape-recipes/imported-sm64ds-r3.md`. Full writeup:
+`docs/research/brief-682-sm64ds-lever-verify.md`.
 
-**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body.
+**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + a per-lever VERIFIED/FAILED/NO-CANDIDATE table + any ships + the .c-added == delinks-flipped count stated in the PR body. ✅
