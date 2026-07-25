@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**116 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**117 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (3)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (46)
+- [Uncategorised](#uncategorised) (47)
 
 ## Analysis / worklist
 
@@ -478,6 +478,12 @@ This is visibility only: it never rejects a change.  It finds added or modified 
 **automate the DETERMINISTIC mechanical carve lanes (brief 456).**
 
 The ov002 `.s` reg-alloc lane and the region-port lane are deterministic: a candidate either passes a byte-exact gate or it doesn't — no LLM judgement. This driver enumerates uncarved candidates in a scope, runs the per-candidate verific…
+
+### `tools/batch_port.py`
+
+**turnkey gated loop for the cross-region port backlog (q-batch-port).**
+
+Builds on tools/batch_carve.py's Ops/commit-on-pass seam: batch_carve ADDS a brand-new delinks.txt block for a freshly-carved .s; batch_port FLIPS an EXISTING block's header from an already-shipped .s to a freshly-ported .c (the mechanic…
 
 ### `tools/batch_sha1.py`
 
