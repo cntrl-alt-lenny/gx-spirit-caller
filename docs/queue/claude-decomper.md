@@ -163,11 +163,31 @@ r11's wall-hygiene audit found two catalogued 'permanent' entries contradicted b
 
 **Gate:** the updated reshape-recipes doc with new levers marked UNVERIFIED-ON-2.0 + any lever actually re-tested on our corpus (with the result) + explicit 'nothing new for X' where a residual stays unaddressed. ✅
 
-### cm-crossregion-mop — close out the port lane: 20/region left + the 2 documented blockers [TODO]
+### cm-crossregion-mop — close out the port lane: 20/region left + the 2 documented blockers [DONE]
 
-The harvest took the backlog from 244/region to **20/region** (verify with `python tools/port_census.py` -> build/port_backlog.json). Finish it: **18 remain at sim==1.0** (should be mechanical — use `tools/batch_port.py`, which now exists and is gated) **+ 2 sub-1.0** needing the ground-truth `.s` comparison that brief 677 used (20 of its 23 sub-1.0 fixes were the same consistent -8 struct-offset shift, so check for that pattern first). ALSO clear brief 677's two explicitly-deferred blockers, which are the reason 3 candidates/region were excluded: (1) a **stale `ov002_core.h` in USA/JPN** missing brief 609/613's struct-bank additions — propagate the EUR header's additions to both regions; (2) **`func_ov008_021ac1cc` needs a second name** (`data_*` same-address alias) — brief 677 says the bss-alias symbol-emission mechanism needs a dedicated look before that one can port. Do (1) first; it likely unblocks 2 of the 3 per region.
+**Result (brief 681, this PR):** both brief-677 blockers cleared —
+`ov002_core.h`'s brief 609/613 struct-bank additions propagated to
+USA/JPN (byte-identical to each other, gated independently), and
+`func_ov008_021ac1cc`'s bss-alias case fixed in both regions via a real
+`.space 0x0`-then-alias split in each region's `bss.s` (a symbols.txt
+line alone is not sufficient — the linker needs the real split too).
+Shipped 13/region (26 total) of the 18 sim==1.0 candidates; 5/region
+refuse even at MEDIUM confidence on a genuine cross-region symbol
+rename, explicitly out of `port_to_region.py`'s documented scope —
+parked. Both sub-1.0 candidates re-confirmed as needing brief 677's
+already-documented 57-slot struct-offset table — parked unchanged.
+Found and documented (not fixed) two `port_to_region.py` bugs while
+hand-fixing 7/region gate-fails: a regex `\b`-boundary gap that makes
+`_alias`-suffixed references invisible to substitution, and a more
+serious address-keyed dict collision that silently mis-resolves even a
+*bare* base-name reference to its alias's name — compiles clean, links
+clean, wrong bytes. Backlog now identical 7/region in both regions (5
+refused + 2 sub-1.0). 3-region `gate3.py --scope all --no-tests` PASS.
+26 `.c` added == 26 delinks.txt flips == 26 `.s` deleted, verified by
+diff not just count symmetry. Full detail:
+`docs/research/brief-681-crossregion-mop.md`.
 
-**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + port_census showing the backlog at/near 0 + the ov002_core.h propagation + a verdict on the bss-alias case.
+**Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + port_census showing the backlog at/near 0 + the ov002_core.h propagation + a verdict on the bss-alias case. ✅
 
 ### cm-sm64ds-lever-verify — verify the newly-ingested sm64ds levers on our 2.0/sp1p5 corpus [TODO]
 
