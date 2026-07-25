@@ -477,7 +477,7 @@ class TestBatchPorterDriver(unittest.TestCase):
         ops.bind([delinks_path])
         backlog = [_entry("func_eur00", "main", "func_tgt00", 0x02006000, 0x40),
                   _entry("func_eur01", "main", "func_tgt01", 0x02006040, 0x40)]
-        rep = self._porter(ops, batch=2, park_path=str(park.relative_to(self.tmp))).run(backlog)
+        self._porter(ops, batch=2, park_path=str(park.relative_to(self.tmp))).run(backlog)
         park_text = park.read_text()
         self.assertIn("func_tgt00 port-refused", park_text)
         self.assertIn("func_tgt01 gate-fail", park_text)

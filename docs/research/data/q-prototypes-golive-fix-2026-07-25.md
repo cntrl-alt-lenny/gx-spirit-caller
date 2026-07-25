@@ -104,6 +104,7 @@ losing 2 of ~3800 entries is not worth the extra complexity.
 - `python tools/configure.py eur && ninja sha1`: **OK** — byte-neutral,
   as expected (nothing `#include`s the header yet).
 - **Pilot TU compile** (real mwccarm, not a simulation):
+
   ```
   ./tools/mwccarm/2.0/sp1p5/mwccarm.exe -O4,p -enum int -char signed \
     -str noreuse -proc arm946e -gccext,on -fp soft -inline noauto \
@@ -112,6 +113,7 @@ losing 2 of ~3800 entries is not worth the extra complexity.
     -i libs/runtime/include -lang=c99 -d eur -c pilot_prototypes_include.c \
     -o <outdir>
   ```
+
   A throwaway TU (`#include "game/prototypes.h"` + a function calling
   `func_02007218` (s32 return), `CTRDG_IsOptionCartridge` (BOOL return),
   `string_put_char` (s8 param) — deliberately exercising the exact

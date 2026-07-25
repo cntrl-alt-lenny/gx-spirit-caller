@@ -63,7 +63,7 @@ python tools/audit_callsite_arity.py
 contradiction.** Two genuinely different categories:
 
 **Category A — 6 already superseded by q-prototypes-golive-fix (PR
-#1341, not yet merged to main as of this branch).** All 6 are
+PR #1341, not yet merged to main as of this branch).** All 6 are
 `asm`-bodied functions (`Copy32`, `Fill32`, `OS_RestoreIrq`,
 `func_0209448c`, `func_020944a4`, `func_ov002_0226ae30`) — exactly the
 landmine class that item's asm-exclusion fix already removes from the

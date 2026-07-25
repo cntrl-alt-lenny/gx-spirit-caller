@@ -73,7 +73,7 @@ to re-derive any of it.
 ## Stale citations found and fixed (7, not 6 — one more surfaced during the audit)
 
 The 6 the queue text named, all from `cm-overlay-small-sweep` (PR
-#1334) shipping functions that older entries still cited as
+PR #1334) shipping functions that older entries still cited as
 "permanent" or "3 prior attempts reverted":
 
 - `func_ov011_021ca600` — "Adjacent finds" prose bullet in

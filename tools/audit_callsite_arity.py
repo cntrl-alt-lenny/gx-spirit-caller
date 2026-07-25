@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.all:
         for name in sorted(consensus):
-            print("%-34s %s" % (name, dict(consensus[name])))
+            print(f"{name:<34} {dict(consensus[name])}")
         return 0
 
     declared = load_declared_arities()
@@ -210,10 +210,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     for c in contradictions:
-        print("!! %s: bank declares %d arg(s), tree call sites use %s (%d confident sites)"
-              % (c["name"], c["declared"], c["tree_uses"], c["site_count"]))
-    print("\n%d declared prototype(s) audited, %d with a CALL-SITE arity contradiction"
-          % (len(declared), len(contradictions)))
+        print(f"!! {c['name']}: bank declares {c['declared']} arg(s), "
+              f"tree call sites use {c['tree_uses']} ({c['site_count']} confident sites)")
+    print(f"\n{len(declared)} declared prototype(s) audited, "
+          f"{len(contradictions)} with a CALL-SITE arity contradiction")
     return 0
 
 

@@ -92,6 +92,7 @@ TST-vs-ANDS, the corpus-grep byte-swap draft for `func_0206ea00`) — both
 executed in this same brief; see the queue doc's Result note.
 
 ## New levers, commit-mined (UNVERIFIED-ON-2.0 — none of these have been
+
 ## re-tested against our own tree or compiler tier; see the gate below)
 
 All are 1.2/sp2p3-observed register-coloring/scheduling nudges from the

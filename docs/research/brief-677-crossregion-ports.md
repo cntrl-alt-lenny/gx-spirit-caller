@@ -132,6 +132,7 @@ test (identity-checked import, matching every other site's pattern)
 plus direct behavioral coverage for all 3 tiers.
 
 ## Also found: `diag_one.py`'s (this session's own throwaway diagnostic
+
 tool) suffix-blind staging
 
 Unrelated to the shared codebase — a scratch tool built earlier this
