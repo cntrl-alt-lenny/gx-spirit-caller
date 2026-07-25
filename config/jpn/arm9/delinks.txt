@@ -79,7 +79,7 @@ src/jpn/main/func_02000d9c.s:
 src/jpn/main/func_02000e34.c:
     complete
     .text start:0x02000e34 end:0x02000e70
-src/jpn/main/func_02000e70.s:
+src/jpn/main/func_02000e70.c:
     complete
     .text start:0x02000e70 end:0x02000ec8
 src/jpn/main/func_02000ec8.c:
@@ -209,7 +209,7 @@ src/jpn/main/func_020038a0.s:
 src/jpn/main/func_02003a2c.s:
     complete
     .text start:0x02003a2c end:0x02003aa0
-src/jpn/main/func_02003aa0.s:
+src/jpn/main/func_02003aa0.c:
     complete
     .text start:0x02003aa0 end:0x02003af4
 src/jpn/main/func_02003af4.s:
@@ -227,7 +227,7 @@ src/jpn/main/func_02003d78.s:
 src/jpn/main/func_02003e78.s:
     complete
     .text start:0x02003e78 end:0x02003efc
-src/jpn/main/func_02003efc.s:
+src/jpn/main/func_02003efc.c:
     complete
     .text start:0x02003efc end:0x02003f50
 src/jpn/main/func_02003f50.s:
@@ -319,7 +319,7 @@ src/jpn/main/func_02005898.c:
 src/jpn/main/func_020058d4.c:
     complete
     .text start:0x020058d4 end:0x02005910
-src/jpn/main/func_02005910.s:
+src/jpn/main/func_02005910.c:
     complete
     .text start:0x02005910 end:0x02005994
 src/jpn/main/func_02005994.s:
@@ -589,7 +589,7 @@ src/jpn/main/func_02009230.c:
 
     .text start:0x02009230 end:0x0200925c
 
-src/jpn/main/func_0200925c.s:
+src/jpn/main/func_0200925c.c:
     complete
     .text start:0x0200925c end:0x020092ac
 src/jpn/main/func_020092ac.c:
@@ -702,7 +702,7 @@ src/jpn/main/func_0200a9e4.s:
 src/jpn/main/func_0200a9ec.c:
     complete
     .text start:0x0200a9ec end:0x0200aa44
-src/jpn/main/func_0200aa44.s:
+src/jpn/main/func_0200aa44.c:
     complete
     .text start:0x0200aa44 end:0x0200aac8
 src/jpn/main/func_0200aac8.c:
@@ -817,7 +817,7 @@ src/jpn/main/func_0200b20c.c:
 src/jpn/main/func_0200b234.s:
     complete
     .text start:0x0200b234 end:0x0200b2d8
-src/jpn/main/func_0200b2d8.s:
+src/jpn/main/func_0200b2d8.c:
     complete
     .text start:0x0200b2d8 end:0x0200b340
 src/jpn/main/func_0200b340.s:
@@ -977,7 +977,7 @@ src/jpn/main/func_0200eed4.c:
 src/jpn/main/func_0200ef44.c:
     complete
     .text start:0x0200ef44 end:0x0200efc4
-src/jpn/main/func_0200efc4.s:
+src/jpn/main/func_0200efc4.c:
     complete
     .text start:0x0200efc4 end:0x0200f000
 src/jpn/main/func_0200f000.s:
@@ -1025,7 +1025,7 @@ src/jpn/main/func_0200fd00.s:
 src/jpn/main/func_0200fd68.c:
     complete
     .text start:0x0200fd68 end:0x0200fda4
-src/jpn/main/func_0200fda4.s:
+src/jpn/main/func_0200fda4.c:
     complete
     .text start:0x0200fda4 end:0x0200fde0
 src/jpn/main/func_0200fde0.s:
@@ -1220,7 +1220,7 @@ src/jpn/main/func_02013990.c:
     complete
     .text start:0x02013990 end:0x020139a0
 
-src/jpn/main/func_020139a0.s:
+src/jpn/main/func_020139a0.c:
     complete
     .text start:0x020139a0 end:0x020139b0
 src/jpn/main/func_020139b0.c:
@@ -1377,7 +1377,7 @@ src/jpn/main/func_0201819c.s:
 src/jpn/main/func_02018324.s:
     complete
     .text start:0x02018324 end:0x0201867c
-src/jpn/main/func_0201867c.s:
+src/jpn/main/func_0201867c.c:
     complete
     .text start:0x0201867c end:0x02018694
 src/jpn/main/func_02018694.s:
@@ -1395,7 +1395,7 @@ src/jpn/main/func_02018a30.c:
     complete
     .text start:0x02018a30 end:0x02018a50
 
-src/jpn/main/func_02018a50.s:
+src/jpn/main/func_02018a50.c:
     complete
     .text start:0x02018a50 end:0x02018a88
 src/jpn/main/func_02018a88.s:
@@ -1464,7 +1464,7 @@ src/jpn/main/func_02018dcc.c:
 src/jpn/main/func_02018e0c.c:
     complete
     .text start:0x02018e0c end:0x02018e54
-src/jpn/main/func_02018e54.s:
+src/jpn/main/func_02018e54.c:
     complete
     .text start:0x02018e54 end:0x02018e98
 src/jpn/main/func_02018e98.s:
@@ -1600,7 +1600,7 @@ src/jpn/main/func_020196a4.s:
 src/jpn/main/func_02019778.s:
     complete
     .text start:0x02019778 end:0x020197ec
-src/jpn/main/func_020197ec.s:
+src/jpn/main/func_020197ec.c:
     complete
     .text start:0x020197ec end:0x02019824
 src/jpn/main/func_02019824.s:
@@ -1650,7 +1650,7 @@ src/jpn/main/func_0201a084.c:
 
     .text start:0x0201a084 end:0x0201a0ac
 
-src/jpn/main/func_0201a0ac.s:
+src/jpn/main/func_0201a0ac.c:
     complete
     .text start:0x0201a0ac end:0x0201a0dc
 src/jpn/main/func_0201a0dc.c:
@@ -1678,7 +1678,7 @@ src/jpn/main/func_0201a384.c:
     complete
     .text start:0x0201a384 end:0x0201a3b8
 
-src/jpn/main/func_0201a3b8.s:
+src/jpn/main/func_0201a3b8.c:
     complete
     .text start:0x0201a3b8 end:0x0201a3fc
 src/jpn/main/func_0201a3fc.c:
@@ -1704,7 +1704,7 @@ src/jpn/main/func_0201a560.c:
 
     .text start:0x0201a560 end:0x0201a58c
 
-src/jpn/main/func_0201a58c.s:
+src/jpn/main/func_0201a58c.c:
     complete
     .text start:0x0201a58c end:0x0201a5c0
 src/jpn/main/func_0201a5c0.s:
@@ -1713,7 +1713,7 @@ src/jpn/main/func_0201a5c0.s:
 src/jpn/main/func_0201a738.s:
     complete
     .text start:0x0201a738 end:0x0201a7e4
-src/jpn/main/func_0201a7e4.s:
+src/jpn/main/func_0201a7e4.c:
     complete
     .text start:0x0201a7e4 end:0x0201a80c
 src/jpn/main/func_0201a80c.s:
@@ -1732,7 +1732,7 @@ src/jpn/main/func_0201aa60.c:
 src/jpn/main/func_0201aa7c.s:
     complete
     .text start:0x0201aa7c end:0x0201aab4
-src/jpn/main/func_0201aab4.s:
+src/jpn/main/func_0201aab4.c:
     complete
     .text start:0x0201aab4 end:0x0201aaec
 src/jpn/main/func_0201aaec.c:
@@ -1865,7 +1865,7 @@ src/jpn/main/func_0201bcf0.s:
 src/jpn/main/func_0201bd9c.s:
     complete
     .text start:0x0201bd9c end:0x0201be24
-src/jpn/main/func_0201be24.s:
+src/jpn/main/func_0201be24.c:
     complete
     .text start:0x0201be24 end:0x0201be58
 src/jpn/main/func_0201be58.c:
@@ -1953,7 +1953,7 @@ src/jpn/main/func_0201cf34.c:
     complete
     .text start:0x0201cf34 end:0x0201cf4c
 
-src/jpn/main/func_0201cf4c.s:
+src/jpn/main/func_0201cf4c.c:
     complete
     .text start:0x0201cf4c end:0x0201cf8c
 src/jpn/main/func_0201cf8c.c:
@@ -2020,7 +2020,7 @@ src/jpn/main/func_0201d330.c:
     complete
     .text start:0x0201d330 end:0x0201d344
 
-src/jpn/main/func_0201d344.s:
+src/jpn/main/func_0201d344.c:
     complete
     .text start:0x0201d344 end:0x0201d3ac
 src/jpn/main/func_0201d3ac.c:
@@ -2039,7 +2039,7 @@ src/jpn/main/func_0201d460.c:
 src/jpn/main/func_0201d4dc.c:
     complete
     .text start:0x0201d4dc end:0x0201d56c
-src/jpn/main/func_0201d56c.s:
+src/jpn/main/func_0201d56c.c:
     complete
     .text start:0x0201d56c end:0x0201d594
 src/jpn/main/func_0201d594.c:
@@ -2535,7 +2535,7 @@ src/jpn/main/Rand_Next.c:
 src/jpn/main/func_020224ec.s:
     complete
     .text start:0x020224ec end:0x0202252c
-src/jpn/main/func_0202252c.s:
+src/jpn/main/func_0202252c.c:
     complete
     .text start:0x0202252c end:0x02022560
 src/jpn/main/func_02022560.s:
@@ -2895,7 +2895,7 @@ src/jpn/main/func_0202b2e8.c:
 src/jpn/main/func_0202b30c.c:
     complete
     .text start:0x0202b30c end:0x0202b380
-src/jpn/main/func_0202b380.s:
+src/jpn/main/func_0202b380.c:
     complete
     .text start:0x0202b380 end:0x0202b3bc
 src/jpn/main/func_0202b3bc.c:
@@ -3200,7 +3200,7 @@ src/jpn/main/func_0202ce24.s:
 src/jpn/main/func_0202cfa8.s:
     complete
     .text start:0x0202cfa8 end:0x0202d140
-src/jpn/main/func_0202d140.s:
+src/jpn/main/func_0202d140.legacy_sp3.c:
     complete
     .text start:0x0202d140 end:0x0202d184
 src/jpn/main/func_0202d184.s:
@@ -3563,7 +3563,7 @@ src/jpn/main/func_020325e0.c:
     complete
     .text start:0x020325e0 end:0x020325f0
 
-src/jpn/main/func_020325f0.s:
+src/jpn/main/func_020325f0.c:
     complete
     .text start:0x020325f0 end:0x02032628
 src/jpn/main/func_02032628.c:
@@ -3588,13 +3588,13 @@ src/jpn/main/func_02032680.s:
 src/jpn/main/func_020326d0.s:
     complete
     .text start:0x020326d0 end:0x020326f4
-src/jpn/main/func_020326f4.s:
+src/jpn/main/func_020326f4.c:
     complete
     .text start:0x020326f4 end:0x02032718
 src/jpn/main/func_02032718.s:
     complete
     .text start:0x02032718 end:0x0203276c
-src/jpn/main/func_0203276c.s:
+src/jpn/main/func_0203276c.c:
     complete
     .text start:0x0203276c end:0x02032790
 src/jpn/main/func_02032790.s:
@@ -3651,7 +3651,7 @@ src/jpn/main/func_02032d04.c:
 src/jpn/main/func_02032d1c.s:
     complete
     .text start:0x02032d1c end:0x02032de4
-src/jpn/main/func_02032de4.s:
+src/jpn/main/func_02032de4.c:
     complete
     .text start:0x02032de4 end:0x02032e18
 src/jpn/main/func_02032e18.s:
@@ -3660,16 +3660,16 @@ src/jpn/main/func_02032e18.s:
 src/jpn/main/func_02032e2c.s:
     complete
     .text start:0x02032e2c end:0x02032e38
-src/jpn/main/func_02032e38.s:
+src/jpn/main/func_02032e38.c:
     complete
     .text start:0x02032e38 end:0x02032e70
-src/jpn/main/func_02032e70.s:
+src/jpn/main/func_02032e70.c:
     complete
     .text start:0x02032e70 end:0x02032ea8
-src/jpn/main/func_02032ea8.s:
+src/jpn/main/func_02032ea8.c:
     complete
     .text start:0x02032ea8 end:0x02032ee4
-src/jpn/main/func_02032ee4.s:
+src/jpn/main/func_02032ee4.c:
     complete
     .text start:0x02032ee4 end:0x02032f20
 src/jpn/main/func_02032f20.s:
@@ -3698,7 +3698,7 @@ src/jpn/main/func_02032fc8.c:
     complete
     .text start:0x02032fc8 end:0x02032fe4
 
-src/jpn/main/func_02032fe4.s:
+src/jpn/main/func_02032fe4.c:
     complete
     .text start:0x02032fe4 end:0x02033000
 src/jpn/main/func_02033000.s:
@@ -3713,13 +3713,13 @@ src/jpn/main/func_02033090.s:
 src/jpn/main/func_0203315c.c:
     complete
     .text start:0x0203315c end:0x020331a4
-src/jpn/main/func_020331a4.s:
+src/jpn/main/func_020331a4.c:
     complete
     .text start:0x020331a4 end:0x020331b8
 src/jpn/main/func_020331b8.s:
     complete
     .text start:0x020331b8 end:0x02033224
-src/jpn/main/func_02033224.s:
+src/jpn/main/func_02033224.c:
     complete
     .text start:0x02033224 end:0x02033250
 src/jpn/main/func_02033250.s:
@@ -3767,19 +3767,19 @@ src/jpn/main/func_02033568.s:
 src/jpn/main/func_02033578.s:
     complete
     .text start:0x02033578 end:0x02033584
-src/jpn/main/func_02033584.s:
+src/jpn/main/func_02033584.c:
     complete
     .text start:0x02033584 end:0x020335cc
-src/jpn/main/func_020335cc.s:
+src/jpn/main/func_020335cc.c:
     complete
     .text start:0x020335cc end:0x02033604
-src/jpn/main/func_02033604.s:
+src/jpn/main/func_02033604.c:
     complete
     .text start:0x02033604 end:0x02033654
-src/jpn/main/func_02033654.s:
+src/jpn/main/func_02033654.c:
     complete
     .text start:0x02033654 end:0x02033668
-src/jpn/main/func_02033668.s:
+src/jpn/main/func_02033668.c:
     complete
     .text start:0x02033668 end:0x0203367c
 src/jpn/main/func_0203367c.s:
@@ -3798,7 +3798,7 @@ src/jpn/main/func_020337ac.c:
     complete
     .text start:0x020337ac end:0x020337b8
 
-src/jpn/main/func_020337b8.s:
+src/jpn/main/func_020337b8.c:
     complete
     .text start:0x020337b8 end:0x020337d8
 src/jpn/main/func_020337d8.c:
@@ -3819,7 +3819,7 @@ src/jpn/main/func_02033858.c:
 src/jpn/main/func_02033868.s:
     complete
     .text start:0x02033868 end:0x020338a8
-src/jpn/main/func_020338a8.s:
+src/jpn/main/func_020338a8.c:
     complete
     .text start:0x020338a8 end:0x020338f4
 src/jpn/main/func_020338f4.s:
@@ -3849,7 +3849,7 @@ src/jpn/main/func_02033c24.s:
 src/jpn/main/func_02033cd8.s:
     complete
     .text start:0x02033cd8 end:0x02033cec
-src/jpn/main/func_02033cec.s:
+src/jpn/main/func_02033cec.c:
     complete
     .text start:0x02033cec end:0x02033d28
 src/jpn/main/func_02033d28.s:
@@ -3920,7 +3920,7 @@ src/jpn/main/func_02034154.c:
 src/jpn/main/func_02034160.s:
     complete
     .text start:0x02034160 end:0x020341e8
-src/jpn/main/func_020341e8.s:
+src/jpn/main/func_020341e8.c:
     complete
     .text start:0x020341e8 end:0x02034220
 src/jpn/main/func_02034220.s:
@@ -3968,7 +3968,7 @@ src/jpn/main/func_0203455c.c:
     complete
     .text start:0x0203455c end:0x02034570
 
-src/jpn/main/func_02034570.s:
+src/jpn/main/func_02034570.c:
     complete
     .text start:0x02034570 end:0x0203462c
 src/jpn/main/func_0203462c.s:
@@ -3986,10 +3986,10 @@ src/jpn/main/func_02034734.c:
     complete
     .text start:0x02034734 end:0x02034768
 
-src/jpn/main/func_02034768.s:
+src/jpn/main/func_02034768.c:
     complete
     .text start:0x02034768 end:0x020347c0
-src/jpn/main/func_020347c0.s:
+src/jpn/main/func_020347c0.c:
     complete
     .text start:0x020347c0 end:0x020347f4
 src/jpn/main/func_020347f4.c:
@@ -4122,7 +4122,7 @@ src/jpn/main/func_020371fc.s:
 src/jpn/main/func_020372d8.s:
     complete
     .text start:0x020372d8 end:0x02037328
-src/jpn/main/func_0203737c.s:
+src/jpn/main/func_0203737c.c:
     complete
     .text start:0x0203737c end:0x020373c4
 src/jpn/main/func_020373c4.s:
@@ -4134,7 +4134,7 @@ src/jpn/main/func_02037730.s:
 src/jpn/main/func_02037878.s:
     complete
     .text start:0x02037878 end:0x02037918
-src/jpn/main/func_02037918.s:
+src/jpn/main/func_02037918.c:
     complete
     .text start:0x02037918 end:0x02037974
 src/jpn/main/func_02037974.s:
@@ -4158,7 +4158,7 @@ src/jpn/main/func_02037a74.c:
     complete
     .text start:0x02037a74 end:0x02037ab4
 
-src/jpn/main/func_02037ab4.s:
+src/jpn/main/func_02037ab4.c:
     complete
     .text start:0x02037ab4 end:0x02037ae4
 src/jpn/main/func_02037ae4.c:
@@ -4181,7 +4181,7 @@ src/jpn/main/func_02037c50.s:
 src/jpn/main/func_02037cd8.s:
     complete
     .text start:0x02037cd8 end:0x02037d70
-src/jpn/main/func_02037d70.s:
+src/jpn/main/func_02037d70.c:
     complete
     .text start:0x02037d70 end:0x02037f94
 src/jpn/main/func_02037f94.s:
@@ -4190,7 +4190,7 @@ src/jpn/main/func_02037f94.s:
 src/jpn/main/func_0203808c.s:
     complete
     .text start:0x0203808c end:0x02038118
-src/jpn/main/func_02038118.s:
+src/jpn/main/func_02038118.c:
     complete
     .text start:0x02038118 end:0x0203816c
 src/jpn/main/func_0203816c.s:
@@ -4278,13 +4278,13 @@ src/jpn/main/func_02038c34.c:
 src/jpn/main/func_02038c48.s:
     complete
     .text start:0x02038c48 end:0x02038cdc
-src/jpn/main/func_02038cdc.s:
+src/jpn/main/func_02038cdc.c:
     complete
     .text start:0x02038cdc end:0x02038d20
 src/jpn/main/func_02038d20.s:
     complete
     .text start:0x02038d20 end:0x02038d5c
-src/jpn/main/func_02038d5c.s:
+src/jpn/main/func_02038d5c.c:
     complete
     .text start:0x02038d5c end:0x02038d8c
 src/jpn/main/func_02038d8c.s:
@@ -4326,7 +4326,7 @@ src/jpn/main/func_0203998c.s:
 src/jpn/main/func_02039cd8.s:
     complete
     .text start:0x02039cd8 end:0x0203a0b4
-src/jpn/main/func_0203a0b4.s:
+src/jpn/main/func_0203a0b4.c:
     complete
     .text start:0x0203a0b4 end:0x0203a100
 src/jpn/main/func_0203a100.s:
@@ -4338,31 +4338,31 @@ src/jpn/main/func_0203a144.s:
 src/jpn/main/func_0203a320.s:
     complete
     .text start:0x0203a320 end:0x0203a4d0
-src/jpn/main/func_0203a4d0.s:
+src/jpn/main/func_0203a4d0.c:
     complete
     .text start:0x0203a4d0 end:0x0203a528
-src/jpn/main/func_0203a528.s:
+src/jpn/main/func_0203a528.c:
     complete
     .text start:0x0203a528 end:0x0203a584
 src/jpn/main/func_0203a584.s:
     complete
     .text start:0x0203a584 end:0x0203a644
-src/jpn/main/func_0203a644.s:
+src/jpn/main/func_0203a644.c:
     complete
     .text start:0x0203a644 end:0x0203a698
-src/jpn/main/func_0203a698.s:
+src/jpn/main/func_0203a698.c:
     complete
     .text start:0x0203a698 end:0x0203a6f4
-src/jpn/main/func_0203a6f4.s:
+src/jpn/main/func_0203a6f4.c:
     complete
     .text start:0x0203a6f4 end:0x0203a730
 src/jpn/main/func_0203a730.s:
     complete
     .text start:0x0203a730 end:0x0203a7fc
-src/jpn/main/func_0203a7fc.s:
+src/jpn/main/func_0203a7fc.c:
     complete
     .text start:0x0203a7fc end:0x0203a848
-src/jpn/main/func_0203a848.s:
+src/jpn/main/func_0203a848.c:
     complete
     .text start:0x0203a848 end:0x0203a88c
 src/jpn/main/func_0203a88c.s:
@@ -4377,7 +4377,7 @@ src/jpn/main/func_0203aa98.s:
 src/jpn/main/func_0203ab48.s:
     complete
     .text start:0x0203ab48 end:0x0203ab4c
-src/jpn/main/func_0203ab4c.s:
+src/jpn/main/func_0203ab4c.c:
     complete
     .text start:0x0203ab4c end:0x0203ab90
 src/jpn/main/func_0203ab90.s:
@@ -4429,7 +4429,7 @@ src/jpn/main/func_0203ba50.c:
 src/jpn/main/func_0203ba80.s:
     complete
     .text start:0x0203ba80 end:0x0203bb5c
-src/jpn/main/func_0203bb5c.s:
+src/jpn/main/func_0203bb5c.c:
     complete
     .text start:0x0203bb5c end:0x0203bbd8
 src/jpn/main/func_0203bbd8.s:
@@ -4474,7 +4474,7 @@ src/jpn/main/func_0203c5e8.c:
 src/jpn/main/func_0203c600.c:
     complete
     .text start:0x0203c600 end:0x0203c648
-src/jpn/main/func_0203c648.s:
+src/jpn/main/func_0203c648.c:
     complete
     .text start:0x0203c648 end:0x0203c694
 src/jpn/main/func_0203c694.s:
@@ -4527,13 +4527,13 @@ src/jpn/main/func_0203ca28.s:
 src/jpn/main/func_0203ca70.s:
     complete
     .text start:0x0203ca70 end:0x0203cabc
-src/jpn/main/func_0203cabc.s:
+src/jpn/main/func_0203cabc.legacy_sp3.c:
     complete
     .text start:0x0203cabc end:0x0203caf0
 src/jpn/main/func_0203caf0.s:
     complete
     .text start:0x0203caf0 end:0x0203cb40
-src/jpn/main/func_0203cb40.s:
+src/jpn/main/func_0203cb40.c:
     complete
     .text start:0x0203cb40 end:0x0203cb70
 src/jpn/main/func_0203cb70.s:
@@ -4569,7 +4569,7 @@ src/jpn/main/func_0203d298.s:
 src/jpn/main/func_0203d34c.s:
     complete
     .text start:0x0203d34c end:0x0203d4d4
-src/jpn/main/func_0203d4d4.s:
+src/jpn/main/func_0203d4d4.c:
     complete
     .text start:0x0203d4d4 end:0x0203d560
 src/jpn/main/func_0203d560.s:
@@ -4590,7 +4590,7 @@ src/jpn/main/func_0203d838.s:
 src/jpn/main/func_0203d974.s:
     complete
     .text start:0x0203d974 end:0x0203da90
-src/jpn/main/func_0203da90.s:
+src/jpn/main/func_0203da90.legacy_sp3.c:
     complete
     .text start:0x0203da90 end:0x0203dad4
 src/jpn/main/func_0203dad4.legacy_sp3.c:
@@ -4751,13 +4751,13 @@ src/jpn/main/func_0203f650.legacy_sp3.c:
 src/jpn/main/func_0203f67c.s:
     complete
     .text start:0x0203f67c end:0x0203f6c8
-src/jpn/main/func_0203f6c8.s:
+src/jpn/main/func_0203f6c8.c:
     complete
     .text start:0x0203f6c8 end:0x0203f6f0
-src/jpn/main/func_0203f6f0.s:
+src/jpn/main/func_0203f6f0.legacy_sp3.c:
     complete
     .text start:0x0203f6f0 end:0x0203f728
-src/jpn/main/func_0203f728.s:
+src/jpn/main/func_0203f728.legacy_sp3.c:
     complete
     .text start:0x0203f728 end:0x0203f770
 src/jpn/main/func_0203f770.s:
@@ -4812,7 +4812,7 @@ src/jpn/main/func_02040c48.c:
 src/jpn/main/func_02040c70.s:
     complete
     .text start:0x02040c70 end:0x02040d04
-src/jpn/main/func_02040d04.s:
+src/jpn/main/func_02040d04.c:
     complete
     .text start:0x02040d04 end:0x02040d44
 src/jpn/main/func_02040d44.s:
@@ -4927,7 +4927,7 @@ src/jpn/main/func_02043a1c.c:
 src/jpn/main/func_02043a28.s:
     complete
     .text start:0x02043a28 end:0x02043ae8
-src/jpn/main/func_02043ae8.s:
+src/jpn/main/func_02043ae8.c:
     complete
     .text start:0x02043ae8 end:0x02043b20
 src/jpn/main/func_02043b20.s:
@@ -4974,7 +4974,7 @@ src/jpn/main/func_02044460.legacy_sp3.c:
     complete
     .text start:0x02044460 end:0x02044494
 
-src/jpn/main/func_02044494.s:
+src/jpn/main/func_02044494.c:
     complete
     .text start:0x02044494 end:0x020444d8
 src/jpn/main/func_020444d8.s:
@@ -5176,7 +5176,7 @@ src/jpn/main/func_02046670.s:
     complete
     .text start:0x02046670 end:0x020466ac
 
-src/jpn/main/func_020466ac.s:
+src/jpn/main/func_020466ac.legacy_sp3.c:
     complete
     .text start:0x020466ac end:0x020466f4
 src/jpn/main/func_020466f4.c:
@@ -5194,7 +5194,7 @@ src/jpn/main/func_02046788.legacy_sp3.c:
     complete
     .text start:0x02046788 end:0x020467c0
 
-src/jpn/main/func_020467c0.s:
+src/jpn/main/func_020467c0.legacy_sp3.c:
     complete
     .text start:0x020467c0 end:0x020467ec
 src/jpn/main/func_020467ec.legacy_sp3.c:
@@ -5205,7 +5205,7 @@ src/jpn/main/func_02046804.legacy_sp3.c:
     complete
     .text start:0x02046804 end:0x0204681c
 
-src/jpn/main/func_0204681c.s:
+src/jpn/main/func_0204681c.legacy_sp3.c:
     complete
     .text start:0x0204681c end:0x02046880
 src/jpn/main/func_02046880.s:
@@ -5218,7 +5218,7 @@ src/jpn/main/func_02046948.c:
 src/jpn/main/func_02046964.legacy_sp3.c:
     complete
     .text start:0x02046964 end:0x020469b0
-src/jpn/main/func_020469b0.s:
+src/jpn/main/func_020469b0.legacy_sp3.c:
     complete
     .text start:0x020469b0 end:0x020469f0
 src/jpn/main/func_020469f0.s:
@@ -5308,7 +5308,7 @@ src/jpn/main/func_02048094.c:
 src/jpn/main/func_020480b0.s:
     complete
     .text start:0x020480b0 end:0x020481c8
-src/jpn/main/func_020481c8.s:
+src/jpn/main/func_020481c8.legacy_sp3.c:
     complete
     .text start:0x020481c8 end:0x02048208
 src/jpn/main/func_02048208.c:
@@ -5345,7 +5345,7 @@ src/jpn/main/func_02048a94.s:
 src/jpn/main/func_02048b4c.s:
     complete
     .text start:0x02048b4c end:0x02048bb4
-src/jpn/main/func_02048bb4.s:
+src/jpn/main/func_02048bb4.legacy_sp3.c:
     complete
     .text start:0x02048bb4 end:0x02048bf4
 src/jpn/main/func_02048bf4.s:
@@ -5418,7 +5418,7 @@ src/jpn/main/func_02049850.c:
     complete
     .text start:0x02049850 end:0x02049868
 
-src/jpn/main/func_02049868.s:
+src/jpn/main/func_02049868.c:
     complete
     .text start:0x02049868 end:0x0204987c
 src/jpn/main/func_0204987c.c:
@@ -5503,7 +5503,7 @@ src/jpn/main/func_0204ab88.s:
 src/jpn/main/func_0204afc0.s:
     complete
     .text start:0x0204afc0 end:0x0204b034
-src/jpn/main/func_0204b034.s:
+src/jpn/main/func_0204b034.c:
     complete
     .text start:0x0204b034 end:0x0204b05c
 src/jpn/main/func_0204b05c.s:
@@ -5512,7 +5512,7 @@ src/jpn/main/func_0204b05c.s:
 src/jpn/main/func_0204b0c0.s:
     complete
     .text start:0x0204b0c0 end:0x0204b130
-src/jpn/main/func_0204b130.s:
+src/jpn/main/func_0204b130.c:
     complete
     .text start:0x0204b130 end:0x0204b20c
 src/jpn/main/func_0204b20c.s:
@@ -5649,7 +5649,7 @@ src/jpn/main/func_0204f704.legacy_sp3.c:
     complete
     .text start:0x0204f704 end:0x0204f724
 
-src/jpn/main/func_0204f724.s:
+src/jpn/main/func_0204f724.legacy_sp3.c:
     complete
     .text start:0x0204f724 end:0x0204f7ac
 src/jpn/main/func_0204f7ac.s:
@@ -5658,7 +5658,7 @@ src/jpn/main/func_0204f7ac.s:
 src/jpn/main/func_0204f87c.s:
     complete
     .text start:0x0204f87c end:0x0204f924
-src/jpn/main/func_0204f924.s:
+src/jpn/main/func_0204f924.c:
     complete
     .text start:0x0204f924 end:0x0204f958
 src/jpn/main/func_0204f958.s:
@@ -5678,7 +5678,7 @@ src/jpn/main/func_0204fa08.s:
 src/jpn/main/func_0204fbc4.s:
     complete
     .text start:0x0204fbc4 end:0x0204fc28
-src/jpn/main/func_0204fc28.s:
+src/jpn/main/func_0204fc28.c:
     complete
     .text start:0x0204fc28 end:0x0204fc4c
 src/jpn/main/func_0204fc4c.s:
@@ -5805,13 +5805,13 @@ src/jpn/main/func_020523b0.s:
 src/jpn/main/func_02052568.c:
     complete
     .text start:0x02052568 end:0x020525a8
-src/jpn/main/func_020525a8.s:
+src/jpn/main/func_020525a8.legacy_sp3.c:
     complete
     .text start:0x020525a8 end:0x02052600
 src/jpn/main/func_02052600.legacy_sp3.c:
     complete
     .text start:0x02052600 end:0x02052644
-src/jpn/main/func_02052644.s:
+src/jpn/main/func_02052644.c:
     complete
     .text start:0x02052644 end:0x02052690
 src/jpn/main/func_02052690.s:
@@ -5879,7 +5879,7 @@ src/jpn/main/func_02052be4.s:
 src/jpn/main/func_02052c68.s:
     complete
     .text start:0x02052c68 end:0x02052d68
-src/jpn/main/func_02052d68.s:
+src/jpn/main/func_02052d68.c:
     complete
     .text start:0x02052d68 end:0x02052d80
 src/jpn/main/func_02052d80.legacy_sp3.c:
@@ -6129,7 +6129,7 @@ src/jpn/main/func_02054454.s:
 src/jpn/main/func_020544f4.s:
     complete
     .text start:0x020544f4 end:0x020545a0
-src/jpn/main/func_020545a0.s:
+src/jpn/main/func_020545a0.c:
     complete
     .text start:0x020545a0 end:0x02054610
 src/jpn/main/func_02054610.s:
@@ -6156,7 +6156,7 @@ src/jpn/main/func_020549bc.s:
 src/jpn/main/func_02054a5c.s:
     complete
     .text start:0x02054a5c end:0x02054a8c
-src/jpn/main/func_02054a8c.s:
+src/jpn/main/func_02054a8c.c:
     complete
     .text start:0x02054a8c end:0x02054aa8
 src/jpn/main/func_02054aa8.legacy_sp3.c:
@@ -6403,7 +6403,7 @@ src/jpn/main/func_02057dec.s:
 src/jpn/main/func_02057ec8.s:
     complete
     .text start:0x02057ec8 end:0x02057fc4
-src/jpn/main/func_02057fc4.s:
+src/jpn/main/func_02057fc4.c:
     complete
     .text start:0x02057fc4 end:0x02057ffc
 src/jpn/main/func_02057ffc.c:
@@ -6715,13 +6715,13 @@ src/jpn/main/func_02060c28.legacy_sp3.c:
 src/jpn/main/func_02060c48.s:
     complete
     .text start:0x02060c48 end:0x02060d18
-src/jpn/main/func_02060d18.s:
+src/jpn/main/func_02060d18.c:
     complete
     .text start:0x02060d18 end:0x02060d60
 src/jpn/main/func_02060d60.s:
     complete
     .text start:0x02060d60 end:0x02060ebc
-src/jpn/main/func_02060ebc.s:
+src/jpn/main/func_02060ebc.c:
     complete
     .text start:0x02060ebc end:0x02060edc
 src/jpn/main/func_02060edc.s:
@@ -6831,7 +6831,7 @@ src/jpn/main/func_020623f4.c:
     complete
     .text start:0x020623f4 end:0x02062424
 
-src/jpn/main/func_02062424.s:
+src/jpn/main/func_02062424.c:
     complete
     .text start:0x02062424 end:0x02062458
 src/jpn/main/func_02062458.s:
@@ -7162,7 +7162,7 @@ src/jpn/main/func_02065da0.legacy_sp3.c:
 src/jpn/main/func_02065dcc.legacy_sp3.c:
     complete
     .text start:0x02065dcc end:0x02065e04
-src/jpn/main/func_02065e04.s:
+src/jpn/main/func_02065e04.c:
     complete
     .text start:0x02065e04 end:0x02065e6c
 src/jpn/main/func_02065e6c.s:
@@ -7245,7 +7245,7 @@ src/jpn/main/func_020672b4.c:
 src/jpn/main/func_020672e0.s:
     complete
     .text start:0x020672e0 end:0x02067368
-src/jpn/main/func_02067368.s:
+src/jpn/main/func_02067368.c:
     complete
     .text start:0x02067368 end:0x020673c4
 src/jpn/main/func_020673c4.s:
@@ -7435,7 +7435,7 @@ src/jpn/main/func_020689ac.s:
 src/jpn/main/func_02068a40.s:
     complete
     .text start:0x02068a40 end:0x02068aa8
-src/jpn/main/func_02068aa8.s:
+src/jpn/main/func_02068aa8.c:
     complete
     .text start:0x02068aa8 end:0x02068ae0
 src/jpn/main/func_02068ae0.s:
@@ -8134,7 +8134,7 @@ src/jpn/main/func_02070c4c.s:
 src/jpn/main/func_02070ca8.s:
     complete
     .text start:0x02070ca8 end:0x02070d6c
-src/jpn/main/func_02070d6c.s:
+src/jpn/main/func_02070d6c.legacy.c:
     complete
     .text start:0x02070d6c end:0x02070dc0
 src/jpn/main/func_02070dc0.c:
@@ -8315,7 +8315,7 @@ src/jpn/main/func_02073ce4.s:
 src/jpn/main/func_02073d6c.s:
     complete
     .text start:0x02073d6c end:0x02073d80
-src/jpn/main/func_02073d80.s:
+src/jpn/main/func_02073d80.legacy.c:
     complete
     .text start:0x02073d80 end:0x02073dc8
 src/jpn/main/func_02073dc8.legacy.c:
@@ -8739,7 +8739,7 @@ src/jpn/main/func_0207b054.s:
 src/jpn/main/func_0207b0a4.s:
     complete
     .text start:0x0207b0a4 end:0x0207b148
-src/jpn/main/func_0207b148.s:
+src/jpn/main/func_0207b148.c:
     complete
     .text start:0x0207b148 end:0x0207b168
 src/jpn/main/func_0207b168.s:
@@ -8832,7 +8832,7 @@ src/jpn/main/func_0207c8f4.c:
     complete
     .text start:0x0207c8f4 end:0x0207c908
 
-src/jpn/main/func_0207c908.s:
+src/jpn/main/func_0207c908.legacy.c:
     complete
     .text start:0x0207c908 end:0x0207c95c
 src/jpn/main/func_0207c95c.s:
@@ -9033,7 +9033,7 @@ src/jpn/main/func_0207dde8.c:
     complete
     .text start:0x0207dde8 end:0x0207ddf8
 
-src/jpn/main/func_0207ddf8.s:
+src/jpn/main/func_0207ddf8.c:
     complete
     .text start:0x0207ddf8 end:0x0207de10
 src/jpn/main/func_0207de10.s:
@@ -9063,7 +9063,7 @@ src/jpn/main/func_0207e03c.s:
 src/jpn/main/func_0207e0dc.s:
     complete
     .text start:0x0207e0dc end:0x0207e12c
-src/jpn/main/func_0207e12c.s:
+src/jpn/main/func_0207e12c.legacy.c:
     complete
     .text start:0x0207e12c end:0x0207e148
 src/jpn/main/func_0207e148.s:
@@ -9072,7 +9072,7 @@ src/jpn/main/func_0207e148.s:
 src/jpn/main/func_0207e150.s:
     complete
     .text start:0x0207e150 end:0x0207e288
-src/jpn/main/func_0207e288.s:
+src/jpn/main/func_0207e288.c:
     complete
     .text start:0x0207e288 end:0x0207e2d4
 src/jpn/main/func_0207e2d4.s:
@@ -9175,14 +9175,14 @@ src/jpn/main/func_0207f050.s:
 src/jpn/main/func_0207f1ac.s:
     complete
     .text start:0x0207f1ac end:0x0207f338
-src/jpn/main/func_0207f338.s:
+src/jpn/main/func_0207f338.legacy_sp3.c:
     complete
     .text start:0x0207f338 end:0x0207f400
 src/jpn/main/func_0207f400.c:
     complete
     .text start:0x0207f400 end:0x0207f410
 
-src/jpn/main/func_0207f410.s:
+src/jpn/main/func_0207f410.c:
     complete
     .text start:0x0207f410 end:0x0207f428
 src/jpn/main/func_0207f428.s:
@@ -9322,7 +9322,7 @@ src/jpn/main/func_02080ff4.s:
 src/jpn/main/func_02081260.s:
     complete
     .text start:0x02081260 end:0x02081394
-src/jpn/main/func_02081394.s:
+src/jpn/main/func_02081394.c:
     complete
     .text start:0x02081394 end:0x020813b0
 src/jpn/main/func_020813b0.s:
@@ -9429,7 +9429,7 @@ src/jpn/main/func_020821b8.c:
     complete
     .text start:0x020821b8 end:0x020821e0
 
-src/jpn/main/func_020821e0.s:
+src/jpn/main/func_020821e0.c:
     complete
     .text start:0x020821e0 end:0x02082208
 src/jpn/main/func_02082208.legacy_sp3.c:
@@ -9735,7 +9735,7 @@ src/jpn/main/func_020874e0.c:
     complete
     .text start:0x020874e0 end:0x020874f8
 
-src/jpn/main/func_020874f8.s:
+src/jpn/main/func_020874f8.c:
     complete
     .text start:0x020874f8 end:0x02087558
 src/jpn/main/func_02087558.s:
@@ -10444,7 +10444,7 @@ src/jpn/main/func_0208cfd4.s:
 src/jpn/main/func_0208d050.s:
     complete
     .text start:0x0208d050 end:0x0208d0fc
-src/jpn/main/func_0208d0fc.s:
+src/jpn/main/func_0208d0fc.c:
     complete
     .text start:0x0208d0fc end:0x0208d11c
 src/jpn/main/func_0208d11c.s:
@@ -10828,10 +10828,10 @@ src/jpn/main/func_02090810.s:
 src/jpn/main/func_02090828.s:
     complete
     .text start:0x02090828 end:0x02090840
-src/jpn/main/func_02090840.s:
+src/jpn/main/func_02090840.c:
     complete
     .text start:0x02090840 end:0x0209085c
-src/jpn/main/func_0209085c.s:
+src/jpn/main/func_0209085c.c:
     complete
     .text start:0x0209085c end:0x02090878
 src/jpn/main/func_02090878.s:
@@ -10840,10 +10840,10 @@ src/jpn/main/func_02090878.s:
 src/jpn/main/func_02090890.s:
     complete
     .text start:0x02090890 end:0x020908a8
-src/jpn/main/func_020908a8.s:
+src/jpn/main/func_020908a8.c:
     complete
     .text start:0x020908a8 end:0x020908c8
-src/jpn/main/func_020908c8.s:
+src/jpn/main/func_020908c8.c:
     complete
     .text start:0x020908c8 end:0x020908e8
 src/jpn/main/func_020908e8.s:
@@ -10909,7 +10909,7 @@ src/jpn/main/func_0209162c.legacy.c:
     complete
     .text start:0x0209162c end:0x02091660
 
-src/jpn/main/func_02091660.s:
+src/jpn/main/func_02091660.c:
     complete
     .text start:0x02091660 end:0x02091680
 src/jpn/main/func_02091680.s:
@@ -11010,7 +11010,7 @@ src/jpn/main/func_020921f0.s:
 src/jpn/main/func_0209223c.s:
     complete
     .text start:0x0209223c end:0x02092280
-src/jpn/main/func_02092280.s:
+src/jpn/main/func_02092280.c:
     complete
     .text start:0x02092280 end:0x02092298
 src/jpn/main/func_02092298.s:
@@ -11799,7 +11799,7 @@ libs/nitro/FS_Init.legacy.c:
     complete
     .text start:0x020982c4 end:0x02098300
 
-src/jpn/main/func_02098300.s:
+src/jpn/main/func_02098300.c:
     complete
     .text start:0x02098300 end:0x02098320
 src/jpn/main/func_02098320.s:
@@ -11899,7 +11899,7 @@ src/jpn/main/func_02099b30.c:
     complete
     .text start:0x02099b30 end:0x02099b44
 
-src/jpn/main/func_02099b44.s:
+src/jpn/main/func_02099b44.c:
     complete
     .text start:0x02099b44 end:0x02099b5c
 src/jpn/main/func_02099b5c.s:
@@ -11939,10 +11939,10 @@ src/jpn/main/func_0209a440.s:
 src/jpn/main/func_0209a700.s:
     complete
     .text start:0x0209a700 end:0x0209a718
-src/jpn/main/func_0209a718.s:
+src/jpn/main/func_0209a718.c:
     complete
     .text start:0x0209a718 end:0x0209a730
-src/jpn/main/func_0209a730.s:
+src/jpn/main/func_0209a730.c:
     complete
     .text start:0x0209a730 end:0x0209a748
 src/jpn/main/func_0209a748.c:
@@ -11967,7 +11967,7 @@ src/jpn/main/func_0209a838.s:
 src/jpn/main/func_0209a874.s:
     complete
     .text start:0x0209a874 end:0x0209a8c4
-src/jpn/main/func_0209a8c4.s:
+src/jpn/main/func_0209a8c4.legacy.c:
     complete
     .text start:0x0209a8c4 end:0x0209a900
 src/jpn/main/func_0209a900.s:
@@ -11976,7 +11976,7 @@ src/jpn/main/func_0209a900.s:
 src/jpn/main/func_0209a954.s:
     complete
     .text start:0x0209a954 end:0x0209a970
-src/jpn/main/func_0209a970.s:
+src/jpn/main/func_0209a970.c:
     complete
     .text start:0x0209a970 end:0x0209a990
 src/jpn/main/func_0209a990.s:
@@ -12044,7 +12044,7 @@ src/jpn/main/func_0209b3f0.legacy.c:
     complete
     .text start:0x0209b3f0 end:0x0209b440
 
-src/jpn/main/func_0209b440.s:
+src/jpn/main/func_0209b440.c:
     complete
     .text start:0x0209b440 end:0x0209b458
 
@@ -12573,7 +12573,7 @@ src/jpn/main/func_020a309c.s:
 src/jpn/main/func_020a3148.s:
     complete
     .text start:0x020a3148 end:0x020a31f0
-src/jpn/main/func_020a31f0.s:
+src/jpn/main/func_020a31f0.c:
     complete
     .text start:0x020a31f0 end:0x020a3214
 src/jpn/main/func_020a3214.s:
