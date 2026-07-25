@@ -20082,13 +20082,9 @@ src/main/data_020b4d60.c:
     complete
     .rodata start:0x020b4d60 end:0x020b52d0
 
-src/main/data_020b52d4.s:
+src/main/data_020b52d0.c:
     complete
-    .rodata start:0x020b52d4 end:0x020b52d8
-
-src/main/data_020b52d8.c:
-    complete
-    .rodata start:0x020b52d8 end:0x020b599c
+    .rodata start:0x020b52d0 end:0x020b599c
 
 src/main/data_020b59a0.c:
     complete

@@ -3,15 +3,23 @@
  *
  *     mov   r1, #0xc
  *     mul   r1, r0, r1
- *     ldr   r0, .L_02011a0c       ; r0 = data_020b52d4
+ *     ldr   r0, .L_02011a0c       ; r0 = data_020b52d0
  *     ldr   ip, .L_02011a10       ; ip = func_0201934c
  *     ldrh  r0, [r0, r1]
  *     bx    ip
  */
 
-extern unsigned short data_020b52d4[];
+typedef struct {
+    int field0;
+    unsigned short field1;
+    unsigned short field2;
+    unsigned short field3;
+    unsigned short field4;
+} Record020b52d0;
+
+extern const Record020b52d0 data_020b52d0[];
 extern int func_0201934c(unsigned int x);
 
 int func_020119f4(int i) {
-    return func_0201934c(*(unsigned short *)((char *)data_020b52d4 + i * 12));
+    return func_0201934c(data_020b52d0[i].field1);
 }
