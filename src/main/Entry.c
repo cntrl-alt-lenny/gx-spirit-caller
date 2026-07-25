@@ -101,15 +101,14 @@
  * sinit ov002 outlier and brief 011's SWI thunks.
  */
 
+#include "game/prototypes.h"
+
 extern void func_02000a78(void);
 extern void func_0200093c(int val, void *dst, int count);
 extern void func_02000950(int count);
 extern void func_020009fc(void);
-extern void func_020b41bc(void);
-extern void func_02000b64(void);
 extern void func_020b4284(void);
 extern void func_01ff8180(void);
-extern void main(void);
 
 extern char data_027e0000[];
 extern char BuildInfo[];
