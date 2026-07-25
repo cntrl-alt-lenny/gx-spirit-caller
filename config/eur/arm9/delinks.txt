@@ -18485,7 +18485,7 @@ src/main/func_0209cad8.c:
 
 
 
-src/main/func_0209cae4.s:
+src/main/func_0209cae4.legacy.c:
     complete
     .text start:0x0209cae4 end:0x0209cb68
 
