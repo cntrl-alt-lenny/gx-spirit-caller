@@ -171,6 +171,8 @@ def _compile(cfile: str, out_o: str, tier: str) -> bool:
     # "tools/mwccarm/..." path raises FileNotFoundError (WinError 2) even
     # though ROOT is correct. Absolute is unambiguous on every platform,
     # including under wine (which just receives it as its own argv[1]).
+    # exe_launch_prefix() (not a hardcoded "wine") also covers wine64/wibo
+    # per platform, matching configure.py's own resolution.
     compiler = os.path.join(ROOT, _COMPILERS[tier])
     subprocess.run(
         [*exe_launch_prefix(), compiler, *_CFLAGS, "-c", cfile, "-o", out_o],
