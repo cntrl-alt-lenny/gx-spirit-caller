@@ -161,7 +161,7 @@ src/usa/overlay005/func_ov005_021ac9c4.s:
 src/usa/overlay005/func_ov005_021ac9cc.s:
     complete
     .text start:0x021ac9cc end:0x021ac9d4
-src/usa/overlay005/func_ov005_021ac9d4.s:
+src/usa/overlay005/func_ov005_021ac9d4.c:
     complete
     .text start:0x021ac9d4 end:0x021aca48
 src/usa/overlay005/func_ov005_021aca48.s:

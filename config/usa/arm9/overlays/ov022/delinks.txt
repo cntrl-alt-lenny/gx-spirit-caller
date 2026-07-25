@@ -33,7 +33,7 @@ src/usa/overlay022/func_ov022_021ab250.s:
 src/usa/overlay022/func_ov022_021ab310.s:
     complete
     .text start:0x021ab310 end:0x021ab380
-src/usa/overlay022/func_ov022_021ab380.s:
+src/usa/overlay022/func_ov022_021ab380.c:
     complete
     .text start:0x021ab380 end:0x021ab3d0
 src/usa/overlay022/func_ov022_021ab3d0.c:

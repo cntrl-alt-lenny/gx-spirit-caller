@@ -80,7 +80,7 @@ src/usa/overlay008/func_ov008_021abbfc.s:
 src/usa/overlay008/func_ov008_021abf8c.s:
     complete
     .text start:0x021abf8c end:0x021abfd8
-src/usa/overlay008/func_ov008_021abfd8.s:
+src/usa/overlay008/func_ov008_021abfd8.c:
     complete
     .text start:0x021abfd8 end:0x021ac128
 src/usa/overlay008/func_ov008_021ac128.s:
@@ -233,7 +233,7 @@ src/usa/overlay008/func_ov008_021b0aa0.s:
 src/usa/overlay008/func_ov008_021b15d4.s:
     complete
     .text start:0x021b15d4 end:0x021b1780
-src/usa/overlay008/func_ov008_021b1780.s:
+src/usa/overlay008/func_ov008_021b1780.c:
     complete
     .text start:0x021b1780 end:0x021b1874
 src/usa/overlay008/func_ov008_021b1874.s:
@@ -252,7 +252,7 @@ src/usa/overlay008/ov008_021b1ce8.c:
     complete
     .text start:0x021b1ce8 end:0x021b1cfc
 
-src/usa/overlay008/func_ov008_021b1cfc.s:
+src/usa/overlay008/func_ov008_021b1cfc.c:
     complete
     .text start:0x021b1cfc end:0x021b1dbc
 src/usa/overlay008/func_ov008_021b1dbc.c:
@@ -263,21 +263,21 @@ src/usa/overlay008/func_ov008_021b1dd0.c:
     complete
     .text start:0x021b1dd0 end:0x021b1e04
 
-src/usa/overlay008/func_ov008_021b1e04.s:
+src/usa/overlay008/func_ov008_021b1e04.c:
     complete
     .text start:0x021b1e04 end:0x021b1f04
 src/usa/overlay008/func_ov008_021b1f04.c:
     complete
     .text start:0x021b1f04 end:0x021b1f40
 
-src/usa/overlay008/func_ov008_021b1f40.s:
+src/usa/overlay008/func_ov008_021b1f40.c:
     complete
     .text start:0x021b1f40 end:0x021b2078
 src/usa/overlay008/func_ov008_021b2078.c:
     complete
     .text start:0x021b2078 end:0x021b20dc
 
-src/usa/overlay008/func_ov008_021b20dc.s:
+src/usa/overlay008/func_ov008_021b20dc.c:
     complete
     .text start:0x021b20dc end:0x021b2120
 src/usa/overlay008/func_ov008_021b2120.c:
@@ -287,7 +287,7 @@ src/usa/overlay008/func_ov008_021b2120.c:
 src/usa/overlay008/func_ov008_021b2144.s:
     complete
     .text start:0x021b2144 end:0x021b21c0
-src/usa/overlay008/func_ov008_021b21c0.s:
+src/usa/overlay008/func_ov008_021b21c0.c:
     complete
     .text start:0x021b21c0 end:0x021b2288
 src/usa/overlay008/func_ov008_021b2288.c:
