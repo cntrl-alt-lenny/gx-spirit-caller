@@ -143,6 +143,7 @@ data_ov008_021b2c08 kind:bss addr:0x021b2c08
 data_ov008_021b2c14 kind:bss addr:0x021b2c14
 data_ov008_021b2c54 kind:bss addr:0x021b2c54
 data_ov008_021b2ca0 kind:bss addr:0x021b2ca0
+data_ov008_021b2ca0_alias kind:bss addr:0x021b2ca0
 data_ov008_021b2ca8 kind:bss addr:0x021b2ca8
 data_ov008_021b2cac kind:bss addr:0x021b2cac
 data_ov008_021b2cae kind:bss addr:0x021b2cae

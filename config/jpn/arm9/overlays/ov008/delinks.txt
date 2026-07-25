@@ -86,7 +86,7 @@ src/jpn/overlay008/func_ov008_021abfd8.c:
 src/jpn/overlay008/func_ov008_021ac128.s:
     complete
     .text start:0x021ac128 end:0x021ac1cc
-src/jpn/overlay008/func_ov008_021ac1cc.s:
+src/jpn/overlay008/func_ov008_021ac1cc.c:
     complete
     .text start:0x021ac1cc end:0x021ac27c
 src/jpn/overlay008/func_ov008_021ac27c.s:
