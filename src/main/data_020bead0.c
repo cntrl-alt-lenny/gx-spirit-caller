@@ -1,4 +1,5 @@
 /* Cluster C Pattern 1 wave 3 — data_020bead0 (136 bytes, 4-aligned). */
+/* scratch verification commit for q-compile-gate-region-fix -- no-op comment. */
 
 const unsigned char data_020bead0[136] = {
     0x17, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00,
