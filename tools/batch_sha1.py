@@ -55,6 +55,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from routing_suffixes import strip_routing_suffix
+
 ROOT = Path(__file__).resolve().parent.parent
 _KNOWN_REGIONS = ("eur", "usa", "jpn")
 
@@ -77,10 +79,12 @@ def _rel_posix(path: Path) -> str:
 
 
 def _c_to_s_rel(c_rel: str) -> str:
-    """'src/main/func_X.c' → 'src/main/func_X.s'."""
+    """'src/main/func_X.c' → 'src/main/func_X.s'.
+    'src/main/func_X.legacy_sp3.c' → 'src/main/func_X.s' (brief 587:
+    routing-tier infixes never appear on the .s side)."""
     if not c_rel.endswith(".c"):
         raise ValueError(f"Expected .c path, got: {c_rel}")
-    return c_rel[:-2] + ".s"
+    return strip_routing_suffix(c_rel[:-2]) + ".s"
 
 
 # ---------------------------------------------------------------------------

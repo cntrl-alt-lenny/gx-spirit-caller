@@ -153,6 +153,25 @@ class TestConformance(unittest.TestCase):
         import sig_census as m
         self.assertIs(m._ROUTING_SUFFIXES, ROUTING_SUFFIXES)
 
+    def test_batch_sha1(self) -> None:
+        # brief 690: batch_sha1.py's own _c_to_s_rel() hand-rolled a bare
+        # `c_rel[:-2] + ".s"` that never stripped the routing infix, so
+        # every .legacy.c/.legacy_sp3.c candidate (and, before brief 587,
+        # every .thumb.c one) resolved to a nonexistent .s path and
+        # failed with "No delinks.txt entry found" for its whole batch.
+        import batch_sha1 as m
+        self.assertIs(m.strip_routing_suffix, strip_routing_suffix)
+
+    def test_batch_sha1_c_to_s_rel_strips_routing_infix(self) -> None:
+        import batch_sha1 as m
+        self.assertEqual(
+            m._c_to_s_rel("src/main/func_abc.legacy_sp3.c"), "src/main/func_abc.s")
+        self.assertEqual(
+            m._c_to_s_rel("src/main/func_abc.legacy.c"), "src/main/func_abc.s")
+        self.assertEqual(
+            m._c_to_s_rel("src/overlay004/func_x.thumb.c"), "src/overlay004/func_x.s")
+        self.assertEqual(m._c_to_s_rel("src/main/func_abc.c"), "src/main/func_abc.s")
+
     def test_claude_post_edit(self) -> None:
         m = _load_module_from_path(
             "_conformance_claude_post_edit",
