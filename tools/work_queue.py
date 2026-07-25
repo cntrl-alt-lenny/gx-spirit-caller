@@ -80,6 +80,52 @@ def _items(text: str) -> list[re.Match]:
     return list(_HDR.finditer(text))
 
 
+# Any `### `-level heading is meant to be a queue item — this file's own
+# convention has no other use for that heading level (verified: every
+# `###` line in every docs/queue/*.md file already follows the `id —
+# title [STATUS]` shape). Deliberately broader than `_HDR` itself: a
+# heading missing its `[STATUS]` bracket entirely (or missing the em-dash
+# separator, or using the wrong bracket placement) still starts with
+# `### `, so it's still a "candidate" this catches -- it just won't also
+# match `_HDR`, which is exactly the silent-invisibility bug this exists
+# to catch. Third confirmed real occurrence of this bug in this lane
+# (q-metric-extern-guard, brief 682's flagged-but-unqueued follow-ups,
+# and once before that) -- `_items()`/`cmd_next` skip anything that
+# doesn't match `_HDR` with NO error or warning, so a malformed heading
+# is not merely mis-parsed, it's completely invisible to `next`/`status`/
+# `list`, permanently, until someone happens to read the raw file.
+_CANDIDATE_HDR = re.compile(r"^###[ \t]+\S.*$", re.M)
+
+
+def find_malformed_headers(text: str) -> list[str]:
+    """Return every `###`-level heading line in `text` that does NOT
+    parse as a valid queue item -- either because it doesn't match
+    `_HDR` at all (no `[STATUS]` bracket found in the required position,
+    e.g. missing entirely or misplaced), or because the bracket it does
+    have isn't one of the recognized `STATUSES`. Empty list = clean.
+
+    Matches are correlated by START POSITION, not by matched text --
+    `_HDR`'s match ends right after the closing `]` (its trailing-
+    whitespace lookahead is zero-width, not consumed), while
+    `_CANDIDATE_HDR`'s `.*$` swallows any trailing whitespace on the
+    line, so comparing matched strings directly would false-positive on
+    a well-formed heading that merely has trailing spaces. Both regexes
+    anchor with `^` in MULTILINE mode, so two matches on the same
+    logical line always share the same start position regardless of
+    what either one consumes after that.
+    """
+    status_by_start: dict[int, str] = {
+        m.start(): m.group("status") for m in _HDR.finditer(text)
+    }
+
+    bad: list[str] = []
+    for cm in _CANDIDATE_HDR.finditer(text):
+        status = status_by_start.get(cm.start())
+        if status is None or status not in STATUSES:
+            bad.append(cm.group(0))
+    return bad
+
+
 def _section(text: str, m: re.Match) -> str:
     """The full section body from this header to the next '### ' (or EOF)."""
     start = m.start()

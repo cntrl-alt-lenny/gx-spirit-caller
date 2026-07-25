@@ -76,5 +76,99 @@ class QueueTest(unittest.TestCase):
         self.assertEqual(self._body().count("[TODO]"), 0)
 
 
+# --------------------------------------------------------------------------- #
+# find_malformed_headers — a heading missing its [STATUS] bracket (or with a
+# bracket that isn't a recognized status) is not just mis-parsed, it's
+# completely INVISIBLE to next/status/list (silently skipped by _items(),
+# no error). Confirmed real, recurring bug in docs/queue/claude-scaffolder.md
+# -- q-metric-extern-guard shipped with no status marker at all and sat
+# unschedulable until a human happened to read the raw file. Third
+# occurrence of this exact class in this lane.
+# --------------------------------------------------------------------------- #
+
+class FindMalformedHeadersTest(unittest.TestCase):
+    def test_clean_file_reports_nothing(self):
+        self.assertEqual(q.find_malformed_headers(SEED), [])
+
+    def test_missing_status_bracket_entirely(self):
+        # The exact q-metric-extern-guard shape: heading present, status
+        # bracket never added.
+        text = "### a1 — first task\nbody\n**Gate:** pytest\n"
+        bad = q.find_malformed_headers(text)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("### a1 — first task", bad[0])
+
+    def test_unrecognized_status_word(self):
+        # Syntactically matches _HDR (brackets are in the right place) but
+        # the word inside isn't one of STATUSES -- e.g. a typo. Silently
+        # excluded from cmd_status's Counter today; should still be
+        # flagged as not-a-recognized-status.
+        text = "### a1 — first task [TDOO]\nbody\n"
+        bad = q.find_malformed_headers(text)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("[TDOO]", bad[0])
+
+    def test_wrong_bracket_order_is_caught(self):
+        # The actual mistake made while filing q-compile-gate-region-fix in
+        # this same session: [TODO] [S] instead of [S] [TODO] -- _HDR's
+        # trailing-whitespace-then-EOL lookahead only matches the LAST
+        # bracket, so [S] (not a recognized status) gets captured instead
+        # of [TODO], and the heading silently reads as malformed.
+        text = "### a1 — first task [TODO] [S]\nbody\n"
+        bad = q.find_malformed_headers(text)
+        self.assertEqual(len(bad), 1)
+
+    def test_correct_bracket_order_is_clean(self):
+        text = "### a1 — first task [S] [TODO]\nbody\n"
+        self.assertEqual(q.find_malformed_headers(text), [])
+
+    def test_trailing_whitespace_after_bracket_is_still_clean(self):
+        # Regression guard for the correlate-by-start-position design: a
+        # naive matched-text comparison would false-positive here, since
+        # _HDR's own match doesn't consume the lookahead's trailing
+        # whitespace but _CANDIDATE_HDR's `.*$` does.
+        text = "### a1 — first task [TODO]   \nbody\n"
+        self.assertEqual(q.find_malformed_headers(text), [])
+
+    def test_multiple_malformed_headers_all_reported(self):
+        text = (
+            "### a1 — first task\n"
+            "body\n"
+            "### a2 — second task [TODO]\n"
+            "body\n"
+            "### a3 — third task [NOTASTATUS]\n"
+            "body\n"
+        )
+        bad = q.find_malformed_headers(text)
+        self.assertEqual(len(bad), 2)
+
+
+class RealQueueFilesTest(unittest.TestCase):
+    """Guards the REAL docs/queue/*.md files in this repo -- not synthetic
+    content. This is the actual regression test: it fails CI the moment
+    anyone (human or agent) commits a heading that `next`/`status`/`list`
+    would silently never see, instead of relying on someone noticing the
+    queue item never gets picked up."""
+
+    def test_no_malformed_headers_in_any_real_queue_file(self):
+        real_qdir = Path(__file__).resolve().parent.parent / "docs" / "queue"
+        lane_files = sorted(real_qdir.glob("*.md"))
+        self.assertGreater(len(lane_files), 0, "no docs/queue/*.md files found")
+        failures: list[str] = []
+        for lane_file in lane_files:
+            text = lane_file.read_text(encoding="utf-8")
+            for bad_line in q.find_malformed_headers(text):
+                failures.append(f"{lane_file.name}: {bad_line}")
+        self.assertEqual(
+            failures, [],
+            msg=(
+                "Heading(s) with no recognized [STATUS] marker -- these are "
+                "SILENTLY INVISIBLE to work_queue.py next/status/list, not "
+                "just mis-parsed. Add the missing/correct [TODO|CLAIMED|"
+                "DONE|PARKED] marker:\n  " + "\n  ".join(failures)
+            ),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
