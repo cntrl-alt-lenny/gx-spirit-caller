@@ -253,16 +253,28 @@ def render_index(notes: list[dict]) -> str:
 
 
 def collect_notes() -> list[dict]:
-    """Scan RESEARCH_DIR (recursively) for research notes, in the
-    same sorted order `main()` renders them in. The single source of
-    truth for "what counts as a note" -- both `main()` and the
-    committed-index regression test call this, so the two can never
-    drift the way they once did (the test used to reimplement this
-    scan with its own copy of the old non-recursive glob, so it never
-    had a chance to catch the recursion bug this function fixed).
+    """Scan RESEARCH_DIR (recursively) for research notes, sorted by
+    `relpath` (a plain string sort). The single source of truth for
+    "what counts as a note" -- both `main()` and the committed-index
+    regression test call this, so the two can never drift the way
+    they once did (the test used to reimplement this scan with its
+    own copy of the old non-recursive glob, so it never had a chance
+    to catch the recursion bug this function fixed).
+
+    Sorting is done on the PARSED notes' `relpath` strings, not on the
+    raw `Path` objects straight out of `rglob()` -- `Path.__lt__`'s
+    comparison semantics differ by platform (`WindowsPath` sorts
+    case-INsensitively, confirmed directly: `sorted([Path("Zebra.md"),
+    Path("apple.md")])` orders "apple" first; `PosixPath` -- what every
+    CI runner uses -- sorts case-SENSITIVELY, uppercase before
+    lowercase). With 3000+ notes across many mixed-case directory
+    names, that divergence is no longer a hypothetical: a Windows-
+    generated index and a Linux-generated one land in genuinely
+    different orders, which `--check` (byte-for-byte) correctly
+    flags as drift. A plain `str` sort has no such platform variance.
     """
     notes: list[dict] = []
-    for path in sorted(RESEARCH_DIR.rglob("*.md")):
+    for path in RESEARCH_DIR.rglob("*.md"):
         # README.md (this index itself, plus a per-directory copy under
         # archive/) and INDEX.md (9 separately-maintained per-subdirectory
         # navigational catalogs, e.g. docs/research/data/INDEX.md, each
@@ -277,6 +289,7 @@ def collect_notes() -> list[dict]:
                   file=sys.stderr)
             continue
         notes.append(parsed)
+    notes.sort(key=lambda n: n["relpath"])
     return notes
 
 

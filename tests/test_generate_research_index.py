@@ -391,6 +391,21 @@ class TestCollectNotesRecursion(unittest.TestCase):
         self.assertIn("campaign-analytics/path-to-100-coverage.md", relpaths)
         self.assertIn("archive/path-to-100-coverage.md", relpaths)
 
+    def test_sort_order_is_platform_independent_plain_string_sort(self):
+        # Real regression, caught by CI (not local testing -- Windows'
+        # WindowsPath.__lt__ sorts case-INsensitively; PosixPath, what
+        # every CI runner uses, sorts case-SENSITIVELY). Sorting raw
+        # Path objects straight out of rglob() -- rather than the
+        # parsed notes' relpath strings -- produced a genuinely
+        # different order on Windows than on Linux once enough mixed-
+        # case directory names existed for it to matter, and --check
+        # (byte-for-byte) correctly flagged that as drift. Pin: the
+        # notes list must already be in the same order a plain `str`
+        # sort of the relpaths would produce, on ANY platform.
+        notes = collect_notes()
+        relpaths = [n["relpath"] for n in notes]
+        self.assertEqual(relpaths, sorted(relpaths))
+
 
 if __name__ == "__main__":
     unittest.main()
