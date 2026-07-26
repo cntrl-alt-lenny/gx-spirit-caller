@@ -15,20 +15,26 @@ name: Generated files drift
 # while CI falls back to `delinks.txt` synthesis which produces a
 # structurally-different SVG. A CI gate would always false-fail.
 
+# DELIBERATELY UNFILTERED. `drift-check` is a REQUIRED status check in the
+# `main-protection` ruleset. GitHub blocks a PR until every required check
+# reports, and a workflow skipped by a `paths:` filter never reports at all
+# — it does not resolve as "passed", it stays pending forever. So a required
+# check must run on EVERY pull request or it is a merge deadlock, not a gate.
+#
+# This bit for real: PR #1360 (the pytest-CI fix) touched only
+# `docs/queue/*.md` + `tests/*.py`, matched none of the old paths below, and
+# sat BLOCKED with all five of its actual checks green. The campaign had not
+# hit it earlier only because every worker PR happens to write a
+# `docs/research/**.md` writeup, which the old filter matched by luck.
+#
+# The old filter listed: tools/**.py, docs/tools-index.md, docs/briefs/**.md,
+# docs/research/**.md, and this workflow file. The job is checkout + Python +
+# three `--check` invocations, so running it unconditionally is cheap.
+#
+# If this is ever re-filtered, drop it from the required-check list in the
+# same change — the two settings are only safe together.
 on:
   pull_request:
-    paths:
-      # tools-index regenerates from tool docstrings + the prefix-
-      # rule table in generate_tool_index.py itself.
-      - 'tools/**.py'
-      - 'docs/tools-index.md'
-      # briefs-index regenerates from filenames + first-paragraph
-      # parsing of every docs/briefs/NNN-*.md.
-      - 'docs/briefs/**.md'
-      # research-index regenerates from H1 + first-paragraph
-      # parsing of every docs/research/*.md.
-      - 'docs/research/**.md'
-      - '.github/workflows/generated-files-drift.yml'
 
 permissions:
   contents: read
