@@ -251,7 +251,13 @@ The CI check has 4 error-severity `cross_file_name_drift` issues, all pre-existi
 
 **Gate:** `python tools/check_match_invariants.py` reports 0 errors (warnings are fine and do not block); `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep — sweep ov002's unknown pool, the biggest untouched concentration left [TODO]
+### cm-ov002-unknown-sweep — sweep ov002's unknown pool, the biggest untouched concentration left [DONE]
+
+> DONE: PR #1363, 79/125 (63.2%) shipped from the 32-88B band (not yet
+> merged as of this branch — patched locally, same staleness gap as
+> cm-sm64ds-lever-apply above; `next` claimed this item by FIFO before
+> handing me q-fastmatch-sweep-friction, since it was still [TODO] on
+> main — corrected here rather than re-attempting already-shipped work).
 
 `wall_aware_headroom.py --exclude-attempted` currently reports ov002 at 2,682 candidates (8 coercible, 2,674 unknown, 0 confirmed-permanent) — the single largest pool in the project, ahead of main's 2,260. Most of it was mechanically `.s`-shipped by size-tier sweeps with zero C-drafting attempts (brief 416), so expect the usual mix, not a wall.
 
@@ -263,7 +269,7 @@ COORDINATION: the scaffolder's data lane is also in overlay002 but only touches 
 
 **Gate:** `python tools/gate3.py --scope all` PASS + shipped/attempted count in the PR body.
 
-### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [TODO]
+### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [CLAIMED]
 
 PR #1363's 5-worktree sweep hit three real `tools/fastmatch.py` gaps, worked around all three, and shipped the workarounds as prose instead of fixes — that's pure repeated cost for the next lane. Fix the tool itself this round:
 
