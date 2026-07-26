@@ -381,9 +381,9 @@ Reads build/<version>/report.json (objdiff-cli format) and writes assets/progres
 
 ### `tools/generate_research_index.py`
 
-**Regenerate docs/research/README.md from the research notes in the**
+**Regenerate docs/research/README.md from the research notes anywhere**
 
-same directory.
+under docs/research/, at any depth (e.g. docs/research/data/*.md).
 
 ### `tools/generate_tool_index.py`
 
