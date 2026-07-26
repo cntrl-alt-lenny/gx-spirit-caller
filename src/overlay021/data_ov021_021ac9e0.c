@@ -1,6 +1,6 @@
 /* Cluster D-1 — data_ov021_021ac9e0 (320 bytes = 80 pointers). */
+#include "game/prototypes.h"
 
-extern void func_ov000_021ac7dc(void);
 extern char data_ov021_021ac4dc;
 extern char data_ov021_021ac77c;
 extern char data_ov021_021ac79c;
@@ -29,7 +29,6 @@ extern char data_ov021_021ac000;
 extern char data_ov021_021ac198;
 extern char data_ov021_021ac108;
 extern char data_ov021_021ac024;
-extern void func_ov000_021abf40(void);
 extern char data_ov021_021abed4;
 extern char data_ov021_021ac25c;
 extern char data_ov021_021abef8;
@@ -48,7 +47,6 @@ extern char data_ov021_021abf34;
 extern char data_ov021_021ac1fc;
 extern char data_ov021_021ac120;
 extern char data_ov021_021ac28c;
-extern void func_ov000_021abf28(void);
 extern char data_ov021_021ac0cc;
 extern char data_ov021_021ac078;
 extern char data_ov021_021ac0c0;
@@ -70,7 +68,6 @@ extern char data_ov021_021ac0b4;
 extern char data_ov021_021abfac;
 extern char data_ov021_021abfe8;
 extern char data_ov021_021ac054;
-extern void func_ov008_021ac06c(void);
 extern char data_ov021_021ac174;
 extern char data_ov021_021ac084;
 extern char data_ov021_021ac0fc;
@@ -78,7 +75,6 @@ extern char data_ov021_021ac114;
 extern char data_ov021_021ac138;
 extern char data_ov021_021ac24c;
 extern char data_ov021_021abf70;
-extern void func_ov000_021ac560(void);
 
 void *data_ov021_021ac9e0[80] = {
     (void *)func_ov000_021ac7dc,

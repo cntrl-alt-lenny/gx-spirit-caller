@@ -44,10 +44,7 @@
  */
 
 #include <runtime/sinit.h>
-
-extern void func_ov010_021b285c(void *arg);
-extern void func_ov010_021b365c(void *arg);
-extern void func_ov010_021b67ec(void *obj);
+#include "game/prototypes.h"
 
 extern char data_ov010_021b9260[];
 extern char data_ov010_021b9294[];
