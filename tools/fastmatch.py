@@ -335,6 +335,13 @@ def find_gap_from_objdiff(out_o: Path) -> Path | None:
 def find_gap_by_glob(func: str, module: str, region: str) -> Path | None:
     """Fallback: glob build/<region>/delinks/**/_dsd_gap@<module>_*.o and
     confirm the candidate contains `func` in its symbol table.
+
+    dsd only emits a `_dsd_gap@` object for a genuinely-unassigned region
+    (bytes with no delinks.txt entry of their own yet) -- it NEVER emits
+    one for a function that already has its own individual delinks.txt
+    entry, which is the common case for a whole-function-ship `.s`
+    candidate. This glob reliably finds nothing for that case; callers
+    needing it should fall back to find_gap_by_delinked_object.
     """
     pattern = str(ROOT / f"build/{region}/delinks" / "**" / f"_dsd_gap@{module}_*.o")
     candidates = sorted(glob.glob(pattern, recursive=True))
@@ -348,6 +355,34 @@ def find_gap_by_glob(func: str, module: str, region: str) -> Path | None:
             rf"\bF\b.+\.text\s+[0-9a-f]+\s+{re.escape(func)}$", out, re.M
         ):
             return Path(obj)
+    return None
+
+
+def find_gap_by_delinked_object(c_path: Path, func: str, region: str) -> Path | None:
+    """Fallback: look up the per-function delinked reference object directly.
+
+    Every delinks.txt entry (whether still `.s` or already converted to
+    `.c`) gets its own reference object at
+    build/<region>/delinks/<same-dir-as-source>/<name-with-suffix-swapped>.o
+    -- confirmed on disk (brief q-fastmatch-sweep-friction): an unconverted
+    candidate `src/overlay002/func_ov002_021aa4a0.s` has its reference at
+    `build/eur/delinks/src/overlay002/func_ov002_021aa4a0.o`, no tier
+    suffix, because dsd names it after the CURRENT (still-`.s`) source
+    path, not the function name in isolation. This is the path
+    find_gap_by_glob's `_dsd_gap@` search can never reach: individually
+    carved candidates always have this entry, never a `_dsd_gap@` blob.
+    """
+    src_rel = c_path.relative_to(ROOT) if c_path.is_absolute() else c_path
+    delinks_dir = ROOT / "build" / region / "delinks" / src_rel.parent
+    candidate = delinks_dir / f"{func}.o"
+    if candidate.is_file():
+        return candidate
+    # Tier-suffixed fallback (e.g. "<func>.legacy.o"), in case the
+    # delinks.txt entry was already converted to a suffixed .c tier.
+    if delinks_dir.is_dir():
+        matches = sorted(delinks_dir.glob(f"{func}.*.o"))
+        if matches:
+            return matches[0]
     return None
 
 
@@ -534,6 +569,8 @@ def match_one(
                 current_gap: Path | None = gap_override
             else:
                 current_gap = find_gap_from_objdiff(out_o)
+                if current_gap is None:
+                    current_gap = find_gap_by_delinked_object(c_path, fn, region)
                 if current_gap is None:
                     current_gap = find_gap_by_glob(fn, module, region)
 
