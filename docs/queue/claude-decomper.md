@@ -251,7 +251,13 @@ The CI check has 4 error-severity `cross_file_name_drift` issues, all pre-existi
 
 **Gate:** `python tools/check_match_invariants.py` reports 0 errors (warnings are fine and do not block); `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep — sweep ov002's unknown pool, the biggest untouched concentration left [TODO]
+### cm-ov002-unknown-sweep — sweep ov002's unknown pool, the biggest untouched concentration left [DONE]
+
+> DONE: PR #1363, 79/125 (63.2%) shipped from the 32-88B band (not yet
+> merged as of this branch — patched locally, same staleness gap as
+> cm-sm64ds-lever-apply above; `next` claimed this item by FIFO before
+> handing me q-fastmatch-sweep-friction, since it was still [TODO] on
+> main — corrected here rather than re-attempting already-shipped work).
 
 `wall_aware_headroom.py --exclude-attempted` currently reports ov002 at 2,682 candidates (8 coercible, 2,674 unknown, 0 confirmed-permanent) — the single largest pool in the project, ahead of main's 2,260. Most of it was mechanically `.s`-shipped by size-tier sweeps with zero C-drafting attempts (brief 416), so expect the usual mix, not a wall.
 
@@ -262,3 +268,28 @@ Two preflights that have bitten this protocol before: seed each worktree with th
 COORDINATION: the scaffolder's data lane is also in overlay002 but only touches `data_ov002_*.c` blobs. Stay on `func_ov002_*` and you are disjoint; delinks.txt overlap merges cleanly with `--no-ff`.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + shipped/attempted count in the PR body.
+
+### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [DONE]
+
+> DONE: PR #1368 (not yet merged as of this branch — patched locally,
+> same staleness gap as cm-sm64ds-lever-apply above).
+
+PR #1363's 5-worktree sweep hit three real `tools/fastmatch.py` gaps, worked around all three, and shipped the workarounds as prose instead of fixes — that's pure repeated cost for the next lane. Fix the tool itself this round:
+
+(a) **Gap-object auto-discovery never finds anything for an individually-carved `.s` file.** `find_gap_by_glob` only matches `_dsd_gap@<module>_*.o` — dsd only emits those for genuinely-unassigned regions, never for a whole-function candidate that already has its own per-function delinked reference object at `build/<region>/delinks/<src-path>/<func>.o`. Confirmed independently by 3 of 5 sweep batches, none of which could rely on it. Fix it (resolve via the delinked-object path instead) or delete the auto-discovery path entirely — a feature that never works and is always bypassed is worse than no feature.
+
+(b) **Ninja hard-errors ("multiple rules generate X") when a candidate's `.c` draft and its still-referenced `.s` coexist.** This is the SAME root cause `q-toolbugs-round2` (#1351) already fixed inside `batch_sha1.py` (`_displace_stale_sibling` / `_restore_stale_sibling` / `_reconfigure` / `_MULTIPLE_RULES_RE` / `_correlate_stale_sibling`). Reuse that fix's approach rather than inventing a second one.
+
+(c) **Unhandled `Path.relative_to(ROOT)` crash for an out-of-repo `--gap` path.** `match_one`'s result-dict construction assumes the resolved gap object is always inside `ROOT`; a user-supplied `--gap` path outside the tree raises `ValueError` instead of reporting cleanly.
+
+ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat unschedulable three times because its heading lacked a status marker — that class of bug must have a real regression test guarding it (check whether `tests/test_work_queue.py` already covers this generically before writing a new one; if it does, say so in the PR body instead of duplicating).
+
+**Gate:** a real repro for each of (a)-(c) against pre-fix code, the way #1351 stash-reverted each fix to prove the test actually catches it — tests that pass before the fix prove nothing. `python tools/gate3.py --scope all` PASS.
+
+### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [TODO]
+
+`cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
+
+The prior sweep reversed 2 documented wall verdicts (`func_ov002_022abf88`, `func_ov002_021e2cd4`) and found a C-34 mistag (`func_ov002_022a1870`) — those corrections belong in `codegen-walls.md` as edits in THIS PR, not only in the writeup, or the next lane re-parks the same functions.
+
+**Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
