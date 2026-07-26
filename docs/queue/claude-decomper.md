@@ -286,7 +286,7 @@ ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat un
 
 **Gate:** a real repro for each of (a)-(c) against pre-fix code, the way #1351 stash-reverted each fix to prove the test actually catches it — tests that pass before the fix prove nothing. `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [TODO]
+### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [CLAIMED]
 
 `cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
 
