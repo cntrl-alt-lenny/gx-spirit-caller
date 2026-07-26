@@ -6143,6 +6143,97 @@ B band (`main` + `ov002`); see the brief doc for the full candidate
 list — the census itself is reusable for future waves once this
 lever is applied from the start.
 
+### C-45. `switch` over a small contiguous case range can avoid mwcc's range-fold
+
+> **Corrects a bulk mis-stamp, not a specific prior citation.**
+> `func_ov002_022abf88` carried only the generic "GLOBAL_ASM endgame"
+> mechanical bulk stamp (brief 294/302 — "reg-alloc-walled, no C match
+> attempted"), never an individually-reasoned wall entry. This C-N
+> documents the lever that disproves the bulk stamp's implicit
+> "unfixable" claim for this shape, so future sweeps try it before
+> accepting the bulk stamp at face value (see the queue header's brief
+> 651 rework note on why the bulk stamp is not per-function proof).
+
+**Target (`func_ov002_022abf88`, cm-ov002-unknown-sweep batch 3):**
+original disassembly checks a value against 3 contiguous constants
+(`0x4b`/`0x4c`/`0x4d`) with an explicit compare chain:
+
+```text
+cmp   r2, #0x4b
+cmpne r2, #0x4c
+cmpne r2, #0x4d
+bne   .L_bcc
+```
+
+**The apparent wall:** a small contiguous-value dispatch looks like
+exactly the shape mwcc's optimizer would normalize into a
+range-check (`sub`+`cmp #2`+`bhi`) instead of a literal compare chain —
+worth checking before assuming a plain C `switch` can ever reproduce
+this, since a folded range-check would never byte-match a compare
+chain.
+
+**The fix:** a plain C `switch` over the 3 contiguous case values
+(falling through to a shared `return`) reproduced the compare chain
+byte-for-byte under the default 2.0/sp1p5 tier — mwcc did **not** fold
+it. No range-check was emitted; try `switch` first rather than
+assuming the range-fold is automatic.
+
+```c
+switch (-self->f4) {
+case 0x4b:
+case 0x4c:
+case 0x4d:
+    return self->f70[idx];
+}
+return func_ov002_021afbd4(self->f68[idx]);
+```
+
+This is at least the 8th confirmed instance (2 here + 6 from
+`cm-overlay-small-sweep`, PR #1334) of the GLOBAL_ASM bulk stamp
+masking a real, simple C match — see C-44's sibling note above and
+[`cm-overlay-small-sweep-2026-07-24.md`](cm-overlay-small-sweep-2026-07-24.md).
+
+**Provenance:** cm-ov002-unknown-sweep (PR #1363), batch 3.
+
+### C-46. Explicit `(unsigned)` cast preserves a logical shift when mirroring a global bitfield read
+
+> Same "corrects a bulk mis-stamp" caveat as C-45 — `func_ov002_021e2cd4`
+> also carried only the generic GLOBAL_ASM bulk stamp, not a specific
+> prior wall citation.
+
+**Target (`func_ov002_021e2cd4`, cm-ov002-unknown-sweep batch 3):**
+original reads one bit out of a global 32-bit field at a
+register-supplied bit index with a **logical** shift:
+
+```text
+ldr r2, [pc, #...]     ; &data_ov002_022d016c
+ldr r2, [r2, #0xd0]
+mov r2, r2, lsr r5      ; LOGICAL shift — lsr, not asr
+and r2, r2, #0x1
+```
+
+**The apparent wall:** natural C for "shift then mask one bit"
+(`(field >> bit) & 1`) on an `int`-typed field emits an **arithmetic**
+shift (`asr`) once mwcc can't prove the value non-negative — silently
+wrong for the top bit, and the resulting diff (right instruction
+family, wrong variant) reads like a deep register-allocation issue
+rather than a one-cast fix, encouraging bulk classification as
+permanent.
+
+**The fix:** cast to `unsigned` before shifting:
+
+```c
+if (val == (((unsigned)D016C->f_d0 >> bit) & 1)) return;
+```
+
+forces mwcc to emit `lsr`, matching the original exactly. Same family
+as C-30 (pool-dup + shift-based bit extraction) but the trigger here
+is shift-family choice (`lsr` vs `asr`) from field signedness, not
+pool deduplication — check this first on any single-bit-out-of-a-
+global-field read that mismatches only in the shift instruction.
+
+**Provenance:** cm-ov002-unknown-sweep (PR #1363), batch 3.
+
 ## Permanent P-wall index (13 live; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
