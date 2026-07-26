@@ -63,7 +63,17 @@ import subprocess
 import sys
 from pathlib import Path
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError as _exc:  # pragma: no cover - environment guard
+    # Fail loud and early rather than degrading to a silent pass. A gate that
+    # cannot run must never look like a gate that ran and approved: that is the
+    # vacuous-gate defect this tool exists to detect.
+    raise SystemExit(
+        "check_ci_contract: PyYAML is required but not installed.\n"
+        "  Fix: python -m pip install -r tools/requirements.txt\n"
+        "  Refusing to skip — an unrunnable check must not report success."
+    ) from _exc
 
 ROOT = Path(__file__).resolve().parent.parent
 WORKFLOW_DIR = ROOT / ".github" / "workflows"
