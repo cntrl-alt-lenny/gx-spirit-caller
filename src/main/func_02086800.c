@@ -7,8 +7,6 @@
  */
 /* func_02086800: transform init. dst ints at 0/4/0x10/0x14/0x30/0x34;
  * src has int@0x24, u16@0x2c, int@0x28, u16@0x2e. Stores in asm order. */
-extern void func_02086800_dummy(void);
-
 void func_02086800(char *dst, char *src) {
     *(int *)(dst + 0x00) = 0x1000;
     *(int *)(dst + 0x14) = 0x1000;
