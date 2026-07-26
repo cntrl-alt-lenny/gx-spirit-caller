@@ -216,6 +216,10 @@ class TestRunM2C(unittest.TestCase):
         (Path(__file__).resolve().parent.parent / "tools/_vendor/m2c/m2c.py").is_file(),
         "m2c not vendored — run tools/m2c_bootstrap.py first",
     )
+    @unittest.skipUnless(
+        shutil.which("gcc") is not None,
+        "m2ctx integration requires the gcc executable",
+    )
     def test_context_yields_named_field_not_raw_cast(self):
         # The brief-555 demo function: func_ov002_021ae400 reads
         # data_ov002_022cd744[a] and calls func_ov002_0229ade0, both
@@ -250,6 +254,10 @@ class TestRunM2C(unittest.TestCase):
     @unittest.skipUnless(
         (Path(__file__).resolve().parent.parent / "tools/_vendor/m2c/m2c.py").is_file(),
         "m2c not vendored — run tools/m2c_bootstrap.py first",
+    )
+    @unittest.skipUnless(
+        shutil.which("gcc") is not None,
+        "m2ctx integration requires the gcc executable",
     )
     def test_struct_bank_context_yields_named_field_not_unk_offset(self):
         # brief 609: data_ov002_022d016c stays `extern char […]` for real
