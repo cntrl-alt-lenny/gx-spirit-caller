@@ -83,6 +83,19 @@ ROOT = Path(__file__).resolve().parent.parent
 
 _KNOWN_REGIONS = ("eur", "usa", "jpn")
 
+
+def _display_path(path: Path) -> str:
+    """A ROOT-relative path string for display, or the absolute path if
+    `path` isn't under ROOT at all -- e.g. a user-supplied `--gap` object
+    outside the repo. `.relative_to(ROOT)` alone raises ValueError for
+    that case; every other caller in this file only ever passes a path
+    it derived itself (always under ROOT), so this is reserved for the
+    one genuinely user-controlled path."""
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
 # ---------------------------------------------------------------------------
 # Import resolver from sibling tool (soft dependency — falls back gracefully)
 # ---------------------------------------------------------------------------
@@ -256,18 +269,132 @@ def summarize_compile_error(combined: str, n: int | None = None) -> str:
     return "\n".join(signal[-n:]) if n is not None else "\n".join(signal)
 
 
-def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
+# A .s has no routing-tier concept (a tier only selects which mwcc
+# invocation compiles a .c); longest-suffix-first because each tier
+# suffix also ends in plain ".c", so a bare ".c" strip tried first would
+# leave "func_X.legacy" as the stem for a "func_X.legacy.c" input.
+# Mirrors batch_sha1.py's _c_to_s_rel / _TIER_SUFFIXES exactly.
+_TIER_SUFFIXES = (".legacy_sp3.c", ".legacy.c", ".thumb.c")
+
+# Same regexes as batch_sha1.py's own stale-sibling self-heal, reused
+# rather than re-derived: ninja's own fatal-configuration-error line
+# (distinct by construction from a real compile error's output -- this
+# prefix only appears when ninja refused to even start the build), and
+# the specific "two source files target the same object" shape.
+_NINJA_ERROR_RE = re.compile(r"^ninja: error:.*$", re.M)
+_MULTIPLE_RULES_RE = re.compile(r"multiple rules generate (?P<path>\S+)")
+
+
+def _sibling_s_path(c_path: Path) -> Path:
+    """The plain `.s` path this `.c` candidate's own translation unit
+    collides with if that `.s` is still on disk (still the active
+    delinks.txt entry -- fastmatch never edits delinks.txt, so this is
+    the common case for any candidate being test-compiled)."""
+    name = c_path.name
+    for suffix in _TIER_SUFFIXES:
+        if name.endswith(suffix):
+            return c_path.with_name(name[: -len(suffix)] + ".s")
+    return c_path.with_suffix(".s")
+
+
+def _ninja_config_error(output: str) -> str | None:
+    """None if `output` shows no ninja-level fatal; otherwise the matched
+    error line(s), joined."""
+    hits = _NINJA_ERROR_RE.findall(output)
+    return "\n".join(hits) if hits else None
+
+
+def _displace_stale_sibling(s_path: Path) -> bytes | None:
+    """Move s_path out of the way (delete, return its exact bytes so the
+    caller can restore it byte-for-byte). None if there was nothing to
+    displace. Uses read_bytes/write_bytes, not text, so line endings and
+    encoding round-trip exactly (same reasoning as batch_sha1.py)."""
+    if not s_path.is_file():
+        return None
+    data = s_path.read_bytes()
+    s_path.unlink()
+    return data
+
+
+def _restore_stale_sibling(s_path: Path, data: bytes | None) -> None:
+    """Undo _displace_stale_sibling. No-op if nothing was displaced --
+    fastmatch must never leave delinks.txt's active .s entry missing,
+    since (unlike batch_sha1) it never flips delinks.txt to compensate."""
+    if data is not None:
+        s_path.write_bytes(data)
+
+
+def _reconfigure(region: str) -> tuple[int, str]:
+    """Re-run configure.py for `region`. Returns (returncode, combined
+    stdout+stderr)."""
+    result = subprocess.run(
+        [sys.executable, "tools/configure.py", region],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    return result.returncode, (result.stdout or "") + (result.stderr or "")
+
+
+def _run_ninja_once(target: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["ninja", target],
+        capture_output=True, text=True, cwd=ROOT,
+    )
+
+
+def ninja_compile_one(out_o: Path, c_path: Path, region: str) -> tuple[bool, str]:
     """Run `ninja <out_o>` to compile exactly one translation unit.
 
     Returns (ok, error_message). On success ok=True and error_message is empty.
     Ninja reads the existing build.ninja; the caller must ensure
     `python tools/configure.py <region>` has been run at least once.
+
+    Self-heals ONE specific ninja-level (not compile-level) fatal:
+    configure.py's auto-discovery adds a build rule for every .c AND
+    every .s file it finds under src/, regardless of delinks.txt -- so a
+    candidate .c draft sitting beside its own still-`.s`-routed sibling
+    makes ninja refuse to build ANYTHING with "multiple rules generate
+    <output>.o". This is the SAME root cause batch_sha1.py's
+    _displace_stale_sibling/_reconfigure already fixed for its own
+    (multi-candidate, permanent-flip) use case (brief q-toolbugs-round2,
+    #1351) -- ported here rather than reinvented. Adapted for fastmatch's
+    read-only, single-file use: the sibling is ALWAYS restored byte-for-
+    byte afterward (success or failure), since fastmatch never touches
+    delinks.txt and must leave the tree exactly as it found it.
     """
     target = str(out_o.relative_to(ROOT))
-    result = subprocess.run(
-        ["ninja", target],
-        capture_output=True, text=True, cwd=ROOT,
-    )
+    result = _run_ninja_once(target)
+
+    if result.returncode != 0:
+        combined = "\n".join(filter(None, [result.stderr.strip(), result.stdout.strip()]))
+        config_error = _ninja_config_error(combined)
+        m = _MULTIPLE_RULES_RE.search(config_error) if config_error else None
+        sibling_s = _sibling_s_path(c_path)
+        expected_hit = str(
+            ninja_target_path(sibling_s, region).relative_to(ROOT)
+        ).replace("\\", "/")
+
+        if m is not None and m.group("path").replace("\\", "/") == expected_hit:
+            backup = _displace_stale_sibling(sibling_s)
+            try:
+                reconf_rc, reconf_output = _reconfigure(region)
+                if reconf_rc != 0:
+                    return False, (
+                        "ninja config error self-heal failed: "
+                        f"`configure.py {region}` errored while retrying "
+                        f"after removing stale sibling {sibling_s.relative_to(ROOT)}:\n"
+                        f"{reconf_output}"
+                    )
+                result = _run_ninja_once(target)
+            finally:
+                _restore_stale_sibling(sibling_s, backup)
+                if backup is not None:
+                    # Best-effort: resync build.ninja with the restored
+                    # .s. A stale build.ninja here only affects whoever
+                    # runs ninja next (they'd get a correct file anyway
+                    # via their own configure.py/ninja invocation), so a
+                    # failure here doesn't change fastmatch's own result.
+                    _reconfigure(region)
+
     if result.returncode == 0:
         return True, ""
 
@@ -281,10 +408,9 @@ def ninja_compile_one(out_o: Path) -> tuple[bool, str]:
         or "unknown build file" in lowered
         or not (ROOT / "build.ninja").is_file()
     ):
-        region_guess = out_o.parts[1] if len(out_o.parts) > 1 else "?"
         return False, (
             f"Target '{target}' not in build.ninja.\n"
-            f"  Run `python tools/configure.py {region_guess}` first.\n"
+            f"  Run `python tools/configure.py {region}` first.\n"
             f"  (configure.py must be re-run whenever a new .c file is added to src/)"
         )
 
@@ -527,7 +653,7 @@ def match_one(
 
     # --- Step 1: compile via ninja ---
     out_o = ninja_target_path(c_path, region)
-    ok, err = ninja_compile_one(out_o)
+    ok, err = ninja_compile_one(out_o, c_path, region)
     if not ok:
         result["status"] = "compile_error"
         result["error"] = err
@@ -605,7 +731,7 @@ def match_one(
                 "mine_words": len(m2),
                 "orig_words": len(o2),
                 "diff_count": len(diffs),
-                "gap_obj": str(current_gap.relative_to(ROOT)),
+                "gap_obj": _display_path(current_gap),
                 "compiled_obj": str(out_o.relative_to(ROOT)),
                 "diffs_sample": [(i, a, b) for i, a, b in diffs[:8]],
             })
