@@ -288,6 +288,16 @@ ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat un
 
 ### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [CLAIMED]
 
+> IN PROGRESS, uploaded partial (2026-07-26): session stopped by request before
+> finishing. 4 of 5 worktree batches complete and merged (77/116 attempted
+> shipped, PR pending); batch 2/5 (29 candidates) is unfinished and its
+> worktree `sweep2-2` / branch `claude/cm-ov002-unknown-sweep-2-2` was
+> deliberately excluded from the merge (still being written to when stopped).
+> `gate3.py --scope all --clean` was started but not confirmed complete before
+> upload. See `docs/research/cm-ov002-unknown-sweep-2-2026-07-26.md` for the
+> full state and what's left. Whoever resumes: finish/redo batch 2, confirm
+> the gate, then mark DONE.
+
 `cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
 
 The prior sweep reversed 2 documented wall verdicts (`func_ov002_022abf88`, `func_ov002_021e2cd4`) and found a C-34 mistag (`func_ov002_022a1870`) — those corrections belong in `codegen-walls.md` as edits in THIS PR, not only in the writeup, or the next lane re-parks the same functions.
