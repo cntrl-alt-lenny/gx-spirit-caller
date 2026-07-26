@@ -53,8 +53,15 @@ jobs:
         run: |
           $files = @(git diff --name-only --diff-filter=ACMR $env:BASE_SHA $env:HEAD_SHA -- 'src/**/*.c')
           $files = @($files | ForEach-Object { $_ -replace '\\', '/' } | Where-Object {
-            $_ -match '^src/.*\.c$' -and
-            (($_ -notmatch '^src/(usa|jpn)/') -or ($_ -match "^src/$env:REGION/"))
+            # Region-EXCLUSIVE, not region-inclusive: src/main/ and src/overlayNNN/
+            # (no region prefix) are the EUR baseline ONLY -- config/usa/arm9/delinks.txt
+            # has 1057 src/usa/ entries and ZERO src/main/ entries, so an unprefixed path
+            # is not a valid usa/jpn build target. eur = unprefixed (NOT under src/usa/ or
+            # src/jpn/); usa/jpn = only their own prefixed subtree.
+            $_ -match '^src/.*\.c$' -and (
+              ($env:REGION -eq 'eur' -and $_ -notmatch '^src/(usa|jpn)/') -or
+              ($env:REGION -ne 'eur' -and $_ -match "^src/$env:REGION/")
+            )
           })
 
           # A workflow-only PR has no changed C file. Compile one stable
