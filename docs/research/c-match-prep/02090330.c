@@ -1,6 +1,15 @@
 /* CAMPAIGN-PREP candidate for func_02090330 (main, class B) — brief 494.
  * UNVERIFIED: built-free swarm draft. The campaign drops this into src/,
  * runs ninja + objdiff, and tweaks per the risk note if <100%.
+ *
+ * STALE as of cm-data-020c3198-carve (2026-07-25): data_020c319a and
+ * data_020c319c no longer exist as independently linkable symbols --
+ * the underlying table was unified into one `data_020c3198[16]` typed
+ * struct array (src/main/data_020c3198.c). If this draft is ever
+ * activated, rewrite the 3 parallel-array reads as
+ * `data_020c3198[idx].field0/field1/field2` against that struct
+ * instead of 3 separate `extern unsigned short foo[]` arrays -- see
+ * docs/research/cm-data-020c3198-carve-2026-07-25.md.
  *   recipe:     call result *6 stride -> 3 parallel u16 LUT[idx*3]<<12; idx-store first then 3 shifted stores
  *   risk:       idx*3 halfword index may emit add/lsl instead of the mul r0,#6; tables must be u16[]; the four store order is fixed
  *   confidence: med

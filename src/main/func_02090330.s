@@ -1,11 +1,15 @@
 ; func_02090330 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
+;
+; _LIT1/_LIT2 reference data_020c3198+2 / +4 rather than independent
+; data_020c319a / data_020c319c externs (cm-data-020c3198-carve):
+; the 3 addresses are 3 fields of ONE 6-byte record in a table now
+; unified into one typed struct array at data_020c3198 — the +2/+4
+; forms are the same final relocation target, verified via objdump.
 
         .text
         .extern data_020c3198
-        .extern data_020c319a
-        .extern data_020c319c
         .extern data_021a633c
         .extern data_021a6348
         .extern data_021a634c
@@ -40,8 +44,8 @@ func_02090330:
     ldmia sp!, {r4, r5, lr}
     bx lr
 _LIT0: .word data_020c3198
-_LIT1: .word data_020c319a
-_LIT2: .word data_020c319c
+_LIT1: .word data_020c3198+2
+_LIT2: .word data_020c3198+4
 _LIT3: .word data_021a6348
 _LIT4: .word data_021a633c
 _LIT5: .word data_021a634c
