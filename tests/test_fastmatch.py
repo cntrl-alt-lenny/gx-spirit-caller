@@ -14,11 +14,21 @@ can still land entirely inside noise for some candidates -- observed
 directly across the same 70-candidate sweep, not a hypothetical. The
 final fix filters out lines matching known noise patterns first, then
 tails whatever real content remains. summarize_compile_error() is the
-extracted, independently-testable pure function; this file does not
-attempt to add broader coverage for the rest of fastmatch.py's real-
-subprocess-driven surface (match_one, ninja_compile_one, gap discovery),
-which is exercised indirectly and extensively by tests/test_cmatch_loop
-.py's real-toolchain integration tests instead.
+extracted, independently-testable pure function.
+
+q-fastmatch-sweep-friction (brief, 2026-07-26) added narrower coverage
+for three more real gaps cm-ov002-unknown-sweep's 5-worktree sweep
+(#1363) hit and worked around instead of fixing: gap-object discovery
+blind to individually-carved `.s` candidates (TestFindGapByDelinkedObject),
+a ninja "multiple rules generate" fatal when a candidate's `.c` draft
+and its still-`.s`-routed sibling coexist (TestSiblingSPath,
+TestNinjaConfigErrorDetection, TestNinjaCompileOneSelfHeal -- the last
+mocks subprocess.run rather than needing a real toolchain), and an
+unhandled crash on an out-of-repo --gap path (TestDisplayPath). The
+rest of fastmatch.py's real-subprocess-driven surface (match_one's own
+end-to-end flow, real gap discovery against a real build tree) is still
+exercised indirectly by tests/test_cmatch_loop.py's real-toolchain
+integration tests instead, per the original scoping above.
 """
 
 from __future__ import annotations
@@ -26,6 +36,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -281,6 +292,203 @@ class TestFindGapByDelinkedObject(unittest.TestCase):
             c_path, "func_ov002_ffffffff", "eur"
         )
         self.assertIsNone(found)
+
+
+class TestSiblingSPath(unittest.TestCase):
+    """gap (b) helper: strips a routing-tier suffix down to the bare stem
+    before swapping to `.s` -- a .s has no tier concept, so the sibling a
+    tiered .c draft collides with is always the untiered name."""
+
+    def test_plain_c(self):
+        self.assertEqual(
+            fastmatch._sibling_s_path(Path("src/main/func_X.c")),
+            Path("src/main/func_X.s"),
+        )
+
+    def test_legacy_tier(self):
+        self.assertEqual(
+            fastmatch._sibling_s_path(Path("src/main/func_X.legacy.c")),
+            Path("src/main/func_X.s"),
+        )
+
+    def test_legacy_sp3_tier(self):
+        self.assertEqual(
+            fastmatch._sibling_s_path(Path("src/overlay002/func_ov002_X.legacy_sp3.c")),
+            Path("src/overlay002/func_ov002_X.s"),
+        )
+
+    def test_thumb_tier(self):
+        self.assertEqual(
+            fastmatch._sibling_s_path(Path("src/main/func_X.thumb.c")),
+            Path("src/main/func_X.s"),
+        )
+
+
+class TestNinjaConfigErrorDetection(unittest.TestCase):
+    def test_detects_multiple_rules_generate(self):
+        output = (
+            "ninja: error: build.ninja:56206: multiple rules generate "
+            "build/eur/src/main/func_X.o\n"
+        )
+        err = fastmatch._ninja_config_error(output)
+        self.assertIsNotNone(err)
+        self.assertIn("multiple rules generate", err)
+
+    def test_none_for_a_real_compile_error(self):
+        # A genuine mwcc failure has no "ninja: error:" line -- ninja
+        # itself ran the build graph fine, the COMPILER rejected the
+        # source. Must never be mistaken for a config-level fatal.
+        output = "src/main/func_X.c:3: declaration syntax error\n"
+        self.assertIsNone(fastmatch._ninja_config_error(output))
+
+
+class TestNinjaCompileOneSelfHeal(unittest.TestCase):
+    """gap (b): configure.py adds a build rule for every .c AND every .s
+    under src/, so a candidate .c draft sitting beside its own still-.s
+    -routed sibling makes ninja refuse to build ANYTHING ("multiple rules
+    generate <out>.o") until the collision is resolved. Same root cause
+    batch_sha1.py's _displace_stale_sibling/_reconfigure already fixed
+    (#1351) for its own multi-candidate, permanent-flip use case --
+    ported here for fastmatch's single-file, read-only use (the sibling
+    must always come back afterward, since fastmatch never edits
+    delinks.txt). Mocks subprocess.run: no real ninja/toolchain needed to
+    prove the retry-and-restore control flow itself.
+    """
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
+        mock.patch("fastmatch.ROOT", self.root).start()
+        self.addCleanup(mock.patch.stopall)
+
+        self.c_path = self.root / "src/main/func_X.c"
+        self.c_path.parent.mkdir(parents=True)
+        self.c_path.write_text("void func_X(void) {}\n")
+
+        self.s_path = self.root / "src/main/func_X.s"
+        self.s_original_bytes = b"@ original .s bytes, must come back byte-exact\r\n"
+        self.s_path.write_bytes(self.s_original_bytes)
+
+        self.out_o = self.root / "build/eur/src/main/func_X.o"
+        (self.root / "build.ninja").write_text("")
+
+    def _completed(self, returncode: int, stderr: str = "", stdout: str = ""):
+        return subprocess.CompletedProcess(
+            args=["x"], returncode=returncode, stdout=stdout, stderr=stderr,
+        )
+
+    def test_self_heals_and_restores_the_sibling_byte_exact(self):
+        collision_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/func_X.o\n"
+        )
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if cmd[0] == "ninja":
+                # First ninja invocation collides; the retry (after
+                # self-heal) succeeds.
+                if sum(1 for c in calls if c[0] == "ninja") == 1:
+                    return self._completed(1, stderr=collision_err)
+                return self._completed(0)
+            # configure.py invocations (self-heal reconfigure, then the
+            # best-effort resync after restoring the sibling).
+            return self._completed(0)
+
+        with mock.patch("fastmatch.subprocess.run", side_effect=fake_run):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertTrue(ok, err)
+        self.assertEqual(err, "")
+        # The sibling must exist again with the EXACT original bytes --
+        # fastmatch never permanently touches a still-.s-routed entry.
+        self.assertTrue(self.s_path.is_file())
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+        # ninja ran twice (collide, then retry) and configure.py ran
+        # twice (heal, then post-restore resync).
+        ninja_calls = [c for c in calls if c[0] == "ninja"]
+        configure_calls = [c for c in calls if "configure.py" in c[1]]
+        self.assertEqual(len(ninja_calls), 2)
+        self.assertEqual(len(configure_calls), 2)
+
+    def test_does_not_self_heal_a_stray_conflict_for_a_different_file(self):
+        # Mirrors batch_sha1.py's own "stray conflict outside the batch"
+        # guard: a multiple-rules fatal for some OTHER object must not
+        # trigger deleting this candidate's sibling.
+        unrelated_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/some_unrelated_func.o\n"
+        )
+        with mock.patch(
+            "fastmatch.subprocess.run",
+            return_value=self._completed(1, stderr=unrelated_err),
+        ):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertFalse(ok)
+        self.assertIn("multiple rules generate", err)
+        # Sibling must be untouched -- self-heal never triggered.
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+
+    def test_a_real_compile_error_is_not_treated_as_a_collision(self):
+        with mock.patch(
+            "fastmatch.subprocess.run",
+            return_value=self._completed(
+                1, stderr="src/main/func_X.c:3: declaration syntax error\n"
+            ),
+        ):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertFalse(ok)
+        self.assertIn("declaration syntax error", err)
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+
+    def test_reports_cleanly_if_reconfigure_fails_during_self_heal(self):
+        collision_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/func_X.o\n"
+        )
+
+        def fake_run(cmd, **kwargs):
+            if cmd[0] == "ninja":
+                return self._completed(1, stderr=collision_err)
+            return self._completed(1, stderr="configure.py: baserom missing\n")
+
+        with mock.patch("fastmatch.subprocess.run", side_effect=fake_run):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertFalse(ok)
+        self.assertIn("self-heal failed", err)
+        # Even on this failure path, the sibling must still be restored.
+        self.assertTrue(self.s_path.is_file())
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+
+
+class TestDisplayPath(unittest.TestCase):
+    """gap (c): match_one's gap_obj reporting assumed the resolved gap
+    object is always inside ROOT (`.relative_to(ROOT)`), which raises
+    ValueError for a user-supplied `--gap` path outside the tree."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
+        mock.patch("fastmatch.ROOT", self.root).start()
+        self.addCleanup(mock.patch.stopall)
+
+    def test_inside_root_returns_relative_path(self):
+        inside = self.root / "build/eur/delinks/src/main/func_X.o"
+        self.assertEqual(
+            fastmatch._display_path(inside),
+            str(Path("build/eur/delinks/src/main/func_X.o")),
+        )
+
+    def test_outside_root_falls_back_to_absolute_str_instead_of_raising(self):
+        outside = self.root.parent / "elsewhere" / "func_X.o"
+        result = fastmatch._display_path(outside)
+        self.assertEqual(result, str(outside))
 
 
 if __name__ == "__main__":
