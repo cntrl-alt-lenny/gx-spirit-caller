@@ -269,7 +269,7 @@ COORDINATION: the scaffolder's data lane is also in overlay002 but only touches 
 
 **Gate:** `python tools/gate3.py --scope all` PASS + shipped/attempted count in the PR body.
 
-### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [CLAIMED]
+### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [DONE]
 
 PR #1363's 5-worktree sweep hit three real `tools/fastmatch.py` gaps, worked around all three, and shipped the workarounds as prose instead of fixes — that's pure repeated cost for the next lane. Fix the tool itself this round:
 
