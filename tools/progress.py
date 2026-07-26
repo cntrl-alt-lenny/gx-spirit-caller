@@ -73,8 +73,12 @@ _PRIMITIVE_TYPE_TOKENS = {
     "void", "char", "short", "int", "long", "float", "double",
     "signed", "unsigned", "bool", "_Bool",
     "u8", "u16", "u32", "u64", "s8", "s16", "s32", "s64",
+    "vu8", "vu16", "vu32", "fx16", "fx32", "BOOL",
 }
-_PRIMITIVE_WIDTH_RE = re.compile(r"^u?int\d*$")
+# `\d*` (zero-or-more) covers bare `int`/`uint` plus `int8`/`uint32`/etc; the
+# second alternative separately covers the stdint.h `_t`-suffixed spellings
+# (`uint32_t`), which require at least one digit before `_t`.
+_PRIMITIVE_WIDTH_RE = re.compile(r"^u?int\d*$|^u?int\d+_t$")
 
 
 def _is_primitive_type_clause(type_clause: str) -> bool:
@@ -462,6 +466,14 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
     counts too, since ``struct``/``union``/``enum`` were never added to the
     primitive set. Both walks use the same module-level delinks ranges as
     the existing data% fallback.
+
+    The named_struct_bytes walk checks every array declaration in a TU
+    (``finditer``, not ``.search()``'s first-match-only) -- a TU can mix a
+    primitive array with a later named-struct one, and stopping at the
+    first match would silently miss the second. It also skips any
+    declaration whose type clause contains ``extern``: an extern array
+    declaration is a forward reference to bytes a DIFFERENT TU owns, so its
+    presence says nothing about the type of bytes THIS TU itself owns.
     """
     named_symbols = placeholder_symbols = 0
     for symbols_file in config_dir.rglob("symbols.txt"):
@@ -503,9 +515,12 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
             )
             if _DATA_ARRAY_DECL_RE.search(source_text):
                 typed_array_bytes += data_bytes
-            type_match = _DATA_ARRAY_DECL_TYPE_CAPTURE_RE.search(source_text)
-            if type_match and not _is_primitive_type_clause(type_match.group(1)):
-                named_struct_bytes += data_bytes
+            for type_match in _DATA_ARRAY_DECL_TYPE_CAPTURE_RE.finditer(source_text):
+                if "extern" in type_match.group(1).split():
+                    continue
+                if not _is_primitive_type_clause(type_match.group(1)):
+                    named_struct_bytes += data_bytes
+                    break
 
     total_symbols = named_symbols + placeholder_symbols
     return {
