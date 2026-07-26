@@ -506,7 +506,9 @@ Review of the merged metric v2 found 3 latent gaps, none affecting today's numbe
 
 **Gate:** `python -m pytest -q tests` no-new-failures + new tests for all 3 gaps + the wiring-constraints note committed.
 
-### q-invariant-drift-fix — pr-invariants' cross_file_name_drift check has a comment-spanning regex bug AND 3 real dead externs, currently blocking merge on EVERY open PR [TODO]
+### q-invariant-drift-fix — pr-invariants' cross_file_name_drift check has a comment-spanning regex bug AND 3 real dead externs, currently blocking merge on EVERY open PR [DONE]
+
+> **SUPERSEDED — do not work this item.** Marked DONE by the brain at integration time. Both root causes below were independently diagnosed and fixed by `q-invariants-green` ([PR #1359](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/1359)) on the decomper lane, which landed in the same integration batch as this item's own filing commit — the two lanes found the same defect concurrently and only one fix was needed. #1359 strips comments before `_EXTERN_FN_RE` (with a `test_comment_prose_mentioning_extern_not_flagged` regression test) and deletes the 3 dead `func_02086800_dummy` externs. Verified on the merged integ branch: `python tools/check_match_invariants.py` reports **0 errors** (was 4). The analysis below is correct and is kept as the record of the independent diagnosis — it is just already actioned.
 
 Found while reading unrelated CI output on a q-compile-gate-region-fix scratch PR (#1357) — a ONE-LINE comment addition to an already-shipped file made `pr-invariants (eur)` and `(usa)` both fail with "Found 4 error-severity invariant issue(s)". Confirmed this is pre-existing and project-wide, not caused by that PR: same 4 errors reproduce on #1355 (an unrelated, already-in-review PR), and `git log` on each offending file shows its content unchanged since 2026-06-30, long before either branch existed. Right now this blocks merge on every open PR in the repo, same failure class as `q-compile-gate-region-fix` before its fix — the campaign has a second gate crying wolf.
 
