@@ -535,7 +535,7 @@ Fix should detect a file-scope declaration whose type clause is a non-primitive 
 
 **Gate:** `python -m pytest -q tests` no-new-failures + new tests for the singleton-instance detection + a real `progress.py --version eur` run showing `data_021015e4`/`data_020bec1c`/`data_020bec8c` now counted, not just the regex changing in isolation.
 
-### cm-data-inference-5 — data wave 5 — continue the method on the ~113 opaque blobs remaining, plus 6 named sibling leads from wave 4 [TODO]
+### cm-data-inference-5 — data wave 5 — continue the method on the ~113 opaque blobs remaining, plus 6 named sibling leads from wave 4 [CLAIMED]
 
 `cm-data-inference-4` investigated 20 of the 125 opaque blobs remaining after wave 3 + this round's 2 carves, shipped 12 (60%). 113 remain (28 main, 85 overlay), plus 6 named leads found but not investigated this wave — continue with the same method (parallel read-only `Explore` agents, one per blob, exhaustive symbol-grep + `relocs.txt` address cross-check, classify fixed-offset/weak vs computed-stride/strong, never force a type onto insufficient evidence) and implement centrally afterward, not via further concurrent write-capable agents (see `cm-data-inference-4`'s own postmortem on why).
 
