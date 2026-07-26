@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**119 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**120 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (3)
+- [Hygiene / invariants](#hygiene--invariants) (4)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (49)
@@ -288,6 +288,12 @@ Brief 066 deliverable: a reproducible way to vendor the three target upstream de
 ## Hygiene / invariants
 
 _Pre-flight sanity checks. Run locally before pushing and in CI on every PR._
+
+### `tools/check_ci_contract.py`
+
+**prove the merge gates can actually gate.**
+
+Failure mode (real incident: PR #1365, and #1360 blocked by it): a status check is marked REQUIRED in the branch-protection ruleset while its workflow carries a `paths:` filter. A workflow skipped by a path filter does not report "succes…
 
 ### `tools/check_delink_dupes.py`
 
