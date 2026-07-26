@@ -1,20 +1,20 @@
-/* data_020b46a0 — opaque tail split from the original data_020b4680
- * blob (cm-data-020b4680-carve). Both known consumers of the original
- * 96-byte blob (func_02002c3c.s, func_02002ffc.s) mask their index to
- * `& 0xf` before an `lsl #1` u16 load into data_020b4680[16], a
- * hardware-enforced [0,15] bound that structurally cannot reach these
- * 64 bytes. No consumer evidence found for this remainder -- carved as
- * its own symbol (not left inside data_020b4680) so the evidenced
- * prefix can be typed without guessing a shape for this part. See
- * docs/research/data/cm-data-inference-3-2026-07-25.md and
- * docs/research/cm-data-020b4680-carve-2026-07-25.md.
+/* data_020b46a0 -- 12-entry u16 lookup table (24 bytes), evidenced
+ * prefix split from the original 64-byte opaque tail carved out of
+ * data_020b4680 (cm-data-020b4680-carve).
+ *
+ * Sole consumer func_0200a250.s (USA/JPN ports; EUR's homolog reads a
+ * different, address-shifted table due to localization-driven data
+ * growth, so this file itself has no EUR-side consumer, but the raw
+ * bytes are region-shared) -- a hard 6-iteration copy loop (24 bytes)
+ * structurally proves exactly 12 elements, and a computed-stride
+ * `base+idx*2` (ldrh) access, with 9 independent call sites across both
+ * ports exercising every index 0-11, confirms both stride and full
+ * coverage. Remaining 40 bytes carved off as their own opaque symbol,
+ * data_020b46b8 -- no consumer evidence covers them (this wave's own
+ * method: never force a type onto insufficient evidence). See
+ * docs/queue/claude-scaffolder.md (cm-data-inference-5).
  */
 
-const unsigned char data_020b46a0[64] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00,
-    0x00, 0x00, 0x01, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
-    0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00,
-    0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x01,
-    0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
-    0x01, 0x01, 0x01, 0x01,
+const unsigned short data_020b46a0[12] = {
+    0x0000, 0x0000, 0x0000, 0x0100, 0x0000, 0x0001, 0x0000, 0x0101, 0x0100, 0x0000, 0x0100, 0x0100,
 };

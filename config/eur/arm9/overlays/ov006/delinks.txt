@@ -2247,6 +2247,10 @@ src/overlay006/data_ov006_021cb6d8.c:
     complete
     .rodata start:0x021cb6d8 end:0x021cb6f8
 
+src/overlay006/data_ov006_021cb6f8.c:
+    complete
+    .rodata start:0x021cb6f8 end:0x021cb718
+
 src/overlay006/data_ov006_021cb718.c:
     complete
     .rodata start:0x021cb718 end:0x021cb738
