@@ -6197,6 +6197,31 @@ rather than iterating.
 (P-6, P-7, P-8, P-10). The three newly corrected headings below are
 P-7, P-8, and P-10; their historical bodies remain intact.
 
+> **"Brief 294" citations are narrower than their bulk application
+> (cm-ov002-unknown-sweep-2/3, 2026-07-26/27).**
+> [`brief-294-regalloc-wall-scout.md`](brief-294-regalloc-wall-scout.md)
+> is real, careful research — it A/B-tested `register`, expression
+> duplication, and `volatile` on one specific shape (a value live
+> across a `bl` inside a loop) and correctly found all three inert. The
+> problem is downstream: that narrow "no C-level lever exists" verdict
+> got cited as blanket justification for bulk-classifying thousands of
+> unrelated `.s` residuals project-wide as permanently reg-alloc-walled
+> — the same "mechanical bulk stamp, not per-function proof" failure
+> mode the queue header's brief-651 rework note already names for the
+> sibling `GLOBAL_ASM`/brief-302 tag, just wearing a more rigorous-
+> sounding citation. Two consecutive ov002 sweeps (92-104B: 95/145
+> shipped, 65.5%; 108-120B: 82/166, 49.4%) worked almost entirely
+> through candidates carrying this exact "brief 294 endgame" header,
+> using levers brief-294 never tested — **declaration order** chief
+> among them (already known to be inconsistent elsewhere in this
+> index, e.g. P-4's own body — it is not a universal fix, but it is
+> untested by brief-294 and demonstrably effective on a meaningful
+> fraction of this specific cohort), alongside goto-shared-tail,
+> positive-condition-wrap, and bitfield-struct-member access. Treat a
+> bare "brief 294" citation the same way as a bare `GLOBAL_ASM`/brief-
+> 302 one: a starting hypothesis to re-test with the full current lever
+> set, not a verdict.
+
 ### P-1. Shift-pair vs mask collapse
 
 > **Wall family note — see also C-15.** P-1 superficially
