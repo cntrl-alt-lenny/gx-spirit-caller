@@ -319,16 +319,32 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
 
-### cm-ov002-unknown-sweep-4 — next size band [S] [CLAIMED]
+### cm-ov002-unknown-sweep-4 — next size band [S] [DONE]
 
-Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B). The decline is real and expected as size grows; 49% is still well worth sweeping. ov002 has 2,418 never-assessed candidates left. Take the next band up.
+> DONE: all 5/5 worktree batches complete and merged (59/145 shipped,
+> 40.7%), codegen-walls.md P-20 (new) + C-46 extensions added,
+> three-way count 59==59==59 confirmed. No stray drafts this round (all
+> 5 batches' own pre-merge `ninja -n` checks were already clean). No
+> mid-flight `main` catch-up needed — `origin/main` had not moved since
+> branch base. 3-region `gate3.py --scope all --clean` PASS confirmed
+> (all three of eur/usa/jpn SHA1 individually grepped from the log).
+> The "brief 302/294 header" question that batches 1/3 re-raised was
+> already settled by sweep-2/3 — confirmed again directly via
+> `tools/asm_escape.py` source, not a new failure-mode instance; see
+> `docs/research/cm-ov002-unknown-sweep-4-2026-07-27.md`.
 
-Same 5-worktree protocol. Carry the accumulated lever set: declaration order (which brief-294 never tested), goto-to-shared-tail, and the bitfield finding (`unsigned int id:13` beats a manual `(x<<19)>>19`, because mwcc canonicalizes the shift-pair into a pool-constant-and-AND).
+### cm-ov002-unknown-sweep-5 — next size band [S] [TODO]
+
+Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B). The decline is real and expected as size grows; 40.7% is still well worth sweeping. `wall_aware_headroom.py --exclude-attempted --min-size 136 --max-size 148` finds 198 ov002 candidates for the next band up. ov002 has ~2,367 never-assessed candidates left overall.
+
+Same 5-worktree protocol. Carry the accumulated lever set (now quite large — see the last 4 sweep writeups for the full list); highest-value additions from sweep-4: the shift-pair-over-mask lever generalizes past 13-bit to any field width; `u16` fields need the `(unsigned)` cast before right-shift too; `do`-`while` (not `for`) is required when a loop bound is re-read from memory; loop-invariant pointers declared *inside* the loop body (not hoisted) plus a fresh per-iteration bound reread produces `bls` not `beq`; an explicit trailing `mov r0,#0` before the final `pop` means `int` with `return 0;`, not `void`.
+
+**On the "brief 302/294" header:** every remaining `.s` file in ov002 carries this bulk-stamped header (confirmed via `tools/asm_escape.py`'s `--whole-function` mode, which stamps it mechanically on any function, not per-function proof). This has now been independently reconfirmed by 4 consecutive sweeps. State this outright in the batch dispatch prompt so workers don't spend effort re-deriving it — it is not evidence a function was already tried, it is boilerplate from when the pool was bulk-marked as ship-as-.s candidates.
 
 Repeat all three checks that earned their keep: the three-way count, `check_delink_dupes.py`, and a stray-draft scan (parked `.c` drafts left beside their still-active `.s` siblings break a real `ninja` build; no gate catches it, only the scan does — confirm with `ninja -n` before AND after consolidating).
 
-**Standing note on the parked residual:** the dominant unresolved class across all 3 ov002 sweeps so far is a pure register-allocation/naming permutation with otherwise byte-identical instruction shape — a plausible permuter target. Do NOT start a permuter pass this round — that lane is documented as blocked on Windows, which is this machine. Keep accumulating and characterising these; if the count grows enough it justifies solving the platform problem, but that's a separate decision for later.
+**Standing note on the parked residual:** the dominant unresolved class across all 4 ov002 sweeps so far is a pure register-allocation/naming permutation with otherwise byte-identical instruction shape (including the new P-20 `(player&1)*0x868` cohort, 11 members) — a plausible permuter target. Do NOT start a permuter pass this round — that lane is documented as blocked on Windows, which is this machine. Keep accumulating and characterising these; if the count grows enough it justifies solving the platform problem, but that's a separate decision for later.
 
-**If the band finishes early:** `main` has 2,219 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol — only older, slower methods. One exploratory batch there would tell us whether the protocol's hit rate holds outside ov002, worth knowing before committing more rounds to either module.
+**If the band finishes early:** `main` has ~2,291 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol — only older, slower methods. One exploratory batch there would tell us whether the protocol's hit rate holds outside ov002, worth knowing before committing more rounds to either module.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
