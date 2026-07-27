@@ -9822,7 +9822,7 @@ src/usa/main/func_02087d44.legacy_sp3.c:
     complete
     .text start:0x02087d44 end:0x02087d6c
 
-src/usa/main/func_02087d6c.s:
+src/usa/main/func_02087d6c.legacy_sp3.c:
     complete
     .text start:0x02087d6c end:0x02087da8
 src/usa/main/func_02087da8.s:
