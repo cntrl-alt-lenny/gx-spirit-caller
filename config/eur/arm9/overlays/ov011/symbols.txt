@@ -207,6 +207,7 @@ data_ov011_021d30f8 kind:data(any) addr:0x021d30f8
 data_ov011_021d3138 kind:data(any) addr:0x021d3138
 data_ov011_021d3177 kind:data(any) addr:0x021d3177
 data_ov011_021d3178 kind:data(any) addr:0x021d3178
+data_ov011_021d3188 kind:data(any) addr:0x021d3188
 data_ov011_021d31d8 kind:data(any) addr:0x021d31d8
 data_ov011_021d323c kind:data(any) addr:0x021d323c
 data_ov011_021d32ba kind:data(any) addr:0x021d32ba
