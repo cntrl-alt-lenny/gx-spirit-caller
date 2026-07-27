@@ -1960,7 +1960,7 @@ src/usa/overlay002/func_ov002_021de9d8.c:
 src/usa/overlay002/func_ov002_021dea38.s:
     complete
     .text start:0x021dea38 end:0x021dea94
-src/usa/overlay002/func_ov002_021dea94.s:
+src/usa/overlay002/func_ov002_021dea94.c:
     complete
     .text start:0x021dea94 end:0x021deaf0
 src/usa/overlay002/func_ov002_021deaf0.c:
