@@ -1904,10 +1904,10 @@ src/usa/overlay002/func_ov002_021de3c0.c:
     complete
     .text start:0x021de3c0 end:0x021de3e8
 
-src/usa/overlay002/func_ov002_021de3e8.s:
+src/usa/overlay002/func_ov002_021de3e8.c:
     complete
     .text start:0x021de3e8 end:0x021de438
-src/usa/overlay002/func_ov002_021de438.s:
+src/usa/overlay002/func_ov002_021de438.c:
     complete
     .text start:0x021de438 end:0x021de4a8
 src/usa/overlay002/func_ov002_021de4a8.c:
