@@ -5655,8 +5655,29 @@ temp higher would change the function shape (orig takes only `self`).
 The permuter is the untested fall-through (cite P-11 / brief-198
 precedent, not a run this session).
 
+> **UPDATE (cm-sm64ds-lever-apply, 2026-07-25):** a 10th form —
+> imported from a sibling decomp project's "fake-dependency virtual-
+> call-argument coloring" lever, tested here as "declare the bitfield
+> container as an eagerly-evaluated `unsigned short` local at the very
+> top of the function, derive every subfield from that same local via
+> `(unsigned)(x<<K)>>J` shifts, no deferred/conditional assignment" —
+> **partially refutes the "no form yields field-in-r3 cleanly" claim**:
+> tried on both `02200084` and `022319f4`, both land the container in
+> r3 AND keep bit0 as the correct `lsl/lsr` pair (not the `and`-collapse
+> the 9 prior forms hit). A NEW, different 3-word residual appears
+> instead in both (a `lsl/lsr/cmp` pre-branch range-test scratch using
+> r1 where target uses r2 — isolated, dead before the branch, doesn't
+> touch the container/bit0/argument-computation which are now
+> byte-identical). Confirmed load-bearing by controlled A/B against a
+> deferred-assignment control (container reverts to r1) on BOTH
+> candidates independently — not a lucky draft. Neither candidate
+> shipped (`02200084`: DIFF 15v15; `022319f4`: DIFF 18v18) but the
+> falsification claim above needs its "No form yields field-in-r3
+> cleanly" line read as "no PREVIOUSLY-TRIED form," not exhaustive.
+
 **Affected picks (3, ov002):** `02200084` (field→r3, deep-verified),
-`02292020` (field→r2), `022319f4` (field→r3). See the
+`02292020` (field→r2, shipped separately since this entry was
+written), `022319f4` (field→r3). See the
 [P-11 census](#p-11-mwcc-20-reg-allocator-plateau-on-mid-size-helper-call-functions)
 and
 [`brief-258-c39-cse-field-temp-and-taxonomy.md`](brief-258-c39-cse-field-temp-and-taxonomy.md).
@@ -6304,11 +6325,23 @@ intervening volatile reads. Brief 031 `func_0207dee0` saw mwcc
 emit `ldmib r2, {r0, r2}` (1 instruction, 2 loads) where target
 had two separate `ldr`.
 
-**Why permanent:** mwcc's load/store-multiple coalescer fires on
-syntactic patterns, but target ROM may have been compiled at a
-slightly different optimisation level / SP version where the
-heuristic threshold differed. C source can't sit on either side
-of the threshold reliably.
+> **UPDATE (cm-sm64ds-lever-apply, 2026-07-25):** `func_0209bf18`
+> **shipped** (`.legacy.c`) — not by defeating the fusion at all, but
+> by ROUTING to the mwcc 1.2/sp2p3 tier, whose instruction selector
+> never performs this specific `ldr`+`ldr` → `ldmia` fusion for a
+> plain `(t[0]*60+t[1])*60+t[2]` transliteration. The "why permanent"
+> framing above holds for the DEFAULT 2.0/sp1p5 tier specifically, not
+> for the wall as a whole — worth checking tier-routing before
+> classifying a fresh direction-B instance as unfixable. Two
+> sm64ds-imported levers (#6 volatile-read pinning, #9 u64
+> pointer-laundering) were also tried on this candidate and neither
+> was needed once the tier was right.
+
+**Why permanent (on the default 2.0/sp1p5 tier):** mwcc's load/
+store-multiple coalescer fires on syntactic patterns, but target ROM
+may have been compiled at a slightly different optimisation level /
+SP version where the heuristic threshold differed. C source can't
+sit on either side of the threshold reliably on that one tier.
 
 **Affected drops:** brief 028 `func_0209bf18`, brief 031
 `func_0207dee0`. **2 of 47 drops (4%)** — but bidirectional
