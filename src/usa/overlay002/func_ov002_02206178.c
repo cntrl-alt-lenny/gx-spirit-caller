@@ -1,0 +1,19 @@
+/* func_ov002_02206178: state-machine step; two guarded
+ * func_ov002_022576f4 checks around a func_ov002_021ff2cc call. */
+typedef unsigned short u16;
+struct S02206268 { short pad0; u16 bit0 : 1; u16 rest : 15; char pad4[8]; short state; };
+extern int func_ov002_021bcf50(int bit0);
+extern int func_ov002_022576f4(struct S02206268 *self);
+extern int func_ov002_021ff2cc(struct S02206268 *self, int arg1);
+
+int func_ov002_02206178(struct S02206268 *self, int arg1) {
+    self->state = 1;
+    if (func_ov002_021bcf50(self->bit0) >= 0) {
+        if (func_ov002_022576f4(self) != 0) return 2;
+    }
+    self->state = 2;
+    if (func_ov002_021ff2cc(self, arg1) != 0) {
+        if (func_ov002_022576f4(self) != 0) return 2;
+    }
+    return 0;
+}
