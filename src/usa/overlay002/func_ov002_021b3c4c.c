@@ -1,0 +1,21 @@
+extern char data_ov002_022d0570[];
+
+int func_ov002_021b3c4c(int node, int val)
+{
+    int count = 0;
+
+    while (node != 0) {
+        char *p = data_ov002_022d0570 + node * 8;
+        struct { unsigned short kind : 4; } *kf = (void *)(p + 2);
+        unsigned int kind = kf->kind;
+        int next = *(unsigned short *)(p + 6);
+
+        if (kind < 6) {
+            unsigned short id = *(unsigned short *)(p + 0);
+            if (id == val)
+                count++;
+        }
+        node = next;
+    }
+    return count;
+}
