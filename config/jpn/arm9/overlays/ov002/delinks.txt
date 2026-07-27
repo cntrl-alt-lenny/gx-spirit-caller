@@ -4084,14 +4084,14 @@ src/jpn/overlay002/func_ov002_02206044.c:
 src/jpn/overlay002/func_ov002_02206078.c:
     complete
     .text start:0x02206078 end:0x022060f0
-src/jpn/overlay002/func_ov002_022060f0.s:
+src/jpn/overlay002/func_ov002_022060f0.c:
     complete
     .text start:0x022060f0 end:0x0220614c
 src/jpn/overlay002/func_ov002_0220614c.c:
     complete
     .text start:0x0220614c end:0x02206178
 
-src/jpn/overlay002/func_ov002_02206178.s:
+src/jpn/overlay002/func_ov002_02206178.c:
     complete
     .text start:0x02206178 end:0x022061f0
 src/jpn/overlay002/func_ov002_022061f0.s:
