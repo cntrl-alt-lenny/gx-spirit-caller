@@ -2740,7 +2740,7 @@ src/overlay002/func_ov002_021eac88.c:
     complete
     .text start:0x021eac88 end:0x021eace4
 
-src/overlay002/func_ov002_021eace4.s:
+src/overlay002/func_ov002_021eace4.c:
     complete
     .text start:0x021eace4 end:0x021ead68
 
@@ -8080,7 +8080,7 @@ src/overlay002/func_ov002_02242e50.s:
     complete
     .text start:0x02242e50 end:0x02242ea8
 
-src/overlay002/func_ov002_02242ea8.s:
+src/overlay002/func_ov002_02242ea8.c:
     complete
     .text start:0x02242ea8 end:0x02242f28
 
