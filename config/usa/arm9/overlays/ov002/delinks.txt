@@ -9972,13 +9972,13 @@ src/usa/overlay002/func_ov002_022818c4.c:
 src/usa/overlay002/func_ov002_02281910.s:
     complete
     .text start:0x02281910 end:0x02281918
-src/usa/overlay002/func_ov002_02281918.s:
+src/usa/overlay002/func_ov002_02281918.c:
     complete
     .text start:0x02281918 end:0x02281964
 src/usa/overlay002/func_ov002_02281964.s:
     complete
     .text start:0x02281964 end:0x022819d8
-src/usa/overlay002/func_ov002_022819d8.s:
+src/usa/overlay002/func_ov002_022819d8.c:
     complete
     .text start:0x022819d8 end:0x02281a4c
 src/usa/overlay002/func_ov002_02281a4c.s:
