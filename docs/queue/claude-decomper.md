@@ -318,3 +318,17 @@ Use the WORKTREE-PARALLEL SWEEP PROTOCOL in the queue header — 5 worktrees, pa
 Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.github/`, run it — it proves every required status check can actually report.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
+
+### cm-ov002-unknown-sweep-4 — next size band [S] [TODO]
+
+Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B). The decline is real and expected as size grows; 49% is still well worth sweeping. ov002 has 2,418 never-assessed candidates left. Take the next band up.
+
+Same 5-worktree protocol. Carry the accumulated lever set: declaration order (which brief-294 never tested), goto-to-shared-tail, and the bitfield finding (`unsigned int id:13` beats a manual `(x<<19)>>19`, because mwcc canonicalizes the shift-pair into a pool-constant-and-AND).
+
+Repeat all three checks that earned their keep: the three-way count, `check_delink_dupes.py`, and a stray-draft scan (parked `.c` drafts left beside their still-active `.s` siblings break a real `ninja` build; no gate catches it, only the scan does — confirm with `ninja -n` before AND after consolidating).
+
+**Standing note on the parked residual:** the dominant unresolved class across all 3 ov002 sweeps so far is a pure register-allocation/naming permutation with otherwise byte-identical instruction shape — a plausible permuter target. Do NOT start a permuter pass this round — that lane is documented as blocked on Windows, which is this machine. Keep accumulating and characterising these; if the count grows enough it justifies solving the platform problem, but that's a separate decision for later.
+
+**If the band finishes early:** `main` has 2,219 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol — only older, slower methods. One exploratory batch there would tell us whether the protocol's hit rate holds outside ov002, worth knowing before committing more rounds to either module.
+
+**Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
