@@ -1,0 +1,22 @@
+typedef unsigned short u16;
+
+struct S022037dc {
+    u16 f0;
+    u16 bit0 : 1;
+    u16 b1_5 : 5;
+    u16 b6_11 : 6;
+    u16 b12_13 : 2;
+    u16 b14_15 : 2;
+    u16 f4lo6 : 6;
+    u16 f4b6_14 : 9;
+    u16 f4b15 : 1;
+};
+
+extern int func_ov002_021bd030(unsigned int bit);
+extern int func_ov002_021b99b4(unsigned int bit, unsigned int field9);
+
+int func_ov002_022037dc(struct S022037dc *self) {
+    if (self->b12_13 != 2) return 0;
+    if (func_ov002_021bd030(self->bit0) < 0) return 0;
+    return func_ov002_021b99b4(self->bit0, self->f4b6_14) >= 0;
+}
