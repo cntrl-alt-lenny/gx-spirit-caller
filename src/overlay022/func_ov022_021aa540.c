@@ -1,5 +1,5 @@
-extern int data_ov022_021ab9a0[];
-extern int func_02006c0c(int, int, int);
+extern void *data_ov022_021ab9a0[];
+extern int func_02006c0c(void *, int, int);
 extern void func_0201d47c(void *);
 extern int func_0201d6d4(int);
 extern int func_0201d760(int);

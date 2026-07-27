@@ -30,7 +30,19 @@
  * per-entry meaning.
  */
 
-const unsigned char data_ov006_021cb5f4[24] = {
-    0x15, 0x19, 0x10, 0x19, 0x0c, 0xc0, 0x1c, 0x02, 0x84, 0xbf, 0x1c, 0x02,
-    0x94, 0xbf, 0x1c, 0x02, 0x08, 0xdd, 0x1c, 0x02, 0xc4, 0xbf, 0x1c, 0x02,
+/* Retyped from the opaque byte blob above to const int[6] as part of
+ * cm-data-inference-10: the already-matched consumer func_ov006_021c148c.c
+ * declares `extern int data_ov006_021cb5f4[];` and reads
+ * `data_ov006_021cb5f4[arg1]` passed straight into OS_SPrintf() as a
+ * formatted number, not dereferenced -- decisive for plain `int`, not a
+ * pointer type, despite entries 1-5 being valid addresses back into this
+ * overlay's own rodata (relocs.txt-proven, same evidence tier already
+ * accepted for sibling data_ov006_021cb680). Overturns this file's own
+ * earlier "kept opaque, only stride evidenced" decision above -- the
+ * relocs.txt accounting is exhaustive (5 relocations at every non-zero
+ * offset, zero elsewhere) and the already-matched consumer's extern
+ * type was the missing piece. */
+const int data_ov006_021cb5f4[6] = {
+    0x19101915,
+    0x021cc00c, 0x021cbf84, 0x021cbf94, 0x021cdd08, 0x021cbfc4,
 };
