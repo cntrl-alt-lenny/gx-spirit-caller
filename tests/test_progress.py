@@ -904,6 +904,90 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["named_struct_bytes"], 0x1344)  # 672 + 4260, primitive array excluded
         self.assertEqual(metric["typed_array_bytes"], 0x1354)   # all 3 arrays count for the broad tier
 
+    def test_named_struct_subtier_skips_extern_declarations(self):
+        # Regression test for q-metric-extern-guard gap (1): an `extern`
+        # array declaration is a forward reference to bytes a DIFFERENT TU
+        # owns. Before the fix, the type-clause capture treated `extern` as
+        # just another unrecognised (thus "non-primitive") token, so a TU
+        # whose ONLY array-shaped declaration is `extern SomeStruct foo[4];`
+        # got miscounted as owning named-struct bytes even though it makes
+        # no claim about the type of ITS OWN data.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x10 kind:data\n"
+                "\n"
+                "src/main/func_foo.c:\n"
+                "    .data start:0x0 end:0x10\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "func_foo.c").write_text(
+                "extern SomeStruct foo[4];\n"
+                "int func_foo(void) { return foo[0].x; }\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
+    def test_named_struct_subtier_finds_a_later_declaration_past_a_primitive_first_one(self):
+        # Regression test for q-metric-extern-guard gap (2): `.search()` is
+        # first-match-only, so a TU declaring a primitive array BEFORE a
+        # named-struct one (real ordering seen in ~43 EUR TUs) silently
+        # dropped the second declaration from named_struct_bytes entirely.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x10 kind:data\n"
+                "\n"
+                "src/main/func_bar.c:\n"
+                "    .data start:0x0 end:0x10\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "func_bar.c").write_text(
+                "static int lookup[4] = {0};\n"
+                "struct Bar data_bar[2] = {{0}, {0}};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x10)
+
+    def test_named_struct_subtier_treats_widened_primitive_spellings_as_primitive(self):
+        # Regression test for q-metric-extern-guard gap (3): stdint.h
+        # `_t`-suffixed widths and the NitroSDK-style vu8/vu16/vu32/fx16/
+        # fx32/BOOL spellings must count as primitive, not as an
+        # unrecognised (thus named-struct-like) type.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            delinks_lines = ["    .data start:0x0 end:0x60 kind:data\n", "\n"]
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            spellings = [
+                ("uint32_t", "data_a"), ("int8_t", "data_b"),
+                ("vu16", "data_c"), ("fx32", "data_d"), ("BOOL", "data_e"),
+            ]
+            offset = 0
+            for c_type, name in spellings:
+                delinks_lines.append(f"src/main/{name}.c:\n")
+                delinks_lines.append(
+                    f"    .data start:0x{offset:x} end:0x{offset + 0x10:x}\n")
+                (source_dir / f"{name}.c").write_text(f"{c_type} {name}[4] = {{0}};\n")
+                offset += 0x10
+            (config / "delinks.txt").write_text("".join(delinks_lines))
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py
         # via json.dumps — the dict must survive the round-trip without
