@@ -5371,7 +5371,7 @@ src/usa/main/func_02048f38.s:
 src/usa/main/func_02048fc4.s:
     complete
     .text start:0x02048fc4 end:0x02049068
-src/usa/main/func_02049068.s:
+src/usa/main/func_02049068.legacy_sp3.c:
     complete
     .text start:0x02049068 end:0x020490ac
 src/usa/main/func_020490ac.s:
@@ -8545,7 +8545,7 @@ src/usa/main/func_020779a0.legacy.c:
     complete
     .text start:0x020779a0 end:0x020779cc
 
-src/usa/main/func_020779cc.s:
+src/usa/main/func_020779cc.legacy.c:
     complete
     .text start:0x020779cc end:0x02077a04
 src/usa/main/func_02077a04.s:
