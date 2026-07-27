@@ -1,9 +1,14 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 60 bytes, shape=string). */
+/* data_ov004_02209f94 (60 bytes, 4-aligned): wave 13 string retype.
+ * relocs.txt: from:0x021d4188 kind:load to:0x02209f94 -- one real
+ * same-overlay consumer takes this string's address (still an opaque
+ * region, no C-level TU of its own yet, so the call site itself can't
+ * be read). Content is 58 printable ASCII bytes + 2 trailing NUL bytes
+ * (1 string terminator + 1 zero-fill to the declared size), byte-exact
+ * per a Python re-extraction against extract/eur/arm9_overlays/ov004.bin
+ * at this wave's mandatory never-hand-transcribe standard. Plain `char`,
+ * no const/unsigned, matching this file's .data ground truth (delinks.txt)
+ * and this project's established string-file convention (see
+ * src/main/data_020fe4b0.c and siblings).
+ */
 
-unsigned char data_ov004_02209f94[60] = {
-    0x45, 0x53, 0x52, 0x42, 0x20, 0x4e, 0x6f, 0x74, 0x69, 0x63, 0x65, 0x3a,
-    0x20, 0x47, 0x61, 0x6d, 0x65, 0x20, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69,
-    0x65, 0x6e, 0x63, 0x65, 0x20, 0x4d, 0x61, 0x79, 0x20, 0x43, 0x68, 0x61,
-    0x6e, 0x67, 0x65, 0x20, 0x44, 0x75, 0x72, 0x69, 0x6e, 0x67, 0x20, 0x4f,
-    0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x20, 0x50, 0x6c, 0x61, 0x79, 0x00, 0x00,
-};
+char data_ov004_02209f94[60] = "ESRB Notice: Game Experience May Change During Online Play";
