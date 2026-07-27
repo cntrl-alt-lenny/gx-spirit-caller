@@ -7,9 +7,9 @@ extern int func_ov002_02259f74(int bit);
 extern int func_ov002_021be384(int bit, int i, int one);
 
 int func_ov002_02293a5c(struct Ov0293a5cSelf *self) {
+    int i;
     int accum;
     int result;
-    int i;
 
     accum = 0;
     result = func_ov002_02259f74(self->b0);
