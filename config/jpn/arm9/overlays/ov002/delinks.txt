@@ -6914,13 +6914,13 @@ src/jpn/overlay002/func_ov002_022394f8.s:
 src/jpn/overlay002/func_ov002_0223956c.s:
     complete
     .text start:0x0223956c end:0x02239610
-src/jpn/overlay002/func_ov002_02239610.s:
+src/jpn/overlay002/func_ov002_02239610.c:
     complete
     .text start:0x02239610 end:0x0223967c
 src/jpn/overlay002/func_ov002_0223967c.s:
     complete
     .text start:0x0223967c end:0x02239844
-src/jpn/overlay002/func_ov002_02239844.s:
+src/jpn/overlay002/func_ov002_02239844.c:
     complete
     .text start:0x02239844 end:0x0223989c
 src/jpn/overlay002/func_ov002_0223989c.s:
