@@ -173,6 +173,33 @@ class TestModuleBinaryAndBaseAndBytes(unittest.TestCase):
                 with self.assertRaises(BlobError):
                     module_binary_and_base("eur", None)
 
+    def test_module_binary_and_base_overlay(self):
+        # dsd's real overlay bin naming is the short `ov{id:03d}.bin`
+        # form (confirmed against the actual extract/ tree and against
+        # containment_check.py / cross_region_cluster_apply.py /
+        # predict_walls.py) -- this path previously guessed the long
+        # `overlay{id:04d}.bin` form first and had never been exercised
+        # against a real overlay (no prior emit_data_blob.py use was ever
+        # against one), so the mismatch went undetected until the
+        # data_ov006_021cddec carve hit it.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            ov_dir = root / "extract" / "eur" / "arm9_overlays"
+            ov_dir.mkdir(parents=True)
+            (ov_dir / "overlays.yaml").write_text(
+                "table_signed: false\n"
+                "overlays:\n"
+                "  - id: 0\n"
+                "    base_address: 35300512\n"
+                "  - id: 6\n"
+                "    base_address: 35520000\n"
+            )
+            (ov_dir / "ov006.bin").write_bytes(bytes(range(256)) * 4)  # 1024 bytes
+            with mock.patch.object(edb, "ROOT", root):
+                bin_path, base = module_binary_and_base("eur", "ov006")
+            self.assertEqual(base, 35520000)
+            self.assertEqual(bin_path, ov_dir / "ov006.bin")
+
     def test_read_ground_truth_bytes_exact_slice(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._make_tree(tmp)

@@ -1,8 +1,8 @@
 typedef unsigned short u16;
 
-extern char data_ov006_021cb6f8[];
-extern char data_ov006_021cb778[];
-extern char data_ov006_021cb798[];
+extern unsigned short data_ov006_021cb6f8[];
+extern unsigned short data_ov006_021cb778[];
+extern unsigned short data_ov006_021cb798[];
 
 extern int func_02001d0c(void *p, int a, int b);
 extern int func_02001e94(void *p, int a, int b, int c);

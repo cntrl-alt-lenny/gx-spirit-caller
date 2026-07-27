@@ -1,0 +1,22 @@
+# Required status checks for the `main-protection` ruleset.
+#
+# One status-check CONTEXT per line — the exact string GitHub shows on the PR,
+# which is a job's `name:` if it has one, otherwise its job id.
+#
+# This file is the committed half of a contract with GitHub's branch-protection
+# settings. `tools/check_ci_contract.py` enforces two things about it:
+#
+#   * every context here resolves to a real job in a workflow that runs on
+#     EVERY pull request (no `paths:` filter) — a filtered-out workflow never
+#     reports a conclusion, so the PR blocks forever instead of passing
+#   * `--verify-ruleset` diffs this list against the live ruleset, so the repo
+#     and GitHub's settings cannot drift apart silently
+#
+# CHANGING THE REQUIRED SET IS A TWO-SIDED EDIT. Update this file AND the
+# ruleset together. Adding a check here that is paths-filtered, or requiring one
+# in the ruleset without listing it here, is the PR #1365 deadlock — see that
+# PR and the tool's docstring for the full incident.
+
+Python (ruff)
+Markdown (markdownlint-cli2)
+drift-check

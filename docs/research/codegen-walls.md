@@ -5655,8 +5655,29 @@ temp higher would change the function shape (orig takes only `self`).
 The permuter is the untested fall-through (cite P-11 / brief-198
 precedent, not a run this session).
 
+> **UPDATE (cm-sm64ds-lever-apply, 2026-07-25):** a 10th form —
+> imported from a sibling decomp project's "fake-dependency virtual-
+> call-argument coloring" lever, tested here as "declare the bitfield
+> container as an eagerly-evaluated `unsigned short` local at the very
+> top of the function, derive every subfield from that same local via
+> `(unsigned)(x<<K)>>J` shifts, no deferred/conditional assignment" —
+> **partially refutes the "no form yields field-in-r3 cleanly" claim**:
+> tried on both `02200084` and `022319f4`, both land the container in
+> r3 AND keep bit0 as the correct `lsl/lsr` pair (not the `and`-collapse
+> the 9 prior forms hit). A NEW, different 3-word residual appears
+> instead in both (a `lsl/lsr/cmp` pre-branch range-test scratch using
+> r1 where target uses r2 — isolated, dead before the branch, doesn't
+> touch the container/bit0/argument-computation which are now
+> byte-identical). Confirmed load-bearing by controlled A/B against a
+> deferred-assignment control (container reverts to r1) on BOTH
+> candidates independently — not a lucky draft. Neither candidate
+> shipped (`02200084`: DIFF 15v15; `022319f4`: DIFF 18v18) but the
+> falsification claim above needs its "No form yields field-in-r3
+> cleanly" line read as "no PREVIOUSLY-TRIED form," not exhaustive.
+
 **Affected picks (3, ov002):** `02200084` (field→r3, deep-verified),
-`02292020` (field→r2), `022319f4` (field→r3). See the
+`02292020` (field→r2, shipped separately since this entry was
+written), `022319f4` (field→r3). See the
 [P-11 census](#p-11-mwcc-20-reg-allocator-plateau-on-mid-size-helper-call-functions)
 and
 [`brief-258-c39-cse-field-temp-and-taxonomy.md`](brief-258-c39-cse-field-temp-and-taxonomy.md).
@@ -6234,7 +6255,7 @@ global-field read that mismatches only in the shift instruction.
 
 **Provenance:** cm-ov002-unknown-sweep (PR #1363), batch 3.
 
-## Permanent P-wall index (13 live; P-6/P-7/P-8/P-10 retired)
+## Permanent P-wall index (15 live; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -6260,8 +6281,10 @@ rather than iterating.
 | P-15 | LIVE | Legacy-tier register-allocation and constant-CSE plateau. |
 | P-16 | LIVE | Repeated-address rematerialisation after a call. |
 | P-17 | LIVE | Briefs 288/290 commutative-add CSE/register-allocation wall. |
+| P-18 | LIVE | Task-config field-write store-reordering (independent stores resequenced). |
+| P-19 | LIVE | Bit-pack intermediate register-choice CSE divergence (r0 vs r2). |
 
-**Current count:** 13 genuinely live P-entries; four retired entries
+**Current count:** 15 genuinely live P-entries; four retired entries
 (P-6, P-7, P-8, P-10). The three newly corrected headings below are
 P-7, P-8, and P-10; their historical bodies remain intact.
 
@@ -6395,11 +6418,23 @@ intervening volatile reads. Brief 031 `func_0207dee0` saw mwcc
 emit `ldmib r2, {r0, r2}` (1 instruction, 2 loads) where target
 had two separate `ldr`.
 
-**Why permanent:** mwcc's load/store-multiple coalescer fires on
-syntactic patterns, but target ROM may have been compiled at a
-slightly different optimisation level / SP version where the
-heuristic threshold differed. C source can't sit on either side
-of the threshold reliably.
+> **UPDATE (cm-sm64ds-lever-apply, 2026-07-25):** `func_0209bf18`
+> **shipped** (`.legacy.c`) — not by defeating the fusion at all, but
+> by ROUTING to the mwcc 1.2/sp2p3 tier, whose instruction selector
+> never performs this specific `ldr`+`ldr` → `ldmia` fusion for a
+> plain `(t[0]*60+t[1])*60+t[2]` transliteration. The "why permanent"
+> framing above holds for the DEFAULT 2.0/sp1p5 tier specifically, not
+> for the wall as a whole — worth checking tier-routing before
+> classifying a fresh direction-B instance as unfixable. Two
+> sm64ds-imported levers (#6 volatile-read pinning, #9 u64
+> pointer-laundering) were also tried on this candidate and neither
+> was needed once the tier was right.
+
+**Why permanent (on the default 2.0/sp1p5 tier):** mwcc's load/
+store-multiple coalescer fires on syntactic patterns, but target ROM
+may have been compiled at a slightly different optimisation level /
+SP version where the heuristic threshold differed. C source can't
+sit on either side of the threshold reliably on that one tier.
 
 **Affected drops:** brief 028 `func_0209bf18`, brief 031
 `func_0207dee0`. **2 of 47 drops (4%)** — but bidirectional
@@ -8022,6 +8057,98 @@ independently (`021ebf40` from brief 654, plus these 2) — 14 remain
 genuinely untested, but the pattern is consistent across all 3 confirmed
 so far. No lever from this session's catalogue (route-before-draft,
 shift-pair preservation, branch polarity, statement sequencing) touches it.
+
+### P-18. Task-config field-write store-reordering
+
+mwcc reorders two independent (non-aliasing, no data dependency between
+them) struct-field stores relative to each other, regardless of source
+statement order or access-syntax style. Distinct from P-2 (that's about
+load/store-multiple *fusion*; this is about the relative *order* of two
+already-separate, already-unfused single-word stores).
+
+**Target asm (`func_ov004_021cd3b4`, a task-config struct build before
+`func_0201e5b8`):** writes `cfg.f0x10 = -1`, then `cfg.f0xc = 0x4080`, then
+a read-modify-write of `cfg.flags`, then `cfg.f0x00 = handle`, then a
+second read-modify-write of `cfg.flags` — the `handle` write sits
+*between* the two flags read-modify-writes.
+
+**Falsifiable claim:** *some source statement order reproduces this exact
+sequence.* **Falsified — 2 forms tried (cm-ov004-021cd3b4-finish,
+2026-07-25):**
+
+- Source statements in the target's own literal order (`f0x10`, `f0xc`,
+  flags-rmw-1, `f0x00`, flags-rmw-2) — mwcc still reorders `f0xc` and
+  `f0x00` relative to each other in the compiled output.
+- Same statement order, but through a proper `typedef struct` with named
+  fields instead of raw `char[]` + offset casts — byte-identical output to
+  the raw-cast version; the access syntax makes no difference.
+
+**Why permanent (for now):** the two stores have no data dependency and
+write to different offsets of the same local aggregate, so mwcc's
+scheduler is free to reorder them and does, independent of the source's
+own textual order — the compiler is choosing an order that happens not to
+match target's, for reasons not yet isolated (possibly instruction-latency
+scheduling around the two different constant-materialization strategies:
+`f0xc`'s value comes from a pool load, `f0x00`'s from a register already
+holding a call result).
+
+**Affected picks (1):** `func_ov004_021cd3b4` (this session's dedicated
+attempt reached `DIFF 188v196` overall; this is one of its 2 named
+residuals — see
+[`cm-ov004-021cd3b4-finish-2026-07-25.md`](cm-ov004-021cd3b4-finish-2026-07-25.md)
+for the full per-instruction diff). Not yet cross-checked against other
+candidates using the same `func_02006c0c`+`func_0201d47c`+`func_0201e5b8`
+config-struct idiom (`func_ov008_021b2064.c`, `func_ov010_021b32ac.c`,
+etc. all matched already, so they're not live test cases for this
+specific residual) — flag any FUTURE unmatched user of this idiom against
+this entry before re-deriving the mechanism from scratch.
+
+**Recipe status: NONE.** Future briefs: try forcing an explicit sequence
+point between the two stores (e.g. a dummy volatile read of one field
+between them) as the next untried lever, or check whether the pool-load
+vs. register-value distinction between the two stores is the actual
+scheduling driver (P-3-adjacent).
+
+### P-19. Bit-pack intermediate register-choice CSE divergence (r0 vs r2)
+
+A pure-arithmetic bit-packing intermediate (`(0x81 - x) & 0xff`, later
+OR'd with several other terms into a single packed word) lands in a
+different register than target with no other divergence anywhere in the
+surrounding code.
+
+**Target asm (`func_ov004_021cd3b4`):** keeps the whole computation in
+**r0** end to end (`rsb r0,r0,#0x81; and r0,r0,#0xff; ...; orr r0,r0,...`).
+mwcc puts the same chain in **r2** instead
+(`rsb r0,r0,#0x81; and r2,r0,#0xff; ...`).
+
+**Falsifiable claim:** *some source form keeps the chain in r0.* **Falsified
+— 2 forms tried (cm-ov004-021cd3b4-finish, 2026-07-25):**
+
+- Single combined C expression (`((0x81-fa4)&0xff) | 0x2000 | 0x80000000 |
+  (...)`) — lands in r2.
+- Step-by-step statement-per-original-instruction transliteration (named
+  temp `t0`, one operation per line, matching the target's exact
+  instruction granularity) — identical compiled output, still r2.
+
+**Why permanent (for now):** no source-shape difference between the two
+forms changed mwcc's register choice at all — the two compiles are
+byte-identical to each other, meaning the allocator's choice here isn't
+sensitive to any of the syntactic levers this session's toolkit covers.
+Correlates with the enclosing function needing one extra callee-saved
+register overall (3 vs. target's 4 saves, with a compensating 4-byte
+`sub sp` difference) — plausibly the SAME root allocator decision surfacing
+in two places, not two independent walls, but that connection isn't proven.
+
+**Affected picks (1):** `func_ov004_021cd3b4` — see
+[`cm-ov004-021cd3b4-finish-2026-07-25.md`](cm-ov004-021cd3b4-finish-2026-07-25.md).
+Not yet seen elsewhere; too new to have a cohort.
+
+**Recipe status: NONE.** Future briefs: since both tried forms produced
+*identical* codegen, the next untried axis is something structural rather
+than expression-level — e.g. check whether the OTHER local variables'
+declaration order/count in the same function changes overall register
+pressure enough to free r0 for this chain (the extra-callee-save
+correlation above), rather than reshaping this expression again.
 
 ## Codegen-inherent edge cases (3 patterns)
 
