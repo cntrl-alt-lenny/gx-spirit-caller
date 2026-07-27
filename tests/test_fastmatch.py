@@ -413,24 +413,51 @@ class TestNinjaCompileOneSelfHeal(unittest.TestCase):
         self.assertEqual(len(ninja_calls), 2)
         self.assertEqual(len(configure_calls), 2)
 
-    def test_does_not_self_heal_a_stray_conflict_for_a_different_file(self):
-        # Mirrors batch_sha1.py's own "stray conflict outside the batch"
-        # guard: a multiple-rules fatal for some OTHER object must not
-        # trigger deleting this candidate's sibling.
+    def test_does_not_self_heal_a_collision_reported_in_a_different_directory(self):
+        # A multiple-rules fatal for a DIFFERENT MODULE's object can't be
+        # fixed by touching anything in this candidate's own directory --
+        # scanning/displacing here would be pure risk (disturbing another
+        # lane's unrelated in-progress work) for zero chance of fixing the
+        # reported collision. Must never even attempt the scan.
+        (self.root / "src/overlay002").mkdir(parents=True)
         unrelated_err = (
             "ninja: error: build.ninja:1: multiple rules generate "
-            "build/eur/src/main/some_unrelated_func.o\n"
+            "build/eur/src/overlay002/some_unrelated_func.o\n"
         )
         with mock.patch(
             "fastmatch.subprocess.run",
             return_value=self._completed(1, stderr=unrelated_err),
-        ):
+        ) as mocked_run:
             ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
 
         self.assertFalse(ok)
         self.assertIn("multiple rules generate", err)
         # Sibling must be untouched -- self-heal never triggered.
         self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+        # Only the one initial ninja invocation -- no reconfigure/retry
+        # was ever attempted for an out-of-scope collision.
+        self.assertEqual(mocked_run.call_count, 1)
+
+    def test_does_not_self_heal_an_unrelated_same_directory_c_with_no_stale_sibling(self):
+        # A second .c file in the SAME directory that has ALREADY shipped
+        # (no .s sibling left) must not be mistaken for a collision --
+        # only .c files that still have a stale .s on disk count.
+        (self.root / "src/main/func_shipped.c").write_text("void func_shipped(void) {}\n")
+        collision_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/func_X.o\n"
+        )
+        with mock.patch(
+            "fastmatch.subprocess.run",
+            return_value=self._completed(1, stderr=collision_err),
+        ):
+            fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        # func_shipped has no .s sibling, so it must never be considered
+        # for displacement -- nothing to assert on disk (it never had an
+        # .s to begin with); this just confirms _find_stale_c_s_collisions
+        # doesn't error out or fabricate work for a file with no sibling.
+        self.assertFalse((self.root / "src/main/func_shipped.s").exists())
 
     def test_a_real_compile_error_is_not_treated_as_a_collision(self):
         with mock.patch(
@@ -464,6 +491,132 @@ class TestNinjaCompileOneSelfHeal(unittest.TestCase):
         # Even on this failure path, the sibling must still be restored.
         self.assertTrue(self.s_path.is_file())
         self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+
+    def test_self_heals_when_a_different_in_flight_candidate_caused_the_collision(self):
+        # q-fastmatch-selfheal-inflight: the ORIGINAL self-heal only
+        # matched a collision against THIS candidate's own sibling, so
+        # it failed outright -- naming the wrong file, no self-heal --
+        # whenever a DIFFERENT in-flight candidate's .c/.s pair (in the
+        # same directory) was what ninja's parser hit first. Independently
+        # rediscovered by 4 of 5 worktree batches in cm-ov002-unknown-
+        # sweep-2 (#1372), all with multiple candidates mid-draft in the
+        # same module at once -- exactly what a parallel sweep batch does.
+        other_c = self.root / "src/main/func_OTHER.c"
+        other_c.write_text("void func_OTHER(void) {}\n")
+        other_s = self.root / "src/main/func_OTHER.s"
+        other_original_bytes = b"@ func_OTHER original .s bytes\r\n"
+        other_s.write_bytes(other_original_bytes)
+
+        # The reported collision names func_OTHER, NOT func_X (the
+        # candidate actually being compiled) -- this is exactly the
+        # shape the old code could never self-heal.
+        collision_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/func_OTHER.o\n"
+        )
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if cmd[0] == "ninja":
+                if sum(1 for c in calls if c[0] == "ninja") == 1:
+                    return self._completed(1, stderr=collision_err)
+                return self._completed(0)
+            return self._completed(0)
+
+        with mock.patch("fastmatch.subprocess.run", side_effect=fake_run):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertTrue(ok, err)
+        # BOTH siblings must be restored byte-exact -- func_X (the
+        # candidate under test) was never actually the problem, and
+        # func_OTHER (the one actually colliding) must come back too.
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+        self.assertEqual(other_s.read_bytes(), other_original_bytes)
+
+    def test_healing_two_candidates_at_once_does_not_reintroduce_either_collision(self):
+        # Sharper finding from the same sweep: healing candidates ONE AT
+        # A TIME (restore + reconfigure per candidate) can reintroduce
+        # the fatal for whichever OTHER candidate is still mid-draft --
+        # fixing every stale pair in the directory together in one pass
+        # (this test's real point) avoids that whack-a-mole failure mode
+        # entirely. Three candidates mid-draft at once in the same
+        # directory; the reported collision names only the middle one.
+        other1_s = self.root / "src/main/func_A.s"
+        other1_s.write_bytes(b"@ func_A\r\n")
+        (self.root / "src/main/func_A.c").write_text("void func_A(void) {}\n")
+        other2_s = self.root / "src/main/func_B.s"
+        other2_s.write_bytes(b"@ func_B\r\n")
+        (self.root / "src/main/func_B.c").write_text("void func_B(void) {}\n")
+
+        collision_err = (
+            "ninja: error: build.ninja:1: multiple rules generate "
+            "build/eur/src/main/func_A.o\n"
+        )
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if cmd[0] == "ninja":
+                if sum(1 for c in calls if c[0] == "ninja") == 1:
+                    return self._completed(1, stderr=collision_err)
+                return self._completed(0)
+            return self._completed(0)
+
+        with mock.patch("fastmatch.subprocess.run", side_effect=fake_run):
+            ok, err = fastmatch.ninja_compile_one(self.out_o, self.c_path, "eur")
+
+        self.assertTrue(ok, err)
+        # A single retry succeeds because ALL THREE stale pairs (func_X,
+        # func_A, func_B) were displaced together in one pass -- not
+        # one at a time, which would leave 2 of 3 still colliding after
+        # "fixing" the first.
+        ninja_calls = [c for c in calls if c[0] == "ninja"]
+        self.assertEqual(len(ninja_calls), 2)
+        # Every sibling comes back byte-exact.
+        self.assertEqual(self.s_path.read_bytes(), self.s_original_bytes)
+        self.assertEqual(other1_s.read_bytes(), b"@ func_A\r\n")
+        self.assertEqual(other2_s.read_bytes(), b"@ func_B\r\n")
+
+
+class TestFindStaleCSCollisions(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
+        mock.patch("fastmatch.ROOT", self.root).start()
+        self.addCleanup(mock.patch.stopall)
+        (self.root / "src/main").mkdir(parents=True)
+
+    def test_finds_every_stale_pair_in_the_directory(self):
+        (self.root / "src/main/func_A.c").write_text("")
+        (self.root / "src/main/func_A.s").write_bytes(b"")
+        (self.root / "src/main/func_B.c").write_text("")
+        (self.root / "src/main/func_B.s").write_bytes(b"")
+        found = fastmatch._find_stale_c_s_collisions(self.root / "src/main/func_A.c")
+        self.assertEqual(
+            sorted(p.name for p in found), ["func_A.s", "func_B.s"],
+        )
+
+    def test_ignores_a_c_with_no_stale_sibling(self):
+        (self.root / "src/main/func_shipped.c").write_text("")
+        found = fastmatch._find_stale_c_s_collisions(self.root / "src/main/func_shipped.c")
+        self.assertEqual(found, [])
+
+    def test_ignores_a_different_directory(self):
+        (self.root / "src/main/func_A.c").write_text("")
+        (self.root / "src/main/func_A.s").write_bytes(b"")
+        (self.root / "src/overlay002").mkdir(parents=True)
+        (self.root / "src/overlay002/func_B.c").write_text("")
+        (self.root / "src/overlay002/func_B.s").write_bytes(b"")
+        found = fastmatch._find_stale_c_s_collisions(self.root / "src/main/func_A.c")
+        self.assertEqual([p.name for p in found], ["func_A.s"])
+
+    def test_handles_a_tiered_sibling_name(self):
+        (self.root / "src/main/func_A.legacy.c").write_text("")
+        (self.root / "src/main/func_A.s").write_bytes(b"")
+        found = fastmatch._find_stale_c_s_collisions(self.root / "src/main/func_A.legacy.c")
+        self.assertEqual([p.name for p in found], ["func_A.s"])
 
 
 class TestDisplayPath(unittest.TestCase):
