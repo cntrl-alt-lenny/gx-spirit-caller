@@ -9400,7 +9400,7 @@ src/usa/overlay002/func_ov002_0226b084.c:
 src/usa/overlay002/func_ov002_0226b0a4.c:
     complete
     .text start:0x0226b0a4 end:0x0226b0c4
-src/usa/overlay002/func_ov002_0226b0c4.s:
+src/usa/overlay002/func_ov002_0226b0c4.c:
     complete
     .text start:0x0226b0c4 end:0x0226b114
 src/usa/overlay002/func_ov002_0226b114.c:
