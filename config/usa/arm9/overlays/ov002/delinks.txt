@@ -11919,7 +11919,7 @@ src/usa/overlay002/func_ov002_022b005c.s:
 src/usa/overlay002/func_ov002_022b0198.s:
     complete
     .text start:0x022b0198 end:0x022b02b8
-src/usa/overlay002/func_ov002_022b02b8.s:
+src/usa/overlay002/func_ov002_022b02b8.c:
     complete
     .text start:0x022b02b8 end:0x022b0308
 src/usa/overlay002/func_ov002_022b0308.c:
