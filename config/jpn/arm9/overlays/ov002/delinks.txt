@@ -3912,14 +3912,14 @@ src/jpn/overlay002/func_ov002_022049c8.s:
 src/jpn/overlay002/func_ov002_02204a18.s:
     complete
     .text start:0x02204a18 end:0x02204a78
-src/jpn/overlay002/func_ov002_02204a78.s:
+src/jpn/overlay002/func_ov002_02204a78.c:
     complete
     .text start:0x02204a78 end:0x02204aec
 src/jpn/overlay002/func_ov002_02204aec.c:
     complete
     .text start:0x02204aec end:0x02204b2c
 
-src/jpn/overlay002/func_ov002_02204b2c.s:
+src/jpn/overlay002/func_ov002_02204b2c.c:
     complete
     .text start:0x02204b2c end:0x02204b98
 src/jpn/overlay002/func_ov002_02204b98.c:
