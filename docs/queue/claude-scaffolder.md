@@ -628,7 +628,7 @@ A real, unrelated bug was found and flagged separately (not fixed here): `src/ma
 Full writeup, per-symbol evidence table, and the `data_020b46b8` cross-region analysis: `docs/research/data/cm-data-inference-9-2026-07-27.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed, full pytest green — 3100 passed, 15 skipped, 0 failed). `Named-struct`: 44,308 → 44,424 bytes (0.93% → 0.93%). Hit rate: 6/15 fresh census investigations shipped directly (40%), 9 files landed with sibling bonuses, 8/15 useful reconfirmations, 1 CONTRADICTION resolved-and-deferred.
 
-### cm-data-inference-10 — data wave 10 — fresh census, plus an optional USA/JPN item [TODO]
+### cm-data-inference-10 — data wave 10 — fresh census, plus an optional USA/JPN item [CLAIMED]
 
 No specific carried-over lead for the main EUR-focused census — re-run the live opaque-blob census fresh (same grep as every prior wave's item) across `main` + all overlays. This deep into the campaign, expect a growing share of any fresh batch to land on already-investigated ground (wave 9 saw 8/15) — that's not a sign the method is failing, it's the expected shape of a shrinking, increasingly-picked-over pool; keep dispatching investigate-first agents rather than trying to pre-filter from the queue side, since only a real per-symbol check can tell settled from fresh.
 
