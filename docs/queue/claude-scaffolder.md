@@ -638,7 +638,7 @@ Optional, separate-track item (not required to close this wave, and not EUR-bloc
 Full writeup, per-symbol evidence table, and both CONTRADICTION resolutions: `docs/research/data/cm-data-inference-10-2026-07-27.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed, full pytest green — 3100 passed, 15 skipped, 0 failed). `Named-struct`: 44,424 → 44,488 bytes (0.93% → 0.93%). Hit rate: 7/15 fresh census investigations shipped directly (47%), 8/15 useful reconfirmations, 0 new CONTRADICTIONs (2 old ones resolved instead).
 
-### cm-data-inference-11 — data wave 11 — fresh census [TODO]
+### cm-data-inference-11 — data wave 11 — fresh census [CLAIMED]
 
 No specific carried-over lead. Re-run the live opaque-blob census fresh (same grep as every prior wave's item) across `main` + all overlays. Two standing optional items from prior waves remain open and are NOT required to close this one: `data_020b46b8`'s USA/JPN region-override files (see wave 9/10 entries above — not EUR-blocking) and the two small never-carved `delinks.txt` gaps near the `data_ov002_022c8368` cluster noted in wave 9 (`data_ov002_022c834c`, `data_ov002_022c8354`) — pick either up only if the fresh census runs thin.
 
