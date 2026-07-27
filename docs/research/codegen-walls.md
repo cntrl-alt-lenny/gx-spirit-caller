@@ -6255,7 +6255,25 @@ global-field read that mismatches only in the shift instruction.
 
 **Provenance:** cm-ov002-unknown-sweep (PR #1363), batch 3.
 
-## Permanent P-wall index (15 live; P-6/P-7/P-8/P-10 retired)
+**Extension (cm-ov002-unknown-sweep-4, 2026-07-27): applies to `u16`
+fields too, not just `int`.** C promotes `unsigned short` to signed
+`int` before a shift, so a plain `u16_field >> N` can still emit `asr`
+even though the field's full 0-65535 range is non-negative — the same
+`(unsigned)` cast fix applies. Found independently while shipping
+`func_ov002_02242ea8` (cm-ov002-unknown-sweep-4 batch 1).
+
+**Extension 2 (cm-ov002-unknown-sweep-4): the underlying shift-pair
+lever generalizes past 13-bit widths.** The 13-bit-id-via-bitfield
+finding from the prior sweep (mwcc folds a manual `(x<<19)>>19` into a
+pool-constant AND unless read through a real C bitfield) is not
+specific to 13 bits — batch 1 confirmed the same collapse-unless-
+bitfield-or-shift-pair behavior at 6-bit, 8-bit, and 9-bit widths.
+When the original shows two plain shift instructions (no `and`), write
+the extraction as `((unsigned)(x << L)) >> R` with the original's exact
+shift amounts, not `(x >> N) & MASK` — the mask form gets folded
+regardless of field width.
+
+## Permanent P-wall index (16 live; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -6283,13 +6301,14 @@ rather than iterating.
 | P-17 | LIVE | Briefs 288/290 commutative-add CSE/register-allocation wall. |
 | P-18 | LIVE | Task-config field-write store-reordering (independent stores resequenced). |
 | P-19 | LIVE | Bit-pack intermediate register-choice CSE divergence (r0 vs r2). |
+| P-20 | LIVE | Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom). |
 
-**Current count:** 15 genuinely live P-entries; four retired entries
+**Current count:** 16 genuinely live P-entries; four retired entries
 (P-6, P-7, P-8, P-10). The three newly corrected headings below are
 P-7, P-8, and P-10; their historical bodies remain intact.
 
 > **"Brief 294" citations are narrower than their bulk application
-> (cm-ov002-unknown-sweep-2/3, 2026-07-26/27).**
+> (cm-ov002-unknown-sweep-2/3/4, 2026-07-26/27).**
 > [`brief-294-regalloc-wall-scout.md`](brief-294-regalloc-wall-scout.md)
 > is real, careful research — it A/B-tested `register`, expression
 > duplication, and `volatile` on one specific shape (a value live
@@ -6300,15 +6319,19 @@ P-7, P-8, and P-10; their historical bodies remain intact.
 > — the same "mechanical bulk stamp, not per-function proof" failure
 > mode the queue header's brief-651 rework note already names for the
 > sibling `GLOBAL_ASM`/brief-302 tag, just wearing a more rigorous-
-> sounding citation. Two consecutive ov002 sweeps (92-104B: 95/145
-> shipped, 65.5%; 108-120B: 82/166, 49.4%) worked almost entirely
-> through candidates carrying this exact "brief 294 endgame" header,
-> using levers brief-294 never tested — **declaration order** chief
+> sounding citation. Three consecutive ov002 sweeps (92-104B: 95/145
+> shipped, 65.5%; 108-120B: 82/166, 49.4%; 124-132B: 59/145, 40.7%)
+> worked almost entirely through candidates carrying this exact "brief
+> 294 endgame" header, using levers brief-294 never tested —
+> **declaration order** chief
 > among them (already known to be inconsistent elsewhere in this
 > index, e.g. P-4's own body — it is not a universal fix, but it is
 > untested by brief-294 and demonstrably effective on a meaningful
 > fraction of this specific cohort), alongside goto-shared-tail,
-> positive-condition-wrap, and bitfield-struct-member access. Treat a
+> positive-condition-wrap, and bitfield-struct-member access. The
+> decline across sweeps (65.5% -> 49.4% -> 40.7%) is the pool
+> genuinely thinning, not the header regaining validity — sweep-4 still
+> shipped 59 candidates that carried it. Treat a
 > bare "brief 294" citation the same way as a bare `GLOBAL_ASM`/brief-
 > 302 one: a starting hypothesis to re-test with the full current lever
 > set, not a verdict.
@@ -8174,6 +8197,65 @@ than expression-level — e.g. check whether the OTHER local variables'
 declaration order/count in the same function changes overall register
 pressure enough to free r0 for this chain (the extra-callee-save
 correlation above), rather than reshaping this expression again.
+
+### P-20. Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom)
+
+> **Wall family note — related to P-17 but a distinct cohort.** Same
+> general shape as P-17 (a commutative multiply/add feeding a register
+> that ends up under a different letter than target) but P-17's cohort
+> is 17 named functions in the `021e8xxx`-`021f2xxx` range from briefs
+> 288/290; this cohort lives in the `0224axxx`-`0224dxxx` range and is
+> specific to the `(player&1)*0x868`-style per-player struct-row-offset
+> calculation. Treat as a sibling wall, not the same one, until proven
+> otherwise.
+
+**The idiom:** many ov002 functions index into a per-player row of a
+struct array via `(self->player & 1) * 0x868` (or an equivalent
+already-masked field), then combine that row offset with a second
+scaled index into the row. Original asm computes this in a specific
+r1/r2 (occasionally r2/r3) register pairing; mwcc's allocator picks the
+opposite pairing for the same arithmetic, with every other instruction
+in the function — including instruction count and order — byte-identical.
+
+**Falsifiable claim:** *some source-level restructuring of the row/index
+computation flips the register pairing to match.* **Falsified — 11
+independently-attempted cohort members, cm-ov002-unknown-sweep-4
+(2026-07-27):**
+
+- `021c3150`, `0224aac0`, `0224c160`, `0224da7c`, `02252914` (batch 3):
+  named-variable separation, operand-order swaps, and a
+  named-constant-first variant all tried — zero effect on codegen.
+- `0224a6f4`, `0224c034`, `0224d8b4`, `02252734` (batch 2): 5 distinct
+  reorderings tried — zero effect.
+- `0224cd18`, `0224f7a0` (batch 4): same residual on the single-int-
+  param variant of an otherwise-fully-matched template.
+
+All 11 land at exactly 87.9% (4 diff words) except `0224da7c` at 81.2% —
+remarkably consistent, suggesting one specific allocator decision point
+rather than 11 independent problems.
+
+**Why permanent (for now):** three independent batches, none aware of
+the others' attempts, converged on the same conclusion via different
+restructurings. Combined with the suspiciously exact, repeated 87.9%
+match figure across unrelated call sites, this reads as a genuine
+allocator-internal decision (likely tied to which of the two operands
+was live first from an enclosing computation) rather than anything
+expressible as a source-level lever from this project's current toolkit.
+
+**Affected picks (11):** `021c3150`, `0224a6f4`, `0224aac0`, `0224c034`,
+`0224c160`, `0224cd18`, `0224d8b4`, `0224da7c`, `0224f7a0`, `02252734`,
+`02252914` (all ov002). Likely a larger cohort exists outside this
+sweep's 124-132B size band given the idiom's generality — worth a
+targeted grep-by-idiom census rather than waiting for size-band sweeps
+to hit the rest.
+
+**Recipe status: NONE.** Future briefs: try the permuter (blocked on
+Windows currently; revisit on a non-Windows lane) given the byte-exact
+87.9% floor and total unresponsiveness to hand restructuring — this
+looks like exactly the "structurally correct, register-naming-only"
+shape the permuter pipeline exists for.
+
+**Provenance:** cm-ov002-unknown-sweep-4 (2026-07-27), batches 2/3/4.
 
 ## Codegen-inherent edge cases (3 patterns)
 
