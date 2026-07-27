@@ -252,7 +252,7 @@ src/jpn/overlay002/func_ov002_021b0e44.s:
 src/jpn/overlay002/func_ov002_021b1120.s:
     complete
     .text start:0x021b1120 end:0x021b1174
-src/jpn/overlay002/func_ov002_021b1174.s:
+src/jpn/overlay002/func_ov002_021b1174.c:
     complete
     .text start:0x021b1174 end:0x021b11dc
 src/jpn/overlay002/func_ov002_021b11dc.s:
