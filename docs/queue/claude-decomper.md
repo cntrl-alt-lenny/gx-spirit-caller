@@ -309,7 +309,7 @@ Fix it the way #1368 and #1351 did: build a real repro against pre-fix code and 
 
 **Gate:** a real repro against pre-fix code (git-stash-verified) + `python -m pytest tests/test_fastmatch.py -v` all passing + `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep-3 — continue the ov002 sweep, next size band [S] [TODO]
+### cm-ov002-unknown-sweep-3 — continue the ov002 sweep, next size band [S] [CLAIMED]
 
 ov002's unknown pool is the largest untouched concentration in the project. Rate so far: 63.2% (#1363, smallest band) then 66.4% (#1372, 92-104B band). Take the next band up.
 
