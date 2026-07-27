@@ -1,6 +1,15 @@
-/* Cluster C Pattern 1 — data_020b4908 (256 bytes, 4-aligned). */
+/* data_020b4908 -- 256-entry signed-byte lookup table (256 bytes).
+ *
+ * Sole consumer func_0200da18.s reads it via 3 independent, reachable
+ * `ldrsb` (sign-extending byte load) sites, each with a runtime-variable
+ * index sourced from another buffer -- computed-stride evidence, and
+ * `ldrsb` (never `ldrb`) uniformly across all 3 sites indicates the
+ * original element type was signed. Values themselves are all <=0x20,
+ * so signed/unsigned reinterpretation changes no stored byte, only the
+ * C type. See docs/queue/claude-scaffolder.md (cm-data-inference-5).
+ */
 
-const unsigned char data_020b4908[256] = {
+const signed char data_020b4908[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x00, 0x10, 0x0c,
     0x10, 0x0c, 0x09, 0x03, 0x03, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x02,
