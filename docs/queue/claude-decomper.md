@@ -283,10 +283,34 @@ ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat un
 
 **Gate:** a real repro for each of (a)-(c) against pre-fix code, the way #1351 stash-reverted each fix to prove the test actually catches it — tests that pass before the fix prove nothing. `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [TODO]
+### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [CLAIMED]
+
+> IN PROGRESS (2026-07-26): 5 of 5 worktree batches now complete and
+> merged (95/145 shipped, PR #1372). See
+> `docs/research/cm-ov002-unknown-sweep-2-2026-07-26.md` for the full
+> state; being finalized (gate confirmation + codegen-walls.md entries)
+> in the same PR.
 
 `cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
 
 The prior sweep reversed 2 documented wall verdicts (`func_ov002_022abf88`, `func_ov002_021e2cd4`) and found a C-34 mistag (`func_ov002_022a1870`) — those corrections belong in `codegen-walls.md` as edits in THIS PR, not only in the writeup, or the next lane re-parks the same functions.
+
+**Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
+
+### q-fastmatch-selfheal-inflight — fix the 4th fastmatch.py gap: cross-candidate collision self-heal [DONE]
+
+`cm-ov002-unknown-sweep-2` (#1372) found a FOURTH `fastmatch.py` gap, independently hit by 4 of its 5 batches: the ninja-collision self-heal added in #1368 does not resolve a "multiple rules generate X" error when a DIFFERENT in-flight candidate caused it — it only recognizes a conflict matching the CURRENT candidate's own `.s` sibling, so it fails naming the wrong file and does not self-heal. One report adds a sharper detail: the self-heal's own successful-path cleanup (restore-sibling + reconfigure) can reintroduce the collision for whatever OTHER candidate is mid-draft at that moment. Four independent rediscoveries in one sweep is decisive evidence it is worth fixing rather than working around again.
+
+Fix it the way #1368 and #1351 did: build a real repro against pre-fix code and confirm the test FAILS before your fix, then passes after. A test that passes before the fix proves nothing — this project has been bitten by exactly that, twice.
+
+**Gate:** a real repro against pre-fix code (git-stash-verified) + `python -m pytest tests/test_fastmatch.py -v` all passing + `python tools/gate3.py --scope all` PASS.
+
+### cm-ov002-unknown-sweep-3 — continue the ov002 sweep, next size band [S] [TODO]
+
+ov002's unknown pool is the largest untouched concentration in the project. Rate so far: 63.2% (#1363, smallest band) then 66.4% (#1372, 92-104B band). Take the next band up.
+
+Use the WORKTREE-PARALLEL SWEEP PROTOCOL in the queue header — 5 worktrees, partition the candidate list up front and write the partition into the PR body, gate ONCE on the consolidated branch. Preflight each worktree with the baserom + a configure run or the batch dies late.
+
+Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.github/`, run it — it proves every required status check can actually report.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.

@@ -345,6 +345,31 @@ def _restore_stale_sibling(s_path: Path, data: bytes | None) -> None:
         s_path.write_bytes(data)
 
 
+def _find_stale_c_s_collisions(c_path: Path) -> list[Path]:
+    """Scan c_path's own directory for every `.c` file with a still-
+    present plain `.s` sibling -- the general shape of the "multiple
+    rules generate" collision, not just c_path's own.
+
+    q-fastmatch-selfheal-inflight: the original self-heal only matched
+    a collision against the CURRENT candidate's own sibling, so it
+    failed (naming the wrong file, no self-heal) whenever a DIFFERENT
+    in-flight candidate's `.c`+`.s` pair was what ninja's parser hit
+    first -- independently rediscovered by 4 of 5 worktree batches in
+    cm-ov002-unknown-sweep-2 (#1372), all mid-draft on several
+    candidates in the same module directory at once (exactly what a
+    parallel sweep batch does). Scoped to c_path's own directory
+    (not the whole src/ tree) so an unrelated stray pair elsewhere in
+    the repo -- a different module, a different lane's in-progress
+    work -- is never touched.
+    """
+    stale: list[Path] = []
+    for sibling_c in sorted(c_path.parent.glob("*.c")):
+        sibling_s = _sibling_s_path(sibling_c)
+        if sibling_s.is_file():
+            stale.append(sibling_s)
+    return stale
+
+
 def _reconfigure(region: str) -> tuple[int, str]:
     """Re-run configure.py for `region`. Returns (returncode, combined
     stdout+stderr)."""
@@ -369,18 +394,32 @@ def ninja_compile_one(out_o: Path, c_path: Path, region: str) -> tuple[bool, str
     Ninja reads the existing build.ninja; the caller must ensure
     `python tools/configure.py <region>` has been run at least once.
 
-    Self-heals ONE specific ninja-level (not compile-level) fatal:
-    configure.py's auto-discovery adds a build rule for every .c AND
-    every .s file it finds under src/, regardless of delinks.txt -- so a
-    candidate .c draft sitting beside its own still-`.s`-routed sibling
-    makes ninja refuse to build ANYTHING with "multiple rules generate
-    <output>.o". This is the SAME root cause batch_sha1.py's
+    Self-heals ninja-level (not compile-level) fatals of one specific
+    shape: configure.py's auto-discovery adds a build rule for every .c
+    AND every .s file it finds under src/, regardless of delinks.txt --
+    so a candidate .c draft sitting beside its own still-`.s`-routed
+    sibling makes ninja refuse to build ANYTHING with "multiple rules
+    generate <output>.o". This is the SAME root cause batch_sha1.py's
     _displace_stale_sibling/_reconfigure already fixed for its own
     (multi-candidate, permanent-flip) use case (brief q-toolbugs-round2,
     #1351) -- ported here rather than reinvented. Adapted for fastmatch's
-    read-only, single-file use: the sibling is ALWAYS restored byte-for-
-    byte afterward (success or failure), since fastmatch never touches
-    delinks.txt and must leave the tree exactly as it found it.
+    read-only, single-file use: every displaced sibling is ALWAYS
+    restored byte-for-byte afterward (success or failure), since
+    fastmatch never touches delinks.txt and must leave the tree exactly
+    as it found it.
+
+    Heals EVERY stale .c/.s collision in c_path's own directory in one
+    pass, not just one matching c_path's own sibling (q-fastmatch-
+    selfheal-inflight): the original narrower check failed outright
+    whenever a DIFFERENT in-flight candidate's pair was what ninja's
+    parser hit first, which 4 of 5 worktree batches in cm-ov002-
+    unknown-sweep-2 (#1372) independently hit while multiple candidates
+    were mid-draft in the same module at once -- exactly what a
+    parallel sweep batch does. Fixing every collision in the directory
+    together (rather than reactively one at a time) also avoids one
+    report's sharper finding: restoring a single sibling and
+    reconfiguring can reintroduce the SAME fatal for whichever other
+    candidate is still mid-draft at that moment.
     """
     target = str(out_o.relative_to(ROOT))
     result = _run_ninja_once(target)
@@ -389,31 +428,43 @@ def ninja_compile_one(out_o: Path, c_path: Path, region: str) -> tuple[bool, str
         combined = "\n".join(filter(None, [result.stderr.strip(), result.stdout.strip()]))
         config_error = _ninja_config_error(combined)
         m = _MULTIPLE_RULES_RE.search(config_error) if config_error else None
-        sibling_s = _sibling_s_path(c_path)
-        expected_hit = str(
-            ninja_target_path(sibling_s, region).relative_to(ROOT)
-        ).replace("\\", "/")
 
-        if m is not None and m.group("path").replace("\\", "/") == expected_hit:
-            backup = _displace_stale_sibling(sibling_s)
+        stale: list[Path] = []
+        if m is not None:
+            hit_dir = m.group("path").replace("\\", "/").rsplit("/", 1)[0]
+            target_dir = str(out_o.parent.relative_to(ROOT)).replace("\\", "/")
+            # Only scan+heal when the reported collision is in the SAME
+            # build-output directory as the candidate being compiled --
+            # a hit reported for some other module can't be fixed by
+            # touching files here, and treating it as in-scope would
+            # displace unrelated siblings for no benefit (see the
+            # directory-scoped docstring note above).
+            if hit_dir == target_dir:
+                stale = _find_stale_c_s_collisions(c_path)
+
+        if stale:
+            backups = [(s, _displace_stale_sibling(s)) for s in stale]
             try:
                 reconf_rc, reconf_output = _reconfigure(region)
                 if reconf_rc != 0:
                     return False, (
                         "ninja config error self-heal failed: "
                         f"`configure.py {region}` errored while retrying "
-                        f"after removing stale sibling {sibling_s.relative_to(ROOT)}:\n"
+                        "after removing stale sibling(s) "
+                        f"{', '.join(str(s.relative_to(ROOT)) for s in stale)}:\n"
                         f"{reconf_output}"
                     )
                 result = _run_ninja_once(target)
             finally:
-                _restore_stale_sibling(sibling_s, backup)
-                if backup is not None:
+                for s_path, backup in backups:
+                    _restore_stale_sibling(s_path, backup)
+                if any(backup is not None for _, backup in backups):
                     # Best-effort: resync build.ninja with the restored
-                    # .s. A stale build.ninja here only affects whoever
-                    # runs ninja next (they'd get a correct file anyway
-                    # via their own configure.py/ninja invocation), so a
-                    # failure here doesn't change fastmatch's own result.
+                    # .s file(s). A stale build.ninja here only affects
+                    # whoever runs ninja next (they'd get a correct file
+                    # anyway via their own configure.py/ninja
+                    # invocation), so a failure here doesn't change
+                    # fastmatch's own result.
                     _reconfigure(region)
 
     if result.returncode == 0:
