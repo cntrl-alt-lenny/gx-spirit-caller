@@ -8432,6 +8432,53 @@ reference so future targets that show a uniform offset-shift
 diff get triaged here first instead of cycling through C-N
 candidates that don't apply.
 
+**S-1 extension — plain miscounted padding, no rounding involved
+(`func_ov002_021edce8`, cm-ov002-unknown-sweep-2, 2026-07-26).**
+A variant of this pitfall that does NOT go through the rounding
+mechanism above: `struct Cd3f4 { int _0; int f4; char _8[0x1c];
+int f20; };` put `f20` at `0x4+0x4+0x1c = 0x24`, four bytes past
+the target's real `0x20` — but `0x1c` is already 4-byte-aligned,
+so mwcc's alignment rounding never enters into it at all. The pad
+size itself was simply counted wrong by 4 bytes when the struct
+was first transcribed from the disassembly (correct: `char
+_8[0x18]`, landing `f20` at `0x20`). Symptom was identical to the
+rounding case (a uniform-looking downstream offset issue) and was
+misdiagnosed for at least one full campaign wave as **"the
+brief-287 cd3f4-arg tail reg-alloc wall"** — see
+`docs/research/brief-287-coldre-wave7-accessor-family.md:76`,
+which tagged `021edce8` (plus 3 siblings sharing the same `cd3f4`
+field pair: `02200310`, `0220257c`, `021e9860`) as "extra-tail /
+cd3f4-arg... hand-RE later, not template" rather than a
+plain-old S-1 struct bug. The function shipped byte-exact the
+moment the pad size was corrected — no reg-alloc lever, no
+routing-tier change, no reshape of the C logic at all.
+
+**Why fold under S-1 (not a fresh S-3):** same "the human's
+struct decl doesn't match the target's layout, mwcc is faithfully
+compiling the wrong description" mechanism as the parent entry —
+only the SOURCE of the wrong pad size differs (a plain counting
+mistake vs. a rounding trap), not the fix (correct the pad size)
+or the diagnostic shape (uniform downstream offset drift). Also a
+useful negative data point for S-1's own "how to spot it before
+writing" check (`4-byte-aligned-up(prev_end + pad_size)`): both
+the wrong value (`0x8 + 0x1c = 0x24`) and the right one
+(`0x8 + 0x18 = 0x20`) are already 4-byte-aligned on their own, so
+that rounding check passes cleanly either way and would NOT have
+caught this particular mistake — this variant only shows up by
+comparing the computed offset against the target's *actual*
+offset, not by checking the pad's internal alignment arithmetic.
+"The arithmetic is self-consistent but built on a wrong input" is
+a distinct trap from "the arithmetic rounds up unexpectedly," even
+though both present identically in the diff.
+
+**The other 3 siblings from the same brief-287 tag
+(`02200310`, `0220257c`, `021e9860`) were NOT re-examined by this
+sweep** (out of scope — only `021edce8` was in this size band) —
+worth a dedicated check, since if one of the four had a miscounted
+`Cd3f4` pad, the others transcribing the same struct may too.
+
+**Provenance:** cm-ov002-unknown-sweep-2 (PR #1372), batch 1.
+
 ### Sweep result — only S-1 surfaced (waves 5+ through 22)
 
 Cloud autonomous sweep covered 34 wave + brief PRs (briefs
