@@ -297,10 +297,10 @@ src/usa/overlay002/func_ov002_021b1e40.s:
 src/usa/overlay002/func_ov002_021b1f08.s:
     complete
     .text start:0x021b1f08 end:0x021b1fb4
-src/usa/overlay002/func_ov002_021b1fb4.s:
+src/usa/overlay002/func_ov002_021b1fb4.c:
     complete
     .text start:0x021b1fb4 end:0x021b1fec
-src/usa/overlay002/func_ov002_021b1fec.s:
+src/usa/overlay002/func_ov002_021b1fec.c:
     complete
     .text start:0x021b1fec end:0x021b204c
 src/usa/overlay002/func_ov002_021b204c.s:
