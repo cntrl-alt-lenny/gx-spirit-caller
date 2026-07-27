@@ -988,6 +988,110 @@ class TestReportJsonRoundtrip(unittest.TestCase):
 
         self.assertEqual(metric["named_struct_bytes"], 0)
 
+    def test_named_struct_subtier_matches_a_bracket_less_singleton_struct_instance(self):
+        # Regression test for q-metric-singleton-struct-gap. A single
+        # struct INSTANCE (no `[N]` on the symbol itself) is invisible to
+        # the array-only regex even when every one of its own fields is
+        # primitive -- this mirrors the real, still-unmerged
+        # cm-data-inference-4 shape of data_021015e4.c (a `typedef struct
+        # {...} Mgr...;` whose fields are all primitive char/int arrays,
+        # instantiated as `Mgr021015e4 data_021015e4 = {...};` with no
+        # brackets on the instance). Also proves the old field-order
+        # dependence is gone: several primitive BRACKETED fields appear
+        # before the real (bracket-less) named-struct declaration, and the
+        # fix must not stop at the first (primitive) match.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x110 kind:data\n"
+                "\n"
+                "src/main/data_021015e4.c:\n"
+                "    .data start:0x0 end:0x110\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_021015e4.c").write_text(
+                "typedef struct {\n"
+                "    int handle;\n"
+                "    char name[0x40];\n"
+                "    unsigned int reserved[7];\n"
+                "    void *userData;\n"
+                "} Mgr021015e4;\n"
+                "\n"
+                "Mgr021015e4 data_021015e4 = {\n"
+                "    -1, {0}, {0}, 0,\n"
+                "};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x110)
+
+    def test_named_struct_subtier_singleton_instance_of_a_primitive_type_stays_excluded(self):
+        # A bracket-less scalar declaration whose type IS primitive (e.g.
+        # `int data_x = 0;`) must NOT be misclassified as named-struct --
+        # guards the new bracket-less regex against over-matching plain
+        # scalar definitions.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x4 kind:data\n"
+                "\n"
+                "src/main/data_x.c:\n"
+                "    .data start:0x0 end:0x4\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_x.c").write_text("int data_x = 0;\n")
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
+    def test_named_struct_subtier_anonymous_struct_first_field_still_registers(self):
+        # Pins the pre-existing (coincidental, per the item's own
+        # diagnosis) path this item found while investigating the gap:
+        # mirrors the real, still-unmerged data_020b5a8c.c shape -- an
+        # anonymous `const struct {...} data_020b5a8c = {...};` instance
+        # whose first FIELD is itself a bracketed named-struct array
+        # (`Entry020b5a8c entries[7];`). This registered correctly even
+        # before this fix (via the array-bracket regex matching the field
+        # line), for a field-ordering reason unrelated to the bracket-less
+        # instance fix -- a regression guard, not new behaviour.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x2c kind:data\n"
+                "\n"
+                "src/main/data_020b5a8c.c:\n"
+                "    .data start:0x0 end:0x2c\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_020b5a8c.c").write_text(
+                "typedef struct {\n"
+                "    unsigned char id;\n"
+                "    short x;\n"
+                "} Entry020b5a8c;\n"
+                "\n"
+                "const struct {\n"
+                "    Entry020b5a8c entries[7];\n"
+                "    unsigned char tail[2];\n"
+                "} data_020b5a8c = {\n"
+                "    { {0} }, {0},\n"
+                "};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x2c)
+
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py
         # via json.dumps — the dict must survive the round-trip without
