@@ -319,7 +319,7 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
 
-### cm-ov002-unknown-sweep-4 — next size band [S] [TODO]
+### cm-ov002-unknown-sweep-4 — next size band [S] [CLAIMED]
 
 Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B). The decline is real and expected as size grows; 49% is still well worth sweeping. ov002 has 2,418 never-assessed candidates left. Take the next band up.
 
