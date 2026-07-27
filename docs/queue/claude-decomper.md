@@ -297,7 +297,7 @@ The prior sweep reversed 2 documented wall verdicts (`func_ov002_022abf88`, `fun
 
 **Gate:** `python tools/gate3.py --scope all` PASS + the three-way count check in the PR body.
 
-### q-fastmatch-selfheal-inflight — fix the 4th fastmatch.py gap: cross-candidate collision self-heal [CLAIMED]
+### q-fastmatch-selfheal-inflight — fix the 4th fastmatch.py gap: cross-candidate collision self-heal [DONE]
 
 `cm-ov002-unknown-sweep-2` (#1372) found a FOURTH `fastmatch.py` gap, independently hit by 4 of its 5 batches: the ninja-collision self-heal added in #1368 does not resolve a "multiple rules generate X" error when a DIFFERENT in-flight candidate caused it — it only recognizes a conflict matching the CURRENT candidate's own `.s` sibling, so it fails naming the wrong file and does not self-heal. One report adds a sharper detail: the self-heal's own successful-path cleanup (restore-sibling + reconfigure) can reintroduce the collision for whatever OTHER candidate is mid-draft at that moment. Four independent rediscoveries in one sweep is decisive evidence it is worth fixing rather than working around again.
 
