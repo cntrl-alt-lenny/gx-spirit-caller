@@ -22,9 +22,12 @@
  * non-pointer word at index 0 (0x19101915, matching the unreached-entry
  * pattern) followed by five 0x021cbXXX/0x021cdXXX values -- valid
  * addresses back into this same overlay's rodata, the same shape as
- * data_ov006_021cb680's proven entries. Kept as an opaque byte blob
- * (matching data_ov006_021cb518.c / data_ov006_021cb680.c convention)
- * since only the stride is evidenced, not a decoded per-entry meaning.
+ * data_ov006_021cb680's proven entries (cm-data-inference-6 confirmed
+ * and retyped data_ov006_021cb680 as int[22] on this exact reading, at
+ * its original address/size -- unchanged from when this comment was
+ * written). Kept as an opaque byte blob (matching data_ov006_021cb518.c
+ * convention) since only the stride is evidenced, not a decoded
+ * per-entry meaning.
  */
 
 const unsigned char data_ov006_021cb5f4[24] = {
