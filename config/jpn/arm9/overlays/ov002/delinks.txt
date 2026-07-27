@@ -11234,7 +11234,7 @@ src/jpn/overlay002/func_ov002_02297b2c.legacy_sp3.c:
 src/jpn/overlay002/func_ov002_02297b70.s:
     complete
     .text start:0x02297b70 end:0x02297bf8
-src/jpn/overlay002/func_ov002_02297bf8.s:
+src/jpn/overlay002/func_ov002_02297bf8.c:
     complete
     .text start:0x02297bf8 end:0x02297c58
 src/jpn/overlay002/func_ov002_02297c58.s:
