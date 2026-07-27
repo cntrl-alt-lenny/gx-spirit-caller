@@ -4,7 +4,6 @@
 
         .text
         .extern data_ov002_022c8368
-        .extern data_ov002_022c836c
         .extern data_ov002_022cd744
         .extern data_ov002_022d016c
         .extern func_ov002_021ae4bc
@@ -110,4 +109,4 @@ func_ov002_02264b84:
 _LIT0: .word data_ov002_022d016c
 _LIT1: .word data_ov002_022c8368
 _LIT2: .word data_ov002_022cd744
-_LIT3: .word data_ov002_022c836c
+_LIT3: .word data_ov002_022c8368+4
