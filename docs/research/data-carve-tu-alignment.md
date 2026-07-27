@@ -75,3 +75,39 @@ This is exactly as valid a carve as two separate files — declining to
 force a type onto the unevidenced remainder is still correct — it's
 only the *file* split, not the *symbol* split, that's unsafe at a
 non-4-byte boundary.
+
+## Only do this at a non-4-byte boundary — and watch same-TU ordering
+
+**Prefer two separate files whenever the split point *is* 4-byte
+aligned.** The same-TU merge above is a workaround for one specific
+problem (the linker's inter-object alignment gap); it is not free.
+
+Discovered in `cm-data-inference-6` (2026-07-27): merging
+`data_ov010_021b8908` (32 bytes) and `data_ov010_021b8928` (24 bytes)
+into one TU — at a boundary that *was* 4-byte aligned, so the merge
+wasn't actually required — produced a built ROM with the two globals'
+bytes **swapped**: the second declaration's content landed at the
+first declaration's address and vice versa. mwcc's `-O4,p` does not
+guarantee source-declaration order for multiple top-level `const`
+globals placed in the same `.rodata` section; it appears to reorder
+them by some internal heuristic (this session's one data point —
+a smaller/higher-element-alignment object placed before a
+larger/lower-alignment one — is consistent with either "smallest
+first" or "highest alignment requirement first" and doesn't
+disambiguate the two). Caught by `dsd rom extract` on the built ROM
+plus a direct byte diff against the baserom, not by SHA1 pass/fail
+alone (SHA1 only tells you *something* is wrong, not *what*).
+
+Reordering within a merged TU is **not a lever available from C
+source** — changing declaration order did not change the built
+layout order in the one case tested.
+
+**Revised rule:**
+- Boundary is a multiple of 4 → use two separate files (two
+  `delinks.txt` entries). No ordering risk, no linker gap risk.
+- Boundary is *not* a multiple of 4 → same-TU merge is the only known
+  safe option, but after merging, **do not assume declaration order
+  survives compilation** — verify the built layout directly (`dsd rom
+  extract` + byte diff against the baserom for the touched module, or
+  `dsd check symbols` bisection) rather than trusting a clean `ninja
+  sha1` pass on the first try alone.
