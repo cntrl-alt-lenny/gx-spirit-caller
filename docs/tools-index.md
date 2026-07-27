@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**120 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**121 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (4)
+- [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (49)
@@ -288,6 +288,12 @@ Brief 066 deliverable: a reproducible way to vendor the three target upstream de
 ## Hygiene / invariants
 
 _Pre-flight sanity checks. Run locally before pushing and in CI on every PR._
+
+### `tools/check_activation_invariant.py`
+
+**mechanically gate sweep bookkeeping.**
+
+Failure mode (a real off-by-one on an earlier sweep): a PR can add one more ``.c`` than it deletes ``.s`` or flips in ``delinks.txt``.  The ROM can still build byte-correct because the build graph has a filename fallback, so ``ninja sha1…
 
 ### `tools/check_ci_contract.py`
 

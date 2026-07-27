@@ -187,3 +187,9 @@ The brain hand-drives every merge round: ~10-15 serial git merges into brain/int
 The Typed-array metric (progress.py:49 _DATA_ARRAY_DECL_RE, :454) matches the opaque carve placeholder `unsigned char data_X[N]=` IDENTICALLY to a real struct array, so summarize_data_readability's 1.69% holds 0 BYTES of genuinely struct-typed data — retyping (cm-data-canary) would move it by ZERO. Add a named-struct sub-tier that EXCLUDES primitive-element arrays (unsigned char/int etc.) and counts only real `StructName foo[N]` typed data. Land it BEFORE the data-retype chapter scales, or the whole lane is invisible + unscorable.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + the new tier reports 0 now and >0 after cm-data-canary lands + a test.
+
+### q-activation-invariant-gate — make the three-way count a real gate [DONE]
+
+Build `tools/check_activation_invariant.py` to mechanically check a git range: added `func_*.c` files under `src/`, deleted `func_*.s` files, and delinks activation flips. Allow routing suffixes (`.legacy.c` / `.legacy_sp3.c`) and report data-file additions separately as informational. Add synthetic failure tests and verify PR #1372 and PR #1376 ranges.
+
+**Gate:** synthetic missing activation exits non-zero; PR #1372 and PR #1376 ranges exit zero; `python -m pytest -q tests` no-new-failures.
