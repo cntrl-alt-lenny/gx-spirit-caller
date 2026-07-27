@@ -1,7 +1,27 @@
-/* Cluster C Pattern 1 — data_ov002_022c8ff0 (32 bytes). */
+/* data_ov002_022c8ff0 (32 bytes, 4-aligned): retyped from opaque bytes to
+ * a typed struct array as part of cm-data-inference-8. One of the same 8
+ * near-identical "card-ID -> handler-pointer pair" tables documented in
+ * data_ov002_022c9038.c (siblings: _022c86b8/_022c9250/_022c89a0/_022c9010/
+ * _022c9508/_022c9ad0).
+ *
+ * The Ov002CardHandlerRecord type matches the one already shipped in
+ * data_ov002_022c9038.c/_022c9ad0.c/_022c89a0.c verbatim -- one semantic
+ * record shape, independently redeclared per TU per this codebase's
+ * existing convention (no shared header). Pointer field emitted as a raw
+ * (void *)0x... literal-address cast (same reasoning as every other table
+ * in this family -- avoids the &symbol/.data placement bug). Byte content
+ * is an exact reinterpretation of the same bytes previously shipped as
+ * `const unsigned char data_ov002_022c8ff0[32]`, mechanically parsed out
+ * of the previous literal, never hand-transcribed.
+ */
+typedef struct {
+    unsigned int cardId;  /* offset 0x0 */
+    void *handler;         /* offset 0x4 */
+} Ov002CardHandlerRecord;
 
-const unsigned char data_ov002_022c8ff0[32] = {
-    0xce, 0x16, 0x00, 0x00, 0x98, 0x17, 0x29, 0x02, 0xf2, 0x15, 0x00, 0x00,
-    0x10, 0x18, 0x29, 0x02, 0xe3, 0x14, 0x00, 0x00, 0x10, 0x18, 0x29, 0x02,
-    0xbf, 0x12, 0x00, 0x00, 0x10, 0x18, 0x29, 0x02,
+const Ov002CardHandlerRecord data_ov002_022c8ff0[4] = {
+    { 0x16ce, (void *)0x02291798 },
+    { 0x15f2, (void *)0x02291810 },
+    { 0x14e3, (void *)0x02291810 },
+    { 0x12bf, (void *)0x02291810 },
 };

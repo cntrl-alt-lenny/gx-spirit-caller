@@ -1,8 +1,22 @@
-/* Cluster C Pattern 1 — data_ov016_021b8e34 (40 bytes). */
+/* data_ov016_021b8e34 (40 bytes, 4-aligned): retyped from opaque bytes to
+ * a struct{short a,b,c,d}[5] record table as part of cm-data-inference-8.
+ * Byte-identical to sibling data_ov019_021b5a28 (same 4-field/8-byte-stride
+ * record shape, same computed-stride evidence class already shipped for
+ * ov006/ov017/ov019 in this campaign) -- likely a shared duel-field-layout
+ * table reused verbatim across overlays.
+ */
 
-const unsigned char data_ov016_021b8e34[40] = {
-    0xe8, 0x00, 0x1c, 0x00, 0x00, 0x01, 0x88, 0x00, 0xe8, 0x00, 0x08, 0x00,
-    0x00, 0x01, 0x1c, 0x00, 0xe8, 0x00, 0x83, 0x00, 0x00, 0x01, 0x97, 0x00,
-    0xe8, 0x00, 0x1d, 0x00, 0x00, 0x01, 0x30, 0x00, 0xe8, 0x00, 0x6f, 0x00,
-    0x00, 0x01, 0x83, 0x00,
+typedef struct {
+    short a;
+    short b;
+    short c;
+    short d;
+} Row021b8e34;
+
+const Row021b8e34 data_ov016_021b8e34[5] = {
+    { 232, 28,  256, 136 },
+    { 232, 8,   256, 28 },
+    { 232, 131, 256, 151 },
+    { 232, 29,  256, 48 },
+    { 232, 111, 256, 131 },
 };

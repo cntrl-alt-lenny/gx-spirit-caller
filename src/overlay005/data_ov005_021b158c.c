@@ -1,8 +1,15 @@
-/* Cluster C Pattern 1 wave 3 — data_ov005_021b158c (40 bytes, 4-aligned). */
+/* data_ov005_021b158c (40 bytes, 4-aligned): retyped from opaque bytes to
+ * a signed short[5][4] record table as part of cm-data-inference-8.
+ * Columns 0/2 are constant (226/249) across all 5 rows, matching the same
+ * evidence class as the sibling record families already shipped in ov006/
+ * ov016/ov017/ov019 (cm-data-inference-6/7/8): computed-stride, runtime-
+ * variable-indexed loop over 4-halfword records.
+ */
 
-const unsigned char data_ov005_021b158c[40] = {
-    0xe2, 0x00, 0x2c, 0x00, 0xf9, 0x00, 0x74, 0x00, 0xe2, 0x00, 0x19, 0x00,
-    0xf9, 0x00, 0x2c, 0x00, 0xe2, 0x00, 0x75, 0x00, 0xf9, 0x00, 0x88, 0x00,
-    0xe2, 0x00, 0x2c, 0x00, 0xf9, 0x00, 0x3f, 0x00, 0xe2, 0x00, 0x62, 0x00,
-    0xf9, 0x00, 0x74, 0x00,
+const short data_ov005_021b158c[5][4] = {
+    { 226, 44, 249, 116 },
+    { 226, 25, 249, 44 },
+    { 226, 117, 249, 136 },
+    { 226, 44, 249, 63 },
+    { 226, 98, 249, 116 },
 };
