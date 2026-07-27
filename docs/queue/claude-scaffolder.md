@@ -647,7 +647,7 @@ A real implementation bug this wave: the first build failed `ninja sha1` outrigh
 Full writeup and the transcription-bug postmortem: `docs/research/data/cm-data-inference-11-2026-07-27.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed, full pytest green — 3100 passed, 15 skipped, 0 failed). `Named-struct`: 44,488 → 44,592 bytes (0.93% → 0.93%). Hit rate: 6/8 fresh-batch investigations shipped (75%).
 
-### cm-data-inference-12 — data wave 12 — fresh census [TODO]
+### cm-data-inference-12 — data wave 12 — fresh census [CLAIMED]
 
 No specific carried-over lead. Re-run the live opaque-blob census fresh (same grep as every prior wave's item) across `main` + all overlays — expect a very thin pool (wave 11 found only 3 genuinely fresh candidates out of 28). If the fresh batch is too thin to fill a normal wave, follow wave 11's example: mix in revisits of older WEAK/CONTRADICTION declines under the current (partial-struct, build-config-exclusion) standard rather than padding with a small fresh-only batch. One standing optional item remains: `data_020b46b8`'s USA/JPN region-override files (see wave 9/10 entries — not EUR-blocking).
 
