@@ -2639,7 +2639,7 @@ src/usa/main/func_02024280.s:
 src/usa/main/func_02024314.s:
     complete
     .text start:0x02024314 end:0x020243dc
-src/usa/main/func_020243dc.s:
+src/usa/main/func_020243dc.c:
     complete
     .text start:0x020243dc end:0x02024494
 src/usa/main/func_02024494.s:
