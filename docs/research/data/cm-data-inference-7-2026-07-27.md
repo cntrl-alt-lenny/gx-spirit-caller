@@ -114,12 +114,12 @@ precedent wave 6 had *already* set for exactly this situation
 as generalizable.
 
 **2. Within a pointer type, whether `const` binds to the pointer or the
-pointee changes the section placement outcome, independent of finding
-#1.** `const void *arr[N]` (pointer-to-const, pointer itself mutable)
-and `void *const arr[N]` (const pointer, pointee mutable) are different
-C types, and only the latter reliably produces `.rodata` output on this
-compiler — even after switching to literal casts (finding #1's fix
-alone), the pointer-table files still linked with a `.data`-not-written
+pointee changes the section placement outcome, independent of the
+first finding.** `const void *arr[N]` (pointer-to-const, pointer itself
+mutable) and `void *const arr[N]` (const pointer, pointee mutable) are
+different C types, and only the latter reliably produces `.rodata`
+output on this compiler — even after switching to literal casts (the
+first fix alone), the pointer-table files still linked with a `.data`-not-written
 warning until the `const` was moved to the correct side of the `*`.
 Caught via `mwldarm`'s own link-time warning
 (`.data(.data) in file X.o is referenced but has not been written`),
