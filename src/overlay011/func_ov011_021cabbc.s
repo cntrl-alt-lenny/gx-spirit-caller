@@ -4,7 +4,7 @@
 
         .text
         .extern data_ov011_021d3060
-        .extern data_ov011_021d3177
+        .extern data_ov011_021d3138
         .extern data_ov011_021d403c
         .extern func_020139b4
         .extern func_0201a3ec
@@ -98,4 +98,4 @@ func_ov011_021cabbc:
     ldmia sp!, {r3, r4, r5, r6, r7, pc}
 _LIT0: .word data_ov011_021d403c
 _LIT1: .word data_ov011_021d3060
-_LIT2: .word data_ov011_021d3177
+_LIT2: .word data_ov011_021d3138+0x3f

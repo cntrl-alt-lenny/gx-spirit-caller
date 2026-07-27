@@ -65,7 +65,9 @@ the summary banner; pytest 3062 passed / 15 skipped, 0 failed).
 
 Lesson for future carves: **a multi-file split at a non-4-byte-aligned
 boundary is not safe in this toolchain; keep such splits inside one TU
-instead.** `ninja check` (dsd's module/symbol consistency check)
+instead.** Promoted to a standing rule (not just this wave's own
+incident report): see `docs/research/data-carve-tu-alignment.md` and
+the queue header's own "DATA-CARVE TU ALIGNMENT" note. `ninja check` (dsd's module/symbol consistency check)
 separately shows pre-existing, unrelated noise in modules this wave
 never touched (e.g. overlay 4) — confirmed via `gate3.py`'s own source
 that `ninja check`/`check_match_invariants.py` are explicitly
