@@ -1956,7 +1956,7 @@ src/jpn/overlay002/func_ov002_021de944.c:
 src/jpn/overlay002/func_ov002_021de958.s:
     complete
     .text start:0x021de958 end:0x021de9d8
-src/jpn/overlay002/func_ov002_021de9d8.s:
+src/jpn/overlay002/func_ov002_021de9d8.c:
     complete
     .text start:0x021de9d8 end:0x021dea38
 src/jpn/overlay002/func_ov002_021dea38.s:
