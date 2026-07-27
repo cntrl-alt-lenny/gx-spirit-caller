@@ -670,7 +670,7 @@ Waves 2 through 12 have worked through every opaque `unsigned char[N]` blob the 
 
 If a future session wants to continue this line of work, it needs a **different discovery angle**, not a re-run of the same census — for example: scanning for opaque data that was never part of the original "Cluster C/D" mechanical carve batch at all (a different category, likely needing its own identification method), auditing already-shipped retypes for correctness now that the method has matured (several early-wave ships used older/weaker evidence standards than waves 8-12), or picking a completely different queue item. `python tools/work_queue.py next claude-scaffolder` will fall through to whatever else is queued, if anything.
 
-### cm-data-inference-13 — the untagged Cluster-C pool in src/overlay004/data/ [TODO] [S]
+### cm-data-inference-13 — the untagged Cluster-C pool in src/overlay004/data/ (priority S) [CLAIMED]
 
 Re-derived fresh via `grep -rlE "^(static )?(const )?unsigned char data_[0-9a-zA-Z_]+\[[0-9]+\] = \{" --include="*.c" src/main src/overlay*` (properly recursive this time — see the correction/standing-rule above): **66 total matches, 24 already conclusively assessed across waves 2-12, 42 genuinely fresh** — every one of them in `src/overlay004/data/`, an overlay never touched by this campaign before. Re-derive this count yourself before trusting it; this campaign's own handed-down counts have been wrong every single wave, including this one's first attempt.
 
