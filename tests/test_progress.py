@@ -904,6 +904,194 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["named_struct_bytes"], 0x1344)  # 672 + 4260, primitive array excluded
         self.assertEqual(metric["typed_array_bytes"], 0x1354)   # all 3 arrays count for the broad tier
 
+    def test_named_struct_subtier_skips_extern_declarations(self):
+        # Regression test for q-metric-extern-guard gap (1): an `extern`
+        # array declaration is a forward reference to bytes a DIFFERENT TU
+        # owns. Before the fix, the type-clause capture treated `extern` as
+        # just another unrecognised (thus "non-primitive") token, so a TU
+        # whose ONLY array-shaped declaration is `extern SomeStruct foo[4];`
+        # got miscounted as owning named-struct bytes even though it makes
+        # no claim about the type of ITS OWN data.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x10 kind:data\n"
+                "\n"
+                "src/main/func_foo.c:\n"
+                "    .data start:0x0 end:0x10\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "func_foo.c").write_text(
+                "extern SomeStruct foo[4];\n"
+                "int func_foo(void) { return foo[0].x; }\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
+    def test_named_struct_subtier_finds_a_later_declaration_past_a_primitive_first_one(self):
+        # Regression test for q-metric-extern-guard gap (2): `.search()` is
+        # first-match-only, so a TU declaring a primitive array BEFORE a
+        # named-struct one (real ordering seen in ~43 EUR TUs) silently
+        # dropped the second declaration from named_struct_bytes entirely.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x10 kind:data\n"
+                "\n"
+                "src/main/func_bar.c:\n"
+                "    .data start:0x0 end:0x10\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "func_bar.c").write_text(
+                "static int lookup[4] = {0};\n"
+                "struct Bar data_bar[2] = {{0}, {0}};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x10)
+
+    def test_named_struct_subtier_treats_widened_primitive_spellings_as_primitive(self):
+        # Regression test for q-metric-extern-guard gap (3): stdint.h
+        # `_t`-suffixed widths and the NitroSDK-style vu8/vu16/vu32/fx16/
+        # fx32/BOOL spellings must count as primitive, not as an
+        # unrecognised (thus named-struct-like) type.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            delinks_lines = ["    .data start:0x0 end:0x60 kind:data\n", "\n"]
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            spellings = [
+                ("uint32_t", "data_a"), ("int8_t", "data_b"),
+                ("vu16", "data_c"), ("fx32", "data_d"), ("BOOL", "data_e"),
+            ]
+            offset = 0
+            for c_type, name in spellings:
+                delinks_lines.append(f"src/main/{name}.c:\n")
+                delinks_lines.append(
+                    f"    .data start:0x{offset:x} end:0x{offset + 0x10:x}\n")
+                (source_dir / f"{name}.c").write_text(f"{c_type} {name}[4] = {{0}};\n")
+                offset += 0x10
+            (config / "delinks.txt").write_text("".join(delinks_lines))
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
+    def test_named_struct_subtier_matches_a_bracket_less_singleton_struct_instance(self):
+        # Regression test for q-metric-singleton-struct-gap. A single
+        # struct INSTANCE (no `[N]` on the symbol itself) is invisible to
+        # the array-only regex even when every one of its own fields is
+        # primitive -- this mirrors the real, still-unmerged
+        # cm-data-inference-4 shape of data_021015e4.c (a `typedef struct
+        # {...} Mgr...;` whose fields are all primitive char/int arrays,
+        # instantiated as `Mgr021015e4 data_021015e4 = {...};` with no
+        # brackets on the instance). Also proves the old field-order
+        # dependence is gone: several primitive BRACKETED fields appear
+        # before the real (bracket-less) named-struct declaration, and the
+        # fix must not stop at the first (primitive) match.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x110 kind:data\n"
+                "\n"
+                "src/main/data_021015e4.c:\n"
+                "    .data start:0x0 end:0x110\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_021015e4.c").write_text(
+                "typedef struct {\n"
+                "    int handle;\n"
+                "    char name[0x40];\n"
+                "    unsigned int reserved[7];\n"
+                "    void *userData;\n"
+                "} Mgr021015e4;\n"
+                "\n"
+                "Mgr021015e4 data_021015e4 = {\n"
+                "    -1, {0}, {0}, 0,\n"
+                "};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x110)
+
+    def test_named_struct_subtier_singleton_instance_of_a_primitive_type_stays_excluded(self):
+        # A bracket-less scalar declaration whose type IS primitive (e.g.
+        # `int data_x = 0;`) must NOT be misclassified as named-struct --
+        # guards the new bracket-less regex against over-matching plain
+        # scalar definitions.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x4 kind:data\n"
+                "\n"
+                "src/main/data_x.c:\n"
+                "    .data start:0x0 end:0x4\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_x.c").write_text("int data_x = 0;\n")
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0)
+
+    def test_named_struct_subtier_anonymous_struct_first_field_still_registers(self):
+        # Pins the pre-existing (coincidental, per the item's own
+        # diagnosis) path this item found while investigating the gap:
+        # mirrors the real, still-unmerged data_020b5a8c.c shape -- an
+        # anonymous `const struct {...} data_020b5a8c = {...};` instance
+        # whose first FIELD is itself a bracketed named-struct array
+        # (`Entry020b5a8c entries[7];`). This registered correctly even
+        # before this fix (via the array-bracket regex matching the field
+        # line), for a field-ordering reason unrelated to the bracket-less
+        # instance fix -- a regression guard, not new behaviour.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x2c kind:data\n"
+                "\n"
+                "src/main/data_020b5a8c.c:\n"
+                "    .data start:0x0 end:0x2c\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_020b5a8c.c").write_text(
+                "typedef struct {\n"
+                "    unsigned char id;\n"
+                "    short x;\n"
+                "} Entry020b5a8c;\n"
+                "\n"
+                "const struct {\n"
+                "    Entry020b5a8c entries[7];\n"
+                "    unsigned char tail[2];\n"
+                "} data_020b5a8c = {\n"
+                "    { {0} }, {0},\n"
+                "};\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["named_struct_bytes"], 0x2c)
+
     def test_summarize_delinks_output_is_json_serialisable(self):
         # CI pipes summarize_delinks output into update_progress_badge.py
         # via json.dumps — the dict must survive the round-trip without

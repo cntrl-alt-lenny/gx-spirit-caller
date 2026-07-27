@@ -1,3 +1,10 @@
 # ninja_syntax is vendored at tools/ninja_syntax.py (Apache-2.0, © 2011 Google)
 requests
 pyperclip
+# PyYAML: tools/check_ci_contract.py parses .github/workflows/*.yml to prove
+# every REQUIRED status check can actually report (see PR #1365 — a required
+# check with a `paths:` filter never reports, so the PR blocks forever).
+# Deliberately a real parser rather than a regex: a subtly wrong parse would
+# make that gate confidently wrong, which is the exact failure class it exists
+# to remove. Added 2026-07-26; the first and so far only yaml consumer here.
+PyYAML

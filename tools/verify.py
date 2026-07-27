@@ -54,11 +54,19 @@ _CFLAGS = (
     "-O4,p -enum int -char signed -str noreuse -proc arm946e -gccext,on "
     "-fp soft -inline noauto -Cpp_exceptions off -RTTI off -interworking "
     "-w off -sym on -gccinc -nolink -msgstyle gcc -i include "
-    "-i libs/runtime/include -i libs/nitro/include -lang=c -d eur"
+    "-i libs/runtime/include -i libs/nitro/include -lang=c99 -d eur"
 ).split()
 
 _HDR = re.compile(r"^[0-9a-f]+ <(\S+)>:")
-_INSN = re.compile(r"^\s+([0-9a-f]+):\s+([0-9a-f]{8})\s")
+# Thumb instructions disassemble as 4 hex digits (2 bytes), ARM ones and
+# literal-pool .word entries as 8 (4 bytes) -- try 8 first so a pool word
+# inside an otherwise-Thumb function isn't mis-split into two 4-digit
+# halves. Brief 683 (cm-sm64ds-lever-apply): the 8-digit-only version of
+# this regex silently produced an EMPTY word list for both sides of a
+# Thumb-mode comparison, so `compare_words([], [])` reported a false
+# `OBJDIFF 100% (0 insns)` for every Thumb candidate instead of ever
+# actually comparing them.
+_INSN = re.compile(r"^\s+([0-9a-f]+):\s+([0-9a-f]{8}|[0-9a-f]{4})\s")
 _RELOC = re.compile(r"^\s+([0-9a-f]+):\s+R_ARM")
 
 

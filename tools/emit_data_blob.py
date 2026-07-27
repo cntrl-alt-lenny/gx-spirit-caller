@@ -146,12 +146,18 @@ def module_binary_and_base(version: str, overlay: str | None) -> tuple[Path, int
     overlay_id = int(overlay[2:])
     ov_dir = ROOT / "extract" / version / "arm9_overlays"
     yaml_path = ov_dir / "overlays.yaml"
-    bin_path = ov_dir / f"overlay{overlay_id:04d}.bin"
+    # dsd's real convention (confirmed against the actual extract/ tree,
+    # and against containment_check.py / cross_region_cluster_apply.py /
+    # predict_walls.py, which all agree) is the short `ov{id:03d}.bin`
+    # form -- try that first, then the older `overlay{id:04d}.bin` guess
+    # this function originally assumed, then a glob as a last resort so a
+    # real mismatch is reported precisely instead of just "file not found"
+    # on a guessed name.
+    bin_path = ov_dir / f"ov{overlay_id:03d}.bin"
     if not bin_path.is_file():
-        # dsd's extracted overlay bin naming has varied historically; fall
-        # back to a glob so a real mismatch is reported precisely instead
-        # of just "file not found" on a guessed name.
-        candidates = sorted(ov_dir.glob(f"overlay{overlay_id:04d}*.bin"))
+        bin_path = ov_dir / f"overlay{overlay_id:04d}.bin"
+    if not bin_path.is_file():
+        candidates = sorted(ov_dir.glob(f"*{overlay_id:03d}*.bin"))
         if not candidates:
             raise BlobError(f"no overlay bin for {overlay} under {ov_dir}")
         bin_path = candidates[0]

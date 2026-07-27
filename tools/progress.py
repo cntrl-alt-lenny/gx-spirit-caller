@@ -60,21 +60,37 @@ _DATA_ARRAY_DECL_TYPE_CAPTURE_RE = re.compile(
     r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+)"
     r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
 
-# Narrow sub-tier for actual arrays of a named (non-primitive) element type.
-# The broad metric above intentionally retains historical coverage,
-# including opaque ``unsigned char data_*[N]`` carve placeholders. This is
-# the actionable typed-data tier: primitive-element arrays cannot count
-# here. Classified by EXCLUSION rather than requiring the literal `struct`
-# keyword, since this repo declares struct types by bare typedef name
-# (`const CharParam data_020b5b80[96]` has no `struct` token at the
+# Same idea as _DATA_ARRAY_DECL_TYPE_CAPTURE_RE, but for a scalar/struct
+# INSTANCE declaration with no array bracket at all (`Type name = {...};`
+# / `Type name;`). A single struct instance never has `[N]` on its own
+# symbol, so it's invisible to the array-only regex above even when its
+# type is a genuine named struct -- see q-metric-singleton-struct-gap.
+_DATA_SCALAR_DECL_TYPE_CAPTURE_RE = re.compile(
+    r"(?m)^\s*((?:(?:static|const|volatile|unsigned|signed|long|short|"
+    r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+)"
+    r"[A-Za-z_]\w*\s*(?:=|;)")
+
+# Narrow sub-tier for actual data of a named (non-primitive) type --
+# either an array-of-struct or a single struct/typedef'd INSTANCE (no
+# array bracket at all). The broad metric above intentionally retains
+# historical coverage, including opaque ``unsigned char data_*[N]`` carve
+# placeholders. This is the actionable typed-data tier: primitive-element
+# declarations cannot count here. Classified by EXCLUSION rather than
+# requiring the literal `struct` keyword, since this repo declares struct
+# types by bare typedef name (`const CharParam data_020b5b80[96]` has no
+# `struct` token at the
 # declaration site) — a keyword requirement misses every such array.
 _PRIMITIVE_TYPE_TOKENS = {
     "static", "const", "volatile",
     "void", "char", "short", "int", "long", "float", "double",
     "signed", "unsigned", "bool", "_Bool",
     "u8", "u16", "u32", "u64", "s8", "s16", "s32", "s64",
+    "vu8", "vu16", "vu32", "fx16", "fx32", "BOOL",
 }
-_PRIMITIVE_WIDTH_RE = re.compile(r"^u?int\d*$")
+# `\d*` (zero-or-more) covers bare `int`/`uint` plus `int8`/`uint32`/etc; the
+# second alternative separately covers the stdint.h `_t`-suffixed spellings
+# (`uint32_t`), which require at least one digit before `_t`.
+_PRIMITIVE_WIDTH_RE = re.compile(r"^u?int\d*$|^u?int\d+_t$")
 
 
 def _is_primitive_type_clause(type_clause: str) -> bool:
@@ -88,6 +104,22 @@ def _is_primitive_type_clause(type_clause: str) -> bool:
         tok in _PRIMITIVE_TYPE_TOKENS or _PRIMITIVE_WIDTH_RE.match(tok)
         for tok in type_clause.split()
     )
+
+
+def _tu_has_named_struct_decl(source_text: str) -> bool:
+    """True if `source_text` contains at least one non-extern, file-scope
+    declaration (array-bracketed OR a bracket-less scalar/struct instance)
+    whose type clause is not primitive. Checks every match from both
+    regexes rather than stopping at the first, since a TU can mix a
+    primitive declaration with a later named-struct one in either order.
+    """
+    for pattern in (_DATA_ARRAY_DECL_TYPE_CAPTURE_RE, _DATA_SCALAR_DECL_TYPE_CAPTURE_RE):
+        for type_match in pattern.finditer(source_text):
+            if "extern" in type_match.group(1).split():
+                continue
+            if not _is_primitive_type_clause(type_match.group(1)):
+                return True
+    return False
 
 
 def count_functions_in_symbols(symbols_file: Path) -> int:
@@ -462,6 +494,24 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
     counts too, since ``struct``/``union``/``enum`` were never added to the
     primitive set. Both walks use the same module-level delinks ranges as
     the existing data% fallback.
+
+    The named_struct_bytes walk (`_tu_has_named_struct_decl`) checks every
+    declaration in a TU (`finditer`, not `.search()`'s first-match-only)
+    -- a TU can mix a primitive declaration with a later named-struct one,
+    and stopping at the first match would silently miss the second. It
+    also skips any declaration whose type clause contains `extern`: an
+    extern declaration is a forward reference to bytes a DIFFERENT TU
+    owns, so its presence says nothing about the type of bytes THIS TU
+    itself owns. It checks BOTH an array-bracketed declaration
+    (`Type name[N]`) and a bracket-less scalar/struct INSTANCE declaration
+    (`Type name = {...};` / `Type name;`) -- a single struct instance never
+    carries `[N]` on its own symbol, so the array-only regex alone is
+    blind to it even when its type is a genuine named struct (see
+    q-metric-singleton-struct-gap). This means named_struct_bytes is no
+    longer strictly a subset of typed_array_bytes: a TU whose only
+    qualifying declaration is a bracket-less named-struct instance
+    contributes 0 to typed_array_bytes (it has no array at all) but
+    nonzero to named_struct_bytes.
     """
     named_symbols = placeholder_symbols = 0
     for symbols_file in config_dir.rglob("symbols.txt"):
@@ -503,8 +553,7 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
             )
             if _DATA_ARRAY_DECL_RE.search(source_text):
                 typed_array_bytes += data_bytes
-            type_match = _DATA_ARRAY_DECL_TYPE_CAPTURE_RE.search(source_text)
-            if type_match and not _is_primitive_type_clause(type_match.group(1)):
+            if _tu_has_named_struct_decl(source_text):
                 named_struct_bytes += data_bytes
 
     total_symbols = named_symbols + placeholder_symbols

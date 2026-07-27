@@ -4167,6 +4167,8 @@ data_020b4340 kind:data(any) addr:0x020b4340
 data_020b4348 kind:data(any) addr:0x020b4348
 data_020b4350 kind:data(any) addr:0x020b4350
 data_020b4680 kind:data(any) addr:0x020b4680
+data_020b46a0 kind:data(any) addr:0x020b46a0
+data_020b46b8 kind:data(any) addr:0x020b46b8
 data_020b46e0 kind:data(any) addr:0x020b46e0
 data_020b4728 kind:data(any) addr:0x020b4728
 data_020b4748 kind:data(any) addr:0x020b4748

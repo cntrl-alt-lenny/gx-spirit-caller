@@ -98,6 +98,39 @@ class SpanFix(unittest.TestCase):
         self.assertEqual(len(strip_pool_tail(ws)), 8)  # 2 reloc'd pool words dropped
 
 
+class ThumbSupport(unittest.TestCase):
+    """Brief 683 (cm-sm64ds-lever-apply): Thumb instructions disassemble as
+    4 hex digits, not 8. The 8-digit-only regex silently parsed BOTH sides
+    of a Thumb comparison as empty, so `compare_words([], [])` reported a
+    false `OBJDIFF 100%` for every Thumb candidate instead of ever actually
+    comparing them."""
+
+    _THUMB = """\
+00000000 <func_020947b8>:
+   0:\t2100      \tmovs\tr1, #0
+   2:\t2200      \tmovs\tr2, #0
+   4:\t2300      \tmovs\tr3, #0
+   6:\tc00e      \tstmia\tr0!, {r1, r2, r3}
+   8:\tc00e      \tstmia\tr0!, {r1, r2, r3}
+   a:\tc00e      \tstmia\tr0!, {r1, r2, r3}
+   c:\t4770      \tbx\tlr
+"""
+
+    def test_thumb_instructions_are_not_dropped(self):
+        ws = parse_words(self._THUMB, "func_020947b8")
+        self.assertEqual(len(ws), 7)  # the bug gave 0
+
+    def test_thumb_mismatch_is_actually_caught(self):
+        """A real divergence between two Thumb functions must be detected,
+        not masked as a false empty-vs-empty match."""
+        mine = parse_words(self._THUMB, "func_020947b8")
+        orig_text = self._THUMB.replace("2300      \tmovs\tr3, #0",
+                                         "2301      \tmovs\tr3, #1")
+        orig = parse_words(orig_text, "func_020947b8")
+        ok, diffs = compare_words(mine, orig)
+        self.assertFalse(ok)
+
+
 class CompareSemantics(unittest.TestCase):
     def test_relocs_are_wildcards(self):
         """Differing pool targets (both reloc'd) must compare equal."""

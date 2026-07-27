@@ -271,9 +271,6 @@ COORDINATION: the scaffolder's data lane is also in overlay002 but only touches 
 
 ### q-fastmatch-sweep-friction — fix the 3 fastmatch.py gaps cm-ov002-unknown-sweep's sweep flagged [DONE]
 
-> DONE: PR #1368 (not yet merged as of this branch — patched locally,
-> same staleness gap as cm-sm64ds-lever-apply above).
-
 PR #1363's 5-worktree sweep hit three real `tools/fastmatch.py` gaps, worked around all three, and shipped the workarounds as prose instead of fixes — that's pure repeated cost for the next lane. Fix the tool itself this round:
 
 (a) **Gap-object auto-discovery never finds anything for an individually-carved `.s` file.** `find_gap_by_glob` only matches `_dsd_gap@<module>_*.o` — dsd only emits those for genuinely-unassigned regions, never for a whole-function candidate that already has its own per-function delinked reference object at `build/<region>/delinks/<src-path>/<func>.o`. Confirmed independently by 3 of 5 sweep batches, none of which could rely on it. Fix it (resolve via the delinked-object path instead) or delete the auto-discovery path entirely — a feature that never works and is always bypassed is worse than no feature.
@@ -288,15 +285,11 @@ ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat un
 
 ### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [CLAIMED]
 
-> IN PROGRESS, uploaded partial (2026-07-26): session stopped by request before
-> finishing. 4 of 5 worktree batches complete and merged (77/116 attempted
-> shipped, PR pending); batch 2/5 (29 candidates) is unfinished and its
-> worktree `sweep2-2` / branch `claude/cm-ov002-unknown-sweep-2-2` was
-> deliberately excluded from the merge (still being written to when stopped).
-> `gate3.py --scope all --clean` was started but not confirmed complete before
-> upload. See `docs/research/cm-ov002-unknown-sweep-2-2026-07-26.md` for the
-> full state and what's left. Whoever resumes: finish/redo batch 2, confirm
-> the gate, then mark DONE.
+> IN PROGRESS (2026-07-26): 5 of 5 worktree batches now complete and
+> merged (95/145 shipped, PR #1372). See
+> `docs/research/cm-ov002-unknown-sweep-2-2026-07-26.md` for the full
+> state; being finalized (gate confirmation + codegen-walls.md entries)
+> in the same PR.
 
 `cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
 
