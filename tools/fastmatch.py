@@ -862,7 +862,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--verbose",
         action="store_true",
-        help="Show first 8 differing words for non-100% matches",
+        help="Show first 8 differing words for non-100%% matches",
     )
     args = ap.parse_args(argv)
 
