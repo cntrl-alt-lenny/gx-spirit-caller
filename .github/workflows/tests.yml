@@ -9,12 +9,20 @@ name: Tests
 # and classifies correctly. If this fails, the analyzer workflow would
 # be dropping garbage into PR comments.
 
+# The `.github/**` entries are load-bearing, not tidiness:
+# tests/test_check_ci_contract.py asserts that every REQUIRED status check
+# resolves to a job in a workflow that runs on every PR. Without those paths
+# this suite would not run on the very PR that adds a `paths:` filter to
+# lint.yml or generated-files-drift.yml, or that edits the required-check
+# contract — i.e. the checker would carry the exact blind spot it detects
+# (PR #1365). Keep them whenever that test exists.
 on:
   pull_request:
     paths:
       - 'tests/**'
       - 'tools/**.py'
-      - '.github/workflows/tests.yml'
+      - '.github/workflows/**'
+      - '.github/required-checks.txt'
   push:
     branches: [main]
     paths:
