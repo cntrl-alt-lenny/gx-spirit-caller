@@ -20,6 +20,7 @@ from generate_research_index import (  # noqa: E402
     INDEX_PATH,
     RESEARCH_DIR,
     _truncate_balanced,
+    collect_notes,
     parse_research_note,
     render_index,
 )
@@ -40,7 +41,7 @@ class TestParseResearchNote(unittest.TestCase):
             )
             parsed = parse_research_note(path)
             self.assertIsNotNone(parsed)
-            self.assertEqual(parsed["filename"], "ov006-cluster-stuck.md")
+            self.assertEqual(parsed["relpath"], "ov006-cluster-stuck.md")
             self.assertEqual(parsed["heading"], "ov006-cluster-stuck")
             self.assertIn("brain noted", parsed["summary"])
             self.assertIn("clusters", parsed["summary"])
@@ -169,11 +170,38 @@ class TestParseResearchNote(unittest.TestCase):
             self.assertIn("Status", parsed["summary"])
             self.assertIn("research writeup", parsed["summary"])
 
+    def test_relpath_falls_back_to_bare_name_outside_research_dir(self):
+        # All the tests above use an isolated tempdir, not a path under
+        # RESEARCH_DIR -- relpath must fall back to the bare filename
+        # rather than raising, so this function stays usable standalone.
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "outside.md"
+            path.write_text("# Outside\n\nSome real summary content here.\n",
+                             encoding="utf-8")
+            parsed = parse_research_note(path)
+            self.assertEqual(parsed["relpath"], "outside.md")
+
+    def test_relpath_is_relative_to_research_dir_for_a_real_subdir_file(self):
+        # A file genuinely under RESEARCH_DIR, nested one level --
+        # relpath must be the subdir-qualified path, not the bare name,
+        # since that's what the index needs to link to correctly.
+        subdir = RESEARCH_DIR / "_test_scratch_subdir"
+        subdir.mkdir(exist_ok=True)
+        path = subdir / "nested.md"
+        try:
+            path.write_text("# Nested\n\nSome real summary content here.\n",
+                             encoding="utf-8")
+            parsed = parse_research_note(path)
+            self.assertEqual(parsed["relpath"], "_test_scratch_subdir/nested.md")
+        finally:
+            path.unlink()
+            subdir.rmdir()
+
 
 class TestRenderIndex(unittest.TestCase):
     def test_table_columns_present(self):
         notes = [{
-            "filename": "foo.md",
+            "relpath": "foo.md",
             "heading": "Foo title",
             "summary": "do the thing",
         }]
@@ -186,7 +214,7 @@ class TestRenderIndex(unittest.TestCase):
 
     def test_pipes_in_summary_escaped_for_table(self):
         notes = [{
-            "filename": "foo.md",
+            "relpath": "foo.md",
             "heading": "Foo",
             "summary": "alt|nat summary",
         }]
@@ -197,7 +225,7 @@ class TestRenderIndex(unittest.TestCase):
         # A heading like "ldmia | ldmib" mid-text would otherwise
         # split the table cell.
         notes = [{
-            "filename": "foo.md",
+            "relpath": "foo.md",
             "heading": "Heading with | bar",
             "summary": "x",
         }]
@@ -206,7 +234,7 @@ class TestRenderIndex(unittest.TestCase):
 
     def test_long_summary_truncated(self):
         notes = [{
-            "filename": "foo.md",
+            "relpath": "foo.md",
             "heading": "Foo",
             "summary": "x" * 500,
         }]
@@ -285,14 +313,7 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
                 "docs/research/README.md not present — run "
                 "`python tools/generate_research_index.py` first.",
             )
-        notes: list[dict] = []
-        for path in sorted(RESEARCH_DIR.glob("*.md")):
-            if path.name == "README.md":
-                continue
-            parsed = parse_research_note(path)
-            if parsed is None:
-                continue
-            notes.append(parsed)
+        notes = collect_notes()
         if not notes:
             self.skipTest("no research notes in docs/research/")
         expected = render_index(notes)
@@ -302,6 +323,88 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
             "docs/research/README.md is stale. Run "
             "`python tools/generate_research_index.py` and commit.",
         )
+
+
+class TestCollectNotesRecursion(unittest.TestCase):
+    """Regression tests for the recursive-glob fix: 15+ real notes
+    already live under docs/research/<subdir>/*.md (e.g. wave 3's own
+    cm-data-inference-3-2026-07-25.md), silently un-indexed by the old
+    non-recursive `glob("*.md")`. These exercise the real RESEARCH_DIR,
+    not a temp dir, since the bug was specifically about directory
+    structure `collect_notes()` must actually walk."""
+
+    def test_finds_a_real_subdirectory_note(self):
+        notes = collect_notes()
+        relpaths = {n["relpath"] for n in notes}
+        subdir_notes = [r for r in relpaths if "/" in r]
+        self.assertGreater(
+            len(subdir_notes), 0,
+            "collect_notes() found zero notes in any subdirectory of "
+            "docs/research/ -- the recursive glob regressed back to "
+            "top-level-only.",
+        )
+
+    def test_every_indexed_relpath_actually_resolves(self):
+        # The bug this whole fix started from: a bare filename used as
+        # the link href is wrong for anything not directly in
+        # RESEARCH_DIR. Confirm every relpath collect_notes() emits is
+        # a real, resolvable path under RESEARCH_DIR.
+        notes = collect_notes()
+        for n in notes:
+            resolved = RESEARCH_DIR / n["relpath"]
+            self.assertTrue(
+                resolved.is_file(),
+                f"relpath {n['relpath']!r} does not resolve to a real file",
+            )
+
+    def test_index_md_excluded_at_every_depth(self):
+        # docs/research/data/INDEX.md and 8 siblings are separately-
+        # maintained navigational catalogs ("Do NOT regenerate -- the
+        # brain handles the index at merge"), never research notes.
+        notes = collect_notes()
+        relpaths = {n["relpath"] for n in notes}
+        index_md_entries = [r for r in relpaths if r.endswith("INDEX.md")]
+        self.assertEqual(
+            index_md_entries, [],
+            f"INDEX.md file(s) leaked into the note index: {index_md_entries}",
+        )
+
+    def test_readme_excluded_at_every_depth(self):
+        # docs/research/archive/README.md, not just the top-level one.
+        notes = collect_notes()
+        relpaths = {n["relpath"] for n in notes}
+        readme_entries = [r for r in relpaths if r.endswith("README.md")]
+        self.assertEqual(
+            readme_entries, [],
+            f"README.md file(s) leaked into the note index: {readme_entries}",
+        )
+
+    def test_same_basename_different_directories_both_indexed_distinctly(self):
+        # docs/research/campaign-analytics/path-to-100-coverage.md (a
+        # superseded-note stub) and docs/research/archive/
+        # path-to-100-coverage.md (its archived copy) share a basename.
+        # Both must appear, each linked to ITS OWN full relative path --
+        # a bare-filename link would either 404 for one of them or,
+        # worse, silently point both rows at the same wrong target.
+        notes = collect_notes()
+        relpaths = {n["relpath"] for n in notes}
+        self.assertIn("campaign-analytics/path-to-100-coverage.md", relpaths)
+        self.assertIn("archive/path-to-100-coverage.md", relpaths)
+
+    def test_sort_order_is_platform_independent_plain_string_sort(self):
+        # Real regression, caught by CI (not local testing -- Windows'
+        # WindowsPath.__lt__ sorts case-INsensitively; PosixPath, what
+        # every CI runner uses, sorts case-SENSITIVELY). Sorting raw
+        # Path objects straight out of rglob() -- rather than the
+        # parsed notes' relpath strings -- produced a genuinely
+        # different order on Windows than on Linux once enough mixed-
+        # case directory names existed for it to matter, and --check
+        # (byte-for-byte) correctly flagged that as drift. Pin: the
+        # notes list must already be in the same order a plain `str`
+        # sort of the relpaths would produce, on ANY platform.
+        notes = collect_notes()
+        relpaths = [n["relpath"] for n in notes]
+        self.assertEqual(relpaths, sorted(relpaths))
 
 
 if __name__ == "__main__":
