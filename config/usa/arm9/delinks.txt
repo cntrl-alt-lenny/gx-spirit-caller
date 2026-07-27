@@ -13326,6 +13326,10 @@ src/usa/main/data/data_020b425c.s:
     complete
     .rodata start:0x020b425c end:0x020b458c
 
+src/usa/main/data/data_020b46b8.c:
+    complete
+    .rodata start:0x020b46b8 end:0x020b4766
+
 src/usa/main/data/data_020c3d68.c:
     complete
     .data start:0x020c3d68 end:0x020c3d6c
