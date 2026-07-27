@@ -1,7 +1,15 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_0220a270 (32 bytes, 4-aligned): wave 13 string retype.
+ * relocs.txt: from:0x021db528 kind:load to:0x0220a270 -- one real
+ * same-overlay consumer takes this string's address (opaque region,
+ * no TU of its own), immediately adjacent to the data_ov004_0220a250
+ * consumer above (0x021db524 vs 0x021db528 -- 4 bytes apart, the same
+ * caller loading two sibling strings back to back). Sibling of
+ * data_ov004_0220a20c ("_001n") and the _0220a250 sprintf template,
+ * same MOBJ .LZ5bg asset family. 28 printable ASCII bytes + 4 trailing
+ * NUL bytes, byte-exact per script re-extraction from
+ * extract/eur/arm9_overlays/ov004.bin. Plain `char`, no const/unsigned,
+ * matching this file's .data ground truth and this project's
+ * established string-file convention (src/main/data_020fe4b0.c).
+ */
 
-unsigned char data_ov004_0220a270[32] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x65, 0x64, 0x69, 0x74, 0x5f, 0x30, 0x30, 0x30, 0x6e, 0x2e, 0x4c,
-    0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00, 0x00,
-};
+char data_ov004_0220a270[32] = "/Duel2D/MOBJ/edit_000n.LZ5bg";
