@@ -14031,6 +14031,14 @@ src/overlay002/data_ov002_022c819c.c:
     complete
     .rodata start:0x022c819c end:0x022c834c
 
+src/overlay002/data_ov002_022c834c.c:
+    complete
+    .rodata start:0x022c834c end:0x022c8354
+
+src/overlay002/data_ov002_022c8354.c:
+    complete
+    .rodata start:0x022c8354 end:0x022c8368
+
 src/overlay002/data_ov002_022c8368.c:
     complete
     .rodata start:0x022c8368 end:0x022c8390
