@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 
 """
-Regenerate docs/research/README.md from the research notes in the
-same directory.
+Regenerate docs/research/README.md from the research notes anywhere
+under docs/research/, at any depth (e.g. docs/research/data/*.md).
 
-A "research note" is any markdown file in `docs/research/` whose
-first non-blank line is an H1 heading. The body's first non-blank
-prose paragraph (skipping italic-only lines like
+A "research note" is any markdown file under `docs/research/` (any
+subdirectory) whose first non-blank line is an H1 heading, EXCEPT a
+file literally named `README.md` or `INDEX.md` -- both are meta/
+navigational (this index itself, an `archive/README.md`, and 9
+separately-maintained per-subdirectory catalogs like
+`docs/research/data/INDEX.md`), never notes. The body's first
+non-blank prose paragraph (skipping italic-only lines like
 `_Generated 2026-MM-DD by scaffolder..._`) is the summary, capped at
-~200 chars in the index table.
+~200 chars in the index table. Each note's index link is its path
+relative to `docs/research/` (not the bare filename) -- several
+same-basename pairs already exist across subdirectories (a superseded
+note's stub at its original path vs. its `archive/`-moved copy), and a
+bare filename would link both to the same, wrong target.
 
 This is the third member of the auto-generated docs trio:
 
@@ -42,6 +50,24 @@ INDEX_PATH = RESEARCH_DIR / "README.md"
 
 H1_RE = re.compile(r"^#\s+(.+?)\s*$")
 SUMMARY_MAX_CHARS = 200
+
+# Matches a Markdown inline link `[text](target)` so it can be flattened
+# to just `text` in a summary. A note's own body text often links
+# relative to ITS OWN file (e.g. `[endgame-ledger.md](../campaign-
+# analytics/endgame-ledger.md)` inside docs/research/archive/path-to-
+# 100-coverage.md) -- correct there, but WRONG once that summary is
+# copied verbatim into docs/research/README.md, which lives at a
+# different depth. Confirmed real via tests/test_docs_links.py once
+# notes anywhere below the top level started being indexed at all.
+MD_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+
+
+def _delinkify(text: str) -> str:
+    """Flatten every Markdown link in `text` to its display text alone,
+    dropping the href. The index's own File column already links to
+    the note correctly; a summary copied from the note's body has no
+    business carrying a second, potentially mis-based link."""
+    return MD_LINK_RE.sub(r"\1", text)
 
 
 def _truncate_balanced(s: str, max_chars: int) -> str:
@@ -98,6 +124,14 @@ def parse_research_note(path: Path) -> dict | None:
     becomes the summary. Returns None for files without an H1
     heading (so README.md and similar non-research files get
     skipped automatically).
+
+    ``relpath`` is `path` relative to `RESEARCH_DIR` (POSIX-style,
+    e.g. `data/cm-data-inference-3-2026-07-25.md`) — this is what the
+    index must link to. Using the bare filename here would silently
+    produce a broken link for any note outside the top level, and
+    would collide for the several same-basename pairs that already
+    exist across subdirectories (e.g. a superseded-note stub at its
+    original path vs. its `archive/`-moved copy).
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -120,7 +154,7 @@ def parse_research_note(path: Path) -> dict | None:
         if not heading:
             hm = H1_RE.match(line)
             if hm:
-                heading = hm.group(1).strip()
+                heading = _delinkify(hm.group(1).strip())
             continue
         # After heading, walk forward looking for prose paragraphs.
         stripped = line.strip()
@@ -155,9 +189,16 @@ def parse_research_note(path: Path) -> dict | None:
     if not heading:
         return None
 
-    summary = " ".join(summary_lines).strip()
+    summary = _delinkify(" ".join(summary_lines).strip())
+    try:
+        relpath = path.relative_to(RESEARCH_DIR).as_posix()
+    except ValueError:
+        # Not under RESEARCH_DIR (e.g. a test fixture in an isolated
+        # temp dir) -- fall back to the bare filename rather than
+        # raising, so this function stays usable standalone.
+        relpath = path.name
     return {
-        "filename": path.name,
+        "relpath": relpath,
         "heading": heading,
         "summary": summary,
     }
@@ -185,7 +226,7 @@ def render_index(notes: list[dict]) -> str:
         # Markdown table cells: collapse pipes and newlines, trim length.
         summary = n["summary"].replace("|", "\\|").replace("\n", " ")
         summary = _truncate_balanced(summary, SUMMARY_MAX_CHARS)
-        link = f"[`{n['filename']}`]({n['filename']})"
+        link = f"[`{n['relpath']}`]({n['relpath']})"
         # Heading already-escaped pipes carry through; collapse here too.
         heading = n["heading"].replace("|", "\\|")
         lines.append(f"| {link} | {heading} | {summary} |")
@@ -211,6 +252,47 @@ def render_index(notes: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def collect_notes() -> list[dict]:
+    """Scan RESEARCH_DIR (recursively) for research notes, sorted by
+    `relpath` (a plain string sort). The single source of truth for
+    "what counts as a note" -- both `main()` and the committed-index
+    regression test call this, so the two can never drift the way
+    they once did (the test used to reimplement this scan with its
+    own copy of the old non-recursive glob, so it never had a chance
+    to catch the recursion bug this function fixed).
+
+    Sorting is done on the PARSED notes' `relpath` strings, not on the
+    raw `Path` objects straight out of `rglob()` -- `Path.__lt__`'s
+    comparison semantics differ by platform (`WindowsPath` sorts
+    case-INsensitively, confirmed directly: `sorted([Path("Zebra.md"),
+    Path("apple.md")])` orders "apple" first; `PosixPath` -- what every
+    CI runner uses -- sorts case-SENSITIVELY, uppercase before
+    lowercase). With 3000+ notes across many mixed-case directory
+    names, that divergence is no longer a hypothetical: a Windows-
+    generated index and a Linux-generated one land in genuinely
+    different orders, which `--check` (byte-for-byte) correctly
+    flags as drift. A plain `str` sort has no such platform variance.
+    """
+    notes: list[dict] = []
+    for path in RESEARCH_DIR.rglob("*.md"):
+        # README.md (this index itself, plus a per-directory copy under
+        # archive/) and INDEX.md (9 separately-maintained per-subdirectory
+        # navigational catalogs, e.g. docs/research/data/INDEX.md, each
+        # explicitly headed "Do NOT regenerate -- the brain handles the
+        # index at merge") are meta/navigational, never research notes,
+        # regardless of which directory they live in.
+        if path.name in ("README.md", "INDEX.md"):
+            continue
+        parsed = parse_research_note(path)
+        if parsed is None:
+            print(f"warning: skipping {path.name} (no H1 heading)",
+                  file=sys.stderr)
+            continue
+        notes.append(parsed)
+    notes.sort(key=lambda n: n["relpath"])
+    return notes
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description="Regenerate docs/research/README.md.",
@@ -222,16 +304,7 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    notes: list[dict] = []
-    for path in sorted(RESEARCH_DIR.glob("*.md")):
-        if path.name == "README.md":
-            continue
-        parsed = parse_research_note(path)
-        if parsed is None:
-            print(f"warning: skipping {path.name} (no H1 heading)",
-                  file=sys.stderr)
-            continue
-        notes.append(parsed)
+    notes = collect_notes()
 
     if not notes:
         print("no research notes found in docs/research/", file=sys.stderr)
