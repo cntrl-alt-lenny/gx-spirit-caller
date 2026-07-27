@@ -617,7 +617,7 @@ No new implementation bugs this wave — the wave-7 const-placement rules held w
 Full writeup, per-symbol evidence table, and both CONTRADICTION resolutions: `docs/research/data/cm-data-inference-8-2026-07-27.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed, full pytest green — 3100 passed, 15 skipped, 0 failed). `Named-struct`: 43,828 → 44,308 bytes (0.92% → 0.93%). Hit rate: 15/15 fresh census investigations landed a retype (100%).
 
-### cm-data-inference-9 — data wave 9 — fresh census [TODO]
+### cm-data-inference-9 — data wave 9 — fresh census [CLAIMED]
 
 No specific carried-over lead this time — both of wave 8's CONTRADICTIONs were resolved in-wave rather than deferred. Re-run the live opaque-blob census fresh (same grep as every prior wave's item); budget the usual 55-70% hit rate rather than expecting another wave-8-sized outlier — this wave's 100% likely reflects an easier-than-average batch (small/simple candidates, several already-partially-mapped record families), not a durable rate change.
 
