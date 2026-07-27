@@ -283,14 +283,16 @@ ALSO in this PR: add the queue-marker guard test. `q-metric-extern-guard` sat un
 
 **Gate:** a real repro for each of (a)-(c) against pre-fix code, the way #1351 stash-reverted each fix to prove the test actually catches it — tests that pass before the fix prove nothing. `python tools/gate3.py --scope all` PASS.
 
-### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [CLAIMED]
+### cm-ov002-unknown-sweep-2 — continue the ov002 sweep, next size band up [DONE]
 
-> IN PROGRESS (2026-07-26): all 5/5 worktree batches complete and merged
-> (95/145 shipped, 65.5%), codegen-walls.md C-45/C-46/S-1-extension
-> entries added, 3-region `gate3.py --scope all --clean` PASS confirmed
-> (all three of eur/usa/jpn SHA1 individually grepped from the log).
-> Finishing: re-gating after catching up with the 12 PRs that merged to
-> main while this was in flight, then marking DONE. See
+> DONE: PR #1372 (not yet merged as of this branch — patched locally,
+> same staleness gap as cm-sm64ds-lever-apply above). All 5/5 worktree
+> batches complete and merged (95/145 shipped, 65.5%), codegen-walls.md
+> C-45/C-46/S-1-extension entries added, three-way count 95==95==95
+> confirmed. 3-region `gate3.py --scope all --clean` PASS confirmed
+> AFTER catching up with the 12 PRs that merged to main mid-flight (all
+> three of eur/usa/jpn SHA1 individually grepped from the log both
+> before and after that catch-up merge). See
 > `docs/research/cm-ov002-unknown-sweep-2-2026-07-26.md`.
 
 `cm-ov002-unknown-sweep` (#1363) covered the 32-88B band (125 candidates, 63.2% shipped). Use `wall_aware_headroom.py --exclude-attempted` to find the next size band up and repeat: same WORKTREE-PARALLEL SWEEP PROTOCOL, same up-front partition written into the PR body, same three-way count check (`.c`-added == `delinks.txt`-flips == `.s`-deleted) after consolidation. Use the fixed `fastmatch.py` from `q-fastmatch-sweep-friction` for this sweep, not the workarounds.
