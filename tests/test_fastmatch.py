@@ -178,6 +178,25 @@ class TestSummarizeCompileError(unittest.TestCase):
         self.assertEqual(result, "src/x.c:1: declaration syntax error\nErrors caused tool to abort.")
 
 
+class TestHelpDoesNotCrash(unittest.TestCase):
+    """cm-ov002-unknown-sweep-3: two independent sweep batches hit
+    `python tools/fastmatch.py --help` crashing with `ValueError:
+    unsupported format character 'm'`. Cause: argparse's own help
+    formatter treats a literal `%` in a help string as the start of a
+    `%(...)s`-style substitution -- `--verbose`'s help text had a bare
+    `100%% matches` (single `%`), and argparse's `_expand_help` blew up
+    trying to interpret `% m` as a format spec. Fix: escape as `%%`."""
+
+    def test_help_does_not_raise(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(SystemExit) as cm:
+                fastmatch.main(["--help"])
+        # argparse's own --help path exits 0 after printing; the bug
+        # was a ValueError raised INSIDE format_help(), never reaching
+        # this clean exit at all.
+        self.assertEqual(cm.exception.code, 0)
+
+
 class TestMissingFile(unittest.TestCase):
     def setUp(self):
         # main() checks `(ROOT / "build.ninja").is_file()` BEFORE checking
