@@ -650,7 +650,7 @@ src/usa/overlay002/func_ov002_021b9dd8.c:
 src/usa/overlay002/func_ov002_021b9dec.s:
     complete
     .text start:0x021b9dec end:0x021b9f54
-src/usa/overlay002/func_ov002_021b9f54.s:
+src/usa/overlay002/func_ov002_021b9f54.c:
     complete
     .text start:0x021b9f54 end:0x021b9fd0
 src/usa/overlay002/func_ov002_021b9fd0.s:
