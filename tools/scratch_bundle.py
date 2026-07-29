@@ -192,14 +192,16 @@ def _find_siblings(
     target: Symbol, src_root: Path,
     *, window: int = SIBLING_WINDOW, max_n: int = MAX_SIBLINGS,
 ) -> list[Sibling]:
-    """Scan src/<module>/ for .c files whose parsed address falls
+    """Scan src/<module>/**/ for .c files whose parsed address falls
     within ±window of the target. Reads bodies, sorts by distance,
     returns up to `max_n`."""
     mod_dir = src_root / module_dir_name(target.module)
     if not mod_dir.is_dir():
         return []
     candidates: list[Sibling] = []
-    for p in mod_dir.glob("*.c"):
+    # Matched siblings can live in nested source directories (for example
+    # data/); keep the module boundary but do not silently miss descendants.
+    for p in mod_dir.rglob("*.c"):
         addr = _parse_addr_from_filename(p.stem)
         if addr is None:
             continue
