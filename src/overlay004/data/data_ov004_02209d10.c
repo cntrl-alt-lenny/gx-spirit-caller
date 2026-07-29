@@ -1,7 +1,13 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_02209d10 (32 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021ce1ac kind:load to:0x02209d10 -- consumer
+ * func_ov004_021cded0.s (_LIT13) passes this directly as OS_SPrintf's
+ * format-string argument, with a computed int (from a bitfield mla) as
+ * the %03d value; the primary format string in 3 of the function's 4
+ * branches (siblings data_ov004_02209d30/_d4c cover the other two).
+ * Byte-identical to wave 13's shipped data_ov004_0220a250 and sibling
+ * data_ov004_02209cc8. 29 printable ASCII + 3 trailing NUL, byte-exact
+ * per script re-extraction. Plain char, no const/unsigned (.data
+ * ground truth).
+ */
 
-unsigned char data_ov004_02209d10[32] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x65, 0x64, 0x69, 0x74, 0x5f, 0x25, 0x30, 0x33, 0x64, 0x6e, 0x2e,
-    0x4c, 0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00,
-};
+char data_ov004_02209d10[32] = "/Duel2D/MOBJ/edit_%03dn.LZ5bg";

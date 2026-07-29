@@ -1,7 +1,12 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_0220a16c (32 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021d8cb4 kind:load to:0x0220a16c -- func_ov004_021d8798
+ * (same function as sibling data_ov004_0220a14c) loads this into r1 and
+ * calls OS_SPrintf(sp+0x30, this, r7) immediately after the identical
+ * call using 0220a14c as the format string -- back-to-back sprintf
+ * calls, r7 bounded to 1/2 just before. "Common dialog" family (see
+ * 0220a12c/0220a14c), not wave 13's /Duel2D/MOBJ/ family despite
+ * proximity to 0220a20c. 30 printable ASCII + 2 trailing NUL, byte-exact
+ * per script re-extraction. Plain char, no const/unsigned (.data).
+ */
 
-unsigned char data_ov004_0220a16c[32] = {
-    0x2f, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2f, 0x64, 0x69, 0x61, 0x6c,
-    0x6f, 0x67, 0x5f, 0x75, 0x6e, 0x69, 0x74, 0x65, 0x25, 0x30, 0x32, 0x64,
-    0x2e, 0x4c, 0x5a, 0x35, 0x62, 0x67, 0x00, 0x00,
-};
+char data_ov004_0220a16c[32] = "/Common/dialog_unite%02d.LZ5bg";

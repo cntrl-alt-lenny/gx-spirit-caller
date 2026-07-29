@@ -1,7 +1,13 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 28 bytes, shape=string). */
+/* data_ov004_02209c70 (28 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021cd39c kind:load to:0x02209c70 -- one of 5
+ * sibling category-label strings in one function's literal pool
+ * (func_ov004_021cced8, permanent GLOBAL_ASM per brief 302; siblings
+ * data_ov004_02209c8c/_ca8/_cc8/_ce8). Independently verified
+ * byte-identical to data_ov004_02209d30 ("chr_NTj.LZ5bg") -- a genuine
+ * duplicate string at a second, unrelated call site
+ * (func_ov004_021cded0), not an error. 26 printable ASCII + 2 trailing
+ * NUL, byte-exact per script re-extraction. Plain char, no
+ * const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209c70[28] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x63, 0x68, 0x72, 0x5f, 0x4e, 0x54, 0x6a, 0x2e, 0x4c, 0x5a, 0x35,
-    0x62, 0x67, 0x00, 0x00,
-};
+char data_ov004_02209c70[28] = "/Duel2D/MOBJ/chr_NTj.LZ5bg";

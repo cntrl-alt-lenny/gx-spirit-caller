@@ -1,7 +1,10 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 28 bytes, shape=string). */
+/* data_ov004_02209b9c (28 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021cab18 kind:load to:0x02209b9c -- one real
+ * consumer (func_ov004_021ca4f8.s, part of a 5-entry literal-pool run
+ * of sibling data blobs). Immediate sibling of data_ov004_02209bb8
+ * ("/WiFi/anime_musen2.LZ5bg" -- same family, index 2). 24 printable
+ * ASCII + 4 trailing NUL, byte-exact per script re-extraction. Plain
+ * char, no const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209b9c[28] = {
-    0x2f, 0x57, 0x69, 0x46, 0x69, 0x2f, 0x61, 0x6e, 0x69, 0x6d, 0x65, 0x5f,
-    0x6d, 0x75, 0x73, 0x65, 0x6e, 0x31, 0x2e, 0x4c, 0x5a, 0x35, 0x62, 0x67,
-    0x00, 0x00, 0x00, 0x00,
-};
+char data_ov004_02209b9c[28] = "/WiFi/anime_musen1.LZ5bg";

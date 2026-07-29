@@ -1,7 +1,15 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 28 bytes, shape=string). */
+/* data_ov004_02209d30 (28 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021ce1b0 kind:load to:0x02209d30 -- consumer
+ * func_ov004_021cded0.s (_LIT14); docs/research/retriage/
+ * Ov004Ov006DeepR8.md's independent reverse-engineering shows this as
+ * the "slot==0" category label, passed to func_02006b10(label) and
+ * func_02006c0c(label,4,0). Sibling of data_ov004_02209d10 ("edit_%03dn"
+ * template used in the same function) and data_ov004_02209d4c (next
+ * category label). Independently verified byte-identical to
+ * data_ov004_02209c70 (same "chr_NTj.LZ5bg" string, different unrelated
+ * call site -- a genuine duplicate). 26 printable ASCII + 2 trailing
+ * NUL, byte-exact per script re-extraction. Plain char, no
+ * const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209d30[28] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x63, 0x68, 0x72, 0x5f, 0x4e, 0x54, 0x6a, 0x2e, 0x4c, 0x5a, 0x35,
-    0x62, 0x67, 0x00, 0x00,
-};
+char data_ov004_02209d30[28] = "/Duel2D/MOBJ/chr_NTj.LZ5bg";

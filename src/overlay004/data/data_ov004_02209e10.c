@@ -1,6 +1,12 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 24 bytes, shape=string). */
+/* data_ov004_02209e10 (24 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021d0e40 and from:0x021d3564 (both kind:load to
+ * this address) -- two real consumers (func_ov004_021d06ac.s,
+ * func_ov004_021d3390.s), each `ldr r0,=this; mov r1,#4; mov r2,#0;
+ * bl func_02006c0c` -- the identical idiom both functions use for
+ * this symbol's siblings (data_ov004_02209e28/_e44/_e60/_e70/_e88/_ea0),
+ * a /WiFi/ background-asset path-string family. 23 printable ASCII +
+ * 1 trailing NUL, byte-exact per script re-extraction. Plain char, no
+ * const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209e10[24] = {
-    0x2f, 0x57, 0x69, 0x46, 0x69, 0x2f, 0x62, 0x67, 0x5f, 0x75, 0x65, 0x5f,
-    0x6d, 0x75, 0x73, 0x65, 0x6e, 0x2e, 0x4c, 0x5a, 0x35, 0x62, 0x67, 0x00,
-};
+char data_ov004_02209e10[24] = "/WiFi/bg_ue_musen.LZ5bg";
