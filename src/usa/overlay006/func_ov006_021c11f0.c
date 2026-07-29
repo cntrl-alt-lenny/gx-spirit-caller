@@ -5,7 +5,7 @@ extern void OS_SPrintf(void *out, void *a, int b);
 extern int  func_02006bf0(void *p, int b, int c);
 extern void func_0201d428(void *cmd);
 extern void func_0201e564(void *cmd);
-extern void func_02006e00(int h);
+extern void Task_Invoke(int h);
 extern char *func_0208dcb4(void);
 extern int  func_02094410(int a, void *b, int c);
 extern int  data_ov006_021cb500[];
@@ -24,7 +24,7 @@ int func_ov006_021c11f0(void *q, int arg1, int slot) {
         *(int *)(cmd + 12) = ((slot << 2) + 829) << 5;
         *(short *)(cmd + 16) = (slot + 5) << 5;
         func_0201e564(cmd);
-        func_02006e00(h);
+        Task_Invoke(h);
     } else {
         func_02094410(0, func_0208dcb4() + (((slot << 2) + 829) << 5), 128);
     }

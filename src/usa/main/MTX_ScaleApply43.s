@@ -1,12 +1,12 @@
-; func_0208b7f8 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; MTX_ScaleApply43 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
         .extern func_0208b0f8
-        .global func_0208b7f8
+        .global MTX_ScaleApply43
         .arm
-func_0208b7f8:
+MTX_ScaleApply43:
     stmdb sp!, {r4, r5, lr}
     sub sp, sp, #0x4
     ldr ip, [sp, #0x10]

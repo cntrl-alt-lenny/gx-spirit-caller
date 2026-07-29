@@ -46,7 +46,7 @@
         .extern func_ov005_021ac9c4
         .extern func_ov015_021b225c
         .extern func_ov015_021b2764
-        .extern func_ov015_021b2af8
+        .extern Ov015_RegisterCallbacks
         .extern func_ov015_021b3478
         .extern func_ov015_021b3db4
         .extern func_ov015_021b3e80
@@ -78,7 +78,7 @@ func_ov015_021b46b4:
     bl func_0207e7d0
     mov r0, #0xf
     bl func_02001a14
-    bl func_ov015_021b2af8
+    bl Ov015_RegisterCallbacks
     ldr r4, _LIT6
     mov r0, #0x200
     ldrh r3, [r4]

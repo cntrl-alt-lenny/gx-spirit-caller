@@ -4,7 +4,7 @@
 extern int  func_02006bf0(void *p, int b, int c);
 extern void func_0201d428(void *cmd);
 extern void func_0201e564(void *cmd);
-extern void func_02006e00(int h);
+extern void Task_Invoke(int h);
 extern char data_ov006_021ce0b0[];
 int func_ov006_021c73d4(void) {
     char cmd[40];
@@ -16,6 +16,6 @@ int func_ov006_021c73d4(void) {
     *(int *)(cmd + 12) = 0x4140;
     *(short *)(cmd + 16) = 96;
     func_0201e564(cmd);
-    func_02006e00(h);
+    Task_Invoke(h);
     return 1;
 }

@@ -11,7 +11,7 @@
         .extern func_0200506c
         .extern func_02005488
         .extern func_0202c06c
-        .extern func_ov015_021b2a08
+        .extern Ov015_SelectVramBank
         .extern func_ov015_021b2ff0
         .global func_ov015_021b2b18
         .arm
@@ -23,7 +23,7 @@ func_ov015_021b2b18:
     mov r0, r1
     str r1, [sp, #0x8]
     str r2, [sp, #0xc]
-    bl func_ov015_021b2a08
+    bl Ov015_SelectVramBank
     ldr r1, [sp, #0x10]
     cmp r4, #0x1
     add r0, r0, r1, lsl #0x5

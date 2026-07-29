@@ -8,7 +8,7 @@
         .extern data_ov002_022cbb7c
         .extern data_ov002_022cbb94
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201e564
         .extern func_0208deac
@@ -77,7 +77,7 @@ func_ov002_022a03a0:
     strh r1, [sp, #0x14]
     bl func_0201e564
     ldr r0, [sp]
-    bl func_02006e00
+    bl Task_Invoke
     cmp r4, #0x0
     addne sp, sp, #0x28
     ldmneia sp!, {r4, r5, r6, r7, r8, pc}

@@ -5,7 +5,7 @@
         .text
         .extern data_ov011_021d3f20
         .extern data_ov011_021d3f5c
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201e564
         .extern func_0208c7e4
@@ -86,7 +86,7 @@ func_ov011_021cb198:
     add r0, sp, #0x0
     bl func_0201e564
     ldr r0, [sp]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [r4, #0x264]
     mov r1, #0x0
     cmp r0, #0x1

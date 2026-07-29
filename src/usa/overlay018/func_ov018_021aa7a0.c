@@ -10,7 +10,7 @@ extern int func_0201ed58(int *out, int cfg);
 extern int func_0201ed90(int *out, int cfg);
 extern void func_0207f528(int s, int b, int c, void *d);
 extern void func_0207f428(int s, int b, int c, void *d);
-extern void func_02006e00(int h);
+extern void Task_Invoke(int h);
 extern char data_ov018_021ad6b8[];
 extern char data_ov018_021ad7a4[];
 extern char data_ov018_021ad6bc[];
@@ -24,8 +24,8 @@ void func_ov018_021aa7a0(int a0, int a1, int a2, int a3) {
     int h2;
     h1 = func_0201ed58(&s1, *(int *)(data_ov018_021ad6b8 + mode * 0x20 + a0 * 0x10));
     func_0207f528(s1, a2, a1, data_ov018_021ad7a4);
-    func_02006e00(h1);
+    Task_Invoke(h1);
     h2 = func_0201ed90(&s0, *(int *)(data_ov018_021ad6bc + mode * 0x20 + a0 * 0x10));
     func_0207f428(s0, a3, a1, data_ov018_021ad790);
-    func_02006e00(h2);
+    Task_Invoke(h2);
 }

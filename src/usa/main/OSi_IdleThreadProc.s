@@ -1,13 +1,13 @@
-; func_02091618 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; OSi_IdleThreadProc — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
         .extern func_020936a8
         .extern OS_Halt
-        .global func_02091618
+        .global OSi_IdleThreadProc
         .arm
-func_02091618:
+OSi_IdleThreadProc:
     stmfd sp!, {lr}
     sub sp, sp, #0x4
     bl func_020936a8

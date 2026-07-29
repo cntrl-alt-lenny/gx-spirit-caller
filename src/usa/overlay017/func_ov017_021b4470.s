@@ -13,7 +13,7 @@
         .extern data_ov017_021b8794
         .extern data_ov017_021b8894
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201e564
         .extern func_0202c06c
@@ -498,7 +498,7 @@ func_ov017_021b4470:
     add r0, sp, #0xc
     bl func_0201e564
     ldr r0, [sp, #0xc]
-    bl func_02006e00
+    bl Task_Invoke
     add r0, sp, #0xc
     bl func_0201d428
     ldr r0, _LIT12
@@ -559,7 +559,7 @@ func_ov017_021b4470:
     cmp r4, r0
     blt .L_794
     ldr r0, [sp, #0xc]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r3, _LIT13
     mov r0, #0x1
     ldr r2, [r3]

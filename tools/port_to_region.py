@@ -47,6 +47,9 @@ Symbol references covered:
    Looked up in `ovNNN`.
 3. **`data_<addr>` (bare):** main-module data symbol.
 4. **`data_ov<NNN>_<addr>` (prefixed):** overlay N data symbol.
+5. **Named EUR functions in `extern` prototypes:** resolved through
+   EUR's symbol table and refused when the target twin is still a
+   `func_*` placeholder, rather than allowing a linker-time failure.
 
 Data-symbol lookups currently fall back to address-equality
 matching in the target region's `symbols.txt` (data symbols
@@ -56,9 +59,9 @@ in the file header for the full scope.
 
 Out of scope for v1:
 
-- Symbols that have been renamed in EUR but not in the target
-  region (e.g. `Task_InvokeLocked` in EUR, still `func_<addr>`
-  in USA). Cross-region rename mapping is a future enhancement.
+- Named functions used without an `extern` prototype. Matched C
+  sources are expected to declare their external callees; named
+  externs are handled by the cross-region rename gate above.
 - Sources that have `#include "..."` from `libs/` or
   `include/` — the headers are region-shared in the current
   layout; the port_to_region tool emits the same `#include`
@@ -106,6 +109,28 @@ SYMBOL_RE = re.compile(
     r"(?:_ov(?P<overlay>\d+))?"
     r"_(?P<addr>[0-9a-fA-F]{8})\b"
 )
+
+# Named EUR functions can appear in matched C as ordinary externs
+# (for example ``extern void Task_Invoke(int);``).  The address-keyed
+# parser above intentionally does not see those names, which used to leave
+# an EUR-only rename untouched in the rewritten target source and defer the
+# failure to the linker.  This parser is restricted to extern prototypes so
+# comments and ordinary call sites do not become symbol references by
+# accident; the caller filters it through EUR's named-function table.
+NAMED_EXTERN_RE = re.compile(
+    r"^\s*extern\s+[^;]*?\b(?P<name>[A-Za-z_]\w*)\s*"
+    r"\([^;]*?\)\s*;",
+    re.M | re.S,
+)
+
+_PLACEHOLDER_FUNC_RE = re.compile(
+    r"^func_(?:ov\d+_)?[0-9a-fA-F]{8}$"
+)
+
+
+def is_placeholder_function_name(name: str) -> bool:
+    """Return whether *name* is the repository's address-keyed placeholder."""
+    return bool(_PLACEHOLDER_FUNC_RE.fullmatch(name))
 
 
 # Filename validation — broader than SYMBOL_RE for source parsing.
@@ -320,7 +345,11 @@ def target_stem_for_prefix(prefix: str, target_func_name: str) -> str:
 # Symbol parsing + resolution
 # --------------------------------------------------------------------------- #
 
-def parse_symbols_in_source(source_text: str, default_module: str) -> dict[tuple[str, str, int], SymbolRef]:
+def parse_symbols_in_source(
+    source_text: str,
+    default_module: str,
+    named_functions: dict[str, tuple[str, int]] | None = None,
+) -> dict[tuple[str, str, int], SymbolRef]:
     """Extract all unique `func_*` / `data_*` references in the source.
 
     Returns dict keyed by (kind, module, addr) → SymbolRef so duplicate
@@ -342,6 +371,17 @@ def parse_symbols_in_source(source_text: str, default_module: str) -> dict[tuple
         if key not in out:
             out[key] = SymbolRef(text=text, kind=kind, module=module,
                                  addr=addr)
+    if named_functions:
+        for m in NAMED_EXTERN_RE.finditer(source_text):
+            name = m.group("name")
+            resolved = named_functions.get(name)
+            if resolved is None:
+                continue
+            module, addr = resolved
+            key = ("func", module, addr)
+            if key not in out:
+                out[key] = SymbolRef(text=name, kind="func", module=module,
+                                     addr=addr)
     return out
 
 
@@ -678,6 +718,21 @@ def resolve_symbol(
     top = matches[0]
     confidence = top.confidence
     notes = top.rationale
+
+    # A named EUR function cannot be emitted under its EUR spelling unless
+    # the target twin has received the same rename.  Leaving the EUR-only
+    # spelling in the generated C defers this deterministic error to mwld;
+    # surface it here so batch_port can park the candidate before any build.
+    if (not is_placeholder_function_name(ref.text)
+            and is_placeholder_function_name(top.func.name)):
+        return Resolution(
+            eur_ref=ref,
+            target_name=top.func.name,
+            confidence="NONE",
+            notes=(f"EUR-only named function {ref.text} has placeholder "
+                   f"target twin {top.func.name}; propagate the rename "
+                   "before porting"),
+        )
 
     # Brief 095 D2 v2 — auto-promote LOW → MEDIUM when the candidate's
     # EUR↔target shift matches the consensus shift of N nearest HIGH
@@ -1203,8 +1258,20 @@ def main() -> int:
                 target_full_relocs.get(main_func_ref.module, {}),
             )
 
-    # Parse all symbols in the source, including the defined function.
-    refs = parse_symbols_in_source(source_text, default_module=module)
+    # Parse all symbols in the source, including the defined function and
+    # named EUR externs.  Named externs are resolved from EUR's function
+    # table so target-only placeholders can be refused before a build.
+    named_functions = {
+        f.name: (mod, f.addr)
+        for mod, funcs in eur.items()
+        for f in funcs
+        if not is_placeholder_function_name(f.name)
+    }
+    refs = parse_symbols_in_source(
+        source_text,
+        default_module=module,
+        named_functions=named_functions,
+    )
     refs[(main_func_ref.kind, main_func_ref.module,
           main_func_ref.addr)] = main_func_ref
 

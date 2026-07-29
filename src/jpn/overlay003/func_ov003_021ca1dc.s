@@ -29,7 +29,7 @@
         .extern func_0200506c
         .extern func_02005488
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_02011a08
         .extern func_02011a48
         .extern func_02018ce8
@@ -98,7 +98,7 @@ func_ov003_021ca1dc:
     add r0, sp, #0x108
     bl func_0201e564
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r1, _LIT5
     add r0, sp, #0x108
     ldr r1, [r1, #0xc3c]
@@ -165,7 +165,7 @@ func_ov003_021ca1dc:
     b .L_230
 .L_1a8:
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     add r0, sp, #0x108
     bl func_0201d428
     ldr r0, _LIT8
@@ -200,7 +200,7 @@ func_ov003_021ca1dc:
     bl func_0201e564
 .L_230:
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     mov r5, #0x2
     bl func_0208e0e4
     mov r6, r0
@@ -588,7 +588,7 @@ func_ov003_021ca1dc:
     str r2, [sp, #0x110]
     bl func_0201e564
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     bl func_0208e138
     ldr r1, _LIT16
     mov r2, #0x0
@@ -638,7 +638,7 @@ func_ov003_021ca1dc:
     add r0, sp, #0x108
     bl func_0201e564
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r1, _LIT5
     add r0, sp, #0x108
     ldr r8, [r1, #0xc3c]
@@ -704,7 +704,7 @@ func_ov003_021ca1dc:
     b .L_a68
 .L_9e0:
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     add r0, sp, #0x108
     bl func_0201d428
     ldr r0, _LIT8
@@ -739,7 +739,7 @@ func_ov003_021ca1dc:
     bl func_0201e564
 .L_a68:
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     mov r9, #0x2
     bl func_0208e0c4
     mov r5, r0
@@ -1145,7 +1145,7 @@ _LIT21: .word data_ov003_021cf158
     str r2, [sp, #0x110]
     bl func_0201e564
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     bl func_0208e118
     ldr r1, _LIT16
     mov r2, #0x0
@@ -1565,7 +1565,7 @@ _LIT21: .word data_ov003_021cf158
     strh r2, [r1, #0xa4]
     bl func_0201e564
     ldr r0, [sp, #0x108]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [sp, #0x18]
     mvn r1, #0xaf
     mov r2, #0x4000000

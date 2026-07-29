@@ -14,7 +14,7 @@
         .extern data_ov005_021b1bc8
         .extern data_ov005_021b1bdc
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_02094410
         .extern func_020aace8
         .extern func_020aaf60
@@ -123,9 +123,9 @@ func_ov005_021afa98:
     cmp r0, #0x0
     bne .L_19c
     mov r0, r6
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, fp
-    bl func_02006e00
+    bl Task_Invoke
     add sp, sp, #0x44
     mov r0, #0x0
     ldmia sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
@@ -135,9 +135,9 @@ func_ov005_021afa98:
     cmp sl, r9
     bge .L_148
     mov r0, r6
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, fp
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [sp, #0xc]
     cmp r0, #0x0
     beq .L_3ac
@@ -254,9 +254,9 @@ func_ov005_021afa98:
     cmp r0, #0x0
     bne .L_38c
     mov r0, r5
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [sp]
-    bl func_02006e00
+    bl Task_Invoke
     add sp, sp, #0x44
     mov r0, #0x0
     ldmia sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
@@ -266,9 +266,9 @@ func_ov005_021afa98:
     cmp r8, r7
     bge .L_338
     mov r0, r5
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [sp]
-    bl func_02006e00
+    bl Task_Invoke
 .L_3ac:
     ldr r0, [sp, #0x10]
     add r1, r0, #0x1
@@ -382,9 +382,9 @@ func_ov005_021afa98:
     cmp r0, #0x0
     bne .L_55c
     mov r0, r9
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, sl
-    bl func_02006e00
+    bl Task_Invoke
     add sp, sp, #0x44
     mov r0, #0x0
     ldmia sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
@@ -407,9 +407,9 @@ func_ov005_021afa98:
     blt .L_504
 .L_598:
     mov r0, r9
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, sl
-    bl func_02006e00
+    bl Task_Invoke
 .L_5a8:
     mov r0, #0x1
     add sp, sp, #0x44

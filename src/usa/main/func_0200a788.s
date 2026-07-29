@@ -9,7 +9,7 @@
         .extern data_0210585c
         .extern data_02106714
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .global func_0200a788
         .arm
 func_0200a788:
@@ -80,7 +80,7 @@ func_0200a788:
     bls .L_54
 .L_f0:
     mov r0, r5
-    bl func_02006e00
+    bl Task_Invoke
     ldmia sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
 _LIT0: .word data_020c3f48
 _LIT1: .word data_02104e6c

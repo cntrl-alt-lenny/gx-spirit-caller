@@ -6,7 +6,7 @@
         .extern data_ov022_021ab9c0
         .extern data_ov022_021aba08
         .extern func_02005898
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_02036540
         .global func_ov022_021ab310
         .arm
@@ -24,14 +24,14 @@ func_ov022_021ab310:
     cmp r0, #0x0
     beq .L_db0
     ldr r0, [r4, #0x874]
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, #0x0
     str r0, [r4, #0x874]
 .L_db0:
     ldr r0, [r4, #0x878]
     cmp r0, #0x0
     beq .L_dc8
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, #0x0
     str r0, [r4, #0x878]
 .L_dc8:

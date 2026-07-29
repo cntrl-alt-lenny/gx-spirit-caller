@@ -11,7 +11,7 @@
         .extern func_02006160
         .extern func_02006178
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d6e4
         .extern func_0208fc48
         .extern func_ov002_02259764
@@ -87,7 +87,7 @@ func_ov002_022b005c:
     mov r2, #0x400
     bl func_0208fc48
     mov r0, r5
-    bl func_02006e00
+    bl Task_Invoke
 .L_10c:
     bl func_02006160
     cmp r0, #0x0
