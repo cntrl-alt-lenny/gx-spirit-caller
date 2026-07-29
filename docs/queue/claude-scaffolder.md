@@ -25,6 +25,10 @@
 2. **Even with a literal cast, `const void *arr[N]` (pointer-to-const, mutable pointer) and `void *const arr[N]` (const pointer, mutable pointee) are different C types, and only the latter reliably compiles to `.rodata`.** Caught via `mwldarm`'s own link warning (`.data(.data) in file X.o is referenced but has not been written`) — check for this warning on any incremental build touching a pointer-typed global, it's far faster to spot than a whole-ROM byte diff. For a struct containing pointer *members* (not a bare pointer array), declaring the struct instance itself `const` correctly makes its pointer fields immutable the same way — verified working for `data_ov002_022ca790`/`data_ov013_021cb750`.
 3. **If ground truth is `.data`, do the opposite: leave the symbol deliberately non-`const`/non-`static`, exactly matching its original declaration** — adding `const`/`static` to a `.data`-sited array relocates it into `.rodata` and breaks the link. (Independently rediscovered from the *other* direction this same wave, via a pre-existing project dossier for `data_ov006_021ce56c` that had already hit and documented this exact footgun.)
 
+**⚠️ NEVER HAND-TRANSCRIBE BYTE CONTENT — generate every initializer from a script reading the real bytes, in every wave, no exceptions.** Confirmed `cm-data-inference-11`: a struct initializer field was written all-zero from memory instead of copied from the actual pre-edit byte literal, which had a stray non-zero byte partway through — caught only because `ninja sha1` failed outright and `dsd check modules` isolated it. The fix that shipped clean on the first attempt in `cm-data-inference-12` (extracting USA/JPN bytes via a small Python `struct.unpack` script reading `extract/<region>/arm9/arm9.bin` directly) is now the **required** method for any new C initializer, not an optional nicety — whether the source is a `.c` file being retyped, a raw ROM extraction, or `git show` of a predecessor branch. Hand-copying hex bytes from a Read-tool dump, even when re-reading the exact same tool output within the same turn, is exactly how this bug happened.
+
+**⚠️ THE OPAQUE-BLOB CENSUS REGEX MUST BE RECURSIVE — `src/overlay*/*.c` (one level) silently skips `src/overlayNNN/data/*.c` and `src/main/data/*.c` subdirectories.** Confirmed after `cm-data-inference-12` incorrectly declared the campaign's discovery method exhausted: a live recount using `grep -rl ... --include="*.c" src/main src/overlay*` (properly recursive) found **66** current matches against the flat glob's **24** — 42 net-new candidates, every one of them inside `src/overlay004/data/` (an overlay this campaign had never touched). This is the same bug class already fixed once before in this project's own tooling (`q-research-index-recursive-glob`, PR #1366, `496→3011 entries`) — a flat, non-recursive glob undercounting a real pool is a recurring failure mode here, not a one-off. **Always use a properly recursive glob for any project-wide file census** (`--include`/`**` rather than a single `*` level), and re-verify the *count itself* is plausible (cross-check against a differently-derived signal, e.g. `find ... -type d` for unexpected subdirectories) before trusting a census result of zero or near-zero.
+
 ---
 
 ## Items
@@ -656,8 +660,58 @@ Pivoted to the one standing concrete lead instead: implemented `data_020b46b8`'s
 Full writeup: `docs/research/data/cm-data-inference-12-2026-07-27.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed, full pytest green — 3100 passed, 15 skipped, 0 failed) on the first attempt. `Named-struct`: 44,592 → 44,592 bytes (unchanged — this wave's work was USA/JPN-only, outside what the EUR-scoped metric measures). No fresh census investigations dispatched (none to dispatch); 1 of 1 standing lead implemented.
 
-## cm-data-inference campaign status: EUR main+overlay census exhausted (2026-07-27, after wave 12)
+## CORRECTED (2026-07-27, post-merge review): the wave-12 "campaign exhausted" claim below was WRONG
+
+The census regex used every wave (`src/main/*.c src/overlay*/*.c`) is a **flat, one-level glob** — it silently never reached `src/overlayNNN/data/*.c` or `src/main/data/*.c` subdirectories. A properly recursive re-run found **66** current opaque `unsigned char[N]` matches, not the 24 the flat glob reported — **42 net-new candidates, all inside `src/overlay004/data/`**, an overlay this campaign never touched in waves 2-12. See the new standing rule above (added same date) — this is the same recursive-glob bug class already fixed once before in this project's own tooling (`q-research-index-recursive-glob`). The paragraph below is kept for the historical record of what wave 12 believed at the time, not as current guidance — see `cm-data-inference-13` instead.
+
+## cm-data-inference campaign status: EUR main+overlay census exhausted (2026-07-27, after wave 12) — SUPERSEDED, see correction above
 
 Waves 2 through 12 have worked through every opaque `unsigned char[N]` blob the original mechanical carve produced across `main` and all 24 overlays, plus the one cross-region lead that surfaced along the way. No `cm-data-inference-13` filed — there is no known fresh lead left for this specific discovery method (a live census re-run at the start of wave 12 confirmed zero remaining untouched candidates).
 
 If a future session wants to continue this line of work, it needs a **different discovery angle**, not a re-run of the same census — for example: scanning for opaque data that was never part of the original "Cluster C/D" mechanical carve batch at all (a different category, likely needing its own identification method), auditing already-shipped retypes for correctness now that the method has matured (several early-wave ships used older/weaker evidence standards than waves 8-12), or picking a completely different queue item. `python tools/work_queue.py next claude-scaffolder` will fall through to whatever else is queued, if anything.
+
+### cm-data-inference-13 — the untagged Cluster-C pool in src/overlay004/data/ (priority S) [DONE]
+
+Re-derived fresh via `grep -rlE "^(static )?(const )?unsigned char data_[0-9a-zA-Z_]+\[[0-9]+\] = \{" --include="*.c" src/main src/overlay*` (properly recursive this time — see the correction/standing-rule above): **66 total matches, 24 already conclusively assessed across waves 2-12, 42 genuinely fresh** — every one of them in `src/overlay004/data/`, an overlay never touched by this campaign before. Re-derive this count yourself before trusting it; this campaign's own handed-down counts have been wrong every single wave, including this one's first attempt.
+
+All 42, sorted by size (bytes), for size-first prioritization (`Named-struct` sits at 0.93% of data bytes — a handful of large correct retypes moves it more than many small ones):
+
+```
+2280 data_ov004_021e3500.c   556 data_ov004_021e2efc.c    32 data_ov004_0220a250.c   28 data_ov004_02209aec.c
+2096 data_ov004_021ff0b4.c   500 data_ov004_021e3f60.c    32 data_ov004_0220a20c.c   24 data_ov004_02209e88.c
+1024 data_ov004_02206760.c   448 data_ov004_021f4880.c    32 data_ov004_0220a16c.c   24 data_ov004_02209e10.c
+ 704 data_ov004_021e87ac.c   376 data_ov004_021e3de8.c    32 data_ov004_0220a14c.c   20 data_ov004_02209ac0.c
+ 268 data_ov004_021e3128.c   152 data_ov004_021f4a40.c    32 data_ov004_0220a12c.c   16 data_ov004_0220a0ac.c
+  88 data_ov004_0220a2a0.c    64 data_ov004_02209fd0.c    32 data_ov004_02209d68.c   12 data_ov004_0220a300.c
+  60 data_ov004_02209f94.c    40 data_ov004_02206738.c    32 data_ov004_02209d10.c   12 data_ov004_02209f88.c
+  32 data_ov004_0220a270.c    32 data_ov004_02209ce8.c    28 data_ov004_02209d30.c   12 data_ov004_02200de8.c
+  32 data_ov004_02209cc8.c    32 data_ov004_02209ca8.c    28 data_ov004_02209c8c.c    8 data_ov004_0220a2f8.c
+  32 data_ov004_02209c2c.c                                28 data_ov004_02209c70.c
+                                                            28 data_ov004_02209bb8.c
+                                                            28 data_ov004_02209b9c.c
+                                                            28 data_ov004_02209b08.c
+```
+
+(all paths relative to `src/overlay004/data/`)
+
+Same method as waves 2-12: consumer-evidence-driven, computed-stride/loop-bound-proven → STRONG, fixed-offset-only → WEAK/decline, boundary conflicts → CONTRADICTION, never force a type onto insufficient evidence. **Expect a different hit-rate profile than waves 2-12**: that pool was pre-filtered by having survived a mechanical carve pass already touched by nothing; this one is genuinely never-assessed, so it likely holds a real mix of correctly-opaque buffers (strings, bitmaps, sound/graphics data legitimately staying `unsigned char`) alongside mis-typed ones — a lower ship rate here is a correct, expected result of a different population, not underperformance. Report it plainly rather than reaching for a number that matches prior waves.
+
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-symbol verdict + hit rate (with an explicit note on why this pool's rate may differ from waves 2-12) + `Named-struct` before/after from a real `progress.py` run.
+
+**Result:** Re-derived the pool count fresh at wave start (66 total recursive matches, 24 already-settled, 42 net-new — independently confirmed, not taken from the queue entry's own number). Dispatched the 17 largest (2280 B down to 40 B) per the size-first instruction. **6 of 17 shipped (35%)**, deliberately lower than waves 8-12's range — see below, this is the expected result of an unfiltered pool, not underperformance. 1 WEAK decline (`02206738`, AES Rcon table — right content, no computed-index consumer proof). 1 kept byte-identical with a comment-only fix (`02209fd0`, genuine Shift-JIS text, not converted to a string literal to avoid charset-mangling risk for zero benefit).
+**The other 9 of 17 are CORRECTLY OPAQUE for an unusual reason**: real, compiled ARM32/Thumb machine code (complete functions + literal pools) that dsd's automatic classification left tagged `data(any)` — not struct/array/string data at all. `data_ov004_021e2efc`'s own brief-154/PR #581 precedent proves reclassifying this class to `kind:function` breaks EUR SHA1, so none were retyped. Several agents also independently caught and corrected a standing error in `docs/research/ov004-rodata-pointer-targets.md`: its large "N refs" counts for these blobs are a mirage from ov002/ov004 sharing address space (mutually-exclusive overlays), not real references.
+Implemented (all 6, byte content generated via Python script reading `extract/eur/arm9_overlays/ov004.bin` directly, per the permanent never-hand-transcribe rule): 3 `/Duel2D/MOBJ/edit_*.LZ5bg` asset-path strings (`0220a20c`, `0220a250` — a sprintf template, `0220a270`), 1 ESRB online-play notice string (`02209f94`), 1 AES **Td2** inverse-cipher table as `const unsigned int[256]` (`02206760` — element count/stride proven directly from the raw undecompiled consumer's own disassembly: explicit `LSL #2` + `AND #0xff`), and 1 partial struct (`0220a2a0` — 2 relocation-proven function-pointer fields via literal casts per this project's pointer-table convention, remaining 76 unproven bytes kept as honest gap fields).
+Full writeup: `docs/research/data/cm-data-inference-13-2026-07-27.md`.
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS on the first attempt (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed; pytest 3108 passed, 15 skipped, 63 subtests). `Named-struct`: 44,592 → 44,680 bytes (+88 — only the one struct-typed file moves this specific metric; the strings and flat array are real readable-C but not struct-shaped).
+
+### cm-data-inference-14 — the remaining src/overlay004/data/ pool (25 of 42, ≤32 bytes each) [TODO]
+
+Wave 13 dispatched only the 17 largest of the 42 fresh `src/overlay004/data/` candidates found by the corrected recursive census. **25 remain, all 32 bytes or smaller** — re-derive the exact list fresh (`grep -rlE "^(static )?(const )?unsigned char data_[0-9a-zA-Z_]+\[[0-9]+\] = \{" --include="*.c" src/main src/overlay*`, cross-check against wave 13's doc for what's already settled) rather than trusting any prior wave's table, per this campaign's standing count-derivation rule.
+
+**Strongest lead**: `data_ov004_0220a12c`, `_0220a14c`, `_0220a16c` (all 32 B, immediately before wave 13's confirmed `_0220a20c` in address order) — very likely more members of the same `/Duel2D/MOBJ/edit_*.LZ5bg` asset-path string family wave 13 shipped 3 of. Worth investigating first.
+
+Also worth checking before investigating fresh: wave 13 found this overlay has an active, separate research thread (`docs/research/ov004-rodata-misclassification-survey.md` and siblings, briefs ~141-182) covering ARM32-veneer-blob misclassification — search there first for any of the 25 remaining symbols before treating them as unseen, since 9 of wave 13's 17 turned out to already be cataloged by that thread under a different framing.
+
+Same method as waves 2-13: consumer-evidence-driven, computed-stride/loop-bound-proven → STRONG, fixed-offset-only → WEAK/decline, boundary conflicts → CONTRADICTION, real compiled code misclassified as data → CORRECTLY OPAQUE (do not retype; do not attempt a `kind:function` reclassification, proven to break SHA1 on this exact symbol class). Small blobs (≤32 B) skew toward being either short strings or small scalar/pointer fields rather than multi-field structs — expect a hit-rate profile closer to the string-heavy part of wave 13 than to its large-blob veneer-code tail, but state the real number rather than assuming it.
+
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-symbol verdict + hit rate + `Named-struct`/`Typed-array` before/after from a real `progress.py` run.
