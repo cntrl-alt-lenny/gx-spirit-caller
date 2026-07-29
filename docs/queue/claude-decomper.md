@@ -333,7 +333,7 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 > `tools/asm_escape.py` source, not a new failure-mode instance; see
 > `docs/research/cm-ov002-unknown-sweep-4-2026-07-27.md`.
 
-### cm-ov002-unknown-sweep-5 — next size band [S] [TODO]
+### cm-ov002-unknown-sweep-5 — next size band [S] [CLAIMED]
 
 Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B). The decline is real and expected as size grows; 40.7% is still well worth sweeping. `wall_aware_headroom.py --exclude-attempted --min-size 136 --max-size 148` finds 198 ov002 candidates for the next band up. ov002 has ~2,367 never-assessed candidates left overall.
 
