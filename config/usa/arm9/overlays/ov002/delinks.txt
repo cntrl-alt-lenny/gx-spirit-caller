@@ -147,7 +147,7 @@ src/usa/overlay002/func_ov002_021afae4.c:
     complete
     .text start:0x021afae4 end:0x021afaf4
 
-src/usa/overlay002/func_ov002_021afaf4.s:
+src/usa/overlay002/func_ov002_021afaf4.c:
     complete
     .text start:0x021afaf4 end:0x021afb74
 src/usa/overlay002/ov002_021afb74.c:
