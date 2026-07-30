@@ -61,6 +61,11 @@ rationale)
   (`new_symbols_txt_lines` in port_to_region.py's output) is parked, not
   auto-applied — writing a new symbols.txt line is a different class of
   edit than this loop's delinks.txt/.c flip and stays a manual step.
+- Before a candidate enters a gated batch, `fastmatch.py` compiles only its
+  target object and performs the resolved comparison. A non-100% result,
+  including fastmatch's fail-closed `NO-INSTRUCTIONS-PARSED` result, is
+  parked before any ROM gate. Compile/gap/tool failures remain retryable tool
+  errors rather than being silently treated as matches or permanent walls.
 """
 from __future__ import annotations
 
@@ -95,6 +100,75 @@ def filter_sim1_backlog(entries: list[dict]) -> list[dict]:
     proven, just untested."""
     return [e for e in entries
             if e.get("byte_sim") is not None and e["byte_sim"] >= SIM_FLOOR]
+
+
+def _fastmatch_has_no_instructions(value: object) -> bool:
+    """Return whether a fastmatch JSON value contains its fail-closed marker."""
+    if isinstance(value, str):
+        return "NO-INSTRUCTIONS-PARSED" in value
+    if isinstance(value, dict):
+        return any(_fastmatch_has_no_instructions(v) for v in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_fastmatch_has_no_instructions(v) for v in value)
+    return False
+
+
+def fastmatch_verdict(payload: object, returncode: int) -> tuple[str, str]:
+    """Classify one `fastmatch --json` result without allowing false passes.
+
+    Returns ``("pass", reason)`` only for one healthy result whose requested
+    function has an explicit 100.0 match. A mismatch is a prefilter refusal;
+    malformed output, missing functions, and missing gap data are retryable
+    tool errors. A compiler diagnostic caused by the candidate itself is an
+    early refusal; missing compiler/build infrastructure remains retryable.
+    The distinction matters: a broken prefilter must never turn an
+    infrastructure failure into a permanent park.
+    """
+    if not isinstance(payload, list) or len(payload) != 1:
+        return "tool-error", "expected one fastmatch JSON result"
+    result = payload[0]
+    if not isinstance(result, dict):
+        return "tool-error", "malformed fastmatch result"
+    status = result.get("status")
+    if status == "compile_error":
+        error = str(result.get("error", ""))
+        lower_error = error.lower()
+        infra_markers = (
+            "not found", "not recognized", "no such file", "cannot open",
+            "build.ninja:", "ninja: error: loading",
+        )
+        if not error or any(marker in lower_error for marker in infra_markers):
+            return "tool-error", "fastmatch compile infrastructure error"
+        first_diagnostic = next(
+            (line.strip() for line in error.splitlines()
+             if line.strip() and "FAILED:" not in line and "mwccarm.exe" not in line),
+            "candidate compiler diagnostic",
+        )
+        return "refused", f"candidate compile error: {first_diagnostic[:240]}"
+    if status != "ok":
+        return "tool-error", f"fastmatch status={status!r}"
+    functions = result.get("functions")
+    if not isinstance(functions, list) or not functions:
+        return "tool-error", "fastmatch returned no function result"
+    if returncode not in (0, 1):
+        return "tool-error", f"fastmatch exited {returncode}"
+
+    for function in functions:
+        if not isinstance(function, dict):
+            return "tool-error", "malformed fastmatch function result"
+        name = function.get("name", "?")
+        if _fastmatch_has_no_instructions(function):
+            return "refused", f"{name}: NO-INSTRUCTIONS-PARSED"
+        if function.get("status") != "ok":
+            if function.get("status") == "not_in_gap":
+                return "refused", f"{name}: not-in-gap"
+            return "tool-error", f"{name}: status={function.get('status')!r}"
+        pct = function.get("match_percent")
+        if pct != 100.0:
+            return "refused", f"{name}: resolved match {pct!r}%"
+    if returncode != 0:
+        return "tool-error", f"fastmatch exited {returncode} despite 100.0% results"
+    return "pass", "all requested functions resolved at 100.0%"
 
 
 _HDR_RE = re.compile(r"^(\S+):$")
@@ -181,6 +255,43 @@ class PortOps(bc.Ops):
             return {"status": "tool-error",
                     "reason": f"non-JSON output (rc={r.returncode}): {combined}"}
 
+    def prefilter(self, c_rel: str, func: str) -> tuple[str, str]:
+        """Run the cheap one-object resolved check before a ROM gate.
+
+        The temporary C is already present when this method is called, so a
+        fresh configure is required to add it to build.ninja. `fastmatch.py`
+        then invokes exactly one ninja object target; it never links or runs
+        the ROM SHA-1 gate. The caller removes the temporary C in a finally
+        block, whether this returns pass, refusal, or tool-error.
+        """
+        try:
+            configured = self._run(
+                [sys.executable, "tools/configure.py", self.version],
+                timeout=self.call_timeout or None,
+            )
+        except subprocess.TimeoutExpired:
+            self._kill_orphans()
+            return "tool-error", "configure timeout"
+        if configured.returncode != 0:
+            combined = (configured.stdout + configured.stderr).strip()[:400]
+            return "tool-error", f"configure failed (rc={configured.returncode}): {combined}"
+
+        try:
+            checked = self._run(
+                [sys.executable, "tools/fastmatch.py", self.version, c_rel,
+                 "--func", func, "--json"],
+                timeout=self.call_timeout or None,
+            )
+        except subprocess.TimeoutExpired:
+            self._kill_orphans()
+            return "tool-error", "fastmatch timeout"
+        try:
+            payload = json.loads(checked.stdout)
+        except (json.JSONDecodeError, ValueError):
+            combined = (checked.stdout + checked.stderr).strip()[:400]
+            return "tool-error", f"fastmatch produced non-JSON output: {combined}"
+        return fastmatch_verdict(payload, checked.returncode)
+
     def git_commit_port(self, add_paths: list[str], remove_paths: list[str],
                         message: str) -> bool:
         """Commit a port batch: `add_paths` (new .c + touched delinks.txt)
@@ -224,6 +335,8 @@ class Report:
     parked_needs_symbol: list[str] = field(default_factory=list)
     stale: list[str] = field(default_factory=list)
     tool_error: list[str] = field(default_factory=list)
+    prefilter_refuse: list[str] = field(default_factory=list)
+    prefilter_tool_error: list[str] = field(default_factory=list)
     gate_fail: list[str] = field(default_factory=list)
     deferred: list[str] = field(default_factory=list)
     committed_batches: int = 0
@@ -231,6 +344,8 @@ class Report:
     def summary(self) -> str:
         return (f"PORTED {len(self.passed)} | refused {len(self.parked_refuse)} | "
                 f"needs-symbol {len(self.parked_needs_symbol)} | "
+                f"prefilter-refuse {len(self.prefilter_refuse)} | "
+                f"prefilter-error {len(self.prefilter_tool_error)} | "
                 f"stale {len(self.stale)} | tool-error {len(self.tool_error)} | "
                 f"gate-fail {len(self.gate_fail)} | deferred {len(self.deferred)} | "
                 f"commits {self.committed_batches}")
@@ -434,6 +549,30 @@ class BatchPorter:
             self._park(entry["tgt"], "needs-symbols-txt-line")
             self.log(f"  ⊘ {entry['tgt']} needs a new symbols.txt line -- manual, skip")
             return None
+
+        # Keep the generated C out of the staged batch until the cheap,
+        # resolved one-object check has passed. Test doubles used by the pure
+        # driver tests do not implement this optional seam; production
+        # PortOps does, so real runs are always prefiltered.
+        prefilter = getattr(self.ops, "prefilter", None)
+        if callable(prefilter):
+            candidate_path = ROOT / new_c_rel
+            candidate_path.parent.mkdir(parents=True, exist_ok=True)
+            candidate_path.write_text(result["rewritten"], encoding="utf-8")
+            try:
+                verdict, reason = prefilter(new_c_rel, entry["tgt"])
+            finally:
+                candidate_path.unlink(missing_ok=True)
+            if verdict == "refused":
+                self.report.prefilter_refuse.append(entry["tgt"])
+                self._park(entry["tgt"], "prefilter-refuse")
+                self.log(f"  ⊘ {entry['tgt']} fastmatch refused ({reason})")
+                return None
+            if verdict != "pass":
+                self.report.prefilter_tool_error.append(entry["tgt"])
+                self.log(f"  ⚠ {entry['tgt']} fastmatch tool-error ({reason}) "
+                         "-- retry next run")
+                return None
         return PendingPort(func=entry["tgt"], old_s_rel=header, new_c_rel=new_c_rel,
                           delinks_rel=delinks_rel, source_text=result["rewritten"],
                           old_s_content=old_s_content)
