@@ -764,3 +764,15 @@ The one symbol with an explicit reopening condition (`data_02101e64`, declined b
 This is methodologically different from wave 12's wrong "exhausted" claim: that census was flat and missed a real subdirectory; this one is fully recursive by construction and every hit was individually reconciled against primary sources, not assumed settled. No wave 16 filed — per this campaign's own wave-12 precedent, a genuinely exhausted discovery method is a real stopping point. Concrete leads for a genuinely different angle, left for the next session to choose from: raw `.s` data never carved into a `.c` file at all (unexplored category), or the specific uncarved `data_02101e7c` gap (corroborates `02101e64`'s shape, doesn't reopen it).
 Full writeup: `docs/research/data/cm-data-inference-15-2026-07-30.md`.
 **Gate:** no source changed; `python tools/gate3.py --scope all` run for hygiene/regression confirmation regardless.
+
+### cm-data-typing-16 — find where the data mass actually is (priority S) [TODO]
+
+Measurement item, not a shipping round by default. `python tools/progress.py --version eur` shows only 1.67% Typed-array / 0.94% Named-struct of 4,776,528 EUR data bytes — the flat unsigned-char census (waves 2-15, now genuinely exhausted per wave 15) only ever addressed one narrow shape. Read `tools/progress.py`'s `summarize_data_readability` and `_DATA_ARRAY_DECL_RE`/`_tu_has_named_struct_decl` first — know exactly what the metric counts before ranking what would move it.
+
+Rank the remaining opportunity by BYTES across: bytes in `.bss` never carved at all (verify the claim that zero `.bss` bytes are `.c`-owned in any region, don't assume it); bytes in `.rodata` not reached by the blob census; bytes already typed as flat primitive arrays (`int[N]`, `unsigned int[N]`, etc — real count TBD, re-derive don't trust a handed-down ~179/~21) that might really be struct arrays; bytes in genuinely opaque veneer/code regions that must NOT be touched (wave 13 established reclassifying these breaks EUR SHA1 — cite and exclude).
+
+Deliverable: a ranked table by bytes with the arithmetic, and a recommendation on which category to attack next. Ship the top few if the evidence is strong enough within the round. A "the data lane has no high-value work left, redirect to code" conclusion is valid and useful if that's the honest result — say so plainly rather than stretching for a number.
+
+**Permanent rules (apply every wave, not just this one):** generate every byte-level claim via script reading the real extracted ROM, never hand-transcribe. Before writing any commit/doc/queue claim, reconcile it against `git diff --stat`/`git status --short`; for multi-file waves, run one consolidated script re-verifying every proposed value against raw ROM bytes before writing anything, plus a `git status --short | wc -l` file-count check after writing but before building. Decline with a citation rather than forcing a type onto weak evidence.
+
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS + the ranked table + recommendation + `Named-struct`/`Typed-array` before/after from a real `progress.py` run.
