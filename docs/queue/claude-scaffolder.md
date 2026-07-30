@@ -809,3 +809,17 @@ The 0.8% (32,768 B) genuinely-unclaimed slice is exactly `ov000`+`ov002` — the
 **First concrete item for the next wave**: a scripted discovery found **462 of 1,422** still-raw `.bss` symbols already have at least one `extern` reference in an already-*matched* consumer proving a real type — zero fresh consumer investigation needed to start, though real per-symbol reconciliation is still required (multi-consumer type agreement; full-vs-partial size match — one already-found case, `data_ov001_021ca420`, has a consumer proving only 4 of its 32 declared bytes). Not a blind bulk-convert list; a well-evidenced starting pool.
 Full writeup: `docs/research/data/cm-bss-carve-scope-2026-07-30.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS, first attempt (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed; pytest 3125 passed, 15 skipped, 63 subtests). `Named-struct`: 50,104 → 50,112 (+8). `Typed-array`: unchanged at 79,664 (expected, explained above).
+
+### cm-bss-convert-1 — start the conversion (priority S) [TODO]
+
+`.bss` is the largest data opportunity in the project: 4,067,552 B = 85.2% of all EUR data bytes, currently 0% C-owned. `cm-bss-carve-scope` found the entry point: 462 of 1,422 still-raw `.bss` symbols already have an `extern` reference in an already-matched consumer proving a real type — zero fresh consumer investigation needed to start.
+
+**Per-symbol reconciliation is a hard rule, not a note, before converting any of them**: multi-consumer type agreement, and full-vs-partial size match against the symbol's real `.space N` size. One `extern` is a claim, not a proof. Decline where consumers disagree, exactly as every other wave has declined on insufficient evidence.
+
+Size the first batch for proper reconciliation, not maximum count. Report `Named-struct` and `Typed-array` before/after, and say plainly which metric each conversion moves and why — the scalar-vs-array distinction from `cm-bss-carve-scope` will come up constantly (a bracket-less scalar struct instance moves `Named-struct` only; an array declaration moves both).
+
+Leave `ov000`/`ov002` alone — that's the 32,768 B genuinely-unclaimed slice the brief-118/139 sweep never reached, and the documented overlay-swap pair sharing a base address. A different problem; file it separately if picked up.
+
+**Permanent rules (every wave):** generate byte-level claims via script from the real extracted ROM, never hand-transcribe (moot for `.bss` itself — no bytes exist — but still applies to any other file touched). Reconcile every commit/doc/queue claim against `git diff --stat`/`git status --short` before writing it. One consolidated re-verification pass before writing a multi-file batch, plus a file-count check before building.
+
+**Gate:** 3-region `python tools/gate3.py --scope all` PASS + per-symbol verdict (converted vs declined, with reasons) + `Named-struct`/`Typed-array` before/after, broken out by which conversions moved which metric.
