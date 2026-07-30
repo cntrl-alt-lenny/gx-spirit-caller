@@ -3566,7 +3566,7 @@ src/main/func_0201c2a8.s:
     complete
     .text start:0x0201c2a8 end:0x0201c498
 
-src/main/func_0201c498.s:
+src/main/func_0201c498.c:
     complete
     .text start:0x0201c498 end:0x0201c560
 src/main/func_0201c560.c:
