@@ -432,3 +432,25 @@ Repeat all three checks that earned their keep: `tools/check_activation_invarian
 **If the band finishes early:** `main` has ~2,291 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + `check_activation_invariant.py` + the three-way count check in the PR body.
+
+### cm-ov002-unknown-sweep-8 — 149-512B, selected by callee coverage [TODO] [S]
+
+> Filed from the coordinating process's own chat message after sweep-7 merged (main 988cd5f7c, EUR 11.66%) — appended here per the project's own "a prose mention is not a task" convention rather than executed straight from chat.
+
+Stay in 149-512B. It holds 33.00pp, is only 12.2%/2.3% complete, and just measured 82.8 bytes/attempt — the best measured productivity in project history. Module-agnostic, as sweep-7 proved was correct.
+
+**CHANGE THE SELECTOR. Do not partition by address order.** Compute callee-coverage per candidate first — what fraction of each function's callees already exist as matched C — and select the top ~100 by coverage. Sweep-7 produced that predictor (every unshipped 513-1023B candidate had under 65% callee coverage; every 149-512B ship had 60-100%); use it here. **Report ship-rate bucketed by coverage band**, not just an overall number — the deliverable is testing whether the relationship is as sharp within the 149-512B band as sweep-7's cross-band comparison suggested.
+
+Exclude candidates already touched by prior sweeps: ov002 `<=164B` (sweeps 1-6's territory) and all of sweep-7's own 149-512B candidates (60 addresses, 20 now shipped/naturally-excluded + 40 still parked as `.s` and NOT yet in `attempts.tsv` — see the `attempts.tsv` gap memory, still unfixed).
+
+Keep reporting BYTES and pp, not ship-rate alone.
+
+Two open leads, still unfiled, yours when wanted: P-17 re-test (15 members, constant-immediate placement resolved 2/2 in sweep-6, untested on the rest); the S-2 sparse-switch-case-order correction and new C-53/C-54 levers from sweep-7, both already in codegen-walls.md and ready to carry forward.
+
+**Correction to prior dispatch-prompt framing**: the "brief 302/294 header is ov002-exclusive" premise was wrong — it appears on `main`/`overlay000`/`overlay004`/`overlay011` too (confirmed independently by 4 of 5 sweep-7 batches). Keep stating the resolution verbatim, drop the ov002-exclusive framing.
+
+**NON-NEGOTIABLE — one worker per worktree, no exceptions**, same as sweep-7 (worked: one small, immediately-caught incident, no file-corruption race). State verbatim: "Work through your assigned functions yourself, one at a time, directly. Do NOT spawn further sub-agents or otherwise sub-divide your assignment — a worker that did this in an earlier round caused a real `fastmatch.py` self-heal race and left its own completion notifications unable to reach its actual parent. The self-heal is designed for one worker per worktree; it is not concurrency-safe and will not be made so." Verify the worktree directly rather than trusting an agent's own account of itself, same as the last two rounds.
+
+Also state verbatim: "Before your final report, run `git status --short` yourself and cross-check every function you're about to claim as shipped — confirm its `.s` is actually gone AND its `delinks.txt` line actually says `.c:`. A `fastmatch.py` 100% result alone does not mean you finalized it."
+
+**Gate:** `python tools/gate3.py --scope all --clean` PASS, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; stray-draft scan; regenerate the research index before pushing.
