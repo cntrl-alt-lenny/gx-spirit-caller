@@ -1,6 +1,11 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 24 bytes, shape=string). */
+/* data_ov004_02209e88 (24 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021d0e5c and from:0x021d3570 (both kind:load to
+ * this address) -- two consumers, same two permanent GLOBAL_ASM
+ * functions and identical func_02006c0c(path,4,0) call shape as
+ * sibling data_ov004_02209e10/_e70 in this wave. Same /WiFi/*.LZ5bg
+ * family as wave 13's /Duel2D/MOBJ/ shipped strings, different
+ * subfolder. 21 printable ASCII + 3 trailing NUL, byte-exact per script
+ * re-extraction. Plain char, no const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209e88[24] = {
-    0x2f, 0x57, 0x69, 0x46, 0x69, 0x2f, 0x62, 0x67, 0x5f, 0x73, 0x69, 0x74,
-    0x61, 0x31, 0x61, 0x2e, 0x4c, 0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00,
-};
+char data_ov004_02209e88[24] = "/WiFi/bg_sita1a.LZ5bg";

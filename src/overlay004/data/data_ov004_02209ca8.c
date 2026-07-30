@@ -1,7 +1,13 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_02209ca8 (32 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021cd3a4 kind:load to:0x02209ca8 -- one of 5
+ * sibling category-label strings sharing func_ov004_021cced8's literal
+ * pool (corroborated independently by
+ * docs/research/retriage/Ov004Ov006DeepR8.md's "category-2 string
+ * label" read). Sibling of data_ov004_02209c70/_c8c/_cc8/_ce8 (the
+ * other 4 category labels) and of wave 13's shipped MOBJ strings, same
+ * /Duel2D/MOBJ/*.LZ5bg family. 29 printable ASCII + 3 trailing NUL,
+ * byte-exact per script re-extraction. Plain char, no const/unsigned
+ * (.data ground truth).
+ */
 
-unsigned char data_ov004_02209ca8[32] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x63, 0x68, 0x72, 0x5f, 0x68, 0x61, 0x69, 0x73, 0x69, 0x6e, 0x2e,
-    0x4c, 0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00,
-};
+char data_ov004_02209ca8[32] = "/Duel2D/MOBJ/chr_haisin.LZ5bg";

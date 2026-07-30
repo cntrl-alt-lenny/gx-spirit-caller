@@ -1,7 +1,12 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_02209d68 (32 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021ce1b8 kind:load to:0x02209d68 -- consumer
+ * func_ov004_021cded0.s (_LIT16), the "category 3/default" fallback per
+ * docs/research/retriage/Ov004Ov006DeepR8.md's pseudocode reconstruction
+ * of that function. Byte-identical to wave 13's shipped
+ * data_ov004_0220a270 (same MOBJ path, second occurrence, different
+ * function/role). 28 printable ASCII + 4 trailing NUL, byte-exact per
+ * script re-extraction. Plain char, no const/unsigned (.data ground
+ * truth).
+ */
 
-unsigned char data_ov004_02209d68[32] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x65, 0x64, 0x69, 0x74, 0x5f, 0x30, 0x30, 0x30, 0x6e, 0x2e, 0x4c,
-    0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00, 0x00,
-};
+char data_ov004_02209d68[32] = "/Duel2D/MOBJ/edit_000n.LZ5bg";

@@ -1,7 +1,10 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 28 bytes, shape=string). */
+/* data_ov004_02209b08 (28 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021caaf8 kind:load to:0x02209b08 -- consumer
+ * func_ov004_021ca4f8.s conditionally loads this vs. sibling
+ * data_ov004_02209aec ("WL_Icons" vs "WF_Icons") on a runtime flag, then
+ * calls func_02006c0c(path,4,0) -- the A/B alternative of that pair.
+ * 27 printable ASCII + 1 trailing NUL, byte-exact per script
+ * re-extraction. Plain char, no const/unsigned (.data ground truth).
+ */
 
-unsigned char data_ov004_02209b08[28] = {
-    0x2f, 0x44, 0x75, 0x65, 0x6c, 0x32, 0x44, 0x2f, 0x4d, 0x4f, 0x42, 0x4a,
-    0x2f, 0x57, 0x4c, 0x5f, 0x49, 0x63, 0x6f, 0x6e, 0x73, 0x2e, 0x4c, 0x5a,
-    0x35, 0x62, 0x67, 0x00,
-};
+char data_ov004_02209b08[28] = "/Duel2D/MOBJ/WL_Icons.LZ5bg";

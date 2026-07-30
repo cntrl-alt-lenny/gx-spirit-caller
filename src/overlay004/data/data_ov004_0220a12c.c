@@ -1,7 +1,12 @@
-/* ov004 cluster sweep brief 141 — Pattern 1 (.data, 32 bytes, shape=string). */
+/* data_ov004_0220a12c (32 bytes, 4-aligned): wave 14 string retype.
+ * relocs.txt: from:0x021d878c kind:load to:0x0220a12c -- one real
+ * consumer (func_ov004_021d8648 / Ov004_InitLockGate, permanent
+ * GLOBAL_ASM). NOT part of the /Duel2D/MOBJ/ family despite proximity to
+ * wave 13's shipped strings -- verified from bytes, not assumed: this is
+ * a distinct "Common dialog" UI family, paired with sibling templates
+ * data_ov004_0220a14c/_0220a16c. 28 printable ASCII + 4 trailing NUL,
+ * byte-exact per script re-extraction. Plain char, no const/unsigned
+ * (.data ground truth, delinks.txt).
+ */
 
-unsigned char data_ov004_0220a12c[32] = {
-    0x2f, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2f, 0x64, 0x69, 0x61, 0x6c,
-    0x6f, 0x67, 0x5f, 0x75, 0x6e, 0x69, 0x74, 0x65, 0x30, 0x31, 0x2e, 0x4c,
-    0x5a, 0x35, 0x62, 0x67, 0x00, 0x00, 0x00, 0x00,
-};
+char data_ov004_0220a12c[32] = "/Common/dialog_unite01.LZ5bg";

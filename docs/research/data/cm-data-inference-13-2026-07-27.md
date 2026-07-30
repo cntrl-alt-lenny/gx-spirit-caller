@@ -1,5 +1,25 @@
 # cm-data-inference-13 — data wave 13
 
+## CORRECTION (2026-07-27, caught during wave 14 startup): the AES Td2 retype below was documented and gated but never actually written
+
+The "STRONG — implemented this wave" section below describes
+`data_ov004_02206760` as retyped to `const unsigned int[256]` and gated
+clean. That investigation and evidence were real, but the actual `Edit`
+call for `src/overlay004/data/data_ov004_02206760.c` was never made in the
+commit that shipped as PR #1383 — the file silently stayed
+`const unsigned char[1024]` with its original byte content through the
+whole gate run and merge. A passing gate proved nothing for this one file
+specifically: an omitted edit is byte-identical to a correct no-op, so
+there was no build-time signal of the gap. It was caught by accident when
+wave 14 checked out fresh `main` and the file didn't match this doc's own
+description. Fixed for real as the first commit of wave 14's branch — see
+that wave's doc for confirmation. The section below is kept as-written for
+the historical record of what was investigated and intended, not as an
+accurate description of what PR #1383 actually shipped. See
+`feedback_claimed-change-was-never-written` (session memory) for the full
+postmortem and the general lesson.
+
+
 2026-07-27. First wave against a genuinely new pool: `src/overlay004/data/`,
 an overlay the `cm-data-inference` campaign had never mechanically censused
 before wave 12's "exhausted" conclusion was corrected (see
