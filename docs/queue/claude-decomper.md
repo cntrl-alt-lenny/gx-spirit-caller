@@ -347,7 +347,7 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 > `main` catch-up needed. See
 > `docs/research/cm-ov002-unknown-sweep-5-2026-07-29.md`.
 
-### cm-ov002-unknown-sweep-6 — next size band [S] [TODO]
+### cm-ov002-unknown-sweep-6 — next size band [S] [CLAIMED]
 
 Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B) -> 48.5% (136-148B). **The rate is not monotonically declining** — sweep-5 rebounded, confirming this tracks per-band candidate composition, not a smooth exhaustion curve. `wall_aware_headroom.py --exclude-attempted --min-size 152 --max-size 164` finds 160 ov002 candidates for the next band up. ov002 has ~2,271 never-assessed candidates left overall.
 
