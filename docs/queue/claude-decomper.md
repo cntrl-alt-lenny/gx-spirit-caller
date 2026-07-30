@@ -364,25 +364,39 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 > `gate3.py --scope all --clean` PASS confirmed. See
 > `docs/research/cm-ov002-unknown-sweep-6-2026-07-30.md`.
 
-### cm-ov002-unknown-sweep-7 — next size band [S] [TODO]
+### cm-ov002-unknown-sweep-7 — module-agnostic measurement sweep, 149-1023B [S] [CLAIMED]
 
-Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B) -> 48.5% (136-148B) -> 45.0% (152-164B). Still oscillating in a 40-65% band, not a smooth decline. `wall_aware_headroom.py --exclude-attempted --min-size 168 --max-size 180` finds 154 ov002 candidates for the next band up. ov002 has ~2,199 never-assessed candidates left overall.
+**Scope changed from the originally-filed item — do NOT run the 168-180B ov002 band.** Six sweeps have worked the 1-148B tier, which holds only 6.75pp (percentage points of the project's remaining unshipped bytes) of what's left. Measured pools instead:
 
-**NEW STANDING INSTRUCTION — state this verbatim in every batch dispatch prompt:** "Work through your assigned functions yourself, one at a time, directly. Do NOT spawn further sub-agents or otherwise sub-divide your assignment — a worker that did this last round caused a real `fastmatch.py` self-heal race (one agent's legitimately-shipped function had its `.s` silently resurrected by a different concurrent agent's unrelated self-heal action) and left its own completion notifications unable to reach its actual parent. One worker per worktree, no exceptions."
+| Band | Candidates | Never-assessed | pp |
+|---|---:|---:|---:|
+| 149-512B | 2,898 | 2,878 | 33.00 |
+| 513-1023B | 613 | 600 | 18.14 |
+| >=1024B | 334 | 315 | 30.16 |
 
-Keep stating the header resolution verbatim too (still working perfectly, zero re-litigation for 2 sweeps running): "The `brief 302/294` header on an ov002 `.s` file is mechanical boilerplate stamped by `tools/asm_escape.py --whole-function` on ANY function. It is NOT a per-function wall verdict and is NOT evidence the candidate was assessed. Ignore it and assess the function yourself."
+Take **100 candidates split ~60/40 across 149-512B and 513-1023B**, module-agnostic (not ov002-only). 5 worktrees, 20 candidates each. **This is a measurement exercise, not a maximize-ships sweep**: the deliverable is bytes-per-attempt and ship-rate in each band separately, to decide where future sweeps go. Real ships are still valuable but breadth of data matters more than grinding any one candidate to completion.
 
-**Also state this verbatim (new standing rule, applies to every worker's own final report, not just the PR body):** "Before your final report, run `git status --short` yourself and cross-check every function you're about to claim as shipped — confirm its `.s` is actually gone AND its `delinks.txt` line actually says `.c:`. A `fastmatch.py` 100% result alone does not mean you finalized it."
+**Report bytes shipped and pp, not ship-rate, going forward.** Ship-rate alone is misleading — it measures rate, not output, and ignores that larger bands hold bigger functions. Across the 6 ov002 sweeps, ship-rate fell (63.2%->45.0%) while bytes-per-attempt rose 88% (37.9->71.1) — the project has been getting steadily MORE productive, the opposite of what ship-rate alone suggested.
 
-Carry the lever set (see the last 6 sweep writeups); highest-value additions from sweep-6: bitfield storage type must match real in-memory width, not just field width (C-49); a callee's declared return type can hide a truncation the original performs — widen it to `int` (C-50); duplicate a per-branch shared load in source rather than manually pre-hoisting it (C-51); `unsigned char` cast vs `&0xff` mask select different instruction sequences for byte-packing (C-52).
+**RECORD ELAPSED MINUTES PER CANDIDATE.** The project has no time data at all; cost-per-attempt at these sizes is unknown and is the number that decides where every future sweep goes. Every worker logs a start/end timestamp (or elapsed minutes) per candidate in its final report, shipped or parked.
 
-**HIGH PRIORITY SIDE LEAD, consider before or alongside the next band:** P-17 is now "under reconsideration," not confirmed-permanent — 2 of 2 members tested this round with **constant-immediate placement** (write a fixed sub-offset before an `idx*stride` term, not after) resolved to 100%. 15 members remain (11 never attempted, 4 previously "confirmed" but never tested with this specific lever). A dedicated re-test brief against all 15 could meaningfully shrink the confirmed-permanent wall count — see codegen-walls.md's P-17 entry for the exact member list and the lever's exact mechanism. This is valuable enough to consider as its own item rather than only folding into a future band sweep.
+**Read `docs/research/brief-582-c-ceiling-probe.md` and `docs/research/brief-586-ceiling-r2.md` first** — the only prior art above 512B. Their verdict: the blocker at these sizes is iteration budget, not comprehension (0/5 targets across both briefs failed on "couldn't understand the assembly"). Proven method: read the `.s`, cross-reference already-matched sibling `.c` files in the same module for real signatures, hand-trace the full behavior BEFORE writing C, use `tools/m2c_feed.py --m2c --context` as a scaffold cross-check, iterate via `fastmatch.py` same as always. Known levers specific to this size range: C-24 (`.legacy_sp3.c` routing for the push-r3-padding-vs-explicit-sub-sp alignment symptom — only try when the REST of the function is otherwise close, it can make things worse on denser functions); un-inline a wrongly-factored shared helper into a macro when the `.s` shows the same block repeated at 3+ call sites with no internal `bl` (the original inlines it, doesn't share it); P-16 (repeated `global_symbol+K` address rematerializing into its own pool constant across 3+ call-separated points).
+
+**Park at the first orthogonal register-allocation residual.** With 3,478 unassessed candidates in these two bands, the marginal candidate is far cheaper than the marginal iteration — don't grind. This applies even harder than in prior sweeps.
+
+**NON-NEGOTIABLE — one worker per worktree, no exceptions.** State this verbatim in every batch dispatch prompt: "Work through your assigned functions yourself, one at a time, directly. Do NOT spawn further sub-agents or otherwise sub-divide your assignment — a worker that did this last round caused a real `fastmatch.py` self-heal race (one agent's legitimately-shipped function had its `.s` silently resurrected by a different concurrent agent's unrelated self-heal action) and left its own completion notifications unable to reach its actual parent. The self-heal is designed for one worker per worktree; it is not concurrency-safe and will not be made so."
+
+Keep stating the header resolution verbatim too: "The `brief 302/294` header on an ov002 `.s` file is mechanical boilerplate stamped by `tools/asm_escape.py --whole-function` on ANY function. It is NOT a per-function wall verdict and is NOT evidence the candidate was assessed. Assess it yourself."
+
+**Also state this verbatim:** "Before your final report, run `git status --short` yourself and cross-check every function you're about to claim as shipped — confirm its `.s` is actually gone AND its `delinks.txt` line actually says `.c:`. A `fastmatch.py` 100% result alone does not mean you finalized it."
+
+**Do NOT cite P-20/21/22/23/24/25/26 member counts or aggregate byte totals as justification for the permuter or any tooling investment** — that framing was wrong by ~20x (37 P-20 members = 0.16pp; the permuter has run 4 functions ~100k iterations for zero ships). Park on sight, don't catalogue.
+
+**HIGH PRIORITY SIDE LEAD, worth its own dedicated item alongside or instead of this sweep:** P-17 is "under reconsideration," not confirmed-permanent — 2 of 2 members tested last round with **constant-immediate placement** (write a fixed sub-offset before an `idx*stride` term, not after) resolved to 100%. 15 members remain untested with this specific lever — see codegen-walls.md's P-17 entry for the exact list.
 
 Repeat all three checks that earned their keep: `tools/check_activation_invariant.py <base>..HEAD`, `check_delink_dupes.py`, and a stray-draft scan (`ninja -n` before AND after consolidating).
 
 **REGENERATE the research index before pushing**: `python tools/generate_research_index.py`.
-
-**Standing note on the parked residual:** P-20 (37 members), P-21 (6), P-22 (3), P-23 (2), P-24 (5, tentative), P-25 (3), P-26 (4) are all permuter-shaped or otherwise source-level-lever-resistant register-allocation walls — 60 combined parks across 3 sweeps. Do NOT grind any of them further; quickly confirm the signature matches and move on. This growing count is a real, concrete case for unblocking the Windows permuter lane.
 
 **If the band finishes early:** `main` has ~2,291 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol.
 
