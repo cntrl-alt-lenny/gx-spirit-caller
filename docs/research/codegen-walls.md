@@ -8478,13 +8478,18 @@ this" standing instruction).
 address, all independently recognized by their investigating batch from
 the documented symptom alone. Brings the confirmed cohort to **37**.
 
-**Recipe status: NONE.** Future briefs: try the permuter (blocked on
-Windows currently; revisit on a non-Windows lane) given the byte-exact
-87.9% floor and total unresponsiveness to hand restructuring — this
-looks like exactly the "structurally correct, register-naming-only"
-shape the permuter pipeline exists for. With 37 confirmed members and
-counting, this cohort alone may now justify solving the Windows
-permuter blocker.
+**Recipe status: NONE. Correction (2026-07-30): do NOT treat this
+cohort as a case for prioritizing the permuter.** An earlier version of
+this entry argued the growing member count "may justify solving the
+Windows permuter blocker" — that framing was wrong by roughly 20x on
+value alone: 37 members at ~136 B average is ~5,000 B, a small fraction
+of a percent of the project's remaining unshipped bytes. It's also
+wrong on the evidence: the permuter has actually been run against 4
+functions of this general shape for ~100k iterations combined,
+shipping zero. This is a genuine, well-evidenced permanent wall — park
+members on sight once the symptom matches, and do not accumulate it as
+a future prize or cite its size as justification for tooling
+investment.
 
 **Provenance:** cm-ov002-unknown-sweep-4 (2026-07-27), batches 2/3/4;
 cm-ov002-unknown-sweep-5 (2026-07-29), batches 2/3/4/5;
@@ -8536,8 +8541,9 @@ compound case), this is likely under-counted — watch for the "correct
 logic, register letters only" symptom broadly, not just in the shapes
 listed here.
 
-**Recipe status: NONE.** Same permuter-shaped profile as P-20; revisit
-together once the Windows blocker is resolved.
+**Recipe status: NONE.** Same profile as P-20 — permanent, low aggregate
+byte value, not a case for tooling investment (see P-20's 2026-07-30
+correction). Park on sight.
 
 **Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 5.
 
