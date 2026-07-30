@@ -8999,7 +8999,7 @@ src/main/func_02049f6c.c:
 
 
 
-src/main/func_02049f74.s:
+src/main/func_02049f74.c:
     complete
     .text start:0x02049f74 end:0x0204a01c
 
