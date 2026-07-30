@@ -193,3 +193,15 @@ The Typed-array metric (progress.py:49 _DATA_ARRAY_DECL_RE, :454) matches the op
 Build `tools/check_activation_invariant.py` to mechanically check a git range: added `func_*.c` files under `src/`, deleted `func_*.s` files, and delinks activation flips. Allow routing suffixes (`.legacy.c` / `.legacy_sp3.c`) and report data-file additions separately as informational. Add synthetic failure tests and verify PR #1372 and PR #1376 ranges.
 
 **Gate:** synthetic missing activation exits non-zero; PR #1372 and PR #1376 ranges exit zero; `python -m pytest -q tests` no-new-failures.
+
+### q-recursive-glob-sweep — close the non-recursive directory-scan bug class [DONE]
+
+> DONE: PR #1385. Shipped without a queue entry — added retroactively by the
+> brain at integration time so `work_queue.py` has a record. Fixed the flat
+> scans in `port_census.py`, `pattern_library.py` and `scratch_bundle.py`, each
+> with a synthetic nested-file regression test, plus a full classification audit
+> of every `glob` call in `tools/`. Measured effect: `pattern_library.py` +258
+> nested matched files; `port_census.py` USA/JPN unparsed names 52 -> ~521 (i.e.
+> ~470 nested files per region were previously invisible to the parser).
+> Deliberately-flat scans were left alone with reasons recorded. Third
+> instance of this bug class (after #1366 and #1383).
