@@ -640,7 +640,7 @@ src/jpn/overlay011/func_ov011_021d2b9c.s:
 src/jpn/overlay011/func_ov011_021d2ba4.s:
     complete
     .text start:0x021d2ba4 end:0x021d2bb8
-src/jpn/overlay011/func_ov011_021d2bb8.s:
+src/jpn/overlay011/func_ov011_021d2bb8.c:
     complete
     .text start:0x021d2bb8 end:0x021d2c14
 src/jpn/overlay011/func_ov011_021d2c14.s:
