@@ -915,10 +915,10 @@ src/jpn/overlay002/func_ov002_021bd284.c:
 src/jpn/overlay002/func_ov002_021bd300.s:
     complete
     .text start:0x021bd300 end:0x021bd37c
-src/jpn/overlay002/func_ov002_021bd37c.s:
+src/jpn/overlay002/func_ov002_021bd37c.c:
     complete
     .text start:0x021bd37c end:0x021bd40c
-src/jpn/overlay002/func_ov002_021bd40c.s:
+src/jpn/overlay002/func_ov002_021bd40c.c:
     complete
     .text start:0x021bd40c end:0x021bd49c
 src/jpn/overlay002/func_ov002_021bd49c.s:
