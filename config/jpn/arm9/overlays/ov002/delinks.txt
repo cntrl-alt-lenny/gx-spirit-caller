@@ -2479,7 +2479,7 @@ src/jpn/overlay002/func_ov002_021edda4.c:
     complete
     .text start:0x021edda4 end:0x021ede3c
 
-src/jpn/overlay002/func_ov002_021ede3c.s:
+src/jpn/overlay002/func_ov002_021ede3c.c:
     complete
     .text start:0x021ede3c end:0x021edeb8
 
