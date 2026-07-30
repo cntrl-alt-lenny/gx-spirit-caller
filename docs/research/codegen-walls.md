@@ -6408,6 +6408,41 @@ required the cast form specifically, the mask form byte-differed.
 
 **Provenance:** cm-ov002-unknown-sweep-6 (2026-07-30), batch 5.
 
+### C-53. Literal C `%` operator, not hand-expanded subtraction, matches mwcc's magic-number modulo codegen
+
+**The trap:** mwcc lowers a constant-divisor `%` into a specific
+magic-number-multiply sequence (frequently a double `smull`). Manually
+expanding the same arithmetic as `x - (x / N) * N` does NOT reliably
+reproduce that exact instruction sequence, even though it's
+mathematically identical and even when the hand-expanded division uses
+the same magic-number technique.
+
+**The fix:** write `x % N` directly and let mwcc's own lowering run,
+rather than hand-transcribing the divide-multiply-subtract expansion
+from the disassembly.
+
+**Evidence:** `func_ov008_021afa34` (cm-ov002-unknown-sweep-7, batch 2)
+— literal `%` matched mwcc's literal double-`smull` codegen exactly;
+the hand-expanded form the worker tried first did not.
+
+**Provenance:** cm-ov002-unknown-sweep-7 (2026-07-30), batch 2.
+
+### C-54. Explicit XOR-then-compare-zero can select `teq` over `cmp`
+
+**The trap:** for an equality test between two values, a plain `==`
+comparison compiles to `cmp`; if the original uses `teq` (test
+equivalence — computes the same true/false result via XOR internally
+without materializing a destination register), a natural `==` won't
+reproduce it.
+
+**The fix:** write the comparison as an explicit XOR against zero
+(`(a ^ b) == 0` rather than `a == b`) to nudge mwcc toward emitting
+`teq` instead of `cmp`.
+
+**Evidence:** `func_0200a704` (cm-ov002-unknown-sweep-7, batch 2).
+
+**Provenance:** cm-ov002-unknown-sweep-7 (2026-07-30), batch 2.
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -8207,6 +8242,26 @@ confirmed instance of the residual to file it as its own wall).
 Full detail: `docs/research/cm-parked-reaudit-1-2026-07-25.md`.
 (Brief 677's independent re-audit reached this entry the same round and had flagged it UNVERIFIED on the grounds the typed-struct lever was untried; cm-parked-reaudit-1 then actually ran that lever — the result above supersedes the untried framing.)
 
+**SECOND independent confirmation (cm-ov002-unknown-sweep-7, 2026-07-30)
+— this is exactly the "two more independently-observed instances"
+this entry called for, and it arrived from a worker who had NOT read
+this update** (briefs 582/586, which the sweep-7 dispatch prompt did
+point workers to, still say "no known C-level fix yet" — this entry's
+2026-07-25 update postdates them and wasn't itself referenced in the
+dispatch). On `func_ov002_02269ab8` (a different function than
+`02269534`), typing the repeatedly-accessed global as a real struct
+with the field at its natural offset (`struct { char _pad[0x300];
+unsigned int flags; };` in place of raw `*(int*)(base+K)` pointer-
+offset arithmetic) made mwcc emit indexed addressing consistently
+across every access site, closing a ~30-point match gap in one move —
+independently re-deriving the same mechanism cm-parked-reaudit-1 found
+on a structurally unrelated target. **The pool-fold half of P-16 is now
+confirmed systemic, not this-function-specific: always reach for a
+typed struct member over raw pointer-offset casting for any
+repeated-global-access pattern, don't wait to diagnose the fold first.**
+The residual-scheduling half (2 small scratch-register-pairing swaps,
+per the 2026-07-25 update) was not re-tested this round — still open.
+
 ### P-17. Briefs 288/290 commutative-add CSE/reg-alloc wall
 
 > **Wall family note — distinct from C-34 and P-16.** The Brief 288/290
@@ -9303,6 +9358,19 @@ disassembly, look for a `ldr pc, [pc, rN, lsl #2]` (or
 equivalent jump-table dispatch) — if you see it, S-2 applies;
 if you see a chain of `cmp; beq` instead, the C case order is
 free.
+
+> **Correction (cm-ov002-unknown-sweep-7, 2026-07-30): the "free" claim
+> above is too strong.** A sparse `cmp;beq`-chain candidate
+> (`src/main/func_0202bcb0.s`) showed case-declaration order measurably
+> affecting where mwcc places a *deferred single-instruction leaf block*
+> — reordering source cases shifted the match from 84.5% to 82.5%. This
+> is a real counter-example to "the C case order is free" for at least
+> some sparse-chain shapes, not just the dense jump-table case this
+> entry was scoped to. The exact ordering rule for the sparse case was
+> NOT cracked this round (comprehension confirmed correct, mechanism
+> not isolated) — treat "sparse switch order is irrelevant" as
+> unconfirmed rather than established until a follow-up brief either
+> finds the rule or narrows which sparse shapes are actually exempt.
 
 **Provenance:** brief 086 wave 1 (PR #474) — decomper documented
 the iteration as a "worth folding into walls" calibration note
