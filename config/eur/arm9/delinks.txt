@@ -2904,7 +2904,7 @@ src/main/func_020196b0.c:
 
 
 
-src/main/func_020196d8.s:
+src/main/func_020196d8.c:
     complete
     .text start:0x020196d8 end:0x020197ac
 
@@ -9371,7 +9371,7 @@ src/main/func_02051c4c.s:
     complete
     .text start:0x02051c4c end:0x02051d84
 
-src/main/func_02051d84.s:
+src/main/func_02051d84.c:
     complete
     .text start:0x02051d84 end:0x02051e38
 
