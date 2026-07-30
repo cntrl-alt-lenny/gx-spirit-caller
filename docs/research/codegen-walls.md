@@ -6273,7 +6273,64 @@ the extraction as `((unsigned)(x << L)) >> R` with the original's exact
 shift amounts, not `(x >> N) & MASK` — the mask form gets folded
 regardless of field width.
 
-## Permanent P-wall index (16 live; P-6/P-7/P-8/P-10 retired)
+### C-47. ARM jump-table dispatch reads `pc` as own-address+8 — index 0 is the table's SECOND row
+
+**The trap:** an `addls pc,pc,idx,lsl#2`-style computed-branch reads
+`pc` as its own address **plus 8** (ARM's pipeline-fetch convention),
+not the address immediately after the instruction. The jump table's
+physical first row — sitting right after the dispatch instruction in
+memory — is therefore a dead pad the dispatch instruction itself
+occupies the slot for; `idx == 0` actually targets the table's
+**second** row.
+
+**The failure mode:** hand-deriving a `switch`'s case values from such
+a table without accounting for this produces an off-by-one in every
+single case value — not a crash, just silently wrong dispatch targets,
+which reads as a deep structural mismatch (very low match%) rather than
+the one-line indexing error it actually is.
+
+**The fix:** when reverse-engineering a jump table feeding
+`addls pc,pc,...`, read the table starting one row past the dispatch
+instruction's own address, or equivalently subtract 1 from every
+hand-derived case value before writing the `switch`.
+
+**Evidence:** `func_ov002_02256150` (cm-ov002-unknown-sweep-5, batch 2)
+went from 8.6% to 83.3% match on this single fix, with the residual
+after the fix being an unrelated register swap. Check any low-match
+`switch`/jump-table candidate for this specific pattern before assuming
+the mismatch is deep structural or register-allocation-related.
+
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 2.
+
+### C-48. Return a call's result directly, not a fresh literal, to elide a redundant `mov r0,#0`
+
+**The pattern:** when a function calls another function, compares the
+result to a constant (commonly `0`), and returns that same constant on
+an early-exit path, mwcc can tell the register already holds the right
+value and skips re-materializing it — but only if the C source returns
+the **variable holding the call's result**, not a fresh literal.
+
+```c
+int r = some_call(...);
+if (r == 0) return r;      /* mwcc sees r0 already == 0, elides the mov */
+/* NOT: if (r == 0) return 0; -- forces a redundant mov r0,#0 */
+```
+
+**Why it matters:** the literal form isn't wrong, it's just byte-
+different — an extra `mov r0,#0` before the conditional `pop` that the
+original doesn't have, which shows up as a clean single-instruction
+diff and can look like a deeper register-allocation issue if the cause
+isn't obvious.
+
+**Evidence:** independently found and applied by 3 of 5
+cm-ov002-unknown-sweep-5 batches on unrelated functions —
+`022521ac` (10%→67.6%, batch 4), and corroborating fixes in batch 3
+(`02251bb0`, `02253304`) and batch 2. Independent triple-confirmation in
+one sweep is unusually strong evidence for a lever this specific.
+
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batches 2/3/4.
+
+## Permanent P-wall index (19 live; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -6302,13 +6359,16 @@ rather than iterating.
 | P-18 | LIVE | Task-config field-write store-reordering (independent stores resequenced). |
 | P-19 | LIVE | Bit-pack intermediate register-choice CSE divergence (r0 vs r2). |
 | P-20 | LIVE | Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom). |
+| P-21 | LIVE | Loop/field-extraction-variable register permutation (near-miss, 65-97%). |
+| P-22 | LIVE | Slot bit-manipulation register-pressure wall — the `&1` remask lever backfires here. |
+| P-23 | LIVE | Pool-constant register-pairing wall (`mla`'s two constant operands, r0/r1/r3). |
 
-**Current count:** 16 genuinely live P-entries; four retired entries
+**Current count:** 19 genuinely live P-entries; four retired entries
 (P-6, P-7, P-8, P-10). The three newly corrected headings below are
 P-7, P-8, and P-10; their historical bodies remain intact.
 
 > **"Brief 294" citations are narrower than their bulk application
-> (cm-ov002-unknown-sweep-2/3/4, 2026-07-26/27).**
+> (cm-ov002-unknown-sweep-2/3/4/5, 2026-07-26/27/29).**
 > [`brief-294-regalloc-wall-scout.md`](brief-294-regalloc-wall-scout.md)
 > is real, careful research — it A/B-tested `register`, expression
 > duplication, and `volatile` on one specific shape (a value live
@@ -6319,19 +6379,21 @@ P-7, P-8, and P-10; their historical bodies remain intact.
 > — the same "mechanical bulk stamp, not per-function proof" failure
 > mode the queue header's brief-651 rework note already names for the
 > sibling `GLOBAL_ASM`/brief-302 tag, just wearing a more rigorous-
-> sounding citation. Three consecutive ov002 sweeps (92-104B: 95/145
-> shipped, 65.5%; 108-120B: 82/166, 49.4%; 124-132B: 59/145, 40.7%)
-> worked almost entirely through candidates carrying this exact "brief
+> sounding citation. Four consecutive ov002 sweeps (92-104B: 95/145
+> shipped, 65.5%; 108-120B: 82/166, 49.4%; 124-132B: 59/145, 40.7%;
+> 136-148B: 96/198, 48.5%) worked almost entirely through candidates
+> carrying this exact "brief
 > 294 endgame" header, using levers brief-294 never tested —
 > **declaration order** chief
 > among them (already known to be inconsistent elsewhere in this
 > index, e.g. P-4's own body — it is not a universal fix, but it is
 > untested by brief-294 and demonstrably effective on a meaningful
 > fraction of this specific cohort), alongside goto-shared-tail,
-> positive-condition-wrap, and bitfield-struct-member access. The
-> decline across sweeps (65.5% -> 49.4% -> 40.7%) is the pool
-> genuinely thinning, not the header regaining validity — sweep-4 still
-> shipped 59 candidates that carried it. Treat a
+> positive-condition-wrap, and bitfield-struct-member access. The rate
+> is NOT monotonically declining (65.5% -> 49.4% -> 40.7% -> 48.5%) —
+> sweep-5's rebound shows this tracks per-band candidate composition,
+> not a smooth exhaustion curve; either way the header itself has never
+> predicted the outcome. Treat a
 > bare "brief 294" citation the same way as a bare `GLOBAL_ASM`/brief-
 > 302 one: a starting hypothesis to re-test with the full current lever
 > set, not a verdict.
@@ -8106,6 +8168,30 @@ genuinely untested, but the pattern is consistent across all 3 confirmed
 so far. No lever from this session's catalogue (route-before-draft,
 shift-pair preservation, branch polarity, statement sequencing) touches it.
 
+**Re-sanity-checked (cm-ov002-unknown-sweep-5, 2026-07-29).** `021eb128`
+(a listed cohort member) was re-attempted per its dispatch flag and
+reconfirmed at 25.0% — exact documented signature, not re-ground.
+`021e8b34` (a listed cohort member) was re-checked and now reaches 97.2%
+against the 72.2% recorded in brief 668 — a large jump on other levers,
+but the SAME single-instruction `add lr,ip,lr`-vs-`add lr,lr,ip` residual
+remains. The improvement is likely from this session's broader lever set
+(neither figure was obtained with the same toolkit), not evidence the
+wall itself moved — worth remembering when comparing match percentages
+across sessions with different lever catalogues.
+
+**Possible cohort expansion, unconfirmed:** two functions well outside
+the originally-surveyed `021e8xxx`-`021f2xxx` address range —
+`021ece34` (97.3%, 1 diff word) and `021f82b8` (97.2%, 1 diff word),
+both cm-ov002-unknown-sweep-5 batch 1 — show the identical symptom
+(single commutative-ADD operand-order residual, otherwise byte-exact).
+Neither is a literal P-17-cohort address, so treat as a *related*
+finding rather than confirmed new members: either the same underlying
+allocator behavior extends well beyond the brief 288/290 census's
+original address range, or this is convergent evolution from a
+different cause with an identical symptom. Worth a dedicated
+cross-module grep for this exact "1-word commutative-add residual"
+signature rather than assuming it's bounded to the known cohort.
+
 ### P-18. Task-config field-write store-reordering
 
 mwcc reorders two independent (non-aliasing, no data dependency between
@@ -8242,20 +8328,159 @@ allocator-internal decision (likely tied to which of the two operands
 was live first from an enclosing computation) rather than anything
 expressible as a source-level lever from this project's current toolkit.
 
-**Affected picks (11):** `021c3150`, `0224a6f4`, `0224aac0`, `0224c034`,
+**Affected picks (28):** `021c3150`, `0224a6f4`, `0224aac0`, `0224c034`,
 `0224c160`, `0224cd18`, `0224d8b4`, `0224da7c`, `0224f7a0`, `02252734`,
-`02252914` (all ov002). Likely a larger cohort exists outside this
-sweep's 124-132B size band given the idiom's generality — worth a
-targeted grep-by-idiom census rather than waiting for size-band sweeps
-to hit the rest.
+`02252914` (cm-ov002-unknown-sweep-4); `02249790`, `0224eab4`,
+`02252ca4`, `022515b0`, `022483ac`, `0224a4f8`, `0224c980`, `0224e230`,
+`0224f824`, `02248a1c`, `0224ab44`, `0224cc90`, `0224e490`, `02250350`,
+`0224b01c` (cm-ov002-unknown-sweep-5) — 17 new members confirmed the
+very next sweep, more than doubling the cohort and confirming this is
+one of the largest single wall classes found in ov002 so far. Likely a
+larger cohort still exists outside these two size bands given the
+idiom's generality — worth a targeted grep-by-idiom census rather than
+waiting for size-band sweeps to hit the rest.
+
+**Sub-variant noted, not yet confirmed as the same mechanism:**
+`0224c4e8`/`0224db94` (cm-ov002-unknown-sweep-5, 83.8%/83.3%) show the
+same pool/register-order symptom but with the idiom as the function's
+*first* statement, unlike every other cohort member — flagged in case a
+future lever cracks this specific positioning without generalizing to
+the rest of the cohort. `0224b01c` (67.6%) additionally compounds with
+what its investigating batch described as an independent second
+register swap — the P-20 signature is present, but isolating it cleanly
+from the second issue wasn't attempted (correctly, per the "don't grind
+this" standing instruction).
 
 **Recipe status: NONE.** Future briefs: try the permuter (blocked on
 Windows currently; revisit on a non-Windows lane) given the byte-exact
 87.9% floor and total unresponsiveness to hand restructuring — this
 looks like exactly the "structurally correct, register-naming-only"
-shape the permuter pipeline exists for.
+shape the permuter pipeline exists for. With 28 confirmed members and
+counting, this cohort alone may now justify solving the Windows
+permuter blocker.
 
-**Provenance:** cm-ov002-unknown-sweep-4 (2026-07-27), batches 2/3/4.
+**Provenance:** cm-ov002-unknown-sweep-4 (2026-07-27), batches 2/3/4;
+cm-ov002-unknown-sweep-5 (2026-07-29), batches 2/3/4/5.
+
+### P-21. Loop/field-extraction-variable register permutation
+
+> **Distinct from P-20.** Both are "near-miss, register-naming-only"
+> walls in the same size band, but P-20 is a specific, narrow idiom
+> (`(player&1)*0x868`) with a consistent 87.9% floor; P-21 is a broader
+> family of loop- and field-extraction-adjacent variables landing on
+> different physical registers across a wider range of match percentages
+> (65-97%), with no single shared source idiom identified yet.
+
+**The symptom:** a loop induction variable, or a variable holding a
+just-extracted struct field, lands on a different physical register
+than target — same instructions, same order, just systematically
+different register letters — in loop or field-extraction contexts that
+don't share P-20's specific per-player-row-offset shape.
+
+**Falsifiable claim:** *some declaration-order or restructuring change
+fixes the register choice.* **Falsified — 6 members,
+cm-ov002-unknown-sweep-5 (2026-07-29), batch 5:**
+
+- `02255148` (77.1%): player/xorval swap survived 4 reorderings.
+- `02228290` (77.1%): loop-variable permutation after an unrelated
+  sizing bug was fixed.
+- `022025f4` (54.3%): off+field10\*stride+0x30 row-lookup permutation.
+- `02219b48` (44.1%): 4-5-way permutation after an unrelated
+  addressing-mode bug was fixed.
+- `0220e040` (65.7%): bit9/bit16/field10 permutation after an unrelated
+  inline-vs-branch bug was fixed.
+- `0224b01c` (67.6%): compounds with a confirmed P-20 signature — the
+  P-20 idiom is present, but an independent second register swap is
+  layered on top of it.
+
+**Why permanent (for now):** ~15 reordering attempts across these 6
+functions never changed the register choice. In 4 of 6 cases a *real*
+structural or addressing bug was found and fixed first (raising the
+match percentage substantially), with this register permutation as the
+remaining, unresponsive residue — meaning this isn't a case of
+insufficiently-debugged source, just a genuine allocator-level wall
+sitting underneath otherwise-correct C.
+
+**Affected picks (6):** `02219b48`, `022025f4`, `02228290`, `0220e040`,
+`02255148`, `0224b01c` (all ov002, all cm-ov002-unknown-sweep-5). Given
+the diversity of shapes (loop bodies, field extraction, one P-20
+compound case), this is likely under-counted — watch for the "correct
+logic, register letters only" symptom broadly, not just in the shapes
+listed here.
+
+**Recipe status: NONE.** Same permuter-shaped profile as P-20; revisit
+together once the Windows blocker is resolved.
+
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 5.
+
+### P-22. Slot bit-manipulation register-pressure wall (the `&1` remask lever backfires here)
+
+> **Warning, not just a wall.** This entry exists mainly to flag that
+> one of this project's most reliable levers — the explicit redundant
+> `&1` re-mask — actively makes this specific shape *worse*. Check
+> against this entry before reflexively applying that lever to a
+> low-match per-player-slot bit computation.
+
+**The shape:** a per-player-slot bit-manipulation computation involving
+a `field8`/`bit13`-style extraction, landing at a very low match
+percentage (2.9-5.4%) — broad register-allocation divergence, not a
+near-miss.
+
+**Falsifiable claim:** *the redundant `&1` re-mask lever (reliable
+elsewhere in this module) fixes or improves the match.* **Falsified —
+3 members, cm-ov002-unknown-sweep-5 (2026-07-29), batch 3:**
+
+- `02203e2c` (2.9%): adding the expected redundant `&1` mask
+  *increased* register pressure instead of fixing it.
+- `02221e3c` (5.4%): identical slot/field8/bit13 computation, same
+  result.
+- `02237e00` (5.4%): confirmed same wall a third time.
+
+**Why permanent (for now):** three independent confirmations of the
+same counter-intuitive result — a lever that helps almost everywhere
+else in this cohort actively hurts here. Suggests the extra masking
+instruction pushes an already-tight register allocation over some
+internal threshold, rather than the mask itself being the issue. No
+alternative lever tried yet; the next angle is probably reducing
+register pressure elsewhere in the function rather than touching the
+mask.
+
+**Affected picks (3):** `02203e2c`, `02221e3c`, `02237e00` (all ov002).
+
+**Recipe status: NONE.** Try register-pressure-reducing restructuring
+(fewer live locals, earlier frees) rather than more masking variants.
+
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3.
+
+### P-23. Pool-constant register-pairing wall (`mla`'s two constant operands)
+
+**The shape:** an `mla` (multiply-accumulate) instruction whose two
+constant operands are fed from a specific r0/r1/r3 register pairing in
+target; mwcc's allocator picks a different pairing. Distinct from
+P-20's r1/r2 pairing inside the multiply itself, and from P-21's
+broader loop/extraction-variable permutations — this is specifically
+about which registers hold the two *constants* feeding one `mla`.
+
+**Falsifiable claim:** *some source restructuring fixes the constant's
+register pairing.* **Falsified — 2 members,
+cm-ov002-unknown-sweep-5 (2026-07-29), batch 3:**
+
+- `02251bb0` (65.7%, up from 27% after real bugs were fixed: call-result
+  variable reuse for early returns, split-shift-reuse).
+- `02253304` (82.9%, up from 26.3%, same fixes applied): identical
+  residual family.
+
+**Why permanent (for now):** both members reached a high match
+percentage after real logic fixes, isolating the residual cleanly to
+this one pairing choice — but it resisted correction in both cases.
+Small sample (2), so "permanent" here is provisional; re-test if a
+third member turns up.
+
+**Affected picks (2):** `02251bb0`, `02253304` (both ov002).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3.
 
 ## Codegen-inherent edge cases (3 patterns)
 

@@ -166,23 +166,26 @@ content was read as data.
 - LLM4Decompile / "Can LLMs Really Do Matching Decompilation" / Mizuchi —
   the unproven LLM frontier.
 
-## UPDATE (cm-ov002-unknown-sweep-2/3/4, 2026-07-26/27)
+## UPDATE (cm-ov002-unknown-sweep-2/3/4/5, 2026-07-26/27/29)
 
 This brief's own A/B testing (`register`, expression duplication,
 `volatile`, all inert on the call-in-loop shape) stands — but its "no
 untried mwcc C-level allocator lever exists" conclusion has since been
-cited far more broadly than that narrow test justifies. Three consecutive
+cited far more broadly than that narrow test justifies. Four consecutive
 worktree-parallel ov002 sweeps worked almost entirely through candidates
 carrying the generic "brief 294 endgame" bulk-stamp header and shipped
 a majority to most of them (92-104B band: 95/145, 65.5%; 108-120B band:
-82/166, 49.4%; 124-132B band: 59/145, 40.7%) using levers this brief
+82/166, 49.4%; 124-132B band: 59/145, 40.7%; 136-148B band: 96/198,
+48.5%) using levers this brief
 never tested — declaration order,
 goto-shared-tail, positive-condition-wrap, and bitfield-struct-member
-access chief among them. The declining rate tracks the pool of easy
-wins thinning as size grows, not the header regaining validity — a
-genuinely exhausted/permanent cohort would floor near 0%, not 40%. See
+access chief among them. The rate is NOT monotonically declining
+(65.5% -> 49.4% -> 40.7% -> 48.5%) — sweep-5's rebound shows this tracks
+per-band candidate composition, not a smooth exhaustion curve. Either
+way, a genuinely exhausted/permanent cohort would floor near 0%, not
+stay in the 40-65% range across four bands. See
 the note in
-[`codegen-walls.md`](codegen-walls.md#permanent-p-wall-index-15-live-p-6p-7p-8p-10-retired)
+[`codegen-walls.md`](codegen-walls.md#permanent-p-wall-index-19-live-p-6p-7p-8p-10-retired)
 just above the P-wall index. This doesn't invalidate the specific
 `register`/duplication/`volatile` findings on the call-in-loop shape —
 it means the bulk-stamping process that cited this brief as blanket
