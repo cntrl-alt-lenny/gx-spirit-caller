@@ -5174,7 +5174,7 @@ src/jpn/overlay002/func_ov002_02211fac.s:
 src/jpn/overlay002/func_ov002_02212020.s:
     complete
     .text start:0x02212020 end:0x02212210
-src/jpn/overlay002/func_ov002_02212210.s:
+src/jpn/overlay002/func_ov002_02212210.c:
     complete
     .text start:0x02212210 end:0x022122a4
 src/jpn/overlay002/func_ov002_022122a4.s:
