@@ -589,7 +589,17 @@ def find_gap_by_delinked_object(c_path: Path, func: str, region: str) -> Path | 
 # ---------------------------------------------------------------------------
 
 _HDR   = re.compile(r"^[0-9a-f]+ <(\S+)>:")
-_INSN  = re.compile(r"^\s+([0-9a-f]+):\s+([0-9a-f]{8})\s")
+# Thumb instructions disassemble as 4 hex digits (2 bytes), ARM ones and
+# literal-pool `.word` entries as 8 (4 bytes) -- try 8 FIRST so a pool word
+# inside an otherwise-Thumb function isn't mis-split into two 4-digit halves.
+#
+# This is the same fix verify.py:69 already carries (brief 683). It was never
+# ported here, so fastmatch kept the 8-digit-only pattern: for a Thumb-mode
+# function it matched NOTHING, both word lists came back empty, and
+# match_percent's `total == 0` branch reported a false 100.0%. 119 `.thumb.c`
+# TUs are in-tree, so this silently "verified" every Thumb candidate it was
+# ever pointed at.
+_INSN  = re.compile(r"^\s+([0-9a-f]+):\s+([0-9a-f]{8}|[0-9a-f]{4})\s")
 _RELOC = re.compile(r"^\s+([0-9a-f]+):\s+R_ARM")
 
 
@@ -665,7 +675,15 @@ def match_percent(
     m2, o2 = _strip_pool(mine), _strip_pool(orig)
     total = max(len(m2), len(o2))
     if total == 0:
-        return 100.0, []
+        # FAIL CLOSED. Zero words on BOTH sides never means "a perfect match of
+        # nothing" -- every real function has at least one instruction, so this
+        # can only mean the disassembly was not parsed (wrong instruction-width
+        # regex, an empty/!.text object, or the wrong symbol name). Returning
+        # 100.0 here is what turned the Thumb regex bug above into a silent
+        # false PASS on every Thumb candidate. Report 0.0 with an explanatory
+        # synthetic diff so the caller's existing `pct < 100.0` mismatch path
+        # fires and the reason is visible, rather than inventing a match.
+        return 0.0, [(0, "NO-INSTRUCTIONS-PARSED", "NO-INSTRUCTIONS-PARSED")]
     diffs: list[tuple[int, str, str]] = []
     for i in range(total):
         mw = m2[i] if i < len(m2) else None
