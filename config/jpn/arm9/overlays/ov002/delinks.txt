@@ -4592,7 +4592,7 @@ src/jpn/overlay002/func_ov002_0220a4c8.c:
     complete
     .text start:0x0220a4c8 end:0x0220a5cc
 
-src/jpn/overlay002/func_ov002_0220a5cc.s:
+src/jpn/overlay002/func_ov002_0220a5cc.c:
     complete
     .text start:0x0220a5cc end:0x0220a654
 src/jpn/overlay002/func_ov002_0220a654.c:
