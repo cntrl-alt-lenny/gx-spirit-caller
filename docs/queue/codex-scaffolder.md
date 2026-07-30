@@ -205,3 +205,9 @@ Build `tools/check_activation_invariant.py` to mechanically check a git range: a
 > ~470 nested files per region were previously invisible to the parser).
 > Deliberately-flat scans were left alone with reasons recorded. Third
 > instance of this bug class (after #1366 and #1383).
+
+### q-activation-invariant-classifier — classify named C functions from authoritative metadata [DONE]
+
+Fix `tools/check_activation_invariant.py`: named function files such as `Ov015_InitScroller.c` are currently reported as DATA because the classifier only recognizes `func_*`. Use the region's `delinks.txt`/`symbols.txt` metadata for `kind:function` vs data, with the existing filename-prefix fallback when metadata is unavailable. Add a synthetic named-function missing-activation failure test and recheck known-good PR #1387 and #1388 ranges. Report the real-range function/data split before and after.
+
+**Gate:** synthetic named-function omission exits non-zero; PR #1387 and PR #1388 ranges exit zero; `python -m pytest -q tests` green; queue entry committed in the same PR.
