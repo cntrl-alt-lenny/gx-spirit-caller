@@ -190,7 +190,7 @@ src/usa/overlay002/func_ov002_021b00a4.s:
 src/usa/overlay002/func_ov002_021b0114.s:
     complete
     .text start:0x021b0114 end:0x021b017c
-src/usa/overlay002/func_ov002_021b017c.s:
+src/usa/overlay002/func_ov002_021b017c.c:
     complete
     .text start:0x021b017c end:0x021b0210
 src/usa/overlay002/func_ov002_021b0210.s:
