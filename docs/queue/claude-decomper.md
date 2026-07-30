@@ -364,9 +364,40 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 > `gate3.py --scope all --clean` PASS confirmed. See
 > `docs/research/cm-ov002-unknown-sweep-6-2026-07-30.md`.
 
-### cm-ov002-unknown-sweep-7 — module-agnostic measurement sweep, 149-1023B [S] [CLAIMED]
+### cm-ov002-unknown-sweep-7 — module-agnostic measurement sweep, 149-1023B [S] [DONE]
 
-**Scope changed from the originally-filed item — do NOT run the 168-180B ov002 band.** Six sweeps have worked the 1-148B tier, which holds only 6.75pp (percentage points of the project's remaining unshipped bytes) of what's left. Measured pools instead:
+> DONE: all 5/5 worktree batches complete and merged. **20/100 shipped
+> (20% blended), but the real result is the band split: 149-512B
+> shipped 20/60 (33.3%, 4,968 bytes, 82.8 B/attempt); 513-1023B shipped
+> ZERO of 40 genuine attempts.** Strongest predictor found: callee
+> ground-truth availability, not raw byte size — every unshipped
+> 513-1023B candidate had under 65% of its callees already matched
+> elsewhere. P-16's counter-lever (typed struct over raw pointer-offset
+> casting) independently re-confirmed on a 2nd function — now believed
+> systemic, not one-off. Corrected S-2's "sparse switch case order is
+> irrelevant" claim (real counter-example found). One process incident
+> (a single mistaken sub-agent spawn on one hard candidate, caught
+> immediately via the coordinator verifying the worktree directly, no
+> stray files, rest of the batch done directly — much smaller-blast-
+> radius than sweep-6's incident, suggesting the non-negotiable framing
+> helped). 3-region `gate3.py --scope all --clean` PASS confirmed. No
+> mid-flight `main` catch-up needed. See
+> `docs/research/cm-ov002-unknown-sweep-7-2026-07-30.md` for full
+> detail, per-batch breakdown, and the time-per-candidate data (with an
+> important caveat: roughly half the 513-1023B band's time entries are
+> "decided not to attempt," not "attempted and failed," and understate
+> true per-candidate cost for that band).
+>
+> **No new item filed.** This was a measurement sweep for a strategic
+> decision, not a ship-maximizing one — the data above (149-512B is
+> productive and module-agnostic; 513-1023B might respond to
+> callee-coverage-targeted selection rather than address-order
+> selection; >=1024B looks tooling-blocked per a separate analysis
+> line, not sweep-blocked) is reported for that decision, not acted on
+> unilaterally here. The P-17 re-test lead (15 members, one lever
+> untested) also remains open and unfiled, per the same reasoning.
+
+Six sweeps had worked the 1-148B tier, which holds only 6.75pp (percentage points of the project's remaining unshipped bytes) of what's left. Measured pools instead:
 
 | Band | Candidates | Never-assessed | pp |
 |---|---:|---:|---:|
