@@ -8134,10 +8134,10 @@ src/jpn/overlay002/func_ov002_022528b0.s:
 src/jpn/overlay002/func_ov002_02252970.s:
     complete
     .text start:0x02252970 end:0x02252a10
-src/jpn/overlay002/func_ov002_02252a10.s:
+src/jpn/overlay002/func_ov002_02252a10.c:
     complete
     .text start:0x02252a10 end:0x02252a98
-src/jpn/overlay002/func_ov002_02252a98.s:
+src/jpn/overlay002/func_ov002_02252a98.c:
     complete
     .text start:0x02252a98 end:0x02252b20
 src/jpn/overlay002/func_ov002_02252b20.s:
