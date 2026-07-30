@@ -7,7 +7,7 @@
         .extern data_020c6c18
         .extern data_0219ac68
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201d4dc
         .extern func_0201e564
@@ -58,7 +58,7 @@ func_0202d288:
     strh r1, [sp, #0x30]
     bl func_0201e564
     ldr r0, [sp, #0x20]
-    bl func_02006e00
+    bl Task_Invoke
     add sp, sp, #0x48
     ldmia sp!, {r3, pc}
 .L_1b8:

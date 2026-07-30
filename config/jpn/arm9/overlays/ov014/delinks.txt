@@ -42,7 +42,7 @@ src/jpn/overlay014/Ov014_HitTestPrimary.c:
     complete
     .text start:0x021b3340 end:0x021b33f0
 
-src/jpn/overlay014/func_ov014_021b33f0.c:
+src/jpn/overlay014/Ov014_HitTestSecondary.c:
     complete
     .text start:0x021b33f0 end:0x021b3468
 

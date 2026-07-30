@@ -5,7 +5,7 @@ extern int func_0201d680(int);
 extern int func_0201d70c(int);
 extern void func_0201e564(void *);
 extern void func_020943b0(int, int, int);
-extern void func_02006e00(int);
+extern void Task_Invoke(int);
 
 typedef struct {
     int f0;
@@ -53,5 +53,5 @@ void func_ov022_021aa460(int index, int state, int flag, int enable) {
         func_020943b0(func_0201d70c(h), enable, tmp);
     }
 
-    func_02006e00(h);
+    Task_Invoke(h);
 }

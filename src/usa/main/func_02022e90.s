@@ -10,7 +10,7 @@
         .extern data_02197354
         .extern data_0219a754
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_020070e8
         .extern func_0201e564
         .extern func_0201e618
@@ -179,7 +179,7 @@ func_02022e90:
     bl func_0201e564
 .L_240:
     ldr r0, [r5, #0x38]
-    bl func_02006e00
+    bl Task_Invoke
     mov r0, #0x0
     str r0, [r5, #0x38]
     ldr r1, [r5, #0x30]

@@ -10,7 +10,7 @@
         .extern data_021a1938
         .extern func_0208b244
         .extern func_0208b464
-        .extern func_0208b7f8
+        .extern MTX_ScaleApply43
         .global func_02082050
         .arm
 func_02082050:
@@ -27,7 +27,7 @@ func_02082050:
     str r2, [sp]
     ldr r2, [r3, #0xec]
     ldr r3, [r3, #0xf0]
-    bl func_0208b7f8
+    bl MTX_ScaleApply43
     ldr r0, _LIT2
     ldr r1, _LIT4
     bl func_0208b464

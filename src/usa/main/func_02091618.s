@@ -5,9 +5,9 @@
         .text
         .extern func_020936a8
         .extern OS_Halt
-        .global func_02091618
+        .global OSi_IdleThreadProc
         .arm
-func_02091618:
+OSi_IdleThreadProc:
     stmfd sp!, {lr}
     sub sp, sp, #0x4
     bl func_020936a8

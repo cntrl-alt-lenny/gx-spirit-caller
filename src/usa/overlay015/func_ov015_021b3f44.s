@@ -16,7 +16,7 @@
         .extern func_ov005_021ac87c
         .extern func_ov005_021ac8c0
         .extern func_ov005_021ac8c8
-        .extern func_ov015_021b228c
+        .extern Ov015_UpdateScrollTarget
         .extern func_ov015_021b22f4
         .extern func_ov015_021b2530
         .extern func_ov015_021b3140
@@ -43,7 +43,7 @@ func_ov015_021b3f44:
     bl func_ov015_021b2530
     add r5, r5, r0
     ldr r0, [r4, #0x848]
-    bl func_ov015_021b228c
+    bl Ov015_UpdateScrollTarget
     ldr r1, [r4, #0x848]
     mov r6, r0
     ldr r0, [r1, #0x18]

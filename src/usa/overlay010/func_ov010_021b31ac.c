@@ -1,6 +1,6 @@
 extern int  data_ov010_021b8970[];
 extern int  func_02006bf0(int a, int b, int c);
-extern void func_02006e00(int task);
+extern void Task_Invoke(int task);
 extern void func_0201d428(void *buf);
 extern void func_0201e564(void *buf);
 
@@ -77,5 +77,5 @@ void func_ov010_021b31ac(int state, int alt, int kind) {
     buf.f14 |= 0x10;
     buf.f00 = handle;
     func_0201e564(&buf);
-    func_02006e00(handle);
+    Task_Invoke(handle);
 }

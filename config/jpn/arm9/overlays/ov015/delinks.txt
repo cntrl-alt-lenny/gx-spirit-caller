@@ -17,7 +17,7 @@ src/jpn/overlay015/func_ov015_021b225c.c:
     complete
     .text start:0x021b225c end:0x021b228c
 
-src/jpn/overlay015/func_ov015_021b228c.c:
+src/jpn/overlay015/Ov015_UpdateScrollTarget.c:
     complete
     .text start:0x021b228c end:0x021b22f4
 
@@ -83,15 +83,15 @@ src/jpn/overlay015/func_ov015_021b2824.c:
     complete
     .text start:0x021b2824 end:0x021b2a08
 
-src/jpn/overlay015/func_ov015_021b2a08.c:
+src/jpn/overlay015/Ov015_SelectVramBank.c:
     complete
     .text start:0x021b2a08 end:0x021b2a80
 
-src/jpn/overlay015/func_ov015_021b2a80.c:
+src/jpn/overlay015/Ov015_SelectVramBankSub.c:
     complete
     .text start:0x021b2a80 end:0x021b2af8
 
-src/jpn/overlay015/func_ov015_021b2af8.c:
+src/jpn/overlay015/Ov015_RegisterCallbacks.c:
     complete
     .text start:0x021b2af8 end:0x021b2b18
 
@@ -109,7 +109,7 @@ src/jpn/overlay015/func_ov015_021b2cdc.c:
 src/jpn/overlay015/func_ov015_021b2cf8.s:
     complete
     .text start:0x021b2cf8 end:0x021b2f28
-src/jpn/overlay015/func_ov015_021b2f28.c:
+src/jpn/overlay015/Ov015_DrawStatusFields.c:
     complete
     .text start:0x021b2f28 end:0x021b2fb0
 
@@ -126,7 +126,7 @@ src/jpn/overlay015/func_ov015_021b3068.s:
 src/jpn/overlay015/func_ov015_021b306c.s:
     complete
     .text start:0x021b306c end:0x021b3070
-src/jpn/overlay015/func_ov015_021b3070.c:
+src/jpn/overlay015/Ov015_InitScroller.c:
     complete
     .text start:0x021b3070 end:0x021b30f0
 

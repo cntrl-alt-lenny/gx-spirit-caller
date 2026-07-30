@@ -17,7 +17,7 @@ extern char data_ov018_021ad658[];
 extern int func_02006bf0(int arc, int mode, int z);
 extern void func_0201d428(void *cfg);
 extern void func_0201e564(void *cfg);
-extern void func_02006e00(int h);
+extern void Task_Invoke(int h);
 
 void func_ov018_021aa6b4(int a0, int a1) {
     BgCfg cfg;
@@ -27,5 +27,5 @@ void func_ov018_021aa6b4(int a0, int a1) {
     cfg.f0 = h;
     cfg.f14 = cfg.f14 & ~0x10;
     func_0201e564(&cfg);
-    func_02006e00(h);
+    Task_Invoke(h);
 }

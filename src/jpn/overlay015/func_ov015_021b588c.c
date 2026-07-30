@@ -4,7 +4,7 @@
 extern void Task_InvokeLocked(int);
 extern void func_ov005_021abb1c(int);
 extern void func_ov005_021aae60(int);
-extern void func_02006e00(int);
+extern void Task_Invoke(int);
 extern char data_ov015_021b5d08[];
 extern char data_ov015_021b5d24[];
 int func_ov015_021b588c(void) {
@@ -15,11 +15,11 @@ int func_ov015_021b588c(void) {
     }
     func_ov005_021aae60(*(int *)(s + 0x874));
     if (*(int *)(s + 0xa78) != 0) {
-        func_02006e00(*(int *)(s + 0xa78));
+        Task_Invoke(*(int *)(s + 0xa78));
         *(int *)(s + 0xa78) = 0;
     }
     if (*(int *)(s + 0xa7c) != 0) {
-        func_02006e00(*(int *)(s + 0xa7c));
+        Task_Invoke(*(int *)(s + 0xa7c));
         *(int *)(s + 0xa7c) = 0;
     }
     return 1;

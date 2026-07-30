@@ -8,7 +8,7 @@
         .extern data_ov015_021b5d24
         .extern data_ov015_021b6708
         .extern func_0208de58
-        .extern func_ov015_021b228c
+        .extern Ov015_UpdateScrollTarget
         .extern func_ov015_021b23f4
         .extern func_ov015_021b2530
         .global func_ov015_021b432c
@@ -39,13 +39,13 @@ func_ov015_021b432c:
     add fp, fp, r0
     ldrsh r4, [r1, #0x30]
     ldr r0, [r6, #0x848]
-    bl func_ov015_021b228c
+    bl Ov015_UpdateScrollTarget
     cmp r4, r0
     beq .L_470
     ldr r0, [r6, #0x848]
     add r1, r6, #0xa00
     strh r4, [r1, #0x32]
-    bl func_ov015_021b228c
+    bl Ov015_UpdateScrollTarget
     add r1, r6, #0xa00
     strh r0, [r1, #0x30]
 .L_470:

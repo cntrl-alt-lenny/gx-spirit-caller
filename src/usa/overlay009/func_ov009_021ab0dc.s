@@ -8,7 +8,7 @@
         .extern data_ov009_021ad898
         .extern data_ov009_021adb20
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201e564
         .extern func_0201e78c
@@ -57,7 +57,7 @@ func_ov009_021ab0dc:
     str r1, [sp, #0x40]
     bl func_0201e564
     ldr r0, [sp, #0x28]
-    bl func_02006e00
+    bl Task_Invoke
     add r0, sp, #0x28
     bl func_0201d428
     ldr r0, _LIT2
@@ -79,7 +79,7 @@ func_ov009_021ab0dc:
     add r0, sp, #0x28
     bl func_0201e564
     ldr r0, [sp, #0x28]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, _LIT3
     add ip, sp, #0x18
     ldmia r0, {r0, r1, r2, r3}

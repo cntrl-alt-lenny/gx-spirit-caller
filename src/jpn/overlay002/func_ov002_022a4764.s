@@ -7,7 +7,7 @@
         .extern data_ov002_022cbd1c
         .extern data_ov002_022cbe5c
         .extern func_02006bf0
-        .extern func_02006e00
+        .extern Task_Invoke
         .extern func_0201d428
         .extern func_0201e564
         .extern func_020371b8
@@ -72,7 +72,7 @@ func_ov002_022a4764:
     add r0, sp, #0x18
     bl func_0201e564
     ldr r0, [sp, #0x18]
-    bl func_02006e00
+    bl Task_Invoke
     ldr r0, [r4, #0x4]
     cmp r0, #0x3
     bne .L_1038
