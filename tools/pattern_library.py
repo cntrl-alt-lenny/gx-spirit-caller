@@ -184,7 +184,7 @@ def build_index(
     modules: dict[str, ModuleData],
     graph: CallGraph,
 ) -> Library:
-    """Walk src/<module-dir>/*.c, resolve each to a Symbol, build
+    """Walk src/<module-dir>/**/*.c, resolve each to a Symbol, build
     the fingerprint, collect into a Library.
 
     Skips files whose filename stem doesn't carry a resolvable
@@ -200,7 +200,10 @@ def build_index(
         md = modules.get(module)
         if md is None:
             continue
-        for p in sorted(module_dir.glob("*.c")):
+        # A module may contain nested source classes such as data/. Keep the
+        # module derived from the first-level directory, but include all
+        # matching C files below it.
+        for p in sorted(module_dir.rglob("*.c")):
             addr = _addr_from_stem(p.stem)
             if addr is None:
                 continue

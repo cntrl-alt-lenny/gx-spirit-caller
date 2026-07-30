@@ -144,6 +144,24 @@ class TestFindSiblings(unittest.TestCase):
             # 0x021b9000 is outside.
             self.assertNotIn("ov005_021b9000.c", names)
 
+    def test_picks_nested_sibling_one_level_down(self):
+        target = _func("ov005", 0x021b2000, size=0x20)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            nested = tmp / "src" / "overlay005" / "data"
+            nested.mkdir(parents=True)
+            (nested / "ov005_021b2100.c").write_text(
+                "// nested sibling",
+                encoding="utf-8",
+            )
+            sibs = _find_siblings(
+                target, tmp / "src", window=0x1000, max_n=10,
+            )
+            self.assertIn(
+                "ov005_021b2100.c",
+                {s.path.name for s in sibs},
+            )
+
     def test_skips_self_distance_zero(self):
         # The target's own .c shouldn't surface as its own sibling.
         target = _func("ov005", 0x021b2000, size=0x20)

@@ -282,6 +282,24 @@ class TestBuildIndex(unittest.TestCase):
                 ),
             )
 
+    def test_harvests_matched_c_file_one_level_down(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            nested = tmp / "src" / "overlay005" / "data"
+            nested.mkdir(parents=True)
+            (nested / "ov005_021b1100.c").write_text(
+                "// nested matched body",
+            )
+            sym = _func("ov005", 0x021b1100, size=0x20)
+            modules = {"ov005": _module("ov005", [sym])}
+            lib = build_index(tmp / "src", modules, CallGraph())
+            self.assertEqual(len(lib.entries), 1)
+            self.assertTrue(lib.entries[0].src_path.endswith(
+                "data\\ov005_021b1100.c",
+            ) or lib.entries[0].src_path.endswith(
+                "data/ov005_021b1100.c",
+            ))
+
     def test_skips_file_when_symbol_missing(self):
         # A .c file exists but no Symbol at that addr (config out
         # of sync with src/) — skip silently rather than hallucinate.
