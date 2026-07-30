@@ -3469,7 +3469,7 @@ src/jpn/overlay002/func_ov002_022002d4.c:
 src/jpn/overlay002/func_ov002_02200310.c:
     complete
     .text start:0x02200310 end:0x02200358
-src/jpn/overlay002/func_ov002_02200358.s:
+src/jpn/overlay002/func_ov002_02200358.c:
     complete
     .text start:0x02200358 end:0x022003d8
 src/jpn/overlay002/func_ov002_022003d8.s:
@@ -3479,7 +3479,7 @@ src/jpn/overlay002/func_ov002_0220043c.c:
     complete
     .text start:0x0220043c end:0x022004bc
 
-src/jpn/overlay002/func_ov002_022004bc.s:
+src/jpn/overlay002/func_ov002_022004bc.c:
     complete
     .text start:0x022004bc end:0x02200540
 src/jpn/overlay002/func_ov002_02200540.s:
