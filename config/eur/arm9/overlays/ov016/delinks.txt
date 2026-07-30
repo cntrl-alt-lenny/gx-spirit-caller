@@ -429,4 +429,12 @@ src/overlay016/data_ov016_021b940c.c:
 
 src/overlay016/bss/data_ov016_bss.s:
     complete
-    .bss start:0x021b9740 end:0x021bb4c0
+    .bss start:0x021b9740 end:0x021b9784
+
+src/overlay016/data_ov016_021b9784.c:
+    complete
+    .bss start:0x021b9784 end:0x021ba740
+
+src/overlay016/bss/data_ov016_bss_2.s:
+    complete
+    .bss start:0x021ba740 end:0x021bb4c0
