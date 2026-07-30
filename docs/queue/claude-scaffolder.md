@@ -783,3 +783,21 @@ Deliverable: a ranked table by bytes with the arithmetic, and a recommendation o
 **Recommendation**: the data lane is NOT out of work — the opposite. But the real mass (`.bss`, 4M+ bytes) needs a fundamentally different method (carving new symbol boundaries from raw `.s`, not retyping already-bounded files) that this campaign was never built for; recommend scoping it as its own new workstream rather than folding into `cm-data-inference`'s existing rhythm. A concrete secondary lead (`data_ov002_022c08c4`, a genuine 9,912-byte never-carved gap with a real boundary tension) is named for a focused future item. `ov004`'s unclaimed `.rodata` is explicitly NOT recommended without new evidence.
 Full writeup: `docs/research/data/cm-data-typing-16-2026-07-30.md`.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS, first attempt (`[eur]`/`[usa]`/`[jpn]` SHA1 individually confirmed; pytest 3125 passed, 15 skipped, 63 subtests). `Named-struct`: 44,728 → 50,104 (+5,376, exactly the shipped file). `Typed-array`: unchanged at 79,664 (the file already counted there pre-retype; fully explained, no discrepancy).
+
+### cm-bss-carve-scope — scope the .bss workstream (priority S) [CLAIMED]
+
+Scoping only, not the carving itself. `cm-data-typing-16`'s own ranking is the mandate: `.bss` is 4,067,552 B = 85.2% of all EUR data bytes, confirmed 0% C-owned (99.2% raw `.s`, 0.8% unclaimed). Everything else in that ranking is a rounding error beside it, and it needs a new workstream (symbol-boundary carving from raw `.s`), not another `cm-data-inference` wave.
+
+Establish with evidence:
+- What does a `.bss` symbol carve actually require end to end? What tools exist (`batch_carve.py`, `emit_data_blob.py`, the delinks/symbols machinery) and what's missing?
+- What does `progress.py` count for `.bss`? Does a carved-and-typed `.bss` symbol move `Typed-array`/`Named-struct` at all, or is the metric blind to it? Measure this first — if the metric can't see the work, that changes whether it's worth doing.
+- Is `.bss` even carvable safely? Zero-initialized means no bytes to preserve — does that make it easier than `.rodata`, or does the entire risk sit in symbol boundaries/sizes instead? Say which.
+- The 0.8% (32,768 B) genuinely-unclaimed slice — what is it, and is it a cheap first target?
+
+Deliverable: a scoped workstream with a first concrete item and a mechanically checkable gate, or a well-argued "not worth it because X." Both are valid outcomes — report the honest answer, don't manufacture a workstream to have something to ship.
+
+Exclude `ov004`'s unclaimed `.rodata` gaps entirely — already established all 9 border symbols wave 13 proved are real ARM32 code misclassified as data. Do not reopen that.
+
+**Permanent rules (every wave):** generate byte-level claims via script from the real extracted ROM, never hand-transcribe. Reconcile every commit/doc/queue claim against `git diff --stat`/`git status --short` before writing it. For multi-file waves, one consolidated re-verification script before writing anything, plus a file-count check before building.
+
+**Gate:** if any carving is proposed/attempted, 3-region `python tools/gate3.py --scope all` PASS + the scoping evidence above + `Named-struct`/`Typed-array` before/after from a real `progress.py` run. If the deliverable is "not worth it," the evidence trail itself is the gate.
