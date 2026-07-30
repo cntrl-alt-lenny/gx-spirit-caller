@@ -15,6 +15,10 @@ src/overlay023/func_ov023_021b2314.c:
     complete
     .text start:0x021b2314 end:0x021b236c
 
+src/overlay023/data_ov023_021b23a0.c:
+    complete
+    .bss start:0x021b23a0 end:0x021b23a8
+
 src/overlay023/bss/data_ov023_bss.s:
     complete
-    .bss start:0x021b23a0 end:0x021b2400
+    .bss start:0x021b23a8 end:0x021b2400
