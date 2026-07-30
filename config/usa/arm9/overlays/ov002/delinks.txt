@@ -3817,7 +3817,7 @@ src/usa/overlay002/func_ov002_02203d3c.s:
 src/usa/overlay002/func_ov002_02203dc4.s:
     complete
     .text start:0x02203dc4 end:0x02203ea4
-src/usa/overlay002/func_ov002_02203ea4.s:
+src/usa/overlay002/func_ov002_02203ea4.c:
     complete
     .text start:0x02203ea4 end:0x02203f30
 src/usa/overlay002/func_ov002_02203f30.c:
