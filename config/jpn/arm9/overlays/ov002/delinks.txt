@@ -1208,7 +1208,7 @@ src/jpn/overlay002/func_ov002_021c9424.s:
 src/jpn/overlay002/func_ov002_021c9570.s:
     complete
     .text start:0x021c9570 end:0x021c9718
-src/jpn/overlay002/func_ov002_021c9718.s:
+src/jpn/overlay002/func_ov002_021c9718.c:
     complete
     .text start:0x021c9718 end:0x021c97ac
 src/jpn/overlay002/func_ov002_021c97ac.s:
