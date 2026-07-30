@@ -4024,7 +4024,7 @@ src/usa/overlay002/func_ov002_02205950.s:
 src/usa/overlay002/func_ov002_02205a40.c:
     complete
     .text start:0x02205a40 end:0x02205acc
-src/usa/overlay002/func_ov002_02205acc.s:
+src/usa/overlay002/func_ov002_02205acc.c:
     complete
     .text start:0x02205acc end:0x02205b5c
 src/usa/overlay002/func_ov002_02205b5c.s:
