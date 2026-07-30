@@ -86,6 +86,51 @@ def _data_fixture_repo() -> tuple[Path, str]:
     return repo, head
 
 
+def _named_function_fixture_repo(*, activate: bool) -> tuple[Path, str]:
+    """A named C function whose old assembly file keeps the address stem."""
+    tmp = tempfile.TemporaryDirectory()
+    repo = Path(tmp.name)
+    _run_git(repo, "init", "-q")
+    _run_git(repo, "config", "user.email", "test@example.com")
+    _run_git(repo, "config", "user.name", "activation-test")
+    src = repo / "src" / "usa" / "overlay015"
+    cfg = repo / "config" / "usa" / "arm9" / "overlays" / "ov015"
+    src.mkdir(parents=True)
+    cfg.mkdir(parents=True)
+    old_s = src / "func_ov015_021b1000.s"
+    old_s.write_text("old\n", encoding="utf-8")
+    (cfg / "symbols.txt").write_text(
+        "Ov015_Foo kind:function(arm,size=0x20) addr:0x021b1000\n",
+        encoding="utf-8",
+    )
+    (cfg / "delinks.txt").write_text(
+        "src/usa/overlay015/func_ov015_021b1000.s:\n"
+        "    complete\n"
+        "    .text start:0x021b1000 end:0x021b1020\n",
+        encoding="utf-8",
+    )
+    _run_git(repo, "add", ".")
+    _run_git(repo, "commit", "-qm", "base")
+    (src / "Ov015_Foo.c").write_text("void Ov015_Foo(void) {}\n", encoding="utf-8")
+    old_s.unlink()
+    if activate:
+        text = (cfg / "delinks.txt").read_text(encoding="utf-8")
+        (cfg / "delinks.txt").write_text(
+            text.replace("func_ov015_021b1000.s", "Ov015_Foo.c"),
+            encoding="utf-8",
+        )
+    _run_git(repo, "add", ".")
+    _run_git(repo, "commit", "-qm", "named sweep")
+    head = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    _TEMP_DIRS.append(tmp)
+    return repo, head
+
+
 class TestActivationInvariantCLI(unittest.TestCase):
     def _invoke(self, repo: Path, git_range: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
@@ -100,6 +145,18 @@ class TestActivationInvariantCLI(unittest.TestCase):
         result = self._invoke(repo, f"HEAD~1..{head}")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("MISSING delinks activation", result.stdout)
+
+    def test_named_function_missing_activation_fails(self):
+        repo, head = _named_function_fixture_repo(activate=False)
+        result = self._invoke(repo, f"HEAD~1..{head}")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("MISSING delinks activation", result.stdout)
+
+    def test_named_function_activation_passes(self):
+        repo, head = _named_function_fixture_repo(activate=True)
+        result = self._invoke(repo, f"HEAD~1..{head}")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("function .c added:       1", result.stdout)
 
     def test_routed_activation_passes(self):
         repo, head = _fixture_repo(activate=True, routed=True)
