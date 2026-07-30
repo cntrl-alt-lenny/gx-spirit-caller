@@ -433,7 +433,7 @@ Repeat all three checks that earned their keep: `tools/check_activation_invarian
 
 **Gate:** `python tools/gate3.py --scope all` PASS + `check_activation_invariant.py` + the three-way count check in the PR body.
 
-### cm-ov002-unknown-sweep-8 — 149-512B, selected by callee coverage [TODO] [S]
+### cm-ov002-unknown-sweep-8 — 149-512B, selected by callee coverage [S] [TODO]
 
 > Filed from the coordinating process's own chat message after sweep-7 merged (main 988cd5f7c, EUR 11.66%) — appended here per the project's own "a prose mention is not a task" convention rather than executed straight from chat.
 
