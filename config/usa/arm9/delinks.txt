@@ -10216,7 +10216,7 @@ src/usa/main/func_0208b244.s:
 src/usa/main/func_0208b464.s:
     complete
     .text start:0x0208b464 end:0x0208b7f8
-src/usa/main/MTX_ScaleApply43.s:
+src/usa/main/func_0208b7f8.s:
     complete
     .text start:0x0208b7f8 end:0x0208b838
 libs/nitro/MTX_Identity44_.legacy.c:
@@ -10916,7 +10916,7 @@ src/usa/main/func_020915e0.legacy.c:
     complete
     .text start:0x020915e0 end:0x02091618
 
-src/usa/main/OSi_IdleThreadProc.s:
+src/usa/main/func_02091618.s:
     complete
     .text start:0x02091618 end:0x0209162c
 src/usa/main/func_0209162c.legacy.c:
