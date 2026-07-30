@@ -347,20 +347,43 @@ Note: PR #1367 added `tools/check_ci_contract.py`. If you touch anything in `.gi
 > `main` catch-up needed. See
 > `docs/research/cm-ov002-unknown-sweep-5-2026-07-29.md`.
 
-### cm-ov002-unknown-sweep-6 — next size band [S] [TODO]
+### cm-ov002-unknown-sweep-6 — next size band [S] [DONE]
 
-Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B) -> 48.5% (136-148B). **The rate is not monotonically declining** — sweep-5 rebounded, confirming this tracks per-band candidate composition, not a smooth exhaustion curve. `wall_aware_headroom.py --exclude-attempted --min-size 152 --max-size 164` finds 160 ov002 candidates for the next band up. ov002 has ~2,271 never-assessed candidates left overall.
+> DONE: all 5/5 worktree batches complete and merged (72/160 shipped,
+> 45.0%). Batch 2's worker self-organized into 4 nested sub-agents in
+> its shared worktree without authorization, which surfaced a real
+> `fastmatch.py` self-heal race under N-way same-worktree concurrency
+> (a resurrected already-deleted `.s`, caught by full independent
+> re-verification, not trusted from self-reports) and confirmed nested-
+> agent notifications route to the root session, not the actual
+> parent. See the new standing instruction below. Major finding: P-17
+> downgraded to UNDER RECONSIDERATION — a previously-untested lever
+> (constant-immediate placement) resolved 2/2 attempted cohort members
+> to 100%. Three new wall classes filed (P-24/25/26). `main` moved to
+> `7c28f92f8` before this branch was cut; no catch-up needed. 3-region
+> `gate3.py --scope all --clean` PASS confirmed. See
+> `docs/research/cm-ov002-unknown-sweep-6-2026-07-30.md`.
 
-Same 5-worktree protocol. Carry the accumulated lever set (now quite large — see the last 5 sweep writeups for the full list); highest-value additions from sweep-5: an ARM jump-table `pc+8` dispatch trap (index 0 targets the table's SECOND row, not the first — codegen-walls.md C-47); returning a call's result variable directly, not a fresh literal, elides a redundant `mov r0,#0` (independently found by 3 of 5 batches — C-48); a union of a raw scalar and same-width bitfield forces a shift-pair over a manual mask for byte-0-aligned fields; literal-pool slot assignment is sensitive to which statement runs first within a single branch, not just first-textual-occurrence in the function.
+### cm-ov002-unknown-sweep-7 — next size band [S] [TODO]
 
-**STATE THIS VERBATIM IN EVERY BATCH DISPATCH PROMPT** (this worked cleanly last round — zero batches wasted effort on it): "The `brief 302/294` header on an ov002 `.s` file is mechanical boilerplate stamped by `tools/asm_escape.py --whole-function` on ANY function. It is NOT a per-function wall verdict and is NOT evidence the candidate was assessed. Ignore it and assess the function yourself."
+Rate by band: 63.2% (32-88B) -> 65.5% (92-104B) -> 49.4% (108-120B) -> 40.7% (124-132B) -> 48.5% (136-148B) -> 45.0% (152-164B). Still oscillating in a 40-65% band, not a smooth decline. `wall_aware_headroom.py --exclude-attempted --min-size 168 --max-size 180` finds 154 ov002 candidates for the next band up. ov002 has ~2,199 never-assessed candidates left overall.
 
-Repeat all three checks that earned their keep: `tools/check_activation_invariant.py <base>..HEAD` (use the tool, not a hand-count — it caught a real miss last sweep that a manual `git diff` count would have shown as balanced), `check_delink_dupes.py`, and a stray-draft scan (`ninja -n` before AND after consolidating).
+**NEW STANDING INSTRUCTION — state this verbatim in every batch dispatch prompt:** "Work through your assigned functions yourself, one at a time, directly. Do NOT spawn further sub-agents or otherwise sub-divide your assignment — a worker that did this last round caused a real `fastmatch.py` self-heal race (one agent's legitimately-shipped function had its `.s` silently resurrected by a different concurrent agent's unrelated self-heal action) and left its own completion notifications unable to reach its actual parent. One worker per worktree, no exceptions."
 
-**REGENERATE the research index before pushing**: `python tools/generate_research_index.py`. PR #1384 got blocked on `drift-check` for skipping this after adding a new research doc — don't repeat it.
+Keep stating the header resolution verbatim too (still working perfectly, zero re-litigation for 2 sweeps running): "The `brief 302/294` header on an ov002 `.s` file is mechanical boilerplate stamped by `tools/asm_escape.py --whole-function` on ANY function. It is NOT a per-function wall verdict and is NOT evidence the candidate was assessed. Ignore it and assess the function yourself."
 
-**Standing note on the parked residual:** P-20 (28 members), P-21 (6 members), P-22 (3 members), and P-23 (2 members) are all permuter-shaped or otherwise source-level-lever-resistant register-allocation walls — 39 combined parks across just 2 sweeps. Do NOT grind any of them further; quickly confirm the signature matches and move on. That said, this growing count is a real, concrete case for unblocking the Windows permuter lane — worth raising as its own decision point rather than just accumulating indefinitely.
+**Also state this verbatim (new standing rule, applies to every worker's own final report, not just the PR body):** "Before your final report, run `git status --short` yourself and cross-check every function you're about to claim as shipped — confirm its `.s` is actually gone AND its `delinks.txt` line actually says `.c:`. A `fastmatch.py` 100% result alone does not mean you finalized it."
 
-**If the band finishes early:** `main` has ~2,291 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol — only older, slower methods. One exploratory batch there would tell us whether the protocol's hit rate holds outside ov002.
+Carry the lever set (see the last 6 sweep writeups); highest-value additions from sweep-6: bitfield storage type must match real in-memory width, not just field width (C-49); a callee's declared return type can hide a truncation the original performs — widen it to `int` (C-50); duplicate a per-branch shared load in source rather than manually pre-hoisting it (C-51); `unsigned char` cast vs `&0xff` mask select different instruction sequences for byte-packing (C-52).
+
+**HIGH PRIORITY SIDE LEAD, consider before or alongside the next band:** P-17 is now "under reconsideration," not confirmed-permanent — 2 of 2 members tested this round with **constant-immediate placement** (write a fixed sub-offset before an `idx*stride` term, not after) resolved to 100%. 15 members remain (11 never attempted, 4 previously "confirmed" but never tested with this specific lever). A dedicated re-test brief against all 15 could meaningfully shrink the confirmed-permanent wall count — see codegen-walls.md's P-17 entry for the exact member list and the lever's exact mechanism. This is valuable enough to consider as its own item rather than only folding into a future band sweep.
+
+Repeat all three checks that earned their keep: `tools/check_activation_invariant.py <base>..HEAD`, `check_delink_dupes.py`, and a stray-draft scan (`ninja -n` before AND after consolidating).
+
+**REGENERATE the research index before pushing**: `python tools/generate_research_index.py`.
+
+**Standing note on the parked residual:** P-20 (37 members), P-21 (6), P-22 (3), P-23 (2), P-24 (5, tentative), P-25 (3), P-26 (4) are all permuter-shaped or otherwise source-level-lever-resistant register-allocation walls — 60 combined parks across 3 sweeps. Do NOT grind any of them further; quickly confirm the signature matches and move on. This growing count is a real, concrete case for unblocking the Windows permuter lane.
+
+**If the band finishes early:** `main` has ~2,291 never-assessed candidates, comparable in size to ov002's remaining pool, and has never been swept with this worktree-parallel protocol.
 
 **Gate:** `python tools/gate3.py --scope all` PASS + `check_activation_invariant.py` + the three-way count check in the PR body.
