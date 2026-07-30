@@ -909,7 +909,7 @@ src/jpn/overlay002/func_ov002_021bd194.s:
 src/jpn/overlay002/func_ov002_021bd228.c:
     complete
     .text start:0x021bd228 end:0x021bd284
-src/jpn/overlay002/func_ov002_021bd284.s:
+src/jpn/overlay002/func_ov002_021bd284.c:
     complete
     .text start:0x021bd284 end:0x021bd300
 src/jpn/overlay002/func_ov002_021bd300.s:
