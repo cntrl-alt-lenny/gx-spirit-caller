@@ -443,7 +443,9 @@ Full pilot-by-pilot detail, every investigation verdict (including the 8 correct
 Root cause, verified: the region filter in `.github/workflows/compile-check.yml` (~line 57) is
 
 ```
+
 (($_ -notmatch '^src/(usa|jpn)/') -or ($_ -match "^src/$env:REGION/"))
+
 ```
 
 which treats an un-prefixed path as region-shared. It is not: `src/main/` and `src/overlayNNN/` are EUR-only. Confirmed: `config/usa/arm9/delinks.txt` contains 1057 `src/usa/main/` entries and ZERO `src/main/` entries. So for usa/jpn the workflow synthesizes targets that do not exist in that region's build graph.
@@ -679,6 +681,7 @@ Re-derived fresh via `grep -rlE "^(static )?(const )?unsigned char data_[0-9a-zA
 All 42, sorted by size (bytes), for size-first prioritization (`Named-struct` sits at 0.93% of data bytes — a handful of large correct retypes moves it more than many small ones):
 
 ```
+
 2280 data_ov004_021e3500.c   556 data_ov004_021e2efc.c    32 data_ov004_0220a250.c   28 data_ov004_02209aec.c
 2096 data_ov004_021ff0b4.c   500 data_ov004_021e3f60.c    32 data_ov004_0220a20c.c   24 data_ov004_02209e88.c
 1024 data_ov004_02206760.c   448 data_ov004_021f4880.c    32 data_ov004_0220a16c.c   24 data_ov004_02209e10.c
@@ -692,6 +695,7 @@ All 42, sorted by size (bytes), for size-first prioritization (`Named-struct` si
                                                             28 data_ov004_02209bb8.c
                                                             28 data_ov004_02209b9c.c
                                                             28 data_ov004_02209b08.c
+
 ```
 
 (all paths relative to `src/overlay004/data/`)
@@ -734,12 +738,16 @@ This closes out the `src/overlay004/data/` pool as found by this wave's census. 
 `src/overlay004/data/` is finished (24/24, wave 14). The remaining pool is project-wide and untagged: a recursive scan of merged `main` shows opaque `unsigned char` data files with no assessment of any kind, outside every prior wave's scope. **Re-derive the exact count and file list yourself before trusting any handed-down number** — every wave of this campaign so far has found the handed-down count wrong, and the last "recursive census" instruction two waves running has surfaced files already resolved elsewhere (wave 13's own census pulled in 2 files `cm-data-inference-2` had already settled; watch for the same class of overlap here, e.g. any file this campaign's waves 2-14 already gave a verdict to should be excluded even if a fresh grep re-surfaces it because its C type never changed).
 
 Example largest-first leads to start from (verify each independently, do not assume these are still accurate or that this list is complete):
+
 ```
+
 5,904B  src/main/data_020bff80.c
 4,096B  src/main/data_020c1f80.c   (obvious repeating 4-byte stride -- record array typed as flat bytes)
 3,328B  src/main/data_020bf280.c
 2,280B  src/overlay004/data/data_ov004_021e3500.c
+
 ```
+
 Note: the last of these (`data_ov004_021e3500`) was already conclusively investigated in wave 13 and confirmed CORRECTLY OPAQUE (real compiled ARM32 code misclassified as data, part of the documented "Category 2 veneer blob" class — do not reclassify, breaks SHA1 per brief 154/PR #581). A fresh recursive grep will still surface it since its C type never changed; exclude it and any other already-settled symbol before dispatching investigations, per the standing "check research broadly, not just this campaign's own docs" rule.
 
 Same method as every prior wave: consumer-evidence-driven, computed-stride/loop-bound-proven → STRONG, fixed-offset-only → WEAK/decline, boundary conflicts → CONTRADICTION, real compiled code misclassified as data → CORRECTLY OPAQUE (never retype; never attempt a `kind:function` reclassification on that class). This pool was never pre-filtered by any mechanical carve pass, so expect a real mix — genuinely correct `unsigned char` buffers (strings, bitmaps, sound/graphics data) alongside mis-typed ones, likely a lower ship rate than wave 14's 100% outlier. State the real number plainly rather than reaching for one that matches a prior wave. `Named-struct` is ~0.94% of data bytes — a few large correct retypes move it far more than many small ones, so prioritize by size.
