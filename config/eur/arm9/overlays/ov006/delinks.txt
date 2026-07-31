@@ -2610,7 +2610,15 @@ src/overlay006/data_ov006_021cf0c4.c:
 
 src/overlay006/bss/data_ov006_bss.s:
     complete
-    .bss start:0x021cf140 end:0x021d6ed0
+    .bss start:0x021cf140 end:0x021cf1b0
+
+src/overlay006/data_ov006_021cf1b0.c:
+    complete
+    .bss start:0x021cf1b0 end:0x021d0afc
+
+src/overlay006/bss/data_ov006_bss_6.s:
+    complete
+    .bss start:0x021d0afc end:0x021d6ed0
 
 src/overlay006/data_ov006_021d6ed0.c:
     complete

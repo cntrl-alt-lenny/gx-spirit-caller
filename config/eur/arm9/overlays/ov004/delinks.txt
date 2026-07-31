@@ -1397,4 +1397,20 @@ src/overlay004/data/data_ov004_0220a33c.c:
 
 src/overlay004/bss/data_ov004_bss.s:
     complete
-    .bss start:0x0220b500 end:0x02293d00
+    .bss start:0x0220b500 end:0x022916b0
+
+src/overlay004/data_ov004_022916b0.c:
+    complete
+    .bss start:0x022916b0 end:0x02291930
+
+src/overlay004/bss/data_ov004_bss_2.s:
+    complete
+    .bss start:0x02291930 end:0x02292008
+
+src/overlay004/data_ov004_02292008.c:
+    complete
+    .bss start:0x02292008 end:0x022923d0
+
+src/overlay004/bss/data_ov004_bss_3.s:
+    complete
+    .bss start:0x022923d0 end:0x02293d00

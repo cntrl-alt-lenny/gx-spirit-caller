@@ -1,12 +1,9 @@
 ; Cluster A wave 4 — overlay 017 (brief 139).
 ; mwasmarm syntax + dsd LCF auto-routing.
-; 17 .bss symbols, range 0x021b8520..0x021b8ac0.
+; 16 .bss symbols, range 0x021b8528..0x021b8ac0.
 
         .bss
 
-        .global data_ov017_021b8520
-data_ov017_021b8520:
-        .space 0x8
         .global data_ov017_021b8528
 data_ov017_021b8528:
         .space 0x3c
