@@ -1058,7 +1058,7 @@ src/main/func_02007278.s:
     complete
     .text start:0x02007278 end:0x02007e8c
 
-src/main/func_02007e8c.s:
+src/main/func_02007e8c.c:
     complete
     .text start:0x02007e8c end:0x02007f38
 
