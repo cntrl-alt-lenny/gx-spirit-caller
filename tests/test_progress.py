@@ -831,6 +831,40 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["named_struct_bytes"], 0)
         self.assertEqual(metric["named_struct_pct"], 0.0)
 
+    def test_typed_array_only_counts_file_scope_declarations(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x30 kind:data\n"
+                "\n"
+                "src/main/data_file_scope.c:\n"
+                "    .data start:0x0 end:0x10\n"
+                "\n"
+                "src/main/data_nested_only.c:\n"
+                "    .data start:0x10 end:0x30\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_file_scope.c").write_text(
+                "const unsigned char data_file_scope[16] = {0};\n"
+            )
+            (source_dir / "data_nested_only.c").write_text(
+                "struct Wrapper {\n"
+                "    int member[4];\n"
+                "};\n"
+                "static void helper(void) {\n"
+                "    int local[4];\n"
+                "    (void)local;\n"
+                "}\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["typed_array_bytes"], 0x10)
+        self.assertAlmostEqual(metric["typed_array_pct"], 100 * 0x10 / 0x30)
+
     def test_named_struct_array_subtier_excludes_primitive_arrays(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
