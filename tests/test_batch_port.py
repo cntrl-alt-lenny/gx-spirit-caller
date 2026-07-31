@@ -26,7 +26,7 @@ import batch_carve as bc  # noqa: E402
 import batch_port as bp  # noqa: E402
 from batch_port import (  # noqa: E402
     BatchPorter, compute_port_output_path, filter_sim1_backlog,
-    find_tu_header_for_addr, module_dirs,
+    fastmatch_verdict, find_tu_header_for_addr, module_dirs,
 )
 
 
@@ -55,6 +55,41 @@ class TestFilterSim1Backlog(unittest.TestCase):
 
     def test_empty_list(self):
         self.assertEqual(filter_sim1_backlog([]), [])
+
+
+class TestFastmatchVerdict(unittest.TestCase):
+    def test_no_instructions_is_a_refusal_even_if_percent_is_misreported(self):
+        payload = [{
+            "status": "ok",
+            "functions": [{
+                "name": "func_thumb",
+                "status": "ok",
+                "match_percent": 100.0,
+                "diffs_sample": [[0, "NO-INSTRUCTIONS-PARSED",
+                                   "NO-INSTRUCTIONS-PARSED"]],
+            }],
+        }]
+        verdict, reason = fastmatch_verdict(payload, 0)
+        self.assertEqual(verdict, "refused")
+        self.assertIn("NO-INSTRUCTIONS-PARSED", reason)
+
+    def test_candidate_compile_error_is_a_refusal(self):
+        payload = [{
+            "status": "compile_error",
+            "error": "src/foo.c:9: undefined identifier 'D016C'",
+        }]
+        verdict, reason = fastmatch_verdict(payload, 2)
+        self.assertEqual(verdict, "refused")
+        self.assertIn("undefined identifier", reason)
+
+    def test_compile_infrastructure_error_is_retryable(self):
+        payload = [{
+            "status": "compile_error",
+            "error": "mwccarm.exe: not found",
+        }]
+        verdict, reason = fastmatch_verdict(payload, 2)
+        self.assertEqual(verdict, "tool-error")
+        self.assertIn("infrastructure", reason)
 
 
 class TestFindTuHeaderForAddr(unittest.TestCase):
@@ -158,15 +193,19 @@ class FakePortOps:
       is checked against what's actually staged in the bound delinks files.
     """
     def __init__(self, refuse=(), tool_error=(), needs_symbol=(), bad_link=(),
-                commit_fails=False, gate_times_out=False):
+                prefilter_refuse=(), prefilter_error=(), commit_fails=False,
+                gate_times_out=False):
         self.refuse = set(refuse)
         self.tool_error = set(tool_error)
         self.needs_symbol = set(needs_symbol)
         self.bad_link = set(bad_link)
+        self.prefilter_refuse = set(prefilter_refuse)
+        self.prefilter_error = set(prefilter_error)
         self.commit_fails = commit_fails
         self.gate_times_out = gate_times_out
         self.committed: list[tuple[list[str], list[str], str]] = []
         self.gate_calls = 0
+        self.prefilter_calls: list[tuple[str, str]] = []
         self._delinks_paths: list[Path] = []
         self._head = 0
 
@@ -202,6 +241,14 @@ class FakePortOps:
             if any(f"{b}.c:" in text for b in self.bad_link):
                 return False
         return True
+
+    def prefilter(self, c_rel: str, func: str) -> tuple[str, str]:
+        self.prefilter_calls.append((c_rel, func))
+        if func in self.prefilter_refuse:
+            return "refused", "simulated resolved mismatch"
+        if func in self.prefilter_error:
+            return "tool-error", "simulated compile/gap failure"
+        return "pass", "simulated 100.0% resolved match"
 
     def head_rev(self) -> str:
         return str(self._head)
@@ -302,6 +349,33 @@ class TestBatchPorterDriver(unittest.TestCase):
         # refused: .s untouched, delinks still says .s
         self.assertTrue((self.tmp / srcdir / "func_tgt00.s").exists())
         self.assertIn("func_tgt00.s:", delinks_path.read_text())
+
+    def test_prefilter_refusal_never_reaches_rom_gate(self):
+        entries = [("func_eur00", "func_tgt00", 0x02006000, 0x40)]
+        delinks_path, srcdir = _mk_repo(self.tmp, "usa", "main", entries)
+        ops = FakePortOps(prefilter_refuse=["func_tgt00"])
+        ops.bind([delinks_path])
+        backlog = [_entry("func_eur00", "main", "func_tgt00",
+                          0x02006000, 0x40)]
+        rep = self._porter(ops).run(backlog)
+        self.assertEqual(rep.prefilter_refuse, ["func_tgt00"])
+        self.assertEqual(ops.gate_calls, 0)
+        self.assertEqual(ops.committed, [])
+        self.assertTrue((self.tmp / srcdir / "func_tgt00.s").exists())
+        self.assertFalse((self.tmp / srcdir / "func_tgt00.c").exists())
+
+    def test_prefilter_pass_still_faces_rom_gate(self):
+        entries = [("func_eur00", "func_tgt00", 0x02006000, 0x40)]
+        delinks_path, _srcdir = _mk_repo(self.tmp, "usa", "main", entries)
+        ops = FakePortOps()
+        ops.bind([delinks_path])
+        backlog = [_entry("func_eur00", "main", "func_tgt00",
+                          0x02006000, 0x40)]
+        rep = self._porter(ops).run(backlog)
+        self.assertEqual(rep.prefilter_refuse, [])
+        self.assertEqual(len(ops.prefilter_calls), 1)
+        self.assertEqual(ops.gate_calls, 1)
+        self.assertEqual(rep.passed, ["func_tgt00"])
 
     def test_tool_error_not_parked_retried_next_run(self):
         entries = [("func_eur00", "func_tgt00", 0x02006000, 0x40)]
