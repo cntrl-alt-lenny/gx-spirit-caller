@@ -13,8 +13,10 @@ alignment-pairing investigations also succeeded, unblocking
 shipped this wave, 19,248 bytes total.**
 
 ```
+
 Typed-array:   139,104 -> 158,304 bytes  (+19,200 B,  2.91% -> 3.31%)
 Named-struct:   50,112 ->  52,040 bytes  (+1,928 B,   1.05% -> 1.09%)
+
 ```
 
 Measured directly via `tools/progress.py` before/after (`git stash`/`git
@@ -63,10 +65,14 @@ showed both landing at overlapping/swapped addresses relative to what was
 expected. The real linker map (`build/eur/arm9.o.xMAP`) confirmed it
 directly — mwldarm placed the two objects in the **opposite** order from
 how they were declared:
+
 ```
+
 0219060C 00000515 .bss    data_0219190b   (data_0219060c.o)
 02190B22 000012FF .bss    data_0219060c   (data_0219060c.o)
+
 ```
+
 Reversing the declaration order in source had **zero effect** on the
 compiled output (byte-identical rebuild) — proving the layout isn't
 driven by declaration order at all, so no source reordering could fix
