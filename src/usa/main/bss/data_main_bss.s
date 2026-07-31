@@ -537,6 +537,8 @@ data_0219a844:
         .space 0x8
         .global data_0219a84c
 data_0219a84c:
+        .global data_0219a92c_alias
+data_0219a92c_alias:
         .space 0x8
         .global data_0219a854
 data_0219a854:

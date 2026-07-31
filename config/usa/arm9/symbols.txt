@@ -11348,6 +11348,7 @@ data_0219a814 kind:bss addr:0x0219a814
 data_0219a834 kind:bss addr:0x0219a834
 data_0219a844 kind:bss addr:0x0219a844
 data_0219a84c kind:bss addr:0x0219a84c
+data_0219a92c_alias kind:bss addr:0x0219a84c
 data_0219a854 kind:bss addr:0x0219a854
 data_0219a85c kind:bss addr:0x0219a85c
 data_0219a868 kind:bss addr:0x0219a868
@@ -11804,3 +11805,4 @@ data_021aa280 kind:bss addr:0x021aa280
 data_021aa380 kind:bss addr:0x021aa380
 data_021aa384 kind:bss addr:0x021aa384
 data_021aa3a0 kind:bss addr:0x021aa3a0
+data_022cc4b4 kind:data(any) addr:0x022cc4b4

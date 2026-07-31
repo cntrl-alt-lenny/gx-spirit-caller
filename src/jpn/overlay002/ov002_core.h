@@ -339,6 +339,13 @@ struct Ov002Ce288 {
 };
 #define CE1A8 ((struct Ov002Ce288 *)data_ov002_022ce1a8)
 
+/* EUR-source compatibility: port_to_region rewrites data symbols, but the
+ * shared EUR C bodies retain the context macro spellings.  The JPN layout
+ * is already represented by D008C/CE1A8; these aliases only bridge the
+ * spelling and do not introduce a second address or declaration. */
+#define D016C D008C
+#define CE288 CE1A8
+
 /* hub: gate on a flag table, then post a command (84 band callers). */
 extern void func_ov002_021ae400(int a, int b);                   /* [shipped] cd744[a]?ret:0229ade0(0x31,0,b,0) */
 
