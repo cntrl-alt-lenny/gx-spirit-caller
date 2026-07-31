@@ -471,7 +471,7 @@ Also state verbatim: "Before your final report, run `git status --short` yoursel
 
 **Gate:** `python tools/gate3.py --scope all --clean` PASS, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-9 — 149-512B, plain selection [S] [TODO]
+### cm-ov002-unknown-sweep-9 — 149-512B, plain selection [S] [CLAIMED]
 
 > Filed from the coordinating process's own chat message after
 > sweep-8 merged (main 77e64a1f9, EUR crossed 12%) — appended here per
