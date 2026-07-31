@@ -51,6 +51,62 @@ _DATA_ARRAY_DECL_RE = re.compile(
     r"struct|union|enum|u?int\d*|[A-Za-z_]\w*)\s+)+"
     r"[A-Za-z_]\w*\s*\[[^\]]*\]\s*(?:=|;)")
 
+
+def _has_file_scope_array_decl(source_text: str) -> bool:
+    """Return whether *source_text* declares an array at brace depth zero.
+
+    The declaration regex is intentionally line-based, but a line match is
+    only an owning data declaration when it is outside a struct/union/enum or
+    function body.  Track braces while ignoring comments and literals so
+    nested fields and locals cannot inflate the file-scope Typed-array tier.
+    """
+    brace_depth = 0
+    in_block_comment = False
+    quote = None
+
+    for line in source_text.splitlines(keepends=True):
+        if brace_depth == 0 and _DATA_ARRAY_DECL_RE.match(line):
+            return True
+
+        i = 0
+        while i < len(line):
+            char = line[i]
+            next_char = line[i + 1] if i + 1 < len(line) else ""
+
+            if in_block_comment:
+                if char == "*" and next_char == "/":
+                    in_block_comment = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+
+            if quote is not None:
+                if char == "\\":
+                    i += 2
+                elif char == quote:
+                    quote = None
+                    i += 1
+                else:
+                    i += 1
+                continue
+
+            if char == "/" and next_char == "/":
+                break
+            if char == "/" and next_char == "*":
+                in_block_comment = True
+                i += 2
+                continue
+            if char in ("'", '"'):
+                quote = char
+            elif char == "{":
+                brace_depth += 1
+            elif char == "}":
+                brace_depth = max(0, brace_depth - 1)
+            i += 1
+
+    return False
+
 # Same shape as _DATA_ARRAY_DECL_RE but captures the type-clause (every
 # qualifier/type token before the array name) so it can be checked for
 # "is every token a primitive/qualifier keyword" — see
@@ -551,7 +607,7 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
                 for name, start, end in tu.get("sections", [])
                 if name in DATA_SECTIONS
             )
-            if _DATA_ARRAY_DECL_RE.search(source_text):
+            if _has_file_scope_array_decl(source_text):
                 typed_array_bytes += data_bytes
             if _tu_has_named_struct_decl(source_text):
                 named_struct_bytes += data_bytes
