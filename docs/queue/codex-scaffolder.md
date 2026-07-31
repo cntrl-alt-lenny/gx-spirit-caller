@@ -206,6 +206,32 @@ Build `tools/check_activation_invariant.py` to mechanically check a git range: a
 > Deliberately-flat scans were left alone with reasons recorded. Third
 > instance of this bug class (after #1366 and #1383).
 
+### q-typed-array-brace-nesting-fix — Typed-array regex credits struct-internal fields, not just file-scope arrays [TODO]
+
+Sibling finding to the `q-metric-singleton-struct-gap`/`q-data-metric-fix` lineage — same metric, opposite direction (over-crediting `Typed-array` instead of under-crediting `Named-struct`). Filed by the Claude Scaffolder lane after tracing a real measurement discrepancy in `cm-bss-convert-2` (PR #1402); write-up and fix belong here since this is metric-tooling correctness, not data-carving.
+
+`tools/progress.py`'s `_DATA_ARRAY_DECL_TYPE_CAPTURE_RE` (feeds `typed_array_bytes` via `summarize_data_readability`) is a line-based regex (`^\s*(...)+[A-Za-z_]\w*\s*\[...\]\s*(?:=|;)`, `re.MULTILINE`) with no brace-depth tracking. It matches any line shaped like `Type name[N];` — including a padding/buffer FIELD nested inside a `typedef struct { ... } Foo;` body, not just a genuine file-scope array declaration. Crediting is per-TU (any qualifying match anywhere in a TU's source credits that TU's whole `delinks.txt` byte range to `typed_array_bytes`), so a TU whose only top-level object is a bracket-less scalar struct INSTANCE (correctly `Named-struct`-only by design) still gets credited to `Typed-array` too, purely because its struct body happens to contain an array-shaped field.
+
+Confirmed empirically: 3 shipped, gate-passing files each declare a scalar struct instance at file scope (no brackets on the instance itself) whose typedef body contains 1-2 array fields:
+
+- `src/main/data/data_021a5340.c` — `data_021a5340_t data_021a5340;` (scalar), typedef body has `thread_state[0xc0]` + `stack[0x400]`
+- `src/main/data/data_021a8b00.c` — `data_021a8b00_t data_021a8b00;` (scalar), typedef body has `_unk0c[0x14]` + `buffer[0x200]`
+- `src/main/data/data_0219a8f4.c` — `Overlay0219a8f4 data_0219a8f4;` (scalar), typedef body has `_pad1[3]` + `_pad7[0x14]`
+
+Each of these 3 TUs' full byte range (1216 + 544 + 32 = 1792 B) is counted toward `typed_array_bytes` in addition to `named_struct_bytes`, even though none has a genuine file-scope array. This is exactly the gap between `cm-bss-convert-2`'s naive per-symbol prediction (+17,408 B) and the measured `Typed-array` delta (+19,200 B). Verify directly:
+
+```
+python -c "import sys; sys.path.insert(0,'tools'); import progress; print(list(progress._DATA_ARRAY_DECL_TYPE_CAPTURE_RE.finditer(open('src/main/data/data_021a5340.c').read())))"
+```
+
+shows 2 matches, both struct-internal fields, zero file-scope arrays.
+
+Worth checking (not confirmed — a plausible mirror-image risk under the same root cause, not directly observed in any shipped file): could a struct field that is itself an ARRAY OF A NON-PRIMITIVE TYPE (e.g. `SomeStruct sub[3];` nested inside an otherwise-primitive-only TU) falsely trigger `_tu_has_named_struct_decl` the same way, over-crediting `Named-struct` for a TU that should be neither tier? `_tu_has_named_struct_decl` checks every match from both `_DATA_ARRAY_DECL_TYPE_CAPTURE_RE` and `_DATA_SCALAR_DECL_TYPE_CAPTURE_RE` for a non-primitive type clause, with the same brace-blindness — worth a test case either way, whichever direction it turns out to go.
+
+Proposed fix direction (not prescribed — pick what's right after investigating): track brace depth while scanning source text so only depth-0 (true file-scope) declarations qualify, or otherwise restrict both capture regexes from matching inside an unclosed `{` opened by a preceding `typedef`/`struct` line.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + a new regression test asserting a TU with ONLY a bracket-less scalar struct instance (whose typedef body contains an array field) does NOT credit `typed_array_bytes` + before/after `python tools/progress.py --version eur` showing `Typed-array` drops by exactly 1792 B (the 3 files above) with `Named-struct` unchanged.
+
 ### q-activation-invariant-classifier — classify named C functions from authoritative metadata [DONE]
 
 Fix `tools/check_activation_invariant.py`: named function files such as `Ov015_InitScroller.c` are currently reported as DATA because the classifier only recognizes `func_*`. Use the region's `delinks.txt`/`symbols.txt` metadata for `kind:function` vs data, with the existing filename-prefix fallback when metadata is unavailable. Add a synthetic named-function missing-activation failure test and recheck known-good PR #1387 and #1388 ranges. Report the real-range function/data split before and after.
