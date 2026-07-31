@@ -582,7 +582,26 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-10 — 149-512B [S] [CLAIMED]
+### cm-ov002-unknown-sweep-10 — 149-512B [S] [DONE]
+
+> **DONE 2026-07-31.** 30/100 shipped (8,344 bytes) — best round this
+> campaign. C-60 investigated directly via standalone `mwccarm`
+> compilation (not delegated): confirmed real, correctly predicts
+> instruction-family selection, but does NOT alone close the 3 priority
+> candidates — a second register-allocation wall sits on top of all
+> three. That same wall family (P-4/11/12/15/17) hit unprecedented
+> volume this round (9/14 parks in one batch alone, on a loop-scan
+> variant of the same `data_ov002_022cf16c` table) — now unmistakably
+> the campaign's dominant open problem across 3 consecutive rounds, and
+> the strongest candidate for the next round's own dedicated mini-item.
+> P-17 cohort: 15->14 (`func_ov002_021eb630` resolved). **The route-
+> before-draft fix from last round was itself incomplete** — paraphrased
+> from memory rather than read from source, causing a 3rd rediscovery
+> incident; corrected verbatim text (the full 3-tier table +
+> disambiguator) is ready for next round. A real worktree-setup gap
+> found (`ninja delink` needed before `fastmatch.py` works correctly in
+> a fresh worktree) — add it to setup next time. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-10-2026-07-31.md`.
 
 > Filed from the coordinating process's own chat message after
 > sweep-9 merged (main b4ca6bb9b, EUR 12.25%) — appended here per the

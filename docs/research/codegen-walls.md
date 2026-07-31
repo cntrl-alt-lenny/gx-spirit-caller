@@ -8591,6 +8591,21 @@ signature rather than assuming it's bounded to the known cohort.
 > `021eb630`, `021ebfd0`, `021ee23c`, `021ef5a0`, `021efe44`, `021f0028`,
 > `021f1458`, `021f208c`, `021f2138`, `021f2ac8`.
 
+> **Continued (cm-ov002-unknown-sweep-10, 2026-07-31): `021eb630`
+> reclassified — shipped 100.0% first-try via constant-immediate
+> placement.** A genuine, previously-untested listed cohort member.
+> **Cohort count drops from 15 to 14.** Same sweep also shipped
+> `021f162c` (not one of the 17 originally-enumerated addresses, but
+> in the same surveyed neighborhood between `021f1458` and `021f1504`)
+> at 100.0% first-try with the same lever — treat as another instance
+> of the "possible cohort expansion" pattern this entry already flagged
+> (`021ece34`, `021f82b8`), not a literal cohort reclassification. Two
+> more first-try 100% hits on constant-immediate placement, both from
+> this round, keeps the "re-test this lever against the 10 remaining
+> untested members before anything else" action item live and
+> increasingly well-supported (4 of 4 attempts with this specific lever
+> have now succeeded, across two separate sweeps).
+
 ### P-18. Task-config field-write store-reordering
 
 mwcc reorders two independent (non-aliasing, no data dependency between
