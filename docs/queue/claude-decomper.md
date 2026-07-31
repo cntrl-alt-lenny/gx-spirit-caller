@@ -470,3 +470,114 @@ Two open leads, still unfiled, yours when wanted: P-17 re-test (15 members, cons
 Also state verbatim: "Before your final report, run `git status --short` yourself and cross-check every function you're about to claim as shipped — confirm its `.s` is actually gone AND its `delinks.txt` line actually says `.c:`. A `fastmatch.py` 100% result alone does not mean you finalized it."
 
 **Gate:** `python tools/gate3.py --scope all --clean` PASS, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; stray-draft scan; regenerate the research index before pushing.
+
+### cm-ov002-unknown-sweep-9 — 149-512B, plain selection [S] [DONE]
+
+> **DONE 2026-07-31.** 19/100 shipped (4,632 bytes). All 3 process
+> fixes held: one consolidated gate only (5 parallel `configure.py eur`
+> config-checks, zero parallel builds — no more toolchain contention),
+> `park_one.py` used by all 5 batches with zero collision incidents,
+> C-32 body-screening caught 2 pre-dispatch and 0 more were found by
+> any worker (screening worked). New lever C-59; C-58 reconfirmed
+> (now believed systemic). Found (not newly — see doc) that 2 batches
+> independently rediscovered the project's own pre-existing "route
+> before you draft" tier-routing guidance, a real gap in this round's
+> dispatch prompt to fix next time. Dominant finding: roughly half of
+> all parks across all 5 batches share one shape (word-count-exact,
+> pure register-letter mismatch) — reconfirms the existing P-4/P-11/
+> P-12/P-15/P-17 register-plateau wall family rather than a new open
+> problem, except one narrow sub-pattern (an MLA-vs-indexed-load
+> choice tied to one ov002 data table) hit 4 times, worth a dedicated
+> look. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-9-2026-07-31.md`.
+
+> Filed from the coordinating process's own chat message after
+> sweep-8 merged (main 77e64a1f9, EUR crossed 12%) — appended here per
+> the project's "a prose mention is not a task" convention.
+
+Sweep-8's own corrected data says callee-coverage doesn't pay within
+the 149-512B band (100% coverage: 4/4 shipped, a small but perfect
+predictor; below that, no clean gradient — 33.3% / 25.6% / 35.3% /
+23.1%). **Drop it as the selector.** Go back to straightforward
+selection across 149-512B, module-agnostic, stride-sampled across
+modules (not first-N-by-address). That band still holds ~33pp and is
+only ~12%/2% complete — the best measured productivity in the project.
+
+100 candidates selected, excluding ov002 ≤164B (sweeps 1-6) and every
+candidate touched by sweeps 7 and 8 (shipped ones are already gone
+from the `.s` pool; parked ones — 40 from sweep-7, 67 from sweep-8 —
+were manually excluded since `attempts.tsv` still doesn't track
+worktree-sweep parks). Partitioned round-robin into 5 worktrees of 20.
+
+**Screen for C-32 walls beyond the header.** 2 undetected instances
+polluted sweep-8's counts — one had zero distinguishing header text at
+all (only the generic brief-302/294 stamp), identifiable only by its
+body: a direct `bl`/`blx` to a callee whose `func_ovNNN_` prefix
+differs from the file's own overlay (a real compiler can never emit
+this — legitimate cross-overlay calls go through a binary-level veneer,
+never a bare source-level `bl`). This selection was screened
+mechanically for that signature before dispatch (2 caught, backfilled);
+state verbatim to workers: "If you see a `bl`/`blx` to a
+`func_ovNNN_XXXXXXXX` target whose overlay number doesn't match this
+file's own, stop — that's a C-32 permanent wall, not a candidate.
+Report it, don't attempt it."
+
+**THE ONE PROCESS CHANGE, non-negotiable:** no more per-batch ROM
+gates. `gate3.py --scope all --clean`'s 5-worktree-parallel setup
+verification (a `configure.py eur && ninja sha1` per worktree) and each
+batch's own end-of-task `ninja sha1` both saturate the machine-wide-
+serialized mwcc toolchain — this has now blocked the Codex Scaffolder
+lane twice. This round: worktree setup runs `configure.py eur` only
+(no `ninja`, no compiler invocation — just baserom/config validation)
+across all 5, safe in parallel. State verbatim to workers: "Iterate
+with `fastmatch.py` per function (single object, no link, no ROM) —
+that is your only build/verify step. Do NOT run `ninja sha1` or any
+full build in your worktree; the one 3-region ROM gate happens once,
+at consolidation, on the merged branch. If you believe you've hit a
+case where only a full ROM build can tell you something fastmatch.py
+can't, stop and say so rather than running one anyway."
+
+**Fixed the `git checkout -- <module>/delinks.txt <file>.s` idiom.**
+`tools/park_one.py <c-file> --region eur` now exists — reuses
+`batch_sha1.py`'s own `_flip_delinks` to surgically revert exactly one
+function's delinks.txt line (verified: round-trips byte-identical, and
+does NOT touch a sibling function's uncommitted entry in the same
+shared file — the actual bug, hit independently twice last round).
+State verbatim: "To abandon a candidate, use `python tools/park_one.py
+<path/to/func_X.c> --region eur` — never `git checkout --
+<module>/delinks.txt`, which reverts the WHOLE shared file and can
+silently discard another candidate's already-shipped, uncommitted
+entry in the same worktree session."
+
+Carry the new levers: C-55 (branch-to-block polarity via
+goto/inverted-condition restructuring — independently found by 4
+batches last round, the strongest-evidenced new lever this session),
+C-56 (local declaration order, not just usage order, affects register
+allocation), C-57 (C addition operand order controls which addend
+fuses into an ARM shifted-register form), C-58 (unsigned vs. signed
+comparison type selects `CC`/`HI` over `LT`/`GT` — 1 instance so far,
+worth a 2nd confirmation). Full detail in codegen-walls.md.
+
+Same NON-NEGOTIABLE no-sub-agent language as the last two rounds
+(verified effective — shrinking blast radius each time). State
+verbatim: "Work through your assigned functions yourself, one at a
+time, directly. Do NOT spawn further sub-agents or otherwise sub-divide
+your assignment — a worker that did this in an earlier round caused a
+real `fastmatch.py` self-heal race and left its own completion
+notifications unable to reach its actual parent. The self-heal is
+designed for one worker per worktree; it is not concurrency-safe and
+will not be made so."
+
+Also state verbatim: "Before your final report, run `git status
+--short` yourself and cross-check every function you're about to claim
+as shipped — confirm its `.s` is actually gone AND its `delinks.txt`
+line actually says `.c:`. Neither a `fastmatch.py` 100% result nor a
+clean `git status` alone means you finalized it correctly — check
+both."
+
+Keep reporting bytes and pp, not ship-rate alone.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
+consolidated branch (not per-batch); three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index before pushing.

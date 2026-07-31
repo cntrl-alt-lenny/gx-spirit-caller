@@ -6544,7 +6544,34 @@ reason to leave a signed type in place.
 instance so far; flagging for reconfirmation on a second, independent
 function before treating it as systemic.
 
+> **Reconfirmed (cm-ov002-unknown-sweep-9, 2026-07-31, batch 2):**
+> `func_0209f514` needed the same lever (an unsigned cast selecting a
+> logical rather than arithmetic shift, same underlying signed-vs-
+> unsigned mechanism). Now believed systemic.
+
 **Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batch 4.
+
+### C-59. A branch target shared with a switch's default case still gets predicated, not branched — force it with an explicit `switch`
+
+**The trap:** C-55 already covers when natural `if`/`else if` predicates
+a block the target actually branches to. This is a related but distinct
+trap: a *trivial* guard whose taken-branch target happens to be the same
+block a nearby `switch`'s default case also falls into can still get
+predicated even when written with a `goto` — because mwcc's if-conversion
+doesn't look at where a `switch`'s dispatch already lands to decide
+whether a plain `if` should become a branch or a predicate.
+
+**The fix:** when a `goto`-restructured `if` still predicates instead of
+branching, and its target is a block also reached by a nearby `switch`'s
+default/fallthrough case, rewrite the guard itself as a 2-outcome
+`switch` (not an `if`) so mwcc treats it as part of the same dispatch
+decision instead of a separate scalar branch.
+
+**Evidence:** `func_02007e8c` (cm-ov002-unknown-sweep-9, batch 4) — one
+instance so far; flagging for reconfirmation on a second, independent
+function before treating it as systemic.
+
+**Provenance:** cm-ov002-unknown-sweep-9 (2026-07-31), batch 4.
 
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
