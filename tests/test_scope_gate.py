@@ -196,15 +196,15 @@ class TestCarve(unittest.TestCase):
 
 
 class TestIntegrationRealMain(unittest.TestCase):
-    """Clean committed HEAD must pass all checks at target 0 (no build)."""
+    """A zero-item target is rejected rather than reported as a pass."""
 
     def setUp(self):
         import importlib
         importlib.reload(sg)  # undo monkeypatches from other tests
 
-    def test_clean_head_passes_target_zero(self):
+    def test_zero_target_is_rejected(self):
         rc = sg.run("naming", base="HEAD", regions=["eur", "usa", "jpn"], target=0)
-        self.assertEqual(rc, 0)
+        self.assertEqual(rc, 2)
 
 
 if __name__ == "__main__":

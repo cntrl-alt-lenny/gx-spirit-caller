@@ -6,12 +6,15 @@ keeps exactly one entry at the address) or on the module's top-of-file .text
 section header.
 """
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr
+from io import StringIO
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 
-from check_delink_dupes import find_dupes  # noqa: E402
+from check_delink_dupes import find_dupes, main  # noqa: E402
 
 # Top-of-file section headers, exactly as dsd emits them (no src/ block above).
 HEADER = (
@@ -25,6 +28,16 @@ def _block(path: str, start: str, end: str) -> str:
 
 
 class TestFindDupes(unittest.TestCase):
+    def test_empty_delinks_fails_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "empty-delinks.txt"
+            path.write_text("", encoding="utf-8")
+            err = StringIO()
+            with redirect_stderr(err):
+                result = main(["check_delink_dupes.py", str(path)])
+        self.assertEqual(result, 2)
+        self.assertIn("vacuous", err.getvalue())
+
     def test_clean_no_dupes(self):
         body = HEADER + _block("src/usa/overlay002/func_ov002_021ab784.c", "0x021ab784", "0x021ab794") \
                       + _block("src/usa/overlay002/func_ov002_021ab794.s", "0x021ab794", "0x021ab980")

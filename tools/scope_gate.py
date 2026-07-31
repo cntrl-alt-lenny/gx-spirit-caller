@@ -26,7 +26,8 @@ Usage:
     python3.13 tools/scope_gate.py --kind naming --target 4 --regions eur,usa,jpn
     python3.13 tools/scope_gate.py --kind carve --base origin/main --target 20
 
-Exit codes: 0 all checks pass · 1 a check failed · 2 usage/IO error.
+Exit codes: 0 all checks pass · 1 a check failed · 2 usage/IO error or a
+zero-item target/scope.
 
 For carve briefs, `--kind carve` checks both the requested complete-unit delta
 and the three-way reconciliation between newly complete delinks TUs, newly
@@ -279,6 +280,18 @@ _KINDS = {"carve", "naming"}
 def run(kind: str, base: str, regions: list[str], target: int) -> int:
     if kind not in _KINDS:
         print(f"scope_gate: kind '{kind}' not implemented (have: {sorted(_KINDS)})", file=sys.stderr)
+        return 2
+    if target <= 0:
+        print(
+            "scope_gate: target must be positive — refusing a zero-item pass.",
+            file=sys.stderr,
+        )
+        return 2
+    if not regions:
+        print(
+            "scope_gate: at least one region is required — refusing a zero-item pass.",
+            file=sys.stderr,
+        )
         return 2
     if kind == "carve":
         results = [

@@ -14,7 +14,8 @@ the provenance table. Any drift — a hand-edit, a stale entry after a
 matched function's signature changed, a provenance path that no longer
 resolves — is reported as an Issue.
 
-Exit code: 0 = clean, 1 = mismatches found, 2 = load/parse error.
+Exit code: 0 = clean, 1 = mismatches found or an empty provenance bank, 2 =
+load/parse error (a zero-item check is never a clean result).
 
 Usage:
     python tools/check_prototypes_provenance.py
@@ -59,6 +60,13 @@ def check() -> list[Issue]:
     fresh = collect_evidence_backed_signatures()
     fresh_names = set(fresh)
     committed_names = set(committed_provenance)
+
+    if not fresh_names and not committed_names:
+        return [Issue(
+            "error", "<input>",
+            "no evidence-backed prototypes found — refusing a vacuous "
+            "provenance pass",
+        )]
 
     for name in sorted(committed_names - fresh_names):
         issues.append(Issue(

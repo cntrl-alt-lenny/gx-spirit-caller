@@ -27,6 +27,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -39,6 +40,7 @@ from check_match_invariants import (  # noqa: E402
     check_missing_tu_sources,
     check_orphan_externs,
     exit_code_for,
+    main,
     print_report,
     to_json,
 )
@@ -342,6 +344,20 @@ class TestExitCodeFor(unittest.TestCase):
             Issue("x", "error", None, None, None, "m", "s"),
         ]
         self.assertEqual(exit_code_for(issues), 2)
+
+    def test_empty_config_refuses_vacuous_clean_result(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "config" / "eur").mkdir(parents=True)
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                with patch(
+                    "check_match_invariants.ROOT", root,
+                ), patch(
+                    "sys.argv", ["check_match_invariants.py", "--version", "eur"],
+                ):
+                    result = main()
+            self.assertEqual(result, 2)
+            self.assertIn("vacuous", err.getvalue())
 
 
 class TestPrintReport(unittest.TestCase):

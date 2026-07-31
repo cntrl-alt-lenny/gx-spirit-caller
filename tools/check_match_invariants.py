@@ -31,7 +31,7 @@ the decomp loop. This tool catches the common footguns:
 Each check emits a list of Issue records. Exit code:
   0 — clean
   1 — warnings only
-  2 — errors
+  2 — errors, missing inputs, or a zero-input invocation
 
 Intended use: run before opening a match PR. Also safe to run on a
 schedule to catch drift between hand-edited files.
@@ -694,6 +694,27 @@ def main() -> int:
         print(
             f"error: {config_dir} not found. Run "
             f"`python tools/configure.py {args.version}` first.",
+            file=sys.stderr,
+        )
+        return 2
+
+    delinks_paths = sorted(config_dir.rglob("delinks.txt"))
+    has_delink_tu = any(
+        re.match(r"^(?:src|libs)/\S+:$", line)
+        for path in delinks_paths
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()
+    )
+    has_source = any(
+        path.is_file()
+        for root in (ROOT / "src", ROOT / "libs")
+        if root.is_dir()
+        for path in root.rglob("*")
+        if path.suffix in {".c", ".cpp"}
+    )
+    if not delinks_paths or not (has_delink_tu or has_source):
+        print(
+            f"check_match_invariants: no checkable metadata/source inputs for "
+            f"{args.version} — refusing a vacuous clean result.",
             file=sys.stderr,
         )
         return 2
