@@ -238,4 +238,12 @@ src/overlay019/sinit_ov019_021b5ae0.c:
 
 src/overlay019/bss/data_ov019_bss.s:
     complete
-    .bss start:0x021b5e20 end:0x021b6940
+    .bss start:0x021b5e20 end:0x021b5e70
+
+src/overlay019/data_ov019_021b5e70.c:
+    complete
+    .bss start:0x021b5e70 end:0x021b6334
+
+src/overlay019/bss/data_ov019_bss_2.s:
+    complete
+    .bss start:0x021b6334 end:0x021b6940

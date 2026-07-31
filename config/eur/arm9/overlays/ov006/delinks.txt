@@ -2610,4 +2610,36 @@ src/overlay006/data_ov006_021cf0c4.c:
 
 src/overlay006/bss/data_ov006_bss.s:
     complete
-    .bss start:0x021cf140 end:0x0225e1a0
+    .bss start:0x021cf140 end:0x021d6ed0
+
+src/overlay006/data_ov006_021d6ed0.c:
+    complete
+    .bss start:0x021d6ed0 end:0x021dba08
+
+src/overlay006/bss/data_ov006_bss_2.s:
+    complete
+    .bss start:0x021dba08 end:0x02257548
+
+src/overlay006/data_ov006_02257548.c:
+    complete
+    .bss start:0x02257548 end:0x0225bee0
+
+src/overlay006/bss/data_ov006_bss_3.s:
+    complete
+    .bss start:0x0225bee0 end:0x0225c4dc
+
+src/overlay006/data_ov006_0225c4dc.c:
+    complete
+    .bss start:0x0225c4dc end:0x0225cb50
+
+src/overlay006/bss/data_ov006_bss_4.s:
+    complete
+    .bss start:0x0225cb50 end:0x0225cbb8
+
+src/overlay006/data_ov006_0225cbb8.c:
+    complete
+    .bss start:0x0225cbb8 end:0x0225dc14
+
+src/overlay006/bss/data_ov006_bss_5.s:
+    complete
+    .bss start:0x0225dc14 end:0x0225e1a0

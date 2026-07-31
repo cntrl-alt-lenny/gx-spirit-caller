@@ -1,0 +1,353 @@
+; Cluster A .bss wave 1 — main module residue (after 10-symbol pilot at 0x02102c60).
+; Per brief 116. mwasmarm syntax + dsd LCF auto-routing.
+;
+; 115 .bss symbols, range 0x02105884..0x02193440.
+; split from the original single-TU cluster to carve out matched symbols (fragment 2 of 5, cm-bss-convert-1).
+
+        .bss
+
+        .global data_02105884
+data_02105884:
+        .space 0x80
+        .global data_02105904
+data_02105904:
+        .space 0x38
+        .global data_0210593c
+data_0210593c:
+        .space 0x10
+        .global data_0210594c
+data_0210594c:
+        .space 0x3d
+        .global data_02105989
+data_02105989:
+        .space 0x15
+        .global data_0210599e
+data_0210599e:
+        .space 0x2
+        .global data_021059a0
+data_021059a0:
+        .space 0x4
+        .global data_021059a4
+data_021059a4:
+        .space 0x4
+        .global data_021059a8
+data_021059a8:
+        .space 0x10
+        .global data_021059b8
+data_021059b8:
+        .space 0xe
+        .global data_021059c6
+data_021059c6:
+        .space 0x2
+        .global data_021059c8
+data_021059c8:
+        .space 0x4
+        .global data_021059cc
+data_021059cc:
+        .space 0x2
+        .global data_021059ce
+data_021059ce:
+        .space 0x2
+        .global data_021059d0
+data_021059d0:
+        .space 0x7c
+        .global data_02105a4c
+data_02105a4c:
+        .space 0x1
+        .global data_02105a4d
+data_02105a4d:
+        .space 0x1b
+        .global data_02105a68
+data_02105a68:
+        .space 0x108
+        .global data_02105b70
+data_02105b70:
+        .space 0x40
+        .global data_02105bb0
+data_02105bb0:
+        .space 0x10
+        .global data_02105bc0
+data_02105bc0:
+        .space 0x2f8
+        .global data_02105eb8
+data_02105eb8:
+        .space 0x84
+        .global data_02105f3c
+data_02105f3c:
+        .space 0x10
+        .global data_02105f4c
+data_02105f4c:
+        .space 0x55c
+        .global data_021064a8
+data_021064a8:
+        .space 0x10
+        .global data_021064b8
+data_021064b8:
+        .space 0x1
+        .global data_021064b9
+data_021064b9:
+        .space 0x13
+        .global data_021064cc
+data_021064cc:
+        .space 0x4
+        .global data_021064d0
+data_021064d0:
+        .space 0x1
+        .global data_021064d1
+data_021064d1:
+        .space 0x26b
+        .global data_0210673c
+data_0210673c:
+        .space 0x10
+        .global data_0210674c
+data_0210674c:
+        .space 0x5e
+        .global data_021067aa
+data_021067aa:
+        .space 0x2
+        .global data_021067ac
+data_021067ac:
+        .space 0x8
+        .global data_021067b4
+data_021067b4:
+        .space 0x20
+        .global data_021067d4
+data_021067d4:
+        .space 0x20
+        .global data_021067f4
+data_021067f4:
+        .space 0x8
+        .global data_021067fc
+data_021067fc:
+        .space 0x8
+        .global data_02106804
+data_02106804:
+        .space 0x8
+        .global data_0210680c
+data_0210680c:
+        .space 0x2
+        .global data_0210680e
+data_0210680e:
+        .space 0x2
+        .global data_02106810
+data_02106810:
+        .space 0x12c
+        .global data_0210693c
+data_0210693c:
+        .space 0x10
+        .global data_0210694c
+data_0210694c:
+        .space 0xa8
+        .global data_021069f4
+data_021069f4:
+        .space 0x58
+        .global data_02106a4c
+data_02106a4c:
+        .space 0xc
+        .global data_02106a58
+data_02106a58:
+        .space 0xae9f
+        .global data_021118f7
+data_021118f7:
+        .space 0x10002
+        .global data_021218f9
+data_021218f9:
+        .space 0x270a
+        .global data_02124003
+data_02124003:
+        .space 0x8
+        .global data_0212400b
+data_0212400b:
+        .space 0xe
+        .global data_02124019
+data_02124019:
+        .space 0xc3ef
+        .global data_02130408
+data_02130408:
+        .space 0x14f2
+        .global data_021318fa
+data_021318fa:
+        .space 0x5f90
+        .global data_0213788a
+data_0213788a:
+        .space 0x200
+        .global data_02137a8a
+data_02137a8a:
+        .space 0x100
+        .global data_02137b8a
+data_02137b8a:
+        .space 0x9d71
+        .global data_021418fb
+data_021418fb:
+        .space 0x609f
+        .global data_0214799a
+data_0214799a:
+        .space 0x200
+        .global data_02147b9a
+data_02147b9a:
+        .space 0x200
+        .global data_02147d9a
+data_02147d9a:
+        .space 0x200
+        .global data_02147f9a
+data_02147f9a:
+        .space 0x8268
+        .global data_02150202
+data_02150202:
+        .space 0xddb
+        .global data_02150fdd
+data_02150fdd:
+        .space 0x525
+        .global data_02151502
+data_02151502:
+        .space 0x3fa
+        .global data_021518fc
+data_021518fc:
+        .space 0xd727
+        .global data_0215f023
+data_0215f023:
+        .space 0x11f2
+        .global data_02160215
+data_02160215:
+        .space 0x16e8
+        .global data_021618fd
+data_021618fd:
+        .space 0xe917
+        .global data_02170214
+data_02170214:
+        .space 0x16f1
+        .global data_02171905
+data_02171905:
+        .space 0x10001
+        .global data_02181906
+data_02181906:
+        .space 0x5152
+        .global data_02186a58
+data_02186a58:
+        .space 0x90
+        .global data_02186ae8
+data_02186ae8:
+        .space 0x6
+        .global data_02186aee
+data_02186aee:
+        .space 0x2
+        .global data_02186af0
+data_02186af0:
+        .space 0x8
+        .global data_02186af8
+data_02186af8:
+        .space 0x4
+        .global data_02186afc
+data_02186afc:
+        .space 0x4
+        .global data_02186b00
+data_02186b00:
+        .space 0x30
+        .global data_02186b30
+data_02186b30:
+        .space 0x30
+        .global data_02186b60
+data_02186b60:
+        .space 0x68
+        .global data_02186bc8
+data_02186bc8:
+        .space 0x1800
+        .global data_021883c8
+data_021883c8:
+        .space 0x1800
+        .global data_02189bc8
+data_02189bc8:
+        .space 0x1800
+        .global data_0218b3c8
+data_0218b3c8:
+        .space 0x1800
+        .global data_0218cbc8
+data_0218cbc8:
+        .space 0x1000
+        .global data_0218dbc8
+data_0218dbc8:
+        .space 0x940
+        .global data_0218e508
+data_0218e508:
+        .space 0x17c0
+        .global data_0218fcc8
+data_0218fcc8:
+        .space 0x48
+        .global data_0218fd10
+data_0218fd10:
+        .space 0x170
+        .global data_0218fe80
+data_0218fe80:
+        .space 0x3c
+        .global data_0218febc
+data_0218febc:
+        .space 0x20
+        .global data_0218fedc
+data_0218fedc:
+        .space 0x18
+        .global data_0218fef4
+data_0218fef4:
+        .space 0x18
+        .global data_0218ff0c
+data_0218ff0c:
+        .space 0x40
+        .global data_0218ff4c
+data_0218ff4c:
+        .space 0x40
+        .global data_0218ff8c
+data_0218ff8c:
+        .space 0x80
+        .global data_0219000c
+data_0219000c:
+        .space 0x1b0
+        .global data_021901bc
+data_021901bc:
+        .space 0x50
+        .global data_0219020c
+data_0219020c:
+        .space 0x400
+        .global data_0219060c
+data_0219060c:
+        .space 0x12ff
+        .global data_0219190b
+data_0219190b:
+        .space 0x515
+        .global data_02191e20
+data_02191e20:
+        .space 0x10
+        .global data_02191e30
+data_02191e30:
+        .space 0x8
+        .global data_02191e38
+data_02191e38:
+        .space 0x108
+        .global data_02191f40
+data_02191f40:
+        .space 0x60
+        .global data_02191fa0
+data_02191fa0:
+        .space 0x20
+        .global data_02191fc0
+data_02191fc0:
+        .space 0x20
+        .global data_02191fe0
+data_02191fe0:
+        .space 0x40
+        .global data_02192020
+data_02192020:
+        .space 0x2c0
+        .global data_021922e0
+data_021922e0:
+        .space 0x820
+        .global data_02192b00
+data_02192b00:
+        .space 0x820
+        .global data_02193320
+data_02193320:
+        .space 0x20
+        .global data_02193340
+data_02193340:
+        .space 0x40
+        .global data_02193380
+data_02193380:
+        .space 0xc0
