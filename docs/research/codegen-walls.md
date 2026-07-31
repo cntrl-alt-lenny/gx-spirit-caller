@@ -6443,6 +6443,109 @@ reproduce it.
 
 **Provenance:** cm-ov002-unknown-sweep-7 (2026-07-30), batch 2.
 
+### C-55. Branch-to-block polarity: `goto`/inverted-condition, not natural if/else-if, when the target branches to a case rather than predicating it
+
+**The trap:** mwcc's ordinary `if`/`else if` chain compiles with a
+consistent "positive strategy" — the first condition's true-branch gets
+inlined/predicated in place, not branched to as a separate block. Many
+targets don't do this: the original genuinely branches away to a shared
+or later block for one arm. Transcribing the natural-looking if/else-if
+shape reproduces the *logic* correctly but not the *layout* — wrong
+branch-vs-predicate choice, sometimes cascading into a wrong prologue
+(different callee-saved registers pushed) since mwcc's whole-function
+analysis sees a different control-flow graph.
+
+**The fix:** restructure the C using `goto` (or an inverted condition
+wrapping the rest of the function as a fallthrough) so the emitted
+branch target matches which block the original physically branches to,
+not just which block executes. Concretely: `if (cond) goto X; goto Y;`
+laid out so the branch instruction's target matches the original's,
+rather than `if (cond) { ...X... } else { ...Y... }`. The same shape
+covers a trivial multi-source `return CONST` that needs to become one
+physically-shared block reached by `goto`, instead of the same constant
+predicated inline at each call site.
+
+**Evidence — four independent same-round confirmations, no shared
+authorship:**
+- `func_02000d9c`, `func_ov002_022335d8`, `func_ov002_022360ac`
+  (cm-ov002-unknown-sweep-8, batch 1) — trivial multi-source
+  `return CONST` needed a `goto` to one shared exit block.
+- `func_ov002_022272a0`, `func_ov017_021b3ca8` (cm-ov002-unknown-sweep-8,
+  batch 3) — guard-clause early `return CONST` rewritten as a
+  fallthrough (inverted condition wrapping the rest of the function),
+  3 confirmations total in that batch alone.
+- `func_020181d0`, `func_ov002_021b0930` (cm-ov002-unknown-sweep-8,
+  batch 4) — same shape, described as "goto-based branch-to-block
+  dispatch."
+- `func_ov002_02223244` (cm-ov002-unknown-sweep-8, batch 5) — same
+  shape on a 9-way jump-table dispatch, paired with the polarity-
+  inversion phrasing `if (cond) goto X; goto Y;` →
+  `if (!cond) goto Y; goto X;`.
+
+**Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batches 1/3/4/5
+independently.
+
+### C-56. Local-variable declaration order, not just usage order, affects register allocation
+
+**The trap:** two source forms that use the same locals in the same
+order of *first read/write* can still get different physical register
+assignments from mwcc if the `<type> name;` declarations themselves
+appear in a different order. Matching the usage sequence isn't enough
+when the declarations are reordered relative to it.
+
+**The fix:** when a register-letter mismatch resists every reordering
+of the executable statements, try reordering the *declarations* to
+match the target's apparent register-allocation sequence, independent
+of where each variable is first used.
+
+**Evidence — two independent same-round confirmations:**
+- `func_0201c498` (cm-ov002-unknown-sweep-8, batch 2) — pre-declaring
+  `byte` before `p` flipped a register mismatch to a match.
+- `func_0203953c` (cm-ov002-unknown-sweep-8, batch 3) — same effect,
+  found independently.
+
+**Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batches 2 and 3
+independently.
+
+### C-57. C addition operand order controls which addend fuses into an ARM shifted-register form
+
+**The trap:** ARM's `add rd, rn, rm, <shift>` fuses a shift into one of
+its two operands. Which C-level addend ends up as the fused `rm, shift`
+register (versus the plain `rn`) is controlled by which side of `+` it
+appears on in the source — not implied by the arithmetic alone, since
+addition is commutative and both orderings are mathematically identical.
+
+**The fix:** when a shift-fused add mismatches only in which operand
+carries the shift, swap the order of the two addends in the C
+expression — the *second* (right-hand) operand is the one mwcc fuses
+into the shift slot.
+
+**Evidence:** 2+ confirmations within `func_ov002_022446d8` and a
+sibling case in the same batch (cm-ov002-unknown-sweep-8, batch 3).
+
+**Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batch 3.
+
+### C-58. Unsigned vs. signed comparison type selects `CC`/`HI` over `LT`/`GT` condition codes
+
+**The trap:** a comparison written with a signed operand type compiles
+to signed condition codes (`LT`/`GT`/`LE`/`GE`); the same logical
+comparison over an unsigned-typed operand compiles to unsigned codes
+(`CC`/`HI`/`LS`/`CS`). For values that are always non-negative in
+practice, it's easy to declare or cast to a signed type and still get
+correct *behavior* while mismatching the target's condition code.
+
+**The fix:** when a comparison's branch condition code doesn't match
+the target (signed where the target is unsigned or vice versa), check
+the operand's true type/range and adjust the C declaration/cast to
+match — don't rely on "the values happen to always be positive" as a
+reason to leave a signed type in place.
+
+**Evidence:** `func_02052218` (cm-ov002-unknown-sweep-8, batch 4) — one
+instance so far; flagging for reconfirmation on a second, independent
+function before treating it as systemic.
+
+**Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batch 4.
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -6997,6 +7100,15 @@ are not coercible without the T-1 post-processing variant
 "byte-identical from C source" invariant). See brief 091
 sub-note under C-22 for the per-iteration score table and
 the permuter-vendor setup gaps surfaced.
+
+> **Reconfirmed (cm-ov002-unknown-sweep-8, 2026-07-31, batch 1):** hit 3
+> more times in one batch, all the same `CE288->f_5a8` toggle-
+> computation shape (bit0^bit14 of a u16, then a state read) —
+> `func_ov002_022369c0` (5 reshape variants, zero movement, parked at
+> 90.55%), `func_ov002_0222e720` and `func_ov002_02222cac` (same shape,
+> recognized faster once seen once, not re-exhausted). No new lever;
+> confirms this specific toggle-computation shape as a recurring, not
+> one-off, P-4 trigger.
 
 ### P-5. Halfword offset >0xff split via add
 
@@ -9371,6 +9483,20 @@ free.
 > not isolated) — treat "sparse switch order is irrelevant" as
 > unconfirmed rather than established until a follow-up brief either
 > finds the rule or narrows which sparse shapes are actually exempt.
+
+> **Partial rule found (cm-ov002-unknown-sweep-8, 2026-07-31, batch 3):**
+> within a genuine `switch` compiling to a `cmp;beq`-style compare chain
+> (as opposed to plain `if`/`else if`, which always uses mwcc's "positive
+> strategy" of inlining the first condition's true branch, per C-55),
+> declaration order controls the chain's shape: **ascending** value
+> order in source gives "all-`beq` plus an explicit final branch" for
+> the last case; **descending** order gives "`beq` for the early-
+> declared cases, then `bne`-plus-inline-fallthrough for whichever case
+> was declared first." 6 confirmations in one batch. This narrows (does
+> not fully resolve) the sparse-case mechanism the sweep-7 counter-
+> example above left open — declaration order is at least part of the
+> rule, though whether it's the *complete* rule for every sparse shape
+> is still unconfirmed.
 
 **Provenance:** brief 086 wave 1 (PR #474) — decomper documented
 the iteration as a "worth folding into walls" calibration note

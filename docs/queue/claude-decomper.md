@@ -433,7 +433,23 @@ Repeat all three checks that earned their keep: `tools/check_activation_invarian
 
 **Gate:** `python tools/gate3.py --scope all` PASS + `check_activation_invariant.py` + the three-way count check in the PR body.
 
-### cm-ov002-unknown-sweep-8 — 149-512B, selected by callee coverage [S] [CLAIMED]
+### cm-ov002-unknown-sweep-8 — 149-512B, selected by callee coverage [S] [DONE]
+
+> **DONE 2026-07-31.** 31/98 real candidates shipped (9,424 bytes; 2 of
+> the 100 dispatched turned out to be pre-existing C-32 permanent walls,
+> excluded). Found and fixed two real bugs in the callee-coverage
+> scoring script itself — one before dispatch, one after (caught by a
+> worker's independent verification, inflated 42% of the whole
+> candidate pool). Corrected result: true 100% coverage is a small but
+> perfect predictor (4/4 shipped); below that the relationship is much
+> weaker than this round's design assumed (75-99%: 33.3%, 50-74%:
+> 25.6%, 25-49%: 35.3%, 0-24%: 23.1% — no clean gradient). Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-8-2026-07-31.md`. New levers:
+> C-55 (branch-to-block polarity, 4 independent batches), C-56
+> (declaration order affects reg-alloc, 2 independent), C-57 (addition
+> operand order controls shift-fusion), C-58 (unsigned/signed compare
+> selects condition code, 1 instance). S-2 gained a partial-rule
+> narrowing on sparse-switch declaration order. P-4 reconfirmed 3x.
 
 > Filed from the coordinating process's own chat message after sweep-7 merged (main 988cd5f7c, EUR 11.66%) — appended here per the project's own "a prose mention is not a task" convention rather than executed straight from chat.
 
