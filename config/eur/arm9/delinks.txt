@@ -13612,7 +13612,7 @@ src/main/func_02079e78.s:
     complete
     .text start:0x02079e78 end:0x0207a1dc
 
-src/main/func_0207a1dc.s:
+src/main/func_0207a1dc.legacy.c:
     complete
     .text start:0x0207a1dc end:0x0207a334
 
