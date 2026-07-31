@@ -293,7 +293,7 @@ src/overlay004/func_ov004_021d03ec.s:
     complete
     .text start:0x021d03ec end:0x021d0530
 
-src/overlay004/func_ov004_021d0530.s:
+src/overlay004/func_ov004_021d0530.c:
     complete
     .text start:0x021d0530 end:0x021d05f4
 
@@ -1065,7 +1065,7 @@ src/overlay004/func_ov004_021dc500.thumb.c:
     complete
     .text start:0x021dc500 end:0x021dc570
 
-src/overlay004/func_ov004_021dc664.s:
+src/overlay004/func_ov004_021dc664.thumb.c:
     complete
     .text start:0x021dc664 end:0x021dc7bc
 
