@@ -581,3 +581,90 @@ Keep reporting bytes and pp, not ship-rate alone.
 consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
+
+### cm-ov002-unknown-sweep-10 — 149-512B [S] [DONE]
+
+> **DONE 2026-07-31.** 30/100 shipped (8,344 bytes) — best round this
+> campaign. C-60 investigated directly via standalone `mwccarm`
+> compilation (not delegated): confirmed real, correctly predicts
+> instruction-family selection, but does NOT alone close the 3 priority
+> candidates — a second register-allocation wall sits on top of all
+> three. That same wall family (P-4/11/12/15/17) hit unprecedented
+> volume this round (9/14 parks in one batch alone, on a loop-scan
+> variant of the same `data_ov002_022cf16c` table) — now unmistakably
+> the campaign's dominant open problem across 3 consecutive rounds, and
+> the strongest candidate for the next round's own dedicated mini-item.
+> P-17 cohort: 15->14 (`func_ov002_021eb630` resolved). **The route-
+> before-draft fix from last round was itself incomplete** — paraphrased
+> from memory rather than read from source, causing a 3rd rediscovery
+> incident; corrected verbatim text (the full 3-tier table +
+> disambiguator) is ready for next round. A real worktree-setup gap
+> found (`ninja delink` needed before `fastmatch.py` works correctly in
+> a fresh worktree) — add it to setup next time. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-10-2026-07-31.md`.
+
+> Filed from the coordinating process's own chat message after
+> sweep-9 merged (main b4ca6bb9b, EUR 12.25%) — appended here per the
+> project's "a prose mention is not a task" convention.
+
+Same shape as sweep-9: plain module-agnostic selection across
+149-512B, 5 worktrees, one consolidated gate.
+
+**FIX THE DISPATCH-PROMPT GAP.** Two sweep-9 batches independently
+rediscovered brief 667's "route before you draft" compiler-tier
+guidance from scratch, mid-session, because it wasn't in the dispatch
+prompt. State this verbatim in every dispatch prompt this round, the
+same treatment as the brief-302/294 resolution:
+
+> "Read the target `.s`'s own epilogue BEFORE writing any C. `sub sp,#4`
+> + separate `pop {lr}`/`bx lr` -> name the file `*.legacy.c`. Fused
+> `pop {..., pc}` -> `*.legacy_sp3.c`. Otherwise plain `.c`. Choosing
+> the tier after drafting wastes the draft. See
+> `docs/research/style-a-epilogue.md`."
+
+Two pieces of knowledge now need this treatment (the header resolution,
+and tier routing) — assume anything a batch has rediscovered twice
+needs to be pasted into the prompt, not left in a doc for it to find.
+
+**The MLA-vs-indexed-load mini-item is DONE, not delegated.** Rather
+than hand off sweep-9's 4-recurrence cohort blind, it was investigated
+directly this round via standalone `mwccarm 2.0/sp1p5` compilation
+(bypassing the full project pipeline — a synthetic table matching the
+real stride/offset constants, several candidate C phrasings, diffed
+against the real disassembly). Result: it's a real, reproducible,
+source-structure-controlled lever, not register-pressure noise — see
+**C-60** in `codegen-walls.md` for the full mechanism (single compound
+expression → double-`mla`-chain; an intermediate pointer variable
+incremented separately → single-`mla`+separate-`mul`+explicit-add+
+indexed-load). Confirmed instruction-for-instruction against 3 of the
+4 real occurrences; not yet applied to a real ship. **Assign
+`func_ov002_021ed1f8`, `func_ov002_0220d974`, and `func_ov002_0222ad54`
+(the 4th, `func_ov002_0223cf18`, was a false-positive inclusion in the
+original cohort — it's a different, already-addressable array access
+at a different table offset, not part of this wall) to one batch as
+priority candidates**, with C-60's mechanism stated verbatim so the
+worker applies the lever directly instead of rediscovering it.
+
+Carry the rest of the lever set, now including **C-59** (a guard whose
+branch target is shared with a nearby switch's default case still gets
+predicated even with `goto` — rewrite the guard itself as a switch)
+and **C-58** (unsigned vs. signed comparison selects `CC`/`HI` over
+`LT`/`GT` — reconfirmed on a second function, treat as systemic now).
+
+Same three process fixes as sweep-9, all validated, keep them exactly
+as they are: one consolidated gate (worktree setup runs `configure.py
+eur` only, no `ninja`, confirmed safe in parallel — workers iterate
+with `fastmatch.py` only, no `ninja sha1` in-batch); `tools/park_one.py`
+for abandoning a candidate, never `git checkout --
+<module>/delinks.txt`; mechanical C-32 screening (a `bl`/`blx` to a
+`func_ovNNN_` target whose overlay number differs from the caller's
+own) checked before dispatch and restated to every worker.
+
+Same NON-NEGOTIABLE no-sub-agent language, same git-status +
+delinks.txt self-check instruction, same "keep reporting bytes and pp,
+not ship-rate alone."
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
+consolidated branch (not per-batch); three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index before pushing.

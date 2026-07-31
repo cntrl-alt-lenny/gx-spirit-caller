@@ -496,7 +496,7 @@ src/main/func_020018d4.s:
     complete
     .text start:0x020018d4 end:0x0200197c
 
-src/main/func_0200197c.s:
+src/main/func_0200197c.c:
     complete
     .text start:0x0200197c end:0x02001a34
 
@@ -3793,7 +3793,7 @@ src/main/func_0201d760.c:
     complete
     .text start:0x0201d760 end:0x0201d778
 
-src/main/func_0201d778.s:
+src/main/func_0201d778.c:
     complete
     .text start:0x0201d778 end:0x0201d910
 
@@ -5862,7 +5862,7 @@ src/main/func_0203158c.c:
     complete
     .text start:0x0203158c end:0x020315e8
 
-src/main/func_020315e8.s:
+src/main/func_020315e8.c:
     complete
     .text start:0x020315e8 end:0x02031684
 
@@ -8716,7 +8716,7 @@ src/main/func_0204717c.s:
     complete
     .text start:0x0204717c end:0x02047408
 
-src/main/func_02047408.s:
+src/main/func_02047408.legacy_sp3.c:
     complete
     .text start:0x02047408 end:0x0204757c
 
@@ -11122,7 +11122,7 @@ src/main/func_02063a4c.s:
     complete
     .text start:0x02063a4c end:0x02063ae0
 
-src/main/func_02063ae0.s:
+src/main/func_02063ae0.legacy_sp3.c:
     complete
     .text start:0x02063ae0 end:0x02063c90
 
@@ -11471,7 +11471,7 @@ src/main/func_020673dc.c:
     complete
     .text start:0x020673dc end:0x02067438
 
-src/main/func_02067438.s:
+src/main/func_02067438.legacy_sp3.c:
     complete
     .text start:0x02067438 end:0x02067560
 
@@ -12458,7 +12458,7 @@ src/main/func_0206d854.s:
     complete
     .text start:0x0206d854 end:0x0206d96c
 
-src/main/func_0206d96c.s:
+src/main/func_0206d96c.legacy.c:
     complete
     .text start:0x0206d96c end:0x0206da98
 
@@ -13210,7 +13210,7 @@ src/main/func_02074c74.s:
     complete
     .text start:0x02074c74 end:0x02074cdc
 
-src/main/func_02074cdc.s:
+src/main/func_02074cdc.legacy.c:
     complete
     .text start:0x02074cdc end:0x02074dcc
 
@@ -13612,7 +13612,7 @@ src/main/func_02079e78.s:
     complete
     .text start:0x02079e78 end:0x0207a1dc
 
-src/main/func_0207a1dc.s:
+src/main/func_0207a1dc.legacy.c:
     complete
     .text start:0x0207a1dc end:0x0207a334
 
@@ -15633,7 +15633,7 @@ src/main/func_0208a764.s:
     complete
     .text start:0x0208a764 end:0x0208a7c8
 
-src/main/func_0208a7c8.s:
+src/main/func_0208a7c8.legacy_sp3.c:
     complete
     .text start:0x0208a7c8 end:0x0208a864
 

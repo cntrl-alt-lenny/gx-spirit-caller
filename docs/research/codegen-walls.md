@@ -6573,6 +6573,91 @@ function before treating it as systemic.
 
 **Provenance:** cm-ov002-unknown-sweep-9 (2026-07-31), batch 4.
 
+### C-60. A two-dimensional table lookup's *expression structure* — not register pressure — selects double-`mla`-chain vs. separate-`mul`-plus-indexed-load
+
+**Background:** sweep-9 flagged 4 parked candidates (`func_ov002_021ed1f8`,
+`func_ov002_0220d974` ×2, `func_ov002_0222ad54`, all indexing
+`data_ov002_022cf16c` — a `[2][N]`-shaped table with a `0x868`-byte row
+stride, `0x14`(20)-byte column stride, and a `0x30`-byte fixed offset)
+as a recurring, unresolved register/instruction-selection wall, framed
+as likely register-pressure noise. It isn't — it's directly controlled
+by how the address arithmetic is *written*, confirmed by standalone
+compilation (not just correlation across shipped attempts): the same
+logical address computation, compiled with the project's real
+`mwccarm 2.0/sp1p5` flags, produces two distinct, reproducible
+instruction families depending purely on C source structure.
+
+**Family A — single compound expression** (raw pointer arithmetic in
+one statement, or direct chained field access with no intermediate
+pointer variable for the column step) compiles to a **double-`mla`
+chain ending in one immediate-offset load**:
+```c
+return *(int *)((char *)table + (row & 1) * 0x868 + col * 20 + 0x30);
+```
+```asm
+mla  r2, r0, r_rowstride, r_base   ; row*0x868 + &table
+mla  r0, r1, r_colstride, r2       ; col*20 + that
+ldr  r0, [r0, #0x30]               ; single immediate-offset load
+```
+This is what `func_ov002_021ed1f8`'s first occurrence shows, and what
+every plain-pointer-arithmetic or single-chained-field-access phrasing
+tested produced — including a version using a natural nested
+`struct Row { char header[0x868]; }` array for the row step,
+combined with raw pointer math for column/offset.
+
+**Family B — an intermediate pointer variable, incremented
+separately** (the column step is NOT part of the same expression as
+the row/base computation — a pointer is materialized first, then
+advanced by `col`) compiles to a **single `mla` for the row term, a
+SEPARATE `mul` for the column term, an explicit `add` for the fixed
+offset, and a register-indexed final load**:
+```c
+struct Elem *e = row_base->elems;   /* intermediate pointer, NOT combined
+                                        with the row computation above */
+e += col;                            /* separate increment */
+return e->field;
+```
+```asm
+mla  r1, r0, r_rowstride, r_base   ; row*0x868 + &table  (unchanged)
+mul  r0, r_col, r_colstride        ; col*20 -- SEPARATE, not fused
+add  r1, r1, #0x30                 ; fixed offset -- explicit, not folded
+ldr  r0, [r1, r0]                  ; register-indexed load, not immediate
+```
+This exactly reproduces `func_ov002_021ed1f8`'s second occurrence and
+both occurrences in `func_ov002_0220d974` (the `mul`/`add` instruction
+*order* between the two real occurrences differs — mwcc's scheduler
+choice, not a further source-level lever — but the instruction
+*selection* is identical).
+
+**The fix:** write the address computation to match which family the
+target's own disassembly shows for that specific occurrence. Don't
+assume a single phrasing reproduces every occurrence of what looks
+like the same logical table access within one function — the *same*
+table can appear in both families in the *same* function, and the
+distinguishing factor is whether the source computes the column offset
+as a separate pointer-increment step (Family B) or folds it into one
+expression with the row/base term (Family A).
+
+**Open, not yet reproduced:** `func_ov002_0222ad54`'s occurrence uses
+neither family cleanly — a separate `mul`+`add` for the ROW term too
+(no `mla` at all), on top of Family B's column/offset shape. This one
+also extracts row/col from packed bitfields rather than plain
+parameters, which may be a contributing factor; not isolated this
+round.
+
+**Evidence:** confirmed via standalone `mwccarm 2.0/sp1p5` compilation
+of multiple candidate phrasings against a synthetic table matching the
+real stride/offset constants, cross-checked instruction-for-instruction
+against 3 of the 4 real parked occurrences (`func_ov002_021ed1f8` both
+occurrences, `func_ov002_0220d974` both occurrences). Not yet applied
+to a real ship — flagged as a priority target for
+cm-ov002-unknown-sweep-10.
+
+**Provenance:** cm-ov002-unknown-sweep-10 (2026-07-31), investigated
+directly rather than delegated, per the coordinating process's request
+to treat this cohort (4 recurrences across cm-ov002-unknown-sweep-9) as
+a dedicated mini-item.
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -8505,6 +8590,21 @@ signature rather than assuming it's bounded to the known cohort.
 > discovery). The 11 genuinely untested members are `021eb300`,
 > `021eb630`, `021ebfd0`, `021ee23c`, `021ef5a0`, `021efe44`, `021f0028`,
 > `021f1458`, `021f208c`, `021f2138`, `021f2ac8`.
+
+> **Continued (cm-ov002-unknown-sweep-10, 2026-07-31): `021eb630`
+> reclassified — shipped 100.0% first-try via constant-immediate
+> placement.** A genuine, previously-untested listed cohort member.
+> **Cohort count drops from 15 to 14.** Same sweep also shipped
+> `021f162c` (not one of the 17 originally-enumerated addresses, but
+> in the same surveyed neighborhood between `021f1458` and `021f1504`)
+> at 100.0% first-try with the same lever — treat as another instance
+> of the "possible cohort expansion" pattern this entry already flagged
+> (`021ece34`, `021f82b8`), not a literal cohort reclassification. Two
+> more first-try 100% hits on constant-immediate placement, both from
+> this round, keeps the "re-test this lever against the 10 remaining
+> untested members before anything else" action item live and
+> increasingly well-supported (4 of 4 attempts with this specific lever
+> have now succeeded, across two separate sweeps).
 
 ### P-18. Task-config field-write store-reordering
 
