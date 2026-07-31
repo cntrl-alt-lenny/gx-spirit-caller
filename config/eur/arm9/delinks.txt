@@ -4315,7 +4315,7 @@ src/main/func_020211b4.c:
 
 
 
-src/main/func_020211c8.s:
+src/main/func_020211c8.c:
     complete
     .text start:0x020211c8 end:0x020212cc
 
@@ -9868,7 +9868,7 @@ src/main/func_02053f48.s:
     complete
     .text start:0x02053f48 end:0x02053fc4
 
-src/main/func_02053fc4.s:
+src/main/func_02053fc4.c:
     complete
     .text start:0x02053fc4 end:0x0205407c
 
