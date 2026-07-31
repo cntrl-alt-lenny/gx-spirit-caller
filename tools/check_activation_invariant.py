@@ -22,7 +22,7 @@ Usage::
 Exit codes::
 
     0   function additions, removals, and delinks activations agree
-    1   an invariant mismatch was found
+    1   an invariant mismatch was found, or the range contained no inputs
     2   usage, git, or repository error
 """
 
@@ -96,6 +96,7 @@ class InvariantReport:
     missing_s_activations: tuple[str, ...]
     activation_flip_count: int
     count_mismatch: int
+    has_inputs: bool
 
     @property
     def function_c_additions(self) -> tuple[str, ...]:
@@ -107,7 +108,7 @@ class InvariantReport:
 
     @property
     def ok(self) -> bool:
-        return not (
+        return self.has_inputs and not (
             self.missing_c_activations
             or self.missing_s_activations
             or self.count_mismatch
@@ -378,6 +379,12 @@ def check_range(repo: Path, git_range: str) -> InvariantReport:
     # function conversion.  Expose the drift as a single failure count while
     # the detailed missing lists explain which side is absent.
     unmatched = abs(function_c_count - flips) + abs(deleted_s_count - flips)
+    has_inputs = bool(
+        files.added_c
+        or files.deleted_func_s
+        or activations.added_c
+        or activations.removed_func_s
+    )
     return InvariantReport(
         git_range=git_range,
         files=files,
@@ -392,6 +399,7 @@ def check_range(repo: Path, git_range: str) -> InvariantReport:
         missing_s_activations=tuple(sorted(set(missing_s))),
         activation_flip_count=flips,
         count_mismatch=unmatched,
+        has_inputs=has_inputs,
     )
 
 
@@ -424,7 +432,12 @@ def print_report(report: InvariantReport) -> None:
         print(f"MISSING delinks activation for added C: {path}")
     for path in report.missing_s_activations:
         print(f"MISSING delinks activation for deleted S: {path}")
-    if report.ok:
+    if not report.has_inputs:
+        print(
+            "check_activation_invariant: FAIL — no source or activation "
+            "changes in the requested range; refusing a vacuous pass"
+        )
+    elif report.ok:
         print("check_activation_invariant: OK")
     else:
         print("check_activation_invariant: FAIL")

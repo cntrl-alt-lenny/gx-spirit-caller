@@ -172,6 +172,12 @@ class TestActivationInvariantCLI(unittest.TestCase):
         self.assertIn("data .c additions:       1 (informational)", result.stdout)
         self.assertIn("no activation (informational)", result.stdout)
 
+    def test_empty_range_fails_closed(self):
+        repo, head = _data_fixture_repo()
+        result = self._invoke(repo, f"{head}..{head}")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no source or activation changes", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,7 +27,7 @@ Usage:
 Exit codes:
     0   no duplicate .text addresses
     1   duplicate(s) found (message names address + files)
-    2   usage / IO error
+    2   usage / IO error, or no source-block claims were available to check
 """
 from __future__ import annotations
 
@@ -40,9 +40,8 @@ _FILE_RE = re.compile(r"^((?:src|libs)/\S+):\s*$")
 _TEXT_RE = re.compile(r"\.text\s+start:(0x[0-9a-fA-F]+)\s+end:")
 
 
-def find_dupes(text: str) -> dict[str, list[str]]:
-    """Return {address: [files...]} for any .text start address claimed by more
-    than one distinct source file in a single delinks.txt body."""
+def _address_claims(text: str) -> dict[str, list[str]]:
+    """Return every source-block .text claim, grouped by address."""
     by_addr: dict[str, list[str]] = {}
     cur: str | None = None
     for line in text.splitlines():
@@ -55,7 +54,16 @@ def find_dupes(text: str) -> dict[str, list[str]]:
             if t:
                 by_addr.setdefault(t.group(1).lower(), []).append(cur)
                 cur = None  # only the first .text of a src block is its function
-    return {a: fs for a, fs in by_addr.items() if len(set(fs)) > 1}
+    return by_addr
+
+
+def find_dupes(text: str) -> dict[str, list[str]]:
+    """Return {address: [files...]} for duplicate source-block claims."""
+    return {
+        address: files
+        for address, files in _address_claims(text).items()
+        if len(set(files)) > 1
+    }
 
 
 def main(argv: list[str]) -> int:
@@ -69,9 +77,12 @@ def main(argv: list[str]) -> int:
         return 2
 
     total = 0
+    claims = 0
     for p in paths:
         try:
-            dupes = find_dupes(p.read_text(encoding="utf-8"))
+            text = p.read_text(encoding="utf-8")
+            claims += sum(len(files) for files in _address_claims(text).values())
+            dupes = find_dupes(text)
         except OSError as e:
             print(f"check_delink_dupes: {p}: {e}", file=sys.stderr)
             return 2
@@ -81,6 +92,13 @@ def main(argv: list[str]) -> int:
             print(f"DUPLICATE .text {addr} in {rel}:")
             for f in sorted(set(files)):
                 print(f"    {f}")
+    if not claims:
+        print(
+            "check_delink_dupes: no source-block .text claims found — "
+            "refusing a vacuous clean result.",
+            file=sys.stderr,
+        )
+        return 2
     if total:
         print(f"\ncheck_delink_dupes: {total} duplicate .text address(es) — "
               f"`dsd lcf` would fail 'overlaps with previous file' at merge.")
