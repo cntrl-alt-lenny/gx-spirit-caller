@@ -427,9 +427,13 @@ src/overlay016/data_ov016_021b940c.c:
     complete
     .data start:0x021b940c end:0x021b941c
 
+src/overlay016/data_ov016_021b9740.c:
+    complete
+    .bss start:0x021b9740 end:0x021b9748
+
 src/overlay016/bss/data_ov016_bss.s:
     complete
-    .bss start:0x021b9740 end:0x021b9784
+    .bss start:0x021b9748 end:0x021b9784
 
 src/overlay016/data_ov016_021b9784.c:
     complete

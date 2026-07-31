@@ -2650,4 +2650,12 @@ src/overlay006/data_ov006_0225cbb8.c:
 
 src/overlay006/bss/data_ov006_bss_5.s:
     complete
-    .bss start:0x0225dc14 end:0x0225e1a0
+    .bss start:0x0225dc14 end:0x0225df3c
+
+src/overlay006/data_ov006_0225df3c.c:
+    complete
+    .bss start:0x0225df3c end:0x0225e05c
+
+src/overlay006/bss/data_ov006_bss_5_2.s:
+    complete
+    .bss start:0x0225e05c end:0x0225e1a0
