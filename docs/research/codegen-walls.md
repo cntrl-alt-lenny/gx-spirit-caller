@@ -263,6 +263,7 @@ i.e. real branches with separate basic blocks.
 **C that coerces it:**
 
 ```c
+
 int f(int a) {
     if (cond) { side_effect; a = b; }
     return a;
@@ -278,6 +279,7 @@ only fires when **no early `return`** appears in the if-body.
 **C that breaks it (drops to early-return shape):**
 
 ```c
+
 if (cond) { side_effect; return b; }
 return a;       // forces bxeq lr branch
 
@@ -428,6 +430,7 @@ or interleaves an unrelated store between the two operations.
 **C that coerces it:**
 
 ```c
+
 T *p = data;        /* local-cached */
 p->m = p->n;        /* two ops via the same p */
 
@@ -436,6 +439,7 @@ p->m = p->n;        /* two ops via the same p */
 **C that breaks it:**
 
 ```c
+
 data->m = data->n;  /* mwcc may re-materialise on the second access */
 volatile T *vp = data;
 vp->m = vp->n;      /* volatile forces TWO reads, worse than miscoded form */
@@ -474,20 +478,24 @@ str r1, [r0, #0x4]             ; store 2
 **C that breaks the ordering** (interleaves load-store-load-store):
 
 ```c
+
 /* C-2 baseline — works for single field; can interleave on pairs */
 T *p = *data;
 out->a = p->f_7c;     /* mwcc may emit ldr/str here, then ldr/str next */
 out->b = p->f_80;
+
 ```
 
 **C that coerces the load-load-store-store order (verified
 byte-identical against `func_0208904c`):**
 
 ```c
+
 typedef struct { int a; int b; } pair_t;
 void f(pair_t *out) {
     *out = *(pair_t *)((char *)data + 0x7c);
 }
+
 ```
 
 The struct-copy expression `*out = *src;` forces mwcc to treat
@@ -524,6 +532,7 @@ the value didn't change. Output is empty for this fragment.
 **C that coerces it:**
 
 ```c
+
 struct {
     volatile int field;     /* or cast at the access site */
 } *p = data;
@@ -562,6 +571,7 @@ bx lr
 **C that coerces it:**
 
 ```c
+
 int f(int a) {
     if (a < L) return 0;
     if (a > H) return 0;
@@ -599,6 +609,7 @@ through to the callee.
 **C that coerces it:**
 
 ```c
+
 typedef int (*fn_int_t)(int arg);
 typedef struct { ... fn_int_t fnptr_N; } data_t;
 extern data_t data;
@@ -641,6 +652,7 @@ The two `orr ..., #0` are no-op moves that mwcc inserts for
 **C that coerces it:**
 
 ```c
+
 unsigned long long f(T *p) {
     return *(unsigned long long *)&p->field;
 }
@@ -652,6 +664,7 @@ Pointer-cast to `u64*` produces clean two-load-and-mov.
 **C that breaks it:**
 
 ```c
+
 return ((u64)p->hi << 32) | (u32)p->lo;   /* spurious orr/0 pack */
 
 ```
@@ -669,6 +682,7 @@ matches:
 - **Post-increment form** — target uses `ldrsb r1, [r0], #1`:
 
   ```c
+
   size_t strlen_b(const signed char *p) {
       size_t n = (size_t)-1;
       while (*p++) n++;
@@ -682,6 +696,7 @@ matches:
 - **Indexed form** — target uses `[r0, r2]`:
 
   ```c
+
   size_t strlen_b_indexed(const signed char *p) {
       size_t i = 0;
       while (p[i]) i++;
@@ -778,6 +793,7 @@ predicated body.
 **C that coerces it (verified byte-identical against W-A):**
 
 ```c
+
 extern int  OS_DisableIrq(void);
 extern void OS_RestoreIrq(int);
 extern unsigned int data_021a63bc;
@@ -793,6 +809,7 @@ unsigned int func_020916c8(void) {
     OS_RestoreIrq(saved);
     return prev;
 }
+
 ```
 
 **C that breaks it:** `unsigned int prev = 0;` — adds the
@@ -831,6 +848,7 @@ shared.
 main return):
 
 ```c
+
 /* breaks: mwcc shares the early-return pop with the main
    return because the success-path lands at the same merged
    epilogue block. */
@@ -839,6 +857,7 @@ int f(T *p) {
     /* main work */
     return 1;
 }
+
 ```
 
 mwcc with this shape produces a single shared epilogue. Target
@@ -847,6 +866,7 @@ ROM has two separate pops.
 **C that coerces it (verified byte-identical):**
 
 ```c
+
 int f(T *p) {
     if (p != 0) {
         /* main work */
@@ -854,6 +874,7 @@ int f(T *p) {
     }
     return 0;
 }
+
 ```
 
 The inverted test pulls the early-zero `return 0;` to the END
@@ -883,9 +904,11 @@ rephrase but produces the right epilogue shape.
 pop that uses the cmp's already-zero r0 directly:
 
 ```text
+
 cmp r0, #0
 ldmeqia sp!, {regs, pc}    ; predicated pop; r0 == 0 already, no mov needed
 ... main path ...
+
 ```
 
 i.e. when the if-condition is true, mwcc emits NO explicit
@@ -895,11 +918,13 @@ test. The pop instruction itself carries the predicate.
 **mwcc emits when miscoded** (extra `mov r0, #0`):
 
 ```c
+
 int f(int x, ...) {
     if (x == 0) return 0;        /* breaks: extra mov r0, #0 */
     /* main work */
     return 1;
 }
+
 ```
 
 mwcc treats the literal `0` as a fresh value to materialise,
@@ -909,11 +934,13 @@ has the single predicated pop.
 **C that coerces it (verified byte-identical):**
 
 ```c
+
 int f(int x, ...) {
     if (x == 0) return x;        /* matches: predicated ldmeqia */
     /* main work */
     return 1;
 }
+
 ```
 
 Returning `x` exploits the fact that *x is provably 0 in this
@@ -986,6 +1013,7 @@ i.e. 6 instructions (24 bytes) — **+8 bytes over target's 16**.
 **C that coerces it (verified byte-identical):**
 
 ```c
+
 extern int func_020932a4(int);
 
 asm void func_02093294(int x) {
@@ -995,6 +1023,7 @@ asm void func_02093294(int x) {
     ldmia sp!, {r0, lr}        /* mwcc inline-asm syntax for `pop` */
     bx    lr
 }
+
 ```
 
 Compiles via the **default `.c` rule (mwcc 2.0/sp1p5)** — no need
@@ -1068,12 +1097,14 @@ The `ldrneh` (non-zero return-`r[2]`) appears BEFORE the `mvneq`
 phrasing):
 
 ```c
+
 /* breaks: mwcc emits mvneq first, ldrneh second */
 int f(unsigned short *p) {
     unsigned short *r = (unsigned short *)helper(p[5]);
     if (r == 0) return -1;       /* eq-path first in source */
     return r[2];                  /* ne-path second */
 }
+
 ```
 
 mwcc walks the if/return blocks in **source order** when both
@@ -1084,6 +1115,7 @@ ops in eq-then-ne order; target ROM has them in ne-then-eq.
 **C that coerces it (verified byte-identical):**
 
 ```c
+
 extern void *helper(unsigned short key);
 
 int f(unsigned short *p) {
@@ -1091,6 +1123,7 @@ int f(unsigned short *p) {
     if (r != 0) return r[2];      /* ne-path first → ldrneh first */
     return -1;                     /* eq-path second → mvneq second */
 }
+
 ```
 
 Inverting the if-condition pulls the ne-path into the source's
@@ -1142,12 +1175,14 @@ ldmia  sp!, {r3, pc}
 **mwcc emits when miscoded** (1-arg signature — natural shape):
 
 ```c
+
 /* breaks: mwcc allocates r1 for the cmp scratch */
 extern int helper(T *p);
 int f(T *p) {
     if (p->field != 0) return 1;
     return helper(p);
 }
+
 ```
 
 mwcc reg-allocator picks the lowest free scratch (r1) for a
@@ -1161,12 +1196,14 @@ dead-codes the unused param.
 **C that coerces it (verified byte-identical, both targets):**
 
 ```c
+
 extern int helper(T *p, int x);     /* declared 2-arg */
 
 int f(T *p, int x) {
     if (p->field != 0) return 1;
     return helper(p, x);             /* x flows through r1 */
 }
+
 ```
 
 The trick is **using x at the helper call site**. mwcc must
@@ -1179,12 +1216,14 @@ r1) — declare it 1-arg and cast at the call site so the source
 doesn't carry an extern-declaration lie:
 
 ```c
+
 extern int helper(T *p);             /* truthful 1-arg */
 
 int f(T *p, int x) {
     if (p->field != 0) return 1;
     return ((int(*)(T*, int))helper)(p, x);
 }
+
 ```
 
 Both shapes emit the same caller bytes. Pick the one that
@@ -1482,6 +1521,7 @@ Single-byte divergence → byte-compare fails.
 `func_0209085c`):**
 
 ```c
+
 extern int func_helper(int);
 
 asm void func_target(int x) {
@@ -1489,6 +1529,7 @@ asm void func_target(int x) {
     ldr r1, =func_helper
     bx  r1
 }
+
 ```
 
 Compiles via the **default `.c` rule (mwcc 2.0/sp1p5)** — no
@@ -1575,8 +1616,10 @@ instructions vs the un-fused chain.
 **mwcc emits when miscoded** (with the redundant `& mask`):
 
 ```c
+
 /* breaks: trailing `& 0x3fcu` prevents lsr+orr fusion */
 *p = (*p & ~0x3fcu) | (((val << 24) >> 22) & 0x3fcu);
+
 ```
 
 ```text
@@ -1597,7 +1640,9 @@ str   r0, [r2, #0x8]
 `func_ov011_021d1058`):**
 
 ```c
+
 *p = (*p & ~0x3fcu) | ((val << 24) >> 22);
+
 ```
 
 Just remove the trailing `& 0x3fcu`. The shifts have **already
@@ -1670,12 +1715,14 @@ between.
 **mwcc emits when miscoded** (separate-if form):
 
 ```c
+
 /* breaks: two predicated early-returns, no shared epilogue */
 int f(int a, int b) {
     if (a == K) return 0;
     if (b == M) return N;
     return 0;
 }
+
 ```
 
 ```text
@@ -1698,10 +1745,12 @@ mwcc with separate-if's uses `bxeq lr` + `movne r0, #0`.
 `func_ov002_0226bad0`):**
 
 ```c
+
 int f(int a, int b) {
     if (a != K && b == M) return N;
     return 0;
 }
+
 ```
 
 Combine the two predicates with `&&`: the first failure
@@ -1746,10 +1795,12 @@ Target uses **`lt`** (signed-less-than) predication.
 **mwcc emits when miscoded** (direct unsigned-byte compare):
 
 ```c
+
 /* breaks: emits `lo` instead of `lt` */
 void f(S *p) {
     if (p->f_byte < 0xff) arr[p->f_byte] = 0;
 }
+
 ```
 
 ```text
@@ -1771,10 +1822,12 @@ insn.
 `func_0203baa0`):**
 
 ```c
+
 void f(S *p) {
     int i = p->f_byte;                /* promote to int local */
     if (i < 0xff) arr[i] = 0;
 }
+
 ```
 
 The `int` local promotes the unsigned-byte to signed-int
@@ -1832,8 +1885,10 @@ because the upper bits get shifted out anyway.
 mwcc 2.0/sp1p5):
 
 ```c
+
 /* breaks: mwcc elides the mask — 9 insns vs target's 11 */
 func_helper(0x31, 6, a, ((c & 0xffff) << 16) | (b & 0xffff));
+
 ```
 
 ```text
@@ -1858,6 +1913,7 @@ zero-extend.
 3-target triplet `func_ov002_021ae60c` / `_638` / `_6a4`):**
 
 ```c
+
 extern void func_helper(int, int, int, unsigned int);
 
 void func_target(int a, unsigned int b, unsigned int c) {
@@ -1865,6 +1921,7 @@ void func_target(int a, unsigned int b, unsigned int c) {
         ((unsigned int)(unsigned short)c << 16) |
         (unsigned int)(unsigned short)b);
 }
+
 ```
 
 **Compile via `*.legacy.c` routing** (mwcc 1.2/sp2p3). The
@@ -1945,6 +2002,7 @@ chain (mwcc-2.0).
 **The recipe (verified byte-identical against both targets):**
 
 ```c
+
 extern void func_helper(int, int, int, unsigned short);
 
 asm void func_target(int a, int b, int c, int d) {
@@ -1959,6 +2017,7 @@ asm void func_target(int a, int b, int c, int d) {
     mov  r1, #0x9
     bx   ip
 }
+
 ```
 
 Same template as **C-12 (push-r0)** and **C-16 (ldr-r1-vs-ip)**:
@@ -2033,8 +2092,10 @@ shift → subtract).
 **mwcc emits when miscoded** (natural ternary form):
 
 ```c
+
 /* breaks: mwcc folds the ternary into 2 direct mov-immediates */
 p->f_1c = (prev < 0) ? 0x80 : 0x100;
+
 ```
 
 ```text
@@ -2055,8 +2116,10 @@ fewer instructions; different bytes.
 `func_ov002_022b3720`):**
 
 ```c
+
 int sign = (prev < 0) ? 1 : 0;             /* decision → 1 or 0 */
 p->f_1c = 0x100 - (sign << 7);             /* arithmetic chain */
+
 ```
 
 **The trick:** decompose the ternary's two roles — *what's the
@@ -2168,10 +2231,12 @@ clear-then-set twice.
 **mwcc emits when miscoded** (natural compound-mask form):
 
 ```c
+
 /* breaks: mwcc folds the two clears into a single combined mask */
 p->field_24 = (p->field_24 & ~0xff00)
             | ((a & 0xf) << 8)
             | ((b & 0xf) << 12);
+
 ```
 
 ```text
@@ -2195,6 +2260,7 @@ covering both. Same semantic; different bytes.
 `func_02001ef4`, mwcc 2.0/sp1p5):**
 
 ```c
+
 typedef struct foo_t {
     u8  padding[0x24];
     u32 lo_8     :  8;
@@ -2207,6 +2273,7 @@ void f(foo_t *p, u32 a, u32 b) {
     p->bf_8_12  = a;
     p->bf_12_16 = b;
 }
+
 ```
 
 **The trick:** declare each 4-bit window as its own bitfield, then
@@ -2495,6 +2562,7 @@ mwcc 2.0 collapses but mwcc 1.2 preserves:
 form, default routing — both peepholes fire):
 
 ```c
+
 /* breaks: mwcc folds 4 base loads → 1 + offsets, AND flips ands → tst */
 int func_0208bde0(int numer, int denom) {
     vu16 *p_divcnt  = (vu16 *)0x04000280;
@@ -2509,6 +2577,7 @@ int func_0208bde0(int numer, int denom) {
         ;
     return *p_result;
 }
+
 ```
 
 ```text
@@ -2540,8 +2609,10 @@ The same natural pointer-local source above. **No source change
 required** — the fix is the routing tier:
 
 ```bash
+
 mv src/main/func_0208bde0.c src/main/func_0208bde0.legacy.c
 ninja
+
 ```
 
 `*.legacy.c` routes through mwcc 1.2/sp2p3, which lacks both
@@ -2679,6 +2750,7 @@ duplicate-pool-ref signal.
 naive C with constant-folded MMIO offset:
 
 ```c
+
 *(int *)(0x027ffc00 + 0x388) |= (1U << slot);  /* mwcc 1.2/
                                                   sp2p3 folds
                                                   this CONSTANT
@@ -2687,6 +2759,7 @@ naive C with constant-folded MMIO offset:
                                                   0x027fff88 pool
                                                   word + `[r3]`
                                                   access */
+
 ```
 
 …compiles to a SINGLE pool word `0x027fff88` and `ldr r2, [r3]`
@@ -2701,12 +2774,14 @@ base into a register and emit `[r3, #imm]`.
 and access via index:
 
 ```c
+
 volatile int *block = (volatile int *)0x027ffc00;
 if (value != 0) {
     block[226] = block[226] | (1U << slot);   /* 226 * 4 = 0x388 */
 } else {
     block[226] = block[226] & ~(1U << slot);
 }
+
 ```
 
 `block[226]` compiles to `ldr/str [r3, #904]` with r3 holding
@@ -2789,6 +2864,7 @@ sequence entirely (no pool dedup, no sub-sp/add-sp pair, uses
 different shape entirely):
 
 ```c
+
 /* breaks: mwcc 2.0 emits 14 insns + 2 pool words, register
    r3 used as alignment-stack-trick instead of sub sp #4 */
 typedef struct cb_t {
@@ -2803,6 +2879,7 @@ void f(void) {
     cb->fn(0, cb->flag, cb->arg);
     data_X->first = 2;
 }
+
 ```
 
 ```text
@@ -2836,8 +2913,10 @@ The same natural source above. **No source change required** —
 the fix is the routing tier:
 
 ```bash
+
 mv src/main/func_02048c28.c src/main/func_02048c28.legacy_sp3.c
 ninja
+
 ```
 
 **Critical source-form constraint**: the C **must use a single
@@ -2959,8 +3038,10 @@ intermediate before returning the chain to r0.
 **mwcc emits when miscoded** (single-statement chain expression):
 
 ```c
+
 /* breaks: in-place chain on r0 throughout */
 p->f_98 = (p->f_98 | 0x4000000) & ~0xf80000 | 0x880000 | 0x8000000;
+
 ```
 
 ```text
@@ -2982,6 +3063,7 @@ keeps r0 → r0).
 `func_ov000_021ac85c`, mwcc 2.0/sp1p5):**
 
 ```c
+
 extern void Fill32(unsigned int v, void *dst, unsigned int n);
 typedef struct {
     char         _pad0[0x98];
@@ -2993,6 +3075,7 @@ void func_ov000_021ac85c(state_t *p) {
     p->f_98 = p->f_98 | 0x4000000;                       /* SEPARATE write */
     p->f_98 = ((p->f_98 & ~0xf80000) | 0x880000) | 0x8000000;
 }
+
 ```
 
 **The trick:** splitting the bitfield-chain expression into TWO
@@ -3099,6 +3182,7 @@ literal.
 default routing):
 
 ```c
+
 /* breaks: declares helper as void func(state_t *) — adds extra
    mov r0, r5 before bl, AND mwcc 2.0 emits dummy-r3 stack-trick */
 extern void func_02091f88(state_t *p);
@@ -3109,6 +3193,7 @@ void func_020919d8(state_t *p) {
     func_02091f88(p);
     OS_RestoreIrq(saved);
 }
+
 ```
 
 ```text
@@ -3135,6 +3220,7 @@ trick). **−0x8 bytes** vs target. Two changes fire together:
 `func_020919d8`, `*.legacy.c` routing → mwcc 1.2/sp2p3):**
 
 ```c
+
 extern int  OS_DisableIrq(void);
 extern void OS_RestoreIrq(int saved);
 extern void func_02091f88(void);    /* NO ARGS — match orig */
@@ -3150,6 +3236,7 @@ void func_020919d8(state_t *p) {
     func_02091f88();
     OS_RestoreIrq(saved);
 }
+
 ```
 
 **The trick:** declare the helper signature WITHOUT args when
@@ -3295,6 +3382,7 @@ when the BL returns.
 **mwcc emits when miscoded** (single extern, natural form):
 
 ```c
+
 extern void *data_X;
 extern void Task_InvokeLocked(void *p);
 
@@ -3305,6 +3393,7 @@ int func_02023fec(void) {
     }
     return 1;
 }
+
 ```
 
 ```text
@@ -3339,6 +3428,7 @@ distinct pool references, mwcc dedupes.
 suffix needed):**
 
 ```c
+
 extern void *data_X;
 extern void *data_X_alias;         /* SAME address (see symbols.txt) */
 extern void Task_InvokeLocked(void *p);
@@ -3352,6 +3442,7 @@ int func_02023fec(void) {
     }
     return 1;
 }
+
 ```
 
 The volatile-qualified local pointer dance forces mwcc to
@@ -3364,9 +3455,11 @@ same address via the alias entry.
 original `data_X` line):
 
 ```text
+
 data_0219a8e4       kind:bss addr:0x0219a8e4
 data_0219a8e4_alias kind:bss addr:0x0219a8e4   ← brief 107 alias
 data_0219a8ec       kind:bss addr:0x0219a8ec
+
 ```
 
 Both names resolve to the same byte. mwldarm doesn't error on
@@ -3473,6 +3566,7 @@ into a single `tst → moveq r5,#0 → beq` (three insns shorter).
 **mwcc emits when miscoded** (natural inline form):
 
 ```c
+
 int func_020338f8(state_t *p) {
     int saved = OS_DisableIrq();
     int result = 1;
@@ -3484,6 +3578,7 @@ int func_020338f8(state_t *p) {
     OS_RestoreIrq(saved);
     return result;
 }
+
 ```
 
 ```text
@@ -3516,6 +3611,7 @@ the flag is only consumed by one branch decision.
 default mwcc 2.0/sp1p5 — no routing change):**
 
 ```c
+
 extern int  OS_DisableIrq(void);
 extern void OS_RestoreIrq(int saved);
 extern int  func_02046ae0(void);
@@ -3539,6 +3635,7 @@ int func_020338f8(struct s338f8 *p) {
     OS_RestoreIrq(saved);
     return result;
 }
+
 ```
 
 Three source-form factors fire together:
@@ -3625,8 +3722,10 @@ ldmia sp!, {r3, pc}
 `== (void*)0` — all coerce identically):
 
 ```c
+
 if (p == 0) return -1;
 return p->f_34 & 0xffff;
+
 ```
 
 ```text
@@ -3650,6 +3749,7 @@ emitting an early-return.
 2.0/sp1p5, no routing change):**
 
 ```c
+
 extern void *func_02037b04(void);
 
 struct s37b34 {
@@ -3662,6 +3762,7 @@ int func_02037b34(void) {
     if (!p) return -1;        /* ← !p instead of p == 0 */
     return p->f_34 & 0xffff;
 }
+
 ```
 
 **Idiom matrix** (verified at default mwcc 2.0/sp1p5):
@@ -3767,11 +3868,13 @@ ldmia sp!, {r4, pc}
 shift idiom):
 
 ```c
+
 void func_020071c4(void) {
     struct s071c4 *p = (struct s071c4 *)&data_02104f1c;
     if ((p->f_10 & 2) == 0) return;
     ...
 }
+
 ```
 
 ```text
@@ -3792,6 +3895,7 @@ fire together: (1) single pool slot, (2) tst peephole.
 2.0/sp1p5):**
 
 ```c
+
 extern unsigned int data_02104f1c;
 extern unsigned int data_02104f1c_alias;  /* via symbols.txt */
 extern void func_02006918(void);
@@ -3815,6 +3919,7 @@ void func_020071c4(void) {
     p_store->f_10 &= ~2u;
     p_store->f_14 = 0;
 }
+
 ```
 
 Plus `data_02104f1c_alias kind:bss addr:0x02104f1c` in
@@ -3885,6 +3990,7 @@ The function body is exactly 8 bytes (Thumb form) or 12 bytes
 (ARM form), and matches one of:
 
 ```text
+
 ; Thumb 8 B — Thumb caller → ARM target interwork shim
 4b 00       ldr   r3, [pc, #0]   ; pc = veneer + 4, so [pc+0] = veneer + 4 = .word slot
 47 18       bx    r3
@@ -3901,6 +4007,7 @@ The function body is exactly 8 bytes (Thumb form) or 12 bytes
 47 18       bx    r3
 00 00       nop                          ; alignment padding
 <4 bytes>   .word target_va
+
 ```
 
 The `.word target_va` is in another module's `.text` (cross-
@@ -3921,8 +4028,10 @@ entry at that address.
 The natural tail-call wrapper looks innocent but explodes:
 
 ```c
+
 extern void func_<target_va>(void);
 void func_<veneer_va>(void) { func_<target_va>(); }
+
 ```
 
 mwcc 2.0/sp1p5 emits this as 12+ bytes of ARM (`push {lr}; bl
@@ -3937,6 +4046,7 @@ cap).
 `func_ov004_021dbdbc`):**
 
 ```text
+
         .text
         .global func_<veneer_va>
         .thumb                  ; or .arm for the 12-byte ARM form
@@ -3944,6 +4054,7 @@ func_<veneer_va>:
         ldr     r3, [pc, #0]
         bx      r3
         .word   <target_va>
+
 ```
 
 Critical details:
@@ -4031,7 +4142,9 @@ recipe rationale at [`first-wave-wall-mwldarm-interwork.md`](first-wave-wall-mwl
 The function's `relocs.txt` contains one or more entries:
 
 ```text
+
 from:0x<addr_inside_func> kind:arm_call to:0x<target> module:none
+
 ```
 
 The `module:none` marker indicates dsd's reloc analysis could
@@ -4056,20 +4169,24 @@ BLs.
 **C that miscodes the wall:**
 
 ```c
+
 extern void func_021b5500(void);
 void func_ov011_021d2c64(int *out) {
     /* ... */
     func_021b5500();   /* mwldarm cannot resolve */
     /* ... */
 }
+
 ```
 
 Build result:
 
 ```text
+
 mwldarm.exe: Undefined : "func_021b5500"
 mwldarm.exe: Referenced from "func_ov011_021d2c64" in ov011_021d2c64.o
 mwldarm.exe: alert: Link failed.
+
 ```
 
 The link aborts before any layout cascade can manifest — there
@@ -4079,6 +4196,7 @@ is no built `.bin` to diff. The brief 180 patcher never runs.
 `func_ov011_021d2c64`):**
 
 ```text
+
         .text
         .extern Task_PostLocked
         .global func_ov011_021d2c64
@@ -4094,6 +4212,7 @@ func_ov011_021d2c64:
         .word   0xebff8a1e                      ; bl 0x021b5500 (cross-overlay, mod:none)
         str     r4, [r5]
         ldmia   sp!, {r3, r4, r5, pc}
+
 ```
 
 Critical details:
@@ -4106,9 +4225,11 @@ Critical details:
 - **BL encoding formula.** For `bl <target>` at PC `<addr>`:
 
   ```text
+
   offset    = (target - (addr + 8)) / 4         ; signed
   imm24     = offset & 0xffffff                 ; bottom 24 bits
   encoding  = 0xeb000000 | imm24                ; ARM bl-cond-AL opcode
+
   ```
 
   This must match the baserom bytes at `addr` verbatim — verify
@@ -4216,12 +4337,14 @@ underlying StyleA/C-15 prediction.
 Inspect `arm9.o.xMAP` with the new `--dump-shifts` flag:
 
 ```bash
+
 python tools/patch_ov004_veneers.py \
     --binary build/eur/build/arm9_ov004.bin \
     --relocs config/eur/arm9/overlays/ov004/relocs.txt \
     --delinks config/eur/arm9/overlays/ov004/delinks.txt \
     --map build/eur/arm9.o.xMAP \
     --dump-shifts
+
 ```
 
 The Cluster F shape is unambiguous:
@@ -4244,23 +4367,27 @@ and routes through `_layout_reconstruct` normally.
 A perfectly valid `.legacy.c` per the C-15 / StyleA recipe:
 
 ```c
+
 /* func_0200b2f4 (0x68 bytes, C-15 mvn r4, #0 pattern) */
 int func_0200b2f4(struct Out *out, ...) {
     int neg_one = ~0;        /* mwcc 1.2/sp2p3 emits mvn r4, #0 */
     int twelve = 12;
     /* ... loop body ... */
 }
+
 ```
 
 Build result (pre-brief-194 patcher):
 
 ```text
+
 error: build/eur/build/arm9_ov004.bin: TU _dsd_gap@ov004_41.o
        (.text) has shift +64 bytes
        (|shift| > MAX_SHIFT_BYTES = 4);
        structural regression suspected — bail rather than
        relocate a TU section whose layout cause we have not
        characterised.
+
 ```
 
 Brief 180's cap was set on the assumption that any shift > 4 B
@@ -4281,8 +4408,10 @@ through `_layout_reconstruct` unchanged.
 Physical FO formula:
 
 ```text
+
 physical_byte_shift = tu.shift - text_modal_shift
 built_fo = orig_fo + physical_byte_shift
+
 ```
 
 Where `text_modal_shift` is the `.text` section's modal shift
@@ -4493,6 +4622,7 @@ Full per-candidate breakdown:
 `func_02023f7c`, default `.s` routing):**
 
 ```text
+
         .text
         .extern data_0219a8e4
         .extern Fill32
@@ -4510,6 +4640,7 @@ func_02023f7c:
         .word   data_0219a8e4
 .L_POOL_B:
         .word   data_0219a8e4
+
 ```
 
 Critical details:
@@ -4780,12 +4911,14 @@ orig has the longer 6-instruction `lsl/lsr/movne/moveq/bx`
 shape:
 
 ```asm
+
 ldr   r0, [r0, #0x4]
 mov   r0, r0, lsl #31      ; bit-0 -> bit-31
 movs  r0, r0, lsr #31      ; back to bit-0, set flags
 movne r0, #1               ; redundant — value already 0/1
 moveq r0, #0               ; ditto
 bx    lr
+
 ```
 
 The `movne #1; moveq #0` tail is functionally redundant after
@@ -4812,11 +4945,13 @@ Two sub-variants exist in the corpus:
 under mwcc 2.0 (or works directly on either tier when N=24):
 
 ```c
+
 int f(int *p) {
     unsigned t = (unsigned)(p[1] << 31) >> 31;
     if (t != 0u) return 1;
     return 0;
 }
+
 ```
 
 Two structural choices matter:
@@ -4844,12 +4979,14 @@ byte-for-byte. Verified empirically across 23 source variants ×
     idiom adapted for byte width:
 
     ```c
+
     int g(void) {
         int x = global_struct.field;  /* byte at offset 0x58 */
         unsigned t = ((unsigned)x << 24) >> 24;
         if (t == 0u) return 1;
         return 0;
     }
+
     ```
 
     No worked example shipped — needs the extern symbol
@@ -5013,6 +5150,7 @@ leaf or non-leaf.
 Canonical recipe for bit-0 of a halfword at struct offset 2:
 
 ```c
+
 struct Self {
     unsigned short pad0;          /* offset 0 */
     unsigned short bit0  : 1;     /* offset 2, bit 0 */
@@ -5025,11 +5163,13 @@ int func_X(struct Self *self) {
     helper(self, self->bit0);
     return 1;
 }
+
 ```
 
 mwcc 2.0/sp1p5 emits:
 
 ```
+
 push  {r3, lr}
 ldrh  r1, [r0, #2]                ; halfword load (matches orig)
 lsl   r1, r1, #31                 ; bit-extract (canonical shift pair)
@@ -5037,6 +5177,7 @@ lsr   r1, r1, #31
 bl    helper
 mov   r0, #1
 pop   {r3, pc}
+
 ```
 
 Three shipped worked examples (brief 222 pilot):
@@ -5139,6 +5280,7 @@ to r1 (the next free arg register) and peepholes
 Canonical recipe (sign-check sub-shape, single helper):
 
 ```c
+
 struct Self {
     unsigned short bit0  : 1;
     unsigned short rest  : 15;
@@ -5155,11 +5297,13 @@ int func_X(struct Outer *p) {
     }
     return 1;
 }
+
 ```
 
 mwcc 2.0/sp1p5 emits (matches orig):
 
 ```
+
 ...
 bl    helper1
 movs  r1, r0                  ; r1 = n, set flags
@@ -5169,6 +5313,7 @@ bl    helper2                 ; helper2(bit, n)  with r1 = n
 .end:
 mov   r0, #1
 pop   {r4, pc}
+
 ```
 
 **Variant — return 0 + literal-1 arg + `rsb` bit-invert.**
@@ -5317,6 +5462,7 @@ pattern directly.
 Canonical recipe:
 
 ```c
+
 struct Self {
     unsigned short bit0 : 1;
     unsigned short rest : 15;
@@ -5333,17 +5479,20 @@ int func_X(struct Outer *self) {
     int b = helper(1 - self->f2.bit0);        /* 2nd read — emits re-read */
     return (a + b) >= 4;
 }
+
 ```
 
 mwcc 2.0/sp1p5 emits (matches orig):
 
 ```
+
 ldrh r0, [r4, #2]               ; first read
 lsl/lsr #31                      ; bit0
 bl   helper
 ldrh r1, [r4, #2]               ; RE-READ (no CSE)
 lsl/lsr #31                      ; bit0 again
 bl   helper
+
 ```
 
 **Why no CSE?** mwcc's intermediate representation treats
@@ -5403,6 +5552,7 @@ arg1 is preserved past an intermediate helper call for use at
 the function tail (typically `return helper2(self, arg1)`).
 
 ```asm
+
 push  {r3, r4, r5, lr}
 movs  r4, r1                    ; r4 = arg1, set flags from arg1
 mov   r5, r0                    ; save self in callee-saved
@@ -5413,6 +5563,7 @@ mov   r0, r5
 mov   r1, r4                    ; r1 = arg1 (restored from r4)
 bl    helper2                   ; helper2(self, arg1)
 pop   {r3, r4, r5, pc}
+
 ```
 
 The `movs r4, r1` is mwcc's peepholed combo of `mov r4, r1`
@@ -5423,11 +5574,13 @@ flag-setting `movs`.
 **The fix.** Natural source recipe:
 
 ```c
+
 int func(struct Self *self, int arg1) {
     if (arg1 == 0) return 0;
     if (helper1(self, ...) == 0) return 0;
     return helper2(self, arg1);
 }
+
 ```
 
 Three structural conditions:
@@ -5508,6 +5661,7 @@ pop   {r3, pc}
 **The fix (two independent levers — verified byte-identical):**
 
 ```c
+
 struct S { unsigned short f0; unsigned short bit0:1; unsigned short rest:15; };
 extern char base[];                                   /* the strided table */
 extern int helper(struct S *self, int arg1, int v);   /* 3-arg: keeps r0/r1 live */
@@ -5517,6 +5671,7 @@ int f(struct S *self, int arg1) {
     if (v == 0) return 0;
     return helper(self, arg1, v);                      /* forces index → ip, pools → r2/r3 */
 }
+
 ```
 
 1. **Reg-alloc lever — 3-arg helper `helper(self, arg1, v)`.** Keeping
@@ -5572,6 +5727,7 @@ signature and the chase lands in orig's registers.
 **`0223ba28` (chase temps wanted r3/ip, mwcc gave r1/r2):**
 
 ```text
+
 push  {r3, lr}
 ldr   r3, [pc, #..]          ; &global
 ldr   r3, [r3, #0x48c]       ; global->ptr   (chase, r3)
@@ -5581,6 +5737,7 @@ cmp   r0, r3                 ; r0 = arg0 (live!)
 movne r0, #0; popne
 bl    func_ov002_0223b864    ; helper(arg0, arg1, arg2) — args forwarded
 pop   {r3, pc}
+
 ```
 
 Recipe: the function takes `(arg0, arg1, arg2)` and tail-forwards them;
@@ -5631,6 +5788,7 @@ lsl r0,r3,#31; lsl r1,r3,#26 ; bit0 (arg0), b5_1 (arg1) — both from the field 
 lsr r0,r0,#31; lsr r1,r1,#27
 bl    func_ov002_021b4098    ; helper(bit0, b5_1, f0)  — 3 args
 pop   {r3, pc}
+
 ```
 
 **Falsifiable claim:** *some source form makes mwcc keep the field in
@@ -5692,6 +5850,7 @@ return. Brief 219 deferred 4 picks (`func_0208deec`,
 recipe was known.
 
 ```asm
+
 ldr   r0, .L_pool                ; pool load
 ldrh  r0, [r0, #0]               ; u16 read
 and   r0, r0, #MASK              ; bit-field mask
@@ -5700,17 +5859,20 @@ mov   r0, r0, lsl #SHIFT2        ; scale to page size
 add   r0, r0, #BASE              ; add result base
 bx    lr
 .word 0x0400100a OR 0x04001008   ; pool word — DS NDS9 register addr
+
 ```
 
 **The fix.** Brief 233's variant matrix found the orig shape
 reaches under EVERY mwccarm tier from this idiom:
 
 ```c
+
 #define REG (*(volatile unsigned short *)0xADDR)
 void *f(void) {
     return (void *)((((REG & MASK) >> SHIFT1) << SHIFT2)
                     + BASE);
 }
+
 ```
 
 Three structural elements jointly required:
@@ -5767,6 +5929,7 @@ Brief 235's broader-C-40 corpus pilot identified 4 picks
 sharing this exact shape.
 
 ```asm
+
 ldr  r2, .L_mmio          ; r2 = 0x04001000
 ldr  ip, .L_helper        ; ip = &helper (reloc)
 ldr  r1, [r2]             ; r1 = *MMIO
@@ -5777,11 +5940,13 @@ bx   ip                   ; tail-call helper(data)
 .word 0x04001000
 .word helper
 .word data
+
 ```
 
 **The fix.** Natural source recipe:
 
 ```c
+
 #define MMIO (*(volatile unsigned int *)0x04001000)
 extern int helper(void *arg);
 extern char data_symbol[];
@@ -5790,6 +5955,7 @@ int func(void) {
     MMIO &= ~MASK;
     return helper(data_symbol);
 }
+
 ```
 
 Three structural elements:
@@ -6029,6 +6195,7 @@ blocker.
 `func_ov016_021b3560`):**
 
 ```c
+
 typedef unsigned short u16;
 struct P { u16 f0; u16 f2; u16 gap4; u16 f6; u16 f8; u16 gap10; };
 extern void helper(int a0, int a1, int a2, void *p);
@@ -6041,6 +6208,7 @@ void f(int a0, int a1, int a2, u16 a3, int A, int B, int C) {
     local.f8 = C;
     helper(a0, a1, a2, &local);
 }
+
 ```
 
 Critical detail: **the stack-passed value args are `int` (word), not
@@ -6180,10 +6348,12 @@ original disassembly checks a value against 3 contiguous constants
 (`0x4b`/`0x4c`/`0x4d`) with an explicit compare chain:
 
 ```text
+
 cmp   r2, #0x4b
 cmpne r2, #0x4c
 cmpne r2, #0x4d
 bne   .L_bcc
+
 ```
 
 **The apparent wall:** a small contiguous-value dispatch looks like
@@ -6200,6 +6370,7 @@ it. No range-check was emitted; try `switch` first rather than
 assuming the range-fold is automatic.
 
 ```c
+
 switch (-self->f4) {
 case 0x4b:
 case 0x4c:
@@ -6207,6 +6378,7 @@ case 0x4d:
     return self->f70[idx];
 }
 return func_ov002_021afbd4(self->f68[idx]);
+
 ```
 
 This is at least the 8th confirmed instance (2 here + 6 from
@@ -6227,10 +6399,12 @@ original reads one bit out of a global 32-bit field at a
 register-supplied bit index with a **logical** shift:
 
 ```text
+
 ldr r2, [pc, #...]     ; &data_ov002_022d016c
 ldr r2, [r2, #0xd0]
 mov r2, r2, lsr r5      ; LOGICAL shift — lsr, not asr
 and r2, r2, #0x1
+
 ```
 
 **The apparent wall:** natural C for "shift then mask one bit"
@@ -6244,7 +6418,9 @@ permanent.
 **The fix:** cast to `unsigned` before shifting:
 
 ```c
+
 if (val == (((unsigned)D016C->f_d0 >> bit) & 1)) return;
+
 ```
 
 forces mwcc to emit `lsr`, matching the original exactly. Same family
@@ -6311,9 +6487,11 @@ value and skips re-materializing it — but only if the C source returns
 the **variable holding the call's result**, not a fresh literal.
 
 ```c
+
 int r = some_call(...);
 if (r == 0) return r;      /* mwcc sees r0 already == 0, elides the mov */
 /* NOT: if (r == 0) return 0; -- forces a redundant mov r0,#0 */
+
 ```
 
 **Why it matters:** the literal form isn't wrong, it's just byte-
@@ -6591,14 +6769,21 @@ instruction families depending purely on C source structure.
 one statement, or direct chained field access with no intermediate
 pointer variable for the column step) compiles to a **double-`mla`
 chain ending in one immediate-offset load**:
+
 ```c
+
 return *(int *)((char *)table + (row & 1) * 0x868 + col * 20 + 0x30);
+
 ```
+
 ```asm
+
 mla  r2, r0, r_rowstride, r_base   ; row*0x868 + &table
 mla  r0, r1, r_colstride, r2       ; col*20 + that
 ldr  r0, [r0, #0x30]               ; single immediate-offset load
+
 ```
+
 This is what `func_ov002_021ed1f8`'s first occurrence shows, and what
 every plain-pointer-arithmetic or single-chained-field-access phrasing
 tested produced — including a version using a natural nested
@@ -6611,18 +6796,25 @@ the row/base computation — a pointer is materialized first, then
 advanced by `col`) compiles to a **single `mla` for the row term, a
 SEPARATE `mul` for the column term, an explicit `add` for the fixed
 offset, and a register-indexed final load**:
+
 ```c
+
 struct Elem *e = row_base->elems;   /* intermediate pointer, NOT combined
                                         with the row computation above */
 e += col;                            /* separate increment */
 return e->field;
+
 ```
+
 ```asm
+
 mla  r1, r0, r_rowstride, r_base   ; row*0x868 + &table  (unchanged)
 mul  r0, r_col, r_colstride        ; col*20 -- SEPARATE, not fused
 add  r1, r1, #0x30                 ; fixed offset -- explicit, not folded
 ldr  r0, [r1, r0]                  ; register-indexed load, not immediate
+
 ```
+
 This exactly reproduces `func_ov002_021ed1f8`'s second occurrence and
 both occurrences in `func_ov002_0220d974` (the `mul`/`add` instruction
 *order* between the two real occurrences differs — mwcc's scheduler
@@ -7627,6 +7819,7 @@ all 75 compiles, including with `unsigned int`+`& 0xffff`,
 volatile`, and `union {int; short}`):
 
 ```c
+
 extern void *func_02037b04(void);
 struct s { char _pad[0x34]; unsigned short f_34; };  /* OR unsigned int + mask */
 
@@ -7635,6 +7828,7 @@ int func_02037b34(void) {
     if (p == 0) return -1;
     return (unsigned short)p->f_34;   /* OR p->f_34 & 0xffff */
 }
+
 ```
 
 ```text
@@ -8363,9 +8557,11 @@ indexes `+0xd20` via the instruction's own addressing mode:
 — both reproduce identically):**
 
 ```c
+
 extern char data_ov002_022d016c[];
 /* ... inside the function, at the same 3 program points ... */
 *(int *)(data_ov002_022d016c + 0xd20) += 1;
+
 ```
 
 ```text
@@ -9164,8 +9360,10 @@ falls back to `bl #<offset>` (raw relative offset, no symbol).
 **Diagnostic signature** in `build/<ver>/disasm/_dsd_gap@*.s`:
 
 ```text
+
 bl #-0x185dc
 bl #+0x12a48
+
 ```
 
 (any `bl` with a `#`-prefixed numeric operand instead of a
@@ -9296,6 +9494,7 @@ offset. The target had an `int` at +0x10, meaning the pad
 needed to occupy exactly +0x00..+0x0f (16 bytes = `0x10`):
 
 ```c
+
 /* Wrong: 17-byte pad ends at +0x11, mwcc aligns int up to +0x14. */
 struct Thing {
     char  _pad[0x11];    /* +0x00..+0x10 (17 bytes), ends at +0x11 */
@@ -9308,6 +9507,7 @@ struct Thing {
     char  _pad[0x10];    /* +0x00..+0x0f (16 bytes), ends at +0x10 */
     int   value;         /* +0x10, already 4-aligned ✓ */
 };
+
 ```
 
 The general rule when the pad doesn't start at offset +0x00:
@@ -9524,6 +9724,7 @@ sitting *after* `mvn r0, #8` (case 1's `return -9`) in memory.
 That tells you the source emitted `case 1` before `case 0`:
 
 ```c
+
 /* Wrong — natural numeric order. mwcc emits bodies in this
    order, but the target wanted case 1's body before case 0's.
    Result: 4 b-target mismatches in the jump-table. */
@@ -9544,6 +9745,7 @@ switch (n) {
     case 3: return -7;
     default: return 0;
 }
+
 ```
 
 The dispatch table (which is just `value → body offset`) is the
@@ -9677,6 +9879,7 @@ bcc     .L_loop             ; loop while i < f_18 (cc/lo = unsigned <)
 Same loop body written with `int i`:
 
 ```c
+
 /* breaks: int i forces signed comparison */
 void f(state_t *p, int arg1) {
     int i;
@@ -9684,6 +9887,7 @@ void f(state_t *p, int arg1) {
         helper(p, i, arg1);
     }
 }
+
 ```
 
 Emits:
@@ -9699,6 +9903,7 @@ blt     .L_loop             ; signed-< loop branch
 Same loop body written with `u32 i`:
 
 ```c
+
 /* coerces target: u32 i forces unsigned comparison */
 void f(state_t *p, int arg1) {
     u32 i;
@@ -9706,6 +9911,7 @@ void f(state_t *p, int arg1) {
         helper(p, i, arg1);
     }
 }
+
 ```
 
 Emits the target's `ldmlsfd` + `bcc`. Two cond-code nibbles flip
