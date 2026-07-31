@@ -701,5 +701,21 @@ src/overlay010/data_ov010_021b8bb4.c:
 
 src/overlay010/bss/data_ov010_bss.s:
     complete
-    .bss start:0x021b8c20 end:0x021ba000
+    .bss start:0x021b8c20 end:0x021b92b8
+
+src/overlay010/data_ov010_021b92b8.c:
+    complete
+    .bss start:0x021b92b8 end:0x021b93b4
+
+src/overlay010/bss/data_ov010_bss_2.s:
+    complete
+    .bss start:0x021b93b4 end:0x021b98f0
+
+src/overlay010/data_ov010_021b98f0.c:
+    complete
+    .bss start:0x021b98f0 end:0x021b99ec
+
+src/overlay010/bss/data_ov010_bss_3.s:
+    complete
+    .bss start:0x021b99ec end:0x021ba000
 

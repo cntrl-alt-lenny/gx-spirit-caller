@@ -1405,7 +1405,19 @@ src/overlay004/data_ov004_022916b0.c:
 
 src/overlay004/bss/data_ov004_bss_2.s:
     complete
-    .bss start:0x02291930 end:0x02292008
+    .bss start:0x02291930 end:0x02291d38
+
+src/overlay004/data_ov004_02291d38.c:
+    complete
+    .bss start:0x02291d38 end:0x02291e68
+
+src/overlay004/data_ov004_02291e68.c:
+    complete
+    .bss start:0x02291e68 end:0x02291f98
+
+src/overlay004/bss/data_ov004_bss_2_2.s:
+    complete
+    .bss start:0x02291f98 end:0x02292008
 
 src/overlay004/data_ov004_02292008.c:
     complete
