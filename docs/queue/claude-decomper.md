@@ -471,7 +471,25 @@ Also state verbatim: "Before your final report, run `git status --short` yoursel
 
 **Gate:** `python tools/gate3.py --scope all --clean` PASS, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-9 — 149-512B, plain selection [S] [CLAIMED]
+### cm-ov002-unknown-sweep-9 — 149-512B, plain selection [S] [DONE]
+
+> **DONE 2026-07-31.** 19/100 shipped (4,632 bytes). All 3 process
+> fixes held: one consolidated gate only (5 parallel `configure.py eur`
+> config-checks, zero parallel builds — no more toolchain contention),
+> `park_one.py` used by all 5 batches with zero collision incidents,
+> C-32 body-screening caught 2 pre-dispatch and 0 more were found by
+> any worker (screening worked). New lever C-59; C-58 reconfirmed
+> (now believed systemic). Found (not newly — see doc) that 2 batches
+> independently rediscovered the project's own pre-existing "route
+> before you draft" tier-routing guidance, a real gap in this round's
+> dispatch prompt to fix next time. Dominant finding: roughly half of
+> all parks across all 5 batches share one shape (word-count-exact,
+> pure register-letter mismatch) — reconfirms the existing P-4/P-11/
+> P-12/P-15/P-17 register-plateau wall family rather than a new open
+> problem, except one narrow sub-pattern (an MLA-vs-indexed-load
+> choice tied to one ov002 data table) hit 4 times, worth a dedicated
+> look. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-9-2026-07-31.md`.
 
 > Filed from the coordinating process's own chat message after
 > sweep-8 merged (main 77e64a1f9, EUR crossed 12%) — appended here per

@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**121 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**122 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (49)
+- [Uncategorised](#uncategorised) (50)
 
 ## Analysis / worklist
 
@@ -662,6 +662,12 @@ units that crash `objdiff-cli report generate` (brief 187).
 **resolve relocations in ELF .o files to a**
 
 fixed fictional virtual base address, strip the relocation tables, write `*.resolved.o` sidecars. Brief 206 workaround for objdiff's `matched_functions` metric under-counting `.legacy.c` / `.legacy_sp3.c` / `.s` ship paths.
+
+### `tools/park_one.py`
+
+**Cleanly park (abandon) a single decompilation attempt.**
+
+Flips the function's delinks.txt entry back to `.s:` via a surgical single-line edit (reusing batch_sha1's `_flip_delinks`), then restores the original `.s` file from git HEAD and removes the abandoned `.c`.
 
 ### `tools/parsers.py`
 
