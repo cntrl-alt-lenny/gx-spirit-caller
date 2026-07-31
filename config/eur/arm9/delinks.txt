@@ -448,7 +448,7 @@ src/main/func_02000d4c.s:
     complete
     .text start:0x02000d4c end:0x02000d9c
 
-src/main/func_02000d9c.s:
+src/main/func_02000d9c.c:
     complete
     .text start:0x02000d9c end:0x02000e34
 
@@ -8999,7 +8999,7 @@ src/main/func_02049f6c.c:
 
 
 
-src/main/func_02049f74.s:
+src/main/func_02049f74.c:
     complete
     .text start:0x02049f74 end:0x0204a01c
 
