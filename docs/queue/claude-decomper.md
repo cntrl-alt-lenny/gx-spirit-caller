@@ -582,7 +582,7 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-10 — 149-512B [S] [TODO]
+### cm-ov002-unknown-sweep-10 — 149-512B [S] [CLAIMED]
 
 > Filed from the coordinating process's own chat message after
 > sweep-9 merged (main b4ca6bb9b, EUR 12.25%) — appended here per the
