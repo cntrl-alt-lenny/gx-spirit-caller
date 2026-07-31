@@ -136,7 +136,7 @@ src/overlay009/func_ov009_021ac4d0.s:
 src/overlay009/func_ov009_021ace60.s:
     complete
     .text start:0x021ace60 end:0x021acf1c
-src/overlay009/func_ov009_021acf1c.s:
+src/overlay009/func_ov009_021acf1c.c:
     complete
     .text start:0x021acf1c end:0x021acff8
 src/overlay009/func_ov009_021acff8.s:

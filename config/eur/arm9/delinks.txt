@@ -480,7 +480,7 @@ src/main/func_0200111c.s:
     complete
     .text start:0x0200111c end:0x0200127c
 
-src/main/func_0200127c.s:
+src/main/func_0200127c.c:
     complete
     .text start:0x0200127c end:0x02001448
 
@@ -3595,7 +3595,7 @@ src/main/func_0201c99c.c:
 libs/nitro/func_0201c9b0.legacy.c:
     complete
     .text start:0x0201c9b0 end:0x0201c9b4
-src/main/func_0201c9b4.s:
+src/main/func_0201c9b4.c:
     complete
     .text start:0x0201c9b4 end:0x0201ca88
 
@@ -9237,7 +9237,7 @@ src/main/func_0204f280.s:
     complete
     .text start:0x0204f280 end:0x0204f310
 
-src/main/func_0204f310.s:
+src/main/func_0204f310.legacy_sp3.c:
     complete
     .text start:0x0204f310 end:0x0204f3c0
 
@@ -13254,7 +13254,7 @@ src/main/func_020757e0.s:
     complete
     .text start:0x020757e0 end:0x02075928
 
-src/main/func_02075928.s:
+src/main/func_02075928.legacy.c:
     complete
     .text start:0x02075928 end:0x02075ae8
 
@@ -18775,7 +18775,7 @@ src/main/func_0209f470.s:
     complete
     .text start:0x0209f470 end:0x0209f514
 
-src/main/func_0209f514.s:
+src/main/func_0209f514.legacy.c:
     complete
     .text start:0x0209f514 end:0x0209f698
 
