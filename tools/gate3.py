@@ -13,9 +13,9 @@ documented failure modes this driver closes:
     the "latent JPN link break" incident). gate3 removes the built ROM (and
     `objdiff.json`) before every region's `ninja sha1` so the ROM is always
     relinked from current inputs, and offers `--clean` for a full
-    `ninja -t clean` when a change *deletes or moves* source (the masking
-    class), not merely adds it (the drain's pure-addition waves are safe
-    without it).
+    generated-output clean when a change *deletes or moves* source (the
+    masking class), not merely adds it (the drain's pure-addition waves are
+    safe without it). Downloaded tool binaries are preserved.
 
   * A synthesized "PASS" that hides the real evidence. gate3 NEVER prints a
     PASS it didn't read: it streams each region's real configure + sha1 output
@@ -26,7 +26,7 @@ documented failure modes this driver closes:
 Per-region sequence (the canonical CLAUDE.md re-verify command):
     python3.13 tools/configure.py <ver>
     rm -f objdiff.json gx-spirit-caller_<ver>.nds
-    [--clean: ninja -t clean]
+    [--clean: clean generated outputs; preserve downloaded tools]
     ninja sha1
 
 Then once: `pytest -q tests` (a hard gate). `--invariants`
@@ -48,6 +48,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import subprocess
 import sys
 from pathlib import Path
@@ -56,6 +57,49 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable  # the python3.13 running this script
 REGIONS = ["eur", "usa", "jpn"]
 DSD_MARKER = "0.11"  # the pinned dsd tag (configure.DSD_VERSION = v0.11.0)
+TOOLCHAIN_RULE = "download_tool"
+TOOLCHAIN_MARKERS = (
+    "mwccarm.exe",
+    "mwldarm.exe",
+    "mwasmarm.exe",
+    "wibo",
+    "download_tool.py",
+    "permissionerror",
+    "permission denied",
+    "access is denied",
+    "requests.exceptions.",
+    "zipfile.badzipfile",
+)
+
+
+@dataclass(frozen=True)
+class CommandResult:
+    """The observable result of one gate subprocess."""
+
+    returncode: int
+    output: str = ""
+    infrastructure: bool = False
+
+
+@dataclass(frozen=True)
+class RegionResult:
+    ok: bool
+    infrastructure: bool = False
+
+
+def is_infrastructure_failure(cmd: list[str], output: str, returncode: int) -> bool:
+    """Classify toolchain/download failures without hiding SHA-1 divergence.
+
+    Compiler, linker, assembler, downloader, and locked-file errors mean the
+    build never reached a valid ROM comparison. The SHA-1 script's ordinary
+    ``FAILED`` report contains none of these markers and remains a content
+    failure.
+    """
+    del cmd  # The output carries the tool invocation and its diagnostic.
+    if returncode == 0:
+        return False
+    lowered = output.lower()
+    return any(marker in lowered for marker in TOOLCHAIN_MARKERS)
 
 
 def check_dsd_binary() -> bool:
@@ -89,17 +133,61 @@ def check_dsd_binary() -> bool:
     return True
 
 
-def run(cmd: list[str]) -> int:
-    """Run a command from ROOT, streaming its output live. Returns the exit code."""
+def run(cmd: list[str]) -> CommandResult:
+    """Run from ROOT, stream output live, and retain it for attribution."""
     print(f"\n$ {' '.join(cmd)}", flush=True)
-    return subprocess.run(cmd, cwd=ROOT).returncode
+    try:
+        proc = subprocess.Popen(
+            cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, encoding="utf-8", errors="replace", bufsize=1,
+        )
+    except OSError as exc:
+        output = f"{type(exc).__name__}: {exc}"
+        print(output, flush=True)
+        return CommandResult(1, output, True)
+    lines: list[str] = []
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        print(line, end="", flush=True)
+        lines.append(line)
+    returncode = proc.wait()
+    output = "".join(lines)
+    return CommandResult(
+        returncode, output, is_infrastructure_failure(cmd, output, returncode)
+    )
 
 
-def gate_region(ver: str, clean: bool) -> bool:
+def clean_non_toolchain_outputs() -> CommandResult:
+    """Clean generated outputs while preserving downloaded tool binaries.
+
+    `ninja -t clean` without rule selection also removes outputs of the
+    `download_tool` rule, forcing every `--clean` gate to re-download the
+    compiler bundle and creating avoidable locked-file races between
+    worktrees. Clean every current generated-output rule except the
+    downloader so newly added output rules remain covered automatically.
+    """
+    rules_result = run(["ninja", "-t", "rules"])
+    if rules_result.returncode != 0:
+        return rules_result
+    rules = sorted({
+        line.strip() for line in rules_result.output.splitlines()
+        if line.strip() and not line.startswith("$")
+        and line.strip() != TOOLCHAIN_RULE
+    })
+    if not rules:
+        return CommandResult(1, "ninja reported no generated-output rules", True)
+    return run(["ninja", "-t", "clean", "-r", *rules])
+
+
+def gate_region(ver: str, clean: bool) -> RegionResult:
     print(f"\n{'=' * 20} {ver} {'=' * 20}", flush=True)
-    if run([PY, "tools/configure.py", ver]) != 0:
+    configured = run([PY, "tools/configure.py", ver])
+    if configured.returncode != 0:
+        if configured.infrastructure:
+            print(f"[{ver}] INFRASTRUCTURE ERROR", flush=True)
+            return RegionResult(False, True)
         print(f"[{ver}] CONFIGURE-FAIL", flush=True)
-        return False
+        return RegionResult(False)
     # Clean-tree: always remove the built ROM so `ninja sha1` relinks from
     # current inputs (never trusts a lingering .nds); --clean also wipes the
     # object tree to defeat stale-.o masking on delete/move changes.
@@ -108,14 +196,23 @@ def gate_region(ver: str, clean: bool) -> bool:
             (ROOT / stale).unlink()
         except FileNotFoundError:
             pass
-    if clean and run(["ninja", "-t", "clean"]) != 0:
-        print(f"[{ver}] CLEAN-FAIL", flush=True)
-        return False
-    if run(["ninja", "sha1"]) != 0:
+    if clean:
+        cleaned = clean_non_toolchain_outputs()
+        if cleaned.returncode != 0:
+            if cleaned.infrastructure:
+                print(f"[{ver}] INFRASTRUCTURE ERROR", flush=True)
+                return RegionResult(False, True)
+            print(f"[{ver}] CLEAN-FAIL", flush=True)
+            return RegionResult(False)
+    checked = run(["ninja", "sha1"])
+    if checked.returncode != 0:
+        if checked.infrastructure:
+            print(f"[{ver}] INFRASTRUCTURE ERROR", flush=True)
+            return RegionResult(False, True)
         print(f"[{ver}] SHA1 FAIL", flush=True)
-        return False
+        return RegionResult(False)
     print(f"[{ver}] SHA1 PASS", flush=True)
-    return True
+    return RegionResult(True)
 
 
 def run_tests(invariants: bool) -> bool:
@@ -132,16 +229,17 @@ def run_tests(invariants: bool) -> bool:
     warnings from the region-port headers), and none of it affects the
     byte-identical ROM — `ninja sha1` is the real gate.
     """
-    tests_ok = run([PY, "-m", "pytest", "-q", "tests"]) == 0
+    tests_ok = run([PY, "-m", "pytest", "-q", "tests"]).returncode == 0
     print("[pytest] " + ("OK" if tests_ok else "FAIL"), flush=True)
     if invariants and (ROOT / "tools" / "check_match_invariants.py").exists():
-        rc = run([PY, "tools/check_match_invariants.py"])
+        rc = run([PY, "tools/check_match_invariants.py"]).returncode
         print(f"[invariants] advisory only, NOT a gate (exit {rc}) - the real "
               f"gate is ninja sha1", flush=True)
     return tests_ok
 
 
-def verdict(*, failed: list[str], checks_run: int, tests_ok: bool) -> tuple[str, int]:
+def verdict(*, failed: list[str], checks_run: int, tests_ok: bool,
+            infrastructure: bool = False) -> tuple[str, int]:
     """Return the gate label and exit code from observable checks.
 
     A zero-check invocation is not a successful gate: it is a caller error
@@ -149,6 +247,8 @@ def verdict(*, failed: list[str], checks_run: int, tests_ok: bool) -> tuple[str,
     """
     if checks_run == 0:
         return "VACUOUS", 2
+    if infrastructure:
+        return "INFRASTRUCTURE", 2
     if failed or not tests_ok:
         return "FAIL", 1
     return "PASS", 0
@@ -165,8 +265,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument(
         "--clean", action="store_true",
-        help="force `ninja -t clean` before each region (stale-.o masking guard; "
-             "use when a change deletes or moves source, not for pure additions)",
+        help="clean generated outputs before each region (preserves downloaded "
+             "tools; use when a change deletes or moves source, not for pure additions)",
     )
     ap.add_argument("--no-tests", action="store_true",
                     help="skip the pytest step")
@@ -209,19 +309,24 @@ def main(argv: list[str] | None = None) -> int:
             return 2
     if regions and (ROOT / "tools" / "check_delink_dupes.py").exists():
         print(f"\n{'=' * 20} preflight: delink dupes {'=' * 20}", flush=True)
-        if run([PY, "tools/check_delink_dupes.py"]) != 0:
+        dupes = run([PY, "tools/check_delink_dupes.py"])
+        if dupes.returncode != 0:
             print("\n==================== GATE FAIL ====================", flush=True)
             print("  duplicate delink (see above) - fix before gating", flush=True)
-            return 1
+            return 2 if dupes.infrastructure else 1
     if regions and (ROOT / "tools" / "fix_delink_suffixes.py").exists():
         print(f"\n{'=' * 20} preflight: delink suffixes {'=' * 20}", flush=True)
-        if run([PY, "tools/fix_delink_suffixes.py"]) != 0:
+        suffixes = run([PY, "tools/fix_delink_suffixes.py"])
+        if suffixes.returncode != 0:
             print("\n==================== GATE FAIL ====================", flush=True)
             print("  routed delink header mismatch (see above) - run "
                   "`python tools/fix_delink_suffixes.py --fix`", flush=True)
-            return 1
+            return 2 if suffixes.infrastructure else 1
 
-    failed = [ver for ver in regions if not gate_region(ver, args.clean)]
+    region_results = [gate_region(ver, args.clean) for ver in regions]
+    failed = [ver for ver, result in zip(regions, region_results, strict=True)
+              if not result.ok]
+    infrastructure = any(result.infrastructure for result in region_results)
 
     tests_ok = True
     tests_ran = False
@@ -246,9 +351,12 @@ def main(argv: list[str] | None = None) -> int:
         failed=failed,
         checks_run=len(regions) + int(tests_ran),
         tests_ok=tests_ok,
+        infrastructure=infrastructure,
     )
     print(f"\n{'=' * 20} GATE {label} {'=' * 20}", flush=True)
-    if failed:
+    if failed and infrastructure:
+        print(f"  infrastructure error in: {', '.join(failed)}", flush=True)
+    elif failed:
         print(f"  diverging region(s): {', '.join(failed)}", flush=True)
     if not tests_ok:
         print("  invariants/tests failed", flush=True)
