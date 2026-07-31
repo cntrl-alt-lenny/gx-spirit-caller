@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -37,6 +41,78 @@ class TestArgumentGuard(unittest.TestCase):
         with self.assertRaises(SystemExit) as ctx:
             gate3.main(["--scope", "tests", "--no-tests"])
         self.assertEqual(ctx.exception.code, 2)
+
+
+class TestInfrastructureAttribution(unittest.TestCase):
+    def test_locked_toolchain_download_is_infrastructure(self):
+        output = (
+            "Traceback (most recent call last):\n"
+            "  PermissionError: [Errno 13] Permission denied: "
+            "'tools/mwccarm/2.0/sp1p5/lmgr8c.dll'\n"
+        )
+        self.assertTrue(gate3.is_infrastructure_failure(
+            ["ninja", "sha1"], output, 1))
+
+    def test_compiler_invocation_is_infrastructure(self):
+        output = "FAILED: build/eur/main/func_02000000.o\n./tools/mwccarm/2.0/sp1p5/mwccarm.exe ...\n"
+        self.assertTrue(gate3.is_infrastructure_failure(
+            ["ninja", "sha1"], output, 1))
+
+    def test_sha1_divergence_is_not_infrastructure(self):
+        output = "gx-spirit-caller_eur.nds: FAILED\n"
+        self.assertFalse(gate3.is_infrastructure_failure(
+            ["ninja", "sha1"], output, 1))
+
+    def test_clean_excludes_download_tool_rule(self):
+        calls = []
+
+        def fake_run(cmd):
+            calls.append(cmd)
+            if cmd == ["ninja", "-t", "rules"]:
+                return gate3.CommandResult(
+                    0, "$ ninja -t rules\n download_tool\n mwcc\n phony\n")
+            return gate3.CommandResult(0)
+
+        with patch.object(gate3, "run", side_effect=fake_run):
+            result = gate3.clean_non_toolchain_outputs()
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(calls[1][:4], ["ninja", "-t", "clean", "-r"])
+        self.assertNotIn("download_tool", calls[1])
+
+    def _run_synthetic_gate(self, ninja_output, infrastructure):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tools").mkdir()
+            (root / "tools" / "configure.py").write_text("# fixture\n")
+
+            def fake_run(cmd):
+                if cmd == ["ninja", "sha1"]:
+                    return gate3.CommandResult(1, ninja_output, infrastructure)
+                return gate3.CommandResult(0)
+
+            stdout = io.StringIO()
+            with patch.object(gate3, "ROOT", root), \
+                    patch.object(gate3, "check_dsd_binary", return_value=True), \
+                    patch.object(gate3, "run", side_effect=fake_run), \
+                    contextlib.redirect_stdout(stdout):
+                exit_code = gate3.main(["--scope", "eur", "--no-tests"])
+            return exit_code, stdout.getvalue()
+
+    def test_gate_exits_two_and_avoids_sha1_fail_for_infrastructure(self):
+        exit_code, output = self._run_synthetic_gate(
+            "PermissionError: [Errno 13] Permission denied: lmgr8c.dll\n",
+            True,
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertIn("INFRASTRUCTURE ERROR", output)
+        self.assertNotIn("SHA1 FAIL", output)
+
+    def test_gate_exits_one_and_reports_real_sha1_divergence(self):
+        exit_code, output = self._run_synthetic_gate(
+            "gx-spirit-caller_eur.nds: FAILED\n", False)
+        self.assertEqual(exit_code, 1)
+        self.assertIn("SHA1 FAIL", output)
+        self.assertIn("GATE FAIL", output)
 
 
 
