@@ -11122,7 +11122,7 @@ src/main/func_02063a4c.s:
     complete
     .text start:0x02063a4c end:0x02063ae0
 
-src/main/func_02063ae0.s:
+src/main/func_02063ae0.legacy_sp3.c:
     complete
     .text start:0x02063ae0 end:0x02063c90
 
@@ -11471,7 +11471,7 @@ src/main/func_020673dc.c:
     complete
     .text start:0x020673dc end:0x02067438
 
-src/main/func_02067438.s:
+src/main/func_02067438.legacy_sp3.c:
     complete
     .text start:0x02067438 end:0x02067560
 
