@@ -629,6 +629,12 @@ PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled 
 
 Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — NATURAL C only: readable C recovered by hand, excluding `asm { }`-bodied `.c` files (those are byte-matched placeholders wearing a `.c` extension…
 
+### `tools/generate_state_table.py`
+
+**regenerate docs/state-table.md, the committed**
+
+snapshot of "where the project actually is".
+
 ### `tools/integrate.py`
 
 **deterministic merge-round driver for the brain lane.**
