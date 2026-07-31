@@ -15,9 +15,9 @@ quote. `asm-C` is inline-asm coverage hygiene, counted separately on purpose.
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 287,662 | **12.06%** | 3,456 | 12.20% |
-| usa | 233,040 | **9.77%** | 2,540 | 9.88% |
-| jpn | 232,612 | **9.75%** | 2,548 | 9.86% |
+| eur | 292,294 | **12.25%** | 3,456 | 12.40% |
+| usa | 236,304 | **9.91%** | 2,540 | 10.01% |
+| jpn | 235,876 | **9.89%** | 2,548 | 10.00% |
 
 ## EUR candidates by function size
 
@@ -28,21 +28,21 @@ much of the project is still locked in functions of that size.
 | size (bytes) | done | todo | done % | remaining pp | mean todo |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1–148 | 4,078 | 1,620 | 71.6% | 6.91 | 101 |
-| 149–256 | 231 | 1,446 | 13.8% | 12.00 | 198 |
-| 257–512 | 57 | 1,335 | 4.1% | 19.96 | 356 |
+| 149–256 | 244 | 1,433 | 14.5% | 11.90 | 198 |
+| 257–512 | 63 | 1,329 | 4.5% | 19.87 | 356 |
 | 513–1023 | 11 | 614 | 1.8% | 18.16 | 705 |
 | 1024–2047 | 0 | 221 | 0.0% | 12.99 | 1,401 |
 | 2048+ | 0 | 114 | 0.0% | 17.22 | 3,603 |
-| **total** | **4,377** | **5,350** | | **87.24** | |
+| **total** | **4,396** | **5,331** | | **87.05** | |
 
-Shipped `.text`: 291,118 B · remaining `.text`: 2,081,542 B · denominator: 2,385,948 B
+Shipped `.text`: 295,750 B · remaining `.text`: 2,076,910 B · denominator: 2,385,948 B
 
 ## EUR data typing
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 139,104 | 2.91% |
-| Named-struct | 50,112 | 1.05% |
+| Typed-array | 158,304 | 3.31% |
+| Named-struct | 52,040 | 1.09% |
 | *(total data bytes)* | 4,776,528 | |
 
 `Typed-array` counts any file-scope array declaration, including opaque
