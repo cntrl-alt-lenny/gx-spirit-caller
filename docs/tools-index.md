@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**122 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**123 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (50)
+- [Uncategorised](#uncategorised) (51)
 
 ## Analysis / worklist
 
@@ -628,6 +628,12 @@ PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled 
 **Combined per-region progress-bar SVG (one card, three nested bars).**
 
 Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — NATURAL C only: readable C recovered by hand, excluding `asm { }`-bodied `.c` files (those are byte-matched placeholders wearing a `.c` extension…
+
+### `tools/generate_state_table.py`
+
+**regenerate docs/state-table.md, the committed**
+
+snapshot of "where the project actually is".
 
 ### `tools/integrate.py`
 
