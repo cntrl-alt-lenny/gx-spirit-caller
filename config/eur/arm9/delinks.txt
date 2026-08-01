@@ -3115,7 +3115,7 @@ src/main/func_0201a5f4.s:
     complete
     .text start:0x0201a5f4 end:0x0201a778
 
-src/main/func_0201a778.s:
+src/main/func_0201a778.c:
     complete
     .text start:0x0201a778 end:0x0201a824
 src/main/func_0201a824.c:
