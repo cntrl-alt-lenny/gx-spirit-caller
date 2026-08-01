@@ -1,7 +1,7 @@
 ; Cluster A .bss wave 1 — main module residue (after 10-symbol pilot at 0x02102c60).
 ; Per brief 116. mwasmarm syntax + dsd LCF auto-routing.
 ;
-; 9 .bss symbols, range 0x021a1874..0x021a1998.
+; 8 .bss symbols, range 0x021a1874..0x021a1974.
 ; split from the original single-TU cluster to carve out matched symbols (fragment 5 of 5, cm-bss-convert-1).
 ; split from the original cluster to carve out matched symbols (fragment 4 of 8, cm-bss-convert-2).
 
@@ -31,6 +31,3 @@ data_021a1938:
         .global data_021a1960
 data_021a1960:
         .space 0x14
-        .global data_021a1974
-data_021a1974:
-        .space 0x24

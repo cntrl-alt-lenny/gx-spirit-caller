@@ -1,6 +1,7 @@
 ; Cluster A wave 4 — overlay 007 (brief 139).
 ; mwasmarm syntax + dsd LCF auto-routing.
-; 47 .bss symbols, range 0x021b3480..0x02233580.
+; 44 .bss symbols, range 0x021b3480..0x022334d0.
+; split from the original cluster to carve out matched symbols (fragment 1 of 2, cm-bss-convert-6).
 
         .bss
 
@@ -136,12 +137,3 @@ data_ov007_0223194e:
         .global data_ov007_022334c4
 data_ov007_022334c4:
         .space 0xc
-        .global data_ov007_022334d0
-data_ov007_022334d0:
-        .space 0x50
-        .global data_ov007_02233520
-data_ov007_02233520:
-        .space 0xc
-        .global data_ov007_0223352c
-data_ov007_0223352c:
-        .space 0x54

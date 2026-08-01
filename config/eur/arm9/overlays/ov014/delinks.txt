@@ -190,4 +190,20 @@ src/overlay014/sinit_ov014_021b4c70.c:
 
 src/overlay014/bss/data_ov014_bss.s:
     complete
-    .bss start:0x021b5040 end:0x02235180
+    .bss start:0x021b5040 end:0x02235094
+
+src/overlay014/data_ov014_02235094.c:
+    complete
+    .bss start:0x02235094 end:0x022350e0
+
+src/overlay014/bss/data_ov014_bss_2.s:
+    complete
+    .bss start:0x022350e0 end:0x022350f4
+
+src/overlay014/data_ov014_022350f4.c:
+    complete
+    .bss start:0x022350f4 end:0x02235150
+
+src/overlay014/bss/data_ov014_bss_3.s:
+    complete
+    .bss start:0x02235150 end:0x02235180
