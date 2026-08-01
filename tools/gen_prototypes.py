@@ -45,6 +45,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from parsers import parse_delinks_file  # noqa: E402
+try:
+    from tools.progress import _strip_c_comments_and_literals  # noqa: E402
+except ModuleNotFoundError:  # direct ``python tools/gen_prototypes.py`` entry
+    from progress import _strip_c_comments_and_literals  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config" / "eur" / "arm9"
@@ -71,9 +75,8 @@ _TYPE_TOKEN_RE = re.compile(
 
 
 def _strip_comments(text: str) -> str:
-    text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
-    text = re.sub(r"//[^\n]*", "", text)
-    return text
+    """Blank comments and literals while preserving source positions."""
+    return _strip_c_comments_and_literals(text)
 
 
 def _find_matching_paren(text: str, open_pos: int) -> int | None:
