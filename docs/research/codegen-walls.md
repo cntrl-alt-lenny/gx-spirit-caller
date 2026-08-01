@@ -7341,7 +7341,7 @@ results that look contradictory until read carefully.
 **On a load / return path:** array-indexed struct-field access
 (`arr[j].field`) reproduced the target's non-strength-reduced,
 recomputed-index form, where the mathematically identical raw pointer
-arithmetic (`*(T *)(base + j * sizeof(T)) `-style) got strength-reduced
+arithmetic (`*(T *)(base + j * sizeof(T))`-style) got strength-reduced
 by mwcc into an induction variable the target doesn't have — confirmed
 concretely in `func_ov006_021b66c4` (cm-ov002-unknown-sweep-13).
 
