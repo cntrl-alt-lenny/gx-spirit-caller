@@ -6950,6 +6950,19 @@ verified via `fastmatch.py` against the real delinked gap object, and
 function** (`func_ov002_0224b0b0`, a 4-guard-check variant of the same
 loop shape) with the identical recipe, identical result.
 
+> **Correction (cm-ov002-unknown-sweep-12):** re-checking this claim
+> directly against the project's real `fastmatch.py` found it does not
+> hold up — `func_ov002_02250540` re-compiled from this exact recipe
+> currently lands at 60.5%, not 100%, blocked by a register-preference
+> mismatch (`r3` vs `r10`/`sl`) unrelated to the loop-triangle lever
+> itself. The loop-body triangle and the guard-condition-code shape
+> documented above are still correct and still real (see C-64 for the
+> guard mechanism specifically), but this entry's "verified 100%,
+> instruction-for-instruction" language was an overclaim for this
+> specific target — left uncorrected in the paragraph above for an
+> honest record of the error; treat `func_ov002_0224b0b0`'s claimed
+> confirmation with the same caveat pending its own re-check.
+
 **Ablation (what the mechanism actually is):** swapping the relative
 order of the index and cursor declarations (cursor-before-index instead
 of index-before-cursor, both still ahead of the guard clause) flips
@@ -7085,6 +7098,198 @@ was the correct operator, with the two forms' instruction sequences
 distinct enough to fully resolve once compared side by side.
 
 **Provenance:** cm-ov002-unknown-sweep-11 (2026-07-31), batch 5.
+
+### C-63. A row-table sub-field indexed by a genuine runtime variable (not a small fixed column) is a THIRD addressing family, distinct from C-60's Family A/B — materialize the row pointer, add the constant sub-offset as a separate step, then use plain array-subscript syntax
+
+**Background — direct investigation of sweep-11's flagged `rowBase+0x120+idx*4`
+residual** (`func_ov002_02221348`, `func_ov002_0224f4a0`, `func_ov002_02236bbc`
+— all resisted both of C-60's Family-A/B phrasings identically). The reason
+they resisted both: they aren't a C-60 Family-A/B case at all. C-60's
+families are about a **fixed, small column selector** (a struct field or
+narrow enum) multiplied by a column stride. These three instead index a
+sub-array within the row by a **genuine runtime variable** — an actual loop
+index or forwarded argument — for which mwcc's natural array-subscript
+addressing mode is simpler than either of C-60's families and was never
+tried because everyone was pattern-matching to the wrong family.
+
+**The shape, confirmed via standalone `mwccarm 2.0/sp1p5` compilation
+against a synthetic reproduction of `data_ov002_022cf16c`'s row stride
+(`0x868`) and this sub-table's fixed offset (`0x120`):**
+
+```c
+int *p = (int *)(data_ov002_022cf16c + (player & 1) * 0x868);
+p = (int *)((char *)p + 0x120);
+return p[idx];   /* idx: a genuine runtime value, not a fixed column */
+```
+
+```asm
+
+mla  r1, r0, r1, r3        ; r1 = row*0x868 + &table            (unchanged from C-60 Family A)
+add  r0, r1, #0x120          ; r0 = r1 + 0x120                    -- SEPARATE add, constant only
+ldr  r0, [r0, r2, lsl #0x2]    ; r0 = *(r0 + idx*4)                   -- register-indexed load,
+                                                                          shift embedded in the LDR
+
+```
+
+This is instruction-for-instruction what `func_ov002_0224f4a0` needs. The
+load-bearing detail: **the intermediate pointer must already be `int`-typed
+(not `char *`) before the `+0x120` adjustment is applied**, and that
+adjustment must be a separate reassignment, not folded into the same
+expression as the initial row computation:
+
+```c
+int *p = (int *)(data_ov002_022cf16c + (player & 1) * 0x868);  /* int* from the start */
+p = (int *)((char *)p + 0x120);                                 /* separate reassignment */
+return p[idx];
+```
+
+A version that stays `char *` through the `+0x120` step and only casts to
+`int *` at the point of indexing (`((int *)p)[idx]`) compiles to a
+DIFFERENT, non-matching instruction order (idx folded into an `add` before
+the row computation's constant, with `#0x120` ending up as the LDR's
+immediate instead of the register-shifted index) — confirmed as a real,
+reproducible negative result via the same standalone method, not assumed.
+
+**Shipped, 100%:** `func_ov002_0224f4a0` (168B) — the full function,
+including its two-field packed-bitfield row entry (a 13-bit `id` at bits
+0–12, matching the existing `Ov002Slot.id:13` convention, plus an
+8-bit/1-bit pair combined by the *caller* as `category*2 + flag` for a
+second callee argument) and a redundant same-address memory reload for a
+stored-pointer field (`data_ov002_022ce288+0x48c`) that must be re-read via
+two independent dereference expressions rather than cached in a local, or
+the compiler keeps the cached register live and drops the reload
+instruction the target actually has.
+
+**Confirmed present but not fully closed:** `func_ov002_02221348` (the
+same `+0x120` access recurs verbatim inside a 5-way branch, alongside a
+SECOND, unrelated table access and a complex multi-argument packed-halfword
+call whose exact semantics weren't reverse-engineered this round) and
+`func_ov002_02236bbc` (a related `+0x5d0` access on the same table, reached
+through a computed-goto 5-case switch; the row pointer here is built via a
+plain `mul`+separate base-load rather than `mla`, because the row byte
+offset is a shared subexpression reused for a second, unrelated 1D table
+lookup first — a CSE side effect, not a new addressing family). Both
+recurrences confirm the SAME `mla`-or-`mul` → separate-const-`add` →
+shifted-register-`ldr` shape; both remain parked because of unrelated
+surrounding complexity (multi-way switch bodies, unresolved call-argument
+packing), not because the addressing lever failed.
+
+**Provenance:** cm-ov002-unknown-sweep-12, investigated directly per the
+coordinating process's explicit request to take sweep-11's two isolated,
+still-open mechanisms head-on.
+
+### C-64. LS-vs-EQ condition code for an `unsigned x <= 0` guard is controlled by whether the check is mwcc's OWN synthesized for-loop trip-count pre-check or a hand-written guard — not by goto-vs-predicated source syntax
+
+**Background.** Sweep-11 flagged 3 instances (`func_ov002_0223cfec`,
+`func_ov002_02286c9c`, plus the investigator's own hit during the C-61
+work) where an `unsigned int count <= 0` guard needed the real target's
+`LS` condition code, and attributed the mismatch to goto-branch vs
+predicated-inline-return source structure. That attribution doesn't
+survive direct testing — it was a correlation from too few data points,
+not the real mechanism.
+
+**Falsified directly, via standalone `mwccarm 2.0/sp1p5` compilation:**
+a hand-written `if (count <= 0) { return; }` and a hand-written
+`if (count <= 0) { goto skip; }` (skip: elsewhere) compile
+**identically** — both fold the unsigned `<=0` test to `EQ`
+(`moveq`/`popeq`), regardless of predicated-return-vs-goto source syntax,
+regardless of how much code the guard skips (tested with a trivial
+early-return and with a real loop behind it), and regardless of register
+pressure (tested with 3 and with 10 callee-saved registers live). None of
+these move the needle — goto-vs-predicate was never the lever.
+
+**What actually produces `LS`:** the check must be mwcc's OWN
+synthesized entry pre-check for a genuine `for` loop, not any hand-written
+`if`. A bare `for (i = 0; i < count; i++) { ... }` — no manual guard
+at all — produces `cmp count, #0; popls {...}` (a predicated `LS` skip)
+for the trip-count-zero case, confirmed on the first try:
+
+```c
+for (i = 0; i < count; i++) {
+    func_a(player, i, count);
+}
+```
+```asm
+
+cmp  r5, #0
+popls  {r4, r5, r6, pc}         ; LS -- the for-loop's OWN pre-check, never
+                                    hand-written, never algebraically folded
+                                    to EQ the way an explicit if(...) is
+
+```
+
+**Whether the pre-check if-converts to a predicated skip (`popls`) or
+compiles to a genuine branch (`bls <label>`) depends on how much
+if-conversion has already happened earlier in the same function** — not
+on anything source-local to the guard itself. A bare for-loop as the
+*first* thing in a function if-converts to `popls`. The exact same
+for-loop, appended after 3 other early-return guards that already
+if-converted (matching `func_ov002_0223cfec`'s real shape: 3 prior
+`movne`/`moveq`-predicated guards, each behind a real call, before this
+one), compiles to a genuine `cmp r7, #0; bls <label>` instead — confirmed
+by faithfully reproducing that function's full preceding call sequence
+in a standalone TU and observing the branch form appear only once that
+context was present. This is consistent with an if-conversion pass that
+has a per-function budget or diminishing eligibility, not a per-guard
+source-level choice — **not yet pinned down further, flagged as its own
+open question**, but the practical lever (write a real `for` loop, don't
+hand-write the guard) is established regardless of which form it lands as.
+
+**Trip-count source can differ from the loop-continuation source** — this
+is what makes the C-61 family's specific shape possible at all. Write the
+loop bound as a plain `for` condition, then **reassign that same variable
+at the end of the loop body** to a value reloaded from a different
+location for the *next* iteration's test:
+
+```c
+unsigned int count = *(unsigned int *)(table_a + row);   /* entry check reads table_a */
+for (i = 0; i < count; i++) {
+    ...
+    count = *(unsigned int *)(table_b + row + 0x10);       /* re-test reads table_b, every iteration */
+}
+```
+
+This reproduces the exact two-table shape `func_ov002_02250540` and
+`func_ov002_0223cfec` both have (an entry-only `data_ov002_022cf17c`
+count check, a per-iteration `data_ov002_022cf16c+0x10` re-test) —
+confirmed via standalone compilation; the `LS`/branch-vs-predicate
+question above was verified specifically using this two-table form.
+
+**Honest scope — mechanism confirmed, not a full ship this round.**
+Reapplying this corrected for-loop shape to `func_ov002_02250540`
+(the original C-61 investigation vehicle, still parked — its documented
+"verified 100%" claim from cm-ov002-unknown-sweep-11 does not hold up on
+re-check with the project's real fastmatch.py: the guard/loop shape
+above closes correctly, but a SEPARATE, so-far-unmoved register-preference
+mismatch remains — `r3` vs `r10`/`sl` as the seventh callee-saved
+register, present regardless of do-while-vs-for-loop structure) — treat
+that entry's "instruction-for-instruction" language as an overclaim,
+corrected here. `func_ov002_0223cfec` and `func_ov002_02286c9c` were not
+attempted end-to-end this round (both have substantial additional loop-
+body complexity — packed-bitfield address computation, a second
+early-exit condition — well beyond the guard clause); the guard/pre-check
+mechanism above is verified via faithful standalone reproduction of each
+function's preceding call sequence, not via a real ship on either.
+
+**Provenance:** cm-ov002-unknown-sweep-12, investigated directly per the
+coordinating process's explicit request; supersedes the goto-vs-predicated
+attribution in C-61's confirmation addendum, which this entry corrects.
+
+> **Independent confirmation, same round, from a worker who arrived at
+> it separately.** Working ordinary plain-selection candidates with no
+> knowledge of this entry, a batch hit the identical `EQ`-not-`LS`
+> pattern 3 times (`func_ov002_0224bbd8`, `func_02089418`, partially on
+> a third) and independently converged on the same conclusion this
+> entry does — their own words: "the same register-set-correct,
+> letter/condition-assignment-scrambled family... just manifesting as a
+> condition-code bit rather than a register letter." Their fix
+> (do-while with the counter declared/initialized before the guard)
+> reliably improved match percentage (63.6%→77.3% and 17.3%→90.0%) but,
+> consistent with the mechanism above, **never flipped `EQ` back to
+> `LS` on its own** — a hand-restructured do-while is still a
+> hand-written guard, not the compiler's own synthesized `for`-loop
+> pre-check, so this is confirmation of the mechanism's boundary, not a
+> contradiction of it.
 
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
