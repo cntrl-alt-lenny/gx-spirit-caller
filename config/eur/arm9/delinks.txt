@@ -3897,7 +3897,7 @@ src/main/func_0201e80c.c:
 
 
 
-src/main/func_0201e818.s:
+src/main/func_0201e818.c:
     complete
     .text start:0x0201e818 end:0x0201e8c4
 
@@ -19201,7 +19201,7 @@ src/main/func_020a5a94.s:
     complete
     .text start:0x020a5a94 end:0x020a5b44
 
-src/main/func_020a5b44.s:
+src/main/func_020a5b44.legacy.c:
     complete
     .text start:0x020a5b44 end:0x020a5c80
 
