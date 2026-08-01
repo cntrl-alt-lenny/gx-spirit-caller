@@ -258,5 +258,5 @@ tier (not the safe reloc-pairing tier) resolves its data reference, it
 could silently bind to the target's unrelated same-numbered object.
 This is a process risk for future porting work on these 105 addresses,
 not a defect in anything on disk today. See
-[`q-cross-region-alias-guard`](queue/codex-scaffolder.md) for the
+[`q-cross-region-alias-guard`](../queue/codex-scaffolder.md) for the
 concrete mitigation filed against this.
