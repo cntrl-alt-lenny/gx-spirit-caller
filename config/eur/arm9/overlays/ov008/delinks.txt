@@ -386,4 +386,12 @@ src/overlay008/data/data_ov008_021b2710.c:
 
 src/overlay008/bss/data_ov008_bss.s:
     complete
-    .bss start:0x021b2780 end:0x021b2f40
+    .bss start:0x021b2780 end:0x021b2cec
+
+src/overlay008/data_ov008_021b2cec.c:
+    complete
+    .bss start:0x021b2cec end:0x021b2d28
+
+src/overlay008/bss/data_ov008_bss_2.s:
+    complete
+    .bss start:0x021b2d28 end:0x021b2f40
