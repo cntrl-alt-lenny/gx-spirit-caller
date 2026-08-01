@@ -232,6 +232,34 @@ Proposed fix direction (not prescribed — pick what's right after investigating
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a new regression test asserting a TU with ONLY a bracket-less scalar struct instance (whose typedef body contains an array field) does NOT credit `typed_array_bytes` + before/after `python tools/progress.py --version eur` showing `Typed-array` drops by exactly 1792 B (the 3 files above) with `Named-struct` unchanged.
 
+### q-zero-width-bss-tu-fix — dsd's delink/LCF stage rejects a zero-width `.bss` TU [TODO]
+
+Filed by the Claude Scaffolder lane after hitting a real build failure in `cm-bss-convert-4` (PR #1413) while carving `data_ov001_021ca420_alias` — the canonical partial-coverage-trap symbol (`data_ov001_021ca420`, a 0-byte marker aliased to its real 32-byte storage under a second name, the established C-34 literal-pool-dedup trick documented in `docs/research/codegen-walls.md`). This is build-tooling correctness, not data-carving, so filing here rather than fixing it in that lane.
+
+**The failure:** carving the 32-byte alias out into its own `.c` TU, while leaving the 0-byte marker alone in its original `bss/*.s` cluster file, produces this `delinks.txt`:
+
+```
+src/overlay001/bss/data_ov001_bss.s:
+    complete
+    .bss start:0x021ca420 end:0x021ca420
+
+src/overlay001/data_ov001_021ca420_alias.c:
+    complete
+    .bss start:0x021ca420 end:0x021ca440
+```
+
+The first entry is genuinely zero-width (`start == end`) — the marker's `.space 0x0` contributes no bytes to the section at all, so its whole reason for existing is the symbol name, not any storage. `ninja sha1` never gets a chance to run: the delink/LCF generation step itself fails first —
+
+```
+Error: .bss in file 'src/overlay001/bss/data_ov001_bss.s' has mixed section order with previous file 'data_ov001_021ca420_alias.c'
+```
+
+**Why this is new, not a repeat of an already-solved wall:** every prior `.bss` carve wave (1 through 4, ~40 symbols shipped total, see `docs/research/data/cm-bss-convert-{1,2,3,4}-*.md`) split cluster files by peeling a target off the front, middle, or back of a run of *nonzero*-sized symbols. When a target was the very first symbol in a cluster (a "front-peel"), the carve tooling simply emits **no** preceding fragment entry at all — there was never a genuine zero-width TU in any of those ~40 conversions. This case is different only because the *thing being kept behind* is itself 0 bytes, which is exactly what the C-34 dedup convention requires (a nonexistent object can't have a nonzero size). Confirmed as the sole cause: reverting only this one symbol's carve made `ninja sha1` pass immediately on the same branch, with the other 8 unrelated carves in that same PR shipping cleanly.
+
+**What's needed:** find whichever tool actually rejects this — most likely somewhere in the delink-stage/LCF-generation path invoked by `ninja` before `dsd rom build` (the error string `"has mixed section order"` should `grep` straight to it, whether that's in `dsd` itself, a wrapper script under `tools/`, or `patch_section_align.py`) — and determine whether a zero-width `.bss` TU can be made legal there, or whether the real fix is one level up: teach whatever writes `delinks.txt`/calls this validator to treat a zero-width TU as a no-op that should be *omitted* from the file list entirely rather than emitted and rejected. The reconciled C is already correct and ready to ship (`data_ov001_021ca420_alias` in `docs/research/data/cm-bss-convert-4-2026-07-31.md`) — this item only needs to unblock the mechanical split.
+
+**Gate:** demonstrate the exact `data_ov001_021ca420_alias` split above builds (`python tools/configure.py eur && ninja sha1` OK) with the 0-byte marker's TU entry either accepted as zero-width or auto-omitted — plus `python -m pytest -q tests` no-new-failures. If investigation concludes this can't be fixed in the tool and must stay a permanent carve-time constraint instead, that's a valid completion too — write up the mechanism and the specific constraint for future carve waves to check against before attempting a similar split.
+
 ### q-activation-invariant-classifier — classify named C functions from authoritative metadata [DONE]
 
 Fix `tools/check_activation_invariant.py`: named function files such as `Ov015_InitScroller.c` are currently reported as DATA because the classifier only recognizes `func_*`. Use the region's `delinks.txt`/`symbols.txt` metadata for `kind:function` vs data, with the existing filename-prefix fallback when metadata is unavailable. Add a synthetic named-function missing-activation failure test and recheck known-good PR #1387 and #1388 ranges. Report the real-range function/data split before and after.
