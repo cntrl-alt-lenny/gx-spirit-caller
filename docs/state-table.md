@@ -15,7 +15,7 @@ quote. `asm-C` is inline-asm coverage hygiene, counted separately on purpose.
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 300,610 | **12.60%** | 3,456 | 12.74% |
+| eur | 306,818 | **12.86%** | 3,456 | 13.00% |
 | usa | 236,636 | **9.92%** | 2,540 | 10.03% |
 | jpn | 236,208 | **9.90%** | 2,548 | 10.01% |
 
@@ -28,14 +28,14 @@ much of the project is still locked in functions of that size.
 | size (bytes) | done | todo | done % | remaining pp | mean todo |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1–148 | 4,078 | 1,620 | 71.6% | 6.91 | 101 |
-| 149–256 | 259 | 1,418 | 15.4% | 11.78 | 198 |
-| 257–512 | 78 | 1,314 | 5.6% | 19.64 | 356 |
+| 149–256 | 278 | 1,399 | 16.6% | 11.62 | 198 |
+| 257–512 | 86 | 1,306 | 6.2% | 19.54 | 357 |
 | 513–1023 | 11 | 614 | 1.8% | 18.16 | 705 |
 | 1024–2047 | 0 | 221 | 0.0% | 12.99 | 1,401 |
 | 2048+ | 0 | 114 | 0.0% | 17.22 | 3,603 |
-| **total** | **4,426** | **5,301** | | **86.70** | |
+| **total** | **4,453** | **5,274** | | **86.44** | |
 
-Shipped `.text`: 304,066 B · remaining `.text`: 2,068,594 B · denominator: 2,385,948 B
+Shipped `.text`: 310,274 B · remaining `.text`: 2,062,386 B · denominator: 2,385,948 B
 
 ## EUR data typing
 
