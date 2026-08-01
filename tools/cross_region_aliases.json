@@ -1,0 +1,842 @@
+[
+  {
+    "module": "main",
+    "name": "data_02102c64",
+    "addr": "0x02102c64",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_02104003",
+    "addr": "0x02104003",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_02181906",
+    "addr": "0x02181906",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_02186ae8",
+    "addr": "0x02186ae8",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219190b",
+    "addr": "0x0219190b",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_02191f40",
+    "addr": "0x02191f40",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219a834",
+    "addr": "0x0219a834",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219b2d4",
+    "addr": "0x0219b2d4",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219b2fc",
+    "addr": "0x0219b2fc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219c408",
+    "addr": "0x0219c408",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219d068",
+    "addr": "0x0219d068",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219d9a8",
+    "addr": "0x0219d9a8",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219d9c0",
+    "addr": "0x0219d9c0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219d9f4",
+    "addr": "0x0219d9f4",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219e3f4",
+    "addr": "0x0219e3f4",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219e434",
+    "addr": "0x0219e434",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219ecdc",
+    "addr": "0x0219ecdc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_0219ef10",
+    "addr": "0x0219ef10",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a18b8",
+    "addr": "0x021a18b8",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a1938",
+    "addr": "0x021a1938",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a6300",
+    "addr": "0x021a6300",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a63c0",
+    "addr": "0x021a63c0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a6630",
+    "addr": "0x021a6630",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a66c0",
+    "addr": "0x021a66c0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a832c",
+    "addr": "0x021a832c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a83e0",
+    "addr": "0x021a83e0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a9848",
+    "addr": "0x021a9848",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a9880",
+    "addr": "0x021a9880",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "main",
+    "name": "data_021a9940",
+    "addr": "0x021a9940",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov000",
+    "name": "data_ov000_021c752c",
+    "addr": "0x021c752c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cd310",
+    "addr": "0x022cd310",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cd444",
+    "addr": "0x022cd444",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cf18c",
+    "addr": "0x022cf18c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cf194",
+    "addr": "0x022cf194",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cf1a2",
+    "addr": "0x022cf1a2",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022cf1ac",
+    "addr": "0x022cf1ac",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022d0f2c",
+    "addr": "0x022d0f2c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022d0fda",
+    "addr": "0x022d0fda",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022d197f",
+    "addr": "0x022d197f",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov002",
+    "name": "data_ov002_022d1a9c",
+    "addr": "0x022d1a9c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov003",
+    "name": "data_ov003_021cf588",
+    "addr": "0x021cf588",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_02210fdc",
+    "addr": "0x02210fdc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_022901f7",
+    "addr": "0x022901f7",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_02291956",
+    "addr": "0x02291956",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_02291d38",
+    "addr": "0x02291d38",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_022923dc",
+    "addr": "0x022923dc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_02292550",
+    "addr": "0x02292550",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_022925d0",
+    "addr": "0x022925d0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov004",
+    "name": "data_ov004_02292610",
+    "addr": "0x02292610",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov005",
+    "name": "data_ov005_021b1cb4",
+    "addr": "0x021b1cb4",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov005",
+    "name": "data_ov005_021b1cdc",
+    "addr": "0x021b1cdc",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov005",
+    "name": "data_ov005_021b1d4c",
+    "addr": "0x021b1d4c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_021d01fd",
+    "addr": "0x021d01fd",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_021d1919",
+    "addr": "0x021d1919",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_0224194f",
+    "addr": "0x0224194f",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_0224f2e8",
+    "addr": "0x0224f2e8",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_02251950",
+    "addr": "0x02251950",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov006",
+    "name": "data_ov006_0225df3c",
+    "addr": "0x0225df3c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov007",
+    "name": "data_ov007_021b4002",
+    "addr": "0x021b4002",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov007",
+    "name": "data_ov007_021c1918",
+    "addr": "0x021c1918",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov007",
+    "name": "data_ov007_021d01fd",
+    "addr": "0x021d01fd",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov007",
+    "name": "data_ov007_021d1919",
+    "addr": "0x021d1919",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov007",
+    "name": "data_ov007_0223194e",
+    "addr": "0x0223194e",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov008",
+    "name": "data_ov008_021b2680",
+    "addr": "0x021b2680",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021b0fdc",
+    "addr": "0x021b0fdc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021b1917",
+    "addr": "0x021b1917",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021b4002",
+    "addr": "0x021b4002",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021c1918",
+    "addr": "0x021c1918",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021d01fd",
+    "addr": "0x021d01fd",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_021d1919",
+    "addr": "0x021d1919",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov009",
+    "name": "data_ov009_0223194e",
+    "addr": "0x0223194e",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov010",
+    "name": "data_ov010_021b8b2c",
+    "addr": "0x021b8b2c",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov010",
+    "name": "data_ov010_021b92b8",
+    "addr": "0x021b92b8",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov010",
+    "name": "data_ov010_021b98f0",
+    "addr": "0x021b98f0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov011",
+    "name": "data_ov011_021d3f20",
+    "addr": "0x021d3f20",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov011",
+    "name": "data_ov011_021d3fcc",
+    "addr": "0x021d3fcc",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov011",
+    "name": "data_ov011_021d4000",
+    "addr": "0x021d4000",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov011",
+    "name": "data_ov011_021d40c0",
+    "addr": "0x021d40c0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov012",
+    "name": "data_ov012_021cc6a0",
+    "addr": "0x021cc6a0",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov012",
+    "name": "data_ov012_021cc78c",
+    "addr": "0x021cc78c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov013",
+    "name": "data_ov013_021cbb20",
+    "addr": "0x021cbb20",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov014",
+    "name": "data_ov014_021c1918",
+    "addr": "0x021c1918",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov014",
+    "name": "data_ov014_021d01fd",
+    "addr": "0x021d01fd",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov014",
+    "name": "data_ov014_021d1919",
+    "addr": "0x021d1919",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov014",
+    "name": "data_ov014_0223194e",
+    "addr": "0x0223194e",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov015",
+    "name": "data_ov015_021b5ce4",
+    "addr": "0x021b5ce4",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov015",
+    "name": "data_ov015_021b5d14",
+    "addr": "0x021b5d14",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov016",
+    "name": "data_ov016_021bab44",
+    "addr": "0x021bab44",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov017",
+    "name": "data_ov017_021b8470",
+    "addr": "0x021b8470",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov017",
+    "name": "data_ov017_021b867c",
+    "addr": "0x021b867c",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov017",
+    "name": "data_ov017_021b8794",
+    "addr": "0x021b8794",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov017",
+    "name": "data_ov017_021b8894",
+    "addr": "0x021b8894",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov018",
+    "name": "data_ov018_021ad7a4",
+    "addr": "0x021ad7a4",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov020",
+    "name": "data_ov020_021adf80",
+    "addr": "0x021adf80",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov020",
+    "name": "data_ov020_021adfa4",
+    "addr": "0x021adfa4",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov020",
+    "name": "data_ov020_021ae948",
+    "addr": "0x021ae948",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021b0fdc",
+    "addr": "0x021b0fdc",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021b1917",
+    "addr": "0x021b1917",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021b4002",
+    "addr": "0x021b4002",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021c1918",
+    "addr": "0x021c1918",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021d01fd",
+    "addr": "0x021d01fd",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_021d1919",
+    "addr": "0x021d1919",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov021",
+    "name": "data_ov021_0222194d",
+    "addr": "0x0222194d",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov022",
+    "name": "data_ov022_021aba18",
+    "addr": "0x021aba18",
+    "eur_kind": "data",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  },
+  {
+    "module": "ov022",
+    "name": "data_ov022_021ac7f4",
+    "addr": "0x021ac7f4",
+    "eur_kind": "bss",
+    "usa_kind": "bss",
+    "jpn_kind": "bss"
+  }
+]

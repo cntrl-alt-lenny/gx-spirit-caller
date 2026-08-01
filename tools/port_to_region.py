@@ -94,11 +94,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cross_region_aliases import load_blocklist  # noqa: E402
 from routing_suffixes import ROUTING_SUFFIXES, split_routing_suffix  # noqa: E402, F401
 
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "src"
+CROSS_REGION_ALIAS_ADDRESSES = load_blocklist()
 
 # Pattern matches `func_<addr>` and `func_ov<NNN>_<addr>` and the
 # analogous `data_*` forms. Single regex with named groups so we
@@ -631,6 +633,13 @@ def resolve_symbol(
         # (works when EUR and target share the data layout for
         # this symbol — common for libraries / lookup tables that
         # don't shift across regions).
+        if (ref.module, ref.addr) in CROSS_REGION_ALIAS_ADDRESSES:
+            return Resolution(
+                eur_ref=ref,
+                target_name=None,
+                confidence="NONE",
+                notes=f"refused: cross-region alias at 0x{ref.addr:08x}",
+            )
         data_table = target_data_symbols.get(ref.module, {})
         target_name = data_table.get(ref.addr)
         if target_name:
