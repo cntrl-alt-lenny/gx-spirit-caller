@@ -1139,6 +1139,16 @@ def main() -> int:
     if report_path.is_file():
         with report_path.open() as f:
             report = json.load(f)
+        measures = report.get("measures", {})
+        if not isinstance(measures, dict) or not any(
+            int(measures.get(key) or 0) > 0
+            for key in ("total_code", "total_data", "total_units")
+        ):
+            print(
+                f"error: {report_path} contains no measured totals",
+                file=sys.stderr,
+            )
+            return 2
         if args.json:
             payload = dict(report)
             c_split = c_code_bytes_by_class(config_dir)
@@ -1183,6 +1193,17 @@ def main() -> int:
     # TU graph yet. Matched is always 0; just shows the denominator so
     # the badge says 0.00% of N functions instead of 0.00% of nothing.
     total = count_total_functions(config_dir)
+    if total == 0:
+        if args.json:
+            json.dump({
+                "version": args.version,
+                "state": "error",
+                "error": "no symbols.txt function entries found",
+            }, sys.stdout, indent=2)
+            print()
+        else:
+            print_stub(args.version, total)
+        return 2
     if args.json:
         json.dump({
             "version": args.version,

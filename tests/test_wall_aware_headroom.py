@@ -8,9 +8,13 @@ and the cohort stamp is a bulk stamp from a mechanical carving tool, not
 per-function proof. These tests pin the corrected 4-way classification.
 """
 from __future__ import annotations
+import io
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
+from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import wall_aware_headroom as w  # noqa: E402
 
@@ -91,6 +95,18 @@ class ClassifyText(unittest.TestCase):
         c = w.classify_text("; stacks C-23 and C-34 (routing trilemma)\n.text\n")
         self.assertEqual(c.kind, "coercible")
         self.assertEqual(c.codes, ["C-23", "C-34"])
+
+
+class MainFailClosed(unittest.TestCase):
+    def test_empty_source_tree_fails_instead_of_reporting_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            err = io.StringIO()
+            with mock.patch.object(w, "ROOT", root), redirect_stderr(err):
+                rc = w.main(["wall_aware_headroom.py", "--json"])
+
+            self.assertEqual(rc, 2)
+            self.assertIn("headroom was not measured", err.getvalue())
 
 
 class ClassifyModule(unittest.TestCase):

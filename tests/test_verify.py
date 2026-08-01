@@ -132,6 +132,11 @@ class ThumbSupport(unittest.TestCase):
 
 
 class CompareSemantics(unittest.TestCase):
+    def test_empty_instruction_stream_is_not_a_match(self):
+        ok, diffs = compare_words([], [])
+        self.assertFalse(ok)
+        self.assertIn("NO-INSTRUCTIONS-PARSED", diffs[0][1])
+
     def test_relocs_are_wildcards(self):
         """Differing pool targets (both reloc'd) must compare equal."""
         mine = [("e59f0000", False), ("aaaaaaaa", True)]

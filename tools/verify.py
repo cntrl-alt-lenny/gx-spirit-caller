@@ -121,6 +121,11 @@ def compare_words(
     """Compare two word lists; reloc'd words on either side are wildcards.
     Returns (is_match, diffs) where diffs is [(index, mine_hex, orig_hex), ...]."""
     m2, o2 = strip_pool_tail(mine), strip_pool_tail(orig)
+    if not m2 or not o2:
+        # An empty post-pool stream means objdump did not yield a code
+        # instruction on at least one side.  Treating empty-vs-empty as a
+        # match would report OBJDIFF 100% without checking any bytes.
+        return False, [(0, "NO-INSTRUCTIONS-PARSED", "NO-INSTRUCTIONS-PARSED")]
     diffs: list[tuple[int, str, str]] = []
     for i in range(max(len(m2), len(o2))):
         mw = m2[i] if i < len(m2) else None
