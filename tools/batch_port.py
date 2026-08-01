@@ -74,6 +74,7 @@ import json
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -367,6 +368,7 @@ class Report:
     prefilter_tool_error: list[str] = field(default_factory=list)
     gate_fail: list[str] = field(default_factory=list)
     deferred: list[str] = field(default_factory=list)
+    contention_deferred: list[str] = field(default_factory=list)
     committed_batches: int = 0
     gate_calls: int = 0
     refused_by_class: dict[str, int] = field(default_factory=dict)
@@ -388,7 +390,8 @@ class CommitError(RuntimeError):
 class BatchPorter:
     def __init__(self, region: str, ops: PortOps, *, batch: int,
                  confidence_floor: str = "HIGH", park_path: str | None = None,
-                 dry_run: bool = False, log=print):
+                 dry_run: bool = False, log=print,
+                 before_batch: Callable[[], bool] | None = None):
         self.region = region
         self.ops = ops
         self.batch = batch
@@ -396,6 +399,7 @@ class BatchPorter:
         self.park_path = park_path
         self.dry_run = dry_run
         self.log = log
+        self.before_batch = before_batch
         self.report = Report()
         self.pending: list[PendingPort] = []
         self._delinks_cache: dict[str, str] = {}   # delinks_rel -> current text
@@ -623,10 +627,21 @@ class BatchPorter:
             candidates = candidates[:limit]
         self.log(f"batch_port {self.region}: {len(candidates)} sim==1.0 candidate(s) "
                  f"(batch={self.batch}, dry_run={self.dry_run})")
-        for entry in candidates:
+        batch_open = False
+        for index, entry in enumerate(candidates):
             if self.dry_run:
                 self.report.passed.append(entry["tgt"])
                 continue
+            if not batch_open:
+                if self.before_batch is not None and not self.before_batch():
+                    remaining = [candidate["tgt"]
+                                 for candidate in candidates[index:]]
+                    self.report.deferred.extend(remaining)
+                    self.report.contention_deferred.extend(remaining)
+                    self.log(f"  ⏸ machine busy -> DEFER {len(remaining)} "
+                             "candidate(s), no gate or commit")
+                    break
+                batch_open = True
             p = self._resolve(entry)
             if p is None:
                 continue
@@ -635,6 +650,7 @@ class BatchPorter:
                      f"[{len(self.pending)}/{self.batch}]")
             if len(self.pending) >= self.batch:
                 self._gate_commit_or_bisect()
+                batch_open = False
         if not self.dry_run:
             self._gate_commit_or_bisect()
         self.log("REPORT: " + self.report.summary())

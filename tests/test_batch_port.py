@@ -591,6 +591,28 @@ class TestBatchPorterDriver(unittest.TestCase):
         self.assertIn("func_tgt00 port-refused", park_text)
         self.assertIn("func_tgt01 gate-fail", park_text)
 
+    def test_contention_callback_defers_before_next_batch(self):
+        entries = [(f"func_eur{i:02d}", f"func_tgt{i:02d}",
+                    0x02006000 + i * 0x40, 0x40) for i in range(3)]
+        delinks_path, srcdir = _mk_repo(self.tmp, "usa", "main", entries)
+        ops = FakePortOps()
+        ops.bind([delinks_path])
+        backlog = [_entry(e, "main", t, a, s) for e, t, a, s in entries]
+        checks = iter([True, False])
+        porter = BatchPorter(
+            "usa", ops, batch=2, before_batch=lambda: next(checks),
+            log=lambda *a: None,
+        )
+
+        rep = porter.run(backlog)
+
+        self.assertEqual(rep.passed, ["func_tgt00", "func_tgt01"])
+        self.assertEqual(rep.deferred, ["func_tgt02"])
+        self.assertEqual(rep.contention_deferred, ["func_tgt02"])
+        self.assertEqual(rep.gate_calls, 1)
+        self.assertFalse((self.tmp / srcdir / "func_tgt02.c").exists())
+        self.assertTrue((self.tmp / srcdir / "func_tgt02.s").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
