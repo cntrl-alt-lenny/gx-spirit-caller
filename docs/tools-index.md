@@ -679,7 +679,7 @@ Flips the function's delinks.txt entry back to `.s:` via a surgical single-line 
 
 **Canonical repository parsers shared by tooling scripts.**
 
-The implementation remains in the two long-standing parser owners for now: ``analyze_symbols`` owns symbols.txt and ``progress`` owns delinks.txt. This small facade gives new and migrated callers one stable import surface without changin…
+Parser ownership is deliberately explicit so a new consumer does not grow a slightly different copy of an existing grammar:
 
 ### `tools/port_census.py`
 
