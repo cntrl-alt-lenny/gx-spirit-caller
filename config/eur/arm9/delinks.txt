@@ -21292,7 +21292,15 @@ src/main/data/data_0218fd10.c:
 
 src/main/bss/data_main_bss_2_3.s:
     complete
-    .bss start:0x0218fe80 end:0x0218ff0c
+    .bss start:0x0218fe80 end:0x0218fedc
+
+src/main/data/data_0218fedc.c:
+    complete
+    .bss start:0x0218fedc end:0x0218fef4
+
+src/main/data/data_0218fef4.c:
+    complete
+    .bss start:0x0218fef4 end:0x0218ff0c
 
 src/main/data/data_0218ff0c.c:
     complete
@@ -21352,7 +21360,19 @@ src/main/data/data_0219adcc.c:
 
 src/main/bss/data_main_bss_4.s:
     complete
-    .bss start:0x0219b27c end:0x0219b490
+    .bss start:0x0219b27c end:0x0219b36c
+
+src/main/data/data_0219b36c.c:
+    complete
+    .bss start:0x0219b36c end:0x0219b384
+
+src/main/data/data_0219b384.c:
+    complete
+    .bss start:0x0219b384 end:0x0219b39c
+
+src/main/bss/data_main_bss_4_4.s:
+    complete
+    .bss start:0x0219b39c end:0x0219b490
 
 src/main/data/data_0219b490.c:
     complete
@@ -21438,17 +21458,25 @@ src/main/data/data_021a0f34.c:
     complete
     .bss start:0x021a0f34 end:0x021a1334
 
+src/main/data/data_021a1334.c:
+    complete
+    .bss start:0x021a1334 end:0x021a1374
+
 src/main/bss/data_main_bss_5_3.s:
     complete
-    .bss start:0x021a1334 end:0x021a1474
+    .bss start:0x021a1374 end:0x021a1474
 
 src/main/data/data_021a1474.c:
     complete
     .bss start:0x021a1474 end:0x021a1874
 
+src/main/data/data_021a1874.c:
+    complete
+    .bss start:0x021a1874 end:0x021a18b4
+
 src/main/bss/data_main_bss_5_4.s:
     complete
-    .bss start:0x021a1874 end:0x021a1974
+    .bss start:0x021a18b4 end:0x021a1974
 
 src/main/data/data_021a1974.c:
     complete
@@ -21480,7 +21508,23 @@ src/main/data/data_021a5340.c:
 
 src/main/bss/data_main_bss_5_6.s:
     complete
-    .bss start:0x021a5800 end:0x021a8288
+    .bss start:0x021a5800 end:0x021a5d18
+
+src/main/data/data_021a5d18.c:
+    complete
+    .bss start:0x021a5d18 end:0x021a5d30
+
+src/main/bss/data_main_bss_5_6_3.s:
+    complete
+    .bss start:0x021a5d30 end:0x021a6734
+
+src/main/data/data_021a6734.c:
+    complete
+    .bss start:0x021a6734 end:0x021a674c
+
+src/main/bss/data_main_bss_5_6_4.s:
+    complete
+    .bss start:0x021a674c end:0x021a8288
 
 src/main/data/data_021a8288.c:
     complete
