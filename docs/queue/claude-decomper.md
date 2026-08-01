@@ -688,26 +688,23 @@ stray-draft scan; regenerate the research index before pushing.
 > (modulo-vs-division instruction-sequence confusion). Full writeup:
 > `docs/research/cm-ov002-unknown-sweep-11-2026-07-31.md`.
 
-### cm-ov002-unknown-sweep-12 — plus the two newly-isolated mechanisms [S]
+### cm-ov002-unknown-sweep-12 — plus the two newly-isolated mechanisms [S] [DONE]
 
-Same protocol as sweep-11: plain module-agnostic selection across
-149-512B, 5 worktrees, `ninja delink` in setup, one consolidated gate,
-verbatim routing + header text copied fresh from source.
-
-**Mini-item:** take the two mechanisms sweep-11 isolated but left
-unresolved — the `rowBase+0x120+idx*4` addressing residual (3 instances)
-and the goto-vs-predicated condition-code question (3 instances, found
-by 2 workers). Investigated directly via standalone `mwccarm`
-compilation against synthetic reproductions, per the coordinating
-process's explicit request, before dispatching any batches.
-
-Same honesty bar as last round: "steerable, here is the recipe" and
-"genuinely closed at the C level, here is why" are equally good.
-
-C-32 screening holds. **Gate:** `python tools/gate3.py --scope all
---clean` ONCE on the consolidated branch; three regions individually
-grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
-stray-draft scan; regenerate the research index before pushing.
+> **DONE 2026-08-01.** 40/100 shipped, 9,296 bytes — best round this
+> campaign. Both mini-item mechanisms closed: C-63 (the
+> `rowBase+0x120` residual is a third addressing family, not a C-60
+> variant — shipped `func_ov002_0224f4a0` 100% as proof) and C-64 (the
+> goto-vs-predicated theory was falsified directly; the real lever is
+> whether mwcc synthesizes the check itself via a bare `for` loop —
+> independently reconfirmed 3 times in the same round by a batch that
+> had no knowledge of the investigation). Also caught and corrected an
+> overclaim in sweep-11's own C-61 entry, and corrected a worker's
+> false "stale candidate pool" finding (a misread of universal `.s`
+> boilerplate, not a real tooling bug — verified against
+> `brief-294-regalloc-wall-scout.md` and disproven twice over by real
+> ships from the flagged pool). C-55 and C-44 both got heavy
+> independent reconfirmation across multiple batches. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-12-2026-08-01.md`.
 
 > Filed from the coordinating process's own chat message after
 > sweep-10 merged (main 12f62dbf6, EUR 12.60%) — appended here per the

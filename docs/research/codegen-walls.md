@@ -7275,6 +7275,22 @@ function's preceding call sequence, not via a real ship on either.
 coordinating process's explicit request; supersedes the goto-vs-predicated
 attribution in C-61's confirmation addendum, which this entry corrects.
 
+> **Independent confirmation, same round, from a worker who arrived at
+> it separately.** Working ordinary plain-selection candidates with no
+> knowledge of this entry, a batch hit the identical `EQ`-not-`LS`
+> pattern 3 times (`func_ov002_0224bbd8`, `func_02089418`, partially on
+> a third) and independently converged on the same conclusion this
+> entry does — their own words: "the same register-set-correct,
+> letter/condition-assignment-scrambled family... just manifesting as a
+> condition-code bit rather than a register letter." Their fix
+> (do-while with the counter declared/initialized before the guard)
+> reliably improved match percentage (63.6%→77.3% and 17.3%→90.0%) but,
+> consistent with the mechanism above, **never flipped `EQ` back to
+> `LS` on its own** — a hand-restructured do-while is still a
+> hand-written guard, not the compiler's own synthesized `for`-loop
+> pre-check, so this is confirmation of the mechanism's boundary, not a
+> contradiction of it.
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
