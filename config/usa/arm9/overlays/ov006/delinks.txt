@@ -548,7 +548,7 @@ src/usa/overlay006/func_ov006_021b7cb0.s:
 src/usa/overlay006/func_ov006_021b7d80.s:
     complete
     .text start:0x021b7d80 end:0x021b7e6c
-src/usa/overlay006/func_ov006_021b7e6c.s:
+src/usa/overlay006/func_ov006_021b7e6c.c:
     complete
     .text start:0x021b7e6c end:0x021b7f5c
 

@@ -73,7 +73,7 @@ src/jpn/overlay014/func_ov014_021b3b20.s:
 src/jpn/overlay014/func_ov014_021b3ec4.s:
     complete
     .text start:0x021b3ec4 end:0x021b3f40
-src/jpn/overlay014/func_ov014_021b3f40.s:
+src/jpn/overlay014/func_ov014_021b3f40.c:
     complete
     .text start:0x021b3f40 end:0x021b40b8
 src/jpn/overlay014/func_ov014_021b40b8.s:

@@ -102,6 +102,34 @@ def filter_sim1_backlog(entries: list[dict]) -> list[dict]:
             if e.get("byte_sim") is not None and e["byte_sim"] >= SIM_FLOOR]
 
 
+def classify_port_refusal(result: dict) -> str:
+    """Return the exclusive primary class for a HIGH-floor port refusal.
+
+    The class order mirrors the residual triage ledger: an EUR-only
+    placeholder twin is most specific, then mixed/weak function resolution,
+    then a data-only resolution failure.  Unknown shapes fail closed into
+    ``unclassified`` rather than being silently counted as a known bucket.
+    """
+    failed = result.get("failed", [])
+    if not isinstance(failed, list):
+        return "unclassified"
+    failed = [r for r in failed if isinstance(r, dict)]
+    if any("placeholder twin" in str(r.get("notes", "")) for r in failed):
+        return "placeholder-twin"
+    function_failed = [r for r in failed if r.get("kind") == "func"]
+    data_failed = [r for r in failed if r.get("kind") == "data"]
+    if function_failed:
+        confidences = {r.get("confidence") for r in function_failed}
+        if confidences == {"MEDIUM"}:
+            return "medium-only"
+        if "LOW" in confidences and "MEDIUM" in confidences:
+            return "low-plus-medium"
+        return "function-symbol"
+    if data_failed:
+        return "data-symbol"
+    return "unclassified"
+
+
 def _fastmatch_has_no_instructions(value: object) -> bool:
     """Return whether a fastmatch JSON value contains its fail-closed marker."""
     if isinstance(value, str):
@@ -340,6 +368,8 @@ class Report:
     gate_fail: list[str] = field(default_factory=list)
     deferred: list[str] = field(default_factory=list)
     committed_batches: int = 0
+    gate_calls: int = 0
+    refused_by_class: dict[str, int] = field(default_factory=dict)
 
     def summary(self) -> str:
         return (f"PORTED {len(self.passed)} | refused {len(self.parked_refuse)} | "
@@ -448,13 +478,18 @@ class BatchPorter:
     def _commit_or_abort(self) -> None:
         if not self._commit_pending():
             raise CommitError("git commit did not advance HEAD -- refusing to "
-                              "continue (ports would be falsely reported shipped)")
+                             "continue (ports would be falsely reported shipped)")
+
+    def _gate(self) -> bool:
+        """Run one ROM gate and count it for machine-readable harvest reports."""
+        self.report.gate_calls += 1
+        return self.ops.gate()
 
     def _gate_commit_or_bisect(self) -> None:
         if not self.pending:
             return
         try:
-            ok = self.ops.gate()
+            ok = self._gate()
         except bc.GateTimeout:
             funcs = [p.func for p in self.pending]
             self.log(f"  ⏳ gate timed out (contention) -> DEFER {len(funcs)} "
@@ -484,7 +519,7 @@ class BatchPorter:
         for half in bc.bisect_plan(ports):
             self._reapply(half)
             try:
-                green = self.ops.gate()
+                green = self._gate()
             except bc.GateTimeout:
                 funcs = [p.func for p in half]
                 self.log(f"     ⏳ gate timed out in bisect -> DEFER "
@@ -537,6 +572,10 @@ class BatchPorter:
             return None
         if status == "refused":
             self.report.parked_refuse.append(entry["tgt"])
+            refusal_class = classify_port_refusal(result)
+            self.report.refused_by_class[refusal_class] = (
+                self.report.refused_by_class.get(refusal_class, 0) + 1
+            )
             self._park(entry["tgt"], "port-refused")
             self.log(f"  ⊘ {entry['tgt']} port refused ({str(result.get('reason', ''))[:80]})")
             return None
