@@ -11064,10 +11064,10 @@ src/overlay002/func_ov002_02273b54.c:
     complete
     .text start:0x02273b54 end:0x02273b94
 
-src/overlay002/func_ov002_02273b94.s:
+src/overlay002/func_ov002_02273b94.c:
     complete
     .text start:0x02273b94 end:0x02273ca4
-src/overlay002/func_ov002_02273ca4.s:
+src/overlay002/func_ov002_02273ca4.c:
     complete
     .text start:0x02273ca4 end:0x02273d74
 src/overlay002/func_ov002_02273d74.s:
