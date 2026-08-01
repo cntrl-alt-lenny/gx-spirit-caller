@@ -6876,6 +6876,7 @@ batch alone).
 rows, 3 guard-check calls per element):**
 
 ```text
+
 ldr   r0, [pc, #...]        ; &data_ov002_022cf16c
 mov   r8, #0xd
 add   r6, r0, r1            ; base = r6
@@ -6891,6 +6892,7 @@ add   r5, r6, #0x260        ; cursor = r5
   cmp   r4, r0
   add   r5, r5, #4          ; cursor++
   bcc   .Lloop
+
 ```
 
 **What did NOT move it (matching this family's own extensive prior
@@ -6910,6 +6912,7 @@ clause — and declare them **in their eventual-use relative order**
 (index, then cursor):
 
 ```c
+
 void func_ov002_02250540(int player) {
     unsigned int row = (player & 1) * 0x868;
     unsigned int i = 0;              /* declared+init BEFORE the guard */
@@ -6940,6 +6943,7 @@ void func_ov002_02250540(int player) {
         } while (i < *(unsigned int *)(data_ov002_022cf16c + row + 0x10));
     }
 }
+
 ```
 
 This reproduces the target's **entire loop body instruction-for-
@@ -7117,9 +7121,11 @@ against a synthetic reproduction of `data_ov002_022cf16c`'s row stride
 (`0x868`) and this sub-table's fixed offset (`0x120`):**
 
 ```c
+
 int *p = (int *)(data_ov002_022cf16c + (player & 1) * 0x868);
 p = (int *)((char *)p + 0x120);
 return p[idx];   /* idx: a genuine runtime value, not a fixed column */
+
 ```
 
 ```asm
@@ -7138,9 +7144,11 @@ adjustment must be a separate reassignment, not folded into the same
 expression as the initial row computation:
 
 ```c
+
 int *p = (int *)(data_ov002_022cf16c + (player & 1) * 0x868);  /* int* from the start */
 p = (int *)((char *)p + 0x120);                                 /* separate reassignment */
 return p[idx];
+
 ```
 
 A version that stays `char *` through the `+0x120` step and only casts to
@@ -7205,10 +7213,13 @@ at all — produces `cmp count, #0; popls {...}` (a predicated `LS` skip)
 for the trip-count-zero case, confirmed on the first try:
 
 ```c
+
 for (i = 0; i < count; i++) {
     func_a(player, i, count);
 }
+
 ```
+
 ```asm
 
 cmp  r5, #0
@@ -7242,11 +7253,13 @@ at the end of the loop body** to a value reloaded from a different
 location for the *next* iteration's test:
 
 ```c
+
 unsigned int count = *(unsigned int *)(table_a + row);   /* entry check reads table_a */
 for (i = 0; i < count; i++) {
     ...
     count = *(unsigned int *)(table_b + row + 0x10);       /* re-test reads table_b, every iteration */
 }
+
 ```
 
 This reproduces the exact two-table shape `func_ov002_02250540` and
