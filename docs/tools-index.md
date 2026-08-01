@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**123 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**124 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (51)
+- [Uncategorised](#uncategorised) (52)
 
 ## Analysis / worklist
 
@@ -686,6 +686,12 @@ The implementation remains in the two long-standing parser owners for now: ``ana
 **READ-ONLY census: EUR .c files whose USA/JPN twin still ships as .s.**
 
 Reproduces the r10 method (find_region_siblings HIGH + byte-sim) against the current checkout. Writes JSON backlog lists to build/ (override with PORT_CENSUS_OUT).
+
+### `tools/port_harvest.py`
+
+**Standing cross-region sim==1.0 port harvest.**
+
+This is a thin, fail-closed entry point around port_census + batch_port. It always re-censuses first, hard-codes the proven HIGH confidence floor, and delegates fastmatch and ROM-gated staging/commits to batch_port.
 
 ### `tools/predict_walls.py`
 
