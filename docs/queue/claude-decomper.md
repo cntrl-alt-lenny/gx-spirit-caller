@@ -688,6 +688,27 @@ stray-draft scan; regenerate the research index before pushing.
 > (modulo-vs-division instruction-sequence confusion). Full writeup:
 > `docs/research/cm-ov002-unknown-sweep-11-2026-07-31.md`.
 
+### cm-ov002-unknown-sweep-12 — plus the two newly-isolated mechanisms [S]
+
+Same protocol as sweep-11: plain module-agnostic selection across
+149-512B, 5 worktrees, `ninja delink` in setup, one consolidated gate,
+verbatim routing + header text copied fresh from source.
+
+**Mini-item:** take the two mechanisms sweep-11 isolated but left
+unresolved — the `rowBase+0x120+idx*4` addressing residual (3 instances)
+and the goto-vs-predicated condition-code question (3 instances, found
+by 2 workers). Investigated directly via standalone `mwccarm`
+compilation against synthetic reproductions, per the coordinating
+process's explicit request, before dispatching any batches.
+
+Same honesty bar as last round: "steerable, here is the recipe" and
+"genuinely closed at the C level, here is why" are equally good.
+
+C-32 screening holds. **Gate:** `python tools/gate3.py --scope all
+--clean` ONCE on the consolidated branch; three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index before pushing.
+
 > Filed from the coordinating process's own chat message after
 > sweep-10 merged (main 12f62dbf6, EUR 12.60%) — appended here per the
 > project's "a prose mention is not a task" convention.
