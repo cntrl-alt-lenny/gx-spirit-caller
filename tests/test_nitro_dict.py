@@ -127,6 +127,10 @@ class TestStripComments(unittest.TestCase):
         out = _strip_comments(src).strip()
         self.assertNotIn("line", out)
 
+    def test_function_prototype_in_a_literal_is_not_indexed(self):
+        header = 'const char *doc = "text; void Fake(int x);";\n'
+        self.assertEqual(parse_header(header), [])
+
 
 class TestSubsystemForName(unittest.TestCase):
     def test_standard_prefix(self):

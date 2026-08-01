@@ -27,6 +27,16 @@ def _by_name(funcs, name):
 
 
 class TestParseFunctionDefinitions(unittest.TestCase):
+    def test_typedef_text_in_a_literal_does_not_hide_real_prototype(self):
+        # The old comment-only scrubber saw the string's `typedef` and
+        # treated HeaderType as a file-local typedef, silently dropping the
+        # real definition. The shared scrubber blanks literals too.
+        funcs = parse_function_definitions(
+            'const char *doc = "typedef int HeaderType;";\n'
+            "int use(HeaderType value) { return 0; }\n"
+        )
+        self.assertEqual(_names(funcs), {"use"})
+
     def test_simple_int_function(self):
         funcs = parse_function_definitions(
             "int func_0201a0e0(int arg0) {\n"

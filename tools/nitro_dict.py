@@ -65,6 +65,11 @@ import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+try:
+    from tools.progress import _strip_c_comments_and_literals
+except ModuleNotFoundError:  # direct ``python tools/nitro_dict.py`` entry
+    from progress import _strip_c_comments_and_literals
+
 
 SCHEMA_VERSION = 1
 
@@ -131,21 +136,9 @@ class NitroFunction:
 # Parsing
 # --------------------------------------------------------------------------- #
 
-_BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
-_LINE_COMMENT_RE = re.compile(r"//[^\n]*")
-
-
 def _strip_comments(text: str) -> str:
-    """Remove C block and line comments before tokenising. Keeps
-    line count roughly accurate by preserving newlines from block
-    comments — the parser doesn't report lineno yet, but might."""
-    # Block comments: replace with equivalent newline count so lines
-    # downstream still align with the source.
-    def _replace_block(m):
-        return "\n" * m.group(0).count("\n")
-    text = _BLOCK_COMMENT_RE.sub(_replace_block, text)
-    text = _LINE_COMMENT_RE.sub("", text)
-    return text
+    """Blank comments and literals before tokenising."""
+    return _strip_c_comments_and_literals(text)
 
 
 def _subsystem_for_name(name: str) -> str:
