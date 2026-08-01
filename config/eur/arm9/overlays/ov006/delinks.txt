@@ -1349,7 +1349,7 @@ src/overlay006/func_ov006_021c4cc4.s:
     complete
     .text start:0x021c4cc4 end:0x021c4ec4
 
-src/overlay006/func_ov006_021c4ec4.s:
+src/overlay006/func_ov006_021c4ec4.c:
     complete
     .text start:0x021c4ec4 end:0x021c507c
 
