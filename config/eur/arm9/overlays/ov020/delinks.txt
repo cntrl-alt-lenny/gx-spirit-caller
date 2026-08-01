@@ -16,7 +16,7 @@ src/overlay020/func_ov020_021aa6cc.c:
     complete
     .text start:0x021aa6cc end:0x021aa700
 
-src/overlay020/func_ov020_021aa700.s:
+src/overlay020/func_ov020_021aa700.c:
     complete
     .text start:0x021aa700 end:0x021aa7ac
 
