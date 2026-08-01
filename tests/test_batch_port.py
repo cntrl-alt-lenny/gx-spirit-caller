@@ -26,7 +26,8 @@ import batch_carve as bc  # noqa: E402
 import batch_port as bp  # noqa: E402
 from batch_port import (  # noqa: E402
     BatchPorter, compute_port_output_path, filter_sim1_backlog,
-    fastmatch_verdict, find_tu_header_for_addr, module_dirs,
+    classify_port_refusal, fastmatch_verdict, find_tu_header_for_addr,
+    module_dirs,
 )
 
 
@@ -90,6 +91,39 @@ class TestFastmatchVerdict(unittest.TestCase):
         verdict, reason = fastmatch_verdict(payload, 2)
         self.assertEqual(verdict, "tool-error")
         self.assertIn("infrastructure", reason)
+
+
+class TestClassifyPortRefusal(unittest.TestCase):
+    def test_prioritizes_placeholder_twin(self):
+        result = {"failed": [{
+            "kind": "func", "confidence": "NONE",
+            "notes": "EUR-only named function has placeholder twin",
+        }]}
+        self.assertEqual(classify_port_refusal(result), "placeholder-twin")
+
+    def test_distinguishes_confidence_and_symbol_classes(self):
+        self.assertEqual(
+            classify_port_refusal({"failed": [{"kind": "func", "confidence": "MEDIUM"}]}),
+            "medium-only",
+        )
+        self.assertEqual(
+            classify_port_refusal({"failed": [
+                {"kind": "func", "confidence": "LOW"},
+                {"kind": "func", "confidence": "MEDIUM"},
+            ]}),
+            "low-plus-medium",
+        )
+        self.assertEqual(
+            classify_port_refusal({"failed": [{"kind": "data", "confidence": "NONE"}]}),
+            "data-symbol",
+        )
+        self.assertEqual(
+            classify_port_refusal({"failed": [{"kind": "func", "confidence": "NONE"}]}),
+            "function-symbol",
+        )
+
+    def test_unknown_shape_fails_closed(self):
+        self.assertEqual(classify_port_refusal({}), "unclassified")
 
 
 class TestFindTuHeaderForAddr(unittest.TestCase):
@@ -376,6 +410,7 @@ class TestBatchPorterDriver(unittest.TestCase):
         self.assertEqual(len(ops.prefilter_calls), 1)
         self.assertEqual(ops.gate_calls, 1)
         self.assertEqual(rep.passed, ["func_tgt00"])
+        self.assertEqual(rep.gate_calls, 1)
 
     def test_tool_error_not_parked_retried_next_run(self):
         entries = [("func_eur00", "func_tgt00", 0x02006000, 0x40)]
