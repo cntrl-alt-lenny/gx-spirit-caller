@@ -35,9 +35,9 @@ JPN.
 | Gross regenerated rows implied by current total | **163** | **163** |
 
 The net change is `206-76` / `208-78`. The gross regenerated figure is
-`206-43` / `208-45`: it accounts for the 33 old recoverable rows drained by
-#1403/#1408 before comparing the current census with the remaining refusal
-floor. This is an arithmetic comparison to the prior tool report, not a
+`206-43` / `208-45`: it accounts for the 33 old recoverable rows drained
+by #1403/#1408 before comparing the current census with the remaining
+refusal floor. This is an arithmetic comparison to the prior tool report, not a
 claim that the old ignored park-list files still exist.
 
 ## Current dry-run classification
