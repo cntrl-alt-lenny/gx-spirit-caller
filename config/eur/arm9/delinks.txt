@@ -7013,7 +7013,7 @@ src/main/func_02035218.s:
     complete
     .text start:0x02035218 end:0x020353cc
 
-src/main/func_020353cc.s:
+src/main/func_020353cc.c:
     complete
     .text start:0x020353cc end:0x020354a8
 
