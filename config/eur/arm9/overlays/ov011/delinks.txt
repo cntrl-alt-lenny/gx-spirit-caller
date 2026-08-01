@@ -1207,7 +1207,15 @@ src/overlay011/data_ov011_021d38f0.c:
 
 src/overlay011/bss/data_ov011_bss.s:
     complete
-    .bss start:0x021d4000 end:0x021d4674
+    .bss start:0x021d4000 end:0x021d41a0
+
+src/overlay011/data_ov011_021d41a0.c:
+    complete
+    .bss start:0x021d41a0 end:0x021d4218
+
+src/overlay011/bss/data_ov011_bss_3.s:
+    complete
+    .bss start:0x021d4218 end:0x021d4674
 
 src/overlay011/data_ov011_021d4674.c:
     complete

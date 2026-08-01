@@ -21264,7 +21264,15 @@ src/main/data/data_02104f58.c:
 
 src/main/bss/data_main_bss_2.s:
     complete
-    .bss start:0x02105884 end:0x0218fd10
+    .bss start:0x02105884 end:0x02105eb8
+
+src/main/data/data_02105eb8.c:
+    complete
+    .bss start:0x02105eb8 end:0x02105f3c
+
+src/main/bss/data_main_bss_2_4.s:
+    complete
+    .bss start:0x02105f3c end:0x0218fd10
 
 src/main/data/data_0218fd10.c:
     complete
@@ -21272,7 +21280,15 @@ src/main/data/data_0218fd10.c:
 
 src/main/bss/data_main_bss_2_3.s:
     complete
-    .bss start:0x0218fe80 end:0x0219060c
+    .bss start:0x0218fe80 end:0x0218ff8c
+
+src/main/data/data_0218ff8c.c:
+    complete
+    .bss start:0x0218ff8c end:0x0219000c
+
+src/main/bss/data_main_bss_2_3_2.s:
+    complete
+    .bss start:0x0219000c end:0x0219060c
 
 src/main/data/data_0219060c.c:
     complete
@@ -21332,7 +21348,11 @@ src/main/data/data_0219d388.c:
 
 src/main/bss/data_main_bss_5.s:
     complete
-    .bss start:0x0219d9a8 end:0x0219db74
+    .bss start:0x0219d9a8 end:0x0219daf4
+
+src/main/data/data_0219daf4.c:
+    complete
+    .bss start:0x0219daf4 end:0x0219db74
 
 src/main/data/data_0219db74.c:
     complete
@@ -21416,7 +21436,15 @@ src/main/data/data_021a5340.c:
 
 src/main/bss/data_main_bss_5_6.s:
     complete
-    .bss start:0x021a5800 end:0x021a8b00
+    .bss start:0x021a5800 end:0x021a8288
+
+src/main/data/data_021a8288.c:
+    complete
+    .bss start:0x021a8288 end:0x021a8308
+
+src/main/bss/data_main_bss_5_6_2.s:
+    complete
+    .bss start:0x021a8308 end:0x021a8b00
 
 src/main/data/data_021a8b00.c:
     complete

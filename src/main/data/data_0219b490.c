@@ -1,1 +1,3 @@
-char data_0219b490[192];
+#include <nitro/os_thread.h>
+
+OSThread data_0219b490;
