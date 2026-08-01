@@ -5854,7 +5854,7 @@ src/main/func_02031358.s:
     complete
     .text start:0x02031358 end:0x02031470
 
-src/main/func_02031470.s:
+src/main/func_02031470.c:
     complete
     .text start:0x02031470 end:0x0203158c
 
@@ -9123,7 +9123,7 @@ src/main/func_0204bdc4.s:
     complete
     .text start:0x0204bdc4 end:0x0204be40
 
-src/main/func_0204be40.s:
+src/main/func_0204be40.c:
     complete
     .text start:0x0204be40 end:0x0204bf00
 
