@@ -6679,6 +6679,26 @@ independently.
 > result with `fastmatch.py` after applying it every time; don't treat
 > "looks like the C-55 shape" as sufficient on its own.
 
+> **Extension (cm-ov002-unknown-sweep-14): `goto` doesn't reliably
+> suppress if-conversion when both arms rejoin at a shared
+> LOOP-CONTINUATION point instead of a function exit.** All of C-55's
+> original evidence involves a `return` (a real function exit) as one
+> arm's target — `goto` reliably forces a branch there. A distinct
+> shape: an if/else whose two arms both flow back into the *same loop*
+> (not out of the function) kept getting if-converted back to
+> predicated instructions regardless of `goto` phrasing. Converting the
+> identical logic to a `switch` statement — even with only 2-3 case
+> values and no jump table needed — suppressed the if-conversion where
+> `goto` alone could not, closing one target from 10.5%→90.7%→100%.
+> Precise rule: `goto` is the right tool when one arm is a genuine
+> function exit; `switch` is the stronger tool when both arms rejoin
+> inside a shared loop body. Also placement-sensitive: the `goto`
+> target label must sit at its **exact original address position**
+> inline in the function (mwcc lays out goto-target blocks in source
+> textual order) — floating it to the end, or giving it its own
+> separate `fail: return X;` block, produces a *duplicate* epilogue
+> instead of sharing the real one.
+
 ### C-56. Local-variable declaration order, not just usage order, affects register allocation
 
 **The trap:** two source forms that use the same locals in the same

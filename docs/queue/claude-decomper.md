@@ -803,7 +803,25 @@ stray-draft scan; regenerate the research index before pushing.
 > history, flagged to the user in-session. Full writeup:
 > `docs/research/cm-ov002-unknown-sweep-13-2026-08-01.md`.
 
-### cm-ov002-unknown-sweep-14 — verbatim dispatch of C-55/C-44/C-64 [TODO]
+### cm-ov002-unknown-sweep-14 — verbatim dispatch of C-55/C-44/C-64 [DONE]
+
+> **DONE 2026-08-01.** 24/100 shipped, 4,968 bytes — lowest count since
+> sweep-9, driven by two real process incidents this round rather than
+> candidate difficulty. Direct C-64 fix attempt on `func_ov002_0220ad78`
+> transferred the core mechanism cleanly but hit a new, distinct
+> redundant-AND residual that resisted 5 variations — reverted, flagged
+> for a future pass. Incident 1: a queue-header edit written as `[S]`
+> alone (never a valid status marker on its own — every prior round's
+> `[S]` only ever appeared bundled with a real `[DONE]`) was invisible
+> to `work_queue.py`, caught by its own test. Incident 2: two dispatched
+> agents collided in one worktree (one operated in the wrong directory);
+> verified directly, recovered both 20-candidate results with zero data
+> loss. Incident 3: one agent crashed with corrupted output; its 4 real
+> shipped candidates were recovered and independently re-verified before
+> committing, the other 16 re-dispatched cleanly. New C-55 extension
+> (switch, not goto, suppresses if-conversion for shared-loop-rejoin
+> arms) and another C-65 confirmation. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-14-2026-08-01.md`.
 
 Same protocol. Plain module-agnostic selection across 149-512B, 5
 worktrees, `ninja delink` in setup, one consolidated gate.
