@@ -1329,7 +1329,7 @@ src/overlay006/func_ov006_021c4768.c:
     complete
     .text start:0x021c4768 end:0x021c480c
 
-src/overlay006/func_ov006_021c480c.s:
+src/overlay006/func_ov006_021c480c.c:
     complete
     .text start:0x021c480c end:0x021c48e0
 
