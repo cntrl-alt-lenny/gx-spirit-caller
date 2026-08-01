@@ -10,6 +10,7 @@ value is `Natural-C` from `python tools/progress.py --version eur`.
 |---|---|---:|---:|---:|
 | 2026-08-01 | `37b143ca5`, #1418 harvest endpoint | 316,114 | 134 | 136 |
 | 2026-08-01 | `ceefe98c1`, q-port-harvest-defer pre-harvest census | 316,114 | 134 | 136 |
+| 2026-08-01 | `6e52e9913`, q-port-harvest-schedule pre-harvest census | 322,522 | 160 | 162 |
 
 The first row is the committed #1418 harvest report's endpoint; the second
 row is a fresh census/progress run on current `origin/main`. No harvest was
