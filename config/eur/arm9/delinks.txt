@@ -2223,7 +2223,7 @@ src/main/func_02015f7c.s:
     complete
     .text start:0x02015f7c end:0x020161ac
 
-src/main/func_020161ac.s:
+src/main/func_020161ac.c:
     complete
     .text start:0x020161ac end:0x020162d0
 
@@ -2288,7 +2288,7 @@ src/main/func_02017afc.s:
     complete
     .text start:0x02017afc end:0x02017be0
 
-src/main/func_02017be0.s:
+src/main/func_02017be0.c:
     complete
     .text start:0x02017be0 end:0x02017d18
 
@@ -10773,7 +10773,7 @@ src/main/func_020618a8.s:
     complete
     .text start:0x020618a8 end:0x020619b8
 
-src/main/func_020619b8.s:
+src/main/func_020619b8.legacy_sp3.c:
     complete
     .text start:0x020619b8 end:0x02061a8c
 
