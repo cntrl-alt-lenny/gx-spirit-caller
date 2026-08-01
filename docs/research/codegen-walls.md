@@ -7016,6 +7016,76 @@ resistant sub-piece).
 directly per the coordinating process's explicit request to give this
 wall family "one round of direct attention."
 
+> **Massive additional confirmation, same round (cm-ov002-unknown-
+> sweep-11 dispatch).** The recipe was handed to 8 real priority-cohort
+> candidates plus applied opportunistically wherever the shape
+> recurred. Result: **the wall is real and systemic at high volume,
+> the recipe applies correctly, and the early-scratch residual above
+> is confirmed as the dominant remaining blocker** — not an isolated
+> case. One more candidate shipped clean with the recipe alone
+> (`func_ov002_0224de94`, 3rd independent application). Six more of
+> the 8 priority-cohort candidates reached high partial matches
+> (69.8%–94.1%) applying the same recipe, every one blocked by the
+> already-documented and/mul residual or an equally-resistant fresh
+> permutation — consistent with, not a contradiction of, the honest
+> scope above. **Independently, without being told which functions
+> were cohort members, a different batch working ordinary plain-
+> selection candidates recognized and flagged 3 more instances of the
+> identical and/mul residual** (`func_ov002_02249cec`,
+> `func_ov002_0224c440`, `func_ov002_02251ec0`) — real evidence this
+> isn't specific to the 2 originally-tested targets.
+>
+> **New sub-finding, independently hit by 2 separate workers on 3
+> functions:** the early guard's condition code (`LS` vs `EQ` for an
+> `unsigned x <= 0`-shaped check) depends on whether the guard is
+> written as a `goto`-based branch or a predicated inline return — the
+> predicated form reliably reproduces `LS`, a `goto`-restructured form
+> reliably produces `EQ` instead. Not yet resolved (2 phrasing variants
+> tried per instance, no movement) — flagged as a distinct, real,
+> unsolved piece of this same shape's puzzle, not yet folded into the
+> main recipe above since it needs its own dedicated pass.
+>
+> **A related-but-distinct addressing residual, 3 instances, not yet
+> investigated directly:** `func_ov002_02221348`, `func_ov002_0224f4a0`,
+> `func_ov002_02236bbc` all show a `rowBase+0x120+idx*4` computation
+> resisting both C-60's Family-A and Family-B phrasings identically —
+> same general "shared-base loop/array addressing" territory as C-60/
+> C-61, different specific constants (`0x120`, not `0x30`/`0x868`/
+> `0x14`), unconfirmed whether it's the same table at a different
+> sub-offset or a genuinely different structure. Worth the same
+> standalone-compilation treatment as a future dedicated item.
+
+### C-62. Signed `%` (modulo) and `/` (division) by the same power-of-2 constant compile to visually-similar but genuinely different `lsr`/`rsb`/`ror`-family instruction sequences — don't misidentify one for the other from disassembly alone
+
+**The trap:** mwcc's signed-division-by-power-of-2 and signed-modulo-
+by-power-of-2 lowerings both use a `lsr`/`rsb`/`ror`-shift family of
+instructions (the standard trick for rounding a signed value toward
+zero without a real divide), and at a glance — especially skimmed
+quickly against a size/shape-matching target — the two forms look
+alike enough to transcribe as the wrong operator. Writing `x / N`
+where the target actually computes `x % N` (or vice versa) is
+logically wrong but can still produce a plausible-looking, mostly-
+correct instruction count, making the error easy to miss until a
+`fastmatch.py` diff shows the real divergence.
+
+**The fix:** confirm which operator the target actually needs by
+checking the *use* of the result, not just pattern-matching the
+instruction shape — a modulo result feeds further arithmetic combining
+it with the original dividend (e.g. `x - (x/N)*N`-shaped follow-on
+use, or a direct remainder use like an array-wraparound index); a
+division result stands alone as a scaled quantity. When in doubt,
+compile both `x % N` and `x / N` standalone via `mwccarm` directly and
+diff against the target's actual instruction sequence rather than
+guessing from the shift/rotate shape alone.
+
+**Evidence:** `func_ov004_021cb940` (cm-ov002-unknown-sweep-11) — the
+worker's own first attempt used `/`, produced a byte-close-but-wrong
+result, and confirmed via standalone `mwccarm` compilation that `%`
+was the correct operator, with the two forms' instruction sequences
+distinct enough to fully resolve once compared side by side.
+
+**Provenance:** cm-ov002-unknown-sweep-11 (2026-07-31), batch 5.
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source

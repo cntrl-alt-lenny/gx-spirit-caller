@@ -669,7 +669,24 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-11 — plus the dominant-wall mini-item [S] [CLAIMED]
+### cm-ov002-unknown-sweep-11 — plus the dominant-wall mini-item [S] [DONE]
+
+> **DONE 2026-07-31.** 27/100 shipped. The mini-item is answered, not
+> fully solved (the honest, correct outcome): C-61's declaration-order
+> recipe is real and reconfirmed 4 more times this round — once via
+> the priority cohort, three times independently by a worker who
+> wasn't told which functions were cohort members. It sits next to at
+> least 3 OTHER distinct mechanisms wearing the same register-mismatch
+> signature (the already-exhausted and/mul residual, a new
+> `rowBase+0x120+idx*4` addressing residual with 3 instances, and a
+> `goto`-vs-predicated condition-code question with 3 instances) — the
+> family is several mechanisms, not one, and this round found the
+> first genuinely steerable one. Both process fixes validated directly:
+> `ninja delink` ran clean in all 5 setups, and the corrected verbatim
+> tier-routing text shipped 7 of 9 functions in one batch through
+> explicit tier routing on the first attempt. New lever C-62
+> (modulo-vs-division instruction-sequence confusion). Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-11-2026-07-31.md`.
 
 > Filed from the coordinating process's own chat message after
 > sweep-10 merged (main 12f62dbf6, EUR 12.60%) — appended here per the
