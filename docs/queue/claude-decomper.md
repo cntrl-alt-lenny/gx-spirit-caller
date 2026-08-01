@@ -783,37 +783,22 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-13 [S]
+### cm-ov002-unknown-sweep-13 — plain sweep, no mini-item [DONE]
 
-Same protocol — it is working. Plain module-agnostic selection across
-149-512B, 5 worktrees, `ninja delink` in setup, verbatim routing/header
-text from source, one consolidated gate.
-
-No mini-item this round unless one emerges from the data. Sweeps 11
-and 12 both spent their mini-item budget productively, but the two
-mechanisms that were blocking cohorts are now closed; the next one
-should be chosen from evidence this round produces, not assigned in
-advance.
-
-Two things carried forward from sweep-12's own findings:
-- **C-55 and C-44 got heavy blind convergence last round** (C-55 in 4
-  of 5 batches, C-44 in 2, no cross-talk between workers) — both are
-  now stated VERBATIM in the dispatch prompt itself, not just left in
-  the catalogue for a worker to rediscover.
-- The sweep-12 C-61 correction means `func_ov002_02250540` is honestly
-  documented as blocked by an unrelated register-preference issue —
-  leave it parked, do not re-grind it.
-
-Same NON-NEGOTIABLE no-sub-agent language, same git-status +
-delinks.txt self-check instruction, same "keep reporting bytes and pp,
-not ship-rate alone," same `park_one.py` (never `git checkout --
-<module>/delinks.txt`), same fastmatch.py-over-eyeball discipline.
-
-Keep C-32 mechanical screening.
-
-**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
-consolidated branch (not per-batch); three regions individually
-grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
-stray-draft scan; regenerate the research index AND
-`docs/state-table.md` before pushing (now part of the pytest suite —
-sweep-12's gate caught it stale).
+> **DONE 2026-08-01.** 27/100 shipped, 6,408 bytes. No mini-item, by
+> design — the round's real signal was cross-batch reconfirmation.
+> C-55 held up as the single most load-bearing lever (independently
+> applied in 4 of 5 batches) but also picked up a real caveat: applying
+> it to 2 superficially-similar functions made the match worse, not
+> better — not safe to apply blindly once recognized. C-64 got a THIRD
+> consecutive round of fully blind independent confirmation, from a
+> batch that proposed it as a brand-new wall without knowing it was
+> already catalogued. C-61's residual reconfirmed twice more, including
+> once on a function flagged in advance. New lever C-65 (loop-body
+> strength reduction) documents a load-vs-store asymmetry that isn't
+> yet explained — flagged as a real open question, not forced into a
+> single theory. One process mistake this round: a queue-claim commit
+> landed directly on `main` instead of a branch, caught immediately,
+> left in place rather than risk a force-push rewrite of shared
+> history, flagged to the user in-session. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-13-2026-08-01.md`.
