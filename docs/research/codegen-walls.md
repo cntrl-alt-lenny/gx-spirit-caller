@@ -6663,6 +6663,15 @@ authorship:**
 **Provenance:** cm-ov002-unknown-sweep-8 (2026-07-31), batches 1/3/4/5
 independently.
 
+> **Caveat (cm-ov002-unknown-sweep-13):** this lever is NOT safe to
+> apply blindly once the general "shared tail" shape is recognized —
+> in the same round it was independently rediscovered and correctly
+> applied 5 times, applying the identical goto-to-shared-tail
+> restructuring to 2 *other*, superficially-identical-looking fusion
+> patterns made the match measurably worse, not better. Check the
+> result with `fastmatch.py` after applying it every time; don't treat
+> "looks like the C-55 shape" as sufficient on its own.
+
 ### C-56. Local-variable declaration order, not just usage order, affects register allocation
 
 **The trap:** two source forms that use the same locals in the same
@@ -7303,6 +7312,65 @@ attribution in C-61's confirmation addendum, which this entry corrects.
 > hand-written guard, not the compiler's own synthesized `for`-loop
 > pre-check, so this is confirmation of the mechanism's boundary, not a
 > contradiction of it.
+
+> **Third-round confirmation (cm-ov002-unknown-sweep-13), again
+> completely blind.** A different batch, with no knowledge of this
+> entry or the prior round's confirmation, hit the identical
+> `bls`-in-target/`beq`-in-every-hand-written-attempt pattern on 2 more
+> functions (`func_ov002_021ff170`; `func_ov002_0220ad78`, reached
+> 98.4% — one instruction short) and explicitly proposed it as a new,
+> uncatalogued wall worth writing up. The phrasings they tried —
+> `<=0`, `<1`, reversed operands, natural `>0` wrapping, with and
+> without `goto`, signed and unsigned — are exactly the class of
+> hand-written guard this entry already predicts will fail; they did
+> not try a bare compiler-synthesized `for` loop, the one form that
+> works. `func_ov002_0220ad78`'s 98.4% is a good, low-effort candidate
+> to close with the known fix in a future round, rather than a new
+> investigation.
+
+### C-65. Loop-body strength reduction (a raw index computation collapsing to pointer-increment form) is source-sensitive, but not the same way for a load and a store
+
+**The trap.** A loop that reads or writes through `base + i * CONST`
+each iteration can compile two different ways: mwcc either keeps the
+per-iteration multiply/add (an "indexed" form) or strength-reduces it
+into a separately-incremented pointer that advances by `CONST` each
+pass (an "induction-variable" form). Which one the target uses is not
+guessable from the arithmetic alone, and this round produced two
+results that look contradictory until read carefully.
+
+**On a load / return path:** array-indexed struct-field access
+(`arr[j].field`) reproduced the target's non-strength-reduced,
+recomputed-index form, where the mathematically identical raw pointer
+arithmetic (`*(T *)(base + j * sizeof(T)) `-style) got strength-reduced
+by mwcc into an induction variable the target doesn't have — confirmed
+concretely in `func_ov006_021b66c4` (cm-ov002-unknown-sweep-13).
+
+**On a store path:** a small fixed-trip-count loop computing
+`base + i * CONST` to store *through* got strength-reduced by mwcc
+**regardless of source form** — combined-expression, split-pointer
+intermediate, `do`-`while`, and array-indexing all four produced the
+same (wrong, induction-variable) shape, none reproducing the target's
+literal recomputed-index form (`func_ov004_021cc63c`,
+cm-ov002-unknown-sweep-13). Also seen as a first ov002-module instance
+of a strength-reduction wall previously only documented for ov004
+(`func_ov002_0224958c`, same round, same batch that later shipped the
+C-65-adjacent array-indexed fix — not yet reconciled with it).
+
+**Honest scope — apparent load-vs-store asymmetry, not yet explained.**
+Whether the direction (read vs. write) through the computed address is
+itself the controlling factor, or whether these are two unrelated
+instances of the general "mwcc's strength-reduction heuristic doesn't
+always match the source's own literal structure" wall, is unresolved —
+flagged as a real open question rather than forced into a single
+unified rule. The practical guidance for now: **try array-indexed
+struct-field access first for a load that resists strength-reduction
+matching; expect it to make no difference for a store**, and confirm
+either way via `fastmatch.py` rather than assuming the load-side result
+transfers.
+
+**Provenance:** cm-ov002-unknown-sweep-13, three independent batches
+(load-side fix, store-side negative result, first ov002 instance) in
+the same round.
 
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
