@@ -576,4 +576,12 @@ src/overlay005/data/data_ov005_021b1c9c.c:
 
 src/overlay005/bss/data_ov005_bss.s:
     complete
-    .bss start:0x021b1d40 end:0x021b2280
+    .bss start:0x021b1d40 end:0x021b1e4c
+
+src/overlay005/data_ov005_021b1e4c.c:
+    complete
+    .bss start:0x021b1e4c end:0x021b1e60
+
+src/overlay005/bss/data_ov005_bss_2.s:
+    complete
+    .bss start:0x021b1e60 end:0x021b2280

@@ -493,4 +493,20 @@ src/overlay015/data_ov015_021b5cbc.c:
 
 src/overlay015/bss/data_ov015_bss.s:
     complete
-    .bss start:0x021b5d40 end:0x021b68e0
+    .bss start:0x021b5d40 end:0x021b5d4c
+
+src/overlay015/data_ov015_021b5d4c.c:
+    complete
+    .bss start:0x021b5d4c end:0x021b5df0
+
+src/overlay015/bss/data_ov015_bss_2.s:
+    complete
+    .bss start:0x021b5df0 end:0x021b66c4
+
+src/overlay015/data_ov015_021b66c4.c:
+    complete
+    .bss start:0x021b66c4 end:0x021b6794
+
+src/overlay015/bss/data_ov015_bss_3.s:
+    complete
+    .bss start:0x021b6794 end:0x021b68e0
