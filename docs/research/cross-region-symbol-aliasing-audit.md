@@ -19,11 +19,15 @@ see "Forward-looking risk" below for what to watch for.
 compile-check job runs `configure.py --skip-sha1` and says so in its own
 header comment — CI green does **not** prove byte-identity. Verified
 directly instead:
+
 ```
+
 python tools/configure.py eur && ninja sha1   ->  gx-spirit-caller_eur.nds: OK
 python tools/configure.py usa && ninja sha1   ->  gx-spirit-caller_usa.nds: OK
 python tools/configure.py jpn && ninja sha1   ->  gx-spirit-caller_jpn.nds: OK
+
 ```
+
 All three regions are byte-identical to their baseroms as of this audit.
 
 **Scan**: parsed every region's `symbols.txt` + `delinks.txt` for `main`
