@@ -41,8 +41,8 @@ Shipped `.text`: 304,066 B · remaining `.text`: 2,068,594 B · denominator: 2,3
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 158,276 | 3.31% |
-| Named-struct | 52,068 | 1.09% |
+| Typed-array | 159,508 | 3.34% |
+| Named-struct | 52,836 | 1.11% |
 | *(total data bytes)* | 4,776,528 | |
 
 `Typed-array` counts any file-scope array declaration, including opaque

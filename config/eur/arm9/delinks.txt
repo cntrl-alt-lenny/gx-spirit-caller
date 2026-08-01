@@ -21308,7 +21308,15 @@ src/main/data/data_0219adcc.c:
 
 src/main/bss/data_main_bss_4.s:
     complete
-    .bss start:0x0219b27c end:0x0219c4a0
+    .bss start:0x0219b27c end:0x0219b490
+
+src/main/data/data_0219b490.c:
+    complete
+    .bss start:0x0219b490 end:0x0219b550
+
+src/main/bss/data_main_bss_4_3.s:
+    complete
+    .bss start:0x0219b550 end:0x0219c4a0
 
 src/main/data/data_0219c4a0.c:
     complete

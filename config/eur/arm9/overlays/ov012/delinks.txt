@@ -132,4 +132,12 @@ src/overlay012/data_ov012_021cc1e8.c:
 
 src/overlay012/bss/data_ov012_bss.s:
     complete
-    .bss start:0x021cc6a0 end:0x021ccc00
+    .bss start:0x021cc6a0 end:0x021cc86c
+
+src/overlay012/data_ov012_021cc86c.c:
+    complete
+    .bss start:0x021cc86c end:0x021cc934
+
+src/overlay012/bss/data_ov012_bss_2.s:
+    complete
+    .bss start:0x021cc934 end:0x021ccc00
