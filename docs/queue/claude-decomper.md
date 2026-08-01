@@ -783,7 +783,7 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-13 [S]
+### cm-ov002-unknown-sweep-13 — plain selection, 149-512B [S] [CLAIMED]
 
 Same protocol — it is working. Plain module-agnostic selection across
 149-512B, 5 worktrees, `ninja delink` in setup, verbatim routing/header
