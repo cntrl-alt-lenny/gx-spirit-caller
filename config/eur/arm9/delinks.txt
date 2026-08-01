@@ -2753,7 +2753,7 @@ src/main/func_02019210.s:
     complete
     .text start:0x02019210 end:0x0201934c
 
-src/main/func_0201934c.s:
+src/main/func_0201934c.c:
     complete
     .text start:0x0201934c end:0x0201942c
 
@@ -16967,7 +16967,7 @@ src/main/func_02092ca0.s:
     complete
     .text start:0x02092ca0 end:0x02092d20
 
-src/main/func_02092d20.s:
+src/main/func_02092d20.legacy.c:
     complete
     .text start:0x02092d20 end:0x02092e38
 
