@@ -6332,6 +6332,13 @@ B band (`main` + `ov002`); see the brief doc for the full candidate
 list — the census itself is reusable for future waves once this
 lever is applied from the start.
 
+> **Scope broadened (cm-ov002-unknown-sweep-13):** this also applies
+> to plain `cmp`/`beq`-chain switches with **no jump table at all**,
+> not just jump-table-lowered ones — 2 independent batches hit the
+> identical source-order-not-value-order body placement on non-jump-
+> table dispatchers in the same round. Don't assume this lever is
+> jump-table-specific just because the discovery brief was.
+
 ### C-45. `switch` over a small contiguous case range can avoid mwcc's range-fold
 
 > **Corrects a bulk mis-stamp, not a specific prior citation.**
