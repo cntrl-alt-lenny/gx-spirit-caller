@@ -1,0 +1,17 @@
+; Cluster A wave 4 — overlay 005 (brief 139).
+; mwasmarm syntax + dsd LCF auto-routing.
+; 3 .bss symbols, range 0x021b1da8..0x021b1ddc.
+; split from the original cluster to carve out matched symbols (fragment 1 of 2, cm-bss-convert-4).
+; split from the original cluster to carve out matched symbols (fragment 2 of 2, cm-bss-convert-8).
+
+        .bss
+
+        .global data_ov005_021b1da8
+data_ov005_021b1da8:
+        .space 0xc
+        .global data_ov005_021b1db4
+data_ov005_021b1db4:
+        .space 0x1c
+        .global data_ov005_021b1dd0
+data_ov005_021b1dd0:
+        .space 0xc
