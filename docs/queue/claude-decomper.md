@@ -669,7 +669,7 @@ consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
 
-### cm-ov002-unknown-sweep-11 — plus the dominant-wall mini-item [S] [TODO]
+### cm-ov002-unknown-sweep-11 — plus the dominant-wall mini-item [S] [CLAIMED]
 
 > Filed from the coordinating process's own chat message after
 > sweep-10 merged (main 12f62dbf6, EUR 12.60%) — appended here per the
