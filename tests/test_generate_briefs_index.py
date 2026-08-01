@@ -182,9 +182,9 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
 
     def test_committed_index_matches_regeneration(self):
         if not INDEX_PATH.is_file():
-            self.skipTest(
-                "docs/briefs/README.md not present — run "
-                "`python tools/generate_briefs_index.py` first.",
+            self.fail(
+                "docs/briefs/README.md is missing — run "
+                "`python tools/generate_briefs_index.py` and commit.",
             )
         # Mirror the main() collection logic.
         briefs: list[dict] = []
@@ -196,7 +196,7 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
                 continue
             briefs.append(parsed)
         if not briefs:
-            self.skipTest("no briefs in docs/briefs/")
+            self.fail("no briefs in docs/briefs/ — generated index cannot be validated")
         expected = render_index(briefs)
         actual = INDEX_PATH.read_text(encoding="utf-8")
         self.assertEqual(

@@ -161,11 +161,11 @@ class TestGeneratedIndexIsCurrent(unittest.TestCase):
 
     def test_committed_index_matches_regeneration(self):
         committed_path = Path(__file__).resolve().parent.parent / "docs" / "tools-index.md"
-        if not committed_path.is_file():
-            self.skipTest(
-                "docs/tools-index.md not present — run "
-                "`python tools/generate_tool_index.py` first.",
-            )
+        self.assertTrue(
+            committed_path.is_file(),
+            "docs/tools-index.md is missing — run "
+            "`python tools/generate_tool_index.py` and commit.",
+        )
         tools = scan_tools(_TOOLS)
         expected = render(tools)
         actual = committed_path.read_text(encoding="utf-8")

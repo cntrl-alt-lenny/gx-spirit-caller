@@ -318,7 +318,7 @@ class TestFilterScaffoldable(unittest.TestCase):
         from scaffold_batch import ROOT
         config_dir = ROOT / "config" / "eur"
         if not (config_dir / "arm9").is_dir():
-            self.skipTest("config/eur not present")
+            self.fail("config/eur/arm9 is missing — the live scaffold filter cannot be checked")
 
         modules = {
             "ov005": _module("ov005", [

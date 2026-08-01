@@ -274,7 +274,10 @@ class TestRealTreeHasZeroUnresolvedContradictions(unittest.TestCase):
 
     def test_committed_bank_has_no_unresolved_contradictions(self):
         if not aca.PROVENANCE_JSON.is_file():
-            self.skipTest("prototypes-provenance.json not present")
+            self.fail(
+                "prototypes-provenance.json is missing — the committed callsite "
+                "bank cannot be audited",
+            )
         consensus = aca.build_consensus()
         provenance = aca.load_provenance()
         declared = {name: len(entry.get("params", [])) for name, entry in provenance.items()}
