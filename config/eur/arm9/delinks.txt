@@ -1829,7 +1829,7 @@ src/main/func_02010eb8.s:
     complete
     .text start:0x02010eb8 end:0x02010f84
 
-src/main/func_02010f84.s:
+src/main/func_02010f84.c:
     complete
     .text start:0x02010f84 end:0x02011098
 
