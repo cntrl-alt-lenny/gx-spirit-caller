@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**124 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**125 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (52)
+- [Uncategorised](#uncategorised) (53)
 
 ## Analysis / worklist
 
@@ -566,6 +566,12 @@ Composes four already-built pieces that nothing currently chains:
 **classify a candidate's build-vs-baseline ARM9 diff as**
 
 CONTAINED (reshapeable) or AVALANCHE (park it).
+
+### `tools/cross_region_aliases.py`
+
+**Derive the cross-region data-symbol alias block-list.**
+
+The fallback data resolver assumes that an EUR address has the same meaning in USA/JPN.  This tool finds the narrower, dangerous case: a data/bss symbol with the same name and absolute address in all three symbol tables while the USA and…
 
 ### `tools/cross_region_chunk_extent.py`
 
