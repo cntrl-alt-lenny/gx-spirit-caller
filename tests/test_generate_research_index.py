@@ -309,13 +309,16 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
 
     def test_committed_index_matches_regeneration(self):
         if not INDEX_PATH.is_file():
-            self.skipTest(
-                "docs/research/README.md not present — run "
-                "`python tools/generate_research_index.py` first.",
+            self.fail(
+                "docs/research/README.md is missing — run "
+                "`python tools/generate_research_index.py` and commit.",
             )
         notes = collect_notes()
         if not notes:
-            self.skipTest("no research notes in docs/research/")
+            self.fail(
+                "no research notes in docs/research/ — generated index "
+                "cannot be validated",
+            )
         expected = render_index(notes)
         actual = INDEX_PATH.read_text(encoding="utf-8")
         self.assertEqual(

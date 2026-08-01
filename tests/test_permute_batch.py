@@ -610,7 +610,7 @@ class TestBriefWorklistRealFile(unittest.TestCase):
             / "cluster-b-e-permuter-targets.json"
         )
         if not worklist.is_file():
-            self.skipTest("brief 196 worklist not in tree yet")
+            self.fail("brief 196 worklist is missing — committed target data cannot be checked")
         picks, meta = load_worklist(worklist)
         self.assertEqual(len(picks), 9)
         ids = {p["id"] for p in picks}
