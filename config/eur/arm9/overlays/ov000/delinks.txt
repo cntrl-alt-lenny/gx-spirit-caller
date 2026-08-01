@@ -643,7 +643,7 @@ src/overlay000/func_ov000_021add44.s:
     complete
     .text start:0x021add44 end:0x021adf18
 
-src/overlay000/func_ov000_021adf18.s:
+src/overlay000/func_ov000_021adf18.c:
     complete
     .text start:0x021adf18 end:0x021adfc4
 

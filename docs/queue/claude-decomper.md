@@ -802,3 +802,63 @@ stray-draft scan; regenerate the research index before pushing.
 > left in place rather than risk a force-push rewrite of shared
 > history, flagged to the user in-session. Full writeup:
 > `docs/research/cm-ov002-unknown-sweep-13-2026-08-01.md`.
+
+### cm-ov002-unknown-sweep-14 — verbatim dispatch of C-55/C-44/C-64 [DONE]
+
+> **DONE 2026-08-01.** 24/100 shipped, 4,968 bytes — lowest count since
+> sweep-9, driven by two real process incidents this round rather than
+> candidate difficulty. Direct C-64 fix attempt on `func_ov002_0220ad78`
+> transferred the core mechanism cleanly but hit a new, distinct
+> redundant-AND residual that resisted 5 variations — reverted, flagged
+> for a future pass. Incident 1: a queue-header edit written as `[S]`
+> alone (never a valid status marker on its own — every prior round's
+> `[S]` only ever appeared bundled with a real `[DONE]`) was invisible
+> to `work_queue.py`, caught by its own test. Incident 2: two dispatched
+> agents collided in one worktree (one operated in the wrong directory);
+> verified directly, recovered both 20-candidate results with zero data
+> loss. Incident 3: one agent crashed with corrupted output; its 4 real
+> shipped candidates were recovered and independently re-verified before
+> committing, the other 16 re-dispatched cleanly. New C-55 extension
+> (switch, not goto, suppresses if-conversion for shared-loop-rejoin
+> arms) and another C-65 confirmation. Full writeup:
+> `docs/research/cm-ov002-unknown-sweep-14-2026-08-01.md`.
+
+Same protocol. Plain module-agnostic selection across 149-512B, 5
+worktrees, `ninja delink` in setup, one consolidated gate.
+
+**Rule going forward, effective this round**: any lever independently
+rediscovered twice goes into the dispatch prompt verbatim — don't wait
+for a third rediscovery. C-55 (with its new backfire caveat), C-44
+(with its broadened non-jump-table scope note), and C-64 (including
+the specific tell: `LS` only appears from a compiler-synthesized bare
+`for` loop, never a hand-written guard) are all stated verbatim in
+every dispatch prompt this round.
+
+Cheap close attempted directly first: `func_ov002_0220ad78` (98.4%,
+flagged as closable with the known C-64 fix). The guard/loop mechanism
+transferred cleanly, but a new, distinct residual surfaced (a redundant
+`and` before a `mul`/`mla`, at 2 symmetric sites) that resisted 5
+tested variations — reverted rather than shipped partial, flagged as
+its own open question rather than a failure of the C-64 fix.
+
+C-65's load-vs-store strength-reduction asymmetry: carry it, don't
+force it. A 4th independent instance earns a mini-item; otherwise
+leave it recorded as-is.
+
+C-61's early AND/MUL residual is confirmed to generalize across the
+whole row-table family — stop attacking it if hit again.
+
+Same NON-NEGOTIABLE no-sub-agent language, same git-status +
+delinks.txt self-check instruction, same "keep reporting bytes and pp,
+not ship-rate alone," same `park_one.py` (never `git checkout --
+<module>/delinks.txt`), same fastmatch.py-over-eyeball discipline.
+
+Keep C-32 mechanical screening.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
+consolidated branch (not per-batch); three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index AND
+`docs/state-table.md` before pushing. **Protocol note**: `--clean`
+deletes the 3 tracked progress heatmaps as build outputs —
+`git restore assets/` before committing, never a bare `git add -A`.
