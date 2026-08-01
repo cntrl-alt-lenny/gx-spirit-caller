@@ -451,6 +451,13 @@ def main(argv: list[str]) -> int:
         args.min_size, args.max_size, args.exclude_attempted,
         args.min_addr, args.max_addr,
     )
+    if not per:
+        print(
+            "error: no live EUR function sources matched; headroom was "
+            "not measured",
+            file=sys.stderr,
+        )
+        return 2
     ranked = sorted(per.items(), key=lambda kv: kv[1]["candidate"], reverse=True)
     total_candidate = sum(d["candidate"] for _, d in ranked)
     total_permanent = sum(d["permanent"] for _, d in ranked)

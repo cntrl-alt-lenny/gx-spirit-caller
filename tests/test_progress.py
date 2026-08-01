@@ -10,9 +10,11 @@ symbols.txt) against schema drift.
 from __future__ import annotations
 
 import json
+import io
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from unittest import mock
 from pathlib import Path
 
@@ -1296,6 +1298,34 @@ class TestSummarizeByModuleHonestMetricColumns(unittest.TestCase):
         row = summarize_by_module(root)[0]
         self.assertEqual(row["module"], "ov004")
         self.assertEqual(row["done_class"], "finishable")
+
+
+class TestProgressMainFailClosed(unittest.TestCase):
+    def test_no_measurement_fails_instead_of_reporting_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config" / "eur").mkdir(parents=True)
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with mock.patch.object(progress_module, "ROOT", root), \
+                 mock.patch.object(sys, "argv", ["progress.py", "--version", "eur"]), \
+                 redirect_stdout(stdout), redirect_stderr(stderr):
+                rc = progress_module.main()
+
+            self.assertEqual(rc, 2)
+            self.assertIn("no symbols.txt files found yet", stdout.getvalue())
+
+    def test_symbol_denominator_still_uses_precarve_stub(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            symbols = root / "config" / "eur" / "arm9" / "symbols.txt"
+            symbols.parent.mkdir(parents=True)
+            symbols.write_text("Foo kind:function addr:0x02000000\n", encoding="utf-8")
+            with mock.patch.object(progress_module, "ROOT", root), \
+                 mock.patch.object(sys, "argv", ["progress.py", "--version", "eur"]):
+                rc = progress_module.main()
+
+            self.assertEqual(rc, 0)
 
 
 class TestCanaryReconciliation(unittest.TestCase):

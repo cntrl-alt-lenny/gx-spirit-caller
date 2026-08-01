@@ -71,9 +71,17 @@ def scan_eur_tree(base: Path) -> tuple[list[tuple[str, int, Path]], list[str]]:
     return eur_c, eur_unparsed
 
 
-def main() -> None:
+def main() -> int:
     # --- EUR baseline .c files ---------------------------------------------
     eur_c, eur_unparsed = scan_eur_tree(ROOT / "src")
+
+    if not eur_c:
+        print(
+            "ERROR: no EUR .c files found; port census has no baseline "
+            "to measure.",
+            file=sys.stderr,
+        )
+        return 2
 
     print(f"EUR baseline .c files (address-keyed): {len(eur_c)}; unparsed names: {len(eur_unparsed)}")
     if eur_unparsed[:5]:
@@ -164,7 +172,8 @@ def main() -> None:
     with open(SCRATCH / "port_backlog.json", "w") as fh:
         json.dump({"backlog": backlog, "nofile": nofile_list}, fh, indent=1)
     print("\nwrote", SCRATCH / "port_backlog.json")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
