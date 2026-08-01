@@ -668,3 +668,82 @@ not ship-rate alone."
 consolidated branch (not per-batch); three regions individually
 grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index before pushing.
+
+### cm-ov002-unknown-sweep-11 — plus the dominant-wall mini-item [S] [TODO]
+
+> Filed from the coordinating process's own chat message after
+> sweep-10 merged (main 12f62dbf6, EUR 12.60%) — appended here per the
+> project's "a prose mention is not a task" convention.
+
+Same shape as sweep-10: plain module-agnostic selection across
+149-512B, 5 worktrees, one consolidated gate.
+
+**THE MINI-ITEM IS DONE, not delegated.** The P-4/P-11/P-12/P-15
+register-allocation family got the "one round of direct attention"
+asked for — standalone `mwccarm 2.0/sp1p5` compilation against real
+parked residuals, same method as C-60. Result: **C-61** in
+`codegen-walls.md` — a real, mechanistically-understood, positive
+lever for one specific sub-shape (a loop with a shared row-base,
+walking cursor, and index needing 3-way correct register assignment):
+declare the index and cursor **before** the guard-clause locals, in
+their eventual-use relative order. Confirmed instruction-for-
+instruction on 2 independent real functions
+(`func_ov002_02250540`, `func_ov002_0224b0b0`). **Full honesty on
+scope: this is a real, partial win, not a full crack** — both targets
+have a SEPARATE residual (an early `and`+`mul` scratch-register swap)
+that did not move under any tested variant and matches the shape of
+P-11's own already-exhaustively-falsified "brief 254" pattern exactly.
+State verbatim to whichever batch gets the priority cohort: "Apply
+C-61's declaration-order recipe first. If a residual remains after
+that, check whether it matches the early AND/MUL operand-swap shape
+C-61's own entry describes as already-exhausted — if so, that's a
+genuine, known-resistant P-11-class residual, not a sign you did
+something wrong. Don't re-derive the negative result from scratch."
+
+**The 8 sweep-10 batch-4 cohort members** (same `data_ov002_022cf16c`
+loop-scan shape, never directly tested against C-61) are this round's
+priority slot — assigned to batch 1, ahead of its 12 regular
+candidates: `func_ov002_02235a78`, `func_ov002_0223cfec`,
+`func_ov002_02242900`, `func_ov002_02248bc0`, `func_ov002_0224de94`,
+`func_ov002_02252d98`, `func_ov002_02264f00`, `func_ov002_02286c9c`.
+Not all 8 are confirmed to share the exact same offset/constant
+shape as the 2 already-tested targets — read each one's own
+disassembly before assuming the recipe transfers verbatim.
+
+**TWO SETUP FIXES FROM THIS ROUND'S OWN FINDINGS:**
+- **Add `ninja delink` to worktree setup** (dsd-only, no compiler —
+  confirmed safe in parallel alongside `configure.py`). A fresh
+  worktree without it leaves `fastmatch.py`'s reference-object cache
+  unpopulated — its first call silently compiles against the STALE
+  `.s` rule instead of the new `.c` draft, no error shown.
+- **Paste the tier-routing text VERBATIM from
+  `docs/research/style-a-epilogue.md`, not paraphrased from memory.**
+  Last round's dispatch text was a paraphrase that dropped the real
+  disambiguator (odd register count vs. epilogue shape alone) and
+  caused a 3rd rediscovery incident. State verbatim: "Read the target
+  `.s`'s own prologue AND epilogue BEFORE writing any C — this is a
+  3-way choice: default tier gets an r3-spill (`push {r3,...,lr}`)
+  when the live register count is ODD, no `sub sp`, `pop {regs,pc}`.
+  `.legacy.c` (1.2/sp2p3): no r3-spill, `sub sp,#4`, `pop {regs,lr};
+  bx lr` (2-step). `.legacy_sp3.c` (1.2/sp3): no r3-spill, `sub sp,#4`,
+  `pop {regs,pc}` (1-step). `sub sp,#4` alone does NOT distinguish
+  `.legacy.c` from `.legacy_sp3.c` — the pop target does. Choosing the
+  tier after drafting wastes the draft." Same treatment for the
+  brief-302/294 header resolution as every prior round.
+
+Carry the full lever set: C-55 through C-61 (C-58 systemic; C-60 and
+C-61 both apply specifically to `data_ov002_022cf16c` addressing —
+state both).
+
+Keep C-32 mechanical screening — 6 genuine catches across 2 prior
+rounds, 0 escapes; 2 more caught pre-dispatch this round (8 total).
+
+Same NON-NEGOTIABLE no-sub-agent language, same git-status +
+delinks.txt self-check instruction, same "keep reporting bytes and pp,
+not ship-rate alone," same `park_one.py` (never `git checkout --
+<module>/delinks.txt`).
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
+consolidated branch (not per-batch); three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index before pushing.

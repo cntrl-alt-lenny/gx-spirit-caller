@@ -6850,6 +6850,172 @@ directly rather than delegated, per the coordinating process's request
 to treat this cohort (4 recurrences across cm-ov002-unknown-sweep-9) as
 a dedicated mini-item.
 
+### C-61. Declaring a loop's index and walking pointer *before* the guard-clause locals, in use order, steers a 3-way register triangle — confirmed on the P-4/11/12/15 family's own signature shape
+
+**Background — direct investigation, per explicit request.** After 3
+consecutive rounds accumulating evidence that the register-allocation-
+plateau family (P-4/P-11/P-12/P-15, plus the P-17 cohort) is the
+campaign's dominant open problem, this was investigated head-on via
+standalone `mwccarm 2.0/sp1p5` compilation against real parked
+residuals — the same method C-60 used — rather than delegated blind.
+Prior falsification history for this family is extensive and mostly
+still stands (see below); this entry documents a genuine, real,
+*positive* result found within it, not a wholesale reversal.
+
+**The shape.** A loop over a per-row array (base address shared
+between two roles: computing a walking cursor, and re-loading a
+per-iteration bound from a fixed offset) with three "slots" needing
+correct register assignment simultaneously: the loop index, the
+walking cursor pointer, and the shared row-base pointer. This is
+structurally the *same* `data_ov002_022cf16c` table C-60 investigates,
+but in a loop-scan access pattern rather than a single lookup — the
+pattern sweep-10 batch 4 flagged at high volume (9 of 14 parks in one
+batch alone).
+
+**Target (`func_ov002_02250540`, do-while over `data_ov002_022cf16c`
+rows, 3 guard-check calls per element):**
+
+```text
+ldr   r0, [pc, #...]        ; &data_ov002_022cf16c
+mov   r8, #0xd
+add   r6, r0, r1            ; base = r6
+add   r5, r6, #0x260        ; cursor = r5
+.Lloop:
+  ldr   r0, [r5]
+  ...                       ; 3 guard calls on the extracted id
+  mov   r2, r4              ; index (arg to the handler call)
+  bl    func_ov002_02253458
+.Lskip:
+  ldr   r0, [r6, #0x10]     ; base reused to reload the bound
+  add   r4, r4, #1          ; index++
+  cmp   r4, r0
+  add   r5, r5, #4          ; cursor++
+  bcc   .Lloop
+```
+
+**What did NOT move it (matching this family's own extensive prior
+history):** natural declaration order matching statement/use order
+(the obvious first attempt) reproduces the *wrong* triangle every
+time — the register **set** {r4,r5,r6} is always right, but the
+**assignment** (which role gets which number) comes out scrambled, in
+a way pure use-order declaration never fixes. This matches every
+already-documented falsification in this family (P-4's 12 variants,
+P-11's 5+9-variant matrices, P-12's 9 variants, P-13's 5 cross-tier
+attempts) in spirit: naive source-shape iteration plateaus.
+
+**What DID work.** Declare the index and the walking-cursor pointer
+**before** the guard-clause locals (`row`, `count`, the early-return
+check) — even though they aren't *assigned* until after the guard
+clause — and declare them **in their eventual-use relative order**
+(index, then cursor):
+
+```c
+void func_ov002_02250540(int player) {
+    unsigned int row = (player & 1) * 0x868;
+    unsigned int i = 0;              /* declared+init BEFORE the guard */
+    int *cursor;                     /* declared BEFORE the guard, after i */
+    unsigned int count = *(unsigned int *)(data_ov002_022cf17c + row);
+    if (count <= 0) {
+        return;
+    }
+    cursor = (int *)(data_ov002_022cf16c + row + 0x260);   /* assigned after */
+    {
+        int type = 13;
+        do {
+            unsigned int id = *(unsigned int *)cursor;
+            id = (unsigned int)(id << 19) >> 19;      /* NOT sign-extension —
+                a plain 13-bit unsigned mask; the shift-pair uses `lsr`
+                not `asr` in the target, confirmed by direct disassembly
+                of the delinked gap object, not by re-reading the .s
+                text — see the process note below. */
+            if (func_0202e234(id) != 0) {
+                if (func_0202ef38(id) != 0) {
+                    if (func_0202b8a8(id) <= 4) {
+                        func_ov002_02253458(player, type, i);
+                    }
+                }
+            }
+            i++;
+            cursor++;
+        } while (i < *(unsigned int *)(data_ov002_022cf16c + row + 0x10));
+    }
+}
+```
+
+This reproduces the target's **entire loop body instruction-for-
+instruction**, including all three triangle registers (index=r4,
+cursor=r5, base=r6) and the self/const/id registers (r7/r8/r9) —
+verified via `fastmatch.py` against the real delinked gap object, and
+**independently reconfirmed on a second, structurally distinct real
+function** (`func_ov002_0224b0b0`, a 4-guard-check variant of the same
+loop shape) with the identical recipe, identical result.
+
+**Ablation (what the mechanism actually is):** swapping the relative
+order of the index and cursor declarations (cursor-before-index instead
+of index-before-cursor, both still ahead of the guard clause) flips
+which of them lands in r4 vs r5, while the shared base still correctly
+lands in r6 — confirming both "ahead of the guard clause" and "in
+use-order relative to each other" are independently load-bearing, not
+one incidental side effect of the other.
+
+**Honest scope — this is a real, partial win, not a full crack.**
+Neither target reaches 100% with this lever alone. A **second,
+separate residual remains** in both: the early `(player&1)*0x868`
+scratch computation (`and`+`mul`, 2 instructions) lands its
+intermediate AND-result and final MUL-result in swapped registers
+(r1/r2) relative to target, and **this residual did not move under
+any tested variant** (explicit named intermediate, operand-order swap,
+declaration-order changes) — behavior indistinguishable from the
+already-documented, already-exhaustively-falsified P-11 "brief 254"
+MLA/commutative-operand pattern (5 source forms tried there, zero
+movement, "no clean lever" — see P-11's entry above). **Do not treat
+this as evidence that pattern is now solvable too** — it looks like the
+same wall, independently re-confirmed here, not a new lever for it.
+
+**What this answers, precisely, for the campaign's dominant open
+question:**
+1. **The wall family is not one mechanism — it's several wearing the
+   same "register-letter mismatch, otherwise byte-identical" signature,
+   even within a single function.** This target has one sub-piece that
+   is genuinely steerable from C (the loop-body triangle) sitting
+   directly next to one sub-piece that is not (the early AND/MUL
+   scratch swap, matching P-11's own documented-resistant shape).
+2. **Yes, declaration order is sometimes the lever — but only a
+   specific form of it** (loop-scope locals hoisted ahead of and in
+   relative-use-order to guard-clause locals), not naive reordering,
+   which this family has already been shown many times not to respond
+   to.
+3. **No construct tested moves the early-scratch commutative-operand
+   class** — consistent with, not a reversal of, prior findings.
+
+**Process note — a real, catchable error.** The first attempt at this
+recipe was eyeball-verified against the `.s` file's own text (a hand
+transcription) and appeared to match completely. It didn't:
+`fastmatch.py` against the real delinked gap object caught two real
+divergences the eyeball comparison missed (the `ldmlsia`/unsigned-LS
+condition code on the early guard, misread as an unconditional-looking
+match against `pople`/signed-LE from a differently-typed comparison;
+and the `lsr`-vs-`asr` shift-pair, invisible unless the exact opcode
+nibble is checked rather than the shift *amount*). **Always verify
+against the tool's own resolved comparison, not a hand read of the
+`.s` text, even when a match looks obviously complete** — this is the
+same discipline [[feedback_read-the-metric-source-before-measuring]]-
+style memory already asks for, re-confirmed here at the instruction
+level rather than the metric level.
+
+**Affected/testable cohort:** the remaining ~7 members of sweep-10
+batch 4's `data_ov002_022cf16c` loop-scan cohort are the natural next
+test — same table, same general shape, unconfirmed whether all of them
+carry the *same* early-scratch residual or whether some close fully
+with this lever alone (both targets tested here happen to share the
+exact same `(player&1)*0x868` prefix; a cohort member with a
+differently-shaped guard clause might not carry that specific
+resistant sub-piece).
+
+**Provenance:** cm-ov002-unknown-sweep-11 (2026-07-31), investigated
+directly per the coordinating process's explicit request to give this
+wall family "one round of direct attention."
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
