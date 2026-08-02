@@ -6692,7 +6692,7 @@ src/main/func_02033ac0.s:
     complete
     .text start:0x02033ac0 end:0x02033b60
 
-src/main/func_02033b60.s:
+src/main/func_02033b60.c:
     complete
     .text start:0x02033b60 end:0x02033c2c
 
