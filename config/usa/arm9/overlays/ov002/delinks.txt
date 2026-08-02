@@ -10360,7 +10360,7 @@ src/usa/overlay002/func_ov002_0228b0a8.c:
 src/usa/overlay002/func_ov002_0228b0f4.c:
     complete
     .text start:0x0228b0f4 end:0x0228b2b4
-src/usa/overlay002/func_ov002_0228b2b4.s:
+src/usa/overlay002/func_ov002_0228b2b4.c:
     complete
     .text start:0x0228b2b4 end:0x0228b368
 src/usa/overlay002/func_ov002_0228b368.s:
@@ -10457,7 +10457,7 @@ src/usa/overlay002/func_ov002_0228cf9c.s:
 src/usa/overlay002/func_ov002_0228d434.s:
     complete
     .text start:0x0228d434 end:0x0228d788
-src/usa/overlay002/func_ov002_0228d788.s:
+src/usa/overlay002/func_ov002_0228d788.c:
     complete
     .text start:0x0228d788 end:0x0228d84c
 src/usa/overlay002/func_ov002_0228d84c.s:
@@ -10599,7 +10599,7 @@ src/usa/overlay002/func_ov002_02291700.c:
 src/usa/overlay002/func_ov002_0229172c.s:
     complete
     .text start:0x0229172c end:0x022917f0
-src/usa/overlay002/func_ov002_022917f0.s:
+src/usa/overlay002/func_ov002_022917f0.c:
     complete
     .text start:0x022917f0 end:0x02291898
 src/usa/overlay002/func_ov002_02291898.s:
@@ -11052,7 +11052,7 @@ src/usa/overlay002/func_ov002_02295c78.c:
     complete
     .text start:0x02295c78 end:0x02295cd0
 
-src/usa/overlay002/func_ov002_02295cd0.s:
+src/usa/overlay002/func_ov002_02295cd0.c:
     complete
     .text start:0x02295cd0 end:0x02295db4
 src/usa/overlay002/func_ov002_02295db4.c:
@@ -11221,7 +11221,7 @@ src/usa/overlay002/func_ov002_022973ac.s:
 src/usa/overlay002/func_ov002_022978ac.s:
     complete
     .text start:0x022978ac end:0x02297a24
-src/usa/overlay002/func_ov002_02297a24.s:
+src/usa/overlay002/func_ov002_02297a24.c:
     complete
     .text start:0x02297a24 end:0x02297b2c
 src/usa/overlay002/func_ov002_02297b2c.legacy_sp3.c:
@@ -11449,7 +11449,7 @@ src/usa/overlay002/func_ov002_0229e084.s:
 src/usa/overlay002/func_ov002_0229e16c.s:
     complete
     .text start:0x0229e16c end:0x0229e3d8
-src/usa/overlay002/func_ov002_0229e3d8.s:
+src/usa/overlay002/func_ov002_0229e3d8.c:
     complete
     .text start:0x0229e3d8 end:0x0229e490
 src/usa/overlay002/func_ov002_0229e490.s:
