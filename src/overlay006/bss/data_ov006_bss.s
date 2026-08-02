@@ -1,6 +1,6 @@
 ; Cluster A .bss wave 2 — overlay 6 (brief 118 self-extend).
 ; mwasmarm syntax + dsd LCF auto-routing.
-; 3 .bss symbols, range 0x021cf140..0x021cf1b0.
+; 2 .bss symbols, range 0x021cf140..0x021cf174.
 ; split from the original single-TU cluster to carve out matched symbols (fragment 1 of 5, cm-bss-convert-1).
 ; split from the original cluster to carve out matched symbols (fragment 1 of 2, cm-bss-convert-2).
 
@@ -12,6 +12,3 @@ data_ov006_021cf140:
         .global data_ov006_021cf158
 data_ov006_021cf158:
         .space 0x1c
-        .global data_ov006_021cf174
-data_ov006_021cf174:
-        .space 0x3c

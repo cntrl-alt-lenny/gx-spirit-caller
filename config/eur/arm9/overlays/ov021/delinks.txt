@@ -221,7 +221,7 @@ src/overlay021/data_ov021_021ace80.c:
     complete
     .bss start:0x021ace80 end:0x021ace8c
 
-src/overlay021/bss/data_ov021_bss.s:
+src/overlay021/data_ov021_021ace8c.c:
     complete
     .bss start:0x021ace8c end:0x021acec8
 
