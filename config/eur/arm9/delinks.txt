@@ -15672,7 +15672,7 @@ src/main/func_0208ae34.s:
     complete
     .text start:0x0208ae34 end:0x0208aec8
 
-src/main/func_0208aec8.s:
+src/main/func_0208aec8.legacy_sp3.c:
     complete
     .text start:0x0208aec8 end:0x0208afac
 
