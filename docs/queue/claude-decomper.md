@@ -862,3 +862,45 @@ stray-draft scan; regenerate the research index AND
 `docs/state-table.md` before pushing. **Protocol note**: `--clean`
 deletes the 3 tracked progress heatmaps as build outputs —
 `git restore assets/` before committing, never a bare `git add -A`.
+
+### cm-ov002-unknown-sweep-15 — one worktree one agent, enforced [TODO]
+
+Same protocol. Plain module-agnostic selection across 149-512B, one
+consolidated gate.
+
+**ONE WORKTREE, ONE AGENT — ENFORCE IT.** Two agents colliding in one
+worktree is the second collision-class incident in three rounds and
+cost real recovery time both times. Before dispatch, verify each
+batch's worktree path is distinct and that no two dispatch prompts
+name the same directory. Each dispatch prompt also carries an explicit
+first-step instruction: verify `pwd`/cwd and `git branch --show-current`
+match the assignment before doing any work, and stop and report
+immediately if they don't. If a batch needs re-dispatching mid-round,
+give it a FRESH worktree, never a reused live one.
+
+Carry verbatim from `codegen-walls.md`, freshly re-read (not from
+memory): C-55 (with its backfire caveat and the new function-exit vs.
+loop-rejoin extension), C-44, C-64 (with its `for`-loop tell), C-63,
+and C-65.
+
+Watch, don't force: the new redundant-and-before-mul/mla residual from
+`func_ov002_0220ad78`, and C-65's load-vs-store asymmetry. Either
+gaining a 3rd independent instance this round earns a mini-item next
+round.
+
+C-61's early AND/MUL residual is confirmed to generalize — do not
+re-attack it if hit again.
+
+Same NON-NEGOTIABLE no-sub-agent language, same git-status +
+delinks.txt self-check instruction, same "keep reporting bytes and pp,
+not ship-rate alone," same `park_one.py` (never `git checkout --
+<module>/delinks.txt`), same fastmatch.py-over-eyeball discipline.
+
+Keep C-32 mechanical screening.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the
+consolidated branch (not per-batch); three regions individually
+grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
+stray-draft scan; regenerate the research index AND
+`docs/state-table.md` before pushing. `git restore assets/` before
+committing after any `--clean` run — never a bare `git add -A`.
