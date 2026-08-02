@@ -551,6 +551,18 @@ def summarize_data_readability(config_dir: Path) -> dict[str, int | float]:
     primitive set. Both walks use the same module-level delinks ranges as
     the existing data% fallback.
 
+    These are TU-level buckets, not declaration-level byte partitions. For
+    each C/C++ TU, its complete DATA_SECTIONS byte range is added once to
+    Typed-array when any file-scope array declaration is present, and once
+    to Named-struct when any qualifying non-extern named-struct declaration
+    is present. The same bytes therefore intentionally contribute to both
+    buckets when a TU has a non-primitive array (or separate array and
+    struct-instance declarations). Replacing a primitive array with a
+    bracketed named-struct array leaves Typed-array unchanged and adds the
+    bytes to Named-struct; replacing it with a bracketless named-struct
+    instance removes the bytes from Typed-array and adds them to
+    Named-struct — a SWAP, not a free addition.
+
     The named_struct_bytes walk (`_tu_has_named_struct_decl`) checks every
     declaration in a TU (`finditer`, not `.search()`'s first-match-only)
     -- a TU can mix a primitive declaration with a later named-struct one,
