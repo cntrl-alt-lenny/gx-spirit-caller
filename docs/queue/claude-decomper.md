@@ -863,7 +863,7 @@ stray-draft scan; regenerate the research index AND
 deletes the 3 tracked progress heatmaps as build outputs —
 `git restore assets/` before committing, never a bare `git add -A`.
 
-### cm-ov002-unknown-sweep-15 — one worktree one agent, enforced [TODO]
+### cm-ov002-unknown-sweep-15 — one worktree one agent, enforced [DONE]
 
 Same protocol. Plain module-agnostic selection across 149-512B, one
 consolidated gate.
@@ -887,6 +887,24 @@ Watch, don't force: the new redundant-and-before-mul/mla residual from
 `func_ov002_0220ad78`, and C-65's load-vs-store asymmetry. Either
 gaining a 3rd independent instance this round earns a mini-item next
 round.
+
+> **DONE 2026-08-01.** 26/100 shipped, 5,756 bytes. The redundant-
+> and-before-mul/mla residual (open question 1) is now fully resolved
+> as **C-66**, with two working fixes (inline `&1` mask; explicit
+> intermediate variable) and 8+ independent same-round confirmations —
+> the best-evidenced new lever at time of write-up this campaign.
+> C-65 got one more manifestation (arithmetic strength reduction
+> eliminating a division) but stays open. The "one worktree, one
+> agent" enforcement caught a real dispatch-infrastructure bug live:
+> 4 of 5 agents' shell sessions started in the wrong (base checkout)
+> directory rather than their assigned worktree; the mandatory
+> first-step check caught all 4 before any work was attempted, and
+> all 4 resumed cleanly via `SendMessage` once their real worktrees
+> were independently verified safe. A self-contradicting batch report
+> (parked-list said 98.2%, prose claimed "cracked") was reconciled
+> against ground truth (no `.c` file, `delinks.txt` unchanged — it was
+> genuinely parked). See
+> [`cm-ov002-unknown-sweep-15-2026-08-01.md`](../research/cm-ov002-unknown-sweep-15-2026-08-01.md).
 
 C-61's early AND/MUL residual is confirmed to generalize — do not
 re-attack it if hit again.
