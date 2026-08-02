@@ -18,12 +18,14 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 import batch_carve as bc  # noqa: E402
 import batch_port as bp  # noqa: E402
+import fastmatch as fm  # noqa: E402
 from batch_port import (  # noqa: E402
     BatchPorter, compute_port_output_path, filter_sim1_backlog,
     classify_port_refusal, fastmatch_verdict, find_tu_header_for_addr,
@@ -91,6 +93,38 @@ class TestFastmatchVerdict(unittest.TestCase):
         verdict, reason = fastmatch_verdict(payload, 2)
         self.assertEqual(verdict, "tool-error")
         self.assertIn("infrastructure", reason)
+
+    def test_missing_reference_object_is_retryable_tool_error(self):
+        payload = [{
+            "status": "ok",
+            "functions": [{
+                "name": "func_target",
+                "status": "not_in_gap",
+                "match_percent": None,
+            }],
+        }]
+        verdict, reason = fastmatch_verdict(payload, 0)
+        self.assertEqual(verdict, "tool-error")
+        self.assertIn("reference object not found", reason)
+
+
+class TestDelinkedObjectLookup(unittest.TestCase):
+    def test_uses_target_source_parent_and_function_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            object_path = (
+                root / "build" / "jpn" / "delinks" / "src" / "jpn" / "main"
+                / "func_0201098c.o"
+            )
+            object_path.parent.mkdir(parents=True)
+            object_path.write_bytes(b"reference")
+            with mock.patch.object(fm, "ROOT", root):
+                found = fm.find_gap_by_delinked_object(
+                    Path("src/jpn/main/func_0201098c.c"),
+                    "func_0201098c",
+                    "jpn",
+                )
+            self.assertEqual(found, object_path)
 
 
 class TestClassifyPortRefusal(unittest.TestCase):
