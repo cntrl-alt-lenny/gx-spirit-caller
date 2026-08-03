@@ -923,7 +923,7 @@ stray-draft scan; regenerate the research index AND
 `docs/state-table.md` before pushing. `git restore assets/` before
 committing after any `--clean` run — never a bare `git add -A`.
 
-### cm-c66-resweep — re-attempt parked candidates with the newly-resolved C-66 lever [TODO]
+### cm-c66-resweep — re-attempt parked candidates with the newly-resolved C-66 lever [DONE]
 
 Sweep-15 resolved its open question as **C-66**: a redundant `and rN, rN, #1` immediately before a `mul`/`mla`, present in the real target but absent from an otherwise-correct draft, in a value mwcc can already prove is 0/1-ranged. Two working fixes (inline `& 1` mask at the multiply's operand; explicit intermediate variable), 8+ independent same-round confirmations across 4 of 5 batches — the best-evidenced new lever this campaign.
 

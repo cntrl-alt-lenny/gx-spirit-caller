@@ -7432,6 +7432,33 @@ single-use site, an intermediate variable fits a value reused across
 multiple statements) — not yet fully distinguished, but both are real,
 reproducible, and byte-exact where tried.
 
+**Source-shape requirement — the value must come from a genuine
+bitfield member, not a computed shift-pair (round 2026-08-03b
+refinement).** Neither fix variant above works if the 0/1 value is a
+*manually-computed* local — e.g. `int bit0 = (unsigned int)(x << 31)
+>> 31;` — instead of a real C bitfield member access (`unsigned short
+field2 : 1;` on the struct, then `self->field2`). mwcc's optimizer
+tracks the computed local's value-chain at the SSA level and proves
+`((x << 31) >> 31) & 1` fully redundant regardless of which fix
+variant is layered on top — inline mask, intermediate variable, or
+both stacked together all collapse to a single plain `and rN, rN, #1`
+(or, when the value also feeds a comparison instead of a multiply,
+to a plain `and` where ground truth uses a fused `cmp rX, rY, lsr
+#31`). The redundant `and` — and the shift-pair extraction it
+depends on — only survive when the SAME logical value is sourced
+through an actual bitfield member expression. Confirmed on two
+functions, both round-tripped from a from-scratch draft with no
+other source difference except this one substitution:
+`func_ov002_02201614` (bit0 feeds both a `cmp` and a later `mla`;
+switching to a bitfield member fixed the shift-pair-vs-and collapse
+at the `cmp` site AND restored the redundant `and` at the `mla` site
+in the same pass) and `func_ov002_022075a4` (bit0 feeds a `mul`
+directly). Practical implication: when re-attempting a C-66 park,
+check whether the draft extracts the bit via computed shift
+arithmetic — if so, convert that one site to a bitfield-typed struct
+member access before applying either documented fix variant; the
+fix variants themselves are unchanged.
+
 **Evidence — exceptionally well-confirmed in a single round.** At
 least 8 independent instances/confirmations across 4 of 5 batches in
 one round, entirely blind (no batch was told the mechanism, only that
@@ -7446,7 +7473,13 @@ other lever in this catalogue had at the time it was first written up.
 
 **Provenance:** cm-ov002-unknown-sweep-14 (residual first flagged,
 `func_ov002_0220ad78`), resolved cm-ov002-unknown-sweep-15 (both fix
-variants found and independently reconfirmed across 4 batches).
+variants found and independently reconfirmed across 4 batches);
+bitfield-source-shape requirement added cm-c66-resweep, round
+2026-08-03b (independent from-scratch instruction-level reproduction
+on `func_ov002_02201614` and `func_ov002_022075a4` — both functions
+had been touched in sweep-15 without a full function-level ship,
+consistent with the companion-wall explanation below rather than a
+failure of the lever itself).
 
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
