@@ -282,7 +282,7 @@ Fix `tools/check_activation_invariant.py`: named function files such as `Ov015_I
 
 **Gate:** synthetic named-function omission exits non-zero; PR #1387 and PR #1388 ranges exit zero; `python -m pytest -q tests` green; queue entry committed in the same PR.
 
-### q-port-census-unparsed — 747 EUR TUs are invisible to the port census [TODO]
+### q-port-census-unparsed — 747 EUR TUs are invisible to the port census [DONE]
 
 `tools/port_census.py` prints, on the current tree: `EUR baseline .c files (address-keyed): 4369; unparsed names: 747` (and USA 531 / JPN 530 on their side). The parser keys on `func_*` / `func_ovNNN_*`; every other filename shape falls out of the address map entirely.
 
