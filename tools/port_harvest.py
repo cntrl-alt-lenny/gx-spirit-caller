@@ -193,6 +193,12 @@ def main(argv: list[str] | None = None) -> int:
             continue
         print(f"HARVEST: {region} — HIGH floor only, batch={args.batch}")
         ops = bp.PortOps(version=region)
+        prepared, reason = ops.prepare_reference_objects()
+        if not prepared:
+            print(f"HARVEST: {region} — tool-error before prefilter: {reason}")
+            reports[region] = _empty_report(entries)
+            reports[region]["tool_errors"] = 1
+            continue
         contention_deferred = False
 
         def before_batch() -> bool:

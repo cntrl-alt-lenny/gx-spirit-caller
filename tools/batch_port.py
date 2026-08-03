@@ -190,7 +190,10 @@ def fastmatch_verdict(payload: object, returncode: int) -> tuple[str, str]:
             return "refused", f"{name}: NO-INSTRUCTIONS-PARSED"
         if function.get("status") != "ok":
             if function.get("status") == "not_in_gap":
-                return "refused", f"{name}: not-in-gap"
+                return "tool-error", (
+                    f"{name}: reference object not found "
+                    "(fastmatch not-in-gap)"
+                )
             return "tool-error", f"{name}: status={function.get('status')!r}"
         pct = function.get("match_percent")
         if pct != 100.0:
@@ -260,6 +263,42 @@ class PortOps(bc.Ops):
     Everything else (gate/branch-guard/dirty-check/kill-orphans) is
     inherited unchanged — the literal "existing Ops seam" this tool builds
     on."""
+
+    def prepare_reference_objects(self) -> tuple[bool, str]:
+        """Configure this region and materialize its delinked reference .o's.
+
+        ``fastmatch`` compares the temporary port against the per-function
+        object under ``build/<region>/delinks/src/...``.  A fresh checkout (or
+        a checkout whose ignored build tree was cleaned) has the committed
+        ``delinks.txt`` but not those generated objects.  In that state the
+        lookup returns ``not_in_gap`` even though the candidate is a live .s
+        target.  Materialize the reference tree before any temporary C is
+        installed; doing it inside ``prefilter`` would let configure see the
+        temporary source instead of the original .s.
+        """
+        try:
+            configured = self._run(
+                [sys.executable, "tools/configure.py", self.version],
+                timeout=self.call_timeout or None,
+            )
+        except subprocess.TimeoutExpired:
+            self._kill_orphans()
+            return False, "configure timeout while preparing delinks"
+        if configured.returncode != 0:
+            combined = (configured.stdout + configured.stderr).strip()[:400]
+            return False, f"configure failed (rc={configured.returncode}): {combined}"
+
+        try:
+            delinked = self._run(
+                ["ninja", "delink"], timeout=self.call_timeout or None,
+            )
+        except subprocess.TimeoutExpired:
+            self._kill_orphans()
+            return False, "ninja delink timeout while preparing reference objects"
+        if delinked.returncode != 0:
+            combined = (delinked.stdout + delinked.stderr).strip()[-400:]
+            return False, f"ninja delink failed (rc={delinked.returncode}): {combined}"
+        return True, "reference objects prepared"
 
     def port(self, eur_rel: str, target: str, confidence_floor: str = "HIGH") -> dict:
         """Shell out to port_to_region.py --json. `--json` alone (see that
@@ -690,6 +729,12 @@ def main(argv: list[str] | None = None) -> int:
     if guard_msg:
         print(f"batch_port: REFUSING (branch={branch!r}) -- {guard_msg}", file=sys.stderr)
         return 2
+
+    if not args.dry_run:
+        prepared, reason = ops.prepare_reference_objects()
+        if not prepared:
+            print(f"batch_port: REFUSING — {reason}", file=sys.stderr)
+            return 2
 
     backlog_path = Path(args.backlog) if args.backlog else ROOT / "build" / "port_backlog.json"
     if not backlog_path.is_file():
