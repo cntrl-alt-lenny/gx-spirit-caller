@@ -1001,6 +1001,7 @@ declined. Full write-up:
 **Before/after** (`tools/progress.py --version eur --json`, no ship this
 item so before=after, confirming item 1's code-only sweep left these
 untouched):
+
 ```
 Typed-array:   161,052 -> 161,052 bytes  (+0 B,   3.37% -> 3.37%)
 Named-struct:   55,204 ->  55,204 bytes  (+0 B,   1.16% -> 1.16%)
