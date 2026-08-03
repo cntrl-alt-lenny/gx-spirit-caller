@@ -176,7 +176,7 @@ fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/r
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + count of prototypes emitted + conflicts resolved.
 
-### q-port-harvest-complete — drain the 322 free byte-identical cross-region ports [TODO]
+### q-port-harvest-complete — drain the 322 free byte-identical cross-region ports [CLAIMED]
 
 The prefilter fix (`not_in_gap` reclassified as a retryable tool-error, plus configure + `ninja delink` before temporary C is installed) unblocked this lane. Brain-run census, right now, on the current integration tree:
 
