@@ -1081,3 +1081,18 @@ work, not this item's scope.
 $ python3.13 -m pytest tests -q
 3178 passed, 13 skipped, 63 subtests passed in 46.68s
 ```
+
+### cm-enum-contradiction-fix — fix the two enum contradictions your own survey found [TODO]
+
+Your `cm-f-cf8-contradiction` survey reported these and correctly did NOT fix them — that was the right call under that item's scope. Fixing them is this item.
+
+Both are **worse than `f_cf8` was**, because they are contradicted by already-shipped, matched `.c` rather than by still-in-dossier disassembly:
+
+- **`Ov006SubState`** — documented `{0, 2-9}`; confirmed real values `11, 12, 14, 16, 17` present in already-verified `.c` files.
+- **`Ov004Phase`** — documented `{0, 2, 4, 15, 16}`; confirmed real value `5`.
+
+Resolve each the way you resolved `f_cf8`: establish the true value set from the matched code, correct the canonical doc, and apply the confidence-marking convention you extended `constants/INDEX.md` with — including the rule that a closed-range claim states its own confidence rather than inheriting the document's blanket score.
+
+Then re-check the remaining 4 of the 7 you surveyed. Your 3/7 was measured against the enums sharing `f_cf8`'s risk shape; say plainly whether the other 4 are genuinely clean or merely unexercised (the `f_cf8` root cause was an *assumed* upper bound that no file happened to test — "no contradiction found" and "verified" are different claims, and that distinction is the whole finding).
+
+**Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the matched-code evidence behind each corrected range, and your clean-vs-unexercised verdict on the remaining 4.

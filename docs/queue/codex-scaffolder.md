@@ -338,3 +338,15 @@ Build the smallest checker that catches both: a queue item marked `[TODO]`/`[CLA
 ⚠️ **Do not migrate the queue format.** The audit explicitly rejected a JSON/SQLite ledger: `work_queue.py` already parses these files as structured data, so the format is not the problem — the absence of a drift check is. A format migration would be architectural neatness for a problem a small checker solves.
 
 **Gate:** `python -m pytest tests -q` no-new-failures + a regression test per drift class (use the two real instances above as fixtures) + the checker's output on the current tree.
+
+### q-activation-basename-fallback — close the fallback path that let a wiped delinks edit pass the gate [TODO]
+
+Found live by the Claude Decomper lane during `cm-c66-resweep` (PR #1443), reported in its own PR body rather than buried.
+
+What happened: reverting an abandoned candidate with a blanket `git checkout <module>/delinks.txt` silently wiped an earlier, unrelated, already-good edit to the same shared file. **The gate then passed anyway** — `check_activation_invariant.py` resolved the activation through a **basename-fallback path** against the stale entry instead of failing. The lane caught it on the first post-merge run, fixed it with a targeted edit, and re-gated clean, so nothing shipped wrong. The blanket-checkout trap is already documented in the operating protocol (`tools/park_one.py` is the sanctioned alternative); **the fallback masking the wipe is new and is the actual defect.**
+
+This is a vacuous-verifier instance: a checker that reports success by resolving around missing state rather than failing on it. The house rule is that a checker which cannot genuinely check must say so and FAIL, never quietly succeed.
+
+Investigate `check_activation_invariant.py`'s basename-fallback resolution: when is it legitimate (routing suffixes `*.legacy.c` / `*.legacy_sp3.c` and data carves are the known-good cases), and when is it papering over a delinks entry that no longer matches its source? Make the illegitimate case fail loudly. Do not remove the fallback wholesale without checking the routing-suffix cases still resolve — they are the reason it exists.
+
+**Gate:** `python3.13 -m pytest tests -q` no-new-failures + a regression test that reproduces the wiped-edit case and asserts the checker FAILS on it + confirmation that routing-suffix and data-carve activations still resolve.
