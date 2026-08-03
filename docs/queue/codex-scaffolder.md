@@ -298,7 +298,39 @@ Effort: **HIGH** — this is classification judgment, not a mechanical edit.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a regression test per newly-recognized filename shape (including the truncated-address `*_stubs_*` case) + before/after `port_census.py` counts for all three regions.
 
-### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [DONE]
+### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [TODO]
+
+> ⚠️ **REOPENED 2026-08-03 — the shipped check is vacuous for the most likely
+> wrong form.** It is line-local (good — a stray `exit 1` elsewhere no longer
+> counts), but it accepts a location *probe* that merely SUCCEEDS rather than a
+> location *assertion* that compares. Both of these pass today and neither
+> proves the agent is in its assigned worktree:
+>
+>     pwd || exit 1
+>     git rev-parse --show-toplevel || exit 1
+>
+> Both succeed inside **every** valid git worktree, including the brain
+> checkout — which is exactly the tree the guard exists to keep lanes out of.
+> Verified by running the merged linter against a kickoff whose only guard is
+> `pwd || exit 1`: it reports `PASS location-guard`.
+>
+> **Repair:** require an actual equality comparison between the current repo
+> root and an explicitly expected path, e.g.
+>
+>     EXPECT="$HOME/Dev/spirit-caller/<lane>"
+>     [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
+>
+> **Negative tests are the deliverable here** — the check is only as good as
+> what it rejects. Prove all four:
+>
+> 1. `pwd || exit 1` → FAIL
+> 2. `git rev-parse --show-toplevel || exit 1` → FAIL
+> 3. a comparison against the WRONG expected path → FAIL
+> 4. a real equality assertion against the assigned path → PASS
+>
+> Case 3 matters most: it is the difference between "there is a comparison" and
+> "the comparison is against the right thing". Do not mark this DONE again
+> until all four are green and pasted.
 
 **Incident response, part 2 of 2** (part 1 is the Brain-owned worker-transcript rule, PR #1438). Full brief with evidence: see the PR description and the failure narrative below.
 

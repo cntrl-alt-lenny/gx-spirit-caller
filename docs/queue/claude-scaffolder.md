@@ -1096,3 +1096,33 @@ Resolve each the way you resolved `f_cf8`: establish the true value set from the
 Then re-check the remaining 4 of the 7 you surveyed. Your 3/7 was measured against the enums sharing `f_cf8`'s risk shape; say plainly whether the other 4 are genuinely clean or merely unexercised (the `f_cf8` root cause was an *assumed* upper bound that no file happened to test — "no contradiction found" and "verified" are different claims, and that distinction is the whole finding).
 
 **Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the matched-code evidence behind each corrected range, and your clean-vs-unexercised verdict on the remaining 4.
+
+### cm-f-cf8-reopen — the duel-phase range is still wrong, and the denominator is off [TODO]
+
+⚠️ **This reopens work merged in PR #1441.** Read it as a correction, not a criticism — the root-cause fix you shipped (the confidence-promotion gap in `constants/INDEX.md`) is sound and stays. What is wrong is the range, and the way it is wrong is the interesting part.
+
+**1. `f_cf8` is not a closed 0–4 range.** You corrected an assumed `0–3` to an assumed `0–4` — which is the same class of error the item existed to diagnose: taking the highest value you happened to observe and declaring the range closed. Brain-side verification, tracing each `str` to `+0xcf8` back to the immediate assigned to that register across all three regions:
+
+| stored value | store sites (÷3 regions) | example |
+|---|---|---|
+| 0 | 4 | `src/overlay002/func_ov002_021aec04.s:141` |
+| 1 | 2 | `func_ov002_021aec04.s:149` |
+| 2 | 1 | `func_ov002_021aec04.s:157` |
+| 3 | 2 | `func_ov002_021aec04.s:166` |
+| **5** | **1** | `func_ov002_021aec04.s:176` |
+| **7** | **2** | `src/overlay002/func_ov002_021af5a0.s:229` |
+
+Note what is *absent*: **4 never appears as a stored immediate at all** — it shows up only in comparisons (the `cmpeq r1, #0x4` you cited). So producers and consumers disagree about which values matter, which is itself worth a sentence in the writeup.
+
+Correct all affected canonical docs (`constants/DuelStateEnums.md`, `constants/INDEX.md`, `types/DuelStateSingleton.md`) and your research report. Until an **exhaustive producer sweep** proves closure, document it as an open observed-value set, not a range:
+
+    confirmed values include 0, 1, 2, 3, 4, 5 and 7;
+    complete range and semantic names are not yet established.
+
+Do **not** call it a five-value state machine, a 0–4 range, or anything else that asserts closure. "Highest value seen" is not "upper bound" — that equivalence is the bug.
+
+**2. The measurement denominator is wrong.** Your survey reported 3 of 7, but the 7 includes `Ov013Slot`, which your own method excludes as array-literal-backed — your report says so explicitly at `cm-f-cf8-contradiction-2026-08-03.md:162` ("Excluded — array-literal-backed"). Either identify a genuine seventh in-category candidate or restate the result as **3 contradictions among 6 actual candidates**. Keep "no contradiction found" distinct from "range verified" when you do — that distinction is your own finding and it applies to your own denominator.
+
+Do this **alongside** the `Ov006SubState` / `Ov004Phase` corrections in `cm-enum-contradiction-fix`, not as a separate pass — they are the same sweep and the producer-vs-consumer question above applies to all of them.
+
+**Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the producer-sweep method, the observed-value set per enum with store-site evidence, and the corrected denominator with its category rule stated.

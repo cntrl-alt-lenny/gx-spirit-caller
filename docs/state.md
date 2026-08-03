@@ -8,7 +8,53 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-03 (M1 Mac, brain=Opus 5; roster unchanged: 2× Codex GPT-5.6 Luna
+**Last updated:** 2026-08-03 (late) — **rounds 0803b/0803c integrated, then a
+REPAIR round opened.** EUR readable-C **14.14%** (Natural-C 333,354 B / asm-C
+3,904 B), USA **11.92%** (281,508 / 2,748), JPN **11.86%** (280,388 / 2,548).
+
+**Merged this stint:** #1436 (port-census classifier — 153 previously-unparseable
+function TUs recovered), #1437 (12 main functions), #1438 (**AGENTS.md verify-gate
+item 12** — read every dispatched worker's transcript before judging), #1439
++ #1444 (queue seeding), #1440 (kickoff_lint `location-guard`), #1441 (`f_cf8`
+enum + confidence-promotion fix), #1442 (5 USA ports — **all asm-C; USA
+natural-C did not move**), #1443 (C-66 bitfield-source refinement + 1 ship), plus
+Codex Decomper's 33 rescued ports.
+
+⚠️ **REPAIR ROUND OPEN — two merged items were wrong and are reopened:**
+
+1. **`q-kickoff-location-guard` is vacuous for the likeliest wrong form.** The
+   shipped check is line-local but accepts a location *probe* that merely
+   succeeds rather than an *assertion* that compares. `pwd || exit 1` and
+   `git rev-parse --show-toplevel || exit 1` both PASS today, and both succeed
+   inside every valid worktree — including the brain checkout the guard exists
+   to keep lanes out of. Verified by running the merged linter. Reopened to
+   `[TODO]` with four required negative tests.
+2. **`f_cf8` is still documented as a closed range.** #1441 corrected an assumed
+   `0–3` to an assumed `0–4` — the same error class the item diagnosed. Stores to
+   `+0xcf8`, traced per-register across all three regions, write **{0,1,2,3,5,7}**;
+   `4` appears only in comparisons, never as a stored immediate. The canonical
+   docs currently assert `0–4` and are **known-wrong pending `cm-f-cf8-reopen`**.
+   Also: the "3 of 7" survey denominator counts `Ov013Slot`, which the report's
+   own method excludes — the honest figure is 3 of 6.
+
+**Do not treat the `f_cf8` canonical docs as authoritative until that item lands.**
+
+**PR state — active vs merely open.** Open PR count is **1**, but *active* count
+is **0**: #1020 (decomp.dev CI) is a deliberately parked draft, not in-flight
+work. These are different claims and conflating them is exactly the drift
+`q-queue-state-drift-check` exists to catch — an earlier revision of this file
+asserted "Open PRs: 0" while #1020 was open.
+
+**Dropped by owner decision (2026-08-03):** the duel-AI understanding track.
+Rationale: it has no external arbiter. Everything that works here works because
+`ninja sha1` is an authority that doesn't care what anyone believes; an ungated
+semantic track produces confident prose nobody can falsify — and the `f_cf8`
+result above is what that failure mode looks like in miniature. External review
+has since re-proposed it twice; the answer remains no. Also dropped: the Luna
+re-test and the `batch_port` work-loss chip (three clean contention deferrals —
+the original loss was a one-off, not a pattern).
+
+**Previously (2026-08-03, earlier):** (M1 Mac, brain=Opus 5; roster unchanged: 2× Codex GPT-5.6 Luna
 + 2× Claude Code Sonnet 5 Max, all four on autonomous standing queues `docs/queue/*.md`).
 **CHAPTER: READABLE-C, and the rate has stepped up hard.** EUR readable-C is now **14.11%**
 = Natural-C 333,246 B (13.97%) + asm-C 3,456 B (0.14%) over the 2,385,948 B `.text`
