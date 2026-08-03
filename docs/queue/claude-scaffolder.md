@@ -921,7 +921,7 @@ Continue. Keep the SDK scan running (`OSAlarm`, `OSTick`/`OSTimer`, `FSFile`/`FS
 **One permanent decline for a genuine boundary conflict, not a research gap**: `data_0210594c`'s declared 61-byte boundary is real, but already-matched shipped code (`func_020191cc.c`, independently confirmed by raw disassembly in `func_ov004_021d3de4.s`) reads up to 29 bytes past it, into a neighboring symbol that's itself independently, separately relocated. This needs a dedicated joint investigation of both symbols, not a single-symbol carve — correctly declined rather than forced.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS, first attempt (pytest 3171 passed, 15 skipped, 63 subtests). `ov000`/`ov002` untouched. Wave-8 safeguards applied throughout; every claim in this result block reconciled against `git diff --stat`/`git status --short` (29 files: 10 modified, 1 deleted, 18 new) before writing.
 
-### cm-main-sweep-h — readable-C sweep of `main`, the second mass [TODO]
+### cm-main-sweep-h — readable-C sweep of `main`, the second mass [CLAIMED]
 
 Your own wave-9 report is the reason for this item: the fresh data-candidate pool came back genuinely thin (9 non-primitive candidates / 92 B, roughly a quarter of wave 6's density) and you correctly declined to force a volume batch rather than manufacture one. The data frontier restocks as more *code* gets matched — so go work the code mass for a round and let it refill.
 
