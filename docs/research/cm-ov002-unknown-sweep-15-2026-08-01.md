@@ -59,8 +59,8 @@ affected 80% of this round's batches.
 
 ## Open question 1 — resolved with two working fixes, exceptionally well-confirmed
 
-Sweep-14 flagged a new, unexplained residual: a redundant `and rN, rN,
-#1` immediately before a `mul`/`mla`, present in the real target but
+Sweep-14 flagged a new, unexplained residual: a redundant
+`and rN, rN, #1` immediately before a `mul`/`mla`, present in the real target but
 absent from an otherwise-correct draft, in a value mwcc can already
 prove is 0/1-ranged (from a bitfield or shift-pair extraction). This
 round resolved it with **two working fixes** — an explicit `& 1` mask
