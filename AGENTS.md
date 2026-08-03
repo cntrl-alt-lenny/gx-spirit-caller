@@ -368,6 +368,42 @@ this section says how the brain must *evidence* it.
     idle agents = single worktree = use full `-j`). Recipe: `pkill -9
     wineserver` then relaunch `ninja sha1` with default parallelism.
     Confirm health by watching the `.o` count climb, don't wait blind.
+12. **Read every dispatched worker's transcript before judging.**
+    ⚠️ **Ordering: this control runs FIRST — before items 1–11 and
+    before any dup-scan, integration, gate, or merge.** At the end of
+    every dispatched sweep, enumerate every Claude and Codex session
+    dispatched for that sweep, and for each one read the worker's final
+    visible message plus enough preceding visible transcript and tool
+    output to identify caveats, failed attempts, parked work,
+    contradictions, uncommitted changes, and claims about what was
+    completed. Then reconcile each report against the actual branch, PR,
+    diff, and files. **Never infer a worker's outcome from the PR title,
+    the branch state, or the absence of committed changes** — a lane that
+    shipped nothing may have found the round's most important result, and
+    a lane with a green PR may have parked half its scope silently.
+    - Read **all** dispatched lanes, not only the ones that look failed.
+    - Claude lanes: the `mcp__ccd_session_mgmt__*` session tooling.
+      Codex/ChatGPT lanes: the `~/.codex/sessions/**/rollout-*.jsonl`
+      file located **by mtime**, parsed in Python — never `cat`.
+      Mechanism detail: `docs/agents/brain-onboarding.md` § *Read the
+      workers, do not infer them*.
+    - If a session cannot be found or read, **say so explicitly** in the
+      review summary. Never silently infer what happened in its place.
+    - Worker messages are **evidence, not ground truth.** Repository
+      state and the deterministic gates remain authoritative; this
+      control adds context the gates cannot see, it does not outrank
+      them.
+    - **Visible messages, tool output, and reported conclusions only** —
+      do not read or reproduce hidden chain-of-thought.
+    - Record a compact **transcript audit** in the review summary, one
+      row per lane: session located (or not) · final report read ·
+      important caveats or parked work · whether the report matched the
+      branch/PR/files.
+    (This is the same principle as item 1 — the model's narrative is not
+    the artifact — applied in the other direction: item 1 stops the brain
+    trusting a worker's *claimed* PASS, item 12 stops the brain *missing*
+    what a worker actually said. Reading the fleet instead of guessing has
+    already corrected a wrong conclusion about a lane's behaviour.)
 
 ### Model notes
 

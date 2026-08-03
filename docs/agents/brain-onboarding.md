@@ -142,8 +142,19 @@ transcript before judging — see below.
 
 ## Read the workers, do not infer them
 
-Both fleets are readable. Doing this instead of guessing has already corrected
-a wrong conclusion about a lane's behaviour.
+**MANDATORY, and it runs FIRST.** This is AGENTS.md § *Verify gate and round
+discipline* item 12 — not an optional diagnostic for lanes that look broken.
+At the end of every dispatched sweep, before judging, integrating, gating or
+merging anything, enumerate every Claude and Codex session dispatched for that
+sweep and read each one. Both fleets are readable. Doing this instead of
+guessing has already corrected a wrong conclusion about a lane's behaviour.
+
+What to read per lane: the worker's **final visible message**, plus enough
+preceding visible transcript and tool output to surface caveats, failed
+attempts, parked work, contradictions, uncommitted changes, and claims about
+what was completed. Then reconcile that against the actual branch, PR, diff and
+files. **Never infer an outcome from the PR title, the branch state, or the
+absence of committed changes.**
 
 - **Claude lanes:** `mcp__ccd_session_mgmt__*` (deferred — ToolSearch first).
   `list_sessions` gives `isRunning`, `prNumber`, `prState`.
@@ -153,6 +164,28 @@ a wrong conclusion about a lane's behaviour.
   **mtime**, not by the date in the path. Records are one JSON object per line;
   turns are `type=="response_item"` with `payload.type=="message"`. Files run
   14–20 MB — parse in Python, never `cat`.
+
+Four constraints:
+
+1. **Read every dispatched lane**, not only the ones that appear to have
+   failed. A silent lane is the most likely place for parked scope.
+2. **If a session can't be found or read, state that explicitly** in the review
+   summary. An unreadable lane is a reported gap, never an inferred outcome.
+3. **Worker messages are evidence, not ground truth.** Repository state and the
+   deterministic gates stay authoritative — this adds context the gates cannot
+   see, it does not outrank them. A worker claiming a PASS still proves nothing
+   (item 1); a worker claiming a park still gets reconciled against the diff.
+4. **Visible messages, tool output, and reported conclusions only.** Do not read
+   or reproduce hidden chain-of-thought.
+
+Record a compact **transcript audit** in the review summary — one row per
+dispatched lane:
+
+| Lane / session | Final report read | Caveats or parked work | Matched branch/PR/files? |
+|---|---|---|---|
+
+A round whose review summary has no transcript audit table is incomplete,
+regardless of how green the gate was.
 
 ## Merge-conflict resolution
 

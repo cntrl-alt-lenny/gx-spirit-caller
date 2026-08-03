@@ -33,16 +33,36 @@ production fire, see below).
 1. `git fetch origin && git pull --ff-only`
 2. Read `docs/state.md` and `gh pr list --state open` to catch up.
 3. For each open PR:
-   a. Build an integration tree and gate it: `python3.13 tools/gate3.py
+   a. **Read every dispatched worker's transcript — FIRST, before judging,
+      integrating, gating or merging.** Enumerate every Claude and Codex
+      session dispatched for this sweep; read each one's final visible
+      message plus enough preceding visible transcript and tool output to
+      catch caveats, failed attempts, parked work, contradictions,
+      uncommitted changes and completion claims. Reconcile each against
+      the real branch / PR / diff / files. Never infer an outcome from a
+      PR title, branch state, or absence of commits. Read ALL dispatched
+      lanes, not just failed-looking ones; if a session cannot be found or
+      read, state that explicitly rather than inferring. Worker messages
+      are evidence, not ground truth — repository state and the
+      deterministic gates stay authoritative. Visible messages and tool
+      output only; never hidden chain-of-thought. Emit a transcript audit
+      table (lane · final report read · caveats/parked work · matched
+      branch/PR/files?) into the review summary.
+      Claude lanes: `mcp__ccd_session_mgmt__*`. Codex/ChatGPT lanes:
+      `~/.codex/sessions/**/rollout-*.jsonl` located by **mtime**, parsed
+      in Python — never `cat` (files run 14-20 MB).
+      Mechanism: `docs/agents/brain-onboarding.md` § "Read the workers, do
+      not infer them". Rule: `AGENTS.md` § Verify gate item 12.
+   b. Build an integration tree and gate it: `python3.13 tools/gate3.py
       --scope all` — the 3-region byte-identical `ninja sha1` (eur+usa+jpn),
       all 27 modules, plus pytest. That is the merge arbiter. For a
       scope/rename-safety companion run `tools/scope_gate.py`. (Ignore any
       older `ninja rom` / `dsd check modules` / "24/27 baseline" workflow —
       obsolete.)
-   b. Write a plain-English summary for cntrl_alt_lenny: what changed,
+   c. Write a plain-English summary for cntrl_alt_lenny: what changed,
       why it's safe, what's next.
-   c. Offer to merge. On OK, `gh pr merge <N> --squash --delete-branch`.
-   d. If cntrl_alt_lenny is AFK, self-merge non-fire PRs only after
+   d. Offer to merge. On OK, `gh pr merge <N> --squash --delete-branch`.
+   e. If cntrl_alt_lenny is AFK, self-merge non-fire PRs only after
       verifying green locally; note self-merge in the PR body.
 4. After any merge wave, update `docs/state.md`.
 
