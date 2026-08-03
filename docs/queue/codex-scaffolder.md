@@ -298,7 +298,7 @@ Effort: **HIGH** — this is classification judgment, not a mechanical edit.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a regression test per newly-recognized filename shape (including the truncated-address `*_stubs_*` case) + before/after `port_census.py` counts for all three regions.
 
-### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [TODO]
+### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [DONE]
 
 **Incident response, part 2 of 2** (part 1 is the Brain-owned worker-transcript rule, PR #1438). Full brief with evidence: see the PR description and the failure narrative below.
 

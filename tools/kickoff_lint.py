@@ -62,6 +62,28 @@ def check_preflight(text: str) -> tuple[bool, str]:
     return False, "no PREFLIGHT guard — a missing tool/base/dir would run as void work"
 
 
+def check_location_guard(text: str) -> tuple[bool, str]:
+    """Require a hard-stop assertion that the shell is in the intended tree.
+
+    Keep this line-local: a printed ``pwd`` in one line and an unrelated
+    ``exit 1`` elsewhere do not protect a kickoff. The accepted location
+    probes are deliberately the small set used by the worktree protocol.
+    """
+    location = (
+        r"\bgit\s+rev-parse\s+--show-toplevel\b",
+        r"\bgit\s+worktree\s+list\b",
+        r"\$PWD\b",
+        r"(?<![\w-])pwd(?=\s*(?:[|;&`$]|$))",
+    )
+    stop = (r"\bexit\s+1\b", r"\|\|\s*\{", r"\bSTOP\b")
+    for line in text.splitlines():
+        if _has(line, *location) and _has(line, *stop):
+            return True, "working-directory assertion with a hard stop present"
+    if _has(text, *location):
+        return False, "location probe present but no same-line hard stop (exit 1 / || {…} / STOP)"
+    return False, "no working-directory assertion — a misplaced lane can mutate the base checkout"
+
+
 def check_canary(text: str) -> tuple[bool, str]:
     # A first-batch check that fails loud before bulk work (dsd check / self-
     # retrieval / sha1 on one item). The word CANARY is our convention; accept
@@ -119,6 +141,7 @@ def lint(text: str) -> list[Check]:
     checks: list[Check] = []
     for key, fn in (
         ("preflight", check_preflight),
+        ("location-guard", check_location_guard),
         ("canary", check_canary),
         ("paste-control", check_paste_control),
         ("effort-tag", check_effort_tag),
