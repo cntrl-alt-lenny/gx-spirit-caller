@@ -950,7 +950,7 @@ PR: #1437.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + `check_activation_invariant.py` + `check_delink_dupes.py` + regenerated research index and `docs/state-table.md`.
 
-### cm-data-restock-check — bounded honest re-census of the data pool [TODO]
+### cm-data-restock-check — bounded honest re-census of the data pool [CLAIMED]
 
 Companion to `cm-main-sweep-h`, to be done **after** it, not instead of it. Two bounded jobs:
 
