@@ -37,18 +37,36 @@ just don't rewrite other agents' tools without a PR/their sign-off.
    **After a stint on the other machine, git/PRs/docs are canonical — read
    them, don't trust a possibly-stale local `AGENTS.md`.**
 2. Catch up: `docs/state.md` (live head) + `gh pr list --state open`.
-3. For each round (usually two agent PRs land together):
-   a. **Dup-scan** the PRs: pure additions only (no re-carve of a shipped
+3. For each round (currently four lanes: 2× Claude Code, 2× Codex):
+   a. **Read every dispatched worker's transcript — FIRST, before judging
+      anything.** Enumerate every Claude and Codex session dispatched for
+      this sweep; read each one's final visible message plus enough
+      preceding visible transcript and tool output to catch caveats,
+      failed attempts, parked work, contradictions, uncommitted changes,
+      and completion claims. Reconcile each against the real branch / PR /
+      diff / files. Never infer an outcome from a PR title, branch state,
+      or absence of commits. Read ALL lanes, not just the failed-looking
+      ones; if a session can't be read, say so explicitly. Worker messages
+      are evidence, not ground truth — the gates stay authoritative.
+      Visible output only; never hidden chain-of-thought. Emit the
+      **transcript audit table** into the review summary.
+      Mechanism: `docs/agents/brain-onboarding.md` § *Read the workers, do
+      not infer them*. Rule: `AGENTS.md` § Verify gate item 12.
+   b. **Dup-scan** the PRs: pure additions only (no re-carve of a shipped
       function), no source deletions, disjoint file sets (the shared
       `docs/research/README.md` row conflict is expected — keep both rows).
-   b. Build an integration branch off `main`, `--no-ff` merge each PR,
+   c. Build an integration branch off `main`, `--no-ff` merge each PR,
       resolve the README conflict.
-   c. **Gate:** `python tools/gate3.py` — reconfigures + clean-tree
+   d. **Gate:** `python tools/gate3.py` — reconfigures + clean-tree
       `ninja sha1` for eur/usa/jpn, then the pytest suite. On Mac this is
       the single wine lane, so don't run it while an agent is mid-drain.
-   d. Merge to `main` and push ONLY on a clean 3-region PASS. Write a
+   e. Merge to `main` and push ONLY on a clean 3-region PASS. Write a
       plain-English summary for cntrl_alt_lenny; merge autonomously when
       they're AFK, noting it.
+
+   The round order is fixed: **read all workers → inspect and reconcile
+   repository work → integrate → gate → merge → write the next complete
+   worker messages.**
 4. Bookkeeping: update `AGENTS.md` (close briefs, LANE STATE, queue next),
    `docs/state.md`, and your file-based memory. Then hand cntrl_alt_lenny
    two paste-ready kickoffs (no nested triple-backticks — they get copied
@@ -88,6 +106,10 @@ git-ignored tool binaries — `cp -R ../brain/tools/mwccarm tools/ && cp
 
 Before merging any ROM-affecting PR (drain waves, ports, `.s`→C):
 
+- [ ] **Transcript audit table emitted** — every dispatched Claude and
+      Codex lane read (or explicitly reported unreadable), each report
+      reconciled against its branch/PR/files. This is done BEFORE the
+      gate, not after.
 - [ ] `python tools/gate3.py` → **GATE PASS** (eur/usa/jpn all
       byte-identical). Paste the tail.
 - [ ] All PR `.s`/`.c` are pure additions vs `main` (no re-carve, no
