@@ -20,7 +20,9 @@ typedef struct DuelStateSingleton {
     /* +0xCE8 – +0xCEB  gap */
     int            f_cec;         /* +0xCEC  card-list slot index → data_ov002_022cd744[] lookup */
     /* +0xCF0 – +0xCF7  gap */
-    int            f_cf8;         /* +0xCF8  DUEL PHASE: 0/1/2/3 (most-tested field) */
+    int            f_cf8;         /* +0xCF8  DUEL PHASE: 0-4, NOT 0-3 (most-tested
+                                      field; see corrected note below --
+                                      confidence MED on the range, HIGH on the shape) */
     /* +0xCFC – +0xD07  gap */
     int            f_d0c;         /* +0xD0C  gate flag (== 0 check blocks main loop) */
     /* +0xD10 – +0xD17  gap */
@@ -57,7 +59,7 @@ extern DuelStateSingleton data_ov002_022d016c;
 |--------|------|-----|--------------|
 | +0xCE4 | `unsigned int` | read | `func_ov002_021e286c.c` — packed as lo/hi u16 halves |
 | +0xCEC | `int` | read | `func_ov002_021e2b3c.c`, `021e2c5c.c` — index into `data_ov002_022cd744[]` |
-| +0xCF8 | `int` | r/w | `func_ov002_021ff9a8.c` (`!= 3`), `022028ac.c` (`== 2`), `02287618.c` (`> 1`) |
+| +0xCF8 | `int` | r/w | HIGH (matched C): `func_ov002_021ff9a8.c` (`!= 3`), `022028ac.c` (`== 2`), `02287618.c` (`> 1`). MED (dossier disasm, not yet matched C — see corrected note below): `02212d98.md` (`== 4`), `0220079c.md` (`== 4`), `02299c9c.md` (`== 4`), `02206eb0.md` (unsigned `> 3`) |
 | +0xD0C | `int` | read | `func_ov002_021e2b3c.c`, `021e2c5c.c` — gate (`== 0` ⇒ proceed) |
 | +0xD18 | `fn ptr` | read | `func_ov002_021b08a8.s` — installed fn ptr, `blx r0` via `[r0, #0xd18]` |
 | +0xD1C | `int` | r/w | `func_ov002_021b08a8.s` — dispatch-table-2 index; `func_ov002_021aec04.s` sets it; incremented on handler success; `func_ov002_021d109c.s`, `021ca6f8.s` also access |
@@ -79,8 +81,13 @@ extern DuelStateSingleton data_ov002_022d016c;
 
 ## The duel-phase field (+0xCF8)
 
-The most frequently tested field in the entire singleton. Three independent
-matched files confirm its semantics:
+The most frequently tested field in the entire singleton. **Confidence:
+MED on the range, HIGH on the shape (corrected 2026-08-03,
+`cm-f-cf8-contradiction`)** — this section previously asserted a closed
+0-3 range at HIGH confidence, but that was an overreach: three
+independent matched files confirm the field's *semantics* (a small-int
+phase gate) at HIGH confidence, but none of them test a value ≥ 4, so the
+*maximum* was never actually verified, only assumed:
 
 ```c
 /* func_ov002_021ff9a8.c */
@@ -93,9 +100,48 @@ if (data_ov002_022d016c.f_cf8 == 2) { ... }
 if ((unsigned int)data_ov002_022d016c.f_cf8 > 1) { ... }
 ```
 
-The field is stored as `int` but read unsigned for the `> 1` check — mwcc
-emits `movhi` for unsigned greater-than. The values 0–3 correspond to duel
-phases (setup / main / resolution / cleanup or similar).
+All three are equally true if `f_cf8 == 4` — they don't contradict a
+wider range, they simply never exercised one. Four independent dossiers
+(`.s`, real disassembly of the shipped game binary, not yet promoted to
+matched C) do test value 4 directly, and three of the four treat it as a
+real, causally-significant state rather than an error case:
+
+```asm
+; docs/research/dossiers/02212d98.md -- inside the f_cec == player_bit path
+ldreq r1, [r1, #0xcf8]
+cmpeq r1, #0x4          ; phase == 4
+moveq r3, #0x2          ; -> selects a distinct output state (2)
+
+; docs/research/dossiers/0220079c.md -- inside the f_cec == player_bit path
+cmp r1, #0x2            ; phase == 2 ...
+cmpne r1, #0x4          ; ... OR phase == 4 (classic "a==2||a==4" idiom:
+                        ;    2nd cmp only fires if the 1st was unequal)
+                        ; either value makes the gate pass
+
+; docs/research/dossiers/02299c9c.md
+ldreq r1, [r1, #0xcf8]
+cmpeq r1, #0x4
+moveq r1, #0x7          ; phase == 4 drives a real state transition (sc->f_4 = 7)
+
+; docs/research/dossiers/02206eb0.md -- the one function that excludes it
+cmp r0, #0x3
+movhi r0, #0x0          ; movhi = unsigned greater-than:
+                        ;   if ((unsigned)f_cf8 > 3) return 0;
+```
+
+`02206eb0` rejects phase 4 for its own narrow fast-path (only relevant
+when `self->f0 == 0x16a3`) — a function needing to explicitly guard
+against seeing 4 is itself evidence 4 is a reachable value, not evidence
+it doesn't exist.
+
+**Verdict: `f_cf8` is a 5-value field (0-4), not a closed 4-value enum.**
+Not a wrong-field mapping (every source, matched C and dossier alike,
+agrees on the offset, the base struct, and the semantic category) and not
+a rejected-transient-only value (3 of the 4 dossiers branch on it as a
+genuine success case, not merely a guard). See
+[`DuelStateEnums.md`](../constants/DuelStateEnums.md) for the corrected
+enum and the promotion-confidence rule this correction is itself an
+example of.
 
 ## State-machine dispatch (+0xD18)
 
