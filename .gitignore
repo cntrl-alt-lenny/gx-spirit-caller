@@ -73,3 +73,7 @@ Files to be Reviewed/
 
 # Ephemeral per-agent worktrees created by parallel sweeps (never tracked).
 .claude/worktrees/
+
+# wall_aware_headroom scratch output (accidentally committed 2026-07-24)
+wah_out.json
+wah_err.txt
