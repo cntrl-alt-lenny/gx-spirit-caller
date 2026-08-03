@@ -297,3 +297,44 @@ Either outcome is a good answer, and they are very different numbers: "N more fr
 Effort: **HIGH** — this is classification judgment, not a mechanical edit.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a regression test per newly-recognized filename shape (including the truncated-address `*_stubs_*` case) + before/after `port_census.py` counts for all three regions.
+
+### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [TODO]
+
+**Incident response, part 2 of 2** (part 1 is the Brain-owned worker-transcript rule, PR #1438). Full brief with evidence: see the PR description and the failure narrative below.
+
+On 2026-08-03 the Codex Decomper lane ran its entire port-harvest brief **inside the brain worktree**. Its shell started in the base checkout; the kickoff's PREFLIGHT verified the *base* (grep the queue file for the item id) and passed — same repo, same `origin/main`, same queue file — so nothing halted. `git checkout -B <branch> origin/main` then moved the brain worktree onto a feature branch and 33 ports were committed into the coordinator's working directory. Recovered by hand; nothing lost. **Second occurrence** — `cm-ov002-unknown-sweep-15` reported 4 of 5 agents starting in the base checkout, and survived only because its kickoff carried a `pwd` self-check.
+
+**Root cause:** a base check and a location check are different questions. "Is my tree current?" was guarded; "am I in the right tree at all?" was not. `kickoff_lint.py` has no check for the second.
+
+**Measured evidence.** A brain-side prototype run against the four kickoffs actually sent that morning: CC Decomper **PASS** (it carried a `pwd` / `git worktree list` self-check); CC Scaffolder, **Codex Decomper**, Codex Scaffolder all **FAIL**. The failing three are exactly the ones that lacked the protection the fourth had, and the offending lane is among them. All four passed the *existing* linter. Controls: base-check-only → FAIL; `pwd` echoed with no hard stop → FAIL; `rev-parse --show-toplevel` + `exit 1` → PASS; `git worktree list` + `STOP` → PASS.
+
+**Suggested shape (yours to change or reject).** A required `location-guard` check registered immediately after `preflight`, matching the existing `check_*(text) -> tuple[bool, str]` convention: detect a location assertion (`pwd`, `rev-parse --show-toplevel`, `git worktree list`, `$PWD`) paired with a hard stop (`exit 1`, `|| { … }`, `STOP`). Location without a stop must FAIL — an echoed directory does not halt a misplaced lane.
+
+⚠️ **`tests/test_kickoff_lint.py`'s `GOOD` fixture has no location guard** — it needs one added or `test_all_required_pass` breaks the moment the check becomes required. Suggested new tests: missing guard; guard-without-hard-stop; base-check-alone (the exact 2026-08-03 regression).
+
+**Tooling budget:** qualifies on *catches a demonstrated failure class* — twice, the second time costing a frozen coordinator worktree and a manual recovery. No new tool; one check in an existing one.
+
+**Gate:** `python -m pytest tests/test_kickoff_lint.py -q` green + paste the linter's verdict on a kickoff lacking a location guard (must FAIL) and one carrying it (must PASS).
+
+### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [TODO]
+
+Companion tool to `cm-f-cf8-contradiction` (Claude Scaffolder lane). **Wait for that item's findings before building** — it reports whether this is one error or a class, which determines whether the tool is worth its budget. If the count comes back at one, say so and close this without building.
+
+The failure it targets, confirmed: `docs/research/constants/DuelStateEnums.md` documents `data_ov002_022d016c.f_cf8` as a 0–3 duel-phase enum, while three dossiers derived from real disassembly compare it against literal 4 (`cmpeq r1, #0x4`) or bound it with an unsigned `> 3`. SHA-1 cannot catch this — the bytes are right and the *meaning* is wrong.
+
+Scope one class only: an enum whose documented range excludes a value that matched `.c` or a dossier compares it against. Report flagged rows; do not auto-correct.
+
+**Gate:** `python -m pytest tests -q` no-new-failures + a regression test using the f_cf8 case as its fixture + the count of rows flagged across `docs/research/constants/`.
+
+### q-queue-state-drift-check — catch queue/state claims that the repo contradicts [TODO]
+
+**Approved from the 2026-08-03 audit.** Two real drift instances, both found by hand this round:
+
+1. `q-cross-region-alias-guard` sat `[TODO]` in `docs/queue/codex-scaffolder.md` after its work had shipped (`cd3d19fd1`, merged `a3af3ce5e`) — a lane would have redone finished work.
+2. `docs/state.md` asserted **"Open PRs: 0"** while PR #1020 was open intentionally as a parked draft. "Zero active PRs" and "zero open PRs" are different claims and the docs conflate them.
+
+Build the smallest checker that catches both: a queue item marked `[TODO]`/`[CLAIMED]` whose described artifact already exists on `main`, and a state-doc open-PR claim that disagrees with `gh pr list`. Distinguish **active** from **open** — a parked draft is legitimately open and must not be reported as drift.
+
+⚠️ **Do not migrate the queue format.** The audit explicitly rejected a JSON/SQLite ledger: `work_queue.py` already parses these files as structured data, so the format is not the problem — the absence of a drift check is. A format migration would be architectural neatness for a problem a small checker solves.
+
+**Gate:** `python -m pytest tests -q` no-new-failures + a regression test per drift class (use the two real instances above as fixtures) + the checker's output on the current tree.
