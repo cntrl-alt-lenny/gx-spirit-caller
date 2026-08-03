@@ -4689,7 +4689,7 @@ src/usa/main/func_0203ea58.s:
 src/usa/main/func_0203eac4.s:
     complete
     .text start:0x0203eac4 end:0x0203eaf8
-src/usa/main/func_0203eaf8.s:
+src/usa/main/func_0203eaf8.legacy_sp3.c:
     complete
     .text start:0x0203eaf8 end:0x0203ebcc
 src/usa/main/func_0203ebcc.s:
@@ -9339,7 +9339,7 @@ src/usa/main/func_020814b0.s:
 src/usa/main/func_02081560.s:
     complete
     .text start:0x02081560 end:0x0208160c
-src/usa/main/func_0208160c.s:
+src/usa/main/func_0208160c.legacy_sp3.c:
     complete
     .text start:0x0208160c end:0x02081708
 src/usa/main/func_02081708.s:
