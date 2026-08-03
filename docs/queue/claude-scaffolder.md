@@ -921,13 +921,32 @@ Continue. Keep the SDK scan running (`OSAlarm`, `OSTick`/`OSTimer`, `FSFile`/`FS
 **One permanent decline for a genuine boundary conflict, not a research gap**: `data_0210594c`'s declared 61-byte boundary is real, but already-matched shipped code (`func_020191cc.c`, independently confirmed by raw disassembly in `func_ov004_021d3de4.s`) reads up to 29 bytes past it, into a neighboring symbol that's itself independently, separately relocated. This needs a dedicated joint investigation of both symbols, not a single-symbol carve — correctly declined rather than forced.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS, first attempt (pytest 3171 passed, 15 skipped, 63 subtests). `ov000`/`ov002` untouched. Wave-8 safeguards applied throughout; every claim in this result block reconciled against `git diff --stat`/`git status --short` (29 files: 10 modified, 1 deleted, 18 new) before writing.
 
-### cm-main-sweep-h — readable-C sweep of `main`, the second mass [CLAIMED]
+### cm-main-sweep-h — readable-C sweep of `main`, the second mass [DONE]
 
-Your own wave-9 report is the reason for this item: the fresh data-candidate pool came back genuinely thin (9 non-primitive candidates / 92 B, roughly a quarter of wave 6's density) and you correctly declined to force a volume batch rather than manufacture one. The data frontier restocks as more *code* gets matched — so go work the code mass for a round and let it refill.
+Shipped 12 functions: 1 natural-C (`func_020b0034`, `copysign()` — union-typed-by-value parameters, not a local union assignment, is what makes mwcc spill upfront to match the original) + 11 asm-void. New toolchain finding from the canary (`func_02032724`, not yet in codegen-walls.md): mwcc keeps a **raw base pointer** alive across an intervening call and folds two constant field offsets into one combined immediate at each access, where the original computes and preserves a **partially-offset intermediate pointer** instead, applying only the remaining offset per-access. Tried flat arithmetic, a reused intermediate, a nested-struct member, and `volatile` (which instead forced a stack spill) — none reproduced it; flagged as a candidate new wall-taxonomy entry. Also: `func_0208b300` (3x3 matrix transpose) inflates 11→23 words under natural C — mwcc never emits register-block `ldm`/`stm` from array-indexed C on this toolchain.
 
-Target `main`: **738,080 B, 14.76% C, attainment 63.4%** — the second-largest module after ov002, and explicitly **not** the Decomper lane's target this round (they are on ov002 + a C-66 park resweep), so the two lanes stay disjoint by module.
+```
+$ python tools/check_delink_dupes.py
+check_delink_dupes: OK (81 delinks.txt, no duplicate .text addresses)
 
-Standard small/medium-tier sweep protocol, the same one that produced `cm-main-small-a` through `-g`. New lever to carry: **C-66** — a redundant `and rN, rN, #1` before a `mul`/`mla` in a provably 0/1-ranged value, fixed either by an inline `& 1` at the multiply's operand or by an explicit intermediate variable (8+ confirmations in sweep-15). Carry C-44/C-55/C-63/C-64/C-65 as usual.
+[eur] SHA1 PASS
+[usa] SHA1 PASS
+[jpn] SHA1 PASS
+
+3176 passed, 13 skipped, 63 subtests passed in 26.47s
+==================== GATE PASS ====================
+
+$ python tools/check_activation_invariant.py
+range: origin/main..HEAD
+function .c added:       12
+function .s deleted:     12
+delinks activations:     12
+data .c additions:       0 (informational)
+classification sources: symbols=12
+check_activation_invariant: OK
+```
+
+PR: #1437.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + `check_activation_invariant.py` + `check_delink_dupes.py` + regenerated research index and `docs/state-table.md`.
 
