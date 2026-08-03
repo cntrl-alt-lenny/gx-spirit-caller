@@ -4141,7 +4141,7 @@ src/usa/main/func_02037878.s:
 src/usa/main/func_02037918.c:
     complete
     .text start:0x02037918 end:0x02037974
-src/usa/main/func_02037974.s:
+src/usa/main/func_02037974.c:
     complete
     .text start:0x02037974 end:0x0203799c
 src/usa/main/func_0203799c.c:
@@ -6143,7 +6143,7 @@ src/usa/main/func_02054610.s:
 src/usa/main/func_0205468c.s:
     complete
     .text start:0x0205468c end:0x020547cc
-src/usa/main/func_020547cc.s:
+src/usa/main/func_020547cc.c:
     complete
     .text start:0x020547cc end:0x020547f4
 src/usa/main/func_020547f4.c:
@@ -7496,7 +7496,7 @@ src/usa/main/func_02068c98.c:
     complete
     .text start:0x02068c98 end:0x02068cb0
 
-src/usa/main/func_02068cb0.s:
+src/usa/main/func_02068cb0.c:
     complete
     .text start:0x02068cb0 end:0x02068cdc
 src/usa/main/func_02068cdc.s:
@@ -11869,7 +11869,7 @@ src/usa/main/FS_LoadOverlayInfo.s:
 src/usa/main/func_02098a6c.s:
     complete
     .text start:0x02098a6c end:0x02098b7c
-src/usa/main/func_02098b7c.s:
+src/usa/main/func_02098b7c.c:
     complete
     .text start:0x02098b7c end:0x02098ba4
 src/usa/main/func_02098ba4.s:
@@ -13183,7 +13183,7 @@ src/usa/main/func_020b174c.s:
 src/usa/main/func_020b1760.s:
     complete
     .text start:0x020b1760 end:0x020b17d0
-src/usa/main/func_020b17d0.s:
+src/usa/main/func_020b17d0.c:
     complete
     .text start:0x020b17d0 end:0x020b17fc
 src/usa/main/func_020b17fc.s:
