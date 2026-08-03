@@ -15,7 +15,7 @@ resolved by this same report's Part 2).
 Kept as a reference artifact so a future wave can start carving directly instead
 of re-deriving this list.
 
-### shape=struct (186 symbols, 20,371 bytes)
+## shape=struct (186 symbols, 20,371 bytes)
 
 | # | Symbol | Module | Address | Sec | Size (B) | Readers |
 |---|---|---|---|---|---|---|

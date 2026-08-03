@@ -32,10 +32,12 @@ investigation item; both open leads are resolved as declined, and the
   previously described (it's a 3-symbol chain, not 2), and it's confirmed to
   be a naming/typing-boundary artifact rather than a functional risk.
 - **Before/after data metrics: unchanged** (no ship this item):
+
   ```
   Typed-array:   161,052 -> 161,052 bytes  (+0 B,   3.37% -> 3.37%)
   Named-struct:   55,204 ->  55,204 bytes  (+0 B,   1.16% -> 1.16%)
   ```
+
   Measured via `python3.13 tools/progress.py --version eur --json` on the
   current branch tip (`e5f789ed8` + this doc), which is exactly wave 9's own
   reported ending state — confirming item 1 (a pure code-C-match sweep)
