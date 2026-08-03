@@ -950,13 +950,60 @@ PR: #1437.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + `check_activation_invariant.py` + `check_delink_dupes.py` + regenerated research index and `docs/state-table.md`.
 
-### cm-data-restock-check — bounded honest re-census of the data pool [CLAIMED]
+### cm-data-restock-check — bounded honest re-census of the data pool [DONE]
 
-Companion to `cm-main-sweep-h`, to be done **after** it, not instead of it. Two bounded jobs:
+Companion to `cm-main-sweep-h`, done **after** it, not instead of it. No
+source files changed — pure investigation, both open leads resolved as
+declined. Full write-up:
+[`docs/research/data/cm-data-restock-check-2026-08-03.md`](../research/data/cm-data-restock-check-2026-08-03.md)
+(candidate table in the companion
+[`cm-data-restock-census-2026-08-03.md`](../research/data/cm-data-restock-census-2026-08-03.md)).
 
-1. Re-run the fresh-candidate census once this round's code ships have landed, and report plainly whether the pool actually restocked or is still thin. "Still thin" is a wanted answer — wave 9 proved the honest version of this report is more useful than a forced batch.
-2. Resolve the two open items wave 9 filed rather than shipped: `data_02101e64` (an 11-field fixed-offset struct filed as a lead because it had no bulk-copy/function-pointer verification), and `data_0210594c`'s boundary conflict with `func_020191cc` — the latter needs a *joint* investigation of both symbols, which is exactly why it was correctly declined as a single-symbol carve.
+1. **Pool census: did NOT restock in the depletion→regrowth sense — it was
+   never visible to the `cm-data-inference`/`cm-bss-convert` series'
+   methodologies in the first place.** Shape-classified re-census
+   (`data_worklist.py --shape struct/array/fnptr_table/jump_table`, `ov002`
+   excluded) finds **274 non-primitive candidates / 24,753 bytes**
+   (`main` 58 struct-shaped + `ov006` 33 + 19 other overlays), none of
+   which were ever shipped or declined by name across all 23 prior wave
+   docs. Wave 9's own "9 candidates/92 B" was scoped specifically to a
+   pre-curated `.bss` cluster-file pool (`cm-bss-carve-scope`'s pool), not
+   this one; wave 15's separate "zero fresh, fully recursive" claim for
+   the `.data`/`.rodata` series is the one this contradicts — and this
+   campaign has hit that exact false-exhaustion failure mode twice before
+   (wave 12's buggy flat glob missing `overlay004/data/` entirely, fixed
+   wave 13). Spot-checked (not just tool output): no `.c` file exists yet
+   for the top 5 candidates by size. Caveat stated plainly in the doc:
+   shape-classification isn't verified typeability — the usual evidence
+   bar still applies before any of these 274 actually ship.
+2. `data_02101e7c` (wave 15's flagged, uninvestigated `data_02101e64`
+   sibling): **declined, 4th confirmation.** Its sole reader
+   (`func_0206bcec.s`) passes it as a fully opaque pointer, zero field
+   access. New finding: it shares its consumer (`func_0206c46c`) with
+   `data_02101e64`/`data_02101e4c` (three parallel instances of whatever
+   that function expects) — genuinely new context, but the call chain
+   dead-ends in permanent `.s`-walled vtable dispatch before any field
+   evidence surfaces. Documented as a lead, not chased further.
+3. `data_0210594c`/`data_02105989` boundary conflict: **declined, 4th
+   confirmation, more precisely scoped than before.** Confirmed via exact
+   hex arithmetic that it's a 3-symbol chain, not 2 — `func_ov004_021d3de4`
+   reads 27 bytes (0x1b) past `data_0210594c`'s declared 0x3d span, which
+   is *also* past all of `data_02105989`'s declared 0x15 span, landing 6
+   bytes into a third symbol, `data_0210599e`. Both this read and the
+   already-shipped `func_020191cc.c` (`data_0210594c + 0x52`) build and
+   gate green today regardless, since absolute-address arithmetic doesn't
+   care about our symbol boundaries — confirmed no functional risk, purely
+   a naming/typing-boundary artifact. `data_0210594c` has 16 reader files
+   across 8 modules, `data_02105989` has 21 across 8 modules — sized here
+   for whoever picks up the dedicated joint investigation this and 2 prior
+   single-symbol attempts have now all recommended.
 
-Keep your existing evidence bar. Ship only what clears it.
+**Before/after** (`tools/progress.py --version eur --json`, no ship this
+item so before=after, confirming item 1's code-only sweep left these
+untouched):
+```
+Typed-array:   161,052 -> 161,052 bytes  (+0 B,   3.37% -> 3.37%)
+Named-struct:   55,204 ->  55,204 bytes  (+0 B,   1.16% -> 1.16%)
+```
 
-**Gate:** whatever each shipped symbol needs (3-region `gate3.py --scope all` if anything is carved); census + lead resolutions documented; predicted vs measured `Typed-array`/`Named-struct` deltas as in wave 9.
+**Gate:** none required (no source changes); doc-only commit.
