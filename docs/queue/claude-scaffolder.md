@@ -920,3 +920,24 @@ Continue. Keep the SDK scan running (`OSAlarm`, `OSTick`/`OSTimer`, `FSFile`/`FS
 **A real process recovery, not a negative result taken at face value**: one dispatched SDK-scan investigation produced a garbled non-answer mid-task instead of findings. Resuming it directly (rather than trusting the malformed output as "no findings" or silently re-spending a full fresh investigation) recovered substantive, real work already in progress — including the `FSArchive` breakthrough. Worth trying before assuming a confused agent output means nothing happened.
 **One permanent decline for a genuine boundary conflict, not a research gap**: `data_0210594c`'s declared 61-byte boundary is real, but already-matched shipped code (`func_020191cc.c`, independently confirmed by raw disassembly in `func_ov004_021d3de4.s`) reads up to 29 bytes past it, into a neighboring symbol that's itself independently, separately relocated. This needs a dedicated joint investigation of both symbols, not a single-symbol carve — correctly declined rather than forced.
 **Gate:** 3-region `python tools/gate3.py --scope all` PASS, first attempt (pytest 3171 passed, 15 skipped, 63 subtests). `ov000`/`ov002` untouched. Wave-8 safeguards applied throughout; every claim in this result block reconciled against `git diff --stat`/`git status --short` (29 files: 10 modified, 1 deleted, 18 new) before writing.
+
+### cm-main-sweep-h — readable-C sweep of `main`, the second mass [TODO]
+
+Your own wave-9 report is the reason for this item: the fresh data-candidate pool came back genuinely thin (9 non-primitive candidates / 92 B, roughly a quarter of wave 6's density) and you correctly declined to force a volume batch rather than manufacture one. The data frontier restocks as more *code* gets matched — so go work the code mass for a round and let it refill.
+
+Target `main`: **738,080 B, 14.76% C, attainment 63.4%** — the second-largest module after ov002, and explicitly **not** the Decomper lane's target this round (they are on ov002 + a C-66 park resweep), so the two lanes stay disjoint by module.
+
+Standard small/medium-tier sweep protocol, the same one that produced `cm-main-small-a` through `-g`. New lever to carry: **C-66** — a redundant `and rN, rN, #1` before a `mul`/`mla` in a provably 0/1-ranged value, fixed either by an inline `& 1` at the multiply's operand or by an explicit intermediate variable (8+ confirmations in sweep-15). Carry C-44/C-55/C-63/C-64/C-65 as usual.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + `check_activation_invariant.py` + `check_delink_dupes.py` + regenerated research index and `docs/state-table.md`.
+
+### cm-data-restock-check — bounded honest re-census of the data pool [TODO]
+
+Companion to `cm-main-sweep-h`, to be done **after** it, not instead of it. Two bounded jobs:
+
+1. Re-run the fresh-candidate census once this round's code ships have landed, and report plainly whether the pool actually restocked or is still thin. "Still thin" is a wanted answer — wave 9 proved the honest version of this report is more useful than a forced batch.
+2. Resolve the two open items wave 9 filed rather than shipped: `data_02101e64` (an 11-field fixed-offset struct filed as a lead because it had no bulk-copy/function-pointer verification), and `data_0210594c`'s boundary conflict with `func_020191cc` — the latter needs a *joint* investigation of both symbols, which is exactly why it was correctly declined as a single-symbol carve.
+
+Keep your existing evidence bar. Ship only what clears it.
+
+**Gate:** whatever each shipped symbol needs (3-region `gate3.py --scope all` if anything is carved); census + lead resolutions documented; predicted vs measured `Typed-array`/`Named-struct` deltas as in wave 9.

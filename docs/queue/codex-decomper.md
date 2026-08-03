@@ -175,3 +175,36 @@ fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/r
 4,712 extern decl-sites for 2,040 distinct functions (2,672 pure duplicates); 463 functions are declared with 2+ MUTUALLY-CONTRADICTORY signatures inline across files (func_ov002_021ff320 = 17 sigs across 21 files); after stripping cosmetic param-name diffs, 366 keep genuine type conflicts, 142 are ABI-SIGNIFICANT (contradictory return type / arg count -> changes call-site codegen -> BLOCKS first-try byte-match on callers). Emit ONE canonical prototype per function into include/game/prototypes.h (created by q-include-layer). Prioritize the ~30 functions declared >20 ways (ov002 sinks, DMA/fill helpers), then the 142 ABI-significant. Resolve each conflict by the best evidence (a matched C body that USES the fn is ground truth). This directly raises first-try match rate on every caller.
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + count of prototypes emitted + conflicts resolved.
+
+### q-port-harvest-complete — drain the 322 free byte-identical cross-region ports [TODO]
+
+The prefilter fix (`not_in_gap` reclassified as a retryable tool-error, plus configure + `ninja delink` before temporary C is installed) unblocked this lane. Brain-run census, right now, on the current integration tree:
+
+- **USA**: 161 backlog, **155 at `sim = 1.0`**, 32,912 B — ov002 73 / main 59 / ov006 15 / ov004 6 / rest 8
+- **JPN**: 173 backlog, **167 at `sim = 1.0`**, 35,552 B — ov002 79 / main 60 / ov006 16 / ov004 8 / rest 10
+
+These are byte-identical siblings of already-matched EUR functions — the cheapest coverage in the project, ~68 KB across the two regions. USA sits at 11.79% C and JPN at 11.68% against EUR's 14.11%; this backlog is most of that gap.
+
+Run `port_census.py` first, then `port_harvest.py --batch 20` in a loop until the `sim = 1.0` rows are drained or genuinely refuse. A refusal for a real reason (below confidence floor, real mismatch percentage) is expected and fine — record each one; do **not** force a below-floor candidate. The backlog **regrows** every time the CC lanes ship EUR functions, so ending non-zero is normal — just report the ending census.
+
+Effort: **MEDIUM** — this is mechanical, harness-driven, and gated at every step.
+
+**Gate:** per-region `ninja sha1` on every batch (the harness already does this) + `python tools/gate3.py --scope all` at the end + `check_activation_invariant.py` + before/after `port_census.py` counts.
+
+### q-sig-refresh-4 — rebuild the signature DB after the C%-jump [TODO]
+
+EUR readable-C went **8.48% → 14.11%** between 2026-07-22 and 2026-08-03, and USA/JPN moved with it. The signature DB has not been rebuilt across that jump, so it is materially stale. Rebuild from ALL currently-named functions, re-apply across EUR/USA/JPN, report the delta vs the last refresh. **Round-trip canary first** — confirm a known-good signature still resolves before trusting any bulk apply.
+
+Naming is candidate-scarce by design: an honest low count or QUEUE-EMPTY is a SUCCESS. Never invent names.
+
+Effort: **MEDIUM**.
+
+**Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming --base origin/main` PASS + names-applied delta.
+
+### q-name-crossprop-4 — cross-region twin propagation sweep [TODO]
+
+Follows `q-sig-refresh-4`. Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade`. Byte-neutral, 3x multiplier on every name the CC lanes created during the jump above. Sweep all modules. Brief 569's sig region-twin map (49/60 exact twins, 0/44 false positives) is the validated fallback when a name alone is ambiguous.
+
+Effort: **MEDIUM**.
+
+**Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins-propagated count.

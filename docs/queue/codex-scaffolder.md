@@ -260,13 +260,15 @@ Error: .bss in file 'src/overlay001/bss/data_ov001_bss.s' has mixed section orde
 
 **Gate:** demonstrate the exact `data_ov001_021ca420_alias` split above builds (`python tools/configure.py eur && ninja sha1` OK) with the 0-byte marker's TU entry either accepted as zero-width or auto-omitted — plus `python -m pytest -q tests` no-new-failures. If investigation concludes this can't be fixed in the tool and must stay a permanent carve-time constraint instead, that's a valid completion too — write up the mechanism and the specific constraint for future carve waves to check against before attempting a similar split.
 
-### q-cross-region-alias-guard — port_to_region.py's fallback resolution can silently bind to an unrelated cross-region symbol [TODO]
+### q-cross-region-alias-guard — port_to_region.py's fallback resolution can silently bind to an unrelated cross-region symbol [DONE]
 
 Filed by the Claude Scaffolder lane after finding (during unrelated `.bss`-carving work, `cm-bss-convert-6`) that EUR and JPN/USA can assign the same symbol name/address to genuinely *different* objects. This is port-tool correctness, not data-carving, so filing here rather than fixing it in that lane. Full investigation, methodology, and the complete data table: `docs/research/cross-region-symbol-aliasing-audit.md`.
 
 **The condition:** EUR's module base address is never exactly equal to USA/JPN's (confirmed with zero exceptions, `main` + all 24 overlays), but the accumulated EUR↔target address shift drifts continuously through each module's range and crosses back through zero at scattered points — producing coincidental identical-absolute-address collisions between two *unrelated* objects. **105 such collisions confirmed** across `main` and 21 of 24 overlays (full table in the audit doc), 26 of which already have live consumers in `src/usa/**`/`src/jpn/**`.
 
-**Current status: not a live bug.** Every one of the 26 live cases was individually verified safe — 16 via unsized/opaque externs (no size ever asserted, so a mismatch can't mislead), 10 via sized structs that were either independently matched against that region's own assembly, or traced to an EUR source using a *numerically different* address, safely re-paired by `port_to_region.py`'s primary resolution method (`derive_data_address_mapping` in `resolve_symbol`) — which pairs relocations by instruction offset within the already-fingerprint-matched sibling function, and so never consults either side's raw address or name text. That method is structurally immune to this class of coincidence. `ninja sha1` is currently green for all 3 regions (verified directly, not via CI — `compile-check.yml` explicitly skips the byte-identity check).
+**Resolved 2026-08-03 (brain):** shipped as `codex/cross-region-alias-guard` (cd3d19fd1, merged a3af3ce5e) — `tools/port_to_region.py` now imports `cross_region_aliases.load_blocklist` and emits a `refused: cross-region alias at 0x...` verdict. Original analysis retained below.
+
+**Original status when filed: not a live bug.** Every one of the 26 live cases was individually verified safe — 16 via unsized/opaque externs (no size ever asserted, so a mismatch can't mislead), 10 via sized structs that were either independently matched against that region's own assembly, or traced to an EUR source using a *numerically different* address, safely re-paired by `port_to_region.py`'s primary resolution method (`derive_data_address_mapping` in `resolve_symbol`) — which pairs relocations by instruction offset within the already-fingerprint-matched sibling function, and so never consults either side's raw address or name text. That method is structurally immune to this class of coincidence. `ninja sha1` is currently green for all 3 regions (verified directly, not via CI — `compile-check.yml` explicitly skips the byte-identity check).
 
 **Where the real risk lives:** the other 79 non-live addresses sit in still-raw EUR `.s` functions that haven't been matched/ported yet. `resolve_symbol`'s two fallback tiers — exact-address match, and D3 shift-consensus — both assume address correspondence across regions, and would be the path invoked if the primary reloc-pairing method doesn't cover a given reference (e.g. a comment-only or indirectly-reached data symbol). If either fallback ever resolves to one of these 105 addresses, it could silently bind to the target's unrelated same-numbered object without any error — the wrong reference would very likely fail `ninja sha1` if it changes program behavior, but a reference that's only ever used opaquely (address-of, never dereferenced with a size-dependent operation) could conceivably still compile byte-identical while being semantically wrong for its own region.
 
@@ -279,3 +281,19 @@ Filed by the Claude Scaffolder lane after finding (during unrelated `.bss`-carvi
 Fix `tools/check_activation_invariant.py`: named function files such as `Ov015_InitScroller.c` are currently reported as DATA because the classifier only recognizes `func_*`. Use the region's `delinks.txt`/`symbols.txt` metadata for `kind:function` vs data, with the existing filename-prefix fallback when metadata is unavailable. Add a synthetic named-function missing-activation failure test and recheck known-good PR #1387 and #1388 ranges. Report the real-range function/data split before and after.
 
 **Gate:** synthetic named-function omission exits non-zero; PR #1387 and PR #1388 ranges exit zero; `python -m pytest -q tests` green; queue entry committed in the same PR.
+
+### q-port-census-unparsed — 747 EUR TUs are invisible to the port census [TODO]
+
+`tools/port_census.py` prints, on the current tree: `EUR baseline .c files (address-keyed): 4369; unparsed names: 747` (and USA 531 / JPN 530 on their side). The parser keys on `func_*` / `func_ovNNN_*`; every other filename shape falls out of the address map entirely.
+
+The shapes it drops, counted on the current tree: `data_*` (325 + per-overlay variants), `ovNNN_ADDR` (~160 across modules, e.g. `src/overlay006/ov006_021b2ee4.c`), `sinit_*`, and `*_stubs_ADDR` — the last of which also carries a **truncated 5-digit address** (`ov009_stubs_ab840.c`) rather than the full 8-digit one, so even a widened prefix rule will not key it correctly without handling that.
+
+Data and stub TUs are legitimately not function ports, so a large share of the 747 is expected to be benign. But `ovNNN_ADDR` is a *function* TU under a module-prefix naming style, and those would be silently missing from the port backlog — i.e. free byte-identical ports nobody is counting.
+
+Audit: of the 747, how many are genuine portable function TUs? Extend the parser to whatever shapes qualify (use `delinks.txt`/`symbols.txt` metadata for `kind:function` rather than a wider filename regex, if that classifies more reliably — `q-activation-invariant-classifier` solved the same problem the same way). Re-run the census and report the backlog delta.
+
+Either outcome is a good answer, and they are very different numbers: "N more free ports were hidden" feeds the Codex Decomper harvest lane directly, while "all 747 are correctly excluded" closes a standing doubt. Right now nobody knows which it is.
+
+Effort: **HIGH** — this is classification judgment, not a mechanical edit.
+
+**Gate:** `python -m pytest -q tests` no-new-failures + a regression test per newly-recognized filename shape (including the truncated-address `*_stubs_*` case) + before/after `port_census.py` counts for all three regions.

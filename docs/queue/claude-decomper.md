@@ -922,3 +922,23 @@ grepped; `check_activation_invariant.py`; `check_delink_dupes.py`;
 stray-draft scan; regenerate the research index AND
 `docs/state-table.md` before pushing. `git restore assets/` before
 committing after any `--clean` run — never a bare `git add -A`.
+
+### cm-c66-resweep — re-attempt parked candidates with the newly-resolved C-66 lever [TODO]
+
+Sweep-15 resolved its open question as **C-66**: a redundant `and rN, rN, #1` immediately before a `mul`/`mla`, present in the real target but absent from an otherwise-correct draft, in a value mwcc can already prove is 0/1-ranged. Two working fixes (inline `& 1` mask at the multiply's operand; explicit intermediate variable), 8+ independent same-round confirmations across 4 of 5 batches — the best-evidenced new lever this campaign.
+
+Every prior time a lever landed this well, the highest-yield next move was **not** a fresh sweep but a re-attempt of already-parked candidates the lever explains: briefs 668/672/673 re-swept `epilogue-wall-corpus.md` and shipped **45/64 (70.3%)** against a fresh-sweep baseline of ~25%. Do that for C-66 before sweeping new ground.
+
+Scope: search the parked corpus for candidates whose park note cites a redundant `and`/mask-before-multiply residual, a `mul`/`mla` mismatch, or an unexplained extra instruction adjacent to a multiply. Re-attempt each with both documented C-66 fixes. Re-park only if neither works, with an updated note saying which was tried.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `git restore assets/` after any `--clean` run — never a bare `git add -A`. Report shipped/attempted against the ~25% fresh-sweep baseline.
+
+### cm-ov002-unknown-sweep-16 — continue the ov002 unknown-pool sweep [TODO]
+
+ov002 is **1,129,372 B = 47% of all `.text`** and sits at 12.58% C (attainment 59%) — the single biggest concentration of remaining runway in the project. Sweeps 9-15 have held a steady ~25% ship rate (13: 27, 14: 24, 15: 26). Continue with the next tranche, same 149-512 B band, one consolidated gate.
+
+Carry **C-66** forward in every dispatch prompt alongside C-44/C-55/C-63/C-64/C-65. C-65 (load-vs-store asymmetry) stays open — another manifestation is worth recording but not worth stalling on.
+
+**Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/branch self-check.** It earned its keep last round: 4 of 5 agents' shells started in the base checkout rather than their assigned worktree, and all 4 stopped clean instead of colliding. Re-verify every worktree with `git worktree list` before dispatch, and treat a mismatch report as a dispatch bug to diagnose, not an agent error to work around.
+
+**Gate:** as `cm-c66-resweep` above.
