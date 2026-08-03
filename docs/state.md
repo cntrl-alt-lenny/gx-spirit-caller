@@ -8,7 +8,46 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-07-23 (Windows PC, brain=Opus; roster: 2× Codex GPT-5.6 Luna High +
+**Last updated:** 2026-08-03 (M1 Mac, brain=Opus 5; roster unchanged: 2× Codex GPT-5.6 Luna
++ 2× Claude Code Sonnet 5 Max, all four on autonomous standing queues `docs/queue/*.md`).
+**CHAPTER: READABLE-C, and the rate has stepped up hard.** EUR readable-C is now **14.11%**
+= Natural-C 333,246 B (13.97%) + asm-C 3,456 B (0.14%) over the 2,385,948 B `.text`
+denominator; USA **11.79%** (278,596 natural / 2,540 asm) and JPN **11.68%** (276,072 /
+2,548). That is **8.48% → 14.11% on EUR in 12 days** — roughly 7× the +0.46 pp/week the
+2026-07-22 scorecard recorded, driven by the ov002 unknown sweeps plus the cross-region
+port harvest coming online.
+
+This round merged 4 PRs on `brain/integ-0803`, gated by a real `gate3.py --scope all` on the
+consolidated tree — `[eur] SHA1 PASS`, `[usa] SHA1 PASS`, `[jpn] SHA1 PASS`, plus
+`check_activation_invariant` OK and `check_delink_dupes` OK (81 delinks.txt, no duplicate
+`.text` addresses). The merged PRs: **#1435** (cm-ov002-unknown-
+sweep-15, 26/100 shipped / 5,756 B — and **C-66 resolved**: a redundant `and rN, rN, #1`
+before a `mul`/`mla` in a provably 0/1-ranged value, two working fixes, 8+ same-round
+confirmations, the best-evidenced new lever this campaign), **#1434** (cm-bss-convert-9,
+9 symbols / 468 B, and an honest "fresh pool is thin" report that declined to force a
+volume batch — the correct call, and the reason that lane is redirected this round),
+**#1433** (cross-region port prefilter root-cause fix — `not_in_gap` reclassified as a
+retryable tool-error + delink-before-install — plus 92 ports harvested), **#1432** (data
+metric overlap semantics documented + 3-state regression test).
+
+Brain-side fixes this session: `wah_out.json` (1.3 MB) + `wah_err.txt` were tracked junk on
+main since fe69e9b4e — removed and gitignored; `q-cross-region-alias-guard` was left `[TODO]`
+despite shipping as cd3d19fd1 — closed. **3 of the 4 queues were QUEUE-EMPTY**; all four
+re-seeded (CC Decomper `cm-c66-resweep` + `cm-ov002-unknown-sweep-16`; CC Scaffolder
+`cm-main-sweep-h` + `cm-data-restock-check`; Codex Decomper `q-port-harvest-complete` +
+`q-sig-refresh-4` + `q-name-crossprop-4`; Codex Scaffolder `q-port-census-unparsed`).
+
+**Where the runway is (measured this session):** ov002 = 1,129,372 B = **47% of all `.text`**
+at 12.58% C; `main` = 738,080 B = 31% at 14.76%. Those two modules are the whole game — every
+other module is "finishable" but small. Separately, `port_census.py` shows **322 free
+byte-identical cross-region ports** waiting (USA 155 + JPN 167 at `sim = 1.0`, ~68 KB),
+which is most of the EUR-vs-USA/JPN gap and the cheapest coverage in the project; the
+backlog regrows every time the CC lanes ship EUR, so a non-zero ending census is normal.
+Open question filed for a future round: `port_census.py` cannot parse **747 EUR TU names**
+(`data_*`, `ovNNN_ADDR`, `sinit_*`, truncated-address `*_stubs_*`) — some unknown share of
+those may be portable function TUs missing from the backlog entirely.
+
+**Previously (2026-07-23):** (Windows PC, brain=Opus; roster: 2× Codex GPT-5.6 Luna High +
 2× Claude Code Sonnet 5 Max, all four on autonomous standing queues `docs/queue/*.md` —
 loop-until-QUEUE-EMPTY, one PR per item). **CHAPTER: READABLE-C, post-wall-correction.**
 EUR readable-C **8.591%** = **Natural-C 201,522 B (8.446%)** + **asm-C 3,456 B
@@ -80,9 +119,19 @@ Historical dated round log moved to [STATE-LOG.md](STATE-LOG.md) by Brief 599.
 
 ## In flight (post this brain-PR)
 
-**Open PRs: 0** once this brain-PR lands. **Both agents idle —
-no briefs in flight.** Brain to scope next-round kickoffs based
-on the candidates listed in *Next-brain TODO* below.
+**Open PRs: 0** once `brain/integ-0803` lands (#1432/#1433/#1434/#1435 all merged into it).
+**All four lanes idle at hand-off, and all four queues re-seeded** — each lane resumes with
+`python tools/work_queue.py next <lane>`, loop-until-QUEUE-EMPTY, one PR per item. Kickoffs
+for this round were linted with `tools/kickoff_lint.py` (preflight + canary + paste-control
++ effort tier all PASS) before send.
+
+Standing hygiene note for the next brain: this Mac carries **9 worktrees**, of which 4 are
+the live lane dirs (`claude-decomper-queue`, `claude-scaffolder-queue`, `codex-decomper-queue`,
+`codex-scaffolder-queue`) and 5 are leftovers from the 2026-07-21 round
+(`claude-decomper-mainb1`/`-mainb2`/`-ov004b`, `claude-decomper-queue-2`,
+`claude-fix-queue-collision`). All 9 branches were verified either merged into `main` or
+fully superseded — `codex/ov004-readable-stubs` and `claude/decomper-queue-run-2` are the two
+that read as "not merged" but hold only content that landed by another path. Safe to prune.
 
 ## Active clusters (post-pivot reality)
 
