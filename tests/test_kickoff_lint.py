@@ -23,6 +23,8 @@ GOOD = """
 Brief 610 — name the SDK layer. SET YOUR REASONING EFFORT TO HIGH.
 Setup + PREFLIGHT:
     ls tools/nitro_suggest_renames.py && echo PREFLIGHT-OK || { echo "preflight failed"; exit 1; }
+    EXPECT="$HOME/Dev/spirit-caller/codex-610"
+    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
     for i in 1 2 3 4 5; do git worktree add ../codex-610 -b codex/naming-610 origin/main && break || { echo retry; sleep 3; }; done
 CANARY: rename ONE function, then run dsd check — it MUST stay green.
 Finish: paste the total names added + the final dsd check green line for all 3 regions.
@@ -46,6 +48,24 @@ class TestMissingGuards(unittest.TestCase):
 
     def test_missing_canary(self):
         self.assertIn("canary", self._fail_keys(GOOD.replace("CANARY", "note")))
+
+    def test_missing_location_guard(self):
+        self.assertIn("location-guard", self._fail_keys(GOOD.replace(
+            '    EXPECT="$HOME/Dev/spirit-caller/codex-610"\n'
+            '    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || '
+            '{ echo "WRONG WORKTREE"; exit 1; }\n',
+            "")))
+
+    def test_location_probe_without_hard_stop_fails(self):
+        text = ("PREFLIGHT: ls || exit 1\n"
+                "pwd; echo current directory\n"
+                "CANARY first check\nHIGH effort\npaste the sha1 line")
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_base_check_alone_does_not_count_as_location_guard(self):
+        text = ("PREFLIGHT: grep queue-file || exit 1\n"
+                "CANARY first check\nHIGH effort\npaste the sha1 line")
+        self.assertIn("location-guard", self._fail_keys(text))
 
     def test_missing_effort(self):
         self.assertIn("effort-tag", self._fail_keys(GOOD.replace("SET YOUR REASONING EFFORT TO HIGH", "go")))
