@@ -1007,3 +1007,29 @@ Named-struct:   55,204 ->  55,204 bytes  (+0 B,   1.16% -> 1.16%)
 ```
 
 **Gate:** none required (no source changes); doc-only commit.
+
+### cm-f-cf8-contradiction — resolve the duel-phase enum contradiction, then measure how common it is [TODO]
+
+**Approved pilot from the 2026-08-03 external-review audit.** Small, doc-only, evidence-producing. Do NOT generalise it into a framework — the point is to find out whether this is one error or a class.
+
+Three canonical documents assert the duel-phase field `data_ov002_022d016c.f_cf8` is a 0–3 enum:
+
+- `docs/research/types/DuelStateSingleton.md` — "DUEL PHASE: 0/1/2/3 (most-tested field)"
+- `docs/research/constants/DuelStateEnums.md` — "The duel phase enum (0–3)"
+- `docs/research/constants/INDEX.md` — "values 0–3"
+
+Three dossiers, derived from real disassembly, contradict them:
+
+- `dossiers/02212d98.md` — `if (dss->f_cf8 == 4) state = 2;`, and its pasted disassembly carries a literal `cmpeq r1, #0x4`
+- `dossiers/0220079c.md` — `pass when f_cf8 == 2 or f_cf8 == 4`
+- `dossiers/02206eb0.md` — `if ((unsigned int)dss->f_cf8 > 3) return 0;`, derived from a `movhi` (unsigned-higher)
+
+**Shipped, byte-matched game code compares this field against literal 4.** So it is not a settled 0–3 enum. Determine the real value range from the disassembly and decide which it is: a five-or-more-state enum, a real-but-rejected transient state, or a wrong field interpretation. Correct or annotate the three canonical docs accordingly — with a `confidence:` marking, since that is the actual root cause (see below).
+
+**Root cause to fix, not just the symptom.** A confidence ladder already exists and is populated: 879 of 1,268 dossiers carry a `confidence:` field (43 high / 495 med / 341 low). It has no counterpart on the canonical `types/` and `constants/` docs — so a claim's uncertainty is recorded at the dossier layer and then **silently dropped when the claim is promoted into canon**. That promotion step is where "0–3" became fact. Propose the smallest change that carries confidence across it.
+
+**Then measure.** Report how many OTHER enums in `docs/research/constants/` have a documented range that some matched `.c` or dossier compares outside of. One contradiction means this was a one-off; fifteen means the readable-C corpus has systematic semantic drift and the follow-on work gets re-ranked immediately. Either answer is the deliverable.
+
+⚠️ Do **not** build the contradiction-checking tool here — `tools/` is Codex Scaffolder territory. Report the pattern and the counts; the tool is filed separately as `q-semantic-contradiction-check`.
+
+**Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the disassembly evidence for the f_cf8 verdict and the other-enum contradiction counts.
