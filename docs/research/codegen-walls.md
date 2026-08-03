@@ -7399,6 +7399,55 @@ transfers.
 (load-side fix, store-side negative result, first ov002 instance) in
 the same round.
 
+### C-66. A redundant `and rN, rN, #1` before a `mul`/`mla` — the compiler drops the mask when it can prove the value is already 0/1; force it back with an explicit intermediate
+
+**The trap.** A bit0-extracted or single-bit-bitfield value that mwcc
+can already prove is range-limited to 0/1 (via a `lsl`/`lsr` shift-pair
+extraction, or a genuine 1-bit bitfield member) does NOT get a
+redundant `and rN, rN, #1` before being multiplied — the mask is
+provably a no-op, and mwcc's optimizer drops it. Many real targets
+still show this exact redundant `and` immediately before the `mul`/
+`mla`, and a source draft using the "obvious" extraction (direct
+bitfield access, or a value passed straight from one expression into
+the multiply) reliably comes out one instruction short — flagged in
+`func_ov002_0220ad78` (cm-ov002-unknown-sweep-14) as a new, unexplained
+residual after C-64's fix otherwise transferred cleanly.
+
+**The fix — two working variants, same underlying idea.** Force the
+compiler to treat the value as needing re-verification rather than a
+provably-clean bitfield read, either by:
+1. **An explicit `& 1` mask written directly in the source**, on a
+   value that's already 0/1-ranged — e.g. `(self->bit0 & 1) * STRIDE`
+   instead of `self->bit0 * STRIDE`. Confirmed reproducing the exact
+   redundant `and` on at least 4 separate functions.
+2. **An explicit intermediate variable, as its own statement**, e.g.
+   `int parity = self->bit0 & 1;` declared and assigned before the
+   value is used in the multiply, rather than inlining the same
+   expression directly into the multiply's operand. Confirmed on at
+   least 2 more functions, independently of variant 1.
+
+Either form works; which one applies may depend on whether the target
+also has other uses of the same value nearby (an inline mask fits a
+single-use site, an intermediate variable fits a value reused across
+multiple statements) — not yet fully distinguished, but both are real,
+reproducible, and byte-exact where tried.
+
+**Evidence — exceptionally well-confirmed in a single round.** At
+least 8 independent instances/confirmations across 4 of 5 batches in
+one round, entirely blind (no batch was told the mechanism, only that
+the question existed): `func_ov002_02201614`, `func_ov002_02201498`
+(variant 1, batch 1), `func_ov002_0224c0b8` (confirmed the residual,
+fix not completed, batch 2), 2 more functions with variant 2 (batch 3),
+`func_ov002_0221eda8` and one more (variant 1, batch 4),
+`func_ov002_02214cb8` (same instruction block reproduced byte-identical
+across 4 different source structurings, strong but not yet resolved,
+batch 5). This is more independent same-round confirmation than any
+other lever in this catalogue had at the time it was first written up.
+
+**Provenance:** cm-ov002-unknown-sweep-14 (residual first flagged,
+`func_ov002_0220ad78`), resolved cm-ov002-unknown-sweep-15 (both fix
+variants found and independently reconfirmed across 4 batches).
+
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source

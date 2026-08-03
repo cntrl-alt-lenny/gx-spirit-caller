@@ -192,6 +192,16 @@ brief 044 (re-stated for convenience):
 > size mismatch immediately. Always read the epilogue first,
 > the prologue second.
 
+> **Pitfall (cm-ov002-unknown-sweep-15): `sub sp, #4` is not
+> required for sp2p3 either.** `func_0207c5b4` routed correctly
+> through `*.legacy.c` with a genuine 2-step `pop {regs, lr};
+> bx lr` epilogue and **zero stack allocation** — no `sub sp`
+> at all. The pop-target shape (2-step vs 1-step) is the only
+> reliable signal across all three tiers; `sub sp, #4`'s
+> presence or absence is incidental to a given function's own
+> stack needs, not a tier discriminator by itself in either
+> direction.
+
 The original two-tier recommendation below is preserved for
 historical context; treat the brief 044/045 update as the
 current state of the routing.
