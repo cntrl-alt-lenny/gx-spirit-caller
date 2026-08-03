@@ -10,9 +10,21 @@ game-object classification enums.
 
 ## Duel phase (data_ov002_022d016c.f_cf8)
 
-A 4-value state machine stored at `data_ov002_022d016c + 0xCF8`. Three
-independent matched files confirm values 1–3; value 0 is implied as the initial
-state.
+**Confidence: MED (corrected 2026-08-03, `cm-f-cf8-contradiction`)** — a
+5-value state machine, not the 4-value 0-3 range this section previously
+documented. The prior text was HIGH-confidence for values 0-3 (3
+independent matched files) but that confidence never actually extended to
+the claim that 3 was the *maximum* — none of those 3 files test a value
+≥ 4, so nothing ever verified an upper bound. Four independent dossiers
+(`docs/research/dossiers/02212d98.md`, `0220079c.md`, `02299c9c.md`,
+`02206eb0.md` — real disassembly of the shipped game binary, not yet
+promoted to matched C) show value 4 in active use: three branch on
+`f_cf8 == 4` to select a distinct, meaningful output state; the fourth
+rejects it defensively for one narrow fast-path
+(`(unsigned)f_cf8 > 3`) — a function needing to guard against seeing 4 is
+itself evidence 4 is reachable, not evidence it doesn't exist. Full
+disassembly evidence in
+[`DuelStateSingleton.md`](../types/DuelStateSingleton.md#the-duel-phase-field-0xcf8).
 
 ```c
 typedef enum DuelPhase {
@@ -20,13 +32,30 @@ typedef enum DuelPhase {
     DUEL_PHASE_MAIN      = 1,   /* main duel phase */
     DUEL_PHASE_RESOLVE   = 2,   /* effect resolution */
     DUEL_PHASE_END       = 3,   /* end phase / cleanup */
+    DUEL_PHASE_4         = 4,   /* confirmed real via dossier disassembly;
+                                   semantic role not yet pinned down --
+                                   do not assume it's just an alias of 2
+                                   because one caller's gate treats them
+                                   the same way */
 } DuelPhase;
 ```
 
-Comparisons found:
-- `f_cf8 != 3` — skip if in end-phase
+Comparisons found (matched C, HIGH confidence):
+- `f_cf8 != 3` — skip if in end-phase (also true for 4 — does not
+  contradict this correction)
 - `f_cf8 == 2` — proceed only during resolution
-- `(unsigned)f_cf8 > 1` — in main or resolution phase
+- `(unsigned)f_cf8 > 1` — in main or resolution phase (also true for 4)
+
+Comparisons found (dossier disassembly, MED confidence — not yet matched
+C, but real disassembly of the shipped binary):
+- `f_cf8 == 4` (`02212d98.md`) — selects a distinct output state (2) when
+  combined with a second field match
+- `f_cf8 == 2 || f_cf8 == 4` (`0220079c.md`) — both phases pass the same
+  gate
+- `f_cf8 == 4` (`02299c9c.md`) — drives a real sub-state transition
+  (`sc->f_4 = 7`)
+- `(unsigned)f_cf8 > 3` (`02206eb0.md`) — one function's own fast-path
+  explicitly excludes phase 4
 
 ---
 
@@ -158,9 +187,12 @@ and as a "slot is empty" marker in card arrays.
 
 ## Notes for C-matching
 
-1. **The duel phase enum (0–3)** at `d016c.f_cf8` is the most frequently
-   tested enum in ov002. Any MED candidate that gates on duel phase needs
-   this typedef to match the unsigned vs signed comparison shapes.
+1. **The duel phase enum (0–4, not 0–3 — see correction above)** at
+   `d016c.f_cf8` is the most frequently tested enum in ov002. Any
+   candidate that gates on duel phase needs this typedef to match the
+   unsigned vs signed comparison shapes, and must not assume 3 is the
+   maximum value: at least one live pattern (`== 2 || == 4`) treats 4 as
+   a normal, reachable phase, not an error case.
 
 2. **Timer thresholds (0x3E8, 0x4B0)** almost always appear together in
    ov002 effect timer functions. If a candidate tests `x <= 0x3E8`, it

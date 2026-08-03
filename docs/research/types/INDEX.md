@@ -5,6 +5,10 @@
 Auto-generated index of all recovered struct definitions in this directory.
 Confidence ratings: **HIGH** = multiple independent sources agree;
 **MED** = one confirmed source or two partial; **LOW** = assembly-only inference.
+Applies per-claim, not just per-document — a struct rated HIGH overall can
+still contain one field whose value *range* was only sampled, not verified
+maximal (see [`constants/INDEX.md`](../constants/INDEX.md#confidence-and-promotion-rule)
+for the promotion rule this is asking you to follow).
 
 > Maintained at: `docs/research/types/INDEX.md`
 > Branch: `kb/types-recovery`

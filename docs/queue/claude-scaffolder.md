@@ -1009,7 +1009,7 @@ Named-struct:   55,204 ->  55,204 bytes  (+0 B,   1.16% -> 1.16%)
 
 **Gate:** none required (no source changes); doc-only commit.
 
-### cm-f-cf8-contradiction — resolve the duel-phase enum contradiction, then measure how common it is [TODO]
+### cm-f-cf8-contradiction — resolve the duel-phase enum contradiction, then measure how common it is [DONE]
 
 **Approved pilot from the 2026-08-03 external-review audit.** Small, doc-only, evidence-producing. Do NOT generalise it into a framework — the point is to find out whether this is one error or a class.
 
@@ -1034,3 +1034,50 @@ Three dossiers, derived from real disassembly, contradict them:
 ⚠️ Do **not** build the contradiction-checking tool here — `tools/` is Codex Scaffolder territory. Report the pattern and the counts; the tool is filed separately as `q-semantic-contradiction-check`.
 
 **Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the disassembly evidence for the f_cf8 verdict and the other-enum contradiction counts.
+
+---
+
+**Done.** Full write-up:
+[`docs/research/cm-f-cf8-contradiction-2026-08-03.md`](../research/cm-f-cf8-contradiction-2026-08-03.md).
+
+**Canary verdict**: `f_cf8` is a 5-value field (0-4), not the documented
+4-value 0-3 — confirmed a genuine new value, not a rejected transient or a
+wrong-field mapping (3 of 4 dossiers branch on `f_cf8==4` as a first-class
+success case, not a guard; a 4th, independently-found dossier
+`02299c9c.md`, is a second `==4` confirmation beyond the 3 named in the
+filing). All three canonical docs corrected
+(`types/DuelStateSingleton.md`, `constants/DuelStateEnums.md`,
+`constants/INDEX.md`).
+
+**Promotion-confidence fix**: `constants/INDEX.md` had no confidence
+ladder at all; added the same HIGH/MED/LOW scale `types/INDEX.md` already
+used, plus one rule — a claim asserting a *closed* range must state its
+own confidence when weaker than the document's blanket rating, instead of
+silently inheriting it. `types/INDEX.md` gets a one-sentence
+cross-reference rather than a duplicate copy. Applied concretely to the
+`f_cf8` sections (MED confidence on the range, HIGH on the shape).
+
+**Measurement**: checked the 7 enums in `docs/research/constants/` that
+share `f_cf8`'s exact risk shape (closed range asserted, inferred from a
+small sample of call sites — excluded hardware-fixed enums,
+array-literal-backed tables, and explicitly open-ended catalogs as
+structurally not at risk). **3 of 7 show a confirmed contradiction**:
+`f_cf8` itself, plus two NEW ones found this round —
+`Ov006SubState` (`OverlayConstants.md`, documented `{0,2-9}`, real set at
+least `{0,2-9,11,12,14,16,17}` — 5 extra values, all in **already-shipped
+matched C**: `data_ov006_021cf140 = 0x11` in `func_ov006_021b23c8.c`, `=
+12` in `021b2c9c.c`, `.f0 = 0xb`/`0xe` in `021b28c0.c`, `= 16` in
+`021b2cbc.c`) and `Ov004Phase` (`OverlayConstants.md`, documented
+`{0,2,4,15,16}`, real set at least adds `5` — `func_ov004_021d9810.c`:
+`if (*(int *)(base + 0x54) != 5) return 0;` on the identical
+`data_ov004_0220b500+0x54` base/offset the doc's own 3 named functions
+use). Not a one-off, not "systematic across everything" either — a real,
+reproducible pattern on the sample checked, with 2 of 3 backed by
+stronger (matched-C, not dossier-only) evidence than `f_cf8` had.
+`Ov006SubState`/`Ov004Phase` reported here, not fixed — that's follow-up
+work, not this item's scope.
+
+```
+$ python3.13 -m pytest tests -q
+3178 passed, 13 skipped, 63 subtests passed in 46.68s
+```
