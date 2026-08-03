@@ -896,6 +896,39 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["named_struct_bytes"], 0x20)
         self.assertAlmostEqual(metric["named_struct_pct"], 100 * 0x20 / 0x30)
 
+    def test_named_struct_overlap_and_retype_direction_are_tu_level(self):
+        """Pin overlap, array retype, and singleton-struct SWAP semantics."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x10 kind:data\n\n"
+                "src/main/data_retype.c:\n"
+                "    .data start:0x0 end:0x10\n",
+            )
+            source = root / "src" / "main" / "data_retype.c"
+            source.parent.mkdir(parents=True)
+
+            def measure(text):
+                source.write_text(text)
+                with mock.patch.object(progress_module, "ROOT", root):
+                    return summarize_data_readability(root / "config" / "eur")
+
+            primitive = measure("unsigned char data_retype[16] = {0};\n")
+            self.assertEqual(primitive["typed_array_bytes"], 0x10)
+            self.assertEqual(primitive["named_struct_bytes"], 0)
+
+            array_struct = measure(
+                "struct Entry data_retype[4] = {{0}, {0}, {0}, {0}};\n"
+            )
+            self.assertEqual(array_struct["typed_array_bytes"], 0x10)
+            self.assertEqual(array_struct["named_struct_bytes"], 0x10)
+
+            singleton_struct = measure("struct Entry data_retype = {0};\n")
+            self.assertEqual(singleton_struct["typed_array_bytes"], 0)
+            self.assertEqual(singleton_struct["named_struct_bytes"], 0x10)
+
     def test_named_struct_subtier_matches_real_bare_typedef_canary_declarations(self):
         # Regression test for q-data-metric-fix-v2: v1 (#1326) required the
         # literal `struct` keyword, so it scored 0 for both of these
