@@ -869,7 +869,7 @@ src/usa/overlay006/func_ov006_021c18e0.s:
 src/usa/overlay006/func_ov006_021c1bac.s:
     complete
     .text start:0x021c1bac end:0x021c1bb4
-src/usa/overlay006/func_ov006_021c1bb4.s:
+src/usa/overlay006/func_ov006_021c1bb4.c:
     complete
     .text start:0x021c1bb4 end:0x021c1c68
 src/usa/overlay006/func_ov006_021c1c68.s:
