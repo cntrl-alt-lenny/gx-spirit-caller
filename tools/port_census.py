@@ -15,8 +15,9 @@ SCRATCH = Path(os.environ.get("PORT_CENSUS_OUT", ROOT / "build"))
 sys.path.insert(0, str(ROOT / "tools"))
 
 from find_region_siblings import load_region, find_siblings  # noqa: E402
-from routing_suffixes import split_routing_suffix  # noqa: E402
+from parsers import CODE_SECTIONS, parse_delinks_file, parse_symbols_file  # noqa: E402
 from port_to_region import parse_filename_stem  # noqa: E402
+from routing_suffixes import split_routing_suffix  # noqa: E402
 
 
 def dir_to_module(d: str) -> str | None:
@@ -27,8 +28,111 @@ def dir_to_module(d: str) -> str | None:
     return None
 
 
-def scan_tree(base: Path) -> dict[tuple[str, int], set[str]]:
-    """(module, addr) -> {'c','s'} present on disk. Also returns unparsed count."""
+def _config_modules(region: str) -> list[tuple[str, Path, Path]]:
+    """Return ``(module, symbols.txt, delinks.txt)`` for a region."""
+    arm9 = ROOT / "config" / region / "arm9"
+    out = [("main", arm9 / "symbols.txt", arm9 / "delinks.txt")]
+    if (arm9 / "itcm" / "symbols.txt").is_file():
+        out.append(("itcm", arm9 / "itcm" / "symbols.txt",
+                    arm9 / "itcm" / "delinks.txt"))
+    overlays = arm9 / "overlays"
+    out.extend(
+        (p.name, p / "symbols.txt", p / "delinks.txt")
+        for p in sorted(overlays.glob("ov*"))
+        if p.is_dir()
+    )
+    return out
+
+
+def source_function_addresses(region: str) -> dict[str, list[tuple[str, int]]]:
+    """Map each delinked source path to its function symbols.
+
+    ``delinks.txt`` identifies the TU's code interval(s); ``symbols.txt``
+    identifies the function entry points inside those intervals. This handles
+    named, ``sinit_*``, and multi-function ``*_stubs_*`` TUs without inferring
+    an address from a filename.
+    """
+    out: dict[str, list[tuple[str, int]]] = defaultdict(list)
+    function_addresses: set[tuple[str, int]] = set()
+    for module, symbols_path, delinks_path in _config_modules(region):
+        functions = [s for s in parse_symbols_file(symbols_path, module)
+                     if s.is_function]
+        function_addresses.update((module, s.addr) for s in functions)
+        _, tus = parse_delinks_file(delinks_path)
+        for tu in tus:
+            source = tu["source"]
+            if not source.endswith((".c", ".s")):
+                continue
+            ranges = [
+                (start, end)
+                for section, start, end in tu["sections"]
+                if section in CODE_SECTIONS and start < end
+            ]
+            for symbol in functions:
+                if any(start <= symbol.addr < end for start, end in ranges):
+                    out[source].append((module, symbol.addr))
+
+    # Three historical source paths predate the current delinks filename:
+    # retain them only when the filename address is independently confirmed by
+    # the region's function symbol table. This is a compatibility bridge, not
+    # a filename-based function classifier.
+    source_root = ROOT / "src" / ("" if region == "eur" else region)
+    for path in source_root.rglob("*.c") if source_root.is_dir() else []:
+        source = path.relative_to(ROOT).as_posix()
+        if source in out:
+            continue
+        stem = split_routing_suffix(path.stem)[0]
+        parsed = parse_filename_stem(stem)
+        if parsed is None:
+            continue
+        parts = Path(source).parts
+        if len(parts) >= 2 and parts[1].startswith("overlay"):
+            module = "ov" + parts[1][len("overlay"):].zfill(3)
+        elif len(parts) >= 3 and parts[1] == "main" and parts[2] == "itcm":
+            module = "itcm"
+        else:
+            module = "main"
+        address = parsed[2]
+        if (module, address) in function_addresses:
+            out[source].append((module, address))
+    for source in out:
+        out[source] = sorted(set(out[source]))
+    return out
+
+
+def _region_for_source_root(base: Path) -> str | None:
+    try:
+        relative = base.resolve().relative_to((ROOT / "src").resolve())
+    except ValueError:
+        return None
+    return "eur" if not relative.parts else relative.parts[0]
+
+
+def _legacy_scan_tree(base: Path) -> tuple[dict[tuple[str, int], set[str]], list[str]]:
+    """Keep the lightweight parser behavior for external synthetic roots."""
+    out: dict[tuple[str, int], set[str]] = defaultdict(set)
+    unparsed = []
+    for module_dir in base.iterdir() if base.is_dir() else []:
+        if dir_to_module(module_dir.name) is None:
+            continue
+        for path in module_dir.rglob("*"):
+            if not path.is_file() or path.suffix not in (".c", ".s"):
+                continue
+            parsed = parse_filename_stem(split_routing_suffix(path.stem)[0])
+            if parsed is None:
+                unparsed.append(str(path))
+                continue
+            _, module, address = parsed
+            out[(module, address)].add(path.suffix[1:])
+    return out, unparsed
+
+
+def scan_tree(base: Path) -> tuple[dict[tuple[str, int], set[str]], list[str]]:
+    """Return function-keyed source kinds and metadata-unresolved TUs."""
+    region = _region_for_source_root(base)
+    if region is None:
+        return _legacy_scan_tree(base)
+    source_functions = source_function_addresses(region)
     out: dict[tuple[str, int], set[str]] = defaultdict(set)
     unparsed = []
     for p in base.iterdir() if base.is_dir() else []:
@@ -43,31 +147,45 @@ def scan_tree(base: Path) -> dict[tuple[str, int], set[str]]:
                 continue
             if f.suffix not in (".c", ".s"):
                 continue
-            stem = split_routing_suffix(f.name[: -len(f.suffix)])[0]
-            parsed = parse_filename_stem(stem)
-            if parsed is None:
+            source = f.relative_to(ROOT).as_posix()
+            functions = source_functions.get(source, [])
+            if not functions:
                 unparsed.append(str(f))
                 continue
-            _, fmod, addr = parsed
-            out[(fmod, addr)].add(f.suffix[1:])
+            for module, addr in functions:
+                out[(module, addr)].add(f.suffix[1:])
     return out, unparsed
 
 
 def scan_eur_tree(base: Path) -> tuple[list[tuple[str, int, Path]], list[str]]:
-    """Return address-keyed EUR .c files and unparsed source paths."""
+    """Return function-keyed EUR .c entries and metadata-unresolved TUs."""
+    if _region_for_source_root(base) is None:
+        entries: list[tuple[str, int, Path]] = []
+        unresolved = []
+        for module_dir in base.iterdir() if base.is_dir() else []:
+            if dir_to_module(module_dir.name) is None:
+                continue
+            for path in module_dir.rglob("*.c"):
+                parsed = parse_filename_stem(split_routing_suffix(path.stem)[0])
+                if parsed is None:
+                    unresolved.append(str(path))
+                    continue
+                _, module, address = parsed
+                entries.append((module, address, path))
+        return entries, unresolved
+    source_functions = source_function_addresses("eur")
     eur_c: list[tuple[str, int, Path]] = []
     eur_unparsed = []
     for p in base.iterdir() if base.is_dir() else []:
         if dir_to_module(p.name) is None:
             continue
         for f in p.rglob("*.c"):
-            stem = split_routing_suffix(f.name[:-2])[0]
-            parsed = parse_filename_stem(stem)
-            if parsed is None:
+            source = f.relative_to(ROOT).as_posix()
+            functions = source_functions.get(source, [])
+            if not functions:
                 eur_unparsed.append(str(f))
                 continue
-            _, fmod, addr = parsed
-            eur_c.append((fmod, addr, f))
+            eur_c.extend((module, addr, f) for module, addr in functions)
     return eur_c, eur_unparsed
 
 
@@ -83,13 +201,13 @@ def main() -> int:
         )
         return 2
 
-    print(f"EUR baseline .c files (address-keyed): {len(eur_c)}; unparsed names: {len(eur_unparsed)}")
+    print(f"EUR baseline .c files (function-address-keyed): {len(eur_c)}; unresolved TUs: {len(eur_unparsed)}")
     if eur_unparsed[:5]:
-        print("  sample unparsed:", eur_unparsed[:5])
+        print("  sample unresolved:", eur_unparsed[:5])
 
     usa_files, usa_unp = scan_tree(ROOT / "src" / "usa")
     jpn_files, jpn_unp = scan_tree(ROOT / "src" / "jpn")
-    print(f"USA on-disk TUs: {len(usa_files)} (unparsed {len(usa_unp)}); JPN: {len(jpn_files)} (unparsed {len(jpn_unp)})")
+    print(f"USA on-disk function TUs: {len(usa_files)} (unresolved {len(usa_unp)}); JPN: {len(jpn_files)} (unresolved {len(jpn_unp)})")
 
     print("loading regions...", file=sys.stderr)
     eur = load_region("eur")
