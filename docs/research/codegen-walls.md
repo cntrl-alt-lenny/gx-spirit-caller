@@ -7435,16 +7435,17 @@ reproducible, and byte-exact where tried.
 **Source-shape requirement — the value must come from a genuine
 bitfield member, not a computed shift-pair (round 2026-08-03b
 refinement).** Neither fix variant above works if the 0/1 value is a
-*manually-computed* local — e.g. `int bit0 = (unsigned int)(x << 31)
->> 31;` — instead of a real C bitfield member access (`unsigned short
-field2 : 1;` on the struct, then `self->field2`). mwcc's optimizer
+*manually-computed* local — e.g.
+`int bit0 = (unsigned int)(x << 31) >> 31;`
+— instead of a real C bitfield member access
+(`unsigned short field2 : 1;` on the struct, then `self->field2`). mwcc's optimizer
 tracks the computed local's value-chain at the SSA level and proves
 `((x << 31) >> 31) & 1` fully redundant regardless of which fix
 variant is layered on top — inline mask, intermediate variable, or
 both stacked together all collapse to a single plain `and rN, rN, #1`
 (or, when the value also feeds a comparison instead of a multiply,
-to a plain `and` where ground truth uses a fused `cmp rX, rY, lsr
-#31`). The redundant `and` — and the shift-pair extraction it
+to a plain `and` where ground truth uses a fused
+`cmp rX, rY, lsr #31`). The redundant `and` — and the shift-pair extraction it
 depends on — only survive when the SAME logical value is sourced
 through an actual bitfield member expression. Confirmed on two
 functions, both round-tripped from a from-scratch draft with no
