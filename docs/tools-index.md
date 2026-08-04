@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**126 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**127 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (54)
+- [Uncategorised](#uncategorised) (55)
 
 ## Analysis / worklist
 
@@ -735,9 +735,9 @@ routing-tier filename suffixes (brief 587, closing the brief-569 / improvement-s
 
 ### `tools/semantic_contradiction_check.py`
 
-**Report closed enum ranges contradicted by matched-C/dossier evidence.**
+**Report documented enum ranges contradicted by matched-C evidence.**
 
-This is deliberately a narrow checker for the risk class identified by ``cm-f-cf8-contradiction``. It reports evidence and never rewrites canonical documentation. The six candidates exclude ``Ov013Slot`` because its values are array-lite…
+Candidates come from the structure of the constants documents rather than a hard-coded enum-name list. Open observed-value sets are reported as observed documentation, not treated as closed ranges. A malformed candidate is an explicit UN…
 
 ### `tools/sig_census.py`
 

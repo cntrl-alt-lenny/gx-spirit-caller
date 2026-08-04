@@ -1209,7 +1209,9 @@ $ python3.13 -m pytest tests -q
 3181 passed, 13 skipped, 63 subtests passed in 29.32s
 ```
 
-### q-producer-consumer-sample — stratified MED-vs-HIGH sample of the producer/consumer lens [DONE — stopped at canary]
+### q-producer-consumer-sample — stratified MED-vs-HIGH sample of the producer/consumer lens [DONE]
+
+> Stopped at the canary — and the stop was the result. See the item body.
 
 Self-scoped and self-filed, per the brain's invitation after
 `cm-f-cf8-reopen`. Question: was `f_cf8` a localized `DuelStateSingleton.md`
