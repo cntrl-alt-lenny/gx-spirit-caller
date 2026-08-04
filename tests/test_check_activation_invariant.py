@@ -24,7 +24,9 @@ def _run_git(repo: Path, *args: str) -> None:
         raise AssertionError(result.stderr)
 
 
-def _fixture_repo(*, activate: bool, routed: bool = False) -> tuple[Path, str]:
+def _fixture_repo(
+    *, activate: bool, routed: bool = False, activation_name: str | None = None,
+) -> tuple[Path, str]:
     tmp = tempfile.TemporaryDirectory()
     repo = Path(tmp.name)
     _run_git(repo, "init", "-q")
@@ -46,7 +48,7 @@ def _fixture_repo(*, activate: bool, routed: bool = False) -> tuple[Path, str]:
     (repo / "src" / "main" / "func_02000000.s").unlink()
     if activate:
         text = (repo / "config" / "eur" / "arm9" / "delinks.txt").read_text(encoding="utf-8")
-        text = text.replace("func_02000000.s:", f"{c_name}:")
+        text = text.replace("func_02000000.s:", f"{activation_name or c_name}:")
         (repo / "config" / "eur" / "arm9" / "delinks.txt").write_text(text, encoding="utf-8")
     _run_git(repo, "add", ".")
     _run_git(repo, "commit", "-qm", "sweep")
@@ -164,6 +166,15 @@ class TestActivationInvariantCLI(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("function .c added:       1", result.stdout)
         self.assertIn("delinks activations:     1", result.stdout)
+
+    def test_same_address_wrong_c_basename_does_not_satisfy_activation(self):
+        repo, head = _fixture_repo(
+            activate=True,
+            activation_name="func_02000000.legacy.c",
+        )
+        result = self._invoke(repo, f"HEAD~1..{head}")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("MISSING delinks activation for added C", result.stdout)
 
     def test_data_addition_is_informational(self):
         repo, head = _data_fixture_repo()

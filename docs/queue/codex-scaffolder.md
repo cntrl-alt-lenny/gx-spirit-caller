@@ -371,7 +371,7 @@ Build the smallest checker that catches both: a queue item marked `[TODO]`/`[CLA
 
 **Gate:** `python -m pytest tests -q` no-new-failures + a regression test per drift class (use the two real instances above as fixtures) + the checker's output on the current tree.
 
-### q-activation-basename-fallback — close the fallback path that let a wiped delinks edit pass the gate [TODO]
+### q-activation-basename-fallback — close the fallback path that let a wiped delinks edit pass the gate [DONE]
 
 Found live by the Claude Decomper lane during `cm-c66-resweep` (PR #1443), reported in its own PR body rather than buried.
 
