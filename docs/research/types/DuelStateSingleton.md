@@ -20,9 +20,12 @@ typedef struct DuelStateSingleton {
     /* +0xCE8 – +0xCEB  gap */
     int            f_cec;         /* +0xCEC  card-list slot index → data_ov002_022cd744[] lookup */
     /* +0xCF0 – +0xCF7  gap */
-    int            f_cf8;         /* +0xCF8  DUEL PHASE: 0-4, NOT 0-3 (most-tested
-                                      field; see corrected note below --
-                                      confidence MED on the range, HIGH on the shape) */
+    int            f_cf8;         /* +0xCF8  DUEL PHASE: open observed-value set
+                                      {0,1,2,3,4,5,7}, NOT a closed range -- see
+                                      corrected note below. Confidence LOW on
+                                      closure, MED on the individual values,
+                                      HIGH on the field's shape (a small-int
+                                      phase gate). */
     /* +0xCFC – +0xD07  gap */
     int            f_d0c;         /* +0xD0C  gate flag (== 0 check blocks main loop) */
     /* +0xD10 – +0xD17  gap */
@@ -59,7 +62,7 @@ extern DuelStateSingleton data_ov002_022d016c;
 |--------|------|-----|--------------|
 | +0xCE4 | `unsigned int` | read | `func_ov002_021e286c.c` — packed as lo/hi u16 halves |
 | +0xCEC | `int` | read | `func_ov002_021e2b3c.c`, `021e2c5c.c` — index into `data_ov002_022cd744[]` |
-| +0xCF8 | `int` | r/w | HIGH (matched C): `func_ov002_021ff9a8.c` (`!= 3`), `022028ac.c` (`== 2`), `02287618.c` (`> 1`). MED (dossier disasm, not yet matched C — see corrected note below): `02212d98.md` (`== 4`), `0220079c.md` (`== 4`), `02299c9c.md` (`== 4`), `02206eb0.md` (unsigned `> 3`) |
+| +0xCF8 | `int` | r/w | HIGH (matched C, consumer-side): `func_ov002_021ff9a8.c` (`!= 3`), `022028ac.c` (`== 2`), `02287618.c` (`> 1`). MED (dossier disasm, consumer-side, not yet matched C — see corrected note below): `02212d98.md` (`== 4`), `0220079c.md` (`== 4`), `02299c9c.md` (`== 4`), `02206eb0.md` (unsigned `> 3`). Producer-side (EUR `str` sweep, see corrected note): confirmed stored values `0,1,2,3,5,7` — `4` is never a literal producer, consumer-only |
 | +0xD0C | `int` | read | `func_ov002_021e2b3c.c`, `021e2c5c.c` — gate (`== 0` ⇒ proceed) |
 | +0xD18 | `fn ptr` | read | `func_ov002_021b08a8.s` — installed fn ptr, `blx r0` via `[r0, #0xd18]` |
 | +0xD1C | `int` | r/w | `func_ov002_021b08a8.s` — dispatch-table-2 index; `func_ov002_021aec04.s` sets it; incremented on handler success; `func_ov002_021d109c.s`, `021ca6f8.s` also access |
@@ -82,12 +85,22 @@ extern DuelStateSingleton data_ov002_022d016c;
 ## The duel-phase field (+0xCF8)
 
 The most frequently tested field in the entire singleton. **Confidence:
-MED on the range, HIGH on the shape (corrected 2026-08-03,
-`cm-f-cf8-contradiction`)** — this section previously asserted a closed
-0-3 range at HIGH confidence, but that was an overreach: three
-independent matched files confirm the field's *semantics* (a small-int
-phase gate) at HIGH confidence, but none of them test a value ≥ 4, so the
-*maximum* was never actually verified, only assumed:
+LOW on closure, MED on the individual observed values, HIGH on the
+shape (corrected 2026-08-04, `cm-f-cf8-reopen` — supersedes the
+2026-08-03 "0-4" correction below, which asserted closure the same way
+the original "0-3" did, just one value later).**
+
+**This is an open observed-value set, not a closed range: confirmed
+values include 0, 1, 2, 3, 4, 5 and 7; complete range and semantic
+names are not yet established.** The 2026-08-03 fix upgraded an assumed
+`0-3` to an assumed `0-4` by taking the highest dossier-confirmed value
+and declaring it the ceiling — "highest value seen" is not "upper
+bound," and that equivalence was the entire bug, so restating it with a
+bigger number wasn't a fix.
+
+Three independent matched files confirm the field's *semantics* (a
+small-int phase gate) at HIGH confidence, but none of them test a value
+≥ 4, so no file has ever verified a maximum:
 
 ```c
 /* func_ov002_021ff9a8.c */
@@ -134,14 +147,51 @@ when `self->f0 == 0x16a3`) — a function needing to explicitly guard
 against seeing 4 is itself evidence 4 is a reachable value, not evidence
 it doesn't exist.
 
-**Verdict: `f_cf8` is a 5-value field (0-4), not a closed 4-value enum.**
-Not a wrong-field mapping (every source, matched C and dossier alike,
-agrees on the offset, the base struct, and the semantic category) and not
-a rejected-transient-only value (3 of the 4 dossiers branch on it as a
-genuine success case, not merely a guard). See
-[`DuelStateEnums.md`](../constants/DuelStateEnums.md) for the corrected
-enum and the promotion-confidence rule this correction is itself an
-example of.
+**Producer sweep, the check the 2026-08-03 correction skipped**: every
+`str` targeting `+0xcf8` in `src/overlay002/*.s`/`*.c` (EUR), traced
+back to the immediate feeding the stored register:
+
+| stored value | store sites found | example |
+|---|---|---|
+| 0 | 4 | `func_ov002_022b809c.s:139` |
+| 1 | 1 | `func_ov002_021aec04.s:149` |
+| 2 | 1 | `func_ov002_021aec04.s:157` |
+| 3 | 2 | `func_ov002_021aec04.s:166`, `func_ov002_021cacf0.s:129` |
+| 5 | 1 | `func_ov002_021aec04.s:176` |
+| 7 | 3 | `func_ov002_021af5a0.s:229`, `func_ov002_021d109c.s:32`, `func_ov002_021ae7b8.s:60` |
+
+**4 never appears as a stored immediate anywhere in this sweep** — every
+occurrence is the consumer-side `cmpeq r1, #0x4` already shown above.
+Kept in the observed set regardless, because 3 of the 4 dossiers treat
+it as a live success case rather than a guard, meaning some producer
+this sweep didn't reach must set it. This producer/consumer disagreement
+is itself the finding, not a loose end to explain away: it means a
+sweep that only traces literal `str` immediates is structurally
+incomplete even when done carefully, because at least two other
+producer shapes exist for this exact field —
+
+- **Argument forwarding** (`func_ov002_021d1158.s:31`): `mov r4, r0`
+  (the function's own parameter) `... str r4, [r0, #0xcf8]` — sets the
+  field to whatever the caller passes, not a fixed literal. Its
+  contribution to the true value set depends on tracing that function's
+  own callers, not attempted this round.
+- **Save/restore** (`func_ov002_021cacf0.s`): reads the current value to
+  the stack, forces `3` temporarily, then restores the saved value —
+  not a new literal producer, just whatever the field already held.
+  Initially flagged as "unresolved" by a naive literal-tracing pass;
+  recorded here so it isn't mistaken for evidence of a distinct value.
+
+**Verdict: `f_cf8` is an open observed-value set — {0,1,2,3,4,5,7}
+confirmed, closure not established.** Not a wrong-field mapping (every
+source, matched C and dossier alike, agrees on the offset, the base
+struct, and the semantic category) and not a rejected-transient-only
+value (3 of 4 dossiers branch on `==4` as a genuine success case, not
+merely a guard) — but also not a 5-value or any other N-value closed
+enum, because no sweep run so far (this one included) has proven there
+isn't an 8th, 9th, or 10th value still unseen. See
+[`DuelStateEnums.md`](../constants/DuelStateEnums.md) for the same
+correction and the promotion-confidence rule this is itself an example
+of applying.
 
 ## State-machine dispatch (+0xD18)
 

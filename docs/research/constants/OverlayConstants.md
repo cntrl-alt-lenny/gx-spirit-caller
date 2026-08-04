@@ -19,32 +19,59 @@ contains 8 parallel per-state sub-machines, each with its own state word,
 callback table, and VRAM setup. The state word values and audio channel fields
 are the most important constants.
 
-### Per-state sub-machine state enum
+### Per-state sub-machine state word — open observed-value set, NOT a closed enum
 
-```c
-typedef enum Ov006SubState {
-    OV006_STATE_INIT     = 0,  /* pre-init / before first audio load */
-    OV006_STATE_AUDIO    = 2,  /* audio bank loaded and started */
-    OV006_STATE_READY    = 3,  /* both subsystem probes passed */
-    OV006_STATE_ACTIVE   = 4,  /* full 6-step init complete, running */
-    OV006_STATE_DONE     = 5,  /* finalize complete (teardown path) */
-    OV006_STATE_SETTLE   = 6,  /* settle pass triggered (cf140 guard) */
-    OV006_STATE_STEP7    = 7,  /* init+c19a8 complete */
-    OV006_STATE_STEP8    = 8,  /* finalize via 021b43a0 path */
-    OV006_STATE_STEP9    = 9,  /* func_ov005 bridge complete */
-} Ov006SubState;
+**Confidence: LOW on closure, HIGH on individual values (corrected
+2026-08-04, `cm-enum-contradiction-fix`)** — this was documented as a
+closed 9-value `typedef enum`. It is not closed. A full producer sweep
+of `data_ov006_021cf140`'s 20 matched-C readers (every assignment to
+the state word — bare `= N`, `.f0 = N`, `[0] = N`, and
+`*(int*)ptr = N` forms, since the original doc's own citations already
+mixed several of these and an incomplete regex on the first re-check
+pass missed 2 of the values below on the first pass) finds **14
+distinct stored literal values, not 9**:
+
+```
+confirmed values include 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17;
+0 has no confirmed explicit store (may be the implicit BSS-zero default,
+unconfirmed either way); complete range and semantic names are not yet
+established.
 ```
 
-Confirmed: `func_ov006_021b2324` (→2), `func_ov006_021b2804` (→3),
-`func_ov006_021b3290` (→4), `func_ov006_021b2f70` / `func_ov006_021b355c` (→5),
-`func_ov006_021b2970` (→6), `func_ov006_021b287c` (→7),
-`func_ov006_021b43a0` (→8), `func_ov006_021b2b08` (→9).
+Store-site evidence (all in already-shipped, matched `.c` — stronger
+than a dossier-only finding):
+
+| value | file | form |
+|---|---|---|
+| 2 | `func_ov006_021b2324.c` | `data_ov006_021cf140[0] = 2;` |
+| 3 | `func_ov006_021b2804.c` | `data_ov006_021cf140[0] = 3;` |
+| 4 | `func_ov006_021b26e0.c` | `*(int *)data_ov006_021cf140 = 4;` |
+| 5 | `func_ov006_021b2d5c.c` | `*(int *)data_ov006_021cf140 = 5;` |
+| 6 | `func_ov006_021b2970.c` | `if (r) data_ov006_021cf140 = 6;` |
+| 7 | `func_ov006_021b287c.c` | `*(int *)data_ov006_021cf140 = 7;` |
+| 8 | `func_ov006_021b28c0.c` | `data_ov006_021cf140.f0 = 8;` (switch case 1) |
+| 9 | `func_ov006_021b2b08.c` | `if (r) data_ov006_021cf140 = 9;` |
+| 11 | `func_ov006_021b28c0.c` | `data_ov006_021cf140.f0 = 0xb;` (switch case 2) |
+| 12 | `func_ov006_021b2c9c.c` | `if (r) data_ov006_021cf140 = 12;` |
+| 14 | `func_ov006_021b28c0.c` | `data_ov006_021cf140.f0 = 0xe;` (switch case 3) |
+| 15 | `func_ov006_021b2de0.c` | `data_ov006_021cf140[0] = 0xf;` |
+| 16 | `func_ov006_021b2cbc.c` | `*(int *)data_ov006_021cf140 = 16;` |
+| 17 | `func_ov006_021b23c8.c` | `data_ov006_021cf140 = 0x11;` |
+
+Reads less like a small closed state machine and more like a shared
+status/mode-code space: the original 9-value "happy path" progression
+(2→3→...→9) is real, but 11/12/14/15/16/17 look like distinct
+error/teardown/alternate-route codes from other call sites sharing the
+same word, not a bigger version of the same sequence. **Scope
+limitation, stated plainly**: this sweep covers `data_ov006_021cf140`
+only. The doc describes "at least six parallel structs" sharing this
+layout (`data_ov006_0224f1b0`, `_0224f1fc`, `_0224f248`, `_0224f290`,
+`_0224f2e8`) — those were **not** independently re-swept this round;
+do not assume their value sets match `021cf140`'s without checking.
 
 Each state struct is a global `int[]`; `[0]` is the state word, `[1]` is a
 cleared flag, `[2]` is the "full-init arg" (display mode selector), `[3]` is
-the teardown handle. There are at least six parallel structs:
-`data_ov006_021cf140`, `data_ov006_0224f1b0`, `data_ov006_0224f1fc`,
-`data_ov006_0224f248`, `data_ov006_0224f290`, `data_ov006_0224f2e8`.
+the teardown handle.
 
 ### Dispatch table index sentinel (no-callback path)
 
@@ -207,20 +234,54 @@ Confirmed: `func_ov004_021d3818`, `func_ov004_021da848`.
 Confirmed: `func_ov004_021ceb24`, `func_ov004_021d97c8`, `func_ov004_021d9724`,
 `func_ov004_021d1360`, `func_ov004_021d9778`, `func_ov004_021cc3c0`.
 
-### Phase state enum (b500+0x54)
+### Phase field (b500+0x54) — open observed-value set, NOT a closed enum
 
-```c
-/* func_ov004_021d7c00: drive the b500.54 phase word */
-typedef enum Ov004Phase {
-    OV004_PHASE_IDLE    = 0,  /* no action in progress */
-    OV004_PHASE_ENTER   = 2,  /* entering: latched early (v < 2) */
-    OV004_PHASE_LEAVE   = 4,  /* leaving: bumped from enter on exit */
-    OV004_PHASE_CMD_15  = 15, /* func_ov004_021d13dc status-15 phase */
-    OV004_PHASE_CMD_16  = 16, /* func_ov004_021d1360 abort path */
-} Ov004Phase;
+**Confidence: LOW on closure, HIGH on individual values (corrected
+2026-08-04, `cm-enum-contradiction-fix`)** — documented as a closed
+5-value `typedef enum`. A producer sweep (every assignment to
+`data_ov004_0220b500 + 0x54`, across all 33 matched-C readers of the
+base symbol) finds only 3 of those 5 values are ever actually
+*stored*; the other 2 are consumer-only, structurally identical to
+`f_cf8`'s own `4`:
+
+```
+confirmed STORED values: 2, 4, 16;
+confirmed COMPARED-ONLY values (never stored in this sweep): 5, 15;
+0 has no confirmed explicit store (may be the implicit BSS-zero
+default, unconfirmed); complete range and semantic names are not yet
+established.
 ```
 
-Confirmed: `func_ov004_021d7c00`, `func_ov004_021d13dc`, `func_ov004_021d1360`.
+Producer evidence:
+
+| value | file | form |
+|---|---|---|
+| 2 | `func_ov004_021d7c00.c` | `*(int *)(b + 0x54) = 2;` |
+| 4 | `func_ov004_021d7c00.c` | `*(int *)(b + 0x54) = 4;` |
+| 4 | `func_ov004_021d1264.c` | `*(int *)((char *)data_ov004_0220b500 + 84) = 4;` |
+| 16 | `func_ov004_021d1360.c` | `*(int *)(b + 84) = 16;` |
+
+Consumer-only evidence (compared, never stored in the 33 readers
+checked):
+
+| value | file | form |
+|---|---|---|
+| 5 | `func_ov004_021ceb6c.c` | `if (*(int *)(b + 84) != 5) return r;` |
+| 5 | `func_ov004_021d9810.c` | `if (*(int *)(base + 0x54) != 5) return 0;` |
+| 15 | `func_ov004_021d13dc.c` | `if (*(int *)(data_ov004_0220b500 + 0x54) == 15) { ... }` |
+
+`15` was already resting on comparison-only evidence in the *original*
+version of this doc, before this correction — the earlier text just
+didn't flag that distinction. `5` is the newly-found value, also
+comparison-only. Same pattern as `f_cf8`: two independent, unrelated
+functions (`021ceb6c`/`021d9810`) both gate on `phase == 5` — real, live
+branches that only make sense if something, somewhere, stores 5; this
+sweep didn't find where.
+
+Confirmed readers: `func_ov004_021d7c00`, `func_ov004_021d13dc`,
+`func_ov004_021d1360`, `func_ov004_021d1264`, `func_ov004_021ceb6c`,
+`func_ov004_021d9810` (33 total matched-C files reference the base
+symbol; only these 6 touch the `+0x54` phase field specifically).
 
 ### Timer seed values (func_ov004_021d4004 / 021d4238 / 021d4958 family)
 
