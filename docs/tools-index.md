@@ -733,6 +733,12 @@ routing-tier filename suffixes (brief 587, closing the brief-569 / improvement-s
 
 `gate3.py` (3-region sha1) is the correctness arbiter, but it is **scope-blind**: a thin PR that renames 40 of 150 targets, or does EUR and skips USA/JPN, passes byte-identically. And a *rename* can be byte-neutral in one region yet brea…
 
+### `tools/semantic_contradiction_check.py`
+
+**Report closed enum ranges contradicted by matched-C/dossier evidence.**
+
+This is deliberately a narrow checker for the risk class identified by ``cm-f-cf8-contradiction``. It reports evidence and never rewrites canonical documentation. The six candidates exclude ``Ov013Slot`` because its values are array-lite…
+
 ### `tools/sig_census.py`
 
 **read-only `dsd sig new` / `sig apply --dry` census**
