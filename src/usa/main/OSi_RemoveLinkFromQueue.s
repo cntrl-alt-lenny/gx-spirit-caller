@@ -1,11 +1,11 @@
-; func_020920c0 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; OSi_RemoveLinkFromQueue — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .global func_020920c0
+        .global OSi_RemoveLinkFromQueue
         .arm
-func_020920c0:
+OSi_RemoveLinkFromQueue:
     ldr r2, [r0]
     cmp r2, #0x0
     beq .L_80

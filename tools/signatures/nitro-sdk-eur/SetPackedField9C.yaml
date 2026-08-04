@@ -1,0 +1,8 @@
+name: SetPackedField9C
+signatures:
+  - bitmask: /////////////////////////////////////////////////////wAAAAA=
+    pattern: AQKA4QQQneUCA4DhAACB4QAgneUDHIDhCACf5QIYgeGcEIDlHv8v4QAAAAA=
+    relocations:
+      - offset: 40
+        name: data_021a18b8
+        kind: Load

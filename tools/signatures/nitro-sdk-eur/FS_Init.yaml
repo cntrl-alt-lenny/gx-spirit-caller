@@ -1,0 +1,11 @@
+name: FS_Init
+signatures:
+  - bitmask: /////////////////////////////////////////////////////wAAAP////////////////8AAAAA
+    pattern: AEAt6QTQTeIoEJ/lACCR5QAAUuME0I0SAEC9GB7/LxEBIKDjACCB5QAAAOsE0I3iAEC96B7/L+EAAAAA
+    relocations:
+      - offset: 40
+        name: func_02098478
+        kind: ArmCall
+      - offset: 56
+        name: data_021a8318
+        kind: Load

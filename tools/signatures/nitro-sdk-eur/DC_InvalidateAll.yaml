@@ -1,0 +1,5 @@
+name: DC_InvalidateAll
+signatures:
+  - bitmask: ////////////////
+    pattern: AACg4xYPB+4e/y/h
+    relocations: []

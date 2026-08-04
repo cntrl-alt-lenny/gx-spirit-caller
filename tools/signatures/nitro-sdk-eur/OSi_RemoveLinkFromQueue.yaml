@@ -1,0 +1,5 @@
+name: OSi_RemoveLinkFromQueue
+signatures:
+  - bitmask: /////////////////////////////////////////////////////////////////////w==
+    pattern: ACCQ5QAAUuMHAAAKgBCS5QAQgOUAAFHjAACgE3wAgRUAEKADBBCABXgQggUCAKDhHv8v4Q==
+    relocations: []

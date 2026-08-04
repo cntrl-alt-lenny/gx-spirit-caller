@@ -1,0 +1,7 @@
+name: OSi_InsertLinkToQueue
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pattern: >-
+      AMCQ5QIAAOoBAFzhHv8vAYDAnOUAAFzjAwAACnAwnOVwIJHlAgBT4fb//5oAAFzjCAAAGgQgkOUAAFLjABCABYAQghV8IIHlACCg44AggeUEEIDlHv8v4XwgnOUAAFLjABCABYAQghV8IIHlgMCB5XwQjOUe/y/h
+    relocations: []

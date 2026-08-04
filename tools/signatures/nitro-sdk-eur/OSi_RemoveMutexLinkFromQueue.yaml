@@ -1,0 +1,5 @@
+name: OSi_RemoveMutexLinkFromQueue
+signatures:
+  - bitmask: ////////////////////////////////////////////////////////////////
+    pattern: ACCQ5QAAUuMGAAAKEBCS5QAQgOUAAFHjAACgExQAgRUAEKADBBCABQIAoOEe/y/h
+    relocations: []

@@ -1,0 +1,8 @@
+name: OS_SNPrintf
+signatures:
+  - bitmask: /////////////////////////////////////wAAAP//////////////////////
+    pattern: DwAt6QBALekE0E3iEDCN4gMww+MQIJ3lBDCD4gAAAOsE0I3iAEC96BDQjeIe/y/h
+    relocations:
+      - offset: 28
+        name: func_02090c44
+        kind: ArmCall

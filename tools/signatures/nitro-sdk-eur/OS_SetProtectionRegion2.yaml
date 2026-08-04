@@ -1,0 +1,5 @@
+name: OS_SetProtectionRegion2
+signatures:
+  - bitmask: //////////8=
+    pattern: Eg8G7h7/L+E=
+    relocations: []

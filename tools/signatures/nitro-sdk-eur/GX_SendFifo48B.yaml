@@ -1,0 +1,5 @@
+name: GX_SendFifo48B
+signatures:
+  - bitmask: ////////////////////////////////////////////////
+    pattern: DBCw6AwQgegMELDoDBCB6AwQsOgMEIHoDBCw6AwQgege/y/h
+    relocations: []

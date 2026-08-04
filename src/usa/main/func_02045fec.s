@@ -11,7 +11,7 @@
         .extern func_020a734c
         .extern func_020aace8
         .extern func_020aadcc
-        .extern func_020aaf94
+        .extern Strchr
         .extern func_020acbac
         .global func_02045fec
         .arm
@@ -53,7 +53,7 @@ func_02045fec:
     add r4, r4, r0
     mov r0, r4
     mov r1, #0x76
-    bl func_020aaf94
+    bl Strchr
     sub r7, r0, r4
     add r0, sp, #0x0
     mov r1, r4

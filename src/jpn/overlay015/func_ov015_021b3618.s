@@ -4,7 +4,7 @@
 
         .text
         .extern data_021058a9
-        .extern func_020a690c
+        .extern Strlen
         .extern func_020a6a08
         .global func_ov015_021b3618
         .arm
@@ -37,7 +37,7 @@ func_ov015_021b3618:
     cmp r0, #0x70
     bne .L_90
     mov r0, r6
-    bl func_020a690c
+    bl Strlen
     mov r8, r0
     cmp r5, #0x0
     beq .L_84

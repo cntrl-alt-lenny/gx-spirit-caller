@@ -1,0 +1,5 @@
+name: MI_Copy64B
+signatures:
+  - bitmask: //////////////////////////////////////////////////////////8=
+    pattern: DBCw6AwQoegMELDoDBCh6AwQsOgMEKHoDBCw6AwQoegNEJDoDRCh6B7/L+E=
+    relocations: []

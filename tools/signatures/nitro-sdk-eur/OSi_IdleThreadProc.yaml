@@ -1,0 +1,11 @@
+name: OSi_IdleThreadProc
+signatures:
+  - bitmask: //////////8AAAD/AAAA//////8=
+    pattern: AEAt6QTQTeIAAADrAAAA6/3//+o=
+    relocations:
+      - offset: 8
+        name: func_02093790
+        kind: ArmCall
+      - offset: 12
+        name: OS_Halt
+        kind: ArmCall
