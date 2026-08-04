@@ -382,3 +382,21 @@ This is a vacuous-verifier instance: a checker that reports success by resolving
 Investigate `check_activation_invariant.py`'s basename-fallback resolution: when is it legitimate (routing suffixes `*.legacy.c` / `*.legacy_sp3.c` and data carves are the known-good cases), and when is it papering over a delinks entry that no longer matches its source? Make the illegitimate case fail loudly. Do not remove the fallback wholesale without checking the routing-suffix cases still resolve — they are the reason it exists.
 
 **Gate:** `python3.13 -m pytest tests -q` no-new-failures + a regression test that reproduces the wiped-edit case and asserts the checker FAILS on it + confirmation that routing-suffix and data-carve activations still resolve.
+
+### q-semantic-check-enum-lookup — the contradiction checker crashes on the live tree [TODO]
+
+⚠️ **PR #1447 was held back from the 2026-08-04 integration for this.** The work is sound and its pinned-fixture tests pass; the defect only appears when #1447 and #1449 are combined, which is precisely what a consolidated integration gate exists to catch. Neither lane could have seen it alone.
+
+`tools/semantic_contradiction_check.py` hard-codes a lookup for a `DuelPhase` enum and **raises** when it is absent:
+
+    ValueError: enum 'DuelPhase' not found
+      parse_enum_values(docs[candidate.doc_name], candidate.name)
+
+That enum no longer exists. #1449 (Claude Scaffolder, merged) correctly replaced the closed `typedef enum DuelPhase { … }` in `constants/DuelStateEnums.md` with an observed-value-set prose form — because you cannot write a C enum for a set whose closure is unproven, which was the whole finding. Your fixtures still pass because they are pinned (correct — I asked for that); the **live scan path** is what breaks.
+
+Two things to fix, and the second matters more than the first:
+
+1. Stop depending on a specific enum name. Discover candidates from the document structure, and handle the observed-value-set form as a first-class case — it is now the *correct* shape for any range whose closure is unproven, so it will become more common, not less.
+2. **Never raise on an unparseable candidate.** Report it as `UNPARSEABLE` and keep scanning. A checker that dies on the first thing it cannot read tells you nothing about the other candidates, and an exception is indistinguishable from "ran and found nothing" to any caller that isn't reading stderr. The house rule applies in both directions: a checker that cannot genuinely check must SAY SO, whether it finds nothing or cannot look.
+
+**Gate:** `python -m pytest tests/test_semantic_contradiction_check.py -q` green + a regression test using the current observed-value-set form of `DuelStateEnums.md` as its fixture + a live `python3.13 tools/semantic_contradiction_check.py` run against the tree that **exits cleanly** and reports counts including any UNPARSEABLE rows. Paste the live run.

@@ -20,26 +20,39 @@ enum + confidence-promotion fix), #1442 (5 USA ports — **all asm-C; USA
 natural-C did not move**), #1443 (C-66 bitfield-source refinement + 1 ship), plus
 Codex Decomper's 33 rescued ports.
 
-⚠️ **REPAIR ROUND OPEN — two merged items were wrong and are reopened:**
+✅ **REPAIR ROUND CLOSED (2026-08-04)** — both wrongly-closed items are fixed and merged.
 
-1. **`q-kickoff-location-guard` is vacuous for the likeliest wrong form.** The
-   shipped check is line-local but accepts a location *probe* that merely
-   succeeds rather than an *assertion* that compares. `pwd || exit 1` and
-   `git rev-parse --show-toplevel || exit 1` both PASS today, and both succeed
-   inside every valid worktree — including the brain checkout the guard exists
-   to keep lanes out of. Verified by running the merged linter. Reopened to
-   `[TODO]` with four required negative tests.
-2. **`f_cf8` is still documented as a closed range.** #1441 corrected an assumed
-   `0–3` to an assumed `0–4` — the same error class the item diagnosed. Stores to
-   `+0xcf8`, traced per-register across all three regions, write **{0,1,2,3,5,7}**;
-   `4` appears only in comparisons, never as a stored immediate. The canonical
-   docs currently assert `0–4` and are **known-wrong pending `cm-f-cf8-reopen`**.
-   Also: the "3 of 7" survey denominator counts `Ov013Slot`, which the report's
-   own method excludes — the honest figure is 3 of 6.
+1. **`q-kickoff-location-guard`** — repaired in #1446. The check now requires a
+   repo-root *equality assertion* against an expected path, not a probe that
+   merely succeeds. Brain-verified all four verdicts on the integrated tree:
+   `pwd || exit 1` FAIL · `git rev-parse --show-toplevel || exit 1` FAIL ·
+   comparison against the WRONG path FAIL · correct equality PASS. The
+   wrong-path case is stronger than asked for — it proves the comparison targets
+   the *assigned* worktree, not merely that a comparison exists.
+2. **`f_cf8`** — repaired in #1449, and the lane went further than the critique.
+   All three canonical docs now state an **open observed-value set**
+   (`{0,1,2,3,4,5,7}`, closure unproven, `4` a comparison target with **no known
+   producer**), with confidence marked LOW on closure. It also found a **fourth
+   producer pattern** — argument-forwarding at `func_ov002_021d1158.s` — that
+   **no literal-`str` sweep can reach**, including the brain's own verification
+   method. And it corrected its own survey twice over: the denominator
+   (`Ov013Slot` self-excluded → 3 of 6, not 3 of 7) and an undercount of
+   `Ov006SubState` (14 real values, not 9 — its grep silently skipped the
+   `[0] =` array-index form). The three "no contradiction found" rows were
+   downgraded to **"unexercised"**, applying its own distinction to its own work.
 
-**Do not treat the `f_cf8` canonical docs as authoritative until that item lands.**
+**Lesson worth keeping:** the `f_cf8` fix initially repeated the bug it
+diagnosed — an assumed `0–3` became an assumed `0–4`. "Highest value observed"
+is not "upper bound". That is the argument for
+`tools/semantic_contradiction_check.py` being a *tool* rather than a discipline.
 
-**PR state — active vs merely open.** Open PR count is **1**, but *active* count
+**PR state — active vs merely open (2026-08-04).** After this integration: **1
+active** (#1447, held back for `q-semantic-check-enum-lookup`) and **1 parked
+draft** (#1020, decomp.dev CI). `tools/queue_state_drift.py` now enforces this
+distinction automatically — it caught an earlier revision of this very file
+claiming 0 active while 5 were open, which is exactly the drift it was built for.
+
+**Previously (2026-08-03):** Open PR count was **1**, but *active* count
 is **0**: #1020 (decomp.dev CI) is a deliberately parked draft, not in-flight
 work. These are different claims and conflating them is exactly the drift
 `q-queue-state-drift-check` exists to catch — an earlier revision of this file
