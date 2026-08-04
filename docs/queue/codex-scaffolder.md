@@ -2,7 +2,7 @@
 
 # Codex Scaffolder — autonomous tooling queue
 
-**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder --claim` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
 
 **Worktree capability (match your gate to it — briefing bug b642):** `kb-map` = build-FREE (no baserom, no `dsd`) · `kb-types` = EUR baserom only · `scaffolder`/`decomper` = all 3 baseroms. If an item's gate needs a build you cannot run, say so and skip rather than forcing.
 
@@ -366,6 +366,12 @@ On 2026-08-03 the Codex Decomper lane ran its entire port-harvest brief **inside
 **Tooling budget:** qualifies on *catches a demonstrated failure class* — twice, the second time costing a frozen coordinator worktree and a manual recovery. No new tool; one check in an existing one.
 
 **Gate:** `python -m pytest tests/test_kickoff_lint.py -q` green + paste the linter's verdict on a kickoff lacking a location guard (must FAIL) and one carrying it (must PASS).
+
+### q-workqueue-claim-side-effect — make queue discovery read-only by default [DONE]
+
+`tools/work_queue.py next <lane>` now prints the first TODO without changing
+the tracked queue file. Queue runners that want the old claim transition must
+pass the explicit `--claim` flag; all four lane protocols use that opt-in.
 
 ### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [DONE]
 
