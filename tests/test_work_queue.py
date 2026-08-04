@@ -36,19 +36,32 @@ class QueueTest(unittest.TestCase):
     def _body(self):
         return (q.QDIR / "lane.md").read_text(encoding="utf-8")
 
-    def test_next_claims_first_todo(self):
+    def test_next_is_read_only_by_default(self):
+        before = self._body()
         rc = q.cmd_next("lane")
         self.assertEqual(rc, 0)
+        self.assertEqual(self._body(), before)
+        self.assertIn("### a1 — first task [TODO]", self._body())
+
+    def test_next_claims_first_todo_with_opt_in(self):
+        rc = q.cmd_next("lane", claim=True)
+        self.assertEqual(rc, 0)
         self.assertIn("### a1 — first task [CLAIMED]", self._body())
-        self.assertIn("### a2 — second task [TODO]", self._body())  # untouched
+        self.assertIn("### a2 — second task [TODO]", self._body())
+
+    def test_cli_claim_flag_is_explicit(self):
+        self.assertEqual(q.main(["work_queue.py", "next", "lane"]), 0)
+        self.assertIn("### a1 — first task [TODO]", self._body())
+        self.assertEqual(q.main(["work_queue.py", "next", "lane", "--claim"]), 0)
+        self.assertIn("### a1 — first task [CLAIMED]", self._body())
 
     def test_next_skips_claimed_to_next_todo(self):
-        q.cmd_next("lane")            # claims a1
-        q.cmd_next("lane")            # should claim a2
+        q.cmd_next("lane", claim=True)
+        q.cmd_next("lane", claim=True)
         self.assertIn("### a2 — second task [CLAIMED]", self._body())
 
     def test_done_marks_done(self):
-        q.cmd_next("lane")
+        q.cmd_next("lane", claim=True)
         q._transition("lane", "a1", "DONE")
         self.assertIn("### a1 — first task [DONE]", self._body())
 
@@ -70,8 +83,8 @@ class QueueTest(unittest.TestCase):
 
     def test_claim_is_atomic_no_double(self):
         # two sequential nexts claim two DISTINCT items, never the same twice
-        q.cmd_next("lane")
-        q.cmd_next("lane")
+        q.cmd_next("lane", claim=True)
+        q.cmd_next("lane", claim=True)
         self.assertEqual(self._body().count("[CLAIMED]"), 2)
         self.assertEqual(self._body().count("[TODO]"), 0)
 

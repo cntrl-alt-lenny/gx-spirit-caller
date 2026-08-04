@@ -28,13 +28,14 @@ Each lane has a markdown file `docs/queue/<lane>.md` whose items are sections:
     **Gate:** <the exact command that proves it done>
 
 Status flows TODO -> CLAIMED -> DONE (or PARKED). The status lives in the header
-so the file is human-readable and git-diffable, and `next` claims atomically
-(reads, flips the first TODO to CLAIMED, writes) so a resumed/duplicate agent
-never double-claims. Committing the queue file after each transition makes the
-whole thing crash-resumable — the agent's own progress log IS the state.
+so the file is human-readable and git-diffable. `next` is read-only by default;
+pass `--claim` to flip the first TODO to CLAIMED and write the queue file.
+Committing the queue file after each explicit transition makes the whole thing
+crash-resumable — the agent's own progress log IS the state.
 
 Usage:
-    python3.13 tools/work_queue.py next   <lane>                 # claim + print next TODO
+    python3.13 tools/work_queue.py next   <lane>                 # print next TODO (read-only)
+    python3.13 tools/work_queue.py next   <lane> --claim        # claim + print next TODO
     python3.13 tools/work_queue.py done   <lane> <id>            # mark DONE
     python3.13 tools/work_queue.py park   <lane> <id> "<reason>" # mark PARKED (+ reason)
     python3.13 tools/work_queue.py status <lane>                 # counts by status
@@ -138,12 +139,15 @@ def _set_status(text: str, m: re.Match, new: str) -> str:
     return text[:m.start()] + new_header + text[m.end():]
 
 
-def cmd_next(lane: str) -> int:
+def cmd_next(lane: str, *, claim: bool = False) -> int:
     text = _read(lane)
     for m in _items(text):
         if m.group("status") == "TODO":
             body = _section(text, m)
-            _qfile(lane).write_text(_set_status(text, m, "CLAIMED"), encoding="utf-8")
+            if claim:
+                _qfile(lane).write_text(
+                    _set_status(text, m, "CLAIMED"), encoding="utf-8"
+                )
             print(body)
             return 0
     print("QUEUE-EMPTY: no TODO items left — ping the brain (queue exhausted).")
@@ -193,7 +197,16 @@ def main(argv: list[str]) -> int:
     cmd, lane, *rest = args
     try:
         if cmd == "next":
-            return cmd_next(lane)
+            claim = False
+            if lane == "--claim" and rest:
+                lane, *rest = rest
+                claim = True
+            elif rest == ["--claim"]:
+                claim = True
+            elif rest:
+                print(f"queue: bad usage ({cmd!r})", file=sys.stderr)
+                return 2
+            return cmd_next(lane, claim=claim)
         if cmd == "status":
             return cmd_status(lane)
         if cmd == "list":

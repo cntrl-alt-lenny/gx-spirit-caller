@@ -2,7 +2,7 @@
 
 # Codex Scaffolder — autonomous tooling queue
 
-**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder --claim` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
 
 **Worktree capability (match your gate to it — briefing bug b642):** `kb-map` = build-FREE (no baserom, no `dsd`) · `kb-types` = EUR baserom only · `scaffolder`/`decomper` = all 3 baseroms. If an item's gate needs a build you cannot run, say so and skip rather than forcing.
 
@@ -380,6 +380,12 @@ Implemented in `tools/field_exposure_census.py`. The DuelStateSingleton canary
 ranked `f_cf8` third of 20 fields by total distinct sites (86 total: 76 reads,
 12 writes), confirming it is near the top. The detector reports its explicit
 lexical blind spots in the command output.
+
+### q-workqueue-claim-side-effect — make queue discovery read-only by default [DONE]
+
+`tools/work_queue.py next <lane>` now prints the first TODO without changing
+the tracked queue file. Queue runners that want the old claim transition must
+pass the explicit `--claim` flag; all four lane protocols use that opt-in.
 
 ### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [DONE]
 
