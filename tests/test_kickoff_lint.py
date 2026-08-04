@@ -62,6 +62,31 @@ class TestMissingGuards(unittest.TestCase):
                 "CANARY first check\nHIGH effort\npaste the sha1 line")
         self.assertIn("location-guard", self._fail_keys(text))
 
+    def test_pwd_probe_with_stop_fails(self):
+        text = GOOD.replace(
+            '    EXPECT="$HOME/Dev/spirit-caller/codex-610"\n'
+            '    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || '
+            '{ echo "WRONG WORKTREE"; exit 1; }',
+            "    pwd || exit 1",
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_repo_root_probe_with_stop_fails(self):
+        text = GOOD.replace(
+            '    EXPECT="$HOME/Dev/spirit-caller/codex-610"\n'
+            '    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || '
+            '{ echo "WRONG WORKTREE"; exit 1; }',
+            "    git rev-parse --show-toplevel || exit 1",
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_wrong_expected_path_fails(self):
+        text = GOOD.replace("$HOME/Dev/spirit-caller/codex-610", "$HOME/Dev/spirit-caller/wrong-lane")
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_assigned_path_equality_passes(self):
+        self.assertNotIn("location-guard", self._fail_keys(GOOD))
+
     def test_base_check_alone_does_not_count_as_location_guard(self):
         text = ("PREFLIGHT: grep queue-file || exit 1\n"
                 "CANARY first check\nHIGH effort\npaste the sha1 line")
