@@ -933,7 +933,7 @@ Scope: search the parked corpus for candidates whose park note cites a redundant
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `git restore assets/` after any `--clean` run — never a bare `git add -A`. Report shipped/attempted against the ~25% fresh-sweep baseline.
 
-### cm-ov002-unknown-sweep-16 — continue the ov002 unknown-pool sweep [CLAIMED]
+### cm-ov002-unknown-sweep-16 — continue the ov002 unknown-pool sweep [DONE]
 
 ov002 is **1,129,372 B = 47% of all `.text`** and sits at 12.58% C (attainment 59%) — the single biggest concentration of remaining runway in the project. Sweeps 9-15 have held a steady ~25% ship rate (13: 27, 14: 24, 15: 26). Continue with the next tranche, same 149-512 B band, one consolidated gate.
 
