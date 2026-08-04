@@ -1208,3 +1208,62 @@ already excluded by the survey's own stated method) — **3 of 6**, not
 $ python3.13 -m pytest tests -q
 3181 passed, 13 skipped, 63 subtests passed in 29.32s
 ```
+
+### q-producer-consumer-sample-2 — repair: method-compatible control, canary passes, full sample clean [DONE]
+
+Repair of `q-producer-consumer-sample` (PR #1451, still open at the time
+of this item — not a conflict, an independent addition). The brain's
+own diagnosis: `GlobalData02104bac` was picked for structural analogy
+(both global-state singletons) without checking field-type compatibility
+with the method — it's dominated by a bitmask flags word, the exact
+shape the method can't evaluate. Fix: same stratified design, control
+re-picked for method compatibility instead.
+
+**Sample**: 13 `DuelStateSingleton.md` fields restricted to discrete
+small-int shapes (dropping `f_cf8` itself, a packed u16 pair, and a
+function pointer) + a 6-field HIGH control across `BgCfg.md` (`fc`,
+`f10` — its other 3 fields, `f0`/`f14`/`f18`, turned out to ALSO fail
+the shape test: a runtime handle and two masked bitfields, same problem
+as before, filed separately not counted) and `Box.md` (`f0`/`f2`/`f6`/`f8`,
+invoked as the anticipated fallback once `BgCfg` alone only yielded 2
+qualifying fields).
+
+**CANARY** (`BgCfg.f10`, HIGH): producer = 2 clean literal stores
+(`cfg.f10=0x1a0`/`=0x180`); consumer = a real `-1`-sentinel gate in the
+receiving callee's raw disassembly. **Passed** — the method transfers
+to a properly-typed HIGH field, confirming the problem was the control's
+field type, not the method itself.
+
+**Full sample (19 fields): zero contradictions in either tier.**
+HIGH: 5/6 CONFIRMED (83%), 1 PRODUCER-ONLY (`BgCfg.fc` — a 2nd, more
+careful read of the receiving callee caught the SAME false-positive
+shape both prior rounds hit: an apparent consumer read at the right
+offset digit, on the wrong base register — this time caught before
+miscounting, not after). MED: 12/13 CONFIRMED (92%), 1 PRODUCER-ONLY
+(`f_d30`). No contradictions, no unfalsifiable claims in either tier.
+
+**What this answers**: real signal, not a third non-answer. Neither
+tier showed a contradiction in a sample restricted to the method's own
+valid shape — evidence against "the gap is systemic regardless of
+tier." Consistent with a narrower reading too: `f_cf8` is the doc's own
+*"most frequently tested field,"* an outlier by call-site density, not
+a representative median field — under that reading the risk
+concentrates in high-traffic fields specifically, which is a useful,
+different conclusion than "unpredictable everywhere." The sample can't
+distinguish the two readings; both point at the same next step
+(recheck the next-most-tested fields per doc, not a uniform sweep).
+
+The flags-word shape (`GlobalData02104bac.flags`, now also `BgCfg.f0`/
+`f14`/`f18`) is filed as a **standing observation**, not resolved and
+not counted toward either hit rate — third occurrence of the same
+shape, worth a dedicated broadened method later, not stretched into
+this round's number.
+
+Full write-up: [`docs/research/q-producer-consumer-sample-2-2026-08-04.md`](../research/q-producer-consumer-sample-2-2026-08-04.md).
+
+**Gate:** doc-only, no build.
+
+```
+$ python3.13 -m pytest tests -q
+3193 passed, 13 skipped, 63 subtests passed in 57.77s
+```
