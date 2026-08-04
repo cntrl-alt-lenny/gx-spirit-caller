@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**125 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**126 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (53)
+- [Uncategorised](#uncategorised) (54)
 
 ## Analysis / worklist
 
@@ -710,6 +710,12 @@ code-decomp resumption wave (brief 189).
 **cap the number of ephemeral claude-NNN task worktrees.**
 
 The multi-agent convention (AGENTS.md § Worktree convention) spins up a new numbered sibling worktree per task session (`claude-525`, `claude-526`, ...). Nothing retires them automatically, so the count only ever grows — 27+ were observe…
+
+### `tools/queue_state_drift.py`
+
+**Find contradictions between queue/state claims and repository state.**
+
+This is a small audit tool, not a replacement queue format. It checks explicit shipped/resolved/merged evidence in non-final queue items and compares the current state section with non-draft open PRs. Parked drafts are reported but exclu…
 
 ### `tools/retrieval_eval.py`
 

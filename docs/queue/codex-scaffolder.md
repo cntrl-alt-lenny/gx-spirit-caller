@@ -358,7 +358,7 @@ Scope one class only: an enum whose documented range excludes a value that match
 
 **Gate:** `python -m pytest tests -q` no-new-failures + a regression test using the f_cf8 case as its fixture + the count of rows flagged across `docs/research/constants/`.
 
-### q-queue-state-drift-check — catch queue/state claims that the repo contradicts [TODO]
+### q-queue-state-drift-check — catch queue/state claims that the repo contradicts [DONE]
 
 **Approved from the 2026-08-03 audit.** Two real drift instances, both found by hand this round:
 
