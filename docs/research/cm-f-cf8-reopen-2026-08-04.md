@@ -92,15 +92,18 @@ own, independent of how carefully it's done, because at least two other
 producer *shapes* exist for this exact field:
 
 - **Argument forwarding** — `func_ov002_021d1158.s`:
+
   ```asm
   mov r4, r0          ; r4 = the function's OWN incoming argument
   ...
   str r4, [r0, #0xcf8]  ; store whatever the caller passed, not a literal
   ```
+
   This function's callers were not traced this round; whatever literals
   *they* pass are part of the true value set and this sweep can't see
   them without following the call graph further.
 - **Save/restore** — `func_ov002_021cacf0.s`:
+
   ```asm
   ldr r0, [r1, #0xcf8]      ; read current value
   str r0, [sp, #0x4]        ; save it
@@ -110,6 +113,7 @@ producer *shapes* exist for this exact field:
   ldr r0, [sp, #0x4]         ; reload the saved value
   str r0, [r1, #0xcf8]      ; restore it
   ```
+
   The final store isn't a new literal producer — it's whatever the field
   already held. A naive version of this sweep initially flagged this
   site as "unresolved" (couldn't trace an immediate within the backward
