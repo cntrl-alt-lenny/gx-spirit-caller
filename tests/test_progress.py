@@ -867,6 +867,34 @@ class TestReportJsonRoundtrip(unittest.TestCase):
         self.assertEqual(metric["typed_array_bytes"], 0x10)
         self.assertAlmostEqual(metric["typed_array_pct"], 100 * 0x10 / 0x30)
 
+    def test_typed_array_excludes_struct_internal_arrays_from_scalar_instance(self):
+        """A scalar struct TU is not a file-scope typed array."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config" / "eur" / "arm9"
+            config.mkdir(parents=True)
+            (config / "delinks.txt").write_text(
+                "    .data start:0x0 end:0x20 kind:data\n"
+                "\n"
+                "src/main/data_scalar_struct.c:\n"
+                "    .data start:0x0 end:0x20\n"
+            )
+            source_dir = root / "src" / "main"
+            source_dir.mkdir(parents=True)
+            (source_dir / "data_scalar_struct.c").write_text(
+                "typedef struct {\n"
+                "    unsigned char thread_state[0x10];\n"
+                "    unsigned int stack[4];\n"
+                "} ScalarStruct;\n"
+                "\n"
+                "ScalarStruct data_scalar_struct;\n"
+            )
+            with mock.patch.object(progress_module, "ROOT", root):
+                metric = summarize_data_readability(root / "config" / "eur")
+
+        self.assertEqual(metric["typed_array_bytes"], 0)
+        self.assertEqual(metric["named_struct_bytes"], 0x20)
+
     def test_named_struct_array_subtier_excludes_primitive_arrays(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

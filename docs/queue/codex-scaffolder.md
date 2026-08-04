@@ -206,7 +206,15 @@ Build `tools/check_activation_invariant.py` to mechanically check a git range: a
 > Deliberately-flat scans were left alone with reasons recorded. Third
 > instance of this bug class (after #1366 and #1383).
 
-### q-typed-array-brace-nesting-fix — Typed-array regex credits struct-internal fields, not just file-scope arrays [TODO]
+### q-typed-array-brace-nesting-fix — Typed-array regex credits struct-internal fields, not just file-scope arrays [DONE]
+
+**Resolution 2026-08-04:** stale premise on this base. The brace-aware
+`_has_file_scope_array_decl()` fix already landed in `8446c3e7d`; all three
+named TUs return `file_scope=False`. EUR progress is `Typed-array: 161052`
+bytes both before and after this audit (delta `0`, not the proposed `1792`),
+so no production change was justified. Added a focused regression for a
+bracket-less scalar struct instance whose typedef body contains array fields;
+it contributes to Named-struct but not Typed-array.
 
 Sibling finding to the `q-metric-singleton-struct-gap`/`q-data-metric-fix` lineage — same metric, opposite direction (over-crediting `Typed-array` instead of under-crediting `Named-struct`). Filed by the Claude Scaffolder lane after tracing a real measurement discrepancy in `cm-bss-convert-2` (PR #1402); write-up and fix belong here since this is metric-tooling correctness, not data-carving.
 
