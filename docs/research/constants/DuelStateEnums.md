@@ -10,52 +10,80 @@ game-object classification enums.
 
 ## Duel phase (data_ov002_022d016c.f_cf8)
 
-**Confidence: MED (corrected 2026-08-03, `cm-f-cf8-contradiction`)** — a
-5-value state machine, not the 4-value 0-3 range this section previously
-documented. The prior text was HIGH-confidence for values 0-3 (3
-independent matched files) but that confidence never actually extended to
-the claim that 3 was the *maximum* — none of those 3 files test a value
-≥ 4, so nothing ever verified an upper bound. Four independent dossiers
-(`docs/research/dossiers/02212d98.md`, `0220079c.md`, `02299c9c.md`,
-`02206eb0.md` — real disassembly of the shipped game binary, not yet
-promoted to matched C) show value 4 in active use: three branch on
-`f_cf8 == 4` to select a distinct, meaningful output state; the fourth
-rejects it defensively for one narrow fast-path
-(`(unsigned)f_cf8 > 3`) — a function needing to guard against seeing 4 is
-itself evidence 4 is reachable, not evidence it doesn't exist. Full
-disassembly evidence in
-[`DuelStateSingleton.md`](../types/DuelStateSingleton.md#the-duel-phase-field-0xcf8).
+**Confidence: LOW on closure, MED on the individual observed values
+(corrected 2026-08-04, `cm-f-cf8-reopen` — supersedes the 2026-08-03
+"0-4" correction, which was the same class of error at one value
+higher).** This is **not** a closed N-value enum. It is an **open
+observed-value set**:
 
-```c
-typedef enum DuelPhase {
-    DUEL_PHASE_INIT      = 0,   /* initial / not yet started */
-    DUEL_PHASE_MAIN      = 1,   /* main duel phase */
-    DUEL_PHASE_RESOLVE   = 2,   /* effect resolution */
-    DUEL_PHASE_END       = 3,   /* end phase / cleanup */
-    DUEL_PHASE_4         = 4,   /* confirmed real via dossier disassembly;
-                                   semantic role not yet pinned down --
-                                   do not assume it's just an alias of 2
-                                   because one caller's gate treats them
-                                   the same way */
-} DuelPhase;
+```
+confirmed values include 0, 1, 2, 3, 4, 5 and 7;
+complete range and semantic names are not yet established.
 ```
 
-Comparisons found (matched C, HIGH confidence):
-- `f_cf8 != 3` — skip if in end-phase (also true for 4 — does not
-  contradict this correction)
-- `f_cf8 == 2` — proceed only during resolution
-- `(unsigned)f_cf8 > 1` — in main or resolution phase (also true for 4)
+Do not write this as "a 5-value state machine," "a 0-4 range," or any
+other phrasing that asserts closure. The 2026-08-03 correction upgraded
+an assumed `0-3` to an assumed `0-4` by taking the highest value a
+dossier search happened to turn up and declaring *that* the ceiling —
+identical in kind to the original bug it was fixing, just one value
+later. "Highest value seen" is not "upper bound."
 
-Comparisons found (dossier disassembly, MED confidence — not yet matched
-C, but real disassembly of the shipped binary):
-- `f_cf8 == 4` (`02212d98.md`) — selects a distinct output state (2) when
-  combined with a second field match
-- `f_cf8 == 2 || f_cf8 == 4` (`0220079c.md`) — both phases pass the same
-  gate
-- `f_cf8 == 4` (`02299c9c.md`) — drives a real sub-state transition
-  (`sc->f_4 = 7`)
-- `(unsigned)f_cf8 > 3` (`02206eb0.md`) — one function's own fast-path
-  explicitly excludes phase 4
+**Producer sweep** (method: every `str` instruction targeting `+0xcf8`
+in `src/overlay002/*.s` and `src/overlay002/*.c`, traced back to the
+immediate that fed the stored register — EUR only; not yet repeated for
+`src/usa/` or `src/jpn/`, whose per-region files are independently
+addressed/renamed and were not re-traced this round):
+
+| stored value | store sites found | example |
+|---|---|---|
+| 0 | 4 | `func_ov002_022b809c.s:139` |
+| 1 | 1 | `func_ov002_021aec04.s:149` |
+| 2 | 1 | `func_ov002_021aec04.s:157` |
+| 3 | 2 | `func_ov002_021aec04.s:166`, `func_ov002_021cacf0.s:129` |
+| 5 | 1 | `func_ov002_021aec04.s:176` |
+| 7 | 3 | `func_ov002_021af5a0.s:229`, `func_ov002_021d109c.s:32`, `func_ov002_021ae7b8.s:60` |
+
+**4 is not among them.** Every occurrence of `4` against this field is a
+*consumer*-side comparison (`cmpeq r1, #0x4` in 4 independent dossiers —
+a 4th, `02299c9c.md`, found beyond the 3 the item was originally filed
+with); no `str` anywhere in the EUR `.s`/`.c` corpus assigns the literal
+4 to this field. Kept in the observed-value set anyway, because 3 of
+those 4 dossiers branch on `f_cf8 == 4` as a first-class success case
+(a distinct output state, or an "either 2 or 4" gate, or a real
+sub-state transition) rather than a defensive guard — real, live code
+expects to reach that comparison and take the equal branch, which means
+some producer sets it to 4 somewhere this sweep didn't reach.
+
+**Producers and consumers disagree about which values matter, and that
+disagreement is the actual finding here** — not just for `f_cf8` alone.
+Two more producer channels make a *literal*-only sweep structurally
+incomplete on its own, independent of how many files get checked:
+
+- **Argument forwarding**: `func_ov002_021d1158.s:31` — `mov r4, r0`
+  (the function's own incoming argument) `... str r4, [r0, #0xcf8]`.
+  This site sets the field to *whatever the caller passes*, not a fixed
+  literal — its contribution to the true value set depends on tracing
+  `func_ov002_021d1158`'s own callers, which this sweep did not do.
+- **Save/restore**: `func_ov002_021cacf0.s` reads the field's current
+  value to a stack slot, temporarily forces it to `3`, does other work,
+  then restores the saved value (`ldr r0, [sp, #0x4]; str r0, [r1,
+  #0xcf8]`). That restore is not a new literal producer — it's whatever
+  the field already held — and was initially misflagged as
+  "unresolved" by the sweep script before manual inspection explained
+  it; recorded here so a future automated version of this method
+  doesn't double-count it as evidence of a distinct value.
+
+**Minor open discrepancy, stated rather than silently resolved**: an
+independent brain-side trace (also EUR, also literal-`str`-based)
+reported 2 store sites for value 1 and 2 for value 7; this sweep found 1
+and 3 respectively. Both sweeps agree exactly on the cited example sites
+for 5 and 7 (same file, same line numbers), and agree that 4 is never a
+literal producer. The count difference on 1 and 7 is unresolved — could
+be a USA/JPN-only site neither sweep has separated out, or a
+methodological difference in what counts as a "site" (e.g. a
+conditional store counted once vs. twice). Not chased further this
+round; flagged rather than picking one number and presenting it as
+settled, which is exactly the failure mode this item exists to avoid.
 
 ---
 
@@ -187,12 +215,15 @@ and as a "slot is empty" marker in card arrays.
 
 ## Notes for C-matching
 
-1. **The duel phase enum (0–4, not 0–3 — see correction above)** at
-   `d016c.f_cf8` is the most frequently tested enum in ov002. Any
-   candidate that gates on duel phase needs this typedef to match the
-   unsigned vs signed comparison shapes, and must not assume 3 is the
-   maximum value: at least one live pattern (`== 2 || == 4`) treats 4 as
-   a normal, reachable phase, not an error case.
+1. **The duel phase field (`d016c.f_cf8`) is an open observed-value set
+   — {0,1,2,3,4,5,7} confirmed so far, not a closed range** (see
+   correction above). It is the most frequently tested enum in ov002.
+   Any candidate that gates on duel phase needs a typedef matching the
+   unsigned vs signed comparison shapes, and must not assume any
+   particular value is the maximum: at least one live pattern
+   (`== 2 || == 4`) treats 4 as a normal, reachable phase, not an error
+   case, and there is no producer-side evidence yet closing off values
+   above 7.
 
 2. **Timer thresholds (0x3E8, 0x4B0)** almost always appear together in
    ov002 effect timer functions. If a candidate tests `x <= 0x3E8`, it

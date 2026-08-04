@@ -5,6 +5,20 @@
 Doc-only. No build, no source changes. Deliberately small per the filing
 instruction: one canary verdict, one minimal process fix, one measurement.
 
+> ⚠️ **Superseded 2026-08-04 by [`cm-f-cf8-reopen-2026-08-04.md`](cm-f-cf8-reopen-2026-08-04.md)**
+> (covers both `cm-f-cf8-reopen` and `cm-enum-contradiction-fix` — filed
+> as one combined repair, per the reopen instruction not to split them).
+> Part 1's "5-value field (0-4)" canary verdict below is **wrong** — it
+> committed the same closure-assuming error the item existed to diagnose,
+> just one value higher. The real finding is an **open observed-value
+> set** `{0,1,2,3,4,5,7}` with no proven upper bound; see the reopen doc
+> for the producer-sweep evidence. Part 3's "3 of 7" denominator is also
+> wrong — `Ov013Slot` was already excluded by this doc's own stated
+> method (line ~162, "array-literal-backed") and should never have been
+> counted in the 7; the corrected figure is **3 of 6**. The root-cause
+> fix (Part 2, the `constants/INDEX.md` confidence-ladder + promotion
+> rule) is unaffected and still stands as originally written below.
+
 ## Result
 
 1. **Canary verdict: `data_ov002_022d016c.f_cf8` (duel phase) is a 5-value

@@ -1082,7 +1082,7 @@ $ python3.13 -m pytest tests -q
 3178 passed, 13 skipped, 63 subtests passed in 46.68s
 ```
 
-### cm-enum-contradiction-fix — fix the two enum contradictions your own survey found [TODO]
+### cm-enum-contradiction-fix — fix the two enum contradictions your own survey found [DONE]
 
 Your `cm-f-cf8-contradiction` survey reported these and correctly did NOT fix them — that was the right call under that item's scope. Fixing them is this item.
 
@@ -1097,7 +1097,46 @@ Then re-check the remaining 4 of the 7 you surveyed. Your 3/7 was measured again
 
 **Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the matched-code evidence behind each corrected range, and your clean-vs-unexercised verdict on the remaining 4.
 
-### cm-f-cf8-reopen — the duel-phase range is still wrong, and the denominator is off [TODO]
+---
+
+**Done, combined with `cm-f-cf8-reopen`** (same sweep, filed together
+per instruction). Full write-up:
+[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../research/cm-f-cf8-reopen-2026-08-04.md).
+
+`Ov006SubState`: producer sweep of `data_ov006_021cf140` across all 4
+assignment syntaxes the codebase uses (bare `=`, `.f0=`, `[0]=`,
+`*(int*)ptr=` — the survey's own re-check had only matched 2 of these
+forms) finds **14 confirmed stored values, not 9**:
+`{2,3,4,5,6,7,8,9,11,12,14,15,16,17}`, all in already-shipped matched
+`.c`. `0` has no confirmed explicit store. Doc corrected to an open set;
+explicitly flags the other 5 parallel structs as not re-swept this
+round.
+
+`Ov004Phase`: producer/consumer split across `data_ov004_0220b500`'s 33
+readers — stored (producer-confirmed): `{2,4,16}`. Compared but never
+found stored (consumer-only, same shape as `f_cf8`'s own `4`): `{5,15}`
+— `func_ov004_021ceb6c.c` and `func_ov004_021d9810.c` both independently
+gate on `phase == 5`; `func_ov004_021d13dc.c` gates on `== 15`. Doc
+corrected to separate stored vs. compared-only explicitly.
+
+**Clean-vs-unexercised verdict on the remaining 3** (re-checked with a
+producer lens, not just consumer comparisons): all 3 are **unexercised,
+not verified** — `Ov000Facing`'s value comes from the setter's own
+*parameter* (only 3 callers found, all passing `1`; the doc's other
+values `0/2/3/4` have no confirmed producer); `Ov011SlotState` is
+written via `*p = (*p & ~0x3u) | (val & 0x3u)` — an untraced caller
+argument, the same argument-forwarding shape `f_cf8` has; `Ov011ViewMode`
+has no write site found at all, only the 2 known `==3` reads. None of
+the 3 should be read as "clean" — the honest status is "not enough
+producer evidence gathered," a materially weaker and different claim
+than the original survey's grouping implied.
+
+```
+$ python3.13 -m pytest tests -q
+3181 passed, 13 skipped, 63 subtests passed in 29.32s
+```
+
+### cm-f-cf8-reopen — the duel-phase range is still wrong, and the denominator is off [DONE]
 
 ⚠️ **This reopens work merged in PR #1441.** Read it as a correction, not a criticism — the root-cause fix you shipped (the confidence-promotion gap in `constants/INDEX.md`) is sound and stays. What is wrong is the range, and the way it is wrong is the interesting part.
 
@@ -1126,3 +1165,46 @@ Do **not** call it a five-value state machine, a 0–4 range, or anything else t
 Do this **alongside** the `Ov006SubState` / `Ov004Phase` corrections in `cm-enum-contradiction-fix`, not as a separate pass — they are the same sweep and the producer-vs-consumer question above applies to all of them.
 
 **Gate:** doc-only, no build. `python3.13 -m pytest tests -q` no-new-failures. Paste the producer-sweep method, the observed-value set per enum with store-site evidence, and the corrected denominator with its category rule stated.
+
+---
+
+**Done.** Full write-up:
+[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../research/cm-f-cf8-reopen-2026-08-04.md).
+
+**CANARY reproduced first**: both cited sites confirmed exactly —
+`func_ov002_021aec04.s:176` (`mov r1,#0x5` / `str r1,[r0,#0xcf8]`) and
+`func_ov002_021af5a0.s:229` (`mov r5,#0x7` / `str r5,[r4,#0xcf8]`).
+
+**Full EUR producer sweep** (every `str` to `+0xcf8`, traced back to the
+feeding immediate): `0`→4 sites, `1`→1, `2`→1, `3`→2, `5`→1, `7`→3.
+**`4` never appears as a stored immediate anywhere** — confirmed, matches
+the brain trace exactly on that point and on both cited example
+file:lines. Minor open discrepancy stated rather than picked: this
+sweep found 1 site for `1` and 3 for `7` vs. the brain trace's 2 and 2
+— both agree on the cited examples; the gap is unresolved (possibly a
+USA/JPN-only site, not re-traced this round).
+
+**Two producer mechanisms found beyond literal `str` tracing**, which is
+why closure still isn't provable even after a careful sweep:
+argument-forwarding (`func_ov002_021d1158.s` stores its own incoming
+parameter to `+0xcf8` — the field can be set to whatever that
+function's own untraced callers pass) and a save/restore idiom
+(`func_ov002_021cacf0.s` temporarily forces `3` then restores the prior
+value — not a new literal producer, just a naive sweep artifact worth
+documenting so it isn't miscounted later).
+
+**Corrected framing** (all 3 canonical docs + the original report):
+
+```
+confirmed values include 0, 1, 2, 3, 4, 5 and 7;
+complete range and semantic names are not yet established.
+```
+
+**Denominator corrected**: `Ov013Slot` removed from the count (it was
+already excluded by the survey's own stated method) — **3 of 6**, not
+3 of 7.
+
+```
+$ python3.13 -m pytest tests -q
+3181 passed, 13 skipped, 63 subtests passed in 29.32s
+```
