@@ -1208,3 +1208,47 @@ already excluded by the survey's own stated method) — **3 of 6**, not
 $ python3.13 -m pytest tests -q
 3181 passed, 13 skipped, 63 subtests passed in 29.32s
 ```
+
+### q-producer-consumer-sample — stratified MED-vs-HIGH sample of the producer/consumer lens [DONE — stopped at canary]
+
+Self-scoped and self-filed, per the brain's invitation after
+`cm-f-cf8-reopen`. Question: was `f_cf8` a localized `DuelStateSingleton.md`
+(MED) defect, or is the producer-vs-consumer gap systemic across the
+research corpus (including HIGH-confidence docs, which would mean the
+confidence ladder isn't load-bearing)? Design: ~13 fields from
+`DuelStateSingleton.md` (MED) + a 6-field HIGH-confidence control split
+across `GlobalData02104bac.md`, `GlobalData02104e6c.md` (the two
+"closest structural analogues" — 1 real-evidence field each, too small
+alone) and `Box.md` (4 of its 6 fields have confirmed access evidence;
+`f4`/`fa` excluded as untestable rather than padding the count).
+
+**CANARY, run before the other 17 fields**: `GlobalData02104bac.flags`
+@ +0x54 (HIGH doc, documented `r/w`). Consumer evidence: abundant and
+convergent — read + bitmask-tested across 12+ files spanning main and
+8 overlays, several reading it together with an undocumented adjacent
+`+0x56` field. Producer evidence: **none found anywhere**, despite
+checking every candidate the search surfaced (2 apparent stores
+resolved as false positives — register reassigned to an unrelated base
+between the `&data_02104bac` load and the store, the exact same failure
+shape as `cm-f-cf8-reopen`'s save/restore false positive).
+
+**Stopped here, per the explicit instruction**: this isn't the same
+failure shape as `f_cf8` (partial producer evidence, missing one value)
+— it's a total absence, on a bitmask/flags field rather than a small-int
+enum. Diagnosed why: "producer" for an enum is crisp (a literal gets
+stored — greppable); for a flags word it isn't (a masked RMW, a bulk
+fill, a hardware latch, or an SDK call could all set it without ever
+looking like "the literal 0x8 stored to +0x54"). The method transfers
+cleanly to other small-int discrete-value fields; it does **not**
+transfer to bitmask fields without a broadened producer-detection
+method first. Real, useful finding — just not the MED-vs-HIGH hit rate
+the sample set out to measure. That original question is still open.
+
+Full write-up: [`docs/research/q-producer-consumer-sample-2026-08-04.md`](../research/q-producer-consumer-sample-2026-08-04.md).
+
+**Gate:** doc-only, no build.
+
+```
+$ python3.13 -m pytest tests -q
+3193 passed, 13 skipped, 63 subtests passed in 74.86s
+```
