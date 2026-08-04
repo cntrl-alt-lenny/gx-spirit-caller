@@ -32,6 +32,7 @@ from __future__ import annotations
 import re
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -62,26 +63,50 @@ def check_preflight(text: str) -> tuple[bool, str]:
     return False, "no PREFLIGHT guard — a missing tool/base/dir would run as void work"
 
 
-def check_location_guard(text: str) -> tuple[bool, str]:
-    """Require a hard-stop assertion that the shell is in the intended tree.
+_EXPECTED_RE = re.compile(
+    r"(?:^|[;&\s])(?:EXPECT|EXPECTED_WORKTREE)\s*=\s*['\"]?"
+    r"(?P<path>[^'\";\s]+)"
+)
+_WORKTREE_TARGET_RE = re.compile(
+    r"\bgit\s+worktree\s+add\s+(?:--[^\s]+\s+)*(?P<path>[^\s;&]+)"
+)
+_ROOT_ASSERTION_RE = re.compile(
+    r"\$\(\s*git\s+rev-parse\s+--show-toplevel\s*\)\s*"
+    r"['\"]?\s*={1,2}\s*['\"]?\$(?:EXPECT|EXPECTED_WORKTREE)\b"
+)
 
-    Keep this line-local: a printed ``pwd`` in one line and an unrelated
-    ``exit 1`` elsewhere do not protect a kickoff. The accepted location
-    probes are deliberately the small set used by the worktree protocol.
+
+def _path_basename(path: str) -> str:
+    path = path.strip("'\"")
+    path = path.replace("$HOME", "~")
+    return Path(path).name
+
+
+def check_location_guard(text: str) -> tuple[bool, str]:
+    """Require equality to the explicitly assigned worktree path.
+
+    This is intentionally line-local. A successful ``pwd`` or
+    ``rev-parse`` probe is not an assertion, and a comparison against a
+    different worktree target is not protection either.
     """
-    location = (
-        r"\bgit\s+rev-parse\s+--show-toplevel\b",
-        r"\bgit\s+worktree\s+list\b",
-        r"\$PWD\b",
-        r"(?<![\w-])pwd(?=\s*(?:[|;&`$]|$))",
-    )
     stop = (r"\bexit\s+1\b", r"\|\|\s*\{", r"\bSTOP\b")
-    for line in text.splitlines():
-        if _has(line, *location) and _has(line, *stop):
-            return True, "working-directory assertion with a hard stop present"
-    if _has(text, *location):
-        return False, "location probe present but no same-line hard stop (exit 1 / || {…} / STOP)"
-    return False, "no working-directory assertion — a misplaced lane can mutate the base checkout"
+    expected_paths = [m.group("path") for m in _EXPECTED_RE.finditer(text)]
+    targets = [m.group("path") for m in _WORKTREE_TARGET_RE.finditer(text)]
+    assertion_lines = [
+        line for line in text.splitlines()
+        if _ROOT_ASSERTION_RE.search(line) and _has(line, *stop)
+    ]
+    if not assertion_lines:
+        return False, "no repo-root equality assertion against EXPECT with a hard stop"
+    if not expected_paths:
+        return False, "repo-root comparison has no explicitly assigned EXPECT path"
+    if targets and not any(
+        _path_basename(expected) == _path_basename(target)
+        for expected in expected_paths
+        for target in targets
+    ):
+        return False, "EXPECT path does not match the assigned worktree target"
+    return True, "repo-root equality assertion matches the assigned worktree path"
 
 
 def check_canary(text: str) -> tuple[bool, str]:

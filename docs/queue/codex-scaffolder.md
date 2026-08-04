@@ -298,7 +298,7 @@ Effort: **HIGH** — this is classification judgment, not a mechanical edit.
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a regression test per newly-recognized filename shape (including the truncated-address `*_stubs_*` case) + before/after `port_census.py` counts for all three regions.
 
-### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [TODO]
+### q-kickoff-location-guard — kickoff_lint must require a working-directory assertion [DONE]
 
 > ⚠️ **REOPENED 2026-08-03 — the shipped check is vacuous for the most likely
 > wrong form.** It is line-local (good — a stray `exit 1` elsewhere no longer
