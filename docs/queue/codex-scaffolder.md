@@ -240,7 +240,18 @@ Proposed fix direction (not prescribed — pick what's right after investigating
 
 **Gate:** `python -m pytest -q tests` no-new-failures + a new regression test asserting a TU with ONLY a bracket-less scalar struct instance (whose typedef body contains an array field) does NOT credit `typed_array_bytes` + before/after `python tools/progress.py --version eur` showing `Typed-array` drops by exactly 1792 B (the 3 files above) with `Named-struct` unchanged.
 
-### q-zero-width-bss-tu-fix — dsd's delink/LCF stage rejects a zero-width `.bss` TU [TODO]
+### q-zero-width-bss-tu-fix — dsd's delink/LCF stage rejects a zero-width `.bss` TU [DONE]
+
+**Resolution 2026-08-04:** permanent carve-time constraint, not a patchable
+repo-side tool defect. The rejecting validator is inside the prebuilt `dsd`
+binary (`cli/src/config/delinks.rs` is present in its embedded paths), and
+Ninja invokes it directly through `./dsd lcf -c <config>`. The exact split
+from cm-bss-convert-4 therefore remains invalid while the marker's
+`.bss start:X end:X` entry is present. Future carve waves must omit a
+zero-width TU from `delinks.txt` before the LCF step; retain the marker in
+the source/symbol metadata, and keep the nonzero alias range as the sole
+delinks owner. No production change was justified without a dsd source or
+an accepted zero-width representation.
 
 Filed by the Claude Scaffolder lane after hitting a real build failure in `cm-bss-convert-4` (PR #1413) while carving `data_ov001_021ca420_alias` — the canonical partial-coverage-trap symbol (`data_ov001_021ca420`, a 0-byte marker aliased to its real 32-byte storage under a second name, the established C-34 literal-pool-dedup trick documented in `docs/research/codegen-walls.md`). This is build-tooling correctness, not data-carving, so filing here rather than fixing it in that lane.
 
