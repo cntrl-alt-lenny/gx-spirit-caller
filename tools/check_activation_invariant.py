@@ -351,26 +351,22 @@ def check_range(repo: Path, git_range: str) -> InvariantReport:
     data_paths = tuple(
         path for path in files.added_c if classifications[path].kind != "function"
     )
-    added_by_key = Counter(
-        _classify_source(path, metadata).identity for path in activations.added_c
-    )
+    added_activation_paths = set(activations.added_c)
+    removed_activation_paths = set(activations.removed_func_s)
     # Data additions are deliberately informational only.  They have no
     # preceding function .s to replace, so they must not make a correct data
     # carve fail the function invariant.  Function C additions still require
-    # a matching activation by authoritative source identity, with the
-    # filename-prefix fallback for old-style function paths.
+    # an exact matching activation path. Identity-only matching lets a stale
+    # routed basename satisfy the invariant after an unrelated delinks wipe.
     missing_c = tuple(
         path for path in files.added_c
         if classifications[path].kind == "function"
         and classifications[path].identity is not None
-        and classifications[path].identity not in added_by_key
-    )
-    activated_c_by_key = Counter(
-        _classify_source(path, metadata).identity for path in activations.added_c
+        and path not in added_activation_paths
     )
     missing_s = tuple(
         path for path in files.deleted_func_s
-        if activated_c_by_key[_source_identity_from_path(path)] == 0
+        if path not in removed_activation_paths
     )
     flips = _paired_flip_count(activations, metadata)
     function_c_count = len(function_paths)
