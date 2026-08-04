@@ -6699,6 +6699,32 @@ independently.
 > separate `fail: return X;` block, produces a *duplicate* epilogue
 > instead of sharing the real one.
 
+> **OBSERVED, NOT CONFIRMED (cmatch/ov002-sweep-16 canary attempts,
+> 2026-08-04): a guard clause testing a value that just came back from
+> a function call may resist the goto fix even where an otherwise
+> identical guard testing a pre-call value converts cleanly.** Two
+> guard clauses in the same function (`func_ov002_02299c9c`): the
+> first (`if (fn == 0) goto X;`, testing an array-indexed pointer
+> computed with no intervening call) converted to a branch on the
+> documented goto fix, first try. The second (`if (fn() == 0) goto Y;`,
+> testing the return value of the call `fn()` made one line above) kept
+> if-converting back to predicated `mov`+`popeq` regardless of 4 source
+> variations tried against it: plain goto, swapped label order (to
+> rule out address-position sensitivity per the sweep-14 note above),
+> a named intermediate (`int r = fn(); if (r == 0) goto Y;`), and the
+> fully-explicit both-arms-goto form C-55's own fix text uses
+> (`if (cond) goto X; goto Y;`). None moved it. A second, unrelated
+> function (`func_ov002_021d1158`) hit a similarly call-adjacent
+> single-instruction scheduling residual (a `mov rN, #imm` landing one
+> position after a branch instead of before it, same block, same
+> registers) that also resisted restructuring — weaker evidence since
+> it isn't the C-55 shape itself, but the same "right after a call,
+> scheduling stops responding to source order" flavor. Two data points
+> in one round is not enough to state a mechanism or a fix — flagged so
+> the next lane to hit this recognizes it rather than re-discovering it
+> from zero. If it recurs, record the instance here; a third or fourth
+> confirmation would make this promotable to its own numbered entry.
+
 ### C-56. Local-variable declaration order, not just usage order, affects register allocation
 
 **The trap:** two source forms that use the same locals in the same
