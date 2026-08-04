@@ -1,0 +1,7 @@
+name: G2x_SetBGyAffine_
+signatures:
+  - bitmask: >-
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pattern: >-
+      cEAt6QBQkeUEQJHlBcag4QTmoOFMWKDhTkig4QXIoOEE6KDhLFig4S5IoOEESIXhAECA5QhQkeUMQJHlBcag4QTmoOFMWKDhTkig4QXIoOEE6KDhFECd5RBgneUsyKDhLlig4QVYjOEEUIDlBMCR5QNQROAMQJHlnAUO4JQFBeAAwJHlAmBG4AhAkeWc5iHglFYl4AIWgeADJoXgQRKg4QgQgOVCEqDhDBCA5XBAvege/y/h
+    relocations: []

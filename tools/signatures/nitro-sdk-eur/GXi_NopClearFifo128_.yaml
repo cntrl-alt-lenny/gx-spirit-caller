@@ -1,0 +1,7 @@
+name: GXi_NopClearFifo128_
+signatures:
+  - bitmask: >-
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w==
+    pattern: >-
+      ABCg4wAgoOMAMKDjAMCg4w4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoDhCA6A4QgOgOEIDoHv8v4Q==
+    relocations: []

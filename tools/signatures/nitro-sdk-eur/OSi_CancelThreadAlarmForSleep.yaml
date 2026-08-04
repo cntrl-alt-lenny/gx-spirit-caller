@@ -1,0 +1,8 @@
+name: OSi_CancelThreadAlarmForSleep
+signatures:
+  - bitmask: /////////////////////////////////////wAAAP////////////////8=
+    pattern: AEAt6QTQTeKwAJDlAABQ4wTQjQIAQL0IHv8vAQAAAOsE0I3iAEC96B7/L+E=
+    relocations:
+      - offset: 28
+        name: func_020933bc
+        kind: ArmCall

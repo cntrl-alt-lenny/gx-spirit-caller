@@ -1,0 +1,5 @@
+name: OSi_EnqueueTail
+signatures:
+  - bitmask: ////////////////////////////////////////////////
+    pattern: jCCQ5QAAUuOIEIAFEBCCFRQggeUAIKDjECCB5YwQgOUe/y/h
+    relocations: []

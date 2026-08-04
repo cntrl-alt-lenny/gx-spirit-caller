@@ -10,7 +10,7 @@
         .extern func_0206eb74
         .extern func_020a6c60
         .extern func_020a7274
-        .extern func_020aaf94
+        .extern Strchr
         .extern func_020acd0c
         .global func_02064d88
         .arm
@@ -30,7 +30,7 @@ func_02064d88:
     b .L_15c
 .L_30:
     mov r1, #0x3a
-    bl func_020aaf94
+    bl Strchr
     movs r4, r0
     moveq r4, #0x0
     beq .L_118

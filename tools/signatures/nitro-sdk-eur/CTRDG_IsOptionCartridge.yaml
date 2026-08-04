@@ -1,0 +1,11 @@
+name: CTRDG_IsOptionCartridge
+signatures:
+  - bitmask: //////////8AAAD///////////8AAAD/////////////////////////////////////////////////
+    pattern: AEAt6QTQTeIAAADrAABQ4wUAAAoAAADrAABQ4wTQjQIBAKADAEC9CB7/LwEAAKDjBNCN4gBAvege/y/h
+    relocations:
+      - offset: 8
+        name: func_020a5f8c
+        kind: ArmCall
+      - offset: 20
+        name: func_020a60a8
+        kind: ArmCall

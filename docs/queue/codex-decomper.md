@@ -191,7 +191,7 @@ Effort: **MEDIUM** — this is mechanical, harness-driven, and gated at every st
 
 **Gate:** per-region `ninja sha1` on every batch (the harness already does this) + `python tools/gate3.py --scope all` at the end + `check_activation_invariant.py` + before/after `port_census.py` counts.
 
-### q-sig-refresh-4 — rebuild the signature DB after the C%-jump [TODO]
+### q-sig-refresh-4 — rebuild the signature DB after the C%-jump [DONE]
 
 EUR readable-C went **8.48% → 14.11%** between 2026-07-22 and 2026-08-03, and USA/JPN moved with it. The signature DB has not been rebuilt across that jump, so it is materially stale. Rebuild from ALL currently-named functions, re-apply across EUR/USA/JPN, report the delta vs the last refresh. **Round-trip canary first** — confirm a known-good signature still resolves before trusting any bulk apply.
 
@@ -201,7 +201,7 @@ Effort: **MEDIUM**.
 
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming --base origin/main` PASS + names-applied delta.
 
-### q-name-crossprop-4 — cross-region twin propagation sweep [TODO]
+### q-name-crossprop-4 — cross-region twin propagation sweep [DONE]
 
 Follows `q-sig-refresh-4`. Any EUR-named function whose USA/JPN twin is still `func_*` → propagate via `rename_symbol.py --cascade`. Byte-neutral, 3x multiplier on every name the CC lanes created during the jump above. Sweep all modules. Brief 569's sig region-twin map (49/60 exact twins, 0/44 false positives) is the validated fallback when a name alone is ambiguous.
 

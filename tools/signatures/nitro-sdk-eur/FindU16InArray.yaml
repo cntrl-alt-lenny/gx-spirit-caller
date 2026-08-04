@@ -1,0 +1,5 @@
+name: FindU16InArray
+signatures:
+  - bitmask: /////////////////////////////////////////////////////w==
+    pattern: AABS4wUAAAqwMNDhAQBT4R7/LwECAIDiASBS4vn//xoAAKDjHv8v4Q==
+    relocations: []

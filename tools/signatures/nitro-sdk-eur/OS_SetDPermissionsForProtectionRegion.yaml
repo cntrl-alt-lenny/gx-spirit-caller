@@ -1,0 +1,5 @@
+name: OS_SetDPermissionsForProtectionRegion
+signatures:
+  - bitmask: //////////////////////////8=
+    pattern: UC8V7gAgwuEBIILhUC8F7h7/L+E=
+    relocations: []

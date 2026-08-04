@@ -1,0 +1,5 @@
+name: OS_DisableProtectionUnit
+signatures:
+  - bitmask: /////////////////////w==
+    pattern: EA8R7gEAwOMQDwHuHv8v4Q==
+    relocations: []

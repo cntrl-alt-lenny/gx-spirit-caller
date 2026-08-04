@@ -3,7 +3,7 @@
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 
         .text
-        .extern func_020a690c
+        .extern Strlen
         .global func_020a69a0
         .arm
 func_020a69a0:
@@ -32,7 +32,7 @@ func_020a69a0:
     strneb r2, [r0, lr]
 .L_c0:
     mov r0, r1
-    bl func_020a690c
+    bl Strlen
     add sp, sp, #0x4
     ldmfd sp!, {lr}
     bx lr

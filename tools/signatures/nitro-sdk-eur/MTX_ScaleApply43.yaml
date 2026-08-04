@@ -1,0 +1,10 @@
+name: MTX_ScaleApply43
+signatures:
+  - bitmask: >-
+      ////////////////////////////////AAAA/////////////////////////////////////////////////w==
+    pattern: >-
+      MEAt6QTQTeIQwJ3lAFCg4QDAjeUBQKDhAAAA6yQAleUkAITlKACV5SgAhOUsAJXlLACE5QTQjeIwQL3oHv8v4Q==
+    relocations:
+      - offset: 24
+        name: func_0208b1e0
+        kind: ArmCall

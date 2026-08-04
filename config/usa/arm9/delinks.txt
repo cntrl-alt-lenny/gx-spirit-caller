@@ -11004,7 +11004,7 @@ libs/nitro/OSi_RemoveMutexLinkFromQueue.legacy.c:
 src/usa/main/func_0209206c.legacy.c:
     complete
     .text start:0x0209206c end:0x020920c0
-src/usa/main/func_020920c0.s:
+src/usa/main/OSi_RemoveLinkFromQueue.s:
     complete
     .text start:0x020920c0 end:0x020920f4
 libs/nitro/OSi_InsertLinkToQueue.legacy.c:
@@ -12851,7 +12851,7 @@ src/usa/main/func_020a68dc.legacy.c:
     complete
     .text start:0x020a68dc end:0x020a690c
 
-src/usa/main/func_020a690c.s:
+src/usa/main/Strlen.s:
     complete
     .text start:0x020a690c end:0x020a6934
 src/usa/main/func_020a6934.s:
@@ -13031,7 +13031,7 @@ src/usa/main/func_020aae4c.s:
 src/usa/main/func_020aaf60.s:
     complete
     .text start:0x020aaf60 end:0x020aaf94
-src/usa/main/func_020aaf94.s:
+src/usa/main/Strchr.s:
     complete
     .text start:0x020aaf94 end:0x020aafd0
 src/usa/main/func_020aafd0.s:
@@ -13070,7 +13070,7 @@ src/usa/main/func_020acd94.c:
     complete
     .text start:0x020acd94 end:0x020acda4
 
-src/usa/main/func_020acda4.s:
+src/usa/main/FindU16InArray.s:
     complete
     .text start:0x020acda4 end:0x020acdcc
 src/usa/main/func_020acdcc.s:

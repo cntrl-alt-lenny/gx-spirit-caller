@@ -4,7 +4,7 @@
 
         .text
         .extern func_02094688
-        .extern func_020aaf94
+        .extern Strchr
         .global func_0204e7f4
         .arm
 func_0204e7f4:
@@ -15,7 +15,7 @@ func_0204e7f4:
     mov r8, r2
     mov r0, r9
     mov r1, #0x0
-    bl func_020aaf94
+    bl Strchr
     mov r7, r0
     cmp r8, #0x0
     mov r6, #0x0
@@ -24,7 +24,7 @@ func_0204e7f4:
 .L_13e8:
     mov r0, r9
     mov r1, r5
-    bl func_020aaf94
+    bl Strchr
     cmp r0, #0x0
     addeq sp, sp, #0x4
     mvneq r0, #0x0
@@ -36,7 +36,7 @@ func_0204e7f4:
 .L_1414:
     mov r0, r9
     mov r1, #0x2f
-    bl func_020aaf94
+    bl Strchr
     cmp r0, #0x0
     moveq r0, r7
     cmp r9, r0
