@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**127 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**128 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (55)
+- [Uncategorised](#uncategorised) (56)
 
 ## Analysis / worklist
 
@@ -610,6 +610,12 @@ WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--w
 **per-TU match check without a full ROM rebuild.**
 
 Compiles a single .c source file by running `ninja <that_unit.o>` — exactly one compilation target, no ROM build, no link, no sha1 — then runs the RESOLVED comparison against its delinked gap object and reports the function match %.
+
+### `tools/field_exposure_census.py`
+
+**Rank documented struct fields by distinct matched-source exposure.**
+
+This is a deliberately narrow lexical census.  It counts a source file once per field and access direction, even when that file contains many matching instructions.  C uses named member access (and, for documented base symbols, the docum…
 
 ### `tools/fix_delink_suffixes.py`
 

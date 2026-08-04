@@ -367,6 +367,20 @@ On 2026-08-03 the Codex Decomper lane ran its entire port-harvest brief **inside
 
 **Gate:** `python -m pytest tests/test_kickoff_lint.py -q` green + paste the linter's verdict on a kickoff lacking a location guard (must FAIL) and one carrying it (must PASS).
 
+### q-field-exposure-census — rank documented fields by distinct access sites [DONE]
+
+Build `tools/field_exposure_census.py` to rank documented fields by distinct
+matched `.c` and `.s` read/write sites. Keep the detector lexical and document
+blind spots for masked read-modify-writes, bulk Fill32, and SDK calls.
+
+**Gate:** `python -m pytest tests -q` no-new-failures, a small fixture regression
+test, and the DuelStateSingleton canary with `f_cf8` near the top.
+
+Implemented in `tools/field_exposure_census.py`. The DuelStateSingleton canary
+ranked `f_cf8` third of 20 fields by total distinct sites (86 total: 76 reads,
+12 writes), confirming it is near the top. The detector reports its explicit
+lexical blind spots in the command output.
+
 ### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [DONE]
 
 Companion tool to `cm-f-cf8-contradiction` (Claude Scaffolder lane). **Wait for that item's findings before building** — it reports whether this is one error or a class, which determines whether the tool is worth its budget. If the count comes back at one, say so and close this without building.
