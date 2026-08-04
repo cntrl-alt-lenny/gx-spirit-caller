@@ -10,7 +10,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
-from semantic_contradiction_check import EnumCandidate, scan_texts  # noqa: E402
+from semantic_contradiction_check import (  # noqa: E402
+    EnumCandidate,
+    discover_candidates,
+    scan_texts,
+)
 
 
 NUMBER = r"(?P<value>-?(?:0[xX][0-9a-fA-F]+|\d+))"
@@ -21,6 +25,62 @@ def candidate(name: str, anchor: str, evidence: str) -> EnumCandidate:
 
 
 class ContradictionTests(unittest.TestCase):
+    def test_current_duel_observed_value_set_is_first_class(self):
+        # Pinned from the current observed-value-set form. Keep this fixture
+        # independent of concurrent edits to the canonical document.
+        docs = {
+            "DuelStateEnums.md": """
+## Duel phase (data_ov002_022d016c.f_cf8)
+
+This is an **open observed-value set**; closure is unproven.
+
+```
+confirmed values include 0, 1, 2, 3, 4, 5 and 7;
+```
+""",
+        }
+        candidates = discover_candidates(docs)
+        self.assertEqual(len(candidates), 1)
+        self.assertTrue(candidates[0].open_set)
+        result = scan_texts(
+            candidates,
+            docs,
+            {"func.c": "if (f_cf8 == 99) return 1;"},
+        )[0]
+        self.assertEqual(result.status, "OBSERVED")
+        self.assertEqual(result.documented, frozenset({0, 1, 2, 3, 4, 5, 7}))
+        self.assertEqual(result.outside, ())
+
+    def test_unparseable_candidate_does_not_stop_other_candidates(self):
+        docs = {
+            "broken.md": """
+## Broken state
+
+This is an open observed-value set.
+confirmed values include no values;
+""",
+            "valid.md": """
+## Valid state
+
+```c
+typedef enum ValidState { A = 0, B = 1 };
+```
+""",
+        }
+        results = scan_texts(
+            discover_candidates(docs),
+            docs,
+            {"valid.c": "state == 2;"},
+        )
+        self.assertEqual(
+            {result.status for result in results},
+            {"UNPARSEABLE", "CHECKED"},
+        )
+        self.assertEqual(
+            next(result for result in results if result.status == "UNPARSEABLE").error,
+            "observed-value-set has no explicit values",
+        )
+
     def test_pinned_three_of_six_survey(self):
         # These strings intentionally preserve the pre-correction claims. Do
         # not read live canonical docs: Claude's correction PRs are concurrent.
