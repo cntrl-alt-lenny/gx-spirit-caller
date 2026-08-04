@@ -348,7 +348,7 @@ On 2026-08-03 the Codex Decomper lane ran its entire port-harvest brief **inside
 
 **Gate:** `python -m pytest tests/test_kickoff_lint.py -q` green + paste the linter's verdict on a kickoff lacking a location guard (must FAIL) and one carrying it (must PASS).
 
-### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [TODO]
+### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [DONE]
 
 Companion tool to `cm-f-cf8-contradiction` (Claude Scaffolder lane). **Wait for that item's findings before building** — it reports whether this is one error or a class, which determines whether the tool is worth its budget. If the count comes back at one, say so and close this without building.
 
@@ -383,7 +383,7 @@ Investigate `check_activation_invariant.py`'s basename-fallback resolution: when
 
 **Gate:** `python3.13 -m pytest tests -q` no-new-failures + a regression test that reproduces the wiped-edit case and asserts the checker FAILS on it + confirmation that routing-suffix and data-carve activations still resolve.
 
-### q-semantic-check-enum-lookup — the contradiction checker crashes on the live tree [TODO]
+### q-semantic-check-enum-lookup — the contradiction checker crashes on the live tree [DONE]
 
 ⚠️ **PR #1447 was held back from the 2026-08-04 integration for this.** The work is sound and its pinned-fixture tests pass; the defect only appears when #1447 and #1449 are combined, which is precisely what a consolidated integration gate exists to catch. Neither lane could have seen it alone.
 
