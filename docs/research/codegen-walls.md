@@ -6699,6 +6699,32 @@ independently.
 > separate `fail: return X;` block, produces a *duplicate* epilogue
 > instead of sharing the real one.
 
+> **OBSERVED, NOT CONFIRMED (cmatch/ov002-sweep-16 canary attempts,
+> 2026-08-04): a guard clause testing a value that just came back from
+> a function call may resist the goto fix even where an otherwise
+> identical guard testing a pre-call value converts cleanly.** Two
+> guard clauses in the same function (`func_ov002_02299c9c`): the
+> first (`if (fn == 0) goto X;`, testing an array-indexed pointer
+> computed with no intervening call) converted to a branch on the
+> documented goto fix, first try. The second (`if (fn() == 0) goto Y;`,
+> testing the return value of the call `fn()` made one line above) kept
+> if-converting back to predicated `mov`+`popeq` regardless of 4 source
+> variations tried against it: plain goto, swapped label order (to
+> rule out address-position sensitivity per the sweep-14 note above),
+> a named intermediate (`int r = fn(); if (r == 0) goto Y;`), and the
+> fully-explicit both-arms-goto form C-55's own fix text uses
+> (`if (cond) goto X; goto Y;`). None moved it. A second, unrelated
+> function (`func_ov002_021d1158`) hit a similarly call-adjacent
+> single-instruction scheduling residual (a `mov rN, #imm` landing one
+> position after a branch instead of before it, same block, same
+> registers) that also resisted restructuring — weaker evidence since
+> it isn't the C-55 shape itself, but the same "right after a call,
+> scheduling stops responding to source order" flavor. Two data points
+> in one round is not enough to state a mechanism or a fix — flagged so
+> the next lane to hit this recognizes it rather than re-discovering it
+> from zero. If it recurs, record the instance here; a third or fourth
+> confirmation would make this promotable to its own numbered entry.
+
 ### C-56. Local-variable declaration order, not just usage order, affects register allocation
 
 **The trap:** two source forms that use the same locals in the same
@@ -7481,6 +7507,72 @@ on `func_ov002_02201614` and `func_ov002_022075a4` — both functions
 had been touched in sweep-15 without a full function-level ship,
 consistent with the companion-wall explanation below rather than a
 failure of the lever itself).
+
+> **OBSERVED, NOT CONFIRMED (cmatch/ov002-sweep-16, 2026-08-04): a
+> `(flag & 1) * 0x868`-style row-pointer computed via `mla` against a
+> relocatable base symbol, combined with a SEPARATE `idx * 0x14`
+> offset added via its own `mul` and two sequential `add`s, reliably
+> lands the masked-flag value and the mla result in different physical
+> registers than ground truth — a pure register-role swap (e.g. `r1`↔
+> `r3`), never a content or size mismatch.** Three independent
+> functions hit the identical symptom this round: `func_ov002_0224bd3c`
+> (parked at 84.2%, 4 source variations tried — operand-order swap,
+> a named `stride` intermediate, a named `masked` intermediate, and
+> the original fused expression — all four producing byte-identical
+> output to each other, differing from ground truth only in this one
+> register pair), `func_ov002_021f058c` (same symptom surfaced only
+> after two independent bitfield fixes closed everything else; a
+> declaration-order swap of the two offset intermediates produced
+> zero change), and `func_ov002_021eba34` (hit again even when the row
+> pointer was written as a single fused expression from the start,
+> matching the shape `mla` itself implies). Six total restructuring
+> attempts across three functions, zero effect on this specific
+> register pair. Whatever selects which of the two independently-
+> computed offsets gets which scratch register appears to be a pure
+> backend allocation choice, not something the C source shape reaches
+> — the same flavor of resistance as C-55's post-call scheduling note
+> above, but triggered by two co-live `mul` results feeding a shared
+> base pointer instead of a call boundary. Not promoted to a P-wall
+> because no attempt swept the OTHER documented C-63 variants (e.g.
+> forcing the idx offset through a bitfield-typed intermediate) before
+> parking; flagged so the next lane recognizes the signature (mla
+> against a `0x868`-literal stride, two-register-role diff, identical
+> byte count) instead of re-deriving it from zero.
+
+### C-67. A 2-way mutually-exclusive `if`/`else if` on equality that
+resists a goto restructure may still resolve via `switch`
+
+**The trap.** GT sometimes lays out a 2-arm mutually-exclusive
+equality selection (`if (x == A) v = P; else if (x == B) v = Q;`) as a
+branch to a SEPARATE block with its own dedicated load for the first
+arm, rather than the compact `cmp`+`ldreq`+`cmp`+`ldreq` predicated
+form a straightforward if/else-if naturally produces. A source draft
+using plain if/else-if — or an explicit `goto`-based restructure
+mirroring the branch-away shape directly — both compiled to the
+IDENTICAL (wrong) predicated form on `func_ov002_02208118`; the goto
+rewrite made no difference at all, mwcc's optimizer collapsed it back.
+
+**The fix.** Rewrite the same two arms as a `switch` on the tested
+value, one `case` per equality target:
+```c
+switch (field0) {
+case 0x175b: val = 0xfa7; break;
+case 0x17f6: val = 0xff8; break;
+}
+```
+This produced GT's exact branch-to-separate-block shape immediately —
+100% match, no further iteration needed. `switch` and `if`/`goto` are
+NOT interchangeable inputs to mwcc's branch-layout decision here, even
+though both are semantically identical to a human reader.
+
+**Confidence — single instance.** Confirmed on exactly one function so
+far; the underlying mechanism (why `switch` gets a different layout
+pass than an equivalent `goto`) is not understood, only that it works.
+Treat as a first thing to try, not a guaranteed fix, until more
+instances land.
+
+**Provenance:** cmatch/ov002-sweep-16, round 2026-08-04
+(`func_ov002_02208118`).
 
 ## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
