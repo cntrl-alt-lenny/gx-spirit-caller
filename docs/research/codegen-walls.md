@@ -7539,8 +7539,8 @@ failure of the lever itself).
 > against a `0x868`-literal stride, two-register-role diff, identical
 > byte count) instead of re-deriving it from zero.
 
-### C-67. A 2-way mutually-exclusive `if`/`else if` on equality that
-resists a goto restructure may still resolve via `switch`
+### C-67. A 2-way mutually-exclusive `if`/`else if` on equality that resists a goto restructure may still resolve via `switch`
+
 
 **The trap.** GT sometimes lays out a 2-arm mutually-exclusive
 equality selection (`if (x == A) v = P; else if (x == B) v = Q;`) as a
@@ -7554,12 +7554,14 @@ rewrite made no difference at all, mwcc's optimizer collapsed it back.
 
 **The fix.** Rewrite the same two arms as a `switch` on the tested
 value, one `case` per equality target:
+
 ```c
 switch (field0) {
 case 0x175b: val = 0xfa7; break;
 case 0x17f6: val = 0xff8; break;
 }
 ```
+
 This produced GT's exact branch-to-separate-block shape immediately —
 100% match, no further iteration needed. `switch` and `if`/`goto` are
 NOT interchangeable inputs to mwcc's branch-layout decision here, even
