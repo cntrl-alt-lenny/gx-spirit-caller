@@ -348,7 +348,7 @@ On 2026-08-03 the Codex Decomper lane ran its entire port-harvest brief **inside
 
 **Gate:** `python -m pytest tests/test_kickoff_lint.py -q` green + paste the linter's verdict on a kickoff lacking a location guard (must FAIL) and one carrying it (must PASS).
 
-### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [TODO]
+### q-semantic-contradiction-check — flag documented enum ranges that matched code contradicts [DONE]
 
 Companion tool to `cm-f-cf8-contradiction` (Claude Scaffolder lane). **Wait for that item's findings before building** — it reports whether this is one error or a class, which determines whether the tool is worth its budget. If the count comes back at one, say so and close this without building.
 
