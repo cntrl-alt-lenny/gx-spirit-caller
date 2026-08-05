@@ -176,7 +176,7 @@ fastmatch.py:685 reads r['region'] before the status guard at :688, so a stale/r
 
 **Gate:** `python tools/configure.py eur && ninja sha1` OK (byte-neutral) + count of prototypes emitted + conflicts resolved.
 
-### q-port-harvest-complete — drain the 322 free byte-identical cross-region ports [TODO]
+### q-port-harvest-complete — drain the 322 free byte-identical cross-region ports [DONE]
 
 The prefilter fix (`not_in_gap` reclassified as a retryable tool-error, plus configure + `ninja delink` before temporary C is installed) unblocked this lane. Brain-run census, right now, on the current integration tree:
 
@@ -190,6 +190,8 @@ Run `port_census.py` first, then `port_harvest.py --batch 20` in a loop until th
 Effort: **MEDIUM** — this is mechanical, harness-driven, and gated at every step.
 
 **Gate:** per-region `ninja sha1` on every batch (the harness already does this) + `python tools/gate3.py --scope all` at the end + `check_activation_invariant.py` + before/after `port_census.py` counts.
+
+**Result (brain, 2026-08-05):** criterion met twice — #1456 shipped 10 ports (5 natural-C + 5 asm-C; sim=1.0 census USA 155→145, JPN 167→147) and #1459's full re-drain from fresh origin/main shipped 0: every remaining sim=1.0 row (292 rows / 61,096 B) refused below the HIGH/EXACT floor. "Drained or genuinely refuse" is this item's own success line, so DONE. Residue re-scoped below (`q-port-residual-fix`, `q-port-highconf-no-target`); full drains are now triggered by EUR-ship rounds, not a standing TODO — #1459 already paid one zero-yield full-drain cycle for leaving this open.
 
 ### q-sig-refresh-4 — rebuild the signature DB after the C%-jump [DONE]
 
@@ -208,3 +210,25 @@ Follows `q-sig-refresh-4`. Any EUR-named function whose USA/JPN twin is still `f
 Effort: **MEDIUM**.
 
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins-propagated count.
+
+### q-port-residual-fix — recover the 3 tool-error ports + the named residues; no full re-drain [TODO]
+
+The sim=1.0 pool is drained to genuine refusals (see q-port-harvest-complete's Result above). What is left has NAMED causes — fix those; do not re-run the loop:
+
+1. **The region-data lookup bug** — on `OSi_PostIrqEvent`, `SNDi_SetTrackParam`, `__register_global_object` the lookup returns a non-JSON filename mismatch; #1459 hit it as 3 "retryable tool-errors" per drain and no queue item tracked it until now. Root-cause and fix the tool (+ a regression test with the failing shape), then port those 3 — they are the only mechanically recoverable ships left in the current pool.
+2. `func_0203e95c` needs its `symbols.txt` line added (needs-symbol refusal); `func_02087174` has a name collision — resolve per naming convention.
+3. `func_0201c444` parked at 98.0%: ONE bounded attempt; park honestly if it stays below the exact floor.
+
+Do NOT run another full drain — the backlog regrows only when EUR ships, so the next full drain is triggered by the next EUR merge round, not by this item. CANARY: the first recovered port goes through per-region `ninja sha1` before touching the other two. End with one before/after `port_census.py` paste.
+
+Effort: **MEDIUM**.
+
+**Gate:** per-region `ninja sha1` on every shipped port + `python tools/gate3.py --scope all` + `python -m pytest -q tests` green (tool fix) + before/after `port_census.py` output pasted in the PR.
+
+### q-port-highconf-no-target — scope the 63-per-region HIGH-but-no-target-file class [TODO]
+
+PR #1436's census fix surfaced **63 functions per region at HIGH sibling-confidence with NO EUR target file** — a class nothing currently tracks. Determine what they are: which modules, and why no target file exists (never delinked? misclassified as data? gap TUs?). Ship the mechanically safe ones; where EUR-side work is the blocker, produce the worklist (module, address, blocker) as a research doc instead of forcing ports. An honest "0 shippable, here is the worklist" is a SUCCESS. CANARY: fully diagnose ONE candidate end-to-end before sweeping the class.
+
+Effort: **MEDIUM**.
+
+**Gate:** if anything ships, per-region `ninja sha1` + `python tools/gate3.py --scope all`; otherwise doc-only + `python -m pytest -q tests` green. The census/worklist table pasted in the PR.

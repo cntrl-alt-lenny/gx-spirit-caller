@@ -1306,3 +1306,15 @@ Full write-up: [`docs/research/q-producer-consumer-sample-2-2026-08-04.md`](../r
 $ python3.13 -m pytest tests -q
 3193 passed, 13 skipped, 63 subtests passed in 74.86s
 ```
+
+### cm-restock-carve-1 — first wave of the restock-census carve series (ov006's 33 structs, then main's 58) [TODO]
+
+`cm-data-restock-check` proved the non-primitive data pool never emptied — it was invisible to the old discovery methods: **274 never-assessed candidates / 24,753 B**, full table at `docs/research/data/cm-data-restock-census-2026-08-03.md`. This is a **fresh series** (third discovery method), per that doc's own recommendation — not a cm-data-inference or cm-bss-convert continuation. Wave 1: **ov006's 33 struct-shaped candidates cross-referenced against `src/overlay006/ov006_core.h`** — the exact method behind wave 9's Ov006AudioBank family — then main's 58 struct-shaped if the wave has room. Fold in wave 9's two fast follow-ups: `data_ov006_0224f2ac` + `data_ov006_0224f344` (same size/idiom as wave 9's AudioBank pair — verify to full wave standard, do not assume). Keep the standing rules: per-symbol reconciliation, `relocs.txt` structural proof, transitive-callee tracing, and const/static matching each symbol's OWN original. CANARY: the first carve goes through the FULL gate before any batching.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + Named-struct/Typed-array before/after (state-table regen) + the per-symbol reconciliation table in the PR body.
+
+### cm-field-recheck-1 — producer/consumer lens on the MOST-tested fields, ranked by the census tool [TODO]
+
+Executes `q-producer-consumer-sample-2`'s own stated next step. The surviving reading is "risk concentrates in high-traffic fields": `f_cf8` — the singleton's most-tested field — was the real contradiction, while 19 lower-traffic fields sampled clean. Rank fields across `docs/research/types/` + `docs/research/constants/` by distinct read/write sites with `python tools/field_exposure_census.py` (from #1457), take the top not-yet-audited **method-compatible** fields (discrete small-int only; state which producer shapes your search covers — sample-1's transferable lesson), and run the full lens on each: CONFIRMED / PRODUCER-ONLY / CONSUMER-ONLY / CONTRADICTED / UNFALSIFIABLE, consumer sites register-provenance-traced, producer search depth (1-2 call hops) stated as such. Flags/bitmask fields stay OUT of scope until `q-flags-producer-detection` (codex-scaffolder) lands its finder. Cheap loose ends to close in the same doc: `f_d64` `== 0xc` in `func_ov002_02262994.s` (the doc cites only `== 0xb`) and the BgCfg.md/Box.md EUR-vs-USA/JPN cited-address anomaly (characterize it; don't guess a cause). CANARY: the first ranked field gets its full producer+consumer trace written up before the batch proceeds.
+
+**Gate:** doc-only — `python -m pytest -q tests` green (skips allowed, failures not) + the per-field verdict table with cited sites in the research doc.
