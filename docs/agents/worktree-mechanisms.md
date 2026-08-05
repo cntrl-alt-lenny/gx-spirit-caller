@@ -36,8 +36,15 @@ Both achieve the same isolation goal. Pick by host convention:
 
 - **Mac:** mechanism A (manual sibling worktrees) — pattern adopted
   during the SHA1-milestone arc per PR #564.
-- **Windows:** mechanism B (Claude Code automatic sandbox worktrees)
-  — pattern in use during the post-SHA1 arc; no manual setup needed.
+- **Windows:** ALSO mechanism A in current practice (corrected
+  2026-08-05 — the observed layout is named sibling worktrees under
+  `Dev/gx-spirit-caller/`: `brain`, `decomper`, `scaffolder`, plus
+  per-item `codex-*` dirs; kickoffs assign an explicit worktree path
+  with an `EXPECT=` location guard). Mechanism B (Claude Code
+  automatic sandbox worktrees) remains valid and is described below,
+  but is not what the standing Windows lanes use today. Named sibling
+  worktrees need their own `orig/` baseroms (copy from `../brain/orig/`)
+  and a `configure.py` run before they can gate.
 
 Brain does not strictly need either mechanism for review/merge work
 on its own — both mechanisms only matter when decomper and scaffolder

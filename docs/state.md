@@ -8,7 +8,61 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-03 (late) — **rounds 0803b/0803c integrated, then a
+**Last updated:** 2026-08-05 — **(Windows PC, brain=Fable 5; roster unchanged.) Round
+0805: back-online review, port-harvest closed as met, all four queues re-seeded.**
+EUR natural-C **13.99%** (333,810 B) / USA **11.81%** / JPN **11.79%** — from the
+regenerated state-table (post-#1460), not inherited.
+
+**0804d round recorded here for the first time** (it post-dated this file's previous
+update; the Mac brain merged it but did not get back to state.md): **#1457**
+(`tools/field_exposure_census.py` — read/write-site ranking over documented fields),
+**#1458** (work-queue discovery read-only by default), **#1459** (port-harvest
+continuation: 0 ports, census unchanged — every remaining sim=1.0 row refused below
+the HIGH/EXACT floor; 3 recurring "retryable tool-errors" from a region-data lookup
+non-JSON bug, previously untracked), **#1460** (cmatch/ov002-sweep-16: 3/12 shipped at
+the steady ~25% rate — the drop vs sweeps 9-15's 24-40 ships was scale [12 attempts,
+single-lane], NOT yield; new **C-67** switch-vs-goto lever, single-instance; two
+OBSERVED-NOT-CONFIRMED codegen-walls notes: row-pointer `mla` register-swap ×3
+pending a C-63-variant sweep, post-call guard resistance ×2). Queue: sweep-16 → DONE.
+
+**Round 0805 decisions (this update):**
+
+1. **`q-port-harvest-complete` closed as met** — its own success criterion ("drained
+   or genuinely refuse") was satisfied twice (#1456 shipped 10, #1459 shipped 0 on a
+   full re-drain of 292 rows / 61,096 B). Residue re-scoped into `q-port-residual-fix`
+   (the 3 tool-error ports + 2 named per-function residues) and
+   `q-port-highconf-no-target` (the 63-per-region HIGH-but-no-target-file class #1436
+   surfaced). Full drains are now **trigger-based** (after EUR-ship rounds) — #1459
+   already paid one zero-yield drain cycle for the standing TODO.
+2. **Queues re-seeded** (all four were empty or stale): CC Decomper
+   `cm-ov002-unknown-sweep-17` (100 candidates, 5-worktree protocol, C-67 in the
+   lever set, mla/C-63 mini-item first + near-miss re-attempts, pool pull
+   cross-checked against sweeps 9-15 park docs); CC Scaffolder `cm-restock-carve-1`
+   (ov006's 33 struct candidates vs ov006_core.h, then main's 58 — the 274-candidate
+   restock census) + `cm-field-recheck-1` (producer/consumer lens on the most-tested
+   fields ranked by field_exposure_census.py); Codex Decomper as in (1); Codex
+   Scaffolder `q-attempts-ledger-backfill` (attempts.tsv blind to ~640 worktree-sweep
+   parks) + `q-flags-producer-detection` (masked-RMW/bulk-fill/SDK-call producer
+   finder — the 3×-recurring flags-word blind spot).
+3. **DECIDED — Next-brain TODO item 0 (pending since 2026-07-25): "readable-C done"
+   definition adopted** per the filing doc's own recommendation: the pret-style
+   public ladder PLUS the verdict-complete gate; attainment-as-completion REJECTED.
+   Freshness cutoff keys per-lever-family off codegen-walls.md's correction history,
+   not one global date. Verdict-gate implementation is M-effort, unscheduled — a
+   candidate for a future tooling slot. (Owner can veto; recorded as the brain's
+   call per the doc's "the brain decides".)
+4. **Hygiene:** deleted 5 superseded remote branches (claude/cm-data-020b4680-carve,
+   claude/cm-data-020c3198-carve, claude/cm-data-inference-3, cmatch/c66-resweep,
+   codex/semantic-contradiction-check — each verified in-main-by-another-path before
+   deletion). `brain/decomp-dev-ci` (#1020 draft) kept pending an owner call — the
+   only branch with genuinely unmerged content. `progress-visuals` is live CI output,
+   never delete. 11 local worktrees on the Windows box are prune candidates
+   (branches merged, remotes gone) — listed for the owner, not pruned; `decomper`/
+   `scaffolder` are standing dirs that need a branch refresh, not removal.
+   `docs/agents/worktree-mechanisms.md` corrected: this Windows box runs manual
+   named sibling worktrees (Mechanism A), not `.claude/worktrees` sandboxes.
+
+**Previously (2026-08-03, late):** — **rounds 0803b/0803c integrated, then a
 REPAIR round opened.** EUR readable-C **14.14%** (Natural-C 333,354 B / asm-C
 3,904 B), USA **11.92%** (281,508 / 2,748), JPN **11.86%** (280,388 / 2,548).
 
@@ -298,9 +352,11 @@ sufficient.
 
 ## Next-brain TODO
 
-**0. (2026-07-25, q-readable-c-done-definition) Decide the "readable-C
-done" definition; ceiling model corrected, not a completion criterion
-anymore.** r11 found the tractable-C ceiling self-contradicting (48.03%
+**0. ✅ DECIDED 2026-08-05 (round 0805, see top): adopted the pret-style public
+ladder + verdict-complete gate; rejected attainment-as-completion. Original item
+kept below for the reasoning trail.** (2026-07-25, q-readable-c-done-definition)
+Decide the "readable-C done" definition; ceiling model corrected, not a completion
+criterion anymore. r11 found the tractable-C ceiling self-contradicting (48.03%
 vs r7-14's 14-24% band); fixed with shown arithmetic (main's headroom
 fraction 0.75 -> 0.10, region-wide ceiling 48.03% -> 30.19%) but
 explicitly NOT reconciled to the band — see
