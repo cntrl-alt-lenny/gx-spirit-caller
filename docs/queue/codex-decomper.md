@@ -211,7 +211,7 @@ Effort: **MEDIUM**.
 
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins-propagated count.
 
-### q-port-residual-fix — recover the 3 tool-error ports + the named residues; no full re-drain [TODO]
+### q-port-residual-fix — recover the 3 tool-error ports + the named residues; no full re-drain [DONE]
 
 The sim=1.0 pool is drained to genuine refusals (see q-port-harvest-complete's Result above). What is left has NAMED causes — fix those; do not re-run the loop:
 
@@ -225,7 +225,7 @@ Effort: **MEDIUM**.
 
 **Gate:** per-region `ninja sha1` on every shipped port + `python tools/gate3.py --scope all` + `python -m pytest -q tests` green (tool fix) + before/after `port_census.py` output pasted in the PR.
 
-### q-port-highconf-no-target — scope the 63-per-region HIGH-but-no-target-file class [TODO]
+### q-port-highconf-no-target — scope the 63-per-region HIGH-but-no-target-file class [DONE]
 
 PR #1436's census fix surfaced **63 functions per region at HIGH sibling-confidence with NO EUR target file** — a class nothing currently tracks. Determine what they are: which modules, and why no target file exists (never delinked? misclassified as data? gap TUs?). Ship the mechanically safe ones; where EUR-side work is the blocker, produce the worklist (module, address, blocker) as a research doc instead of forcing ports. An honest "0 shippable, here is the worklist" is a SUCCESS. CANARY: fully diagnose ONE candidate end-to-end before sweeping the class.
 
