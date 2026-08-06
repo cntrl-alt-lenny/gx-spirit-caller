@@ -267,6 +267,34 @@ def parse_filename_stem(stem: str) -> tuple[str, str, int] | None:
     return prefix, module, addr
 
 
+def resolve_named_source_function(
+    source_stem: str,
+    module: str,
+    region_functions: dict[str, list],
+) -> tuple[str, int] | None:
+    """Resolve a semantic source filename to its EUR symbol.
+
+    Most matched sources are address-keyed, but the original named runtime
+    sources predate that convention (for example
+    ``src/main/register_global_object.c`` defines
+    ``__register_global_object``).  The port lane must use the symbol table
+    for these files instead of treating the basename as an address-keyed
+    filename.  A leading underscore is accepted as the conventional spelling
+    difference used by the registrar source; ambiguity is fail-closed.
+    """
+    names = [source_stem]
+    if not source_stem.startswith("_"):
+        names.extend((f"_{source_stem}", f"__{source_stem}"))
+    matches = [
+        (f.name, f.addr)
+        for f in region_functions.get(module, [])
+        if f.name in names
+    ]
+    if len(matches) != 1:
+        return None
+    return matches[0]
+
+
 def function_symbol_for(module: str, addr: int) -> str:
     """Build the function-symbol name (as it appears in the C
     source and in symbols.txt) for a given (module, address) pair.
@@ -827,6 +855,94 @@ def find_rename_collisions(
     ]
 
 
+def repair_rename_collisions(
+    resolutions: list[Resolution],
+    eur_regions: dict[str, list],
+    target_regions: dict[str, list],
+    find_siblings_fn,
+    target_region_name: str,
+) -> list[Resolution]:
+    """Give colliding refs a deterministic one-to-one sibling assignment.
+
+    Some region symbol tables contain a run of same-sized functions with the
+    same relocation signature.  The normal resolver quite correctly chooses
+    the top candidate for each ref, but that can make two EUR refs rewrite to
+    one target name.  Before refusing, retry each collision as a small
+    bipartite assignment: preserve the ranked candidate order while requiring
+    distinct target names.  If no distinct assignment exists, leave the
+    collision intact so the existing fail-closed refusal remains in force.
+
+    This is the mechanical naming-convention rule used by the 02087174
+    residue: adjacent same-shape thunks retain distinct target names in source
+    order; the ROM gate remains the final arbiter.
+    """
+    repaired = list(resolutions)
+    for _name, group in find_rename_collisions(repaired):
+        occupied = {
+            r.target_name for r in repaired
+            if r not in group and r.target_name is not None
+        }
+        candidate_lists: list[list] = []
+        for resolution in group:
+            eur_func = next(
+                (
+                    f for f in eur_regions.get(resolution.eur_ref.module, [])
+                    if f.addr == resolution.eur_ref.addr
+                ),
+                None,
+            )
+            if eur_func is None:
+                candidate_lists = []
+                break
+            matches = find_siblings_fn(
+                eur_func,
+                target_regions,
+                max_results=10,
+                source_region="eur",
+                target_region_name=target_region_name,
+                byte_disambiguate=True,
+            )
+            candidate_lists.append([
+                m for m in matches
+                if m.confidence in ("HIGH", "MEDIUM", "LOW")
+                and m.func.name not in occupied
+            ])
+        if not candidate_lists:
+            continue
+
+        assignment: list | None = None
+
+        def search(index: int, chosen: set[str], picks: list) -> bool:
+            nonlocal assignment
+            if index == len(candidate_lists):
+                assignment = list(picks)
+                return True
+            for match in candidate_lists[index]:
+                if match.func.name in chosen:
+                    continue
+                chosen.add(match.func.name)
+                picks.append(match)
+                if search(index + 1, chosen, picks):
+                    return True
+                picks.pop()
+                chosen.remove(match.func.name)
+            return False
+
+        if not search(0, set(), []):
+            continue
+
+        for resolution, match in zip(group, assignment, strict=True):
+            replacement = Resolution(
+                eur_ref=resolution.eur_ref,
+                target_name=match.func.name,
+                confidence=match.confidence,
+                notes=(f"{match.rationale} | collision repair: "
+                       "distinct sibling assignment"),
+            )
+            repaired[repaired.index(resolution)] = replacement
+    return repaired
+
+
 def apply_substitutions(
     source_text: str,
     resolutions: list[Resolution],
@@ -837,17 +953,22 @@ def apply_substitutions(
     don't fire (e.g. rewriting `func_02006164` doesn't touch
     `func_020061640` if such a thing existed).
     """
-    out = source_text
-    # Apply longest-first so prefixed names (e.g. func_ov002_X) get
-    # replaced before the bare func_X variant would be considered.
-    sorted_res = sorted(
-        [r for r in resolutions if r.target_name is not None],
-        key=lambda r: -len(r.eur_ref.text),
+    # Rewrite against the original source in one pass. Sequential
+    # substitutions can cascade when a resolved target name is itself an
+    # EUR source name (the 02087174 residue: the function definition was
+    # rewritten a second time through a callee mapping).
+    mapping = {
+        r.eur_ref.text: r.target_name
+        for r in resolutions
+        if r.target_name is not None
+    }
+    if not mapping:
+        return source_text
+    names = sorted(mapping, key=len, reverse=True)
+    pattern = re.compile(
+        r"\b(?:" + "|".join(re.escape(name) for name in names) + r")\b"
     )
-    for r in sorted_res:
-        pattern = r"\b" + re.escape(r.eur_ref.text) + r"\b"
-        out = re.sub(pattern, r.target_name, out)
-    return out
+    return pattern.sub(lambda match: mapping[match.group(0)], source_text)
 
 
 def compute_output_path(
@@ -1212,12 +1333,20 @@ def main() -> int:
     # accepted pattern" — no Thumb function could region-port at all).
     file_stem = split_routing_suffix(args.source.stem)[0]
     parsed = parse_filename_stem(file_stem)
+    named_source = False
     if parsed is None:
-        print(f"error: filename doesn't match any accepted pattern "
-              f"(func_<addr>, func_ov<NNN>_<addr>, main_<addr>, "
-              f"ov<NNN>_<addr>): {args.source.name}", file=sys.stderr)
-        return 1
-    file_prefix, file_module, file_addr = parsed
+        named = resolve_named_source_function(file_stem, module, eur)
+        if named is None:
+            print(f"error: filename doesn't match an address-keyed pattern "
+                  f"and is not a unique named EUR function: "
+                  f"{args.source.name}", file=sys.stderr)
+            return 1
+        file_prefix = file_stem
+        file_module = module
+        file_addr = named[1]
+        named_source = True
+    else:
+        file_prefix, file_module, file_addr = parsed
     # Belt-and-suspenders consistency: the module derived from the
     # *path* (src/main/, src/overlay002/, …) must agree with the
     # one derived from the filename prefix. Disagreement means the
@@ -1332,6 +1461,11 @@ def main() -> int:
                   "or fix the renames upstream.")
         return 2
 
+    resolutions = repair_rename_collisions(
+        resolutions, eur, target, find_siblings,
+        args.target,
+    )
+
     # Detect rename collisions: two or more distinct EUR refs
     # resolved to the same target name. Worst case is parent ↔
     # callee collision (self-recursive rewrite); any collision is
@@ -1387,6 +1521,11 @@ def main() -> int:
     else:
         if main_func_resolution.target_name is None:
             target_stem = f"{file_prefix}_UNRESOLVED"
+        elif named_source:
+            # Semantic sources keep the target symbol's spelling.  This is
+            # also what batch_port derives from the target's existing .s
+            # sibling (including __register_global_object).
+            target_stem = main_func_resolution.target_name
         else:
             target_stem = target_stem_for_prefix(
                 file_prefix, main_func_resolution.target_name,

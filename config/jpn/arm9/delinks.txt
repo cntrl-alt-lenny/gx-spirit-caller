@@ -1904,7 +1904,7 @@ src/jpn/main/func_0201c1d0.s:
 src/jpn/main/func_0201c254.s:
     complete
     .text start:0x0201c254 end:0x0201c444
-src/jpn/main/func_0201c444.s:
+src/jpn/main/func_0201c444.c:
     complete
     .text start:0x0201c444 end:0x0201c50c
 src/jpn/main/func_0201c50c.c:
@@ -4676,7 +4676,7 @@ src/jpn/main/func_0203e868.s:
 src/jpn/main/func_0203e90c.s:
     complete
     .text start:0x0203e90c end:0x0203e95c
-src/jpn/main/func_0203e95c.s:
+src/jpn/main/func_0203e95c.legacy_sp3.c:
     complete
     .text start:0x0203e95c end:0x0203ea58
 src/jpn/main/func_0203ea58.s:
@@ -9686,7 +9686,7 @@ src/jpn/main/func_02087118.legacy_sp3.c:
 src/jpn/main/func_02087144.c:
     complete
     .text start:0x02087144 end:0x02087174
-src/jpn/main/func_02087174.s:
+src/jpn/main/func_02087174.legacy_sp3.c:
     complete
     .text start:0x02087174 end:0x02087214
 src/jpn/main/func_02087214.c:
@@ -10773,7 +10773,7 @@ src/jpn/main/OSi_IrqHandlerDma1.c:
 src/jpn/main/OSi_IrqHandlerDma0.c:
     complete
     .text start:0x020903dc end:0x020903ec
-src/jpn/main/OSi_PostIrqEvent.s:
+src/jpn/main/OSi_PostIrqEvent.legacy.c:
     complete
     .text start:0x020903ec end:0x02090488
 src/jpn/main/OS_DefaultIrqHandler.s:
@@ -11386,7 +11386,7 @@ src/jpn/main/func_02094bf8.legacy.c:
     complete
     .text start:0x02094bf8 end:0x02094c24
 
-src/jpn/main/SNDi_SetTrackParam.s:
+src/jpn/main/SNDi_SetTrackParam.legacy.c:
     complete
     .text start:0x02094c24 end:0x02094c58
 
@@ -13296,7 +13296,7 @@ src/jpn/main/func_020b4188.s:
 src/jpn/main/func_020b4190.s:
     complete
     .text start:0x020b4190 end:0x020b41bc
-src/jpn/main/__register_global_object.s:
+src/jpn/main/__register_global_object.c:
     complete
     .text start:0x020b4200 end:0x020b4220
 src/jpn/main/func_020b4220.c:
