@@ -7248,6 +7248,28 @@ packing), not because the addressing lever failed.
 coordinating process's explicit request to take sweep-11's two isolated,
 still-open mechanisms head-on.
 
+> **Extension — non-4-byte idx stride needs a real sizeof-matched
+> struct array, not `int*` indexing (cm-ov002-unknown-sweep-17,
+> 2026-08-06, mini-item A).** The original recipe above covers a
+> `p[idx]` stride of 4 bytes (a plain `int*`), where mwcc's native
+> array-subscript addressing embeds `idx<<2` directly into the `LDR`'s
+> shift field. When the real per-entry stride is a non-power-of-2 value
+> like `0x14` (20 bytes) — i.e. `mul idx_offset, idx, #0x14` followed by
+> a register-offset `LDR` with no embedded shift — plain `int*`
+> indexing can't reproduce it (the compiler will always emit a `<<2`
+> shift for `int*`, wrong stride entirely). Declaring the row-entry
+> type as a real `struct` whose `sizeof` equals the true stride, and
+> indexing an array of THAT type, reproduces the explicit `mul`
+> correctly: `struct Entry *arr = (struct Entry *)(rowBase + 0x30);
+> entry = &arr[idx];` (constant sub-offset folded into the base
+> pointer here, small enough to also work as the final access's `LDR`
+> immediate if applied at the point of use instead). Took
+> `func_ov002_021f058c` from a 39.5% park to **97.4%** combined with a
+> C-55 shared-tail `goto` fix for an unrelated early-return; the last
+> word (a commutative operand-order choice in a plain `add`, not an
+> `mla`) resisted 4 further variations and was left parked — see the
+> resolution note under C-66 below for the full breakdown.
+
 ### C-64. LS-vs-EQ condition code for an `unsigned x <= 0` guard is controlled by whether the check is mwcc's OWN synthesized for-loop trip-count pre-check or a hand-written guard — not by goto-vs-predicated source syntax
 
 **Background.** Sweep-11 flagged 3 instances (`func_ov002_0223cfec`,
@@ -7508,36 +7530,38 @@ had been touched in sweep-15 without a full function-level ship,
 consistent with the companion-wall explanation below rather than a
 failure of the lever itself).
 
-> **OBSERVED, NOT CONFIRMED (cmatch/ov002-sweep-16, 2026-08-04): a
-> `(flag & 1) * 0x868`-style row-pointer computed via `mla` against a
-> relocatable base symbol, combined with a SEPARATE `idx * 0x14`
-> offset added via its own `mul` and two sequential `add`s, reliably
-> lands the masked-flag value and the mla result in different physical
-> registers than ground truth — a pure register-role swap (e.g. `r1`↔
-> `r3`), never a content or size mismatch.** Three independent
-> functions hit the identical symptom this round: `func_ov002_0224bd3c`
-> (parked at 84.2%, 4 source variations tried — operand-order swap,
-> a named `stride` intermediate, a named `masked` intermediate, and
-> the original fused expression — all four producing byte-identical
-> output to each other, differing from ground truth only in this one
-> register pair), `func_ov002_021f058c` (same symptom surfaced only
-> after two independent bitfield fixes closed everything else; a
-> declaration-order swap of the two offset intermediates produced
-> zero change), and `func_ov002_021eba34` (hit again even when the row
-> pointer was written as a single fused expression from the start,
-> matching the shape `mla` itself implies). Six total restructuring
-> attempts across three functions, zero effect on this specific
-> register pair. Whatever selects which of the two independently-
-> computed offsets gets which scratch register appears to be a pure
-> backend allocation choice, not something the C source shape reaches
-> — the same flavor of resistance as C-55's post-call scheduling note
-> above, but triggered by two co-live `mul` results feeding a shared
-> base pointer instead of a call boundary. Not promoted to a P-wall
-> because no attempt swept the OTHER documented C-63 variants (e.g.
-> forcing the idx offset through a bitfield-typed intermediate) before
-> parking; flagged so the next lane recognizes the signature (mla
-> against a `0x868`-literal stride, two-register-role diff, identical
-> byte count) instead of re-deriving it from zero.
+> **RESOLVED (cm-ov002-unknown-sweep-17, 2026-08-06, mini-item A) — this
+> was three separate outcomes wearing one symptom, not one open
+> question.** The prior round's OBSERVED note (2026-08-04) flagged
+> `func_ov002_0224bd3c`, `func_ov002_021f058c`, and `func_ov002_021eba34`
+> together as one unresolved register-role-swap signature and
+> explicitly suggested forcing the idx offset through a C-63
+> bitfield-typed intermediate as the untried next step. That variant
+> was tried on all three this round, directly. It did not move the
+> register-pairing residual on any of them — but it separated the
+> three into what they actually are:
+> - `func_ov002_021eba34` is already a **documented P-20 member**
+>   (see above), independently landing at the identical 76.3% figure
+>   sweep-6 recorded for it in 2026-07-30. It should have been
+>   recognized and parked on sight; it wasn't, because this note didn't
+>   cross-reference the P-wall catalogue when it was written. Lesson
+>   for future rounds: check the P-wall affected-picks lists, not just
+>   the C-lever catalogue, before writing a fresh OBSERVED note.
+> - `func_ov002_0224bd3c` is a genuinely new instance of **P-23**
+>   (pool-constant register-pairing wall), now promoted from
+>   provisional (n=2) to confirmed (n=3) — see P-23 above for the full
+>   7-variation evidence trail.
+> - `func_ov002_021f058c` was NOT the same wall at all. Its 39.5%
+>   baseline was mostly ordinary, fixable complexity: a genuine
+>   bitfield-typed struct member (matching C-63's established idiom,
+>   extended here to an idx-stride of 0x14 rather than a natural
+>   4-byte `int*` stride — see C-63's extension note below) plus a
+>   C-55 shared-tail `goto` took it to **97.4%**, parked one word short
+>   on an unrelated, narrower residual: a single commutative-operand
+>   swap in a plain `add` (not an `mla`), which resisted 4 more
+>   variations on its own. Not promoted to a P-wall at n=1 — flagged
+>   here for a future round to recognize if it recurs, distinct from
+>   both P-20 and P-23's `mla`-specific signatures.
 
 ### C-67. A 2-way mutually-exclusive `if`/`else if` on equality that resists a goto restructure may still resolve via `switch`
 
@@ -7576,7 +7600,7 @@ instances land.
 **Provenance:** cmatch/ov002-sweep-16, round 2026-08-04
 (`func_ov002_02208118`).
 
-## Permanent P-wall index (21 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
+## Permanent P-wall index (22 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -9711,6 +9735,20 @@ investment.
 cm-ov002-unknown-sweep-5 (2026-07-29), batches 2/3/4/5;
 cm-ov002-unknown-sweep-6 (2026-07-30), batches 2/3/4/5.
 
+> **Independent reconfirmation, cm-ov002-unknown-sweep-17 (2026-08-06),
+> mini-item A.** `021eba34` re-attempted from scratch without
+> cross-referencing this entry first (flagged only as an
+> OBSERVED-NOT-CONFIRMED note under C-63/C-66 by the prior round) —
+> landed at exactly 76.3%, matching this entry's own sweep-6 figure for
+> the same function digit-for-digit. Also tried: an explicit bitfield-
+> typed struct member for a second, unrelated field read elsewhere in
+> the same function (see C-63's idx-stride-struct extension) — zero
+> effect on this residual, consistent with "park on sight" already
+> being the right call. Worth a standing note for future sweeps: grep
+> this entry's affected-picks list before writing a fresh
+> OBSERVED-NOT-CONFIRMED block for a symptom that looks like this one —
+> it may already be catalogued.
+
 ### P-21. Loop/field-extraction-variable register permutation
 
 > **Distinct from P-20.** Both are "near-miss, register-naming-only"
@@ -9812,25 +9850,44 @@ broader loop/extraction-variable permutations — this is specifically
 about which registers hold the two *constants* feeding one `mla`.
 
 **Falsifiable claim:** *some source restructuring fixes the constant's
-register pairing.* **Falsified — 2 members,
-cm-ov002-unknown-sweep-5 (2026-07-29), batch 3:**
+register pairing.* **Falsified — 3 members,
+cm-ov002-unknown-sweep-5 (2026-07-29) batch 3 and
+cm-ov002-unknown-sweep-17 (2026-08-06) mini-item A:**
 
 - `02251bb0` (65.7%, up from 27% after real bugs were fixed: call-result
   variable reuse for early returns, split-shift-reuse).
 - `02253304` (82.9%, up from 26.3%, same fixes applied): identical
   residual family.
+- `0224bd3c` (84.2%): the row-table `(player&1)*0x868` idiom feeding an
+  `mla` whose two pool-loaded constants (stride, table base) AND the
+  masked runtime flag all land in a different r0/r1/r3 pairing than
+  target — a fuller 3-way permutation than the first two members'
+  2-register pairing, but the same underlying phenomenon (the `mla`'s
+  operand-to-register assignment is a backend choice, not a source-level
+  one). **7 independent source variations tried across this member
+  alone and its 2 mini-item siblings, zero effect**: operand-order swap,
+  named `stride` intermediate, named `masked` intermediate, the fused
+  expression (all 4 from cm-ov002-unknown-sweep-16), plus an explicit
+  bitfield-typed struct-member extraction for the surrounding row-entry
+  read (cm-ov002-unknown-sweep-17 — this changed the id/category/flag
+  extraction instructions completely while leaving this exact residual
+  byte-for-byte untouched, confirming it's decoupled from the rest of
+  the function's source shape, not just the `mla` expression's own
+  phrasing).
 
-**Why permanent (for now):** both members reached a high match
-percentage after real logic fixes, isolating the residual cleanly to
-this one pairing choice — but it resisted correction in both cases.
-Small sample (2), so "permanent" here is provisional; re-test if a
-third member turns up.
+**Why permanent:** three independent members, across two sweeps ~10
+days apart, all isolated this exact residual after unrelated real fixes
+raised them to their respective plateaus, and all resisted every
+restructuring tried (7 variations combined). No longer provisional at
+n=2 — the third member is an independent confirmation with the most
+exhaustive single-member variation coverage in the catalogue.
 
-**Affected picks (2):** `02251bb0`, `02253304` (both ov002).
+**Affected picks (3):** `02251bb0`, `02253304`, `0224bd3c` (all ov002).
 
 **Recipe status: NONE.**
 
-**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3.
+**Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3;
+cm-ov002-unknown-sweep-17 (2026-08-06), mini-item A.
 
 ### P-24. Per-player row + idx\*0x14-stride loop register-swap (tentative, P-20-sibling)
 
@@ -9907,6 +9964,85 @@ member.
 **Recipe status: NONE.**
 
 **Provenance:** cm-ov002-unknown-sweep-6 (2026-07-30), batch 5.
+
+### P-27. Post-call scheduling/materialization resists source-level restructuring (family, not one mechanism)
+
+> **A family, not a single wall.** Unlike P-20/P-23's narrow, single
+> instruction-shape signature, this entry covers several DIFFERENT
+> symptoms that share one property: the divergence sits in code that
+> executes immediately after a function call (direct `bl` or indirect
+> `blx`), and none of it responds to source-level restructuring the way
+> the exact same construct does when it's NOT call-adjacent elsewhere
+> in the same function. Filed as one family entry per the project's
+> "don't over-generalize from one batch" caution — future rounds should
+> watch whether a specific sub-symptom (branch-vs-predicate, block
+> reorder, or pool-vs-immediate) earns enough independent members to
+> split into its own precise entry.
+
+**The shape(s), all confirmed cm-ov002-unknown-sweep-17 (2026-08-06),
+mini-item B, building on 2 data points cm-ov002-unknown-sweep-16
+(2026-08-04) flagged under C-55 as OBSERVED-NOT-CONFIRMED:**
+
+1. **Branch-vs-predicate for a guard testing a just-returned value**
+   (`func_ov002_02299c9c`, sweep-16): `if (fn() == 0) goto Y;` kept
+   if-converting to predicated `mov`/`popeq` instead of target's real
+   `beq`, across all 4 variations tried (plain goto, swapped label
+   order, named intermediate, fully-explicit both-arms-goto). The SAME
+   function's FIRST guard (`if (fn == 0) ...`, no intervening call)
+   converted correctly on the first try with the identical technique.
+2. **A second, distinct instance in the same function**
+   (`func_ov002_02299c9c`, sweep-17): after the post-call guard passes,
+   a 3-statement block (`d524[0x8]=0; d524[0x4]++; read d016c[0xd34]`)
+   compiles with a different instruction order/register pairing than
+   target — 2 variations tried (direct expression, named `count`
+   intermediate), zero effect. Everything else in this function,
+   including a second `goto`-based shared-tail restructure for the
+   overall `return 0`/`return 1` convergence, matched cleanly — this
+   isolates the residual to specifically the code right after `blx r0`.
+3. **Pool-constant materialization instead of an immediate op**
+   (`func_ov002_022a8190`, sweep-17): a 16-bit struct field assigned
+   the constant `-1` right after `func_0201d47c(&d)` compiled as a
+   fresh `LDR` pool load of `0xffff`, where target uses `mvn r1, #0`
+   (the same 32-bit-immediate technique that correctly closed an
+   UNRELATED, non-call-adjacent field two statements earlier in the
+   very same function). 3 variations tried (bare `-1`, `int`
+   intermediate, `~0`), zero effect. The rest of the function — the
+   proven `Desc0229e4e8` struct/task-spawn idiom borrowed directly from
+   the already-shipped sibling `func_ov002_0229e4e8` — reproduced the
+   documented 95.0% baseline exactly, isolating this one field's
+   materialization cleanly.
+4. **Pool-constant re-materialization for a repeated field access**
+   (`func_ov002_021d1158`, sweep-17, weaker/indirect evidence): a final
+   `(*(int*)(base+0x810))++;` two calls after the base pointer was last
+   live compiled as a fresh combined `base+0x810` pool constant, where
+   target reloads the plain base and adds `#0x810` as an immediate. 3
+   variations tried (inline repeated expression, whole-function-scoped
+   `base` variable — which also regressed unrelated register allocation
+   elsewhere, a caution of its own — and a call-site-local pointer
+   intermediate), zero effect on this specific choice.
+
+**Why filed as permanent (for now):** 4 independent functions, 2 sweeps
+9 days apart, 3 batches with no cross-talk on the details (sweep-16's
+2 original instances were flagged blind; sweep-17's mini-item B
+targets were dispatched specifically to re-test them and found 2 more
+independently). 12 total restructuring variations combined across all
+4 instances, zero effect on any of them. The unifying, falsifiable-and-
+not-yet-falsified claim: **once past a call boundary, mwcc's scheduler
+and constant-materializer make choices this project's source-level
+toolkit cannot currently reach**, regardless of which specific
+instruction-selection question is at stake.
+
+**Affected picks (4):** `func_ov002_02299c9c` (71.8%, two distinct
+instances), `func_ov002_022a8190` (95.0%), `func_ov002_021d1158`
+(87.2%, weaker evidence — see caveat above).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-ov002-unknown-sweep-16 (2026-08-04), canary
+attempts (2 instances, filed as OBSERVED-NOT-CONFIRMED under C-55);
+cm-ov002-unknown-sweep-17 (2026-08-06), mini-item B (promoted to a
+numbered entry per the standing rule: a 3rd/4th independent instance
+promotes an OBSERVED note).
 
 ## Codegen-inherent edge cases (3 patterns)
 

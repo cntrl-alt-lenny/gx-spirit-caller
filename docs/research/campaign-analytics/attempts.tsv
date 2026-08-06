@@ -122,3 +122,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021d30c8	ov002	152	default	ringbuf-conditional-notify	parked	13.2	reg-alloc	brief-683
 0x022a8190	ov002	152	default	task-struct-init	parked	95.0	pool-const-materialize	brief-683
 0x021cd414	ov002	152	default	ringbuf-branch-dispatch	parked	5.0	unclear	brief-683
+0x0224bd3c	ov002	152	default	row-lookup-guarded-calls	parked	84.2	P-23-confirmed	cm-ov002-unknown-sweep-17
+0x021f058c	ov002	152	default	dual-mul-offset-lookup	parked	97.4	reg-alloc	cm-ov002-unknown-sweep-17
+0x021eba34	ov002	152	default	row-lookup-composite-cmp	parked	76.3	P-20-confirmed	cm-ov002-unknown-sweep-17
+0x021d1158	ov002	152	default	state-toggle-dispatch	parked	87.2	P-27-post-call	cm-ov002-unknown-sweep-17
+0x02299c9c	ov002	152	default	guard-goto-dispatch	parked	71.8	P-27-post-call	cm-ov002-unknown-sweep-17
+0x022a8190	ov002	152	default	task-struct-init	parked	95.0	P-27-post-call	cm-ov002-unknown-sweep-17
