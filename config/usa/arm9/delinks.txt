@@ -1910,7 +1910,7 @@ src/usa/main/func_0201c1d0.s:
 src/usa/main/func_0201c254.s:
     complete
     .text start:0x0201c254 end:0x0201c444
-src/usa/main/func_0201c444.s:
+src/usa/main/func_0201c444.c:
     complete
     .text start:0x0201c444 end:0x0201c50c
 src/usa/main/func_0201c50c.c:
@@ -4680,7 +4680,7 @@ src/usa/main/func_0203e868.s:
 src/usa/main/func_0203e90c.s:
     complete
     .text start:0x0203e90c end:0x0203e95c
-src/usa/main/func_0203e95c.s:
+src/usa/main/func_0203e95c.legacy_sp3.c:
     complete
     .text start:0x0203e95c end:0x0203ea58
 src/usa/main/func_0203ea58.s:
@@ -9690,7 +9690,7 @@ src/usa/main/func_02087118.legacy_sp3.c:
 src/usa/main/func_02087144.c:
     complete
     .text start:0x02087144 end:0x02087174
-src/usa/main/func_02087174.s:
+src/usa/main/func_02087174.legacy_sp3.c:
     complete
     .text start:0x02087174 end:0x02087214
 src/usa/main/func_02087214.c:
@@ -10786,7 +10786,7 @@ src/usa/main/OSi_IrqHandlerDma0.c:
     complete
     .text start:0x020903dc end:0x020903ec
 
-src/usa/main/OSi_PostIrqEvent.s:
+src/usa/main/OSi_PostIrqEvent.legacy.c:
     complete
     .text start:0x020903ec end:0x02090488
 src/usa/main/OS_DefaultIrqHandler.s:
@@ -11402,7 +11402,7 @@ src/usa/main/func_02094bf8.legacy.c:
     complete
     .text start:0x02094bf8 end:0x02094c24
 
-src/usa/main/SNDi_SetTrackParam.s:
+src/usa/main/SNDi_SetTrackParam.legacy.c:
     complete
     .text start:0x02094c24 end:0x02094c58
 
@@ -13315,7 +13315,7 @@ src/usa/main/func_020b4188.s:
 src/usa/main/func_020b4190.s:
     complete
     .text start:0x020b4190 end:0x020b41bc
-src/usa/main/__register_global_object.s:
+src/usa/main/__register_global_object.c:
     complete
     .text start:0x020b4200 end:0x020b4220
 src/usa/main/func_020b4220.c:

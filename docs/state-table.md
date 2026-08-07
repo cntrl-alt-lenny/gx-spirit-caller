@@ -16,8 +16,8 @@ quote. `asm-C` is inline-asm coverage hygiene, counted separately on purpose.
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
 | eur | 340,770 | **14.28%** | 3,904 | 14.45% |
-| usa | 281,576 | **11.81%** | 2,748 | 11.92% |
-| jpn | 281,148 | **11.79%** | 2,756 | 11.90% |
+| usa | 282,428 | **11.84%** | 2,748 | 11.96% |
+| jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
 ## EUR candidates by function size
 
