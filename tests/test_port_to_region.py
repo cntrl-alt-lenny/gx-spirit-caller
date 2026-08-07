@@ -38,6 +38,7 @@ from port_to_region import (  # noqa: E402
     parse_filename_stem,
     parse_symbols_in_source,
     resolve_symbol,
+    resolve_named_source_function,
     symbols_txt_path_for,
     synthesize_data_symbol_name,
     target_stem_for_prefix,
@@ -246,6 +247,28 @@ class TestApplySubstitutions(unittest.TestCase):
             "func_ov002_021b3b30 + func_021b3aaa",
         )
 
+    def test_substitutions_do_not_cascade(self):
+        # The target name of the defined function may also be an EUR name
+        # used by a callee. Both replacements must see the original source;
+        # sequential rewriting would rename the definition a second time.
+        src = "void func_0208725c(void) { func_02087174(); }"
+        resolutions = [
+            Resolution(
+                eur_ref=SymbolRef(text="func_0208725c", kind="func",
+                                  module="main", addr=0x0208725C),
+                target_name="func_02087174", confidence="HIGH", notes="",
+            ),
+            Resolution(
+                eur_ref=SymbolRef(text="func_02087174", kind="func",
+                                  module="main", addr=0x02087174),
+                target_name="func_0208708c", confidence="HIGH", notes="",
+            ),
+        ]
+        self.assertEqual(
+            apply_substitutions(src, resolutions),
+            "void func_02087174(void) { func_0208708c(); }",
+        )
+
 
 class TestComputeOutputPath(unittest.TestCase):
     def test_main(self):
@@ -357,6 +380,34 @@ class TestParseFilenameStem(unittest.TestCase):
             parse_filename_stem("main_020498dc"),
             ("main", "main", 0x020498dc),
         )
+
+
+class TestNamedSourceFunction(unittest.TestCase):
+    """Named EUR source files must resolve through symbols.txt, not the
+    address-keyed filename parser (the #1459 port retryable-error shape)."""
+
+    class _Function:
+        def __init__(self, name, addr):
+            self.name = name
+            self.addr = addr
+
+    def test_registrar_filename_maps_to_double_underscore_symbol(self):
+        eur = {
+            "main": [self._Function("__register_global_object", 0x020B42F4)]
+        }
+        self.assertEqual(
+            resolve_named_source_function("register_global_object", "main", eur),
+            ("__register_global_object", 0x020B42F4),
+        )
+
+    def test_ambiguous_named_filename_fails_closed(self):
+        eur = {
+            "main": [
+                self._Function("Foo", 0x02000000),
+                self._Function("_Foo", 0x02000004),
+            ]
+        }
+        self.assertIsNone(resolve_named_source_function("Foo", "main", eur))
 
     def test_ov_addr_routes_to_overlay(self):
         self.assertEqual(

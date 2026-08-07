@@ -211,7 +211,7 @@ Effort: **MEDIUM**.
 
 **Gate:** `dsd check` green 3 regions + `scope_gate.py --kind naming` PASS + twins-propagated count.
 
-### q-port-residual-fix — recover the 3 tool-error ports + the named residues; no full re-drain [TODO]
+### q-port-residual-fix — recover the 3 tool-error ports + the named residues; no full re-drain [DONE]
 
 The sim=1.0 pool is drained to genuine refusals (see q-port-harvest-complete's Result above). What is left has NAMED causes — fix those; do not re-run the loop:
 
