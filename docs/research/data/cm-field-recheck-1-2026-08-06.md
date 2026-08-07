@@ -8,8 +8,9 @@ restricted to `docs/research/types/`.
 ## Result
 
 **5 of 5 ranked, method-compatible, not-yet-audited fields CONFIRMED**
-(1 with a real refinement to the doc's claim, richer than a simple
-correction). Zero contradictions, zero gaps this round. Two real
+(2 with genuine refinements to the doc's claim — `f_5a8` and `f_5b4` —
+richer than a simple correction in both cases). Zero contradictions,
+zero gaps this round. Two real
 methodology gaps found in the ranking tool itself along the way — see
 Part 1 — which is why the candidate pool ended up smaller and more
 tightly curated than a naive top-N read of the tool's raw output would
@@ -105,6 +106,7 @@ handshake, citing `func_ov002_0222b2e0.c` (reads `==0x7f`) and
 
 **Producer** — `func_ov002_022699a4.s` (still ship-as-.s), two real
 write sites, register-traced to `data_ov002_022ce288` via `_LIT0`:
+
 ```asm
 .L_4bc:                        ; entering active state
     ldr r1, _LIT0
@@ -119,6 +121,7 @@ write sites, register-traced to `data_ov002_022ce288` via `_LIT0`:
 ```
 
 **Consumer** — both doc-cited files re-verified fresh (not just trusted):
+
 ```c
 /* func_ov002_0222b2e0.c */
 switch (*(int *)(data_ov002_022ce288 + 0x5a8)) {
