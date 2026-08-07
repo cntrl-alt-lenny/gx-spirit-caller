@@ -16,8 +16,8 @@ quote. `asm-C` is inline-asm coverage hygiene, counted separately on purpose.
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
 | eur | 333,810 | **13.99%** | 3,904 | 14.15% |
-| usa | 281,576 | **11.81%** | 2,748 | 11.92% |
-| jpn | 281,148 | **11.79%** | 2,756 | 11.90% |
+| usa | 282,428 | **11.84%** | 2,748 | 11.96% |
+| jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
 ## EUR candidates by function size
 
@@ -41,8 +41,8 @@ Shipped `.text`: 337,714 B · remaining `.text`: 2,034,946 B · denominator: 2,3
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 161,052 | 3.37% |
-| Named-struct | 55,204 | 1.16% |
+| Typed-array | 162,884 | 3.41% |
+| Named-struct | 57,076 | 1.19% |
 | *(total data bytes)* | 4,776,528 | |
 
 `Typed-array` counts any file-scope array declaration, including opaque
