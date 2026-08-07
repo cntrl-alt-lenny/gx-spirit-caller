@@ -45,7 +45,12 @@ typedef struct DuelStateSingleton {
     int            f_d50;         /* +0xD50  guard flag (nonzero = skip) */
     int            f_d54;         /* +0xD54  guard flag (set 1 in blocking states, checked at loop entry) */
     /* +0xD58 – +0xD63  gap */
-    int            f_d64;         /* +0xD64  assigned arg+0xd; compared to 0xb (mode code) */
+    int            f_d64;         /* +0xD64  assigned arg+0xd; compared to 0xb (mode code) in the doc's
+                                      originally-cited sources, and separately to 0xc in
+                                      func_ov002_02262994.s's f_d20==5 case (gated behind f_d50!=0;
+                                      ==0xc -> f_d20++, else f_d54=1 && f_d20--) -- a second mode-code
+                                      value read by a consumer outside the original citation set, not a
+                                      contradiction (q-producer-consumer-sample-2, cm-field-recheck-1) */
     /* +0xD68 – +0xD93  gap */
     int            f_d94;         /* +0xD94  compared to arg (upper bound check) */
     /* +0xD98 – +0xD9B  gap */
@@ -280,6 +285,8 @@ accessed directly without a getter.
 - `func_ov002_021ff9a8`, `022028ac`, `02287618` — tests +0xCF8 (duel phase)
 - `func_ov002_02266650` — tests +0xD38 against 6
 - `func_ov002_0225929c`, `022598d0`, `02259834`, `022593f4` — reads +0xD48/D4C/D50/D64
+- `func_ov002_02262994` — reads +0xD20/D50/D54/D64 (f_d20's 5-case switch arm; f_d64 compared to
+  0xc, not 0xb -- see the +0xD64 field comment above)
 - `func_ov002_0226b204` — uses +0xCEC as arg
 - `func_ov002_0226bad0` — uses +0xD94 as bound
 - `func_ov002_021b08a8` — dispatches via fn ptr at +0xD18
