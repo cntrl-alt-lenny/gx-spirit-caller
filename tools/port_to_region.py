@@ -912,7 +912,8 @@ def repair_rename_collisions(
 
         assignment: list | None = None
 
-        def search(index: int, chosen: set[str], picks: list) -> bool:
+        def search(index: int, chosen: set[str], picks: list,
+                   candidate_lists: list[list] = candidate_lists) -> bool:
             nonlocal assignment
             if index == len(candidate_lists):
                 assignment = list(picks)
