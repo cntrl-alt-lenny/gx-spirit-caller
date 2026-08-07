@@ -943,7 +943,7 @@ Carry **C-66** forward in every dispatch prompt alongside C-44/C-55/C-63/C-64/C-
 
 **Gate:** as `cm-c66-resweep` above.
 
-### cm-ov002-unknown-sweep-17 — worktree-parallel sweep at full scale, C-67 in the lever set [TODO]
+### cm-ov002-unknown-sweep-17 — worktree-parallel sweep at full scale, C-67 in the lever set [DONE]
 
 Sweep-16 ran single-lane and stopped at 12 attempts / 3 ships — the same ~25% rate as sweeps 13-15 (27/24/26 ships), so the shortfall was scale, not yield. This round: the ⚡ WORKTREE-PARALLEL SWEEP PROTOCOL from this queue's header, at full scale. **Explicit tranche: 100 candidates, 5 batch worktrees × 20, partition written into the PR body.** Same 149-512 B ov002 band. Pool pull: `wall_aware_headroom.py --json --exclude-attempted`, sorted by `text_size` — then **cross-check the pull against the per-candidate park tables in the `docs/research/cm-ov002-unknown-sweep-9` … `-15` docs before dispatch**: attempts.tsv holds only ~61 of the ~700 already-attempted (the worktree sweeps never wrote it — `q-attempts-ledger-backfill` on the codex-scaffolder lane is backfilling in parallel), so a naive `--exclude-attempted` pull WILL resurface already-diagnosed walls. Park every attempt via `park_one.py` so this round's parks ARE recorded; expect append-side merge traffic on attempts.tsv from the backfill lane — rebase before final push.
 
@@ -956,3 +956,23 @@ Lever set for every dispatch prompt (verbatim citations — look each up in code
 Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/branch self-check (it caught 4/5 misdispatches in sweep-15). STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever comes first. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-files-added == delinks-activations-flipped count check; `git restore assets/` after any `--clean` run — never a bare `git add -A`. Report shipped/attempted vs the ~25% baseline + before/after `wall_aware_headroom.py` counts.
+
+> **DONE 2026-08-06.** 42/100 shipped, 6,960 bytes — the campaign's
+> best round yet (prior best: sweep-12, 40/100). Mini-item A separated
+> one shared symptom into three real outcomes (P-20 reconfirmation, a
+> new P-23 member now promoted from provisional, and a genuine C-63
+> extension that closed a park to 97.4%). Mini-item B promoted the
+> post-call-scheduling family to **P-27** with a 4th instance. The
+> P-wall-catalogue cross-check (not just attempts.tsv) caught 46
+> already-diagnosed candidates before dispatch — the round's
+> highest-value new process step. Two dispatch mistakes (stale pool
+> data reused for one batch's list; 21 orphaned `.s` files across 3
+> batches) were caught and corrected transparently during
+> consolidation, neither causing data loss. Substantial catalogue
+> growth: 3 C-63 refinements, 2 new C-65 counter-recipes, an
+> independently-confirmed C-66 extension, 3 C-55 refinements, a C-67
+> generalization, 2 new entries (C-68/C-69), and a corrected P-26
+> mischaracterization where 3 batches independently rediscovered an
+> already-9-member wall without checking the catalogue first — now a
+> recurring failure mode worth a standing pre-dispatch check. See
+> [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
