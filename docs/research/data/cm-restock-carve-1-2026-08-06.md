@@ -33,6 +33,52 @@ of real new bytes shipped this wave. Measured against a freshly
 re-baselined `git stash` snapshot of this exact branch point
 (`origin/main` at `c35d49d8d`).
 
+## Per-symbol reconciliation table
+
+All 31 shipped symbols, module `ov006`. Every row is non-const (all
+address ranges are `.data`, one exception noted; `.data`/`.bss`
+placement is delinks.txt ground truth, never asserted from the C side)
+and non-static. "Evidence" cites each symbol's own primary proof basis
+(full detail in its own file's header comment and in Parts 2-4 below).
+
+| Symbol | Address | Size | Section | Type | Evidence |
+|---|---:|---:|---|---|---|
+| `data_ov006_021cbb08` | `0x021cbb08` | 24 | `.data` | `Ov006StateCb[6]` | Real bytes: 5 fn-ptr words (each a real `kind:function` symbol in `symbols.txt`) + NULL sentinel |
+| `data_ov006_021cbb20` | `0x021cbb20` | 24 | `.data` | `Ov006StateCb[6]` | Same as above; symbol newly declared (was comment-only in `ov006_core.h`) |
+| `data_ov006_021cbb38` | `0x021cbb38` | 24 | `.data` | `Ov006StateCb[6]` | Same pattern; `ov006_core.h` line 77 pre-declared |
+| `data_ov006_021cbb74` | `0x021cbb74` | 24 | `.data` | `Ov006StateCb[6]` | Same pattern; `ov006_core.h` line 73 pre-declared |
+| `data_ov006_021cbb8c` | `0x021cbb8c` | 36 | `.data` | `Ov006StateCb[9]` | Same pattern (8 fn-ptrs + NULL); `ov006_core.h` line 75 pre-declared |
+| `data_ov006_021cbbb0` | `0x021cbbb0` | 24 | `.data` | `Ov006StateCb[6]` | Same pattern; `ov006_core.h` line 71 pre-declared |
+| `data_ov006_021cc034` | `0x021cc034` | 8 | `.data` | `Ov006Rect021cc034` | `relocs.txt`: 2 pool-load relocs to this symbol; consumer `func_ov006_021be948.s` rect test |
+| `data_ov006_021cc08c` | `0x021cc08c` | 20 | `.data` | `Ov006PosRow021cc08c[5]` | `relocs.txt`: 1 load; consumer `func_ov006_021c0dc8.s`, same idiom as shipped `Ov006PosRow021cc03c` |
+| `data_ov006_021cc0c8` | `0x021cc0c8` | 20 | `.data` | `Ov006PosRow021cc08c[5]` | `relocs.txt`: 1 load; sibling of `021cc08c`, same consumer |
+| `data_ov006_021cc0dc` | `0x021cc0dc` | 24 | `.data` | `RecordOv006_021cc588[2]` | `relocs.txt`: 1 load (`_LIT5`); reuses shipped typedef verbatim, consumer `func_ov006_021bd8ac.s` |
+| `data_ov006_021cc118` | `0x021cc118` | 36 | `.data` | `Ov006PosRow021cc118[9]` | `relocs.txt`: 1 load; consumer `func_ov006_021c0c14.s`, loop-bound-proven (9 iters) |
+| `data_ov006_021cc164` | `0x021cc164` | 84 | `.data` | `Ov006HitRect021cc164[7]` | `relocs.txt`: 1 load; 1 of a 6-table family, `func_ov006_021be948.s` switch, `mov r6,#0x7` |
+| `data_ov006_021cc1b8` | `0x021cc1b8` | 84 | `.data` | `Ov006HitRect021cc164[7]` | `relocs.txt`: 1 load; sibling of `021cc164`, same family/switch |
+| `data_ov006_021cc268` | `0x021cc268` | 96 | `.data` | `Ov006HitRect021cc164[8]` | `relocs.txt`: 1 load; same family, default/case-4 arm |
+| `data_ov006_021cc2c8` | `0x021cc2c8` | 108 | `.data` | `Ov006HitRect021cc164[9]` | `relocs.txt`: 1 load; same family, case 0/3 arm |
+| `data_ov006_021cc334` | `0x021cc334` | 108 | `.data` | `Ov006HitRect021cc164[9]` | `relocs.txt`: 1 load; same family, case 5 arm |
+| `data_ov006_021cc3a0` | `0x021cc3a0` | 108 | `.data` | `RecordOv006_021cc588[9]` | `relocs.txt`: literal-pool loads at `0x021bdcb8-cc`; reuses shipped typedef, `func_ov006_021bd8ac.s` state 0/3 |
+| `data_ov006_021cc40c` | `0x021cc40c` | 108 | `.data` | `RecordOv006_021cc588[9]` | Same pool region; sibling of `021cc3a0`, state 2 arm |
+| `data_ov006_021cc618` | `0x021cc618` | 180 | `.data` | `Ov006HitRect021cc164[15]` | `relocs.txt`: 1 load; same 6-table family, case 2 arm, largest member |
+| `data_ov006_021cdddc` | `0x021cdddc` | 16 | `.data` | `short[8]` | `relocs.txt`: 1 load (from `0x021c48dc`); consumer `func_ov006_021c480c.c`, bounded index 0-7 |
+| `data_ov006_021cddfc` | `0x021cddfc` | 24 | `.data` | `TouchBoxEntry[2]` | `relocs.txt`: 1 load (from `0x021c450c`); coordinates match DS touch-screen bounds |
+| `data_ov006_021cde14` | `0x021cde14` | 24 | `.data` | `TouchBoxEntry[2]` | `relocs.txt`: 1 load (from `0x021c4514`); sibling cascade table, same consumer |
+| `data_ov006_021cde48` | `0x021cde48` | 96 | `.data` | `TouchBoxEntry[8]` | `relocs.txt`: 1 load (from `0x021c43b8`); coordinates exactly reproduce shipped `data_ov006_021cdf88`'s own `(x,y)` fields |
+| `data_ov006_021cdea8` | `0x021cdea8` | 224 | `.data` | `DuelIconEntry[8]` | `relocs.txt`: 1 load (`_LIT1`); reuses shipped typedef, same offset/property-ID mapping as `021cdf88`'s consumers |
+| `data_ov006_021ce084` | `0x021ce084` | 36 | `.data` | `Ov006HitRect021ce084[3]` | `relocs.txt`: 1 load (from `0x021c6638`); own typedef (same shape as `Ov006HitRect021cc164` but a different consumer/subsystem) |
+| `data_ov006_021ce0a8` | `0x021ce0a8` | 196 | `.data` | `DuelIconEntry[7]` | `relocs.txt`: 1 load (from `0x021c60f4`); reuses shipped typedef verbatim |
+| `data_ov006_021ce274` | `0x021ce274` | 12 | `.data` | `kv_t[3]` | `relocs.txt`: 2 loads (both twin functions); reuses shipped typedef, completes the 9-table family (9/9) |
+| `data_ov006_021ce4a4` | `0x021ce4a4` | 60 | `.data` | `short[30]` | `relocs.txt`: 1 load (`_LIT9`); computed-stride access, ruled out as `Ov006AudioBank` despite matching size |
+| `data_ov006_021ceb04` | `0x021ceb04` | 12 | `.data` | `signed char[12]` | `relocs.txt`: 2 loads; identical consumer idiom to shipped sibling `data_ov006_021ceb2c` |
+| `data_ov006_0224f2ac` | `0x0224f2ac` | 60 | `.bss` | `Ov006AudioBank` | No ROM bytes (`.bss`) — ground truth is `func_ov006_021b40ac.s`'s `bl func_0202adf8`+`bl func_0202ae1c` call-chain, matching all 6 already-shipped family members |
+| `data_ov006_0224f344` | `0x0224f344` | 60 | `.bss` | `Ov006AudioBank` | Same proof mechanism; caller `func_ov006_021b4f68.s` |
+
+**Total: 31 symbols, 1,960 bytes** (29 `.data` = 1,840 B + 2 `.bss` = 120
+B). Matches the Typed-array/Named-struct deltas exactly per the
+reconciliation above.
+
 ## Part 0: a new byte-extraction discipline for `.data`/`.rodata`
 
 Unlike `.bss` (reserved space, no ROM bytes), `.data`/`.rodata`
@@ -130,7 +176,7 @@ files.
   cleanly, completing a 9-table lookup family (case selectors 1-9 all
   now resolved) — see Part 5 for the other 4 members of this same
   family, which did NOT ship.
-- Plus 2 standalone tables: `data_ov006_021cdddc` (`short[8]` glyph
+- Plus 3 standalone tables: `data_ov006_021cdddc` (`short[8]` glyph
   lookup) and `data_ov006_021ce4a4` (`short[30]` decimal score table,
   ruled out as an `Ov006AudioBank`-family member despite matching size
   — computed-stride halfword access, not fixed-offset field access,
