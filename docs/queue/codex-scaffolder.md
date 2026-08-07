@@ -440,7 +440,7 @@ Two things to fix, and the second matters more than the first:
 
 **Gate:** `python -m pytest tests/test_semantic_contradiction_check.py -q` green + a regression test using the current observed-value-set form of `DuelStateEnums.md` as its fixture + a live `python3.13 tools/semantic_contradiction_check.py` run against the tree that **exits cleanly** and reports counts including any UNPARSEABLE rows. Paste the live run.
 
-### q-attempts-ledger-backfill — attempts.tsv is blind to ~640 worktree-sweep parks; backfill it and make recording structural [TODO]
+### q-attempts-ledger-backfill — attempts.tsv is blind to ~640 worktree-sweep parks; backfill it and make recording structural [DONE]
 
 `docs/research/campaign-analytics/attempts.tsv` holds only ~61 excludable rows for ov002's 149-512 B band, but sweeps 9-15 parked ~640+ candidates in worktree rounds that never wrote the ledger — so `wall_aware_headroom.py --exclude-attempted` silently resurfaces already-diagnosed walls (this burned a candidate pull at least once, and sweep-17 is hand-cross-checking park tables THIS round to work around it — your backfill removes that tax from every future round). Backfill: harvest the per-candidate park tables from the `docs/research/cm-ov002-unknown-sweep-9` … `-15` docs and the sweep PR bodies (#1404 #1410 #1414 #1419 #1425 #1431 #1435) into attempts.tsv rows: address, band, verdict, park class where recorded, source ref. (Sweep-16's 12 rows are already in the tsv under brief-683 — a format reference, and proof the single-lane path records correctly.) Mechanical extraction with per-source count reconciliation. CANARY: reconcile ONE sweep doc's park count against its backfilled rows exactly before processing the rest. **Coordinate:** `cm-ov002-unknown-sweep-17` appends live rows in parallel — rows are append-only, so rebase before final push and the merge is mechanical. Then make recording structural: verify `park_one.py` writes attempts.tsv correctly from batch worktrees, fix + test if not.
 
@@ -448,7 +448,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (stale-
 
 **Gate:** `python -m pytest -q tests` green + before/after row counts per source + a 10-row spot-check table (random backfilled rows traced to their source doc) in the PR body.
 
-### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [TODO]
+### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [DONE]
 
 The producer/consumer lens cannot audit flags-word/bitmask fields — 3 recurrences now (`GlobalData02104bac.flags` CONSUMER-ONLY with 3 unchased hypotheses: unmatched init fn / hardware latch / bulk Fill32; `BgCfg.f14`/`f18` excluded from sample-2 as untestable), and `field_exposure_census.py`'s own coverage note names the same blind spots. Build a **finder, not a judge**: given a field (base symbol + offset + width), surface candidate producer sites of the broadened shapes — (a) masked read-modify-write (`ldr` → `orr`/`bic`/`and` → `str` on the same base+offset), (b) bulk fills whose range covers the offset (memset / MI_CpuFill / Fill32 / DMA), (c) SDK-call writes (a call taking the field's address or its containing block). Output: ranked candidate sites with shape tags; the lens stays the verdict-maker. CANARY: `GlobalData02104bac.flags` — the tool must either surface at least one concrete producer-site hypothesis for it or honestly report none WITH the searched-shape list; paste that run. Then run it on the 4 known blocked fields and report.
 
