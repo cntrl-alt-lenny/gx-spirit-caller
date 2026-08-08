@@ -874,3 +874,11 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02055f84	main	104	default	small dispatcher	parked	84.6	P-20-r0-vs-ip	cm-main-tier-sweep-2-batch5
 0x02046b3c	main	108	default	small dispatcher	parked	33.3	P-32-scope-caveat	cm-main-tier-sweep-2-batch5
 0x020577d8	main	108	default	small dispatcher	parked	7.4	P-31	cm-main-tier-sweep-2-batch5
+0x0205c7f4	main	60	default	loop	parked	33.3	P-31	cm-main-tier-sweep-3-batch1
+0x02054db8	main	68	legacy_sp3	loop	parked	19.1	P-36-postinc-pair	cm-main-tier-sweep-3-batch1
+0x02084dc0	main	76	legacy_sp3	loop	parked	89.5	P-36-poolhoist	cm-main-tier-sweep-3-batch1
+0x02054ca8	main	80	legacy_sp3	loop	parked	12.5	P-36-postinc-pair	cm-main-tier-sweep-3-batch1
+0x020b007c	main	188	legacy	guard chain	parked	39.6	P-20-regalloc-plus-imm-fold	cm-main-tier-sweep-3-batch1
+0x0208ffec	main	92	legacy	guard chain	parked	8.3	P-20-r4-vs-lr	cm-main-tier-sweep-3-batch1
+0x0208ddec	main	96	default	guard chain	parked	8.3	P-36-reginterleave	cm-main-tier-sweep-3-batch1
+0x020a3308	main	52	default	other	parked	53.9	P-36-poolhoist	cm-main-tier-sweep-3-batch1
