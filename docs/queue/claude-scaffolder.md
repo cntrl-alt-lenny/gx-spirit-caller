@@ -1359,3 +1359,23 @@ CANARY: the FIRST carve goes through the FULL gate (3-region SHA1) before any ba
 Standing rules: **NEVER hand-transcribe byte content — generate every C initializer from a script reading the real bytes, every wave, no exceptions**; per-symbol reconciliation table (one row per shipped symbol: address, size, section, type, evidence — wave 1's fix pass had to add this retroactively, so build it as you go); `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original, never a sibling's convention; check `delinks.txt` ground truth before choosing sections (`&symbol` always relocates to `.data`; literal-cast pointer arrays need `void *const` for `.rodata`); never assume mwcc preserves same-TU global declaration order — verify the built layout directly; keep a non-4-byte split inside ONE TU; never shift an already-matched consumer's relocation boundary.
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ `gate3` piped through `tee` MASKS its exit code (both lanes hit this last round) — read the log, do not trust exit 0. Paste the three sha1 lines VERBATIM + the Named-struct/Typed-array before/after lines from the state-table regen + the per-symbol reconciliation table in the PR body. Coordinate the full gate with Lenny: the mwcc toolchain serialises MACHINE-WIDE, and the CC Decomper is running a 5-worktree consolidated `--clean` gate this round — never run yours while theirs is live.
+
+### cm-restock-carve-3 — the misaligned remainder, and whether the alignment wall is really a wall [TODO]
+
+`cm-restock-carve-2` (#1473) carved 58/58 of main's struct candidates (16,412 B) — a genuine 100%, because every main candidate is 4-aligned at both ends. Waves 1 and 2 have now taken the census's easy geometry: `ov006`'s 33 and `main`'s 58.
+
+What remains is the harder half, and it is worth attacking deliberately rather than skimming for more 4-aligned wins. The census (`docs/research/data/cm-data-restock-census-2026-08-03.md`) holds **35 struct candidates that are 2-byte misaligned**, spread across ov006/ov011/ov016/ov017/ov004/ov022/ov005/ov019/ov000/ov009/ov012 — exactly the population wave 1's ALIGNALL(2) finding declined, and the reason wave 2 could report 100%.
+
+Two parts, in order:
+
+1. **Sweep the remaining 4-ALIGNED candidates first** (whatever the census still holds outside ov006 and main). Same method that worked twice: cross-reference each module's own header, script every initializer from the real bytes, per-symbol reconciliation table built as you go. This is the reliable yield and it funds the round.
+
+2. **Then take ONE bounded run at the misaligned class.** The wall is documented (`docs/research/ov004-odd-aligned-slot-recipe.md`) and three source-level workarounds were falsified in wave 1 — do NOT re-run those three. The open question is different: is the +2 cascade avoidable by **TU composition** rather than by source form? Specifically, does placing a misaligned symbol so that its containing TU's total span lands 4-aligned (pairing two misaligned symbols, or absorbing the odd tail into an adjacent already-carved symbol's TU) avoid the cascade? Test that on exactly ONE candidate pair, byte-verify, and report the answer either way. **A clean negative is a full success here** — it would let us mark those 35 candidates permanently declined with evidence instead of leaving them as perpetual "maybe" rows, which is worth as much as carving them.
+
+⚠️ Do NOT split a non-4-byte boundary across two TUs (`feedback_non-4-byte-tu-split-linker-gap`) — that is the thing that produces a real linker gap. The experiment is about TU *composition*, not splitting.
+
+CANARY: the first carve of part 1 goes through the FULL gate (3-region SHA1) before any batching; the part-2 experiment is byte-verified on its own before any conclusion is written.
+
+Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify built layout directly rather than assuming declaration order.
+
+**Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is not `gate3.py`'s — READ THE LOG. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the part-2 verdict with its byte evidence. Regenerate `docs/research/README.md` before committing — #1473 was blocked on exactly that (its index row was generated before the doc's H1 was reworded).

@@ -64,15 +64,33 @@ def check_preflight(text: str) -> tuple[bool, str]:
 
 
 _EXPECTED_RE = re.compile(
-    r"(?:^|[;&\s])(?:EXPECT|EXPECTED_WORKTREE)\s*=\s*['\"]?"
+    # `EXPECT=...` (POSIX) or `$EXPECT = ...` (PowerShell).
+    r"(?:^|[;&\s(])\$?(?:EXPECT|EXPECTED_WORKTREE)\s*=\s*['\"]?"
     r"(?P<path>[^'\";\s]+)"
 )
 _WORKTREE_TARGET_RE = re.compile(
     r"\bgit\s+worktree\s+add\s+(?:--[^\s]+\s+)*(?P<path>[^\s;&]+)"
 )
+# Two accepted spellings of the same assertion. Requiring only the POSIX form
+# was itself a void-work generator: the Codex lanes run PowerShell, so a lane
+# handed a bash-only guard transliterates it, and on 2026-08-08 one of them
+# Windows-ified the path while writing it -- `git rev-parse --show-toplevel`
+# ALWAYS emits forward slashes on Windows, so the comparison was false-negative
+# and the lane stopped after 17 seconds in the correct worktree. Accept the
+# PowerShell form natively so briefs can ship a guard the lane can run as-is.
 _ROOT_ASSERTION_RE = re.compile(
+    # POSIX:      [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ]
     r"\$\(\s*git\s+rev-parse\s+--show-toplevel\s*\)\s*"
     r"['\"]?\s*={1,2}\s*['\"]?\$(?:EXPECT|EXPECTED_WORKTREE)\b"
+    r"|"
+    # PowerShell: if ((git rev-parse --show-toplevel) -ne $EXPECT) { ... }
+    r"\(\s*git\s+rev-parse\s+--show-toplevel\s*\)\s*"
+    r"(?:\.Replace\([^)]*\)\s*)?"
+    r"-(?:eq|ne)\s*\$(?:EXPECT|EXPECTED_WORKTREE)\b"
+)
+# A backslash in the expected path cannot match git's forward-slash output.
+_BACKSLASH_PATH_RE = re.compile(
+    r"(?:^|[;&\s(])(?:\$)?(?:EXPECT|EXPECTED_WORKTREE)\s*=\s*['\"]?[^'\";\s]*\\"
 )
 
 
@@ -100,6 +118,12 @@ def check_location_guard(text: str) -> tuple[bool, str]:
         return False, "no repo-root equality assertion against EXPECT with a hard stop"
     if not expected_paths:
         return False, "repo-root comparison has no explicitly assigned EXPECT path"
+    if _BACKSLASH_PATH_RE.search(text):
+        return False, (
+            "EXPECT uses backslashes — `git rev-parse --show-toplevel` always "
+            "emits forward slashes on Windows, so this guard false-negatives "
+            "and stops a lane that is in the CORRECT worktree"
+        )
     if targets and not any(
         _path_basename(expected) == _path_basename(target)
         for expected in expected_paths

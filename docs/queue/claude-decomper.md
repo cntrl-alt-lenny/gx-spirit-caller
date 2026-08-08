@@ -1015,3 +1015,21 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever 
 > own warning, fixed, and re-verified. 9 new codegen-walls.md entries
 > (C-70–C-76, P-30–P-33) plus a C-55 boundary extension. See
 > [`cm-main-tier-sweep-1-2026-08-08.md`](../research/cm-main-tier-sweep-1-2026-08-08.md).
+
+### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [TODO]
+
+`cm-main-tier-sweep-1` (#1472) shipped 71/100 (6,720 B), the campaign's best single round, and moved EUR natural-C 14.28% → 14.56%. Continue on the same selector: `docs/research/main-small-tier-worklist.md`, **0x02040000+** range (0x02000000–0x0203ffff stays the Scaffolder's), 100 candidates, 5 batch worktrees × 20, partition frozen before dispatch.
+
+**Read wave 1's rate honestly and design this round to test it.** The 71% came from a homogeneous slice — 100/100 attempts were shape=`guard chain`, 40–128 B — and that band was already 71.8% converted project-wide before the round, so wave 1 measured a favourable, pre-filtered population rather than the tier at large. That makes the NEXT question the valuable one: **does the rate hold outside the guard-chain band?** Split this tranche deliberately: **50 candidates continuing the guard-chain band** (the known-good seam) and **50 drawn from the other shape classes and/or the next size band up**, chosen from the worklist's own columns. Report the two sub-rates SEPARATELY in the PR body. A large gap between them is the most useful measurement this lane can produce right now, and a low rate on the second 50 is a SUCCESS if it is honestly measured — it tells us where the tier's real floor is.
+
+Use the levers from wave 1's own catalogue additions (C-70…C-76, P-30…P-33 landed in #1472) alongside the standing set: C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67. ROUTE BEFORE YOU DRAFT on every candidate.
+
+⚠️ **`park_one.py` still does not record from batch worktrees** — wave 1 hit a zero-line `attempts.tsv` diff from all five batches and had to backfill 101 rows by hand. The structural fix is in flight on the Codex Scaffolder lane (`#1467`), so assume it is still broken: plan the backfill up front, recompute every `text_size` from `delinks.txt` ground truth rather than copying batch self-reports, and say in the PR body which method you used.
+
+⚠️ **Fix wave 1's schema drift while you are here:** its 29 parked rows put a wall descriptor in the `shape` column (`P-20-bf94-result-register`, `predication-resistance-new`, …) instead of a shape class; `park_class` is the column for that. Use the correct columns this round and note the wave-1 rows that need correcting.
+
+⚠️ **Headline arithmetic:** wave 1's "71/100, 6,720 B" mixes bases — 6,720 B covers 72 functions (71 batch + the canary); the 71 alone are 6,632 B. State a single basis this round.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — wave 1 was bitten by exactly this and caught it only by reading the log. READ THE LOG. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, before/after `wall_aware_headroom.py` counts, and the two sub-rates.
