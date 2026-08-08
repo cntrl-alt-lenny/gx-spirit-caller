@@ -290,12 +290,18 @@ this section says how the brain must *evidence* it.
 5. **End-of-round checklist — ticked as the brain's last action**, in
    the doc-PR header alongside the state block. Any unticked box
    blocks yielding the turn:
-   - [ ] PR-A gate tail pasted; [ ] PR-B gate tail pasted
-   - [ ] doc-PR closes every merged brief AND queues the next two by
-     number (n even = scaffolder, n+1 odd = decomper) in AGENTS.md
-   - [ ] exactly TWO kickoffs drafted, each ending "push, run
-     `gh pr create`, reply with the PR URL"
-   - [ ] docs/state.md updated
+   - [ ] every merged PR's gate tail pasted (one box per PR this round)
+   - [ ] doc-PR closes every merged item AND re-seeds each active lane's
+     queue file under `docs/queue/` (one file per lane)
+   - [ ] **one complete paste-ready message per active standing lane that
+     needs dispatch — normally all four** (Claude Code Decomper, Claude
+     Code Scaffolder, Codex Decomper, Codex Scaffolder), all in the SAME
+     final response, each ending "push, run `gh pr create`, reply with
+     the PR URL". A lane is skipped only when it is genuinely mid-flight
+     or has nothing to dispatch, and the response says so explicitly.
+     Never defer a message ("ready elsewhere" / "will send next") — the
+     message is the deliverable.
+   - [ ] docs/state.md updated, including its `main-sha:` anchor
 
    (The round is itself a multi-step task; the card shows 4.8
    finishing incidentals and silently dropping the back-half

@@ -232,3 +232,22 @@ PR #1436's census fix surfaced **63 functions per region at HIGH sibling-confide
 Effort: **MEDIUM**.
 
 **Gate:** if anything ships, per-region `ninja sha1` + `python tools/gate3.py --scope all`; otherwise doc-only + `python -m pytest -q tests` green. The census/worklist table pasted in the PR.
+
+### q-census-methodology-fixes — close the two field_exposure_census.py gaps #1465 discovered [TODO]
+
+`cm-field-recheck-1` (#1465) surfaced two methodology gaps in the field
+exposure census while using it to rank fields — see `tools/field_exposure_census.py`.
+They were recorded in that round's research doc but never queued; the ranking is
+now a standing input to the producer/consumer lens, so a gap here silently
+mis-ranks what gets audited.
+
+1. **Missing base-symbol detection.** The census counts explicit named C members and, per its own coverage note (`field_exposure_census.py:241`), misses access sites where the base symbol is not detected. Establish mechanically which base-symbol spellings are missed (start from the documented symbols in `docs/research/types/` and `docs/research/constants/`), then close the gap. Report a before/after site count per affected field — an honest "the gap is smaller than believed, here are the numbers" is a fine outcome.
+2. **Decimal-offset field-name matching.** Field names are matched against hex-offset spellings; sites that reference the same field by its decimal offset are not joined to it. `cm-field-recheck-1` hit this concretely — `func_ov002_021f85f8.c:7` uses `+ 1460` for `+0x5b4`, and `func_ov002_021e2b3c.c:36` writes `f1492 = 0` for the same field. Both are real access sites the census does not count.
+
+⚠️ **Do NOT simply match any bare decimal equal to the offset.** The Codex Scaffolder's `field_producer_finder.py` has the inverse bug from exactly this shortcut: its `#?{offset}\b` fallback matches `cfg.unrelated = cfg.unrelated | 20;` for offset `0x14` because `20 == 0x14`, promoting an unrelated write to a scored producer hypothesis. Require a member-access or pointer-arithmetic context. Coordinate: that lane is fixing its side under `q-producer-anchoring` this round — compare approaches and land the same rule on both sides rather than two divergent heuristics.
+
+CANARY: the two `cm-field-recheck-1` sites above must be counted after the fix and must NOT bring unrelated `1460`/`1492` literals with them — paste both the positive and the negative check.
+
+Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-ranked audit inputs).
+
+**Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + a regression per gap (including the negative case above) + before/after per-field site counts, with any field whose RANK changes called out explicitly.

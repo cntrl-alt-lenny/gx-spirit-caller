@@ -976,3 +976,21 @@ Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/b
 > already-9-member wall without checking the catalogue first — now a
 > recurring failure mode worth a standing pre-dispatch check. See
 > [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
+
+### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [TODO]
+
+**Why this module and not another ov002 sweep.** `attempts.tsv` is mid-repair: #1467 (open, changes requested) would record ~19 never-attempted candidates as `parked` and writes a module key (`overlay002`) the selector cannot match (`ov002`). Until that lands, an ov002 pull driven by `--exclude-attempted` is selecting against a corrupted exclusion set. This round therefore sweeps **`main`**, selected from a committed worklist rather than from the ledger — so the round cannot be poisoned by the repair in flight. (`main` is also the one module where `park_one.py`'s module bug does not bite: writer and consumer both say `main`.)
+
+**Selector: `docs/research/main-small-tier-worklist.md`**, the ranked output of `q-small-tier-worklist` — address, size, shape class (trivial stub / tail-call forwarder / guard chain / small dispatcher / loop / other), header provenance, and whether a matched sibling of similar shape exists. Take the **0x02040000+** range (that worklist is split so 0x02000000–0x0203ffff belongs to the Scaffolder lane). Work the shapes brief 661 measured as tractable FIRST — stubs and forwarders — then guard chains. Brief 661 put this tier's floor at 35–55%, well above ov002's steady ~25%, and it has never been swept at scale.
+
+**Tranche: 100 candidates, 5 batch worktrees × 20**, per the ⚡ WORKTREE-PARALLEL SWEEP PROTOCOL in this queue's header, partition written into the PR body. Cross-check your pull against `main`'s prior attempts in the sweep docs before dispatch — but do NOT rely on `--exclude-attempted` as the primary filter this round; the worklist plus the park docs are your selector, and say so in the PR body.
+
+Keep the standing enforcement: one worktree = one agent; mandatory first-step `pwd`/branch self-check in every batch prompt (it caught 4/5 misdispatches in sweep-15); partition decided up front so no two batches claim the same candidate; **build the pool ONCE and dispatch from that exact list** — sweep-17's only real defect was batch1 being dispatched from a pre-rebuild draft, which cost 4 double-worked candidates and left 1 of 5 batches outside the P-wall cross-check.
+
+ROUTE BEFORE YOU DRAFT on every candidate (read the target `.s` epilogue, pick `.c` / `.legacy.c` / `.legacy_sp3.c` before writing the body). Lever set, verbatim citations, look each up in `docs/research/codegen-walls.md`: C-44 / C-55 (incl. the switch-vs-goto loop-rejoin extension) / C-63 / C-64 / C-65 (open — record data points, don't stall) / C-66 (bitfield-source-shape caveat) / C-67 (switch-on-equality-targets — first thing to try on a 2-arm equality selection).
+
+Park every attempt via `park_one.py` so this round IS recorded. Two caveats while the repair is in flight: it dedupes on address alone, so a repeat attempt at an address already in the ledger will be silently skipped — if that happens, note the address in the PR body and add the row by hand; and `main` is unaffected by the module-key bug, so no workaround is needed there.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever comes first. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-files-added == delinks-activations-flipped count check; `git restore assets/` after any `--clean` run — never a bare `git add -A`. ⚠️ `gate3` is piped through `tee` in the standing recipe, which MASKS its exit code — two lanes hit this last round and both caught it only by reading the log. Read the log, do not trust exit 0. Paste in the PR body: the three per-region sha1 lines VERBATIM, both invariant-checker outputs, the partition, before/after `wall_aware_headroom.py` counts, and shipped/attempted vs the 35–55% tier estimate.

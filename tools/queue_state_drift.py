@@ -2,9 +2,16 @@
 """Find contradictions between queue/state claims and repository state.
 
 This is a small audit tool, not a replacement queue format. It checks explicit
-shipped/resolved/merged evidence in non-final queue items and compares the
-current state section with non-draft open PRs. Parked drafts are reported but
-excluded from the active count.
+shipped/resolved/merged evidence in non-final queue items, compares the current
+state section with the ACTIVE open PRs, and verifies that docs/state.md carries
+a `main-sha:` anchor that still describes the current tip.
+
+Parked status is an EXPLICIT declaration (a `parked` label, or a `[parked]` /
+`PARKED` marker in the PR title) — it is deliberately NOT inferred from
+GitHub's draft bit. The worker lanes publish ordinary output as draft PRs
+(the `yeet` skill opens drafts by default), so equating draft with parked hid
+every active worker PR from the active count and made the state claim
+unfalsifiable.
 """
 from __future__ import annotations
 
@@ -33,6 +40,13 @@ _ACTIVE_RE = re.compile(
     r"\*{0,2}active\*{0,2}\s+count\s+is\s*\*{0,2}(\d+)\*{0,2}",
     re.I,
 )
+_PARKED_TITLE_RE = re.compile(r"\[parked\]|\bPARKED\b")
+_PARKED_DECL_RE = re.compile(r"parked-prs:\s*([0-9,\s]+)", re.I)
+_MAIN_SHA_RE = re.compile(r"main-sha:\s*`?([0-9a-f]{7,40})`?", re.I)
+# The state doc is written BEFORE its own doc-PR merges, so at write time the
+# anchor names the current tip and main later gains exactly that one merge.
+# Anything beyond that means PRs landed without the handoff doc being updated.
+_STALE_MERGE_TOLERANCE = 1
 
 
 @dataclass(frozen=True)
@@ -92,10 +106,71 @@ def _state_claim(text: str) -> tuple[str, int] | None:
     return None
 
 
+def parked_numbers(state_text: str) -> set[int]:
+    """PR numbers the project has EXPLICITLY declared parked.
+
+    Declared in docs/state.md as `<!-- parked-prs: 1020, 1234 -->` so the
+    declaration is version-controlled and reviewable, rather than depending on
+    mutable GitHub-side state.
+    """
+    match = _PARKED_DECL_RE.search(state_text)
+    if not match:
+        return set()
+    return {int(n) for n in re.findall(r"\d+", match.group(1))}
+
+
+def is_parked(pr: dict, declared: set[int] | None = None) -> bool:
+    """Parked is declared explicitly; it is never inferred from `isDraft`.
+
+    A draft PR is how the worker lanes ship normal output, so the draft bit
+    says nothing about whether an item is parked. Only an in-repo declaration,
+    a `parked` label, or a `[parked]` / `PARKED` title marker counts.
+    """
+    if declared and pr.get("number") in declared:
+        return True
+    for label in pr.get("labels") or []:
+        name = label.get("name") if isinstance(label, dict) else label
+        if isinstance(name, str) and name.strip().lower() == "parked":
+            return True
+    return bool(_PARKED_TITLE_RE.search(pr.get("title") or ""))
+
+
+def state_sha_findings(state_text: str, anchor_checker) -> list[Finding]:
+    """Verify docs/state.md's `main-sha:` anchor still describes the tip.
+
+    `anchor_checker(sha)` returns (is_ancestor, merges_since) for the ref.
+    This catches a stale handoff doc even when it makes no PR-count claim —
+    the failure mode that let state.md sit five merged PRs behind.
+    """
+    match = _MAIN_SHA_RE.search(_current_state_section(state_text))
+    if not match:
+        return [Finding(
+            "state", "docs/state.md",
+            "no `main-sha:` freshness anchor in the current state section — "
+            "a stale handoff cannot be detected without one",
+        )]
+    sha = match.group(1)
+    is_ancestor, merges_since = anchor_checker(sha)
+    if not is_ancestor:
+        return [Finding(
+            "state", "docs/state.md",
+            f"`main-sha: {sha}` is not an ancestor of the ref — the anchor "
+            "names a commit that never landed",
+        )]
+    if merges_since > _STALE_MERGE_TOLERANCE:
+        return [Finding(
+            "state", "docs/state.md",
+            f"`main-sha: {sha}` is {merges_since} PR-merges behind the ref "
+            f"(tolerance {_STALE_MERGE_TOLERANCE}) — the handoff doc is stale",
+        )]
+    return []
+
+
 def state_findings(state_text: str, open_prs: list[dict]) -> tuple[list[Finding], int, int]:
-    """Compare the current state claim with non-draft open PRs."""
+    """Compare the current state claim with the ACTIVE open PRs."""
     claim = _state_claim(state_text)
-    parked = sum(bool(pr.get("isDraft")) for pr in open_prs)
+    declared = parked_numbers(state_text)
+    parked = sum(is_parked(pr, declared) for pr in open_prs)
     active = len(open_prs) - parked
     if claim is None:
         return [], active, parked
@@ -110,7 +185,7 @@ def state_findings(state_text: str, open_prs: list[dict]) -> tuple[list[Finding]
         "state",
         "docs/state.md",
         f"claims {kind} PRs: {expected}, but {counted} exist "
-        f"({parked} parked draft(s) excluded from active count)",
+        f"({parked} explicitly-parked PR(s) excluded from active count)",
     )], active, parked
 
 
@@ -132,12 +207,26 @@ def main_artifact_checker(repo: Path, ref: str):
     return exists
 
 
+def main_anchor_checker(repo: Path, ref: str):
+    """Return (is_ancestor, merges_since) for a candidate anchor sha."""
+    def check(sha: str) -> tuple[bool, int]:
+        if _git(repo, "merge-base", "--is-ancestor", sha, ref).returncode != 0:
+            return False, 0
+        merges = _git(repo, "rev-list", "--count", "--merges", f"{sha}..{ref}")
+        try:
+            return True, int(merges.stdout.strip() or 0)
+        except ValueError:
+            return True, 0
+
+    return check
+
+
 def _load_prs(repo: Path, fixture: str | None) -> list[dict]:
     if fixture:
         return json.loads(Path(fixture).read_text(encoding="utf-8"))
     result = subprocess.run(
         ["gh", "pr", "list", "--state", "open", "--limit", "1000",
-         "--json", "number,isDraft,title,headRefName"],
+         "--json", "number,isDraft,title,headRefName,labels"],
         cwd=repo,
         text=True,
         capture_output=True,
@@ -175,12 +264,14 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"PR LIST ERROR: {exc}")
         return 2
-    state_findings_list, active, parked = state_findings(
-        args.state.read_text(encoding="utf-8"), prs,
-    )
+    state_text = args.state.read_text(encoding="utf-8")
+    state_findings_list, active, parked = state_findings(state_text, prs)
     findings.extend(state_findings_list)
+    findings.extend(state_sha_findings(
+        state_text, main_anchor_checker(repo, args.ref),
+    ))
     print(f"queue files scanned: {len(queue_paths)}")
-    print(f"active open PRs: {active}; parked drafts excluded: {parked}")
+    print(f"active open PRs: {active}; explicitly-parked excluded: {parked}")
     for finding in findings:
         print(f"DRIFT [{finding.kind}] {finding.source}: {finding.detail}")
     print(f"QUEUE-STATE DRIFT: {len(findings)} finding(s)")
