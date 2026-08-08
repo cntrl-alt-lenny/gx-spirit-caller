@@ -1,20 +1,39 @@
 # The ALIGNALL(2) wall is avoidable by TU composition — a working recipe (cm-restock-carve-3)
 
-**Status: CONFIRMED WORKING.** Pairing two adjacent 2-byte-misaligned
+**Status: CONFIRMED WORKING, on one verified pair, under a precondition
+narrower than first written.** Pairing two adjacent 2-byte-misaligned
 symbols as separate named globals of the same type, in address order,
-in one TU whose combined `.data` section totals a multiple of 4 bytes,
-avoids the `ALIGNALL(2)` cascade — verified via a full 3-region-capable
-build (EUR SHA1 PASS) and direct byte-level comparison against pristine
-ROM at the symbols themselves *and* at both neighboring already-shipped
-TUs (the cascade would show up there first).
+in one TU, avoids the `ALIGNALL(2)` cascade — verified via a full
+3-region-capable build (EUR SHA1 PASS) and direct byte-level comparison
+against pristine ROM at the symbols themselves *and* at both neighboring
+already-shipped TUs (the cascade would show up there first).
 
-This resolves the open question three consecutive restock-carve waves
-have carried: wave 1 (`cm-restock-carve-1`) declined 4 `kv_t` symbols
-in `ov006` after 3 *source-level* workarounds failed; wave 2
-(`cm-restock-carve-2`) could report 100% only because every one of
-main's 58 candidates happened to be 4-aligned; this wave asked whether
-*TU composition* (as opposed to source form) could do what source-level
-tricks couldn't.
+**The precondition is 4-alignment at BOTH ends of the composed span, not
+just a multiple-of-4 size.** The composed TU must start 4-aligned AND
+have a size divisible by 4. Size alone is necessary but not sufficient,
+and the difference is not academic: `ov006`'s four `kv_t` symbols
+(`data_ov006_021ce38a` / `_3ae` / `_3d6` / `_3fe`) each already have a
+size divisible by 4 (36/40/40/40) yet every one starts at `%4 == 2`,
+and their whole contiguous run begins at `0x021ce38a` — so no
+self-composition of that group can ever produce a 4-aligned span.
+
+**This recipe therefore does NOT unlock wave 1's four declined `kv_t`
+symbols** (an earlier draft of this document claimed it resolved that
+question; it does not). Reaching those needs *backward absorption* into
+`data_ov006_021ce372`'s extent — the other half of the composition
+question, which this wave did not test, and which
+`cm-restock-carve-1` Part 5 attempt #1 already recorded as rejected by
+dsd's containment check. That half remains genuinely open.
+
+What this wave did settle: *TU composition* can beat the cascade where
+*source form* cannot, on a pair whose composed span is 4-aligned at both
+ends. Wave 1 (`cm-restock-carve-1`) declined the 4 `kv_t` symbols after
+3 workarounds failed; wave 2 (`cm-restock-carve-2`) could report 100%
+only because every one of main's 58 candidates happened to be 4-aligned.
+Note that two of wave 1's three attempts (backward absorption, and the
+single large bundle TU) were themselves *TU-composition* attempts rather
+than source-level ones — see the section below, which describes them
+correctly.
 
 ## Why this is a different question than the ones already answered
 
@@ -120,8 +139,12 @@ Two separate named globals, same type, declared in address order, one
 
 **Verdict: the ALIGNALL(2) cascade is avoidable by TU composition**,
 specifically: pair (or group) adjacent misaligned symbols as separate
-named globals, in address order, in one TU, such that the combined
-`.data` section size is a multiple of 4 bytes. No source-level
+named globals, in address order, in one TU, such that the composed span
+is **4-aligned at both ends** — a 4-aligned start address AND a combined
+`.data` section size divisible by 4. Size alone is not sufficient; a
+group whose members all have `%4==0` sizes but whose run starts at
+`%4==2` (e.g. `ov006`'s four `kv_t` symbols) can never self-compose into
+an aligned span, and this recipe does not reach it. No source-level
 alignment hint, `.s` rewrite, or padding trick is needed — the
 existing `cluster-b-size-1-2-recipe.md` mechanism (size-is-a-4-multiple
 avoids the cascade) generalizes from "one real symbol + zero padding"
@@ -134,12 +157,19 @@ at this smaller 2-symbol scale.
 This was a single bounded test per the wave-3 kickoff's explicit
 scope — it was not a mandate to carve the remaining population. Of
 this project's 35 total 2-byte-misaligned struct candidates (this
-wave's Part 2 population), most come in the same "two adjacent
+wave's Part 2 population), many come in the same "two adjacent
 misaligned symbols whose sizes are individually `%4==2` but sum to a
 multiple of 4" shape (e.g. `ov005`'s 4 candidates split into two such
-pairs; `ov017` and `ov019` show the identical pattern). A future wave
-can very likely apply this exact recipe to most of the remaining pool
-directly — the main residual risk to check per-candidate is whether
+pairs; `ov017` and `ov019` show the identical pattern).
+
+⚠️ **A future wave must screen on the both-ends criterion before
+assuming applicability. 11 of the 35 fail it structurally** — their
+run's start address is `%4==2` with no 4-aligned composition available
+from the group itself, so this recipe cannot reach them no matter how
+the members are paired. `ov006`'s four `kv_t` symbols are the worked
+example above. Those 11 need the untested backward-absorption half, not
+this recipe. Screen first, then apply — the main additional risk to
+check per-candidate is whether
 **more than 2** symbols need bundling to reach a 4-byte-multiple total
 (this test only confirmed n=2; the declaration-order risk that broke
 wave 1 was specifically correlated with *bundle size*, so a 3+ symbol

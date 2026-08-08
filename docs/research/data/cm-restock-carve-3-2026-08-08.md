@@ -125,8 +125,8 @@ verified directly, never assumed from the C side.
 | `data_ov017_021b8020` | ov017 | `0x021b8020` | 16 | data | `Ov017StepFn[4]` | Dispatch table, pre-declared in `ov017_core.h`; consumer `func_ov017_021b2c8c.c` |
 | `data_ov017_021b80c8` | ov017 | `0x021b80c8` | 12 | data | `Box` | Reuses exact type from already-shipped `func_ov017_021b4090.c`; consumer `func_ov017_021b312c.s`, matches existing retriage doc |
 | `data_ov019_021b5b20` | ov019 | `0x021b5b20` | 16 | data | `Ov019StepFn[4]` | Dispatch table, pre-declared in `ov019_core.h`; consumer `func_ov019_021b26d0.c` |
-| `data_ov016_021b9000` | ov016 | `0x021b9000` | 12 | data | `Ov016Record021b9000` | **Part 2 TU-composition experiment**, element 0 of a real 10B-stride record array; 2 consumers |
-| `data_ov016_021b900a` | ov016 | `0x021b900a` | 12 | data | `Ov016Record021b9000` | **Part 2 TU-composition experiment**, element 1, same array; 2 consumers |
+| `data_ov016_021b9000` | ov016 | `0x021b9000` | 10 | data | `Ov016Record021b9000` | **Part 2 TU-composition experiment**, element 0 of a real 10B-stride record array; 2 consumers |
+| `data_ov016_021b900a` | ov016 | `0x021b900a` | 10 | data | `Ov016Record021b9000` | **Part 2 TU-composition experiment**, element 1, same array; 2 consumers |
 
 **64 Part-1 + 2 Part-2 = 66 symbols shipped this wave, zero declined.**
 One symbol (`data_ov011_021d2fe4`) is flagged lower-confidence (typed by
@@ -148,8 +148,14 @@ own tip, no divergence). Independently re-derived by running the
 project's own classifier (`tools/progress.py`'s
 `_has_file_scope_array_decl` / `_tu_has_named_struct_decl`) directly
 against all 65 new/changed files: 956 B Typed-array (exact match) and
-752 B Named-struct (4 B over the real delta — not fully reconciled to
-the byte, see below). One concrete, confirmed source of Typed-array/
+748 B Named-struct (exact match). **The earlier "752 B, 4 B over" note
+was an artifact of this document's own table, not of the classifier:**
+the two Part-2 rows listed Size 12 where the struct is 5 × `unsigned
+short` = 10 B each, and the shipped delinks TU spans exactly 20 B
+(`0x021b9000`–`0x021b9014`). With those two cells corrected to 10 the
+Size column sums to the real 1,348 B of delinks coverage and the
+Named-struct delta reconciles to the byte, so there is no residual
+discrepancy to chase. One concrete, confirmed source of Typed-array/
 Named-struct divergence this wave: `data_ov003_021cf160.c` declares
 `int (*data_ov003_021cf160[])(void)`, a function-pointer-array
 declarator the classifier's regex doesn't recognize as an array
