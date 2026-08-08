@@ -273,7 +273,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0201f34c	main	392	default	unknown	parked	unknown	reg-alloc	PR#1414:bb6e87a4
 0x02003400	main	488	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
 0x020038c0	main	396	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
-0x0203d39c	main	392	default	unknown	not-attempted	0	unknown	PR#1414:bb6e87a4
+0x0203d39c	main	392	default	unknown	parked	0	unknown	PR#1414:bb6e87a4
 0x02055938	main	224	default	unknown	shipped	100	none	PR#1414:4fbb3f08
 0x0205a0ec	main	160	default	unknown	shipped	100	none	PR#1414:4fbb3f08
 0x020607b0	main	260	default	unknown	shipped	100	none	PR#1414:4fbb3f08
@@ -315,8 +315,8 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0229f7e8	ov002	444	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
 0x021d40bc	ov004	212	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
 0x021b8e4c	ov006	304	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
-0x021aae04	ov008	416	default	unknown	parked	unknown	reg-alloc	PR#1414:2e2d2f3f
-0x021b7218	ov010	168	default	unknown	parked	90.5	structural	PR#1414:2e2d2f3f
+0x021aae04	ov008	416	default	unknown	parked	unknown	structural	PR#1414:2e2d2f3f
+0x021b7218	ov010	168	default	unknown	parked	90.5	reg-alloc	PR#1414:2e2d2f3f
 0x021b33dc	ov017	232	default	unknown	parked	93.1	unknown	PR#1414:2e2d2f3f
 0x021b4a4c	ov019	484	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
 0x021b16f8	ov008	428	default	unknown	not-attempted	unknown	unknown	PR#1414:2e2d2f3f
