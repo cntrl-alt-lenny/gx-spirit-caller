@@ -42,6 +42,55 @@ class TestGoodKickoff(unittest.TestCase):
         self.assertEqual(warns, [], f"good kickoff tripped advisories: {[c.key for c in warns]}")
 
 
+class TestPowerShellLocationGuard(unittest.TestCase):
+    """The Codex lanes run PowerShell, not bash.
+
+    Accepting only the POSIX spelling made the linter a void-work generator:
+    on 2026-08-08 a lane handed a bash-only guard transliterated it into
+    PowerShell, Windows-ified the path to backslashes, and stopped after 17
+    seconds -- while sitting in the CORRECT worktree. `git rev-parse
+    --show-toplevel` always emits forward slashes on Windows.
+    """
+
+    _PWSH = (
+        "PREFLIGHT — STOP-and-report on any failure:\n"
+        "    $EXPECT = 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n"
+        "    if ((git rev-parse --show-toplevel) -ne $EXPECT) "
+        "{ Write-Output 'WRONG WORKTREE'; exit 1 }\n"
+        "CANARY: first item verified before the batch\n"
+        "Effort: MEDIUM\n"
+        "paste the real pytest tail\n"
+    )
+
+    def _fail_keys(self, text: str) -> set[str]:
+        return {c.key for c in lint(text) if c.required and not c.ok}
+
+    def test_powershell_form_is_accepted(self):
+        self.assertNotIn("location-guard", self._fail_keys(self._PWSH))
+
+    def test_powershell_replace_normalisation_is_accepted(self):
+        text = self._PWSH.replace(
+            "(git rev-parse --show-toplevel) -ne $EXPECT",
+            "(git rev-parse --show-toplevel).Replace('\\','/') -ne $EXPECT",
+        )
+        self.assertNotIn("location-guard", self._fail_keys(text))
+
+    def test_backslash_expect_path_is_rejected(self):
+        """The exact shape that stopped the lane: a Windows-ified EXPECT."""
+        text = self._PWSH.replace(
+            "'C:/Users/leona/Dev/gx-spirit-caller/kb-map'",
+            "'C:\\Users\\leona\\Dev\\gx-spirit-caller\\kb-map'",
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_backslash_rejected_in_posix_form_too(self):
+        text = GOOD.replace(
+            '"$HOME/Dev/spirit-caller/codex-610"',
+            '"C:\\Users\\leona\\Dev\\gx-spirit-caller\\decomper"',
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+
 class TestMissingGuards(unittest.TestCase):
     def _fail_keys(self, text: str) -> set[str]:
         return {c.key for c in lint(text) if c.required and not c.ok}
