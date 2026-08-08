@@ -7815,7 +7815,253 @@ watching for recurrence rather than treated as fully general yet.
 
 **Provenance:** cm-ov002-unknown-sweep-17 (2026-08-06), batch 5.
 
-## Permanent P-wall index (24 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
+> **Extension — a hard boundary on the goto-to-distinct-labels fix
+> (cm-main-tier-sweep-1, 2026-08-08, batch 1).** Two sequential
+> "same trailing action" guards on DIFFERENT variables/expressions
+> (`if (A==0) return; if (B==0) return;`) get compound-compare-merged
+> by mwcc's optimizer regardless of surface syntax (`&&`-wrap,
+> `||`-early-return, sequential-if all identical) — the fix is `goto`
+> to two lexically DISTINCT labels, even if both bodies are identical
+> (`ret1: return; ret2: return;`); confirmed on `func_020480b4`
+> (9.5%→85.7%) and reused successfully on `func_0204931c`'s first
+> guard pair. **But this does NOT work when the two conditions are
+> repeated equality tests on the SAME already-loaded register**
+> (`tag==0`/`tag==2` on one variable, or a 3-way `a0==2`/`a0==3`/
+> `a0==4`) — there, `&&`, goto-same-label, goto-distinct-labels, and
+> `switch` all either reproduce the identical compound-compare merge
+> or collapse even further with each attempt (see P-33). Different-
+> variable guard pairs are goto-fixable; same-register repeated-
+> equality guards are not, at least not via any source-level trick
+> tried so far.
+
+### C-70. A `cmp;cmpeq` pair sharing a materialized-zero register on adjacent even-offset fields is often a disguised 64-bit `== 0` compare, not two independent `int` guards
+
+**The trap.** A guard-chain shape showing `cmp regA,r0; cmpeq regB,r0`
+(a shared zero register, materialized once via `mov r0,#0`) testing
+two struct fields that look like independent 32-bit ints is very
+often actually a single `long long` (64-bit) field compared to zero
+— the "AND of two equality tests" some readers assume is really just
+the mandatory two-half comparison ARM needs for a 64-bit `==0`.
+Modeling the two halves as separate `int` fields joined with `&&`
+produces 4 independent branches (wrong): every combination of
+short-circuit ordering and predicate direction still shows extra
+branch instructions the target doesn't have.
+
+**The fix.** Model the pair as one `long long` struct field (or two
+adjacent `long long` fields, matching the exact reserved stack/struct
+span) and compare it directly to `0`:
+
+```c
+struct { long long field_0; long long field_8; int field_10; } *s;
+if (s->field_0 == 0 && s->field_8 == 0) { ... }
+```
+
+Matched byte-for-byte on the next attempt once the two fields were
+retyped as `long long` (was 4 independent-`int` branches; became the
+target's exact `cmp;cmpeq` pair). Worth checking FIRST whenever a
+guard-chain candidate shows a `cmp;cmpeq` pair sharing a materialized-
+zero register on adjacent, evenly-offset fields.
+
+**Affected picks:** `func_02044c10` (main, 100%).
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 1.
+
+### C-71. A leaf function (no push/pop at all) can still require legacy-tier routing — the 3-tier discriminator gives no signal when there's no prologue/epilogue to read
+
+**The trap.** The routing rule as documented is keyed off
+prologue/epilogue shape (`sub sp,#4` + 2-step pop vs fused 1-step
+pop). A leaf function has NEITHER — no stack frame, no push, no pop —
+so the discriminator is silent. Compiling such a function under the
+default (mwcc 2.0/sp1p5) tier can diverge early with a totally
+different instruction count/shape, which looks like a source-shape
+bug but is actually a compiler-version issue.
+
+**The mechanism.** mwcc 2.0/sp1p5 aggressively peephole-optimizes an
+"AND with a 16-bit mask constant that doesn't fit an ARM rotated
+immediate" into an equivalent `lsl`+`lsr` shift-pair, avoiding the
+pool-constant load entirely. mwcc 1.2/sp2p3 (legacy) does NOT perform
+this substitution and emits the straightforward `ldr`-pool-constant +
+`and`, matching the target.
+
+**The fix.** If a leaf/no-prologue candidate's plain-tier compile
+diverges early with a completely different instruction count/shape
+(not just a register swap), try `.legacy.c` routing before spending
+more cycles on C-source reshaping — the identical C body, just
+renamed, can go from 0% to 100%.
+
+**Affected picks:** `func_02054b44` (Park-Miller RNG step, 16807
+multiplier, 0%→100% under legacy with zero body changes),
+`func_020558fc` (6.7%→80% under legacy, though a separate P-20
+residual remained on top) — both main.
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 2.
+
+### C-72. A goto-target label's PHYSICAL POSITION in the source must match the original's actual block address order — not just "a goto exists somewhere with the right polarity"
+
+**The trap.** C-55 already establishes that a branch-away `goto` can
+be needed instead of a predicated `if`/`else`. What's easy to miss is
+that the goto TARGET LABEL's placement in the source — before or
+after the "main" code, at the top or bottom of the function — is
+itself significant, independent of the goto's polarity being
+correct. A "natural"-feeling placement (early-return code first,
+shared/goto target declared last) can produce a systematically wrong
+result — not a register swap, but wrong branch offsets/polarities
+throughout — because it forces a different block layout than the
+target, even though the control-flow graph is logically identical to
+the correctly-placed version.
+
+**The fix.** Walk the `.s` file's label positions in ADDRESS order
+(the same technique C-44 already prescribes for switch-body layout)
+and lay out the C `goto` targets in that same physical order — not
+whatever order feels natural to write, and not always "shared exit
+at the bottom of the function". Sometimes the failure label must sit
+physically BEFORE the success-path label, with the guard branching
+*forward* to the main path and falling through to the failure label;
+sometimes it's the reverse. Read the block order off the disassembly
+directly rather than assuming a convention.
+
+**A related symptom of the same mechanism: over-merging.** When a
+function has an early-exit block and a late-completion block that
+are physically far apart in the target but return the identical
+expression, writing a single shared `return expr;` lets mwcc
+tail-merge ALL of the function's logical exit points into one block
+— wrong, if the target keeps them separate. Fix: write two lexically
+DISTINCT `return expr;` statements (one per block), even though
+they're textually identical, to force the separate layout.
+
+**Evidence — hit independently by 3 batches, 6+ instances, this
+round alone.** `func_02051ab0` (over-merging symptom: single shared
+return wrongly merged all 4 exit points; two textually separate
+`return a2;` statements fixed it, 100% on the next try).
+`func_02051ec0` (goto-placement symptom: `ret0:` needed to appear
+BEFORE the "work" block, guard branching forward on success — the
+logically-equivalent inverse compiled with systematically wrong
+branch offsets throughout). `func_02055654`/`func_020556c8`/
+`func_0205d614` (batch 2: the shared `ret:` label had to sit
+physically BEFORE the main-path label, matching the target's early-
+block/branch-over layout — placing it at the end of the function, a
+seemingly equivalent CFG, produced measurably worse output than even
+the naive predicated form). `func_0206e4a4`/`func_0206df54`/
+`func_02070d34` (batch 4: same fix, applied by literally walking the
+`.s` file's label addresses in order, matching C-44's technique).
+
+**Affected picks (7):** `func_02051ab0`, `func_02051ec0`,
+`func_02055654`, `func_020556c8`, `func_0205d614`, `func_0206e4a4`,
+`func_0206df54`, `func_02070d34` — all main, all 100%.
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 1, 2, 4.
+
+### C-73. A field re-read needs an explicit `volatile` qualifier to survive mwcc's CSE even with zero true aliasing risk — both for a repeated READ and for a READ immediately after a STORE
+
+**The trap.** A struct-field dereference that appears twice in the
+target with no intervening store (a trivially side-effect-free
+repeated read) can still get value-numbered into a single load by
+mwcc's CSE — a wider trigger than the previously-documented
+"aliasing store forces reload" case. The same CSE also fires across
+a STORE: when the target re-`ldr`s a field immediately after storing
+to it (a fresh read of a value the compiler could easily have kept
+in a register), the natural C phrasing lets mwcc fold the store's
+source value straight into the following use instead of re-loading.
+
+**What does NOT work for the store-then-reload case.** A pointer-
+indirection trick (`T **p = &x->field; *p = y; if (*p == 0) ...`) did
+not force the reload.
+
+**The fix.** Mark the SPECIFIC struct member `volatile` — only that
+member, not the whole struct or the whole pointer — at its
+declaration. This forces a fresh load on every access, matching the
+target exactly, with zero disruption to the surrounding
+already-matching instructions. Works for both triggers (repeated
+read; read-after-store).
+
+**Evidence.** Repeated-read variant confirmed on `func_02046a5c`,
+`func_02046ae0`, `func_0207d05c` (batch 1) — the third shows it
+surviving as a single-line reload buried inside a larger doubly-
+linked-list insertion, not just a small-function quirk. Read-after-
+store variant confirmed on `func_020683ec`, `func_0206b47c`
+(batch 3).
+
+**Affected picks (5):** `func_02046a5c`, `func_02046ae0`,
+`func_0207d05c`, `func_020683ec`, `func_0206b47c` — all main, all
+100%.
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 1, 3.
+
+### C-74. An address-taken local must be sized to the callee's FULL reserved stack span, not just the bytes the C source visibly reads back
+
+**The trap.** Passing `&local` to an opaque callee that (per the
+disassembly) reserves more stack than a single scalar needs
+(`sub sp,#8` / `sub sp,#0xc`) — where only the first word is ever
+read back by the caller itself — is easy to under-declare as a plain
+`int local;` (4 bytes). This produces a PROLOGUE-ONLY divergence:
+mwcc folds the "missing" bytes into an extra push register instead
+of a plain `sub sp`, changing the callee-save register count and,
+transitively, which physical registers everything else in the
+function lands in — even though every body instruction still matches
+byte-for-byte in isolation.
+
+**The fix.** Size the local to match the ORIGINAL's reserved span
+exactly (`int local[2]` for 8B, `int local[3]` for 12B), even though
+the extra words are never referenced by name in the C source. This
+is a variant of the sp1p5-vs-sp3 r3-filler discriminator already
+documented in `sp3-routing-decision.md`, but the trigger here is
+LOCAL-VARIABLE SIZING, not register-count parity.
+
+**Affected picks:** `func_02068ab4`, `func_0206b47c` (main, both
+100%).
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 3.
+
+### C-75. Pure statement-order (scheduling) sensitivity, with no register, type, or control-flow change, can be the only lever a function needs
+
+**The trap.** A function can have every register, type, and branch
+choice already correct and still mismatch purely because mwcc's
+scheduler hoists or sinks independent work when the C source gives it
+room to — matching the target's exact instruction sequence sometimes
+requires matching its exact STATEMENT order, with no other change.
+
+**The fix.** Reorder the C statements to mirror the target's read of
+the `.s` file directly — e.g. move a call-argument computation to sit
+between two field stores instead of after both, if that's where the
+`.s` file's instructions actually fall. Try this before reaching for
+heavier restructuring tools (goto, volatile, retyping) when the diff
+looks like a pure reordering with no register or value change.
+
+**Affected picks:** `func_02074c74` (main, 100% — a call-argument
+computation moved between two stores), plus the general principle
+observed again in batch 5's session notes as a first-thing-to-try.
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 4, 5.
+
+### C-76. Signed/unsigned typing controls more than arithmetic semantics — it selects ASR vs LSR for shifts, and can be needed at only ONE use site while leaving a related idiom's own typing untouched
+
+**Two confirmed sub-cases (cm-main-tier-sweep-1, 2026-08-08, batches
+4 and 5, same round, different functions):**
+
+1. **Shift-instruction selection.** A plain (signed) `int`
+   right-shifted compiles to `ASR`; a target's `LSR` needs the
+   operand declared or cast `unsigned`. Seen cleanly on a hand-rolled
+   32-bit byte-swap (`((v>>24)&0xFF) | ((v>>8)&0xFF00) | ...`) where
+   all four shift instructions were affected the moment `v` was typed
+   signed instead of `unsigned int` (`func_0206e720`, main, 100%).
+2. **A targeted cast at the comparison site only, not the variable's
+   declaration.** A modulo-16 ring-buffer index needed its counter
+   variable to STAY plain signed `int` at declaration — to preserve
+   mwcc's full sign-correcting modulo-by-16 idiom (`lsr #31`/`rsb`/
+   `ror #28`), which silently collapses to a trivial `AND #0xf` if the
+   variable is declared `unsigned` (regression to 0% when tried) — but
+   the SEPARATE `count < 16` range-check specifically needed
+   `(unsigned int)count < 16` to get the `CC` (carry-clear) condition
+   code instead of the `LT` (signed) a plain comparison produces.
+   Fixing only the comparison site, leaving the modulo's own type
+   signed, matched 100% (`func_0207cdd0`, main). Related to but
+   distinct from C-64 (LS-vs-EQ on `for`-loop pre-checks): this is a
+   plain `if`, not a loop, and the codes involved are CC/LT, not
+   LS/EQ.
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 4, 5.
+
+## Permanent P-wall index (28 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -7850,11 +8096,22 @@ rather than iterating.
 | P-24 | LIVE (tentative) | Per-player row + idx*0x14-stride loop register-swap, P-20-sibling shape (5 members, unconfirmed against re-attempt). |
 | P-25 | LIVE | Legacy_sp3-tier dead-value-in-callee-saved-register push/stack-padding wall. |
 | P-26 | LIVE | Precheck-array-lookup P-20 variant with an added EQ-vs-LS condition-code component. |
+| P-27 | LIVE | Post-call scheduling/materialization resists source-level restructuring (family, not one mechanism). |
+| P-28 | LIVE (tentative) | Single-scratch-value register-mirror, broader than P-20/P-23's literal `mla`-operand shape. |
+| P-29 | LIVE (tentative) | Single-symbol guard + row-loop eager-`mla` fusion (single-batch). |
+| P-30 | LIVE (tentative) | Canary-lever residual — shared large-offset base reproduces structure but not its physical register (main). |
+| P-31 | LIVE (tentative) | Predication-resistance — mwcc fully if-converts a guard no restructuring can force into a branch (mirror of C-55). |
+| P-32 | LIVE | OR-of-non-adjacent-equality-values resists branch separation; sticky CMP/CMPNE predicated form. |
+| P-33 | LIVE (tentative) | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). |
 
-**Current count:** 21 genuinely live P-entries (P-17 under reconsideration,
-not yet retired); four retired entries (P-6, P-7, P-8, P-10). The three
-newly corrected headings below are P-7, P-8, and P-10; their historical
-bodies remain intact.
+**Current count:** 28 genuinely live P-entries (P-17 under reconsideration,
+not yet retired; P-28/29/30/31/33 tentative but counted live); four retired
+entries (P-6, P-7, P-8, P-10). The three corrected headings among the
+above are P-7, P-8, and P-10; their historical bodies remain intact. This
+table previously undercounted by omitting P-27/28/29 after they were added
+as body entries without a table update — recounted directly against the
+body entries present in the file (cm-main-tier-sweep-1, 2026-08-08) rather
+than propagated from the prior stated figure.
 
 > **"Brief 294" citations are narrower than their bulk application
 > (cm-ov002-unknown-sweep-2/3/4/5/6, 2026-07-26/27/29/30).**
@@ -10409,6 +10666,161 @@ isolated).
 **Recipe status: NONE.**
 
 **Provenance:** cm-ov002-unknown-sweep-17 (2026-08-06), batch 4.
+
+### P-30. Canary-lever residual — the shared large-offset base reproduces structure but not its physical register (tentative, main module)
+
+> **Tentative — 5/5 hit rate on qualifying candidates in one batch,
+> plus a documented counter-example where the trigger doesn't fire at
+> all.** The canary lever (an explicit named local for a shared base
+> pointer used at 2+ offsets exceeding the ARM LDR immediate limit,
+> `>0xFFF`) reliably reproduces the CORRECT STRUCTURE — word count,
+> control flow, which register holds the base across the accesses —
+> but does not reliably reproduce WHICH physical register mwcc
+> assigns to that base.
+
+**The shape:** functions derived from `data_021a088c`/
+`func_0207b538()`-style shared handles, each dereferencing the handle
+at 2+ offsets past `0xFFF`. The named-base-variable pattern
+(`char *base = (char*)handle + 0x1000; ... base + 0x210 ...`) gets the
+whole function's shape and control flow right, but leaves either a
+r1-vs-r2 or ip-vs-lr register choice for the base itself.
+
+**Falsifiable claim:** *some source-level variation controls which
+register the base lands in.* **Falsified on 5 members in one batch
+(cm-main-tier-sweep-1, 2026-08-08, batch 5):** direct vs. named
+expression, `char*` vs. `unsigned int` typing, declaration reordering
+(though this fixed an UNRELATED top-level register-mapping bug on one
+member first), and `&&` vs. nested-if all left the specific
+register-choice residual unchanged. 13 total attempts across the 5
+functions never moved it once. On a 6th member (`func_0207cbe0`),
+swapping declaration order of two unrelated locals fixed a real
+top-level register-mapping bug (46.4%→71.4%) BEFORE this same
+residual was hit as what remained.
+
+**Counter-example — the trigger does not universally fire.**
+`func_02043250` (batch 1) has a near-identical shape (global handle +
+two accesses whose combined offsets exceed `0xFFF`) but matched 100%
+on the FIRST TRY with plain direct-offset expressions, no named base
+needed — consistent with this project's own pre-existing reference
+(`func_020403d4.legacy_sp3.c`, 5 direct-offset accesses, no named
+base). Try direct-offset first; reach for the named-base lever only
+once `fastmatch.py` actually shows the multi-offset residual, and
+budget at most 1 attempt at fixing the specific register-choice
+residual if the lever's structural fix doesn't also nail the register.
+
+**Affected picks (5):** `func_0207af28` (86.7%), `func_0207b0e0`
+(73.9%), `func_0207c8d8` (91.3%, first access matched, second
+independent residual), `func_0207cbe0` (71.4%), `func_0207cc50`
+(81.8%) — all main.
+
+**Recipe status: NONE for the register-choice residual** (the
+structural half of the lever — canary finding, main text above — is
+a confirmed working recipe on its own).
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 5.
+
+### P-31. Predication-resistance — mwcc fully if-converts a guard that no source restructuring can force into a real branch (mirror image of C-55)
+
+> **Tentative — 2 independent occurrences in one batch (both ~40-50%
+> best), suggesting systematic rather than per-function noise, but
+> not yet tested outside that batch.**
+
+**The shape:** a guard whose true-arm is 3-4 instructions including a
+memory store, false-arm is a single constant — mwcc fully
+if-converts this to a branchless `streq`/`moveq`/`movne`-style
+sequence in the target, but every source restructuring tried produces
+a REAL branch for at least one arm instead. This is the mirror image
+of C-55: there, mwcc predicates when a branch is wanted; here, mwcc
+wants to predicate but the source can't talk it into doing so.
+
+**Falsifiable claim:** *some source restructuring produces the fully-
+predicated (branchless) form.* **Falsified on 2 members
+(cm-main-tier-sweep-1, 2026-08-08, batch 5):** goto per C-55's own
+literal recipe, `switch` per C-67, if/else with a shared result
+variable, ternary, and an accumulator-default-then-override pattern
+all produced a real conditional branch (`bxne`/`beq`) for at least one
+arm on both `func_02073ed8` (11 restructuring attempts, best 40%) and
+`func_0207c990` (6 attempts, best 50% — a sibling of the successfully-
+shipped `func_0207c934`).
+
+**Possible relation to P-32:** both are cases where mwcc's predicate/
+branch decision resists every source-level lever tried; P-32 is
+specifically about a 2-value OR-membership test, this entry is about
+a single guard with an asymmetric true/false arm. Kept separate
+pending a future round that tests both shapes independently.
+
+**Affected picks:** `func_02073ed8` (40%), `func_0207c990` (50%) —
+both main.
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 5.
+
+### P-32. OR-of-non-adjacent-equality-values resists suppression into two genuine branches — a sticky CMP/CMPNE predicated membership test
+
+**The shape:** a guard of the form `field == A || field == B` where
+`A` and `B` are NOT adjacent integers (e.g. 4 and 10) feeds a 3-way-
+branch shared tail reached from multiple points in the target. The
+target uses two genuinely separate `beq`/`bne` branches; every source
+phrasing tried instead compiles to a compact, sticky `CMP`/`CMPNE`-
+predicated "membership in {A,B}" encoding.
+
+**Adjacency is the apparent trigger.** A sibling function in the same
+batch testing ADJACENT values (`field == 3 || field == 4`) matched
+100% on the first try via plain natural `||` syntax — no special
+handling needed. Only the non-adjacent case is walled.
+
+**Falsifiable claim:** *some source phrasing suppresses the compact
+CMP/CMPNE form for non-adjacent values.* **Falsified on 1 member, 4
+phrasings (cm-main-tier-sweep-1, 2026-08-08, batch 4):** plain
+boolean OR, goto-with-correct-block-order (best result, 23.8%),
+`switch`/`case A: case B:`, and a second goto variant all compiled to
+either the identical CMPNE-predicated form or a worse fully-predicated
+form. Not in the existing catalogue as such — closest is C-67, which
+covers if/else-if arms with DIFFERENT bodies (value or call-sequence
+dispatch), not a single combined-condition guard sharing ONE body.
+
+**Affected picks:** `func_02070ce0` (23.8% best of 4 attempts) —
+main. Contrast: `func_02070c84` (adjacent values 3/4, same batch,
+100% first try, no special handling).
+
+**Recipe status: NONE for the non-adjacent case** (the adjacent case
+needs no special recipe at all).
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 4.
+
+### P-33. Same-register repeated-equality compound-compare-merge — a C-55 boundary case with no working recipe
+
+**The shape:** two (or three) equality tests against the SAME
+already-loaded register (e.g. `tag==0`, `tag==2`, both dispatching to
+the same target; or a 3-way `a0==2`/`a0==3`/`a0==4` both arms just
+returning a constant) get compound-compare-merged by mwcc into a
+`cmp;cmpne;beq`-style chain (or, for the 3-way case, a fully-
+predicated `cmp;cmpne;cmpne;moveq;movne;bx` with no branches at all).
+This is a hard boundary on the otherwise-reliable C-55 goto-to-
+distinct-labels fix (see the extension note at the end of C-69):
+that fix works cleanly for DIFFERENT-variable guard pairs but not for
+repeated-equality tests on one already-loaded register.
+
+**Falsifiable claim:** *some source restructuring defeats the
+compound-compare-merge for same-register repeated-equality tests.*
+**Falsified on 2 members, cm-main-tier-sweep-1 (2026-08-08), batch 1:**
+`func_0204931c` (2-way, `tag==0`/`tag==2`) — `&&`, goto-to-shared-
+label, goto-to-distinct-labels, and `switch`-with-fallthrough all
+tried; 3 gave byte-identical 37.5% output, one (distinct labels) gave
+a slightly different but not-better 38.5%. `func_02052704` (3-way,
+`a0==2`/`3`/`4`) — an even more aggressive collapse (no branches
+survive in the best attempt at all): `switch` (20.0%, best) → explicit
+sequential goto (10.0%, worse) → `volatile` parameter (0.0%, worst —
+forces a spurious stack frame). Attempts were NOT monotonic on this
+member; further tries actively degraded the match.
+
+**Affected picks:** `func_0204931c` (38.5%), `func_02052704` (20.0%)
+— both main.
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 1.
 
 ## Codegen-inherent edge cases (3 patterns)
 
