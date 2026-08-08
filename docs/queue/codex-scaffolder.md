@@ -448,6 +448,12 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (stale-
 
 **Gate:** `python -m pytest -q tests` green + before/after row counts per source + a 10-row spot-check table (random backfilled rows traced to their source doc) in the PR body.
 
+> **Result note 2026-08-07 (re-scoped):** The advertised per-candidate park
+> tables do not exist in the sweep-9..15 docs or PR bodies. The recoverable
+> source is the individual batch commit messages: 192 shipped rows and 195
+> explicit parked rows. The remaining parks are disclosed in the PR body by
+> sweep rather than reconstructed from guesswork.
+
 ### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [DONE]
 
 The producer/consumer lens cannot audit flags-word/bitmask fields — 3 recurrences now (`GlobalData02104bac.flags` CONSUMER-ONLY with 3 unchased hypotheses: unmatched init fn / hardware latch / bulk Fill32; `BgCfg.f14`/`f18` excluded from sample-2 as untestable), and `field_exposure_census.py`'s own coverage note names the same blind spots. Build a **finder, not a judge**: given a field (base symbol + offset + width), surface candidate producer sites of the broadened shapes — (a) masked read-modify-write (`ldr` → `orr`/`bic`/`and` → `str` on the same base+offset), (b) bulk fills whose range covers the offset (memset / MI_CpuFill / Fill32 / DMA), (c) SDK-call writes (a call taking the field's address or its containing block). Output: ranked candidate sites with shape tags; the lens stays the verdict-maker. CANARY: `GlobalData02104bac.flags` — the tool must either surface at least one concrete producer-site hypothesis for it or honestly report none WITH the searched-shape list; paste that run. Then run it on the 4 known blocked fields and report.
@@ -456,7 +462,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (3 recu
 
 **Gate:** `python -m pytest -q tests` green + the canary run pasted + the 4-blocked-fields table in the PR body.
 
-### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [TODO]
+### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [DONE]
 
 Repairs `#1467` (do NOT merge it as-is; fix on the same branch). Four defects, each verified at source by the brain — the first is the one that makes the whole structural fix a no-op:
 
@@ -494,7 +500,7 @@ Also remove the per-input hardcodes in `make_spec` (`if base.lower().endswith("0
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + NEGATIVE fixtures proving each class is rejected or downgraded: (a) an unrelated symbol doing the identical 0x54 RMW → OFFSET-ONLY, ranked below any anchored hit; (b) a `BgCfg021aa460 cfg` local of a different type → rejected or downgraded; (c) a bare decimal literal equal to the offset → not a producer. Re-paste the `GlobalData02104bac 0x54 2` canary with the anchor column, and re-paste the 4-blocked-fields table with the corrected counts.
 
-### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [TODO]
+### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [DONE]
 
 Second pass on `#1467`, same branch. The code fixes from the first pass are sound and stay: the module key is now derived from `_source_module`, dedup is event-level, failure-safety is ordered before the mutation, and all six required regressions exist and pass. Three defects remain, one of them introduced BY the fix.
 

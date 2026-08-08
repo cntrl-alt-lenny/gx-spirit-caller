@@ -277,6 +277,11 @@ def _attempted_keys(path: Path | None = None) -> set[tuple[str, str]]:
                 f"{ledger}: expected TSV columns including addr and module"
             )
         for row in reader:
+            # Fail closed: only an explicit never-attempted marker may remain
+            # dispatchable.  Unknown, blank, and legacy result values still
+            # represent an attempted row until a human/tool proves otherwise.
+            if (row.get("result") or "").strip().lower() == "not-attempted":
+                continue
             addr = _normalise_attempt_addr(row.get("addr"))
             module = (row.get("module") or "").strip().lower()
             if addr and module:
