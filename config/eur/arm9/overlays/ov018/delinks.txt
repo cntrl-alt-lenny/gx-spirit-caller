@@ -120,6 +120,26 @@ src/overlay018/func_ov018_021ad1f4.c:
     complete
     .text start:0x021ad1f4 end:0x021ad2e4
 
+src/overlay018/data_ov018_021ad2e4.c:
+    complete
+    .rodata start:0x021ad2e4 end:0x021ad2f0
+
+src/overlay018/data_ov018_021ad2f0.c:
+    complete
+    .rodata start:0x021ad2f0 end:0x021ad2fc
+
+src/overlay018/data_ov018_021ad2fc.c:
+    complete
+    .rodata start:0x021ad2fc end:0x021ad308
+
+src/overlay018/data_ov018_021ad308.c:
+    complete
+    .rodata start:0x021ad308 end:0x021ad314
+
+src/overlay018/data_ov018_021ad71c.c:
+    complete
+    .data start:0x021ad71c end:0x021ad738
+
 src/overlay018/data_ov018_021ad738.c:
     complete
     .data start:0x021ad738 end:0x021ad798

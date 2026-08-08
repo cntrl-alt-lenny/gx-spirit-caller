@@ -168,6 +168,14 @@ src/overlay009/func_ov009_021ad7d4.c:
     complete
     .text start:0x021ad7d4 end:0x021ad82c
 
+src/overlay009/data/data_ov009_021ad82c.c:
+    complete
+    .rodata start:0x021ad82c end:0x021ad83c
+
+src/overlay009/data/data_ov009_021ad84c.c:
+    complete
+    .rodata start:0x021ad84c end:0x021ad858
+
 src/overlay009/sinit_ov009_021ad868.c:
     complete
     .init start:0x021ad868 end:0x021ad894
@@ -213,6 +221,34 @@ src/overlay009/sinit_ov009_021ad8c0.c:
 src/overlay009/data/data_ov009_021ada18.c:
     complete
     .data start:0x021ada18 end:0x021ada1c
+src/overlay009/data/data_ov009_021ada90.c:
+    complete
+    .data start:0x021ada90 end:0x021ada9c
+
+src/overlay009/data/data_ov009_021ada9c.c:
+    complete
+    .data start:0x021ada9c end:0x021adaa8
+
+src/overlay009/data/data_ov009_021adaa8.c:
+    complete
+    .data start:0x021adaa8 end:0x021adab4
+
+src/overlay009/data/data_ov009_021adab4.c:
+    complete
+    .data start:0x021adab4 end:0x021adac0
+
+src/overlay009/data/data_ov009_021adac0.c:
+    complete
+    .data start:0x021adac0 end:0x021adacc
+
+src/overlay009/data/data_ov009_021adacc.c:
+    complete
+    .data start:0x021adacc end:0x021adad8
+
+src/overlay009/data/data_ov009_021adad8.c:
+    complete
+    .data start:0x021adad8 end:0x021adae4
+
 src/overlay009/bss/data_ov009_bss.s:
     complete
     .bss start:0x021adbc0 end:0x021adc00

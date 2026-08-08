@@ -72,6 +72,10 @@ src/overlay013/data_ov013_021cb7b4.c:
     complete
     .rodata start:0x021cb7b4 end:0x021cb91c
 
+src/overlay013/data_ov013_021cb9b0.c:
+    complete
+    .data start:0x021cb9b0 end:0x021cb9c4
+
 src/overlay013/data/data_ov013_021cbb1c.c:
     complete
     .data start:0x021cbb1c end:0x021cbb20
