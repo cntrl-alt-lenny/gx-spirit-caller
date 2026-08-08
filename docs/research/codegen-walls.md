@@ -7346,6 +7346,19 @@ still-open mechanisms head-on.
 > mathematically the same value. Found on `func_ov002_02209d04`: a
 > 97.7%→100% fix was purely swapping these two terms' source order.
 
+> **Extension — caching a twice-referenced FIELD VALUE, not just a base
+> pointer (cm-main-tier-sweep-2, 2026-08-08, batch 4).** The
+> materialize-explicitly technique also applies to a plain struct field
+> read twice, not just a row/table base address. `func_0208b070`:
+> without an explicit named local for a twice-referenced field
+> (`self->f0`), mwcc instead cached the whole `self` struct pointer into
+> a callee-saved register (the wrong shape). Adding `int f0 = self->f0;`
+> and using the local for both reads reverted mwcc to the target's
+> preferred style — re-dereferencing `self` directly (still in its
+> original register) at each use site, with no cached base at all. The
+> fix is the mirror image of what it looks like: caching a VALUE
+> stopped mwcc from wrongly caching a POINTER.
+
 ### C-64. LS-vs-EQ condition code for an `unsigned x <= 0` guard is controlled by whether the check is mwcc's OWN synthesized for-loop trip-count pre-check or a hand-written guard — not by goto-vs-predicated source syntax
 
 **Background.** Sweep-11 flagged 3 instances (`func_ov002_0223cfec`,
@@ -7951,6 +7964,19 @@ the naive predicated form). `func_0206e4a4`/`func_0206df54`/
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 1, 2, 4.
 
+> **Sub-pattern — shared-exit-via-goto for two independently-
+> if-converted call sites (cm-main-tier-sweep-2, 2026-08-08, batch 2).**
+> A DIFFERENT symptom of the same physical-placement mechanism: the
+> target reuses ONE epilogue block from multiple call sites (e.g. two
+> different guard failures both fall through to the same `return 0;`),
+> but a naive C source independently if-converts EACH site into its own
+> predicated return — producing two separate copies of the same exit
+> instead of one shared block reached by real branches. Fix: `goto` from
+> both sites to one shared label, same as the main entry's return-
+> statement-merging fix, but the trigger here is "two call/guard sites
+> converging on one identical exit," not "physically-distant exit
+> blocks." `func_020ab054` (main, 100%).
+
 ### C-73. A field re-read needs an explicit `volatile` qualifier to survive mwcc's CSE even with zero true aliasing risk — both for a repeated READ and for a READ immediately after a STORE
 
 **The trap.** A struct-field dereference that appears twice in the
@@ -8012,6 +8038,19 @@ LOCAL-VARIABLE SIZING, not register-count parity.
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 3.
 
+> **Extension — multiple same-scope locals passed by address to the
+> SAME callee need one struct, not separate declarations, to get the
+> right relative stack order (cm-main-tier-sweep-2, 2026-08-08,
+> batch 3).** When a caller passes `&a` and `&b` (two separate locals)
+> to one opaque callee that reads back through both, two independently-
+> declared locals can land in the WRONG relative order on the stack no
+> matter which declaration/reference order is tried (byte-identical
+> output across 2 different orderings) — because the compiler is free
+> to place unrelated locals in either order. Wrapping both in one
+> anonymous `struct { ... } tmp;` and passing `&tmp.a`/`&tmp.b` forces
+> the exact physical layout the target expects. `func_02065d18` (main,
+> 100%, combined with a C-76 LDRH/LDRSH fix for the remaining word).
+
 ### C-75. Pure statement-order (scheduling) sensitivity, with no register, type, or control-flow change, can be the only lever a function needs
 
 **The trap.** A function can have every register, type, and branch
@@ -8061,6 +8100,138 @@ observed again in batch 5's session notes as a first-thing-to-try.
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batches 4, 5.
 
+> **Extension — LDRH-vs-LDRSH, and branch condition codes, not just shifts
+> (cm-main-tier-sweep-2, 2026-08-08, batches 3, 4).** The same signed/
+> unsigned lever also controls which LOAD instruction mwcc picks (a
+> `short*` cast → `LDRSH`, sign-extend; `unsigned short*` → `LDRH`,
+> zero-extend) at a single read site, independent of any shift (batch
+> 3, `func_02065d18`). It also controls which CONDITION CODE a branch
+> gets: a `for`-loop-adjacent range value declared `unsigned int`
+> produces `BCC`/`BCS`; the SAME value declared plain signed `int`
+> produces `BLT`/`BGE` — even when the value is provably non-negative
+> either way, so "it can never be negative" is not a safe reason to
+> default to `unsigned` (batch 4, `func_0208dd9c`). Check the target's
+> actual condition-code mnemonic before picking a type, don't infer it
+> from the value's real range.
+
+### C-77. A scan-loop's traveling pointer must be the incoming PARAMETER itself, mutated in place — not a copy — or the final delta's operands land in swapped registers
+
+**The trap.** For a loop that scans forward from a pointer parameter
+and returns an offset/delta at the end, writing `char *p = param;`
+and scanning `p` while leaving `param` untouched is semantically
+identical to mutating `param` directly (`param++`) and saving a
+*fresh local* for the original start — but the two forms make mwcc
+assign the scanning role to different physical registers throughout
+the function, swapping which operand of the final `sub` (delta
+computation) lands where.
+
+**The fix.** Mutate the incoming parameter itself in the loop; if you
+need the original start value at the end, save it into a NEW local
+declared before the loop, not the other way around (don't leave the
+parameter untouched and scan a copy).
+
+**Affected picks:** `func_02077094` (main, 100%), and independently
+confirmed on `func_020aaf10`'s first loop (main, that function's
+overall park was for an unrelated second-loop wall).
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 1.
+
+### C-78. A loop's compound exit condition (e.g. "not null AND not-yet-found") must have BOTH tests physically in the check block reached by the loop's entry jump — not split across the check block and the body
+
+**The trap.** `while (cond1) { if (cond2) return; advance(); }` is
+logically equivalent to a loop that exits on `!cond1 || cond2`, but it
+puts `cond2`'s test in the wrong basic block relative to the target:
+many `for`/`while` loops are compiled with a jump-to-check-first
+layout (entry jumps directly to the condition test, body only reached
+after that test passes), and if the compound condition's second half
+lives in the body instead of the check block, the resulting CFG has a
+different shape entirely — extra words, wrong branch targets — even
+though it's semantically identical.
+
+**The fix.** Use explicit `goto`/labels to force BOTH halves of the
+compound exit condition into the SAME block that the loop's initial
+entry jump reaches, with only the advance/increment step left in the
+body/backedge block.
+
+**Affected picks:** `func_020919ac`, `func_0206e504` (main, both
+100%).
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 1.
+
+### C-79. Register pairing for pure data-flow (no branches involved) can hinge on declaration order or written operand order alone, with the emitted instruction order completely unchanged
+
+**The trap.** This is C-55's "polarity" idea (source phrasing controls
+codegen even when semantically inert) applied outside branches — to
+plain value/register assignment. Three independent shapes hit this in
+one batch: (1) a shift-amount local needed to be initialized by
+COPYING the loop counter (`sh = i;`) rather than an independent literal
+(`sh = 0;`) to land in the right register, even though both are 0 on
+first iteration; (2) two locals (a counter and a zero-initialized
+accumulator) needed to be DECLARED before an unrelated pointer local,
+not after, to get the right register pairing; (3) a bitwise-OR's two
+operands needed to be WRITTEN in a specific syntactic order
+(`(field<<N) | (*reg&mask)`, not the reverse) even though the actual
+emitted instruction sequence was byte-identical either way once
+matched.
+
+**The fix.** When a diff is a pure register-identity swap with
+correct instruction count/order otherwise, try: matching a local's
+initializer to reuse an already-live value instead of an independent
+constant; reordering local declarations (not statements); and
+reordering a commutative expression's written operand order. All
+three are free, source-only changes with zero effect on the emitted
+instruction SEQUENCE, only on register assignment.
+
+**Affected picks:** `func_020442f8`, `func_02095c18`, `func_020a5f10`
+(main, all 100%).
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 1.
+
+### C-80. An explicit double-shift (`(x & mask) << N) >> N`) can get silently collapsed into one instruction by mwcc's own peephole, undershooting a target that keeps both shifts separate — write it so the collapse can't fire
+
+**The trap.** This is a word-COUNT preservation issue, distinct from
+C-76's condition-code/instruction-selection issue even though both
+involve shift instructions. mwcc's optimizer proves an explicit
+double-shift idiom (mask-then-shift-then-unshift, commonly used to
+sign- or zero-extend a sub-field) is equivalent to a single ASR/LSR
+and collapses it — but some targets keep the two shifts as genuinely
+separate instructions, and the collapsed 1-instruction form is then
+one or more words short.
+
+**The fix.** Write the double-shift explicitly with the correct
+signedness on both the masking type AND the shift operations — get
+this exactly right and the collapse doesn't fire; get the signedness
+wrong on either half and either the collapse still fires or the wrong
+condition/value comes out.
+
+**Affected picks:** `func_020938f8`, `func_0207da1c` (main).
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 2.
+
+### C-81. For `pointer + int` addition, mwcc always assigns the POINTER operand to the ADD's Rn (base) field regardless of the C source's left/right operand order — cast both operands to a plain integer type to regain operand-order control
+
+**The trap.** `ptr + len` and `len + ptr` are commutative in C and
+compile IDENTICALLY under ordinary pointer arithmetic — mwcc always
+puts the pointer in Rn (the base register position) and the integer
+in Rm, regardless of which one is written first. If a target's
+register allocation implies the two operands need to swap Rn/Rm
+positions (matching a different physical register to each role), pure
+source-order changes on a genuine pointer expression cannot produce
+that.
+
+**The fix.** Cast BOTH operands to a plain integer type (e.g.
+`unsigned int`) before adding, removing pointer-ness from the
+expression entirely — this restores ordinary commutative-operand-order
+behavior and gives back control over which operand becomes Rn.
+
+**Affected picks:** confirmed by controlled A/B test on `func_0207d4dc`
+(main; both orderings under real pointer arithmetic produced identical
+output, the cast-to-`unsigned int` form was the only one that changed
+Rn/Rm assignment) — part of a park, not a full ship, but the lever
+itself is a clean, isolated, reproducible finding.
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 4.
+
 ## Permanent P-wall index (28 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
@@ -8100,12 +8271,16 @@ rather than iterating.
 | P-28 | LIVE (tentative) | Single-scratch-value register-mirror, broader than P-20/P-23's literal `mla`-operand shape. |
 | P-29 | LIVE (tentative) | Single-symbol guard + row-loop eager-`mla` fusion (single-batch). |
 | P-30 | LIVE (tentative) | Canary-lever residual — shared large-offset base reproduces structure but not its physical register (main). |
-| P-31 | LIVE (tentative) | Predication-resistance — mwcc fully if-converts a guard no restructuring can force into a branch (mirror of C-55). |
-| P-32 | LIVE | OR-of-non-adjacent-equality-values resists branch separation; sticky CMP/CMPNE predicated form. |
-| P-33 | LIVE (tentative) | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). |
+| P-31 | LIVE | Predication-resistance — mwcc fully if-converts a guard no restructuring can force into a branch (mirror of C-55). 8+ confirmed instances, no longer tentative. |
+| P-32 | LIVE | OR-of-non-adjacent-equality-values resists branch separation; sticky CMP/CMPNE predicated form. Scope caveat: adjacency alone insufficient inside a larger guard chain. |
+| P-33 | LIVE (tentative) | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). Confirmed bidirectional. |
+| P-34 | LIVE (tentative) | Prologue pad-register-fold resistance — stack-alignment pad won't fold into the `lr` push from any source form. |
+| P-35 | LIVE (tentative) | SUBS-flag-fusion resistance for a variable-assigned shift/subtract amount. |
+| P-36 | LIVE | Instruction-scheduling order not source-controllable (6 sub-shapes); highest-yield new wall family this round. |
+| P-37 | LIVE (tentative) | Register reuse via free-`lr`-after-`pop{pc}` — hand-optimized allocation trick, single instance. |
 
-**Current count:** 28 genuinely live P-entries (P-17 under reconsideration,
-not yet retired; P-28/29/30/31/33 tentative but counted live); four retired
+**Current count:** 32 genuinely live P-entries (P-17 under reconsideration,
+not yet retired; P-28/29/30/34/35/37 tentative but counted live); four retired
 entries (P-6, P-7, P-8, P-10). The three corrected headings among the
 above are P-7, P-8, and P-10; their historical bodies remain intact. This
 table previously undercounted by omitting P-27/28/29 after they were added
@@ -10721,40 +10896,74 @@ a confirmed working recipe on its own).
 
 ### P-31. Predication-resistance — mwcc fully if-converts a guard that no source restructuring can force into a real branch (mirror image of C-55)
 
-> **Tentative — 2 independent occurrences in one batch (both ~40-50%
-> best), suggesting systematic rather than per-function noise, but
-> not yet tested outside that batch.**
+> **No longer tentative — 8+ confirmed instances across two rounds and
+> four separate batches, no cross-talk between most of them.**
+> Originally filed on 2 members from a single batch; a second round
+> (cm-main-tier-sweep-2) independently reproduced it 6+ more times
+> across 3 different batches, on both guard-chain and small-dispatcher
+> shapes and across all three compiler tiers. Confirmed systematic, not
+> per-function noise.
 
-**The shape:** a guard whose true-arm is 3-4 instructions including a
-memory store, false-arm is a single constant — mwcc fully
-if-converts this to a branchless `streq`/`moveq`/`movne`-style
-sequence in the target, but every source restructuring tried produces
-a REAL branch for at least one arm instead. This is the mirror image
-of C-55: there, mwcc predicates when a branch is wanted; here, mwcc
-wants to predicate but the source can't talk it into doing so.
+**The shape:** a guard whose true-arm is a few instructions (a memory
+store, a call, or a compact predicated block), false-arm is a single
+constant or fallthrough — mwcc fully if-converts this to a branchless
+predicated sequence (`streq`/`moveq`/`movne`, or a chained
+`ldreq/cmpeq` sequence) in the target, but every source restructuring
+tried produces a REAL branch for at least one arm instead. This is the
+mirror image of C-55: there, mwcc predicates when a branch is wanted;
+here, mwcc wants to predicate but the source can't talk it into doing
+so.
 
 **Falsifiable claim:** *some source restructuring produces the fully-
-predicated (branchless) form.* **Falsified on 2 members
-(cm-main-tier-sweep-1, 2026-08-08, batch 5):** goto per C-55's own
-literal recipe, `switch` per C-67, if/else with a shared result
-variable, ternary, and an accumulator-default-then-override pattern
-all produced a real conditional branch (`bxne`/`beq`) for at least one
-arm on both `func_02073ed8` (11 restructuring attempts, best 40%) and
-`func_0207c990` (6 attempts, best 50% — a sibling of the successfully-
-shipped `func_0207c934`).
+predicated (branchless) form.* **Falsified on every member tried
+across two rounds:**
+- cm-main-tier-sweep-1, batch 5: `func_02073ed8` (11 attempts, best
+  40%), `func_0207c990` (6 attempts, best 50%).
+- cm-main-tier-sweep-2, batch 3: `func_0208de4c` (leaf, no
+  prologue/epilogue signal at all; 3 distinct C shapes including a
+  tier switch, best 27.8%), `func_0208c940` (mirrored signature —
+  target predicates the `mode==0` arm fully; 3 shapes, best 68.4%).
+- cm-main-tier-sweep-2, batch 5: `func_02064580` (3-field-guard chain
+  before a helper call; `&&`, goto-to-shared-label, and
+  `do/while(0)`-with-break all produced byte-identical if-converted
+  output; best 50%), `func_020577d8` (3 straight-line guards, NO calls
+  between them — goto and `do/while(0)` actively made the merge
+  TIGHTER rather than breaking it, 26→22-23 words; best 7.4%),
+  `func_0209f904` (108B, 4-guard chain sharing one fail tail — this is
+  the EXACT shape the round's own canary shipped successfully at a
+  smaller size/simpler tail; here, with a tail call plus argument
+  setup instead of a bare constant return, if-conversion wins instead
+  — **the key negative finding of cm-main-tier-sweep-2**: the canary's
+  successful nested-if/goto recipe does NOT generalize once the
+  success path gets more complex than a bare return).
+- cm-main-tier-sweep-2, batch 5 Pool A: `func_0208e6ac` — tried under
+  ALL THREE compiler tiers (2.0/sp1p5, 1.2/sp2p3, 1.2/sp3, identical
+  wrong output on all three, ruling out tier as the variable) and 5 C
+  shapes; zero movement, best 4.5-9.1%.
+
+**Size/complexity is the apparent trigger for WHICH direction wins.**
+The round-2 evidence suggests if-conversion becomes more likely to WIN
+(defeat every branch-forcing attempt) as the guard chain's success
+path grows more complex — a bare constant return (the canary's shape)
+lets branch-forcing recipes work; a tail call with argument setup, or
+a call between guards, tips mwcc toward keeping/forcing the predicated
+form regardless of source structure. Not yet a predictive rule, just
+the clearest pattern across this round's members.
 
 **Possible relation to P-32:** both are cases where mwcc's predicate/
 branch decision resists every source-level lever tried; P-32 is
 specifically about a 2-value OR-membership test, this entry is about
-a single guard with an asymmetric true/false arm. Kept separate
-pending a future round that tests both shapes independently.
+a single guard (or guard-chain) with an asymmetric true/false arm or
+a call-adjacent success path.
 
-**Affected picks:** `func_02073ed8` (40%), `func_0207c990` (50%) —
-both main.
+**Affected picks (8):** `func_02073ed8`, `func_0207c990`,
+`func_0208de4c`, `func_0208c940`, `func_02064580`, `func_020577d8`,
+`func_0209f904`, `func_0208e6ac` — all main.
 
 **Recipe status: NONE.**
 
-**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 5.
+**Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 5;
+cm-main-tier-sweep-2 (2026-08-08), batches 3, 5.
 
 ### P-32. OR-of-non-adjacent-equality-values resists suppression into two genuine branches — a sticky CMP/CMPNE predicated membership test
 
@@ -10789,6 +10998,20 @@ needs no special recipe at all).
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 4.
 
+> **Scope caveat — adjacency alone is not sufficient once the OR sits
+> inside a LARGER guard chain (cm-main-tier-sweep-2, 2026-08-08,
+> batch 5).** `func_02046b3c`: a 2-value equality-OR on genuinely
+> ADJACENT values (`field==5 || field==6`) still resisted every
+> suppression attempt (plain `||`, dual-goto, dual-goto with C-72-
+> corrected physical block order) when embedded as one guard among 3
+> in a larger chain — mwcc collapsed it to `cmp+cmpne+bne` regardless.
+> The original adjacent-values-are-fine finding was in what was likely
+> an ISOLATED 2-guard context; this suggests the surrounding guard
+> chain's complexity, not adjacency alone, may be the real variable.
+> Best: 33.3% (26/27 words, off by one throughout). Not yet resolved
+> which factor dominates — flag any future adjacent-value-OR park with
+> its surrounding guard-chain size so this can be disentangled.
+
 ### P-33. Same-register repeated-equality compound-compare-merge — a C-55 boundary case with no working recipe
 
 **The shape:** two (or three) equality tests against the SAME
@@ -10821,6 +11044,211 @@ member; further tries actively degraded the match.
 **Recipe status: NONE.**
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 1.
+
+> **Confirmed BIDIRECTIONAL (cm-main-tier-sweep-2, 2026-08-08,
+> batch 4).** The original write-up only observed mwcc MERGING
+> same-register repeated-equality tests when the target keeps them
+> separate (source wants branches, mwcc predicates/merges — no fix).
+> `func_0206e33c` reproduces the identical resistance in the OPPOSITE
+> direction: the target uses REAL BRANCHES for `tag==0`/`tag==4` (both
+> tested against one already-loaded signed-byte register), but every
+> C form tried (goto-to-distinct-labels, `switch`) gets
+> if-converted/predicate-merged by mwcc regardless — the same "nothing
+> tried defeats this" character, just mirrored. P-33 blocks conversion
+> in BOTH directions on this shape family, not only one. Best: 50%
+> (10/20 words).
+
+### P-34. Prologue pad-register-fold resistance — a stack-alignment pad word folds into the `lr` push in the target but never in source-driven recompiles
+
+**The shape:** a function whose body needs a computed stack address
+passed to an unconverted callee (the classic "address of the last
+named local, rounded up, plus an offset" pattern — effectively a
+hand-rolled `va_start`) has its 1-word alignment pad folded directly
+into the `lr` push (`push {r3,lr}`, using the otherwise-unused r3 slot
+as the pad) in the target. Every C form tried instead produces a
+separate `push {lr}` followed by `sub sp,#4` — a 1-word divergence
+confined entirely to the PROLOGUE, with the function BODY (address
+math, redundant reload, the call itself) matching byte-for-byte on the
+first correctly-derived draft.
+
+**Falsifiable claim:** *some source form makes mwcc fold the pad into
+the push.* **Falsified on 2 sibling functions (same wrapper family,
+same callee), cm-main-tier-sweep-2, 2026-08-08, batch 1.** This
+project's headers have no `<stdarg.h>` (confirmed absent from every
+vendored header via grep) and mwcc doesn't recognize
+`__builtin_va_list`, so 5 structurally distinct forms were tried
+instead: ellipsis + manual pointer math (3 variations), and 4
+plain-named-int-params with an unused trailing parameter. Every form
+that compiled produced the IDENTICAL byte-for-byte prologue
+divergence — confirming this is independent of source shape, not a
+missing va-args idiom specifically.
+
+**Affected picks:** `func_020a9764`, `func_020a978c` (main, both
+parked, bodies match, prologue doesn't).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 1.
+
+### P-35. SUBS-flag-fusion resistance — a variable-assigned shift/subtract amount won't fuse its flags into the following branch when the amount is stored to a local first
+
+**The shape:** a hand-written soft-float-adjacent routine (not the
+compiler's own runtime helper) computing a shift amount via
+subtraction needs the flags from that SAME subtraction to feed a
+following conditional branch directly — target emits `mov r2,#K;
+subs r2,r2,r1,lsr#23` (SUBS, flags used by the next instruction). Any
+C form that assigns the subtraction's result to a named variable
+before testing it emits a plain `sub`/`rsb` followed by a SEPARATE
+redundant `cmp`, never the flag-fused form.
+
+**Falsifiable claim:** *some source form fuses the flags directly.*
+**Falsified across 5 attempts, cm-main-tier-sweep-2, 2026-08-08,
+batch 1:** RSB-immediate form, goto-based block reorder, compound
+`-=` assignment as its own statement, the same compound assignment
+inlined directly into the `if` condition, and fixing only the
+overflow-expression in isolation — all hit the identical flag-fusion
+gap. Every OTHER aspect of the function (branch polarity, physical
+block placement, the overflow path's bit-trick) was independently
+confirmed correct before isolating this as the sole remaining
+residual.
+
+**Affected picks:** `func_020b3168` (main, parked).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 1.
+
+### P-36. Instruction-scheduling order is frequently not source-controllable at all — a family of walls where every diff is a pure reordering of otherwise-correct instructions
+
+> **New this round, but already the single highest-yield wall family
+> — explains roughly a third of cm-main-tier-sweep-2's parks across 3
+> independent batches with no cross-talk.** Distinct from C-75 (pure
+> statement-order sensitivity): C-75 is a LEVER — reordering C
+> statements DOES fix the match. This entry is the family of cases
+> where that exact technique was tried and FAILED — the scheduling
+> comes from somewhere below source-level control entirely. Treat any
+> of the sub-shapes below as effectively permanent once 3-4 honest
+> statement-order variations are exhausted; don't keep grinding.
+
+**Sub-shapes observed (all "correct instructions, wrong order," no
+value/type/control-flow difference):**
+
+1. **Independent pool-load scheduling hoist.** Target orders a
+   hardware-register store BEFORE a following pool-constant load;
+   source-driven recompiles always hoist the load first regardless of
+   statement order, scoped-block placement, or declaration timing.
+   4 distinct C shapes, byte-identical wrong output every time.
+   (`func_0208bf3c`, cm-main-tier-sweep-2 batch 4, 90% best.)
+2. **Pipeline-scheduler register-interleaving.** For two independent
+   straight-line sub-computations (e.g. two hardware-register
+   bitfield packs), the target INTERLEAVES their instructions
+   (A-step1, B-step1, A-step2, B-step2, ...) with a rigid
+   accumulator/secondary-register role assignment; source-driven
+   recompiles always fully resolve one sub-expression before starting
+   the other, swapping which register ends up in which role. 5
+   variations on the first instance, reproduced byte-for-byte-
+   identical-diff-shape on 2 further twins with a single try each —
+   systematic, not per-function noise. (`func_0208df0c`/`df60`/`e1cc`,
+   cm-main-tier-sweep-2 batch 4, all 53.9%.)
+3. **LDM-fusion instruction-selection resistance.** Target reads back
+   2 consecutive stack words via a fused `add`+`ldm` pair; every C
+   framing (array-index, pointer-variable, struct-copy, struct-typed
+   local) instead emits 2 separate `ldr`s. (`func_02098038`,
+   cm-main-tier-sweep-2 batch 4, 85%.)
+4. **Argument-evaluation order not source-controllable.** A 5-argument
+   call where the 5th argument is passed on the caller's stack: target
+   computes an unrelated register-OR chain for args 1-4 BEFORE reading
+   the 5th (stack) argument; every C statement ordering (direct,
+   split-then-merge, ternary-fused, extra-leading-local) reads the
+   stack argument FIRST instead. 4 attempts, byte-identical for the
+   first 2 words every time. (`func_0208e5ec`, cm-main-tier-sweep-2
+   batch 3, 8.3%.)
+5. **Call-adjacent literal-pool/register-move interleaving.** Target
+   interleaves an expensive literal-pool load with cheap register
+   moves in a specific latency-hiding order around a call
+   (`mov ip,#0` first, pool load in the middle, saves last); 2 C
+   shapes (direct call, pre-computed named locals in matching textual
+   order) produced byte-identical output regardless.
+   (`func_020536d0`, cm-main-tier-sweep-2 batch 3, 30.8%.) This is the
+   same family P-27 already catalogs for POST-call scheduling — this
+   sub-shape is effectively P-27 confirmed again on a pre-call variant.
+6. **Condition-code family not source-controllable.** A range/sign
+   test (`cmp idx,#0x60`) uses bare PL/MI (raw N-flag test) fully
+   predicated into the following ops with zero branches in the target;
+   4 distinct C shapes (signed if/else, unsigned if/else,
+   pre-subtracted-then-test-sign, ternary/select-based) produced 3
+   different WRONG condition-code families (GE/LT, then CS/CC, then a
+   worse ternary expansion) — PL/MI was never reached by any source
+   form. (`func_020908c0`, cm-main-tier-sweep-2 batch 3, 8.3%.)
+
+**Recipe status: NONE for any sub-shape.** If C-75-style statement
+reordering doesn't move a residual within 3-4 honest tries and the
+diff looks like a pure reordering/selection choice with correct
+values throughout, recognize this family and park — further
+restructuring attempts have not moved any member of this family once
+identified.
+
+**Affected picks (7):** `func_0208bf3c`, `func_0208df0c`,
+`func_0208df60`, `func_0208e1cc`, `func_02098038`, `func_0208e5ec`,
+`func_020536d0`, `func_020908c0` — all main.
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batches 3, 4.
+
+### P-37. Register reuse via free-`lr`-after-`pop{pc}` — a hand-optimized-looking allocation trick a C compiler won't reproduce from ordinary source (tentative, single instance)
+
+**The shape:** a function whose epilogue pops directly into `pc`
+(`pop {..., pc}`, not the 2-step `pop {..., lr}; bx lr` form) frees
+`lr` for use as ordinary scratch mid-body, since it's never needed for
+a return branch. The target exploits this: it needs only 1 extra
+callee-saved register (`push {r4,lr}`) because it reuses `ip` and `lr`
+themselves as scratch space that an ordinary register allocator
+wouldn't consider available until the function's actual exit. Every C
+form tried allocates registers as if `lr`/`ip` were unavailable until
+the epilogue, needing 2 extra callee-saved registers
+(`push {r3,lr}` instead of `push {r4,lr}`) — a different push mask
+and a different word count (15 vs target's 13) throughout.
+
+**Falsifiable claim:** *some source restructuring reproduces the
+reduced push-register footprint.* **Falsified across 4 shapes,
+cm-main-tier-sweep-2, 2026-08-08, batch 3:** nested expression,
+sequential accumulation, single fused statement, pre-computed row
+pointer — none influenced the register count.
+
+**Affected picks:** `func_0208226c` (main, parked, 0%).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 3.
+
+## Open questions (not levers, not walls — genuinely unresolved)
+
+### OQ-1. Dead-branch preservation: a provably-dead compile-time-constant guard survives in the target but gets folded away by the same toolchain under every C reproduction tried
+
+**The puzzle.** A target contains `movs r0,#6; beq <target>` — a
+literal constant 6 tested against zero, which is always false at
+compile time, immediately followed by the (therefore always-taken)
+call this guard nominally protects. This is NOT explainable as "the
+compiler always does this for this call shape" — a byte-identical use
+of the SAME callee with the SAME first-argument-6 idiom is already
+shipped elsewhere in this codebase (`func_02049910.legacy_sp3.c`)
+WITHOUT any such guard (a plain unconditional `mov r0,#6; bl`),
+proving the guard is source-real in the target, not a fixed codegen
+artifact of that call shape. Yet every C reproduction attempted (bare
+`if(6)`, a local `int msgId=6; if(msgId)`, `msgId` assigned inside a
+switch's default case, `msgId` declared before/after the switch) gets
+the dead test constant-folded away by the same compiler.
+
+**Status:** open. 5 attempts, zero working reproduction. The rest of
+the SAME function's dispatch logic (a genuine 3-way switch) resolved
+cleanly via C-67 — this puzzle is isolated to one tail block. Worth a
+dedicated research pass (what source shape survives dead-code
+elimination for a provably-false compile-time constant?) rather than
+more blind guessing.
+
+**Affected picks:** `func_0204a960` (main, parked — this specific
+block; the function's dispatch portion is otherwise resolved).
+
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 4.
 
 ## Codegen-inherent edge cases (3 patterns)
 

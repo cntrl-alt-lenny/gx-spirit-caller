@@ -1016,7 +1016,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever 
 > (C-70–C-76, P-30–P-33) plus a C-55 boundary extension. See
 > [`cm-main-tier-sweep-1-2026-08-08.md`](../research/cm-main-tier-sweep-1-2026-08-08.md).
 
-### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [TODO]
+### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [DONE]
 
 `cm-main-tier-sweep-1` (#1472) shipped 71/100 (6,720 B), the campaign's best single round, and moved EUR natural-C 14.28% → 14.56%. Continue on the same selector: `docs/research/main-small-tier-worklist.md`, **0x02040000+** range (0x02000000–0x0203ffff stays the Scaffolder's), 100 candidates, 5 batch worktrees × 20, partition frozen before dispatch.
 
@@ -1033,3 +1033,27 @@ Use the levers from wave 1's own catalogue additions (C-70…C-76, P-30…P-33 l
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — wave 1 was bitten by exactly this and caught it only by reading the log. READ THE LOG. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, before/after `wall_aware_headroom.py` counts, and the two sub-rates.
+
+> **DONE 2026-08-08.** 60/100 shipped (59 batch + 1 canary, 3,852 B —
+> reported on one basis throughout, canary kept separate). **Pool A
+> (guard chain): 32/50 (64%). Pool B (loop/other/small dispatcher):
+> 27/50 (54%).** A real gap, but far smaller than the framing worried
+> about, and it varied enormously batch-to-batch — 2 of 5 batches had
+> Pool B *outship* Pool A (several "guard chain" labels concealed
+> softfloat/wrapper bodies that walled, while several "loop"/"other"
+> candidates were clean libc idioms), while the other 3 showed the
+> expected gap, one batch dropping to 20%. Both process incidents from
+> wave 1 (orphaned-`.s`, batch-worktree `attempts.tsv` non-recording)
+> reproduced again — including in my OWN canary commit, the mistake I
+> was warning every batch about in the same round's dispatch prompts —
+> caught and fixed across all 6 checkouts with zero data loss. Wave
+> 1's schema drift fixed in place (29 rows corrected). 14 new
+> codegen-walls.md entries (C-77–C-81, P-34–P-37, plus an open-
+> questions section) — the standout is **P-36**, a newly-catalogued
+> instruction-scheduling wall family explaining roughly a third of
+> this round's parks, and **P-31** promoted from tentative to
+> confirmed (8+ instances) with a real negative finding: the canary's
+> own successful predication-resistance recipe does NOT generalize
+> once a guard chain's success path grows more complex than a bare
+> return. See
+> [`cm-main-tier-sweep-2-2026-08-08.md`](../research/cm-main-tier-sweep-2-2026-08-08.md).

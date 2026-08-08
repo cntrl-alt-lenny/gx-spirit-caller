@@ -744,32 +744,133 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0207c934	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
 0x0207cd7c	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
 0x0207cdd0	main	128	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
-0x02046a5c	main	104	default	P-20-self-overwrite-deref	parked	80.8	reg-alloc	cm-main-tier-sweep-1-batch1
-0x020480b4	main	84	default	P-20-guard-merge-residual	parked	85.7	reg-alloc	cm-main-tier-sweep-1-batch1
-0x0204918c	main	96	default	P-20-mla-dest-register	parked	91.7	reg-alloc	cm-main-tier-sweep-1-batch1
-0x0204931c	main	96	default	compound-compare-same-reg	parked	38.5	compound-compare	cm-main-tier-sweep-1-batch1
-0x0204d468	main	76	default	reg-alloc-extra-mov	parked	40.0	reg-alloc	cm-main-tier-sweep-1-batch1
-0x02052704	main	40	default	compound-compare-3way	parked	20.0	compound-compare	cm-main-tier-sweep-1-batch1
-0x02052ecc	main	56	default	P-20-redundant-const-preserve	parked	14.3	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020531c0	main	112	default	64bit-compare-reg-pressure	parked	42.9	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055654	main	116	default	guard-chain-double-deref-p1reg	parked	79.3	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020558fc	main	60	default	guard-chain-double-deref-p1reg	parked	80.0	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055a18	main	108	default	guard-chain-double-deref-p1reg	parked	77.8	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055c04	main	108	default	guard-chain-double-deref-p1reg	parked	77.8	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020620d8	main	64	default	P-20-scratch-reg-swap	parked	75.0	reg-alloc	cm-main-tier-sweep-1-batch3
-0x0206811c	main	120	default	reg-alloc-diverge-stmia-merge	parked	23.3	reg-alloc	cm-main-tier-sweep-1-batch3
-0x020689e4	main	60	default	struct-by-value-return-abi	parked	5.0	abi-model	cm-main-tier-sweep-1-batch3
-0x0206aa68	main	100	default	neg1-materialization-reg-swap	parked	84.0	reg-alloc	cm-main-tier-sweep-1-batch3
-0x0206c84c	main	96	default	P-20-bf94-result-register	parked	54.2	reg-alloc	cm-main-tier-sweep-1-batch4
-0x0206cd0c	main	88	default	P-20-bf94-result-register	parked	95.5	reg-alloc	cm-main-tier-sweep-1-batch4
-0x0207092c	main	84	default	P-20-leaf-r0r1-choice	parked	71.4	reg-alloc	cm-main-tier-sweep-1-batch4
-0x02070ce0	main	84	default	cmpne-predication-nonadjacent-or	parked	23.8	predication	cm-main-tier-sweep-1-batch4
-0x02073a5c	main	100	default	P-20-dead-stackword-register	parked	96.0	reg-alloc	cm-main-tier-sweep-1-batch5
-0x02073ed8	main	80	default	predication-resistance-new	parked	40.0	predication	cm-main-tier-sweep-1-batch5
-0x02074b38	main	88	default	P-20-dual-register-swap	parked	63.6	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207af28	main	120	default	canary-lever-residual	parked	86.7	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207b0e0	main	92	default	canary-lever-residual-iplr	parked	73.9	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207c8d8	main	92	default	canary-lever-residual-2nd-access	parked	91.3	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207c990	main	76	default	predication-resistance-new	parked	50.0	predication	cm-main-tier-sweep-1-batch5
-0x0207cbe0	main	112	default	canary-lever-residual	parked	71.4	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207cc50	main	88	default	canary-lever-residual	parked	81.8	reg-alloc	cm-main-tier-sweep-1-batch5
+0x02046a5c	main	104	default	guard chain	parked	80.8	P-20-self-overwrite-deref	cm-main-tier-sweep-1-batch1
+0x020480b4	main	84	default	guard chain	parked	85.7	P-20-guard-merge-residual	cm-main-tier-sweep-1-batch1
+0x0204918c	main	96	default	guard chain	parked	91.7	P-20-mla-dest-register	cm-main-tier-sweep-1-batch1
+0x0204931c	main	96	default	guard chain	parked	38.5	compound-compare-same-reg	cm-main-tier-sweep-1-batch1
+0x0204d468	main	76	default	guard chain	parked	40.0	reg-alloc-extra-mov	cm-main-tier-sweep-1-batch1
+0x02052704	main	40	default	guard chain	parked	20.0	compound-compare-3way	cm-main-tier-sweep-1-batch1
+0x02052ecc	main	56	default	guard chain	parked	14.3	P-20-redundant-const-preserve	cm-main-tier-sweep-1-batch2
+0x020531c0	main	112	default	guard chain	parked	42.9	64bit-compare-reg-pressure	cm-main-tier-sweep-1-batch2
+0x02055654	main	116	default	guard chain	parked	79.3	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020558fc	main	60	default	guard chain	parked	80.0	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055a18	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055c04	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020620d8	main	64	default	guard chain	parked	75.0	P-20-scratch-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206811c	main	120	default	guard chain	parked	23.3	reg-alloc-diverge-stmia-merge	cm-main-tier-sweep-1-batch3
+0x020689e4	main	60	default	guard chain	parked	5.0	struct-by-value-return-abi	cm-main-tier-sweep-1-batch3
+0x0206aa68	main	100	default	guard chain	parked	84.0	neg1-materialization-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206c84c	main	96	default	guard chain	parked	54.2	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0206cd0c	main	88	default	guard chain	parked	95.5	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0207092c	main	84	default	guard chain	parked	71.4	P-20-leaf-r0r1-choice	cm-main-tier-sweep-1-batch4
+0x02070ce0	main	84	default	guard chain	parked	23.8	cmpne-predication-nonadjacent-or	cm-main-tier-sweep-1-batch4
+0x02073a5c	main	100	default	guard chain	parked	96.0	P-20-dead-stackword-register	cm-main-tier-sweep-1-batch5
+0x02073ed8	main	80	default	guard chain	parked	40.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x02074b38	main	88	default	guard chain	parked	63.6	P-20-dual-register-swap	cm-main-tier-sweep-1-batch5
+0x0207af28	main	120	default	guard chain	parked	86.7	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207b0e0	main	92	default	guard chain	parked	73.9	canary-lever-residual-iplr	cm-main-tier-sweep-1-batch5
+0x0207c8d8	main	92	default	guard chain	parked	91.3	canary-lever-residual-2nd-access	cm-main-tier-sweep-1-batch5
+0x0207c990	main	76	default	guard chain	parked	50.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x0207cbe0	main	112	default	guard chain	parked	71.4	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207cc50	main	88	default	guard chain	parked	81.8	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0205d4c0	main	68	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-canary
+0x0207d37c	main	48	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0208c9d4	main	48	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0207da48	main	52	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a5f10	main	52	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a7200	main	56	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0208a8bc	main	60	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x02077094	main	40	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0206e504	main	44	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020919ac	main	44	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020b4284	main	44	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020442f8	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020938c8	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x02095c18	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0209adb4	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a2cbc	main	60	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020854a4	main	64	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020a39ec	main	64	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020938f8	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b1e4c	main	60	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b1e0c	main	64	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020953e4	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020a6afc	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020ab054	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020aee78	main	52	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b4248	main	52	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02053bfc	main	56	legacy_sp3	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02094550	main	56	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020534b4	main	32	default	other	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02097e18	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02095344	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02097a04	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020a5f44	main	72	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020b319c	main	72	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02095de0	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02098388	main	48	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020489c4	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02054c30	main	52	legacy_sp3	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02054d68	main	52	legacy_sp3	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02065d18	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020952f8	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a3144	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a5d08	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02087954	main	80	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02088f94	main	80	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02089b64	main	80	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0208dd9c	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0209a968	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0208b070	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020670f4	main	76	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a1bf8	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02091a8c	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02098414	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209a9f4	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a0328	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a5668	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209ee90	main	80	default	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0206bef4	main	88	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209b050	main	104	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02097ea4	main	108	default	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a9764	main	40	default	guard chain	parked	90.0	P-34-prologue-pad-fold	cm-main-tier-sweep-2-batch1
+0x020a978c	main	44	default	guard chain	parked	91.0	P-34-prologue-pad-fold	cm-main-tier-sweep-2-batch1
+0x020b3168	main	52	default	guard chain	parked	90.0	P-35-subs-flag-fusion	cm-main-tier-sweep-2-batch1
+0x020a1bbc	main	60	default	guard chain	parked	65.0	P-20-r0-vs-r3-scratch	cm-main-tier-sweep-2-batch1
+0x020aaf10	main	48	default	loop	parked	91.7	reg-alloc-2nd-loop-addressing	cm-main-tier-sweep-2-batch1
+0x0206f170	main	52	default	loop	parked	71.4	condition-fusion-redundant-cmp	cm-main-tier-sweep-2-batch1
+0x02091c44	main	68	default	guard chain	parked	52.9	P-20-register-permutation	cm-main-tier-sweep-2-batch2
+0x0207ec28	main	64	default	guard chain	parked	62.5	P-20-r2r3-swap	cm-main-tier-sweep-2-batch2
+0x0208b000	main	64	default	guard chain	parked	68.8	P-20-mul-dest-cascade	cm-main-tier-sweep-2-batch2
+0x0208c844	main	64	default	guard chain	parked	70.6	P-31-tail-guard-if-conversion	cm-main-tier-sweep-2-batch2
+0x0207da1c	main	44	default	other	parked	27.3	P-20-r2r3-swap-post-doubleshift	cm-main-tier-sweep-2-batch2
+0x02054ad0	main	48	default	other	parked	91.7	P-20-final-add-register-choice	cm-main-tier-sweep-2-batch2
+0x0208de4c	main	72	default	guard chain	parked	27.8	P-31-if-conversion	cm-main-tier-sweep-2-batch3
+0x0208c940	main	76	default	guard chain	parked	68.4	P-31-if-conversion-mirrored	cm-main-tier-sweep-2-batch3
+0x0208f1c4	main	76	default	guard chain	parked	79.0	P-20-operand-order-swap	cm-main-tier-sweep-2-batch3
+0x0208f2a8	main	76	default	guard chain	parked	79.0	P-20-operand-order-swap	cm-main-tier-sweep-2-batch3
+0x0208e5ec	main	48	default	other	parked	8.3	P-36-argument-eval-order	cm-main-tier-sweep-2-batch3
+0x020908c0	main	48	default	other	parked	8.3	P-36-condition-code-family	cm-main-tier-sweep-2-batch3
+0x02044724	main	52	default	other	parked	61.5	CSE-resistant-reverse-direction	cm-main-tier-sweep-2-batch3
+0x020536d0	main	52	default	other	parked	30.8	P-36-call-adjacent-scheduling	cm-main-tier-sweep-2-batch3
+0x0208226c	main	52	default	other	parked	0.0	P-37-free-lr-register-reuse	cm-main-tier-sweep-2-batch3
+0x0208bf3c	main	80	default	guard chain	parked	90.0	P-36-pool-load-hoist	cm-main-tier-sweep-2-batch4
+0x02098038	main	80	default	guard chain	parked	85.0	P-36-ldm-fusion	cm-main-tier-sweep-2-batch4
+0x0208df0c	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0208df60	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0208e1cc	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0207d4dc	main	68	default	small dispatcher	parked	88.2	P-20-plus-C81-register-number	cm-main-tier-sweep-2-batch4
+0x0207db00	main	68	default	small dispatcher	parked	88.2	P-20-plus-C81-register-number	cm-main-tier-sweep-2-batch4
+0x0204a960	main	80	default	small dispatcher	parked	65.0	OQ-1-dead-branch-preservation	cm-main-tier-sweep-2-batch4
+0x0206e33c	main	80	default	small dispatcher	parked	50.0	P-33-bidirectional-mirror	cm-main-tier-sweep-2-batch4
+0x0206e9b0	main	80	default	small dispatcher	parked	95.0	ANDS-vs-TST-instruction-choice	cm-main-tier-sweep-2-batch4
+0x0209d438	main	80	default	guard chain	parked	80.0	P-20-scratch-register	cm-main-tier-sweep-2-batch5
+0x0208e6ac	main	84	default	guard chain	parked	9.1	P-31-tier-independent	cm-main-tier-sweep-2-batch5
+0x0209b448	main	84	default	guard chain	parked	52.4	P-20-register-swap-plus-scheduling	cm-main-tier-sweep-2-batch5
+0x0209d69c	main	84	default	guard chain	parked	66.7	P-20-r4r5-swap	cm-main-tier-sweep-2-batch5
+0x0209f904	main	108	default	small dispatcher	parked	3.7	P-31-canary-shape-negative	cm-main-tier-sweep-2-batch5
+0x0204a9b0	main	92	default	small dispatcher	parked	87.0	constant-materialization-peephole	cm-main-tier-sweep-2-batch5
+0x02064580	main	96	default	small dispatcher	parked	50.0	P-31-mirror-C55	cm-main-tier-sweep-2-batch5
+0x02055f84	main	104	default	small dispatcher	parked	84.6	P-20-r0-vs-ip	cm-main-tier-sweep-2-batch5
+0x02046b3c	main	108	default	small dispatcher	parked	33.3	P-32-scope-caveat	cm-main-tier-sweep-2-batch5
+0x020577d8	main	108	default	small dispatcher	parked	7.4	P-31	cm-main-tier-sweep-2-batch5
