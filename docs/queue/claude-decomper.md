@@ -1016,7 +1016,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever 
 > (C-70–C-76, P-30–P-33) plus a C-55 boundary extension. See
 > [`cm-main-tier-sweep-1-2026-08-08.md`](../research/cm-main-tier-sweep-1-2026-08-08.md).
 
-### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [TODO]
+### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [CLAIMED]
 
 `cm-main-tier-sweep-1` (#1472) shipped 71/100 (6,720 B), the campaign's best single round, and moved EUR natural-C 14.28% → 14.56%. Continue on the same selector: `docs/research/main-small-tier-worklist.md`, **0x02040000+** range (0x02000000–0x0203ffff stays the Scaffolder's), 100 candidates, 5 batch worktrees × 20, partition frozen before dispatch.
 
