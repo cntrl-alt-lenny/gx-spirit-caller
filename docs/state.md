@@ -24,9 +24,46 @@ even when this file makes no PR-count claim), and `parked-prs` is the
 EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
-**PR state — active vs merely open.** **active** count is **2** (#1467, #1468 —
-Codex Scaffolder output under review, both draft but NOT parked). #1020
-(decomp.dev CI) is the one genuinely parked draft.
+**PR state — active vs merely open.** **active** count is **3**: #1467 and #1468
+(Codex Scaffolder output, both draft but NOT parked — **changes requested, see
+below**) and #1469 (this repair PR). #1020 (decomp.dev CI) is the one genuinely
+parked draft.
+
+**#1467 and #1468 are NOT mergeable as they stand** — both were verified at
+source and both have correctness defects that CI cannot see:
+
+- **#1467** (`attempts.tsv` recorder + 387-row backfill). Four blockers.
+  (a) `park_one.py::_ledger_identity` records module `overlay002` while the only
+  consumer, `wall_aware_headroom.py::_source_module`, says `ov002` — so the
+  structural recorder is a **no-op for every overlay function**, i.e. for the
+  whole ov002 campaign it was built for. It passes today only because its single
+  test uses `src/main/`, where the two spellings coincide.
+  (b) `_record_attempt` dedupes on **address alone** and returns silently, but
+  the ledger is an event log: main already holds 9 addresses with two rows, six
+  of them re-attempts that reached a *different* verdict, and `0x021bbc68` is a
+  documented park-then-ship. The PR's own backfill contains two park-then-ship
+  pairs the writer it ships would refuse.
+  (c) the ledger append runs **after** `_flip_delinks` and `unlink()`, so a
+  header/IO failure leaves a candidate parked but unrecorded.
+  (d) ~19 candidates whose source commits say "Not attempted" are recorded as
+  `parked`, which would permanently hide them from `--exclude-attempted` — the
+  item's own failure class, inverted.
+  Its GitHub "CONFLICTING" status is spurious: `.gitattributes` carries
+  `merge=union` for that file and `git merge-tree` merges it cleanly.
+- **#1468** (field producer finder). The assembly masked-RMW path accepts on
+  same-register + same-offset with **no base-symbol anchoring**, though the
+  bulk-fill and sdk-call paths in the same function do call `_contains_symbol`.
+  All 12 masked-RMW hits in its own canary are false positives — the showcased
+  rank-1 site loads `_LIT0 = data_ov014_02234ff4`, a different symbol in a
+  different overlay, and `02104bac` appears zero times in that file — and they
+  outrank the 4 genuinely anchored hits. Its assembly test codifies the bug as
+  correct. Also: a generic `cfg` alias, an offset-literal fallback where decimal
+  `20` matches `0x14`, per-input hardcodes in `make_spec`, and no region filter
+  (~3x count inflation from EUR/USA/JPN mirrors).
+
+Both lanes' transcripts were read: procedure was sound (full suite run twice,
+canary reconciled, handoff exact, nothing uncommitted). These are design
+defects, not process failures.
 
 **Round 0806 (dispatch).** Nothing to merge; all four lanes dispatched on the
 0805 seeds. A stale uncommitted `q-recursive-glob-sweep [CLAIMED]` edit from

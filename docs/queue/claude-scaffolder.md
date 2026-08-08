@@ -1330,3 +1330,32 @@ $ python -m pytest -q tests
 ```
 
 **Gate:** doc-only — `python -m pytest -q tests` green (skips allowed, failures not) + the per-field verdict table with cited sites in the research doc.
+
+### cm-restock-carve-2 — second wave of the restock-census carve series (main's 58 struct-shaped) [TODO]
+
+Continues `cm-restock-carve-1` (#1464: 31/35 carved, 1,960 B — 6 Ov006StateCb
+tables + 2 Ov006AudioBank `.bss` fast-follows + 23 struct-batch, with 4 `kv_t`
+symbols honestly declined on the mwldarm 2-byte alignment wall).
+
+Wave 1 took ov006's 33 struct-shaped candidates. The restock census —
+`docs/research/data/cm-data-restock-census-2026-08-03.md` — holds **274
+never-assessed candidates / 24,753 B** in total, so the pool is far from empty.
+
+Wave 2: **`main`'s 58 struct-shaped candidates**, cross-referenced against the module's own headers the way wave 1 used `src/overlay006/ov006_core.h` — that header-cross-reference is the method that produced wave 9's Ov006AudioBank family and wave 1's six StateCb tables, so lead with it rather than carving blind. If the wave has room after main's 58, continue into the census's next-largest module group and say which.
+
+**Carry wave 1's alignment finding forward as a pre-filter, not a rediscovery.**
+Wave 1 proved that a non-4-aligned TU boundary makes mwldarm/ALIGNALL(2) insert
+a +2 cascade, and that three source-level workarounds all fail: separate files
+(cascade caught by `ninja check`), a combined-TU absorber (withdrawn), and a
+third variant per that doc. The reference write-up is
+`docs/research/ov004-odd-aligned-slot-recipe.md`.
+
+Check each candidate's start/end alignment in `delinks.txt` BEFORE drafting and
+route the 2-byte-misaligned ones to a declined list up front. Declining early is
+a success; re-deriving the wall per symbol is wasted budget.
+
+CANARY: the FIRST carve goes through the FULL gate (3-region SHA1) before any batching.
+
+Standing rules: **NEVER hand-transcribe byte content — generate every C initializer from a script reading the real bytes, every wave, no exceptions**; per-symbol reconciliation table (one row per shipped symbol: address, size, section, type, evidence — wave 1's fix pass had to add this retroactively, so build it as you go); `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original, never a sibling's convention; check `delinks.txt` ground truth before choosing sections (`&symbol` always relocates to `.data`; literal-cast pointer arrays need `void *const` for `.rodata`); never assume mwcc preserves same-TU global declaration order — verify the built layout directly; keep a non-4-byte split inside ONE TU; never shift an already-matched consumer's relocation boundary.
+
+**Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ `gate3` piped through `tee` MASKS its exit code (both lanes hit this last round) — read the log, do not trust exit 0. Paste the three sha1 lines VERBATIM + the Named-struct/Typed-array before/after lines from the state-table regen + the per-symbol reconciliation table in the PR body. Coordinate the full gate with Lenny: the mwcc toolchain serialises MACHINE-WIDE, and the CC Decomper is running a 5-worktree consolidated `--clean` gate this round — never run yours while theirs is live.
