@@ -1,0 +1,29 @@
+/* data_020fe904 (84 bytes, 4-aligned): HTTP POST request-line + headers
+ * sprintf/vsnprintf format string: "POST /%s HTTP/1.0\r\nContent-type:
+ * application/x-www-form-urlencoded\r\nHost: %s\r\n\r\n", followed by 4
+ * trailing NUL bytes (past the 1 a plain string literal would supply --
+ * kept as a raw byte array, not a quoted literal, so the exact padding
+ * survives byte-for-byte; same rationale as data_020c5934.c).
+ * Consumer: func_020417e8 (main, 196B; not yet landed as matched C -- see
+ * docs/research/dossiers/020417e8.md and
+ * docs/research/c-match-prep/020417e8.c, a "CAMPAIGN-PREP... UNVERIFIED"
+ * draft whose GROUND TRUTH section lists `_LIT1: data_020fe904` in the
+ * function's real literal pool). Selected via
+ * `sign = (*(int*)(self+0x1008)==0) ? data_020fe904 : data_020fe958;`
+ * then passed as the vsnprintf-style `fmt` arg to
+ * func_0209150c(dst, cap, sign, a, b).
+ * relocs.txt: `from:0x020418a4 kind:load to:0x020fe904 module:main`
+ * (config/eur/arm9/relocs.txt:6628).
+ * Not const: 0x020fe904 is inside main's .data span 0x020c3bc0-0x02102c60
+ * (delinks.txt line 4); const would relocate this to .rodata and break
+ * byte-identity. 4-aligned (0x020fe904 mod 4 == 0), confirmed.
+ */
+unsigned char data_020fe904[84] = {
+    0x50, 0x4f, 0x53, 0x54, 0x20, 0x2f, 0x25, 0x73, 0x20, 0x48, 0x54, 0x54,
+    0x50, 0x2f, 0x31, 0x2e, 0x30, 0x0d, 0x0a, 0x43, 0x6f, 0x6e, 0x74, 0x65,
+    0x6e, 0x74, 0x2d, 0x74, 0x79, 0x70, 0x65, 0x3a, 0x20, 0x61, 0x70, 0x70,
+    0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x78, 0x2d, 0x77,
+    0x77, 0x77, 0x2d, 0x66, 0x6f, 0x72, 0x6d, 0x2d, 0x75, 0x72, 0x6c, 0x65,
+    0x6e, 0x63, 0x6f, 0x64, 0x65, 0x64, 0x0d, 0x0a, 0x48, 0x6f, 0x73, 0x74,
+    0x3a, 0x20, 0x25, 0x73, 0x0d, 0x0a, 0x0d, 0x0a, 0x00, 0x00, 0x00, 0x00,
+};

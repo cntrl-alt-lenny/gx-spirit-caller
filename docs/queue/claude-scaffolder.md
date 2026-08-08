@@ -1331,7 +1331,7 @@ $ python -m pytest -q tests
 
 **Gate:** doc-only — `python -m pytest -q tests` green (skips allowed, failures not) + the per-field verdict table with cited sites in the research doc.
 
-### cm-restock-carve-2 — second wave of the restock-census carve series (main's 58 struct-shaped) [TODO]
+### cm-restock-carve-2 — second wave of the restock-census carve series (main's 58 struct-shaped) [DONE]
 
 Continues `cm-restock-carve-1` (#1464: 31/35 carved, 1,960 B — 6 Ov006StateCb
 tables + 2 Ov006AudioBank `.bss` fast-follows + 23 struct-batch, with 4 `kv_t`
