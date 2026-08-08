@@ -1380,7 +1380,7 @@ Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` struc
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is not `gate3.py`'s — READ THE LOG. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the part-2 verdict with its byte evidence. Regenerate `docs/research/README.md` before committing — #1473 was blocked on exactly that (its index row was generated before the doc's H1 was reworded).
 
-### cm-restock-carve-4 — apply the TU-composition recipe at scale, and test the half that is still open [CLAIMED]
+### cm-restock-carve-4 — apply the TU-composition recipe at scale, and test the half that is still open [DONE]
 
 `cm-restock-carve-3` (#1476) shipped 64/64 aligned candidates plus the Part 2 experiment, and **the TU-composition recipe is real and gate-covered** — the experimental pair (`data_ov016_021b9000` + `_021b900a`) actually shipped, so the 3-region SHA1 PASS proves it rather than a local observation. That is a genuine mechanism, not a plausible one.
 
