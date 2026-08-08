@@ -1058,7 +1058,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
 > return. See
 > [`cm-main-tier-sweep-2-2026-08-08.md`](../research/cm-main-tier-sweep-2-2026-08-08.md).
 
-### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [TODO]
+### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [CLAIMED]
 
 `cm-main-tier-sweep-2` (#1478) answered its question honestly: Pool A (guard chain) **32/50 = 64%**, Pool B (loop / other / small dispatcher) **27/50 = 54%**. A real gap, but far smaller than wave 1's 71% framing implied — and **two of five batches had Pool B outship Pool A**, with Pool B ranging 20–80% across batches. The tier is not a cliff; the variance is mostly batch composition.
 
