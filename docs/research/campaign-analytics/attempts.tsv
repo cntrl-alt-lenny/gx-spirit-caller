@@ -893,3 +893,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0208de94	main	88	default	unknown	parked	unknown	unknown	unknown
 0x0208fd30	main	96	default	unknown	parked	unknown	unknown	unknown
 0x02048880	main	116	default	unknown	parked	unknown	unknown	unknown
+0x0208bed8	main	60	plain	loop	parked	13.3	instr-selection	cm-main-tier-sweep-3-batch3
+0x0207e790	main	72	plain	loop	parked	88.9	scheduling-cmp-reuse	cm-main-tier-sweep-3-batch3
+0x020779d8	main	80	plain	loop	parked	60.0	P-20-r2-vs-ip	cm-main-tier-sweep-3-batch3
+0x0208d030	main	140	legacy	guard chain	parked	88.6	P-20-r3-vs-ip	cm-main-tier-sweep-3-batch3
+0x0209a1b8	main	88	legacy	guard chain	parked	72.7	P-36-cand-field-read-order	cm-main-tier-sweep-3-batch3
+0x020a1d44	main	92	legacy	guard chain	parked	91.3	P-20-r0-vs-r1	cm-main-tier-sweep-3-batch3
+0x0208fd90	main	96	legacy	guard chain	parked	29.2	instr-selection-const-materialize	cm-main-tier-sweep-3-batch3
