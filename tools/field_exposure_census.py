@@ -29,6 +29,10 @@ FIELD_RE = re.compile(
     re.MULTILINE,
 )
 BASE_RE = re.compile(r"\bdata_(?:ov\d+_)?[0-9a-fA-F]+\b")
+GETTER_DECL_RE = re.compile(
+    r"(?m)^\s*(?:extern\s+)?[A-Za-z_]\w*\s*\*?\s*"
+    r"(?P<name>func_[0-9a-fA-F]{8})\s*\([^;]*\)\s*;"
+)
 DIRECT_MEMBER_RE = r"(?:\.|->)\s*{field}\b"
 
 
@@ -53,7 +57,12 @@ class ExposureRow:
 def parse_documented_fields(doc_name: str, text: str) -> list[DocumentedField]:
     """Parse C-style field declarations with an inline hexadecimal offset."""
     fields: list[DocumentedField] = []
-    bases = tuple(sorted(set(BASE_RE.findall(text))))
+    # Keep only symbols documented as actual bases.  A getter declaration is
+    # an anchor for structs such as GameSingleton whose storage symbol is not
+    # named in the type note; prose mentions of consumer functions are not.
+    bases = tuple(sorted(set(BASE_RE.findall(text)) | {
+        match.group("name") for match in GETTER_DECL_RE.finditer(text)
+    }))
     seen: set[tuple[str, int]] = set()
     for match in FIELD_RE.finditer(text):
         name = match.group("name")
@@ -68,52 +77,94 @@ def parse_documented_fields(doc_name: str, text: str) -> list[DocumentedField]:
 
 def _source_matches_field(field: DocumentedField, path: str, text: str) -> bool:
     """Return whether a source has lexical evidence for this field."""
-    member = re.compile(DIRECT_MEMBER_RE.format(field=re.escape(field.name)))
-    if path.endswith(".c") and member.search(text):
-        return True
+    member, decimal_member = _member_patterns(field)
+    if path.endswith(".c"):
+        for line in text.splitlines():
+            if member.search(line):
+                return True
+            if decimal_member and decimal_member.search(line) and any(
+                _contains_symbol(line, base) for base in field.base_symbols
+            ):
+                return True
     if path.endswith(".s"):
-        offset = f"0x{field.offset:x}"
-        return bool(
-            re.search(
-                rf"\[[^,\]]+,\s*#?{re.escape(offset)}\s*\]",
-                text,
-                re.IGNORECASE,
-            )
-        )
-    if not field.base_symbols or not any(base in text for base in field.base_symbols):
+        if not field.base_symbols or not any(
+            _contains_symbol(text, base)
+            for base in field.base_symbols
+        ):
+            return False
+        return bool(_raw_offset_re(field).search(text))
+    if not field.base_symbols or not any(
+        _contains_symbol(text, base) for base in field.base_symbols
+    ):
         return False
-    offset = f"0x{field.offset:x}"
-    return bool(
-        re.search(
-            rf"\[[^,\]]+,\s*#?{re.escape(offset)}\s*\]",
-            text,
-            re.IGNORECASE,
+    return bool(_raw_offset_re(field).search(text))
+
+
+def _contains_symbol(text: str, symbol: str) -> bool:
+    """Match a documented symbol as a token, not as a substring."""
+    return bool(re.search(rf"\b{re.escape(symbol)}\b", text))
+
+
+def _member_patterns(
+    field: DocumentedField,
+) -> tuple[re.Pattern[str], re.Pattern[str] | None]:
+    """Return unanchored real/hex names and an anchored decimal alias."""
+    names = {field.name, f"f{field.offset:x}", f"f{field.offset:X}"}
+    member = re.compile(
+        DIRECT_MEMBER_RE.format(
+            field="(?:" + "|".join(
+                re.escape(name) for name in sorted(names, key=len, reverse=True)
+            ) + ")"
         )
+    )
+    decimal_name = f"f{field.offset}"
+    decimal_member = None
+    if decimal_name not in names:
+        decimal_member = re.compile(
+            DIRECT_MEMBER_RE.format(field=re.escape(decimal_name))
+        )
+    return member, decimal_member
+
+
+def _raw_offset_re(field: DocumentedField) -> re.Pattern[str]:
+    """Match an offset only in pointer/member arithmetic context.
+
+    The decimal form is deliberately not accepted as a bare token: a literal
+    such as ``cfg.unrelated = cfg.unrelated | 20`` is not evidence for a
+    field at hexadecimal offset 0x14.
+    """
+    offsets = f"(?:0x{field.offset:x}|0x{field.offset:X}|{field.offset})"
+    return re.compile(
+        rf"\[[^,\]]+,\s*#?{offsets}\s*\]"
+        rf"|\+\s*{offsets}\b",
+        re.IGNORECASE,
     )
 
 
 def _c_accesses(field: DocumentedField, text: str) -> tuple[bool, bool]:
     reads = writes = False
-    member = re.compile(DIRECT_MEMBER_RE.format(field=re.escape(field.name)))
-    offset = f"0x{field.offset:x}"
-    raw = re.compile(
-        rf"\[[^,\]]+,\s*#?{re.escape(offset)}\s*\]"
-        rf"|\b(?:\+\s*)?{re.escape(offset)}\b",
-        re.IGNORECASE,
-    )
+    member, decimal_member = _member_patterns(field)
+    raw = _raw_offset_re(field)
     for line in _strip_c_comments_and_literals(text).splitlines():
         stripped = line.lstrip()
         if stripped.startswith(("//", "/*", "*", "#")):
             continue
-        is_member = bool(member.search(line))
+        is_member = bool(member.search(line)) or bool(
+            decimal_member
+            and decimal_member.search(line)
+            and any(_contains_symbol(line, base) for base in field.base_symbols)
+        )
         is_raw = bool(field.base_symbols) and any(
-            base in line for base in field.base_symbols
+            _contains_symbol(line, base) for base in field.base_symbols
         ) and bool(raw.search(line))
         if not (is_member or is_raw):
             continue
         if is_member:
+            member_alternatives = member.pattern
+            if decimal_member:
+                member_alternatives += "|" + decimal_member.pattern
             token = re.search(
-                rf"{DIRECT_MEMBER_RE.format(field=re.escape(field.name))}"
+                rf"(?:{member_alternatives})"
                 rf"\s*(?P<op>[+\-*/%&|^]?=|\+\+|--)",
                 line,
             )
@@ -125,8 +176,17 @@ def _c_accesses(field: DocumentedField, text: str) -> tuple[bool, bool]:
                 reads = True
             continue
         raw_match = raw.search(line)
-        equals = re.search(r"(?<![=!<>])=(?!=)", line)
-        if equals and raw_match and raw_match.start() < equals.start():
+        # Keep assignment classification within the statement containing the
+        # offset.  A later, unrelated assignment on the same source line must
+        # not turn an earlier read (for example ``if (base + 1460 == 0)``)
+        # into a write.
+        statement_start = line.rfind(";", 0, raw_match.start()) + 1
+        statement_end = line.find(";", raw_match.end())
+        if statement_end < 0:
+            statement_end = len(line)
+        statement = line[statement_start:statement_end]
+        equals = re.search(r"(?<![=!<>])=(?!=)", statement)
+        if equals and raw_match:
             writes = True
         else:
             reads = True
@@ -238,10 +298,13 @@ def render(rows: list[ExposureRow], version: str) -> str:
         )
     lines.extend([
         "",
-        "Coverage note: this lexical census counts explicit named C members and "
-        "offset-based load/store instructions in matched .c/.s sites. It cannot "
-        "see masked read-modify-writes, bulk Fill32 operations, or SDK calls that "
-        "touch a field behind an API.",
+        "Coverage note: this lexical census counts explicit named C members, "
+        "decimal-derived member aliases, and offset-based accesses only when "
+        "they occur in member or pointer-arithmetic context. Assembly offset "
+        "matches also require a documented base-symbol/getter anchor. It cannot "
+        "see bare numeric literals, unanchored local/parameter assembly, masked "
+        "read-modify-writes, bulk Fill32 operations, or SDK calls that touch a "
+        "field behind an API.",
     ])
     return "\n".join(lines)
 

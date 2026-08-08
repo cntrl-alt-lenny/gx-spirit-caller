@@ -233,7 +233,7 @@ Effort: **MEDIUM**.
 
 **Gate:** if anything ships, per-region `ninja sha1` + `python tools/gate3.py --scope all`; otherwise doc-only + `python -m pytest -q tests` green. The census/worklist table pasted in the PR.
 
-### q-census-methodology-fixes — close the two field_exposure_census.py gaps #1465 discovered [TODO]
+### q-census-methodology-fixes — close the two field_exposure_census.py gaps #1465 discovered [DONE]
 
 `cm-field-recheck-1` (#1465) surfaced two methodology gaps in the field
 exposure census while using it to rank fields — see `tools/field_exposure_census.py`.
@@ -252,7 +252,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-ra
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + a regression per gap (including the negative case above) + before/after per-field site counts, with any field whose RANK changes called out explicitly.
 
-### q-census-decimal-alias-anchor — the decimal member alias re-opens the collision class [TODO]
+### q-census-decimal-alias-anchor — the decimal member alias re-opens the collision class [DONE]
 
 Second pass on `#1475`, same branch. The two gaps ARE genuinely addressed and your before/after table reproduces exactly when re-run. The specific collision the item warned about is genuinely absent — `cfg.unrelated = cfg.unrelated | 20;`, `other.timeout = 20;`, `foo(20);` and `int x = 20;` all correctly return zero sites for a field at `0x14`. That part is right.
 
@@ -271,3 +271,11 @@ This corrupts the ranking the item exists to protect — a field can be promoted
 And the rules genuinely DIVERGE where the item told you to converge: the sibling's `field_producer_finder.py:81` uses `field_names = {f"f{offset:x}", f"f{offset:X}"}` — **hex only, no decimal member alias** — while yours adds `f{offset}`. The pointer-arithmetic halves DO agree. Reconcile the member-alias half deliberately: either drop the decimal alias to match, or keep it WITH base anchoring and state why the census needs it when the finder does not. Your PR body never mentions the sibling lane at all — say what the shared rule is.
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning an unrelated-struct `.f{decimal}` access as NOT a site + the canary rows unchanged + a before/after table for the ~85 affected fields with any RANK change called out.
+
+> **Result note 2026-08-08 (brain, merge resolution):** the lane delivered this
+> in `6233512b2` before the brief reached `origin/main` — it created its own
+> shorter entry for the same item and completed the work. This merge keeps the
+> brain's fuller requirement text (which records WHY the anchoring is needed)
+> over the lane's summary, and carries the lane's `[DONE]` status, which is the
+> accurate one. `_member_patterns` now returns "unanchored real/hex names and an
+> anchored decimal alias", which is the specified remedy.
