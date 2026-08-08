@@ -75,8 +75,16 @@ preferences. Every one has cost a round, a merge, or nearly cost real work.
   history; "replace the third block with…" is not actionable to it, and forces
   cntrl_alt_lenny to reconcile two replies by hand. Fragments have been pasted
   to agents verbatim, arriving as a bare data block with no task attached.
-- One response, one fenced block per worker, all lanes together, each
-  self-contained (context + task + mechanically checkable gate).
+- **CANONICAL DISPATCH RULE.** One response, one fenced block per worker,
+  all lanes together — **one complete paste-ready message per active
+  standing lane that needs dispatch, normally all four** (Claude Code
+  Decomper, Claude Code Scaffolder, Codex Decomper, Codex Scaffolder) —
+  each self-contained (context + task + mechanically checkable gate). Skip
+  a lane only when it is genuinely mid-flight or has nothing to dispatch,
+  and say which and why. Never defer a message to a later turn: the message
+  is the deliverable, not a note that one is ready. `AGENTS.md`
+  § end-of-round checklist and `.claude/agents/brain.md` restate this rule;
+  if any copy disagrees, THIS is the one that governs.
 
 ## Contention: the toolchain serialises MACHINE-WIDE
 

@@ -8,10 +8,118 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-05 — **(Windows PC, brain=Fable 5; roster unchanged.) Round
-0805: back-online review, port-harvest closed as met, all four queues re-seeded.**
-EUR natural-C **13.99%** (333,810 B) / USA **11.81%** / JPN **11.79%** — from the
-regenerated state-table (post-#1460), not inherited.
+**Last updated:** 2026-08-07 — **(Windows PC, brain=Opus 5; roster unchanged.) Rounds
+0806 (dispatch) + 0807 (review): all four lanes ran, five PRs merged, then a
+focused repair round.**
+EUR natural-C **14.28%** (340,770 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
+(282,000 B) — from the regenerated state-table at the SHA below, not inherited.
+
+<!-- main-sha: 01dda0384 -->
+<!-- parked-prs: 1020 -->
+
+Those two markers are machine-checked by `tools/queue_state_drift.py`:
+`main-sha` is the `main` commit this document describes (drift fires when
+`main` runs more than one PR-merge ahead of it, so a stale handoff is caught
+even when this file makes no PR-count claim), and `parked-prs` is the
+EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
+because the worker lanes publish ordinary output as drafts.
+
+**PR state — active vs merely open.** **active** count is **2**: #1467 and #1468
+(Codex Scaffolder output, both draft but NOT parked — **changes requested, see
+below**). #1020 (decomp.dev CI) is the one genuinely parked draft.
+
+⚠️ **Convention — the active count EXCLUDES the doc-PR carrying this update.**
+That PR is open while you write the number and merged moments later, so counting
+it makes the claim wrong on `main` the instant it lands and fails `drift-check`
+on the NEXT PR's CI. Write the count you expect to be true after this update
+merges. (The `main-sha` anchor has an explicit one-merge tolerance for the same
+reason; the PR-count claim has none, so it must be written post-merge-accurate.)
+
+**#1467 and #1468 are NOT mergeable as they stand** — both were verified at
+source and both have correctness defects that CI cannot see:
+
+- **#1467** (`attempts.tsv` recorder + 387-row backfill). Four blockers.
+  (a) `park_one.py::_ledger_identity` records module `overlay002` while the only
+  consumer, `wall_aware_headroom.py::_source_module`, says `ov002` — so the
+  structural recorder is a **no-op for every overlay function**, i.e. for the
+  whole ov002 campaign it was built for. It passes today only because its single
+  test uses `src/main/`, where the two spellings coincide.
+  (b) `_record_attempt` dedupes on **address alone** and returns silently, but
+  the ledger is an event log: main already holds 9 addresses with two rows, six
+  of them re-attempts that reached a *different* verdict, and `0x021bbc68` is a
+  documented park-then-ship. The PR's own backfill contains two park-then-ship
+  pairs the writer it ships would refuse.
+  (c) the ledger append runs **after** `_flip_delinks` and `unlink()`, so a
+  header/IO failure leaves a candidate parked but unrecorded.
+  (d) ~19 candidates whose source commits say "Not attempted" are recorded as
+  `parked`, which would permanently hide them from `--exclude-attempted` — the
+  item's own failure class, inverted.
+  Its GitHub "CONFLICTING" status is spurious: `.gitattributes` carries
+  `merge=union` for that file and `git merge-tree` merges it cleanly.
+- **#1468** (field producer finder). The assembly masked-RMW path accepts on
+  same-register + same-offset with **no base-symbol anchoring**, though the
+  bulk-fill and sdk-call paths in the same function do call `_contains_symbol`.
+  All 12 masked-RMW hits in its own canary are false positives — the showcased
+  rank-1 site loads `_LIT0 = data_ov014_02234ff4`, a different symbol in a
+  different overlay, and `02104bac` appears zero times in that file — and they
+  outrank the 4 genuinely anchored hits. Its assembly test codifies the bug as
+  correct. Also: a generic `cfg` alias, an offset-literal fallback where decimal
+  `20` matches `0x14`, per-input hardcodes in `make_spec`, and no region filter
+  (~3x count inflation from EUR/USA/JPN mirrors).
+
+Both lanes' transcripts were read: procedure was sound (full suite run twice,
+canary reconciled, handoff exact, nothing uncommitted). These are design
+defects, not process failures.
+
+**Round 0806 (dispatch).** Nothing to merge; all four lanes dispatched on the
+0805 seeds. A stale uncommitted `q-recursive-glob-sweep [CLAIMED]` edit from
+2026-07-29 was reverted out of `kb-types` (that item shipped as #1385).
+
+**Round 0807 (review) — merged #1462–#1466:**
+
+- **#1462** — `q-port-residual-fix`: root-caused the region-data lookup bug
+  (`port_to_region.py` rejected semantic EUR filenames before emitting JSON),
+  fixed fail-closed + collision repair, ported all 6 named residues per region
+  (852 B each side). Brain fixed one ruff B023 lint-only closure to unblock it.
+- **#1463** — `q-port-highconf-no-target`: honest 0-shipped + a 62-per-region
+  worklist (the queue's "63" was a stale pre-#1436 census value).
+- **#1464** — `cm-restock-carve-1`: 31/35 shipped, 1,960 B; 4 `kv_t` symbols
+  declined on a documented mwldarm 2-byte alignment wall.
+- **#1465** — `cm-field-recheck-1`: 5/5 fields verdicted, 2 refinements.
+- **#1466** — `cm-ov002-unknown-sweep-17`: **42/100 shipped, 6,960 B — the
+  best sweep round to date**, validating the worktree-parallel protocol at
+  full scale (sweep-16's 3/12 was a scale artifact, not a yield drop).
+
+**Verification standard applied this round:** every PR's numbers were
+independently recomputed (not read from the PR body), and all four worker
+transcripts were read. No dishonesty was found in any lane; every blocker was
+evidence-presentation, lint, or infrastructure. Both Claude lanes then ran a
+completion pass that closed all fifteen flagged gaps, including sweep-17's 58
+missing `attempts.tsv` park rows and its own overstated "8 double-dispatched"
+claim (the demonstrable figure is 4).
+
+**Two infrastructure findings worth carrying forward:**
+
+1. **GitHub Actions event-delivery gap**, ~20:47–21:20Z on 2026-08-06:
+   #1462/#1463/#1464 got ZERO workflow runs (not the paths-filter trap —
+   `drift-check` is deliberately unfiltered). Remedy: close/reopen the PR.
+   Marking ready-for-review does NOT re-trigger, because the workflows use
+   the default `pull_request` types, which exclude `ready_for_review`.
+2. **Generated-file conflict cascade.** Any two same-round PRs that both
+   regenerate `docs/state-table.md` or `docs/research/README.md` will conflict
+   pairwise. Resolve by merging `main` into the branch in a throwaway detached
+   worktree, re-running the generator on the merged tree, then full pytest —
+   never by hand-resolving generated content.
+
+**Round 0807 repair (this update).** Fixed the canonical dispatch rule: the
+brain hands over **one complete paste-ready message per active standing lane
+that needs dispatch, normally all four**, in the same final response.
+`AGENTS.md` § end-of-round checklist and `.claude/agents/brain.md` both carried
+obsolete two-lane wording ("exactly TWO kickoffs" / "two paste-ready kickoffs")
+that contradicted `AGENTS.md`'s own four-session roster;
+`docs/agents/brain-onboarding.md` now holds the canonical statement and the
+other two defer to it. Also repaired `queue_state_drift.py` (draft ≠ parked,
+plus the `main-sha` anchor above) with regressions.
 
 **0804d round recorded here for the first time** (it post-dated this file's previous
 update; the Mac brain merged it but did not get back to state.md): **#1457**
