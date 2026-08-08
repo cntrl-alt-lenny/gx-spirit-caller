@@ -473,7 +473,7 @@ The PR is NOT genuinely conflicting: `.gitattributes` on main carries `docs/rese
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + regressions for ALL of: (a) two attempts at the same address both preserved; (b) an exact duplicate event handled as you choose, documented; (c) a ledger failure (bad header AND unwritable path) leaving the tree unchanged or rolled back; (d) an overlay path round-tripping writer→consumer so `--exclude-attempted` actually excludes what `park_one.py` wrote — assert against `_source_module`'s output, not a hardcoded string; (e) a `not-attempted` row NOT excluded by the selector. Paste before/after row counts per source and a spot-check table verified against commit text.
 
-### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [TODO]
+### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [DONE]
 
 Repairs `#1468` (do NOT merge as-is; fix on the same branch). CI is green — this is a correctness block, not a mechanical one.
 

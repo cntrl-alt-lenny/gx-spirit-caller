@@ -11,7 +11,7 @@ actually writes the requested field.
 
 Usage:
     python tools/field_producer_finder.py BASE OFFSET WIDTH
-    python tools/field_producer_finder.py GlobalData02104bac 0x54 2 --json
+    python tools/field_producer_finder.py GlobalData02104bac 0x54 2 --region eur --json
 
 Exit codes:
     0  The search completed, whether or not hypotheses were found.
@@ -23,7 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 from progress import _strip_c_comments_and_literals
@@ -62,19 +62,16 @@ class Candidate:
     shape: str
     score: int
     evidence: str
+    anchor: str = "BASE-ANCHORED"
 
 
 def _symbols(base: str) -> tuple[str, ...]:
-    """Return spelling variants used by named globals and local struct vars."""
+    """Return mechanically-derived global spellings; do not invent aliases."""
     values = {base}
     match = re.search(r"([0-9a-f]{8})$", base, re.IGNORECASE)
     if match:
         address = match.group(1).lower()
         values.update({f"data_{address}", f"GlobalData{address}"})
-    if base.lower() in {"bgcfg", "bg_cfg"}:
-        values.update({"cfg", "bgCfg", "BgCfg"})
-    if base.lower() in {"duelstatesingleton", "duel_state_singleton"}:
-        values.update({"data_ov002_022d016c"})
     return tuple(sorted(values, key=lambda value: (-len(value), value)))
 
 
@@ -82,14 +79,23 @@ def make_spec(base: str, offset: int, width: int) -> FieldSpec:
     if offset < 0 or width <= 0:
         raise ValueError("offset must be non-negative and width must be positive")
     field_names = {f"f{offset:x}", f"f{offset:X}"}
-    if base.lower().endswith("02104bac") and offset == 0x54:
-        field_names.add("flags")
     return FieldSpec(base, offset, width, _symbols(base), tuple(sorted(field_names)))
 
 
 def _contains_symbol(line: str, spec: FieldSpec) -> bool:
     return any(re.search(rf"(?<![A-Za-z0-9_]){re.escape(symbol)}(?![A-Za-z0-9_])", line)
                for symbol in spec.symbols)
+
+
+def _c_symbols(text: str, spec: FieldSpec) -> tuple[str, ...]:
+    """Add only local variable names declared with the requested exact type."""
+    values = set(spec.symbols)
+    for symbol in spec.symbols:
+        declaration = re.compile(
+            rf"\b{re.escape(symbol)}\s*(?:\*\s*)*([A-Za-z_]\w*)\s*(?:[;,=)])"
+        )
+        values.update(match.group(1) for match in declaration.finditer(text))
+    return tuple(sorted(values, key=lambda value: (-len(value), value)))
 
 
 def _field_access(line: str, spec: FieldSpec) -> bool:
@@ -99,7 +105,11 @@ def _field_access(line: str, spec: FieldSpec) -> bool:
     if re.search(rf"(?:\.|->)\s*(?:{names})\b", line):
         return True
     offset = f"(?:0x{spec.offset:x}|0x{spec.offset:X}|{spec.offset})"
-    return bool(re.search(rf"\+\s*{offset}\b|#?{offset}\b", line, re.IGNORECASE))
+    # A bare number on a line mentioning the base is not an access: decimal
+    # 20 must not accidentally qualify a field at hexadecimal 0x14.
+    return bool(re.search(
+        rf"\+\s*{offset}\b|\[\s*{offset}\s*\]", line, re.IGNORECASE
+    ))
 
 
 def _address_taking_call(line: str, spec: FieldSpec) -> bool:
@@ -155,6 +165,7 @@ def _candidate_from_window(
 def _scan_c(path: Path, text: str, spec: FieldSpec) -> list[Candidate]:
     # Do not let a prose comment or a string literal become a fake producer.
     lines = _strip_c_comments_and_literals(text).splitlines()
+    spec = replace(spec, symbols=_c_symbols("\n".join(lines), spec))
     candidates: list[Candidate] = []
     for index, line in enumerate(lines):
         if not _field_access(line, spec) and not _contains_symbol(line, spec):
@@ -207,6 +218,33 @@ def _scan_asm(path: Path, text: str, spec: FieldSpec) -> list[Candidate]:
         if match and int(match.group("offset"), 0) == wanted:
             accesses.append((index, match))
     candidates: list[Candidate] = []
+
+    def base_anchor(access_index: int, base_register: str) -> str:
+        """Resolve ``ldr rX, _LITn`` and compare its pool symbol to the field."""
+        load_re = re.compile(
+            rf"^\s*ldr(?:\.\w+)?\s+{re.escape(base_register)},\s*"
+            r"(?P<label>_?LIT\w+)\b", re.IGNORECASE
+        )
+        pool_re = re.compile(
+            r"^\s*(?P<label>_?LIT\w+):\s*\.word\s+(?P<symbol>[A-Za-z_]\w*)",
+            re.IGNORECASE,
+        )
+        for prior in range(access_index - 1, max(-1, access_index - 64), -1):
+            load = load_re.match(lines[prior])
+            if not load:
+                continue
+            label = load.group("label")
+            for pool_line in lines:
+                pool = pool_re.match(pool_line)
+                if pool and pool.group("label").lower() == label.lower():
+                    return (
+                        "BASE-ANCHORED"
+                        if pool.group("symbol") in spec.symbols
+                        else "OFFSET-ONLY"
+                    )
+            return "OFFSET-ONLY"
+        return "OFFSET-ONLY"
+
     for index, access in accesses:
         if not access.group("op").lower().startswith("ldr"):
             continue
@@ -222,7 +260,11 @@ def _scan_asm(path: Path, text: str, spec: FieldSpec) -> list[Candidate]:
                         and store.group("base") == access.group("base")
                         and int(store.group("offset"), 0) == wanted):
                     window = lines[max(0, index - 3):min(len(lines), store_index + 4)]
-                    candidates.append(Candidate(str(path).replace("\\", "/"), index + 1, "masked-rmw", 120, " ".join(window).strip()))
+                    anchor = base_anchor(index, access.group("base"))
+                    candidates.append(Candidate(
+                        str(path).replace("\\", "/"), index + 1, "masked-rmw", 120,
+                        " ".join(window).strip(), anchor,
+                    ))
                     break
             break
         window = lines[max(0, index - 16):min(len(lines), index + 17)]
@@ -237,8 +279,18 @@ def _scan_asm(path: Path, text: str, spec: FieldSpec) -> list[Candidate]:
     return candidates
 
 
-def find_candidates(spec: FieldSpec, root: Path = ROOT) -> list[Candidate]:
-    """Search tracked-looking C/ARM source files below *root*."""
+def _in_region(relative: str, region: str | None) -> bool:
+    if region is None:
+        return True
+    if region == "eur":
+        return bool(re.match(r"src/(?:main|overlay\d{3})(?:/|$)", relative))
+    return relative.startswith(f"src/{region}/")
+
+
+def find_candidates(
+    spec: FieldSpec, root: Path = ROOT, region: str | None = "eur"
+) -> list[Candidate]:
+    """Search C/ARM source files below *root*, EUR-first by default."""
     candidates: list[Candidate] = []
     for path in sorted(root.glob("src/**/*.c")) + sorted(root.glob("src/**/*.s")):
         try:
@@ -246,12 +298,19 @@ def find_candidates(spec: FieldSpec, root: Path = ROOT) -> list[Candidate]:
         except OSError:
             continue
         relative = str(path.relative_to(root)).replace("\\", "/")
+        if not _in_region(relative, region):
+            continue
         local = _scan_c(Path(relative), text, spec) if path.suffix == ".c" else _scan_asm(Path(relative), text, spec)
         candidates.extend(local)
     unique: dict[tuple[str, int, str], Candidate] = {}
     for candidate in candidates:
         unique[(candidate.path, candidate.line, candidate.shape)] = candidate
-    return sorted(unique.values(), key=lambda item: (-item.score, item.path, item.line, item.shape))
+    return sorted(
+        unique.values(),
+        key=lambda item: (
+            item.anchor != "BASE-ANCHORED", -item.score, item.path, item.line, item.shape
+        ),
+    )
 
 
 def render(spec: FieldSpec, candidates: list[Candidate], as_json: bool = False) -> str:
@@ -270,10 +329,16 @@ def render(spec: FieldSpec, candidates: list[Candidate], as_json: bool = False) 
     if not candidates:
         lines.append("NO CANDIDATES: no searched-shape hypothesis was found.")
         return "\n".join(lines)
-    lines.extend(["rank | score | shape | site | evidence", "---: | ---: | --- | --- | ---"])
+    lines.extend([
+        "rank | score | anchor | shape | site | evidence",
+        "---: | ---: | --- | --- | --- | ---",
+    ])
     for rank, candidate in enumerate(candidates, 1):
         evidence = re.sub(r"\s+", " ", candidate.evidence).replace("|", "\\|")
-        lines.append(f"{rank} | {candidate.score} | {candidate.shape} | {candidate.path}:{candidate.line} | {evidence}")
+        lines.append(
+            f"{rank} | {candidate.score} | {candidate.anchor} | {candidate.shape} | "
+            f"{candidate.path}:{candidate.line} | {evidence}"
+        )
     return "\n".join(lines)
 
 
@@ -283,6 +348,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("offset", type=lambda value: int(value, 0))
     parser.add_argument("width", type=int)
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--region", choices=("eur", "usa", "jpn"), default="eur")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     if not args.root.is_dir():
@@ -291,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
         spec = make_spec(args.base, args.offset, args.width)
     except ValueError as exc:
         parser.error(str(exc))
-    print(render(spec, find_candidates(spec, args.root), args.json))
+    print(render(spec, find_candidates(spec, args.root, args.region), args.json))
     return 0
 
 
