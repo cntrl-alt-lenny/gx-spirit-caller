@@ -977,7 +977,7 @@ Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/b
 > recurring failure mode worth a standing pre-dispatch check. See
 > [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
 
-### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [CLAIMED]
+### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [DONE]
 
 **Why this module and not another ov002 sweep.** `attempts.tsv` is mid-repair: #1467 (open, changes requested) would record ~19 never-attempted candidates as `parked` and writes a module key (`overlay002`) the selector cannot match (`ov002`). Until that lands, an ov002 pull driven by `--exclude-attempted` is selecting against a corrupted exclusion set. This round therefore sweeps **`main`**, selected from a committed worklist rather than from the ledger — so the round cannot be poisoned by the repair in flight. (`main` is also the one module where `park_one.py`'s module bug does not bite: writer and consumer both say `main`.)
 
@@ -994,3 +994,24 @@ Park every attempt via `park_one.py` so this round IS recorded. Two caveats whil
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever comes first. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-files-added == delinks-activations-flipped count check; `git restore assets/` after any `--clean` run — never a bare `git add -A`. ⚠️ `gate3` is piped through `tee` in the standing recipe, which MASKS its exit code — two lanes hit this last round and both caught it only by reading the log. Read the log, do not trust exit 0. Paste in the PR body: the three per-region sha1 lines VERBATIM, both invariant-checker outputs, the partition, before/after `wall_aware_headroom.py` counts, and shipped/attempted vs the 35–55% tier estimate.
+
+> **DONE 2026-08-08.** 71/100 shipped, 6,720 bytes — well above the
+> 35–55% floor estimate (read in context: a homogeneous, pre-filtered
+> small-guard-chain population by the worklist's own design, not a
+> random cross-section of `main`). Canary seeded a real lever (explicit
+> named base variable for a shared large-offset pointer) that later
+> proved real-but-not-universal (P-30). The exact orphaned-`.s` process
+> bug documented as a lesson from sweep-17 one round ago was reproduced
+> in this round's own canary — caught the same way (a failing `ninja
+> delink`) and fixed cleanly across all 6 affected checkouts. The
+> batch-worktree `attempts.tsv` non-recording gap also reproduced
+> exactly (zero-line diff across all 5 batches, despite this item's own
+> text above expecting only a narrower address-dedup edge case) — all
+> 101 attempts (1 canary + 100 batch) backfilled from ground truth
+> after catching a real regex bug in the reconstruction script itself.
+> A real gate failure (stale `docs/state-table.md`, masked by the
+> background task's own wrapper-exit-code-0 notification rather than
+> gate3's real exit 1) was caught by reading the log per this item's
+> own warning, fixed, and re-verified. 9 new codegen-walls.md entries
+> (C-70–C-76, P-30–P-33) plus a C-55 boundary extension. See
+> [`cm-main-tier-sweep-1-2026-08-08.md`](../research/cm-main-tier-sweep-1-2026-08-08.md).
