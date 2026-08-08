@@ -907,7 +907,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0209cc90	main	172	legacy	guard chain	parked	22.9	P-20-base-ptr-rescratch-after-calls	cm-main-tier-sweep-3-batch4
 0x02090048	main	88	legacy	guard chain	parked	81.8	P-20-cmp-operand-r0-r1-swap	cm-main-tier-sweep-3-batch4
 0x0208e220	main	52	default	other	parked	53.9	P-36-sub2-pipeline-interleave	cm-main-tier-sweep-3-batch4
-0x0205bccc	main	64	default	unknown	parked	unknown	unknown	unknown
+0x0205bccc	main	64	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch5
 0x02092074	main	72	default	loop	parked	50.0	P-31	cm-main-tier-sweep-3-batch5
 0x02079c74	main	76	legacy	loop	parked	10.5	P-20-reg-alloc	cm-main-tier-sweep-3-batch5
 0x020b03fc	main	76	default	loop	parked	95.0	P-38-tentative-void-loop-trailing-epilogue	cm-main-tier-sweep-3-batch5
