@@ -199,3 +199,38 @@ class ParkOneLedgerTests(TestCase):
             with patch.object(headroom, "ROOT", root):
                 self.assertNotIn(("ov002", "0x02100010"), headroom._attempted_keys(ledger))
 
+    def test_measured_attempt_results_remain_excluded(self) -> None:
+        import tempfile
+
+        import wall_aware_headroom as headroom
+
+        measured = (
+            ("main", "0x020b3168", "genuine-wall"),
+            ("main", "0x02060fdc", "genuine-wall"),
+            ("main", "0x0202bc38", "genuine-wall"),
+            ("main", "0x0206eecc", "near-miss"),
+            ("main", "0x020685c8", "near-miss"),
+            ("main", "0x02073fc8", "near-miss"),
+            ("main", "0x020403d4", "near-miss"),
+            ("main", "0x0209a000", "near-miss"),
+            ("main", "0x020915e4", "close-wall"),
+            ("main", "0x020458d8", "close-wall"),
+            ("main", "0x020967bc", "close"),
+            ("ov002", "0x022476e8", "skipped"),
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger.parent.mkdir(parents=True)
+            lines = [
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tbrief"
+            ]
+            lines.extend(
+                f"{addr}\t{module}\tunknown\tdefault\tunknown\t{result}\t41.7\tunknown\tbrief-test"
+                for module, addr, result in measured
+            )
+            ledger.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            with patch.object(headroom, "ROOT", root):
+                keys = headroom._attempted_keys(ledger)
+        self.assertTrue({(module, addr) for module, addr, _ in measured} <= keys)
+

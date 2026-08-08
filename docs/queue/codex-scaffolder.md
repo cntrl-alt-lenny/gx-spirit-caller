@@ -500,7 +500,7 @@ Also remove the per-input hardcodes in `make_spec` (`if base.lower().endswith("0
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + NEGATIVE fixtures proving each class is rejected or downgraded: (a) an unrelated symbol doing the identical 0x54 RMW → OFFSET-ONLY, ranked below any anchored hit; (b) a `BgCfg021aa460 cfg` local of a different type → rejected or downgraded; (c) a bare decimal literal equal to the offset → not a producer. Re-paste the `GlobalData02104bac 0x54 2` canary with the anchor column, and re-paste the 4-blocked-fields table with the corrected counts.
 
-### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [TODO]
+### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [DONE]
 
 Second pass on `#1467`, same branch. The code fixes from the first pass are sound and stay: the module key is now derived from `_source_module`, dedup is event-level, failure-safety is ordered before the mutation, and all six required regressions exist and pass. Three defects remain, one of them introduced BY the fix.
 

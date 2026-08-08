@@ -316,9 +316,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021d40bc	ov004	212	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
 0x021b8e4c	ov006	304	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
 0x021aae04	ov008	416	default	unknown	parked	unknown	reg-alloc	PR#1414:2e2d2f3f
-0x021b7218	ov010	168	default	unknown	not-attempted	unknown	structural	PR#1414:2e2d2f3f
-0x021b33dc	ov017	232	default	unknown	not-attempted	93.1	unknown	PR#1414:2e2d2f3f
-0x021b4a4c	ov019	484	default	unknown	not-attempted	90.5	unknown	PR#1414:2e2d2f3f
+0x021b7218	ov010	168	default	unknown	parked	90.5	structural	PR#1414:2e2d2f3f
+0x021b33dc	ov017	232	default	unknown	parked	93.1	unknown	PR#1414:2e2d2f3f
+0x021b4a4c	ov019	484	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
 0x021b16f8	ov008	428	default	unknown	not-attempted	unknown	unknown	PR#1414:2e2d2f3f
 0x0201ee1c	main	244	default	unknown	shipped	100	none	PR#1419:a538a333
 0x0206b96c	main	224	default	unknown	shipped	100	none	PR#1419:a538a333
