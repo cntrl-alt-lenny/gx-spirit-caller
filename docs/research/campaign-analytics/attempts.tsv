@@ -882,17 +882,17 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0208ffec	main	92	legacy	guard chain	parked	8.3	P-20-r4-vs-lr	cm-main-tier-sweep-3-batch1
 0x0208ddec	main	96	default	guard chain	parked	8.3	P-36-reginterleave	cm-main-tier-sweep-3-batch1
 0x020a3308	main	52	default	other	parked	53.9	P-36-poolhoist	cm-main-tier-sweep-3-batch1
-0x02079b0c	main	60	default	unknown	parked	unknown	unknown	unknown
-0x02055298	main	68	default	unknown	parked	unknown	unknown	unknown
-0x020a67cc	main	68	default	unknown	parked	unknown	unknown	unknown
-0x02078f08	main	72	default	unknown	parked	unknown	unknown	unknown
-0x020a2c74	main	72	default	unknown	parked	unknown	unknown	unknown
-0x02094504	main	76	default	unknown	parked	unknown	unknown	unknown
-0x0208cfa4	main	140	default	unknown	parked	unknown	unknown	unknown
-0x0209d018	main	224	default	unknown	parked	unknown	unknown	unknown
-0x0208de94	main	88	default	unknown	parked	unknown	unknown	unknown
-0x0208fd30	main	96	default	unknown	parked	unknown	unknown	unknown
-0x02048880	main	116	default	unknown	parked	unknown	unknown	unknown
+0x02079b0c	main	60	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch2
+0x02055298	main	68	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch2
+0x020a67cc	main	68	default	loop	parked	unknown	P-37-scope-broadening-candidate	cm-main-tier-sweep-3-batch2
+0x02078f08	main	72	default	loop	parked	38.9	P-36-store-postindex-fusion	cm-main-tier-sweep-3-batch2
+0x020a2c74	main	72	default	loop	parked	47.4	and-shift-pair-collapse	cm-main-tier-sweep-3-batch2
+0x02094504	main	76	default	loop	parked	unknown	stm-burst-needs-asm	cm-main-tier-sweep-3-batch2
+0x0208cfa4	main	140	default	guard chain	parked	88.6	P-20-3register-permutation	cm-main-tier-sweep-3-batch2
+0x0209d018	main	224	default	guard chain	parked	6.0	regalloc-cascade-unresolved	cm-main-tier-sweep-3-batch2
+0x0208de94	main	88	default	guard chain	parked	59.1	P-36-poolhoist	cm-main-tier-sweep-3-batch2
+0x0208fd30	main	96	default	guard chain	parked	37.5	unknown	cm-main-tier-sweep-3-batch2
+0x02048880	main	116	default	small dispatcher	parked	86.2	sibling-constant-arithmetic-reuse	cm-main-tier-sweep-3-batch2
 0x0208bed8	main	60	plain	loop	parked	13.3	instr-selection	cm-main-tier-sweep-3-batch3
 0x0207e790	main	72	plain	loop	parked	88.9	scheduling-cmp-reuse	cm-main-tier-sweep-3-batch3
 0x020779d8	main	80	plain	loop	parked	60.0	P-20-r2-vs-ip	cm-main-tier-sweep-3-batch3
