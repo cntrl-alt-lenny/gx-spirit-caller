@@ -260,9 +260,21 @@ src/overlay017/data_ov017_021b8020.c:
     complete
     .data start:0x021b8020 end:0x021b8030
 
+src/overlay017/data_ov017_021b80a0.c:
+    complete
+    .data start:0x021b80a0 end:0x021b80b4
+
+src/overlay017/data_ov017_021b80b4.c:
+    complete
+    .data start:0x021b80b4 end:0x021b80c8
+
 src/overlay017/data_ov017_021b80c8.c:
     complete
     .data start:0x021b80c8 end:0x021b80d4
+
+src/overlay017/data_ov017_021b816c.c:
+    complete
+    .data start:0x021b816c end:0x021b8180
 
 src/overlay017/sinit_ov017_021b7f5c.c:
     complete
