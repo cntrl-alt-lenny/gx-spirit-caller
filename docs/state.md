@@ -112,7 +112,7 @@ Scaffolder, `q-ledger-residuals`, just opened — not yet reviewed). #1020
 absent from this count.
 
 **Round 0808d — everything else merged.** #1478 (`cm-main-tier-sweep-2`) and
-#1475 (census methodology, second pass) both landed. EUR natural-C is now
+PR #1475 (census methodology, second pass) both landed. EUR natural-C is now
 **14.71%** (351,058 B) — up **+0.43 pp across round 0808 as a whole**
 (14.28% → 14.71%).
 
