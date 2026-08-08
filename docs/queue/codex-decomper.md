@@ -233,7 +233,7 @@ Effort: **MEDIUM**.
 
 **Gate:** if anything ships, per-region `ninja sha1` + `python tools/gate3.py --scope all`; otherwise doc-only + `python -m pytest -q tests` green. The census/worklist table pasted in the PR.
 
-### q-census-methodology-fixes — close the two field_exposure_census.py gaps #1465 discovered [TODO]
+### q-census-methodology-fixes — close the two field_exposure_census.py gaps #1465 discovered [DONE]
 
 `cm-field-recheck-1` (#1465) surfaced two methodology gaps in the field
 exposure census while using it to rank fields — see `tools/field_exposure_census.py`.
