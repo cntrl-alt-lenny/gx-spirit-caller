@@ -246,6 +246,9 @@ def _file_metadata(
 
 
 _ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
+_DIAGNOSED_WALL_PARK_CLASSES = frozenset({
+    "complexity", "permanent-header", "c-23-c-36", "c-31",
+})
 _ATTEMPT_ADDR_RE = re.compile(r"(?:^|_)([0-9a-fA-F]{8})$")
 
 
@@ -278,9 +281,14 @@ def _attempted_keys(path: Path | None = None) -> set[tuple[str, str]]:
             )
         for row in reader:
             # Fail closed: only an explicit never-attempted marker may remain
-            # dispatchable.  Unknown, blank, and legacy result values still
+            # dispatchable. Unknown, blank, and legacy result values still
             # represent an attempted row until a human/tool proves otherwise.
-            if (row.get("result") or "").strip().lower() == "not-attempted":
+            # A never-attempted row with a diagnosed wall class is also kept
+            # out of the queue: it has a documented blocker even without a C
+            # draft, so redispatching it would repeat a known dead end.
+            result = (row.get("result") or "").strip().lower()
+            park_class = (row.get("park_class") or "").strip().lower()
+            if result == "not-attempted" and park_class not in _DIAGNOSED_WALL_PARK_CLASSES:
                 continue
             addr = _normalise_attempt_addr(row.get("addr"))
             module = (row.get("module") or "").strip().lower()

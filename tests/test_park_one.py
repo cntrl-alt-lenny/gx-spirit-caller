@@ -12,6 +12,19 @@ import park_one  # noqa: E402
 
 
 class ParkOneLedgerTests(TestCase):
+    def test_real_ledger_rejects_not_attempted_measurements(self) -> None:
+        import csv
+
+        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        with ledger.open(newline="", encoding="utf-8") as stream:
+            contradictions = [
+                row["addr"]
+                for row in csv.DictReader(stream, delimiter="\t")
+                if row["result"].strip().lower() == "not-attempted"
+                and row["match_pct"].strip().lower() not in {"", "unknown"}
+            ]
+        self.assertEqual(contradictions, [])
+
     def test_park_one_restores_and_records_attempt(self) -> None:
         import tempfile
 
@@ -233,4 +246,30 @@ class ParkOneLedgerTests(TestCase):
             with patch.object(headroom, "ROOT", root):
                 keys = headroom._attempted_keys(ledger)
         self.assertTrue({(module, addr) for module, addr, _ in measured} <= keys)
+
+    def test_real_ledger_measured_attempts_remain_excluded(self) -> None:
+        import wall_aware_headroom as headroom
+
+        measured = {
+            ("main", addr)
+            for addr in (
+                "0x020b3168", "0x02060fdc", "0x0202bc38", "0x0206eecc",
+                "0x020685c8", "0x02073fc8", "0x020403d4", "0x0209a000",
+                "0x020915e4", "0x020458d8", "0x020967bc",
+            )
+        } | {("ov002", "0x022476e8")}
+        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        self.assertTrue(measured <= headroom._attempted_keys(ledger))
+
+    def test_diagnosed_never_attempted_walls_remain_excluded(self) -> None:
+        import wall_aware_headroom as headroom
+
+        diagnosed = {
+            ("main", "0x02010354"),
+            ("main", "0x02021b38"),
+            ("main", "0x02023478"),
+            ("main", "0x0209085c"),
+        }
+        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        self.assertTrue(diagnosed <= headroom._attempted_keys(ledger))
 
