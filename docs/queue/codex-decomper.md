@@ -251,3 +251,23 @@ CANARY: the two `cm-field-recheck-1` sites above must be counted after the fix a
 Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-ranked audit inputs).
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + a regression per gap (including the negative case above) + before/after per-field site counts, with any field whose RANK changes called out explicitly.
+
+### q-census-decimal-alias-anchor — the decimal member alias re-opens the collision class [TODO]
+
+Second pass on `#1475`, same branch. The two gaps ARE genuinely addressed and your before/after table reproduces exactly when re-run. The specific collision the item warned about is genuinely absent — `cfg.unrelated = cfg.unrelated | 20;`, `other.timeout = 20;`, `foo(20);` and `int x = 20;` all correctly return zero sites for a field at `0x14`. That part is right.
+
+But the fix introduces a **different false-positive class of the same family**, via the new decimal member alias:
+
+`_field_names_pattern` (`tools/field_exposure_census.py:104-107`) returns `{name, f{offset:x}, f{offset:X}, f{offset}}`, and the member path in `_c_accesses` (:135) requires **no base symbol at all** — unlike the raw-offset path (:136-138), which does. So `.f{decimal}` matches anywhere in the corpus, including on unrelated structs.
+
+Measured on the real EUR corpus (10,624 delinked sources): **85 of 255 fields gain sites from the decimal alias.** Worst case `PerPlayerRowTable.f_0e` (offset `0xE`, decimal alias `.f14`): as-shipped `(25, 36, 53)` vs `(10, 12, 16)` with the alias removed — **37 of its 53 sites (70%) are `self->f14` / `p->f14` / `c->f14` accesses on unrelated structs at offset 0x14.** `BgCfg.f14` (offset `0x14`, alias `.f20`) goes 46 vs 37. Twelve aliases collide across two distinct documented offsets AND actually occur in `src/*.c`: `.f14` (99 files, 0x14 vs 0xE), `.f10` (68, 0x10 vs 0xA), `.f18` (64, 0x12 vs 0x18), `.f24` (41), `.f12` (40), `.f20` (31), `.f28` (27), `.f16` (23), `.f60` (9), `.f84` (5), `.f17` (4), `.f13` (3).
+
+This corrupts the ranking the item exists to protect — a field can be promoted up the audit order by sites belonging to a different struct entirely.
+
+**Verified remedy** (implemented and measured during review, so it is known to work): require the documented base symbol on the SAME LINE for **decimal-alias member matches only**. Hex-alias and real-name matches keep their current behaviour. Effect: the canary rows are untouched (`f_5d4` stays `(31, 9, 38)`, `f_5b4` stays `(53, 54, 55)` — the real site `data_ov002_022ce288.f1492 = 0;` carries the base on the line), while the pollution collapses (`f_0e` 53 → 16, `BgCfg.f14` 46 → 37). Implement it your own way if you prefer, but match or beat those numbers and show them.
+
+**Also BLOCKING — retract a false claim.** `docs/research/data/cm-field-census-methodology-2026-08-08.md` states: *"The census now follows the same anchoring shape as the landed `field_producer_finder.py` rule."* That tool was NOT on `origin/main` when you wrote it (#1468 was still an open draft), so "landed" was untrue at the time. It has since merged — so re-check the claim against reality and restate it accurately.
+
+And the rules genuinely DIVERGE where the item told you to converge: the sibling's `field_producer_finder.py:81` uses `field_names = {f"f{offset:x}", f"f{offset:X}"}` — **hex only, no decimal member alias** — while yours adds `f{offset}`. The pointer-arithmetic halves DO agree. Reconcile the member-alias half deliberately: either drop the decimal alias to match, or keep it WITH base anchoring and state why the census needs it when the finder does not. Your PR body never mentions the sibling lane at all — say what the shared rule is.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning an unrelated-struct `.f{decimal}` access as NOT a site + the canary rows unchanged + a before/after table for the ~85 affected fields with any RANK change called out.

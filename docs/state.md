@@ -16,8 +16,50 @@ EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), pl
 **+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
 57,076 → 72,440).
 
-<!-- main-sha: 0cf767e89 -->
+<!-- main-sha: b97c73b98 -->
 <!-- parked-prs: 1020 -->
+
+**Round 0808c (partial round — 3 of 4 lanes reviewed while the CC Decomper
+was still sweeping).** Merged **#1467** (ledger event semantics + the
+exclusion regression closed), **#1468** (producer anchoring + score
+consistency) and **#1476** (carve-3: 64/64 aligned candidates, 1,348 B,
+plus a **working TU-composition recipe for the ALIGNALL(2) wall**).
+
+**The alignment wall is cracked, with a narrower precondition than first
+claimed.** Pairing two adjacent 2-byte-misaligned symbols as separate named
+globals of the same type, in address order, in one TU avoids the cascade —
+and it is gate-covered, because the experimental pair actually shipped, so
+the 3-region SHA1 PASS proves it. The brain corrected three things before
+merge: the precondition is **4-alignment at BOTH ends** of the composed span
+(not size alone), the recipe therefore does **not** reach `ov006`'s four
+`kv_t` symbols, and **11 of the 35** misaligned candidates fail that screen
+structurally. Two reconciliation cells also read 12 where the struct is 10 B
+— which was the entire cause of the PR's unexplained "Named-struct 752 vs
+748" note.
+
+**#1475 (census methodology) stays open — second pass required.** The two
+gaps are genuinely closed and the specific collision the item warned about
+is absent (verified by probing: `cfg.unrelated = ... | 20;`, `foo(20);` and
+a bare `int x = 20;` all correctly score zero for offset `0x14`). But the
+new **decimal member alias is unanchored** — `_field_names_pattern` emits
+`f{offset}` and the member path requires no base symbol, so `.f{decimal}`
+matches on unrelated structs anywhere in the corpus. 85 of 255 fields gain
+sites from it; `PerPlayerRowTable.f_0e` (alias `.f14`) has **37 of its 53
+sites, 70%, on unrelated structs at offset 0x14**. That corrupts the very
+ranking the item exists to protect. The research doc also claims the census
+"follows the same anchoring shape as the landed `field_producer_finder.py`
+rule" — untrue when written (#1468 was still an open draft), and the two
+rules actually diverge exactly there: the finder is hex-only, the census
+adds a decimal alias.
+
+**Partial-round policy (adopted this round).** Do NOT hold finished lanes
+for a still-running one. The deciding factor is whether a lane's gate needs
+the machine: build-free lanes (Codex, `kb-map`/`kb-types`) can always be
+dispatched independently; only lanes running a 3-region gate need their
+windows staggered. The costs are a generated-file conflict for the
+still-running lane (mechanical, resolved by regen-on-merged-tree) and stale
+headline numbers in the dispatched messages (cosmetic; phrase as "as of this
+dispatch").
 
 **Merged this round:**
 
@@ -63,9 +105,11 @@ even when this file makes no PR-count claim), and `parked-prs` is the
 EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
-**PR state — active vs merely open.** **active** count is **2**: #1467 and #1468
-(Codex Scaffolder output, both draft but NOT parked — **second pass required,
-see below**). #1020 (decomp.dev CI) is the one genuinely parked draft.
+**PR state — active vs merely open.** **active** count is **1**: #1475 (census
+methodology, second pass required — see above). #1020 (decomp.dev CI) is the
+one genuinely parked draft. The CC Decomper's `cm-main-tier-sweep-2` is still
+in flight and has NOT opened a PR yet, so it is correctly absent from this
+count — expect it to become the second active PR shortly.
 
 **#1467 second pass — the repair introduced a NEW regression.** Three of five
 fixes are genuinely closed (module key now derived from the consumer's own
