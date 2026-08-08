@@ -977,7 +977,7 @@ Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/b
 > recurring failure mode worth a standing pre-dispatch check. See
 > [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
 
-### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [TODO]
+### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [CLAIMED]
 
 **Why this module and not another ov002 sweep.** `attempts.tsv` is mid-repair: #1467 (open, changes requested) would record ~19 never-attempted candidates as `parked` and writes a module key (`overlay002`) the selector cannot match (`ov002`). Until that lands, an ov002 pull driven by `--exclude-attempted` is selecting against a corrupted exclusion set. This round therefore sweeps **`main`**, selected from a committed worklist rather than from the ledger — so the round cannot be poisoned by the repair in flight. (`main` is also the one module where `park_one.py`'s module bug does not bite: writer and consumer both say `main`.)
 
