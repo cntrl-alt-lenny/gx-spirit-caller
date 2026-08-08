@@ -67,10 +67,16 @@ just don't rewrite other agents' tools without a PR/their sign-off.
    The round order is fixed: **read all workers → inspect and reconcile
    repository work → integrate → gate → merge → write the next complete
    worker messages.**
-4. Bookkeeping: update `AGENTS.md` (close briefs, LANE STATE, queue next),
-   `docs/state.md`, and your file-based memory. Then hand cntrl_alt_lenny
-   two paste-ready kickoffs (no nested triple-backticks — they get copied
-   verbatim to the agents).
+4. Bookkeeping: update `AGENTS.md` (close items, LANE STATE), re-seed the
+   per-lane queue files under `docs/queue/`, update `docs/state.md`
+   (including its `main-sha:` anchor) and your file-based memory. Then hand
+   cntrl_alt_lenny **one complete paste-ready message per active standing
+   lane that needs dispatch — normally all four** (Claude Code Decomper,
+   Claude Code Scaffolder, Codex Decomper, Codex Scaffolder), all in the
+   SAME final response (no nested triple-backticks — they get copied
+   verbatim to the agents). Skip a lane only when it is genuinely
+   mid-flight or has nothing to dispatch, and say so explicitly. Never
+   defer a message to a later turn — the message is the deliverable.
 
 ## Integrity (non-negotiable)
 
@@ -94,13 +100,20 @@ Scope: production fires only, never feature work.
 
 ## Brief / kickoff writing
 
-The live queue is `AGENTS.md` § Open briefs. For each queued brief, hand
-cntrl_alt_lenny a self-contained paste-ready kickoff: worktree setup
-(`git worktree add ../claude-NNN -b <branch> origin/main`, then copy the
+The live queues are the four per-lane files under `docs/queue/`
+(`claude-decomper.md`, `claude-scaffolder.md`, `codex-decomper.md`,
+`codex-scaffolder.md`). For each lane's claimed item, hand cntrl_alt_lenny
+a self-contained paste-ready kickoff: the assigned worktree path with an
+`EXPECT=` repo-root equality guard, worktree setup where a new one is
+needed (`git worktree add ../<dir> -b <branch> origin/main`, then copy the
 git-ignored tool binaries — `cp -R ../brain/tools/mwccarm tools/ && cp
 ../brain/objdiff-cli ../brain/dsd .`), the exact command block, the gate
-+ PR instructions, and the branch name. Mac = ONE wine drain lane
-(scaffolder) + wine-free decomper; PC = both on the drain.
++ PR instructions, and the branch name. Lint every kickoff before sending:
+`python tools/kickoff_lint.py <file>`. Match each lane's gate to its
+worktree's build capability (`kb-map` = build-free, `kb-types` = EUR only,
+`decomper`/`scaffolder`/`codex-*` = all 3 baseroms). On Mac the wine drain
+is a single lane; on Windows all four lanes can build, but the mwcc
+toolchain still serialises MACHINE-WIDE — never two 3-region gates at once.
 
 ## Verification checklist
 

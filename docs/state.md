@@ -8,10 +8,75 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-05 — **(Windows PC, brain=Fable 5; roster unchanged.) Round
-0805: back-online review, port-harvest closed as met, all four queues re-seeded.**
-EUR natural-C **13.99%** (333,810 B) / USA **11.81%** / JPN **11.79%** — from the
-regenerated state-table (post-#1460), not inherited.
+**Last updated:** 2026-08-07 — **(Windows PC, brain=Opus 5; roster unchanged.) Rounds
+0806 (dispatch) + 0807 (review): all four lanes ran, five PRs merged, then a
+focused repair round.**
+EUR natural-C **14.28%** (340,770 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
+(282,000 B) — from the regenerated state-table at the SHA below, not inherited.
+
+<!-- main-sha: 750ad5120 -->
+<!-- parked-prs: 1020 -->
+
+Those two markers are machine-checked by `tools/queue_state_drift.py`:
+`main-sha` is the `main` commit this document describes (drift fires when
+`main` runs more than one PR-merge ahead of it, so a stale handoff is caught
+even when this file makes no PR-count claim), and `parked-prs` is the
+EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
+because the worker lanes publish ordinary output as drafts.
+
+**PR state — active vs merely open.** **active** count is **2** (#1467, #1468 —
+Codex Scaffolder output under review, both draft but NOT parked). #1020
+(decomp.dev CI) is the one genuinely parked draft.
+
+**Round 0806 (dispatch).** Nothing to merge; all four lanes dispatched on the
+0805 seeds. A stale uncommitted `q-recursive-glob-sweep [CLAIMED]` edit from
+2026-07-29 was reverted out of `kb-types` (that item shipped as #1385).
+
+**Round 0807 (review) — merged #1462–#1466:**
+
+- **#1462** — `q-port-residual-fix`: root-caused the region-data lookup bug
+  (`port_to_region.py` rejected semantic EUR filenames before emitting JSON),
+  fixed fail-closed + collision repair, ported all 6 named residues per region
+  (852 B each side). Brain fixed one ruff B023 lint-only closure to unblock it.
+- **#1463** — `q-port-highconf-no-target`: honest 0-shipped + a 62-per-region
+  worklist (the queue's "63" was a stale pre-#1436 census value).
+- **#1464** — `cm-restock-carve-1`: 31/35 shipped, 1,960 B; 4 `kv_t` symbols
+  declined on a documented mwldarm 2-byte alignment wall.
+- **#1465** — `cm-field-recheck-1`: 5/5 fields verdicted, 2 refinements.
+- **#1466** — `cm-ov002-unknown-sweep-17`: **42/100 shipped, 6,960 B — the
+  best sweep round to date**, validating the worktree-parallel protocol at
+  full scale (sweep-16's 3/12 was a scale artifact, not a yield drop).
+
+**Verification standard applied this round:** every PR's numbers were
+independently recomputed (not read from the PR body), and all four worker
+transcripts were read. No dishonesty was found in any lane; every blocker was
+evidence-presentation, lint, or infrastructure. Both Claude lanes then ran a
+completion pass that closed all fifteen flagged gaps, including sweep-17's 58
+missing `attempts.tsv` park rows and its own overstated "8 double-dispatched"
+claim (the demonstrable figure is 4).
+
+**Two infrastructure findings worth carrying forward:**
+
+1. **GitHub Actions event-delivery gap**, ~20:47–21:20Z on 2026-08-06:
+   #1462/#1463/#1464 got ZERO workflow runs (not the paths-filter trap —
+   `drift-check` is deliberately unfiltered). Remedy: close/reopen the PR.
+   Marking ready-for-review does NOT re-trigger, because the workflows use
+   the default `pull_request` types, which exclude `ready_for_review`.
+2. **Generated-file conflict cascade.** Any two same-round PRs that both
+   regenerate `docs/state-table.md` or `docs/research/README.md` will conflict
+   pairwise. Resolve by merging `main` into the branch in a throwaway detached
+   worktree, re-running the generator on the merged tree, then full pytest —
+   never by hand-resolving generated content.
+
+**Round 0807 repair (this update).** Fixed the canonical dispatch rule: the
+brain hands over **one complete paste-ready message per active standing lane
+that needs dispatch, normally all four**, in the same final response.
+`AGENTS.md` § end-of-round checklist and `.claude/agents/brain.md` both carried
+obsolete two-lane wording ("exactly TWO kickoffs" / "two paste-ready kickoffs")
+that contradicted `AGENTS.md`'s own four-session roster;
+`docs/agents/brain-onboarding.md` now holds the canonical statement and the
+other two defer to it. Also repaired `queue_state_drift.py` (draft ≠ parked,
+plus the `main-sha` anchor above) with regressions.
 
 **0804d round recorded here for the first time** (it post-dated this file's previous
 update; the Mac brain merged it but did not get back to state.md): **#1457**
