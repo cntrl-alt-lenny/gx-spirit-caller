@@ -369,9 +369,21 @@ src/overlay016/data_ov016_021b9014.c:
     complete
     .data start:0x021b9014 end:0x021b9020
 
+src/overlay016/data/data_ov016_021b9184.c:
+    complete
+    .data start:0x021b9184 end:0x021b9198
+
+src/overlay016/data/data_ov016_021b9198.c:
+    complete
+    .data start:0x021b9198 end:0x021b91ac
+
 src/overlay016/data_ov016_021b91ac.c:
     complete
     .data start:0x021b91ac end:0x021b921c
+
+src/overlay016/data/data_ov016_021b9374.c:
+    complete
+    .data start:0x021b9374 end:0x021b939c
 
 src/overlay016/sinit_ov016_021b8e7c.c:
     complete
