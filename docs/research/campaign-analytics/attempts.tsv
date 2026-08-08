@@ -744,32 +744,32 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0207c934	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
 0x0207cd7c	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
 0x0207cdd0	main	128	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
-0x02046a5c	main	104	default	P-20-self-overwrite-deref	parked	80.8	reg-alloc	cm-main-tier-sweep-1-batch1
-0x020480b4	main	84	default	P-20-guard-merge-residual	parked	85.7	reg-alloc	cm-main-tier-sweep-1-batch1
-0x0204918c	main	96	default	P-20-mla-dest-register	parked	91.7	reg-alloc	cm-main-tier-sweep-1-batch1
-0x0204931c	main	96	default	compound-compare-same-reg	parked	38.5	compound-compare	cm-main-tier-sweep-1-batch1
-0x0204d468	main	76	default	reg-alloc-extra-mov	parked	40.0	reg-alloc	cm-main-tier-sweep-1-batch1
-0x02052704	main	40	default	compound-compare-3way	parked	20.0	compound-compare	cm-main-tier-sweep-1-batch1
-0x02052ecc	main	56	default	P-20-redundant-const-preserve	parked	14.3	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020531c0	main	112	default	64bit-compare-reg-pressure	parked	42.9	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055654	main	116	default	guard-chain-double-deref-p1reg	parked	79.3	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020558fc	main	60	default	guard-chain-double-deref-p1reg	parked	80.0	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055a18	main	108	default	guard-chain-double-deref-p1reg	parked	77.8	reg-alloc	cm-main-tier-sweep-1-batch2
-0x02055c04	main	108	default	guard-chain-double-deref-p1reg	parked	77.8	reg-alloc	cm-main-tier-sweep-1-batch2
-0x020620d8	main	64	default	P-20-scratch-reg-swap	parked	75.0	reg-alloc	cm-main-tier-sweep-1-batch3
-0x0206811c	main	120	default	reg-alloc-diverge-stmia-merge	parked	23.3	reg-alloc	cm-main-tier-sweep-1-batch3
-0x020689e4	main	60	default	struct-by-value-return-abi	parked	5.0	abi-model	cm-main-tier-sweep-1-batch3
-0x0206aa68	main	100	default	neg1-materialization-reg-swap	parked	84.0	reg-alloc	cm-main-tier-sweep-1-batch3
-0x0206c84c	main	96	default	P-20-bf94-result-register	parked	54.2	reg-alloc	cm-main-tier-sweep-1-batch4
-0x0206cd0c	main	88	default	P-20-bf94-result-register	parked	95.5	reg-alloc	cm-main-tier-sweep-1-batch4
-0x0207092c	main	84	default	P-20-leaf-r0r1-choice	parked	71.4	reg-alloc	cm-main-tier-sweep-1-batch4
-0x02070ce0	main	84	default	cmpne-predication-nonadjacent-or	parked	23.8	predication	cm-main-tier-sweep-1-batch4
-0x02073a5c	main	100	default	P-20-dead-stackword-register	parked	96.0	reg-alloc	cm-main-tier-sweep-1-batch5
-0x02073ed8	main	80	default	predication-resistance-new	parked	40.0	predication	cm-main-tier-sweep-1-batch5
-0x02074b38	main	88	default	P-20-dual-register-swap	parked	63.6	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207af28	main	120	default	canary-lever-residual	parked	86.7	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207b0e0	main	92	default	canary-lever-residual-iplr	parked	73.9	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207c8d8	main	92	default	canary-lever-residual-2nd-access	parked	91.3	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207c990	main	76	default	predication-resistance-new	parked	50.0	predication	cm-main-tier-sweep-1-batch5
-0x0207cbe0	main	112	default	canary-lever-residual	parked	71.4	reg-alloc	cm-main-tier-sweep-1-batch5
-0x0207cc50	main	88	default	canary-lever-residual	parked	81.8	reg-alloc	cm-main-tier-sweep-1-batch5
+0x02046a5c	main	104	default	guard chain	parked	80.8	P-20-self-overwrite-deref	cm-main-tier-sweep-1-batch1
+0x020480b4	main	84	default	guard chain	parked	85.7	P-20-guard-merge-residual	cm-main-tier-sweep-1-batch1
+0x0204918c	main	96	default	guard chain	parked	91.7	P-20-mla-dest-register	cm-main-tier-sweep-1-batch1
+0x0204931c	main	96	default	guard chain	parked	38.5	compound-compare-same-reg	cm-main-tier-sweep-1-batch1
+0x0204d468	main	76	default	guard chain	parked	40.0	reg-alloc-extra-mov	cm-main-tier-sweep-1-batch1
+0x02052704	main	40	default	guard chain	parked	20.0	compound-compare-3way	cm-main-tier-sweep-1-batch1
+0x02052ecc	main	56	default	guard chain	parked	14.3	P-20-redundant-const-preserve	cm-main-tier-sweep-1-batch2
+0x020531c0	main	112	default	guard chain	parked	42.9	64bit-compare-reg-pressure	cm-main-tier-sweep-1-batch2
+0x02055654	main	116	default	guard chain	parked	79.3	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020558fc	main	60	default	guard chain	parked	80.0	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055a18	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055c04	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020620d8	main	64	default	guard chain	parked	75.0	P-20-scratch-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206811c	main	120	default	guard chain	parked	23.3	reg-alloc-diverge-stmia-merge	cm-main-tier-sweep-1-batch3
+0x020689e4	main	60	default	guard chain	parked	5.0	struct-by-value-return-abi	cm-main-tier-sweep-1-batch3
+0x0206aa68	main	100	default	guard chain	parked	84.0	neg1-materialization-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206c84c	main	96	default	guard chain	parked	54.2	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0206cd0c	main	88	default	guard chain	parked	95.5	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0207092c	main	84	default	guard chain	parked	71.4	P-20-leaf-r0r1-choice	cm-main-tier-sweep-1-batch4
+0x02070ce0	main	84	default	guard chain	parked	23.8	cmpne-predication-nonadjacent-or	cm-main-tier-sweep-1-batch4
+0x02073a5c	main	100	default	guard chain	parked	96.0	P-20-dead-stackword-register	cm-main-tier-sweep-1-batch5
+0x02073ed8	main	80	default	guard chain	parked	40.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x02074b38	main	88	default	guard chain	parked	63.6	P-20-dual-register-swap	cm-main-tier-sweep-1-batch5
+0x0207af28	main	120	default	guard chain	parked	86.7	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207b0e0	main	92	default	guard chain	parked	73.9	canary-lever-residual-iplr	cm-main-tier-sweep-1-batch5
+0x0207c8d8	main	92	default	guard chain	parked	91.3	canary-lever-residual-2nd-access	cm-main-tier-sweep-1-batch5
+0x0207c990	main	76	default	guard chain	parked	50.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x0207cbe0	main	112	default	guard chain	parked	71.4	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207cc50	main	88	default	guard chain	parked	81.8	canary-lever-residual	cm-main-tier-sweep-1-batch5
