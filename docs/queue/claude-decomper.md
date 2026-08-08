@@ -1057,3 +1057,26 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
 > once a guard chain's success path grows more complex than a bare
 > return. See
 > [`cm-main-tier-sweep-2-2026-08-08.md`](../research/cm-main-tier-sweep-2-2026-08-08.md).
+
+### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [TODO]
+
+`cm-main-tier-sweep-2` (#1478) answered its question honestly: Pool A (guard chain) **32/50 = 64%**, Pool B (loop / other / small dispatcher) **27/50 = 54%**. A real gap, but far smaller than wave 1's 71% framing implied — and **two of five batches had Pool B outship Pool A**, with Pool B ranging 20–80% across batches. The tier is not a cliff; the variance is mostly batch composition.
+
+The most useful thing that round found is a **defect in the selector itself**: several worklist rows labelled `guard chain` concealed non-guard-chain bodies (softfloat conversions among them). That means wave 1's "100/100 guard chain" homogeneity claim — the basis for reading its 71% as pre-filtered — is itself unreliable, and every future shape-based split inherits the error. Treat the worklist's `shape` column as a hint, not ground truth.
+
+This round, 100 candidates, same 0x02040000+ range, 5 worktrees × 20, partition frozen before dispatch:
+
+1. **Re-derive each candidate's shape from its own `.s` body at pull time** rather than reading the worklist column, and record BOTH (worklist label, derived label) per attempt. Report how often they disagree — that number is the deliverable that makes every future sweep's targeting honest, and the Codex Decomper is rebuilding the labels wholesale in parallel (`q-main-shape-reclassify`), so your disagreement sample is its ground-truth check.
+2. Prioritise by the DERIVED shape, leading with whatever sweep-2's per-shape breakdown actually shipped best — read your own round doc for that, not the worklist's ranking.
+
+**P-36 (instruction-scheduling family) explained roughly a third of sweep-2's parks.** Before drafting a candidate whose diff is scheduling-only, check P-36's criteria; if it matches, park immediately rather than iterating. If you find a lever that moves ANY P-36 member, that is worth more than five ordinary ships — record it with the same evidence standard as C-70…C-76.
+
+Standing enforcement unchanged: one worktree = one agent, mandatory first-step location guard in every batch prompt, pool built ONCE and frozen, ROUTE BEFORE YOU DRAFT on every candidate (read the `.s` epilogue, pick `.c` / `.legacy.c` / `.legacy_sp3.c` first). Lever set: C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus your own C-70…C-76 and P-30…P-36.
+
+⚠️ **Sequencing, from sweep-2's own disclosure:** you checked worktrees for the orphaned-`.s` bug before batch2's completion notification had arrived and ran `git rm`/`git commit` in its worktree while its agent may still have been live. No damage that time. Wait for each batch's completion notification before touching its worktree.
+
+⚠️ `park_one.py`'s structural recording is now fixed and merged (#1467/#1479) — use it, and verify it actually wrote rows rather than assuming. If a batch worktree still records nothing, that is a finding worth reporting, not a silent backfill.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — read the log. State ONE basis for the headline (sweep-2 got this right: "60/100 shipped (59 batch + 1 canary), 3,852 bytes"). Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, before/after `wall_aware_headroom.py`, the per-shape ship rates, and the worklist-vs-derived disagreement count.

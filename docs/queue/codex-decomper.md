@@ -279,3 +279,23 @@ And the rules genuinely DIVERGE where the item told you to converge: the sibling
 > over the lane's summary, and carries the lane's `[DONE]` status, which is the
 > accurate one. `_member_patterns` now returns "unanchored real/hex names and an
 > anchored decimal alias", which is the specified remedy.
+
+### q-main-shape-reclassify — the worklist's shape labels are wrong often enough to mis-target sweeps [TODO]
+
+`cm-main-tier-sweep-2` (#1478) found that several `docs/research/main-small-tier-worklist.md` rows labelled `guard chain` conceal non-guard-chain bodies — softfloat conversions among them. That matters more than it sounds:
+
+- the worklist is the CC Decomper's **selector**, so a wrong label mis-targets a whole batch;
+- wave 1's headline read ("71% but on a 100/100 homogeneous guard-chain population, so treat it as pre-filtered") rests on those labels being right — if they are not, the campaign's most-quoted rate is resting on a shaky premise;
+- sweep-2's Pool A/B split (64% vs 54%) was designed around the same labels, so its gap is measured through a noisy lens.
+
+Rebuild the shape classification **mechanically from each function's own `.s` body**, not from the existing column. Cover the whole `main` small tier the worklist spans (both address ranges, ~1,640 rows). For each row emit: address, size, the CURRENT label, the DERIVED label, and agree/disagree. Then report the confusion matrix — which labels are reliable, which are catch-alls, and the overall disagreement rate.
+
+Derive from structure, and say plainly what each rule keys on so the next reader can audit it: trivial stub (single `bx lr`, no frame), tail-call forwarder (set up args → `b`/`bl` → return), guard chain (compare/branch ladder to a small number of exits), small dispatcher (jump table or switch shape), loop (backward branch), softfloat/CLZ (calls into or implements the float helpers — sweep-2 shipped 5 of these as `asm` for want of a C-reachable `clz`), other. If a body genuinely fits none, say `unclassified` rather than forcing it — an honest bucket beats a wrong label, which is the whole point of this item.
+
+Ship the corrected labels as a NEW column alongside the existing one rather than overwriting it — the old column is what three waves were selected against, so preserving it keeps their results interpretable.
+
+⚠️ Coordinate: the CC Decomper is running `cm-main-tier-sweep-3` in parallel and re-deriving shape at pull time for its own 100 candidates, recording (worklist label, derived label) per attempt. That is an independent sample against your bulk classifier — compare against it when it lands and reconcile any systematic disagreement. If your rules and its rules disagree on a class, resolve it rather than shipping two definitions.
+
+Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-targeted sweep batches) and directly improves the selector every C-match round uses.
+
+**Gate:** doc+tool — `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the confusion matrix + the overall disagreement rate + a 10-row spot check where you show the `.s` body next to both labels, so the derivation is auditable rather than asserted.
