@@ -230,6 +230,10 @@ src/overlay007/func_ov007_021b2ef0.s:
     complete
     .text start:0x021b2ef0 end:0x021b2f38
 
+src/overlay007/data_ov007_021b2fa0.c:
+    complete
+    .data start:0x021b2fa0 end:0x021b2fb0
+
 src/overlay007/sinit_ov007_021b2f38.c:
     complete
     .init start:0x021b2f38 end:0x021b2f64
@@ -269,6 +273,10 @@ src/overlay007/data_ov007_021b2fdc.c:
 src/overlay007/data_ov007_021b2fe8.c:
     complete
     .data start:0x021b2fe8 end:0x021b2ff4
+
+src/overlay007/data_ov007_021b2ff4.c:
+    complete
+    .data start:0x021b2ff4 end:0x021b3078
 
 src/overlay007/data/data_ov007_021b30c0.s:
     complete

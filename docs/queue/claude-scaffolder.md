@@ -1360,7 +1360,7 @@ Standing rules: **NEVER hand-transcribe byte content — generate every C initia
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ `gate3` piped through `tee` MASKS its exit code (both lanes hit this last round) — read the log, do not trust exit 0. Paste the three sha1 lines VERBATIM + the Named-struct/Typed-array before/after lines from the state-table regen + the per-symbol reconciliation table in the PR body. Coordinate the full gate with Lenny: the mwcc toolchain serialises MACHINE-WIDE, and the CC Decomper is running a 5-worktree consolidated `--clean` gate this round — never run yours while theirs is live.
 
-### cm-restock-carve-3 — the misaligned remainder, and whether the alignment wall is really a wall [TODO]
+### cm-restock-carve-3 — the misaligned remainder, and whether the alignment wall is really a wall [DONE]
 
 `cm-restock-carve-2` (#1473) carved 58/58 of main's struct candidates (16,412 B) — a genuine 100%, because every main candidate is 4-aligned at both ends. Waves 1 and 2 have now taken the census's easy geometry: `ov006`'s 33 and `main`'s 58.
 

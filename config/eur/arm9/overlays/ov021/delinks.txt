@@ -177,6 +177,14 @@ src/overlay021/func_ov021_021abd78.c:
     complete
     .text start:0x021abd78 end:0x021abe30
 
+src/overlay021/data_ov021_021abea0.c:
+    complete
+    .data start:0x021abea0 end:0x021abeb8
+
+src/overlay021/data_ov021_021ac874.c:
+    complete
+    .data start:0x021ac874 end:0x021ac8a0
+
 src/overlay021/sinit_ov021_021abe30.c:
     complete
     .init start:0x021abe30 end:0x021abe5c
