@@ -1379,3 +1379,31 @@ CANARY: the first carve of part 1 goes through the FULL gate (3-region SHA1) bef
 Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify built layout directly rather than assuming declaration order.
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is not `gate3.py`'s — READ THE LOG. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the part-2 verdict with its byte evidence. Regenerate `docs/research/README.md` before committing — #1473 was blocked on exactly that (its index row was generated before the doc's H1 was reworded).
+
+### cm-restock-carve-4 — apply the TU-composition recipe at scale, and test the half that is still open [TODO]
+
+`cm-restock-carve-3` (#1476) shipped 64/64 aligned candidates plus the Part 2 experiment, and **the TU-composition recipe is real and gate-covered** — the experimental pair (`data_ov016_021b9000` + `_021b900a`) actually shipped, so the 3-region SHA1 PASS proves it rather than a local observation. That is a genuine mechanism, not a plausible one.
+
+The brain corrected three things in the write-up before merge; read the corrected doc (`docs/research/alignment-wall-tu-composition-recipe.md`), not your memory of it:
+
+- the precondition is **4-alignment at BOTH ends** of the composed span (4-aligned start AND `size % 4 == 0`), not size alone;
+- the recipe therefore does **not** unlock wave 1's four `ov006` `kv_t` symbols, and **11 of the 35** misaligned candidates fail the both-ends screen structurally;
+- the two Part-2 table rows read 10 B, not 12 — which is also what made the "752 vs 748 Named-struct" note evaporate.
+
+Two parts, in order:
+
+**PART 1 — apply the recipe to the candidates that pass the screen.** Screen all 35 misaligned candidates on the both-ends criterion FIRST and publish the screen as a table (candidate, run start, run size, PASS/FAIL, reason) before carving anything. Expect roughly 24 to pass. Then compose and carve them. Keep the verified shape: adjacent misaligned symbols as separate named globals of the same type, **in address order**, in one TU. Byte-verify each composed TU against pristine ROM at the symbols AND at both neighbouring already-shipped TUs — the cascade shows up at the neighbours first, which is exactly how #1476 proved the negative space.
+
+⚠️ **`n > 2` is unproven.** #1476 confirmed `n = 2` only, and wave 1's failure mode (mwcc reordering declarations) was correlated with bundle size. If a group needs 3+ symbols to reach a 4-aligned span, spot-test that group for declaration reordering by inspecting the compiled `.o` symbol table BEFORE trusting it — do not assume it generalises.
+
+**PART 2 — test the half that is still open: backward absorption.** The 11 screen-failures need the other composition move — absorbing the odd head into an adjacent already-carved symbol's TU extent, so the *combined* span becomes 4-aligned at both ends. `ov006`'s four `kv_t` symbols are the worked example: their run starts at `0x021ce38a`, and reaching them means extending backward into `data_ov006_021ce372`'s extent. `cm-restock-carve-1` Part 5 attempt #1 recorded that as rejected by dsd's containment check — establish whether that rejection is a hard structural limit or an artifact of how that attempt was framed, on exactly ONE candidate group.
+
+A clean negative here is a FULL SUCCESS: it would let us mark those 11 permanently declined with evidence and stop three-plus waves from circling the same question. Say plainly which it is.
+
+⚠️ Never split a non-4-byte boundary across two TUs — composition and absorption are both in scope, splitting is not.
+
+CANARY: the first composed carve of Part 1 goes through the FULL gate (3-region SHA1) before any batching; the Part 2 experiment is byte-verified on its own before any conclusion is written.
+
+Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order — doubly so here, since declaration order IS the mechanism.
+
+**Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — read the log. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the both-ends screen table + the per-symbol reconciliation table (built as you go; check every Size cell against `delinks.txt` — a wrong cell is what produced #1476's phantom 4 B) + the Part 2 verdict with byte evidence. Regenerate `docs/research/README.md` LAST, after any retitling.
