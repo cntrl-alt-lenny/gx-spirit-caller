@@ -454,7 +454,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (stale-
 > explicit parked rows. The remaining parks are disclosed in the PR body by
 > sweep rather than reconstructed from guesswork.
 
-### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [TODO]
+### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [DONE]
 
 The producer/consumer lens cannot audit flags-word/bitmask fields — 3 recurrences now (`GlobalData02104bac.flags` CONSUMER-ONLY with 3 unchased hypotheses: unmatched init fn / hardware latch / bulk Fill32; `BgCfg.f14`/`f18` excluded from sample-2 as untestable), and `field_exposure_census.py`'s own coverage note names the same blind spots. Build a **finder, not a judge**: given a field (base symbol + offset + width), surface candidate producer sites of the broadened shapes — (a) masked read-modify-write (`ldr` → `orr`/`bic`/`and` → `str` on the same base+offset), (b) bulk fills whose range covers the offset (memset / MI_CpuFill / Fill32 / DMA), (c) SDK-call writes (a call taking the field's address or its containing block). Output: ranked candidate sites with shape tags; the lens stays the verdict-maker. CANARY: `GlobalData02104bac.flags` — the tool must either surface at least one concrete producer-site hypothesis for it or honestly report none WITH the searched-shape list; paste that run. Then run it on the 4 known blocked fields and report.
 
@@ -479,7 +479,7 @@ The PR is NOT genuinely conflicting: `.gitattributes` on main carries `docs/rese
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + regressions for ALL of: (a) two attempts at the same address both preserved; (b) an exact duplicate event handled as you choose, documented; (c) a ledger failure (bad header AND unwritable path) leaving the tree unchanged or rolled back; (d) an overlay path round-tripping writer→consumer so `--exclude-attempted` actually excludes what `park_one.py` wrote — assert against `_source_module`'s output, not a hardcoded string; (e) a `not-attempted` row NOT excluded by the selector. Paste before/after row counts per source and a spot-check table verified against commit text.
 
-### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [TODO]
+### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [DONE]
 
 Repairs `#1468` (do NOT merge as-is; fix on the same branch). CI is green — this is a correctness block, not a mechanical one.
 
@@ -514,7 +514,7 @@ CANARY: before changing anything, write a test that asserts the 12 genuine-attem
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the exclusion-set diff vs `origin/main` pasted in the PR body with a justification per changed key + the four `PR#1414:2e2d2f3f` rows shown against the commit text.
 
-### q-anchor-score-consistency — the score column contradicts the rank [TODO]
+### q-anchor-score-consistency — the score column contradicts the rank [DONE]
 
 Second pass on `#1468`, same branch, one-line change. The anchoring repair is verified working — the base register now resolves to its `_LITn` producer, the previously-showcased false positives are gone, the different-typed `cfg` locals no longer rank as BgCfg producers, and the canary reproduces exactly (8 / 27 / 46 / 0).
 
