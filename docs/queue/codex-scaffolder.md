@@ -462,7 +462,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (3 recu
 
 **Gate:** `python -m pytest -q tests` green + the canary run pasted + the 4-blocked-fields table in the PR body.
 
-### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [TODO]
+### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [DONE]
 
 Repairs `#1467` (do NOT merge it as-is; fix on the same branch). Four defects, each verified at source by the brain — the first is the one that makes the whole structural fix a no-op:
 

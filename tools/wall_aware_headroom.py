@@ -277,6 +277,8 @@ def _attempted_keys(path: Path | None = None) -> set[tuple[str, str]]:
                 f"{ledger}: expected TSV columns including addr and module"
             )
         for row in reader:
+            if (row.get("result") or "").strip().lower() not in {"parked", "shipped"}:
+                continue
             addr = _normalise_attempt_addr(row.get("addr"))
             module = (row.get("module") or "").strip().lower()
             if addr and module:
