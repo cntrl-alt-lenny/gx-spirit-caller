@@ -1307,14 +1307,55 @@ $ python3.13 -m pytest tests -q
 3193 passed, 13 skipped, 63 subtests passed in 74.86s
 ```
 
-### cm-restock-carve-1 — first wave of the restock-census carve series (ov006's 33 structs, then main's 58) [TODO]
+### cm-restock-carve-1 — first wave of the restock-census carve series (ov006's 33 structs, then main's 58) [DONE]
 
-`cm-data-restock-check` proved the non-primitive data pool never emptied — it was invisible to the old discovery methods: **274 never-assessed candidates / 24,753 B**, full table at `docs/research/data/cm-data-restock-census-2026-08-03.md`. This is a **fresh series** (third discovery method), per that doc's own recommendation — not a cm-data-inference or cm-bss-convert continuation. Wave 1: **ov006's 33 struct-shaped candidates cross-referenced against `src/overlay006/ov006_core.h`** — the exact method behind wave 9's Ov006AudioBank family — then main's 58 struct-shaped if the wave has room. Fold in wave 9's two fast follow-ups: `data_ov006_0224f2ac` + `data_ov006_0224f344` (same size/idiom as wave 9's AudioBank pair — verify to full wave standard, do not assume). Keep the standing rules: per-symbol reconciliation, `relocs.txt` structural proof, transitive-callee tracing, and const/static matching each symbol's OWN original. CANARY: the first carve goes through the FULL gate before any batching.
+**Result: 31 of 35 candidates shipped (1,960 B), 4 cleanly declined on a real mwldarm alignment wall — not a research gap.** CANARY discipline held throughout: the 6-symbol callback-table cluster (`Ov006StateCb` dispatch tables) went through a full 3-region gate before any batching. Discovered and validated a new mechanical pattern this series needs going forward: unlike `.bss`, these `.data` candidates have **no existing delinks.txt TU at all** — dsd silently fills genuine gaps from the base ROM, so carving means *inserting* a brand-new TU entry, not repointing an `.s` cluster file. Both wave-9 fast-follow `.bss` symbols (`data_ov006_0224f2ac`/`_0224f344`) verified to full standard via raw-disassembly call-chain proof (their callers are still ship-as-`.s`) and shipped. 5 parallel read-only investigation agents covered the remaining 27 struct candidates; two independently derived the *same* 6-member hit-test-rect family from opposite ends of one shared dispatch function without knowing about each other's symbols — reconciled into one typedef rather than shipped as two artificially-divergent families. **Declined 4 symbols** (the remaining members of a 9-table `kv_t` lookup family): every one sits at a 2-byte-misaligned address, and `arm9.lcf`'s `ALIGNALL(2)` inserts a real linker padding gap at any new non-4-aligned TU boundary, cascading a +2 byte shift through the rest of the module. Tried 3 source-level workarounds (backward byte-absorb — rejected by dsd's symbol-containment check; one large bundle TU — built, but mwcc reordered the top-level globals, landing every symbol at the wrong address; a smaller bundle — blocked by undefined-symbol link errors, since 4 of the "no consumer" placeholder bytes are in fact referenced by name from two unrelated existing files). Matches `docs/research/ov004-odd-aligned-slot-recipe.md`'s documented harder case (all 3 of *its* source-level variants also failed) — a genuine structural floor, not a one-off mistake. **main's 58 struct-shaped candidates: not started — this wave did not have room** after the alignment-wall investigation; left for a future wave. Full per-symbol tables, the 3-attempt alignment-wall writeup, and process notes: `docs/research/data/cm-restock-carve-1-2026-08-06.md`.
+
+```
+Typed-array:   161,052 -> 162,884 bytes  (+1,832 B,  3.37% -> 3.41%)
+Named-struct:   55,204 ->  57,076 bytes  (+1,872 B,  1.16% -> 1.19%)
+```
+
+3-region `gate3.py --scope all` SHA1 PASS (EUR/USA/JPN) + full pytest suite green.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS + Named-struct/Typed-array before/after (state-table regen) + the per-symbol reconciliation table in the PR body.
 
-### cm-field-recheck-1 — producer/consumer lens on the MOST-tested fields, ranked by the census tool [TODO]
+### cm-field-recheck-1 — producer/consumer lens on the MOST-tested fields, ranked by the census tool [DONE]
 
-Executes `q-producer-consumer-sample-2`'s own stated next step. The surviving reading is "risk concentrates in high-traffic fields": `f_cf8` — the singleton's most-tested field — was the real contradiction, while 19 lower-traffic fields sampled clean. Rank fields across `docs/research/types/` + `docs/research/constants/` by distinct read/write sites with `python tools/field_exposure_census.py` (from #1457), take the top not-yet-audited **method-compatible** fields (discrete small-int only; state which producer shapes your search covers — sample-1's transferable lesson), and run the full lens on each: CONFIRMED / PRODUCER-ONLY / CONSUMER-ONLY / CONTRADICTED / UNFALSIFIABLE, consumer sites register-provenance-traced, producer search depth (1-2 call hops) stated as such. Flags/bitmask fields stay OUT of scope until `q-flags-producer-detection` (codex-scaffolder) lands its finder. Cheap loose ends to close in the same doc: `f_d64` `== 0xc` in `func_ov002_02262994.s` (the doc cites only `== 0xb`) and the BgCfg.md/Box.md EUR-vs-USA/JPN cited-address anomaly (characterize it; don't guess a cause). CANARY: the first ranked field gets its full producer+consumer trace written up before the batch proceeds.
+**Result: 5/5 ranked method-compatible fields CONFIRMED (2 with genuine refinements), 0 gaps, 0 contradictions.** Found 2 real methodology gaps in `field_exposure_census.py` before trusting its ranking (per the standing "read the metric's own source" rule): (A) 11 of 22 type docs have no detected base-symbol (getter/self-pointer/parameter-accessed structs like `GameSingleton`), so the tool's file-relevance filter falls back to scanning the whole tree, producing cross-doc-contaminated counts — multiple unrelated docs shared *identical* inflated numbers for same-offset fields; excluded those 11 from the candidate pool. (B) the tool's matching is hex-offset-only and misses this codebase's own decimal-offset field-naming convention used by several already-matched files (`f1472`/`f1492`/`+ 1460` for what the canonical docs call `f_5c0`/`f_5d4`/`f_5b4`) — a real undercount, confirmed directly while tracing 3 of this wave's 5 fields by hand. Neither gap fixed (out of scope), both filed for whoever next touches the tool. Ranked candidates after filtering: `DuelQueueState.f_5a8`/`f_5b4`/`f_5d4` (a doc never touched by sample-2) and `DuelStateSingleton.f_d50`/`f_d9c` (2 of its fields sample-2 didn't reach). CANARY (`f_5a8`) confirmed the doc's 0x7f/0x80 handshake claim while finding it undersold: both consumers are real dual-case dispatchers, and the producer briefly stores a 3rd, call-result value. Both cheap loose ends closed: `f_d64==0xc` cited into `DuelStateSingleton.md`; the `BgCfg.md`/`Box.md` region anomaly characterized as real (all cited functions exist only under USA/JPN, EUR has genuinely different addresses in the same modules) without asserting a cause. Full per-field table and both gap writeups: `docs/research/data/cm-field-recheck-1-2026-08-06.md`.
+
+```
+$ python -m pytest -q tests
+3200 passed, 15 skipped, 63 subtests passed in 44.30s
+```
 
 **Gate:** doc-only — `python -m pytest -q tests` green (skips allowed, failures not) + the per-field verdict table with cited sites in the research doc.
+
+### cm-restock-carve-2 — second wave of the restock-census carve series (main's 58 struct-shaped) [TODO]
+
+Continues `cm-restock-carve-1` (#1464: 31/35 carved, 1,960 B — 6 Ov006StateCb
+tables + 2 Ov006AudioBank `.bss` fast-follows + 23 struct-batch, with 4 `kv_t`
+symbols honestly declined on the mwldarm 2-byte alignment wall).
+
+Wave 1 took ov006's 33 struct-shaped candidates. The restock census —
+`docs/research/data/cm-data-restock-census-2026-08-03.md` — holds **274
+never-assessed candidates / 24,753 B** in total, so the pool is far from empty.
+
+Wave 2: **`main`'s 58 struct-shaped candidates**, cross-referenced against the module's own headers the way wave 1 used `src/overlay006/ov006_core.h` — that header-cross-reference is the method that produced wave 9's Ov006AudioBank family and wave 1's six StateCb tables, so lead with it rather than carving blind. If the wave has room after main's 58, continue into the census's next-largest module group and say which.
+
+**Carry wave 1's alignment finding forward as a pre-filter, not a rediscovery.**
+Wave 1 proved that a non-4-aligned TU boundary makes mwldarm/ALIGNALL(2) insert
+a +2 cascade, and that three source-level workarounds all fail: separate files
+(cascade caught by `ninja check`), a combined-TU absorber (withdrawn), and a
+third variant per that doc. The reference write-up is
+`docs/research/ov004-odd-aligned-slot-recipe.md`.
+
+Check each candidate's start/end alignment in `delinks.txt` BEFORE drafting and
+route the 2-byte-misaligned ones to a declined list up front. Declining early is
+a success; re-deriving the wall per symbol is wasted budget.
+
+CANARY: the FIRST carve goes through the FULL gate (3-region SHA1) before any batching.
+
+Standing rules: **NEVER hand-transcribe byte content — generate every C initializer from a script reading the real bytes, every wave, no exceptions**; per-symbol reconciliation table (one row per shipped symbol: address, size, section, type, evidence — wave 1's fix pass had to add this retroactively, so build it as you go); `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original, never a sibling's convention; check `delinks.txt` ground truth before choosing sections (`&symbol` always relocates to `.data`; literal-cast pointer arrays need `void *const` for `.rodata`); never assume mwcc preserves same-TU global declaration order — verify the built layout directly; keep a non-4-byte split inside ONE TU; never shift an already-matched consumer's relocation boundary.
+
+**Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ `gate3` piped through `tee` MASKS its exit code (both lanes hit this last round) — read the log, do not trust exit 0. Paste the three sha1 lines VERBATIM + the Named-struct/Typed-array before/after lines from the state-table regen + the per-symbol reconciliation table in the PR body. Coordinate the full gate with Lenny: the mwcc toolchain serialises MACHINE-WIDE, and the CC Decomper is running a 5-worktree consolidated `--clean` gate this round — never run yours while theirs is live.

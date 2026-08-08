@@ -727,7 +727,7 @@ The multi-agent convention (AGENTS.md § Worktree convention) spins up a new num
 
 **Find contradictions between queue/state claims and repository state.**
 
-This is a small audit tool, not a replacement queue format. It checks explicit shipped/resolved/merged evidence in non-final queue items and compares the current state section with non-draft open PRs. Parked drafts are reported but exclu…
+This is a small audit tool, not a replacement queue format. It checks explicit shipped/resolved/merged evidence in non-final queue items, compares the current state section with the ACTIVE open PRs, and verifies that docs/state.md carrie…
 
 ### `tools/retrieval_eval.py`
 
