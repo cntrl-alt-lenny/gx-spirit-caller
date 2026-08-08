@@ -251,3 +251,14 @@ CANARY: the two `cm-field-recheck-1` sites above must be counted after the fix a
 Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-ranked audit inputs).
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + a regression per gap (including the negative case above) + before/after per-field site counts, with any field whose RANK changes called out explicitly.
+
+### q-census-decimal-alias-anchor — anchor decimal member aliases [DONE]
+
+Second pass on PR #1475: decimal-derived member aliases must carry the
+documented base symbol on the same line, so aliases cannot join unrelated
+structs merely because their decimal spelling collides. Reconcile the shared
+member/pointer-context rule with `field_producer_finder.py`, add a failing
+then passing negative regression, and refresh the affected-field census.
+
+**Gate:** `python -m pytest -q tests` green + `ruff check` clean + canary and
+before/after census artifacts pasted in the PR.

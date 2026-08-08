@@ -89,6 +89,14 @@ class TestFieldExposureCensus(unittest.TestCase):
         }
         self.assertEqual(count_exposure(pending, sources), (1, 0, 1))
         self.assertEqual(count_exposure(edge, sources), (0, 1, 1))
+        unrelated_alias = {
+            "src/overlay002/unrelated.c": "other.f1492 = 0;\n",
+            "src/overlay002/separate-line-base.c": (
+                "data_ov002_022ce288;\n"
+                "other.f1492 = 0;\n"
+            ),
+        }
+        self.assertEqual(count_exposure(edge, unrelated_alias), (0, 0, 0))
 
 
 if __name__ == "__main__":

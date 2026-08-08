@@ -77,11 +77,15 @@ def parse_documented_fields(doc_name: str, text: str) -> list[DocumentedField]:
 
 def _source_matches_field(field: DocumentedField, path: str, text: str) -> bool:
     """Return whether a source has lexical evidence for this field."""
-    member = re.compile(
-        DIRECT_MEMBER_RE.format(field=_field_names_pattern(field))
-    )
-    if path.endswith(".c") and member.search(text):
-        return True
+    member, decimal_member = _member_patterns(field)
+    if path.endswith(".c"):
+        for line in text.splitlines():
+            if member.search(line):
+                return True
+            if decimal_member and decimal_member.search(line) and any(
+                _contains_symbol(line, base) for base in field.base_symbols
+            ):
+                return True
     if path.endswith(".s"):
         if not field.base_symbols or not any(
             _contains_symbol(text, base)
@@ -101,10 +105,25 @@ def _contains_symbol(text: str, symbol: str) -> bool:
     return bool(re.search(rf"\b{re.escape(symbol)}\b", text))
 
 
-def _field_names_pattern(field: DocumentedField) -> str:
-    """Return canonical and decimal-derived member spellings."""
-    names = {field.name, f"f{field.offset:x}", f"f{field.offset:X}", f"f{field.offset}"}
-    return "(?:" + "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True)) + ")"
+def _member_patterns(
+    field: DocumentedField,
+) -> tuple[re.Pattern[str], re.Pattern[str] | None]:
+    """Return unanchored real/hex names and an anchored decimal alias."""
+    names = {field.name, f"f{field.offset:x}", f"f{field.offset:X}"}
+    member = re.compile(
+        DIRECT_MEMBER_RE.format(
+            field="(?:" + "|".join(
+                re.escape(name) for name in sorted(names, key=len, reverse=True)
+            ) + ")"
+        )
+    )
+    decimal_name = f"f{field.offset}"
+    decimal_member = None
+    if decimal_name not in names:
+        decimal_member = re.compile(
+            DIRECT_MEMBER_RE.format(field=re.escape(decimal_name))
+        )
+    return member, decimal_member
 
 
 def _raw_offset_re(field: DocumentedField) -> re.Pattern[str]:
@@ -124,23 +143,28 @@ def _raw_offset_re(field: DocumentedField) -> re.Pattern[str]:
 
 def _c_accesses(field: DocumentedField, text: str) -> tuple[bool, bool]:
     reads = writes = False
-    member = re.compile(
-        DIRECT_MEMBER_RE.format(field=_field_names_pattern(field))
-    )
+    member, decimal_member = _member_patterns(field)
     raw = _raw_offset_re(field)
     for line in _strip_c_comments_and_literals(text).splitlines():
         stripped = line.lstrip()
         if stripped.startswith(("//", "/*", "*", "#")):
             continue
-        is_member = bool(member.search(line))
+        is_member = bool(member.search(line)) or bool(
+            decimal_member
+            and decimal_member.search(line)
+            and any(_contains_symbol(line, base) for base in field.base_symbols)
+        )
         is_raw = bool(field.base_symbols) and any(
             _contains_symbol(line, base) for base in field.base_symbols
         ) and bool(raw.search(line))
         if not (is_member or is_raw):
             continue
         if is_member:
+            member_alternatives = member.pattern
+            if decimal_member:
+                member_alternatives += "|" + decimal_member.pattern
             token = re.search(
-                rf"{DIRECT_MEMBER_RE.format(field=_field_names_pattern(field))}"
+                rf"(?:{member_alternatives})"
                 rf"\s*(?P<op>[+\-*/%&|^]?=|\+\+|--)",
                 line,
             )
