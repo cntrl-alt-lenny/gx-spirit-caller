@@ -24,10 +24,16 @@ even when this file makes no PR-count claim), and `parked-prs` is the
 EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
-**PR state — active vs merely open.** **active** count is **3**: #1467 and #1468
+**PR state — active vs merely open.** **active** count is **2**: #1467 and #1468
 (Codex Scaffolder output, both draft but NOT parked — **changes requested, see
-below**) and #1469 (this repair PR). #1020 (decomp.dev CI) is the one genuinely
-parked draft.
+below**). #1020 (decomp.dev CI) is the one genuinely parked draft.
+
+⚠️ **Convention — the active count EXCLUDES the doc-PR carrying this update.**
+That PR is open while you write the number and merged moments later, so counting
+it makes the claim wrong on `main` the instant it lands and fails `drift-check`
+on the NEXT PR's CI. Write the count you expect to be true after this update
+merges. (The `main-sha` anchor has an explicit one-merge tolerance for the same
+reason; the PR-count claim has none, so it must be written post-merge-accurate.)
 
 **#1467 and #1468 are NOT mergeable as they stand** — both were verified at
 source and both have correctness defects that CI cannot see:
