@@ -10022,7 +10022,7 @@ src/main/func_02054cf8.legacy_sp3.c:
     complete
     .text start:0x02054cf8 end:0x02054d14
 
-src/main/func_02054d14.s:
+src/main/func_02054d14.legacy_sp3.c:
     complete
     .text start:0x02054d14 end:0x02054d4c
 
@@ -10537,7 +10537,7 @@ src/main/func_0205d688.legacy_sp3.c:
     complete
     .text start:0x0205d688 end:0x0205d6bc
 
-src/main/func_0205d6bc.s:
+src/main/func_0205d6bc.legacy_sp3.c:
     complete
     .text start:0x0205d6bc end:0x0205d6f8
 
@@ -11534,7 +11534,7 @@ src/main/func_02067ba8.c:
     complete
     .text start:0x02067ba8 end:0x02067c08
 
-src/main/func_02067c08.s:
+src/main/func_02067c08.legacy_sp3.c:
     complete
     .text start:0x02067c08 end:0x02067c58
 
@@ -12335,7 +12335,7 @@ src/main/func_0206c380.legacy.c:
     complete
     .text start:0x0206c380 end:0x0206c3f4
 
-src/main/func_0206c3f4.s:
+src/main/func_0206c3f4.legacy.c:
     complete
     .text start:0x0206c3f4 end:0x0206c46c
 
@@ -12611,7 +12611,7 @@ src/main/func_0206e720.legacy.c:
     complete
     .text start:0x0206e720 end:0x0206e778
 
-src/main/func_0206e778.s:
+src/main/func_0206e778.legacy.c:
     complete
     .text start:0x0206e778 end:0x0206e7b0
 
@@ -13995,7 +13995,7 @@ src/main/func_0207d78c.s:
     complete
     .text start:0x0207d78c end:0x0207d914
 
-src/main/func_0207d914.s:
+src/main/func_0207d914.legacy_sp3.c:
     complete
     .text start:0x0207d914 end:0x0207d994
 
@@ -17382,7 +17382,7 @@ src/main/func_02094c70.legacy.c:
     complete
     .text start:0x02094c70 end:0x02094c94
 
-src/main/func_02094c94.s:
+src/main/func_02094c94.legacy.c:
     complete
     .text start:0x02094c94 end:0x02094cec
 
@@ -18304,7 +18304,7 @@ src/main/func_0209b49c.c:
 
 
 
-src/main/func_0209b4a4.s:
+src/main/func_0209b4a4.legacy.c:
     complete
     .text start:0x0209b4a4 end:0x0209b4e4
 
@@ -18594,7 +18594,7 @@ src/main/func_0209db88.s:
     complete
     .text start:0x0209db88 end:0x0209dc30
 
-src/main/func_0209dc30.s:
+src/main/func_0209dc30.legacy.c:
     complete
     .text start:0x0209dc30 end:0x0209dc8c
 

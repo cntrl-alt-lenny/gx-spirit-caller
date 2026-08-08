@@ -882,3 +882,14 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0208ffec	main	92	legacy	guard chain	parked	8.3	P-20-r4-vs-lr	cm-main-tier-sweep-3-batch1
 0x0208ddec	main	96	default	guard chain	parked	8.3	P-36-reginterleave	cm-main-tier-sweep-3-batch1
 0x020a3308	main	52	default	other	parked	53.9	P-36-poolhoist	cm-main-tier-sweep-3-batch1
+0x02079b0c	main	60	default	unknown	parked	unknown	unknown	unknown
+0x02055298	main	68	default	unknown	parked	unknown	unknown	unknown
+0x020a67cc	main	68	default	unknown	parked	unknown	unknown	unknown
+0x02078f08	main	72	default	unknown	parked	unknown	unknown	unknown
+0x020a2c74	main	72	default	unknown	parked	unknown	unknown	unknown
+0x02094504	main	76	default	unknown	parked	unknown	unknown	unknown
+0x0208cfa4	main	140	default	unknown	parked	unknown	unknown	unknown
+0x0209d018	main	224	default	unknown	parked	unknown	unknown	unknown
+0x0208de94	main	88	default	unknown	parked	unknown	unknown	unknown
+0x0208fd30	main	96	default	unknown	parked	unknown	unknown	unknown
+0x02048880	main	116	default	unknown	parked	unknown	unknown	unknown
