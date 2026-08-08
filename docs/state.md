@@ -16,7 +16,7 @@ EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), pl
 **+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
 57,076 → 72,440).
 
-<!-- main-sha: b97c73b98 -->
+<!-- main-sha: 9526efe5c -->
 <!-- parked-prs: 1020 -->
 
 **Round 0808c (partial round — 3 of 4 lanes reviewed while the CC Decomper
@@ -105,11 +105,46 @@ even when this file makes no PR-count claim), and `parked-prs` is the
 EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
-**PR state — active vs merely open.** **active** count is **1**: #1475 (census
-methodology, second pass required — see above). #1020 (decomp.dev CI) is the
-one genuinely parked draft. The CC Decomper's `cm-main-tier-sweep-2` is still
-in flight and has NOT opened a PR yet, so it is correctly absent from this
-count — expect it to become the second active PR shortly.
+**PR state — active vs merely open.** **active** count is **1**: #1479 (Codex
+Scaffolder, `q-ledger-residuals`, just opened — not yet reviewed). #1020
+(decomp.dev CI) is the one genuinely parked draft. The CC Scaffolder's
+`cm-restock-carve-4` is still in flight with no PR yet, so it is correctly
+absent from this count.
+
+**Round 0808d — everything else merged.** #1478 (`cm-main-tier-sweep-2`) and
+PR #1475 (census methodology, second pass) both landed. EUR natural-C is now
+**14.71%** (351,058 B) — up **+0.43 pp across round 0808 as a whole**
+(14.28% → 14.71%).
+
+**#1478 answered its question honestly, and found a defect in the selector.**
+Pool A (guard chain) **32/50 = 64%**, Pool B (loop/other/small dispatcher)
+**27/50 = 54%** — a real gap, far smaller than wave 1's 71% framing implied,
+and **two of five batches had Pool B outship Pool A** with Pool B ranging
+20–80%. The reason matters more than the rate: several worklist rows labelled
+`guard chain` conceal non-guard-chain bodies (softfloat conversions among
+them), so wave 1's "100/100 homogeneous" premise — the basis for discounting
+its 71% — is itself unreliable. Both follow-ups are queued
+(`cm-main-tier-sweep-3` re-derives shape at pull time;
+`q-main-shape-reclassify` rebuilds the labels wholesale). The round shipped
+60 functions / 3,852 B on ONE stated basis (55 natural-C + 5 mwcc `asm`
+softfloat/CLZ functions, disclosed with reasons) — wave 1's mixed-basis
+headline error was not repeated.
+
+**#1475's second pass hit the specified numbers exactly**: `f_0e` 53 → 16
+sites, canaries unchanged (`f_5b4` 53/54/55, `f_5d4` 31/9/38). The decimal
+member alias now requires the documented base symbol on the same line; hex
+and real names stay unanchored. The false "landed" coordination claim is
+retracted and the divergence from `field_producer_finder.py` is now stated
+deliberately (the finder is hex-only) rather than papered over.
+
+**Two brain-caused lane stalls this round, both fixed, both worth avoiding.**
+(1) The queue items were seeded in an UNMERGED bookkeeping PR while the
+messages went out, so two lanes correctly reported `QUEUE-EMPTY` — merge the
+seeding PR before dispatching, and verify `work_queue.py next` resolves on
+`origin/main`, not on the local tree. (2) Appending a new item to the same
+queue-file region a lane's branch had edited produced a merge conflict that
+stopped the Codex Decomper at preflight; the brain resolved it on the lane's
+branch. In both cases the lanes behaved correctly by stopping.
 
 **#1467 second pass — the repair introduced a NEW regression.** Three of five
 fixes are genuinely closed (module key now derived from the consumer's own
