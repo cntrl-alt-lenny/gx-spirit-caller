@@ -8,14 +8,53 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-07 — **(Windows PC, brain=Opus 5; roster unchanged.) Rounds
-0806 (dispatch) + 0807 (review): all four lanes ran, five PRs merged, then a
-focused repair round.**
-EUR natural-C **14.28%** (340,770 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
+**Last updated:** 2026-08-08 — **(Windows PC, brain=Opus 5; roster unchanged.) Round
+0808: the biggest single-round coverage move of the campaign.**
+EUR natural-C **14.56%** (347,490 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
 (282,000 B) — from the regenerated state-table at the SHA below, not inherited.
+EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), plus
+**+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
+57,076 → 72,440).
 
-<!-- main-sha: 01dda0384 -->
+<!-- main-sha: 0cf767e89 -->
 <!-- parked-prs: 1020 -->
+
+**Merged this round:**
+
+- **#1472 — `cm-main-tier-sweep-1`, the first main-module sweep: 71/100 shipped
+  (6,720 B), all 72 files natural C, zero asm-void.** Independently recomputed:
+  72 `.c` added == 72 `.s` deleted == 72 delinks activations, every address
+  inside the assigned 0x02040000+ range, asm-C column unchanged at 3,904 B.
+  Read the rate honestly — the worklist front-loaded a homogeneous
+  pre-filtered population (100% shape=`guard chain`, 40–128 B), and that band
+  was already 71.8% converted project-wide, so 71% is consistent with the band
+  rather than a new campaign-wide expectation. Added C-70…C-76 and P-30…P-33.
+- **#1473 — `cm-restock-carve-2`: 58/58 of main's restock-census struct
+  candidates (16,412 B).** The 100% rate is genuine, not a redefinition: all 58
+  main candidates are 4-aligned at both ends, and all 35 misaligned candidates
+  in that census live in non-main modules, so wave 1's ALIGNALL(2) wall cannot
+  fire on this scope. 45/58 symbols byte-verified against the ROM (95.7% of
+  bytes; the remainder are expected pointer relocations).
+
+**Still open — both need a second pass (see the queue):** #1467 and #1468.
+
+**Round 0808's three process findings, all worth carrying:**
+
+1. **`kickoff_lint`'s location guard was itself a void-work generator.** It
+   accepted only the POSIX spelling, so a PowerShell lane transliterated the
+   guard, Windows-ified the path to backslashes, and stopped after **17
+   seconds while sitting in the correct worktree** — `git rev-parse
+   --show-toplevel` always emits forward slashes on Windows. Fixed in this PR:
+   the linter now accepts the PowerShell form natively AND rejects a
+   backslashed EXPECT outright. The brain owns this failure, not the lane.
+2. **The `attempts.tsv` batch-worktree non-recording gap reproduced exactly**
+   in #1472 — a zero-line diff from all five batch worktrees. The sweep lane
+   backfilled all 101 attempts by hand with sizes recomputed from `delinks.txt`
+   ground truth. This is the same gap `q-ledger-event-semantics` is fixing.
+3. **A gate failure was masked by a background task's own exit-code 0** (the
+   code belonged to an `echo` wrapper, not `gate3.py`). Reading the log — per
+   the standing warning — surfaced a real stale-`state-table` pytest failure.
+   Third independent recurrence of the tee/exit-code hazard.
 
 Those two markers are machine-checked by `tools/queue_state_drift.py`:
 `main-sha` is the `main` commit this document describes (drift fires when
@@ -25,8 +64,34 @@ EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
 **PR state — active vs merely open.** **active** count is **2**: #1467 and #1468
-(Codex Scaffolder output, both draft but NOT parked — **changes requested, see
-below**). #1020 (decomp.dev CI) is the one genuinely parked draft.
+(Codex Scaffolder output, both draft but NOT parked — **second pass required,
+see below**). #1020 (decomp.dev CI) is the one genuinely parked draft.
+
+**#1467 second pass — the repair introduced a NEW regression.** Three of five
+fixes are genuinely closed (module key now derived from the consumer's own
+`_source_module`; event-level dedup; failure-safety) and all six required
+regressions exist and pass. But the consumer filter added at
+`wall_aware_headroom.py:280` is an **allowlist**
+(`if result not in {"parked","shipped"}: continue`), which un-excludes 16
+`(module, addr)` keys that `main` previously excluded — 12 of them genuine
+attempts with measured percentages, including three permanent walls. That
+re-dispatches already-diagnosed walls: precisely the failure class the ledger
+exists to prevent, reintroduced by its own fix. Separately, three functions
+that `PR#1414:2e2d2f3f` explicitly parks (`0x021b7218`, `0x021b33dc`,
+`0x021b4a4c`) were relabelled `not-attempted` because the trailing
+"`func_ov008_021b16f8` not attempted (time)" sentence was applied backwards
+over the preceding parked list — and `0x021b7218`'s 90.5% was shifted onto
+`0x021b4a4c`, so the match_pct pairing bug is not fully fixed either.
+
+**#1468 second pass — 7 of 8 closed, empirically verified.** Base-symbol
+anchoring works: the tool now resolves the base register to its `_LITn`
+producer, the previously-showcased false positives are gone, the three
+different-typed `cfg` locals no longer rank as BgCfg producers, and the
+canary reproduces exactly (8 / 27 / 46 / 0). The one gap is cosmetic but
+misleading: the `score` integer was never adjusted, so the rendered table
+shows `1 | 90 | BASE-ANCHORED` above `5 | 120 | OFFSET-ONLY` — the sort is
+provably anchored-first, but the score column visibly contradicts the rank.
+One-line fix.
 
 ⚠️ **Convention — the active count EXCLUDES the doc-PR carrying this update.**
 That PR is open while you write the number and merged moments later, so counting
