@@ -8329,7 +8329,7 @@ src/main/func_020442f8.legacy.c:
     complete
     .text start:0x020442f8 end:0x02044328
 
-src/main/func_02044328.s:
+src/main/func_02044328.legacy_sp3.c:
     complete
     .text start:0x02044328 end:0x0204436c
 
@@ -8533,7 +8533,7 @@ src/main/func_02045c34.s:
     complete
     .text start:0x02045c34 end:0x02045c7c
 
-src/main/func_02045c7c.s:
+src/main/func_02045c7c.legacy_sp3.c:
     complete
     .text start:0x02045c7c end:0x02045cb8
 
@@ -11258,7 +11258,7 @@ src/main/func_02064ae4.s:
     complete
     .text start:0x02064ae4 end:0x02064d10
 
-src/main/func_02064d10.s:
+src/main/func_02064d10.legacy_sp3.c:
     complete
     .text start:0x02064d10 end:0x02064d48
 
@@ -11514,7 +11514,7 @@ src/main/func_02067984.legacy_sp3.c:
     complete
     .text start:0x02067984 end:0x02067a4c
 
-src/main/func_02067a4c.s:
+src/main/func_02067a4c.c:
     complete
     .text start:0x02067a4c end:0x02067a94
 
@@ -15573,7 +15573,7 @@ src/main/func_02089e70.legacy_sp3.c:
     complete
     .text start:0x02089e70 end:0x02089ee8
 
-src/main/func_02089ee8.s:
+src/main/func_02089ee8.legacy_sp3.c:
     complete
     .text start:0x02089ee8 end:0x02089f60
 
@@ -15649,7 +15649,7 @@ src/main/func_0208a8f8.s:
     complete
     .text start:0x0208a8f8 end:0x0208aa0c
 
-src/main/func_0208aa0c.s:
+src/main/func_0208aa0c.legacy_sp3.c:
     complete
     .text start:0x0208aa0c end:0x0208aa50
 
@@ -16360,7 +16360,7 @@ src/main/func_0208fdf0.legacy.c:
     complete
     .text start:0x0208fdf0 end:0x0208fe58
 
-src/main/func_0208fe58.s:
+src/main/func_0208fe58.legacy.c:
     complete
     .text start:0x0208fe58 end:0x0208feb4
 
@@ -16535,7 +16535,7 @@ src/main/func_0209085c.s:
     complete
     .text start:0x0209085c end:0x02090868
 
-src/main/func_02090868.s:
+src/main/func_02090868.c:
     complete
     .text start:0x02090868 end:0x020908c0
 
@@ -17592,7 +17592,7 @@ src/main/func_02095a50.s:
     complete
     .text start:0x02095a50 end:0x02095b68
 
-src/main/func_02095b68.s:
+src/main/func_02095b68.legacy.c:
     complete
     .text start:0x02095b68 end:0x02095bc8
 
@@ -17680,7 +17680,7 @@ src/main/func_02096234.s:
     complete
     .text start:0x02096234 end:0x02096358
 
-src/main/func_02096358.s:
+src/main/func_02096358.legacy.c:
     complete
     .text start:0x02096358 end:0x0209640c
 
