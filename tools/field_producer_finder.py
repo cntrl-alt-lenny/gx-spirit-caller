@@ -305,6 +305,19 @@ def find_candidates(
     unique: dict[tuple[str, int, str], Candidate] = {}
     for candidate in candidates:
         unique[(candidate.path, candidate.line, candidate.shape)] = candidate
+    anchored = [
+        candidate.score for candidate in unique.values()
+        if candidate.anchor == "BASE-ANCHORED"
+    ]
+    if anchored:
+        offset_ceiling = min(anchored) - 1
+        unique = {
+            key: (
+                replace(candidate, score=min(candidate.score, offset_ceiling))
+                if candidate.anchor == "OFFSET-ONLY" else candidate
+            )
+            for key, candidate in unique.items()
+        }
     return sorted(
         unique.values(),
         key=lambda item: (

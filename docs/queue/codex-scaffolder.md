@@ -508,7 +508,7 @@ CANARY: before changing anything, write a test that asserts the 12 genuine-attem
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the exclusion-set diff vs `origin/main` pasted in the PR body with a justification per changed key + the four `PR#1414:2e2d2f3f` rows shown against the commit text.
 
-### q-anchor-score-consistency — the score column contradicts the rank [TODO]
+### q-anchor-score-consistency — the score column contradicts the rank [DONE]
 
 Second pass on `#1468`, same branch, one-line change. The anchoring repair is verified working — the base register now resolves to its `_LITn` producer, the previously-showcased false positives are gone, the different-typed `cfg` locals no longer rank as BgCfg producers, and the canary reproduces exactly (8 / 27 / 46 / 0).
 

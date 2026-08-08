@@ -85,6 +85,15 @@ class TestFieldProducerFinder(unittest.TestCase):
         self.assertEqual([candidate.anchor for candidate in candidates], [
             "BASE-ANCHORED", "OFFSET-ONLY"
         ])
+        anchored_scores = [
+            candidate.score for candidate in candidates
+            if candidate.anchor == "BASE-ANCHORED"
+        ]
+        offset_scores = [
+            candidate.score for candidate in candidates
+            if candidate.anchor == "OFFSET-ONLY"
+        ]
+        self.assertLess(max(offset_scores), min(anchored_scores))
         self.assertIn("anchor", render(make_spec("GlobalData02104bac", 0x54, 2), candidates))
 
     def test_generic_cfg_alias_with_different_declared_type_is_rejected(self):
