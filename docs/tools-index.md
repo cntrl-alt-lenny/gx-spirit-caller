@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**128 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**129 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (56)
+- [Uncategorised](#uncategorised) (57)
 
 ## Analysis / worklist
 
@@ -616,6 +616,12 @@ Compiles a single .c source file by running `ninja <that_unit.o>` — exactly on
 **Rank documented struct fields by distinct matched-source exposure.**
 
 This is a deliberately narrow lexical census.  It counts a source file once per field and access direction, even when that file contains many matching instructions.  C uses named member access (and, for documented base symbols, the docum…
+
+### `tools/field_producer_finder.py`
+
+**Find candidate producer sites for a field without claiming they are writes.**
+
+The older field-exposure census intentionally handles only explicit member access and direct load/store pairs.  That leaves three common producer shapes unreported: masked read-modify-write sequences, fills whose range contains a field,…
 
 ### `tools/fix_delink_suffixes.py`
 

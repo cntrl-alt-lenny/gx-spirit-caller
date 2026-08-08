@@ -440,7 +440,7 @@ Two things to fix, and the second matters more than the first:
 
 **Gate:** `python -m pytest tests/test_semantic_contradiction_check.py -q` green + a regression test using the current observed-value-set form of `DuelStateEnums.md` as its fixture + a live `python3.13 tools/semantic_contradiction_check.py` run against the tree that **exits cleanly** and reports counts including any UNPARSEABLE rows. Paste the live run.
 
-### q-attempts-ledger-backfill — attempts.tsv is blind to ~640 worktree-sweep parks; backfill it and make recording structural [TODO]
+### q-attempts-ledger-backfill — attempts.tsv is blind to ~640 worktree-sweep parks; backfill it and make recording structural [DONE]
 
 `docs/research/campaign-analytics/attempts.tsv` holds only ~61 excludable rows for ov002's 149-512 B band, but sweeps 9-15 parked ~640+ candidates in worktree rounds that never wrote the ledger — so `wall_aware_headroom.py --exclude-attempted` silently resurfaces already-diagnosed walls (this burned a candidate pull at least once, and sweep-17 is hand-cross-checking park tables THIS round to work around it — your backfill removes that tax from every future round). Backfill: harvest the per-candidate park tables from the `docs/research/cm-ov002-unknown-sweep-9` … `-15` docs and the sweep PR bodies (#1404 #1410 #1414 #1419 #1425 #1431 #1435) into attempts.tsv rows: address, band, verdict, park class where recorded, source ref. (Sweep-16's 12 rows are already in the tsv under brief-683 — a format reference, and proof the single-lane path records correctly.) Mechanical extraction with per-source count reconciliation. CANARY: reconcile ONE sweep doc's park count against its backfilled rows exactly before processing the rest. **Coordinate:** `cm-ov002-unknown-sweep-17` appends live rows in parallel — rows are append-only, so rebase before final push and the merge is mechanical. Then make recording structural: verify `park_one.py` writes attempts.tsv correctly from batch worktrees, fix + test if not.
 
@@ -448,7 +448,13 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (stale-
 
 **Gate:** `python -m pytest -q tests` green + before/after row counts per source + a 10-row spot-check table (random backfilled rows traced to their source doc) in the PR body.
 
-### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [TODO]
+> **Result note 2026-08-07 (re-scoped):** The advertised per-candidate park
+> tables do not exist in the sweep-9..15 docs or PR bodies. The recoverable
+> source is the individual batch commit messages: 192 shipped rows and 195
+> explicit parked rows. The remaining parks are disclosed in the PR body by
+> sweep rather than reconstructed from guesswork.
+
+### q-flags-producer-detection — a producer-site FINDER for masked-RMW / bulk-fill / SDK-call shapes [DONE]
 
 The producer/consumer lens cannot audit flags-word/bitmask fields — 3 recurrences now (`GlobalData02104bac.flags` CONSUMER-ONLY with 3 unchased hypotheses: unmatched init fn / hardware latch / bulk Fill32; `BgCfg.f14`/`f18` excluded from sample-2 as untestable), and `field_exposure_census.py`'s own coverage note names the same blind spots. Build a **finder, not a judge**: given a field (base symbol + offset + width), surface candidate producer sites of the broadened shapes — (a) masked read-modify-write (`ldr` → `orr`/`bic`/`and` → `str` on the same base+offset), (b) bulk fills whose range covers the offset (memset / MI_CpuFill / Fill32 / DMA), (c) SDK-call writes (a call taking the field's address or its containing block). Output: ranked candidate sites with shape tags; the lens stays the verdict-maker. CANARY: `GlobalData02104bac.flags` — the tool must either surface at least one concrete producer-site hypothesis for it or honestly report none WITH the searched-shape list; paste that run. Then run it on the 4 known blocked fields and report.
 
@@ -456,7 +462,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (3 recu
 
 **Gate:** `python -m pytest -q tests` green + the canary run pasted + the 4-blocked-fields table in the PR body.
 
-### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [TODO]
+### q-ledger-event-semantics — attempts.tsv is an EVENT log; the writer currently forbids the second event [DONE]
 
 Repairs `#1467` (do NOT merge it as-is; fix on the same branch). Four defects, each verified at source by the brain — the first is the one that makes the whole structural fix a no-op:
 
@@ -473,7 +479,7 @@ The PR is NOT genuinely conflicting: `.gitattributes` on main carries `docs/rese
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + regressions for ALL of: (a) two attempts at the same address both preserved; (b) an exact duplicate event handled as you choose, documented; (c) a ledger failure (bad header AND unwritable path) leaving the tree unchanged or rolled back; (d) an overlay path round-tripping writer→consumer so `--exclude-attempted` actually excludes what `park_one.py` wrote — assert against `_source_module`'s output, not a hardcoded string; (e) a `not-attempted` row NOT excluded by the selector. Paste before/after row counts per source and a spot-check table verified against commit text.
 
-### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [TODO]
+### q-producer-anchoring — the RMW finder must prove the base register derives from the requested symbol [DONE]
 
 Repairs `#1468` (do NOT merge as-is; fix on the same branch). CI is green — this is a correctness block, not a mechanical one.
 
@@ -494,7 +500,7 @@ Also remove the per-input hardcodes in `make_spec` (`if base.lower().endswith("0
 
 **Gate:** `python -m pytest -q tests` green (paste the real tail) + `ruff check` clean + NEGATIVE fixtures proving each class is rejected or downgraded: (a) an unrelated symbol doing the identical 0x54 RMW → OFFSET-ONLY, ranked below any anchored hit; (b) a `BgCfg021aa460 cfg` local of a different type → rejected or downgraded; (c) a bare decimal literal equal to the offset → not a producer. Re-paste the `GlobalData02104bac 0x54 2` canary with the anchor column, and re-paste the 4-blocked-fields table with the corrected counts.
 
-### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [TODO]
+### q-ledger-exclusion-regression — the repair's own consumer filter un-excludes genuine attempts [DONE]
 
 Second pass on `#1467`, same branch. The code fixes from the first pass are sound and stay: the module key is now derived from `_source_module`, dedup is event-level, failure-safety is ordered before the mutation, and all six required regressions exist and pass. Three defects remain, one of them introduced BY the fix.
 
@@ -508,7 +514,7 @@ CANARY: before changing anything, write a test that asserts the 12 genuine-attem
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the exclusion-set diff vs `origin/main` pasted in the PR body with a justification per changed key + the four `PR#1414:2e2d2f3f` rows shown against the commit text.
 
-### q-anchor-score-consistency — the score column contradicts the rank [TODO]
+### q-anchor-score-consistency — the score column contradicts the rank [DONE]
 
 Second pass on `#1468`, same branch, one-line change. The anchoring repair is verified working — the base register now resolves to its `_LITn` producer, the previously-showcased false positives are gone, the different-typed `cfg` locals no longer rank as BgCfg producers, and the canary reproduces exactly (8 / 27 / 46 / 0).
 

@@ -200,6 +200,10 @@ src/overlay020/func_ov020_021add24.s:
     complete
     .text start:0x021add24 end:0x021addc0
 
+src/overlay020/data_ov020_021addc8.c:
+    complete
+    .rodata start:0x021addc8 end:0x021addd0
+
 src/overlay020/data_ov020_021addd0.c:
     complete
     .rodata start:0x021addd0 end:0x021addd8
@@ -207,6 +211,10 @@ src/overlay020/data_ov020_021addd0.c:
 src/overlay020/data_ov020_021adf68.c:
     complete
     .data start:0x021adf68 end:0x021adf80
+
+src/overlay020/data_ov020_021adf80.c:
+    complete
+    .data start:0x021adf80 end:0x021adf9c
 
 src/overlay020/data_ov020_021adfa8.c:
     complete

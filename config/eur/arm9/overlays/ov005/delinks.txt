@@ -550,9 +550,17 @@ src/overlay005/data/data_ov005_021b17e0.c:
     complete
     .data start:0x021b17e0 end:0x021b17e4
 
+src/overlay005/data/data_ov005_021b17e8.c:
+    complete
+    .data start:0x021b17e8 end:0x021b17f8
+
 src/overlay005/data_ov005_021b1abc.c:
     complete
     .data start:0x021b1abc end:0x021b1b84
+
+src/overlay005/data/data_ov005_021b1be0.c:
+    complete
+    .data start:0x021b1be0 end:0x021b1be8
 
 src/overlay005/data/data_ov005_021b1c8c.c:
     complete
