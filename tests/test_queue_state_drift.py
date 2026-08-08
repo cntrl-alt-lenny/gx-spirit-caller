@@ -138,6 +138,22 @@ class StateShaAnchorTests(unittest.TestCase):
         )
         self.assertEqual(findings, [])
 
+    def test_followup_bookkeeping_pr_is_tolerated(self):
+        """Round 0808 needed two doc-PRs: the repair, then a fix to its own
+        PR-count claim. A tolerance of 1 turned that into a red required
+        check on main, blocking every subsequent lane PR."""
+        findings = state_sha_findings(
+            "<!-- main-sha: 750ad5120 -->\n", lambda _sha: (True, 2),
+        )
+        self.assertEqual(findings, [])
+
+    def test_three_merges_still_flagged(self):
+        findings = state_sha_findings(
+            "<!-- main-sha: 750ad5120 -->\n", lambda _sha: (True, 3),
+        )
+        self.assertEqual(len(findings), 1)
+        self.assertIn("3 PR-merges behind", findings[0].detail)
+
     def test_stale_anchor_is_flagged(self):
         """The real failure: five PRs landed while state.md sat unchanged."""
         findings = state_sha_findings(

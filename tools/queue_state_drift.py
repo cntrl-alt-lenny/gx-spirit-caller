@@ -44,9 +44,12 @@ _PARKED_TITLE_RE = re.compile(r"\[parked\]|\bPARKED\b")
 _PARKED_DECL_RE = re.compile(r"parked-prs:\s*([0-9,\s]+)", re.I)
 _MAIN_SHA_RE = re.compile(r"main-sha:\s*`?([0-9a-f]{7,40})`?", re.I)
 # The state doc is written BEFORE its own doc-PR merges, so at write time the
-# anchor names the current tip and main later gains exactly that one merge.
-# Anything beyond that means PRs landed without the handoff doc being updated.
-_STALE_MERGE_TOLERANCE = 1
+# anchor names the current tip and main later gains that merge. A round can
+# legitimately need a follow-up bookkeeping PR (round 0808 needed two: the
+# repair itself, then a correction to its own PR-count claim), so allow two.
+# Beyond that means real work landed without the handoff doc being updated --
+# the failure this check exists for was five PRs deep, so 2 still catches it.
+_STALE_MERGE_TOLERANCE = 2
 
 
 @dataclass(frozen=True)

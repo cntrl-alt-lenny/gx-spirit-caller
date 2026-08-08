@@ -14,7 +14,7 @@ focused repair round.**
 EUR natural-C **14.28%** (340,770 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
 (282,000 B) — from the regenerated state-table at the SHA below, not inherited.
 
-<!-- main-sha: 750ad5120 -->
+<!-- main-sha: 01dda0384 -->
 <!-- parked-prs: 1020 -->
 
 Those two markers are machine-checked by `tools/queue_state_drift.py`:
