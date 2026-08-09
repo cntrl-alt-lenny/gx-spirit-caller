@@ -186,7 +186,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224dafc	ov002	152	default	P-26-observed	parked	38.5	reg-alloc	cm-ov002-unknown-sweep-17-batch5
 0x0228c924	ov002	152	default	P-26-observed	parked	12.8	reg-alloc	cm-ov002-unknown-sweep-17-batch5
 0x021ee668	ov002	156	default	P-28-register-letter	parked	56.4	reg-alloc	cm-ov002-unknown-sweep-17-batch5
-0x022a8190	ov002	152	default	task-struct-init	parked	95.0	pool-const-materialize	brief-683
+0x022a8190	ov002	156	default	task-struct-init	parked	95.0	pool-const-materialize	brief-683
 0x020211c8	main	260	default	unknown	shipped	100	none	PR#1404:1fb75e64
 0x02053fc4	main	184	default	unknown	shipped	100	none	PR#1404:1fb75e64
 0x021c1e44	ov002	172	default	unknown	shipped	100	none	PR#1404:1fb75e64
@@ -252,7 +252,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021ee4c8	ov002	380	default	unknown	shipped	100	c-55	PR#1410:51b195eb
 0x021f162c	ov002	168	default	unknown	shipped	100	p-17	PR#1410:51b195eb
 0x021f664c	ov002	184	default	unknown	shipped	100	none	PR#1410:51b195eb
-0x0220196c	ov002	240	default	unknown	shipped	100	c-55	PR#1410:51b195eb
+0x0220196c	ov002	212	default	unknown	shipped	100	c-55	PR#1410:51b195eb
 0x022095ac	ov002	204	default	unknown	shipped	100	none	PR#1410:51b195eb
 0x022127b4	ov002	240	default	unknown	shipped	100	c-55	PR#1410:51b195eb
 0x0221d6ec	ov002	376	default	unknown	shipped	100	c-55	PR#1414:1e6c121d
@@ -469,8 +469,8 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021cc8b8	ov003	464	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
 0x021bf2a4	ov006	432	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
 0x020161ac	main	292	default	unknown	shipped	100	none	PR#1431:b90c00b2
-0x02017be0	main	292	default	unknown	shipped	100	none	PR#1431:b90c00b2
-0x020619b8	main	292	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x02017be0	main	312	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x020619b8	main	212	default	unknown	shipped	100	none	PR#1431:b90c00b2
 0x021b38fc	ov006	168	default	unknown	shipped	100	none	PR#1431:b90c00b2
 0x0201e818	main	172	default	unknown	shipped	100	none	PR#1431:1f596c3e
 0x020a5b44	main	316	default	unknown	shipped	100	none	PR#1431:1f596c3e
