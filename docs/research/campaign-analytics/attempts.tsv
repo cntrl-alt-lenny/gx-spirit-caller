@@ -920,3 +920,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020740c4	main	96	legacy	guard-chain	parked	87.5	register-choice	cm-main-tier-sweep-4-batch1
 0x02076b74	main	216	legacy	other	parked	87.0	register-choice	cm-main-tier-sweep-4-batch1
 0x02077db0	main	168	legacy	loop	parked	59.5	register-choice	cm-main-tier-sweep-4-batch1
+0x020416f8	main	240	legacy_sp3	other	parked	91.7	P-36-sub5-call-adjacent-pool-schedule	cm-main-tier-sweep-4-batch2
+0x02043ca4	main	152	legacy_sp3	loop	parked	89.5	P-20-r8-vs-r9-const-vs-masked-swap	cm-main-tier-sweep-4-batch2
+0x02051f98	main	256	legacy_sp3	guard chain	parked	92.2	P-20-r1-vs-r2-and-r2-vs-r3-double-swap	cm-main-tier-sweep-4-batch2
+0x02076d14	main	200	legacy	guard chain	parked	30.0	P-36-sub9-addr-vs-load-hoist-cascade	cm-main-tier-sweep-4-batch2
