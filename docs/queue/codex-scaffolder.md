@@ -536,7 +536,7 @@ Then one design question the verification raised, worth answering in the same PR
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the contradiction assertion over the full ledger + the live-ledger canary + a before/after exclusion-set count with the `park_class` decision stated.
 
-### q-ledger-hygiene-sweep — generalise the contradiction audit, fix the shape/park_class misuse [TODO]
+### q-ledger-hygiene-sweep — generalise the contradiction audit, fix the shape/park_class misuse [CLAIMED]
 
 `#1479` closed the ledger repair arc cleanly. This is the last sweep over `attempts.tsv`, then the lane moves on.
 
