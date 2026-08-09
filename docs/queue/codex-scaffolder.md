@@ -522,7 +522,7 @@ The remaining gap: the `score` integer was never adjusted, so the sort is anchor
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test asserting `max(OFFSET-ONLY scores) < min(BASE-ANCHORED scores)` + the re-pasted canary table showing score and rank in agreement.
 
-### q-ledger-residuals — three exclusion-set residuals the second pass left behind [TODO]
+### q-ledger-residuals — three exclusion-set residuals the second pass left behind [DONE]
 
 `#1467` and `#1468` are merged; the ledger's event semantics, the denylist, and the producer anchoring are all verified working. Three residuals surfaced during that verification, none of which blocked the merge but all of which cost future rounds if left:
 
