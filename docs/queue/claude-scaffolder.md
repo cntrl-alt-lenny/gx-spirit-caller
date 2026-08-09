@@ -1407,3 +1407,23 @@ CANARY: the first composed carve of Part 1 goes through the FULL gate (3-region 
 Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order — doubly so here, since declaration order IS the mechanism.
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — read the log. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the both-ends screen table + the per-symbol reconciliation table (built as you go; check every Size cell against `delinks.txt` — a wrong cell is what produced #1476's phantom 4 B) + the Part 2 verdict with byte evidence. Regenerate `docs/research/README.md` LAST, after any retitling.
+
+### cm-restock-carve-5 — close out the declined 11, finish the composable pool, return to the main pool [TODO]
+
+`cm-restock-carve-4` (#1481) carved 22 symbols in 11 composed TUs (Named-struct +488 B, independently recomputed) and — more valuably — returned a **clean negative on backward absorption**: `cm-restock-carve-1` Part 5 attempt 1's dsd-containment rejection is a real structural wall, not an artifact of framing. That closes a question three consecutive waves carried.
+
+Three parts, in order:
+
+1. **Close out the declined 11.** Record the backward-absorption negative against each of the 11 both-ends screen-failures in the census, so future selection sees them as permanently declined with evidence attached rather than as perpetual maybes. Bookkeeping, but it is the payoff of #1481's negative — minutes, not hours.
+
+2. **Finish the composable pool.** #1481 carved 22 of the ~24 that passed the screen. Carve whatever remains, same verified shape: adjacent misaligned symbols as separate named globals of the same type, **in address order**, one TU, composed span 4-aligned at both ends. Byte-verify each composed TU against pristine ROM at the symbols AND at both neighbouring already-shipped TUs — the cascade shows at the neighbours first.
+
+   ⚠️ **`n > 2` is still unproven.** #1476 and #1481 both confirmed `n = 2` only, and wave 1's failure mode (mwcc reordering declarations) correlates with bundle size. If a group needs 3+ symbols to reach a 4-aligned span, inspect the compiled `.o` symbol table for reordering BEFORE trusting it.
+
+3. **Return to the main pool.** The restock census still holds candidates outside the misaligned class (274 total, minus ov006's 33, main's 58, and this arc's ~35). Sweep the largest remaining 4-aligned module group with the standard method: cross-reference the module's own header, script every initializer from the real bytes, per-symbol reconciliation table built AS YOU GO with every Size cell checked against `delinks.txt` — a wrong cell produced #1476's phantom 4 B.
+
+CANARY: the first carve of part 2 goes through the FULL gate (3-region SHA1) before any batching.
+
+Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order — doubly so here, since declaration order IS the mechanism.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the declined-11 closeout. Regenerate `docs/research/README.md` LAST.

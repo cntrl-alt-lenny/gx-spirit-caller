@@ -16,7 +16,7 @@ EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), pl
 **+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
 57,076 → 72,440).
 
-<!-- main-sha: 9526efe5c -->
+<!-- main-sha: af5f34a2c -->
 <!-- parked-prs: 1020 -->
 
 **Round 0808c (partial round — 3 of 4 lanes reviewed while the CC Decomper
@@ -105,11 +105,7 @@ even when this file makes no PR-count claim), and `parked-prs` is the
 EXPLICIT parked list — parked is never inferred from GitHub's draft bit,
 because the worker lanes publish ordinary output as drafts.
 
-**PR state — active vs merely open.** **active** count is **1**: #1479 (Codex
-Scaffolder, `q-ledger-residuals`, just opened — not yet reviewed). #1020
-(decomp.dev CI) is the one genuinely parked draft. The CC Scaffolder's
-`cm-restock-carve-4` is still in flight with no PR yet, so it is correctly
-absent from this count.
+**PR state — active vs merely open.** **active** count is **0** — #1479 and #1481 both merged. #1020 (decomp.dev CI) is the one genuinely parked draft. The CC Decomper's `cm-main-tier-sweep-3` is still in flight with no PR yet, so it is correctly absent.
 
 **Round 0808d — everything else merged.** #1478 (`cm-main-tier-sweep-2`) and
 PR #1475 (census methodology, second pass) both landed. EUR natural-C is now
