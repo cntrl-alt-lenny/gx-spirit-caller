@@ -7977,6 +7977,28 @@ the naive predicated form). `func_0206e4a4`/`func_0206df54`/
 > converging on one identical exit," not "physically-distant exit
 > blocks." `func_020ab054` (main, 100%).
 
+> **Diagnostic signature confirmed again, 4 more instances
+> (cm-main-tier-sweep-3, 2026-08-08, batches 3 and 5).** The tell is a
+> prologue `push`/`stmdb` register list short by exactly one register
+> from ground truth (e.g. `e92d4000`/`{lr}` vs `e92d4010`/`{r4,lr}`, or
+> `e92d4070`/`{r4,r5,r6}` vs `e92d40f0`/`{r4,r5,r6,r7}`) on a function
+> with 2+ independent early-return guards ahead of a shared tail:
+> `func_020a1d44` (two independent `if (cond) return 0;` sites →
+> `goto fail;` into one shared `return 0;`, 8.0%->91.3% in one edit),
+> `func_02089df8` (identical pattern, 6.5%->100%), `func_02089ee8`
+> (early return + late return funneled through one `goto tail;`
+> block, 6.5%->100%). **New sub-case (`func_020ace14`, batch 5):** two
+> independent guards can also share ONE physical FALLTHROUGH block
+> rather than a goto-reached tail — guard 1 explicitly branches to the
+> shared block, guard 2 branches AWAY on success and falls through to
+> that SAME block on failure. The shared label had to sit physically
+> BETWEEN the two guards, not at the function's end (placing it at the
+> end measurably regressed the match, 17.2%->still 17.2%); also needed
+> a flat 3-way `if(x==0)goto; if(x==1)goto; if(x==2)…` chain rather
+> than `if/else if` to match the target's dispatch-then-bodies block
+> order. Took 17.2%->63.3% (parked on an unrelated partial-predication
+> residual, C-72 itself fully resolved).
+
 ### C-73. A field re-read needs an explicit `volatile` qualifier to survive mwcc's CSE even with zero true aliasing risk — both for a repeated READ and for a READ immediately after a STORE
 
 **The trap.** A struct-field dereference that appears twice in the
@@ -8232,7 +8254,48 @@ itself is a clean, isolated, reproducible finding.
 
 **Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 4.
 
-## Permanent P-wall index (28 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
+### C-82. A `switch` case whose body is textually identical to `default`'s must stay a SEPARATE case label — a shared `case N: default:` label lets mwcc merge their jump-table targets
+
+**The trap.** When a case value's computed result happens to equal
+the `default` arm's result, writing them as one shared label
+(`case 3: default: X; break;`) is the natural C simplification — but
+mwcc's redundant-block elimination treats the shared label as
+license to merge the two jump-table entries onto ONE physical copy
+of `X`, producing a smaller function than the target, which keeps
+the two bodies as duplicate, separately-addressed code (one entry
+"falls through" from an explicit `case 3:` block, the other is a
+true `default:` block elsewhere) even though both compute the exact
+same value.
+
+**The fix.** Keep the two arms as textually distinct case labels —
+`case 3: X; break;` and, separately, `default: X; break;` — even
+though the bodies are byte-for-byte identical C. This preserves two
+separate jump-table targets and two separate compiled copies,
+matching the original.
+
+**Affected picks:** `func_0206b814` (main, 120B, small dispatcher) —
+28-word wrong output with the shared label, 30-word correct output
+(matching the target's two redundant `ldr` pool loads) once split.
+100% on the next try after the fix.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 1.
+
+> **Worked-example addendum to C-44 (cm-main-tier-sweep-3, batch 2).**
+> A first pass at reading a jump table's raw `b`-list off the wrong
+> mental model (assuming "the entry for value 0 is the second `b`
+> after `addls`" without re-verifying against the ACTUAL list for
+> this function) silently mapped every case value to the wrong body.
+> Re-deriving carefully from the raw list
+> (`[L_160, L_138, L_148, L_15c, L_160, L_138]`) gave the real mapping
+> — value0→L_138, value1→L_148, value2→L_15c, value3→L_160 (empty
+> tail), value4→L_138 (cases 0 and 4 share a body via fall-through) —
+> and fixed `func_0206c3f4` straight to 100%. Worth restating as a
+> standing caution: this still compiles cleanly to A jump table when
+> wrong, just the wrong one — always re-count the raw `b`-list for
+> THIS function rather than trusting a remembered pattern from a
+> previous one.
+
+## Permanent P-wall index (34 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -10960,10 +11023,27 @@ a call-adjacent success path.
 `func_0208de4c`, `func_0208c940`, `func_02064580`, `func_020577d8`,
 `func_0209f904`, `func_0208e6ac` — all main.
 
-**Recipe status: NONE.**
+**Recipe status: NONE for the general family. PARTIAL for one named
+sub-case — see below.**
+
+> **Counter-technique found for the "guard skips an entire loop"
+> sub-case (cm-main-tier-sweep-3, 2026-08-08, batch 4).**
+> `func_020a7440` (a memcmp-shaped function): writing the zero-trip
+> guard as its own leading statement —
+> `if (count == 0) { return 0; } do { ... } while (--count != 0);` —
+> got if-converted (predicated) by mwcc even though the target wants a
+> real `beq` skipping the whole loop. Folding the SAME guard into the
+> loop's own condition instead — `while (count != 0) { ...; count--; }`
+> — produced the required branch. The guard is identical either way;
+> only whether it's a separate leading statement or structurally part
+> of the loop's own test changes the if-conversion decision. Does not
+> generalize to P-31's other members (none of which are "a guard in
+> front of a loop") — flagged as a specific, reusable fix for this one
+> sub-shape, not a resolution of the family.
 
 **Provenance:** cm-main-tier-sweep-1 (2026-08-08), batch 5;
-cm-main-tier-sweep-2 (2026-08-08), batches 3, 5.
+cm-main-tier-sweep-2 (2026-08-08), batches 3, 5;
+cm-main-tier-sweep-3 (2026-08-08), batch 4.
 
 ### P-32. OR-of-non-adjacent-equality-values resists suppression into two genuine branches — a sticky CMP/CMPNE predicated membership test
 
@@ -11139,6 +11219,16 @@ value/type/control-flow difference):**
    statement order, scoped-block placement, or declaration timing.
    4 distinct C shapes, byte-identical wrong output every time.
    (`func_0208bf3c`, cm-main-tier-sweep-2 batch 4, 90% best.)
+   **3 further confirmations (cm-main-tier-sweep-3, 2026-08-08,
+   batches 1 and 2):** `func_02084dc0` (89.5%, an unrelated
+   table-pointer `ldr` hoisted ahead of a data-independent
+   `add rN,rN,#imm`), `func_020a3308` (53.9%, three independent
+   pool loads always hoisted before any of 4 independent stores
+   across 3 declaration-order permutations), `func_0208de94` (59.1%
+   — the function's OTHER half, the compute block, matched
+   byte-for-byte with no tuning, confirming the wall is confined to
+   the scheduler's handling of the two adjacent MMIO reads and
+   nothing else in the function).
 2. **Pipeline-scheduler register-interleaving.** For two independent
    straight-line sub-computations (e.g. two hardware-register
    bitfield packs), the target INTERLEAVES their instructions
@@ -11150,11 +11240,40 @@ value/type/control-flow difference):**
    identical-diff-shape on 2 further twins with a single try each —
    systematic, not per-function noise. (`func_0208df0c`/`df60`/`e1cc`,
    cm-main-tier-sweep-2 batch 4, all 53.9%.)
+   **2 further confirmations (cm-main-tier-sweep-3, 2026-08-08,
+   batch 1 and batch 4):** `func_0208ddec` (8.3% — two independent
+   MMIO reads, DISPCNT and BG3CNT, get their register roles and
+   read-order rigidly fixed; 5 statement-order attempts produced only
+   two outcomes, neither the target's), `func_0208e220` (53.9% — same
+   pattern on a VRAM-address computation from two hardware reads; 3 of
+   5 phrasings reproduced the identical wrong 53.9%, the other 2 made
+   it worse by triggering unrelated restructuring).
 3. **LDM-fusion instruction-selection resistance.** Target reads back
    2 consecutive stack words via a fused `add`+`ldm` pair; every C
    framing (array-index, pointer-variable, struct-copy, struct-typed
    local) instead emits 2 separate `ldr`s. (`func_02098038`,
    cm-main-tier-sweep-2 batch 4, 85%.)
+   **Generalizes beyond stack-word LDM specifically (cm-main-tier-
+   sweep-3, 2026-08-08, batch 1):** the same fusion-resistance hits
+   PAIRED POST-INCREMENT loads/stores generally, not just a fused
+   `ldm` read-back. `func_02054db8` (19.1%) and `func_02054ca8`
+   (12.5%), both unrolled `for(n=4;...){2x ldrb-post-inc; 2x
+   strb-post-inc;}` byte-copy loops: a single `*dst++ = *b++;`
+   reliably compiles to true post-increment addressing, but as soon
+   as a SECOND such operation appears adjacent in the same loop body
+   mwcc falls back to plain offset addressing plus a separate manual
+   pointer bump for BOTH accesses — named temps, direct pointer
+   chaining, deferred `dst[0]=;dst[1]=;dst+=2;` array style, `for` vs
+   `do-while`, mid- vs end-body decrement placement all failed to
+   recover the fused form. **Companion diagnostic technique found in
+   the same investigation:** when a trailing call passes a stack
+   buffer a copy loop just filled, and a SECOND trailing call reuses
+   the first call's return value as its own first argument with no
+   explicit reload of the original first parameter, that's a strong
+   signal the source chains `ret = f(a, buf); g(ret, -1);` rather than
+   reusing `a` directly — confirmed on 3 separate functions now,
+   always recognizable from the `.s` by an argument register live
+   across a `bl` with no reload before the next `bl`.
 4. **Argument-evaluation order not source-controllable.** A 5-argument
    call where the 5th argument is passed on the caller's stack: target
    computes an unrelated register-OR chain for args 1-4 BEFORE reading
@@ -11180,19 +11299,46 @@ value/type/control-flow difference):**
    different WRONG condition-code families (GE/LT, then CS/CC, then a
    worse ternary expansion) — PL/MI was never reached by any source
    form. (`func_020908c0`, cm-main-tier-sweep-2 batch 3, 8.3%.)
+7. **(Tentative, single instance) Store+pointer-decrement post-index
+   fusion — a possible STR-side sibling of sub-shape 3.**
+   `func_02078f08` (cm-main-tier-sweep-3, batch 2, best 38.9%):
+   fixing one fold (forcing `q = dst-1` to materialize as a real
+   register instead of folding into `[dst,#-1]` addressing, by moving
+   `dst -= 2` before its use) immediately triggers a DIFFERENT fold —
+   the compiler fuses the adjacent `dst[0]=v; ...; dst-=2;` into one
+   `strb r3,[r0],#-2` post-indexed store, which the target avoids
+   (uses 2 plain instructions). Either fold individually suppressible
+   in 3 tries; never both together. Needs independent confirmation
+   before treating as established.
+8. **(Tentative, single instance) Adjacent-field read-order plus
+   RRWW/RWRW pairing trade-off.** `func_0209a1b8` (cm-main-tier-
+   sweep-3, batch 3, best 72.7%): copies 4 adjacent `u16` struct
+   fields to a destination in pairs; the target reads each pair in
+   ASCENDING offset order and keeps an RRWW (read-both-then-write-
+   both) pairing shape. Every combination tried (default/reversed
+   declaration order, no named temporaries, reused temporaries, a
+   real struct in place of raw offset casts) got EITHER the read
+   order OR the RRWW pairing right, never both at once — the two
+   properties seemed to trade off against each other under every
+   source shape tried. Needs independent confirmation before treating
+   as established.
 
-**Recipe status: NONE for any sub-shape.** If C-75-style statement
+**Recipe status: NONE for sub-shapes 1-6.** If C-75-style statement
 reordering doesn't move a residual within 3-4 honest tries and the
 diff looks like a pure reordering/selection choice with correct
 values throughout, recognize this family and park — further
-restructuring attempts have not moved any member of this family once
-identified.
+restructuring attempts have not moved any member of sub-shapes 1-6
+once identified. Sub-shapes 7-8 are single-instance and tentative;
+treat as candidates to watch for, not yet as confirmed permanent.
 
-**Affected picks (7):** `func_0208bf3c`, `func_0208df0c`,
+**Affected picks (17):** `func_0208bf3c`, `func_0208df0c`,
 `func_0208df60`, `func_0208e1cc`, `func_02098038`, `func_0208e5ec`,
-`func_020536d0`, `func_020908c0` — all main.
+`func_020536d0`, `func_020908c0`, `func_02084dc0`, `func_020a3308`,
+`func_0208de94`, `func_0208ddec`, `func_0208e220`, `func_02054db8`,
+`func_02054ca8`, `func_02078f08`, `func_0209a1b8` — all main.
 
-**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batches 3, 4.
+**Provenance:** cm-main-tier-sweep-2 (2026-08-08), batches 3, 4;
+cm-main-tier-sweep-3 (2026-08-08), batches 1, 2, 3, 4.
 
 ### P-37. Register reuse via free-`lr`-after-`pop{pc}` — a hand-optimized-looking allocation trick a C compiler won't reproduce from ordinary source (tentative, single instance)
 
@@ -11219,6 +11365,172 @@ pointer — none influenced the register count.
 **Recipe status: NONE.**
 
 **Provenance:** cm-main-tier-sweep-2 (2026-08-08), batch 3.
+
+> **Possible scope broadening beyond fused-`pop{pc}` epilogues
+> (cm-main-tier-sweep-3, 2026-08-08, batch 2, single additional
+> instance — not yet confirmed).** `func_020a67cc` (a CRC-table
+> builder, parked) shows the same free-register-reuse trick — mwcc
+> reuses the freed callee-saved `lr` as a general scratch register for
+> the outer loop counter, the reverse of a straightforward
+> allocation — but on a **separate-`bx lr` Style A epilogue**
+> (`.legacy.c` tier, `pop {regs,lr}` then a standalone `bx lr`), not
+> the fused `pop{...,pc}` form this entry is currently framed around.
+> 3 source shapes (nested scope, flat scope, for-vs-while) produced
+> byte-identical output every time, meaning the choice is fully
+> source-insensitive here too. If a second independent instance
+> confirms this, P-37's documented trigger condition should broaden
+> from "fused-pop-pc epilogues only" to "any epilogue that frees a
+> register before the function's true last use of it."
+
+### P-40. Immediate/constant materialization strategy resists source-level control — mwcc's own optimizer prefers folding a small-enough constant into an ADD's immediate field, but the original binary sometimes doesn't
+
+**The shape:** distinct from P-36 (which is about the ORDER of
+otherwise-correct, already-selected instructions) — this is about
+INSTRUCTION SELECTION itself. The target materializes a constant into
+a scratch register with a separate `mov`/`mvn`, then does a
+register-register `ADD` in a following instruction — a strictly
+LONGER encoding than the single-instruction immediate-fold `ADD`
+mwcc's optimizer produces from every C phrasing tried. 3 independent
+instances, no cross-talk:
+
+- `func_0208bed8` (cm-main-tier-sweep-3, batch 3): a `+0x80000`
+  rounding bias. 5 phrasings tried (raw literal used once/twice,
+  `#define`, plain `int` local, `const`-flavored local, pointer-typed
+  local, computed inside vs. outside a branch, computed separately
+  inside each of two mutually-exclusive branches) — all fold.
+- `func_0208fd90` (cm-main-tier-sweep-3, batch 3): a `+0x6400000`
+  base address, same set of phrasings tried, same result.
+- `func_020a3ed8` (cm-main-tier-sweep-3, batch 5): a mid-size constant
+  (`0x14a`) built via a literal-pool `LDR` combined with an
+  inline-shifted `ADD` in the target, but always splits into two
+  chained immediate `ADD`s with a separate `LSL` in every recompile —
+  byte-identical across 3 structurally different source forms (split
+  locals, reordered operands, single combined expression).
+
+**Recipe status: NONE.** ~9 combined attempts across the 3 instances,
+zero movement. Closest in spirit to P-36's pool-load scheduling hoist
+sub-shape, but for a plain immediate rather than a pool load, and
+about WHETHER to fold rather than WHEN — kept as its own entry rather
+than folded into P-36.
+
+**Affected picks (3):** `func_0208bed8`, `func_0208fd90`,
+`func_020a3ed8` — all main.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batches 3, 5.
+
+### P-41. mwcc 2.0 silently truncates a folded constant offset that exceeds the 12-bit STR immediate range instead of splitting it into a register ADD plus an in-range offset — a genuine compiler correctness defect, not a source-shape wall
+
+> **Different in kind from every other entry in this catalogue.**
+> Every other P-wall is "no C source shape reproduces the target's
+> instruction choice." This one is the reverse: mwcc's own constant
+> folding produces a WRONG effective address that the original avoids
+> by deliberately splitting its arithmetic. There is no C phrasing
+> that should reproduce the buggy folded form — the target's actual
+> source almost certainly looks exactly like the natural C, and mwcc's
+> optimizer is what's misbehaving on the recompile.
+
+**The bug.** `(base+0x3000)+0xf7c` constant-folds to a single
+`+0x3f7c` offset, which exceeds the 12-bit `STR` immediate range
+(max `0xFFF`). Instead of emitting a compensating register `ADD`,
+mwcc silently truncates to the low 12 bits, producing
+`str [base,#0xf7c]` — writing to the WRONG effective address. The
+target correctly splits the same arithmetic into a separate `ADD`
+(register) followed by an in-range `STR` offset.
+
+**Falsifiable claim:** *some source phrasing avoids the fold.*
+**Falsified across 3 shapes (cm-main-tier-sweep-3, 2026-08-08, batch
+5):** an intermediate pointer local (plain — folds anyway; `volatile`
+— forces a full stack spill instead, worse), and a separately-named
+`int delta` for the register-held second offset (also folded away).
+
+**Affected picks:** `func_02090574` (main, parked, 0% — the fold
+produces genuinely wrong output, not just a stylistic mismatch).
+
+**Recipe status: NONE found, though by nature of the bug a working
+recipe (if one exists) would look like deliberately preventing
+constant-folding across the two offset components, not adding any
+new computation.**
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 5.
+
+### P-42. A `void` function whose body is a single backward-branching loop with only internal `return;` exits still gets one extra unreachable trailing `bx lr` appended (tentative, single instance)
+
+**The shape:** every source form tried (`while(1)`, `for(;;)`,
+`do-while(1)`, goto-loop, goto-to-shared-return-label) produces a
+byte-identical extra padding instruction after the loop that the
+target doesn't have. Declaring the function non-`void` removes the
+pad but breaks the predicated body instead (26.1%). Routing to
+`.legacy.c` tier compiles but reintroduces a register mismatch on top
+of the same pad (55.0%).
+
+**Affected picks:** `func_020b03fc` (main, parked, 95.0% — a single
+word off).
+
+**Recipe status: NONE.** Needs independent confirmation before
+treating as established; flagged rather than force-mapped onto an
+existing entry.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 5.
+
+### P-43. mwcc downgrades a dead-result XOR to a flags-only TEQ — an EOR/TEQ cousin of P-35's SUBS-flag-fusion (tentative, single instance)
+
+**The shape:** when an XOR's result register is provably dead (only
+the flags feed a following branch), mwcc proves the write dead and
+downgrades `eors` to `teq` — the target keeps the real `eors`
+(result-register write live). Tried and inert: naming the XOR into a
+local (plain — no change; `volatile` — forces a full stack spill
+instead, 0%), `!=` instead of `^`, swapped operand order, explicit
+`!= 0`.
+
+**Affected picks:** `func_0207e840` (main, parked, 95.8% — a single
+word off; two real C-73 fixes already closed the rest of the gap).
+
+**Recipe status: NONE.** Needs independent confirmation before
+treating as established.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 5.
+
+### P-44. Sibling-constant arithmetic reuse between two different sequentially-assigned local variables (tentative, single instance)
+
+**The shape:** two sequentially assigned local constants in the same
+case body, differing by a small integer (`msg=9; arg=-1;` — diff=10),
+compile via `sub r2,<msg's register>,#10` instead of an independent
+`mvn` immediate for the second — regardless of literal syntax
+(`-10` vs `~9`, identical output), declaration order (swapping which
+is assigned first just moves the trick to the OTHER variable, never
+removes it), or `volatile` on the first variable (made it drastically
+worse — forced a stack spill that broke the whole function shape, 0%
+and +8 words). Distinct from P-33 (repeated-comparison merge on ONE
+register) — this is arithmetic reuse between TWO DIFFERENT variables.
+
+**Affected picks:** `func_02048880` (main, parked, 86.2% — all 4
+remaining diffs isolated to this one issue).
+
+**Recipe status: NONE across 5 variations.** Needs independent
+confirmation before treating as established.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 2.
+
+### P-45. A mask-AND needed for two different downstream uses collapses to a shift-pair, resisting every caching hint (tentative, single instance)
+
+**The shape:** `sum & 0xffff` (needed both for a fold step and, via
+the same constant, a later `XOR`) compiles to `lsl #16; lsr #16`
+instead of a pool-loaded `AND`, even when the mask is a named
+variable, hoisted to function-top, or the truncation is written via
+`(unsigned short)` cast instead of `&`. The target visibly loads
+`0xffff` from the pool ONCE and reuses that register for both the AND
+and the XOR (since XOR can't shift-pair-reduce, forcing a pool load
+anyway, which then makes reusing it for the AND strictly cheaper) —
+mwcc never made that connection compiling any recompile attempted,
+regardless of the hint given.
+
+**Affected picks:** `func_020a2c74` (main, parked, 47.4% — though the
+loop body, the harder 8-word half, matched 100%).
+
+**Recipe status: NONE across 5 attempts.** Needs independent
+confirmation before treating as established.
+
+**Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 2.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 

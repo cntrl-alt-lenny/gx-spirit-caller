@@ -981,7 +981,7 @@ Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/b
 
 **Why this module and not another ov002 sweep.** `attempts.tsv` is mid-repair: #1467 (open, changes requested) would record ~19 never-attempted candidates as `parked` and writes a module key (`overlay002`) the selector cannot match (`ov002`). Until that lands, an ov002 pull driven by `--exclude-attempted` is selecting against a corrupted exclusion set. This round therefore sweeps **`main`**, selected from a committed worklist rather than from the ledger — so the round cannot be poisoned by the repair in flight. (`main` is also the one module where `park_one.py`'s module bug does not bite: writer and consumer both say `main`.)
 
-**Selector: `docs/research/main-small-tier-worklist.md`**, the ranked output of `q-small-tier-worklist` — address, size, shape class (trivial stub / tail-call forwarder / guard chain / small dispatcher / loop / other), header provenance, and whether a matched sibling of similar shape exists. Take the **0x02040000+** range (that worklist is split so 0x02000000–0x0203ffff belongs to the Scaffolder lane). Work the shapes brief 661 measured as tractable FIRST — stubs and forwarders — then guard chains. Brief 661 put this tier's floor at 35–55%, well above ov002's steady ~25%, and it has never been swept at scale.
+**Selector: `docs/research/campaign-analytics/main-small-tier-worklist.md`**, the ranked output of `q-small-tier-worklist` — address, size, shape class (trivial stub / tail-call forwarder / guard chain / small dispatcher / loop / other), header provenance, and whether a matched sibling of similar shape exists. Take the **0x02040000+** range (that worklist is split so 0x02000000–0x0203ffff belongs to the Scaffolder lane). Work the shapes brief 661 measured as tractable FIRST — stubs and forwarders — then guard chains. Brief 661 put this tier's floor at 35–55%, well above ov002's steady ~25%, and it has never been swept at scale.
 
 **Tranche: 100 candidates, 5 batch worktrees × 20**, per the ⚡ WORKTREE-PARALLEL SWEEP PROTOCOL in this queue's header, partition written into the PR body. Cross-check your pull against `main`'s prior attempts in the sweep docs before dispatch — but do NOT rely on `--exclude-attempted` as the primary filter this round; the worklist plus the park docs are your selector, and say so in the PR body.
 
@@ -1018,7 +1018,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever 
 
 ### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [DONE]
 
-`cm-main-tier-sweep-1` (#1472) shipped 71/100 (6,720 B), the campaign's best single round, and moved EUR natural-C 14.28% → 14.56%. Continue on the same selector: `docs/research/main-small-tier-worklist.md`, **0x02040000+** range (0x02000000–0x0203ffff stays the Scaffolder's), 100 candidates, 5 batch worktrees × 20, partition frozen before dispatch.
+`cm-main-tier-sweep-1` (#1472) shipped 71/100 (6,720 B), the campaign's best single round, and moved EUR natural-C 14.28% → 14.56%. Continue on the same selector: `docs/research/campaign-analytics/main-small-tier-worklist.md`, **0x02040000+** range (0x02000000–0x0203ffff stays the Scaffolder's), 100 candidates, 5 batch worktrees × 20, partition frozen before dispatch.
 
 **Read wave 1's rate honestly and design this round to test it.** The 71% came from a homogeneous slice — 100/100 attempts were shape=`guard chain`, 40–128 B — and that band was already 71.8% converted project-wide before the round, so wave 1 measured a favourable, pre-filtered population rather than the tier at large. That makes the NEXT question the valuable one: **does the rate hold outside the guard-chain band?** Split this tranche deliberately: **50 candidates continuing the guard-chain band** (the known-good seam) and **50 drawn from the other shape classes and/or the next size band up**, chosen from the worklist's own columns. Report the two sub-rates SEPARATELY in the PR body. A large gap between them is the most useful measurement this lane can produce right now, and a low rate on the second 50 is a SUCCESS if it is honestly measured — it tells us where the tier's real floor is.
 
@@ -1058,7 +1058,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
 > return. See
 > [`cm-main-tier-sweep-2-2026-08-08.md`](../research/cm-main-tier-sweep-2-2026-08-08.md).
 
-### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [TODO]
+### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [DONE]
 
 `cm-main-tier-sweep-2` (#1478) answered its question honestly: Pool A (guard chain) **32/50 = 64%**, Pool B (loop / other / small dispatcher) **27/50 = 54%**. A real gap, but far smaller than wave 1's 71% framing implied — and **two of five batches had Pool B outship Pool A**, with Pool B ranging 20–80% across batches. The tier is not a cliff; the variance is mostly batch composition.
 
@@ -1080,3 +1080,50 @@ Standing enforcement unchanged: one worktree = one agent, mandatory first-step l
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, three regions individually grepped; `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — read the log. State ONE basis for the headline (sweep-2 got this right: "60/100 shipped (59 batch + 1 canary), 3,852 bytes"). Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, before/after `wall_aware_headroom.py`, the per-shape ship rates, and the worklist-vs-derived disagreement count.
+
+> **57/100 shipped, 5,112 B (58 incl. canary, one basis throughout).**
+> A mechanical shape-derivation tool was built and validated (3 real
+> bugs caught, incl. a dot-prefixed-label ordering bug that had
+> silently disabled ALL backward-branch detection until fixed) —
+> disagreement rate 1.7% (17/975) project-wide, 11/100 in this
+> round's deliberately-oversampled dispatched pool (12 incl. canary),
+> and every `guard chain → other` disagreement shipped (4/4, 100%)
+> while `small dispatcher → guard chain` shipped only 3/8 (37.5%).
+> **Headline finding: per-shape yield did NOT carry over from
+> sweep-2** — loop went from the campaign's best shape (88.2%) to
+> roughly its worst (45.0%); other and small dispatcher went from
+> worst (41.2%/31.2%) to best (83.3%/75.0%). Leading with "what
+> shipped best last round" produced a WORSE overall rate (57.0%) than
+> sweep-2's less-targeted split (59.0%) — read as a real finding about
+> sample instability, not a regression. Batch 4's entire 20-candidate
+> pool turned out to be a pre-diagnosed GLOBAL_ASM-endgame backlog
+> (brief 302/294) invisible to `attempts.tsv`'s exclusion filter, yet
+> still shipped 13/20 (65%) — the lever catalogue has outgrown a slice
+> of what the campaign currently treats as permanently walled.
+> `park_one.py`'s ledger fix (#1467/#1479) is confirmed genuinely
+> working for the first time this campaign, across all 5 batches, with
+> no manual backfill needed. 1 new C-lever (C-82), 1 new C-44
+> worked-example addendum, 2 new P-36 sub-shapes plus 3 sub-shape
+> reconfirmations, and 6 new tentative P-walls (P-40–P-45, including a
+> genuine mwcc 2.0 STR-immediate-truncation correctness bug, not just
+> a match gap). See
+> [`cm-main-tier-sweep-3-2026-08-08.md`](../research/cm-main-tier-sweep-3-2026-08-08.md).
+
+### cm-main-tier-sweep-4 — shape is not the lever; find one that is [TODO]
+
+`cm-main-tier-sweep-3` (#1483) shipped 57/100 (5,112 B across 58 functions including the canary, one basis throughout) and delivered the measurement it existed for: **11% of the dispatched pool's worklist shape labels were mechanically wrong** (11/100; 17/975 across the wider set), and — the bigger finding — **per-shape yield did NOT carry over from sweep-2**. Guard chain's 64% and Pool B's 54% did not reproduce. Shape category is not a stable predictor of ship rate.
+
+That closes the shape-targeting line: three waves have now tried to steer by shape and the signal is weak, mislabelled, and non-stationary. **Do not design wave 4 around shape.** The Codex Decomper's `q-main-shape-reclassify` still has standalone value as a corrected reference column, but it is no longer the selector this lane waits on.
+
+So this round asks a different question: **what DOES predict ship rate on `main`?** You now have three waves of ground truth — 100 + 100 + 100 attempts with recorded outcomes, sizes, derived shapes, park classes and match percentages, all in `attempts.tsv`. Mine your own data before dispatching:
+
+1. **Retrospective first, on the merged ledger.** For every `main` attempt across sweeps 1-3, test which recorded attribute actually correlates with `shipped`: text size (and size band), derived shape, park class of neighbours, whether a matched sibling exists in the same TU or address run, header provenance, callee count, presence of a float/CLZ helper call. Report what predicts and what does not, with counts — not impressions. A finding of "nothing we record predicts it" is a legitimate and valuable answer; say so plainly if that is what the data shows.
+2. **Then dispatch 100 candidates selected by whatever your retrospective says is the best available predictor**, and state the prediction up front: what ship rate do you expect, and why. Compare against the outcome in the PR body. Being wrong with a stated prior is worth more than being right with none.
+
+⚠️ **One of sweep-3's 20-candidate pools turned out to be a resurfaced pre-diagnosed wall cohort.** Cross-check the pull against `attempts.tsv` via `--exclude-attempted` (now that the ledger's exclusion semantics are fixed and the diagnosed-wall `park_class` guard has landed) AND against the sweep park docs. If a whole batch comes back near-zero, suspect the pool before suspecting the candidates.
+
+Same mechanics as before: 100 candidates, 0x02040000+ range, 5 worktrees x 20, pool frozen before dispatch, one worktree = one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every attempt via `park_one.py` and verify it wrote rows. Levers C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-76 and P-30..P-36; park P-36 scheduling-only diffs on sight rather than iterating.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis for the headline. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the retrospective's predictor table, your stated prior, and the outcome against it.

@@ -282,7 +282,7 @@ And the rules genuinely DIVERGE where the item told you to converge: the sibling
 
 ### q-main-shape-reclassify — the worklist's shape labels are wrong often enough to mis-target sweeps [TODO]
 
-`cm-main-tier-sweep-2` (#1478) found that several `docs/research/main-small-tier-worklist.md` rows labelled `guard chain` conceal non-guard-chain bodies — softfloat conversions among them. That matters more than it sounds:
+`cm-main-tier-sweep-2` (#1478) found that several `docs/research/campaign-analytics/main-small-tier-worklist.md` rows labelled `guard chain` conceal non-guard-chain bodies — softfloat conversions among them. That matters more than it sounds:
 
 - the worklist is the CC Decomper's **selector**, so a wrong label mis-targets a whole batch;
 - wave 1's headline read ("71% but on a 100/100 homogeneous guard-chain population, so treat it as pre-filtered") rests on those labels being right — if they are not, the campaign's most-quoted rate is resting on a shaky premise;
