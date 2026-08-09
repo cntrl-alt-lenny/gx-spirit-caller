@@ -917,3 +917,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02090574	main	52	default	other	parked	0.0	new-imm-offset-truncation-fold	cm-main-tier-sweep-3-batch5
 0x020a3ed8	main	112	default	small dispatcher	parked	46.4	P-36-adjacent-const-materialization	cm-main-tier-sweep-3-batch5
 0x020ace14	main	116	default	small dispatcher	parked	63.3	P-31-inverted-partial-predication	cm-main-tier-sweep-3-batch5
+0x020740c4	main	96	legacy	guard-chain	parked	87.5	register-choice	cm-main-tier-sweep-4-batch1
+0x02076b74	main	216	legacy	other	parked	87.0	register-choice	cm-main-tier-sweep-4-batch1
+0x02077db0	main	168	legacy	loop	parked	59.5	register-choice	cm-main-tier-sweep-4-batch1
