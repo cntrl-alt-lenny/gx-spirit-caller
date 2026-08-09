@@ -175,8 +175,8 @@ reordered) at a very similar scale (n=13). Because no smaller
 Part 1 n=4 run, which could be split into two clean n=2 halves — this
 group cannot be de-risked the way Part 1's was.
 
-**Verdict on the open question**: `cm-restock-carve-1` Part 5 attempt
-#1's dsd-containment-check rejection (trying to absorb just 2 bytes
+**Verdict on the open question**: the `cm-restock-carve-1` Part 5
+attempt #1 dsd-containment-check rejection (trying to absorb just 2 bytes
 backward) was symptomatic of a real structural wall, not an artifact of
 that attempt's narrow framing — this wave's full, correctly-scoped,
 every-symbol-accounted-for 13-way retry hits a *different* checkpoint
