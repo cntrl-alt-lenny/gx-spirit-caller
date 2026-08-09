@@ -198,6 +198,10 @@ src/overlay019/data_ov019_021b5b20.c:
     complete
     .data start:0x021b5b20 end:0x021b5b30
 
+src/overlay019/data_ov019_021b5ba0.c:
+    complete
+    .data start:0x021b5ba0 end:0x021b5bc8
+
 src/overlay019/sinit_ov019_021b5a88.c:
     complete
     .init start:0x021b5a88 end:0x021b5ab4
