@@ -1408,7 +1408,7 @@ Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` struc
 
 **Gate:** `python tools/gate3.py --scope all` — 3-region SHA1 PASS. ⚠️ A background wrapper's exit code is NOT `gate3.py`'s — read the log. Paste the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the both-ends screen table + the per-symbol reconciliation table (built as you go; check every Size cell against `delinks.txt` — a wrong cell is what produced #1476's phantom 4 B) + the Part 2 verdict with byte evidence. Regenerate `docs/research/README.md` LAST, after any retitling.
 
-### cm-restock-carve-5 — close out the declined 11, finish the composable pool, return to the main pool [TODO]
+### cm-restock-carve-5 — close out the declined 11, finish the composable pool, return to the main pool [DONE]
 
 `cm-restock-carve-4` (#1481) carved 22 symbols in 11 composed TUs (Named-struct +488 B, independently recomputed) and — more valuably — returned a **clean negative on backward absorption**: `cm-restock-carve-1` Part 5 attempt 1's dsd-containment rejection is a real structural wall, not an artifact of framing. That closes a question three consecutive waves carried.
 

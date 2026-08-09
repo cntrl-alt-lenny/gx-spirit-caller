@@ -839,6 +839,10 @@ src/overlay000/func_ov000_021af7a8.c:
     complete
     .text start:0x021af7a8 end:0x021af7d0
 
+src/overlay000/data_ov000_021b55dc.c:
+    complete
+    .rodata start:0x021b55dc end:0x021b55e4
+
 src/overlay000/data_ov000_021b55e4.c:
     complete
     .rodata start:0x021b55e4 end:0x021b5600

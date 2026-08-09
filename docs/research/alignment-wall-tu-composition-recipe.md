@@ -177,6 +177,48 @@ group should be spot-tested for reordering before being trusted, not
 assumed safe by extrapolation) — and whether each candidate's `relocs.txt`
 confirms no unexpected cross-TU reference the way this pair's did.
 
+⚠️ **wave 4 update: n>2 is now CONFIRMED unsafe, not just untested.**
+Compiling and inspecting three separate n=4 groups (three different
+modules, three different type shapes) standalone found mwcc reordered
+the declarations in **all three** — e.g. source order `[0,1,2,3]` came
+out compiled as `[3,2,1,0]` or `[2,1,0,3]`. The `.data`/`.rodata`
+section *size* was still correct in every case (a 4-byte multiple), so
+this failure is invisible at compile time and only shows up as a
+silent SHA1 mismatch at gate time. Every n=4 group that hit this was
+fixed by finding an interior 4-aligned symbol and splitting into two
+n=2 sub-TUs instead. **Do not assume n=2 generalizes to n>2 by
+extrapolation; compile-and-inspect every 3+-symbol group before
+trusting it, with no exceptions.**
+
+⚠️ **wave 5 update: n=2 with DIFFERING member sizes is not
+automatically safe either.** Every n=2 mixed-size pair confirmed safe
+through wave 4 (e.g. `data_ov016_021b9374.c`, 10B+30B;
+`data_ov022_021ab8e4.c`, 26B+142B) happened to already have its real
+address order equal to ascending-size order — that coincidence masked
+a real wall. Four independent isolated scratch compiles (struct+scalar,
+two differently-sized structs, two scalars ascending, two scalars
+descending) all confirm: **when two top-level `const` globals in one TU
+have different sizes, mwcc places the smaller one first in the compiled
+section — regardless of source declaration order.** There is no
+declaration-order workaround; whichever way the two globals are written,
+mwcc's own sort wins. A composition is only safe from this specific wall
+when the real address-ascending sequence of member *sizes* is itself
+non-decreasing (ties are fine; a strict decrease anywhere is fatal, and
+adding more members to try to route around it does not help unless the
+full sequence becomes non-decreasing). Confirmed with a real, in-project
+byte-exact repro: `data_ov011_021d3034`(43B) + `data_ov011_021d305f`(1B)
+(address-ascending, size-descending) compiled with the 1-byte symbol
+first and the 43-byte symbol second, exactly backward from the required
+address layout, under every declaration order tried — declined, see
+`cm-restock-carve-5-2026-08-09.md`.
+
+**Combined standing rule (supersedes both notes above): compile every
+composed TU standalone and inspect the `.o` symbol table before
+trusting it — n=2 same-size pairs are the only shape confirmed safe by
+default; everything else (n>2 of any kind, or n=2 with differing sizes)
+must be verified per-candidate, not assumed from a prior wave's
+different candidate.**
+
 ## See also
 
 - [`ov004-odd-aligned-slot-recipe.md`](ov004-odd-aligned-slot-recipe.md) —
