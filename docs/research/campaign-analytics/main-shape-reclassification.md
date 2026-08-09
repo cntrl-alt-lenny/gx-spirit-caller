@@ -67,7 +67,9 @@ The merged sweep-3 report explicitly records `func_020b007c` as worklist `small 
 ## Ten-row body spot check
 
 Each excerpt is the current source body after `;` comment removal; labels are shown next to the exact derived result. The excerpt is capped at 12 instructions plus the final 3 when longer, so the structural evidence is auditable without duplicating every full source file.
+
 ### Spot check 1: `0x02003a4c`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -88,7 +90,9 @@ bl func_02001f18
 add sp, sp, #0xc
 ldmia sp!, {r4, r5, r6, r7, pc}
 ```
+
 ### Spot check 2: `0x02004ef4`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -111,6 +115,7 @@ ldmfd sp!, {pc}
 ```
 
 ### Spot check 3: `0x02006264`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -133,6 +138,7 @@ ldmia sp!, {r3, pc}
 ```
 
 ### Spot check 4: `0x020091f4`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -155,6 +161,7 @@ ldmia sp!, {r4, r5, r6, pc}
 ```
 
 ### Spot check 5: `0x02009a68`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -177,6 +184,7 @@ ldmia sp!, {r4, pc}
 ```
 
 ### Spot check 6: `0x0201d47c`
+
 Current label: `guard chain`; derived label: `other`; result: `disagree`.
 
 ```asm
@@ -197,6 +205,7 @@ ldmia sp!, {r4, pc}
 ```
 
 ### Spot check 7: `0x02037ca0`
+
 Current label: `guard chain`; derived label: `guard chain`; result: `agree`.
 
 ```asm
@@ -219,6 +228,7 @@ ldmia sp!, {r4, pc}
 ```
 
 ### Spot check 8: `0x020b007c`
+
 Current label: `small dispatcher`; derived label: `guard chain`; result: `disagree`.
 
 ```asm
@@ -241,6 +251,7 @@ bx lr
 ```
 
 ### Spot check 9: `0x02081498`
+
 Current label: `loop`; derived label: `softfloat/CLZ`; result: `disagree`.
 
 ```asm
@@ -263,6 +274,7 @@ ldmia sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
 ```
 
 ### Spot check 10: `0x020b30e4`
+
 Current label: `loop`; derived label: `softfloat/CLZ`; result: `disagree`.
 
 ```asm
