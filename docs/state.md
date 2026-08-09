@@ -16,7 +16,7 @@ EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), pl
 **+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
 57,076 → 72,440).
 
-<!-- main-sha: 0f35a188f -->
+<!-- main-sha: 48f8a3948 -->
 <!-- parked-prs: 1020 -->
 
 **Round 0808c (partial round — 3 of 4 lanes reviewed while the CC Decomper
