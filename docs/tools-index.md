@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**129 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**130 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (57)
+- [Uncategorised](#uncategorised) (58)
 
 ## Analysis / worklist
 
@@ -778,6 +778,12 @@ pick from its disassembly (brief 264, stretch goal).
 ### `tools/touch_stamp.py`
 
 **Touch a Ninja stamp output after a side-effecting rule succeeds.**
+
+### `tools/validate_attempts.py`
+
+**Validate the append-only attempts ledger before it feeds a sweep.**
+
+Failure mode: ``attempts.tsv`` is consumed as machine data, but previously only selected writer paths and ad-hoc tests checked it.  A malformed row could therefore hide a candidate, misstate its size, or move a wall label between columns…
 
 ### `tools/verify.py`
 

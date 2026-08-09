@@ -54,3 +54,11 @@ def test_shape_migration_and_conflict_are_distinguished() -> None:
     assert len(move.shape_migrations) == 1
     conflict = _audit(_row(shape="P-20-example", park_class="reg-alloc"))
     assert len(conflict.shape_conflicts) == 1
+
+
+def test_committed_ledger_has_no_hard_validation_errors() -> None:
+    report = validate_attempts.audit_file(
+        Path(__file__).resolve().parents[1]
+        / "docs/research/campaign-analytics/attempts.tsv"
+    )
+    assert report.error_count == 0
