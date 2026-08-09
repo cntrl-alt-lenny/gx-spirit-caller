@@ -671,6 +671,10 @@ The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter o
 
 mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 
+### `tools/main_shape_reclassify.py`
+
+**Mechanically reclassify the main small-tier worklist from .s bodies.**
+
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**

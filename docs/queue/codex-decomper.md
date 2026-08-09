@@ -280,7 +280,7 @@ And the rules genuinely DIVERGE where the item told you to converge: the sibling
 > accurate one. `_member_patterns` now returns "unanchored real/hex names and an
 > anchored decimal alias", which is the specified remedy.
 
-### q-main-shape-reclassify — the worklist's shape labels are wrong often enough to mis-target sweeps [TODO]
+### q-main-shape-reclassify — the worklist's shape labels are wrong often enough to mis-target sweeps [DONE]
 
 `cm-main-tier-sweep-2` (#1478) found that several `docs/research/campaign-analytics/main-small-tier-worklist.md` rows labelled `guard chain` conceal non-guard-chain bodies — softfloat conversions among them. That matters more than it sounds:
 
