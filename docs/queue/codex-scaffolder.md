@@ -535,3 +535,17 @@ The remaining gap: the `score` integer was never adjusted, so the sort is anchor
 Then one design question the verification raised, worth answering in the same PR: the 4 keys `main` excluded that the branch does not (`main/0x02010354`, `0x02021b38`, `0x02023478`, `0x0209085c`) are all genuinely `not-attempted` — but their `park_class` values are `complexity`, `permanent-header`, `C-23-C-36` and `C-31` (interwork-veneer), i.e. **diagnosed walls**. Under the denylist they are now dispatchable. A diagnosed wall should arguably stay excluded regardless of `result`. Decide it deliberately — either teach the filter about `park_class`, or record why a diagnosed-but-never-attempted candidate SHOULD be re-offered — and say which you chose and why. An explicit "these should be re-offered because X" is a fine answer; silently leaving it is not.
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the contradiction assertion over the full ledger + the live-ledger canary + a before/after exclusion-set count with the `park_class` decision stated.
+
+### q-ledger-hygiene-sweep — generalise the contradiction audit, fix the shape/park_class misuse [TODO]
+
+`#1479` closed the ledger repair arc cleanly. This is the last sweep over `attempts.tsv`, then the lane moves on.
+
+1. **Generalise the contradiction audit.** The check you added (`result == not-attempted` AND a measured `match_pct`) found exactly one row. Sweep the whole ledger for the other contradictions of the same family and report every hit: a `shipped` row with `match_pct` below 100; a `parked` row with `match_pct` exactly 100; a `park_class` naming a `C-NN` lever while `result` is `shipped`; a `module` value `wall_aware_headroom._source_module` would never produce for a real path; a `text_size` disagreeing with `delinks.txt` ground truth. Per family: how many rows, real errors or legitimate, and fix the real ones. Add each as a test so the class cannot silently return.
+
+2. **The `shape` column is being misused.** `cm-main-tier-sweep-1` wrote wall descriptors (`P-20-bf94-result-register`, `predication-resistance-new`) into `shape` instead of `park_class`; sweep-2 fixed its own rows but wave-1's were never corrected. Move every non-shape value to `park_class` where that cell is empty, and list individually any row where both are populated and disagree — those need judgement, not an automatic move.
+
+3. **Then decide, explicitly:** is the `attempts.tsv` schema worth enforcing mechanically? Several checks now live only as tests. A `--validate` mode on `park_one.py`, or a small checker wired into CI, would catch a bad row at write time rather than a round later. Tooling budget applies — argue it either way, but argue it.
+
+CANARY: run the full contradiction sweep BEFORE fixing anything and paste the raw per-family counts. That baseline is the deliverable; some families may legitimately be zero.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + per-family contradiction counts before/after + the shape/park_class migration count with conflicts listed individually + the stated decision on mechanical validation.
