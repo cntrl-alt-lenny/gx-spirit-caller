@@ -8295,7 +8295,7 @@ matching the original.
 > THIS function rather than trusting a remembered pattern from a
 > previous one.
 
-## Permanent P-wall index (34 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
+## Permanent P-wall index (36 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -11531,6 +11531,245 @@ loop body, the harder 8-word half, matched 100%).
 confirmation before treating as established.
 
 **Provenance:** cm-main-tier-sweep-3 (2026-08-08), batch 2.
+
+### C-83. Cross-call pointer-CSE defeat via integer round-trip — the mirror image of C-73
+
+**The trap.** mwcc sometimes promotes a repeated `base + offset`
+pointer computation into a callee-saved register so it survives an
+intervening call, even when the target recomputes the same address
+fresh at BOTH occurrences (no persistent register). C-73 already
+covers forcing a fresh MEMORY reload via `volatile`; this is the
+companion case for forcing a fresh REGISTER computation with no load
+involved at all.
+
+**The fix.** Write the second (or later) occurrence of the identical
+pointer expression through an integer round-trip —
+`(void *)((unsigned int)base + offset)` — instead of the plain
+`(char *)base + offset` form used at the first occurrence, even
+though both are semantically identical C. The type-based detour
+defeats mwcc's CSE and forces a fresh `add` at that site.
+
+**Affected picks:** `func_02041f04` (main, 204B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 1.
+
+### C-84. A named stack buffer's declared size must exclude mwcc's own outgoing-vararg argument-build area
+
+**The trap.** For a variadic call (e.g. `OS_SNPrintf`) whose
+stack-passed arguments are values already sitting in a locally
+declared buffer, if that buffer's declared size covers the same
+stack region mwcc wants to use as its OWN outgoing-argument build
+area, the compiler reserves BOTH separately — the buffer keeps its
+full declared size, plus an additional word-aligned args area is
+added on top. This inflates the whole frame and shifts every
+buffer-relative offset used downstream.
+
+**The fix.** Size the named buffer to exclude the vararg-argument
+bytes specifically (here: `char buf[0x40]` → `char buf[0x2c]`, with
+downstream sub-pointers recomputed at the new, smaller offsets), and
+pass the shift/format expressions as call arguments DIRECTLY rather
+than pre-storing them into the buffer first. This is a distinct
+mechanism from C-74 (which is about sizing an address-taken local to
+the CALLEE's full reserved span) — here the local buffer competes
+with the CALLER's own vararg spill area, not a callee's frame.
+
+**Effect:** `func_0205337c` went from 30.2% to 100% in one step once
+the buffer was resized and the pre-store removed.
+
+**Affected picks:** `func_0205337c` (main, 144B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 4.
+
+### C-85. Taking the address of a function's own 2nd/3rd parameter for a specific two-out-param helper call forces a full 4-register incoming-argument spill block
+
+**Not newly discovered — surfacing existing project knowledge into
+this catalog for the first time.** A background research pass
+during this round found the mechanism is already described in
+`docs/research/rnd-swarm-2026-07-24-r11-postwall.md` and already
+shipped once, uncredited, in `src/main/func_020622c8.legacy.c` — but
+had never been added to this catalog under its own entry.
+
+**The shape.** When a function calls a specific helper in the shape
+`helper(&paramB, &paramC)` — passing the addresses of its OWN 2nd
+and 3rd incoming `int` parameters as two output-parameter pointers —
+mwcc emits `stmdb sp!, {r0,r1,r2,r3}` (spilling ALL FOUR incoming
+argument registers to their stack homes) as the very FIRST
+instruction, BEFORE the normal `{r4,r5,lr}` callee-saved push. This
+can look identical to a genuine variadic-forwarding wrapper's
+all-4-regs-spill shape (already flagged as a false-friend pattern
+elsewhere in this catalog) — the disambiguator is what happens
+NEXT: a true variadic wrapper forwards the spilled block wholesale;
+this shape instead reuses two of the SAME spilled slots as
+`helper`'s own out-parameters, verifiable by computing the exact
+stack offsets (with `sub sp,#N` locals below `{r4,r5,lr}` below the
+`{r0-r3}` spill block, the out-param offsets land INSIDE the r1/r2
+homes).
+
+**The fix.** Recognize the shape from the stack math, not just the
+spill instruction; write the call as `helper(&paramB, &paramC)`
+directly rather than inventing fresh local variables to receive the
+output.
+
+**Affected picks:** `func_0206238c` (main, 172B, shipped 100%);
+`func_020622c8` (main, previously shipped under the same pattern,
+uncredited).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 2.
+
+### C-86. A hand-written zero-trip guard placed immediately before a `for` loop over the same bound duplicates the loop's own auto-generated check
+
+**The trap.** Writing `if (bound <= 0) return; for (i = 0; i <
+bound; i++) { ... }` — an explicit leading guard PLUS the for-loop's
+own implicit zero-trip test over the identical bound — causes mwcc
+to emit the SAME predicated zero-trip-count check TWICE (once for
+each redundant test) rather than recognizing the redundancy and
+collapsing them, costing extra words and shifting all downstream
+register allocation.
+
+**The fix.** Remove the explicit guard and trust the for-loop's own
+synthesized zero-trip check — never add a hand-written guard in
+front of a for-loop that already implies the identical test.
+
+**Affected picks:** `func_02079a08` (main, 188B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 1.
+
+### C-87. Dense fall-through case labels can force `switch` lowering into a real jump table instead of a compare-chain
+
+**The trap.** A sparse `switch` (few, non-adjacent case values) can
+compile to a linear compare-chain instead of the target's jump
+table, even when the target clearly uses `addls pc, pc, rN, lsl #2`
+dispatch.
+
+**The fix.** Add redundant fall-through case labels for values the
+target's own table ALSO routes to `default` (`case 2: case 3: case
+4: default: ...`), densifying the visible case-value range enough
+that mwcc's own heuristic switches from compare-chain to table
+lowering — even though the added cases are logically redundant with
+`default` and change nothing about program behavior.
+
+**Effect:** `func_0207a7d4` went from 8.1% to 100%.
+
+**Affected picks:** `func_0207a7d4` (main, 148B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 3.
+
+### C-88. A loop with multiple break-conditions needs ONE combined `while` condition, not separate `for(;;)`-with-internal-breaks, to get mwcc's jump-to-test-first rotation
+
+**The trap.** `for (;;) { if (c1) break; if (c2) break; ...; body();
+}` — testing each break condition as its own separate `if`-break
+inside an infinite loop — does NOT get mwcc's usual "rotate the loop
+so the test comes first, jump into the middle for the first
+iteration" transform, even when the target clearly has that shape.
+
+**The fix.** Combine every break-condition into ONE compound `while`
+condition instead — `while (!c1 && !c2 && ...) { body(); }` — and
+ONLY that form reliably gets the rotation.
+
+**Affected picks:** `func_02070bac` (main, 148B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 2.
+
+> **C-65 extension, positive (cm-main-tier-sweep-4, 2026-08-09, batch
+> 3).** `func_02044384`: an array-indexed struct-field WRITE
+> (`blocks[i].v = val`, with the struct sized to match the real
+> stride) avoided strength-reduction on the store side, matching
+> declaration-order dependence rather than resisting all source
+> forms — contrast with the negative sub-case immediately below,
+> confirming the store-side behavior is shape-dependent, not
+> uniformly resistant as C-65's original text implies.
+
+> **C-65 extension, negative — new sub-shape (cm-main-tier-sweep-4,
+> 2026-08-09, batch 3).** `func_02077ecc`: a CALL-ARGUMENT pointer
+> (`base + accumulator`, passed directly as an argument, not used as
+> a memory-store address) strength-reduces into a persistent register
+> regardless of while/for/array-index phrasing — 3 forms tried,
+> byte-identical wrong output every time. Extends C-65's documented
+> scope from memory addressing specifically to argument-pointer
+> computation generally.
+
+> **C-73 extension (cm-main-tier-sweep-4, 2026-08-09, batch 3).** A
+> global counter's own increment must re-read the global fresh even
+> when a local variable already holds an equal cached copy from
+> moments earlier — write `g = g + 1;`, not `g = cached + 1;`, even
+> though `cached == g` is guaranteed at that point.
+> (`func_02073040`.) A second instance shows the freshness
+> requirement can be PER-ARGUMENT-POSITION within one call's argument
+> list: one position re-reads a global fresh while sibling positions
+> in the SAME call reuse an already-cached copy of the same value
+> (`func_020468ec`).
+
+> **C-56 caveat (cm-main-tier-sweep-4, 2026-08-09, batch 1).**
+> Declaration-order reordering reliably resolves small (2-3-variable)
+> register rotations but is not a dependable tool once more variables
+> compete for the same register-file region: a 5-variable rotation
+> (`func_02077db0`) resisted 4 different declaration-order
+> permutations, none of them an improvement over the default order.
+
+### P-46. Repeated pure-address computation gets cached into an extra callee-saved register, where the target recomputes it fresh at every use — no load involved
+
+**The shape.** A repeated address expression (a local stack buffer's
+address, or `pointer + constant`) referenced across 3-4 call sites
+gets promoted by mwcc into a dedicated extra callee-saved register
+(forcing e.g. `r8` where the target only needs `r4-r7`), while the
+target recomputes the same cheap `add rN, base, #imm` fresh at every
+call site with zero persistent register. Distinct from P-30
+(register-CHOICE only, value already computed once) and C-73 (a
+MEMORY read, not a pure address computation) — this is specifically
+about caching an ADDRESS with no load anywhere in the picture.
+
+**Falsifiable claim:** *some source restructuring forces a fresh
+recomputation at each site instead of caching.* **Falsified across 2
+independent instances, 5 combined attempts:** separate named
+variables per site, a single consolidated/reused variable,
+block-scoping the expression narrowly, pulling nested calls out of
+argument lists — all byte-identical wrong output (extra register
+cached) regardless.
+
+**Affected picks:** `func_02041ca8` (main, 256B, parked, 0.0%),
+`func_0204f820` (main, 208B, parked, 21.8%).
+
+**Recipe status: NONE.**
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 5.
+
+### P-47. `ip`/`lr` used as extra scratch registers beyond r0-r3 during a no-call computation window (tentative, single instance)
+
+**The shape.** A 4-field byte-swap-and-repack sequence with no calls
+anywhere in its body: the target uses `ip` and `lr` as ADDITIONAL
+scratch registers beyond the normal r0-r3 argument/scratch set,
+keeping only one value live in a genuine callee-saved register.
+Every source restructuring tried still needed a 5th callee-saved
+register instead of reaching for the free `ip`/`lr` scratch space
+the target exploits.
+
+**Affected picks:** `func_020726e0` (main, 252B, parked, 0.0%).
+
+**Recipe status: NONE.** Needs independent confirmation before
+treating as established.
+
+**Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 5.
+
+> **P-36 sub-shape additions, both tentative single instances
+> (cm-main-tier-sweep-4, 2026-08-09, batch 3).** A boolean
+> materialized via `moveq`/`movne` can have its instruction ORDER
+> resist every source rephrasing tried (`func_020488f4`, 96.2%, 5
+> tries). A captured-and-tested return value's canonicalization
+> between `cmp`-then-test and a direct `movs`-with-flags form can
+> similarly resist 3 rephrasings (`func_020770bc`, 98.4%). Neither
+> matches an existing named sub-shape cleanly; flagged as candidates
+> for future confirmation rather than force-numbered as their own
+> P-entries.
+
+> **Loop-rotation and store-scheduling notes (cm-main-tier-sweep-4,
+> 2026-08-09, batch 2).** Two independent pool-constant loads inside
+> one function got freely reordered by mwcc's scheduler, but the
+> STORES built from them stayed pinned to source statement order —
+> reordering only the store statements (not fighting the load
+> scheduling directly) fixed the diff (`func_02045828`). This is a
+> useful general tactic for P-36-shaped residuals: if a load's
+> scheduling looks immovable, check whether the DOWNSTREAM store can
+> still be reordered independently before parking.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 
