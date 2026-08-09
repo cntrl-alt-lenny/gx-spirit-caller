@@ -1109,7 +1109,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > a match gap). See
 > [`cm-main-tier-sweep-3-2026-08-08.md`](../research/cm-main-tier-sweep-3-2026-08-08.md).
 
-### cm-main-tier-sweep-4 — shape is not the lever; find one that is [TODO]
+### cm-main-tier-sweep-4 — shape is not the lever; find one that is [CLAIMED]
 
 `cm-main-tier-sweep-3` (#1483) shipped 57/100 (5,112 B across 58 functions including the canary, one basis throughout) and delivered the measurement it existed for: **11% of the dispatched pool's worklist shape labels were mechanically wrong** (11/100; 17/975 across the wider set), and — the bigger finding — **per-shape yield did NOT carry over from sweep-2**. Guard chain's 64% and Pool B's 54% did not reproduce. Shape category is not a stable predictor of ship rate.
 
