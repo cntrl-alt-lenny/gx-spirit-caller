@@ -928,3 +928,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020488f4	main	208	legacy_sp3	guard chain	parked	96.2	P-36-cand-cmp-moveq-movne-order	cm-main-tier-sweep-4-batch3
 0x02077ecc	main	192	legacy	other	parked	4.0	C-65-store-strength-reduction-confirmed	cm-main-tier-sweep-4-batch3
 0x020770bc	main	256	legacy	small dispatcher	parked	98.4	P-36-cmp-vs-movs-canonicalization	cm-main-tier-sweep-4-batch3
+0x02044528	main	232	legacy_sp3	loop	parked	96.5	P-30-scratch-register-choice	cm-main-tier-sweep-4-batch4
+0x0204bb5c	main	240	legacy_sp3	small dispatcher	parked	50.0	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
+0x020720b4	main	144	legacy	guard chain	parked	47.2	P-30-parameter-register-rotation	cm-main-tier-sweep-4-batch4
+0x0206f48c	main	112	legacy	other	parked	9.7	pool-constant-caching-resistance	cm-main-tier-sweep-4-batch4
+0x020418ac	main	204	legacy_sp3	guard chain	parked	15.4	P-36-address-hoist-across-branch	cm-main-tier-sweep-4-batch4
+0x02077c08	main	256	legacy	loop	parked	59.4	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
