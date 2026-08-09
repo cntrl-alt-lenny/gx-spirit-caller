@@ -1427,3 +1427,21 @@ CANARY: the first carve of part 2 goes through the FULL gate (3-region SHA1) bef
 Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order — doubly so here, since declaration order IS the mechanism.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the declined-11 closeout. Regenerate `docs/research/README.md` LAST.
+
+### cm-restock-carve-6 — work the new size-ordering wall, then keep draining the main pool [TODO]
+
+`cm-restock-carve-5` (#1487) closed the declined 11 with evidence, swept ov011, and — the part worth building on — **found a new mwcc size-ordering wall** while establishing that the composable pool was not fully exhausted. Two threads:
+
+1. **Characterise the size-ordering wall properly.** #1487 found it; it is not yet a taxonomy entry with criteria a future wave can cite. Write it up to the `C-NN` / `P-NN` standard: what shapes trigger it, how it presents in the diff, whether any source-level or TU-composition form avoids it, and how many of the remaining census candidates it blocks. If it is permanent, give it a `P-NN` and say what evidence makes it permanent rather than merely unbeaten — the taxonomy has been wrong in that direction before (brief 640 found 0 of 5 sampled wall citations matched their entry's criteria).
+
+2. **Finish the composable pool, then keep draining.** #1487 established the pool was not exhausted — carve whatever composable candidates remain under the verified recipe (adjacent misaligned symbols, same type, address order, one TU, span 4-aligned at BOTH ends, `n = 2` proven only). Then continue the main restock pool: largest remaining 4-aligned module group, header cross-reference first, script every initializer from the real bytes, per-symbol reconciliation table built AS YOU GO with every Size cell checked against `delinks.txt`.
+
+⚠️ `n > 2` remains unproven across three waves now. If a group needs 3+ symbols, inspect the compiled `.o` symbol table for declaration reordering before trusting it.
+
+⚠️ Run `npx markdownlint-cli2 --fix` on any doc you write before committing — MD022/MD031/MD018 have blocked four PRs in two days, including two of the brain's own.
+
+CANARY: the first carve goes through the FULL gate (3-region SHA1) before any batching.
+
+Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the size-ordering wall write-up with its criteria. Regenerate `docs/research/README.md` LAST.

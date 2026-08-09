@@ -549,3 +549,15 @@ Then one design question the verification raised, worth answering in the same PR
 CANARY: run the full contradiction sweep BEFORE fixing anything and paste the raw per-family counts. That baseline is the deliverable; some families may legitimately be zero.
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + per-family contradiction counts before/after + the shape/park_class migration count with conflicts listed individually + the stated decision on mechanical validation.
+
+### q-ledger-validate-adopt — wire the validator into the loop that writes the ledger [TODO]
+
+`q-ledger-hygiene-sweep` (#1485) built `tools/validate_attempts.py`, argued the case for mechanical enforcement, and fixed four real `text_size` errors. The checker exists but nothing runs it automatically, so the next bad row still lands and is found a round later — the exact latency the item set out to remove.
+
+Close that: run it where rows are actually written and where they are actually reviewed. `park_one.py` writes rows; the CI doc/tool job reviews them. Wire it into both — a write-time check that refuses (or loudly warns on) a row failing validation, and a CI invocation so a hand-edited or backfilled row cannot merge dirty. Keep the exit semantics honest: a hard contradiction should fail, a legitimate-but-unusual row (the 31 `shipped` rows retaining a `C-NN` `park_class`, which you correctly classified as legitimate) must not.
+
+Then run it once across the full merged ledger post-#1485 and report the residual: how many rows fail, in which families, and whether each is a real error or a rule that needs loosening.
+
+Effort: **MEDIUM**. Tooling budget: consolidates a manual check into the loop that produces the data.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a bad row is refused at write time + a test proving the 31 legitimate rows still pass + the full-ledger residual table.

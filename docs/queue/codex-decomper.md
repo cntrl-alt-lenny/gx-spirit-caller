@@ -299,3 +299,22 @@ Ship the corrected labels as a NEW column alongside the existing one rather than
 Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-targeted sweep batches) and directly improves the selector every C-match round uses.
 
 **Gate:** doc+tool — `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the confusion matrix + the overall disagreement rate + a 10-row spot check where you show the `.s` body next to both labels, so the derivation is auditable rather than asserted.
+
+### q-shape-rate-reconcile — the bulk classifier and the sweep sample disagree 5x [TODO]
+
+`q-main-shape-reclassify` (#1486) reports **29/1,247 = 2.33%** disagreement among rows with live `.s` bodies. `cm-main-tier-sweep-3` (#1483), sampling independently at pull time, measured **11/100 = 11%** in its dispatched pool. Both were mechanical, both are internally consistent, and they differ by roughly 5x. One of them does not describe the population it appears to describe, and the campaign has been steering on shape for three waves — so it is worth an hour to know which.
+
+Reconcile it. Candidate explanations to test rather than assume:
+
+- **Population**: sweep-3 dispatched only from the 0x02040000+ range and only from candidates surviving its own filters. Is disagreement concentrated in that range or in that filtered subset? Compute your rate restricted to sweep-3's exact 100 addresses and compare directly against its per-candidate record — that is the apples-to-apples number and it settles most of this on its own.
+- **Rule divergence**: your classifier and sweep-3's pull-time derivation are two implementations. Where they disagree on the same address, which is right? Read the `.s` and say.
+- **The 393 missing-body rows**: those are rows whose `.s` has since been converted. Confirm they are excluded from both denominators rather than silently inflating one.
+
+Deliverable: the same-population comparison, a per-address disagreement list for sweep-3's 100, and a plain statement of which rate describes what. If the honest answer is "both are right about different populations", say that and give the two scopes precisely — that is a useful result, not a non-answer.
+
+⚠️ Run `npx markdownlint-cli2 --fix` on any doc you write before committing. #1486 needed 13 auto-fixes (MD022/MD031) and the brain applied them for you; that is a required check and it blocks the merge.
+
+Effort: **MEDIUM**.
+
+**Gate:** doc-only — `python -m pytest -q tests` green (paste the real pytest tail) + the same-population comparison table + the per-address list + the scope statement.
+
