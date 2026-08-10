@@ -1445,3 +1445,27 @@ CANARY: the first carve goes through the FULL gate (3-region SHA1) before any ba
 Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` structural proof per carve; transitive-callee tracing; const/static matching each symbol's OWN original; `delinks.txt` ground truth before choosing sections; verify the built layout directly rather than assuming declaration order.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the size-ordering wall write-up with its criteria. Regenerate `docs/research/README.md` LAST.
+
+### cm-restock-carve-7 — close P-50's evidence boundary, then keep draining [TODO]
+
+`cm-restock-carve-6` (#1493) is merged. The carve half was the strongest in the series — every one of the 144 shipped bytes independently confirmed against the real ROM image and `relocs.txt`, and the misaligned-struct arc closure reconciles when derived from scratch (186 struct rows → exactly 35 misaligned → 26 delinks-claimed + 9 declined + 0 in limbo).
+
+The taxonomy half needed three corrections at merge review, all now applied — **read the corrected entry before citing it**:
+
+- your wall was renumbered **P-48 → P-50**: `cm-main-tier-sweep-5` had independently claimed P-48 for a register-pressure wall and `main` already ran to P-49. Check the highest existing `P-`/`C-` number on `origin/main` before assigning one;
+- it is now marked **OBSERVED-NOT-CONFIRMED**, because every scratch compile and both real candidates ran at the **default SP only** while this document's bar for a `P` verdict is an N-variant × SP sweep — the same bar that demoted P-10 to C-29;
+- its census impact was corrected from 2 to **4**, because this same wave declined four candidates citing it.
+
+**PART 1 — CLOSE THE EVIDENCE BOUNDARY. This is the round's point and it is cheap.** The two legacy tiers are selected by FILENAME (`tools/configure.py`, `is_legacy_c()` / `is_legacy_sp3_c()`) and apply to a data TU with zero extra machinery. Run the two-differently-sized-globals scratch test at **`.legacy.c` (mwcc 1.2/sp2p3)** and **`.legacy_sp3.c` (mwcc 1.2/sp3)**. If either preserves declaration order, P-50 becomes a `C-NN` with a routing-tier recipe and unlocks up to 4 declined candidates. If neither does, P-50 earns its `P` and you can delete the OBSERVED-NOT-CONFIRMED block with evidence.
+
+Also test the one-compile repair Leg 3 asserted instead of checking: rewrite `func_ov011_021caafc`'s reference to `data_ov011_021d305f` as the merged symbol `+ 43` — the final ROM word is the same absolute address either way, so the only open question is whether dsd's symbol/reloc check accepts the renamed target. If it does, the merge-to-one-symbol leg is not structural.
+
+**Either outcome is a full success.** A clean negative at both tiers is what upgrades P-50 from "unbeaten" to "permanent" with evidence, which is worth more than another few carves.
+
+**PART 2 — keep draining.** Continue the restock pool: largest remaining 4-aligned module group, header cross-reference first, script every initializer from the real bytes, per-symbol reconciliation table built AS YOU GO with every Size cell checked against `delinks.txt`.
+
+⚠️ Run `npx markdownlint-cli2 --fix` on any doc before committing.
+
+CANARY: the first carve of Part 2 goes through the FULL gate (3-region SHA1) before any batching.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the P-50 tier-test result stated either way. Regenerate `docs/research/README.md` LAST.

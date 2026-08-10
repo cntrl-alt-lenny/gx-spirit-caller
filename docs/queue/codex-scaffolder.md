@@ -561,3 +561,20 @@ Then run it once across the full merged ledger post-#1485 and report the residua
 Effort: **MEDIUM**. Tooling budget: consolidates a manual check into the loop that produces the data.
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a bad row is refused at write time + a test proving the 31 legitimate rows still pass + the full-ledger residual table.
+
+### q-validator-brittleness — the 31-row guard will red-fail the next legitimate ship [TODO]
+
+`q-ledger-validate-adopt` (#1491) is adopted correctly: the write-time check runs strictly BEFORE the `.s` restore, `_flip_delinks` and `unlink()` (verified by execution, not just by reading), and the CI step lands inside `drift-check`, which is genuinely one of the three required contexts in the `main-protection` ruleset. That is real adoption, not a tool sitting unused.
+
+One high-value fix, plus two smaller ones:
+
+1. **The false-positive guard is itself brittle.** `tests/test_validate_attempts.py` asserts `len(report.shipped_with_c_lever) == 31` against a **live, append-only, growing** ledger. The moment any future round ships a function carrying a `C-NN` `park_class`, that test goes red on a **legitimate** row — which is exactly the "validator gets disabled within two rounds" pressure the item existed to prevent. Replace the equality with a property assertion: every `shipped_with_c_lever` row is `result=shipped` with `match_pct=100` and a well-formed `C-NN` class, and `error_count == 0`. Assert the *shape* of the exemption, not its cardinality. If you want a count for visibility, print it rather than assert it.
+
+2. **Say in the PR body which check is required.** #1491 wired the validator into `drift-check` without stating that `drift-check` is a required context. That is the single most important fact about the adoption — a reader cannot tell from the PR whether a dirty row can merge. State it.
+
+3. **Re-run the residual against current `origin/main`.** The ledger has grown since #1491's snapshot (sweep-5 added its parks). Re-run `validate_attempts.py` over the current file, report the row count and any new failures, and confirm the count matches `origin/main`'s `attempts.tsv` rather than an earlier copy.
+
+Effort: **LOW-MEDIUM**. Tooling budget: prevents a required check from going red on correct data, which is how checks get switched off.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a NEW legitimate `C-NN` shipped row does not fail the guard (construct one; it must pass) + the re-run residual with the row count matching `origin/main`.
+
