@@ -942,3 +942,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
 0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
 0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
+0x02067208	main	140	legacy_sp3	loop-per-iter-offset-register-count	parked	13.5	reg-alloc	cm-main-tier-sweep-5-batch4
+0x0206eb4c	main	156	legacy	dual-byteswap-pipeline-interleave	parked	28.2	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x0207b18c	main	164	legacy	canary-lever-residual-shared-base	parked	65.8	P-30-whole-function-register-rotation	cm-main-tier-sweep-5-batch4
+0x02080670	main	184	legacy_sp3	nested-loop-2d-buffer-fill-scheduling	parked	44.9	instruction-selection	cm-main-tier-sweep-5-batch4
+0x02089f60	main	160	legacy_sp3	freed-r0-reuse-register-choice	parked	95.0	register-choice	cm-main-tier-sweep-5-batch4
+0x0209240c	main	180	legacy	cross-branch-reread-vs-cached-local-regpressure	parked	24.4	reg-alloc	cm-main-tier-sweep-5-batch4
+0x02092748	main	112	legacy	irq-save-vs-global-addr-load-interleave	parked	13.8	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x02095418	main	108	legacy	loop-invariant-const-register-hoist-resistance	parked	0.0	pool-const-materialize	cm-main-tier-sweep-5-batch4
+0x02097258	main	124	legacy	double-boolify-phrasing-insensitive-residual	parked	25.8	reg-alloc	cm-main-tier-sweep-5-batch4
