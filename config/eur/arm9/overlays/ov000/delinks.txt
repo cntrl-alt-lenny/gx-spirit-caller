@@ -859,13 +859,41 @@ src/overlay000/data_ov000_021b561c.c:
     complete
     .rodata start:0x021b561c end:0x021b5628
 
+src/overlay000/data_ov000_021b562c.c:
+    complete
+    .rodata start:0x021b562c end:0x021b5638
+
 src/overlay000/data_ov000_021b5638.c:
     complete
     .rodata start:0x021b5638 end:0x021b5644
 
+src/overlay000/data_ov000_021b5644.c:
+    complete
+    .rodata start:0x021b5644 end:0x021b5650
+
 src/overlay000/data_ov000_021b5650.c:
     complete
     .rodata start:0x021b5650 end:0x021b565c
+
+src/overlay000/data_ov000_021b565c.c:
+    complete
+    .rodata start:0x021b565c end:0x021b566c
+
+src/overlay000/data_ov000_021b566c.c:
+    complete
+    .rodata start:0x021b566c end:0x021b567c
+
+src/overlay000/data_ov000_021b567c.c:
+    complete
+    .rodata start:0x021b567c end:0x021b568c
+
+src/overlay000/data_ov000_021b568c.c:
+    complete
+    .rodata start:0x021b568c end:0x021b569c
+
+src/overlay000/data_ov000_021b569c.c:
+    complete
+    .rodata start:0x021b569c end:0x021b56b4
 
 src/overlay000/data_ov000_021b56b4.c:
     complete

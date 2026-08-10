@@ -1428,7 +1428,7 @@ Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` struc
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the declined-11 closeout. Regenerate `docs/research/README.md` LAST.
 
-### cm-restock-carve-6 — work the new size-ordering wall, then keep draining the main pool [TODO]
+### cm-restock-carve-6 — work the new size-ordering wall, then keep draining the main pool [DONE]
 
 `cm-restock-carve-5` (#1487) closed the declined 11 with evidence, swept ov011, and — the part worth building on — **found a new mwcc size-ordering wall** while establishing that the composable pool was not fully exhausted. Two threads:
 

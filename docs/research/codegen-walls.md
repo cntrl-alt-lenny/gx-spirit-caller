@@ -11771,6 +11771,132 @@ treating as established.
 > scheduling looks immovable, check whether the DOWNSTREAM store can
 > still be reordered independently before parking.
 
+### P-48. Composed-TU declaration order collapses to ascending byte size whenever two top-level data globals differ in size — a data-layout wall, not a codegen one (permanent, evidence chain below)
+
+> **Different domain from every other entry in this document.** P-1
+> through P-47 and C-1 through C-88 are all about FUNCTION codegen —
+> register allocation, instruction scheduling, branch/predicate form.
+> This entry is about **top-level DATA OBJECT ordering** inside one
+> translation unit — the mechanism the `cm-restock-carve` series (data
+> section carving via TU composition, see
+> [`alignment-wall-tu-composition-recipe.md`](alignment-wall-tu-composition-recipe.md))
+> depends on. Filed here anyway, under the shared `P-NN` number space,
+> because that's where this project's wall registry lives and where a
+> future wave will grep for it — not because it shares C-1..C-88's
+> mechanism.
+
+**The shape.** Two `const` (or non-`const`) top-level global
+declarations in one `.c` file, composed into a single `ALIGNALL(2)`-
+avoiding TU (per the proven recipe: separate named globals, in address
+order, combined span 4-aligned at both ends). When the two globals
+have the SAME byte size, mwcc preserves source declaration order
+(confirmed extensively across `cm-restock-carve-3`/`4`/`5`, dozens of
+instances). When the two globals have DIFFERING byte size, mwcc places
+the SMALLER one first in the compiled `.o`'s section — regardless of
+which order the `.c` source declares them in. If the real address-
+ascending pair does not also have ascending size (i.e. the
+lower-address symbol is the LARGER one), the compiled layout is
+backward: correct total section size, wrong per-symbol content, a
+SILENT SHA1 mismatch at gate time rather than a compile error.
+
+**How it presents in the diff.** Nothing at compile time — the `.o`
+compiles cleanly either way. Only a direct ELF section/symbol-offset
+inspection of the standalone-compiled `.o` (`readelf`-style: section
+size, then each symbol's in-section `st_value`) shows the wrong
+ordering. A full link + `ninja sha1` would also catch it (wrong bytes
+propagate into the final ROM), but *only* if the composed TU actually
+gets linked into the build — inspecting the `.o` before linking is
+strictly faster and pinpoints the cause directly, per this project's
+standing "verify the built layout directly" rule.
+
+**Falsifiable claim tested:** *some source-level construct (declaration
+order, type wrapping, field packing) controls which of two
+differently-sized top-level globals lands first.* **Falsified on 6
+independent isolated scratch compiles** (`cm-restock-carve-5`/`6`,
+2026-08-09): struct-then-scalar, scalar-then-struct (same pair, both
+orders — output identical regardless), two-differently-sized-structs,
+two-scalars-ascending, two-scalars-descending. Declaration order never
+changed the outcome; only relative size did.
+
+**Falsified again on 2 real in-project candidates**
+(`cm-restock-carve-5`): `data_ov011_021d3034`(43B)+
+`data_ov011_021d305f`(1B) and `data_ov011_021d323c`(126B)+
+`data_ov011_021d32ba`(30B) — both address-ascending/size-descending
+pairs, both compiled with the smaller symbol first, both confirmed via
+direct `.o` inspection with the REAL byte content (not synthetic
+test data).
+
+**The one plausible alternative fix, tested and falsified with a hard
+error, not just a soft one** (`cm-restock-carve-6`): merge the pair
+into ONE top-level symbol (name the combined struct after the
+lower-address member; the higher-address member's bytes become an
+unlabeled trailing field, no separate global declared for it at all).
+Since there's only one top-level declaration, mwcc has nothing left to
+reorder — the byte layout comes out correct. **But this does not
+survive linking**: `data_ov011_021d305f` (the member that would lose
+its own symbol) is referenced BY NAME from `func_ov011_021caafc.c`
+(`extern char data_ov011_021d305f[];`, already shipped and matched) —
+removing its symbol produces a hard `mwldarm` link failure
+(`Undefined : "data_ov011_021d305f", Referenced from
+"func_ov011_021caafc"`), not a soft `dsd check symbols` warning. This
+is not a coincidence specific to one candidate: the same absorption
+that makes a symbol a genuine composable-recipe target (a real,
+independently-referenced placeholder, per the recipe's own "not an
+artificial pairing" requirement) is exactly what makes it unmergeable
+— any real census candidate reached by this pattern is, by
+construction, referenced by name from somewhere else in the tree.
+
+**Why PERMANENT, not merely unbeaten** (the brief-640 standard: 0 of 5
+sampled prior wall citations matched their entry's own criteria — this
+entry names its criteria explicitly so a future wave can check them
+directly, not just cite the label):
+
+1. The trigger is precisely mechanical and reproducible: two top-level
+   globals, differing size, address order disagreeing with size
+   order. Six isolated scratch tests spanning four independent shape
+   axes (scalar-vs-struct, struct-vs-struct, scalar-vs-scalar
+   ascending, scalar-vs-scalar descending) all reproduce it with zero
+   exceptions.
+2. Two real in-project candidates, evidenced independently to this
+   project's full byte-extraction/consumer standard, reproduce it a
+   third and fourth time with real (not synthetic) content.
+3. The one genuine alternative mechanism (eliminate the ordering
+   question by eliminating one of the two symbols) was tested, not
+   assumed — and fails for a structural reason (real external
+   references to the eliminated name) that generalizes to any
+   candidate this recipe would ever target, not just the one tested.
+4. No declaration-order, type-wrapping, or field-packing variant
+   affected the outcome in any of the 6 scratch tests — the sort key is
+   size, full stop, and nothing at the C source level reaches it.
+
+**Recipe status: NONE.** Composing two differently-sized top-level
+globals is only safe when the real address-ascending sequence of
+member *sizes* is already non-decreasing (a property of the census
+data, not something source form can change). When it isn't, the pair
+is permanently blocked from this TU-composition recipe — not a
+research gap, a structural wall. A future wave should not re-attempt
+declaration-order or type-shape variations on a same-shaped candidate
+without new evidence (e.g. a genuinely different mwcc flag/pragma
+neither this entry nor `cm-restock-carve-5`/`6` tried).
+
+**Census impact:** 2 of the 35 misaligned-struct-arc candidates
+(`data_ov011_021d3034`, `data_ov011_021d32ba`) are blocked by this
+wall specifically (both declined in `cm-restock-carve-5`/`6`). A third,
+`data_ov006_021ce38a`-family (the `kv_t` group, declined in
+`cm-restock-carve-4`), is blocked by the RELATED but DISTINCT n>2
+declaration-reordering wall (same general "mwcc doesn't preserve
+top-level declaration order" family, different specific trigger —
+symbol count there, symbol size here; see
+`alignment-wall-tu-composition-recipe.md`'s own standing rule, which
+covers both).
+
+**Affected picks (2):** `data_ov011_021d3034` (43B, `ov011`),
+`data_ov011_021d32ba` (30B, `ov011`).
+
+**Provenance:** `cm-restock-carve-5` (2026-08-09, discovery, PR #1487),
+`cm-restock-carve-6` (2026-08-09, formal characterization + the
+merge-to-one-symbol falsification).
+
 ## Open questions (not levers, not walls — genuinely unresolved)
 
 ### OQ-1. Dead-branch preservation: a provably-dead compile-time-constant guard survives in the target but gets folded away by the same toolchain under every C reproduction tried
