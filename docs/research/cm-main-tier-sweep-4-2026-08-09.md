@@ -116,6 +116,53 @@ legacy_sp3 tier) was 88.2% on a supporting sample of 34. Predicted
 and this campaign's own repeated lesson that one round's rate does
 not always reproduce on fresh data.
 
+> **Correction and addition (brain, 2026-08-09, at merge review).** The
+> prior was stated up front and the outcome landed at its floor — that
+> is a well-calibrated prediction and the round deserves credit for it.
+> But "rates do not always reproduce" is generic hedging, and a
+> **specific, data-supported explanation sits in this round's own
+> numbers**: the dispatch pool ran at a mean 177 B against the
+> retrospective's 82 B — 2.2× the size of its own training data, into a
+> band where the "size is noise" conclusion had almost no support (only
+> N=8 historical records have both ≥128 B and 4+ calls).
+>
+> Fitting a calls+size logistic on the 303 historical records and
+> scoring this round's actual pool out-of-sample predicts **72.8%**
+> against 75% observed; a calls-ONLY model predicts 84.9%. The outcome
+> is much better explained by the model that includes size as a
+> negative term.
+>
+> **Within this round, size is strongly predictive and callee count is
+> flat** — the breakdown this doc does not report:
+>
+> | Size band | Ship rate | N |  | Callee bucket | Ship rate | N |
+> |---|---|---|---|---|---|---|
+> | 64–127 B | 87% | 15 |  | 4 calls | 76% | 38 |
+> | 128–191 B | 86% | 42 |  | 5–6 calls | 76% | 34 |
+> | 192–255 B | 65% | 37 |  | 7+ calls | 71% | 28 |
+> | 256 B | 33% | 6 |  | | | |
+>
+> So this round generated real evidence that **text size becomes a live
+> predictor above ~192 B** once callee count is held high — which is the
+> next lever, and is why `cm-main-tier-sweep-5` is designed as a
+> matched-pair experiment rather than another single-variable pull.
+>
+> The confound check passed cleanly, and that is the round's strongest
+> result: callee count correlates with size (r=0.555), but size has
+> essentially zero *marginal* correlation with ship rate (r=0.007), and
+> controlling for size makes the callee coefficient **grow**
+> (0.315 → 0.428) while size turns negative. Permutation p=0.0004,
+> Cochran-Armitage z=4.64. Callee count is a suppressor-attenuated
+> effect, not a size proxy — and the pool was not skewed toward smaller,
+> simpler functions, so the 75% is not a selection artifact.
+>
+> **One claim to retire, though:** the PR title says "callee count *is
+> the lever*". In this project's vocabulary a lever (C-NN) is a
+> mechanism an agent *applies* to a function — and you cannot give a
+> function more callees. Callee count is a **selector**, and this round
+> tested association only, never mechanism. The accurate framing is
+> "callee count is the best selector found; shape is not."
+
 ### Result: 75/100 shipped
 
 | Batch | Shipped/20 | Legacy | Legacy_sp3 | Tier-label agreement |
@@ -145,14 +192,34 @@ a reproducible rate) — but reached through a mechanistically
 grounded, falsifiable predictor rather than a favorable starting
 population.
 
-### Byte total
+### Byte total — 12,752 B
 
-Summed directly from each batch's own shipped-file list (ground
-truth, not estimated): batch1 through batch5 shipped 17+16+16+14+12
-= 75 functions. Exact byte sum verified in the Gate section below
-against `wall_aware_headroom.py`'s before/after delta and
-`docs/state-table.md`'s regenerated total, cross-checked three ways
-on one stated basis throughout.
+> **Correction (brain, 2026-08-09, at merge review).** This section
+> originally verified FUNCTION COUNTS and called them a byte total, and
+> forward-referenced an "exact byte sum" in a Gate section that does not
+> exist. `wall_aware_headroom.py` prints `total.s` / `perm` / `coerc` as
+> **file counts**, so `2031 → 1956 = 75` restates the function invariant
+> the three-way check already proves — it is not a byte verification.
+> This is the tracked *read-the-metric's-own-source* failure recurring.
+> The correction makes the round look better, not worse.
+
+Summed directly from each batch's own shipped-file list (ground truth,
+not estimated): batch1 through batch5 shipped 17+16+16+14+12 = **75
+functions**, one basis throughout, no canary this round.
+
+**The round shipped 12,752 B.** Recomputed independently from
+`config/eur/arm9/delinks.txt`'s `.text start:`/`end:` ranges for the 75
+flipped entries, and triple-corroborated against `docs/state-table.md`'s
+own regenerated diff:
+
+- natural-C 356,082 → 368,834 = **+12,752**
+- shipped `.text` 360,358 → 373,110 = **+12,752**
+- remaining `.text` 2,012,302 → 1,999,550 = **−12,752**
+- asm-C 4,276 → 4,276 = **0** (all 75 files are natural C, zero asm)
+
+That is **2.5× sweep-3's 5,112 B and 1.9× sweep-1's 6,720 B** — by bytes,
+the largest sweep round of the campaign, and the figure was missing from
+both this doc and the PR body.
 
 ## Process notes
 
