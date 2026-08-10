@@ -300,7 +300,7 @@ Effort: **MEDIUM**. Tooling budget: catches a demonstrated failure class (mis-ta
 
 **Gate:** doc+tool — `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + the confusion matrix + the overall disagreement rate + a 10-row spot check where you show the `.s` body next to both labels, so the derivation is auditable rather than asserted.
 
-### q-shape-rate-reconcile — the bulk classifier and the sweep sample disagree 5x [TODO]
+### q-shape-rate-reconcile — the bulk classifier and the sweep sample disagree 5x [DONE]
 
 `q-main-shape-reclassify` (#1486) reports **29/1,247 = 2.33%** disagreement among rows with live `.s` bodies. `cm-main-tier-sweep-3` (#1483), sampling independently at pull time, measured **11/100 = 11%** in its dispatched pool. Both were mechanical, both are internally consistent, and they differ by roughly 5x. One of them does not describe the population it appears to describe, and the campaign has been steering on shape for three waves — so it is worth an hour to know which.
 
