@@ -1109,7 +1109,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > a match gap). See
 > [`cm-main-tier-sweep-3-2026-08-08.md`](../research/cm-main-tier-sweep-3-2026-08-08.md).
 
-### cm-main-tier-sweep-4 — shape is not the lever; find one that is [TODO]
+### cm-main-tier-sweep-4 — shape is not the lever; find one that is [DONE]
 
 `cm-main-tier-sweep-3` (#1483) shipped 57/100 (5,112 B across 58 functions including the canary, one basis throughout) and delivered the measurement it existed for: **11% of the dispatched pool's worklist shape labels were mechanically wrong** (11/100; 17/975 across the wider set), and — the bigger finding — **per-shape yield did NOT carry over from sweep-2**. Guard chain's 64% and Pool B's 54% did not reproduce. Shape category is not a stable predictor of ship rate.
 
@@ -1127,3 +1127,27 @@ Same mechanics as before: 100 candidates, 0x02040000+ range, 5 worktrees x 20, p
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis for the headline. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the retrospective's predictor table, your stated prior, and the outcome against it.
+
+> **75/100 shipped — callee count beat shape by a wide margin, and
+> the prediction landed exactly at the bottom of the stated range.**
+> Retrospective on 302 combined sweep-1/2/3 records found shape weak
+> (14-point spread even pooled across 3 sweeps) but callee count
+> monotonic and robust: 0 calls 46% → 1 call 58% → 2-3 calls 71% →
+> 4+ calls 83%, holding up even within a single mwcc tier. A
+> methodology trap was caught mid-analysis: the ledger's own `tier`
+> column looked dramatic (27.6% default vs ~90% legacy/legacy_sp3)
+> but turned out only 24.6% self-consistent on PARKED rows (vs 95.4%
+> on shipped — you can't ship under the wrong compiler, so only
+> shipped rows' recorded tier is trustworthy). Recomputed with a
+> uniform mechanical classifier applied to all 302 original `.s`
+> files: a real but far more modest tier effect (legacy_sp3 74.7%,
+> legacy 67.0%, leaf-with-no-calls-at-all 44.0% — leaf turned out to
+> be a strict subset of the 0-callee-count population, not an
+> independent signal). Dispatched 100 candidates on the validated
+> predictor alone — 4+ calls, 50/50 legacy/legacy_sp3, ≤256B to stay
+> in scope — with a stated prior of 75-85% before drafting anything.
+> Landed at 75/100 (76% legacy, 74% legacy_sp3), and all 100
+> pre-computed tier labels were independently re-verified correct by
+> the batches (0 disagreements). 6 new C-levers, 2 new P-walls, and
+> several extensions to existing entries. See
+> [`cm-main-tier-sweep-4-2026-08-09.md`](../research/cm-main-tier-sweep-4-2026-08-09.md).

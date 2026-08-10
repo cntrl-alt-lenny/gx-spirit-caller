@@ -917,3 +917,28 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02090574	main	52	default	other	parked	0.0	new-imm-offset-truncation-fold	cm-main-tier-sweep-3-batch5
 0x020a3ed8	main	112	default	small dispatcher	parked	46.4	P-36-adjacent-const-materialization	cm-main-tier-sweep-3-batch5
 0x020ace14	main	116	default	small dispatcher	parked	63.3	P-31-inverted-partial-predication	cm-main-tier-sweep-3-batch5
+0x020740c4	main	96	legacy	guard-chain	parked	87.5	register-choice	cm-main-tier-sweep-4-batch1
+0x02076b74	main	216	legacy	other	parked	87.0	register-choice	cm-main-tier-sweep-4-batch1
+0x02077db0	main	168	legacy	loop	parked	59.5	register-choice	cm-main-tier-sweep-4-batch1
+0x020416f8	main	240	legacy_sp3	other	parked	91.7	P-36-sub5-call-adjacent-pool-schedule	cm-main-tier-sweep-4-batch2
+0x02043ca4	main	152	legacy_sp3	loop	parked	89.5	P-20-r8-vs-r9-const-vs-masked-swap	cm-main-tier-sweep-4-batch2
+0x02051f98	main	256	legacy_sp3	guard chain	parked	92.2	P-20-r1-vs-r2-and-r2-vs-r3-double-swap	cm-main-tier-sweep-4-batch2
+0x02076d14	main	200	legacy	guard chain	parked	30.0	P-36-sub9-addr-vs-load-hoist-cascade	cm-main-tier-sweep-4-batch2
+0x020417e8	main	196	legacy_sp3	guard chain	parked	3.9	P-30-adjacent-reg-pressure	cm-main-tier-sweep-4-batch3
+0x020488f4	main	208	legacy_sp3	guard chain	parked	96.2	P-36-cand-cmp-moveq-movne-order	cm-main-tier-sweep-4-batch3
+0x02077ecc	main	192	legacy	other	parked	4.0	C-65-store-strength-reduction-confirmed	cm-main-tier-sweep-4-batch3
+0x020770bc	main	256	legacy	small dispatcher	parked	98.4	P-36-cmp-vs-movs-canonicalization	cm-main-tier-sweep-4-batch3
+0x02044528	main	232	legacy_sp3	loop	parked	96.5	P-30-scratch-register-choice	cm-main-tier-sweep-4-batch4
+0x0204bb5c	main	240	legacy_sp3	small dispatcher	parked	50.0	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
+0x020720b4	main	144	legacy	guard chain	parked	47.2	P-30-parameter-register-rotation	cm-main-tier-sweep-4-batch4
+0x0206f48c	main	112	legacy	other	parked	9.7	pool-constant-caching-resistance	cm-main-tier-sweep-4-batch4
+0x020418ac	main	204	legacy_sp3	guard chain	parked	15.4	P-36-address-hoist-across-branch	cm-main-tier-sweep-4-batch4
+0x02077c08	main	256	legacy	loop	parked	59.4	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
+0x02041ca8	main	256	legacy_sp3	other	parked	0.0	new-repeated-addr-cse-vs-target-recompute	cm-main-tier-sweep-4-batch5
+0x02044758	main	128	legacy_sp3	loop	parked	17.6	P-36-adjacent-strength-reduction-plus-param-register-order	cm-main-tier-sweep-4-batch5
+0x0204f820	main	208	legacy_sp3	other	parked	21.8	new-repeated-addr-cse-vs-target-recompute	cm-main-tier-sweep-4-batch5
+0x0205396c	main	248	legacy_sp3	other	parked	95.2	P-36-tail-fallthrough-register-shift	cm-main-tier-sweep-4-batch5
+0x0205442c	main	156	legacy_sp3	small dispatcher	parked	61.5	P-36-eq-neg1-materialize-order	cm-main-tier-sweep-4-batch5
+0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
+0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
+0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
