@@ -1152,7 +1152,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > several extensions to existing entries. See
 > [`cm-main-tier-sweep-4-2026-08-09.md`](../research/cm-main-tier-sweep-4-2026-08-09.md).
 
-### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [TODO]
+### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [CLAIMED]
 
 `cm-main-tier-sweep-4` (#1489) is the campaign's best round on both counts: **75/100 shipped, 12,752 B** — 2.5x sweep-3 and 1.9x sweep-1 by bytes, all 75 natural C with zero asm — and the strongest analysis. It stated a prior (75-85%) before dispatching and landed at its floor, which is a well-calibrated prediction.
 
