@@ -29,6 +29,7 @@ import sys
 from pathlib import Path
 
 from batch_sha1 import ROOT, _c_to_s_rel, _flip_delinks, _is_already_applied
+from validate_attempts import audit_event
 from wall_aware_headroom import _source_module
 
 _ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
@@ -123,6 +124,12 @@ def _record_attempt(
         addr, module, text_size, tier, shape, result,
         match_pct, park_class, brief,
     )
+    report = audit_event(dict(zip(_ATTEMPTS_HEADER, row, strict=True)), root=ROOT)
+    if report.error_count:
+        raise ValueError(
+            "attempt row failed validation: "
+            f"{report.error_count} hard error(s)"
+        )
     with ledger.open("a", newline="", encoding="utf-8") as stream:
         csv.writer(stream, delimiter="\t", lineterminator="\n").writerow(row)
     print(f"recorded {addr} in {_ATTEMPTS_REL}")
@@ -175,6 +182,28 @@ def park_one(
         print(f"ERROR: attempts ledger preflight failed: {exc}", file=sys.stderr)
         return 1
 
+    addr, module = _ledger_identity(c_rel)
+    text_size = _text_size(delinks_path, c_rel)
+    event = {
+        "addr": addr,
+        "module": module,
+        "text_size": text_size,
+        "tier": tier,
+        "shape": shape,
+        "result": "parked",
+        "match_pct": match_pct,
+        "park_class": park_class,
+        "brief": brief,
+    }
+    report = audit_event(event, root=ROOT)
+    if report.error_count:
+        print(
+            "ERROR: attempts row failed validation before source mutation: "
+            f"{report.error_count} hard error(s)",
+            file=sys.stderr,
+        )
+        return 1
+
     s_path = ROOT / s_rel
     if not s_path.is_file():
         result = subprocess.run(
@@ -194,7 +223,6 @@ def park_one(
     else:
         print(f"{s_rel} already present on disk, left untouched")
 
-    text_size = _text_size(delinks_path, c_rel)
     if not _flip_delinks(delinks_path, c_rel, s_rel):
         print(f"ERROR: could not find header line '{c_rel}:' in {delinks_path}", file=sys.stderr)
         return 1
