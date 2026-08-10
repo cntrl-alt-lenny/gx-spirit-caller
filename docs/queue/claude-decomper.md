@@ -1208,3 +1208,27 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > P-walls, 3 new P-36 sub-shapes (2 now confirmed at 2 instances
 > each), extensions to C-45 and C-73. See
 > [`cm-main-tier-sweep-5-2026-08-09.md`](../research/cm-main-tier-sweep-5-2026-08-09.md).
+
+### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [TODO]
+
+`cm-main-tier-sweep-5` (#1494) settled the question five waves had confounded. The brain independently reproduced every number: the arms are genuinely matched (size 159.4 B vs 155.7 B with the LOW arm nominally *harder*, Mann-Whitney p=0.46; tiers exactly 14 legacy + 11 legacy_sp3 in each), the 36-point gap survives size stratification at **36.5 points standardized**, and Fisher exact gives p=0.021. **Callee count is a real, independent selector on `main`.**
+
+The open question now is whether it is a property of the compiler or a property of `main`. Everything measured so far — sweeps 1-5, ~500 attempts — is one module. If the selector transfers, it retargets the whole campaign; if it does not, it is a `main` artifact and the ov002 pool needs its own rule.
+
+**THE ROUND: replicate the matched-pair design on `ov002`.** Same construction, different module: one narrow size band, 25 candidates at 0-1 callees and 25 at 4+, tier-matched as closely as the pool allows. State a prior — the `main` result predicts a gap of roughly this size; say what you expect on ov002 and why. Then dispatch 50 more on your best selector for yield.
+
+Use `--exclude-attempted` for the pull (the ledger's exclusion semantics are fixed, the diagnosed-wall `park_class` guard has landed, and #1491 now validates rows at write time) and cross-check against the ov002 sweep park docs — that pool has ~700 prior attempts, far more prior art than `main` had.
+
+⚠️ **If ov002's arms cannot be tier-matched, say so and report the imbalance rather than proceeding as if matched.** The `main` experiment's credibility rests entirely on its arms being comparable; an unmatched replication is worth less than an honest "the pool would not support a matched design here".
+
+Two reporting corrections carried from sweep-5, both small:
+
+- **State the natural-C vs asm split.** Sweep-5 shipped 1 hand-written `asm` file of 65 (144 B, the `clz` case) and never gave a count, while sweep-4's headline said "all natural C" — a reader comparing rounds will assume the same. Give the split every round.
+- **Name the mechanism probe's confound if you run one again.** Sweep-5's park_class gradient is nearly collinear with *which sweep wrote the label* (the 4+ bucket is 78% sweep-4 rows, the 0-1 bucket 88% sweeps 2-3), and reg-alloc share varies 34.9-52% by sweep with callee count held out entirely. The informative within-round n for 4+ calls is still **seven**. The hedge was correctly placed; the confound was not named.
+
+Same mechanics: 5 worktrees x 20, pool FROZEN before dispatch, one worktree = one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every attempt via `park_one.py` and verify rows were written, wait for each batch's completion notification before touching its worktree. Levers C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-93 and P-30..P-50 — park P-36 scheduling-only diffs on sight.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis, WITH the byte total and the natural-C/asm split. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the two arm rates against your prior, and the arms' size/tier distributions so the match can be audited.
+

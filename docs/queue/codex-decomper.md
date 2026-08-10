@@ -318,3 +318,17 @@ Effort: **MEDIUM**.
 
 **Gate:** doc-only — `python -m pytest -q tests` green (paste the real pytest tail) + the same-population comparison table + the per-address list + the scope statement.
 
+
+### q-shape-classifier-bicne — `branch_kind()` counts predicated data-processing ops as branches [TODO]
+
+`q-shape-rate-reconcile` (#1492) settled the 2.33%-vs-11% question cleanly and its population test reproduces to the address. While verifying it, a **live bug in `tools/main_shape_reclassify.py`** surfaced that the reconcile itself missed.
+
+`branch_kind()` ends with a catch-all along the lines of `if base.startswith("b") and base not in {"bic","bics"}: return "conditional"`. The exclusion list covers the bare mnemonics but **not their predicated forms** — so `bicne` (a data-processing op) is counted as a conditional *branch*. At `0x0209e628` that tips the body from three real conditional exits (`bxne lr`, `bxeq lr`, `bxne lr`) to four, crossing the small-dispatcher threshold and deriving `small dispatcher` where the true shape is `guard chain`. Sweep-3's pull-time tool got this one right; the bulk classifier did not.
+
+Fix the predicate handling properly rather than extending the literal exclusion list: strip a trailing condition code before classifying, and decide on the *base* mnemonic. `bic`/`bics`/`bicne`/`biceq`/… must all classify as data-processing; only real branch mnemonics (`b`, `bl`, `bx`, `blx`, plus their predicated forms) are branches. Then re-run the bulk classification and report how many of the 1,640 rows change — the brain's measurement says the blast radius is small (2 rows, 0.17 pt on the bulk rate), so confirm or correct that.
+
+**Also amend #1492's reconcile doc**, which is now slightly wrong on the record: it states sweep-3 "did not persist a per-candidate derived-shape field for its 57 shipped rows" and uses that to explain why only one implementation-vs-implementation disagreement was adjudicated. Sweep-3's five batch commit messages DO name their disagreements, which is how `0x0209e628` was found. Correct the claim and adjudicate the second address.
+
+Effort: **LOW-MEDIUM**. Tooling budget: catches a demonstrated misclassification in a tool three waves have used as a reference.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning `bicne` (and at least one other predicated data-processing op) as NOT a branch + the before/after row-change count over the 1,640 + the corrected paragraph in the reconcile doc.
