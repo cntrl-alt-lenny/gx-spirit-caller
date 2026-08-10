@@ -318,14 +318,17 @@ ov011 11+8+1=20; ov016 12; ov009 9; ov017 8; ov014 8; ov000 7+0+9+2=18; the
 remainder spread thinly (1-6 each) across ov001/ov003/ov005/ov007/ov008/ov010/
 ov012/ov013/ov015/ov018/ov019/ov020/ov021/ov022/ov023.
 
-## Disposition: the misaligned-struct arc's declined set (as of cm-restock-carve-5, 2026-08-09)
+## Disposition: the misaligned-struct arc's declined set (as of cm-restock-carve-6, 2026-08-09)
 
 Of the `shape=struct` section's 35 candidates that failed the standard
 4-aligned carve (waves 1-2's method) due to `ALIGNALL(2)` misalignment,
-25 have since shipped via TU composition or backward/forward absorption
-(`cm-restock-carve-3`/`4`/`5`, PRs #1476/#1481/pending) and **10 are now
-PERMANENTLY DECLINED, tested and evidenced — do not re-carve any of
-these without genuinely new evidence or a new recipe mechanism**:
+26 have since shipped via TU composition or backward/forward absorption
+(`cm-restock-carve-3`/`4`/`5`/`6`, PRs #1476/#1481/#1487/pending) and
+**9 are now PERMANENTLY DECLINED, tested and evidenced — do not re-carve
+any of these without genuinely new evidence or a new recipe mechanism.
+The arc is CLOSED: every one of the original 35 candidates now has
+either a shipped carve or an evidenced permanent decline; none remain
+open or untested.**
 
 | Symbol | Module | Size | Reason declined |
 |---|---|---:|---|
@@ -333,19 +336,29 @@ these without genuinely new evidence or a new recipe mechanism**:
 | `data_ov006_021ce3ae` | ov006 | 40 | Same bundle, same finding. |
 | `data_ov006_021ce3d6` | ov006 | 40 | Same bundle, same finding. |
 | `data_ov006_021ce3fe` | ov006 | 40 | Same bundle, same finding. |
-| `data_ov011_021d3034` | ov011 | 43 | Real backward/forward-absorption partner exists (`data_ov011_021d305f`, 1B), but the pair's real address order (43B then 1B) is size-*descending* — mwcc sorts differently-sized top-level globals by ascending size regardless of declaration order, so the compiled layout comes out backward no matter how the `.c` file is written. `cm-restock-carve-5`. |
-| `data_ov011_021d32ba` | ov011 | 30 | Same wall, independently reconfirmed: absorption partner `data_ov011_021d323c` (126B) is address-ascending/size-descending (126B then 30B). Unusually thorough investigation (125/126 + 20/30 bytes proven via `capstone` disassembly of a permanent hand-encoded `.s` wall, plus an exhaustive byte-level self-consistency check) — the evidence is real, only the composition mechanism is blocked. `cm-restock-carve-5`. |
-| `data_ov004_021de7e5` | ov004 | 20 | Member of a contiguous `%4==1`-aligned symbol run; the same alignment-residue family `docs/research/ov004-odd-aligned-slot-recipe.md` (brief 173) already tested on a larger sibling (`data_ov004_021ded69`) — all 3 source-level variants failed, including a bundle/absorption attempt that hit dsd's own containment check. Not independently re-tested this wave (analogy by family/module, not a repeat test), but the documented wall applies. |
-| `data_ov000_021b55de` | — | — | **RESOLVED, not declined** — see `cm-restock-carve-5`: backward absorption with `data_ov000_021b55dc` (2B, ascending size order) shipped cleanly. Left here only to show it started in wave 4's original 11. |
-| `data_ov011_021d2fc9` | — | — | **RESOLVED, not declined** — see `cm-restock-carve-5`: forward absorption with `data_ov011_021d2fc8` (1B, ascending size order) shipped cleanly. |
-| `data_ov011_021d3583` | ov011 | 8 | **OPEN, not tested.** Real consumer confirmed (`relocs.txt:144`). Only viable absorption fix found is a 3-symbol bundle with `data_ov011_021d33bc` (455B, itself a census `array`-shape candidate, uninvestigated) — sizes 455/8/9 are non-monotonic in address order, likely subject to the same size-ordering wall, but not compiled/confirmed. A future wave should test this directly rather than assume either outcome. |
-| `data_ov011_021d358b` | ov011 | 9 | Same open lead as `021d3583` (same bundle, same partner). |
+| `data_ov011_021d3034` | ov011 | 43 | Real backward/forward-absorption partner exists (`data_ov011_021d305f`, 1B), but the pair's real address order (43B then 1B) is size-*descending* — mwcc sorts differently-sized top-level globals by ascending size regardless of declaration order, so the compiled layout comes out backward no matter how the `.c` file is written. Formally taxonomized as [`codegen-walls.md` P-50](../codegen-walls.md#p-48-composed-tu-declaration-order-collapses-to-ascending-byte-size-whenever-two-top-level-data-globals-differ-in-size--a-data-layout-wall-not-a-codegen-one-permanent-evidence-chain-below), PERMANENT. `cm-restock-carve-5`/`6`. |
+| `data_ov011_021d32ba` | ov011 | 30 | Same wall (P-50), independently reconfirmed: absorption partner `data_ov011_021d323c` (126B) is address-ascending/size-descending (126B then 30B). Unusually thorough investigation (125/126 + 20/30 bytes proven via `capstone` disassembly of a permanent hand-encoded `.s` wall, plus an exhaustive byte-level self-consistency check) — the evidence is real, only the composition mechanism is blocked. `cm-restock-carve-5`. |
+| `data_ov004_021de7e5` | ov004 | 20 | Member of a contiguous `%4==1`-aligned symbol run; the same alignment-residue family `docs/research/ov004-odd-aligned-slot-recipe.md` (brief 173) already tested on a larger sibling (`data_ov004_021ded69`) — all 3 source-level variants failed, including a bundle/absorption attempt that hit dsd's own containment check. Not independently re-tested (analogy by family/module, not a repeat test), but the documented wall applies. |
+| `data_ov011_021d3583` | ov011 | 8 | **CLOSED this wave (`cm-restock-carve-6`).** Only viable absorption fix is the 3-symbol bundle with `data_ov011_021d33bc` (455B) + `data_ov011_021d358b` (9B) — address-ascending sizes 455/8/9, non-monotonic. Compiled standalone and inspected directly: landed as `[8, 9, 455]` in-section order, exactly the P-50 ascending-size sort, confirming the prediction empirically rather than assuming it. No interior 4-aligned split point exists (both `0x021d3583`/`0x021d358b` are `%4==3`), so wave 4's usual n>2 fix (split into n=2 sub-TUs) is unavailable — irreducible. `data_ov011_021d33bc` itself got a full investigation despite the outcome (per "a well-evidenced negative is a full success"): a real, previously-uncataloged `0x72`-stride row-table structural lead was found and documented for a future patcher-level or full-table-reconciliation attempt, though only 4 of its 455 bytes have direct per-field consumer proof. |
+| `data_ov011_021d358b` | ov011 | 9 | Same bundle, same finding — see `021d3583`. |
 
-**Net: 7 confirmed/evidenced permanent declines (`021ce38a`/`_3ae`/
-`_3d6`/`_3fe`, `021d3034`, `021d32ba`, `021de7e5`), 1 open untested lead
-covering 2 symbols (`021d3583`/`_358b`), 2 resolved as shipped after all
-(`021b55de`, `021d2fc9`) — 7 + 2 + 2 = 11, reconciling exactly against
-wave 4's original declined count.** See
-`docs/research/alignment-wall-tu-composition-recipe.md` for the general
-mwcc-behavior findings (n>2 reordering; n=2 differing-size ordering)
-this disposition rests on.
+**Also resolved as shippable, not declined** (`cm-restock-carve-5`):
+`data_ov000_021b55de` (backward absorption with `data_ov000_021b55dc`,
+2B, ascending size order) and `data_ov011_021d2fc9` (forward absorption
+with `data_ov011_021d2fc8`, 1B, ascending size order). **And one more
+this wave** (`cm-restock-carve-6`): `data_ov011_021d3374`/`_3376`
+(2B+30B, strictly ascending, discovered via a corrected re-derivation of
+the `data_ov011_021d323c`/`_32ba` gap that found 2 real symbols the
+original census misaligned-candidate extraction had missed).
+
+**Net: 9 confirmed/evidenced permanent declines (`021ce38a`/`_3ae`/
+`_3d6`/`_3fe`, `021d3034`, `021d32ba`, `021de7e5`, `021d3583`/`_358b`),
+0 open leads, 3 resolved as shipped after all
+(`021b55de`+`021d2fc9` in wave 5; `021d3374`/`_3376` in wave 6) —
+9 + 0 + 2 = 11, reconciling exactly against wave 4's original declined
+count (the 3rd resolved pair, `021d3374`/`_3376`, was never one of the
+original 11 — it surfaced from a corrected gap re-derivation this
+wave, see `cm-restock-carve-6-2026-08-09.md`).** See
+`docs/research/alignment-wall-tu-composition-recipe.md` and
+`codegen-walls.md`'s P-50 for the general mwcc-behavior findings (n>2
+reordering; n=2 differing-size ordering) this disposition rests on.

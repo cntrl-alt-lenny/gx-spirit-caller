@@ -219,6 +219,16 @@ default; everything else (n>2 of any kind, or n=2 with differing sizes)
 must be verified per-candidate, not assumed from a prior wave's
 different candidate.**
 
+**wave 6 update: the n=2 differing-size case is now formally
+taxonomized as [`codegen-walls.md`'s P-50](codegen-walls.md#p-48-composed-tu-declaration-order-collapses-to-ascending-byte-size-whenever-two-top-level-data-globals-differ-in-size--a-data-layout-wall-not-a-codegen-one-permanent-evidence-chain-below),
+classified PERMANENT. The one plausible alternative fix — merging the
+two symbols into one so there's nothing left to reorder — was tested
+directly and fails with a hard `mwldarm` link error, because the
+absorbed symbol is referenced by name from other already-shipped code
+(a structural property of any real composable candidate, not a
+one-off). See P-50 for the full evidence chain and exact trigger
+criteria.
+
 ## See also
 
 - [`ov004-odd-aligned-slot-recipe.md`](ov004-odd-aligned-slot-recipe.md) —

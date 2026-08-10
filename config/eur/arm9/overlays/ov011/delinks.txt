@@ -1183,6 +1183,10 @@ src/overlay011/data_ov011_021d31d8.c:
     complete
     .rodata start:0x021d31d8 end:0x021d323c
 
+src/overlay011/data_ov011_021d3374.c:
+    complete
+    .rodata start:0x021d3374 end:0x021d3394
+
 src/overlay011/data_ov011_021d3394.c:
     complete
     .rodata start:0x021d3394 end:0x021d33bc
