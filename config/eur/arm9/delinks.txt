@@ -10399,7 +10399,7 @@ src/main/func_0205b7a8.s:
     complete
     .text start:0x0205b7a8 end:0x0205b9ac
 
-src/main/func_0205b9ac.s:
+src/main/func_0205b9ac.legacy_sp3.c:
     complete
     .text start:0x0205b9ac end:0x0205ba5c
 
@@ -10710,7 +10710,7 @@ src/main/func_02060f30.c:
     complete
     .text start:0x02060f30 end:0x02060f50
 
-src/main/func_02060f50.s:
+src/main/func_02060f50.legacy_sp3.c:
     complete
     .text start:0x02060f50 end:0x02060fdc
 
@@ -10809,7 +10809,7 @@ src/main/func_0206200c.c:
     complete
     .text start:0x0206200c end:0x0206205c
 
-src/main/func_0206205c.s:
+src/main/func_0206205c.legacy_sp3.c:
     complete
     .text start:0x0206205c end:0x020620d8
 
@@ -11365,7 +11365,7 @@ src/main/func_02065e78.c:
     complete
     .text start:0x02065e78 end:0x02065ee0
 
-src/main/func_02065ee0.s:
+src/main/func_02065ee0.legacy_sp3.c:
     complete
     .text start:0x02065ee0 end:0x02065f78
 
@@ -12410,7 +12410,7 @@ src/main/func_0206ceb8.s:
     complete
     .text start:0x0206ceb8 end:0x0206cf10
 
-src/main/func_0206cf10.s:
+src/main/func_0206cf10.legacy.c:
     complete
     .text start:0x0206cf10 end:0x0206cfa0
 
@@ -14848,7 +14848,7 @@ src/main/func_02084e0c.s:
     complete
     .text start:0x02084e0c end:0x02084efc
 
-src/main/func_02084efc.s:
+src/main/func_02084efc.legacy_sp3.c:
     complete
     .text start:0x02084efc end:0x02084fbc
 
@@ -15557,7 +15557,7 @@ src/main/func_02089c0c.legacy_sp3.c:
 src/main/func_02089c44.legacy_sp3.c:
     complete
     .text start:0x02089c44 end:0x02089c74
-src/main/func_02089c74.s:
+src/main/func_02089c74.legacy_sp3.c:
     complete
     .text start:0x02089c74 end:0x02089cd8
 
@@ -15668,7 +15668,7 @@ src/main/func_0208ac90.s:
 libs/nitro/func_0208ae30.legacy.c:
     complete
     .text start:0x0208ae30 end:0x0208ae34
-src/main/func_0208ae34.s:
+src/main/func_0208ae34.legacy_sp3.c:
     complete
     .text start:0x0208ae34 end:0x0208aec8
 
@@ -16180,7 +16180,7 @@ src/main/func_0208e4ec.legacy.c:
 src/main/func_0208e518.legacy.c:
     complete
     .text start:0x0208e518 end:0x0208e544
-src/main/func_0208e544.s:
+src/main/func_0208e544.legacy.c:
     complete
     .text start:0x0208e544 end:0x0208e5ec
 
@@ -16757,7 +16757,7 @@ libs/nitro/OSi_CancelThreadAlarmForSleep.legacy.c:
     complete
     .text start:0x02091b30 end:0x02091b5c
 
-src/main/func_02091b5c.s:
+src/main/func_02091b5c.legacy.c:
     complete
     .text start:0x02091b5c end:0x02091be4
 
@@ -17762,7 +17762,7 @@ src/main/func_02097074.c:
     complete
     .text start:0x02097074 end:0x020970a8
 
-src/main/func_020970a8.s:
+src/main/func_020970a8.legacy.c:
     complete
     .text start:0x020970a8 end:0x02097154
 
@@ -18239,7 +18239,7 @@ src/main/func_0209ae5c.legacy.c:
     complete
     .text start:0x0209ae5c end:0x0209ae98
 
-src/main/func_0209ae98.s:
+src/main/func_0209ae98.legacy.c:
     complete
     .text start:0x0209ae98 end:0x0209af48
 
