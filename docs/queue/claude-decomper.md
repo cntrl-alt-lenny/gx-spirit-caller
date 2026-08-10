@@ -1151,3 +1151,32 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > the batches (0 disagreements). 6 new C-levers, 2 new P-walls, and
 > several extensions to existing entries. See
 > [`cm-main-tier-sweep-4-2026-08-09.md`](../research/cm-main-tier-sweep-4-2026-08-09.md).
+
+### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [TODO]
+
+`cm-main-tier-sweep-4` (#1489) is the campaign's best round on both counts: **75/100 shipped, 12,752 B** — 2.5x sweep-3 and 1.9x sweep-1 by bytes, all 75 natural C with zero asm — and the strongest analysis. It stated a prior (75-85%) before dispatching and landed at its floor, which is a well-calibrated prediction.
+
+The brain independently re-ran the retrospective and **could not break the central claim**: callee count correlates with size (r=0.555), but size has essentially zero *marginal* correlation with ship rate (r=0.007), and controlling for size makes the callee coefficient GROW (0.315 -> 0.428) while size turns negative. Permutation p=0.0004; Cochran-Armitage z=4.64. The pool was not skewed small (177 B mean vs 82 B historical), so 75% is not a selection artifact. Callee count is real.
+
+Two things the round did not report, both now appended as corrections to its own doc, and both of which define this round:
+
+- **Size is strongly predictive within sweep-4 while callee count is flat.** By size band: 64-127 B 87% (N=15), 128-191 B 86% (N=42), 192-255 B 65% (N=37), 256 B 33% (N=6). By callee bucket: 4 calls 76% (N=38), 5-6 calls 76% (N=34), 7+ calls 71% (N=28). Once callee count is held high, **size becomes the live variable above ~192 B**.
+- **"Callee count is the lever" overstates it.** A lever (C-NN) is something an agent *applies*; you cannot give a function more callees. It is a **selector**. The round tested association, never mechanism.
+
+So this round does two things, and the experiment matters more than the ship count:
+
+**PART 1 — THE MATCHED-PAIR DISPATCH (the point of the round).** Sweeps 1-4 all confounded callee count with size because they pulled on one variable and let the other float. Break it by design: dispatch **50 candidates from a SINGLE narrow size band** — pick the band from the worklist where you have enough population, 128-192 B is the obvious candidate — split **25 at 0-1 callees** and **25 at 4+ callees**. Same band, same tier mix as far as the pool allows. Report the two sub-rates. If callee count is a genuine independent selector, the 4+ arm should beat the 0-1 arm within the band; if the arms come out level, callee count was a size proxy after all and sweep-4's result needs re-reading. **Either outcome is a full success** — this is the experiment that settles it, and the retrospective currently cannot, because only N=8 historical records have both >=128 B and 4+ calls.
+
+**PART 2 — the remaining 50, and the mechanism probe.** Dispatch 50 more on your best current selector (4+ callees, size <=192 B given the band finding) for yield. Then, cheaply, probe WHY more calls ship better, using data you already have: `attempts.tsv`'s `park_class` column over sweeps 1-4. The brain's probe over 113 sweep-1..3 parks found 4+-call parks (N=7) are near-uniformly register-allocation residuals (`reg-alloc-extra-mov`, `reg-alloc-diverge-stmia-merge`, `regalloc-cascade-unresolved`) while 0-call parks (N=36) skew to scheduling and predication (`P-36-pipeline-interleaving`, `predication-resistance-new`, `P-31`). That is consistent with the plausible mechanism — more call boundaries pin more register state via the ABI, leaving mwcc fewer degrees of freedom to diverge — but N=7 is far too small to assert. With sweep-4's 25 parks added you have a real sample. If the pattern holds, say so with counts and propose it as a numbered entry; if it dissolves, say that.
+
+STATE A PRIOR for both parts before dispatching, as you did last round — that habit is now the lane's standard.
+
+⚠️ **Report bytes, not just counts.** Sweep-4's "Byte total" section verified function counts and no byte figure appeared anywhere; the brain had to recompute it (12,752 B) at review. `wall_aware_headroom.py`'s `total.s`/`perm`/`coerc` columns are FILE COUNTS — read the tool's source before quoting it as a byte measure.
+
+⚠️ **Gate on the FINAL tree.** Sweep-4 rebased onto a main that had gained 7 real EUR ROM build inputs (ov000/ov011 data + delinks) and the gate timestamps did not fit a post-rebase run, so the brain re-ran the full 3-region gate itself to clear the merge (it passed). Either gate after the last rebase, or state plainly which commit the gate covered.
+
+Same mechanics otherwise: 0x02040000+ range, 5 worktrees x 20, pool FROZEN before dispatch, one worktree = one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every attempt via `park_one.py` and verify rows were written, wait for each batch's completion notification before touching its worktree. Levers C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-76 and P-30..P-36 — park P-36 scheduling-only diffs on sight.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis for the headline, WITH the byte total. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the two matched-pair sub-rates against your prior, and the mechanism probe's counts.
