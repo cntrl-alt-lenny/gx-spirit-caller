@@ -62,3 +62,6 @@ jobs:
 
       - name: Check research-index drift
         run: python tools/generate_research_index.py --check
+
+      - name: Validate attempts ledger
+        run: python tools/validate_attempts.py

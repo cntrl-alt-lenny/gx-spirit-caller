@@ -5,10 +5,10 @@ characterize wave 5's newly-discovered mwcc size-ordering wall to the
 project's `C-NN`/`P-NN` taxonomy standard, and finish draining both the
 composable pool and the main restock census.
 
-## Thread 1 — P-48
+## Thread 1 — P-50
 
 Wrote up wave 5's size-ordering discovery as
-[`codegen-walls.md`'s P-48](../codegen-walls.md#p-48-composed-tu-declaration-order-collapses-to-ascending-byte-size-whenever-two-top-level-data-globals-differ-in-size--a-data-layout-wall-not-a-codegen-one-permanent-evidence-chain-below),
+[`codegen-walls.md`'s P-50](../codegen-walls.md#p-48-composed-tu-declaration-order-collapses-to-ascending-byte-size-whenever-two-top-level-data-globals-differ-in-size--a-data-layout-wall-not-a-codegen-one-permanent-evidence-chain-below),
 explicitly flagged as a different domain (data layout, not function
 codegen) filed under the shared registry anyway since that's where a
 future wave will look for it. Classified **PERMANENT**, with the
@@ -34,7 +34,7 @@ sampled prior wall citations matched their entry's own criteria):
    so this isn't a one-off obstacle, it's structural to the whole
    candidate class.
 
-`alignment-wall-tu-composition-recipe.md` cross-references P-48 and
+`alignment-wall-tu-composition-recipe.md` cross-references P-50 and
 restates the combined standing rule: compile every composed TU
 standalone and inspect the `.o` before trusting it; same-size n=2 is
 the only shape safe by default.
@@ -44,7 +44,7 @@ the only shape safe by default.
 Wave 5 left one open, untested lead: `data_ov011_021d3583`/`_358b`
 (8B/9B), whose only viable absorption fix needs a 3-symbol bundle with
 the previously-uninvestigated `data_ov011_021d33bc` (455B). Address-
-ascending sizes are 455/8/9 — non-monotonic, so P-48 predicted decline.
+ascending sizes are 455/8/9 — non-monotonic, so P-50 predicted decline.
 Tested rather than assumed: `data_ov011_021d33bc` got a full
 investigation (its sole hard-evidenced field is 4 of its 455 bytes, via
 the already-shipped `func_ov011_021cefb4.c`; a real, well-corroborated
@@ -52,7 +52,7 @@ the already-shipped `func_ov011_021cefb4.c`; a real, well-corroborated
 future full-table reconciliation, but not implemented — 455÷114 isn't
 whole, so a clean record-array shape is mathematically impossible for
 this exact byte range regardless of evidence quality). The compiled
-`.o` landed as `[8, 9, 455]` in-section order — the P-48 prediction,
+`.o` landed as `[8, 9, 455]` in-section order — the P-50 prediction,
 confirmed empirically. No interior 4-aligned split point exists in this
 gap (both `021d3583`/`021d358b` are `%4==3`), so the usual n>2 fix
 (split into n=2 sub-TUs) doesn't apply either — **declined, irreducible**.
@@ -67,9 +67,9 @@ silently dropped — `data_ov011_021d32d8` (1B) and `data_ov011_021d3374`
 (2B) — splitting what looked like one 5-symbol, 341-byte gap into
 **three** genuinely separate both-ends-4-aligned cells:
 
-- Cell 1 (`021d323c`+`_32ba`, sizes 126→30): already declined, P-48.
+- Cell 1 (`021d323c`+`_32ba`, sizes 126→30): already declined, P-50.
 - Cell 2 (`021d32d8`+`_32d9`+`_334a`, sizes 1→113→42): non-monotonic
-  (113→42 descends) — blocked by the identical P-48 mechanism, and an
+  (113→42 descends) — blocked by the identical P-50 mechanism, and an
   n=3 group besides. `data_ov011_021d32d9`'s own start is never
   4-aligned, so it has no smaller anchor either. **New candidates
   investigated to full evidentiary standard regardless** (all 3 are
@@ -77,7 +77,7 @@ silently dropped — `data_ov011_021d32d8` (1B) and `data_ov011_021d3374`
   reader-count symbol in the whole gap has 8 confirmed consumers) —
   real research value even though no carve exists this wave.
 - **Cell 3 (`021d3374`+`_3376`, sizes 2→30, STRICTLY ASCENDING) — a
-  genuinely new, P-48-safe composable pair the original census
+  genuinely new, P-50-safe composable pair the original census
   extraction never surfaced.** Investigated, byte-verified, compiled
   standalone (order preserved, section size correct), and shipped.
 

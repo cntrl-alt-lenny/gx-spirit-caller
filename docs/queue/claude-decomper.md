@@ -1152,7 +1152,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > several extensions to existing entries. See
 > [`cm-main-tier-sweep-4-2026-08-09.md`](../research/cm-main-tier-sweep-4-2026-08-09.md).
 
-### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [TODO]
+### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [DONE]
 
 `cm-main-tier-sweep-4` (#1489) is the campaign's best round on both counts: **75/100 shipped, 12,752 B** — 2.5x sweep-3 and 1.9x sweep-1 by bytes, all 75 natural C with zero asm — and the strongest analysis. It stated a prior (75-85%) before dispatching and landed at its floor, which is a well-calibrated prediction.
 
@@ -1180,3 +1180,31 @@ Same mechanics otherwise: 0x02040000+ range, 5 worktrees x 20, pool FROZEN befor
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch, AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis for the headline, WITH the byte total. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the two matched-pair sub-rates against your prior, and the mechanism probe's counts.
+
+> **65/100 shipped, 9,732 B (computed correctly this time — summed
+> directly from delinks.txt spans, cross-checked against each
+> batch's own independent sum, exact match).** The matched-pair
+> experiment is decisive: within the SAME 128-192B band, tier-matched
+> exactly between arms (14 legacy + 11 legacy_sp3 each, after catching
+> and fixing a real imbalance a naive per-arm sort produced), **0-1
+> calls shipped 10/25 (40%) vs 4+ calls 19/25 (76%) — a 36-point gap
+> that EXCEEDS the stated 20-35-point prior.** Callee count is a
+> genuine independent predictor, not a size proxy — this closes the
+> question sweep-4's own retrospective could not settle (only N=8
+> historical records had both ≥128B and 4+ calls). The yield dispatch
+> (Part 2, 4+ calls ≤192B) shipped 36/50 (72%), missing its own
+> 80-88% prior — an honest self-critique in the round doc traces this
+> to the SAME kind of marginal-combination extrapolation this round's
+> Part 1 exists to catch sweep-4 making, with two batches flagging
+> (not proving) indirect-call presence and a residual size-vs-callee
+> interaction as candidate explanations. The mechanism probe (138
+> resolvable parked rows, up from the brain's preliminary N=113/N=7)
+> confirms and sharpens the proposed mechanism: reg-alloc-ish
+> park_class share rises with callee count (31.6%→46.7%→59.4%) while
+> scheduling/predication-ish share is highest at 0-1 calls (39.5%)
+> and drops sharply above that — consistent with more call boundaries
+> pinning more register state via the ABI, leaving fewer degrees of
+> freedom for scheduling divergence. 6 new C-levers, 2 new tentative
+> P-walls, 3 new P-36 sub-shapes (2 now confirmed at 2 instances
+> each), extensions to C-45 and C-73. See
+> [`cm-main-tier-sweep-5-2026-08-09.md`](../research/cm-main-tier-sweep-5-2026-08-09.md).
