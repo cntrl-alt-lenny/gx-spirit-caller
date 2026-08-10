@@ -114,7 +114,7 @@ def _ground_truth(root: Path) -> tuple[set[str], dict[tuple[str, str], int]]:
 
 
 def audit_rows(
-    rows: list[dict], *, modules: set[str], sizes: dict[tuple[str, str], int],
+    rows: list[dict], *, modules: set[str] | None, sizes: dict[tuple[str, str], int] | None,
 ) -> Audit:
     """Audit parsed rows against supplied mechanical ground truth."""
     report = Audit(row_count=len(rows))
@@ -131,7 +131,7 @@ def audit_rows(
             report.shipped_with_c_lever.append(row)
 
         module = (row.get("module") or "").strip().lower()
-        if module not in modules:
+        if modules is not None and module not in modules:
             report.invalid_modules.append(row)
 
         text_size = (row.get("text_size") or "").strip().lower()
@@ -144,7 +144,7 @@ def audit_rows(
                     {"row": row, "ground_truth": "non-numeric"}
                 )
             else:
-                expected = sizes.get(key)
+                expected = sizes.get(key) if sizes is not None else recorded
                 if expected is None:
                     report.text_size_mismatches.append(
                         {"row": row, "ground_truth": "missing"}
@@ -177,6 +177,20 @@ def audit_file(path: Path, *, root: Path = ROOT) -> Audit:
         rows = list(reader)
     modules, sizes = _ground_truth(root)
     return audit_rows(rows, modules=modules, sizes=sizes)
+
+
+def audit_event(row: dict, *, root: Path = ROOT) -> Audit:
+    """Validate one prospective append without requiring a ledger file.
+
+    Synthetic callers may not have EUR delinks data, so source-grounded
+    module/size checks are applied when the configured EUR tree exists and
+    semantic row checks still apply everywhere.
+    """
+    if (root / "config/eur/arm9").is_dir():
+        modules, sizes = _ground_truth(root)
+    else:
+        modules, sizes = None, None
+    return audit_rows([row], modules=modules, sizes=sizes)
 
 
 def _summary(report: Audit) -> dict:

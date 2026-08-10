@@ -134,13 +134,17 @@ class ParkOneLedgerTests(TestCase):
                 encoding="utf-8",
             )
             with patch.object(park_one, "ROOT", root):
-                for result, brief in (("parked", "brief-a"), ("shipped", "brief-b"), ("shipped", "brief-b")):
+                for result, match_pct, brief in (
+                    ("parked", "75.0", "brief-a"),
+                    ("shipped", "100", "brief-b"),
+                    ("shipped", "100", "brief-b"),
+                ):
                     park_one._record_attempt(
                         "src/main/func_02000010.c",
                         text_size="24",
                         tier="default",
                         shape="leaf",
-                        match_pct="75.0",
+                        match_pct=match_pct,
                         park_class="unknown",
                         brief=brief,
                         result=result,
@@ -170,6 +174,44 @@ class ParkOneLedgerTests(TestCase):
             ):
                 self.assertEqual(park_one.park_one(c_rel, "eur"), 1)
             self.assertEqual((c_path.read_bytes(), s_path.read_bytes(), delinks.read_bytes()), before)
+
+    def test_bad_attempt_row_is_refused_before_source_mutation(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            c_rel = "src/main/func_02000010.c"
+            s_rel = "src/main/func_02000010.s"
+            c_path, s_path = root / c_rel, root / s_rel
+            delinks = root / "config/eur/arm9/delinks.txt"
+            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            c_path.parent.mkdir(parents=True)
+            delinks.parent.mkdir(parents=True)
+            ledger.parent.mkdir(parents=True)
+            c_path.write_text("draft\n", encoding="utf-8")
+            s_path.write_text("original\n", encoding="utf-8")
+            delinks.write_text(
+                f"{c_rel}:\n"
+                "    complete\n"
+                "    .text start:0x02000010 end:0x02000028\n",
+                encoding="utf-8",
+            )
+            ledger.write_text(
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tbrief\n",
+                encoding="utf-8",
+            )
+            before = (c_path.read_bytes(), s_path.read_bytes(), delinks.read_bytes())
+
+            with patch.object(park_one, "ROOT", root), patch.object(
+                park_one, "_is_already_applied", return_value=delinks
+            ):
+                result = park_one.park_one(c_rel, "eur", match_pct="100")
+
+            self.assertEqual(result, 1)
+            self.assertEqual(
+                (c_path.read_bytes(), s_path.read_bytes(), delinks.read_bytes()),
+                before,
+            )
 
     def test_unwritable_ledger_path_leaves_park_tree_unchanged(self) -> None:
         import tempfile

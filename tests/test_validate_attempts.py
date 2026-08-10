@@ -62,3 +62,12 @@ def test_committed_ledger_has_no_hard_validation_errors() -> None:
         / "docs/research/campaign-analytics/attempts.tsv"
     )
     assert report.error_count == 0
+
+
+def test_committed_ledger_keeps_all_31_legitimate_c_lever_ships_green() -> None:
+    report = validate_attempts.audit_file(
+        Path(__file__).resolve().parents[1]
+        / "docs/research/campaign-analytics/attempts.tsv"
+    )
+    assert len(report.shipped_with_c_lever) == 31
+    assert report.error_count == 0

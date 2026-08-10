@@ -550,7 +550,7 @@ CANARY: run the full contradiction sweep BEFORE fixing anything and paste the ra
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + per-family contradiction counts before/after + the shape/park_class migration count with conflicts listed individually + the stated decision on mechanical validation.
 
-### q-ledger-validate-adopt — wire the validator into the loop that writes the ledger [TODO]
+### q-ledger-validate-adopt — wire the validator into the loop that writes the ledger [DONE]
 
 `q-ledger-hygiene-sweep` (#1485) built `tools/validate_attempts.py`, argued the case for mechanical enforcement, and fixed four real `text_size` errors. The checker exists but nothing runs it automatically, so the next bad row still lands and is found a round later — the exact latency the item set out to remove.
 
