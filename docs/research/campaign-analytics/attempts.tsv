@@ -942,3 +942,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
 0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
 0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
+0x020608b4	main	164	legacy_sp3	other	parked	70.7	P-36-poolhoist	cm-main-tier-sweep-5-batch1
+0x02069454	main	184	legacy	other	parked	43.5	P-36-literal-store-order	cm-main-tier-sweep-5-batch1
+0x0206a724	main	140	legacy_sp3	other	parked	8.6	P-36-load-pair-scheduling	cm-main-tier-sweep-5-batch1
+0x0206ed7c	main	156	legacy	other	parked	43.6	canary-lever-residual	cm-main-tier-sweep-5-batch1
+0x02091768	main	172	legacy	other	parked	88.4	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch1
+0x02093454	main	120	legacy	other	parked	30.3	register-choice	cm-main-tier-sweep-5-batch1
+0x02097a4c	main	164	legacy	guard chain	parked	7.3	P-36-const-hoist-across-loop	cm-main-tier-sweep-5-batch1
