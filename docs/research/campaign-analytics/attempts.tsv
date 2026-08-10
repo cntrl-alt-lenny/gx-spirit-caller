@@ -942,3 +942,8 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
 0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
 0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
+0x020544c8	main	160	legacy_sp3	guard-call-idx-cache	parked	60.0	register-choice-post-call-mov-before-const	cm-main-tier-sweep-5-batch5
+0x02062cfc	main	140	legacy_sp3	guard-then-conditional-field-copy	parked	91.4	P-36-boolean-materialization-order	cm-main-tier-sweep-5-batch5
+0x02067a94	main	192	legacy_sp3	keystream-mixer-6-param	parked	27.1	register-spill-pressure-8-live-values	cm-main-tier-sweep-5-batch5
+0x0206eccc	main	136	legacy	null-safe-byteswap-forward	parked	5.9	register-pressure-passthrough-args-vs-computed	cm-main-tier-sweep-5-batch5
+0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
