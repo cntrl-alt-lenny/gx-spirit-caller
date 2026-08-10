@@ -8295,7 +8295,7 @@ matching the original.
 > THIS function rather than trusting a remembered pattern from a
 > previous one.
 
-## Permanent P-wall index (36 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
+## Permanent P-wall index (38 live, P-17 under reconsideration; P-6/P-7/P-8/P-10 retired)
 
 mwcc keeps "winning" the codegen choice regardless of C source
 variation. Budget **zero matches** for symbols hitting these
@@ -11750,16 +11750,11 @@ treating as established.
 
 **Provenance:** cm-main-tier-sweep-4 (2026-08-09), batch 5.
 
-> **P-36 sub-shape additions, both tentative single instances
-> (cm-main-tier-sweep-4, 2026-08-09, batch 3).** A boolean
-> materialized via `moveq`/`movne` can have its instruction ORDER
-> resist every source rephrasing tried (`func_020488f4`, 96.2%, 5
-> tries). A captured-and-tested return value's canonicalization
+> **A captured-and-tested return value's canonicalization
 > between `cmp`-then-test and a direct `movs`-with-flags form can
-> similarly resist 3 rephrasings (`func_020770bc`, 98.4%). Neither
-> matches an existing named sub-shape cleanly; flagged as candidates
-> for future confirmation rather than force-numbered as their own
-> P-entries.
+> resist source rephrasing (`func_020770bc`, cm-main-tier-sweep-4
+> batch 3, 98.4%, 3 tries). No matching named sub-shape; flagged as a
+> candidate for future confirmation.
 
 > **Loop-rotation and store-scheduling notes (cm-main-tier-sweep-4,
 > 2026-08-09, batch 2).** Two independent pool-constant loads inside
@@ -11770,6 +11765,207 @@ treating as established.
 > useful general tactic for P-36-shaped residuals: if a load's
 > scheduling looks immovable, check whether the DOWNSTREAM store can
 > still be reordered independently before parking.
+
+9. **Boolean materialized via `moveq`/`movne` resists instruction-
+   order rephrasing — now confirmed, 2 independent instances.**
+   `func_020488f4` (cm-main-tier-sweep-4, batch 3, 96.2%, 5 tries) and
+   `func_02062cfc` (cm-main-tier-sweep-5, batch 5, 91.4%, 5 tries)
+   both show the same shape: a boolean result built from a
+   conditional-move pair, where the target's exact instruction order
+   (which arm of the pair comes first) resisted every source
+   rephrasing tried across both instances.
+10. **Literal register-set store-order resists scheduling.**
+    A run of `mov Rx,#literal` instructions feeding a byte-buffer
+    init gets freely reordered by the scheduler independent of source
+    statement order — only the register SET was ever correct, never
+    the emission order. (`func_02069454`, cm-main-tier-sweep-5 batch
+    1, 5 variations tried.)
+11. **Load-pair scheduling for an unaligned struct-like copy resists
+    pairing hints.** A 4-byte copy (`dst[0..3]=src[1..4]`) wants a
+    load-load-store-store pairing using 2 scratch registers in the
+    target; every source reshaping (named pointer, explicit temp
+    pairs) instead produced a simple load-store-load-store chain
+    using only 1 register. (`func_0206a724`, cm-main-tier-sweep-5
+    batch 1.)
+12. **Loop-invariant constant stays resident in a dedicated register
+    across iterations and calls — 2 independent instances.**
+    `func_02097a4c` (cm-main-tier-sweep-5, batch 1: two boolean
+    constants 0/1 stay in dedicated callee-saved registers across all
+    loop iterations and intervening calls; no literal/ternary/named-
+    constant phrasing reproduced the extra register footprint, target
+    pushes 6 regs vs. best attempt's 4) and `func_02095418`
+    (cm-main-tier-sweep-5, batch 4: a small integer constant reused as
+    a call argument across loop iterations gets pre-loaded into a
+    dedicated register in the target; mwcc consistently re-
+    materializes the immediate at each use site instead, insensitive
+    to declaration placement or `for`-vs-`do-while` shape, 3 attempts
+    byte-identical). Distinct from sub-shape 1 (pool-LOAD hoisting) —
+    this is a plain immediate constant staying resident, not a pool
+    reference.
+
+### C-89. Guard-clause polarity inversion can be the difference between predication and a real branch
+
+**The shape.** When a target predicates the LARGER of two mutually-
+exclusive return blocks and leaves the SMALLER as an unconditional
+fallthrough, a naive 1:1 transcription (writing whichever block
+"looks like" the predicated arm as the explicit guard) produces a
+real branch where the target has none.
+
+**The fix.** Write the SMALLER block as the explicit
+`if (fail) { ...; return; }` guard and let the LARGER block fall
+through unconditionally — regardless of which block felt more
+"guard-like" on a first read of the disassembly.
+
+**Affected picks:** `func_0205b9ac` (main, 176B, shipped 100%, 4 tries).
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 3.
+
+### C-90. A zero-initialized array's ELEMENT TYPE controls stmia-pair lowering vs. a byte-store loop
+
+**The trap.** `unsigned char buf[N] = {0};` compiles to a byte-store
+loop; `unsigned int buf[N/4] = {0};` (same underlying bytes, wider
+element type) compiles to unrolled `stmia` word-pair stores. Which
+one the target actually needs isn't obvious from the buffer's
+semantic size alone.
+
+**The fix.** Match the element type to whichever lowering the target
+disassembly shows (word-pair `stmia` bursts vs. a byte-at-a-time
+loop) rather than defaulting to whatever type "reads more naturally"
+for the buffer's contents.
+
+**Affected picks:** `func_02065ee0` (main, 152B, shipped 100%, 2 tries).
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 3.
+
+### C-91. An extern global passed by address needs array-decay typing, not a pointer-variable declaration
+
+**The trap.** `extern void *sym;` declares a variable that itself
+HOLDS a pointer value — using it as an argument loads that stored
+pointer. For a global whose address is what's actually wanted (the
+symbol IS the buffer, not a pointer to one), this produces a spurious
+load. `extern char sym[];` decays to the symbol's own address with no
+load at all.
+
+**The fix.** Declare a bare-address global as an array type
+(`extern char sym[]` or similarly typed), never as a pointer variable,
+when the target passes the symbol's address directly.
+
+**Affected picks:** `func_0208771c` (main, 116B, parked 93.1% — this
+fix took it from 9.4%, the residual 2 words are an unrelated P-28
+register-choice issue).
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 3.
+
+### C-92. A boolean assigned only on the true branch, relying on a pre-zeroed default, must be written as a bare `if`, not a full assignment expression
+
+**The trap.** `x = (cond);` materializes BOTH `moveq`/`movne` arms
+explicitly even when `x` was already zero-initialized and the target
+only ever needs to conditionally set it to 1.
+
+**The fix.** Write `if (cond) x = 1;` instead, relying on the
+pre-zeroed default for the false case — this emits only the single
+conditional set, matching a target that omits the redundant `movne`.
+
+**Affected picks:** `func_02072544` (main, 188B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 4.
+
+### C-93. When a structurally-correct routing tier's assembler doesn't support a needed mnemonic, ship as inline `asm` under a DIFFERENT tier instead of fighting the structural router
+
+**The situation.** `func_02080728`'s epilogue structurally reads as
+`legacy_sp3` (1-step pop, no r3-pad, `sub sp` present) — but the
+function's body needs a `clz` instruction, which the routed mwcc
+1.2/sp3 assembler doesn't recognize (`unknown assembler instruction
+mnemonic`). The structural tier classification was CORRECT; the
+problem is a per-assembler mnemonic gap, a different axis entirely.
+
+**The fix.** Hand-transliterate the target disassembly into a
+`nofralloc` inline-`asm` block, filed under the PLAIN (mwcc 2.0)
+tier instead of the structurally-indicated one. Since an inline-asm
+block bypasses the compiler's own instruction selection entirely,
+only the assembler's mnemonic table matters — the tier the `.c` file
+is nominally compiled under becomes irrelevant to the shipped bytes.
+
+**Affected picks:** `func_02080728` (main, 144B, shipped 100%).
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 5.
+
+### C-94. An unnecessary cached local — even one that's re-read fresh elsewhere and never needs to survive a call — can force mwcc to allocate a genuinely extra callee-saved register
+
+**The trap.** Caching a struct field's value in a local variable
+"for convenience," when the field is in fact re-read directly at
+other use sites in the same function (i.e. the cache isn't load-
+bearing for correctness or for surviving an intervening call), can
+still push mwcc's register allocator to reserve an EXTRA callee-saved
+register purely to hold the cached copy — inflating the push/pop set
+beyond what the target actually uses.
+
+**The fix.** Remove the unnecessary named cache and read the field
+directly at each use site. `func_0209240c` went from needing 6
+registers to the target's correct 5 once the cached local was
+removed.
+
+**Affected picks:** `func_0209240c` (main, 180B, parked 24.4% — this
+fix closed part of the gap; a residual register-role mismatch
+remained after 7 total attempts). Suspected but unresolved on
+`func_02092748` (main, 112B, parked 13.8%) — same shape, fix not
+found in the time available.
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 4.
+
+> **C-45 extension — the range-fold lever generalizes beyond `switch`
+> (cm-main-tier-sweep-5, 2026-08-09, batch 2).** `func_02064158`'s
+> `if (f0c==5 || f0c==6)` collapsed to mwcc's own `sub+cmp+bhi` range
+> check — the SAME range-fold C-45 documents for `switch`, but
+> triggered here from a plain `||`-chained `if`, not a `switch`
+> statement at all. Fix: write it as two sequential
+> `if (a==X) goto L;` statements instead of the `||` form. Parked at
+> 93.2% (a separate r0-vs-r3 register-choice residual remained), but
+> the range-fold itself is confirmed fixed by this technique.
+
+> **C-73 extension — `volatile` can be needed for cross-statement
+> scheduling ADJACENCY, not just read/CSE freshness (cm-main-tier-
+> sweep-5, 2026-08-09, batch 2).** `func_0209a210`: two independent
+> struct-field read-modify-writes (`f36 |= 1; f34 &= ~1;`) compiled
+> as read-read-modify-modify-store-store instead of the target's
+> read-modify-store ×2, even with zero aliasing risk between the
+> fields. Marking both fields `volatile` forced the correct
+> sequential (adjacent) instruction order. The lever is identical to
+> C-73's (mark `volatile`); the NEW diagnostic trigger is a scheduler
+> reordering two independent field accesses into separate phases,
+> not the CSE-reload case C-73's existing text describes.
+
+### P-48. Register pressure can evict a passthrough parameter from r0-r3 into a callee-saved register even with no intervening calls, if the function also does non-trivial bit arithmetic (tentative, single instance)
+
+**The shape.** A parameter that's never read except at a single final
+forwarding call can still get evicted from its natural r0-r3 argument
+register into a callee-saved register in the target, when the same
+function also performs unrelated non-trivial bit-arithmetic — even
+though nothing calls out or clobbers the argument registers in
+between.
+
+**Affected picks:** `func_0206eccc` (main, 136B, parked 5.9%).
+
+**Recipe status: NONE.** Needs independent confirmation before
+treating as established.
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 5.
+
+### P-49. mwcc always folds `-(x) + CONST` into a single `rsb`-immediate, even where the target keeps two separate instructions (tentative, single instance)
+
+**The shape.** An expression of the form "negate then add a constant"
+folds to one `rsb Rd, Rn, #CONST` in every recompile attempted; the
+target instead uses two separate instructions for the same
+computation. Named locals, `volatile`, and statement reordering all
+failed to prevent the fold. A specific RSB sub-case of the broader
+P-40 family (immediate/constant materialization strategy resists
+source-level control).
+
+**Affected picks:** `func_020858cc` (main, 192B, parked 58.3%).
+
+**Recipe status: NONE.** Needs independent confirmation.
+
+**Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 5.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 

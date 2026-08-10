@@ -942,3 +942,38 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
 0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
 0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
+0x020608b4	main	164	legacy_sp3	other	parked	70.7	P-36-poolhoist	cm-main-tier-sweep-5-batch1
+0x02069454	main	184	legacy	other	parked	43.5	P-36-literal-store-order	cm-main-tier-sweep-5-batch1
+0x0206a724	main	140	legacy_sp3	other	parked	8.6	P-36-load-pair-scheduling	cm-main-tier-sweep-5-batch1
+0x0206ed7c	main	156	legacy	other	parked	43.6	canary-lever-residual	cm-main-tier-sweep-5-batch1
+0x02091768	main	172	legacy	other	parked	88.4	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch1
+0x02093454	main	120	legacy	other	parked	30.3	register-choice	cm-main-tier-sweep-5-batch1
+0x02097a4c	main	164	legacy	guard chain	parked	7.3	P-36-const-hoist-across-loop	cm-main-tier-sweep-5-batch1
+0x02067e94	main	168	legacy_sp3	bitfield-flag byte-register-choice (r0-vs-r1 for a masked byte temp; 5 source variations tried, byte-identical wrong output every time)	parked	90.5	reg-alloc	cm-main-tier-sweep-5-batch2
+0x0207fff8	main	192	legacy_sp3	loop-condition-variable r0-vs-r1 register choice (fn/total decl-order fix took it 66.7%->91.7%; 5 further variations on the callback-result var's register all byte-identical wrong)	parked	91.7	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02064158	main	176	legacy_sp3	tier-discriminator field register-choice (r0-vs-r3); range-fold fix (sequential goto tests instead of ||) took 11.4%->93.2%, 3 further variations on the remaining register left byte-identical	parked	93.2	reg-alloc	cm-main-tier-sweep-5-batch2
+0x0207d610	main	188	legacy_sp3	best-fit free-block search: multiple simultaneous residuals (frame uses one fewer callee-saved register than target's r9, a bit0-test that target compiles via and+lsl16+lsr16 shift-pair but mine collapses to a plain ands, and a bestSize register-letter swap r5-vs-lr); double-shift rewrite attempt regressed 8.5%->6.1%, reverted	parked	8.5	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02077954	main	132	legacy	leaf function needing a 5th scratch register beyond r0-r3: target pushes+uses lr (with a 4-byte alignment-pad frame) as the extra register; my compile always uses ip instead with zero frame, byte-identical under both legacy and default(2.0) tier	parked	0.0	reg-alloc	cm-main-tier-sweep-5-batch2
+0x020960ac	main	160	legacy	dual coupled loop-index variables (a0+i*8 'entry', a0+0x18+i*8 'slot') resist C-65-style non-strength-reduced recompute simultaneously; target keeps a0 stable and recomputes entry via a fused shift-add each iteration, but both raw-pointer-shift and C-63 struct-array-index source forms get strength-reduced into an incremental pointer instead, costing an extra callee-saved register + alignment-pad frame the target doesn't have. 4 source variations tried (raw shift, statement-reorder, struct-array, separate-multiply-statement); struct-array was closest (5.0%, off by 1 word) but still wrong shape	parked	5.0	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02061290	main	172	legacy_sp3	loop	parked	20.9	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0206880c	main	132	legacy_sp3	other	parked	75.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0207039c	main	148	legacy	guard chain	parked	20.5	reg-alloc	cm-main-tier-sweep-5-batch3
+0x02078e3c	main	128	legacy	loop	parked	12.1	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0207d6cc	main	192	legacy_sp3	loop	parked	18.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0208771c	main	116	legacy_sp3	guard chain	parked	93.1	reg-alloc	cm-main-tier-sweep-5-batch3
+0x020933bc	main	152	legacy	other	parked	65.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0209417c	main	192	legacy	other	parked	89.6	P-36-poolhoist	cm-main-tier-sweep-5-batch3
+0x02067208	main	140	legacy_sp3	loop-per-iter-offset-register-count	parked	13.5	reg-alloc	cm-main-tier-sweep-5-batch4
+0x0206eb4c	main	156	legacy	dual-byteswap-pipeline-interleave	parked	28.2	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x0207b18c	main	164	legacy	canary-lever-residual-shared-base	parked	65.8	P-30-whole-function-register-rotation	cm-main-tier-sweep-5-batch4
+0x02080670	main	184	legacy_sp3	nested-loop-2d-buffer-fill-scheduling	parked	44.9	instruction-selection	cm-main-tier-sweep-5-batch4
+0x02089f60	main	160	legacy_sp3	freed-r0-reuse-register-choice	parked	95.0	register-choice	cm-main-tier-sweep-5-batch4
+0x0209240c	main	180	legacy	cross-branch-reread-vs-cached-local-regpressure	parked	24.4	reg-alloc	cm-main-tier-sweep-5-batch4
+0x02092748	main	112	legacy	irq-save-vs-global-addr-load-interleave	parked	13.8	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x02095418	main	108	legacy	loop-invariant-const-register-hoist-resistance	parked	0.0	pool-const-materialize	cm-main-tier-sweep-5-batch4
+0x02097258	main	124	legacy	double-boolify-phrasing-insensitive-residual	parked	25.8	reg-alloc	cm-main-tier-sweep-5-batch4
+0x020544c8	main	160	legacy_sp3	guard-call-idx-cache	parked	60.0	register-choice-post-call-mov-before-const	cm-main-tier-sweep-5-batch5
+0x02062cfc	main	140	legacy_sp3	guard-then-conditional-field-copy	parked	91.4	P-36-boolean-materialization-order	cm-main-tier-sweep-5-batch5
+0x02067a94	main	192	legacy_sp3	keystream-mixer-6-param	parked	27.1	register-spill-pressure-8-live-values	cm-main-tier-sweep-5-batch5
+0x0206eccc	main	136	legacy	null-safe-byteswap-forward	parked	5.9	register-pressure-passthrough-args-vs-computed	cm-main-tier-sweep-5-batch5
+0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
