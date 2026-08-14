@@ -981,3 +981,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0222a9d0	ov002	180	legacy_sp3	player-subrow-id-composite-guard-plus-conditional-event	parked	8.9	bitfield-read-lowering-and-vs-shift-plus-r3-push-alloc	cm-main-tier-sweep-6-batch2
 0x0220c4e8	ov002	188	default	kind-gate-plus-active-selection-and-own-row-bitmask-and	parked	78.7	T-1-r2-vs-r3-scratch-register-renaming	cm-main-tier-sweep-6-batch2
 0x021bcf18	ov002	204	default	row-scan-count-with-visibility-gate-and-first5-callee-check	parked	18.5	loop-index-count-register-role-swap-plus-stack-spill-risk	cm-main-tier-sweep-6-batch2
+0x021b1488	ov002	232	default	32-entry-jumptable-inc-dec-signed-bitfield	parked	11.9	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	cm-main-tier-sweep-6-batch2
