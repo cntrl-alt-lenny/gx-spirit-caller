@@ -229,6 +229,18 @@ absorbed symbol is referenced by name from other already-shipped code
 one-off). See P-50 for the full evidence chain and exact trigger
 criteria.
 
+**wave 7 update: P-50's evidence boundary is closed.** The brain's
+2026-08-10 OBSERVED-NOT-CONFIRMED flag on P-50 asked for two things:
+an N-variant × SP sweep across the two untested legacy compiler tiers,
+and a direct test of the one-compile merged-symbol repair. Both ran
+this wave (`cm-restock-carve-7`) with clean negative results — neither
+`.legacy.c` (mwcc 1.2/sp2p3) nor `.legacy_sp3.c` (mwcc 1.2/sp3) escapes
+the ascending-by-size sort, and the merged-symbol repair fails even
+earlier than the original mwldarm leg (`dsd delink` itself rejects a
+removed symbol that's still a relocation target in the original ROM).
+P-50 is confirmed PERMANENT with no open caveat. See P-50 in
+`codegen-walls.md` for the full readout.
+
 ## See also
 
 - [`ov004-odd-aligned-slot-recipe.md`](ov004-odd-aligned-slot-recipe.md) —
