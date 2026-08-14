@@ -980,3 +980,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021c3008	ov002	180	default	per-player-array-scan-count-c68-split-id	parked	46.7	preamble-sink-scheduling	cm-main-tier-sweep-6-batch3
 0x021c1d4c	ov002	212	default	gate-flags-idlist-scratch-reg-choice	parked	39.6	register-choice-post-guard	cm-main-tier-sweep-6-batch3
 0x021b3774	ov002	240	default	linked-list-scan-hi-lo-flag-gate-bittrick	parked	85.0	scheduler-interleave-reg-swap	cm-main-tier-sweep-6-batch3
+0x0222800c	ov002	184	default	gate-chain-lohi-bytepair-plus-bit0-field5	parked	87.0	lo-hi-register-swap	cm-main-tier-sweep-6-batch3
+0x02230a30	ov002	192	default	gate-chain-plus-cd3f4-fields-into-021d5a08	parked	81.2	self-vs-scratch-register-swap	cm-main-tier-sweep-6-batch3
