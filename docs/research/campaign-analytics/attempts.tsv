@@ -988,3 +988,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224f0c4	ov002	180	default	per-player-slot-gate-dispatch	parked	86.7	mla-operand-order-register-numbering-P17-adjacent	unknown
 0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
