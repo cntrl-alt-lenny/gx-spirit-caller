@@ -983,3 +983,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021b39c4	ov002	252	default	linked-list-traverse-slot-match-dispatch	parked	27.0	smulbb-instruction-selection-and-r5-reuse-residual	unknown
 0x0224f548	ov002	180	default	per-player-array-loop-4call-dispatch	parked	6.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0220a218	ov002	200	default	nested-player-idx-loop-popcount-gate	parked	3.9	loop-invariant-hoist-register-cascade-P36-adjacent	unknown
+0x022b859c	ov002	224	legacy_sp3	kind-bitfield-div3-dispatch-double-call	parked	1.8	sp3-dead-store-stack-pad-reg-pressure	unknown
