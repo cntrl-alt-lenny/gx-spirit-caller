@@ -977,3 +977,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02067a94	main	192	legacy_sp3	keystream-mixer-6-param	parked	27.1	register-spill-pressure-8-live-values	cm-main-tier-sweep-5-batch5
 0x0206eccc	main	136	legacy	null-safe-byteswap-forward	parked	5.9	register-pressure-passthrough-args-vs-computed	cm-main-tier-sweep-5-batch5
 0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
+0x0223dc14	ov002	172	legacy_sp3	3-field-bitfield-pack-plus-row-idx-bump	parked	7.0	bitfield-insert-lowering-and-vs-shift-fusion	cm-main-tier-sweep-6-batch2
+0x0222a9d0	ov002	180	legacy_sp3	player-subrow-id-composite-guard-plus-conditional-event	parked	8.9	bitfield-read-lowering-and-vs-shift-plus-r3-push-alloc	cm-main-tier-sweep-6-batch2
