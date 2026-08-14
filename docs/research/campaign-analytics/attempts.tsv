@@ -997,3 +997,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0221771c	ov002	184	default	gate self->f4.bit2, then switch on CE288->f_5a8 (0x7e/0x7f/0x80) dispatching to func_ov002_021e2c5c / func_ov002_0226ad5c / (cf178-count-gated) func_ov002_021e2b3c+func_ov002_0226af38; case body order matters (0x80,0x7f,0x7e,default)	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
 0x0224e2b8	ov002	188	default	do-while over per-player slot array (bound reread from block+0x10 each iter); id gated by classify + func_0202b8a8<=2 + func_0202de9c==0 + func_ov002_021ca440; posts kind-13 entries	parked	78.7	reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	canary-cm-main-tier-sweep-6-batch1
 0x02259774	ov002	192	default	stash (bit0,val5,val8,flag) into D016C, look up a slot via func_ov002_021c93f0 three times (id + two packed-word derefs combined into f_d60 via + not |), val5<=4 gates func_ov002_021b9ecc	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x0223dc14	ov002	172	legacy_sp3	3-field-bitfield-pack-plus-row-idx-bump	parked	7.0	bitfield-insert-lowering-and-vs-shift-fusion	cm-main-tier-sweep-6-batch2
+0x0222a9d0	ov002	180	legacy_sp3	player-subrow-id-composite-guard-plus-conditional-event	parked	8.9	bitfield-read-lowering-and-vs-shift-plus-r3-push-alloc	cm-main-tier-sweep-6-batch2
+0x0220c4e8	ov002	188	default	kind-gate-plus-active-selection-and-own-row-bitmask-and	parked	78.7	T-1-r2-vs-r3-scratch-register-renaming	cm-main-tier-sweep-6-batch2
+0x021bcf18	ov002	204	default	row-scan-count-with-visibility-gate-and-first5-callee-check	parked	18.5	loop-index-count-register-role-swap-plus-stack-spill-risk	cm-main-tier-sweep-6-batch2
+0x021b1488	ov002	232	default	32-entry-jumptable-inc-dec-signed-bitfield	parked	11.9	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	cm-main-tier-sweep-6-batch2
+0x0224f910	ov002	176	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x0224d510	ov002	184	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02216334	ov002	192	default	gated-mask-accumulate-per-byte-family-func022123fc-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02229a88	ov002	204	default	packed-return-decode-plus-gated-table-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x021ef844	ov002	232	default	field-gate-plus-slot-check-plus-double-gate-dispatch-with-funcptr-arg	parked	71.2	cross-call-scratch-reg-reuse-r3-subrow-not-source-forceable	cm-main-tier-sweep-6-batch2
+0x022aaf8c	ov002	88	default	debounce-guard-plus-task-spawn-dispatch-func022aafe4-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x022342d0	ov002	128	default	ce288-gate-plus-toggle-bit-double-call-dispatch	parked	90.6	T-1-r1-vs-r2-scratch-register-renaming	cm-main-tier-sweep-6-batch2
+0x021d7c88	ov002	132	default	node-spawn-plus-composite-idword-gate-plus-double-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x0222d1a0	ov002	144	default	field6-gate-plus-spawn-plus-two-way-dispatch	parked	27.8	cross-call-self-and-result-persistence-reg-alloc-mismatch	cm-main-tier-sweep-6-batch2
+0x02294ee4	ov002	172	default	triple-gate-helper-chain-bool-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02294c70	ov002	180	default	gate-plus-limit-compute-plus-5row-scan-guard	parked	51.1	row-address-mla-add-operand-register-order-not-source-forceable	cm-main-tier-sweep-6-batch2
+0x022524a4	ov002	180	default	gate-plus-per-player-id-array-scan-triple-gate-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02294938	ov002	188	default	dual-metric-min-gate-plus-double-guard-dispatch	parked	95.7	T-1-r4-vs-r5-first-call-result-register-choice	cm-main-tier-sweep-6-batch2
+0x0220e594	ov002	188	default	mask-accumulate-family-dynamic-bound-plus-extra-guard	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02209f48	ov002	192	default	triple-gate-plus-summed-metric-plus-count-threshold-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
