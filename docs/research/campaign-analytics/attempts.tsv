@@ -982,3 +982,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x022a85a4	ov002	196	default	timer-to-vram-color-bar-fixed-point	parked	71.4	predicated-flag-scheduling-interleave	cm-main-tier-sweep-6-batch4
 0x02257464	ov002	216	default	2bit-switch-dispatch-binary-search	parked	92.6	predicated-pointer-vs-value-choice-on-final-compare	cm-main-tier-sweep-6-batch4
 0x02212ce8	ov002	176	default	guard-call-then-4-callee-cascade	parked	17.8	dead-param-preservation-move-not-elided	cm-main-tier-sweep-6-batch4
+0x021c3d84	ov002	188	default	fisher-yates-shuffle-handle-swap	parked	74.5	register-role-rotation-side-count-array-idx	cm-main-tier-sweep-6-batch4
