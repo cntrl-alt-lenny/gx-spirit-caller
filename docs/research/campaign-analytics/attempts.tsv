@@ -988,3 +988,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02229a88	ov002	204	default	packed-return-decode-plus-gated-table-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
 0x021ef844	ov002	232	default	field-gate-plus-slot-check-plus-double-gate-dispatch-with-funcptr-arg	parked	71.2	cross-call-scratch-reg-reuse-r3-subrow-not-source-forceable	cm-main-tier-sweep-6-batch2
 0x022aaf8c	ov002	88	default	debounce-guard-plus-task-spawn-dispatch-func022aafe4-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x022342d0	ov002	128	default	ce288-gate-plus-toggle-bit-double-call-dispatch	parked	90.6	T-1-r1-vs-r2-scratch-register-renaming	cm-main-tier-sweep-6-batch2
