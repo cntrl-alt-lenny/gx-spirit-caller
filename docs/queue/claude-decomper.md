@@ -1209,7 +1209,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > each), extensions to C-45 and C-73. See
 > [`cm-main-tier-sweep-5-2026-08-09.md`](../research/cm-main-tier-sweep-5-2026-08-09.md).
 
-### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [TODO]
+### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [CLAIMED]
 
 `cm-main-tier-sweep-5` (#1494) settled the question five waves had confounded. The brain independently reproduced every number: the arms are genuinely matched (size 159.4 B vs 155.7 B with the LOW arm nominally *harder*, Mann-Whitney p=0.46; tiers exactly 14 legacy + 11 legacy_sp3 in each), the 36-point gap survives size stratification at **36.5 points standardized**, and Fisher exact gives p=0.021. **Callee count is a real, independent selector on `main`.**
 
