@@ -991,3 +991,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224aa14	ov002	172	default	per-side-record-scan-validate-arm-v2	parked	74.4	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
 0x0225170c	ov002	180	default	per-side-record-scan-validate-arm-v3	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
 0x0224c2a4	ov002	180	default	per-side-record-scan-validate-arm-v4	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x0224ed8c	ov002	188	default	per-side-record-scan-validate-arm-v5-3gate	parked	78.7	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
