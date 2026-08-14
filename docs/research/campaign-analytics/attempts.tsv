@@ -980,3 +980,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021eb070	ov002	184	default	guard-chain-slot-check-dispatch	parked	97.8	P-17-commutative-add-operand-order	unknown
 0x0227ab9c	ov002	200	default	dual-store-bitpack-global-dispatch	parked	18.0	reg-alloc-interleaved-bitfield-extraction-forces-r5-spill	unknown
 0x022b84c0	ov002	220	legacy_sp3	bitfield-dispatch-div3-switch	parked	23.2	sp3-dead-store-stack-pad-reg-pressure	unknown
+0x021b39c4	ov002	252	default	linked-list-traverse-slot-match-dispatch	parked	27.0	smulbb-instruction-selection-and-r5-reuse-residual	unknown
+0x0224f548	ov002	180	default	per-player-array-loop-4call-dispatch	parked	6.2	register-numbering-permutation-cascade-P36-adjacent	unknown
