@@ -987,3 +987,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02252868	ov002	172	default	per-player-array-scan-post-021ca440-sink	parked	90.7	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
 0x0224d044	ov002	180	default	per-player-array-scan-post-021c33e4-sink	parked	91.1	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
 0x0229ce5c	ov002	180	default	sprintf-lite-percent-s-substitution	parked	73.3	missing-char-reload-spill	cm-main-tier-sweep-6-batch3
+0x02252998	ov002	192	default	per-player-array-scan-dual-guard-post-021ca440-sink	parked	91.7	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
