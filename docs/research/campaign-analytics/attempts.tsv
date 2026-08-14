@@ -984,3 +984,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021b1488	ov002	232	default	32-entry-jumptable-inc-dec-signed-bitfield	parked	11.9	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	cm-main-tier-sweep-6-batch2
 0x0224f910	ov002	176	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
 0x0224d510	ov002	184	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02216334	ov002	192	default	gated-mask-accumulate-per-byte-family-func022123fc-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
