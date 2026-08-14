@@ -990,3 +990,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02234bc0	ov002	148	default	flags-gate-bitpos-mask-build-arm	parked	2.7	constant-zero-register-materialization-not-reproduced	cm-main-tier-sweep-6-batch4
 0x0224aa14	ov002	172	default	per-side-record-scan-validate-arm-v2	parked	74.4	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
 0x0225170c	ov002	180	default	per-side-record-scan-validate-arm-v3	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x0224c2a4	ov002	180	default	per-side-record-scan-validate-arm-v4	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
