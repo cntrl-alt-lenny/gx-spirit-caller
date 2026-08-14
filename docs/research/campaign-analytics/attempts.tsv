@@ -979,3 +979,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
 0x021d9778	ov002	176	default	packed-record-bitfield-lookup-callee-guard	parked	18.2	register-choice-residual-v-flags-swap	unknown
 0x021b2e04	ov002	184	default	nested-loop-linked-list-record-scan-update	parked	63.0	register-role-rotation-side-rec-cat-idx	cm-main-tier-sweep-6-batch4
+0x022a85a4	ov002	196	default	timer-to-vram-color-bar-fixed-point	parked	71.4	predicated-flag-scheduling-interleave	cm-main-tier-sweep-6-batch4
