@@ -987,3 +987,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x022583b4	ov002	248	default	color-bar-render-dispatch-with-refcount	parked	30.6	dead-until-later-param-register-choice-plus-bitpack	cm-main-tier-sweep-6-batch4
 0x0221e650	ov002	112	default	case-dispatch-2-yield-calls	parked	67.9	register-role-rotation-field2-holder	cm-main-tier-sweep-6-batch4
 0x021cac64	ov002	140	default	counter-gated-arm-plus-status-clear	parked	80.6	byte-pack-mask-form-plus-pool-refold	cm-main-tier-sweep-6-batch4
+0x02234bc0	ov002	148	default	flags-gate-bitpos-mask-build-arm	parked	2.7	constant-zero-register-materialization-not-reproduced	cm-main-tier-sweep-6-batch4
