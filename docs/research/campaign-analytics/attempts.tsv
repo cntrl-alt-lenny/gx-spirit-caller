@@ -996,3 +996,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x022524a4	ov002	180	default	gate-plus-per-player-id-array-scan-triple-gate-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
 0x02294938	ov002	188	default	dual-metric-min-gate-plus-double-guard-dispatch	parked	95.7	T-1-r4-vs-r5-first-call-result-register-choice	cm-main-tier-sweep-6-batch2
 0x0220e594	ov002	188	default	mask-accumulate-family-dynamic-bound-plus-extra-guard	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02209f48	ov002	192	default	triple-gate-plus-summed-metric-plus-count-threshold-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
