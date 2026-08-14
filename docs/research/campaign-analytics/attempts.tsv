@@ -993,3 +993,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0222d1a0	ov002	144	default	field6-gate-plus-spawn-plus-two-way-dispatch	parked	27.8	cross-call-self-and-result-persistence-reg-alloc-mismatch	cm-main-tier-sweep-6-batch2
 0x02294ee4	ov002	172	default	triple-gate-helper-chain-bool-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
 0x02294c70	ov002	180	default	gate-plus-limit-compute-plus-5row-scan-guard	parked	51.1	row-address-mla-add-operand-register-order-not-source-forceable	cm-main-tier-sweep-6-batch2
+0x022524a4	ov002	180	default	gate-plus-per-player-id-array-scan-triple-gate-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
