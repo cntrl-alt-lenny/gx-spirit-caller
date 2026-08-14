@@ -977,3 +977,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02067a94	main	192	legacy_sp3	keystream-mixer-6-param	parked	27.1	register-spill-pressure-8-live-values	cm-main-tier-sweep-5-batch5
 0x0206eccc	main	136	legacy	null-safe-byteswap-forward	parked	5.9	register-pressure-passthrough-args-vs-computed	cm-main-tier-sweep-5-batch5
 0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
+0x0229e5a0	ov002	172	default	self-struct field pack: zero one field, call callee(a1,a2,0), pack a1/a2/callresult into a bitfield word stored to another field, zero a byte field	parked	25.6	P-1-shift-pair-vs-mask-collapse-halfword-zeroextend	canary-cm-main-tier-sweep-6-batch1
+0x021f3318	ov002	176	default	per-player row/sub-row triplet gate + active-selection check, deferring to func_ov002_021c1e44	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
