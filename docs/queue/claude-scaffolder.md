@@ -1469,3 +1469,23 @@ Also test the one-compile repair Leg 3 asserted instead of checking: rewrite `fu
 CANARY: the first carve of Part 2 goes through the FULL gate (3-region SHA1) before any batching.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the P-50 tier-test result stated either way. Regenerate `docs/research/README.md` LAST.
+
+### cm-restock-carve-8 — the pool after main; and decide whether this lane's method has an end [TODO]
+
+`cm-restock-carve-7` (#1496) closed P-50's evidence boundary the right way: a three-tier scratch sweep (default `2.0/sp1p5`, `.legacy.c` `1.2/sp2p3`, `.legacy_sp3.c` `1.2/sp3`, both declaration orders) came back identical every time, so **P-50 is now PERMANENT with evidence** rather than by assertion, and the OBSERVED-NOT-CONFIRMED block is gone. A clean negative, properly run — that is the outcome the item wanted. You also drained main's largest remaining pool (36 symbols, Typed-array +1,864 B).
+
+Two threads:
+
+**PART 1 — keep draining.** Continue the restock census into the next-largest remaining module group. Same method that has now worked across seven waves: header cross-reference first, script every initializer from the real bytes, per-symbol reconciliation table built AS YOU GO with every Size cell checked against `delinks.txt`, `relocs.txt` structural proof per carve, const/static matching each symbol's OWN original.
+
+**PART 2 — and answer the question this lane has been deferring: how much is actually left?** Seven waves in, the census is the only map, and it was built once (2026-08-03) by one discovery method. Re-census honestly: how many never-assessed data candidates remain, how many are reachable by the current method, how many are blocked by a documented wall (P-50 and the n>2 reordering wall between them now decline a known set), and how many are in neither bucket. `cm-data-restock-check` established once before that the pool "never emptied — it was invisible to the old discovery methods"; the useful question now is whether that is *still* true or whether this method is genuinely approaching its end.
+
+An honest "the method has roughly N candidates and M bytes left, then it is done" is exactly as valuable as another carve wave — arguably more, because it tells the campaign when to stop investing here. Do not pad the estimate in either direction.
+
+⚠️ Run `npx markdownlint-cli2 --fix` on any doc before committing, and regenerate `docs/research/README.md` LAST — stale-index `drift-check` failures have now blocked three PRs.
+
+CANARY: the first carve of Part 1 goes through the FULL gate (3-region SHA1) before any batching.
+
+⚠️ GATE TIMING: the CC Decomper is running `cm-main-tier-sweep-7` with a 5-worktree consolidated `--clean` 3-region gate. mwcc serialises MACHINE-WIDE. Before your canary gate run `Get-Process | Where-Object { $_.Name -match 'mwcc|mwld|mwasm|ninja' }` — if it returns rows, wait. Confirm the window with Lenny.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the re-census table with its four buckets and a stated remaining-bytes figure.
