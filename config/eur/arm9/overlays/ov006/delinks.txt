@@ -689,7 +689,7 @@ src/overlay006/func_ov006_021b831c.c:
     complete
     .text start:0x021b831c end:0x021b843c
 
-src/overlay006/func_ov006_021b843c.s:
+src/overlay006/func_ov006_021b843c.c:
     complete
     .text start:0x021b843c end:0x021b8544
 
@@ -1434,7 +1434,7 @@ src/overlay006/func_ov006_021c5d98.c:
     complete
     .text start:0x021c5d98 end:0x021c5df0
 
-src/overlay006/func_ov006_021c5df0.s:
+src/overlay006/func_ov006_021c5df0.c:
     complete
     .text start:0x021c5df0 end:0x021c5f44
 
