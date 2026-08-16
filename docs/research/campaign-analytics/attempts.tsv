@@ -1154,3 +1154,11 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021d1118	ov004	332	default	dual-index-loop-nested-2x-drain	parked	1.1	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
 0x021ce1ec	ov004	376	default	double-timer-setter-packed-descriptor	parked	16.0	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
 0x021d9fc4	ov004	316	legacy_sp3	fixedpoint-fill-plus-2tile-loop	parked	21.5	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021ce364	ov004	324	default	3-phase-slot-scan-fallback-min-search	parked	63.0	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021c3384	ov006	316	default	8row-config-broadcast-triple-source-field-pick	parked	69.6	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021ca264	ov006	316	default	conditional-record-base-stride-index-field-init	parked	10.0	P-29-mirror-mla-fusion-resistant	cm-main-tier-sweep-7-p2batch5
+0x021cb25c	ov011	344	default	cmd-record-dense-bitfield-pack-dual-pass-mode-gate	parked	8.0	ov011-core-multifield-rmw-wall-stack-variant	cm-main-tier-sweep-7-p2batch5
+0x021d2158	ov011	288	default	growable-array-drain-loop-stack-accumulator	parked	20.8	constant-fold-mask-collapse-register-cascade	cm-main-tier-sweep-7-p2batch5
+0x021d53c0	ov004	364	default	changed-bool-reinit-mode-record-select-dispatch	parked	45.0	changed-bool-reg-reuse	cm-main-tier-sweep-7-p2batch5
+0x021da1bc	ov004	268	default	grid-nibble-repaint-plus-wrap-split-blit	parked	16.4	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021cc4c8	ov011	252	legacy_sp3	packed-bitfield-config-triple-dispatch	parked	38.1	P-36-adjacent-field-chain-interleave	cm-main-tier-sweep-7-p2batch5
