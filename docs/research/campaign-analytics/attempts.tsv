@@ -1146,3 +1146,11 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021cc0e0	ov004	316	default	guard-chain-dual-record-builder	parked	81.0	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
 0x021cdd38	ov004	256	default	loop-vram-copy-with-glyph-width-clamp	parked	84.4	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
 0x021d0e98	ov004	256	default	loop-vram-bank-clear-plus-glyph-render	parked	43.9	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c8e98	ov006	264	default	audio-init-family-cousin	parked	39.4	P-31	cm-main-tier-sweep-7-p2batch4
+0x021cac38	ov006	252	default	mmio-scroll-pair-dual-delta	parked	42.9	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch4
+0x021b70fc	ov006	324	default	5-state-table-scan-3call-score	parked	4.4	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021cc27c	ov011	200	legacy_sp3	cell-config-eaa0-12arg	parked	32.1	stmib-grouping-scheduling	cm-main-tier-sweep-7-p2batch4
+0x021d5004	ov004	296	default	state-step-changed-bool-guard	parked	24.3	changed-bool	cm-main-tier-sweep-7-p2batch4
+0x021d1118	ov004	332	default	dual-index-loop-nested-2x-drain	parked	1.1	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021ce1ec	ov004	376	default	double-timer-setter-packed-descriptor	parked	16.0	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021d9fc4	ov004	316	legacy_sp3	fixedpoint-fill-plus-2tile-loop	parked	21.5	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
