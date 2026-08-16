@@ -1119,3 +1119,11 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021ca400	ov011	216	default	tile-lookup-bitmanip-register-pressure	parked	7.4	complex-216B-leaf-extra-scratch-registers	cm-main-tier-sweep-7-batch5-part1
 0x021be6f4	ov006	388	legacy_sp3	dual-table-copy-quad-writeback-register-pressure	parked	4.1	complex-388B-large-register-pressure-mismatch	cm-main-tier-sweep-7-batch5-part1
 0x021d512c	ov004	372	default	3way-gate-large-register-numbering-shift	parked	3.2	complex-372B-global-register-shift	cm-main-tier-sweep-7-batch5-part1
+0x021b5dec	ov006	356	default	parallel-store-loop	parked	93.3	C-65-strength-reduction	cm-main-tier-sweep-7-p2batch2
+0x021be5b8	ov006	316	default	record-refresh-scheduling	parked	36.2	P-36-instruction-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021caa64	ov006	264	default	dual-engine-cell-config	parked	10.6	P-40-constant-materialization	cm-main-tier-sweep-7-p2batch2
+0x021cf0c8	ov011	304	n/a	cross-overlay-bl	parked	unknown	C-32-cross-overlay-bl	cm-main-tier-sweep-7-p2batch2
+0x021d3a7c	ov004	248	default	count-format-dual-source	parked	52.4	dead-call-result-register-reuse	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021d6f20	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cd924	ov004	360	legacy_sp3	message-dispatch-3way	parked	14.4	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
