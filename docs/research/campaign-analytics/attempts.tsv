@@ -1137,3 +1137,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021d6f20	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
 0x021cd924	ov004	360	legacy_sp3	message-dispatch-3way	parked	14.4	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
 0x021cb63c	ov004	316	legacy_sp3	task-grid-blit-setup	parked	25.0	tier-verification-inferior	cm-main-tier-sweep-7-p2batch2
+0x021d4584	ov004	288	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	88.9	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-p2batch3
+0x021d9d58	ov004	332	default	state-dispatch-guard-chain-timer-counters	parked	9.6	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cabbc	ov011	304	default	guard-chain-bitfield-table-lookup-dispatch	parked	11.8	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021b6364	ov006	364	default	init-loop-then-column-copy-loop	parked	81.7	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021b8a88	ov006	364	default	dual-bitmask-pack-loop-compact-index	parked	7.4	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c71e0	ov006	232	legacy_sp3	guard-chain-vram-clear-plus-text-layer-config	parked	25.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-p2batch3
+0x021cc0e0	ov004	316	default	guard-chain-dual-record-builder	parked	81.0	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cdd38	ov004	256	default	loop-vram-copy-with-glyph-width-clamp	parked	84.4	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021d0e98	ov004	256	default	loop-vram-bank-clear-plus-glyph-render	parked	43.9	reg-alloc	cm-main-tier-sweep-7-p2batch3
