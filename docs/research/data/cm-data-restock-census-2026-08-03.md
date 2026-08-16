@@ -362,3 +362,57 @@ wave, see `cm-restock-carve-6-2026-08-09.md`).** See
 `docs/research/alignment-wall-tu-composition-recipe.md` and
 `codegen-walls.md`'s P-50 for the general mwcc-behavior findings (n>2
 reordering; n=2 differing-size ordering) this disposition rests on.
+
+## Disposition: `main` pool (as of `cm-restock-carve-7`, 2026-08-14)
+
+The misaligned-struct arc above covers only the 35 `shape=struct`
+candidates that hit `ALIGNALL(2)`; the rest of this census's 274
+symbols (all four shapes, all modules) is a separate, much larger
+pool. Re-derived the remaining count by cross-referencing every
+symbol against `config/eur/arm9/**/delinks.txt` for a `complete` entry
+(not by filename — several shipped symbols live in a composed file
+named after a different member). As of this wave: **265 shipped, 10
+declined (the 9 P-50 symbols above + `data_02101e7c`), 75 remaining**
+across 22 modules; `main` was the largest remaining group at 40
+symbols (2,296 B) before this wave.
+
+**36 of `main`'s 39 non-declined remaining candidates shipped this
+wave** (`cm-restock-carve-7`, 1,864 B) —
+`data_020be77c`, `data_020be9ac`, `data_020be9c4`, `data_020c35cc`,
+`data_020c58b0`, `data_020c5994`, `data_020c59ac`, `data_020c6878`,
+`data_020c68fc`, `data_020c72f0`, `data_020cd040`, `data_020cd460`,
+`data_020ce380`, `data_020d0ef0`, `data_020e5c60`, `data_020f84e0`,
+`data_020f8700`, `data_020f87d8`, `data_020f8a40`, `data_020fb840`,
+`data_020fbd50`, `data_020fbe60`, `data_020fd470`, `data_020fda40`,
+`data_02100310`, `data_02100de0`, `data_02101e4c`, `data_02101f74`,
+`data_02102198`, `data_02102200`, `data_02102210`, `data_0210225c`,
+`data_021022a4`, `data_0210268c`, `data_02102718`,
+`data_02102764` — full reconciliation table in
+`cm-restock-carve-7-2026-08-14.md`.
+
+**`data_020c3e88` (188 B) deferred, not shipped or declined.** Its
+sole relocation site (`func_020069f4`) indexes it as a continuation of
+the already-shipped `data_020c3e84` 8-byte-pair array
+(`0x020c3e84 + offsetof(w) == 0x020c3e88` exactly; `4 + 188 = 192 =
+24 × 8`) — very likely the same logical array `dsd`'s boundary
+derivation split at a second literal-pool reference, not an
+independent object. Resolving the true array length needs the
+`func_020069f4` caller-range analysis, out of this wave's bounded
+scope; left open for a future wave rather than shipped as a
+possibly-mislabeled independent blob or force-declined without a real
+test.
+
+**`data_021023d8` (192 B) and `data_02102c44` (28 B) carved then
+reverted** — both are genuinely all-zero across their full span and
+mwcc silently routes an all-zero non-`const` global to `.bss` (no file
+bytes), a known wall already documented in
+[`cluster-b-size-1-2-recipe.md`](../cluster-b-size-1-2-recipe.md#generalisation--recipe-also-drains-value0-size4-brief-155).
+The proven fix (bundle with a non-zero neighbor) needs rewriting an
+already-shipped adjacent TU for both — out of this wave's scope. Full
+incident writeup (including how this reached a full gate cycle before
+being caught) in `cm-restock-carve-7-2026-08-14.md`.
+
+**Remaining after this wave: 39** (75 − 36 shipped, `main`'s 3
+holdouts — 1 deferred structural finding + 2 known-wall reverts),
+spread across the other 21 modules per the by-module table above
+(ov006 next largest at 6).

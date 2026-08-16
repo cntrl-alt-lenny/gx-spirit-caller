@@ -1446,7 +1446,7 @@ Standing rules unchanged: never hand-transcribe byte content; `relocs.txt` struc
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log — a background wrapper's exit code is not `gate3.py`'s) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the size-ordering wall write-up with its criteria. Regenerate `docs/research/README.md` LAST.
 
-### cm-restock-carve-7 — close P-50's evidence boundary, then keep draining [TODO]
+### cm-restock-carve-7 — close P-50's evidence boundary, then keep draining [DONE]
 
 `cm-restock-carve-6` (#1493) is merged. The carve half was the strongest in the series — every one of the 144 shipped bytes independently confirmed against the real ROM image and `relocs.txt`, and the misaligned-struct arc closure reconciles when derived from scratch (186 struct rows → exactly 35 misaligned → 26 delinks-claimed + 9 declined + 0 in limbo).
 

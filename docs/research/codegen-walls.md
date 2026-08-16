@@ -11856,50 +11856,83 @@ directly, not just cite the label):
    project's full byte-extraction/consumer standard, reproduce it a
    third and fourth time with real (not synthetic) content.
 3. The one genuine alternative mechanism (eliminate the ordering
-   question by eliminating one of the two symbols) was tested, not
-   assumed — and fails for a structural reason (real external
-   references to the eliminated name) that generalizes to any
-   candidate this recipe would ever target, not just the one tested.
+   question by eliminating one of the two symbols) was tested twice,
+   not assumed — once at the C-source level (fails at `mwldarm` link
+   with an undefined-symbol error, see below) and once at the
+   config level (fails even earlier, at `dsd delink`, see Leg 3
+   below) — for structural reasons that generalize to any candidate
+   this recipe would ever target, not just the one tested.
 4. No declaration-order, type-wrapping, or field-packing variant
    affected the outcome in any of the 6 scratch tests — the sort key is
    size, full stop, and nothing at the C source level reaches it.
+5. **The mechanism is compiler-tier-invariant, not a default-SP
+   quirk.** `cm-restock-carve-7` (2026-08-14) ran the
+   two-differently-sized-globals scratch test through all three mwcc
+   tiers reachable in this tree — default `2.0/sp1p5`, `.legacy.c`
+   (`1.2/sp2p3`), and `.legacy_sp3.c` (`1.2/sp3`) — using the same
+   43-byte-array + 1-byte-scalar shape as the real
+   `data_ov011_021d3034`/`_305f` candidate, in both declaration orders
+   (big-then-small, small-then-big). All three tiers, both orders: the
+   compiled `.o` places the 1-byte symbol's `.data` section first
+   (lower section index, lower file offset) and the 43-byte symbol's
+   section second — every time, byte-identical outcome across all 6
+   compiles. This closes the N-variant × SP sweep this document's `P`
+   bar requires (briefs 084/088/099) — see the confirmation note below.
 
-**Recipe status: NONE at the default SP.** Composing two
-differently-sized top-level globals is only safe when the real
-address-ascending sequence of member *sizes* is already non-decreasing
-(a property of the census data, not something source form can change).
-When it isn't, the pair is blocked from this TU-composition recipe.
+**Recipe status: NONE at any of the three compiler tiers reachable in
+this tree** (`2.0/sp1p5` default, `1.2/sp2p3` `.legacy.c`, `1.2/sp3`
+`.legacy_sp3.c` — confirmed identical by direct scratch compile,
+`cm-restock-carve-7`). Composing two differently-sized top-level
+globals is only safe when the real address-ascending sequence of
+member *sizes* is already non-decreasing (a property of the census
+data, not something source form or compiler tier can change). When it
+isn't, the pair is blocked from this TU-composition recipe.
 
-> ⚠️ **OBSERVED-NOT-CONFIRMED — the `P` classification outruns the
-> evidence (brain, 2026-08-10, at merge review).** Every scratch compile
-> and both real candidates behind this entry were run at the **default
-> SP only**. This document's own bar for a `P` verdict is an
-> N-variant × SP sweep (briefs 084/088/099), and that bar exists because
-> `P-10` was demoted to `C-29` by exactly this lever. Three routing
-> tiers are reachable here for **zero extra machinery** — `.legacy.c`
-> (mwcc 1.2/sp2p3) and `.legacy_sp3.c` (mwcc 1.2/sp3) are selected by
-> FILENAME (`tools/configure.py`, `is_legacy_c()` / `is_legacy_sp3_c()`)
-> and apply to a data TU just as they do to a code TU — and none was
-> tried. The entry's own text concedes "a genuinely different mwcc
-> flag/pragma neither this entry nor `cm-restock-carve-5`/`6` tried",
-> which is an admission of *unbeaten*, not a demonstration of
-> *permanent*.
+> ✅ **CONFIRMED — the evidence boundary flagged at merge review
+> (2026-08-10) is now closed (`cm-restock-carve-7`, 2026-08-14).** Both
+> items the brain's OBSERVED-NOT-CONFIRMED note asked for were run:
 >
-> **Untested lever set, for whoever picks this up:** the two legacy SP
-> tiers above, and pragma/section-placement space. Until one of those is
-> run, read this entry as "unbeaten at the default SP", and do not cite
-> it to decline a candidate without noting that boundary.
+> **The N-variant × SP sweep.** Six isolated scratch compiles (the
+> same 43B/1B shape as the real candidate, both declaration orders,
+> ×3 compiler tiers) all reproduce the identical ascending-by-size
+> section ordering — see item 5 above for the raw section/symbol-table
+> readout. Neither `.legacy.c` nor `.legacy_sp3.c` preserves
+> declaration order; both sort exactly like the default tier. This is
+> the SP-sweep bar this document has required for a `P` verdict since
+> `P-10`'s demotion to `C-29` — now satisfied with a clean negative
+> across all three tiers, not just the default one.
 >
-> Leg 3 of the evidence chain (merge-to-one-symbol) is also weaker than
-> stated: it fails because `data_ov011_021d305f` is referenced by name
-> from `func_ov011_021caafc`, and the entry generalises that to
-> "structural to the whole candidate class". Two one-compile repairs
-> were never tried — rewriting that single consumer to reference the
-> merged symbol `+ 43` (the final ROM word is the same absolute address
-> either way; the only open question is whether dsd's symbol/reloc check
-> accepts the renamed target), or re-providing the absorbed name at that
-> address via an assembly alias. Read that leg as **untested for this
-> candidate class**, not structural.
+> **Leg 3's two untested one-compile repairs — the "rewrite the
+> consumer to `merged_symbol + 43`" repair was run directly** (the
+> assembly-alias repair was not, see below): `func_ov011_021caafc.c`
+> was rewritten to reference `data_ov011_021d3034 + 43` instead of
+> `data_ov011_021d305f`, and `data_ov011_021d305f` was removed from
+> `config/eur/arm9/overlays/ov011/symbols.txt` (simulating the merge).
+> Result: **`dsd delink` fails immediately**, before `dsd check
+> symbols` or `mwldarm` even run — `[ERROR] No symbol found for
+> relocation from 0x021cabb4 in overlay 11 to 0x021d305f in overlay
+> 11`. This is a *stronger* failure than the original mwldarm leg: it
+> is independent of how `func_ov011_021caafc` references the address,
+> because `dsd delink` validates every relocation site in the
+> **original ROM's own disassembly** against `symbols.txt` — the
+> original binary's own literal pool at `0x021cabb4` still targets
+> `0x021d305f` regardless of what the C-source consumer says. Removing
+> the symbol breaks delink unconditionally for any TU whose original
+> code has a relocation to that address, which is precisely the
+> "referenced from elsewhere" property that makes a symbol a real
+> composable-recipe target in the first place (the recipe's own
+> "not an artificial pairing" requirement, restated in delink terms).
+> This confirms Leg 3 is structural, not an artifact of one consumer's
+> phrasing — the assembly-alias repair (re-providing the absorbed name
+> at that address via a hand-written `.s` label) was not tried and
+> remains a theoretical escape, but it does not change the
+> `dsd check symbols`/link-time picture this entry is about: any
+> C-source-level merge is closed off. Change reverted after
+> confirming the error (`git checkout --` on both files); tree is
+> clean.
+>
+> **Verdict: `P` earns its classification. No caveat remains open at
+> the default SP or either legacy tier.**
 
 **Census impact: 4 of the 35** misaligned-struct-arc candidates are
 declined citing this wall. Two are the `n=2` differing-size pairs it was
@@ -11927,7 +11960,9 @@ both.
 
 **Provenance:** `cm-restock-carve-5` (2026-08-09, discovery, PR #1487),
 `cm-restock-carve-6` (2026-08-09, formal characterization + the
-merge-to-one-symbol falsification).
+merge-to-one-symbol falsification), `cm-restock-carve-7` (2026-08-14,
+closes the evidence boundary: 3-tier SP sweep + the Leg 3 one-compile
+repair test).
 9. **Boolean materialized via `moveq`/`movne` resists instruction-
    order rephrasing — now confirmed, 2 independent instances.**
    `func_020488f4` (cm-main-tier-sweep-4, batch 3, 96.2%, 5 tries) and
