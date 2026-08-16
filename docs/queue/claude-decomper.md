@@ -1272,7 +1272,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > [`cm-main-tier-sweep-6-2026-08-14.md`](../research/cm-main-tier-sweep-6-2026-08-14.md).
 
 
-### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [TODO]
+### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [CLAIMED]
 
 `cm-main-tier-sweep-6` (#1497) replicated the matched-pair design on `ov002`: 24% (0-1 calls) vs 52% (4+), a 28-point gap, direction exactly as predicted and magnitude smaller as predicted. You also reported your own tier-match failure rather than presenting the arms as clean — that is why the rest of the numbers are trustworthy.
 
