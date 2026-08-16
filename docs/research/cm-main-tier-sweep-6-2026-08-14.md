@@ -35,6 +35,25 @@ and the direction prediction held exactly. Read as a reasonably
 well-calibrated prior: right on direction, right that the gap would
 shrink, off by a few points on how much.
 
+> **Statistical framing (brain, 2026-08-14, at merge review).** The
+> direction replicates and the magnitude behaved as predicted, but this
+> round **on its own is suggestive rather than conclusive**: 6/25 vs
+> 13/25 gives a two-sided Fisher exact **p = 0.079**, above the
+> conventional threshold, where `main`'s 10/25 vs 19/25 gave p = 0.021.
+> Combined with the tier-match failure reported below, a reader should
+> not take this single round as independently settling transfer.
+>
+> **Pooled across both modules, however, the evidence is strong:**
+> 16/50 (0–1 calls) vs 32/50 (4+ calls) = **32% vs 64%, Fisher exact
+> p = 0.0025**. That is the number to cite. Two independent modules,
+> same direction, same rough magnitude, and a pooled result an order of
+> magnitude past threshold — the selector transfers, but it is the
+> *replication* that establishes it, not either round alone.
+>
+> Practical consequence for sweep-7: a third module would add real
+> value, and an arm size above 25 would let a single round stand on its
+> own. At n=25 per arm a 28-point gap simply cannot reach p<0.05.
+
 ## Part 1 — the matched-pair replication
 
 **Design.** Pulled `ov002`'s full `--exclude-attempted` pool (1,865
