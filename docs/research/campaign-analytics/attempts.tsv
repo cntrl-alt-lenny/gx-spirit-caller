@@ -1055,3 +1055,16 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x021d52a0	ov004	120	default	rec-flag-clear-then-notify-dispatch	parked	13.3	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021d5a10	ov004	128	default	rec-flag-clear-then-ctx-format-dispatch	parked	15.6	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021cd0dc	ov011	180	default	cell-config-sink-8param-eaa0	parked	37.0	stmib-grouping-scheduling-p7-split	cm-main-tier-sweep-7-batch1-part1
+0x021cd2d4	ov011	136	default	tri-table-row-col-lookup	parked	23.5	multi-table-reg-numbering	cm-main-tier-sweep-7-batch1-part1
+0x021d6ed0	ov004	80	default	fn-ptr-array-dispatch-with-counter	parked	20.0	fn-ptr-field-pool-b6c-dispatch	cm-main-tier-sweep-7-batch1-part1
+0x021d0884	ov011	152	default	cross-overlay-hardcoded-bl	parked	7.9	cross-overlay-bl-module-none	cm-main-tier-sweep-7-batch1-part1
+0x021d22d4	ov011	92	legacy	byval-2point-fixedpt-distance	parked	3.9	legacy-prologue-r3-pad-vs-subsp4-register-pressure	cm-main-tier-sweep-7-batch1-part1
+0x021c63cc	ov006	136	default	slot-rebalance-clamp-two-loops	parked	20.6	P-36-redundant-branch-vs-predication-register-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b9e08	ov006	232	legacy_sp3	int-to-glyph-string-signed-div10-loop	parked	11.7	reciprocal-division-register-numbering-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b5f60	ov006	132	default	dual-row-advance-grid-copy-with-scalar-sibling	parked	5.4	register-pressure-cascade-dual-advancing-pointers	cm-main-tier-sweep-7-batch1-part1
+0x021d46a4	ov004	280	default	rec-flag-clear-voice-notify-dual-gate	parked	7.1	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021b4f68	ov006	268	default	audio-init-bigger-tail-notify-record-seed	parked	40.3	post-call-scratch-scheduling-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021cb834	ov004	268	default	grid-fill-plus-circular-vram-bank-copy	parked	3.0	loop-strength-reduction-plus-uncertain-div256-idiom	cm-main-tier-sweep-7-batch1-part1
