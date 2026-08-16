@@ -925,7 +925,7 @@ src/overlay006/func_ov006_021bd8ac.s:
     complete
     .text start:0x021bd8ac end:0x021bdcdc
 
-src/overlay006/func_ov006_021bdcdc.s:
+src/overlay006/func_ov006_021bdcdc.c:
     complete
     .text start:0x021bdcdc end:0x021bddd4
 

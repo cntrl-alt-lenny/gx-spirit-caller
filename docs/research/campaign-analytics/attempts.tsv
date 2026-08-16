@@ -1119,3 +1119,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021ca400	ov011	216	default	tile-lookup-bitmanip-register-pressure	parked	7.4	complex-216B-leaf-extra-scratch-registers	cm-main-tier-sweep-7-batch5-part1
 0x021be6f4	ov006	388	legacy_sp3	dual-table-copy-quad-writeback-register-pressure	parked	4.1	complex-388B-large-register-pressure-mismatch	cm-main-tier-sweep-7-batch5-part1
 0x021d512c	ov004	372	default	3way-gate-large-register-numbering-shift	parked	3.2	complex-372B-global-register-shift	cm-main-tier-sweep-7-batch5-part1
+0x021ca9e8	ov011	276	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-p2batch1
+0x021b5a54	ov006	284	legacy_sp3	state-machine-switch-dispatch	parked	8.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021b7db0	ov006	208	default	scan-loop-dual-counter	parked	7.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021c4bd4	ov006	240	default	guard-loop-text-emit	parked	6.7	large-diff-scheduling-mismatch	cm-main-tier-sweep-7-p2batch1
+0x021cb3b4	ov011	332	default	command-record-bitfield-pack	parked	1.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021cc664	ov011	316	legacy_sp3	fixed-point-row-loop-dispatch	parked	2.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021ce3a4	ov011	304	legacy_sp3	mode-dispatch-bitfield-gate	parked	3.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d2de4	ov011	364	default	64bit-fixedpoint-integrator-loop	parked	1.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d5bdc	ov004	264	legacy_sp3	mode-dispatch-callback-register	parked	12.1	large-diff-materialized-bool-mismatch	cm-main-tier-sweep-7-p2batch1
