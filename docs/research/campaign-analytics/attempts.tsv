@@ -1127,3 +1127,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021cb63c	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
 0x021d6f20	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
 0x021cd924	ov004	360	legacy_sp3	message-dispatch-3way	parked	14.4	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	legacy_sp3	task-grid-blit-setup	parked	25.0	tier-verification-inferior	cm-main-tier-sweep-7-p2batch2
