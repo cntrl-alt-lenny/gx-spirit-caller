@@ -14,6 +14,19 @@ Both rates are correct because they describe different populations:
 
 The 2.33% figure is the broad live-body rate for the 1,640-row worklist snapshot. The 11.00% figure is the rate in sweep-3's filtered, quota-filled dispatch; its pool deliberately included all known disagreement candidates, so it was not a random estimate of the bulk population. The 1.74% figure is the wider unattempted-D-range baseline. None of these numbers should be substituted for another.
 
+## Classifier correction addendum
+
+The first version of this reconciliation used a live classifier bug: `branch_kind()` treated predicated `bic` instructions such as `bicne` as conditional branches. The corrected rule strips a trailing ARM condition code and then decides from the base mnemonic, so `bic`, `bics`, `bicne`, and `bicsne` remain data-processing operations while `bne`, `blne`, `blxeq`, and `bxne` remain branches.
+
+On the current 1,640-row worklist, the before/after tool output is:
+
+| Run | Rows | Live `.s` bodies | Disagreements among live bodies |
+|---|---:|---:|---:|
+| Before predicate fix | 1,640 | 1,108 | 28 / 1,108 = 2.53% |
+| After predicate fix | 1,640 | 1,108 | 30 / 1,108 = 2.71% |
+
+Exactly 2 of 1,640 rows changed derived label, both from `guard chain` to `other`: `0x02033864` and `0x0203671c`. That is 0.12% of all rows and a 0.18 percentage-point increase in the current live-body disagreement rate. `0x0209e628` is not a current `.s` row, so it changes the historical sweep-3 replay rather than this current-tree 1,640-row count.
+
 ## Same-population reconstruction
 
 The exact sweep-3 population was reconstructed mechanically by address:
@@ -28,7 +41,7 @@ The five shipped commits contribute 12, 9, 13, 13, and 10 function `.s` deletion
 
 ## Per-address disagreements in the exact 100
 
-These are the 11 rows where the preserved worklist label differs from the re-derived label. `historical` means the body was read from the parent of the listed ship commit; `current` means it remains an `.s` in the current tree.
+With the corrected predicate rule, these are the 12 rows where the preserved worklist label differs from the richer re-derived label. `historical` means the body was read from the parent of the listed ship commit; `current` means it remains an `.s` in the current tree.
 
 | Address | Worklist label | Re-derived label | Body source | Mechanical evidence |
 |---|---|---|---|---|
@@ -37,6 +50,7 @@ These are the 11 rows where the preserved worklist label differs from the re-der
 | `0x02089938` | guard chain | other | historical: `010616b65^` | no qualifying 1–3-conditional guard-chain shape after the body scan |
 | `0x0208cfa4` | small dispatcher | guard chain | current `.s` | conditional-branch ladder, no jump-table/PC dispatch and no backward edge |
 | `0x0208d030` | small dispatcher | guard chain | current `.s` | conditional-branch ladder, no jump-table/PC dispatch and no backward edge |
+| `0x0209e628` | small dispatcher | guard chain | historical: `010616b65^` | `bicne` is data-processing; the body has three real conditional exits, not four |
 | `0x02090868` | guard chain | softfloat/CLZ | historical: `814e92b3c^` | body contains two `clz` instructions; this is the richer taxonomy's intentional split |
 | `0x02096358` | small dispatcher | guard chain | historical: `814e92b3c^` | 1–3 conditional branches, with no dispatcher shape or backward edge |
 | `0x020971b8` | small dispatcher | guard chain | historical: `4ee955643^` | 1–3 conditional branches, with no dispatcher shape or backward edge |
@@ -44,9 +58,11 @@ These are the 11 rows where the preserved worklist label differs from the re-der
 | `0x0209d018` | small dispatcher | guard chain | current `.s` | 1–3 conditional branches, with no dispatcher shape or backward edge |
 | `0x020b007c` | small dispatcher | guard chain | current `.s` | 2–3 conditional branches; its IEEE-754 `frexp`-style arithmetic is semantically softfloat, but mechanically it is a guard chain |
 
-The body evidence supports the re-derived control-flow labels for the three `guard chain → other` and seven `small dispatcher → guard chain` rows. `0x02090868` is a taxonomy difference: sweep-3's rule set had no separate CLZ bucket and could truthfully describe its two conditional exits as a guard chain, while the endgame reference taxonomy records the direct `clz` operations. `0x020b007c` is the converse warning: its bit-level floating-point idiom is semantically recognizable, but without a direct CLZ or helper call it remains mechanically `guard chain` under the classifier. The two taxonomies must not be treated as semantic and mechanical synonyms.
+The body evidence supports the re-derived control-flow labels for the three `guard chain → other` and eight `small dispatcher → guard chain` rows. `0x0209e628` is the implementation bug's canary: its historical body has only the three real conditional exits named in the sweep-3 brief once `bicne` is excluded from branch counting. `0x02090868` is a taxonomy difference: sweep-3's rule set had no separate CLZ bucket and could truthfully describe its two conditional exits as a guard chain, while the endgame reference taxonomy records the direct `clz` operations. `0x020b007c` is the converse warning: its bit-level floating-point idiom is semantically recognizable, but without a direct CLZ or helper call it remains mechanically `guard chain` under the classifier. The two taxonomies must not be treated as semantic and mechanical synonyms.
 
-Sweep-3's published subtype table says 8 `small dispatcher → guard chain` and 4 `guard chain → other` including the separate canary, or 8 and 3 within the dispatched 100. This reconciliation produces 7, 3, and 1 `guard chain → softfloat/CLZ` within the exact 100. The totals agree at 11, but the subtype histograms are not interchangeable: the richer taxonomy splits the direct-CLZ case, and sweep-3 did not persist a per-candidate derived-shape field for its 57 shipped rows. For the 43 parked rows, the `attempts.tsv` shape field is available and matches this re-read for all 43; the 57-row list above is the reproducible historical-body reclassification, not an invented recovery of a missing sweep-3 record.
+Sweep-3's published subtype table says 8 `small dispatcher → guard chain` and 4 `guard chain → other` including the separate canary, or 8 and 3 within the dispatched 100. This corrected reconciliation produces 8, 3, and 1 `guard chain → softfloat/CLZ` within the exact 100. The sweep-3 total remains 11 under its branch-only taxonomy; the richer endgame taxonomy reports 12 because it separately marks `0x02090868` as CLZ. The five batch commit messages did record named disagreement identities and derived-shape explanations for shipped rows, even though they did not normalize all 57 shipped candidates into `attempts.tsv`. In particular, `010616b65` names `0x0209e628` as a `DISAGREE` candidate; its historical body and the three real conditional exits adjudicate the shape here. The earlier claim that no per-candidate evidence existed for shipped rows was too strong.
+
+The two named implementation adjudications are now explicit. `0x020b007c` is mechanically a guard chain but semantically an IEEE-754 `frexp`-style routine, so the branch-shape label is not a semantic family label. `0x0209e628` is a genuine classifier error: the source's `bicne` is a predicated data-processing instruction, and the corrected classifier returns `guard chain`, matching sweep-3's pull-time derivation rather than the old false `small dispatcher` result.
 
 ## The missing-body denominator check
 
