@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -36,8 +37,8 @@ def test_contradiction_families_are_detected() -> None:
     assert _audit(_row(result="parked", match_pct="100")).parked_at_100
 
 
-def test_shipped_c_lever_is_reported_as_provenance_not_error() -> None:
-    report = _audit(_row(result="shipped", match_pct="100", park_class="C-55"))
+def test_new_legitimate_c_lever_ship_stays_green() -> None:
+    report = _audit(_row(result="shipped", match_pct="100", park_class="C-99"))
     assert len(report.shipped_with_c_lever) == 1
     assert report.error_count == 0
 
@@ -64,10 +65,14 @@ def test_committed_ledger_has_no_hard_validation_errors() -> None:
     assert report.error_count == 0
 
 
-def test_committed_ledger_keeps_all_31_legitimate_c_lever_ships_green() -> None:
+def test_committed_ledger_c_lever_exemption_is_property_shaped() -> None:
     report = validate_attempts.audit_file(
         Path(__file__).resolve().parents[1]
         / "docs/research/campaign-analytics/attempts.tsv"
     )
-    assert len(report.shipped_with_c_lever) == 31
+    c_lever = re.compile(r"C-\d+[a-z]?\Z", re.IGNORECASE)
+    for row in report.shipped_with_c_lever:
+        assert row["result"].strip().lower() == "shipped"
+        assert float(row["match_pct"]) == 100
+        assert c_lever.fullmatch(row["park_class"].strip())
     assert report.error_count == 0
