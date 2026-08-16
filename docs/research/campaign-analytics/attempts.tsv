@@ -1055,3 +1055,16 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x021cf358	ov011	76	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-batch2-part1
+0x021d2330	ov011	96	legacy	packed-vec2-struct-partial-spill	parked	4.2	reg-alloc-arg-spill-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021c1958	ov006	72	default	preamble-register-alias-resistant	parked	61.1	reg-alloc-preamble-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021ce344	ov011	96	default	dual-mask-register-preload-order	parked	16.0	reg-alloc-instr-scheduling	cm-main-tier-sweep-7-batch2-part1
+0x021d49b4	ov004	148	default	redundant-bool-materialize-before-predicated-return	parked	48.6	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021d5a90	ov004	132	default	redundant-bool-materialize-before-predicated-return	parked	39.4	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021c9bc8	ov006	140	default	nested-grid-search-high-register-pressure	parked	13.5	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021bef6c	ov006	176	default	predication-resistant-branch-P31	parked	47.7	P-31	cm-main-tier-sweep-7-batch2-part1
+0x021cc014	ov004	204	default	reg-alloc-state-variable-not-r0	parked	62.8	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021c6454	ov006	220	default	reshape-loop-excess-callee-saved	parked	20.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cab6c	ov006	156	default	nested-grid-search-high-register-pressure	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cfd6c	ov004	156	default	chained-fixed-point-div-packed-record	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021d705c	ov004	188	default	chained-fixed-point-div-packed-record	parked	2.1	reg-alloc	cm-main-tier-sweep-7-batch2-part1
