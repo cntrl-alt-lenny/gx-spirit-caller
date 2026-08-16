@@ -25,7 +25,7 @@ libs/nitro/func_ov004_021c9eec.legacy.c:
     complete
     .text start:0x021c9eec end:0x021c9ef0
 
-src/overlay004/func_ov004_021c9ef0.s:
+src/overlay004/func_ov004_021c9ef0.c:
     complete
     .text start:0x021c9ef0 end:0x021c9f94
 
@@ -586,7 +586,7 @@ src/overlay004/func_ov004_021d53c0.s:
     complete
     .text start:0x021d53c0 end:0x021d552c
 
-src/overlay004/func_ov004_021d552c.s:
+src/overlay004/func_ov004_021d552c.c:
     complete
     .text start:0x021d552c end:0x021d55d8
 
