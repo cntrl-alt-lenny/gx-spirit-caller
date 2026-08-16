@@ -1209,7 +1209,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > each), extensions to C-45 and C-73. See
 > [`cm-main-tier-sweep-5-2026-08-09.md`](../research/cm-main-tier-sweep-5-2026-08-09.md).
 
-### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [TODO]
+### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [DONE]
 
 `cm-main-tier-sweep-5` (#1494) settled the question five waves had confounded. The brain independently reproduced every number: the arms are genuinely matched (size 159.4 B vs 155.7 B with the LOW arm nominally *harder*, Mann-Whitney p=0.46; tiers exactly 14 legacy + 11 legacy_sp3 in each), the 36-point gap survives size stratification at **36.5 points standardized**, and Fisher exact gives p=0.021. **Callee count is a real, independent selector on `main`.**
 
@@ -1231,4 +1231,43 @@ Same mechanics: 5 worktrees x 20, pool FROZEN before dispatch, one worktree = on
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. ONE stated basis, WITH the byte total and the natural-C/asm split. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the two arm rates against your prior, and the arms' size/tier distributions so the match can be audited.
+
+> **DONE 2026-08-14. The selector TRANSFERS: 24% (LOW, 0-1 calls) vs
+> 52% (HIGH, 4+ calls), a 28-point gap** — smaller than `main`'s 36
+> points as the stated prior predicted (estimated range 15-25, landed
+> 3 points above it), same direction, consistent with a compiler-level
+> mechanism rather than a `main`-specific artifact. Sizes matched
+> tightly (199.5B vs 201.3B mean, 0.9% relative difference). Tier match
+> did NOT hold as designed: the mechanical pre-pass classifier had a
+> 50% false-positive rate on its `legacy_sp3` label (4/8 flagged
+> candidates were actually `default` tier on real compile, all in the
+> same direction — a `sub sp,#4`-alone heuristic that misses default
+> tier's own r3-spill-plus-pad case) — true composition LOW 3/25
+> legacy_sp3 vs HIGH 1/25, reported honestly per this item's own
+> instruction rather than claimed as matched. PART 2 yield (4+ calls,
+> ≤192B) shipped 20/48 attempted (41.7%), well below `main`'s 72% on
+> the same formula, consistent with `ov002`'s much heavier prior
+> mining (~700 vs ~500 attempts) compressing both arms toward a floor.
+> **Combined: 39/98 attempted shipped, 6,864 bytes, all natural C (0
+> hand-written asm)** — cross-validated two independent ways
+> (`check_activation_invariant.py`'s 39/39/39 count and
+> `generate_state_table.py`'s byte delta, exact match both times).
+> Process notes: the canary's first candidate walled (a real, already-
+> catalogued P-1 instance) before the second candidate shipped and got
+> a full single-region `ninja sha1` byte-verify — more expensive than
+> the standing `fastmatch.py`-only protocol, corrected for the
+> remaining 96 candidates; batch 4 stopped 2 candidates early on a
+> misapplied "15 total parks" reading of the "15 *consecutive*" stop
+> rule (true streak was 6); the first gate run was falsely reported
+> complete by a `nohup`-detached background wrapper while `gate3.py`
+> was still mid-build for another ~40 minutes, caught by reading the
+> log rather than trusting the notification; the real first run came
+> back a genuine `GATE FAIL` on a stale `docs/state-table.md` (all 3
+> regions had already passed SHA1), fixed and the full gate re-run
+> clean. Several recurring wall-shaped residuals surfaced across
+> batches (an "off-mul" register-swap family, a register-role-rotation
+> family, a scratch-register-renaming family) but are left unnumbered
+> pending proper cross-reference against the existing catalogue rather
+> than risk a wrong or duplicate entry. See
+> [`cm-main-tier-sweep-6-2026-08-14.md`](../research/cm-main-tier-sweep-6-2026-08-14.md).
 
