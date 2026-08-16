@@ -8,15 +8,45 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-08 — **(Windows PC, brain=Opus 5; roster unchanged.) Round
-0808: the biggest single-round coverage move of the campaign.**
-EUR natural-C **14.56%** (347,490 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
+**Last updated:** 2026-08-14 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0814: the callee-count selector is established across two modules.**
+EUR natural-C **16.15%** (385,286 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
 (282,000 B) — from the regenerated state-table at the SHA below, not inherited.
-EUR moved **+0.28 pp in one round** (14.28% → 14.56%, +6,720 B of `.text`), plus
-**+16,412 B of newly-typed data** (Typed-array 162,884 → 178,932; Named-struct
-57,076 → 72,440).
 
-<!-- main-sha: 1cee4f2c0 -->
+**EUR has moved 14.28% → 16.15% (+1.87 pp) across the 0808–0814 arc**, driven by
+the `main`-tier sweep series once it stopped selecting on shape and started
+selecting on callee count.
+
+**THE HEADLINE RESULT — callee count is a real, transferable selector.** Two
+matched-pair experiments, two modules, arms matched on size and (on `main`)
+tier:
+
+| Module | 0–1 calls | 4+ calls | Gap | Fisher p |
+|---|---|---|---|---|
+| `main` (#1494) | 10/25 = 40% | 19/25 = 76% | 36 pt | 0.021 |
+| `ov002` (#1497) | 6/25 = 24% | 13/25 = 52% | 28 pt | 0.079 |
+| **Pooled** | **16/50 = 32%** | **32/50 = 64%** | **32 pt** | **0.0025** |
+
+Read it as the *replication* establishing the result, not either round alone —
+at n=25/arm a 28-point gap mathematically cannot reach p<0.05, which is why
+`cm-main-tier-sweep-7` moves to 50/arm on a third module and then stops
+experimenting. On `main` the effect survives size stratification at 36.5 pt
+standardized (r=0.555 between calls and size, but size's *marginal* correlation
+with ship rate is r=0.007, and controlling for size makes the callee
+coefficient grow) — so it is not a size proxy. It is a **selector**, not a
+lever: you cannot give a function more callees.
+
+**Also settled this arc:** shape is NOT a usable selector (three waves; per-shape
+yield did not reproduce and ~11% of worklist labels were wrong); the ALIGNALL(2)
+alignment wall is beatable by TU composition when the composed span is 4-aligned
+at BOTH ends; and **P-50** (composed-TU declaration order collapsing to ascending
+size) is PERMANENT with evidence after a three-tier × two-order scratch sweep.
+
+⚠️ **This file is over 700 lines and its own header says "Keep it short."** The
+next brain should split the per-round narrative into `docs/research/` and leave
+only the current state, the anchors and the open questions here.
+
+<!-- main-sha: 4ed4bfea9 -->
 <!-- parked-prs: 1020 -->
 
 **Round 0808c (partial round — 3 of 4 lanes reviewed while the CC Decomper

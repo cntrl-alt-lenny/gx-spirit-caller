@@ -1271,3 +1271,26 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > than risk a wrong or duplicate entry. See
 > [`cm-main-tier-sweep-6-2026-08-14.md`](../research/cm-main-tier-sweep-6-2026-08-14.md).
 
+
+### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [TODO]
+
+`cm-main-tier-sweep-6` (#1497) replicated the matched-pair design on `ov002`: 24% (0-1 calls) vs 52% (4+), a 28-point gap, direction exactly as predicted and magnitude smaller as predicted. You also reported your own tier-match failure rather than presenting the arms as clean — that is why the rest of the numbers are trustworthy.
+
+**The brain added the statistical framing at merge, and it changes what this round should do.** On its own, 6/25 vs 13/25 is Fisher exact **p = 0.079** — suggestive, not conclusive (main's was p = 0.021). Pooled across both modules it is strong: 16/50 vs 32/50 = **32% vs 64%, p = 0.0025**. So the selector transfers, but it is the *replication* that establishes it, and **at n=25 per arm a 28-point gap mathematically cannot reach p<0.05**. Two rounds have now spent 50 candidates each on an experiment that could not individually conclude.
+
+So stop under-powering it, and start using it.
+
+**PART 1 — one properly-powered confirmation, then done experimenting.** A third module (pick the largest remaining unswept pool) with **50 per arm, not 25**. At 50/arm a 28-point gap lands near p≈0.005 and a single round stands on its own. State the prior. If the gap holds, the question is closed and no further matched-pair rounds are needed — say so explicitly in the round doc so a future wave does not re-litigate it. If it does not hold on a third module, that is the more interesting result and needs its own analysis.
+
+**PART 2 — exploit, with the remaining budget.** Dispatch on 4+ callees at the best size band your accumulated data supports, purely for yield. You now have ~600 recorded attempts across `main` and `ov002`; use them to pick the band rather than guessing. Report the rate against what the pooled model predicts — a large miss is itself a finding about the third module.
+
+⚠️ **Fix the pre-pass classifier before you rely on it.** Sweep-6's mechanical tier pre-pass had a **50% false-positive rate**, which is what broke the tier match. Either fix it or verify tier by reading the `.s` epilogue directly for every candidate in the arms (the arms are only 100 candidates; direct reading is affordable and is the ground truth the pre-pass was approximating).
+
+Standing reporting requirements, all of which recent rounds have had to be corrected on: ONE stated basis for the headline; the **byte total** (not file counts — `wall_aware_headroom.py`'s columns are file counts); the **natural-C vs asm split**; and the arms' size AND tier distributions so the match can be audited rather than asserted.
+
+Same mechanics: 5 worktrees x 20, pool FROZEN before dispatch, one worktree = one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every attempt via `park_one.py` and verify rows were written, wait for each batch's completion notification before touching its worktree. Levers C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-93 and P-30..P-50 — park P-36 scheduling-only diffs on sight.
+
+STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the arm rates with their Fisher p, and the arms' size/tier distributions. Regenerate `docs/research/README.md` LAST — a stale index has now failed `drift-check` on three separate PRs.
+
