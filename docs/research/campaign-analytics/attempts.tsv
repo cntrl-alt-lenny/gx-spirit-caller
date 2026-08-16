@@ -1055,3 +1055,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x021c15a4	ov006	172	default	3-state-dispatch-switch	parked	60.5	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d2008	ov011	224	default	duplicated-guard-asymmetric-mask-pack	parked	96.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021cc21c	ov004	136	default	record-init-counter-bump-message	parked	79.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d5638	ov004	196	default	changed-bool-flag-message-dispatch	parked	89.8	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d4ae4	ov004	196	default	changed-bool-flag-plus-dual-gate-message	parked	79.6	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c426c	ov006	220	default	bitfield-gate-dual-copy-loop	parked	19.6	loop-strength-reduction-register-role-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c9dd4	ov004	280	default	rgb555-fixedpoint-blend-loop	parked	1.4	fixed-point-blend-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
+0x021cca04	ov011	212	default	band-index-double-clamp-getsystemwork-gate	parked	0	fold-predication-alloc	cm-main-tier-sweep-7-batch4-part1
+0x021ceebc	ov011	124	default	band-table-dual-select-scaled-store	parked	0	predication-vs-branch-dual-assignment	cm-main-tier-sweep-7-batch4-part1
+0x021db874	ov004	288	default	sjis-halfwidth-transcoder-loop	parked	3.9	control-flow-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
