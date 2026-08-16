@@ -850,7 +850,7 @@ src/overlay006/func_ov006_021ba090.c:
     complete
     .text start:0x021ba090 end:0x021ba0f0
 
-src/overlay006/func_ov006_021ba0f0.s:
+src/overlay006/func_ov006_021ba0f0.c:
     complete
     .text start:0x021ba0f0 end:0x021ba1f0
 
@@ -1245,7 +1245,7 @@ src/overlay006/func_ov006_021c1d74.s:
     complete
     .text start:0x021c1d74 end:0x021c215c
 
-src/overlay006/func_ov006_021c215c.s:
+src/overlay006/func_ov006_021c215c.c:
     complete
     .text start:0x021c215c end:0x021c2280
 
