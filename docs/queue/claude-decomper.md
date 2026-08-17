@@ -1318,7 +1318,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the arm rates with their Fisher p, and the arms' size/tier distributions. Regenerate `docs/research/README.md` LAST — a stale index has now failed `drift-check` on three separate PRs.
 
 
-### cm-main-wall-filtered-sweep-1 — stop selecting on callees, start filtering out the walls [CLAIMED]
+### cm-main-wall-filtered-sweep-1 — stop selecting on callees, start filtering out the walls [DONE]
 
 `cm-main-tier-sweep-7` (#1502) did exactly what it was asked: 50/arm, a stated
 prior, a fixed classifier (0/19 disagreements), and a **clean null** —
