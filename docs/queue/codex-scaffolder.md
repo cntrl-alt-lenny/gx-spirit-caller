@@ -562,7 +562,7 @@ Effort: **MEDIUM**. Tooling budget: consolidates a manual check into the loop th
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a bad row is refused at write time + a test proving the 31 legitimate rows still pass + the full-ledger residual table.
 
-### q-validator-brittleness — the 31-row guard will red-fail the next legitimate ship [TODO]
+### q-validator-brittleness — the 31-row guard will red-fail the next legitimate ship [DONE]
 
 `q-ledger-validate-adopt` (#1491) is adopted correctly: the write-time check runs strictly BEFORE the `.s` restore, `_flip_delinks` and `unlink()` (verified by execution, not just by reading), and the CI step lands inside `drift-check`, which is genuinely one of the three required contexts in the `main-protection` ruleset. That is real adoption, not a tool sitting unused.
 
