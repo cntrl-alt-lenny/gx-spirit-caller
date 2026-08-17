@@ -13416,3 +13416,76 @@ boundaries to find the size-mismatched TU.
 - See [S-1](#s-1-padding-off-by-one--sub-word-_pad-lands-fields-at-wrong-offsets)
   for the struct-decl-error sibling pattern that produces an
   identical-looking diff but needs a different fix.
+
+### P-51. `int c=0; if(rec.field){rec.field=0;c=1;}` reuses the just-emptied field's dead register for `c`; mwcc always allocates a fresh one (permanent, ov004, 18 confirmed members)
+
+**The pattern.** A "changed" boolean derived from clearing a
+struct/record field: `int c=0; if(rec.unk38){rec.unk38=0;c=1;}
+if(c)...` (or an early-return variant, `if(!c)return;`). The
+original binary's register allocator reuses the now-dead register
+that held `rec.unk38` (typically r0, freed the instant the field is
+cleared) to also hold `c`. mwcc's allocator, given the identical C
+source, never makes that reuse — it always assigns `c` a fresh
+register (typically r1). The result is exactly one register off on
+every member, everywhere else in the function matching exactly (one
+park row logged 24/24 other words matching, only the 5 changed-bool
+words diverging).
+
+**Recipe status: NONE.** This pattern was first documented in
+`src/overlay004/ov004_core.h` (brief 320, wave 3) as "unsteerable" —
+storing `c` back to a struct field, forcing it through `!!`, and
+routing it through an explicit temp variable were all tried and all
+failed to make mwcc pick the dead register. cm-main-tier-sweep-7
+re-attempted several members fresh (not just re-reading the old
+notes) and did not find a coercion either. Treat as permanent: park
+on sight once the symptom matches (single-digit-word diff, isolated
+to a cleared-flag-then-branch site), do not re-grind it.
+
+**Mechanism note — this round's new finding.** Of the 12 sweep-7
+ledger rows matching this pattern, all 12 landed in candidates with
+4 or more callees (`n_call` 4–12); zero landed in any 0–1-callee
+candidate, despite roughly half of sweep-7's Part 1 pool (50 of 100
+candidates) being drawn specifically from the 0–1-callee band. This
+is consistent with sweep-5/6/7's pooled register-pinning-via-ABI
+hypothesis: more callees leave the allocator fewer free physical
+registers to choose from at the clear-then-branch site, making it
+more likely to land on the *specific* register the original also
+converged on by chance, or conversely more likely to diverge from it
+when it doesn't. It does not, on its own, explain why the original
+binary's allocator *consistently* prefers the reuse and mwcc's
+*consistently* doesn't — that half of the mechanism is still open.
+
+**Affected picks — 8 pre-existing (documented, brief 320, sizes not
+re-verified this round):** `021d48bc`, `021d52a0`, `021d4044`,
+`021d427c`, `021d43a0`, `021d4d8c`, `021d4804`, `021d5a10`.
+
+**Affected picks — 12 confirmed by cm-main-tier-sweep-7 (2026-08-17):**
+10 genuinely new — `021d46a4` (280B), `021d4a48` (140B), `021d55d8`
+(96B), `021d5638` (196B), `021d4ae4` (196B), `021d441c` (176B),
+`021d5738` (180B), `021d4584` (288B), `021d5004` (296B), `021d53c0`
+(364B) — plus 2 re-attempts of pre-existing members that had never
+gotten an `attempts.tsv` row before this round, `021d52a0` (120B)
+and `021d5a10` (128B), surfacing again as apparently-fresh candidates
+because `--exclude-attempted` only filters addresses already logged
+in the ledger and these had only ever been noted in prose in
+`ov004_core.h` — the same pre-ledger-documentation gap already
+tracked for pre-park-one.py walls elsewhere in this campaign.
+**Confirmed cohort is now 18** (8 + 10 net-new; the 2 re-attempts add
+ledger rows but not new membership). This lines up closely with
+`ov004_core.h`'s own brief-320 "THINNING FLAG" estimate of "~19" —
+a rough, unverified estimate at the time, now essentially confirmed
+by direct count.
+
+**Not the same pattern, flagged separately:** `021d3a7c` (ov004,
+248B, cm-main-tier-sweep-7 p2batch2, tag
+`dead-call-result-register-reuse`) is structurally similar — a dead
+value's register gets reused by the original but not by mwcc — but
+the dead value there is a discarded call *result*, not a
+cleared *struct field*, and the site is a plain dual-source count
+format rather than a clear-then-branch guard. Related family, not
+folded into this entry's count.
+
+**Provenance:** original ~8 documented in `src/overlay004/ov004_core.h`
+(brief 320, wave 3, pre-dates the `attempts.tsv` ledger). 12 more
+ledger rows: cm-main-tier-sweep-7 (2026-08-17), Part 1 batches 1/3/4/5
+and Part 2 batches 2/3/4/5.

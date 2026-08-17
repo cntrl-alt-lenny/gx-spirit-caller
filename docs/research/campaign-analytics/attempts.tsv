@@ -1055,3 +1055,111 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
 0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x021d52a0	ov004	120	default	rec-flag-clear-then-notify-dispatch	parked	13.3	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021d5a10	ov004	128	default	rec-flag-clear-then-ctx-format-dispatch	parked	15.6	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021cd0dc	ov011	180	default	cell-config-sink-8param-eaa0	parked	37.0	stmib-grouping-scheduling-p7-split	cm-main-tier-sweep-7-batch1-part1
+0x021cd2d4	ov011	136	default	tri-table-row-col-lookup	parked	23.5	multi-table-reg-numbering	cm-main-tier-sweep-7-batch1-part1
+0x021d6ed0	ov004	80	default	fn-ptr-array-dispatch-with-counter	parked	20.0	fn-ptr-field-pool-b6c-dispatch	cm-main-tier-sweep-7-batch1-part1
+0x021d0884	ov011	152	default	cross-overlay-hardcoded-bl	parked	7.9	cross-overlay-bl-module-none	cm-main-tier-sweep-7-batch1-part1
+0x021d22d4	ov011	92	legacy	byval-2point-fixedpt-distance	parked	3.9	legacy-prologue-r3-pad-vs-subsp4-register-pressure	cm-main-tier-sweep-7-batch1-part1
+0x021c63cc	ov006	136	default	slot-rebalance-clamp-two-loops	parked	20.6	P-36-redundant-branch-vs-predication-register-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b9e08	ov006	232	legacy_sp3	int-to-glyph-string-signed-div10-loop	parked	11.7	reciprocal-division-register-numbering-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b5f60	ov006	132	default	dual-row-advance-grid-copy-with-scalar-sibling	parked	5.4	register-pressure-cascade-dual-advancing-pointers	cm-main-tier-sweep-7-batch1-part1
+0x021d46a4	ov004	280	default	rec-flag-clear-voice-notify-dual-gate	parked	7.1	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021b4f68	ov006	268	default	audio-init-bigger-tail-notify-record-seed	parked	40.3	post-call-scratch-scheduling-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021cb834	ov004	268	default	grid-fill-plus-circular-vram-bank-copy	parked	3.0	loop-strength-reduction-plus-uncertain-div256-idiom	cm-main-tier-sweep-7-batch1-part1
+0x021cf358	ov011	76	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-batch2-part1
+0x021d2330	ov011	96	legacy	packed-vec2-struct-partial-spill	parked	4.2	reg-alloc-arg-spill-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021c1958	ov006	72	default	preamble-register-alias-resistant	parked	61.1	reg-alloc-preamble-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021ce344	ov011	96	default	dual-mask-register-preload-order	parked	16.0	reg-alloc-instr-scheduling	cm-main-tier-sweep-7-batch2-part1
+0x021d49b4	ov004	148	default	redundant-bool-materialize-before-predicated-return	parked	48.6	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021d5a90	ov004	132	default	redundant-bool-materialize-before-predicated-return	parked	39.4	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021c9bc8	ov006	140	default	nested-grid-search-high-register-pressure	parked	13.5	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021bef6c	ov006	176	default	predication-resistant-branch-P31	parked	47.7	P-31	cm-main-tier-sweep-7-batch2-part1
+0x021cc014	ov004	204	default	reg-alloc-state-variable-not-r0	parked	62.8	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021c6454	ov006	220	default	reshape-loop-excess-callee-saved	parked	20.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cab6c	ov006	156	default	nested-grid-search-high-register-pressure	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cfd6c	ov004	156	default	chained-fixed-point-div-packed-record	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021d705c	ov004	188	default	chained-fixed-point-div-packed-record	parked	2.1	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021b5fe4	ov006	192	default	5x-outer/7x-inner nested loop, sliding self+dest pointers, 8th-register pressure (r10 vs orig r3 padding)	parked	11.5	reg-alloc	cm-main-tier-sweep-7-batch3-part1
+0x021bf4fc	ov006	232	legacy_sp3	if/else both branches assign a call result to the same var; orig cross-jump-merges the store to ONE copy at the join label, sp3 backend duplicates it per-branch regardless of if/else vs ternary vs int/pointer typing (4 variations tried)	parked	32.2	control-flow-tail-merge	cm-main-tier-sweep-7-batch3-part1
+0x021cc194	ov011	188	legacy_sp3	12-arg call (func_0201eaa0), 8 stack args; orig fuses middle 4 (h,d,c,0) into one stmib, mine emits 3 separate str (P-2 stm-fusion, direction A)	parked	36.0	P-2-stm-fusion	cm-main-tier-sweep-7-batch3-part1
+0x021cfa50	ov011	168	legacy_sp3	two independent same-base struct-field RMWs (f2bc|=0x200, f2a4&=~0x10&=~0xf); orig fully sequential (field1 read/mod/store THEN field2 read/mod/store, no shared reg reuse); mwcc always load-hoists/interleaves the two fields' accesses regardless of source statement order, bitfield-vs-mask syntax, or temp-var staging (7 variations tried); branch-vs-predication (switch) and register-hoist (char *p) sub-issues WERE solved en route	parked	16.3	load-scheduling-interleave	cm-main-tier-sweep-7-batch3-part1
+0x021d4a48	ov004	140	default	changed-bool family: if(rec.unk38){rec.unk38=0;c=1;} if(c)... — orig reuses dead unk38 reg (r0) for c, mwcc always picks fresh r1 (documented unsteerable in ov004_core.h across 8 prior instances: 021d48bc/021d52a0/021d4044/021d427c/021d43a0/021d4d8c/021d4804/021d5a10; this is the 9th confirmed instance); func_02033308's 2-value r0:r1 return needed 'long long' not struct-by-value (mwcc uses hidden-pointer ABI for struct returns) — that sub-issue WAS solved en route	parked	62.9	changed-bool-reg-reuse	cm-main-tier-sweep-7-batch3-part1
+0x021d55d8	ov004	96	default	changed-bool family, early-return variant: if(rec.unk38){rec.unk38=0;c=1;} if(!c)return; — identical documented wall as 021d4a48 (this round) and the 8 ov004_core.h instances; 10th confirmed occurrence, rest of function matches exactly (24/24 words, only the 5 changed-bool words diverge)	parked	79.2	changed-bool-reg-reuse	cm-main-tier-sweep-7-batch3-part1
+0x021bd700	ov006	204	legacy_sp3	record[idx] bounds/split-by-flag; orig fuses the reset-branch's 2-field write into stmeq{r1,r2} (P-2 stm-fusion) AND fuses each asr#2 into the following add via the barrel shifter for the magic-number div/mod-by-10 pair; mine keeps both separate (struct-copy assignment and statement-reorder attempts both regressed further, changing the register set entirely)	parked	24.6	P-2-stm-fusion	cm-main-tier-sweep-7-batch3-part1
+0x021c9c54	ov006	172	default	structurally perfect match (branch structure, all registers) except ONE instruction: orig materializes -1 via mvneq r0,#0; mwcc always instead computes subeq r0,r3,#21 reusing the still-live r3=20 (stride constant) register — P-3 constant-materialization, 4 variations tried (bitwise-not, separate var, collapsed expr, negation operator), byte-identical every time; this single word cascades into pool-offset/branch-offset shifts accounting for all other diffs	parked	58.1	P-3-constant-materialization	cm-main-tier-sweep-7-batch3-part1
+0x021cb778	ov004	188	default	loop building packed flags/angle word via func_02005dac; orig keeps param 'a' as a plain +0x20/iter accumulator, reshifting (a<<23) fresh each iteration; mwcc always strength-reduces the shift-of-induction-variable into a directly-incrementing (a<<23)-accumulator (+0x10000000/iter) instead — 3 variations tried (volatile param: bad stack spill; volatile local shadow: same; i*0x20 fresh recompute: introduces a genuine unwanted multiply). Found+fixed 2 real signedness bugs en route (int+unsigned promotion silently changed asr->lsr twice)	parked	4.1	induction-strength-reduction	cm-main-tier-sweep-7-batch3-part1
+0x021d1080	ov011	144	legacy_sp3	if-branch (0x72-stride table334a row/cell lookup) matches BYTE-EXACT; else-branch (table4660 stride-0x28 2-field read) has orig reuse r0 for mul-result/pointer/loaded-value in a tight 3-way chain, mwcc picks r1 for the mul result instead — 4 variations tried (named ptr, inlined double-offset, incrementing ptr, explicit mul temp), byte-identical every time	parked	86.1	register-reuse-preference	cm-main-tier-sweep-7-batch3-part1
+0x021d4870	ov004	76	default	materialized-bool-global: if(g!=0)return; — documented VERBATIM in ov004_core.h wave-2 notes for THIS EXACT function address (021d4870, sibling 021d57ec): orig materialises movne#1;moveq#0 before the branch, mwcc always branches direct regardless of source form (plain if, or explicit ternary-materialized bool both tried, byte-identical)	parked	31.6	materialized-bool-global	cm-main-tier-sweep-7-batch3-part1
+0x021da100	ov004	188	default	byte-identical twin of func_ov004_021cb778 (same round, same batch) — same induction-variable strength-reduction wall on the (a<<23) computation; not re-attempted since 3 variations already failed identically on the twin. 2 real signedness bugs fixed en route (same as twin).	parked	4.1	induction-strength-reduction	cm-main-tier-sweep-7-batch3-part1
+0x021c15a4	ov006	172	default	3-state-dispatch-switch	parked	60.5	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d2008	ov011	224	default	duplicated-guard-asymmetric-mask-pack	parked	96.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021cc21c	ov004	136	default	record-init-counter-bump-message	parked	79.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d5638	ov004	196	default	changed-bool-flag-message-dispatch	parked	89.8	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d4ae4	ov004	196	default	changed-bool-flag-plus-dual-gate-message	parked	79.6	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c426c	ov006	220	default	bitfield-gate-dual-copy-loop	parked	19.6	loop-strength-reduction-register-role-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c9dd4	ov004	280	default	rgb555-fixedpoint-blend-loop	parked	1.4	fixed-point-blend-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
+0x021cca04	ov011	212	default	band-index-double-clamp-getsystemwork-gate	parked	0	fold-predication-alloc	cm-main-tier-sweep-7-batch4-part1
+0x021ceebc	ov011	124	default	band-table-dual-select-scaled-store	parked	0	predication-vs-branch-dual-assignment	cm-main-tier-sweep-7-batch4-part1
+0x021db874	ov004	288	default	sjis-halfwidth-transcoder-loop	parked	3.9	control-flow-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
+0x021b3318	ov006	172	legacy_sp3	or-of-adjacent-equality-range-fold	parked	86.0	P-32/P-33/C-45-ext	cm-main-tier-sweep-7-batch5-part1
+0x021dabcc	ov004	176	default	instruction-scheduling-register-choice-post-call	parked	81.8	P-36-adjacent	cm-main-tier-sweep-7-batch5-part1
+0x021c4348	ov006	116	default	hit-value-register-reuse-vs-fresh	parked	93.1	P-33-adjacent-register-reuse	cm-main-tier-sweep-7-batch5-part1
+0x021d641c	ov004	76	legacy_sp3	two-step-pointer-add-front-end-fold	parked	79.0	field-pool-base212-known-wall	cm-main-tier-sweep-7-batch5-part1
+0x021cc814	ov011	168	default	case0-load-dest-reg-numbering	parked	90.5	ov011-core-documented-1reg-wall	cm-main-tier-sweep-7-batch5-part1
+0x021b9c98	ov006	132	default	byteswap-stack-key-reg-alloc-cascade	parked	54.5	P-36-adjacent-source-invariant	cm-main-tier-sweep-7-batch5-part1
+0x021b7cfc	ov006	180	default	loop-register-role-cascade-r5-reused-across-loops	parked	53.3	permuter-class-register-mirror	cm-main-tier-sweep-7-batch5-part1
+0x021d441c	ov004	176	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	34.1	ov004-core-changed-bool-family-partial	cm-main-tier-sweep-7-batch5-part1
+0x021d5738	ov004	180	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	33.3	ov004-core-changed-bool-family-partial	cm-main-tier-sweep-7-batch5-part1
+0x021ccf3c	ov011	80	default	multi-field-rmw-base-pooling	parked	0.0	ov011-core-documented-multifield-rmw-wall	cm-main-tier-sweep-7-batch5-part1
+0x021ceffc	ov011	76	default	double-shift-pair-collapses-to-single-op	parked	47.4	P-1-adjacent-shift-pair-permanent	cm-main-tier-sweep-7-batch5-part1
+0x021d12c0	ov011	372	default	shell-sort-stack-resident-locals-reg-alloc	parked	16.5	complex-372B-multi-loop-reg-cascade	cm-main-tier-sweep-7-batch5-part1
+0x021caedc	ov004	388	default	switch-nested-loop-register-pressure-mismatch	parked	5.2	extra-2-register-cascade	cm-main-tier-sweep-7-batch5-part1
+0x021ca400	ov011	216	default	tile-lookup-bitmanip-register-pressure	parked	7.4	complex-216B-leaf-extra-scratch-registers	cm-main-tier-sweep-7-batch5-part1
+0x021be6f4	ov006	388	legacy_sp3	dual-table-copy-quad-writeback-register-pressure	parked	4.1	complex-388B-large-register-pressure-mismatch	cm-main-tier-sweep-7-batch5-part1
+0x021d512c	ov004	372	default	3way-gate-large-register-numbering-shift	parked	3.2	complex-372B-global-register-shift	cm-main-tier-sweep-7-batch5-part1
+0x021ca9e8	ov011	276	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-p2batch1
+0x021b5a54	ov006	284	legacy_sp3	state-machine-switch-dispatch	parked	8.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021b7db0	ov006	208	default	scan-loop-dual-counter	parked	7.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021c4bd4	ov006	240	default	guard-loop-text-emit	parked	6.7	large-diff-scheduling-mismatch	cm-main-tier-sweep-7-p2batch1
+0x021cb3b4	ov011	332	default	command-record-bitfield-pack	parked	1.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021cc664	ov011	316	legacy_sp3	fixed-point-row-loop-dispatch	parked	2.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021ce3a4	ov011	304	legacy_sp3	mode-dispatch-bitfield-gate	parked	3.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d2de4	ov011	364	default	64bit-fixedpoint-integrator-loop	parked	1.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d5bdc	ov004	264	legacy_sp3	mode-dispatch-callback-register	parked	12.1	large-diff-materialized-bool-mismatch	cm-main-tier-sweep-7-p2batch1
+0x021b5dec	ov006	356	default	parallel-store-loop	parked	93.3	C-65-strength-reduction	cm-main-tier-sweep-7-p2batch2
+0x021be5b8	ov006	316	default	record-refresh-scheduling	parked	36.2	P-36-instruction-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021caa64	ov006	264	default	dual-engine-cell-config	parked	10.6	P-40-constant-materialization	cm-main-tier-sweep-7-p2batch2
+0x021cf0c8	ov011	304	n/a	cross-overlay-bl	parked	unknown	C-32-cross-overlay-bl	cm-main-tier-sweep-7-p2batch2
+0x021d3a7c	ov004	248	default	count-format-dual-source	parked	52.4	dead-call-result-register-reuse	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021d6f20	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cd924	ov004	360	legacy_sp3	message-dispatch-3way	parked	14.4	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	legacy_sp3	task-grid-blit-setup	parked	25.0	tier-verification-inferior	cm-main-tier-sweep-7-p2batch2
+0x021d4584	ov004	288	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	88.9	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-p2batch3
+0x021d9d58	ov004	332	default	state-dispatch-guard-chain-timer-counters	parked	9.6	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cabbc	ov011	304	default	guard-chain-bitfield-table-lookup-dispatch	parked	11.8	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021b6364	ov006	364	default	init-loop-then-column-copy-loop	parked	81.7	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021b8a88	ov006	364	default	dual-bitmask-pack-loop-compact-index	parked	7.4	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c71e0	ov006	232	legacy_sp3	guard-chain-vram-clear-plus-text-layer-config	parked	25.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-p2batch3
+0x021cc0e0	ov004	316	default	guard-chain-dual-record-builder	parked	81.0	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cdd38	ov004	256	default	loop-vram-copy-with-glyph-width-clamp	parked	84.4	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021d0e98	ov004	256	default	loop-vram-bank-clear-plus-glyph-render	parked	43.9	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c8e98	ov006	264	default	audio-init-family-cousin	parked	39.4	P-31	cm-main-tier-sweep-7-p2batch4
+0x021cac38	ov006	252	default	mmio-scroll-pair-dual-delta	parked	42.9	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch4
+0x021b70fc	ov006	324	default	5-state-table-scan-3call-score	parked	4.4	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021cc27c	ov011	200	legacy_sp3	cell-config-eaa0-12arg	parked	32.1	stmib-grouping-scheduling	cm-main-tier-sweep-7-p2batch4
+0x021d5004	ov004	296	default	state-step-changed-bool-guard	parked	24.3	changed-bool	cm-main-tier-sweep-7-p2batch4
+0x021d1118	ov004	332	default	dual-index-loop-nested-2x-drain	parked	1.1	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021ce1ec	ov004	376	default	double-timer-setter-packed-descriptor	parked	16.0	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021d9fc4	ov004	316	legacy_sp3	fixedpoint-fill-plus-2tile-loop	parked	21.5	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021ce364	ov004	324	default	3-phase-slot-scan-fallback-min-search	parked	63.0	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021c3384	ov006	316	default	8row-config-broadcast-triple-source-field-pick	parked	69.6	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021ca264	ov006	316	default	conditional-record-base-stride-index-field-init	parked	10.0	P-29-mirror-mla-fusion-resistant	cm-main-tier-sweep-7-p2batch5
+0x021cb25c	ov011	344	default	cmd-record-dense-bitfield-pack-dual-pass-mode-gate	parked	8.0	ov011-core-multifield-rmw-wall-stack-variant	cm-main-tier-sweep-7-p2batch5
+0x021d2158	ov011	288	default	growable-array-drain-loop-stack-accumulator	parked	20.8	constant-fold-mask-collapse-register-cascade	cm-main-tier-sweep-7-p2batch5
+0x021d53c0	ov004	364	default	changed-bool-reinit-mode-record-select-dispatch	parked	45.0	changed-bool-reg-reuse	cm-main-tier-sweep-7-p2batch5
+0x021da1bc	ov004	268	default	grid-nibble-repaint-plus-wrap-split-blit	parked	16.4	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021cc4c8	ov011	252	legacy_sp3	packed-bitfield-config-triple-dispatch	parked	38.1	P-36-adjacent-field-chain-interleave	cm-main-tier-sweep-7-p2batch5
+0x021d07b0	ov011	212	n/a	cross-overlay-hardcoded-bl	parked	unknown	C-32	cm-main-tier-sweep-7-batch5-part1

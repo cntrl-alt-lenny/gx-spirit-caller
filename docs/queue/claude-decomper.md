@@ -1272,7 +1272,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > [`cm-main-tier-sweep-6-2026-08-14.md`](../research/cm-main-tier-sweep-6-2026-08-14.md).
 
 
-### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [TODO]
+### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [DONE]
 
 `cm-main-tier-sweep-6` (#1497) replicated the matched-pair design on `ov002`: 24% (0-1 calls) vs 52% (4+), a 28-point gap, direction exactly as predicted and magnitude smaller as predicted. You also reported your own tier-match failure rather than presenting the arms as clean — that is why the rest of the numbers are trustworthy.
 
@@ -1291,6 +1291,29 @@ Standing reporting requirements, all of which recent rounds have had to be corre
 Same mechanics: 5 worktrees x 20, pool FROZEN before dispatch, one worktree = one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every attempt via `park_one.py` and verify rows were written, wait for each batch's completion notification before touching its worktree. Levers C-44 / C-55 / C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-93 and P-30..P-50 — park P-36 scheduling-only diffs on sight.
 
 STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+> **Result.** Part 1 pooled overlay004+006+011 (no single module had
+> 50 in the 0-1-call band) for 50/arm: LOW 17/50 (34.0%), HIGH 18/50
+> (36.0%), Fisher **p = 1.0000** — a clean null *within this round*.
+> Two register-choice wall families (a newly-catalogued
+> [P-51](../research/codegen-walls.md) changed-bool-field family, 18
+> confirmed members, and the pre-existing register-numbering-
+> permutation-cascade family) landed **100% in the HIGH arm, 0% in
+> LOW** across 21 combined ledger rows — a plausible, evidenced
+> explanation for the miss, not just a shrug. Pooling all three
+> matched-pair rounds to date (sweep-5 + sweep-6 + this round, 300
+> candidates) still gives 33% vs 50%, **p = 0.0214** — significant.
+> The honest read: the callee-count effect is real at the pooled
+> level but not deterministic round-to-round, and this round's own
+> null has a specific, evidenced cause rather than being unexplained
+> noise. Part 2 (4+ calls, 200-376 B, mean 298 B) shipped 8/50
+> (16.0%) against a stated 30-50% prior — a large miss, driven by the
+> same two wall families continuing into the larger-size tail plus
+> the already-known size-decay effect. Tier pre-classifier
+> independently re-verified clean this round: 0/19 disagreements
+> against actual shipped tier (vs. sweep-6's 50% false-positive
+> rate). 43 shipped, 8,116 B, all natural C. See
+> [`cm-main-tier-sweep-7-2026-08-17.md`](../research/cm-main-tier-sweep-7-2026-08-17.md).
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the arm rates with their Fisher p, and the arms' size/tier distributions. Regenerate `docs/research/README.md` LAST — a stale index has now failed `drift-check` on three separate PRs.
 
