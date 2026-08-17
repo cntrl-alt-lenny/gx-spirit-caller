@@ -24,10 +24,12 @@ SOFTFLOAT_TARGET_RE = re.compile(
     r"sqrtf|float|softfloat|fixsf)",
     re.IGNORECASE,
 )
-CONDITIONAL_BRANCHES = {
-    "bcs", "bcc", "bhs", "blo", "beq", "bne", "bmi", "bpl", "bvs", "bvc",
-    "bhi", "bls", "bge", "blt", "bgt", "ble",
+CONDITION_CODES = {
+    "eq", "ne", "cs", "hs", "cc", "lo", "mi", "pl", "vs", "vc",
+    "hi", "ls", "ge", "lt", "gt", "le", "al",
 }
+BRANCH_MNEMONICS = {"b", "bl", "blx", "bx"}
+DATA_PROCESSING_B_PREFIXES = {"bic", "bics"}
 
 
 @dataclass(frozen=True)
@@ -90,13 +92,14 @@ def parse_body(row: Row) -> Body:
 
 
 def branch_kind(op: str) -> str:
-    base = op.rstrip(".")
-    if base in {"b", "bl", "blx", "bx"}:
-        return base
-    if base in CONDITIONAL_BRANCHES:
-        return "conditional"
-    if base.startswith("b") and base not in {"bic", "bics"}:
-        return "conditional"
+    mnemonic = op.rstrip(".")
+    base = mnemonic
+    if len(mnemonic) > 2 and mnemonic[-2:] in CONDITION_CODES:
+        candidate = mnemonic[:-2]
+        if candidate in BRANCH_MNEMONICS | DATA_PROCESSING_B_PREFIXES:
+            base = candidate
+    if base in BRANCH_MNEMONICS:
+        return base if base == mnemonic else "conditional"
     return ""
 
 

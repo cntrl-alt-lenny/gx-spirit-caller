@@ -319,7 +319,7 @@ Effort: **MEDIUM**.
 **Gate:** doc-only — `python -m pytest -q tests` green (paste the real pytest tail) + the same-population comparison table + the per-address list + the scope statement.
 
 
-### q-shape-classifier-bicne — `branch_kind()` counts predicated data-processing ops as branches [TODO]
+### q-shape-classifier-bicne — `branch_kind()` counts predicated data-processing ops as branches [DONE]
 
 `q-shape-rate-reconcile` (#1492) settled the 2.33%-vs-11% question cleanly and its population test reproduces to the address. While verifying it, a **live bug in `tools/main_shape_reclassify.py`** surfaced that the reconcile itself missed.
 

@@ -7,6 +7,7 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 from main_shape_reclassify import (  # noqa: E402
+    branch_kind,
     classify,
     read_rows,
 )
@@ -29,6 +30,16 @@ class TestMainShapeReclassify(unittest.TestCase):
 
     def test_worklist_row_count(self):
         self.assertEqual(len(self.rows), 1640)
+
+    def test_predicated_data_processing_is_not_a_branch(self):
+        for mnemonic in ("bic", "bics", "bicne", "biceq", "bicsne"):
+            with self.subTest(mnemonic=mnemonic):
+                self.assertEqual(branch_kind(mnemonic), "")
+
+    def test_predicated_real_branches_are_branches(self):
+        for mnemonic in ("bne", "blne", "blxeq", "bxne"):
+            with self.subTest(mnemonic=mnemonic):
+                self.assertEqual(branch_kind(mnemonic), "conditional")
 
 
 if __name__ == "__main__":
