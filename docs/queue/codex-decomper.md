@@ -333,7 +333,7 @@ Effort: **LOW-MEDIUM**. Tooling budget: catches a demonstrated misclassification
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning `bicne` (and at least one other predicated data-processing op) as NOT a branch + the before/after row-change count over the 1,640 + the corrected paragraph in the reconcile doc.
 
-### q-park-class-normalisation — one wall family, three spellings, no controlled vocabulary [TODO]
+### q-park-class-normalisation — one wall family, three spellings, no controlled vocabulary [DONE]
 
 `q-shape-classifier-bicne` (#1500) is merged and it is clean work. The brain
 re-ran your corrected classifier against the unmodified one on the same tree and
