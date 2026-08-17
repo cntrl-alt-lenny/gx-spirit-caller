@@ -657,3 +657,41 @@ now FAILS, the per-round coverage table, and the canary reconciliation. Run
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ledger-ship-coverage`; commit; report
 the PR number with the pasted artifacts.
+
+### q-ci-timeout-cache — no workflow sets a timeout; compile-check re-downloads the toolchain every run [TODO]
+
+External audit lead (2026-08-14), brain-verified live on `main` twice — at
+`b1015c872` and again at `fcb39a4c2`. Two independent CI-hygiene gaps:
+
+1. **All 12 workflows in `.github/workflows/` lack `timeout-minutes`** (verified:
+   `grep -L timeout-minutes .github/workflows/*.yml` returns 12 of 12). A hung
+   job therefore burns GitHub's 360-minute default before it is killed.
+2. **`compile-check.yml` has no toolchain cache.** It is a 3-region matrix on
+   `windows-latest` firing on every `src/**` PR, and it fetches the ~87 MB
+   mwcc/mwld toolchain via `tools/download_tool.py` on every run — so the
+   download happens three times per triggering PR (verified: no `actions/cache`
+   step anywhere in the file).
+
+The work:
+
+- Add `timeout-minutes` to every job in all 12 workflows. Size each one honestly
+  from its own run history (`gh run list --workflow <name> --limit 20`, take
+  roughly 3× observed p95, minimum 10) rather than picking one blanket number —
+  the analysis-diff workflows are minutes; `compile-check` needs real headroom.
+- Add `actions/cache` for the toolchain in `compile-check.yml`, keyed on the
+  tool version/URL strings in `download_tool.py` so a future re-pin busts the
+  cache automatically. Confirm `download_tool.py` short-circuits when a valid
+  cached tree is present; if it has no such check, add one that is checksum- or
+  marker-based, **never** mtime-based.
+
+Effort: **LOW**. Build-free: CI config plus at most one Python touch.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) +
+`ruff check` clean + all 12 workflows carrying a stated, justified timeout
+(list them with values in the PR body) + one real CI run on this PR showing a
+`compile-check` cache hit on its second run — paste the cache step's log lines
+from the Actions run, not a local claim.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-scaffolder q-ci-timeout-cache`; commit; report
+the PR number with the pasted artifacts.

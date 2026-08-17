@@ -408,3 +408,52 @@ of how many distinct raw values collapsed into how many families. Run
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-park-class-normalisation`; commit;
 report the PR number with the pasted artifacts.
+
+### q-cascade-ci-quadratic — three PR-CI tools rebuild per-target what they should index once [TODO]
+
+External audit lead (2026-08-14, external read-only pass), brain-verified live on
+`main` twice — at `b1015c872` and again at `fcb39a4c2` — so this is not a stale
+premise. Three analysis tools that run in **PR CI** carry per-target full-graph
+rescans, measured at roughly 78 s of CI wall per triggering PR, and the common
+result is now zero rows (EUR is at 9,837/9,867 functions matched).
+
+1. **`tools/find_mega_cascades.py`** — `mega_cascade_for_target` (lines 164-191)
+   builds the `callers_of` reverse index over all of `graph.edges_call` *inside*
+   the per-target body. Its own comment says "Invert `graph.edges_call` once" —
+   it inverts once per **call**. `rank_mega_cascades` (245-273, call site 266)
+   calls it once per placeholder symbol. Measured 67.5 s wall for a zero-result
+   run. Fix: build `callers_of` once in the rank driver and pass it down. Keep
+   the single-target CLI path working (build it there too, once).
+2. **`tools/find_cascades.py`** — `cascades_for_target` (146-174) rescans the
+   full `graph.edges_call.items()` per target with no index at all. Brain
+   re-measured on Mac: **10.36 s wall, 0 results** (`--version eur --top 5`).
+   Same fix shape.
+3. **`tools/propagate_template.py`** — `relocs_for_function` (134-149) linear
+   scans the whole module reloc list per symbol; `find_pattern_clusters.py` and
+   `pattern_library.py` each call it once per symbol (measured 10.8 s on `main`:
+   4,138 funcs × 27,401 relocs). Fix: pre-sort each module's relocs by
+   `src_addr` once, then `bisect` the symbol range per call.
+
+**Why this is worth a slot:** `.github/workflows/cascades-diff.yml` and
+`mega-cascades-diff.yml` fire on every PR touching `config/**/symbols.txt`, and
+`pattern-clusters-diff.yml` on `delinks.txt` changes — essentially every
+conversion PR this campaign ships pays this cost.
+
+⚠️ **OUTPUT-IDENTITY GUARD — this is the gate's core.** These tools' outputs
+feed CI diffs. Before and after the restructure, run each tool on the same `eur`
+snapshot; the emitted artifacts (`cascades.md`, the mega equivalent, the
+pattern-clusters output) must be **byte-identical**. Tie-ordering is the trap:
+dict/set iteration order must not leak into output ordering. Add a regression
+per tool pinning output equality on a small fixture graph. Do **not** add timing
+assertions (flaky) — report measured before/after wall times in the PR body.
+
+Effort: **LOW-MEDIUM**. Build-free: pytest + ruff only.
+
+**Gate:** `python -m pytest -q tests` green (paste the real pytest tail) +
+`ruff check` clean + the byte-identity demonstration for all three tools (paste
+the `cmp`/sha of before-and-after artifacts) + before/after wall times pasted
+from a real timing run.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-decomper q-cascade-ci-quadratic`; commit; report
+the PR number with the pasted artifacts.

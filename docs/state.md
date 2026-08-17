@@ -16,8 +16,33 @@ EUR natural-C **16.49%** (393,402 B) / USA **11.84%** (282,428 B) / JPN **11.82%
 
 All four lanes delivered: **#1502** (`cm-main-tier-sweep-7`), **#1501**
 (`cm-restock-carve-8`), **#1500** (`q-shape-classifier-bicne`), **#1499**
-(`q-validator-brittleness`). Both Codex lanes came back after **three missed
-rounds** — the dispatch path is working again; nothing in the repo was ever wrong.
+(`q-validator-brittleness`).
+
+**CORRECTION (Mac brain, 2026-08-17) — the "three missed rounds" reading in this
+round's original note was wrong, and the correct version matters operationally.
+The Codex lanes never missed a round and the dispatch path was never broken.**
+Rounds 0810-0814 were dispatched from the **Mac**, into Mac worktrees
+(`~/Dev/spirit-caller/codex-decomper-queue` / `codex-scaffolder-queue`), while
+the PC brain was checking the **Windows** worktrees (`kb-map`, `kb-types`) —
+idle precisely because the operator was working on the other machine. Reading a
+machine-local worktree as evidence about a lane is only valid on the machine the
+lane is running on.
+
+One Codex lane did stop early on 2026-08-14, for an unrelated and now-fixed
+cause: the **brain's own canary was impossible**. It demanded a live-`.s`
+reproduction of `func_0209e628`, which shipped to C in `cm-main-tier-sweep-3` —
+so `src/main/func_0209e628.legacy.c` is on disk and the `.s` exists only in
+history. The lane correctly STOPped and reported. The corrected kickoff routed
+the repro through `git show 010616b65^:src/main/func_0209e628.s` plus a
+unit-level `branch_kind()` check, and that is the version #1500 actually ran —
+its PR body's "1,108 live `.s` bodies" and historical `0x0209e628` adjudication
+are that correction's fingerprint.
+
+**Standing rule this produced:** a kickoff's `EXPECT` path and its preflight are
+**machine-specific**. Never forward a kickoff between machines — re-path it.
+A Windows-pathed guard pasted into a Mac session (or the reverse) fails its
+location check instantly, which is precisely the void-work class
+`tools/kickoff_lint.py` exists to prevent.
 
 **THE HEADLINE RESULT — the callee-count selector is real but WEAK, and it did
 not reproduce at full power.** Sweep-7 ran the 50/arm confirmation the previous
@@ -236,6 +261,39 @@ sufficient.
   path, EUR-only SHA1 PASS is sufficient evidence.
 
 ## Next-brain TODO
+
+**0a. SEEDED-NOT-DISPATCHED (Mac brain, 2026-08-17) — three CI/tooling items
+from an external read-only audit.** They sit **second** in their lanes' queues,
+behind round 0817's four items, so `work_queue.py next` is unaffected until
+those clear. Every premise was verified live on `main` twice (`b1015c872` and
+`fcb39a4c2`); re-verify before dispatch anyway.
+
+- `q-cascade-ci-quadratic` (codex-decomper) — `find_mega_cascades.py`,
+  `find_cascades.py` and `propagate_template.py` rebuild per-target what they
+  should index once; ~78 s of CI wall per triggering PR, and all three tools run
+  in PR CI on essentially every conversion PR. Brain re-measured
+  `find_cascades.py` at 10.36 s for a zero-result run.
+- `q-ci-timeout-cache` (codex-scaffolder) — 12 of 12 workflows lack
+  `timeout-minutes`; `compile-check.yml` re-downloads the ~87 MB toolchain on
+  every run of a 3-region matrix.
+- `q-toolchain-repin-eval` (claude-scaffolder) — `dsd` / `m2c` / permuter pins
+  have drifted 2-4 months. **Evaluation only, adoption is a separate item.**
+  Carries a layer correction: upstream m2c cannot subsume our `.legacy` /
+  `.legacy_sp3` routing (compile-tier vs draft-generation).
+
+**Rejected in the same pass, with reasons — do not re-litigate without new
+information.** A `git filter-repo` scrub of the `.wine-lane` blobs in history
+is real (the three largest objects in the pack are `.wine-lane` files; 1,822
+wine-path blobs; ~150 MB pack) but was **declined**: rewriting every commit hash
+invalidates 47 unique commit-sha citations across `docs/`, this file's own
+`main-sha` drift anchor, and the standing `git show <sha>` convention in briefs
+and kickoffs, and forces a re-clone on both machines. Reclaiming ~74 MB does not
+buy that. Preconditions if ever revived: between rounds, both machines synced,
+commit-map retained, and docs sha-citations remapped in the same change.
+Separately, `wine_link_lock.py` was examined and is **correctly scoped** — per-
+worktree WINEPREFIXes already parallelise compile (3.66× at 4 lanes, brief
+608/614); only the final link serialises, and wider-than-2-way concurrent
+linking was never tested. That test is the next experiment if anyone wants one.
 
 **0. ✅ DECIDED 2026-08-05 (round 0805, see top): adopted the pret-style public
 ladder + verdict-complete gate; rejected attainment-as-completion. Original item

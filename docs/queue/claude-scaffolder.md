@@ -1571,3 +1571,51 @@ blocked four PRs.
 the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the
 per-symbol reconciliation table + the Part 2 PoC verdict stated as a plain
 yes/no with its evidence.
+
+### q-toolchain-repin-eval — evaluate (do NOT adopt) dsd v0.12.0, m2c 19f2ddb2, permuter 27952473 [TODO]
+
+External audit lead (2026-08-14). Our pins have drifted: `dsd` vendored at
+**v0.11.0** (2026-04) against upstream **v0.12.0** (2026-08, whose notes cite a
+Thumb-BLX/jump-table `dsd dis` fix relevant to the m2c_feed export path); `m2c`
+pinned `ce052171` in `tools/m2c_bootstrap.py` (2026-06) against upstream
+`19f2ddb2`, with three ARM-specific commits on 2026-08-10 including a
+PopAndReturnPattern fix; `decomp-permuter` pinned `efc5c5e7` in `tools/permute.py`
+(2026-04) against upstream `27952473`, including a `perm_var_cond_block` mutation
+(2026-06-30) never tested against our documented reg-alloc plateau.
+
+⚠️ **LAYER CORRECTION, carried from brain review — do not chase a phantom.** The
+audit implied upstream m2c epilogue work might subsume our `.legacy` /
+`.legacy_sp3` routing. It cannot. Our routing tiers are a **compile-tier**
+mechanism (which mwcc compiles the TU, so the shipped bytes match); m2c is
+**draft generation** for the cold-RE track. Upstream m2c improvements can only
+improve draft quality feeding `m2c_feed.py`. Evaluate strictly on that basis.
+
+Scope, cheapest first, each with its own written verdict:
+
+1. **m2c bump** in a scratch clone (it is gitignored-vendored — bump
+   `M2C_COMMIT` locally only). Run the m2c_feed pipeline over a fixed panel of
+   6-10 previously-fed functions (draw from the cold-RE track docs; include at
+   least 2 with Style A/B epilogues and 1 known pool-literal mis-resolution
+   case) and A/B the drafts. Verdict: adopt or decline, with diffs.
+2. **permuter bump** likewise: probe `perm_var_cond_block` against 2-3
+   documented reg-alloc-plateau cases from `codegen-walls.md`. Permuter is a
+   demoted last-resort probe (brief 403) — the adoption bar is **cracking a
+   documented wall case**, not "upstream is newer".
+3. **dsd v0.12.0 LAST**, and only if 1 or 2 produced value. `dsd` is
+   load-bearing in the build graph (the delink layer). Bump in a dedicated
+   worktree, then run a FULL `python tools/gate3.py --scope all` 3-region SHA1
+   plus a delink-ref audit before proposing adoption. Any output drift in
+   delinks or symbols from the new version is a **finding to report**, never
+   something to auto-accept.
+
+Effort: **MEDIUM**. Item 3 needs the build machine — coordinate the wine lane.
+
+**Gate:** a per-item verdict with pasted evidence (m2c draft diffs; permuter
+case outcomes; for `dsd`, the three per-region sha1 lines VERBATIM if attempted)
++ an explicit adopt/decline per pin + **no pin actually changed on `main` in
+this PR**. This item is evaluation only; adoption is its own follow-up item with
+its own gate.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder q-toolchain-repin-eval`; commit;
+report the PR number with the pasted artifacts.
