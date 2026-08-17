@@ -15621,7 +15621,7 @@ src/main/func_0208a684.legacy_sp3.c:
     complete
     .text start:0x0208a684 end:0x0208a6b8
 
-src/main/func_0208a6b8.s:
+src/main/func_0208a6b8.c:
     complete
     .text start:0x0208a6b8 end:0x0208a728
 
@@ -20879,13 +20879,13 @@ src/main/data/data_020fb814.c:
     complete
     .data start:0x020fb814 end:0x020fb818
 
-src/main/data/data_020fb980.s:
-    complete
-    .data start:0x020fb980 end:0x020fbaa0
-
 src/main/data/data_020fb840.c:
     complete
     .data start:0x020fb840 end:0x020fb860
+
+src/main/data/data_020fb980.s:
+    complete
+    .data start:0x020fb980 end:0x020fbaa0
 
 src/main/data/data_020fbad8.c:
     complete
@@ -21295,13 +21295,13 @@ src/main/data_02101f34.c:
     complete
     .data start:0x02101f34 end:0x02101f74
 
-src/main/data/data_02101fb4.s:
-    complete
-    .data start:0x02101fb4 end:0x021020b4
-
 src/main/data/data_02101f74.c:
     complete
     .data start:0x02101f74 end:0x02101fb4
+
+src/main/data/data_02101fb4.s:
+    complete
+    .data start:0x02101fb4 end:0x021020b4
 
 src/main/data/data_021020b4.c:
     complete
@@ -21399,6 +21399,10 @@ src/main/data_02102254.c:
     complete
     .data start:0x02102254 end:0x0210225c
 
+src/main/data/data_0210225c.c:
+    complete
+    .data start:0x0210225c end:0x02102280
+
 src/main/data_02102280.s:
     complete
     .data start:0x02102280 end:0x0210228c
@@ -21406,10 +21410,6 @@ src/main/data_02102280.s:
 src/main/data_0210228c.s:
     complete
     .data start:0x0210228c end:0x02102298
-
-src/main/data/data_0210225c.c:
-    complete
-    .data start:0x0210225c end:0x02102280
 
 src/main/data/data_02102298.c:
     complete
@@ -21419,6 +21419,10 @@ src/main/data_0210229c.c:
     complete
     .data start:0x0210229c end:0x021022a4
 
+src/main/data_021022a4.c:
+    complete
+    .data start:0x021022a4 end:0x021022c8
+
 src/main/data_021022c8.s:
     complete
     .data start:0x021022c8 end:0x021022d4
@@ -21426,10 +21430,6 @@ src/main/data_021022c8.s:
 src/main/data_021022d4.s:
     complete
     .data start:0x021022d4 end:0x021022e0
-
-src/main/data_021022a4.c:
-    complete
-    .data start:0x021022a4 end:0x021022c8
 
 src/main/data_021022e0.c:
     complete
