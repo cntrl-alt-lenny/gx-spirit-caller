@@ -1179,3 +1179,19 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0201bddc	main	136	default	bitfield-flags-plus-guard-chain	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
 0x0201f25c	main	96	default	indirect-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
 0x0201fbe0	main	140	default	nested-guard-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0204f8f0	main	168	default	OQ-1 dead-branch: unsigned-char field_e<0 guard always folds away under mwcc, target keeps it (documented open question)	parked	21.4	OQ-1	cm-main-wall-filtered-sweep-1-batch2
+0x02020490	main	192	default	sum-of-3-halfwords register-allocation swap: same instruction shape/count, r0/r1/r2 assigned differently than target across 4 declaration-order variations tried	parked	85.4	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0202be4c	main	176	default	extra/k local register-allocation swap (r7 vs r8): correct push list, instruction count and shape, 5 declaration-order variations tried	parked	79.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0203de2c	main	84	default	P-36-like CSE hoist: mwcc hoists shared mov r0,r4 before the final branch, target duplicates it in each arm; 4 structural variations (if-chain/flip/if-else/switch) tried	parked	76.2	P-36	cm-main-wall-filtered-sweep-1-batch2
+0x02034b2c	main	172	default	straight-line resource-init call sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038ad4	main	192	default	ring-buffer wrapped stream read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203b774	main	188	default	two-branch retry-loop dispatcher	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202bf90	main	152	default	task-locked buffer load from offset table	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202c6ac	main	132	default	task-locked fixed-size record load	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032028	main	76	default	lazy-init-then-memset accessor	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032370	main	132	default	lazy-alloc IRQ-guarded object init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203320c	main	108	default	3-way dispatch on nested-struct helpers	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x020378c8	main	160	default	linked-list-walk vs indexed-node dual-mode setter	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038b94	main	192	default	overlay-info-load-then-stream-read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203991c	main	116	default	infinite event-poll loop	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203efa0	main	144	default	bitfield-dispatch vs 64-bit-timer-compare	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
