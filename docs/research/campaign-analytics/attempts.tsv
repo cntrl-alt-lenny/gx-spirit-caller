@@ -1162,3 +1162,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021d53c0	ov004	364	default	changed-bool-reinit-mode-record-select-dispatch	parked	45.0	changed-bool-reg-reuse	cm-main-tier-sweep-7-p2batch5
 0x021da1bc	ov004	268	default	grid-nibble-repaint-plus-wrap-split-blit	parked	16.4	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
 0x021cc4c8	ov011	252	legacy_sp3	packed-bitfield-config-triple-dispatch	parked	38.1	P-36-adjacent-field-chain-interleave	cm-main-tier-sweep-7-p2batch5
+0x021d07b0	ov011	212	n/a	cross-overlay-hardcoded-bl	parked	unknown	C-32	cm-main-tier-sweep-7-batch5-part1
