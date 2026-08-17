@@ -578,3 +578,82 @@ Effort: **LOW-MEDIUM**. Tooling budget: prevents a required check from going red
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a NEW legitimate `C-NN` shipped row does not fail the guard (construct one; it must pass) + the re-run residual with the row count matching `origin/main`.
 
+
+### q-ledger-ship-coverage — the ledger records parks and drops ships, so every rate from it is wrong [TODO]
+
+`q-validator-brittleness` (#1499) is merged. You did the right thing with the
+central fix: the `== 31` cardinality assertion is gone, replaced by a property
+check that every `shipped_with_c_lever` row is `result=shipped`, `match_pct=100`
+and a well-formed `C-NN`. That is the assertion that survives a growing ledger,
+and it removes the pressure that would have got the validator disabled within two
+rounds.
+
+**One gap the brain found while verifying it, and it is yours to close here:**
+the new test iterates `report.shipped_with_c_lever` and asserts a property per
+row — so **if that list is ever empty the test passes vacuously**. A regression
+that broke exemption detection outright would make the CI check silently
+meaningless, which is the same failure mode in a new costume. Fix: assert the
+list is non-empty before the per-row loop, and print the count for visibility
+rather than asserting it (the item asked for exactly that, and it got dropped).
+
+**THE MAIN ITEM — a structural bias the brain found in the ledger this round.**
+`attempts.tsv` records parks and, round to round, silently drops ships:
+
+| Round | shipped rows | parked rows | reality |
+|---|---:|---:|---|
+| `cm-main-tier-sweep-1` | 71 | 29 | complete |
+| `cm-main-tier-sweep-2` | 59 | 41 | complete |
+| `cm-main-tier-sweep-3` | **0** | 43 | shipped 57 |
+| `cm-main-tier-sweep-4` | **0** | 25 | shipped 75 |
+| `cm-main-tier-sweep-5` | **0** | 35 | shipped 65 |
+| `cm-main-tier-sweep-6` | 10 | 35 | partial |
+| `cm-main-tier-sweep-7` | **0** | 108 | shipped 43 |
+| `cm-ov002-unknown-sweep-17` | **0** | 64 | shipped 42 |
+
+`park_one.py` is the only recorder and it records parks by design, so whether a
+round's ships reach the ledger depends on whether that round's lane happened to
+add them by hand. **Consequence: any ship rate computed from `attempts.tsv` is
+biased toward failure.** This is not hypothetical — `cm-main-tier-sweep-7`'s
+kickoff told that lane to choose its Part 2 size band from "~600 recorded
+attempts", and Part 2 came in at 16% against a 30-50% prior.
+
+**THREE DELIVERABLES.**
+
+1. **Quantify it.** Per round, shipped rows recorded vs functions actually
+   shipped. Derive the truth mechanically, not from PR bodies: a round's shipped
+   addresses are exactly the `.s:` to `.c:` flips in that round's `delinks.txt`
+   diff, with sizes from the following `.text start:/end:` span. That is how the
+   brain verified sweep-7's 43 functions / 8,116 B independently, and it
+   reproduces exactly.
+2. **Backfill the missing shipped rows** by that same mechanical derivation.
+   ⚠️ **Do not invent fields you cannot derive.** `addr`, `module`, `text_size`,
+   `result=shipped` and `brief` are all derivable. `match_pct` is 100 for a
+   shipped function. `tier` is derivable from the file extension
+   (`.c` / `.legacy.c` / `.legacy_sp3.c`). `shape` and `park_class` are NOT
+   derivable for a backfilled ship — leave them empty rather than guessing, and
+   mark provenance so a future analysis can tell a backfilled row from a
+   contemporaneous one.
+3. **Guard it.** A validator check that fails when a round's `brief` prefix
+   appears among `delinks.txt` ship flips but contributes zero `result=shipped`
+   rows. That is the check that would have caught all five rounds above.
+
+⚠️ The Codex Decomper is normalising `park_class` this round and has been told
+explicitly **not to touch `attempts.tsv`**, so this file is yours alone — but it
+also means you must not add a `park_family` column or renormalise any existing
+`park_class` value. Rows only.
+
+CANARY before the bulk backfill: derive and paste `cm-main-tier-sweep-7`'s
+shipped set and show it is **43 addresses totalling 8,116 B**, split
+ov004 = 8 / 1,076 B, ov006 = 31 / 6,308 B, ov011 = 4 / 732 B. Those figures are
+independently confirmed; if your derivation disagrees, your derivation is wrong,
+and that is the finding to report before going any further.
+
+**Gate:** `python -m pytest -q tests` green — paste the real pytest tail — plus
+`ruff check` clean, `python tools/validate_attempts.py` exit 0 on the backfilled
+ledger, the non-empty-list fix with a regression proving an empty exemption list
+now FAILS, the per-round coverage table, and the canary reconciliation. Run
+`npx markdownlint-cli2 --fix` on any doc before committing.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-scaffolder q-ledger-ship-coverage`; commit; report
+the PR number with the pasted artifacts.

@@ -332,3 +332,79 @@ Fix the predicate handling properly rather than extending the literal exclusion 
 Effort: **LOW-MEDIUM**. Tooling budget: catches a demonstrated misclassification in a tool three waves have used as a reference.
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning `bicne` (and at least one other predicated data-processing op) as NOT a branch + the before/after row-change count over the 1,640 + the corrected paragraph in the reconcile doc.
+
+### q-park-class-normalisation — one wall family, three spellings, no controlled vocabulary [TODO]
+
+`q-shape-classifier-bicne` (#1500) is merged and it is clean work. The brain
+re-ran your corrected classifier against the unmodified one on the same tree and
+reproduced your blast radius **exactly**: 2 of 1,640 rows change label, both
+`guard chain` to `other`, live-body disagreements 28 to 30. Your condition-code
+stripping is also correct on the cases that matter — `bicne`/`bicsne` are
+data-processing, `bne`/`blne`/`blxeq`/`bxne` stay branches, and bare `b`/`bl`/`blx`
+keep their unconditional labels. You also amended the reconciliation to withdraw
+the earlier too-strong claim and adjudicated `0x0209e628` into the table. That
+self-correction is the part worth naming.
+
+**THE NEXT PROBLEM IS UPSTREAM OF EVERY WALL-BASED DECISION THE CAMPAIGN NOW
+WANTS TO MAKE.** `attempts.tsv`'s `park_class` column is free text and has drifted
+badly. In `cm-main-tier-sweep-7`'s 108 rows alone there are **~70 distinct
+`park_class` values**, and the round's own doc admits three of them are one
+family:
+
+- `register-numbering-permutation-cascade` (x2)
+- `register-numbering-permutation-cascade-P36-adjacent` (x4)
+- `P-30-adjacent-register-choice` (x3)
+
+The same round also carries `reg-alloc` (x10), `register-allocation-scheduling`
+(x3), `large-diff-register-realloc` (x6), `reg-alloc-instr-scheduling`,
+`reg-alloc-preamble-mismatch`, `reg-alloc-stack-footprint-mismatch` (x2),
+`extra-2-register-cascade` and `register-reuse-preference` — plausibly a handful
+of real families wearing a dozen names. Meanwhile
+`docs/research/codegen-walls.md` holds a formal numbered catalog (`C-NN` / `P-NN`,
+now through P-51) that most of these rows never reference.
+
+**The CC Decomper is building a wall-family detector this round and the campaign
+is about to start selecting on wall family. It cannot work on free text.**
+
+**THE ITEM — three deliverables, and one hard constraint.**
+
+1. **A controlled vocabulary** mapping to the formal catalog in
+   `docs/research/codegen-walls.md`. Every canonical family gets its `C-NN`/`P-NN`
+   anchor where one exists, and a named provisional family where one genuinely
+   does not yet. Derive it from the data, not from taste: enumerate all distinct
+   `park_class` values across the full ledger first, then cluster.
+2. **A normaliser** (`tools/normalise_park_class.py` or similar) that maps any
+   existing free-text value to a canonical family, with its mapping table as
+   reviewable data rather than buried regexes.
+3. **A family census** over the whole ledger: rows per canonical family, and how
+   much of the parked population the top families account for. That number is the
+   actual input to any wall-filtered targeting decision.
+
+⚠️ **HARD CONSTRAINT — DO NOT MODIFY `attempts.tsv` THIS ROUND.** Not one row,
+not one column. Two reasons. First, provenance: the raw tag a lane wrote is
+evidence and must not be overwritten by a derived label — the eventual shape is a
+NEW `park_family` column beside the untouched `park_class`, landing in a later
+round. Second, collision: the Codex Scaffolder is adding rows to that exact file
+this round under `q-ledger-ship-coverage`, and a column addition against
+concurrent row additions conflicts textually. Deliver the tool, the vocabulary
+and the census report; the ledger edit is sequenced after their work merges.
+
+CANARY, both directions, pasted before the wider run:
+
+- The three permutation-cascade spellings above must normalise to **one** family.
+- `C-32` and `C-32-cross-overlay-bl` must both normalise to **C-32** while the
+  qualifier survives somewhere inspectable — a normaliser that silently discards
+  `cross-overlay-bl` has destroyed the distinction that made that row useful.
+- At least one pair that looks similar but must NOT merge, chosen and justified
+  from the data (e.g. a scheduling-only P-36 diff vs a register-choice diff —
+  these have different fixability and must not collapse into one bucket).
+
+**Gate:** `python -m pytest -q tests` green — paste the real pytest tail — plus
+`ruff check` clean, a regression per canary case, the full distinct-value
+enumeration with counts, the canonical-family census, and an explicit statement
+of how many distinct raw values collapsed into how many families. Run
+`npx markdownlint-cli2 --fix` on any doc before committing.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-decomper q-park-class-normalisation`; commit;
+report the PR number with the pasted artifacts.
