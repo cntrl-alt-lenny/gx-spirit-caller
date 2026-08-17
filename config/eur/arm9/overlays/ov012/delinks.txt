@@ -57,7 +57,7 @@ src/overlay012/func_ov012_021ca814.s:
 src/overlay012/func_ov012_021ca964.s:
     complete
     .text start:0x021ca964 end:0x021caea8
-src/overlay012/func_ov012_021caea8.s:
+src/overlay012/func_ov012_021caea8.c:
     complete
     .text start:0x021caea8 end:0x021caf44
 
