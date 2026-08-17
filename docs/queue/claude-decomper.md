@@ -1317,3 +1317,95 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the arm rates with their Fisher p, and the arms' size/tier distributions. Regenerate `docs/research/README.md` LAST — a stale index has now failed `drift-check` on three separate PRs.
 
+
+### cm-main-wall-filtered-sweep-1 — stop selecting on callees, start filtering out the walls [TODO]
+
+`cm-main-tier-sweep-7` (#1502) did exactly what it was asked: 50/arm, a stated
+prior, a fixed classifier (0/19 disagreements), and a **clean null** —
+LOW 17/50 (34.0%) vs HIGH 18/50 (36.0%), Fisher p = 1.0000. 43 shipped,
+8,116 B, all natural C, zero asm escapes; the byte total was verified
+independently by the brain from `delinks.txt` spans and matches exactly.
+
+**Read the corrected conclusion before planning anything.** The round explained
+its null by two register-choice wall families landing entirely in the HIGH arm,
+and computed that crediting half of "21 such rows" restores a 22-point gap. The
+brain re-derived the split from the `brief` column of the 108 rows the PR added:
+**only 12 of the 21 are in Part 1** — the other 9 are Part 2 rows, which the
+round's own Part 2 section says. Corrected:
+
+| Credit to Part 1 HIGH | HIGH | vs LOW 34% | Fisher p |
+|---|---:|---|---:|
+| none (as measured) | 18/50 (36%) | +2 pt | 1.0000 |
+| half of the 12 | 24/50 (48%) | +14 pt | 0.2223 |
+| all 12 | 30/50 (60%) | +26 pt | 0.0158 |
+
+So the wall concentration is real and one-sided, but it does **not** rescue the
+round on any conservative accounting. Pooled across all three matched-pair
+rounds (200 candidates, 100/arm) the selector still holds at 33% vs 50%,
+p = 0.0214.
+
+**THE CALLEE-COUNT QUESTION IS NOW CLOSED. Do not run a fourth matched-pair
+round.** The answer is: real, transferable, but weak and not reliable
+round-to-round — a useful tiebreaker, not a targeting strategy. Say so in your
+round doc so no future wave re-litigates it.
+
+**What actually moved the rate this round was wall-family density.** Part 2 (4+
+calls, 200-376 B) shipped 8/50 = 16% against a 30-50% prior, and the same two
+families followed it into the larger band at equal or higher density. That is
+the lever worth attacking, and unlike callee count it is *actionable*: you can
+decline a candidate before spending a dispatch on it.
+
+**PART 1 — build a pre-dispatch wall detector, and VALIDATE it by dispatching
+both arms.** Target the two families this round evidenced: **P-51**
+(changed-bool-field register reuse, 18 confirmed members, `int c=0;
+if(rec.field){rec.field=0;c=1;} if(c)...`) and the register-numbering-permutation
+cascade. Build the detector mechanically from the `.s` body, calibrate it on the
+known members as positives and this round's 43 shipped as negatives, then:
+
+- **30 candidates the detector FLAGS** (predicted walls) — dispatch them anyway.
+- **60 candidates the detector PASSES** — dispatch normally.
+
+Both arms from the same ≤192 B, 4+-callee pool. **Stated prediction required
+before dispatch:** flagged arm <15%, passed arm >55%. Dispatching the flagged
+arm is the whole point — it measures the detector's precision directly instead
+of assuming it. A detector that flags real walls is worth more than another
+selector study, and one that doesn't is a negative result you can only get this
+way.
+
+⚠️ **STAY AT OR BELOW 192 B.** Part 2 established 16% at a 298 B mean. Do not
+re-probe the large band this round; that question is answered.
+
+⚠️ **RECORD YOUR SHIPPED ROWS IN `attempts.tsv`, not just your parks.** The
+brain found this round recorded 108 rows, **all `result=parked`** — zero shipped
+rows for 43 shipped functions. Sweeps 3/4/5/7 all did this; sweeps 1-2 did not.
+Consequence: any ship rate computed from the ledger is biased toward failure
+(sweep-4 reads as 25 parked / 0 shipped when it actually shipped 75/100), and
+your own Part 2 band selection was drawn from that biased history. The Codex
+Scaffolder is fixing the recorder and backfilling under `q-ledger-ship-coverage`
+this round — do not backfill history yourself, but **do** record this round's
+ships as you go.
+
+Standing reporting requirements: ONE stated basis for the headline; the **byte
+total** (not file counts — `wall_aware_headroom.py`'s columns are file counts);
+the **natural-C vs asm split**; both arms' size distributions; and the
+detector's confusion matrix (flagged-and-parked, flagged-but-shipped,
+passed-and-shipped, passed-but-parked) with a Fisher p on the 2x2.
+
+Same mechanics: 5 worktrees x ~18, pool FROZEN before dispatch, one worktree =
+one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every
+attempt via `park_one.py` and verify rows were written, wait for each batch's
+completion notification before touching its worktree. Levers C-44 / C-55 / C-63
+/ C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-93 and P-30..P-51 — park P-36
+scheduling-only diffs on sight, and P-51 members on sight now that it is formal.
+
+STOP: at 90 recorded attempts, or 15 consecutive parks with no ship. Effort MAX.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated
+branch AFTER any final rebase (read the log — a background wrapper's exit code
+is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`;
+`.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`.
+Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the
+confusion matrix with its Fisher p, and both arms' size distributions. Run
+`npx markdownlint-cli2 --fix` on your round doc, and regenerate
+`docs/research/README.md` LAST — a stale index has now failed `drift-check` on
+four separate PRs.

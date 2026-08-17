@@ -206,8 +206,13 @@ shape and reader filters never surfaced as candidates at all.
 **So: is the pool empty?** For the specific method this lane has run
 for 8 waves — 4-shape, ≥1-reader, header-cross-reference-and-type — 
 essentially yes. What's left reachable by that exact method is 25
-symbols / 548 bytes: smaller than half of what a *single* module
-(`ov006`) contributed this wave alone. Widening only the shape filter
+symbols / 548 bytes — **about 1.56x what this wave's `ov006` carve
+shipped (352 B), not "smaller than half" of it** (brain correction at
+merge: the original comparison was inverted, and it was the one
+quantitative claim supporting the "exhausted" conclusion). The
+conclusion survives the correction, but on a different basis: 548 B is
+roughly *one more wave* of headroom at this wave's own rate, not a
+fraction of one. Widening only the shape filter
 (same reader evidence standard, just including `string`/`string-ascii4`
 shapes the original census excluded) adds 1,076 symbols / 11,592 bytes
 — real, still worth a future wave, but not a new discovery, just an

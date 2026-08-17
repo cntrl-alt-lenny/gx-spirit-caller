@@ -452,10 +452,27 @@ bounded scope so far. `cm-restock-carve-7`.
 
 **Remaining after `cm-restock-carve-8`'s `ov006` carve (6 symbols,
 352 B shipped this wave): 25 symbols, 548 bytes, across 14 modules**
-(`ov012` 4, `ov009` 4, `ov016` 4, `ov019` 2, `ov020`/`ov023`/`ov001`/
-`ov003`/`ov021`/`ov015`/`ov005`/`ov014`/`ov017` 1 each) — genuinely
+(`ov012` 4, `ov009` 4, `ov016` 4, `ov019` 2, **`ov008` 2**,
+`ov020`/`ov023`/`ov001`/`ov003`/`ov021`/`ov015`/`ov005`/`ov014`/
+`ov017` 1 each) — genuinely
 open by this reconciliation, not individually re-verified for hidden
 walls this wave beyond the census's own recorded sizes. `232 + 16 + 1
-+ 25 = 274`, exact. Full four-bucket accounting, plus the much larger
++ 25 = 274`, exact.
+
+> **BRAIN CORRECTION (2026-08-17, at merge).** As originally written,
+> this module enumeration listed only 23 symbols across 13 modules
+> against its own stated 25 / 14 — the omitted module was **`ov008`
+> (`data_ov008_021b23c0` and `data_ov008_021b23d0`, 16 B each, census
+> rows 18-19)**. Both verified still open directly against
+> `config/eur/arm9/overlays/ov008/delinks.txt`: the `.rodata` section
+> runs `0x021b23b8`-`0x021b2430`, carving covers `0x021b23b8`-`0x021b23c0`
+> and `0x021b23e0`-`0x021b2430`, leaving the 32-byte gap
+> `0x021b23c0`-`0x021b23e0` — exactly these two symbols — uncarved.
+> The bucket **totals were always right** (25 / 548 B includes them:
+> 23 symbols = 516 B, + 32 B = 548 B); only the parenthetical
+> breakdown was short. A wave using this disposition as its worklist
+> would have skipped both.
+
+Full four-bucket accounting, plus the much larger
 pool this method has never been able to see at all, in
 [`cm-restock-carve-8-2026-08-14.md`](cm-restock-carve-8-2026-08-14.md).

@@ -107,19 +107,42 @@ being LOW candidates:
 
 Together these 21 ledger rows (12 + 9, no overlap) are register-
 allocator-choice walls with no known coercion, and every single one
-of them fell in the HIGH arm. A rough counterfactual: crediting even
-half of them as "would have shipped under a hypothetical fix" moves
-HIGH from 18/50 to roughly 28/50 (56%) against LOW's unchanged 17/50
-(34%) — a 22-point gap, back inside the stated prior range. This is
-consistent with, not a refutation of, the pooled model: the callee-
-count effect appears to be real, but this round's specific HIGH-arm
-draw happened to concentrate an unusually large share of two
+of them fell in a 4+-callee pool rather than a 0-1-callee one.
+
+> **BRAIN CORRECTION (2026-08-17, at merge).** The counterfactual as
+> originally written credited all 21 rows to the Part 1 HIGH arm and
+> concluded a restored 22-point gap. **Only 12 of the 21 are in Part 1
+> at all** — the other 9 are Part 2 pool rows, as this round's own
+> Part 2 section states. Re-derived directly from the `brief` column
+> of the 108 ledger rows this PR adds: changed-bool family 9 in Part 1
+> / 3 in Part 2; permutation family 3 in Part 1 / 6 in Part 2. The
+> corrected counterfactual is therefore:
+>
+> | Credit applied to Part 1 HIGH | HIGH | vs LOW 17/50 (34%) | Fisher p |
+> |---|---:|---|---:|
+> | none (as measured) | 18/50 (36%) | +2 pt | 1.0000 |
+> | half of the 12 Part 1 walls (6) | 24/50 (48%) | +14 pt | 0.2223 |
+> | all 12 Part 1 walls | 30/50 (60%) | +26 pt | 0.0158 |
+>
+> So the half-credit counterfactual does **not** restore the gap to
+> significance and lands below the stated 55-65% prior; only crediting
+> *every* Part 1 wall row does. The wall concentration remains a real
+> and evidenced partial explanation for the null — the 12 Part 1 rows
+> genuinely are all in the HIGH arm, which is not a chance pattern —
+> but it does not rescue the round's HIGH arm back into the prior on
+> any conservative accounting. The null stands on its own terms.
+
+This is consistent with, not a refutation of, the pooled model: the
+callee-count effect appears to be real, but this round's specific
+HIGH-arm draw happened to concentrate an unusually large share of two
 adjacent, currently-uncoercible register-choice walls.
 
 ### Does the question stay closed? Pooling all three rounds
 
-Sweep-5 + sweep-6 + this round's Part 1, combined (300 candidates,
-150/arm):
+Sweep-5 + sweep-6 + this round's Part 1, combined (200 matched-pair
+candidates, 100/arm — 25 + 25 + 50 per arm; the "300 candidates,
+150/arm" originally written here contradicted the denominators in the
+table below and in the Fisher test, corrected by the brain at merge):
 
 | Round | LOW shipped | HIGH shipped |
 |---|---:|---:|

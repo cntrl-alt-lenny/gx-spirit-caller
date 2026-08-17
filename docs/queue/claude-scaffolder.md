@@ -1489,3 +1489,85 @@ CANARY: the first carve of Part 1 goes through the FULL gate (3-region SHA1) bef
 ⚠️ GATE TIMING: the CC Decomper is running `cm-main-tier-sweep-7` with a 5-worktree consolidated `--clean` 3-region gate. mwcc serialises MACHINE-WIDE. Before your canary gate run `Get-Process | Where-Object { $_.Name -match 'mwcc|mwld|mwasm|ninja' }` — if it returns rows, wait. Confirm the window with Lenny.
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the re-census table with its four buckets and a stated remaining-bytes figure.
+
+### cm-restock-carve-9 — the two successors this lane's own re-census identified [TODO]
+
+`cm-restock-carve-8` (#1501) shipped `ov006`'s last 6 candidates (352 B) and did
+the harder half of the job: the honest four-bucket re-census this lane had
+deferred for seven waves. It also caught something worth carrying — **six
+symbols that waves 5-7 investigated and wall-blocked but recorded only in their
+own narrative docs**, so a mechanical reconciliation kept re-surfacing them as
+open. They are now in the formal declined table. `232 + 16 + 1 + 25 = 274`,
+exact.
+
+**Two brain corrections landed with the merge; both matter to this wave's
+scoping:**
+
+1. The remaining reachable pool is **548 B — about 1.56x what `ov006` shipped
+   this wave (352 B)**, not "smaller than half" of it. The comparison was
+   inverted, and it was the one quantitative claim supporting the "exhausted"
+   verdict. The verdict survives, on a different basis: 548 B is roughly *one
+   more wave* of headroom, not a fraction of one.
+2. The 25-symbol module enumeration listed only 23 across 13 modules. The
+   omitted module is **`ov008`** — `data_ov008_021b23c0` and
+   `data_ov008_021b23d0`, 16 B each, verified still open directly against
+   `delinks.txt` (the `.rodata` section runs `0x021b23b8`-`0x021b2430`; carving
+   covers `0x021b23b8`-`0x021b23c0` and `0x021b23e0`-`0x021b2430`, leaving
+   exactly those two uncarved). Bucket totals were always right; the breakdown
+   was short. **A wave using that list as its worklist would have skipped both.**
+
+This wave takes the two successors the re-census itself identified.
+
+**PART 1 — the shape-filtered pool (cheap, same method, same evidence
+standard).** 1,076 symbols / 11,592 B are reachable by exactly this lane's
+method and were excluded only because the original census ran a 4-shape filter
+that dropped `string`/`string-ascii4`. Widening the filter is not a new
+discovery, it is an uncovered corner of the method you already trust. Start with
+the largest contiguous groups. Same rules throughout: header cross-reference
+first, script every initializer from the real bytes, per-symbol reconciliation
+table built AS YOU GO with every Size cell checked against `delinks.txt`,
+`relocs.txt` structural proof per carve, const/static matching each symbol's OWN
+original. If you exhaust the appetite for one wave inside this pool, say where
+you stopped and what remains.
+
+**PART 2 — a bounded PoC against the zero-reader pool.** The ~9,690-symbol /
+~227,820 B pool you sampled is ~10x everything these 8 waves have shipped
+combined, and this lane's reader-based method cannot see any of it. You already
+did the diagnosis: the largest contributor is `shape=string` (4,506 entries /
+95,593 B), real readable filenames and archive paths, clustered into 159
+contiguous runs, almost certainly one resource/archive manifest that `dsd` split
+into one placeholder per string because nothing holds a *direct* pointer to any
+individual string.
+
+**Prove or disprove the obvious method on ONE run.** Pick a SMALL contiguous run
+(not the 1,588-string / 35,424 B monster — a first-of-kind PoC should be cheap to
+throw away), emit the whole run as a single C string table in one TU, and gate
+it. The question to answer is narrow and binary: **does a contiguous run of
+reader-less strings match when emitted as one table?** If yes, that unlocks a
+path to ~95,593 B and the next several waves write themselves. If no, report the
+exact failure mode — that is the finding, and it saves a future wave from
+assuming it.
+
+⚠️ Expect the alignment and declaration-order walls to be live here. `P-50`
+(composed-TU declaration order collapsing to ascending size) is PERMANENT with
+evidence and a multi-symbol TU is exactly its trigger — check the run's
+address-ascending size sequence for monotonicity BEFORE drafting, and decline
+early rather than re-deriving the wall.
+
+CANARY: the first carve of Part 1 goes through the FULL gate (3-region SHA1)
+before any batching.
+
+⚠️ GATE TIMING: the CC Decomper is running `cm-main-wall-filtered-sweep-1` with
+a 5-worktree consolidated `--clean` 3-region gate. mwcc serialises MACHINE-WIDE.
+Before your canary gate run `Get-Process | Where-Object { $_.Name -match
+'mwcc|mwld|mwasm|ninja' }` — if it returns rows, wait. Confirm the window with
+Lenny.
+
+⚠️ Run `npx markdownlint-cli2 --fix` on any doc before committing, and regenerate
+`docs/research/README.md` LAST — stale-index `drift-check` failures have now
+blocked four PRs.
+
+**Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) +
+the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the
+per-symbol reconciliation table + the Part 2 PoC verdict stated as a plain
+yes/no with its evidence.
