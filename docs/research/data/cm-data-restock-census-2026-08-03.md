@@ -416,3 +416,46 @@ being caught) in `cm-restock-carve-7-2026-08-14.md`.
 holdouts — 1 deferred structural finding + 2 known-wall reverts),
 spread across the other 21 modules per the by-module table above
 (ov006 next largest at 6).
+
+## Disposition: full re-reconciliation (as of `cm-restock-carve-8`, 2026-08-14)
+
+`cm-restock-carve-8` re-parsed all 274 census rows directly and
+cross-referenced each against current `delinks.txt` rather than
+trusting wave 7's stated 265/10/75 split (which does not arithmetically
+reconcile against 274 — `265 + 10 + 75 = 350`). The re-derived, verified
+split: **226 shipped, 10 declined, 38 remaining** as of immediately
+before this wave (`226 + 10 + 38 = 274`, exact).
+
+**Two more symbol groups are wall-blocked but were never added to the
+formal declined table above** — `cm-restock-carve-5`/`6` investigated
+and blocked them, but only in their own narrative docs, so a
+mechanical shipped∪declined reconciliation kept re-surfacing them as
+"remaining." Added here to close that gap for good:
+
+| Symbol | Module | Size | Reason declined |
+|---|---|---:|---|
+| `data_ov011_021d323c` | ov011 | 126 | Absorption partner of the already-declined `data_ov011_021d32ba` (P-50, same wall, address-ascending/size-descending). |
+| `data_ov011_021d32d9` | ov011 | 113 | Part of the `021d32d8`(1B)/`_32d9`/`_334a` cell; address-ascending sizes 1→113→42 are non-monotonic (113→42 descends) — P-50, and n=3 besides. `cm-restock-carve-6`. |
+| `data_ov011_021d334a` | ov011 | 42 | Same cell as `021d32d9`, same finding. |
+| `data_ov011_021d33bc` | ov011 | 455 | The only viable absorption bundle for `021d3583`/`_358b` (declined above); address-ascending sizes 455/8/9, non-monotonic — P-50. Compiled and inspected directly: `[8, 9, 455]` in-section order, confirming the prediction. `cm-restock-carve-6`. |
+| `data_021023d8` | main | 192 | All-zero `.data` global silently routes to `.bss` under mwcc (no file bytes) — the fix needs rewriting an already-shipped neighbor TU. `cm-restock-carve-7`. |
+| `data_02102c44` | main | 28 | Same wall, same wave. |
+
+**Net declined, all-time: 16** (10 formal + 6 above), **1,246 bytes.**
+
+**One symbol is neither shipped, declined, nor simply open:**
+`data_020c3e88` (main, 188 B) is very likely a continuation of the
+already-shipped `data_020c3e84` array that `dsd`'s boundary derivation
+split at a second literal-pool reference — resolving it needs a
+caller-range analysis of `func_020069f4`, out of any single wave's
+bounded scope so far. `cm-restock-carve-7`.
+
+**Remaining after `cm-restock-carve-8`'s `ov006` carve (6 symbols,
+352 B shipped this wave): 25 symbols, 548 bytes, across 14 modules**
+(`ov012` 4, `ov009` 4, `ov016` 4, `ov019` 2, `ov020`/`ov023`/`ov001`/
+`ov003`/`ov021`/`ov015`/`ov005`/`ov014`/`ov017` 1 each) — genuinely
+open by this reconciliation, not individually re-verified for hidden
+walls this wave beyond the census's own recorded sizes. `232 + 16 + 1
++ 25 = 274`, exact. Full four-bucket accounting, plus the much larger
+pool this method has never been able to see at all, in
+[`cm-restock-carve-8-2026-08-14.md`](cm-restock-carve-8-2026-08-14.md).

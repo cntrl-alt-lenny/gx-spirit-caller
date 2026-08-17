@@ -1470,7 +1470,7 @@ CANARY: the first carve of Part 2 goes through the FULL gate (3-region SHA1) bef
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the P-50 tier-test result stated either way. Regenerate `docs/research/README.md` LAST.
 
-### cm-restock-carve-8 — the pool after main; and decide whether this lane's method has an end [TODO]
+### cm-restock-carve-8 — the pool after main; and decide whether this lane's method has an end [DONE]
 
 `cm-restock-carve-7` (#1496) closed P-50's evidence boundary the right way: a three-tier scratch sweep (default `2.0/sp1p5`, `.legacy.c` `1.2/sp2p3`, `.legacy_sp3.c` `1.2/sp3`, both declaration orders) came back identical every time, so **P-50 is now PERMANENT with evidence** rather than by assertion, and the OBSERVED-NOT-CONFIRMED block is gone. A clean negative, properly run — that is the outcome the item wanted. You also drained main's largest remaining pool (36 symbols, Typed-array +1,864 B).
 
