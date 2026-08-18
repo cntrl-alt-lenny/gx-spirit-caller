@@ -1466,3 +1466,83 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x02296048	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
 0x02296814	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
 0x022ae374	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x020198ec	main	84	default	signed-byte-clamp-plus-lookup	parked	95.2	P-17	cm-main-wall-filtered-sweep-1-batch1
+0x0201ce94	main	192	default	mutex-guarded-ring-buffer-dispatch	parked	91.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201e5b8	main	180	default	fourcc-chunk-scan-loop	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201f7f0	main	132	default	syswork-position-init	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x02020130	main	88	default	state-guarded-mode-check	parked	90.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201c224	main	132	default	cross-overlay-hardcoded-bl-unlinkable	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch1
+0x02020ff8	main	108	default	three-merged-functions-shared-gap	parked	0	structural	cm-main-wall-filtered-sweep-1-batch1
+0x0200abb0	main	116	default	trap-loop-scan-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02019f94	main	176	default	mask-scan-plus-magic-div10	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02034888	main	192	default	mode-dispatch-7arg-call	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02007f58	main	156	default	linear-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02017df0	main	184	default	mode-switch-guarded-transition	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x020197ac	main	116	default	stride7-lookup-clamped-sum	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201bddc	main	136	default	bitfield-flags-plus-guard-chain	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201f25c	main	96	default	indirect-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201fbe0	main	140	default	nested-guard-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0204f8f0	main	168	default	OQ-1 dead-branch: unsigned-char field_e<0 guard always folds away under mwcc, target keeps it (documented open question)	parked	21.4	OQ-1	cm-main-wall-filtered-sweep-1-batch2
+0x02020490	main	192	default	sum-of-3-halfwords register-allocation swap: same instruction shape/count, r0/r1/r2 assigned differently than target across 4 declaration-order variations tried	parked	85.4	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0202be4c	main	176	default	extra/k local register-allocation swap (r7 vs r8): correct push list, instruction count and shape, 5 declaration-order variations tried	parked	79.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0203de2c	main	84	default	P-36-like CSE hoist: mwcc hoists shared mov r0,r4 before the final branch, target duplicates it in each arm; 4 structural variations (if-chain/flip/if-else/switch) tried	parked	76.2	P-36	cm-main-wall-filtered-sweep-1-batch2
+0x02034b2c	main	172	default	straight-line resource-init call sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038ad4	main	192	default	ring-buffer wrapped stream read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203b774	main	188	default	two-branch retry-loop dispatcher	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202bf90	main	152	default	task-locked buffer load from offset table	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202c6ac	main	132	default	task-locked fixed-size record load	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032028	main	76	default	lazy-init-then-memset accessor	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032370	main	132	default	lazy-alloc IRQ-guarded object init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203320c	main	108	default	3-way dispatch on nested-struct helpers	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x020378c8	main	160	default	linked-list-walk vs indexed-node dual-mode setter	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038b94	main	192	default	overlay-info-load-then-stream-read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203991c	main	116	default	infinite event-poll loop	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203efa0	main	144	default	bitfield-dispatch vs 64-bit-timer-compare	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0206bd74	main	168	legacy	irq-critsec-dispatch-loop-infinite	parked	93.3	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x02087444	main	128	default	bit-signal-vs-handshake-dispatch	parked	12.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02087c34	main	180	default	two-array-init-loops	parked	62.2	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02052f04	main	132	default	category-dispatch-pair-unpack	parked	87.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02074dcc	main	128	legacy	irq-rearm-dispatch-loop-infinite	parked	91.4	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x0208a764	main	100	default	bitfield-guarded-callback-teardown	parked	88.0	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a1da0	main	156	legacy	irq-critsec-slot-copy	parked	89.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a3190	main	172	legacy	field-refresh-vs-dispatch-branch	parked	97.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02060728	main	136	default	keyed-chunk-decrypt-and-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x02051384	main	168	default	singleton-field-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020528e4	main	144	default	gated-dispatch-with-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209dd30	main	184	legacy	variadic-record-alloc-and-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209e788	main	104	legacy	singleton-node-copy-into-buffer	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a3e34	main	164	legacy	irq-critsec-slot-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a6614	main	144	legacy	irq-critsec-one-shot-init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ab798	ov000	184	default	bitfield-ratio-decay-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ae218	ov000	180	default	flags-bitfield gate, adjacent bit11/bit9 test pair shares one load; r0/r1 register-letter swap resists 4 variations	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02239160	ov002	120	default	CE288.f_5a8 counter/dispatch gate; base-ptr register (r2) matches but loaded-value register (r1 vs r3) resists 4 variations	parked	86.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02210104	ov002	192	default	per-side conditional dispatch (df818/e05fc), 2-int local array indexed by bit0-of-field2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x02288068	ov002	132	default	bitfield gate + byte-pack call + bic-mask field write	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022a6860	ov002	140	default	packed bitfield decode (1/5/8-bit fields) called twice; 2nd occurrence's source register happens to alias FIELD1's dest, forcing target to reschedule f2/f3-before-f1; resists 3 variations	parked	85.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02228fac	ov002	160	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, d59cc+e276c dual dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0223163c	ov002	108	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, de9d4 dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0224b3b0	ov002	180	default	row-loop scan; (player&1)*0x868 mla/mul register-letter swap matches documented P-20 exactly, resists 4 variations incl. unsigned typing	parked	8.3	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022503d8	ov002	192	default	row-loop scan; identical P-20 twin of 0224b3b0 (same mla/mul register swap), same residual confirmed not tool-noise	parked	7.8	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022521ac	ov002	148	default	slot[idx] indexed record; 1st read matches byte-exact, 2nd read of identical expression picks different register (r1 vs r2), cascades into packed-field bit-shift reorder	parked	67.6	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02253304	ov002	140	default	row+idx*4+0x120 indexed record dispatch chain; CONTRADICTS P-23 permanent-wall listing -- fix was declaring func_0202b8a8 as signed int not unsigned (forces LT not CS on the <5 compare), mla itself was never the issue	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0208a6b8	main	112	default	IRQ-guarded linked-list scan+remove-matching; needed exact local decl order (irq/node/next) for r4/r6 letter match	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022410f0	ov002	180	default	byte-unpack dual-guard dispatch; needed real truncation (int not u16 return decl) + unsigned-char cast for byte-pack, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	ANOMALY not normal park: fastmatch RESOLVED reports 100pct (text+PC24relocs byte-identical to gap .o) but real ninja sha1 FAILS reproducibly (confirmed via full clean rebuild); root cause undiagnosed, flagged for follow-up	parked	99.9	tool-anomaly	cm-main-wall-filtered-sweep-1-batch4
+0x02089864	main	188	default	nested list drain + indirect-call dispatch, GLOBAL_ASM-endgame precedent; broad register relabeling from word 2 on, not attempted further given time budget	parked	51.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021ada0c	ov008	132	default	conditional dual-source weighted accumulation loop; large early structural divergence (missing sl-class register, push-list mismatch), not attempted further given time budget	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	SUPERSEDES earlier mis-park: unbounded for-loop w/ break on null, per-node 4x dispatch calls; earlier sha1 FAIL was caused by MY OWN dangling .s.stash for unrelated candidates 1/4 in the same tree, not this file -- confirmed genuinely 100% on a verified-clean baseline	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021cb674	ov013	140	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch5
+0x021b34dc	ov010	136	default	dual-sprite-spawn-invoke	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ab708	ov020	144	default	dual-sprite-spawn-invoke-indexed	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021cedf8	ov003	188	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ac208	ov008	164	default	bitfield-index-table-lookup	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2268	ov008	124	default	guard-store-notify-sprintf	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b46a8	ov010	168	default	threshold-velocity-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021caea8	ov012	156	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b274c	ov014	192	default	bitfield-branch-reset-tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b3b9c	ov014	124	default	task-reset-loop-2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b7718	ov016	172	default	task-reset-loop-5-switch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2280	ov023	100	default	bitfield-notify-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b611c	ov017	192	default	9-slot-dual-table-clear-strength-reduction	parked	70.8	strength-reduction	cm-main-wall-filtered-sweep-1-batch5
+0x021cbe8c	ov003	124	default	3-state-dispatch-switch-value-register	parked	87.1	P-4	cm-main-wall-filtered-sweep-1-batch5
+0x021b2630	ov007	100	default	field-reset-two-mov-order-swap	parked	92.0	P-36	cm-main-wall-filtered-sweep-1-batch5

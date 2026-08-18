@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**131 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**133 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (59)
+- [Uncategorised](#uncategorised) (61)
 
 ## Analysis / worklist
 
@@ -733,6 +733,12 @@ The multi-agent convention (AGENTS.md § Worktree convention) spins up a new num
 
 This is a small audit tool, not a replacement queue format. It checks explicit shipped/resolved/merged evidence in non-final queue items, compares the current state section with the ACTIVE open PRs, and verifies that docs/state.md carrie…
 
+### `tools/record_shipped.py`
+
+**Record one successfully-shipped C-match attempt in attempts.tsv.**
+
+cm-ledger-park-bias (2026-08-17): `park_one.py` is the only recorder in regular use, and it always writes `result=parked` -- ships only ever reach the ledger when a lane adds them by hand, which mostly doesn't happen (0 shipped rows acro…
+
 ### `tools/retrieval_eval.py`
 
 **Small pure-Python BM25 evaluation for the matched-pair corpora.**
@@ -800,6 +806,12 @@ object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain
 **TRUE readable-C headroom (walls subtracted).**
 
 The raw C% metric (progress.py) counts every not-yet-`.c` byte as "headroom", including functions that are documented permanent walls. Brief 640's audit (docs/research/brief-640-wall-audit.md) found the PREVIOUS version of this tool badl…
+
+### `tools/wall_prefilter.py`
+
+**pre-dispatch register-choice wall detector for**
+
+cm-main-wall-filtered-sweep-1.
 
 ### `tools/wine_link_lock.py`
 
