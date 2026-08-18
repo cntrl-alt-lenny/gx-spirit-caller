@@ -8,7 +8,87 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-17 — **(Windows PC, brain=Opus 5; roster unchanged.)
+**Last updated:** 2026-08-18 — **(Mac M1, brain=Fable 5; roster unchanged.)
+Round 0818: all four lanes delivered, and the second selector programme in a row
+returned null — while the round's own yield hit 60.8%, the best measured this
+campaign. The lever was never the selector; it was the pool.**
+
+**Round 0818 — merged #1505, #1506, #1507, #1508.**
+
+- **#1508 `cm-main-wall-filtered-sweep-1` — a clean null, honestly obtained.**
+  The lane built the P-51 detector (18/18 recall, 1/43 FP against sweep-7's
+  shipped negatives) and then **dispatched the flagged arm too**, which is what
+  makes the null trustworthy: flagged 11/19 (57.9%) vs passed 37/60 (61.7%),
+  Fisher p = 0.7927, holding in both main and overlay slices. It disclosed its
+  own pool deviation (19 flagged, not the planned 30) and declined to loosen the
+  threshold to hit the number. **P-51 fired zero times across 209 candidates**,
+  so the high-confidence half was never actually tested; the weaker
+  permutation-cascade proxy is what got measured. Brain-verified: 48 `.c` added
+  == 48 `.s` deleted, 7,128 B.
+- **#1507 `cm-restock-carve-9` — 694 files, +11,716 B typed-array, and it
+  corrected its own kickoff.** The brief cited a 1,076-symbol pool; a fresh tool
+  run gives **689**, and the lane treated its own measurement as authoritative
+  rather than the brain's number. 689/689 shipped. Reconciles exactly:
+  694 files = 689 + 4 + 1, and 11,716 B = 11,588 + 32 + 96.
+  **Part 2 killed a standing assumption:** the ~9,690-symbol "zero-reader" pool
+  is not reader-less — 100% of the 3,901 `main` `shape=string` symbols checked
+  have a real relocation from an *uncarved data pointer table*, invisible to
+  `data_worklist.py` because `build_call_graph` only follows function→data
+  edges. It also reported a real link failure it caused and the precondition
+  that fixes it (screen candidate names against `src/` first).
+- **#1506 `q-ledger-ship-coverage` — the ledger bias is closed.** 303 shipped
+  events backfilled by mechanical delinks derivation, `-backfilled` provenance
+  suffix, `shape`/`park_class` left empty rather than guessed. The demanded
+  canary reproduced the brain's independent sweep-7 figure **exactly** (43
+  functions / 8,116 B; ov004 8 / ov006 31 / ov011 4). A ship-coverage guard now
+  hard-errors a round that flips delinks without recording ships, and it runs in
+  `drift-check`, a required context.
+- **#1505 `q-park-class-normalisation` — HELD, not merged.** The work itself is
+  good: 283 raw values → 91 canonical families, and all three canary cases
+  correct (the register-numbering spellings collapse to P-30 with qualifiers
+  retained; `C-32` and `C-32-cross-overlay-bl` both → `C-32` with the qualifier
+  preserved; P-36 scheduling stays separate from P-30 register-choice). It also
+  held the hard constraint exactly — `attempts.tsv` untouched, which is why
+  #1506 could append 303 rows to the same file with zero conflict. **But its
+  test cannot survive its own campaign's ledger growth**, and the consolidated
+  gate caught it: `test_every_ledger_value_has_a_reviewed_mapping` asserts
+  `report["rows"] == 1164` against a live, append-only ledger that #1506 and
+  #1508 grew to **1,547** in this very round. Dropping #1505 from the
+  consolidation cleared the failure and nothing else, confirming the
+  attribution. `q-park-class-remap` is seeded to finish it.
+
+**THE BRITTLENESS LESSON DID NOT TRANSFER ACROSS LANES.** #1499
+(`q-validator-brittleness`) existed precisely to kill cardinality assertions
+against this ledger — "assert the SHAPE of the exemption, not its cardinality" —
+and it did, in `test_validate_attempts.py`. In the *same round*, a different
+lane wrote four fresh hardcoded counts (`rows`, `raw_distinct`,
+`family_distinct`, `parked_rows`) into a different file. A per-file fix does not
+generalise; the next round makes it a rule.
+
+**The deeper half of the same finding:** 10 distinct `park_class` values now
+have no mapping entry. Two are correct-by-design and must be *scoped out*, not
+mapped — `''` (303 backfilled shipped rows, empty by the brain's own
+instruction) and `n/a` (48 shipped rows); a shipped row has no park class. The
+other 8 are on parked rows, all from `cm-main-wall-filtered-sweep-1`: `P-4`,
+`P-17`, `P-20`, `P-36`, `P-42` and `OQ-1` are bare catalog anchors that want an
+identity rule, while `strength-reduction` and `tool-anomaly` need real taxonomy
+judgment. The brain did **not** guess those at merge — that is the lane's call.
+
+**Brain fix at merge:** #1506 added `import pytest` to
+`tests/test_validate_attempts.py`, which fails the `unittest` CI job outright —
+that job deliberately installs no third-party packages
+(`python -m unittest discover`, `ModuleNotFoundError: No module named 'pytest'`).
+Replaced with a stdlib try/except that preserves the assertion's meaning;
+mutation-checked that the vacuous-pass regression still fires. **Standing note:
+a lane whose gate is `pytest -q tests` can be green locally and still red in CI.
+Both runners matter.**
+
+**Two selector programmes have now returned weak-or-null back to back**, while
+simply dispatching a sane pool yields ~60%. `cm-main-exploit-drain-1` seeds the
+consequence: stop the selector science, drain the remaining ~130 of the 209
+qualifying candidates (full EUR, ≤192 B, ≥4 `bl`, unattempted).
+
+**Last updated (previous):** 2026-08-17 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0817: the properly-powered confirmation came back NULL, and both
 `main`-sweep and restock-carve reached the end of their current method.**
 EUR natural-C **16.49%** (393,402 B) / USA **11.84%** (282,428 B) / JPN **11.82%**

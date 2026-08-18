@@ -333,7 +333,9 @@ Effort: **LOW-MEDIUM**. Tooling budget: catches a demonstrated misclassification
 
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a regression pinning `bicne` (and at least one other predicated data-processing op) as NOT a branch + the before/after row-change count over the 1,640 + the corrected paragraph in the reconcile doc.
 
-### q-park-class-normalisation — one wall family, three spellings, no controlled vocabulary [TODO]
+### q-park-class-normalisation — one wall family, three spellings, no controlled vocabulary [PARKED]
+
+> PARKED: superseded by q-park-class-remap: PR #1505 is held (cardinality assertions vs a live ledger); the rework item carries the full diagnosis
 
 `q-shape-classifier-bicne` (#1500) is merged and it is clean work. The brain
 re-ran your corrected classifier against the unmodified one on the same tree and
@@ -408,6 +410,65 @@ of how many distinct raw values collapsed into how many families. Run
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-park-class-normalisation`; commit;
 report the PR number with the pasted artifacts.
+
+### q-park-class-remap — finish the normaliser: scope the invariant, kill the counts, map the 8 new values [TODO]
+
+`q-park-class-normalisation` (#1505) is **held, not merged** — the work is good
+and the brain wants it, but it cannot survive its own campaign's ledger growth.
+Read this before reworking: the tool, the 283→91 mapping and all three canary
+cases were **correct**, and holding the `attempts.tsv` constraint is exactly
+why PR #1506 could append 303 rows to that file with zero conflict. Rebase onto
+current `origin/main` and fix three things.
+
+1. **Kill the cardinality assertions.** `test_every_ledger_value_has_a_reviewed_mapping`
+   asserts `report["rows"] == 1164`, plus `raw_distinct == 283`,
+   `family_distinct == 91` and `parked_rows == 744`, against a **live,
+   append-only** ledger. #1506 (+303 backfilled) and #1508 (+48) took it to
+   **1,547** in the same round and the consolidated gate went red. This is the
+   identical defect `q-validator-brittleness` (#1499) removed from
+   `test_validate_attempts.py` one round earlier — **assert the property, not
+   the count.** Print the census for visibility; do not assert it.
+2. **Scope the invariant to parked rows.** `all(row["park_class"] in mapping)`
+   is wrong as written, and the data proves it: `''` (303 rows) and `n/a` (48
+   rows) are **all `result=shipped`**. A shipped row has no park class — the
+   empty value is there because the brain instructed #1506 to leave it empty
+   rather than guess. Scope the check to `result=parked` with a non-empty
+   `park_class`, so correct data stops reading as a gap.
+3. **Map the 8 genuinely-new values**, all from `cm-main-wall-filtered-sweep-1`
+   parks. Six are bare catalog anchors — `P-4`, `P-17`, `P-20`, `P-36`, `P-42`,
+   `OQ-1` — and want a general **identity rule** for anchor-shaped values, not
+   six hand-written rows (`C-32` already proves the anchor case; make it
+   systematic so the next round's anchors map themselves). Two need real
+   taxonomy judgment and are yours to make, with reasoning: `strength-reduction`
+   and `tool-anomaly`. The brain deliberately did **not** guess these at merge.
+
+⚠️ **The mapping table must not need hand-editing every round.** If your rework
+still requires a new row per new anchor, it will rot exactly as fast as the
+counts did. Design for the arrival of unseen values: anchors map themselves,
+genuinely-new free text is reported as an explicit "unmapped" list the round can
+act on, and the test fails only on the latter.
+
+⚠️ **Both runners.** The CI `unittest` job runs `python -m unittest discover -s tests`
+with NO third-party packages installed. A test module that does `import pytest`
+fails it outright with `ModuleNotFoundError` even when `pytest -q tests` is green
+— that exact defect shipped in #1506 and the brain fixed it at merge.
+
+CANARY, pasted before the wider run: re-run the census against **current**
+`origin/main` and paste the four numbers it now produces (they will not be
+1164/283/91/744). Then paste the unmapped-value list and show it contains
+exactly the 8 parked values above — no `''`, no `n/a`. If your scoping still
+surfaces those two, the scope fix is wrong.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real pytest tail) AND
+`python3.13 -m unittest discover -s tests` green (paste its `Ran N tests` and
+`OK` lines) + `ruff check` clean + a regression proving the suite still passes
+when N new ledger rows are appended (construct them; that is the whole point) +
+a regression proving a genuinely-unmapped free-text value still FAILS loudly +
+the three original canary cases still passing.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-decomper q-park-class-remap`; commit; report the
+PR number with the pasted artifacts.
 
 ### q-cascade-ci-quadratic — three PR-CI tools rebuild per-target what they should index once [TODO]
 

@@ -1409,3 +1409,77 @@ confusion matrix with its Fisher p, and both arms' size distributions. Run
 `npx markdownlint-cli2 --fix` on your round doc, and regenerate
 `docs/research/README.md` LAST — a stale index has now failed `drift-check` on
 four separate PRs.
+
+### cm-main-exploit-drain-1 — the selector science is done; drain the pool that already yields 60% [TODO]
+
+`cm-main-wall-filtered-sweep-1` (#1508) built the detector the round asked for,
+calibrated it honestly (18/18 recall, 1/43 FP on P-51), and then did the thing
+that makes the result trustworthy: **it dispatched the flagged arm too.** Result
+is a clean null — flagged 11/19 (57.9%) vs passed 37/60 (61.7%), Fisher
+p = 0.7927, holding in both the main and overlay slices. The round also
+disclosed its own pool deviation rather than hiding it (19 flagged, not the
+planned 30; it declined to loosen the threshold to hit a number).
+
+**Two selector programmes have now returned weak-or-null in a row.** Callee
+count: real but weak, closed at round 0817. The wall detector: null on the only
+family it could actually test. Note what the detector round could NOT test —
+P-51 fired **zero** times across 209 qualifying candidates, so the
+high-confidence half of the detector never got an opportunity; what was measured
+is the weaker permutation-cascade proxy, and it does not transfer past the three
+modules it was calibrated on. **Do not run a third selector study.** If P-51
+candidates reappear naturally in a future pool, the detector is already built
+and calibrated — use it opportunistically, do not go hunting for a population to
+justify it.
+
+**THE ACTUAL FINDING IS THE YIELD.** This round shipped **48/79 = 60.8%** —
+against sweep-7's 34-36% on its matched arms. The difference is not a selector,
+it is the **pool definition**: full EUR candidate population, `<=192 B`,
+`>=4 bl`, unattempted. That configuration is the most productive this campaign
+has measured, and #1508 dispatched only 79 of the **209** qualifying candidates
+it enumerated.
+
+**THE ROUND — exploit it. No experiment, no arms, no prior.** Drain the
+remainder of that exact pool. Re-enumerate it fresh (the population moved: 48 of
+the 209 are now shipped, and `--exclude-attempted` must account for this round's
+newly-recorded ships as well as its parks). Dispatch for yield until the pool is
+drained or the stop condition trips. State the pool size at dispatch and the
+rate you get against the 60.8% prior — a large miss is itself a finding about
+how much of that 60.8% was the pool versus the 79 candidates that happened to be
+picked first.
+
+Carry three things #1508 surfaced, all cheap:
+
+- **P-23 needs a catalog correction** — a documented `permanent` member shipped
+  via an unrelated callee-signedness fix (`0x02253304`, contradiction recorded
+  in the ledger). Apply the correction to `codegen-walls.md` with the evidence.
+- **The bitfield-vs-manual-mask lever** was found independently by two batches
+  and is not yet in the catalog. Write it up as a `C-NN` (check the highest
+  existing number on `origin/main` first — a taxonomy collision cost a round at
+  0810).
+- **`tools/record_shipped.py` now exists** (the ship-side counterpart to
+  `park_one.py`). Use it from the start this round; do not hand-add ship rows.
+  The `q-ledger-ship-coverage` guard now fails a round that flips delinks
+  without recording ships, so this is enforced, not advisory.
+
+Same mechanics: 5 worktrees x ~20, pool FROZEN before dispatch, one worktree =
+one agent with its own location guard, ROUTE BEFORE YOU DRAFT, park every
+attempt via `park_one.py` and record every ship via `record_shipped.py`, and
+wait for each batch's completion notification before touching its worktree. Any
+`git worktree add` carries the b602 config-lock retry-loop. Levers C-44 / C-55 /
+C-63 / C-64 / C-65 (open) / C-66 / C-67 plus C-70..C-93 and P-30..P-51 — park
+P-36 scheduling-only diffs and P-51 members on sight.
+
+STOP: at 100 recorded attempts, at pool exhaustion, or 15 consecutive parks with
+no ship.
+
+**Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated
+branch AFTER any final rebase (read the log — a background wrapper's exit code
+is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`;
+`.c`-added == `.s`-deleted == delinks-activations-flipped; `git restore assets/`
+after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant
+outputs, ONE stated basis for the headline, the BYTE TOTAL, the natural-C vs asm
+split, the pool size at dispatch, and the rate against the 60.8% prior.
+Regenerate `docs/research/README.md` LAST.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper cm-main-exploit-drain-1`; commit; report.
