@@ -1546,3 +1546,1552 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief
 0x021b611c	ov017	192	default	9-slot-dual-table-clear-strength-reduction	parked	70.8	strength-reduction	C-65	cm-main-wall-filtered-sweep-1-batch5
 0x021cbe8c	ov003	124	default	3-state-dispatch-switch-value-register	parked	87.1	P-4	P-4	cm-main-wall-filtered-sweep-1-batch5
 0x021b2630	ov007	100	default	field-reset-two-mov-order-swap	parked	92.0	P-36	P-36	cm-main-wall-filtered-sweep-1-batch5
+addr	module	text_size	tier	shape	result	match_pct	park_class	brief
+0x022961a0	ov002	28	default	tail-call-forwarder	shipped	100	none	brief-650
+0x021b9ba0	ov002	52	default	guard-call	shipped	100	none	brief-650
+0x021c9af0	ov002	60	default	set-clear-bit	shipped	100	none	brief-650
+0x021b8ecc	ov002	68	default	guard-call-threshold	shipped	100	none	brief-650
+0x02242e50	ov002	88	default	guard-call	parked	27	reg-alloc-predication	brief-650
+0x02200310	ov002	104	default	guard-chain	shipped	100	none	brief-650
+0x02288350	ov002	116	default	unknown	parked	21	scheduling-order	brief-650
+0x021b33b0	ov002	132	default	unknown	parked	30	reg-alloc	brief-650
+0x021bc0d4	ov002	152	default	unknown	parked	34	reg-alloc	brief-650
+0x0222c3dc	ov002	176	default	guard-chain	parked	93	branch-polarity-cse	brief-650
+0x0224e8fc	ov002	208	default	unknown	parked	22	structural	brief-650
+0x02246a50	ov002	1036	default	state-machine	parked	57	structural	brief-650
+0x02238864	ov002	516	default	state-machine	parked	0	bitfield-model	brief-650
+0x022519c4	ov002	336	default	double-loop	parked	30	structural	brief-650
+0x0221af90	ov002	408	default	unknown	parked	10	unknown	brief-650
+0x021e2e18	ov002	32	default	shared-epilogue	shipped	100	asm-int	brief-654
+0x02200630	ov002	32	default	bitfield-guard	shipped	100	bitfield-branch	brief-654
+0x021ff500	ov002	64	default	bitfield-xor	shipped	100	xor-order	brief-654
+0x021f639c	ov002	68	default	unknown	shipped	100	none	brief-654
+0x021f67d0	ov002	68	default	unknown	shipped	100	none	brief-654
+0x021f9910	ov002	68	default	unknown	shipped	100	none	brief-654
+0x021fbbc4	ov002	68	default	unknown	shipped	100	none	brief-654
+0x021ff3bc	ov002	68	default	bitfield-xor	shipped	100	xor-order	brief-654
+0x021f81cc	ov002	72	default	bitfield-call	shipped	100	bitfield	brief-654
+0x021faa6c	ov002	72	default	bit-extract-store	shipped	100	bitfield	brief-654
+0x021f754c	ov002	76	default	guard-call-chain	shipped	100	none	brief-654
+0x021f8244	ov002	76	default	shared-epilogue	shipped	100	asm-int	brief-654
+0x021f677c	ov002	84	default	bitfield-compare	shipped	100	unsigned-cast	brief-654
+0x021ff2c8	ov002	88	default	bitfield-store	shipped	100	statement-order	brief-654
+0x021ff400	ov002	108	default	bitfield-chain	shipped	100	combined-levers	brief-654
+0x021efac8	ov002	112	default	table-call	parked	75	reg-alloc	brief-654
+0x021ef7b4	ov002	144	default	table-call	parked	91.7	reg-alloc	brief-654
+0x021efa38	ov002	144	default	table-call	shipped	100	none	brief-654
+0x021f2ca8	ov002	144	default	table-call	parked	41.7	reg-alloc	brief-654
+0x02247ad8	ov002	148	default	pool-duplicate	parked	94.6	C-34	brief-654
+0x021ec110	ov002	148	default	table-call	shipped	100	none	brief-654
+0x022476e8	ov002	184	default	pool-duplicate	skipped	unknown	C-34	brief-654
+0x021ef92c	ov002	152	default	guard-chain	shipped	100	none	brief-654
+0x021ebf40	ov002	144	default	unknown-pool	parked	41.7	reg-alloc	brief-654
+0x0200b2f4	main	unknown	default	loop-fill	shipped	100	mistagged-c34	brief-655
+0x020a32e4	main	unknown	default	byte-writes	shipped	100	mistagged-c34	brief-655
+0x0208b0d0	main	unknown	default	set-reload	shipped	100	mistagged-c34	brief-655
+0x02097238	main	unknown	default	conditional-set	shipped	100	mistagged-c34	brief-655
+0x02007f38	main	unknown	default	constant-builder	parked	37	constant-materialization	brief-655
+0x020061bc	main	unknown	default	popcount	parked	37	reg-alloc	brief-655
+0x0201904c	main	unknown	default	packed-u16-add	parked	27	instruction-selection	brief-655
+0x02034094	main	unknown	default	range-check	parked	44	predication	brief-655
+0x0206d79c	main	unknown	default	ring-buffer	parked	67	load-order	brief-655
+0x0209bf18	main	unknown	default	base60-combine	parked	57	load-fusion	brief-655
+0x020a7368	main	unknown	default	byte-copy-loop	parked	75	reg-alloc	brief-655
+0x020aee58	main	unknown	default	u16-string-copy	parked	50	reg-alloc	brief-655
+0x0203c70c	main	unknown	default	flag-test	parked	33	predication	brief-655
+0x020644a4	main	unknown	default	big-endian-u16	parked	25	instruction-selection	brief-655
+0x02067850	main	unknown	default	bounds-array-write	parked	62.5	predication	brief-655
+0x0207f8d8	main	unknown	default	multi-field-set	parked	25	predication	brief-655
+0x0207f914	main	unknown	default	multi-field-set	parked	33	predication	brief-655
+0x0209aa48	main	unknown	default	bit-test-clear	parked	85.7	instruction-selection	brief-655
+0x0209d788	main	unknown	default	bit-test-clear	parked	85.7	instruction-selection	brief-655
+0x020323f4	main	unknown	default	irq-callback	parked	37.5	reg-alloc	brief-655
+0x0209085c	main	unknown	default	interwork-veneer	not-attempted	unknown	C-31	brief-655
+0x02021b38	main	unknown	default	unknown	not-attempted	unknown	permanent-header	brief-655
+0x02023478	main	unknown	default	unknown	not-attempted	unknown	C-23-C-36	brief-655
+0x020ace98	main	unknown	default	linear-search	shipped	100	none	brief-655
+0x020a6a00	main	unknown	default	strlen-like	shipped	100	none	brief-655
+0x02052704	main	unknown	default	equality-chain	parked	60	optimizer-collapse	brief-655
+0x02077094	main	unknown	default	strchr-scan	parked	80	predication	brief-655
+0x02001e5c	main	unknown	default	null-empty-check	parked	60	reg-alloc	brief-655
+0x020534b4	main	unknown	default	callback-pointer-return	parked	62.5	reg-alloc	brief-655
+0x02031794	main	unknown	default	equality-or	parked	45.5	predication	brief-655
+0x02084ac4	main	unknown	default	callback-counter	parked	70	reg-alloc	brief-655
+0x0200f01c	main	unknown	default	bitfield-update	parked	80	reg-alloc	brief-655
+0x02040d54	main	64	default	unknown	shipped	100	mistagged-brief294	brief-661
+0x020b3168	main	52	default	unknown	genuine-wall	41.7	predication	brief-661
+0x0206eecc	main	64	default	unknown	near-miss	37.5	epilogue-shape	brief-661
+0x02060fdc	main	60	default	unknown	genuine-wall	60	predication	brief-661
+0x020ab088	main	60	default	strchr-like	shipped	100	mistagged-brief294	brief-661
+0x0202bc38	main	76	default	unknown	genuine-wall	52.6	reg-alloc	brief-661
+0x020915e4	main	104	default	unknown	close-wall	69.2	epilogue-shape	brief-661
+0x020458d8	main	100	default	unknown	close-wall	48	epilogue-shape	brief-661
+0x020685c8	main	96	default	hash	near-miss	29.2	unknown	brief-661
+0x020526b8	main	76	default	unknown	shipped	100	mistagged-brief294	brief-661
+0x02073fc8	main	192	default	checksum	near-miss	22.9	structural	brief-661
+0x020967bc	main	140	default	ring-buffer	close	74.3	epilogue-shape	brief-661
+0x02010354	main	180	default	allocator-walk	not-attempted	unknown	complexity	brief-661
+0x020403d4	main	164	default	allocator-setup	near-miss	26.8	constant-decomposition	brief-661
+0x0209a000	main	164	default	irq-callback	near-miss	19	reg-alloc	brief-661
+0x0209a8d0	main	unknown	default	list-append	parked	73.68	predication	brief-663
+0x0209a884	main	unknown	default	list-remove	parked	0	predication	brief-663
+0x0206df54	main	unknown	default	bool-and-chain	parked	40	predication	brief-663
+0x021b91d0	ov002	unknown	default	stack-scratch	parked	30	frame-shape	brief-664
+0x021aff4c	ov002	unknown	default	u16-byte-insert	parked	32.5	instruction-selection	brief-664
+0x021f95f8	ov002	unknown	default	bitfield-call	parked	54.5	reg-alloc	brief-664
+0x0220cff8	ov002	unknown	default	bitfield-compare	parked	27.6	reg-alloc	brief-664
+0x022576d8	ov002	unknown	default	double-null-guard	parked	81.8	reg-alloc	brief-664
+0x02067b8c	main	unknown	legacy	bounded-counter-append	shipped	100	P-6-routing	brief-665
+0x0207f8f8	main	unknown	legacy	guarded-field-set	shipped	100	P-6-routing	brief-665
+0x020947b8	main	unknown	thumb	store-burst	parked	0	store-coalescing	brief-665
+0x02098cdc	main	unknown	default	bit-packed-flag	parked	14.3	memory-width	brief-665
+0x020b3850	main	unknown	default	64x64-multiply	parked	0	reg-alloc	brief-665
+0x02096040	main	unknown	default	zero-struct	parked	66.7	frame-shape	brief-665
+0x02052ecc	main	unknown	default	pointer-call	parked	unknown	reg-alloc	brief-668
+0x02077ab4	main	unknown	default	pointer-call	parked	unknown	reg-alloc	brief-668
+0x02097004	main	unknown	default	vtable-dispatch	parked	42.9	reg-alloc	brief-668
+0x0209703c	main	unknown	default	vtable-dispatch	parked	42.9	reg-alloc	brief-668
+0x0208a728	main	unknown	default	global-read	parked	84	reg-alloc	brief-668
+0x020a1bbc	main	unknown	default	global-read	parked	84	reg-alloc	brief-668
+0x02056068	main	unknown	default	global-read	parked	84	reg-alloc	brief-668
+0x020620d8	main	unknown	default	bool-conversion	parked	56.25	predication	brief-668
+0x02066ea0	main	unknown	default	struct-write	parked	18.75	store-order	brief-668
+0x02087e54	main	unknown	default	double-guard-call	parked	73.3	reg-alloc	brief-672
+0x020490dc	main	unknown	default	global-call-write	parked	72.2	reg-alloc	brief-672
+0x02063620	main	unknown	default	comparison-chain	parked	88.2	reg-alloc	brief-672
+0x0207d4dc	main	unknown	default	range-alignment-check	parked	88.2	reg-alloc	brief-672
+0x0224bd3c	ov002	152	default	row-lookup-guarded-calls	parked	84.2	reg-alloc	brief-683
+0x021d1158	ov002	152	default	state-toggle-dispatch	parked	99.3	reg-alloc	brief-683
+0x02299c9c	ov002	152	default	guard-goto-dispatch	parked	92.1	C-55-observed	brief-683
+0x02296ebc	ov002	152	default	loop-entry-scan	parked	10.5	reg-alloc	brief-683
+0x02238cb4	ov002	152	default	compound-field-compare	parked	0.0	reg-alloc	brief-683
+0x021f058c	ov002	152	default	dual-mul-offset-lookup	parked	39.5	reg-alloc	brief-683
+0x021eba34	ov002	152	default	row-lookup-composite-cmp	parked	42.5	reg-alloc	brief-683
+0x021d30c8	ov002	152	default	ringbuf-conditional-notify	parked	13.2	reg-alloc	brief-683
+0x022a8190	ov002	156	default	task-struct-init	parked	95.0	pool-const-materialize	brief-683
+0x021cd414	ov002	152	default	ringbuf-branch-dispatch	parked	5.0	unclear	brief-683
+0x0224bd3c	ov002	152	default	row-lookup-guarded-calls	parked	84.2	P-23-confirmed	cm-ov002-unknown-sweep-17
+0x021f058c	ov002	152	default	dual-mul-offset-lookup	parked	97.4	reg-alloc	cm-ov002-unknown-sweep-17
+0x021eba34	ov002	152	default	row-lookup-composite-cmp	parked	76.3	P-20-confirmed	cm-ov002-unknown-sweep-17
+0x021d1158	ov002	152	default	state-toggle-dispatch	parked	87.2	P-27-post-call	cm-ov002-unknown-sweep-17
+0x02299c9c	ov002	152	default	guard-goto-dispatch	parked	71.8	P-27-post-call	cm-ov002-unknown-sweep-17
+0x022a8190	ov002	156	default	task-struct-init	parked	95.0	P-27-post-call	cm-ov002-unknown-sweep-17
+0x021b1e80	ov002	160	default	P-20-P-23-mla-dest-swap	parked	20.0	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x0228c924	ov002	152	default	P-20-P-23-cascade	parked	10.0	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x02246ecc	ov002	156	default	P-26-observed	parked	12.2	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x022029e0	ov002	152	default	unclear	parked	5.0	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021bbbc0	ov002	152	default	P-20-P-23-dual-pointer	parked	33.3	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021bbc68	ov002	156	default	P-20-P-23-sibling-of-021bbbc0	parked	32.5	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021ee668	ov002	156	default	P-28-commutative-add-order	parked	97.4	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x0224dafc	ov002	152	default	P-26-observed	parked	5.0	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x022327b8	ov002	156	default	P-28-register-letter	parked	59.0	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x02232c84	ov002	156	default	unclear	parked	5.1	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021edd4c	ov002	160	default	P-28-commutative-add-order	parked	97.5	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021eef88	ov002	160	default	reg-alloc	parked	27.5	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x02249a54	ov002	156	default	P-26-observed	parked	2.5	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x0224d818	ov002	156	default	P-20-P-23-cascade	parked	69.2	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x02227c4c	ov002	156	default	C-68-id-reconstruction	parked	51.3	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x02228418	ov002	156	default	C-68-id-reconstruction	parked	51.3	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021eecd8	ov002	156	default	C-68-id-reconstruction	parked	30.8	reg-alloc	cm-ov002-unknown-sweep-17-batch1
+0x021ff87c	ov002	160	default	P-27-post-call	parked	82.5	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x0220d638	ov002	160	default	P-27-post-call	parked	87.5	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x0224a28c	ov002	160	default	P-28-register-mirror	parked	90.0	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x0224f024	ov002	160	default	P-28-register-mirror	parked	90.0	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x02286ed4	ov002	160	default	P-28-movs-vs-cmp	parked	63.4	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x022942d0	ov002	160	default	P-28-movs-vs-cmp	parked	95.0	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x021ba38c	ov002	164	default	P-28-register-mirror	parked	70.7	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x021c1a2c	ov002	164	default	P-28-ip-scratch	parked	63.4	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x021d7268	ov002	164	default	P-28-register-mirror	parked	80.5	reg-alloc	cm-ov002-unknown-sweep-17-batch2
+0x0220c320	ov002	164	default	P-28-register-identity	parked	78.0	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x0222ffc0	ov002	164	default	P-28-register-identity	parked	90.2	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x022499b0	ov002	164	default	P-26-observed	parked	53.7	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x0224fe84	ov002	164	default	P-28-mla-pool-order	parked	85.4	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x02251f70	ov002	164	default	P-28-mla-pool-order	parked	85.4	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x02201614	ov002	168	default	P-28-ip-preference	parked	83.3	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021b9000	ov002	168	default	P-28-ip-preference	parked	52.4	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021aeb5c	ov002	168	default	unclear	parked	2.4	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021ea10c	ov002	168	default	P-28-commutative-add-order	parked	97.6	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021cd64c	ov002	168	default	C-66-tension	parked	85.7	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021cd6f4	ov002	168	default	P-27-post-call	parked	78.6	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021ed090	ov002	168	default	P-28-commutative-add-order	parked	97.6	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x021eddec	ov002	168	default	P-28-commutative-add-order	parked	97.6	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x0220c0b8	ov002	168	default	P-26-observed	parked	41.9	reg-alloc	cm-ov002-unknown-sweep-17-batch3
+0x0224a1e4	ov002	168	default	P-29-eager-mla-fusion	parked	8.3	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x0224b0b0	ov002	168	default	P-29-eager-mla-fusion	parked	14.3	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x0224c0b8	ov002	168	default	P-29-eager-mla-fusion	parked	4.8	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x0224e0dc	ov002	168	default	P-29-eager-mla-fusion	parked	11.9	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x02250498	ov002	168	default	P-29-eager-mla-fusion	parked	4.8	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x0221b5ac	ov002	168	default	scheduling-wall	parked	64.3	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x02249268	ov002	168	default	P-28-register-permutation	parked	54.8	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x02253000	ov002	168	default	P-28-register-permutation	parked	57.1	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x02287024	ov002	168	default	P-28-register-permutation	parked	66.7	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x022b13ec	ov002	168	default	brief-358-range-opt	parked	28.6	reg-alloc	cm-ov002-unknown-sweep-17-batch4
+0x021be2d8	ov002	172	default	P-25-legacy-sp3-push-pad	parked	72.1	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x021d7054	ov002	172	default	P-20-observed	parked	44.2	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x021eed74	ov002	172	default	P-28-register-letter	parked	67.4	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x021f9190	ov002	172	default	P-28-register-pairing	parked	90.7	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x0222742c	ov002	172	default	P-28-register-letter	parked	81.4	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x0224dafc	ov002	152	default	P-26-observed	parked	38.5	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x0228c924	ov002	152	default	P-26-observed	parked	12.8	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x021ee668	ov002	156	default	P-28-register-letter	parked	56.4	reg-alloc	cm-ov002-unknown-sweep-17-batch5
+0x022a8190	ov002	156	default	task-struct-init	parked	95.0	pool-const-materialize	brief-683
+0x020211c8	main	260	default	unknown	shipped	100	none	PR#1404:1fb75e64
+0x02053fc4	main	184	default	unknown	shipped	100	none	PR#1404:1fb75e64
+0x021c1e44	ov002	172	default	unknown	shipped	100	none	PR#1404:1fb75e64
+0x022033cc	ov002	168	default	unknown	shipped	100	c-55	PR#1404:1fb75e64
+0x02007e8c	main	172	default	unknown	shipped	100	none	PR#1404:54fa7d0a
+0x02206da0	ov002	196	default	unknown	shipped	100	none	PR#1404:54fa7d0a
+0x0202e79c	main	200	default	unknown	shipped	100	none	PR#1404:f99f3990
+0x0206e284	main	184	default	unknown	shipped	100	none	PR#1404:f99f3990
+0x0224701c	ov002	168	default	unknown	shipped	100	none	PR#1404:f99f3990
+0x021d3bc0	ov004	200	default	unknown	shipped	100	none	PR#1404:f99f3990
+0x0200111c	main	352	default	unknown	shipped	100	none	PR#1404:66147366
+0x02049430	main	292	default	unknown	shipped	100	none	PR#1404:66147366
+0x022814f0	ov002	180	default	unknown	shipped	100	none	PR#1404:66147366
+0x0200127c	main	460	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x0201c9b4	main	212	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x0204f310	main	176	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x02075928	main	448	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x0209f514	main	388	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x021acf1c	ov009	220	default	unknown	shipped	100	none	PR#1404:2b14ae30
+0x02063ae0	main	432	default	unknown	shipped	100	none	PR#1410:55f04e77
+0x02067438	main	296	default	unknown	shipped	100	none	PR#1410:55f04e77
+0x022935a0	ov002	320	default	unknown	shipped	100	none	PR#1410:3e2a7031
+0x02296fa4	ov002	172	default	unknown	shipped	100	none	PR#1410:3e2a7031
+0x022b3784	ov002	276	default	unknown	shipped	100	none	PR#1410:3e2a7031
+0x0206d96c	main	300	default	unknown	shipped	100	none	PR#1410:9f5f69a5
+0x02074cdc	main	240	default	unknown	shipped	100	none	PR#1410:9f5f69a5
+0x0207a1dc	main	344	default	unknown	shipped	100	none	PR#1410:d71e16b3
+0x021b6508	ov006	396	default	unknown	shipped	100	none	PR#1410:03b765ab
+0x0208a7c8	main	156	default	unknown	shipped	100	none	PR#1410:e59dde4e
+0x021ac430	ov008	160	default	unknown	shipped	100	none	PR#1410:45e0531d
+0x022252f4	ov002	300	default	unknown	shipped	100	c-59	PR#1410:846ca42d
+0x0222a518	ov002	304	default	unknown	shipped	100	c-60	PR#1410:846ca42d
+0x0222e244	ov002	168	default	unknown	shipped	100	c-56	PR#1410:846ca42d
+0x02231794	ov002	512	default	unknown	shipped	100	none	PR#1410:846ca42d
+0x02239a74	ov002	244	default	unknown	shipped	100	c-55	PR#1410:846ca42d
+0x0227d400	ov002	476	default	unknown	shipped	100	none	PR#1410:846ca42d
+0x02235a78	ov002	252	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0223cfec	ov002	344	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02242900	ov002	444	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02248bc0	ov002	296	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0224b0b0	ov002	168	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0224de94	ov002	228	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02250540	ov002	168	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02252d98	ov002	188	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02255f6c	ov002	280	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0225ac68	ov002	316	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02264f00	ov002	204	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0226be44	ov002	356	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02271524	ov002	228	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x02286c9c	ov002	340	default	unknown	parked	unknown	unknown	PR#1410:846ca42d
+0x0200197c	main	184	default	unknown	shipped	100	none	PR#1410:40c19714
+0x0201d778	main	408	default	unknown	shipped	100	none	PR#1410:40c19714
+0x020315e8	main	156	default	unknown	shipped	100	c-55	PR#1410:40c19714
+0x02047408	main	372	default	unknown	shipped	100	none	PR#1410:40c19714
+0x021ed1f8	ov002	348	default	unknown	parked	unknown	C-60	PR#1410:40c19714
+0x0220d974	ov002	300	default	unknown	parked	unknown	C-60	PR#1410:40c19714
+0x0222ad54	ov002	168	default	unknown	parked	unknown	C-60	PR#1410:40c19714
+0x02042068	main	296	default	unknown	parked	unknown	unknown	PR#1410:40c19714
+0x0205190c	main	376	default	unknown	not-attempted	unknown	unknown	PR#1410:40c19714
+0x021bb9b4	ov002	168	default	unknown	shipped	100	c-58	PR#1410:51b195eb
+0x021e381c	ov002	332	default	unknown	shipped	100	none	PR#1410:51b195eb
+0x021eb630	ov002	212	default	unknown	shipped	100	p-17	PR#1410:51b195eb
+0x021ee4c8	ov002	380	default	unknown	shipped	100	c-55	PR#1410:51b195eb
+0x021f162c	ov002	168	default	unknown	shipped	100	p-17	PR#1410:51b195eb
+0x021f664c	ov002	184	default	unknown	shipped	100	none	PR#1410:51b195eb
+0x0220196c	ov002	212	default	unknown	shipped	100	c-55	PR#1410:51b195eb
+0x022095ac	ov002	204	default	unknown	shipped	100	none	PR#1410:51b195eb
+0x022127b4	ov002	240	default	unknown	shipped	100	c-55	PR#1410:51b195eb
+0x0221d6ec	ov002	376	default	unknown	shipped	100	c-55	PR#1414:1e6c121d
+0x0222ec50	ov002	204	default	unknown	shipped	100	none	PR#1414:1e6c121d
+0x022647c8	ov002	256	default	unknown	shipped	100	c-55	PR#1414:1e6c121d
+0x02010f84	main	276	default	unknown	shipped	100	none	PR#1414:bb6e87a4
+0x0224de94	ov002	228	default	unknown	shipped	100	c-61	PR#1414:bb6e87a4
+0x02252d98	ov002	188	default	unknown	parked	89.4	unknown	PR#1414:bb6e87a4
+0x02264f00	ov002	204	default	unknown	parked	80.4	unknown	PR#1414:bb6e87a4
+0x02235a78	ov002	252	default	unknown	parked	69.8	unknown	PR#1414:bb6e87a4
+0x0223cfec	ov002	344	default	unknown	parked	90.7	unknown	PR#1414:bb6e87a4
+0x02248bc0	ov002	296	default	unknown	parked	93.2	c-61	PR#1414:bb6e87a4
+0x02242900	ov002	444	default	unknown	parked	41.4	c-56	PR#1414:bb6e87a4
+0x02286c9c	ov002	340	default	unknown	parked	94.1	unknown	PR#1414:bb6e87a4
+0x02026e38	main	160	default	unknown	parked	65.0	unknown	PR#1414:bb6e87a4
+0x0202d1d8	main	260	default	unknown	parked	unknown	unknown	PR#1414:bb6e87a4
+0x02039020	main	352	default	unknown	parked	unknown	unknown	PR#1414:bb6e87a4
+0x0201f34c	main	392	default	unknown	parked	unknown	reg-alloc	PR#1414:bb6e87a4
+0x02003400	main	488	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
+0x020038c0	main	396	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
+0x0203d39c	main	392	default	unknown	parked	0	unknown	PR#1414:bb6e87a4
+0x02055938	main	224	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x0205a0ec	main	160	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x020607b0	main	260	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x02063ca4	main	292	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x0206b258	main	196	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x0206e010	main	180	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x02072600	main	224	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x020767c8	main	168	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x0207bc20	main	184	default	unknown	shipped	100	none	PR#1414:4fbb3f08
+0x0209eee0	main	264	default	unknown	shipped	100	c-55	PR#1414:28c00424
+0x020a36dc	main	260	default	unknown	shipped	100	c-55	PR#1414:28c00424
+0x020b06dc	main	156	default	unknown	shipped	100	none	PR#1414:28c00424
+0x021ef6f4	ov002	192	default	unknown	shipped	100	c-55	PR#1414:28c00424
+0x02204084	ov002	228	default	unknown	shipped	100	none	PR#1414:28c00424
+0x022085a0	ov002	200	default	unknown	shipped	100	none	PR#1414:28c00424
+0x0220bafc	ov002	212	default	unknown	shipped	100	none	PR#1414:28c00424
+0x0209b298	main	236	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021bbda8	ov002	228	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021c37f4	ov002	208	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021d1284	ov002	308	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021d8010	ov002	280	default	unknown	parked	94.3	unknown	PR#1414:28c00424
+0x021e8a7c	ov002	184	default	unknown	parked	94.3	unknown	PR#1414:28c00424
+0x021ec1a4	ov002	488	default	unknown	parked	94.3	unknown	PR#1414:28c00424
+0x021f2628	ov002	232	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021f9434	ov002	452	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021fdc08	ov002	404	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x02211a74	ov002	196	default	unknown	parked	unknown	reg-alloc	PR#1414:28c00424
+0x0228c864	ov002	192	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x022a8cf0	ov002	336	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x021cb940	ov004	164	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x021d8648	ov004	336	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x021c480c	ov006	212	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x021b3718	ov015	228	default	unknown	shipped	100	none	PR#1414:2e2d2f3f
+0x02270de8	ov002	484	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x0227b0b8	ov002	188	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x02287024	ov002	168	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x02293ac4	ov002	356	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x02298dcc	ov002	428	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x0229f7e8	ov002	444	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x021d40bc	ov004	212	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
+0x021b8e4c	ov006	304	default	unknown	parked	81	unknown	PR#1414:2e2d2f3f
+0x021aae04	ov008	416	default	unknown	parked	unknown	structural	PR#1414:2e2d2f3f
+0x021b7218	ov010	168	default	unknown	parked	90.5	reg-alloc	PR#1414:2e2d2f3f
+0x021b33dc	ov017	232	default	unknown	parked	93.1	unknown	PR#1414:2e2d2f3f
+0x021b4a4c	ov019	484	default	unknown	parked	unknown	unknown	PR#1414:2e2d2f3f
+0x021b16f8	ov008	428	default	unknown	not-attempted	unknown	unknown	PR#1414:2e2d2f3f
+0x0201ee1c	main	244	default	unknown	shipped	100	none	PR#1419:a538a333
+0x0206b96c	main	224	default	unknown	shipped	100	none	PR#1419:a538a333
+0x0206cfa0	main	272	default	unknown	shipped	100	none	PR#1419:a538a333
+0x02070980	main	184	default	unknown	shipped	100	none	PR#1419:a538a333
+0x0209d1f0	main	152	default	unknown	shipped	100	none	PR#1419:a538a333
+0x02214fc8	ov002	184	default	unknown	shipped	100	none	PR#1419:a538a333
+0x021beec4	ov006	168	default	unknown	shipped	100	none	PR#1419:a538a333
+0x02229dcc	ov002	284	default	unknown	parked	unknown	unknown	PR#1419:a538a333
+0x021b768c	ov017	172	default	unknown	parked	unknown	unknown	PR#1419:a538a333
+0x0208428c	main	212	default	unknown	parked	unknown	unknown	PR#1419:a538a333
+0x0201934c	main	224	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x02092d20	main	280	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x021d1f2c	ov002	168	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x0220d2d0	ov002	200	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x0222ccb8	ov002	376	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x0223fc08	ov002	264	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x02297b34	ov002	264	default	unknown	shipped	100	none	PR#1419:ceba9800
+0x020a1e68	main	276	default	unknown	parked	95.7	structural	PR#1419:ceba9800
+0x021eff70	ov002	184	default	unknown	parked	97.8	P-4,P-11	PR#1419:ceba9800
+0x021b9000	ov002	168	default	unknown	parked	unknown	unknown	PR#1419:ceba9800
+0x021d3f44	ov004	192	default	unknown	parked	unknown	unknown	PR#1419:ceba9800
+0x02006b4c	main	192	default	unknown	shipped	100	none	PR#1419:6330b724
+0x02087a08	main	172	default	unknown	shipped	100	none	PR#1419:6330b724
+0x020acd38	main	200	default	unknown	shipped	100	none	PR#1419:6330b724
+0x02217098	ov002	152	default	unknown	shipped	100	none	PR#1419:6330b724
+0x02271710	ov002	232	default	unknown	shipped	100	none	PR#1419:6330b724
+0x0228d898	ov002	196	default	unknown	shipped	100	none	PR#1419:6330b724
+0x02291900	ov002	168	default	unknown	shipped	100	none	PR#1419:6330b724
+0x021c4ec4	ov006	440	default	unknown	shipped	100	none	PR#1419:6330b724
+0x021b3e6c	ov017	312	default	unknown	shipped	100	none	PR#1419:6330b724
+0x021aa80c	ov020	228	default	unknown	shipped	100	none	PR#1419:6330b724
+0x021b3174	ov016	380	default	unknown	parked	96.8	reg-alloc	PR#1419:6330b724
+0x0203bc28	main	452	default	unknown	parked	94.7	reg-alloc	PR#1419:6330b724
+0x02249cec	ov002	176	default	unknown	parked	40	c-61	PR#1419:6330b724
+0x02224cf4	ov002	220	default	unknown	parked	27.3	unknown	PR#1419:6330b724
+0x0223af48	ov002	228	default	unknown	parked	3.5	unknown	PR#1419:6330b724
+0x0221bbd8	ov002	472	default	unknown	parked	11.9	unknown	PR#1419:6330b724
+0x021d0028	ov002	440	default	unknown	parked	0	structural	PR#1419:6330b724
+0x02006ef0	main	492	default	unknown	parked	6.5	structural	PR#1419:6330b724
+0x021caea8	ov006	384	default	unknown	not-attempted	unknown	unknown	PR#1419:6330b724
+0x02044eec	main	484	default	unknown	not-attempted	unknown	unknown	PR#1419:6330b724
+0x020353cc	main	220	default	unknown	shipped	100	c-61	PR#1419:21180cbb
+0x02244bb0	ov002	260	default	unknown	shipped	100	none	PR#1419:21180cbb
+0x0228b204	ov002	448	default	unknown	shipped	100	none	PR#1419:21180cbb
+0x021d42f8	ov004	168	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x020899c0	main	196	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x0203cef8	main	256	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02009dec	main	176	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02228418	ov002	156	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02214aa0	ov002	164	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02231dec	ov002	320	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x0224c358	ov002	232	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02224044	ov002	372	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02230064	ov002	324	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x022188b4	ov002	192	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x0204a2ec	main	512	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02214e58	ov002	368	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02027738	main	420	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x0201a920	main	176	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x0203444c	main	252	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x0205fe18	main	164	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x020704e8	main	236	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x022094f0	ov002	188	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x0221b128	ov002	276	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x02229d00	ov002	204	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x02242450	ov002	288	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x02257b48	ov002	268	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x0228b3c4	ov002	180	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x021bbdc0	ov006	188	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x021c6840	ov006	284	default	unknown	shipped	100	none	PR#1419:9187c1f7
+0x020a4a94	main	216	default	unknown	parked	83.3	reg-alloc	PR#1419:9187c1f7
+0x022a63d0	ov002	176	default	unknown	parked	88.6	reg-alloc	PR#1419:9187c1f7
+0x02206994	ov002	260	default	unknown	parked	89.2	reg-alloc	PR#1419:9187c1f7
+0x02082fcc	main	224	default	unknown	parked	41.1	unknown	PR#1419:9187c1f7
+0x02097364	main	152	default	unknown	parked	13.2	unknown	PR#1419:9187c1f7
+0x0224bbd8	ov002	176	default	unknown	parked	77.3	unknown	PR#1419:9187c1f7
+0x02089418	main	200	default	unknown	parked	90.0	unknown	PR#1419:9187c1f7
+0x021aef18	ov008	188	default	unknown	parked	unknown	unknown	PR#1419:9187c1f7
+0x02071a74	main	256	default	unknown	shipped	100	c-44	PR#1425:5dff46c7
+0x0225c0f8	ov002	224	default	unknown	shipped	100	none	PR#1425:5dff46c7
+0x021ace60	ov009	188	default	unknown	shipped	100	none	PR#1425:5dff46c7
+0x021d6384	ov004	152	default	unknown	parked	65.8	reg-alloc	PR#1425:5dff46c7
+0x021d62b8	ov004	204	default	unknown	parked	96.1	instruction-selection	PR#1425:5dff46c7
+0x021cc63c	ov004	272	default	unknown	parked	29	unknown	PR#1425:5dff46c7
+0x0203e540	main	208	default	unknown	parked	75	c-44	PR#1425:5dff46c7
+0x0207108c	main	176	default	unknown	parked	63.6	unknown	PR#1425:5dff46c7
+0x0208a8f8	main	276	default	unknown	parked	62.3	unknown	PR#1425:5dff46c7
+0x02241400	ov002	236	default	unknown	parked	79.7	unknown	PR#1425:5dff46c7
+0x02010040	main	372	default	unknown	not-attempted	unknown	unknown	PR#1425:5dff46c7
+0x021b0c54	ov002	420	default	unknown	not-attempted	unknown	unknown	PR#1425:5dff46c7
+0x0203e9ac	main	252	default	unknown	shipped	100	none	PR#1425:45e4ec60
+0x0207ae74	main	180	default	unknown	shipped	100	c-44	PR#1425:45e4ec60
+0x0208dce4	main	184	default	unknown	shipped	100	c-23	PR#1425:45e4ec60
+0x020a0854	main	160	default	unknown	shipped	100	none	PR#1425:45e4ec60
+0x02233d2c	ov002	188	default	unknown	shipped	100	none	PR#1425:45e4ec60
+0x0227b0b8	ov002	188	default	unknown	shipped	100	c-60	PR#1425:45e4ec60
+0x020109a8	main	240	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x02033c74	main	180	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x02034388	main	168	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x02094378	main	276	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x02273b94	ov002	272	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x02273ca4	ov002	208	default	unknown	shipped	100	none	PR#1425:bf42079d
+0x021bba5c	ov002	192	default	unknown	shipped	100	none	PR#1425:5f6094e0
+0x02205a40	ov002	240	default	unknown	shipped	100	c-55	PR#1425:5f6094e0
+0x0225a578	ov002	244	default	unknown	shipped	100	none	PR#1425:5f6094e0
+0x021d4190	ov004	168	default	unknown	shipped	100	none	PR#1425:5f6094e0
+0x021d7440	ov004	292	default	unknown	shipped	100	none	PR#1425:5f6094e0
+0x021b66c4	ov006	428	default	unknown	shipped	100	none	PR#1425:5f6094e0
+0x02069634	main	236	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x02287a08	ov002	240	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x02288524	ov002	200	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x0227d6f8	ov002	308	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x021af0a8	ov008	172	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x02230324	ov002	432	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x02250234	ov002	284	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x022377f0	ov002	368	default	unknown	parked	98	unknown	PR#1425:5f6094e0
+0x022568a8	ov002	424	default	unknown	not-attempted	unknown	unknown	PR#1425:5f6094e0
+0x0221bbd8	ov002	472	default	unknown	not-attempted	unknown	unknown	PR#1425:5f6094e0
+0x020438b8	main	436	default	unknown	not-attempted	unknown	unknown	PR#1425:5f6094e0
+0x02044eec	main	484	default	unknown	not-attempted	unknown	unknown	PR#1425:5f6094e0
+0x0208725c	main	160	default	unknown	shipped	100	none	PR#1425:18164de4
+0x0209591c	main	308	default	unknown	shipped	100	none	PR#1425:18164de4
+0x021b34f4	ov002	168	default	unknown	shipped	100	none	PR#1425:18164de4
+0x021f1e94	ov002	340	default	unknown	shipped	100	none	PR#1425:18164de4
+0x02239fe0	ov002	312	default	unknown	shipped	100	none	PR#1425:18164de4
+0x02293418	ov002	392	default	unknown	shipped	100	none	PR#1425:18164de4
+0x022a0654	ov002	416	default	unknown	parked	unknown	unknown	PR#1425:18164de4
+0x0206cb6c	main	336	default	unknown	parked	unknown	reg-alloc	PR#1425:18164de4
+0x021ea044	ov002	200	default	unknown	parked	98	unknown	PR#1425:18164de4
+0x021db780	ov004	224	default	unknown	parked	unknown	unknown	PR#1425:18164de4
+0x0224958c	ov002	296	default	unknown	parked	unknown	unknown	PR#1425:18164de4
+0x021bb068	ov002	508	default	unknown	not-attempted	unknown	unknown	PR#1425:18164de4
+0x021b5424	ov016	280	default	unknown	not-attempted	unknown	unknown	PR#1425:18164de4
+0x02031470	main	284	default	unknown	shipped	100	none	PR#1431:0bd0c3f8
+0x0204be40	main	192	default	unknown	shipped	100	none	PR#1431:0bd0c3f8
+0x0227e914	ov002	192	default	unknown	shipped	100	none	PR#1431:0bd0c3f8
+0x02295de0	ov002	228	default	unknown	shipped	100	none	PR#1431:0bd0c3f8
+0x02201b24	ov002	352	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x02263f04	ov002	240	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x0220e16c	ov002	232	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021ef4c8	ov002	216	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x0224c8c4	ov002	188	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021bb7f8	ov002	276	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x022053f8	ov002	216	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x0206de68	main	236	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x020b0f60	main	384	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021cc8b8	ov003	464	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021bf2a4	ov006	432	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x020161ac	main	292	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x02017be0	main	312	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x020619b8	main	212	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x021b38fc	ov006	168	default	unknown	shipped	100	none	PR#1431:b90c00b2
+0x0201e818	main	172	default	unknown	shipped	100	none	PR#1431:1f596c3e
+0x020a5b44	main	316	default	unknown	shipped	100	none	PR#1431:1f596c3e
+0x0229e4e8	ov002	184	default	unknown	shipped	100	none	PR#1431:1f596c3e
+0x02049e84	main	180	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x0223ae68	ov002	224	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x021f1338	ov002	180	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x021d5318	ov004	168	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x020a70fc	main	232	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x022333b4	ov002	336	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x021f1bac	ov002	308	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x0222a688	ov002	288	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x0220e3c8	ov002	336	default	unknown	parked	unknown	reg-alloc	PR#1431:1f596c3e
+0x020038c0	main	396	default	unknown	parked	unknown	reg-alloc	PR#1431:1f596c3e
+0x021ad780	ov020	400	default	unknown	not-attempted	unknown	unknown	PR#1431:1f596c3e
+0x021ab01c	ov000	404	default	unknown	not-attempted	unknown	unknown	PR#1431:1f596c3e
+0x0201a778	main	172	default	unknown	shipped	100	none	PR#1431:7af789c4
+0x021adf18	ov000	172	default	unknown	shipped	100	none	PR#1431:7af789c4
+0x0220b634	ov002	168	default	unknown	shipped	100	none	PR#1431:7af789c4
+0x020678b8	main	204	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0222f67c	ov002	272	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0202abdc	main	272	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x021ae2cc	ov000	200	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0206fa48	main	284	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0205d7e4	main	352	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0225490c	ov002	288	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0203f198	main	372	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x0207f138	main	348	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x02099718	main	508	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x02254c64	ov002	304	default	unknown	parked	unknown	reg-alloc	PR#1431:7af789c4
+0x021aae04	ov008	416	default	unknown	parked	unknown	reg-alloc	PR#1431:7af789c4
+0x0203a5d4	main	192	default	unknown	shipped	100	none	PR#1431:733d9358
+0x0205be60	main	184	default	unknown	shipped	100	none	PR#1431:733d9358
+0x0207ce90	main	152	default	unknown	shipped	100	none	PR#1431:733d9358
+0x02238578	ov002	268	default	unknown	shipped	100	none	PR#1431:733d9358
+0x021cc97c	ov004	180	default	unknown	shipped	100	none	PR#1431:733d9358
+0x021b28c0	ov006	176	default	unknown	shipped	100	none	PR#1431:733d9358
+0x02023d88	main	208	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x02081d18	main	180	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x02073738	main	256	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0220ad78	ov002	252	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x020868cc	main	244	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x02051618	main	392	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x02266dec	ov002	268	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0206d148	main	168	default	unknown	shipped	100	none	PR#1431:1a3c866f
+0x022b1494	ov002	220	default	unknown	shipped	100	none	PR#1431:1a3c866f
+0x021b6f50	ov006	192	default	unknown	shipped	100	none	PR#1431:1a3c866f
+0x021aa700	ov020	172	default	unknown	shipped	100	none	PR#1431:1a3c866f
+0x021ac35c	ov008	212	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x0204653c	main	284	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x02235948	ov002	304	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x021f0df4	ov002	192	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x02224044	ov002	372	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x021b9ecc	ov002	360	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x02274454	ov002	412	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x02234c54	ov002	460	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x021d3e9c	ov004	168	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x0202d3c4	main	228	default	unknown	shipped	100	c-55	PR#1435:093b1ce4
+0x02067984	main	200	default	unknown	shipped	100	none	PR#1435:093b1ce4
+0x0206dc04	main	176	default	unknown	shipped	100	none	PR#1435:093b1ce4
+0x020816f4	main	252	default	unknown	shipped	100	none	PR#1435:093b1ce4
+0x021c1cc0	ov006	180	default	unknown	shipped	100	none	PR#1435:093b1ce4
+0x021b22d8	ov016	220	default	unknown	shipped	100	none	PR#1435:093b1ce4
+0x0208aec8	main	228	default	unknown	shipped	100	none	PR#1435:0852cfc2
+0x02201764	ov002	172	default	unknown	shipped	100	none	PR#1435:0852cfc2
+0x022717f8	ov002	252	default	unknown	shipped	100	none	PR#1435:0852cfc2
+0x022951c4	ov002	192	default	unknown	shipped	100	none	PR#1435:0852cfc2
+0x02070278	main	212	default	unknown	parked	81.1	reg-alloc	PR#1435:0852cfc2
+0x021ea2b4	ov002	220	default	unknown	parked	98	instruction-selection	PR#1435:0852cfc2
+0x02214cb8	ov002	188	default	unknown	parked	57.5	reg-alloc	PR#1435:0852cfc2
+0x0220736c	ov002	228	default	unknown	parked	10.5	unknown	PR#1435:0852cfc2
+0x0224e518	ov002	328	default	unknown	parked	10.5	unknown	PR#1435:0852cfc2
+0x022bd080	ov002	380	default	unknown	parked	24	c-64	PR#1435:0852cfc2
+0x020585d4	main	244	default	unknown	parked	67.7	unknown	PR#1435:0852cfc2
+0x021f80b0	ov002	208	default	unknown	parked	1.9	reg-alloc	PR#1435:0852cfc2
+0x0203eb48	main	212	default	unknown	shipped	100	c-55	PR#1435:edabd3af
+0x02068f78	main	212	default	unknown	shipped	100	none	PR#1435:edabd3af
+0x0222b3a4	ov002	352	default	unknown	shipped	100	c-44	PR#1435:edabd3af
+0x0223fb48	ov002	192	default	unknown	shipped	100	none	PR#1435:edabd3af
+0x022425ac	ov002	248	default	unknown	shipped	100	none	PR#1435:edabd3af
+0x0206d600	main	412	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x021d3de4	ov004	184	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x02069634	main	236	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x021b2a48	ov019	152	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x021e97bc	ov002	164	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x02275938	ov002	220	default	unknown	parked	98.2	unknown	PR#1435:edabd3af
+0x02075394	main	352	default	unknown	shipped	100	none	PR#1435:6355740e
+0x021eaf7c	ov002	244	default	unknown	shipped	100	c-63	PR#1435:6355740e
+0x02203b8c	ov002	260	default	unknown	shipped	100	none	PR#1435:6355740e
+0x02204290	ov002	160	default	unknown	shipped	100	c-55	PR#1435:6355740e
+0x0220c1e4	ov002	220	default	unknown	shipped	100	c-55	PR#1435:6355740e
+0x022859e8	ov002	180	default	unknown	shipped	100	none	PR#1435:6355740e
+0x021d1f04	ov011	152	default	unknown	shipped	100	c-44	PR#1435:6355740e
+0x02033b60	main	204	default	unknown	shipped	100	reg-alloc	PR#1435:55bd0f94
+0x02203580	ov002	200	default	unknown	shipped	100	c-55	PR#1435:55bd0f94
+0x0221eda8	ov002	180	default	unknown	shipped	100	none	PR#1435:55bd0f94
+0x0222c8dc	ov002	288	default	unknown	shipped	100	c-55	PR#1435:55bd0f94
+0x021facbc	ov002	400	default	unknown	parked	89	reg-alloc	PR#1435:55bd0f94
+0x02243138	ov002	308	default	unknown	parked	94.8	reg-alloc	PR#1435:55bd0f94
+0x0225163c	ov002	208	default	unknown	parked	69.2	reg-alloc	PR#1435:55bd0f94
+0x02251908	ov002	188	default	unknown	parked	76.6	unknown	PR#1435:55bd0f94
+0x020035e8	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
+0x02005374	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x02009968	main	unknown	default	unknown	parked	40.6	unknown	PR#1414:bb6e87a4
+0x0200bb5c	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x020138b8	main	unknown	default	unknown	parked	87.8	unknown	PR#1435:6355740e
+0x020162d0	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0201a170	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1414:bb6e87a4
+0x0201a9d0	main	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x020258c4	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x02033b60	main	unknown	default	unknown	parked	96.1	unknown	PR#1414:bb6e87a4
+0x02034c34	main	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x02041248	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x0204653c	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02047ea0	main	unknown	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x020489f8	main	unknown	default	unknown	parked	10.7	unknown	PR#1435:55bd0f94
+0x0204a2ec	main	512	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x020506b0	main	unknown	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x02051168	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02051b10	main	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x020557b8	main	324	default	unknown	parked	66.7	c-55	PR#1425:18164de4
+0x02055e60	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1410:40c19714
+0x0205bc24	main	unknown	default	unknown	parked	42.9	unknown	PR#1435:55bd0f94
+0x0205c830	main	unknown	default	unknown	parked	unknown	structural	PR#1435:6355740e
+0x0205f844	main	492	default	unknown	parked	unknown	unknown	PR#1425:18164de4
+0x02060ad4	main	176	default	unknown	parked	86.4	unknown	PR#1425:18164de4
+0x0206429c	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x020678b8	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02069720	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x02070430	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x02073318	main	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x0207c5b4	main	unknown	default	unknown	parked	8.2	unknown	PR#1435:55bd0f94
+0x0207feec	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02081348	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x0208428c	main	212	default	unknown	parked	unknown	unknown	PR#1425:5dff46c7
+0x0208571c	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02088350	main	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x020894e0	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x0208a344	main	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x0208d204	main	unknown	default	unknown	parked	84.8	unknown	PR#1414:4fbb3f08
+0x020901cc	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0209256c	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x020932a4	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02097364	main	unknown	default	unknown	parked	unknown	unknown	PR#1414:4fbb3f08
+0x02097364	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x020987a4	main	unknown	default	unknown	parked	0	unknown	PR#1435:55bd0f94
+0x0209def8	main	unknown	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x020a70fc	main	unknown	default	unknown	parked	93.1	c-55	PR#1435:55bd0f94
+0x021aa5f0	ov008	180	default	unknown	parked	unknown	unknown	PR#1425:18164de4
+0x021aa8d4	ov000	unknown	default	unknown	parked	0	unknown	PR#1435:55bd0f94
+0x021ab6ac	ov005	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x021ac394	ov020	unknown	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x021af5e0	ov000	unknown	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021af750	ov005	292	default	unknown	parked	unknown	unknown	PR#1404:2b14ae30
+0x021b27f8	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021b34f4	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1414:28c00424
+0x021b36bc	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1410:51b195eb
+0x021b4f1c	ov019	unknown	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x021b6264	ov017	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x021b6ad8	ov006	unknown	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x021c38c4	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x021caf48	ov002	unknown	default	unknown	parked	10.1	unknown	PR#1435:55bd0f94
+0x021cde38	ov004	unknown	default	unknown	parked	73.7	unknown	PR#1435:6355740e
+0x021cfc64	ov004	264	default	unknown	parked	75.8	unknown	PR#1425:5dff46c7
+0x021d0168	ov004	unknown	default	unknown	parked	81.8	unknown	PR#1435:55bd0f94
+0x021d3f9c	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x021d5ce4	ov004	unknown	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x021ea044	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1435:0852cfc2
+0x021edd4c	ov002	unknown	default	unknown	parked	63.4	unknown	PR#1419:ceba9800
+0x0220079c	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:7af789c4
+0x022053f8	ov002	unknown	default	unknown	parked	18.5	c-64	PR#1435:55bd0f94
+0x022076a0	ov002	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x02207d04	ov002	unknown	default	unknown	parked	84.1	unknown	PR#1435:6355740e
+0x02213188	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1404:2b14ae30
+0x0221b278	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x0222b030	ov002	unknown	default	unknown	parked	86.0	unknown	PR#1435:6355740e
+0x0222b73c	ov002	380	default	unknown	parked	83.2	unknown	PR#1425:18164de4
+0x022377f0	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:0bd0c3f8
+0x02237bc0	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:1f596c3e
+0x0223838c	ov002	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x0223876c	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1425:5f6094e0
+0x0223965c	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:1a3c866f
+0x0223a2e4	ov002	unknown	default	unknown	parked	31.4	unknown	PR#1435:55bd0f94
+0x0223cfec	ov002	unknown	default	unknown	parked	32.6	unknown	PR#1435:6355740e
+0x0224c0b8	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x0224c440	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1425:5dff46c7
+0x0224d374	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1404:2b14ae30
+0x0224e6e8	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1435:edabd3af
+0x0224f024	ov002	160	default	unknown	parked	unknown	unknown	PR#1425:5dff46c7
+0x0225070c	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1419:21180cbb
+0x022511bc	ov002	232	default	unknown	parked	58.6	unknown	PR#1425:18164de4
+0x02254c64	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1435:6355740e
+0x022558ec	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x022585dc	ov002	180	default	unknown	parked	91.1	unknown	PR#1425:18164de4
+0x0226674c	ov002	228	default	unknown	parked	unknown	unknown	PR#1425:5dff46c7
+0x02286ae8	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0228ad68	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1404:2b14ae30
+0x0228c700	ov002	unknown	default	unknown	not-attempted	unknown	unknown	PR#1419:ceba9800
+0x022a04b0	ov002	420	default	unknown	parked	58.3	c-55	PR#1425:5dff46c7
+0x022aab4c	ov002	368	default	unknown	parked	unknown	unknown	PR#1404:2b14ae30
+0x022b50a4	ov002	unknown	default	unknown	parked	unknown	unknown	PR#1431:733d9358
+0x0204037c	main	88	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-canary
+0x02043250	main	128	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02044c10	main	80	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x0204550c	main	88	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x0204642c	main	108	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02046ae0	main	92	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02048050	main	100	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02049910	main	128	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x0204b850	main	128	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x0204bdc4	main	124	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02051ab0	main	96	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02051e38	main	92	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02051ec0	main	92	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02051f48	main	80	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x0207d05c	main	116	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch1
+0x02052bd4	main	100	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02053600	main	44	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02053e58	main	92	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02053f48	main	124	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x0205407c	main	84	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02054b44	main	88	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02054b9c	main	96	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02055250	main	72	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x020552dc	main	64	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02055330	main	92	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x020556c8	main	112	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x0205c340	main	128	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x0205d614	main	96	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x020604b0	main	112	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch2
+0x02061464	main	116	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x020614d8	main	88	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02061fa4	main	104	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x0206200c	main	80	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x020622c8	main	88	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x020624cc	main	60	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02062e6c	main	128	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02063808	main	76	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02063e78	main	88	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02065788	main	56	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02065934	main	64	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02067ba8	main	96	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x020683ec	main	56	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02068ab4	main	104	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x02068c08	main	100	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x0206b47c	main	128	default	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch3
+0x0206b6bc	main	64	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206bcec	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206bd30	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206be64	main	116	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206bf94	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206c010	main	100	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206c380	main	116	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206c46c	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206df54	main	60	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206e4a4	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0206e720	main	88	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x0207034c	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x020707f0	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x02070c40	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x02070c84	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x02070d34	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch4
+0x02070f78	main	112	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02072398	main	124	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02073d30	main	112	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02074134	main	96	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02074c74	main	104	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02074ef4	main	56	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02077aec	main	96	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x0207afbc	main	124	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x0207c934	main	92	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x0207cd7c	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x0207cdd0	main	128	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-1-batch5
+0x02046a5c	main	104	default	guard chain	parked	80.8	P-20-self-overwrite-deref	cm-main-tier-sweep-1-batch1
+0x020480b4	main	84	default	guard chain	parked	85.7	P-20-guard-merge-residual	cm-main-tier-sweep-1-batch1
+0x0204918c	main	96	default	guard chain	parked	91.7	P-20-mla-dest-register	cm-main-tier-sweep-1-batch1
+0x0204931c	main	96	default	guard chain	parked	38.5	compound-compare-same-reg	cm-main-tier-sweep-1-batch1
+0x0204d468	main	76	default	guard chain	parked	40.0	reg-alloc-extra-mov	cm-main-tier-sweep-1-batch1
+0x02052704	main	40	default	guard chain	parked	20.0	compound-compare-3way	cm-main-tier-sweep-1-batch1
+0x02052ecc	main	56	default	guard chain	parked	14.3	P-20-redundant-const-preserve	cm-main-tier-sweep-1-batch2
+0x020531c0	main	112	default	guard chain	parked	42.9	64bit-compare-reg-pressure	cm-main-tier-sweep-1-batch2
+0x02055654	main	116	default	guard chain	parked	79.3	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020558fc	main	60	default	guard chain	parked	80.0	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055a18	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x02055c04	main	108	default	guard chain	parked	77.8	guard-chain-double-deref-p1reg	cm-main-tier-sweep-1-batch2
+0x020620d8	main	64	default	guard chain	parked	75.0	P-20-scratch-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206811c	main	120	default	guard chain	parked	23.3	reg-alloc-diverge-stmia-merge	cm-main-tier-sweep-1-batch3
+0x020689e4	main	60	default	guard chain	parked	5.0	struct-by-value-return-abi	cm-main-tier-sweep-1-batch3
+0x0206aa68	main	100	default	guard chain	parked	84.0	neg1-materialization-reg-swap	cm-main-tier-sweep-1-batch3
+0x0206c84c	main	96	default	guard chain	parked	54.2	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0206cd0c	main	88	default	guard chain	parked	95.5	P-20-bf94-result-register	cm-main-tier-sweep-1-batch4
+0x0207092c	main	84	default	guard chain	parked	71.4	P-20-leaf-r0r1-choice	cm-main-tier-sweep-1-batch4
+0x02070ce0	main	84	default	guard chain	parked	23.8	cmpne-predication-nonadjacent-or	cm-main-tier-sweep-1-batch4
+0x02073a5c	main	100	default	guard chain	parked	96.0	P-20-dead-stackword-register	cm-main-tier-sweep-1-batch5
+0x02073ed8	main	80	default	guard chain	parked	40.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x02074b38	main	88	default	guard chain	parked	63.6	P-20-dual-register-swap	cm-main-tier-sweep-1-batch5
+0x0207af28	main	120	default	guard chain	parked	86.7	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207b0e0	main	92	default	guard chain	parked	73.9	canary-lever-residual-iplr	cm-main-tier-sweep-1-batch5
+0x0207c8d8	main	92	default	guard chain	parked	91.3	canary-lever-residual-2nd-access	cm-main-tier-sweep-1-batch5
+0x0207c990	main	76	default	guard chain	parked	50.0	predication-resistance-new	cm-main-tier-sweep-1-batch5
+0x0207cbe0	main	112	default	guard chain	parked	71.4	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0207cc50	main	88	default	guard chain	parked	81.8	canary-lever-residual	cm-main-tier-sweep-1-batch5
+0x0205d4c0	main	68	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-canary
+0x0207d37c	main	48	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0208c9d4	main	48	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0207da48	main	52	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a5f10	main	52	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a7200	main	56	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0208a8bc	main	60	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x02077094	main	40	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0206e504	main	44	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020919ac	main	44	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020b4284	main	44	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020442f8	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020938c8	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x02095c18	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x0209adb4	main	48	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch1
+0x020a2cbc	main	60	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020854a4	main	64	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020a39ec	main	64	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020938f8	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b1e4c	main	60	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b1e0c	main	64	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020953e4	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020a6afc	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020ab054	main	52	legacy	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020aee78	main	52	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020b4248	main	52	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02053bfc	main	56	legacy_sp3	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02094550	main	56	default	loop	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x020534b4	main	32	default	other	shipped	100	none	cm-main-tier-sweep-2-batch2
+0x02097e18	main	68	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02095344	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02097a04	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020a5f44	main	72	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020b319c	main	72	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02095de0	main	72	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02098388	main	48	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020489c4	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02054c30	main	52	legacy_sp3	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02054d68	main	52	legacy_sp3	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x02065d18	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch3
+0x020952f8	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a3144	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a5d08	main	76	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02087954	main	80	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02088f94	main	80	default	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x02089b64	main	80	legacy_sp3	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0208dd9c	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0209a968	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x0208b070	main	52	default	other	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020670f4	main	76	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch4
+0x020a1bf8	main	80	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02091a8c	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02098414	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209a9f4	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a0328	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a5668	main	84	legacy	guard chain	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209ee90	main	80	default	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0206bef4	main	88	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x0209b050	main	104	legacy	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x02097ea4	main	108	default	small dispatcher	shipped	100	none	cm-main-tier-sweep-2-batch5
+0x020a9764	main	40	default	guard chain	parked	90.0	P-34-prologue-pad-fold	cm-main-tier-sweep-2-batch1
+0x020a978c	main	44	default	guard chain	parked	91.0	P-34-prologue-pad-fold	cm-main-tier-sweep-2-batch1
+0x020b3168	main	52	default	guard chain	parked	90.0	P-35-subs-flag-fusion	cm-main-tier-sweep-2-batch1
+0x020a1bbc	main	60	default	guard chain	parked	65.0	P-20-r0-vs-r3-scratch	cm-main-tier-sweep-2-batch1
+0x020aaf10	main	48	default	loop	parked	91.7	reg-alloc-2nd-loop-addressing	cm-main-tier-sweep-2-batch1
+0x0206f170	main	52	default	loop	parked	71.4	condition-fusion-redundant-cmp	cm-main-tier-sweep-2-batch1
+0x02091c44	main	68	default	guard chain	parked	52.9	P-20-register-permutation	cm-main-tier-sweep-2-batch2
+0x0207ec28	main	64	default	guard chain	parked	62.5	P-20-r2r3-swap	cm-main-tier-sweep-2-batch2
+0x0208b000	main	64	default	guard chain	parked	68.8	P-20-mul-dest-cascade	cm-main-tier-sweep-2-batch2
+0x0208c844	main	64	default	guard chain	parked	70.6	P-31-tail-guard-if-conversion	cm-main-tier-sweep-2-batch2
+0x0207da1c	main	44	default	other	parked	27.3	P-20-r2r3-swap-post-doubleshift	cm-main-tier-sweep-2-batch2
+0x02054ad0	main	48	default	other	parked	91.7	P-20-final-add-register-choice	cm-main-tier-sweep-2-batch2
+0x0208de4c	main	72	default	guard chain	parked	27.8	P-31-if-conversion	cm-main-tier-sweep-2-batch3
+0x0208c940	main	76	default	guard chain	parked	68.4	P-31-if-conversion-mirrored	cm-main-tier-sweep-2-batch3
+0x0208f1c4	main	76	default	guard chain	parked	79.0	P-20-operand-order-swap	cm-main-tier-sweep-2-batch3
+0x0208f2a8	main	76	default	guard chain	parked	79.0	P-20-operand-order-swap	cm-main-tier-sweep-2-batch3
+0x0208e5ec	main	48	default	other	parked	8.3	P-36-argument-eval-order	cm-main-tier-sweep-2-batch3
+0x020908c0	main	48	default	other	parked	8.3	P-36-condition-code-family	cm-main-tier-sweep-2-batch3
+0x02044724	main	52	default	other	parked	61.5	CSE-resistant-reverse-direction	cm-main-tier-sweep-2-batch3
+0x020536d0	main	52	default	other	parked	30.8	P-36-call-adjacent-scheduling	cm-main-tier-sweep-2-batch3
+0x0208226c	main	52	default	other	parked	0.0	P-37-free-lr-register-reuse	cm-main-tier-sweep-2-batch3
+0x0208bf3c	main	80	default	guard chain	parked	90.0	P-36-pool-load-hoist	cm-main-tier-sweep-2-batch4
+0x02098038	main	80	default	guard chain	parked	85.0	P-36-ldm-fusion	cm-main-tier-sweep-2-batch4
+0x0208df0c	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0208df60	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0208e1cc	main	52	default	other	parked	53.9	P-36-pipeline-interleaving	cm-main-tier-sweep-2-batch4
+0x0207d4dc	main	68	default	small dispatcher	parked	88.2	P-20-plus-C81-register-number	cm-main-tier-sweep-2-batch4
+0x0207db00	main	68	default	small dispatcher	parked	88.2	P-20-plus-C81-register-number	cm-main-tier-sweep-2-batch4
+0x0204a960	main	80	default	small dispatcher	parked	65.0	OQ-1-dead-branch-preservation	cm-main-tier-sweep-2-batch4
+0x0206e33c	main	80	default	small dispatcher	parked	50.0	P-33-bidirectional-mirror	cm-main-tier-sweep-2-batch4
+0x0206e9b0	main	80	default	small dispatcher	parked	95.0	ANDS-vs-TST-instruction-choice	cm-main-tier-sweep-2-batch4
+0x0209d438	main	80	default	guard chain	parked	80.0	P-20-scratch-register	cm-main-tier-sweep-2-batch5
+0x0208e6ac	main	84	default	guard chain	parked	9.1	P-31-tier-independent	cm-main-tier-sweep-2-batch5
+0x0209b448	main	84	default	guard chain	parked	52.4	P-20-register-swap-plus-scheduling	cm-main-tier-sweep-2-batch5
+0x0209d69c	main	84	default	guard chain	parked	66.7	P-20-r4r5-swap	cm-main-tier-sweep-2-batch5
+0x0209f904	main	108	default	small dispatcher	parked	3.7	P-31-canary-shape-negative	cm-main-tier-sweep-2-batch5
+0x0204a9b0	main	92	default	small dispatcher	parked	87.0	constant-materialization-peephole	cm-main-tier-sweep-2-batch5
+0x02064580	main	96	default	small dispatcher	parked	50.0	P-31-mirror-C55	cm-main-tier-sweep-2-batch5
+0x02055f84	main	104	default	small dispatcher	parked	84.6	P-20-r0-vs-ip	cm-main-tier-sweep-2-batch5
+0x02046b3c	main	108	default	small dispatcher	parked	33.3	P-32-scope-caveat	cm-main-tier-sweep-2-batch5
+0x020577d8	main	108	default	small dispatcher	parked	7.4	P-31	cm-main-tier-sweep-2-batch5
+0x0205c7f4	main	60	default	loop	parked	33.3	P-31	cm-main-tier-sweep-3-batch1
+0x02054db8	main	68	legacy_sp3	loop	parked	19.1	P-36-postinc-pair	cm-main-tier-sweep-3-batch1
+0x02084dc0	main	76	legacy_sp3	loop	parked	89.5	P-36-poolhoist	cm-main-tier-sweep-3-batch1
+0x02054ca8	main	80	legacy_sp3	loop	parked	12.5	P-36-postinc-pair	cm-main-tier-sweep-3-batch1
+0x020b007c	main	188	legacy	guard chain	parked	39.6	P-20-regalloc-plus-imm-fold	cm-main-tier-sweep-3-batch1
+0x0208ffec	main	92	legacy	guard chain	parked	8.3	P-20-r4-vs-lr	cm-main-tier-sweep-3-batch1
+0x0208ddec	main	96	default	guard chain	parked	8.3	P-36-reginterleave	cm-main-tier-sweep-3-batch1
+0x020a3308	main	52	default	other	parked	53.9	P-36-poolhoist	cm-main-tier-sweep-3-batch1
+0x02079b0c	main	60	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch2
+0x02055298	main	68	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch2
+0x020a67cc	main	68	default	loop	parked	unknown	P-37-scope-broadening-candidate	cm-main-tier-sweep-3-batch2
+0x02078f08	main	72	default	loop	parked	38.9	P-36-store-postindex-fusion	cm-main-tier-sweep-3-batch2
+0x020a2c74	main	72	default	loop	parked	47.4	and-shift-pair-collapse	cm-main-tier-sweep-3-batch2
+0x02094504	main	76	default	loop	parked	unknown	stm-burst-needs-asm	cm-main-tier-sweep-3-batch2
+0x0208cfa4	main	140	default	guard chain	parked	88.6	P-20-3register-permutation	cm-main-tier-sweep-3-batch2
+0x0209d018	main	224	default	guard chain	parked	6.0	regalloc-cascade-unresolved	cm-main-tier-sweep-3-batch2
+0x0208de94	main	88	default	guard chain	parked	59.1	P-36-poolhoist	cm-main-tier-sweep-3-batch2
+0x0208fd30	main	96	default	guard chain	parked	37.5	unknown	cm-main-tier-sweep-3-batch2
+0x02048880	main	116	default	small dispatcher	parked	86.2	sibling-constant-arithmetic-reuse	cm-main-tier-sweep-3-batch2
+0x0208bed8	main	60	plain	loop	parked	13.3	instr-selection	cm-main-tier-sweep-3-batch3
+0x0207e790	main	72	plain	loop	parked	88.9	scheduling-cmp-reuse	cm-main-tier-sweep-3-batch3
+0x020779d8	main	80	plain	loop	parked	60.0	P-20-r2-vs-ip	cm-main-tier-sweep-3-batch3
+0x0208d030	main	140	legacy	guard chain	parked	88.6	P-20-r3-vs-ip	cm-main-tier-sweep-3-batch3
+0x0209a1b8	main	88	legacy	guard chain	parked	72.7	P-36-cand-field-read-order	cm-main-tier-sweep-3-batch3
+0x020a1d44	main	92	legacy	guard chain	parked	91.3	P-20-r0-vs-r1	cm-main-tier-sweep-3-batch3
+0x0208fd90	main	96	legacy	guard chain	parked	29.2	instr-selection-const-materialize	cm-main-tier-sweep-3-batch3
+0x020548b4	main	64	default	loop	parked	31.2	reg-alloc-preexisting-global-asm-wall	cm-main-tier-sweep-3-batch4
+0x02087348	main	68	default	loop	parked	11.1	P-31-reverse-wants-predication-got-branch	cm-main-tier-sweep-3-batch4
+0x0208aa50	main	72	legacy_sp3	loop	parked	0.0	P-20-lr-reuse-vs-r5-allocation	cm-main-tier-sweep-3-batch4
+0x020a6858	main	72	legacy	loop	parked	38.9	P-20-r4-lr-swap	cm-main-tier-sweep-3-batch4
+0x0209cc90	main	172	legacy	guard chain	parked	22.9	P-20-base-ptr-rescratch-after-calls	cm-main-tier-sweep-3-batch4
+0x02090048	main	88	legacy	guard chain	parked	81.8	P-20-cmp-operand-r0-r1-swap	cm-main-tier-sweep-3-batch4
+0x0208e220	main	52	default	other	parked	53.9	P-36-sub2-pipeline-interleave	cm-main-tier-sweep-3-batch4
+0x0205bccc	main	64	default	loop	parked	unknown	unknown	cm-main-tier-sweep-3-batch5
+0x02092074	main	72	default	loop	parked	50.0	P-31	cm-main-tier-sweep-3-batch5
+0x02079c74	main	76	legacy	loop	parked	10.5	P-20-reg-alloc	cm-main-tier-sweep-3-batch5
+0x020b03fc	main	76	default	loop	parked	95.0	P-38-tentative-void-loop-trailing-epilogue	cm-main-tier-sweep-3-batch5
+0x020aaec0	main	80	sp3	loop	parked	0.0	P-20-lr-vs-ip	cm-main-tier-sweep-3-batch5
+0x020879a4	main	88	sp3	guard chain	parked	90.9	P-20-r0-vs-r2	cm-main-tier-sweep-3-batch5
+0x0207e840	main	96	default	guard chain	parked	95.8	P-39-tentative-dead-eor-flags-downgrade	cm-main-tier-sweep-3-batch5
+0x02090574	main	52	default	other	parked	0.0	new-imm-offset-truncation-fold	cm-main-tier-sweep-3-batch5
+0x020a3ed8	main	112	default	small dispatcher	parked	46.4	P-36-adjacent-const-materialization	cm-main-tier-sweep-3-batch5
+0x020ace14	main	116	default	small dispatcher	parked	63.3	P-31-inverted-partial-predication	cm-main-tier-sweep-3-batch5
+0x020740c4	main	96	legacy	guard-chain	parked	87.5	register-choice	cm-main-tier-sweep-4-batch1
+0x02076b74	main	216	legacy	other	parked	87.0	register-choice	cm-main-tier-sweep-4-batch1
+0x02077db0	main	168	legacy	loop	parked	59.5	register-choice	cm-main-tier-sweep-4-batch1
+0x020416f8	main	240	legacy_sp3	other	parked	91.7	P-36-sub5-call-adjacent-pool-schedule	cm-main-tier-sweep-4-batch2
+0x02043ca4	main	152	legacy_sp3	loop	parked	89.5	P-20-r8-vs-r9-const-vs-masked-swap	cm-main-tier-sweep-4-batch2
+0x02051f98	main	256	legacy_sp3	guard chain	parked	92.2	P-20-r1-vs-r2-and-r2-vs-r3-double-swap	cm-main-tier-sweep-4-batch2
+0x02076d14	main	200	legacy	guard chain	parked	30.0	P-36-sub9-addr-vs-load-hoist-cascade	cm-main-tier-sweep-4-batch2
+0x020417e8	main	196	legacy_sp3	guard chain	parked	3.9	P-30-adjacent-reg-pressure	cm-main-tier-sweep-4-batch3
+0x020488f4	main	208	legacy_sp3	guard chain	parked	96.2	P-36-cand-cmp-moveq-movne-order	cm-main-tier-sweep-4-batch3
+0x02077ecc	main	192	legacy	other	parked	4.0	C-65-store-strength-reduction-confirmed	cm-main-tier-sweep-4-batch3
+0x020770bc	main	256	legacy	small dispatcher	parked	98.4	P-36-cmp-vs-movs-canonicalization	cm-main-tier-sweep-4-batch3
+0x02044528	main	232	legacy_sp3	loop	parked	96.5	P-30-scratch-register-choice	cm-main-tier-sweep-4-batch4
+0x0204bb5c	main	240	legacy_sp3	small dispatcher	parked	50.0	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
+0x020720b4	main	144	legacy	guard chain	parked	47.2	P-30-parameter-register-rotation	cm-main-tier-sweep-4-batch4
+0x0206f48c	main	112	legacy	other	parked	9.7	pool-constant-caching-resistance	cm-main-tier-sweep-4-batch4
+0x020418ac	main	204	legacy_sp3	guard chain	parked	15.4	P-36-address-hoist-across-branch	cm-main-tier-sweep-4-batch4
+0x02077c08	main	256	legacy	loop	parked	59.4	P-30-whole-function-register-rotation	cm-main-tier-sweep-4-batch4
+0x02041ca8	main	256	legacy_sp3	other	parked	0.0	new-repeated-addr-cse-vs-target-recompute	cm-main-tier-sweep-4-batch5
+0x02044758	main	128	legacy_sp3	loop	parked	17.6	P-36-adjacent-strength-reduction-plus-param-register-order	cm-main-tier-sweep-4-batch5
+0x0204f820	main	208	legacy_sp3	other	parked	21.8	new-repeated-addr-cse-vs-target-recompute	cm-main-tier-sweep-4-batch5
+0x0205396c	main	248	legacy_sp3	other	parked	95.2	P-36-tail-fallthrough-register-shift	cm-main-tier-sweep-4-batch5
+0x0205442c	main	156	legacy_sp3	small dispatcher	parked	61.5	P-36-eq-neg1-materialize-order	cm-main-tier-sweep-4-batch5
+0x020726e0	main	252	legacy	other	parked	0.0	new-bitswap-scratch-register-pressure	cm-main-tier-sweep-4-batch5
+0x02076ad0	main	164	legacy	other	parked	54.8	P-36-ptr-increment-recompute-vs-persist	cm-main-tier-sweep-4-batch5
+0x0207850c	main	192	legacy	other	parked	42.0	P-36-param-materialize-scheduling	cm-main-tier-sweep-4-batch5
+0x020608b4	main	164	legacy_sp3	other	parked	70.7	P-36-poolhoist	cm-main-tier-sweep-5-batch1
+0x02069454	main	184	legacy	other	parked	43.5	P-36-literal-store-order	cm-main-tier-sweep-5-batch1
+0x0206a724	main	140	legacy_sp3	other	parked	8.6	P-36-load-pair-scheduling	cm-main-tier-sweep-5-batch1
+0x0206ed7c	main	156	legacy	other	parked	43.6	canary-lever-residual	cm-main-tier-sweep-5-batch1
+0x02091768	main	172	legacy	other	parked	88.4	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch1
+0x02093454	main	120	legacy	other	parked	30.3	register-choice	cm-main-tier-sweep-5-batch1
+0x02097a4c	main	164	legacy	guard chain	parked	7.3	P-36-const-hoist-across-loop	cm-main-tier-sweep-5-batch1
+0x02067e94	main	168	legacy_sp3	bitfield-flag byte-register-choice (r0-vs-r1 for a masked byte temp; 5 source variations tried, byte-identical wrong output every time)	parked	90.5	reg-alloc	cm-main-tier-sweep-5-batch2
+0x0207fff8	main	192	legacy_sp3	loop-condition-variable r0-vs-r1 register choice (fn/total decl-order fix took it 66.7%->91.7%; 5 further variations on the callback-result var's register all byte-identical wrong)	parked	91.7	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02064158	main	176	legacy_sp3	tier-discriminator field register-choice (r0-vs-r3); range-fold fix (sequential goto tests instead of ||) took 11.4%->93.2%, 3 further variations on the remaining register left byte-identical	parked	93.2	reg-alloc	cm-main-tier-sweep-5-batch2
+0x0207d610	main	188	legacy_sp3	best-fit free-block search: multiple simultaneous residuals (frame uses one fewer callee-saved register than target's r9, a bit0-test that target compiles via and+lsl16+lsr16 shift-pair but mine collapses to a plain ands, and a bestSize register-letter swap r5-vs-lr); double-shift rewrite attempt regressed 8.5%->6.1%, reverted	parked	8.5	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02077954	main	132	legacy	leaf function needing a 5th scratch register beyond r0-r3: target pushes+uses lr (with a 4-byte alignment-pad frame) as the extra register; my compile always uses ip instead with zero frame, byte-identical under both legacy and default(2.0) tier	parked	0.0	reg-alloc	cm-main-tier-sweep-5-batch2
+0x020960ac	main	160	legacy	dual coupled loop-index variables (a0+i*8 'entry', a0+0x18+i*8 'slot') resist C-65-style non-strength-reduced recompute simultaneously; target keeps a0 stable and recomputes entry via a fused shift-add each iteration, but both raw-pointer-shift and C-63 struct-array-index source forms get strength-reduced into an incremental pointer instead, costing an extra callee-saved register + alignment-pad frame the target doesn't have. 4 source variations tried (raw shift, statement-reorder, struct-array, separate-multiply-statement); struct-array was closest (5.0%, off by 1 word) but still wrong shape	parked	5.0	reg-alloc	cm-main-tier-sweep-5-batch2
+0x02061290	main	172	legacy_sp3	loop	parked	20.9	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0206880c	main	132	legacy_sp3	other	parked	75.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0207039c	main	148	legacy	guard chain	parked	20.5	reg-alloc	cm-main-tier-sweep-5-batch3
+0x02078e3c	main	128	legacy	loop	parked	12.1	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0207d6cc	main	192	legacy_sp3	loop	parked	18.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0208771c	main	116	legacy_sp3	guard chain	parked	93.1	reg-alloc	cm-main-tier-sweep-5-batch3
+0x020933bc	main	152	legacy	other	parked	65.8	reg-alloc	cm-main-tier-sweep-5-batch3
+0x0209417c	main	192	legacy	other	parked	89.6	P-36-poolhoist	cm-main-tier-sweep-5-batch3
+0x02067208	main	140	legacy_sp3	loop-per-iter-offset-register-count	parked	13.5	reg-alloc	cm-main-tier-sweep-5-batch4
+0x0206eb4c	main	156	legacy	dual-byteswap-pipeline-interleave	parked	28.2	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x0207b18c	main	164	legacy	canary-lever-residual-shared-base	parked	65.8	P-30-whole-function-register-rotation	cm-main-tier-sweep-5-batch4
+0x02080670	main	184	legacy_sp3	nested-loop-2d-buffer-fill-scheduling	parked	44.9	instruction-selection	cm-main-tier-sweep-5-batch4
+0x02089f60	main	160	legacy_sp3	freed-r0-reuse-register-choice	parked	95.0	register-choice	cm-main-tier-sweep-5-batch4
+0x0209240c	main	180	legacy	cross-branch-reread-vs-cached-local-regpressure	parked	24.4	reg-alloc	cm-main-tier-sweep-5-batch4
+0x02092748	main	112	legacy	irq-save-vs-global-addr-load-interleave	parked	13.8	P-36-pipeline-interleaving	cm-main-tier-sweep-5-batch4
+0x02095418	main	108	legacy	loop-invariant-const-register-hoist-resistance	parked	0.0	pool-const-materialize	cm-main-tier-sweep-5-batch4
+0x02097258	main	124	legacy	double-boolify-phrasing-insensitive-residual	parked	25.8	reg-alloc	cm-main-tier-sweep-5-batch4
+0x020544c8	main	160	legacy_sp3	guard-call-idx-cache	parked	60.0	register-choice-post-call-mov-before-const	cm-main-tier-sweep-5-batch5
+0x02062cfc	main	140	legacy_sp3	guard-then-conditional-field-copy	parked	91.4	P-36-boolean-materialization-order	cm-main-tier-sweep-5-batch5
+0x02067a94	main	192	legacy_sp3	keystream-mixer-6-param	parked	27.1	register-spill-pressure-8-live-values	cm-main-tier-sweep-5-batch5
+0x0206eccc	main	136	legacy	null-safe-byteswap-forward	parked	5.9	register-pressure-passthrough-args-vs-computed	cm-main-tier-sweep-5-batch5
+0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	58.3	RSB-immediate-constant-fusion-resists-source	cm-main-tier-sweep-5-batch5
+0x0229e5a0	ov002	172	default	self-struct field pack: zero one field, call callee(a1,a2,0), pack a1/a2/callresult into a bitfield word stored to another field, zero a byte field	parked	25.6	P-1-shift-pair-vs-mask-collapse-halfword-zeroextend	canary-cm-main-tier-sweep-6-batch1
+0x021f3318	ov002	176	default	per-player row/sub-row triplet gate + active-selection check, deferring to func_ov002_021c1e44	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x021ff9c4	ov002	188	default	phase-field range gate [18,19] + per-player row/subrow/active triplet (global-keyed via data_ov002_022cd3f4) + b0-vs-player compare, shared fail tail	parked	23.4	P-40-immediate-materialization-add-vs-sub-encoding	canary-cm-main-tier-sweep-6-batch1
+0x02253390	ov002	200	default	kind-dispatch (12-15) to per-player count table + loop posting to func_ov002_02253458	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x022afc0c	ov002	228	default	grid hit-test: coordinate swap by orientation flag, bounds checks, row-height via divmod helper or cached field, 4-way classify (-2..3)	parked	8.3	reg-alloc-early-coordinate-swap-persistent-across-phrasings	canary-cm-main-tier-sweep-6-batch1
+0x0224cf98	ov002	172	default	do-while over per-player slot array (bound reread from block+0x10 each iter); id gated by 2 predicates + divmod-free classify-vs-cap; posts kind-13 entries	parked	76.7	reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	canary-cm-main-tier-sweep-6-batch1
+0x021d0e18	ov002	184	default	decode func_ov002_021b947c(f4) packed result via func_ov002_021b9b64 idiom, gate byte1==f2, look up slot, stash+dispatch to f6-selected list, post event 0x14	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x022520f0	ov002	188	default	do-while over per-player slot array (bound reread from block+0x14 each iter); id gated by classify + (predicate!=0 && id!=arg1) + func_ov002_021c33e4 approval; posts kind-14 entries	parked	76.6	reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	canary-cm-main-tier-sweep-6-batch1
+0x0223ac98	ov002	200	default	df38/de94/764c/e2b3c/de4d8/e2c5c gate chain (sibling of func_ov002_022221dc) + slot-id classify via func_0202b8f0, posts func_ov002_021df818(self,1-b0,classified)	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x02209728	ov002	228	default	gate arg1 fields + b0 match + 2 classify calls, then func_ov002_021ff2c8/021ff170 gate on self, defer to func_ov002_021ff354 for 0/2 result	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x0227b960	ov002	88	default	try func_ov002_0227b9b8 first; on -1, classify arg1 and retry via func_ov002_0227b174, falling back to arg3	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x02231534	ov002	116	default	nested loop (i 0..1, j 0..10) gating func_ov002_021d6c98(self,D016C->f_cec^i,j) on func_ov002_0225764c; bracketed by func_ov002_021e2b3c/021e2c5c	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x022ac03c	ov002	132	default	same task-descriptor spawn shape as func_ov002_0229e4e8, looped 14x over (entry,arg) table	parked	82.3	P-40-adjacent-mvn-vs-poolload-constant-materialization	canary-cm-main-tier-sweep-6-batch1
+0x022aead0	ov002	144	default	classify self, unpack packed field via bitfield read (bit0/val5/val8), post to func_ov002_02259774 with a classify-derived flag; conditional func_ov002_0229a414; always func_ov002_022ae9c0; on classify==0 also func_02037208	parked	16.7	reg-alloc-missing-store-reload-roundtrip-for-multi-read-bitfield	canary-cm-main-tier-sweep-6-batch1
+0x0228dbe4	ov002	172	default	slot id lookup gated by func_0202eab0, list via func_0202f620, gate id vs list-last, func_ov002_021c3b60 fast-path or func_ov002_021ba294 confirm, return list-last	parked	95.3	reg-alloc-single-load-dest-choice-persistent	canary-cm-main-tier-sweep-6-batch1
+0x021ed354	ov002	180	default	bit15 tail-calls func_ov002_021e96a0; else field6==0x23->1, gate bit0/arg2, gate func_ov002_021ba104/021c23ac, final result from func_ov002_02257888(self,&021e96a0,-1)!=0	parked	95.6	reg-alloc-scratch-register-choice-ip-vs-r0-persistent	canary-cm-main-tier-sweep-6-batch1
+0x0224e78c	ov002	180	default	do-while over per-player slot array (bound reread from block+0xc each iter, slots at +0x120); id gated by classify + func_ov002_021b9128(id,3) + func_ov002_021ca440(player,id); posts kind-11 entries	parked	77.8	reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	canary-cm-main-tier-sweep-6-batch1
+0x0221771c	ov002	184	default	gate self->f4.bit2, then switch on CE288->f_5a8 (0x7e/0x7f/0x80) dispatching to func_ov002_021e2c5c / func_ov002_0226ad5c / (cf178-count-gated) func_ov002_021e2b3c+func_ov002_0226af38; case body order matters (0x80,0x7f,0x7e,default)	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x0224e2b8	ov002	188	default	do-while over per-player slot array (bound reread from block+0x10 each iter); id gated by classify + func_0202b8a8<=2 + func_0202de9c==0 + func_ov002_021ca440; posts kind-13 entries	parked	78.7	reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	canary-cm-main-tier-sweep-6-batch1
+0x02259774	ov002	192	default	stash (bit0,val5,val8,flag) into D016C, look up a slot via func_ov002_021c93f0 three times (id + two packed-word derefs combined into f_d60 via + not |), val5<=4 gates func_ov002_021b9ecc	shipped	100	none	canary-cm-main-tier-sweep-6-batch1
+0x0223dc14	ov002	172	legacy_sp3	3-field-bitfield-pack-plus-row-idx-bump	parked	7.0	bitfield-insert-lowering-and-vs-shift-fusion	cm-main-tier-sweep-6-batch2
+0x0222a9d0	ov002	180	legacy_sp3	player-subrow-id-composite-guard-plus-conditional-event	parked	8.9	bitfield-read-lowering-and-vs-shift-plus-r3-push-alloc	cm-main-tier-sweep-6-batch2
+0x0220c4e8	ov002	188	default	kind-gate-plus-active-selection-and-own-row-bitmask-and	parked	78.7	T-1-r2-vs-r3-scratch-register-renaming	cm-main-tier-sweep-6-batch2
+0x021bcf18	ov002	204	default	row-scan-count-with-visibility-gate-and-first5-callee-check	parked	18.5	loop-index-count-register-role-swap-plus-stack-spill-risk	cm-main-tier-sweep-6-batch2
+0x021b1488	ov002	232	default	32-entry-jumptable-inc-dec-signed-bitfield	parked	11.9	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	cm-main-tier-sweep-6-batch2
+0x0224f910	ov002	176	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x0224d510	ov002	184	default	per-player-id-array-scan-gate-chain-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02216334	ov002	192	default	gated-mask-accumulate-per-byte-family-func022123fc-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02229a88	ov002	204	default	packed-return-decode-plus-gated-table-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x021ef844	ov002	232	default	field-gate-plus-slot-check-plus-double-gate-dispatch-with-funcptr-arg	parked	71.2	cross-call-scratch-reg-reuse-r3-subrow-not-source-forceable	cm-main-tier-sweep-6-batch2
+0x022aaf8c	ov002	88	default	debounce-guard-plus-task-spawn-dispatch-func022aafe4-sibling	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x022342d0	ov002	128	default	ce288-gate-plus-toggle-bit-double-call-dispatch	parked	90.6	T-1-r1-vs-r2-scratch-register-renaming	cm-main-tier-sweep-6-batch2
+0x021d7c88	ov002	132	default	node-spawn-plus-composite-idword-gate-plus-double-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x0222d1a0	ov002	144	default	field6-gate-plus-spawn-plus-two-way-dispatch	parked	27.8	cross-call-self-and-result-persistence-reg-alloc-mismatch	cm-main-tier-sweep-6-batch2
+0x02294ee4	ov002	172	default	triple-gate-helper-chain-bool-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02294c70	ov002	180	default	gate-plus-limit-compute-plus-5row-scan-guard	parked	51.1	row-address-mla-add-operand-register-order-not-source-forceable	cm-main-tier-sweep-6-batch2
+0x022524a4	ov002	180	default	gate-plus-per-player-id-array-scan-triple-gate-dispatch	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02294938	ov002	188	default	dual-metric-min-gate-plus-double-guard-dispatch	parked	95.7	T-1-r4-vs-r5-first-call-result-register-choice	cm-main-tier-sweep-6-batch2
+0x0220e594	ov002	188	default	mask-accumulate-family-dynamic-bound-plus-extra-guard	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x02209f48	ov002	192	default	triple-gate-plus-summed-metric-plus-count-threshold-tail	shipped	100	none	cm-main-tier-sweep-6-batch2
+0x021c3008	ov002	180	default	per-player-array-scan-count-c68-split-id	parked	46.7	preamble-sink-scheduling	cm-main-tier-sweep-6-batch3
+0x021c1d4c	ov002	212	default	gate-flags-idlist-scratch-reg-choice	parked	39.6	register-choice-post-guard	cm-main-tier-sweep-6-batch3
+0x021b3774	ov002	240	default	linked-list-scan-hi-lo-flag-gate-bittrick	parked	85.0	scheduler-interleave-reg-swap	cm-main-tier-sweep-6-batch3
+0x0222800c	ov002	184	default	gate-chain-lohi-bytepair-plus-bit0-field5	parked	87.0	lo-hi-register-swap	cm-main-tier-sweep-6-batch3
+0x02230a30	ov002	192	default	gate-chain-plus-cd3f4-fields-into-021d5a08	parked	81.2	self-vs-scratch-register-swap	cm-main-tier-sweep-6-batch3
+0x02233348	ov002	108	default	gate-chain-lohi-tailcall-021dea04	parked	77.8	lo-hi-register-swap	cm-main-tier-sweep-6-batch3
+0x022a16fc	ov002	136	default	boolean-materialize-guard-then-or-check	parked	67.7	boolean-collapse-vs-orig-double-cmp	cm-main-tier-sweep-6-batch3
+0x02252868	ov002	172	default	per-player-array-scan-post-021ca440-sink	parked	90.7	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
+0x0224d044	ov002	180	default	per-player-array-scan-post-021c33e4-sink	parked	91.1	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
+0x0229ce5c	ov002	180	default	sprintf-lite-percent-s-substitution	parked	73.3	missing-char-reload-spill	cm-main-tier-sweep-6-batch3
+0x02252998	ov002	192	default	per-player-array-scan-dual-guard-post-021ca440-sink	parked	91.7	off-mul-scratch-register-swap	cm-main-tier-sweep-6-batch3
+0x021d9778	ov002	176	default	packed-record-bitfield-lookup-callee-guard	parked	18.2	register-choice-residual-v-flags-swap	unknown
+0x021b2e04	ov002	184	default	nested-loop-linked-list-record-scan-update	parked	63.0	register-role-rotation-side-rec-cat-idx	cm-main-tier-sweep-6-batch4
+0x022a85a4	ov002	196	default	timer-to-vram-color-bar-fixed-point	parked	71.4	predicated-flag-scheduling-interleave	cm-main-tier-sweep-6-batch4
+0x02257464	ov002	216	default	2bit-switch-dispatch-binary-search	parked	92.6	predicated-pointer-vs-value-choice-on-final-compare	cm-main-tier-sweep-6-batch4
+0x02212ce8	ov002	176	default	guard-call-then-4-callee-cascade	parked	17.8	dead-param-preservation-move-not-elided	cm-main-tier-sweep-6-batch4
+0x021c3d84	ov002	188	default	fisher-yates-shuffle-handle-swap	parked	74.5	register-role-rotation-side-count-array-idx	cm-main-tier-sweep-6-batch4
+0x0224b5b4	ov002	216	default	per-side-record-scan-validate-arm	parked	68.5	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x022583b4	ov002	248	default	color-bar-render-dispatch-with-refcount	parked	30.6	dead-until-later-param-register-choice-plus-bitpack	cm-main-tier-sweep-6-batch4
+0x0221e650	ov002	112	default	case-dispatch-2-yield-calls	parked	67.9	register-role-rotation-field2-holder	cm-main-tier-sweep-6-batch4
+0x021cac64	ov002	140	default	counter-gated-arm-plus-status-clear	parked	80.6	byte-pack-mask-form-plus-pool-refold	cm-main-tier-sweep-6-batch4
+0x02234bc0	ov002	148	default	flags-gate-bitpos-mask-build-arm	parked	2.7	constant-zero-register-materialization-not-reproduced	cm-main-tier-sweep-6-batch4
+0x0224aa14	ov002	172	default	per-side-record-scan-validate-arm-v2	parked	74.4	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x0225170c	ov002	180	default	per-side-record-scan-validate-arm-v3	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x0224c2a4	ov002	180	default	per-side-record-scan-validate-arm-v4	parked	75.6	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x0224ed8c	ov002	188	default	per-side-record-scan-validate-arm-v5-3gate	parked	78.7	register-role-rotation-plus-LS-vs-EQ-mnemonic	cm-main-tier-sweep-6-batch4
+0x021eb070	ov002	184	default	guard-chain-slot-check-dispatch	parked	97.8	P-17-commutative-add-operand-order	unknown
+0x0227ab9c	ov002	200	default	dual-store-bitpack-global-dispatch	parked	18.0	reg-alloc-interleaved-bitfield-extraction-forces-r5-spill	unknown
+0x022b84c0	ov002	220	legacy_sp3	bitfield-dispatch-div3-switch	parked	23.2	sp3-dead-store-stack-pad-reg-pressure	unknown
+0x021b39c4	ov002	252	default	linked-list-traverse-slot-match-dispatch	parked	27.0	smulbb-instruction-selection-and-r5-reuse-residual	unknown
+0x0224f548	ov002	180	default	per-player-array-loop-4call-dispatch	parked	6.2	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x0220a218	ov002	200	default	nested-player-idx-loop-popcount-gate	parked	3.9	loop-invariant-hoist-register-cascade-P36-adjacent	unknown
+0x022b859c	ov002	224	legacy_sp3	kind-bitfield-div3-dispatch-double-call	parked	1.8	sp3-dead-store-stack-pad-reg-pressure	unknown
+0x0224f9c0	ov002	172	default	per-player-array-loop-4call-dispatch	parked	6.5	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x0224f0c4	ov002	180	default	per-player-slot-gate-dispatch	parked	86.7	mla-operand-order-register-numbering-P17-adjacent	unknown
+0x0224d660	ov002	184	default	per-player-array-loop-3call-dispatch	parked	65.2	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x0224e840	ov002	188	default	per-player-array-loop-4call-dispatch	parked	70.2	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x0224c1e4	ov002	192	default	per-player-array-loop-4call-dispatch	parked	72.9	register-numbering-permutation-cascade-P36-adjacent	unknown
+0x021d52a0	ov004	120	default	rec-flag-clear-then-notify-dispatch	parked	13.3	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021d5a10	ov004	128	default	rec-flag-clear-then-ctx-format-dispatch	parked	15.6	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021cd0dc	ov011	180	default	cell-config-sink-8param-eaa0	parked	37.0	stmib-grouping-scheduling-p7-split	cm-main-tier-sweep-7-batch1-part1
+0x021cd2d4	ov011	136	default	tri-table-row-col-lookup	parked	23.5	multi-table-reg-numbering	cm-main-tier-sweep-7-batch1-part1
+0x021d6ed0	ov004	80	default	fn-ptr-array-dispatch-with-counter	parked	20.0	fn-ptr-field-pool-b6c-dispatch	cm-main-tier-sweep-7-batch1-part1
+0x021d0884	ov011	152	default	cross-overlay-hardcoded-bl	parked	7.9	cross-overlay-bl-module-none	cm-main-tier-sweep-7-batch1-part1
+0x021d22d4	ov011	92	legacy	byval-2point-fixedpt-distance	parked	3.9	legacy-prologue-r3-pad-vs-subsp4-register-pressure	cm-main-tier-sweep-7-batch1-part1
+0x021c63cc	ov006	136	default	slot-rebalance-clamp-two-loops	parked	20.6	P-36-redundant-branch-vs-predication-register-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b9e08	ov006	232	legacy_sp3	int-to-glyph-string-signed-div10-loop	parked	11.7	reciprocal-division-register-numbering-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021b5f60	ov006	132	default	dual-row-advance-grid-copy-with-scalar-sibling	parked	5.4	register-pressure-cascade-dual-advancing-pointers	cm-main-tier-sweep-7-batch1-part1
+0x021d46a4	ov004	280	default	rec-flag-clear-voice-notify-dual-gate	parked	7.1	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-batch1-part1
+0x021b4f68	ov006	268	default	audio-init-bigger-tail-notify-record-seed	parked	40.3	post-call-scratch-scheduling-cascade	cm-main-tier-sweep-7-batch1-part1
+0x021cb834	ov004	268	default	grid-fill-plus-circular-vram-bank-copy	parked	3.0	loop-strength-reduction-plus-uncertain-div256-idiom	cm-main-tier-sweep-7-batch1-part1
+0x021cf358	ov011	76	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-batch2-part1
+0x021d2330	ov011	96	legacy	packed-vec2-struct-partial-spill	parked	4.2	reg-alloc-arg-spill-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021c1958	ov006	72	default	preamble-register-alias-resistant	parked	61.1	reg-alloc-preamble-mismatch	cm-main-tier-sweep-7-batch2-part1
+0x021ce344	ov011	96	default	dual-mask-register-preload-order	parked	16.0	reg-alloc-instr-scheduling	cm-main-tier-sweep-7-batch2-part1
+0x021d49b4	ov004	148	default	redundant-bool-materialize-before-predicated-return	parked	48.6	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021d5a90	ov004	132	default	redundant-bool-materialize-before-predicated-return	parked	39.4	scheduling-wall	cm-main-tier-sweep-7-batch2-part1
+0x021c9bc8	ov006	140	default	nested-grid-search-high-register-pressure	parked	13.5	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021bef6c	ov006	176	default	predication-resistant-branch-P31	parked	47.7	P-31	cm-main-tier-sweep-7-batch2-part1
+0x021cc014	ov004	204	default	reg-alloc-state-variable-not-r0	parked	62.8	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021c6454	ov006	220	default	reshape-loop-excess-callee-saved	parked	20.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cab6c	ov006	156	default	nested-grid-search-high-register-pressure	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021cfd6c	ov004	156	default	chained-fixed-point-div-packed-record	parked	0.0	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021d705c	ov004	188	default	chained-fixed-point-div-packed-record	parked	2.1	reg-alloc	cm-main-tier-sweep-7-batch2-part1
+0x021b5fe4	ov006	192	default	5x-outer/7x-inner nested loop, sliding self+dest pointers, 8th-register pressure (r10 vs orig r3 padding)	parked	11.5	reg-alloc	cm-main-tier-sweep-7-batch3-part1
+0x021bf4fc	ov006	232	legacy_sp3	if/else both branches assign a call result to the same var; orig cross-jump-merges the store to ONE copy at the join label, sp3 backend duplicates it per-branch regardless of if/else vs ternary vs int/pointer typing (4 variations tried)	parked	32.2	control-flow-tail-merge	cm-main-tier-sweep-7-batch3-part1
+0x021cc194	ov011	188	legacy_sp3	12-arg call (func_0201eaa0), 8 stack args; orig fuses middle 4 (h,d,c,0) into one stmib, mine emits 3 separate str (P-2 stm-fusion, direction A)	parked	36.0	P-2-stm-fusion	cm-main-tier-sweep-7-batch3-part1
+0x021cfa50	ov011	168	legacy_sp3	two independent same-base struct-field RMWs (f2bc|=0x200, f2a4&=~0x10&=~0xf); orig fully sequential (field1 read/mod/store THEN field2 read/mod/store, no shared reg reuse); mwcc always load-hoists/interleaves the two fields' accesses regardless of source statement order, bitfield-vs-mask syntax, or temp-var staging (7 variations tried); branch-vs-predication (switch) and register-hoist (char *p) sub-issues WERE solved en route	parked	16.3	load-scheduling-interleave	cm-main-tier-sweep-7-batch3-part1
+0x021d4a48	ov004	140	default	changed-bool family: if(rec.unk38){rec.unk38=0;c=1;} if(c)... — orig reuses dead unk38 reg (r0) for c, mwcc always picks fresh r1 (documented unsteerable in ov004_core.h across 8 prior instances: 021d48bc/021d52a0/021d4044/021d427c/021d43a0/021d4d8c/021d4804/021d5a10; this is the 9th confirmed instance); func_02033308's 2-value r0:r1 return needed 'long long' not struct-by-value (mwcc uses hidden-pointer ABI for struct returns) — that sub-issue WAS solved en route	parked	62.9	changed-bool-reg-reuse	cm-main-tier-sweep-7-batch3-part1
+0x021d55d8	ov004	96	default	changed-bool family, early-return variant: if(rec.unk38){rec.unk38=0;c=1;} if(!c)return; — identical documented wall as 021d4a48 (this round) and the 8 ov004_core.h instances; 10th confirmed occurrence, rest of function matches exactly (24/24 words, only the 5 changed-bool words diverge)	parked	79.2	changed-bool-reg-reuse	cm-main-tier-sweep-7-batch3-part1
+0x021bd700	ov006	204	legacy_sp3	record[idx] bounds/split-by-flag; orig fuses the reset-branch's 2-field write into stmeq{r1,r2} (P-2 stm-fusion) AND fuses each asr#2 into the following add via the barrel shifter for the magic-number div/mod-by-10 pair; mine keeps both separate (struct-copy assignment and statement-reorder attempts both regressed further, changing the register set entirely)	parked	24.6	P-2-stm-fusion	cm-main-tier-sweep-7-batch3-part1
+0x021c9c54	ov006	172	default	structurally perfect match (branch structure, all registers) except ONE instruction: orig materializes -1 via mvneq r0,#0; mwcc always instead computes subeq r0,r3,#21 reusing the still-live r3=20 (stride constant) register — P-3 constant-materialization, 4 variations tried (bitwise-not, separate var, collapsed expr, negation operator), byte-identical every time; this single word cascades into pool-offset/branch-offset shifts accounting for all other diffs	parked	58.1	P-3-constant-materialization	cm-main-tier-sweep-7-batch3-part1
+0x021cb778	ov004	188	default	loop building packed flags/angle word via func_02005dac; orig keeps param 'a' as a plain +0x20/iter accumulator, reshifting (a<<23) fresh each iteration; mwcc always strength-reduces the shift-of-induction-variable into a directly-incrementing (a<<23)-accumulator (+0x10000000/iter) instead — 3 variations tried (volatile param: bad stack spill; volatile local shadow: same; i*0x20 fresh recompute: introduces a genuine unwanted multiply). Found+fixed 2 real signedness bugs en route (int+unsigned promotion silently changed asr->lsr twice)	parked	4.1	induction-strength-reduction	cm-main-tier-sweep-7-batch3-part1
+0x021d1080	ov011	144	legacy_sp3	if-branch (0x72-stride table334a row/cell lookup) matches BYTE-EXACT; else-branch (table4660 stride-0x28 2-field read) has orig reuse r0 for mul-result/pointer/loaded-value in a tight 3-way chain, mwcc picks r1 for the mul result instead — 4 variations tried (named ptr, inlined double-offset, incrementing ptr, explicit mul temp), byte-identical every time	parked	86.1	register-reuse-preference	cm-main-tier-sweep-7-batch3-part1
+0x021d4870	ov004	76	default	materialized-bool-global: if(g!=0)return; — documented VERBATIM in ov004_core.h wave-2 notes for THIS EXACT function address (021d4870, sibling 021d57ec): orig materialises movne#1;moveq#0 before the branch, mwcc always branches direct regardless of source form (plain if, or explicit ternary-materialized bool both tried, byte-identical)	parked	31.6	materialized-bool-global	cm-main-tier-sweep-7-batch3-part1
+0x021da100	ov004	188	default	byte-identical twin of func_ov004_021cb778 (same round, same batch) — same induction-variable strength-reduction wall on the (a<<23) computation; not re-attempted since 3 variations already failed identically on the twin. 2 real signedness bugs fixed en route (same as twin).	parked	4.1	induction-strength-reduction	cm-main-tier-sweep-7-batch3-part1
+0x021c15a4	ov006	172	default	3-state-dispatch-switch	parked	60.5	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d2008	ov011	224	default	duplicated-guard-asymmetric-mask-pack	parked	96.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021cc21c	ov004	136	default	record-init-counter-bump-message	parked	79.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d5638	ov004	196	default	changed-bool-flag-message-dispatch	parked	89.8	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021d4ae4	ov004	196	default	changed-bool-flag-plus-dual-gate-message	parked	79.6	dead-value-register-reuse-changed-bool-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c426c	ov006	220	default	bitfield-gate-dual-copy-loop	parked	19.6	loop-strength-reduction-register-role-cascade-P36-adjacent	cm-main-tier-sweep-7-batch4-part1
+0x021c9dd4	ov004	280	default	rgb555-fixedpoint-blend-loop	parked	1.4	fixed-point-blend-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
+0x021cca04	ov011	212	default	band-index-double-clamp-getsystemwork-gate	parked	0	fold-predication-alloc	cm-main-tier-sweep-7-batch4-part1
+0x021ceebc	ov011	124	default	band-table-dual-select-scaled-store	parked	0	predication-vs-branch-dual-assignment	cm-main-tier-sweep-7-batch4-part1
+0x021db874	ov004	288	default	sjis-halfwidth-transcoder-loop	parked	3.9	control-flow-structural-mismatch	cm-main-tier-sweep-7-batch4-part1
+0x021b3318	ov006	172	legacy_sp3	or-of-adjacent-equality-range-fold	parked	86.0	P-32/P-33/C-45-ext	cm-main-tier-sweep-7-batch5-part1
+0x021dabcc	ov004	176	default	instruction-scheduling-register-choice-post-call	parked	81.8	P-36-adjacent	cm-main-tier-sweep-7-batch5-part1
+0x021c4348	ov006	116	default	hit-value-register-reuse-vs-fresh	parked	93.1	P-33-adjacent-register-reuse	cm-main-tier-sweep-7-batch5-part1
+0x021d641c	ov004	76	legacy_sp3	two-step-pointer-add-front-end-fold	parked	79.0	field-pool-base212-known-wall	cm-main-tier-sweep-7-batch5-part1
+0x021cc814	ov011	168	default	case0-load-dest-reg-numbering	parked	90.5	ov011-core-documented-1reg-wall	cm-main-tier-sweep-7-batch5-part1
+0x021b9c98	ov006	132	default	byteswap-stack-key-reg-alloc-cascade	parked	54.5	P-36-adjacent-source-invariant	cm-main-tier-sweep-7-batch5-part1
+0x021b7cfc	ov006	180	default	loop-register-role-cascade-r5-reused-across-loops	parked	53.3	permuter-class-register-mirror	cm-main-tier-sweep-7-batch5-part1
+0x021d441c	ov004	176	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	34.1	ov004-core-changed-bool-family-partial	cm-main-tier-sweep-7-batch5-part1
+0x021d5738	ov004	180	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	33.3	ov004-core-changed-bool-family-partial	cm-main-tier-sweep-7-batch5-part1
+0x021ccf3c	ov011	80	default	multi-field-rmw-base-pooling	parked	0.0	ov011-core-documented-multifield-rmw-wall	cm-main-tier-sweep-7-batch5-part1
+0x021ceffc	ov011	76	default	double-shift-pair-collapses-to-single-op	parked	47.4	P-1-adjacent-shift-pair-permanent	cm-main-tier-sweep-7-batch5-part1
+0x021d12c0	ov011	372	default	shell-sort-stack-resident-locals-reg-alloc	parked	16.5	complex-372B-multi-loop-reg-cascade	cm-main-tier-sweep-7-batch5-part1
+0x021caedc	ov004	388	default	switch-nested-loop-register-pressure-mismatch	parked	5.2	extra-2-register-cascade	cm-main-tier-sweep-7-batch5-part1
+0x021ca400	ov011	216	default	tile-lookup-bitmanip-register-pressure	parked	7.4	complex-216B-leaf-extra-scratch-registers	cm-main-tier-sweep-7-batch5-part1
+0x021be6f4	ov006	388	legacy_sp3	dual-table-copy-quad-writeback-register-pressure	parked	4.1	complex-388B-large-register-pressure-mismatch	cm-main-tier-sweep-7-batch5-part1
+0x021d512c	ov004	372	default	3way-gate-large-register-numbering-shift	parked	3.2	complex-372B-global-register-shift	cm-main-tier-sweep-7-batch5-part1
+0x021ca9e8	ov011	276	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-tier-sweep-7-p2batch1
+0x021b5a54	ov006	284	legacy_sp3	state-machine-switch-dispatch	parked	8.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021b7db0	ov006	208	default	scan-loop-dual-counter	parked	7.4	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021c4bd4	ov006	240	default	guard-loop-text-emit	parked	6.7	large-diff-scheduling-mismatch	cm-main-tier-sweep-7-p2batch1
+0x021cb3b4	ov011	332	default	command-record-bitfield-pack	parked	1.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021cc664	ov011	316	legacy_sp3	fixed-point-row-loop-dispatch	parked	2.2	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021ce3a4	ov011	304	legacy_sp3	mode-dispatch-bitfield-gate	parked	3.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d2de4	ov011	364	default	64bit-fixedpoint-integrator-loop	parked	1.1	large-diff-register-realloc	cm-main-tier-sweep-7-p2batch1
+0x021d5bdc	ov004	264	legacy_sp3	mode-dispatch-callback-register	parked	12.1	large-diff-materialized-bool-mismatch	cm-main-tier-sweep-7-p2batch1
+0x021b5dec	ov006	356	default	parallel-store-loop	parked	93.3	C-65-strength-reduction	cm-main-tier-sweep-7-p2batch2
+0x021be5b8	ov006	316	default	record-refresh-scheduling	parked	36.2	P-36-instruction-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021caa64	ov006	264	default	dual-engine-cell-config	parked	10.6	P-40-constant-materialization	cm-main-tier-sweep-7-p2batch2
+0x021cf0c8	ov011	304	n/a	cross-overlay-bl	parked	unknown	C-32-cross-overlay-bl	cm-main-tier-sweep-7-p2batch2
+0x021d3a7c	ov004	248	default	count-format-dual-source	parked	52.4	dead-call-result-register-reuse	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021d6f20	ov004	316	default	task-grid-blit-setup	parked	42.2	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cd924	ov004	360	legacy_sp3	message-dispatch-3way	parked	14.4	register-allocation-scheduling	cm-main-tier-sweep-7-p2batch2
+0x021cb63c	ov004	316	legacy_sp3	task-grid-blit-setup	parked	25.0	tier-verification-inferior	cm-main-tier-sweep-7-p2batch2
+0x021d4584	ov004	288	default	changed-bool-fixed-then-msgcall-argsetup-residual	parked	88.9	changed-bool-family-r0-reuse	cm-main-tier-sweep-7-p2batch3
+0x021d9d58	ov004	332	default	state-dispatch-guard-chain-timer-counters	parked	9.6	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cabbc	ov011	304	default	guard-chain-bitfield-table-lookup-dispatch	parked	11.8	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021b6364	ov006	364	default	init-loop-then-column-copy-loop	parked	81.7	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021b8a88	ov006	364	default	dual-bitmask-pack-loop-compact-index	parked	7.4	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c71e0	ov006	232	legacy_sp3	guard-chain-vram-clear-plus-text-layer-config	parked	25.4	register-numbering-permutation-cascade-P36-adjacent	cm-main-tier-sweep-7-p2batch3
+0x021cc0e0	ov004	316	default	guard-chain-dual-record-builder	parked	81.0	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021cdd38	ov004	256	default	loop-vram-copy-with-glyph-width-clamp	parked	84.4	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch3
+0x021d0e98	ov004	256	default	loop-vram-bank-clear-plus-glyph-render	parked	43.9	reg-alloc	cm-main-tier-sweep-7-p2batch3
+0x021c8e98	ov006	264	default	audio-init-family-cousin	parked	39.4	P-31	cm-main-tier-sweep-7-p2batch4
+0x021cac38	ov006	252	default	mmio-scroll-pair-dual-delta	parked	42.9	P-36-pipeline-interleaving	cm-main-tier-sweep-7-p2batch4
+0x021b70fc	ov006	324	default	5-state-table-scan-3call-score	parked	4.4	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021cc27c	ov011	200	legacy_sp3	cell-config-eaa0-12arg	parked	32.1	stmib-grouping-scheduling	cm-main-tier-sweep-7-p2batch4
+0x021d5004	ov004	296	default	state-step-changed-bool-guard	parked	24.3	changed-bool	cm-main-tier-sweep-7-p2batch4
+0x021d1118	ov004	332	default	dual-index-loop-nested-2x-drain	parked	1.1	reg-alloc-stack-footprint-mismatch	cm-main-tier-sweep-7-p2batch4
+0x021ce1ec	ov004	376	default	double-timer-setter-packed-descriptor	parked	16.0	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021d9fc4	ov004	316	legacy_sp3	fixedpoint-fill-plus-2tile-loop	parked	21.5	register-numbering-permutation-cascade	cm-main-tier-sweep-7-p2batch4
+0x021ce364	ov004	324	default	3-phase-slot-scan-fallback-min-search	parked	63.0	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021c3384	ov006	316	default	8row-config-broadcast-triple-source-field-pick	parked	69.6	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021ca264	ov006	316	default	conditional-record-base-stride-index-field-init	parked	10.0	P-29-mirror-mla-fusion-resistant	cm-main-tier-sweep-7-p2batch5
+0x021cb25c	ov011	344	default	cmd-record-dense-bitfield-pack-dual-pass-mode-gate	parked	8.0	ov011-core-multifield-rmw-wall-stack-variant	cm-main-tier-sweep-7-p2batch5
+0x021d2158	ov011	288	default	growable-array-drain-loop-stack-accumulator	parked	20.8	constant-fold-mask-collapse-register-cascade	cm-main-tier-sweep-7-p2batch5
+0x021d53c0	ov004	364	default	changed-bool-reinit-mode-record-select-dispatch	parked	45.0	changed-bool-reg-reuse	cm-main-tier-sweep-7-p2batch5
+0x021da1bc	ov004	268	default	grid-nibble-repaint-plus-wrap-split-blit	parked	16.4	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
+0x021cc4c8	ov011	252	legacy_sp3	packed-bitfield-config-triple-dispatch	parked	38.1	P-36-adjacent-field-chain-interleave	cm-main-tier-sweep-7-p2batch5
+0x021d07b0	ov011	212	n/a	cross-overlay-hardcoded-bl	parked	unknown	C-32	cm-main-tier-sweep-7-batch5-part1
+0x02044328	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02045c7c	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02047fb8	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0204ab88	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0205272c	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020540d0	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02054d14	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02055e28	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0205d6bc	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02061540	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064500	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064544	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064d10	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067870	main	72	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067a4c	main	72	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067b54	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067c08	main	80	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206b814	main	120	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206c3f4	main	120	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206dbbc	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206e174	main	116	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206e778	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d0d0	main	92	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d12c	main	96	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d914	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02087ee4	main	64	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020897fc	main	104	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089938	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089df8	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089e70	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089ee8	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208a864	main	88	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208aa0c	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208cf6c	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208f38c	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208fe58	main	92	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02090868	main	88	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02091be4	main	96	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02092700	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209362c	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02094c94	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02095b68	main	96	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02095e28	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096060	main	76	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096358	main	180	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096728	main	100	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020971b8	main	128	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020977c0	main	80	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209b4a4	main	64	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209dc30	main	92	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209e628	main	232	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a5db0	main	84	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a6788	main	68	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a6810	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a68a0	main	64	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a68e0	main	68	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a7388	main	76	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a7440	main	64	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02040478	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02041f04	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02044384	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020447d8	main	256	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02045828	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020468ec	main	200	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046ba8	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046e80	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046f24	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02047de8	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02048b08	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02048f04	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02049710	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204b134	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204b280	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204c04c	main	212	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204c120	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ca70	main	228	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204cb54	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ce3c	main	84	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ce90	main	236	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204e868	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204e914	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ec90	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204f280	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02050054	main	196	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052160	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052b34	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052c58	main	132	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052cdc	main	256	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052e30	main	96	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053230	main	196	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0205337c	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053d10	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053eb4	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02054148	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020541b8	main	212	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02057e60	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206238c	main	172	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206256c	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02064790	main	212	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c110	main	120	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c2f4	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c4b0	main	124	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c7c0	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206d7c0	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206ddc0	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206df90	main	128	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206e0c4	main	176	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206e38c	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206f624	main	100	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070ac0	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070bac	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070d90	main	196	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02072924	main	240	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02072bcc	main	172	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073040	main	188	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073450	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073838	main	228	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02074b90	main	228	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02074e58	main	156	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207576c	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076284	main	200	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207634c	main	232	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076434	main	232	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207651c	main	64	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076764	main	100	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02077d08	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02077e58	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02078498	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02079a08	main	188	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207a458	main	236	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207a7d4	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207b038	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207c20c	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204937c	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054568	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054684	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054a30	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02055738	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020566f4	main	72	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02058954	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205b9ac	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205bdb8	main	168	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205c748	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02060a3c	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02060f50	main	140	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206205c	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02062c74	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02062fc0	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02063a4c	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020640c0	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02065ee0	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206677c	main	108	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02066e00	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02067560	main	168	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206adfc	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206b4fc	main	108	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206b6fc	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206c728	main	152	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206cf10	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206f0c0	main	176	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02072544	main	188	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02074938	main	156	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020778c4	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0207c698	main	192	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0207cca8	main	140	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02080728	main	144	default		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02084efc	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020852fc	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02086cc4	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02087690	main	140	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020881b0	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088620	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088cc0	main	156	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088ee4	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02089c74	main	100	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a1e4	main	156	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a440	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a4ec	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208ae34	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208e544	main	168	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020909d0	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02090a60	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209181c	main	180	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02091b5c	main	136	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020924c0	main	172	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020927b8	main	140	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209295c	main	80	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02092ca0	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02093848	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02093e38	main	168	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020955e8	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02095880	main	156	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020970a8	main	172	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02097700	main	192	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209a210	main	160	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209ae98	main	176	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209b1e0	main	184	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209bba4	main	124	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x021e1870	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021f19e8	ov002	240	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021ffa80	ov002	212	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220b85c	ov002	140	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220cdd4	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220e650	ov002	252	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0221b9f4	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0222bf50	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x02237e94	ov002	196	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022395e8	ov002	116	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022628e4	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022648c8	ov002	192	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0226c884	ov002	172	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0226e9fc	ov002	128	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0228bbf8	ov002	148	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x02294bb4	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022961bc	ov002	132	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229a0a4	ov002	248	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229d01c	ov002	128	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229da84	ov002	192	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021c9ef0	ov004	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ced78	ov004	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cfbec	ov004	120	legacy_sp3		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d552c	ov004	172	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d57ec	ov004	76	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d5b14	ov004	136	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021da2c8	ov004	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021db994	ov004	116	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2760	ov006	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b29b0	ov006	168	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2b28	ov006	172	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2bd4	ov006	200	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b5b70	ov006	180	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6d1c	ov006	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6dac	ov006	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6e3c	ov006	220	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b7a20	ov006	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b7bb0	ov006	228	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b831c	ov006	288	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b843c	ov006	264	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba090	ov006	96	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba0f0	ov006	256	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba1f8	ov006	364	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021bd7cc	ov006	152	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021bdcdc	ov006	248	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021be8ec	ov006	92	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c11c8	ov006	308	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c215c	ov006	292	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c31d0	ov006	220	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c32ac	ov006	216	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c4028	ov006	136	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c5df0	ov006	340	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c6530	ov006	272	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c7edc	ov006	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c7f5c	ov006	268	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c8068	ov006	268	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ca4b8	ov006	96	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ca678	ov006	124	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cae24	ov006	132	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cfb70	ov011	92	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1110	ov011	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1434	ov011	224	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1b70	ov011	272	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b1fe8	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021bbc68	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021bcd80	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021d16f8	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021ebddc	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021ef41c	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f03d4	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f2710	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f3000	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f40f4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022013d4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02203a40	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02208bfc	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02209d04	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220aad0	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220bd20	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220cc98	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220d558	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022101c4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02212fbc	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0221454c	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02214aa0	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02216e9c	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0221be00	ov002	172	legacy_sp3		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0222054c	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02220e54	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0222d2f8	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0223965c	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0223d144	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02240a10	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02243508	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02244b08	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02257888	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02263858	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0226df90	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02271608	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02280794	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02283bc8	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02294d5c	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02296048	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02296814	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022ae374	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x020198ec	main	84	default	signed-byte-clamp-plus-lookup	parked	95.2	P-17	cm-main-wall-filtered-sweep-1-batch1
+0x0201ce94	main	192	default	mutex-guarded-ring-buffer-dispatch	parked	91.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201e5b8	main	180	default	fourcc-chunk-scan-loop	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201f7f0	main	132	default	syswork-position-init	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x02020130	main	88	default	state-guarded-mode-check	parked	90.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201c224	main	132	default	cross-overlay-hardcoded-bl-unlinkable	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch1
+0x02020ff8	main	108	default	three-merged-functions-shared-gap	parked	0	structural	cm-main-wall-filtered-sweep-1-batch1
+0x0200abb0	main	116	default	trap-loop-scan-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02019f94	main	176	default	mask-scan-plus-magic-div10	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02034888	main	192	default	mode-dispatch-7arg-call	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02007f58	main	156	default	linear-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02017df0	main	184	default	mode-switch-guarded-transition	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x020197ac	main	116	default	stride7-lookup-clamped-sum	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201bddc	main	136	default	bitfield-flags-plus-guard-chain	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201f25c	main	96	default	indirect-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201fbe0	main	140	default	nested-guard-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0204f8f0	main	168	default	OQ-1 dead-branch: unsigned-char field_e<0 guard always folds away under mwcc, target keeps it (documented open question)	parked	21.4	OQ-1	cm-main-wall-filtered-sweep-1-batch2
+0x02020490	main	192	default	sum-of-3-halfwords register-allocation swap: same instruction shape/count, r0/r1/r2 assigned differently than target across 4 declaration-order variations tried	parked	85.4	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0202be4c	main	176	default	extra/k local register-allocation swap (r7 vs r8): correct push list, instruction count and shape, 5 declaration-order variations tried	parked	79.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0203de2c	main	84	default	P-36-like CSE hoist: mwcc hoists shared mov r0,r4 before the final branch, target duplicates it in each arm; 4 structural variations (if-chain/flip/if-else/switch) tried	parked	76.2	P-36	cm-main-wall-filtered-sweep-1-batch2
+0x02034b2c	main	172	default	straight-line resource-init call sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038ad4	main	192	default	ring-buffer wrapped stream read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203b774	main	188	default	two-branch retry-loop dispatcher	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202bf90	main	152	default	task-locked buffer load from offset table	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202c6ac	main	132	default	task-locked fixed-size record load	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032028	main	76	default	lazy-init-then-memset accessor	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032370	main	132	default	lazy-alloc IRQ-guarded object init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203320c	main	108	default	3-way dispatch on nested-struct helpers	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x020378c8	main	160	default	linked-list-walk vs indexed-node dual-mode setter	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038b94	main	192	default	overlay-info-load-then-stream-read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203991c	main	116	default	infinite event-poll loop	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203efa0	main	144	default	bitfield-dispatch vs 64-bit-timer-compare	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0206bd74	main	168	legacy	irq-critsec-dispatch-loop-infinite	parked	93.3	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x02087444	main	128	default	bit-signal-vs-handshake-dispatch	parked	12.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02087c34	main	180	default	two-array-init-loops	parked	62.2	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02052f04	main	132	default	category-dispatch-pair-unpack	parked	87.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02074dcc	main	128	legacy	irq-rearm-dispatch-loop-infinite	parked	91.4	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x0208a764	main	100	default	bitfield-guarded-callback-teardown	parked	88.0	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a1da0	main	156	legacy	irq-critsec-slot-copy	parked	89.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a3190	main	172	legacy	field-refresh-vs-dispatch-branch	parked	97.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02060728	main	136	default	keyed-chunk-decrypt-and-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x02051384	main	168	default	singleton-field-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020528e4	main	144	default	gated-dispatch-with-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209dd30	main	184	legacy	variadic-record-alloc-and-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209e788	main	104	legacy	singleton-node-copy-into-buffer	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a3e34	main	164	legacy	irq-critsec-slot-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a6614	main	144	legacy	irq-critsec-one-shot-init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ab798	ov000	184	default	bitfield-ratio-decay-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ae218	ov000	180	default	flags-bitfield gate, adjacent bit11/bit9 test pair shares one load; r0/r1 register-letter swap resists 4 variations	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02239160	ov002	120	default	CE288.f_5a8 counter/dispatch gate; base-ptr register (r2) matches but loaded-value register (r1 vs r3) resists 4 variations	parked	86.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02210104	ov002	192	default	per-side conditional dispatch (df818/e05fc), 2-int local array indexed by bit0-of-field2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x02288068	ov002	132	default	bitfield gate + byte-pack call + bic-mask field write	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022a6860	ov002	140	default	packed bitfield decode (1/5/8-bit fields) called twice; 2nd occurrence's source register happens to alias FIELD1's dest, forcing target to reschedule f2/f3-before-f1; resists 3 variations	parked	85.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02228fac	ov002	160	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, d59cc+e276c dual dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0223163c	ov002	108	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, de9d4 dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0224b3b0	ov002	180	default	row-loop scan; (player&1)*0x868 mla/mul register-letter swap matches documented P-20 exactly, resists 4 variations incl. unsigned typing	parked	8.3	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022503d8	ov002	192	default	row-loop scan; identical P-20 twin of 0224b3b0 (same mla/mul register swap), same residual confirmed not tool-noise	parked	7.8	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022521ac	ov002	148	default	slot[idx] indexed record; 1st read matches byte-exact, 2nd read of identical expression picks different register (r1 vs r2), cascades into packed-field bit-shift reorder	parked	67.6	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02253304	ov002	140	default	row+idx*4+0x120 indexed record dispatch chain; CONTRADICTS P-23 permanent-wall listing -- fix was declaring func_0202b8a8 as signed int not unsigned (forces LT not CS on the <5 compare), mla itself was never the issue	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0208a6b8	main	112	default	IRQ-guarded linked-list scan+remove-matching; needed exact local decl order (irq/node/next) for r4/r6 letter match	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022410f0	ov002	180	default	byte-unpack dual-guard dispatch; needed real truncation (int not u16 return decl) + unsigned-char cast for byte-pack, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	ANOMALY not normal park: fastmatch RESOLVED reports 100pct (text+PC24relocs byte-identical to gap .o) but real ninja sha1 FAILS reproducibly (confirmed via full clean rebuild); root cause undiagnosed, flagged for follow-up	parked	99.9	tool-anomaly	cm-main-wall-filtered-sweep-1-batch4
+0x02089864	main	188	default	nested list drain + indirect-call dispatch, GLOBAL_ASM-endgame precedent; broad register relabeling from word 2 on, not attempted further given time budget	parked	51.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021ada0c	ov008	132	default	conditional dual-source weighted accumulation loop; large early structural divergence (missing sl-class register, push-list mismatch), not attempted further given time budget	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	SUPERSEDES earlier mis-park: unbounded for-loop w/ break on null, per-node 4x dispatch calls; earlier sha1 FAIL was caused by MY OWN dangling .s.stash for unrelated candidates 1/4 in the same tree, not this file -- confirmed genuinely 100% on a verified-clean baseline	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021cb674	ov013	140	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch5
+0x021b34dc	ov010	136	default	dual-sprite-spawn-invoke	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ab708	ov020	144	default	dual-sprite-spawn-invoke-indexed	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021cedf8	ov003	188	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ac208	ov008	164	default	bitfield-index-table-lookup	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2268	ov008	124	default	guard-store-notify-sprintf	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b46a8	ov010	168	default	threshold-velocity-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021caea8	ov012	156	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b274c	ov014	192	default	bitfield-branch-reset-tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b3b9c	ov014	124	default	task-reset-loop-2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b7718	ov016	172	default	task-reset-loop-5-switch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2280	ov023	100	default	bitfield-notify-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b611c	ov017	192	default	9-slot-dual-table-clear-strength-reduction	parked	70.8	strength-reduction	cm-main-wall-filtered-sweep-1-batch5
+0x021cbe8c	ov003	124	default	3-state-dispatch-switch-value-register	parked	87.1	P-4	cm-main-wall-filtered-sweep-1-batch5
+0x021b2630	ov007	100	default	field-reset-two-mov-order-swap	parked	92.0	P-36	cm-main-wall-filtered-sweep-1-batch5
+0x02004fe8	main	160	default	state-bracket forwarder: flag-set call, 7-arg dispatch w/ callback, flag-clear call, 7-arg dispatch w/ different callback	shipped	100	n/a	cm-main-exploit-drain-1-canary
