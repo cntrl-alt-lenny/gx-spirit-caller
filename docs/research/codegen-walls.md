@@ -8326,7 +8326,7 @@ rather than iterating.
 | P-20 | LIVE | Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom). |
 | P-21 | LIVE | Loop/field-extraction-variable register permutation (near-miss, 65-97%). |
 | P-22 | LIVE | Slot bit-manipulation register-pressure wall — the `&1` remask lever backfires here. |
-| P-23 | LIVE | Pool-constant register-pairing wall (`mla`'s two constant operands, r0/r1/r3). |
+| P-23 | LIVE (tentative — was confirmed, downgraded 2026-08-18) | Pool-constant register-pairing wall (`mla`'s two constant operands, r0/r1/r3). n=2 after `02253304` retracted (shipped clean via an unrelated fix). |
 | P-24 | LIVE (tentative) | Per-player row + idx*0x14-stride loop register-swap, P-20-sibling shape (5 members, unconfirmed against re-attempt). |
 | P-25 | LIVE | Legacy_sp3-tier dead-value-in-callee-saved-register push/stack-padding wall. |
 | P-26 | LIVE | Precheck-array-lookup P-20 variant with an added EQ-vs-LS condition-code component. |
@@ -10556,7 +10556,21 @@ mask.
 
 **Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3.
 
-### P-23. Pool-constant register-pairing wall (`mla`'s two constant operands)
+### P-23. Pool-constant register-pairing wall (`mla`'s two constant operands) (tentative — see 2026-08-18 correction)
+
+> **Catalog correction (cm-main-exploit-drain-1, 2026-08-18).**
+> `02253304` shipped clean in `cm-main-wall-filtered-sweep-1` (#1508) —
+> the real fix was declaring an *unrelated callee's* return type
+> `signed int` instead of `unsigned int` (forcing `LT` instead of `CS`
+> on a `<5` compare in the caller), not anything touching the `mla`
+> register pairing this entry describes. It was never actually blocked
+> by this wall; it just happened to sit at a matching plateau until the
+> real (unrelated) bug was found. Removed from affected picks below —
+> see `attempts.tsv` for the contradicting row (result=shipped,
+> brief=cm-main-wall-filtered-sweep-1). This drops confirmed membership
+> from 3 to 2, which by this entry's own n=2/n=3 convention (below)
+> means the wall reverts to **tentative** pending a fresh third
+> independent hit.
 
 **The shape:** an `mla` (multiply-accumulate) instruction whose two
 constant operands are fed from a specific r0/r1/r3 register pairing in
@@ -10566,18 +10580,16 @@ broader loop/extraction-variable permutations — this is specifically
 about which registers hold the two *constants* feeding one `mla`.
 
 **Falsifiable claim:** *some source restructuring fixes the constant's
-register pairing.* **Falsified — 3 members,
+register pairing.* **Falsified — 2 members,
 cm-ov002-unknown-sweep-5 (2026-07-29) batch 3 and
 cm-ov002-unknown-sweep-17 (2026-08-06) mini-item A:**
 
 - `02251bb0` (65.7%, up from 27% after real bugs were fixed: call-result
   variable reuse for early returns, split-shift-reuse).
-- `02253304` (82.9%, up from 26.3%, same fixes applied): identical
-  residual family.
 - `0224bd3c` (84.2%): the row-table `(player&1)*0x868` idiom feeding an
   `mla` whose two pool-loaded constants (stride, table base) AND the
   masked runtime flag all land in a different r0/r1/r3 pairing than
-  target — a fuller 3-way permutation than the first two members'
+  target — a fuller 3-way permutation than the first member's
   2-register pairing, but the same underlying phenomenon (the `mla`'s
   operand-to-register assignment is a backend choice, not a source-level
   one). **7 independent source variations tried across this member
@@ -10591,19 +10603,26 @@ cm-ov002-unknown-sweep-17 (2026-08-06) mini-item A:**
   the function's source shape, not just the `mla` expression's own
   phrasing).
 
-**Why permanent:** three independent members, across two sweeps ~10
-days apart, all isolated this exact residual after unrelated real fixes
-raised them to their respective plateaus, and all resisted every
-restructuring tried (7 variations combined). No longer provisional at
-n=2 — the third member is an independent confirmation with the most
-exhaustive single-member variation coverage in the catalogue.
+**Why tentative (was "permanent"):** two independent members, across
+two sweeps ~10 days apart, both isolated this exact residual after
+unrelated real fixes raised them to their respective plateaus, and both
+resisted every restructuring tried (7 variations combined on
+`0224bd3c` alone). Real evidence, but per this catalogue's own n=2/n=3
+convention this is provisional strength, not confirmed — the former
+"third member" (`02253304`) turned out to be a different bug entirely
+(see correction above). A fresh, genuinely independent third hit would
+restore confirmed status.
 
-**Affected picks (3):** `02251bb0`, `02253304`, `0224bd3c` (all ov002).
+**Affected picks (2):** `02251bb0`, `0224bd3c` (both ov002).
+`02253304` (ov002) RETRACTED 2026-08-18 — shipped clean, see correction
+note above; do not re-add without new evidence.
 
 **Recipe status: NONE.**
 
 **Provenance:** cm-ov002-unknown-sweep-5 (2026-07-29), batch 3;
-cm-ov002-unknown-sweep-17 (2026-08-06), mini-item A.
+cm-ov002-unknown-sweep-17 (2026-08-06), mini-item A;
+cm-main-wall-filtered-sweep-1 (2026-08-17)/cm-main-exploit-drain-1
+(2026-08-18) — retraction of `02253304`.
 
 ### P-24. Per-player row + idx\*0x14-stride loop register-swap (tentative, P-20-sibling)
 
@@ -12109,6 +12128,43 @@ remained after 7 total attempts). Suspected but unresolved on
 found in the time available.
 
 **Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 4.
+
+### C-95. Declare a bit-packed field as a real C bitfield, not a manual mask/shift — mwcc only emits the target's double-shift pair from an actual `: N` member
+
+**The trap.** A struct field packed into a sub-word range (e.g. 4 or 8
+bits inside a larger word) can be read/written two semantically
+identical ways in C: an actual bitfield struct member
+(`unsigned x : N;`) or a manual mask/shift expression (`x & mask`,
+`(x << a) >> a`, `(x >> a) & mask`). These are NOT codegen-equivalent
+under mwcc. The manual form always collapses to a single mask/shift
+instruction under the optimizer regardless of how the expression is
+phrased (parenthesization, intermediate variables, operand order all
+tried, all collapse the same way) — but target ROM code for these
+fields consistently emits the double-shift instruction pair (shift up
+then back down, or an explicit `bic`+`orr` pair) that only a genuine
+bitfield member reproduces.
+
+**The fix.** Declare the field as an actual bitfield struct member
+(mirroring the pattern C-22/P-4/P-8 already use for adjacent-bitfield
+inserts — see `func_02001ef4`'s `bitfield_24_t` for a worked example)
+instead of hand-rolling the mask/shift. No other source change needed;
+the instruction-pair shape follows directly from the declaration.
+
+**Affected picks:** found independently by 2 batches in
+`cm-main-wall-filtered-sweep-1` (#1508, 2026-08-17) — 3 candidates in
+batch5, 2 in batch2 (specific addresses not itemized in that round's
+report; see it for the per-batch ledger). Not yet cross-referenced
+against every existing bitfield-adjacent entry (C-22, P-4, P-8) for
+overlap — a future pass should check whether any of those entries'
+"tried and failed" notes were hitting this exact manual-vs-bitfield
+distinction without naming it.
+
+**Provenance:** cm-main-wall-filtered-sweep-1 (2026-08-17), batches 2
+and 5 (see `docs/research/cm-main-wall-filtered-sweep-1-2026-08-17.md`,
+"Other findings"); catalogued as C-95 by cm-main-exploit-drain-1
+(2026-08-18) — highest existing lever was C-94 at catalog time, not
+C-93 as an earlier draft assumed (kickoff_lint's 0810 taxonomy-collision
+lesson: always check `origin/main` fresh before numbering).
 
 > **C-45 extension — the range-fold lever generalizes beyond `switch`
 > (cm-main-tier-sweep-5, 2026-08-09, batch 2).** `func_02064158`'s
