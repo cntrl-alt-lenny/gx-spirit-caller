@@ -1490,7 +1490,7 @@ CANARY: the first carve of Part 1 goes through the FULL gate (3-region SHA1) bef
 
 **Gate:** `python tools/gate3.py --scope all` 3-region SHA1 PASS (read the log) + the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the per-symbol reconciliation table + the re-census table with its four buckets and a stated remaining-bytes figure.
 
-### cm-restock-carve-9 — the two successors this lane's own re-census identified [TODO]
+### cm-restock-carve-9 — the two successors this lane's own re-census identified [DONE]
 
 `cm-restock-carve-8` (#1501) shipped `ov006`'s last 6 candidates (352 B) and did
 the harder half of the job: the honest four-bucket re-census this lane had
