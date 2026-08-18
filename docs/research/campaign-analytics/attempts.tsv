@@ -3134,3 +3134,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0203e254	main	156	legacy_sp3	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
 0x0203e8b8	main	164	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
 0x0203ec1c	main	136	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02041e18	main	136	default	hard-to-encode pointer-offset constant reused across if/else branches: mwcc picks a 2-ADD register-cached decomposition instead of the original's literal-pool recompute-per-call-site	parked	44.1	instruction-selection	cm-main-exploit-drain-1-batch3
+0x020532f4	main	136	default	0x404-byte stack-frame size constant: mwcc decomposes into two immediate subs instead of the original's literal-pool-loaded register sub	parked	79.4	instruction-selection	cm-main-exploit-drain-1-batch3
+0x0205cb14	main	164	default	two-condition guard (result==0 && field==const) on a single simple call always collapses to predicated ldreq/cmpeq regardless of source form (&&, nested-if, goto early-exit); original uses genuine separate branches	parked	36.6	predication	cm-main-exploit-drain-1-batch3
+0x020639c8	main	132	default	commutative add of two struct-field loads (obj->f_44 + item->f_0) feeding a call arg: mwcc splits the pair across ip/r2 opposite to the original regardless of declaration/read/addition order tried	parked	93.9	register-choice	cm-main-exploit-drain-1-batch3
+0x02067354	main	136	default	same predication wall as func_0205cb14: two-condition guard (field!=-1 && field2!=0) on a single call collapses to ldrne/cmpne regardless of source form	parked	26.5	predication	cm-main-exploit-drain-1-batch3
+0x02068a20	main	148	default	call-argument setup (mov r0,<arg>) for an early-return fallback call gets hoisted before its guarding branch instead of placed inside the branch's own block; resists goto restructuring	parked	24.3	instruction-selection	cm-main-exploit-drain-1-batch3
+0x0203edd4	main	192	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0203eefc	main	108	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0203f030	main	100	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0203f544	main	76	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x02043b70	main	108	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x02043c28	main	124	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0204b0d0	main	100	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0204b300	main	112	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x02057730	main	168	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x020643ec	main	148	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0206b590	main	88	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0206b670	main	76	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0207113c	main	116	legacy_sp3	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
+0x0207d1e8	main	140	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch3
