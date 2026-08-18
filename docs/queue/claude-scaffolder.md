@@ -1572,7 +1572,7 @@ the three sha1 lines VERBATIM + Named-struct/Typed-array before/after + the
 per-symbol reconciliation table + the Part 2 PoC verdict stated as a plain
 yes/no with its evidence.
 
-### q-toolchain-repin-eval — evaluate (do NOT adopt) dsd v0.12.0, m2c 19f2ddb2, permuter 27952473 [TODO]
+### q-toolchain-repin-eval — evaluate (do NOT adopt) dsd v0.12.0, m2c 19f2ddb2, permuter 27952473 [DONE]
 
 External audit lead (2026-08-14). Our pins have drifted: `dsd` vendored at
 **v0.11.0** (2026-04) against upstream **v0.12.0** (2026-08, whose notes cite a
