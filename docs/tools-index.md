@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**133 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**134 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (5)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (61)
+- [Uncategorised](#uncategorised) (62)
 
 ## Analysis / worklist
 
@@ -678,6 +678,10 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**
+
+### `tools/normalise_park_class.py`
+
+**Map attempts.tsv park_class provenance to a controlled wall vocabulary.**
 
 ### `tools/objdiff_filter_panic_units.py`
 
