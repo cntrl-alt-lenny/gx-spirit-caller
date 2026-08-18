@@ -518,3 +518,89 @@ from a real timing run.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-cascade-ci-quadratic`; commit; report
 the PR number with the pasted artifacts.
+
+### q-park-family-column — add the derived `park_family` column now that both blockers have merged [TODO]
+
+`q-park-class-remap` (#1511) is merged and the sequencing it was waiting on is
+now clear on both sides: the normaliser exists, and `q-ledger-ship-coverage`
+(#1506) has finished appending its 303 backfilled rows. The original
+normalisation item deferred the ledger edit explicitly — *"the eventual shape is
+a NEW `park_family` column beside the untouched `park_class`, landing in a later
+round"* — because a column addition against concurrent row additions conflicts
+textually. **Both merged. This is that later round.**
+
+Add `park_family` to `docs/research/campaign-analytics/attempts.tsv` as a
+**derived** column, populated by `tools/normalise_park_class.py`.
+
+Hard rules, all of them provenance rules:
+
+- **`park_class` is evidence and is never overwritten.** The raw tag a lane
+  wrote stays byte-identical. `park_family` sits beside it.
+- **Regenerable, not hand-maintained.** Provide a `--write` mode (or equivalent)
+  that recomputes the whole column from `park_class` deterministically. Running
+  it twice must be a no-op — prove that with a test.
+- **Shipped rows get an empty `park_family`**, matching the scoping already
+  established: a shipped row has no park class, so it has no family either.
+  `''` and `n/a` must not acquire one.
+- **`UNCLASSIFIED:` and `PROVISIONAL:` families carry through verbatim.** Do not
+  quietly promote a provisional family to a formal anchor.
+
+Then make `park_one.py` and `record_shipped.py` write the new column on new
+rows, so the ledger does not immediately start drifting again — a derived column
+that only a manual tool run maintains is a column that goes stale by round 3.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real pytest tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + an idempotence test (regenerate twice, assert byte-identical)
++ a test that a new `park_one.py` park lands with a correct `park_family` + the
+row count before and after, proving no rows were added or lost + `git diff --stat`
+showing `park_class` values unchanged (diff the column in isolation and say so).
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-decomper q-park-family-column`; commit; then take
+the next queue item immediately.
+
+### q-metric-canon-guard — stop "unmatched functions" being read as campaign completion [TODO]
+
+`q-toolchain-repin-eval` (#1512) delivered a genuinely useful census as an
+incidental finding: **30 unmatched functions remain project-wide** (18 `ov004`,
+10 ITCM stubs, 4 overlay-swap residues), derived by `objdump -t` over every
+`_dsd_gap@*.o` in the EUR build. The number is real and the method is sound.
+
+**Its framing is not, and the brain caught it at merge.** The doc says the
+project is *"materially closer to done than the historical docs suggest"* and
+suggests *"a headline update somewhere in the campaign tracking"*. Acting on
+that would badly misrepresent campaign state. A `.s` file is **byte-matched by
+construction** — that is precisely why `ninja sha1` passes with 4,642 of them
+still shipped in the EUR baseline — but it is **not decompiled C**, and this
+campaign's headline is natural-C, currently **~16.5% EUR / 11.84% USA**. "30
+unmatched" measures *delink gaps*, a different axis entirely.
+
+Two deliverables:
+
+1. **Correct the record in place.** Amend
+   `docs/research/q-toolchain-repin-eval.md` so the census keeps its value and
+   loses the completion framing: state plainly what `_dsd_gap` unmatched counts
+   and what it does not, and cross-reference the metric canon. Do not delete the
+   finding — it is good work and the 30-function pool is a real, small,
+   closeable target. Reframe it.
+2. **Make the confusion mechanically hard to repeat.** `docs/state-table.md`
+   already warns that `C-decompiled` must not be conflated with natural-C. Extend
+   that discipline: a check (test or lint) that fails when a doc presents a
+   function-count completion claim without naming which axis it measures. Design
+   this narrowly enough that it does not fire on ordinary prose — a check that
+   cries wolf gets switched off, which is the lesson `q-validator-brittleness`
+   already paid for. If you conclude a mechanical check cannot be made precise
+   enough to be worth it, **say so with your reasoning and deliver only item 1** —
+   that is an acceptable, reportable outcome, not a failure.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real pytest tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + the corrected paragraph quoted in the PR body + the
+independently re-derived count of `.s` files still shipped in `src/` (the brain
+gets 4,642 for the EUR baseline — confirm or correct it) + if you build the
+check, a test proving it does NOT fire on three ordinary existing docs.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-decomper q-metric-canon-guard`; commit; then take
+the next queue item immediately.

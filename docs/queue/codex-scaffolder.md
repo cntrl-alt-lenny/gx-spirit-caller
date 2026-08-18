@@ -695,3 +695,99 @@ from the Actions run, not a local claim.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ci-timeout-cache`; commit; report
 the PR number with the pasted artifacts.
+
+### q-test-brittleness-sweep — the cardinality-assertion class, swept repo-wide instead of one file at a time [TODO]
+
+This item exists because a per-file fix demonstrably did not generalise, twice.
+
+- Round 0817, `q-validator-brittleness` (#1499): removed
+  `len(report.shipped_with_c_lever) == 31` from `tests/test_validate_attempts.py`
+  because it asserted a **count** against a live, append-only ledger and would
+  red-fail the next legitimate ship.
+- Round 0818, one round later: `tests/test_normalise_park_class.py` arrived with
+  **four fresh hardcoded counts** (`rows == 1164`, `raw_distinct == 283`,
+  `family_distinct == 91`, `parked_rows == 744`). #1506 and #1508 grew the ledger
+  to 1,547 in the same round, the consolidated 3-region gate went red, and PR
+  #1505 had to be held out of the merge entirely.
+
+Both were written by careful lanes. The lesson does not transfer by being written
+down; it needs a mechanical check.
+
+**PART 1 — sweep and inventory.** Find every assertion in `tests/` that pins a
+**count or a set-size derived from live repo data** — the ledger, `delinks.txt`,
+`symbols.txt`, `codegen-walls.md`, the queue files, the research index, `src/`
+listings. Distinguish honestly, because the distinction is the whole item:
+
+- **Legitimate**: counts over a fixture the test itself constructs. A test that
+  builds 3 rows and asserts 3 is fine and must not be touched.
+- **Brittle**: counts over data that grows when the campaign does its normal work.
+
+Produce the inventory as a table (file, line, expression, which live source it
+reads, verdict) before changing anything.
+
+**PART 2 — fix the brittle ones**, using the shape the two prior rounds
+converged on: assert the *property* every row must satisfy, assert non-emptiness
+so the check cannot pass vacuously, and **print** the count for visibility
+instead of asserting it. `tests/test_validate_attempts.py` is the reference
+implementation — match its shape.
+
+**PART 3 — a guard so round 0819 does not add a third.** A test or lint that
+fails when a new assertion pins a live-data cardinality. Keep it narrow: it must
+not fire on fixture-local counts, and it must name the offending line clearly
+enough to fix in one read. ⚠️ **If you cannot make it precise, deliver Parts 1-2
+and say why with your reasoning** — a noisy guard gets disabled inside two
+rounds, which is the exact failure mode this whole lineage is about.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real pytest tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + the Part 1 inventory table in the PR body with a verdict per
+row + for each fixed test, proof it still fails on genuinely-bad data (construct
+it; it must go red) + if you build the Part 3 guard, a test proving it does not
+fire on at least three legitimate fixture-local counts.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-scaffolder q-test-brittleness-sweep`; commit; then
+take the next queue item immediately.
+
+### q-ci-runner-parity — a green pytest is not evidence that CI is green [TODO]
+
+Round 0818, PR #1506 shipped `import pytest` inside a test module. The CI
+`unittest` job runs `python -m unittest discover -s tests` in an environment that
+**deliberately installs no third-party packages** (see the header comment in
+`.github/workflows/tests.yml`: *"tests use stdlib unittest"*), so the import
+failed the entire module with `ModuleNotFoundError` and turned a required job
+red — while `pytest -q tests` was green locally and green in the lane's own
+report. The brain fixed it at merge with a stdlib `try/except`.
+
+The defect is not one import line; it is that **the two runners can disagree and
+nothing catches it before CI.**
+
+1. **Add a parity check.** Fail fast when any module under `tests/` imports a
+   third-party package — i.e. anything outside the stdlib and this repo's own
+   `tools/`. Derive the stdlib set programmatically (`sys.stdlib_module_names`),
+   do not hand-maintain an allowlist that rots. The failure message must name the
+   file, the line and the offending module, and say plainly why it breaks the
+   `unittest` job.
+2. **Wire it so it actually runs** in the same job that would otherwise break,
+   and state in the PR body whether that job is a **required** context in the
+   `main-protection` ruleset. That fact is the difference between a check that
+   blocks a bad merge and one that decorates it — #1491's review made exactly
+   this point about `drift-check`.
+3. **Sweep the existing suite** and report how many modules currently violate it
+   (the brain expects zero after the round-0818 fix — confirm or correct that,
+   and fix any stragglers you find).
+
+⚠️ Keep the check honest about *conditional* imports: a module that guards a
+third-party import behind `try/except ImportError` and degrades gracefully is not
+the bug this is hunting. Decide how to treat that case and state your reasoning.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real pytest tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + a test proving the parity check FAILS on a synthetic test
+module that imports a third-party package (construct one; it must go red) and
+PASSES on the real suite + the required-context answer stated explicitly + the
+violation count over the current suite.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-scaffolder q-ci-runner-parity`; commit; then take
+the next queue item immediately.

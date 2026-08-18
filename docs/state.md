@@ -13,6 +13,49 @@ Round 0818: all four lanes delivered, and the second selector programme in a row
 returned null — while the round's own yield hit 60.8%, the best measured this
 campaign. The lever was never the selector; it was the pool.**
 
+**Round 0818b (partial round — 3 of 4 lanes; the CC Decomper is still draining
+`cm-main-exploit-drain-1`).** Merged **#1511** (`q-park-class-remap`) and
+**#1512** (`q-toolchain-repin-eval`); closed **#1505** as superseded.
+
+- **#1511 finished the held work properly.** Cardinality assertions gone,
+  invariant scoped to parked rows, and an **identity rule** for bare `C-`/`P-`/
+  `OQ-` anchors so future anchors need no table row — better than the brief
+  asked for. The two taxonomy calls the brain declined to guess both check out:
+  `strength-reduction` → **C-65**, which is literally "Loop-body strength
+  reduction" and already has `C-65-strength-reduction` rows mapping there; and
+  `tool-anomaly` → `UNCLASSIFIED:tool-anomaly`, correctly **refused** a wall
+  family because it records a fastmatch-vs-SHA1 tooling discrepancy, not a
+  codegen wall. Both runners green.
+- **#1512 evaluated honestly and reported a blocked leg rather than forcing it.**
+  m2c **ADOPT** (fixes a real stack-argument-by-reference misresolution on 2/8
+  live panel functions), permuter **DECLINE** with *no evidence either way* —
+  proved by experiment that all 3 documented plateau candidates are `.s` TUs
+  that `import.py` cannot stage, independently rediscovering the known
+  permuter/`.s`-TU prerequisite — and `dsd` **NOT ATTEMPTED** because `pgrep`
+  showed the Decomper's `ninja sha1` live. It also caught that 7 of 8 cited
+  panel functions were already matched, and rebuilt the panel instead of
+  reporting a dead comparison.
+
+⚠️ **METRIC CORRECTION — do not let this one propagate.** #1512's incidental
+census (**30 unmatched functions project-wide**: 18 `ov004`, 10 ITCM stubs, 4
+overlay-swap residues, via `objdump -t` over every `_dsd_gap@*.o`) is a real
+measurement of a real thing — **delink gaps** — and the 30-function pool is a
+genuine small closeable target. But the doc's framing that the project is
+*"materially closer to done"* and wants *"a headline update"* is wrong and would
+badly misstate campaign state. **A `.s` file is byte-matched by construction** —
+that is exactly why `ninja sha1` passes with **4,642** of them still shipped in
+the EUR baseline — **but it is not decompiled C.** The campaign headline is
+natural-C: ~16.5% EUR, 11.84% USA. Different axis. `q-metric-canon-guard` is
+seeded to correct the doc in place and make the conflation mechanically hard.
+
+**The Codex lanes were finishing in minutes because their queues were one item
+deep.** Both queue headers already say *loop until QUEUE-EMPTY*, so a lane that
+completes its single item and stops is obeying the protocol, not failing it. The
+Codex Scaffolder additionally produced **nothing** this round — branch created at
+`origin/main`, clean tree, item never claimed — and no Codex session log exists
+on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
+Both Codex queues are now **three items deep**.
+
 **Round 0818 — merged #1505, #1506, #1507, #1508.**
 
 - **#1508 `cm-main-wall-filtered-sweep-1` — a clean null, honestly obtained.**
@@ -179,7 +222,7 @@ this file is back under 400 lines and holds current state, the anchors, the
 durable conventions and the open questions. Keep it that way — archive a round's
 narrative once the round after it has merged.
 
-<!-- main-sha: a984ea85d -->
+<!-- main-sha: 16da23770 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

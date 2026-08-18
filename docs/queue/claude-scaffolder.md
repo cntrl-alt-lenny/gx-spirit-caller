@@ -1619,3 +1619,57 @@ its own gate.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder q-toolchain-repin-eval`; commit;
 report the PR number with the pasted artifacts.
+
+### cm-toolchain-adopt-1 — execute the m2c ADOPT verdict, then finish the dsd leg you were blocked on [TODO]
+
+`q-toolchain-repin-eval` (#1512) is merged and it did the evaluation properly:
+it captured a baseline at the current pin **before** bumping, discovered that
+7 of the 8 historically-cited panel functions were already matched (doc
+staleness, not a pipeline fault), rebuilt the panel from live gaps rather than
+reporting a dead comparison, and produced three clearly-separated verdicts. It
+also respected the contention rule under real pressure — `pgrep` showed the
+Decomper's `ninja sha1` running, and the lane reported the `dsd` leg **blocked**
+instead of forcing a window. That was the correct call and it is why this item
+exists rather than a re-run.
+
+**PART 1 — ADOPT the m2c pin.** Bump `M2C_COMMIT` in `tools/m2c_bootstrap.py`
+from `ce052171` to `19f2ddb2`. Your own evidence carried it: the new pin fixes a
+real stack-argument-by-reference misresolution (wrong callee arity plus a
+nonsense `&subroutine_arg0` placeholder) on 2 of 8 live panel functions, with
+the other 5 identical and zero build risk — m2c is draft-generation for the
+cold-RE track, so it cannot affect shipped bytes. Re-run the same 8-function
+panel at the adopted pin and paste the drafts, so the adoption carries its own
+evidence rather than pointing back at #1512.
+
+**PART 2 — the `dsd` leg, this time with a window.** `dsd` v0.11.0 → v0.12.0 was
+in scope last round and never attempted. It is load-bearing (the delink layer),
+so it needs the full treatment: a dedicated worktree, `python3.13 tools/gate3.py
+--scope all` 3-region SHA1, and a delink-ref audit. **Any drift in delinks or
+symbols output is a finding to report, never something to auto-accept** — if the
+new version changes even one delink boundary, stop and write it up rather than
+absorbing it.
+
+Two things you already found that belong in this round's scope:
+
+- **The reproducible `dsd` v0.11.0 `dis` panic** you hit incidentally. If
+  v0.12.0 fixes it, that is a second concrete adoption argument; if it does not,
+  it is worth an upstream issue with your reproduction.
+- **The m2c `MagicFuncPattern` assert** on `bl symbol+offset` targets, identical
+  on both pins. Pre-existing and out of scope to fix, but note it in the round
+  doc so the next person feeding m2c a post-link object does not rediscover it.
+
+⚠️ **MAC CONTENTION.** The CC Decomper is draining a pool this round and gates
+once at the end with `--clean`. Before the Part 2 gate run `pgrep -fl
+'mwcc|mwld|mwasm|ninja'` and wait if it returns rows. If you again cannot get a
+clean window, **deliver Part 1 and report Part 2 blocked** — the same call you
+made last round, and it stays the right one.
+
+**Gate:** for Part 1, the 8-function panel drafts at the adopted pin pasted, plus
+`git diff` showing `M2C_COMMIT` as the only pin changed. For Part 2 if attempted,
+`python3.13 tools/gate3.py --scope all` 3-region SHA1 PASS with the three
+per-region sha1 lines VERBATIM (read the log — a background wrapper's exit code
+is not `gate3.py`'s), plus the delink-ref audit result stated either way.
+`python3.13 -m pytest -q tests` green. Regenerate `docs/research/README.md` LAST.
+
+ONE PR; verify every claim against `git diff --stat`; `python3.13
+tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-1`; commit; report.
