@@ -411,7 +411,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-park-class-normalisation`; commit;
 report the PR number with the pasted artifacts.
 
-### q-park-class-remap — finish the normaliser: scope the invariant, kill the counts, map the 8 new values [TODO]
+### q-park-class-remap — finish the normaliser: scope the invariant, kill the counts, map the 8 new values [DONE]
 
 `q-park-class-normalisation` (#1505) is **held, not merged** — the work is good
 and the brain wants it, but it cannot survive its own campaign's ledger growth.
