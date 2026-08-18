@@ -22,7 +22,9 @@ import argparse
 import csv
 import json
 import re
+import subprocess
 from dataclasses import asdict, dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 from batch_sha1 import _c_to_s_rel
@@ -41,6 +43,12 @@ _NON_SHAPE_RE = re.compile(
     r".*(?:wall|resistance).*)",
     re.IGNORECASE,
 )
+_ROUND_RE = re.compile(
+    r"\b(cm-(?:main-tier-sweep-\d+|ov\d{3}-unknown-sweep-\d+))\b"
+)
+_SHIP_COVERAGE_RE = re.compile(
+    r"\b(cm-main-tier-sweep-\d+|cm-ov002-unknown-sweep-17)\b"
+)
 
 
 @dataclass
@@ -54,6 +62,7 @@ class Audit:
     text_size_mismatches: list[dict] = field(default_factory=list)
     shape_migrations: list[dict] = field(default_factory=list)
     shape_conflicts: list[dict] = field(default_factory=list)
+    ship_coverage_errors: list[dict] = field(default_factory=list)
     schema_errors: list[str] = field(default_factory=list)
 
     @property
@@ -64,6 +73,7 @@ class Audit:
             self.parked_at_100,
             self.invalid_modules,
             self.text_size_mismatches,
+            self.ship_coverage_errors,
             self.schema_errors,
         ]
 
@@ -165,6 +175,112 @@ def audit_rows(
     return report
 
 
+def _brief_round(brief: str) -> str | None:
+    match = _ROUND_RE.search(brief)
+    return match.group(1) if match else None
+
+
+def audit_ship_coverage(
+    round_flips: dict[str, list[dict]], rows: list[dict]
+) -> list[dict]:
+    """Return delinks ship flips with no shipped ledger event for that round."""
+    shipped_by_round: dict[str, set[tuple[str, str]]] = {}
+    for row in rows:
+        if (row.get("result") or "").strip().lower() != "shipped":
+            continue
+        round_name = _brief_round(row.get("brief", ""))
+        if round_name is None:
+            continue
+        shipped_by_round.setdefault(round_name, set()).add(
+            (
+                (row.get("module") or "").strip().lower(),
+                (row.get("addr") or "").strip().lower(),
+            )
+        )
+
+    errors = []
+    for round_name, flips in sorted(round_flips.items()):
+        observed = shipped_by_round.get(round_name, set())
+        missing = [
+            flip
+            for flip in flips
+            if (
+                str(flip.get("module", "")).lower(),
+                str(flip.get("addr", "")).lower(),
+            )
+            not in observed
+        ]
+        if missing:
+            errors.append(
+                {
+                    "round": round_name,
+                    "flips": len(flips),
+                    "recorded_shipped": len(observed),
+                    "missing": missing,
+                }
+            )
+    return errors
+
+
+@lru_cache(maxsize=4)
+def _history_ship_flips(root: Path) -> dict[str, list[dict]]:
+    """Derive round ship flips from the round-labelled git history."""
+    # Main-tier rounds and ov002 sweep-17 are the ship-coverage campaign
+    # represented by this ledger.  Older ov002 rounds predate ship recording
+    # and are intentionally outside this backfill's coverage contract.
+    log = subprocess.check_output(
+        ["git", "log", "--all", "--format=%H%x09%s"],
+        cwd=root,
+        text=True,
+    )
+    by_round: dict[str, set[tuple[str, str]]] = {}
+    for line in log.splitlines():
+        commit, subject = line.split("\t", 1)
+        names = {match.group(1) for match in _SHIP_COVERAGE_RE.finditer(subject)}
+        if not names:
+            continue
+        parent = subprocess.run(
+            ["git", "rev-parse", f"{commit}^1"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+        )
+        if parent.returncode:
+            continue
+        diff = subprocess.check_output(
+            [
+                "git", "diff", "--unified=0", parent.stdout.strip(), commit,
+                "--", "config/eur/arm9",
+            ],
+            cwd=root,
+            text=True,
+        )
+        lines = diff.splitlines()
+        for index in range(len(lines) - 1):
+            old_line, new_line = lines[index : index + 2]
+            if not (old_line.startswith("-src/") and old_line.endswith(".s:")):
+                continue
+            if not (new_line.startswith("+src/") and new_line.endswith(".c:")):
+                continue
+            source = new_line[1:-1]
+            module = _source_module(source[:-2] + ".s")
+            address = re.search(
+                r"func_(?:ov\d{3}_)?([0-9a-fA-F]{8})", Path(source).name
+            )
+            if module is None or address is None:
+                continue
+            key = (module.lower(), f"0x{address.group(1).lower()}")
+            for name in names:
+                by_round.setdefault(name, set()).add(key)
+    return {
+        name: [
+            {"module": module, "addr": addr}
+            for module, addr in sorted(keys)
+        ]
+        for name, keys in by_round.items()
+    }
+
+
 def audit_file(path: Path, *, root: Path = ROOT) -> Audit:
     with path.open(newline="", encoding="utf-8") as stream:
         reader = csv.DictReader(stream, delimiter="\t")
@@ -176,7 +292,12 @@ def audit_file(path: Path, *, root: Path = ROOT) -> Audit:
             return report
         rows = list(reader)
     modules, sizes = _ground_truth(root)
-    return audit_rows(rows, modules=modules, sizes=sizes)
+    report = audit_rows(rows, modules=modules, sizes=sizes)
+    if root == ROOT and path.resolve() == LEDGER.resolve():
+        report.ship_coverage_errors = audit_ship_coverage(
+            _history_ship_flips(root), rows
+        )
+    return report
 
 
 def audit_event(row: dict, *, root: Path = ROOT) -> Audit:
@@ -204,6 +325,7 @@ def _summary(report: Audit) -> dict:
             "shipped-with-C-lever": len(report.shipped_with_c_lever),
             "invalid-module": len(report.invalid_modules),
             "text-size-mismatch": len(report.text_size_mismatches),
+            "ship-coverage-missing": len(report.ship_coverage_errors),
         },
         "shape_migrations": len(report.shape_migrations),
         "shape_conflicts": len(report.shape_conflicts),
@@ -232,6 +354,12 @@ def main(argv: list[str] | None = None) -> int:
                 "shape-conflict: "
                 f"{row['module']}/{row['addr']} shape={item['shape']!r} "
                 f"park_class={item['park_class']!r} source={row['brief']}"
+            )
+        for item in report.ship_coverage_errors:
+            print(
+                "ship-coverage-missing: "
+                f"{item['round']} recorded={item['recorded_shipped']} "
+                f"flips={item['flips']} missing={len(item['missing'])}"
             )
     return 1 if report.error_count else 0
 

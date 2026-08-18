@@ -579,7 +579,7 @@ Effort: **LOW-MEDIUM**. Tooling budget: prevents a required check from going red
 **Gate:** `python -m pytest -q tests` green (paste the real pytest tail) + `ruff check` clean + a test proving a NEW legitimate `C-NN` shipped row does not fail the guard (construct one; it must pass) + the re-run residual with the row count matching `origin/main`.
 
 
-### q-ledger-ship-coverage — the ledger records parks and drops ships, so every rate from it is wrong [TODO]
+### q-ledger-ship-coverage — the ledger records parks and drops ships, so every rate from it is wrong [DONE]
 
 `q-validator-brittleness` (#1499) is merged. You did the right thing with the
 central fix: the `== 31` cardinality assertion is gone, replaced by a property

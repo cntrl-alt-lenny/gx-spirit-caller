@@ -44,6 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Ship-coverage validation derives round flips from round-labelled
+          # commits, so the drift job must have the history it validates.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
