@@ -3171,3 +3171,22 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x0209f1b0	main	108	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch4
 0x0209f21c	main	140	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch4
 0x0209f698	main	136	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch4
+0x02237434	ov002	180	default	byte0/byte1 extract + func_ov002_021c848c round-div-by-2 feeding func_ov002_021df818; single scheduling-only 2-instruction reorder (add-with-shift vs ldrh) resists restructuring, all else byte-exact	parked	86.7	scheduling-diff	cm-main-exploit-drain-1-batch5
+0x02248ab0	ov002	172	default	(player&1)*0x868 row-offset guard+do-while scan; mask/product register-letter swap in the mla-adjacent and+mul pair, unmovable via operand-order/negation rephrasing	parked	59.1	reg-alloc	cm-main-exploit-drain-1-batch5
+0x0224ca08	ov002	188	default	same (player&1)*0x868 row-offset family as func_ov002_02248ab0, extra func_0202b8a8 guard; identical mask/product register-letter wall	parked	62.5	reg-alloc	cm-main-exploit-drain-1-batch5
+0x0224fcd4	ov002	192	default	same (player&1)*0x868 row-offset family, gated by an a2!=0 early dispatch (if/else polarity fixed, 6%->53.1%); same residual mask/product register-letter wall as func_ov002_02248ab0	parked	53.1	reg-alloc	cm-main-exploit-drain-1-batch5
+0x0224c4e8	ov002	148	default	(player&1)*0x868 row base + mla combined with a second idx<<2 index -- the confirmed P-20 idiom shape; matches codegen-walls.md's flagged 'first-statement' sub-variant (prior 83.8%), mask/base register-letter wall	parked	81.6	P-20-family	cm-main-exploit-drain-1-batch5
+0x0224db94	ov002	144	default	same P-20-idiom sub-variant as func_ov002_0224c4e8 (codegen-walls.md prior 83.3%), mask/base register-letter wall	parked	81.1	P-20-family	cm-main-exploit-drain-1-batch5
+0x020a0630	main	128	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a08f4	main	132	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a0e9c	main	156	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a323c	main	168	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a342c	main	180	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a3a2c	main	136	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a53e4	main	116	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a5894	main	136	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x020a5e90	main	128	legacy	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x021faab4	ov002	192	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x0221b4f0	ov002	188	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x02225274	ov002	128	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
+0x0222daa4	ov002	172	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch5
