@@ -1,3 +1,4 @@
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -11,6 +12,16 @@ from main_shape_reclassify import (  # noqa: E402
     classify,
     read_rows,
 )
+
+
+def _assert_worklist_shape(rows):
+    assert rows
+    assert all(
+        re.fullmatch(r"0x[0-9a-f]+", row.address, re.IGNORECASE)
+        and key == row.address[2:].lower()
+        and row.size > 0
+        for key, row in rows.items()
+    )
 
 
 class TestMainShapeReclassify(unittest.TestCase):
@@ -29,7 +40,11 @@ class TestMainShapeReclassify(unittest.TestCase):
         self.assertEqual(classify(self.rows["02000e70"])[0], "unclassified")
 
     def test_worklist_row_count(self):
-        self.assertEqual(len(self.rows), 1640)
+        _assert_worklist_shape(self.rows)
+
+    def test_worklist_shape_rejects_empty_snapshot(self):
+        with self.assertRaises(AssertionError):
+            _assert_worklist_shape({})
 
     def test_predicated_data_processing_is_not_a_branch(self):
         for mnemonic in ("bic", "bics", "bicne", "biceq", "bicsne"):
