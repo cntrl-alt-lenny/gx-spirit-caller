@@ -658,7 +658,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ledger-ship-coverage`; commit; report
 the PR number with the pasted artifacts.
 
-### q-ci-timeout-cache — no workflow sets a timeout; compile-check re-downloads the toolchain every run [TODO]
+### q-ci-timeout-cache — no workflow sets a timeout; compile-check re-downloads the toolchain every run [DONE]
 
 External audit lead (2026-08-14), brain-verified live on `main` twice — at
 `b1015c872` and again at `fcb39a4c2`. Two independent CI-hygiene gaps:
@@ -696,7 +696,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ci-timeout-cache`; commit; report
 the PR number with the pasted artifacts.
 
-### q-test-brittleness-sweep — the cardinality-assertion class, swept repo-wide instead of one file at a time [TODO]
+### q-test-brittleness-sweep — the cardinality-assertion class, swept repo-wide instead of one file at a time [DONE]
 
 This item exists because a per-file fix demonstrably did not generalise, twice.
 
@@ -749,7 +749,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-test-brittleness-sweep`; commit; then
 take the next queue item immediately.
 
-### q-ci-runner-parity — a green pytest is not evidence that CI is green [TODO]
+### q-ci-runner-parity — a green pytest is not evidence that CI is green [DONE]
 
 Round 0818, PR #1506 shipped `import pytest` inside a test module. The CI
 `unittest` job runs `python -m unittest discover -s tests` in an environment that

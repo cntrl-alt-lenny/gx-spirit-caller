@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**134 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**135 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (5)
+- [Hygiene / invariants](#hygiene--invariants) (6)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (62)
@@ -318,6 +318,10 @@ The metadata scattered across `symbols.txt`, `delinks.txt`, and the C sources in
 **re-verify include/game/prototypes.h**
 
 against the matched C bodies it claims to be derived from.
+
+### `tools/check_test_imports.py`
+
+**Check that the unittest suite has no undeclared third-party imports.**
 
 ## CI formatters
 
