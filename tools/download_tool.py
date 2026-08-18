@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 from pathlib import Path
 from get_platform import get_platform
 import zipfile
@@ -54,6 +55,38 @@ TOOLS = {
 
 
 download_url = TOOLS[args.tool](args.tag)
+
+
+def _cache_marker(tool: str, tag: str, url: str, path: Path) -> Path:
+    """Return the marker path for a downloaded tool tree.
+
+    The mwccarm archive extracts below ``<path>/mwccarm``.  Hashing the
+    tool identity makes a restored marker specific to both the requested
+    release and its URL, so a re-pin cannot reuse an old tree silently.
+    """
+    identity = f"{tool}\n{tag}\n{url}\n".encode()
+    digest = hashlib.sha256(identity).hexdigest()[:16]
+    destination = path / "mwccarm" if tool == "mwccarm" else path
+    return destination / f".download-tool-{tool}-{digest}.complete"
+
+
+def _mwccarm_cache_is_valid(path: Path, marker: Path) -> bool:
+    """Accept a restored mwccarm tree only when its marker and tools exist."""
+    expected = (
+        path / "mwccarm/2.0/sp1p5/mwccarm.exe",
+        path / "mwccarm/2.0/sp1p5/mwldarm.exe",
+        path / "mwccarm/2.0/sp1p5/mwasmarm.exe",
+        path / "mwccarm/1.2/sp2p3/mwccarm.exe",
+        path / "mwccarm/1.2/sp3/mwccarm.exe",
+    )
+    return marker.is_file() and all(tool.is_file() for tool in expected)
+
+
+cache_marker = _cache_marker(args.tool, args.tag, download_url, args.path)
+if args.tool == "mwccarm" and _mwccarm_cache_is_valid(args.path, cache_marker):
+    print(f"Using cached {args.tool} {args.tag} at {args.path / 'mwccarm'}")
+    raise SystemExit(0)
+
 print(f'\nDownloading {args.tool} {args.tag}...')
 response = requests.get(download_url)
 if args.tool == "arm-binutils":
@@ -99,3 +132,10 @@ else:
     with out_path.open('wb') as f:
         f.write(response.content)
     out_path.chmod(out_path.stat().st_mode | stat.S_IEXEC)
+
+if args.tool == "mwccarm":
+    cache_marker.parent.mkdir(parents=True, exist_ok=True)
+    cache_marker.write_text(
+        f"{args.tool}\n{args.tag}\n{download_url}\n", encoding="utf-8"
+    )
+    print(f"Marked {args.tool} cache complete: {cache_marker}")

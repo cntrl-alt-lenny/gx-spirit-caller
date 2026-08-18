@@ -36,6 +36,7 @@ permissions:
 jobs:
   unittest:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -68,6 +69,7 @@ jobs:
     # doesn't pay for either. The end-to-end "ninja rom + dsd check
     # modules" smoke test is brain's job pre-merge.
     runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 

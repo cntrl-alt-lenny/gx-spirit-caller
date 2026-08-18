@@ -658,7 +658,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ledger-ship-coverage`; commit; report
 the PR number with the pasted artifacts.
 
-### q-ci-timeout-cache — no workflow sets a timeout; compile-check re-downloads the toolchain every run [TODO]
+### q-ci-timeout-cache — no workflow sets a timeout; compile-check re-downloads the toolchain every run [DONE]
 
 External audit lead (2026-08-14), brain-verified live on `main` twice — at
 `b1015c872` and again at `fcb39a4c2`. Two independent CI-hygiene gaps:
