@@ -4,8 +4,6 @@ import re
 import sys
 from pathlib import Path
 
-import pytest
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import validate_attempts  # noqa: E402
@@ -56,8 +54,15 @@ def _assert_c_lever_exemption_shape(report: validate_attempts.Audit) -> None:
 
 
 def test_empty_c_lever_exemption_list_fails_loudly() -> None:
-    with pytest.raises(AssertionError):
+    # Stdlib-only: the `unittest` CI job installs no third-party packages, so a
+    # `pytest.raises` here fails the whole module at import time (ModuleNotFoundError).
+    try:
         _assert_c_lever_exemption_shape(validate_attempts.Audit())
+    except AssertionError:
+        return
+    raise AssertionError(
+        "an empty shipped_with_c_lever set must fail loudly, not pass vacuously"
+    )
 
 
 def test_module_and_text_size_ground_truth_are_checked() -> None:
