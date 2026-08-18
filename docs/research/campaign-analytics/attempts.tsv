@@ -3114,3 +3114,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x020206d8	main	96	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch1
 0x0202b294	main	136	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch1
 0x0202ba94	main	80	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch1
+0x020327e4	main	128	default	loop count/index register-role swap (r4<->r6), 3 declaration-order variants tried, C-56-style but resistant	parked	71.9	reg-alloc	cm-main-exploit-drain-1-batch2
+0x0203ba24	main	124	default	6th-param(2nd stack slot) pointer eagerly materialized before an early-return check; target defers the load past the branch, 3 variants tried (typed struct, raw ptr-cast, offset fix) all reproduce identical scheduling	parked	83.9	reg-alloc	cm-main-exploit-drain-1-batch2
+0x0203eca4	main	136	default	4-byte sum: mwcc reuses r2 for the last byte load (c8-then-cb register reuse) in target; 4 expression-order/temp variants all landed on r12/ip instead for that one load, best 94.1% (2/34 words)	parked	94.1	reg-alloc	cm-main-exploit-drain-1-batch2
+0x0203467c	main	192	default	2-word {a,b} pair return (4 divergent return sites, one forwarding a callees own 2-word return): a 2-int STRUCT return type makes mwcc spill the whole aggregate to the stack (sub sp #32+) across every site; switching to a genuine long long fixed the spill (0%->7.4%, 54w vs 48w target) but per-site register construction order (which field loads first) still does not match target on the early-return site; 5 real variants tried (struct, compound-literal, long-long+shift/or macro x2 operand orders, union-of-longlong+struct which reintroduced the spill)	parked	7.4	reg-alloc	cm-main-exploit-drain-1-batch2
+0x0203dc10	main	132	default	target if-converts a 4-insn if(r==1){*p=0;return 1;} block (moveq/strbeq/moveq/popeq, no branch) that mwcc never if-converts from equivalent source in 2 variants (sequential-if, negated-if-else); inverse of documented P-31 (there mwcc over-predicates; here it under-predicates vs target). unsigned-vs-signed compare type fix (bhi vs bgt) landed cleanly on the outer guard though.	parked	16.7	predication	cm-main-exploit-drain-1-batch2
+0x0202befc	main	148	default	3-variable cyclic register-role rotation (type/extra/off get r5/r7/r6 in mine vs r7/r6/r5 in target); target computes type directly into its permanent r7 with zero temp-register use, mine always routes through a scratch reg (r1) first regardless of declaration order — 2 declaration-order permutations tried, both produced the identical wrong mapping	parked	13.2	reg-alloc	cm-main-exploit-drain-1-batch2
+0x0202c334	main	148	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0202d4a8	main	176	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02031d0c	main	116	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02032a34	main	144	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02033554	main	100	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02033944	main	144	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02037d28	main	152	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x02038c98	main	148	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203a8dc	main	116	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203cb40	main	80	legacy_sp3	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203db70	main	160	legacy_sp3	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203e254	main	156	legacy_sp3	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203e8b8	main	164	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
+0x0203ec1c	main	136	default	unknown	shipped	100	n/a	cm-main-exploit-drain-1-batch2
