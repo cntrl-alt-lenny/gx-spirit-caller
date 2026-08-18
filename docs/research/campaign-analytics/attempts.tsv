@@ -1163,3 +1163,386 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	brief
 0x021da1bc	ov004	268	default	grid-nibble-repaint-plus-wrap-split-blit	parked	16.4	P-30-adjacent-register-choice	cm-main-tier-sweep-7-p2batch5
 0x021cc4c8	ov011	252	legacy_sp3	packed-bitfield-config-triple-dispatch	parked	38.1	P-36-adjacent-field-chain-interleave	cm-main-tier-sweep-7-p2batch5
 0x021d07b0	ov011	212	n/a	cross-overlay-hardcoded-bl	parked	unknown	C-32	cm-main-tier-sweep-7-batch5-part1
+0x02044328	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02045c7c	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02047fb8	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0204ab88	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0205272c	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020540d0	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02054d14	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02055e28	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0205d6bc	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02061540	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064500	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064544	main	60	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02064d10	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067870	main	72	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067a4c	main	72	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067b54	main	56	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02067c08	main	80	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206b814	main	120	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206c3f4	main	120	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206dbbc	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206e174	main	116	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0206e778	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d0d0	main	92	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d12c	main	96	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0207d914	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02087ee4	main	64	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020897fc	main	104	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089938	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089df8	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089e70	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02089ee8	main	120	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208a864	main	88	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208aa0c	main	68	legacy_sp3		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208cf6c	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208f38c	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0208fe58	main	92	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02090868	main	88	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02091be4	main	96	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02092700	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209362c	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02094c94	main	88	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02095b68	main	96	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02095e28	main	56	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096060	main	76	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096358	main	180	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02096728	main	100	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020971b8	main	128	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020977c0	main	80	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209b4a4	main	64	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209dc30	main	92	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x0209e628	main	232	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a5db0	main	84	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a6788	main	68	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a6810	main	72	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a68a0	main	64	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a68e0	main	68	legacy		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a7388	main	76	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x020a7440	main	64	default		shipped	100		cm-main-tier-sweep-3-backfilled
+0x02040478	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02041f04	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02044384	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020447d8	main	256	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02045828	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020468ec	main	200	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046ba8	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046e80	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02046f24	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02047de8	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02048b08	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02048f04	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02049710	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204b134	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204b280	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204c04c	main	212	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204c120	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ca70	main	228	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204cb54	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ce3c	main	84	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ce90	main	236	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204e868	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204e914	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204ec90	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204f280	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02050054	main	196	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052160	main	184	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052b34	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052c58	main	132	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052cdc	main	256	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02052e30	main	96	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053230	main	196	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0205337c	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053d10	main	204	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02053eb4	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02054148	main	112	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x020541b8	main	212	legacy_sp3		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02057e60	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206238c	main	172	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206256c	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02064790	main	212	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c110	main	120	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c2f4	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c4b0	main	124	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206c7c0	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206d7c0	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206ddc0	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206df90	main	128	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206e0c4	main	176	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206e38c	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0206f624	main	100	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070ac0	main	140	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070bac	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02070d90	main	196	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02072924	main	240	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02072bcc	main	172	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073040	main	188	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073450	main	220	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02073838	main	228	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02074b90	main	228	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02074e58	main	156	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207576c	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076284	main	200	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207634c	main	232	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076434	main	232	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207651c	main	64	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02076764	main	100	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02077d08	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02077e58	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02078498	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x02079a08	main	188	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207a458	main	236	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207a7d4	main	148	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207b038	main	168	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0207c20c	main	116	legacy		shipped	100		cm-main-tier-sweep-4-backfilled
+0x0204937c	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054568	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054684	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02054a30	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02055738	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020566f4	main	72	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02058954	main	180	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205b9ac	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205bdb8	main	168	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0205c748	main	144	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02060a3c	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02060f50	main	140	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206205c	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02062c74	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02062fc0	main	116	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02063a4c	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020640c0	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02065ee0	main	152	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206677c	main	108	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02066e00	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02067560	main	168	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206adfc	main	164	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206b4fc	main	108	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206b6fc	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206c728	main	152	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206cf10	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0206f0c0	main	176	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02072544	main	188	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02074938	main	156	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020778c4	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0207c698	main	192	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0207cca8	main	140	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02080728	main	144	default		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02084efc	main	192	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020852fc	main	160	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02086cc4	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02087690	main	140	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020881b0	main	124	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088620	main	128	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088cc0	main	156	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02088ee4	main	176	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02089c74	main	100	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a1e4	main	156	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a440	main	172	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208a4ec	main	136	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208ae34	main	148	legacy_sp3		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0208e544	main	168	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020909d0	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02090a60	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209181c	main	180	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02091b5c	main	136	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020924c0	main	172	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020927b8	main	140	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209295c	main	80	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02092ca0	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02093848	main	128	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02093e38	main	168	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020955e8	main	144	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02095880	main	156	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x020970a8	main	172	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x02097700	main	192	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209a210	main	160	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209ae98	main	176	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209b1e0	main	184	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x0209bba4	main	124	legacy		shipped	100		cm-main-tier-sweep-5-backfilled
+0x021e1870	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021f19e8	ov002	240	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021ffa80	ov002	212	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220b85c	ov002	140	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220cdd4	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0220e650	ov002	252	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0221b9f4	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0222bf50	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x02237e94	ov002	196	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022395e8	ov002	116	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022628e4	ov002	176	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022648c8	ov002	192	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0226c884	ov002	172	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0226e9fc	ov002	128	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0228bbf8	ov002	148	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x02294bb4	ov002	188	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x022961bc	ov002	132	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229a0a4	ov002	248	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229d01c	ov002	128	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x0229da84	ov002	192	default		shipped	100		cm-main-tier-sweep-6-backfilled
+0x021c9ef0	ov004	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ced78	ov004	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cfbec	ov004	120	legacy_sp3		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d552c	ov004	172	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d57ec	ov004	76	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d5b14	ov004	136	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021da2c8	ov004	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021db994	ov004	116	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2760	ov006	164	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b29b0	ov006	168	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2b28	ov006	172	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b2bd4	ov006	200	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b5b70	ov006	180	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6d1c	ov006	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6dac	ov006	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b6e3c	ov006	220	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b7a20	ov006	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b7bb0	ov006	228	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b831c	ov006	288	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b843c	ov006	264	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba090	ov006	96	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba0f0	ov006	256	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ba1f8	ov006	364	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021bd7cc	ov006	152	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021bdcdc	ov006	248	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021be8ec	ov006	92	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c11c8	ov006	308	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c215c	ov006	292	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c31d0	ov006	220	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c32ac	ov006	216	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c4028	ov006	136	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c5df0	ov006	340	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c6530	ov006	272	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c7edc	ov006	128	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c7f5c	ov006	268	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021c8068	ov006	268	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ca4b8	ov006	96	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021ca678	ov006	124	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cae24	ov006	132	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021cfb70	ov011	92	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1110	ov011	144	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1434	ov011	224	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021d1b70	ov011	272	default		shipped	100		cm-main-tier-sweep-7-backfilled
+0x021b1fe8	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021bbc68	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021bcd80	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021d16f8	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021ebddc	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021ef41c	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f03d4	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f2710	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f3000	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x021f40f4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022013d4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02203a40	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02208bfc	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02209d04	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220aad0	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220bd20	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220cc98	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0220d558	ov002	156	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022101c4	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02212fbc	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0221454c	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02214aa0	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02216e9c	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0221be00	ov002	172	legacy_sp3		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0222054c	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02220e54	ov002	172	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0222d2f8	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0223965c	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0223d144	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02240a10	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02243508	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02244b08	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02257888	ov002	164	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02263858	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x0226df90	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02271608	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02280794	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02283bc8	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02294d5c	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02296048	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x02296814	ov002	168	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x022ae374	ov002	160	default		shipped	100		cm-ov002-unknown-sweep-17-backfilled
+0x020198ec	main	84	default	signed-byte-clamp-plus-lookup	parked	95.2	P-17	cm-main-wall-filtered-sweep-1-batch1
+0x0201ce94	main	192	default	mutex-guarded-ring-buffer-dispatch	parked	91.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201e5b8	main	180	default	fourcc-chunk-scan-loop	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201f7f0	main	132	default	syswork-position-init	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x02020130	main	88	default	state-guarded-mode-check	parked	90.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch1
+0x0201c224	main	132	default	cross-overlay-hardcoded-bl-unlinkable	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch1
+0x02020ff8	main	108	default	three-merged-functions-shared-gap	parked	0	structural	cm-main-wall-filtered-sweep-1-batch1
+0x0200abb0	main	116	default	trap-loop-scan-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02019f94	main	176	default	mask-scan-plus-magic-div10	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02034888	main	192	default	mode-dispatch-7arg-call	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02007f58	main	156	default	linear-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x02017df0	main	184	default	mode-switch-guarded-transition	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x020197ac	main	116	default	stride7-lookup-clamped-sum	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201bddc	main	136	default	bitfield-flags-plus-guard-chain	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201f25c	main	96	default	indirect-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0201fbe0	main	140	default	nested-guard-callback-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch1
+0x0204f8f0	main	168	default	OQ-1 dead-branch: unsigned-char field_e<0 guard always folds away under mwcc, target keeps it (documented open question)	parked	21.4	OQ-1	cm-main-wall-filtered-sweep-1-batch2
+0x02020490	main	192	default	sum-of-3-halfwords register-allocation swap: same instruction shape/count, r0/r1/r2 assigned differently than target across 4 declaration-order variations tried	parked	85.4	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0202be4c	main	176	default	extra/k local register-allocation swap (r7 vs r8): correct push list, instruction count and shape, 5 declaration-order variations tried	parked	79.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch2
+0x0203de2c	main	84	default	P-36-like CSE hoist: mwcc hoists shared mov r0,r4 before the final branch, target duplicates it in each arm; 4 structural variations (if-chain/flip/if-else/switch) tried	parked	76.2	P-36	cm-main-wall-filtered-sweep-1-batch2
+0x02034b2c	main	172	default	straight-line resource-init call sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038ad4	main	192	default	ring-buffer wrapped stream read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203b774	main	188	default	two-branch retry-loop dispatcher	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202bf90	main	152	default	task-locked buffer load from offset table	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0202c6ac	main	132	default	task-locked fixed-size record load	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032028	main	76	default	lazy-init-then-memset accessor	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02032370	main	132	default	lazy-alloc IRQ-guarded object init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203320c	main	108	default	3-way dispatch on nested-struct helpers	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x020378c8	main	160	default	linked-list-walk vs indexed-node dual-mode setter	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x02038b94	main	192	default	overlay-info-load-then-stream-read	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203991c	main	116	default	infinite event-poll loop	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0203efa0	main	144	default	bitfield-dispatch vs 64-bit-timer-compare	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch2
+0x0206bd74	main	168	legacy	irq-critsec-dispatch-loop-infinite	parked	93.3	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x02087444	main	128	default	bit-signal-vs-handshake-dispatch	parked	12.5	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02087c34	main	180	default	two-array-init-loops	parked	62.2	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02052f04	main	132	default	category-dispatch-pair-unpack	parked	87.9	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02074dcc	main	128	legacy	irq-rearm-dispatch-loop-infinite	parked	91.4	P-42	cm-main-wall-filtered-sweep-1-batch3
+0x0208a764	main	100	default	bitfield-guarded-callback-teardown	parked	88.0	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a1da0	main	156	legacy	irq-critsec-slot-copy	parked	89.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x020a3190	main	172	legacy	field-refresh-vs-dispatch-branch	parked	97.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch3
+0x02060728	main	136	default	keyed-chunk-decrypt-and-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x02051384	main	168	default	singleton-field-init-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020528e4	main	144	default	gated-dispatch-with-callback	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209dd30	main	184	legacy	variadic-record-alloc-and-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x0209e788	main	104	legacy	singleton-node-copy-into-buffer	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a3e34	main	164	legacy	irq-critsec-slot-arm	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x020a6614	main	144	legacy	irq-critsec-one-shot-init	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ab798	ov000	184	default	bitfield-ratio-decay-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch3
+0x021ae218	ov000	180	default	flags-bitfield gate, adjacent bit11/bit9 test pair shares one load; r0/r1 register-letter swap resists 4 variations	parked	91.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02239160	ov002	120	default	CE288.f_5a8 counter/dispatch gate; base-ptr register (r2) matches but loaded-value register (r1 vs r3) resists 4 variations	parked	86.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02210104	ov002	192	default	per-side conditional dispatch (df818/e05fc), 2-int local array indexed by bit0-of-field2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x02288068	ov002	132	default	bitfield gate + byte-pack call + bic-mask field write	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022a6860	ov002	140	default	packed bitfield decode (1/5/8-bit fields) called twice; 2nd occurrence's source register happens to alias FIELD1's dest, forcing target to reschedule f2/f3-before-f1; resists 3 variations	parked	85.7	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02228fac	ov002	160	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, d59cc+e276c dual dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0223163c	ov002	108	default	guard chain: df38 gate, de94 byte-unpack, 5764c gate, de9d4 dispatch, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0224b3b0	ov002	180	default	row-loop scan; (player&1)*0x868 mla/mul register-letter swap matches documented P-20 exactly, resists 4 variations incl. unsigned typing	parked	8.3	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022503d8	ov002	192	default	row-loop scan; identical P-20 twin of 0224b3b0 (same mla/mul register swap), same residual confirmed not tool-noise	parked	7.8	P-20	cm-main-wall-filtered-sweep-1-batch4
+0x022521ac	ov002	148	default	slot[idx] indexed record; 1st read matches byte-exact, 2nd read of identical expression picks different register (r1 vs r2), cascades into packed-field bit-shift reorder	parked	67.6	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x02253304	ov002	140	default	row+idx*4+0x120 indexed record dispatch chain; CONTRADICTS P-23 permanent-wall listing -- fix was declaring func_0202b8a8 as signed int not unsigned (forces LT not CS on the <5 compare), mla itself was never the issue	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x0208a6b8	main	112	default	IRQ-guarded linked-list scan+remove-matching; needed exact local decl order (irq/node/next) for r4/r6 letter match	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x022410f0	ov002	180	default	byte-unpack dual-guard dispatch; needed real truncation (int not u16 return decl) + unsigned-char cast for byte-pack, goto shared tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	ANOMALY not normal park: fastmatch RESOLVED reports 100pct (text+PC24relocs byte-identical to gap .o) but real ninja sha1 FAILS reproducibly (confirmed via full clean rebuild); root cause undiagnosed, flagged for follow-up	parked	99.9	tool-anomaly	cm-main-wall-filtered-sweep-1-batch4
+0x02089864	main	188	default	nested list drain + indirect-call dispatch, GLOBAL_ASM-endgame precedent; broad register relabeling from word 2 on, not attempted further given time budget	parked	51.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021ada0c	ov008	132	default	conditional dual-source weighted accumulation loop; large early structural divergence (missing sl-class register, push-list mismatch), not attempted further given time budget	parked	12.1	reg-alloc	cm-main-wall-filtered-sweep-1-batch4
+0x021b2e00	ov007	132	default	SUPERSEDES earlier mis-park: unbounded for-loop w/ break on null, per-node 4x dispatch calls; earlier sha1 FAIL was caused by MY OWN dangling .s.stash for unrelated candidates 1/4 in the same tree, not this file -- confirmed genuinely 100% on a verified-clean baseline	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch4
+0x021cb674	ov013	140	default	cross-overlay-hardcoded-bl	parked	0	C-32	cm-main-wall-filtered-sweep-1-batch5
+0x021b34dc	ov010	136	default	dual-sprite-spawn-invoke	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ab708	ov020	144	default	dual-sprite-spawn-invoke-indexed	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021cedf8	ov003	188	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021ac208	ov008	164	default	bitfield-index-table-lookup	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2268	ov008	124	default	guard-store-notify-sprintf	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b46a8	ov010	168	default	threshold-velocity-dispatch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021caea8	ov012	156	default	spawn-effect-fixedpoint-coord	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b274c	ov014	192	default	bitfield-branch-reset-tail	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b3b9c	ov014	124	default	task-reset-loop-2	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b7718	ov016	172	default	task-reset-loop-5-switch	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b2280	ov023	100	default	bitfield-notify-sequence	shipped	100	n/a	cm-main-wall-filtered-sweep-1-batch5
+0x021b611c	ov017	192	default	9-slot-dual-table-clear-strength-reduction	parked	70.8	strength-reduction	cm-main-wall-filtered-sweep-1-batch5
+0x021cbe8c	ov003	124	default	3-state-dispatch-switch-value-register	parked	87.1	P-4	cm-main-wall-filtered-sweep-1-batch5
+0x021b2630	ov007	100	default	field-reset-two-mov-order-swap	parked	92.0	P-36	cm-main-wall-filtered-sweep-1-batch5

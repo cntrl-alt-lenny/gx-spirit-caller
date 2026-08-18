@@ -1,0 +1,12 @@
+/* data_02101f20 (8 bytes, 4-aligned): string constant.
+ * "CLNT" (4 chars + NUL, zero-padded to 8 bytes (automatic from array size
+ * > literal length)).
+ * Reader(s): func_0207634c (relocs.txt from:0x02076430 kind:load
+ * to:0x02101f20); func_02076434 (relocs.txt from:0x02076518 kind:load
+ * to:0x02101f20).
+ * No outgoing relocs in this span (plain text, not pointers) -- relocs.txt
+ * cross-checked over 0x02101f20-0x02101f28.
+ * Not const: ground truth section is .data (delinks.txt); matches this
+ * wave's canonical non-const char[] convention (data_ov008_021b275c.c).
+ */
+char data_02101f20[8] = "CLNT";

@@ -43,6 +43,28 @@ def test_new_legitimate_c_lever_ship_stays_green() -> None:
     assert report.error_count == 0
 
 
+def _assert_c_lever_exemption_shape(report: validate_attempts.Audit) -> None:
+    assert report.shipped_with_c_lever
+    print(f"shipped C-lever rows: {len(report.shipped_with_c_lever)}")
+    c_lever = re.compile(r"C-\d+[a-z]?\Z", re.IGNORECASE)
+    for row in report.shipped_with_c_lever:
+        assert row["result"].strip().lower() == "shipped"
+        assert float(row["match_pct"]) == 100
+        assert c_lever.fullmatch(row["park_class"].strip())
+
+
+def test_empty_c_lever_exemption_list_fails_loudly() -> None:
+    # Stdlib-only: the `unittest` CI job installs no third-party packages, so a
+    # `pytest.raises` here fails the whole module at import time (ModuleNotFoundError).
+    try:
+        _assert_c_lever_exemption_shape(validate_attempts.Audit())
+    except AssertionError:
+        return
+    raise AssertionError(
+        "an empty shipped_with_c_lever set must fail loudly, not pass vacuously"
+    )
+
+
 def test_module_and_text_size_ground_truth_are_checked() -> None:
     invalid = _audit(_row(module="overlay999"))
     assert invalid.invalid_modules
@@ -70,9 +92,17 @@ def test_committed_ledger_c_lever_exemption_is_property_shaped() -> None:
         Path(__file__).resolve().parents[1]
         / "docs/research/campaign-analytics/attempts.tsv"
     )
-    c_lever = re.compile(r"C-\d+[a-z]?\Z", re.IGNORECASE)
-    for row in report.shipped_with_c_lever:
-        assert row["result"].strip().lower() == "shipped"
-        assert float(row["match_pct"]) == 100
-        assert c_lever.fullmatch(row["park_class"].strip())
+    _assert_c_lever_exemption_shape(report)
     assert report.error_count == 0
+
+
+def test_ship_coverage_requires_a_shipped_event_for_each_flip() -> None:
+    flips = {"cm-main-tier-sweep-99": [{"module": "main", "addr": "0x02000010"}]}
+    rows = [_row(result="parked", brief="cm-main-tier-sweep-99")]
+    errors = validate_attempts.audit_ship_coverage(flips, rows)
+    assert errors and errors[0]["missing"] == flips["cm-main-tier-sweep-99"]
+
+
+def test_ship_coverage_history_is_not_vacuous() -> None:
+    rounds = validate_attempts._history_ship_flips(validate_attempts.ROOT)
+    assert len(rounds["cm-main-tier-sweep-7"]) == 43
