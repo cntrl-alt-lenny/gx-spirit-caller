@@ -791,3 +791,137 @@ violation count over the current suite.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-ci-runner-parity`; commit; then take
 the next queue item immediately.
+
+### q-kickoff-lint-canary-check — the linter passes kickoffs whose canary is impossible to run [TODO]
+
+`tools/kickoff_lint.py` exists because a bad brain→worker handoff becomes fact
+for the next layer. It currently checks that a CANARY is *present*. It does not
+check that the canary is *possible*, and that gap has cost this campaign a full
+lane-round at least once.
+
+**The incident, in full, because it is the spec.** On 2026-08-14 a kickoff told
+the Codex Decomper to reproduce a live-`.s` miscount on `func_0209e628`. That
+function had shipped to C in `cm-main-tier-sweep-3`, so `src/main/
+func_0209e628.legacy.c` was on disk and the `.s` existed only in git history.
+The lane correctly STOPped and reported. `kickoff_lint` had passed the kickoff
+7/7 — every guard present, the canary simply unrunnable. The fix was to route
+the repro through `git show 010616b65^:src/main/func_0209e628.s`.
+
+Extend the linter with checks that are **mechanically decidable from the kickoff
+text plus the repo**, and no more:
+
+1. **Referenced paths exist.** Any `src/...`, `tools/...`, `docs/...`,
+   `config/...` or `.github/...` path appearing in a command position must exist
+   at `HEAD` — *unless* it is the object of a `git show <rev>:<path>`, which is
+   exactly the escape hatch that fixed the original incident and must keep
+   passing.
+2. **Referenced commits resolve.** Any `<sha>^?:<path>` or bare 7-40 hex sha in
+   a command must `git cat-file -e` successfully.
+3. **Machine-path coherence.** The `EXPECT` path's platform must match the
+   interpreter: an `EXPECT` beginning `/Users/` alongside bare `python` (not
+   `python3.13`), or a `C:/` `EXPECT` alongside `python3.13`, is a
+   cross-machine paste and must fail. Forwarding a kickoff between machines is a
+   known void-work class — `docs/state.md` records it as a standing rule.
+
+⚠️ **Precision matters more than coverage here.** This linter gates every
+dispatch; a false positive stops a correct round. Prose that merely *mentions* a
+path must not trip it — scope the check to lines that look like commands. If you
+cannot separate the two reliably, implement checks 2 and 3 (which are
+unambiguous) and report why 1 was left out. That is a good outcome.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + a regression built from the REAL incident (a kickoff citing
+a live `.s` for an address whose `.s` no longer exists must FAIL; the same
+kickoff using `git show <sha>^:<path>` must PASS) + proof the linter still
+passes the four kickoffs from round 0818b (they are in this repo's history —
+reconstruct one and show it green) + the cross-machine case failing both
+directions.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-scaffolder q-kickoff-lint-canary-check`; commit;
+then take the next queue item immediately.
+
+### q-pool-freshness-tool — every wave's kickoff cites a stale pool number, and it keeps costing rounds [TODO]
+
+This is a recurring, measured failure — not a hypothesis:
+
+- `cm-restock-carve-9` was dispatched citing a **1,076-symbol** pool. A fresh
+  tool run gave **689**. The lane was right, the brief was wrong, and it had to
+  spend part of its round building a search table proving no configuration
+  reproduces 1,076.
+- `cm-data-inference-5/6/7` each recorded that the queued blob estimate had
+  drifted — wave 6's own doc calls it *"5th consecutive wave with a drifted
+  count"*.
+- `cm-main-exploit-drain-1` had to be told to **re-enumerate its pool fresh**
+  because 48 of 209 candidates had shipped since the brief was written.
+
+The brain writes these numbers by reading the previous round's doc, and the pool
+moves underneath. Build the tool that makes a stale number impossible to paste.
+
+**`tools/pool_freshness.py`** (name it as you see fit): given a named pool
+definition, emit its **live** size, byte total, and the SHA it was computed at.
+Cover the pool shapes the campaign actually dispatches on — at minimum the
+`data_worklist.py` shape filters and the `wall_aware_headroom.py` candidate
+buckets. Include the exact command that reproduces the number, so a kickoff can
+paste command *and* output together rather than a bare figure.
+
+Then add the cheap half that prevents the recurrence: a check that flags a
+**pool figure in a queue item older than N days or N merges** against the live
+value, so `q-*`/`cm-*` items carrying a stale count are caught before dispatch
+rather than by the lane mid-round.
+
+⚠️ Do not invent a new pool taxonomy. Read how `data_worklist.py` and
+`wall_aware_headroom.py` already define their populations and expose *those*.
+A second, differently-defined notion of "the pool" would create exactly the
+disagreement this item exists to end.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + the tool reproducing **689** for the `string,string-ascii4`
+pool that `cm-restock-carve-9` corrected (that is the known-answer case — if you
+cannot reproduce it, say so with what you got rather than adjusting the target) +
+the staleness check demonstrated firing on a deliberately-stale figure.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-scaffolder q-pool-freshness-tool`; commit; then
+take the next queue item immediately.
+
+### q-unittest-required-evidence — the parity check you just built currently decorates rather than blocks [TODO]
+
+`q-ci-runner-parity` (#1517) did the honest thing and reported the fact that
+undercuts its own value: it verified against the live GitHub API that
+`main-protection`'s required contexts are **`Python (ruff)`**,
+**`Markdown (markdownlint-cli2)`** and **`drift-check`** — and that **`unittest`
+is not among them**. So the import-parity check runs, and a PR that breaks it
+can still merge. The defect it was built to stop (#1506's `import pytest`
+turning the job red) would today be *reported* and *mergeable*.
+
+Promoting a context to required is a repo-settings change and **not yours to
+make**. Build the evidence that makes it a one-click decision for the human, and
+say plainly that the toggle is theirs.
+
+1. **Stability evidence.** Pull the last 50 `unittest` job runs on `main`
+   (`gh run list --workflow tests.yml`), and report: pass rate, every failure
+   with its cause, and whether any failure was **flaky** (same commit passing on
+   re-run) versus a **true** red. A context that flakes must not be made
+   required — that is how a whole campaign gets blocked on noise, and it is the
+   single fact the decision turns on.
+2. **Blast-radius statement.** Which currently-open or recently-merged PRs would
+   have been blocked had `unittest` been required? #1506 is the known case —
+   confirm it and find any others in the last 30 merges.
+3. **The exact change, written out.** The precise `gh api` call or Settings path
+   that adds the context, plus how to revert it in one step.
+
+⚠️ **Do not change branch protection yourself**, and do not open a PR that
+attempts to. Deliver the evidence and the ready-to-run command.
+
+**Gate:** `python3.13 -m pytest -q tests` green (paste the real tail) AND
+`python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
+`ruff check` clean + the 50-run stability table with flaky-vs-true failures
+separated + the blast-radius list + the exact revert command + an explicit
+statement that no settings were changed.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
+tools/work_queue.py done codex-scaffolder q-unittest-required-evidence`; commit;
+then take the next queue item immediately.
