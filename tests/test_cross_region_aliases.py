@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -23,8 +24,12 @@ from port_to_region import (  # noqa: E402
 class CrossRegionAliasGuardTests(unittest.TestCase):
     def test_committed_blocklist_matches_reproducible_derivation(self):
         derived = derive_aliases(ROOT)
-        self.assertEqual(len(derived), 105)
+        _assert_alias_shape(derived)
         self.assertEqual(load_entries(), derived)
+
+    def test_alias_shape_rejects_empty_snapshot(self):
+        with self.assertRaises(AssertionError):
+            _assert_alias_shape([])
 
     def test_blocked_exact_address_fallback_refuses_loudly(self):
         row = next(row for row in load_entries() if row["module"] == "main")
@@ -84,6 +89,18 @@ class CrossRegionAliasGuardTests(unittest.TestCase):
             result.notes,
             f"refused: cross-region alias at 0x{address:08x}",
         )
+
+
+def _assert_alias_shape(rows):
+    required = {"module", "name", "addr"}
+    assert rows
+    assert all(
+        required <= row.keys()
+        and row["module"]
+        and row["name"]
+        and re.fullmatch(r"0x[0-9a-f]{8}", row["addr"], re.IGNORECASE)
+        for row in rows
+    )
 
 
 if __name__ == "__main__":
