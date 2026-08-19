@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import re
+import tempfile
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,6 +17,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAP_PATH = ROOT / "tools" / "park_class_map.tsv"
 LEDGER_PATH = ROOT / "docs" / "research" / "campaign-analytics" / "attempts.tsv"
+LEDGER_FIELDS = (
+    "addr", "module", "text_size", "tier", "shape", "result",
+    "match_pct", "park_class", "park_family", "brief",
+)
+LEGACY_LEDGER_FIELDS = tuple(field for field in LEDGER_FIELDS if field != "park_family")
 ANCHOR_RE = re.compile(r"(?P<family>(?:c|p|oq)-\d+)", re.IGNORECASE)
 
 
@@ -50,6 +57,63 @@ def normalize(raw: str, mapping: dict[str, Normalized] | None = None) -> Normali
 def load_ledger(path: Path = LEDGER_PATH) -> list[dict[str, str]]:
     with path.open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle, delimiter="\t"))
+
+
+def derive_family(
+    row: dict[str, str], mapping: dict[str, Normalized] | None = None,
+) -> str:
+    """Derive the family column without changing park_class evidence."""
+    if row.get("result", "").strip().lower() == "shipped":
+        return ""
+    raw = row.get("park_class", "")
+    if not raw.strip() or raw.strip().lower() == "n/a":
+        return ""
+    return normalize(raw, mapping).family
+
+
+def regenerate_rows(
+    rows: list[dict[str, str]], mapping: dict[str, Normalized] | None = None,
+) -> list[dict[str, str]]:
+    """Return rows with a deterministic derived park_family value."""
+    return [
+        {**row, "park_family": derive_family(row, mapping)}
+        for row in rows
+    ]
+
+
+def write_ledger(
+    path: Path = LEDGER_PATH,
+    mapping: dict[str, Normalized] | None = None,
+) -> None:
+    """Regenerate park_family atomically, preserving every other field."""
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        fields = tuple(reader.fieldnames or ())
+        if fields not in {LEDGER_FIELDS, LEGACY_LEDGER_FIELDS}:
+            raise ValueError(
+                f"Unexpected attempts ledger header in {path}: {fields!r}"
+            )
+        rows = regenerate_rows(list(reader), mapping)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=path.parent,
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle, fieldnames=LEDGER_FIELDS, delimiter="\t",
+                lineterminator="\n",
+            )
+            writer.writeheader()
+            writer.writerows(
+                {field: row.get(field, "") for field in LEDGER_FIELDS}
+                for row in rows
+            )
+        os.replace(temp_name, path)
+    except BaseException:
+        os.unlink(temp_name)
+        raise
 
 
 def unmapped_values(
@@ -122,6 +186,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--value", action="append", help="normalize one raw value; repeatable")
     parser.add_argument("--census", action="store_true", help="enumerate the ledger and census families")
+    parser.add_argument("--write", action="store_true", help="regenerate the park_family column")
     args = parser.parse_args()
     mapping = load_map()
     if args.value:
@@ -129,8 +194,11 @@ def main() -> int:
             print(json.dumps(normalize(raw, mapping).__dict__, sort_keys=True))
     if args.census:
         print_census(census(load_ledger(), mapping))
-    if not args.value and not args.census:
-        parser.error("choose --value or --census")
+    if args.write:
+        write_ledger(mapping=mapping)
+        print(f"wrote {LEDGER_PATH}")
+    if not args.value and not args.census and not args.write:
+        parser.error("choose --value, --census, or --write")
     return 0
 
 
