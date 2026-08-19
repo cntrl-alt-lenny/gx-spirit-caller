@@ -519,7 +519,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-cascade-ci-quadratic`; commit; report
 the PR number with the pasted artifacts.
 
-### q-park-family-column — add the derived `park_family` column now that both blockers have merged [TODO]
+### q-park-family-column — add the derived `park_family` column now that both blockers have merged [DONE]
 
 `q-park-class-remap` (#1511) is merged and the sequencing it was waiting on is
 now clear on both sides: the normaliser exists, and `q-ledger-ship-coverage`

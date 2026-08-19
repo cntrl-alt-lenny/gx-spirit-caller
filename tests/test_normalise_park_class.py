@@ -1,4 +1,5 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -9,10 +10,12 @@ sys.path.insert(0, str(_TOOLS))
 from normalise_park_class import (  # noqa: E402
     assert_all_parked_values_mapped,
     census,
+    derive_family,
     load_ledger,
     load_map,
     normalize,
     print_census,
+    write_ledger,
     unmapped_values,
 )
 
@@ -85,6 +88,41 @@ class TestNormaliseParkClass(unittest.TestCase):
         self.assertEqual(unmapped_values(expanded, self.mapping), ["new-free-text-wall"])
         with self.assertRaisesRegex(AssertionError, "new-free-text-wall"):
             assert_all_parked_values_mapped(expanded, self.mapping)
+
+    def test_park_family_regeneration_is_idempotent_and_preserves_rows(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "attempts.tsv"
+            path.write_text(
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\t"
+                "match_pct\tpark_class\tbrief\n"
+                "0x1\tmain\t1\tdefault\tshape\tparked\t50\t"
+                "reg-alloc\tbrief\n"
+                "0x2\tmain\t1\tdefault\tshape\tshipped\t100\t"
+                "n/a\tbrief\n",
+                encoding="utf-8",
+            )
+            write_ledger(path, self.mapping)
+            first = path.read_bytes()
+            line_count = len(first.splitlines())
+            write_ledger(path, self.mapping)
+            self.assertEqual(path.read_bytes(), first)
+            self.assertEqual(len(path.read_bytes().splitlines()), line_count)
+            generated = load_ledger(path)
+            self.assertEqual(generated[0]["park_family"], "PROVISIONAL:register-allocation")
+            self.assertEqual(generated[1]["park_family"], "")
+            self.assertEqual([row["park_class"] for row in generated], [
+                "reg-alloc", "n/a",
+            ])
+
+    def test_family_rules_leave_shipped_and_empty_values_empty(self):
+        self.assertEqual(
+            derive_family({"result": "shipped", "park_class": "none"}, self.mapping),
+            "",
+        )
+        self.assertEqual(
+            derive_family({"result": "parked", "park_class": ""}, self.mapping),
+            "",
+        )
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "docs/research/campaign-analytics/attempts.tsv"
 FIELDS = (
     "addr", "module", "text_size", "tier", "shape", "result",
-    "match_pct", "park_class", "brief",
+    "match_pct", "park_class", "park_family", "brief",
 )
 _C_LEVER_RE = re.compile(r"\bC-\d+[a-z]?\b", re.IGNORECASE)
 _NON_SHAPE_RE = re.compile(

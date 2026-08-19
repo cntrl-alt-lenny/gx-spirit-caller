@@ -29,13 +29,14 @@ import sys
 from pathlib import Path
 
 from batch_sha1 import ROOT, _c_to_s_rel, _flip_delinks, _is_already_applied
+from normalise_park_class import derive_family
 from validate_attempts import audit_event
 from wall_aware_headroom import _source_module
 
 _ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
 _ATTEMPTS_HEADER = (
     "addr", "module", "text_size", "tier", "shape", "result",
-    "match_pct", "park_class", "brief",
+    "match_pct", "park_class", "park_family", "brief",
 )
 
 
@@ -122,7 +123,9 @@ def _record_attempt(
             csv.writer(stream, delimiter="\t", lineterminator="\n").writerow(_ATTEMPTS_HEADER)
     row = (
         addr, module, text_size, tier, shape, result,
-        match_pct, park_class, brief,
+        match_pct, park_class, derive_family({
+            "result": result, "park_class": park_class,
+        }), brief,
     )
     report = audit_event(dict(zip(_ATTEMPTS_HEADER, row, strict=True)), root=ROOT)
     if report.error_count:

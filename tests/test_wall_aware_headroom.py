@@ -274,7 +274,7 @@ class ScanCandidateAccounting(unittest.TestCase):
             ledger = root / "docs/research/campaign-analytics/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tbrief\n"
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n"
                 "0x02000010\tmain\t0\tdefault\tleaf\tparked\t50\tC-34\tbrief-1\n",
                 encoding="utf-8",
             )
