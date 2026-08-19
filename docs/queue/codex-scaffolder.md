@@ -749,7 +749,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-test-brittleness-sweep`; commit; then
 take the next queue item immediately.
 
-### q-ci-runner-parity — a green pytest is not evidence that CI is green [TODO]
+### q-ci-runner-parity — a green pytest is not evidence that CI is green [DONE]
 
 Round 0818, PR #1506 shipped `import pytest` inside a test module. The CI
 `unittest` job runs `python -m unittest discover -s tests` in an environment that
