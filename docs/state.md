@@ -222,7 +222,7 @@ this file is back under 400 lines and holds current state, the anchors, the
 durable conventions and the open questions. Keep it that way — archive a round's
 narrative once the round after it has merged.
 
-<!-- main-sha: 16da23770 -->
+<!-- main-sha: 2c5d92e72 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

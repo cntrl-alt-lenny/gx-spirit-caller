@@ -1673,3 +1673,61 @@ is not `gate3.py`'s), plus the delink-ref audit result stated either way.
 
 ONE PR; verify every claim against `git diff --stat`; `python3.13
 tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-1`; commit; report.
+
+### cm-toolchain-adopt-2 — the dsd leg, third attempt, and this time you get the machine first [TODO]
+
+`cm-toolchain-adopt-1` (#1515) adopted the m2c pin correctly: `M2C_COMMIT` is the
+only pin file changed, and you re-ran the full 8-function panel **at the adopted
+pin** rather than pointing back at #1512's evidence — line counts matched, and
+the 3 differing functions showed the same real fix (`sp0` materialised, correct
+callee arity, no more `&subroutine_arg0` placeholder).
+
+**The dsd leg has now been blocked twice, and the second block was reported
+better than the first.** You ran a genuine bounded poll — 10 checks over ~9
+minutes — instead of a single instantaneous check, and you observed contention
+*escalate* mid-poll from one Decomper worktree to two. You created no worktree,
+never touched `DSD_VERSION`, and ran no gate. That is the correct behaviour and
+it is why this item exists rather than a reprimand.
+
+**This round the scheduling is fixed at the dispatch level: you are being
+started FIRST, before the CC Decomper's round begins.** The wine lane is yours.
+Do not poll politely and yield — take the window, run the gate, and get the
+answer. Still run `pgrep -fl 'mwcc|mwld|mwasm|ninja'` before you start so you
+know the state you are entering, and report what you saw.
+
+**THE ROUND — `dsd` v0.11.0 → v0.12.0, the full treatment.** It is load-bearing
+(the delink layer), so: a dedicated worktree, `DSD_VERSION` bumped there only,
+`python3.13 tools/gate3.py --scope all` 3-region SHA1, and a delink-ref audit.
+
+⚠️ **ANY drift in delinks or symbols output is a FINDING TO REPORT, never
+something to auto-accept.** If v0.12.0 moves even one delink boundary, stop and
+write it up. A silent boundary change that still passes SHA1 today is exactly the
+kind of thing that detonates three rounds later.
+
+Two carried items, both cheap once you are in the worktree:
+
+- **The reproducible v0.11.0 `dis` panic** you found incidentally. Test it
+  against v0.12.0. If fixed, that is a second concrete adoption argument; if
+  not, produce a minimal reproduction worth sending upstream.
+- **m2c's `MagicFuncPattern` assert** on post-link `bl symbol+offset` targets —
+  pre-existing, identical on both pins, already restated in your last doc. No
+  action; do not spend the round on it.
+
+**Verdict shape:** ADOPT with the gate evidence, DECLINE with the reason, or
+BLOCKED with what blocked it. All three are acceptable outcomes. What is not
+acceptable is adopting a delink-layer bump without a 3-region PASS behind it.
+
+CANARY: before the full gate, bump `DSD_VERSION` in the dedicated worktree and
+run `dsd` once on a single module, diffing its delinks output against v0.11.0's.
+If that one module already drifts, you have your finding without spending a
+40-minute gate — report it and stop.
+
+**Gate + report — paste the real sha1 output, never summarize it:** the three
+per-region sha1 lines VERBATIM (read the log — a background wrapper's exit code
+is not `gate3.py`'s), the delink-ref audit stated either way, the single-module
+canary diff, and `python3.13 -m pytest -q tests` green. `git diff --stat` must
+show `DSD_VERSION` as the only toolchain change if you adopt. Regenerate
+`docs/research/README.md` LAST.
+
+ONE PR; verify every claim against `git diff --stat`; `python3.13
+tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-2`; commit; report.
