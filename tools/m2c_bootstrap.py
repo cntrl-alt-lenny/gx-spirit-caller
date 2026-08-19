@@ -24,8 +24,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 M2C_REPO_URL = "https://github.com/matt-kempster/m2c.git"
-# Pinned 2026-06-08. To bump: `git -C tools/_vendor/m2c rev-parse HEAD`.
-M2C_COMMIT = "ce05217168449189eea615d01e468868ebb16d24"
+# Pinned 2026-08-18 (q-toolchain-repin-eval / cm-toolchain-adopt-1, PR #1512):
+# adopted for a real stack-argument-by-reference misresolution fix in m2c's
+# ARM backend, verified on the project's own 8-function draft panel. To
+# bump: `git -C tools/_vendor/m2c rev-parse HEAD`.
+M2C_COMMIT = "19f2ddb22dcf5161c27b7eae62f142e697ae895f"
 M2C_VENDOR_DIR = ROOT / "tools" / "_vendor" / "m2c"
 M2C_PIP_DEPS = ("pycparser",)
 # Reuse the permuter venv if present (created by permute.py under PEP 668);

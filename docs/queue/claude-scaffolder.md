@@ -1620,7 +1620,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder q-toolchain-repin-eval`; commit;
 report the PR number with the pasted artifacts.
 
-### cm-toolchain-adopt-1 — execute the m2c ADOPT verdict, then finish the dsd leg you were blocked on [TODO]
+### cm-toolchain-adopt-1 — execute the m2c ADOPT verdict, then finish the dsd leg you were blocked on [DONE]
 
 `q-toolchain-repin-eval` (#1512) is merged and it did the evaluation properly:
 it captured a baseline at the current pin **before** bumping, discovered that
