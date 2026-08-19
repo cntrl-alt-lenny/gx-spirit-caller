@@ -15,7 +15,12 @@ from pathlib import Path
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
-from kickoff_lint import lint  # noqa: E402
+from kickoff_lint import (  # noqa: E402
+    check_platform_coherence,
+    check_referenced_commits,
+    check_referenced_paths,
+    lint,
+)
 
 
 # A well-formed kickoff (indented code blocks, no triple-backticks).
@@ -32,6 +37,28 @@ Reply with the PR URL + the sha1 result.
 """
 
 
+ROUND_0818B_DISPATCHES = tuple(
+    GOOD.replace(
+        "Brief 610 — name the SDK layer.",
+        f"Round 0818b reconstruction — {label}.",
+    )
+    .replace(
+        "tools/nitro_suggest_renames.py",
+        tool_path,
+    )
+    .replace(
+        "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+        f"CANARY: run git show {commit} --stat and paste the result.",
+    )
+    for label, tool_path, commit in (
+        ("cm-restock-carve-9", "tools/wall_aware_headroom.py", "3bdded4951fdb6d8862302012bad372282612da5"),
+        ("cm-main-wall-filtered-sweep-1", "tools/wall_prefilter.py", "272a84a4c29ac4dbf49b29de7b949291ce3021d8"),
+        ("ledger-ship-coverage", "tools/validate_attempts.py", "972306ed46985da20348cb6c1b3818b4ab9ce4fb"),
+        ("stdlib-unittest-fix", "tools/kickoff_lint.py", "3afd6df27c4119906a6895be605d6cfa87590493"),
+    )
+)
+
+
 class TestGoodKickoff(unittest.TestCase):
     def test_all_required_pass(self):
         failed = [c for c in lint(GOOD) if c.required and not c.ok]
@@ -40,6 +67,14 @@ class TestGoodKickoff(unittest.TestCase):
     def test_no_advisory_warnings(self):
         warns = [c for c in lint(GOOD) if not c.required and not c.ok]
         self.assertEqual(warns, [], f"good kickoff tripped advisories: {[c.key for c in warns]}")
+
+    def test_reconstructed_round_0818b_dispatches_still_pass(self):
+        for kickoff in ROUND_0818B_DISPATCHES:
+            with self.subTest(kickoff=kickoff.splitlines()[1]):
+                self.assertEqual(
+                    [check.key for check in lint(kickoff) if check.required and not check.ok],
+                    [],
+                )
 
 
 class TestPowerShellLocationGuard(unittest.TestCase):
@@ -164,6 +199,56 @@ class TestMissingGuards(unittest.TestCase):
         # No worktree add → the retry check does not apply, must not fail.
         text = "PREFLIGHT: ls || exit 1\nCANARY first check\nHIGH effort\npaste the sha1 line"
         self.assertNotIn("worktree-retry", self._fail_keys(text))
+
+
+class TestReferencedCanaryInputs(unittest.TestCase):
+    _INCIDENT_CANARY = GOOD.replace(
+        "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+        "CANARY: run python3.13 tools/kickoff_lint.py src/main/func_0209e628.s and paste the result.",
+    )
+
+    def _fail_keys(self, text: str) -> set[str]:
+        return {c.key for c in lint(text) if c.required and not c.ok}
+
+    def test_real_incident_live_s_path_fails(self):
+        self.assertFalse((Path(__file__).resolve().parents[1] / "src/main/func_0209e628.s").exists())
+        self.assertIn("referenced-paths", self._fail_keys(self._INCIDENT_CANARY))
+
+    def test_real_incident_git_show_history_escape_passes(self):
+        text = self._INCIDENT_CANARY.replace(
+            "python3.13 tools/kickoff_lint.py src/main/func_0209e628.s",
+            "git show 010616b65^:src/main/func_0209e628.s",
+        )
+        self.assertNotIn("referenced-paths", self._fail_keys(text))
+        self.assertNotIn("referenced-commits", self._fail_keys(text))
+
+    def test_bad_commit_reference_fails(self):
+        text = GOOD.replace("origin/main", "deadbeef1234567")
+        self.assertIn("referenced-commits", self._fail_keys(text))
+
+    def test_prose_path_and_sha_are_not_commands(self):
+        text = GOOD + (
+            "\nThe prose mentions src/does-not-exist.s and deadbeef1234567, "
+            "but it is not an instruction.\n"
+        )
+        self.assertEqual(check_referenced_paths(text)[0], True)
+        self.assertEqual(check_referenced_commits(text)[0], True)
+
+    def test_cross_machine_mac_path_with_bare_python_fails(self):
+        text = GOOD.replace(
+            '"$HOME/Dev/spirit-caller/codex-610"',
+            '"/Users/leo/Dev/spirit-caller/codex-610"',
+        ).replace(
+            "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+            "CANARY: run python tools/kickoff_lint.py and paste the result.",
+        )
+        self.assertEqual(check_platform_coherence(text)[0], False)
+
+    def test_cross_machine_windows_path_with_python313_fails(self):
+        text = TestPowerShellLocationGuard._PWSH + (
+            "python3.13 tools/kickoff_lint.py\n"
+        )
+        self.assertEqual(check_platform_coherence(text)[0], False)
 
 
 class TestAdvisory(unittest.TestCase):
