@@ -696,7 +696,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-ci-timeout-cache`; commit; report
 the PR number with the pasted artifacts.
 
-### q-test-brittleness-sweep — the cardinality-assertion class, swept repo-wide instead of one file at a time [TODO]
+### q-test-brittleness-sweep — the cardinality-assertion class, swept repo-wide instead of one file at a time [DONE]
 
 This item exists because a per-file fix demonstrably did not generalise, twice.
 

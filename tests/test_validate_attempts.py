@@ -105,4 +105,24 @@ def test_ship_coverage_requires_a_shipped_event_for_each_flip() -> None:
 
 def test_ship_coverage_history_is_not_vacuous() -> None:
     rounds = validate_attempts._history_ship_flips(validate_attempts.ROOT)
-    assert len(rounds["cm-main-tier-sweep-7"]) == 43
+    _assert_ship_flip_shape(rounds["cm-main-tier-sweep-7"])
+
+
+def _assert_ship_flip_shape(flips: list[dict]) -> None:
+    assert flips
+    assert all(
+        set(flip) == {"module", "addr"}
+        and isinstance(flip["module"], str)
+        and flip["module"]
+        and re.fullmatch(r"0x[0-9a-f]{8}", flip["addr"], re.IGNORECASE)
+        for flip in flips
+    )
+    print(f"cm-main-tier-sweep-7 ship flips: {len(flips)}")
+
+
+def test_ship_coverage_history_shape_rejects_empty_snapshot() -> None:
+    try:
+        _assert_ship_flip_shape([])
+    except AssertionError:
+        return
+    raise AssertionError("an empty history snapshot must fail loudly")
