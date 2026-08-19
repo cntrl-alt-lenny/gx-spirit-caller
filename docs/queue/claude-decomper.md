@@ -1410,7 +1410,7 @@ confusion matrix with its Fisher p, and both arms' size distributions. Run
 `docs/research/README.md` LAST — a stale index has now failed `drift-check` on
 four separate PRs.
 
-### cm-main-exploit-drain-1 — the selector science is done; drain the pool that already yields 60% [CLAIMED]
+### cm-main-exploit-drain-1 — the selector science is done; drain the pool that already yields 60% [DONE]
 
 `cm-main-wall-filtered-sweep-1` (#1508) built the detector the round asked for,
 calibrated it honestly (18/18 recall, 1/43 FP on P-51), and then did the thing
