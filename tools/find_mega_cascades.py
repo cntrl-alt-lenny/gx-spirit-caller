@@ -88,6 +88,7 @@ from analyze_symbols import (  # noqa: E402
 )
 from find_cascades import (  # noqa: E402
     MEDIUM_SIZE_CAP,
+    build_callers_index,
 )
 from next_targets import (  # noqa: E402
     collect_matched_ranges,
@@ -168,6 +169,7 @@ def mega_cascade_for_target(
     matched: dict[str, list[tuple[int, int]]],
     *,
     max_depth: int = 16,
+    callers_of: dict[SymbolKey, set[SymbolKey]] | None = None,
 ) -> MegaCascade:
     """BFS over the rename-promotion graph starting from `target`.
 
@@ -182,12 +184,8 @@ def mega_cascade_for_target(
     """
     target_key: SymbolKey = (target.module, target.addr)
 
-    # Invert graph.edges_call once for fast caller lookup.
-    # callers_of[(m, a)] = set of (m', a') whose edges include (m,a).
-    callers_of: dict[SymbolKey, set[SymbolKey]] = {}
-    for caller_key, callees in graph.edges_call.items():
-        for callee in callees:
-            callers_of.setdefault(callee, set()).add(caller_key)
+    if callers_of is None:
+        callers_of = build_callers_index(graph)
 
     named_set: set[SymbolKey] = {target_key}
     promoted_all: set[SymbolKey] = set()
@@ -199,8 +197,8 @@ def mega_cascade_for_target(
         newly_promoted: set[SymbolKey] = set()
         # For each freshly-named symbol, check its callers to see
         # if any just gained their final named-callee condition.
-        for nk in frontier:
-            for caller_key in callers_of.get(nk, set()):
+        for nk in sorted(frontier):
+            for caller_key in sorted(callers_of.get(nk, ())):
                 if caller_key in promoted_all:
                     continue
                 if caller_key in named_set:
@@ -255,6 +253,7 @@ def rank_mega_cascades(
     cheaper matches win equal-weight ties.
     """
     out: list[MegaCascade] = []
+    callers_of = build_callers_index(graph)
     for _mod, md in modules.items():
         for sym in md.symbols:
             if not sym.is_function:
@@ -263,12 +262,15 @@ def rank_mega_cascades(
                 continue
             if sym.is_named:
                 continue
-            mc = mega_cascade_for_target(sym, modules, graph, matched)
+            mc = mega_cascade_for_target(
+                sym, modules, graph, matched, callers_of=callers_of,
+            )
             if mc.weight < min_weight or mc.depth < min_depth:
                 continue
             out.append(mc)
     out.sort(key=lambda m: (
         -m.weight, m.anchor.size, m.anchor.addr,
+        m.anchor.module, m.anchor.name,
     ))
     return out
 

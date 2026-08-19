@@ -470,7 +470,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-decomper q-park-class-remap`; commit; report the
 PR number with the pasted artifacts.
 
-### q-cascade-ci-quadratic — three PR-CI tools rebuild per-target what they should index once [TODO]
+### q-cascade-ci-quadratic — three PR-CI tools rebuild per-target what they should index once [DONE]
 
 External audit lead (2026-08-14, external read-only pass), brain-verified live on
 `main` twice — at `b1015c872` and again at `fcb39a4c2` — so this is not a stale

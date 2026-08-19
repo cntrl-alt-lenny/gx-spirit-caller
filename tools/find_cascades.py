@@ -94,6 +94,17 @@ class CascadeEntry:
         return len(self.promoted)
 
 
+def build_callers_index(
+    graph: CallGraph,
+) -> dict[SymbolKey, set[SymbolKey]]:
+    """Build the reverse call graph once for per-target lookups."""
+    callers_of: dict[SymbolKey, set[SymbolKey]] = {}
+    for caller_key in sorted(graph.edges_call):
+        for callee in sorted(graph.edges_call[caller_key]):
+            callers_of.setdefault(callee, set()).add(caller_key)
+    return callers_of
+
+
 def _would_cascade_to_medium(
     caller: Symbol,
     caller_callees: set[SymbolKey],
@@ -148,6 +159,8 @@ def cascades_for_target(
     modules: dict[str, ModuleData],
     graph: CallGraph,
     matched: dict[str, list[tuple[int, int]]],
+    *,
+    callers_of: dict[SymbolKey, set[SymbolKey]] | None = None,
 ) -> frozenset[SymbolKey]:
     """Return the set of callers that promote hard → medium if
     `target` becomes named. Matched callers are excluded (no
@@ -155,10 +168,11 @@ def cascades_for_target(
     """
     target_key: SymbolKey = (target.module, target.addr)
     promoted: set[SymbolKey] = set()
-    # Iterate edges_call: which callers reach `target`?
-    for caller_key, callee_set in graph.edges_call.items():
-        if target_key not in callee_set:
-            continue
+    if callers_of is None:
+        callers_of = build_callers_index(graph)
+    # Look up which callers reach `target` in the shared reverse index.
+    for caller_key in sorted(callers_of.get(target_key, ())):
+        callee_set = graph.edges_call.get(caller_key, set())
         caller_mod = modules.get(caller_key[0])
         if caller_mod is None:
             continue
@@ -189,6 +203,7 @@ def rank_cascades(
     smaller one is the better pick.
     """
     out: list[CascadeEntry] = []
+    callers_of = build_callers_index(graph)
     for _mod_name, md in modules.items():
         for sym in md.symbols:
             if not sym.is_function:
@@ -197,11 +212,16 @@ def rank_cascades(
                 continue
             if sym.is_named:
                 continue
-            promoted = cascades_for_target(sym, modules, graph, matched)
+            promoted = cascades_for_target(
+                sym, modules, graph, matched, callers_of=callers_of,
+            )
             if not promoted:
                 continue
             out.append(CascadeEntry(target=sym, promoted=promoted))
-    out.sort(key=lambda e: (-e.weight, e.target.size, e.target.addr))
+    out.sort(key=lambda e: (
+        -e.weight, e.target.size, e.target.addr,
+        e.target.module, e.target.name,
+    ))
     return out
 
 

@@ -42,6 +42,7 @@ from analyze_symbols import (  # noqa: E402
 from find_cascades import (  # noqa: E402
     CascadeEntry,
     _would_cascade_to_medium,
+    build_callers_index,
     cascades_for_target,
     rank_cascades,
     render_ranked_markdown,
@@ -251,6 +252,18 @@ class TestCascadesForTarget(unittest.TestCase):
         # Should still find main|0x02001000, ghost-caller ignored silently.
         promoted = cascades_for_target(target, modules, graph, matched={})
         self.assertIn(("main", 0x02001000), promoted)
+
+    def test_reverse_index_preserves_rendered_output(self):
+        target, modules, graph = self._build_fixture()
+        before = cascades_for_target(target, modules, graph, matched={})
+        indexed = cascades_for_target(
+            target, modules, graph, matched={},
+            callers_of=build_callers_index(graph),
+        )
+        self.assertEqual(
+            render_single_target(target, before, modules),
+            render_single_target(target, indexed, modules),
+        )
 
 
 class TestRanking(unittest.TestCase):

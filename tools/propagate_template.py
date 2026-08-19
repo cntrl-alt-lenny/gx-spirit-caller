@@ -50,6 +50,7 @@ Dry-run by default; pass `--confirm` to actually write files.
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_left
 import json
 import re
 import sys
@@ -131,6 +132,21 @@ def _module_from_symbols_path(
 # Reloc windowing
 # --------------------------------------------------------------------------- #
 
+def _indexed_relocs(
+    module_data: ModuleData,
+) -> tuple[tuple[int, ...], tuple[Reloc, ...]]:
+    """Return a cached source-address index for a module's relocs."""
+    cache = getattr(module_data, "_reloc_index_cache", None)
+    if cache is None or cache[0] is not module_data.relocs:
+        ordered = tuple(sorted(module_data.relocs, key=lambda r: r.src_addr))
+        cache = (
+            module_data.relocs,
+            tuple(r.src_addr for r in ordered),
+            ordered,
+        )
+        module_data._reloc_index_cache = cache
+    return cache[1], cache[2]
+
 def relocs_for_function(
     symbol: Symbol, module_data: ModuleData,
 ) -> list[Reloc]:
@@ -141,12 +157,10 @@ def relocs_for_function(
         return []
     start = symbol.addr
     end = symbol.addr + symbol.size
-    out = [
-        r for r in module_data.relocs
-        if start <= r.src_addr < end
-    ]
-    out.sort(key=lambda r: r.src_addr)
-    return out
+    src_addrs, ordered = _indexed_relocs(module_data)
+    left = bisect_left(src_addrs, start)
+    right = bisect_left(src_addrs, end)
+    return list(ordered[left:right])
 
 
 def reloc_signature(relocs: list[Reloc], base_addr: int) -> tuple:
