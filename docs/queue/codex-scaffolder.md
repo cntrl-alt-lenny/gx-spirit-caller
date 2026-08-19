@@ -792,7 +792,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-ci-runner-parity`; commit; then take
 the next queue item immediately.
 
-### q-kickoff-lint-canary-check — the linter passes kickoffs whose canary is impossible to run [TODO]
+### q-kickoff-lint-canary-check — the linter passes kickoffs whose canary is impossible to run [DONE]
 
 `tools/kickoff_lint.py` exists because a bad brain→worker handoff becomes fact
 for the next layer. It currently checks that a CANARY is *present*. It does not

@@ -30,6 +30,7 @@ Exit codes:
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -144,6 +145,117 @@ def check_canary(text: str) -> tuple[bool, str]:
     return False, "no CANARY — the wrong-base/wrong-tool class won't be caught before bulk work"
 
 
+_COMMAND_NAMES = (
+    r"\[", r"awk", r"bash", r"cat", r"cd", r"cp", r"diff", r"echo",
+    r"find", r"gh", r"git", r"grep", r"head", r"ls", r"mkdir", r"mv",
+    r"ninja", r"npx", r"open", r"python(?:3\.\d+)?", r"pytest", r"pwd",
+    r"rg", r"ruff", r"sed", r"sh", r"sort", r"tail", r"test", r"wc",
+    r"which", r"xargs", r"zsh",
+)
+_COMMAND_HEAD_RE = re.compile(
+    r"^(?:(?:sudo|env)\s+)?(?:" + "|".join(_COMMAND_NAMES) + r")\b"
+)
+_SCOPED_PATH_RE = re.compile(
+    r"(?P<path>(?:src|tools|docs|config|\.github)/[^\s'\"`;&|(){}\[\],]+)"
+)
+_GIT_SHOW_PATH_RE = re.compile(
+    r"\bgit\s+show\s+[^\s:]+:(?P<path>(?:src|tools|docs|config|\.github)/[^\s'\"`;&|(){}\[\],]+)"
+)
+_COMMIT_TOKEN_RE = re.compile(
+    r"(?P<revision>[0-9a-fA-F]{7,40}\^?(?::[^\s'\"`;&|(){}\[\],]+)?)$"
+)
+
+
+def _command_segments(text: str) -> list[tuple[int, str]]:
+    """Return only shell-like command segments, excluding ordinary prose."""
+    segments: list[tuple[int, str]] = []
+    for line_number, raw_line in enumerate(text.splitlines(), 1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        line = re.sub(
+            r"^(?:CANARY|COMMAND|RUN|THEN|DO)\s*[:—-]?\s*",
+            "",
+            line,
+            flags=re.IGNORECASE,
+        )
+        for segment in re.split(r"\s*(?:&&|\|\||[;|])\s*", line):
+            segment = re.sub(
+                r"^(?:run|then|do|command|execute)\s+",
+                "",
+                segment.strip(),
+                flags=re.IGNORECASE,
+            )
+            if _COMMAND_HEAD_RE.match(segment):
+                segments.append((line_number, segment))
+    return segments
+
+
+def _clean_path(path: str) -> str:
+    return path.rstrip(".:;!?)]}")
+
+
+def check_referenced_paths(
+    text: str, *, root: Path = Path(__file__).resolve().parent.parent,
+) -> tuple[bool, str]:
+    """Require command-line repo paths to exist, with git-show as history escape."""
+    missing: list[str] = []
+    for line_number, segment in _command_segments(text):
+        escaped = {_clean_path(match.group("path")) for match in _GIT_SHOW_PATH_RE.finditer(segment)}
+        for match in _SCOPED_PATH_RE.finditer(segment):
+            path = _clean_path(match.group("path"))
+            if path in escaped:
+                continue
+            if not (root / path).exists():
+                missing.append(f"line {line_number}: {path}")
+    if missing:
+        return False, "referenced command path(s) missing at HEAD — " + ", ".join(missing)
+    return True, "all referenced command paths exist at HEAD or use git show history"
+
+
+def check_referenced_commits(
+    text: str, *, root: Path = Path(__file__).resolve().parent.parent,
+) -> tuple[bool, str]:
+    """Require command-line abbreviated/full revisions to resolve in this repo."""
+    missing: list[str] = []
+    checked: set[str] = set()
+    for line_number, segment in _command_segments(text):
+        for token in re.split(r"\s+", segment):
+            token = token.strip("'\"(),")
+            match = _COMMIT_TOKEN_RE.fullmatch(token)
+            if not match:
+                continue
+            revision = match.group("revision")
+            commit_revision = revision.split(":", 1)[0]
+            if commit_revision in checked:
+                continue
+            checked.add(commit_revision)
+            result = subprocess.run(
+                ["git", "cat-file", "-e", commit_revision],
+                cwd=root,
+                capture_output=True,
+            )
+            if result.returncode:
+                missing.append(f"line {line_number}: {commit_revision}")
+    if missing:
+        return False, "referenced commit(s) do not resolve — " + ", ".join(missing)
+    return True, "all command-line commit references resolve"
+
+
+def check_platform_coherence(text: str) -> tuple[bool, str]:
+    """Reject the two known cross-machine EXPECT/interpreter paste shapes."""
+    expected_paths = [m.group("path") for m in _EXPECTED_RE.finditer(text)]
+    commands = [segment for _line, segment in _command_segments(text)]
+    bare_python = any(re.match(r"^python\b", command) for command in commands)
+    python313 = any(re.match(r"^python3\.13\b", command) for command in commands)
+    for path in expected_paths:
+        if path.startswith("/Users/") and bare_python:
+            return False, "Mac /Users/ EXPECT is paired with bare python; use python3.13"
+        if path.startswith("C:/") and python313:
+            return False, "C:/ EXPECT is paired with python3.13; use the Windows interpreter"
+    return True, "EXPECT path and interpreter platform are coherent"
+
+
 def check_paste_control(text: str) -> tuple[bool, str]:
     # The kickoff must demand a *pasted tool-derived artifact*, never a self-
     # report. Look for an explicit paste request tied to a checkable output.
@@ -194,6 +306,9 @@ def lint(text: str) -> list[Check]:
         ("canary", check_canary),
         ("paste-control", check_paste_control),
         ("effort-tag", check_effort_tag),
+        ("referenced-paths", check_referenced_paths),
+        ("referenced-commits", check_referenced_commits),
+        ("platform-coherence", check_platform_coherence),
     ):
         ok, detail = fn(text)
         checks.append(Check(key, True, ok, detail))
