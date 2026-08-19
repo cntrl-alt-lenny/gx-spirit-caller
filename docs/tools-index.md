@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**135 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**136 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (6)
+- [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (62)
@@ -312,6 +312,10 @@ Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an
 **pre-flight sanity checks before claiming a match.**
 
 The metadata scattered across `symbols.txt`, `delinks.txt`, and the C sources in `src/` can drift out of sync in ways that silently break the decomp loop. This tool catches the common footguns:
+
+### `tools/check_metric_canon.py`
+
+**Reject unqualified function-count completion claims in metric docs.**
 
 ### `tools/check_prototypes_provenance.py`
 
