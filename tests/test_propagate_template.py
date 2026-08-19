@@ -97,6 +97,21 @@ class TestRelocsForFunction(unittest.TestCase):
         md = _module("ov005", [sym], [_reloc(0x100, "ov005", 0x200, "main")])
         self.assertEqual(relocs_for_function(sym, md), [])
 
+    def test_cached_index_preserves_window_and_order(self):
+        sym = _sym("f", "ov005", 0x100, size=0x20)
+        relocs = [
+            _reloc(0x118, "ov005", 0x200, "main"),
+            _reloc(0x104, "ov005", 0x300, "main"),
+            _reloc(0x110, "ov005", 0x400, "main"),
+        ]
+        md = _module("ov005", [sym], relocs)
+        first = relocs_for_function(sym, md)
+        second = relocs_for_function(sym, md)
+        self.assertEqual(first, second)
+        self.assertEqual(
+            [r.src_addr for r in first], [0x104, 0x110, 0x118],
+        )
+
 
 class TestRelocSignature(unittest.TestCase):
     def test_offsets_relative_to_base(self):

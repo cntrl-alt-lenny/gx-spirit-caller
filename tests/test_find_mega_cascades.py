@@ -41,6 +41,7 @@ from analyze_symbols import (  # noqa: E402
 from find_mega_cascades import (  # noqa: E402
     MegaCascade,
     _would_promote,
+    build_callers_index,
     mega_cascade_for_target,
     rank_mega_cascades,
     render_ranked_markdown,
@@ -146,6 +147,27 @@ class TestWouldPromote(unittest.TestCase):
 
 
 class TestMegaCascadeChains(unittest.TestCase):
+    def test_reverse_index_preserves_rendered_output(self):
+        target = _func("main", 0x2000, size=0x8)
+        caller_a = _func("main", 0x1000, size=0x20)
+        caller_b = _func("main", 0x0800, size=0x20)
+        modules = {"main": _module("main", [target, caller_a, caller_b])}
+        graph = _build_chain([
+            (0x1000, 0x2000),
+            (0x0800, 0x1000),
+        ])
+        fallback = mega_cascade_for_target(
+            target, modules, graph, matched={}, max_depth=16,
+        )
+        indexed = mega_cascade_for_target(
+            target, modules, graph, matched={}, max_depth=16,
+            callers_of=build_callers_index(graph),
+        )
+        self.assertEqual(
+            render_single_target(fallback, modules),
+            render_single_target(indexed, modules),
+        )
+
     def test_depth_1_chain_matches_direct_only(self):
         # X (target, small) → A (caller, size-OK, no other callees)
         #   Naming X promotes A. Total = 1, direct = 1, indirect = 0.
