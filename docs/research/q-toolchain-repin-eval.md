@@ -107,9 +107,10 @@ general cold-RE draft targets the survey found, **have since been matched** by l
 A full live census (`objdump -t` over every `_dsd_gap@*.o` in the EUR build) found the true
 current pool: **30 unmatched functions project-wide** — 18 in ov004, 10 tiny ITCM stubs, and 4
 single-function overlay-swap residues (`ov001`/`ov003`/`ov014`/`ov019`, each sharing a base
-address with a sibling overlay). This project is materially closer to done than the historical
-docs suggest, at least at the function-count level; worth a headline update somewhere in the
-campaign tracking if not already known.
+address with a sibling overlay). This is a **delink-gap count**, not a decomp-completion metric:
+the `.s` ships are byte-matched by construction, while the campaign headline is natural-C
+(~16.5% EUR / 11.84% USA). The 30-function pool remains a real, small, closeable cold-RE target;
+see `docs/state-table.md` for the metric canon and do not read this census as C progress.
 
 I tried one workaround to still exercise the named epilogue/pool-literal shapes: feeding m2c
 the *post-build* compiled object for a matched function via `m2c_feed.py`'s `--obj` override
@@ -362,8 +363,9 @@ still open — retry when the shared wine lane is free.
 3. **Only 30 unmatched functions remain project-wide** as of this check (18 ov004, 10 ITCM, 4
    overlay-swap residues) — 7 of 8 functions named in cold-RE m2c panel docs and all 3 of the
    P-11 re-audit's "still open" permuter candidates have already been matched by work not yet
-   reflected in those docs. The project is closer to function-level completion than the
-   historical doc trail suggests.
+   reflected in those docs. This is a small cold-RE delink-gap pool, not evidence that the
+   natural-C campaign is near completion; the canonical headline remains ~16.5% EUR / 11.84%
+   USA (see `docs/state-table.md`).
 
 ## `git diff --stat` (this PR)
 

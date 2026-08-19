@@ -560,7 +560,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-decomper q-park-family-column`; commit; then take
 the next queue item immediately.
 
-### q-metric-canon-guard — stop "unmatched functions" being read as campaign completion [TODO]
+### q-metric-canon-guard — stop "unmatched functions" being read as campaign completion [DONE]
 
 `q-toolchain-repin-eval` (#1512) delivered a genuinely useful census as an
 incidental finding: **30 unmatched functions remain project-wide** (18 `ov004`,
