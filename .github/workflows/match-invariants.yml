@@ -39,6 +39,7 @@ jobs:
   pr-invariants:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         version: [eur, usa, jpn]
@@ -105,6 +106,7 @@ jobs:
   main-baseline:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         version: [eur, usa, jpn]

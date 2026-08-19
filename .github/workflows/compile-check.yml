@@ -18,6 +18,7 @@ jobs:
   compile:
     name: Compile changed C (${{ matrix.region }})
     runs-on: windows-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -33,6 +34,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Cache mwccarm toolchain
+        id: mwccarm-cache
+        uses: actions/cache@v4
+        with:
+          path: tools/mwccarm
+          # download_tool.py contains the tool tag and URL builders; changing
+          # either invalidates this cache automatically.
+          key: ${{ runner.os }}-mwccarm-${{ hashFiles('tools/download_tool.py') }}
+
+      - name: Report mwccarm cache status
+        shell: pwsh
+        run: |
+          if ('${{ steps.mwccarm-cache.outputs.cache-hit }}' -eq 'true') {
+            Write-Host 'mwccarm cache hit'
+          } else {
+            Write-Host 'mwccarm cache miss; configure will populate it'
+          }
 
       - name: Install Python dependencies
         run: python -m pip install -r tools/requirements.txt
