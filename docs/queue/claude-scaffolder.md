@@ -1674,7 +1674,7 @@ is not `gate3.py`'s), plus the delink-ref audit result stated either way.
 ONE PR; verify every claim against `git diff --stat`; `python3.13
 tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-1`; commit; report.
 
-### cm-toolchain-adopt-2 — the dsd leg, third attempt, and this time you get the machine first [TODO]
+### cm-toolchain-adopt-2 — the dsd leg, third attempt, and this time you get the machine first [DONE]
 
 `cm-toolchain-adopt-1` (#1515) adopted the m2c pin correctly: `M2C_COMMIT` is the
 only pin file changed, and you re-ran the full 8-function panel **at the adopted
