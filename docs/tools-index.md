@@ -7,11 +7,11 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**136 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**137 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (15)
+- [Analysis / worklist](#analysis--worklist) (16)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
@@ -96,6 +96,12 @@ NitroSDK / MSL_C / libnns API surface.
 **cross-module call-density report.**
 
 Walks every `config/<ver>/arm9/**/relocs.txt`, counts the control-flow edges between each (source module, destination module) pair, and produces:
+
+### `tools/pool_freshness.py`
+
+**Measure campaign pools from the live repository.**
+
+The pool definitions intentionally delegate to the campaign's existing selectors.  This module adds only a reproducible measurement envelope: count, effective bytes, repository revision, and the exact command.
 
 ### `tools/progress.py`
 
