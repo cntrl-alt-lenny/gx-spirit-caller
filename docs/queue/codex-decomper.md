@@ -605,7 +605,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-decomper q-metric-canon-guard`; commit; then take
 the next queue item immediately.
 
-### q-wall-citation-backfill — the wall catalog and the `.s` headers disagree, and the tool trusts the headers [TODO]
+### q-wall-citation-backfill — the wall catalog and the `.s` headers disagree, and the tool trusts the headers [DONE]
 
 `wall_aware_headroom.py` decides "permanent" by reading each `.s` file's **own
 header citation**. `codegen-walls.md` records wall membership in per-wall
