@@ -605,7 +605,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-decomper q-metric-canon-guard`; commit; then take
 the next queue item immediately.
 
-### q-wall-citation-backfill — the wall catalog and the `.s` headers disagree, and the tool trusts the headers [TODO]
+### q-wall-citation-backfill — the wall catalog and the `.s` headers disagree, and the tool trusts the headers [DONE]
 
 `wall_aware_headroom.py` decides "permanent" by reading each `.s` file's **own
 header citation**. `codegen-walls.md` records wall membership in per-wall
@@ -677,7 +677,7 @@ canary above + `git diff` demonstrating only comment-prefixed lines changed in
 `src/`. This worktree is build-free — the brain runs the 3-region ROM gate at
 integration.
 
-### q-batch-sha1-stale-s — the apply step leaves the superseded `.s` on disk, silently [TODO]
+### q-batch-sha1-stale-s — the apply step leaves the superseded `.s` on disk, silently [CLAIMED]
 
 Reported as a defect by `cm-main-exploit-drain-1` (#1524), confirmed **twice** in
 one round, in two different situations:
