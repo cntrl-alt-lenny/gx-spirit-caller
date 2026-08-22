@@ -1008,7 +1008,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-pool-freshness-tool`; commit; then
 take the next queue item immediately.
 
-### q-unittest-required-evidence — the parity check you just built currently decorates rather than blocks [PARKED]
+### q-unittest-required-evidence — the parity check you just built currently decorates rather than blocks [DONE]
 >
 > PARKED: Superseded by owner decision 2026-08-22 (round 0822b): the toggle was executed directly - tests.yml unfiltered on pull_request, unittest added to required-checks.txt and the live main-protection ruleset (PR #1531, check_ci_contract.py --verify-ruleset clean). If the in-flight lane round already produced the evidence doc, it merges as documentation; no further action needed.
 
