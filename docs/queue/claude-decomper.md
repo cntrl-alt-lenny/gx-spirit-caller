@@ -1484,7 +1484,7 @@ Regenerate `docs/research/README.md` LAST.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper cm-main-exploit-drain-1`; commit; report.
 
-### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [TODO]
+### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [DONE]
 
 `cm-main-exploit-drain-1` (#1524) did exactly what it was asked and the number
 held up: **73/100 shipped, 9,488 B, zero `asm` escapes across all 73** — against
