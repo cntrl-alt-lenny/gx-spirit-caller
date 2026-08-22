@@ -1732,7 +1732,7 @@ show `DSD_VERSION` as the only toolchain change if you adopt. Regenerate
 ONE PR; verify every claim against `git diff --stat`; `python3.13
 tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-2`; commit; report.
 
-### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [TODO]
+### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [DONE]
 
 `cm-restock-carve-9` (#1507) shipped 689/689 of the shape-filtered pool
 (11,588 B) and — more valuable — **killed a standing assumption with its own

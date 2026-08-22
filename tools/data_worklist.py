@@ -58,6 +58,7 @@ for function symbols) — this is the data-side companion.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -82,6 +83,63 @@ from next_targets import (  # noqa: E402
 #   data_ov005_021cabcd   (overlays)
 # Both start with `data_`; one `startswith` covers both.
 DATA_PLACEHOLDER_PREFIX = "data_"
+
+
+# --------------------------------------------------------------------------- #
+# src/ screen — mandatory precondition before absorbing a placeholder name
+# into another candidate's declaration (cm-restock-carve-10).
+#
+# cm-restock-carve-9's Attempt 1 absorbed 3 sibling addresses into one
+# declaration on the theory that "0 function-readers" meant "nothing
+# references this name" — but an already-shipped Pattern-3 `.s` chunk
+# (tools/cluster_c_pattern3_gen.py output, briefs 121-125) `.extern`'d
+# all three, and the link failed. `relocs.txt` cannot catch this: it
+# proves a *pointer relationship*, not whether some other TU already
+# references the symbol *by name*. The only reliable check is grepping
+# already-shipped source directly. This makes that check code, not a
+# step a wave's prose can silently skip.
+# --------------------------------------------------------------------------- #
+
+_SRC_TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_SRC_SCREEN_SUFFIXES = (".c", ".cpp", ".h", ".s")
+
+
+def screen_names_against_src(
+    names,
+    src_root: Path,
+) -> dict[str, list[str]]:
+    """Grep every `.c`/`.cpp`/`.h`/`.s` file under `src_root` for a
+    reference to any of `names` (e.g. `.extern data_020c3cb0`, or a
+    `.word data_020c3cb0` operand).
+
+    Returns `{name: [relative file paths]}` for every name with at
+    least one hit — a non-empty result means that name is NOT safe to
+    fold into a neighbour's declaration without its own top-level
+    symbol; it must get its own declaration in THIS carve too (never
+    silently omitted). An empty dict means every name is genuinely
+    unreferenced anywhere in already-shipped source and safe to
+    absorb. Token-matched (word-boundary), not substring — `data_100`
+    must not false-positive on a file that only mentions `data_1000`.
+
+    This has to run BEFORE any name is chosen to be omitted from its
+    own declaration — call it on the full candidate set, and refuse to
+    absorb any name this returns a hit for (see cm-restock-carve-9's
+    Part 2 Attempt 1 postmortem in the module docstring above)."""
+    name_set = set(names)
+    hits: dict[str, list[str]] = {}
+    if not name_set:
+        return hits
+    for path in sorted(src_root.rglob("*")):
+        if not path.is_file() or path.suffix not in _SRC_SCREEN_SUFFIXES:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        found = name_set & set(_SRC_TOKEN_RE.findall(text))
+        for name in found:
+            hits.setdefault(name, []).append(str(path))
+    return hits
 
 
 # --------------------------------------------------------------------------- #
@@ -681,10 +739,20 @@ class DataEntry:
     section: str = "unknown"                # bss / data / rodata / dtcm / itcm
     effective_size: int = 0                 # deduced if symbol.size is 0
     shape: str = SHAPE_UNKNOWN              # scalar / string / etc.
+    # cm-restock-carve-10: readers attributed to an enclosing DATA
+    # symbol (e.g. an uncarved pointer table) rather than a function.
+    # Always 0/empty unless `rank_data_symbols(include_data_readers=True)`
+    # — see that function and `_load_readers_index_from_data`.
+    data_reader_count: int = 0
+    data_reader_modules: frozenset[str] = frozenset()
+
+    @property
+    def total_reader_count(self) -> int:
+        return self.reader_count + self.data_reader_count
 
     @property
     def cross_module_readers(self) -> int:
-        return len(self.reader_modules)
+        return len(self.reader_modules | self.data_reader_modules)
 
     @property
     def sort_key(self) -> tuple[int, int, int]:
@@ -692,9 +760,12 @@ class DataEntry:
         # Secondary: raw reader count. Tertiary: size (prefer knowable
         # extents over 0-size `data(any)`). All descending → negate.
         # Quaternary tiebreak: address (ascending) for determinism.
+        # total_reader_count == reader_count whenever data_reader_count
+        # is 0 (the default, unopted-in case), so this is byte-identical
+        # to the pre-carve-10 sort for every existing caller.
         return (
             -self.cross_module_readers,
-            -self.reader_count,
+            -self.total_reader_count,
             -self.effective_size,
         )
 
@@ -714,6 +785,27 @@ def _load_readers_index(
     return by_datum
 
 
+def _load_readers_index_from_data(
+    graph: CallGraph,
+) -> dict[tuple[str, int], set[tuple[str, int]]]:
+    """Same inversion as `_load_readers_index`, but over
+    `graph.edges_load_from_data` — readers that are themselves DATA
+    symbols (e.g. a still-uncarved pointer table), not functions.
+
+    cm-restock-carve-10: wave 9 found that a large "zero-reader"
+    string pool is nothing of the sort — every sampled symbol has a
+    real relocation from an uncarved data pointer table that
+    `analyze_symbols.build_call_graph`'s function-only attribution
+    couldn't see. `edges_load_from_data` is empty unless the graph was
+    built with `data_size_of` (an explicit opt-in — see that
+    function's docstring), so this index is empty by default too."""
+    by_datum: dict[tuple[str, int], set[tuple[str, int]]] = {}
+    for reader, data_keys in graph.edges_load_from_data.items():
+        for datum in data_keys:
+            by_datum.setdefault(datum, set()).add(reader)
+    return by_datum
+
+
 def rank_data_symbols(
     modules: dict[str, ModuleData],
     graph: CallGraph,
@@ -728,6 +820,7 @@ def rank_data_symbols(
     shape_filter: frozenset[str] | None = None,
     size_min: int = 0,
     size_max: int | None = None,
+    include_data_readers: bool = False,
 ) -> list[DataEntry]:
     """Build the ranked DataEntry list.
 
@@ -748,8 +841,23 @@ def rank_data_symbols(
       * `shape_filter`: keep only entries whose shape is in this set.
         Shape names are the SHAPE_* constants.
       * `size_min` / `size_max`: byte range filter on effective_size.
+
+    cm-restock-carve-10 addition:
+      * `include_data_readers` (default False): also count readers
+        attributed to an enclosing DATA symbol (`graph.edges_load_from_data`
+        — only non-empty if `graph` was built with `build_call_graph`'s
+        `data_size_of`). When False (the default — every caller before
+        this wave, and every caller that doesn't explicitly opt in),
+        `data_reader_count`/`data_reader_modules` on every DataEntry
+        stay at their zero/empty defaults and `min_readers` filtering
+        is unchanged — this parameter cannot alter output unless a
+        caller passes both `include_data_readers=True` AND a
+        `data_size_of`-built graph.
     """
     readers_of = _load_readers_index(graph)
+    readers_of_data = (
+        _load_readers_index_from_data(graph) if include_data_readers else {}
+    )
     out: list[DataEntry] = []
     for mod_name, md in modules.items():
         if module_filter is not None and mod_name != module_filter:
@@ -769,9 +877,11 @@ def rank_data_symbols(
                 # isn't in the worklist — it's done.
                 continue
             readers = readers_of.get((sym.module, sym.addr), set())
-            if len(readers) < min_readers:
+            data_readers = readers_of_data.get((sym.module, sym.addr), set())
+            if len(readers) + len(data_readers) < min_readers:
                 continue
             reader_mods = frozenset(r[0] for r in readers)
+            data_reader_mods = frozenset(r[0] for r in data_readers)
 
             # v2 enrichment.
             section = "unknown"
@@ -809,6 +919,8 @@ def rank_data_symbols(
                 section=section,
                 effective_size=effective_size,
                 shape=shape,
+                data_reader_count=len(data_readers),
+                data_reader_modules=data_reader_mods,
             ))
     # Sort + secondary tiebreak by address for determinism.
     out.sort(key=lambda e: (e.sort_key, e.symbol.module, e.symbol.addr))
@@ -833,6 +945,7 @@ def render_markdown(
     size_min: int = 0,
     size_max: int | None = None,
     cluster: str | None = None,
+    include_data_readers: bool = False,
 ) -> str:
     """Render the Markdown worklist. Caller decides the output path."""
     shown = entries if top_n is None else entries[:top_n]
@@ -860,6 +973,8 @@ def render_markdown(
     if size_max is not None:
         filters.append(f"size_max={size_max}")
     filters.append(f"min_readers={min_readers}")
+    if include_data_readers:
+        filters.append("include_data_readers=true")
     if top_n is not None:
         filters.append(f"top={top_n}")
     lines.append("**Filters applied:** " + ", ".join(filters))
@@ -929,28 +1044,34 @@ def render_markdown(
            else ""),
     )
     lines.append("")
+    data_col_hdr = " Data readers |" if include_data_readers else ""
+    data_col_sep = "-----------:|" if include_data_readers else ""
     lines.append(
         "| # | Module | Name | Addr | Section | Size | Shape | "
-        "Readers | Cross-mod | Reader modules |"
+        f"Readers |{data_col_hdr} Cross-mod | Reader modules |"
     )
     lines.append(
         "|--:|--------|------|------|---------|-----:|-------|"
-        "--------:|----------:|----------------|"
+        f"--------:|{data_col_sep}----------:|----------------|"
     )
     for i, e in enumerate(shown, start=1):
         sym = e.symbol
         size_str = f"0x{e.effective_size:x}" if e.effective_size else "_any_"
         # Cap displayed reader modules at 6 to keep rows readable;
         # the count column already carries the full cardinality.
-        mods = sorted(e.reader_modules)
+        mods = sorted(e.reader_modules | e.data_reader_modules)
         if len(mods) > 6:
             mods_str = ", ".join(mods[:6]) + f", …(+{len(mods) - 6})"
         else:
             mods_str = ", ".join(mods)
+        # cm-restock-carve-10: the data-readers column only renders
+        # when the caller opted in — default markdown output is
+        # byte-identical to before this addition.
+        data_col_val = f" {e.data_reader_count} |" if include_data_readers else ""
         lines.append(
             f"| {i} | `{sym.module}` | `{sym.name}` | "
             f"`0x{sym.addr:08x}` | `{e.section}` | {size_str} | "
-            f"`{e.shape}` | {e.reader_count} | "
+            f"`{e.shape}` | {e.reader_count} |{data_col_val} "
             f"{e.cross_module_readers} | {mods_str} |",
         )
     lines.append("")
@@ -972,6 +1093,7 @@ def render_stdout_summary(
     total_data_symbols: int,
     matched_data_count: int,
     top_n: int,
+    include_data_readers: bool = False,
 ) -> None:
     matched_pct = 100.0 * matched_data_count / max(total_data_symbols, 1)
     print(
@@ -985,11 +1107,18 @@ def render_stdout_summary(
     for i, e in enumerate(entries[:top_n], start=1):
         sym = e.symbol
         size_str = f"0x{e.effective_size:x}" if e.effective_size else "?"
+        # cm-restock-carve-10: the data-readers suffix only appears when
+        # the caller opted in (include_data_readers=True on the
+        # underlying rank_data_symbols call) — every existing call
+        # produces the exact same line as before this addition.
+        data_suffix = (
+            f"  data_readers={e.data_reader_count:3d}" if include_data_readers else ""
+        )
         print(
             f"  {i:>3}. {sym.module:6s} {sym.name:30s} "
             f"@ 0x{sym.addr:08x}  sec={e.section:7s} size={size_str:>6}  "
             f"shape={e.shape:11s} readers={e.reader_count:3d}  "
-            f"xmod={e.cross_module_readers}",
+            f"xmod={e.cross_module_readers}{data_suffix}",
         )
 
 
@@ -1088,6 +1217,16 @@ def main() -> int:
              "with --section / --shape / --size-min / --size-max but "
              "values from --cluster take precedence on conflict.",
     )
+    ap.add_argument(
+        "--include-data-readers", action="store_true",
+        help="cm-restock-carve-10: also count readers attributed to an "
+             "enclosing DATA symbol (e.g. a still-uncarved pointer "
+             "table), not just readers that are functions. Off by "
+             "default — a 'zero-reader' pool can be reader-less by the "
+             "default function-only count yet fully pointed-to once "
+             "data->data edges are considered (wave 9's finding). "
+             "Adds a 'data readers' column to the worklist output.",
+    )
     args = ap.parse_args()
 
     config_dir = ROOT / "config" / args.version
@@ -1096,10 +1235,16 @@ def main() -> int:
         return 2
 
     modules = load_all(config_dir)
-    graph = build_call_graph(modules)
     matched = collect_matched_ranges(config_dir)
     modsecs_map = load_module_sections(config_dir, args.version)
     size_table = build_size_table(modules, modsecs_map)
+    # data_size_of stays None (build_call_graph's exact prior behaviour)
+    # unless --include-data-readers opts in.
+    data_size_of = None
+    if args.include_data_readers:
+        def data_size_of(s: Symbol) -> int:
+            return size_table.get((s.module, s.addr), s.size)
+    graph = build_call_graph(modules, data_size_of=data_size_of)
 
     # Resolve filters — cluster overrides individual flags.
     try:
@@ -1141,6 +1286,7 @@ def main() -> int:
         shape_filter=shape_filter,
         size_min=size_min,
         size_max=size_max,
+        include_data_readers=args.include_data_readers,
     )
 
     top_n = None if args.top == 0 else args.top
@@ -1149,6 +1295,7 @@ def main() -> int:
         total_data_symbols=total_data,
         matched_data_count=matched_data,
         top_n=args.top if args.top > 0 else max(len(entries), 1),
+        include_data_readers=args.include_data_readers,
     )
 
     if args.no_outputs:
@@ -1173,6 +1320,7 @@ def main() -> int:
             size_min=size_min,
             size_max=size_max,
             cluster=args.cluster,
+            include_data_readers=args.include_data_readers,
         ), encoding="utf-8")
     except OSError as e:
         print(f"error: could not write {out_path}: {e}", file=sys.stderr)

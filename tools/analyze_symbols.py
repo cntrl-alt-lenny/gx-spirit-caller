@@ -23,10 +23,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import bisect
 import json
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -155,6 +157,32 @@ class ModuleData:
         if not cand.is_function or cand.size == 0:
             return None
         if cand.addr <= addr < cand.end_addr:
+            return cand
+        return None
+
+    def enclosing_data_symbol(
+        self, addr: int, size_of: Callable[[Symbol], int],
+    ) -> Symbol | None:
+        """Find the DATA/BSS symbol whose address range contains `addr`,
+        or None if `addr` isn't inside any known data symbol in this
+        module. Mirrors `enclosing_function`'s bisect approach, but for
+        data instead of code.
+
+        Unlike functions, most `data(any)` symbols declare `size=0` in
+        symbols.txt (the true extent is only known via next-symbol-gap
+        deduction — see `data_worklist.build_size_table`), so the
+        caller must supply `size_of` to resolve each candidate's
+        effective size rather than trusting `Symbol.size` directly."""
+        idx = bisect.bisect_right([s.addr for s in self.by_addr_sorted], addr) - 1
+        if idx < 0:
+            return None
+        cand = self.by_addr_sorted[idx]
+        if cand.type not in ("data", "bss"):
+            return None
+        size = size_of(cand)
+        if size <= 0:
+            return None
+        if cand.addr <= addr < cand.addr + size:
             return cand
         return None
 
@@ -307,7 +335,14 @@ class CallGraph:
     """Resolved adjacency structure over all Symbols.
 
     edges_call[caller_key] -> set of callee keys
-    edges_load[reader_key] -> set of data keys referenced
+    edges_load[reader_key] -> set of data keys referenced (reader_key is
+        always a FUNCTION — see build_call_graph)
+    edges_load_from_data[reader_key] -> set of data keys referenced,
+        where reader_key is a DATA/BSS symbol (e.g. an uncarved pointer
+        table) rather than a function. Kept separate from `edges_load`
+        so every existing `edges_load` consumer is unaffected; only
+        populated when `build_call_graph` is called with `data_size_of`
+        (cm-restock-carve-10 — see that function's docstring).
     in_degree_call / out_degree_call / in_degree_load / out_degree_load:
         cached per-node counts (call edges and load edges kept separate).
     unresolved_calls: relocs whose dest_addr didn't map to any known
@@ -316,6 +351,7 @@ class CallGraph:
 
     edges_call: dict[SymbolKey, set[SymbolKey]] = field(default_factory=lambda: defaultdict(set))
     edges_load: dict[SymbolKey, set[SymbolKey]] = field(default_factory=lambda: defaultdict(set))
+    edges_load_from_data: dict[SymbolKey, set[SymbolKey]] = field(default_factory=lambda: defaultdict(set))
     unresolved_calls: list[Reloc] = field(default_factory=list)
     unresolved_loads: list[Reloc] = field(default_factory=list)
 
@@ -336,10 +372,32 @@ class CallGraph:
         return counts
 
 
-def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
+def build_call_graph(
+    modules: dict[str, ModuleData],
+    data_size_of: Callable[[Symbol], int] | None = None,
+) -> CallGraph:
     """For every reloc in every module, resolve src_addr and dest_addr
     to enclosing symbols and add an edge to the CallGraph. Relocs whose
-    endpoints don't resolve go into the unresolved_* lists."""
+    endpoints don't resolve go into the unresolved_* lists.
+
+    `data_size_of` (opt-in, default None — cm-restock-carve-10): a load
+    reloc whose source doesn't resolve to an enclosing FUNCTION used to
+    always fall straight into `unresolved_loads`, even when the source
+    is plainly inside another DATA symbol (e.g. a still-uncarved
+    pointer table reading one of its own entries — `analyze_symbols`
+    had no way to see that edge at all). When `data_size_of` is
+    provided, such a load is additionally checked against enclosing
+    DATA/BSS symbols (via `ModuleData.enclosing_data_symbol`, which
+    needs this callback because `Symbol.size` is 0 for most
+    `data(any)` entries — see `data_worklist.build_size_table` for the
+    canonical resolver). A resolved data->data edge lands in the new
+    `graph.edges_load_from_data` field, kept separate from
+    `edges_load` so every existing consumer — which only ever reads
+    `edges_load` — sees byte-identical output whether or not this
+    parameter is passed. Passing None (the default, and what every
+    current call site does) reproduces the exact prior behaviour with
+    no code-path change at all.
+    """
     graph = CallGraph()
 
     for _src_mod_name, src_mod in modules.items():
@@ -348,16 +406,23 @@ def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
             # relocs often originate inside functions too, so we treat
             # caller lookup the same way for both call and load kinds.
             caller = src_mod.enclosing_function(r.src_addr)
-            if caller is None:
-                # Source lives in a gap/data/unaligned region — rare but
-                # possible; we can't attribute the edge to a function.
+            data_caller: Symbol | None = None
+            if caller is None and data_size_of is not None and r.kind in LOAD_RELOC_KINDS:
+                data_caller = src_mod.enclosing_data_symbol(r.src_addr, data_size_of)
+            if caller is None and data_caller is None:
+                # Source lives in a gap/unaligned region, or (without
+                # data_size_of) inside a data symbol — we can't
+                # attribute the edge to any known reader.
                 if r.kind in CALL_RELOC_KINDS:
                     graph.unresolved_calls.append(r)
                 elif r.kind in LOAD_RELOC_KINDS:
                     graph.unresolved_loads.append(r)
                 continue
 
-            caller_key: SymbolKey = (caller.module, caller.addr)
+            caller_key: SymbolKey = (
+                (caller.module, caller.addr) if caller is not None
+                else (data_caller.module, data_caller.addr)
+            )
 
             # Callee/datum: exact entry match is the common case (BL targets
             # the function prologue); fall back to enclosing_function for
@@ -390,7 +455,10 @@ def build_call_graph(modules: dict[str, ModuleData]) -> CallGraph:
             if r.kind in CALL_RELOC_KINDS:
                 graph.edges_call[caller_key].add(callee_key)
             elif r.kind in LOAD_RELOC_KINDS:
-                graph.edges_load[caller_key].add(callee_key)
+                if caller is not None:
+                    graph.edges_load[caller_key].add(callee_key)
+                else:
+                    graph.edges_load_from_data[caller_key].add(callee_key)
             # else: link_time_const and other rarer kinds — ignore for now.
 
     return graph
