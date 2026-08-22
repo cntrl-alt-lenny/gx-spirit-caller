@@ -50,10 +50,12 @@ P-20-reg-alloc	P-20	reg-alloc	1
 P-20-regalloc-plus-imm-fold	P-20	regalloc-plus-imm-fold	1
 P-20-register-permutation	P-20	register-permutation	1
 P-20-register-swap-plus-scheduling	P-20	register-swap-plus-scheduling	1
+P-20-row-offset	P-20	row-offset	15
 P-20-scratch-reg-swap	P-20	scratch-reg-swap	1
 P-20-scratch-register	P-20	scratch-register	1
 P-20-self-overwrite-deref	P-20	self-overwrite-deref	1
 P-23-confirmed	P-23	confirmed	1
+P-23-tentative	P-23	tentative	1
 P-27-post-call	P-27	post-call	3
 P-29-mirror-mla-fusion-resistant	P-29	mirror-mla-fusion-resistant	1
 P-3-constant-materialization	P-3	constant-materialization	1
