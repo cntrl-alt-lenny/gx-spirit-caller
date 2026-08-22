@@ -94,8 +94,7 @@ but the changed test is directly confirmed in that merge tree.
 
 Across the 30 most recently merged PRs, #1506 is the only PR whose added test
 code introduces that import-time unittest failure. The available runs for the
-other recent test-touching merges (#1499, #1500, #1509, #1511, #1514, #1515,
-#1516, #1517, #1521, #1523, #1525, and #1531) all report a successful
+other recent test-touching merges (PRs #1499, #1500, #1509, #1511, #1514, #1515, #1516, #1517, #1521, #1523, #1525 and #1531) all report a successful
 `unittest` job. The latest run, #1531's 32592882371, is green.
 
 ## Owner-controlled toggle and one-step revert

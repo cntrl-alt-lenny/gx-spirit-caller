@@ -268,6 +268,19 @@ class TestReferencedCanaryInputs(unittest.TestCase):
         self.assertIn("referenced-paths", self._fail_keys(self._INCIDENT_CANARY))
 
     def test_real_incident_git_show_history_escape_passes(self):
+        # `010616b65^` is deep history. CI checks out at depth 1
+        # (`actions/checkout@v4` with no `fetch-depth`), so the commit is absent
+        # there and `referenced-commits` fails for a reason that has nothing to
+        # do with the behaviour under test. Skip rather than assert against
+        # repo state that is not universally available — the same choice this
+        # file already makes for missing reconstruction sources above.
+        # (Brain fix at merge, round 0822c: green locally, red in CI.)
+        if subprocess.run(
+            ["git", "cat-file", "-e", "010616b65"],
+            cwd=Path(__file__).resolve().parents[1],
+            capture_output=True,
+        ).returncode:
+            self.skipTest("shallow clone: historical commit 010616b65 not present")
         text = self._INCIDENT_CANARY.replace(
             "python3.13 tools/kickoff_lint.py src/main/func_0209e628.s",
             "git show 010616b65^:src/main/func_0209e628.s",
