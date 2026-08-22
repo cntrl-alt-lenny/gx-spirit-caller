@@ -225,6 +225,12 @@ def _apply_one(cand: Candidate) -> bool:
     ok = _flip_delinks(cand.delinks_path, cand.s_rel, cand.c_rel)
     if ok:
         cand.applied = True
+        # The .s is the superseded build input as soon as delinks routes this
+        # TU to .c.  Remove it now, while retaining an exact in-memory backup
+        # for a later bisect/revert.  Waiting for configure.py's self-heal
+        # leaves a silent .c/.s pair on disk and can make the next configure
+        # fail with "multiple rules generate".
+        _displace_stale_sibling(cand)
     return ok
 
 
