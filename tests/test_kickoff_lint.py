@@ -8,6 +8,7 @@ must fail the corresponding required check.
 
 from __future__ import annotations
 
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -28,35 +29,50 @@ GOOD = """
 Brief 610 — name the SDK layer. SET YOUR REASONING EFFORT TO HIGH.
 Setup + PREFLIGHT:
     ls tools/nitro_suggest_renames.py && echo PREFLIGHT-OK || { echo "preflight failed"; exit 1; }
+    for i in 1 2 3 4 5; do git worktree add ../codex-610 -b codex/naming-610 origin/main && break || { echo retry; sleep 3; }; done
+    cd "$HOME/Dev/spirit-caller/codex-610"
     EXPECT="$HOME/Dev/spirit-caller/codex-610"
     [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
-    for i in 1 2 3 4 5; do git worktree add ../codex-610 -b codex/naming-610 origin/main && break || { echo retry; sleep 3; }; done
 CANARY: rename ONE function, then run dsd check — it MUST stay green.
 Finish: paste the total names added + the final dsd check green line for all 3 regions.
 Reply with the PR URL + the sha1 result.
 """
 
 
-ROUND_0818B_DISPATCHES = tuple(
-    GOOD.replace(
-        "Brief 610 — name the SDK layer.",
-        f"Round 0818b reconstruction — {label}.",
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _reconstruction_commit(tool_path: str) -> str:
+    result = subprocess.run(
+        ["git", "log", "-1", "--format=%H", "--", tool_path],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
     )
-    .replace(
-        "tools/nitro_suggest_renames.py",
-        tool_path,
-    )
-    .replace(
-        "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
-        f"CANARY: run git show {commit} --stat and paste the result.",
-    )
-    for label, tool_path, commit in (
-        ("cm-restock-carve-9", "tools/wall_aware_headroom.py", "3bdded4951fdb6d8862302012bad372282612da5"),
-        ("cm-main-wall-filtered-sweep-1", "tools/wall_prefilter.py", "272a84a4c29ac4dbf49b29de7b949291ce3021d8"),
-        ("ledger-ship-coverage", "tools/validate_attempts.py", "972306ed46985da20348cb6c1b3818b4ab9ce4fb"),
-        ("stdlib-unittest-fix", "tools/kickoff_lint.py", "3afd6df27c4119906a6895be605d6cfa87590493"),
-    )
-)
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _round_0818b_dispatches(test_case: unittest.TestCase):
+    for label, tool_path in (
+        ("cm-restock-carve-9", "tools/wall_aware_headroom.py"),
+        ("cm-main-wall-filtered-sweep-1", "tools/wall_prefilter.py"),
+        ("ledger-ship-coverage", "tools/validate_attempts.py"),
+        ("stdlib-unittest-fix", "tools/kickoff_lint.py"),
+    ):
+        commit = _reconstruction_commit(tool_path)
+        if not commit:
+            test_case.skipTest(f"no committed reconstruction source for {tool_path}")
+        yield GOOD.replace(
+            "Brief 610 — name the SDK layer.",
+            f"Round 0818b reconstruction — {label}.",
+        ).replace(
+            "tools/nitro_suggest_renames.py",
+            tool_path,
+        ).replace(
+            "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+            f"CANARY: run git show {commit} --stat and paste the result.",
+        )
 
 
 class TestGoodKickoff(unittest.TestCase):
@@ -69,7 +85,7 @@ class TestGoodKickoff(unittest.TestCase):
         self.assertEqual(warns, [], f"good kickoff tripped advisories: {[c.key for c in warns]}")
 
     def test_reconstructed_round_0818b_dispatches_still_pass(self):
-        for kickoff in ROUND_0818B_DISPATCHES:
+        for kickoff in _round_0818b_dispatches(self):
             with self.subTest(kickoff=kickoff.splitlines()[1]):
                 self.assertEqual(
                     [check.key for check in lint(kickoff) if check.required and not check.ok],
@@ -89,6 +105,7 @@ class TestPowerShellLocationGuard(unittest.TestCase):
 
     _PWSH = (
         "PREFLIGHT — STOP-and-report on any failure:\n"
+        "    Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n"
         "    $EXPECT = 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n"
         "    if ((git rev-parse --show-toplevel) -ne $EXPECT) "
         "{ Write-Output 'WRONG WORKTREE'; exit 1 }\n"
@@ -124,6 +141,42 @@ class TestPowerShellLocationGuard(unittest.TestCase):
             '"C:\\Users\\leona\\Dev\\gx-spirit-caller\\decomper"',
         )
         self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_location_guard_requires_prior_establishment(self):
+        text = self._PWSH.replace(
+            "    Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n",
+            "",
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_location_guard_accepts_preceding_set_location(self):
+        self.assertNotIn("location-guard", self._fail_keys(self._PWSH))
+
+
+ROUND_0822_CODEX_KICKOFF = """
+PREFLIGHT — STOP-and-report on any failure.
+    $EXPECT = 'C:/Users/leona/Dev/gx-spirit-caller/kb-types'
+    if ((git rev-parse --show-toplevel) -ne $EXPECT) { Write-Output 'WRONG WORKTREE'; exit 1 }
+    if (-not (Test-Path tools/kickoff_lint.py)) { Write-Output 'MISSING TOOL'; exit 1 }
+CANARY: run the first check and paste the pytest result.
+SET YOUR REASONING EFFORT TO HIGH.
+Reply with the pytest tail.
+"""
+
+
+class TestLocationGuardEstablishmentIncident(unittest.TestCase):
+    def _fail_keys(self, text: str) -> set[str]:
+        return {c.key for c in lint(text) if c.required and not c.ok}
+
+    def test_round_0822_kickoff_as_sent_is_red(self):
+        self.assertIn("location-guard", self._fail_keys(ROUND_0822_CODEX_KICKOFF))
+
+    def test_round_0822_kickoff_with_set_location_is_green(self):
+        fixed = (
+            "Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-types'\n"
+            + ROUND_0822_CODEX_KICKOFF
+        )
+        self.assertNotIn("location-guard", self._fail_keys(fixed))
 
 
 class TestMissingGuards(unittest.TestCase):

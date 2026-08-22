@@ -94,11 +94,39 @@ _BACKSLASH_PATH_RE = re.compile(
     r"(?:^|[;&\s(])(?:\$)?(?:EXPECT|EXPECTED_WORKTREE)\s*=\s*['\"]?[^'\";\s]*\\"
 )
 
+_LOCATION_ESTABLISHMENT_RES = (
+    re.compile(r"\b(?:cd|Set-Location)\s+(?P<path>[^\s;&|]+)", re.IGNORECASE),
+    re.compile(r"\bgit\s+-C\s+(?P<path>[^\s;&|]+)", re.IGNORECASE),
+)
+
 
 def _path_basename(path: str) -> str:
     path = path.strip("'\"")
     path = path.replace("$HOME", "~")
     return Path(path).name
+
+
+def _unquote_path(path: str) -> str:
+    return path.strip("'\"")
+
+
+def _established_paths_before(
+    text: str, line_number: int, expected_paths: list[str],
+) -> list[str]:
+    """Return literal directory paths established before a guard line."""
+    lines = text.splitlines()
+    paths: list[str] = []
+    for raw_line in lines[: line_number - 1]:
+        for pattern in _LOCATION_ESTABLISHMENT_RES:
+            for match in pattern.finditer(raw_line):
+                path = _unquote_path(match.group("path"))
+                if path in {"$EXPECT", "$EXPECTED_WORKTREE"}:
+                    paths.extend(expected_paths)
+                else:
+                    paths.append(path)
+        for match in _WORKTREE_TARGET_RE.finditer(raw_line):
+            paths.append(_unquote_path(match.group("path")))
+    return paths
 
 
 def check_location_guard(text: str) -> tuple[bool, str]:
@@ -112,7 +140,8 @@ def check_location_guard(text: str) -> tuple[bool, str]:
     expected_paths = [m.group("path") for m in _EXPECTED_RE.finditer(text)]
     targets = [m.group("path") for m in _WORKTREE_TARGET_RE.finditer(text)]
     assertion_lines = [
-        line for line in text.splitlines()
+        (line_number, line)
+        for line_number, line in enumerate(text.splitlines(), 1)
         if _ROOT_ASSERTION_RE.search(line) and _has(line, *stop)
     ]
     if not assertion_lines:
@@ -131,6 +160,16 @@ def check_location_guard(text: str) -> tuple[bool, str]:
         for target in targets
     ):
         return False, "EXPECT path does not match the assigned worktree target"
+    if not any(
+        _path_basename(expected) == _path_basename(established)
+        for expected in expected_paths
+        for line_number, _line in assertion_lines
+        for established in _established_paths_before(text, line_number, expected_paths)
+    ):
+        return False, (
+            "repo-root equality assertion has no preceding directory establishment "
+            "for the EXPECT path"
+        )
     return True, "repo-root equality assertion matches the assigned worktree path"
 
 
