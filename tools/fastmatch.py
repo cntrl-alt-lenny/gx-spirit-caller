@@ -140,24 +140,31 @@ def _resolve_objdump() -> str:
 _OBJDUMP = _resolve_objdump()
 
 
-def _run_objdump(extra_args: list[str], obj: Path) -> str:
-    """Run arm-none-eabi-objdump and return stdout.
+class ObjdumpError(RuntimeError):
+    """The objdump process could not produce a usable report."""
 
-    Exits with code 2 and a clean message if the binary is not on PATH, so
-    the user sees an actionable hint instead of a raw FileNotFoundError
-    traceback.
-    """
+
+def _run_objdump(extra_args: list[str], obj: Path) -> str:
+    """Run objdump and return non-empty stdout, or raise on launch failure."""
     cmd = [_OBJDUMP] + extra_args + [str(obj)]
     try:
-        return subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT).stdout
-    except FileNotFoundError:
-        print(
-            f"ERROR: '{_OBJDUMP}' not found on PATH.\n"
+        completed = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    except OSError as exc:
+        raise ObjdumpError(
+            f"ERROR: '{_OBJDUMP}' failed to launch: {exc}\n"
             "  Run `ninja` once to download toolchain binaries, or:\n"
-            "  python tools/download_tool.py",
-            file=sys.stderr,
+            "  python tools/download_tool.py"
+        ) from exc
+    stdout = completed.stdout or ""
+    stderr = (completed.stderr or "").strip()
+    if completed.returncode != 0:
+        detail = stderr or stdout.strip() or f"exit code {completed.returncode}"
+        raise ObjdumpError(
+            f"ERROR: '{_OBJDUMP}' failed (exit code {completed.returncode}):\n{detail}"
         )
-        sys.exit(2)
+    if not stdout.strip():
+        raise ObjdumpError(f"ERROR: '{_OBJDUMP}' ran but produced no output")
+    return stdout
 
 
 def _resolve_obj_bytes(path: Path) -> bytes | None:
@@ -750,7 +757,12 @@ def match_one(
         return result
 
     # --- Step 2: list functions ---
-    funcs_in_obj = list_funcs_in_obj(out_o)
+    try:
+        funcs_in_obj = list_funcs_in_obj(out_o)
+    except ObjdumpError as exc:
+        result["status"] = "objdump_error"
+        result["error"] = str(exc)
+        return result
     if not funcs_in_obj:
         result["status"] = "no_functions"
         return result
@@ -775,7 +787,12 @@ def match_one(
                 use_resolved = False
 
         result["resolved"] = use_resolved
-        my_dump = _objdump_text(resolved_out_o)
+        try:
+            my_dump = _objdump_text(resolved_out_o)
+        except ObjdumpError as exc:
+            result["status"] = "objdump_error"
+            result["error"] = str(exc)
+            return result
 
         for fn_idx, fn in enumerate(targets):
             mine = _parse_words(my_dump, fn)
@@ -809,7 +826,13 @@ def match_one(
                 # If gap resolve fails, compare resolved mine vs unresolved gap:
                 # still better than fully unresolved, but note the asymmetry.
 
-            orig_dump = _objdump_text(resolved_gap)
+            try:
+                orig_dump = _objdump_text(resolved_gap)
+            except ObjdumpError as exc:
+                result["status"] = "objdump_error"
+                result["error"] = str(exc)
+                result["functions"] = []
+                return result
             orig = _parse_words(orig_dump, fn)
             pct, diffs = match_percent(mine, orig)
             m2, o2 = _strip_pool(mine), _strip_pool(orig)
@@ -920,7 +943,9 @@ def main(argv: list[str] | None = None) -> int:
         )
         all_results.append(r)
 
-        if r["status"] in ("compile_error", "no_functions", "file_not_found"):
+        if r["status"] in (
+            "compile_error", "objdump_error", "no_functions", "file_not_found",
+        ):
             exit_code = max(exit_code, 2)
         else:
             for fn_r in r["functions"]:
@@ -945,6 +970,13 @@ def main(argv: list[str] | None = None) -> int:
         if r["status"] == "compile_error":
             err = r.get("error", "")
             print(f"{tag} {label}: COMPILE ERROR")
+            if err:
+                for line in err.splitlines():
+                    print(f"  {line}")
+            continue
+        if r["status"] == "objdump_error":
+            err = r.get("error", "")
+            print(f"{tag} {label}: OBJDUMP ERROR")
             if err:
                 for line in err.splitlines():
                     print(f"  {line}")
