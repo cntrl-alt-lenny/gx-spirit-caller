@@ -950,7 +950,7 @@ before it goes green.
 `python tools/work_queue.py done codex-scaffolder q-kickoff-lint-sha-brittleness`;
 then take the next item immediately.
 
-### q-pool-freshness-tool — every wave's kickoff cites a stale pool number, and it keeps costing rounds [TODO]
+### q-pool-freshness-tool — every wave's kickoff cites a stale pool number, and it keeps costing rounds [DONE]
 
 This is a recurring, measured failure — not a hypothesis:
 
