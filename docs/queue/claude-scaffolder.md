@@ -1731,3 +1731,84 @@ show `DSD_VERSION` as the only toolchain change if you adopt. Regenerate
 
 ONE PR; verify every claim against `git diff --stat`; `python3.13
 tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-2`; commit; report.
+
+### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [TODO]
+
+`cm-restock-carve-9` (#1507) shipped 689/689 of the shape-filtered pool
+(11,588 B) and — more valuable — **killed a standing assumption with its own
+Part 2**: the ~9,690-symbol / ~227,820 B "zero-reader" pool is not reader-less.
+100% of the 3,901 `main` `shape=string` symbols it checked have a real
+relocation from an **uncarved data pointer table**. `cm-restock-carve-8` had
+written that pool off as needing "a different discovery method"; wave 9 proved it
+is reachable by the exact reader-based method this lane already trusts. It also
+proved the absorbing carve works end to end — a contiguous run of
+apparently-reader-less strings emitted as one declaration passed a clean 3-region
+SHA1.
+
+This item is the successor wave 9 scoped for itself. It is the largest unclaimed
+target on the board.
+
+**The mechanism, confirmed by the brain in the source this round** — so you are
+not starting from the prose. `analyze_symbols.build_call_graph` resolves an
+edge's origin with:
+
+```python
+caller = src_mod.enclosing_function(r.src_addr)
+if caller is None:
+    ... graph.unresolved_loads.append(r)   # edge dropped
+```
+
+A relocation originating **inside a data pointer table** has no enclosing
+*function*, so `caller` is `None` and the edge is discarded into
+`unresolved_loads`. That is the entire blind spot. Note the useful half: the
+edges are already collected — they are simply unattributed. You are adding
+attribution, not discovery.
+
+**Scope:**
+
+1. **Extend the graph to data->data load edges.** Attribute an edge to its
+   enclosing *symbol* (data or function), not only `enclosing_function`. Keep the
+   existing function->data behaviour byte-identical — any consumer of the current
+   graph (`data_worklist.py` and friends) must produce the same output it does
+   today unless it opts in. State in the PR which existing consumers you checked
+   and how.
+2. **Make the `src/` screen a precondition, in code, not in prose.** Wave 9's
+   Attempt 1 caused a real link failure by absorbing a symbol whose name was
+   already `.extern`'d by an earlier shipped Pattern-3 file. `relocs.txt` alone
+   does not catch this. Every absorption candidate must be screened by name
+   against the **entire `src/` tree** first. Wire that into the carve path so it
+   cannot be skipped.
+3. **Then drain a bounded first tranche.** Do NOT attempt the whole pool in one
+   round. Take the newly-visible candidates that the extended graph surfaces,
+   ship as many as gate cleanly, and report the honest remaining census.
+
+**Report the pool honestly, including if it shrinks.** ~227,820 B / ~9,690
+symbols is `cm-restock-carve-8`'s figure and it has never been re-derived under
+the extended graph. **Your own fresh measurement is authoritative over that
+number** — wave 9 corrected its own kickoff's 1,076 to 689 and was right to. If
+the extended graph surfaces far fewer usable candidates than the raw symbol count
+suggests, that is the finding; say so with the count you got.
+
+**One falsification test up front (AGENTS.md control 6):** before you carve a
+tranche, take a single newly-visible candidate whose only reader is an uncarved
+pointer table, ship it alone, and gate it alone on 3-region SHA1. If that single
+carve does not pass, the data->data reader is not a sufficient basis for the
+method and the tranche does not get dispatched — report that instead. Wave 9
+gated its own Part 1 canary this way before batching; do the same.
+
+**Do not compose TUs to beat alignment.** Wave 9 avoided P-50 entirely by
+emitting each candidate as its own single-declaration file, and every candidate
+in its pool was individually 4-aligned. Check alignment per candidate and prefer
+the single-declaration form; only reach for composition if you have a
+4-aligned-at-both-ends span, and say so explicitly if you do.
+
+**Gate:** full `python tools/gate3.py --scope all --clean` — all three `SHA1
+PASS` lines pasted verbatim + pytest tail. Report `typed_array_bytes` /
+`named_struct_bytes` before -> after via `tools/progress.py`'s
+`summarize_data_readability`, with the BEFORE isolated by an actual
+`git stash push -u` / `pop` (wave 9's method), not recalled. The byte delta must
+reconcile against the files you shipped, item by item, the way wave 9's
+`11,716 = 11,588 + 32 + 96` did.
+
+ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
+`python tools/work_queue.py done claude-scaffolder cm-restock-carve-10`.
