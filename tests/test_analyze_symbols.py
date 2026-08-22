@@ -322,6 +322,145 @@ class TestEnclosingFunction(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# Enclosing data symbol (cm-restock-carve-10)
+# --------------------------------------------------------------------------- #
+
+class TestEnclosingDataSymbol(unittest.TestCase):
+    """`enclosing_data_symbol` mirrors `enclosing_function`'s bisect
+    approach but for data/bss symbols, using an injected `size_of`
+    resolver since most `data(any)` symbols declare size=0 in
+    symbols.txt (the real extent comes from data_worklist's
+    next-symbol-gap deduction, not from Symbol.size directly)."""
+
+    def setUp(self):
+        # A pointer table (data, size=0 in symbols.txt — deduced as
+        # 0x10 by size_of) at 0x100, containing 4 string targets that
+        # live elsewhere and are irrelevant to this module's own
+        # enclosing lookups.
+        self.table = make_symbol("data_100", "main", 0x100, size=0, type_="data", mode="any")
+        self.func = make_symbol("Entry", "main", 0x200, size=0x20)
+        self.m = make_module("main", [self.table, self.func])
+
+    def _size_of(self, s: Symbol) -> int:
+        return {0x100: 0x10, 0x200: 0x20}.get(s.addr, s.size)
+
+    def test_exact_entry_hits(self):
+        got = self.m.enclosing_data_symbol(0x100, self._size_of)
+        self.assertIsNotNone(got)
+        self.assertEqual(got.name, "data_100")
+
+    def test_mid_data_hits(self):
+        got = self.m.enclosing_data_symbol(0x108, self._size_of)
+        self.assertEqual(got.name, "data_100")
+
+    def test_end_addr_misses(self):
+        # 0x100 + 0x10 = 0x110 is one past the end of the table.
+        self.assertIsNone(self.m.enclosing_data_symbol(0x110, self._size_of))
+
+    def test_function_never_matches(self):
+        # enclosing_data_symbol only considers data/bss candidates —
+        # an address inside a function must miss, even though
+        # enclosing_function would hit.
+        self.assertIsNone(self.m.enclosing_data_symbol(0x205, self._size_of))
+        self.assertIsNotNone(self.m.enclosing_function(0x205))
+
+    def test_zero_resolved_size_never_encloses(self):
+        # size_of returning 0 (e.g. the resolver has no better info
+        # than the raw declared size) must not claim any address —
+        # same "unsized placeholder can't enclose" contract as
+        # enclosing_function's zero-size guard.
+        got = self.m.enclosing_data_symbol(0x100, lambda s: 0)
+        self.assertIsNone(got)
+
+    def test_before_any_symbol_misses(self):
+        self.assertIsNone(self.m.enclosing_data_symbol(0x50, self._size_of))
+
+    def test_bss_type_also_matches(self):
+        bss_sym = make_symbol("bss_300", "main", 0x300, size=0, type_="bss", mode="any")
+        m = make_module("main", [bss_sym])
+        got = m.enclosing_data_symbol(0x300, lambda s: 0x8)
+        self.assertEqual(got.name, "bss_300")
+
+
+# --------------------------------------------------------------------------- #
+# build_call_graph — data->data edge attribution (cm-restock-carve-10)
+# --------------------------------------------------------------------------- #
+
+class TestBuildCallGraphDataEdges(unittest.TestCase):
+    """A load reloc sourced from inside a data symbol (e.g. an uncarved
+    pointer table's own entry) used to always fall into
+    `unresolved_loads`, regardless of caller. `data_size_of` opts a
+    caller into also seeing that edge, attributed to the enclosing
+    DATA symbol via the new `edges_load_from_data` field — without
+    disturbing `edges_load`/`unresolved_loads` for anyone who doesn't
+    pass it (the exact behaviour every one of the 16 real call sites
+    in tools/ still gets, since none of them pass this parameter)."""
+
+    def setUp(self):
+        # main: a 0x10-byte pointer table at 0x100 (size=0 declared,
+        # deduced 0x10) whose one entry (at 0x104) loads a string at
+        # 0x300. Also a function at 0x200 that itself loads 0x300 (an
+        # ordinary function->data edge, to prove it's unaffected).
+        self.table = make_symbol("data_100", "main", 0x100, size=0, type_="data", mode="any")
+        self.string = make_symbol("data_300", "main", 0x300, size=0x8, type_="data", mode="any")
+        self.func = make_symbol("Entry", "main", 0x200, size=0x20)
+        relocs = [
+            Reloc(src_addr=0x104, src_module="main", dest_addr=0x300,
+                  dest_module="main", kind="load"),
+            Reloc(src_addr=0x204, src_module="main", dest_addr=0x300,
+                  dest_module="main", kind="load"),
+        ]
+        by_addr = {s.addr: s for s in (self.table, self.string, self.func)}
+        by_sorted = sorted((self.table, self.string, self.func), key=lambda s: s.addr)
+        self.modules = {
+            "main": ModuleData(name="main", symbols=[self.table, self.string, self.func],
+                               relocs=relocs, by_addr=by_addr, by_addr_sorted=by_sorted),
+        }
+
+    def _size_of(self, s: Symbol) -> int:
+        return {0x100: 0x10, 0x300: 0x8}.get(s.addr, s.size)
+
+    def test_default_is_byte_identical_to_prior_behaviour(self):
+        # No data_size_of passed (every real call site today): the
+        # table->string load is unattributable, same as before this
+        # parameter existed.
+        graph = build_call_graph(self.modules)
+        self.assertEqual(graph.edges_load_from_data, {})
+        self.assertEqual(len(graph.unresolved_loads), 1)
+        self.assertEqual(graph.unresolved_loads[0].src_addr, 0x104)
+        # The ordinary function->data edge is untouched either way.
+        self.assertIn(("main", 0x300), graph.edges_load[("main", 0x200)])
+
+    def test_explicit_none_matches_default(self):
+        graph = build_call_graph(self.modules, data_size_of=None)
+        self.assertEqual(graph.edges_load_from_data, {})
+        self.assertEqual(len(graph.unresolved_loads), 1)
+
+    def test_opt_in_attributes_data_to_data_edge(self):
+        graph = build_call_graph(self.modules, data_size_of=self._size_of)
+        self.assertIn(("main", 0x300), graph.edges_load_from_data[("main", 0x100)])
+        # Resolved now, so it must NOT also appear as unresolved.
+        self.assertEqual(graph.unresolved_loads, [])
+
+    def test_opt_in_never_pollutes_edges_load(self):
+        # The function->data edge stays in edges_load; the data->data
+        # edge must never leak into it (existing consumers like
+        # data_worklist's reader-count only ever read edges_load).
+        graph = build_call_graph(self.modules, data_size_of=self._size_of)
+        self.assertNotIn(("main", 0x100), graph.edges_load)
+        self.assertEqual(graph.edges_load[("main", 0x200)], {("main", 0x300)})
+
+    def test_call_reloc_never_routes_through_data_size_of(self):
+        # data_size_of only ever applies to LOAD_RELOC_KINDS — a call
+        # reloc sourced from inside data stays unresolved regardless.
+        call_reloc = Reloc(src_addr=0x108, src_module="main", dest_addr=0x300,
+                           dest_module="main", kind="arm_call")
+        self.modules["main"].relocs.append(call_reloc)
+        graph = build_call_graph(self.modules, data_size_of=self._size_of)
+        self.assertTrue(any(r.src_addr == 0x108 for r in graph.unresolved_calls))
+
+
+# --------------------------------------------------------------------------- #
 # classify / tier assignment
 # --------------------------------------------------------------------------- #
 
