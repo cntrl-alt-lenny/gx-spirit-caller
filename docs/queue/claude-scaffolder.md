@@ -1812,3 +1812,54 @@ reconcile against the files you shipped, item by item, the way wave 9's
 
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
 `python tools/work_queue.py done claude-scaffolder cm-restock-carve-10`.
+
+### cm-progress-dashboard — one page where every number is tool-derived [TODO]
+
+The project owner steers this campaign without reading diffs; the brain
+re-derives the same handful of numbers by hand every round (natural-C % per
+region, remaining pool by band, data-readability bytes) and pastes them into
+prose, where they immediately start going stale — the exact failure class the
+pool-freshness tool was built for, one level up. Build the page that makes the
+hand-derivation unnecessary.
+
+`tools/generate_dashboard.py` writing `docs/dashboard.md`:
+
+1. **Headline:** natural-C % and bytes for EUR / USA / JPN. REUSE the
+   state-table generator's own parser — do not re-implement the metric (the
+   standing rule from the metric-extern-guard incident: read the metric's own
+   source, reuse its parser). State in the PR which function you reused.
+2. **Trend:** the committed git history of `docs/state-table.md` IS the time
+   series — walk `git log --follow -p` (or `git show <sha>:...` per commit)
+   and emit a compact per-round table or sparkline of natural-C bytes. No new
+   bookkeeping files; history is the database.
+3. **Remaining pools by band:** reuse `wall_aware_headroom.scan()` (and the
+   pool-freshness tool once it merges — check whether it landed and say which
+   you used) for the candidate bands the campaign actually dispatches on
+   (≤192 B, 193–256, 257–320, 321–384, ≥4 `bl` variants). Every figure
+   stamped with the command that reproduces it.
+4. **Data readability:** `progress.py summarize_data_readability` typed-array
+   / named-struct bytes, plus the remaining zero-reader-pool estimate.
+5. **The honest ceiling:** one short section linking
+   `docs/research/rnd-swarm-2026-07-24-r8.md` (the measured-ceiling
+   reclassification) and `docs/research/post-small-pool-strategy.md` (the
+   decision memo) — the dashboard must carry the calibration, not just the
+   good news.
+6. **Freshness guard:** mirror the existing
+   `test_generate_state_table.py::TestCommittedTableIsCurrent` mechanism so a
+   stale committed dashboard fails the suite. Do NOT invent a new drift
+   mechanism; copy the one that already works. No hardcoded counts, SHAs, or
+   row totals in the test — assert shape, not cardinality (the class is
+   0-for-3; see #1499/#1505/#1520).
+
+Regenerate `docs/research/README.md` LAST if you touch research docs. Tooling
+budget clause: consolidates duplicated infrastructure (the brain's per-round
+hand-derivations) and measurably cuts cycle time.
+
+**Gate:** full `python tools/gate3.py --scope tests` green (paste the tail) +
+the committed `docs/dashboard.md` regenerated at HEAD + markdownlint clean +
+every dashboard number annotated with its reproducing command. This item needs
+no ROM build — if you find yourself running `ninja`, you have left scope.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
+report.

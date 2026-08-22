@@ -733,3 +733,48 @@ Two separable things; do both:
 clean + a test that shows the old behaviour would have reported "no functions"
 for a deliberately-broken objdump stub and the new behaviour reports the launch
 failure. Red-first, per control 7. Build-free.
+
+### q-worktree-gc — safe, repeatable cleanup of stale sweep worktrees [TODO]
+
+The Windows PC has accumulated 20+ registered worktrees from finished sweeps
+(`wfs1-batch1..5`, `sweep17-batch*`, `fix-14xx`, the codex-port series), all on
+long-merged branches, plus a second population of ORPHANED directories that look
+like checkouts but are no longer registered with git at all. The Mac
+accumulates the same. Manual cleanup happened in round 0822b; this item makes it
+repeatable and safe, because ad-hoc `rm -rf` of a directory that MIGHT hold
+unpushed work is exactly the kind of destructive shortcut this project bans.
+
+Build `tools/worktree_gc.py`:
+
+1. Read `git worktree list --porcelain` and classify every entry:
+   - **KEEP** — a standing lane worktree. The keep-set is the five standing
+     names (`brain`, `decomper`, `scaffolder`, `kb-map`, `kb-types`) plus
+     anything passed via `--keep`; match on basename, not full path, so the
+     same tool works on the Mac layout.
+   - **REMOVABLE** — branch fully merged into `origin/main` (verify with
+     `git merge-base --is-ancestor`, not name-matching), working tree clean
+     (`git -C <wt> status --porcelain` empty), not locked.
+   - **HELD** — dirty tree, unmerged branch, or locked: report with the reason,
+     never touch.
+2. Default mode is REPORT ONLY. `--prune` executes `git worktree remove`
+   (never `--force`) on REMOVABLE entries and prints each removal.
+3. Directories under the repo parent that look like worktrees but are NOT
+   registered (stale checkouts whose metadata was pruned): REPORT with path and
+   size, never delete. A human deletes those, with the report in hand.
+
+Unit-test against synthetic temp repos (create real worktrees with subprocess
+git; no baserom needed). Show the dangerous cases red-first: a dirty worktree
+and an unmerged branch must both classify HELD even when `--prune` is passed —
+demonstrate the test failing against a deliberately-broken classifier before
+your fix, per AGENTS.md control 7. Tooling budget clause: catches a
+demonstrated failure class (destructive cleanup of possibly-unpushed work) and
+measurably cuts cycle time (round 0822b's manual audit of 20+ worktrees).
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + a real
+REPORT-mode run on this machine pasted (it should classify the five standing
+worktrees KEEP). Build-free — fits kb-map.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-decomper q-worktree-gc`; commit; then take the
+next queue item immediately.
