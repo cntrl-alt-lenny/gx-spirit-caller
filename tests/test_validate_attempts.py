@@ -40,7 +40,7 @@ def test_contradiction_families_are_detected() -> None:
 def test_new_legitimate_c_lever_ship_stays_green() -> None:
     report = _audit(_row(result="shipped", match_pct="100", park_class="C-99"))
     assert len(report.shipped_with_c_lever) == 1
-    assert report.error_count == 0
+    assert not report.error_count
 
 
 def _assert_c_lever_exemption_shape(report: validate_attempts.Audit) -> None:
@@ -84,7 +84,7 @@ def test_committed_ledger_has_no_hard_validation_errors() -> None:
         Path(__file__).resolve().parents[1]
         / "docs/research/campaign-analytics/attempts.tsv"
     )
-    assert report.error_count == 0
+    assert not report.error_count
 
 
 def test_committed_ledger_c_lever_exemption_is_property_shaped() -> None:
@@ -93,7 +93,7 @@ def test_committed_ledger_c_lever_exemption_is_property_shaped() -> None:
         / "docs/research/campaign-analytics/attempts.tsv"
     )
     _assert_c_lever_exemption_shape(report)
-    assert report.error_count == 0
+    assert not report.error_count
 
 
 def test_ship_coverage_requires_a_shipped_event_for_each_flip() -> None:

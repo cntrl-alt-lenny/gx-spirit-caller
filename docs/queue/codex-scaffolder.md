@@ -845,7 +845,7 @@ tools/work_queue.py done codex-scaffolder q-kickoff-lint-canary-check`; commit;
 then take the next queue item immediately.
 
 
-### q-kickoff-lint-sha-brittleness — your linter is right; its own test contains the bug it exists to catch [TODO]
+### q-kickoff-lint-sha-brittleness — your linter is right; its own test contains the bug it exists to catch [DONE]
 
 **The work in #1520 is good and it is not being thrown away.** `check_referenced_paths`,
 `check_referenced_commits` and `check_platform_coherence` are the right three
