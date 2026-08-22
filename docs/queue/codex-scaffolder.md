@@ -916,6 +916,29 @@ generalise twice.
 3. **Re-open #1520** with the fix on top, or open a fresh PR that supersedes it —
    your call, say which. The three new checks ship in the same PR; there is no
    reason to split them.
+4. **New, and it is the brain's own bug — a location guard that asserts but never
+   establishes.** On 2026-08-22 both Codex kickoffs of round 0822 carried a
+   correct `$EXPECT` / `git rev-parse --show-toplevel` guard, and both lanes
+   STOPped instantly with `WRONG WORKTREE` having done nothing. They were right:
+   a Codex CLI session starts in `C:/Users/leona/Dev/gx-spirit-caller`, the
+   **parent** directory, which is not a git worktree at all — its `.git` holds
+   only `info/`, so `git rev-parse --show-toplevel` prints nothing and the
+   comparison correctly fails. The kickoff asserted a location it never navigated
+   to. That is a full round of void work from a kickoff passing every existing
+   check, and it is the same shape as the incident in the parked item above, one
+   layer over: there the canary was present but impossible, here the guard is
+   present but unreachable.
+
+   Add the check: **if a kickoff contains a location guard, it must also contain a
+   directory-establishing command for that same path, positioned before the
+   guard.** `cd <path>`, `Set-Location <path>`, `git -C <path>`, or a
+   `git worktree add` of that path all count. A guard with no preceding
+   establishment is a required failure. Keep it textual and mechanically decidable
+   from the kickoff alone, like your other three — do NOT try to verify the path
+   is a real worktree on the linting machine, because kickoffs are written on one
+   host for another and that check would be wrong by construction. The regression
+   fixture is this incident: the round-0822 Codex kickoff as actually sent (must
+   FAIL) and the same kickoff with `Set-Location` prepended (must PASS).
 
 **Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
 tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + **the four
