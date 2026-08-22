@@ -385,7 +385,7 @@ Layout follows dqix (https://github.com/StanHash/dqix), with two project- specif
 
 ### `tools/download_tool.py`
 
-**(no docstring)**
+**Download the project's external tools and verify extracted executables.**
 
 ### `tools/generate_briefs_index.py`
 

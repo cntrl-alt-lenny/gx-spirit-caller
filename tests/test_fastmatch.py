@@ -239,6 +239,34 @@ class TestMissingFile(unittest.TestCase):
         self.assertEqual(result["region"], "jpn")
 
 
+class TestObjdumpExecution(unittest.TestCase):
+    def test_launch_failure_is_not_reported_as_no_functions(self):
+        completed = subprocess.CompletedProcess(
+            args=["stub-objdump"],
+            returncode=1,
+            stdout="",
+            stderr="Library not loaded: libzstd.1.dylib",
+        )
+        with mock.patch.object(fastmatch, "ninja_compile_one", return_value=(True, "")), \
+             mock.patch.object(fastmatch, "_OBJDUMP", "stub-objdump"), \
+             mock.patch.object(fastmatch.subprocess, "run", return_value=completed):
+            result = fastmatch.match_one(Path("src/main/func_X.c"), "eur")
+
+        self.assertEqual(result["status"], "objdump_error")
+        self.assertIn("Library not loaded: libzstd.1.dylib", result["error"])
+        self.assertNotEqual(result["status"], "no_functions")
+
+    def test_successful_empty_objdump_output_is_an_execution_error(self):
+        completed = subprocess.CompletedProcess(
+            args=["stub-objdump"], returncode=0, stdout="", stderr=""
+        )
+        with mock.patch.object(fastmatch, "_OBJDUMP", "stub-objdump"), \
+             mock.patch.object(fastmatch.subprocess, "run", return_value=completed):
+            with self.assertRaises(fastmatch.ObjdumpError) as raised:
+                fastmatch.list_funcs_in_obj(Path("func.o"))
+        self.assertIn("produced no output", str(raised.exception))
+
+
 class TestFindGapByDelinkedObject(unittest.TestCase):
     """q-fastmatch-sweep-friction gap (a): cm-ov002-unknown-sweep's 5-worktree
     sweep (PR #1363) found gap-object auto-discovery reliably empty-handed

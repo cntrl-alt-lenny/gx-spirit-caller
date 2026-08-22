@@ -677,7 +677,7 @@ canary above + `git diff` demonstrating only comment-prefixed lines changed in
 `src/`. This worktree is build-free — the brain runs the 3-region ROM gate at
 integration.
 
-### q-batch-sha1-stale-s — the apply step leaves the superseded `.s` on disk, silently [CLAIMED]
+### q-batch-sha1-stale-s — the apply step leaves the superseded `.s` on disk, silently [DONE]
 
 Reported as a defect by `cm-main-exploit-drain-1` (#1524), confirmed **twice** in
 one round, in two different situations:
@@ -705,7 +705,7 @@ the project actually ships (`.c`, `.legacy.c`, `.legacy_sp3.c`).
 **Gate:** `pytest -q tests` + `unittest discover -s tests` both green (paste real
 tails) + `ruff check` clean + the two red-then-green transcripts. Build-free.
 
-### q-fastmatch-error-masking — a crashed objdump is reported as "no functions in compiled .o" [TODO]
+### q-fastmatch-error-masking — a crashed objdump is reported as "no functions in compiled .o" [DONE]
 
 Also from #1524, and it cost that round real time. A freshly downloaded
 `arm-binutils` produced an `arm-none-eabi-objdump` that **crashed on launch**
