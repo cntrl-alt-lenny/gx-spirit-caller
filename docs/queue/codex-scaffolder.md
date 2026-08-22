@@ -952,6 +952,52 @@ then take the next item immediately.
 
 ### q-pool-freshness-tool — every wave's kickoff cites a stale pool number, and it keeps costing rounds [TODO]
 
+⚠️ **RE-TAKE, 2026-08-22 (round 0822c). PR #1534 was HELD — the tool is
+arithmetically correct and one default is wrong, which is worse than a bug
+because the wrong answer arrives stamped with authority.**
+
+`_wall_bl4_pool()` defaults to `module="main"`. The `wall-bl4-small` pool is
+**full-EUR, all modules** by definition — that is how `cm-main-exploit-drain-1`
+enumerated it and how the brain re-derived it. Brain ran your own tool three
+ways on the same tree:
+
+```text
+module='main'   -> count=3   bytes=440
+module=None     -> count=34  bytes=5224      <-- the known-answer case, EXACT
+module=''       -> count=0   bytes=0         <-- silent empty, no error
+```
+
+**With the right scope your tool reproduces 34 / 5,224 B exactly.** It works.
+But because the default narrowed the population to `main`, the PR concluded
+that the round-0822 `34 / 5,224 B` figure was *stale on this tree*. It was not
+stale — it was correct, and it still is. A scope mismatch got reported as
+staleness, which is precisely the inference this tool exists to make
+impossible.
+
+Fix, and keep everything else — the delegation design, the reproducer-command
+stamping, and `--check-queue` are all right:
+
+1. `wall-bl4-small` measures **all modules** by default. If you want a
+   per-module view, keep it as an explicit opt-in (`--module main`), never the
+   default.
+2. `module=""` must raise or be rejected at the CLI, not silently return zero.
+   A pool oracle that can quietly answer "nothing left" is the most dangerous
+   possible failure for this tool.
+3. Re-run both known-answer cases and paste them. `wall-bl4-small` must print
+   **34 / 5,224 B** at `origin/main` as of round 0822's merge-base (it moves as
+   the CC Decomper drains — reconcile against the drain PR's ledger rather than
+   assuming the literal 34, and say which commit you measured at).
+4. Add a regression test that the default scope is all-modules: assert the
+   default count is **strictly greater than** the `--module main` count on the
+   live tree. Assert the *shape* of that relationship, not either literal
+   number — those move every round (0-for-3 class; #1499/#1505/#1520).
+5. The `data-string-pool` `0 / 0 B` reading is **correct** and needs no change:
+   `cm-restock-carve-9` shipped that pool in full. Say so explicitly rather
+   than filing it alongside a stale-figure finding.
+
+Everything below is the original item, still in force.
+
+
 This is a recurring, measured failure — not a hypothesis:
 
 - `cm-restock-carve-9` was dispatched citing a **1,076-symbol** pool. A fresh
