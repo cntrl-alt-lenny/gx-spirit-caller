@@ -1546,3 +1546,99 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief
 0x021b611c	ov017	192	default	9-slot-dual-table-clear-strength-reduction	parked	70.8	strength-reduction	C-65	cm-main-wall-filtered-sweep-1-batch5
 0x021cbe8c	ov003	124	default	3-state-dispatch-switch-value-register	parked	87.1	P-4	P-4	cm-main-wall-filtered-sweep-1-batch5
 0x021b2630	ov007	100	default	field-reset-two-mov-order-swap	parked	92.0	P-36	P-36	cm-main-wall-filtered-sweep-1-batch5
+0x02004fe8	main	160	default	state-bracket forwarder: flag-set call, 7-arg dispatch w/ callback, flag-clear call, 7-arg dispatch w/ different callback	shipped	100	n/a		cm-main-exploit-drain-1-canary
+0x02006524	main	132	default	system-tick forwarder: 2 struct field updates (flags OR, counter++) + 1 far-offset (0x3ff8) MMIO-shadow bit-set + 3 conditional callback dispatches + 1 tail call; mwcc always folds symbol+large-constant-offset into a single relocated pool word (eliding the target's separate add r0,r0,#0x3000); tried direct expr / split pointer var / volatile pointer / const-index array struct, all fold identically	parked	6.1	address-fold	PROVISIONAL:address-fold	cm-main-exploit-drain-1-batch1
+0x0200ac60	main	172	default	C-34 dup-pool-word candidate (2 accesses of data_02186a58 at offset 0); literal-address-cast lever DOES split the pool correctly and DOES fix the branch-polarity (goto matches target's real-branch else-block instead of predicating it), but the repeatedly-dereferenced global's base address never gets promoted to a callee-saved register (target uses r4 across 4 calls; mine always rematerializes from the literal pool in r0/r3 after every bl) -- tried literal-cast-for-p, symbol-for-p+literal-for-single-use, and reduced-temp-count, all identical register choice	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch1
+0x0201a498	main	68	default	GetSystemWork guard + tail-call chain + conditional bit10-test-then-set-and-notify; near-miss (17w/17w, structurally perfect, byte-identical except a pure r0/r1 register-letter swap on the single-bit test-and-preserve idiom); tried plain int, unsigned int, union-of-bitfield (caused an extra stack spill), inline-assignment-in-condition, and declaration-order swap -- all 7 variations produced the identical r1=value/r0=shift-scratch allocation, target wants the opposite	parked	76.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch1
+0x0201c5b4	main	152	default	GetSystemWork side-effect call + 2-byte-unrolled 19-iter copy loop (data table -> stack buf) + gated byte-scan validation loop (2nd loop matches target byte-for-byte); the COPY loop's register choice (r4/dst-fused-cmp vs target's r2/r3 + fused subs+bne) is completely unresponsive to restructuring -- do-while(--count) vs for-loop, indexed vs pointer-post-increment, with/without temp locals, and scope-isolating the loop's locals into a nested block all produced byte-IDENTICAL (wrong) output	parked	15.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch1
+0x02029c80	main	192	default	4-arg dispatcher: bit2-selected field (0x84 vs 0x90) & 1 -> flag, gated by field_18c!=0 into 2x2 branch matrix each calling a different 3-callee sequence, converging on a shared tail; near-miss (48w/48w) -- goto+shared-tail fixed a genuine branch-polarity divergence (bne vs beq) cleanly, but a residual p1/p2/p3 callee-saved-register CACHING-ORDER divergence (target defers r5/p2's cache to right before first use, mine caches all 3 args immediately) resisted 3 further variations (explicit early a1/a3 + late a2 locals, reordered declarations, flag-computed-first) -- same resistant-register-letter class as func_0201a498 and func_0201c5b4 this batch	parked	83.3	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch1
+0x02008f24	main	148	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0200dd58	main	108	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x02011aec	main	76	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x02017a98	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0201816c	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0201bd30	main	172	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0201f6c0	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0201fc6c	main	96	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0201fd24	main	160	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x020202ac	main	172	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x02020550	main	156	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x020206d8	main	96	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0202b294	main	136	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x0202ba94	main	80	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch1
+0x020327e4	main	128	default	loop count/index register-role swap (r4<->r6), 3 declaration-order variants tried, C-56-style but resistant	parked	71.9	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch2
+0x0203ba24	main	124	default	6th-param(2nd stack slot) pointer eagerly materialized before an early-return check; target defers the load past the branch, 3 variants tried (typed struct, raw ptr-cast, offset fix) all reproduce identical scheduling	parked	83.9	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch2
+0x0203eca4	main	136	default	4-byte sum: mwcc reuses r2 for the last byte load (c8-then-cb register reuse) in target; 4 expression-order/temp variants all landed on r12/ip instead for that one load, best 94.1% (2/34 words)	parked	94.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch2
+0x0203467c	main	192	default	2-word {a,b} pair return (4 divergent return sites, one forwarding a callees own 2-word return): a 2-int STRUCT return type makes mwcc spill the whole aggregate to the stack (sub sp #32+) across every site; switching to a genuine long long fixed the spill (0%->7.4%, 54w vs 48w target) but per-site register construction order (which field loads first) still does not match target on the early-return site; 5 real variants tried (struct, compound-literal, long-long+shift/or macro x2 operand orders, union-of-longlong+struct which reintroduced the spill)	parked	7.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch2
+0x0203dc10	main	132	default	target if-converts a 4-insn if(r==1){*p=0;return 1;} block (moveq/strbeq/moveq/popeq, no branch) that mwcc never if-converts from equivalent source in 2 variants (sequential-if, negated-if-else); inverse of documented P-31 (there mwcc over-predicates; here it under-predicates vs target). unsigned-vs-signed compare type fix (bhi vs bgt) landed cleanly on the outer guard though.	parked	16.7	predication	PROVISIONAL:predication/branch	cm-main-exploit-drain-1-batch2
+0x0202befc	main	148	default	3-variable cyclic register-role rotation (type/extra/off get r5/r7/r6 in mine vs r7/r6/r5 in target); target computes type directly into its permanent r7 with zero temp-register use, mine always routes through a scratch reg (r1) first regardless of declaration order — 2 declaration-order permutations tried, both produced the identical wrong mapping	parked	13.2	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch2
+0x0202c334	main	148	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0202d4a8	main	176	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02031d0c	main	116	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02032a34	main	144	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02033554	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02033944	main	144	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02037d28	main	152	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02038c98	main	148	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203a8dc	main	116	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203cb40	main	80	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203db70	main	160	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203e254	main	156	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203e8b8	main	164	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x0203ec1c	main	136	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch2
+0x02041e18	main	136	default	hard-to-encode pointer-offset constant reused across if/else branches: mwcc picks a 2-ADD register-cached decomposition instead of the original's literal-pool recompute-per-call-site	parked	44.1	instruction-selection	PROVISIONAL:instruction-selection	cm-main-exploit-drain-1-batch3
+0x020532f4	main	136	default	0x404-byte stack-frame size constant: mwcc decomposes into two immediate subs instead of the original's literal-pool-loaded register sub	parked	79.4	instruction-selection	PROVISIONAL:instruction-selection	cm-main-exploit-drain-1-batch3
+0x0205cb14	main	164	default	two-condition guard (result==0 && field==const) on a single simple call always collapses to predicated ldreq/cmpeq regardless of source form (&&, nested-if, goto early-exit); original uses genuine separate branches	parked	36.6	predication	PROVISIONAL:predication/branch	cm-main-exploit-drain-1-batch3
+0x020639c8	main	132	default	commutative add of two struct-field loads (obj->f_44 + item->f_0) feeding a call arg: mwcc splits the pair across ip/r2 opposite to the original regardless of declaration/read/addition order tried	parked	93.9	register-choice	PROVISIONAL:register-choice	cm-main-exploit-drain-1-batch3
+0x02067354	main	136	default	same predication wall as func_0205cb14: two-condition guard (field!=-1 && field2!=0) on a single call collapses to ldrne/cmpne regardless of source form	parked	26.5	predication	PROVISIONAL:predication/branch	cm-main-exploit-drain-1-batch3
+0x02068a20	main	148	default	call-argument setup (mov r0,<arg>) for an early-return fallback call gets hoisted before its guarding branch instead of placed inside the branch's own block; resists goto restructuring	parked	24.3	instruction-selection	PROVISIONAL:instruction-selection	cm-main-exploit-drain-1-batch3
+0x0203edd4	main	192	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0203eefc	main	108	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0203f030	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0203f544	main	76	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x02043b70	main	108	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x02043c28	main	124	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0204b0d0	main	100	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0204b300	main	112	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x02057730	main	168	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x020643ec	main	148	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0206b590	main	88	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0206b670	main	76	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0207113c	main	116	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x0207d1e8	main	140	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch3
+0x020856a0	main	124	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x02088070	main	76	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x020887a0	main	124	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0208881c	main	88	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0208a000	main	156	legacy_sp3	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209bc64	main	120	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209c1dc	main	164	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209d3dc	main	92	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209d55c	main	120	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209dcb8	main	120	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209e450	main	168	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209e710	main	120	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209ee20	main	112	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209f070	main	104	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209f1b0	main	108	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209f21c	main	140	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x0209f698	main	136	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch4
+0x02237434	ov002	180	default	byte0/byte1 extract + func_ov002_021c848c round-div-by-2 feeding func_ov002_021df818; single scheduling-only 2-instruction reorder (add-with-shift vs ldrh) resists restructuring, all else byte-exact	parked	86.7	scheduling-diff	P-36	cm-main-exploit-drain-1-batch5
+0x02248ab0	ov002	172	default	(player&1)*0x868 row-offset guard+do-while scan; mask/product register-letter swap in the mla-adjacent and+mul pair, unmovable via operand-order/negation rephrasing	parked	59.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch5
+0x0224ca08	ov002	188	default	same (player&1)*0x868 row-offset family as func_ov002_02248ab0, extra func_0202b8a8 guard; identical mask/product register-letter wall	parked	62.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch5
+0x0224fcd4	ov002	192	default	same (player&1)*0x868 row-offset family, gated by an a2!=0 early dispatch (if/else polarity fixed, 6%->53.1%); same residual mask/product register-letter wall as func_ov002_02248ab0	parked	53.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-1-batch5
+0x0224c4e8	ov002	148	default	(player&1)*0x868 row base + mla combined with a second idx<<2 index -- the confirmed P-20 idiom shape; matches codegen-walls.md's flagged 'first-statement' sub-variant (prior 83.8%), mask/base register-letter wall	parked	81.6	P-20-family	P-20	cm-main-exploit-drain-1-batch5
+0x0224db94	ov002	144	default	same P-20-idiom sub-variant as func_ov002_0224c4e8 (codegen-walls.md prior 83.3%), mask/base register-letter wall	parked	81.1	P-20-family	P-20	cm-main-exploit-drain-1-batch5
+0x020a0630	main	128	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a08f4	main	132	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a0e9c	main	156	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a323c	main	168	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a342c	main	180	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a3a2c	main	136	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a53e4	main	116	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a5894	main	136	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020a5e90	main	128	legacy	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x021faab4	ov002	192	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x0221b4f0	ov002	188	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x02225274	ov002	128	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x0222daa4	ov002	172	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5

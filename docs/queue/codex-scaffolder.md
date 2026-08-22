@@ -792,7 +792,9 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-ci-runner-parity`; commit; then take
 the next queue item immediately.
 
-### q-kickoff-lint-canary-check — the linter passes kickoffs whose canary is impossible to run [TODO]
+### q-kickoff-lint-canary-check — the linter passes kickoffs whose canary is impossible to run [PARKED]
+>
+> PARKED: Delivered in PR #1520 and the three new checks are correct (brain reproduced the incident canary red/green independently). HELD not merged: tests/test_kickoff_lint.py hardcodes commit 3afd6df27c... which is a bad object in the shared repo, so the suite is red everywhere except the machine it was written on. Superseded by q-kickoff-lint-sha-brittleness.
 
 `tools/kickoff_lint.py` exists because a bad brain→worker handoff becomes fact
 for the next layer. It currently checks that a CANARY is *present*. It does not
@@ -842,6 +844,89 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-kickoff-lint-canary-check`; commit;
 then take the next queue item immediately.
 
+
+### q-kickoff-lint-sha-brittleness — your linter is right; its own test contains the bug it exists to catch [TODO]
+
+**The work in #1520 is good and it is not being thrown away.** `check_referenced_paths`,
+`check_referenced_commits` and `check_platform_coherence` are the right three
+checks, the `git show <rev>:<path>` history escape is exactly the right escape,
+and the brain reproduced your incident canary independently rather than taking
+your word for it:
+
+```
+kick_bad.md  -> failing: ('referenced-paths',
+   'referenced command path(s) missing at HEAD — line 6: src/main/func_0209e628.s')
+kick_good.md -> failing: []     # same kickoff via `git show 010616b65^:...`
+```
+
+Red on the impossible canary, green on the history form. That is control 7
+satisfied on the brain's own machine, not on your report of it.
+
+**#1520 is HELD, not merged, for one reason.** In
+`tests/test_kickoff_lint.py`, `ROUND_0818B_DISPATCHES` hardcodes four commit
+SHAs. Three are real merged commits. The fourth is not:
+
+```
+3bdded495  RESOLVES -> cm-restock-carve-9: shape-filtered string pool ships in full
+272a84a4c  RESOLVES -> cm-main-wall-filtered-sweep-1: pre-dispatch wall detector
+972306ed4  RESOLVES -> Backfill shipped attempts and enforce round coverage
+3afd6df27  *** BAD OBJECT — does not exist in this repo ***
+
+$ git branch -a --contains 3afd6df27c4119906a6895be605d6cfa87590493
+error: no such commit
+```
+
+Consequence on the integration tree:
+
+```
+AssertionError: Lists differ: ['referenced-commits'] != []
+SUBFAILED ... TestGoodKickoff::test_reconstructed_round_0818b_dispatches_still_pass
+1 failed, 27 passed
+```
+
+`3afd6df27...` is a machine-local object. It exists in the worktree you ran in
+and nowhere in the shared repository — which is why your run was green and every
+other machine's is red. **The tool built to catch a canary that cannot run
+elsewhere shipped a test that cannot run elsewhere.** That is not an insult; it
+is the cleanest possible demonstration of why the tool needed to exist, and it is
+the reason this is a follow-up item rather than a brain fix at merge.
+
+**It is also the third round running.** #1499 killed cardinality assertions
+against the live ledger ("assert the SHAPE of the exemption, not its
+cardinality"); #1505 was held when a different lane wrote four fresh hardcoded
+counts into a different file; this is the same class in a third file, with a
+commit SHA instead of a count. A per-file fix has now demonstrably failed to
+generalise twice.
+
+**Scope:**
+
+1. **Make the fixture self-sourcing.** Derive the reconstruction commits from the
+   repo at test time — e.g. `git log -1 --format=%H -- <the tool path>` for each
+   label, or a `git rev-parse HEAD`-anchored form. No literal SHA survives in the
+   test. If a derivation legitimately finds nothing, `skipTest` with the reason
+   rather than asserting against a value you invented.
+2. **Generalise the guard, since per-file fixes have not held.** Add a check that
+   fails when a test file asserts against a hardcoded 40-hex commit SHA, a live
+   ledger row count, or an equivalent repo-state constant. Scope it so it does
+   not fire on legitimately-frozen historical references (the `010616b65^` in the
+   incident escape is correct and must stay legal) — the distinguishing property
+   is whether the constant is *asserted against* versus *used as an input*. If
+   you conclude that line cannot be drawn mechanically, say so with what you
+   tried; a well-argued negative here is worth more than a guard that cries wolf.
+3. **Re-open #1520** with the fix on top, or open a fresh PR that supersedes it —
+   your call, say which. The three new checks ship in the same PR; there is no
+   reason to split them.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + **the four
+reconstructions passing on a machine that has never seen your local commits** —
+demonstrate that by deriving them, not by picking four SHAs that happen to exist
+today + the new brittleness guard shown RED on a deliberately-hardcoded fixture
+before it goes green.
+
+`python tools/work_queue.py done codex-scaffolder q-kickoff-lint-sha-brittleness`;
+then take the next item immediately.
+
 ### q-pool-freshness-tool — every wave's kickoff cites a stale pool number, and it keeps costing rounds [TODO]
 
 This is a recurring, measured failure — not a hypothesis:
@@ -876,12 +961,25 @@ rather than by the lane mid-round.
 A second, differently-defined notion of "the pool" would create exactly the
 disagreement this item exists to end.
 
+**A second known-answer case, added 2026-08-22.** The brain re-derived
+`cm-main-exploit-drain-1`'s pool at round 0822's `main`, reusing
+`wall_aware_headroom.py`'s own `scan(max_size=192, exclude_attempted=True)` plus
+a `>=4 bl/blx` body filter: **34 candidates / 5,224 B** (32 drainable once the two
+documented-permanent P-25/P-21 files are excluded — 4,916 B). That reconciles
+exactly with #1524's own 28-reserve + 4-not-reached + 2-swapped-out account. This
+is the `wall_aware_headroom.py` bucket shape, so it is squarely in scope, and
+unlike the 689 case it comes with the definition's `bl`-count half — which no
+committed tool currently expresses. Expressing it is the point.
+
 **Gate:** `python3.13 -m pytest -q tests` green (paste the real tail) AND
 `python3.13 -m unittest discover -s tests` green (paste `Ran N tests` and `OK`) +
 `ruff check` clean + the tool reproducing **689** for the `string,string-ascii4`
-pool that `cm-restock-carve-9` corrected (that is the known-answer case — if you
-cannot reproduce it, say so with what you got rather than adjusting the target) +
-the staleness check demonstrated firing on a deliberately-stale figure.
+pool that `cm-restock-carve-9` corrected AND **34 / 5,224 B** for the
+`<=192 B, >=4 bl, unattempted` pool above (those are the two known-answer cases —
+if you cannot reproduce either, say so with what you got rather than adjusting the
+target; note the second moves as the CC Decomper drains it, so re-derive at your
+own `main` and reconcile, don't assume the literal 34) + the staleness check
+demonstrated firing on a deliberately-stale figure.
 
 ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-pool-freshness-tool`; commit; then

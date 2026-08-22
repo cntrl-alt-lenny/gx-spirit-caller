@@ -8,7 +8,133 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
-**Last updated:** 2026-08-18 — **(Mac M1, brain=Fable 5; roster unchanged.)
+**Last updated:** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0822: the exploit round landed at 73/100 and settled the pool-vs-selector
+question for good — but it also drained the pool it was exploiting down to 32
+candidates. The next question is no longer "which selector"; it is "where does
+this pool's boundary actually sit".**
+
+Merged **#1524** (`cm-main-exploit-drain-1`) and **#1522** (`cm-toolchain-adopt-2`).
+**Held #1520** (`q-kickoff-lint-canary-check`). Codex Decomper's queue was found
+empty; all four lanes are re-seeded.
+
+⚠️ **Transcript audit — this round it could not be done, and that is stated
+rather than papered over (AGENTS.md control 12).** Round 0819 was dispatched from
+the **Mac**; this brain is on the **Windows PC**. `mcp__ccd_session_mgmt__*` lists
+no `gx-spirit-caller` session on this machine, and the newest local
+`~/.codex/sessions/**/rollout-*.jsonl` is dated 2026-07-12. **Zero of the four
+lanes' transcripts were readable here.** Every judgement below therefore rests on
+repository state, the PR bodies as *claims*, and the brain's own re-derivations —
+which is why more of this round's review than usual is independent measurement.
+Nothing was inferred from a branch's appearance. (This is the same
+machine-locality trap that produced the wrong "three missed rounds" reading in
+round 0817 and was corrected in #1504.)
+
+**#1524 `cm-main-exploit-drain-1` — 73/100, and every load-bearing number
+re-derived independently.** Not accepted from the PR body:
+
+| Claim | Brain's independent check |
+|---|---|
+| 73 shipped / 23 parked | ledger diff vs `origin/main`: **96 new rows, 73 `shipped` + 23 `parked`** |
+| 9,488 B | sum of `text_size` over the 73 shipped rows: **9,488** |
+| 73 `.c` added == 73 `.s` deleted | `git diff --name-status`: **73 A `.c`, 73 D `.s`** |
+| zero `asm` escapes | grep for `asm` / `__asm` / `GLOBAL_ASM` over all 73: **no hits** |
+| P-23 downgraded | `codegen-walls.md`: **"LIVE (tentative — was confirmed, downgraded 2026-08-18)"** |
+| 28 in reserve | reconciles exactly — see the pool re-derivation below |
+
+Per-brief row counts reconcile against the round's own "4 not reached" account
+(canary 1 + b1 19 + b2 20 + b3 20 + b4 17 + b5 19 = 96). The round corrected the
+catalog *against itself* (P-23 confirmed → tentative after a listed member shipped
+clean via an unrelated fix), filed **C-95** (bit-packed fields need a real C
+bitfield; a manual mask/shift always collapses to one instruction), and reported
+three real tooling defects as defects rather than quirks — `batch_sha1.py` leaving
+superseded `.s` files on disk, `fastmatch.py` masking an objdump launch crash as
+"no functions in compiled .o", and `wall_aware_headroom.py`'s citation-trust blind
+spot. All three are now queued to the Codex Decomper.
+
+**THE HEADLINE — the pool-vs-selector question is closed, and the pool is nearly
+empty.** Three rounds now: sweep-7 34-36%, #1508 60.8%, #1524 **73%**. The
+variable was never a selector; it was the pool definition (full EUR, `.text`
+≤192 B, ≥4 `bl`/`blx`, unattempted). But the brain re-derived that pool at this
+round's `main`, reusing `wall_aware_headroom.py`'s own `scan()` plus the `bl`
+filter, and it is **34 candidates / 5,224 B** — of which 2 are documented-permanent
+(P-25 `0x02212bc4`, P-21 `0x0224b01c`), leaving **32 drainable / 4,916 B**. That
+reconciles exactly with #1524's own account (28 reserve + 4 not-reached + 2 swapped
+out pre-dispatch). All 34 are `unknown_files`; none coercible.
+
+**So the next question is the pool's BOUNDARY, and it is measured, not guessed.**
+Same `≥4 bl` filter, same `--exclude-attempted`, one axis moved:
+
+| `.text` cap | candidates | bytes |
+|---|---:|---:|
+| ≤192 B | 34 | 5,224 |
+| ≤256 B | 298 | 64,784 |
+| ≤320 B | 581 | 146,464 |
+| ≤384 B | 781 | 217,016 |
+
+The 193-256 B slice alone is **264 candidates / 59,560 B**. This is *not* a third
+selector study — the standing ban is on selecting *within* a pool, and this asks
+where the pool stops. There is a real prior on the other side:
+`cm-main-tier-sweep-7` Part 2 (4+ calls, **200-376 B**) shipped **8/50 = 16%**.
+The 193-256 B slice is the bottom sliver of that band and has never been isolated.
+`cm-main-exploit-drain-2` dispatches 40 from it with the falsification test written
+down in advance: ≥50% ⇒ sweep-7 Part 2's 16% was a whole-band artifact and 59,560 B
+plus a 146 KB tail are open; ≤25% ⇒ the ~192 B cap is real and this campaign's
+small-function pool is genuinely near its end. Either answer redirects the lane.
+
+**#1522 `cm-toolchain-adopt-2` — DECLINE dsd v0.12.0, and the third attempt was
+the one that got the machine.** Scheduling it first worked exactly as intended: it
+found the Decomper's gate live, ran a bounded poll instead of reporting blocked,
+and had the wine lane clear in ~1 minute. The finding is real, not a contention
+report. v0.12.0's function-boundary analysis is *better* — it is the DECLINE cause
+anyway, because adopting it moves `ov000`'s `.text`/`.rodata` split by **0x5E0C
+(24,076 B)** and `ov004`'s by **0x22784 (141,700 B)**, reclassifying former rodata
+as real code (+52 genuine `kind:function` symbols in ov000 alone). Adopting means
+re-deriving the whole committed `config/eur/` tree — a project-wide re-bootstrap,
+not a pin bump. **Brain-verified the one claim the whole argument rests on:**
+`config/eur/arm9/overlays/ov000/delinks.txt` and `.../ov004/delinks.txt` on `main`
+today show `0x021af7d0` and `0x021de638` — exactly the lane's v0.11.0 baseline.
+The comparison was against reality, not a hypothetical. Separately real: v0.12.0
+restructured `config.yaml`'s two flat padding fields into an 11-key `padding:`
+block, so v0.11.0's `init` cannot parse a v0.12.0 extraction at all. The toolchain
+arc is now closed on all three legs — m2c **ADOPTED** (#1515), permuter
+**DECLINED** (#1512), dsd **DECLINED** (#1522).
+
+**#1520 `q-kickoff-lint-canary-check` — HELD, and the reason is almost too neat.**
+The work is right: three new checks (`referenced-paths`, `referenced-commits`,
+`platform-coherence`) with a `git show <rev>:<path>` history escape, and the brain
+reproduced the incident canary itself rather than trusting the report — red on the
+impossible form (`referenced-paths` firing on `src/main/func_0209e628.s`), green on
+the `git show 010616b65^:` form. Control 7 satisfied on this machine.
+
+**But `tests/test_kickoff_lint.py` hardcodes four commit SHAs and one of them —
+`3afd6df27c4119906a6895be605d6cfa87590493` — is a bad object in this repository.**
+`git branch -a --contains` returns `error: no such commit`. The other three are real
+merged commits. On the integration tree that is `1 failed, 3283 passed`, and the
+failure is `['referenced-commits'] != []` inside the tool's own fixture. It is a
+machine-local object: green where it was written, red everywhere else. **The tool
+built to catch a canary that cannot run elsewhere shipped a test that cannot run
+elsewhere.** Dropping #1520 from the integration cleared the failure and nothing
+else, confirming attribution — the same isolation that held #1505.
+
+**THE BRITTLENESS CLASS IS NOW 0-FOR-3.** #1499 killed cardinality assertions
+against the live ledger in `test_validate_attempts.py`. #1505 was held when a
+different lane wrote four fresh hardcoded counts into a different file. This is a
+third file, with a commit SHA instead of a count. Two per-file fixes have not
+generalised, so `q-kickoff-lint-sha-brittleness` asks for the *general* guard —
+fail any test that asserts against a hardcoded 40-hex SHA or a live repo-state
+constant — and explicitly accepts a well-argued negative if that line cannot be
+drawn mechanically.
+
+**Manifest-vs-practice drift, flagged not fixed.** `AGENTS.md` puts `tools/`
+in the Codex Decomper's *hands-off* column, but that lane's last ~20 items
+(`q-cascade-ci-quadratic`, `q-park-family-column`, `q-metric-canon-guard`, …) are
+all tooling. The practice is settled and productive; the manifest is stale. This
+round's Codex Decomper seed keeps the same shape. **cntrl_alt_lenny's call whether
+to widen the column or re-slice the lanes** — the brain is not re-partitioning
+agent scope on its own initiative.
+
+**Last updated (previous):** 2026-08-18 — **(Mac M1, brain=Fable 5; roster unchanged.)
 Round 0818: all four lanes delivered, and the second selector programme in a row
 returned null — while the round's own yield hit 60.8%, the best measured this
 campaign. The lever was never the selector; it was the pool.**
@@ -56,173 +182,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-**Round 0818 — merged #1505, #1506, #1507, #1508.**
-
-- **#1508 `cm-main-wall-filtered-sweep-1` — a clean null, honestly obtained.**
-  The lane built the P-51 detector (18/18 recall, 1/43 FP against sweep-7's
-  shipped negatives) and then **dispatched the flagged arm too**, which is what
-  makes the null trustworthy: flagged 11/19 (57.9%) vs passed 37/60 (61.7%),
-  Fisher p = 0.7927, holding in both main and overlay slices. It disclosed its
-  own pool deviation (19 flagged, not the planned 30) and declined to loosen the
-  threshold to hit the number. **P-51 fired zero times across 209 candidates**,
-  so the high-confidence half was never actually tested; the weaker
-  permutation-cascade proxy is what got measured. Brain-verified: 48 `.c` added
-  == 48 `.s` deleted, 7,128 B.
-- **#1507 `cm-restock-carve-9` — 694 files, +11,716 B typed-array, and it
-  corrected its own kickoff.** The brief cited a 1,076-symbol pool; a fresh tool
-  run gives **689**, and the lane treated its own measurement as authoritative
-  rather than the brain's number. 689/689 shipped. Reconciles exactly:
-  694 files = 689 + 4 + 1, and 11,716 B = 11,588 + 32 + 96.
-  **Part 2 killed a standing assumption:** the ~9,690-symbol "zero-reader" pool
-  is not reader-less — 100% of the 3,901 `main` `shape=string` symbols checked
-  have a real relocation from an *uncarved data pointer table*, invisible to
-  `data_worklist.py` because `build_call_graph` only follows function→data
-  edges. It also reported a real link failure it caused and the precondition
-  that fixes it (screen candidate names against `src/` first).
-- **#1506 `q-ledger-ship-coverage` — the ledger bias is closed.** 303 shipped
-  events backfilled by mechanical delinks derivation, `-backfilled` provenance
-  suffix, `shape`/`park_class` left empty rather than guessed. The demanded
-  canary reproduced the brain's independent sweep-7 figure **exactly** (43
-  functions / 8,116 B; ov004 8 / ov006 31 / ov011 4). A ship-coverage guard now
-  hard-errors a round that flips delinks without recording ships, and it runs in
-  `drift-check`, a required context.
-- **#1505 `q-park-class-normalisation` — HELD, not merged.** The work itself is
-  good: 283 raw values → 91 canonical families, and all three canary cases
-  correct (the register-numbering spellings collapse to P-30 with qualifiers
-  retained; `C-32` and `C-32-cross-overlay-bl` both → `C-32` with the qualifier
-  preserved; P-36 scheduling stays separate from P-30 register-choice). It also
-  held the hard constraint exactly — `attempts.tsv` untouched, which is why
-  #1506 could append 303 rows to the same file with zero conflict. **But its
-  test cannot survive its own campaign's ledger growth**, and the consolidated
-  gate caught it: `test_every_ledger_value_has_a_reviewed_mapping` asserts
-  `report["rows"] == 1164` against a live, append-only ledger that #1506 and
-  #1508 grew to **1,547** in this very round. Dropping #1505 from the
-  consolidation cleared the failure and nothing else, confirming the
-  attribution. `q-park-class-remap` is seeded to finish it.
-
-**THE BRITTLENESS LESSON DID NOT TRANSFER ACROSS LANES.** #1499
-(`q-validator-brittleness`) existed precisely to kill cardinality assertions
-against this ledger — "assert the SHAPE of the exemption, not its cardinality" —
-and it did, in `test_validate_attempts.py`. In the *same round*, a different
-lane wrote four fresh hardcoded counts (`rows`, `raw_distinct`,
-`family_distinct`, `parked_rows`) into a different file. A per-file fix does not
-generalise; the next round makes it a rule.
-
-**The deeper half of the same finding:** 10 distinct `park_class` values now
-have no mapping entry. Two are correct-by-design and must be *scoped out*, not
-mapped — `''` (303 backfilled shipped rows, empty by the brain's own
-instruction) and `n/a` (48 shipped rows); a shipped row has no park class. The
-other 8 are on parked rows, all from `cm-main-wall-filtered-sweep-1`: `P-4`,
-`P-17`, `P-20`, `P-36`, `P-42` and `OQ-1` are bare catalog anchors that want an
-identity rule, while `strength-reduction` and `tool-anomaly` need real taxonomy
-judgment. The brain did **not** guess those at merge — that is the lane's call.
-
-**Brain fix at merge:** #1506 added `import pytest` to
-`tests/test_validate_attempts.py`, which fails the `unittest` CI job outright —
-that job deliberately installs no third-party packages
-(`python -m unittest discover`, `ModuleNotFoundError: No module named 'pytest'`).
-Replaced with a stdlib try/except that preserves the assertion's meaning;
-mutation-checked that the vacuous-pass regression still fires. **Standing note:
-a lane whose gate is `pytest -q tests` can be green locally and still red in CI.
-Both runners matter.**
-
-**Two selector programmes have now returned weak-or-null back to back**, while
-simply dispatching a sane pool yields ~60%. `cm-main-exploit-drain-1` seeds the
-consequence: stop the selector science, drain the remaining ~130 of the 209
-qualifying candidates (full EUR, ≤192 B, ≥4 `bl`, unattempted).
-
-**Last updated (previous):** 2026-08-17 — **(Windows PC, brain=Opus 5; roster unchanged.)
-Round 0817: the properly-powered confirmation came back NULL, and both
-`main`-sweep and restock-carve reached the end of their current method.**
-EUR natural-C **16.49%** (393,402 B) / USA **11.84%** (282,428 B) / JPN **11.82%**
-(282,000 B) — from the regenerated state-table at the SHA below, not inherited.
-
-All four lanes delivered: **#1502** (`cm-main-tier-sweep-7`), **#1501**
-(`cm-restock-carve-8`), **#1500** (`q-shape-classifier-bicne`), **#1499**
-(`q-validator-brittleness`).
-
-**CORRECTION (Mac brain, 2026-08-17) — the "three missed rounds" reading in this
-round's original note was wrong, and the correct version matters operationally.
-The Codex lanes never missed a round and the dispatch path was never broken.**
-Rounds 0810-0814 were dispatched from the **Mac**, into Mac worktrees
-(`~/Dev/spirit-caller/codex-decomper-queue` / `codex-scaffolder-queue`), while
-the PC brain was checking the **Windows** worktrees (`kb-map`, `kb-types`) —
-idle precisely because the operator was working on the other machine. Reading a
-machine-local worktree as evidence about a lane is only valid on the machine the
-lane is running on.
-
-One Codex lane did stop early on 2026-08-14, for an unrelated and now-fixed
-cause: the **brain's own canary was impossible**. It demanded a live-`.s`
-reproduction of `func_0209e628`, which shipped to C in `cm-main-tier-sweep-3` —
-so `src/main/func_0209e628.legacy.c` is on disk and the `.s` exists only in
-history. The lane correctly STOPped and reported. The corrected kickoff routed
-the repro through `git show 010616b65^:src/main/func_0209e628.s` plus a
-unit-level `branch_kind()` check, and that is the version #1500 actually ran —
-its PR body's "1,108 live `.s` bodies" and historical `0x0209e628` adjudication
-are that correction's fingerprint.
-
-**Standing rule this produced:** a kickoff's `EXPECT` path and its preflight are
-**machine-specific**. Never forward a kickoff between machines — re-path it.
-A Windows-pathed guard pasted into a Mac session (or the reverse) fails its
-location check instantly, which is precisely the void-work class
-`tools/kickoff_lint.py` exists to prevent.
-
-**THE HEADLINE RESULT — the callee-count selector is real but WEAK, and it did
-not reproduce at full power.** Sweep-7 ran the 50/arm confirmation the previous
-two rounds could not statistically support, and got a clean null:
-
-| Round | 0-1 calls | 4+ calls | Gap | Fisher p |
-|---|---|---|---|---|
-| `main` (#1494) | 10/25 = 40% | 19/25 = 76% | 36 pt | 0.021 |
-| `ov002` (#1497) | 6/25 = 24% | 13/25 = 52% | 28 pt | 0.079 |
-| ov004/006/011 (#1502, **50/arm**) | 17/50 = 34% | 18/50 = 36% | **2 pt** | **1.0000** |
-| **Pooled (200 candidates, 100/arm)** | **33/100 = 33%** | **50/100 = 50%** | **17 pt** | **0.0214** |
-
-Read it honestly: the effect survives pooling at p=0.02, but the one round
-designed to be conclusive on its own found nothing, and **the brain's correction
-at merge removed the round's escape hatch.** Sweep-7 attributed the null to two
-register-choice wall families landing entirely in the HIGH arm and computed that
-crediting half of "21 such rows" restores a 22-point gap. Only **12 of those 21
-rows are in Part 1 at all** (re-derived from the ledger's own `brief` column; the
-other 9 are Part 2 rows). Half-credit gives 24/50 = 48%, **p = 0.2223 — not
-significant**; only crediting every Part 1 wall row reaches 30/50 = 60%,
-p = 0.0158. The wall concentration is real and one-sided, but it does not rescue
-the round.
-
-**So stop selecting on callee count and start selecting against the walls.** The
-thing that actually explains this round is wall-family density, not callee count:
-Part 2 (4+ calls, 200-376 B) shipped **8/50 = 16%** against a 30-50% prior, and
-the same two families followed it into the larger band. New **P-51**
-(changed-bool-field register reuse, 18 confirmed members) is now formal.
-
-**Also closed this round:** the restock-carve lane declared its own method
-**exhausted** — 548 B of honest headroom left inside the frozen 274-symbol census
-— while sampling a **~227,820 B / ~9,690-symbol zero-reader pool** it structurally
-cannot see, plus **11,592 B** reachable by merely widening the shape filter. Both
-findings are the lane's own, asked for and delivered.
-
-**NEW BRAIN FINDING — the attempts ledger is structurally park-biased.** Shipped
-rows are recorded inconsistently across rounds: sweeps 1-2 recorded both results,
-sweeps 3/4/5/7 recorded **parks only**, sweep-6 recorded a partial 10. `park_one.py`
-is the only recorder and it records parks by design. Consequence: **any ship rate
-computed from `attempts.tsv` is biased toward failure** — sweep-4 reads as 25
-parked / 0 shipped when it really shipped 75/100. Sweep-7's own kickoff told the
-lane to pick its Part 2 band from "~600 recorded attempts", which may be part of
-why Part 2 missed so low. Queued to the Codex Scaffolder as `q-ledger-ship-coverage`.
-
-**Also settled in the previous arc:** shape is NOT a usable selector; the
-ALIGNALL(2) alignment wall is beatable by TU composition when the composed span is
-4-aligned at BOTH ends; **P-50** (composed-TU declaration order collapsing to
-ascending size) is PERMANENT with evidence.
-
-✅ **The >700-line problem flagged here last round is fixed.** Rounds 0805-0810's
-per-round narrative moved to
-[`docs/research/brain-rounds-0805-0810.md`](research/brain-rounds-0805-0810.md);
-this file is back under 400 lines and holds current state, the anchors, the
-durable conventions and the open questions. Keep it that way — archive a round's
-narrative once the round after it has merged.
-
-<!-- main-sha: 2c5d92e72 -->
+<!-- main-sha: 555c2aeac -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
@@ -261,23 +221,38 @@ they stay here:
 
 ## In flight (post this brain-PR)
 
-**Active PRs: 0** once `brain/integ-0817` lands. #1502 / #1501 / #1500 / #1499 all
-merged this round. **#1020** (decomp.dev CI) remains the one genuinely parked draft
-and is declared in the `parked-prs` anchor above.
+**Active PRs: 1** once `brain/integ-0822` lands — **#1520**, HELD (not parked: the
+work is good, it needs the SHA-brittleness fix and comes back as
+`q-kickoff-lint-sha-brittleness`). **#1020** (decomp.dev CI) remains the one
+genuinely parked draft and is declared in the `parked-prs` anchor above.
 
 **All four lanes idle at hand-off, and all four queues re-seeded** — each lane
-resumes with `python tools/work_queue.py next <lane>`, one PR per item. Every one of
-the four items was verified to resolve on `origin/main` before dispatch, per the
-standing pre-send check.
+resumes with `python tools/work_queue.py next <lane>`, one PR per item. Every
+seeded item was verified to resolve via `work_queue.py next` on the integration
+tree before dispatch, per the standing pre-send check.
 
-This round's four items, and why each is what it is:
+**Dispatch host this round: the Windows PC.** All four kickoffs are Windows-pathed
+(`C:/Users/leona/Dev/gx-spirit-caller/{decomper,scaffolder,kb-map,kb-types}`,
+bare `python`, **not** `python3.13`). Round 0819 ran on the Mac, so all four
+worktrees here are a round stale and each kickoff opens with the fetch/reset step.
+Baserom capability re-verified on this machine before writing the gates:
+`decomper` and `scaffolder` hold all three baseroms, `kb-types` holds EUR only,
+`kb-map` holds none (build-free) — the Codex items are gated accordingly.
+
+⚠️ **Both build-gating lanes are on one machine and the mwcc toolchain serialises
+machine-wide.** The CC Scaffolder's `cm-restock-carve-10` is dispatched **first**
+so it gets the wine lane, the same scheduling fix that finally unblocked the dsd
+leg in #1522. The CC Decomper's kickoff carries the bounded-poll instruction
+rather than a blocked-report.
+
+This round's items, and why each is what it is:
 
 | Lane | Item | Why |
 |---|---|---|
-| CC Decomper | `cm-main-wall-filtered-sweep-1` | Callee count is settled as far as it can be (pooled p=0.02, one full-power null). Wall-family density is what actually moves the rate — so filter on it instead of selecting on callees. |
-| CC Scaffolder | `cm-restock-carve-9` | The lane proved its own method exhausted (548 B). Two successors it identified itself: the 11,592 B shape-filtered pool (cheap, same method) and a PoC on the 227,820 B zero-reader pool (needs a new method). |
-| Codex Decomper | `q-park-class-normalisation` | Sweep-7 used **three different spellings for one wall family** and ~70 distinct `park_class` values appear in a single round. No wall-based selector can work until the tags are a controlled vocabulary. |
-| Codex Scaffolder | `q-ledger-ship-coverage` | The park-bias finding above. Also carries the one gap the brain found in #1499: the new property test passes vacuously if `shipped_with_c_lever` is ever empty. |
+| CC Decomper | `cm-main-exploit-drain-2` | The ≤192 B pool is down to 32 drainable candidates (list pasted into the item, so it cannot go stale). The open question is the pool's *boundary*: the 193-256 B slice is 264 candidates / 59,560 B, and sweep-7 Part 2's 16% is the prior to test against. |
+| CC Scaffolder | `cm-restock-carve-10` | Wave 9 proved the ~227,820 B "zero-reader" pool is not reader-less — every sampled symbol has a relocation from an uncarved pointer table that `build_call_graph` discards because it resolves origins with `enclosing_function`. Largest unclaimed target on the board. |
+| Codex Decomper (×3) | `q-wall-citation-backfill`, `q-batch-sha1-stale-s`, `q-fastmatch-error-masking` | Queue was found EMPTY. All three are defects #1524 found and reported *as* defects; each is build-free and unit-testable, matching `kb-map`. |
+| Codex Scaffolder (×3) | `q-kickoff-lint-sha-brittleness`, `q-pool-freshness-tool`, `q-unittest-required-evidence` | The first finishes #1520 and generalises the brittleness guard (0-for-3 as a per-file fix). The other two were already queued and untouched. |
 
 ## Active clusters (post-pivot reality)
 

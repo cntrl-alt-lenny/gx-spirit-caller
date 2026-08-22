@@ -284,3 +284,6 @@ unclear	PROVISIONAL:unclear	unclear	1
 unknown	UNCLASSIFIED:unknown	raw value is unknown	259
 unsigned-cast	PROVISIONAL:unsigned-cast	unsigned-cast	1
 xor-order	PROVISIONAL:xor-order	xor-order	2
+P-20-family	P-20	P-20-family	2
+address-fold	PROVISIONAL:address-fold	address-fold	1
+scheduling-diff	P-36	scheduling-diff	1

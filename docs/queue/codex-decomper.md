@@ -604,3 +604,132 @@ check, a test proving it does NOT fire on three ordinary existing docs.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-decomper q-metric-canon-guard`; commit; then take
 the next queue item immediately.
+
+### q-wall-citation-backfill — the wall catalog and the `.s` headers disagree, and the tool trusts the headers [TODO]
+
+`wall_aware_headroom.py` decides "permanent" by reading each `.s` file's **own
+header citation**. `codegen-walls.md` records wall membership in per-wall
+`**Affected picks**` lists. These two are supposed to agree. They do not.
+
+`cm-main-exploit-drain-1` (#1524) grepped its 100 dispatch candidates' bare
+addresses against every `**Affected picks**` line before freezing the partition
+and caught **2 real misses** — `func_ov002_02212bc4` (a documented P-25 member)
+and `func_ov002_0224b01c` (P-21) — both of which `wall_aware_headroom.py` was
+happily reporting as fresh candidates because their `.s` headers were never
+backfilled with the citation. In a 100-candidate sample. Nobody has ever run that
+check project-wide.
+
+**Do the project-wide cross-check, then backfill.**
+
+1. Build the cross-check as a committed tool (or a subcommand of an existing one
+   — the tooling budget applies, state which clause it satisfies). For every
+   address cited in any wall entry's affected-picks list, determine whether a
+   live `.s` for that address in that **module** exists and whether its header
+   cites the wall it is catalogued under.
+2. **Report the real number.** A crude, module-naive, prose-inclusive scan by the
+   brain returns an upper bound of ~264 hits — that number is **not** a target
+   and it is **not** evidence. It counts cross-region duplicates
+   (`src/usa/main/...` alongside `src/main/...`) and any address that merely
+   appears in prose as though it were a pick. Your properly module-scoped,
+   affected-picks-scoped count is the real one and it will be smaller. If it
+   comes out at 12 or at 200, report what you got.
+3. Backfill the missing citations into the `.s` headers. **Header comment lines
+   only — not one byte of emitted code changes**, and your PR must demonstrate
+   that, not assert it (`git diff` showing only comment-prefixed lines is the
+   cheap proof).
+4. Where the catalog is the thing that is wrong — an address listed under a wall
+   whose live `.s` shows nothing of that wall's signature — **say so and do not
+   backfill it.** #1524 retracted `func_ov002_02253304` from P-23 for exactly
+   this reason and downgraded the wall confirmed -> tentative. A wrong catalog
+   entry is a defect to report, not a header to manufacture (AGENTS.md control 9).
+
+⚠️ **Partition, to avoid colliding with the CC Decomper this round.** That lane
+is draining these 32 addresses and will be deleting their `.s` files:
+
+```
+0x020896cc 0x0208a5e4 0x0209c280 0x0224b1e0 0x02250d9c 0x02251104 0x02251bb0
+0x02251ec0 0x022527b8 0x02291160 0x02294478 0x02295efc 0x02296240 0x0229d258
+0x022ae2e0 0x021cbdf4 0x021abb08 0x021afbac 0x021b2b08 0x021b3ea0 0x021b3f50
+0x021b4194 0x021b6b58 0x021b2644 0x021b3ecc 0x021b3f98 0x021b43a8 0x021b61dc
+0x021b6774 0x021aa4a0 0x021ab330 0x021ab3f0
+```
+
+Do not edit those files. `0x02212bc4` (P-25) and `0x0224b01c` (P-21) are
+explicitly **yours** — they are the two #1524 found, the CC Decomper has been
+told to leave them alone, and they are the natural canary for this item.
+
+**Canary (brain-verified runnable on this machine, 2026-08-22 — run it BEFORE
+you touch anything, and again after):**
+
+```
+python tools/wall_aware_headroom.py --json --exclude-attempted --max-size 192   | grep -oE '"[^"]*(02212bc4|0224b01c)[^"]*"' | sort | uniq -c
+```
+
+Right now that prints exactly four lines, count 2 each — the two addresses and
+their two `.s` paths, 8 matching strings in total. **After your backfill it must
+print nothing.** Paste both runs. Note `--coercible` will NOT show them: both
+files are in the `unknown` bucket, which is the whole point — the tool has no
+citation to read, so it reports them as fresh candidates.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the before/after
+canary above + `git diff` demonstrating only comment-prefixed lines changed in
+`src/`. This worktree is build-free — the brain runs the 3-region ROM gate at
+integration.
+
+### q-batch-sha1-stale-s — the apply step leaves the superseded `.s` on disk, silently [TODO]
+
+Reported as a defect by `cm-main-exploit-drain-1` (#1524), confirmed **twice** in
+one round, in two different situations:
+
+- once when the `.s` had been pre-restored from `HEAD` as a bisection safety net
+  — the flip only rewrites `delinks.txt`'s text and never touches the file;
+- once as a partial self-heal — 13 of 14 stale siblings cleaned automatically,
+  the 14th (a `.legacy_sp3.c`-suffixed file) left behind.
+
+Both are **silent**. `git status` shows a clean add-only diff. Nothing surfaces
+until a later `configure.py` regeneration dies with `multiple rules generate X`.
+PR #1524 only caught them because it hand-verified all 73 shipped files
+file-by-file before committing, which is not a control that scales.
+
+Reproduce both shapes at unit level, fix the apply step so a flip that activates
+`X.c` cannot leave `X.s` (or `X.legacy.s` / `X.legacy_sp3.s`) on disk, and add a
+regression test per shape. **Show the tests red first** (AGENTS.md control 7) —
+paste them failing against the current code before your fix, then green after.
+A test you cannot show red is narrow-case and is not trusted.
+
+Note the suffix handling is where the second case lived: the self-heal matched
+plain-stem siblings and missed the `.legacy_sp3.c` one. Cover every tier suffix
+the project actually ships (`.c`, `.legacy.c`, `.legacy_sp3.c`).
+
+**Gate:** `pytest -q tests` + `unittest discover -s tests` both green (paste real
+tails) + `ruff check` clean + the two red-then-green transcripts. Build-free.
+
+### q-fastmatch-error-masking — a crashed objdump is reported as "no functions in compiled .o" [TODO]
+
+Also from #1524, and it cost that round real time. A freshly downloaded
+`arm-binutils` produced an `arm-none-eabi-objdump` that **crashed on launch**
+(`Library not loaded: @rpath/libzstd.1.dylib`, macOS). `fastmatch.py` swallowed
+that crash and reported `"no functions in compiled .o"` — which reads exactly
+like a real compile failure, and sends the reader off debugging their C.
+
+Two separable things; do both:
+
+1. **Stop masking the error.** `fastmatch.py` must distinguish "objdump failed to
+   run" (non-zero exit / empty output / missing binary) from "objdump ran
+   successfully and the `.o` genuinely contains no functions". Surface the real
+   stderr in the first case. This is platform-independent and unit-testable with
+   a stub binary — no baserom needed.
+2. **Report, don't fix, the dependency itself.** The missing `libzstd.1.dylib` is
+   a macOS packaging problem in the upstream release, worked around per-worktree
+   by copying Homebrew's copy into `tools/arm-none-eabi/libexec/` (which is
+   gitignored, so it recurs on every fresh worktree bootstrap). Record it in the
+   right place — a `download_tool.py` post-download sanity check that *verifies
+   the downloaded binary actually runs* is in scope and is the durable fix; a
+   silent auto-install of somebody else's dylib is not. If you judge the check
+   belongs elsewhere, say where and why.
+
+**Gate:** `pytest -q tests` + `unittest discover -s tests` green + `ruff check`
+clean + a test that shows the old behaviour would have reported "no functions"
+for a deliberately-broken objdump stub and the new behaviour reports the launch
+failure. Red-first, per control 7. Build-free.

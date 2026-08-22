@@ -1410,7 +1410,7 @@ confusion matrix with its Fisher p, and both arms' size distributions. Run
 `docs/research/README.md` LAST — a stale index has now failed `drift-check` on
 four separate PRs.
 
-### cm-main-exploit-drain-1 — the selector science is done; drain the pool that already yields 60% [TODO]
+### cm-main-exploit-drain-1 — the selector science is done; drain the pool that already yields 60% [DONE]
 
 `cm-main-wall-filtered-sweep-1` (#1508) built the detector the round asked for,
 calibrated it honestly (18/18 recall, 1/43 FP on P-51), and then did the thing
@@ -1483,3 +1483,127 @@ Regenerate `docs/research/README.md` LAST.
 
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper cm-main-exploit-drain-1`; commit; report.
+
+### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [TODO]
+
+`cm-main-exploit-drain-1` (#1524) did exactly what it was asked and the number
+held up: **73/100 shipped, 9,488 B, zero `asm` escapes across all 73** — against
+a 60.8% prior and sweep-7's 34-36%. Brain re-derived every load-bearing figure
+independently: 73 `.c` added == 73 `.s` deleted == 73 delink activations, 96 new
+ledger rows (73 shipped + 23 parked), `text_size` sum = 9,488 B exactly, and
+`grep -lE '\basm\b|__asm|GLOBAL_ASM'` over all 73 shipped files returns nothing.
+The round also corrected the catalog against itself (P-23 confirmed -> tentative
+after a listed member shipped clean via an unrelated fix) and filed C-95.
+
+**The standing finding is now three rounds deep: the pool definition is the
+lever, not any selector.** Do not re-open that question.
+
+**Part 1 — drain the remainder. The pool is 32 candidates, and here it is.**
+
+Re-derived by the brain at this item's `main`, reusing `wall_aware_headroom.py`'s
+own `scan()` (`max_size=192, exclude_attempted=True`) plus the `>=4 bl/blx` body
+filter — **34 in-pool, 5,224 B**, of which 2 are documented-permanent and must be
+excluded, leaving **32 drainable / 4,916 B**. This reconciles exactly with the
+account in PR #1524 (28 reserve + 4 not-reached + the 2 it swapped out
+pre-dispatch), which is why it is pasted as a list rather than a number — a list
+cannot go stale the way five consecutive waves' pool counts did:
+
+```
+main        0x020896cc  124B bl=4    overlay002  0x0229d258  112B bl=4
+main        0x0208a5e4  160B bl=5    overlay002  0x022ae2e0  148B bl=5
+main        0x0209c280  156B bl=4    overlay003  0x021cbdf4  152B bl=10
+overlay002  0x0224b1e0  156B bl=5    overlay008  0x021abb08  152B bl=4
+overlay002  0x02250d9c  164B bl=5    overlay008  0x021afbac  128B bl=4
+overlay002  0x02251104  184B bl=5    overlay010  0x021b2b08  120B bl=8
+overlay002  0x02251bb0  140B bl=4    overlay010  0x021b3ea0  176B bl=5
+overlay002  0x02251ec0  176B bl=4    overlay010  0x021b3f50   72B bl=5
+overlay002  0x022527b8  176B bl=4    overlay010  0x021b4194  136B bl=8
+overlay002  0x02291160  180B bl=5    overlay010  0x021b6b58  168B bl=4
+overlay002  0x02294478  140B bl=4    overlay014  0x021b2644  168B bl=9
+overlay002  0x02295efc  188B bl=4    overlay015  0x021b3ecc  180B bl=4
+overlay002  0x02296240  192B bl=4    overlay015  0x021b3f98  168B bl=4
+                                     overlay015  0x021b43a8  156B bl=5
+EXCLUDE (documented permanent,       overlay017  0x021b61dc  136B bl=6
+ `.s` header citation never          overlay017  0x021b6774  144B bl=4
+ backfilled — see below):            overlay022  0x021aa4a0  160B bl=8
+overlay002  0x02212bc4  P-25         overlay022  0x021ab330  192B bl=5
+overlay002  0x0224b01c  P-21         overlay022  0x021ab3f0  112B bl=5
+```
+
+All 34 are `unknown_files` — none coercible. That is consistent with the round's
+own finding: this pool is the bulk-stamped, never-individually-assessed tranche,
+and the "reg-alloc-walled, no C match" boilerplate header on it is not evidence.
+The 4 `not reached` from #1524 (`func_020896cc`, `func_0208a5e4`,
+`func_0209c280`, `func_ov002_0224b1e0`) are in the list above and were left
+deliberately, not rushed — one has an ambiguous return-value pattern worth a
+careful look. **Do not exclude the 2 P-25/P-21 files silently — the citation
+backfill is queued to the Codex Decomper this round (`q-wall-citation-backfill`),
+so leave their `.s` alone and just don't attempt them.**
+
+**Part 2 — the pool-boundary question, which is the actual point of this round.**
+
+At `<=192 B` the pool is nearly gone. Move ONE axis — the size cap — and it comes
+back. Brain-measured at this item's `main`, same `>=4 bl` filter, same
+`--exclude-attempted`:
+
+| `.text` cap | candidates (>=4 bl) | bytes |
+|---|---:|---:|
+| <=192 B | 34 | 5,224 |
+| <=256 B | 298 | 64,784 |
+| <=320 B | 581 | 146,464 |
+| <=384 B | 781 | 217,016 |
+
+The **193-256 B slice alone is 264 candidates / 59,560 B.**
+
+**This is not a third selector study, and the distinction matters.** The standing
+instruction is to stop selecting *within* a pool. This asks where the pool's
+*boundary* is, and there is a real prior on the other side of it:
+**`cm-main-tier-sweep-7` Part 2 (4+ calls, 200-376 B) shipped 8/50 = 16%.** The
+193-256 B slice is the bottom sliver of that band and has never been isolated —
+sweep-7 measured the band as a whole, dominated by its 256-376 B half.
+
+Dispatch **40 candidates** from the 193-256 B slice, sampled across modules the
+same way Part 1's partition is (do not take all 40 from ov002). Record every one
+in the ledger — shipped AND parked — via `record_shipped.py` / `park_one.py`.
+
+**The falsification test, stated before you run it (AGENTS.md control 6):**
+
+- Slice ships **>=50%** => sweep-7 Part 2's 16% was a whole-band artifact driven
+  by its larger half, the ~192 B cap is NOT the binding constraint, and
+  59,560 B + a 146 KB tail behind it are open. Say so plainly.
+- Slice ships **<=25%** => the cap near 192 B is real, sweep-7 Part 2 reproduces,
+  and this campaign's small-function pool is genuinely near its end. Say that
+  plainly too — a confirmed ceiling is a result, not a failure, and it redirects
+  the whole lane.
+- Anything in between is exactly that: state the number, do not round it toward
+  the story you prefer.
+
+Do NOT loosen the `>=4 bl` threshold, the size cap, or the sampling to reach a
+nicer number; #1508 declined to do that and it is the reason its null is
+trustworthy.
+
+**Process notes carried from #1524, worth keeping:**
+
+- Run the final gate as three separate `gate3.py --scope <region> --clean` calls,
+  not one `--scope all --clean`. #1524 lost ~2,500 build steps to an interruption
+  mid-EUR and adopted this; it is the same total verification in a
+  far-cheaper-to-redo unit.
+- Hand-verify every shipped file has no same-stem `.s` left on disk before
+  committing. `batch_sha1.py`'s apply step silently fails to delete the
+  superseded `.s` in at least two situations (#1524 hit both) and nothing catches
+  it until a later `configure.py` errors with `multiple rules generate X`. The
+  tool fix is queued to the Codex Decomper this round; until it lands, the manual
+  check stays.
+- Screen every candidate address against every `**Affected picks**` line in
+  `codegen-walls.md` before freezing the partition — not just each file's own
+  header. That check is what caught the P-25/P-21 pair.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three `SHA1 PASS` lines pasted verbatim + `check_activation_invariant.py`
+(`.c` added == `.s` deleted == activations) + `check_delink_dupes.py` +
+`gate3.py --scope tests`. Paste real tails, not prose. `git restore assets/`
+after each `--clean` so the heatmap SVGs stay out of the diff. Dedup touched
+delinks against **current `main`**, not just your branch base.
+
+ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
+`python tools/work_queue.py done claude-decomper cm-main-exploit-drain-2`.

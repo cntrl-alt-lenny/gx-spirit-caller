@@ -10,13 +10,31 @@ the regression test proves that it would reject a reintroduced copy.
 from __future__ import annotations
 
 import ast
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOLS = ROOT / "tools"
+
+
+def _tracked_tool_python_files() -> list[Path]:
+    """Every `tools/*.py` file git actually tracks.
+
+    A raw `(ROOT / "tools").rglob("*.py")` also walks gitignored download directories
+    (`tools/arm-none-eabi/`, `tools/mwccarm/`, ...) that some workflows
+    populate locally -- arm-binutils bundles its own CPython stdlib, whose
+    test suite includes deliberately-malformed fixtures (e.g.
+    `bad_coding2.py`, a bad-encoding regression test) that aren't valid
+    Python and were never meant to be scanned as project source.
+    """
+
+    output = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "tools/*.py"],
+        capture_output=True, text=True, check=True,
+    ).stdout
+    return sorted(ROOT / line for line in output.splitlines() if line)
 
 
 def _target_names(node: ast.AST) -> set[str]:
@@ -87,11 +105,11 @@ def _ownership_violations(paths: list[Path]) -> list[str]:
 
 class ParserOwnershipTests(unittest.TestCase):
     def test_current_tools_obey_the_ownership_contract(self) -> None:
-        paths = sorted(TOOLS.rglob("*.py"))
+        paths = _tracked_tool_python_files()
         self.assertEqual(_ownership_violations(paths), [])
 
     def test_synthetic_reintroduced_duplicates_are_rejected(self) -> None:
-        paths = sorted(TOOLS.rglob("*.py"))
+        paths = _tracked_tool_python_files()
         with tempfile.TemporaryDirectory() as directory:
             duplicate = Path(directory) / "reintroduced_copy.py"
             duplicate.write_text(
