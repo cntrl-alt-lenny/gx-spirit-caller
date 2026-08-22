@@ -1,0 +1,135 @@
+# Build the objdiff progress report for each region inside the PRIVATE
+# build image (ROM data baked in) and upload it as the `<ver>_report`
+# artifact decomp.dev ingests.
+#
+# Modeled on zeldaret/ph + zeldaret/st (same dsd/mwccarm/wibo toolchain,
+# same report.json, same `<ver>_report` artifact contract). Adapted to THIS
+# repo's configure.py, which (unlike ph) verifies the baserom SHA-1 at
+# configure time and reads orig/ + extract/ from the repo root.
+#
+# STATUS: v1, UNTESTED. Verify the image builds and this job runs green once
+# on `main` before relying on it. See docs/decomp-dev-setup.md
+# § "Likely failure points".
+name: decomp.dev report
+
+on:
+  push:
+    branches: [main]
+  # Manual trigger so the owner can re-run after registering on decomp.dev
+  # or after rebuilding/pushing a new image, without an empty commit.
+  workflow_dispatch:
+
+# Read-only token is enough: we only checkout + pull the private GHCR image +
+# upload artifacts. `packages: read` lets the job pull
+# ghcr.io/cntrl-alt-lenny/gx-spirit-caller-build (a PRIVATE package) using the
+# automatic GITHUB_TOKEN — provided the package grants this repo access (see
+# docs/decomp-dev-setup.md step (b)).
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    # The private build image with orig/ + extract/ + toolchain baked in.
+    # GitHub logs the container registry in automatically with GITHUB_TOKEN
+    # when the image is on ghcr.io and the workflow has `packages: read`.
+    container:
+      image: ghcr.io/cntrl-alt-lenny/gx-spirit-caller-build:main
+
+    strategy:
+      # Don't cancel usa/jpn just because eur failed — we want every region's
+      # status independently (matches ph/st `fail-fast: false`).
+      fail-fast: false
+      matrix:
+        version: [eur, usa, jpn]
+
+    steps:
+      # Mirror progress-badge.yml's checkout. No submodules in this repo (ph
+      # uses `submodules: recursive`; we have none), so a plain checkout is
+      # correct. This populates the workspace with src/, config/, tools/, the
+      # committed build.ninja-generating configure.py — but NOT orig/ or
+      # extract/ (both gitignored). We stage those from the image next.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Stage the baked copyrighted data into the checkout. The image stashed
+      # it at /rom-data (see docker/decomp-dev-build.Dockerfile); the checkout
+      # ships empty orig/ + extract/ dirs (or none), so copy the baked trees
+      # over them. configure.py then finds:
+      #   - orig/baserom_${version}.nds  -> SHA-1 check at configure time
+      #   - extract/${version}/          -> dsd delink (because --no-extract)
+      #
+      # We also drop the Linux objdiff-cli into the repo root under the exact
+      # name configure.py hardcodes (./objdiff-cli — there is NO --objdiff
+      # flag). dsd is passed explicitly via --dsd below; mwccarm via
+      # --compiler; wibo via -w. So objdiff-cli is the one tool that must live
+      # at the repo-root default path.
+      - name: Stage baked ROM data + objdiff-cli
+        run: |
+          set -euxo pipefail
+          # cp -a preserves perms/timestamps; merge into existing dirs.
+          mkdir -p orig extract
+          cp -a /rom-data/orig/.    orig/
+          cp -a /rom-data/extract/. extract/
+          # objdiff-cli is baked on PATH at /usr/local/bin; symlink it to the
+          # repo-root name the OBJDIFF constant in configure.py expects.
+          ln -sf /usr/local/bin/objdiff-cli ./objdiff-cli
+          # Sanity: the region's baserom + extract config must be present.
+          ls -la orig/baserom_${{ matrix.version }}.nds
+          ls -la extract/${{ matrix.version }}/config.yaml
+
+      # Generate build.ninja for this region, then build the report.
+      #
+      #   -w wibo            -> use the baked Win32 runner (on PATH).
+      #   --compiler /mwccarm-> use the baked mwccarm bundle root.
+      #   --dsd /usr/local/bin/dsd
+      #                      -> use the baked Linux dsd (NOT the macOS ./dsd
+      #                         that may be committed; we never copy that one).
+      #   --no-extract       -> do NOT re-run `dsd rom extract` (we staged the
+      #                         pre-extracted tree). NOTE: this skips the
+      #                         EXTRACT step only; the baserom SHA-1 check
+      #                         still runs at configure time, which is why we
+      #                         staged orig/ above. (If a future image cannot
+      #                         bake orig/, add --skip-sha1 here instead — see
+      #                         docs/decomp-dev-setup.md.)
+      #
+      # `ninja report` builds: download stubs (objdiff already symlinked, dsd
+      # via --dsd, mwccarm via --compiler, wibo via -w -> all download rules
+      # are no-ops/skipped) -> dsd delink -> compile every src .o ->
+      # dsd objdiff -> objdiff-cli report generate -> build/<ver>/report.json.
+      # We deliberately do NOT build the ROM or run `ninja sha1` here — the
+      # report does not need a linked ROM, and skipping it keeps CI fast and
+      # avoids the wineserver/link hazards. (ph runs `ninja arm9 report check`;
+      # `report` alone is sufficient for decomp.dev.)
+      - name: Configure + build report
+        run: |
+          set -euxo pipefail
+          python3.13 tools/configure.py ${{ matrix.version }} \
+            -w wibo \
+            --compiler /mwccarm \
+            --dsd /usr/local/bin/dsd \
+            --no-extract
+          ninja report
+          # Show the headline numbers in the log for a quick eyeball.
+          python3.13 - <<'PY'
+          import json, os
+          v = os.environ["VER"]
+          with open(f"build/{v}/report.json") as f:
+              r = json.load(f)
+          m = r.get("measures", r)
+          print(f"[{v}] report.json measures:", json.dumps(m, indent=2)[:1200])
+          PY
+        env:
+          VER: ${{ matrix.version }}
+
+      # Upload under the EXACT name decomp.dev requires: `<ver>_report`,
+      # containing build/<ver>/report.json. decomp.dev pulls the artifact from
+      # the workflow run on the default branch.
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.version }}_report
+          path: build/${{ matrix.version }}/report.json
+          if-no-files-found: error
