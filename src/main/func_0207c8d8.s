@@ -1,4 +1,5 @@
 ; func_0207c8d8 — whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; Wall catalog: P-30.
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 

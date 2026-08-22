@@ -1,4 +1,5 @@
 ; func_0207db8c — brief 655 review: no duplicate-address evidence.
+; Wall catalog: P-12.
 ; Taxonomy citation removed; never assessed as a C-match target.
 
         .text

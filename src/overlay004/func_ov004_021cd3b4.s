@@ -1,4 +1,5 @@
 ; func_ov004_021cd3b4 - whole-function ship-as-.s (GLOBAL_ASM endgame, brief 302):
+; Wall catalog: P-18, P-19.
 ; the original disassembly emitted verbatim as a byte-exact mwasm TU.
 ; For reg-alloc-walled functions with no C match (brief 294 endgame).
 

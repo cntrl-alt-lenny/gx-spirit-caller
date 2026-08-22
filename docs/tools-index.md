@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**136 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**137 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (62)
+- [Uncategorised](#uncategorised) (63)
 
 ## Analysis / worklist
 
@@ -818,6 +818,12 @@ object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain
 **TRUE readable-C headroom (walls subtracted).**
 
 The raw C% metric (progress.py) counts every not-yet-`.c` byte as "headroom", including functions that are documented permanent walls. Brief 640's audit (docs/research/brief-640-wall-audit.md) found the PREVIOUS version of this tool badl…
+
+### `tools/wall_catalog_check.py`
+
+**Cross-check permanent wall catalog membership against live assembly headers.**
+
+The wall catalog is prose, so this deliberately parses only the immediate paragraph or table following each ``**Affected picks`` marker.  Addresses in later explanatory prose (including retractions) are not membership.  The tool's scope…
 
 ### `tools/wall_prefilter.py`
 
