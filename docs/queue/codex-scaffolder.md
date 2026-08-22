@@ -1008,7 +1008,9 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-pool-freshness-tool`; commit; then
 take the next queue item immediately.
 
-### q-unittest-required-evidence — the parity check you just built currently decorates rather than blocks [TODO]
+### q-unittest-required-evidence — the parity check you just built currently decorates rather than blocks [PARKED]
+>
+> PARKED: Superseded by owner decision 2026-08-22 (round 0822b): the toggle was executed directly - tests.yml unfiltered on pull_request, unittest added to required-checks.txt and the live main-protection ruleset (PR #1531, check_ci_contract.py --verify-ruleset clean). If the in-flight lane round already produced the evidence doc, it merges as documentation; no further action needed.
 
 `q-ci-runner-parity` (#1517) did the honest thing and reported the fact that
 undercuts its own value: it verified against the live GitHub API that
@@ -1045,4 +1047,56 @@ statement that no settings were changed.
 
 ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-unittest-required-evidence`; commit;
+then take the next queue item immediately.
+
+### q-make-kickoff-generator — the machine writes the preflight, the brain writes the prose [TODO]
+
+⚠️ **Ordering: take this AFTER `q-pool-freshness-tool`** — it consumes that
+tool's output. If you reach this item and pool-freshness is not yet merged,
+say so and pause here rather than building against an unmerged interface.
+
+Every mechanical fault in a kickoff so far has been the brain hand-writing
+machine-checkable facts: a canary that cannot run (the `func_0209e628`
+incident), cross-machine paths (`/Users/` pasted into a Windows session), a
+stale pool number (five consecutive waves), and — round 0822 — a location
+guard asserting a worktree the session never navigated to, which voided both
+Codex dispatches in one stroke. `kickoff_lint.py` catches these AFTER the
+brain writes them. This item stops the brain writing them at all.
+
+Build `tools/make_kickoff.py --lane <lane> --host <windows|mac> [--item <id>]
+[--branch <name>]`:
+
+1. Emits the mechanical skeleton of a kickoff, in order: the
+   directory-ESTABLISHING line first (`Set-Location '<path>'` for the Codex
+   lanes, `cd <path> || { echo "CANNOT REACH WORKTREE"; exit 1; }` for the
+   Claude lanes), then the EXPECT assignment and the single-line location
+   guard, tool-presence checks, `git fetch origin` + `git checkout -B <branch>
+   origin/main`, `work_queue.py next <lane> --claim`, and the expected-item
+   line. Host-correct interpreter throughout (Windows: plain `python`; Mac:
+   `python3.13`).
+2. The lane→worktree path table lives in ONE committed structure in the tool.
+   Windows paths (`C:/Users/leona/Dev/gx-spirit-caller/{decomper, scaffolder,
+   kb-map, kb-types}`) are brain-verified as of 2026-08-22. Mac paths follow
+   the convention in AGENTS.md / `docs/agents/` (`~/Dev/spirit-caller/...`) —
+   mark them UNVERIFIED in a comment until the first Mac brain runs the tool
+   and confirms; do not silently trust this kickoff's spelling of them.
+3. Self-linting: the tool runs `kickoff_lint.lint()` on its own emission and
+   **refuses to print a skeleton that fails any required check** (nonzero
+   exit, failures listed). The generator and the linter must never disagree.
+4. When `--item` is given, pull the item's live pool figure via the
+   pool-freshness tool where one of its named pools applies, and stamp the
+   emission with the figure + the reproducing command. Where no named pool
+   applies, emit no number at all — a blank is honest, a stale figure is not.
+5. NOT scope: prose. The brain writes context, findings, and instructions
+   around the skeleton. The tool owns only what a machine can check.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover
+-s tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + all 8
+lane×host emissions pass `kickoff_lint` (paste the 8-line summary) + one
+deliberately-sabotaged emission (establishment line stripped) shown REFUSED.
+Tooling budget clause: catches a demonstrated failure class — four distinct
+incident types cited above, two of them this week.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-scaffolder q-make-kickoff-generator`; commit;
 then take the next queue item immediately.

@@ -8,6 +8,24 @@ brain (possibly on a different machine or LLM) can catch up in under a
 minute. Keep it short. If you're the brain reading this cold: `git
 log --oneline -20` and the open-PR list fill in whatever this misses.
 
+**Round 0822b (2026-08-22, Windows PC, brain=Fable 5) — owner-approved hardening
+package, no lane dispatch (all four mid-flight).** cntrl_alt_lenny reviewed the
+brain's six-item hardening proposal and approved all of it. Executed this round:
+(1) **`unittest` is now a REQUIRED check on every PR** — #1531 unfiltered
+`tests.yml`, added the context to `required-checks.txt` and the live
+`main-protection` ruleset; `check_ci_contract.py --verify-ruleset` clean. The
+machine-local-SHA class from #1520 now fails in CI, not at the brain's gate.
+(2) **[`docs/dispatch-log.md`](dispatch-log.md)** — one row per round: host,
+model, lanes, transcript location. Closes the machine-locality gap structurally;
+appending a row is now part of every seeding PR (see durable convention 5).
+(3) **[`docs/research/post-small-pool-strategy.md`](research/post-small-pool-strategy.md)**
+— decision rules pre-staged for `cm-main-exploit-drain-2`'s boundary result, so
+the fleet redirects the day it lands. (4) Three queue seeds: `cm-progress-dashboard`
+(CC-S), `q-make-kickoff-generator` (CX-S, after pool-freshness),
+`q-worktree-gc` (CX-D). (5) `q-unittest-required-evidence` PARKED as superseded
+by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
+orphaned dirs reported to the owner, never `rm -rf`'d).
+
 **Last updated:** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0822: the exploit round landed at 73/100 and settled the pool-vs-selector
 question for good — but it also drained the pool it was exploiting down to 32
@@ -182,7 +200,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: 555c2aeac -->
+<!-- main-sha: 6689860b2 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
@@ -212,12 +230,21 @@ they stay here:
    later message. `docs/agents/brain-onboarding.md` holds the canonical
    statement; `AGENTS.md` and `.claude/agents/brain.md` defer to it.
 4. **Branch protection is LIVE** (ruleset `main-protection`). Required
-   checks are `Python (ruff)`, `Markdown (markdownlint-cli2)` and
-   `drift-check` — the only three that run on EVERY PR (`pr-invariants`
-   and the compile checks are paths-filtered; requiring them would hang
-   docs-only PRs). Force-push and deletion are blocked; repo-admin bypass
-   keeps the brain's gated integ→main flow working. The brain's 3-region
-   `ninja sha1` gate remains the real merge gate, always run locally.
+   checks are `Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`
+   and — since round 0822b (#1531) — `unittest`, the four that run on EVERY
+   PR (`pr-invariants` and the compile checks are paths-filtered; requiring
+   them would hang docs-only PRs — the required set and the workflows are
+   contract-checked by `tools/check_ci_contract.py`). Force-push and deletion
+   are blocked; repo-admin bypass keeps the brain's gated integ→main flow
+   working. The brain's 3-region `ninja sha1` gate remains the real merge
+   gate, always run locally.
+5. **Every seeding/doc PR appends a row to
+   [`docs/dispatch-log.md`](dispatch-log.md)** — round, date, host, brain
+   model, lanes dispatched, transcript location. Machine-locality has burned
+   this campaign at least five distinct ways (#1504's correction, the 0822
+   transcript-audit gap, #1520's local git object, the WRONG-WORKTREE void
+   dispatch); the log is the structural fix. A kickoff is written for the
+   host in that row, never forwarded across machines.
 
 ## In flight (post this brain-PR)
 
