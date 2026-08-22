@@ -52,6 +52,7 @@ from data_worklist import (  # noqa: E402
     _is_code_address,
     _is_printable_string,
     _load_readers_index,
+    _load_readers_index_from_data,
     _looks_like_array,
     _looks_like_fnptr_table,
     _parse_csv_filter,
@@ -63,6 +64,7 @@ from data_worklist import (  # noqa: E402
     render_markdown,
     render_stdout_summary,
     resolve_cluster,
+    screen_names_against_src,
     section_for_symbol,
 )
 
@@ -265,6 +267,88 @@ class TestRanking(unittest.TestCase):
         self.assertEqual(entries[0].reader_count, 0)
 
 
+class TestIncludeDataReaders(unittest.TestCase):
+    """cm-restock-carve-10: a data symbol whose only reader is another
+    DATA symbol (e.g. an uncarved pointer table) is invisible to the
+    default function-only reader count. `include_data_readers=True`
+    surfaces it via `graph.edges_load_from_data`, without changing a
+    single default-path result (every assertion here that omits the
+    flag must match TestRanking's existing behaviour exactly)."""
+
+    def _fixture_with_data_reader(self):
+        # A pointer table (data, uncarved) at main:0x500 whose one
+        # entry loads the target string at main:0x600. No function
+        # anywhere reads the string directly.
+        table = _data_sym("main", 0x02000500, size=0x10)
+        target = _data_sym("main", 0x02000600, size=0x8)
+        md = _module("main", [table, target])
+        modules = {"main": md}
+        graph = CallGraph()
+        graph.edges_load_from_data[("main", 0x02000500)].add(("main", 0x02000600))
+        return modules, graph
+
+    def test_readers_index_from_data_inversion(self):
+        _, graph = self._fixture_with_data_reader()
+        idx = _load_readers_index_from_data(graph)
+        self.assertEqual(idx[("main", 0x02000600)], {("main", 0x02000500)})
+
+    def test_empty_graph_from_data(self):
+        self.assertEqual(_load_readers_index_from_data(CallGraph()), {})
+
+    def test_default_excludes_data_only_reader(self):
+        # Without include_data_readers, the target has 0 FUNCTION
+        # readers, so default min_readers=1 drops it — exactly like
+        # any other zero-reader datum today.
+        modules, graph = self._fixture_with_data_reader()
+        entries = rank_data_symbols(modules, graph, matched={})
+        self.assertEqual(entries, [])
+
+    def test_opt_in_surfaces_data_only_reader(self):
+        modules, graph = self._fixture_with_data_reader()
+        entries = rank_data_symbols(
+            modules, graph, matched={}, include_data_readers=True,
+        )
+        addrs = [e.symbol.addr for e in entries]
+        self.assertIn(0x02000600, addrs)
+        e = next(e for e in entries if e.symbol.addr == 0x02000600)
+        self.assertEqual(e.reader_count, 0)
+        self.assertEqual(e.data_reader_count, 1)
+        self.assertEqual(e.total_reader_count, 1)
+        self.assertEqual(e.cross_module_readers, 1)
+
+    def test_opt_in_does_not_alter_existing_fixture_results(self):
+        # Running the SAME existing fixture (no edges_load_from_data
+        # at all) with include_data_readers=True must reproduce
+        # TestRanking.test_sort_cross_module_primary's result exactly
+        # — the flag is a no-op when the graph carries no data edges.
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={}, include_data_readers=True,
+        )
+        self.assertEqual(entries[0].symbol.addr, 0x02000100)
+        self.assertEqual(entries[1].symbol.addr, 0x021c0100)
+
+    def test_min_readers_counts_combined_total(self):
+        # A datum with 1 function reader AND 1 data reader passes
+        # min_readers=2 only when both are counted together.
+        table = _data_sym("main", 0x02000700, size=0x10)
+        target = _data_sym("main", 0x02000800, size=0x8)
+        reader = _func_sym("main", 0x02001000)
+        md = _module("main", [table, target, reader])
+        modules = {"main": md}
+        graph = CallGraph()
+        graph.edges_load[("main", 0x02001000)].add(("main", 0x02000800))
+        graph.edges_load_from_data[("main", 0x02000700)].add(("main", 0x02000800))
+        entries = rank_data_symbols(
+            modules, graph, matched={}, min_readers=2, include_data_readers=True,
+        )
+        self.assertEqual([e.symbol.addr for e in entries], [0x02000800])
+        # Without the opt-in, only 1 (function) reader is counted and
+        # min_readers=2 must drop it.
+        entries_default = rank_data_symbols(modules, graph, matched={}, min_readers=2)
+        self.assertEqual(entries_default, [])
+
+
 class TestRenderMarkdown(unittest.TestCase):
     def test_header_totals_independent_of_filters(self):
         # With min_readers=99 the worklist is empty, but the
@@ -326,6 +410,31 @@ class TestRenderMarkdown(unittest.TestCase):
         )
         self.assertIn("_any_", md)
 
+    def test_data_readers_column_absent_by_default(self):
+        # cm-restock-carve-10: default markdown output must be
+        # byte-identical to before include_data_readers existed.
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(modules, graph, matched={})
+        md = render_markdown(
+            entries, version="eur",
+            total_data_symbols=4, matched_data_count=0,
+        )
+        self.assertNotIn("Data readers", md)
+        self.assertNotIn("include_data_readers", md)
+
+    def test_data_readers_column_present_when_opted_in(self):
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={}, include_data_readers=True,
+        )
+        md = render_markdown(
+            entries, version="eur",
+            total_data_symbols=4, matched_data_count=0,
+            include_data_readers=True,
+        )
+        self.assertIn("Data readers", md)
+        self.assertIn("include_data_readers=true", md)
+
 
 class TestRenderStdoutSummary(unittest.TestCase):
     def test_emits_totals_and_top_rows(self):
@@ -343,6 +452,23 @@ class TestRenderStdoutSummary(unittest.TestCase):
         self.assertIn("Data symbols: 4 total", out)
         self.assertIn("Top 2 by cross-module density", out)
         self.assertIn("data_02000100", out)
+        self.assertNotIn("data_readers=", out)
+
+    def test_data_readers_suffix_when_opted_in(self):
+        modules, graph = _build_fixture()
+        entries = rank_data_symbols(
+            modules, graph, matched={}, include_data_readers=True,
+        )
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            render_stdout_summary(
+                entries,
+                total_data_symbols=4,
+                matched_data_count=0,
+                top_n=2,
+                include_data_readers=True,
+            )
+        self.assertIn("data_readers=", buf.getvalue())
 
     def test_top_n_zero_fallback_for_empty_entries(self):
         # Callers pass top_n=0 when --top 0 is requested. The summary
@@ -376,6 +502,72 @@ class TestDataPlaceholderPrefix(unittest.TestCase):
     def test_named_data_doesnt_match(self):
         self.assertFalse("g_HeapState".startswith(DATA_PLACEHOLDER_PREFIX))
         self.assertFalse("OSi_Context".startswith(DATA_PLACEHOLDER_PREFIX))
+
+
+class TestScreenNamesAgainstSrc(unittest.TestCase):
+    """cm-restock-carve-10: the mandatory precondition before folding a
+    placeholder name into a neighbour's declaration instead of giving
+    it its own — wave 9's Attempt 1 broke exactly this way (an
+    already-shipped `.s` chunk `.extern`'d a name that got silently
+    omitted from its own declaration)."""
+
+    def _tree(self, tmp: str, files: dict[str, str]) -> Path:
+        root = Path(tmp) / "src"
+        for rel, content in files.items():
+            p = root / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(content, encoding="utf-8")
+        return root
+
+    def test_no_hits_when_name_absent(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {"main/foo.c": "char foo[4] = \"abc\";"})
+            hits = screen_names_against_src(["data_020c3cb0"], root)
+            self.assertEqual(hits, {})
+
+    def test_finds_extern_reference(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {
+                "main/data/data_020b46e0.s": (
+                    ".extern data_020c3cb0\n.word data_020c3cb0\n"
+                ),
+            })
+            hits = screen_names_against_src(["data_020c3cb0"], root)
+            self.assertIn("data_020c3cb0", hits)
+            self.assertEqual(len(hits["data_020c3cb0"]), 1)
+
+    def test_word_boundary_not_substring(self):
+        # A file that only mentions data_1000 must NOT false-positive
+        # a screen for data_100 (prefix collision).
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {"main/foo.c": "extern int data_1000;"})
+            hits = screen_names_against_src(["data_100"], root)
+            self.assertEqual(hits, {})
+
+    def test_multiple_names_one_pass(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {
+                "main/data/data_x.s": ".extern data_a\n.extern data_b\n",
+            })
+            hits = screen_names_against_src(["data_a", "data_b", "data_c"], root)
+            self.assertEqual(set(hits.keys()), {"data_a", "data_b"})
+
+    def test_non_source_suffix_ignored(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {"main/notes.md": "data_020c3cb0 mentioned here"})
+            hits = screen_names_against_src(["data_020c3cb0"], root)
+            self.assertEqual(hits, {})
+
+    def test_empty_names_returns_empty(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._tree(tmp, {"main/foo.c": "int x;"})
+            self.assertEqual(screen_names_against_src([], root), {})
 
 
 # --------------------------------------------------------------------------- #

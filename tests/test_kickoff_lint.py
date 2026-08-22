@@ -8,6 +8,7 @@ must fail the corresponding required check.
 
 from __future__ import annotations
 
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -15,7 +16,12 @@ from pathlib import Path
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
-from kickoff_lint import lint  # noqa: E402
+from kickoff_lint import (  # noqa: E402
+    check_platform_coherence,
+    check_referenced_commits,
+    check_referenced_paths,
+    lint,
+)
 
 
 # A well-formed kickoff (indented code blocks, no triple-backticks).
@@ -23,13 +29,50 @@ GOOD = """
 Brief 610 — name the SDK layer. SET YOUR REASONING EFFORT TO HIGH.
 Setup + PREFLIGHT:
     ls tools/nitro_suggest_renames.py && echo PREFLIGHT-OK || { echo "preflight failed"; exit 1; }
+    for i in 1 2 3 4 5; do git worktree add ../codex-610 -b codex/naming-610 origin/main && break || { echo retry; sleep 3; }; done
+    cd "$HOME/Dev/spirit-caller/codex-610"
     EXPECT="$HOME/Dev/spirit-caller/codex-610"
     [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
-    for i in 1 2 3 4 5; do git worktree add ../codex-610 -b codex/naming-610 origin/main && break || { echo retry; sleep 3; }; done
 CANARY: rename ONE function, then run dsd check — it MUST stay green.
 Finish: paste the total names added + the final dsd check green line for all 3 regions.
 Reply with the PR URL + the sha1 result.
 """
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _reconstruction_commit(tool_path: str) -> str:
+    result = subprocess.run(
+        ["git", "log", "-1", "--format=%H", "--", tool_path],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _round_0818b_dispatches(test_case: unittest.TestCase):
+    for label, tool_path in (
+        ("cm-restock-carve-9", "tools/wall_aware_headroom.py"),
+        ("cm-main-wall-filtered-sweep-1", "tools/wall_prefilter.py"),
+        ("ledger-ship-coverage", "tools/validate_attempts.py"),
+        ("stdlib-unittest-fix", "tools/kickoff_lint.py"),
+    ):
+        commit = _reconstruction_commit(tool_path)
+        if not commit:
+            test_case.skipTest(f"no committed reconstruction source for {tool_path}")
+        yield GOOD.replace(
+            "Brief 610 — name the SDK layer.",
+            f"Round 0818b reconstruction — {label}.",
+        ).replace(
+            "tools/nitro_suggest_renames.py",
+            tool_path,
+        ).replace(
+            "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+            f"CANARY: run git show {commit} --stat and paste the result.",
+        )
 
 
 class TestGoodKickoff(unittest.TestCase):
@@ -40,6 +83,14 @@ class TestGoodKickoff(unittest.TestCase):
     def test_no_advisory_warnings(self):
         warns = [c for c in lint(GOOD) if not c.required and not c.ok]
         self.assertEqual(warns, [], f"good kickoff tripped advisories: {[c.key for c in warns]}")
+
+    def test_reconstructed_round_0818b_dispatches_still_pass(self):
+        for kickoff in _round_0818b_dispatches(self):
+            with self.subTest(kickoff=kickoff.splitlines()[1]):
+                self.assertEqual(
+                    [check.key for check in lint(kickoff) if check.required and not check.ok],
+                    [],
+                )
 
 
 class TestPowerShellLocationGuard(unittest.TestCase):
@@ -54,6 +105,7 @@ class TestPowerShellLocationGuard(unittest.TestCase):
 
     _PWSH = (
         "PREFLIGHT — STOP-and-report on any failure:\n"
+        "    Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n"
         "    $EXPECT = 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n"
         "    if ((git rev-parse --show-toplevel) -ne $EXPECT) "
         "{ Write-Output 'WRONG WORKTREE'; exit 1 }\n"
@@ -89,6 +141,42 @@ class TestPowerShellLocationGuard(unittest.TestCase):
             '"C:\\Users\\leona\\Dev\\gx-spirit-caller\\decomper"',
         )
         self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_location_guard_requires_prior_establishment(self):
+        text = self._PWSH.replace(
+            "    Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-map'\n",
+            "",
+        )
+        self.assertIn("location-guard", self._fail_keys(text))
+
+    def test_location_guard_accepts_preceding_set_location(self):
+        self.assertNotIn("location-guard", self._fail_keys(self._PWSH))
+
+
+ROUND_0822_CODEX_KICKOFF = """
+PREFLIGHT — STOP-and-report on any failure.
+    $EXPECT = 'C:/Users/leona/Dev/gx-spirit-caller/kb-types'
+    if ((git rev-parse --show-toplevel) -ne $EXPECT) { Write-Output 'WRONG WORKTREE'; exit 1 }
+    if (-not (Test-Path tools/kickoff_lint.py)) { Write-Output 'MISSING TOOL'; exit 1 }
+CANARY: run the first check and paste the pytest result.
+SET YOUR REASONING EFFORT TO HIGH.
+Reply with the pytest tail.
+"""
+
+
+class TestLocationGuardEstablishmentIncident(unittest.TestCase):
+    def _fail_keys(self, text: str) -> set[str]:
+        return {c.key for c in lint(text) if c.required and not c.ok}
+
+    def test_round_0822_kickoff_as_sent_is_red(self):
+        self.assertIn("location-guard", self._fail_keys(ROUND_0822_CODEX_KICKOFF))
+
+    def test_round_0822_kickoff_with_set_location_is_green(self):
+        fixed = (
+            "Set-Location 'C:/Users/leona/Dev/gx-spirit-caller/kb-types'\n"
+            + ROUND_0822_CODEX_KICKOFF
+        )
+        self.assertNotIn("location-guard", self._fail_keys(fixed))
 
 
 class TestMissingGuards(unittest.TestCase):
@@ -164,6 +252,69 @@ class TestMissingGuards(unittest.TestCase):
         # No worktree add → the retry check does not apply, must not fail.
         text = "PREFLIGHT: ls || exit 1\nCANARY first check\nHIGH effort\npaste the sha1 line"
         self.assertNotIn("worktree-retry", self._fail_keys(text))
+
+
+class TestReferencedCanaryInputs(unittest.TestCase):
+    _INCIDENT_CANARY = GOOD.replace(
+        "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+        "CANARY: run python3.13 tools/kickoff_lint.py src/main/func_0209e628.s and paste the result.",
+    )
+
+    def _fail_keys(self, text: str) -> set[str]:
+        return {c.key for c in lint(text) if c.required and not c.ok}
+
+    def test_real_incident_live_s_path_fails(self):
+        self.assertFalse((Path(__file__).resolve().parents[1] / "src/main/func_0209e628.s").exists())
+        self.assertIn("referenced-paths", self._fail_keys(self._INCIDENT_CANARY))
+
+    def test_real_incident_git_show_history_escape_passes(self):
+        # `010616b65^` is deep history. CI checks out at depth 1
+        # (`actions/checkout@v4` with no `fetch-depth`), so the commit is absent
+        # there and `referenced-commits` fails for a reason that has nothing to
+        # do with the behaviour under test. Skip rather than assert against
+        # repo state that is not universally available — the same choice this
+        # file already makes for missing reconstruction sources above.
+        # (Brain fix at merge, round 0822c: green locally, red in CI.)
+        if subprocess.run(
+            ["git", "cat-file", "-e", "010616b65"],
+            cwd=Path(__file__).resolve().parents[1],
+            capture_output=True,
+        ).returncode:
+            self.skipTest("shallow clone: historical commit 010616b65 not present")
+        text = self._INCIDENT_CANARY.replace(
+            "python3.13 tools/kickoff_lint.py src/main/func_0209e628.s",
+            "git show 010616b65^:src/main/func_0209e628.s",
+        )
+        self.assertNotIn("referenced-paths", self._fail_keys(text))
+        self.assertNotIn("referenced-commits", self._fail_keys(text))
+
+    def test_bad_commit_reference_fails(self):
+        text = GOOD.replace("origin/main", "deadbeef1234567")
+        self.assertIn("referenced-commits", self._fail_keys(text))
+
+    def test_prose_path_and_sha_are_not_commands(self):
+        text = GOOD + (
+            "\nThe prose mentions src/does-not-exist.s and deadbeef1234567, "
+            "but it is not an instruction.\n"
+        )
+        self.assertEqual(check_referenced_paths(text)[0], True)
+        self.assertEqual(check_referenced_commits(text)[0], True)
+
+    def test_cross_machine_mac_path_with_bare_python_fails(self):
+        text = GOOD.replace(
+            '"$HOME/Dev/spirit-caller/codex-610"',
+            '"/Users/leo/Dev/spirit-caller/codex-610"',
+        ).replace(
+            "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+            "CANARY: run python tools/kickoff_lint.py and paste the result.",
+        )
+        self.assertEqual(check_platform_coherence(text)[0], False)
+
+    def test_cross_machine_windows_path_with_python313_fails(self):
+        text = TestPowerShellLocationGuard._PWSH + (
+            "python3.13 tools/kickoff_lint.py\n"
+        )
+        self.assertEqual(check_platform_coherence(text)[0], False)
 
 
 class TestAdvisory(unittest.TestCase):

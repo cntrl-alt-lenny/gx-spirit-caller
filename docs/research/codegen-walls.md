@@ -10428,6 +10428,20 @@ this" standing instruction).
 address, all independently recognized by their investigating batch from
 the documented symptom alone. Brings the confirmed cohort to **37**.
 
+**More members, cm-main-exploit-drain-2 (2026-08-22):** 15 candidates
+from this round's ≤192 B (Part 1) and 193–256 B (Part 2) pools shared this
+exact `(self&1)*0x868` table, all reproduced the identical register-letter
+symptom on independent fresh drafts, zero ships. Two are re-confirmations of
+already-catalogued members — `0224b1e0` and `02250d9c` were listed above from
+cm-ov002-unknown-sweep-6 (69.2%/70.7%); this round's own independent drafts
+plateaued at 52.5%/57.1% respectively, a different specific figure (as
+expected — different draft, different residual-word overlap) but the same
+wall. The other 13 are new: `02251104`, `02251ec0`, `022527b8`, `02295efc`,
+`02296240` (Part 1); `021d7a64`, `021f126c`, `022058b4`, `02215bf4`,
+`0221b804`, `02239f10`, `0224ac6c`, `02251844` (Part 2). Brings the confirmed
+cohort to **50** (37 + 13 new). Ledger detail and match percentages:
+`cm-main-exploit-drain-2-2026-08-22.md`.
+
 **Recipe status: NONE. Correction (2026-07-30): do NOT treat this
 cohort as a case for prioritizing the permuter.** An earlier version of
 this entry argued the growing member count "may justify solving the

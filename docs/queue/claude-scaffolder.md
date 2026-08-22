@@ -1732,7 +1732,7 @@ show `DSD_VERSION` as the only toolchain change if you adopt. Regenerate
 ONE PR; verify every claim against `git diff --stat`; `python3.13
 tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-2`; commit; report.
 
-### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [TODO]
+### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [DONE]
 
 `cm-restock-carve-9` (#1507) shipped 689/689 of the shape-filtered pool
 (11,588 B) and — more valuable — **killed a standing assumption with its own
@@ -1863,3 +1863,58 @@ no ROM build — if you find yourself running `ninja`, you have left scope.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
 report.
+
+### cm-restock-carve-11 — the two tranches your own census sized [TODO]
+
+`cm-restock-carve-10` (#1526) did what the brief asked and then some. Brain
+verified independently: **739 new `src/main/data/*.c`, declared array bytes
+summing to exactly 15,732**, 748 files total, zero deletions, and the
+`typed_array_bytes` delta reconciles to the same figure. The `data_size_of`
+parameter is opt-in and you checked all 16 real `build_call_graph` call sites
+stay byte-identical by default — that is the right way to extend a shared tool.
+`screen_names_against_src` is now code rather than prose, which is what wave 9's
+Attempt-1 link failure actually cost us.
+
+**And you corrected the pool figure again, which is the habit that matters.**
+`cm-restock-carve-8`'s ~9,690-symbol / ~227,820 B estimate is superseded by your
+own census: **5,826 symbols / 215,668 B** in `main`'s previously-"zero-reader"
+pool, of which **5,751 / 213,220 B (98.7%)** have a real data-attributed reader
+and only **75 / 2,448 B** are genuinely reader-less by both methods. Fourth
+consecutive wave to correct an inherited count. That is now the series'
+signature and it should stay that way.
+
+**This wave takes the two successors you sized yourself:**
+
+1. **3,187 string-shaped symbols / 68,613 B that need TU composition.** These
+   are the ones that are not individually 4-aligned, so the Pattern-1
+   one-declaration-per-file recipe does not apply. **P-50 is live here** —
+   composed-TU declaration order collapsing to ascending size is PERMANENT with
+   evidence, and the alignment-wall recipe only works when the composed span is
+   4-aligned at BOTH ends. Take a bounded first tranche, gate the first composed
+   TU alone before batching, and report the composable fraction honestly — if
+   most of the 3,187 turn out to be non-composable under those two constraints,
+   that is the finding and the byte figure comes down accordingly.
+2. **1,825 non-string symbols / 128,875 B needing shape-specific recipes.** Do
+   NOT attempt this as one job. Classify by shape first, pick the single largest
+   tractable shape class, and write its recipe with one gated worked example —
+   the way `cluster-c-recipe.md` was established. A recipe with one proven
+   example beats a tranche of guesses.
+
+Prefer (1) if you have to choose: the recipe already exists and only its
+preconditions are in question. (2) opens a new method and deserves a clean run
+at it rather than the tail end of a round.
+
+**Standing preconditions, both now enforceable in code — use them:**
+`screen_names_against_src` before any absorption, and the individual-alignment
+check before choosing Pattern-1 over composition. Neither is optional and both
+are yours from previous waves.
+
+**Gate:** full `python tools/gate3.py --scope all --clean` — three SHA1 PASS
+lines verbatim + pytest tail. `typed_array_bytes`/`named_struct_bytes` before ->
+after via `summarize_data_readability`, BEFORE isolated with a real `git stash
+push -u`/`pop`, and the delta reconciled item by item against the files shipped.
+`git restore assets/` after the clean run. Regenerate `docs/research/README.md`
+LAST.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-restock-carve-11`.

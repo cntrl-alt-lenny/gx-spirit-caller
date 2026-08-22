@@ -300,6 +300,62 @@ class TestDisplaceRestoreStaleSibling(unittest.TestCase):
             self.assertIsNone(cand.s_backup)
 
 
+class TestApplyRemovesStaleSiblings(unittest.TestCase):
+    """q-batch-sha1-stale-s: applying a C candidate owns the sibling cleanup."""
+
+    def _make_apply_tree(self, root: Path, c_rels: list[str]) -> list[bs.Candidate]:
+        delinks = root / "config" / "eur" / "arm9" / "delinks.txt"
+        delinks.parent.mkdir(parents=True)
+        candidates: list[bs.Candidate] = []
+        blocks: list[str] = []
+        for index, c_rel in enumerate(c_rels):
+            s_rel = bs._c_to_s_rel(c_rel)
+            s_path = root / s_rel
+            s_path.parent.mkdir(parents=True, exist_ok=True)
+            s_path.write_bytes(f"; original {index}\r\n".encode())
+            (root / c_rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / c_rel).write_text("int candidate(void) { return 0; }\n")
+            blocks.append(f"{s_rel}:\n    complete\n")
+            candidates.append(
+                bs.Candidate(
+                    c_path=Path(c_rel),
+                    s_rel=s_rel,
+                    c_rel=c_rel,
+                    delinks_path=delinks,
+                )
+            )
+        delinks.write_text("".join(blocks))
+        return candidates
+
+    def test_apply_removes_pre_restored_sibling_for_every_shipped_tier(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c_rels = [
+                "src/main/func_plain.c",
+                "src/main/func_legacy.legacy.c",
+                "src/main/func_sp3.legacy_sp3.c",
+            ]
+            with mock.patch.object(bs, "ROOT", root):
+                candidates = self._make_apply_tree(root, c_rels)
+                for candidate in candidates:
+                    self.assertTrue(bs._apply_one(candidate))
+                    self.assertFalse((root / candidate.s_rel).exists())
+                    self.assertIsNotNone(candidate.s_backup)
+
+    def test_apply_many_does_not_leave_a_partial_self_heal_tail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c_rels = [
+                *(f"src/main/func_{index:02d}.c" for index in range(12)),
+                "src/main/func_12.legacy.c",
+                "src/main/func_13.legacy_sp3.c",
+            ]
+            with mock.patch.object(bs, "ROOT", root):
+                candidates = self._make_apply_tree(root, c_rels)
+                bs._apply_many(candidates)
+                self.assertTrue(all(not (root / candidate.s_rel).exists() for candidate in candidates))
+
+
 # --------------------------------------------------------------------------- #
 # End-to-end self-heal through main() — subprocess.run mocked, so no real
 # ninja/configure.py toolchain is needed; only batch_sha1's own control

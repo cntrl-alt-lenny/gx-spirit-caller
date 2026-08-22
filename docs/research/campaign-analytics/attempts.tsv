@@ -1642,3 +1642,75 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief
 0x0221b4f0	ov002	188	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
 0x02225274	ov002	128	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
 0x0222daa4	ov002	172	default	unknown	shipped	100	n/a		cm-main-exploit-drain-1-batch5
+0x020896cc	main	124	default	unknown	parked	77.4	register-choice	PROVISIONAL:register-choice	cm-main-exploit-drain-2
+0x0208a5e4	main	160	default	unknown	parked	25.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b3f50	ov010	72	2.0	switch-forwarder	shipped	100	n/a		cm-main-exploit-drain-2-canary
+0x0209c280	main	156	default	unknown	parked	5.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x0224b1e0	ov002	156	default	unknown	parked	52.5	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x02250d9c	ov002	164	default	unknown	parked	57.1	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x02251104	ov002	184	default	unknown	parked	4.0	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x02251ec0	ov002	176	default	unknown	parked	2.1	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x022527b8	ov002	176	default	unknown	parked	2.1	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x02296240	ov002	192	default	unknown	parked	6.2	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x02295efc	ov002	188	default	unknown	parked	0.0	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x021abb08	ov008	152	2.0	sound-event-pair	shipped	100	n/a		cm-main-exploit-drain-2
+0x021b2b08	ov010	120	2.0	jump-table-switch	shipped	100	n/a		cm-main-exploit-drain-2
+0x021b4194	ov010	136	2.0	sequential-pipeline	shipped	100	n/a		cm-main-exploit-drain-2
+0x021b3ea0	ov010	176	default	unknown	parked	2.2	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b6b58	ov010	168	default	unknown	parked	4.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021cbdf4	ov003	152	default	unknown	parked	89.5	register-choice	PROVISIONAL:register-choice	cm-main-exploit-drain-2
+0x021afbac	ov008	128	2.0	indexed-lookup	shipped	100	n/a		cm-main-exploit-drain-2
+0x0229d258	ov002	112	default	unknown	parked	75.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-main-exploit-drain-2
+0x022ae2e0	ov002	148	default	unknown	parked	81.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-main-exploit-drain-2
+0x02291160	ov002	180	default	unknown	parked	17.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x02294478	ov002	140	default	unknown	parked	25.7	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b61dc	ov017	136	default	unknown	parked	91.2	register-choice	PROVISIONAL:register-choice	cm-main-exploit-drain-2
+0x021b2644	ov014	168	default	unknown	parked	21.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b3ecc	ov015	180	default	unknown	parked	17.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b3f98	ov015	168	default	unknown	parked	4.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b43a8	ov015	156	default	unknown	parked	7.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021b6774	ov017	144	default	unknown	parked	26.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021aa4a0	ov022	160	default	unknown	parked	17.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021ab330	ov022	192	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x021ab3f0	ov022	112	default	unknown	parked	9.7	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2
+0x0207d520	main	240	default	unknown	parked	80.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-main-exploit-drain-2-part2
+0x02020a24	main	256	default	unknown	parked	34.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02020ba0	main	244	default	unknown	parked	11.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0202c0c0	main	236	default	unknown	parked	5.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02033390	main	248	default	unknown	parked	3.2	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0203e0a0	main	248	default	unknown	parked	6.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02059e5c	main	220	default	unknown	parked	47.3	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02062a20	main	204	default	unknown	parked	10.9	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02085e74	main	212	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0209b384	main	196	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0209ea24	main	220	default	unknown	parked	23.6	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0209f720	main	220	default	unknown	parked	40.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021d1c1c	ov002	204	default	unknown	parked	60.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aa4c4	ov000	244	default	unknown	parked	11.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021d7a64	ov002	224	default	unknown	parked	1.8	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x021e05fc	ov002	232	default	unknown	parked	36.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021f126c	ov002	204	default	unknown	parked	13.2	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x022058b4	ov002	232	default	unknown	parked	36.2	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x02209268	ov002	216	default	unknown	parked	3.7	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02215bf4	ov002	256	default	unknown	parked	48.4	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x0221b804	ov002	220	default	unknown	parked	16.4	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x0223998c	ov002	232	default	unknown	parked	51.7	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02239f10	ov002	208	default	unknown	parked	21.1	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x0223b2ec	ov002	224	default	unknown	parked	5.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x0224ac6c	ov002	248	default	unknown	parked	15.9	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x02251844	ov002	196	default	unknown	parked	5.7	P-20-row-offset	PROVISIONAL:unmapped	cm-main-exploit-drain-2-part2
+0x0226d864	ov002	248	default	unknown	parked	6.2	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021ab00c	ov005	240	default	unknown	parked	12.7	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021b2d3c	ov007	196	default	unknown	parked	14.3	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aba3c	ov008	204	default	unknown	parked	3.9	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aefd4	ov008	212	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aa4a8	ov009	244	default	unknown	parked	38.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021b2eec	ov014	204	default	unknown	parked	92.2	register-choice	PROVISIONAL:register-choice	cm-main-exploit-drain-2-part2
+0x021b3dd8	ov010	200	default	unknown	parked	2.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021cb320	ov012	224	default	unknown	parked	28.6	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021b3d2c	ov015	232	default	unknown	parked	34.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021b7dac	ov017	208	default	unknown	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021b5948	ov019	208	default	unknown	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aad10	ov020	252	default	unknown	parked	23.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x021aaf5c	ov021	256	default	unknown	parked	9.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
+0x02251bb0	ov002	140	default	unknown	parked	65.7	P-23-tentative	PROVISIONAL:unmapped	cm-main-exploit-drain-2

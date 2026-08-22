@@ -1484,7 +1484,7 @@ Regenerate `docs/research/README.md` LAST.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper cm-main-exploit-drain-1`; commit; report.
 
-### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [TODO]
+### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [DONE]
 
 `cm-main-exploit-drain-1` (#1524) did exactly what it was asked and the number
 held up: **73/100 shipped, 9,488 B, zero `asm` escapes across all 73** — against
@@ -1607,3 +1607,78 @@ delinks against **current `main`**, not just your branch base.
 
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
 `python tools/work_queue.py done claude-decomper cm-main-exploit-drain-2`.
+
+### cm-main-boundary-rerun — settle the 193-256 B question with matched effort [TODO]
+
+`cm-main-exploit-drain-2` (#1536) ran the boundary test and reported **0/40**,
+then did the thing that makes it worth acting on: **it disclosed that Part 2 got
+materially less iteration than Part 1** — mostly one fastmatch attempt each,
+versus Part 1's 2-4 and versus the protocol `cm-main-exploit-drain-1` used to
+reach 73%. It called its own 0% a lower bound rather than a measurement, and it
+declined to invoke the decision memo's redirect on evidence it knew was
+confounded. That is exactly right, and it is why this item is a re-run rather
+than a verdict.
+
+**The brain's independent read of your own ledger, which you should have before
+you start.** Park `match_pct` distributions for the two arms:
+
+| | n | median | >=85% | <50% |
+|---|---:|---:|---:|---:|
+| Part 1 (<=192 B tail, 2-4 attempts) | 27 | 17.8% | 2 | 19 |
+| Part 2 (193-256 B, ~1 attempt) | 40 | 12.9% | 1 | 36 |
+
+If under-iteration were the whole story, Part 2 would show a pile of
+high-percentage near-misses that one more pass would close. It does not — 36 of
+40 sit below 50%, and only one candidate is above 85%. Note the bias runs
+*against* that reading, too: Part 1's figures are best-of-several attempts while
+Part 2's are best-of-one, so Part 1 is flattered and the gap between them is
+still only ~5 points. (Caveat, stated because it matters: `match_pct` is
+agent-reported, not tool-derived — it is evidence, not proof. What makes the
+comparison usable is that both arms were recorded by the same lane under the
+same convention.)
+
+**So the honest position is: the evidence leans toward the cap being real, and
+the round cannot close the question. Close it.**
+
+**Scope — deliberately small.** Re-test **20 candidates** from the 193-256 B
+slice, sampled fresh (do not reuse #1536's 40; draw from the untouched
+remainder), under **Part 1's protocol**: 2-4 fastmatch iterations each, real
+struct-layout and register-order experiments before parking. Record every one.
+This is ~half the sample size of the confounded run and worth more than it was.
+
+**Run it arm-blind if your batching allows it.** `cm-main-wall-filtered-sweep-1`
+deliberately hid arm labels from its dispatched batches to avoid exactly the
+effort-bias that confounded #1536, and it is the reason that round's null was
+trustworthy. If you split across worktrees, do not tell a batch whether it is
+"the hard band" — give it candidates and the standard protocol.
+
+**Decision, stated before the run:**
+
+- **>=25% ships** — the cap is NOT real; #1536's 0% was an effort artifact.
+  `post-small-pool-strategy.md` Outcome A/C applies, the band ladder opens, and
+  59,560 B plus a 146 KB tail behind it are back on the table.
+- **<=10% ships** — the cap is real and confirmed at matched effort. Outcome B
+  fires: the small-code frontier is closing, and the campaign's centre of
+  gravity moves to the data pool (which is now measured at 213,220 B reachable
+  and shipping successfully — see `cm-restock-carve-10`, #1526).
+- **10-25%** — consistent with sweep-7 Part 2's 16%; the band is workable but
+  poor. Report it and let the owner weigh it against the data pool's rate.
+
+Do not adjust the sample, the protocol, or the thresholds to reach a number.
+The value of this round is entirely in it being clean.
+
+**One correction to carry:** #1536's prose said the P-20 wall took 9 Part 2 hits
+for 16 total; its own ledger and `codegen-walls.md` say **8 and 15** (7 Part 1 +
+8 Part 2, 13 new members, cohort 50). The brain corrected the writeup at merge.
+The catalog was right; only the prose was off. Re-derive from the ledger, not
+from the previous round's summary.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines pasted verbatim + `check_activation_invariant.py` +
+`check_delink_dupes.py` + `gate3.py --scope tests`. Paste real tails.
+`git restore assets/` after each clean run. Dedup touched delinks against
+current `main`.
+
+ONE PR; verify every PR-body claim against `git diff --stat` before writing it —
+including the arithmetic, which is what slipped last round; `python
+tools/work_queue.py done claude-decomper cm-main-boundary-rerun`.

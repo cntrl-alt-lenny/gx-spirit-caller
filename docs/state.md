@@ -27,6 +27,130 @@ by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
 **Last updated:** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0822c: all four lanes delivered, eight PRs reviewed, seven merged. The
+boundary experiment came back 0/40 and the lane disclosed the confound that makes
+it uninterpretable — so it is being re-run at matched effort rather than acted on.
+The data pool is now the campaign's largest measured frontier and it is
+shipping.**
+
+Merged **#1526**, **#1528**, **#1529**, **#1530**, **#1532**, **#1535**, **#1536**.
+**Held #1534.** Closed **#1520** (superseded by #1530).
+
+✅ **Transcript audit performed in full this round** — all four lanes ran on this
+machine, so control 12 was actually executable for the first time since 0817.
+Both Claude sessions read via `mcp__ccd_session_mgmt__*`; both Codex lanes read
+from `~/.codex/sessions/2026/08/22/rollout-*.jsonl` located by mtime and parsed
+in Python. This is exactly the gap `docs/dispatch-log.md` was created to close
+last round, and the log's 0822c row records it.
+
+| Lane | Session located | Caveat found in transcript but NOT in the PR title | Reconciled |
+|---|---|---|---|
+| CC Decomper (#1536) | ✓ | **the round's headline is confounded** — see below | ✓ |
+| CC Scaffolder (#1526) | ✓ | none; report matched branch exactly | ✓ |
+| Codex Decomper (#1528/#1529/#1532) | ✓ | left its own `q-batch-sha1-stale-s` marker at CLAIMED; the next branch corrected it | ✓ |
+| Codex Scaffolder (#1530/#1534/#1535) | ✓ | **refused to report QUEUE-EMPTY** when a re-claim made it look empty, and undid the accidental claim | ✓ |
+
+**#1536 `cm-main-exploit-drain-2` — 0/40, and the lane told us why that number
+can't be spent.** Part 1 finished the ≤192 B tail: 5/32 shipped, 608 B. Part 2
+ran the falsification test on the 193-256 B slice: **0/40**. Brain-verified
+mechanically — 5 `.c` added == 5 `.s` deleted == 5 activations, 72 ledger rows
+(5 shipped + 67 parked), per-brief split 31 + 1 canary + 40 exactly.
+
+The lane then disclosed, in the PR body *and* the writeup, that **Part 2 got
+materially less iteration than Part 1** — mostly one fastmatch attempt each
+versus Part 1's 2-4 and versus the protocol #1524 used to reach 73% — and called
+its own 0% *a lower bound, not a measurement*. It declined to invoke
+`post-small-pool-strategy.md`'s Outcome B on evidence it knew was confounded.
+That is the correct call and it is why the memo exists rather than a reflex.
+
+**Brain's independent read of the round's own ledger, which partly answers the
+question the lane thought it couldn't:**
+
+| | n | median `match_pct` | ≥85% | <50% |
+|---|---:|---:|---:|---:|
+| Part 1 (≤192 B tail, 2-4 attempts) | 27 | 17.8% | 2 | 19 |
+| Part 2 (193-256 B, ~1 attempt) | 40 | 12.9% | 1 | 36 |
+
+Under-iteration would leave a pile of high-percentage near-misses that one more
+pass closes. It doesn't — 36 of 40 sit below 50% and exactly one is above 85%.
+The bias also runs *against* that reading: Part 1's figures are best-of-several
+while Part 2's are best-of-one, so Part 1 is flattered and the gap is still only
+~5 points. Caveat stated plainly: `match_pct` is agent-reported, not
+tool-derived (`park_one.py` takes it as a free-text argument) — it is evidence,
+not proof; what makes the *comparison* usable is that both arms were recorded by
+one lane under one convention. **Read together: the evidence leans toward the cap
+being real, and no one should spend the 0% until it is re-run clean.**
+`cm-main-boundary-rerun` does exactly that — n=20, Part 1's protocol, arm-blind
+where batching allows, thresholds stated in advance.
+
+**Brain correction at merge:** the writeup's prose said the P-20 wall took 9
+Part 2 hits for 16 total. The round's own ledger says **8**, for **15** (7 + 8),
+and `codegen-walls.md` says 2 re-confirmations + 13 new for a cohort of **50** —
+which is internally correct. Only the prose was off; corrected in place. The
+P-20 reproduction itself is the round's one unconfounded result and it is a
+strong one: 15 hits, zero ships, zero exceptions.
+
+**#1526 `cm-restock-carve-10` — the data pool is real, reachable, and shipping.**
+Brain-verified: **739 new `src/main/data/*.c`, declared array bytes summing to
+exactly 15,732**, 748 files total, zero deletions, `typed_array_bytes` delta
+reconciling to the same figure. The `data_size_of` extension is opt-in and the
+lane checked all 16 real `build_call_graph` call sites stay byte-identical by
+default — the right way to widen a shared tool. `screen_names_against_src` is now
+code, not prose.
+
+**And the fourth consecutive inherited-count correction.** `cm-restock-carve-8`'s
+~9,690-symbol / ~227,820 B figure is superseded by the lane's own census:
+**5,826 symbols / 215,668 B**, of which **5,751 / 213,220 B (98.7%)** have a real
+data-attributed reader and only **75 / 2,448 B** are genuinely reader-less. The
+next two tranches are sized by the same census — 3,187 string-shaped / 68,613 B
+needing TU composition (P-50 live), 1,825 non-string / 128,875 B needing
+shape-specific recipes — and are seeded as `cm-restock-carve-11`.
+
+**#1534 `q-pool-freshness-tool` — HELD, and the reason is subtle enough to be
+worth stating precisely: the tool is arithmetically correct and one default is
+wrong, which is worse than a bug.** `_wall_bl4_pool()` defaults to
+`module="main"`, but `wall-bl4-small` is a **full-EUR, all-modules** pool by
+definition. Brain ran the lane's own tool three ways on one tree:
+
+```text
+module='main'   -> count=3   bytes=440
+module=None     -> count=34  bytes=5224      <-- known-answer case, EXACT
+module=''       -> count=0   bytes=0         <-- silent empty, no error
+```
+
+**With the right scope it reproduces 34 / 5,224 B exactly** — the tool works.
+But the narrowed default led the PR to conclude that round 0822's
+`34 / 5,224 B` figure was *stale on this tree*. It was not stale; it was correct.
+**A scope mismatch was reported as staleness — precisely the inference this tool
+exists to make impossible**, and it arrives stamped with a reproducer command,
+so it would have been believed. The re-take item carries all three findings plus
+the `module=""` silent-zero footgun. The lane's `data-string-pool` `0 / 0 B`
+reading is correct and needs no change (carve-9 shipped that pool in full).
+
+**#1530 supersedes #1520 and the held work paid off twice.** Control 7 satisfied
+on the brain's own reproduction: the new establishment check goes **red on the
+literal round-0822 kickoff as sent** and green with `Set-Location` prepended, and
+all four of this round's real dispatches pass every required check. The
+self-sourcing fixture removes the machine-local SHA. #1520 closed as superseded.
+
+**#1528 is byte-safe by construction** — 155 added lines in `src/`, every one a
+`;` comment, zero removals, and the before/after canary goes 4 matching lines →
+none. It also declined to manufacture headers for 10 catalog entries with no live
+source, including the retracted `0x02253304`. **#1532** is correctly scoped: the
+new `--version` runtime probe covers **only** `arm-binutils` (the tool that
+actually failed); `mwccarm`/`wibo`/`dsd`/`objdiff` return `[]` and are untouched,
+so there is no fresh-bootstrap risk. **#1535** validates last round's toggle
+directly: 50 sampled `unittest` runs, 43 pass, and **all 7 failures were true
+red with no same-SHA passing rerun — zero flakes**, several of them the exact
+`pytest`-import-in-a-unittest-only-job class. Making it required adds no spurious
+friction.
+
+**Integration hazard checked and clean:** #1528 edits `.s` headers while #1536
+deletes `.s` files. Zero overlap between the 155 touched and the 5 deleted — the
+partition written into both kickoffs held. One benign queue-marker conflict
+resolved to DONE.
+
+**Last updated (previous):** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0822: the exploit round landed at 73/100 and settled the pool-vs-selector
 question for good — but it also drained the pool it was exploiting down to 32
 candidates. The next question is no longer "which selector"; it is "where does
@@ -200,7 +324,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: 6689860b2 -->
+<!-- main-sha: 2e253e9d0 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
@@ -248,17 +372,22 @@ they stay here:
 
 ## In flight (post this brain-PR)
 
-**Active PRs: 1** once `brain/integ-0822` lands — **#1520**, HELD (not parked: the
-work is good, it needs the SHA-brittleness fix and comes back as
-`q-kickoff-lint-sha-brittleness`). **#1020** (decomp.dev CI) remains the one
-genuinely parked draft and is declared in the `parked-prs` anchor above.
+**Active PRs: 1** once `brain/integ-0822c` lands — **#1534**, HELD (not parked:
+the tool is correct and one default is wrong; it comes back as the
+`q-pool-freshness-tool` re-take with the scope finding written into the item).
+**#1020** (decomp.dev CI) remains the one genuinely parked draft and is declared
+in the `parked-prs` anchor above. **#1520 is CLOSED** — superseded by #1530,
+which shipped its three checks plus the self-sourcing fixture and the
+location-establishment guard. Held-vs-parked stays a real distinction: a held PR
+is expected back next round, a parked one is not.
 
 **All four lanes idle at hand-off, and all four queues re-seeded** — each lane
 resumes with `python tools/work_queue.py next <lane>`, one PR per item. Every
 seeded item was verified to resolve via `work_queue.py next` on the integration
 tree before dispatch, per the standing pre-send check.
 
-**Dispatch host this round: the Windows PC.** All four kickoffs are Windows-pathed
+**Dispatch host this round: the Windows PC** (recorded in
+[`docs/dispatch-log.md`](dispatch-log.md), row 0822c)**.** All four kickoffs are Windows-pathed
 (`C:/Users/leona/Dev/gx-spirit-caller/{decomper,scaffolder,kb-map,kb-types}`,
 bare `python`, **not** `python3.13`). Round 0819 ran on the Mac, so all four
 worktrees here are a round stale and each kickoff opens with the fetch/reset step.
