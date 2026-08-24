@@ -1918,3 +1918,88 @@ no ROM build — if you find yourself running `ninja`, you have left scope.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
 report.
+
+### cm-restock-carve-12 — scale the tranche, not the risk [TODO]
+
+⚠️ **Read this scoping note before you size the wave, because the instruction
+here is deliberately different from previous waves.**
+
+cntrl_alt_lenny has asked the fleet to take on materially more work per round.
+For *this* lane that is genuinely safe, and it is worth being explicit about
+why: every file you ship is verified byte-identical by a 3-region SHA1 gate.
+There is no judgment call whose quality degrades when the batch gets bigger —
+a mis-carved symbol does not slip through as "probably fine", it fails the
+gate. `cm-restock-carve-10` shipped **739 files / 15,732 B in a single wave**
+with zero escapes. That is the proof that the method scales.
+
+So: **take the largest tranche you can gate cleanly in one round, and treat
+739 as a floor rather than a target.** If the pool supports 1,500 or 2,500
+files, take them. The binding constraint is the ~40-minute 3-region clean gate
+and the machine-wide toolchain lock, not your carving throughput.
+
+**What is NOT safe to scale, and must not be:** the canary-before-batch rule,
+the `screen_names_against_src` precondition, the per-candidate alignment check,
+and the byte-total reconciliation. Those are what make a big tranche
+trustworthy. A 2,000-file wave with a skipped canary is worth less than a
+200-file wave with one. If a bigger batch would mean cutting any of those,
+take the smaller batch and say so.
+
+**The pool, from your own census (#1526) — re-derive before relying on it:**
+
+- 3,187 string-shaped symbols / 68,613 B needing TU composition (P-50 live;
+  composition only works when the span is 4-aligned at BOTH ends).
+- 1,825 non-string symbols / 128,875 B needing shape-specific recipes, with
+  `fnptr_table` and `jump_table` among the shapes you identified.
+
+`cm-restock-carve-11` takes the first bite of these. This wave continues from
+wherever 11 stopped — **read 11's own closing census rather than this item's
+numbers**, which will be stale by the time you get here. Four consecutive waves
+have corrected an inherited count; assume this one is wrong too.
+
+**Report the composable fraction honestly.** If TU composition turns out to
+apply to far fewer of the 3,187 than hoped, that is the finding and the byte
+figure comes down. A smaller true number beats a larger hopeful one.
+
+**Gate:** full `python tools/gate3.py --scope all --clean` — three SHA1 PASS
+lines verbatim plus the pytest tail. `typed_array_bytes` / `named_struct_bytes`
+before -> after via `summarize_data_readability`, BEFORE isolated with a real
+`git stash push -u` / `pop`, delta reconciled against the files shipped.
+`git restore assets/` after the clean run. Regenerate `docs/research/README.md`
+LAST.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-restock-carve-12`; next item.
+
+### cm-restock-carve-13 — the non-string shapes, one recipe at a time [TODO]
+
+The 1,825 non-string symbols / 128,875 B are the larger half of the remaining
+pool by bytes and the one with no established recipe. `cm-restock-carve-11`
+was told to pick the single largest tractable shape class and prove one recipe
+with a gated worked example. This wave takes the **next** shape class the same
+way.
+
+**Do not batch across shapes.** The reason the string pool scaled to 739 files
+in one wave is that every candidate used one proven declaration form. A
+non-string wave that mixes `fnptr_table`, `jump_table` and struct-ish shapes
+inherits the failure modes of all three and diagnoses none of them. One shape,
+one recipe, one gated example, then scale *within* that shape as far as the
+pool allows — the same scale-the-tranche-not-the-risk rule as wave 12.
+
+**`fnptr_table` deserves specific care.** A table of function pointers is not
+inert data: its contents are relocations against real functions, several of
+which are still `.s`. Emitting it wrong can produce a file that gates green in
+isolation and breaks when a sibling function later ships to C. Screen every
+entry against `src/` and against the delinks routing for the functions it
+points at, and say in the PR what you checked.
+
+Where a shape turns out to need a lever this campaign does not have, park it
+with a real diagnosis and move to the next shape rather than iterating. An
+honest "this shape needs X, which we do not have" is a result — it is how
+`cluster-c-recipe.md` and the P-catalog got built.
+
+**Gate:** as wave 12 — full 3-region clean gate, readability delta with the
+BEFORE stashed, reconciliation item by item, README regenerated last.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-restock-carve-13`; then take the
+next item — report QUEUE-EMPTY honestly if you genuinely reach it.
