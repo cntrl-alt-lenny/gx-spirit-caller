@@ -94,6 +94,7 @@ BANDS: tuple[tuple[str, int | None, int | None], ...] = (
     ("193-256 B", 193, 256),
     ("257-320 B", 257, 320),
     ("321-384 B", 321, 384),
+    ("385+ B", 385, None),
 )
 
 
@@ -183,6 +184,20 @@ def _all_candidate_sizes() -> list[int]:
         for d in per.values()
         for key in ("coercible_files", "unknown_files", "no_marker_files")
         for f in d[key]
+    ]
+
+
+def _candidate_scan() -> dict[str, dict]:
+    """One wall-aware scan reused by all candidate census sections."""
+    return scan(None, None, True, None, None)
+
+
+def _files_in_band(files: list[dict], min_size: int | None, max_size: int | None) -> list[dict]:
+    lo = min_size if min_size is not None else 0
+    return [
+        item for item in files
+        if lo <= int(item.get("text_size") or 0)
+        and (max_size is None or int(item.get("text_size") or 0) <= max_size)
     ]
 
 
@@ -314,10 +329,46 @@ def render() -> str:
     add("")
     add("| band | candidates (size-only) | bytes (size-only) |")
     add("| --- | ---: | ---: |")
-    all_sizes = _all_candidate_sizes()
+    per = _candidate_scan()
+    all_sizes = [
+        int(f.get("text_size") or 0)
+        for d in per.values()
+        for key in ("coercible_files", "unknown_files", "no_marker_files")
+        for f in d[key]
+    ]
     for label, lo, hi in BANDS:
         count, band_bytes = _band_totals(all_sizes, lo, hi)
         add(f"| {label} | {count:,} | {band_bytes:,} |")
+    add("")
+
+    add("### Remaining unmatched `.text` by module")
+    add("")
+    add("This is the same wall-aware, attempted-excluded candidate population "
+        "as the band table, split by module. Confirmed permanent walls are "
+        "not included in these candidate columns.")
+    add("")
+    add("Reproduce: `python tools/wall_aware_headroom.py --json "
+        "--exclude-attempted`; each row below sums that JSON module's "
+        "`coercible_files`, `unknown_files`, and `no_marker_files`.")
+    add("")
+    add("| module | permanent count | permanent bytes | unassessed count | "
+        "unassessed bytes |")
+    add("| --- | ---: | ---: | ---: | ---: |")
+    for module, data in sorted(per.items()):
+        candidates = [
+            f
+            for key in ("coercible_files", "unknown_files", "no_marker_files")
+            for f in data[key]
+        ]
+        add(f"| {module} | {data['permanent']:,} | "
+            f"{sum(int(f.get('text_size') or 0) for f in data['permanent_files']):,} | "
+            f"{len(candidates):,} | "
+            f"{sum(int(f.get('text_size') or 0) for f in candidates):,} |")
+    add("")
+    add("Permanent-wall bytes are not inferred from counts here: the scan's "
+        "permanent classification is the exclusion source, while its "
+        "candidate file metadata is the byte source. This keeps the two "
+        "sides auditable when a wall citation or source span changes.")
     add("")
 
     # ---- Data readability ----
@@ -347,6 +398,46 @@ def render() -> str:
         f"bytes** with no function reader AND no data-pointer-table "
         f"reader under the extended call graph "
         f"(`cm-restock-carve-10`'s `edges_load_from_data`).")
+    add("")
+    add("### Data opportunity disposition")
+    add("")
+    add("Reproduce the current reachable total with `python tools/data_worklist.py "
+        "--version eur --include-data-readers --no-outputs`. This is the "
+        "live unmatched placeholder data/bss population with function or "
+        "data readers; it is not a forecast and does not claim every shape "
+        "has a proven recipe.")
+    add("")
+    modules = load_all(eur)
+    modsecs_map = load_module_sections(eur, "eur", load_binaries=False)
+    size_table = build_size_table(modules, modsecs_map)
+    graph = build_call_graph(
+        modules,
+        data_size_of=lambda symbol: size_table.get(
+            (symbol.module, symbol.addr), symbol.size,
+        ),
+    )
+    matched = collect_matched_ranges(eur)
+    entries = rank_data_symbols(
+        modules, graph, matched, min_readers=1,
+        modsecs_map=modsecs_map, size_table=size_table,
+        include_data_readers=True,
+    )
+    add("| disposition | symbols | bytes | command / evidence |")
+    add("| --- | ---: | ---: | --- |")
+    add(f"| reachable, reader-attributed | {len(entries):,} | "
+        f"{sum(e.effective_size for e in entries):,} | `data_worklist.py "
+        "--include-data-readers --no-outputs` |")
+    add("| proven recipe currently shippable |  |  | blank: the build-free "
+        "worklist cannot classify the remaining shapes without compiled "
+        "bytes |")
+    add("| blocked pending per-group verification |  |  | blank for the "
+        "whole reachable pool; the latest scoped string-pool disposition is "
+        "published in `cm-restock-carve-11-2026-08-24.md` |")
+    add("")
+    add("The latest scoped string-pool note records 46/1,060 B shipped by a "
+        "proven same-size composition recipe and 3,069/66,096 B deferred "
+        "pending group verification. Those are a dated sub-pool disposition, "
+        "not silently promoted to a project-wide split.")
     add("")
 
     # ---- Honest ceiling ----

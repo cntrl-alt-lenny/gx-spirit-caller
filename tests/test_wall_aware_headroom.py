@@ -189,6 +189,8 @@ class ScanCandidateAccounting(unittest.TestCase):
         self.assertEqual(d["unknown"], 1)
         self.assertEqual(d["no_marker"], 1)
         self.assertEqual(d["candidate"], 3)  # everything except permanent
+        self.assertIn("permanent_files", d)
+        self.assertEqual(d["permanent_files"][0]["path"], "src/main/permanent.s")
         self.assertEqual(d["coercible_files"], [{
             "path": "src/main/coercible.s",
             "addr": None,

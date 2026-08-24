@@ -1031,7 +1031,7 @@ Build-free.
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — and report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [TODO]
+### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [DONE]
 
 `q-ledger-contradiction-audit` (#1546) is merged and the tool is good: 57
 repeated groups classified 53 legitimate / 3 contradictory / 1 ambiguous, with
@@ -1095,7 +1095,7 @@ classifies LEGITIMATE. Assert the shape, never the counts — they move. Build-f
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [TODO]
+### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [DONE]
 
 This item exists because the campaign reached a real inflection point on
 2026-08-24 and nobody has written down the resulting picture in one place with
