@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -70,6 +71,7 @@ TOOLCHAIN_MARKERS = (
     "requests.exceptions.",
     "zipfile.badzipfile",
 )
+STATE_PATH = ROOT / "build" / "gate3-state.json"
 
 
 @dataclass(frozen=True)
@@ -85,6 +87,87 @@ class CommandResult:
 class RegionResult:
     ok: bool
     infrastructure: bool = False
+    pass_line: str = ""
+
+
+def current_commit_sha() -> str | None:
+    """Return HEAD, or None when git cannot identify this checkout."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT,
+            capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return None
+    sha = result.stdout.strip()
+    return sha if result.returncode == 0 and sha else None
+
+
+def worktree_clean() -> bool:
+    """Resume only from a checkout with no tracked or untracked changes."""
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=ROOT,
+            capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0 and not result.stdout.strip()
+
+
+def load_gate_state() -> dict[str, object] | None:
+    """Load a valid resume record; malformed or missing state fails closed."""
+    try:
+        state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(state, dict) or not isinstance(state.get("sha"), str):
+        return None
+    regions = state.get("regions")
+    if not isinstance(regions, dict):
+        return None
+    return state
+
+
+def save_gate_state(sha: str, region: str, pass_line: str) -> None:
+    """Record one observed region pass as a gitignored build artifact."""
+    state = load_gate_state()
+    if state is None or state.get("sha") != sha:
+        state = {"sha": sha, "regions": {}}
+    regions = state["regions"]
+    assert isinstance(regions, dict)
+    regions[region] = {"sha": sha, "pass": pass_line}
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def resume_regions(sha: str | None, *, clean: bool) -> dict[str, str]:
+    """Return only same-HEAD, clean-tree, non-cleaned region records."""
+    if sha is None:
+        print("gate3: resume disabled — HEAD could not be identified; re-running all regions")
+        return {}
+    if not worktree_clean():
+        print("gate3: resume disabled — working tree is dirty; re-running all regions")
+        return {}
+    state = load_gate_state()
+    if clean:
+        print("gate3: --clean invalidates saved region results; re-running all regions")
+        try:
+            STATE_PATH.unlink()
+        except FileNotFoundError:
+            pass
+        return {}
+    if state is None or state.get("sha") != sha:
+        print("gate3: resume disabled — state missing or from another commit; re-running all regions")
+        return {}
+    regions = state.get("regions", {})
+    assert isinstance(regions, dict)
+    valid: dict[str, str] = {}
+    for region, record in regions.items():
+        if isinstance(region, str) and isinstance(record, dict):
+            if record.get("sha") == sha and isinstance(record.get("pass"), str):
+                valid[region] = record["pass"]
+    return valid
 
 
 def is_infrastructure_failure(cmd: list[str], output: str, returncode: int) -> bool:
@@ -211,8 +294,9 @@ def gate_region(ver: str, clean: bool) -> RegionResult:
             return RegionResult(False, True)
         print(f"[{ver}] SHA1 FAIL", flush=True)
         return RegionResult(False)
-    print(f"[{ver}] SHA1 PASS", flush=True)
-    return RegionResult(True)
+    pass_line = f"[{ver}] SHA1 PASS"
+    print(pass_line, flush=True)
+    return RegionResult(True, pass_line=pass_line)
 
 
 def run_tests(invariants: bool) -> bool:
@@ -323,7 +407,22 @@ def main(argv: list[str] | None = None) -> int:
                   "`python tools/fix_delink_suffixes.py --fix`", flush=True)
             return 2 if suffixes.infrastructure else 1
 
-    region_results = [gate_region(ver, args.clean) for ver in regions]
+    if scope == "all":
+        saved = resume_regions(current_commit_sha(), clean=args.clean)
+        region_results: list[RegionResult] = []
+        for ver in regions:
+            if ver in saved:
+                print(f"[{ver}] SKIP — already verified at this commit: {saved[ver]}", flush=True)
+                region_results.append(RegionResult(True, pass_line=saved[ver]))
+                continue
+            result = gate_region(ver, args.clean)
+            region_results.append(result)
+            if result.ok and result.pass_line and worktree_clean():
+                sha = current_commit_sha()
+                if sha is not None:
+                    save_gate_state(sha, ver, result.pass_line)
+    else:
+        region_results = [gate_region(ver, args.clean) for ver in regions]
     failed = [ver for ver, result in zip(regions, region_results, strict=True)
               if not result.ok]
     infrastructure = any(result.infrastructure for result in region_results)

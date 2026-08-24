@@ -1218,7 +1218,7 @@ statement per run. No pin or lock change adopted in this PR.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-gate-resumability — a 40-minute gate is a terrible unit of work to lose [TODO]
+### q-gate-resumability — a 40-minute gate is a terrible unit of work to lose [DONE]
 
 `cm-main-exploit-drain-1` (#1524) lost roughly **2,500 build steps** to a
 mid-EUR interruption and adopted a workaround it then recommended to everyone:
