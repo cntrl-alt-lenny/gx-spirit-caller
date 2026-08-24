@@ -935,7 +935,7 @@ mapping. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-ledger-analytics-tool — commit the analysis that saved last round's headline [TODO]
+### q-ledger-analytics-tool — commit the analysis that saved last round's headline [DONE]
 
 Reviewing #1536, the brain wrote throwaway Python to bucket park `match_pct` by
 brief, and it changed the round's conclusion:
