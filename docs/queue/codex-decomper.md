@@ -779,7 +779,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-worktree-gc`; commit; then take the
 next queue item immediately.
 
-### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [TODO]
+### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [DONE]
 
 `cm-main-exploit-drain-2` (#1536) reported **0/40** on the 193-256 B band, then
 disclosed in prose that Part 2 candidates got roughly **one** fastmatch attempt
@@ -831,7 +831,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-ledger-effort-column`; commit; then
 take the next item immediately.
 
-### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [TODO]
+### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [DONE]
 
 Brain measured on `main`: **1,655 distinct `(module, addr)` pairs across 1,715
 rows — 57 pairs appear more than once.** `attempts.tsv` is an EVENT log by

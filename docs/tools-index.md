@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**138 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**139 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (64)
+- [Uncategorised](#uncategorised) (65)
 
 ## Analysis / worklist
 
@@ -498,6 +498,10 @@ This is visibility only: it never rejects a change.  It finds added or modified 
 **audit_callsite_arity.py -- cross-check declared arity against real CALL SITES.**
 
 Ported from khdays-decomp's `tools/audit_callsite_arity.py` (https://github.com/Yokimitsuro/khdays-decomp, CC0-1.0 -- see docs/research/data/khdays-callsite-arity-report-2026-07-25.md for the full attribution note this project's q-khdays…
+
+### `tools/audit_ledger_contradictions.py`
+
+**Audit repeated attempts.tsv events without treating repeats as duplicates.**
 
 ### `tools/batch_carve.py`
 
