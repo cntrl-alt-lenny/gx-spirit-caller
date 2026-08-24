@@ -1683,7 +1683,7 @@ ONE PR; verify every PR-body claim against `git diff --stat` before writing it �
 including the arithmetic, which is what slipped last round; `python
 tools/work_queue.py done claude-decomper cm-main-boundary-rerun`.
 
-### cm-main-band-followthrough — one bounded pilot at 257-320 B, framed as the test it actually is [TODO]
+### cm-main-band-followthrough — one bounded pilot at 257-320 B, framed as the test it actually is [DONE]
 
 **Rewritten 2026-08-24 by the brain after `cm-main-boundary-rerun` (#1545)
 answered, and after a finding that changes what this item should ask.**

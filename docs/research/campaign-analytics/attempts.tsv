@@ -1734,3 +1734,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02086d70	main	212	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
 0x021abbf0	ov008	236	default	unknown	parked	13.6	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
 0x021aaa80	ov020	252	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021b1ad8	ov008	316	default	unknown	parked	70.0	self-vs-scratch-register-swap	PROVISIONAL:register-choice	cm-main-band-followthrough	2
+0x021b476c	ov010	280	default	unknown	parked	4.2	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	cm-main-band-followthrough	1
+0x021ac920	ov000	264	default	unknown	parked	55.2	extra-2-register-cascade	PROVISIONAL:register-pressure/cascade	cm-main-band-followthrough	1
+0x021b6f08	ov016	260	default	unknown	parked	73.8	register-numbering-permutation-cascade	P-30	cm-main-band-followthrough	3
+0x022341c8	ov002	264	default	unknown	parked	unknown	P-20-row-offset	P-20	cm-main-band-followthrough	0
+0x0222427c	ov002	284	default	unknown	parked	unknown	P-20-row-offset	P-20	cm-main-band-followthrough	0
+0x021b429c	ov015	268	default	unknown	shipped	100.0	n/a		cm-main-band-followthrough	5
+0x021b4294	ov014	292	default	unknown	shipped	100.0	n/a		cm-main-band-followthrough	2
+0x022178fc	ov002	296	default	unknown	parked	2.6	reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	cm-main-band-followthrough	2

@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 410,626 | **17.21%** | 4,420 | 17.40% |
+| eur | 411,186 | **17.23%** | 4,420 | 17.42% |
 | usa | 282,428 | **11.84%** | 2,748 | 11.96% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
@@ -83,7 +83,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
-| 257-320 B | 431 | 123,900 |
+| 257-320 B | 422 | 121,376 |
 | 321-384 B | 277 | 97,324 |
 
 ## Data readability (EUR)

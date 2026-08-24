@@ -12279,6 +12279,128 @@ source-level control).
 
 **Provenance:** cm-main-tier-sweep-5 (2026-08-09), batch 5.
 
+## Band ship-rate closures (pool-exhaustion findings, not codegen walls)
+
+These are not compiler-behavior walls — they are findings about the
+**candidate pool**, not about mwcc. Recorded here (rather than left as
+research-doc prose that ages out of visibility) because a closed band
+re-opens in three months once nobody remembers it was tested, per
+`band-rate-vintage.md`'s standing rule: never quote a historical
+band/pool ship-rate as a forecast without re-deriving it against the
+current unattempted population.
+
+### BR-1. The 193-256 B `.text` band (EUR, `>=4 bl/blx`, unattempted): CLOSED
+
+**Two independent, disjoint-sample measurements, both near-zero:**
+
+| Round | n | Shipped | Ship rate | Effort/candidate | Median `match_pct` | `>=85%` | `<50%` |
+|---|---:|---:|---:|---|---:|---:|---:|
+| `cm-main-exploit-drain-2` Part 2 (2026-08-22, PR #1536) | 40 | 0 | 0.0% | ~1 fastmatch attempt each | 12.9% | 1/40 | 36/40 |
+| `cm-main-boundary-rerun` (2026-08-22, PR #1545) | 20 | 0 | 0.0% | 2-4+ fastmatch attempts each, real struct/register-order experiments | 5.2% | 2/20 | 16/20 |
+
+Zero address overlap between the two 40- and 20-candidate samples (verified
+directly), and zero overlap with `cm-main-tier-sweep-7`'s earlier 29
+candidates in this same band (8/29 = 27.6%, 2026-08-17) or with the
+`<=192 B` pool's own now-exhausted candidates. **Combined: 0/60 shipped
+across this band's entire tested-since-sweep-7 remainder.**
+
+The second measurement used *more* effort than the first (matched Part 1's
+2-4-iteration protocol, plus real bitfield/struct-layout/register-order
+experimentation — the C-95 bitfield lever alone moved one candidate from
+~50% to 87% mid-round) and still landed on a *lower* median (5.2% vs
+12.9%) and a *lower* ship rate (0% either way, but the distribution
+shifted further from tractable, not toward it). This is the opposite of
+what an under-iteration artifact looks like: more effort should raise a
+confounded number, not lower it. Two closest near-misses across both
+rounds (92.6%, 92.2%) both plateaued on a newly-confirmed register-choice
+wall (see `P-20-mode-switch-selector`, new this round) that resisted 5+
+independent source variations each.
+
+**Interpretation.** Sweep-7's 27.6% on this band was a true measurement of
+a real pool *at the time* — the campaign harvests in descending order of
+tractability, so sweep-7 took the easiest ~29 candidates first and shipped
+8 of them. What both #1536 and #1545 measured afterward is what sweep-7
+*declined*: the residue. A band's ship rate is a property of the pool at
+the moment it's measured, not a property of the band — see `BR-2` and
+`band-rate-vintage.md` for the general pattern, confirmed independently a
+second time by this same band's own two-stage collapse (27.6% → 12.9% →
+5.2% across three successive harvests).
+
+**Status: closed for this method generation.** No further ≤256 B
+candidates should be drawn without a new pool derivation proving the
+population has changed (e.g. new candidates surfacing from upstream
+symbol/rename work). The `<=192 B` sub-band is separately confirmed fully
+drained (0 unattempted `>=4 bl` candidates remain, per
+`cm-main-boundary-rerun`'s pool re-derivation at that item's `main`).
+
+**Provenance:** `cm-main-tier-sweep-7` (2026-08-17, PR unlisted here — see
+`cm-main-tier-sweep-series.md`); `cm-main-exploit-drain-2` (2026-08-22, PR
+#1536); `cm-main-boundary-rerun` (2026-08-22, PR #1545);
+`band-rate-vintage.md` (2026-08-24 brain finding).
+
+### BR-2. General rule: band/pool ship-rates are vintage-stamped
+
+Confirmed on two independent bands now: the 193-256 B collapse above
+(27.6% → 5.2-12.9%), and `cm-main-exploit-drain-2` Part 1's own `<=192 B`
+**tail** (32 reserve candidates left over from `cm-main-exploit-drain-1`)
+shipping 5/32 = 15.6%, against 73/100 = 73% on that same band's *fresh*
+pool exactly one round earlier — a 4.7x collapse from residue alone,
+recorded at the time in that PR's writeup but not generalized until
+`band-rate-vintage.md` named the pattern explicitly.
+
+**The rule:** never quote a historical band/pool ship-rate as a forecast
+for an *unattempted* population without re-deriving the rate against the
+population as it stands now. If the current population can't be sampled
+in the moment, name the quoted figure's vintage explicitly rather than
+presenting it as current. See `band-rate-vintage.md` for the full
+derivation and the `pool_freshness.py` precedent this extends from pool
+*sizes* to pool *ship rates*.
+
+### BR-3. The 257-320 B `.text` band (EUR, `>=4 bl/blx`, unattempted): PARTIAL SAMPLE, marginal signal, not a verdict
+
+`cm-main-band-followthrough` sampled n=20 from the unattempted 257-320 B
+pool (283 candidates / 81,680 B after the `>=4 bl/blx` filter; stratified
+by module, seed `20260824`), following BR-1/BR-2's warning not to trust
+sweep-7's 23.5% on this same nominal band (that figure is the same
+vintage as the 27.6% that collapsed to 0% in BR-1 — see `band-rate-vintage.md`).
+
+**Coverage is partial: 9/20 sampled candidates received a real attempt
+(build-tested or wall-recognized); 11/20 were read and set aside as
+disproportionately complex for this round's budget, without being built
+or marked attempted.** They remain in the unattempted pool, unchanged
+from before this round, available to a future round at full effort.
+
+| Outcome | n | Detail |
+|---|---|---|
+| Shipped | 2 | `func_ov015_021b429c` (100%, 5 attempts — control-flow guard chain, no arithmetic residue), `func_ov014_021b4294` (100%, 2 attempts — 4x `OS_SPrintf` + byte-extract shift-pair) |
+| Parked, build-tested | 5 | 70.0%, 73.8%, 55.2%, 4.2%, 2.6% match — a mix of resistant register-letter/permutation residuals (3 of 5) and genuine structural mismatches (2 of 5) |
+| Parked, wall-recognized (0 attempts) | 2 | `func_ov002_022341c8`, `func_ov002_0222427c` — both carry the confirmed P-20-row-offset `(self&1)*0x868` idiom against `data_ov002_022cf16c`/`022cf178` (cohort now 57); excluded on sight, not build-tested |
+| Not attempted | 11 | Read in full; each carries a specific complexity marker the shipped/near-miss candidates this round did not: nested loops with signed division (`asr`+`lsr` magic-constant idioms), multi-field `bic`/`orr` bitfield repacking into a stack config struct called twice, an RGB555 min/mid/max/hue selection network, or a jump-table dispatcher with a wall-contaminated case. See the round's research doc for the full per-candidate list and reasoning. |
+
+**On the 9 fully-processed candidates: 2/9 = 22.2%** — inside the
+pre-registered 10-25% "marginal" zone, not the 25%+ "band holds" zone.
+**This is not the round's verdict on the 257-320 B band**: the
+denominator the pre-registered thresholds were written against is the
+full n=20 sample, and only 9 of 20 were reached. Reporting 22.2% as if
+it settled the question would repeat, one level down, the exact mistake
+BR-2 exists to name — quoting a rate against the wrong population. What
+this round adds is a real (if incomplete) data point and two more
+confirmed ships, not a closed verdict either way.
+
+A pattern worth flagging for whoever finishes the sample: every
+candidate that shipped or came close (73.8%, 92.5% pre-fix) this round
+was control-flow/register-pressure-bound with simple arithmetic; every
+candidate set aside as too complex, and the two lowest-scoring
+build-tested parks (2.6%, structural stack-frame mismatch; 55.2%,
+extra-2-register cascade), involved either a loop or heavy bitfield
+packing. That correlation is suggestive, not proven — n=9 is too small
+to split by shape reliably — but it matches BR-1/BR-2's broader
+picture of a pool where the easy, arithmetically-simple members clear
+first, leaving loop-and-bitpack residue behind.
+
+**Provenance:** `cm-main-band-followthrough` (this PR), `attempts.tsv`
+rows tagged `cm-main-band-followthrough`, `band-rate-vintage.md`.
+
 ## Open questions (not levers, not walls — genuinely unresolved)
 
 ### OQ-1. Dead-branch preservation: a provably-dead compile-time-constant guard survives in the target but gets folded away by the same toolchain under every C reproduction tried
