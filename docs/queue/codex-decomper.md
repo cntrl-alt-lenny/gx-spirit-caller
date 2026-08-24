@@ -831,7 +831,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-ledger-effort-column`; commit; then
 take the next item immediately.
 
-### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [TODO]
+### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [DONE]
 
 Brain measured on `main`: **1,655 distinct `(module, addr)` pairs across 1,715
 rows — 57 pairs appear more than once.** `attempts.tsv` is an EVENT log by
