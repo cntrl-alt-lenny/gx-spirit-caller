@@ -1682,3 +1682,95 @@ current `main`.
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it —
 including the arithmetic, which is what slipped last round; `python
 tools/work_queue.py done claude-decomper cm-main-boundary-rerun`.
+
+### cm-main-band-followthrough — act on the re-run's answer, whichever way it lands [TODO]
+
+⚠️ **Do not start this until `cm-main-boundary-rerun` has a result.** This item
+is the follow-through for that experiment and its content depends on the
+answer. If you reach it with the re-run unmerged or inconclusive, say so and
+stop — that is the correct outcome, not a failure.
+
+`post-small-pool-strategy.md` pre-stages the fork; this item executes it.
+
+**If the re-run shipped >=25%** — the ~192 B cap was an effort artifact and the
+band is real work. Drain the 193-256 B band in bulk under the protocol that
+produced 73% on the small pool: frozen partitions written into the PR body,
+canary-first, both results ledgered, three single-region `--clean` gates. The
+band held **224 candidates / 50,548 B** at round 0822c and the re-run consumes
+20 of them. **Take as large a batch as you can gate cleanly** — this is
+mechanical drain work under a byte-exact gate, so batch size is throughput, not
+risk. Then probe 257-320 B with the same n=20 matched-effort pattern before
+stepping into it. Never step two bands on one band's evidence.
+
+**If the re-run shipped <=10%** — the cap is real at matched effort and the
+small-code frontier is closed for this method generation. Do **not** grind the
+band. Instead:
+
+1. Write the closure into `codegen-walls.md` with the evidence from both runs,
+   so nobody re-opens it in three months. A closed tier recorded with its
+   evidence is a permanent saving.
+2. Take the **257-512 B bounded pilot**, n=25, m2c-as-draft-assist plus human
+   judgment (the post-#1515 m2c, which fixed a real stack-argument
+   misresolution). Kill criterion stated in advance: **<15% ships means the
+   tier is closed for this method generation** — write that result to the
+   catalog too, and do not iterate past it hunting for a better number.
+
+**If it landed between 10% and 25%** — the band is workable but poor. Report
+the number, take a modest batch, and let the measured rate speak for itself
+against the data lane's, which is currently shipping a far better return per
+hour of machine time.
+
+**In every branch, the protocol per candidate is fixed at 2-4 real
+iterations.** cntrl_alt_lenny has asked the fleet to take on more work, and for
+mechanical drain that means bigger batches. It does **not** mean thinner
+attempts: #1536 produced an uninterpretable 0/40 precisely because per-candidate
+effort was cut to fit a round, and the campaign spent a whole experiment
+learning nothing. Scale by taking more candidates, never by trying less hard on
+each. If you cannot do both, do fewer candidates properly and say so.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs with
+all three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, and `gate3.py --scope tests`. `git restore assets/`
+after each clean run. Dedup touched delinks against current `main`.
+
+ONE PR; verify every claim against `git diff --stat` including the arithmetic;
+`python tools/work_queue.py done claude-decomper cm-main-band-followthrough`.
+
+### cm-513-1023-census — settle a disagreement nobody has measured [TODO]
+
+⚠️ Take this only after `cm-main-band-followthrough`, and only if that item did
+not open a large band to drain. If the band is live, draining it is worth more
+than this census and you should say so and stop here.
+
+`post-small-pool-strategy.md` flags a cheap, high-information probe that has
+never been run: the **513-1023 B** band carries a recorded model-vs-observed
+disagreement, and above it sits a hard empirical fact — **zero functions over
+1024 B have ever matched in this campaign.** Nobody has established whether
+513-1023 B behaves like the tractable bands below it or like the dead zone
+above it.
+
+This is a **census plus a small pilot**, not a drain:
+
+1. Enumerate the band honestly — candidate count and bytes at `<=1023` minus
+   `<=512`, using `wall_aware_headroom.scan()` (and the pool-freshness tool if
+   it has merged, but sanity-check its scope: #1534 was held for defaulting to
+   `main`-only, so verify any figure it gives you against `scan()` directly).
+2. Sample **n=15** across the band under the full 2-4 iteration protocol.
+   Fifteen is deliberately small — this is a probe to decide whether a real
+   pilot is justified, not the pilot itself.
+3. Report the rate with its confidence honestly. At n=15 almost nothing will be
+   statistically strong, and saying "this is suggestive, not significant" is the
+   correct write-up. This campaign has twice been saved by a lane declining to
+   over-claim a small sample.
+
+**The banked "4.2x model/observed disagreement" figure is round-0810-era.
+Re-derive it; do not quote it.** If it no longer reproduces, that itself is the
+finding.
+
+**Gate:** three `--clean` region gates with SHA1 PASS lines verbatim +
+`check_activation_invariant.py` + `check_delink_dupes.py` + `gate3.py --scope
+tests`. Ledger every candidate, shipped and parked.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper cm-513-1023-census`; then take the next
+item — report QUEUE-EMPTY honestly if you genuinely reach it.

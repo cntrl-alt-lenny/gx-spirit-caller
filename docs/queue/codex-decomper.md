@@ -778,3 +778,255 @@ worktrees KEEP). Build-free — fits kb-map.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-worktree-gc`; commit; then take the
 next queue item immediately.
+
+### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [TODO]
+
+`cm-main-exploit-drain-2` (#1536) reported **0/40** on the 193-256 B band, then
+disclosed in prose that Part 2 candidates got roughly **one** fastmatch attempt
+each against Part 1's **2-4**. That disclosure is the only reason the number
+wasn't spent — and it survived purely because one lane chose to write it down.
+The brain could partly reconstruct the picture from `match_pct` distributions,
+but only partly, and `match_pct` is itself a free-text field the agent supplies.
+
+**The ledger has ten columns and not one of them records effort:**
+
+```text
+addr  module  text_size  tier  shape  result  match_pct  park_class  park_family  brief
+```
+
+So "how hard did we actually try?" is structurally unmeasurable across 1,715
+rows, and every ship-rate this campaign quotes silently assumes constant effort
+per candidate. It has not been constant, and we now know of at least one round
+where it wasn't.
+
+**Add an `attempts` integer column** (draft-compile/fastmatch iterations for
+that candidate in that brief) and wire it through **both** recorders —
+`park_one.py` and `record_shipped.py`. Requirements:
+
+1. **Append-safe.** `attempts.tsv` is a live, append-only, 1,715-row artifact
+   that three lanes write concurrently. Adding a column must not invalidate a
+   single existing row. Existing rows have no value: leave them **empty**, do
+   NOT backfill a guess — an invented 1 is worse than a blank, and the
+   `-backfilled` provenance convention from `q-ledger-ship-coverage` is the
+   precedent for how absence gets recorded.
+2. **Default is empty, not zero.** Zero means "tried zero times", which is a
+   real and different claim from "not recorded".
+3. `validate_attempts.py` accepts blank, rejects non-integer, and does **not**
+   assert any cardinality (0-for-3 class; the merged AST guard from #1530 will
+   fail your PR if you hardcode repo-state constants).
+4. Update the ledger's own schema documentation in the same PR.
+
+**Canary:** record one parked and one shipped row with `attempts=3`, read both
+back, and show a pre-existing row still validating with the column blank. Paste
+all three.
+
+**Tooling budget:** catches a demonstrated failure class — the round-0822c
+confound, which cost a full 40-candidate experiment.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the canary.
+Build-free.
+
+ONE PR; verify every PR-body claim against `git diff --stat`; `python
+tools/work_queue.py done codex-decomper q-ledger-effort-column`; commit; then
+take the next item immediately.
+
+### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [TODO]
+
+Brain measured on `main`: **1,655 distinct `(module, addr)` pairs across 1,715
+rows — 57 pairs appear more than once.** `attempts.tsv` is an EVENT log by
+design (`q-ledger-event-semantics` established that a second event is legal), so
+repeats are expected: park-then-ship is the normal life of a candidate that a
+later round cracked. But nobody has ever checked which of the 57 are legitimate
+sequences and which are contradictions.
+
+Classify every one of the 57:
+
+- **Legitimate** — e.g. `parked` in an early brief, `shipped` in a later one;
+  or two parks with different `park_class` from genuinely different attempts.
+- **Contradictory** — `shipped` twice; `shipped` then `parked` with no
+  intervening re-attempt (a ship that silently regressed, or a mis-recorded
+  row); or two rows in the **same** brief with different `result`.
+- **Ambiguous** — say so and show the rows rather than forcing a call.
+
+Then add the audit as a check that runs over the live ledger. ⚠️ Assert the
+SHAPE of a contradiction, never the count — 57 will change next round and a
+hardcoded 57 is exactly the class the merged guard rejects.
+
+**Watch for the trap this campaign already hit once:** an apparent contradiction
+may be a *module-key* artifact rather than a real one — the same address can
+exist in `main` and in a region-specific tree, and `_normalise_attempt_addr` /
+the selector's module key have crossed before. Check that before calling
+anything contradictory.
+
+**Tooling budget:** catches a demonstrated failure class (ledger integrity is
+what every ship-rate in the campaign rests on).
+
+**Gate:** pytest + unittest green (paste both tails) + `ruff check` clean + the
+full 57-row classification pasted with counts per bucket. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-tentative-wall-audit — nine walls are stuck at "tentative" and the evidence to settle some may already exist [TODO]
+
+`codegen-walls.md` currently carries **nine** LIVE-tentative walls: P-23, P-24,
+P-28, P-29, P-30, P-33, P-34, P-35, P-37. The catalog's own convention promotes
+tentative → confirmed at **n=3** members. Every sweep since has been recording
+parks with `park_class` values that name these families — so for at least some
+of them, the third member may already be sitting in the ledger, unclaimed.
+
+This is a **read-only reconciliation**, not new decomp work: for each of the
+nine, cross-reference the catalog's affected-picks list against every
+`park_class` / `park_family` value in `attempts.tsv`, and report per wall:
+
+- current cited member count,
+- ledger rows that name the family but are NOT in the catalog's list,
+- whether that pushes it to n>=3 (→ **promote**, with the evidence),
+- or whether the ledger rows are actually a *different* symptom wearing the same
+  tag (→ say so; do NOT promote on a tag match alone — read the rows).
+
+**P-23 is the cautionary case and must be handled explicitly:** it was
+*downgraded* confirmed→tentative in #1524 when `func_ov002_02253304` shipped
+clean via an unrelated fix, dropping it to n=2. A tag-match promotion that
+ignores that history would silently undo a correction the campaign paid for.
+
+Where the evidence genuinely isn't there, say "still n=2, needs a real
+attempt" — an honest short list of what remains unprovable is the deliverable
+just as much as any promotion.
+
+**Tooling budget:** directly ships bytes downstream — every confirmed wall
+sharpens `wall_aware_headroom.py`'s exclusion and stops future sweeps burning
+attempts on known-dead candidates.
+
+**Gate:** pytest + unittest green + `ruff check` clean + the nine-wall table
+pasted. If you commit a promotion, `codegen-walls.md` carries the evidence
+inline. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-park-class-drift-guard — new raw park_class values appear every round and are caught by hand [TODO]
+
+`tools/park_class_map.tsv` is the controlled vocabulary `q-park-class-remap`
+(#1511) established. It works, but it is maintained reactively: #1524 had to add
+three entries mid-round (`P-20-family`, `address-fold`, `scheduling-diff`), and
+PR #1536 added two more (`P-20-row-offset`, `P-23-tentative`). Each time the lane
+discovered the gap by watching its own test suite go red *after* the parks were
+already written.
+
+Make it a pre-commit-visible check instead of an after-the-fact failure: flag
+any `park_class` in the live ledger with no mapping entry, name the rows that
+introduced it, and suggest the closest existing family by string distance
+**without auto-adopting it** — the taxonomy call stays human. A lane should be
+able to run one command before opening its PR and see "you introduced 2 new raw
+values; here they are".
+
+⚠️ Do not auto-map. `q-park-class-remap` deliberately refused a wall family for
+`tool-anomaly` because it records a tooling discrepancy, not a codegen wall.
+An auto-mapper would have got that wrong, and a wrong mapping is invisible
+downstream in a way a missing one is not.
+
+**Tooling budget:** measurably cuts cycle time (removes a recurring mid-round
+red) and catches a demonstrated failure class (five unmapped values across two
+rounds).
+
+**Gate:** pytest + unittest green + `ruff check` clean + a demonstration on a
+deliberately-introduced fake value, shown flagged and then shown clean after
+mapping. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-ledger-analytics-tool — commit the analysis that saved last round's headline [TODO]
+
+Reviewing #1536, the brain wrote throwaway Python to bucket park `match_pct` by
+brief, and it changed the round's conclusion:
+
+```text
+Part 1 (<=192B tail, 2-4 attempts):  n=27  median 17.8%  >=85%: 2   <50%: 19
+Part 2 (193-256B, ~1 attempt):       n=40  median 12.9%  >=85%: 1   <50%: 36
+```
+
+That distribution is what separated "under-iterated" from "genuinely hard" — a
+pile of high-percentage near-misses would have meant the first, and it isn't
+there. The analysis then evaporated into a chat message.
+
+Commit it as `tools/ledger_analytics.py`: given a brief filter (or a pair of
+briefs to compare), emit per-group n, median/mean `match_pct`, the count at
+`>=85%` / `>=75%` / `<50%`, the `park_class` breakdown, and shipped bytes.
+Comparison mode should print both groups side by side, because the comparison is
+where the signal was.
+
+**State the caveat in the tool's own output, not just its docs:** `match_pct` is
+agent-reported (`park_one.py` takes it as a free-text argument), so it is
+evidence, not proof; a comparison is only meaningful when both groups were
+recorded by the same lane under the same convention. A tool that prints
+authoritative-looking statistics over a self-reported field must say so on every
+run. Once `q-ledger-effort-column` lands, group by `attempts` too — that turns
+the inference into a measurement.
+
+**Tooling budget:** consolidates duplicated infrastructure (the brain re-derives
+this by hand every review) and catches a demonstrated failure class.
+
+**Gate:** pytest + unittest green + `ruff check` clean + the tool reproducing
+the two-row table above from the live ledger (state your commit; the numbers
+move as lanes append). Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-walls-catalog-index — 13,561 lines with no way in [TODO]
+
+`docs/research/codegen-walls.md` is **13,561 lines**. It is the campaign's most
+load-bearing document — every sweep consults it, `wall_aware_headroom.py`
+depends on its citations, and #1524 found two members catalogued in it that the
+tooling could not see. It has no index.
+
+Generate one (`tools/generate_walls_index.py`, written into the document or a
+sibling): every P-NN and C-NN with its status (LIVE / tentative / retracted),
+member count, one-line symptom, and line anchor. Derive all of it from the
+document — do not maintain a parallel hand-written list, which would drift
+within one round.
+
+Add the freshness guard the same way `docs/state-table.md` does it: a stale
+committed index fails the suite. **Mirror that existing mechanism rather than
+inventing a new one**, and assert shape, not counts.
+
+**Tooling budget:** measurably cuts cycle time — every wall lookup today is a
+grep through 13.5k lines, and mis-citation has already cost this campaign real
+attempts.
+
+**Gate:** pytest + unittest green + `ruff check` clean + markdownlint clean on
+the generated file + the freshness guard shown RED against a deliberately-stale
+index. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-worktree-gc-mac-parity — the tool you just shipped has an unverified half [TODO]
+
+`tools/worktree_gc.py` (#1540) is correct on Windows: the REPORT canary
+classified all five standing worktrees KEEP, reported four orphan directories,
+and removed nothing. Its keep-set matches on basename specifically so the Mac
+layout works too — but no Mac has ever run it, so that half is **asserted, not
+verified**, and this project has been burned by exactly that asymmetry before
+(the round-0817 "three missed rounds" misread, and #1520's machine-local SHA).
+
+Make the Mac path testable without a Mac: drive the classifier over a synthetic
+worktree tree laid out in the Mac convention
+(`~/Dev/spirit-caller/{brain,decomper,scaffolder,codex-decomper-queue,codex-scaffolder-queue}`)
+and assert the same KEEP/REMOVABLE/HELD outcomes. The Mac lane names differ from
+the Windows ones — `codex-decomper-queue` / `codex-scaffolder-queue` versus
+`kb-map` / `kb-types` — so a basename keep-set that only knows the Windows names
+would silently classify two live Mac lanes as REMOVABLE. **That is the bug this
+item exists to prevent, and if it is already present, it is a real one: say so
+and fix it.**
+
+Also add `--keep` coverage: an operator-supplied name must survive even when the
+branch is merged and the tree is clean.
+
+**Tooling budget:** catches a demonstrated failure class (cross-machine
+assumptions that hold on one host and not the other).
+
+**Gate:** pytest + unittest green + `ruff check` clean + the synthetic Mac-layout
+test, shown RED against the current keep-set if it is indeed Windows-only.
+Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
+the next item — and report QUEUE-EMPTY honestly if you genuinely reach it.

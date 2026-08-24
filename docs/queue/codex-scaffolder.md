@@ -1163,3 +1163,143 @@ incident types cited above, two of them this week.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-make-kickoff-generator`; commit;
 then take the next queue item immediately.
+
+### q-wine-link-concurrency — the one experiment that could widen the machine's real bottleneck [TODO]
+
+This is the highest-leverage item in your queue, because it targets the
+constraint that actually caps this project's throughput.
+
+`docs/state.md`'s own next-brain notes record the finding and then leave it
+open, verbatim: per-worktree `WINEPREFIX`es already parallelise *compilation*
+(**3.66x at 4 lanes**, briefs 608/614), and `tools/wine_link_lock.py` is
+**correctly scoped** — only the final `mwld` link serialises. But:
+*"wider-than-2-way concurrent linking was never tested. That test is the next
+experiment if anyone wants one."* Nobody has run it. Meanwhile every round the
+brain serialises the two CC lanes' 3-region gates (~40 min each, machine-wide)
+and tells one lane to poll while the other builds.
+
+**Run the experiment.** Measure link-step wall time at 1, 2, 3 and 4 concurrent
+linkers and find out whether the lock can widen, and if so how far:
+
+1. Read `wine_link_lock.py` first and state what it actually serialises and why.
+   The lock exists for a reason and that reason must be in your writeup before
+   you touch anything.
+2. Measure. Repeat each width enough to separate signal from noise, and report
+   raw numbers, not just a ratio.
+3. **Failure is the expected outcome and is a full result.** If 3-way or 4-way
+   linking corrupts output, deadlocks, or produces a non-deterministic ROM, that
+   is the answer — write it into the catalog so nobody re-runs this in three
+   months. Do NOT relax the lock on a green 2-way run and call it proven.
+4. If it *does* widen safely, propose the change but **do not adopt it in this
+   PR.** A change to link serialisation can corrupt a build in ways the 3-region
+   gate catches only intermittently, and this worktree cannot run that gate.
+   Adoption is a separate, brain-gated item.
+
+⚠️ **Coordinate before you measure.** `kb-types` has the EUR baserom so you can
+drive real links, but the mwcc toolchain is machine-wide and both CC lanes gate
+on it. Run `tasklist | grep -iE 'mwcc|mwld|mwasm|ninja'` first, and if either CC
+lane is building, **wait or defer this item and take the next one** rather than
+contending — a timing experiment on a contended machine measures nothing. State
+the machine's contention status for every measurement in the PR.
+
+**Tooling budget:** measurably cuts cycle time. This is the item most likely to
+raise the ceiling on how much work the whole fleet can do per round.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green + `ruff check` clean + the raw timing table + the contention
+statement per run. No pin or lock change adopted in this PR.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-gate-resumability — a 40-minute gate is a terrible unit of work to lose [TODO]
+
+`cm-main-exploit-drain-1` (#1524) lost roughly **2,500 build steps** to a
+mid-EUR interruption and adopted a workaround it then recommended to everyone:
+run the final gate as three separate `gate3.py --scope <region> --clean` calls
+rather than one `--scope all --clean`, because each region is then an
+independently redoable unit. Every kickoff since has repeated that as prose.
+Nobody has put it in the tool.
+
+Add real resumability to `tools/gate3.py`:
+
+1. `--scope all` records per-region completion — region, the commit sha it was
+   verified at, and the PASS line — to a small state file.
+2. A re-invocation at the **same sha with a clean tree** skips already-verified
+   regions and says so loudly, never silently.
+3. Any of: different sha, dirty tree, or missing state means **re-run
+   everything. Fail closed.** A gate that wrongly skips a region is far worse
+   than one that redundantly repeats it — this is the project's single
+   load-bearing check and a false PASS is the worst outcome in the system.
+4. `--clean` invalidates the state for the regions it cleans.
+
+The state file is a build artifact: gitignored, never committed, and its absence
+must be indistinguishable from "nothing verified".
+
+**Tooling budget:** measurably cuts cycle time — a resumed gate saves 13-40 min
+per interruption, and interruptions are routine (#1524 hit three in one round).
+
+**Gate:** pytest + unittest green + `ruff check` clean + a demonstration that a
+dirty tree and a changed sha each force a full re-run, both shown rather than
+asserted. You have the EUR baserom, so exercise the real EUR path at least once;
+the brain re-verifies 3-region at integration. Show the fail-closed cases RED
+first.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-dispatch-log-lint — the log only helps if it is actually appended [TODO]
+
+`docs/dispatch-log.md` was created in round 0822b to close the campaign's most
+persistent failure class: nobody knowing which machine a round ran on, and
+therefore whether a worktree or a session log is evidence. It works — round
+0822c's transcript audit was the first fully-executable one since 0817 because
+the log said where to look.
+
+But it is maintained by the brain remembering to append a row, and the brain's
+memory is exactly what the log exists to replace. Add a check: a PR that
+modifies `docs/state.md`'s "Last updated" block (a round doc-PR) must also add a
+`docs/dispatch-log.md` row whose round id does not already exist. Scope it
+narrowly — it must NOT fire on ordinary docs PRs, tooling PRs, or lane PRs that
+touch `state.md` incidentally.
+
+If you conclude the trigger cannot be identified reliably from the diff alone,
+say so with what you tried and propose the narrowest thing that does work. A
+guard that cries wolf on every lane PR is worse than no guard, and this lane has
+argued a well-reasoned negative before.
+
+**Tooling budget:** catches a demonstrated failure class — five distinct
+machine-locality incidents are enumerated in the log's own header.
+
+**Gate:** pytest + unittest green + `ruff check` clean + the check shown firing
+on a synthetic round-PR missing its row, and shown NOT firing on a synthetic
+tooling PR that edits `state.md` incidentally. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-required-checks-coverage-audit — four checks are required; are they the right four? [TODO]
+
+Round 0822b made `unittest` required (#1531) and it earned its place within
+hours: it caught a CI-shallow-clone test dependency on the very next
+integration, which a local pytest run could not see. The required set is now
+`Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`, `unittest`.
+
+Nobody has audited the remaining unrequired checks against the same question:
+which run on every PR, are cheap, and would have caught a real defect that
+reached `main`? Do that audit. Per currently-unrequired workflow report: whether
+it runs on every PR or is paths-filtered (a filtered check can NEVER be
+required — that is the PR #1365 deadlock, and `check_ci_contract.py` enforces
+it), its typical runtime, and whether repo history shows it failing on something
+that mattered.
+
+Deliver a ranked recommendation with evidence per candidate. **Do not change
+`required-checks.txt` or the ruleset** — that is a three-sided edit and
+cntrl_alt_lenny's call. #1531 is the worked example of how it is done and #1535
+is the worked example of the evidence that should precede it.
+
+**Tooling budget:** catches a demonstrated failure class — the #1520 and #1530
+defects both reached brain-integration because no required check covered them.
+
+**Gate:** pytest + unittest green + `ruff check` clean + the per-workflow table.
+Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
+the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
