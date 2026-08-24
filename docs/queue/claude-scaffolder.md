@@ -1813,7 +1813,7 @@ reconcile against the files you shipped, item by item, the way wave 9's
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
 `python tools/work_queue.py done claude-scaffolder cm-restock-carve-10`.
 
-### cm-restock-carve-11 — the two tranches your own census sized [TODO]
+### cm-restock-carve-11 — the two tranches your own census sized [DONE]
 
 `cm-restock-carve-10` (#1526) did what the brief asked and then some. Brain
 verified independently: **739 new `src/main/data/*.c`, declared array bytes
